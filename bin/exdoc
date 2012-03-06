@@ -1,0 +1,10 @@
+#!/usr/bin/env elixir
+Code.prepend_path File.expand_path("../../ebin", __FILE__)
+
+files = File.wildcard 'for_docs/*'
+
+docs = EDocs.get_docs(files, [])
+
+EDocs.generate_markdown(docs)
+
+# vim: ft=elixir:
