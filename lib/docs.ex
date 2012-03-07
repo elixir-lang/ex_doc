@@ -1,6 +1,6 @@
 defmodule ExDoc do
   def get_docs(files) do
-    List.reverse get_docs_from_files(files, [])
+    Enum.map files, get_docs_from_file(&1)
   end
 
   ####
@@ -20,13 +20,6 @@ defmodule ExDoc do
   ####
   # Helpers
   ####
-
-  defp get_docs_from_files([h|t], buffer) do
-    buffer = [get_docs_from_file(h)|buffer]
-    get_docs_from_files(t, buffer)
-  end
-
-  defp get_docs_from_files([], buffer), do: buffer
 
   defp get_docs_from_file(file) do
     module_name = get_module_name(file)
@@ -49,6 +42,7 @@ defmodule ExDoc do
     ''
   end
 
+  # TODO: Refactor this method to use Enum.map
   defp generate_markdown_for_docs([h|t], buffer) do
     buffer = buffer ++ extract_docs(h)
     generate_markdown_for_docs(t, buffer)
@@ -59,6 +53,7 @@ defmodule ExDoc do
     buffer
   end
 
+  # TODO: Refactor this method to use string interpolation
   defp extract_docs({ { name, arity }, _line, _type, doc }) do
     to_char_list(name) ++ '/' ++ to_char_list(arity) ++ '\n' ++ to_char_list(doc) ++ '\n'
   end
