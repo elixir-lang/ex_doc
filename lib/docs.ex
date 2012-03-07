@@ -1,16 +1,9 @@
 defmodule ExDoc do
   def get_docs(files) do
-    get_docs(files, [])
+    List.reverse get_docs_from_files(files, [])
   end
 
-  def get_docs([h|t], buffer) do
-    buffer = get_docs_0(h, buffer)
-    get_docs(t, buffer)
-  end
-
-  def get_docs([], buffer) do
-    buffer
-  end
+  ####
 
   def generate_markdown([{name,{ moduledoc, docs }}|t]) do
     buffer = generate_markdown_for_moduledoc(moduledoc) ++
@@ -25,16 +18,26 @@ defmodule ExDoc do
   end
 
   ####
+  # Helpers
+  ####
 
-  defp get_docs_0(file, buffer) do
-    name = get_module_name(file)
-    module = :"#{name}"
+  defp get_docs_from_files([h|t], buffer) do
+    buffer = [get_docs_from_file(h)|buffer]
+    get_docs_from_files(t, buffer)
+  end
+
+  defp get_docs_from_files([], buffer), do: buffer
+
+  defp get_docs_from_file(file) do
+    module_name = get_module_name(file)
+    module = :"#{module_name}"
     moduledoc = module.__info__(:moduledoc)
     docs = module.__info__(:docs)
-    List.append buffer, [{ name, { moduledoc, docs } }]
+    { module_name, { moduledoc, docs } }
   end
 
   defp get_module_name(name) do
+    # TODO: Create an Elixir wrapper to this Erlang function
     :filename.basename(name, '.beam')
   end
 
