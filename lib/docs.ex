@@ -1,4 +1,8 @@
-defmodule EDocs do
+defmodule ExDoc do
+  def get_docs(files) do
+    get_docs(files, [])
+  end
+
   def get_docs([h|t], buffer) do
     buffer = get_docs_0(h, buffer)
     get_docs(t, buffer)
@@ -24,18 +28,14 @@ defmodule EDocs do
 
   defp get_docs_0(file, buffer) do
     name = get_module_name(file)
-    module = list_to_atom(name)
+    module = :"#{name}"
     moduledoc = module.__info__(:moduledoc)
     docs = module.__info__(:docs)
     List.append buffer, [{ name, { moduledoc, docs } }]
   end
 
-  defp get_module_name('samples/for_docs/' ++ name) do
-    get_module_name_0(List.reverse(name))
-  end
-
-  defp get_module_name_0('maeb.' ++ name) do
-    List.reverse(name)
+  defp get_module_name(name) do
+    :filename.basename(name, '.beam')
   end
 
   defp generate_markdown_for_moduledoc({_line, doc}) do
