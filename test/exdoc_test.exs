@@ -21,4 +21,16 @@ defmodule ExDocTest do
     { _, doc_text } = moduledoc
     assert_nil doc_text
   end
+
+  test "get_docs returns the doc info for each module function" do
+    file = File.expand_path("../fixtures/::Enum.beam", __FILE__)
+    [{ _, {_, doc} }] = ExDoc.get_docs([file])
+    assert_equal 20, length(doc)
+  end
+
+  test "get_docs returns an empty list if there's no docs info" do
+    file = File.expand_path("../fixtures/::ArgumentError.beam", __FILE__)
+    [{ _, {_, doc} }] = ExDoc.get_docs([file])
+    assert_empty doc
+  end
 end
