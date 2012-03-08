@@ -5,16 +5,8 @@ defmodule ExDoc do
 
   ####
 
-  def generate_markdown([{name,{ moduledoc, docs }}|t]) do
-    buffer = generate_markdown_for_moduledoc(moduledoc) ++
-      generate_markdown_for_docs(docs, '')
-
-    Erlang.file.write_file('html/' ++ name ++ '.md', list_to_binary(buffer))
-
-    generate_markdown t
-  end
-
-  def generate_markdown([]) do
+  def generate_markdown(docs) do
+    Enum.map docs, write_markdown_to_file(&1)
   end
 
   ####
@@ -32,6 +24,13 @@ defmodule ExDoc do
   defp get_module_name(name) do
     # TODO: Create an Elixir wrapper to this Erlang function
     :filename.basename(name, '.beam')
+  end
+
+  defp write_markdown_to_file({name,{ moduledoc, docs }}) do
+    buffer = "#{generate_markdown_for_moduledoc(moduledoc)}\n#{generate_markdown_for_docs(docs, '')}"
+    path = File.expand_path("../../output/#{name}.md", __FILE__)
+
+    Erlang.file.write_file(path, buffer)
   end
 
   defp generate_markdown_for_moduledoc({_line, doc}) do

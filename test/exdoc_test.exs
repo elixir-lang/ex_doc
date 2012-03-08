@@ -76,4 +76,42 @@ defmodule ExDocTest do
       :os.cmd('rm -rf #{tmp}')
     end
   end
+
+  test "generate_markdown generates the markdown file with the documentation" do
+    tmp = File.expand_path("../tmp", __FILE__)
+    output_dir = File.expand_path("../../output", __FILE__)
+
+    try do
+      :file.make_dir(tmp)
+      :file.make_dir(output_dir)
+
+      file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
+      docs = ExDoc.get_docs([file])
+      ExDoc.generate_markdown(docs)
+      path = output_dir <> "/::CompiledWithDocs.md"
+      assert :filelib.is_file(path)
+    after:
+      :os.cmd('rm -rf #{tmp}')
+      :os.cmd('rm -rf #{output_dir}')
+    end
+  end
+
+  test "generate_markdown outputs the correct content" do
+    tmp = File.expand_path("../tmp", __FILE__)
+    output_dir = File.expand_path("../../output", __FILE__)
+
+    try do
+      :file.make_dir(tmp)
+      :file.make_dir(output_dir)
+
+      file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
+      docs = ExDoc.get_docs([file])
+      ExDoc.generate_markdown(docs)
+      path = output_dir <> "/::CompiledWithDocs.md"
+      assert_match { :ok, "moduledoc\nexample/0\nSome example\n" }, :file.read_file(path)
+    after:
+      :os.cmd('rm -rf #{tmp}')
+      :os.cmd('rm -rf #{output_dir}')
+    end
+  end
 end
