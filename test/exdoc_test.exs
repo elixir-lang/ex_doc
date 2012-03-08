@@ -57,7 +57,7 @@ defmodule ExDocTest do
 
       file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
       [{ _, {_, doc} }] = ExDoc.get_docs([file])
-      assert_match [{_, _, _, "Some example"}], doc
+      assert_match [{ {:example, 0}, 5, :def, "Some example"}, { {:"example_1", 0}, 8, :def, "Another example"}], doc
     after:
       :os.cmd('rm -rf #{tmp}')
     end
@@ -108,7 +108,7 @@ defmodule ExDocTest do
       docs = ExDoc.get_docs([file])
       ExDoc.generate_markdown(docs)
       path = output_dir <> "/::CompiledWithDocs.md"
-      assert_match { :ok, "moduledoc\nexample/0\nSome example\n" }, :file.read_file(path)
+      assert_match { :ok, "moduledoc\nexample/0\nSome example\nexample_1/0\nAnother example\n" }, :file.read_file(path)
     after:
       :os.cmd('rm -rf #{tmp}')
       :os.cmd('rm -rf #{output_dir}')
