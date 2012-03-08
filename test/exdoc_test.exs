@@ -4,33 +4,76 @@ defmodule ExDocTest do
   use ExUnit::Case
 
   test "get_docs returns the module name" do
-    file = File.expand_path("../fixtures/::Enum.beam", __FILE__)
-    assert_match [{ "::Enum", _ }], ExDoc.get_docs([file])
+    tmp = File.expand_path("../tmp", __FILE__)
+    path = File.expand_path("../fixtures/compiled_with_docs.ex", __FILE__)
+
+    try do
+      :file.make_dir(tmp)
+      Code.compile_file_to_dir(path, tmp, docs: true)
+      Code.prepend_path(tmp)
+
+      file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
+      assert_match [{ "::CompiledWithDocs", _ }], ExDoc.get_docs([file])
+    after:
+      :os.cmd('rm -rf #{tmp}')
+    end
   end
 
   test "get_docs returns the moduledoc info" do
-    file = File.expand_path("../fixtures/::Enum.beam", __FILE__)
-    [{ _, {moduledoc, _} }] = ExDoc.get_docs([file])
-    { _, doc_text } = moduledoc
-    assert is_binary(doc_text)
+    tmp = File.expand_path("../tmp", __FILE__)
+
+    try do
+      :file.make_dir(tmp)
+
+      file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
+      [{ _, {moduledoc, _} }] = ExDoc.get_docs([file])
+      assert_match { 1, "moduledoc" }, moduledoc
+    after:
+      :os.cmd('rm -rf #{tmp}')
+    end
   end
 
   test "get_docs returns nil if there's no moduledoc info" do
-    file = File.expand_path("../fixtures/::ArgumentError.beam", __FILE__)
-    [{ _, {moduledoc, _} }] = ExDoc.get_docs([file])
-    { _, doc_text } = moduledoc
-    assert_nil doc_text
+    tmp = File.expand_path("../tmp", __FILE__)
+    path = File.expand_path("../fixtures/compiled_without_docs.ex", __FILE__)
+
+    try do
+      :file.make_dir(tmp)
+      Code.compile_file_to_dir(path, tmp, docs: true)
+
+      file = File.expand_path("../tmp/::CompiledWithoutDocs.beam", __FILE__)
+      [{ _, {moduledoc, _} }] = ExDoc.get_docs([file])
+      assert_match { _, nil }, moduledoc
+    after:
+      :os.cmd('rm -rf #{tmp}')
+    end
   end
 
   test "get_docs returns the doc info for each module function" do
-    file = File.expand_path("../fixtures/::Enum.beam", __FILE__)
-    [{ _, {_, doc} }] = ExDoc.get_docs([file])
-    assert_equal 20, length(doc)
+    tmp = File.expand_path("../tmp", __FILE__)
+
+    try do
+      :file.make_dir(tmp)
+
+      file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
+      [{ _, {_, doc} }] = ExDoc.get_docs([file])
+      assert_match [{_, _, _, "Some example"}], doc
+    after:
+      :os.cmd('rm -rf #{tmp}')
+    end
   end
 
   test "get_docs returns an empty list if there's no docs info" do
-    file = File.expand_path("../fixtures/::ArgumentError.beam", __FILE__)
-    [{ _, {_, doc} }] = ExDoc.get_docs([file])
-    assert_empty doc
+    tmp = File.expand_path("../tmp", __FILE__)
+
+    try do
+      :file.make_dir(tmp)
+
+      file = File.expand_path("../tmp/::CompiledWithoutDocs.beam", __FILE__)
+      [{ _, {_, doc} }] = ExDoc.get_docs([file])
+      assert_empty doc
+    after:
+      :os.cmd('rm -rf #{tmp}')
+    end
   end
 end
