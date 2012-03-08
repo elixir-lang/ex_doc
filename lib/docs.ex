@@ -27,7 +27,7 @@ defmodule ExDoc do
   end
 
   defp write_markdown_to_file({name,{ moduledoc, docs }}) do
-    buffer = "#{generate_markdown_for_moduledoc(moduledoc)}\n#{generate_markdown_for_docs(docs, '')}"
+    buffer = "#{generate_markdown_for_moduledoc(moduledoc)}\n#{generate_markdown_for_docs(docs)}"
     path = File.expand_path("../../output/#{name}.md", __FILE__)
 
     Erlang.file.write_file(path, buffer)
@@ -41,19 +41,11 @@ defmodule ExDoc do
     ''
   end
 
-  # TODO: Refactor this method to use Enum.map
-  defp generate_markdown_for_docs([h|t], buffer) do
-    buffer = buffer ++ extract_docs(h)
-    generate_markdown_for_docs(t, buffer)
+  defp generate_markdown_for_docs(docs) do
+    Enum.map docs, extract_docs(&1)
   end
 
-  defp generate_markdown_for_docs(doc, buffer) when doc == nil \
-                                               when doc == [] do
-    buffer
-  end
-
-  # TODO: Refactor this method to use string interpolation
   defp extract_docs({ { name, arity }, _line, _type, doc }) do
-    to_char_list(name) ++ '/' ++ to_char_list(arity) ++ '\n' ++ to_char_list(doc) ++ '\n'
+    "#{name}/#{arity}\n#{doc}\n"
   end
 end
