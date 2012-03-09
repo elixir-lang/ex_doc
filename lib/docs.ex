@@ -22,8 +22,7 @@ defmodule ExDoc do
   end
 
   defp get_module_name(name) do
-    # TODO: Create an Elixir wrapper to this Erlang function
-    :filename.basename(name, '.beam')
+    File.basename(name, '.beam')
   end
 
   defp write_markdown_to_file({name,{ moduledoc, docs }}) do
