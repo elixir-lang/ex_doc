@@ -1,3 +1,5 @@
 ebin/
 html/
 test/tmp
+*.o
+*.so

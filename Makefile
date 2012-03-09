@@ -1,4 +1,25 @@
+CFLAGS=-g -O3 -fPIC
+LDFLAGS=-Isundown/src -Isundown/html
+ERLANG_FLAGS=-I/usr/local/Cellar/erlang/R15B/lib/erlang/erts-5.9/include
+CC=gcc
 EBIN_DIR=ebin
+
+SUNDOWN_SRC=\
+	    sundown/src/buffer.o\
+	    sundown/src/markdown.o\
+	    sundown/src/stack.o\
+	    sundown/src/autolink.o\
+	    sundown/html/html.o\
+	    sundown/html/html_smartypants.o\
+	    sundown/html/houdini_html_e.o\
+	    sundown/html/houdini_href_e.o
+
+NIF_SRC=\
+	src/markdown_nif.o
+
+markdown.so: $(SUNDOWN_SRC) $(NIF_SRC)
+	$(CC) $(CFLAGS) $(ERLANG_FLAGS) -dynamiclib -undefined dynamic_lookup -o share/$@ $(SUNDOWN_SRC) $(NIF_SRC)
+
 
 .PHONY: setup test clean
 
@@ -22,5 +43,10 @@ test: compile compile_test
 	@ echo
 
 clean:
+	rm -f sundown/src/*.o sundown/html/*.o src/*.o
+	rm markdown.so
 	rm -rf $(EBIN_DIR)
 	@ echo
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(ERLANG_FLAGS) -c -o $@ $^
