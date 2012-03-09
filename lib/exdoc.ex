@@ -28,6 +28,6 @@ defmodule ExDoc do
   end
 
   defp extract_docs({ { name, arity }, _line, _type, doc }) do
-    "#{name}/#{arity}\n#{doc}\n"
+    "\n<div>\n#{name}/#{arity}\n#{doc}\n</div>"
   end
 end
