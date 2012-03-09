@@ -10,8 +10,7 @@ defmodule ExDocTest do
       :file.make_dir(output_dir)
 
       file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
-      docs = ExDoc.get_docs([file])
-      ExDoc.generate_markdown(docs)
+      ExDoc.generate_markdown([file])
       path = output_dir <> "/::CompiledWithDocs.md"
       assert :filelib.is_file(path)
     after:
@@ -26,8 +25,7 @@ defmodule ExDocTest do
       :file.make_dir(output_dir)
 
       file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
-      docs = ExDoc.get_docs([file])
-      ExDoc.generate_markdown(docs)
+      ExDoc.generate_markdown([file])
       path = output_dir <> "/::CompiledWithDocs.md"
       assert_match { :ok, "moduledoc\nexample/0\nSome example\nexample_1/0\nAnother example\n" }, :file.read_file(path)
     after:

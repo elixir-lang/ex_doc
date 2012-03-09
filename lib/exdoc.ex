@@ -1,11 +1,6 @@
 defmodule ExDoc do
-  def get_docs(files) do
-    ExDoc::Retriever.get_docs(files)
-  end
-
-  ####
-
-  def generate_markdown(docs) do
+  def generate_markdown(files) do
+    docs = ExDoc::Retriever.get_docs(files)
     Enum.map docs, write_markdown_to_file(&1)
   end
 

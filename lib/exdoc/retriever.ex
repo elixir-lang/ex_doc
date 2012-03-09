@@ -3,11 +3,15 @@ defmodule ExDoc::Retriever do
     Enum.map files, get_docs_from_file(&1)
   end
 
+  # Helpers
+
   defp get_docs_from_file(file) do
     module_name = get_module_name(file)
     module = :"#{module_name}"
+
     moduledoc = module.__info__(:moduledoc)
     docs = module.__info__(:docs)
+
     { module_name, { moduledoc, docs } }
   end
 
