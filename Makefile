@@ -12,9 +12,13 @@ ebin: lib/*.ex lib/*/*.ex lib/*/*/*.ex
 	elixirc lib/*/*/*.ex lib/*/*.ex lib/*.ex -o ebin
 	@ echo
 
-test: compile
+compile_test:
+	@ rm -f test/tmp/*.beam
+	@ elixirc --docs test/fixtures/*.ex -o test/tmp
+
+test: compile compile_test
 	@ echo Running tests ...
-	time elixir "test/**/*_test.exs"
+	time elixir -pa test/tmp -pa ebin "test/**/*_test.exs"
 	@ echo
 
 clean:
