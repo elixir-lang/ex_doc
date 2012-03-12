@@ -17,13 +17,11 @@ SUNDOWN_SRC=\
 NIF_SRC=\
 	src/markdown_nif.o
 
-markdown.so: $(SUNDOWN_SRC) $(NIF_SRC)
-	$(CC) $(CFLAGS) $(ERLANG_FLAGS) -dynamiclib -undefined dynamic_lookup -o share/$@ $(SUNDOWN_SRC) $(NIF_SRC)
-
-
 .PHONY: setup test clean
 
 compile: ebin
+
+setup: markdown.so
 
 ebin: lib/*.ex lib/*/*.ex lib/*/*/*.ex
 	@ rm -f ebin/::*.beam
@@ -44,9 +42,12 @@ test: compile compile_test
 
 clean:
 	rm -f sundown/src/*.o sundown/html/*.o src/*.o
-	rm markdown.so
+	rm share/markdown.so
 	rm -rf $(EBIN_DIR)
 	@ echo
+
+markdown.so: $(SUNDOWN_SRC) $(NIF_SRC)
+	$(CC) $(CFLAGS) $(ERLANG_FLAGS) -dynamiclib -undefined dynamic_lookup -o share/$@ $(SUNDOWN_SRC) $(NIF_SRC)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(ERLANG_FLAGS) -c -o $@ $^
