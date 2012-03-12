@@ -1,5 +1,5 @@
 defmodule ExDoc do
-  def generate_markdown(files) do
+  def generate_html(files) do
     docs = ExDoc::Retriever.get_docs(files)
     Enum.map docs, write_markdown_to_file(&1)
   end
