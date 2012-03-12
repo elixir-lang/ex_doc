@@ -17,11 +17,11 @@ defmodule ExDoc do
   end
 
   defp generate_markdown_for_moduledoc({_line, doc}) do
-    to_char_list(doc)
+    doc
   end
 
   defp generate_markdown_for_moduledoc(nil) do
-    ''
+    ""
   end
 
   defp generate_markdown_for_docs(docs) do
