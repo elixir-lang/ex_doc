@@ -10,9 +10,10 @@ defmodule ExDoc do
 
   defp write_markdown_to_file({name,{ moduledoc, docs }}) do
     buffer = "#{generate_markdown_for_moduledoc(moduledoc)}\n#{generate_markdown_for_docs(docs)}"
-    path = File.expand_path("../../output/#{name}.md", __FILE__)
+    html = Markdown.to_html(buffer)
+    path = File.expand_path("../../output/#{name}.html", __FILE__)
 
-    Erlang.file.write_file(path, buffer)
+    Erlang.file.write_file(path, html)
   end
 
   defp generate_markdown_for_moduledoc({_line, doc}) do
