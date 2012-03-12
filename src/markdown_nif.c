@@ -8,7 +8,7 @@
 #include "html.h"
 #include "buffer.h"
 
-#define OUTPUT_SIZE 64 
+#define OUTPUT_SIZE 64
 
 struct sd_callbacks callbacks;
 struct sd_markdown *markdown;
@@ -33,7 +33,7 @@ static ERL_NIF_TERM to_markdown_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM
 
   enif_alloc_binary(sizeof(char)*(output->size), &output_binary);
   memset(output_binary.data, 0, output->size);
-  strcpy(output_binary.data, output->data); 
+  strcpy(output_binary.data, output->data);
 
   bufrelease(input);
   bufrelease(output);
@@ -46,5 +46,5 @@ static ErlNifFunc nif_funcs[] =
     {"to_html", 1, to_markdown_nif}
 };
 
-ERL_NIF_INIT(markdown,nif_funcs,NULL,NULL,NULL,NULL);
+ERL_NIF_INIT(::Markdown,nif_funcs,NULL,NULL,NULL,NULL);
 
