@@ -3,8 +3,6 @@ Code.prepend_path File.expand_path("../../ebin", __FILE__)
 
 files = File.wildcard 'samples/for_docs/*'
 
-docs = ExDoc.get_docs(files, [])
-
-ExDoc.generate_markdown(docs)
+ExDoc.generate_html(files)
 
 # vim: ft=elixir:
