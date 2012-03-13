@@ -23,15 +23,26 @@ defmodule ExDocTest do
 
     try do
       expected = """
+      <h1>::CompiledWithDocs</h1>
+      <div id="moduledoc">
       <p>moduledoc</p>
 
-      <div>
-      example/0
-      Some example
+      <h2>Example</h2>
+
+      <pre><code>CompiledWithDocs.example
+      </code></pre>
+
       </div>
-      <div>
+
+      <div id="example_0">
+      example/0
+      <p>Some example</p>
+
+      </div>
+      <div id="example_1_0">
       example_1/0
-      Another example
+      <p>Another example</p>
+
       </div>
       """
 

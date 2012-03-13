@@ -1,5 +1,10 @@
 defmodule CompiledWithDocs do
-  @moduledoc "moduledoc"
+  @moduledoc """
+  moduledoc
+
+  ## Example
+      CompiledWithDocs.example
+  """
 
   @doc "Some example"
   def example, do: 1
