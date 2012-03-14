@@ -47,7 +47,7 @@ defmodule ExDocTest do
       </code></pre>
 
               </div>
-              <div class="sectiontitle">Public functions</div>
+              <div class="sectiontitle">Functions</div>
               <div class="function"><div class="function-title" id="example_0">
       <b>example/0</b>
       </div>
