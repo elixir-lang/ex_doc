@@ -22,147 +22,147 @@ p {
 }
 
 h1 {
-    font-size: 2.1em;
-    font-weight: normal;
-    line-height: 1.2em;
-    margin: 1.4em 0 0.7em 0;
+  font-size: 2.1em;
+  font-weight: normal;
+  line-height: 1.2em;
+  margin: 1.4em 0 0.7em 0;
 }
 
 h2 {
-    font-size: 1.6em;
-    margin: 1.8em 0 0.8em 0;
-    font-weight: normal;
-    line-height: 1.2em;
+  font-size: 1.6em;
+  margin: 1.8em 0 0.8em 0;
+  font-weight: normal;
+  line-height: 1.2em;
 }
 
 h3 {
-    font-size: 1.4em;
-    color:#555;
-    margin: 1.4em 0 0.7em 0;
-    font-weight: normal;
+  font-size: 1.4em;
+  color:#555;
+  margin: 1.4em 0 0.7em 0;
+  font-weight: normal;
 }
 
 h4 {
-    margin: 1.4em 0 0.5em 0;
-    font-size: 1em;
+  margin: 1.4em 0 0.5em 0;
+  font-size: 1em;
 }
 
 table
 {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 
 td, th
 {
-    padding: 0 0.7em 0.3em 0;
+  padding: 0 0.7em 0.3em 0;
 }
 
 th
 {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .clear
 {
-    clear: both;
-    width: 0; height: 0;
+  clear: both;
+  width: 0; height: 0;
 }
 
 dt
 {
-    margin-bottom: 0.3em;
-    font-weight: bold;
+  margin-bottom: 0.3em;
+  font-weight: bold;
 }
 
 dd
 {
-    margin-left: 2em;
-    margin-bottom: 1em;
+  margin-left: 2em;
+  margin-bottom: 1em;
 }
 
 dd p
 {
-    margin-top: 0.6em;
+  margin-top: 0.6em;
 }
 
 li
 {
-    margin: 0 0 0.5em 2em;
+  margin: 0 0 0.5em 2em;
 }
 
 ul li
 {
-    list-style: disc;
+  list-style: disc;
 }
 
 ol li
 {
-    list-style: decimal;
+  list-style: decimal;
 }
 
 .banner
 {
-    background: #EDF3FE;
-    border-bottom: 1px solid #ccc;
-    padding: 1em 2em 0.5em 2em;
+  background: #EDF3FE;
+  border-bottom: 1px solid #ccc;
+  padding: 1em 2em 0.5em 2em;
 }
 .banner h1
 {
-    font-size: 1.2em;
-    margin: 0;
+  font-size: 1.2em;
+  margin: 0;
 }
 
 .banner h1 .type
 {
-    font-size: 0.833em;
-    display:block;
-    color: #666;
+  font-size: 0.833em;
+  display:block;
+  color: #666;
 }
 
 .banner ul
 {
-    margin-top: 0.3em;
-    margin-bottom: 0;
-    font-size: 0.85em;
+  margin-top: 0.3em;
+  margin-bottom: 0;
+  font-size: 0.85em;
 }
 
 .banner li
 {
-    list-style: none;
-    margin-left: 0;
-    margin-bottom: 0;
+  list-style: none;
+  margin-left: 0;
+  margin-bottom: 0;
 }
 
 pre
 {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 
 .functions dt
 {
-    width: 1em;
-    font-size: 1.5em;
-    color:#AAA;
-    position: absolute;
-    font-weight: normal;
-    margin: 0;
+  width: 1em;
+  font-size: 1.5em;
+  color:#AAA;
+  position: absolute;
+  font-weight: normal;
+  margin: 0;
 }
 
 .functions dd
 {
-    margin-left: 2.5em;
-    min-height: 1.8em;
-    -height: 1.8em;
-    padding-bottom: 0.8em;
+  margin-left: 2.5em;
+  min-height: 1.8em;
+  -height: 1.8em;
+  padding-bottom: 0.8em;
 }
 
 
 .functions ul li
 {
-    margin-right: 0.7em;
-    margin-left: 0;
-    list-style: none;
-    display: inline;
+  margin-right: 0.7em;
+  margin-left: 0;
+  list-style: none;
+  display: inline;
 }
 
 #content {
@@ -202,27 +202,27 @@ tt {
 }
 
 .function {
-    margin-bottom: 2em;
+  margin-bottom: 2em;
 }
 .function .description,
 .function .sourcecode
 {
-    margin-left: 1.2em;
+  margin-left: 1.2em;
 }
 .function h4
 {
-    border-bottom: 1px dotted #999;
-    padding: 0 0 0.2em 0;
-    margin-bottom: 0.8em;
-    font-size: 1.1em;
-    color:#333;
+  border-bottom: 1px dotted #999;
+  padding: 0 0 0.2em 0;
+  margin-bottom: 0.8em;
+  font-size: 1.1em;
+  color:#333;
 }
 .function .function-title {
-    border-bottom: 1px dotted #666;
-    padding: 0 0 0.15em 0;
-    margin: 0 0 0.5em 0;
-    font-size: 1.2em;
-    line-height: 1.25em;
+  border-bottom: 1px dotted #666;
+  padding: 0 0 0.15em 0;
+  margin: 0 0 0.5em 0;
+  font-size: 1.2em;
+  line-height: 1.25em;
 }
 
 .function .sourcecode p.source-link {
@@ -239,5 +239,5 @@ tt {
 
 .function .source-link
 {
-    font-size: 0.85em;
+  font-size: 0.85em;
 }
