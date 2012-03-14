@@ -27,7 +27,6 @@ defmodule ExDocTest do
       <html>
         <head>
           <title>::CompiledWithDocs</title>
-
           <meta charset="utf-8">
         </head>
 
@@ -43,12 +42,12 @@ defmodule ExDocTest do
 
           </div>
           <div id="example_0">
-      example/0
+      <strong>example/0</strong>
       <p>Some example</p>
 
       </div>
       <div id="example_1_0">
-      example_1/0
+      <strong>example_1/0</strong>
       <p>Another example</p>
 
       </div>

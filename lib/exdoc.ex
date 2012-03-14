@@ -34,6 +34,6 @@ defmodule ExDoc do
 
   defp extract_docs({ { name, arity }, _line, _type, doc }) do
     html = Markdown.to_html(doc)
-    "<div id=\"#{name}_#{arity}\">\n#{name}/#{arity}\n#{html}\n</div>\n"
+    "<div id=\"#{name}_#{arity}\">\n<strong>#{name}/#{arity}</strong>\n#{html}\n</div>\n"
   end
 end
