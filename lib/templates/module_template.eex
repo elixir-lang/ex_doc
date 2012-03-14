@@ -16,7 +16,7 @@
         <div id="moduledoc" class="description">
           <%= moduledoc %>
         </div>
-        <div class="sectiontitle">Public functions</div>
+        <div class="sectiontitle">Functions</div>
         <%= function_docs %>
       </div>
     </div>

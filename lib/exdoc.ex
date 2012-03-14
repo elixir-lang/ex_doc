@@ -12,22 +12,24 @@ defmodule ExDoc do
   ####
 
   defp move_css_files() do
-    css_source_path = File.expand_path("../templates/css/main.css", __FILE__)
-    css_path = File.expand_path("../../output/css", __FILE__)
-    F.make_dir(css_path)
-    F.copy(css_source_path, css_path <> "/main.css")
+    F.make_dir(output_path <> "/css")
+    F.copy(template_path <> "/css/main.css", output_path <> "/css/main.css")
   end
 
   defp write_html_to_file({name,{ moduledoc, docs }}) do
     function_docs = generate_html_for_docs(docs)
     moduledoc = generate_html_for_moduledoc(moduledoc)
-    path = File.expand_path("../../output/#{name}.html", __FILE__)
 
-    compiled = EEx.file(File.expand_path("../templates/module_template.eex", __FILE__))
     bindings = [name: name, moduledoc: moduledoc, function_docs: function_docs]
-    { result, _ } = Code.eval_quoted(compiled, bindings, __FILE__, __LINE__)
+    content = compile_template(bindings)
 
-    F.write_file(path, result)
+    F.write_file(output_path <> "/#{name}.html", content)
+  end
+
+  defp compile_template(bindings) do
+    compiled = EEx.file(template_path <> "/module_template.eex")
+    { content, _ } = Code.eval_quoted(compiled, bindings, __FILE__, __LINE__)
+    content
   end
 
   defp generate_html_for_moduledoc({_line, doc}) do
@@ -45,5 +47,13 @@ defmodule ExDoc do
   defp extract_docs({ { name, arity }, _line, _type, doc }) do
     html = Markdown.to_html(doc)
     "<div class=\"function\"><div class=\"function-title\" id=\"#{name}_#{arity}\">\n<b>#{name}/#{arity}</b>\n</div>\n<div class=\"description\">\n#{html}\n</div>\n</div>\n"
+  end
+
+  defp template_path() do
+    File.expand_path("../templates", __FILE__)
+  end
+
+  defp output_path() do
+    File.expand_path("../../output", __FILE__)
   end
 end
