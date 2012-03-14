@@ -33,17 +33,16 @@ defmodule ExDocTest do
 
         <body>
           <h1>::CompiledWithDocs</h1>
-      <div id="moduledoc">
-      <p>moduledoc</p>
+          <div id="moduledoc">
+            <p>moduledoc</p>
 
       <h2>Example</h2>
 
       <pre><code>CompiledWithDocs.example
       </code></pre>
 
-      </div>
-
-      <div id="example_0">
+          </div>
+          <div id="example_0">
       example/0
       <p>Some example</p>
 

@@ -9,18 +9,19 @@ defmodule ExDoc do
   ####
 
   defp write_html_to_file({name,{ moduledoc, docs }}) do
-    html = "<h1>#{name}</h1>\n#{generate_html_for_moduledoc(moduledoc)}\n#{generate_html_for_docs(docs)}\n"
+    function_docs = generate_html_for_docs(docs)
+    moduledoc = generate_html_for_moduledoc(moduledoc)
     path = File.expand_path("../../output/#{name}.html", __FILE__)
 
     compiled = EEx.file(File.expand_path("../templates/module_template.eex", __FILE__))
-    { result, _ } = Code.eval_quoted(compiled, [name: name, content: html], __FILE__, __LINE__)
+    bindings = [name: name, moduledoc: moduledoc, function_docs: function_docs]
+    { result, _ } = Code.eval_quoted(compiled, bindings, __FILE__, __LINE__)
 
     Erlang.file.write_file(path, result)
   end
 
   defp generate_html_for_moduledoc({_line, doc}) do
-    html = Markdown.to_html(doc)
-    "<div id=\"moduledoc\">\n#{html}\n</div>"
+    Markdown.to_html(doc)
   end
 
   defp generate_html_for_moduledoc(nil) do
@@ -33,6 +34,6 @@ defmodule ExDoc do
 
   defp extract_docs({ { name, arity }, _line, _type, doc }) do
     html = Markdown.to_html(doc)
-    "\n<div id=\"#{name}_#{arity}\">\n#{name}/#{arity}\n#{html}\n</div>"
+    "<div id=\"#{name}_#{arity}\">\n#{name}/#{arity}\n#{html}\n</div>\n"
   end
 end
