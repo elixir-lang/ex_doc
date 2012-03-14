@@ -12,7 +12,10 @@ defmodule ExDoc do
     html = "<h1>#{name}</h1>\n#{generate_html_for_moduledoc(moduledoc)}\n#{generate_html_for_docs(docs)}\n"
     path = File.expand_path("../../output/#{name}.html", __FILE__)
 
-    Erlang.file.write_file(path, html)
+    compiled = EEx.file(File.expand_path("../templates/module_template.eex", __FILE__))
+    { result, _ } = Code.eval_quoted(compiled, [name: name, content: html], __FILE__, __LINE__)
+
+    Erlang.file.write_file(path, result)
   end
 
   defp generate_html_for_moduledoc({_line, doc}) do

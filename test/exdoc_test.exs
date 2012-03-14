@@ -23,7 +23,16 @@ defmodule ExDocTest do
 
     try do
       expected = """
-      <h1>::CompiledWithDocs</h1>
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>::CompiledWithDocs</title>
+
+          <meta charset="utf-8">
+        </head>
+
+        <body>
+          <h1>::CompiledWithDocs</h1>
       <div id="moduledoc">
       <p>moduledoc</p>
 
@@ -44,6 +53,9 @@ defmodule ExDocTest do
       <p>Another example</p>
 
       </div>
+
+        </body>
+      </html>
       """
 
       :file.make_dir(output_dir)
