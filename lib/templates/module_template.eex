@@ -3,13 +3,22 @@
   <head>
     <title><%= name %></title>
     <meta charset="utf-8">
+    <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" charset="utf-8">
   </head>
 
   <body>
-    <h1><%= name %></h1>
-    <div id="moduledoc">
-      <%= moduledoc %>
+    <div class="banner">
+      <span>Elixir v0.9</span>
+      <h1><%= name %></h1>
     </div>
-    <%= function_docs %>
+    <div id="bodyContent">
+      <div id="content">
+        <div id="moduledoc" class="description">
+          <%= moduledoc %>
+        </div>
+        <div class="sectiontitle">Public functions</div>
+        <%= function_docs %>
+      </div>
+    </div>
   </body>
 </html>

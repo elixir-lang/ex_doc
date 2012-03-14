@@ -28,30 +28,45 @@ defmodule ExDocTest do
         <head>
           <title>::CompiledWithDocs</title>
           <meta charset="utf-8">
+          <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" charset="utf-8">
         </head>
 
         <body>
-          <h1>::CompiledWithDocs</h1>
-          <div id="moduledoc">
-            <p>moduledoc</p>
+          <div class="banner">
+            <span>Elixir v0.9</span>
+            <h1>::CompiledWithDocs</h1>
+          </div>
+          <div id="bodyContent">
+            <div id="content">
+              <div id="moduledoc" class="description">
+                <p>moduledoc</p>
 
       <h2>Example</h2>
 
       <pre><code>CompiledWithDocs.example
       </code></pre>
 
-          </div>
-          <div id="example_0">
-      <strong>example/0</strong>
+              </div>
+              <div class="sectiontitle">Public functions</div>
+              <div class="function"><div class="function-title" id="example_0">
+      <b>example/0</b>
+      </div>
+      <div class="description">
       <p>Some example</p>
 
       </div>
-      <div id="example_1_0">
-      <strong>example_1/0</strong>
+      </div>
+      <div class="function"><div class="function-title" id="example_1_0">
+      <b>example_1/0</b>
+      </div>
+      <div class="description">
       <p>Another example</p>
 
       </div>
+      </div>
 
+            </div>
+          </div>
         </body>
       </html>
       """

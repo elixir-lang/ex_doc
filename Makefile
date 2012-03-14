@@ -23,7 +23,7 @@ compile: ebin
 
 setup: markdown.so
 
-ebin: lib/*.ex lib/*/*.ex lib/*/*/*.ex
+ebin: $(shell find . -type f -name "*.ex")
 	@ rm -f ebin/::*.beam
 	@ echo Compiling ...
 	@ mkdir -p $(EBIN_DIR)
