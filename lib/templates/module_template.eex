@@ -18,6 +18,10 @@
         </div>
         <div class="sectiontitle">Functions</div>
         <%= function_docs %>
+        <% if macro_docs do %>
+          <div class="sectiontitle">Macros</div>
+          <%= macro_docs %>
+        <% end %>
       </div>
     </div>
   </body>

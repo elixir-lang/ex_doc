@@ -25,7 +25,7 @@ defmodule ExDoc::RetrieverTest do
   test "get_docs returns the doc info for each module function" do
     file = File.expand_path("../../tmp/::CompiledWithDocs.beam", __FILE__)
     [{ _, {_, doc} }] = R.get_docs([file])
-    assert_match [{ {:example, 0}, 10, :def, "Some example"}, { {:"example_1", 0}, 13, :def, "Another example"}], doc
+    assert_match [{ {:example, 0}, 10, :def, "Some example"}, { {:"example_1", 0}, 13, :defmacro, "Another example"}], doc
   end
 
   test "get_docs returns an empty list if there's no docs info" do

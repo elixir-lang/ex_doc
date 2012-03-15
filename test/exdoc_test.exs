@@ -56,7 +56,10 @@ defmodule ExDocTest do
 
       </div>
       </div>
-      <div class="function"><div class="function-title" id="example_1_0">
+
+              
+                <div class="sectiontitle">Macros</div>
+                <div class="function"><div class="function-title" id="example_1_0">
       <b>example_1/0</b>
       </div>
       <div class="description">
@@ -65,6 +68,7 @@ defmodule ExDocTest do
       </div>
       </div>
 
+              
             </div>
           </div>
         </body>
