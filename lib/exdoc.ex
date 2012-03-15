@@ -24,11 +24,28 @@ defmodule ExDoc do
   defp generate_seach_index(docs) do
     output_path = File.expand_path("../../output", __FILE__)
     modules = Enum.map docs, get_module(&1)
-    content = Enum.join(modules, ", ")
+    content = generate_html_from_modules(modules)
     Erlang.file.write_file(output_path <> "/index.html", content)
   end
 
   defp get_module({name, _}) do
     name
+  end
+
+  defp generate_html_from_modules(modules) do
+    modules = Enum.map modules, generate_list_item(&1)
+    bindings = [modules: modules]
+    compile_template(bindings)
+  end
+
+  defp compile_template(bindings) do
+    template_path = File.expand_path("../templates/index_template.eex", __FILE__)
+    compiled = EEx.compile(File.read!(template_path))
+    { content, _ } = Code.eval_quoted(compiled, bindings, __FILE__, __LINE__)
+    content
+  end
+
+  defp generate_list_item(module) do
+    "<li>#{module}</li>\n"
   end
 end

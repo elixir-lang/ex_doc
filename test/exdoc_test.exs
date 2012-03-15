@@ -24,12 +24,31 @@ defmodule ExDocTest do
     try do
       :file.make_dir(output_dir)
 
+      expected = """
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Modules</title>
+          <meta charset="utf-8">
+          <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" charset="utf-8">
+        </head>
+
+        <body>
+          <ul>
+            <li>::CompiledWithDocs</li>
+      <li>::CompiledWithoutDocs</li>
+
+          </ul>
+        </body>
+      </html>
+      """
+
       file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
       file_2 = File.expand_path("../tmp/::CompiledWithoutDocs.beam", __FILE__)
       ExDoc.generate_docs([file, file_2])
       path = output_dir <> "/index.html"
       generated = File.read!(path)
-      assert_equal "::CompiledWithDocs, ::CompiledWithoutDocs", generated
+      assert_equal expected, generated
     after:
       :os.cmd('rm -rf #{output_dir}')
     end
