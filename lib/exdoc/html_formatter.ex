@@ -27,12 +27,12 @@ defmodule ExDoc::HTMLFormatter do
     content
   end
 
-  defp generate_html_for_moduledoc({_line, doc}) do
-    Markdown.to_html(doc)
+  defp generate_html_for_moduledoc({_, nil}) do
+    nil
   end
 
-  defp generate_html_for_moduledoc(nil) do
-    ""
+  defp generate_html_for_moduledoc({_line, doc}) do
+    Markdown.to_html(doc)
   end
 
   defp generate_html_for_docs(docs) do

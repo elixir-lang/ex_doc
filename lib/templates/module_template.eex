@@ -13,12 +13,16 @@
     </div>
     <div id="bodyContent">
       <div id="content">
-        <div id="moduledoc" class="description">
-          <%= moduledoc %>
-        </div>
-        <div class="sectiontitle">Functions</div>
-        <%= function_docs %>
-        <% if macro_docs do %>
+        <% if moduledoc do %>
+          <div id="moduledoc" class="description">
+            <%= moduledoc %>
+          </div>
+        <% end %>
+        <% unless Enum.empty?(function_docs) do %>
+          <div class="sectiontitle">Functions</div>
+          <%= function_docs %>
+        <% end %>
+        <% unless Enum.empty?(macro_docs) do %>
           <div class="sectiontitle">Macros</div>
           <%= macro_docs %>
         <% end %>

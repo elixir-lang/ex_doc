@@ -38,17 +38,20 @@ defmodule ExDocTest do
           </div>
           <div id="bodyContent">
             <div id="content">
-              <div id="moduledoc" class="description">
-                <p>moduledoc</p>
+              
+                <div id="moduledoc" class="description">
+                  <p>moduledoc</p>
 
       <h2>Example</h2>
 
       <pre><code>CompiledWithDocs.example
       </code></pre>
 
-              </div>
-              <div class="sectiontitle">Functions</div>
-              <div class="function"><div class="function-title" id="example_0">
+                </div>
+              
+              
+                <div class="sectiontitle">Functions</div>
+                <div class="function"><div class="function-title" id="example_0">
       <b>example/0</b>
       </div>
       <div class="description">
@@ -57,6 +60,7 @@ defmodule ExDocTest do
       </div>
       </div>
 
+              
               
                 <div class="sectiontitle">Macros</div>
                 <div class="function"><div class="function-title" id="example_1_0">
