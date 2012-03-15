@@ -1,5 +1,5 @@
-defmodule ExDoc::HTMLWriter do
-  def write_html_to_file({name,{ moduledoc, docs }}) do
+defmodule ExDoc::HTMLFormatter do
+  def format_docs({name,{ moduledoc, docs }}) do
     function_docs = generate_html_for_docs(docs)
     moduledoc = generate_html_for_moduledoc(moduledoc)
 

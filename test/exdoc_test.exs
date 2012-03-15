@@ -3,14 +3,14 @@ Code.require_file "../test_helper", __FILE__
 defmodule ExDocTest do
   use ExUnit::Case
 
-  test "generate_html generates the markdown file with the documentation" do
+  test "generate_docs generates the html file with the documentation" do
     output_dir = File.expand_path("../../output", __FILE__)
 
     try do
       :file.make_dir(output_dir)
 
       file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
-      ExDoc.generate_html([file])
+      ExDoc.generate_docs([file])
       path = output_dir <> "/::CompiledWithDocs.html"
       assert :filelib.is_file(path)
     after:
@@ -18,7 +18,7 @@ defmodule ExDocTest do
     end
   end
 
-  test "generate_html outputs the correct content" do
+  test "generate_docs outputs the correct content" do
     output_dir = File.expand_path("../../output", __FILE__)
 
     try do
@@ -74,7 +74,7 @@ defmodule ExDocTest do
       :file.make_dir(output_dir)
 
       file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
-      ExDoc.generate_html([file])
+      ExDoc.generate_docs([file])
       path = output_dir <> "/::CompiledWithDocs.html"
       { :ok, generated } = :file.read_file(path)
       assert_equal expected, generated

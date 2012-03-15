@@ -1,10 +1,10 @@
 defmodule ExDoc do
   require Erlang.file, as: F
 
-  def generate_html(files) do
+  def generate_docs(files, formatter // ExDoc::HTMLFormatter) do
     docs = ExDoc::Retriever.get_docs(files)
     move_css_files
-    Enum.map docs, ExDoc::HTMLWriter.write_html_to_file(&1)
+    Enum.map docs, formatter.format_docs(&1)
   end
 
   ####
