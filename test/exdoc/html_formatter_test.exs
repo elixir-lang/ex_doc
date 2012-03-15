@@ -1,7 +1,7 @@
 Code.require_file "../../test_helper", __FILE__
 
 defmodule ExDoc::HTMLFormatterTest do
-  use ExUnit::Case
+  use ExUnit::Case, sync: true
 
   test "format_docs generate only the module name when there's no more info" do
     output_dir = File.expand_path("../../../output", __FILE__)
