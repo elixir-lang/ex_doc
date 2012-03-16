@@ -20,8 +20,9 @@ static ERL_NIF_TERM to_markdown_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM
   struct buf *input, *output;
 
   if(!enif_inspect_binary(env, argv[0], &markdown_binary)){
-    enif_make_badarg(env);
+    return enif_make_badarg(env);
   }
+
   input = bufnew(markdown_binary.size);
   bufput(input, markdown_binary.data, markdown_binary.size);
 
