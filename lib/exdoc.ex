@@ -33,16 +33,12 @@ defmodule ExDoc do
   end
 
   defp generate_html_from_modules(modules) do
+    template_path = File.expand_path("../templates/index_template.eex", __FILE__)
+
     modules = Enum.map modules, generate_list_item(&1)
     bindings = [modules: modules]
-    compile_template(bindings)
-  end
 
-  defp compile_template(bindings) do
-    template_path = File.expand_path("../templates/index_template.eex", __FILE__)
-    compiled = EEx.compile(File.read!(template_path))
-    { content, _ } = Code.eval_quoted(compiled, bindings, __FILE__, __LINE__)
-    content
+    EEx.eval_file(template_path, bindings)
   end
 
   defp generate_list_item(module) do
