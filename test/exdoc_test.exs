@@ -36,6 +36,11 @@ defmodule ExDocTest do
         <body>
           <ul>
             <li>::CompiledWithDocs</li>
+
+      <ul>
+      <li>example/0</li>
+      <li>example_1/0</li>
+      </ul>
       <li>::CompiledWithoutDocs</li>
 
           </ul>

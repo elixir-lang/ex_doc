@@ -23,25 +23,44 @@ defmodule ExDoc do
 
   defp generate_seach_index(docs) do
     output_path = File.expand_path("../../output", __FILE__)
-    modules = Enum.map docs, get_module(&1)
-    content = generate_html_from_modules(modules)
+    names = Enum.map docs, get_names(&1)
+    content = generate_html_from_names(names)
     Erlang.file.write_file(output_path <> "/index.html", content)
   end
 
-  defp get_module({name, _}) do
-    name
+  defp get_names({ module_name, { _, functions }}) do
+    functions = Enum.map functions, get_function_name(&1)
+    { module_name, functions }
   end
 
-  defp generate_html_from_modules(modules) do
+  defp generate_html_from_names(names) do
     template_path = File.expand_path("../templates/index_template.eex", __FILE__)
 
-    modules = Enum.map modules, generate_list_item(&1)
-    bindings = [modules: modules]
+    names = Enum.map names, generate_list_items(&1)
+    bindings = [names: names]
 
     EEx.eval_file(template_path, bindings)
   end
 
-  defp generate_list_item(module) do
-    "<li>#{module}</li>\n"
+  defp generate_list_items({ module, functions }) do
+    module = "<li>#{module}</li>\n"
+    functions = functions_list(functions)
+    "#{module}#{functions}"
+  end
+
+  defp get_function_name({ { function, arity }, _, _, _ }) do
+    "#{function}/#{arity}"
+  end
+
+  defp functions_list(functions) do
+    function_items = Enum.map functions, function_list_item(&1)
+    unless Enum.empty?(function_items) do
+      functions_ul = "\n<ul>\n#{function_items}</ul>\n"
+    end
+    functions_ul
+  end
+
+  defp function_list_item(function) do
+    "<li>#{function}</li>\n"
   end
 end
