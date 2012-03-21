@@ -1,8 +1,8 @@
 defmodule ExDoc do
   require Erlang.file, as: F
 
-  def generate_docs(files, formatter // ExDoc::HTMLFormatter) do
-    docs = ExDoc::Retriever.get_docs(files)
+  def generate_docs(path, formatter // ExDoc::HTMLFormatter) do
+    docs = ExDoc::Retriever.get_docs find_files(path)
     move_css_files
     generate_seach_index(docs)
     Enum.map docs, formatter.format_docs(&1)
@@ -12,7 +12,12 @@ defmodule ExDoc do
   # Helpers
   ####
 
-  defp move_css_files() do
+  defp find_files(path) do
+    path = List.reverse binary_to_list(path)
+    File.wildcard normalize_path(path)
+  end
+
+  defp move_css_files do
     css_path = File.expand_path("../../output/css", __FILE__)
     template_path = File.expand_path("../templates/css/main.css", __FILE__)
 
@@ -62,5 +67,13 @@ defmodule ExDoc do
 
   defp function_list_item(function) do
     "<li>#{function}</li>\n"
+  end
+
+  defp normalize_path('/' ++ path) do
+    List.reverse(path) ++ '*'
+  end
+
+  defp normalize_path(path) do
+    List.reverse(path) ++ '/*'
   end
 end

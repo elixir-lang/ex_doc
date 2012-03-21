@@ -9,8 +9,7 @@ defmodule ExDocTest do
     try do
       :file.make_dir(output_dir)
 
-      file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
-      ExDoc.generate_docs([file])
+      ExDoc.generate_docs File.expand_path("../tmp", __FILE__)
       path = output_dir <> "/::CompiledWithDocs.html"
       assert :filelib.is_file(path)
     after:
@@ -48,9 +47,7 @@ defmodule ExDocTest do
       </html>
       """
 
-      file = File.expand_path("../tmp/::CompiledWithDocs.beam", __FILE__)
-      file_2 = File.expand_path("../tmp/::CompiledWithoutDocs.beam", __FILE__)
-      ExDoc.generate_docs([file, file_2])
+      ExDoc.generate_docs File.expand_path("../tmp", __FILE__)
       path = output_dir <> "/index.html"
       generated = File.read!(path)
       assert_equal expected, generated

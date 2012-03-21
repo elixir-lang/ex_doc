@@ -1,8 +1,6 @@
 #!/usr/bin/env elixir
 Code.prepend_path File.expand_path("../../ebin", __FILE__)
 
-files = File.wildcard 'samples/for_docs/*'
-
-ExDoc.generate_html(files)
+ExDoc.generate_docs('exbin')
 
 # vim: ft=elixir:
