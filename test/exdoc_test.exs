@@ -17,6 +17,20 @@ defmodule ExDocTest do
     end
   end
 
+  test "generate_docs accepts relative directories" do
+    output_dir = File.expand_path("../../output", __FILE__)
+
+    try do
+      :file.make_dir(output_dir)
+
+      ExDoc.generate_docs "test/tmp"
+      path = output_dir <> "/::CompiledWithDocs.html"
+      assert :filelib.is_file(path)
+    after:
+      :os.cmd('rm -rf #{output_dir}')
+    end
+  end
+
   test "generate_docs generates the index html file with all modules" do
     output_dir = File.expand_path("../../output", __FILE__)
 
