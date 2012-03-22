@@ -74,7 +74,7 @@ defmodule ExDoc::HTMLFormatterTest do
               
               
                 <div class="sectiontitle">Functions</div>
-                <div class="function"><div class="function-title" id="example_0">
+                <div class="function"><div class="function-title" id="example/0">
       <b>example/0</b>
       </div>
       <div class="description">
@@ -86,7 +86,7 @@ defmodule ExDoc::HTMLFormatterTest do
               
               
                 <div class="sectiontitle">Macros</div>
-                <div class="function"><div class="function-title" id="example_1_0">
+                <div class="function"><div class="function-title" id="example_1/0">
       <b>example_1/0</b>
       </div>
       <div class="description">
