@@ -48,13 +48,13 @@ defmodule ExDocTest do
 
         <body>
           <ul>
-            <li>::CompiledWithDocs
+            <li><a href='::CompiledWithDocs.html' target='_blank'>::CompiledWithDocs</a>
       <ul>
-      <li>example/0</li>
-      <li>example_1/0</li>
+      <li><a href='::CompiledWithDocs.html#example/0' target='_blank'>example/0</a></li>
+      <li><a href='::CompiledWithDocs.html#example_1/0' target='_blank'>example_1/0</a></li>
       </ul>
       </li>
-      <li>::CompiledWithoutDocs</li>
+      <li><a href='::CompiledWithoutDocs.html' target='_blank'>::CompiledWithoutDocs</a></li>
 
           </ul>
         </body>

@@ -17,6 +17,14 @@ defmodule ExDoc do
     File.wildcard normalize_path(path)
   end
 
+  defp normalize_path('/' ++ path) do
+    List.reverse(path) ++ '*'
+  end
+
+  defp normalize_path(path) do
+    List.reverse(path) ++ '/*'
+  end
+
   defp move_css_files do
     css_path = File.expand_path("../../output/css", __FILE__)
     template_path = File.expand_path("../templates/css/main.css", __FILE__)
@@ -38,6 +46,10 @@ defmodule ExDoc do
     { module_name, functions }
   end
 
+  defp get_function_name({ { name, arity }, _, _, _ }) do
+    "#{name}/#{arity}"
+  end
+
   defp generate_html_from_names(names) do
     template_path = File.expand_path("../templates/index_template.eex", __FILE__)
 
@@ -48,31 +60,27 @@ defmodule ExDoc do
   end
 
   defp generate_list_items({ module, functions }) do
-    functions = functions_list(functions)
-    "<li>#{module}#{functions}</li>\n"
+    functions = functions_list(module, functions)
+    "<li>#{link_to_file(module)}#{functions}</li>\n"
   end
 
-  defp get_function_name({ { function, arity }, _, _, _ }) do
-    "#{function}/#{arity}"
-  end
-
-  defp functions_list(functions) do
-    function_items = Enum.map functions, function_list_item(&1)
+  defp functions_list(module, functions) do
+    function_items = Enum.map functions, function_list_item(module, &1)
     unless Enum.empty?(function_items) do
       functions_ul = "\n<ul>\n#{function_items}</ul>\n"
     end
     functions_ul
   end
 
-  defp function_list_item(function) do
-    "<li>#{function}</li>\n"
+  defp function_list_item(module, function) do
+    "<li>#{link_to_file(module, function)}</li>\n"
   end
 
-  defp normalize_path('/' ++ path) do
-    List.reverse(path) ++ '*'
+  defp link_to_file(module) do
+    "<a href='#{module}.html' target='_blank'>#{module}</a>"
   end
 
-  defp normalize_path(path) do
-    List.reverse(path) ++ '/*'
+  defp link_to_file(module, function) do
+    "<a href='#{module}.html##{function}' target='_blank'>#{function}</a>"
   end
 end
