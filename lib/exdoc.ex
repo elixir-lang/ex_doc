@@ -48,9 +48,8 @@ defmodule ExDoc do
   end
 
   defp generate_list_items({ module, functions }) do
-    module = "<li>#{module}</li>\n"
     functions = functions_list(functions)
-    "#{module}#{functions}"
+    "<li>#{module}#{functions}</li>\n"
   end
 
   defp get_function_name({ { function, arity }, _, _, _ }) do

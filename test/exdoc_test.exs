@@ -48,12 +48,12 @@ defmodule ExDocTest do
 
         <body>
           <ul>
-            <li>::CompiledWithDocs</li>
-
+            <li>::CompiledWithDocs
       <ul>
       <li>example/0</li>
       <li>example_1/0</li>
       </ul>
+      </li>
       <li>::CompiledWithoutDocs</li>
 
           </ul>
