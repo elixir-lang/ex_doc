@@ -3,6 +3,7 @@ defmodule ExDoc do
 
   def generate_docs(path, formatter // ExDoc::HTMLFormatter) do
     docs = ExDoc::Retriever.get_docs find_files(path)
+    move_index_files
     move_css_files
     generate_seach_index(docs)
     Enum.map docs, formatter.format_docs(&1)
@@ -26,16 +27,28 @@ defmodule ExDoc do
   end
 
   defp move_css_files do
-    css_path = File.expand_path("../../output/css", __FILE__)
-    template_path = File.expand_path("../templates/css/main.css", __FILE__)
+    Enum.map ["main.css", "reset.css", "panel.css"],
+      move_file("../templates/css", "../../output/css", &1)
+  end
 
-    F.make_dir(css_path)
+  defp move_index_files do
+    move_file("../templates", "../../output", "index.html")
+  end
 
-    F.copy(template_path, css_path <> "/main.css")
+  defp move_file(input_path, output_path, file) do
+    input_path = File.expand_path(input_path, __FILE__)
+    output_path = File.expand_path(output_path, __FILE__)
+
+    F.make_dir(output_path)
+
+    filename = "/#{file}"
+
+    F.copy(input_path <> filename, output_path <> filename)
   end
 
   defp generate_seach_index(docs) do
-    output_path = File.expand_path("../../output", __FILE__)
+    output_path = File.expand_path("../../output/panel", __FILE__)
+    F.make_dir(output_path)
     names = Enum.map docs, get_names(&1)
     content = generate_html_from_names(names)
     Erlang.file.write_file(output_path <> "/index.html", content)
@@ -51,7 +64,7 @@ defmodule ExDoc do
   end
 
   defp generate_html_from_names(names) do
-    template_path = File.expand_path("../templates/index_template.eex", __FILE__)
+    template_path = File.expand_path("../templates/panel_template.eex", __FILE__)
 
     names = Enum.map names, generate_list_items(&1)
     bindings = [names: names]
@@ -77,10 +90,10 @@ defmodule ExDoc do
   end
 
   defp link_to_file(module) do
-    "<a href='#{module}.html' target='_blank'>#{module}</a>"
+    "<a href='../#{module}.html' target='docwin'>#{module}</a>"
   end
 
   defp link_to_file(module, function) do
-    "<a href='#{module}.html##{function}' target='_blank'>#{function}</a>"
+    "<a href='../#{module}.html##{function}' target='docwin'>#{function}</a>"
   end
 end

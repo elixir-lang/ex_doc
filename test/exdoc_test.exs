@@ -7,8 +7,6 @@ defmodule ExDocTest do
     output_dir = File.expand_path("../../output", __FILE__)
 
     try do
-      :file.make_dir(output_dir)
-
       ExDoc.generate_docs File.expand_path("../tmp", __FILE__)
       path = output_dir <> "/::CompiledWithDocs.html"
       assert :filelib.is_file(path)
@@ -21,8 +19,6 @@ defmodule ExDocTest do
     output_dir = File.expand_path("../../output", __FILE__)
 
     try do
-      :file.make_dir(output_dir)
-
       ExDoc.generate_docs "test/tmp"
       path = output_dir <> "/::CompiledWithDocs.html"
       assert :filelib.is_file(path)
@@ -31,30 +27,29 @@ defmodule ExDocTest do
     end
   end
 
-  test "generate_docs generates the index html file with all modules" do
+  test "generate_docs generates the panel index html file with all modules" do
     output_dir = File.expand_path("../../output", __FILE__)
 
     try do
-      :file.make_dir(output_dir)
-
       expected = """
       <!DOCTYPE html>
       <html>
         <head>
           <title>Modules</title>
           <meta charset="utf-8">
-          <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" charset="utf-8">
+          <link rel="stylesheet" href="../css/reset.css" type="text/css" media="screen" charset="utf-8">
+          <link rel="stylesheet" href="../css/panel.css" type="text/css" media="screen" charset="utf-8">
         </head>
 
         <body>
           <ul>
-            <li><a href='::CompiledWithDocs.html' target='_blank'>::CompiledWithDocs</a>
+            <li><a href='../::CompiledWithDocs.html' target='docwin'>::CompiledWithDocs</a>
       <ul>
-      <li><a href='::CompiledWithDocs.html#example/0' target='_blank'>example/0</a></li>
-      <li><a href='::CompiledWithDocs.html#example_1/0' target='_blank'>example_1/0</a></li>
+      <li><a href='../::CompiledWithDocs.html#example/0' target='docwin'>example/0</a></li>
+      <li><a href='../::CompiledWithDocs.html#example_1/0' target='docwin'>example_1/0</a></li>
       </ul>
       </li>
-      <li><a href='::CompiledWithoutDocs.html' target='_blank'>::CompiledWithoutDocs</a></li>
+      <li><a href='../::CompiledWithoutDocs.html' target='docwin'>::CompiledWithoutDocs</a></li>
 
           </ul>
         </body>
@@ -62,8 +57,7 @@ defmodule ExDocTest do
       """
 
       ExDoc.generate_docs File.expand_path("../tmp", __FILE__)
-      path = output_dir <> "/index.html"
-      generated = File.read!(path)
+      generated = File.read!(output_dir <> "/panel/index.html")
       assert_equal expected, generated
     after:
       :os.cmd('rm -rf #{output_dir}')

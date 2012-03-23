@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Modules</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../css/reset.css" type="text/css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="../css/panel.css" type="text/css" media="screen" charset="utf-8">
+  </head>
+
+  <body>
+    <ul>
+      <%= names %>
+    </ul>
+  </body>
+</html>
