@@ -3,8 +3,9 @@ defmodule ExDoc do
 
   def generate_docs(path, formatter // ExDoc::HTMLFormatter) do
     docs = ExDoc::Retriever.get_docs find_files(path)
-    move_index_files
-    move_css_files
+    copy_index_files
+    copy_css_files
+    copy_image_files
     generate_seach_index(docs)
     Enum.map docs, formatter.format_docs(&1)
   end
@@ -26,16 +27,25 @@ defmodule ExDoc do
     List.reverse(path) ++ '/*'
   end
 
-  defp move_css_files do
-    Enum.map ["main.css", "reset.css", "panel.css"],
-      move_file("../templates/css", "../../output/css", &1)
+  defp copy_index_files do
+    copy_file("../templates", "../../output", "index.html")
   end
 
-  defp move_index_files do
-    move_file("../templates", "../../output", "index.html")
+  defp copy_css_files do
+    copy_files("*.css", "../templates/css", "../../output/css")
   end
 
-  defp move_file(input_path, output_path, file) do
+  defp copy_image_files do
+    copy_files("*.png", "../templates/i", "../../output/i")
+  end
+
+  defp copy_files(wildcard, input_path, output_path) do
+    files = Enum.map File.wildcard(File.expand_path("#{input_path}/#{wildcard}", __FILE__)),
+      File.basename(&1)
+    Enum.map files, copy_file(input_path, output_path, &1)
+  end
+
+  defp copy_file(input_path, output_path, file) do
     input_path = File.expand_path(input_path, __FILE__)
     output_path = File.expand_path(output_path, __FILE__)
 
@@ -74,22 +84,22 @@ defmodule ExDoc do
 
   defp generate_list_items({ module, functions }) do
     functions = functions_list(module, functions)
-    "<li>#{link_to_file(module)}#{functions}</li>\n"
+    "<li class='level_0 closed'>\n#{wrap_link(module)}\n</li>\n#{functions}"
   end
 
   defp functions_list(module, functions) do
-    function_items = Enum.map functions, function_list_item(module, &1)
-    unless Enum.empty?(function_items) do
-      functions_ul = "\n<ul>\n#{function_items}</ul>\n"
-    end
-    functions_ul
+    Enum.map functions, function_list_item(module, &1)
   end
 
   defp function_list_item(module, function) do
-    "<li>#{link_to_file(module, function)}</li>\n"
+    "<li class='level_1 closed'>\n#{wrap_link(module, function)}\n</li>\n"
   end
 
-  defp link_to_file(module) do
+  defp wrap_link(module, function // nil) do
+    "<div class='content'>\n#{link_to_file(module, function)}\n<div class='icon'></div>\n</div>"
+  end
+
+  defp link_to_file(module, nil) do
     "<a href='../#{module}.html' target='docwin'>#{module}</a>"
   end
 

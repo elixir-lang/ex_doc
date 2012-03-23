@@ -42,16 +42,50 @@ defmodule ExDocTest do
         </head>
 
         <body>
-          <ul>
-            <li><a href='../::CompiledWithDocs.html' target='docwin'>::CompiledWithDocs</a>
-      <ul>
-      <li><a href='../::CompiledWithDocs.html#example/0' target='docwin'>example/0</a></li>
-      <li><a href='../::CompiledWithDocs.html#example_1/0' target='docwin'>example_1/0</a></li>
-      </ul>
-      </li>
-      <li><a href='../::CompiledWithoutDocs.html' target='docwin'>::CompiledWithoutDocs</a></li>
+          <div class="panel panel-tree" id="panel">
+            <div class="header">
+              <div>
+                <label for="search" id="search-label" style="display: none">Search</label>
+                <table>
+                  <tr>
+                    <td>
+                      <input type="search" placeholder="Search" autosave="searchdoc" results="10" id="search" autocomplete="off"/>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
 
-          </ul>
+            <div class="tree">
+              <ul>
+                <li class='level_0 closed'>
+      <div class='content'>
+      <a href='../::CompiledWithDocs.html' target='docwin'>::CompiledWithDocs</a>
+      <div class='icon'></div>
+      </div>
+      </li>
+      <li class='level_1 closed'>
+      <div class='content'>
+      <a href='../::CompiledWithDocs.html#example/0' target='docwin'>example/0</a>
+      <div class='icon'></div>
+      </div>
+      </li>
+      <li class='level_1 closed'>
+      <div class='content'>
+      <a href='../::CompiledWithDocs.html#example_1/0' target='docwin'>example_1/0</a>
+      <div class='icon'></div>
+      </div>
+      </li>
+      <li class='level_0 closed'>
+      <div class='content'>
+      <a href='../::CompiledWithoutDocs.html' target='docwin'>::CompiledWithoutDocs</a>
+      <div class='icon'></div>
+      </div>
+      </li>
+
+              </ul>
+            </div>
+          </div>
         </body>
       </html>
       """

@@ -8,8 +8,25 @@
   </head>
 
   <body>
-    <ul>
-      <%= names %>
-    </ul>
+    <div class="panel panel-tree" id="panel">
+      <div class="header">
+        <div>
+          <label for="search" id="search-label" style="display: none">Search</label>
+          <table>
+            <tr>
+              <td>
+                <input type="search" placeholder="Search" autosave="searchdoc" results="10" id="search" autocomplete="off"/>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="tree">
+        <ul>
+          <%= names %>
+        </ul>
+      </div>
+    </div>
   </body>
 </html>
