@@ -25,12 +25,20 @@ defmodule ExDoc::HTMLFormatter do
     nil
   end
 
+  defp generate_html_for_moduledoc({_, false}) do
+    nil
+  end
+
   defp generate_html_for_moduledoc({_line, doc}) do
     Markdown.to_html(doc)
   end
 
   defp generate_html_for_docs(docs) do
     Enum.map docs, extract_docs(&1)
+  end
+
+  defp extract_docs({ { name, arity }, _line, type, false }) do
+    { type, "" }
   end
 
   defp extract_docs({ { name, arity }, _line, type, doc }) do
