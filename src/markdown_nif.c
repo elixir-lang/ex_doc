@@ -49,5 +49,5 @@ static ErlNifFunc nif_funcs[] =
     {"to_html", 1, to_markdown_nif}
 };
 
-ERL_NIF_INIT(::Markdown,nif_funcs,NULL,NULL,NULL,NULL);
+ERL_NIF_INIT(__MAIN__.Markdown,nif_funcs,NULL,NULL,NULL,NULL);
 

@@ -1,14 +1,14 @@
 Code.require_file "../test_helper", __FILE__
 
 defmodule ExDocTest do
-  use ExUnit::Case, sync: true
+  use ExUnit.Case, sync: true
 
   test "generate_docs generates the html file with the documentation" do
     output_dir = File.expand_path("../../output", __FILE__)
 
     try do
       ExDoc.generate_docs File.expand_path("../tmp", __FILE__)
-      path = output_dir <> "/::CompiledWithDocs.html"
+      path = output_dir <> "/CompiledWithDocs.html"
       assert :filelib.is_file(path)
     after:
       :os.cmd('rm -rf #{output_dir}')
@@ -20,7 +20,7 @@ defmodule ExDocTest do
 
     try do
       ExDoc.generate_docs "test/tmp"
-      path = output_dir <> "/::CompiledWithDocs.html"
+      path = output_dir <> "/CompiledWithDocs.html"
       assert :filelib.is_file(path)
     after:
       :os.cmd('rm -rf #{output_dir}')
@@ -60,25 +60,25 @@ defmodule ExDocTest do
               <ul>
                 <li class='level_0 closed'>
       <div class='content'>
-      <a href='../::CompiledWithDocs.html' target='docwin'>::CompiledWithDocs</a>
+      <a href='../CompiledWithDocs.html' target='docwin'>CompiledWithDocs</a>
       <div class='icon'></div>
       </div>
       </li>
       <li class='level_1 closed'>
       <div class='content'>
-      <a href='../::CompiledWithDocs.html#example/0' target='docwin'>example/0</a>
+      <a href='../CompiledWithDocs.html#example/0' target='docwin'>example/0</a>
       <div class='icon'></div>
       </div>
       </li>
       <li class='level_1 closed'>
       <div class='content'>
-      <a href='../::CompiledWithDocs.html#example_1/0' target='docwin'>example_1/0</a>
+      <a href='../CompiledWithDocs.html#example_1/0' target='docwin'>example_1/0</a>
       <div class='icon'></div>
       </div>
       </li>
       <li class='level_0 closed'>
       <div class='content'>
-      <a href='../::CompiledWithoutDocs.html' target='docwin'>::CompiledWithoutDocs</a>
+      <a href='../CompiledWithoutDocs.html' target='docwin'>CompiledWithoutDocs</a>
       <div class='icon'></div>
       </div>
       </li>

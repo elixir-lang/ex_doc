@@ -1,8 +1,8 @@
 defmodule ExDoc do
   require Erlang.file, as: F
 
-  def generate_docs(path, formatter // ExDoc::HTMLFormatter) do
-    docs = ExDoc::Retriever.get_docs find_files(path)
+  def generate_docs(path, formatter // ExDoc.HTMLFormatter) do
+    docs = ExDoc.Retriever.get_docs find_files(path)
     copy_index_files
     copy_css_files
     copy_image_files
@@ -20,11 +20,11 @@ defmodule ExDoc do
   end
 
   defp normalize_path('/' ++ path) do
-    List.reverse(path) ++ '*'
+    List.reverse(path) ++ '**/*.beam'
   end
 
   defp normalize_path(path) do
-    List.reverse(path) ++ '/*'
+    List.reverse(path) ++ '/**/*.beam'
   end
 
   defp copy_index_files do
