@@ -37,10 +37,6 @@ defmodule ExDoc.HTMLFormatter do
     Enum.map docs, extract_docs(&1)
   end
 
-  defp extract_docs({ { _name, _arity }, _line, type, false }) do
-    { type, "" }
-  end
-
   defp extract_docs({ { name, arity }, _line, type, doc }) do
     html = Markdown.to_html(doc)
     function_name = "#{name}/#{arity}"
