@@ -6,7 +6,7 @@ defmodule ExDoc do
     copy_index_files
     copy_css_files
     copy_image_files
-    generate_seach_index(docs)
+    generate_seach_index docs
     Enum.map docs, formatter.format_docs(&1)
   end
 
@@ -28,15 +28,15 @@ defmodule ExDoc do
   end
 
   defp copy_index_files do
-    copy_file("../templates", "../../output", "index.html")
+    copy_file "../templates", "../../output", "index.html"
   end
 
   defp copy_css_files do
-    copy_files("*.css", "../templates/css", "../../output/css")
+    copy_files "*.css", "../templates/css", "../../output/css"
   end
 
   defp copy_image_files do
-    copy_files("*.png", "../templates/i", "../../output/i")
+    copy_files "*.png", "../templates/i", "../../output/i"
   end
 
   defp copy_files(wildcard, input_path, output_path) do
@@ -46,22 +46,20 @@ defmodule ExDoc do
   end
 
   defp copy_file(input_path, output_path, file) do
-    input_path = File.expand_path(input_path, __FILE__)
-    output_path = File.expand_path(output_path, __FILE__)
+    input_path = File.expand_path input_path, __FILE__
+    output_path = File.expand_path output_path, __FILE__
 
-    F.make_dir(output_path)
+    F.make_dir output_path
 
-    filename = "/#{file}"
-
-    F.copy(input_path <> filename, output_path <> filename)
+    F.copy "#{input_path}/#{file}", "#{output_path}/#{file}"
   end
 
   defp generate_seach_index(docs) do
-    output_path = File.expand_path("../../output/panel", __FILE__)
-    F.make_dir(output_path)
+    output_path = File.expand_path "../../output/panel", __FILE__
+    F.make_dir output_path
     names = Enum.map docs, get_names(&1)
-    content = generate_html_from_names(names)
-    Erlang.file.write_file(output_path <> "/index.html", content)
+    content = generate_html_from_names names
+    Erlang.file.write_file("#{output_path}/index.html", content)
   end
 
   defp get_names({ module_name, { _, functions }}) do
@@ -74,17 +72,17 @@ defmodule ExDoc do
   end
 
   defp generate_html_from_names(names) do
-    template_path = File.expand_path("../templates/panel_template.eex", __FILE__)
+    template_path = File.expand_path "../templates/panel_template.eex", __FILE__
 
     names = Enum.map names, generate_list_items(&1)
     bindings = [names: names]
 
-    EEx.eval_file(template_path, bindings)
+    EEx.eval_file template_path, bindings
   end
 
   defp generate_list_items({ module, functions }) do
-    functions = functions_list(module, functions)
-    "<li class='level_0 closed'>\n#{wrap_link(module)}\n</li>\n#{functions}"
+    functions = functions_list module, functions
+    "<li class='level_0 closed'>\n#{wrap_link module}\n</li>\n#{functions}"
   end
 
   defp functions_list(module, functions) do
@@ -92,11 +90,11 @@ defmodule ExDoc do
   end
 
   defp function_list_item(module, function) do
-    "<li class='level_1 closed'>\n#{wrap_link(module, function)}\n</li>\n"
+    "<li class='level_1 closed'>\n#{wrap_link module, function}\n</li>\n"
   end
 
   defp wrap_link(module, function // nil) do
-    "<div class='content'>\n#{link_to_file(module, function)}\n<div class='icon'></div>\n</div>"
+    "<div class='content'>\n#{link_to_file module, function}\n<div class='icon'></div>\n</div>"
   end
 
   defp link_to_file(module, nil) do
