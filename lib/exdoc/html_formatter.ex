@@ -6,9 +6,9 @@ defmodule ExDoc.HTMLFormatter do
     macro_docs = Enum.filter_map docs, fn(x, do: filter_by_type(x, :defmacro)), fn(x, do: get_content(x))
 
     bindings = [name: name, moduledoc: moduledoc, function_docs: function_docs, macro_docs: macro_docs]
-    content = EEx.eval_file(template_path <> "/module_template.eex", bindings)
+    content = EEx.eval_file("#{template_path}/module_template.eex", bindings)
 
-    Erlang.file.write_file(output_path <> "/#{name}.html", content)
+    Erlang.file.write_file("#{output_path}/#{name}.html", content)
   end
 
   def filter_by_type(function, expected) do
