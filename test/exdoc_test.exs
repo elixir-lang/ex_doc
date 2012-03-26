@@ -4,31 +4,30 @@ defmodule ExDocTest do
   use ExUnit.Case, sync: true
 
   test "generate_docs generates the html file with the documentation" do
-    output_dir = File.expand_path("../../output", __FILE__)
+    output_dir = File.expand_path "output"
 
     try do
-      ExDoc.generate_docs File.expand_path("../tmp", __FILE__)
+      ExDoc.generate_docs File.expand_path("test/tmp")
       path = output_dir <> "/CompiledWithDocs.html"
-      assert :filelib.is_file(path)
+      assert :filelib.is_file("#{output_dir}/CompiledWithDocs.html")
     after:
       :os.cmd('rm -rf #{output_dir}')
     end
   end
 
   test "generate_docs accepts relative directories" do
-    output_dir = File.expand_path("../../output", __FILE__)
+    output_dir = File.expand_path "output"
 
     try do
       ExDoc.generate_docs "test/tmp"
-      path = output_dir <> "/CompiledWithDocs.html"
-      assert :filelib.is_file(path)
+      assert :filelib.is_file("#{output_dir}/CompiledWithDocs.html")
     after:
       :os.cmd('rm -rf #{output_dir}')
     end
   end
 
   test "generate_docs generates the panel index html file with all modules" do
-    output_dir = File.expand_path("../../output", __FILE__)
+    output_dir = File.expand_path "output"
 
     try do
       expected = """
@@ -82,6 +81,18 @@ defmodule ExDocTest do
       <div class='icon'></div>
       </div>
       </li>
+      <li class='level_0 closed'>
+      <div class='content'>
+      <a href='../ExDocTest.Nested.html' target='docwin'>ExDocTest.Nested</a>
+      <div class='icon'></div>
+      </div>
+      </li>
+      <li class='level_1 closed'>
+      <div class='content'>
+      <a href='../ExDocTest.Nested.html#example/2' target='docwin'>example/2</a>
+      <div class='icon'></div>
+      </div>
+      </li>
 
               </ul>
             </div>
@@ -90,8 +101,8 @@ defmodule ExDocTest do
       </html>
       """
 
-      ExDoc.generate_docs File.expand_path("../tmp", __FILE__)
-      generated = File.read!(output_dir <> "/panel/index.html")
+      ExDoc.generate_docs File.expand_path("test/tmp")
+      generated = File.read!("#{output_dir}/panel/index.html")
       assert_equal expected, generated
     after:
       :os.cmd('rm -rf #{output_dir}')

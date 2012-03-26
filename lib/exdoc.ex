@@ -2,7 +2,7 @@ defmodule ExDoc do
   require Erlang.file, as: F
 
   def generate_docs(path, formatter // ExDoc.HTMLFormatter) do
-    docs = ExDoc.Retriever.get_docs find_files(path)
+    docs = ExDoc.Retriever.get_docs find_files(path), File.expand_path(path)
     copy_index_files
     copy_css_files
     copy_image_files
