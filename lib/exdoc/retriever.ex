@@ -10,9 +10,17 @@ defmodule ExDoc.Retriever do
     module = :"__MAIN__.#{module_name}"
 
     moduledoc = module.__info__(:moduledoc)
-    docs = module.__info__(:docs)
+    docs = Enum.filter module.__info__(:docs), has_doc?(&1)
 
     { module_name, { moduledoc, docs } }
+  end
+
+  defp has_doc?({_, _, _, false}) do
+    false
+  end
+
+  defp has_doc?({_, _, _, _doc}) do
+    true
   end
 
   defp get_module_name(name, relative_to) when is_list(name) do

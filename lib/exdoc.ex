@@ -67,6 +67,10 @@ defmodule ExDoc do
     { module_name, functions }
   end
 
+  defp get_function_name({ { _name, _arity }, _, _, false }) do
+    false
+  end
+
   defp get_function_name({ { name, arity }, _, _, _ }) do
     "#{name}/#{arity}"
   end
