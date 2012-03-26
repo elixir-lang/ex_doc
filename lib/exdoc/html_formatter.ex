@@ -38,9 +38,10 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   defp extract_docs({ { name, arity }, _line, type, doc }) do
-    html = Markdown.to_html(doc)
+    html = if doc, do: Markdown.to_html(doc), else: ""
+
     function_name = "#{name}/#{arity}"
-    content = "<div class=\"function\"><div class=\"function-title\" id=\"#{function_name}\">\n<b>#{function_name}</b>\n</div>\n<div class=\"description\">\n#{html}\n</div>\n</div>\n"
+    content = %b{<div class="function"><div class="function-title" id="#{function_name}">\n<b>#{function_name}</b>\n</div>\n<div class="description">\n#{html}</div>\n</div>\n}
     { type, content }
   end
 

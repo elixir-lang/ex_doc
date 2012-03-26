@@ -75,6 +75,12 @@ defmodule ExDocTest do
       <div class='icon'></div>
       </div>
       </li>
+      <li class='level_1 closed'>
+      <div class='content'>
+      <a href='../CompiledWithDocs.html#example_without_docs/0' target='docwin'>example_without_docs/0</a>
+      <div class='icon'></div>
+      </div>
+      </li>
       <li class='level_0 closed'>
       <div class='content'>
       <a href='../CompiledWithoutDocs.html' target='docwin'>CompiledWithoutDocs</a>

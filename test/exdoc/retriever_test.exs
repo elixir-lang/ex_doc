@@ -43,7 +43,11 @@ defmodule ExDoc.RetrieverTest do
 
     [{ _, {_, doc} }] = R.get_docs([file], input_path)
 
-    assert_match [{ {:example, 0}, 10, :def, "Some example"}, { {:"example_1", 0}, 13, :defmacro, "Another example"}], doc
+    assert_match [
+      {{:example, 0}, 10, :def, "Some example"},
+      {{:"example_1", 0}, 13, :defmacro, "Another example"},
+      {{:example_without_docs, 0}, 15, :def, nil}
+      ], doc
   end
 
   test "get_docs returns an empty list if there's no docs info" do

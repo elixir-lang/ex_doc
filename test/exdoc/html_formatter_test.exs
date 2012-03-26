@@ -87,7 +87,12 @@ defmodule ExDoc.HTMLFormatterTest do
       </div>
       <div class="description">
       <p>Some example</p>
-
+      </div>
+      </div>
+      <div class="function"><div class="function-title" id="example_without_docs/0">
+      <b>example_without_docs/0</b>
+      </div>
+      <div class="description">
       </div>
       </div>
 
@@ -99,7 +104,6 @@ defmodule ExDoc.HTMLFormatterTest do
       </div>
       <div class="description">
       <p>Another example</p>
-
       </div>
       </div>
 
