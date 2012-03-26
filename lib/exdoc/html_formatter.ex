@@ -1,4 +1,4 @@
-defmodule ExDoc::HTMLFormatter do
+defmodule ExDoc.HTMLFormatter do
   def format_docs({name,{ moduledoc, docs }}) do
     docs = generate_html_for_docs(docs)
     moduledoc = generate_html_for_moduledoc(moduledoc)
@@ -6,15 +6,9 @@ defmodule ExDoc::HTMLFormatter do
     macro_docs = Enum.filter_map docs, fn(x, do: filter_by_type(x, :defmacro)), fn(x, do: get_content(x))
 
     bindings = [name: name, moduledoc: moduledoc, function_docs: function_docs, macro_docs: macro_docs]
-    content = compile_template(bindings)
+    content = EEx.eval_file("#{template_path}/module_template.eex", bindings)
 
-    Erlang.file.write_file(output_path <> "/#{name}.html", content)
-  end
-
-  defp compile_template(bindings) do
-    compiled = EEx.file(template_path <> "/module_template.eex")
-    { content, _ } = Code.eval_quoted(compiled, bindings, __FILE__, __LINE__)
-    content
+    Erlang.file.write_file("#{output_path}/#{name}.html", content)
   end
 
   def filter_by_type(function, expected) do
@@ -31,6 +25,10 @@ defmodule ExDoc::HTMLFormatter do
     nil
   end
 
+  defp generate_html_for_moduledoc({_, false}) do
+    nil
+  end
+
   defp generate_html_for_moduledoc({_line, doc}) do
     Markdown.to_html(doc)
   end
@@ -41,7 +39,8 @@ defmodule ExDoc::HTMLFormatter do
 
   defp extract_docs({ { name, arity }, _line, type, doc }) do
     html = Markdown.to_html(doc)
-    content = "<div class=\"function\"><div class=\"function-title\" id=\"#{name}_#{arity}\">\n<b>#{name}/#{arity}</b>\n</div>\n<div class=\"description\">\n#{html}\n</div>\n</div>\n"
+    function_name = "#{name}/#{arity}"
+    content = "<div class=\"function\"><div class=\"function-title\" id=\"#{function_name}\">\n<b>#{function_name}</b>\n</div>\n<div class=\"description\">\n#{html}\n</div>\n</div>\n"
     { type, content }
   end
 

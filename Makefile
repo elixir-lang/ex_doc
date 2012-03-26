@@ -32,7 +32,7 @@ ebin: $(shell find . -type f -name "*.ex")
 	@ echo
 
 compile_test:
-	@ rm -f test/tmp/*.beam
+	@ rm -rf test/tmp/*
 	@ elixirc --docs test/fixtures/*.ex -o test/tmp
 
 test: markdown.so compile compile_test

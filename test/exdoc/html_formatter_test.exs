@@ -1,21 +1,21 @@
 Code.require_file "../../test_helper", __FILE__
 
-defmodule ExDoc::HTMLFormatterTest do
-  use ExUnit::Case
+defmodule ExDoc.HTMLFormatterTest do
+  use ExUnit.Case, sync: true
 
   test "format_docs generate only the module name when there's no more info" do
-    output_dir = File.expand_path("../../../output", __FILE__)
+    output_dir = File.expand_path "output"
 
     try do
       :file.make_dir(output_dir)
 
-      ExDoc::HTMLFormatter.format_docs({"::XPTOModule", {{1, nil}, []}})
-      path = File.expand_path(output_dir <> "/::XPTOModule.html", __FILE__)
+      ExDoc.HTMLFormatter.format_docs({"XPTOModule", {{1, nil}, []}})
+
       expected = """
       <!DOCTYPE html>
       <html>
         <head>
-          <title>::XPTOModule</title>
+          <title>XPTOModule</title>
           <meta charset="utf-8">
           <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" charset="utf-8">
         </head>
@@ -23,7 +23,7 @@ defmodule ExDoc::HTMLFormatterTest do
         <body>
           <div class="banner">
             <span>Elixir v0.9</span>
-            <h1>::XPTOModule</h1>
+            <h1>XPTOModule</h1>
           </div>
           <div id="bodyContent">
             <div id="content">
@@ -35,21 +35,29 @@ defmodule ExDoc::HTMLFormatterTest do
         </body>
       </html>
       """
-      assert_equal expected, File.read!(path)
+      assert_equal expected, File.read!("#{output_dir}/XPTOModule.html")
     after:
       :os.cmd('rm -rf #{output_dir}')
     end
   end
 
   test "generate_docs outputs the correct content" do
-    output_dir = File.expand_path("../../../output", __FILE__)
+    output_dir = File.expand_path "output"
 
     try do
+      :file.make_dir(output_dir)
+      input_path = File.expand_path "test/tmp"
+      file = "#{input_path}/CompiledWithDocs.beam"
+
+      [docs] = ExDoc.Retriever.get_docs [file], input_path
+      ExDoc.HTMLFormatter.format_docs(docs)
+      { :ok, generated } = :file.read_file("#{output_dir}/CompiledWithDocs.html")
+
       expected = """
       <!DOCTYPE html>
       <html>
         <head>
-          <title>::CompiledWithDocs</title>
+          <title>CompiledWithDocs</title>
           <meta charset="utf-8">
           <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" charset="utf-8">
         </head>
@@ -57,7 +65,7 @@ defmodule ExDoc::HTMLFormatterTest do
         <body>
           <div class="banner">
             <span>Elixir v0.9</span>
-            <h1>::CompiledWithDocs</h1>
+            <h1>CompiledWithDocs</h1>
           </div>
           <div id="bodyContent">
             <div id="content">
@@ -74,7 +82,7 @@ defmodule ExDoc::HTMLFormatterTest do
               
               
                 <div class="sectiontitle">Functions</div>
-                <div class="function"><div class="function-title" id="example_0">
+                <div class="function"><div class="function-title" id="example/0">
       <b>example/0</b>
       </div>
       <div class="description">
@@ -86,7 +94,7 @@ defmodule ExDoc::HTMLFormatterTest do
               
               
                 <div class="sectiontitle">Macros</div>
-                <div class="function"><div class="function-title" id="example_1_0">
+                <div class="function"><div class="function-title" id="example_1/0">
       <b>example_1/0</b>
       </div>
       <div class="description">
@@ -101,14 +109,6 @@ defmodule ExDoc::HTMLFormatterTest do
         </body>
       </html>
       """
-
-      :file.make_dir(output_dir)
-
-      file = File.expand_path("../../tmp/::CompiledWithDocs.beam", __FILE__)
-      [docs] = ExDoc::Retriever.get_docs([file])
-      ExDoc::HTMLFormatter.format_docs(docs)
-      path = output_dir <> "/::CompiledWithDocs.html"
-      { :ok, generated } = :file.read_file(path)
       assert_equal expected, generated
     after:
       :os.cmd('rm -rf #{output_dir}')

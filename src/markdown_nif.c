@@ -25,20 +25,22 @@ static ERL_NIF_TERM to_markdown_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM
 
   input = bufnew(markdown_binary.size);
   bufput(input, markdown_binary.data, markdown_binary.size);
+  enif_release_binary(&markdown_binary);
 
   output = bufnew(OUTPUT_SIZE);
 
   sdhtml_renderer(&callbacks, &options, 0);
   markdown = sd_markdown_new(0, 16, &callbacks, &options);
-  sd_markdown_render(output, input->data, input->size, markdown);
 
-  enif_alloc_binary(sizeof(char)*(output->size), &output_binary);
-  strcpy(output_binary.data, output->data);
+  sd_markdown_render(output, input->data, input->size, markdown);
+  sd_markdown_free(markdown);
+
+  enif_alloc_binary(output->size, &output_binary);
+  memcpy(output_binary.data, output->data, output->size);
 
   bufrelease(input);
   bufrelease(output);
 
-  sd_markdown_free(markdown);
   return enif_make_binary(env, &output_binary);
 }
 
@@ -47,5 +49,5 @@ static ErlNifFunc nif_funcs[] =
     {"to_html", 1, to_markdown_nif}
 };
 
-ERL_NIF_INIT(::Markdown,nif_funcs,NULL,NULL,NULL,NULL);
+ERL_NIF_INIT(__MAIN__.Markdown,nif_funcs,NULL,NULL,NULL,NULL);
 
