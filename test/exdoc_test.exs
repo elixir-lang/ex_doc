@@ -17,94 +17,26 @@ defmodule ExDocTest do
 
   test "generate_docs generates the html file with the documentation" do
     ExDoc.generate_docs File.expand_path("test/tmp")
+
     assert :filelib.is_file("#{output_dir}/CompiledWithDocs.html")
   end
 
   test "generate_docs accepts relative directories" do
     ExDoc.generate_docs "test/tmp"
+
     assert :filelib.is_file("#{output_dir}/CompiledWithDocs.html")
   end
 
   test "generate_docs generates the panel index html file with all modules" do
-    expected = """
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Modules</title>
-        <meta charset="utf-8">
-        <link rel="stylesheet" href="../css/reset.css" type="text/css" media="screen" charset="utf-8">
-        <link rel="stylesheet" href="../css/panel.css" type="text/css" media="screen" charset="utf-8">
-      </head>
-
-      <body>
-        <div class="panel panel-tree" id="panel">
-          <div class="header">
-            <div>
-              <label for="search" id="search-label" style="display: none">Search</label>
-              <table>
-                <tr>
-                  <td>
-                    <input type="search" placeholder="Search" autosave="searchdoc" results="10" id="search" autocomplete="off"/>
-                  </td>
-                </tr>
-              </table>
-            </div>
-          </div>
-
-          <div class="tree">
-            <ul>
-              <li class='level_0 closed'>
-    <div class='content'>
-    <a href='../CompiledWithDocs.html' target='docwin'>CompiledWithDocs</a>
-    <div class='icon'></div>
-    </div>
-    </li>
-    <li class='level_1 closed'>
-    <div class='content'>
-    <a href='../CompiledWithDocs.html#example/0' target='docwin'>example/0</a>
-    <div class='icon'></div>
-    </div>
-    </li>
-    <li class='level_1 closed'>
-    <div class='content'>
-    <a href='../CompiledWithDocs.html#example_1/0' target='docwin'>example_1/0</a>
-    <div class='icon'></div>
-    </div>
-    </li>
-    <li class='level_1 closed'>
-    <div class='content'>
-    <a href='../CompiledWithDocs.html#example_without_docs/0' target='docwin'>example_without_docs/0</a>
-    <div class='icon'></div>
-    </div>
-    </li>
-    <li class='level_0 closed'>
-    <div class='content'>
-    <a href='../CompiledWithoutDocs.html' target='docwin'>CompiledWithoutDocs</a>
-    <div class='icon'></div>
-    </div>
-    </li>
-    <li class='level_0 closed'>
-    <div class='content'>
-    <a href='../ExDocTest.Nested.html' target='docwin'>ExDocTest.Nested</a>
-    <div class='icon'></div>
-    </div>
-    </li>
-    <li class='level_1 closed'>
-    <div class='content'>
-    <a href='../ExDocTest.Nested.html#example/2' target='docwin'>example/2</a>
-    <div class='icon'></div>
-    </div>
-    </li>
-
-            </ul>
-          </div>
-        </div>
-      </body>
-    </html>
-    """
-
     ExDoc.generate_docs File.expand_path("test/tmp")
-    generated = File.read!("#{output_dir}/panel/index.html")
-    assert_equal expected, generated
+
+    content = File.read!("#{output_dir}/panel/index.html")
+    assert Regex.match?(%r/<li class='level_0 closed'>.*'..\/CompiledWithDocs\.html'.*CompiledWithDocs.*<\/li>/m, content)
+    assert Regex.match?(%r/<li class='level_1 closed'>.*'..\/CompiledWithDocs\.html#example\/0'.*example\/0.*<\/li>/m, content)
+    assert Regex.match?(%r/<li class='level_1 closed'>.*'..\/CompiledWithDocs\.html#example_1\/0'.*example_1\/0.*<\/li>/m, content)
+    assert Regex.match?(%r/<li class='level_1 closed'>.*'..\/CompiledWithDocs\.html#example_without_docs\/0'.*example_without_docs\/0.*<\/li>/m, content)
+    assert Regex.match?(%r/<li class='level_0 closed'>.*'..\/CompiledWithoutDocs\.html'.*CompiledWithoutDocs.*<\/li>/m, content)
+    assert Regex.match?(%r/<li class='level_0 closed'>.*'..\/ExDocTest\.Nested\.html'.*ExDocTest\.Nested.*<\/li>/m, content)
+    assert Regex.match?(%r/<li class='level_1 closed'>.*'..\/ExDocTest\.Nested\.html#example\/2'.*example\/2.*<\/li>/m, content)
   end
 end
