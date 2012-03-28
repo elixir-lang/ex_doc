@@ -5,22 +5,23 @@ defmodule ExDoc.RetrieverTest do
 
   require ExDoc.Retriever, as: R
 
+  defp input_path do
+    File.expand_path("test/tmp")
+  end
+
   test "get_docs returns the module name" do
-    input_path = File.expand_path("test/tmp")
     file = "#{input_path}/__MAIN__/CompiledWithDocs.beam"
 
     assert_match [{ "CompiledWithDocs", _ }], R.get_docs([file], input_path)
   end
 
   test "get_docs returns the nested module name" do
-    input_path = File.expand_path("test/tmp")
     file = "#{input_path}/__MAIN__/ExDocTest/Nested.beam"
 
     assert_match [{ "ExDocTest.Nested", _ }], R.get_docs([file], input_path)
   end
 
   test "get_docs returns the moduledoc info" do
-    input_path = File.expand_path("test/tmp")
     file = "#{input_path}/__MAIN__/CompiledWithDocs.beam"
 
     [{ _, {moduledoc, _} }] = R.get_docs([file], input_path)
@@ -29,7 +30,6 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "get_docs returns nil if there's no moduledoc info" do
-    input_path = File.expand_path("test/tmp")
     file = "#{input_path}/__MAIN__/CompiledWithoutDocs.beam"
 
     [{ _, {moduledoc, _} }] = R.get_docs([file], input_path)
@@ -38,7 +38,6 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "get_docs returns the doc info for each module function" do
-    input_path = File.expand_path("test/tmp")
     file = "#{input_path}/__MAIN__/CompiledWithDocs.beam"
 
     [{ _, {_, doc} }] = R.get_docs([file], input_path)
@@ -51,7 +50,6 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "get_docs returns an empty list if there's no docs info" do
-    input_path = File.expand_path("test/tmp")
     file = "#{input_path}/__MAIN__/CompiledWithoutDocs.beam"
 
     [{ _, {_, doc} }] = R.get_docs([file], input_path)
