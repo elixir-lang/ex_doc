@@ -5,6 +5,13 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="../css/reset.css" type="text/css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="../css/panel.css" type="text/css" media="screen" charset="utf-8">
+    <script src="../js/jquery-1.7.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/tree.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8">
+      $(function() {
+        new Tree($('.tree', '#panel'));
+      });
+    </script>
   </head>
 
   <body>
@@ -15,7 +22,7 @@
           <table>
             <tr>
               <td>
-                <input type="search" placeholder="Search" autosave="searchdoc" results="10" id="search" autocomplete="off"/>
+                <input type="search" placeholder="Search" autosave="searchdoc" results="10" id="search" autocomplete="off" />
               </td>
             </tr>
           </table>

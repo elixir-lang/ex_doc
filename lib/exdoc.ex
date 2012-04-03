@@ -5,6 +5,7 @@ defmodule ExDoc do
     docs = ExDoc.Retriever.get_docs find_files(path), File.expand_path(path)
     copy_index_files
     copy_css_files
+    copy_javascript_files
     copy_image_files
     generate_seach_index docs
     Enum.map docs, formatter.format_docs(&1)
@@ -33,6 +34,10 @@ defmodule ExDoc do
 
   defp copy_css_files do
     copy_files "*.css", "../templates/css", "../../output/css"
+  end
+
+  defp copy_javascript_files do
+    copy_files "*.js", "../templates/js", "../../output/js"
   end
 
   defp copy_image_files do
