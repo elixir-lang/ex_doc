@@ -37,7 +37,7 @@ compile_test:
 
 test: markdown.so compile compile_test
 	@ echo Running tests ...
-	time elixir -pa test/tmp -pa ebin "test/**/*_test.exs"
+	time elixir -pa test/tmp -pa ebin -r "test/**/*_test.exs"
 	@ echo
 
 clean:
