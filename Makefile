@@ -1,6 +1,6 @@
 CFLAGS=-g -O3 -fPIC
 LDFLAGS=-Isundown/src -Isundown/html
-ERLANG_FLAGS=-I/usr/local/Cellar/erlang/R15B/lib/erlang/erts-5.9/include
+ERLANG_FLAGS=-I/usr/local/Cellar/erlang/R15B01/lib/erlang/erts-5.9.1/include
 CC=gcc
 EBIN_DIR=ebin
 
