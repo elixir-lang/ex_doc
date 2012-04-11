@@ -1,6 +1,6 @@
 CFLAGS=-g -O3 -fPIC
 LDFLAGS=-Isundown/src -Isundown/html
-ERLANG_FLAGS=-I/usr/local/Cellar/erlang/R15B01/lib/erlang/erts-5.9.1/include
+ERLANG_FLAGS=-I`erl -eval 'io:format("~s~n", [lists:concat([code:root_dir(), "/erts-", erlang:system_info(version), "/include"])])' -s init stop -noshell`
 CC=gcc
 EBIN_DIR=ebin
 
@@ -47,7 +47,7 @@ clean:
 	@ echo
 
 markdown.so: $(SUNDOWN_SRC) $(NIF_SRC)
-	$(CC) $(CFLAGS) $(ERLANG_FLAGS) -dynamiclib -undefined dynamic_lookup -o share/$@ $(SUNDOWN_SRC) $(NIF_SRC)
+	$(CC) $(CFLAGS) -dynamiclib -undefined dynamic_lookup -o share/$@ $(SUNDOWN_SRC) $(NIF_SRC)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(ERLANG_FLAGS) -c -o $@ $^
