@@ -18,7 +18,7 @@ SUNDOWN_SRC=\
 NIF_SRC=\
 	src/markdown_nif.o
 
-.PHONY: test
+.PHONY: test compile clean
 
 compile: ebin
 
