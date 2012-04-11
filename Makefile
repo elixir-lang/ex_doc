@@ -20,9 +20,9 @@ NIF_SRC=\
 
 .PHONY: test compile clean
 
-compile: share/markdown.so ebin
+compile: share/markdown.so $(EBIN_DIR)
 
-ebin: $(shell find lib -type f -name "*.ex")
+$(EBIN_DIR): $(shell find lib -type f -name "*.ex")
 	@ rm -rf ebin/
 	@ echo Compiling ...
 	@ mkdir -p $(EBIN_DIR)
