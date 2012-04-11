@@ -20,9 +20,7 @@ NIF_SRC=\
 
 .PHONY: test compile clean
 
-compile: ebin
-
-setup: markdown.so
+compile: share/markdown.so ebin
 
 ebin: $(shell find lib -type f -name "*.ex")
 	@ rm -rf ebin/
@@ -36,7 +34,7 @@ test/tmp: $(shell find test/fixtures -type f -name "*.ex")
 	@ rm -rf test/tmp/*
 	@ elixirc --docs test/fixtures/*.ex -o test/tmp
 
-test: share/markdown.so compile test/tmp
+test: compile test/tmp
 	@ echo Running tests ...
 	time elixir -pa test/tmp -pa ebin -r "test/**/*_test.exs"
 	@ echo
@@ -48,7 +46,7 @@ clean:
 	@ echo
 
 share/markdown.so: $(SUNDOWN_SRC) $(NIF_SRC)
-	$(CC) $(CFLAGS) -dynamiclib -undefined dynamic_lookup -o share/$@ $(SUNDOWN_SRC) $(NIF_SRC)
+	$(CC) $(CFLAGS) -dynamiclib -undefined dynamic_lookup -o $@ $(SUNDOWN_SRC) $(NIF_SRC)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(ERLANG_FLAGS) -c -o $@ $^
