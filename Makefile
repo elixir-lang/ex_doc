@@ -1,6 +1,7 @@
+ERLANG_PATH:=$(shell erl -eval 'io:format("~s~n", [lists:concat([code:root_dir(), "/erts-", erlang:system_info(version), "/include"])])' -s init stop -noshell)
 CFLAGS=-g -O3 -fPIC
 LDFLAGS=-Isundown/src -Isundown/html
-ERLANG_FLAGS=-I`erl -eval 'io:format("~s~n", [lists:concat([code:root_dir(), "/erts-", erlang:system_info(version), "/include"])])' -s init stop -noshell`
+ERLANG_FLAGS=-I$(ERLANG_PATH)
 CC=gcc
 EBIN_DIR=ebin
 
@@ -17,25 +18,25 @@ SUNDOWN_SRC=\
 NIF_SRC=\
 	src/markdown_nif.o
 
-.PHONY: setup test clean
+.PHONY: test
 
 compile: ebin
 
 setup: markdown.so
 
-ebin: $(shell find . -type f -name "*.ex")
-	@ rm -f ebin/::*.beam
+ebin: $(shell find lib -type f -name "*.ex")
+	@ rm -rf ebin/
 	@ echo Compiling ...
 	@ mkdir -p $(EBIN_DIR)
 	@ touch $(EBIN_DIR)
 	elixirc lib/*/*/*.ex lib/*/*.ex lib/*.ex -o ebin
 	@ echo
 
-compile_test:
+test/tmp: $(shell find test/fixtures -type f -name "*.ex")
 	@ rm -rf test/tmp/*
 	@ elixirc --docs test/fixtures/*.ex -o test/tmp
 
-test: markdown.so compile compile_test
+test: share/markdown.so compile test/tmp
 	@ echo Running tests ...
 	time elixir -pa test/tmp -pa ebin -r "test/**/*_test.exs"
 	@ echo
@@ -46,7 +47,7 @@ clean:
 	rm -rf $(EBIN_DIR)
 	@ echo
 
-markdown.so: $(SUNDOWN_SRC) $(NIF_SRC)
+share/markdown.so: $(SUNDOWN_SRC) $(NIF_SRC)
 	$(CC) $(CFLAGS) -dynamiclib -undefined dynamic_lookup -o share/$@ $(SUNDOWN_SRC) $(NIF_SRC)
 
 %.o: %.c
