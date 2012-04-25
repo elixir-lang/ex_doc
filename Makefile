@@ -27,12 +27,12 @@ $(EBIN_DIR): $(shell find lib -type f -name "*.ex")
 	@ echo Compiling ...
 	@ mkdir -p $(EBIN_DIR)
 	@ touch $(EBIN_DIR)
-	elixirc lib/*/*/*.ex lib/*/*.ex lib/*.ex -o ebin
+	elixirc lib -o ebin
 	@ echo
 
 test/tmp: $(shell find test/fixtures -type f -name "*.ex")
 	@ rm -rf test/tmp/*
-	@ elixirc --docs test/fixtures/*.ex -o test/tmp
+	@ elixirc --docs test/fixtures -o test/tmp
 
 test: compile test/tmp
 	@ echo Running tests ...
