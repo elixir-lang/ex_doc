@@ -41,4 +41,10 @@ defmodule ExDocTest do
     assert Regex.match?(%r/<li class='level_0 closed'>.*'..\/ExDocTest\.Nested\.html'.*ExDocTest\.Nested.*<\/li>/m, content)
     assert Regex.match?(%r/<li class='level_1 closed'>.*'..\/ExDocTest\.Nested\.html#example\/2'.*example\/2.*<\/li>/m, content)
   end
+
+  test "generate_docs generates in specified output directory" do
+    ExDoc.generate_docs "tmp", "#{output_dir}/docs"
+
+    assert :filelib.is_file("#{output_dir}/docs/CompiledWithDocs.html")
+  end
 end

@@ -12,11 +12,11 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   defp output_dir do
-    File.expand_path "output"
+    File.expand_path "test/tmp/output"
   end
 
   test "format_docs generate only the module name when there's no more info" do
-    ExDoc.HTMLFormatter.format_docs({"XPTOModule", {{1, nil}, []}})
+    ExDoc.HTMLFormatter.format_docs({"XPTOModule", {{1, nil}, []}}, output_dir)
 
     content = File.read!("#{output_dir}/XPTOModule.html")
     assert Regex.match?(%r/<title>XPTOModule<\/title>/, content)
@@ -30,7 +30,7 @@ defmodule ExDoc.HTMLFormatterTest do
     file = "#{input_path}/CompiledWithDocs.beam"
 
     [docs] = ExDoc.Retriever.get_docs [file], input_path
-    ExDoc.HTMLFormatter.format_docs(docs)
+    ExDoc.HTMLFormatter.format_docs(docs, output_dir)
 
     content = File.read!("#{output_dir}/CompiledWithDocs.html")
     assert Regex.match?(%r/<title>CompiledWithDocs<\/title>/, content)
