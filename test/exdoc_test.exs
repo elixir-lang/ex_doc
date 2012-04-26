@@ -4,11 +4,13 @@ defmodule ExDocTest do
   use ExUnit.Case, sync: true
 
   def setup_all do
+    :file.set_cwd("test")
     :file.make_dir(output_dir)
   end
 
   def teardown_all do
     :os.cmd('rm -rf #{output_dir}')
+    :file.set_cwd("..")
   end
 
   defp output_dir do
@@ -16,19 +18,19 @@ defmodule ExDocTest do
   end
 
   test "generate_docs generates the html file with the documentation" do
-    ExDoc.generate_docs File.expand_path("test/tmp")
+    ExDoc.generate_docs File.expand_path("tmp")
 
     assert :filelib.is_file("#{output_dir}/CompiledWithDocs.html")
   end
 
   test "generate_docs accepts relative directories" do
-    ExDoc.generate_docs "test/tmp"
+    ExDoc.generate_docs "tmp"
 
     assert :filelib.is_file("#{output_dir}/CompiledWithDocs.html")
   end
 
   test "generate_docs generates the panel index html file with all modules" do
-    ExDoc.generate_docs File.expand_path("test/tmp")
+    ExDoc.generate_docs File.expand_path("tmp")
 
     content = File.read!("#{output_dir}/panel/index.html")
     assert Regex.match?(%r/<li class='level_0 closed'>.*'..\/CompiledWithDocs\.html'.*CompiledWithDocs.*<\/li>/m, content)

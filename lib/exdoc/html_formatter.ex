@@ -50,6 +50,6 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   defp output_path() do
-    File.expand_path("../../../output", __FILE__)
+    File.expand_path "output"
   end
 end
