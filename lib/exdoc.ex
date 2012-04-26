@@ -29,19 +29,19 @@ defmodule ExDoc do
   end
 
   defp copy_index_files do
-    copy_file "../templates", "../../output", "index.html"
+    copy_file "../templates", "output", "index.html"
   end
 
   defp copy_css_files do
-    copy_files "*.css", "../templates/css", "../../output/css"
+    copy_files "*.css", "../templates/css", "output/css"
   end
 
   defp copy_javascript_files do
-    copy_files "*.js", "../templates/js", "../../output/js"
+    copy_files "*.js", "../templates/js", "output/js"
   end
 
   defp copy_image_files do
-    copy_files "*.png", "../templates/i", "../../output/i"
+    copy_files "*.png", "../templates/i", "output/i"
   end
 
   defp copy_files(wildcard, input_path, output_path) do
@@ -52,7 +52,7 @@ defmodule ExDoc do
 
   defp copy_file(input_path, output_path, file) do
     input_path = File.expand_path input_path, __FILE__
-    output_path = File.expand_path output_path, __FILE__
+    output_path = File.expand_path output_path
 
     F.make_dir output_path
 
@@ -60,7 +60,7 @@ defmodule ExDoc do
   end
 
   defp generate_seach_index(docs) do
-    output_path = File.expand_path "../../output/panel", __FILE__
+    output_path = File.expand_path "output/panel"
     F.make_dir output_path
     names = Enum.map docs, get_names(&1)
     content = generate_html_from_names names
