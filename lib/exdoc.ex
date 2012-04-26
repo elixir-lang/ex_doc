@@ -1,14 +1,14 @@
 defmodule ExDoc do
   require Erlang.file, as: F
 
-  def generate_docs(path, formatter // ExDoc.HTMLFormatter) do
+  def generate_docs(path, output_path // "output", formatter // ExDoc.HTMLFormatter) do
     docs = ExDoc.Retriever.get_docs find_files(path), File.expand_path(path)
-    copy_index_files
-    copy_css_files
-    copy_javascript_files
-    copy_image_files
-    generate_seach_index docs
-    Enum.map docs, formatter.format_docs(&1)
+    copy_index_files output_path
+    copy_css_files output_path
+    copy_javascript_files output_path
+    copy_image_files output_path
+    generate_seach_index docs, output_path
+    Enum.map docs, formatter.format_docs(&1, output_path)
   end
 
   ####
@@ -28,20 +28,20 @@ defmodule ExDoc do
     List.reverse(path) ++ '/**/*.beam'
   end
 
-  defp copy_index_files do
-    copy_file "../templates", "output", "index.html"
+  defp copy_index_files(output_path) do
+    copy_file "../templates", output_path, "index.html"
   end
 
-  defp copy_css_files do
-    copy_files "*.css", "../templates/css", "output/css"
+  defp copy_css_files(output_path) do
+    copy_files "*.css", "../templates/css", "#{output_path}/css"
   end
 
-  defp copy_javascript_files do
-    copy_files "*.js", "../templates/js", "output/js"
+  defp copy_javascript_files(output_path) do
+    copy_files "*.js", "../templates/js", "#{output_path}/js"
   end
 
-  defp copy_image_files do
-    copy_files "*.png", "../templates/i", "output/i"
+  defp copy_image_files(output_path) do
+    copy_files "*.png", "../templates/i", "#{output_path}/i"
   end
 
   defp copy_files(wildcard, input_path, output_path) do
@@ -59,8 +59,8 @@ defmodule ExDoc do
     F.copy "#{input_path}/#{file}", "#{output_path}/#{file}"
   end
 
-  defp generate_seach_index(docs) do
-    output_path = File.expand_path "output/panel"
+  defp generate_seach_index(docs, base_output_path) do
+    output_path = File.expand_path "#{base_output_path}/panel"
     F.make_dir output_path
     names = Enum.map docs, get_names(&1)
     content = generate_html_from_names names
