@@ -1,5 +1,5 @@
 defmodule ExDoc.HTMLFormatter do
-  def format_docs({name,{ moduledoc, docs }}) do
+  def format_docs({name,{ moduledoc, docs }}, output_path) do
     docs = generate_html_for_docs(docs)
     moduledoc = generate_html_for_moduledoc(moduledoc)
     function_docs = Enum.filter_map docs, fn(x, do: filter_by_type(x, :def)), fn(x, do: get_content(x))
@@ -47,9 +47,5 @@ defmodule ExDoc.HTMLFormatter do
 
   defp template_path() do
     File.expand_path("../../templates", __FILE__)
-  end
-
-  defp output_path() do
-    File.expand_path "output"
   end
 end
