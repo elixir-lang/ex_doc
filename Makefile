@@ -5,6 +5,10 @@ ERLANG_FLAGS=-I$(ERLANG_PATH)
 CC=gcc
 EBIN_DIR=ebin
 
+ifeq ($(shell uname),Darwin)
+	OPTIONS=-dynamiclib -undefined dynamic_lookup
+endif
+
 SUNDOWN_SRC=\
 	    sundown/src/buffer.o\
 	    sundown/src/markdown.o\
@@ -46,7 +50,7 @@ clean:
 	@ echo
 
 share/markdown.so: $(SUNDOWN_SRC) $(NIF_SRC)
-	$(CC) $(CFLAGS) -dynamiclib -undefined dynamic_lookup -o $@ $(SUNDOWN_SRC) $(NIF_SRC)
+	$(CC) $(CFLAGS) -shared $(OPTIONS) -o $@ $(SUNDOWN_SRC) $(NIF_SRC)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(ERLANG_FLAGS) -c -o $@ $^
