@@ -15,8 +15,12 @@ defmodule ExDoc.HTMLFormatterTest do
     File.expand_path "test/tmp/output"
   end
 
+  defp source_root_url do
+    "https://github.com/elixir-lang/elixir/blob/master/"
+  end
+
   test "format_docs generate only the module name when there's no more info" do
-    ExDoc.HTMLFormatter.format_docs({"XPTOModule", {{1, nil}, []}}, output_dir)
+    ExDoc.HTMLFormatter.format_docs({"XPTOModule", "", {{1, nil}, []}}, output_dir)
 
     content = File.read!("#{output_dir}/XPTOModule.html")
     assert Regex.match?(%r/<title>XPTOModule<\/title>/, content)
@@ -39,5 +43,6 @@ defmodule ExDoc.HTMLFormatterTest do
     assert Regex.match?(%r/example\/0.*Some example/m, content)
     assert Regex.match?(%r/example_without_docs\/0.*<div class="description">.*<\/div>/m, content)
     assert Regex.match?(%r/example_1\/0.*Another example/m, content)
+    assert Regex.match?(%r{<a href="#{source_root_url}test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}m, content)
   end
 end
