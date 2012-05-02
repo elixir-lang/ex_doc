@@ -45,8 +45,9 @@ test: compile test/tmp
 
 clean:
 	rm -f sundown/src/*.o sundown/html/*.o src/*.o
-	rm share/markdown.so
+	rm -f share/markdown.so
 	rm -rf $(EBIN_DIR)
+	rm -rf test/tmp
 	@ echo
 
 share/markdown.so: $(SUNDOWN_SRC) $(NIF_SRC)
