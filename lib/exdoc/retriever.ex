@@ -12,7 +12,7 @@ defmodule ExDoc.Retriever do
     moduledoc = module.__info__(:moduledoc)
     docs = Enum.filter module.__info__(:docs), has_doc?(&1)
 
-    { module_name, { moduledoc, docs } }
+    { module_name, source_path(module), { moduledoc, docs } }
   end
 
   defp has_doc?({_, _, _, false}) do
@@ -32,5 +32,14 @@ defmodule ExDoc.Retriever do
     relative = File.split relative_to
     hierarchy = :lists.subtract name, relative
     Enum.join hierarchy, "."
+  end
+
+  defp source_path(module) do
+    compile_info = module.__info__(:compile)
+    compile_options = Keyword.get(compile_info, :options)
+    compile_source  = Keyword.get(compile_info, :source)
+
+    list_to_binary :lists.nthtail(length(compile_source) + 1,
+                                  Keyword.get(compile_options, :source))
   end
 end
