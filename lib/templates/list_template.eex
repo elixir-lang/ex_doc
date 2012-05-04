@@ -15,6 +15,18 @@
       }
     </script>
     <div id="content">
+      <div id="nav">
+        <span class="<%= if(scope == :module, do: "selected") %>"><a target="_self" href="module_list.html">
+          Modules
+        </a></span>
+        <span class="<%= if(scope == :record, do: "selected") %>"><a target="_self" href="record_list.html">
+          Records
+        </a></span>
+        <span class="<%= if(scope == :protocol, do: "selected") %>"><a target="_self" href="protocol_list.html">
+          Protocols
+        </a></span>
+        <div class="clear"></div>
+      </div>
       <div id="search">Search: <input type="text" /></div>
 
       <ul id="full_list" class="class">

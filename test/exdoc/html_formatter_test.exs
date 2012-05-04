@@ -12,7 +12,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "module_page generate only the module name when there's no more info" do
-    node = ExDoc.Node.new module: XPTOModule, moduledoc: {1, nil}
+    node = ExDoc.ModuleNode.new module: XPTOModule, moduledoc: nil, id: "XPTOModule"
     content = ExDoc.HTMLFormatter.module_page(node)
 
     assert content[%r/<title>XPTOModule<\/title>/]
@@ -21,7 +21,7 @@ defmodule ExDoc.HTMLFormatterTest do
 
   test "module_page outputs the docstrings" do
     file = "#{input_path}/CompiledWithDocs.beam"
-    [node] = ExDoc.Retriever.get_docs [file], input_path
+    { [node], _, _ } = ExDoc.Retriever.get_docs [file], input_path
     content = ExDoc.HTMLFormatter.module_page(node)
 
     assert content[%r/<title>CompiledWithDocs<\/title>/]
@@ -36,7 +36,7 @@ defmodule ExDoc.HTMLFormatterTest do
 
   test "module_page outputs summaries" do
     file = "#{input_path}/CompiledWithDocs.beam"
-    [node] = ExDoc.Retriever.get_docs [file], input_path
+    { [node], _, _ } = ExDoc.Retriever.get_docs [file], input_path
     content = ExDoc.HTMLFormatter.module_page(node)
     assert content[%r{<span class="summary_signature">\s*<a href="#example_1/0">}]
   end

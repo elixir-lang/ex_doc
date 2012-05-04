@@ -33,10 +33,12 @@ li.clicked { background: #05a; color: #ccc; }
 li.clicked a:link, li.clicked a:visited { color: #eee; }
 li.clicked a.toggle { opacity: 0.5; background-position: bottom right; }
 li.collapsed.clicked a.toggle { background-position: top right; }
-#search input { border: 1px solid #bbb; -moz-border-radius: 3px; -webkit-border-radius: 3px; }
-#nav { margin-left: 10px; font-size: 0.9em; display: none; color: #aaa; }
+#nav { margin: 5px 0 10px 5px; font-size: 0.9em; display: none; color: #aaa; }
 #nav a:link, #nav a:visited { color: #358; }
 #nav a:hover { background: transparent; color: #5af; }
+#nav span { border-left: 1px solid #ccc; padding: 0 5px; display: block; float: left }
+#nav span:first-child { border-left: 0; border-radius: 3px; }
+#nav span.selected { text-decoration: underline; }
 
 .frames #content h1 { margin-top: 0; }
 .frames li { white-space: nowrap; cursor: normal; }

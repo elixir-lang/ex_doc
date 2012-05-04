@@ -14,5 +14,6 @@ defmodule CompiledWithDocs do
 
   def example_without_docs, do: nil
 
-  defrecord Nested, sample: []
+  defmodule Nested do
+  end
 end

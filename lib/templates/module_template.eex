@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= name %></title>
+    <title><%= module.id %></title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
 
@@ -20,20 +20,20 @@
     </script>
 
     <div id="content">
-      <h1><%= name %></h1>
+      <h1><%= module.id %></h1>
 
-      <% if moduledoc do %>
+      <% if module.moduledoc do %>
         <div id="moduledoc" class="docstring">
-          <%= moduledoc %>
+          <%= module.moduledoc %>
         </div>
       <% end %>
       <% unless Enum.empty?(functions) do %>
         <h2>Functions summary</h2>
         <ul class="summary">
-        <%= for { { name, arity }, _, _, _ } in functions do %>
+        <%= for node in functions do %>
           <li>
             <span class="summary_signature">
-              <a href="#<%= name %>/<%= arity %>"><%= name %>/<%= arity %></a>
+              <a href="#<%= node.id %>"><%= node.id %></a>
             </span>
           </li>
         <% end %>
@@ -42,25 +42,41 @@
       <% unless Enum.empty?(macros) do %>
         <h2>Macros summary</h2>
         <ul class="summary">
-        <%= for { { name, arity }, _, _, _ } in macros do %>
+        <%= for node in macros do %>
           <li>
             <span class="summary_signature">
-              <a href="#<%= name %>/<%= arity %>"><%= name %>/<%= arity %></a>
+              <a href="#<%= node.id %>"><%= node.id %></a>
             </span>
           </li>
         <% end %>
         </ul>
       <% end %>
-      <% unless Enum.empty?(function_docs) do %>
+      <% unless Enum.empty?(functions) do %>
         <div id="functions_details" class="details_list">
           <h2>Functions</h2>
-          <%= function_docs %>
+          <%= for node in functions do %>
+            <div class="detail">
+              <p class="signature" id="<%= node.id %>">
+                <strong><%= node.id %></strong>
+              </p>
+              <div class="docstring"><%= node.doc %></div>
+              <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
+            </div>
+          <% end %>
         </div>
       <% end %>
-      <% unless Enum.empty?(macro_docs) do %>
+      <% unless Enum.empty?(macros) do %>
         <div id="macros_details" class="details_list">
           <h2>Macros</h2>
-          <%= macro_docs %>
+          <%= for node in macros do %>
+            <div class="detail">
+              <p class="signature" id="<%= node.id %>">
+                <strong><%= node.id %></strong>
+              </p>
+              <div class="docstring"><%= node.doc %></div>
+              <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
+            </div>
+          <% end %>
         </div>
       <% end %>
     </div>
