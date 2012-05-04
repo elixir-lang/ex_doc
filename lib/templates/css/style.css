@@ -1,6 +1,6 @@
-body { 
+body {
   padding: 0 20px;
-  font-family: "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif; 
+  font-family: "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif;
   font-size: 13px;
 }
 
@@ -8,7 +8,7 @@ body.frames { padding: 0 5px; }
 
 h1 { font-size: 25px; border-top: 0px; margin-top: 0; padding-top: 4px; }
 
-h2 { 
+h2 {
   padding: 0;
   padding-bottom: 3px;
   border-bottom: 1px #aaa solid;
@@ -17,8 +17,6 @@ h2 {
 }
 
 .clear { clear: both; }
-
-.summary_desc .object_link, .docstring .object_link { font-family: monospace; }
 
 li.r1 { background: #f0f0f0; }
 li.r2 { background: #fafafa; }
@@ -31,17 +29,17 @@ div.docstring, p.docstring { margin-right: 6em; }
 .docstring pre {
   padding: 0.5em;
   border: #ffe0bb dotted 1px;
-  background: #fffde8;  
+  background: #fffde8;
 }
 
-p.signature { 
-  font-size: 1.1em; font-weight: normal; font-family: Monaco, Consolas, Courier, monospace; 
-  padding: 6px 10px; margin-top: 18px; 
+p.signature {
+  font-size: 1.1em; font-weight: normal; font-family: Monaco, Consolas, Courier, monospace;
+  padding: 6px 10px; margin-top: 18px;
   background: #e5e8ff; border: 1px solid #d8d8e5; -moz-border-radius: 3px; -webkit-border-radius: 3px;
 }
 
-#content a:link, #content a:visited { text-decoration: none; color: #05a; }
-#content a:hover { background: #ffffa5; }
+a:link, a:visited { text-decoration: none; color: #05a; }
+a:hover { background: #ffffa5; }
 
 .detail { border-top: 1px dotted #aaa; margin-top: 15px; padding-top: 0; }
 .detail:nth-child(2) { border: 0; }
@@ -52,28 +50,19 @@ ul.summary {
   font-family: monospace;
   font-size: 1em;
   line-height: 1.5em;
+  margin: 0;
+  padding: 0;
 }
-ul.summary a:link, ul.summary a:visited { 
+ul.summary li { display: inline-block; margin: 0px 5px 0px 0px; line-height: 2.6em;}
+ul.summary a:link, ul.summary a:visited {
   text-decoration: none; font-size: 1.1em;
 }
-ul.summary li { margin-bottom: 5px; }
-.summary .summary_signature { 
-  padding: 1px 10px;
+ul.summary .summary_signature {
+  padding: 5px 7px; padding-right: 4px;
   background: #eaeaff; border: 1px solid #dfdfe5;
-  -moz-border-radius: 3px; -webkit-border-radius: 3px; 
+  -moz-border-radius: 3px; -webkit-border-radius: 3px;
 }
-.summary_signature:hover { background: #eeeeff; cursor: pointer; }
-ul.summary.compact li { display: inline-block; margin: 0px 5px 0px 0px; line-height: 2.6em;}
-ul.summary.compact .summary_signature { padding: 5px 7px; padding-right: 4px; }
-
-#content .summary_signature:hover a:link, 
-#content .summary_signature:hover a:visited {
-  background: transparent;
-  color: #48f;
-}
-
-#content ul.summary li.deprecated .summary_signature a:link,
-#content ul.summary li.deprecated .summary_signature a:visited { text-decoration: line-through; font-style: italic; }
+ul.summary .summary_signature:hover { background: #eeeeff; cursor: pointer; }
 
 /* File contents */
 #filecontents li > p, .docstring li > p { margin: 0px; }
@@ -122,7 +111,7 @@ ul.summary.compact .summary_signature { padding: 5px 7px; padding-right: 4px; }
 #footer a:hover { color: #05a; }
 
 /* TOC */
-#toc { 
+#toc {
   padding: 20px; padding-right: 30px; border: 1px solid #ddd; float: right; background: #fff; margin-left: 20px; margin-bottom: 20px;
   max-width: 300px;
   -webkit-box-shadow: -2px 2px 6px #bbb;

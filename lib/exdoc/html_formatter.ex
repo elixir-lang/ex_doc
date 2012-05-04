@@ -4,10 +4,14 @@ defmodule ExDoc.HTMLFormatter do
     docs      = generate_html_for_docs(node.source, node.docs)
     moduledoc = generate_html_for_moduledoc(node.moduledoc)
 
+    functions = Enum.filter node.docs, match?({ _, _, :def, _ }, &1)
+    macros    = Enum.filter node.docs, match?({ _, _, :defmacro, _ }, &1)
+
     function_docs = Enum.filter_map docs, filter_by_type(&1, :def), get_content(&1)
     macro_docs    = Enum.filter_map docs, filter_by_type(&1, :defmacro), get_content(&1)
 
-    bindings = [name: name, moduledoc: moduledoc, function_docs: function_docs, macro_docs: macro_docs]
+    bindings = [name: name, moduledoc: moduledoc, functions: functions, macros: macros,
+      function_docs: function_docs, macro_docs: macro_docs]
     EEx.eval_file("#{template_path}/module_template.eex", bindings)
   end
 
@@ -40,10 +44,10 @@ defmodule ExDoc.HTMLFormatter do
 
     # TODO The project URL needs to be configurable
     source_link = %b{<a href="https://github.com/elixir-lang/elixir/blob/master/#{source_path}#L#{line}" target="_blank" class="view_source">Source</a>}
-    
+
     content = %b"""
       <div class="detail">
-        <p class="signature">
+        <p class="signature" id="#{name}/#{arity}">
           <strong>#{name}/#{arity}</strong>
         </p>
         <div class="docstring">#{html}</div>

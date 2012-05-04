@@ -27,6 +27,30 @@
           <%= moduledoc %>
         </div>
       <% end %>
+      <% unless Enum.empty?(functions) do %>
+        <h2>Functions summary</h2>
+        <ul class="summary">
+        <%= for { { name, arity }, _, _, _ } in functions do %>
+          <li>
+            <span class="summary_signature">
+              <a href="#<%= name %>/<%= arity %>"><%= name %>/<%= arity %></a>
+            </span>
+          </li>
+        <% end %>
+        </ul>
+      <% end %>
+      <% unless Enum.empty?(macros) do %>
+        <h2>Macros summary</h2>
+        <ul class="summary">
+        <%= for { { name, arity }, _, _, _ } in macros do %>
+          <li>
+            <span class="summary_signature">
+              <a href="#<%= name %>/<%= arity %>"><%= name %>/<%= arity %></a>
+            </span>
+          </li>
+        <% end %>
+        </ul>
+      <% end %>
       <% unless Enum.empty?(function_docs) do %>
         <div id="functions_details" class="details_list">
           <h2>Functions</h2>
