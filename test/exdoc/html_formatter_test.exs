@@ -20,7 +20,8 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "format_docs generate only the module name when there's no more info" do
-    ExDoc.HTMLFormatter.format_docs({"XPTOModule", "", {1, nil}, []}, output_dir)
+    node = ExDoc.Node.new name: "XPTOModule", moduledoc: {1, nil}
+    ExDoc.HTMLFormatter.format_docs(node, output_dir)
 
     content = File.read!("#{output_dir}/XPTOModule.html")
     assert Regex.match?(%r/<title>XPTOModule<\/title>/, content)

@@ -7,7 +7,7 @@ defmodule ExDoc do
     copy_css_files output_path
     copy_javascript_files output_path
     copy_image_files output_path
-    generate_seach_index docs, output_path
+    generate_search_index docs, output_path
     Enum.map docs, formatter.format_docs(&1, output_path)
   end
 
@@ -16,16 +16,7 @@ defmodule ExDoc do
   ####
 
   defp find_files(path) do
-    path = List.reverse binary_to_list(path)
-    File.wildcard normalize_path(path)
-  end
-
-  defp normalize_path('/' ++ path) do
-    List.reverse(path) ++ '**/*.beam'
-  end
-
-  defp normalize_path(path) do
-    List.reverse(path) ++ '/**/*.beam'
+    File.wildcard :filename.join(path, "**/*.beam")
   end
 
   defp copy_index_files(output_path) do
@@ -59,7 +50,7 @@ defmodule ExDoc do
     F.copy "#{input_path}/#{file}", "#{output_path}/#{file}"
   end
 
-  defp generate_seach_index(docs, base_output_path) do
+  defp generate_search_index(docs, base_output_path) do
     output_path = File.expand_path "#{base_output_path}/panel"
     F.make_dir output_path
     names = Enum.map docs, get_names(&1)
@@ -67,9 +58,9 @@ defmodule ExDoc do
     Erlang.file.write_file("#{output_path}/index.html", content)
   end
 
-  defp get_names({ module_name, _, _, functions }) do
-    functions = Enum.map functions, get_function_name(&1)
-    { module_name, functions }
+  defp get_names(node) do
+    functions = Enum.map node.docs, get_function_name(&1)
+    { node.name, functions }
   end
 
   defp get_function_name({ { _name, _arity }, _, _, false }) do
