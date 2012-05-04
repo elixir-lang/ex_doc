@@ -3,30 +3,45 @@
   <head>
     <title><%= name %></title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
   </head>
 
   <body>
-    <div class="banner">
-      <span>Elixir v0.9</span>
-      <h1><%= name %></h1>
-    </div>
-    <div id="bodyContent">
-      <div id="content">
-        <% if moduledoc do %>
-          <div id="moduledoc" class="description">
-            <%= moduledoc %>
-          </div>
-        <% end %>
-        <% unless Enum.empty?(function_docs) do %>
-          <div class="sectiontitle">Functions</div>
-          <%= function_docs %>
-        <% end %>
-        <% unless Enum.empty?(macro_docs) do %>
-          <div class="sectiontitle">Macros</div>
-          <%= macro_docs %>
-        <% end %>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+
+    <!-- <div id="header">
+      <div id="menu">
+        <span class="title"><%= name %></span>
       </div>
+      <div class="clear"></div>
+    </div> -->
+
+    <div id="content">
+      <h1><%= name %></h1>
+
+      <% if moduledoc do %>
+        <div id="moduledoc" class="docstring">
+          <%= moduledoc %>
+        </div>
+      <% end %>
+      <% unless Enum.empty?(function_docs) do %>
+        <h2>Functions</h2>
+        <%= function_docs %>
+      <% end %>
+      <% unless Enum.empty?(macro_docs) do %>
+        <h2>Macros</h2>
+        <%= macro_docs %>
+      <% end %>
     </div>
   </body>
 </html>

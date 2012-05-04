@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="css/full_list.css" type="text/css" media="screen" charset="utf-8" />    
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/full_list.js"></script>
+    <base id="base_target" target="_parent" />
+  </head>
+  <body class="frames">
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) {
+        document.getElementById('base_target').target = 'main';
+        document.body.className = 'frames';
+      }
+    </script>
+    <div id="content">
+      <div id="search">Search: <input type="text" /></div>
+
+      <ul id="full_list" class="class">
+        <%= names %>
+      </ul>
+    </div>
+  </body>
+</html>

@@ -64,11 +64,11 @@ defmodule ExDoc do
     F.copy "#{input_path}/#{file}", "#{output_path}/#{file}"
   end
 
-  defp generate_search_index(nodes, base_output_path) do
-    output_path = File.expand_path "#{base_output_path}/panel"
+  defp generate_search_index(nodes, output_path) do
+    output_file = File.expand_path "#{output_path}/module_list.html"
     F.make_dir output_path
     content = generate_html_from_nodes nodes
-    Erlang.file.write_file("#{output_path}/index.html", content)
+    Erlang.file.write_file(output_file, content)
   end
 
   defp get_function_name({ { _name, _arity }, _, _, false }) do
@@ -80,43 +80,38 @@ defmodule ExDoc do
   end
 
   defp generate_html_from_nodes(nodes) do
-    template_path = File.expand_path "../templates/panel_template.eex", __FILE__
+    template_path = File.expand_path "../templates/list_template.eex", __FILE__
 
-    names = Enum.map nodes, generate_list_items(&1, 0)
+    names = Enum.map nodes, module_list_item(&1)
     bindings = [names: names]
 
     EEx.eval_file template_path, bindings
   end
 
-  defp generate_list_items(node, level) do
+  defp module_list_item(node) do
     functions = Enum.map node.docs, get_function_name(&1)
-    children  = Enum.map node.children, generate_list_items(&1, level + 1)
-    module    = inspect(node.module)
-    functions = functions_list module, functions, level + 1
-    "<li class='level_#{level} closed'>\n#{wrap_link module}\n</li>\n#{children}\n#{functions}"
+    functions = Enum.filter functions, fn(x) -> x end
+    functions = Enum.map functions, function_list_item(node, &1)
+
+    children  = Enum.map node.children, module_list_item(&1)
+    
+    "<li>\n<a class='toggle'></a>\n#{wrap_link node}\n</li>" <>
+      "<ul>#{children}\n#{functions}</ul>"
   end
 
-  defp functions_list(module, functions, level) do
-    Enum.map functions, function_list_item(module, &1, level)
+  defp function_list_item(module, function) do
+    "<li>\n#{wrap_link module, function}\n</li>\n"
   end
 
-  defp function_list_item(module, function, level) do
-    "<li class='level_#{level} closed'>\n#{wrap_link module, function}\n</li>\n"
+  defp wrap_link(node) do
+    name = inspect(node.module)
+    "<span class='object_link'><a href='#{name}.html'>#{node.relative}</a>" <>
+      "<small class='search_info'>#{name}</small>"
   end
 
-  defp wrap_link(module) do
-    "<div class='content'>\n#{link_to_file module, nil}\n<div class='icon'></div>\n</div>"
-  end
-
-  defp wrap_link(module, function) do
-    "<div class='content'>\n#{link_to_file module, function}\n</div>"
-  end
-
-  defp link_to_file(module, nil) do
-    "<a href='../#{module}.html' target='docwin'>#{module}</a>"
-  end
-
-  defp link_to_file(module, function) do
-    "<a href='../#{module}.html##{function}' target='docwin'>#{function}</a>"
+  defp wrap_link(node, function) do
+    name = inspect(node.module)
+    "<span class='object_link'><a href='#{name}.html##{function}'>#{function}</a>" <>
+      "<small class='search_info'>#{name}</small>"
   end
 end
