@@ -1,8 +1,8 @@
 defrecord ExDoc.ModuleNode, module: nil, relative: nil, moduledoc: nil,
-  docs: [], source: nil, children: [], type: nil, id: nil
+  docs: [], source: nil, children: [], type: nil, id: nil, line: 0
 
 defrecord ExDoc.FunctionNode, name: nil, arity: 0, id: nil,
-  doc: [], source: nil, type: nil
+  doc: [], source: nil, type: nil, line: 0
 
 defmodule ExDoc.Retriever do
   import :erlang, only: [function_exported: 3]
@@ -84,13 +84,12 @@ defmodule ExDoc.Retriever do
       raise "Module #{inspect module} was not compiled with flag --docs"
     end
 
-    moduledoc   = if moduledoc, do: Markdown.to_html(moduledoc)
     source_path = source_path(module)
-
     docs = Enum.filter_map module.__info__(:docs), has_doc?(&1), get_function(&1, source_path)
 
     ExDoc.ModuleNode[
       id: inspect(module),
+      line: line,
       module: module,
       type: type,
       moduledoc: moduledoc,
@@ -114,9 +113,10 @@ defmodule ExDoc.Retriever do
       name: name,
       arity: arity,
       id: "#{name}/#{arity}",
-      doc: if(doc, do: Markdown.to_html(doc)),
-      source_path: source_link(source_path, line),
-      type: type
+      doc: doc,
+      source: source_link(source_path, line),
+      type: type,
+      line: line
     ]
   end
 

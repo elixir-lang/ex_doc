@@ -50,11 +50,17 @@ defmodule ExDoc.RetrieverTest do
 
     { [node], _, _ } = R.get_docs([file], input_path)
 
-    assert node.docs == [
-      {{:example, 0}, 10, :def, "Some example"},
-      {{:"example_1", 0}, 13, :defmacro, "Another example"},
-      {{:example_without_docs, 0}, 15, :def, nil}
-    ]
+    [ example, example_1, example_without_docs ] = node.docs
+
+    assert example.id == "example/0"
+    assert example.doc == "Some example"
+    assert example.type == :def
+
+    assert example_1.id == "example_1/0"
+    assert example_1.type == :defmacro
+
+    assert example_without_docs.source == "https://github.com/elixir-lang/elixir/blob/master/test/fixtures/compiled_with_docs.ex\#L15"
+    assert example_without_docs.doc == nil
   end
 
   test "get_docs returns an empty list if there's no docs info" do
@@ -63,10 +69,10 @@ defmodule ExDoc.RetrieverTest do
     assert node.docs == []
   end
 
-  test "get_docs returns a relative source path" do
+  test "get_docs returns the source" do
     file = "#{input_path}/__MAIN__/CompiledWithDocs.beam"
     { [node], _, _ } = R.get_docs([file], input_path)
-    assert node.source == "test/fixtures/compiled_with_docs.ex"
+    assert node.source == "https://github.com/elixir-lang/elixir/blob/master/test/fixtures/compiled_with_docs.ex\#L1"
   end
 
   test "get_docs returns an empty list if there's no children" do

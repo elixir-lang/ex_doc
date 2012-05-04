@@ -26,7 +26,7 @@ NIF_SRC=\
 
 compile: share/markdown.so $(EBIN_DIR)
 
-$(EBIN_DIR): $(shell find lib -type f -name "*.ex")
+$(EBIN_DIR): $(shell find lib -type f -name "*")
 	@ rm -rf ebin/
 	@ echo Compiling ...
 	@ mkdir -p $(EBIN_DIR)

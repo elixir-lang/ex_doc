@@ -1,12 +1,15 @@
 defmodule ExDoc.HTMLFormatter do
+  require EEx
+
   def module_page(node) do
     functions = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :def], &1)
     macros    = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :defmacro], &1)
-    bindings  = [module: node, functions: functions, macros: macros]
-    EEx.eval_file("#{template_path}/module_template.eex", bindings)
+    module_template(node, functions, macros)
   end
 
-  defp template_path() do
-    File.expand_path("../../templates", __FILE__)
-  end
+  defp to_html(nil), do: nil
+  defp to_html(bin) when is_binary(bin), do: Markdown.to_html(bin)
+
+  filename = File.expand_path("../../templates/module_template.eex", __FILE__)
+  EEx.function_from_file :defp, :module_template, filename, [:module, :functions, :macros]
 end

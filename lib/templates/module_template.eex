@@ -24,7 +24,7 @@
 
       <% if module.moduledoc do %>
         <div id="moduledoc" class="docstring">
-          <%= module.moduledoc %>
+          <%= to_html(module.moduledoc) %>
         </div>
       <% end %>
       <% unless Enum.empty?(functions) do %>
@@ -59,7 +59,7 @@
               <p class="signature" id="<%= node.id %>">
                 <strong><%= node.id %></strong>
               </p>
-              <div class="docstring"><%= node.doc %></div>
+              <div class="docstring"><%= to_html(node.doc) %></div>
               <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
             </div>
           <% end %>
@@ -73,7 +73,7 @@
               <p class="signature" id="<%= node.id %>">
                 <strong><%= node.id %></strong>
               </p>
-              <div class="docstring"><%= node.doc %></div>
+              <div class="docstring"><%= to_html(node.doc) %></div>
               <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
             </div>
           <% end %>
