@@ -20,7 +20,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "format_docs generate only the module name when there's no more info" do
-    node = ExDoc.Node.new name: "XPTOModule", moduledoc: {1, nil}
+    node = ExDoc.Node.new module: XPTOModule, moduledoc: {1, nil}
     ExDoc.HTMLFormatter.format_docs(node, output_dir)
 
     content = File.read!("#{output_dir}/XPTOModule.html")

@@ -2,16 +2,17 @@ defmodule ExDoc.HTMLFormatter do
   # TODO This should *not* write to disk
   # Not writing to disk should make it easier to test
   def format_docs(node, output_path) do
+    name      = inspect(node.module)
     docs      = generate_html_for_docs(node.source, node.docs)
     moduledoc = generate_html_for_moduledoc(node.moduledoc)
 
     function_docs = Enum.filter_map docs, filter_by_type(&1, :def), get_content(&1)
     macro_docs    = Enum.filter_map docs, filter_by_type(&1, :defmacro), get_content(&1)
 
-    bindings = [name: node.name, moduledoc: moduledoc, function_docs: function_docs, macro_docs: macro_docs]
+    bindings = [name: name, moduledoc: moduledoc, function_docs: function_docs, macro_docs: macro_docs]
     content  = EEx.eval_file("#{template_path}/module_template.eex", bindings)
 
-    Erlang.file.write_file("#{output_path}/#{node.name}.html", content)
+    Erlang.file.write_file("#{output_path}/#{name}.html", content)
   end
 
   def filter_by_type(function, expected) do

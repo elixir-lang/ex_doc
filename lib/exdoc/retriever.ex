@@ -1,9 +1,10 @@
-defrecord ExDoc.Node, name: nil, moduledoc: nil, docs: [],
-  source: nil, children: []
+defrecord ExDoc.Node, module: nil, relative: nil, moduledoc: nil,
+  docs: [], source: nil, children: []
 
 defmodule ExDoc.Retriever do
   def get_docs(files, relative_to) do
-    modules = Enum.map files, get_module_from_file(&1, "#{relative_to}/__MAIN__")
+    parts   = File.split "#{relative_to}/__MAIN__"
+    modules = Enum.map files, get_module_from_file(&1, parts)
     get_docs_from_modules([], Enum.qsort(modules), [])
   end
 
@@ -26,7 +27,8 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_docs_from_module(scope, segments, nested) do
-    module = :"__MAIN__.#{Enum.join segments, "."}"
+    module   = :"__MAIN__.#{Enum.join segments, "."}"
+    relative = Enum.join Enum.drop(segments, length(scope) - length(segments)), "."
 
     if match?({ :error,_ }, Code.ensure_loaded(module)), do:
       raise "module #{inspect module} is not defined"
@@ -39,10 +41,11 @@ defmodule ExDoc.Retriever do
     docs = Enum.filter module.__info__(:docs), has_doc?(&1)
 
     ExDoc.Node.new(
-      name: inspect(module),
-      source: source_path(module),
+      module: module,
       moduledoc: moduledoc,
       docs: docs,
+      relative: relative,
+      source: source_path(module),
       children: get_docs_from_modules(scope, nested, [])
     )
   end
@@ -55,10 +58,9 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_module_from_file(name, relative_to) do
-    name = File.split :filename.rootname(name, '.beam')
-    relative = File.split relative_to
-    :lists.subtract name, relative
+  defp get_module_from_file(name, parts) do
+    name = File.split :filename.rootname(name, ".beam")
+    name -- parts
   end
 
   # TODO: This function needs to receive the project root level

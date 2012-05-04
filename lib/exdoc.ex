@@ -60,7 +60,7 @@ defmodule ExDoc do
 
   defp get_names(node) do
     functions = Enum.map node.docs, get_function_name(&1)
-    { node.name, functions }
+    { inspect(node.module), functions }
   end
 
   defp get_function_name({ { _name, _arity }, _, _, false }) do

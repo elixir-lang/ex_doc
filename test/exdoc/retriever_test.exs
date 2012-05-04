@@ -12,13 +12,19 @@ defmodule ExDoc.RetrieverTest do
   test "get_docs returns the module name" do
     file = "#{input_path}/__MAIN__/CompiledWithDocs.beam"
     [node] = R.get_docs([file], input_path)
-    assert node.name == "CompiledWithDocs"
+    assert node.module == CompiledWithDocs
   end
 
   test "get_docs returns the nested module name" do
     file = "#{input_path}/__MAIN__/ExDocTest/Nested.beam"
     [node] = R.get_docs([file], input_path)
-    assert node.name == "ExDocTest.Nested"
+    assert node.module == ExDocTest.Nested
+  end
+
+  test "get_docs returns the relative module name" do
+    file = "#{input_path}/__MAIN__/ExDocTest/Nested.beam"
+    [node] = R.get_docs([file], input_path)
+    assert node.relative == "ExDocTest.Nested"
   end
 
   test "get_docs returns the moduledoc info" do
@@ -71,7 +77,8 @@ defmodule ExDoc.RetrieverTest do
 
     [node]  = R.get_docs(files, input_path)
     [child] = node.children
-    assert child.name == "CompiledWithDocs.Nested"
+    assert child.module   == CompiledWithDocs.Nested
+    assert child.relative == "Nested"
   end
 
 end
