@@ -36,11 +36,11 @@ $(EBIN_DIR): $(shell find lib -type f -name "*.ex")
 
 test/tmp: $(shell find test/fixtures -type f -name "*.ex")
 	@ rm -rf test/tmp/*
-	@ elixirc --docs test/fixtures -o test/tmp
+	@ elixirc test/fixtures -o test/tmp --docs
 
 test: compile test/tmp
 	@ echo Running tests ...
-	time elixir -pa test/tmp -pa ebin -r "test/**/*_test.exs"
+	time elixir -pa test/tmp -pa ebin -r "test/test_helper.exs" -pr "test/**/*_test.exs"
 	@ echo
 
 clean:

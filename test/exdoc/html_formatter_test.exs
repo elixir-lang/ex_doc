@@ -24,10 +24,8 @@ defmodule ExDoc.HTMLFormatterTest do
     ExDoc.HTMLFormatter.format_docs(node, output_dir)
 
     content = File.read!("#{output_dir}/XPTOModule.html")
-    assert Regex.match?(%r/<title>XPTOModule<\/title>/, content)
-    assert Regex.match?(%r/<h1>XPTOModule<\/h1>/, content)
-    refute Regex.match?(%r/<div id="moduledoc"/, content)
-    refute Regex.match?(%r/<div class="function"/, content)
+    assert content[%r/<title>XPTOModule<\/title>/]
+    assert content[%r/<h1>XPTOModule<\/h1>/]
   end
 
   test "generate_docs outputs the correct content" do
@@ -38,12 +36,12 @@ defmodule ExDoc.HTMLFormatterTest do
     ExDoc.HTMLFormatter.format_docs(docs, output_dir)
 
     content = File.read!("#{output_dir}/CompiledWithDocs.html")
-    assert Regex.match?(%r/<title>CompiledWithDocs<\/title>/, content)
-    assert Regex.match?(%r/<h1>CompiledWithDocs<\/h1>/, content)
-    assert Regex.match?(%r/moduledoc.*Example.*CompiledWithDocs\.example.*/m, content)
-    assert Regex.match?(%r/example\/0.*Some example/m, content)
-    assert Regex.match?(%r/example_without_docs\/0.*<div class="description">.*<\/div>/m, content)
-    assert Regex.match?(%r/example_1\/0.*Another example/m, content)
-    assert Regex.match?(%r{<a href="#{source_root_url}test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}m, content)
+    assert content[%r/<title>CompiledWithDocs<\/title>/]
+    assert content[%r/<h1>CompiledWithDocs<\/h1>/]
+    assert content[%r/moduledoc.*Example.*CompiledWithDocs\.example.*/m]
+    assert content[%r/example\/0.*Some example/m]
+    assert content[%r/example_without_docs\/0.*<div class="description">.*<\/div>/m]
+    assert content[%r/example_1\/0.*Another example/m]
+    assert content[%r{<a href="#{source_root_url}test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}m]
   end
 end

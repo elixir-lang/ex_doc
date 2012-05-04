@@ -56,4 +56,22 @@ defmodule ExDoc.RetrieverTest do
     [node] = R.get_docs([file], input_path)
     assert node.source == "test/fixtures/compiled_with_docs.ex"
   end
+
+  test "get_docs returns an empty list if there's no children" do
+    file = "#{input_path}/__MAIN__/CompiledWithDocs.beam"
+    [node] = R.get_docs([file], input_path)
+    assert node.children == []
+  end
+
+  test "get_docs returns a list with children" do
+    files = [
+      "#{input_path}/__MAIN__/CompiledWithDocs.beam",
+      "#{input_path}/__MAIN__/CompiledWithDocs/Nested.beam"
+    ]
+
+    [node]  = R.get_docs(files, input_path)
+    [child] = node.children
+    assert child.name == "CompiledWithDocs.Nested"
+  end
+
 end

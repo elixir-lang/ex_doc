@@ -13,4 +13,6 @@ defmodule CompiledWithDocs do
   defmacro example_1, do: 1
 
   def example_without_docs, do: nil
+
+  defrecord Nested, sample: []
 end

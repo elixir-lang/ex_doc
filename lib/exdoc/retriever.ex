@@ -4,28 +4,46 @@ defrecord ExDoc.Node, name: nil, moduledoc: nil, docs: [],
 defmodule ExDoc.Retriever do
   def get_docs(files, relative_to) do
     modules = Enum.map files, get_module_from_file(&1, "#{relative_to}/__MAIN__")
-    get_docs_from_modules(:lists.sort(modules))
+    get_docs_from_modules([], Enum.qsort(modules), [])
   end
 
   # Helpers
 
-  defp get_docs_from_modules([h|t]) do
-    [get_docs_from_module(h)|get_docs_from_modules(t)]
+  defp get_docs_from_modules(scope, [h|t], acc) do
+    flag   = scope ++ h
+    length = length(flag)
+
+    { nested, rest } = Enum.split_with t, fn(x) ->
+      Enum.take(x, length) == flag
+    end
+
+    module = get_docs_from_module(flag, h, nested)
+    get_docs_from_modules(scope, rest, [module|acc])
   end
 
-  defp get_docs_from_modules([]) do
-    []
+  defp get_docs_from_modules(_, [], acc) do
+    List.reverse(acc)
   end
 
-  defp get_docs_from_module({ _, module }) do
+  defp get_docs_from_module(scope, segments, nested) do
+    module = :"__MAIN__.#{Enum.join segments, "."}"
+
+    if match?({ :error,_ }, Code.ensure_loaded(module)), do:
+      raise "module #{inspect module} is not defined"
+
     moduledoc = module.__info__(:moduledoc)
-    docs      = Enum.filter module.__info__(:docs), has_doc?(&1)
+
+    unless moduledoc, do:
+      raise "Module #{inspect module} was not compiled with flag --docs"
+
+    docs = Enum.filter module.__info__(:docs), has_doc?(&1)
 
     ExDoc.Node.new(
       name: inspect(module),
       source: source_path(module),
       moduledoc: moduledoc,
-      docs: docs
+      docs: docs,
+      children: get_docs_from_modules(scope, nested, [])
     )
   end
 
@@ -40,9 +58,7 @@ defmodule ExDoc.Retriever do
   defp get_module_from_file(name, relative_to) do
     name = File.split :filename.rootname(name, '.beam')
     relative = File.split relative_to
-    hierarchy = :lists.subtract name, relative
-    segments = Enum.join hierarchy, "."
-    { length(hierarchy), :"__MAIN__.#{segments}" }
+    :lists.subtract name, relative
   end
 
   # TODO: This function needs to receive the project root level

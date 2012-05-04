@@ -1,5 +1,6 @@
 defmodule ExDoc.HTMLFormatter do
-  # TODO: This should *not* write to disk
+  # TODO This should *not* write to disk
+  # Not writing to disk should make it easier to test
   def format_docs(node, output_path) do
     docs      = generate_html_for_docs(node.source, node.docs)
     moduledoc = generate_html_for_moduledoc(node.moduledoc)
