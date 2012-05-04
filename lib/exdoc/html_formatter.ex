@@ -39,8 +39,17 @@ defmodule ExDoc.HTMLFormatter do
     function_name = "#{name}/#{arity}"
 
     # TODO The project URL needs to be configurable
-    source_link = %b{<a href="https://github.com/elixir-lang/elixir/blob/master/#{source_path}#L#{line}" target="_blank">Source</a>}
-    content = %b{<div class="function"><div class="function-title" id="#{function_name}">\n<b>#{function_name}</b>\n</div>\n<div class="description">\n#{html}</div>\n#{source_link}</div>\n}
+    source_link = %b{<a href="https://github.com/elixir-lang/elixir/blob/master/#{source_path}#L#{line}" target="_blank" class="view_source">Source</a>}
+    
+    content = %b"""
+      <div class="detail">
+        <p class="signature">
+          <strong>#{name}/#{arity}</strong>
+        </p>
+        <div class="docstring">#{html}</div>
+        #{source_link}
+      </div>
+    """
 
     { type, content }
   end

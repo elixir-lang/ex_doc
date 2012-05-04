@@ -19,13 +19,6 @@
       if (window.top.frames.main) document.body.className = 'frames';
     </script>
 
-    <!-- <div id="header">
-      <div id="menu">
-        <span class="title"><%= name %></span>
-      </div>
-      <div class="clear"></div>
-    </div> -->
-
     <div id="content">
       <h1><%= name %></h1>
 
@@ -35,12 +28,16 @@
         </div>
       <% end %>
       <% unless Enum.empty?(function_docs) do %>
-        <h2>Functions</h2>
-        <%= function_docs %>
+        <div id="functions_details" class="details_list">
+          <h2>Functions</h2>
+          <%= function_docs %>
+        </div>
       <% end %>
       <% unless Enum.empty?(macro_docs) do %>
-        <h2>Macros</h2>
-        <%= macro_docs %>
+        <div id="macros_details" class="details_list">
+          <h2>Macros</h2>
+          <%= macro_docs %>
+        </div>
       <% end %>
     </div>
   </body>

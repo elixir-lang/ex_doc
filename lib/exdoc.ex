@@ -6,7 +6,6 @@ defmodule ExDoc do
     copy_index_files output_path
     copy_css_files output_path
     copy_javascript_files output_path
-    copy_image_files output_path
     generate_search_index nodes, output_path
     generate_each_page nodes, formatter, output_path
   end
@@ -43,10 +42,6 @@ defmodule ExDoc do
 
   defp copy_javascript_files(output_path) do
     copy_files "*.js", "../templates/js", "#{output_path}/js"
-  end
-
-  defp copy_image_files(output_path) do
-    copy_files "*.png", "../templates/i", "#{output_path}/i"
   end
 
   defp copy_files(wildcard, input_path, output_path) do
