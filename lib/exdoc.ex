@@ -67,7 +67,7 @@ defmodule ExDoc do
     Erlang.file.write_file("#{output_path}/index.html", content)
   end
 
-  defp get_names({ module_name, _, { _, functions }}) do
+  defp get_names({ module_name, _, _, functions }) do
     functions = Enum.map functions, get_function_name(&1)
     { module_name, functions }
   end

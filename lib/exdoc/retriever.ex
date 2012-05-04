@@ -12,7 +12,7 @@ defmodule ExDoc.Retriever do
     moduledoc = module.__info__(:moduledoc)
     docs = Enum.filter module.__info__(:docs), has_doc?(&1)
 
-    { module_name, source_path(module), { moduledoc, docs } }
+    { module_name, source_path(module), moduledoc, docs }
   end
 
   defp has_doc?({_, _, _, false}) do
@@ -34,6 +34,9 @@ defmodule ExDoc.Retriever do
     Enum.join hierarchy, "."
   end
 
+  # TODO: This function needs to receive the project root level
+  # as argument. Relying on this logic will break on next Erlang
+  # release.
   defp source_path(module) do
     compile_info = module.__info__(:compile)
     compile_options = Keyword.get(compile_info, :options)
