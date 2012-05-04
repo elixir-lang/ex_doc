@@ -1,19 +1,7 @@
 Code.require_file "../../test_helper", __FILE__
 
 defmodule ExDoc.HTMLFormatterTest do
-  use ExUnit.Case, sync: true
-
-  def setup_all do
-    :file.make_dir(output_dir)
-  end
-
-  def teardown_all do
-    :os.cmd('rm -rf #{output_dir}')
-  end
-
-  defp output_dir do
-    File.expand_path "test/tmp/output"
-  end
+  use ExUnit.Case
 
   defp source_root_url do
     "https://github.com/elixir-lang/elixir/blob/master/"
@@ -21,9 +9,8 @@ defmodule ExDoc.HTMLFormatterTest do
 
   test "format_docs generate only the module name when there's no more info" do
     node = ExDoc.Node.new module: XPTOModule, moduledoc: {1, nil}
-    ExDoc.HTMLFormatter.format_docs(node, output_dir)
+    content = ExDoc.HTMLFormatter.module_page(node)
 
-    content = File.read!("#{output_dir}/XPTOModule.html")
     assert content[%r/<title>XPTOModule<\/title>/]
     assert content[%r/<h1>XPTOModule<\/h1>/]
   end
@@ -32,10 +19,9 @@ defmodule ExDoc.HTMLFormatterTest do
     input_path = File.expand_path "test/tmp"
     file = "#{input_path}/CompiledWithDocs.beam"
 
-    [docs] = ExDoc.Retriever.get_docs [file], input_path
-    ExDoc.HTMLFormatter.format_docs(docs, output_dir)
+    [node] = ExDoc.Retriever.get_docs [file], input_path
+    content = ExDoc.HTMLFormatter.module_page(node)
 
-    content = File.read!("#{output_dir}/CompiledWithDocs.html")
     assert content[%r/<title>CompiledWithDocs<\/title>/]
     assert content[%r/<h1>CompiledWithDocs<\/h1>/]
     assert content[%r/moduledoc.*Example.*CompiledWithDocs\.example.*/m]

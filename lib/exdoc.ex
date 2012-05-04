@@ -2,18 +2,32 @@ defmodule ExDoc do
   require Erlang.file, as: F
 
   def generate_docs(path, output_path // "output", formatter // ExDoc.HTMLFormatter) do
-    docs = ExDoc.Retriever.get_docs find_files(path), File.expand_path(path)
+    nodes = ExDoc.Retriever.get_docs find_files(path), File.expand_path(path)
     copy_index_files output_path
     copy_css_files output_path
     copy_javascript_files output_path
     copy_image_files output_path
-    generate_search_index docs, output_path
-    Enum.map docs, formatter.format_docs(&1, output_path)
+    generate_search_index nodes, output_path
+    generate_each_page nodes, formatter, output_path
   end
 
   ####
   # Helpers
   ####
+
+  defp generate_each_page([node|t], formatter, output_path) do
+    name    = inspect(node.module)
+    content = formatter.module_page(node)
+
+    F.write_file("#{output_path}/#{name}.html", content)
+
+    generate_each_page(node.children, formatter, output_path)
+    generate_each_page(t, formatter, output_path)
+  end
+
+  defp generate_each_page([], _formatter, _output_path) do
+    :ok
+  end
 
   defp find_files(path) do
     File.wildcard :filename.join(path, "**/*.beam")

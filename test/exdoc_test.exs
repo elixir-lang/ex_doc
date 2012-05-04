@@ -9,7 +9,7 @@ defmodule ExDocTest do
   end
 
   def teardown_all do
-    :os.cmd('rm -rf #{output_dir}')
+    System.cmd("rm -rf #{output_dir}")
     :file.set_cwd("..")
   end
 
@@ -19,14 +19,14 @@ defmodule ExDocTest do
 
   test "generate_docs generates the html file with the documentation" do
     ExDoc.generate_docs File.expand_path("tmp")
-
-    assert :filelib.is_file("#{output_dir}/CompiledWithDocs.html")
+    assert File.regular?("#{output_dir}/CompiledWithDocs.html")
+    assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
   end
 
   test "generate_docs accepts relative directories" do
     ExDoc.generate_docs "tmp"
-
-    assert :filelib.is_file("#{output_dir}/CompiledWithDocs.html")
+    assert File.regular?("#{output_dir}/CompiledWithDocs.html")
+    assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
   end
 
   test "generate_docs generates the panel index html file with all modules" do
