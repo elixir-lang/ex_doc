@@ -29,11 +29,11 @@ defmodule ExDoc.Retriever do
     remaining = Enum.filter modules, match?({ _, _, nil }, &1)
 
     # Sort the modules and return the list of nodes
-    {
-      nest_modules([], Enum.qsort(remaining), []),
-      nest_modules([], Enum.qsort(records), []),
-      nest_modules([], Enum.qsort(protocols), [])
-    }
+    [
+      modules:   nest_modules([], Enum.qsort(remaining), []),
+      records:   nest_modules([], Enum.qsort(records), []),
+      protocols: nest_modules([], Enum.qsort(protocols), [])
+    ]
   end
 
   # Helpers

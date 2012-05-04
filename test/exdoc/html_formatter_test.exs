@@ -21,7 +21,7 @@ defmodule ExDoc.HTMLFormatterTest do
 
   test "module_page outputs the docstrings" do
     file = "#{input_path}/CompiledWithDocs.beam"
-    { [node], _, _ } = ExDoc.Retriever.get_docs [file], input_path
+    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :modules
     content = ExDoc.HTMLFormatter.module_page(node)
 
     assert content[%r/<title>CompiledWithDocs<\/title>/]
@@ -36,7 +36,7 @@ defmodule ExDoc.HTMLFormatterTest do
 
   test "module_page outputs summaries" do
     file = "#{input_path}/CompiledWithDocs.beam"
-    { [node], _, _ } = ExDoc.Retriever.get_docs [file], input_path
+    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :modules
     content = ExDoc.HTMLFormatter.module_page(node)
     assert content[%r{<span class="summary_signature">\s*<a href="#example_1/0">}]
   end

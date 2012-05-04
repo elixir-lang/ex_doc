@@ -2,14 +2,17 @@ defmodule ExDoc do
   require Erlang.file, as: F
 
   def generate_docs(path, output_path // "output", formatter // ExDoc.HTMLFormatter) do
-    { nodes, records, protocols } = ExDoc.Retriever.get_docs find_files(path), File.expand_path(path)
-    copy_index_files output_path
-    copy_css_files output_path
-    copy_javascript_files output_path
+    output_path = File.expand_path(output_path)
+    F.make_dir output_path
 
-    generate_listing :module, nodes, output_path, formatter
-    generate_listing :record, records, output_path, formatter
-    generate_listing :protocol, protocols, output_path, formatter
+    path  = File.expand_path(path)
+    pairs = ExDoc.Retriever.get_docs find_files(path), path
+
+    Enum.each formatter.assets, copy_assets(&1, output_path)
+
+    Enum.each pairs, fn({ name, nodes }) ->
+      generate_listing name, nodes, output_path, formatter
+    end
   end
 
   ####
@@ -18,7 +21,6 @@ defmodule ExDoc do
 
   defp generate_each_page([node|t], formatter, output_path) do
     content = formatter.module_page(node)
-
     F.write_file("#{output_path}/#{node.id}.html", content)
 
     generate_each_page(node.children, formatter, output_path)
@@ -33,37 +35,20 @@ defmodule ExDoc do
     File.wildcard :filename.join(path, "**/*.beam")
   end
 
-  defp copy_index_files(output_path) do
-    copy_file "../templates", output_path, "index.html"
-  end
+  defp copy_assets({ pattern, dir }, output_path) do
+    output = "#{output_path}/#{dir}"
+    F.make_dir output
 
-  defp copy_css_files(output_path) do
-    copy_files "*.css", "../templates/css", "#{output_path}/css"
-  end
-
-  defp copy_javascript_files(output_path) do
-    copy_files "*.js", "../templates/js", "#{output_path}/js"
-  end
-
-  defp copy_files(wildcard, input_path, output_path) do
-    files = Enum.map File.wildcard(File.expand_path("#{input_path}/#{wildcard}", __FILE__)),
-      File.basename(&1)
-    Enum.map files, copy_file(input_path, output_path, &1)
-  end
-
-  defp copy_file(input_path, output_path, file) do
-    input_path = File.expand_path input_path, __FILE__
-    output_path = File.expand_path output_path
-
-    F.make_dir output_path
-
-    F.copy "#{input_path}/#{file}", "#{output_path}/#{file}"
+    Enum.map File.wildcard(pattern), fn(file) ->
+      base = File.basename(file)
+      F.copy file, "#{output}/#{base}"
+    end
   end
 
   defp generate_listing(scope, nodes, output_path, formatter) do
     generate_each_page(nodes, formatter, output_path)
 
-    output_file = File.expand_path "#{output_path}/#{scope}_list.html"
+    output_file = "#{output_path}/#{scope}_list.html"
     F.make_dir output_path
 
     template_path = File.expand_path "../templates/list_template.eex", __FILE__

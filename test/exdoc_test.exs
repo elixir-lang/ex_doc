@@ -14,7 +14,7 @@ defmodule ExDocTest do
   end
 
   defp output_dir do
-    File.expand_path "output"
+    File.expand_path("../output", __FILE__)
   end
 
   test "generate_docs generates the html file with the documentation" do
@@ -32,7 +32,7 @@ defmodule ExDocTest do
   test "generate_docs generates the panel index html file with all modules" do
     ExDoc.generate_docs File.expand_path("tmp")
 
-    content = File.read!("#{output_dir}/module_list.html")
+    content = File.read!("#{output_dir}/modules_list.html")
     assert content[%r/<li>.*'CompiledWithDocs\.html'.*CompiledWithDocs.*<\/li>/m]
     assert content[%r/<li>.*'CompiledWithDocs\.html#example\/0'.*example\/0.*<\/li>/m]
     assert content[%r/<li>.*'CompiledWithDocs\.html#example_1\/0'.*example_1\/0.*<\/li>/m]
@@ -44,8 +44,9 @@ defmodule ExDocTest do
   end
 
   test "generate_docs generates in specified output directory" do
-    ExDoc.generate_docs "tmp", "#{output_dir}/docs"
-
-    assert :filelib.is_file("#{output_dir}/docs/CompiledWithDocs.html")
+    ExDoc.generate_docs File.expand_path("../tmp", __FILE__), "#{output_dir}/docs"
+    assert File.regular?("#{output_dir}/docs/CompiledWithDocs.html")
+    assert File.regular?("#{output_dir}/docs/index.html")
+    assert File.regular?("#{output_dir}/docs/css/style.css")
   end
 end
