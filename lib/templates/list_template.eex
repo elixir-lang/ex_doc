@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="css/full_list.css" type="text/css" media="screen" charset="utf-8" />    
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/full_list.js"></script>
+    <base id="base_target" target="_parent" />
+  </head>
+  <body class="frames">
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) {
+        document.getElementById('base_target').target = 'main';
+        document.body.className = 'frames';
+      }
+    </script>
+    <div id="content">
+      <div id="nav">
+        <span class="<%= if(scope == :modules, do: "selected") %>"><a target="_self" href="modules_list.html">
+          Modules
+        </a></span>
+        <span class="<%= if(scope == :records, do: "selected") %>"><a target="_self" href="records_list.html">
+          Records
+        </a></span>
+        <span class="<%= if(scope == :protocols, do: "selected") %>"><a target="_self" href="protocols_list.html">
+          Protocols
+        </a></span>
+        <div class="clear"></div>
+      </div>
+      <div id="search">Search: <input type="text" /></div>
+
+      <ul id="full_list" class="class">
+        <%= names %>
+      </ul>
+    </div>
+  </body>
+</html>

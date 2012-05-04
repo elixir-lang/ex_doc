@@ -1,32 +1,84 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= name %></title>
+    <title><%= module.id %></title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
   </head>
 
   <body>
-    <div class="banner">
-      <span>Elixir v0.9</span>
-      <h1><%= name %></h1>
-    </div>
-    <div id="bodyContent">
-      <div id="content">
-        <% if moduledoc do %>
-          <div id="moduledoc" class="description">
-            <%= moduledoc %>
-          </div>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+
+    <div id="content">
+      <h1><%= module.id %></h1>
+
+      <% if module.moduledoc do %>
+        <div id="moduledoc" class="docstring">
+          <%= to_html(module.moduledoc) %>
+        </div>
+      <% end %>
+      <% unless Enum.empty?(functions) do %>
+        <h2>Functions summary</h2>
+        <ul class="summary">
+        <%= for node in functions do %>
+          <li>
+            <span class="summary_signature">
+              <a href="#<%= node.id %>"><%= node.id %></a>
+            </span>
+          </li>
         <% end %>
-        <% unless Enum.empty?(function_docs) do %>
-          <div class="sectiontitle">Functions</div>
-          <%= function_docs %>
+        </ul>
+      <% end %>
+      <% unless Enum.empty?(macros) do %>
+        <h2>Macros summary</h2>
+        <ul class="summary">
+        <%= for node in macros do %>
+          <li>
+            <span class="summary_signature">
+              <a href="#<%= node.id %>"><%= node.id %></a>
+            </span>
+          </li>
         <% end %>
-        <% unless Enum.empty?(macro_docs) do %>
-          <div class="sectiontitle">Macros</div>
-          <%= macro_docs %>
-        <% end %>
-      </div>
+        </ul>
+      <% end %>
+      <% unless Enum.empty?(functions) do %>
+        <div id="functions_details" class="details_list">
+          <h2>Functions</h2>
+          <%= for node in functions do %>
+            <div class="detail">
+              <p class="signature" id="<%= node.id %>">
+                <strong><%= node.id %></strong>
+              </p>
+              <div class="docstring"><%= to_html(node.doc) %></div>
+              <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+      <% unless Enum.empty?(macros) do %>
+        <div id="macros_details" class="details_list">
+          <h2>Macros</h2>
+          <%= for node in macros do %>
+            <div class="detail">
+              <p class="signature" id="<%= node.id %>">
+                <strong><%= node.id %></strong>
+              </p>
+              <div class="docstring"><%= to_html(node.doc) %></div>
+              <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     </div>
   </body>
 </html>
