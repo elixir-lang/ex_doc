@@ -26,7 +26,7 @@ defmodule ExDoc.HTMLFormatterTest do
     assert content[%r/<h1>CompiledWithDocs<\/h1>/]
     assert content[%r/moduledoc.*Example.*CompiledWithDocs\.example.*/m]
     assert content[%r/example\/0.*Some example/m]
-    assert content[%r/example_without_docs\/0.*<div class="description">.*<\/div>/m]
+    assert content[%r/example_without_docs\/0.*<div class="docstring">.*<\/div>/m]
     assert content[%r/example_1\/0.*Another example/m]
     assert content[%r{<a href="#{source_root_url}test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}m]
   end
