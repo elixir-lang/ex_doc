@@ -13,3 +13,7 @@ defmodule ExDocTest.Nested do
   def example_without_docs do
   end
 end
+
+defmodule ExDocTest.Undocumented do
+  @moduledoc false
+end

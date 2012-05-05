@@ -44,6 +44,7 @@ defmodule ExDocTest do
     assert content[%r{<li>.*"CompiledWithDocs\.html#example\/0".*example\/0.*<\/li>}m]
     assert content[%r{<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}m]
     assert content[%r{<li>.*"ExDocTest\.Nested\.html".*ExDocTest\.Nested.*<\/li>}m]
+    assert !content[%r{ExDocTest\.Undocumented}m]
 
     content = File.read!("#{output_dir}/records_list.html")
     assert content[%r{<li>.*"CompiledRecord\.html".*CompiledRecord.*<\/li>}m]

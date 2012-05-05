@@ -7,6 +7,8 @@ defrecord ExDoc.FunctionNode, name: nil, arity: 0, id: nil,
 defmodule ExDoc.Retriever do
   import :erlang, only: [function_exported: 3]
 
+  defexception Error, message: nil
+
   @doc """
   This function receives a bunch of .beam file paths and
   the directory they are relative to and return a list of
@@ -139,9 +141,16 @@ defmodule ExDoc.Retriever do
     module   = :"__MAIN__.#{Enum.join segments, "."}"
 
     if match?({ :error,_ }, Code.ensure_loaded(module)), do:
-      raise "module #{inspect module} is not defined/available"
+      raise Error, message: "module #{inspect module} is not defined/available"
 
-    { segments, module, detect_type(module) }
+    case module.__info__(:moduledoc) do
+    match: { _, false }
+      nil
+    match: { _, _moduledoc }
+      { segments, module, detect_type(module) }
+    else:
+      raise Error, message: "module #{inspect module} was not compiled with flag --docs"
+    end
   end
 
   # Detect if a module is an exception, record,
