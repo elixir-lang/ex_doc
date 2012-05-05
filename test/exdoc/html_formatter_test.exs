@@ -52,7 +52,40 @@ defmodule ExDoc.HTMLFormatterTest do
     assert content[%r{<h1>\s*CompiledRecord\s*<small>record</small>\s*<\/h1>}m]
   end
 
+  test "module_page outputs record fields" do
+    file = "#{input_path}/CompiledRecord.beam"
+    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :records
+    content = ExDoc.HTMLFormatter.module_page(node)
+    assert content[%r{<strong>foo:</strong> nil}m]
+    assert content[%r{<strong>bar:</strong> "sample"}m]
+  end
+
+  test "module_page outputs exceptions fields" do
+    file = "#{input_path}/RandomError.beam"
+    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :records
+    content = ExDoc.HTMLFormatter.module_page(node)
+    assert !content[%r{<strong>__exception__:</strong>}m]
+    assert content[%r{<strong>message:</strong> "this is random!"}m]
+  end
+
   ## PROTOCOLS
+
+  test "module_page outputs the protocol type" do
+    file = "#{input_path}/CustomProtocol.beam"
+    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :protocols
+    content = ExDoc.HTMLFormatter.module_page(node)
+    assert content[%r{<h1>\s*CustomProtocol\s*<small>protocol</small>\s*<\/h1>}m]
+  end
+
+  test "module_page outputs protocol implementations" do
+    files = [
+      "#{input_path}/CustomProtocol.beam",
+      "#{input_path}/CustomProtocol/Number.beam"
+    ]
+    [node] = Keyword.get ExDoc.Retriever.get_docs(files, input_path), :protocols
+    content = ExDoc.HTMLFormatter.module_page(node)
+    assert content[%r{<a href="CustomProtocol.Number.html">Number</a>}m]
+  end
 
   ## LISTING
 
