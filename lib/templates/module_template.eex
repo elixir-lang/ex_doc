@@ -30,53 +30,25 @@
       <% unless Enum.empty?(functions) do %>
         <h2>Functions summary</h2>
         <ul class="summary">
-        <%= for node in functions do %>
-          <li>
-            <span class="summary_signature">
-              <a href="#<%= node.id %>"><%= node.id %></a>
-            </span>
-          </li>
-        <% end %>
+          <%= for node in functions, do: summary_template(node) %>
         </ul>
       <% end %>
       <% unless Enum.empty?(macros) do %>
         <h2>Macros summary</h2>
         <ul class="summary">
-        <%= for node in macros do %>
-          <li>
-            <span class="summary_signature">
-              <a href="#<%= node.id %>"><%= node.id %></a>
-            </span>
-          </li>
-        <% end %>
+          <%= for node in macros, do: summary_template(node) %>
         </ul>
       <% end %>
       <% unless Enum.empty?(functions) do %>
         <div id="functions_details" class="details_list">
           <h2>Functions</h2>
-          <%= for node in functions do %>
-            <div class="detail">
-              <p class="signature" id="<%= node.id %>">
-                <strong><%= node.id %></strong>
-              </p>
-              <div class="docstring"><%= to_html(node.doc) %></div>
-              <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
-            </div>
-          <% end %>
+          <%= for node in functions, do: detail_template(node) %>
         </div>
       <% end %>
       <% unless Enum.empty?(macros) do %>
         <div id="macros_details" class="details_list">
           <h2>Macros</h2>
-          <%= for node in macros do %>
-            <div class="detail">
-              <p class="signature" id="<%= node.id %>">
-                <strong><%= node.id %></strong>
-              </p>
-              <div class="docstring"><%= to_html(node.doc) %></div>
-              <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
-            </div>
-          <% end %>
+          <%= for node in macros, do: detail_template(node) %>
         </div>
       <% end %>
     </div>

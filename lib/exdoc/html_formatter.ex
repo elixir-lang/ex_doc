@@ -29,7 +29,9 @@ defmodule ExDoc.HTMLFormatter do
   templates = [
     module_template: [:module, :functions, :macros],
     list_template: [:scope, :nodes],
-    list_item_template: [:node]
+    list_item_template: [:node],
+    summary_template: [:node],
+    detail_template: [:node]
   ]
 
   Enum.each templates, fn({ name, args }) ->
