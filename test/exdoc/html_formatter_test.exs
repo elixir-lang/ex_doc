@@ -11,6 +11,12 @@ defmodule ExDoc.HTMLFormatterTest do
     "https://github.com/elixir-lang/elixir/blob/master/"
   end
 
+  defp get_content(kind, names) do
+    files  = Enum.map names, fn(n) -> "#{input_path}/__MAIN__/#{n}.beam" end
+    [node] = Keyword.get ExDoc.Retriever.get_docs(files, input_path), kind
+    ExDoc.HTMLFormatter.module_page(node)
+  end
+
   ## MODULES
 
   test "module_page generate only the module name when there's no more info" do
@@ -22,9 +28,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "module_page outputs the docstrings" do
-    file = "#{input_path}/CompiledWithDocs.beam"
-    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :modules
-    content = ExDoc.HTMLFormatter.module_page(node)
+    content = get_content(:modules, ["CompiledWithDocs"])
 
     assert content[%r/<title>CompiledWithDocs<\/title>/]
     assert content[%r/<h1>\s*CompiledWithDocs\s*<\/h1>/]
@@ -37,33 +41,25 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "module_page outputs summaries" do
-    file = "#{input_path}/CompiledWithDocs.beam"
-    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :modules
-    content = ExDoc.HTMLFormatter.module_page(node)
+    content = get_content(:modules, ["CompiledWithDocs"])
     assert content[%r{<span class="summary_signature">\s*<a href="#example_1/0">}]
   end
 
   ## RECORDS
 
   test "module_page outputs the record type" do
-    file = "#{input_path}/CompiledRecord.beam"
-    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :records
-    content = ExDoc.HTMLFormatter.module_page(node)
+    content = get_content(:records, ["CompiledRecord"])
     assert content[%r{<h1>\s*CompiledRecord\s*<small>record</small>\s*<\/h1>}m]
   end
 
   test "module_page outputs record fields" do
-    file = "#{input_path}/CompiledRecord.beam"
-    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :records
-    content = ExDoc.HTMLFormatter.module_page(node)
+    content = get_content(:records, ["CompiledRecord"])
     assert content[%r{<strong>foo:</strong> nil}m]
     assert content[%r{<strong>bar:</strong> "sample"}m]
   end
 
   test "module_page outputs exceptions fields" do
-    file = "#{input_path}/RandomError.beam"
-    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :records
-    content = ExDoc.HTMLFormatter.module_page(node)
+    content = get_content(:records, ["RandomError"])
     assert !content[%r{<strong>__exception__:</strong>}m]
     assert content[%r{<strong>message:</strong> "this is random!"}m]
   end
@@ -71,19 +67,12 @@ defmodule ExDoc.HTMLFormatterTest do
   ## PROTOCOLS
 
   test "module_page outputs the protocol type" do
-    file = "#{input_path}/CustomProtocol.beam"
-    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :protocols
-    content = ExDoc.HTMLFormatter.module_page(node)
+    content = get_content(:protocols, ["CustomProtocol"])
     assert content[%r{<h1>\s*CustomProtocol\s*<small>protocol</small>\s*<\/h1>}m]
   end
 
   test "module_page outputs protocol implementations" do
-    files = [
-      "#{input_path}/CustomProtocol.beam",
-      "#{input_path}/CustomProtocol/Number.beam"
-    ]
-    [node] = Keyword.get ExDoc.Retriever.get_docs(files, input_path), :protocols
-    content = ExDoc.HTMLFormatter.module_page(node)
+    content = get_content(:protocols, ["CustomProtocol", "CustomProtocol/Number"])
     assert content[%r{<a href="CustomProtocol.Number.html">Number</a>}m]
   end
 
