@@ -1,6 +1,7 @@
 defmodule ExDoc do
   require Erlang.file, as: F
 
+  # TODO: Output path, formatter should be options
   def generate_docs(path, output_path // "output", formatter // ExDoc.HTMLFormatter) do
     path  = File.expand_path(path)
     pairs = ExDoc.Retriever.get_docs find_beams(path), path
