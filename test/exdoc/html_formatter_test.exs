@@ -18,7 +18,7 @@ defmodule ExDoc.HTMLFormatterTest do
     content = ExDoc.HTMLFormatter.module_page(node)
 
     assert content[%r/<title>XPTOModule<\/title>/]
-    assert content[%r/<h1>XPTOModule<\/h1>/]
+    assert content[%r/<h1>\s*XPTOModule\s*<\/h1>/]
   end
 
   test "module_page outputs the docstrings" do
@@ -27,7 +27,7 @@ defmodule ExDoc.HTMLFormatterTest do
     content = ExDoc.HTMLFormatter.module_page(node)
 
     assert content[%r/<title>CompiledWithDocs<\/title>/]
-    assert content[%r/<h1>CompiledWithDocs<\/h1>/]
+    assert content[%r/<h1>\s*CompiledWithDocs\s*<\/h1>/]
     assert content[%r/moduledoc.*Example.*CompiledWithDocs\.example.*/m]
     assert content[%r/example\/0.*Some example/m]
     assert content[%r/example_without_docs\/0.*<div class="docstring">.*<\/div>/m]
@@ -44,6 +44,13 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   ## RECORDS
+
+  test "module_page outputs the record type" do
+    file = "#{input_path}/CompiledRecord.beam"
+    [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :records
+    content = ExDoc.HTMLFormatter.module_page(node)
+    assert content[%r{<h1>\s*CompiledRecord\s*<small>record</small>\s*<\/h1>}m]
+  end
 
   ## PROTOCOLS
 
