@@ -13,7 +13,8 @@ defmodule ExDoc.HTMLFormatter do
     functions = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :def], &1)
     macros    = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :defmacro], &1)
     fields    = get_fields(node)
-    module_template(node, functions, macros, fields)
+    impls     = get_impls(node)
+    module_template(node, functions, macros, fields, impls)
   end
 
   def list_page(scope, nodes) do
@@ -29,6 +30,16 @@ defmodule ExDoc.HTMLFormatter do
 
   defp get_fields(_), do: []
 
+  # Loop through all children finding implementations
+  defp get_impls(ExDoc.ModuleNode[type: :protocol, module: module, children: children]) do
+    Enum.filter children, fn(child) ->
+      child.type == :impl && child.module.__impl__ == module
+    end
+  end
+
+  defp get_impls(_), do: []
+
+  # Convert to html using markdown
   defp to_html(nil), do: nil
   defp to_html(bin) when is_binary(bin), do: Markdown.to_html(bin)
 
@@ -37,7 +48,7 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   templates = [
-    module_template: [:module, :functions, :macros, :fields],
+    module_template: [:module, :functions, :macros, :fields, :impls],
     list_template: [:scope, :nodes],
     list_item_template: [:node],
     summary_template: [:node],
