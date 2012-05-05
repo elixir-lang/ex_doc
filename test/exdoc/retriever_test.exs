@@ -84,6 +84,62 @@ defmodule ExDoc.RetrieverTest do
   end
 
   ## RECORDS
-  
+
+  test "get_docs properly tag records" do
+    [node] = get_docs :records, ["CompiledRecord"]
+    assert node.type == :record
+  end
+
+  test "ignore records internal functions" do
+    [node] = get_docs :records, ["CompiledRecord"]
+    functions = Enum.map node.docs, fn(doc) -> doc.id end
+    assert functions == [
+      "bar/1","bar/2",
+      "foo/1","foo/2",
+      "new/0","new/1",
+      "update_bar/2","update_foo/2"
+    ]
+  end
+
+  ## EXCEPTIONS
+
+  test "get_docs properly tag exceptions" do
+    [node] = get_docs :records, ["RandomError"]
+    assert node.type == :exception
+  end
+
+  test "ignore exceptions internal functions" do
+    [node] = get_docs :records, ["RandomError"]
+    functions = Enum.map node.docs, fn(doc) -> doc.id end
+    assert functions == [
+      "message/1","message/2",
+      "new/0","new/1", "update_message/2"
+    ]
+  end
+
   ## PROTOCOLS
+
+  test "get_docs properly tag protocols" do
+    [node] = get_docs :protocols, ["CustomProtocol"]
+    assert node.type == :protocol
+  end
+
+  test "ignore protocols internal functions" do
+    [node] = get_docs :protocols, ["CustomProtocol"]
+    functions = Enum.map node.docs, fn(doc) -> doc.id end
+    assert functions == ["plus_one/1"]
+  end
+
+  ## IMPLEMENTATIONS
+
+  test "get_docs properly tag implementations" do
+    [node]  = get_docs :protocols, ["CustomProtocol/Number"]
+    assert node.type == :impl
+  end
+
+  test "ignore impl internal functions" do
+    [node]  = get_docs :protocols, ["CustomProtocol/Number"]
+    functions = Enum.map node.docs, fn(doc) -> doc.id end
+    assert functions == ["plus_one/1"]
+  end
 end

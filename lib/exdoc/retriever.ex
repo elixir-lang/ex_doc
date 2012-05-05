@@ -85,7 +85,7 @@ defmodule ExDoc.Retriever do
     end
 
     source_path = source_path(module)
-    docs = Enum.filter_map module.__info__(:docs), has_doc?(&1), get_function(&1, source_path)
+    docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type), get_function(&1, source_path)
 
     ExDoc.ModuleNode[
       id: inspect(module),
@@ -100,11 +100,23 @@ defmodule ExDoc.Retriever do
     ]
   end
 
-  defp has_doc?({_, _, _, false}) do
+  # Skip docs explicitly marked as false
+  defp has_doc?({_, _, _, false}, _) do
     false
   end
 
-  defp has_doc?({_, _, _, _doc}) do
+  # Skip exception specific functions
+  defp has_doc?({{:update___exception__, _}, _, _, _}, :exception) do
+    false
+  end
+
+  # Skip everything starting with __ if it does not have explicit docs
+  defp has_doc?({{name, _}, _, _, nil}, _) do
+    hd(atom_to_list(name)) != ?_
+  end
+
+  # Everything else is ok
+  defp has_doc?(_, _) do
     true
   end
 
