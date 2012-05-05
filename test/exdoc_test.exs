@@ -44,5 +44,13 @@ defmodule ExDocTest do
     assert content[%r{<li>.*"CompiledWithDocs\.html#example\/0".*example\/0.*<\/li>}m]
     assert content[%r{<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}m]
     assert content[%r{<li>.*"ExDocTest\.Nested\.html".*ExDocTest\.Nested.*<\/li>}m]
+
+    content = File.read!("#{output_dir}/records_list.html")
+    assert content[%r{<li>.*"CompiledRecord\.html".*CompiledRecord.*<\/li>}m]
+    assert content[%r{<li>.*"RandomError\.html".*RandomError.*<\/li>}m]
+
+    content = File.read!("#{output_dir}/protocols_list.html")
+    assert content[%r{<li>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}m]
+    assert content[%r{<li>.*"CustomProtocol.Number\.html".*Number.*<\/li>}m]
   end
 end
