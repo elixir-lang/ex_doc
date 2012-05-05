@@ -12,12 +12,22 @@ defmodule ExDoc.HTMLFormatter do
   def module_page(node) do
     functions = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :def], &1)
     macros    = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :defmacro], &1)
-    module_template(node, functions, macros)
+    fields    = get_fields(node)
+    module_template(node, functions, macros, fields)
   end
 
   def list_page(scope, nodes) do
     list_template(scope, nodes)
   end
+
+  # Get only fields that start with underscore
+  defp get_fields(ExDoc.ModuleNode[type: type] = node) when type in [:record, :exception] do
+    Enum.filter node.module.__record__(:fields), fn({f,_}) ->
+      hd(atom_to_list(f)) != ?_
+    end
+  end
+
+  defp get_fields(_), do: []
 
   defp to_html(nil), do: nil
   defp to_html(bin) when is_binary(bin), do: Markdown.to_html(bin)
@@ -27,7 +37,7 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   templates = [
-    module_template: [:module, :functions, :macros],
+    module_template: [:module, :functions, :macros, :fields],
     list_template: [:scope, :nodes],
     list_item_template: [:node],
     summary_template: [:node],

@@ -32,6 +32,18 @@
           <%= to_html(module.moduledoc) %>
         </div>
       <% end %>
+      <%= unless Enum.empty?(fields) do %>
+        <h2>Fields <small>(and defaults)</small></h2>
+        <ul class="summary">
+          <%= for { field, default } in fields do %>
+            <li>
+              <span class="summary_signature">
+                <strong><%= field %>:</strong> <%= inspect(default) %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
       <%= unless Enum.empty?(functions) do %>
         <h2>Functions summary</h2>
         <ul class="summary">
