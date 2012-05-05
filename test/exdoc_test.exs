@@ -33,14 +33,14 @@ defmodule ExDocTest do
     ExDoc.generate_docs File.expand_path("tmp")
 
     content = File.read!("#{output_dir}/modules_list.html")
-    assert content[%r/<li>.*'CompiledWithDocs\.html'.*CompiledWithDocs.*<\/li>/m]
-    assert content[%r/<li>.*'CompiledWithDocs\.html#example\/0'.*example\/0.*<\/li>/m]
-    assert content[%r/<li>.*'CompiledWithDocs\.html#example_1\/0'.*example_1\/0.*<\/li>/m]
-    assert content[%r/<li>.*'CompiledWithDocs\.html#example_without_docs\/0'.*example_without_docs\/0.*<\/li>/m]
-    assert content[%r/<li>.*'CompiledWithDocs.Nested\.html'.*Nested.*<\/li>/m]
-    assert content[%r/<li>.*'CompiledWithoutDocs\.html'.*CompiledWithoutDocs.*<\/li>/m]
-    assert content[%r/<li>.*'ExDocTest\.Nested\.html'.*ExDocTest\.Nested.*<\/li>/m]
-    assert content[%r/<li>.*'ExDocTest\.Nested\.html#example\/2'.*example\/2.*<\/li>/m]
+    assert content[%r/<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>/m]
+    assert content[%r/<li>.*"CompiledWithDocs\.html#example\/0".*example\/0.*<\/li>/m]
+    assert content[%r/<li>.*"CompiledWithDocs\.html#example_1\/0".*example_1\/0.*<\/li>/m]
+    assert content[%r/<li>.*"CompiledWithDocs\.html#example_without_docs\/0".*example_without_docs\/0.*<\/li>/m]
+    assert content[%r/<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>/m]
+    assert content[%r/<li>.*"CompiledWithoutDocs\.html".*CompiledWithoutDocs.*<\/li>/m]
+    assert content[%r/<li>.*"ExDocTest\.Nested\.html".*ExDocTest\.Nested.*<\/li>/m]
+    assert content[%r/<li>.*"ExDocTest\.Nested\.html#example\/2".*example\/2.*<\/li>/m]
   end
 
   test "generate_docs generates in specified output directory" do

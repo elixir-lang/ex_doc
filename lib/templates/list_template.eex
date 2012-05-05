@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="css/full_list.css" type="text/css" media="screen" charset="utf-8" />    
+    <link rel="stylesheet" href="css/full_list.css" type="text/css" media="screen" charset="utf-8" />
     <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
     <script type="text/javascript" charset="utf-8" src="js/full_list.js"></script>
     <base id="base_target" target="_parent" />
@@ -30,7 +30,7 @@
       <div id="search">Search: <input type="text" /></div>
 
       <ul id="full_list" class="class">
-        <%= names %>
+        <%= for node in nodes, do: list_item_template(node) %>
       </ul>
     </div>
   </body>

@@ -1,0 +1,20 @@
+<li>
+  <a class="toggle"></a>
+  <span class="object_link">
+    <a href="<%= node.id %>.html">
+      <%= node.relative %>
+    </a>
+  </span>
+  <small class="search_info"><%= node.id %></small>
+</li>
+<ul>
+  <%= for child in node.children, do: list_item_template(child) %>
+  <%= for doc in node.docs do  %>
+    <li>
+      <span class="object_link">
+        <a href="<%= node.id %>.html#<%= doc.id %>"><%= doc.id %></a>
+      </span>
+      <small class="search_info"><%= node.id %></small>
+    </li>
+  <% end %>
+</ul>

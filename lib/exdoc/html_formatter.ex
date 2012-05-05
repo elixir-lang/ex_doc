@@ -15,6 +15,10 @@ defmodule ExDoc.HTMLFormatter do
     module_template(node, functions, macros)
   end
 
+  def list_page(scope, nodes) do
+    list_template(scope, nodes)
+  end
+
   defp to_html(nil), do: nil
   defp to_html(bin) when is_binary(bin), do: Markdown.to_html(bin)
 
@@ -22,6 +26,14 @@ defmodule ExDoc.HTMLFormatter do
     File.expand_path("../../templates/#{other}", __FILE__)
   end
 
-  filename = File.expand_path("../../templates/module_template.eex", __FILE__)
-  EEx.function_from_file :defp, :module_template, filename, [:module, :functions, :macros]
+  templates = [
+    module_template: [:module, :functions, :macros],
+    list_template: [:scope, :nodes],
+    list_item_template: [:node]
+  ]
+
+  Enum.each templates, fn({ name, args }) ->
+    filename = File.expand_path("../../templates/#{name}.eex", __FILE__)
+    EEx.function_from_file :defp, name, filename, args
+  end
 end
