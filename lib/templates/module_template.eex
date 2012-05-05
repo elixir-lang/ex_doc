@@ -33,6 +33,8 @@
         </div>
       <% end %>
 
+      <a href="<%= module.source %>" target="_blank" class="view_source">Source</a>
+
       <%= unless Enum.empty?(impls) do %>
         <h2>Implementations</h2>
         <ul class="summary">
