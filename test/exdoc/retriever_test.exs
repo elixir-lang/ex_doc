@@ -9,6 +9,8 @@ defmodule ExDoc.RetrieverTest do
     File.expand_path("test/tmp")
   end
 
+  ## MODULES
+
   test "get_docs returns the module id" do
     file = "#{input_path}/__MAIN__/CompiledWithDocs.beam"
     [node] = Keyword.get R.get_docs([file], input_path), :modules
@@ -93,4 +95,7 @@ defmodule ExDoc.RetrieverTest do
     assert child.relative == "Nested"
   end
 
+  ## RECORDS
+  
+  ## PROTOCOLS
 end

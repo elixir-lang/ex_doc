@@ -11,6 +11,8 @@ defmodule ExDoc.HTMLFormatterTest do
     "https://github.com/elixir-lang/elixir/blob/master/"
   end
 
+  ## MODULES
+
   test "module_page generate only the module name when there's no more info" do
     node = ExDoc.ModuleNode.new module: XPTOModule, moduledoc: nil, id: "XPTOModule"
     content = ExDoc.HTMLFormatter.module_page(node)
@@ -39,5 +41,32 @@ defmodule ExDoc.HTMLFormatterTest do
     [node] = Keyword.get ExDoc.Retriever.get_docs([file], input_path), :modules
     content = ExDoc.HTMLFormatter.module_page(node)
     assert content[%r{<span class="summary_signature">\s*<a href="#example_1/0">}]
+  end
+
+  ## RECORDS
+
+  ## PROTOCOLS
+
+  ## LISTING
+
+  test "current listing page is marked as selected" do
+    content = ExDoc.HTMLFormatter.list_page(:modules, [])
+    assert content[%r{<span class="selected"><a target="_self" href="modules_list.html">}]
+    assert content[%r{<span class=""><a target="_self" href="records_list.html">}]
+  end
+
+  test "list_page outputs listing for the given nodes" do
+    files   = [
+      "#{input_path}/CompiledWithDocs.beam",
+      "#{input_path}/CompiledWithDocs/Nested.beam"
+    ]
+    nodes   = Keyword.get ExDoc.Retriever.get_docs(files, input_path), :modules
+    content = ExDoc.HTMLFormatter.list_page(:modules, nodes)
+
+    assert content[%r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}m]
+    assert content[%r{<li>.*"CompiledWithDocs\.html#example\/0".*example\/0.*<\/li>}m]
+    assert content[%r{<li>.*"CompiledWithDocs\.html#example_1\/0".*example_1\/0.*<\/li>}m]
+    assert content[%r{<li>.*"CompiledWithDocs\.html#example_without_docs\/0".*example_without_docs\/0.*<\/li>}m]
+    assert content[%r{<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}m]
   end
 end
