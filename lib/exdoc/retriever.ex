@@ -107,11 +107,6 @@ defmodule ExDoc.Retriever do
     false
   end
 
-  # Skip exception specific functions
-  defp has_doc?({{:update___exception__, _}, _, _, _}, :exception) do
-    false
-  end
-
   # Skip everything starting with __ if it does not have explicit docs
   defp has_doc?({{name, _}, _, _, nil}, _) do
     hd(atom_to_list(name)) != ?_
