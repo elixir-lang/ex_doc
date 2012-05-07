@@ -152,8 +152,12 @@ defmodule ExDoc.Retriever do
   # protocol, implementation or simply a module
   defp detect_type(module) do
     if function_exported(module, :__record__, 1) do
-      if function_exported(module, :__exception__, 1),
-        do: :exception, else: :record
+      case module.__record__(:fields) do
+      match: [{ :__exception__, :__exception__}|_]
+        :exception
+      else:
+        :record
+      end
     elsif: function_exported(module, :__protocol__, 1)
       :protocol
     elsif: function_exported(module, :__impl__, 0)

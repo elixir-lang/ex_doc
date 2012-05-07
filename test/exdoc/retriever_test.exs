@@ -112,6 +112,7 @@ defmodule ExDoc.RetrieverTest do
     [node] = get_docs :records, ["RandomError"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == [
+      "exception/1", "exception/2",
       "message/1","message/2",
       "new/0","new/1", "update_message/2"
     ]
