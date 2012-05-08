@@ -1,6 +1,6 @@
 #!/usr/bin/env elixir
 Code.prepend_path File.expand_path("../../ebin", __FILE__)
 
-ExDoc.generate_docs("exbin")
+ExDoc.generate_docs("ebin")
 
 # vim: ft=elixir:
