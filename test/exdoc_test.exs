@@ -30,7 +30,7 @@ defmodule ExDocTest do
   end
 
   test "generate_docs generates in specified output directory" do
-    ExDoc.generate_docs File.expand_path("../tmp", __FILE__), "#{output_dir}/docs"
+    ExDoc.generate_docs File.expand_path("../tmp", __FILE__), [output: "#{output_dir}/docs"]
     assert File.regular?("#{output_dir}/docs/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/docs/index.html")
     assert File.regular?("#{output_dir}/docs/css/style.css")
