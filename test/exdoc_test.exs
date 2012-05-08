@@ -54,4 +54,10 @@ defmodule ExDocTest do
     assert content[%r{<li>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}m]
     assert content[%r{<li>.*"CustomProtocol.Number\.html".*Number.*<\/li>}m]
   end
+
+  test "generate_docs generates the source link with the specified url" do
+    ExDoc.generate_docs File.expand_path("../tmp", __FILE__), [project_url: "http://example.com/bar"]
+    content = File.read!("#{output_dir}/CompiledWithDocs.html")
+    assert content[%r{http:\/\/example.com\/bar}m]
+  end
 end

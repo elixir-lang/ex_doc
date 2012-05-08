@@ -9,9 +9,9 @@ defmodule ExDoc.RetrieverTest do
     File.expand_path("test/tmp/__MAIN__")
   end
 
-  defp get_docs(kind, names) do
+  defp get_docs(kind, names, project_url // "http://example.com") do
     files = Enum.map names, fn(n) -> "#{input_path}/#{n}.beam" end
-    Keyword.get R.get_docs(files, input_path), kind
+    Keyword.get R.get_docs(files, input_path, project_url), kind
   end
 
   ## MODULES
@@ -57,7 +57,7 @@ defmodule ExDoc.RetrieverTest do
     assert example_1.id == "example_1/0"
     assert example_1.type == :defmacro
 
-    assert example_without_docs.source == "https://github.com/elixir-lang/elixir/blob/master/test/fixtures/compiled_with_docs.ex\#L15"
+    assert example_without_docs.source == "http://example.com/test/fixtures/compiled_with_docs.ex\#L15"
     assert example_without_docs.doc == nil
   end
 
@@ -67,8 +67,8 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "get_docs returns the source" do
-    [node] = get_docs :modules, ["CompiledWithDocs"]
-    assert node.source == "https://github.com/elixir-lang/elixir/blob/master/test/fixtures/compiled_with_docs.ex\#L1"
+    [node] = get_docs :modules, ["CompiledWithDocs"], "http://foo.com/bar"
+    assert node.source == "http://foo.com/bar/test/fixtures/compiled_with_docs.ex\#L1"
   end
 
   test "get_docs returns an empty list if there's no children" do

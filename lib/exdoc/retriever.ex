@@ -16,7 +16,7 @@ defmodule ExDoc.Retriever do
   can be found under the function children of each node) and
   contain all the required information already processed.
   """
-  def get_docs(files, relative_to) when is_list(files) and is_binary(relative_to) do
+  def get_docs(files, relative_to, project_url) when is_list(files) and is_binary(relative_to) do
     # Split the relative directory into parts
     parts = File.split relative_to
 
@@ -32,9 +32,9 @@ defmodule ExDoc.Retriever do
 
     # Sort the modules and return the list of nodes
     [
-      modules:   nest_modules([], Enum.qsort(remaining), []),
-      records:   nest_modules([], Enum.qsort(records), []),
-      protocols: nest_modules([], Enum.qsort(protocols), [])
+      modules:   nest_modules([], Enum.qsort(remaining), [], project_url),
+      records:   nest_modules([], Enum.qsort(records), [], project_url),
+      protocols: nest_modules([], Enum.qsort(protocols), [], project_url)
     ]
   end
 
@@ -55,7 +55,7 @@ defmodule ExDoc.Retriever do
   # and look ahead the list noticing that the next
   # module starts with "Foo" and consequently is a
   # child.
-  defp nest_modules(scope, [h|t], acc) do
+  defp nest_modules(scope, [h|t], acc, project_url) do
     flag   = scope ++ elem(h, 1)
     length = length(flag)
 
@@ -63,11 +63,11 @@ defmodule ExDoc.Retriever do
       Enum.take(x, length) == flag
     end
 
-    module = get_module(flag, h, nested)
-    nest_modules(scope, rest, [module|acc])
+    module = get_module(flag, h, nested, project_url)
+    nest_modules(scope, rest, [module|acc], project_url)
   end
 
-  defp nest_modules(_, [], acc) do
+  defp nest_modules(_, [], acc, _) do
     List.reverse(acc)
   end
 
@@ -76,7 +76,7 @@ defmodule ExDoc.Retriever do
   # an error while retrieving the information (like
   # the module is not available or it was not compiled
   # with --docs flag), we raise an exception.
-  defp get_module(scope, { segments, module, type }, children) do
+  defp get_module(scope, { segments, module, type }, children, project_url) do
     relative = Enum.join Enum.drop(segments, length(scope) - length(segments)), "."
 
     case module.__info__(:moduledoc) do
@@ -87,7 +87,7 @@ defmodule ExDoc.Retriever do
     end
 
     source_path = source_path(module)
-    docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type), get_function(&1, source_path)
+    docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type), get_function(&1, source_path, project_url)
 
     ExDoc.ModuleNode[
       id: inspect(module),
@@ -97,8 +97,8 @@ defmodule ExDoc.Retriever do
       moduledoc: moduledoc,
       docs: docs,
       relative: relative,
-      source: source_link(source_path, line),
-      children: nest_modules(scope, children, [])
+      source: source_link(project_url, source_path, line),
+      children: nest_modules(scope, children, [], project_url)
     ]
   end
 
@@ -117,13 +117,13 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function({ { name, arity }, line, type, doc }, source_path) do
+  defp get_function({ { name, arity }, line, type, doc }, source_path, project_url) do
     ExDoc.FunctionNode[
       name: name,
       arity: arity,
       id: "#{name}/#{arity}",
       doc: doc,
-      source: source_link(source_path, line),
+      source: source_link(project_url, source_path, line),
       type: type,
       line: line
     ]
@@ -167,9 +167,8 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  # TODO The project URL needs to be configurable
-  defp source_link(source_path, line) do
-    "https://github.com/elixir-lang/elixir/blob/master/#{source_path}#L#{line}"
+  defp source_link(project_url, source_path, line) do
+    "#{project_url}/#{source_path}#L#{line}"
   end
 
   # Get the source of the compiled module. Due to a bug in Erlang

@@ -8,12 +8,12 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   defp source_root_url do
-    "https://github.com/elixir-lang/elixir/blob/master/"
+    "https://github.com/elixir-lang/elixir/blob/master"
   end
 
   defp get_content(kind, names) do
     files  = Enum.map names, fn(n) -> "#{input_path}/#{n}.beam" end
-    [node] = Keyword.get ExDoc.Retriever.get_docs(files, input_path), kind
+    [node] = Keyword.get ExDoc.Retriever.get_docs(files, input_path, source_root_url), kind
     ExDoc.HTMLFormatter.module_page(node)
   end
 
@@ -37,7 +37,7 @@ defmodule ExDoc.HTMLFormatterTest do
     assert content[%r/example_without_docs\/0.*<div class="docstring">.*<\/div>/m]
     assert content[%r/example_1\/0.*Another example/m]
     assert content[%r{<p class="signature" id="example_1/0">}]
-    assert content[%r{<a href="#{source_root_url}test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}m]
+    assert content[%r{<a href="#{source_root_url}/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}m]
   end
 
   test "module_page outputs summaries" do
@@ -89,7 +89,7 @@ defmodule ExDoc.HTMLFormatterTest do
       "#{input_path}/CompiledWithDocs.beam",
       "#{input_path}/CompiledWithDocs/Nested.beam"
     ]
-    nodes   = Keyword.get ExDoc.Retriever.get_docs(files, input_path), :modules
+    nodes   = Keyword.get ExDoc.Retriever.get_docs(files, input_path, source_root_url), :modules
     content = ExDoc.HTMLFormatter.list_page(:modules, nodes)
 
     assert content[%r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}m]

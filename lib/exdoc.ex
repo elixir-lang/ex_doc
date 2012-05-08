@@ -2,11 +2,12 @@ defmodule ExDoc do
   require Erlang.file, as: F
 
   def generate_docs(path, options // []) do
-    output_path = options[:output]    || "output"
-    formatter   = options[:formatter] || ExDoc.HTMLFormatter
+    output_path = options[:output]      || "output"
+    formatter   = options[:formatter]   || ExDoc.HTMLFormatter
+    project_url = options[:project_url] || "https://github.com/elixir-lang/elixir/blob/master"
 
     path  = File.join(File.expand_path(path), "__MAIN__")
-    pairs = ExDoc.Retriever.get_docs find_beams(path), path
+    pairs = ExDoc.Retriever.get_docs find_beams(path), path, project_url
 
     output_path = File.expand_path(output_path)
     F.make_dir output_path
