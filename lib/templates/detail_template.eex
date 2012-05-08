@@ -1,6 +1,6 @@
 <div class="detail">
-  <p class="signature" id="<%= node.id %>">
-    <strong><%= node.id %></strong>
+  <p class="signature" id="<%=h node.id %>">
+    <strong><%=h node.id %></strong>
   </p>
   <div class="docstring"><%= to_html(node.doc) %></div>
   <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>

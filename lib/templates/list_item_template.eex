@@ -12,7 +12,7 @@
   <%= for doc in node.docs do  %>
     <li>
       <span class="object_link">
-        <a href="<%= node.id %>.html#<%= doc.id %>"><%= doc.id %></a>
+        <a href="<%= node.id %>.html#<%=h doc.id %>"><%=h doc.id %></a>
       </span>
       <small class="search_info"><%= node.id %></small>
     </li>

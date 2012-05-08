@@ -47,6 +47,13 @@ defmodule ExDoc.HTMLFormatter do
     File.expand_path("../../templates/#{other}", __FILE__)
   end
 
+  def h(binary) do
+    escape_map = [{ %r(&), "\\&amp;" }, { %r(<), "\\&lt;" }, { %r(>), "\\&gt;" }, { %r("), "\\&quot;" }]
+    Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace_all(re, acc, escape) end
+  end
+
+  defp escape(?<)
+
   templates = [
     module_template: [:module, :functions, :macros, :fields, :impls],
     list_template: [:scope, :nodes],
