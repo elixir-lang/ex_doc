@@ -3,7 +3,7 @@ defmodule ExDoc do
 
   # TODO: Output path, formatter should be options
   def generate_docs(path, output_path // "output", formatter // ExDoc.HTMLFormatter) do
-    path  = :filename.join(File.expand_path(path), "__MAIN__")
+    path  = File.join(File.expand_path(path), "__MAIN__")
     pairs = ExDoc.Retriever.get_docs find_beams(path), path
 
     output_path = File.expand_path(output_path)
@@ -18,7 +18,7 @@ defmodule ExDoc do
   # Helpers
 
   defp find_beams(path) do
-    File.wildcard(:filename.join(path, "**/*.beam"))
+    File.wildcard(File.join(path, "**/*.beam"))
   end
 
   defp copy_assets({ pattern, dir }, output_path) do
