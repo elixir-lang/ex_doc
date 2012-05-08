@@ -6,11 +6,11 @@ defmodule ExDoc.RetrieverTest do
   require ExDoc.Retriever, as: R
 
   defp input_path do
-    File.expand_path("test/tmp")
+    File.expand_path("test/tmp/__MAIN__")
   end
 
   defp get_docs(kind, names) do
-    files = Enum.map names, fn(n) -> "#{input_path}/__MAIN__/#{n}.beam" end
+    files = Enum.map names, fn(n) -> "#{input_path}/#{n}.beam" end
     Keyword.get R.get_docs(files, input_path), kind
   end
 

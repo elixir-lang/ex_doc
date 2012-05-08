@@ -18,7 +18,7 @@ defmodule ExDoc.Retriever do
   """
   def get_docs(files, relative_to) when is_list(files) and is_binary(relative_to) do
     # Split the relative directory into parts
-    parts = File.split "#{relative_to}/__MAIN__"
+    parts = File.split relative_to
 
     # Then we get all the module names as a list of binaries.
     # For example, the module Foo.Bar.Baz will be represented

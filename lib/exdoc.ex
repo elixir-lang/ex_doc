@@ -3,7 +3,7 @@ defmodule ExDoc do
 
   # TODO: Output path, formatter should be options
   def generate_docs(path, output_path // "output", formatter // ExDoc.HTMLFormatter) do
-    path  = File.expand_path(path)
+    path  = :filename.join(File.expand_path(path), "__MAIN__")
     pairs = ExDoc.Retriever.get_docs find_beams(path), path
 
     output_path = File.expand_path(output_path)

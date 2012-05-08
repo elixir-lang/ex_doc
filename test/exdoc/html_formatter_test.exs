@@ -4,7 +4,7 @@ defmodule ExDoc.HTMLFormatterTest do
   use ExUnit.Case
 
   defp input_path do
-    File.expand_path("test/tmp")
+    File.expand_path("test/tmp/__MAIN__")
   end
 
   defp source_root_url do
@@ -12,7 +12,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   defp get_content(kind, names) do
-    files  = Enum.map names, fn(n) -> "#{input_path}/__MAIN__/#{n}.beam" end
+    files  = Enum.map names, fn(n) -> "#{input_path}/#{n}.beam" end
     [node] = Keyword.get ExDoc.Retriever.get_docs(files, input_path), kind
     ExDoc.HTMLFormatter.module_page(node)
   end
