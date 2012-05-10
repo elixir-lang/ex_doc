@@ -168,7 +168,8 @@ defmodule ExDoc.Retriever do
   end
 
   defp source_link(project_url, source_path, line) do
-    "#{project_url}/#{source_path}#L#{line}"
+    project_url = Regex.replace(%r/%{path}/, project_url, source_path)
+    Regex.replace(%r/%{line}/, project_url, to_binary(line))
   end
 
   # Get the source of the compiled module. Due to a bug in Erlang

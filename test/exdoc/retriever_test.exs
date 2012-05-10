@@ -9,7 +9,7 @@ defmodule ExDoc.RetrieverTest do
     File.expand_path("test/tmp/__MAIN__")
   end
 
-  defp get_docs(kind, names, project_url // "http://example.com") do
+  defp get_docs(kind, names, project_url // "http://example.com/%{path}#L%{line}") do
     files = Enum.map names, fn(n) -> "#{input_path}/#{n}.beam" end
     Keyword.get R.get_docs(files, input_path, project_url), kind
   end
@@ -67,7 +67,7 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "get_docs returns the source" do
-    [node] = get_docs :modules, ["CompiledWithDocs"], "http://foo.com/bar"
+    [node] = get_docs :modules, ["CompiledWithDocs"], "http://foo.com/bar/%{path}#L%{line}"
     assert node.source == "http://foo.com/bar/test/fixtures/compiled_with_docs.ex\#L1"
   end
 
