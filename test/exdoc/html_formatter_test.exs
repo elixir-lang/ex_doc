@@ -13,7 +13,7 @@ defmodule ExDoc.HTMLFormatterTest do
 
   defp get_content(kind, names) do
     files  = Enum.map names, fn(n) -> "#{input_path}/#{n}.beam" end
-    [node] = Keyword.get ExDoc.Retriever.get_docs(files, input_path, source_root_url), kind
+    [node] = Keyword.get ExDoc.Retriever.get_docs(files, input_path, "#{source_root_url}/%{path}#L%{line}"), kind
     ExDoc.HTMLFormatter.module_page(node)
   end
 
