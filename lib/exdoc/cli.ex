@@ -4,7 +4,7 @@ defmodule ExDoc.CLI do
 
     if length(argv) == 0 do
       path = "ebin"
-    else:
+    else
       [path, _] = argv
     end
 

@@ -80,10 +80,8 @@ defmodule ExDoc.Retriever do
     relative = Enum.join Enum.drop(segments, length(scope) - length(segments)), "."
 
     case module.__info__(:moduledoc) do
-    match: { line, moduledoc }
-      nil
-    else:
-      raise "Module #{inspect module} was not compiled with flag --docs"
+      { line, moduledoc } -> nil
+      _ -> raise "Module #{inspect module} was not compiled with flag --docs"
     end
 
     source_path = source_path(module)
@@ -139,31 +137,27 @@ defmodule ExDoc.Retriever do
       raise Error, message: "module #{inspect module} is not defined/available"
 
     case module.__info__(:moduledoc) do
-    match: { _, false }
-      nil
-    match: { _, _moduledoc }
-      { segments, module, detect_type(module) }
-    else:
-      raise Error, message: "module #{inspect module} was not compiled with flag --docs"
+      { _, false } ->
+        nil
+      { _, _moduledoc } ->
+        { segments, module, detect_type(module) }
+      _ ->
+        raise Error, message: "module #{inspect module} was not compiled with flag --docs"
     end
   end
 
   # Detect if a module is an exception, record,
   # protocol, implementation or simply a module
   defp detect_type(module) do
-    if function_exported(module, :__record__, 1) do
-      case module.__record__(:fields) do
-      match: [{ :__exception__, :__exception__}|_]
-        :exception
-      else:
-        :record
-      end
-    elsif: function_exported(module, :__protocol__, 1)
-      :protocol
-    elsif: function_exported(module, :__impl__, 0)
-      :impl
-    else:
-      nil
+    cond do
+      function_exported(module, :__record__, 1) ->
+        case module.__record__(:fields) do
+          [{ :__exception__, :__exception__}|_] -> :exception
+          _ -> :record
+        end
+      function_exported(module, :__protocol__, 1) -> :protocol
+      function_exported(module, :__impl__, 0) -> :impl
+      :else -> nil
     end
   end
 
