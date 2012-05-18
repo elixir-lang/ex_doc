@@ -30,7 +30,7 @@ static ERL_NIF_TERM to_markdown_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM
   output = bufnew(OUTPUT_SIZE);
 
   sdhtml_renderer(&callbacks, &options, 0);
-  markdown = sd_markdown_new(0, 16, &callbacks, &options);
+  markdown = sd_markdown_new(MKDEXT_AUTOLINK, 16, &callbacks, &options);
 
   sd_markdown_render(output, input->data, input->size, markdown);
   sd_markdown_free(markdown);
