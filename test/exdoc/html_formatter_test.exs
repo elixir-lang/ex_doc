@@ -32,12 +32,12 @@ defmodule ExDoc.HTMLFormatterTest do
 
     assert content[%r/<title>CompiledWithDocs<\/title>/]
     assert content[%r/<h1>\s*CompiledWithDocs\s*<\/h1>/]
-    assert content[%r/moduledoc.*Example.*CompiledWithDocs\.example.*/m]
-    assert content[%r/example\/0.*Some example/m]
-    assert content[%r/example_without_docs\/0.*<div class="docstring">.*<\/div>/m]
-    assert content[%r/example_1\/0.*Another example/m]
+    assert content[%r/moduledoc.*Example.*CompiledWithDocs\.example.*/ms]
+    assert content[%r/example\/0.*Some example/ms]
+    assert content[%r/example_without_docs\/0.*<div class="docstring">.*<\/div>/ms]
+    assert content[%r/example_1\/0.*Another example/ms]
     assert content[%r{<p class="signature" id="example_1/0">}]
-    assert content[%r{<a href="#{source_root_url}/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}m]
+    assert content[%r{<a href="#{source_root_url}/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms]
   end
 
   test "module_page outputs summaries" do
@@ -92,10 +92,10 @@ defmodule ExDoc.HTMLFormatterTest do
     nodes   = Keyword.get ExDoc.Retriever.get_docs(files, input_path, source_root_url), :modules
     content = ExDoc.HTMLFormatter.list_page(:modules, nodes)
 
-    assert content[%r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}m]
-    assert content[%r{<li>.*"CompiledWithDocs\.html#example\/0".*example\/0.*<\/li>}m]
-    assert content[%r{<li>.*"CompiledWithDocs\.html#example_1\/0".*example_1\/0.*<\/li>}m]
-    assert content[%r{<li>.*"CompiledWithDocs\.html#example_without_docs\/0".*example_without_docs\/0.*<\/li>}m]
-    assert content[%r{<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}m]
+    assert content[%r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms]
+    assert content[%r{<li>.*"CompiledWithDocs\.html#example\/0".*example\/0.*<\/li>}ms]
+    assert content[%r{<li>.*"CompiledWithDocs\.html#example_1\/0".*example_1\/0.*<\/li>}ms]
+    assert content[%r{<li>.*"CompiledWithDocs\.html#example_without_docs\/0".*example_without_docs\/0.*<\/li>}ms]
+    assert content[%r{<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}ms]
   end
 end
