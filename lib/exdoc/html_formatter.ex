@@ -43,16 +43,28 @@ defmodule ExDoc.HTMLFormatter do
   defp to_html(nil), do: nil
   defp to_html(bin) when is_binary(bin), do: Markdown.to_html(bin)
 
-  defp templates_path(other) do
-    File.expand_path("../../templates/#{other}", __FILE__)
+  # Get the full signature from a function
+  defp signature(ExDoc.FunctionNode[name: name, signature: args]) do
+    atom_to_binary(name) <> "(" <> Enum.map_join(args, ", ", signature_arg(&1)) <> ")"
   end
 
-  def h(binary) do
+  defp signature(node) do
+    node.id
+  end
+
+  defp signature_arg({ ://, _, [left, right] }) do
+    signature_arg(left) <> " // " <> Macro.to_binary(right)
+  end
+
+  defp signature_arg({ var, _, _ }) do
+    atom_to_binary(var)
+  end
+
+  # Escaping
+  defp h(binary) do
     escape_map = [{ %r(&), "\\&amp;" }, { %r(<), "\\&lt;" }, { %r(>), "\\&gt;" }, { %r("), "\\&quot;" }]
     Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace_all(re, acc, escape) end
   end
-
-  defp escape(?<)
 
   templates = [
     module_template: [:module, :functions, :macros, :fields, :impls],
@@ -61,6 +73,10 @@ defmodule ExDoc.HTMLFormatter do
     summary_template: [:node],
     detail_template: [:node]
   ]
+
+  defp templates_path(other) do
+    File.expand_path("../../templates/#{other}", __FILE__)
+  end
 
   Enum.each templates, fn({ name, args }) ->
     filename = File.expand_path("../../templates/#{name}.eex", __FILE__)

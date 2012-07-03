@@ -2,7 +2,7 @@ defrecord ExDoc.ModuleNode, module: nil, relative: nil, moduledoc: nil,
   docs: [], source: nil, children: [], type: nil, id: nil, line: 0
 
 defrecord ExDoc.FunctionNode, name: nil, arity: 0, id: nil,
-  doc: [], source: nil, type: nil, line: 0
+  doc: [], source: nil, type: nil, line: 0, signature: nil
 
 defmodule ExDoc.Retriever do
   import :erlang, only: [function_exported: 3]
@@ -112,12 +112,13 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function({ { name, arity }, line, type, _signature, doc }, source_path, project_url) do
+  defp get_function({ { name, arity }, line, type, signature, doc }, source_path, project_url) do
     ExDoc.FunctionNode[
       name: name,
       arity: arity,
       id: "#{name}/#{arity}",
       doc: doc,
+      signature: signature,
       source: source_link(project_url, source_path, line),
       type: type,
       line: line

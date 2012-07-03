@@ -46,11 +46,12 @@ defmodule ExDoc.RetrieverTest do
     [node] = get_docs :modules, ["CompiledWithDocs"]
     [ example, example_1, example_without_docs ] = node.docs
 
-    assert example.id == "example/0"
-    assert example.doc == "Some example"
+    assert example.id   == "example/2"
+    assert example.doc  == "Some example"
     assert example.type == :def
+    assert [{ :foo, _, _ }, { ://, _, _ }] = example.signature
 
-    assert example_1.id == "example_1/0"
+    assert example_1.id   == "example_1/0"
     assert example_1.type == :defmacro
 
     assert example_without_docs.source == "http://example.com/test/fixtures/compiled_with_docs.ex\#L15"
