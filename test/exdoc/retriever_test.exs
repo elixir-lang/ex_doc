@@ -5,13 +5,9 @@ defmodule ExDoc.RetrieverTest do
 
   require ExDoc.Retriever, as: R
 
-  defp input_path do
-    File.expand_path("test/tmp/__MAIN__")
-  end
-
   defp get_docs(kind, names, project_url // "http://example.com/%{path}#L%{line}") do
-    files = Enum.map names, fn(n) -> "#{input_path}/#{n}.beam" end
-    Keyword.get R.get_docs(files, input_path, project_url), kind
+    files = Enum.map names, fn(n) -> "test/tmp/__MAIN__-#{n}.beam" end
+    Keyword.get R.get_docs(files, project_url), kind
   end
 
   ## MODULES
@@ -27,12 +23,12 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "get_docs returns the nested module" do
-    [node] = get_docs :modules, ["ExDocTest/Nested"]
+    [node] = get_docs :modules, ["ExDocTest-Nested"]
     assert node.module == ExDocTest.Nested
   end
 
   test "get_docs returns the relative module name" do
-    [node] = get_docs :modules, ["ExDocTest/Nested"]
+    [node] = get_docs :modules, ["ExDocTest-Nested"]
     assert node.relative == "ExDocTest.Nested"
   end
 
@@ -77,7 +73,7 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "get_docs returns a list with children" do
-    [node]  = get_docs :modules, ["CompiledWithDocs", "CompiledWithDocs/Nested"]
+    [node]  = get_docs :modules, ["CompiledWithDocs", "CompiledWithDocs-Nested"]
     [child] = node.children
     assert child.module   == CompiledWithDocs.Nested
     assert child.relative == "Nested"
@@ -134,12 +130,12 @@ defmodule ExDoc.RetrieverTest do
   ## IMPLEMENTATIONS
 
   test "get_docs properly tag implementations" do
-    [node]  = get_docs :protocols, ["CustomProtocol/Number"]
+    [node]  = get_docs :protocols, ["CustomProtocol-Number"]
     assert node.type == :impl
   end
 
   test "ignore impl internal functions" do
-    [node]  = get_docs :protocols, ["CustomProtocol/Number"]
+    [node]  = get_docs :protocols, ["CustomProtocol-Number"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["plus_one/1"]
   end

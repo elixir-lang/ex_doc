@@ -6,8 +6,7 @@ defmodule ExDoc do
     formatter   = options[:formatter]   || ExDoc.HTMLFormatter
     project_url = options[:project_url] || "https://github.com/elixir-lang/elixir/blob/master/%{path}#L%{line}"
 
-    path  = File.join(File.expand_path(path), "__MAIN__")
-    pairs = ExDoc.Retriever.get_docs find_beams(path), path, project_url
+    pairs = ExDoc.Retriever.get_docs find_beams(path), project_url
 
     output_path = File.expand_path(output_path)
     F.make_dir output_path
@@ -21,7 +20,7 @@ defmodule ExDoc do
   # Helpers
 
   defp find_beams(path) do
-    File.wildcard(File.join(path, "**/*.beam"))
+    File.wildcard File.expand_path("__MAIN__-*.beam", path)
   end
 
   defp copy_assets({ pattern, dir }, output_path) do

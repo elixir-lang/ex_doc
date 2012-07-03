@@ -12,8 +12,8 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   defp get_content(kind, names) do
-    files  = Enum.map names, fn(n) -> "#{input_path}/#{n}.beam" end
-    [node] = Keyword.get ExDoc.Retriever.get_docs(files, input_path, "#{source_root_url}/%{path}#L%{line}"), kind
+    files  = Enum.map names, fn(n) -> "#{input_path}-#{n}.beam" end
+    [node] = Keyword.get ExDoc.Retriever.get_docs(files, "#{source_root_url}/%{path}#L%{line}"), kind
     ExDoc.HTMLFormatter.module_page(node)
   end
 
@@ -72,7 +72,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "module_page outputs protocol implementations" do
-    content = get_content(:protocols, ["CustomProtocol", "CustomProtocol/Number"])
+    content = get_content(:protocols, ["CustomProtocol", "CustomProtocol-Number"])
     assert content[%r{<a href="CustomProtocol.Number.html">Number</a>}m]
   end
 
@@ -86,10 +86,10 @@ defmodule ExDoc.HTMLFormatterTest do
 
   test "list_page outputs listing for the given nodes" do
     files   = [
-      "#{input_path}/CompiledWithDocs.beam",
-      "#{input_path}/CompiledWithDocs/Nested.beam"
+      "#{input_path}-CompiledWithDocs.beam",
+      "#{input_path}-CompiledWithDocs-Nested.beam"
     ]
-    nodes   = Keyword.get ExDoc.Retriever.get_docs(files, input_path, source_root_url), :modules
+    nodes   = Keyword.get ExDoc.Retriever.get_docs(files, source_root_url), :modules
     content = ExDoc.HTMLFormatter.list_page(:modules, nodes)
 
     assert content[%r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms]

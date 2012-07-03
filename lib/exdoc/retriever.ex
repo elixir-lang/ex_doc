@@ -16,14 +16,11 @@ defmodule ExDoc.Retriever do
   can be found under the function children of each node) and
   contain all the required information already processed.
   """
-  def get_docs(files, relative_to, project_url) when is_list(files) and is_binary(relative_to) do
-    # Split the relative directory into parts
-    parts = File.split relative_to
-
+  def get_docs(files, project_url) when is_list(files) do
     # Then we get all the module names as a list of binaries.
     # For example, the module Foo.Bar.Baz will be represented
     # as ["Foo", "Bar", "Baz"]
-    modules = Enum.map files, get_module_from_file(&1, parts)
+    modules = Enum.map files, get_module_from_file(&1)
 
     # Split each type
     protocols = Enum.filter modules, match?({ _, _, x } when x in [:protocol, :impl], &1)
@@ -101,12 +98,12 @@ defmodule ExDoc.Retriever do
   end
 
   # Skip docs explicitly marked as false
-  defp has_doc?({_, _, _, false}, _) do
+  defp has_doc?({_, _, _, _, false}, _) do
     false
   end
 
   # Skip everything starting with __ if it does not have explicit docs
-  defp has_doc?({{name, _}, _, _, nil}, _) do
+  defp has_doc?({{name, _}, _, _, _, nil}, _) do
     hd(atom_to_list(name)) != ?_
   end
 
@@ -115,7 +112,7 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function({ { name, arity }, line, type, doc }, source_path, project_url) do
+  defp get_function({ { name, arity }, line, type, _signature, doc }, source_path, project_url) do
     ExDoc.FunctionNode[
       name: name,
       arity: arity,
@@ -127,11 +124,9 @@ defmodule ExDoc.Retriever do
     ]
   end
 
-  defp get_module_from_file(name, parts) do
-    name = File.split :filename.rootname(name, ".beam")
-
-    segments = name -- parts
-    module   = :"__MAIN__.#{Enum.join segments, "."}"
+  defp get_module_from_file(name) do
+    name   = File.basename name, ".beam"
+    module = binary_to_atom name
 
     if match?({ :error,_ }, Code.ensure_loaded(module)), do:
       raise Error, message: "module #{inspect module} is not defined/available"
@@ -140,7 +135,7 @@ defmodule ExDoc.Retriever do
       { _, false } ->
         nil
       { _, _moduledoc } ->
-        { segments, module, detect_type(module) }
+        { tl(Regex.split(%r(\-), name)), module, detect_type(module) }
       _ ->
         raise Error, message: "module #{inspect module} was not compiled with flag --docs"
     end
