@@ -129,7 +129,7 @@ defmodule ExDoc.Retriever do
     name   = File.basename name, ".beam"
     module = binary_to_atom name
 
-    if match?({ :error,_ }, Code.ensure_loaded(module)), do:
+    if match?({ :error, _ }, Code.ensure_loaded(module)), do:
       raise Error, message: "module #{inspect module} is not defined/available"
 
     case module.__info__(:moduledoc) do
@@ -165,10 +165,6 @@ defmodule ExDoc.Retriever do
   # Get the source of the compiled module. Due to a bug in Erlang
   # R15 and before, we need to look for the source first in the
   # options and then into the real source.
-  #
-  # TODO: This function needs to receive the project root level
-  # as argument. Relying on this logic will break on next Erlang
-  # release.
   defp source_path(module) do
     compile_info = module.__info__(:compile)
     compile_options = Keyword.get(compile_info, :options)

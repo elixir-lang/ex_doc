@@ -45,7 +45,9 @@ defmodule ExDoc.HTMLFormatter do
 
   # Get the full signature from a function
   defp signature(ExDoc.FunctionNode[name: name, signature: args]) do
-    atom_to_binary(name) <> "(" <> Enum.map_join(args, ", ", signature_arg(&1)) <> ")"
+    name = atom_to_binary(name)
+    args = Enum.map_join(args, ", ", signature_arg(&1))
+    "#{name}(#{args})"
   end
 
   defp signature(node) do

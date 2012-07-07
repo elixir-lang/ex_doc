@@ -1,13 +1,7 @@
 defmodule ExDoc.CLI do
   def run(args) do
     { options, argv } = OptionParser.Simple.parse(args, [o: :output, f: :formatter, p: :project_url])
-
-    if length(argv) == 0 do
-      path = "ebin"
-    else
-      [path, _] = argv
-    end
-
+    path = Enum.first(argv) || "ebin"
     ExDoc.generate_docs(path, options)
   end
 end
