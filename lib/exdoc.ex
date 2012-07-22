@@ -20,7 +20,7 @@ defmodule ExDoc do
   # Helpers
 
   defp find_beams(path) do
-    File.wildcard File.expand_path("__MAIN__-*.beam", path)
+    File.wildcard File.expand_path("Elixir-*.beam", path)
   end
 
   defp copy_assets({ pattern, dir }, output_path) do
