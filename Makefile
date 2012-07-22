@@ -36,7 +36,7 @@ $(EBIN_DIR): $(shell find lib -type f -name "*")
 
 test/tmp: $(shell find test/fixtures -type f -name "*.ex")
 	@ rm -rf test/tmp/*
-	@ elixirc test/fixtures -o test/tmp --docs
+	@ elixirc test/fixtures -o test/tmp
 
 test: compile test/tmp
 	@ echo Running tests ...

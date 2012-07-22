@@ -40,24 +40,24 @@ defmodule ExDocTest do
     ExDoc.generate_docs File.expand_path("tmp")
 
     content = File.read!("#{output_dir}/modules_list.html")
-    assert content[%r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms]
-    assert content[%r{<li>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms]
-    assert content[%r{<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}ms]
-    assert content[%r{<li>.*"ExDocTest\.Nested\.html".*ExDocTest\.Nested.*<\/li>}ms]
-    assert !content[%r{ExDocTest\.Undocumented}ms]
+    assert content =~ %r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
+    assert content =~ %r{<li>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms
+    assert content =~ %r{<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}ms
+    assert content =~ %r{<li>.*"ExDocTest\.Nested\.html".*ExDocTest\.Nested.*<\/li>}ms
+    refute content =~ %r{ExDocTest\.Undocumented}ms
 
     content = File.read!("#{output_dir}/records_list.html")
-    assert content[%r{<li>.*"CompiledRecord\.html".*CompiledRecord.*<\/li>}ms]
-    assert content[%r{<li>.*"RandomError\.html".*RandomError.*<\/li>}ms]
+    assert content =~ %r{<li>.*"CompiledRecord\.html".*CompiledRecord.*<\/li>}ms
+    assert content =~ %r{<li>.*"RandomError\.html".*RandomError.*<\/li>}ms
 
     content = File.read!("#{output_dir}/protocols_list.html")
-    assert content[%r{<li>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}ms]
-    assert content[%r{<li>.*"CustomProtocol.Number\.html".*Number.*<\/li>}ms]
+    assert content =~ %r{<li>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}ms
+    assert content =~ %r{<li>.*"CustomProtocol.Number\.html".*Number.*<\/li>}ms
   end
 
   test "generate_docs generates the source link with the specified url" do
     ExDoc.generate_docs File.expand_path("../tmp", __FILE__), [project_url: "http://example.com/bar"]
     content = File.read!("#{output_dir}/CompiledWithDocs.html")
-    assert content[%r{http:\/\/example.com\/bar}m]
+    assert content =~ %r{http:\/\/example.com\/bar}m
   end
 end

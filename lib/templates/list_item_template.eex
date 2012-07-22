@@ -8,8 +8,8 @@
   <small class="search_info"><%= node.id %></small>
 </li>
 <ul>
-  <%= for child in node.children, do: list_item_template(child) %>
-  <%= for doc in node.docs do  %>
+  <%= lc child inlist node.children, do: list_item_template(child) %>
+  <%= lc doc inlist node.docs do  %>
     <li>
       <span class="object_link">
         <a href="<%= node.id %>.html#<%=h doc.id %>"><%=h doc.id %></a>
