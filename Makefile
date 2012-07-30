@@ -22,26 +22,7 @@ SUNDOWN_SRC=\
 NIF_SRC=\
 	src/markdown_nif.o
 
-.PHONY: test compile clean
-
-compile: share/markdown.so $(EBIN_DIR)
-
-$(EBIN_DIR): $(shell find lib -type f -name "*")
-	@ rm -rf ebin/
-	@ echo Compiling ...
-	@ mkdir -p $(EBIN_DIR)
-	@ touch $(EBIN_DIR)
-	elixirc lib -o ebin
-	@ echo
-
-test/tmp: $(shell find test/fixtures -type f -name "*.ex")
-	@ rm -rf test/tmp/*
-	@ elixirc test/fixtures -o test/tmp
-
-test: compile test/tmp
-	@ echo Running tests ...
-	time elixir -pa test/tmp -pa ebin -r "test/test_helper.exs" -pr "test/**/*_test.exs"
-	@ echo
+.PHONY: clean
 
 clean:
 	rm -f sundown/src/*.o sundown/html/*.o src/*.o
