@@ -24,7 +24,7 @@ defmodule Markdown do
     list_to_binary :xmerl_ucs.to_utf8(s)
   end
 
-  def quote_urls(s, p) do
+  defp quote_urls(s, p) do
     case :re.run(s, p) do
       :nomatch -> s
       {:match, [{start, len}|_]} ->
@@ -40,7 +40,7 @@ defmodule Markdown do
     end
   end
 
-  def pattern do
+  defp pattern do
     {:ok, p} = :re.compile('(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:\'\".,<>?«»\“\”\‘\’]))', [:unicode])
     p
   end
