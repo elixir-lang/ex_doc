@@ -65,7 +65,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp nest_modules(_, [], acc, _) do
-    List.reverse(acc)
+    Enum.reverse(acc)
   end
 
   # Get all the information from the module and compile
