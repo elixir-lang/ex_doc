@@ -1,4 +1,4 @@
-defmodule ExDocTest.Nested do
+defmodule UndefParent.Nested do
   @moduledoc """
   This is a nested module
   """
@@ -14,6 +14,6 @@ defmodule ExDocTest.Nested do
   end
 end
 
-defmodule ExDocTest.Undocumented do
+defmodule UndefParent.Undocumented do
   @moduledoc false
 end

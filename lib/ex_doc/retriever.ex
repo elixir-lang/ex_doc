@@ -53,7 +53,7 @@ defmodule ExDoc.Retriever do
   # module starts with "Foo" and consequently is a
   # child.
   defp nest_modules(scope, [h|t], acc, project_url) do
-    flag   = scope ++ elem(h, 1)
+    flag   = scope ++ elem(h, 0)
     length = length(flag)
 
     { nested, rest } = Enum.split_with t, fn({ x, _, _ }) ->
@@ -82,7 +82,8 @@ defmodule ExDoc.Retriever do
     end
 
     source_path = source_path(module)
-    docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type), get_function(&1, source_path, project_url)
+    docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type),
+      get_function(&1, source_path, project_url)
 
     ExDoc.ModuleNode[
       id: inspect(module),
@@ -102,8 +103,13 @@ defmodule ExDoc.Retriever do
     false
   end
 
-  # Skip everything starting with __ if it does not have explicit docs
-  defp has_doc?({{name, _}, _, _, _, nil}, _) do
+  # Skip docs by default for implementations
+  defp has_doc?({_, _, _, _, nil}, :impl) do
+    false
+  end
+
+  # Skip default docs if starting with _
+  defp has_doc?({{name, _}, _, _, _, nil}, _type) do
     hd(atom_to_list(name)) != ?_
   end
 
@@ -129,14 +135,14 @@ defmodule ExDoc.Retriever do
     name   = File.basename name, ".beam"
     module = binary_to_atom name
 
-    if match?({ :error, _ }, Code.ensure_loaded(module)), do:
+    unless Code.ensure_loaded?(module), do:
       raise Error, message: "module #{inspect module} is not defined/available"
 
     case module.__info__(:moduledoc) do
       { _, false } ->
         nil
       { _, _moduledoc } ->
-        { tl(Regex.split(%r(\-), name)), module, detect_type(module) }
+        { Module.split(name), module, detect_type(module) }
       _ ->
         raise Error, message: "module #{inspect module} was not compiled with flag --docs"
     end

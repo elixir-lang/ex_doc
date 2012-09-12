@@ -23,13 +23,13 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "get_docs returns the nested module" do
-    [node] = get_docs :modules, ["ExDocTest-Nested"]
-    assert node.module == ExDocTest.Nested
+    [node] = get_docs :modules, ["UndefParent-Nested"]
+    assert node.module == UndefParent.Nested
   end
 
   test "get_docs returns the relative module name" do
-    [node] = get_docs :modules, ["ExDocTest-Nested"]
-    assert node.relative == "ExDocTest.Nested"
+    [node] = get_docs :modules, ["UndefParent-Nested"]
+    assert node.relative == "UndefParent.Nested"
   end
 
   test "get_docs returns the moduledoc info" do
@@ -125,7 +125,7 @@ defmodule ExDoc.RetrieverTest do
   test "ignore protocols internal functions" do
     [node] = get_docs :protocols, ["CustomProtocol"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
-    assert functions == ["plus_one/1"]
+    assert functions == ["plus_one/1", "plus_two/1"]
   end
 
   ## IMPLEMENTATIONS
