@@ -115,6 +115,20 @@ defmodule ExDoc.RetrieverTest do
     ]
   end
 
+  ## BEHAVIOURS
+
+  test "get_docs properly tag behaviours" do
+    [node] = get_docs :modules, ["CustomBehaviour"]
+    assert node.type == :behaviour
+  end
+
+  test "ignore behaviours internal functions" do
+    [node] = get_docs :modules, ["CustomBehaviour"]
+    functions = Enum.map node.docs, fn(doc) -> doc.id end
+    assert functions == ["hello/1"]
+    assert hd(node.docs).type == :defcallback
+  end
+
   ## PROTOCOLS
 
   test "get_docs properly tag protocols" do

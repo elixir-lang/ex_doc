@@ -12,9 +12,10 @@ defmodule ExDoc.HTMLFormatter do
   def module_page(node) do
     functions = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :def], &1)
     macros    = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :defmacro], &1)
+    callbacks = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :defcallback], &1)
     fields    = get_fields(node)
     impls     = get_impls(node)
-    module_template(node, functions, macros, fields, impls)
+    module_template(node, functions, macros, callbacks, fields, impls)
   end
 
   def list_page(scope, nodes) do
@@ -69,7 +70,7 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   templates = [
-    module_template: [:module, :functions, :macros, :fields, :impls],
+    module_template: [:module, :functions, :macros, :callbacks, :fields, :impls],
     list_template: [:scope, :nodes],
     list_item_template: [:node],
     summary_template: [:node],

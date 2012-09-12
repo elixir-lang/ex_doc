@@ -1,9 +1,7 @@
 <li>
   <a class="toggle"></a>
   <span class="object_link">
-    <a href="<%= node.id %>.html">
-      <%= node.relative %>
-    </a>
+    <a href="<%= node.id %>.html" title="<%= node.id %>"><%= node.relative %></a>
   </span>
   <small class="search_info"><%= node.id %></small>
 </li>

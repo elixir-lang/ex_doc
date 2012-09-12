@@ -5,8 +5,6 @@ defrecord ExDoc.FunctionNode, name: nil, arity: 0, id: nil,
   doc: [], source: nil, type: nil, line: 0, signature: nil
 
 defmodule ExDoc.Retriever do
-  import :erlang, only: [function_exported: 3]
-
   defexception Error, message: nil
 
   @doc """
@@ -25,7 +23,7 @@ defmodule ExDoc.Retriever do
     # Split each type
     protocols = Enum.filter modules, match?({ _, _, x } when x in [:protocol, :impl], &1)
     records   = Enum.filter modules, match?({ _, _, x } when x in [:record, :exception], &1)
-    remaining = Enum.filter modules, match?({ _, _, nil }, &1)
+    remaining = Enum.filter modules, match?({ _, _, x } when x in [nil, :behaviour], &1)
 
     # Sort the modules and return the list of nodes
     [
@@ -82,8 +80,10 @@ defmodule ExDoc.Retriever do
     end
 
     source_path = source_path(module)
+    callbacks   = module_callbacks(type, module)
+
     docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type),
-      get_function(&1, source_path, project_url)
+      get_function(&1, source_path, project_url, callbacks)
 
     ExDoc.ModuleNode[
       id: inspect(module),
@@ -118,7 +118,9 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function({ { name, arity }, line, type, signature, doc }, source_path, project_url) do
+  defp get_function(function, source_path, project_url, callbacks) do
+    { { name, arity }, line, type, signature, doc } = function
+
     ExDoc.FunctionNode[
       name: name,
       arity: arity,
@@ -126,9 +128,21 @@ defmodule ExDoc.Retriever do
       doc: doc,
       signature: signature,
       source: source_link(project_url, source_path, line),
-      type: type,
+      type: function_type(name, arity, type, callbacks),
       line: line
     ]
+  end
+
+  defp function_type(name, arity, :def, callbacks) when callbacks != [] do
+    if List.member?(callbacks, { name, arity }) do
+      :defcallback
+    else
+      :def
+    end
+  end
+
+  defp function_type(_name, _arity, type, _callbacks) do
+    type
   end
 
   defp get_module_from_file(name) do
@@ -152,15 +166,36 @@ defmodule ExDoc.Retriever do
   # protocol, implementation or simply a module
   defp detect_type(module) do
     cond do
-      function_exported(module, :__record__, 1) ->
+      function_exported?(module, :__record__, 1) ->
         case module.__record__(:fields) do
           [{ :__exception__, :__exception__}|_] -> :exception
           _ -> :record
         end
-      function_exported(module, :__protocol__, 1) -> :protocol
-      function_exported(module, :__impl__, 0) -> :impl
-      :else -> nil
+      function_exported?(module, :__protocol__, 1) -> :protocol
+      function_exported?(module, :__impl__, 0) -> :impl
+      module_callbacks(module) != [] -> :behaviour
+      true -> nil
     end
+  end
+
+  defp module_callbacks(module) do
+    if function_exported?(module, :behaviour_info, 1) do
+      try do
+        module.behaviour_info(:callbacks)
+      rescue
+        _ -> []
+      end
+    else
+      []
+    end
+  end
+
+  defp module_callbacks(:behaviour, module) do
+    module.behaviour_info(:callbacks)
+  end
+
+  defp module_callbacks(_type, _module) do
+    []
   end
 
   defp source_link(project_url, source_path, line) do

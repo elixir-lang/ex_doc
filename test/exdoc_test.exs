@@ -44,6 +44,7 @@ defmodule ExDocTest do
     assert content =~ %r{<li>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms
     assert content =~ %r{<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}ms
     assert content =~ %r{<li>.*"UndefParent\.Nested\.html".*UndefParent\.Nested.*<\/li>}ms
+    assert content =~ %r{<li>.*"CustomBehaviour.html".*CustomBehaviour.*<\/li>}ms
     refute content =~ %r{UndefParent\.Undocumented}ms
 
     content = File.read!("#{output_dir}/records_list.html")

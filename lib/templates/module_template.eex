@@ -75,6 +75,13 @@
         </ul>
       <% end %>
 
+      <%= unless Enum.empty?(callbacks) do %>
+        <h2>Callbacks summary</h2>
+        <ul class="summary">
+          <%= lc node inlist callbacks, do: summary_template(node) %>
+        </ul>
+      <% end %>
+
       <%= unless Enum.empty?(functions) do %>
         <div id="functions_details" class="details_list">
           <h2>Functions</h2>
@@ -86,6 +93,13 @@
         <div id="macros_details" class="details_list">
           <h2>Macros</h2>
           <%= lc node inlist macros, do: detail_template(node) %>
+        </div>
+      <% end %>
+
+      <%= unless Enum.empty?(callbacks) do %>
+        <div id="callbacks_details" class="details_list">
+          <h2>Callbacks</h2>
+          <%= lc node inlist callbacks, do: detail_template(node) %>
         </div>
       <% end %>
     </div>

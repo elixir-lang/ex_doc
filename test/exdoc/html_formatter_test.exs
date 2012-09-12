@@ -19,7 +19,7 @@ defmodule ExDoc.HTMLFormatterTest do
 
   ## MODULES
 
-  test "module_page generate only the module name when there's no more info" do
+  test "module_page generates only the module name when there's no more info" do
     node = ExDoc.ModuleNode.new module: XPTOModule, moduledoc: nil, id: "XPTOModule"
     content = ExDoc.HTMLFormatter.module_page(node)
 
@@ -44,6 +44,16 @@ defmodule ExDoc.HTMLFormatterTest do
   test "module_page outputs summaries" do
     content = get_content(:modules, ["CompiledWithDocs"])
     assert content =~ %r{<span class="summary_signature">\s*<a href="#example_1/0">}
+  end
+
+  ## BEHAVIOURS
+
+  test "module_page outputs behavior and callbacks" do
+    content = get_content(:modules, ["CustomBehaviour"])
+
+    assert content =~ %r{<h1>\s*CustomBehaviour\s*<small>behaviour</small>\s*<\/h1>}m
+    assert content =~ %r{Callbacks}
+    assert content =~ %r{<p class="signature" id="hello/1">}
   end
 
   ## RECORDS
