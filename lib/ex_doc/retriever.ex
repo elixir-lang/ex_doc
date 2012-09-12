@@ -80,10 +80,8 @@ defmodule ExDoc.Retriever do
     end
 
     source_path = source_path(module)
-    callbacks   = module_callbacks(type, module)
-
     docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type),
-      get_function(&1, source_path, project_url, callbacks)
+      get_function(&1, source_path, project_url)
 
     ExDoc.ModuleNode[
       id: inspect(module),
@@ -118,7 +116,7 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function(function, source_path, project_url, callbacks) do
+  defp get_function(function, source_path, project_url) do
     { { name, arity }, line, type, signature, doc } = function
 
     ExDoc.FunctionNode[
@@ -128,21 +126,9 @@ defmodule ExDoc.Retriever do
       doc: doc,
       signature: signature,
       source: source_link(project_url, source_path, line),
-      type: function_type(name, arity, type, callbacks),
+      type: type,
       line: line
     ]
-  end
-
-  defp function_type(name, arity, :def, callbacks) when callbacks != [] do
-    if List.member?(callbacks, { name, arity }) do
-      :defcallback
-    else
-      :def
-    end
-  end
-
-  defp function_type(_name, _arity, type, _callbacks) do
-    type
   end
 
   defp get_module_from_file(name) do
@@ -188,14 +174,6 @@ defmodule ExDoc.Retriever do
     else
       []
     end
-  end
-
-  defp module_callbacks(:behaviour, module) do
-    module.behaviour_info(:callbacks)
-  end
-
-  defp module_callbacks(_type, _module) do
-    []
   end
 
   defp source_link(project_url, source_path, line) do
