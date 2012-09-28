@@ -54,7 +54,7 @@ defmodule ExDoc.Retriever do
     flag   = scope ++ elem(h, 0)
     length = length(flag)
 
-    { nested, rest } = Enum.split_with t, fn({ x, _, _ }) ->
+    { nested, rest } = Enum.split_while t, fn({ x, _, _ }) ->
       Enum.take(x, length) == flag
     end
 
