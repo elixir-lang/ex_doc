@@ -66,7 +66,7 @@ defmodule ExDoc.HTMLFormatter do
   # Escaping
   defp h(binary) do
     escape_map = [{ %r(&), "\\&amp;" }, { %r(<), "\\&lt;" }, { %r(>), "\\&gt;" }, { %r("), "\\&quot;" }]
-    Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace_all(re, acc, escape) end
+    Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
   end
 
   templates = [
