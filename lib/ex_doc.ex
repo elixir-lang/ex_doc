@@ -1,5 +1,5 @@
 defmodule ExDoc do
-  require Erlang.file, as: F
+  require :file, as: F
 
   def generate_docs(path, options // []) do
     output_path = options[:output]      || "output"
@@ -37,7 +37,7 @@ defmodule ExDoc do
     generate_module_page(nodes, formatter, output_path)
     output_file = "#{output_path}/#{scope}_list.html"
     content     = formatter.list_page(scope, nodes)
-    Erlang.file.write_file(output_file, content)
+    :file.write_file(output_file, content)
   end
 
   defp generate_module_page([node|t], formatter, output_path) do
