@@ -94,7 +94,7 @@ defmodule ExDoc.RetrieverTest do
       "bar/1","bar/2",
       "foo/1","foo/2",
       "new/0","new/1", "to_keywords/1",
-      "update_bar/2","update_foo/2"
+      "update/2", "update_bar/2","update_foo/2"
     ]
   end
 
@@ -111,7 +111,7 @@ defmodule ExDoc.RetrieverTest do
     assert functions == [
       "exception/1", "exception/2",
       "message/1","message/2",
-      "new/0","new/1", "to_keywords/1", "update_message/2"
+      "new/0","new/1", "to_keywords/1", "update/2", "update_message/2"
     ]
   end
 
