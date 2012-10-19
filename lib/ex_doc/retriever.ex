@@ -186,9 +186,10 @@ defmodule ExDoc.Retriever do
   # options and then into the real source.
   defp source_path(module) do
     compile_info = module.__info__(:compile)
+    compile_options = Keyword.get(compile_info, :options)
     compile_source  = Keyword.get(compile_info, :source)
 
-    list_to_binary :lists.nthtail(String.length(File.cwd!) + 1,
-                                  compile_source)
+    list_to_binary :lists.nthtail(length(compile_source) + 1,
+                                  Keyword.get(compile_options, :source))
   end
 end
