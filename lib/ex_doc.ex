@@ -1,6 +1,4 @@
 defmodule ExDoc do
-  require :file, as: F
-
   def generate_docs(path, options // []) do
     output_path = options[:output]      || "output"
     formatter   = options[:formatter]   || ExDoc.HTMLFormatter
@@ -9,7 +7,7 @@ defmodule ExDoc do
     pairs = ExDoc.Retriever.get_docs find_beams(path), project_url
 
     output_path = File.expand_path(output_path)
-    F.make_dir output_path
+    File.mkdir_p output_path
 
     Enum.each formatter.assets, copy_assets(&1, output_path)
     Enum.each pairs, fn({ name, nodes }) ->
@@ -25,11 +23,11 @@ defmodule ExDoc do
 
   defp copy_assets({ pattern, dir }, output_path) do
     output = "#{output_path}/#{dir}"
-    F.make_dir output
+    File.mkdir output
 
     Enum.map File.wildcard(pattern), fn(file) ->
       base = File.basename(file)
-      F.copy file, "#{output}/#{base}"
+      File.copy file, "#{output}/#{base}"
     end
   end
 
@@ -37,12 +35,12 @@ defmodule ExDoc do
     generate_module_page(nodes, formatter, output_path)
     output_file = "#{output_path}/#{scope}_list.html"
     content     = formatter.list_page(scope, nodes)
-    :file.write_file(output_file, content)
+    File.write(output_file, content)
   end
 
   defp generate_module_page([node|t], formatter, output_path) do
     content = formatter.module_page(node)
-    F.write_file("#{output_path}/#{node.id}.html", content)
+    File.write("#{output_path}/#{node.id}.html", content)
 
     generate_module_page(node.children, formatter, output_path)
     generate_module_page(t, formatter, output_path)
