@@ -80,6 +80,7 @@ defmodule ExDoc.Retriever do
     end
 
     source_path = source_path(module)
+
     docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type),
       get_function(&1, source_path, project_url)
 
@@ -185,11 +186,9 @@ defmodule ExDoc.Retriever do
   # R15 and before, we need to look for the source first in the
   # options and then into the real source.
   defp source_path(module) do
-    compile_info = module.__info__(:compile)
-    compile_options = Keyword.get(compile_info, :options)
-    compile_source  = Keyword.get(compile_info, :source)
-
-    list_to_binary :lists.nthtail(length(compile_source) + 1,
-                                  Keyword.get(compile_options, :source))
+    compile = module.__info__(:compile)
+    options = compile[:options] || []
+    source  = options[:source]  || compile[:source]
+    String.replace(list_to_binary(source), File.cwd! <> "/", "")
   end
 end
