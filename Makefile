@@ -28,7 +28,8 @@ SUNDOWN_OBJS=\
 	sundown/src/markdown.o
 
 NIF_SRC=\
-	src/markdown_nif.c
+	src/markdown_nif.c\
+	src/render_ansi.c
 
 clean:
 	rm -f sundown/src/*.o sundown/html/*.o src/*.o
@@ -38,7 +39,7 @@ clean:
 	@ echo
 
 
-share/markdown.so: sundown/libsundown.so
+share/markdown.so: sundown/libsundown.so ${NIF_SRC}
 	$(CC) $(CFLAGS) $(ERLANG_FLAGS) -shared $(OPTIONS) -o $@ $(SUNDOWN_OBJS) $(NIF_SRC)
 
 .PHONY: clean

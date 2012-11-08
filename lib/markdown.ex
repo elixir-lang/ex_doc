@@ -9,4 +9,8 @@ defmodule Markdown do
   def to_html(_) do
     exit(:nif_library_not_loaded)
   end
+
+  def to_ansi(_) do
+    exit(:nif_library_not_loaded)
+  end
 end
