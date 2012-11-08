@@ -10,10 +10,13 @@
 
 #define OUTPUT_SIZE 64
 
-static ERL_NIF_TERM to_markdown_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-  struct sd_markdown *markdown;
+struct render_data {
   struct sd_callbacks callbacks;
-  struct html_renderopt options;
+  void *options;
+};
+
+static ERL_NIF_TERM render_term(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[], struct render_data *data) {
+  struct sd_markdown *markdown;
 
   ErlNifBinary markdown_binary;
   ErlNifBinary output_binary;
@@ -29,9 +32,7 @@ static ERL_NIF_TERM to_markdown_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM
 
   output = bufnew(OUTPUT_SIZE);
 
-  sdhtml_renderer(&callbacks, &options, 0);
-  markdown = sd_markdown_new(MKDEXT_AUTOLINK, 16, &callbacks, &options);
-
+  markdown = sd_markdown_new(MKDEXT_AUTOLINK, 16, &data->callbacks, data->options);
   sd_markdown_render(output, input->data, input->size, markdown);
   sd_markdown_free(markdown);
 
@@ -44,9 +45,31 @@ static ERL_NIF_TERM to_markdown_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM
   return enif_make_binary(env, &output_binary);
 }
 
+extern void ansi_renderer(struct sd_callbacks *callbacks);
+
+static ERL_NIF_TERM to_ansi_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
+  struct render_data data;
+  
+  data.options = NULL;
+  ansi_renderer(&data.callbacks);
+
+  return render_term(env, argc, argv, &data);
+}
+
+static ERL_NIF_TERM to_markdown_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
+  struct render_data data;
+  struct html_renderopt options;
+  
+  data.options = &options;
+  sdhtml_renderer(&data.callbacks, data.options, 0);
+
+  return render_term(env, argc, argv, &data);
+}
+
 static ErlNifFunc nif_funcs[] =
 {
-    {"to_html", 1, to_markdown_nif}
+    {"to_html", 1, to_markdown_nif},
+    {"to_ansi", 1, to_ansi_nif}
 };
 
 ERL_NIF_INIT(Elixir-Markdown,nif_funcs,NULL,NULL,NULL,NULL);
