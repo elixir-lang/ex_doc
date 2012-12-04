@@ -27,9 +27,9 @@ defmodule ExDoc.Retriever do
 
     # Sort the modules and return the list of nodes
     [
-      modules:   nest_modules([], Enum.qsort(remaining), [], project_url),
-      records:   nest_modules([], Enum.qsort(records), [], project_url),
-      protocols: nest_modules([], Enum.qsort(protocols), [], project_url)
+      modules:   nest_modules([], Enum.sort(remaining), [], project_url),
+      records:   nest_modules([], Enum.sort(records), [], project_url),
+      protocols: nest_modules([], Enum.sort(protocols), [], project_url)
     ]
   end
 
@@ -84,6 +84,13 @@ defmodule ExDoc.Retriever do
     docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type),
       get_function(&1, source_path, project_url)
 
+    if type == :behaviour do
+      callbacks = Kernel.Typespec.beam_callbacks(module)
+
+      docs = Enum.map(module.__behaviour__(:docs),
+        get_callback(&1, source_path, project_url, callbacks)) ++ docs
+    end
+
     ExDoc.ModuleNode[
       id: inspect(module),
       line: line,
@@ -132,6 +139,22 @@ defmodule ExDoc.Retriever do
     ]
   end
 
+  defp get_callback(callback, source_path, project_url, callbacks) do
+    { { name, arity } = tuple, line, doc } = callback
+    { _, signature } = List.keyfind(callbacks, tuple, 0, { nil, [] })
+
+    ExDoc.FunctionNode[
+      name: name,
+      arity: arity,
+      id: "#{name}/#{arity}",
+      doc: doc || nil,
+      signature: Enum.first(signature),
+      source: source_link(project_url, source_path, line),
+      type: :defcallback,
+      line: line
+    ]
+  end
+
   defp get_module_from_file(name) do
     name   = File.basename name, ".beam"
     module = binary_to_atom name
@@ -160,20 +183,21 @@ defmodule ExDoc.Retriever do
         end
       function_exported?(module, :__protocol__, 1) -> :protocol
       function_exported?(module, :__impl__, 0) -> :impl
-      module_callbacks(module) != [] -> :behaviour
+      defines_behaviour?(module) -> :behaviour
       true -> nil
     end
   end
 
-  defp module_callbacks(module) do
-    if function_exported?(module, :behaviour_info, 1) do
+  defp defines_behaviour?(module) do
+    if function_exported?(module, :__behaviour__, 1) do
       try do
-        module.behaviour_info(:callbacks)
+        module.__behaviour__(:callbacks)
+        true
       rescue
-        _ -> []
+        _ -> false
       end
     else
-      []
+      false
     end
   end
 

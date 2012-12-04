@@ -4,5 +4,5 @@ defmodule CustomBehaviour do
   @doc """
   This is a sample callback.
   """
-  defcallback hello(world)
+  defcallback hello(integer) :: integer
 end
