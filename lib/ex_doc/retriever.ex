@@ -141,14 +141,18 @@ defmodule ExDoc.Retriever do
 
   defp get_callback(callback, source_path, project_url, callbacks) do
     { { name, arity } = tuple, line, doc } = callback
-    { _, signature } = List.keyfind(callbacks, tuple, 0, { nil, [] })
+    { _, signatures } = List.keyfind(callbacks, tuple, 0, { nil, [] })
+
+    if signature = Enum.first(signatures) do
+      { :::, _, [{ ^name, _, signature }, _] } = Kernel.Typespec.spec_to_ast(name, signature)
+    end
 
     ExDoc.FunctionNode[
       name: name,
       arity: arity,
       id: "#{name}/#{arity}",
       doc: doc || nil,
-      signature: Enum.first(signature),
+      signature: signature,
       source: source_link(project_url, source_path, line),
       type: :defcallback,
       line: line

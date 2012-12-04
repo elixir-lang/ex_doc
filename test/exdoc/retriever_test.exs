@@ -127,6 +127,7 @@ defmodule ExDoc.RetrieverTest do
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["hello/1"]
     assert hd(node.docs).type == :defcallback
+    assert hd(node.docs).signature == [{ :integer, 7, [] }]
   end
 
   ## PROTOCOLS
