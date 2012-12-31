@@ -90,12 +90,7 @@ defmodule ExDoc.RetrieverTest do
   test "ignore records internal functions" do
     [node] = get_docs :records, ["CompiledRecord"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
-    assert functions == [
-      "bar/1","bar/2",
-      "foo/1","foo/2",
-      "new/0","new/1", "to_keywords/1",
-      "update/2", "update_bar/2","update_foo/2"
-    ]
+    assert functions == []
   end
 
   ## EXCEPTIONS
@@ -108,11 +103,7 @@ defmodule ExDoc.RetrieverTest do
   test "ignore exceptions internal functions" do
     [node] = get_docs :records, ["RandomError"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
-    assert functions == [
-      "exception/1", "exception/2",
-      "message/1","message/2",
-      "new/0","new/1", "to_keywords/1", "update/2", "update_message/2"
-    ]
+    assert functions == []
   end
 
   ## BEHAVIOURS
@@ -153,6 +144,6 @@ defmodule ExDoc.RetrieverTest do
   test "ignore impl internal functions" do
     [node]  = get_docs :protocols, ["CustomProtocol-Number"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
-    assert functions == ["plus_one/1"]
+    assert functions == ["plus_one/1", "plus_two/1"]
   end
 end

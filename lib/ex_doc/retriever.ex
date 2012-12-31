@@ -109,11 +109,6 @@ defmodule ExDoc.Retriever do
     false
   end
 
-  # Skip docs by default for implementations
-  defp has_doc?({_, _, _, _, nil}, :impl) do
-    false
-  end
-
   # Skip default docs if starting with _
   defp has_doc?({{name, _}, _, _, _, nil}, _type) do
     hd(atom_to_list(name)) != ?_
