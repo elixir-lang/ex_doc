@@ -68,11 +68,11 @@ defmodule ExDoc.HTMLFormatter do
   ]
 
   defp templates_path(other) do
-    File.expand_path("../../templates/#{other}", __FILE__)
+    Path.expand("../../templates/#{other}", __FILE__)
   end
 
   Enum.each templates, fn({ name, args }) ->
-    filename = File.expand_path("../../templates/#{name}.eex", __FILE__)
+    filename = Path.expand("../../templates/#{name}.eex", __FILE__)
     EEx.function_from_file :defp, name, filename, args
   end
 end

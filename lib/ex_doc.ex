@@ -6,7 +6,7 @@ defmodule ExDoc do
 
     pairs = ExDoc.Retriever.get_docs find_beams(path), project_url
 
-    output_path = File.expand_path(output_path)
+    output_path = Path.expand(output_path)
     File.mkdir_p output_path
 
     Enum.each formatter.assets, copy_assets(&1, output_path)
@@ -18,15 +18,15 @@ defmodule ExDoc do
   # Helpers
 
   defp find_beams(path) do
-    File.wildcard File.expand_path("Elixir-*.beam", path)
+    Path.wildcard Path.expand("Elixir-*.beam", path)
   end
 
   defp copy_assets({ pattern, dir }, output_path) do
     output = "#{output_path}/#{dir}"
     File.mkdir output
 
-    Enum.map File.wildcard(pattern), fn(file) ->
-      base = File.basename(file)
+    Enum.map Path.wildcard(pattern), fn(file) ->
+      base = Path.basename(file)
       File.copy file, "#{output}/#{base}"
     end
   end

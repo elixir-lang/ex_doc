@@ -155,7 +155,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_module_from_file(name) do
-    name   = File.basename name, ".beam"
+    name   = Path.basename name, ".beam"
     module = binary_to_atom name
 
     unless Code.ensure_loaded?(module), do:

@@ -2,7 +2,7 @@ defmodule Markdown do
   @on_load { :init, 0 }
 
   def init do
-    file = File.expand_path('../../share/markdown', __FILE__)
+    file = Path.expand('../../share/markdown', __FILE__)
     :ok = :erlang.load_nif(binary_to_list(file), 1)
   end
 

@@ -14,11 +14,11 @@ defmodule ExDocTest do
   end
 
   defp output_dir do
-    File.expand_path("../output", __FILE__)
+    Path.expand("../output", __FILE__)
   end
 
   test "generate_docs generates the html file with the documentation" do
-    ExDoc.generate_docs File.expand_path("tmp")
+    ExDoc.generate_docs Path.expand("tmp")
     assert File.regular?("#{output_dir}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
   end
@@ -30,14 +30,14 @@ defmodule ExDocTest do
   end
 
   test "generate_docs generates in specified output directory" do
-    ExDoc.generate_docs File.expand_path("../tmp", __FILE__), [output: "#{output_dir}/docs"]
+    ExDoc.generate_docs Path.expand("../tmp", __FILE__), [output: "#{output_dir}/docs"]
     assert File.regular?("#{output_dir}/docs/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/docs/index.html")
     assert File.regular?("#{output_dir}/docs/css/style.css")
   end
 
   test "generate_docs generates all listing files" do
-    ExDoc.generate_docs File.expand_path("tmp")
+    ExDoc.generate_docs Path.expand("tmp")
 
     content = File.read!("#{output_dir}/modules_list.html")
     assert content =~ %r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
@@ -57,7 +57,7 @@ defmodule ExDocTest do
   end
 
   test "generate_docs generates the source link with the specified url" do
-    ExDoc.generate_docs File.expand_path("../tmp", __FILE__), [project_url: "http://example.com/bar"]
+    ExDoc.generate_docs Path.expand("../tmp", __FILE__), [project_url: "http://example.com/bar"]
     content = File.read!("#{output_dir}/CompiledWithDocs.html")
     assert content =~ %r{http:\/\/example.com\/bar}m
   end

@@ -4,7 +4,7 @@ defmodule ExDoc.HTMLFormatterTest do
   use ExUnit.Case
 
   defp input_path do
-    File.expand_path("test/tmp/Elixir")
+    Path.expand("test/tmp/Elixir")
   end
 
   defp source_root_url do

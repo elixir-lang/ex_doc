@@ -1,5 +1,5 @@
 #!/usr/bin/env elixir
-Code.prepend_path File.expand_path("../../ebin", __FILE__)
+Code.prepend_path Path.expand("../../ebin", __FILE__)
 
 ExDoc.CLI.run(System.argv)
 
