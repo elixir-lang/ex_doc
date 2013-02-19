@@ -5,9 +5,9 @@ defmodule ExDoc.RetrieverTest do
 
   require ExDoc.Retriever, as: R
 
-  defp get_docs(kind, names, project_url // "http://example.com/%{path}#L%{line}") do
+  defp get_docs(kind, names, source_url // "http://example.com/%{path}#L%{line}") do
     files = Enum.map names, fn(n) -> "test/tmp/Elixir-#{n}.beam" end
-    Keyword.get R.get_docs(files, project_url), kind
+    Keyword.get R.get_docs(files, ExDoc.Config[source_url: source_url, source_root: File.cwd!]), kind
   end
 
   ## MODULES
@@ -118,7 +118,7 @@ defmodule ExDoc.RetrieverTest do
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["hello/1"]
     assert hd(node.docs).type == :defcallback
-    assert hd(node.docs).signature == [{ :integer, 7, [] }]
+    assert hd(node.docs).signature == [{ :integer, [line: 7], [] }]
   end
 
   ## PROTOCOLS

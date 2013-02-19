@@ -1,17 +1,26 @@
 defmodule ExDoc do
-  def generate_docs(path, options // []) do
-    output_path = options[:output]      || "output"
-    formatter   = options[:formatter]   || ExDoc.HTMLFormatter
-    project_url = options[:project_url] || "https://github.com/elixir-lang/elixir/blob/master/%{path}#L%{line}"
+  defrecord Config, output: "docs", source_root: nil, source_url: nil, source_beam: nil,
+                    formatter: ExDoc.HTMLFormatter, project: nil, version: nil, main: nil
 
-    pairs = ExDoc.Retriever.get_docs find_beams(path), project_url
+  @doc """
+  Generates documentation for the given project, version
+  and options.
+  """
+  def generate_docs(project, version, options) do
+    config = ExDoc.Config[project: project, version: version, main: options[:main] || project,
+                          source_root: options[:source_root] || File.cwd!].update(options)
 
-    output_path = Path.expand(output_path)
-    File.mkdir_p output_path
+    source_beam = config.source_beam || Path.join(config.source_root, "ebin")
+    docs = ExDoc.Retriever.get_docs find_beams(source_beam), config
 
-    Enum.each formatter.assets, copy_assets(&1, output_path)
-    Enum.each pairs, fn({ name, nodes }) ->
-      generate_list name, nodes, output_path, formatter
+    output = Path.expand(config.output)
+    File.mkdir_p output
+
+    formatter = config.formatter
+    generate_index(formatter, output, config)
+    generate_assets(formatter, output, config)
+    Enum.each docs, fn({ name, nodes }) ->
+      generate_list name, nodes, formatter, output, config
     end
   end
 
@@ -21,32 +30,38 @@ defmodule ExDoc do
     Path.wildcard Path.expand("Elixir-*.beam", path)
   end
 
-  defp copy_assets({ pattern, dir }, output_path) do
-    output = "#{output_path}/#{dir}"
-    File.mkdir output
+  defp generate_index(formatter, output, config) do
+    content = formatter.index_page(config)
+    File.write("#{output}/index.html", content)
+  end
 
-    Enum.map Path.wildcard(pattern), fn(file) ->
-      base = Path.basename(file)
-      File.copy file, "#{output}/#{base}"
+  defp generate_assets(formatter, output, _config) do
+    Enum.each formatter.assets, fn({ pattern, dir }) ->
+      output = "#{output}/#{dir}"
+      File.mkdir output
+
+      Enum.map Path.wildcard(pattern), fn(file) ->
+        base = Path.basename(file)
+        File.copy file, "#{output}/#{base}"
+      end
     end
   end
 
-  defp generate_list(scope, nodes, output_path, formatter) do
-    generate_module_page(nodes, formatter, output_path)
-    output_file = "#{output_path}/#{scope}_list.html"
-    content     = formatter.list_page(scope, nodes)
-    File.write(output_file, content)
+  defp generate_list(scope, nodes, formatter, output, config) do
+    generate_module_page(nodes, formatter, output, config)
+    content = formatter.list_page(scope, nodes, config)
+    File.write("#{output}/#{scope}_list.html", content)
   end
 
-  defp generate_module_page([node|t], formatter, output_path) do
-    content = formatter.module_page(node)
-    File.write("#{output_path}/#{node.id}.html", content)
+  defp generate_module_page([node|t], formatter, output, config) do
+    content = formatter.module_page(node, config)
+    File.write("#{output}/#{node.id}.html", content)
 
-    generate_module_page(node.children, formatter, output_path)
-    generate_module_page(t, formatter, output_path)
+    generate_module_page(node.children, formatter, output, config)
+    generate_module_page(t, formatter, output, config)
   end
 
-  defp generate_module_page([], _formatter, _output_path) do
+  defp generate_module_page([], _formatter, _output, _config) do
     :ok
   end
 end

@@ -2,14 +2,15 @@ defmodule ExDoc.HTMLFormatter do
   require EEx
 
   def assets do
-    [
-      { templates_path("index.html"), "." },
-      { templates_path("css/*.css"), "css" },
-      { templates_path("js/*.js"), "js" }
-    ]
+    [ { templates_path("css/*.css"), "css" },
+      { templates_path("js/*.js"), "js" } ]
   end
 
-  def module_page(node) do
+  def index_page(config) do
+    index_template(config)
+  end
+
+  def module_page(node, _config) do
     functions = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :def], &1)
     macros    = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :defmacro], &1)
     callbacks = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :defcallback], &1)
@@ -18,8 +19,8 @@ defmodule ExDoc.HTMLFormatter do
     module_template(node, functions, macros, callbacks, fields, impls)
   end
 
-  def list_page(scope, nodes) do
-    list_template(scope, nodes)
+  def list_page(scope, nodes, config) do
+    list_template(scope, nodes, config)
   end
 
   # Get only fields that start with underscore
@@ -60,8 +61,9 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   templates = [
+    index_template: [:config],
+    list_template: [:scope, :nodes, :config],
     module_template: [:module, :functions, :macros, :callbacks, :fields, :impls],
-    list_template: [:scope, :nodes],
     list_item_template: [:node],
     summary_template: [:node],
     detail_template: [:node]

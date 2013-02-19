@@ -14,7 +14,7 @@ defmodule ExDoc.Retriever do
   can be found under the function children of each node) and
   contain all the required information already processed.
   """
-  def get_docs(files, project_url) when is_list(files) do
+  def get_docs(files, config) when is_list(files) do
     # Then we get all the module names as a list of binaries.
     # For example, the module Foo.Bar.Baz will be represented
     # as ["Foo", "Bar", "Baz"]
@@ -27,9 +27,9 @@ defmodule ExDoc.Retriever do
 
     # Sort the modules and return the list of nodes
     [
-      modules:   nest_modules([], Enum.sort(remaining), [], project_url),
-      records:   nest_modules([], Enum.sort(records), [], project_url),
-      protocols: nest_modules([], Enum.sort(protocols), [], project_url)
+      modules:   nest_modules([], Enum.sort(remaining), [], config),
+      records:   nest_modules([], Enum.sort(records), [], config),
+      protocols: nest_modules([], Enum.sort(protocols), [], config)
     ]
   end
 
@@ -50,7 +50,7 @@ defmodule ExDoc.Retriever do
   # and look ahead the list noticing that the next
   # module starts with "Foo" and consequently is a
   # child.
-  defp nest_modules(scope, [h|t], acc, project_url) do
+  defp nest_modules(scope, [h|t], acc, config) do
     flag   = scope ++ elem(h, 0)
     length = length(flag)
 
@@ -58,8 +58,8 @@ defmodule ExDoc.Retriever do
       Enum.take(x, length) == flag
     end
 
-    module = get_module(flag, h, nested, project_url)
-    nest_modules(scope, rest, [module|acc], project_url)
+    module = get_module(flag, h, nested, config)
+    nest_modules(scope, rest, [module|acc], config)
   end
 
   defp nest_modules(_, [], acc, _) do
@@ -71,7 +71,7 @@ defmodule ExDoc.Retriever do
   # an error while retrieving the information (like
   # the module is not available or it was not compiled
   # with --docs flag), we raise an exception.
-  defp get_module(scope, { segments, module, type }, children, project_url) do
+  defp get_module(scope, { segments, module, type }, children, config) do
     relative = Enum.join Enum.drop(segments, length(scope) - length(segments)), "."
 
     case module.__info__(:moduledoc) do
@@ -79,16 +79,17 @@ defmodule ExDoc.Retriever do
       _ -> raise "Module #{inspect module} was not compiled with flag --docs"
     end
 
-    source_path = source_path(module)
+    source_url  = config.source_url
+    source_path = source_path(module, config)
 
     docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type),
-      get_function(&1, source_path, project_url)
+      get_function(&1, source_path, source_url)
 
     if type == :behaviour do
       callbacks = Kernel.Typespec.beam_callbacks(module)
 
       docs = Enum.map(module.__behaviour__(:docs),
-        get_callback(&1, source_path, project_url, callbacks)) ++ docs
+        get_callback(&1, source_path, source_url, callbacks)) ++ docs
     end
 
     ExDoc.ModuleNode[
@@ -99,8 +100,8 @@ defmodule ExDoc.Retriever do
       moduledoc: moduledoc,
       docs: docs,
       relative: relative,
-      source: source_link(project_url, source_path, line),
-      children: nest_modules(scope, children, [], project_url)
+      source: source_link(source_path, source_url, line),
+      children: nest_modules(scope, children, [], config)
     ]
   end
 
@@ -119,7 +120,7 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function(function, source_path, project_url) do
+  defp get_function(function, source_path, source_url) do
     { { name, arity }, line, type, signature, doc } = function
 
     ExDoc.FunctionNode[
@@ -128,13 +129,13 @@ defmodule ExDoc.Retriever do
       id: "#{name}/#{arity}",
       doc: doc,
       signature: signature,
-      source: source_link(project_url, source_path, line),
+      source: source_link(source_path, source_url, line),
       type: type,
       line: line
     ]
   end
 
-  defp get_callback(callback, source_path, project_url, callbacks) do
+  defp get_callback(callback, source_path, source_url, callbacks) do
     { { name, arity } = tuple, line, doc } = callback
     { _, signatures } = List.keyfind(callbacks, tuple, 0, { nil, [] })
 
@@ -148,7 +149,7 @@ defmodule ExDoc.Retriever do
       id: "#{name}/#{arity}",
       doc: doc || nil,
       signature: signature,
-      source: source_link(project_url, source_path, line),
+      source: source_link(source_path, source_url, line),
       type: :defcallback,
       line: line
     ]
@@ -200,18 +201,20 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp source_link(project_url, source_path, line) do
-    project_url = Regex.replace(%r/%{path}/, project_url, source_path)
-    Regex.replace(%r/%{line}/, project_url, to_binary(line))
+  defp source_link(_source_path, nil, _line), do: nil
+
+  defp source_link(source_path, source_url, line) do
+    source_url = Regex.replace(%r/%{path}/, source_url, source_path)
+    Regex.replace(%r/%{line}/, source_url, to_binary(line))
   end
 
   # Get the source of the compiled module. Due to a bug in Erlang
   # R15 and before, we need to look for the source first in the
   # options and then into the real source.
-  defp source_path(module) do
+  defp source_path(module, config) do
     compile = module.__info__(:compile)
     options = compile[:options] || []
     source  = options[:source]  || compile[:source]
-    String.replace(list_to_binary(source), File.cwd! <> "/", "")
+    Path.relative_to source, config.source_root
   end
 end

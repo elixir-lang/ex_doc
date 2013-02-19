@@ -3,41 +3,46 @@ Code.require_file "../test_helper.exs", __FILE__
 defmodule ExDocTest do
   use ExUnit.Case, sync: true
 
-  def setup_all do
+  setup_all do
     :file.set_cwd("test")
     :file.make_dir(output_dir)
+    :ok
   end
 
-  def teardown_all do
+  teardown_all do
     System.cmd("rm -rf #{output_dir}")
     :file.set_cwd("..")
+    :ok
   end
 
   defp output_dir do
-    Path.expand("../output", __FILE__)
+    Path.expand("../docs", __FILE__)
   end
 
   test "generate_docs generates the html file with the documentation" do
-    ExDoc.generate_docs Path.expand("tmp")
+    ExDoc.generate_docs "Elixir", "1", source_root: Path.expand("../tmp", __FILE__)
     assert File.regular?("#{output_dir}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
   end
 
   test "generate_docs accepts relative directories" do
-    ExDoc.generate_docs "tmp"
+    ExDoc.generate_docs "Elixir", "1", source_root: "tmp"
     assert File.regular?("#{output_dir}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
   end
 
   test "generate_docs generates in specified output directory" do
-    ExDoc.generate_docs Path.expand("../tmp", __FILE__), [output: "#{output_dir}/docs"]
+    ExDoc.generate_docs "Elixir", "1",
+                          output: "#{output_dir}/docs",
+                          source_root: Path.expand("../tmp", __FILE__)
+
     assert File.regular?("#{output_dir}/docs/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/docs/index.html")
     assert File.regular?("#{output_dir}/docs/css/style.css")
   end
 
   test "generate_docs generates all listing files" do
-    ExDoc.generate_docs Path.expand("tmp")
+    ExDoc.generate_docs "Elixir", "1", source_root: Path.expand("../tmp", __FILE__)
 
     content = File.read!("#{output_dir}/modules_list.html")
     assert content =~ %r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
@@ -57,7 +62,9 @@ defmodule ExDocTest do
   end
 
   test "generate_docs generates the source link with the specified url" do
-    ExDoc.generate_docs Path.expand("../tmp", __FILE__), [project_url: "http://example.com/bar"]
+    ExDoc.generate_docs "Elixir", "1",
+                          source_url: "http://example.com/bar",
+                          source_root: Path.expand("../tmp", __FILE__)
     content = File.read!("#{output_dir}/CompiledWithDocs.html")
     assert content =~ %r{http:\/\/example.com\/bar}m
   end

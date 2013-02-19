@@ -3,5 +3,7 @@
     <strong><%=h signature(node) %></strong>
   </p>
   <div class="docstring"><%= to_html(node.doc) %></div>
-  <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
+  <%= if node.source do %>
+    <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
+  <% end %>
 </div>

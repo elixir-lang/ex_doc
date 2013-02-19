@@ -7,21 +7,26 @@ defmodule ExDoc.HTMLFormatterTest do
     Path.expand("test/tmp/Elixir")
   end
 
-  defp source_root_url do
+  defp source_url_root do
     "https://github.com/elixir-lang/elixir/blob/master"
+  end
+
+  defp doc_config do
+    ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
+                 source_url: "#{source_url_root}/%{path}#L%{line}"]
   end
 
   defp get_content(kind, names) do
     files  = Enum.map names, fn(n) -> "#{input_path}-#{n}.beam" end
-    [node] = Keyword.get ExDoc.Retriever.get_docs(files, "#{source_root_url}/%{path}#L%{line}"), kind
-    ExDoc.HTMLFormatter.module_page(node)
+    [node] = Keyword.get ExDoc.Retriever.get_docs(files, doc_config), kind
+    ExDoc.HTMLFormatter.module_page(node, doc_config)
   end
 
   ## MODULES
 
   test "module_page generates only the module name when there's no more info" do
     node = ExDoc.ModuleNode.new module: XPTOModule, moduledoc: nil, id: "XPTOModule"
-    content = ExDoc.HTMLFormatter.module_page(node)
+    content = ExDoc.HTMLFormatter.module_page(node, doc_config)
 
     assert content =~ %r/<title>XPTOModule<\/title>/
     assert content =~ %r/<h1>\s*XPTOModule\s*<\/h1>/
@@ -38,7 +43,7 @@ defmodule ExDoc.HTMLFormatterTest do
     assert content =~ %r/example_1\/0.*Another example/ms
     assert content =~ %r{<p class="signature" id="example_1/0">}
     assert content =~ %r{<strong>example\(foo, bar // Baz\)</strong>}
-    assert content =~ %r{<a href="#{source_root_url}/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
+    assert content =~ %r{<a href="#{source_url_root}/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
   end
 
   test "module_page outputs summaries" do
@@ -90,7 +95,7 @@ defmodule ExDoc.HTMLFormatterTest do
   ## LISTING
 
   test "current listing page is marked as selected" do
-    content = ExDoc.HTMLFormatter.list_page(:modules, [])
+    content = ExDoc.HTMLFormatter.list_page(:modules, [], doc_config)
     assert content =~ %r{<span class="selected"><a target="_self" href="modules_list.html">}
     assert content =~ %r{<span class=""><a target="_self" href="records_list.html">}
   end
@@ -100,8 +105,8 @@ defmodule ExDoc.HTMLFormatterTest do
       "#{input_path}-CompiledWithDocs.beam",
       "#{input_path}-CompiledWithDocs-Nested.beam"
     ]
-    nodes   = Keyword.get ExDoc.Retriever.get_docs(files, source_root_url), :modules
-    content = ExDoc.HTMLFormatter.list_page(:modules, nodes)
+    nodes   = Keyword.get ExDoc.Retriever.get_docs(files, doc_config), :modules
+    content = ExDoc.HTMLFormatter.list_page(:modules, nodes, doc_config)
 
     assert content =~ %r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
     assert content =~ %r{<li>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms

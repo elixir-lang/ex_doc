@@ -16,7 +16,7 @@
     </script>
     <div id="content">
       <h1 id="full_list_header">
-        <a href="http://elixir-lang.org/" target="_blank">Elixir v<%= System.version %></a>
+        <a href="http://elixir-lang.org/" target="_blank"><%= config.project %> v<%= config.version %></a>
       </h1>
       <div id="nav">
         <span class="<%= if(scope == :modules, do: "selected") %>"><a target="_self" href="modules_list.html">
