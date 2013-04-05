@@ -36,7 +36,7 @@
       <a href="<%= module.source %>" target="_blank" class="view_source">Source</a>
 
       <%= unless Enum.empty?(impls) do %>
-        <h2>Implementations</h2>
+        <h2 id="implementations">Implementations</h2>
         <ul class="summary">
           <%= lc node inlist impls do %>
             <li>
@@ -62,21 +62,21 @@
       <% end %>
 
       <%= unless Enum.empty?(functions) do %>
-        <h2>Functions summary</h2>
+        <h2 id="functions_summary">Functions summary</h2>
         <ul class="summary">
           <%= lc node inlist functions, do: summary_template(node) %>
         </ul>
       <% end %>
 
       <%= unless Enum.empty?(macros) do %>
-        <h2>Macros summary</h2>
+        <h2 id="macros_summary">Macros summary</h2>
         <ul class="summary">
           <%= lc node inlist macros, do: summary_template(node) %>
         </ul>
       <% end %>
 
       <%= unless Enum.empty?(callbacks) do %>
-        <h2>Callbacks summary</h2>
+        <h2 id="callbacks_summary">Callbacks summary</h2>
         <ul class="summary">
           <%= lc node inlist callbacks, do: summary_template(node) %>
         </ul>
