@@ -1,5 +1,3 @@
-defexception ConfigError, message: "configuration error"
-
 defmodule Mix.Tasks.Docs do
   use Mix.Task
 
@@ -17,11 +15,23 @@ defmodule Mix.Tasks.Docs do
     :source_url   public URL of the project (optional)
     :main         main module of the project, will be shown on the starting page
 
+
+  Command-line usage:
+
+    mix docs [-o/--output <path>]
+
   """
 
   def run(args) do
+    { cli_opts, args } = OptionParser.parse(args, aliases: [o: :output])
+    if args != [] do
+      IO.puts "Extraneous arguments on the command line.\n"
+      print_usage()
+    end
+
     if nil?(project = Mix.project[:name]) do
-      raise ConfigError, message: "Undefined project name (:name option)"
+      IO.puts "Undefined project name (:name option).\n"
+      exit(1)
     end
     if nil?(version = Mix.project[:version]) do
       version = "dev"
@@ -35,6 +45,27 @@ defmodule Mix.Tasks.Docs do
       options = Keyword.put(options, :formatter, String.split(formatter, "."))
     end
 
+    # Merge command-line and project options
+    options = Enum.reduce cli_opts, options, fn(opt, acc) ->
+      if opt == :output do
+        Keyword.put(acc, :output, opt)
+      else
+        { opt, _ } = opt
+        IO.puts "Unrecognized option: #{to_binary opt}"
+        exit(1)
+      end
+    end
+
     ExDoc.generate_docs(project, version, options)
+  end
+
+  defp print_usage do
+    IO.puts %B"""
+    Usage:
+      mix docs [-o <path>]
+
+      -o, --output      output directory for the generated docs; default: docs
+    """
+    exit(1)
   end
 end
