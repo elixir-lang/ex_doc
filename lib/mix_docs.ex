@@ -4,10 +4,22 @@ defmodule Mix.Tasks.Docs do
   @shortdoc "Generate HTML documentation for the project"
 
   @moduledoc """
-  There is a bunch of customizable options available. Put them under your project's :doc key.
+  Uses ExDoc to generate a static web page from the docstrings extracted from
+  all of the project's modules.
 
-  Your project must have :name defined. If you also define :version, it will be
-  used. Otherwise, the version will be set to "dev".
+  ## Command line options
+
+  * `--output`, `-o` - output directory for the generated docs; default: docs
+
+  ## Configuration
+
+  The task uses the project's `:name` key if defined, otherwise it will use the
+  `:app` key as a substitute.
+
+  It also uses the `:version` key.
+
+  The following options should be put under the `:docs` key in your project's
+  main configuration.
 
     :output       output directory for the generated docs; default: docs
     :formatter    doc formatter to use; default: ExDoc.HTMLFormatter
@@ -15,18 +27,13 @@ defmodule Mix.Tasks.Docs do
     :source_url   public URL of the project (optional)
     :main         main module of the project, will be shown on the starting page
 
-
-  Command-line usage:
-
-    mix docs [-o/--output <path>]
-
   """
 
   def run(args) do
     { cli_opts, args } = OptionParser.parse(args, aliases: [o: :output])
     if args != [] do
       IO.puts "Extraneous arguments on the command line.\n"
-      print_usage()
+      exit(1)
     end
 
     if nil?(project = Mix.project[:name]) do
@@ -57,15 +64,5 @@ defmodule Mix.Tasks.Docs do
     end
 
     ExDoc.generate_docs(project, version, options)
-  end
-
-  defp print_usage do
-    IO.puts %B"""
-    Usage:
-      mix docs [-o <path>]
-
-      -o, --output      output directory for the generated docs; default: docs
-    """
-    exit(1)
   end
 end
