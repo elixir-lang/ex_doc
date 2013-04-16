@@ -89,14 +89,23 @@ defmodule Mix.Tasks.Docs do
     ExDoc.generate_docs(project, version, options)
   end
 
-  def guess_url(url = <<"https://github.com/", _ :: binary>>) do
-    if not match?([?/|_], Enum.reverse binary_to_list(url)) do
-      url = url <> "/"
-    end
-    url <> "blob/master/%{path}#L%{line}"
+  defp guess_url(url = <<"https://github.com/", _ :: binary>>) do
+    append_slash(url) <> "blob/master/%{path}#L%{line}"
   end
 
-  def guess_url(other) do
+  defp guess_url(url = <<"https://bitbucket.org/", _ :: binary>>) do
+    append_slash(url) <> "src/master/%{path}?at=master#cl-%{line}"
+  end
+
+  defp guess_url(other) do
     other
+  end
+
+  defp append_slash(url) do
+    if not match?([?/|_], Enum.reverse binary_to_list(url)) do
+      url <> "/"
+    else
+      url
+    end
   end
 end
