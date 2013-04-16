@@ -21,18 +21,18 @@ defmodule Mix.Tasks.Docs do
   The following options should be put under the `:docs` key in your project's
   main configuration.
 
-    :output               output directory for the generated docs; default: docs
-                          may be overriden by command line argument
+  * `:output` - output directory for the generated docs; default: docs.
+    May be overriden by command line argument.
 
-    :formatter            doc formatter to use; default: ExDoc.HTMLFormatter
+  * `:formatter` - doc formatter to use; default: ExDoc.HTMLFormatter.
 
-    :source_root          path to the source code root directory; default: . (current directory)
+  * `:source_root` - path to the source code root directory; default: . (current directory).
 
-    :source_url_pattern   public URL of the project
-                          (derived from project's `:source_url` if not present)
+  * `:source_url_pattern` - public URL of the project.
+    Derived from project's `:source_url` if not present.
 
-    :main                 main module of the project, will be shown on the starting page
-                          (derived from project's `:app` if not present)
+  * `:main` - main module of the project, will be shown on the starting page.
+    Derived from project's `:app` if not present.
 
   """
 
