@@ -37,19 +37,33 @@ defmodule Mix.Tasks.Docs do
     end
 
     if nil?(project = Mix.project[:name]) do
-      IO.puts "Undefined project name (:name option).\n"
-      exit(1)
+      project = Mix.project[:app]
     end
+
     if nil?(version = Mix.project[:version]) do
       version = "dev"
     end
 
-    options = Mix.project[:doc_options]
-    if is_atom(options[:main]) do
-      options = Keyword.update(options, :main, fn(mod) -> Module.to_binary(mod) end)
+    options = Mix.project[:docs]
+    if nil?(options) do
+      options = []
     end
+
+    cond do
+      nil?(options[:main]) ->
+        # Try generating main module's name from the app name
+        options = Keyword.put(options, :main, (Mix.project[:app] |> atom_to_binary |> Mix.Utils.camelize))
+
+      is_atom(options[:main]) ->
+        options = Keyword.update(options, :main, fn(mod) -> Module.to_binary(mod) end)
+    end
+
     if formatter = options[:formatter] do
       options = Keyword.put(options, :formatter, String.split(formatter, "."))
+    end
+
+    if pattern = options[:source_url_pattern] do
+      options = Keyword.put(options, :source_url, pattern)
     end
 
     # Merge command-line and project options
