@@ -21,11 +21,18 @@ defmodule Mix.Tasks.Docs do
   The following options should be put under the `:docs` key in your project's
   main configuration.
 
-    :output       output directory for the generated docs; default: docs
-    :formatter    doc formatter to use; default: ExDoc.HTMLFormatter
-    :source_root  path to the source code root directory; default: . (current directory)
-    :source_url   public URL of the project (optional)
-    :main         main module of the project, will be shown on the starting page
+    :output               output directory for the generated docs; default: docs
+                          may be overriden by command line argument
+
+    :formatter            doc formatter to use; default: ExDoc.HTMLFormatter
+
+    :source_root          path to the source code root directory; default: . (current directory)
+
+    :source_url_pattern   public URL of the project
+                          (derived from project's `:source_url` if not present)
+
+    :main                 main module of the project, will be shown on the starting page
+                          (derived from project's `:app` if not present)
 
   """
 
@@ -62,9 +69,11 @@ defmodule Mix.Tasks.Docs do
       options = Keyword.put(options, :formatter, String.split(formatter, "."))
     end
 
-    if pattern = options[:source_url_pattern] do
-      options = Keyword.put(options, :source_url, pattern)
+    pattern = options[:source_url_pattern]
+    if nil?(pattern) do
+      pattern = guess_url(Mix.project[:source_url])
     end
+    options = Keyword.put(options, :source_url, pattern)
 
     # Merge command-line and project options
     options = Enum.reduce cli_opts, options, fn(opt, acc) ->
