@@ -2,7 +2,35 @@
 
 ExDoc is a tool to generate documentation for your Elixir projects. In case you are looking for documentation for Elixir itself, [check out Elixir's website](http://elixir-lang.org/).
 
-Currently, it can only be invoked through the command line. You can use it as follow:
+## Using ExDoc with Mix
+
+To use ExDoc in your Mix projects, first add ExDoc as a dependency:
+
+```elixir
+def deps do
+  [ { :ex_doc, github: "elixir-lang/ex_doc" } ]
+end
+```
+
+After adding ExDoc as a dependency, please run `mix deps.get` to install it.
+
+ExDoc will automatically pull in information from your project, like the application and version. However, you may want to set both `:name` and `:source_url` to have a nicer output from ExDoc, for example:
+
+```elixir
+def project do
+  [ app: :repo
+    version: "0.1.0.dev",
+    name: "REPO",
+    source_url: "https://github.com/USER/REPO",
+    deps: deps ]
+end
+```
+
+Now you are ready to generate your project documentation with `mix docs`. There are other options available, you can check them out by running `mix help docs`.
+
+## Using ExDoc via command line
+
+You can ExDoc via the command line as follow:
 
 1. First clone and compile it:
 
@@ -17,7 +45,7 @@ Currently, it can only be invoked through the command line. You can use it as fo
 
 3. Next invoke the exdoc executable from your project:
 
-        elixir -pa ebin PATH_TO_YOUR_EXDOC/bin/exdoc "PROJECT_NAME" "PROJECT_VERSION" -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO/blob/master/%{path}#L%{line}"
+        elixir -pa ebin PATH_TO_YOUR_EXDOC/bin/exdoc "PROJECT_NAME" "PROJECT_VERSION" -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO"
 
 For example, here are some acceptable values:
 
@@ -26,8 +54,6 @@ For example, here are some acceptable values:
     PROJECT_MODULE  => Dynamo (the main module provided by the library)
     GITHUB_USER     => elixir-lang
     GITHUB_REPO     => dynamo
-
-We have plans to integrate ExDoc with Mix, you can [join the discussion here](https://github.com/elixir-lang/exdoc/issues/16).
 
 # License
 
