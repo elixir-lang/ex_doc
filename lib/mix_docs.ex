@@ -37,6 +37,8 @@ defmodule Mix.Tasks.Docs do
   """
 
   def run(args) do
+    Mix.Task.run "compile"
+
     { cli_opts, args } = OptionParser.parse(args, aliases: [o: :output])
 
     if args != [] do
@@ -71,5 +73,9 @@ defmodule Mix.Tasks.Docs do
     end
 
     ExDoc.generate_docs(project, version, options)
+
+    index = Path.join(options[:output] || "docs", "index.html")
+    Mix.shell.info "%{green}Docs generated with success."
+    Mix.shell.info "%{green}Open up #{index} in your browser to read them."
   end
 end
