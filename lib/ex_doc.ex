@@ -1,14 +1,16 @@
 defmodule ExDoc do
-  defrecord Config, output: "docs", source_root: nil, source_url: nil, source_beam: nil,
-                    formatter: ExDoc.HTMLFormatter, project: nil, version: nil, main: nil
+  defrecord Config, output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
+                    source_beam: nil, formatter: ExDoc.HTMLFormatter, project: nil, version: nil,
+                    main: nil
 
   @doc """
   Generates documentation for the given project, version
   and options.
   """
-  def generate_docs(project, version, options) do
-    config = ExDoc.Config[project: project, version: version, main: options[:main] || project,
-                          source_root: options[:source_root] || File.cwd!].update(options)
+  def generate_docs(project, version, options) when is_binary(project) and is_binary(version) and is_list(options) do
+    options = normalize_options(options)
+    config  = Config[project: project, version: version, main: options[:main] || project,
+                     source_root: options[:source_root] || File.cwd!].update(options)
 
     source_beam = config.source_beam || Path.join(config.source_root, "ebin")
     docs = ExDoc.Retriever.get_docs find_beams(source_beam), config
@@ -25,6 +27,27 @@ defmodule ExDoc do
   end
 
   # Helpers
+
+  defp normalize_options(options) do
+    pattern = options[:source_url_pattern] || guess_url(options[:source_url])
+    Keyword.put(options, :source_url_pattern, pattern)
+  end
+
+  defp guess_url(url = <<"https://github.com/", _ :: binary>>) do
+    append_slash(url) <> "blob/master/%{path}#L%{line}"
+  end
+
+  defp guess_url(url = <<"https://bitbucket.org/", _ :: binary>>) do
+    append_slash(url) <> "src/master/%{path}?at=master#cl-%{line}"
+  end
+
+  defp guess_url(other) do
+    other
+  end
+
+  defp append_slash(url) do
+    if :binary.last(url) == ?/, do: url, else: url <> "/"
+  end
 
   defp find_beams(path) do
     Path.wildcard Path.expand("Elixir-*.beam", path)

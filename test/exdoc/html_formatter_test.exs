@@ -7,13 +7,13 @@ defmodule ExDoc.HTMLFormatterTest do
     Path.expand("test/tmp/Elixir")
   end
 
-  defp source_url_root do
-    "https://github.com/elixir-lang/elixir/blob/master"
+  defp source_url do
+    "https://github.com/elixir-lang/elixir"
   end
 
   defp doc_config do
     ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                 source_url: "#{source_url_root}/%{path}#L%{line}"]
+                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
   end
 
   defp get_content(kind, names) do
@@ -43,7 +43,7 @@ defmodule ExDoc.HTMLFormatterTest do
     assert content =~ %r/example_1\/0.*Another example/ms
     assert content =~ %r{<p class="signature" id="example_1/0">}
     assert content =~ %r{<strong>example\(foo, bar // Baz\)</strong>}
-    assert content =~ %r{<a href="#{source_url_root}/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
+    assert content =~ %r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
   end
 
   test "module_page outputs summaries" do

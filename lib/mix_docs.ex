@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Docs do
   The task uses the project's `:name` key if defined, otherwise it will use the
   `:app` key as a substitute.
 
-  It also uses the `:version` key.
+  It also uses the `:version` key and `:source_url` from the project's configuration.
 
   The following options should be put under the `:docs` key in your project's
   main configuration.
@@ -38,23 +38,14 @@ defmodule Mix.Tasks.Docs do
 
   def run(args) do
     { cli_opts, args } = OptionParser.parse(args, aliases: [o: :output])
+
     if args != [] do
-      IO.puts "Extraneous arguments on the command line.\n"
-      exit(1)
+      raise Mix.Error, message: "Extraneous arguments on the command line"
     end
 
-    if nil?(project = Mix.project[:name]) do
-      project = Mix.project[:app]
-    end
-
-    if nil?(version = Mix.project[:version]) do
-      version = "dev"
-    end
-
-    options = Mix.project[:docs]
-    if nil?(options) do
-      options = []
-    end
+    project = (Mix.project[:name] || Mix.project[:app]) |> to_binary
+    version = Mix.project[:version] || "dev"
+    options = Mix.project[:docs] || []
 
     cond do
       nil?(options[:main]) ->
@@ -62,18 +53,12 @@ defmodule Mix.Tasks.Docs do
         options = Keyword.put(options, :main, (Mix.project[:app] |> atom_to_binary |> Mix.Utils.camelize))
 
       is_atom(options[:main]) ->
-        options = Keyword.update(options, :main, fn(mod) -> Module.to_binary(mod) end)
+        options = Keyword.update(options, :main, Module.to_binary(&1))
     end
 
     if formatter = options[:formatter] do
       options = Keyword.put(options, :formatter, String.split(formatter, "."))
     end
-
-    pattern = options[:source_url_pattern]
-    if nil?(pattern) do
-      pattern = guess_url(Mix.project[:source_url])
-    end
-    options = Keyword.put(options, :source_url, pattern)
 
     # Merge command-line and project options
     options = Enum.reduce cli_opts, options, fn(opt, acc) ->
@@ -81,31 +66,10 @@ defmodule Mix.Tasks.Docs do
         Keyword.put(acc, :output, opt)
       else
         { opt, _ } = opt
-        IO.puts "Unrecognized option: #{to_binary opt}"
-        exit(1)
+        raise Mix.Error, message: "Unrecognized option: #{to_binary opt}"
       end
     end
 
     ExDoc.generate_docs(project, version, options)
-  end
-
-  defp guess_url(url = <<"https://github.com/", _ :: binary>>) do
-    append_slash(url) <> "blob/master/%{path}#L%{line}"
-  end
-
-  defp guess_url(url = <<"https://bitbucket.org/", _ :: binary>>) do
-    append_slash(url) <> "src/master/%{path}?at=master#cl-%{line}"
-  end
-
-  defp guess_url(other) do
-    other
-  end
-
-  defp append_slash(url) do
-    if not match?([?/|_], Enum.reverse binary_to_list(url)) do
-      url <> "/"
-    else
-      url
-    end
   end
 end

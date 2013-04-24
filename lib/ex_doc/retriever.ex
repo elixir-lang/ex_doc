@@ -79,7 +79,7 @@ defmodule ExDoc.Retriever do
       _ -> raise "Module #{inspect module} was not compiled with flag --docs"
     end
 
-    source_url  = config.source_url
+    source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
     docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type),

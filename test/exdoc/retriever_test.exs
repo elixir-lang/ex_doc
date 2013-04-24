@@ -5,9 +5,10 @@ defmodule ExDoc.RetrieverTest do
 
   require ExDoc.Retriever, as: R
 
-  defp get_docs(kind, names, source_url // "http://example.com/%{path}#L%{line}") do
-    files = Enum.map names, fn(n) -> "test/tmp/Elixir-#{n}.beam" end
-    Keyword.get R.get_docs(files, ExDoc.Config[source_url: source_url, source_root: File.cwd!]), kind
+  defp get_docs(kind, names, url_pattern // "http://example.com/%{path}#L%{line}") do
+    files  = Enum.map names, fn(n) -> "test/tmp/Elixir-#{n}.beam" end
+    config = ExDoc.Config[source_url_pattern: url_pattern, source_root: File.cwd!]
+    Keyword.get R.get_docs(files, config), kind
   end
 
   ## MODULES
