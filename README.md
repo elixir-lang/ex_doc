@@ -30,7 +30,7 @@ Now you are ready to generate your project documentation with `mix docs`. There 
 
 ## Using ExDoc via command line
 
-You can ExDoc via the command line as follow:
+You can ExDoc via the command line as follows:
 
 1. First clone and compile it:
 
