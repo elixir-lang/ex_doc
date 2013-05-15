@@ -34,8 +34,8 @@ You can ExDoc via the command line as follows:
 
 1. First clone and compile it:
 
-        git clone https://github.com/elixir-lang/exdoc.git
-        cd exdoc
+        git clone https://github.com/elixir-lang/ex_doc.git
+        cd ex_doc
         mix compile
 
 2. Then you are ready to use it in your projects. First move into your project directory and ensure it is compiled:
