@@ -33,6 +33,7 @@ defmodule ExDoc.CLI do
       -f, --formatter   Docs formatter to use, default: ExDoc.HTMLFormatter
       -r, --source-root Path to the source code root, default: .
       -u, --source-url  URL to the source code
+      --source-ref      Branch/commit/tag used for source link inference, default: master
       -m, --main        The main, entry-point module in docs
 
     ## Source linking
@@ -47,6 +48,14 @@ defmodule ExDoc.CLI do
     Will be inflected as:
 
         https://github.com/elixir-lang/dynamo/blob/master/%{path}#L%{line}
+
+    To specify a particular branch or commit, use the `--source-ref` option:
+
+        --source-url "https://github.com/elixir-lang/dynamo" --source-ref "v1.0"
+
+    will result in the following URL pattern:
+
+        https://github.com/elixir-lang/dynamo/blob/v1.0/%{path}#L%{line}
 
     """
     exit(1)
