@@ -29,19 +29,19 @@ defmodule ExDoc do
   # Helpers
 
   defp normalize_options(options) do
-    pattern = options[:source_url_pattern] || guess_url(options[:source_url])
+    pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || "master")
     Keyword.put(options, :source_url_pattern, pattern)
   end
 
-  defp guess_url(url = <<"https://github.com/", _ :: binary>>) do
-    append_slash(url) <> "blob/master/%{path}#L%{line}"
+  defp guess_url(url = <<"https://github.com/", _ :: binary>>, ref) do
+    append_slash(url) <> "blob/#{ref}/%{path}#L%{line}"
   end
 
-  defp guess_url(url = <<"https://bitbucket.org/", _ :: binary>>) do
-    append_slash(url) <> "src/master/%{path}?at=master#cl-%{line}"
+  defp guess_url(url = <<"https://bitbucket.org/", _ :: binary>>, ref) do
+    append_slash(url) <> "src/#{ref}/%{path}#cl-%{line}"
   end
 
-  defp guess_url(other) do
+  defp guess_url(other, _) do
     other
   end
 
