@@ -3,6 +3,15 @@ defmodule Mix.Tasks.Compile.Sundown do
 
   def run(_) do
     Mix.shell.info System.cmd("make share/markdown.so")
+
+    if not File.regular?("sundown/sundown") do
+      IO.puts """
+          If the build did not work for you, try removing the -Wl compilation flag in
+          sundown/Makefile and run `mix compile` again.
+
+          See also https://github.com/elixir-lang/ex_doc/issues/31
+      """
+    end
   end
 end
 
