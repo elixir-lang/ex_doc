@@ -31,6 +31,9 @@ defmodule Mix.Tasks.Docs do
   * `:source_url_pattern` - public URL of the project.
     Derived from project's `:source_url` if not present.
 
+  * `:source_ref` - the branch/commit/tag used for source link inference.
+    Ignored if `:source_url_pattern` is provided. Defaults to _master_.
+
   * `:main` - main module of the project, will be shown on the starting page.
     Derived from project's `:app` if not present.
 
