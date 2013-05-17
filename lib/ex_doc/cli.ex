@@ -23,10 +23,10 @@ defmodule ExDoc.CLI do
   defp print_usage do
     IO.puts %B"""
     Usage:
-      exdoc PROJECT VERSION [OPTIONS]
+      ex_doc PROJECT VERSION [OPTIONS]
 
     Examples:
-      exdoc "Dynamo" "0.8.0" -u "https://github.com/elixir-lang/dynamo"
+      ex_doc "Dynamo" "0.8.0" -u "https://github.com/elixir-lang/dynamo"
 
     Options:
       -o, --output      Path to output docs, default: docs

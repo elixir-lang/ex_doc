@@ -43,9 +43,9 @@ You can ExDoc via the command line as follows:
         cd PATH_TO_YOUR_PROJECT
         mix compile
 
-3. Next invoke the exdoc executable from your project:
+3. Next invoke the ex_doc executable from your project:
 
-        elixir -pa ebin PATH_TO_YOUR_EXDOC/bin/exdoc "PROJECT_NAME" "PROJECT_VERSION" -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO"
+        elixir -pa ebin PATH_TO_YOUR_EXDOC/bin/ex_doc "PROJECT_NAME" "PROJECT_VERSION" -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO"
 
 For example, here are some acceptable values:
 

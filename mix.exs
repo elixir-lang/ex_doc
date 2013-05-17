@@ -1,5 +1,5 @@
 defmodule Mix.Tasks.Compile.Sundown do
-  @shortdoc "Compiles sundown that ships with exdoc"
+  @shortdoc "Compiles sundown that ships with ExDoc"
 
   def run(_) do
     Mix.shell.info System.cmd("make share/markdown.so")
@@ -22,7 +22,7 @@ defmodule ExDoc.Mixfile do
     [ app: :ex_doc,
       version: "0.1.0",
       compilers: [:sundown, :elixir, :app],
-      source_url: "https://github.com/elixir-lang/exdoc/"
+      source_url: "https://github.com/elixir-lang/ex_doc/"
     ]
   end
 end
