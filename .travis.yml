@@ -4,9 +4,6 @@ notifications:
     - jose.valim@plataformatec.com.br
 otp_release:
   - R16B
-  - R15B03
-  - R15B02
-  - R15B01
 before_install:
   - git clone https://github.com/elixir-lang/elixir
   - cd elixir && make && cd ..
