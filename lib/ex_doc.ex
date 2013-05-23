@@ -50,7 +50,7 @@ defmodule ExDoc do
   end
 
   defp find_beams(path) do
-    Path.wildcard Path.expand("Elixir-*.beam", path)
+    Path.wildcard Path.expand("Elixir.*.beam", path)
   end
 
   defp generate_index(formatter, output, config) do

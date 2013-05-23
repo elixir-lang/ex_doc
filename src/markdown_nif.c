@@ -72,5 +72,5 @@ static ErlNifFunc nif_funcs[] =
     {"to_ansi", 1, to_ansi_nif}
 };
 
-ERL_NIF_INIT(Elixir-Markdown,nif_funcs,NULL,NULL,NULL,NULL);
+ERL_NIF_INIT(Elixir.Markdown,nif_funcs,NULL,NULL,NULL,NULL);
 

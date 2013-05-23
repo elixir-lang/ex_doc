@@ -208,13 +208,8 @@ defmodule ExDoc.Retriever do
     Regex.replace(%r/%{line}/, source_url, to_binary(line))
   end
 
-  # Get the source of the compiled module. Due to a bug in Erlang
-  # R15 and before, we need to look for the source first in the
-  # options and then into the real source.
   defp source_path(module, config) do
-    compile = module.__info__(:compile)
-    options = compile[:options] || []
-    source  = options[:source]  || compile[:source]
+    source = module.__info__(:compile)[:source]
     Path.relative_to source, config.source_root
   end
 end
