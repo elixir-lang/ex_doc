@@ -13,7 +13,8 @@ defmodule ExDoc.HTMLFormatterTest do
 
   defp doc_config do
     ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
+                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}",
+                 source_url: source_url]
   end
 
   defp get_content(kind, names) do
@@ -98,6 +99,19 @@ defmodule ExDoc.HTMLFormatterTest do
     content = ExDoc.HTMLFormatter.list_page(:modules, [], doc_config)
     assert content =~ %r{<span class="selected"><a target="_self" href="modules_list.html">}
     assert content =~ %r{<span class=""><a target="_self" href="records_list.html">}
+  end
+
+  test "project name links to source_url" do
+    content = ExDoc.HTMLFormatter.list_page(:modules, [], doc_config)
+    assert content =~ %r{<a href="#{source_url}" target="_blank">Elixir v1.0.1</a>}
+  end
+
+  test "when project name is not set link to Elixir" do
+    doc_config_without_source_url = ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
+                                                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
+
+    content = ExDoc.HTMLFormatter.list_page(:modules, [], doc_config_without_source_url)
+    assert content =~ %r{<a href="http://elixir-lang.org/" target="_blank">Elixir v1.0.1</a>}
   end
 
   test "list_page outputs listing for the given nodes" do
