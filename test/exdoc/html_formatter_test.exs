@@ -11,9 +11,14 @@ defmodule ExDoc.HTMLFormatterTest do
     "https://github.com/elixir-lang/elixir"
   end
 
+  def homepage_url do
+    "http://elixir-lang.org"
+  end
+
   defp doc_config do
     ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
+                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}",
+                 homepage_url: homepage_url, source_url: source_url]
   end
 
   defp get_content(kind, names) do
@@ -98,6 +103,26 @@ defmodule ExDoc.HTMLFormatterTest do
     content = ExDoc.HTMLFormatter.list_page(:modules, [], doc_config)
     assert content =~ %r{<span class="selected"><a target="_self" href="modules_list.html">}
     assert content =~ %r{<span class=""><a target="_self" href="records_list.html">}
+  end
+
+  test "site title text links to homepage_url when set" do
+    content = ExDoc.HTMLFormatter.list_page(:modules, [], doc_config)
+    assert content =~ %r{<a href="#{homepage_url}" target="_blank">Elixir v1.0.1</a>}
+  end
+
+  test "site title text links to source_url when there is no homepage_url" do
+    doc_config_without_source_url = ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
+                                                 source_url: source_url,
+                                                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
+    content = ExDoc.HTMLFormatter.list_page(:modules, [], doc_config_without_source_url)
+    assert content =~ %r{<a href="#{source_url}" target="_blank">Elixir v1.0.1</a>}
+  end
+
+  test "site title text links to / when there is no homepage_url or source_url" do
+    doc_config_without_source_url = ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
+                                                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
+    content = ExDoc.HTMLFormatter.list_page(:modules, [], doc_config_without_source_url)
+    assert content =~ %r{<a href="/" target="_blank">Elixir v1.0.1</a>}
   end
 
   test "list_page outputs listing for the given nodes" do
