@@ -1,7 +1,8 @@
 defmodule ExDoc.CLI do
   def run(args) do
     { options, args } = OptionParser.parse(args,
-      aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root, m: :main])
+      aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root, m: :main,
+                p: :homepage_url])
 
     case args do
       [project, version] -> :ok
@@ -29,12 +30,13 @@ defmodule ExDoc.CLI do
       ex_doc "Dynamo" "0.8.0" -u "https://github.com/elixir-lang/dynamo"
 
     Options:
-      -o, --output      Path to output docs, default: docs
-      -f, --formatter   Docs formatter to use, default: ExDoc.HTMLFormatter
-      -r, --source-root Path to the source code root, default: .
-      -u, --source-url  URL to the source code
-      --source-ref      Branch/commit/tag used for source link inference, default: master
-      -m, --main        The main, entry-point module in docs
+      -o, --output       Path to output docs, default: docs
+      -f, --formatter    Docs formatter to use, default: ExDoc.HTMLFormatter
+      -r, --source-root  Path to the source code root, default: .
+      -u, --source-url   URL to the source code
+      --source-ref       Branch/commit/tag used for source link inference, default: master
+      -m, --main         The main, entry-point module in docs
+      -p  --homepage-url URL to link to for the site name
 
     ## Source linking
 
