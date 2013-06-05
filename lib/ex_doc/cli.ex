@@ -2,7 +2,7 @@ defmodule ExDoc.CLI do
   def run(args) do
     { options, args } = OptionParser.parse(args,
       aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root, m: :main,
-                h: :homepage_url])
+                p: :homepage_url])
 
     case args do
       [project, version] -> :ok
@@ -36,7 +36,7 @@ defmodule ExDoc.CLI do
       -u, --source-url   URL to the source code
       --source-ref       Branch/commit/tag used for source link inference, default: master
       -m, --main         The main, entry-point module in docs
-      -h  --homepage-url URL to link to for the site name
+      -p  --homepage-url URL to link to for the site name
 
     ## Source linking
 
