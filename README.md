@@ -14,7 +14,7 @@ end
 
 After adding ExDoc as a dependency, please run `mix deps.get` to install it.
 
-ExDoc will automatically pull in information from your project, like the application and version. However, you may want to set both `:name` and `:source_url` to have a nicer output from ExDoc, for example:
+ExDoc will automatically pull in information from your project, like the application and version. However, you may want to set `:name`, `:source_url` and `:homepage_url` to have a nicer output from ExDoc, for example:
 
 ```elixir
 def project do
@@ -22,6 +22,7 @@ def project do
     version: "0.1.0.dev",
     name: "REPO",
     source_url: "https://github.com/USER/REPO",
+    homepage_url: "http://YOUR_PROJECT_HOMEPAGE"
     deps: deps ]
 end
 ```

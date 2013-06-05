@@ -1,7 +1,7 @@
 defmodule ExDoc do
   defrecord Config, output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
-                    source_beam: nil, formatter: ExDoc.HTMLFormatter, project: nil, version: nil,
-                    main: nil
+                    homepage_url: nil, source_beam: nil, formatter: ExDoc.HTMLFormatter,
+                    project: nil, version: nil, main: nil
 
   @doc """
   Generates documentation for the given project, version
@@ -10,6 +10,7 @@ defmodule ExDoc do
   def generate_docs(project, version, options) when is_binary(project) and is_binary(version) and is_list(options) do
     options = normalize_options(options)
     config  = Config[project: project, version: version, main: options[:main] || project,
+                     homepage_url: options[:homepage_url],
                      source_root: options[:source_root] || File.cwd!].update(options)
 
     source_beam = config.source_beam || Path.join(config.source_root, "ebin")
