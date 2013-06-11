@@ -8,8 +8,10 @@ ifeq ($(shell uname),Darwin)
 	OPTIONS=-dynamiclib -undefined dynamic_lookup
 endif
 
-all: share/markdown.so
+all: ex_doc
 
+ex_doc:
+	mix compile
 
 sundown/src:
 	git submodule update --init
