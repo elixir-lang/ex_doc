@@ -6,7 +6,7 @@ defmodule ExDoc.RetrieverTest do
   require ExDoc.Retriever, as: R
 
   defp get_docs(kind, names, url_pattern // "http://example.com/%{path}#L%{line}") do
-    files  = Enum.map names, fn(n) -> "test/tmp/Elixir.#{n}.beam" end
+    files  = Enum.map names, fn(n) -> "test/tmp/Elixir-#{String.replace n, ".", "-"}.beam" end
     config = ExDoc.Config[source_url_pattern: url_pattern, source_root: File.cwd!]
     Keyword.get R.get_docs(files, config), kind
   end
