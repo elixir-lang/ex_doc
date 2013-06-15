@@ -22,7 +22,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   defp get_content(kind, names) do
-    files  = Enum.map names, fn(n) -> "#{input_path}.#{n}.beam" end
+    files  = Enum.map names, fn(n) -> "#{input_path}-#{String.replace n, ".", "-"}.beam" end
     [node] = Keyword.get ExDoc.Retriever.get_docs(files, doc_config), kind
     ExDoc.HTMLFormatter.module_page(node, doc_config)
   end
@@ -127,8 +127,8 @@ defmodule ExDoc.HTMLFormatterTest do
 
   test "list_page outputs listing for the given nodes" do
     files   = [
-      "#{input_path}.CompiledWithDocs.beam",
-      "#{input_path}.CompiledWithDocs.Nested.beam"
+      "#{input_path}-CompiledWithDocs.beam",
+      "#{input_path}-CompiledWithDocs-Nested.beam"
     ]
     nodes   = Keyword.get ExDoc.Retriever.get_docs(files, doc_config), :modules
     content = ExDoc.HTMLFormatter.list_page(:modules, nodes, doc_config)
