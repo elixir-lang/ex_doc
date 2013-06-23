@@ -47,7 +47,7 @@ defmodule ExDoc.HTMLFormatter do
 
   # Get the full signature from a function
   defp signature(ExDoc.FunctionNode[name: name, signature: args]) do
-    Macro.to_binary { name, 0, args }
+    Macro.to_string { name, 0, args }
   end
 
   defp signature(node) do
