@@ -160,7 +160,7 @@ defmodule ExDoc.Retriever do
     module = binary_to_atom name
 
     unless Code.ensure_loaded?(module), do:
-      raise Error, message: "module #{inspect module} is not defined/available"
+      raise(Error, message: "module #{inspect module} is not defined/available")
 
     case module.__info__(:moduledoc) do
       { _, false } ->
@@ -168,7 +168,7 @@ defmodule ExDoc.Retriever do
       { _, _moduledoc } ->
         { Module.split(name), module, detect_type(module) }
       _ ->
-        raise Error, message: "module #{inspect module} was not compiled with flag --docs"
+        raise(Error, message: "module #{inspect module} was not compiled with flag --docs")
     end
   end
 
