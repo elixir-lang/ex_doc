@@ -117,7 +117,7 @@ defmodule ExDoc.RetrieverTest do
   test "ignore behaviours internal functions" do
     [node] = get_docs :modules, ["CustomBehaviour"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
-    assert functions == ["hello/1"]
+    assert functions == ["first/1", "hello/1","last/1"]
     assert hd(node.docs).type == :defcallback
     assert hd(node.docs).signature == [{ :integer, [line: 7], [] }]
   end
