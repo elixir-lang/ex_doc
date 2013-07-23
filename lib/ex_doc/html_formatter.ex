@@ -35,7 +35,7 @@ defmodule ExDoc.HTMLFormatter do
   # Loop through all children finding implementations
   defp get_impls(ExDoc.ModuleNode[type: :protocol, module: module, children: children]) do
     Enum.filter children, fn(child) ->
-      child.type == :impl && child.module.__impl__ == module
+      child.type == :impl && :lists.prefix(Module.split(module), Module.split(child.module.__impl__(:name)))
     end
   end
 
