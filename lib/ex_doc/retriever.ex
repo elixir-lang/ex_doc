@@ -182,7 +182,7 @@ defmodule ExDoc.Retriever do
           _ -> :record
         end
       function_exported?(module, :__protocol__, 1) -> :protocol
-      function_exported?(module, :__impl__, 0) -> :impl
+      function_exported?(module, :__impl__, 1) -> :impl
       defines_behaviour?(module) -> :behaviour
       true -> nil
     end
