@@ -26,6 +26,14 @@ static ERL_NIF_TERM render_term(ErlNifEnv* env, int argc, const ERL_NIF_TERM arg
     return enif_make_badarg(env);
   }
 
+  if (markdown_binary.size <= 0){
+    const char *empty_string = "";
+    const int empty_len = strlen(empty_string);
+    enif_alloc_binary(empty_len, &output_binary);
+    strncpy(output_binary.data, empty_string, empty_len);
+    return enif_make_binary(env, &output_binary);
+  }
+
   input = bufnew(markdown_binary.size);
   bufput(input, markdown_binary.data, markdown_binary.size);
   enif_release_binary(&markdown_binary);
