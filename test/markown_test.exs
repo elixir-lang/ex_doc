@@ -17,4 +17,8 @@ defmodule MarkdownTest do
     expected = %b(<p><a href="https://github.com/elixir-lang">https://github.com/elixir-lang</a></p>\n)
     assert Markdown.to_html("https://github.com/elixir-lang") == expected
   end
+
+  test "to_html handles empty input" do
+    assert Markdown.to_html("") == ""
+  end
 end
