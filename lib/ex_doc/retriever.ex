@@ -136,7 +136,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_callback(callback, source_path, source_url, callbacks) do
-    { { name, arity } = tuple, line, doc } = callback
+    { { name, arity } = tuple, line, kind, doc } = callback
     { _, signatures } = List.keyfind(callbacks, tuple, 0, { nil, [] })
 
     if signature = Enum.first(signatures) do
