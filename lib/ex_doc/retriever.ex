@@ -9,9 +9,9 @@ defmodule ExDoc.Retriever do
 
   @doc """
   This function receives a bunch of .beam file paths and
-  the directory they are relative to and return a list of
+  the directory they are relative to and returns a list of
   `ExDoc.ModuleNode`. Those nodes are nested (child modules
-  can be found under the function children of each node) and
+  can be found under the function `children` of each node) and
   contain all the required information already processed.
   """
   def get_docs(files, config) when is_list(files) do
