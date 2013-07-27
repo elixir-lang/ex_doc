@@ -4,8 +4,8 @@ defmodule ExDoc do
                     project: nil, version: nil, main: nil
 
   @doc """
-  Generates documentation for the given project, version
-  and options.
+  Generates documentation for the given `project`, `version`
+  and `options`.
   """
   def generate_docs(project, version, options) when is_binary(project) and is_binary(version) and is_list(options) do
     options = normalize_options(options)
