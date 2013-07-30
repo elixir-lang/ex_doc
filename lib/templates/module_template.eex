@@ -29,7 +29,7 @@
 
       <%= if module.moduledoc do %>
         <div id="moduledoc" class="docstring">
-          <%= to_html(module.moduledoc) %>
+          <%= to_html(module.moduledoc, module) %>
         </div>
       <% end %>
 
@@ -85,21 +85,21 @@
       <%= unless Enum.empty?(functions) do %>
         <div id="functions_details" class="details_list">
           <h2>Functions</h2>
-          <%= lc node inlist functions, do: detail_template(node) %>
+          <%= lc node inlist functions, do: detail_template(node, module) %>
         </div>
       <% end %>
 
       <%= unless Enum.empty?(macros) do %>
         <div id="macros_details" class="details_list">
           <h2>Macros</h2>
-          <%= lc node inlist macros, do: detail_template(node) %>
+          <%= lc node inlist macros, do: detail_template(node, module) %>
         </div>
       <% end %>
 
       <%= unless Enum.empty?(callbacks) do %>
         <div id="callbacks_details" class="details_list">
           <h2>Callbacks</h2>
-          <%= lc node inlist callbacks, do: detail_template(node) %>
+          <%= lc node inlist callbacks, do: detail_template(node, module) %>
         </div>
       <% end %>
     </div>
