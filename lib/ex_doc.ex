@@ -22,8 +22,9 @@ defmodule ExDoc do
     formatter = config.formatter
     generate_index(formatter, output, config)
     generate_assets(formatter, output, config)
+    has_readme = generate_readme(formatter, output)
     Enum.each docs, fn({ name, nodes }) ->
-      generate_list name, nodes, formatter, output, config
+      generate_list name, nodes, formatter, output, config, has_readme
     end
   end
 
@@ -71,9 +72,24 @@ defmodule ExDoc do
     end
   end
 
-  defp generate_list(scope, nodes, formatter, output, config) do
+  defp generate_readme(formatter, output) do
+    File.rm("#{output}/README.html")
+    write_readme(formatter, output, File.read("README.md"))
+  end
+
+  defp write_readme(formatter, output, {:ok, content}) do
+    readme_html = formatter.readme_page content
+    File.write("#{output}/README.html", readme_html)
+    true
+  end
+
+  defp write_readme(_, _, _) do
+    false
+  end
+
+  defp generate_list(scope, nodes, formatter, output, config, has_readme) do
     generate_module_page(nodes, formatter, output, config)
-    content = formatter.list_page(scope, nodes, config)
+    content = formatter.list_page(scope, nodes, config, has_readme)
     File.write("#{output}/#{scope}_list.html", content)
   end
 
