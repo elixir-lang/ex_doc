@@ -67,8 +67,8 @@ defmodule Mix.Tasks.Docs do
 
     # Merge command-line and project options
     options = Enum.reduce cli_opts, options, fn(opt, acc) ->
-      if opt == :output do
-        Keyword.put(acc, :output, opt)
+      if { :output, arg } = opt do
+        Keyword.put(acc, :output, arg)
       else
         { opt, _ } = opt
         raise Mix.Error, message: "Unrecognized option: #{to_binary opt}"
@@ -78,7 +78,7 @@ defmodule Mix.Tasks.Docs do
     ExDoc.generate_docs(project, version, options)
 
     index = Path.join(options[:output] || "docs", "index.html")
-    Mix.shell.info "%{green}Docs generated with success."
-    Mix.shell.info "%{green}Open up #{index} in your browser to read them."
+    Mix.shell.info "%{green}Docs successfully generated."
+    Mix.shell.info "%{green}Open #{index} in your browser to read them."
   end
 end
