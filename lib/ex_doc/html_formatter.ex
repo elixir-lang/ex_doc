@@ -15,9 +15,9 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   def module_page(node, _config) do
-    functions = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :def], &1)
-    macros    = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :defmacro], &1)
-    callbacks = Enum.filter node.docs, match?(ExDoc.FunctionNode[type: :defcallback], &1)
+    functions = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :def], &1)
+    macros    = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defmacro], &1)
+    callbacks = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defcallback], &1)
     fields    = get_fields(node)
     impls     = get_impls(node)
 
@@ -50,7 +50,7 @@ defmodule ExDoc.HTMLFormatter do
   defp to_html(nil, _node), do: nil
   defp to_html(bin, node) when is_binary(bin) do
     available_funs = node.docs 
-      |> Enum.filter(match?(ExDoc.FunctionNode[], &1))
+      |> Enum.filter(&match?(ExDoc.FunctionNode[], &1))
       |> Enum.reduce([], fn(x, acc) -> [x.id|acc] end)
 
     bin |> Markdown.autolink_locals(available_funs) |> Markdown.to_html
