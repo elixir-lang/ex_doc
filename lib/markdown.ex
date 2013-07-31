@@ -31,7 +31,7 @@ defmodule Markdown do
       matches
       |> Enum.uniq
       |> List.flatten
-      |> Enum.filter(&1 in available_funs)
+      |> Enum.filter(&(&1 in available_funs))
       |> Enum.reduce([bin], fn (x, [acc]) ->
            escaped = Regex.escape(x)
            [Regex.replace(%r/(?<!\[)`(\s*(#{escaped})\s*)`(?!\])/, 
