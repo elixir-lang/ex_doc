@@ -18,12 +18,12 @@ defmodule ExDoc.Retriever do
     # Then we get all the module names as a list of binaries.
     # For example, the module Foo.Bar.Baz will be represented
     # as ["Foo", "Bar", "Baz"]
-    modules = Enum.map files, get_module_from_file(&1)
+    modules = Enum.map files, &get_module_from_file(&1)
 
     # Split each type
-    protocols = Enum.filter modules, match?({ _, _, x } when x in [:protocol, :impl], &1)
-    records   = Enum.filter modules, match?({ _, _, x } when x in [:record, :exception], &1)
-    remaining = Enum.filter modules, match?({ _, _, x } when x in [nil, :behaviour], &1)
+    protocols = Enum.filter modules, &match?({ _, _, x } when x in [:protocol, :impl], &1)
+    records   = Enum.filter modules, &match?({ _, _, x } when x in [:record, :exception], &1)
+    remaining = Enum.filter modules, &match?({ _, _, x } when x in [nil, :behaviour], &1)
 
     # Sort the modules and return the list of nodes
     [
@@ -82,14 +82,14 @@ defmodule ExDoc.Retriever do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
-    docs = Enum.filter_map module.__info__(:docs), has_doc?(&1, type),
-      get_function(&1, source_path, source_url)
+    docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
+      &get_function(&1, source_path, source_url)
 
     if type == :behaviour do
       callbacks = Kernel.Typespec.beam_callbacks(module)
 
       docs = Enum.map(module.__behaviour__(:docs),
-        get_callback(&1, source_path, source_url, callbacks)) ++ docs
+        &get_callback(&1, source_path, source_url, callbacks)) ++ docs
     end
 
     ExDoc.ModuleNode[
