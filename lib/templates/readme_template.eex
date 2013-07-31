@@ -20,7 +20,7 @@
     </script>
 
     <div id="content">
-      <%= to_html(content) %>
+      <%= Markdown.to_html(content) %>
     </div>
   </body>
 </html>

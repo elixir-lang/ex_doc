@@ -22,7 +22,7 @@ defmodule ExDoc do
     formatter = config.formatter
     generate_index(formatter, output, config)
     generate_assets(formatter, output, config)
-    has_readme = generate_readme(formatter, output)
+    has_readme = options[:readme] && generate_readme(formatter, output)
     Enum.each docs, fn({ name, nodes }) ->
       generate_list name, nodes, formatter, output, config, has_readme
     end
