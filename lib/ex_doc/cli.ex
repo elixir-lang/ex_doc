@@ -2,7 +2,7 @@ defmodule ExDoc.CLI do
   def run(args) do
     { options, args } = OptionParser.parse(args,
       aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root, m: :main,
-                p: :homepage_url])
+                p: :homepage_url], switches: [readme: :boolean])
 
     case args do
       [project, version] -> :ok
@@ -31,6 +31,7 @@ defmodule ExDoc.CLI do
 
     Options:
       -o, --output       Path to output docs, default: docs
+      --readme           Generate a project README from a README.md file, default: false
       -f, --formatter    Docs formatter to use, default: ExDoc.HTMLFormatter
       -r, --source-root  Path to the source code root, default: .
       -u, --source-url   URL to the source code
