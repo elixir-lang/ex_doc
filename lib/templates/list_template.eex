@@ -18,6 +18,11 @@
       <h1 id="full_list_header">
         <a href="<%= config.homepage_url || config.source_url || "/" %>" target="_blank"><%= config.project %> v<%= config.version %></a>
       </h1>
+      <%= if has_readme do %>
+      <h2 id="readme">
+        <a href="README.html">README</a>
+      </h2>
+      <% end %>
       <div id="nav">
         <span class="<%= if(scope == :modules, do: "selected") %>"><a target="_self" href="modules_list.html">
           Modules

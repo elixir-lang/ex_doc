@@ -9,7 +9,9 @@ defmodule Mix.Tasks.Docs do
 
   ## Command line options
 
-  * `--output`, `-o` - output directory for the generated docs; default: docs
+  * `--output`, `-o` - output directory for the generated docs; default: `"docs"`
+  * `--readme`       - generate a project README doc from a README.md file; 
+    default: `false`
 
   ## Configuration
 
@@ -23,6 +25,9 @@ defmodule Mix.Tasks.Docs do
 
   * `:output` - output directory for the generated docs; default: docs.
     May be overriden by command line argument.
+
+  * `:readme` - boolean indicating whether a project README should be created
+    from a README.md; default: `false`
 
   * `:formatter` - doc formatter to use; default: ExDoc.HTMLFormatter.
 
@@ -67,11 +72,10 @@ defmodule Mix.Tasks.Docs do
 
     # Merge command-line and project options
     options = Enum.reduce cli_opts, options, fn(opt, acc) ->
-      if { :output, arg } = opt do
-        Keyword.put(acc, :output, arg)
-      else
-        { opt, _ } = opt
-        raise Mix.Error, message: "Unrecognized option: #{to_binary opt}"
+      case opt do
+        { :output, arg } -> Keyword.put(acc, :output, arg)
+        { :readme, arg } when is_boolean(arg) -> Keyword.put(acc, :readme, arg)
+        { opt, _ } -> raise Mix.Error, message: "Unrecognized option: #{to_binary opt}"
       end
     end
 
