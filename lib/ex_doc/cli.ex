@@ -1,8 +1,11 @@
 defmodule ExDoc.CLI do
   def run(args) do
-    { options, args } = OptionParser.parse(args,
-      aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root, m: :main,
-                p: :homepage_url], switches: [readme: :boolean])
+    parsed = OptionParser.parse(args, switches: [readme: :boolean],
+               aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root,
+                         m: :main, p: :homepage_url])
+
+    opts = elem(parsed, 0)
+    args = elem(parsed, 1)
 
     case args do
       [project, version] -> :ok
@@ -14,11 +17,11 @@ defmodule ExDoc.CLI do
         print_usage()
     end
 
-    if formatter = options[:formatter] do
-      options = Keyword.put(options, :formatter, String.split(formatter, "."))
+    if formatter = opts[:formatter] do
+      opts = Keyword.put(opts, :formatter, String.split(formatter, "."))
     end
 
-    ExDoc.generate_docs(project, version, options)
+    ExDoc.generate_docs(project, version, opts)
   end
 
   defp print_usage do
