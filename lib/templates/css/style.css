@@ -39,6 +39,14 @@ p.signature {
   background: #e5e8ff; border: 1px solid #d8d8e5; -moz-border-radius: 3px; -webkit-border-radius: 3px;
 }
 
+ul.spec {
+  font-size: 1.1em; font-weight: normal; font-family: Monaco, Consolas, Courier, monospace;
+  font-style: oblique;
+  padding: 6px 10px; margin-top: 18px;
+  background: #e5e8ef; border: 1px solid #d8d8e5; -moz-border-radius: 3px; -webkit-border-radius: 3px;
+  list-style-type: none;
+}
+
 a:link, a:visited { text-decoration: none; color: #05a; }
 a:hover { color: #27c; }
 

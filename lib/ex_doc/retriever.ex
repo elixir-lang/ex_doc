@@ -2,7 +2,7 @@ defrecord ExDoc.ModuleNode, module: nil, relative: nil, moduledoc: nil,
   docs: [], source: nil, children: [], type: nil, id: nil, line: 0
 
 defrecord ExDoc.FunctionNode, name: nil, arity: 0, id: nil,
-  doc: [], source: nil, type: nil, line: 0, signature: nil
+  doc: [], source: nil, type: nil, line: 0, signature: nil, specs: nil
 
 defmodule ExDoc.Retriever do
   @moduledoc """
@@ -67,10 +67,12 @@ defmodule ExDoc.Retriever do
 
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
+    
+    specs = Kernel.Typespec.beam_specs(module)
 
     type = detect_type(module)
     docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
-      &get_function(&1, source_path, source_url)
+      &get_function(&1, source_path, source_url, specs)
 
     if type == :behaviour do
       callbacks = Kernel.Typespec.beam_callbacks(module)
@@ -166,8 +168,10 @@ defmodule ExDoc.Retriever do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
+    specs = Kernel.Typespec.beam_specs(module)
+
     docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
-      &get_function(&1, source_path, source_url)
+      &get_function(&1, source_path, source_url, specs)
 
     if type == :behaviour do
       callbacks = Kernel.Typespec.beam_callbacks(module)
@@ -204,8 +208,9 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function(function, source_path, source_url) do
+  defp get_function(function, source_path, source_url, all_specs) do
     { { name, arity }, line, type, signature, doc } = function
+    specs = ListDict.get(all_specs, { name, arity }, nil)
 
     ExDoc.FunctionNode[
       name: name,
@@ -213,6 +218,7 @@ defmodule ExDoc.Retriever do
       id: "#{name}/#{arity}",
       doc: doc,
       signature: signature,
+      specs: specs,
       source: source_link(source_path, source_url, line),
       type: type,
       line: line

@@ -23,6 +23,17 @@ defmodule ExDoc.HTMLFormatter.Templates do
   defp signature(node) do
     node.id
   end
+  
+  # Get the full typespecs from a function
+  defp specs(ExDoc.FunctionNode[name: name, specs: specs]) do
+    lc spec inlist specs || [] do
+      Kernel.Typespec.spec_to_ast(name, spec) |> Macro.to_string
+    end
+  end
+  
+  defp specs(_node) do
+    []
+  end
 
   # Escaping
   defp h(binary) do
