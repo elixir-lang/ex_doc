@@ -11,7 +11,7 @@ defmodule ExDoc.HTMLFormatterTest do
     "https://github.com/elixir-lang/elixir"
   end
 
-  def homepage_url do
+  defp homepage_url do
     "http://elixir-lang.org"
   end
 
