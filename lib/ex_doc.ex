@@ -14,7 +14,7 @@ defmodule ExDoc do
                      source_root: options[:source_root] || File.cwd!].update(options)
 
     source_beam = config.source_beam || Path.join(config.source_root, "ebin")
-    docs = ExDoc.Retriever.get_docs find_beams(source_beam), config
+    docs = ExDoc.Retriever.docs_from_dir(source_beam, config)
 
     config.formatter.run(docs, config)
   end
@@ -42,7 +42,4 @@ defmodule ExDoc do
     if :binary.last(url) == ?/, do: url, else: url <> "/"
   end
 
-  defp find_beams(path) do
-    Path.wildcard Path.expand("Elixir.*.beam", path)
-  end
 end

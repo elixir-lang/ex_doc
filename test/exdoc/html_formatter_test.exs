@@ -21,9 +21,9 @@ defmodule ExDoc.HTMLFormatterTest do
                  homepage_url: homepage_url, source_url: source_url]
   end
 
-  defp get_content(kind, names) do
+  defp get_content(names) do
     files  = Enum.map names, fn(n) -> "#{input_path}.#{n}.beam" end
-    [node] = Keyword.get ExDoc.Retriever.get_docs(files, doc_config), kind
+    [node] = ExDoc.Retriever.docs_from_files(files, doc_config)
     ExDoc.HTMLFormatter.module_page(node, doc_config)
   end
 
@@ -38,7 +38,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "module_page outputs the functions and docstrings" do
-    content = get_content(:modules, ["CompiledWithDocs"])
+    content = get_content(["CompiledWithDocs"])
 
     assert content =~ %r/<title>CompiledWithDocs<\/title>/
     assert content =~ %r/<h1>\s*CompiledWithDocs\s*<\/h1>/
@@ -52,14 +52,14 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "module_page outputs summaries" do
-    content = get_content(:modules, ["CompiledWithDocs"])
+    content = get_content(["CompiledWithDocs"])
     assert content =~ %r{<span class="summary_signature">\s*<a href="#example_1/0">}
   end
 
   ## BEHAVIOURS
 
   test "module_page outputs behavior and callbacks" do
-    content = get_content(:modules, ["CustomBehaviour"])
+    content = get_content(["CustomBehaviour"])
 
     assert content =~ %r{<h1>\s*CustomBehaviour\s*<small>behaviour</small>\s*<\/h1>}m
     assert content =~ %r{Callbacks}
@@ -69,18 +69,18 @@ defmodule ExDoc.HTMLFormatterTest do
   ## RECORDS
 
   test "module_page outputs the record type" do
-    content = get_content(:records, ["CompiledRecord"])
+    content = get_content(["CompiledRecord"])
     assert content =~ %r{<h1>\s*CompiledRecord\s*<small>record</small>\s*<\/h1>}m
   end
 
   test "module_page outputs record fields" do
-    content = get_content(:records, ["CompiledRecord"])
+    content = get_content(["CompiledRecord"])
     assert content =~ %r{<strong>foo:</strong> nil}m
     assert content =~ %r{<strong>bar:</strong> "sample"}m
   end
 
   test "module_page outputs exceptions fields" do
-    content = get_content(:records, ["RandomError"])
+    content = get_content(["RandomError"])
     refute content =~ %r{<strong>__exception__:</strong>}m
     assert content =~ %r{<strong>message:</strong> "this is random!"}m
   end
@@ -88,12 +88,16 @@ defmodule ExDoc.HTMLFormatterTest do
   ## PROTOCOLS
 
   test "module_page outputs the protocol type" do
-    content = get_content(:protocols, ["CustomProtocol"])
+    content = get_content(["CustomProtocol"])
     assert content =~ %r{<h1>\s*CustomProtocol\s*<small>protocol</small>\s*<\/h1>}m
   end
 
   test "module_page outputs protocol implementations" do
-    content = get_content(:protocols, ["CustomProtocol", "CustomProtocol.Number"])
+    names = ["CustomProtocol", "CustomProtocol.Number"]
+    files  = Enum.map names, fn(n) -> "#{input_path}.#{n}.beam" end
+    nodes = ExDoc.Retriever.docs_from_files(files, doc_config)
+    [node] = ExDoc.Retriever.nest_modules(nodes, doc_config)
+    content = ExDoc.HTMLFormatter.module_page(node, doc_config)
     assert content =~ %r{<a href="CustomProtocol.Number.html">Number</a>}m
   end
 
@@ -130,7 +134,7 @@ defmodule ExDoc.HTMLFormatterTest do
       "#{input_path}.CompiledWithDocs.beam",
       "#{input_path}.CompiledWithDocs.Nested.beam"
     ]
-    nodes   = Keyword.get ExDoc.Retriever.get_docs(files, doc_config), :modules
+    nodes   = ExDoc.Retriever.docs_from_files(files, doc_config)
     content = ExDoc.HTMLFormatter.list_page(:modules, nodes, doc_config, false)
 
     assert content =~ %r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms

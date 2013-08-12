@@ -3,48 +3,46 @@ Code.require_file "../../test_helper.exs", __FILE__
 defmodule ExDoc.RetrieverTest do
   use ExUnit.Case
 
-  require ExDoc.Retriever, as: R
-
-  defp get_docs(kind, names, url_pattern // "http://example.com/%{path}#L%{line}") do
+  defp get_docs(names, url_pattern // "http://example.com/%{path}#L%{line}") do
     files  = Enum.map names, fn(n) -> "test/tmp/Elixir.#{n}.beam" end
     config = ExDoc.Config[source_url_pattern: url_pattern, source_root: File.cwd!]
-    Keyword.get R.get_docs(files, config), kind
+    ExDoc.Retriever.docs_from_files(files, config)
   end
 
   ## MODULES
 
   test "get_docs returns the module id" do
-    [node] = get_docs :modules, ["CompiledWithDocs"]
+    [node] = get_docs ["CompiledWithDocs"]
     assert node.id == "CompiledWithDocs"
   end
 
   test "get_docs returns the module" do
-    [node] = get_docs :modules, ["CompiledWithDocs"]
+    [node] = get_docs ["CompiledWithDocs"]
     assert node.module == CompiledWithDocs
   end
 
   test "get_docs returns the nested module" do
-    [node] = get_docs :modules, ["UndefParent.Nested"]
+    [node] = get_docs ["UndefParent.Nested"]
     assert node.module == UndefParent.Nested
   end
 
   test "get_docs returns the relative module name" do
-    [node] = get_docs :modules, ["UndefParent.Nested"]
+    [node] = get_docs ["UndefParent.Nested"]
     assert node.relative == "UndefParent.Nested"
   end
 
   test "get_docs returns the moduledoc info" do
-    [node] = get_docs :modules, ["CompiledWithDocs"]
+    [node] = get_docs ["CompiledWithDocs"]
     assert node.moduledoc == "moduledoc\n\n\#\# Example\n    CompiledWithDocs.example\n"
   end
 
   test "get_docs returns nil if there's no moduledoc info" do
-    [node] = get_docs :modules, ["CompiledWithoutDocs"]
+    [node] = get_docs ["CompiledWithoutDocs"]
     assert node.moduledoc == nil
   end
 
   test "get_docs returns the doc info for each module function" do
-    [node] = get_docs :modules, ["CompiledWithDocs"]
+    [node] = get_docs ["CompiledWithDocs"]
     [ example, example_1, example_without_docs ] = node.docs
 
     assert example.id   == "example/2"
@@ -60,36 +58,36 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "get_docs returns an empty list if there's no docs info" do
-    [node] = get_docs :modules, ["CompiledWithoutDocs"]
+    [node] = get_docs ["CompiledWithoutDocs"]
     assert node.docs == []
   end
 
   test "get_docs returns the source" do
-    [node] = get_docs :modules, ["CompiledWithDocs"], "http://foo.com/bar/%{path}#L%{line}"
+    [node] = get_docs ["CompiledWithDocs"], "http://foo.com/bar/%{path}#L%{line}"
     assert node.source == "http://foo.com/bar/test/fixtures/compiled_with_docs.ex\#L1"
   end
 
-  test "get_docs returns an empty list if there's no children" do
-    [node] = get_docs :modules, ["CompiledWithDocs"]
-    assert node.children == []
-  end
+  # test "get_docs returns an empty list if there's no children" do
+  #   [node] = get_docs ["CompiledWithDocs"]
+  #   assert node.children == []
+  # end
 
-  test "get_docs returns a list with children" do
-    [node]  = get_docs :modules, ["CompiledWithDocs", "CompiledWithDocs.Nested"]
-    [child] = node.children
-    assert child.module   == CompiledWithDocs.Nested
-    assert child.relative == "Nested"
-  end
+  # test "get_docs returns a list with children" do
+  #   [node]  = get_docs ["CompiledWithDocs", "CompiledWithDocs.Nested"]
+  #   [child] = node.children
+  #   assert child.module   == CompiledWithDocs.Nested
+  #   assert child.relative == "Nested"
+  # end
 
   ## RECORDS
 
   test "get_docs properly tag records" do
-    [node] = get_docs :records, ["CompiledRecord"]
+    [node] = get_docs ["CompiledRecord"]
     assert node.type == :record
   end
 
   test "ignore records internal functions" do
-    [node] = get_docs :records, ["CompiledRecord"]
+    [node] = get_docs ["CompiledRecord"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == []
   end
@@ -97,12 +95,12 @@ defmodule ExDoc.RetrieverTest do
   ## EXCEPTIONS
 
   test "get_docs properly tag exceptions" do
-    [node] = get_docs :records, ["RandomError"]
+    [node] = get_docs ["RandomError"]
     assert node.type == :exception
   end
 
   test "ignore exceptions internal functions" do
-    [node] = get_docs :records, ["RandomError"]
+    [node] = get_docs ["RandomError"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == []
   end
@@ -110,12 +108,12 @@ defmodule ExDoc.RetrieverTest do
   ## BEHAVIOURS
 
   test "get_docs properly tag behaviours" do
-    [node] = get_docs :modules, ["CustomBehaviour"]
+    [node] = get_docs ["CustomBehaviour"]
     assert node.type == :behaviour
   end
 
   test "ignore behaviours internal functions" do
-    [node] = get_docs :modules, ["CustomBehaviour"]
+    [node] = get_docs ["CustomBehaviour"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["hello/1"]
     assert hd(node.docs).type == :defcallback
@@ -125,12 +123,12 @@ defmodule ExDoc.RetrieverTest do
   ## PROTOCOLS
 
   test "get_docs properly tag protocols" do
-    [node] = get_docs :protocols, ["CustomProtocol"]
+    [node] = get_docs ["CustomProtocol"]
     assert node.type == :protocol
   end
 
   test "ignore protocols internal functions" do
-    [node] = get_docs :protocols, ["CustomProtocol"]
+    [node] = get_docs ["CustomProtocol"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["plus_one/1", "plus_two/1"]
   end
@@ -138,12 +136,12 @@ defmodule ExDoc.RetrieverTest do
   ## IMPLEMENTATIONS
 
   test "get_docs properly tag implementations" do
-    [node]  = get_docs :protocols, ["CustomProtocol.Number"]
+    [node]  = get_docs ["CustomProtocol.Number"]
     assert node.type == :impl
   end
 
   test "ignore impl internal functions" do
-    [node]  = get_docs :protocols, ["CustomProtocol.Number"]
+    [node]  = get_docs ["CustomProtocol.Number"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["plus_one/1", "plus_two/1"]
   end

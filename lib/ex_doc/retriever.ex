@@ -5,35 +5,129 @@ defrecord ExDoc.FunctionNode, name: nil, arity: 0, id: nil,
   doc: [], source: nil, type: nil, line: 0, signature: nil
 
 defmodule ExDoc.Retriever do
+  @moduledoc """
+  Functions to extract documentation information from modules.
+  """
+
   defexception Error, message: nil
 
   @doc """
-  This function receives a bunch of .beam file paths and
-  the directory they are relative to and returns a list of
-  `ExDoc.ModuleNode`. Those nodes are nested (child modules
-  can be found under the function `children` of each node) and
-  contain all the required information already processed.
+  Extract documentaiton from all modules in the specified directory
   """
-  def get_docs(files, config) when is_list(files) do
-    # Then we get all the module names as a list of binaries.
-    # For example, the module Foo.Bar.Baz will be represented
-    # as ["Foo", "Bar", "Baz"]
-    modules = Enum.map files, &get_module_from_file(&1)
+  def docs_from_dir(dir, config) do
+    files = Path.wildcard Path.expand("Elixir.*.beam", dir)
+    docs_from_files(files, config)
+  end
 
-    # Split each type
-    protocols = Enum.filter modules, &match?({ _, _, x } when x in [:protocol, :impl], &1)
-    records   = Enum.filter modules, &match?({ _, _, x } when x in [:record, :exception], &1)
-    remaining = Enum.filter modules, &match?({ _, _, x } when x in [nil, :behaviour], &1)
+  @doc """
+  Extract documentaiton from all modules in the specified list of files
+  """
+  def docs_from_files(files, config) when is_list(files) do
+    files
+      |> Enum.map(&get_module_from_file(&1))
+      |> Enum.filter(fn(x) -> not nil? x end)
+      |> docs_from_modules(config)
+  end
 
-    # Sort the modules and return the list of nodes
-    [
-      modules:   nest_modules([], Enum.sort(remaining), [], config),
-      records:   nest_modules([], Enum.sort(records), [], config),
-      protocols: nest_modules([], Enum.sort(protocols), [], config)
+  @doc """
+  Extract documentaiton from all modules in the list `modules`
+  """
+  def docs_from_modules(modules, config) when is_list(modules) do
+    Enum.map modules, &get_module_no_children(&1, config)
+  end
+
+  # Get all the information from the module and compile
+  # it. If there is
+  # an error while retrieving the information (like
+  # the module is not available or it was not compiled
+  # with --docs flag), we raise an exception.
+  defp get_module_no_children({ segments, module, type }, config) do
+    # relative = Enum.join Enum.drop(segments, length(scope) - length(segments)), "."
+    relative = Enum.join segments, "."
+
+    case module.__info__(:moduledoc) do
+      { line, moduledoc } -> nil
+      _ -> raise "Module #{inspect module} was not compiled with flag --docs"
+    end
+
+    source_url  = config.source_url_pattern
+    source_path = source_path(module, config)
+
+    docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
+      &get_function(&1, source_path, source_url)
+
+    if type == :behaviour do
+      callbacks = Kernel.Typespec.beam_callbacks(module)
+
+      docs = Enum.map(module.__behaviour__(:docs),
+        &get_callback(&1, source_path, source_url, callbacks)) ++ docs
+    end
+
+    ExDoc.ModuleNode[
+      id: inspect(module),
+      line: line,
+      module: module,
+      type: type,
+      moduledoc: moduledoc,
+      docs: docs,
+      relative: relative,
+      source: source_link(source_path, source_url, line),
     ]
   end
 
+  # @doc """
+  # This function receives a bunch of .beam file paths and
+  # the directory they are relative to and returns a list of
+  # `ExDoc.ModuleNode`. Those nodes are nested (child modules
+  # can be found under the function `children` of each node) and
+  # contain all the required information already processed.
+  # """
+  # def get_docs(files, config) when is_list(files) do
+  #   # Then we get all the module names as a list of binaries.
+  #   # For example, the module Foo.Bar.Baz will be represented
+  #   # as ["Foo", "Bar", "Baz"]
+  #   modules = Enum.map files, &get_module_from_file(&1)
+
+  #   # Split each type
+  #   protocols = Enum.filter modules, &match?({ _, _, x } when x in [:protocol, :impl], &1)
+  #   records   = Enum.filter modules, &match?({ _, _, x } when x in [:record, :exception], &1)
+  #   remaining = Enum.filter modules, &match?({ _, _, x } when x in [nil, :behaviour], &1)
+
+  #   # Sort the modules and return the list of nodes
+  #   [
+  #     modules:   nest_modules([], Enum.sort(remaining), [], config),
+  #     records:   nest_modules([], Enum.sort(records), [], config),
+  #     protocols: nest_modules([], Enum.sort(protocols), [], config)
+  #   ]
+  # end
+
   # Helpers
+
+  @doc """
+  Filters out modules of the specified type
+  """
+  def filter_modules(modules, :modules) do
+    Enum.filter modules, &match?(ExDoc.ModuleNode[type: x] when x in [nil, :behaviour], &1)
+  end
+
+  def filter_modules(modules, :records) do
+    Enum.filter modules, &match?(ExDoc.ModuleNode[type: x] when x in [:record, :exception], &1)
+  end
+
+  def filter_modules(modules, :protocols) do
+    Enum.filter modules, &match?(ExDoc.ModuleNode[type: x] when x in [:protocol, :impl], &1)
+  end
+
+  @doc """
+  Nests modules in the `children` field of the record.
+  """
+  def nest_modules(modules, config) do
+    mod_names = Enum.map modules, fn(x) -> 
+      { String.split(x.relative, ".") , binary_to_atom("Elixir." <> x.id), x.type }
+    end
+    nest_modules([], Enum.sort(mod_names), [], config)
+  end
+
 
   # Goes through each module in the list. Since the list
   # is ordered, nested modules can be found by looking

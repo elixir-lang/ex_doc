@@ -6,17 +6,21 @@ defmodule ExDoc.HTMLFormatter do
   require EEx
 
   @doc """
-  Generate HTML documenation for the given docs
+  Generate HTML documentation for the given modules
   """
-  def run(docs, config)  do
+  def run(modules, config)  do
     output = Path.expand(config.output)
     File.mkdir_p output
 
     generate_index(output, config)
     generate_assets(output, config)
     has_readme = config.readme && generate_readme(output)
-    Enum.each docs, fn({ name, nodes }) ->
-      generate_list(name, nodes, output, config, has_readme)
+
+    Enum.each [:modules, :records, :protocols], fn(mod_type) ->
+      modules
+        |> ExDoc.Retriever.filter_modules(mod_type)
+        |> ExDoc.Retriever.nest_modules(config)
+        |> generate_list(mod_type, output, config, has_readme)
     end
   end
 
@@ -57,7 +61,7 @@ defmodule ExDoc.HTMLFormatter do
     false
   end
 
-  defp generate_list(scope, nodes, output, config, has_readme) do
+  defp generate_list(nodes, scope, output, config, has_readme) do
     generate_module_page(nodes, output, config)
     content = list_page(scope, nodes, config, has_readme)
     File.write("#{output}/#{scope}_list.html", content)
