@@ -1,8 +1,10 @@
 defrecord ExDoc.ModuleNode, module: nil, relative: nil, moduledoc: nil,
-  docs: [], source: nil, children: [], type: nil, id: nil, line: 0
+  docs: [], typespecs: [], source: nil, children: [], type: nil, id: nil, line: 0
 
 defrecord ExDoc.FunctionNode, name: nil, arity: 0, id: nil,
   doc: [], source: nil, type: nil, line: 0, signature: nil, specs: nil
+
+defrecord ExDoc.TypeNode, name: nil, id: nil, spec: nil
 
 defmodule ExDoc.Retriever do
   @moduledoc """
@@ -69,6 +71,7 @@ defmodule ExDoc.Retriever do
     source_path = source_path(module, config)
     
     specs = Kernel.Typespec.beam_specs(module)
+    typespecs = get_typespecs(module)
 
     type = detect_type(module)
     docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
@@ -88,6 +91,7 @@ defmodule ExDoc.Retriever do
       type: type,
       moduledoc: moduledoc,
       docs: docs,
+      typespecs: typespecs,
       relative: relative,
       source: source_link(source_path, source_url, line),
     ]
@@ -169,6 +173,7 @@ defmodule ExDoc.Retriever do
     source_path = source_path(module, config)
 
     specs = Kernel.Typespec.beam_specs(module)
+    typespecs = get_typespecs(module)
 
     docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
       &get_function(&1, source_path, source_url, specs)
@@ -187,6 +192,7 @@ defmodule ExDoc.Retriever do
       type: type,
       moduledoc: moduledoc,
       docs: docs,
+      typespecs: typespecs,
       relative: relative,
       source: source_link(source_path, source_url, line),
       children: nest_modules(scope, children, [], config)
@@ -273,6 +279,15 @@ defmodule ExDoc.Retriever do
     else
       false
     end
+  end
+
+  defp get_typespecs(module) do
+    types_raw = Kernel.Typespec.beam_types(module) |> Enum.map(elem(&1, 1)) |> Enum.sort
+    lc {name, _, _} = tup inlist types_raw do
+                        ExDoc.TypeNode[name: atom_to_binary(name),
+                                       id: "t:#{name}",
+                                       spec: tup] 
+                      end
   end
 
   defp source_link(_source_path, nil, _line), do: nil

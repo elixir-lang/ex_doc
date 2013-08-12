@@ -14,6 +14,15 @@ defmodule ExDoc.HTMLFormatter.Templates do
 
     bin |> Markdown.autolink_locals(available_funs) |> Markdown.to_html
   end
+  
+  # Get the label for a node (used in the summary).
+  defp label(ExDoc.TypeNode[name: name]) do
+    name
+  end
+
+  defp label(node) do
+    node.id
+  end
 
   # Get the full signature from a function
   defp signature(ExDoc.FunctionNode[name: name, signature: args]) do
@@ -34,6 +43,15 @@ defmodule ExDoc.HTMLFormatter.Templates do
   defp specs(_node) do
     []
   end
+  
+  # Get the full typespec from a type
+  defp typespec(ExDoc.TypeNode[spec: spec]) do
+    Kernel.Typespec.type_to_ast(spec) |> Macro.to_string
+  end
+
+  defp typespec(_node) do
+    nil
+  end
 
   # Escaping
   defp h(binary) do
@@ -45,13 +63,14 @@ defmodule ExDoc.HTMLFormatter.Templates do
   Generate content from the module template for a given `node`
   """
   def module_page(node) do
+    types     = node.typespecs
     functions = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :def], &1)
     macros    = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defmacro], &1)
     callbacks = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defcallback], &1)
     fields    = get_fields(node)
     impls     = get_impls(node)
 
-    module_template(node, functions, macros, callbacks, fields, impls)
+    module_template(node, types, functions, macros, callbacks, fields, impls)
   end
 
   # Get only fields that do not start with underscore
@@ -75,10 +94,11 @@ defmodule ExDoc.HTMLFormatter.Templates do
   templates = [
     index_template: [:config],
     list_template: [:scope, :nodes, :config, :has_readme],
-    module_template: [:module, :functions, :macros, :callbacks, :fields, :impls],
+    module_template: [:module, :types, :functions, :macros, :callbacks, :fields, :impls],
     list_item_template: [:node],
     summary_template: [:node],
     detail_template: [:node, :module],
+    type_detail_template: [:node, :module],
     readme_template: [:content]
   ]
 

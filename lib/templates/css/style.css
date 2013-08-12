@@ -47,11 +47,20 @@ ul.spec {
   list-style-type: none;
 }
 
+p.typespec {
+  /* Intentionally left blank, the default style seems to work out quite well. */
+}
+
 a:link, a:visited { text-decoration: none; color: #05a; }
 a:hover { color: #27c; }
 
 .detail { border-top: 1px dotted #aaa; margin-top: 15px; padding-top: 0; }
 .detail:nth-child(2) { border: 0; }
+
+/* No top border for type_detail, types are better left without lines between
+ * them as they are typically just one line at the moment.
+ */
+.type_detail { margin-top: 15px; padding-top: 0; }
 
 /* Summary */
 ul.summary {
