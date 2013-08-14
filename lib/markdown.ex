@@ -3,7 +3,7 @@ defmodule Markdown do
 
   def init do
     file = Path.expand('../../share/markdown', __FILE__)
-    :ok = :erlang.load_nif(binary_to_list(file), 1)
+    :ok = :erlang.load_nif(String.to_char_list!(file), 1)
   end
 
   def to_html(_) do
