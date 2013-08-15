@@ -4,7 +4,7 @@ defrecord ExDoc.ModuleNode, module: nil, relative: nil, moduledoc: nil,
 defrecord ExDoc.FunctionNode, name: nil, arity: 0, id: nil,
   doc: [], source: nil, type: nil, line: 0, signature: nil, specs: nil
 
-defrecord ExDoc.TypeNode, name: nil, id: nil, spec: nil
+defrecord ExDoc.TypeNode, name: nil, id: nil, type: nil, spec: nil
 
 defmodule ExDoc.Retriever do
   @moduledoc """
@@ -192,7 +192,7 @@ defmodule ExDoc.Retriever do
       type: type,
       moduledoc: moduledoc,
       docs: docs,
-      typespecs: typespecs,
+      typespecs: typespecs, 
       relative: relative,
       source: source_link(source_path, source_url, line),
       children: nest_modules(scope, children, [], config)
@@ -282,12 +282,14 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_typespecs(module) do
-    types_raw = Kernel.Typespec.beam_types(module) |> Enum.map(elem(&1, 1)) |> Enum.sort
-    lc {name, _, _} = tup inlist types_raw do
-                        ExDoc.TypeNode[name: atom_to_binary(name),
-                                       id: "t:#{name}",
-                                       spec: tup] 
-                      end
+    raw = Kernel.Typespec.beam_types(module)
+    nodes = lc { type, {name, _, _} = tup } inlist raw do
+              ExDoc.TypeNode[name: atom_to_binary(name),
+                             id: "t:#{name}",
+                             type: type,
+                             spec: tup] 
+            end
+    Enum.filter(nodes, &(&1.type != :typep)) |> Enum.sort(&(&1.name > &2.name))
   end
 
   defp source_link(_source_path, nil, _line), do: nil

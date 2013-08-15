@@ -44,9 +44,21 @@ defmodule ExDoc.HTMLFormatter.Templates do
     []
   end
   
-  # Get the full typespec from a type
-  defp typespec(ExDoc.TypeNode[spec: spec]) do
-    Kernel.Typespec.type_to_ast(spec) |> Macro.to_string
+  # Get the full typespec from a type.
+  # 
+  # Returns HTML or nil if the node doesn't represent a type.
+  defp typespec(ExDoc.TypeNode[spec: spec, type: :type]) do
+    Kernel.Typespec.type_to_ast(spec) |> Macro.to_string 
+  end
+  
+  defp typespec(ExDoc.TypeNode[spec: spec, type: :opaque]) do
+    # Hide the opaque type if it fits the standard pattern (i.e. head :: body).
+    # If it doesn't match that pattern it's probably best to output something
+    # instead of bailing.
+    case Kernel.Typespec.type_to_ast(spec) do
+      {:::, _, [d|_]} -> Macro.to_string(d)
+      o               -> Macro.to_string(o)
+    end
   end
 
   defp typespec(_node) do
