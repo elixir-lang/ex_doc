@@ -3,7 +3,7 @@ defmodule ExDoc.HTMLFormatter do
   Provide HTML-formatted documentation
   """
 
-  require EEx
+  alias ExDoc.HTMLFormatter.Templates
 
   @doc """
   Generate HTML documentation for the given modules
@@ -25,8 +25,13 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   defp generate_index(output, config) do
-    content = index_template(config)
+    content = Templates.index_template(config)
     File.write("#{output}/index.html", content)
+  end
+
+  defp assets do
+    [ { Templates.templates_path("css/*.css"), "css" },
+      { Templates.templates_path("js/*.js"), "js" } ]
   end
 
   defp generate_assets(output, _config) do
@@ -41,18 +46,13 @@ defmodule ExDoc.HTMLFormatter do
     end
   end
 
-  defp assets do
-    [ { templates_path("css/*.css"), "css" },
-      { templates_path("js/*.js"), "js" } ]
-  end
-
   defp generate_readme(output) do
     File.rm("#{output}/README.html")
     write_readme(output, File.read("README.md"))
   end
 
   defp write_readme(output, {:ok, content}) do
-    readme_html = readme_template content
+    readme_html = Templates.readme_template(content)
     File.write("#{output}/README.html", readme_html)
     true
   end
@@ -63,7 +63,7 @@ defmodule ExDoc.HTMLFormatter do
 
   defp generate_list(nodes, scope, output, config, has_readme) do
     generate_module_page(nodes, output, config)
-    content = list_page(scope, nodes, config, has_readme)
+    content = Templates.list_template(scope, nodes, config, has_readme)
     File.write("#{output}/#{scope}_list.html", content)
   end
 
@@ -86,14 +86,10 @@ defmodule ExDoc.HTMLFormatter do
     fields    = get_fields(node)
     impls     = get_impls(node)
 
-    module_template(node, functions, macros, callbacks, fields, impls)
+    Templates.module_template(node, functions, macros, callbacks, fields, impls)
   end
 
-  def list_page(scope, nodes, config, has_readme) do
-    list_template(scope, nodes, config, has_readme)
-  end
-
-  # Get only fields that start with underscore
+  # Get only fields that do not start with underscore
   defp get_fields(ExDoc.ModuleNode[type: type] = node) when type in [:record, :exception] do
     Enum.filter node.module.__record__(:fields), fn({f,_}) ->
       hd(atom_to_list(f)) != ?_
@@ -110,48 +106,4 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   defp get_impls(_), do: []
-
-  # Convert to html using markdown
-  defp to_html(nil, _node), do: nil
-  defp to_html(bin, node) when is_binary(bin) do
-    available_funs = node.docs 
-      |> Enum.filter(&match?(ExDoc.FunctionNode[], &1))
-      |> Enum.reduce([], fn(x, acc) -> [x.id|acc] end)
-
-    bin |> Markdown.autolink_locals(available_funs) |> Markdown.to_html
-  end
-
-  # Get the full signature from a function
-  defp signature(ExDoc.FunctionNode[name: name, signature: args]) do
-    Macro.to_string { name, 0, args }
-  end
-
-  defp signature(node) do
-    node.id
-  end
-
-  # Escaping
-  defp h(binary) do
-    escape_map = [{ %r(&), "\\&amp;" }, { %r(<), "\\&lt;" }, { %r(>), "\\&gt;" }, { %r("), "\\&quot;" }]
-    Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
-  end
-
-  templates = [
-    index_template: [:config],
-    list_template: [:scope, :nodes, :config, :has_readme],
-    module_template: [:module, :functions, :macros, :callbacks, :fields, :impls],
-    list_item_template: [:node],
-    summary_template: [:node],
-    detail_template: [:node, :module],
-    readme_template: [:content]
-  ]
-
-  defp templates_path(other) do
-    Path.expand("../../templates/#{other}", __FILE__)
-  end
-
-  Enum.each templates, fn({ name, args }) ->
-    filename = Path.expand("../../templates/#{name}.eex", __FILE__)
-    EEx.function_from_file :defp, name, filename, args
-  end
 end
