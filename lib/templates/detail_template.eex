@@ -2,7 +2,7 @@
   <p class="signature" id="<%=h node.id %>">
     <strong><%=h signature(node) %></strong>
   </p>
-  <% specs_ = specs(node) %>
+  <% specs_ = funcspecs(node) %>
   <%= if specs_ != [] do %>
     <ul class="spec">
       <%= lc spec inlist specs_ do %>

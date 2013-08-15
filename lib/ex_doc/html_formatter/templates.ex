@@ -34,13 +34,17 @@ defmodule ExDoc.HTMLFormatter.Templates do
   end
   
   # Get the full typespecs from a function
-  defp specs(ExDoc.FunctionNode[name: name, specs: specs]) do
+  #
+  # This is distinct from typespec because a function can have multiple specs
+  # while a type can only have one spec (a type is little more than a
+  # spec).
+  defp funcspecs(ExDoc.FunctionNode[name: name, specs: specs]) do
     lc spec inlist specs || [] do
       Kernel.Typespec.spec_to_ast(name, spec) |> Macro.to_string
     end
   end
   
-  defp specs(_node) do
+  defp funcspecs(_node) do
     []
   end
   
