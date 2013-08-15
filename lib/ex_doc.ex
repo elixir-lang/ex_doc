@@ -1,6 +1,7 @@
 defmodule ExDoc do
   defrecord Config, output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
-                    homepage_url: nil, source_beam: nil, formatter: ExDoc.HTMLFormatter,
+                    homepage_url: nil, source_beam: nil, 
+                    retriever: ExDoc.Retriever, formatter: ExDoc.HTMLFormatter,
                     project: nil, version: nil, main: nil, readme: false
 
   @doc """
@@ -14,7 +15,7 @@ defmodule ExDoc do
                      source_root: options[:source_root] || File.cwd!].update(options)
 
     source_beam = config.source_beam || Path.join(config.source_root, "ebin")
-    docs = ExDoc.Retriever.docs_from_dir(source_beam, config)
+    docs = config.retriever.docs_from_dir(source_beam, config)
 
     config.formatter.run(docs, config)
   end
