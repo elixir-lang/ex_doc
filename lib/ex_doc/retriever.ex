@@ -42,7 +42,6 @@ defmodule ExDoc.Retriever do
   # the module is not available or it was not compiled
   # with --docs flag), we raise an exception.
   defp get_module_no_children({ segments, module, type }, config) do
-    # relative = Enum.join Enum.drop(segments, length(scope) - length(segments)), "."
     relative = Enum.join segments, "."
 
     case module.__info__(:moduledoc) do
@@ -74,32 +73,6 @@ defmodule ExDoc.Retriever do
       source: source_link(source_path, source_url, line),
     ]
   end
-
-  # @doc """
-  # This function receives a bunch of .beam file paths and
-  # the directory they are relative to and returns a list of
-  # `ExDoc.ModuleNode`. Those nodes are nested (child modules
-  # can be found under the function `children` of each node) and
-  # contain all the required information already processed.
-  # """
-  # def get_docs(files, config) when is_list(files) do
-  #   # Then we get all the module names as a list of binaries.
-  #   # For example, the module Foo.Bar.Baz will be represented
-  #   # as ["Foo", "Bar", "Baz"]
-  #   modules = Enum.map files, &get_module_from_file(&1)
-
-  #   # Split each type
-  #   protocols = Enum.filter modules, &match?({ _, _, x } when x in [:protocol, :impl], &1)
-  #   records   = Enum.filter modules, &match?({ _, _, x } when x in [:record, :exception], &1)
-  #   remaining = Enum.filter modules, &match?({ _, _, x } when x in [nil, :behaviour], &1)
-
-  #   # Sort the modules and return the list of nodes
-  #   [
-  #     modules:   nest_modules([], Enum.sort(remaining), [], config),
-  #     records:   nest_modules([], Enum.sort(records), [], config),
-  #     protocols: nest_modules([], Enum.sort(protocols), [], config)
-  #   ]
-  # end
 
   # Helpers
 
