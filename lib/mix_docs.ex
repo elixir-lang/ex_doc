@@ -47,7 +47,7 @@ defmodule Mix.Tasks.Docs do
   def run(args) do
     Mix.Task.run "compile"
 
-    { cli_opts, args } = OptionParser.parse(args, aliases: [o: :output])
+    { cli_opts, args, _ } = OptionParser.parse(args, aliases: [o: :output])
 
     if args != [] do
       raise Mix.Error, message: "Extraneous arguments on the command line"
