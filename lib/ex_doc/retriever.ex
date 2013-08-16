@@ -12,7 +12,7 @@ defmodule ExDoc.Retriever do
   defexception Error, message: nil
 
   @doc """
-  Extract documentaiton from all modules in the specified directory
+  Extract documentation from all modules in the specified directory
   """
   def docs_from_dir(dir, config) do
     files = Path.wildcard Path.expand("Elixir.*.beam", dir)
@@ -20,7 +20,7 @@ defmodule ExDoc.Retriever do
   end
 
   @doc """
-  Extract documentaiton from all modules in the specified list of files
+  Extract documentation from all modules in the specified list of files
   """
   def docs_from_files(files, config) when is_list(files) do
     files
@@ -36,13 +36,29 @@ defmodule ExDoc.Retriever do
     Enum.map modules, &get_module_no_children(&1, config)
   end
 
+  defp get_module_from_file(name) do
+    name   = Path.basename name, ".beam"
+    module = binary_to_atom name
+
+    unless Code.ensure_loaded?(module), do:
+      raise(Error, message: "module #{inspect module} is not defined/available")
+
+    case module.__info__(:moduledoc) do
+      { _, false } ->
+        nil
+      { _, _moduledoc } ->
+        module
+      _ ->
+        raise(Error, message: "module #{inspect module} was not compiled with flag --docs")
+    end
+  end
+
   # Get all the information from the module and compile
-  # it. If there is
-  # an error while retrieving the information (like
+  # it. If there is an error while retrieving the information (like
   # the module is not available or it was not compiled
   # with --docs flag), we raise an exception.
-  defp get_module_no_children({ segments, module, type }, config) do
-    relative = Enum.join segments, "."
+  defp get_module_no_children(module, config) do
+    relative = Enum.join(Module.split(module), ".")
 
     case module.__info__(:moduledoc) do
       { line, moduledoc } -> nil
@@ -52,6 +68,7 @@ defmodule ExDoc.Retriever do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
+    type = detect_type(module)
     docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
       &get_function(&1, source_path, source_url)
 
@@ -222,22 +239,6 @@ defmodule ExDoc.Retriever do
     ]
   end
 
-  defp get_module_from_file(name) do
-    name   = Path.basename name, ".beam"
-    module = binary_to_atom name
-
-    unless Code.ensure_loaded?(module), do:
-      raise(Error, message: "module #{inspect module} is not defined/available")
-
-    case module.__info__(:moduledoc) do
-      { _, false } ->
-        nil
-      { _, _moduledoc } ->
-        { Module.split(name), module, detect_type(module) }
-      _ ->
-        raise(Error, message: "module #{inspect module} was not compiled with flag --docs")
-    end
-  end
 
   # Detect if a module is an exception, record,
   # protocol, implementation or simply a module
