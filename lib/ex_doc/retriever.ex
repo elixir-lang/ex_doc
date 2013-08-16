@@ -30,7 +30,7 @@ defmodule ExDoc.Retriever do
   end
 
   @doc """
-  Extract documentaiton from all modules in the list `modules`
+  Extract documentation from all modules in the list `modules`
   """
   def docs_from_modules(modules, config) when is_list(modules) do
     Enum.map modules, &get_module_no_children(&1, config)
