@@ -1,92 +1,82 @@
 defmodule ExDoc.HTMLFormatter do
-  require EEx
+  @moduledoc """
+  Provide HTML-formatted documentation
+  """
 
-  def assets do
-    [ { templates_path("css/*.css"), "css" },
-      { templates_path("js/*.js"), "js" } ]
-  end
+  alias ExDoc.HTMLFormatter.Templates
 
-  def index_page(config) do
-    index_template(config)
-  end
+  @doc """
+  Generate HTML documentation for the given modules
+  """
+  def run(modules, config)  do
+    output = Path.expand(config.output)
+    File.mkdir_p output
 
-  def readme_page(content) do
-    readme_template(content)
-  end
+    generate_index(output, config)
+    generate_assets(output, config)
+    has_readme = config.readme && generate_readme(output)
 
-  def module_page(node, _config) do
-    functions = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :def], &1)
-    macros    = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defmacro], &1)
-    callbacks = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defcallback], &1)
-    fields    = get_fields(node)
-    impls     = get_impls(node)
-
-    module_template(node, functions, macros, callbacks, fields, impls)
-  end
-
-  def list_page(scope, nodes, config, has_readme) do
-    list_template(scope, nodes, config, has_readme)
-  end
-
-  # Get only fields that start with underscore
-  defp get_fields(ExDoc.ModuleNode[type: type] = node) when type in [:record, :exception] do
-    Enum.filter node.module.__record__(:fields), fn({f,_}) ->
-      hd(atom_to_list(f)) != ?_
+    Enum.each [:modules, :records, :protocols], fn(mod_type) ->
+      modules
+        |> ExDoc.Retriever.filter_modules(mod_type)
+        |> ExDoc.Retriever.nest_modules(config)
+        |> generate_list(mod_type, output, config, has_readme)
     end
   end
 
-  defp get_fields(_), do: []
+  defp generate_index(output, config) do
+    content = Templates.index_template(config)
+    File.write("#{output}/index.html", content)
+  end
 
-  # Loop through all children finding implementations
-  defp get_impls(ExDoc.ModuleNode[type: :protocol, module: module, children: children]) do
-    Enum.filter children, fn(child) ->
-      child.type == :impl && child.module.__impl__(:protocol) == module
+  defp assets do
+    [ { Templates.templates_path("css/*.css"), "css" },
+      { Templates.templates_path("js/*.js"), "js" } ]
+  end
+
+  defp generate_assets(output, _config) do
+    Enum.each assets, fn({ pattern, dir }) ->
+      output = "#{output}/#{dir}"
+      File.mkdir output
+
+      Enum.map Path.wildcard(pattern), fn(file) ->
+        base = Path.basename(file)
+        File.copy file, "#{output}/#{base}"
+      end
     end
   end
 
-  defp get_impls(_), do: []
-
-  # Convert to html using markdown
-  defp to_html(nil, _node), do: nil
-  defp to_html(bin, node) when is_binary(bin) do
-    available_funs = node.docs 
-      |> Enum.filter(&match?(ExDoc.FunctionNode[], &1))
-      |> Enum.reduce([], fn(x, acc) -> [x.id|acc] end)
-
-    bin |> Markdown.autolink_locals(available_funs) |> Markdown.to_html
+  defp generate_readme(output) do
+    File.rm("#{output}/README.html")
+    write_readme(output, File.read("README.md"))
   end
 
-  # Get the full signature from a function
-  defp signature(ExDoc.FunctionNode[name: name, signature: args]) do
-    Macro.to_string { name, 0, args }
+  defp write_readme(output, {:ok, content}) do
+    readme_html = Templates.readme_template(content)
+    File.write("#{output}/README.html", readme_html)
+    true
   end
 
-  defp signature(node) do
-    node.id
+  defp write_readme(_, _) do
+    false
   end
 
-  # Escaping
-  defp h(binary) do
-    escape_map = [{ %r(&), "\\&amp;" }, { %r(<), "\\&lt;" }, { %r(>), "\\&gt;" }, { %r("), "\\&quot;" }]
-    Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
+  defp generate_list(nodes, scope, output, config, has_readme) do
+    generate_module_page(nodes, output)
+    content = Templates.list_template(scope, nodes, config, has_readme)
+    File.write("#{output}/#{scope}_list.html", content)
   end
 
-  templates = [
-    index_template: [:config],
-    list_template: [:scope, :nodes, :config, :has_readme],
-    module_template: [:module, :functions, :macros, :callbacks, :fields, :impls],
-    list_item_template: [:node],
-    summary_template: [:node],
-    detail_template: [:node, :module],
-    readme_template: [:content]
-  ]
+  defp generate_module_page([node|t], output) do
+    content = Templates.module_page(node)
+    File.write("#{output}/#{node.id}.html", content)
 
-  defp templates_path(other) do
-    Path.expand("../../templates/#{other}", __FILE__)
+    generate_module_page(node.children, output)
+    generate_module_page(t, output)
   end
 
-  Enum.each templates, fn({ name, args }) ->
-    filename = Path.expand("../../templates/#{name}.eex", __FILE__)
-    EEx.function_from_file :defp, name, filename, args
+  defp generate_module_page([], _output) do
+    :ok
   end
+
 end
