@@ -96,6 +96,20 @@ defmodule ExDoc.HTMLFormatterTest.TemplatesTest do
     assert content =~ %r{<strong>example\(foo, bar // Baz\)</strong>}
     assert content =~ %r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
   end
+  
+  test "module_page outputs the types and function specs" do
+    content = get_content([TypesAndSpecs])
+
+    assert content =~ %r[<title>TypesAndSpecs</title>]
+    assert content =~ %r[<a href="#t:public">public</a>]
+    assert content =~ %r[<a href="#t:opaque">opaque</a>]
+    assert !(content =~ %r[<a href="#t:private">private</a>])
+    assert content =~ %r[<strong>public\(t\) :: {t, String.t\(\), :ok | :error}</strong>]
+    assert content =~ %r[<strong>opaque\(\)</strong>]
+    assert !(content =~ %r[<strong>private\(t\)])
+    assert content =~ %r[add\(integer\(\), integer\(\)\) :: integer\(\)]
+    assert !(content =~ %r[minus\(integer\(\), integer\(\)\) :: integer\(\)])
+  end
 
   test "module_page outputs summaries" do
     content = get_content([CompiledWithDocs])

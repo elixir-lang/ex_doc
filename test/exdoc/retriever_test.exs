@@ -65,6 +65,34 @@ defmodule ExDoc.RetrieverTest do
     [node] = docs_from_files ["CompiledWithoutDocs"]
     assert node.docs == []
   end
+  
+  test "docs_from_files returns the specs for each non-private function" do
+    [node] = docs_from_files ["TypesAndSpecs"]
+    [add] = node.docs
+
+    assert add.id   == "add/2"
+    assert add.doc  == nil 
+    assert add.type == :def
+    assert Enum.map(add.specs, 
+      fn spec -> Macro.to_string(Kernel.Typespec.spec_to_ast(:add, spec)) end) == 
+      ["add(integer(), integer()) :: integer()"]
+  end
+  
+  test "docs_from_files returns the doc info for each non-private module type" do
+    [node] = docs_from_files ["TypesAndSpecs"]
+    [ public, opaque ] = node.typespecs
+
+    assert public.name  == "public"
+    assert public.id    == "t:public"
+    assert public.type  == :type
+    assert Macro.to_string(Kernel.Typespec.type_to_ast(public.spec)) == 
+      "public(t) :: {t, String.t(), :ok | :error}"
+    
+    assert opaque.name  == "opaque"
+    assert opaque.id    == "t:opaque"
+    assert opaque.type  == :opaque
+    assert Macro.to_string(Kernel.Typespec.type_to_ast(opaque.spec)) == "opaque() :: Dict.t()"
+  end
 
   test "docs_from_files returns the source" do
     [node] = docs_from_files ["CompiledWithDocs"], "http://foo.com/bar/%{path}#L%{line}"
