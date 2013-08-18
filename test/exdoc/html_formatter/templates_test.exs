@@ -73,6 +73,75 @@ defmodule ExDoc.HTMLFormatterTest.TemplatesTest do
     refute content =~ %r{<a href="README.html">README</a>}
   end
 
+  ## LIST ITEMS
+
+  test "arrows for modules with functions" do
+    defmodule FunctionModule do
+      def func, do: true
+    end
+
+    [node] = ExDoc.Retriever.docs_from_modules([FunctionModule], doc_config)
+    content = Templates.list_item_template(node)
+    assert content =~ %r/<a class="toggle">/
+  end
+
+  test "no arrows for modules without functions" do
+    defmodule NoFunctionsModule do
+    end
+
+    [node] = ExDoc.Retriever.docs_from_modules([NoFunctionsModule], doc_config)
+    content = Templates.list_item_template(node)
+    refute content =~ %r/<a class="toggle">/
+  end
+
+  test "arrows for modules with children" do
+    defmodule ParentModule do
+      defmodule ChildModule do
+      end
+    end
+
+    nodes = ExDoc.Retriever.docs_from_modules([ParentModule, ParentModule.ChildModule], doc_config)
+    [node] = ExDoc.Retriever.nest_modules(nodes, doc_config)
+    content = Templates.list_item_template(node)
+    assert content =~ %r/<a class="toggle">/
+  end
+
+  test "no arrows for records without functions" do
+    defrecord NoFunRecord, value: true
+
+    [node] = ExDoc.Retriever.docs_from_modules([NoFunRecord], doc_config)
+    content = Templates.list_item_template(node)
+    refute content =~ %r/<a class="toggle">/
+  end
+
+  test "arrows for records with functions" do
+    defrecord FunRecord, value: true do
+      def record_fun, do: true
+    end
+
+    [node] = ExDoc.Retriever.docs_from_modules([FunRecord], doc_config)
+    content = Templates.list_item_template(node)
+    assert content =~ %r/<a class="toggle">/
+  end
+
+  test "no arrows for exceptions without functions" do
+    defexception NoFunException, message: "No functions"
+
+    [node] = ExDoc.Retriever.docs_from_modules([NoFunException], doc_config)
+    content = Templates.list_item_template(node)
+    refute content =~ %r/<a class="toggle">/
+  end
+
+  test "arrows for exceptions with functions" do
+    defexception FunException, message: "No functions" do
+      def exception_fun, do: true
+    end
+
+    [node] = ExDoc.Retriever.docs_from_modules([FunException], doc_config)
+    content = Templates.list_item_template(node)
+    assert content =~ %r/<a class="toggle">/
+  end
+
   ## MODULES
 
   test "module_page generates only the module name when there's no more info" do
