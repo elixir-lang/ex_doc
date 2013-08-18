@@ -5,6 +5,15 @@ defmodule ExDoc.HTMLFormatter.Templates do
 
   require EEx
 
+  @doc """
+  Escape `'`, `"`, `&`, `<` and `>` in the string using HTML entities.
+
+  This is only intended for use by the HTML formatter.
+  """
+  def escape_html(s) do
+    h(s)
+  end
+
   # Convert to html using markdown
   defp to_html(nil, _node), do: nil
   defp to_html(bin, node) when is_binary(bin) do
@@ -33,38 +42,26 @@ defmodule ExDoc.HTMLFormatter.Templates do
     node.id
   end
   
-  # Get the full typespecs from a function
+  # Get the full typespecs from a function, already in HTML form.
   #
   # This is distinct from typespec because a function can have multiple specs
   # while a type can only have one spec (a type is little more than a
   # spec).
-  defp funcspecs(ExDoc.FunctionNode[name: name, specs: specs]) do
-    lc spec inlist specs || [] do
-      Kernel.Typespec.spec_to_ast(name, spec) |> Macro.to_string
-    end
+  defp funcspecs(ExDoc.FunctionNode[specs: specs]) when is_list(specs) do
+    Enum.map(specs,
+      &ExDoc.HTMLFormatter.LinkifyTypes.linkify(&1.spec, &1.locals, &1.remotes))
   end
-  
   defp funcspecs(_node) do
     []
   end
   
-  # Get the full typespec from a type.
+  # Get the full typespec from a type, already in HTML form.
   # 
   # Returns HTML or nil if the node doesn't represent a type.
-  defp typespec(ExDoc.TypeNode[spec: spec, type: :type]) do
-    Kernel.Typespec.type_to_ast(spec) |> Macro.to_string 
+  defp typespec(ExDoc.TypeNode[spec: spec]) do
+    ExDoc.HTMLFormatter.LinkifyTypes.linkify(spec.spec, spec.locals, spec.remotes)
   end
   
-  defp typespec(ExDoc.TypeNode[spec: spec, type: :opaque]) do
-    # Hide the opaque type if it fits the standard pattern (i.e. head :: body).
-    # If it doesn't match that pattern it's probably best to output something
-    # instead of bailing.
-    case Kernel.Typespec.type_to_ast(spec) do
-      {:::, _, [d|_]} -> Macro.to_string(d)
-      o               -> Macro.to_string(o)
-    end
-  end
-
   defp typespec(_node) do
     nil
   end

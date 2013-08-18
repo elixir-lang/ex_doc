@@ -7,7 +7,7 @@
     <ul class="spec">
       <%= lc spec inlist specs_ do %>
         <li>
-          <%=h spec %>
+          <%= spec %>
         </li>
       <% end %>
     </ul>
