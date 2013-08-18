@@ -94,18 +94,6 @@ defmodule ExDoc.HTMLFormatterTest.TemplatesTest do
     refute content =~ %r/<a class="toggle">/
   end
 
-  test "arrows for modules with children" do
-    defmodule ParentModule do
-      defmodule ChildModule do
-      end
-    end
-
-    nodes = ExDoc.Retriever.docs_from_modules([ParentModule, ParentModule.ChildModule], doc_config)
-    [node] = ExDoc.Retriever.nest_modules(nodes, doc_config)
-    content = Templates.list_item_template(node)
-    assert content =~ %r/<a class="toggle">/
-  end
-
   test "no arrows for records without functions" do
     defrecord NoFunRecord, value: true
 
