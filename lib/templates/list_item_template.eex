@@ -1,5 +1,5 @@
 <li>
-  <%= unless(Enum.empty?(node.children) and Enum.empty?(node.docs)) do %>
+  <%= unless Enum.empty?(node.docs) do %>
     <a class="toggle"></a>
   <% end %>
   <span class="object_link">
@@ -8,7 +8,6 @@
   <small class="search_info"><%= node.id %></small>
 </li>
 <ul>
-  <%= lc child inlist node.children, do: list_item_template(child) %>
   <%= lc doc inlist node.docs do  %>
     <li>
       <span class="object_link">

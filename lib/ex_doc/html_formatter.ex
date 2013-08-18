@@ -19,7 +19,7 @@ defmodule ExDoc.HTMLFormatter do
     Enum.each [:modules, :records, :protocols], fn(mod_type) ->
       modules
         |> ExDoc.Retriever.filter_modules(mod_type)
-        |> ExDoc.Retriever.nest_modules(config)
+        |> Enum.sort(&(&1.id < &2.id)) 
         |> generate_list(mod_type, output, config, has_readme)
     end
   end
