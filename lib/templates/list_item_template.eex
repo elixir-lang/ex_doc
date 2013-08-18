@@ -1,5 +1,7 @@
 <li>
-  <a class="toggle"></a>
+  <%= unless(Enum.empty?(node.children) and Enum.empty?(node.docs)) do %>
+    <a class="toggle"></a>
+  <% end %>
   <span class="object_link">
     <a href="<%= node.id %>.html" title="<%= node.id %>"><%= node.relative %></a>
   </span>
