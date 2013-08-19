@@ -29,7 +29,7 @@
 
       <%= if module.moduledoc do %>
         <div id="moduledoc" class="docstring">
-          <%= to_html(module.moduledoc, module) %>
+          <%= to_html(module.moduledoc) %>
         </div>
       <% end %>
 

@@ -4,6 +4,7 @@ defmodule ExDoc.HTMLFormatter do
   """
 
   alias ExDoc.HTMLFormatter.Templates
+  alias ExDoc.HTMLFormatter.Autolink
 
   @doc """
   Generate HTML documentation for the given modules
@@ -15,6 +16,8 @@ defmodule ExDoc.HTMLFormatter do
     generate_index(output, config)
     generate_assets(output, config)
     has_readme = config.readme && generate_readme(output)
+
+    modules = Autolink.all(modules)
 
     Enum.each [:modules, :records, :protocols], fn(mod_type) ->
       generate_list(mod_type, modules, output, config, has_readme)
@@ -72,13 +75,13 @@ defmodule ExDoc.HTMLFormatter do
 
   defp generate_list(scope, all, output, config, has_readme) do
     nodes = filter_list(scope, all)
-    Enum.each nodes, &generate_module_page(&1, all, output)
+    Enum.each nodes, &generate_module_page(&1, output)
     content = Templates.list_page(scope, nodes, config, has_readme)
     File.write("#{output}/#{scope}_list.html", content)
   end
 
-  defp generate_module_page(node, all, output) do
-    content = Templates.module_page(node, all)
+  defp generate_module_page(node, output) do
+    content = Templates.module_page(node)
     File.write("#{output}/#{node.id}.html", content)
   end
 

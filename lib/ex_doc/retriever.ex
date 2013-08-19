@@ -2,7 +2,7 @@ defrecord ExDoc.ModuleNode, id: nil, module: nil, moduledoc: nil,
   docs: [], typespecs: [], source: nil, type: nil
 
 defrecord ExDoc.FunctionNode, id: nil, name: nil, arity: 0,
-  doc: [], source: nil, type: nil, signature: nil, specs: nil
+  doc: [], source: nil, type: nil, signature: nil, specs: []
 
 defrecord ExDoc.TypeNode, id: nil, name: nil, arity: 0, type: nil, spec: nil
 

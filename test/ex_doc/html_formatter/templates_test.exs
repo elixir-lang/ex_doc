@@ -19,7 +19,8 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   defp get_module_page(names) do
     [node] = ExDoc.Retriever.docs_from_modules(names, doc_config)
-    Templates.module_page(node, [])
+             |> ExDoc.HTMLFormatter.Autolink.all
+    Templates.module_page(node)
   end
 
   ## LISTING
@@ -133,7 +134,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   test "module_page generates only the module name when there's no more info" do
     node = ExDoc.ModuleNode.new module: XPTOModule, moduledoc: nil, id: "XPTOModule"
-    content = Templates.module_page(node, [])
+    content = Templates.module_page(node)
 
     assert content =~ %r/<title>XPTOModule<\/title>/
     assert content =~ %r/<h1>\s*XPTOModule\s*<\/h1>/
