@@ -1,5 +1,3 @@
-Code.require_file "../test_helper.exs", __FILE__
-
 defmodule ExDocTest do
   use ExUnit.Case
 
@@ -36,5 +34,4 @@ defmodule ExDocTest do
     {{source_dir, _retr_config}, _config} = ExDoc.generate_docs "Elixir", "1", options
     assert source_dir == Path.join(File.cwd!, "ebin")
   end
-
 end

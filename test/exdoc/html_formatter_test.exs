@@ -1,7 +1,6 @@
-Code.require_file "../../test_helper.exs", __FILE__
-
 defmodule ExDoc.HTMLFormatterTest do
   use ExUnit.Case
+
   alias ExDoc.HTMLFormatter
 
   setup_all do

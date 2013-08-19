@@ -10,8 +10,7 @@ defmodule Mix.Tasks.Docs do
   ## Command line options
 
   * `--output`, `-o` - output directory for the generated docs; default: `"docs"`
-  * `--readme`       - generate a project README doc from a README.md file; 
-    default: `false`
+  * `--readme`       - generate a project README doc from a README.md file; default: `false`
 
   ## Configuration
 

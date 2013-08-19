@@ -1,7 +1,6 @@
-Code.require_file "../../test_helper.exs", __FILE__
-
 defmodule ExDoc.RetrieverTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
+
   alias ExDoc.Retriever
 
   defp config(url_pattern // "http://example.com/%{path}#L%{line}") do

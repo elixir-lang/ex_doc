@@ -12,7 +12,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
       |> Enum.filter(&match?(ExDoc.FunctionNode[], &1))
       |> Enum.reduce([], fn(x, acc) -> [x.id|acc] end)
 
-    bin |> Markdown.autolink_locals(available_funs) |> Markdown.to_html
+    bin |> ExDoc.Autolink.locals(available_funs) |> Markdown.to_html
   end
 
   # Get the full signature from a function

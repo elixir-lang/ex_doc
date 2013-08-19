@@ -1,7 +1,6 @@
-Code.require_file "../../../test_helper.exs", __FILE__
+defmodule ExDoc.HTMLFormatter.TemplatesTest do
+  use ExUnit.Case, async: true
 
-defmodule ExDoc.HTMLFormatterTest.TemplatesTest do
-  use ExUnit.Case
   alias ExDoc.HTMLFormatter.Templates
 
   defp source_url do
