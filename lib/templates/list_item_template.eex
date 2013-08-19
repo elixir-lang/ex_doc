@@ -3,7 +3,7 @@
     <a class="toggle"></a>
   <% end %>
   <span class="object_link">
-    <a href="<%= node.id %>.html" title="<%= node.id %>"><%= node.relative %></a>
+    <a href="<%= node.id %>.html" title="<%= node.id %>"><%= node.id %></a>
   </span>
   <small class="search_info"><%= node.id %></small>
 </li>

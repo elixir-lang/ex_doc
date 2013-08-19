@@ -17,9 +17,9 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
                  homepage_url: homepage_url, source_url: source_url]
   end
 
-  defp get_content(names) do
+  defp get_module_page(names) do
     [node] = ExDoc.Retriever.docs_from_modules(names, doc_config)
-    Templates.module_page(node)
+    Templates.module_page(node, [])
   end
 
   ## LISTING
@@ -133,14 +133,14 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   test "module_page generates only the module name when there's no more info" do
     node = ExDoc.ModuleNode.new module: XPTOModule, moduledoc: nil, id: "XPTOModule"
-    content = Templates.module_page(node)
+    content = Templates.module_page(node, [])
 
     assert content =~ %r/<title>XPTOModule<\/title>/
     assert content =~ %r/<h1>\s*XPTOModule\s*<\/h1>/
   end
 
   test "module_page outputs the functions and docstrings" do
-    content = get_content([CompiledWithDocs])
+    content = get_module_page([CompiledWithDocs])
 
     assert content =~ %r/<title>CompiledWithDocs<\/title>/
     assert content =~ %r/<h1>\s*CompiledWithDocs\s*<\/h1>/
@@ -154,7 +154,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   end
   
   test "module_page outputs the types and function specs" do
-    content = get_content([TypesAndSpecs])
+    content = get_module_page([TypesAndSpecs])
 
     # Master base
     mb = "http://elixir-lang.org/docs/master/"
@@ -177,14 +177,14 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   end
 
   test "module_page outputs summaries" do
-    content = get_content([CompiledWithDocs])
+    content = get_module_page([CompiledWithDocs])
     assert content =~ %r{<span class="summary_signature">\s*<a href="#example_1/0">}
   end
 
   ## BEHAVIOURS
 
   test "module_page outputs behavior and callbacks" do
-    content = get_content([CustomBehaviour])
+    content = get_module_page([CustomBehaviour])
 
     assert content =~ %r{<h1>\s*CustomBehaviour\s*<small>behaviour</small>\s*<\/h1>}m
     assert content =~ %r{Callbacks}
@@ -194,18 +194,18 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   ## RECORDS
 
   test "module_page outputs the record type" do
-    content = get_content([CompiledRecord])
+    content = get_module_page([CompiledRecord])
     assert content =~ %r{<h1>\s*CompiledRecord\s*<small>record</small>\s*<\/h1>}m
   end
 
   test "module_page outputs record fields" do
-    content = get_content([CompiledRecord])
+    content = get_module_page([CompiledRecord])
     assert content =~ %r{<strong>foo:</strong> nil}m
     assert content =~ %r{<strong>bar:</strong> "sample"}m
   end
 
   test "module_page outputs exceptions fields" do
-    content = get_content([RandomError])
+    content = get_module_page([RandomError])
     refute content =~ %r{<strong>__exception__:</strong>}m
     assert content =~ %r{<strong>message:</strong> "this is random!"}m
   end
@@ -213,15 +213,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   ## PROTOCOLS
 
   test "module_page outputs the protocol type" do
-    content = get_content([CustomProtocol])
+    content = get_module_page([CustomProtocol])
     assert content =~ %r{<h1>\s*CustomProtocol\s*<small>protocol</small>\s*<\/h1>}m
-  end
-
-  test "module_page outputs protocol implementations" do
-    names = [CustomProtocol, CustomProtocol.Number]
-    nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
-    [node] = ExDoc.Retriever.nest_modules(nodes, doc_config)
-    content = Templates.module_page(node)
-    assert content =~ %r{<a href="CustomProtocol.Number.html">Number</a>}m
   end
 end

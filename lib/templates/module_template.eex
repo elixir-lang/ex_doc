@@ -35,20 +35,7 @@
 
       <a href="<%= module.source %>" target="_blank" class="view_source">Source</a>
 
-      <%= unless Enum.empty?(impls) do %>
-        <h2 id="implementations">Implementations</h2>
-        <ul class="summary">
-          <%= lc node inlist impls do %>
-            <li>
-              <span class="summary_signature">
-                <a href="<%= node.id %>.html"><%= node.relative %></a>
-              </span>
-            </li>
-          <% end %>
-        </ul>
-      <% end %>
-
-      <%= unless Enum.empty?(fields) do %>
+      <%= if fields = get_fields(module) do %>
         <h2>Fields <small>(and defaults)</small></h2>
         <ul class="summary">
           <%= lc { field, default } inlist fields do %>
@@ -85,7 +72,7 @@
       <%= unless Enum.empty?(types) do %>
         <div id="types_details" class="details_list">
           <h2>Types</h2>
-          <%= lc node inlist types, do: type_detail_template(node, module) %>
+          <%= lc node inlist types, do: type_detail_template(node) %>
         </div>
       <% end %>
 

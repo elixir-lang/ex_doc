@@ -1,4 +1,4 @@
-defrecord ExDoc.ModuleNode, module: nil, relative: nil, moduledoc: nil,
+defrecord ExDoc.ModuleNode, module: nil, moduledoc: nil,
   docs: [], typespecs: [], source: nil, children: [], type: nil, id: nil, line: 0
 
 defrecord ExDoc.FunctionNode, name: nil, arity: 0, id: nil,
@@ -31,7 +31,7 @@ defmodule ExDoc.Retriever do
   def docs_from_files(files, config) when is_list(files) do
     files
       |> Enum.map(&get_module_from_file(&1))
-      |> Enum.filter(fn(x) -> not nil? x end)
+      |> Enum.filter(fn(x) -> x end)
       |> docs_from_modules(config)
   end
 
@@ -39,7 +39,8 @@ defmodule ExDoc.Retriever do
   Extract documentation from all modules in the list `modules`
   """
   def docs_from_modules(modules, config) when is_list(modules) do
-    Enum.map modules, &get_module_no_children(&1, config)
+    Enum.map(modules, &get_module(&1, config))
+    |> Enum.sort(&(&1.id < &2.id))
   end
 
   defp get_module_from_file(name) do
@@ -63,9 +64,7 @@ defmodule ExDoc.Retriever do
   # it. If there is an error while retrieving the information (like
   # the module is not available or it was not compiled
   # with --docs flag), we raise an exception.
-  defp get_module_no_children(module, config) do
-    relative = Enum.join(Module.split(module), ".")
-
+  defp get_module(module, config) do
     case module.__info__(:moduledoc) do
       { line, moduledoc } -> nil
       _ -> raise "Module #{inspect module} was not compiled with flag --docs"
@@ -73,7 +72,7 @@ defmodule ExDoc.Retriever do
 
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
-    
+
     specs = Kernel.Typespec.beam_specs(module)
     { typespecs, typenames } = get_types(module)
 
@@ -96,112 +95,11 @@ defmodule ExDoc.Retriever do
       moduledoc: moduledoc,
       docs: docs,
       typespecs: typespecs,
-      relative: relative,
       source: source_link(source_path, source_url, line),
     ]
   end
 
   # Helpers
-
-  @doc """
-  Filters out modules of the specified type
-  """
-  def filter_modules(modules, :modules) do
-    Enum.filter modules, &match?(ExDoc.ModuleNode[type: x] when x in [nil, :behaviour], &1)
-  end
-
-  def filter_modules(modules, :records) do
-    Enum.filter modules, &match?(ExDoc.ModuleNode[type: x] when x in [:record, :exception], &1)
-  end
-
-  def filter_modules(modules, :protocols) do
-    Enum.filter modules, &match?(ExDoc.ModuleNode[type: x] when x in [:protocol, :impl], &1)
-  end
-
-  @doc """
-  Nests modules in the `children` field of the record.
-  """
-  def nest_modules(modules, config) do
-    mod_names = Enum.map modules, fn(x) -> 
-      { String.split(x.relative, ".") , binary_to_atom("Elixir." <> x.id), x.type }
-    end
-    nest_modules([], Enum.sort(mod_names), [], config)
-  end
-
-
-  # Goes through each module in the list. Since the list
-  # is ordered, nested modules can be found by looking
-  # ahead the list under the given scope. For example,
-  # imagine the list is made by the modules:
-  #
-  #     [
-  #       ["Foo"],
-  #       ["Foo", "Bar"],
-  #       ["Last"]
-  #     ]
-  #
-  # On the first interaction, it will see ["Foo"]
-  # and look ahead the list noticing that the next
-  # module starts with "Foo" and consequently is a
-  # child.
-  defp nest_modules(scope, [h|t], acc, config) do
-    flag   = scope ++ elem(h, 0)
-    length = length(flag)
-
-    { nested, rest } = Enum.split_while t, fn({ x, _, _ }) ->
-      Enum.take(x, length) == flag
-    end
-
-    module = get_module(flag, h, nested, config)
-    nest_modules(scope, rest, [module|acc], config)
-  end
-
-  defp nest_modules(_, [], acc, _) do
-    Enum.reverse(acc)
-  end
-
-  # Get all the information from the module and compile
-  # it, also looping through its children. If there is
-  # an error while retrieving the information (like
-  # the module is not available or it was not compiled
-  # with --docs flag), we raise an exception.
-  defp get_module(scope, { segments, module, type }, children, config) do
-    relative = Enum.join Enum.drop(segments, length(scope) - length(segments)), "."
-
-    case module.__info__(:moduledoc) do
-      { line, moduledoc } -> nil
-      _ -> raise "Module #{inspect module} was not compiled with flag --docs"
-    end
-
-    source_url  = config.source_url_pattern
-    source_path = source_path(module, config)
-
-    specs = Kernel.Typespec.beam_specs(module)
-    { typespecs, typenames } = get_types(module)
-
-    docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
-      &get_function(&1, source_path, source_url, specs, module, typenames)
-
-    if type == :behaviour do
-      callbacks = Kernel.Typespec.beam_callbacks(module)
-
-      docs = Enum.map(module.__behaviour__(:docs),
-        &get_callback(&1, source_path, source_url, callbacks)) ++ docs
-    end
-
-    ExDoc.ModuleNode[
-      id: inspect(module),
-      line: line,
-      module: module,
-      type: type,
-      moduledoc: moduledoc,
-      docs: docs,
-      typespecs: typespecs, 
-      relative: relative,
-      source: source_link(source_path, source_url, line),
-      children: nest_modules(scope, children, [], config)
-    ]
-  end
 
   # Skip docs explicitly marked as false
   defp has_doc?({_, _, _, _, false}, _) do
@@ -220,7 +118,7 @@ defmodule ExDoc.Retriever do
 
   defp get_function(function, source_path, source_url, all_specs, module, typenames) do
     { { name, arity }, line, type, signature, doc } = function
-    specs = ListDict.get(all_specs, { name, arity }, [])
+    specs = Dict.get(all_specs, { name, arity }, [])
             |> Enum.map(&make_spec_with_refs(Kernel.Typespec.spec_to_ast(name, &1),
                                              name, module, typenames))
 
@@ -256,7 +154,6 @@ defmodule ExDoc.Retriever do
       line: line
     ]
   end
-
 
   # Detect if a module is an exception, record,
   # protocol, implementation or simply a module
@@ -298,7 +195,7 @@ defmodule ExDoc.Retriever do
               ExDoc.TypeNode[name: atom_to_binary(name),
                              id: "t:#{name}",
                              type: type,
-                             spec: spec] 
+                             spec: spec]
             end
     { Enum.sort(nodes, &(&1.name < &2.name)), typenames }
   end
@@ -314,7 +211,7 @@ defmodule ExDoc.Retriever do
     source = module.__info__(:compile)[:source]
     Path.relative_to source, config.source_root
   end
- 
+
   defp make_spec_with_refs(ast, name, module, typenames) do
       locals = reduce_ast(ast, [], &find_local_calls/2)
                |> Enum.uniq |> Enum.sort
@@ -330,12 +227,12 @@ defmodule ExDoc.Retriever do
   # Searches for local "function" calls (really type function calls) in an AST
   # produced by Kernel.Typespec.spec_to_ast or Kernel.Typespec.type_to_ast.
   defp find_local_calls({ name, _, _ }, acc) when is_atom(name), do: [name|acc]
-  defp find_local_calls(_, acc), do: acc 
+  defp find_local_calls(_, acc), do: acc
 
   # Searches for remote "function" calls (really type function calls) in an AST
   # produced by Kernel.Typespec.spec_to_ast or Kernel.Typespec.type_to_ast.
   defp find_remote_calls({ {:., _, [mod, type] }, _, _ }, acc), do: [{mod, type}|acc]
-  defp find_remote_calls(_, acc), do: acc 
+  defp find_remote_calls(_, acc), do: acc
 
   # Recursively, in preorder, traverse the AST, working like reduce on a list.
   @spec reduce_ast(Macro.t, any, ((Macro.t, any) -> any)) :: any
@@ -360,7 +257,7 @@ defmodule ExDoc.Retriever do
   # tuple containing the passed type function info and either :current (for
   # current project) or :elixir (for the elixir project). If the module isn't
   # part of the current or elixir project nil is returned.
-  @spec find_remote_call_ref({ Module.t, atom }, Module.t) :: 
+  @spec find_remote_call_ref({ Module.t, atom }, Module.t) ::
     { { Module.t, atom }, :current | :elixir } | nil
   defp find_remote_call_ref({ mod, _ } = tup, curmod) do
     cond do
@@ -377,10 +274,10 @@ defmodule ExDoc.Retriever do
   @spec ebin_dir(Module.t) :: Path.t
   @spec ebin_dir(Module.t, integer) :: Path.t
   defp ebin_dir(mod, extra // 0) do
-    Path.expand(Path.join(List.duplicate("..", 1 + extra)), :code.which(mod)) 
+    Path.expand(Path.join(List.duplicate("..", 1 + extra)), :code.which(mod))
   end
 
-  # Cut off the body of an opaque type while leaving it on a normal type. 
+  # Cut off the body of an opaque type while leaving it on a normal type.
   #
   # If the opaque type doesn't match the expected pattern just present it in
   # full, it's better than hiding potentially useful information.

@@ -4,6 +4,15 @@ defmodule ExDoc.Autolink do
   """
 
   @doc """
+  Escape `'`, `"`, `&`, `<` and `>` in the string using HTML entities.
+  This is only intended for use by the HTML formatter.
+  """
+  def escape_html(binary) do
+    escape_map = [{ %r(&), "\\&amp;" }, { %r(<), "\\&lt;" }, { %r(>), "\\&gt;" }, { %r("), "\\&quot;" }]
+    Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
+  end
+
+  @doc """
   Create links to locally defined functions, specified in `available_funs`
   as a list of `fun/arity` tuples.
 

@@ -17,10 +17,7 @@ defmodule ExDoc.HTMLFormatter do
     has_readme = config.readme && generate_readme(output)
 
     Enum.each [:modules, :records, :protocols], fn(mod_type) ->
-      modules
-        |> ExDoc.Retriever.filter_modules(mod_type)
-        |> Enum.sort(&(&1.id < &2.id)) 
-        |> generate_list(mod_type, output, config, has_readme)
+      generate_list(mod_type, modules, output, config, has_readme)
     end
   end
 
@@ -61,22 +58,27 @@ defmodule ExDoc.HTMLFormatter do
     false
   end
 
-  defp generate_list(nodes, scope, output, config, has_readme) do
-    generate_module_page(nodes, output)
-    content = Templates.list_template(scope, nodes, config, has_readme)
+  defp filter_list(:records, nodes) do
+    Enum.filter nodes, &match?(ExDoc.ModuleNode[type: x] when x in [:record, :exception], &1)
+  end
+
+  defp filter_list(:modules, nodes) do
+    Enum.filter nodes, &match?(ExDoc.ModuleNode[type: x] when x in [nil, :behaviour], &1)
+  end
+
+  defp filter_list(:protocols, nodes) do
+    Enum.filter nodes, &match?(ExDoc.ModuleNode[type: x] when x in [:protocol], &1)
+  end
+
+  defp generate_list(scope, all, output, config, has_readme) do
+    nodes = filter_list(scope, all)
+    Enum.each nodes, &generate_module_page(&1, all, output)
+    content = Templates.list_page(scope, nodes, config, has_readme)
     File.write("#{output}/#{scope}_list.html", content)
   end
 
-  defp generate_module_page([node|t], output) do
-    content = Templates.module_page(node)
+  defp generate_module_page(node, all, output) do
+    content = Templates.module_page(node, all)
     File.write("#{output}/#{node.id}.html", content)
-
-    generate_module_page(node.children, output)
-    generate_module_page(t, output)
   end
-
-  defp generate_module_page([], _output) do
-    :ok
-  end
-
 end

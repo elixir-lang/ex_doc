@@ -3,13 +3,10 @@ defmodule ExDoc.RetrieverTest do
 
   alias ExDoc.Retriever
 
-  defp config(url_pattern // "http://example.com/%{path}#L%{line}") do
-    ExDoc.Config[source_url_pattern: url_pattern, source_root: File.cwd!]
-  end
-
   defp docs_from_files(names, url_pattern // "http://example.com/%{path}#L%{line}") do
     files  = Enum.map names, fn(n) -> "test/tmp/Elixir.#{n}.beam" end
-    Retriever.docs_from_files(files, config(url_pattern))
+    config = ExDoc.Config[source_url_pattern: url_pattern, source_root: File.cwd!]
+    Retriever.docs_from_files(files, config)
   end
 
   ## MODULES
@@ -27,11 +24,6 @@ defmodule ExDoc.RetrieverTest do
   test "docs_from_files returns the nested module" do
     [node] = docs_from_files ["UndefParent.Nested"]
     assert node.module == UndefParent.Nested
-  end
-
-  test "docs_from_files returns the relative module name" do
-    [node] = docs_from_files ["UndefParent.Nested"]
-    assert node.relative == "UndefParent.Nested"
   end
 
   test "docs_from_files returns the moduledoc info" do
@@ -177,68 +169,4 @@ defmodule ExDoc.RetrieverTest do
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["plus_one/1", "plus_two/1"]
   end
-
-  ## FILTERS
-
-  test "filters modules" do
-    assert [] == Retriever.filter_modules([], :modules)
-
-    module_nil = ExDoc.ModuleNode[type: nil]
-    behavior = ExDoc.ModuleNode[type: :behaviour]
-    record = ExDoc.ModuleNode[type: :record]
-    exception = ExDoc.ModuleNode[type: :exception]
-    protocol = ExDoc.ModuleNode[type: :protocol]
-    impl = ExDoc.ModuleNode[type: :impl]
-
-    result = Retriever.filter_modules([module_nil, behavior, record, exception, protocol, impl], :modules)
-    assert 2 == Enum.count result
-    assert HashSet.new([module_nil, behavior]) == HashSet.new(result)
-  end
-
-  test "filters records" do
-    assert [] == Retriever.filter_modules([], :records)
-
-    module_nil = ExDoc.ModuleNode[type: nil]
-    behavior = ExDoc.ModuleNode[type: :behaviour]
-    record = ExDoc.ModuleNode[type: :record]
-    exception = ExDoc.ModuleNode[type: :exception]
-    protocol = ExDoc.ModuleNode[type: :protocol]
-    impl = ExDoc.ModuleNode[type: :impl]
-
-    result = Retriever.filter_modules([module_nil, behavior, record, exception, protocol, impl], :records)
-    assert 2 == Enum.count result
-    assert HashSet.new([record, exception]) == HashSet.new(result)
-  end
-
-  test "filters protocols" do
-    assert [] == Retriever.filter_modules([], :protocols)
-
-    module_nil = ExDoc.ModuleNode[type: nil]
-    behavior = ExDoc.ModuleNode[type: :behaviour]
-    record = ExDoc.ModuleNode[type: :record]
-    exception = ExDoc.ModuleNode[type: :exception]
-    protocol = ExDoc.ModuleNode[type: :protocol]
-    impl = ExDoc.ModuleNode[type: :impl]
-
-    result = Retriever.filter_modules([module_nil, behavior, record, exception, protocol, impl], :protocols)
-    assert 2 == Enum.count result
-    assert HashSet.new([protocol, impl]) == HashSet.new(result)
-  end
-
-  ## NEST MODULES
-
-  test "nest_modules returns an empty list if there's no children" do
-    nodes = docs_from_files ["CompiledWithDocs"]
-    [node] = Retriever.nest_modules(nodes, config)
-    assert node.children == []
-  end
-
-  test "nest_modules returns a list with children" do
-    nodes = docs_from_files ["CompiledWithDocs", "CompiledWithDocs.Nested"]
-    [node] = Retriever.nest_modules(nodes, config)
-    [child] = node.children
-    assert child.module   == CompiledWithDocs.Nested
-    assert child.relative == "Nested"
-  end
-
 end
