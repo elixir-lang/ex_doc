@@ -60,6 +60,13 @@
           <% end %>
         </ul>
       <% end %>
+      
+      <%= unless Enum.empty?(types) do %>
+        <h2 id="types_summary">Types summary</h2>
+        <ul class="summary">
+          <%= lc node inlist types, do: summary_template(node) %>
+        </ul>
+      <% end %>
 
       <%= unless Enum.empty?(functions) do %>
         <h2 id="functions_summary">Functions summary</h2>
@@ -80,6 +87,13 @@
         <ul class="summary">
           <%= lc node inlist callbacks, do: summary_template(node) %>
         </ul>
+      <% end %>
+      
+      <%= unless Enum.empty?(types) do %>
+        <div id="types_details" class="details_list">
+          <h2>Types</h2>
+          <%= lc node inlist types, do: type_detail_template(node, module) %>
+        </div>
       <% end %>
 
       <%= unless Enum.empty?(functions) do %>
