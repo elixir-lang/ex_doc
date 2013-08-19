@@ -1,5 +1,5 @@
 <li>
   <span class="summary_signature">
-    <a href="#<%=h node.id %>"><%=h node.id %></a>
+    <a href="#<%=h node.id %>"><%=h label(node) %></a>
   </span>
 </li>

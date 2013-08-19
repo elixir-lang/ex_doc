@@ -1,8 +1,14 @@
 defrecord ExDoc.ModuleNode, module: nil, relative: nil, moduledoc: nil,
-  docs: [], source: nil, children: [], type: nil, id: nil, line: 0
+  docs: [], typespecs: [], source: nil, children: [], type: nil, id: nil, line: 0
 
 defrecord ExDoc.FunctionNode, name: nil, arity: 0, id: nil,
-  doc: [], source: nil, type: nil, line: 0, signature: nil
+  doc: [], source: nil, type: nil, line: 0, signature: nil, specs: nil
+
+defrecord ExDoc.TypeNode, name: nil, id: nil, type: nil, spec: nil
+
+# Small helper for sharing typespec related stuff between FunctionNode and
+# TypeNode.
+defrecord ExDoc.SpecWithRefs, spec: nil, locals: [], remotes: []
 
 defmodule ExDoc.Retriever do
   @moduledoc """
@@ -67,10 +73,13 @@ defmodule ExDoc.Retriever do
 
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
+    
+    specs = Kernel.Typespec.beam_specs(module)
+    { typespecs, typenames } = get_types(module)
 
     type = detect_type(module)
     docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
-      &get_function(&1, source_path, source_url)
+      &get_function(&1, source_path, source_url, specs, module, typenames)
 
     if type == :behaviour do
       callbacks = Kernel.Typespec.beam_callbacks(module)
@@ -86,6 +95,7 @@ defmodule ExDoc.Retriever do
       type: type,
       moduledoc: moduledoc,
       docs: docs,
+      typespecs: typespecs,
       relative: relative,
       source: source_link(source_path, source_url, line),
     ]
@@ -166,8 +176,11 @@ defmodule ExDoc.Retriever do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
+    specs = Kernel.Typespec.beam_specs(module)
+    { typespecs, typenames } = get_types(module)
+
     docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
-      &get_function(&1, source_path, source_url)
+      &get_function(&1, source_path, source_url, specs, module, typenames)
 
     if type == :behaviour do
       callbacks = Kernel.Typespec.beam_callbacks(module)
@@ -183,6 +196,7 @@ defmodule ExDoc.Retriever do
       type: type,
       moduledoc: moduledoc,
       docs: docs,
+      typespecs: typespecs, 
       relative: relative,
       source: source_link(source_path, source_url, line),
       children: nest_modules(scope, children, [], config)
@@ -204,8 +218,11 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function(function, source_path, source_url) do
+  defp get_function(function, source_path, source_url, all_specs, module, typenames) do
     { { name, arity }, line, type, signature, doc } = function
+    specs = ListDict.get(all_specs, { name, arity }, [])
+            |> Enum.map(&make_spec_with_refs(Kernel.Typespec.spec_to_ast(name, &1),
+                                             name, module, typenames))
 
     ExDoc.FunctionNode[
       name: name,
@@ -213,6 +230,7 @@ defmodule ExDoc.Retriever do
       id: "#{name}/#{arity}",
       doc: doc,
       signature: signature,
+      specs: specs,
       source: source_link(source_path, source_url, line),
       type: type,
       line: line
@@ -269,6 +287,22 @@ defmodule ExDoc.Retriever do
     end
   end
 
+  defp get_types(module) do
+    raw = Kernel.Typespec.beam_types(module)
+    # There are typenames to help look up what can be referred to, so don't
+    # bother including private types.
+    typenames = lc { type, {name, _, _} } inlist raw, type != :typep, do: name
+    nodes = lc { type, {name, _, _} = tup } inlist raw, type != :typep do
+              ast = process_type_ast(Kernel.Typespec.type_to_ast(tup), type)
+              spec = make_spec_with_refs(ast, name, module, typenames)
+              ExDoc.TypeNode[name: atom_to_binary(name),
+                             id: "t:#{name}",
+                             type: type,
+                             spec: spec] 
+            end
+    { Enum.sort(nodes, &(&1.name < &2.name)), typenames }
+  end
+
   defp source_link(_source_path, nil, _line), do: nil
 
   defp source_link(source_path, source_url, line) do
@@ -280,4 +314,77 @@ defmodule ExDoc.Retriever do
     source = module.__info__(:compile)[:source]
     Path.relative_to source, config.source_root
   end
+ 
+  defp make_spec_with_refs(ast, name, module, typenames) do
+      locals = reduce_ast(ast, [], &find_local_calls/2)
+               |> Enum.uniq |> Enum.sort
+               |> Enum.filter(&(&1 in typenames and &1 != name))
+      remotes = reduce_ast(ast, [], &find_remote_calls/2)
+                |> Enum.uniq |> Enum.sort |> Enum.map(find_remote_call_ref(&1, module))
+                |> Enum.filter(&(&1 != nil))
+      ExDoc.SpecWithRefs[spec: Macro.to_string(ast),
+                         locals: locals,
+                         remotes: remotes]
+  end
+
+  # Searches for local "function" calls (really type function calls) in an AST
+  # produced by Kernel.Typespec.spec_to_ast or Kernel.Typespec.type_to_ast.
+  defp find_local_calls({ name, _, _ }, acc) when is_atom(name), do: [name|acc]
+  defp find_local_calls(_, acc), do: acc 
+
+  # Searches for remote "function" calls (really type function calls) in an AST
+  # produced by Kernel.Typespec.spec_to_ast or Kernel.Typespec.type_to_ast.
+  defp find_remote_calls({ {:., _, [mod, type] }, _, _ }, acc), do: [{mod, type}|acc]
+  defp find_remote_calls(_, acc), do: acc 
+
+  # Recursively, in preorder, traverse the AST, working like reduce on a list.
+  @spec reduce_ast(Macro.t, any, ((Macro.t, any) -> any)) :: any
+  defp reduce_ast({ _, _, children } = node, acc, f) do
+    if is_list(children) do
+      Enum.reduce children, f.(node, acc), reduce_ast(&1, &2, f)
+    else
+      f.(node, acc)
+    end
+  end
+  defp reduce_ast(l, acc, f) when is_list(l) do
+    Enum.reduce l, acc, reduce_ast(&1, &2, f)
+  end
+  defp reduce_ast({ left, right }, acc, f) do
+    reduce_ast(right, reduce_ast(left, acc, f), f)
+  end
+  defp reduce_ast(node, acc, f) do
+    f.(node, acc)
+  end
+
+  # Find out to which project a type function call points and if so return a
+  # tuple containing the passed type function info and either :current (for
+  # current project) or :elixir (for the elixir project). If the module isn't
+  # part of the current or elixir project nil is returned.
+  @spec find_remote_call_ref({ Module.t, atom }, Module.t) :: 
+    { { Module.t, atom }, :current | :elixir } | nil
+  defp find_remote_call_ref({ mod, _ } = tup, curmod) do
+    cond do
+      ebin_dir(mod)    == ebin_dir(curmod)          -> { tup, :current }
+      ebin_dir(mod, 2) == ebin_dir(Kernel, 2)       -> { tup, :elixir }
+      true                                          -> nil
+    end
+  end
+
+  # Find the directory containing the ebin dir containing the ebin of a
+  # module. The extra parameter additionally goes up a few steps (this is useful
+  # for finding out if something is in a related part of the elixir project
+  # tree).
+  @spec ebin_dir(Module.t) :: Path.t
+  @spec ebin_dir(Module.t, integer) :: Path.t
+  defp ebin_dir(mod, extra // 0) do
+    Path.expand(Path.join(List.duplicate("..", 1 + extra)), :code.which(mod)) 
+  end
+
+  # Cut off the body of an opaque type while leaving it on a normal type. 
+  #
+  # If the opaque type doesn't match the expected pattern just present it in
+  # full, it's better than hiding potentially useful information.
+  @spec process_type_ast(Macro.t, atom) :: String.t
+  defp process_type_ast({:::, _, [d|_]}, :opaque), do: d
+  defp process_type_ast(ast, _), do: ast
 end
