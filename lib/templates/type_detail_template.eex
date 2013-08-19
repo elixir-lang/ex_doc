@@ -1,5 +1,5 @@
 <div class="type_detail">
   <p class="typespec" id="<%=h node.id %>">
-    <strong><%= typespec(node) %></strong>
+    <%= typespec(node) %>
   </p>
 </div>

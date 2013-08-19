@@ -40,15 +40,8 @@ p.signature {
 }
 
 ul.spec {
-  font-size: 1.1em; font-weight: normal; font-family: Monaco, Consolas, Courier, monospace;
-  font-style: oblique;
-  padding: 6px 10px; margin-top: 18px;
-  background: #e5e8ef; border: 1px solid #d8d8e5; -moz-border-radius: 3px; -webkit-border-radius: 3px;
-  list-style-type: none;
-}
-
-p.typespec {
-  /* Intentionally left blank, the default style seems to work out quite well. */
+  font-size: 1.0em; font-weight: bold; font-family: Courier, monospace;
+  padding: 6px 10px; padding-left: 25px; list-style-type: none;
 }
 
 a:link, a:visited { text-decoration: none; color: #05a; }
@@ -57,10 +50,10 @@ a:hover { color: #27c; }
 .detail { border-top: 1px dotted #aaa; margin-top: 15px; padding-top: 0; }
 .detail:nth-child(2) { border: 0; }
 
-/* No top border for type_detail, types are better left without lines between
- * them as they are typically just one line at the moment.
- */
-.type_detail { margin-top: 15px; padding-top: 0; }
+.type_detail {
+  font-size: 1.0em; font-weight: bold; font-family: Courier, monospace;
+  margin-top: 15px; padding-top: 0;
+}
 
 /* Summary */
 ul.summary {
