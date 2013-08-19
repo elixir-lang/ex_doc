@@ -160,20 +160,21 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     mb = "http://elixir-lang.org/docs/master/"
 
     public_html = 
-      "public(t) :: {t, <a href=\"#{mb}String.html#t:t\">String.t()</a>, " <>
-      "<a href=\"TypesAndSpecs.Sub.html#t:t\">TypesAndSpecs.Sub.t()</a>, " <>
-      "<a href=\"#t:opaque\">opaque()</a>, :ok | :error}"
+      "<a href=\"#t:public/1\">public(t)</a> :: {t, " <>
+      "String.t(), " <>
+      "TypesAndSpecs.Sub.t(), " <>
+      "<a href=\"#t:opaque/0\">opaque()</a>, :ok | :error}"
 
-    ref_html = "ref() :: {:binary.part(), <a href=\"#t:public\">public</a>(any())}"
+    ref_html = "<a href=\"#t:ref/0\">ref()</a> :: " <>
+               "{:binary.part(), <a href=\"#t:public/1\">public(any())</a>}"
 
-    assert content =~ %r[<title>TypesAndSpecs</title>]
-    assert content =~ %r[<a href="#t:public">public</a>]
-    refute content =~ %r[<a href="#t:private">private</a>]
-    assert String.contains?(content, public_html), content, public_html, "contain"
-    assert String.contains?(content, ref_html), content, ref_html, "contain"
-    refute content =~ %r[<strong>private\(t\)]
-    assert content =~ %r[add\(integer\(\), <a href=\"#t:opaque\">opaque\(\)</a>\) :: integer\(\)]
-    refute content =~ %r[minus\(integer\(\), integer\(\)\) :: integer\(\)]
+    assert content =~ %b[<a href="#t:public/1">public(t)</a>]
+    refute content =~ %b[<a href="#t:private/0">private</a>]
+    assert content =~ public_html
+    assert content =~ ref_html
+    refute content =~ %b[<strong>private\(t\)]
+    assert content =~ %b[add(integer(), <a href="#t:opaque/0">opaque()</a>) :: integer()]
+    refute content =~ %b[minus(integer(), integer()) :: integer()]
   end
 
   test "module_page outputs summaries" do

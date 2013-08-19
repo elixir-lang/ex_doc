@@ -21,11 +21,6 @@ defmodule ExDoc.RetrieverTest do
     assert node.module == CompiledWithDocs
   end
 
-  test "docs_from_files returns the nested module" do
-    [node] = docs_from_files ["UndefParent.Nested"]
-    assert node.module == UndefParent.Nested
-  end
-
   test "docs_from_files returns the moduledoc info" do
     [node] = docs_from_files ["CompiledWithDocs"]
     assert node.moduledoc == "moduledoc\n\n\#\# Example\n    CompiledWithDocs.example\n"
@@ -56,45 +51,41 @@ defmodule ExDoc.RetrieverTest do
     [node] = docs_from_files ["CompiledWithoutDocs"]
     assert node.docs == []
   end
-  
+
   test "docs_from_files returns the specs for each non-private function" do
     [node] = docs_from_files ["TypesAndSpecs"]
     [add] = node.docs
 
     assert add.id     == "add/2"
-    assert add.doc    == nil 
+    assert add.doc    == nil
     assert add.type   == :def
-    assert add.specs  == 
-      [ ExDoc.SpecWithRefs[spec: "add(integer(), opaque()) :: integer()",
-                           locals: [:opaque],
-                           remotes: []] ]
+    assert Macro.to_string(add.specs) ==
+           "[add(integer(), opaque()) :: integer()]"
   end
-  
+
   test "docs_from_files returns the spec info for each non-private module type" do
     [node] = docs_from_files ["TypesAndSpecs"]
     [ opaque, public, ref ] = node.typespecs
-    
-    assert opaque.name         == "opaque"
-    assert opaque.id           == "t:opaque"
-    assert opaque.type         == :opaque
-    assert opaque.spec.spec    == "opaque()"
-    assert opaque.spec.locals  == [] 
-    assert opaque.spec.remotes == []
 
-    assert public.name         == "public"
-    assert public.id           == "t:public"
-    assert public.type         == :type
-    assert public.spec.spec    ==
-      "public(t) :: {t, String.t(), TypesAndSpecs.Sub.t(), opaque(), :ok | :error}"
-    assert public.spec.locals  == [:opaque]
-    assert public.spec.remotes == [{{String, :t}, :elixir}, {{TypesAndSpecs.Sub, :t}, :current}]
-    
-    assert ref.name            == "ref"
-    assert ref.id              == "t:ref"
-    assert ref.type            == :type
-    assert ref.spec.spec       == "ref() :: {:binary.part(), public(any())}"
-    assert ref.spec.locals     == [:public]
-    assert ref.spec.remotes    == []
+    assert opaque.name  == :opaque
+    assert opaque.arity == 0
+    assert opaque.id    == "opaque/0"
+    assert opaque.type  == :opaque
+    assert Macro.to_string(opaque.spec) == "opaque()"
+
+    assert public.name  == :public
+    assert public.arity == 1
+    assert public.id    == "public/1"
+    assert public.type  == :type
+    assert Macro.to_string(public.spec) ==
+           "public(t) :: {t, String.t(), TypesAndSpecs.Sub.t(), opaque(), :ok | :error}"
+
+    assert ref.name  == :ref
+    assert ref.arity == 0
+    assert ref.id    == "ref/0"
+    assert ref.type  == :type
+    assert Macro.to_string(ref.spec) ==
+           "ref() :: {:binary.part(), public(any())}"
   end
 
   test "docs_from_files returns the source" do

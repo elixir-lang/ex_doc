@@ -1,4 +1,4 @@
-defmodule ExDoc.Autolink do
+defmodule ExDoc.HTMLFormatter.Autolink do
   @moduledoc """
   Conveniences for autolinking locals, types and more.
   """
@@ -13,6 +13,24 @@ defmodule ExDoc.Autolink do
   end
 
   @doc """
+  Converts the given `ast` to string while linking the locals
+  given by `typespecs`.
+  """
+  def typespec(ast, typespecs) do
+    Macro.to_string(ast, fn
+      { name, _, args }, string when is_atom(name) and is_list(args) ->
+        arity = length(args)
+        if { name, arity } in typespecs do
+          %b[<a href="#t:#{name}/#{arity}">#{string}</a>]
+        else
+          string
+        end
+      _, string ->
+        string
+    end)
+  end
+
+  @doc """
   Create links to locally defined functions, specified in `available_funs`
   as a list of `fun/arity` tuples.
 
@@ -21,7 +39,7 @@ defmodule ExDoc.Autolink do
   or trailing `]`, e.g. `[my link link/1 is here](url)`, the fun/arity
   will get translated to the new href of the function.
   """
-  def locals(bin, available_funs) when is_binary(bin) do
+  def docs(bin, available_funs) when is_binary(bin) do
     Regex.scan(%r{(?<!\[)`\s*([a-z_!\\?]+/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten

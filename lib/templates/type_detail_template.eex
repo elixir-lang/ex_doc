@@ -1,5 +1,5 @@
 <div class="type_detail">
-  <p class="typespec" id="<%=h node.id %>">
-    <%= typespec(node) %>
+  <p class="typespec" id="t:<%=h node.id %>">
+    <%= typespec(node.spec, module) %>
   </p>
 </div>
