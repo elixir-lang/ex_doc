@@ -73,7 +73,7 @@ defmodule ExDoc.Retriever do
 
     type = detect_type(module)
     docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
-                           &get_function(&1, source_path, source_url, specs, module)
+                           &get_function(&1, source_path, source_url, specs)
 
     if type == :behaviour do
       callbacks = Kernel.Typespec.beam_callbacks(module)
@@ -109,7 +109,7 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function(function, source_path, source_url, all_specs, module) do
+  defp get_function(function, source_path, source_url, all_specs) do
     { { name, arity }, line, type, signature, doc } = function
 
     specs = Dict.get(all_specs, { name, arity }, [])

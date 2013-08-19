@@ -27,8 +27,8 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   defp assets do
-    [ { Templates.templates_path("css/*.css"), "css" },
-      { Templates.templates_path("js/*.js"), "js" } ]
+    [ { templates_path("css/*.css"), "css" },
+      { templates_path("js/*.js"), "js" } ]
   end
 
   defp generate_assets(output, _config) do
@@ -80,5 +80,9 @@ defmodule ExDoc.HTMLFormatter do
   defp generate_module_page(node, all, output) do
     content = Templates.module_page(node, all)
     File.write("#{output}/#{node.id}.html", content)
+  end
+
+  defp templates_path(other) do
+    Path.expand("html_formatter/templates/#{other}", __DIR__)
   end
 end

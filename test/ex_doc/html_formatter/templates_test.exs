@@ -156,9 +156,6 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   test "module_page outputs the types and function specs" do
     content = get_module_page([TypesAndSpecs])
 
-    # Master base
-    mb = "http://elixir-lang.org/docs/master/"
-
     public_html = 
       "<a href=\"#t:public/1\">public(t)</a> :: {t, " <>
       "String.t(), " <>
