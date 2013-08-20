@@ -97,7 +97,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   test "no arrows for records without functions" do
     defrecord NoFunRecord, value: true
 
-    [node] = ExDoc.Retriever.docs_from_modules([NoFunRecord], doc_config)
+    [node]  = ExDoc.Retriever.docs_from_modules([NoFunRecord], doc_config)
     content = Templates.list_item_template(node)
     refute content =~ %r/<a class="toggle">/
   end
@@ -157,9 +157,11 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   test "module_page outputs the types and function specs" do
     content = get_module_page([TypesAndSpecs])
 
+    mb = "http://elixir-lang.org/docs/master"
+
     public_html = 
       "<a href=\"#t:public/1\">public(t)</a> :: {t, " <>
-      "String.t(), " <>
+      "<a href=\"#{mb}/String.html#t:t/0\">String.t()</a>, " <>
       "TypesAndSpecs.Sub.t(), " <>
       "<a href=\"#t:opaque/0\">opaque()</a>, :ok | :error}"
 

@@ -30,7 +30,7 @@ defmodule ExDoc.HTMLFormatter.AutolinkTest do
 
   # typespec
 
-  test "autolink locals" do
+  test "autolink locals in typespecs" do
     assert Autolink.typespec(quote(do: foo(1)), [foo: 1]) ==
            %b[<a href="#t:foo/1">foo(1)</a>]
 
@@ -39,5 +39,13 @@ defmodule ExDoc.HTMLFormatter.AutolinkTest do
 
     assert Autolink.typespec(quote(do: bar(foo(1))), []) ==
            %b[bar(foo(1))]
+  end
+
+  test "autolink Elixir types in typespecs" do
+    assert Autolink.typespec(quote(do: String.t), []) ==
+           %b[<a href="http://elixir-lang.org/docs/master/String.html#t:t/0">String.t()</a>]
+
+    assert Autolink.typespec(quote(do: Unknown.bar()), []) ==
+           %b[Unknown.bar()]
   end
 end

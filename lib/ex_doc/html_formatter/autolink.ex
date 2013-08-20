@@ -3,6 +3,8 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   Conveniences for autolinking locals, types and more.
   """
 
+  @elixir_docs "http://elixir-lang.org/docs/master"
+
   @doc """
   Escape `'`, `"`, `&`, `<` and `>` in the string using HTML entities.
   This is only intended for use by the HTML formatter.
@@ -61,9 +63,46 @@ defmodule ExDoc.HTMLFormatter.Autolink do
         else
           string
         end
+      { { :., _, [alias, name] }, _, args }, string when is_atom(name) and is_list(args) ->
+        alias = expand_alias(alias)
+        if source = get_source(alias) do
+          %b[<a href="#{source}/#{inspect alias}.html#t:#{name}/#{length(args)}">#{string}</a>]
+        else
+          string
+        end
       _, string ->
         string
     end)
+  end
+
+  defp expand_alias({ :__aliases__, _, [h|t] }) when is_atom(h), do: Module.concat([h|t])
+  defp expand_alias(atom) when is_atom(atom), do: atom
+  defp expand_alias(_), do: nil
+
+  defp get_source(alias) do
+    cond do
+      nil?(alias) -> nil
+      from_elixir?(alias) -> @elixir_docs
+      true -> nil
+    end
+  end
+
+  defp from_elixir?(alias) do
+    :lists.prefix(elixir_ebin, alias_ebin(alias))
+  end
+
+  defp alias_ebin(alias) do
+    case :code.where_is_file('#{alias}.beam') do
+      :non_existing -> ''
+      path -> path
+    end
+  end
+
+  defp elixir_ebin do
+    case :code.where_is_file('Elixir.Kernel.beam') do
+      :non_existing -> [0]
+      path -> path |> Path.dirname |> Path.dirname |> Path.dirname
+    end
   end
 
   @doc """
