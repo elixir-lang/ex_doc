@@ -18,9 +18,11 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   end
 
   defp get_module_page(names) do
-    [node] = ExDoc.Retriever.docs_from_modules(names, doc_config)
-             |> ExDoc.HTMLFormatter.Autolink.all
-    Templates.module_page(node)
+    names
+    |> ExDoc.Retriever.docs_from_modules(doc_config)
+    |> ExDoc.HTMLFormatter.Autolink.all()
+    |> hd()
+    |> Templates.module_page
   end
 
   ## LISTING
@@ -155,14 +157,14 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   end
   
   test "module_page outputs the types and function specs" do
-    content = get_module_page([TypesAndSpecs])
+    content = get_module_page([TypesAndSpecs, TypesAndSpecs.Sub])
 
     mb = "http://elixir-lang.org/docs/master"
 
     public_html = 
       "<a href=\"#t:public/1\">public(t)</a> :: {t, " <>
       "<a href=\"#{mb}/String.html#t:t/0\">String.t()</a>, " <>
-      "TypesAndSpecs.Sub.t(), " <>
+      "<a href=\"TypesAndSpecs.Sub.html#t:t/0\">TypesAndSpecs.Sub.t()</a>, " <>
       "<a href=\"#t:opaque/0\">opaque()</a>, :ok | :error}"
 
     ref_html = "<a href=\"#t:ref/0\">ref()</a> :: " <>

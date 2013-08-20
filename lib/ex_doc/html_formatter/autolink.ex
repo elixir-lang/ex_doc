@@ -3,7 +3,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   Conveniences for autolinking locals, types and more.
   """
 
-  @elixir_docs "http://elixir-lang.org/docs/master"
+  @elixir_docs "http://elixir-lang.org/docs/master/"
 
   @doc """
   Escape `'`, `"`, `&`, `<` and `>` in the string using HTML entities.
@@ -18,7 +18,8 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   Receives a list of module nodes and autolink all docs and typespecs.
   """
   def all(modules) do
-    Enum.map modules, &(&1 |> all_docs |> all_typespecs)
+    aliases = Enum.map modules, &(&1.module)
+    Enum.map modules, &(&1 |> all_docs |> all_typespecs(aliases))
   end
 
   defp all_docs(ExDoc.ModuleNode[] = module) do
@@ -32,18 +33,18 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     module.moduledoc(moduledoc).docs(docs)
   end
 
-  defp all_typespecs(ExDoc.ModuleNode[] = module) do
+  defp all_typespecs(ExDoc.ModuleNode[] = module, aliases) do
     locals = Enum.map module.typespecs, fn
       ExDoc.TypeNode[name: name, arity: arity] -> { name, arity }
     end
 
     typespecs = lc ExDoc.TypeNode[] = typespec inlist module.typespecs do
-      typespec.update_spec &typespec(&1, locals)
+      typespec.update_spec &typespec(&1, locals, aliases)
     end
 
     docs = lc node inlist module.docs do
       node.update_specs fn(specs) ->
-        Enum.map(specs, &typespec(&1, locals))
+        Enum.map(specs, &typespec(&1, locals, aliases))
       end
     end
 
@@ -54,7 +55,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   Converts the given `ast` to string while linking the locals
   given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs) do
+  def typespec(ast, typespecs, aliases) do
     Macro.to_string(ast, fn
       { name, _, args }, string when is_atom(name) and is_list(args) ->
         arity = length(args)
@@ -65,8 +66,8 @@ defmodule ExDoc.HTMLFormatter.Autolink do
         end
       { { :., _, [alias, name] }, _, args }, string when is_atom(name) and is_list(args) ->
         alias = expand_alias(alias)
-        if source = get_source(alias) do
-          %b[<a href="#{source}/#{inspect alias}.html#t:#{name}/#{length(args)}">#{string}</a>]
+        if source = get_source(alias, aliases) do
+          %b[<a href="#{source}#{inspect alias}.html#t:#{name}/#{length(args)}">#{string}</a>]
         else
           string
         end
@@ -79,9 +80,10 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   defp expand_alias(atom) when is_atom(atom), do: atom
   defp expand_alias(_), do: nil
 
-  defp get_source(alias) do
+  defp get_source(alias, aliases) do
     cond do
       nil?(alias) -> nil
+      alias in aliases -> ""
       from_elixir?(alias) -> @elixir_docs
       true -> nil
     end
