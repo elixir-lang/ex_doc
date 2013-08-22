@@ -19,7 +19,8 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   """
   def all(modules) do
     aliases = Enum.map modules, &(&1.module)
-    Enum.map modules, &(&1 |> local_docs() |> project_docs(modules) |> all_typespecs(aliases))
+    project_funs = all_functions(modules)
+    Enum.map modules, &(&1 |> local_docs() |> project_docs(project_funs) |> all_typespecs(aliases))
   end
 
   defp local_docs(ExDoc.ModuleNode[] = module) do
@@ -33,8 +34,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     module.moduledoc(moduledoc).docs(docs)
   end
 
-  defp project_docs(ExDoc.ModuleNode[] = module, all_modules) do
-    project_funs = all_functions(all_modules)
+  defp project_docs(ExDoc.ModuleNode[] = module, project_funs) do
     moduledoc = module.moduledoc && project_doc(module.moduledoc, project_funs)
 
     docs = lc node inlist module.docs do
@@ -62,16 +62,12 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     module.typespecs(typespecs).docs(docs)
   end
 
-  @doc """
-  Given a list of `ModulesNodes`, return a list of all functions defined in those modules.
-  """
-  def all_functions(modules) do
-     m = Enum.map modules, fn (mod) ->
+  defp all_functions(modules) do
+    Enum.flat_map modules, fn (mod) ->
       Enum.map mod.docs, fn (d) ->
         mod.id <> "." <> d.id
       end
     end
-    List.flatten m
   end
 
   @doc """
@@ -165,7 +161,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     |> List.flatten
     |> Enum.filter(&(&1 in project_funs))
     |> Enum.reduce(bin, fn (x, acc) ->
-         {mod_str, function_name, arity} = split_function(x)
+         { mod_str, function_name, arity } = split_function(x)
          escaped = Regex.escape(x)
          Regex.replace(%r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc, 
            "[`\\1`](#{mod_str}.html##{function_name}/#{arity})")
@@ -174,14 +170,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
 
   defp split_function(bin) do
     [modules, arity] = String.split(bin, "/")
-    rev = modules
-      |> String.split(".")
-      |> Enum.reverse
-    function_name = hd(rev)
-    mod_str = rev
-      |> tl
-      |> Enum.reverse
-      |> Enum.join(".")
-    {mod_str, function_name, arity}
+    { mod, name } = modules |> String.split(".") |> Enum.split(-1)
+    { Enum.join(mod, "."), hd(name), arity }
   end
 end

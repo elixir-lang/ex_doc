@@ -49,26 +49,14 @@ defmodule ExDoc.HTMLFormatter.AutolinkTest do
       "[`Mod.funny_name\?/1`](Mod.html#funny_name\?/1) and [`Mod.funny_name!/2`](Mod.html#funny_name!/2)"
   end
 
-  # all_functions
-
-  test "all_functions returns empty for empty list" do
-    assert Autolink.all_functions([]) == []
+  test "autolink doesn't create links for undefined Mod.functions in docs" do
+    assert Autolink.project_doc("`Mod.example/1`", ["Mod.example/2"]) == "`Mod.example/1`"
+    assert Autolink.project_doc("`Mod.example/1`", []) == "`Mod.example/1`"
   end
 
-  test "all_functions returns the correct values" do
-    defmodule Outer do
-      defmodule Inner do
-        def inner_one(_a), do: true
-        def inner_two, do: true
-      end
-      def outer_one, do: true
-    end
-
-    modules = ExDoc.Retriever.docs_from_modules([Outer, Outer.Inner], ExDoc.Config.new)
-    modules = Autolink.all_functions modules
-    set = HashSet.new modules
-    expected = HashSet.new ["ExDoc.HTMLFormatter.AutolinkTest.Outer.outer_one/0", "ExDoc.HTMLFormatter.AutolinkTest.Outer.Inner.inner_one/1", "ExDoc.HTMLFormatter.AutolinkTest.Outer.Inner.inner_two/0"]
-    assert set == expected
+  test "autolink doesn't create links for pre-linked Mod.functions docs" do
+    assert Autolink.project_doc("[`Mod.example/1`]()", ["Mod.example/1"]) == "[`Mod.example/1`]()"
+    assert Autolink.project_doc("[the `Mod.example/1`]()", ["Mod.example/1"]) == "[the `Mod.example/1`]()"
   end
 
   # typespec
