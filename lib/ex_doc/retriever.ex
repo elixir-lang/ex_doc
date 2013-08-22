@@ -189,7 +189,7 @@ defmodule ExDoc.Retriever do
     lc { type, { name, _, args } = tuple } inlist all, type != :typep do
       spec  = process_type_ast(Kernel.Typespec.type_to_ast(tuple), type)
       arity = length(args)
-      doc   = ListDict.get(docs, { name, arity })
+      doc   = docs[{ name, arity }]
       ExDoc.TypeNode[id: "#{name}/#{arity}", name: name, arity: arity, type: type, spec: spec, doc: doc]
     end
   end
