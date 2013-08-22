@@ -52,7 +52,7 @@ defmodule Mix.Tasks.Docs do
       raise Mix.Error, message: "Extraneous arguments on the command line"
     end
 
-    project = (Mix.project[:name] || Mix.project[:app]) |> to_binary
+    project = (Mix.project[:name] || Mix.project[:app]) |> to_string
     version = Mix.project[:version] || "dev"
     options = Mix.project[:docs] || []
 
@@ -74,7 +74,7 @@ defmodule Mix.Tasks.Docs do
       case opt do
         { :output, arg } -> Keyword.put(acc, :output, arg)
         { :readme, arg } when is_boolean(arg) -> Keyword.put(acc, :readme, arg)
-        { opt, _ } -> raise Mix.Error, message: "Unrecognized option: #{to_binary opt}"
+        { opt, _ } -> raise Mix.Error, message: "Unrecognized option: #{to_string opt}"
       end
     end
 
