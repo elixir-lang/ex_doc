@@ -175,8 +175,9 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ public_html
     assert content =~ ref_html
     refute content =~ %s[<strong>private\(t\)]
-    assert content =~ %s[add(integer, <a href="#t:opaque/0">opaque</a>) :: integer]
-    refute content =~ %s[minus(integer, integer) :: integer]
+    assert content =~ %s[A public type]
+    assert content =~ %s[add(integer(), <a href="#t:opaque/0">opaque()</a>) :: integer()]
+    refute content =~ %s[minus(integer(), integer()) :: integer()]
   end
 
   test "module_page outputs summaries" do

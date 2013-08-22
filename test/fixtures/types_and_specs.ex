@@ -7,6 +7,7 @@ defmodule TypesAndSpecs do
   Types and tests fixture.
   """
 
+  @typedoc "A public type"
   @type public(t) :: { t, String.t, Sub.t, opaque, :ok | :error }
   @typep private :: any
   @opaque opaque :: {Dict.t}
@@ -17,4 +18,8 @@ defmodule TypesAndSpecs do
 
   @spec minus(integer, integer) :: integer
   defp minus(x, y), do: x - y
+
+  # This is just to ignore warnings about unused private types/functions.
+  @spec ignore(private) :: integer
+  def ignore(_), do: minus(0, 0)
 end

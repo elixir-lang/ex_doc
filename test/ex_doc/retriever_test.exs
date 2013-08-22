@@ -61,7 +61,7 @@ defmodule ExDoc.RetrieverTest do
 
   test "docs_from_files returns the specs for each non-private function" do
     [node] = docs_from_files ["TypesAndSpecs"]
-    [add] = node.docs
+    [add, _] = node.docs
 
     assert add.id     == "add/2"
     assert add.doc    == nil
@@ -84,6 +84,7 @@ defmodule ExDoc.RetrieverTest do
     assert public.arity == 1
     assert public.id    == "public/1"
     assert public.type  == :type
+    assert public.doc   == "A public type"
     assert Macro.to_string(public.spec) ==
            "public(t) :: {t, String.t(), TypesAndSpecs.Sub.t(), opaque(), :ok | :error}"
 
