@@ -51,8 +51,13 @@ a:hover { color: #27c; }
 .detail:nth-child(2) { border: 0; }
 
 .type_detail {
-  font-size: 1.0em; font-weight: bold; font-family: Courier, monospace;
   margin-top: 15px; padding-top: 0;
+}
+.type_detail > p.typespec {
+  font-size: 1.0em; font-weight: bold; font-family: Courier, monospace;
+}
+.type_detail > div.typespec_doc {
+  margin-left: 3em;
 }
 
 /* Summary */
