@@ -63,6 +63,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   def typespec(ast, typespecs, aliases) do
     Macro.to_string(ast, fn
       { name, _, args }, string when is_atom(name) and is_list(args) ->
+        string = strip_parens(string, args)
         arity = length(args)
         if { name, arity } in typespecs do
           %b[<a href="#t:#{name}/#{arity}">#{string}</a>]
@@ -70,6 +71,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
           string
         end
       { { :., _, [alias, name] }, _, args }, string when is_atom(name) and is_list(args) ->
+        string = strip_parens(string, args)
         alias = expand_alias(alias)
         if source = get_source(alias, aliases) do
           %b[<a href="#{source}#{inspect alias}.html#t:#{name}/#{length(args)}">#{string}</a>]
@@ -80,6 +82,9 @@ defmodule ExDoc.HTMLFormatter.Autolink do
         string
     end)
   end
+
+  defp strip_parens(string, []), do: :binary.part(string, 0, size(string)-2)
+  defp strip_parens(string, _), do: string
 
   defp expand_alias({ :__aliases__, _, [h|t] }) when is_atom(h), do: Module.concat([h|t])
   defp expand_alias(atom) when is_atom(atom), do: atom

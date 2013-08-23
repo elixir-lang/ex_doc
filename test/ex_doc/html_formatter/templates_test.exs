@@ -163,20 +163,20 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
     public_html = 
       "<a href=\"#t:public/1\">public(t)</a> :: {t, " <>
-      "<a href=\"#{mb}/String.html#t:t/0\">String.t()</a>, " <>
-      "<a href=\"TypesAndSpecs.Sub.html#t:t/0\">TypesAndSpecs.Sub.t()</a>, " <>
-      "<a href=\"#t:opaque/0\">opaque()</a>, :ok | :error}"
+      "<a href=\"#{mb}/String.html#t:t/0\">String.t</a>, " <>
+      "<a href=\"TypesAndSpecs.Sub.html#t:t/0\">TypesAndSpecs.Sub.t</a>, " <>
+      "<a href=\"#t:opaque/0\">opaque</a>, :ok | :error}"
 
-    ref_html = "<a href=\"#t:ref/0\">ref()</a> :: " <>
-               "{:binary.part(), <a href=\"#t:public/1\">public(any())</a>}"
+    ref_html = "<a href=\"#t:ref/0\">ref</a> :: " <>
+               "{:binary.part, <a href=\"#t:public/1\">public(any)</a>}"
 
     assert content =~ %b[<a href="#t:public/1">public(t)</a>]
     refute content =~ %b[<a href="#t:private/0">private</a>]
     assert content =~ public_html
     assert content =~ ref_html
     refute content =~ %b[<strong>private\(t\)]
-    assert content =~ %b[add(integer(), <a href="#t:opaque/0">opaque()</a>) :: integer()]
-    refute content =~ %b[minus(integer(), integer()) :: integer()]
+    assert content =~ %b[add(integer, <a href="#t:opaque/0">opaque</a>) :: integer]
+    refute content =~ %b[minus(integer, integer) :: integer]
   end
 
   test "module_page outputs summaries" do

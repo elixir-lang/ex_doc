@@ -74,14 +74,14 @@ defmodule ExDoc.HTMLFormatter.AutolinkTest do
 
   test "autolink Elixir types in typespecs" do
     assert Autolink.typespec(quote(do: String.t), [], []) ==
-           %b[<a href="http://elixir-lang.org/docs/master/String.html#t:t/0">String.t()</a>]
+           %b[<a href="http://elixir-lang.org/docs/master/String.html#t:t/0">String.t</a>]
 
     assert Autolink.typespec(quote(do: Unknown.bar()), [], []) ==
-           %b[Unknown.bar()]
+           %b[Unknown.bar]
   end
 
   test "autolink shared aliases in typespecs" do
     assert Autolink.typespec(quote(do: Foo.t), [], [Foo]) ==
-           %b[<a href="Foo.html#t:t/0">Foo.t()</a>]
+           %b[<a href="Foo.html#t:t/0">Foo.t</a>]
   end
 end
