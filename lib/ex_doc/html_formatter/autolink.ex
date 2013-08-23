@@ -19,26 +19,20 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   """
   def all(modules) do
     aliases = Enum.map modules, &(&1.module)
-    project_funs = all_functions(modules)
-    Enum.map modules, &(&1 |> local_docs() |> project_docs(project_funs) |> all_typespecs(aliases))
+    project_funs = lc m inlist modules, d inlist m.docs, do: m.id <> "." <> d.id
+    Enum.map modules, &(&1 |> all_docs(project_funs) |> all_typespecs(aliases))
   end
 
-  defp local_docs(ExDoc.ModuleNode[] = module) do
-    locals    = Enum.map module.docs, &(&1.id)
-    moduledoc = module.moduledoc && local_doc(module.moduledoc, locals)
+  defp all_docs(ExDoc.ModuleNode[] = module, project_funs) do
+    locals = Enum.map module.docs, &(&1.id)
+
+    moduledoc = module.moduledoc &&
+      module.moduledoc |> local_doc(locals) |> project_doc(project_funs)
 
     docs = lc node inlist module.docs do
-      node.update_doc fn(doc) -> doc && local_doc(doc, locals) end
-    end
-
-    module.moduledoc(moduledoc).docs(docs)
-  end
-
-  defp project_docs(ExDoc.ModuleNode[] = module, project_funs) do
-    moduledoc = module.moduledoc && project_doc(module.moduledoc, project_funs)
-
-    docs = lc node inlist module.docs do
-      node.update_doc fn(doc) -> doc && project_doc(doc, project_funs) end
+      node.update_doc fn(doc) ->
+        doc && doc |> local_doc(locals) |> project_doc(project_funs)
+      end
     end
 
     module.moduledoc(moduledoc).docs(docs)
@@ -60,14 +54,6 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     end
 
     module.typespecs(typespecs).docs(docs)
-  end
-
-  defp all_functions(modules) do
-    Enum.flat_map modules, fn (mod) ->
-      Enum.map mod.docs, fn (d) ->
-        mod.id <> "." <> d.id
-      end
-    end
   end
 
   @doc """
@@ -163,7 +149,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     |> Enum.reduce(bin, fn (x, acc) ->
          { mod_str, function_name, arity } = split_function(x)
          escaped = Regex.escape(x)
-         Regex.replace(%r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc, 
+         Regex.replace(%r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
            "[`\\1`](#{mod_str}.html##{function_name}/#{arity})")
        end)
   end
