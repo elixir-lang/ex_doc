@@ -50,6 +50,15 @@ defmodule ExDoc.HTMLFormatter.Templates do
     Macro.to_string { name, 0, args }
   end
 
+  # Get the first paragraph of the documentation of a node, if any.
+  defp synopsis(node) do
+    if node.doc != nil do
+      String.split(node.doc, %r/\n\s*\n/) |> hd
+    else
+      nil
+    end
+  end
+
   defp presence([]),    do: nil
   defp presence(other), do: other
 

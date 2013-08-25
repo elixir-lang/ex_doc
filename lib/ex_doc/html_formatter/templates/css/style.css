@@ -75,6 +75,14 @@ ul.summary .summary_signature {
 }
 ul.summary .summary_signature:hover { background: #eeeeff; cursor: pointer; }
 
+table.summary tr:nth-child(odd) { background: #f0f0f0; }
+table.summary tr:nth-child(even) { background: #fafafa; }
+table.summary tr td { padding-top: 0.5em; padding-bottom: 0.5em; }
+
+td.summary_signature { padding-right: 0.5em; }
+td.summary_synopsis { padding-left: 0.5em; }
+td.summary_synopsis p { margin: 0em 0em; }
+
 /* File contents */
 #filecontents li > p, .docstring li > p { margin: 0px; }
 #filecontents ul, .docstring ul { padding-left: 20px; }
