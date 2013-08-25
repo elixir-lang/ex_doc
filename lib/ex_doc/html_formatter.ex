@@ -18,6 +18,8 @@ defmodule ExDoc.HTMLFormatter do
     has_readme = config.readme && generate_readme(output)
 
     modules = Autolink.all(modules)
+    
+    generate_overview(modules, output, config)
 
     Enum.each [:modules, :records, :protocols], fn(mod_type) ->
       generate_list(mod_type, modules, output, config, has_readme)
@@ -27,6 +29,16 @@ defmodule ExDoc.HTMLFormatter do
   defp generate_index(output, config) do
     content = Templates.index_template(config)
     File.write("#{output}/index.html", content)
+  end
+  
+  defp generate_overview(modules, output, config) do
+    content = Templates.overview_template(
+      config,
+      filter_list(:modules, modules),
+      filter_list(:records, modules),
+      filter_list(:protocols, modules)
+    )
+    File.write("#{output}/overview.html", content)
   end
 
   defp assets do

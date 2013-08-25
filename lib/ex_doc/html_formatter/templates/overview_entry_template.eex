@@ -1,0 +1,6 @@
+<tr>
+  <td class="summary_signature"><a href="#<%=h node.id %>"><%=h node.id %></a></td>
+  <%= if node.moduledoc do %>
+    <td class="summary_synopsis"><%= to_html(synopsis(node.moduledoc)) %></td>
+  <% end %>
+</tr>
