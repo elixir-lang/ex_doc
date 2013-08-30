@@ -11,6 +11,13 @@ defmodule ExDoc.RetrieverTest do
 
   ## MODULES
 
+  test "docs_from_files and docs_from_modules match" do
+    config = ExDoc.Config[source_url_pattern: "http://example.com/%{path}#L%{line}", source_root: File.cwd!]
+    file_nodes = Retriever.docs_from_files(["test/tmp/Elixir.UndefParent.Undocumented.beam"], config)
+    module_nodes = Retriever.docs_from_modules([UndefParent.Undocumented], config)
+    assert file_nodes == module_nodes
+  end
+
   test "docs_from_files returns the module id" do
     [node] = docs_from_files ["CompiledWithDocs"]
     assert node.id == "CompiledWithDocs"
