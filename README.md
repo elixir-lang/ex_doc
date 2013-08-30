@@ -2,7 +2,7 @@
 
 ExDoc is a tool to generate documentation for your Elixir projects. In case you are looking for documentation for Elixir itself, [check out Elixir's website](http://elixir-lang.org/).
 
-To use ExDoc, you need Elixir 0.10.2 or newer.
+To use ExDoc, you need Elixir master.
 
 ## Using ExDoc with Mix
 
