@@ -26,8 +26,7 @@ defmodule ExDoc.Retriever do
   """
   def docs_from_files(files, config) when is_list(files) do
     files
-      |> Enum.map(&get_module_from_file(&1))
-      |> Enum.filter(fn(x) -> x end)
+      |> Enum.map(&filename_to_module(&1))
       |> docs_from_modules(config)
   end
 
@@ -35,13 +34,28 @@ defmodule ExDoc.Retriever do
   Extract documentation from all modules in the list `modules`
   """
   def docs_from_modules(modules, config) when is_list(modules) do
-    Enum.map(modules, &get_module(&1, config)) |> Enum.sort
+    modules
+      |> Enum.map(&get_module(&1, config)) 
+      |> Enum.filter(fn(x) -> x end)
+      |> Enum.sort
   end
 
-  defp get_module_from_file(name) do
-    name   = Path.basename name, ".beam"
-    module = binary_to_atom name
+  defp filename_to_module(name) do
+    name = Path.basename name, ".beam"
+    binary_to_atom name
+  end
 
+  # Get all the information from the module and compile
+  # it. If there is an error while retrieving the information (like
+  # the module is not available or it was not compiled
+  # with --docs flag), we raise an exception.
+  defp get_module(module, config) do
+    module 
+      |> verify_module
+      |> generate_node(config)
+  end
+
+  defp verify_module(module) do
     unless Code.ensure_loaded?(module), do:
       raise(Error, message: "module #{inspect module} is not defined/available")
 
@@ -55,21 +69,13 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  # Get all the information from the module and compile
-  # it. If there is an error while retrieving the information (like
-  # the module is not available or it was not compiled
-  # with --docs flag), we raise an exception.
-  defp get_module(module, config) do
-    case module.__info__(:moduledoc) do
-      { line, moduledoc } -> nil
-      _ -> raise "Module #{inspect module} was not compiled with flag --docs"
-    end
+  defp generate_node(nil, _), do: nil
 
+  defp generate_node(module, config) do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
     specs = Kernel.Typespec.beam_specs(module)
-    types = get_types(module)
 
     type = detect_type(module)
     docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
@@ -81,13 +87,14 @@ defmodule ExDoc.Retriever do
         &get_callback(&1, source_path, source_url, callbacks)) ++ docs
     end
 
+    {line, moduledoc} = module.__info__(:moduledoc)
     ExDoc.ModuleNode[
       id: inspect(module),
       module: module,
       type: type,
       moduledoc: moduledoc,
       docs: docs,
-      typespecs: types,
+      typespecs: get_types(module),
       source: source_link(source_path, source_url, line),
     ]
   end
