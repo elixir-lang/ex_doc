@@ -33,12 +33,21 @@
         <span class="<%= if(scope == :protocols, do: "selected") %>"><a target="_self" href="protocols_list.html">
           Protocols
         </a></span>
+        <%= if guide && guide != [] do %>
+          <span class="<%= if(scope == :guide, do: "selected") %>"><a target="_self" href="guide_list.html">
+            Guide
+          </a></span>
+        <% end %>
         <div class="clear"></div>
       </div>
       <div id="search">Search: <input type="text" /></div>
 
       <ul id="full_list" class="class">
-        <%= lc node inlist nodes, do: list_item_template(node) %>
+        <%= if scope == :guide do %>
+          <%= lc { filename, title } inlist guide, do: list_guide_item_template(filename, title) %>
+        <%= else %>
+          <%= lc node inlist nodes, do: list_item_template(node) %>
+        <% end %>
       </ul>
     </div>
   </body>

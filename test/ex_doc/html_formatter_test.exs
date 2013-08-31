@@ -22,9 +22,14 @@ defmodule ExDoc.HTMLFormatterTest do
   defp beam_dir do
     Path.expand("../../tmp/ebin", __FILE__)
   end
+  
+  defp fixture_dir do
+    Path.expand("../../fixtures", __FILE__)
+  end
 
   defp doc_config do
-    ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: beam_dir]
+    ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: beam_dir,
+      guide_files: [ "#{fixture_dir}/doc.md", "#{fixture_dir}/docdir" ] ]
   end
 
   defp get_modules(config // doc_config) do
@@ -64,5 +69,10 @@ defmodule ExDoc.HTMLFormatterTest do
 
     content = File.read!("#{output_dir}/protocols_list.html")
     assert content =~ %r{<li>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}ms
+    
+    content = File.read!("#{output_dir}/guide_list.html")
+    assert content =~ %r{<li>.*/guide/doc\.html".*For the guide.*<\/li>}ms
+    assert content =~ %r{<li>.*/guide/a\.html".*This is file A.*<\/li>}ms
+    assert content =~ %r{<li>.*/guide/b.html".*This is file B.*<\/li>}ms
   end
 end

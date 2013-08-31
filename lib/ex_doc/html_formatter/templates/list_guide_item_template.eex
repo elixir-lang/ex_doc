@@ -1,0 +1,6 @@
+<li>
+  <span class="object_link">
+    <a href="<%= filename %>" title="<%= title %>"><%= title %></a>
+  </span>
+  <small class="search_info"><%= title %></small>
+</li>

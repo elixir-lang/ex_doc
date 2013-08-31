@@ -1,8 +1,8 @@
 defmodule ExDoc.CLI do
   def run(args) do
-    parsed = OptionParser.parse(args, switches: [readme: :boolean],
+    parsed = OptionParser.parse(args, switches: [readme: :boolean, guide: :keep],
                aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root,
-                         m: :main, p: :homepage_url])
+                         m: :main, p: :homepage_url, g: :guide])
 
     opts = elem(parsed, 0)
     args = elem(parsed, 1)
@@ -19,6 +19,12 @@ defmodule ExDoc.CLI do
 
     if formatter = opts[:formatter] do
       opts = Keyword.put(opts, :formatter, String.split(formatter, "."))
+    end
+
+    guide_files = Keyword.get_values(opts, :guide)
+    if guide_files != [] do
+      opts = Keyword.delete(opts, :guide)
+      opts = Keyword.put(opts, :guide_files, guide_files)
     end
 
     ExDoc.generate_docs(project, version, opts)
@@ -41,6 +47,8 @@ defmodule ExDoc.CLI do
       --source-ref       Branch/commit/tag used for source link inference, default: master
       -m, --main         The main, entry-point module in docs
       -p  --homepage-url URL to link to for the site name
+      -g  --guide        Add the file to the user's guide (multiple may be given, order
+                         matters)
 
     ## Source linking
 

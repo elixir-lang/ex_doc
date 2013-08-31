@@ -20,8 +20,8 @@ defmodule ExDoc.HTMLFormatter.Templates do
   @doc """
   Generates the listing.
   """
-  def list_page(scope, nodes, config, has_readme) do
-    list_template(scope, nodes, config, has_readme)
+  def list_page(scope, nodes, config, has_readme, guide) do
+    list_template(scope, nodes, config, has_readme, guide)
   end
 
   # Get fields for records an exceptions, removing any field
@@ -60,9 +60,10 @@ defmodule ExDoc.HTMLFormatter.Templates do
 
   templates = [
     index_template: [:config],
-    list_template: [:scope, :nodes, :config, :has_readme],
+    list_template: [:scope, :nodes, :config, :has_readme, :guide],
     module_template: [:module, :types, :functions, :macros, :callbacks],
     list_item_template: [:node],
+    list_guide_item_template: [:filename, :title],
     summary_template: [:node],
     detail_template: [:node, :_module],
     type_detail_template: [:node, :_module],
