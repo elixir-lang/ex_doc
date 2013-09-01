@@ -67,7 +67,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
     summary_template: [:node],
     detail_template: [:node, :_module],
     type_detail_template: [:node, :_module],
-    readme_template: [:content]
+    document_template: [:title, :content]
   ]
 
   Enum.each templates, fn({ name, args }) ->

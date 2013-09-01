@@ -58,8 +58,9 @@ defmodule ExDoc.HTMLFormatter do
         lc f inlist l do
           contents = File.read!(f)
           filename = Path.join(guide_dir, "#{Path.basename(f, ".md")}.html")
-          File.write!(filename, Markdown.to_html(contents))
-          { filename, extract_guide_title(contents) }
+          title = extract_guide_title(contents)
+          File.write!(filename, Templates.document_template(title, contents))
+          { filename, title }
         end
     end
   end
@@ -96,7 +97,7 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   defp write_readme(output, {:ok, content}) do
-    readme_html = Templates.readme_template(content)
+    readme_html = Templates.document_template("README", content)
     File.write("#{output}/README.html", readme_html)
     true
   end
