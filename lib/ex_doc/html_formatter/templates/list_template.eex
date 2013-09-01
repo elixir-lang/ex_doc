@@ -44,7 +44,7 @@
 
       <ul id="full_list" class="class">
         <%= if scope == :guide do %>
-          <%= lc { filename, title } inlist guide, do: list_guide_item_template(filename, title) %>
+          <%= lc { f, t, s } inlist guide, do: list_guide_item_template(f, t, s ) %>
         <%= else %>
           <%= lc node inlist nodes, do: list_item_template(node) %>
         <% end %>

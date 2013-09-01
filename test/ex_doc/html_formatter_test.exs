@@ -72,7 +72,18 @@ defmodule ExDoc.HTMLFormatterTest do
     
     content = File.read!("#{output_dir}/guide_list.html")
     assert content =~ %r{<li>.*/guide/doc\.html".*For the guide.*<\/li>}ms
+    assert content =~ %r{<a .*/guide/doc\.html#section_a".*Section A.*<\/a>}ms
+    assert content =~ %r{<a .*/guide/doc\.html#section__b".*Section &amp;&amp; B.*<\/a>}ms
     assert content =~ %r{<li>.*/guide/a\.html".*This is file A.*<\/li>}ms
     assert content =~ %r{<li>.*/guide/b.html".*This is file B.*<\/li>}ms
+  end
+ 
+  test "guide contains right title and ids" do
+    HTMLFormatter.run(get_modules, doc_config)
+
+    content = File.read!("#{output_dir}/guide/doc.html")
+    assert content =~ %r{<title>For the guide</title>}ms
+    assert content =~ %r{<h2 id="section_a">Section A</h2>}ms
+    assert content =~ %r{<h2 id="section__b">Section &amp;&amp; B</h2>}ms
   end
 end

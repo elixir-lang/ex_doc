@@ -63,7 +63,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
     list_template: [:scope, :nodes, :config, :has_readme, :guide],
     module_template: [:module, :types, :functions, :macros, :callbacks],
     list_item_template: [:node],
-    list_guide_item_template: [:filename, :title],
+    list_guide_item_template: [:filename, :title, :sections],
     summary_template: [:node],
     detail_template: [:node, :_module],
     type_detail_template: [:node, :_module],

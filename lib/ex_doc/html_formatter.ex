@@ -58,9 +58,13 @@ defmodule ExDoc.HTMLFormatter do
         lc f inlist l do
           contents = File.read!(f)
           filename = Path.join(guide_dir, "#{Path.basename(f, ".md")}.html")
-          title = extract_guide_title(contents)
-          File.write!(filename, Templates.document_template(title, contents))
-          { filename, title }
+          # Ok, very ugly, we need to process the template in order to get the
+          # title (it's extracted from the HTML). We'll pass an empty title now
+          # and then splice in the title in post processing.
+          html = Templates.document_template("", contents)
+          { html, title, sections } = post_process_document(html)
+          File.write!(filename, html) 
+          { filename, title, sections }
         end
     end
   end
@@ -76,14 +80,22 @@ defmodule ExDoc.HTMLFormatter do
     end)
   end
 
-  def extract_guide_title(contents) do
-    lines = String.split(contents, %r/\r\n?|\n/)
-            |> Enum.drop_while(&(String.strip(&1) == ""))
-    case lines do
-      []    -> "<empty file>"
-      # Strip off any "##" header symbols.
-      [h|_] -> String.strip(h) |> String.strip(?#) |> String.strip()
-    end
+  def post_process_document(html) do
+    title = case Regex.run(%r{<h1>(.*?)</h1>}g, html) do
+              nil    -> "(unknown)"
+              [_, t] -> t 
+            end
+    # A section id is simply the text in HTML with all entities removed
+    # and spaces converted to underscores.
+    secs = lc [h, t] inlist Regex.scan(%r{<h2>(.*?)</h2>}g, html) do
+             { h, t, String.replace(t, %r{&(.*?);}, "") |> String.replace(" ", "_") |> String.downcase }
+           end
+    # Add id's so that direct links to them from the sidebar are possible. 
+    html = Enum.reduce(secs, html, fn { h, inner, id }, acc ->
+             String.replace(acc, h, "<h2 id=\"#{id}\">#{inner}</h2>")
+           end)
+    html = String.replace(html, "<title></title>", "<title>#{title}</title>")
+    { html, title, (lc { _, sec_title, id } inlist secs, do: { sec_title, id }) }
   end
   
   def generate_guide_list(output, config, has_readme, guide) do
