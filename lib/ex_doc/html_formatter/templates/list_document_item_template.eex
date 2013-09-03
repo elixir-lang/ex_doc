@@ -1,0 +1,19 @@
+<li>
+  <%= unless Enum.empty?(sections) do %>
+    <a class="toggle"></a>
+  <% end %>
+  <span class="object_link">
+    <a href="<%= filename %>" title="<%= title %>"><%= title %></a>
+  </span>
+  <small class="search_info"><%= title %></small>
+</li>
+<ul>
+  <%= lc { title, id } inlist sections do  %>
+    <li>
+      <span class="object_link">
+        <a href="<%= filename %>#<%= id %>"><%= title %></a>
+      </span>
+      <small class="search_info"><%= title %></small>
+    </li>
+  <% end %>
+</ul>

@@ -2,7 +2,8 @@ defmodule ExDoc do
   defrecord Config, output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
                     homepage_url: nil, source_beam: nil, 
                     retriever: ExDoc.Retriever, formatter: ExDoc.HTMLFormatter,
-                    project: nil, version: nil, main: nil, readme: false
+                    project: nil, version: nil, main: nil, readme: false,
+                    guide_files: [], misc_files: []
 
   @doc """
   Generates documentation for the given `project`, `version`
