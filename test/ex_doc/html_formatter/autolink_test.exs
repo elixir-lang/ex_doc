@@ -61,6 +61,10 @@ defmodule ExDoc.HTMLFormatter.AutolinkTest do
 
   # typespec
 
+  test "strip parens in typespecs" do
+    assert Autolink.typespec(quote(do: foo({}, bar())), [], []) == %b[foo({}, bar)]
+  end
+
   test "autolink locals in typespecs" do
     assert Autolink.typespec(quote(do: foo(1)), [foo: 1], []) ==
            %b[<a href="#t:foo/1">foo(1)</a>]

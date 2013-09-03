@@ -83,7 +83,14 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     end)
   end
 
-  defp strip_parens(string, []), do: :binary.part(string, 0, size(string)-2)
+  defp strip_parens(string, []) do
+    if :binary.last(string) == ?) do
+      :binary.part(string, 0, size(string)-2)
+    else
+      string
+    end
+  end
+
   defp strip_parens(string, _), do: string
 
   defp expand_alias({ :__aliases__, _, [h|t] }) when is_atom(h), do: Module.concat([h|t])
