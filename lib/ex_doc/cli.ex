@@ -25,7 +25,7 @@ defmodule ExDoc.CLI do
   end
 
   defp print_usage do
-    IO.puts %B"""
+    IO.puts %S"""
     Usage:
       ex_doc PROJECT VERSION [OPTIONS]
 

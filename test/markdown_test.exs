@@ -12,7 +12,7 @@ defmodule MarkdownTest do
   end
 
   test "to_html autolink http address" do
-    expected = %b(<p><a href="https://github.com/elixir-lang">https://github.com/elixir-lang</a></p>\n)
+    expected = %s(<p><a href="https://github.com/elixir-lang">https://github.com/elixir-lang</a></p>\n)
     assert Markdown.to_html("https://github.com/elixir-lang") == expected
   end
 

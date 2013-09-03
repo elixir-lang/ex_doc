@@ -66,7 +66,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
         string = strip_parens(string, args)
         arity = length(args)
         if { name, arity } in typespecs do
-          %b[<a href="#t:#{name}/#{arity}">#{string}</a>]
+          %s[<a href="#t:#{name}/#{arity}">#{string}</a>]
         else
           string
         end
@@ -74,7 +74,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
         string = strip_parens(string, args)
         alias = expand_alias(alias)
         if source = get_source(alias, aliases) do
-          %b[<a href="#{source}#{inspect alias}.html#t:#{name}/#{length(args)}">#{string}</a>]
+          %s[<a href="#{source}#{inspect alias}.html#t:#{name}/#{length(args)}">#{string}</a>]
         else
           string
         end
