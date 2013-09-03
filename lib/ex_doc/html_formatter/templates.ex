@@ -20,8 +20,18 @@ defmodule ExDoc.HTMLFormatter.Templates do
   @doc """
   Generates the listing.
   """
-  def list_page(scope, nodes, config, has_readme, guide) do
-    list_template(scope, nodes, config, has_readme, guide)
+  def list_page(scope, nodes, config, has_readme, documents) do
+    list_template(scope, nodes, config, has_readme, documents)
+  end
+  
+  @doc """
+  Escape text for use in HTML.
+
+  Only intended to be used by ExDoc HTML formatting code.
+  """
+  def h(binary) do
+    escape_map = [{ %r(&), "\\&amp;" }, { %r(<), "\\&lt;" }, { %r(>), "\\&gt;" }, { %r("), "\\&quot;" }]
+    Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
   end
 
   # Get fields for records an exceptions, removing any field
@@ -53,17 +63,12 @@ defmodule ExDoc.HTMLFormatter.Templates do
   defp presence([]),    do: nil
   defp presence(other), do: other
 
-  defp h(binary) do
-    escape_map = [{ %r(&), "\\&amp;" }, { %r(<), "\\&lt;" }, { %r(>), "\\&gt;" }, { %r("), "\\&quot;" }]
-    Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
-  end
-
   templates = [
     index_template: [:config],
-    list_template: [:scope, :nodes, :config, :has_readme, :guide],
+    list_template: [:scope, :nodes, :config, :has_readme, :documents],
     module_template: [:module, :types, :functions, :macros, :callbacks],
     list_item_template: [:node],
-    list_guide_item_template: [:filename, :title, :sections],
+    list_document_item_template: [:filename, :title, :sections],
     summary_template: [:node],
     detail_template: [:node, :_module],
     type_detail_template: [:node, :_module],

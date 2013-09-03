@@ -29,7 +29,8 @@ defmodule ExDoc.HTMLFormatterTest do
 
   defp doc_config do
     ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: beam_dir,
-      guide_files: [ "#{fixture_dir}/doc.md", "#{fixture_dir}/docdir" ] ]
+      guide_files: [ "#{fixture_dir}/doc.md", "#{fixture_dir}/docdir/**" ],
+      misc_files: [ "#{fixture_dir}/doc.md", "#{fixture_dir}/miscdir/**" ] ]
   end
 
   defp get_modules(config // doc_config) do
@@ -71,17 +72,23 @@ defmodule ExDoc.HTMLFormatterTest do
     assert content =~ %r{<li>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}ms
     
     content = File.read!("#{output_dir}/guide_list.html")
-    assert content =~ %r{<li>.*/guide/doc\.html".*For the guide.*<\/li>}ms
-    assert content =~ %r{<a .*/guide/doc\.html#section_a".*Section A.*<\/a>}ms
-    assert content =~ %r{<a .*/guide/doc\.html#section__b".*Section &amp;&amp; B.*<\/a>}ms
-    assert content =~ %r{<li>.*/guide/a\.html".*This is file A.*<\/li>}ms
-    assert content =~ %r{<li>.*/guide/b.html".*This is file B.*<\/li>}ms
+    assert content =~ %r{<li>.*fixtures/doc\.html".*For the guide.*<\/li>}ms
+    assert content =~ %r{<a .*fixtures/doc\.html#section_a".*Section A.*<\/a>}ms
+    assert content =~ %r{<a .*fixtures/doc\.html#section__b".*Section &amp;&amp; B.*<\/a>}ms
+    assert content =~ %r{<li>.*fixtures/docdir/a\.html".*This is file A.*<\/li>}ms
+    assert content =~ %r{<li>.*fixtures/docdir/b\.html".*This is file B.*<\/li>}ms
+    
+    content = File.read!("#{output_dir}/files_list.html")
+    assert content =~ %r{<li>.*fixtures/doc\.html".*fixtures/doc.md.*<\/li>}ms
+    refute content =~ %r{<a .*fixtures/doc\.html#section_a".*<\/a>}ms
+    refute content =~ %r{<a .*fixtures/doc\.html#section__b".*Section &amp;&amp; B.*<\/a>}ms
+    assert content =~ %r{<li>.*fixtures/miscdir/x\.html".*fixtures/miscdir/x<\/a>.*<\/li>}ms
   end
  
   test "guide contains right title and ids" do
     HTMLFormatter.run(get_modules, doc_config)
 
-    content = File.read!("#{output_dir}/guide/doc.html")
+    content = File.read!("#{output_dir}/fixtures/doc.html")
     assert content =~ %r{<title>For the guide</title>}ms
     assert content =~ %r{<h2 id="section_a">Section A</h2>}ms
     assert content =~ %r{<h2 id="section__b">Section &amp;&amp; B</h2>}ms
