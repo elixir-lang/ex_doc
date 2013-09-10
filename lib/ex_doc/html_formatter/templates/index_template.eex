@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -10,3 +9,13 @@
   <frame name="main" src="<%= config.main %>.html" />
 </frameset>
 </html>
+<!--
+(Do not edit this block unless you know what you're doing, ex_doc's project
+summary generator depends on it being in a particular format.)
+
+EX_DOC_SUMMARY_START
+name: <%= config.project %>
+version: <%= config.version %>
+description: <%= config.description || "" %>
+EX_DOC_SUMMARY_END
+-->
