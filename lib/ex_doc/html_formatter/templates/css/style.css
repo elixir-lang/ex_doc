@@ -55,6 +55,11 @@ a:hover { color: #27c; }
   margin-top: 15px; padding-top: 0;
 }
 
+/* Projects table */
+table.projects tr:nth-child(odd) { background: #f0f0f0; }
+table.projects tr:nth-child(even) { background: #fafafa; }
+table.projects tr td { padding: 0.5em }
+
 /* Summary */
 ul.summary {
   list-style: none;

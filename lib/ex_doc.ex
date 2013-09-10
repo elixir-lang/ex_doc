@@ -20,6 +20,14 @@ defmodule ExDoc do
     config.formatter.run(docs, config)
   end
 
+  @doc """
+  Generates the master project index.
+  """
+  def generate_project_index(opts) do
+    config  = Config[].update(opts)
+    config.formatter.generate_project_index(config.output)
+  end
+
   # Helpers
 
   defp normalize_options(options) do

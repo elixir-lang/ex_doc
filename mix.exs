@@ -12,6 +12,7 @@ defmodule ExDoc.Mixfile do
   def project do
     [ app: :ex_doc,
       version: "0.1.0",
+      description: "The ExDoc documentation generator",
       elixir: "~> 0.10.2-dev",
       compilers: [:sundown, :elixir, :app],
       source_url: "https://github.com/elixir-lang/ex_doc/"

@@ -24,6 +24,20 @@ defmodule ExDoc.HTMLFormatter do
     end
   end
 
+  @doc """
+  Generates the project index in `output`.
+  """
+  def generate_project_index(output) do
+    output = Path.expand(output)
+    File.mkdir_p output
+
+    generate_assets(output, nil) # Doesn't use config arg actually, so nil is safe
+    
+    projects = scan_projects(output)
+    content = Templates.project_index_template(projects)
+    File.write("#{output}/index.html", content)
+  end
+
   defp generate_index(output, config) do
     content = Templates.index_template(config)
     File.write("#{output}/index.html", content)
@@ -87,5 +101,43 @@ defmodule ExDoc.HTMLFormatter do
 
   defp templates_path(other) do
     Path.expand("html_formatter/templates/#{other}", __DIR__)
+  end
+
+  defp scan_projects(output) do
+    Path.wildcard(Path.join(output, "**/index.html"))
+    |> Stream.map(&extract_summary(&1, output))
+    |> Stream.reject(&(&1 == nil))
+    |> Enum.sort(fn (a, b) -> 
+        # The order of fields in Mix.Schema is just so that comparison
+        # works.
+        { String.downcase(a[:name]), Mix.Version.parse(a[:version]) } < 
+        { String.downcase(b[:name]), Mix.Version.parse(b[:version]) }
+       end)
+  end
+
+  defp extract_summary(path, output) do
+    case File.read(path) do
+      { :error, _ }     -> nil
+      { :ok, contents } ->
+        summary =
+          String.split(contents, %r/\r?\n/)
+          |> Stream.drop_while(&!String.starts_with?(&1, "EX_DOC_SUMMARY_START"))
+          |> Stream.drop(1)
+          |> Stream.take_while(&!String.starts_with?(&1, "EX_DOC_SUMMARY_END"))
+          |> Stream.map(&summary_line_to_tup/1)
+          |> Enum.reject(&(&1 == nil))
+        cond do
+          summary[:name]    == nil -> nil
+          summary[:version] == nil -> nil
+          true                     -> [path: Path.relative_to(path, output)] ++ summary
+        end
+    end
+  end
+
+  defp summary_line_to_tup(line) do
+    case String.split(line, ":", global: false) do
+      [key, value] -> { binary_to_atom(String.strip(key)), String.strip(value) }
+      _            -> nil
+    end
   end
 end

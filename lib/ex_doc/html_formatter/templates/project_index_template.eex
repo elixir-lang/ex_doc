@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Elixir Project Documentation Index</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+  </head>
+
+  <body>
+    <div id="content">
+      <h1>Elixir Project Documentation Index</h1>
+      <table class="projects">
+      <%= lc project inlist projects do %>
+        <tr>
+          <td class="project_name">
+            <a href="<%= Enum.join(Path.split(project[:path]), "/") %>"><%= project[:name] %></a>
+          </td>
+          <td class="project_version"><%= project[:version] %></td>
+          <td class="project_description"><%= project[:description] %></td>
+        </tr>
+      <% end %>
+      </table>
+  </body>
+</html>
