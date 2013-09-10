@@ -17,7 +17,8 @@ defmodule Mix.Tasks.Docs do
   The task uses the project's `:name` key if defined, otherwise it will use the
   `:app` key as a substitute.
 
-  It also uses the `:version` key and `:source_url` from the project's configuration.
+  It also uses the `:version`, `:source_url` and `:description` key from the
+  project's configuration.
 
   The following options should be put under the `:docs` key in your project's
   main configuration.
@@ -55,6 +56,9 @@ defmodule Mix.Tasks.Docs do
     project = (Mix.project[:name] || Mix.project[:app]) |> to_string
     version = Mix.project[:version] || "dev"
     options = Mix.project[:docs] || []
+    if Mix.project[:description] do
+      options = Keyword.put(options, :description, Mix.project[:description])
+    end
 
     cond do
       nil?(options[:main]) ->

@@ -60,6 +60,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
 
   templates = [
     index_template: [:config],
+    project_index_template: [:projects],
     list_template: [:scope, :nodes, :config, :has_readme],
     module_template: [:module, :types, :functions, :macros, :callbacks],
     list_item_template: [:node],
