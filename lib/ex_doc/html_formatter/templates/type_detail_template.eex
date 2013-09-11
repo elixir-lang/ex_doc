@@ -2,4 +2,7 @@
   <p class="typespec" id="t:<%=h node.id %>">
     <%= node.spec %>
   </p>
+  <%= if node.doc do %>
+      <div class="typespec_doc"><%= node.doc %></div>
+  <% end %>
 </div>

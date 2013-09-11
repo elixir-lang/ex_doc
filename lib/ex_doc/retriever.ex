@@ -4,7 +4,7 @@ defrecord ExDoc.ModuleNode, id: nil, module: nil, moduledoc: nil,
 defrecord ExDoc.FunctionNode, id: nil, name: nil, arity: 0,
   doc: [], source: nil, type: nil, signature: nil, specs: []
 
-defrecord ExDoc.TypeNode, id: nil, name: nil, arity: 0, type: nil, spec: nil
+defrecord ExDoc.TypeNode, id: nil, name: nil, arity: 0, type: nil, spec: nil, doc: nil
 
 defmodule ExDoc.Retriever do
   @moduledoc """
@@ -184,11 +184,13 @@ defmodule ExDoc.Retriever do
 
   defp get_types(module) do
     all = Kernel.Typespec.beam_types(module)
+    docs = Kernel.Typespec.beam_typedocs(module)
 
     lc { type, { name, _, args } = tuple } inlist all, type != :typep do
       spec  = process_type_ast(Kernel.Typespec.type_to_ast(tuple), type)
       arity = length(args)
-      ExDoc.TypeNode[id: "#{name}/#{arity}", name: name, arity: arity, type: type, spec: spec]
+      doc   = docs[{ name, arity }]
+      ExDoc.TypeNode[id: "#{name}/#{arity}", name: name, arity: arity, type: type, spec: spec, doc: doc]
     end
   end
 
