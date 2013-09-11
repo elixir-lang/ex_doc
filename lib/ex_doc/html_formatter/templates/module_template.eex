@@ -50,23 +50,23 @@
 
       <%= unless Enum.empty?(functions) do %>
         <h2 id="functions_summary">Functions summary</h2>
-        <ul class="summary">
+        <table class="summary">
           <%= lc node inlist functions, do: summary_template(node) %>
-        </ul>
+        </table>
       <% end %>
 
       <%= unless Enum.empty?(macros) do %>
         <h2 id="macros_summary">Macros summary</h2>
-        <ul class="summary">
+        <table class="summary">
           <%= lc node inlist macros, do: summary_template(node) %>
-        </ul>
+        </table>
       <% end %>
 
       <%= unless Enum.empty?(callbacks) do %>
         <h2 id="callbacks_summary">Callbacks summary</h2>
-        <ul class="summary">
+        <table class="summary">
           <%= lc node inlist callbacks, do: summary_template(node) %>
-        </ul>
+        </table>
       <% end %>
 
       <%= unless Enum.empty?(types) do %>
