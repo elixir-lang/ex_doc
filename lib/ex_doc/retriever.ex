@@ -35,7 +35,7 @@ defmodule ExDoc.Retriever do
   """
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
-      |> Enum.map(&get_module(&1, config)) 
+      |> Enum.map(&get_module(&1, config))
       |> Enum.filter(fn(x) -> x end)
       |> Enum.sort
   end
@@ -50,17 +50,26 @@ defmodule ExDoc.Retriever do
   # the module is not available or it was not compiled
   # with --docs flag), we raise an exception.
   defp get_module(module, config) do
-    module 
-      |> verify_module
-      |> generate_node(config)
-  end
-
-  defp verify_module(module) do
     unless Code.ensure_loaded?(module), do:
       raise(Error, message: "module #{inspect module} is not defined/available")
 
+    type = detect_type(module)
+
+    module
+    |> verify_module(type)
+    |> generate_node(type, config)
+  end
+
+  defp verify_module(module, type) do
     case module.__info__(:moduledoc) do
       { _, false } ->
+        nil
+      # TODO: Today the majorify of records are private structures.
+      # So we just add them to the documentation if they are
+      # explicitly documented. Once we support maps, the private
+      # records should be replaced by maps and we can remove this
+      # filtering.
+      { _, nil } when type in [:record] ->
         nil
       { _, _moduledoc } ->
         module
@@ -69,17 +78,15 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp generate_node(nil, _), do: nil
+  defp generate_node(nil, _, _), do: nil
 
-  defp generate_node(module, config) do
+  defp generate_node(module, type, config) do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
     specs = Kernel.Typespec.beam_specs(module)
-
-    type = detect_type(module)
-    docs = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
-                           &get_function(&1, source_path, source_url, specs)
+    docs  = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
+                            &get_function(&1, source_path, source_url, specs)
 
     if type == :behaviour do
       callbacks = Kernel.Typespec.beam_callbacks(module)
@@ -87,7 +94,8 @@ defmodule ExDoc.Retriever do
         &get_callback(&1, source_path, source_url, callbacks)) ++ docs
     end
 
-    {line, moduledoc} = module.__info__(:moduledoc)
+    { line, moduledoc } = module.__info__(:moduledoc)
+
     ExDoc.ModuleNode[
       id: inspect(module),
       module: module,

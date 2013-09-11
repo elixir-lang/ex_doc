@@ -89,6 +89,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   test "no arrows for modules without functions" do
     defmodule NoFunctionsModule do
+      @moduledoc "Hello"
     end
 
     [node] = ExDoc.Retriever.docs_from_modules([NoFunctionsModule], doc_config)
@@ -97,7 +98,9 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   end
 
   test "no arrows for records without functions" do
-    defrecord NoFunRecord, value: true
+    defrecord NoFunRecord, value: true do
+      @moduledoc "Hello"
+    end
 
     [node]  = ExDoc.Retriever.docs_from_modules([NoFunRecord], doc_config)
     content = Templates.list_item_template(node)
@@ -106,6 +109,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   test "arrows for records with functions" do
     defrecord FunRecord, value: true do
+      @moduledoc "Hello"
       def record_fun, do: true
     end
 

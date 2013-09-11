@@ -1,4 +1,4 @@
 defrecord CompiledRecord, [foo: nil, bar: "sample"] do
-  @moduledoc nil
+  @moduledoc "Hello"
 end
 defexception RandomError, message: "this is random!"
