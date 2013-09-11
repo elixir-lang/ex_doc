@@ -182,7 +182,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   test "module_page outputs summaries" do
     content = get_module_page([CompiledWithDocs])
-    assert content =~ %r{<span class="summary_signature">\s*<a href="#example_1/0">}
+    assert content =~ %r{<td class="summary_signature">\s*<a href="#example_1/0">}
   end
 
   ## BEHAVIOURS

@@ -50,6 +50,12 @@ defmodule ExDoc.HTMLFormatter.Templates do
     Macro.to_string { name, 0, args }
   end
 
+  # Get the first paragraph of the documentation of a node, if any.
+  defp synopsis(nil), do: nil
+  defp synopsis(doc) do
+    String.split(doc, %r/\n\s*\n/) |> hd
+  end
+
   defp presence([]),    do: nil
   defp presence(other), do: other
 
@@ -61,8 +67,10 @@ defmodule ExDoc.HTMLFormatter.Templates do
   templates = [
     index_template: [:config],
     list_template: [:scope, :nodes, :config, :has_readme],
+    overview_template: [:config, :modules, :records, :protocols],
     module_template: [:module, :types, :functions, :macros, :callbacks],
     list_item_template: [:node],
+    overview_entry_template: [:node],
     summary_template: [:node],
     detail_template: [:node, :_module],
     type_detail_template: [:node, :_module],

@@ -23,6 +23,9 @@
         <a href="README.html">README</a>
       </h2>
       <% end %>
+      <h2 id="overview">
+        <a href="overview.html">Overview</a>
+      </h2>
       <div id="nav">
         <span class="<%= if(scope == :modules, do: "selected") %>"><a target="_self" href="modules_list.html">
           Modules
