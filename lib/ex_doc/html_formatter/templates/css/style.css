@@ -33,10 +33,21 @@ div.docstring, p.docstring { margin-right: 6em; }
   background: #fffde8;
 }
 
-p.signature {
-  font-size: 1.1em; font-weight: normal; font-family: Monaco, Consolas, Courier, monospace;
-  padding: 6px 10px; margin-top: 18px;
+div.detail_header {
   background: #e5e8ff; border: 1px solid #d8d8e5; -moz-border-radius: 3px; -webkit-border-radius: 3px;
+  padding: 6px 10px; margin-top: 18px;
+}
+
+span.signature {
+  font-size: 1.1em; font-weight: normal; font-family: Monaco, Consolas, Courier, monospace;
+}
+
+span.detail_header_links {
+  float: right;
+}
+
+span.detail_type {
+  font-size: 0.9em; font-style: italic;
 }
 
 ul.spec {

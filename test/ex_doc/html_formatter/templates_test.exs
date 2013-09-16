@@ -155,9 +155,12 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ %r/example\/2.*Some example/ms
     assert content =~ %r/example_without_docs\/0.*<div class="docstring">.*<\/div>/ms
     assert content =~ %r/example_1\/0.*Another example/ms
-    assert content =~ %r{<p class="signature" id="example_1/0">}
+    assert content =~ %r{<div class="detail_header" id="example_1/0">}
     assert content =~ %r{<strong>example\(foo, bar // Baz\)</strong>}
     assert content =~ %r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
+    assert content =~ %r{<span class="detail_type">\(function\)</span>}
+    assert content =~ %r{<a href="#example/2" title="Link to this function">#</a>}
+    assert content =~ %r{<a href="#content" title="To the top of the page">&uarr;</a>}
   end
   
   test "module_page outputs the types and function specs" do
@@ -196,7 +199,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
     assert content =~ %r{<h1>\s*CustomBehaviour\s*<small>behaviour</small>\s*<\/h1>}m
     assert content =~ %r{Callbacks}
-    assert content =~ %r{<p class="signature" id="hello/1">}
+    assert content =~ %r{<div class="detail_header" id="hello/1">}
   end
 
   ## RECORDS

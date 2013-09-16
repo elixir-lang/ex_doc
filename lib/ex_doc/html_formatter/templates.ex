@@ -50,6 +50,15 @@ defmodule ExDoc.HTMLFormatter.Templates do
     Macro.to_string { name, 0, args }
   end
 
+  # Get the pretty name of a function node
+  defp pretty_type(ExDoc.FunctionNode[type: t]) do
+    case t do
+      :def          -> "function"
+      :defmacro     -> "macro"
+      :defcallback  -> "callback"
+    end
+  end
+
   # Get the first paragraph of the documentation of a node, if any.
   defp synopsis(nil), do: nil
   defp synopsis(doc) do
