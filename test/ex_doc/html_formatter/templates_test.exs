@@ -135,7 +135,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     content = Templates.list_item_template(node)
     assert content =~ %r/<a class="toggle">/
   end
-
+  
   ## MODULES
 
   test "module_page generates only the module name when there's no more info" do

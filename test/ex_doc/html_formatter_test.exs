@@ -65,4 +65,14 @@ defmodule ExDoc.HTMLFormatterTest do
     content = File.read!("#{output_dir}/protocols_list.html")
     assert content =~ %r{<li>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}ms
   end
+  
+  test "run generates the overview file" do
+    HTMLFormatter.run(get_modules, doc_config)
+
+    assert File.regular?("#{output_dir}/overview.html")
+    content = File.read!("#{output_dir}/overview.html")
+    assert content =~ %r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
+    assert content =~ %r{<p>moduledoc</p>}
+    assert content =~ %r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
+  end
 end
