@@ -9,19 +9,19 @@ defmodule ExDoc.HTMLFormatter.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(node) do
+  def module_page(node, state) do
     types     = node.typespecs
     functions = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :def], &1)
     macros    = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defmacro], &1)
     callbacks = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defcallback], &1)
-    module_template(node, types, functions, macros, callbacks)
+    module_template(state, node, types, functions, macros, callbacks)
   end
 
   @doc """
   Generates the listing.
   """
-  def list_page(scope, nodes, config, has_readme) do
-    list_template(scope, nodes, config, has_readme)
+  def list_page(scope, nodes, state, has_readme) do
+    list_template(scope, nodes, state, has_readme)
   end
 
   # Get fields for records an exceptions, removing any field
@@ -44,6 +44,28 @@ defmodule ExDoc.HTMLFormatter.Templates do
   # Convert markdown to HTML.
   defp to_html(nil), do: nil
   defp to_html(bin) when is_binary(bin), do: Markdown.to_html(bin)
+
+  # Get the breadcrumbs HTML.
+  #
+  # If module is :overview generates the breadcrumbs for the overview.
+  defp breadcrumbs(state, module) do
+    root = "#{state.config.project} v#{state.config.version}"
+    parts = [{root, nil}, {"API reference", "overview.html"}]
+    module_aliases = if module == :overview, do: [], else: Module.split(module.module)
+    { modparts, _ } =
+      Enum.reduce(module_aliases, { [], [] }, fn item, { l, parents } ->
+        path = parents ++ [ item ]
+        mod = Module.concat(path)
+        if mod in state.modules do
+          { [{ item, inspect(mod) <> ".html" } | l], path }
+        else
+          { [{ item, nil } | l], path }
+        end
+      end)
+    Enum.map_join(parts ++ Enum.reverse(modparts), " &rarr; ", fn { name, ref } ->
+      if ref, do: "<a href=\"#{h(ref)}\">#{h(name)}</a>", else: h(name)
+    end)
+  end
 
   # Get the full signature from a function
   defp signature(ExDoc.FunctionNode[name: name, signature: args]) do
@@ -74,10 +96,10 @@ defmodule ExDoc.HTMLFormatter.Templates do
   end
 
   templates = [
-    index_template: [:config],
-    list_template: [:scope, :nodes, :config, :has_readme],
-    overview_template: [:config, :modules, :records, :protocols],
-    module_template: [:module, :types, :functions, :macros, :callbacks],
+    index_template: [:state],
+    list_template: [:scope, :nodes, :state, :has_readme],
+    overview_template: [:state, :modules, :records, :protocols],
+    module_template: [:state, :module, :types, :functions, :macros, :callbacks],
     list_item_template: [:node],
     overview_entry_template: [:node],
     summary_template: [:node],

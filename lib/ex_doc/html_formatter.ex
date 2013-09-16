@@ -3,6 +3,8 @@ defmodule ExDoc.HTMLFormatter do
   Provide HTML-formatted documentation
   """
 
+  defrecord State, config: nil, modules: []
+
   alias ExDoc.HTMLFormatter.Templates
   alias ExDoc.HTMLFormatter.Autolink
 
@@ -10,30 +12,32 @@ defmodule ExDoc.HTMLFormatter do
   Generate HTML documentation for the given modules
   """
   def run(modules, config)  do
-    output = Path.expand(config.output)
+    state = State[config: config, modules: Enum.map(modules, &(&1.module))]
+
+    output = Path.expand(state.config.output)
     File.mkdir_p output
 
-    generate_index(output, config)
-    generate_assets(output, config)
-    has_readme = config.readme && generate_readme(output)
+    generate_index(output, state)
+    generate_assets(output, state)
+    has_readme = state.config.readme && generate_readme(output)
 
     modules = Autolink.all(modules)
     
-    generate_overview(modules, output, config)
+    generate_overview(modules, output, state)
 
     Enum.each [:modules, :records, :protocols], fn(mod_type) ->
-      generate_list(mod_type, modules, output, config, has_readme)
+      generate_list(mod_type, modules, output, state, has_readme)
     end
   end
 
-  defp generate_index(output, config) do
-    content = Templates.index_template(config)
+  defp generate_index(output, state) do
+    content = Templates.index_template(state)
     File.write("#{output}/index.html", content)
   end
   
-  defp generate_overview(modules, output, config) do
+  defp generate_overview(modules, output, state) do
     content = Templates.overview_template(
-      config,
+      state,
       filter_list(:modules, modules),
       filter_list(:records, modules),
       filter_list(:protocols, modules)
@@ -46,7 +50,7 @@ defmodule ExDoc.HTMLFormatter do
       { templates_path("js/*.js"), "js" } ]
   end
 
-  defp generate_assets(output, _config) do
+  defp generate_assets(output, _state) do
     Enum.each assets, fn({ pattern, dir }) ->
       output = "#{output}/#{dir}"
       File.mkdir output
@@ -88,15 +92,15 @@ defmodule ExDoc.HTMLFormatter do
     Enum.filter nodes, &match?(ExDoc.ModuleNode[type: x] when x in [:protocol], &1)
   end
 
-  defp generate_list(scope, all, output, config, has_readme) do
+  defp generate_list(scope, all, output, state, has_readme) do
     nodes = filter_list(scope, all)
-    Enum.each nodes, &generate_module_page(&1, output)
-    content = Templates.list_page(scope, nodes, config, has_readme)
+    Enum.each nodes, &generate_module_page(&1, output, state)
+    content = Templates.list_page(scope, nodes, state, has_readme)
     File.write("#{output}/#{scope}_list.html", content)
   end
 
-  defp generate_module_page(node, output) do
-    content = Templates.module_page(node)
+  defp generate_module_page(node, output, state) do
+    content = Templates.module_page(node, state)
     File.write("#{output}/#{node.id}.html", content)
   end
 

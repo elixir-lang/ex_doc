@@ -33,6 +33,10 @@ div.docstring, p.docstring { margin-right: 6em; }
   background: #fffde8;
 }
 
+div.breadcrumbs {
+  padding-bottom: 0.5em;
+}
+
 div.detail_header {
   background: #e5e8ff; border: 1px solid #d8d8e5; -moz-border-radius: 3px; -webkit-border-radius: 3px;
   padding: 6px 10px; margin-top: 18px;

@@ -18,8 +18,10 @@
     <script type="text/javascript" charset="utf-8">
       if (window.top.frames.main) document.body.className = 'frames';
     </script>
+
+    <div class="breadcrumbs"><%= breadcrumbs(state, :overview) %></div>
 	
-    <h1><%= config.project %> v<%= config.version %></h1>
+    <h1><%= state.config.project %> v<%= state.config.version %></h1>
 
     <div id="content">
       <%= unless Enum.empty?(modules) do %>

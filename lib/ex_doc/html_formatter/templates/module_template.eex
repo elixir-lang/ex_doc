@@ -20,6 +20,8 @@
     </script>
 
     <div id="content">
+      <div class="breadcrumbs"><%= breadcrumbs(state, module) %></div>
+
       <h1>
         <%= module.id %>
         <%= if module.type do %>
