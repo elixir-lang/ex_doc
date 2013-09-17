@@ -2,7 +2,6 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   use ExUnit.Case, async: true
 
   alias ExDoc.HTMLFormatter.Templates
-  alias ExDoc.HTMLFormatter.State
 
   defp source_url do
     "https://github.com/elixir-lang/elixir"
@@ -18,28 +17,23 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
                  homepage_url: homepage_url, source_url: source_url]
   end
 
-  defp doc_state do
-    # If the list of modules is required it has to be added manually.
-    State[config: doc_config, modules: []]
-  end
-
   defp get_module_page(names) do
     mods = names
            |> ExDoc.Retriever.docs_from_modules(doc_config)
            |> ExDoc.HTMLFormatter.Autolink.all()
-    Templates.module_page(hd(mods), State[config: doc_config, modules: names], mods)
+    Templates.module_page(hd(mods), doc_config, mods)
   end
 
   ## LISTING
 
   test "current listing page is marked as selected" do
-    content = Templates.list_template(:modules, [], doc_state, false)
+    content = Templates.list_template(:modules, [], doc_config, false)
     assert content =~ %r{<span class="selected"><a target="_self" href="modules_list.html">}
     assert content =~ %r{<span class=""><a target="_self" href="records_list.html">}
   end
 
   test "site title text links to homepage_url when set" do
-    content = Templates.list_template(:modules, [], doc_state, false)
+    content = Templates.list_template(:modules, [], doc_config, false)
     assert content =~ %r{<a href="#{homepage_url}" target="_blank">Elixir v1.0.1</a>}
   end
 
@@ -47,22 +41,21 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     doc_config_without_source_url = ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                  source_url: source_url,
                                                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
-    content = Templates.list_template(:modules, [], State[config: doc_config_without_source_url], false)
+    content = Templates.list_template(:modules, [], doc_config_without_source_url, false)
     assert content =~ %r{<a href="#{source_url}" target="_blank">Elixir v1.0.1</a>}
   end
 
   test "site title text links to / when there is no homepage_url or source_url" do
     doc_config_without_source_url = ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
-    content = Templates.list_template(:modules, [], State[config: doc_config_without_source_url], false)
+    content = Templates.list_template(:modules, [], doc_config_without_source_url, false)
     assert content =~ %r{<a href="/" target="_blank">Elixir v1.0.1</a>}
   end
 
   test "list_page outputs listing for the given nodes" do
     names = [CompiledWithDocs, CompiledWithDocs.Nested]
     nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
-    state = State[config: doc_config, modules: names]
-    content = Templates.list_template(:modules, nodes, state, false)
+    content = Templates.list_template(:modules, nodes, doc_config, false)
 
     assert content =~ %r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
     assert content =~ %r{<li>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms
@@ -72,12 +65,12 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   end
 
   test "listing page has README link if present" do
-    content = Templates.list_template(:modules, [], doc_state, true)
+    content = Templates.list_template(:modules, [], doc_config, true)
     assert content =~ %r{<a href="README.html">README</a>}
   end
 
   test "listing page doesn't have README link if not present" do
-    content = Templates.list_template(:modules, [], doc_state, false)
+    content = Templates.list_template(:modules, [], doc_config, false)
     refute content =~ %r{<a href="README.html">README</a>}
   end
 
@@ -146,7 +139,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   test "module_page generates only the module name when there's no more info" do
     node = ExDoc.ModuleNode.new module: XPTOModule, moduledoc: nil, id: "XPTOModule"
-    content = Templates.module_page(node, doc_state, [node])
+    content = Templates.module_page(node, doc_config, [node])
 
     assert content =~ %r/<title>XPTOModule<\/title>/
     assert content =~ %r/<h1>\s*XPTOModule\s*<\/h1>/
@@ -211,7 +204,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     names = [CompiledWithDocs, CompiledWithDocs.Nested]
     mods = ExDoc.Retriever.docs_from_modules(names, doc_config)
            |> ExDoc.HTMLFormatter.Autolink.all()
-    content = Templates.module_page(Enum.at(mods, 1), State[config: doc_config, modules: names], mods)
+    content = Templates.module_page(Enum.at(mods, 1), doc_config, mods)
     assert content =~ %r{CompiledWithDocs</a> &rarr; <a href="CompiledWithDocs.Nested.html">Nested</a>}
   end
 
@@ -221,7 +214,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   end
   
   test "module_page contains links to summary sections when those exist" do
-    content = get_module_page([CompiledWithDocs])
+    content = get_module_page([CompiledWithDocs, CompiledWithDocs.Nested])
     assert content =~ %r{<a href="#functions_summary">Functions</a>}
     assert content =~ %r{<a href="#macros_summary">Macros</a>}
     refute content =~ %r{protocol_summary}

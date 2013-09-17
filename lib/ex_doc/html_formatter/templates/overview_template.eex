@@ -20,9 +20,9 @@
     </script>
 
     <div id="content">
-      <div class="breadcrumbs"><%= breadcrumbs(state, :overview) %></div>
+      <div class="breadcrumbs"><%= breadcrumbs([], config, :overview) %></div>
     
-      <h1><%= state.config.project %> v<%= state.config.version %></h1>
+      <h1><%= config.project %> v<%= config.version %></h1>
 
       <ul class="summary_links">
         <%= unless Enum.empty?(modules) do %>

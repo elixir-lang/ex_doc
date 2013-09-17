@@ -20,7 +20,15 @@
     </script>
 
     <div id="content">
-      <div class="breadcrumbs"><%= breadcrumbs(state, module) %></div>
+      <div class="breadcrumbs"><%= breadcrumbs(modules ++ records ++ protocols, config, module) %></div>
+      
+      <%
+          # These were unfiltered so that the call to breadcrumbs would work.
+          # Filter them now.
+          modules = modules_below(module, modules)
+          records = modules_below(module, records)
+          protocols = modules_below(module, protocols)
+      %>
 
       <h1>
         <%= module.id %>
@@ -99,7 +107,7 @@
           <%= lc node inlist callbacks, do: summary_template(node) %>
         </table>
       <% end %>
-    
+   
       <%= overview_summaries(modules, records, protocols) %>
 
       <%= unless Enum.empty?(types) do %>

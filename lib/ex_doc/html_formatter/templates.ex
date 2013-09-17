@@ -9,21 +9,21 @@ defmodule ExDoc.HTMLFormatter.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(node, state, modules) do
+  def module_page(node, config, modules) do
     types       = node.typespecs
     functions   = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :def], &1)
     macros      = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defmacro], &1)
     callbacks   = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defcallback], &1)
     cat_modules = ExDoc.HTMLFormatter.categorize_modules(modules)
-    module_template(state, node, types, functions, macros, callbacks,
+    module_template(config, node, types, functions, macros, callbacks,
                     cat_modules[:modules], cat_modules[:records], cat_modules[:protocols])
   end
 
   @doc """
   Generates the listing.
   """
-  def list_page(scope, nodes, state, has_readme) do
-    list_template(scope, nodes, state, has_readme)
+  def list_page(scope, nodes, config, has_readme) do
+    list_template(scope, nodes, config, has_readme)
   end
 
   # Get fields for records an exceptions, removing any field
@@ -50,15 +50,16 @@ defmodule ExDoc.HTMLFormatter.Templates do
   # Get the breadcrumbs HTML.
   #
   # If module is :overview generates the breadcrumbs for the overview.
-  defp breadcrumbs(state, module) do
-    root = "#{state.config.project} v#{state.config.version}"
+  defp breadcrumbs(modules, config, module) do
+    root = "#{config.project} v#{config.version}"
     parts = [{root, nil}, {"API reference", "overview.html"}]
     module_aliases = if module == :overview, do: [], else: Module.split(module.module)
+    module_atoms = Enum.map(modules, &(&1.module))
     { modparts, _ } =
       Enum.reduce(module_aliases, { [], [] }, fn item, { l, parents } ->
         path = parents ++ [ item ]
         mod = Module.concat(path)
-        if mod in state.modules do
+        if mod in module_atoms do
           { [{ item, inspect(mod) <> ".html" } | l], path }
         else
           { [{ item, nil } | l], path }
@@ -93,6 +94,15 @@ defmodule ExDoc.HTMLFormatter.Templates do
   defp to_top_link() do
     "<a class=\"to_top_link\" href=\"#content\" title=\"To the top of the page\">&uarr;</a>"
   end
+  
+  defp modules_below(parent, all) do
+    parent_parts = Module.split(parent.module)
+    Enum.filter(all, fn ExDoc.ModuleNode[module: mod] ->
+      parts = Module.split(mod)
+      length(parts) > length(parent_parts) && 
+        Enum.take(parts, length(parent_parts)) == parent_parts
+    end)
+  end
 
   defp presence([]),    do: nil
   defp presence(other), do: other
@@ -103,10 +113,10 @@ defmodule ExDoc.HTMLFormatter.Templates do
   end
 
   templates = [
-    index_template: [:state],
-    list_template: [:scope, :nodes, :state, :has_readme],
-    overview_template: [:state, :modules, :records, :protocols],
-    module_template: [:state, :module, :types, :functions, :macros, :callbacks, :modules, :records, :protocols],
+    index_template: [:config],
+    list_template: [:scope, :nodes, :config, :has_readme],
+    overview_template: [:config, :modules, :records, :protocols],
+    module_template: [:config, :module, :types, :functions, :macros, :callbacks, :modules, :records, :protocols],
     list_item_template: [:node],
     overview_summaries: [:modules, :records, :protocols],
     overview_entry_template: [:node],
