@@ -9,12 +9,14 @@ defmodule ExDoc.HTMLFormatter.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(node, state) do
-    types     = node.typespecs
-    functions = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :def], &1)
-    macros    = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defmacro], &1)
-    callbacks = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defcallback], &1)
-    module_template(state, node, types, functions, macros, callbacks)
+  def module_page(node, state, modules) do
+    types       = node.typespecs
+    functions   = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :def], &1)
+    macros      = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defmacro], &1)
+    callbacks   = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defcallback], &1)
+    cat_modules = ExDoc.HTMLFormatter.categorize_modules(modules)
+    module_template(state, node, types, functions, macros, callbacks,
+                    cat_modules[:modules], cat_modules[:records], cat_modules[:protocols])
   end
 
   @doc """
@@ -87,6 +89,11 @@ defmodule ExDoc.HTMLFormatter.Templates do
     String.split(doc, %r/\n\s*\n/) |> hd
   end
 
+  # A bit of standard HTML to insert the to-top arrow.
+  defp to_top_link() do
+    "<a class=\"to_top_link\" href=\"#content\" title=\"To the top of the page\">&uarr;</a>"
+  end
+
   defp presence([]),    do: nil
   defp presence(other), do: other
 
@@ -99,8 +106,9 @@ defmodule ExDoc.HTMLFormatter.Templates do
     index_template: [:state],
     list_template: [:scope, :nodes, :state, :has_readme],
     overview_template: [:state, :modules, :records, :protocols],
-    module_template: [:state, :module, :types, :functions, :macros, :callbacks],
+    module_template: [:state, :module, :types, :functions, :macros, :callbacks, :modules, :records, :protocols],
     list_item_template: [:node],
+    overview_summaries: [:modules, :records, :protocols],
     overview_entry_template: [:node],
     summary_template: [:node],
     detail_template: [:node, :_module],

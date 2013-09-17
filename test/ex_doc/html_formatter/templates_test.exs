@@ -24,11 +24,10 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   end
 
   defp get_module_page(names) do
-    names
-    |> ExDoc.Retriever.docs_from_modules(doc_config)
-    |> ExDoc.HTMLFormatter.Autolink.all()
-    |> hd()
-    |> Templates.module_page(State[config: doc_config, modules: names])
+    mods = names
+           |> ExDoc.Retriever.docs_from_modules(doc_config)
+           |> ExDoc.HTMLFormatter.Autolink.all()
+    Templates.module_page(hd(mods), State[config: doc_config, modules: names], mods)
   end
 
   ## LISTING
@@ -147,7 +146,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   test "module_page generates only the module name when there's no more info" do
     node = ExDoc.ModuleNode.new module: XPTOModule, moduledoc: nil, id: "XPTOModule"
-    content = Templates.module_page(node, doc_state)
+    content = Templates.module_page(node, doc_state, [node])
 
     assert content =~ %r/<title>XPTOModule<\/title>/
     assert content =~ %r/<h1>\s*XPTOModule\s*<\/h1>/
@@ -167,7 +166,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ %r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
     assert content =~ %r{<span class="detail_type">\(function\)</span>}
     assert content =~ %r{<a href="#example/2" title="Link to this function">#</a>}
-    assert content =~ %r{<a href="#content" title="To the top of the page">&uarr;</a>}
+    assert content =~ %r{<a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>}
   end
   
   test "module_page outputs the types and function specs" do
@@ -199,22 +198,37 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ %r{<td class="summary_signature">\s*<a href="#example_1/0">}
   end
   
+  test "module_page outputs module summaries for nested modules" do
+    content = get_module_page([CompiledWithDocs, CompiledWithDocs.Nested])
+    assert content =~ %r{<td class="summary_signature">\s*<a href="CompiledWithDocs.Nested.html">}
+  end
+  
   test "module_page contains breadcrumbs" do
     content = get_module_page([CompiledWithDocs])
     assert content =~ %r{<div class="breadcrumbs">}
     assert content =~ %r{Elixir v1.0.1 &rarr; <a href="overview.html">API reference</a>}
     assert content =~ %r{reference</a> &rarr; <a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     names = [CompiledWithDocs, CompiledWithDocs.Nested]
-    content = ExDoc.Retriever.docs_from_modules(names, doc_config)
-              |> ExDoc.HTMLFormatter.Autolink.all()
-              |> Enum.at(1) 
-              |> Templates.module_page(State[config: doc_config, modules: names])
+    mods = ExDoc.Retriever.docs_from_modules(names, doc_config)
+           |> ExDoc.HTMLFormatter.Autolink.all()
+    content = Templates.module_page(Enum.at(mods, 1), State[config: doc_config, modules: names], mods)
     assert content =~ %r{CompiledWithDocs</a> &rarr; <a href="CompiledWithDocs.Nested.html">Nested</a>}
   end
 
   test "module_page breadcrumbs do not link to non-existent pages" do
     content = get_module_page([UndefParent.Nested])
     assert content =~ %r{&rarr; UndefParent &rarr; <a href="UndefParent.Nested.html">Nested</a>}
+  end
+  
+  test "module_page contains links to summary sections when those exist" do
+    content = get_module_page([CompiledWithDocs])
+    assert content =~ %r{<a href="#functions_summary">Functions</a>}
+    assert content =~ %r{<a href="#macros_summary">Macros</a>}
+    refute content =~ %r{protocol_summary}
+    assert content =~ %r{<a href="#modules_summary">Modules</a>}
+    refute content =~ %r{records_summary}
+    refute content =~ %r{protocols_summary}
+    refute content =~ %r{types_details}
   end
 
   ## BEHAVIOURS

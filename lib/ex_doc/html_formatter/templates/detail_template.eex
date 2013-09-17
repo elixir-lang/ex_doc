@@ -4,7 +4,7 @@
     <span class="detail_header_links">
       <span class="detail_type">(<%= pretty_type(node) %>)</span>&nbsp;
       <a href="#<%=h node.id%>" title="Link to this <%= pretty_type(node) %>">#</a>
-      <a href="#content" title="To the top of the page">&uarr;</a>
+      <%= to_top_link() %>
     </span>
   </div>
   <%= if specs = get_specs(node) do %>

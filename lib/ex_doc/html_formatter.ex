@@ -80,6 +80,16 @@ defmodule ExDoc.HTMLFormatter do
     false
   end
 
+  @doc false
+  # Helper to split modules into different categories.
+  #
+  # Public so that code in Template can use it.
+  def categorize_modules(nodes) do
+    [modules: filter_list(:modules, nodes),
+     records: filter_list(:records, nodes),
+     protocols: filter_list(:protocols, nodes)]
+  end
+
   defp filter_list(:records, nodes) do
     Enum.filter nodes, &match?(ExDoc.ModuleNode[type: x] when x in [:record, :exception], &1)
   end
@@ -94,14 +104,24 @@ defmodule ExDoc.HTMLFormatter do
 
   defp generate_list(scope, all, output, state, has_readme) do
     nodes = filter_list(scope, all)
-    Enum.each nodes, &generate_module_page(&1, output, state)
+    Enum.each nodes, &generate_module_page(&1, all, output, state)
     content = Templates.list_page(scope, nodes, state, has_readme)
     File.write("#{output}/#{scope}_list.html", content)
   end
 
-  defp generate_module_page(node, output, state) do
-    content = Templates.module_page(node, state)
+  defp generate_module_page(node, modules, output, state) do
+    modules = modules_below(node.module, modules)
+    content = Templates.module_page(node, state, modules)
     File.write("#{output}/#{node.id}.html", content)
+  end
+
+  defp modules_below(parent, all) do
+    parent_parts = Module.split(parent)
+    Enum.filter(all, fn ExDoc.ModuleNode[module: mod] ->
+      parts = Module.split(mod)
+      length(parts) > length(parent_parts) && 
+        Enum.take(parts, length(parent_parts)) == parent_parts
+    end)
   end
 
   defp templates_path(other) do

@@ -22,6 +22,20 @@ h2 {
 li.r1 { background: #f0f0f0; }
 li.r2 { background: #fafafa; }
 
+ul.summary_links {
+  margin: 0em;
+  margin-bottom: 1em;
+  padding: 0em;
+}
+
+ul.summary_links li {
+  display: inline-block;
+  list-style-type: none;
+  text-align: center;
+  width: 7em;
+  background: #f0f0f0;
+}
+
 div.docstring, p.docstring { margin-right: 6em; }
 .docstring h1, .docstring h2, .docstring h3, .docstring h4 { padding: 0; border: 0; border-bottom: 0; }
 .docstring h1 { font-size: 1.2em; }
@@ -52,6 +66,10 @@ span.detail_header_links {
 
 span.detail_type {
   font-size: 0.9em; font-style: italic;
+}
+
+a.to_top_link {
+  float: right; padding-left: 0.3em; font-size: 1em; font-weight: normal;
 }
 
 ul.spec {
