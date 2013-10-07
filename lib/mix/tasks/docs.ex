@@ -56,6 +56,10 @@ defmodule Mix.Tasks.Docs do
     version = Mix.project[:version] || "dev"
     options = Mix.project[:docs] || []
 
+    if source_url = Mix.project[:source_url] do
+      options = Keyword.put(options, :source_url, source_url)
+    end
+
     cond do
       nil?(options[:main]) ->
         # Try generating main module's name from the app name
