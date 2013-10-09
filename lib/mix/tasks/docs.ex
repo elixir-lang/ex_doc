@@ -66,7 +66,7 @@ defmodule Mix.Tasks.Docs do
         options = Keyword.put(options, :main, (Mix.project[:app] |> atom_to_binary |> Mix.Utils.camelize))
 
       is_atom(options[:main]) ->
-        options = Keyword.update(options, :main, &Module.to_binary(&1))
+        options = Keyword.update!(options, :main, &inspect/1)
     end
 
     if formatter = options[:formatter] do
