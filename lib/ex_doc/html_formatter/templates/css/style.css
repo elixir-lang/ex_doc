@@ -27,10 +27,11 @@ div.docstring, p.docstring { margin-right: 6em; }
 .docstring h1 { font-size: 1.2em; }
 .docstring h2 { font-size: 1.1em; }
 .docstring h3, .docstring h4 { font-size: 1em; padding-top: 10px; }
-.docstring pre, .codeblock {
+.docstring pre, .codeblock, .elixir {
   padding: 0.5em;
   border: #ffe0bb dotted 1px;
   background: #fffde8;
+  display: block;
 }
 
 p.signature {
