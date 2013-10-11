@@ -10,7 +10,6 @@ defmodule Mix.Tasks.Docs do
   ## Command line options
 
   * `--output`, `-o` - output directory for the generated docs; default: `"docs"`
-  * `--readme`       - generate a project README doc from a README.md file; default: `false`
 
   ## Configuration
 
@@ -27,7 +26,7 @@ defmodule Mix.Tasks.Docs do
     May be overriden by command line argument.
 
   * `:readme` - boolean indicating whether a project README should be created
-    from a README.md; default: `false`
+    from a README.md; default: `false`.
 
   * `:formatter` - doc formatter to use; default: ExDoc.HTMLFormatter.
 
@@ -37,34 +36,34 @@ defmodule Mix.Tasks.Docs do
     Derived from project's `:source_url` if not present.
 
   * `:source_ref` - the branch/commit/tag used for source link inference.
-    Ignored if `:source_url_pattern` is provided. Defaults to _master_.
+    Ignored if `:source_url_pattern` is provided; default: master.
 
-  * `:main` - main module of the project, will be shown on the starting page.
-    Derived from project's `:app` if not present.
-
+  * `:main` - main page of the documentation. It may be a module or a
+    generated page, like "overview" or "README";
   """
 
-  def run(args) do
+  @doc false
+  def run(args, config // Mix.project, generator // &ExDoc.generate_docs/3) do
     Mix.Task.run "compile"
 
-    { cli_opts, args, _ } = OptionParser.parse(args, aliases: [o: :output])
+    { cli_opts, args, _ } = OptionParser.parse(args, aliases: [o: :output], switches: [output: :string])
 
     if args != [] do
       raise Mix.Error, message: "Extraneous arguments on the command line"
     end
 
-    project = (Mix.project[:name] || Mix.project[:app]) |> to_string
-    version = Mix.project[:version] || "dev"
-    options = get_options()
+    project = (config[:name] || config[:app]) |> to_string
+    version = config[:version] || "dev"
+    options = Keyword.merge(get_docs_opts(config), cli_opts)
 
-    if source_url = Mix.project[:source_url] do
+    if source_url = config[:source_url] do
       options = Keyword.put(options, :source_url, source_url)
     end
 
     cond do
       nil?(options[:main]) ->
         # Try generating main module's name from the app name
-        options = Keyword.put(options, :main, (Mix.project[:app] |> atom_to_binary |> Mix.Utils.camelize))
+        options = Keyword.put(options, :main, (config[:app] |> atom_to_binary |> Mix.Utils.camelize))
 
       is_atom(options[:main]) ->
         options = Keyword.update!(options, :main, &inspect/1)
@@ -77,24 +76,19 @@ defmodule Mix.Tasks.Docs do
       options = Keyword.put(options, :formatter, String.split(formatter, "."))
     end
 
-    # Merge command-line and project options
-    options = Enum.reduce cli_opts, options, fn(opt, acc) ->
-      case opt do
-        { :output, arg } -> Keyword.put(acc, :output, arg)
-        { :readme, arg } when is_boolean(arg) -> Keyword.put(acc, :readme, arg)
-        { opt, _ } -> raise Mix.Error, message: "Unrecognized option: #{to_string opt}"
-      end
-    end
+    res = generator.(project, version, options)
+    log(options)
+    res
+  end
 
-    ExDoc.generate_docs(project, version, options)
-
+  defp log(options) do
     index = Path.join(options[:output] || "docs", "index.html")
     Mix.shell.info "%{green}Docs successfully generated."
     Mix.shell.info "%{green}Open #{index} in your browser to read them."
   end
 
-  defp get_options do
-    docs = Mix.project[:docs]
+  defp get_docs_opts(config) do
+    docs = config[:docs]
     cond do
       is_function(docs, 0) -> docs.()
       nil?(docs) -> []
