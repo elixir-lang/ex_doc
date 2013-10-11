@@ -30,8 +30,7 @@ SUNDOWN_OBJS=\
 	sundown/src/markdown.o
 
 NIF_SRC=\
-	src/markdown_nif.c\
-	src/render_ansi.c
+	src/markdown_nif.c
 
 clean:
 	rm -f sundown/src/*.o sundown/html/*.o src/*.o
