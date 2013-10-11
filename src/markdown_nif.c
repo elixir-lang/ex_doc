@@ -40,7 +40,8 @@ static ERL_NIF_TERM render_term(ErlNifEnv* env, int argc, const ERL_NIF_TERM arg
 
   output = bufnew(OUTPUT_SIZE);
 
-  markdown = sd_markdown_new(MKDEXT_AUTOLINK, 16, &data->callbacks, data->options);
+  unsigned int extensions = MKDEXT_AUTOLINK | MKDEXT_FENCED_CODE;
+  markdown = sd_markdown_new(extensions, 16, &data->callbacks, data->options);
   sd_markdown_render(output, input->data, input->size, markdown);
   sd_markdown_free(markdown);
 
@@ -57,7 +58,7 @@ extern void ansi_renderer(struct sd_callbacks *callbacks);
 
 static ERL_NIF_TERM to_ansi_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
   struct render_data data;
-  
+
   data.options = NULL;
   ansi_renderer(&data.callbacks);
 
@@ -67,7 +68,7 @@ static ERL_NIF_TERM to_ansi_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM arg
 static ERL_NIF_TERM to_markdown_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
   struct render_data data;
   struct html_renderopt options;
-  
+
   data.options = &options;
   sdhtml_renderer(&data.callbacks, data.options, 0);
 
