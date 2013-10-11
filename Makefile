@@ -34,13 +34,12 @@ NIF_SRC=\
 
 clean:
 	rm -f sundown/src/*.o sundown/html/*.o src/*.o
-	rm -f share/markdown.so
+	rm -f priv/markdown.so
 	rm -rf $(EBIN_DIR)
 	rm -rf test/tmp
 	@ echo
 
-
-share/markdown.so: sundown/libsundown.so ${NIF_SRC}
+priv/markdown.so: sundown/libsundown.so ${NIF_SRC}
 	$(CC) $(CFLAGS) $(ERLANG_FLAGS) -shared $(OPTIONS) -o $@ $(SUNDOWN_OBJS) $(NIF_SRC)
 
 .PHONY: clean

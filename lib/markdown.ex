@@ -2,8 +2,8 @@ defmodule Markdown do
   @on_load { :init, 0 }
 
   def init do
-    file = Path.expand('../../share/markdown', __FILE__)
-    :ok = :erlang.load_nif(String.to_char_list!(file), 1)
+    path = :filename.join(:code.priv_dir(:ex_doc), 'markdown')
+    :ok  = :erlang.load_nif(path, 1)
   end
 
   def to_html(_) do

@@ -2,7 +2,7 @@ defmodule Mix.Tasks.Compile.Sundown do
   @shortdoc "Compiles sundown that ships with ExDoc"
 
   def run(_) do
-    Mix.shell.info System.cmd("make share/markdown.so")
+    Mix.shell.info System.cmd("make priv/markdown.so")
   end
 end
 
