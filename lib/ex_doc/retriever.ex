@@ -84,14 +84,14 @@ defmodule ExDoc.Retriever do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
-    specs = Kernel.Typespec.beam_specs(module)
+    specs = Kernel.Typespec.beam_specs(module) || []
     docs  = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
                             &get_function(&1, source_path, source_url, specs)
 
     if type == :behaviour do
-      callbacks = Kernel.Typespec.beam_callbacks(module)
+      callbacks = Kernel.Typespec.beam_callbacks(module) || []
       docs = Enum.map(module.__behaviour__(:docs),
-        &get_callback(&1, source_path, source_url, callbacks)) ++ docs
+                      &get_callback(&1, source_path, source_url, callbacks)) ++ docs
     end
 
     { line, moduledoc } = module.__info__(:moduledoc)
@@ -191,8 +191,8 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_types(module) do
-    all = Kernel.Typespec.beam_types(module)
-    docs = Kernel.Typespec.beam_typedocs(module)
+    all  = Kernel.Typespec.beam_types(module) || []
+    docs = Kernel.Typespec.beam_typedocs(module) || []
 
     lc { type, { name, _, args } = tuple } inlist all, type != :typep do
       spec  = process_type_ast(Kernel.Typespec.type_to_ast(tuple), type)
