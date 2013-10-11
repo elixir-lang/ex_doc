@@ -65,6 +65,9 @@ defmodule ExDoc.HTMLFormatter do
 
   defp write_readme(output, {:ok, content}) do
     readme_html = Templates.readme_template(content)
+    # Allow using nice codeblock syntax for readme too.
+    readme_html = String.replace(readme_html, "<pre><code>",
+                                 "<pre class=\"codeblock\"><code>")
     File.write("#{output}/README.html", readme_html)
     true
   end
