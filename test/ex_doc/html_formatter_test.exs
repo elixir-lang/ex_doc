@@ -24,7 +24,8 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   defp doc_config do
-    ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: beam_dir]
+    ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: beam_dir,
+                 synopsis_file: "../test/fixtures/synopsis.md"]
   end
 
   defp get_modules(config // doc_config) do
@@ -74,5 +75,6 @@ defmodule ExDoc.HTMLFormatterTest do
     assert content =~ %r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     assert content =~ %r{<p>moduledoc</p>}
     assert content =~ %r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
+    assert content =~ %r{<strong>This is a synopsis</strong>}
   end
 end

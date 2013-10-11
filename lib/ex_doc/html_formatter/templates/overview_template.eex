@@ -22,6 +22,10 @@
     <h1><%= config.project %> v<%= config.version %></h1>
 
     <div id="content">
+      <%= if synopsis do %>
+        <%= synopsis %>
+      <% end %>
+
       <%= unless Enum.empty?(modules) do %>
         <h2 id="modules_summary">Modules summary</h2>
         <table class="summary">

@@ -32,14 +32,21 @@ defmodule ExDoc.HTMLFormatter do
   end
   
   defp generate_overview(modules, output, config) do
+    synopsis = if config.synopsis_file,
+                 do: generate_synopsis(File.read(config.synopsis_file)),
+                 else: nil
     content = Templates.overview_template(
       config,
       filter_list(:modules, modules),
       filter_list(:records, modules),
-      filter_list(:protocols, modules)
+      filter_list(:protocols, modules),
+      synopsis
     )
     File.write("#{output}/overview.html", content)
   end
+
+  defp generate_synopsis({ :ok, contents }), do: Markdown.to_html(contents)
+  defp generate_synopsis(e), do: nil
 
   defp assets do
     [ { templates_path("css/*.css"), "css" },
