@@ -20,7 +20,8 @@ defmodule Mix.Tasks.Docs do
   It also uses the `:version` key and `:source_url` from the project's configuration.
 
   The following options should be put under the `:docs` key in your project's
-  main configuration.
+  main configuration. The docs options should be a keyword list or a function
+  returning a keyword list that will be lazily executed.
 
   * `:output` - output directory for the generated docs; default: docs.
     May be overriden by command line argument.
@@ -54,7 +55,7 @@ defmodule Mix.Tasks.Docs do
 
     project = (Mix.project[:name] || Mix.project[:app]) |> to_string
     version = Mix.project[:version] || "dev"
-    options = Mix.project[:docs] || []
+    options = get_options()
 
     if source_url = Mix.project[:source_url] do
       options = Keyword.put(options, :source_url, source_url)
@@ -67,6 +68,9 @@ defmodule Mix.Tasks.Docs do
 
       is_atom(options[:main]) ->
         options = Keyword.update!(options, :main, &inspect/1)
+
+      is_binary(options[:main]) ->
+        options
     end
 
     if formatter = options[:formatter] do
@@ -87,5 +91,14 @@ defmodule Mix.Tasks.Docs do
     index = Path.join(options[:output] || "docs", "index.html")
     Mix.shell.info "%{green}Docs successfully generated."
     Mix.shell.info "%{green}Open #{index} in your browser to read them."
+  end
+
+  defp get_options do
+    docs = Mix.project[:docs]
+    cond do
+      is_function(docs, 0) -> docs.()
+      nil?(docs) -> []
+      true -> docs
+    end
   end
 end
