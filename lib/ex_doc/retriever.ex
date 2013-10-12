@@ -84,9 +84,10 @@ defmodule ExDoc.Retriever do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
-    specs = Kernel.Typespec.beam_specs(module) || []
-    docs  = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
-                            &get_function(&1, source_path, source_url, specs)
+    specs    = Kernel.Typespec.beam_specs(module) || []
+    cb_impls = callback_implementations(module)
+    docs     = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
+                               &get_function(&1, source_path, source_url, specs, cb_impls)
 
     if type == :behaviour do
       callbacks = Kernel.Typespec.beam_callbacks(module) || []
@@ -124,9 +125,15 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function(function, source_path, source_url, all_specs) do
+  defp get_function(function, source_path, source_url, all_specs, cb_impls) do
     { { name, arity }, line, type, signature, doc } = function
 
+    bmod = Dict.get(cb_impls, { name, arity }, [])
+    doc = if doc == nil and bmod != [] do
+            "Callback implementation of `#{inspect bmod}.#{name}/#{arity}`."
+          else
+            doc
+          end
     specs = Dict.get(all_specs, { name, arity }, [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
 
@@ -188,6 +195,25 @@ defmodule ExDoc.Retriever do
     else
       false
     end
+  end
+
+  # Returns a dict of { name, arity } -> [ behaviour_module ].
+  defp callback_implementations(module) do
+    implements_behaviours(module)
+    |> Enum.map(fn bmod -> Enum.map(callbacks_of(bmod), &{ &1, bmod }) end)
+    |> Enum.reduce(ListDict.new(), fn pairs, acc -> Dict.merge(acc, pairs) end)
+  end
+
+  defp callbacks_of(module) do
+    module.__info__(:attributes)
+    |> Enum.filter_map(&match?({ :callback, _ }, &1), fn {_, [{t,_}|_]} -> t end)
+  end
+
+  defp implements_behaviours(module) do
+    module.__info__(:attributes)
+    |> Stream.filter(&match?({ :behaviour, _ }, &1))
+    |> Stream.map(fn {_, l} -> l end)
+    |> Enum.concat()
   end
 
   defp get_types(module) do
