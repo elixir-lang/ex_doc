@@ -205,12 +205,12 @@ defmodule ExDoc.Retriever do
   end
 
   defp callbacks_of(module) do
-    module.__info__(:attributes)
+    module.module_info(:attributes)
     |> Enum.filter_map(&match?({ :callback, _ }, &1), fn {_, [{t,_}|_]} -> t end)
   end
 
   defp implements_behaviours(module) do
-    module.__info__(:attributes)
+    module.module_info(:attributes)
     |> Stream.filter(&match?({ :behaviour, _ }, &1))
     |> Stream.map(fn {_, l} -> l end)
     |> Enum.concat()
