@@ -52,6 +52,13 @@ defmodule Mix.Tasks.Docs do
       raise Mix.Error, message: "Extraneous arguments on the command line"
     end
 
+    { res, options } = run_with_cli_opts(cli_opts, config, generator)
+    log(options)
+    res
+  end
+
+  # This is for the archive.docs task.
+  def run_with_cli_opts(cli_opts, config, generator) do
     project = (config[:name] || config[:app]) |> to_string
     version = config[:version] || "dev"
     options = Keyword.merge(get_docs_opts(config), cli_opts)
@@ -77,8 +84,7 @@ defmodule Mix.Tasks.Docs do
     end
 
     res = generator.(project, version, options)
-    log(options)
-    res
+    { res, options }
   end
 
   defp log(options) do
