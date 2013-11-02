@@ -4,7 +4,6 @@ defmodule ExDoc.HTMLFormatter.Templates do
   """
 
   require EEx
-  alias ExDoc.HTMLFormatter.Autolink
 
   @doc """
   Generate content from the module template for a given `node`
