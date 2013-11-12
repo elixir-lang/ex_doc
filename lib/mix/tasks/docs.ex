@@ -2,7 +2,7 @@ defmodule Mix.Tasks.Docs do
   use Mix.Task
 
   @shortdoc "Generate HTML documentation for the project"
-
+  @recursive true
   @moduledoc """
   Uses ExDoc to generate a static web page from the docstrings extracted from
   all of the project's modules.
