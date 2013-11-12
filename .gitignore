@@ -1,7 +1,5 @@
-ebin/
 test/tmp
 _build/
 *.o
 *.so
 priv/*.so.dSYM
-
