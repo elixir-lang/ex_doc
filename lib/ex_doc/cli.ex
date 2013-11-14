@@ -8,8 +8,8 @@ defmodule ExDoc.CLI do
     args = elem(parsed, 1)
 
     case args do
-      [project, version] -> :ok
-      [_,_|_] ->
+      [project, version, source_beam] -> :ok
+      [_,_,_|_] ->
         IO.puts "Too many arguments.\n"
         print_usage()
       _ ->
@@ -21,18 +21,22 @@ defmodule ExDoc.CLI do
       opts = Keyword.put(opts, :formatter, String.split(formatter, "."))
     end
 
+    opts = Keyword.put(opts, :source_beam, source_beam)
     ExDoc.generate_docs(project, version, opts)
   end
 
   defp print_usage do
     IO.puts %S"""
     Usage:
-      ex_doc PROJECT VERSION [OPTIONS]
+      ex_doc PROJECT VERSION BEAMS [OPTIONS]
 
     Examples:
-      ex_doc "Dynamo" "0.8.0" -u "https://github.com/elixir-lang/dynamo"
+      ex_doc "Dynamo" "0.8.0" "_build/shared/lib/dynamo/ebin" -u "https://github.com/elixir-lang/dynamo"
 
     Options:
+      PROJECT            Project name
+      VERSION            Version number
+      BEAMS              Path to compiled beam files
       -o, --output       Path to output docs, default: docs
       --readme           Generate a project README from a README.md file, default: false
       -f, --formatter    Docs formatter to use, default: ExDoc.HTMLFormatter
