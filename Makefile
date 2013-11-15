@@ -2,7 +2,7 @@ ERLANG_PATH:=$(shell erl -eval 'io:format("~s~n", [lists:concat([code:root_dir()
 CFLAGS=-g -O3 -fPIC -Isundown/src -Isundown/html
 ERLANG_FLAGS=-I$(ERLANG_PATH)
 CC=gcc
-EBIN_DIR=ebin
+BUILD_DIR=_build
 
 ifeq ($(shell uname),Darwin)
 	OPTIONS=-dynamiclib -undefined dynamic_lookup
@@ -33,9 +33,9 @@ NIF_SRC=\
 	src/markdown_nif.c
 
 clean:
-	rm -f sundown/src/*.o sundown/html/*.o src/*.o
+	cd sundown && make clean
 	rm -f priv/markdown.so
-	rm -rf $(EBIN_DIR)
+	rm -rf $(BUILD_DIR)
 	rm -rf test/tmp
 	@ echo
 

@@ -32,6 +32,8 @@ defmodule Mix.Tasks.Docs do
 
   * `:source_root` - path to the source code root directory; default: . (current directory).
 
+  * `:source_beam` - path to the beam directory; default: mix's compile path.
+
   * `:source_url_pattern` - public URL of the project.
     Derived from project's `:source_url` if not present.
 
@@ -75,6 +77,8 @@ defmodule Mix.Tasks.Docs do
     if formatter = options[:formatter] do
       options = Keyword.put(options, :formatter, String.split(formatter, "."))
     end
+
+    options = Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
 
     res = generator.(project, version, options)
     log(options)

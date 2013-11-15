@@ -9,42 +9,46 @@ defmodule Mix.Tasks.DocsTest do
   end
 
   test "inflects values from app and version" do
-    assert run([], [app: :ex_doc, version: "0.1.0"]) ==
-           { "ex_doc", "0.1.0", [main: "ExDoc"] }
+    assert { "ex_doc", "0.1.0", [source_beam: _, main: "ExDoc"] } =
+           run([], [app: :ex_doc, version: "0.1.0"])
   end
 
   test "uses the given name" do
-    assert run([], [app: :ex_doc, version: "0.1.0", name: "ExDoc"]) ==
-           { "ExDoc", "0.1.0", [main: "ExDoc"] }
+    assert { "ExDoc", "0.1.0", [source_beam: _, main: "ExDoc"] } =
+           run([], [app: :ex_doc, version: "0.1.0", name: "ExDoc"])
+
   end
 
   test "accepts modules in :main" do
-    assert run([], [app: :ex_doc, docs: [main: Sample]]) ==
-           { "ex_doc", "dev", [main: "Sample"] }
+    assert { "ex_doc", "dev", [source_beam: _, main: "Sample"] } =
+           run([], [app: :ex_doc, docs: [main: Sample]])
   end
 
   test "accepts files in :main" do
-    assert run([], [app: :ex_doc, docs: [main: "overview"]]) ==
-           { "ex_doc", "dev", [main: "overview"] }
+    assert { "ex_doc", "dev", [source_beam: _, main: "overview"] } =
+           run([], [app: :ex_doc, docs: [main: "overview"]])
   end
 
   test "accepts output in :output" do
-    assert run([], [app: :ex_doc, docs: [output: "hello"]]) ==
-           { "ex_doc", "dev", [main: "ExDoc", output: "hello"] }
+    assert { "ex_doc", "dev", [source_beam: _, main: "ExDoc", output: "hello"] } =
+           run([], [app: :ex_doc, docs: [output: "hello"]])
+
   end
 
   test "parses output with higher preference than options" do
-    assert run(%w(-o world), [app: :ex_doc, docs: [output: "hello"]]) ==
-           { "ex_doc", "dev", [main: "ExDoc", output: "world"] }
+    assert { "ex_doc", "dev", [source_beam: _, main: "ExDoc", output: "world"] } =
+           run(%w(-o world), [app: :ex_doc, docs: [output: "hello"]])
   end
 
   test "accepts lazy docs" do
-    assert run([], [app: :ex_doc, docs: fn -> [main: "overview"] end]) ==
-           { "ex_doc", "dev", [main: "overview"] }
+    assert { "ex_doc", "dev", [source_beam: _, main: "overview"] } =
+           run([], [app: :ex_doc, docs: fn -> [main: "overview"] end])
+
   end
 
   test "accepts source_url from root" do
-    assert run([], [app: :ex_doc, source_url: "http://github.com/elixir-lang/ex_doc"]) ==
-           { "ex_doc", "dev", [main: "ExDoc", source_url: "http://github.com/elixir-lang/ex_doc"] }
+    assert { "ex_doc", "dev", [source_beam: _, main: "ExDoc", source_url: "http://github.com/elixir-lang/ex_doc"] } =
+           run([], [app: :ex_doc, source_url: "http://github.com/elixir-lang/ex_doc"])
+
   end
 end
