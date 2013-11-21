@@ -18,25 +18,18 @@
       <h1 id="full_list_header">
         <a href="<%= config.homepage_url || config.source_url || "/" %>" target="_blank"><%= config.project %> v<%= config.version %></a>
       </h1>
-      <%= if has_readme do %>
-      <h2 id="readme">
-        <a href="README.html">README</a>
-      </h2>
-      <% end %>
-      <h2 id="overview">
+
+      <h2 id="sub_list_header">
+        <%= if has_readme do %>
+          <a href="README.html">README</a> -
+        <% end %>
         <a href="overview.html">Overview</a>
       </h2>
-      <div id="nav">
-        <span class="<%= if(scope == :modules, do: "selected") %>"><a target="_self" href="modules_list.html">
-          Modules
-        </a></span>
-        <span class="<%= if(scope == :records, do: "selected") %>"><a target="_self" href="records_list.html">
-          Records
-        </a></span>
-        <span class="<%= if(scope == :protocols, do: "selected") %>"><a target="_self" href="protocols_list.html">
-          Protocols
-        </a></span>
-        <div class="clear"></div>
+
+      <div class="nav">
+        <span class="<%= if(scope == :modules, do: "selected") %>"><a target="_self" href="modules_list.html">Modules</a></span>
+        <span class="<%= if(scope == :records, do: "selected") %>"><a target="_self" href="records_list.html">Records</a></span>
+        <span class="<%= if(scope == :protocols, do: "selected") %>"><a target="_self" href="protocols_list.html">Protocols</a></span>
       </div>
       <div id="search">Search: <input type="text" /></div>
 
