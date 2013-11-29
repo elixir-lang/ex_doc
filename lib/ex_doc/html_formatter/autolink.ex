@@ -20,18 +20,27 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   def all(modules) do
     aliases = Enum.map modules, &(&1.module)
     project_funs = lc m inlist modules, d inlist m.docs, do: m.id <> "." <> d.id
-    Enum.map modules, &(&1 |> all_docs(project_funs) |> all_typespecs(aliases))
+    project_modules = modules |> Enum.map(&module_to_string/1) |> Enum.uniq
+    Enum.map modules, &(&1 |> all_docs(project_funs, project_modules) |> all_typespecs(aliases))
   end
 
-  defp all_docs(ExDoc.ModuleNode[] = module, project_funs) do
+  defp module_to_string(ExDoc.ModuleNode[] = module) do
+    module.module 
+      |> atom_to_binary
+      |> String.split(".")
+      |> tl
+      |> Enum.join(".")
+  end
+
+  defp all_docs(ExDoc.ModuleNode[] = module, project_funs, modules) do
     locals = Enum.map module.docs, &(&1.id)
 
     moduledoc = module.moduledoc &&
-      module.moduledoc |> local_doc(locals) |> project_doc(project_funs)
+      module.moduledoc |> local_doc(locals) |> project_doc(project_funs, modules)
 
     docs = lc node inlist module.docs do
       node.update_doc fn(doc) ->
-        doc && doc |> local_doc(locals) |> project_doc(project_funs)
+        doc && doc |> local_doc(locals) |> project_doc(project_funs, modules)
       end
     end
 
@@ -129,7 +138,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   as a list of `fun/arity` strings.
 
   Ignores functions which are already wrapped in markdown url syntax,
-  e.g. `[test/1](url)`. In case the function doesn't touch the leading
+  e.g. `[test/1](url)`. If the function doesn't touch the leading
   or trailing `]`, e.g. `[my link link/1 is here](url)`, the fun/arity
   will get translated to the new href of the function.
   """
@@ -145,15 +154,22 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   end
 
   @doc """
+  Creates links to modules and functions defined in the project.
+  """
+  def project_doc(bin, project_funs, modules) when is_binary(bin) do
+    bin |> project_functions(project_funs) |> project_modules(modules)
+  end
+
+  @doc """
   Create links to functions defined in the project, specified in `project_funs`
   as a list of `Module.fun/arity` tuples.
 
   Ignores functions which are already wrapped in markdown url syntax,
-  e.g. `[Module.test/1](url)`. In case the function doesn't touch the leading
+  e.g. `[Module.test/1](url)`. If the function doesn't touch the leading
   or trailing `]`, e.g. `[my link Module.link/1 is here](url)`, the Module.fun/arity
   will get translated to the new href of the function.
   """
-  def project_doc(bin, project_funs) when is_binary(bin) do
+  def project_functions(bin, project_funs) when is_binary(bin) do
     Regex.scan(%r{(?<!\[)`\s*((([A-Z][A-Za-z]+)\.)+[a-z_!\\?]+/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
@@ -163,6 +179,27 @@ defmodule ExDoc.HTMLFormatter.Autolink do
          escaped = Regex.escape(x)
          Regex.replace(%r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
            "[`\\1`](#{mod_str}.html##{function_name}/#{arity})")
+       end)
+  end
+
+  @doc """
+  Create links to modules defined in the project, specified in `modules`
+  as a list.
+
+  Ignores modules which are already wrapped in markdown url syntax,
+  e.g. `[Module](url)`. If the module name doesn't touch the leading
+  or trailing `]`, e.g. `[my link Module is here](url)`, the Module
+  will get translated to the new href of the module.
+  """
+  def project_modules(bin, modules) when is_binary(bin) do
+    Regex.scan(%r{(?<!\[)`\s*(([A-Z][A-Za-z]+\.?)+)\s*`(?!\])}, bin)
+    |> Enum.uniq
+    |> List.flatten
+    |> Enum.filter(&(&1 in modules))
+    |> Enum.reduce(bin, fn (x, acc) ->
+         escaped = Regex.escape(x)
+         Regex.replace(%r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
+           "[`\\1`](\\1.html)")
        end)
   end
 

@@ -28,36 +28,60 @@ defmodule ExDoc.HTMLFormatter.AutolinkTest do
     assert Autolink.local_doc("[the `example/1`]()", ["example/1"]) == "[the `example/1`]()"
   end
 
-  # project_doc
+  # project_functions
 
   test "autolink Module.fun/arity in docs" do
-    assert Autolink.project_doc("`Mod.example/2`", ["Mod.example/2"]) == 
+    assert Autolink.project_functions("`Mod.example/2`", ["Mod.example/2"]) == 
       "[`Mod.example/2`](Mod.html#example/2)"
-    assert Autolink.project_doc("`MyModule.example/2`", ["MyModule.example/2"]) == 
+    assert Autolink.project_functions("`MyModule.example/2`", ["MyModule.example/2"]) == 
       "[`MyModule.example/2`](MyModule.html#example/2)"
-    assert Autolink.project_doc("`MyModule.Nested.example/2`", ["MyModule.Nested.example/2"]) == 
+    assert Autolink.project_functions("`MyModule.Nested.example/2`", ["MyModule.Nested.example/2"]) == 
       "[`MyModule.Nested.example/2`](MyModule.Nested.html#example/2)"
-    assert Autolink.project_doc("`Mod.example/2` then `Mod.example/2`",
+    assert Autolink.project_functions("`Mod.example/2` then `Mod.example/2`",
       ["Mod.example/2"]) == "[`Mod.example/2`](Mod.html#example/2) then [`Mod.example/2`](Mod.html#example/2)"
-    assert Autolink.project_doc("`  MyModule.spaces/0  `", ["MyModule.spaces/0"]) ==
+    assert Autolink.project_functions("`  MyModule.spaces/0  `", ["MyModule.spaces/0"]) ==
       "[`  MyModule.spaces/0  `](MyModule.html#spaces/0)"
-    assert Autolink.project_doc("`ModA.example/1` and `ModB.example/2`",
+    assert Autolink.project_functions("`ModA.example/1` and `ModB.example/2`",
       ["ModA.example/1", "ModB.example/2"]) == 
       "[`ModA.example/1`](ModA.html#example/1) and [`ModB.example/2`](ModB.html#example/2)"
-    assert Autolink.project_doc("`Mod.funny_name\?/1` and `Mod.funny_name!/2`",
+    assert Autolink.project_functions("`Mod.funny_name\?/1` and `Mod.funny_name!/2`",
       ["Mod.funny_name\?/1", "Mod.funny_name!/2"]) ==
       "[`Mod.funny_name\?/1`](Mod.html#funny_name\?/1) and [`Mod.funny_name!/2`](Mod.html#funny_name!/2)"
   end
 
   test "autolink doesn't create links for undefined Mod.functions in docs" do
-    assert Autolink.project_doc("`Mod.example/1`", ["Mod.example/2"]) == "`Mod.example/1`"
-    assert Autolink.project_doc("`Mod.example/1`", []) == "`Mod.example/1`"
+    assert Autolink.project_functions("`Mod.example/1`", ["Mod.example/2"]) == "`Mod.example/1`"
+    assert Autolink.project_functions("`Mod.example/1`", []) == "`Mod.example/1`"
   end
 
   test "autolink doesn't create links for pre-linked Mod.functions docs" do
-    assert Autolink.project_doc("[`Mod.example/1`]()", ["Mod.example/1"]) == "[`Mod.example/1`]()"
-    assert Autolink.project_doc("[the `Mod.example/1`]()", ["Mod.example/1"]) == "[the `Mod.example/1`]()"
+    assert Autolink.project_functions("[`Mod.example/1`]()", ["Mod.example/1"]) == "[`Mod.example/1`]()"
+    assert Autolink.project_functions("[the `Mod.example/1`]()", ["Mod.example/1"]) == "[the `Mod.example/1`]()"
   end
+
+  test "autolink Modules in docs" do
+    assert Autolink.project_modules("`MyModule`", ["MyModule"]) == "[`MyModule`](MyModule.html)"
+    assert Autolink.project_modules("`MyModule.Nested`", ["MyModule.Nested"]) == "[`MyModule.Nested`](MyModule.Nested.html)"
+    assert Autolink.project_modules("`MyModule.Nested.Deep`", ["MyModule.Nested.Deep"]) == 
+      "[`MyModule.Nested.Deep`](MyModule.Nested.Deep.html)"
+  end
+
+  test "autolink Modules doesn't link functions" do
+    assert Autolink.project_modules("`Mod.example/1`", ["Mod"]) == "`Mod.example/1`"
+  end
+
+  test "autolink doesn't create links for pre-linked Mod docs" do
+    assert Autolink.project_functions("[`Mod`](other.html)", ["Mod"]) == "[`Mod`](other.html)"
+    assert Autolink.project_functions("[the `Mod`](other.html)", ["Mod"]) == "[the `Mod`](other.html)"
+    assert Autolink.project_functions("[the `Mod.Nested`](other.html)", ["Mod.Nested"]) == "[the `Mod.Nested`](other.html)"
+  end
+
+  test "autolink doesn't create links for undefined modules"do
+    assert Autolink.project_modules("`MyModule`", []) == "`MyModule`"
+    assert Autolink.project_modules("`MyModule`", ["DiffModule"]) == "`MyModule`"
+    assert Autolink.project_modules("`MyModule.Nested`", ["MyModule.DiffNested"]) == "`MyModule.Nested`"
+  end
+
 
   # typespec
 
