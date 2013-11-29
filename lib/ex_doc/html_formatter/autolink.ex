@@ -25,11 +25,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   end
 
   defp module_to_string(ExDoc.ModuleNode[] = module) do
-    module.module 
-      |> atom_to_binary
-      |> String.split(".")
-      |> tl
-      |> Enum.join(".")
+    inspect module.module 
   end
 
   defp all_docs(ExDoc.ModuleNode[] = module, project_funs, modules) do
