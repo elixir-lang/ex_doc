@@ -4,6 +4,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   """
 
   @elixir_docs "http://elixir-lang.org/docs/master/"
+  @erlang_docs "http://www.erlang.org/doc/man/"
 
   @doc """
   Escape `'`, `"`, `&`, `<` and `>` in the string using HTML entities.
@@ -153,7 +154,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   Creates links to modules and functions defined in the project.
   """
   def project_doc(bin, project_funs, modules) when is_binary(bin) do
-    bin |> project_functions(project_funs) |> project_modules(modules)
+    bin |> project_functions(project_funs) |> project_modules(modules) |> erlang_functions
   end
 
   @doc """
@@ -204,4 +205,26 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     { mod, name } = modules |> String.split(".") |> Enum.split(-1)
     { Enum.join(mod, "."), hd(name), arity }
   end
+
+  @doc """
+  Create links to Erlang functions in code blocks.
+
+  Ignores functions which are already wrapped in markdown url syntax,
+  e.g. `[:module.test/1](url)`. If the function doesn't touch the leading
+  or trailing `]`, e.g. `[my link :module.link/1 is here](url)`, the :module.fun/arity
+  will get translated to the new href of the function.
+  """
+  def erlang_functions(bin) when is_binary(bin) do
+    Regex.scan(%r{(?<!\[)`\s*(:[a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}, bin)
+    |> Enum.uniq
+    |> List.flatten
+    |> Enum.reduce(bin, fn (x, acc) ->
+         { mod_str, function_name, arity } = split_function(x)
+         mod_str = String.lstrip(mod_str, ?:)
+         escaped = Regex.escape(x)
+         Regex.replace(%r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
+           "[`\\1`](#{@erlang_docs}#{mod_str}.html##{function_name}-#{arity})")
+       end)
+  end
+
 end
