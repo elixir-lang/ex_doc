@@ -209,6 +209,10 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   @doc """
   Create links to Erlang functions in code blocks.
 
+  Only links modules that are in the Erlang distribution `lib_dir`
+  and only link functions in those modules that export a function of the
+  same name and arity.
+
   Ignores functions which are already wrapped in markdown url syntax,
   e.g. `[:module.test/1](url)`. If the function doesn't touch the leading
   or trailing `]`, e.g. `[my link :module.link/1 is here](url)`, the :module.fun/arity
@@ -218,6 +222,8 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     Regex.scan(%r{(?<!\[)`\s*(:[a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
+    |> Enum.filter(&valid_erlang_beam?/1)
+    |> Enum.filter(&module_exports_function?/1)
     |> Enum.reduce(bin, fn (x, acc) ->
          { mod_str, function_name, arity } = split_function(x)
          mod_str = String.lstrip(mod_str, ?:)
@@ -227,4 +233,30 @@ defmodule ExDoc.HTMLFormatter.Autolink do
        end)
   end
 
+  defp valid_erlang_beam?(function_str) do
+    { mod_str, _function_name, _arity } = split_function(function_str)
+    "#{mod_str}.beam" 
+      |> String.lstrip(?:)
+      |> String.to_char_list!
+      |> :code.where_is_file 
+      |> on_erl_lib_path?
+  end
+
+  defp on_erl_lib_path?(:non_existing), do: false
+  defp on_erl_lib_path?(beam_path) do
+    beam_path |> Path.expand |> String.from_char_list! |> String.starts_with?(erlang_lib_dir)
+  end
+
+  defp erlang_lib_dir do
+    :code.lib_dir |> Path.expand |> String.from_char_list!
+  end
+
+  defp module_exports_function?(function_str) do
+    { mod_str, function_name, arity_str } = split_function(function_str)
+    module = mod_str |> String.lstrip(?:) |> binary_to_atom
+    function_name = binary_to_atom(function_name)
+    {arity, _} = Integer.parse(arity_str)
+    exports = module.module_info(:exports)
+    Enum.member? exports, {function_name, arity}
+  end
 end
