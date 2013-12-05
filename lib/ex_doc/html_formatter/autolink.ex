@@ -219,16 +219,15 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   will get translated to the new href of the function.
   """
   def erlang_functions(bin) when is_binary(bin) do
-    Regex.scan(%r{(?<!\[)`\s*(:[a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}, bin)
+    Regex.scan(%r{(?<!\[)`\s*:([a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
     |> Enum.filter(&valid_erlang_beam?/1)
     |> Enum.filter(&module_exports_function?/1)
     |> Enum.reduce(bin, fn (x, acc) ->
          { mod_str, function_name, arity } = split_function(x)
-         mod_str = String.lstrip(mod_str, ?:)
          escaped = Regex.escape(x)
-         Regex.replace(%r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
+         Regex.replace(%r/(?<!\[)`(\s*:#{escaped}\s*)`(?!\])/, acc,
            "[`\\1`](#{@erlang_docs}#{mod_str}.html##{function_name}-#{arity})")
        end)
   end
@@ -236,7 +235,6 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   defp valid_erlang_beam?(function_str) do
     { mod_str, _function_name, _arity } = split_function(function_str)
     "#{mod_str}.beam" 
-      |> String.lstrip(?:)
       |> String.to_char_list!
       |> :code.where_is_file 
       |> on_erl_lib_path?
@@ -253,7 +251,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
 
   defp module_exports_function?(function_str) do
     { mod_str, function_name, arity_str } = split_function(function_str)
-    module = mod_str |> String.lstrip(?:) |> binary_to_atom
+    module = mod_str |> binary_to_atom
     function_name = binary_to_atom(function_name)
     {arity, _} = Integer.parse(arity_str)
     exports = module.module_info(:exports)

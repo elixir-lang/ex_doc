@@ -100,6 +100,8 @@ defmodule ExDoc.HTMLFormatter.AutolinkTest do
   test "autolink erlang doesn't create links for pre-linked docs" do
     assert Autolink.erlang_functions("[`:erlang.apply/2`](other.html)") == "[`:erlang.apply/2`](other.html)"
     assert Autolink.erlang_functions("[the `:erlang.apply/2`](other.html)") == "[the `:erlang.apply/2`](other.html)"
+
+    assert Autolink.erlang_functions("`:erlang`") == "`:erlang`"
   end
 
   test "autolink erlang doesn't create links for functions that aren't part of the erlang distribution" do
