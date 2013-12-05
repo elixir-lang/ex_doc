@@ -219,10 +219,11 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   will get translated to the new href of the function.
   """
   def erlang_functions(bin) when is_binary(bin) do
+    lib_dir = erlang_lib_dir()
     Regex.scan(%r{(?<!\[)`\s*:([a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
-    |> Enum.filter(&valid_erlang_beam?/1)
+    |> Enum.filter(&valid_erlang_beam?(&1, lib_dir))
     |> Enum.filter(&module_exports_function?/1)
     |> Enum.reduce(bin, fn (x, acc) ->
          { mod_str, function_name, arity } = split_function(x)
@@ -232,17 +233,17 @@ defmodule ExDoc.HTMLFormatter.Autolink do
        end)
   end
 
-  defp valid_erlang_beam?(function_str) do
+  defp valid_erlang_beam?(function_str, lib_dir) do
     { mod_str, _function_name, _arity } = split_function(function_str)
     "#{mod_str}.beam" 
       |> String.to_char_list!
       |> :code.where_is_file 
-      |> on_erl_lib_path?
+      |> on_lib_path?(lib_dir)
   end
 
-  defp on_erl_lib_path?(:non_existing), do: false
-  defp on_erl_lib_path?(beam_path) do
-    beam_path |> Path.expand |> String.from_char_list! |> String.starts_with?(erlang_lib_dir)
+  defp on_lib_path?(:non_existing, _base_path), do: false
+  defp on_lib_path?(beam_path, base_path) do
+    beam_path |> Path.expand |> String.from_char_list! |> String.starts_with?(base_path)
   end
 
   defp erlang_lib_dir do
