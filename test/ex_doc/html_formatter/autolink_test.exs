@@ -82,6 +82,34 @@ defmodule ExDoc.HTMLFormatter.AutolinkTest do
     assert Autolink.project_modules("`MyModule.Nested`", ["MyModule.DiffNested"]) == "`MyModule.Nested`"
   end
 
+  # erlang functions
+
+  @erlang_docs "http://www.erlang.org/doc/man/"
+
+  test "autolink to erlang functions" do
+    assert Autolink.erlang_functions("`:erlang.apply/2`") == "[`:erlang.apply/2`](#{@erlang_docs}erlang.html#apply-2)"
+    assert Autolink.erlang_functions("`:erlang.adler32/2`") == "[`:erlang.adler32/2`](#{@erlang_docs}erlang.html#adler32-2)"
+    assert Autolink.erlang_functions("`:erlang.apply/2` `:erlang.apply/3`") == 
+      "[`:erlang.apply/2`](#{@erlang_docs}erlang.html#apply-2) [`:erlang.apply/3`](#{@erlang_docs}erlang.html#apply-3)"
+
+    assert Autolink.erlang_functions("`:erl_prim_loader.get_file/1`") == 
+      "[`:erl_prim_loader.get_file/1`](#{@erlang_docs}erl_prim_loader.html#get_file-1)"
+    assert Autolink.erlang_functions("`:zlib.deflateInit/2`") == "[`:zlib.deflateInit/2`](#{@erlang_docs}zlib.html#deflateInit-2)"
+  end
+
+  test "autolink erlang doesn't create links for pre-linked docs" do
+    assert Autolink.erlang_functions("[`:erlang.apply/2`](other.html)") == "[`:erlang.apply/2`](other.html)"
+    assert Autolink.erlang_functions("[the `:erlang.apply/2`](other.html)") == "[the `:erlang.apply/2`](other.html)"
+
+    assert Autolink.erlang_functions("`:erlang`") == "`:erlang`"
+  end
+
+  test "autolink erlang doesn't create links for functions that aren't part of the erlang distribution" do
+    assert Autolink.erlang_functions("`:erl_prim_loader.adder32_combine/0`") == 
+      "`:erl_prim_loader.adder32_combine/0`"
+    assert Autolink.erlang_functions("`:erl_prim_loader_non.adder32_combine/0`") == 
+      "`:erl_prim_loader_non.adder32_combine/0`"
+  end
 
   # typespec
 

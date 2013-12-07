@@ -4,6 +4,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   """
 
   @elixir_docs "http://elixir-lang.org/docs/master/"
+  @erlang_docs "http://www.erlang.org/doc/man/"
 
   @doc """
   Escape `'`, `"`, `&`, `<` and `>` in the string using HTML entities.
@@ -153,7 +154,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   Creates links to modules and functions defined in the project.
   """
   def project_doc(bin, project_funs, modules) when is_binary(bin) do
-    bin |> project_functions(project_funs) |> project_modules(modules)
+    bin |> project_functions(project_funs) |> project_modules(modules) |> erlang_functions
   end
 
   @doc """
@@ -203,5 +204,58 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     [modules, arity] = String.split(bin, "/")
     { mod, name } = modules |> String.split(".") |> Enum.split(-1)
     { Enum.join(mod, "."), hd(name), arity }
+  end
+
+  @doc """
+  Create links to Erlang functions in code blocks.
+
+  Only links modules that are in the Erlang distribution `lib_dir`
+  and only link functions in those modules that export a function of the
+  same name and arity.
+
+  Ignores functions which are already wrapped in markdown url syntax,
+  e.g. `[:module.test/1](url)`. If the function doesn't touch the leading
+  or trailing `]`, e.g. `[my link :module.link/1 is here](url)`, the :module.fun/arity
+  will get translated to the new href of the function.
+  """
+  def erlang_functions(bin) when is_binary(bin) do
+    lib_dir = erlang_lib_dir()
+    Regex.scan(%r{(?<!\[)`\s*:([a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}, bin)
+    |> Enum.uniq
+    |> List.flatten
+    |> Enum.filter(&valid_erlang_beam?(&1, lib_dir))
+    |> Enum.filter(&module_exports_function?/1)
+    |> Enum.reduce(bin, fn (x, acc) ->
+         { mod_str, function_name, arity } = split_function(x)
+         escaped = Regex.escape(x)
+         Regex.replace(%r/(?<!\[)`(\s*:#{escaped}\s*)`(?!\])/, acc,
+           "[`\\1`](#{@erlang_docs}#{mod_str}.html##{function_name}-#{arity})")
+       end)
+  end
+
+  defp valid_erlang_beam?(function_str, lib_dir) do
+    { mod_str, _function_name, _arity } = split_function(function_str)
+    "#{mod_str}.beam" 
+      |> String.to_char_list!
+      |> :code.where_is_file 
+      |> on_lib_path?(lib_dir)
+  end
+
+  defp on_lib_path?(:non_existing, _base_path), do: false
+  defp on_lib_path?(beam_path, base_path) do
+    beam_path |> Path.expand |> String.from_char_list! |> String.starts_with?(base_path)
+  end
+
+  defp erlang_lib_dir do
+    :code.lib_dir |> Path.expand |> String.from_char_list!
+  end
+
+  defp module_exports_function?(function_str) do
+    { mod_str, function_name, arity_str } = split_function(function_str)
+    module = mod_str |> binary_to_atom
+    function_name = binary_to_atom(function_name)
+    {arity, _} = Integer.parse(arity_str)
+    exports = module.module_info(:exports)
+    Enum.member? exports, {function_name, arity}
   end
 end
