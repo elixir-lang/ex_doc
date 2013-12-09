@@ -16,7 +16,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   defp output_dir do
-    Path.expand("../../docs", __FILE__)
+    Path.expand("../../docs/Elixir", __FILE__)
   end
 
   defp beam_dir do
@@ -24,7 +24,8 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   defp doc_config do
-    ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: beam_dir]
+    ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: beam_dir,
+                 output: "docs/Elixir"]
   end
 
   defp get_modules(config // doc_config) do

@@ -9,7 +9,7 @@ defmodule Mix.Tasks.Docs do
 
   ## Command line options
 
-  * `--output`, `-o` - output directory for the generated docs; default: `"docs"`
+  * `--output`, `-o` - output directory for the generated docs; default: `"docs/PROJECT"`
 
   ## Configuration
 
@@ -22,7 +22,7 @@ defmodule Mix.Tasks.Docs do
   main configuration. The docs options should be a keyword list or a function
   returning a keyword list that will be lazily executed.
 
-  * `:output` - output directory for the generated docs; default: docs.
+  * `:output` - output directory for the generated docs; default: docs/PROJECT.
     May be overriden by command line argument.
 
   * `:readme` - boolean indicating whether a project README should be created
@@ -81,12 +81,12 @@ defmodule Mix.Tasks.Docs do
     options = Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
 
     res = generator.(project, version, options)
-    log(options)
+    log(project, options)
     res
   end
 
-  defp log(options) do
-    index = Path.join(options[:output] || "docs", "index.html")
+  defp log(project, options) do
+    index = Path.join([options[:output] || "docs", project, "index.html"])
     Mix.shell.info "%{green}Docs successfully generated."
     Mix.shell.info "%{green}Open #{index} in your browser to read them."
   end

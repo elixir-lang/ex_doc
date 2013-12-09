@@ -1,5 +1,5 @@
 defmodule ExDoc do
-  defrecord Config, output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
+  defrecord Config, output: nil, source_root: nil, source_url: nil, source_url_pattern: nil,
                     homepage_url: nil, source_beam: nil,
                     retriever: ExDoc.Retriever, formatter: ExDoc.HTMLFormatter,
                     project: nil, version: nil, main: nil, readme: false
@@ -12,6 +12,7 @@ defmodule ExDoc do
     options = normalize_options(options)
     config  = Config[project: project, version: version, main: options[:main] || project,
                      homepage_url: options[:homepage_url],
+                     output: options[:output] || Path.join("docs", project),
                      source_root: options[:source_root] || File.cwd!].update(options)
 
     docs = config.retriever.docs_from_dir(config.source_beam, config)

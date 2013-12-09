@@ -37,7 +37,7 @@ defmodule ExDoc.CLI do
       PROJECT            Project name
       VERSION            Version number
       BEAMS              Path to compiled beam files
-      -o, --output       Path to output docs, default: docs
+      -o, --output       Path to output docs, default: docs/PROJECT
       --readme           Generate a project README from a README.md file, default: false
       -f, --formatter    Docs formatter to use, default: ExDoc.HTMLFormatter
       -r, --source-root  Path to the source code root, default: .
