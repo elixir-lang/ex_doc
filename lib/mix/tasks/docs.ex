@@ -9,7 +9,7 @@ defmodule Mix.Tasks.Docs do
 
   ## Command line options
 
-  * `--output`, `-o` - output directory for the generated docs; default: `"docs/PROJECT"`
+  * `--output`, `-o` - output directory for the generated docs; default: `"docs"`
 
   ## Configuration
 
@@ -22,7 +22,7 @@ defmodule Mix.Tasks.Docs do
   main configuration. The docs options should be a keyword list or a function
   returning a keyword list that will be lazily executed.
 
-  * `:output` - output directory for the generated docs; default: docs/PROJECT.
+  * `:output` - output directory for the generated docs; default: docs.
     May be overriden by command line argument.
 
   * `:readme` - boolean indicating whether a project README should be created
@@ -48,7 +48,10 @@ defmodule Mix.Tasks.Docs do
   def run(args, config // Mix.project, generator // &ExDoc.generate_docs/3) do
     Mix.Task.run "compile"
 
-    { cli_opts, args, _ } = OptionParser.parse(args, aliases: [o: :output], switches: [output: :string])
+    { cli_opts, args, _ } =
+      OptionParser.parse(args, aliases: [o: :output],
+                               switches: [output: :string,
+                                          no_assets: :boolean])
 
     if args != [] do
       raise Mix.Error, message: "Extraneous arguments on the command line"

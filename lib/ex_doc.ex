@@ -1,8 +1,9 @@
 defmodule ExDoc do
-  defrecord Config, output: nil, source_root: nil, source_url: nil, source_url_pattern: nil,
+  defrecord Config, output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
                     homepage_url: nil, source_beam: nil,
                     retriever: ExDoc.Retriever, formatter: ExDoc.HTMLFormatter,
-                    project: nil, version: nil, main: nil, readme: false
+                    project: nil, version: nil, main: nil, readme: false,
+                    create_assets: true
 
   @doc """
   Generates documentation for the given `project`, `version`
@@ -12,7 +13,7 @@ defmodule ExDoc do
     options = normalize_options(options)
     config  = Config[project: project, version: version, main: options[:main] || project,
                      homepage_url: options[:homepage_url],
-                     output: options[:output] || Path.join("docs", project),
+                     output: options[:output] || "docs",
                      source_root: options[:source_root] || File.cwd!].update(options)
 
     docs = config.retriever.docs_from_dir(config.source_beam, config)
@@ -24,6 +25,10 @@ defmodule ExDoc do
   defp normalize_options(options) do
     pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || "master")
     Keyword.put(options, :source_url_pattern, pattern)
+    if options[:no_assets] do
+      options = Keyword.put(Keyword.delete(options, :no_assets), :create_assets, false)
+    end
+    options
   end
 
   defp guess_url(url = <<"https://github.com/", _ :: binary>>, ref) do

@@ -1,6 +1,7 @@
 defmodule ExDoc.CLI do
   def run(args) do
-    parsed = OptionParser.parse(args, switches: [readme: :boolean],
+    parsed = OptionParser.parse(args,
+               switches: [readme: :boolean, no_assets: :boolean],
                aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root,
                          m: :main, p: :homepage_url])
 
@@ -37,7 +38,7 @@ defmodule ExDoc.CLI do
       PROJECT            Project name
       VERSION            Version number
       BEAMS              Path to compiled beam files
-      -o, --output       Path to output docs, default: docs/PROJECT
+      -o, --output       Path to output docs, default: docs
       --readme           Generate a project README from a README.md file, default: false
       -f, --formatter    Docs formatter to use, default: ExDoc.HTMLFormatter
       -r, --source-root  Path to the source code root, default: .
@@ -45,6 +46,7 @@ defmodule ExDoc.CLI do
       --source-ref       Branch/commit/tag used for source link inference, default: master
       -m, --main         The main, entry-point module in docs
       -p  --homepage-url URL to link to for the site name
+      --no-assets        Don't copy the CSS and JS to the output directory.
 
     ## Source linking
 

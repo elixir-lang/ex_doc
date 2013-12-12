@@ -13,16 +13,22 @@ defmodule ExDoc.HTMLFormatter do
     output = Path.expand(config.output)
     File.mkdir_p output
 
-    generate_index(output, config)
-    generate_assets(output, config)
-    has_readme = config.readme && generate_readme(output)
+    proj_output = Path.join(output, to_string(config.project))
+    File.mkdir_p proj_output
+
+    if config.create_assets do
+      generate_assets(output, config)
+    end
+
+    generate_index(proj_output, config)
+    has_readme = config.readme && generate_readme(proj_output)
 
     modules = Autolink.all(modules)
     
-    generate_overview(modules, output, config)
+    generate_overview(modules, proj_output, config)
 
     Enum.each [:modules, :records, :protocols], fn(mod_type) ->
-      generate_list(mod_type, modules, output, config, has_readme)
+      generate_list(mod_type, modules, proj_output, config, has_readme)
     end
   end
 
@@ -47,8 +53,9 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   defp generate_assets(output, _config) do
+    File.mkdir "#{output}/_assets"
     Enum.each assets, fn({ pattern, dir }) ->
-      output = "#{output}/#{dir}"
+      output = "#{output}/_assets/#{dir}"
       File.mkdir output
 
       Enum.map Path.wildcard(pattern), fn(file) ->
