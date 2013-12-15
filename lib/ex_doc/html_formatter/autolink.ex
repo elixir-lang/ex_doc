@@ -140,7 +140,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   will get translated to the new href of the function.
   """
   def local_doc(bin, locals) when is_binary(bin) do
-    Regex.scan(%r{(?<!\[)`\s*([a-z_!\\?]+/\d+)\s*`(?!\])}, bin)
+    Regex.scan(%r{(?<!\[)`\s*(([a-z_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
     |> Enum.filter(&(&1 in locals))
@@ -167,7 +167,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   will get translated to the new href of the function.
   """
   def project_functions(bin, project_funs) when is_binary(bin) do
-    Regex.scan(%r{(?<!\[)`\s*((([A-Z][A-Za-z]+)\.)+[a-z_!\\?]+/\d+)\s*`(?!\])}, bin)
+    Regex.scan(%r{(?<!\[)`\s*((([A-Z][A-Za-z]+)\.)+([a-z_!\?>\|=&<!~+\.\+*^@-]+)/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
     |> Enum.filter(&(&1 in project_funs))
@@ -202,7 +202,10 @@ defmodule ExDoc.HTMLFormatter.Autolink do
 
   defp split_function(bin) do
     [modules, arity] = String.split(bin, "/")
-    { mod, name } = modules |> String.split(".") |> Enum.split(-1)
+    { mod, name } = modules
+      |> String.replace(%r{([^\.])\.}, "\\1 ") # this handles the case of the ".." function
+      |> String.split(" ")
+      |> Enum.split(-1)
     { Enum.join(mod, "."), hd(name), arity }
   end
 

@@ -28,6 +28,13 @@ defmodule ExDoc.HTMLFormatter.AutolinkTest do
     assert Autolink.local_doc("[the `example/1`]()", ["example/1"]) == "[the `example/1`]()"
   end
 
+  test "autolink creates links for special forms" do
+    assert Autolink.local_doc("`++/2`", ["++/2"]) === "[`++/2`](#++/2)"
+    assert Autolink.local_doc("`!/1`", ["!/1"]) === "[`!/1`](#!/1)"
+    assert Autolink.local_doc("`../2`", ["../2"]) === "[`../2`](#../2)"
+    assert Autolink.local_doc("`--/2`", ["--/2"]) === "[`--/2`](#--/2)"
+  end
+
   # project_functions
 
   test "autolink Module.fun/arity in docs" do
@@ -47,6 +54,13 @@ defmodule ExDoc.HTMLFormatter.AutolinkTest do
     assert Autolink.project_functions("`Mod.funny_name\?/1` and `Mod.funny_name!/2`",
       ["Mod.funny_name\?/1", "Mod.funny_name!/2"]) ==
       "[`Mod.funny_name\?/1`](Mod.html#funny_name\?/1) and [`Mod.funny_name!/2`](Mod.html#funny_name!/2)"
+  end
+
+  test "autolink creates links for Module special forms" do
+    assert Autolink.project_functions("`Mod.++/2`", ["Mod.++/2"]) === "[`Mod.++/2`](Mod.html#++/2)"
+    assert Autolink.project_functions("`Mod.!/1`", ["Mod.!/1"]) === "[`Mod.!/1`](Mod.html#!/1)"
+    assert Autolink.project_functions("`Mod.../2`", ["Mod.../2"]) === "[`Mod.../2`](Mod.html#../2)"
+    assert Autolink.project_functions("`Mod.--/2`", ["Mod.--/2"]) === "[`Mod.--/2`](Mod.html#--/2)"
   end
 
   test "autolink doesn't create links for undefined Mod.functions in docs" do
