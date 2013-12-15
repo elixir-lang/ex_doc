@@ -154,7 +154,10 @@ defmodule ExDoc.Retriever do
     { _, signatures } = List.keyfind(callbacks, tuple, 0, { nil, [] })
 
     if signature = Enum.first(signatures) do
-      { :::, _, [{ ^name, _, signature }, _] } = Kernel.Typespec.spec_to_ast(name, signature)
+      case Kernel.Typespec.spec_to_ast(name, signature) do
+        { :::, _, [{ ^name, _, signature }, _] } -> signature
+        { :when, _, [{ :::, _, [{ ^name, _, signature }, _] }, _] } -> signature
+      end
     end
 
     ExDoc.FunctionNode[
