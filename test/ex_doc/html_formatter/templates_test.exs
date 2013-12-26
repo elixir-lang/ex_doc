@@ -224,4 +224,27 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     content = get_module_page([CustomProtocol])
     assert content =~ %r{<h1>\s*CustomProtocol\s*<small>protocol</small>\s*<\/h1>}m
   end
+
+  ## MASTER INDEX
+  
+  test "master index contains projects and modules" do
+    alias ExDoc.ProjectInfo, as: PI
+    projects = [
+      PI[project: "foo", version: "1.0.1", documented_modules:
+          [{Foo, nil}, {Bar, :protocol}, {Baz, :exception}]],
+      PI[project: "rock_city", version: "old", documented_modules:
+          [{Rock.Fred, :record}]],
+      PI[project: "void", version: "0", documented_modules: []]
+    ]
+    content = Templates.master_index_template(projects)
+    assert content =~ %r{<title>\s*Project Index</title>}
+    assert content =~ %r{<h1>\s*Project Index</h1>}
+    assert content =~ %r{<a href="foo/index.html">foo v1.0.1</a>}
+    assert content =~ %r{<a href="foo/Foo.html">Foo</a>\s*</span>\s*</li>}
+    assert content =~ %r{<a href="foo/Bar.html">Bar</a>\s*<small>protocol</small>}
+    assert content =~ %r{<a href="rock_city/index.html">rock_city vold</a>}
+    assert content =~ %r{<a href="rock_city/Rock.Fred.html">Rock.Fred</a>\s*<small>record</small>}
+    assert content =~ %r{<a href="void/index.html">void v0</a>\s*</span>\s*</li>\s*<ul>\s*</ul>}
+  end
+      
 end

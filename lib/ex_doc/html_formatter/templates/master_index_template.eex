@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Project Index</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="_assets/css/full_list.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="_assets/js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="_assets/js/full_list.js"></script>
+  </head>
+
+  <body>
+    <div id="content">
+      <h1>Project Index</h1>
+    <ul id="full_list" class="class">
+      <%= lc pi inlist projects do %>
+        <li>
+          <%= unless Enum.empty?(pi.documented_modules) do %>
+            <a class="toggle"></a>
+          <% end %>
+          <span class="object_link">
+            <a href="<%= "#{h(pi.project)}/index.html" %>"><%=h pi.project %> v<%= h pi.version %></a>
+          </span>
+        </li>
+        <ul>
+          <%= lc { mod, type } inlist pi.documented_modules do %>
+          <li>
+            <span class="object_link">
+              <a href="<%= "#{h(pi.project)}/#{h(inspect(mod))}.html" %>"><%=h inspect(mod) %></a>
+              <%= if type do %>
+                <small><%=h to_string(type) %></small>
+              <% end %>
+            </span>
+          </li>
+          <%= end %> 
+        </ul>
+      <% end %>
+    </ul>
+    </div>
+  </body>
+</html>

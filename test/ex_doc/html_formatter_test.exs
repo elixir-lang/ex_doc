@@ -44,19 +44,12 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "run generates in specified output directory" do
+    File.mkdir_p!("#{output_dir}/foo/bar")
     config = ExDoc.Config[project: "bar", output: "#{output_dir}/foo"]
     HTMLFormatter.run(get_modules(config), config)
 
     assert File.regular?("#{output_dir}/foo/bar/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/foo/bar/index.html")
-    assert File.regular?("#{output_dir}/foo/_assets/css/style.css")
-  end
-  
-  test "run does not generate assets if create_assets is false" do
-    config = doc_config.update(create_assets: false, output: "#{output_dir}/na")
-    HTMLFormatter.run(get_modules(config), config)
-
-    refute File.regular?("#{output_dir}/na/_assets/css/style.css")
   end
 
   test "run generates all listing files" do
@@ -79,6 +72,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
   
   test "run generates the overview file" do
+    File.mkdir!(proj_output_dir)
     HTMLFormatter.run(get_modules, doc_config)
 
     assert File.regular?("#{proj_output_dir}/overview.html")

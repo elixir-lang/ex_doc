@@ -49,14 +49,20 @@ defmodule Mix.Tasks.Docs do
     Mix.Task.run "compile"
 
     { cli_opts, args, _ } =
-      OptionParser.parse(args, aliases: [o: :output],
-                               switches: [output: :string,
-                                          no_assets: :boolean])
+      OptionParser.parse(args, aliases: [o: :output], switches: [output: :string])
 
     if args != [] do
       raise Mix.Error, message: "Extraneous arguments on the command line"
     end
 
+    { res, project, options } = run_internal(config, generator, cli_opts)
+    log(project, options)
+    res
+  end
+
+  # Internal parts of run, used by Docs.All as well
+  @doc false
+  def run_internal(config, generator, cli_opts // []) do
     project = (config[:name] || config[:app]) |> to_string
     version = config[:version] || "dev"
     options = Keyword.merge(get_docs_opts(config), cli_opts)
@@ -84,8 +90,7 @@ defmodule Mix.Tasks.Docs do
     options = Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
 
     res = generator.(project, version, options)
-    log(project, options)
-    res
+    { res, project, options }
   end
 
   defp log(project, options) do
