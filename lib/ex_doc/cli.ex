@@ -7,15 +7,7 @@ defmodule ExDoc.CLI do
     opts = elem(parsed, 0)
     args = elem(parsed, 1)
 
-    case args do
-      [project, version, source_beam] -> :ok
-      [_,_,_|_] ->
-        IO.puts "Too many arguments.\n"
-        print_usage()
-      _ ->
-        IO.puts "Too few arguments.\n"
-        print_usage()
-    end
+    [project, version, source_beam] = parse_args(args)
 
     if formatter = opts[:formatter] do
       opts = Keyword.put(opts, :formatter, String.split(formatter, "."))
@@ -24,6 +16,19 @@ defmodule ExDoc.CLI do
     opts = Keyword.put(opts, :source_beam, source_beam)
     ExDoc.generate_docs(project, version, opts)
   end
+
+  defp parse_args([_project, _version, _source_beam] = args), do: args
+  defp parse_args([_, _, _ | _]) do
+    IO.puts "Too many arguments.\n"
+    print_usage()
+    exit(1)
+  end
+  defp parse_args(_) do
+    IO.puts "Too few arguments.\n"
+    print_usage()
+    exit(1)
+  end
+
 
   defp print_usage do
     IO.puts %S"""
@@ -68,6 +73,5 @@ defmodule ExDoc.CLI do
         https://github.com/elixir-lang/dynamo/blob/v1.0/%{path}#L%{line}
 
     """
-    exit(1)
   end
 end
