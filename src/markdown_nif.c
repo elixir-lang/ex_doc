@@ -40,7 +40,7 @@ static ERL_NIF_TERM render_term(ErlNifEnv* env, int argc, const ERL_NIF_TERM arg
 
   output = bufnew(OUTPUT_SIZE);
 
-  unsigned int extensions = MKDEXT_AUTOLINK | MKDEXT_FENCED_CODE;
+  unsigned int extensions = MKDEXT_AUTOLINK | MKDEXT_FENCED_CODE | MKDEXT_TABLES;
   markdown = sd_markdown_new(extensions, 16, &data->callbacks, data->options);
   sd_markdown_render(output, input->data, input->size, markdown);
   sd_markdown_free(markdown);
