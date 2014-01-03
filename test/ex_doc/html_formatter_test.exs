@@ -16,11 +16,11 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   defp output_dir do
-    Path.expand("../../docs", __FILE__)
+    Path.expand("../docs", __DIR__)
   end
 
   defp beam_dir do
-    Path.expand("../../tmp/ebin", __FILE__)
+    Path.expand("../tmp/ebin", __DIR__)
   end
 
   defp doc_config do
