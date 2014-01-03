@@ -76,6 +76,16 @@ defmodule ExDoc.HTMLFormatter do
     false
   end
 
+  @doc false
+  # Helper to split modules into different categories.
+  #
+  # Public so that code in Template can use it.
+  def categorize_modules(nodes) do
+    [modules: filter_list(:modules, nodes),
+     records: filter_list(:records, nodes),
+     protocols: filter_list(:protocols, nodes)]
+  end
+
   defp filter_list(:records, nodes) do
     Enum.filter nodes, &match?(ExDoc.ModuleNode[type: x] when x in [:record, :exception], &1)
   end
@@ -90,13 +100,13 @@ defmodule ExDoc.HTMLFormatter do
 
   defp generate_list(scope, all, output, config, has_readme) do
     nodes = filter_list(scope, all)
-    Enum.each nodes, &generate_module_page(&1, output)
+    Enum.each nodes, &generate_module_page(&1, all, output, config)
     content = Templates.list_page(scope, nodes, config, has_readme)
     File.write("#{output}/#{scope}_list.html", content)
   end
 
-  defp generate_module_page(node, output) do
-    content = Templates.module_page(node)
+  defp generate_module_page(node, modules, output, config) do
+    content = Templates.module_page(node, config, modules)
     File.write("#{output}/#{node.id}.html", content)
   end
 

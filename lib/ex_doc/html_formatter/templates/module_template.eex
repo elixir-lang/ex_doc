@@ -20,12 +20,51 @@
     </script>
 
     <div id="content">
+      <div class="breadcrumbs"><%= breadcrumbs(modules ++ records ++ protocols, config, module) %></div>
+      
+      <%
+          # These were unfiltered so that the call to breadcrumbs would work.
+          # Filter them now.
+          modules = modules_below(module, modules)
+          records = modules_below(module, records)
+          protocols = modules_below(module, protocols)
+      %>
+
       <h1>
         <%= module.id %>
         <%= if module.type do %>
           <small><%= module.type %></small>
         <% end %>
       </h1>
+
+      <% fields = get_fields(module) %>
+
+      <ul class="summary_links">
+        <%= if fields do %>
+          <li><a href="#fields_summary">Fields</a></li>
+        <% end %>
+        <%= unless Enum.empty?(functions) do %>
+          <li><a href="#functions_summary">Functions</a></li>
+        <% end %>
+        <%= unless Enum.empty?(macros) do %>
+          <li><a href="#macros_summary">Macros</a></li>
+        <% end %>
+        <%= unless Enum.empty?(callbacks) do %>
+          <li><a href="#callbacks_summary">Callbacks</a></li>
+        <% end %>
+        <%= unless Enum.empty?(modules) do %>
+          <li><a href="#modules_summary">Modules</a></li>
+        <% end %>
+        <%= unless Enum.empty?(records) do %>
+          <li><a href="#records_summary">Records</a></li>
+        <% end %>
+        <%= unless Enum.empty?(protocols) do %>
+          <li><a href="#protocols_summary">Protocols</a></li>
+        <% end %>
+        <%= unless Enum.empty?(types) do %>
+          <li><a href="#types_details">Types</a></li>
+        <% end %>
+      </ul>
 
       <%= if module.moduledoc do %>
         <div id="moduledoc" class="docstring">
@@ -35,8 +74,8 @@
 
       <a href="<%= module.source %>" target="_blank" class="view_source">Source</a>
 
-      <%= if fields = get_fields(module) do %>
-        <h2>Fields <small>(and defaults)</small></h2>
+      <%= if fields do %>
+        <h2 id="fields_summary">Fields <small>(and defaults)</small></h2>
         <ul class="summary">
           <%= lc { field, default } inlist fields do %>
             <li>
@@ -49,29 +88,31 @@
       <% end %>
 
       <%= unless Enum.empty?(functions) do %>
-        <h2 id="functions_summary">Functions summary</h2>
+        <h2 id="functions_summary">Functions summary<%= to_top_link() %></h2>
         <table class="summary">
           <%= lc node inlist functions, do: summary_template(node) %>
         </table>
       <% end %>
 
       <%= unless Enum.empty?(macros) do %>
-        <h2 id="macros_summary">Macros summary</h2>
+        <h2 id="macros_summary">Macros summary<%= to_top_link() %></h2>
         <table class="summary">
           <%= lc node inlist macros, do: summary_template(node) %>
         </table>
       <% end %>
 
       <%= unless Enum.empty?(callbacks) do %>
-        <h2 id="callbacks_summary">Callbacks summary</h2>
+        <h2 id="callbacks_summary">Callbacks summary<%= to_top_link() %></h2>
         <table class="summary">
           <%= lc node inlist callbacks, do: summary_template(node) %>
         </table>
       <% end %>
+   
+      <%= overview_summaries(modules, records, protocols) %>
 
       <%= unless Enum.empty?(types) do %>
         <div id="types_details" class="details_list">
-          <h2>Types</h2>
+          <h2>Types <%= to_top_link() %></h2>
           <%= lc node inlist types, do: type_detail_template(node, module) %>
         </div>
       <% end %>
