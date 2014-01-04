@@ -65,7 +65,7 @@ defmodule ExDoc.HTMLFormatterTest do
     content = File.read!("#{output_dir}/protocols_list.html")
     assert content =~ %r{<li>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}ms
   end
-  
+
   test "run generates the overview file" do
     HTMLFormatter.run(get_modules, doc_config)
 
