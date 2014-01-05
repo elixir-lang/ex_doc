@@ -33,7 +33,9 @@
         </div>
       <% end %>
 
-      <a href="<%= module.source %>" target="_blank" class="view_source">Source</a>
+      <%= if module.source do %>
+        <a href="<%= module.source %>" target="_blank" class="view_source">Source</a>
+      <% end %>
 
       <%= if fields = get_fields(module) do %>
         <h2>Fields <small>(and defaults)</small></h2>

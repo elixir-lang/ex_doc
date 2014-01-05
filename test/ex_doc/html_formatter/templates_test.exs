@@ -46,11 +46,11 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ %r{<a href="#{source_url}" target="_blank">Elixir v1.0.1</a>}
   end
 
-  test "site title text links to / when there is no homepage_url or source_url" do
+  test "site title text creates no link when there is no homepage_url or source_url" do
     doc_config_without_source_url = ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
     content = Templates.list_template(:modules, [], doc_config_without_source_url, false)
-    assert content =~ %r{<a href="/" target="_blank">Elixir v1.0.1</a>}
+    assert content =~ %r{Elixir v1.0.1}
   end
 
   test "list_page outputs listing for the given nodes" do
@@ -135,7 +135,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     content = Templates.list_item_template(node)
     assert content =~ %r/<a class="toggle">/
   end
-  
+
   ## MODULES
 
   test "module_page generates only the module name when there's no more info" do
@@ -159,13 +159,13 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ %r{<strong>example\(foo, bar // Baz\)</strong>}
     assert content =~ %r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
   end
-  
+
   test "module_page outputs the types and function specs" do
     content = get_module_page([TypesAndSpecs, TypesAndSpecs.Sub])
 
     mb = "http://elixir-lang.org/docs/master"
 
-    public_html = 
+    public_html =
       "<a href=\"#t:public/1\">public(t)</a> :: {t, " <>
       "<a href=\"#{mb}/String.html#t:t/0\">String.t</a>, " <>
       "<a href=\"TypesAndSpecs.Sub.html#t:t/0\">TypesAndSpecs.Sub.t</a>, " <>

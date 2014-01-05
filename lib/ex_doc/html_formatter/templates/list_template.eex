@@ -16,7 +16,11 @@
     </script>
     <div id="content">
       <h1 id="full_list_header">
-        <a href="<%= config.homepage_url || config.source_url || "/" %>" target="_blank"><%= config.project %> v<%= config.version %></a>
+        <%= if url = config.homepage_url || config.source_url do %>
+          <a href="<%= url %>" target="_blank"><%= config.project %> v<%= config.version %></a>
+        <% else %>
+          <%= config.project %> v<%= config.version %>
+        <% end %>
       </h1>
 
       <h2 id="sub_list_header">
