@@ -46,7 +46,14 @@ defmodule ExDoc.HTMLFormatter.Templates do
 
   # Get the full signature from a function
   defp signature(ExDoc.FunctionNode[name: name, signature: args]) do
-    Macro.to_string { name, 0, args }
+    cond do
+      name in [:__aliases__, :__block__] ->
+        "#{name}(args)"
+      name in [:__ENV__, :__MODULE__, :__DIR__, :__CALLER__] ->
+        "#{name}"
+      true ->
+        Macro.to_string { name, 0, args }
+    end
   end
 
   # Get the first paragraph of the documentation of a node, if any.
