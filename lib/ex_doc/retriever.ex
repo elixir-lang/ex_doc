@@ -26,8 +26,8 @@ defmodule ExDoc.Retriever do
   """
   def docs_from_files(files, config) when is_list(files) do
     files
-      |> Enum.map(&filename_to_module(&1))
-      |> docs_from_modules(config)
+    |> Enum.map(&filename_to_module(&1))
+    |> docs_from_modules(config)
   end
 
   @doc """
@@ -35,9 +35,9 @@ defmodule ExDoc.Retriever do
   """
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
-      |> Enum.map(&get_module(&1, config))
-      |> Enum.filter(fn(x) -> x end)
-      |> Enum.sort
+    |> Enum.map(&get_module(&1, config))
+    |> Enum.filter(fn(x) -> x end)
+    |> Enum.sort
   end
 
   defp filename_to_module(name) do
