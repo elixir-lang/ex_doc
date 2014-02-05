@@ -50,6 +50,7 @@ defmodule ExDoc.CLI do
       --source-ref       Branch/commit/tag used for source link inference, default: master
       -m, --main         The main, entry-point module in docs
       -p  --homepage-url URL to link to for the site name
+      --synopsis-file    File containing a short description of the package
 
     ## Source linking
 
