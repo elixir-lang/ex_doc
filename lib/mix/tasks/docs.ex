@@ -48,12 +48,21 @@ defmodule Mix.Tasks.Docs do
   def run(args, config // Mix.project, generator // &ExDoc.generate_docs/3) do
     Mix.Task.run "compile"
 
-    { cli_opts, args, _ } = OptionParser.parse(args, aliases: [o: :output], switches: [output: :string])
+    { cli_opts, args, _ } =
+      OptionParser.parse(args, aliases: [o: :output], switches: [output: :string])
 
     if args != [] do
       raise Mix.Error, message: "Extraneous arguments on the command line"
     end
 
+    { res, project, options } = run_internal(config, generator, cli_opts)
+    log(project, options)
+    res
+  end
+
+  # Internal parts of run, used by Docs.All as well
+  @doc false
+  def run_internal(config, generator, cli_opts // []) do
     project = (config[:name] || config[:app]) |> to_string
     version = config[:version] || "dev"
     options = Keyword.merge(get_docs_opts(config), cli_opts)
@@ -81,12 +90,11 @@ defmodule Mix.Tasks.Docs do
     options = Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
 
     res = generator.(project, version, options)
-    log(options)
-    res
+    { res, project, options }
   end
 
-  defp log(options) do
-    index = Path.join(options[:output] || "docs", "index.html")
+  defp log(project, options) do
+    index = Path.join([options[:output] || "docs", project, "index.html"])
     Mix.shell.info "%{green}Docs successfully generated."
     Mix.shell.info "%{green}Open #{index} in your browser to read them."
   end

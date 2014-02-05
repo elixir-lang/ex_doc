@@ -1,6 +1,7 @@
 defmodule ExDoc.CLI do
   def run(args) do
-    parsed = OptionParser.parse(args, switches: [readme: :boolean],
+    parsed = OptionParser.parse(args,
+               switches: [readme: :boolean, no_assets: :boolean, no_index: :boolean],
                aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root,
                          m: :main, p: :homepage_url])
 
@@ -50,6 +51,8 @@ defmodule ExDoc.CLI do
       --source-ref       Branch/commit/tag used for source link inference, default: master
       -m, --main         The main, entry-point module in docs
       -p  --homepage-url URL to link to for the site name
+      --no-assets        Don't copy the CSS and JS to the output directory.
+      --no-index         Don't generate the main index file in the output directory.
 
     ## Source linking
 
