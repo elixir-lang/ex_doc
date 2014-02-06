@@ -7,7 +7,7 @@ defmodule CompiledWithDocs do
   """
 
   @doc "Some example"
-  def example(foo, bar // Baz), do: bar.baz(foo)
+  def example(foo, bar \\ Baz), do: bar.baz(foo)
 
   @doc "Another example"
   defmacro example_1, do: 1

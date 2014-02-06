@@ -45,7 +45,7 @@ defmodule Mix.Tasks.Docs do
   """
 
   @doc false
-  def run(args, config // Mix.project, generator // &ExDoc.generate_docs/3) do
+  def run(args, config \\ Mix.project, generator \\ &ExDoc.generate_docs/3) do
     Mix.Task.run "compile"
 
     { cli_opts, args, _ } = OptionParser.parse(args, aliases: [o: :output], switches: [output: :string])

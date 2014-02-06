@@ -156,7 +156,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ %r/example_without_docs\/0.*<div class="docstring">.*<\/div>/ms
     assert content =~ %r/example_1\/0.*Another example/ms
     assert content =~ %r{<p class="signature" id="example_1/0">}
-    assert content =~ %r{<strong>example\(foo, bar // Baz\)</strong>}
+    assert content =~ %r{<strong>example\(foo, bar \\\\ Baz\)</strong>}
     assert content =~ %r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
   end
 

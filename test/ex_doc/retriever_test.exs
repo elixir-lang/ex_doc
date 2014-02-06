@@ -45,7 +45,7 @@ defmodule ExDoc.RetrieverTest do
     assert example.id   == "example/2"
     assert example.doc  == "Some example"
     assert example.type == :def
-    assert [{ :foo, _, _ }, { ://, _, _ }] = example.signature
+    assert [{ :foo, _, _ }, { :\\, _, _ }] = example.signature
 
     assert example_1.id   == "example_1/0"
     assert example_1.type == :defmacro
