@@ -27,7 +27,7 @@ defmodule ExDoc.HTMLFormatterTest do
     ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: beam_dir]
   end
 
-  defp get_modules(config // doc_config) do
+  defp get_modules(config \\ doc_config) do
     ExDoc.Retriever.docs_from_dir(beam_dir, config)
   end
 
