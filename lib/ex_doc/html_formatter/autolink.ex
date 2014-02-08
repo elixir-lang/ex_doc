@@ -11,7 +11,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   This is only intended for use by the HTML formatter.
   """
   def escape_html(binary) do
-    escape_map = [{ %r(&), "\\&amp;" }, { %r(<), "\\&lt;" }, { %r(>), "\\&gt;" }, { %r("), "\\&quot;" }]
+    escape_map = [{ ~r(&), "\\&amp;" }, { ~r(<), "\\&lt;" }, { ~r(>), "\\&gt;" }, { ~r("), "\\&quot;" }]
     Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
   end
 
@@ -72,7 +72,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
         string = strip_parens(string, args)
         arity = length(args)
         if { name, arity } in typespecs do
-          %s[<a href="#t:#{name}/#{arity}">#{string}</a>]
+          ~s[<a href="#t:#{name}/#{arity}">#{string}</a>]
         else
           string
         end
@@ -80,7 +80,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
         string = strip_parens(string, args)
         alias = expand_alias(alias)
         if source = get_source(alias, aliases) do
-          %s[<a href="#{source}#{inspect alias}.html#t:#{name}/#{length(args)}">#{string}</a>]
+          ~s[<a href="#{source}#{inspect alias}.html#t:#{name}/#{length(args)}">#{string}</a>]
         else
           string
         end
@@ -140,13 +140,13 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   will get translated to the new href of the function.
   """
   def local_doc(bin, locals) when is_binary(bin) do
-    Regex.scan(%r{(?<!\[)`\s*(([a-z_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)\s*`(?!\])}, bin)
+    Regex.scan(~r{(?<!\[)`\s*(([a-z_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
     |> Enum.filter(&(&1 in locals))
     |> Enum.reduce(bin, fn (x, acc) ->
          escaped = Regex.escape(x)
-         Regex.replace(%r/(?<!\[)`(\s*(#{escaped})\s*)`(?!\])/, acc, "[`\\1`](#\\2)")
+         Regex.replace(~r/(?<!\[)`(\s*(#{escaped})\s*)`(?!\])/, acc, "[`\\1`](#\\2)")
        end)
   end
 
@@ -167,14 +167,14 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   will get translated to the new href of the function.
   """
   def project_functions(bin, project_funs) when is_binary(bin) do
-    Regex.scan(%r{(?<!\[)`\s*((([A-Z][A-Za-z]+)\.)+([a-z_!\?>\|=&<!~+\.\+*^@-]+)/\d+)\s*`(?!\])}, bin)
+    Regex.scan(~r{(?<!\[)`\s*((([A-Z][A-Za-z]+)\.)+([a-z_!\?>\|=&<!~+\.\+*^@-]+)/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
     |> Enum.filter(&(&1 in project_funs))
     |> Enum.reduce(bin, fn (x, acc) ->
          { mod_str, function_name, arity } = split_function(x)
          escaped = Regex.escape(x)
-         Regex.replace(%r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
+         Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
            "[`\\1`](#{mod_str}.html##{function_name}/#{arity})")
        end)
   end
@@ -189,13 +189,13 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   will get translated to the new href of the module.
   """
   def project_modules(bin, modules) when is_binary(bin) do
-    Regex.scan(%r{(?<!\[)`\s*(([A-Z][A-Za-z]+\.?)+)\s*`(?!\])}, bin)
+    Regex.scan(~r{(?<!\[)`\s*(([A-Z][A-Za-z]+\.?)+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
     |> Enum.filter(&(&1 in modules))
     |> Enum.reduce(bin, fn (x, acc) ->
          escaped = Regex.escape(x)
-         Regex.replace(%r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
+         Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
            "[`\\1`](\\1.html)")
        end)
   end
@@ -203,7 +203,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   defp split_function(bin) do
     [modules, arity] = String.split(bin, "/")
     { mod, name } = modules
-      |> String.replace(%r{([^\.])\.}, "\\1 ") # this handles the case of the ".." function
+      |> String.replace(~r{([^\.])\.}, "\\1 ") # this handles the case of the ".." function
       |> String.split(" ")
       |> Enum.split(-1)
     { Enum.join(mod, "."), hd(name), arity }
@@ -223,7 +223,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   """
   def erlang_functions(bin) when is_binary(bin) do
     lib_dir = erlang_lib_dir()
-    Regex.scan(%r{(?<!\[)`\s*:([a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}, bin)
+    Regex.scan(~r{(?<!\[)`\s*:([a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
     |> Enum.filter(&valid_erlang_beam?(&1, lib_dir))
@@ -231,7 +231,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     |> Enum.reduce(bin, fn (x, acc) ->
          { mod_str, function_name, arity } = split_function(x)
          escaped = Regex.escape(x)
-         Regex.replace(%r/(?<!\[)`(\s*:#{escaped}\s*)`(?!\])/, acc,
+         Regex.replace(~r/(?<!\[)`(\s*:#{escaped}\s*)`(?!\])/, acc,
            "[`\\1`](#{@erlang_docs}#{mod_str}.html##{function_name}-#{arity})")
        end)
   end

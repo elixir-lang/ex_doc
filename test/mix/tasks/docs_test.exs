@@ -37,7 +37,7 @@ defmodule Mix.Tasks.DocsTest do
 
   test "parses output with higher preference than options" do
     assert { "ex_doc", "dev", [source_beam: _, main: "ExDoc", output: "world"] } =
-           run(%w(-o world), [app: :ex_doc, docs: [output: "hello"]])
+           run(~w(-o world), [app: :ex_doc, docs: [output: "hello"]])
   end
 
   test "accepts lazy docs" do

@@ -31,7 +31,7 @@ defmodule ExDoc.CLI do
 
 
   defp print_usage do
-    IO.puts %S"""
+    IO.puts ~S"""
     Usage:
       ex_doc PROJECT VERSION BEAMS [OPTIONS]
 
