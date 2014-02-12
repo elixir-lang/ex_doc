@@ -18,30 +18,24 @@
     <script type="text/javascript" charset="utf-8">
       if (window.top.frames.main) document.body.className = 'frames';
     </script>
-	
-    <h1><%= config.project %> v<%= config.version %></h1>
 
     <div id="content">
-      <%= unless Enum.empty?(modules) do %>
-        <h2 id="modules_summary">Modules summary</h2>
-        <table class="summary">
-          <%= lc node inlist modules, do: overview_entry_template(node) %>
-        </table>
-      <% end %>
+      <div class="breadcrumbs"><%= breadcrumbs([], config, :overview) %></div>
+    
+      <h1><%= config.project %> v<%= config.version %></h1>
 
-      <%= unless Enum.empty?(records) do %>
-        <h2 id="records_summary">Records summary</h2>
-        <table class="summary">
-          <%= lc node inlist records, do: overview_entry_template(node) %>
-        </table>
-      <% end %>
-
-      <%= unless Enum.empty?(protocols) do %>
-        <h2 id="protocols_summary">Protocols summary</h2>
-        <table class="summary">
-          <%= lc node inlist protocols, do: overview_entry_template(node) %>
-        </table>
-      <% end %>
+      <ul class="summary_links">
+        <%= unless Enum.empty?(modules) do %>
+          <li><a href="#modules_summary">Modules</a></li>
+        <% end %>
+        <%= unless Enum.empty?(records) do %>
+          <li><a href="#records_summary">Records</a></li>
+        <% end %>
+        <%= unless Enum.empty?(protocols) do %>
+          <li><a href="#protocols_summary">Protocols</a></li>
+        <% end %>
+      </ul>
+      <%= overview_summaries(modules, records, protocols) %>
     </div>
   </body>
 </html>
