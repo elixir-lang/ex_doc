@@ -59,14 +59,14 @@ defmodule ExDoc.HTMLFormatter.Templates do
   # Get the first paragraph of the documentation of a node, if any.
   defp synopsis(nil), do: nil
   defp synopsis(doc) do
-    String.split(doc, %r/\n\s*\n/) |> hd
+    String.split(doc, ~r/\n\s*\n/) |> hd
   end
 
   defp presence([]),    do: nil
   defp presence(other), do: other
 
   defp h(binary) do
-    escape_map = [{ %r(&), "\\&amp;" }, { %r(<), "\\&lt;" }, { %r(>), "\\&gt;" }, { %r("), "\\&quot;" }]
+    escape_map = [{ ~r(&), "\\&amp;" }, { ~r(<), "\\&lt;" }, { ~r(>), "\\&gt;" }, { ~r("), "\\&quot;" }]
     Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
   end
 

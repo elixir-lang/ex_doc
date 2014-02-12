@@ -230,8 +230,8 @@ defmodule ExDoc.Retriever do
   defp source_link(_source_path, nil, _line), do: nil
 
   defp source_link(source_path, source_url, line) do
-    source_url = Regex.replace(%r/%{path}/, source_url, source_path)
-    Regex.replace(%r/%{line}/, source_url, to_string(line))
+    source_url = Regex.replace(~r/%{path}/, source_url, source_path)
+    Regex.replace(~r/%{line}/, source_url, to_string(line))
   end
 
   defp source_path(module, config) do
