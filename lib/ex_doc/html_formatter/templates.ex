@@ -59,7 +59,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
   # Get the first paragraph of the documentation of a node, if any.
   defp synopsis(nil), do: nil
   defp synopsis(doc) do
-    String.split(doc, ~r/\n\s*\n/) |> hd
+    String.split(doc, ~r/\n\s*\n/) |> hd |> String.rstrip(".")
   end
 
   defp presence([]),    do: nil
