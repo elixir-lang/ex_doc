@@ -20,8 +20,8 @@
     </script>
 
     <div id="content">
-      <div class="breadcrumbs"><%= breadcrumbs([], config, :overview) %></div>
-    
+      <div class="breadcrumbs"><%= page_breadcrumbs(config, "Overview", "overview.html") %></div>
+
       <h1><%= config.project %> v<%= config.version %></h1>
 
       <ul class="summary_links">
@@ -35,7 +35,27 @@
           <li><a href="#protocols_summary">Protocols</a></li>
         <% end %>
       </ul>
-      <%= overview_summaries(modules, records, protocols) %>
+
+      <%= unless Enum.empty?(modules) do %>
+        <h2 id="modules_summary">Modules summary <%= to_top_link() %></h2>
+        <table class="summary">
+          <%= lc node inlist modules, do: overview_entry_template(node) %>
+        </table>
+      <% end %>
+
+      <%= unless Enum.empty?(records) do %>
+        <h2 id="records_summary">Records summary <%= to_top_link() %></h2>
+        <table class="summary">
+          <%= lc node inlist records, do: overview_entry_template(node) %>
+        </table>
+      <% end %>
+
+      <%= unless Enum.empty?(protocols) do %>
+        <h2 id="protocols_summary">Protocols summary <%= to_top_link() %></h2>
+        <table class="summary">
+          <%= lc node inlist protocols, do: overview_entry_template(node) %>
+        </table>
+      <% end %>
     </div>
   </body>
 </html>

@@ -46,29 +46,6 @@ defmodule ExDoc.HTMLFormatter.Templates do
   defp to_html(nil), do: nil
   defp to_html(bin) when is_binary(bin), do: Markdown.to_html(bin)
 
-  # Get the breadcrumbs HTML.
-  #
-  # If module is :overview generates the breadcrumbs for the overview.
-  defp breadcrumbs(modules, config, module) do
-    root = "#{config.project} v#{config.version}"
-    parts = [{root, nil}, {"API reference", "overview.html"}]
-    module_aliases = if module == :overview, do: [], else: Module.split(module.module)
-    module_atoms = Enum.map(modules, &(&1.module))
-    { modparts, _ } =
-      Enum.reduce(module_aliases, { [], [] }, fn item, { l, parents } ->
-        path = parents ++ [ item ]
-        mod = Module.concat(path)
-        if mod in module_atoms do
-          { [{ item, inspect(mod) <> ".html" } | l], path }
-        else
-          { [{ item, nil } | l], path }
-        end
-      end)
-    Enum.map_join(parts ++ Enum.reverse(modparts), " &rarr; ", fn { name, ref } ->
-      if ref, do: "<a href=\"#{h(ref)}\">#{h(name)}</a>", else: h(name)
-    end)
-  end
-
   # Get the full signature from a function
   defp signature(ExDoc.FunctionNode[name: name, signature: args]) do
     cond do
@@ -100,15 +77,6 @@ defmodule ExDoc.HTMLFormatter.Templates do
   defp to_top_link() do
     "<a class=\"to_top_link\" href=\"#content\" title=\"To the top of the page\">&uarr;</a>"
   end
-  
-  defp modules_below(parent, all) do
-    parent_parts = Module.split(parent.module)
-    Enum.filter(all, fn ExDoc.ModuleNode[module: mod] ->
-      parts = Module.split(mod)
-      length(parts) > length(parent_parts) && 
-        Enum.take(parts, length(parent_parts)) == parent_parts
-    end)
-  end
 
   defp presence([]),    do: nil
   defp presence(other), do: other
@@ -118,18 +86,50 @@ defmodule ExDoc.HTMLFormatter.Templates do
     Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
   end
 
+  # Get the breadcrumbs HTML.
+  #
+  # If module is :overview generates the breadcrumbs for the overview.
+  defp module_breadcrumbs(config, modules, module) do
+    parts = [root_breadcrumbs(config), { "Overview", "overview.html" }]
+    aliases = Module.split(module.module)
+    modules = Enum.map(modules, &(&1.module))
+
+    { crumbs, _ } =
+      Enum.map_reduce(aliases, [], fn item, parents ->
+        path = parents ++ [item]
+        mod  = Module.concat(path)
+        page = if mod in modules, do: inspect(mod) <> ".html"
+        { { item, page }, path }
+      end)
+
+    generate_breadcrumbs(parts ++ crumbs)
+  end
+
+  defp page_breadcrumbs(config, title, link) do
+    generate_breadcrumbs [root_breadcrumbs(config), { title, link }]
+  end
+
+  defp root_breadcrumbs(config) do
+    { "#{config.project} v#{config.version}", nil }
+  end
+
+  defp generate_breadcrumbs(crumbs) do
+    Enum.map_join(crumbs, " &rarr; ", fn { name, ref } ->
+      if ref, do: "<a href=\"#{h(ref)}\">#{h(name)}</a>", else: h(name)
+    end)
+  end
+
   templates = [
     index_template: [:config],
     list_template: [:scope, :nodes, :config, :has_readme],
     overview_template: [:config, :modules, :records, :protocols],
     module_template: [:config, :module, :types, :functions, :macros, :callbacks, :modules, :records, :protocols],
+    readme_template: [:config, :content],
     list_item_template: [:node],
-    overview_summaries: [:modules, :records, :protocols],
     overview_entry_template: [:node],
     summary_template: [:node],
     detail_template: [:node, :_module],
     type_detail_template: [:node, :_module],
-    readme_template: [:content]
   ]
 
   Enum.each templates, fn({ name, args }) ->

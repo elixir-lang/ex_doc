@@ -20,16 +20,8 @@
     </script>
 
     <div id="content">
-      <div class="breadcrumbs"><%= breadcrumbs(modules ++ records ++ protocols, config, module) %></div>
+      <div class="breadcrumbs"><%= module_breadcrumbs(config, modules ++ records ++ protocols, module) %></div>
       
-      <%
-          # These were unfiltered so that the call to breadcrumbs would work.
-          # Filter them now.
-          modules = modules_below(module, modules)
-          records = modules_below(module, records)
-          protocols = modules_below(module, protocols)
-      %>
-
       <h1>
         <%= module.id %>
         <%= if module.type do %>
@@ -51,15 +43,6 @@
         <% end %>
         <%= unless Enum.empty?(callbacks) do %>
           <li><a href="#callbacks_summary">Callbacks</a></li>
-        <% end %>
-        <%= unless Enum.empty?(modules) do %>
-          <li><a href="#modules_summary">Modules</a></li>
-        <% end %>
-        <%= unless Enum.empty?(records) do %>
-          <li><a href="#records_summary">Records</a></li>
-        <% end %>
-        <%= unless Enum.empty?(protocols) do %>
-          <li><a href="#protocols_summary">Protocols</a></li>
         <% end %>
         <%= unless Enum.empty?(types) do %>
           <li><a href="#types_details">Types</a></li>
@@ -110,8 +93,6 @@
         </table>
       <% end %>
    
-      <%= overview_summaries(modules, records, protocols) %>
-
       <%= unless Enum.empty?(types) do %>
         <div id="types_details" class="details_list">
           <h2>Types <%= to_top_link() %></h2>

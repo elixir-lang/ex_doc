@@ -40,5 +40,4 @@ defmodule ExDoc do
   defp append_slash(url) do
     if :binary.last(url) == ?/, do: url, else: url <> "/"
   end
-
 end
