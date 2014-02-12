@@ -38,8 +38,8 @@ ul.summary_links li {
 
 div.docstring, p.docstring { margin-right: 6em; }
 .docstring h1, .docstring h2, .docstring h3, .docstring h4 { padding: 0; border: 0; border-bottom: 0; }
-.docstring h1 { font-size: 1.2em; }
-.docstring h2 { font-size: 1.1em; }
+.docstring h1 { font-size: 1.3em; }
+.docstring h2 { font-size: 1.2em; }
 .docstring h3, .docstring h4 { font-size: 1em; padding-top: 10px; }
 .docstring pre, .codeblock, .elixir {
   padding: 0.5em;
@@ -61,7 +61,7 @@ span.signature {
   font-size: 1.1em; font-weight: normal; font-family: Monaco, Consolas, Courier, monospace;
 }
 
-span.detail_header_links {
+div.detail_header_links {
   float: right;
 }
 
@@ -69,8 +69,12 @@ span.detail_type {
   font-size: 0.9em; font-style: italic;
 }
 
+a.detail_link {
+  padding-left: 0.3em;
+}
+
 a.to_top_link {
-  float: right; padding-left: 0.3em; font-size: 1em; font-weight: normal;
+  padding-left: 0.3em; font-size: 1em; font-weight: normal;
 }
 
 ul.spec {

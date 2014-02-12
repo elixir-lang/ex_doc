@@ -21,7 +21,7 @@
 
     <div id="content">
       <div class="breadcrumbs"><%= module_breadcrumbs(config, modules ++ records ++ protocols, module) %></div>
-      
+
       <h1>
         <%= module.id %>
         <%= if module.type do %>
@@ -35,14 +35,17 @@
         <%= if fields do %>
           <li><a href="#fields_summary">Fields</a></li>
         <% end %>
+        <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
+          <li><a href="#summary">Summary</a></li>
+        <% end %>
         <%= unless Enum.empty?(functions) do %>
-          <li><a href="#functions_summary">Functions</a></li>
+          <li><a href="#functions_details">Functions</a></li>
         <% end %>
         <%= unless Enum.empty?(macros) do %>
-          <li><a href="#macros_summary">Macros</a></li>
+          <li><a href="#macros_details">Macros</a></li>
         <% end %>
         <%= unless Enum.empty?(callbacks) do %>
-          <li><a href="#callbacks_summary">Callbacks</a></li>
+          <li><a href="#callbacks_details">Callbacks</a></li>
         <% end %>
         <%= unless Enum.empty?(types) do %>
           <li><a href="#types_details">Types</a></li>
@@ -72,27 +75,13 @@
         </ul>
       <% end %>
 
-      <%= unless Enum.empty?(functions) do %>
-        <h2 id="functions_summary">Functions summary<%= to_top_link() %></h2>
+      <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
+        <h2 id="summary">Summary<div class="detail_header_links"><%= to_top_link() %></div></h2>
         <table class="summary">
-          <%= lc node inlist functions, do: summary_template(node) %>
+          <%= lc node inlist Enum.sort(functions ++ macros), do: summary_template(node) %>
         </table>
       <% end %>
 
-      <%= unless Enum.empty?(macros) do %>
-        <h2 id="macros_summary">Macros summary<%= to_top_link() %></h2>
-        <table class="summary">
-          <%= lc node inlist macros, do: summary_template(node) %>
-        </table>
-      <% end %>
-
-      <%= unless Enum.empty?(callbacks) do %>
-        <h2 id="callbacks_summary">Callbacks summary<%= to_top_link() %></h2>
-        <table class="summary">
-          <%= lc node inlist callbacks, do: summary_template(node) %>
-        </table>
-      <% end %>
-   
       <%= unless Enum.empty?(types) do %>
         <div id="types_details" class="details_list">
           <h2>Types <%= to_top_link() %></h2>
