@@ -159,7 +159,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ ~s{<div class="detail_header" id="example_1/0">}
     assert content =~ ~s{<strong>example(foo, bar \\\\ Baz)</strong>}
     assert content =~ ~s{<span class="detail_type">\(function\)</span>}
-    assert content =~ ~s{<a href="#example/2" title="Link to this function">#</a>}
+    assert content =~ ~s{<a href="#example/2" class="detail_link" title="Link to this function">#</a>}
     assert content =~ ~s{<a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>}
   end
 
@@ -206,8 +206,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   test "module_page contains links to summary sections when those exist" do
     content = get_module_page([CompiledWithDocs, CompiledWithDocs.Nested])
-    assert content =~ ~r{<a href="#functions_summary">Functions</a>}
-    assert content =~ ~r{<a href="#macros_summary">Macros</a>}
+    assert content =~ ~r{<a href="#summary">Summary</a>}
     refute content =~ ~r{types_details}
   end
 

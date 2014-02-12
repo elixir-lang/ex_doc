@@ -70,7 +70,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
   # Get the first paragraph of the documentation of a node, if any.
   defp synopsis(nil), do: nil
   defp synopsis(doc) do
-    String.split(doc, ~r/\n\s*\n/) |> hd |> String.strip() |> String.rstrip(?.) |> IO.inspect
+    String.split(doc, ~r/\n\s*\n/) |> hd |> String.strip() |> String.rstrip(?.)
   end
 
   # A bit of standard HTML to insert the to-top arrow.
