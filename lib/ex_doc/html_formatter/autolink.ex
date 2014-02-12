@@ -41,7 +41,13 @@ defmodule ExDoc.HTMLFormatter.Autolink do
       end
     end
 
-    module.moduledoc(moduledoc).docs(docs)
+    typedocs = lc node inlist module.typespecs do
+      node.update_doc fn(doc) ->
+        doc && doc |> local_doc(locals) |> project_doc(project_funs, modules)
+      end
+    end
+
+    module.moduledoc(moduledoc).docs(docs).typespecs(typedocs)
   end
 
   defp all_typespecs(ExDoc.ModuleNode[] = module, aliases) do
