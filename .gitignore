@@ -3,3 +3,4 @@ _build/
 *.o
 *.so
 priv/*.so.dSYM
+erl_crash.dump

@@ -11,7 +11,7 @@ defmodule ExDoc.HTMLFormatter do
   """
   def run(modules, config)  do
     output = Path.expand(config.output)
-    File.mkdir_p output
+    :ok = File.mkdir_p output
 
     generate_index(output, config)
     generate_assets(output, config)
@@ -28,7 +28,7 @@ defmodule ExDoc.HTMLFormatter do
 
   defp generate_index(output, config) do
     content = Templates.index_template(config)
-    File.write("#{output}/index.html", content)
+    :ok = File.write("#{output}/index.html", content)
   end
   
   defp generate_overview(modules, output, config) do
@@ -38,7 +38,7 @@ defmodule ExDoc.HTMLFormatter do
       filter_list(:records, modules),
       filter_list(:protocols, modules)
     )
-    File.write("#{output}/overview.html", content)
+    :ok = File.write("#{output}/overview.html", content)
   end
 
   defp assets do
