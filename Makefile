@@ -13,6 +13,9 @@ all: ex_doc
 ex_doc:
 	mix compile
 
+test:
+	mix test
+
 sundown/src:
 	git submodule update --init
 
@@ -42,5 +45,5 @@ clean:
 priv/markdown.so: sundown/libsundown.so ${NIF_SRC}
 	$(CC) $(CFLAGS) $(ERLANG_FLAGS) -shared $(OPTIONS) -o $@ $(SUNDOWN_OBJS) $(NIF_SRC)
 
-.PHONY: clean
+.PHONY: clean test
 
