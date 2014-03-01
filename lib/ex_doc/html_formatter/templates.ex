@@ -51,7 +51,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
     cond do
       name in [:__aliases__, :__block__] ->
         "#{name}(args)"
-      name in [:__ENV__, :__MODULE__, :__DIR__, :__CALLER__, :%, :%{}] ->
+      name in [:__ENV__, :__MODULE__, :__DIR__, :__CALLER__, :"%", :"%{}"] ->
         "#{name}"
       true ->
         Macro.to_string { name, 0, args }
