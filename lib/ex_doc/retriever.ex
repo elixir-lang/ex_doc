@@ -64,11 +64,6 @@ defmodule ExDoc.Retriever do
     case module.__info__(:moduledoc) do
       { _, false } ->
         nil
-      # TODO: Today the majorify of records are private structures.
-      # So we just add them to the documentation if they are
-      # explicitly documented. Once we support maps, the private
-      # records should be replaced by maps and we can remove this
-      # filtering.
       { _, nil } when type in [:record] ->
         nil
       { _, _moduledoc } ->
@@ -89,7 +84,7 @@ defmodule ExDoc.Retriever do
     docs     = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
                                &get_function(&1, source_path, source_url, specs, cb_impls)
 
-    if type == :behaviour do
+    if defines_behaviour?(module) do
       callbacks = Kernel.Typespec.beam_callbacks(module) || []
       docs = Enum.map(Enum.sort(module.__behaviour__(:docs)),
                       &get_callback(&1, source_path, source_url, callbacks)) ++ docs
@@ -142,7 +137,7 @@ defmodule ExDoc.Retriever do
       name: name,
       arity: arity,
       doc: doc,
-      signature: signature,
+      signature: get_signature(name, signature),
       specs: specs,
       source: source_link(source_path, source_url, line),
       type: type
@@ -150,7 +145,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_callback(callback, source_path, source_url, callbacks) do
-    { { name, arity }, line, _kind, signature, doc } = callback
+    { { name, arity }, line, _kind, doc } = callback
 
     specs = Dict.get(callbacks, { name, arity }, [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
@@ -160,11 +155,22 @@ defmodule ExDoc.Retriever do
       name: name,
       arity: arity,
       doc: doc || nil,
-      signature: signature,
+      signature: "#{name}/#{arity}",
       specs: specs,
       source: source_link(source_path, source_url, line),
       type: :defcallback
     ]
+  end
+
+  defp get_signature(name, args) do
+    cond do
+      name in [:__aliases__, :__block__] ->
+        "#{name}(args)"
+      name in [:__ENV__, :__MODULE__, :__DIR__, :__CALLER__, :"%", :"%{}"] ->
+        "#{name}"
+      true ->
+        Macro.to_string { name, 0, args }
+    end
   end
 
   # Detect if a module is an exception, record,
@@ -178,7 +184,6 @@ defmodule ExDoc.Retriever do
         end
       function_exported?(module, :__protocol__, 1) -> :protocol
       function_exported?(module, :__impl__, 1) -> :impl
-      defines_behaviour?(module) -> :behaviour
       true -> nil
     end
   end

@@ -1,6 +1,6 @@
 <div class="detail">
   <div class="detail_header" id="<%=h node.id %>">
-    <span class="signature"><strong><%=h signature(node) %></strong></span>
+    <span class="signature"><strong><%=h node.signature %></strong></span>
     <div class="detail_header_links">
       <span class="detail_type">(<%= pretty_type(node) %>)</span>
       <a href="#<%=h node.id%>" class="detail_link" title="Link to this <%= pretty_type(node) %>">#</a>

@@ -46,18 +46,6 @@ defmodule ExDoc.HTMLFormatter.Templates do
   defp to_html(nil), do: nil
   defp to_html(bin) when is_binary(bin), do: Markdown.to_html(bin)
 
-  # Get the full signature from a function
-  defp signature(ExDoc.FunctionNode[name: name, signature: args]) do
-    cond do
-      name in [:__aliases__, :__block__] ->
-        "#{name}(args)"
-      name in [:__ENV__, :__MODULE__, :__DIR__, :__CALLER__, :"%", :"%{}"] ->
-        "#{name}"
-      true ->
-        Macro.to_string { name, 0, args }
-    end
-  end
-
   # Get the pretty name of a function node
   defp pretty_type(ExDoc.FunctionNode[type: t]) do
     case t do

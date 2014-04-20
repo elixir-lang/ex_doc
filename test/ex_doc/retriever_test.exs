@@ -45,7 +45,7 @@ defmodule ExDoc.RetrieverTest do
     assert example.id   == "example/2"
     assert example.doc  == "Some example"
     assert example.type == :def
-    assert [{ :foo, _, _ }, { :\\, _, _ }] = example.signature
+    assert example.signature == "example(foo, bar \\\\ Baz)"
 
     assert example_1.id   == "example_1/0"
     assert example_1.type == :defmacro
@@ -130,17 +130,12 @@ defmodule ExDoc.RetrieverTest do
 
   ## BEHAVIOURS
 
-  test "docs_from_files properly tags behaviours" do
-    [node] = docs_from_files ["CustomBehaviour"]
-    assert node.type == :behaviour
-  end
-
   test "ignore behaviours internal functions" do
     [node] = docs_from_files ["CustomBehaviour"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["hello/1"]
     assert hd(node.docs).type == :defcallback
-    assert hd(node.docs).signature == [{ :integer, [line: 7], nil }]
+    assert hd(node.docs).signature == "hello/1"
   end
 
   test "undocumented callback implementations get default doc" do
