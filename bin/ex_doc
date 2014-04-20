@@ -5,6 +5,6 @@ if Code.ensure_loaded?(ExDoc.CLI) do
   ExDoc.CLI.run(System.argv)
 else
   IO.puts :stderr, "Error: cannot generate docs because ExDoc.CLI module is not available. " <>
-                   "Is the ex_doc project compiled?"
+                   "Please run mix compile before or ensure ExDoc is available."
   exit(1)
 end
