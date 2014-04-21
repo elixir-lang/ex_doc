@@ -26,7 +26,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   end
 
   defp module_to_string(ExDoc.ModuleNode[] = module) do
-    inspect module.module 
+    inspect module.module
   end
 
   defp all_docs(ExDoc.ModuleNode[] = module, project_funs, modules) do
@@ -119,13 +119,13 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   end
 
   defp from_elixir?(alias) do
-    :lists.prefix(elixir_ebin, alias_ebin(alias))
+    String.starts_with?(alias_ebin(alias), elixir_ebin)
   end
 
   defp alias_ebin(alias) do
     case :code.where_is_file('#{alias}.beam') do
-      :non_existing -> ''
-      path -> path
+      :non_existing -> ""
+      path -> String.from_char_data!(path)
     end
   end
 
@@ -244,19 +244,19 @@ defmodule ExDoc.HTMLFormatter.Autolink do
 
   defp valid_erlang_beam?(function_str, lib_dir) do
     { mod_str, _function_name, _arity } = split_function(function_str)
-    "#{mod_str}.beam" 
-      |> String.to_char_list!
-      |> :code.where_is_file 
+    "#{mod_str}.beam"
+      |> List.from_char_data!
+      |> :code.where_is_file
       |> on_lib_path?(lib_dir)
   end
 
   defp on_lib_path?(:non_existing, _base_path), do: false
   defp on_lib_path?(beam_path, base_path) do
-    beam_path |> Path.expand |> String.from_char_list! |> String.starts_with?(base_path)
+    beam_path |> Path.expand |> String.from_char_data! |> String.starts_with?(base_path)
   end
 
   defp erlang_lib_dir do
-    :code.lib_dir |> Path.expand |> String.from_char_list!
+    :code.lib_dir |> Path.expand |> String.from_char_data!
   end
 
   defp module_exports_function?(function_str) do

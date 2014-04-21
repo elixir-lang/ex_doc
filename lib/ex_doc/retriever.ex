@@ -79,13 +79,13 @@ defmodule ExDoc.Retriever do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
-    specs    = Kernel.Typespec.beam_specs(module) || []
+    specs    = Enum.into(Kernel.Typespec.beam_specs(module) || [], %{})
     cb_impls = callback_implementations(module)
     docs     = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
                                &get_function(&1, source_path, source_url, specs, cb_impls)
 
     if defines_behaviour?(module) do
-      callbacks = Kernel.Typespec.beam_callbacks(module) || []
+      callbacks = Enum.into(Kernel.Typespec.beam_callbacks(module) || [], %{})
       docs = Enum.map(Enum.sort(module.__behaviour__(:docs)),
                       &get_callback(&1, source_path, source_url, callbacks)) ++ docs
     end
@@ -205,7 +205,7 @@ defmodule ExDoc.Retriever do
   defp callback_implementations(module) do
     implements_behaviours(module)
     |> Enum.map(fn bmod -> Enum.map(callbacks_of(bmod), &{ &1, bmod }) end)
-    |> Enum.reduce(ListDict.new(), fn pairs, acc -> Dict.merge(acc, pairs) end)
+    |> Enum.reduce(%{}, &Enum.into/2)
   end
 
   defp callbacks_of(module) do
@@ -222,9 +222,9 @@ defmodule ExDoc.Retriever do
 
   defp get_types(module) do
     all  = Kernel.Typespec.beam_types(module) || []
-    docs = Kernel.Typespec.beam_typedocs(module) || []
+    docs = Enum.into(Kernel.Typespec.beam_typedocs(module) || [], %{})
 
-    lc { type, { name, _, args } = tuple } inlist all, type != :typep do
+    for { type, { name, _, args } = tuple } <- all, type != :typep do
       spec  = process_type_ast(Kernel.Typespec.type_to_ast(tuple), type)
       arity = length(args)
       doc   = docs[{ name, arity }]
@@ -241,7 +241,12 @@ defmodule ExDoc.Retriever do
 
   defp source_path(module, config) do
     source = module.__info__(:compile)[:source]
-    Path.relative_to source, config.source_root
+
+    if root = config.source_root do
+      Path.relative_to(source, root)
+    else
+      source
+    end
   end
 
   # Cut off the body of an opaque type while leaving it on a normal type.
