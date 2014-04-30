@@ -20,7 +20,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   """
   def all(modules) do
     aliases = Enum.map modules, &(&1.module)
-    project_funs = lc m inlist modules, d inlist m.docs, do: m.id <> "." <> d.id
+    project_funs = for m <- modules, d <- m.docs, do: m.id <> "." <> d.id
     project_modules = modules |> Enum.map(&module_to_string/1) |> Enum.uniq
     Enum.map modules, &(&1 |> all_docs(project_funs, project_modules) |> all_typespecs(aliases))
   end
@@ -35,13 +35,13 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     moduledoc = module.moduledoc &&
       module.moduledoc |> local_doc(locals) |> project_doc(project_funs, modules)
 
-    docs = lc node inlist module.docs do
+    docs = for node <- module.docs do
       node.update_doc fn(doc) ->
         doc && doc |> local_doc(locals) |> project_doc(project_funs, modules)
       end
     end
 
-    typedocs = lc node inlist module.typespecs do
+    typedocs = for node <- module.typespecs do
       node.update_doc fn(doc) ->
         doc && doc |> local_doc(locals) |> project_doc(project_funs, modules)
       end
@@ -55,11 +55,11 @@ defmodule ExDoc.HTMLFormatter.Autolink do
       ExDoc.TypeNode[name: name, arity: arity] -> { name, arity }
     end
 
-    typespecs = lc ExDoc.TypeNode[] = typespec inlist module.typespecs do
+    typespecs = for ExDoc.TypeNode[] = typespec <- module.typespecs do
       typespec.update_spec &typespec(&1, locals, aliases)
     end
 
-    docs = lc node inlist module.docs do
+    docs = for node <- module.docs do
       node.update_specs fn(specs) ->
         Enum.map(specs, &typespec(&1, locals, aliases))
       end

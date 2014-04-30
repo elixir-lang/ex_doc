@@ -65,7 +65,7 @@
       <%= if fields do %>
         <h2 id="fields_summary">Fields <small>(and defaults)</small></h2>
         <ul class="summary">
-          <%= lc { field, default } inlist fields do %>
+          <%= for { field, default } <- fields do %>
             <li>
               <span class="summary_signature">
                 <strong><%= field %>:</strong> <%= inspect(default) %>
@@ -78,35 +78,35 @@
       <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
         <h2 id="summary">Summary<div class="detail_header_links"><%= to_top_link() %></div></h2>
         <table class="summary">
-          <%= lc node inlist Enum.sort(functions ++ macros), do: summary_template(node) %>
+          <%= for node <- Enum.sort(functions ++ macros), do: summary_template(node) %>
         </table>
       <% end %>
 
       <%= unless Enum.empty?(types) do %>
         <div id="types_details" class="details_list">
           <h2>Types <%= to_top_link() %></h2>
-          <%= lc node inlist types, do: type_detail_template(node, module) %>
+          <%= for node <- types, do: type_detail_template(node, module) %>
         </div>
       <% end %>
 
       <%= unless Enum.empty?(functions) do %>
         <div id="functions_details" class="details_list">
           <h2>Functions</h2>
-          <%= lc node inlist functions, do: detail_template(node, module) %>
+          <%= for node <- functions, do: detail_template(node, module) %>
         </div>
       <% end %>
 
       <%= unless Enum.empty?(macros) do %>
         <div id="macros_details" class="details_list">
           <h2>Macros</h2>
-          <%= lc node inlist macros, do: detail_template(node, module) %>
+          <%= for node <- macros, do: detail_template(node, module) %>
         </div>
       <% end %>
 
       <%= unless Enum.empty?(callbacks) do %>
         <div id="callbacks_details" class="details_list">
           <h2>Callbacks</h2>
-          <%= lc node inlist callbacks, do: detail_template(node, module) %>
+          <%= for node <- callbacks, do: detail_template(node, module) %>
         </div>
       <% end %>
     </div>

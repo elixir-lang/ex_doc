@@ -8,7 +8,7 @@
   <small class="search_info"><%= node.id %></small>
 </li>
 <ul>
-  <%= lc doc inlist node.docs do  %>
+  <%= for doc <- node.docs do  %>
     <li>
       <span class="object_link">
         <a href="<%= node.id %>.html#<%=h doc.id %>"><%=h doc.id %></a>

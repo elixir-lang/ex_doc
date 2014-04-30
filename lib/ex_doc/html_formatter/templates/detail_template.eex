@@ -10,7 +10,7 @@
   <%= if specs = get_specs(node) do %>
     <p>Specs:</p>
     <ul class="spec">
-      <%= lc spec inlist specs do %>
+      <%= for spec <- specs do %>
         <li><%= spec %></li>
       <% end %>
     </ul>
