@@ -13,6 +13,7 @@ defmodule ExDoc.CLI do
       opts = Keyword.put(opts, :formatter, String.split(formatter, "."))
     end
 
+    Code.prepend_path(source_beam)
     opts = Keyword.put(opts, :source_beam, source_beam)
     ExDoc.generate_docs(project, version, opts)
   end
@@ -28,7 +29,6 @@ defmodule ExDoc.CLI do
     print_usage()
     exit(1)
   end
-
 
   defp print_usage do
     IO.puts ~S"""
