@@ -18,7 +18,7 @@ defmodule ExDoc.HTMLFormatter do
     has_readme = config.readme && generate_readme(output, config)
 
     modules = Autolink.all(modules)
-    
+
     generate_overview(modules, output, config)
 
     Enum.each [:modules, :records, :protocols], fn(mod_type) ->
@@ -30,7 +30,7 @@ defmodule ExDoc.HTMLFormatter do
     content = Templates.index_template(config)
     :ok = File.write("#{output}/index.html", content)
   end
-  
+
   defp generate_overview(modules, output, config) do
     content = Templates.overview_template(
       config,
@@ -87,15 +87,15 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   defp filter_list(:records, nodes) do
-    Enum.filter nodes, &match?(ExDoc.ModuleNode[type: x] when x in [:record, :exception], &1)
+    Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:record, :exception], &1)
   end
 
   defp filter_list(:modules, nodes) do
-    Enum.filter nodes, &match?(ExDoc.ModuleNode[type: x] when x in [nil, :behaviour], &1)
+    Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [nil, :behaviour], &1)
   end
 
   defp filter_list(:protocols, nodes) do
-    Enum.filter nodes, &match?(ExDoc.ModuleNode[type: x] when x in [:protocol], &1)
+    Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:protocol], &1)
   end
 
   defp generate_list(scope, all, output, config, has_readme) do

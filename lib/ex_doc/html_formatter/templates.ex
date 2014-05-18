@@ -10,9 +10,9 @@ defmodule ExDoc.HTMLFormatter.Templates do
   """
   def module_page(node, config, modules) do
     types       = node.typespecs
-    functions   = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :def], &1)
-    macros      = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defmacro], &1)
-    callbacks   = Enum.filter node.docs, &match?(ExDoc.FunctionNode[type: :defcallback], &1)
+    functions   = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :def}, &1)
+    macros      = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :defmacro}, &1)
+    callbacks   = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :defcallback}, &1)
     cat_modules = ExDoc.HTMLFormatter.categorize_modules(modules)
     module_template(config, node, types, functions, macros, callbacks,
                     cat_modules[:modules], cat_modules[:records], cat_modules[:protocols])
@@ -27,7 +27,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
 
   # Get fields for records an exceptions, removing any field
   # that starts with underscore
-  defp get_fields(ExDoc.ModuleNode[type: type] = node) when type in [:record, :exception] do
+  defp get_fields(%ExDoc.ModuleNode{type: type} = node) when type in [:record, :exception] do
     node.module.__record__(:fields)
     |> Enum.filter(fn({f,_}) -> hd(atom_to_list(f)) != ?_ end)
     |> presence
@@ -36,7 +36,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
   defp get_fields(_), do: nil
 
   # Get the full specs from a function, already in HTML form.
-  defp get_specs(ExDoc.FunctionNode[specs: specs]) when is_list(specs) do
+  defp get_specs(%ExDoc.FunctionNode{specs: specs}) when is_list(specs) do
     presence specs
   end
 
@@ -47,7 +47,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
   defp to_html(bin) when is_binary(bin), do: Markdown.to_html(bin)
 
   # Get the pretty name of a function node
-  defp pretty_type(ExDoc.FunctionNode[type: t]) do
+  defp pretty_type(%ExDoc.FunctionNode{type: t}) do
     case t do
       :def          -> "function"
       :defmacro     -> "macro"

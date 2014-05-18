@@ -12,15 +12,16 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   end
 
   defp doc_config do
-    ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}",
-                 homepage_url: homepage_url, source_url: source_url]
+    %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
+                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}",
+                  homepage_url: homepage_url, source_url: source_url}
   end
 
   defp get_module_page(names) do
     mods = names
            |> ExDoc.Retriever.docs_from_modules(doc_config)
            |> ExDoc.HTMLFormatter.Autolink.all()
+
     Templates.module_page(hd(mods), doc_config, mods)
   end
 
@@ -38,16 +39,16 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   end
 
   test "site title text links to source_url when there is no homepage_url" do
-    doc_config_without_source_url = ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                                                 source_url: source_url,
-                                                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
+    doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
+                                                  source_url: source_url,
+                                                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
     content = Templates.list_template(:modules, [], doc_config_without_source_url, false)
     assert content =~ ~r{<a href="#{source_url}" target="_blank">Elixir v1.0.1</a>}
   end
 
   test "site title text creates no link when there is no homepage_url or source_url" do
-    doc_config_without_source_url = ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                                                 source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"]
+    doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
+                                                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
     content = Templates.list_template(:modules, [], doc_config_without_source_url, false)
     assert content =~ ~r{Elixir v1.0.1}
   end
@@ -96,49 +97,10 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     refute content =~ ~r/<a class="toggle">/
   end
 
-  test "no arrows for records without functions" do
-    defrecord NoFunRecord, value: true do
-      @moduledoc "Hello"
-    end
-
-    [node]  = ExDoc.Retriever.docs_from_modules([NoFunRecord], doc_config)
-    content = Templates.list_item_template(node)
-    refute content =~ ~r/<a class="toggle">/
-  end
-
-  test "arrows for records with functions" do
-    defrecord FunRecord, value: true do
-      @moduledoc "Hello"
-      def record_fun, do: true
-    end
-
-    [node] = ExDoc.Retriever.docs_from_modules([FunRecord], doc_config)
-    content = Templates.list_item_template(node)
-    assert content =~ ~r/<a class="toggle">/
-  end
-
-  test "no arrows for exceptions without functions" do
-    defexception NoFunException, message: "No functions"
-
-    [node] = ExDoc.Retriever.docs_from_modules([NoFunException], doc_config)
-    content = Templates.list_item_template(node)
-    refute content =~ ~r/<a class="toggle">/
-  end
-
-  test "arrows for exceptions with functions" do
-    defexception FunException, message: "No functions" do
-      def exception_fun, do: true
-    end
-
-    [node] = ExDoc.Retriever.docs_from_modules([FunException], doc_config)
-    content = Templates.list_item_template(node)
-    assert content =~ ~r/<a class="toggle">/
-  end
-
   ## MODULES
 
   test "module_page generates only the module name when there's no more info" do
-    node = ExDoc.ModuleNode.new module: XPTOModule, moduledoc: nil, id: "XPTOModule"
+    node = %ExDoc.ModuleNode{module: XPTOModule, moduledoc: nil, id: "XPTOModule"}
     content = Templates.module_page(node, doc_config, [node])
 
     assert content =~ ~r/<title>XPTOModule<\/title>/

@@ -1,8 +1,12 @@
 defmodule ExDoc do
-  defrecord Config, output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
-                    homepage_url: nil, source_beam: nil,
-                    retriever: ExDoc.Retriever, formatter: ExDoc.HTMLFormatter,
-                    project: nil, version: nil, main: nil, readme: false
+  defmodule Config do
+    defstruct [
+      output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
+      homepage_url: nil, source_beam: nil, retriever: ExDoc.Retriever,
+      formatter: ExDoc.HTMLFormatter, project: nil, version: nil, main: nil,
+      readme: false
+    ]
+  end
 
   @doc """
   Generates documentation for the given `project`, `version`
@@ -10,9 +14,10 @@ defmodule ExDoc do
   """
   def generate_docs(project, version, options) when is_binary(project) and is_binary(version) and is_list(options) do
     options = normalize_options(options)
-    config  = Config[project: project, version: version, main: options[:main] || project,
-                     homepage_url: options[:homepage_url],
-                     source_root: options[:source_root] || File.cwd!].update(options)
+    config  = %Config{project: project, version: version, main: options[:main] || project,
+                      homepage_url: options[:homepage_url],
+                      source_root: options[:source_root] || File.cwd!}
+    config = struct(config, options)
 
     docs = config.retriever.docs_from_dir(config.source_beam, config)
     config.formatter.run(docs, config)
