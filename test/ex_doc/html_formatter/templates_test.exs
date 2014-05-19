@@ -117,20 +117,12 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ ~r/<a class="toggle">/
   end
 
-  test "no arrows for exceptions without functions" do
-    defexception NoFunException, message: "No functions"
-
-    [node] = ExDoc.Retriever.docs_from_modules([NoFunException], doc_config)
-    content = Templates.list_item_template(node)
-    refute content =~ ~r/<a class="toggle">/
-  end
-
-  test "arrows for exceptions with functions" do
-    defexception FunException, message: "No functions" do
-      def exception_fun, do: true
+  test "arrows for exceptions without functions" do
+    defmodule NoFunException do
+      defexception [:message]
     end
 
-    [node] = ExDoc.Retriever.docs_from_modules([FunException], doc_config)
+    [node] = ExDoc.Retriever.docs_from_modules([NoFunException], doc_config)
     content = Templates.list_item_template(node)
     assert content =~ ~r/<a class="toggle">/
   end
@@ -231,12 +223,6 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     content = get_module_page([CompiledRecord])
     assert content =~ ~r{<strong>foo:</strong> nil}m
     assert content =~ ~r{<strong>bar:</strong> "sample"}m
-  end
-
-  test "module_page outputs exceptions fields" do
-    content = get_module_page([RandomError])
-    refute content =~ ~r{<strong>__exception__:</strong>}m
-    assert content =~ ~r{<strong>message:</strong> "this is random!"}m
   end
 
   ## PROTOCOLS
