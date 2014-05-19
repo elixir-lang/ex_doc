@@ -122,12 +122,6 @@ defmodule ExDoc.RetrieverTest do
     assert node.type == :exception
   end
 
-  test "ignore exceptions internal functions" do
-    [node] = docs_from_files ["RandomError"]
-    functions = Enum.map node.docs, fn(doc) -> doc.id end
-    assert functions == []
-  end
-
   ## BEHAVIOURS
 
   test "ignore behaviours internal functions" do

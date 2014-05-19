@@ -27,7 +27,7 @@ defmodule ExDoc.HTMLFormatter.Templates do
 
   # Get fields for records an exceptions, removing any field
   # that starts with underscore
-  defp get_fields(ExDoc.ModuleNode[type: type] = node) when type in [:record, :exception] do
+  defp get_fields(ExDoc.ModuleNode[type: type] = node) when type in [:record] do
     node.module.__record__(:fields)
     |> Enum.filter(fn({f,_}) -> hd(atom_to_list(f)) != ?_ end)
     |> presence
