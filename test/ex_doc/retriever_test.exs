@@ -159,7 +159,7 @@ defmodule ExDoc.RetrieverTest do
   test "ignore protocols internal functions" do
     [node] = docs_from_files ["CustomProtocol"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
-    assert functions == ["impl_for/1", "impl_for!/1", "plus_one/1", "plus_two/1"]
+    assert functions == ["plus_one/1", "plus_two/1"]
   end
 
   ## IMPLEMENTATIONS

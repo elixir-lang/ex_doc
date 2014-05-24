@@ -112,6 +112,11 @@ defmodule ExDoc.Retriever do
 
   # Helpers
 
+  # Skip impl_for and impl_for! for protocols
+  defp has_doc?({{name, _}, _, _, _, nil}, :protocol) when name in [:impl_for, :impl_for!] do
+    false
+  end
+
   # Skip docs explicitly marked as false
   defp has_doc?({_, _, _, _, false}, _) do
     false
