@@ -63,18 +63,16 @@ defmodule ExDoc.Retriever do
     type = detect_type(module)
 
     module
-    |> verify_module(type)
+    |> verify_module()
     |> generate_node(type, config)
   end
 
-  defp verify_module(module, type) do
-    case module.__info__(:moduledoc) do
-      { _, false } ->
-        nil
-      { _, nil } when type in [:record] ->
-        nil
-      { _, _moduledoc } ->
+  defp verify_module(module) do
+    case Code.get_docs(module, :all) do
+      [docs: _docs, moduledoc: _moduledoc] ->
         module
+      nil ->
+        nil
       _ ->
         raise(Error, message: "module #{inspect module} was not compiled with flag --docs")
     end
@@ -88,7 +86,7 @@ defmodule ExDoc.Retriever do
 
     specs    = Enum.into(Kernel.Typespec.beam_specs(module) || [], %{})
     cb_impls = callback_implementations(module)
-    docs     = Enum.filter_map module.__info__(:docs), &has_doc?(&1, type),
+    docs     = Enum.filter_map Code.get_docs(module, :docs), &has_doc?(&1, type),
                                &get_function(&1, source_path, source_url, specs, cb_impls)
 
     if defines_behaviour?(module) do
@@ -97,7 +95,7 @@ defmodule ExDoc.Retriever do
                       &get_callback(&1, source_path, source_url, callbacks)) ++ docs
     end
 
-    { line, moduledoc } = module.__info__(:moduledoc)
+    { line, moduledoc } = Code.get_docs(module, :moduledoc)
 
     %ExDoc.ModuleNode{
       id: inspect(module),

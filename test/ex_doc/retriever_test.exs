@@ -102,19 +102,6 @@ defmodule ExDoc.RetrieverTest do
   end
 
 
-  ## RECORDS
-
-  test "docs_from_files properly tags records" do
-    [node] = docs_from_files ["CompiledRecord"]
-    assert node.type == :record
-  end
-
-  test "ignore records internal functions" do
-    [node] = docs_from_files ["CompiledRecord"]
-    functions = Enum.map node.docs, fn(doc) -> doc.id end
-    assert functions == []
-  end
-
   ## EXCEPTIONS
 
   test "docs_from_files properly tags exceptions" do

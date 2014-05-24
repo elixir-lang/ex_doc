@@ -78,20 +78,12 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   ## LIST ITEMS
 
   test "arrows for modules with functions" do
-    defmodule FunctionModule do
-      def func, do: true
-    end
-
     [node] = ExDoc.Retriever.docs_from_modules([FunctionModule], doc_config)
     content = Templates.list_item_template(node)
     assert content =~ ~r/<a class="toggle">/
   end
 
   test "no arrows for modules without functions" do
-    defmodule NoFunctionsModule do
-      @moduledoc "Hello"
-    end
-
     [node] = ExDoc.Retriever.docs_from_modules([NoFunctionsModule], doc_config)
     content = Templates.list_item_template(node)
     refute content =~ ~r/<a class="toggle">/
@@ -182,18 +174,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ ~r{<div class="detail_header" id="hello/1">}
   end
 
-  ## RECORDS
-
-  test "module_page outputs the record type" do
-    content = get_module_page([CompiledRecord])
-    assert content =~ ~r{<h1>\s*CompiledRecord\s*<small>record</small>\s*<\/h1>}m
-  end
-
-  test "module_page outputs record fields" do
-    content = get_module_page([CompiledRecord])
-    assert content =~ ~r{<strong>foo:</strong> nil}m
-    assert content =~ ~r{<strong>bar:</strong> "sample"}m
-  end
+  ## EXCEPTIONS
 
   test "module_page outputs exceptions fields" do
     content = get_module_page([RandomError])
