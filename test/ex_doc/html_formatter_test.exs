@@ -24,7 +24,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   defp doc_config do
-    ExDoc.Config[project: "Elixir", version: "1.0.1", source_root: beam_dir]
+    %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: beam_dir}
   end
 
   defp get_modules(config \\ doc_config) do
@@ -39,7 +39,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "run generates in specified output directory" do
-    config = ExDoc.Config[output: "#{output_dir}/docs"]
+    config = %ExDoc.Config{output: "#{output_dir}/docs"}
     HTMLFormatter.run(get_modules(config), config)
 
     assert File.regular?("#{output_dir}/docs/CompiledWithDocs.html")

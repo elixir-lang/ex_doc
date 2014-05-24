@@ -5,14 +5,14 @@ defmodule ExDoc.RetrieverTest do
 
   defp docs_from_files(names, url_pattern \\ "http://example.com/%{path}#L%{line}") do
     files  = Enum.map names, fn(n) -> "test/tmp/Elixir.#{n}.beam" end
-    config = ExDoc.Config[source_url_pattern: url_pattern, source_root: File.cwd!]
+    config = %ExDoc.Config{source_url_pattern: url_pattern, source_root: File.cwd!}
     Retriever.docs_from_files(files, config)
   end
 
   ## MODULES
 
   test "docs_from_files and docs_from_modules match" do
-    config = ExDoc.Config[source_url_pattern: "http://example.com/%{path}#L%{line}", source_root: File.cwd!]
+    config = %ExDoc.Config{source_url_pattern: "http://example.com/%{path}#L%{line}", source_root: File.cwd!}
     file_nodes = Retriever.docs_from_files(["test/tmp/Elixir.UndefParent.Undocumented.beam"], config)
     module_nodes = Retriever.docs_from_modules([UndefParent.Undocumented], config)
     assert file_nodes == module_nodes
@@ -140,7 +140,7 @@ defmodule ExDoc.RetrieverTest do
 
   test "undocumented callback implementations get default doc" do
     [node] = docs_from_files(["CustomBehaviour", "CustomBehaviourTwo", "CustomBehaviourImpl"])
-             |> Enum.filter(&match?(ExDoc.ModuleNode[id: "CustomBehaviourImpl"], &1))
+             |> Enum.filter(&match?(%ExDoc.ModuleNode{id: "CustomBehaviourImpl"}, &1))
     docs = node.docs
     assert Enum.map(docs, &(&1.id)) == ["bye/1", "hello/1"]
     assert Enum.at(docs, 0).doc ==

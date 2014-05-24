@@ -25,47 +25,49 @@ defmodule ExDoc.HTMLFormatter.Autolink do
     Enum.map modules, &(&1 |> all_docs(project_funs, project_modules) |> all_typespecs(aliases))
   end
 
-  defp module_to_string(ExDoc.ModuleNode[] = module) do
+  defp module_to_string(module) do
     inspect module.module
   end
 
-  defp all_docs(ExDoc.ModuleNode[] = module, project_funs, modules) do
+  defp all_docs(module, project_funs, modules) do
     locals = Enum.map module.docs, &(&1.id)
 
-    moduledoc = module.moduledoc &&
-      module.moduledoc |> local_doc(locals) |> project_doc(project_funs, modules)
+    if moduledoc = module.moduledoc do
+      moduledoc = moduledoc |> local_doc(locals) |> project_doc(project_funs, modules)
+    end
 
     docs = for node <- module.docs do
-      node.update_doc fn(doc) ->
-        doc && doc |> local_doc(locals) |> project_doc(project_funs, modules)
+      if doc = node.doc do
+        doc = doc |> local_doc(locals) |> project_doc(project_funs, modules)
       end
+      %{node | doc: doc}
     end
 
     typedocs = for node <- module.typespecs do
-      node.update_doc fn(doc) ->
-        doc && doc |> local_doc(locals) |> project_doc(project_funs, modules)
+      if doc = node.doc do
+        doc = doc |> local_doc(locals) |> project_doc(project_funs, modules)
       end
+      %{node | doc: doc}
     end
 
-    module.moduledoc(moduledoc).docs(docs).typespecs(typedocs)
+    %{module | moduledoc: moduledoc, docs: docs, typespecs: typedocs}
   end
 
-  defp all_typespecs(ExDoc.ModuleNode[] = module, aliases) do
+
+  defp all_typespecs(module, aliases) do
     locals = Enum.map module.typespecs, fn
-      ExDoc.TypeNode[name: name, arity: arity] -> { name, arity }
+      %ExDoc.TypeNode{name: name, arity: arity} -> { name, arity }
     end
 
-    typespecs = for ExDoc.TypeNode[] = typespec <- module.typespecs do
-      typespec.update_spec &typespec(&1, locals, aliases)
+    typespecs = for typespec <- module.typespecs do
+      %{typespec | spec: typespec(typespec.spec, locals, aliases)}
     end
 
     docs = for node <- module.docs do
-      node.update_specs fn(specs) ->
-        Enum.map(specs, &typespec(&1, locals, aliases))
-      end
+      %{node | specs: Enum.map(node.specs, &typespec(&1, locals, aliases))}
     end
 
-    module.typespecs(typespecs).docs(docs)
+    %{module | typespecs: typespecs, docs: docs}
   end
 
   @doc """

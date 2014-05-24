@@ -1,10 +1,17 @@
-defrecord ExDoc.ModuleNode, id: nil, module: nil, moduledoc: nil,
-  docs: [], typespecs: [], source: nil, type: nil
+defmodule ExDoc.ModuleNode do
+  defstruct id: nil, module: nil, moduledoc: nil,
+    docs: [], typespecs: [], source: nil, type: nil
+end
 
-defrecord ExDoc.FunctionNode, id: nil, name: nil, arity: 0,
-  doc: [], source: nil, type: nil, signature: nil, specs: []
+defmodule ExDoc.FunctionNode do
+  defstruct id: nil, name: nil, arity: 0, doc: [],
+    source: nil, type: nil, signature: nil, specs: []
+end
 
-defrecord ExDoc.TypeNode, id: nil, name: nil, arity: 0, type: nil, spec: nil, doc: nil
+defmodule ExDoc.TypeNode do
+  defstruct id: nil, name: nil, arity: 0, type: nil,
+    spec: nil, doc: nil
+end
 
 defmodule ExDoc.Retriever do
   @moduledoc """
@@ -37,7 +44,7 @@ defmodule ExDoc.Retriever do
     modules
     |> Enum.map(&get_module(&1, config))
     |> Enum.filter(fn(x) -> x end)
-    |> Enum.sort
+    |> Enum.sort(&(&1.id < &2.id))
   end
 
   defp filename_to_module(name) do
@@ -92,7 +99,7 @@ defmodule ExDoc.Retriever do
 
     { line, moduledoc } = module.__info__(:moduledoc)
 
-    ExDoc.ModuleNode[
+    %ExDoc.ModuleNode{
       id: inspect(module),
       module: module,
       type: type,
@@ -100,7 +107,7 @@ defmodule ExDoc.Retriever do
       docs: docs,
       typespecs: get_types(module),
       source: source_link(source_path, source_url, line),
-    ]
+    }
   end
 
   # Helpers
@@ -132,7 +139,7 @@ defmodule ExDoc.Retriever do
     specs = Dict.get(all_specs, { name, arity }, [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
 
-    ExDoc.FunctionNode[
+    %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
       name: name,
       arity: arity,
@@ -141,7 +148,7 @@ defmodule ExDoc.Retriever do
       specs: specs,
       source: source_link(source_path, source_url, line),
       type: type
-    ]
+    }
   end
 
   defp get_callback(callback, source_path, source_url, callbacks) do
@@ -150,7 +157,7 @@ defmodule ExDoc.Retriever do
     specs = Dict.get(callbacks, { name, arity }, [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
 
-    ExDoc.FunctionNode[
+    %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
       name: name,
       arity: arity,
@@ -159,7 +166,7 @@ defmodule ExDoc.Retriever do
       specs: specs,
       source: source_link(source_path, source_url, line),
       type: :defcallback
-    ]
+    }
   end
 
   defp get_signature(name, args) do
@@ -228,7 +235,14 @@ defmodule ExDoc.Retriever do
       spec  = process_type_ast(Kernel.Typespec.type_to_ast(tuple), type)
       arity = length(args)
       doc   = docs[{ name, arity }]
-      ExDoc.TypeNode[id: "#{name}/#{arity}", name: name, arity: arity, type: type, spec: spec, doc: doc]
+      %ExDoc.TypeNode{
+        id: "#{name}/#{arity}",
+        name: name,
+        arity: arity,
+        type: type,
+        spec: spec,
+        doc: doc
+      }
     end
   end
 
