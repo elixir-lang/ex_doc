@@ -13,12 +13,15 @@ defmodule ExDoc.TypeNode do
     spec: nil, doc: nil
 end
 
+defmodule ExDoc.Retriever.Error do
+  defexception [:message]
+end
+
 defmodule ExDoc.Retriever do
   @moduledoc """
   Functions to extract documentation information from modules.
   """
 
-  defexception Error, message: nil
 
   @doc """
   Extract documentation from all modules in the specified directory

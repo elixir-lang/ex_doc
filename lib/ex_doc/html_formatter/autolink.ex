@@ -127,7 +127,7 @@ defmodule ExDoc.HTMLFormatter.Autolink do
   defp alias_ebin(alias) do
     case :code.where_is_file('#{alias}.beam') do
       :non_existing -> ""
-      path -> String.from_char_data!(path)
+      path -> List.to_string(path)
     end
   end
 
@@ -246,19 +246,18 @@ defmodule ExDoc.HTMLFormatter.Autolink do
 
   defp valid_erlang_beam?(function_str, lib_dir) do
     { mod_str, _function_name, _arity } = split_function(function_str)
-    "#{mod_str}.beam"
-      |> List.from_char_data!
-      |> :code.where_is_file
-      |> on_lib_path?(lib_dir)
+    '#{mod_str}.beam'
+    |> :code.where_is_file
+    |> on_lib_path?(lib_dir)
   end
 
   defp on_lib_path?(:non_existing, _base_path), do: false
   defp on_lib_path?(beam_path, base_path) do
-    beam_path |> Path.expand |> String.from_char_data! |> String.starts_with?(base_path)
+    beam_path |> Path.expand |> String.starts_with?(base_path)
   end
 
   defp erlang_lib_dir do
-    :code.lib_dir |> Path.expand |> String.from_char_data!
+    :code.lib_dir |> Path.expand
   end
 
   defp module_exports_function?(function_str) do
