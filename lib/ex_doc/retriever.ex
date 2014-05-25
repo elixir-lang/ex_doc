@@ -186,14 +186,14 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  # Detect if a module is an exception, record,
+  # Detect if a module is an exception, struct,
   # protocol, implementation or simply a module
   defp detect_type(module) do
     cond do
-      function_exported?(module, :__record__, 1) ->
-        case module.__record__(:fields) do
-          [{ :__exception__, :__exception__}|_] -> :exception
-          _ -> :record
+      function_exported?(module, :__struct__, 0) ->
+        case module.__struct__ do
+          %{__exception__: true} -> :exception
+          _ -> :struct
         end
       function_exported?(module, :__protocol__, 1) -> :protocol
       function_exported?(module, :__impl__, 1) -> :impl
