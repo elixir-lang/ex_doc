@@ -72,7 +72,9 @@ defmodule ExDoc.Retriever do
 
   defp verify_module(module) do
     case Code.get_docs(module, :all) do
-      [docs: _docs, moduledoc: _moduledoc] ->
+      [docs: _, moduledoc: {_line, false}] ->
+        nil
+      [docs: _, moduledoc: _] ->
         module
       nil ->
         nil
