@@ -47,7 +47,7 @@ defmodule ExDoc.Retriever do
     modules
     |> Enum.map(&get_module(&1, config))
     |> Enum.filter(fn(x) -> x end)
-    |> Enum.sort(&(&1.id < &2.id))
+    |> Enum.sort(&(&1.id <= &2.id))
   end
 
   defp filename_to_module(name) do

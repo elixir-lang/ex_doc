@@ -39,8 +39,8 @@ defmodule ExDoc.HTMLFormatter do
   end
 
   defp assets do
-    [ { templates_path("css/*.css"), "css" },
-      { templates_path("js/*.js"), "js" } ]
+    [{ templates_path("css/*.css"), "css" },
+     { templates_path("js/*.js"), "js" }]
   end
 
   defp generate_assets(output, _config) do

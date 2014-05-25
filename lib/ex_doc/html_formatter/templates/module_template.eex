@@ -60,7 +60,7 @@
       <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
         <h2 id="summary">Summary<div class="detail_header_links"><%= to_top_link() %></div></h2>
         <table class="summary">
-          <%= for node <- Enum.sort(functions ++ macros), do: summary_template(node) %>
+          <%= for node <- Enum.sort(functions ++ macros, &(&1.id <= &2.id)), do: summary_template(node) %>
         </table>
       <% end %>
 
