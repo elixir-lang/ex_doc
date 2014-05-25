@@ -25,16 +25,6 @@ defmodule ExDoc.HTMLFormatter.Templates do
     list_template(scope, nodes, config, has_readme)
   end
 
-  # Get fields for records an exceptions, removing any field
-  # that starts with underscore
-  defp get_fields(%ExDoc.ModuleNode{type: type} = node) when type in [:record, :exception] do
-    node.module.__record__(:fields)
-    |> Enum.filter(fn({f,_}) -> hd(atom_to_list(f)) != ?_ end)
-    |> presence
-  end
-
-  defp get_fields(_), do: nil
-
   # Get the full specs from a function, already in HTML form.
   defp get_specs(%ExDoc.FunctionNode{specs: specs}) when is_list(specs) do
     presence specs

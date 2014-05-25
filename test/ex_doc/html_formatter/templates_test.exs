@@ -174,14 +174,6 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
     assert content =~ ~r{<div class="detail_header" id="hello/1">}
   end
 
-  ## EXCEPTIONS
-
-  test "module_page outputs exceptions fields" do
-    content = get_module_page([RandomError])
-    refute content =~ ~r{<strong>__exception__:</strong>}m
-    assert content =~ ~r{<strong>message:</strong> "this is random!"}m
-  end
-
   ## PROTOCOLS
 
   test "module_page outputs the protocol type" do

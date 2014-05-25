@@ -29,12 +29,7 @@
         <% end %>
       </h1>
 
-      <% fields = get_fields(module) %>
-
       <ul class="summary_links">
-        <%= if fields do %>
-          <li><a href="#fields_summary">Fields</a></li>
-        <% end %>
         <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
           <li><a href="#summary">Summary</a></li>
         <% end %>
@@ -60,19 +55,6 @@
 
       <%= if module.source do %>
         <a href="<%= module.source %>" target="_blank" class="view_source">Source</a>
-      <% end %>
-
-      <%= if fields do %>
-        <h2 id="fields_summary">Fields <small>(and defaults)</small></h2>
-        <ul class="summary">
-          <%= for { field, default } <- fields do %>
-            <li>
-              <span class="summary_signature">
-                <strong><%= field %>:</strong> <%= inspect(default) %>
-              </span>
-            </li>
-          <% end %>
-        </ul>
       <% end %>
 
       <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
