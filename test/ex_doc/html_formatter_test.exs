@@ -59,7 +59,6 @@ defmodule ExDoc.HTMLFormatterTest do
     refute content =~ ~r{UndefParent\.Undocumented}ms
 
     content = File.read!("#{output_dir}/records_list.html")
-    assert content =~ ~r{<li>.*"CompiledRecord\.html".*CompiledRecord.*<\/li>}ms
     assert content =~ ~r{<li>.*"RandomError\.html".*RandomError.*<\/li>}ms
 
     content = File.read!("#{output_dir}/protocols_list.html")
