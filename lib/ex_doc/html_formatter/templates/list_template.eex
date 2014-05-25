@@ -17,7 +17,7 @@
     <div id="content">
       <h1 id="full_list_header">
         <%= if url = config.homepage_url || config.source_url do %>
-          <a href="<%= url %>" target="_blank"><%= config.project %> v<%= config.version %></a>
+          <a href="<%= url %>"><%= config.project %> v<%= config.version %></a>
         <% else %>
           <%= config.project %> v<%= config.version %>
         <% end %>
@@ -32,7 +32,7 @@
 
       <div class="nav">
         <span class="<%= if(scope == :modules, do: "selected") %>"><a target="_self" href="modules_list.html">Modules</a></span>
-        <span class="<%= if(scope == :records, do: "selected") %>"><a target="_self" href="records_list.html">Records</a></span>
+        <span class="<%= if(scope == :exceptions, do: "selected") %>"><a target="_self" href="exceptions_list.html">Exceptions</a></span>
         <span class="<%= if(scope == :protocols, do: "selected") %>"><a target="_self" href="protocols_list.html">Protocols</a></span>
       </div>
       <div id="search">Search: <input type="text" /></div>

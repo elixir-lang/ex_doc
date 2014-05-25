@@ -28,8 +28,8 @@
         <%= unless Enum.empty?(modules) do %>
           <li><a href="#modules_summary">Modules</a></li>
         <% end %>
-        <%= unless Enum.empty?(records) do %>
-          <li><a href="#records_summary">Records</a></li>
+        <%= unless Enum.empty?(exceptions) do %>
+          <li><a href="#exceptions_summary">Exceptions</a></li>
         <% end %>
         <%= unless Enum.empty?(protocols) do %>
           <li><a href="#protocols_summary">Protocols</a></li>
@@ -43,10 +43,10 @@
         </table>
       <% end %>
 
-      <%= unless Enum.empty?(records) do %>
-        <h2 id="records_summary">Records summary <%= to_top_link() %></h2>
+      <%= unless Enum.empty?(exceptions) do %>
+        <h2 id="exceptions_summary">Exceptions summary <%= to_top_link() %></h2>
         <table class="summary">
-          <%= for node <- records, do: overview_entry_template(node) %>
+          <%= for node <- exceptions, do: overview_entry_template(node) %>
         </table>
       <% end %>
 

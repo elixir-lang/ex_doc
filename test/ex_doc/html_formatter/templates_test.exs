@@ -30,12 +30,12 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   test "current listing page is marked as selected" do
     content = Templates.list_template(:modules, [], doc_config, false)
     assert content =~ ~r{<span class="selected"><a target="_self" href="modules_list.html">}
-    assert content =~ ~r{<span class=""><a target="_self" href="records_list.html">}
+    assert content =~ ~r{<span class=""><a target="_self" href="exceptions_list.html">}
   end
 
   test "site title text links to homepage_url when set" do
     content = Templates.list_template(:modules, [], doc_config, false)
-    assert content =~ ~r{<a href="#{homepage_url}" target="_blank">Elixir v1.0.1</a>}
+    assert content =~ ~r{<a href="#{homepage_url}">Elixir v1.0.1</a>}
   end
 
   test "site title text links to source_url when there is no homepage_url" do
@@ -43,7 +43,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
                                                   source_url: source_url,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
     content = Templates.list_template(:modules, [], doc_config_without_source_url, false)
-    assert content =~ ~r{<a href="#{source_url}" target="_blank">Elixir v1.0.1</a>}
+    assert content =~ ~r{<a href="#{source_url}">Elixir v1.0.1</a>}
   end
 
   test "site title text creates no link when there is no homepage_url or source_url" do
@@ -169,7 +169,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   test "module_page outputs behavior and callbacks" do
     content = get_module_page([CustomBehaviour])
 
-    assert content =~ ~r{<h1>\s*CustomBehaviour\s*<\/h1>}m
+    assert content =~ ~r{<h1>\s*CustomBehaviour\s*<small>behaviour</small>\s*</h1>}m
     assert content =~ ~r{Callbacks}
     assert content =~ ~r{<div class="detail_header" id="hello/1">}
   end
@@ -178,6 +178,6 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   test "module_page outputs the protocol type" do
     content = get_module_page([CustomProtocol])
-    assert content =~ ~r{<h1>\s*CustomProtocol\s*<small>protocol</small>\s*<\/h1>}m
+    assert content =~ ~r{<h1>\s*CustomProtocol\s*<small>protocol</small>\s*</h1>}m
   end
 end

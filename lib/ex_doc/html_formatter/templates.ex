@@ -8,14 +8,12 @@ defmodule ExDoc.HTMLFormatter.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(node, config, modules) do
+  def module_page(node, config, all) do
     types       = node.typespecs
     functions   = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :def}, &1)
     macros      = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :defmacro}, &1)
     callbacks   = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :defcallback}, &1)
-    cat_modules = ExDoc.HTMLFormatter.categorize_modules(modules)
-    module_template(config, node, types, functions, macros, callbacks,
-                    cat_modules[:modules], cat_modules[:records], cat_modules[:protocols])
+    module_template(config, node, types, functions, macros, callbacks, all)
   end
 
   @doc """
@@ -100,8 +98,8 @@ defmodule ExDoc.HTMLFormatter.Templates do
   templates = [
     index_template: [:config],
     list_template: [:scope, :nodes, :config, :has_readme],
-    overview_template: [:config, :modules, :records, :protocols],
-    module_template: [:config, :module, :types, :functions, :macros, :callbacks, :modules, :records, :protocols],
+    overview_template: [:config, :modules, :exceptions, :protocols],
+    module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all],
     readme_template: [:config, :content],
     list_item_template: [:node],
     overview_entry_template: [:node],

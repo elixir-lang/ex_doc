@@ -20,7 +20,7 @@
     </script>
 
     <div id="content">
-      <div class="breadcrumbs"><%= module_breadcrumbs(config, modules ++ records ++ protocols, module) %></div>
+      <div class="breadcrumbs"><%= module_breadcrumbs(config, all, module) %></div>
 
       <h1>
         <%= module.id %>
@@ -54,7 +54,7 @@
       <% end %>
 
       <%= if module.source do %>
-        <a href="<%= module.source %>" target="_blank" class="view_source">Source</a>
+        <a href="<%= module.source %>" class="view_source">Source</a>
       <% end %>
 
       <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>

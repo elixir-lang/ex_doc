@@ -89,12 +89,13 @@ defmodule ExDoc.Retriever do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
-    specs    = Enum.into(Kernel.Typespec.beam_specs(module) || [], %{})
-    cb_impls = callback_implementations(module)
-    docs     = Enum.filter_map Code.get_docs(module, :docs), &has_doc?(&1, type),
-                               &get_function(&1, source_path, source_url, specs, cb_impls)
+    specs = Enum.into(Kernel.Typespec.beam_specs(module) || [], %{})
+    callbacks = callbacks_implemented_by(module)
 
-    if defines_behaviour?(module) do
+    docs = Enum.filter_map Code.get_docs(module, :docs), &has_doc?(&1, type),
+                           &get_function(&1, source_path, source_url, specs, callbacks)
+
+    if type == :behaviour do
       callbacks = Enum.into(Kernel.Typespec.beam_callbacks(module) || [], %{})
       docs = Enum.map(Enum.sort(module.__behaviour__(:docs)),
                       &get_callback(&1, source_path, source_url, callbacks)) ++ docs
@@ -137,14 +138,17 @@ defmodule ExDoc.Retriever do
 
   defp get_function(function, source_path, source_url, all_specs, cb_impls) do
     { { name, arity }, line, type, signature, doc } = function
+    behaviour = Dict.get(cb_impls, { name, arity })
 
-    bmod = Dict.get(cb_impls, { name, arity }, [])
-    doc = if doc == nil and bmod != [] do
-            "Callback implementation of `#{inspect bmod}.#{name}/#{arity}`."
-          else
-            doc
-          end
-    specs = Dict.get(all_specs, { name, arity }, [])
+    doc =
+      if nil?(doc) && behaviour do
+        "Callback implementation of `#{inspect behaviour}.#{name}/#{arity}`."
+      else
+        doc
+      end
+
+    specs = all_specs
+            |> Dict.get({ name, arity }, [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
@@ -195,31 +199,19 @@ defmodule ExDoc.Retriever do
       function_exported?(module, :__struct__, 0) ->
         case module.__struct__ do
           %{__exception__: true} -> :exception
-          _ -> :struct
+          _ -> nil
         end
       function_exported?(module, :__protocol__, 1) -> :protocol
       function_exported?(module, :__impl__, 1) -> :impl
+      function_exported?(module, :__behaviour__, 1) -> :behaviour
       true -> nil
     end
   end
 
-  defp defines_behaviour?(module) do
-    if function_exported?(module, :__behaviour__, 1) do
-      try do
-        module.__behaviour__(:callbacks)
-        true
-      rescue
-        _ -> false
-      end
-    else
-      false
-    end
-  end
-
   # Returns a dict of { name, arity } -> [ behaviour_module ].
-  defp callback_implementations(module) do
-    implements_behaviours(module)
-    |> Enum.map(fn bmod -> Enum.map(callbacks_of(bmod), &{ &1, bmod }) end)
+  defp callbacks_implemented_by(module) do
+    behaviours_implemented_by(module)
+    |> Enum.map(fn behaviour -> Enum.map(callbacks_of(behaviour), &{ &1, behaviour }) end)
     |> Enum.reduce(%{}, &Enum.into/2)
   end
 
@@ -228,7 +220,7 @@ defmodule ExDoc.Retriever do
     |> Enum.filter_map(&match?({ :callback, _ }, &1), fn {_, [{t,_}|_]} -> t end)
   end
 
-  defp implements_behaviours(module) do
+  defp behaviours_implemented_by(module) do
     module.module_info(:attributes)
     |> Stream.filter(&match?({ :behaviour, _ }, &1))
     |> Stream.map(fn {_, l} -> l end)

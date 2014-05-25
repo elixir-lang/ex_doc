@@ -17,13 +17,15 @@ defmodule ExDoc.HTMLFormatter do
     generate_assets(output, config)
     has_readme = config.readme && generate_readme(output, config)
 
-    modules = Autolink.all(modules)
+    all = Autolink.all(modules)
+    modules    = filter_list(:modules, all)
+    exceptions = filter_list(:exceptions, all)
+    protocols  = filter_list(:protocols, all)
 
-    generate_overview(modules, output, config)
-
-    Enum.each [:modules, :records, :protocols], fn(mod_type) ->
-      generate_list(mod_type, modules, output, config, has_readme)
-    end
+    generate_overview(modules, exceptions, protocols, output, config)
+    generate_list(:modules, modules, all, output, config, has_readme)
+    generate_list(:exceptions, exceptions, all, output, config, has_readme)
+    generate_list(:protocols, protocols, all, output, config, has_readme)
   end
 
   defp generate_index(output, config) do
@@ -31,13 +33,8 @@ defmodule ExDoc.HTMLFormatter do
     :ok = File.write("#{output}/index.html", content)
   end
 
-  defp generate_overview(modules, output, config) do
-    content = Templates.overview_template(
-      config,
-      filter_list(:modules, modules),
-      filter_list(:records, modules),
-      filter_list(:protocols, modules)
-    )
+  defp generate_overview(modules, exceptions, protocols, output, config) do
+    content = Templates.overview_template(config, modules, exceptions, protocols)
     :ok = File.write("#{output}/overview.html", content)
   end
 
@@ -82,24 +79,23 @@ defmodule ExDoc.HTMLFormatter do
   # Public so that code in Template can use it.
   def categorize_modules(nodes) do
     [modules: filter_list(:modules, nodes),
-     records: filter_list(:records, nodes),
+     exceptions: filter_list(:exceptions, nodes),
      protocols: filter_list(:protocols, nodes)]
   end
 
-  defp filter_list(:records, nodes) do
-    Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:record, :exception], &1)
+  defp filter_list(:modules, nodes) do
+    Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when not x in [:exception, :protocol, :impl], &1)
   end
 
-  defp filter_list(:modules, nodes) do
-    Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [nil, :behaviour], &1)
+  defp filter_list(:exceptions, nodes) do
+    Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:exception], &1)
   end
 
   defp filter_list(:protocols, nodes) do
     Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:protocol], &1)
   end
 
-  defp generate_list(scope, all, output, config, has_readme) do
-    nodes = filter_list(scope, all)
+  defp generate_list(scope, nodes, all, output, config, has_readme) do
     Enum.each nodes, &generate_module_page(&1, all, output, config)
     content = Templates.list_page(scope, nodes, config, has_readme)
     File.write("#{output}/#{scope}_list.html", content)

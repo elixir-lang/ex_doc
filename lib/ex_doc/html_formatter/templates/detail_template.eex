@@ -17,6 +17,6 @@
   <% end %>
   <div class="docstring"><%= to_html(node.doc) %></div>
   <%= if node.source do %>
-    <a href="<%= node.source %>" target="_blank" class="view_source">Source</a>
+    <a href="<%= node.source %>" class="view_source">Source</a>
   <% end %>
 </div>
