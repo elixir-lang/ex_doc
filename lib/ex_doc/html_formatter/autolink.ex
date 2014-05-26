@@ -1,4 +1,4 @@
-defmodule ExDoc.HTMLFormatter.Autolink do
+defmodule ExDoc.Formatter.HTML.Autolink do
   @moduledoc """
   Conveniences for autolinking locals, types and more.
   """

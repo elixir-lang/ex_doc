@@ -3,7 +3,7 @@ defmodule ExDoc do
     defstruct [
       output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
       homepage_url: nil, source_beam: nil, retriever: ExDoc.Retriever,
-      formatter: ExDoc.HTMLFormatter, project: nil, version: nil, main: nil,
+      formatter: "html", project: nil, version: nil, main: nil,
       readme: false
     ]
   end
@@ -20,7 +20,29 @@ defmodule ExDoc do
     config = struct(config, options)
 
     docs = config.retriever.docs_from_dir(config.source_beam, config)
-    config.formatter.run(docs, config)
+    find_formatter(config.formatter).run(docs, config)
+  end
+
+  # short path for programmatic interface
+  defp find_formatter(modname) when is_atom(modname), do: modname
+
+  # short path for the stock formatters
+  defp find_formatter("html"), do: ExDoc.Formatter.HTML
+
+  defp find_formatter("ExDoc.Formatter." <> _ = name) do
+    Module.concat([name]) |> check_formatter_module(name)
+  end
+
+  defp find_formatter(name) do
+    Module.concat([ExDoc.Formatter, String.upcase(name)])
+    |> check_formatter_module(name)
+  end
+
+  defp check_formatter_module(modname, argname) do
+    unless Code.ensure_loaded?(modname) do
+      raise "Formatter module not found for: #{argname}"
+    end
+    modname
   end
 
   # Helpers
