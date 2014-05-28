@@ -35,7 +35,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
 
   test "site title text links to homepage_url when set" do
     content = Templates.list_template(:modules, [], doc_config, false)
-    assert content =~ ~r{<a href="#{homepage_url}">Elixir v1.0.1</a>}
+    assert content =~ ~r{<a href="#{homepage_url}" target="_top">Elixir v1.0.1</a>}
   end
 
   test "site title text links to source_url when there is no homepage_url" do
@@ -43,7 +43,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
                                                   source_url: source_url,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
     content = Templates.list_template(:modules, [], doc_config_without_source_url, false)
-    assert content =~ ~r{<a href="#{source_url}">Elixir v1.0.1</a>}
+    assert content =~ ~r{<a href="#{source_url}" target="_top">Elixir v1.0.1</a>}
   end
 
   test "site title text creates no link when there is no homepage_url or source_url" do

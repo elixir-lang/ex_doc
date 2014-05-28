@@ -17,7 +17,7 @@
     <div id="content">
       <h1 id="full_list_header">
         <%= if url = config.homepage_url || config.source_url do %>
-          <a href="<%= url %>"><%= config.project %> v<%= config.version %></a>
+          <a href="<%= url %>" target="_top"><%= config.project %> v<%= config.version %></a>
         <% else %>
           <%= config.project %> v<%= config.version %>
         <% end %>
