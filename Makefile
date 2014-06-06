@@ -8,6 +8,12 @@ ifeq ($(shell uname),Darwin)
 	OPTIONS=-dynamiclib -undefined dynamic_lookup
 endif
 
+ifeq ($(OS),Windows_NT)
+	SUNDOWN_MAKE=nmake -f Makefile.win
+else
+	SUNDOWN_MAKE=make
+endif
+
 all: ex_doc
 
 ex_doc:
@@ -20,7 +26,7 @@ sundown/src:
 	git submodule update --init
 
 sundown/libsundown.so: sundown/src
-	cd sundown && make
+	cd sundown && $(SUNDOWN_MAKE)
 
 SUNDOWN_OBJS=\
 	sundown/html/html.o \
