@@ -10,7 +10,7 @@ defmodule ExDoc.CLI do
     [project, version, source_beam] = parse_args(args)
 
     if formatter = opts[:formatter] do
-      opts = Keyword.put(opts, :formatter, String.split(formatter, "."))
+      opts = Keyword.put(opts, :formatter, Module.concat(String.split(formatter, ".")))
     end
 
     Code.prepend_path(source_beam)
