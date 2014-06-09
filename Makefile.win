@@ -1,0 +1,44 @@
+NMAKE = $(MAKE) /$(MAKEFLAGS)
+CFLAGS = /O2 /EHsc /I"sundown\src" /I"sundown\html" /I"C:\Program Files\erl6.0\erts-6.0\include"
+
+all: ex_doc
+
+ex_doc:
+	mix compile
+
+test:
+	mix test
+
+sundown\src:
+	git submodule update --init
+
+sundown\sundown.dll: sundown\src
+	cd sundown
+	$(NMAKE) /F Makefile.win
+	cd ..
+
+SUNDOWN_OBJS=\
+	sundown\html\html.obj \
+	sundown\html\html_smartypants.obj \
+	sundown\html\houdini_html_e.obj \
+	sundown\html\houdini_href_e.obj \
+	sundown\src\buffer.obj \
+	sundown\src\autolink.obj \
+	sundown\src\stack.obj \
+	sundown\src\markdown.obj
+
+priv\markdown.dll: sundown\sundown.dll
+	$(CC) $(CFLAGS) /LD /MD /Fe$@ $(SUNDOWN_OBJS) src\markdown_nif.c
+
+.c.obj:
+	$(CC) $(CFLAGS) /c $< /Fo$@
+
+.IGNORE:
+
+clean:
+	cd sundown
+	$(NMAKE) /F Makefile.win clean
+	cd ..
+	del /Q /F priv\markdown.dll priv\markdown.exp priv\markdown.lib markdown_nif.obj
+	rd /Q /S _build
+	rd /Q /S test\tmp
