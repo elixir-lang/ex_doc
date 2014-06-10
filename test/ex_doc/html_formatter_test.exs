@@ -1,7 +1,7 @@
-defmodule ExDoc.HTMLFormatterTest do
+defmodule ExDoc.Formatter.HTML.Test do
   use ExUnit.Case
 
-  alias ExDoc.HTMLFormatter
+  alias ExDoc.Formatter.HTML
 
   setup_all do
     :file.set_cwd("test")
@@ -32,7 +32,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "run generates the html file with the documentation" do
-    HTMLFormatter.run(get_modules, doc_config)
+    HTML.run(get_modules, doc_config)
 
     assert File.regular?("#{output_dir}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
@@ -40,7 +40,7 @@ defmodule ExDoc.HTMLFormatterTest do
 
   test "run generates in specified output directory" do
     config = %ExDoc.Config{output: "#{output_dir}/docs"}
-    HTMLFormatter.run(get_modules(config), config)
+    HTML.run(get_modules(config), config)
 
     assert File.regular?("#{output_dir}/docs/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/docs/index.html")
@@ -48,7 +48,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "run generates all listing files" do
-    HTMLFormatter.run(get_modules, doc_config)
+    HTML.run(get_modules, doc_config)
 
     content = File.read!("#{output_dir}/modules_list.html")
     assert content =~ ~r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
@@ -66,7 +66,7 @@ defmodule ExDoc.HTMLFormatterTest do
   end
 
   test "run generates the overview file" do
-    HTMLFormatter.run(get_modules, doc_config)
+    HTML.run(get_modules, doc_config)
 
     assert File.regular?("#{output_dir}/overview.html")
     content = File.read!("#{output_dir}/overview.html")

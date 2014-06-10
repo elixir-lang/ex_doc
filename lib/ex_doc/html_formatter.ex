@@ -1,10 +1,10 @@
-defmodule ExDoc.HTMLFormatter do
+defmodule ExDoc.Formatter.HTML do
   @moduledoc """
   Provide HTML-formatted documentation
   """
 
-  alias ExDoc.HTMLFormatter.Templates
-  alias ExDoc.HTMLFormatter.Autolink
+  alias ExDoc.Formatter.HTML.Templates
+  alias ExDoc.Formatter.HTML.Autolink
 
   @doc """
   Generate HTML documentation for the given modules

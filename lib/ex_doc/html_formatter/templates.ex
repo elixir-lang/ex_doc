@@ -1,6 +1,6 @@
-defmodule ExDoc.HTMLFormatter.Templates do
+defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc """
-  Handle all template interfaces for the HTMLFormatter.
+  Handle all template interfaces for the HTML formatter.
   """
 
   require EEx

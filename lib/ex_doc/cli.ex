@@ -9,10 +9,6 @@ defmodule ExDoc.CLI do
 
     [project, version, source_beam] = parse_args(args)
 
-    if formatter = opts[:formatter] do
-      opts = Keyword.put(opts, :formatter, String.split(formatter, "."))
-    end
-
     Code.prepend_path(source_beam)
     opts = Keyword.put(opts, :source_beam, source_beam)
     ExDoc.generate_docs(project, version, opts)
@@ -44,7 +40,7 @@ defmodule ExDoc.CLI do
       BEAMS              Path to compiled beam files
       -o, --output       Path to output docs, default: docs
       --readme           Generate a project README from a README.md file, default: false
-      -f, --formatter    Docs formatter to use, default: ExDoc.HTMLFormatter
+      -f, --formatter    Docs formatter to use; default: html
       -r, --source-root  Path to the source code root, default: .
       -u, --source-url   URL to the source code
       --source-ref       Branch/commit/tag used for source link inference, default: master

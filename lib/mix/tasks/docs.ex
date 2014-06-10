@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Docs do
   * `:readme` - boolean indicating whether a project README should be created
     from a README.md; default: `false`.
 
-  * `:formatter` - doc formatter to use; default: ExDoc.HTMLFormatter.
+  * `:formatter` - doc formatter to use; default: html.
 
   * `:source_root` - path to the source code root directory; default: . (current directory).
 

@@ -1,7 +1,7 @@
-defmodule ExDoc.HTMLFormatter.TemplatesTest do
+defmodule ExDoc.Formatter.HTML.TemplatesTest do
   use ExUnit.Case, async: true
 
-  alias ExDoc.HTMLFormatter.Templates
+  alias ExDoc.Formatter.HTML.Templates
 
   defp source_url do
     "https://github.com/elixir-lang/elixir"
@@ -20,7 +20,7 @@ defmodule ExDoc.HTMLFormatter.TemplatesTest do
   defp get_module_page(names) do
     mods = names
            |> ExDoc.Retriever.docs_from_modules(doc_config)
-           |> ExDoc.HTMLFormatter.Autolink.all()
+           |> ExDoc.Formatter.HTML.Autolink.all()
 
     Templates.module_page(hd(mods), doc_config, mods)
   end
