@@ -12,26 +12,25 @@ defmodule ExDoc.Markdown.Pandoc do
 
   def to_html(nil, _), do: raise(ArgumentError, message: "Expected a binary")
 
-  def to_html(text, header_lvl) when is_binary(text) do
-    tmp_path = text_to_file(text)
-    convert_markdown(tmp_path, "html", header_lvl)
-  end
-
-  defp text_to_file(text) do
-    {a,b,c} = :erlang.now()
-    d = :erlang.phash2(text)  # FIXME
-    unique_name = "tmpdoc_#{a}#{b}#{c}_#{d}.md"
-    tmp_path = Path.join(System.tmp_dir, unique_name)
-
-    File.write!(tmp_path, text)
-    tmp_path
+  def to_html(text, header_lvl) do
+    convert_markdown(text, "html", header_lvl)
   end
 
   @doc false
   # Used by custom formatters that need to get intermediate markup (e.g. reST)
   # before generating final HTML
-  def convert_markdown(path, format, header_lvl) do
-    open_port(path, format, header_lvl) |> process_port()
+  def convert_markdown(text, format, header_lvl) when is_binary(text) do
+    tmp_path = text_to_file(text)
+    open_port(tmp_path, format, header_lvl) |> process_port()
+  end
+
+  defp text_to_file(text) do
+    id = :crypto.rand_bytes(4) |> bin_to_hex
+    unique_name = "tmpdoc_#{id}.md"
+    tmp_path = Path.join(System.tmp_dir, unique_name)
+
+    File.write!(tmp_path, text)
+    tmp_path
   end
 
   defp open_port(path, format, header_lvl) do
@@ -41,7 +40,7 @@ defmodule ExDoc.Markdown.Pandoc do
             "--base-header-level", to_string(header_lvl),
             path]
     Port.open({:spawn_executable, exe}, [:stream, :binary, {:args, args},
-                                   :use_stdio, :stderr_to_stdout, :exit_status])
+                            :hide, :use_stdio, :stderr_to_stdout, :exit_status])
   end
 
   defp process_port(port) do
@@ -58,4 +57,13 @@ defmodule ExDoc.Markdown.Pandoc do
         {status, List.to_string(data)}
     end
   end
+
+  defp bin_to_hex(bin), do: bin_to_hex(bin, <<>>)
+
+  defp bin_to_hex(<<>>, acc), do: acc
+  defp bin_to_hex(<<hi::4, lo::4>> <> rest, acc),
+    do: bin_to_hex(rest, <<hex_char(hi), hex_char(lo), acc::binary>>)
+
+  defp hex_char(n) when n in 0..9, do: ?0 + n
+  defp hex_char(n), do: ?a + n - 10
 end

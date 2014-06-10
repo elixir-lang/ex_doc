@@ -16,7 +16,7 @@ defmodule ExDoc do
   and `options`.
   """
   def generate_docs(project, version, options) when is_binary(project) and is_binary(version) and is_list(options) do
-    init_markdown_processor(@markdown_processors)
+    init_markdown_processor()
 
     options = normalize_options(options)
     config  = %Config{project: project, version: version, main: options[:main] || project,
