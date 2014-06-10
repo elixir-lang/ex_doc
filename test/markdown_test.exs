@@ -3,6 +3,10 @@ defmodule MarkdownTest.SundownTest do
 
   alias ExDoc.Markdown.Sundown, as: Markdown
 
+  setup_all do
+    :ok = Markdown.init()
+  end
+
   test "to_html generate the HTML from the markdown" do
     assert Markdown.to_html("# Test") == "<h1>Test</h1>\n"
   end
@@ -27,6 +31,10 @@ defmodule MarkdownTest.PandocTest do
   use ExUnit.Case, async: true
 
   alias ExDoc.Markdown.Pandoc, as: Markdown
+
+  setup_all do
+    :ok = Markdown.init()
+  end
 
   test "to_html generate the HTML from the markdown" do
     assert Markdown.to_html("# Test") == ~s(<h1 id="test">Test</h1>\n)

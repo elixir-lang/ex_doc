@@ -1,4 +1,13 @@
 defmodule ExDoc.Markdown.Pandoc do
+  def init do
+    if :os.find_executable('pandoc') do
+      ExDoc.register_markdown_processor(__MODULE__)
+    else
+      {:error, "pandoc program not found"}
+    end
+  end
+
+
   def to_html(text, header_lvl \\ 1)
 
   def to_html(nil, _), do: raise(ArgumentError, message: "Expected a binary")

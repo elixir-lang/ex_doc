@@ -25,6 +25,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     Templates.module_page(hd(mods), doc_config, mods)
   end
 
+
+  setup_all do
+    ExDoc.Markdown.Sundown.init()
+  end
+
   ## LISTING
 
   test "current listing page is marked as selected" do
