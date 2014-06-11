@@ -120,11 +120,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   test "module_page outputs the types and function specs" do
     content = get_module_page([TypesAndSpecs, TypesAndSpecs.Sub])
 
-    mb = "http://elixir-lang.org/docs/master"
+    mb = "http://elixir-lang.org/docs/stable"
 
     public_html =
       "<a href=\"#t:public/1\">public(t)</a> :: {t, " <>
-      "<a href=\"#{mb}/String.html#t:t/0\">String.t</a>, " <>
+      "<a href=\"#{mb}/elixir/String.html#t:t/0\">String.t</a>, " <>
       "<a href=\"TypesAndSpecs.Sub.html#t:t/0\">TypesAndSpecs.Sub.t</a>, " <>
       "<a href=\"#t:opaque/0\">opaque</a>, :ok | :error}"
 

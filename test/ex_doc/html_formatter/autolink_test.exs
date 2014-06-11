@@ -144,7 +144,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   test "autolink Elixir types in typespecs" do
     assert Autolink.typespec(quote(do: String.t), [], []) ==
-           ~s[<a href="http://elixir-lang.org/docs/master/String.html#t:t/0">String.t</a>]
+           ~s[<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>]
 
     assert Autolink.typespec(quote(do: Unknown.bar()), [], []) ==
            ~s[Unknown.bar]

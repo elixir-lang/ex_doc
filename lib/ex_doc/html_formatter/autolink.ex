@@ -3,7 +3,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   Conveniences for autolinking locals, types and more.
   """
 
-  @elixir_docs "http://elixir-lang.org/docs/master/"
+  @elixir_docs "http://elixir-lang.org/docs/stable/"
   @erlang_docs "http://www.erlang.org/doc/man/"
 
   @doc """
@@ -115,13 +115,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     cond do
       nil?(alias) -> nil
       alias in aliases -> ""
-      from_elixir?(alias) -> @elixir_docs
+      dir = from_elixir(alias) -> @elixir_docs <> dir <> "/"
       true -> nil
     end
   end
 
-  defp from_elixir?(alias) do
-    String.starts_with?(alias_ebin(alias), elixir_ebin)
+  defp from_elixir(alias) do
+    alias_ebin = alias_ebin(alias)
+    if String.starts_with?(alias_ebin, elixir_ebin()) do
+      alias_ebin |> Path.dirname |> Path.dirname |> Path.basename
+    end
   end
 
   defp alias_ebin(alias) do
