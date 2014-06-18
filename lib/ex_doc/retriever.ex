@@ -52,7 +52,7 @@ defmodule ExDoc.Retriever do
 
   defp filename_to_module(name) do
     name = Path.basename name, ".beam"
-    binary_to_atom name
+    String.to_atom name
   end
 
   # Get all the information from the module and compile
@@ -128,7 +128,7 @@ defmodule ExDoc.Retriever do
 
   # Skip default docs if starting with _
   defp has_doc?({{name, _}, _, _, _, nil}, _type) do
-    hd(atom_to_list(name)) != ?_
+    hd(Atom.to_char_list(name)) != ?_
   end
 
   # Everything else is ok

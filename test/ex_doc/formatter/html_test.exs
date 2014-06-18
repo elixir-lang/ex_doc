@@ -6,12 +6,12 @@ defmodule ExDoc.Formatter.HTMLTest do
   setup_all do
     :file.set_cwd("test")
     :file.make_dir(output_dir)
-    :ok
-  end
 
-  teardown_all do
-    System.cmd("rm -rf #{output_dir}")
-    :file.set_cwd("..")
+    on_exit fn ->
+      System.cmd("rm -rf #{output_dir}")
+      :file.set_cwd("..")
+    end
+
     :ok
   end
 

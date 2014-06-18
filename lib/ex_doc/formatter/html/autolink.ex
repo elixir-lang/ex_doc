@@ -265,8 +265,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp module_exports_function?(function_str) do
     { mod_str, function_name, arity_str } = split_function(function_str)
-    module = mod_str |> binary_to_atom
-    function_name = binary_to_atom(function_name)
+    module = String.to_atom(mod_str)
+    function_name = String.to_atom(function_name)
     {arity, _} = Integer.parse(arity_str)
     exports = module.module_info(:exports)
     Enum.member? exports, {function_name, arity}
