@@ -1,22 +1,15 @@
-defmodule Mix.Tasks.Compile.Sundown do
-  @shortdoc "Compiles sundown that ships with ExDoc"
-
-  def run(_) do
-    if Mix.shell.cmd("make priv/markdown.so") != 0 do
-      raise Mix.Error, message: "could not run `make priv/markdown.so`. Do you have make and gcc installed?"
-    end
-  end
-end
-
 defmodule ExDoc.Mixfile do
   use Mix.Project
 
   def project do
-    [ app: :ex_doc,
-      version: "0.1.0",
-      elixir: "~> 0.14.0-dev",
-      compilers: [:sundown, :elixir, :app],
-      source_url: "https://github.com/elixir-lang/ex_doc/"
-    ]
+    [app: :ex_doc,
+     version: "0.5.0-dev",
+     elixir: "~> 0.14.0",
+     deps: deps,
+     source_url: "https://github.com/elixir-lang/ex_doc/"]
+  end
+
+  defp deps do
+    [{:markdown, github: "devinus/markdown", only: [:dev, :test]}]
   end
 end

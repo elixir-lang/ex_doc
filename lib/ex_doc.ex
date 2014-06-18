@@ -8,16 +8,11 @@ defmodule ExDoc do
     ]
   end
 
-  @markdown_processors [ExDoc.Markdown.Sundown, ExDoc.Markdown.Pandoc]
-  @markdown_processor_key :markdown_processor
-
   @doc """
   Generates documentation for the given `project`, `version`
   and `options`.
   """
   def generate_docs(project, version, options) when is_binary(project) and is_binary(version) and is_list(options) do
-    init_markdown_processor()
-
     options = normalize_options(options)
     config  = %Config{project: project, version: version, main: options[:main] || project,
                       homepage_url: options[:homepage_url],
@@ -26,42 +21,6 @@ defmodule ExDoc do
 
     docs = config.retriever.docs_from_dir(config.source_beam, config)
     find_formatter(config.formatter).run(docs, config)
-  end
-
-  @doc false
-  # This is made public for use in tests
-  def init_markdown_processor(candidates \\ @markdown_processors) do
-    {processor, errors, _} = Enum.reduce(candidates, {nil, [], :continue}, fn
-      _, {module, _, :stop} -> {module, nil, :stop}
-
-      module, {_, errors, _} ->
-        case module.init() do
-          :ok -> {module, nil, :stop}
-          {:error, reason} -> {nil, [{module, reason}|errors], :continue}
-        end
-    end)
-    unless processor do
-      IO.puts "Failed to initialize markdown processor:"
-      errors |> Enum.reverse |> Enum.each(fn {module, reason} ->
-        IO.puts "  #{inspect module}: #{inspect reason}"
-      end)
-      System.halt(1)
-    end
-  end
-
-  @doc false
-  # This function is used by individual processors
-  def register_markdown_processor(module) do
-    :application.set_env(:ex_doc, @markdown_processor_key, module)
-  end
-
-  @doc false
-  # This is used by the ExDoc.Markdown
-  def get_markdown_processor() do
-    case :application.get_env(:ex_doc, @markdown_processor_key) do
-      {:ok, module} -> module
-      :undefined -> false
-    end
   end
 
   # short path for programmatic interface

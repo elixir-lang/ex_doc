@@ -1,0 +1,2 @@
+%{"hoedown": {:git, "git://github.com/hoedown/hoedown.git", "0610117f44b173a4e2112afb2f510156a32355b5", []},
+  "markdown": {:git, "git://github.com/devinus/markdown.git", "1c4cdc1227ba5eb53a4b2fa7b996df9608229bd0", []}}

@@ -1,6 +1,5 @@
-test/tmp
-_build/
-*.o
-*.so
-priv/*.so.dSYM
+/_build
+/deps
 erl_crash.dump
+*.ez
+/test/tmp

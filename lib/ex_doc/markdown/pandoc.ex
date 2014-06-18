@@ -1,46 +1,42 @@
 defmodule ExDoc.Markdown.Pandoc do
-  def init do
-    if :os.find_executable('pandoc') do
-      ExDoc.register_markdown_processor(__MODULE__)
-    else
-      {:error, "pandoc program not found"}
-    end
+  def available? do
+    !!System.find_executable("pandoc")
   end
 
+  @doc """
+  Pandoc specific options:
 
-  def to_html(text, header_lvl \\ 1)
+    * `:format` - output format, defaults to :html
+    * `:header_level` - base header level, outputs to 1
 
-  def to_html(nil, _), do: raise(ArgumentError, message: "Expected a binary")
-
-  def to_html(text, header_lvl) do
-    convert_markdown(text, "html", header_lvl)
-  end
-
-  @doc false
-  # Used by custom formatters that need to get intermediate markup (e.g. reST)
-  # before generating final HTML
-  def convert_markdown(text, format, header_lvl) when is_binary(text) do
-    tmp_path = text_to_file(text)
-    open_port(tmp_path, format, header_lvl) |> process_port()
+  """
+  def to_html(text, opts \\ []) do
+    text
+    |> text_to_file()
+    |> open_port(opts)
+    |> process_port()
   end
 
   defp text_to_file(text) do
     id = :crypto.rand_bytes(4) |> bin_to_hex
     unique_name = "tmpdoc_#{id}.md"
     tmp_path = Path.join(System.tmp_dir, unique_name)
-
     File.write!(tmp_path, text)
     tmp_path
   end
 
-  defp open_port(path, format, header_lvl) do
-    exe = :os.find_executable('pandoc')
+  defp open_port(path, opts) do
+    exe  = :os.find_executable('pandoc')
     args = ["--from", "markdown",
-            "--to", format,
-            "--base-header-level", to_string(header_lvl),
+            "--to", get_string(opts, :format, :html),
+            "--base-header-level", get_string(opts, :header_level, 1),
             path]
     Port.open({:spawn_executable, exe}, [:stream, :binary, {:args, args},
-                            :hide, :use_stdio, :stderr_to_stdout, :exit_status])
+              :hide, :use_stdio, :stderr_to_stdout, :exit_status])
+  end
+
+  defp get_string(opts, key, default) do
+    Keyword.get(opts, key, default) |> to_string
   end
 
   defp process_port(port) do
