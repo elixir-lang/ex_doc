@@ -1,0 +1,60 @@
+!IF [where /Q Makefile.auto.win]
+# The file doesn't exist, so don't include it.
+!ELSE
+!INCLUDE Makefile.auto.win
+!ENDIF
+
+NMAKE = nmake /$(MAKEFLAGS)
+CFLAGS = /O2 /EHsc /I"sundown\src" /I"sundown\html"
+
+all: ex_doc
+
+ex_doc:
+	mix compile
+
+test:
+	mix test
+
+Makefile.auto.win:
+	echo # Auto-generated as part of Makefile.win, do not modify. > $@
+	erl -eval "io:format(\"~s~n\", [lists:concat([\"ERTS_INCLUDE_PATH=\", code:root_dir(), \"/erts-\", erlang:system_info(version), \"/include\"])])" -s init stop -noshell >> $@
+
+sundown\src:
+	git submodule update --init
+
+sundown\sundown.dll: sundown\src
+	cd sundown
+	$(NMAKE) /F Makefile.win
+	cd ..
+
+SUNDOWN_OBJS=\
+	sundown\html\html.obj \
+	sundown\html\html_smartypants.obj \
+	sundown\html\houdini_html_e.obj \
+	sundown\html\houdini_href_e.obj \
+	sundown\src\buffer.obj \
+	sundown\src\autolink.obj \
+	sundown\src\stack.obj \
+	sundown\src\markdown.obj
+
+!IFDEF ERTS_INCLUDE_PATH
+priv\markdown.dll: sundown\sundown.dll
+	$(CC) $(CFLAGS) /I"$(ERTS_INCLUDE_PATH)" /LD /MD /Fe$@ $(SUNDOWN_OBJS) src\markdown_nif.c
+!ELSE
+priv\markdown.dll: Makefile.auto.win
+	$(NMAKE) /F Makefile.win priv\markdown.dll
+!ENDIF
+
+.c.obj:
+	$(CC) $(CFLAGS) /c $< /Fo$@
+
+.IGNORE:
+
+clean:
+	cd sundown
+	$(NMAKE) /F Makefile.win clean
+	cd ..
+	del /Q /F priv\markdown.dll priv\markdown.exp priv\markdown.lib markdown_nif.obj
+	del /Q /F Makefile.auto.win
+	rd /Q /S _build
+	rd /Q /S test\tmp
