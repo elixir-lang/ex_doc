@@ -21,7 +21,7 @@
 
     <div id="content">
       <div class="breadcrumbs"><%= page_breadcrumbs(config, "README", "readme.html") %></div>
-      <%= Markdown.to_html(content) %>
+      <%= to_html(content) %>
     </div>
   </body>
 </html>

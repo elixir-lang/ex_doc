@@ -64,10 +64,18 @@ static ERL_NIF_TERM to_markdown_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM
   return render_term(env, argc, argv, &data);
 }
 
-static ErlNifFunc nif_funcs[] =
-{
-    {"to_html", 1, to_markdown_nif}
+static ERL_NIF_TERM is_available_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
+  return enif_make_atom(env, "true");
+}
+
+static ErlNifFunc nif_funcs[] = {
+    {"to_html", 1, to_markdown_nif},
+    {"available?", 0, is_available_nif}
 };
 
-ERL_NIF_INIT(Elixir.Markdown,nif_funcs,NULL,NULL,NULL,NULL);
+static int upgrade_nif(ErlNifEnv* env, void** priv_data, void** old_priv_data, ERL_NIF_TERM load_info) {
+    return 0;
+}
+
+ERL_NIF_INIT(Elixir.ExDoc.Markdown.Sundown,nif_funcs,NULL,NULL,upgrade_nif,NULL);
 
