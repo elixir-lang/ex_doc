@@ -99,7 +99,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp strip_parens(string, []) do
     if :binary.last(string) == ?) do
-      :binary.part(string, 0, size(string)-2)
+      :binary.part(string, 0, byte_size(string)-2)
     else
       string
     end
