@@ -107,6 +107,6 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp templates_path(other) do
-    Path.expand("html_formatter/templates/#{other}", __DIR__)
+    Path.expand("html/templates/#{other}", __DIR__)
   end
 end

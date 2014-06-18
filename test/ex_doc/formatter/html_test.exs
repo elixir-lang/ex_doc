@@ -1,4 +1,4 @@
-defmodule ExDoc.Formatter.HTML.Test do
+defmodule ExDoc.Formatter.HTMLTest do
   use ExUnit.Case
 
   alias ExDoc.Formatter.HTML
@@ -16,11 +16,11 @@ defmodule ExDoc.Formatter.HTML.Test do
   end
 
   defp output_dir do
-    Path.expand("../docs", __DIR__)
+    Path.expand("../../docs", __DIR__)
   end
 
   defp beam_dir do
-    Path.expand("../tmp/ebin", __DIR__)
+    Path.expand("../../tmp/ebin", __DIR__)
   end
 
   defp doc_config do
