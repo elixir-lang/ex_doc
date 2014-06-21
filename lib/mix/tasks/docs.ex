@@ -83,7 +83,7 @@ defmodule Mix.Tasks.Docs do
 
   defp log(index) do
     Mix.shell.info "%{green}Docs successfully generated."
-    Mix.shell.info "%{green}Open #{index} in your browser to read them."
+    Mix.shell.info "%{green}View them at #{index}."
   end
 
   defp get_docs_opts(config) do
