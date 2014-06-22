@@ -78,12 +78,12 @@ defmodule Mix.Tasks.Docs do
 
     index = generator.(project, version, options)
     log(index)
-    :ok
+    index
   end
 
   defp log(index) do
     Mix.shell.info "%{green}Docs successfully generated."
-    Mix.shell.info "%{green}View them at #{index}."
+    Mix.shell.info "%{green}View them at #{inspect index}."
   end
 
   defp get_docs_opts(config) do
