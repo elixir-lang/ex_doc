@@ -24,7 +24,7 @@ defmodule ExDoc.Markdown.Pandoc do
   end
 
   defp text_to_file(text) do
-    id = :crypto.rand_bytes(4) |> bin_to_hex
+    id = :crypto.rand_bytes(4) |> Base.encode16
     unique_name = "tmpdoc_#{id}.md"
     tmp_path = Path.join(System.tmp_dir, unique_name)
     File.write!(tmp_path, text)
@@ -59,13 +59,4 @@ defmodule ExDoc.Markdown.Pandoc do
         {status, List.to_string(data)}
     end
   end
-
-  defp bin_to_hex(bin), do: bin_to_hex(bin, <<>>)
-
-  defp bin_to_hex(<<>>, acc), do: acc
-  defp bin_to_hex(<<hi::4, lo::4>> <> rest, acc),
-    do: bin_to_hex(rest, <<hex_char(hi), hex_char(lo), acc::binary>>)
-
-  defp hex_char(n) when n in 0..9, do: ?0 + n
-  defp hex_char(n), do: ?a + n - 10
 end
