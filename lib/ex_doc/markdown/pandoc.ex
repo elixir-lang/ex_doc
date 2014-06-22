@@ -10,13 +10,7 @@ defmodule ExDoc.Markdown.Pandoc do
     * `:header_level` - base header level, outputs to 1
 
   """
-  def to_html(text, opts \\ [])
-
-  def to_html(nil, _) do
-    raise ArgumentError, message: "Expected a string, got nil"
-  end
-
-  def to_html(text, opts) do
+  def to_html(text, opts \\ []) when is_binary(text) do
     text
     |> text_to_file()
     |> open_port(opts)

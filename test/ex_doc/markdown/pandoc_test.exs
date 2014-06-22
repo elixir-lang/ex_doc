@@ -11,8 +11,8 @@ defmodule MarkdownTest.PandocTest do
     assert Markdown.to_html("# Test Another", header_level: 6) == ~s(<h6 id="test-another">Test Another</h6>\n)
   end
 
-  test "to_html raises an ArgumentError if the value passed is nil" do
-    assert_raise ArgumentError, fn ->
+  test "to_html raises when the value passed is not a binary" do
+    assert_raise FunctionClauseError, fn ->
       Markdown.to_html(nil)
     end
   end
