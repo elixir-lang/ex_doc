@@ -5,7 +5,8 @@ notifications:
 otp_release:
   - 17.0
 before_install:
+  - sudo apt-get install -y pandoc
   - git clone https://github.com/elixir-lang/elixir
   - cd elixir && make && cd ..
 before_script: "export PATH=`pwd`/elixir/bin:$PATH"
-script: "mix deps.get && mix test"
+script: "mix deps.get && mix test --include pandoc"
