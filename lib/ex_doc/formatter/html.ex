@@ -26,6 +26,8 @@ defmodule ExDoc.Formatter.HTML do
     generate_list(:modules, modules, all, output, config, has_readme)
     generate_list(:exceptions, exceptions, all, output, config, has_readme)
     generate_list(:protocols, protocols, all, output, config, has_readme)
+
+    Path.join(config.output, "index.html")
   end
 
   defp generate_index(output, config) do

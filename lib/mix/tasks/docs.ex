@@ -74,21 +74,16 @@ defmodule Mix.Tasks.Docs do
         options
     end
 
-    if formatter = options[:formatter] do
-      options = Keyword.put(options, :formatter, String.split(formatter, "."))
-    end
-
     options = Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
 
-    res = generator.(project, version, options)
-    log(options)
-    res
+    index = generator.(project, version, options)
+    log(index)
+    :ok
   end
 
-  defp log(options) do
-    index = Path.join(options[:output] || "docs", "index.html")
+  defp log(index) do
     Mix.shell.info "%{green}Docs successfully generated."
-    Mix.shell.info "%{green}Open #{index} in your browser to read them."
+    Mix.shell.info "%{green}View them at #{index}."
   end
 
   defp get_docs_opts(config) do
