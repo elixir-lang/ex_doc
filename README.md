@@ -10,7 +10,7 @@ To use ExDoc in your Mix projects, first add ExDoc as a dependency:
 
 ```elixir
 def deps do
-  [ { :ex_doc, github: "elixir-lang/ex_doc" } ]
+  [{:ex_doc, github: "elixir-lang/ex_doc"}]
 end
 ```
 
@@ -20,16 +20,22 @@ ExDoc will automatically pull in information from your project, like the applica
 
 ```elixir
 def project do
-  [ app: :repo
-    version: "0.1.0.dev",
-    name: "REPO",
-    source_url: "https://github.com/USER/REPO",
-    homepage_url: "http://YOUR_PROJECT_HOMEPAGE"
-    deps: deps ]
+  [app: :repo
+   version: "0.1.0.dev",
+   name: "REPO",
+   source_url: "https://github.com/USER/REPO",
+   homepage_url: "http://YOUR_PROJECT_HOMEPAGE"
+   deps: deps]
 end
 ```
 
-Now you are ready to generate your project documentation with `mix docs`. There are other options available, you can check them out by running `mix help docs`.
+Now you are almost ready to generate your project documentation with `mix docs`. ExDoc requires a markdown tool to be available before generating docs. You have two options:
+
+  * Install [pandoc](http://johnmacfarlane.net/pandoc/) - which is available in multiple package managers and provides installers for different operating systems. Pandoc must be installed just once and it will be used for all projects;
+
+  * Add http://github.com/devinus/markdown as a dependency to your project as: `{:markdown, github: "devinus/markdown"}`
+
+To see all options available when generating docs, just run `mix help docs`.
 
 ## Using ExDoc via command line
 
