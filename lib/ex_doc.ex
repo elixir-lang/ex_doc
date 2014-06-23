@@ -14,10 +14,13 @@ defmodule ExDoc do
   """
   def generate_docs(project, version, options) when is_binary(project) and is_binary(version) and is_list(options) do
     options = normalize_options(options)
-    config  = %Config{project: project, version: version, main: options[:main] || project,
-                      homepage_url: options[:homepage_url],
-                      source_root: options[:source_root] || File.cwd!}
-    config = struct(config, options)
+    config = %Config{
+      project: project,
+      version: version,
+      main: options[:main] || project,
+      homepage_url: options[:homepage_url],
+      source_root: options[:source_root] || File.cwd!,
+    } |> struct(options)
 
     docs = config.retriever.docs_from_dir(config.source_beam, config)
     find_formatter(config.formatter).run(docs, config)
