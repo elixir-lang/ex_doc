@@ -1,5 +1,5 @@
 defmodule ExDoc.CLI do
-  def run(args) do
+  def run(args, generator \\ &ExDoc.generate_docs/3) do
     {opts, args, _} = OptionParser.parse(args, switches: [readme: :boolean],
                aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root,
                          m: :main, p: :homepage_url, c: :config])
@@ -11,9 +11,9 @@ defmodule ExDoc.CLI do
       opts
       |> Keyword.put(:source_beam, source_beam)
       |> merge_config()
-    ExDoc.generate_docs(project, version, opts)
-  end
 
+    generator.(project, version, opts)
+  end
 
   defp merge_config(opts) do
     case Keyword.fetch(opts, :config) do
