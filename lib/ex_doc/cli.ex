@@ -1,18 +1,44 @@
 defmodule ExDoc.CLI do
-  def run(args) do
-    parsed = OptionParser.parse(args, switches: [readme: :boolean],
+  def run(args, generator \\ &ExDoc.generate_docs/3) do
+    {opts, args, _} = OptionParser.parse(args, switches: [readme: :boolean],
                aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root,
-                         m: :main, p: :homepage_url])
-
-    opts = elem(parsed, 0)
-    args = elem(parsed, 1)
+                         m: :main, p: :homepage_url, c: :config])
 
     [project, version, source_beam] = parse_args(args)
 
     Code.prepend_path(source_beam)
-    opts = Keyword.put(opts, :source_beam, source_beam)
-    ExDoc.generate_docs(project, version, opts)
+    opts =
+      opts
+      |> Keyword.put(:source_beam, source_beam)
+      |> merge_config()
+
+    generator.(project, version, opts)
   end
+
+  defp merge_config(opts) do
+    case Keyword.fetch(opts, :config) do
+      {:ok, config} ->
+        opts
+        |> Keyword.delete(:config)
+        |> Keyword.put(:formatter_opts, read_config(config))
+      _ -> opts
+    end
+  end
+
+  defp read_config(path) do
+    config_str = case File.read(path) do
+      {:ok, str} -> str
+      _ -> raise "Could not load config. No such file: #{path}"
+    end
+
+    {result, _} = Code.eval_string(config_str)
+    unless is_list(result) do
+      raise "Bad config. Expected a keyword list"
+    end
+
+    result
+  end
+
 
   defp parse_args([_project, _version, _source_beam] = args), do: args
   defp parse_args([_, _, _ | _]) do
@@ -41,6 +67,7 @@ defmodule ExDoc.CLI do
       -o, --output       Path to output docs, default: docs
       --readme           Generate a project README from a README.md file, default: false
       -f, --formatter    Docs formatter to use; default: html
+      -c, --config       Path to the formatter's config file
       -r, --source-root  Path to the source code root, default: .
       -u, --source-url   URL to the source code
       --source-ref       Branch/commit/tag used for source link inference, default: master
