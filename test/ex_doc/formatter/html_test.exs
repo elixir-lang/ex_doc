@@ -8,7 +8,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     :file.make_dir(output_dir)
 
     on_exit fn ->
-      System.cmd("rm -rf #{output_dir}")
+      System.cmd "rm", ["-rf", "#{output_dir}"]
       :file.set_cwd("..")
     end
 
