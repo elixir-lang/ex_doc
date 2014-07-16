@@ -1,4 +1,9 @@
-exclude = if ExDoc.Markdown.Pandoc.available?, do: [], else: [pandoc: true]
+exclude = [
+     pandoc:  !ExDoc.Markdown.Pandoc.available?,
+     hoedown: !ExDoc.Markdown.Hoedown.available?,
+     earmark: !ExDoc.Markdown.Earmark.available?
+]
+
 ExUnit.start(exclude: exclude)
 
 if Enum.empty? Path.wildcard("test/tmp/ebin/*.beam") do
