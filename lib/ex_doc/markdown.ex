@@ -1,5 +1,11 @@
 defmodule ExDoc.Markdown do
-  @markdown_processors [ExDoc.Markdown.Hoedown, ExDoc.Markdown.Pandoc]
+
+  @markdown_processors [
+    ExDoc.Markdown.Earmark, 
+    ExDoc.Markdown.Hoedown, 
+    ExDoc.Markdown.Pandoc
+  ]
+
   @markdown_processor_key :markdown_processor
 
   def to_html(text) when is_binary(text) do

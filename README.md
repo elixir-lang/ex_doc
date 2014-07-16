@@ -29,11 +29,21 @@ def project do
 end
 ```
 
-Now you are almost ready to generate your project documentation with `mix docs`. ExDoc requires a markdown tool to be available before generating docs. You have two options:
+Now you are ready to generate your project documentation with `mix docs`.
+
+## Changing the Markdown tool
+
+By default, ExDoc uses [Earmark][http://github.com/pragdave/earmark] to convert Markdown to HTML. If you prefer, you can also use pandoc or hoedown.
 
   * Install [pandoc](http://johnmacfarlane.net/pandoc/) - which is available in multiple package managers and provides installers for different operating systems. Pandoc must be installed just once and it will be used for all projects;
 
   * Add http://github.com/devinus/markdown as a dependency to your project as: `{:markdown, github: "devinus/markdown"}`
+
+Then add the entry
+
+    markdown_processor:  ExDoc.Markdown.Pandoc  (or ExDoc.MarkDown.Hoedown)
+
+to your `mix.exs`.
 
 To see all options available when generating docs, just run `mix help docs`.
 
