@@ -1,2 +1,3 @@
-%{"hoedown": {:git, "git://github.com/hoedown/hoedown.git", "0610117f44b173a4e2112afb2f510156a32355b5", []},
+%{"earmark": {:git, "git://github.com/pragdave/earmark", "84758f2549fe5d0a0ef485b4c169471356f6c55e", []},
+  "hoedown": {:git, "git://github.com/hoedown/hoedown.git", "0610117f44b173a4e2112afb2f510156a32355b5", []},
   "markdown": {:git, "git://github.com/devinus/markdown.git", "7b1912a693611a9445574e099687879948bafbae", []}}
