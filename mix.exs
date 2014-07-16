@@ -13,8 +13,7 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [
-     {:earmark, ">= 0.1.4", git: "git://github.com/pragdave/earmark", only: [:dev, :test]}
-#     {:earmark, ">= 0.1.4", only: [:dev, :test]}
+     {:earmark, ">= 0.1.4", only: [:dev, :test]}
     ]
   end
 end
