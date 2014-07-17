@@ -33,7 +33,7 @@ Now you are ready to generate your project documentation with `mix docs`.
 
 ## Changing the Markdown tool
 
-By default, ExDoc uses [Earmark][http://github.com/pragdave/earmark] to convert Markdown to HTML. If you prefer, you can also use pandoc or hoedown.
+By default, ExDoc uses [Earmark](http://github.com/pragdave/earmark) to convert Markdown to HTML. If you prefer, you can also use pandoc or hoedown:
 
   * Install [pandoc](http://johnmacfarlane.net/pandoc/) - which is available in multiple package managers and provides installers for different operating systems. Pandoc must be installed just once and it will be used for all projects;
 
