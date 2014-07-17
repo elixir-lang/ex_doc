@@ -30,11 +30,17 @@ defmodule ExDoc.Markdown do
 
   defp raise_no_markdown_processor() do
     raise """
-    Could not find a markdown processor to be used on ex_doc.
+    Could not find a markdown processor to be used by ex_doc.
     You can either:
 
-    1. Add {:markdown, github: "devinus/markdown"} to your mix.exs deps
-    2. Ensure pandoc (http://johnmacfarlane.net/pandoc) is available in your system
+    * Add {:earmark, github: "pragdave/earmark"} to your mix.exs deps
+      to use an Elixir-based markdown processor
+
+    * Add {:markdown, github: "devinus/markdown"} to your mix.exs deps
+      to use a C-based markdown processor
+
+    * Ensure pandoc (http://johnmacfarlane.net/pandoc) is available in your system
+      to use it as an external tool
     """
   end
 end
