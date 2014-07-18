@@ -24,11 +24,10 @@ defmodule ExDoc.Markdown.Earmark do
 
   """
   def to_html(text, opts \\ []) do
-    options = %Earmark.Options{
-       gfm:         Keyword.get(opts, :gfm,         true),
-       breaks:      Keyword.get(opts, :breaks,      false),
-       smartypants: Keyword.get(opts, :smartypants, true),
-    }
+    options = struct(Earmark.Options,
+      gfm:         Keyword.get(opts, :gfm,         true),
+      breaks:      Keyword.get(opts, :breaks,      false),
+      smartypants: Keyword.get(opts, :smartypants, true))
     Earmark.to_html(text, options)
   end
 end
