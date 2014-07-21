@@ -6,11 +6,20 @@ defmodule ExDoc.Mixfile do
      version:    "0.5.1-dev",
      elixir:     "~> 0.14.3",
      deps:       deps,
+     aliases:    aliases,
      source_url: "https://github.com/elixir-lang/ex_doc/"]
   end
 
   defp deps do
     [{:earmark, ">= 0.1.4", only: [:dev, :test]},
      {:markdown, github: "devinus/markdown", only: [:test]}]
+  end
+
+  defp aliases do
+    [clean: [&clean_test_fixtures/1, "clean"]]
+  end
+
+  defp clean_test_fixtures(_args) do
+    File.rm_rf "test/tmp"
   end
 end
