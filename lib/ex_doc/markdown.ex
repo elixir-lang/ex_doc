@@ -1,8 +1,8 @@
 defmodule ExDoc.Markdown do
 
   @markdown_processors [
-    ExDoc.Markdown.Earmark, 
-    ExDoc.Markdown.Hoedown, 
+    ExDoc.Markdown.Hoedown,
+    ExDoc.Markdown.Earmark,
     ExDoc.Markdown.Pandoc
   ]
 
