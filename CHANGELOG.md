@@ -1,11 +1,12 @@
 # Changelog
 
-## v0.5.1-dev
+## v0.5.1
 
 * Enhancements
-  * Add support for Earmark—no need for external processors
+  * Support Elixir v0.15.0
+  * Add support for Earmark - no need for external processors
 
-## v0.5.0-dev
+## v0.5.0
 
 * Enhancements
   * First public release

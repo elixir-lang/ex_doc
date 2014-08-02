@@ -3,15 +3,15 @@ defmodule ExDoc.Mixfile do
 
   def project do
     [app:        :ex_doc,
-     version:    "0.5.1-dev",
-     elixir:     "~> 0.14.3 or ~> 0.15.0-dev",
+     version:    "0.5.1",
+     elixir:     "~> 0.15.0-dev",
      deps:       deps,
      aliases:    aliases,
      source_url: "https://github.com/elixir-lang/ex_doc/"]
   end
 
   defp deps do
-    [{:earmark, ">= 0.1.4", only: [:dev, :test]},
+    [{:earmark, "~> 0.1", only: [:dev, :test]},
      {:markdown, github: "devinus/markdown", only: [:dev, :test]}]
   end
 
