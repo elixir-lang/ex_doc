@@ -10,18 +10,19 @@ To use ExDoc in your Mix projects, first add ExDoc as a dependency:
 
 ```elixir
 def deps do
-  [{:ex_doc, github: "elixir-lang/ex_doc"}]
+  [{:earmark, "~> 0.1", only: :dev},
+   {:ex_doc, "~> 0.5", only: :dev}]
 end
 ```
 
-After adding ExDoc as a dependency, please run `mix deps.get` to install it.
+After adding ExDoc as a dependency, run `mix deps.get` to install it.
 
 ExDoc will automatically pull in information from your project, like the application and version. However, you may want to set `:name`, `:source_url` and `:homepage_url` to have a nicer output from ExDoc, for example:
 
 ```elixir
 def project do
   [app: :repo
-   version: "0.1.0.dev",
+   version: "0.1.0-dev",
    name: "REPO",
    source_url: "https://github.com/USER/REPO",
    homepage_url: "http://YOUR_PROJECT_HOMEPAGE"
@@ -31,22 +32,6 @@ end
 
 Now you are ready to generate your project documentation with `mix docs`.
 
-## Changing the Markdown tool
-
-By default, ExDoc uses [Earmark](http://github.com/pragdave/earmark) to convert Markdown to HTML. If you prefer, you can also use pandoc or hoedown:
-
-  * Install [pandoc](http://johnmacfarlane.net/pandoc/) - which is available in multiple package managers and provides installers for different operating systems. Pandoc must be installed just once and it will be used for all projects;
-
-  * Add http://github.com/devinus/markdown as a dependency to your project as: `{:markdown, github: "devinus/markdown"}`
-
-Then add the entry
-
-    markdown_processor:  ExDoc.Markdown.Pandoc  (or ExDoc.MarkDown.Hoedown)
-
-to your `mix.exs`.
-
-To see all options available when generating docs, just run `mix help docs`.
-
 ## Using ExDoc via command line
 
 You can ExDoc via the command line as follows:
@@ -55,7 +40,7 @@ You can ExDoc via the command line as follows:
 
         git clone https://github.com/elixir-lang/ex_doc.git
         cd ex_doc
-        mix compile
+        mix do deps.get, compile
 
 2. Then you are ready to use it in your projects. First move into your project directory and ensure it is compiled:
 
@@ -69,10 +54,26 @@ You can ExDoc via the command line as follows:
 For example, here are some acceptable values:
 
     PROJECT_NAME    => Dynamo
-    PROJECT_VERSION => 0.1
+    PROJECT_VERSION => 0.1.0
     PROJECT_MODULE  => Dynamo (the main module provided by the library)
     GITHUB_USER     => elixir-lang
     GITHUB_REPO     => dynamo
+
+## Changing the Markdown tool
+
+In the examples above, we have used [Earmark](http://github.com/pragdave/earmark) to convert Markdown to HTML. If you prefer, you can also use pandoc or hoedown (in C):
+
+  * Install [pandoc](http://johnmacfarlane.net/pandoc/) - which is available in multiple package managers and provides installers for different operating systems. Pandoc must be installed just once and it will be used for all projects;
+
+  * To use hoedown - add http://github.com/devinus/markdown as a dependency to your project as: `{:markdown, github: "devinus/markdown"}`
+
+Then add the entry:
+
+    config :ex_doc, :markdown_processor, ExDoc.Markdown.Pandoc  # or ExDoc.Markdown.Hoedown
+
+to your `config/config.exs` file.
+
+To see all options available when generating docs, just run `mix help docs`.
 
 # License
 

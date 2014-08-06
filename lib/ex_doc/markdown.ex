@@ -1,5 +1,4 @@
 defmodule ExDoc.Markdown do
-
   @markdown_processors [
     ExDoc.Markdown.Hoedown,
     ExDoc.Markdown.Earmark,
@@ -33,7 +32,7 @@ defmodule ExDoc.Markdown do
     Could not find a markdown processor to be used by ex_doc.
     You can either:
 
-    * Add {:earmark, github: "pragdave/earmark"} to your mix.exs deps
+    * Add {:earmark, ">= 0.0.0"} to your mix.exs deps
       to use an Elixir-based markdown processor
 
     * Add {:markdown, github: "devinus/markdown"} to your mix.exs deps
