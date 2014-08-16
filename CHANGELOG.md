@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.2
+
+* Bug fixes
+  * Use proper ANSI escape sequence on Mix success messages
+
 ## v0.5.1
 
 * Enhancements
