@@ -82,8 +82,8 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp log(index) do
-    Mix.shell.info "%{green}Docs successfully generated."
-    Mix.shell.info "%{green}View them at #{inspect index}."
+    Mix.shell.info [:green, "Docs successfully generated."]
+    Mix.shell.info [:green, "View them at #{inspect index}."]
   end
 
   defp get_docs_opts(config) do

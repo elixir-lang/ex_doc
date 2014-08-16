@@ -4,7 +4,7 @@ defmodule ExDoc.Mixfile do
   def project do
     [app:        :ex_doc,
      version:    "0.5.1",
-     elixir:     "~> 0.15.0-dev",
+     elixir:     "~> 0.15.0",
      deps:       deps,
      aliases:    aliases,
      source_url: "https://github.com/elixir-lang/ex_doc/"]
