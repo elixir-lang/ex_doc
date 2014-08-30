@@ -113,7 +113,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp get_source(alias, aliases) do
     cond do
-      nil?(alias) -> nil
+      is_nil(alias) -> nil
       alias in aliases -> ""
       dir = from_elixir(alias) -> @elixir_docs <> dir <> "/"
       true -> nil

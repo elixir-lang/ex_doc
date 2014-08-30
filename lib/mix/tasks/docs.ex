@@ -63,7 +63,7 @@ defmodule Mix.Tasks.Docs do
     end
 
     cond do
-      nil?(options[:main]) ->
+      is_nil(options[:main]) ->
         # Try generating main module's name from the app name
         options = Keyword.put(options, :main, (config[:app] |> Atom.to_string |> Mix.Utils.camelize))
 
@@ -90,7 +90,7 @@ defmodule Mix.Tasks.Docs do
     docs = config[:docs]
     cond do
       is_function(docs, 0) -> docs.()
-      nil?(docs) -> []
+      is_nil(docs) -> []
       true -> docs
     end
   end

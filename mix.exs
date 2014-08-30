@@ -3,8 +3,8 @@ defmodule ExDoc.Mixfile do
 
   def project do
     [app:        :ex_doc,
-     version:    "0.5.2",
-     elixir:     "~> 0.15.0",
+     version:    "0.6.0",
+     elixir:     "~> 1.0.0-rc1",
      deps:       deps,
      aliases:    aliases,
      source_url: "https://github.com/elixir-lang/ex_doc/"]
