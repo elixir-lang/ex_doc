@@ -12,7 +12,7 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [{:earmark, "~> 0.1", only: [:dev, :test]},
-     {:markdown, github: "devinus/markdown", only: [:dev, :test]}]
+     {:markdown, github: "devinus/markdown", only: [:test]}]
   end
 
   defp aliases do

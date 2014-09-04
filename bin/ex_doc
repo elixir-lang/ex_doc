@@ -1,5 +1,4 @@
 #!/usr/bin/env elixir
-Code.prepend_path Path.expand("../_build/dev/lib/markdown/ebin", __DIR__)
 Code.prepend_path Path.expand("../_build/dev/lib/earmark/ebin", __DIR__)
 Code.prepend_path Path.expand("../_build/dev/lib/ex_doc/ebin", __DIR__)
 
