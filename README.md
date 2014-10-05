@@ -2,8 +2,6 @@
 
 ExDoc is a tool to generate documentation for your Elixir projects. In case you are looking for documentation for Elixir itself, [check out Elixir's website](http://elixir-lang.org/).
 
-To use ExDoc, you need Elixir master.
-
 ## Using ExDoc with Mix
 
 To use ExDoc in your Mix projects, first add ExDoc as a dependency:
@@ -11,7 +9,7 @@ To use ExDoc in your Mix projects, first add ExDoc as a dependency:
 ```elixir
 def deps do
   [{:earmark, "~> 0.1", only: :dev},
-   {:ex_doc, "~> 0.5", only: :dev}]
+   {:ex_doc, "~> 0.6", only: :dev}]
 end
 ```
 
