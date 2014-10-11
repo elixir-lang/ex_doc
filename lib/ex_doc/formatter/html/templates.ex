@@ -40,6 +40,17 @@ defmodule ExDoc.Formatter.HTML.Templates do
       :def          -> "function"
       :defmacro     -> "macro"
       :defcallback  -> "callback"
+      :type         -> "type"
+    end
+  end
+
+  # Generate a link id
+  defp link_id(node), do: link_id(node.id, node.type)
+  defp link_id(id, type) do
+    case type do
+      :defcallback  -> "c:#{id}"
+      :type         -> "t:#{id}"
+      _             -> "#{id}"
     end
   end
 

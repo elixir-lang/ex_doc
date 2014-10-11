@@ -1,9 +1,9 @@
 <div class="detail">
-  <div class="detail_header" id="<%=h node.id %>">
+  <div class="detail_header" id="<%=h link_id(node) %>">
     <span class="signature"><strong><%=h node.signature %></strong></span>
     <div class="detail_header_links">
       <span class="detail_type">(<%= pretty_type(node) %>)</span>
-      <a href="#<%=h node.id%>" class="detail_link" title="Link to this <%= pretty_type(node) %>">#</a>
+      <a href="#<%=h link_id(node) %>" class="detail_link" title="Link to this <%= pretty_type(node) %>">#</a>
       <%= to_top_link() %>
     </div>
   </div>
