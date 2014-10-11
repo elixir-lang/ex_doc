@@ -97,8 +97,8 @@ defmodule ExDoc.Retriever do
 
     if type == :behaviour do
       callbacks = Enum.into(Kernel.Typespec.beam_callbacks(module) || [], %{})
-      docs = Enum.map(Enum.sort(module.__behaviour__(:docs)),
-                      &get_callback(&1, source_path, source_url, callbacks)) ++ docs
+      docs = docs ++ Enum.map(Enum.sort(module.__behaviour__(:docs)),
+                      &get_callback(&1, source_path, source_url, callbacks))
     end
 
     { line, moduledoc } = Code.get_docs(module, :moduledoc)
