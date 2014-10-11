@@ -1,5 +1,5 @@
 <div class="type_detail">
-  <p class="typespec" id="t:<%=h node.id %>">
+  <p class="typespec" id="<%=h link_id(node) %>">
     <%= node.spec %>
   </p>
   <%= if node.doc do %>

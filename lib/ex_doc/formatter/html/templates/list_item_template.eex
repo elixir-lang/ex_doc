@@ -11,7 +11,7 @@
   <%= for doc <- node.docs do  %>
     <li>
       <span class="object_link">
-        <a href="<%= node.id %>.html#<%= if doc.type == :defcallback do h("c:") end %><%=h doc.id %>" title="<%=h node.id %>.<%=h doc.id %>"><%=h doc.id %></a>
+        <a href="<%= node.id %>.html#<%= link_id(doc) %>" title="<%=h node.id %>.<%=h doc.id %>"><%=h doc.id %></a>
       </span>
       <small class="search_info"><%= node.id %></small>
     </li>
