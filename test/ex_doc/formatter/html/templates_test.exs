@@ -171,7 +171,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     assert content =~ ~r{<h1>\s*CustomBehaviour\s*<small>behaviour</small>\s*</h1>}m
     assert content =~ ~r{Callbacks}
-    assert content =~ ~r{<div class="detail_header" id="hello/1">}
+    assert content =~ ~r{<div class="detail_header" id="c:hello/1">}
   end
 
   ## PROTOCOLS
