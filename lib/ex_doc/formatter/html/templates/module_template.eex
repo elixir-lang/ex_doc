@@ -33,6 +33,9 @@
         <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
           <li><a href="#summary">Summary</a></li>
         <% end %>
+        <%= unless Enum.empty?(types) do %>
+          <li><a href="#types_details">Types</a></li>
+        <% end %>
         <%= unless Enum.empty?(functions) do %>
           <li><a href="#functions_details">Functions</a></li>
         <% end %>
@@ -41,9 +44,6 @@
         <% end %>
         <%= unless Enum.empty?(callbacks) do %>
           <li><a href="#callbacks_details">Callbacks</a></li>
-        <% end %>
-        <%= unless Enum.empty?(types) do %>
-          <li><a href="#types_details">Types</a></li>
         <% end %>
       </ul>
 
