@@ -20,32 +20,30 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def all(modules) do
     aliases = Enum.map modules, &(&1.module)
-    project_funs = for m <- modules, d <- m.docs, do: m.id <> "." <> d.id
-    project_modules = modules |> Enum.map(&module_to_string/1) |> Enum.uniq
-    Enum.map modules, &(&1 |> all_docs(project_funs, project_modules) |> all_typespecs(aliases))
+    Enum.map modules, &(&1 |> all_docs(modules) |> all_typespecs(aliases))
   end
 
   defp module_to_string(module) do
     inspect module.module
   end
 
-  defp all_docs(module, project_funs, modules) do
+  defp all_docs(module, modules) do
     locals = Enum.map module.docs, &(&1.id)
 
     if moduledoc = module.moduledoc do
-      moduledoc = moduledoc |> local_doc(locals) |> project_doc(project_funs, modules)
+      moduledoc = moduledoc |> local_doc(locals) |> project_doc(modules)
     end
 
     docs = for node <- module.docs do
       if doc = node.doc do
-        doc = doc |> local_doc(locals) |> project_doc(project_funs, modules)
+        doc = doc |> local_doc(locals) |> project_doc(modules)
       end
       %{node | doc: doc}
     end
 
     typedocs = for node <- module.typespecs do
       if doc = node.doc do
-        doc = doc |> local_doc(locals) |> project_doc(project_funs, modules)
+        doc = doc |> local_doc(locals) |> project_doc(modules)
       end
       %{node | doc: doc}
     end
@@ -164,8 +162,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @doc """
   Creates links to modules and functions defined in the project.
   """
-  def project_doc(bin, project_funs, modules) when is_binary(bin) do
-    bin |> project_functions(project_funs) |> project_modules(modules) |> erlang_functions
+  def project_doc(bin, modules) when is_binary(bin) do
+    project_funs = for m <- modules, d <- m.docs, do: m.id <> "." <> d.id
+    project_modules = modules |> Enum.map(&module_to_string/1) |> Enum.uniq
+    bin |> project_functions(project_funs) |> project_modules(project_modules) |> erlang_functions
   end
 
   @doc """
