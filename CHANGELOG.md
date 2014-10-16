@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.1
+
+* Enhancements
+  * Autolink modules and functions in the README
+  * Generate ids for callbacks starting with "c:"
+  * Ensure group ordering is consistent: TYPES > FUNCTIONS > MACROS > CALLBACKS
+  * Allow users to search by Module.function
+
 ## v0.6.0
 
 * Enhancements
