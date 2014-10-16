@@ -4,7 +4,7 @@ defmodule ExDoc do
       output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
       homepage_url: nil, source_beam: nil, retriever: ExDoc.Retriever,
       formatter: "html", project: nil, version: nil, main: nil,
-      readme: false, formatter_opts: []
+      readme: nil, formatter_opts: []
     ]
   end
 

@@ -59,21 +59,27 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_readme(output, modules, config) do
     File.rm("#{output}/README.html")
-    write_readme(output, File.read("README.md"), modules, config)
+    readme_path = Path.expand(config.readme)
+    write_readme(output, File.read(readme_path), modules, config)
   end
 
   defp write_readme(output, {:ok, content}, modules, config) do
     content = Autolink.project_doc(content, modules)
-    readme_html = Templates.readme_template(config, content)
-    # Allow using nice codeblock syntax for readme too.
-    readme_html = String.replace(readme_html, "<pre><code class=\"\">",
-                                 "<pre class=\"codeblock\"><code>")
+    readme_html = Templates.readme_template(config, content) |> pretty_codeblocks
     File.write("#{output}/README.html", readme_html)
     true
   end
 
   defp write_readme(_, _, _, _) do
     false
+  end
+
+  @doc false
+  # Helper to handle plain code blocks (```...```) without
+  # language specification and indentation code blocks
+  def pretty_codeblocks(bin) do
+    Regex.replace(~r/<pre><code\s*(class=\"\")?>/,
+                  bin, "<pre class=\"codeblock\">")
   end
 
   @doc false

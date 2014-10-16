@@ -1,6 +1,6 @@
 defmodule ExDoc.CLI do
   def run(args, generator \\ &ExDoc.generate_docs/3) do
-    {opts, args, _} = OptionParser.parse(args, switches: [readme: :boolean],
+    {opts, args, _} = OptionParser.parse(args,
                aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root,
                          m: :main, p: :homepage_url, c: :config])
 
@@ -65,7 +65,7 @@ defmodule ExDoc.CLI do
       VERSION            Version number
       BEAMS              Path to compiled beam files
       -o, --output       Path to output docs, default: docs
-      --readme           Generate a project README from a README.md file, default: false
+      --readme           Path to README.md file to generate a project README, default: nil
       -f, --formatter    Docs formatter to use; default: html
       -c, --config       Path to the formatter's config file
       -r, --source-root  Path to the source code root, default: .
