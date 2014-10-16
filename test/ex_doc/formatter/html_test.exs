@@ -1,17 +1,15 @@
 defmodule ExDoc.Formatter.HTMLTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias ExDoc.Formatter.HTML
 
   setup_all do
-    :file.set_cwd("test")
-    :file.make_dir(output_dir)
-    :file.copy("fixtures/README.md", "README.md")
+    File.mkdir(output_dir)
+    File.copy("test/fixtures/README.md", "test/README.md")
 
     on_exit fn ->
-      :file.delete("README.md")
+      File.rm("test/README.md")
       System.cmd "rm", ["-rf", "#{output_dir}"]
-      :file.set_cwd("..")
     end
 
     :ok
@@ -26,7 +24,11 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp doc_config do
-    %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: beam_dir, readme: true}
+    %ExDoc.Config{project: "Elixir",
+                  version: "1.0.1",
+                  output: "test/docs",
+                  source_root: beam_dir,
+                  readme: "test/README.md"}
   end
 
   defp get_modules(config \\ doc_config) do
@@ -85,5 +87,15 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code>TypesAndSpecs.Sub</code></a>}
+  end
+
+  test "make markdown codeblocks pretty" do
+    with_empty_class = "<pre><code class=\"\">mix run --no-halt path/to/file.exs"
+    without_class = "<pre><code>mix run --no-halt path/to/file.exs"
+
+    assert HTML.pretty_codeblocks(with_empty_class) ==
+           "<pre class=\"codeblock\">mix run --no-halt path/to/file.exs"
+    assert HTML.pretty_codeblocks(without_class) ==
+           "<pre class=\"codeblock\">mix run --no-halt path/to/file.exs"
   end
 end
