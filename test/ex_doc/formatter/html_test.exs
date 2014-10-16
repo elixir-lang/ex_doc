@@ -6,8 +6,10 @@ defmodule ExDoc.Formatter.HTMLTest do
   setup_all do
     :file.set_cwd("test")
     :file.make_dir(output_dir)
+    :file.copy("fixtures/README.md", "README.md")
 
     on_exit fn ->
+      :file.delete("README.md")
       System.cmd "rm", ["-rf", "#{output_dir}"]
       :file.set_cwd("..")
     end
@@ -24,7 +26,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp doc_config do
-    %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: beam_dir}
+    %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: beam_dir, readme: true}
   end
 
   defp get_modules(config \\ doc_config) do
@@ -73,5 +75,15 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
     assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
+  end
+
+  test "run generates the readme file" do
+    HTML.run(get_modules, doc_config)
+
+    assert File.regular?("#{output_dir}/README.html")
+    content = File.read!("#{output_dir}/README.html")
+    assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
+    assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
+    assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code>TypesAndSpecs.Sub</code></a>}
   end
 end

@@ -15,7 +15,7 @@ defmodule ExDoc.Formatter.HTML do
 
     generate_index(output, config)
     generate_assets(output, config)
-    has_readme = config.readme && generate_readme(output, config)
+    has_readme = config.readme && generate_readme(output, modules, config)
 
     all = Autolink.all(modules)
     modules    = filter_list(:modules, all)
@@ -57,21 +57,22 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  defp generate_readme(output, config) do
+  defp generate_readme(output, modules, config) do
     File.rm("#{output}/README.html")
-    write_readme(output, File.read("README.md"), config)
+    write_readme(output, File.read("README.md"), modules, config)
   end
 
-  defp write_readme(output, {:ok, content}, config) do
+  defp write_readme(output, {:ok, content}, modules, config) do
+    content = Autolink.project_doc(content, modules)
     readme_html = Templates.readme_template(config, content)
     # Allow using nice codeblock syntax for readme too.
-    readme_html = String.replace(readme_html, "<pre><code>",
+    readme_html = String.replace(readme_html, "<pre><code class=\"\">",
                                  "<pre class=\"codeblock\"><code>")
     File.write("#{output}/README.html", readme_html)
     true
   end
 
-  defp write_readme(_, _, _) do
+  defp write_readme(_, _, _, _) do
     false
   end
 
