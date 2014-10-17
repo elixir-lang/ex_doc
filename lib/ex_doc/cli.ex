@@ -39,17 +39,16 @@ defmodule ExDoc.CLI do
     result
   end
 
-
   defp parse_args([_project, _version, _source_beam] = args), do: args
   defp parse_args([_, _, _ | _]) do
     IO.puts "Too many arguments.\n"
     print_usage()
-    exit(1)
+    exit {:shutdown, 1}
   end
   defp parse_args(_) do
     IO.puts "Too few arguments.\n"
     print_usage()
-    exit(1)
+    exit {:shutdown, 1}
   end
 
   defp print_usage do
