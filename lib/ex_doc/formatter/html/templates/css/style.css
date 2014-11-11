@@ -36,7 +36,7 @@ ul.summary_links li {
   background: #f0f0f0;
 }
 
-div.docstring, p.docstring { margin-right: 6em; }
+section.docstring, p.docstring { margin-right: 6em; }
 .docstring h1, .docstring h2, .docstring h3, .docstring h4 { padding: 0; border: 0; border-bottom: 0; }
 .docstring h1 { font-size: 1.3em; }
 .docstring h2 { font-size: 1.2em; }

@@ -14,7 +14,7 @@
         document.body.className = 'frames';
       }
     </script>
-    <div id="content">
+    <section id="content">
       <h1 id="full_list_header">
         <%= if url = config.homepage_url || config.source_url do %>
           <a href="<%= url %>" target="_top"><%= config.project %> v<%= config.version %></a>
@@ -40,6 +40,6 @@
       <ul id="full_list" class="class">
         <%= for node <- nodes, do: list_item_template(node) %>
       </ul>
-    </div>
+    </section>
   </body>
 </html>

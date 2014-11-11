@@ -19,7 +19,7 @@
       if (window.top.frames.main) document.body.className = 'frames';
     </script>
 
-    <div id="content">
+    <section id="content">
       <div class="breadcrumbs"><%= page_breadcrumbs(config, "Overview", "overview.html") %></div>
 
       <h1><%= config.project %> v<%= config.version %></h1>
@@ -56,6 +56,6 @@
           <%= for node <- protocols, do: overview_entry_template(node) %>
         </table>
       <% end %>
-    </div>
+    </section>
   </body>
 </html>
