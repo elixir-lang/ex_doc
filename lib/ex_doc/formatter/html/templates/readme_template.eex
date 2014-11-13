@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>README</title>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
 
     <script type="text/javascript" charset="utf-8">
@@ -19,9 +19,9 @@
       if (window.top.frames.main) document.body.className = 'frames';
     </script>
 
-    <div id="content">
+    <section id="content">
       <div class="breadcrumbs"><%= page_breadcrumbs(config, "README", "readme.html") %></div>
       <%= to_html(content) %>
-    </div>
+    </section>
   </body>
 </html>
