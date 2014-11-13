@@ -7,13 +7,17 @@
   </span>
   <small class="search_info"><%= node.id %></small>
 </li>
-<ul>
-  <%= for doc <- node.docs do  %>
-    <li>
-      <span class="object_link">
-        <a href="<%= node.id %>.html#<%= link_id(doc) %>" title="<%=h node.id %>.<%=h doc.id %>"><%=h doc.id %></a>
-      </span>
-      <small class="search_info"><%= node.id %></small>
-    </li>
-  <% end %>
-</ul>
+<%= unless Enum.empty?(node.docs) do %>
+<li>
+  <ul>
+    <%= for doc <- node.docs do  %>
+      <li>
+        <span class="object_link">
+          <a href="<%= node.id %>.html#<%=h link_id(doc) %>" title="<%=h node.id %>.<%=h doc.id %>"><%=h doc.id %></a>
+        </span>
+        <small class="search_info"><%= node.id %></small>
+      </li>
+    <% end %>
+  </ul>
+</li>
+<% end %>
