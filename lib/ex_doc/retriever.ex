@@ -136,6 +136,9 @@ defmodule ExDoc.Retriever do
     true
   end
 
+  defp spec_name(name, arity, :defmacro), do: { String.to_atom("MACRO-" <> to_string(name)), arity + 1 }
+  defp spec_name(name, arity, _), do: { name, arity }
+
   defp get_function(function, source_path, source_url, all_specs, cb_impls) do
     { { name, arity }, line, type, signature, doc } = function
     behaviour = Dict.get(cb_impls, { name, arity })
@@ -148,7 +151,7 @@ defmodule ExDoc.Retriever do
       end
 
     specs = all_specs
-            |> Dict.get({ name, arity }, [])
+            |> Dict.get(spec_name(name, arity, type), [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
