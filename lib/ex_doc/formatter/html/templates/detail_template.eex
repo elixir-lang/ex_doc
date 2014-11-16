@@ -1,4 +1,4 @@
-<section class="detail">
+<div class="detail">
   <div class="detail_header" id="<%=h link_id(node) %>">
     <span class="signature"><strong><%=h node.signature %></strong></span>
     <div class="detail_header_links">
@@ -15,10 +15,8 @@
       <% end %>
     </ul>
   <% end %>
-  <section class="docstring">
-    <%= to_html(node.doc) %>
-  </section>
+  <div class="docstring"><%= to_html(node.doc) %></div>
   <%= if node.source do %>
     <a href="<%= node.source %>" class="view_source">Source</a>
   <% end %>
-</section>
+</div>

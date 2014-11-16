@@ -106,7 +106,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r/<h1>\s*CompiledWithDocs\s*<\/h1>/
     assert content =~ ~r/moduledoc.*Example.*CompiledWithDocs\.example.*/ms
     assert content =~ ~r/example\/2.*Some example/ms
-    assert content =~ ~r/example_without_docs\/0.*<section class="docstring">.*<\/section>/ms
+    assert content =~ ~r/example_without_docs\/0.*<div class="docstring">.*<\/div>/ms
     assert content =~ ~r/example_1\/0.*Another example/ms
     assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
 

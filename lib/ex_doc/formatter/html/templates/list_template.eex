@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>List of <%= String.capitalize("#{scope}") %></title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="css/full_list.css" type="text/css" media="screen" charset="utf-8" />
     <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
@@ -15,7 +14,7 @@
         document.body.className = 'frames';
       }
     </script>
-    <section id="content">
+    <div id="content">
       <h1 id="full_list_header">
         <%= if url = config.homepage_url || config.source_url do %>
           <a href="<%= url %>" target="_top"><%= config.project %> v<%= config.version %></a>
@@ -41,6 +40,6 @@
       <ul id="full_list" class="class">
         <%= for node <- nodes, do: list_item_template(node) %>
       </ul>
-    </section>
+    </div>
   </body>
 </html>
