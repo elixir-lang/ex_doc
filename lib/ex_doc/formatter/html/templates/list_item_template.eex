@@ -8,7 +8,6 @@
   <small class="search_info"><%= node.id %></small>
 </li>
 <%= unless Enum.empty?(node.docs) do %>
-<li>
   <ul>
     <%= for doc <- node.docs do  %>
       <li>
@@ -19,5 +18,4 @@
       </li>
     <% end %>
   </ul>
-</li>
 <% end %>
