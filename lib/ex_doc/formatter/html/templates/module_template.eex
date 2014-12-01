@@ -4,7 +4,7 @@
     <title><%= module.id %></title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
-
+    <link rel="stylesheet" href="css/elixir.css" type="text/css" media="screen" charset="utf-8" />
     <script type="text/javascript" charset="utf-8">
       relpath = '';
       if (relpath != '') relpath += '/';
@@ -12,6 +12,8 @@
 
     <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
     <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
   </head>
 
   <body>
