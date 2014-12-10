@@ -58,11 +58,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
     content = Templates.list_template(:modules, nodes, doc_config, false)
 
-    assert content =~ ~r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
-    assert content =~ ~r{<li>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms
-    assert content =~ ~r{<li>.*"CompiledWithDocs\.html#example_1\/0".*example_1\/0.*<\/li>}ms
-    assert content =~ ~r{<li>.*"CompiledWithDocs\.html#example_without_docs\/0".*example_without_docs\/0.*<\/li>}ms
-    assert content =~ ~r{<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}ms
+    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
+    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms
+    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html#example_1\/0".*example_1\/0.*<\/li>}ms
+    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html#example_without_docs\/0".*example_without_docs\/0.*<\/li>}ms
+    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}ms
   end
 
   test "listing page has README link if present" do
