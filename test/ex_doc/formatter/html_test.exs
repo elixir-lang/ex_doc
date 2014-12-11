@@ -55,18 +55,18 @@ defmodule ExDoc.Formatter.HTMLTest do
     HTML.run(get_modules, doc_config)
 
     content = File.read!("#{output_dir}/modules_list.html")
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"UndefParent\.Nested\.html".*UndefParent\.Nested.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CustomBehaviour.html".*CustomBehaviour.*<\/li>}ms
+    assert content =~ ~r{<li>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
+    assert content =~ ~r{<li>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms
+    assert content =~ ~r{<li>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}ms
+    assert content =~ ~r{<li>.*"UndefParent\.Nested\.html".*UndefParent\.Nested.*<\/li>}ms
+    assert content =~ ~r{<li>.*"CustomBehaviour.html".*CustomBehaviour.*<\/li>}ms
     refute content =~ ~r{UndefParent\.Undocumented}ms
 
     content = File.read!("#{output_dir}/exceptions_list.html")
-    assert content =~ ~r{<li(\ [^>]*)?>.*"RandomError\.html".*RandomError.*<\/li>}ms
+    assert content =~ ~r{<li>.*"RandomError\.html".*RandomError.*<\/li>}ms
 
     content = File.read!("#{output_dir}/protocols_list.html")
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}ms
+    assert content =~ ~r{<li>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}ms
   end
 
   test "run generates the overview file" do

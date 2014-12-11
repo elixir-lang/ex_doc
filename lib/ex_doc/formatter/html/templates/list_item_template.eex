@@ -1,19 +1,21 @@
-<li class="node">
+<li>
   <%= unless Enum.empty?(node.docs) do %>
     <a class="toggle"></a>
   <% end %>
-  <a href="<%= node.id %>.html" title="<%= node.id %>" class="object_link"><%= node.id %></a>
-  <span class="node_name"><%= node.id %></span>
+  <span class="object_link">
+    <a href="<%= node.id %>.html" title="<%= node.id %>"><%= node.id %></a>
+  </span>
+  <small class="search_info"><%= node.id %></small>
 </li>
 <%= unless Enum.empty?(node.docs) do %>
-<li class="docs">
   <ul>
     <%= for doc <- node.docs do  %>
       <li>
-        <a href="<%= node.id %>.html#<%=h link_id(doc) %>" title="<%=h node.id %>.<%=h doc.id %>" class="object_link"><%=h doc.id %></a>
-        <span class="node_name"><%= node.id %></span>
+        <span class="object_link">
+          <a href="<%= node.id %>.html#<%=h link_id(doc) %>" title="<%=h node.id %>.<%=h doc.id %>"><%=h doc.id %></a>
+        </span>
+        <small class="search_info"><%= node.id %></small>
       </li>
     <% end %>
   </ul>
-</li>
 <% end %>

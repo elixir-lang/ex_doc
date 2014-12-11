@@ -38,11 +38,9 @@
       </div>
       <div id="search">Search: <input type="text" /></div>
 
-      <ul id="full_list">
+      <ul id="full_list" class="class">
         <%= for node <- nodes, do: list_item_template(node) %>
       </ul>
-      
-      <div id="no_results"></div>
     </section>
   </body>
 </html>
