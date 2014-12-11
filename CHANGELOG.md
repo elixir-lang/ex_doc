@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.6.2
+
+* Enhancements
+  * Improvements to the document structure
+  * Add syntax highlight
+
 ## v0.6.1
 
 * Enhancements
