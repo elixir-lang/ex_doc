@@ -79,7 +79,7 @@ h2 {
 .clear { clear: both; }
 
 table {
-  border: 1px solid #aaaaaa;
+  border: 1px solid #aaa;
   border-collapse: collapse;
   margin-top: 1em;
 }
@@ -121,12 +121,6 @@ section.docstring, p.docstring { margin-right: 6em; }
 .docstring h3, .docstring h4 {
   font-size: 1em;
   padding-top: 10px;
-}
-.docstring pre, .codeblock, .elixir {
-  padding: 0.5em;
-  border: #ffe0bb dotted 1px;
-  background: #fffde8;
-  display: block;
 }
 .docstring ul { padding-left: 20px; }
 .docstring li > p { margin: 0; }
