@@ -17,7 +17,9 @@ h2 {
   margin: 1.8em 0 0.5em;
 }
 
-.clear { clear: both; }
+.clear {
+  clear: both;
+}
 
 li.r1 { background: #f0f0f0; }
 li.r2 { background: #fafafa; }
@@ -31,8 +33,8 @@ ul.summary_links {
 ul.summary_links li {
   display: inline-block;
   list-style-type: none;
-  text-align: center;
   width: 7em;
+  text-align: center;
   background: #f0f0f0;
 }
 
