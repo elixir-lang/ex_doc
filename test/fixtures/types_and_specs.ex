@@ -19,13 +19,13 @@ defmodule TypesAndSpecs do
   @spec minus(integer, integer) :: integer
   defp minus(x, y), do: x - y
 
-  # This is just to ignore warnings about unused private types/functions.
-  @spec ignore(private) :: integer
-  def ignore(_), do: minus(0, 0)
-
   @spec macro_spec(any) :: { :ok, any }
   defmacro macro_spec(v), do: { :ok, v }
 
   @spec priv_macro_spec(any) :: { :no, any }
   defmacrop priv_macro_spec(v), do: { :no, v }
+
+  # This is just to ignore warnings about unused private types/functions.
+  @spec ignore(private) :: integer
+  def ignore(_), do: priv_macro_spec(minus(0, 0))
 end
