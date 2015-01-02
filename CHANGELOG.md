@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.7.0
+
+* Enhancements
+  * Documentation is now generated at doc to follow OTP "standard"
+
 ## v0.6.2
 
 * Enhancements

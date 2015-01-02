@@ -4,7 +4,7 @@ exclude = [
   earmark: !ExDoc.Markdown.Earmark.available?
 ]
 
-ExUnit.start(exclude: exclude)
+ExUnit.start(exclude: Enum.filter(exclude, &elem(&1, 1)))
 
 if Enum.empty? Path.wildcard("test/tmp/ebin/*.beam") do
   IO.puts "Compiling fixtures..."

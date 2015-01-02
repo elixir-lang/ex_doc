@@ -1,7 +1,7 @@
 defmodule ExDoc do
   defmodule Config do
     defstruct [
-      output: "docs", source_root: nil, source_url: nil, source_url_pattern: nil,
+      output: "doc", source_root: nil, source_url: nil, source_url_pattern: nil,
       homepage_url: nil, source_beam: nil, retriever: ExDoc.Retriever,
       formatter: "html", project: nil, version: nil, main: nil,
       readme: nil, formatter_opts: []
@@ -30,11 +30,8 @@ defmodule ExDoc do
     struct(preconfig, options)
   end
 
-  # short path for programmatic interface
+  # Short path for programmatic interface
   defp find_formatter(modname) when is_atom(modname), do: modname
-
-  # short path for the stock formatters
-  defp find_formatter("html"), do: ExDoc.Formatter.HTML
 
   defp find_formatter("ExDoc.Formatter." <> _ = name) do
     Module.concat([name]) |> check_formatter_module(name)

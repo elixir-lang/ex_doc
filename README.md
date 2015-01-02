@@ -53,9 +53,9 @@ For example, here are some acceptable values:
 
     PROJECT_NAME    => Dynamo
     PROJECT_VERSION => 0.1.0
-    PROJECT_MODULE  => Dynamo (the main module provided by the library)
+    PROJECT_MODULE  => Ecto (the main module provided by the library)
     GITHUB_USER     => elixir-lang
-    GITHUB_REPO     => dynamo
+    GITHUB_REPO     => ecto
 
 ## Changing the Markdown tool
 
