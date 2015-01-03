@@ -36,7 +36,8 @@
         <span class="<%= if(scope == :exceptions, do: "selected") %>"><a target="_self" href="exceptions_list.html">Exceptions</a></span>
         <span class="<%= if(scope == :protocols, do: "selected") %>"><a target="_self" href="protocols_list.html">Protocols</a></span>
       </div>
-      <div id="search">Search: <input type="text" id="search_field" autocomplete="off" autofocus="autofocus" /></div>
+
+      <div id="search"><input type="search" id="search_field" placeholder="Search" autocomplete="off" autofocus="autofocus" results="0" /></div>
 
       <ul id="full_list">
         <%= for node <- nodes, do: list_item_template(node) %>
