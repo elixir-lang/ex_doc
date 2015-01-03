@@ -1,5 +1,7 @@
 # ExDoc
 
+[![Build Status](https://secure.travis-ci.org/elixir-lang/ex_doc.svg?branch=master "Build Status")](http://travis-ci.org/elixir-lang/ex_doc)
+
 ExDoc is a tool to generate documentation for your Elixir projects. In case you are looking for documentation for Elixir itself, [check out Elixir's website](http://elixir-lang.org/).
 
 ## Using ExDoc with Mix
