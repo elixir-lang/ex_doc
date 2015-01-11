@@ -26,8 +26,8 @@ defmodule Mix.Tasks.Docs do
   * `:output` - output directory for the generated docs; default: "doc".
     May be overriden by command line argument.
 
-  * `:readme` - boolean indicating whether a project README should be created
-    from a README.md; default: `false`.
+  * `:readme` - string denoting the source file for a project README 
+    (e.g., "README.md"); default: `false` (no README created).
 
   * `:formatter` - doc formatter to use; default: "html".
 
