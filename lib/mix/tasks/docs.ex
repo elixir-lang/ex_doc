@@ -27,7 +27,7 @@ defmodule Mix.Tasks.Docs do
     May be overriden by command line argument.
 
   * `:readme` - string denoting the source file for a project README 
-    (e.g., "README.md"); default: `false` (no README created).
+    (e.g., "README.md"); default: `nil` (no README created).
 
   * `:formatter` - doc formatter to use; default: "html".
 
