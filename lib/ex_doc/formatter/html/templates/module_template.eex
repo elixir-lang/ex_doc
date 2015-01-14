@@ -13,7 +13,10 @@
     <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
     <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
     <script type="text/javascript" charset="utf-8" src="js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
+    <script type="text/javascript" charset="utf-8">
+      hljs.initHighlightingOnLoad();
+      hljs.configure({languages: []}); //disable autodetect
+    </script>
   </head>
 
   <body>
