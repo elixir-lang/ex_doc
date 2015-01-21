@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.1-dev
+
+* Enhancements
+  * Use type=search for search input
+  * Update highlight.js dependency
+
 ## v0.7.0
 
 * Enhancements
