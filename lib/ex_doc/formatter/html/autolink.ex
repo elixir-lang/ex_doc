@@ -7,15 +7,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @erlang_docs "http://www.erlang.org/doc/man/"
 
   @doc """
-  Escape `'`, `"`, `&`, `<` and `>` in the string using HTML entities.
-  This is only intended for use by the HTML formatter.
-  """
-  def escape_html(binary) do
-    escape_map = [{ ~r(&), "\\&amp;" }, { ~r(<), "\\&lt;" }, { ~r(>), "\\&gt;" }, { ~r("), "\\&quot;" }]
-    Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
-  end
-
-  @doc """
   Receives a list of module nodes and autolink all docs and typespecs.
   """
   def all(modules) do

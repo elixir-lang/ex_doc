@@ -69,8 +69,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp presence(other), do: other
 
   defp h(binary) do
-    escape_map = [{ ~r(&), "\\&amp;" }, { ~r(<), "\\&lt;" }, { ~r(>), "\\&gt;" }, { ~r("), "\\&quot;" }]
-    Enum.reduce escape_map, binary, fn({ re, escape }, acc) -> Regex.replace(re, acc, escape) end
+    escape_map = [{"&", "&amp;"}, {"<", "&lt;"}, {">", "&gt;"}, {"\"", "&quot;"}]
+    Enum.reduce escape_map, binary, fn({pattern, escape}, acc) ->
+      String.replace(acc, pattern, escape)
+    end
   end
 
   # Get the breadcrumbs HTML.
