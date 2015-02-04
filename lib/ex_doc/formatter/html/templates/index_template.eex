@@ -4,9 +4,18 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title><%= config.project %> v<%= config.version %> Documentation</title>
+	<script type="text/javascript" charset="utf-8">
+		window.onload = function frame_redirect() {
+			if ( window.location.href.match(/\/#!/, window.location.hash)  ) {
+				document.querySelector('#main').src = window.location.href.replace(/\/#!/, '/');
+			} else if ( window.location.href.match(/\/<%= config.main %>.html#!/, window.location.hash)  ) {
+				document.querySelector('#main').src = window.location.href.replace(/\/<%= config.main %>.html#!/, '/');
+			}
+		}
+	</script>	
 </head>
 <frameset cols="20%,*">
-  <frame name="list" src="modules_list.html" />
-  <frame name="main" src="<%= config.main %>.html" />
+  <frame name="list" id="list" src="modules_list.html" />
+  <frame name="main" id="main" src="<%= config.main %>.html" />
 </frameset>
 </html>
