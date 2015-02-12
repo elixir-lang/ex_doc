@@ -1,10 +1,12 @@
 # Changelog
 
-## v0.7.1-dev
+## v0.7.1
 
 * Enhancements
   * Use type=search for search input
   * Update highlight.js dependency
+  * Properly tag code comments as coming from elixir/iex unless noted otherwise
+  * Add support for hash redirection
 
 ## v0.7.0
 
