@@ -79,4 +79,4 @@ To see all options available when generating docs, just run `mix help docs`.
 
 ExDoc source code is released under Apache 2 License with snippets under MIT-LICENSE.
 
-Check LICENSE file for more information.
+Check [LICENSE](LICENSE) file for more information.

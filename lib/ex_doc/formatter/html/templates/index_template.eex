@@ -8,8 +8,8 @@
 		window.onload = function frame_redirect() {
 			if ( window.location.href.match(/\/#!/, window.location.hash)  ) {
 				document.querySelector('#main').src = window.location.href.replace(/\/#!/, '/');
-			} else if ( window.location.href.match(/\/<%= config.main %>.html#!/, window.location.hash)  ) {
-				document.querySelector('#main').src = window.location.href.replace(/\/<%= config.main %>.html#!/, '/');
+			} else if ( window.location.href.match(/\/index.html#!/, window.location.hash)  ) {
+				document.querySelector('#main').src = window.location.href.replace(/\/index.html#!/, '/');
 			}
 		}
 	</script>	
