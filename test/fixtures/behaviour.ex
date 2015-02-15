@@ -22,6 +22,6 @@ defmodule CustomBehaviourImpl do
 
   def hello(i), do: i
 
-  @doc "A doc for this so it doesn't use 'Callback implementation of'"
+  @doc "A doc for this so it doesn't use 'Callback implementation for'"
   def bye(i), do: i
 end

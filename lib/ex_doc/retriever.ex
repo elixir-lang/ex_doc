@@ -145,7 +145,7 @@ defmodule ExDoc.Retriever do
 
     doc =
       if is_nil(doc) && behaviour do
-        "Callback implementation of `#{inspect behaviour}.#{name}/#{arity}`."
+        "Callback implementation for `c:#{inspect behaviour}.#{name}/#{arity}`."
       else
         doc
       end

@@ -135,9 +135,9 @@ defmodule ExDoc.RetrieverTest do
     docs = node.docs
     assert Enum.map(docs, &(&1.id)) == ["bye/1", "hello/1"]
     assert Enum.at(docs, 0).doc ==
-      "A doc for this so it doesn't use 'Callback implementation of'"
+      "A doc for this so it doesn't use 'Callback implementation for'"
     assert Enum.at(docs, 1).doc ==
-      "Callback implementation of `CustomBehaviour.hello/1`."
+      "Callback implementation for `c:CustomBehaviour.hello/1`."
   end
 
   ## PROTOCOLS
