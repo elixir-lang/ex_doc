@@ -1,5 +1,4 @@
 ExDoc
-
 Copyright (c) 2012 Plataformatec
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,8 @@ Copyright (c) 2012 Plataformatec
   limitations under the License.
 
 ==========================================================================
-CSS Template: lib/ex_doc/formatter/html/templates/css/style.css
 
+CSS Template: lib/ex_doc/formatter/html/templates/css/style.css
 Copyright (c) 2007 Loren Segal
 
 	Permission is hereby granted, free of charge, to any person
@@ -41,8 +40,8 @@ Copyright (c) 2007 Loren Segal
 	OTHER DEALINGS IN THE SOFTWARE.
 
 ==========================================================================
-highlight.js
 
+highlight.js
 Copyright (c) 2006, Ivan Sagalaev
 
   All rights reserved.
@@ -70,22 +69,25 @@ Copyright (c) 2006, Ivan Sagalaev
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ==========================================================================
-lib/ex_doc/formatter/html/templates/css/elixir.css 
 
-  (c) Vasily Polovnyov <vast@whiteants.net>
+lib/ex_doc/formatter/html/templates/css/elixir.css 
+(c) Vasily Polovnyov <vast@whiteants.net>
+
   Released under the same license as highlight.js
 
 ==========================================================================
-lib/ex_doc/formatter/html/templates/js/jquery.js 
 
 jQuery JavaScript Library
 Copyright 2011, John Resig
-Dual licensed under the MIT or GPL Version 2 licenses.
-http://jquery.org/license
+
+  Dual licensed under the MIT or GPL Version 2 licenses.
+  http://jquery.org/license
+
 
 Includes Sizzle.js
 Copyright 2011, The Dojo Foundation
-Released under the MIT, BSD, and GPL Licenses.
-https://github.com/jquery/sizzle/blob/master/LICENSE.txt
+
+  Released under the MIT, BSD, and GPL Licenses.
+  https://github.com/jquery/sizzle/blob/master/LICENSE.txt
 
 ==========================================================================
