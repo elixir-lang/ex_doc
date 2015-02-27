@@ -114,11 +114,6 @@ li.r2 {
 div.breadcrumbs {
   padding-bottom: 0.5em;
 }
-code.inline {
-  padding: 0.0625em 0.1875em;
-  background: #fffde8;
-  border:1px solid #ffe0bb;
-}
 
 /* SUMMARY LINKS */
 ul.summary_links {
