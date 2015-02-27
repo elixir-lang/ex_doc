@@ -19,7 +19,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp all_docs(module, modules) do
-    locals = Enum.map module.docs, &(&1.id)
+    locals = Enum.map module.docs, &(doc_prefix(&1) <> &1.id)
 
     if moduledoc = module.moduledoc do
       moduledoc = moduledoc |> local_doc(locals) |> project_doc(modules)
