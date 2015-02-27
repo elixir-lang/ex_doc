@@ -90,10 +90,10 @@ defmodule ExDoc.Retriever do
     source_path = source_path(module, config)
 
     specs = Enum.into(Kernel.Typespec.beam_specs(module) || [], %{})
-    callbacks = callbacks_implemented_by(module)
+    impls = callbacks_implemented_by(module)
 
     docs = Enum.filter_map Code.get_docs(module, :docs), &has_doc?(&1, type),
-                           &get_function(&1, source_path, source_url, specs, callbacks)
+                           &get_function(&1, source_path, source_url, specs, impls)
 
     if type == :behaviour do
       callbacks = Enum.into(Kernel.Typespec.beam_callbacks(module) || [], %{})
@@ -167,7 +167,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_callback(callback, source_path, source_url, callbacks) do
-    { { name, arity }, line, _kind, doc } = callback
+    { { name, arity }, line, kind, doc } = callback
 
     specs = Dict.get(callbacks, { name, arity }, [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
@@ -180,7 +180,7 @@ defmodule ExDoc.Retriever do
       signature: "#{name}/#{arity}",
       specs: specs,
       source: source_link(source_path, source_url, line),
-      type: :defcallback
+      type: :"#{kind}callback"
     }
   end
 

@@ -47,7 +47,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.project_functions("`Mod.example/2` then `Mod.example/2`",
       ["Mod.example/2"]) == "[`Mod.example/2`](Mod.html#example/2) then [`Mod.example/2`](Mod.html#example/2)"
     assert Autolink.project_functions("`  MyModule.spaces/0  `", ["MyModule.spaces/0"]) ==
-      "[`  MyModule.spaces/0  `](MyModule.html#spaces/0)"
+      "[`MyModule.spaces/0`](MyModule.html#spaces/0)"
     assert Autolink.project_functions("`ModA.example/1` and `ModB.example/2`",
       ["ModA.example/1", "ModB.example/2"]) ==
       "[`ModA.example/1`](ModA.html#example/1) and [`ModB.example/2`](ModB.html#example/2)"
@@ -56,11 +56,16 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       "[`Mod.funny_name\?/1`](Mod.html#funny_name\?/1) and [`Mod.funny_name!/2`](Mod.html#funny_name!/2)"
   end
 
-  test "autolink creates links for Module special forms" do
+  test "autolink creates links for modules special forms" do
     assert Autolink.project_functions("`Mod.++/2`", ["Mod.++/2"]) === "[`Mod.++/2`](Mod.html#++/2)"
     assert Autolink.project_functions("`Mod.!/1`", ["Mod.!/1"]) === "[`Mod.!/1`](Mod.html#!/1)"
     assert Autolink.project_functions("`Mod.../2`", ["Mod.../2"]) === "[`Mod.../2`](Mod.html#../2)"
     assert Autolink.project_functions("`Mod.--/2`", ["Mod.--/2"]) === "[`Mod.--/2`](Mod.html#--/2)"
+  end
+
+  test "autolink creates links for callbacks" do
+    assert Autolink.project_functions("`c:Mod.++/2`", ["c:Mod.++/2"]) ===
+           "[`Mod.++/2`](Mod.html#c:++/2)"
   end
 
   test "autolink doesn't create links for undefined Mod.functions in docs" do
@@ -73,14 +78,14 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.project_functions("[the `Mod.example/1`]()", ["Mod.example/1"]) == "[the `Mod.example/1`]()"
   end
 
-  test "autolink Modules in docs" do
+  test "autolink modules in docs" do
     assert Autolink.project_modules("`MyModule`", ["MyModule"]) == "[`MyModule`](MyModule.html)"
     assert Autolink.project_modules("`MyModule.Nested`", ["MyModule.Nested"]) == "[`MyModule.Nested`](MyModule.Nested.html)"
     assert Autolink.project_modules("`MyModule.Nested.Deep`", ["MyModule.Nested.Deep"]) ==
       "[`MyModule.Nested.Deep`](MyModule.Nested.Deep.html)"
   end
 
-  test "autolink Modules doesn't link functions" do
+  test "autolink modules doesn't link functions" do
     assert Autolink.project_modules("`Mod.example/1`", ["Mod"]) == "`Mod.example/1`"
   end
 

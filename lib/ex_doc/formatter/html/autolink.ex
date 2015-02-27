@@ -42,7 +42,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     %{module | moduledoc: moduledoc, docs: docs, typespecs: typedocs}
   end
 
-
   defp all_typespecs(module, aliases) do
     locals = Enum.map module.typespecs, fn
       %ExDoc.TypeNode{name: name, arity: arity} -> { name, arity }
@@ -154,10 +153,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   Creates links to modules and functions defined in the project.
   """
   def project_doc(bin, modules) when is_binary(bin) do
-    project_funs = for m <- modules, d <- m.docs, do: m.id <> "." <> d.id
+    project_funs = for m <- modules, d <- m.docs, do: doc_prefix(d) <> m.id <> "." <> d.id
     project_modules = modules |> Enum.map(&module_to_string/1) |> Enum.uniq
-    bin |> project_functions(project_funs) |> project_modules(project_modules) |> erlang_functions
+    bin
+    |> project_functions(project_funs)
+    |> project_modules(project_modules)
+    |> erlang_functions
   end
+
+  defp doc_prefix(%{type: c}) when c in [:defcallback, :defmacrocallback], do: "c:"
+  defp doc_prefix(%{type: _}), do: ""
 
   @doc """
   Create links to functions defined in the project, specified in `project_funs`
@@ -169,15 +174,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def project_functions(bin, project_funs) when is_binary(bin) do
-    Regex.scan(~r{(?<!\[)`\s*((([A-Z][A-Za-z]+)\.)+([a-z_!\?>\|=&<!~+\.\+*^@-]+)/\d+)\s*`(?!\])}, bin)
+    Regex.scan(~r{(?<!\[)`\s*((c:)?(([A-Z][A-Za-z]+)\.)+([a-z_!\?>\|=&<!~+\.\+*^@-]+)/\d+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
     |> Enum.filter(&(&1 in project_funs))
     |> Enum.reduce(bin, fn (x, acc) ->
-         { mod_str, function_name, arity } = split_function(x)
+         { prefix, mod_str, function_name, arity } = split_function(x)
          escaped = Regex.escape(x)
          Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
-           "[`\\1`](#{mod_str}.html##{function_name}/#{arity})")
+           "[`#{mod_str}.#{function_name}/#{arity}`](#{mod_str}.html##{prefix}#{function_name}/#{arity})")
        end)
   end
 
@@ -202,13 +207,18 @@ defmodule ExDoc.Formatter.HTML.Autolink do
        end)
   end
 
+  defp split_function("c:" <> bin) do
+    {"", mod, fun, arity} = split_function(bin)
+    {"c:", mod, fun, arity}
+  end
+
   defp split_function(bin) do
     [modules, arity] = String.split(bin, "/")
     { mod, name } = modules
       |> String.replace(~r{([^\.])\.}, "\\1 ") # this handles the case of the ".." function
       |> String.split(" ")
       |> Enum.split(-1)
-    { Enum.join(mod, "."), hd(name), arity }
+    { "", Enum.join(mod, "."), hd(name), arity }
   end
 
   @doc """
@@ -231,7 +241,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> Enum.filter(&valid_erlang_beam?(&1, lib_dir))
     |> Enum.filter(&module_exports_function?/1)
     |> Enum.reduce(bin, fn (x, acc) ->
-         { mod_str, function_name, arity } = split_function(x)
+         { _, mod_str, function_name, arity } = split_function(x)
          escaped = Regex.escape(x)
          Regex.replace(~r/(?<!\[)`(\s*:#{escaped}\s*)`(?!\])/, acc,
            "[`\\1`](#{@erlang_docs}#{mod_str}.html##{function_name}-#{arity})")
@@ -239,7 +249,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp valid_erlang_beam?(function_str, lib_dir) do
-    { mod_str, _function_name, _arity } = split_function(function_str)
+    { _, mod_str, _function_name, _arity } = split_function(function_str)
     '#{mod_str}.beam'
     |> :code.where_is_file
     |> on_lib_path?(lib_dir)
@@ -255,7 +265,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp module_exports_function?(function_str) do
-    { mod_str, function_name, arity_str } = split_function(function_str)
+    { _, mod_str, function_name, arity_str } = split_function(function_str)
     module = String.to_atom(mod_str)
     function_name = String.to_atom(function_name)
     {arity, _} = Integer.parse(arity_str)
