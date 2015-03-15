@@ -111,6 +111,12 @@ defmodule ExDoc.RetrieverTest do
     assert node.source == "http://foo.com/bar/test/fixtures/compiled_with_docs.ex\#L1"
   end
 
+  test "docs_from_modules fails when module is not available" do
+    config = %ExDoc.Config{source_url_pattern: "http://example.com/%{path}#L%{line}", source_root: File.cwd!}
+    assert_raise ExDoc.Retriever.Error, "module NotAvailable is not defined/available", fn ->
+      docs_from_files(["NotAvailable"], config)
+    end
+  end
 
   ## EXCEPTIONS
 
