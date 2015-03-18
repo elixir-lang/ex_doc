@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.2
+
+* Bug fixes
+  * Support Elixir master
+  * Fix error reporting when modules are compiled without docs
+
 ## v0.7.1
 
 * Enhancements
