@@ -11,7 +11,7 @@ defmodule ExDoc.Mixfile do
   end
 
   defp deps do
-    [{:earmark, "~> 0.1", only: [:dev, :test]},
+    [{:earmark, "~> 0.1.15", only: [:dev, :test]},
      {:markdown, github: "devinus/markdown", only: [:test]}]
   end
 
