@@ -27,7 +27,7 @@ defmodule ExDoc.Markdown.Pandoc do
 
   defp open_port(path, opts) do
     exe  = :os.find_executable('pandoc')
-    args = ["--from", "markdown",
+    args = ["--from", "markdown+fenced_code_blocks",
             "--to", get_string(opts, :format, :html),
             "--base-header-level", get_string(opts, :header_level, 1),
             path]
