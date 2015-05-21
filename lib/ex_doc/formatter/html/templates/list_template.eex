@@ -2,19 +2,11 @@
 <html>
   <head>
     <title>List of <%= String.capitalize("#{scope}") %></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="css/full_list.css" type="text/css" media="screen" charset="utf-8" />
-    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
-    <script type="text/javascript" charset="utf-8" src="js/full_list.js"></script>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="css/full_list.css">
     <base id="base_target" target="_parent" />
   </head>
   <body class="frames">
-    <script type="text/javascript" charset="utf-8">
-      if (window.top.frames.main) {
-        document.getElementById('base_target').target = 'main';
-        document.body.className = 'frames';
-      }
-    </script>
     <section id="content">
       <h1 id="full_list_header">
         <%= if url = config.homepage_url || config.source_url do %>
@@ -42,8 +34,19 @@
       <ul id="full_list">
         <%= for node <- nodes, do: list_item_template(node) %>
       </ul>
-      
+
       <div id="no_results"></div>
     </section>
+
+    <!-- Scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/jquery.js"><\/script>')</script>
+    <script src="js/full_list.js"></script>
+    <script>
+      if (window.top.frames.main) {
+        document.getElementById('base_target').target = 'main';
+        document.body.className = 'frames';
+      }
+    </script>
   </body>
 </html>

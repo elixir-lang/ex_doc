@@ -3,25 +3,24 @@
   <head>
     <title>README</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
-
-    <script type="text/javascript" charset="utf-8">
-      relpath = '';
-      if (relpath != '') relpath += '/';
-    </script>
-
-    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
-    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+    <link rel="stylesheet" href="css/style.css">
   </head>
-
   <body>
-    <script type="text/javascript" charset="utf-8">
-      if (window.top.frames.main) document.body.className = 'frames';
-    </script>
-
     <section id="content">
       <div class="breadcrumbs"><%= page_breadcrumbs(config, "README", "readme.html") %></div>
       <%= to_html(content) %>
     </section>
+
+    <!-- Scripts -->
+    <script type="text/javascript">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+      if (window.top.frames.main) { document.body.className = 'frames'; }
+    </script>
   </body>
 </html>
