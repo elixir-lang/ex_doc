@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.3
+
+* Bug fixes
+  * Update highlight.js with fixes some inlining issues
+  * Require latest Earmark
+
 ## v0.7.2
 
 * Bug fixes

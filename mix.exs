@@ -3,7 +3,7 @@ defmodule ExDoc.Mixfile do
 
   def project do
     [app:        :ex_doc,
-     version:    "0.7.2",
+     version:    "0.7.3",
      elixir:     "~> 1.0",
      deps:       deps,
      aliases:    aliases,
@@ -11,7 +11,7 @@ defmodule ExDoc.Mixfile do
   end
 
   defp deps do
-    [{:earmark, "~> 0.1.15", only: [:dev, :test]},
+    [{:earmark, "~> 0.1.17 or ~> 0.2", optional: true},
      {:markdown, github: "devinus/markdown", only: [:test]}]
   end
 
