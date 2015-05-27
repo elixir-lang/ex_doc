@@ -11,6 +11,7 @@ defmodule ExDoc.Formatter.HTML do
   """
   def run(modules, config)  do
     output = Path.expand(config.output)
+    File.rm_rf! output
     :ok = File.mkdir_p output
 
     generate_index(output, config)
@@ -58,7 +59,6 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_readme(output, modules, config) do
-    File.rm("#{output}/README.html")
     readme_path = Path.expand(config.readme)
     write_readme(output, File.read(readme_path), modules, config)
   end
