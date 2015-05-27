@@ -109,7 +109,7 @@ defmodule ExDoc.Retriever do
       moduledoc: moduledoc,
       docs: docs,
       typespecs: get_types(module),
-      source: source_link(source_path, source_url, line),
+      source: source_link(source_path, source_url, line)
     }
   end
 

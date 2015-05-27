@@ -5,7 +5,8 @@ notifications:
 otp_release:
   - 17.0
 before_install:
-  - sudo apt-get install -y pandoc
+  - wget -c https://github.com/jgm/pandoc/releases/download/1.13.2/pandoc-1.13.2-1-amd64.deb
+  - sudo dpkg -i pandoc-1.13.2-1-amd64.deb
   - git clone https://github.com/elixir-lang/elixir
   - cd elixir && make && cd ..
 before_script: "export PATH=`pwd`/elixir/bin:$PATH"
