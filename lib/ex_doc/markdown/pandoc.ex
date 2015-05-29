@@ -15,6 +15,7 @@ defmodule ExDoc.Markdown.Pandoc do
     |> text_to_file()
     |> open_port(opts)
     |> process_port()
+    |> pretty_codeblocks()
   end
 
   defp text_to_file(text) do
@@ -52,5 +53,17 @@ defmodule ExDoc.Markdown.Pandoc do
       {^port, {:exit_status, status}} ->
         {status, List.to_string(data)}
     end
+  end
+
+  @doc false
+  # Helper to handle fenced code blocks (```...```) with
+  # language specification
+  defp pretty_codeblocks(bin) do
+    # Pandoc parser puts the class attribute inside the `pre` tag
+    # Move the class attribute to the code element to keep consistency.
+    bin = Regex.replace(~r/<pre\s+class=\"([^\"]+)\"><code>/,
+                        bin, "<pre><code class=\"\\1\">")
+
+    bin
   end
 end

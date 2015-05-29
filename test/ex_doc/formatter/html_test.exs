@@ -92,10 +92,16 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "make markdown codeblocks pretty" do
     with_empty_class = "<pre><code class=\"\">mix run --no-halt path/to/file.exs"
     without_class = "<pre><code>mix run --no-halt path/to/file.exs"
+    iex_detected_with_empty_class = "<pre><code class=\"\">iex&gt; max(4, 5)"
+    iex_detected_without_class = "<pre><code>iex&gt; max(4, 5)"
 
     assert HTML.pretty_codeblocks(with_empty_class) ==
-           "<pre class=\"codeblock\">mix run --no-halt path/to/file.exs"
+           "<pre><code class=\"elixir\">mix run --no-halt path/to/file.exs"
     assert HTML.pretty_codeblocks(without_class) ==
-           "<pre class=\"codeblock\">mix run --no-halt path/to/file.exs"
+           "<pre><code class=\"elixir\">mix run --no-halt path/to/file.exs"
+    assert HTML.pretty_codeblocks(iex_detected_with_empty_class) ==
+          "<pre><code class=\"iex elixir\">iex&gt; max(4, 5)"
+    assert HTML.pretty_codeblocks(iex_detected_without_class) ==
+          "<pre><code class=\"iex elixir\">iex&gt; max(4, 5)"
   end
 end

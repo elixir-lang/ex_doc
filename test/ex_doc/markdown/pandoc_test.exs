@@ -30,4 +30,10 @@ defmodule MarkdownTest.PandocTest do
   test "to_html converts to rst" do
     assert Markdown.to_html("`hello`", format: "rst") == "``hello``\n"
   end
+
+  test "pretty Markdown fenced code blocks for Pandoc" do
+    pandoc_with_language_specified = "```elixir\nmix run --no-halt path/to/file.exs\n```"
+    expected = "<pre><code class=\"elixir\">mix run --no-halt path/to/file.exs</code></pre>\n"
+    assert Markdown.to_html(pandoc_with_language_specified) == expected
+  end
 end
