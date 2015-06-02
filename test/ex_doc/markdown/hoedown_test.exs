@@ -23,4 +23,10 @@ defmodule ExDoc.Markdown.HoedownTest do
   test "to_html handles empty input" do
     assert Markdown.to_html("") == ""
   end
+
+  test "pretty Markdown fenced code blocks for Hoedown" do
+    hoedown_with_language_specified = "```elixir\nmix run --no-halt path/to/file.exs\n```"
+    expected = "<pre><code class=\"elixir\">mix run --no-halt path/to/file.exs\n</code></pre>\n"
+    assert Markdown.to_html(hoedown_with_language_specified) == expected
+  end
 end

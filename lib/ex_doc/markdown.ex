@@ -7,16 +7,11 @@ defmodule ExDoc.Markdown do
 
   @markdown_processor_key :markdown_processor
 
+  import ExDoc.Formatter.HTML, only: [pretty_codeblocks: 1]
+
   def to_html(text) when is_binary(text) do
-    text = get_markdown_processor().to_html(text)
+    text = get_markdown_processor().to_html(text) |> pretty_codeblocks
 
-    # handle code blocks (```...```) with language specification
-    text = Regex.replace(~r/<pre><code\s*(class=\"\")?>\s*iex&gt;/,
-                  #add "elixir" class for now, until we have support for iex in highlight.js
-                  text, "<pre><code class=\"iex elixir\">iex&gt;")
-
-    text = Regex.replace(~r/<pre><code(\s+class=\"\")?>/,
-                  text, "<pre><code class=\"elixir\">")
     text
   end
 

@@ -75,11 +75,17 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   @doc false
-  # Helper to handle plain code blocks (```...```) without
+  # Helper to handle plain code blocks (```...```) with and without
   # language specification and indentation code blocks
   def pretty_codeblocks(bin) do
-    Regex.replace(~r/<pre><code\s*(class=\"\")?>/,
-                  bin, "<pre class=\"codeblock\">")
+    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>\s*iex&gt;/,
+                        # Add "elixir" class for now, until we have support for
+                        # "iex" in highlight.js
+                        bin, "<pre><code class=\"iex elixir\">iex&gt;")
+    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>/,
+                        bin, "<pre><code class=\"elixir\">")
+
+    bin
   end
 
   @doc false
