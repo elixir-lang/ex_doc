@@ -1,0 +1,33 @@
+    <section id="sidebar">
+      <h1 id="full_list_header">
+        <%= if url = config.homepage_url || config.source_url do %>
+          <a href="<%= url %>"><%= config.project %> v<%= config.version %></a>
+        <% else %>
+          <%= config.project %> v<%= config.version %>
+        <% end %>
+      </h1>
+
+      <h2 id="sub_list_header">
+        <%= if has_readme do %>
+        <a href="index.html">README</a>
+        <a href="overview.html">Overview</a>
+        <% else %>
+        <a href="index.html">Overview</a>
+        <% end %>
+      </h2>
+
+      <div class="nav">
+        <input id="modules_list" type="button" value="Modules" class="selected" />
+        <input id="exceptions_list" type="button" value="Exceptions" />
+        <input id="protocols_list" type="button" value="Protocols" />
+      </div>
+
+      <div id="search"><input type="search" id="search_field" placeholder="Search" autocomplete="off" autofocus="autofocus" results="0" /></div>
+
+      <script src="sidebar_items.js" defer></script>
+
+      <ul id="full_list">
+      </ul>
+
+      <div id="no_results"></div>
+    </section>

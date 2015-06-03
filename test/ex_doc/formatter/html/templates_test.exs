@@ -22,78 +22,60 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
            |> ExDoc.Retriever.docs_from_modules(doc_config)
            |> ExDoc.Formatter.HTML.Autolink.all()
 
-    Templates.module_page(hd(mods), doc_config, mods)
+    Templates.module_page(hd(mods), doc_config, mods, false)
   end
 
   ## LISTING
 
-  test "current listing page is marked as selected" do
-    content = Templates.list_template(:modules, [], doc_config, false)
-    assert content =~ ~r{<span class="selected"><a target="_self" href="modules_list.html">}
-    assert content =~ ~r{<span class=""><a target="_self" href="exceptions_list.html">}
-  end
-
   test "site title text links to homepage_url when set" do
-    content = Templates.list_template(:modules, [], doc_config, false)
-    assert content =~ ~r{<a href="#{homepage_url}" target="_top">Elixir v1.0.1</a>}
+    content = Templates.sidebar_template(doc_config, false)
+    assert content =~ ~r{<a href="#{homepage_url}">Elixir v1.0.1</a>}
   end
 
   test "site title text links to source_url when there is no homepage_url" do
     doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                   source_url: source_url,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.list_template(:modules, [], doc_config_without_source_url, false)
-    assert content =~ ~r{<a href="#{source_url}" target="_top">Elixir v1.0.1</a>}
+    content = Templates.sidebar_template(doc_config_without_source_url, false)
+    assert content =~ ~r{<a href="#{source_url}">Elixir v1.0.1</a>}
   end
 
   test "site title text creates no link when there is no homepage_url or source_url" do
     doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.list_template(:modules, [], doc_config_without_source_url, false)
+    content = Templates.sidebar_template(doc_config_without_source_url, false)
     assert content =~ ~r{Elixir v1.0.1}
   end
 
   test "list_page outputs listing for the given nodes" do
     names = [CompiledWithDocs, CompiledWithDocs.Nested]
     nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
-    content = Templates.list_template(:modules, nodes, doc_config, false)
+    content = Templates.sidebar_items_template([%{id: "modules", value: nodes}])
 
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html#example_1\/0".*example_1\/0.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html#example_without_docs\/0".*example_without_docs\/0.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}ms
+    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*}ms
+    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example\/2\".*}ms
+    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example_1\/0\".*}ms
+    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example_without_docs\/0\".*}ms
+    assert content =~ ~r{.*"CompiledWithDocs.Nested\"}ms
+    refute content =~ ~r{.*\"exceptions\":}ms
+    refute content =~ ~r{.*\"protocols\":}ms
   end
 
   test "listing page has README link if present" do
-    content = Templates.list_template(:modules, [], doc_config, true)
-    assert content =~ ~r{<a href="README.html">README</a>}
+    content = Templates.sidebar_template(doc_config, true)
+    assert content =~ ~r{<a href="index.html">README</a>}
   end
 
   test "listing page doesn't have README link if not present" do
-    content = Templates.list_template(:modules, [], doc_config, false)
-    refute content =~ ~r{<a href="README.html">README</a>}
-  end
-
-  ## LIST ITEMS
-
-  test "arrows for modules with functions" do
-    [node] = ExDoc.Retriever.docs_from_modules([FunctionModule], doc_config)
-    content = Templates.list_item_template(node)
-    assert content =~ ~r/<a class="toggle">/
-  end
-
-  test "no arrows for modules without functions" do
-    [node] = ExDoc.Retriever.docs_from_modules([NoFunctionsModule], doc_config)
-    content = Templates.list_item_template(node)
-    refute content =~ ~r/<a class="toggle">/
+    content = Templates.sidebar_template(doc_config, false)
+    refute content =~ ~r{<a href="index.html">README</a>}
   end
 
   ## MODULES
 
   test "module_page generates only the module name when there's no more info" do
     node = %ExDoc.ModuleNode{module: XPTOModule, moduledoc: nil, id: "XPTOModule"}
-    content = Templates.module_page(node, doc_config, [node])
+    content = Templates.module_page(node, doc_config, [node], false)
 
     assert content =~ ~r/<title>XPTOModule<\/title>/
     assert content =~ ~r/<h1>\s*XPTOModule\s*<\/h1>/

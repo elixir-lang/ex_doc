@@ -8,19 +8,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(node, config, all) do
+  def module_page(node, config, all, has_readme) do
     types       = node.typespecs
     functions   = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :def}, &1)
     macros      = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :defmacro}, &1)
     callbacks   = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :defcallback}, &1)
-    module_template(config, node, types, functions, macros, callbacks, all)
-  end
-
-  @doc """
-  Generates the listing.
-  """
-  def list_page(scope, nodes, config, has_readme) do
-    list_template(scope, nodes, config, has_readme)
+    module_template(config, node, types, functions, macros, callbacks, all, has_readme)
   end
 
   # Get the full specs from a function, already in HTML form.
@@ -109,12 +102,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    index_template: [:config],
-    list_template: [:scope, :nodes, :config, :has_readme],
-    overview_template: [:config, :modules, :exceptions, :protocols],
-    module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all],
+    overview_template: [:config, :modules, :exceptions, :protocols, :has_readme],
+    sidebar_template: [:config, :has_readme],
+    sidebar_items_template: [:input],
+    sidebar_items_keys_template: [:node],
+    sidebar_items_entry_template: [:node],
+    module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all, :has_readme],
     readme_template: [:config, :content],
-    list_item_template: [:node],
     overview_entry_template: [:node],
     summary_template: [:node],
     detail_template: [:node, :_module],

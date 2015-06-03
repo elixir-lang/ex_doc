@@ -1,15 +1,29 @@
 /*** DOCUMENT STRUCTURE: module_template.eex ***
 body
+  section#sidebar [.in_search]
+    h1#full_list_header
+    h2#sub_list_header
+    div#nav
+    div#search [.loading] > input#search_field
+    ul#full_list
+      li.node [.collpased, .search_uncollapsed, .found]
+        a.toggle
+        a.object_link
+        span.node_name
+      li.docs [.collpased, .search_uncollapsed, .found]
+        a.toggle
+        a.object_link
+        span.node_name
+        ...
+    div.no_results
+
   section#content
     div.breadcrumbs
-    
     h1
       small
-    
     ul.summary_links
       li > a
       ...
-    
     section.docstring#moduledoc
     a.view_source
 
@@ -19,7 +33,6 @@ body
         td.summary_signature > a
         td.summary_synopsis > p
       ...
-    
     section.details_list#types_details
       h2 > a.to_top_link
       div.type_detail
@@ -44,17 +57,271 @@ body
 
 */
 
+@import "normalize.css";
+
 /* DOCUMENT STYLES */
+
 body {
   font: 13px "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif;
-  padding: 0 20px;
+  padding: 0;
+  margin: 0;
+  line-height: 1.618;
 }
+
+#sidebar h1 {
+  font-size: 1.4em;
+  margin: 0;
+  padding: 12px 10px 0;
+}
+
+#sidebar a:link,
+#sidebar a:visited {
+  color: #05a;
+  text-decoration: none;
+}
+
+#sidebar li {
+  color: #888;
+  cursor: pointer;
+}
+
+#sidebar li:hover {
+  background: #ddd;
+}
+
+#sidebar span.node_name {
+  font-size: 0.8em;
+}
+
+#sidebar li {
+  white-space: nowrap;
+  cursor: default;
+}
+
+
+/* HEADERS */
+
+#sidebar h1 {
+  margin-top: 0;
+}
+
+#sidebar h2 {
+  font-size: 0.9em;
+  margin: 5px 10px 15px;
+}
+
+
+/* NAVIGATION BAR */
+
+.nav {
+  margin: 0 0 10px 5px;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.nav a:link,
+.nav a:visited {
+  color: #358;
+}
+
+.nav a:hover {
+  background: transparent;
+  color: #5af;
+}
+
+.nav span {
+  border-left: 1px solid #ccc;
+  padding: 0 3px 0 5px;
+}
+
+.nav span:first-child {
+  border-left: 0;
+  border-radius: 3px;
+}
+
+.nav input.selected {
+  background-color: #f0f0f0;
+  color: #05a;
+}
+
+
+/* SEARCH BOX */
+
+#search {
+  font-size: 0.9em;
+  color: #888;
+  margin: 3px;
+  margin-left: 10px;
+  padding-left: 0;
+  padding-right: 24px;
+}
+
+#search_field {
+  width: 180px;
+  margin-right: 35px;
+  border: 2px solid #d8d8e5;
+  padding: 2px 4px;
+  -moz-box-sizing: border-box;
+}
+
+#search.loading {
+  background: url(data:image/gif;base64,R0lGODlhEAAQAPYAAP///wAAAPr6+pKSkoiIiO7u7sjIyNjY2J6engAAAI6OjsbGxjIyMlJSUuzs7KamppSUlPLy8oKCghwcHLKysqSkpJqamvT09Pj4+KioqM7OzkRERAwMDGBgYN7e3ujo6Ly8vCoqKjY2NkZGRtTU1MTExDw8PE5OTj4+PkhISNDQ0MrKylpaWrS0tOrq6nBwcKysrLi4uLq6ul5eXlxcXGJiYoaGhuDg4H5+fvz8/KKiohgYGCwsLFZWVgQEBFBQUMzMzDg4OFhYWBoaGvDw8NbW1pycnOLi4ubm5kBAQKqqqiQkJCAgIK6urnJyckpKSjQ0NGpqatLS0sDAwCYmJnx8fEJCQlRUVAoKCggICLCwsOTk5ExMTPb29ra2tmZmZmhoaNzc3KCgoBISEiIiIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCAAAACwAAAAAEAAQAAAHaIAAgoMgIiYlg4kACxIaACEJCSiKggYMCRselwkpghGJBJEcFgsjJyoAGBmfggcNEx0flBiKDhQFlIoCCA+5lAORFb4AJIihCRbDxQAFChAXw9HSqb60iREZ1omqrIPdJCTe0SWI09GBACH5BAkIAAAALAAAAAAQABAAAAdrgACCgwc0NTeDiYozCQkvOTo9GTmDKy8aFy+NOBA7CTswgywJDTIuEjYFIY0JNYMtKTEFiRU8Pjwygy4ws4owPyCKwsMAJSTEgiQlgsbIAMrO0dKDGMTViREZ14kYGRGK38nHguHEJcvTyIEAIfkECQgAAAAsAAAAABAAEAAAB2iAAIKDAggPg4iJAAMJCRUAJRIqiRGCBI0WQEEJJkWDERkYAAUKEBc4Po1GiKKJHkJDNEeKig4URLS0ICImJZAkuQAhjSi/wQyNKcGDCyMnk8u5rYrTgqDVghgZlYjcACTA1sslvtHRgQAh+QQJCAAAACwAAAAAEAAQAAAHZ4AAgoOEhYaCJSWHgxGDJCQARAtOUoQRGRiFD0kJUYWZhUhKT1OLhR8wBaaFBzQ1NwAlkIszCQkvsbOHL7Y4q4IuEjaqq0ZQD5+GEEsJTDCMmIUhtgk1lo6QFUwJVDKLiYJNUd6/hoEAIfkECQgAAAAsAAAAABAAEAAAB2iAAIKDhIWGgiUlh4MRgyQkjIURGRiGGBmNhJWHm4uen4ICCA+IkIsDCQkVACWmhwSpFqAABQoQF6ALTkWFnYMrVlhWvIKTlSAiJiVVPqlGhJkhqShHV1lCW4cMqSkAR1ofiwsjJyqGgQAh+QQJCAAAACwAAAAAEAAQAAAHZ4AAgoOEhYaCJSWHgxGDJCSMhREZGIYYGY2ElYebi56fhyWQniSKAKKfpaCLFlAPhl0gXYNGEwkhGYREUywag1wJwSkHNDU3D0kJYIMZQwk8MjPBLx9eXwuETVEyAC/BOKsuEjYFhoEAIfkECQgAAAAsAAAAABAAEAAAB2eAAIKDhIWGgiUlh4MRgyQkjIURGRiGGBmNhJWHm4ueICImip6CIQkJKJ4kigynKaqKCyMnKqSEK05StgAGQRxPYZaENqccFgIID4KXmQBhXFkzDgOnFYLNgltaSAAEpxa7BQoQF4aBACH5BAkIAAAALAAAAAAQABAAAAdogACCg4SFggJiPUqCJSWGgkZjCUwZACQkgxGEXAmdT4UYGZqCGWQ+IjKGGIUwPzGPhAc0NTewhDOdL7Ykji+dOLuOLhI2BbaFETICx4MlQitdqoUsCQ2vhKGjglNfU0SWmILaj43M5oEAOwAAAAAAAAAAAA==) no-repeat 188px center;
+  min-height: 18px;
+}
+
+#no_results {
+  margin-left: 7px;
+  padding: 7px 12px;
+}
+
+
+/* FULL LIST OF CONTENTS */
+
+#full_list {
+  list-style: none;
+  margin-left: 0;
+  padding: 0;
+}
+
+#full_list ul {
+  margin: 0;
+  padding: 0;
+}
+
+#full_list li {
+  margin: 0;
+  padding: 5px 5px 5px 0;
+  font-size: 1.1em;
+  list-style: none;
+}
+
+#full_list li.node {
+  padding-left: 25px;
+}
+
+#full_list li.docs {
+  padding: 0;
+}
+
+#full_list li.docs li {
+  padding-left: 25px;
+}
+
+#full_list li span.node_name {
+  display: none;
+}
+
+#full_list .no_padding {
+  padding-left: 0;
+}
+
+
+/* while searching */
+
+.in_search #full_list ul {
+  margin-left: 0;
+}
+
+.in_search #full_list li {
+  display: none;
+}
+
+.in_search #full_list li.found {
+  display: list-item;
+}
+
+.in_search #full_list li a.toggle {
+  display: none;
+}
+
+.in_search #full_list li span.node_name {
+  display: block;
+}
+
+
+/* collapsed menu */
+
+#full_list .search_uncollapsed,
+#full_list .search_uncollapsed ul {
+  display: block !important;
+}
+
+#full_list ul.collapsed ul,
+#full_list ul.collapsed li,
+#full_list li.collapsed ul,
+#full_list li.collapsed li {
+  display: none;
+}
+
+#full_list ul.search_uncollapsed li.found,
+#full_list li.search_uncollapsed li.found {
+  display: list-item;
+}
+
+#full_list li.deprecated {
+  text-decoration: line-through;
+  font-style: italic;
+}
+
+#full_list li.r1 {
+  background: #f0f0f0;
+}
+
+#full_list li.r2 {
+  background: #fafafa;
+}
+
+
+/* link properties */
+
+#full_list li a.toggle {
+  display: block;
+  float: left;
+  position: relative;
+  left: -5px;
+  top: 4px;
+  width: 10px;
+  height: 9px;
+  margin-left: -10px;
+  text-indent: -999px;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAASCAYAAABb0P4QAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAK8AAACvABQqw0mAAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTM5jWRgMAAAAVdEVYdENyZWF0aW9uIFRpbWUAMy8xNC8wOeNZPpQAAAE2SURBVDiNrZTBccIwEEXfelIAHUA6CZ24BGaWO+FuzZAK4k6gg5QAdGAq+Bxs2Yqx7BzyL7Llp/VfzZeQhCTc/ezuGzKKnKSzpCxXJM8fwNXda3df5RZETlIt6YUzSQDs93sl8w3wBZxCCE10GM1OcWbWjB2mWgEH4Mfdyxm3PSepBHibgQE2wLe7r4HjEidpnXMYdQPKEMJcsZ4zs2POYQOcaPfwMVOo58zsAdMt18BuoVDPxUJRacELbXv3hUIX2vYmOUvi8C8ydz/ThjXrqKqqLbDIAdsCKBd+Wo7GWa7o9qzOQHVVVXeAbs+yHHCH4aTsaCOQqunmUy1yBUAXkdMIfMlgF5EXLo2OpV/c/Up7jG4hhHcYLgWzAZXUc2b2ixsfvc/RmNNfOXD3Q/oeL9axJE1yT9IOoUu6MGUkAAAAAElFTkSuQmCC) no-repeat bottom left;
+  cursor: default;
+}
+
+#full_list li.collapsed a.toggle {
+  opacity: 0.5;
+  cursor: default;
+  background-position: top left;
+}
+
+#full_list li.clicked {
+  background: #05a;
+  color: #ccc;
+}
+
+#full_list li.clicked a:link,
+#full_list li.clicked a:visited {
+  color: #eee;
+}
+
+#full_list li.clicked a.toggle {
+  opacity: 0.5;
+  background-position: bottom right;
+}
+
+#full_list li.collapsed.clicked a.toggle {
+  background-position: top right;
+}
+
+
+/* DOCUMENT STYLES */
 
 a:link,
 a:visited {
   color: #05a;
   text-decoration: none;
 }
+
 a:hover {
   color: #27c;
 }
@@ -65,10 +332,12 @@ h1 {
   margin-top: 0;
   padding-top: 4px;
 }
+
 h1 small {
   color: #888;
   font-size: 18px;
 }
+
 h2 {
   padding: 0;
   padding-bottom: 3px;
@@ -86,40 +355,47 @@ table {
   border-collapse: collapse;
   margin-top: 1em;
 }
+
 table th {
   background: #fafafa;
 }
+
 table th,
 table td {
   border: 1px solid #ddd;
   padding: 0.4em 1em 0.4em 0.4em;
 }
+
 table tr:nth-child(odd) {
   background: #f0f0f0;
 }
+
 table tr:nth-child(even) {
   background: #fafafa;
 }
 
+
 /* OTHERS */
-body.frames {
-  padding: 0 5px;
-}
+
 li.r1 {
   background: #f0f0f0;
 }
+
 li.r2 {
   background: #fafafa;
 }
+
 div.breadcrumbs {
   padding-bottom: 0.5em;
 }
 
 /* SUMMARY LINKS */
+
 ul.summary_links {
   margin: 0 0 1em 0;
   padding: 0em;
 }
+
 ul.summary_links li {
   display: inline-block;
   list-style-type: none;
@@ -128,11 +404,14 @@ ul.summary_links li {
   background: #f0f0f0;
 }
 
+
 /* DOCSTRING */
+
 section.docstring,
 p.docstring {
   margin-right: 6em;
 }
+
 .docstring h1,
 .docstring h2,
 .docstring h3,
@@ -140,80 +419,105 @@ p.docstring {
   padding: 0;
   border: 0;
 }
+
 .docstring h1 {
   font-size: 1.3em;
 }
+
 .docstring h2 {
   font-size: 1.2em;
 }
+
 .docstring h3,
 .docstring h4 {
   font-size: 1em;
   padding-top: 10px;
 }
+
 .docstring ul {
   padding-left: 20px;
 }
+
 .docstring li > p {
   margin: 0;
 }
 
+
 /* SUMMARY */
+
 div.detail_header_links {
   float: right;
 }
+
 a.to_top_link {
   padding-left: 0.3em;
   font-size: 1em;
   font-weight: normal;
 }
+
 table.summary {
   border: 0;
   border-collapse: separate;
 }
+
 table.summary tr:nth-child(odd) {
   background: #f0f0f0;
 }
+
 table.summary tr:nth-child(even) {
   background: #fafafa;
 }
+
 table.summary tr td {
   border: 0;
-  padding-top: 0.5em; padding-bottom: 0.5em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
 }
+
 td.summary_signature {
   padding-right: 0.5em;
 }
+
 td.summary_synopsis {
   padding-left: 0.5em;
 }
+
 td.summary_synopsis p {
   margin: 0;
 }
 
+
 /* DETAILS LIST */
-.spec, .typespec {
+
+.spec,
+.typespec {
   font: bold 1em Courier, monospace;
 }
+
 ul.spec {
   padding: 6px 10px 6px 25px;
   list-style-type: none;
 }
+
 .type_detail {
   margin-top: 15px;
   padding-top: 0;
 }
+
 .type_detail > div.typespec_doc {
   margin-left: 3em;
 }
+
 .detail {
   border-top: 1px dotted #aaa;
   margin-top: 15px;
   padding-top: 0;
 }
+
 .detail:nth-child(2) {
   border: 0;
 }
+
 div.detail_header {
   background: #e5e8ff;
   border: 1px solid #d8d8e5;
@@ -221,15 +525,54 @@ div.detail_header {
   margin-top: 18px;
   padding: 6px 10px;
 }
+
 span.signature {
   font: normal 1.1em Monaco, Consolas, Courier, monospace;
 }
+
 span.detail_type {
   font-style: italic;
   font-size: 0.9em;
 }
+
 a.detail_link {
   padding-left: 0.3em;
+}
+
+/* Layout */
+
+#sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 1px solid #ccc;
+  width: 250px;
+  padding: 5px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+#content {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 255px;
+  overflow: auto;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+
+/* Media print */
+
+@media print {
+  #sidebar {
+    display: none;
+  }
 }
 
 /* CUSTOMIZATION FOR elixir.css */

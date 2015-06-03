@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>README</title>
     <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title><%= config.project %> v<%= config.version %> README</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc">
+
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
+    <%= sidebar_template(config, true) %>
     <section id="content">
-      <div class="breadcrumbs"><%= page_breadcrumbs(config, "README", "readme.html") %></div>
+      <div class="breadcrumbs"><%= page_breadcrumbs(config, "README", "index.html") %></div>
       <%= to_html(content) %>
     </section>
 
@@ -17,10 +22,9 @@
       if (relpath != '') relpath += '/';
     </script>
 
-    <script src="js/jquery.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/jquery.js"><\/script>')</script>
+    <script src="js/highlight.pack.js"></script>
     <script src="js/app.js"></script>
-    <script>
-      if (window.top.frames.main) { document.body.className = 'frames'; }
-    </script>
   </body>
 </html>

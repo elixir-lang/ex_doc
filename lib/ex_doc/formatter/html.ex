@@ -14,7 +14,6 @@ defmodule ExDoc.Formatter.HTML do
     File.rm_rf! output
     :ok = File.mkdir_p output
 
-    generate_index(output, config)
     generate_assets(output, config)
     has_readme = config.readme && generate_readme(output, modules, config)
 
@@ -23,22 +22,29 @@ defmodule ExDoc.Formatter.HTML do
     exceptions = filter_list(:exceptions, all)
     protocols  = filter_list(:protocols, all)
 
-    generate_overview(modules, exceptions, protocols, output, config)
-    generate_list(:modules, modules, all, output, config, has_readme)
-    generate_list(:exceptions, exceptions, all, output, config, has_readme)
-    generate_list(:protocols, protocols, all, output, config, has_readme)
+    generate_overview(modules, exceptions, protocols, output, config, has_readme)
+    generate_sidebar_items(modules, exceptions, protocols, output)
+    generate_list(modules, all, output, config, has_readme)
+    generate_list(exceptions, all, output, config, has_readme)
+    generate_list(protocols, all, output, config, has_readme)
 
     Path.join(config.output, "index.html")
   end
 
-  defp generate_index(output, config) do
-    content = Templates.index_template(config)
-    :ok = File.write("#{output}/index.html", content)
+  defp generate_overview(modules, exceptions, protocols, output, config, has_readme) do
+    content = Templates.overview_template(config, modules, exceptions, protocols, has_readme)
+
+    if has_readme do
+      :ok = File.write("#{output}/overview.html", content)
+    else
+      :ok = File.write("#{output}/index.html", content)
+    end
   end
 
-  defp generate_overview(modules, exceptions, protocols, output, config) do
-    content = Templates.overview_template(config, modules, exceptions, protocols)
-    :ok = File.write("#{output}/overview.html", content)
+  defp generate_sidebar_items(modules, exceptions, protocols, output) do
+    input = for node <- [%{id: "modules", value: modules}, %{id: "exceptions", value: exceptions}, %{id: "protocols", value: protocols}], !Enum.empty?(node.value), do: node
+    content = Templates.sidebar_items_template(input)
+    :ok = File.write("#{output}/sidebar_items.js", content)
   end
 
   defp assets do
@@ -66,7 +72,7 @@ defmodule ExDoc.Formatter.HTML do
   defp write_readme(output, {:ok, content}, modules, config) do
     content = Autolink.project_doc(content, modules)
     readme_html = Templates.readme_template(config, content) |> pretty_codeblocks
-    File.write("#{output}/README.html", readme_html)
+    File.write("#{output}/index.html", readme_html)
     true
   end
 
@@ -110,14 +116,12 @@ defmodule ExDoc.Formatter.HTML do
     Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:protocol], &1)
   end
 
-  defp generate_list(scope, nodes, all, output, config, has_readme) do
-    Enum.each nodes, &generate_module_page(&1, all, output, config)
-    content = Templates.list_page(scope, nodes, config, has_readme)
-    File.write("#{output}/#{scope}_list.html", content)
+  defp generate_list(nodes, all, output, config, has_readme) do
+    Enum.each nodes, &generate_module_page(&1, all, output, config, has_readme)
   end
 
-  defp generate_module_page(node, modules, output, config) do
-    content = Templates.module_page(node, config, modules)
+  defp generate_module_page(node, modules, output, config, has_readme) do
+    content = Templates.module_page(node, config, modules, has_readme)
     File.write("#{output}/#{node.id}.html", content)
   end
 
