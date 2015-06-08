@@ -1,20 +1,22 @@
 /*
+
 github.com style (c) Vasily Polovnyov <vast@whiteants.net>
+
+Source: https://github.com/isagalaev/highlight.js/blob/master/src/styles/github.css
+
 */
 
 .hljs {
-  overflow-x: auto;
-  color: #333;
-  padding: 0.5em;
-  border: #ffe0bb dotted 1px;
-  background: #fffde8;
   display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #333;
+  background: #f8f8f8;
   -webkit-text-size-adjust: none;
 }
 
 .hljs-comment,
-.diff .hljs-header,
-.hljs-javadoc {
+.diff .hljs-header {
   color: #998;
   font-style: italic;
 }
@@ -38,8 +40,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
 .hljs-string,
 .hljs-tag .hljs-value,
-.hljs-phpdoc,
-.hljs-dartdoc,
+.hljs-doctag,
 .tex .hljs-formula {
   color: #d14;
 }
@@ -60,13 +61,13 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 .hljs-type,
 .vhdl .hljs-literal,
 .tex .hljs-command {
-  color: #445588;
+  color: #458;
   font-weight: bold;
 }
 
 .hljs-tag,
 .hljs-tag .hljs-title,
-.hljs-rules .hljs-property,
+.hljs-rule .hljs-property,
 .django .hljs-tag .hljs-keyword {
   color: #000080;
   font-weight: normal;
@@ -74,7 +75,8 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
 .hljs-attribute,
 .hljs-variable,
-.lisp .hljs-body {
+.lisp .hljs-body,
+.hljs-name {
   color: #008080;
 }
 

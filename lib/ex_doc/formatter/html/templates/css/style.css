@@ -231,3 +231,9 @@ span.detail_type {
 a.detail_link {
   padding-left: 0.3em;
 }
+
+/* CUSTOMIZATION FOR elixir.css */
+.hljs {
+    background: #fffde8;
+    border: #ffe0bb dotted 1px;
+}
