@@ -17,9 +17,9 @@
       </h2>
 
       <div class="nav">
-        <input id="modules_list" type="button" value="Modules" class="selected" />
-        <input id="exceptions_list" type="button" value="Exceptions" />
-        <input id="protocols_list" type="button" value="Protocols" />
+        <span class="selected"><a id="modules_list" href="#">Modules</a></span>
+        <span><a id="exceptions_list" href="#">Exceptions</a></span>
+        <span><a id="protocols_list" href="#">Protocols</a></span>
       </div>
 
       <div id="search"><input type="search" id="search_field" placeholder="Search" autocomplete="off" autofocus="autofocus" results="0" /></div>

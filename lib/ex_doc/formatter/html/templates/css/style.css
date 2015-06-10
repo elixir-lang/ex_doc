@@ -139,7 +139,7 @@ body {
   border-radius: 3px;
 }
 
-.nav input.selected {
+.nav span.selected {
   background-color: #f0f0f0;
   color: #05a;
 }
@@ -326,7 +326,7 @@ a:hover {
   color: #27c;
 }
 
-h1 {
+h1:not(#full_list_header) {
   font-size: 25px;
   border-top: 0;
   margin-top: 0;
@@ -338,7 +338,7 @@ h1 small {
   font-size: 18px;
 }
 
-h2 {
+h2:not(#sub_list_header) {
   padding: 0;
   padding-bottom: 3px;
   border-bottom: 1px #aaa solid;
