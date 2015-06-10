@@ -113,6 +113,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     summary_template: [:node],
     detail_template: [:node, :_module],
     type_detail_template: [:node, :_module],
+    head_template: [:page],
+    footer_template: []
   ]
 
   Enum.each templates, fn({ name, args }) ->
