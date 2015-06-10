@@ -1,0 +1,4 @@
+sidebarNodes = {
+<% require Enum, as: E %><%= E.into(input, [], &(sidebar_items_keys_template(&1))) |> E.join(",") %>
+};
+fillSidebarWithNodes(sidebarNodes);

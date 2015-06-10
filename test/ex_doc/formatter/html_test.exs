@@ -54,19 +54,17 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates all listing files" do
     HTML.run(get_modules, doc_config)
 
-    content = File.read!("#{output_dir}/modules_list.html")
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html".*CompiledWithDocs.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs\.html#example\/2".*example\/2.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CompiledWithDocs.Nested\.html".*Nested.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"UndefParent\.Nested\.html".*UndefParent\.Nested.*<\/li>}ms
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CustomBehaviour.html".*CustomBehaviour.*<\/li>}ms
+    content = File.read!("#{output_dir}/sidebar_items.js")
+    assert content =~ ~r{.*"CompiledWithDocs\".*}ms
+    assert content =~ ~r{.*"CompiledWithDocs\".*\"example\/2\".*}ms
+    assert content =~ ~r{.*"CompiledWithDocs.Nested\".*}ms
+    assert content =~ ~r{.*"UndefParent\.Nested\".*}ms
+    assert content =~ ~r{.*"CustomBehaviour\".*}ms
     refute content =~ ~r{UndefParent\.Undocumented}ms
 
-    content = File.read!("#{output_dir}/exceptions_list.html")
-    assert content =~ ~r{<li(\ [^>]*)?>.*"RandomError\.html".*RandomError.*<\/li>}ms
+    assert content =~ ~r{.*"RandomError\".*}ms
 
-    content = File.read!("#{output_dir}/protocols_list.html")
-    assert content =~ ~r{<li(\ [^>]*)?>.*"CustomProtocol\.html".*CustomProtocol.*<\/li>}ms
+    assert content =~ ~r{.*"CustomProtocol\".*}ms
   end
 
   test "run generates the overview file" do
@@ -82,8 +80,8 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates the readme file" do
     HTML.run(get_modules, doc_config)
 
-    assert File.regular?("#{output_dir}/README.html")
-    content = File.read!("#{output_dir}/README.html")
+    assert File.regular?("#{output_dir}/index.html")
+    content = File.read!("#{output_dir}/index.html")
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code>TypesAndSpecs.Sub</code></a>}
