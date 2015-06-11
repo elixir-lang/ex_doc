@@ -22,19 +22,23 @@ defmodule ExDoc.Formatter.HTML do
     exceptions = filter_list(:exceptions, all)
     protocols  = filter_list(:protocols, all)
 
-    generate_overview(modules, exceptions, protocols, output, config, has_readme)
+    generate_overview(modules, exceptions, protocols, output, config, has_readme, config.main)
     generate_sidebar_items(modules, exceptions, protocols, output)
     generate_list(modules, all, output, config, has_readme)
     generate_list(exceptions, all, output, config, has_readme)
     generate_list(protocols, all, output, config, has_readme)
 
+    if config.main do
+      generate_main(output, config)
+    end
+
     Path.join(config.output, "index.html")
   end
 
-  defp generate_overview(modules, exceptions, protocols, output, config, has_readme) do
-    content = Templates.overview_template(config, modules, exceptions, protocols, has_readme)
+  defp generate_overview(modules, exceptions, protocols, output, config, has_readme, has_main) do
+    content = Templates.overview_template(config, modules, exceptions, protocols, has_readme, has_main)
 
-    if has_readme do
+    if has_readme || has_main do
       :ok = File.write("#{output}/overview.html", content)
     else
       :ok = File.write("#{output}/index.html", content)
@@ -64,6 +68,11 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
+  defp generate_main(output, config) do
+    File.cp!("#{output}/#{config.main}.html", "#{output}/index.html")
+    true
+  end
+
   defp generate_readme(output, modules, config) do
     readme_path = Path.expand(config.readme)
     write_readme(output, File.read(readme_path), modules, config)
@@ -72,7 +81,13 @@ defmodule ExDoc.Formatter.HTML do
   defp write_readme(output, {:ok, content}, modules, config) do
     content = Autolink.project_doc(content, modules)
     readme_html = Templates.readme_template(config, content) |> pretty_codeblocks
-    File.write("#{output}/index.html", readme_html)
+
+    if config.main do
+      File.write("#{output}/readme.html", readme_html)
+    else
+      File.write("#{output}/index.html", readme_html)
+    end
+
     true
   end
 
