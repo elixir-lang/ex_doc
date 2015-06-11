@@ -2,7 +2,7 @@
     <%= sidebar_template(config, has_readme) %>
     <section id="content">
       <div class="breadcrumbs">
-        <%= if has_readme do %>
+        <%= if has_readme || has_main do %>
           <%= page_breadcrumbs(config, "Overview", "overview.html") %>
         <% else %>
           <%= page_breadcrumbs(config, "Overview", "index.html") %>

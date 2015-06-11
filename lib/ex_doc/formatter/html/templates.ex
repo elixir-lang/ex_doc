@@ -102,7 +102,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    overview_template: [:config, :modules, :exceptions, :protocols, :has_readme],
+    overview_template: [:config, :modules, :exceptions, :protocols, :has_readme, :has_main],
     sidebar_template: [:config, :has_readme],
     sidebar_items_template: [:input],
     sidebar_items_keys_template: [:node],

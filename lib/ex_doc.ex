@@ -23,7 +23,7 @@ defmodule ExDoc do
     preconfig = %Config{
       project: project,
       version: version,
-      main: options[:main] || project,
+      main: options[:main],
       homepage_url: options[:homepage_url],
       source_root: options[:source_root] || File.cwd!,
     }
