@@ -1,4 +1,12 @@
-<section id="sidebar">
+<div class="row row-offcanvas row-offcanvas-left">
+<section id="sidebar" class="col-xs-6 col-sm-3 sidebar-offcanvas">
+<div data-spy="affix" data-offset-top="0" data-offset-bottom="0">
+  <p class="pull-right visible-xs">
+  <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
+    <span class="glyphicon glyphicon-remove"></span>
+  </button>
+  </p>
+
   <h1 id="full_list_header">
     <%= if url = config.homepage_url || config.source_url do %>
       <a href="<%= url %>"><%= config.project %> v<%= config.version %></a>
@@ -28,7 +36,19 @@
     <span><a id="protocols_list" href="#full_list">Protocols</a></span>
   </div>
 
-  <div id="search"><input type="search" id="search_field" placeholder="Search" autocomplete="off" autofocus="autofocus" results="0" /></div>
+  <div id="search" class="row">
+    <div class="col-xs-10">
+      <div class="input-group input-group-sm">
+        <input type="text" id="search_field" class="form-control" placeholder="Search" autocomplete="off" autofocus="autofocus" results="0">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
+        </span>
+      </div><!-- /input-group -->
+    </div><!-- /.col-xs-10 -->
+    <div class="col-xs-2" id="spinning">
+      <span></span>
+    </div><!-- /.col-xs-2 -->
+  </div><!-- /#search .row -->
 
   <script src="sidebar_items.js" defer></script>
 
@@ -36,4 +56,11 @@
   </ul>
 
   <div id="no_results"></div>
-</section>
+</div><!-- /.affix -->
+</section><!--/.sidebar-offcanvas -->
+<section id="content" class="col-xs-12 col-sm-9">
+  <p class="pull-left visible-xs">
+  <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
+    <span class="glyphicon glyphicon-menu-hamburger"></span>
+  </button>
+  </p>

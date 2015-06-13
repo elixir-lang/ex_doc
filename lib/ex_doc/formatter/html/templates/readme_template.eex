@@ -1,7 +1,6 @@
-<%= head_template(%{id: :readme, content: config}) %>
+    <%= head_template(%{id: :readme, content: config}) %>
     <%= sidebar_template(config, true) %>
-    <section id="content">
+
       <div class="breadcrumbs"><%= page_breadcrumbs(config, "README", "index.html") %></div>
       <%= to_html(content) %>
-    </section>
     <%= footer_template %>
