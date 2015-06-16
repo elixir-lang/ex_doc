@@ -132,7 +132,9 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_list(nodes, all, output, config, has_readme) do
-    Enum.each nodes, &generate_module_page(&1, all, output, config, has_readme)
+    nodes
+    |> Enum.map(&Task.async(fn -> generate_module_page(&1, all, output, config, has_readme) end))
+    |> Enum.map(&Task.await/1)
   end
 
   defp generate_module_page(node, modules, output, config, has_readme) do
