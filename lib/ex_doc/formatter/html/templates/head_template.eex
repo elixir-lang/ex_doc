@@ -16,5 +16,6 @@
 
     <link rel="stylesheet" href="css/elixir.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">
   </head>
   <body>

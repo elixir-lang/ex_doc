@@ -2,7 +2,7 @@ defmodule ExDoc.CLI do
   def run(args, generator \\ &ExDoc.generate_docs/3) do
     {opts, args, _} = OptionParser.parse(args,
                aliases: [o: :output, f: :formatter, u: :source_url, r: :source_root,
-                         m: :main, p: :homepage_url, c: :config])
+                         m: :main, p: :homepage_url, c: :config, i: :favicon])
 
     [project, version, source_beam] = parse_args(args)
 
@@ -72,6 +72,7 @@ defmodule ExDoc.CLI do
       --source-ref       Branch/commit/tag used for source link inference, default: master
       -m, --main         The main, entry-point module in docs
       -p  --homepage-url URL to link to for the site name
+      -i, --favicon      Path to the favorite icon file
 
     ## Source linking
 

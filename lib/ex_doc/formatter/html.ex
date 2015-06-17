@@ -15,6 +15,7 @@ defmodule ExDoc.Formatter.HTML do
     :ok = File.mkdir_p output
 
     generate_assets(output, config)
+    generate_favicon(output, config)
     has_readme = config.readme && generate_readme(output, modules, config)
 
     all = Autolink.all(modules)
@@ -66,6 +67,19 @@ defmodule ExDoc.Formatter.HTML do
         File.copy file, "#{output}/#{base}"
       end
     end
+  end
+
+  defp generate_favicon(output, config) do
+    File.mkdir output
+    output = "#{output}/favicon.ico"
+
+    if config.favicon && Path.extname(config.favicon) == ".ico" do
+      favicon_path = Path.expand(config.favicon)
+    else
+      favicon_path = templates_path("assets/favicon.ico")
+    end
+
+    File.copy!(favicon_path, output)
   end
 
   defp generate_main(output, config) do
