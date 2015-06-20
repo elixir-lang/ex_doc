@@ -10,9 +10,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   """
   def module_page(node, config, all, has_readme) do
     types       = node.typespecs
-    functions   = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :def}, &1)
-    macros      = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :defmacro}, &1)
-    callbacks   = Enum.filter node.docs, &match?(%ExDoc.FunctionNode{type: :defcallback}, &1)
+    functions   = Enum.filter node.docs, & &1.type in [:def]
+    macros      = Enum.filter node.docs, & &1.type in [:defmacro]
+    callbacks   = Enum.filter node.docs, & &1.type in [:defcallback, :defmacrocallback]
     module_template(config, node, types, functions, macros, callbacks, all, has_readme)
   end
 
@@ -30,10 +30,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
   # Get the pretty name of a function node
   defp pretty_type(%ExDoc.FunctionNode{type: t}) do
     case t do
-      :def          -> "function"
-      :defmacro     -> "macro"
-      :defcallback  -> "callback"
-      :type         -> "type"
+      :def              -> "function"
+      :defmacro         -> "macro"
+      :defcallback      -> "callback"
+      :defmacrocallback -> "macro callback"
+      :type             -> "type"
     end
   end
 
@@ -41,9 +42,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp link_id(node), do: link_id(node.id, node.type)
   defp link_id(id, type) do
     case type do
-      :defcallback  -> "c:#{id}"
-      :type         -> "t:#{id}"
-      _             -> "#{id}"
+      :defmacrocallback -> "c:#{id}"
+      :defcallback      -> "c:#{id}"
+      :type             -> "t:#{id}"
+      _                 -> "#{id}"
     end
   end
 
@@ -72,16 +74,16 @@ defmodule ExDoc.Formatter.HTML.Templates do
   #
   # If module is :overview generates the breadcrumbs for the overview.
   defp module_breadcrumbs(config, modules, module) do
-    parts = [root_breadcrumbs(config), { "Overview", "overview.html" }]
+    parts = [root_breadcrumbs(config), {"Overview", "overview.html"}]
     aliases = Module.split(module.module)
     modules = Enum.map(modules, &(&1.module))
 
-    { crumbs, _ } =
+    {crumbs, _} =
       Enum.map_reduce(aliases, [], fn item, parents ->
         path = parents ++ [item]
         mod  = Module.concat(path)
         page = if mod in modules, do: inspect(mod) <> ".html"
-        { { item, page }, path }
+        {{item, page}, path}
       end)
 
     generate_breadcrumbs(parts ++ crumbs)
@@ -92,7 +94,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   defp root_breadcrumbs(config) do
-    { "#{config.project} v#{config.version}", nil }
+    {"#{config.project} v#{config.version}", nil}
   end
 
   defp generate_breadcrumbs(crumbs) do

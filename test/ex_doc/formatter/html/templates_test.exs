@@ -149,11 +149,15 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   ## BEHAVIOURS
 
   test "module_page outputs behavior and callbacks" do
-    content = get_module_page([CustomBehaviour])
-
-    assert content =~ ~r{<h1>\s*CustomBehaviour\s*<small>behaviour</small>\s*</h1>}m
+    content = get_module_page([CustomBehaviourOne])
+    assert content =~ ~r{<h1>\s*CustomBehaviourOne\s*<small>behaviour</small>\s*</h1>}m
     assert content =~ ~r{Callbacks}
     assert content =~ ~r{<div class="detail_header" id="c:hello/1">}
+
+    content = get_module_page([CustomBehaviourTwo])
+    assert content =~ ~r{<h1>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*</h1>}m
+    assert content =~ ~r{Callbacks}
+    assert content =~ ~r{<div class="detail_header" id="c:bye/1">}
   end
 
   ## PROTOCOLS

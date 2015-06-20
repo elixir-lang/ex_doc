@@ -59,7 +59,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{.*"CompiledWithDocs\".*\"example\/2\".*}ms
     assert content =~ ~r{.*"CompiledWithDocs.Nested\".*}ms
     assert content =~ ~r{.*"UndefParent\.Nested\".*}ms
-    assert content =~ ~r{.*"CustomBehaviour\".*}ms
+    assert content =~ ~r{.*"CustomBehaviourOne\".*}ms
+    assert content =~ ~r{.*"CustomBehaviourTwo\".*}ms
     refute content =~ ~r{UndefParent\.Undocumented}ms
 
     assert content =~ ~r{.*"RandomError\".*}ms

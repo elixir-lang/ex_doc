@@ -1,4 +1,4 @@
-defmodule CustomBehaviour do
+defmodule CustomBehaviourOne do
   use Behaviour
 
   @doc """
@@ -13,15 +13,15 @@ defmodule CustomBehaviourTwo do
   @doc """
   This is a different sample callback.
   """
-  defcallback bye(integer) :: integer
+  defmacrocallback bye(integer) :: integer
 end
 
 defmodule CustomBehaviourImpl do
-  @behaviour CustomBehaviour
+  @behaviour CustomBehaviourOne
   @behaviour CustomBehaviourTwo
 
   def hello(i), do: i
 
   @doc "A doc for this so it doesn't use 'Callback implementation for'"
-  def bye(i), do: i
+  defmacro bye(i), do: i
 end

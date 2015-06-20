@@ -128,22 +128,30 @@ defmodule ExDoc.RetrieverTest do
   ## BEHAVIOURS
 
   test "ignore behaviours internal functions" do
-    [node] = docs_from_files ["CustomBehaviour"]
+    [node] = docs_from_files ["CustomBehaviourOne"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["hello/1"]
     assert hd(node.docs).type == :defcallback
     assert hd(node.docs).signature == "hello/1"
   end
 
+  test "retrieves macro callbacks from behaviours" do
+    [node] = docs_from_files ["CustomBehaviourTwo"]
+    functions = Enum.map node.docs, fn(doc) -> doc.id end
+    assert functions == ["bye/1"]
+    assert hd(node.docs).type == :defmacrocallback
+    assert hd(node.docs).signature == "bye/1"
+  end
+
   test "undocumented callback implementations get default doc" do
-    [node] = docs_from_files(["CustomBehaviour", "CustomBehaviourTwo", "CustomBehaviourImpl"])
+    [node] = docs_from_files(["CustomBehaviourOne", "CustomBehaviourTwo", "CustomBehaviourImpl"])
              |> Enum.filter(&match?(%ExDoc.ModuleNode{id: "CustomBehaviourImpl"}, &1))
     docs = node.docs
     assert Enum.map(docs, &(&1.id)) == ["bye/1", "hello/1"]
     assert Enum.at(docs, 0).doc ==
       "A doc for this so it doesn't use 'Callback implementation for'"
     assert Enum.at(docs, 1).doc ==
-      "Callback implementation for `c:CustomBehaviour.hello/1`."
+      "Callback implementation for `c:CustomBehaviourOne.hello/1`."
   end
 
   ## PROTOCOLS

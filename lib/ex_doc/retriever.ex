@@ -100,7 +100,7 @@ defmodule ExDoc.Retriever do
                       &get_callback(&1, source_path, source_url, callbacks))
     end
 
-    { line, moduledoc } = Code.get_docs(module, :moduledoc)
+    {line, moduledoc} = Code.get_docs(module, :moduledoc)
 
     %ExDoc.ModuleNode{
       id: inspect(module),
@@ -135,12 +135,12 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp spec_name(name, arity, :defmacro), do: { String.to_atom("MACRO-" <> to_string(name)), arity + 1 }
-  defp spec_name(name, arity, _), do: { name, arity }
+  defp spec_name(name, arity, :defmacro), do: {String.to_atom("MACRO-" <> to_string(name)), arity + 1}
+  defp spec_name(name, arity, _), do: {name, arity}
 
   defp get_function(function, source_path, source_url, all_specs, cb_impls) do
-    { { name, arity }, line, type, signature, doc } = function
-    behaviour = Dict.get(cb_impls, { name, arity })
+    {{name, arity}, line, type, signature, doc} = function
+    behaviour = Dict.get(cb_impls, {name, arity})
 
     doc =
       if is_nil(doc) && behaviour do
@@ -166,9 +166,9 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_callback(callback, source_path, source_url, callbacks) do
-    { { name, arity }, line, kind, doc } = callback
+    {{name, arity}, line, kind, doc} = callback
 
-    specs = Dict.get(callbacks, { name, arity }, [])
+    specs = Dict.get(callbacks, {name, arity}, [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
