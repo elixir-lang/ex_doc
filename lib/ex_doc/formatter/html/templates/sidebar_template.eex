@@ -23,9 +23,9 @@
   </h2>
 
   <div class="nav">
-    <span class="selected"><a id="modules_list" href="#">Modules</a></span>
-    <span><a id="exceptions_list" href="#">Exceptions</a></span>
-    <span><a id="protocols_list" href="#">Protocols</a></span>
+    <span class="selected"><a id="modules_list" href="#full_list">Modules</a></span>
+    <span><a id="exceptions_list" href="#full_list">Exceptions</a></span>
+    <span><a id="protocols_list" href="#full_list">Protocols</a></span>
   </div>
 
   <div id="search"><input type="search" id="search_field" placeholder="Search" autocomplete="off" autofocus="autofocus" results="0" /></div>
