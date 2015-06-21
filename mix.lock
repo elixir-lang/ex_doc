@@ -1,3 +1,3 @@
 %{"earmark": {:hex, :earmark, "0.1.17"},
-  "hoedown": {:git, "git://github.com/hoedown/hoedown.git", "2a4cf17c70e6572ed42cdca3ea7ca3e768ed17be", []},
-  "markdown": {:git, "git://github.com/devinus/markdown.git", "cd0df79b6f1cc374499d47f6ba6aaab5096f874f", []}}
+  "hoedown": {:git, "https://github.com/hoedown/hoedown.git", "d52bd1ca0f2de3fa946873831d25e85440aa8cda", []},
+  "markdown": {:git, "https://github.com/devinus/markdown.git", "cd0df79b6f1cc374499d47f6ba6aaab5096f874f", []}}
