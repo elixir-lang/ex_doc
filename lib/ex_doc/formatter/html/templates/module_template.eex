@@ -1,7 +1,13 @@
     <%= head_template(%{id: :module, content: module.id}) %>
     <%= sidebar_template(config, has_readme) %>
 
-      <div class="breadcrumbs"><%= module_breadcrumbs(config, all, module) %></div>
+      <div class="breadcrumbs">
+        <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
+          <span class="glyphicon glyphicon-menu-hamburger"></span>
+        </button>
+        <%= module_breadcrumbs(config, all, module) %>
+      </div>
+
       <h1>
         <%= module.id %>
         <%= if module.type do %>

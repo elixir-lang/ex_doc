@@ -2,11 +2,14 @@
     <%= sidebar_template(config, has_readme) %>
 
       <div class="breadcrumbs">
+        <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
+          <span class="glyphicon glyphicon-menu-hamburger"></span>
+        </button>
         <%= if has_readme || has_main do %>
           <%= page_breadcrumbs(config, "Overview", "overview.html") %>
         <% else %>
           <%= page_breadcrumbs(config, "Overview", "index.html") %>
-      <% end %>
+        <% end %>
       </div>
 
       <h1><%= config.project %> v<%= config.version %></h1>

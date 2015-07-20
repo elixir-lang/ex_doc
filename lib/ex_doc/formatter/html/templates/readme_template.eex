@@ -1,6 +1,12 @@
-    <%= head_template(%{id: :readme, content: config}) %>
-    <%= sidebar_template(config, true) %>
+<%= head_template(%{id: :readme, content: config}) %>
+<%= sidebar_template(config, true) %>
 
-      <div class="breadcrumbs"><%= page_breadcrumbs(config, "README", "index.html") %></div>
-      <%= to_html(content) %>
-    <%= footer_template %>
+<div class="breadcrumbs">
+  <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
+    <span class="glyphicon glyphicon-menu-hamburger"></span>
+  </button>
+  <%= page_breadcrumbs(config, "README", "index.html") %>
+</div>
+
+<%= to_html(content) %>
+<%= footer_template %>

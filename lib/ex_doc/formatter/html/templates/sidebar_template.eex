@@ -59,8 +59,3 @@
 </div><!-- /.affix -->
 </section><!--/.sidebar-offcanvas -->
 <section id="content" class="col-xs-12 col-sm-9">
-  <p class="pull-left visible-xs">
-  <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
-    <span class="glyphicon glyphicon-menu-hamburger"></span>
-  </button>
-  </p>

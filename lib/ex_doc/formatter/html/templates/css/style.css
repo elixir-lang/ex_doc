@@ -396,7 +396,11 @@ li.r2 {
 }
 
 div.breadcrumbs {
-  padding-bottom: 0.5em;
+  padding: 3px 6px;
+  background-color: #EEE;
+  margin: 0 -6px 10px;
+  line-height: 28px;
+  display: block;
 }
 
 /* SUMMARY LINKS */
@@ -595,16 +599,12 @@ pre {
     width: 50%; /* 6 columns */
   }
 
-  .pull-left button {
-    margin: 5px 10px 0 5px;
-  }
-
   .pull-right button {
-    margin: 6px 5px 0 0;
+    margin: 3px 6px 0 0;
   }
 
   #content {
-      padding-left: 20px;
+    padding-left: 20px;
   }
 }
 /*
@@ -621,6 +621,9 @@ pre {
   }
   .affix {
     top: 0;
+  }
+  div.breadcrumbs button {
+    display: none;
   }
 }
 @media screen and (max-width: 767px) {
@@ -642,5 +645,9 @@ pre {
     -webkit-transition: all .25s ease-out;
          -o-transition: all .25s ease-out;
             transition: all .25s ease-out;
+  }
+
+  div.breadcrumbs button {
+    display: block;
   }
 }
