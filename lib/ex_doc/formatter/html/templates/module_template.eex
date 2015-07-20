@@ -1,7 +1,6 @@
-<%= head_template(%{id: :module, content: module.id}) %>
+    <%= head_template(%{id: :module, content: module.id}) %>
     <%= sidebar_template(config, has_readme) %>
 
-    <section id="content">
       <div class="breadcrumbs"><%= module_breadcrumbs(config, all, module) %></div>
       <h1>
         <%= module.id %>
@@ -72,5 +71,4 @@
           <%= for node <- callbacks, do: detail_template(node, module) %>
         </section>
       <% end %>
-    </section>
     <%= footer_template %>

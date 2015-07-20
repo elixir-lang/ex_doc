@@ -1,6 +1,6 @@
-<%= head_template(%{id: :overview, content: config}) %>
+    <%= head_template(%{id: :overview, content: config}) %>
     <%= sidebar_template(config, has_readme) %>
-    <section id="content">
+
       <div class="breadcrumbs">
         <%= if has_readme || has_main do %>
           <%= page_breadcrumbs(config, "Overview", "overview.html") %>
@@ -43,5 +43,4 @@
           <%= for node <- protocols, do: overview_entry_template(node) %>
         </table>
       <% end %>
-    </section>
     <%= footer_template %>
