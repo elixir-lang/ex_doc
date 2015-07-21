@@ -39,6 +39,7 @@
   <div id="search" class="row">
     <div class="col-xs-10">
       <div class="input-group input-group-sm">
+        <label for="search_field" class="sr-only">Search</label>
         <input type="text" id="search_field" class="form-control" placeholder="Search" autocomplete="off" autofocus="autofocus" results="0">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
