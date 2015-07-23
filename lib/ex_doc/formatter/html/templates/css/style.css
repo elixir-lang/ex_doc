@@ -418,6 +418,11 @@ ul.summary_links li {
   background: #f0f0f0;
 }
 
+/* EXTERNAL LINKS */
+#content a.external span {
+  padding-left: 3px;
+}
+
 /* DOCSTRING */
 
 section.docstring,
