@@ -31,7 +31,7 @@
   </h2>
 
   <div class="nav">
-    <span class="selected"><a id="modules_list" href="#full_list">Modules</a></span>
+    <span><a id="modules_list" href="#full_list">Modules</a></span>
     <span><a id="exceptions_list" href="#full_list">Exceptions</a></span>
     <span><a id="protocols_list" href="#full_list">Protocols</a></span>
   </div>
