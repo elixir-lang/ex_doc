@@ -1,5 +1,5 @@
     <%= head_template(%{id: :overview, content: config}) %>
-    <%= sidebar_template(config, has_readme) %>
+    <%= sidebar_template(config, modules, exceptions, protocols, has_readme) %>
 
       <div class="breadcrumbs">
         <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">

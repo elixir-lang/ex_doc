@@ -9,19 +9,19 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generate HTML documentation for the given modules
   """
-  def run(modules, config)  do
+  def run(module_nodes, config)  do
     output = Path.expand(config.output)
     File.rm_rf! output
     :ok = File.mkdir_p output
 
     generate_assets(output, config)
-    has_readme = config.readme && generate_readme(output, modules, config)
 
-    all = Autolink.all(modules)
+    all = Autolink.all(module_nodes)
     modules    = filter_list(:modules, all)
     exceptions = filter_list(:exceptions, all)
     protocols  = filter_list(:protocols, all)
 
+    has_readme = config.readme && generate_readme(output, module_nodes, config, modules, exceptions, protocols)
     generate_overview(modules, exceptions, protocols, output, config, has_readme, config.main)
     generate_sidebar_items(modules, exceptions, protocols, output)
     generate_list(modules, all, output, config, has_readme)
@@ -74,14 +74,14 @@ defmodule ExDoc.Formatter.HTML do
     true
   end
 
-  defp generate_readme(output, modules, config) do
+  defp generate_readme(output, module_nodes, config, modules, exceptions, protocols) do
     readme_path = Path.expand(config.readme)
-    write_readme(output, File.read(readme_path), modules, config)
+    write_readme(output, File.read(readme_path), module_nodes, config, modules, exceptions, protocols)
   end
 
-  defp write_readme(output, {:ok, content}, modules, config) do
-    content = Autolink.project_doc(content, modules)
-    readme_html = Templates.readme_template(config, content) |> pretty_codeblocks
+  defp write_readme(output, {:ok, content}, module_nodes, config, modules, exceptions, protocols) do
+    content = Autolink.project_doc(content, module_nodes)
+    readme_html = Templates.readme_template(config, modules, exceptions, protocols, content) |> pretty_codeblocks
 
     if config.main do
       File.write("#{output}/readme.html", readme_html)
@@ -92,7 +92,7 @@ defmodule ExDoc.Formatter.HTML do
     true
   end
 
-  defp write_readme(_, _, _, _) do
+  defp write_readme(_, _, _, _, _, _, _) do
     false
   end
 
@@ -120,15 +120,15 @@ defmodule ExDoc.Formatter.HTML do
      protocols: filter_list(:protocols, nodes)]
   end
 
-  defp filter_list(:modules, nodes) do
+  def filter_list(:modules, nodes) do
     Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when not x in [:exception, :protocol, :impl], &1)
   end
 
-  defp filter_list(:exceptions, nodes) do
+  def filter_list(:exceptions, nodes) do
     Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:exception], &1)
   end
 
-  defp filter_list(:protocols, nodes) do
+  def filter_list(:protocols, nodes) do
     Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:protocol], &1)
   end
 

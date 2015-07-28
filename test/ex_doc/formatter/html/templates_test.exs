@@ -1,6 +1,7 @@
 defmodule ExDoc.Formatter.HTML.TemplatesTest do
   use ExUnit.Case, async: true
 
+  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates
 
   defp source_url do
@@ -20,7 +21,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   defp get_module_page(names) do
     mods = names
            |> ExDoc.Retriever.docs_from_modules(doc_config)
-           |> ExDoc.Formatter.HTML.Autolink.all()
+           |> HTML.Autolink.all()
 
     Templates.module_page(hd(mods), doc_config, mods, false)
   end
@@ -28,22 +29,43 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   ## LISTING
 
   test "site title text links to homepage_url when set" do
-    content = Templates.sidebar_template(doc_config, false)
+    content = Templates.sidebar_template(doc_config, [], [], [], false)
     assert content =~ ~r{<a href="#{homepage_url}">Elixir v1.0.1</a>}
+  end
+
+  test "Disable nav links when module type is empty" do
+    content = Templates.sidebar_template(doc_config, [], [], [], false)
+    assert content =~ ~r{<span role="presentation" class="disabled">Modules</span>}
+    assert content =~ ~r{<span role="presentation" class="disabled">Exceptions</span>}
+    assert content =~ ~r{<span role="presentation" class="disabled">Protocols</span>}
+  end
+
+  test "Enable nav link when module type have at least one element" do
+    names = [CompiledWithDocs, CompiledWithDocs.Nested]
+    nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
+    all = HTML.Autolink.all(nodes)
+    modules    = HTML.filter_list(:modules, all)
+    exceptions = HTML.filter_list(:exceptions, all)
+    protocols  = HTML.filter_list(:protocols, all)
+
+    content = Templates.sidebar_template(doc_config, modules, exceptions, protocols, false)
+    assert content =~ ~r{<span><a id="modules_list" href="#full_list">Modules</a></span>}
+    assert content =~ ~r{<span role="presentation" class="disabled">Exceptions</span>}
+    assert content =~ ~r{<span role="presentation" class="disabled">Protocols</span>}
   end
 
   test "site title text links to source_url when there is no homepage_url" do
     doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                   source_url: source_url,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.sidebar_template(doc_config_without_source_url, false)
+    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [], false)
     assert content =~ ~r{<a href="#{source_url}">Elixir v1.0.1</a>}
   end
 
   test "site title text creates no link when there is no homepage_url or source_url" do
     doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.sidebar_template(doc_config_without_source_url, false)
+    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [], false)
     assert content =~ ~r{Elixir v1.0.1}
   end
 
@@ -62,12 +84,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   test "listing page has README link if present" do
-    content = Templates.sidebar_template(doc_config, true)
+    content = Templates.sidebar_template(doc_config, [], [], [], true)
     assert content =~ ~r{<a href="index.html">README</a>}
   end
 
   test "listing page doesn't have README link if not present" do
-    content = Templates.sidebar_template(doc_config, false)
+    content = Templates.sidebar_template(doc_config, [], [], [], false)
     refute content =~ ~r{<a href="index.html">README</a>}
   end
 
