@@ -31,9 +31,21 @@
   </h2>
 
   <div class="nav">
-    <span><a id="modules_list" href="#full_list">Modules</a></span>
-    <span><a id="exceptions_list" href="#full_list">Exceptions</a></span>
-    <span><a id="protocols_list" href="#full_list">Protocols</a></span>
+    <%= if Enum.empty?(modules) do %>
+      <span role="presentation" class="disabled">Modules</span>
+    <% else %>
+      <span><a id="modules_list" href="#full_list">Modules</a></span>
+    <% end %>
+    <%= if Enum.empty?(exceptions) do %>
+      <span role="presentation" class="disabled">Exceptions</span>
+    <% else %>
+      <span><a id="exceptions_list" href="#full_list">Exceptions</a></span>
+    <% end %>
+    <%= if Enum.empty?(protocols) do %>
+      <span role="presentation" class="disabled">Protocols</span>
+    <% else %>
+      <span><a id="protocols_list" href="#full_list">Protocols</a></span>
+    <% end %>
   </div>
 
   <div id="search" class="row">

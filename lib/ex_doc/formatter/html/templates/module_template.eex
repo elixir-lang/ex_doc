@@ -1,5 +1,6 @@
     <%= head_template(%{id: :module, content: module.id}) %>
-    <%= sidebar_template(config, has_readme) %>
+    <%= alias ExDoc.Formatter.HTML, as: H %>
+    <%= sidebar_template(config, H.filter_list(:modules, all), H.filter_list(:exceptions, all), H.filter_list(:protocols, all), has_readme) %>
 
       <div class="breadcrumbs">
         <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">

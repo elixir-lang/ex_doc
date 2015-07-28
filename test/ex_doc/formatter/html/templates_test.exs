@@ -28,7 +28,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   ## LISTING
 
   test "site title text links to homepage_url when set" do
-    content = Templates.sidebar_template(doc_config, false)
+    content = Templates.sidebar_template(doc_config, [], [], [], false)
     assert content =~ ~r{<a href="#{homepage_url}">Elixir v1.0.1</a>}
   end
 
@@ -36,14 +36,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                   source_url: source_url,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.sidebar_template(doc_config_without_source_url, false)
+    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [], false)
     assert content =~ ~r{<a href="#{source_url}">Elixir v1.0.1</a>}
   end
 
   test "site title text creates no link when there is no homepage_url or source_url" do
     doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.sidebar_template(doc_config_without_source_url, false)
+    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [], false)
     assert content =~ ~r{Elixir v1.0.1}
   end
 
@@ -62,12 +62,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   test "listing page has README link if present" do
-    content = Templates.sidebar_template(doc_config, true)
+    content = Templates.sidebar_template(doc_config, [], [], [], true)
     assert content =~ ~r{<a href="index.html">README</a>}
   end
 
   test "listing page doesn't have README link if not present" do
-    content = Templates.sidebar_template(doc_config, false)
+    content = Templates.sidebar_template(doc_config, [], [], [], false)
     refute content =~ ~r{<a href="index.html">README</a>}
   end
 
