@@ -79,14 +79,14 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   end
 
   test "autolink modules in docs" do
-    assert Autolink.project_modules("`MyModule`", ["MyModule"]) == "[`MyModule`](MyModule.html)"
-    assert Autolink.project_modules("`MyModule.Nested`", ["MyModule.Nested"]) == "[`MyModule.Nested`](MyModule.Nested.html)"
-    assert Autolink.project_modules("`MyModule.Nested.Deep`", ["MyModule.Nested.Deep"]) ==
-      "[`MyModule.Nested.Deep`](MyModule.Nested.Deep.html)"
+    assert Autolink.project_modules("`MyModule`", ["MyModule"], "MyModule") == "[`MyModule`](MyModule.html#content)"
+    assert Autolink.project_modules("`MyModule.Nested`", ["MyModule.Nested"], "MyModule.Nested") == "[`MyModule.Nested`](MyModule.Nested.html#content)"
+    assert Autolink.project_modules("`MyModule.Nested.Deep`", ["MyModule.Nested.Deep"], "MyModule.Nested.Deep") ==
+      "[`MyModule.Nested.Deep`](MyModule.Nested.Deep.html#content)"
   end
 
   test "autolink modules doesn't link functions" do
-    assert Autolink.project_modules("`Mod.example/1`", ["Mod"]) == "`Mod.example/1`"
+    assert Autolink.project_modules("`Mod.example/1`", ["Mod"], "Mod") == "`Mod.example/1`"
   end
 
   test "autolink doesn't create links for pre-linked Mod docs" do
