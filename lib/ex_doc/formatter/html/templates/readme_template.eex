@@ -5,7 +5,7 @@
   <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
     <span class="glyphicon glyphicon-menu-hamburger"></span>
   </button>
-  <%= page_breadcrumbs(config, "README", "index.html") %>
+  <%= page_breadcrumbs(config, "README", "index.html#content") %>
 </div>
 
 <%= to_html(content) %>
