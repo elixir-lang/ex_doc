@@ -22,19 +22,19 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     locals = Enum.map module.docs, &(doc_prefix(&1) <> &1.id)
 
     if moduledoc = module.moduledoc do
-      moduledoc = moduledoc |> local_doc(locals) |> project_doc(modules)
+      moduledoc = moduledoc |> local_doc(locals) |> project_doc(modules, module.id)
     end
 
     docs = for node <- module.docs do
       if doc = node.doc do
-        doc = doc |> local_doc(locals) |> project_doc(modules)
+        doc = doc |> local_doc(locals) |> project_doc(modules, module.id)
       end
       %{node | doc: doc}
     end
 
     typedocs = for node <- module.typespecs do
       if doc = node.doc do
-        doc = doc |> local_doc(locals) |> project_doc(modules)
+        doc = doc |> local_doc(locals) |> project_doc(modules, module.id)
       end
       %{node | doc: doc}
     end
@@ -152,12 +152,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @doc """
   Creates links to modules and functions defined in the project.
   """
-  def project_doc(bin, modules) when is_binary(bin) do
+  def project_doc(bin, modules, module_id \\ nil) when is_binary(bin) do
     project_funs = for m <- modules, d <- m.docs, do: doc_prefix(d) <> m.id <> "." <> d.id
     project_modules = modules |> Enum.map(&module_to_string/1) |> Enum.uniq
     bin
     |> project_functions(project_funs)
-    |> project_modules(project_modules)
+    |> project_modules(project_modules, module_id)
     |> erlang_functions
   end
 
@@ -195,15 +195,19 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   or trailing `]`, e.g. `[my link Module is here](url)`, the Module
   will get translated to the new href of the module.
   """
-  def project_modules(bin, modules) when is_binary(bin) do
+  def project_modules(bin, modules, module_id \\ nil) when is_binary(bin) do
     Regex.scan(~r{(?<!\[)`\s*(([A-Z][A-Za-z]+\.?)+)\s*`(?!\])}, bin)
     |> Enum.uniq
     |> List.flatten
     |> Enum.filter(&(&1 in modules))
     |> Enum.reduce(bin, fn (x, acc) ->
          escaped = Regex.escape(x)
+         suffix = ".html"
+         if module_id && x == module_id do
+           suffix = suffix <> "#content"
+         end
          Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
-           "[`\\1`](\\1.html)")
+           "[`\\1`](\\1" <> suffix <> ")")
        end)
   end
 

@@ -82,7 +82,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
       Enum.map_reduce(aliases, [], fn item, parents ->
         path = parents ++ [item]
         mod  = Module.concat(path)
-        page = if mod in modules, do: inspect(mod) <> ".html"
+        page = if mod in modules, do: inspect(mod) <> ".html#content"
         {{item, page}, path}
       end)
 

@@ -6,9 +6,9 @@
           <span class="glyphicon glyphicon-menu-hamburger"></span>
         </button>
         <%= if has_readme || has_main do %>
-          <%= page_breadcrumbs(config, "Overview", "overview.html") %>
+          <%= page_breadcrumbs(config, "Overview", "overview.html#content") %>
         <% else %>
-          <%= page_breadcrumbs(config, "Overview", "index.html") %>
+          <%= page_breadcrumbs(config, "Overview", "index.html#content") %>
         <% end %>
       </div>
 

@@ -154,12 +154,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     content = get_module_page([CompiledWithDocs])
     assert content =~ ~s{<div class="breadcrumbs">}
     assert content =~ ~s{Elixir v1.0.1 &rarr; <a href="overview.html">Overview</a> } <>
-                      ~s{&rarr; <a href="CompiledWithDocs.html">CompiledWithDocs</a>}
+                      ~s{&rarr; <a href="CompiledWithDocs.html#content">CompiledWithDocs</a>}
   end
 
   test "module_page breadcrumbs do not link to non-existent pages" do
     content = get_module_page([UndefParent.Nested])
-    assert content =~ ~r{&rarr; UndefParent &rarr; <a href="UndefParent.Nested.html">Nested</a>}
+    assert content =~ ~r{&rarr; UndefParent &rarr; <a href="UndefParent.Nested.html#content">Nested</a>}
   end
 
   test "module_page contains links to summary sections when those exist" do
