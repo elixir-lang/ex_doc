@@ -65,13 +65,7 @@ body {
 
 body {
   font: 13px "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif;
-  padding: 0;
-  margin: 0;
   line-height: 1.618;
-}
-
-div.row {
-    padding: 0 5px 0 0;
 }
 
 #sidebar a:link,
@@ -398,7 +392,7 @@ li.r2 {
 div.breadcrumbs {
   padding: 3px 6px;
   background-color: #EEE;
-  margin: 0 -6px 10px;
+  margin: 0 -15px 10px;
   line-height: 28px;
   display: block;
 }
@@ -577,6 +571,35 @@ pre {
  * Off Canvas
  * --------------------------------------------------
  */
+@media screen and (min-width: 767px) {
+  .row-offcanvas {
+    position: relative;
+  }
+
+  .row-offcanvas-left {
+    left: 25%; /* 3 columns */
+    margin-left: 0;
+  }
+
+  .sidebar-offcanvas {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+    border-right: 1px solid #ccc;
+  }
+
+  .sidebar-offcanvas.col-sm-3 {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .breadcrumbs button {
+    display: none;
+  }
+}
+
 @media screen and (max-width: 767px) {
   .row-offcanvas {
     position: relative;
@@ -601,58 +624,35 @@ pre {
   .sidebar-offcanvas {
     position: absolute;
     top: 0;
-    width: 50%; /* 6 columns */
+    left: 0;
+    bottom: 0;
+    overflow: auto;
+    border-right: 1px solid #ccc;
+  }
+
+  .sidebar-offcanvas.col-xs-6 {
+    padding-left: 30px;
+    padding-right: 0;
   }
 
   .pull-right button {
     margin: 3px 6px 0 0;
   }
 
-  #content {
-    padding-left: 20px;
-  }
-}
-/*
- * Affix
- * --------------------------------------------------
- */
-@media screen and (min-width: 767px) {
-  .affix-top,
-  .affix,
-  .affix-bottom {
-    position: fixed;
-    width: 25%;
-    border-right: 1px solid #ccc;
-  }
-  .affix {
-    top: 0;
-  }
-  div.breadcrumbs button {
-    display: none;
-  }
-}
-@media screen and (max-width: 767px) {
-  .row-offcanvas-left .affix,
-  .row-offcanvas-left .affix-top,
-  .row-offcanvas-left .affix-bottom {
-    position: relative;
-    left: -50%;
+  #content.col-xs-12 {
+    padding-left: 30px;
   }
 
-  .row-offcanvas-left.active .affix,
-  .row-offcanvas-left.active .affix-top,
-  .row-offcanvas-left.active .affix-bottom {
-    position: fixed;
-    left: 0 ;
-    max-width: 50%;
-    overflow: hidden;
-    border-right: 1px solid #ccc;
-    -webkit-transition: all .25s ease-out;
-         -o-transition: all .25s ease-out;
-            transition: all .25s ease-out;
+  #content.col-xs-12.offcanvas-active {
+    padding-left: 15px;
   }
 
-  div.breadcrumbs button {
+  .breadcrumbs {
+    margin: 0 -6px 10px;
+  }
+
+  .breadcrumbs button {
     display: block;
   }
+
 }
