@@ -1,6 +1,5 @@
 <div class="row row-offcanvas row-offcanvas-left">
 <section id="sidebar" class="col-xs-6 col-sm-3 sidebar-offcanvas">
-<div data-spy="affix" data-offset-top="0" data-offset-bottom="0">
   <p class="pull-right visible-xs">
   <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
     <span class="glyphicon glyphicon-remove"></span>
@@ -69,6 +68,5 @@
   </ul>
 
   <div id="no_results"></div>
-</div><!-- /.affix -->
 </section><!--/.sidebar-offcanvas -->
 <section id="content" class="col-xs-12 col-sm-9">
