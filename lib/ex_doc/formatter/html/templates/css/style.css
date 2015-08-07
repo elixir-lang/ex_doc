@@ -70,6 +70,10 @@ body {
   line-height: 1.618;
 }
 
+#content {
+  padding: 0 28px 20px 28px;
+}
+
 #sidebar a:link,
 #sidebar a:visited {
   color: #05a;
@@ -404,9 +408,9 @@ li.r2 {
 }
 
 div.breadcrumbs {
-  padding: 3px 6px;
+  padding: 3px 15px;
   background-color: #EEE;
-  margin: 0 -15px 10px;
+  margin: 0 -28px 10px;
   line-height: 28px;
   display: block;
 }
