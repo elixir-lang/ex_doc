@@ -2,7 +2,7 @@
 <section id="sidebar" class="col-xs-6 col-sm-3 sidebar-offcanvas">
   <p class="pull-right visible-xs">
   <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
-    <span class="glyphicon glyphicon-remove"></span>
+    <span class="glyphicon glyphicon-search"></span>
   </button>
   </p>
 
