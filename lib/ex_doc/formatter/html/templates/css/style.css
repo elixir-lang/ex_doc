@@ -372,6 +372,7 @@ table {
   border: 1px solid #aaa;
   border-collapse: collapse;
   margin-top: 1em;
+  empty-cells: show;
 }
 
 table th {
