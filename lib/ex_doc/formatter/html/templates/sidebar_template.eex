@@ -1,3 +1,12 @@
+<header id="header">
+  <%= if url = config.homepage_url || config.source_url do %>
+    <h1><a href="<%= url %>"><%= config.project %></a></h1>
+  <% else %>
+    <h1><%= config.project %></h1>
+  <% end %>
+  <h2>v<%= config.version %></h2>
+</header>
+
 <div class="row row-offcanvas row-offcanvas-left">
 <section id="sidebar" class="col-xs-6 col-sm-3 sidebar-offcanvas">
   <p class="pull-right visible-xs">
@@ -5,14 +14,6 @@
     <span class="glyphicon glyphicon-search"></span>
   </button>
   </p>
-
-  <h1 id="full_list_header">
-    <%= if url = config.homepage_url || config.source_url do %>
-      <a href="<%= url %>"><%= config.project %> v<%= config.version %></a>
-    <% else %>
-      <%= config.project %> v<%= config.version %>
-    <% end %>
-  </h1>
 
   <h2 id="sub_list_header">
     <%= if has_readme do %>
