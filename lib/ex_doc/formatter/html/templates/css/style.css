@@ -483,6 +483,7 @@ a.to_top_link {
 table.summary {
   border: 0;
   border-collapse: separate;
+  width: 100%;
 }
 
 table.summary tr:nth-child(odd) {
@@ -505,6 +506,7 @@ td.summary_signature {
 
 td.summary_synopsis {
   padding-left: 0.5em;
+  width: 90%;
 }
 
 td.summary_synopsis p {
