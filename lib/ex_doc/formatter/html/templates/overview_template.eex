@@ -27,23 +27,29 @@
       </ul>
 
       <%= unless Enum.empty?(modules) do %>
-        <h2 id="modules_summary">Modules summary <%= to_top_link() %></h2>
-        <table class="summary">
-          <%= for node <- modules, do: overview_entry_template(node) %>
-        </table>
+        <section id="modules_summary" class="details_list">
+          <h1>Modules summary</h1>
+          <table class="summary">
+            <%= for node <- modules, do: overview_entry_template(node) %>
+          </table>
+        </section>
       <% end %>
 
       <%= unless Enum.empty?(exceptions) do %>
-        <h2 id="exceptions_summary">Exceptions summary <%= to_top_link() %></h2>
-        <table class="summary">
-          <%= for node <- exceptions, do: overview_entry_template(node) %>
-        </table>
+        <section id="exceptions_summary" class="details_list">
+          <h1>Exceptions summary</h1>
+          <table class="summary">
+            <%= for node <- exceptions, do: overview_entry_template(node) %>
+          </table>
+        </section>
       <% end %>
 
       <%= unless Enum.empty?(protocols) do %>
-        <h2 id="protocols_summary">Protocols summary <%= to_top_link() %></h2>
-        <table class="summary">
-          <%= for node <- protocols, do: overview_entry_template(node) %>
-        </table>
+        <section id="protocols_summary" class="details_list">
+          <h1>Protocols summary</h1>
+          <table class="summary">
+            <%= for node <- protocols, do: overview_entry_template(node) %>
+          </table>
+        </section>
       <% end %>
     <%= footer_template %>

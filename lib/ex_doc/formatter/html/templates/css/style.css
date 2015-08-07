@@ -27,20 +27,22 @@ body
     section.docstring#moduledoc
     a.view_source
 
-    h2#summary > span.detail_header_links > a.to_top_link
-    table.summary
-      tr
-        td.summary_signature > a
-        td.summary_synopsis > p
-      ...
+    section.details_list#summary_details
+      h1
+      table.summary
+        tr
+          td.summary_signature > a
+          td.summary_synopsis > p
+        ...
+
     section.details_list#types_details
-      h2 > a.to_top_link
+      h1
       div.type_detail
         p.typespec > a
       ...
 
     section.details_list#functions_details
-      h2
+      h1
       section.detail
         div.detail_header
           span.signature > strong
@@ -355,6 +357,12 @@ h2:not(#sub_list_header) {
   margin: 1.8em 0 0.5em;
 }
 
+section.details_list h1 {
+  border-bottom: 1px dotted #aaa;
+  padding-top: 35px !important;
+  padding-bottom: 10px;
+}
+
 table {
   border: 1px solid #aaa;
   border-collapse: collapse;
@@ -653,7 +661,7 @@ pre {
 
   .breadcrumbs button {
     display: inline;
-    margin-top: -3px;
+    margin-top: -2px;
   }
 
 }

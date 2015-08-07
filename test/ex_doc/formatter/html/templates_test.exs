@@ -164,7 +164,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "module_page contains links to summary sections when those exist" do
     content = get_module_page([CompiledWithDocs, CompiledWithDocs.Nested])
-    assert content =~ ~r{<a href="#summary">Summary</a>}
+    assert content =~ ~r{<a href="#summary_details">Summary</a>}
     refute content =~ ~r{types_details}
   end
 
