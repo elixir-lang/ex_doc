@@ -156,6 +156,11 @@ body {
   padding-right: 3px;
 }
 
+#search button {
+  outline: 0;
+  z-index: 0;
+}
+
 #search .glyphicon.spinning {
     -moz-animation: spin 1s linear infinite;
     -webkit-animation: spin 1s linear infinite;
