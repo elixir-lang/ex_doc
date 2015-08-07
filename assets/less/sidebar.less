@@ -7,16 +7,12 @@
 }
 
 #sidebar li {
-  color: #888;
+  color: @darkGray;
   cursor: pointer;
 }
 
-#sidebar li:hover {
-  background: #ddd;
-}
-
 #sidebar span.node_name {
-  font-size: 0.8em;
+  font-size: 12px;
 }
 
 #sidebar li {
@@ -27,7 +23,7 @@
 /* HEADERS */
 
 #sidebar h1 {
-  font-size: 1.4em;
+  font-size: 14px;
   margin: 0;
   padding: 6px 10px 0;
 }
@@ -48,12 +44,12 @@
 
 .nav a:link,
 .nav a:visited {
-  color: #358;
+  font-weight: 400;
+  color: @gray;
 }
 
 .nav a:hover {
   background: transparent;
-  color: #5af;
 }
 
 .nav span {
@@ -66,16 +62,17 @@
   border-radius: 3px;
 }
 
-.nav span.selected {
-  text-decoration: underline;
+.nav span.selected > a{
+  color: @darkGray;
+  font-weight: 700;
 }
 
 /* SEARCH BOX */
 
 #search {
-  color: #888;
-  margin: 0 0 6px 10px;
-  height: 34px;
+  font-size: 12px;
+  line-height: 18px;
+  margin: 0 0 6px 5px;
 }
 
 #search .col-xs-10 {
@@ -124,10 +121,10 @@
 
 #full_list li {
   margin: 0;
-  padding: 5px 5px 5px 0;
-  font-size: 1.1em;
+  padding: 3px 0;
+  font-size: 14px;
   list-style: none;
-}
+  line-height: 16px;}
 
 #full_list li.node {
   padding-left: 25px;
@@ -135,6 +132,10 @@
 
 #full_list li.docs {
   padding: 0;
+}
+
+#full_list li.docs a {
+  color: @darkGray;
 }
 
 #full_list li.docs li {
@@ -195,14 +196,6 @@
   font-style: italic;
 }
 
-#full_list li.r1 {
-  background: #f0f0f0;
-}
-
-#full_list li.r2 {
-  background: #fafafa;
-}
-
 /* link properties */
 
 #full_list li a.toggle {
@@ -220,24 +213,21 @@
 }
 
 #full_list li.collapsed a.toggle {
-  opacity: 0.5;
   cursor: default;
   background-position: top left;
 }
 
-#full_list li.clicked {
-  background: #05a;
-  color: #ccc;
+#full_list .node a.object_link {
+  font-family: @sansFontFamily;
+  color: @green;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
 #full_list li.clicked a:link,
 #full_list li.clicked a:visited {
-  color: #eee;
-}
-
-#full_list li.clicked a.toggle {
-  opacity: 0.5;
-  background-position: bottom right;
+  font-weight: 600;
 }
 
 #full_list li.collapsed.clicked a.toggle {
