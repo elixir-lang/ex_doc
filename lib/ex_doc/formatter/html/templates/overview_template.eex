@@ -27,23 +27,23 @@
       </ul>
 
       <%= unless Enum.empty?(modules) do %>
-        <h2 id="modules_summary">Modules summary <%= to_top_link() %></h2>
-        <table class="summary">
+        <h2 id="modules_summary" class="section_heading">Modules summary <%= to_top_link() %></h2>
+        <div class="summary">
           <%= for node <- modules, do: overview_entry_template(node) %>
-        </table>
+        </div>
       <% end %>
 
       <%= unless Enum.empty?(exceptions) do %>
-        <h2 id="exceptions_summary">Exceptions summary <%= to_top_link() %></h2>
-        <table class="summary">
+        <h2 id="exceptions_summary" class="section_heading">Exceptions summary <%= to_top_link() %></h2>
+        <div class="summary">
           <%= for node <- exceptions, do: overview_entry_template(node) %>
-        </table>
+        </div>
       <% end %>
 
       <%= unless Enum.empty?(protocols) do %>
-        <h2 id="protocols_summary">Protocols summary <%= to_top_link() %></h2>
-        <table class="summary">
+        <h2 id="protocols_summary" class="section_heading">Protocols summary <%= to_top_link() %></h2>
+        <div class="summary">
           <%= for node <- protocols, do: overview_entry_template(node) %>
-        </table>
+        </div>
       <% end %>
     <%= footer_template %>

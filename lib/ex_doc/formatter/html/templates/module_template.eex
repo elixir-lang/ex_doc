@@ -45,36 +45,36 @@
       <% end %>
 
       <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
-        <h2 id="summary">Summary<span class="detail_header_links"><%= to_top_link() %></span></h2>
-        <table class="summary">
+        <h2 id="summary" class="section_heading">Summary <%= to_top_link() %></h2>
+        <div class="summary">
           <%= for node <- Enum.sort(functions ++ macros, &(&1.id <= &2.id)), do: summary_template(node) %>
-        </table>
+        </div>
       <% end %>
 
       <%= unless Enum.empty?(types) do %>
         <section id="types_details" class="details_list">
-          <h2>Types <%= to_top_link() %></h2>
+          <h2 class="section_heading">Types <%= to_top_link() %></h2>
           <%= for node <- types, do: type_detail_template(node, module) %>
         </section>
       <% end %>
 
       <%= unless Enum.empty?(functions) do %>
         <section id="functions_details" class="details_list">
-          <h2>Functions</h2>
+          <h2 class="section_heading">Functions</h2>
           <%= for node <- functions, do: detail_template(node, module) %>
         </section>
       <% end %>
 
       <%= unless Enum.empty?(macros) do %>
         <section id="macros_details" class="details_list">
-          <h2>Macros</h2>
+          <h2 class="section_heading">Macros</h2>
           <%= for node <- macros, do: detail_template(node, module) %>
         </section>
       <% end %>
 
       <%= unless Enum.empty?(callbacks) do %>
         <section id="callbacks_details" class="details_list">
-          <h2>Callbacks</h2>
+          <h2 class="section_heading">Callbacks</h2>
           <%= for node <- callbacks, do: detail_template(node, module) %>
         </section>
       <% end %>
