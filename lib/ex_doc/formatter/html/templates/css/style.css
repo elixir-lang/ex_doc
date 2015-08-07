@@ -652,7 +652,8 @@ pre {
   }
 
   .breadcrumbs button {
-    display: block;
+    display: inline;
+    margin-top: -3px;
   }
 
 }
