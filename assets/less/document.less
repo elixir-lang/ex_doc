@@ -7,18 +7,23 @@ body {
 }
 
 body {
-  font: 13px "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif;
-  line-height: 1.618;
+  font-size: 18px;
+  font-family: @serifFontFamily;
+  color: @darkGray;
+}
+
+a {
+  text-decoration: none;
 }
 
 a:link,
 a:visited {
-  color: #05a;
   text-decoration: none;
+  border: none;
 }
 
 a:hover {
-  color: #27c;
+  color: @darkGray;
 }
 
 h1 {
@@ -45,10 +50,6 @@ table {
   border-collapse: collapse;
   margin: 1em 0;
   empty-cells: show;
-}
-
-table th {
-  background: #fafafa;
 }
 
 table th,

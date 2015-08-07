@@ -4,6 +4,28 @@
   padding: 0 28px 20px 18px;
 }
 
+h1:not(#full_list_header) {
+  font-size: 40px;
+  font-weight: bold;
+  font-family: @serifFontFamily;
+  padding-bottom: 25px;
+  border-bottom: 1px solid #C1C6D1;
+  margin-bottom: 20px;
+}
+
+h2.section_heading {
+  color: @green;
+  font-family: @sansFontFamily;
+  padding-bottom: 20px;
+  font-weight: normal;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+
+.clear {
+  clear: both;
+}
+
 section.details_list h1 {
   border-bottom: 1px dotted #aaa;
   padding-top: 35px;
@@ -11,14 +33,6 @@ section.details_list h1 {
 }
 
 /* OTHERS */
-
-li.r1 {
-  background: #f0f0f0;
-}
-
-li.r2 {
-  background: #fafafa;
-}
 
 div.breadcrumbs {
   padding: 3px 15px 3px 16px;
@@ -55,12 +69,16 @@ p.docstring {
   margin-right: 0;
 }
 
-.docstring h2, .docstring h3, .docstring h4 {
+.docstring h1,
+.docstring h2,
+.docstring h3,
+.docstring h4 {
   border: 0;
   margin: 1.8em 0 0.5em;
 }
 
-.docstring h3, .docstring h4 {
+.docstring h3,
+.docstring h4 {
   font-size: 1.2em;
 }
 
@@ -76,6 +94,7 @@ p.docstring {
 
 div.detail_header_links {
   float: right;
+  padding-right: 10px;
 }
 
 a.to_top_link {
@@ -84,9 +103,8 @@ a.to_top_link {
   font-weight: normal;
 }
 
-table.summary {
-  border: 0;
-  border-collapse: separate;
+.summary {
+  padding: 0;
   width: 100%;
 }
 
@@ -130,16 +148,18 @@ ul.spec {
 }
 
 .type_detail {
-  margin-top: 15px;
-  padding-top: 0;
+  margin: 20px 0 0 0;
 }
 
 .type_detail > div.typespec_doc {
-  margin-left: 3em;
+  margin-left: 10px;
+}
+
+.type_detail > div.typespec_doc > p {
+  margin: 5px 0;
 }
 
 .detail {
-  border-top: 1px dotted #aaa;
   margin-top: 15px;
   padding-top: 0;
 }
@@ -149,22 +169,35 @@ ul.spec {
 }
 
 div.detail_header {
-  background: #e5e8ff;
-  border: 1px solid #d8d8e5;
-  border-radius: 3px;
-  margin: 18px 0 13px;
-  padding: 6px 10px;
+  float: left;
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 span.signature {
-  font: normal 1.1em Monaco, Consolas, Courier, monospace;
+  font-family: @monoFontFamily;
+  font-size: 15px;
+  padding-left: 10px;
+
+  strong {
+    font-weight: 400;
+  }
 }
 
+
 span.detail_type {
-  font-style: italic;
-  font-size: 0.9em;
+padding-left: 10px;
+  font-size: 14px;
+  font-family: @sansFontFamily;
+  font-weight: 300;
 }
 
 a.detail_link {
   padding-left: 0.3em;
+}
+
+.detail_header_links > a {
+  border: none;
+  font-size: 14px;
 }
