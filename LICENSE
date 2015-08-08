@@ -91,3 +91,13 @@ Copyright 2011, The Dojo Foundation
   https://github.com/jquery/sizzle/blob/master/LICENSE.txt
 
 ==========================================================================
+
+Javascript fuction "should_request_from_CDN", based the regular expression
+to detect the private networks on the works from
+"Regular Expression for URL validation"
+https://gist.github.com/dperini/729294
+
+Copyright (c) 2010-2013 Diego Perini (http://www.iport.it)
+Released under MIT License
+
+==========================================================================

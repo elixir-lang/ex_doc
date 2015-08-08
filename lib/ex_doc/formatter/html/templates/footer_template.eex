@@ -1,8 +1,31 @@
   </section> <!--/content -->
 </div><!--/row -->
   <!-- Scripts -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="js/jquery.js"><\/script>')</script>
+    <script>
+      function should_request_from_CDN(protocol, host) {
+        var re_private_network = new RegExp(
+          "^(?:" +
+            "(?:(?:10|127)(?:\\.\\d{1,3}){3})" +
+            "|(?:(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})" +
+            "|(?:172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})" +
+          ")$"
+        );
+
+        // if protocol is either http: or https: AND it is not a private network
+        // AND the hostname contains ".", THEN request from CDN
+        if ( ( protocol == 'http:' || protocol == 'https:' ) &&
+               re_private_network.test(host) == false && host.indexOf('.') !== -1 ) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      if ( should_request_from_CDN(window.location.protocol, window.location.host) ) {
+        document.write('<script src="\/\/ajax.googleapis.com\/ajax\/libs\/jquery\/2.1.4\/jquery.min.js"><\/script>');
+      }
+    </script>
+    <script>window.jQuery || document.write('<script src="js\/jquery.js"><\/script>')</script>
     <script src="js/highlight.pack.js"></script>
     <script src="js/app.js"></script>
   </body>
