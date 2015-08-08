@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.8.0
+
+* Enhancements
+  * New and responsive layout without frames
+
 ## v0.7.3
 
 * Bug fixes
