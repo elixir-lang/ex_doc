@@ -46,7 +46,8 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     assert File.regular?("#{output_dir}/another_dir/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/another_dir/index.html")
-    assert File.regular?("#{output_dir}/another_dir/css/style.css")
+    assert File.regular?("#{output_dir}/another_dir/dist/app.css")
+    assert File.regular?("#{output_dir}/another_dir/dist/app.js")
   end
 
   test "run generates all listing files" do

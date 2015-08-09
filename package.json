@@ -1,0 +1,55 @@
+{
+  "name": "ex_doc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elixir-lang/ex_doc.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/elixir-lang/ex_doc/issues"
+  },
+  "homepage": "https://github.com/elixir-lang/ex_doc#readme",
+  "devDependencies": {
+    "bootstrap": "^3.3.5",
+    "eslint": "^1.1.0",
+    "eslint-config-standard": "^4.0.0",
+    "eslint-plugin-standard": "^1.2.0",
+    "gulp": "^3.9.0",
+    "gulp-clean": "^0.3.1",
+    "gulp-eslint": "^1.0.0",
+    "gulp-if": "^1.2.5",
+    "gulp-less": "^3.0.3",
+    "gulp-load-plugins": "^0.10.0",
+    "gulp-minify-css": "^1.2.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-size": "^1.2.3",
+    "gulp-uglify": "^1.2.0",
+    "gulp-util": "^3.0.6",
+    "gulp-watch": "^4.3.4",
+    "gulp-webpack": "^1.5.0",
+    "highlightjs": "^8.7.0",
+    "jquery": "^2.1.4",
+    "karma": "^0.13.8",
+    "karma-chai-plugins": "^0.6.0",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-firefox-launcher": "^0.1.6",
+    "karma-mocha": "^0.2.0",
+    "karma-sourcemap-loader": "^0.3.5",
+    "karma-webpack": "^1.7.0",
+    "less-plugin-autoprefix": "^1.4.2",
+    "less-plugin-npm-import": "^2.1.0",
+    "mocha": "^2.2.5",
+    "run-sequence": "^1.1.2",
+    "webpack": "^1.11.0"
+  }
+}
