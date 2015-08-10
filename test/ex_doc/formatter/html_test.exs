@@ -4,19 +4,17 @@ defmodule ExDoc.Formatter.HTMLTest do
   alias ExDoc.Formatter.HTML
 
   setup_all do
+    # clean up from previous test
+    File.rm("test/tmp/README.md")
+    File.rm_rf("#{output_dir}")
+
     File.mkdir(output_dir)
-    File.copy("test/fixtures/README.md", "test/README.md")
-
-    on_exit fn ->
-      File.rm("test/README.md")
-      System.cmd "rm", ["-rf", "#{output_dir}"]
-    end
-
+    File.copy("test/fixtures/README.md", "test/tmp/README.md")
     :ok
   end
 
   defp output_dir do
-    Path.expand("../../docs", __DIR__)
+    Path.expand("../../tmp/doc", __DIR__)
   end
 
   defp beam_dir do
@@ -26,9 +24,9 @@ defmodule ExDoc.Formatter.HTMLTest do
   defp doc_config do
     %ExDoc.Config{project: "Elixir",
                   version: "1.0.1",
-                  output: "test/docs",
+                  output: "test/tmp/doc",
                   source_root: beam_dir,
-                  readme: "test/README.md"}
+                  readme: "test/tmp/README.md"}
   end
 
   defp get_modules(config \\ doc_config) do
@@ -43,12 +41,12 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates in specified output directory" do
-    config = %ExDoc.Config{output: "#{output_dir}/docs"}
+    config = %ExDoc.Config{output: "#{output_dir}/another_dir"}
     HTML.run(get_modules(config), config)
 
-    assert File.regular?("#{output_dir}/docs/CompiledWithDocs.html")
-    assert File.regular?("#{output_dir}/docs/index.html")
-    assert File.regular?("#{output_dir}/docs/css/style.css")
+    assert File.regular?("#{output_dir}/another_dir/CompiledWithDocs.html")
+    assert File.regular?("#{output_dir}/another_dir/index.html")
+    assert File.regular?("#{output_dir}/another_dir/css/style.css")
   end
 
   test "run generates all listing files" do
