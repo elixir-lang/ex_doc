@@ -104,19 +104,19 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    overview_template: [:config, :modules, :exceptions, :protocols, :has_readme, :has_main],
-    sidebar_template: [:config, :modules, :exceptions, :protocols, :has_readme],
-    sidebar_items_template: [:input],
-    sidebar_items_keys_template: [:node],
-    sidebar_items_entry_template: [:node],
-    module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all, :has_readme],
-    readme_template: [:config, :modules, :exceptions, :protocols, :content],
-    overview_entry_template: [:node],
-    summary_template: [:node],
     detail_template: [:node, :_module],
-    type_detail_template: [:node, :_module],
+    footer_template: [],
     head_template: [:page],
-    footer_template: []
+    module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all, :has_readme],
+    overview_entry_template: [:node],
+    overview_template: [:config, :modules, :exceptions, :protocols, :has_readme, :has_main],
+    readme_template: [:config, :modules, :exceptions, :protocols, :content],
+    sidebar_items_entry_template: [:node],
+    sidebar_items_keys_template: [:node],
+    sidebar_items_template: [:input],
+    sidebar_template: [:config, :modules, :exceptions, :protocols, :has_readme],
+    summary_template: [:node],
+    type_detail_template: [:node, :_module],
   ]
 
   Enum.each templates, fn({ name, args }) ->
