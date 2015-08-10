@@ -77,6 +77,6 @@ To see all options available when generating docs, just run `mix help docs`.
 
 # License
 
-ExDoc source code is released under Apache 2 License with snippets under MIT-LICENSE.
+ExDoc source code is released under Apache 2 License. The generated contents, however, are under different licenses based on projects used to help render html, including css, js and other assets.
 
-Check [LICENSE](LICENSE) file for more information.
+Check the [LICENSE](LICENSE) file for more information.
