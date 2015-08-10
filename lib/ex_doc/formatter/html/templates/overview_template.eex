@@ -5,10 +5,8 @@
         <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
           <span class="glyphicon glyphicon-menu-hamburger"></span>
         </button>
-        <%= if has_readme || has_main do %>
+        <%= if has_readme do %>
           <%= page_breadcrumbs(config, "Overview", "overview.html#content") %>
-        <% else %>
-          <%= page_breadcrumbs(config, "Overview", "index.html#content") %>
         <% end %>
       </div>
 

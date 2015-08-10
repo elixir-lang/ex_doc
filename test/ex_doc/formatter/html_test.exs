@@ -38,6 +38,21 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     assert File.regular?("#{output_dir}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
+    assert File.regular?("#{output_dir}/readme.html")
+    assert File.regular?("#{output_dir}/overview.html")
+    content = File.read!("#{output_dir}/index.html")
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
+  end
+
+  test "run generates the html file with the documentation and readme.html" do
+    config = Map.merge(doc_config, %{})
+    HTML.run(get_modules, config)
+
+    assert File.regular?("#{output_dir}/CompiledWithDocs.html")
+    assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
+    assert File.regular?("#{output_dir}/readme.html")
+    content = File.read!("#{output_dir}/index.html")
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
   end
 
   test "run generates in specified output directory" do
@@ -70,7 +85,6 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates the overview file" do
     HTML.run(get_modules, doc_config)
 
-    assert File.regular?("#{output_dir}/overview.html")
     content = File.read!("#{output_dir}/overview.html")
     assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
@@ -80,8 +94,8 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates the readme file" do
     HTML.run(get_modules, doc_config)
 
-    assert File.regular?("#{output_dir}/index.html")
-    content = File.read!("#{output_dir}/index.html")
+    content = File.read!("#{output_dir}/readme.html")
+    assert content =~ ~r{<title>[^<]* README</title>}
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code>TypesAndSpecs.Sub</code></a>}
@@ -102,4 +116,32 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert HTML.pretty_codeblocks(iex_detected_without_class) ==
           "<pre><code class=\"iex elixir\">iex&gt; max(4, 5)"
   end
+
+  test "run generates the redirect index.html" do
+    config = %ExDoc.Config{output: "#{output_dir}/redirect", main: "RandomError", }
+    HTML.run(get_modules(config), config)
+
+    assert File.regular?("#{output_dir}/redirect/RandomError.html")
+    content = File.read!("#{output_dir}/redirect/index.html")
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=RandomError.html"\s*/>}
+  end
+
+  test "run generates index.html and normalized options" do
+    config = Map.merge(doc_config, %{output: "test/tmp/doc//"})
+    HTML.run(get_modules, config)
+
+    content = File.read!("test/tmp/doc/index.html")
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
+    assert File.regular?("test/tmp/doc/readme.html")
+  end
+
+  test "run generates trying to sex 'main: index.html'" do
+    config = Map.merge(doc_config, %{main: "index"})
+    HTML.run(get_modules, config)
+
+    content = File.read!("test/tmp/doc/index.html")
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=index.html"\s*/>}
+    assert File.regular?("test/tmp/doc/readme.html")
+  end
+
 end

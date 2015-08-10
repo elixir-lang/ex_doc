@@ -6,10 +6,17 @@ defmodule ExDoc.Formatter.HTML do
   alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Formatter.HTML.Autolink
 
+  defmodule Config do
+    defstruct [
+      main: "overview",
+    ]
+  end
+
   @doc """
   Generate HTML documentation for the given modules
   """
-  def run(module_nodes, config)  do
+  def run(module_nodes, config) when is_map(config) do
+    config = build_config(config)
     output = Path.expand(config.output)
     File.rm_rf! output
     :ok = File.mkdir_p output
@@ -22,27 +29,29 @@ defmodule ExDoc.Formatter.HTML do
     protocols  = filter_list(:protocols, all)
 
     has_readme = config.readme && generate_readme(output, module_nodes, config, modules, exceptions, protocols)
-    generate_overview(modules, exceptions, protocols, output, config, has_readme, config.main)
+    generate_index(output, config)
+    generate_overview(modules, exceptions, protocols, output, config, has_readme)
     generate_sidebar_items(modules, exceptions, protocols, output)
     generate_list(modules, all, output, config, has_readme)
     generate_list(exceptions, all, output, config, has_readme)
     generate_list(protocols, all, output, config, has_readme)
 
-    if config.main do
-      generate_main(output, config)
-    end
-
     Path.join(config.output, "index.html")
   end
 
-  defp generate_overview(modules, exceptions, protocols, output, config, has_readme, has_main) do
-    content = Templates.overview_template(config, modules, exceptions, protocols, has_readme, has_main)
+  defp build_config(config) when is_map(config) do
+    Map.merge(config, %Config{}, fn(_k, v1, v2) ->
+      if is_nil(v1) do v2; else v1; end
+    end)
+  end
 
-    if has_readme || has_main do
-      :ok = File.write("#{output}/overview.html", content)
-    else
-      :ok = File.write("#{output}/index.html", content)
-    end
+  defp generate_index(output, config) do
+    generate_redirect(output, "index.html", config, "#{config.main}.html")
+  end
+
+  defp generate_overview(modules, exceptions, protocols, output, config, has_readme) do
+    content = Templates.overview_template(config, modules, exceptions, protocols, has_readme)
+    :ok = File.write("#{output}/overview.html", content)
   end
 
   defp generate_sidebar_items(modules, exceptions, protocols, output) do
@@ -68,11 +77,6 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  defp generate_main(output, config) do
-    File.cp!("#{output}/#{config.main}.html", "#{output}/index.html")
-    true
-  end
-
   defp generate_readme(output, module_nodes, config, modules, exceptions, protocols) do
     readme_path = Path.expand(config.readme)
     write_readme(output, File.read(readme_path), module_nodes, config, modules, exceptions, protocols)
@@ -81,18 +85,17 @@ defmodule ExDoc.Formatter.HTML do
   defp write_readme(output, {:ok, content}, module_nodes, config, modules, exceptions, protocols) do
     content = Autolink.project_doc(content, module_nodes)
     readme_html = Templates.readme_template(config, modules, exceptions, protocols, content) |> pretty_codeblocks
-
-    if config.main do
-      File.write("#{output}/readme.html", readme_html)
-    else
-      File.write("#{output}/index.html", readme_html)
-    end
-
+    :ok = File.write("#{output}/readme.html", readme_html)
     true
   end
 
   defp write_readme(_, _, _, _, _, _, _) do
     false
+  end
+
+  defp generate_redirect(output, file_name, config, redirect_to) do
+    content = Templates.redirect_template(config, redirect_to)
+    :ok = File.write("#{output}/#{file_name}", content)
   end
 
   @doc false

@@ -15,6 +15,22 @@ defmodule ExDocTest do
     end
   end
 
+  test "build_config & normalize_options" do
+    project = "Elixir"
+    version = "1"
+    options = [formatter: IdentityFormatter, retriever: IdentityRetriever,
+               source_root: "root_dir", source_beam: "beam_dir",]
+
+    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/docs"])
+    assert config.output == "test/tmp/docs"
+
+    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/docs/"])
+    assert config.output == "test/tmp/docs"
+
+    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/docs//"])
+    assert config.output == "test/tmp/docs"
+  end
+
   test "source_beam sets source dir" do
     options = [formatter: IdentityFormatter, retriever: IdentityRetriever,
                source_root: "root_dir", source_beam: "beam_dir"]
@@ -42,4 +58,5 @@ defmodule ExDocTest do
   after
     File.rm!("test.config")
   end
+
 end

@@ -62,7 +62,13 @@ defmodule ExDoc do
 
   defp normalize_options(options) do
     pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || "master")
-    Keyword.put(options, :source_url_pattern, pattern)
+    normalized_options = [source_url_pattern: pattern]
+
+    if is_bitstring(options[:output]) do
+      normalized_options = normalized_options ++ [output: String.rstrip(options[:output], ?/)]
+    end
+
+    Keyword.merge(options, normalized_options)
   end
 
   defp guess_url(url = <<"https://github.com/", _ :: binary>>, ref) do
