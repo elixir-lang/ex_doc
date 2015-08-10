@@ -108,7 +108,8 @@ body {
 
 #sidebar h2 {
   font-size: 0.9em;
-  margin: 0 10px 12px;
+  margin: 0 10px 10px;
+  border: 0;
 }
 
 /* NAVIGATION BAR */
@@ -347,7 +348,7 @@ a:hover {
   color: #27c;
 }
 
-h1:not(#full_list_header) {
+h1 {
   font-size: 25px;
   border-top: 0;
   margin-top: 0;
@@ -359,7 +360,7 @@ h1 small {
   font-size: 18px;
 }
 
-h2:not(#sub_list_header) {
+h2 {
   padding: 0 0 3px 0;
   border-bottom: 1px #aaa solid;
   font-size: 1.4em;
@@ -368,14 +369,14 @@ h2:not(#sub_list_header) {
 
 section.details_list h1 {
   border-bottom: 1px dotted #aaa;
-  padding-top: 35px !important;
+  padding-top: 35px;
   padding-bottom: 10px;
 }
 
 table {
   border: 1px solid #aaa;
   border-collapse: collapse;
-  margin-top: 1em;
+  margin: 1em 0;
   empty-cells: show;
 }
 
@@ -442,26 +443,13 @@ p.docstring {
   margin-right: 0;
 }
 
-.docstring h1,
-.docstring h2,
-.docstring h3,
-.docstring h4 {
-  padding: 0;
+.docstring h2, .docstring h3, .docstring h4 {
   border: 0;
+  margin: 1.8em 0 0.5em;
 }
 
-.docstring h1 {
-  font-size: 1.3em;
-}
-
-.docstring h2 {
+.docstring h3, .docstring h4 {
   font-size: 1.2em;
-}
-
-.docstring h3,
-.docstring h4 {
-  font-size: 1em;
-  padding-top: 10px;
 }
 
 .docstring ul {
