@@ -5,10 +5,10 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   setup_all do
     File.mkdir(output_dir)
-    File.copy("test/fixtures/README.md", "test/README.md")
+    File.copy("test/fixtures/README.md", "test/tmp/README.md")
 
     on_exit fn ->
-      File.rm("test/README.md")
+      File.rm("test/tmp/README.md")
       System.cmd "rm", ["-rf", "#{output_dir}"]
     end
 
@@ -16,7 +16,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp output_dir do
-    Path.expand("../../docs", __DIR__)
+    Path.expand("../../tmp/doc", __DIR__)
   end
 
   defp beam_dir do
@@ -26,9 +26,9 @@ defmodule ExDoc.Formatter.HTMLTest do
   defp doc_config do
     %ExDoc.Config{project: "Elixir",
                   version: "1.0.1",
-                  output: "test/docs",
+                  output: "test/tmp/doc",
                   source_root: beam_dir,
-                  readme: "test/README.md"}
+                  readme: "test/tmp/README.md"}
   end
 
   defp get_modules(config \\ doc_config) do
