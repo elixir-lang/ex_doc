@@ -1,10 +1,19 @@
 defmodule ExDoc do
   defmodule Config do
     defstruct [
-      output: "doc", source_root: nil, source_url: nil, source_url_pattern: nil,
-      homepage_url: nil, source_beam: nil, retriever: ExDoc.Retriever,
-      formatter: "html", project: nil, version: nil, main: nil,
-      readme: nil, formatter_opts: []
+      formatter: "html",
+      formatter_opts: [],
+      homepage_url: nil,
+      main: nil,
+      output: "doc",
+      project: nil,
+      readme: nil,
+      retriever: ExDoc.Retriever,
+      source_beam: nil,
+      source_root: nil,
+      source_url: nil,
+      source_url_pattern: nil,
+      version: nil,
     ]
   end
 
