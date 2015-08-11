@@ -1,4 +1,7 @@
 language: erlang
+node_js:
+  - "iojs"
+
 notifications:
   recipients:
     - jose.valim@plataformatec.com.br
@@ -9,5 +12,13 @@ before_install:
   - sudo dpkg -i pandoc-1.13.2-1-amd64.deb
   - git clone https://github.com/elixir-lang/elixir
   - cd elixir && make && cd ..
-before_script: "export PATH=`pwd`/elixir/bin:$PATH"
-script: "mix do local.hex --force, deps.get && mix test --include pandoc"
+before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - "export PATH=`pwd`/elixir/bin:$PATH"
+  - npm install -g npm
+  - npm install
+
+script:
+  - "mix do local.hex --force, deps.get && mix test --include pandoc"
+  - node_modules/.bin/gulp
