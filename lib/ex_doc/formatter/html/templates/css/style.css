@@ -71,7 +71,7 @@ body {
 }
 
 #content {
-  padding: 0 28px 20px 28px;
+  padding: 0 28px 20px 18px;
 }
 
 #sidebar a:link,
@@ -409,9 +409,9 @@ li.r2 {
 }
 
 div.breadcrumbs {
-  padding: 3px 15px;
+  padding: 3px 15px 3px 18px;
   background-color: #EEE;
-  margin: 0 -28px 10px;
+  margin: 0 -18px 10px;
   line-height: 28px;
   display: block;
 }
