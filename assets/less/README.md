@@ -21,7 +21,7 @@ body
         ...
     div.no_results
 
-  section#content
+  section
     div.breadcrumbs
     h1
       small
