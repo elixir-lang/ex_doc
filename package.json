@@ -26,6 +26,7 @@
     "eslint-plugin-standard": "^1.2.0",
     "font-awesome": "^4.4.0",
     "gulp": "^3.9.0",
+    "gulp-batch": "^1.0.5",
     "gulp-clean": "^0.3.1",
     "gulp-eslint": "^1.0.0",
     "gulp-if": "^1.2.5",
@@ -49,6 +50,7 @@
     "karma-webpack": "^1.7.0",
     "less-plugin-autoprefix": "^1.4.2",
     "less-plugin-npm-import": "^2.1.0",
+    "lodash": "^3.10.1",
     "mocha": "^2.2.5",
     "run-sequence": "^1.1.2",
     "webpack": "^1.11.0"
