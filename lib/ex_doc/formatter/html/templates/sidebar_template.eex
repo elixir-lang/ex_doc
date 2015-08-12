@@ -11,7 +11,7 @@
 <section id="sidebar" class="col-xs-6 col-sm-3 sidebar-offcanvas">
   <p class="pull-right visible-xs">
   <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
-    <span class="glyphicon glyphicon-search"></span>
+    <span class="fa fa-search"></span>
   </button>
   </p>
 
@@ -46,7 +46,7 @@
         <label for="search_field" class="sr-only">Search</label>
         <input type="text" id="search_field" class="form-control" placeholder="Search" autocomplete="off" autofocus="autofocus" results="0">
         <span class="input-group-btn">
-          <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
+          <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
         </span>
       </div><!-- /input-group -->
     </div><!-- /.col-xs-10 -->

@@ -55,8 +55,8 @@ function showAllResults () {
     link.text(link.text())
   })
   $('#no_results').text('')
-  $('#spinning span').removeClass('glyphicon glyphicon-refresh spinning')
-  $('#search button span.glyphicon-remove').addClass('glyphicon-search').removeClass('glyphicon-remove')
+  $('#spinning span').removeClass('fa fa-refresh fa-spin')
+  $('#search button span.fa-times').addClass('fa-search').removeClass('fa-times')
   highlight()
 }
 
@@ -74,7 +74,7 @@ function searchDone () {
     $('#no_results').text('')
   }
 
-  $('#spinning span').removeClass('glyphicon glyphicon-refresh spinning')
+  $('#spinning span').removeClass('fa fa-refresh fa-spin')
   clearTimeout(inSearch)
   inSearch = null
 }
@@ -121,7 +121,7 @@ function searchItem () {
 function fullListSearch () {
   // generate cache
   searchCache = []
-  $('#spinning span').removeClass('glyphicon glyphicon-refresh spinning')
+  $('#spinning span').removeClass('fa fa-refresh fa-spin')
 
   $('#full_list li').each(function () {
     var link = $(this).find('a.object_link:first')
@@ -152,8 +152,8 @@ function performSearch () {
     if (inSearch) {
       clearTimeout(inSearch)
     }
-    $('#spinning span').addClass('glyphicon glyphicon-refresh spinning')
-    $('#search button span.glyphicon-search').addClass('glyphicon-remove').removeClass('glyphicon-search')
+    $('#spinning span').addClass('fa fa-refresh fa-spin')
+    $('#search button span.fa-search').addClass('fa-times').removeClass('fa-search')
     searchIndex = 0
     lastRowClass = ''
     $('#sidebar').addClass('in_search')
@@ -173,7 +173,7 @@ function identifyExternalLinks (section) {
   $([section, 'a'].join(' ')).filter(function () {
     return (this.hostname !== location.hostname)
   }).append($('<span/>').attr({
-    'class': 'glyphicon glyphicon-new-window',
+    'class': 'fa fa-external-link',
     'aria-hidden': 'true'
   })).addClass('external')
 }
@@ -325,7 +325,7 @@ function initalize () {
 
   $('#search button').on('click', function () {
     $('#search input').val('').focus()
-    $('#search button span.glyphicon-remove').addClass('glyphicon-search').removeClass('glyphicon-remove')
+    $('#search button span.fa-times').addClass('fa-search').removeClass('fa-times')
     showAllResults()
   })
 
