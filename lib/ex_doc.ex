@@ -29,7 +29,7 @@ defmodule ExDoc do
   end
 
   # Builds configuration by merging `options`, and normalizing the options.
-  # @spec build_config(String.t, String.t, Keyword.t) :: %ExDoc.Config{Keyword.t}
+  @spec build_config(String.t, String.t, Keyword.t) :: %ExDoc.Config{}
   defp build_config(project, version, options) do
     options = normalize_options(options)
     preconfig = %Config{
@@ -64,16 +64,14 @@ defmodule ExDoc do
   # Helpers
 
   defp normalize_options(options) do
-    options_norm = []
-
     pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || "master")
-    options_norm = options_norm ++ [source_url_pattern: pattern]
+    options = Keyword.put(options, :source_url_pattern, pattern)
 
     if is_bitstring(options[:output]) do
-      options_norm = options_norm ++ [output: String.rstrip(options[:output], ?/)]
+      options = Keyword.put(options, :output, String.rstrip(options[:output], ?/))
     end
 
-    Keyword.merge(options, options_norm)
+    options
   end
 
   defp guess_url(url = <<"https://github.com/", _ :: binary>>, ref) do

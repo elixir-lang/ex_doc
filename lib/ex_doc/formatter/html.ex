@@ -6,12 +6,15 @@ defmodule ExDoc.Formatter.HTML do
   alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Formatter.HTML.Autolink
 
+  # default values
+  @main "overview"
+
   @doc """
   Generate HTML documentation for the given modules
   """
-  # @spec run(list, %ExDoc.Config{Keyword.t}) :: String.t
+  @spec run(list, %ExDoc.Config{}) :: String.t
   def run(module_nodes, config) when is_map(config) do
-    config = build_config(config)
+    config = normalize_config(config)
     output = Path.expand(config.output)
     File.rm_rf! output
     :ok = File.mkdir_p output
@@ -34,17 +37,14 @@ defmodule ExDoc.Formatter.HTML do
     Path.join(config.output, "index.html")
   end
 
-  defp build_config(config) when is_map(config) do
+  # Builds `config` by setting default values and checking for non-valid ones.
+  @spec normalize_config(%ExDoc.Config{}) :: %ExDoc.Config{}
+  defp normalize_config(config) when is_map(config) do
     if config.main == "index" do
-      raise ArgumentError, message: "`main` cannot be set to \"index\", otherwise it will recursively link to itself"
+      raise ArgumentError, message: "\"main\" cannot be set to \"index\", otherwise it will recursively link to itself"
     end
 
-    preconfig = %{
-      main: "overview",
-    }
-    Map.merge(config, preconfig, fn(_k, v1, v2) ->
-      if is_nil(v1) do v2; else v1; end
-    end)
+    Map.put(config, :main, config.main || @main)
   end
 
   defp generate_index(output, config) do
