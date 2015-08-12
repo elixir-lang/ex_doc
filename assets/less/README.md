@@ -11,11 +11,9 @@ body
     div#search [.loading] > input#search_field
     ul#full_list
       li.node [.collpased, .search_uncollapsed, .found]
-        a.toggle
         a.object_link
         span.node_name
       li.docs [.collpased, .search_uncollapsed, .found]
-        a.toggle
         a.object_link
         span.node_name
         ...
