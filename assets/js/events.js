@@ -184,12 +184,6 @@ function setupSelected (id) {
   })
 }
 function collapse () {
-  $('#full_list a.toggle').click(function () {
-    $(this).parent().toggleClass('collapsed').next().toggleClass('collapsed')
-    highlight()
-    return false
-  })
-
   $('#full_list > li.node:not(.clicked)').each(function () {
     $(this).addClass('collapsed').next('li.docs').addClass('collapsed')
   })
