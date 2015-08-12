@@ -30,7 +30,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "site title text links to homepage_url when set" do
     content = Templates.sidebar_template(doc_config, [], [], [], false)
-    assert content =~ ~r{<a href="#{homepage_url}">Elixir v1.0.1</a>}
+    assert content =~ ~r{<h1><a href="#{homepage_url}">Elixir</a></h1>\n\s*<h2>v1.0.1</h2>}
   end
 
   test "Disable nav links when module type is empty" do
@@ -59,14 +59,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                                                   source_url: source_url,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
     content = Templates.sidebar_template(doc_config_without_source_url, [], [], [], false)
-    assert content =~ ~r{<a href="#{source_url}">Elixir v1.0.1</a>}
+    assert content =~ ~r{<h1><a href="#{source_url}">Elixir</a></h1>\n\s*<h2>v1.0.1</h2>}
   end
 
   test "site title text creates no link when there is no homepage_url or source_url" do
     doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
     content = Templates.sidebar_template(doc_config_without_source_url, [], [], [], false)
-    assert content =~ ~r{Elixir v1.0.1}
+    assert content =~ ~r{<h1>Elixir</h1>\n\s*<h2>v1.0.1</h2>}
   end
 
   test "list_page outputs listing for the given nodes" do
@@ -112,12 +112,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r/example\/2.*Some example/ms
     assert content =~ ~r/example_without_docs\/0.*<section class="docstring">.*<\/section>/ms
     assert content =~ ~r/example_1\/0.*Another example/ms
-    assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
+    assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*Source <i class="fa fa-code"><\/i>\n\s*<\/a>}ms
 
     assert content =~ ~s{<div class="detail_header" id="example_1/0">}
     assert content =~ ~s{<strong>example(foo, bar \\\\ Baz)</strong>}
     assert content =~ ~s{<span class="detail_type">\(function\)</span>}
-    assert content =~ ~s{<a href="#example/2" class="detail_link" title="Link to this function">#</a>}
+    assert content =~ ~r{<a href="#example/2" class="detail_link" title="Link to this function">\n\s*<i class="fa fa-link"><\/i>\n\s*<\/a>}ms
     assert content =~ ~s{<a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>}
   end
 
@@ -147,7 +147,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "module_page outputs summaries" do
     content = get_module_page([CompiledWithDocs])
-    assert content =~ ~r{<td class="summary_signature">\s*<a href="#example_1/0">}
+    assert content =~ ~r{<div class="summary_signature">\s*<a href="#example_1/0">}
   end
 
   test "module_page contains breadcrumbs" do
