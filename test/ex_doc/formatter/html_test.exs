@@ -1,15 +1,16 @@
 defmodule ExDoc.Formatter.HTMLTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias ExDoc.Formatter.HTML
 
   setup_all do
-    # clean up from previous test
-    File.rm("test/tmp/README.md")
-    File.rm_rf("#{output_dir}")
-
-    File.mkdir(output_dir)
     File.copy("test/fixtures/README.md", "test/tmp/README.md")
+    :ok
+  end
+
+  setup do
+    File.rm_rf("#{output_dir}")
+    File.mkdir(output_dir)
     :ok
   end
 
@@ -22,19 +23,27 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp doc_config do
-    %ExDoc.Config{project: "Elixir",
-                  version: "1.0.1",
-                  output: "test/tmp/doc",
-                  source_root: beam_dir,
-                  readme: "test/tmp/README.md"}
+    [
+      project: "Elixir",
+      version: "1.0.1",
+      formatter: "html",
+      output: "test/tmp/doc",
+      source_root: beam_dir,
+      source_beam: beam_dir,
+      readme: "test/tmp/README.md",
+    ]
   end
 
-  defp get_modules(config \\ doc_config) do
-    ExDoc.Retriever.docs_from_dir(beam_dir, config)
+  defp doc_config(config) do
+    Keyword.merge(doc_config, config)
+  end
+
+  defp generate_docs(config) do
+    ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
   test "run generates the html file with the documentation" do
-    HTML.run(get_modules, doc_config)
+    generate_docs(doc_config)
 
     assert File.regular?("#{output_dir}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
@@ -45,8 +54,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates the html file with the documentation and readme.html" do
-    config = Map.merge(doc_config, %{})
-    HTML.run(get_modules, config)
+    generate_docs(doc_config)
 
     assert File.regular?("#{output_dir}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
@@ -56,8 +64,8 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates in specified output directory" do
-    config = %ExDoc.Config{output: "#{output_dir}/another_dir"}
-    HTML.run(get_modules(config), config)
+    config = doc_config([output: "#{output_dir}/another_dir"])
+    generate_docs(config)
 
     assert File.regular?("#{output_dir}/another_dir/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/another_dir/index.html")
@@ -66,7 +74,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates all listing files" do
-    HTML.run(get_modules, doc_config)
+    generate_docs(doc_config)
 
     content = File.read!("#{output_dir}/sidebar_items.js")
     assert content =~ ~r{.*"CompiledWithDocs\".*}ms
@@ -83,7 +91,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates the overview file" do
-    HTML.run(get_modules, doc_config)
+    generate_docs(doc_config)
 
     content = File.read!("#{output_dir}/overview.html")
     assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
@@ -92,7 +100,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates the readme file" do
-    HTML.run(get_modules, doc_config)
+    generate_docs(doc_config)
 
     content = File.read!("#{output_dir}/readme.html")
     assert content =~ ~r{<title>[^<]* README</title>}
@@ -118,8 +126,8 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates the redirect index.html" do
-    config = %ExDoc.Config{output: "#{output_dir}/redirect", main: "RandomError", }
-    HTML.run(get_modules(config), config)
+    config = doc_config([project: "Elixir", version: "1.0.1", output: "#{output_dir}/redirect", main: "RandomError", ])
+    generate_docs(config)
 
     assert File.regular?("#{output_dir}/redirect/RandomError.html")
     content = File.read!("#{output_dir}/redirect/index.html")
@@ -127,21 +135,23 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates index.html and normalized options" do
-    config = Map.merge(doc_config, %{output: "test/tmp/doc//"})
-    HTML.run(get_modules, config)
+    for dir <- ["test/tmp/doc", "test/tmp/doc/", "test/tmp/doc//"] do
+      generate_docs doc_config([output: dir])
 
-    content = File.read!("test/tmp/doc/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
-    assert File.regular?("test/tmp/doc/readme.html")
+      content = File.read!("test/tmp/doc/index.html")
+      assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
+      assert File.regular?("test/tmp/doc/readme.html")
+    end
   end
 
-  test "run generates trying to sex 'main: index.html'" do
-    config = Map.merge(doc_config, %{main: "index"})
-    HTML.run(get_modules, config)
-
-    content = File.read!("test/tmp/doc/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=index.html"\s*/>}
-    assert File.regular?("test/tmp/doc/readme.html")
+  test "run generates trying to set 'main: index'" do
+    config = doc_config([main: "index"])
+    assert_raise ArgumentError,
+                 "`main` cannot be set to \"index\", otherwise it will recursively link to itself",
+                 fn -> generate_docs(config) end
+    refute File.regular?("test/tmp/doc/index.html")
+    refute File.regular?("test/tmp/doc/overview.html")
+    refute File.regular?("test/tmp/doc/readme.html")
   end
 
 end
