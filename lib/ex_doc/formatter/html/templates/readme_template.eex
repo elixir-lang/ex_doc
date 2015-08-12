@@ -3,7 +3,7 @@
 
 <div class="breadcrumbs">
   <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
-    <span class="glyphicon glyphicon-menu-hamburger"></span>
+    <span class="fa fa-bars"></span>
   </button>
   <%= page_breadcrumbs(config, "README", "index.html#content") %>
 </div>

@@ -4,7 +4,7 @@
 
       <div class="breadcrumbs">
         <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
-          <span class="glyphicon glyphicon-menu-hamburger"></span>
+          <span class="fa fa-bars"></span>
         </button>
         <%= module_breadcrumbs(config, all, module) %>
       </div>
