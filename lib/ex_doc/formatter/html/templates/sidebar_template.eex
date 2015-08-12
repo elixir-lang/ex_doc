@@ -10,9 +10,9 @@
 <div class="row row-offcanvas row-offcanvas-left">
 <section id="sidebar" class="col-xs-6 col-sm-3 sidebar-offcanvas">
   <p class="pull-right visible-xs">
-  <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas" aria-label="Close">
-    <span class="fa fa-times" aria-hidden="true"></span>
-  </button>
+    <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas" aria-label="Close">
+      <span class="fa fa-times" aria-hidden="true"></span>
+    </button>
   </p>
 
   <h2 id="sub_list_header">
@@ -43,11 +43,11 @@
   <div id="search" class="row">
     <div class="col-xs-10">
       <div class="input-group input-group-sm">
+        <button class="btn btn-default" type="button" aria-label="Search">
+          <span class="fa fa-search" aria-hidden="true"></span>
+        </button>
         <label for="search_field" class="sr-only">Search</label>
-        <input type="text" id="search_field" class="form-control" placeholder="Search" autocomplete="off" autofocus="autofocus" results="0">
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="button" aria-label="Search"><span class="fa fa-search" aria-hidden="true"></span></button>
-        </span>
+        <input type="text" id="search_field" class="form-control" placeholder="search" autocomplete="off" autofocus="autofocus" results="0">
       </div><!-- /input-group -->
     </div><!-- /.col-xs-10 -->
     <div class="col-xs-2" id="spinning">
