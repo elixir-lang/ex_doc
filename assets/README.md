@@ -29,16 +29,27 @@ This will build a complete bundle, including JavaScript and CSS.
 Using the flag `--type production` will result in minified JavaScript and CSS
 bundles.
 
-Using the flag `--watch` a file watcher will be changed that recompiles the
-JavaScript files on any change in the `js` folder.
+### `development`
+
+Builds JavaScript and CSS on file changes. See `javascript-watch` and `less-watch`
+for details.
 
 ### `javascript`
 
 Build the JavaScript in `js` into a bundled file using [webpack].
 
+
+### `javascript-watch`
+
+Run `javascript` on file changes in `assets/js/*.js`.
+
 ### `less`
 
 Build the [less] files in `less` into a bundled CSS file.
+
+### `less-watch`
+
+Run `less` on file changes in `assets/less/*.js`.
 
 ### `lint`
 
