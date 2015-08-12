@@ -2,8 +2,8 @@
 <%= sidebar_template(config, modules, exceptions, protocols, true) %>
 
 <div class="breadcrumbs">
-  <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
-    <span class="fa fa-bars"></span>
+  <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas" aria-label="Close">
+    <span class="fa fa-bars" aria-hidden="true"></span>
   </button>
   <%= page_breadcrumbs(config, "README", "README.html#content") %>
 </div>
