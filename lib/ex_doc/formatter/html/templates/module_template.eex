@@ -3,8 +3,8 @@
     <%= sidebar_template(config, H.filter_list(:modules, all), H.filter_list(:exceptions, all), H.filter_list(:protocols, all), has_readme) %>
 
       <div class="breadcrumbs">
-        <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
-          <span class="fa fa-bars"></span>
+        <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas" aria-label="Close">
+          <span class="fa fa-bars" aria-hidden="true"></span>
         </button>
         <%= module_breadcrumbs(config, all, module) %>
       </div>
