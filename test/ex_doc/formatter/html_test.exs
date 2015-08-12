@@ -4,13 +4,16 @@ defmodule ExDoc.Formatter.HTMLTest do
   alias ExDoc.Formatter.HTML
 
   setup_all do
-    File.copy("test/fixtures/README.md", "test/tmp/README.md")
+    {:ok, _} = File.copy("test/fixtures/README.md", "test/tmp/README.md")
+
     :ok
   end
 
   setup do
-    File.rm_rf("#{output_dir}")
-    File.mkdir(output_dir)
+    {:ok, _} = File.rm_rf(output_dir)
+    :ok = File.mkdir(output_dir)
+    {:ok, []} = File.ls(output_dir)
+
     :ok
   end
 
@@ -125,18 +128,13 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates index.html and normalized options" do
-    # 1. Check for default [main: "overview"]
-    # 2. Check for output dir having trailing "/" stripped
-    for dir <- ["#{output_dir}", "#{output_dir}/", "#{output_dir}//"] do
-      File.rm_rf(output_dir)
-      File.mkdir(output_dir)
-      refute File.regular?("#{output_dir}/index.html")
-      generate_docs doc_config([output: dir, main: nil, ])
+    # 1. Check for output dir having trailing "/" stripped
+    # 2. Check for default [main: "overview"]
+    generate_docs doc_config([output: "#{output_dir}//", main: nil, ])
 
-      content = File.read!("#{output_dir}/index.html")
-      assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
-      assert File.regular?("#{output_dir}/readme.html")
-    end
+    content = File.read!("#{output_dir}/index.html")
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
+    assert File.regular?("#{output_dir}/overview.html")
   end
 
   test "run generates trying to set 'main: index', should fail" do
