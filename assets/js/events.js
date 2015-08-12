@@ -17,7 +17,6 @@ var searchCache = []
 var searchString = ''
 var regexSearchString = ''
 var caseSensitiveMatch = false
-var lastRowClass = ''
 var sidebarNav = $('.nav')
 
 // Local Methods
@@ -97,8 +96,6 @@ function searchItem () {
     } else {
       item.node.addClass('found')
       item.node.parents('li').addClass('search_uncollapsed')
-      item.node.removeClass(lastRowClass).addClass(lastRowClass === 'r1' ? 'r2' : 'r1')
-      lastRowClass = item.node.hasClass('r1') ? 'r1' : 'r2'
       item.link.html(item.name.replace(matchRegexp, '<strong>$&</strong>'))
     }
 
@@ -155,7 +152,6 @@ function performSearch () {
     $('#spinning span').addClass('fa fa-refresh fa-spin')
     $('#search button span.fa-search').addClass('fa-times').removeClass('fa-search')
     searchIndex = 0
-    lastRowClass = ''
     $('#sidebar').addClass('in_search')
     $('#no_results').text('')
     searchItem()
