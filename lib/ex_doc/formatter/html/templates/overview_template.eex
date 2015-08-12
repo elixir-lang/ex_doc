@@ -2,8 +2,8 @@
     <%= sidebar_template(config, modules, exceptions, protocols, has_readme) %>
 
       <div class="breadcrumbs">
-        <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
-          <span class="fa fa-bars"></span>
+        <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas" aria-label="Close">
+          <span class="fa fa-bars" aria-hidden="true"></span>
         </button>
         <%= if has_readme do %>
           <%= page_breadcrumbs(config, "Overview", "overview.html#content") %>
