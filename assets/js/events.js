@@ -184,12 +184,6 @@ function setupSelected (id) {
   })
 }
 function collapse () {
-  $('#full_list a.toggle').click(function () {
-    $(this).parent().toggleClass('collapsed').next().toggleClass('collapsed')
-    highlight()
-    return false
-  })
-
   $('#full_list > li.node:not(.clicked)').each(function () {
     $(this).addClass('collapsed').next('li.docs').addClass('collapsed')
   })
@@ -242,10 +236,6 @@ function fillSidebarWithNodes (nodes, filter) {
       li = $('<li>', {
         'class': 'node'
       })
-
-      if (element.hasOwnProperty('docs')) {
-        li.append($('<a/>').attr('class', 'toggle'))
-      }
 
       // When visiting a module page, the link to this module page
       // in the menu should not link to a new page, instead should
