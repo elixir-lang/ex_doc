@@ -31,26 +31,30 @@ defmodule Mix.Tasks.Docs do
 
   * `:formatter` - doc formatter to use; default: "html".
 
-  * `:source_root` - path to the source code root directory; default: "." (current directory).
+  * `:source_root` - path to the source code root directory;
+    default: "." _(current directory)_.
 
   * `:source_beam` - path to the beam directory; default: mix's compile path.
-
+  
   * `:source_url_pattern` - public URL of the project.
     Derived from project's `:source_url` if not present.
 
   * `:source_ref` - the branch/commit/tag used for source link inference.
     Ignored if `:source_url_pattern` is provided; default: master.
 
-  * `:main` - main page of the documentation. It may be a module or a
-    generated page, like "overview" or "README";
+  * `:main` - main page of the documentation. It may be a module or a generated page,
+    like "overview" or "readme"; default: "overview" when --fomatter is "html".
   """
 
   @doc false
   def run(args, config \\ Mix.Project.config, generator \\ &ExDoc.generate_docs/3) do
     Mix.Task.run "compile"
 
-    {cli_opts, args, _} = OptionParser.parse(args, aliases: [o: :output],
-                                                   switches: [output: :string])
+    {cli_opts, args, _} = OptionParser.parse( args,
+                            aliases: [o: :output, f: :formatter, c: :config,
+                                      r: :source_root, u: :source_url,
+                                      m: :main, p: :homepage_url, ],
+                            switches: [output: :string], )
 
     if args != [] do
       Mix.raise "Extraneous arguments on the command line"

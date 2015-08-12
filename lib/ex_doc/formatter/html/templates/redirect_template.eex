@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= config.project %> – Redirecting...</title>
+    <meta http-equiv="refresh" content="0; url=<%= h(redirect_to) %>" />
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content="ExDoc" />
+  </head>
+  <body>
+    <div style="font-size: 1.2em; text-align:center; margin: 3.6em; ">
+      <p><strong>The page you have requested has been moved.</strong></p>
+      <p>If you are not redirected automatically, visit <a href="<%= h(redirect_to) %>"><%= h(redirect_to) %></a></p>
+      <script>
+        document.location.href = "<%= redirect_to %>";
+      </script>
+    </div>
+  </body>
+</html>

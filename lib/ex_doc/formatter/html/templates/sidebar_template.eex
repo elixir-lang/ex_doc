@@ -15,18 +15,10 @@
   </h1>
 
   <h2 id="sub_list_header">
-    <%= cond do %>
-      <%= config.main && has_readme -> %>
-        <a href="readme.html">README</a>
-        <a href="overview.html">Overview</a>
-      <%= config.main && !has_readme -> %>
-        <a href="overview.html">Overview</a>
-      <%= !config.main && has_readme -> %>
-        <a href="index.html">README</a>
-        <a href="overview.html">Overview</a>
-      <%= !config.main && !has_readme -> %>
-        <a href="index.html">Overview</a>
+    <%= if has_readme do %>
+      <a href="readme.html">README</a> 
     <% end %>
+    <a href="overview.html">Overview</a>
   </h2>
 
   <div class="nav">

@@ -13,9 +13,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   defp doc_config do
-    %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}",
-                  homepage_url: homepage_url, source_url: source_url}
+    %ExDoc.Config{
+      project: "Elixir",
+      version: "1.0.1",
+      source_root: File.cwd!,
+      source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}",
+      homepage_url: homepage_url,
+      source_url: source_url,
+    }
   end
 
   defp get_module_page(names) do
@@ -85,12 +90,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "listing page has README link if present" do
     content = Templates.sidebar_template(doc_config, [], [], [], true)
-    assert content =~ ~r{<a href="index.html">README</a>}
+    assert content =~ ~r{<a href="readme.html">README</a>}
   end
 
   test "listing page doesn't have README link if not present" do
     content = Templates.sidebar_template(doc_config, [], [], [], false)
-    refute content =~ ~r{<a href="index.html">README</a>}
+    refute content =~ ~r{<a href="readme.html">README</a>}
   end
 
   ## MODULES

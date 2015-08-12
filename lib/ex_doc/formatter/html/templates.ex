@@ -109,7 +109,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     head_template: [:page],
     module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all, :has_readme],
     overview_entry_template: [:node],
-    overview_template: [:config, :modules, :exceptions, :protocols, :has_readme, :has_main],
+    overview_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     readme_template: [:config, :modules, :exceptions, :protocols, :content],
     sidebar_items_entry_template: [:node],
     sidebar_items_keys_template: [:node],
@@ -117,6 +117,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     sidebar_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     summary_template: [:node],
     type_detail_template: [:node, :_module],
+    redirect_template: [:config, :redirect_to],
   ]
 
   Enum.each templates, fn({ name, args }) ->

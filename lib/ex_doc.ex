@@ -21,12 +21,15 @@ defmodule ExDoc do
   Generates documentation for the given `project`, `version`
   and `options`.
   """
+  @spec generate_docs(String.t, String.t, Keyword.t) :: atom
   def generate_docs(project, version, options) when is_binary(project) and is_binary(version) and is_list(options) do
     config = build_config(project, version, options)
     docs = config.retriever.docs_from_dir(config.source_beam, config)
     find_formatter(config.formatter).run(docs, config)
   end
 
+  # Builds configuration by merging `options`, and normalizing the options.
+  @spec build_config(String.t, String.t, Keyword.t) :: %ExDoc.Config{}
   defp build_config(project, version, options) do
     options = normalize_options(options)
     preconfig = %Config{
@@ -62,7 +65,13 @@ defmodule ExDoc do
 
   defp normalize_options(options) do
     pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || "master")
-    Keyword.put(options, :source_url_pattern, pattern)
+    options = Keyword.put(options, :source_url_pattern, pattern)
+
+    if is_bitstring(options[:output]) do
+      options = Keyword.put(options, :output, String.rstrip(options[:output], ?/))
+    end
+
+    options
   end
 
   defp guess_url(url = <<"https://github.com/", _ :: binary>>, ref) do
