@@ -104,14 +104,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     node = %ExDoc.ModuleNode{module: XPTOModule, moduledoc: nil, id: "XPTOModule"}
     content = Templates.module_page(node, doc_config, [node], false)
 
-    assert content =~ ~r/<title>XPTOModule<\/title>/
+    assert content =~ ~r/<title>XPTOModule [^<]*<\/title>/
     assert content =~ ~r/<h1>\s*XPTOModule\s*<\/h1>/
   end
 
   test "module_page outputs the functions and docstrings" do
     content = get_module_page([CompiledWithDocs])
 
-    assert content =~ ~r/<title>CompiledWithDocs<\/title>/
+    assert content =~ ~r/<title>CompiledWithDocs [^<]*<\/title>/
     assert content =~ ~r/<h1>\s*CompiledWithDocs\s*<\/h1>/
     assert content =~ ~r/moduledoc.*Example.*CompiledWithDocs\.example.*/ms
     assert content =~ ~r/example\/2.*Some example/ms
