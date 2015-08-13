@@ -1,3 +1,10 @@
+    <hr>
+    <footer>
+      <p>
+        This site was built using <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc">ExDoc</a>
+        and <a href="http://elixir-lang.org/" title="Elixir">Elixir</a>.
+      </p>
+    </footer>
   </section> <!--/content -->
 </div><!--/row -->
 
