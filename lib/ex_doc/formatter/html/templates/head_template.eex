@@ -5,11 +5,11 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <%= cond do %>
       <%= page.id == :module -> %>
-        <title><%= page.module.id %> – <%= page.content.project %> v<%= page.content.version %></title>
+        <title><%= page.module %> – <%= config.project %> v<%= config.version %></title>
       <%= page.id == :readme -> %>
-         <title>README – <%= page.content.project %> v<%= page.content.version %></title>
+        <title>README – <%= config.project %> v<%= config.version %></title>
       <%= page.id == :overview -> %>
-        <title>Overview – <%= page.content.project %> v<%= page.content.version %></title>
+        <title>Overview – <%= config.project %> v<%= config.version %></title>
     <% end %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc">

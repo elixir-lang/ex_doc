@@ -1,4 +1,4 @@
-<%= head_template(%{id: :readme, content: config}) %>
+<%= head_template(config, %{id: :readme}) %>
 <%= sidebar_template(config, modules, exceptions, protocols, true) %>
 
 <div class="breadcrumbs">
