@@ -225,11 +225,10 @@ function fillSidebarWithNodes (nodes, filter) {
 
   function scope (items) {
     var filtered = nodes[items]
-    var fullList = $('<ul>', {
-      'id': 'full_list'
-    })
+    var fullList = '<ul id="full_list">'
 
     if (!filtered) {
+      fullList += '</ul>'
       full_list.replaceWith(fullList)
       return
     }
@@ -243,13 +242,7 @@ function fillSidebarWithNodes (nodes, filter) {
       var href
 
       /* li.node */
-      li = $('<li>', {
-        'class': 'node'
-      })
-
-      if (element.hasOwnProperty('docs')) {
-        li.append($('<a/>').attr('class', 'toggle'))
-      }
+      li = '<li class="node">'
 
       // When visiting a module page, the link to this module page
       // in the menu should not link to a new page, instead should
@@ -257,49 +250,35 @@ function fillSidebarWithNodes (nodes, filter) {
       current_path = window.location.pathname.split('/')
       href = id + '.html'
       if (href === current_path[current_path.length - 1]) {
-        li.addClass('clicked')
+        li = '<li class="node clicked">'
         href = href + '#content'
       }
 
-      li.append($('<a/>', {
-        'href': href,
-        'title': id,
-        'html': id,
-        'class': 'object_link'
-      }))
+      if (element.hasOwnProperty('docs')) {
+        li += '<a class="toggle"></a>'
+      }
 
-      li.append($('<span/>', {
-        'class': 'node_name',
-        'html': id
-      }))
+      li += '<a href="' + href + '" title="' + id + '" class="object_link">' + id + '</a>'
+      li += '<span class="node_name">' + id + '</span></li>'
 
-      fullList.append(li)
+      fullList += li
 
       if (element.hasOwnProperty('docs')) {
         /* li.docs */
-        docs_container = $('<li>', {
-          'class': 'docs'
-        })
-        ul = $('<ul>')
+        docs_container = '<li class="docs">'
+        ul = '<ul>'
 
         element.docs.forEach(function (element) {
-          var detail = $('<li>')
+          var detail = '<li>'
 
-          detail.append($('<a/>', {
-            'href': id + '.html' + '#' + element,
-            'title': id + '.' + element,
-            'class': 'object_link',
-            'html': element
-          }))
-          detail.append($('<span/>', {
-            'class': 'node_name',
-            'html': id
-          }))
-          ul.append(detail)
+          detail += '<a href="' + id + '.html#' + element + '" title="' + id + '.' + element + '" class="object_link">' + element + '</a>'
+          detail += '<span class="node_name">' + id + '</span></li>'
+
+          ul += detail
         })
 
-        docs_container.append(ul)
-        fullList.append(docs_container)
+        docs_container += ul + '</ul></li>'
+        fullList += docs_container
       }
     })
     full_list.replaceWith(fullList)
