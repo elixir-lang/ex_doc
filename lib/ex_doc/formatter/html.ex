@@ -50,7 +50,7 @@ defmodule ExDoc.Formatter.HTML do
     content = Templates.sidebar_items_template(input)
     # Safely reduce the size of the JS code
     content = Regex.replace(~r/([:,\[\]\{\};])(\s|\t|\R|\h|\v)+/, content, "\\1")
-    :ok = File.write("#{output}/sidebar_items.js", content)
+    :ok = File.write("#{output}/dist/sidebar_items.js", content)
   end
 
   defp assets do

@@ -53,7 +53,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates all listing files" do
     HTML.run(get_modules, doc_config)
 
-    content = File.read!("#{output_dir}/sidebar_items.js")
+    content = File.read!("#{output_dir}/dist/sidebar_items.js")
     assert content =~ ~r{.*"CompiledWithDocs\".*}ms
     assert content =~ ~r{.*"CompiledWithDocs\".*\"example\/2\".*}ms
     assert content =~ ~r{.*"CompiledWithDocs.Nested\".*}ms
