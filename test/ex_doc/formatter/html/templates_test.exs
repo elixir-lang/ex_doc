@@ -123,7 +123,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~s{<strong>example(foo, bar \\\\ Baz)</strong>}
     assert content =~ ~s{<span class="detail_type">\(function\)</span>}
     assert content =~ ~r{<a href="#example/2" class="detail_link" title="Link to this function">\n\s*<i class="fa fa-link"><\/i>\n\s*<\/a>}ms
-    assert content =~ ~s{<a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>}
   end
 
   test "module_page outputs the types and function specs" do

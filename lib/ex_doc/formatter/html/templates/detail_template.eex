@@ -5,7 +5,7 @@
       <span class="detail_type">(<%= pretty_type(node) %>)</span>
       <a href="#<%=h link_id(node) %>" class="detail_link" title="Link to this <%= pretty_type(node) %>">
         <i class="fa fa-link"></i>
-      </a> <%= to_top_link() %>
+      </a>
     </div>
   </div>
   <%= if specs = get_specs(node) do %>
