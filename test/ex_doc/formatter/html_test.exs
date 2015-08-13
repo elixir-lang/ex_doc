@@ -72,7 +72,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     content = File.read!("#{output_dir}/sidebar_items.js")
     assert content =~ ~r{.*"CompiledWithDocs\".*}ms
-    assert content =~ ~r{.*"CompiledWithDocs\".*\"example\/2\".*}ms
+    assert content =~ ~r{.*"CompiledWithDocs\".*\"example/2\".*}ms
     assert content =~ ~r{.*"CompiledWithDocs.Nested\".*}ms
     assert content =~ ~r{.*"UndefParent\.Nested\".*}ms
     assert content =~ ~r{.*"CustomBehaviourOne\".*}ms

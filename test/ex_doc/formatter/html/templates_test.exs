@@ -80,9 +80,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     content = Templates.sidebar_items_template([%{id: "modules", value: nodes}])
 
     assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*}ms
-    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example\/2\".*}ms
-    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example_1\/0\".*}ms
-    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example_without_docs\/0\".*}ms
+    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example/2\".*}ms
+    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example_1/0\".*}ms
+    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example_without_docs/0\".*}ms
     assert content =~ ~r{.*"CompiledWithDocs.Nested\"}ms
     refute content =~ ~r{.*\"exceptions\":}ms
     refute content =~ ~r{.*\"protocols\":}ms
@@ -104,20 +104,20 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     node = %ExDoc.ModuleNode{module: XPTOModule, moduledoc: nil, id: "XPTOModule"}
     content = Templates.module_page(node, doc_config, [node], false)
 
-    assert content =~ ~r/<title>XPTOModule [^<]*<\/title>/
-    assert content =~ ~r/<h1>\s*XPTOModule\s*<\/h1>/
+    assert content =~ ~r{<title>XPTOModule [^<]*</title>}
+    assert content =~ ~r{<h1>\s*XPTOModule\s*</h1>}
   end
 
   test "module_page outputs the functions and docstrings" do
     content = get_module_page([CompiledWithDocs])
 
-    assert content =~ ~r/<title>CompiledWithDocs [^<]*<\/title>/
-    assert content =~ ~r/<h1>\s*CompiledWithDocs\s*<\/h1>/
-    assert content =~ ~r/moduledoc.*Example.*CompiledWithDocs\.example.*/ms
-    assert content =~ ~r/example\/2.*Some example/ms
-    assert content =~ ~r/example_without_docs\/0.*<section class="docstring">.*<\/section>/ms
-    assert content =~ ~r/example_1\/0.*Another example/ms
-    assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source<\/a>}ms
+    assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
+    assert content =~ ~r{<h1>\s*CompiledWithDocs\s*</h1>}
+    assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
+    assert content =~ ~r{example/2.*Some example}ms
+    assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
+    assert content =~ ~r{example_1/0.*Another example}ms
+    assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>Source</a>}ms
 
     assert content =~ ~s{<div class="detail_header" id="example_1/0">}
     assert content =~ ~s{<strong>example(foo, bar \\\\ Baz)</strong>}
