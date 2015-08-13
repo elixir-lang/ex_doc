@@ -54,7 +54,7 @@
     </div><!-- /.col-xs-2 -->
   </div><!-- /#search .row -->
 
-  <script src="sidebar_items.js" defer></script>
+  <script src="dist/sidebar_items.js" defer></script>
 
   <ul id="full_list">
   </ul>
