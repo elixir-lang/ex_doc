@@ -46,7 +46,7 @@
 
       <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
         <section id="summary_details" class="details_list">
-          <h1 id="summary" class="section_heading">Summary <%= to_top_link() %></h1>
+          <h1 id="summary" class="section_heading">Summary</h1>
           <div class="summary">
             <%= for node <- Enum.sort(functions ++ macros, &(&1.id <= &2.id)), do: summary_template(node) %>
           </div>
@@ -55,7 +55,7 @@
 
       <%= unless Enum.empty?(types) do %>
         <section id="types_details" class="details_list">
-          <h1 class="section_heading">Types <%= to_top_link() %></h1>
+          <h1 class="section_heading">Types</h1>
           <%= for node <- types, do: type_detail_template(node, module) %>
         </section>
       <% end %>

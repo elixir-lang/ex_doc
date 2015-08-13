@@ -55,11 +55,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     String.split(doc, ~r/\n\s*\n/) |> hd |> String.strip() |> String.rstrip(?.)
   end
 
-  # A bit of standard HTML to insert the to-top arrow.
-  defp to_top_link() do
-    "<a class=\"to_top_link\" href=\"#content\" title=\"To the top of the page\">&uarr;</a>"
-  end
-
   defp presence([]),    do: nil
   defp presence(other), do: other
 
