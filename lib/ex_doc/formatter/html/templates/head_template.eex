@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <%= cond do %>
-    <%= page.id == :module -> %>
-    <title><%= page.content %></title>
-    <%= page.id == :readme -> %>
-    <title><%= page.content.project %> v<%= page.content.version %> README</title>
-    <%= page.id == :overview -> %>
-    <title><%= page.content.project %> v<%= page.content.version %> Overview</title>
+      <%= page.id == :module -> %>
+        <title><%= page.module %> – <%= config.project %> v<%= config.version %></title>
+      <%= page.id == :readme -> %>
+        <title>README – <%= config.project %> v<%= config.version %></title>
+      <%= page.id == :overview -> %>
+        <title>Overview – <%= config.project %> v<%= config.version %></title>
     <% end %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc">

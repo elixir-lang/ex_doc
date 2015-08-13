@@ -72,7 +72,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     content = File.read!("#{output_dir}/sidebar_items.js")
     assert content =~ ~r{.*"CompiledWithDocs\".*}ms
-    assert content =~ ~r{.*"CompiledWithDocs\".*\"example\/2\".*}ms
+    assert content =~ ~r{.*"CompiledWithDocs\".*\"example/2\".*}ms
     assert content =~ ~r{.*"CompiledWithDocs.Nested\".*}ms
     assert content =~ ~r{.*"UndefParent\.Nested\".*}ms
     assert content =~ ~r{.*"CustomBehaviourOne\".*}ms
@@ -97,7 +97,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config)
 
     content = File.read!("#{output_dir}/readme.html")
-    assert content =~ ~r{<title>[^<]* README</title>}
+    assert content =~ ~r{<title>README [^<]*</title>}
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code>TypesAndSpecs.Sub</code></a>}
@@ -108,7 +108,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     refute File.regular?("#{output_dir}/readme.html")
     content = File.read!("#{output_dir}/index.html")
-    refute content =~ ~r{<title>[^<]* README</title>}
+    refute content =~ ~r{<title>README [^<]*</title>}
   end
 
   test "make markdown codeblocks pretty" do
