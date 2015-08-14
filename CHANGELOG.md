@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.8.2
+
+* Enhancements
+  * Uglify and minify JS and CSS code
+  * Performance improvements when building sidebar
+  * Redirect from index.html to proper page
+
+* Bug fixes
+  * Style fixes in the new layout
+
 ## v0.8.1
 
 * Bug fixes
