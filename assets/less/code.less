@@ -2,31 +2,34 @@
 code {
   font-family: @monoFontFamily;
   font-size: 14px;
-  line-height: 20px;
+  line-height: 25px;
   font-weight: 400;
   background-color: #FAFAFC;
   border: 1px solid #E3E4E8;
-  vertical-align: middle;
-}
-
-pre.spec {
-  margin: 0;
-}
-pre.spec code {
-  padding: 0;
+  vertical-align: top;
+  border-radius: 2px;
+  padding: 0 .5em;
 }
 
 pre {
   margin: @baseLineHeight 0;
-}
 
-pre code.hljs {
-  white-space: inherit;
-  padding: @baseLineHeight;
-  border-radius: 2px;
-}
+  &.spec {
+      margin: 0;
+  }
 
-pre code a,
-pre code a:visited {
-  color: white;
+  &.spec code {
+    padding: 0;
+  }
+
+  code.hljs {
+    white-space: inherit;
+    padding: @baseLineHeight;
+    border-radius: 2px;
+  }
+
+  code a,
+  code a:visited {
+    color: white;
+  }
 }
