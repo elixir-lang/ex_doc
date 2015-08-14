@@ -1,105 +1,9 @@
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-title {
-  color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-attribute,
-.hljs-tag,
-.hljs-regexp,
-.ruby .hljs-constant,
-.xml .hljs-tag .hljs-title,
-.xml .hljs-pi,
-.xml .hljs-doctype,
-.html .hljs-doctype,
-.css .hljs-id,
-.css .hljs-class,
-.css .hljs-pseudo {
-  color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-preprocessor,
-.hljs-pragma,
-.hljs-built_in,
-.hljs-literal,
-.hljs-params,
-.hljs-constant {
-  color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.ruby .hljs-class .hljs-title,
-.css .hljs-rules .hljs-attribute {
-  color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-value,
-.hljs-inheritance,
-.hljs-header,
-.ruby .hljs-symbol,
-.xml .hljs-cdata {
-  color: #718c00;
-}
-
-/* Tomorrow Aqua */
-.css .hljs-hexcolor {
-  color: #3e999f;
-}
-
-/* Tomorrow Blue */
-.hljs-function,
-.python .hljs-decorator,
-.python .hljs-title,
-.ruby .hljs-function .hljs-title,
-.ruby .hljs-title .hljs-keyword,
-.perl .hljs-sub,
-.javascript .hljs-title,
-.coffeescript .hljs-title {
-  color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.javascript .hljs-function {
-  color: #8959a8;
-}
-
-.hljs {
-  display: block;
-  overflow-x: auto;
-  background: #2b2f3e;
-  color: white;
-  -webkit-text-size-adjust: none;
-
-  span {
-    white-space: inherit;
-  }
-}
-
-.coffeescript .javascript,
-.javascript .xml,
-.tex .hljs-formula,
-.xml .javascript,
-.xml .vbscript,
-.xml .css,
-.xml .hljs-cdata {
-  opacity: 0.5;
-}
-
 // Customizations
 code {
   font-family: @monoFontFamily;
   font-size: 14px;
   line-height: 20px;
-  font-weight: 300;
+  font-weight: 400;
   background-color: #FAFAFC;
   border: 1px solid #E3E4E8;
   vertical-align: middle;
@@ -113,13 +17,13 @@ pre.spec code {
 }
 
 pre {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin: @baseLineHeight 0;
 }
 
-pre code {
+pre code.hljs {
   white-space: inherit;
-  padding: 15px;
+  padding: @baseLineHeight;
+  border-radius: 2px;
 }
 
 pre code a,
