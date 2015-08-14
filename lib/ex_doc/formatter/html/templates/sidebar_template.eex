@@ -39,7 +39,7 @@
     <% end %>
   </div>
 
-  <div id="search" class="row">
+  <div id="search">
     <div class="col-xs-10">
       <div class="input-group input-group-sm">
         <label for="search_field" class="sr-only">Search</label>
