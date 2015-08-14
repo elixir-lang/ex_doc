@@ -8,6 +8,7 @@ body {
 
 body {
   font-size: 18px;
+  line-height: @baseLineHeight;
   font-family: @serifFontFamily;
   color: @darkGray;
 }
@@ -24,44 +25,4 @@ a:visited {
 
 a:hover {
   color: @darkGray;
-}
-
-h1 {
-  font-size: 25px;
-  border-top: 0;
-  margin-top: 0;
-  padding-top: 4px;
-}
-
-h1 small {
-  color: #888;
-  font-size: 18px;
-}
-
-h2 {
-  padding: 0 0 3px 0;
-  border-bottom: 1px #aaa solid;
-  font-size: 1.4em;
-  margin: 1.8em 0 0.5em;
-}
-
-table {
-  border: 1px solid #aaa;
-  border-collapse: collapse;
-  margin: 1em 0;
-  empty-cells: show;
-}
-
-table th,
-table td {
-  border: 1px solid #ddd;
-  padding: 0.4em 1em 0.4em 0.4em;
-}
-
-table tr:nth-child(odd) {
-  background: #f0f0f0;
-}
-
-table tr:nth-child(even) {
-  background: #fafafa;
 }

@@ -1,203 +1,238 @@
 // Content Styles
 
 #content {
-  padding: 0 28px 20px 18px;
-}
+  font-size: 18px;
+  line-height: @baseLineHeight;
+  padding: 20px 60px;
+  margin-top: 70px;
 
-h1:not(#full_list_header) {
-  font-size: 40px;
-  font-weight: bold;
-  font-family: @serifFontFamily;
-  padding-bottom: 25px;
-  border-bottom: 1px solid #C1C6D1;
-  margin-bottom: 20px;
-}
+  h1 {
+    font-family: @sansFontFamily;
+    font-size: @h1FontSize;
+    line-height: @h1LineHeight;
+    margin-top: @h1MarginTop;
+    margin-bottom: @h1MarginBottom;
 
-h2.section-heading {
-  color: @green;
-  font-family: @sansFontFamily;
-  padding-bottom: 20px;
-  font-weight: normal;
-  font-size: 20px;
-  text-transform: uppercase;
-}
-
-.clear {
-  clear: both;
-}
-
-section.details-list h1 {
-  border-bottom: 1px dotted #aaa;
-  padding-top: 35px;
-  padding-bottom: 10px;
-}
-
-/* OTHERS */
-
-div.breadcrumbs {
-  padding: 3px 15px 3px 16px;
-  background-color: #EEE;
-  margin: 0 -26px 10px -18px;
-  line-height: 28px;
-  display: block;
-}
-
-/* SUMMARY LINKS */
-
-ul.summary-links {
-  margin: 0 0 1em 0;
-  padding: 0;
-}
-
-ul.summary-links li {
-  display: inline-block;
-  list-style-type: none;
-  width: 7em;
-  text-align: center;
-  background: #f0f0f0;
-}
-
-/* EXTERNAL LINKS */
-#content a.external span {
-  padding-left: 3px;
-}
-
-/* DOCSTRING */
-
-section.docstring,
-p.docstring {
-  margin-right: 0;
-}
-
-.docstring h1,
-.docstring h2,
-.docstring h3,
-.docstring h4 {
-  border: 0;
-  margin: 1.8em 0 0.5em;
-}
-
-.docstring h3,
-.docstring h4 {
-  font-size: 1.2em;
-}
-
-.docstring ul {
-  padding-left: 20px;
-}
-
-.docstring li > p {
-  margin: 0;
-}
-
-/* SUMMARY */
-
-div.detail-header-links {
-  float: right;
-  padding-right: 10px;
-}
-
-a.to-top-link {
-  padding-left: 0.3em;
-  font-size: 1em;
-  font-weight: normal;
-}
-
-.summary {
-  padding: 0;
-  width: 100%;
-}
-
-table.summary tr:nth-child(odd) {
-  background: #f0f0f0;
-}
-
-table.summary tr:nth-child(even) {
-  background: #fafafa;
-}
-
-table.summary tr td {
-  border: 0;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-}
-
-td.summary-signature {
-  padding-right: 0.5em;
-}
-
-td.summary-synopsis {
-  padding-left: 0.5em;
-  width: 90%;
-}
-
-td.summary-synopsis p {
-  margin: 0;
-}
-
-/* DETAILS LIST */
-
-.spec,
-.typespec {
-  font: bold 1em Courier, monospace;
-}
-
-ul.spec {
-  padding: 6px 10px 6px 25px;
-  list-style-type: none;
-}
-
-.type-detail {
-  margin: 20px 0 0 0;
-}
-
-.type-detail > div.typespec-doc {
-  margin-left: 10px;
-}
-
-.type-detail > div.typespec-doc > p {
-  margin: 5px 0;
-}
-
-.detail {
-  margin-top: 15px;
-  padding-top: 0;
-}
-
-.detail:nth-child(2) {
-  border: 0;
-}
-
-div.detail-header {
-  float: left;
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-span.signature {
-  font-family: @monoFontFamily;
-  font-size: 15px;
-  padding-left: 10px;
-
-  strong {
-    font-weight: 400;
+    font-weight: 700;
+    padding-bottom: @h1Line;
+    border-bottom: 1px solid @lightGray;
   }
-}
+
+  h1 small {
+    color: #888;
+  }
+
+  h2 {
+    font-family: @sansFontFamily;
+    font-size: @h2FontSize;
+    line-height: @h2LineHeight;
+    margin-top: @h2MarginTop;
+    margin-bottom: @h2MarginBottom;
+    font-weight: 700;
+  }
+
+  h1.section-heading {
+    color: @green;
+    font-family: @sansFontFamily;
+    font-weight: normal;
+    text-transform: uppercase;
+    font-size: @h3FontSize;
+    line-height: @h3LineHeight;
+    margin-top: @h3MarginTop;
+    margin-bottom: @h3MarginBottom;
+    border: none;
+  }
+
+  h3 {
+    font-family: @sansFontFamily;
+    font-size: @h3FontSize;
+    line-height: @h3LineHeight;
+    margin-top: @h3MarginTop;
+    margin-bottom: @h3MarginBottom;
+  }
+
+  h4 {
+    font-family: @sansFontFamily;
+    font-size: @h4FontSize;
+    line-height: @h4LineHeight;
+    margin-top: @h4MarginTop;
+    margin-bottom: @h4MarginBottom;
+  }
+
+  table {
+    border: 1px solid #aaa;
+    border-collapse: collapse;
+    margin: 1em 0;
+    empty-cells: show;
+  }
+
+  table th,
+  table td {
+    border: 1px solid #ddd;
+    padding: 0.4em 1em 0.4em 0.4em;
+  }
+
+  table tr:nth-child(odd) {
+    background: #f0f0f0;
+  }
+
+  table tr:nth-child(even) {
+    background: #fafafa;
+  }
+
+  .clear {
+    clear: both;
+  }
+
+  .breadcrumbs {
+    font-size: .9em;
+    font-family: @sansFontFamily;
+    display: block;
+  }
 
 
-span.detail-type {
-padding-left: 10px;
-  font-size: 14px;
-  font-family: @sansFontFamily;
-  font-weight: 300;
-}
+  ul.summary-links {
+    margin: 0 0 1em 0;
+    padding: 0;
+  }
 
-a.detail-link {
-  padding-left: 0.3em;
-}
+  ul.summary-links li {
+    display: inline-block;
+    list-style-type: none;
+    width: 7em;
+    text-align: center;
+    background: #f0f0f0;
+  }
 
-.detail-header-links > a {
-  border: none;
-  font-size: 14px;
+  /* EXTERNAL LINKS */
+  #content a.external span {
+    padding-left: 3px;
+  }
+
+  /* DOCSTRING */
+
+  section.docstring,
+  p.docstring {
+    margin-right: 0;
+  }
+
+  .docstring ul {
+    padding-left: 20px;
+  }
+
+  .docstring li > p {
+    margin: 0;
+  }
+
+  /* SUMMARY */
+
+  div.detail-header-links {
+    float: right;
+    padding-right: 10px;
+  }
+
+  a.to-top-link {
+    padding-left: 0.3em;
+    font-size: 1em;
+    font-weight: normal;
+  }
+
+  .summary {
+    padding: 0;
+    width: 100%;
+  }
+
+  table.summary tr:nth-child(odd) {
+    background: #f0f0f0;
+  }
+
+  table.summary tr:nth-child(even) {
+    background: #fafafa;
+  }
+
+  table.summary tr td {
+    border: 0;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+  }
+
+  td.summary-signature {
+    padding-right: 0.5em;
+  }
+
+  td.summary-synopsis {
+    padding-left: 0.5em;
+    width: 90%;
+  }
+
+  td.summary-synopsis p {
+    margin: 0;
+  }
+
+  /* DETAILS LIST */
+
+  .spec,
+  .typespec {
+    font: bold 1em Courier, monospace;
+  }
+
+  ul.spec {
+    padding: 6px 10px 6px 25px;
+    list-style-type: none;
+  }
+
+  .type-detail {
+    margin: 20px 0 0 0;
+  }
+
+  .type-detail > div.typespec-doc {
+    margin-left: 10px;
+  }
+
+  .type-detail > div.typespec-doc > p {
+    margin: 5px 0;
+  }
+
+  .detail {
+    margin-top: 15px;
+    padding-top: 0;
+  }
+
+  .detail:nth-child(2) {
+    border: 0;
+  }
+
+  div.detail-header {
+    float: left;
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  span.signature {
+    font-family: @monoFontFamily;
+    font-size: 15px;
+    padding-left: 10px;
+
+    strong {
+      font-weight: 400;
+    }
+  }
+
+
+  span.detail-type {
+    padding-left: 10px;
+    font-size: 14px;
+    font-family: @sansFontFamily;
+    font-weight: 300;
+  }
+
+  a.detail-link {
+    padding-left: 0.3em;
+  }
+
+  .detail-header-links > a {
+    border: none;
+    font-size: 14px;
+  }
 }
