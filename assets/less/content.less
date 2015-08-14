@@ -123,10 +123,6 @@
 
   /* SUMMARY */
 
-  div.detail-header-links {
-    float: right;
-    padding-right: 10px;
-  }
 
   a.to-top-link {
     padding-left: 0.3em;
@@ -199,37 +195,49 @@
     border: 0;
   }
 
-  div.detail-header {
+  .detail-header {
     float: left;
     display: block;
     width: 100%;
-    margin-bottom: 10px;
-  }
+    margin-bottom: 1em;
+    background-color: @lighterGray;
+    padding: .5em;
+    border-left: 5px solid @green;
 
-  span.signature {
-    font-family: @monoFontFamily;
-    font-size: 15px;
-    padding-left: 10px;
-
-    strong {
-      font-weight: 400;
+    .detail-type {
+      padding-left: 10px;
+      font-size: 16px;
+      font-family: @sansFontFamily;
+      font-weight: 300;
+      float: right;
     }
-  }
 
+    .signature {
+      font-family: @monoFontFamily;
+      font-size: 18px;
+      padding-left: 10px;
+    }
 
-  span.detail-type {
-    padding-left: 10px;
-    font-size: 14px;
-    font-family: @sansFontFamily;
-    font-weight: 300;
-  }
+    .detail-link {
+      opacity: 0;
+      padding-left: 0.3em;
+      background: transparent;
+      border: none;
+      margin-left: -49px;
+      margin-top: -9px;
+      padding: 12px 12px 7px 12px;
+      position: absolute;
+      color: @gray;
+      transition: all 0.3s linear;
 
-  a.detail-link {
-    padding-left: 0.3em;
-  }
+      &:hover {
+        opacity: 1;
+        color: @darkGray;
+      }
+    }
 
-  .detail-header-links > a {
-    border: none;
-    font-size: 14px;
+    &:hover .detail-link {
+      opacity: 1;
+    }
   }
 }

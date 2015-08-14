@@ -120,7 +120,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*Source <i class="fa fa-code"></i>\n\s*</a>}ms
 
     assert content =~ ~s{<div class="detail-header" id="example_1/0">}
-    assert content =~ ~s{<strong>example(foo, bar \\\\ Baz)</strong>}
+    assert content =~ ~s{example(foo, bar \\\\ Baz)}
     assert content =~ ~s{<span class="detail-type">\(function\)</span>}
     assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\n\s*<i class="fa fa-link"><\/i>\n\s*<\/a>}ms
   end
