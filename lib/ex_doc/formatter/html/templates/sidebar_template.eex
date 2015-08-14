@@ -5,6 +5,9 @@
     <h1><%= config.project %></h1>
   <% end %>
   <h2>v<%= config.version %></h2>
+  <button type="button" class="btn btn-default btn-sm mobile-nav-toggle" data-toggle="offcanvas" aria-label="Close">
+    <span class="fa fa-bars" aria-hidden="true"></span>
+  </button>
 </header>
 
 <div class="row row-offcanvas row-offcanvas-left">
