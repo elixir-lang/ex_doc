@@ -1,15 +1,6 @@
     <%= head_template(config, %{id: :overview}) %>
     <%= sidebar_template(config, modules, exceptions, protocols, has_readme) %>
 
-      <div class="breadcrumbs">
-        <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas" aria-label="Close">
-          <span class="fa fa-bars" aria-hidden="true"></span>
-        </button>
-        <%= if has_readme do %>
-          <%= page_breadcrumbs(config, "Overview", "overview.html#content") %>
-        <% end %>
-      </div>
-
       <h1><%= config.project %> v<%= config.version %></h1>
 
       <ul class="summary-links">

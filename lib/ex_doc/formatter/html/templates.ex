@@ -65,39 +65,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     end
   end
 
-  # Get the breadcrumbs HTML.
-  #
-  # If module is :overview generates the breadcrumbs for the overview.
-  defp module_breadcrumbs(config, modules, module) do
-    parts = [root_breadcrumbs(config), {"Overview", "overview.html"}]
-    aliases = Module.split(module.module)
-    modules = Enum.map(modules, &(&1.module))
-
-    {crumbs, _} =
-      Enum.map_reduce(aliases, [], fn item, parents ->
-        path = parents ++ [item]
-        mod  = Module.concat(path)
-        page = if mod in modules, do: inspect(mod) <> ".html#content"
-        {{item, page}, path}
-      end)
-
-    generate_breadcrumbs(parts ++ crumbs)
-  end
-
-  defp page_breadcrumbs(config, title, link) do
-    generate_breadcrumbs [root_breadcrumbs(config), { title, link }]
-  end
-
-  defp root_breadcrumbs(config) do
-    {"#{config.project} v#{config.version}", nil}
-  end
-
-  defp generate_breadcrumbs(crumbs) do
-    Enum.map_join(crumbs, " &rarr; ", fn { name, ref } ->
-      if ref, do: "<a href=\"#{h(ref)}\">#{h(name)}</a>", else: h(name)
-    end)
-  end
-
   templates = [
     detail_template: [:node, :_module],
     footer_template: [],
