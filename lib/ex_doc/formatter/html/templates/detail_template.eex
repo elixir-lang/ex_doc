@@ -1,9 +1,9 @@
 <section class="detail">
-  <div class="detail_header" id="<%=h link_id(node) %>">
+  <div class="detail-header" id="<%=h link_id(node) %>">
     <span class="signature"><strong><%=h node.signature %></strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(<%= pretty_type(node) %>)</span>
-      <a href="#<%=h link_id(node) %>" class="detail_link" title="Link to this <%= pretty_type(node) %>">
+    <div class="detail-header-links">
+      <span class="detail-type">(<%= pretty_type(node) %>)</span>
+      <a href="#<%=h link_id(node) %>" class="detail-link" title="Link to this <%= pretty_type(node) %>">
         <i class="fa fa-link"></i>
       </a>
     </div>
@@ -20,7 +20,7 @@
     <%= to_html(node.doc) %>
   </section>
   <%= if node.source do %>
-    <a href="<%= node.source %>" class="view_source">
+    <a href="<%= node.source %>" class="view-source">
       Source <i class="fa fa-code"></i>
     </a>
   <% end %>
