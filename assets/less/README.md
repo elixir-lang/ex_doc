@@ -20,7 +20,6 @@ body
     div.no-results
 
   section
-    div.breadcrumbs
     h1
       small
     ul.summary-links
