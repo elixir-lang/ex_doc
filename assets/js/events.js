@@ -24,15 +24,15 @@ var sidebarNav = $('.nav')
 
 function highlight (no_padding) {
   var n = 1
-  $('#full_list a.object_link:visible').each(function () {
+  $('#full_list a.object-link:visible').each(function () {
     var next = n === 1 ? 2 : 1
     var li = $(this).parent()
 
     li.removeClass('r' + next).addClass('r' + n)
     if (no_padding) {
-      li.addClass('no_padding')
+      li.addClass('no-padding')
     } else {
-      li.removeClass('no_padding')
+      li.removeClass('no-padding')
     }
     n = next
   })
@@ -41,16 +41,16 @@ function highlight (no_padding) {
 /**
  * When the search field is empty show the children nodes of the #full_list
  *
- * Also removes the class .search_uncollapsed, .in_search, .found and .loading
+ * Also removes the class .search-uncollapsed, .in-search, .found and .loading
  * among other things to reset the sidebar default status
  */
 function showAllResults () {
   clearTimeout(inSearch)
   inSearch = defaultSearchItemTimeOut
-  $('.search_uncollapsed').removeClass('search_uncollapsed')
-  $('#sidebar').removeClass('in_search')
+  $('.search-uncollapsed').removeClass('search-uncollapsed')
+  $('#sidebar').removeClass('in-search')
   $('#full_list li').removeClass('found').each(function () {
-    var link = $(this).find('a.object_link:first')
+    var link = $(this).find('a.object-link:first')
     link.text(link.text())
   })
   $('#no_results').text('')
@@ -95,7 +95,7 @@ function searchItem () {
       item.node.removeClass('found')
     } else {
       item.node.addClass('found')
-      item.node.parents('li').addClass('search_uncollapsed')
+      item.node.parents('li').addClass('search-uncollapsed')
       item.link.html(item.name.replace(matchRegexp, '<strong>$&</strong>'))
     }
 
@@ -121,7 +121,7 @@ function fullListSearch () {
   $('#spinning span').removeClass('fa fa-refresh fa-spin')
 
   $('#full_list li').each(function () {
-    var link = $(this).find('a.object_link:first')
+    var link = $(this).find('a.object-link:first')
     var fullName
 
     if (link.attr('title')) {
@@ -152,7 +152,7 @@ function performSearch () {
     $('#spinning span').addClass('fa fa-refresh fa-spin')
     $('#search button span.fa-search').addClass('fa-times').removeClass('fa-search')
     searchIndex = 0
-    $('#sidebar').addClass('in_search')
+    $('#sidebar').addClass('in-search')
     $('#no_results').text('')
     searchItem()
   }
@@ -232,8 +232,8 @@ function fillSidebarWithNodes (nodes, filter) {
         li += '<a class="toggle"></a>'
       }
 
-      li += '<a href="' + href + '" title="' + id + '" class="object_link">' + id + '</a>'
-      li += '<span class="node_name">' + id + '</span></li>'
+      li += '<a href="' + href + '" title="' + id + '" class="object-link">' + id + '</a>'
+      li += '<span class="node-name">' + id + '</span></li>'
 
       fullList += li
 
@@ -245,8 +245,8 @@ function fillSidebarWithNodes (nodes, filter) {
         element.docs.forEach(function (element) {
           var detail = '<li>'
 
-          detail += '<a href="' + id + '.html#' + element + '" title="' + id + '.' + element + '" class="object_link">' + element + '</a>'
-          detail += '<span class="node_name">' + id + '</span></li>'
+          detail += '<a href="' + id + '.html#' + element + '" title="' + id + '.' + element + '" class="object-link">' + element + '</a>'
+          detail += '<span class="node-name">' + id + '</span></li>'
 
           ul += detail
         })
@@ -313,7 +313,7 @@ function initalize () {
 
   $('#search input').on('keypress', function (e) {
     if (e.which === 13) { // enter key maps to 13
-      var firstLinkFound = document.querySelectorAll('#full_list li.found a.object_link')[0]
+      var firstLinkFound = document.querySelectorAll('#full_list li.found a.object-link')[0]
       firstLinkFound.click()
     }
   })
