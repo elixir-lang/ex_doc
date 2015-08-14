@@ -12,7 +12,7 @@
 
       <h1><%= config.project %> v<%= config.version %></h1>
 
-      <ul class="summary_links">
+      <ul class="summary-links">
         <%= unless Enum.empty?(modules) do %>
           <li><a href="#modules_summary">Modules</a></li>
         <% end %>
@@ -25,21 +25,21 @@
       </ul>
 
       <%= unless Enum.empty?(modules) do %>
-        <h1 id="modules_summary" class="section_heading">Modules summary</h1>
+        <h1 id="modules_summary" class="section-heading">Modules summary</h1>
         <div class="summary">
           <%= for node <- modules, do: overview_entry_template(node) %>
         </div>
       <% end %>
 
       <%= unless Enum.empty?(exceptions) do %>
-        <h1 id="exceptions_summary" class="section_heading">Exceptions summary</h1>
+        <h1 id="exceptions_summary" class="section-heading">Exceptions summary</h1>
         <div class="summary">
           <%= for node <- exceptions, do: overview_entry_template(node) %>
         </div>
       <% end %>
 
       <%= unless Enum.empty?(protocols) do %>
-        <h1 id="protocols_summary" class="section_heading">Protocols summary</h1>
+        <h1 id="protocols_summary" class="section-heading">Protocols summary</h1>
         <div class="summary">
           <%= for node <- protocols, do: overview_entry_template(node) %>
         </div>
