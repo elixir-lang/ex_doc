@@ -1,7 +1,8 @@
 /_build
-/doc
 /deps
-erl_crash.dump
-*.ez
+/doc
+/node_modules
 /test/tmp
-node_modules
+*.ez
+erl_crash.dump
+/npm-debug.log
