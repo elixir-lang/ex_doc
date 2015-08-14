@@ -8,6 +8,8 @@ var hljs = require('highlightjs/highlight.pack')
 
 var events = require('./events')
 
+require('./fix-anchors')
+
 $(function () {
   // Setup Highlight.js
   hljs.configure({
