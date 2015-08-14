@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.8.3
+
+* Bug fixes
+  * Style fixes in the new layout
+
 ## v0.8.2
 
 * Enhancements
