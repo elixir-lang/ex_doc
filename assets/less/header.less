@@ -30,4 +30,25 @@
     font-weight: 300;
     color: @gray;
   }
+
+  .mobile-nav-toggle {
+    position: fixed;
+    right: 20px;
+    top: 14px;
+    color: @gray;
+    background-color: transparent;
+    border: none;
+    font-size: 21px;
+    transition: color .2s linear;
+
+    &:hover {
+      background-color: transparent;
+      border: none;
+      color: @white;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
 }

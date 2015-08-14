@@ -5,6 +5,9 @@
     <h1><%= config.project %></h1>
   <% end %>
   <h2>v<%= config.version %></h2>
+  <button type="button" class="btn btn-default btn-sm mobile-nav-toggle" data-toggle="offcanvas" aria-label="Close">
+    <span class="fa fa-bars" aria-hidden="true"></span>
+  </button>
 </header>
 
 <div class="row row-offcanvas row-offcanvas-left">
@@ -17,7 +20,7 @@
 
   <h2 id="sub_list_header">
     <%= if has_readme do %>
-      <a href="readme.html">README</a> 
+      <a href="readme.html">README</a>
     <% end %>
     <a href="overview.html">Overview</a>
   </h2>
