@@ -16,16 +16,28 @@
     font-weight: 700;
     padding-bottom: @h1Line;
     border-bottom: 1px solid @lightGray;
-  }
 
-  h1 small {
-    color: #888;
-  }
+    small {
+      color: #888;
+    }
 
-  h1:first-child {
-    margin-top: 0;
-  }
+    &:first-child {
+      margin-top: 0;
+    }
 
+    &.section-heading {
+      color: @green;
+      font-family: @sansFontFamily;
+      font-weight: normal;
+      text-transform: uppercase;
+      font-size: @h3FontSize;
+      line-height: @h3LineHeight;
+      margin-top: @h3MarginTop;
+      margin-bottom: @h3MarginBottom;
+      border: none;
+    }
+
+  }
   h2 {
     font-family: @sansFontFamily;
     font-size: @h2FontSize;
@@ -33,18 +45,6 @@
     margin-top: @h2MarginTop;
     margin-bottom: @h2MarginBottom;
     font-weight: 700;
-  }
-
-  h1.section-heading {
-    color: @green;
-    font-family: @sansFontFamily;
-    font-weight: normal;
-    text-transform: uppercase;
-    font-size: @h3FontSize;
-    line-height: @h3LineHeight;
-    margin-top: @h3MarginTop;
-    margin-bottom: @h3MarginBottom;
-    border: none;
   }
 
   h3 {
