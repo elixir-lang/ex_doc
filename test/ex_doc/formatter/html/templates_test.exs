@@ -119,10 +119,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{example_1/0.*Another example}ms
     assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*Source <i class="fa fa-code"></i>\n\s*</a>}ms
 
-    assert content =~ ~s{<div class="detail_header" id="example_1/0">}
+    assert content =~ ~s{<div class="detail-header" id="example_1/0">}
     assert content =~ ~s{<strong>example(foo, bar \\\\ Baz)</strong>}
-    assert content =~ ~s{<span class="detail_type">\(function\)</span>}
-    assert content =~ ~r{<a href="#example/2" class="detail_link" title="Link to this function">\n\s*<i class="fa fa-link"><\/i>\n\s*<\/a>}ms
+    assert content =~ ~s{<span class="detail-type">\(function\)</span>}
+    assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\n\s*<i class="fa fa-link"><\/i>\n\s*<\/a>}ms
   end
 
   test "module_page outputs the types and function specs" do
@@ -151,7 +151,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "module_page outputs summaries" do
     content = get_module_page([CompiledWithDocs])
-    assert content =~ ~r{<div class="summary_signature">\s*<a href="#example_1/0">}
+    assert content =~ ~r{<div class="summary-signature">\s*<a href="#example_1/0">}
   end
 
   test "module_page contains breadcrumbs" do
@@ -178,12 +178,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     content = get_module_page([CustomBehaviourOne])
     assert content =~ ~r{<h1>\s*CustomBehaviourOne\s*<small>behaviour</small>\s*</h1>}m
     assert content =~ ~r{Callbacks}
-    assert content =~ ~r{<div class="detail_header" id="c:hello/1">}
+    assert content =~ ~r{<div class="detail-header" id="c:hello/1">}
 
     content = get_module_page([CustomBehaviourTwo])
     assert content =~ ~r{<h1>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*</h1>}m
     assert content =~ ~r{Callbacks}
-    assert content =~ ~r{<div class="detail_header" id="c:bye/1">}
+    assert content =~ ~r{<div class="detail-header" id="c:bye/1">}
   end
 
   ## PROTOCOLS
