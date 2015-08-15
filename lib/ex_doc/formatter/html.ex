@@ -3,6 +3,7 @@ defmodule ExDoc.Formatter.HTML do
   Provide HTML-formatted documentation
   """
 
+  require ExDoc
   alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Formatter.HTML.Autolink
 
@@ -147,7 +148,7 @@ defmodule ExDoc.Formatter.HTML do
     File.write("#{output}/#{node.id}.html", content)
   end
 
-  defp templates_path(other) do
-    Path.expand("html/templates/#{other}", __DIR__)
+  defp templates_path(dir) do
+    Path.expand(dir, ExDoc.template_dir)
   end
 end

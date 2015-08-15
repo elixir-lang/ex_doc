@@ -21,7 +21,7 @@ var isProduction = environment === 'production'
 // Set variable via $ gulp --watch
 var watching = $.util.env.watch
 
-var distPath = 'lib/ex_doc/formatter/html/templates/dist'
+var distPath = 'templates/dist'
 
 var npmPlugin = new LessPluginNpmImport()
 var autoprefixPlugin = new LessPluginAutoPrefix({

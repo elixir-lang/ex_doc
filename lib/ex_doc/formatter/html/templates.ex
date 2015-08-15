@@ -3,6 +3,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   Handle all template interfaces for the HTML formatter.
   """
 
+  require ExDoc
   require EEx
 
   @doc """
@@ -121,7 +122,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   ]
 
   Enum.each templates, fn({ name, args }) ->
-    filename = Path.expand("templates/#{name}.eex", __DIR__)
+    filename = Path.expand("#{name}.eex", ExDoc.template_dir)
     EEx.function_from_file :def, name, filename, args
   end
 end

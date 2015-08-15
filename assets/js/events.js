@@ -354,7 +354,7 @@ function initalize () {
 }
 
 // Set as global, so it's accessible in
-// lib/ex_doc/formatter/html/templates/sidebar_items_template.eex
+// templates/sidebar_items_template.eex
 window.fillSidebarWithNodes = fillSidebarWithNodes
 
 module.exports = {
