@@ -18,6 +18,14 @@ defmodule ExDoc do
   end
 
   @doc """
+  Returns the path to the "templates" dir
+  """
+  @spec template_dir() :: binary
+  def template_dir() do
+    Path.expand("../templates", __DIR__)
+  end
+
+  @doc """
   Generates documentation for the given `project`, `version`
   and `options`.
   """
