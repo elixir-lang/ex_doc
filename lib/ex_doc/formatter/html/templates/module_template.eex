@@ -34,7 +34,7 @@
       <% end %>
 
       <%= if module.source do %>
-        <a href="<%= module.source %>" class="view-source">Source</a>
+        <a href="<%= module.source %>" class="view-source" rel="help">Source</a>
       <% end %>
 
       <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
