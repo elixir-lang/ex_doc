@@ -43,7 +43,7 @@
     <% end %>
   </div>
 
-  <div id="search">
+  <div id="search" class="row">
     <div class="col-xs-10">
       <div class="input-group input-group-sm">
         <button class="btn btn-default" type="button" aria-label="Search">
