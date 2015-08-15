@@ -101,10 +101,10 @@ defmodule ExDoc.Retriever do
         if function_exported?(module, :__behaviour__, 1) do
           module.__behaviour__(:docs)
         else
-          Code.get_docs(module, :all)[:callback_docs] || []
+          Code.get_docs(module, :all)[:callback_docs]
         end
 
-      docs = docs ++ Enum.map(inner, &get_callback(&1, source_path, source_url, callbacks))
+      docs = docs ++ Enum.map(inner || [], &get_callback(&1, source_path, source_url, callbacks))
     end
 
     {line, moduledoc} = Code.get_docs(module, :moduledoc)
