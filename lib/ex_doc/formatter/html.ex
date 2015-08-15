@@ -147,7 +147,7 @@ defmodule ExDoc.Formatter.HTML do
     File.write("#{output}/#{node.id}.html", content)
   end
 
-  defp templates_path(other) do
-    Path.expand("html/templates/#{other}", __DIR__)
+  defp templates_path(dir) do
+    Path.expand("../../../templates/#{dir}", __DIR__)
   end
 end
