@@ -167,7 +167,7 @@ function performSearch () {
  */
 function identifyExternalLinks (section) {
   $([section, 'a'].join(' ')).filter(function () {
-    return (this.hostname !== location.hostname && $(this).attr('rel') !== "help")
+    return (this.hostname !== location.hostname && $(this).attr('rel') !== 'help')
   }).append($('<span/>').attr({
     'class': 'fa fa-external-link',
     'aria-hidden': 'true'
