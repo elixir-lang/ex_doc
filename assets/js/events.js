@@ -158,6 +158,22 @@ function performSearch () {
   }
 }
 
+/**
+ * Identify external links inside of an specific section
+ *
+ * This function adds an icon to identify an external link.
+ *
+ * @param {String} section  Section where we want to identify the external links.
+ */
+function identifyExternalLinks (section) {
+  $([section, 'a'].join(' ')).filter(function () {
+    return (this.hostname !== location.hostname && $(this).attr('rel') !== "help")
+  }).append($('<span/>').attr({
+    'class': 'fa fa-external-link',
+    'aria-hidden': 'true'
+  })).addClass('external')
+}
+
 function setupSelected (id) {
   ['#modules_list', '#exceptions_list', '#protocols_list'].forEach(function (element) {
     if (element === id) {
@@ -324,6 +340,7 @@ function initalize () {
 
   fullListSearch()
   collapse()
+  identifyExternalLinks('#content')
 }
 
 // Set as global, so it's accessible in
