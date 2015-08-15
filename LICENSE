@@ -85,7 +85,7 @@ https://highlightjs.org/
 github.com style
 (c) Vasily Polovnyov <vast@whiteants.net>
 https://github.com/isagalaev/highlight.js/blob/master/src/styles/github.css
-File: lib/ex_doc/formatter/html/templates/css/elixir.css
+File: assets/less/code.less
 
   Released under the same license as highlight.js
 
