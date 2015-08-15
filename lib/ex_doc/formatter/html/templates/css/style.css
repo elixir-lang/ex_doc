@@ -70,6 +70,10 @@ body {
   line-height: 1.618;
 }
 
+blockquote {
+  font-size: 1em;
+}
+
 #content {
   padding: 0 28px 20px 18px;
 }
