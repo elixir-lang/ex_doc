@@ -22,7 +22,7 @@
     <%= to_html(node.doc) %>
   </section>
   <%= if node.source do %>
-    <a href="<%= node.source %>" class="view-source">
+    <a href="<%= node.source %>" class="view-source" rel="help">
       Source <i class="fa fa-code"></i>
     </a>
   <% end %>
