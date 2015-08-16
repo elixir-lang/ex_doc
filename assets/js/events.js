@@ -6,6 +6,7 @@
 
 var $ = require('jquery')
 var helpers = require('./helpers')
+var sidebarItemsTemplate = require('./sidebar-items.handlebars')
 
 // Local Variables
 // ---------------
@@ -210,68 +211,12 @@ function resetSidebar () {
  * @param {String} filter - Filter of nodes, by default 'modules'.
  */
 function fillSidebarWithNodes (nodes, filter) {
-  var full_list = $('#full_list')
   var module_type
 
   function scope (items) {
     var filtered = nodes[items]
-    var fullList = '<ul id="full_list">'
-
-    if (!filtered) {
-      fullList += '</ul>'
-      full_list.replaceWith(fullList)
-      return
-    }
-
-    filtered.forEach(function (element) {
-      var docs_container
-      var id = element.id
-      var li
-      var ul
-      var current_path
-      var href
-
-      /* li.node */
-      li = '<li class="node">'
-
-      // When visiting a module page, the link to this module page
-      // in the menu should not link to a new page, instead should
-      // link to the top of the page itself.
-      current_path = window.location.pathname.split('/')
-      href = id + '.html'
-      if (href === current_path[current_path.length - 1]) {
-        li = '<li class="node clicked">'
-        href = href + '#content'
-      }
-
-      if (element.hasOwnProperty('docs')) {
-        li += '<a class="toggle"></a>'
-      }
-
-      li += '<a href="' + href + '" title="' + id + '" class="object-link">' + id + '</a>'
-      li += '<span class="node-name">' + id + '</span></li>'
-
-      fullList += li
-
-      if (element.hasOwnProperty('docs')) {
-        /* li.docs */
-        docs_container = '<li class="docs">'
-        ul = '<ul>'
-
-        element.docs.forEach(function (element) {
-          var detail = '<li>'
-
-          detail += '<a href="' + id + '.html#' + element.anchor + '" title="' + id + '.' + element.id + '" class="object-link">' + element.id + '</a>'
-          detail += '<span class="node-name">' + id + '</span></li>'
-
-          ul += detail
-        })
-
-        docs_container += ul + '</ul></li>'
-        fullList += docs_container
-      }
-    })
-    full_list.replaceWith(fullList)
+    var fullList = $('#full_list')
+    fullList.replaceWith(sidebarItemsTemplate(filtered))
   }
 
   module_type = $('#content h1 small').text()
