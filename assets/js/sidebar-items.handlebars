@@ -1,0 +1,39 @@
+<ul id="full_list">
+{{#each this as |node nodeId|}}
+  {{#isLocal node.id}}
+    <li class="node clicked">
+  {{else}}
+    <li class="node">
+  {{/isLocal}}
+
+  {{#if node.docs}}
+    <a class="toggle"></a>
+  {{/if}}
+
+    {{!-- When visiting a module page, the link to this module page
+    in the menu should not link to a new page, instead should link
+    to the top of the page itself. --}}
+
+    {{#isLocal node.id}}
+      <a href="{{node.id}}.html#content" title="{{node.id}}" class="object-link">{{node.id}}</a>
+    {{else}}
+      <a href="{{node.id}}.html" title="{{node.id}}" class="object-link">{{node.id}}</a>
+    {{/isLocal}}
+    <span class="node-name">{{node.id}}</span>
+  </li>
+
+  {{#if node.docs}}
+    <li class="docs">
+      <ul>
+
+      {{#each node.docs as |docs docsId|}}
+        <li>
+          <a href="{{node.id}}.html#{{docs}}" title="{{node.id}}.{{docs}}" class="object-link">{{docs}}</a>
+          <span class="node-name">{{node.id}}</span>
+        </li>
+      {{/each}}
+      </ul>
+    </li>
+  {{/if}}
+{{/each}}
+</ul>
