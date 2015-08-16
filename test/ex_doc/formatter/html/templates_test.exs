@@ -40,9 +40,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "Disable nav links when module type is empty" do
     content = Templates.sidebar_template(doc_config, [], [], [], false)
-    assert content =~ ~r{<span role="presentation" class="disabled">Modules</span>}
-    assert content =~ ~r{<span role="presentation" class="disabled">Exceptions</span>}
-    assert content =~ ~r{<span role="presentation" class="disabled">Protocols</span>}
+    assert content =~ ~r{<li role="presentation" class="disabled">Modules</li>}
+    assert content =~ ~r{<li role="presentation" class="disabled">Exceptions</li>}
+    assert content =~ ~r{<li role="presentation" class="disabled">Protocols</li>}
   end
 
   test "Enable nav link when module type have at least one element" do
@@ -54,9 +54,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     protocols  = HTML.filter_list(:protocols, all)
 
     content = Templates.sidebar_template(doc_config, modules, exceptions, protocols, false)
-    assert content =~ ~r{<span><a id="modules_list" href="#full_list">Modules</a></span>}
-    assert content =~ ~r{<span role="presentation" class="disabled">Exceptions</span>}
-    assert content =~ ~r{<span role="presentation" class="disabled">Protocols</span>}
+    assert content =~ ~r{<li><a id="modules_list" href="#full_list">Modules</a></li>}
+    assert content =~ ~r{<li role="presentation" class="disabled">Exceptions</li>}
+    assert content =~ ~r{<li role="presentation" class="disabled">Protocols</li>}
   end
 
   test "site title text links to source_url when there is no homepage_url" do

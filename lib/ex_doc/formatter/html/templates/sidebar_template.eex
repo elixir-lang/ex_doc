@@ -18,30 +18,31 @@
     </button>
   </p>
 
-  <h2 id="sub_list_header">
+  <ul class="main-nav">
     <%= if has_readme do %>
-      <a href="readme.html">README</a>
+      <li>
+        <a href="readme.html">README</a>
+      </li>
     <% end %>
-    <a href="overview.html">Overview</a>
-  </h2>
-
-  <div class="nav">
+    <li>
+      <a href="overview.html">Overview</a>
+    </li>
     <%= if Enum.empty?(modules) do %>
-      <span role="presentation" class="disabled">Modules</span>
+      <li role="presentation" class="disabled">Modules</li>
     <% else %>
-      <span><a id="modules_list" href="#full_list">Modules</a></span>
+      <li><a id="modules_list" href="#full_list">Modules</a></li>
     <% end %>
     <%= if Enum.empty?(exceptions) do %>
-      <span role="presentation" class="disabled">Exceptions</span>
+      <li role="presentation" class="disabled">Exceptions</li>
     <% else %>
-      <span><a id="exceptions_list" href="#full_list">Exceptions</a></span>
+      <li><a id="exceptions_list" href="#full_list">Exceptions</a></li>
     <% end %>
     <%= if Enum.empty?(protocols) do %>
-      <span role="presentation" class="disabled">Protocols</span>
+      <li role="presentation" class="disabled">Protocols</li>
     <% else %>
-      <span><a id="protocols_list" href="#full_list">Protocols</a></span>
+      <li><a id="protocols_list" href="#full_list">Protocols</a></li>
     <% end %>
-  </div>
+  </ul>
 
   <div id="search" class="row">
     <div class="col-xs-10">
@@ -60,9 +61,11 @@
 
   <script src="dist/sidebar_items.js" defer></script>
 
-  <ul id="full_list">
-  </ul>
+  <div class="nav-list">
+    <ul id="full_list">
+    </ul>
+  </div>
 
   <div id="no_results"></div>
 </section><!--/.sidebar-offcanvas -->
-<section id="content" class="col-xs-12 col-sm-9">
+<section id="content" class="row col-xs-12 col-sm-9">

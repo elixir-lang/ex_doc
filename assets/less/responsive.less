@@ -6,7 +6,7 @@
   }
 
   .row-offcanvas-left {
-    left: 25%; /* 3 columns */
+    left: 200px; /* 3 columns */
     margin-left: 0;
   }
 
@@ -15,9 +15,8 @@
     left: 0;
     top: 70px;
     bottom: 0;
-    overflow: auto;
-    width: 25%;
-    padding: 30px 10px 30px 30px;
+    width: 200px;
+    padding: 0;
   }
 
   .mobile-nav-toggle {
@@ -26,6 +25,10 @@
 }
 
 @media screen and (max-width: 767px) {
+  #header {
+    width: 100%;
+  }
+
   .row-offcanvas {
     position: relative;
     transition: all .25s ease-out;
@@ -33,15 +36,21 @@
 
   .row-offcanvas-left {
     left: 0;
+    top: 70px;
   }
 
   .row-offcanvas-left
-  .sidebar-offcanvas {
+  .sidebar-offcanvas,
+  #sidebar .nav-list {
     left: -50%; /* 6 columns */
   }
 
   .row-offcanvas-left.active {
     left: 50%; /* 6 columns */
+  }
+
+  .row-offcanvas-left.active #sidebar .nav-list {
+    left: 0;
   }
 
   .sidebar-offcanvas {

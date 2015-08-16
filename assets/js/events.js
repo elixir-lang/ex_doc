@@ -18,7 +18,7 @@ var searchCache = []
 var searchString = ''
 var regexSearchString = ''
 var caseSensitiveMatch = false
-var sidebarNav = $('.nav')
+var mainNav = $('.main-nav')
 
 // Local Methods
 // -------------
@@ -232,21 +232,21 @@ function fillSidebarWithNodes (nodes, filter) {
 }
 
 function initalize () {
-  sidebarNav.on('click', '#modules_list', function (e) {
+  mainNav.on('click', '#modules_list', function (e) {
     fillSidebarWithNodes(sidebarNodes, 'modules')
     resetSidebar()
     performSearch()
     e.preventDefault()
   })
 
-  sidebarNav.on('click', '#exceptions_list', function (e) {
+  mainNav.on('click', '#exceptions_list', function (e) {
     fillSidebarWithNodes(sidebarNodes, 'exceptions')
     resetSidebar()
     performSearch()
     e.preventDefault()
   })
 
-  sidebarNav.on('click', '#protocols_list', function (e) {
+  mainNav.on('click', '#protocols_list', function (e) {
     fillSidebarWithNodes(sidebarNodes, 'protocols')
     resetSidebar()
     performSearch()
