@@ -107,7 +107,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   test "run should not generate the readme file" do
     generate_docs(doc_config([readme: nil]))
-    refute File.regular?("#{output_dir}/readme.html")
+    refute File.regular?("#{output_dir}/README.html")
     content = File.read!("#{output_dir}/index.html")
     refute content =~ ~r{<title>README [^<]*</title>}
   end
