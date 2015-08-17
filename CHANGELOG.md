@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.4
+
+* Bug fixes
+  * Generate "README.html" file instead of "readme.html" as in previous releases
+  * Style fixes in the new layout
+
 ## v0.8.3
 
 * Bug fixes
