@@ -90,12 +90,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "listing page has README link if present" do
     content = Templates.sidebar_template(doc_config, [], [], [], true)
-    assert content =~ ~r{<a href="readme.html">README</a>}
+    assert content =~ ~r{<a href="README.html">README</a>}
   end
 
   test "listing page doesn't have README link if not present" do
     content = Templates.sidebar_template(doc_config, [], [], [], false)
-    refute content =~ ~r{<a href="readme.html">README</a>}
+    refute content =~ ~r{<a href="README.html">README</a>}
   end
 
   ## MODULES

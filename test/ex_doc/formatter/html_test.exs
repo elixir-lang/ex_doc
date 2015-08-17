@@ -45,18 +45,17 @@ defmodule ExDoc.Formatter.HTMLTest do
     ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
-  test "run generates the html file with the documentation and readme.html" do
+  test "run generates in default directory and redirect index.html file" do
     generate_docs(doc_config)
 
     assert File.regular?("#{output_dir}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
-    assert File.regular?("#{output_dir}/readme.html")
     content = File.read!("#{output_dir}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
   end
 
   test "run generates in specified output directory and redirect index.html file" do
-    config = doc_config([output: "#{output_dir}/another_dir", main: "RandomError", ])
+    config = doc_config([output: "#{output_dir}/another_dir", main: "RandomError"])
     generate_docs(config)
 
     assert File.regular?("#{output_dir}/another_dir/CompiledWithDocs.html")
@@ -80,7 +79,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute content =~ ~r{UndefParent\.Undocumented}ms
 
     assert content =~ ~r{.*"RandomError\".*}ms
-
     assert content =~ ~r{.*"CustomProtocol\".*}ms
   end
 
@@ -96,7 +94,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates the readme file" do
     generate_docs(doc_config)
 
-    content = File.read!("#{output_dir}/readme.html")
+    content = File.read!("#{output_dir}/README.html")
     assert content =~ ~r{<title>README [^<]*</title>}
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
@@ -104,8 +102,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run should not generate the readme file" do
-    generate_docs(doc_config([readme: nil, ]))
-
+    generate_docs(doc_config([readme: nil]))
     refute File.regular?("#{output_dir}/readme.html")
     content = File.read!("#{output_dir}/index.html")
     refute content =~ ~r{<title>README [^<]*</title>}
@@ -127,10 +124,10 @@ defmodule ExDoc.Formatter.HTMLTest do
           "<pre><code class=\"iex elixir\">iex&gt; max(4, 5)"
   end
 
-  test "run generates index.html and normalized options" do
+  test "run normalizes options" do
     # 1. Check for output dir having trailing "/" stripped
     # 2. Check for default [main: "overview"]
-    generate_docs doc_config([output: "#{output_dir}//", main: nil, ])
+    generate_docs doc_config([output: "#{output_dir}//", main: nil])
 
     content = File.read!("#{output_dir}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
@@ -144,5 +141,4 @@ defmodule ExDoc.Formatter.HTMLTest do
                  fn -> generate_docs(config) end
     assert {:ok, []} == File.ls "#{output_dir}"
   end
-
 end

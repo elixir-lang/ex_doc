@@ -26,7 +26,7 @@ defmodule Mix.Tasks.Docs do
   * `:output` - output directory for the generated docs; default: "doc".
     May be overriden by command line argument.
 
-  * `:readme` - string denoting the source file for a project README 
+  * `:readme` - string denoting the source file for a project README
     (e.g., "README.md"); default: `nil` (no README created).
 
   * `:formatter` - doc formatter to use; default: "html".
@@ -35,7 +35,7 @@ defmodule Mix.Tasks.Docs do
     default: "." _(current directory)_.
 
   * `:source_beam` - path to the beam directory; default: mix's compile path.
-  
+
   * `:source_url_pattern` - public URL of the project.
     Derived from project's `:source_url` if not present.
 
@@ -43,7 +43,7 @@ defmodule Mix.Tasks.Docs do
     Ignored if `:source_url_pattern` is provided; default: master.
 
   * `:main` - main page of the documentation. It may be a module or a generated page,
-    like "overview" or "readme"; default: "overview" when --fomatter is "html".
+    like "overview" or "readme"; default: "overview" when --formatter is "html".
   """
 
   @doc false

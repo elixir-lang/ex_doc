@@ -87,7 +87,7 @@ defmodule ExDoc.Formatter.HTML do
   defp write_readme(output, {:ok, content}, module_nodes, config, modules, exceptions, protocols) do
     content = Autolink.project_doc(content, module_nodes)
     readme_html = Templates.readme_template(config, modules, exceptions, protocols, content) |> pretty_codeblocks
-    :ok = File.write("#{output}/readme.html", readme_html)
+    :ok = File.write("#{output}/README.html", readme_html)
     true
   end
 
