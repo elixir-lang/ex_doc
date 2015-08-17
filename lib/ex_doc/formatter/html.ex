@@ -1,7 +1,5 @@
 defmodule ExDoc.Formatter.HTML do
-  @moduledoc """
-  Provide HTML-formatted documentation
-  """
+  @moduledoc false
 
   alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Formatter.HTML.Autolink
@@ -10,10 +8,16 @@ defmodule ExDoc.Formatter.HTML do
   @main "overview"
 
   @doc """
-  Generate HTML documentation for the given modules
+  Generate HTML documentation for the given modules.
   """
-  @spec run(list, %ExDoc.Config{}) :: String.t
-  def run(module_nodes, config) when is_map(config) do
+  @spec run(list, %ExDoc.Config{}, module) :: String.t
+  def run(module_nodes, config, caller) when is_map(config) do
+    if caller !== ExDoc do
+      raise ArgumentError,
+        message: "#{__MODULE__}.run/3 is not supposed to be called directly from #{caller}. " <>
+                 "Please call \"ExDoc.generate_docs/3\" instead"
+    end
+
     config = normalize_config(config)
     output = Path.expand(config.output)
     File.rm_rf! output

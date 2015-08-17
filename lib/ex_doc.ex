@@ -33,7 +33,7 @@ defmodule ExDoc do
   def generate_docs(project, version, options) when is_binary(project) and is_binary(version) and is_list(options) do
     config = build_config(project, version, options)
     docs = config.retriever.docs_from_dir(config.source_beam, config)
-    find_formatter(config.formatter).run(docs, config)
+    find_formatter(config.formatter).run(docs, config, __MODULE__)
   end
 
   # Builds configuration by merging `options`, and normalizing the options.
