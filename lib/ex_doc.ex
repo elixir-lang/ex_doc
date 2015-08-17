@@ -17,6 +17,13 @@ defmodule ExDoc do
     ]
   end
 
+  @ex_doc_vsn Mix.Project.config[:version]
+
+  @doc """
+  Returns the ExDoc version (used in templates).
+  """
+  def version, do: @ex_doc_vsn
+
   @doc """
   Generates documentation for the given `project`, `version`
   and `options`.
