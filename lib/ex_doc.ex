@@ -1,7 +1,6 @@
 defmodule ExDoc do
   defmodule Config do
     defstruct [
-      ex_doc_version: nil,
       formatter: "html",
       formatter_opts: [],
       homepage_url: nil,
@@ -47,7 +46,6 @@ defmodule ExDoc do
       main: options[:main],
       homepage_url: options[:homepage_url],
       source_root: options[:source_root] || File.cwd!,
-      ex_doc_version: ExDoc.version,
     }
     struct(preconfig, options)
   end
@@ -80,8 +78,6 @@ defmodule ExDoc do
     if is_bitstring(options[:output]) do
       options = Keyword.put(options, :output, String.rstrip(options[:output], ?/))
     end
-
-    options = Keyword.put(options, :ex_doc_version, version)
 
     options
   end
