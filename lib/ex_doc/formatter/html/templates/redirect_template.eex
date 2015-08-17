@@ -5,7 +5,7 @@
     <title><%= config.project %> v<%= config.version %> – Documentation</title>
     <meta http-equiv="refresh" content="0; url=<%= h(redirect_to) %>" />
     <meta name="index" content="noindex" />
-    <meta name="generator" content="ExDoc" />
+    <meta name="generator" content="ExDoc v<%= config.ex_doc_version %>" />
   </head>
   <body></body>
 </html>
