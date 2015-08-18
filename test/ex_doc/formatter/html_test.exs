@@ -191,4 +191,12 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert {:ok, []} == File.ls "#{output_dir}"
   end
 
+  test "Elixir.ExDoc.Formatter.HTML.run/3 fails when called directly" do
+    assert_raise ArgumentError,
+      "Elixir.ExDoc.Formatter.HTML.run/3 is not supposed to be called directly from " <>
+      "Elixir.ExDoc.Formatter.HTMLTest. Please call \"ExDoc.generate_docs/3\" instead",
+      fn -> HTML.run([], %{}, __MODULE__) end
+    assert {:ok, []} == File.ls "#{output_dir}"
+  end
+
 end
