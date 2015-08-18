@@ -97,6 +97,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     footer_template: [],
     head_template: [:config, :page],
     module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all, :has_readme],
+    not_found_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     overview_entry_template: [:node],
     overview_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     readme_template: [:config, :modules, :exceptions, :protocols, :content],
