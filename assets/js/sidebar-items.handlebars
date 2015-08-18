@@ -19,7 +19,6 @@
     {{else}}
       <a href="{{node.id}}.html" title="{{node.id}}" class="object-link">{{node.id}}</a>
     {{/isLocal}}
-    <span class="node-name">{{node.id}}</span>
   </li>
 
   {{#if node.docs}}
@@ -28,8 +27,9 @@
 
       {{#each node.docs as |docs docsId|}}
         <li>
-          <a href="{{node.id}}.html#{{docs.anchor}}" title="{{node.id}}.{{docs.id}}" class="object-link">{{docs.id}}</a>
-          <span class="node-name">{{node.id}}</span>
+          <a href="{{node.id}}.html#{{docs.anchor}}" title="{{node.id}}.{{docs.id}}" class="object-link">
+            {{docs.id}}
+          </a>
         </li>
       {{/each}}
       </ul>
