@@ -26,6 +26,7 @@ defmodule ExDoc.Formatter.HTML do
     has_readme = config.readme && generate_readme(output, module_nodes, config, modules, exceptions, protocols)
     generate_index(output, config)
     generate_overview(modules, exceptions, protocols, output, config, has_readme)
+    generate_not_found(modules, exceptions, protocols, output, config, has_readme)
     generate_sidebar_items(modules, exceptions, protocols, output)
     generate_list(modules, all, output, config, has_readme)
     generate_list(exceptions, all, output, config, has_readme)
@@ -51,6 +52,11 @@ defmodule ExDoc.Formatter.HTML do
   defp generate_overview(modules, exceptions, protocols, output, config, has_readme) do
     content = Templates.overview_template(config, modules, exceptions, protocols, has_readme)
     :ok = File.write("#{output}/overview.html", content)
+  end
+
+  defp generate_not_found(modules, exceptions, protocols, output, config, has_readme) do
+    content = Templates.not_found_template(config, modules, exceptions, protocols, has_readme)
+    :ok = File.write("#{output}/404.html", content)
   end
 
   defp generate_sidebar_items(modules, exceptions, protocols, output) do
