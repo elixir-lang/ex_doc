@@ -1,0 +1,37 @@
+html,
+body {
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  .display(flex);
+  .flex-direction(row);
+}
+
+
+.sidebar {
+  .display(flex);
+  .flex(0, 1, 300px);
+  .flex-direction(column);
+}
+
+.content {
+  .flex(1);
+}
+
+.content-inner {
+  .display(flex);
+  .flex(1);
+  .flex-direction(column);
+
+  max-width: 860px;
+  margin: 0 auto;
+}
