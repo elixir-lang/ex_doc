@@ -17,12 +17,13 @@ defmodule ExDoc do
     ]
   end
 
-  @ex_doc_vsn Mix.Project.config[:version]
+  @ex_doc_version Mix.Project.config[:version]
 
   @doc """
   Returns the ExDoc version (used in templates).
   """
-  def version, do: @ex_doc_vsn
+  @spec version :: String.t
+  def version, do: @ex_doc_version
 
   @doc """
   Generates documentation for the given `project`, `version`

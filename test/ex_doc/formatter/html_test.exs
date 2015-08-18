@@ -51,7 +51,52 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
     content = File.read!("#{output_dir}/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html">}
+  end
+
+  test "check headers for index.html and module pages" do
+    generate_docs doc_config([main: "RandomError", ])
+
+    content_index  = File.read!("#{output_dir}/index.html")
+    content_module = File.read!("#{output_dir}/RandomError.html")
+
+    # Regular Expressions
+    re = %{
+      shared: %{
+        charset:   ~r{<meta charset="utf-8">},
+        generator: ~r{<meta name="generator" content="ExDoc v\d+.\d+.\d+">},
+      },
+
+      index: %{
+        title:   ~r{<title>Elixir v1.0.1 – Documentation</title>},
+        index:   ~r{<meta name="index" content="noindex"},
+        refresh: ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">},
+      },
+
+      module: %{
+        title:    ~r{<title>RandomError – Elixir v1.0.1</title>},
+        viewport: ~r{<meta name="viewport" content="width=device-width, initial-scale=1.0">},
+        x_ua:     ~r{<meta http-equiv="x-ua-compatible" content="ie=edge">},
+      },
+    }
+
+    assert content_index  =~ re[:shared][:charset]
+    assert content_index  =~ re[:shared][:generator]
+    assert content_index  =~ re[:index][:title]
+    assert content_index  =~ re[:index][:index]
+    assert content_index  =~ re[:index][:refresh]
+    refute content_index  =~ re[:module][:title]
+    refute content_index  =~ re[:module][:viewport]
+    refute content_index  =~ re[:module][:x_ua]
+
+    assert content_module =~ re[:shared][:charset]
+    assert content_module =~ re[:shared][:generator]
+    assert content_module =~ re[:module][:title]
+    assert content_module =~ re[:module][:viewport]
+    assert content_module =~ re[:module][:x_ua]
+    refute content_module =~ re[:index][:title]
+    refute content_module =~ re[:index][:index]
+    refute content_module =~ re[:index][:refresh]
   end
 
   test "run generates in specified output directory and redirect index.html file" do
@@ -63,7 +108,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir}/another_dir/dist/app.js")
     assert File.regular?("#{output_dir}/another_dir/RandomError.html")
     content = File.read!("#{output_dir}/another_dir/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=RandomError.html"\s*/>}
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}
   end
 
   test "run generates all listing files" do
@@ -96,7 +141,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(config)
 
     content = File.read!("#{output_dir}/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=README.html"\s*/>}
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=README.html">}
 
     content = File.read!("#{output_dir}/README.html")
     assert content =~ ~r{<title>README [^<]*</title>}
@@ -134,7 +179,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs doc_config([output: "#{output_dir}//", main: nil])
 
     content = File.read!("#{output_dir}/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html"\s*/>}
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html">}
     assert File.regular?("#{output_dir}/overview.html")
   end
 
@@ -145,4 +190,5 @@ defmodule ExDoc.Formatter.HTMLTest do
                  fn -> generate_docs(config) end
     assert {:ok, []} == File.ls "#{output_dir}"
   end
+
 end

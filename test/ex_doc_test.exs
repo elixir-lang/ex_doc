@@ -59,4 +59,8 @@ defmodule ExDocTest do
     File.rm!("test.config")
   end
 
+  test "version" do
+    assert ExDoc.version =~ ~r{\d+\.\d+\.\d+} 
+  end
+
 end
