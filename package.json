@@ -20,10 +20,10 @@
   },
   "homepage": "https://github.com/elixir-lang/ex_doc#readme",
   "devDependencies": {
-    "bootstrap": "^3.3.5",
     "eslint": "^1.1.0",
     "eslint-config-standard": "^4.0.0",
     "eslint-plugin-standard": "^1.2.0",
+    "flex.less": "^1.1.0",
     "font-awesome": "^4.4.0",
     "gulp": "^3.9.0",
     "gulp-batch": "^1.0.5",
@@ -54,6 +54,7 @@
     "less-plugin-npm-import": "^2.1.0",
     "lodash": "^3.10.1",
     "mocha": "^2.2.5",
+    "normalize.css": "^3.0.3",
     "run-sequence": "^1.1.2",
     "webpack": "^1.11.0"
   }

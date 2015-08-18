@@ -1,0 +1,64 @@
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: @sansFontFamily;
+  font-weight: 800;
+}
+
+h1 {
+  font-size: 2em;
+  margin: 1em 0 .5em;
+
+  &.section-heading {
+    margin: 1.5em 0 .5em;
+  }
+
+  & small {
+    font-weight: 300;
+  }
+
+  a.view-source {
+    font-size: 1.2rem;
+  }
+}
+
+h2 {
+  font-size: 1.625em;
+  margin: 1em 0 .5em;
+  font-weight: 400;
+}
+
+h3 {
+  font-size: 1.375em;
+  font-weight: 400;
+  margin: 1em 0 .5em;
+  font-weight: 600;
+}
+
+a {
+  .linkUnderlines(@white, @black);
+}
+
+ul {
+  li {
+    line-height: 1.5em;
+  }
+}
+
+
+a.view-source {
+  float: right;
+  color: @mediumGray;
+  background: none;
+  border: none;
+  text-shadow: none;
+  transition: color 0.3s ease-in-out;
+
+  &:hover {
+    color: @darkGray;
+  }
+}
