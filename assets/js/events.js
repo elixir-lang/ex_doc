@@ -271,7 +271,7 @@ function fillSidebarWithNodes (nodes, filter) {
         element.docs.forEach(function (element) {
           var detail = '<li>'
 
-          detail += '<a href="' + id + '.html#' + element + '" title="' + id + '.' + element + '" class="object_link">' + element + '</a>'
+          detail += '<a href="' + id + '.html#' + element.anchor + '" title="' + id + '.' + element.id + '" class="object_link">' + element.id + '</a>'
           detail += '<span class="node_name">' + id + '</span></li>'
 
           ul += detail

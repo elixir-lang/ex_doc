@@ -113,6 +113,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     readme_template: [:config, :modules, :exceptions, :protocols, :content],
     sidebar_items_entry_template: [:node],
     sidebar_items_keys_template: [:node],
+    sidebar_items_object_template: [:node],
     sidebar_items_template: [:input],
     sidebar_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     summary_template: [:node],
