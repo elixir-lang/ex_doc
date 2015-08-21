@@ -103,6 +103,33 @@ defmodule ExDoc.Formatter.HTML.Templates do
     end)
   end
 
+  defp sidebar_items_object(node) do
+    ~s{"id":"#{node.id}","anchor":"#{h link_id(node)}"}
+  end
+
+  defp sidebar_items_entry(node) do
+    result = ~s/"id":"#{node.id}"/
+    unless Enum.empty?(node.docs) do
+      object = Enum.into(node.docs, [], &(sidebar_items_object(&1)))
+               |> Enum.join("},{")
+      result = ~s/#{result},"docs":[{#{object}}]/
+    end
+    result
+  end
+
+  defp sidebar_items_keys(node) do
+    keys = Enum.into(node.value, [], &(sidebar_items_entry(&1)))
+           |> Enum.join("},{")
+    ~s/"#{node.id}":[{#{keys}}]/
+  end
+
+  @spec create_sidebar_items(list) :: String.t
+  def create_sidebar_items(input) do
+    object = Enum.into(input, [], &(sidebar_items_keys(&1)))
+             |> Enum.join(",")
+    "sidebarNodes={#{object}};fillSidebarWithNodes(sidebarNodes);"
+  end
+
   templates = [
     detail_template: [:node, :_module],
     footer_template: [],
@@ -111,10 +138,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     overview_entry_template: [:node],
     overview_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     readme_template: [:config, :modules, :exceptions, :protocols, :content],
-    sidebar_items_entry_template: [:node],
-    sidebar_items_keys_template: [:node],
-    sidebar_items_object_template: [:node],
-    sidebar_items_template: [:input],
     sidebar_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     summary_template: [:node],
     type_detail_template: [:node, :_module],

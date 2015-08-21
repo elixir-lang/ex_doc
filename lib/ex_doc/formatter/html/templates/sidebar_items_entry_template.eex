@@ -1,2 +1,0 @@
-"id": "<%= node.id %>"<%= unless Enum.empty?(node.docs) do %>,
-"docs": [{<% require Enum, as: E %><%= E.into(node.docs, [], &(sidebar_items_object_template(&1))) |> E.join("},{") %>}]<% end %>

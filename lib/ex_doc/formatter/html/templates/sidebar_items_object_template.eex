@@ -1,2 +1,0 @@
-"id": "<%= node.id %>",
-"anchor": "<%= h link_id(node) %>"
