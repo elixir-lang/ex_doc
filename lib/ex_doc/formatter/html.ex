@@ -55,7 +55,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_sidebar_items(modules, exceptions, protocols, output) do
     input = for node <- [%{id: "modules", value: modules}, %{id: "exceptions", value: exceptions}, %{id: "protocols", value: protocols}], !Enum.empty?(node.value), do: node
-    content = Templates.sidebar_items_template(input)
+    content = Templates.create_sidebar_items(input)
     :ok = File.write("#{output}/dist/sidebar_items.js", content)
   end
 
