@@ -80,11 +80,11 @@ function searchDone () {
 }
 
 function searchItem () {
-  var i,
-    item,
-    searchName,
-    matchString,
-    matchRegexp
+  var i
+  var item
+  var searchName
+  var matchString
+  var matchRegexp
 
   for (i = 0; i < searchCache.length / 50; i += 1) {
     item = searchCache[searchIndex]
@@ -171,7 +171,7 @@ function performSearch () {
  */
 function identifyExternalLinks (section) {
   $([section, 'a'].join(' ')).filter(function () {
-    return (this.hostname !== location.hostname)
+    return (this.hostname !== window.location.hostname)
   }).append($('<span/>').attr({
     'class': 'glyphicon glyphicon-new-window',
     'aria-hidden': 'true'
