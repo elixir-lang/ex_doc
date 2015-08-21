@@ -11,16 +11,13 @@ body {
   box-sizing: inherit;
 }
 
-body {
+.main {
   .display(flex);
-  .flex-direction(row);
 }
 
 
 .sidebar {
-  .display(flex);
   .flex(0, 1, 300px);
-  .flex-direction(column);
 }
 
 .content {
@@ -28,10 +25,7 @@ body {
 }
 
 .content-inner {
-  .display(flex);
-  .flex(1);
-  .flex-direction(column);
-
-  max-width: 860px;
+  max-width: 768px;
   margin: 0 auto;
+  padding: 20px 40px;
 }

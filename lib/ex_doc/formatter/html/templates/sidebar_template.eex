@@ -1,3 +1,4 @@
+<div class="main">
 <section class="sidebar">
   <%= if url = config.homepage_url || config.source_url do %>
     <h1 class="sidebar-projectName">
