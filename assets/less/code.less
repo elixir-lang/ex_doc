@@ -1,11 +1,11 @@
 // Customizations
 code {
   font-family: @monoFontFamily;
-  font-size: 14px;
-  line-height: 25px;
+  font-size: 15px;
+  line-height: 27px;
   font-weight: 400;
-  background-color: #FAFAFC;
-  border: 1px solid #E3E4E8;
+  background-color: @lightestBlue;
+  border: 1px solid @gray;
   vertical-align: top;
   border-radius: 2px;
   padding: 0 .5em;
@@ -25,7 +25,9 @@ pre {
   code.hljs {
     white-space: inherit;
     padding: @baseLineHeight;
-    border-radius: 2px;
+    border: none;
+    border-left: 3px solid @lightGray;
+    border-radius: 0;
   }
 
   code a,

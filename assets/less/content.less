@@ -2,4 +2,33 @@
 
 .content-inner {
   font-family: @serifFontFamily;
+  font-size: 16px;
+  line-height: 27px;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: @sansFontFamily;
+    font-weight: 700;
+  }
+
+  h1 {
+    font-size: 31px;
+  }
+
+  h2 {
+    font-size: 26px;
+  }
+
+  h3 {
+    font-size: 22px;
+    font-weight: 500;
+  }
+
+  a {
+    .linkUnderlines(@white, @black);
+  }
 }
