@@ -37,7 +37,7 @@
 
   <div class="sidebar-search">
     <i class="fa fa-search"></i>
-    <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" autofocus="autofocus" results="0" />
+    <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" results="0" />
   </div>
 
   <ul id="full_list" class="sidebar-fullList"></ul>

@@ -7,6 +7,11 @@
         <%= if module.type do %>
           <small><%= module.type %></small>
         <% end %>
+        <%= if module.source do %>
+          <a href="<%= module.source %>" title="View Source" class="view-source" rel="help">
+            <i class="fa fa-code"></i>
+          </a>
+        <% end %>
       </h1>
 
       <ul class="summary-links">
@@ -31,10 +36,6 @@
         <section id="moduledoc" class="docstring">
           <%= to_html(module.moduledoc) %>
         </section>
-      <% end %>
-
-      <%= if module.source do %>
-        <a href="<%= module.source %>" class="view-source" rel="help">Source</a>
       <% end %>
 
       <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>

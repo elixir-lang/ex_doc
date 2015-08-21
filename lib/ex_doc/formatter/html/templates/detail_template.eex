@@ -4,7 +4,11 @@
       <i class="fa fa-link"></i>
     </a>
     <span class="signature"><%=h node.signature %></span>
-    <span class="detail-type">(<%= pretty_type(node) %>)</span>
+      <%= if node.source do %>
+      <a href="<%= node.source %>" class="view-source" rel="help" title="View Source">
+       <i class="fa fa-code"></i>
+     </a>
+    <% end %>
   </div>
   <%= if specs = get_specs(node) do %>
     <div class="specs">
@@ -21,9 +25,4 @@
   <div class="docstring">
     <%= to_html(node.doc) %>
   </div>
-  <%= if node.source do %>
-    <a href="<%= node.source %>" class="view-source" rel="help">
-      Source <i class="fa fa-code"></i>
-    </a>
-  <% end %>
 </div>

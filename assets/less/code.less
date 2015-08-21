@@ -1,4 +1,8 @@
-// Customizations
+
+a code {
+  color: @purple;
+}
+
 code {
   font-family: @monoFontFamily;
   font-size: 15px;
@@ -24,14 +28,10 @@ pre {
 
   code.hljs {
     white-space: inherit;
-    padding: @baseLineHeight;
+    padding: 1em 1.5em;
     border: none;
     border-left: 3px solid @lightGray;
     border-radius: 0;
-  }
-
-  code a,
-  code a:visited {
-    color: white;
+    background-color: @lightestBlue;
   }
 }
