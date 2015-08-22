@@ -18,26 +18,10 @@ var searchCache = []
 var searchString = ''
 var regexSearchString = ''
 var caseSensitiveMatch = false
-var sidebarNav = $('.nav')
+var sidebarNav = $('.sidebar-mainNav')
 
 // Local Methods
 // -------------
-
-function highlight (no_padding) {
-  var n = 1
-  $('#full_list a.object-link:visible').each(function () {
-    var next = n === 1 ? 2 : 1
-    var li = $(this).parent()
-
-    li.removeClass('r' + next).addClass('r' + n)
-    if (no_padding) {
-      li.addClass('no-padding')
-    } else {
-      li.removeClass('no-padding')
-    }
-    n = next
-  })
-}
 
 /**
  * When the search field is empty show the children nodes of the #full_list
@@ -56,8 +40,7 @@ function showAllResults () {
   })
   $('#no_results').text('')
   $('#spinning span').removeClass('fa fa-refresh fa-spin')
-  $('#search button span.fa-times').addClass('fa-search').removeClass('fa-times')
-  highlight()
+  $('.sidebar-search button span.fa-times').addClass('fa-search').removeClass('fa-times')
 }
 
 /**
@@ -67,7 +50,6 @@ function showAllResults () {
  * initially by setTimeout.
  */
 function searchDone () {
-  highlight(true)
   if ($('#full_list li.found').size() === 0) {
     $('#no_results').text('No results were found.').hide().fadeIn()
   } else {
@@ -136,11 +118,11 @@ function fullListSearch () {
     }
   })
 
-  $('#search input').focus()
+  $('.sidebar-search input').focus()
 }
 
 function performSearch () {
-  searchString = $('#search input').val()
+  searchString = $('.sidebar-search input').val()
   caseSensitiveMatch = searchString.match(/[A-Z]/) !== null
   regexSearchString = helpers.escapeText(searchString)
 
@@ -151,7 +133,7 @@ function performSearch () {
       clearTimeout(inSearch)
     }
     $('#spinning span').addClass('fa fa-refresh fa-spin')
-    $('#search button span.fa-search').addClass('fa-times').removeClass('fa-search')
+    $('.sidebar-search button span.fa-search').addClass('fa-times').removeClass('fa-search')
     searchIndex = 0
     $('#sidebar').addClass('in-search')
     $('#no_results').text('')
@@ -188,8 +170,6 @@ function collapse () {
   $('#full_list > li.node:not(.clicked)').each(function () {
     $(this).addClass('collapsed').next('li.docs').addClass('collapsed')
   })
-
-  highlight()
 }
 
 function resetSidebar () {
@@ -219,7 +199,7 @@ function fillSidebarWithNodes (nodes, filter) {
     fullList.replaceWith(sidebarItemsTemplate(filtered))
   }
 
-  module_type = $('#content h1 small').text()
+  module_type = $('.content h1 small').text()
   if (module_type && (module_type === 'exception' || module_type === 'protocol')) {
     module_type = module_type + 's' // pluralize 'exception' or 'protocol'
   } else {
@@ -258,28 +238,28 @@ function initalize () {
     $('#content').toggleClass('offcanvas-active')
   })
 
-  $('#search button').on('click', function () {
-    $('#search input').val('').focus()
-    $('#search button span.fa-times').addClass('fa-search').removeClass('fa-times')
+  $('.sidebar-search button').on('click', function () {
+    $('.sidebar-search input').val('').focus()
+    $('.sidebar-search button span.fa-times').addClass('fa-search').removeClass('fa-times')
     showAllResults()
   })
 
   $(document).on('keyup', function (e) {
-    var searchInput = $('#search input')
+    var searchInput = $('.sidebar-search input')
     if (e.keyCode === 27 && searchInput.val() !== '') { // escape key maps to 27
       searchInput.val('').focus()
       showAllResults()
     }
   })
 
-  $('#search input').on('keypress', function (e) {
+  $('.sidebar-search input').on('keypress', function (e) {
     if (e.which === 13) { // enter key maps to 13
       var firstLinkFound = document.querySelectorAll('#full_list li.found a.object-link')[0]
       firstLinkFound.click()
     }
   })
 
-  $('#search input').on('input', function () {
+  $('.sidebar-search input').on('input', function () {
     performSearch()
   })
 

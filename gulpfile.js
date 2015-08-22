@@ -87,7 +87,7 @@ gulp.task('less', function () {
 })
 
 gulp.task('less-watch', function () {
-  $.watch('assets/less/*.less', $.batch(function (events, done) {
+  $.watch('assets/less/**/*.less', $.batch(function (events, done) {
     gulp.start('less', done)
   }))
 })

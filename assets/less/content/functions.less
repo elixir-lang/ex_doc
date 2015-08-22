@@ -1,0 +1,53 @@
+.detail-header {
+  margin: 2.5em 0 .5em;
+  padding: .5em 1em;
+  background: @detailGray;
+  border-left: 3px solid @purple;
+  font-size: 1em;
+  font-family: @monoFontFamily;
+  position: relative;
+
+  .signature {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  &:hover a.detail-link {
+    opacity: 1;
+    text-decoration: none;
+  }
+
+  a.detail-link {
+    transition: opacity 0.3s ease-in-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    opacity: 0;
+    padding: .6em;
+    line-height: 1.5em;
+    margin-left: -2.5em;
+    background: none;
+    border: none;
+    text-shadow: none;
+  }
+}
+
+.specs {
+  .spec-title {
+
+  }
+
+  .specs-list {
+    list-style: none;
+    padding: 1em 1.5em;
+    border: 1px solid @lightGray;
+
+    li {
+      code {
+        border: none;
+        background: none;
+      }
+    }
+  }
+}

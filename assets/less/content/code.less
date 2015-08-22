@@ -1,0 +1,40 @@
+
+a code,
+code a {
+  color: @purple;
+  text-shadow: none;
+  background-image: none;
+}
+
+code {
+  font-family: @monoFontFamily;
+  font-size: 15px;
+  line-height: 27px;
+  font-weight: 400;
+  background-color: @lightestBlue;
+  border: 1px solid @gray;
+  vertical-align: top;
+  border-radius: 2px;
+  padding: 0 .5em;
+}
+
+pre {
+  margin: @baseLineHeight 0;
+
+  &.spec {
+      margin: 0;
+  }
+
+  &.spec code {
+    padding: 0;
+  }
+
+  code.hljs {
+    white-space: inherit;
+    padding: 1em 1.5em;
+    border: none;
+    border-left: 3px solid @lightGray;
+    border-radius: 0;
+    background-color: @lightestBlue;
+  }
+}
