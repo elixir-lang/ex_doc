@@ -69,12 +69,21 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~s{"id":"#{node.id}","anchor":"#{h link_id(node)}"}
   end
 
+  defp sidebar_items_by_type({type, node}) do
+    objects = node |> Enum.map_join("},{", &(sidebar_items_object(&1)))
+    ~s/"#{type}":[{#{objects}}]/
+  end
+
   defp sidebar_items_entry(node) do
     result = ~s/"id":"#{node.id}"/
     unless Enum.empty?(node.docs) do
-      object = Enum.into(node.docs, [], &(sidebar_items_object(&1)))
-               |> Enum.join("},{")
-      result = ~s/#{result},"docs":[{#{object}}]/
+      types = [types: node.typespecs,
+        functions: Enum.filter(node.docs, & &1.type in [:def]),
+        macros: Enum.filter(node.docs, & &1.type in [:defmacro]),
+        callbacks: Enum.filter(node.docs, & &1.type in [:defcallback, :defmacrocallback])]
+      |> Enum.reject(fn {_type, entries} -> entries == [] end)
+      |> Enum.map_join(",", &sidebar_items_by_type(&1))
+      result = "#{result},#{types}"
     end
     result
   end
