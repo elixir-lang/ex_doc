@@ -1,11 +1,16 @@
 .detail-header {
-  margin: 2em 0 .5em;
-  padding: .5em 1.5em;
+  margin: 2.5em 0 .5em;
+  padding: .5em 1em;
   background: @detailGray;
   border-left: 3px solid @purple;
   font-size: 1em;
   font-family: @monoFontFamily;
   position: relative;
+
+  .signature {
+    font-size: 1.375em;
+    font-weight: 600;
+  }
 
   &:hover a.detail-link {
     opacity: 1;
@@ -25,5 +30,24 @@
     background: none;
     border: none;
     text-shadow: none;
+  }
+}
+
+.specs {
+  .spec-title {
+
+  }
+
+  .specs-list {
+    list-style: none;
+    padding: 1em 1.5em;
+    border: 1px solid @lightGray;
+
+    li {
+      code {
+        border: none;
+        background: none;
+      }
+    }
   }
 }
