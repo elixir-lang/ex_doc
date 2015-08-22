@@ -1,18 +1,9 @@
     <%= head_template(config, %{id: :overview}) %>
     <%= sidebar_template(config, modules, exceptions, protocols, has_readme) %>
 
-      <div class="breadcrumbs">
-        <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
-          <span class="glyphicon glyphicon-menu-hamburger"></span>
-        </button>
-        <%= if has_readme do %>
-          <%= page_breadcrumbs(config, "Overview", "overview.html#content") %>
-        <% end %>
-      </div>
-
       <h1><%= config.project %> v<%= config.version %></h1>
 
-      <ul class="summary_links">
+      <ul class="summary-links">
         <%= unless Enum.empty?(modules) do %>
           <li><a href="#modules_summary">Modules</a></li>
         <% end %>
@@ -25,29 +16,23 @@
       </ul>
 
       <%= unless Enum.empty?(modules) do %>
-        <section id="modules_summary" class="details_list">
-          <h1>Modules summary</h1>
-          <table class="summary">
-            <%= for node <- modules, do: overview_entry_template(node) %>
-          </table>
-        </section>
+        <h1 id="modules_summary" class="section-heading">Modules summary</h1>
+        <div class="summary">
+          <%= for node <- modules, do: overview_entry_template(node) %>
+        </div>
       <% end %>
 
       <%= unless Enum.empty?(exceptions) do %>
-        <section id="exceptions_summary" class="details_list">
-          <h1>Exceptions summary</h1>
-          <table class="summary">
-            <%= for node <- exceptions, do: overview_entry_template(node) %>
-          </table>
-        </section>
+        <h1 id="exceptions_summary" class="section-heading">Exceptions summary</h1>
+        <div class="summary">
+          <%= for node <- exceptions, do: overview_entry_template(node) %>
+        </div>
       <% end %>
 
       <%= unless Enum.empty?(protocols) do %>
-        <section id="protocols_summary" class="details_list">
-          <h1>Protocols summary</h1>
-          <table class="summary">
-            <%= for node <- protocols, do: overview_entry_template(node) %>
-          </table>
-        </section>
+        <h1 id="protocols_summary" class="section-heading">Protocols summary</h1>
+        <div class="summary">
+          <%= for node <- protocols, do: overview_entry_template(node) %>
+        </div>
       <% end %>
     <%= footer_template %>

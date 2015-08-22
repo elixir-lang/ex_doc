@@ -55,11 +55,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     String.split(doc, ~r/\n\s*\n/) |> hd |> String.strip() |> String.rstrip(?.)
   end
 
-  # A bit of standard HTML to insert the to-top arrow.
-  defp to_top_link() do
-    "<a class=\"to_top_link\" href=\"#content\" title=\"To the top of the page\">&uarr;</a>"
-  end
-
   defp presence([]),    do: nil
   defp presence(other), do: other
 
@@ -68,39 +63,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     Enum.reduce escape_map, binary, fn({pattern, escape}, acc) ->
       String.replace(acc, pattern, escape)
     end
-  end
-
-  # Get the breadcrumbs HTML.
-  #
-  # If module is :overview generates the breadcrumbs for the overview.
-  defp module_breadcrumbs(config, modules, module) do
-    parts = [root_breadcrumbs(config), {"Overview", "overview.html"}]
-    aliases = Module.split(module.module)
-    modules = Enum.map(modules, &(&1.module))
-
-    {crumbs, _} =
-      Enum.map_reduce(aliases, [], fn item, parents ->
-        path = parents ++ [item]
-        mod  = Module.concat(path)
-        page = if mod in modules, do: inspect(mod) <> ".html#content"
-        {{item, page}, path}
-      end)
-
-    generate_breadcrumbs(parts ++ crumbs)
-  end
-
-  defp page_breadcrumbs(config, title, link) do
-    generate_breadcrumbs [root_breadcrumbs(config), { title, link }]
-  end
-
-  defp root_breadcrumbs(config) do
-    {"#{config.project} v#{config.version}", nil}
-  end
-
-  defp generate_breadcrumbs(crumbs) do
-    Enum.map_join(crumbs, " &rarr; ", fn { name, ref } ->
-      if ref, do: "<a href=\"#{h(ref)}\">#{h(name)}</a>", else: h(name)
-    end)
   end
 
   defp sidebar_items_object(node) do
@@ -135,6 +97,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     footer_template: [],
     head_template: [:config, :page],
     module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all, :has_readme],
+    not_found_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     overview_entry_template: [:node],
     overview_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     readme_template: [:config, :modules, :exceptions, :protocols, :content],
