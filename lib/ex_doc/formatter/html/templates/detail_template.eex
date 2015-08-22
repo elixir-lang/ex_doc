@@ -22,7 +22,7 @@
       </ul>
     </div>
   <% end %>
-  <div class="docstring">
+  <section class="docstring">
     <%= to_html(node.doc) %>
-  </div>
+  </section>
 </div>
