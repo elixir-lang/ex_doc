@@ -20,15 +20,21 @@ body {
 
 .main {
   .display(flex);
+  height: 100%;
 }
 
 
 .sidebar {
   .flex(0, 1, 300px);
+  .display(flex);
+  .flex-direction(column);
+  height: 100%;
 }
 
 .content {
   .flex(1);
+  overflow-y: auto;
+  height: 100%;
 }
 
 .content-inner {
