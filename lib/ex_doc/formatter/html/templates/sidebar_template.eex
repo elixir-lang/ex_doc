@@ -48,3 +48,6 @@
 
 <section class="content">
   <div class="content-inner">
+    <button class="sidebar-toggle">
+      <i class="fa fa-bars"></i>
+    </button>
