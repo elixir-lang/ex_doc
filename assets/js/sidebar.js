@@ -15,13 +15,17 @@ function closeSidebar () {
   })
 }
 
-function openSidebar () {
+function openSidebar (immediate) {
+  var dur = duration
+  if (immediate) {
+    dur = 0
+  }
   sidebar.animate({
     '-webkit-flex-basis': width,
     '-moz-flex-basis': width,
     '-ms-flex-basis': width,
     'flex-basis': width
-  }, duration, function () {
+  }, 0, function () {
     body.addClass(bodyClass)
   })
 }
@@ -40,7 +44,7 @@ function init () {
   })
 
   if ($(window).width() > 768) {
-    openSidebar()
+    openSidebar(true)
   }
 }
 
