@@ -80,9 +80,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     content = Templates.create_sidebar_items([%{id: "modules", value: nodes}])
 
     assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*}ms
-    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example/2\".*}ms
-    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example_1/0\".*}ms
-    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"docs\".*\"example_without_docs/0\".*}ms
+    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"functions\".*\"example/2\".*}ms
+    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"macros\".*\"example_1/0\".*}ms
+    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"functions\".*\"example_without_docs/0\".*}ms
     assert content =~ ~r{.*"CompiledWithDocs.Nested\"}ms
     refute content =~ ~r{.*\"exceptions\":}ms
     refute content =~ ~r{.*\"protocols\":}ms

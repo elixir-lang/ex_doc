@@ -21,14 +21,14 @@
     {{/isLocal}}
   </li>
 
-  {{#if node.docs}}
+  {{#if node.functions}}
     <li class="docs">
       <ul>
 
-      {{#each node.docs as |docs docsId|}}
+      {{#each node.functions as |function functionId|}}
         <li>
-          <a href="{{node.id}}.html#{{docs.anchor}}" title="{{node.id}}.{{docs.id}}" class="object-link">
-            {{docs.id}}
+          <a href="{{node.id}}.html#{{function.anchor}}" title="{{node.id}}.{{function.id}}" class="object-link">
+            {{function.id}}
           </a>
         </li>
       {{/each}}
