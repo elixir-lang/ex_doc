@@ -3,9 +3,10 @@
 // Dependencies
 // ------------
 
-var $ = require('jquery')
+var $ = window.$ = require('jquery')
 var hljs = require('highlightjs/highlight.pack')
 
+var sidebar = require('./sidebar')
 var events = require('./events')
 
 require('./fix-anchors')
@@ -17,6 +18,7 @@ $(function () {
     languages: []       // disable auto-detect
   })
 
+  sidebar.init()
   events.initialize()
   hljs.initHighlighting()
 })

@@ -4,6 +4,7 @@
   line-height: 18px;
   background: @darkGray;
   color: @lightestGray;
+  overflow: hidden;
 
   ul {
     list-style: none;
@@ -17,6 +18,11 @@
   a {
     color: @lightestGray;
     text-decoration: none;
+    transition: color 0.3s ease-in-out;
+
+    &:hover {
+      color: @white;
+    }
   }
 
   .sidebar-projectName {
@@ -68,6 +74,7 @@
 
   .sidebar-search {
     margin: 0 60px;
+    .display(flex);
 
     i.fa.fa-search {
       font-size: 14px;
@@ -78,6 +85,7 @@
       background-color: transparent;
       border: none;
       border-bottom: 1px solid @mediumGray;
+      margin-left: 5px;
 
       &:focus,
       &:hover {

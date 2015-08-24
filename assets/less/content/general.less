@@ -62,3 +62,21 @@ a.view-source {
     color: @darkGray;
   }
 }
+
+blockquote {
+  font-style: italic;
+  margin: .5em 0;
+  padding: .25em 1.5em;
+  border-left: 3px solid @gray;
+  display: inline-block;
+
+  *:first-child {
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  *:last-child {
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+}
