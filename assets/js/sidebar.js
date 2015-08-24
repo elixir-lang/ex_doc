@@ -25,7 +25,7 @@ function openSidebar (immediate) {
     '-moz-flex-basis': width,
     '-ms-flex-basis': width,
     'flex-basis': width
-  }, 0, function () {
+  }, dur, function () {
     body.addClass(bodyClass)
   })
 }
