@@ -1,39 +1,16 @@
 // Content Styles
 
+@import './content/toggle';
+
 .content-inner {
   font-family: @serifFontFamily;
   font-size: 1em;
   line-height: 1.6875em;
 
   @import './content/general';
+  @import './content/summary';
   @import './content/functions';
+  @import './content/types';
   @import './content/code';
-}
-
-body.sidebar-open .sidebar-toggle {
-  color: @gray;
-
-  &:hover {
-    color: white;
-  }
-}
-
-.sidebar-toggle {
-  position: absolute;
-  z-index: 99;
-  left: 1em;
-  background-color: transparent;
-  border: none;
-  padding: 0;
-  transition: color 0.3s ease-in-out;
-
-  &:hover {
-    color: @gray;
-  }
-
-  &:active,
-  &:hover,
-  &:focus {
-    outline: none;
-  }
+  @import './content/footer';
 }

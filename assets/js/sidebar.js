@@ -20,18 +20,18 @@ function openSidebar (immediate) {
   if (immediate) {
     dur = 0
   }
+
+  body.addClass(bodyClass)
   sidebar.animate({
     '-webkit-flex-basis': width,
     '-moz-flex-basis': width,
     '-ms-flex-basis': width,
     'flex-basis': width
-  }, dur, function () {
-    body.addClass(bodyClass)
-  })
+  }, dur)
 }
 
 function toggleSidebar () {
-  if (sidebar.width() > 0) {
+  if (sidebar.css('display') !== 'none') {
     closeSidebar()
   } else {
     openSidebar()

@@ -1,0 +1,28 @@
+body.sidebar-open .sidebar-toggle {
+  color: @gray;
+
+  &:hover {
+    color: white;
+  }
+}
+
+.sidebar-toggle {
+  position: fixed;
+  z-index: 99;
+  left: 18px;
+  top: 28px;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  transition: color 0.3s ease-in-out;
+
+  &:hover {
+    color: @gray;
+  }
+
+  &:active,
+  &:hover,
+  &:focus {
+    outline: none;
+  }
+}
