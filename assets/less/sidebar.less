@@ -26,7 +26,7 @@
   }
 
   .sidebar-projectName {
-    margin: 39px 60px 0;
+    margin: 21px 40px 0;
     padding: 0 0 10px 0;
     font-weight: 700;
     font-size: 30px;
@@ -39,7 +39,7 @@
   }
 
   .sidebar-projectVersion {
-    margin: 0 60px 30px;
+    margin: 0 40px 30px;
     padding: 0;
     font-weight: 300;
     font-size: 20px;
@@ -48,7 +48,7 @@
   }
 
   .sidebar-mainNav {
-    padding: 0px 60px;
+    padding: 0px 40px;
 
     li,
     li a {
@@ -73,7 +73,7 @@
   }
 
   .sidebar-search {
-    margin: 0 60px;
+    margin: 0 40px;
     .display(flex);
 
     i.fa.fa-search {
@@ -84,6 +84,7 @@
     .sidebar-searchInput {
       background-color: transparent;
       border: none;
+      border-radius: 0;
       border-bottom: 1px solid @mediumGray;
       margin-left: 5px;
 
@@ -95,9 +96,10 @@
   }
 
   #full_list {
-    margin: 54px 0 0 60px;
+    margin: 54px 0 0 40px;
     padding: 0 20px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     .flex(1);
 
     ul {

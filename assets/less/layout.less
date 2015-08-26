@@ -3,7 +3,7 @@ body {
   box-sizing: border-box;
   height: 100%;
   width: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 body {
@@ -21,24 +21,30 @@ body {
 .main {
   .display(flex);
   height: 100%;
+  overflow: hidden;
 }
 
 
 .sidebar {
   .flex(0, 1, 0);
-  .display(flex);
   .flex-direction(column);
+  display: none;
   height: 100%;
+}
+
+body.sidebar-open .sidebar {
+  .display(flex);
 }
 
 .content {
   .flex(1);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   height: 100%;
 }
 
 .content-inner {
   max-width: 768px;
   margin: 0 auto;
-  padding: 13px 40px;
+  padding: 13px 60px;
 }
