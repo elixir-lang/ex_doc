@@ -4,6 +4,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates
 
+  import ExDoc.TestHTMLHelpers
+
   defp source_url do
     "https://github.com/elixir-lang/elixir"
   end
@@ -29,24 +31,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
            |> HTML.Autolink.all()
 
     Templates.module_page(hd(mods), doc_config, mods, false)
-  end
-
-  defp findElem(content, selector) do
-    hd(Floki.find(content, selector))
-  end
-
-  defp assertText(el, expected) do
-    actual = Floki.text(el)
-    assert actual === expected
-  end
-
-  defp assertAttribute(el, attribute, expected) do
-    actual = hd(Floki.attribute(el, attribute))
-    assert actual === expected
-  end
-
-  defp exists(content, selector) do
-    assert length(Floki.find(content, selector)) > 0
   end
 
   ## LISTING

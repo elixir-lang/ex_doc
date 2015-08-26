@@ -13,3 +13,5 @@ if Enum.empty? Path.wildcard("test/tmp/ebin/*.beam") do
 end
 
 Code.prepend_path "test/tmp/ebin"
+
+Code.require_file "test_html_helpers.exs", __DIR__
