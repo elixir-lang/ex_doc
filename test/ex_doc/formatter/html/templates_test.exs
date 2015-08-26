@@ -31,18 +31,45 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     Templates.module_page(hd(mods), doc_config, mods, false)
   end
 
+  defp findElem(content, selector) do
+    hd(Floki.find(content, selector))
+  end
+
+  defp assertText(el, expected) do
+    actual = Floki.text(el)
+    assert actual === expected
+  end
+
+  defp assertAttribute(el, attribute, expected) do
+    actual = hd(Floki.attribute(el, attribute))
+    assert actual === expected
+  end
+
+  defp exists(content, selector) do
+    assert length(Floki.find(content, selector)) > 0
+  end
+
   ## LISTING
 
   test "site title text links to homepage_url when set" do
     content = Templates.sidebar_template(doc_config, [], [], [], false)
-    assert content =~ ~r{<h1 class="sidebar-projectName">\n\s*<a href="#{homepage_url}">Elixir</a>\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">v1.0.1</h2>}
+
+    titleLink = findElem content, "h1 a"
+    version = findElem content, "h2"
+
+    assertText titleLink, "Elixir"
+    assertText version, "v1.0.1"
+
+    assertAttribute titleLink, "href", homepage_url
   end
 
   test "Disable nav links when module type is empty" do
     content = Templates.sidebar_template(doc_config, [], [], [], false)
-    assert content =~ ~r{<li role="presentation" class="disabled">Modules</li>}
-    assert content =~ ~r{<li role="presentation" class="disabled">Exceptions</li>}
-    assert content =~ ~r{<li role="presentation" class="disabled">Protocols</li>}
+
+    links = Floki.find(content, ".sidebar-mainNav li")
+
+    Enum.drop(links, 1)
+      |> assertAttribute "class", "disabled"
   end
 
   test "Enable nav link when module type have at least one element" do
@@ -54,9 +81,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     protocols  = HTML.filter_list(:protocols, all)
 
     content = Templates.sidebar_template(doc_config, modules, exceptions, protocols, false)
-    assert content =~ ~r{<li><a id="modules_list" href="#full_list">Modules</a></li>}
-    assert content =~ ~r{<li role="presentation" class="disabled">Exceptions</li>}
-    assert content =~ ~r{<li role="presentation" class="disabled">Protocols</li>}
+
+    links = Floki.find(content, ".sidebar-mainNav li")
+    moduleLink = Enum.at(links, 1)
+
+    assert Floki.attribute(moduleLink, "class") === []
+
+    Enum.drop(links, 2)
+      |> assertAttribute "class", "disabled"
   end
 
   test "site title text links to source_url when there is no homepage_url" do

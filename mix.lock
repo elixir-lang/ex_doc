@@ -1,3 +1,5 @@
 %{"earmark": {:hex, :earmark, "0.1.17"},
+  "floki": {:hex, :floki, "0.3.3"},
   "hoedown": {:git, "git://github.com/hoedown/hoedown.git", "2a4cf17c70e6572ed42cdca3ea7ca3e768ed17be", []},
-  "markdown": {:git, "git://github.com/devinus/markdown.git", "cd0df79b6f1cc374499d47f6ba6aaab5096f874f", []}}
+  "markdown": {:git, "git://github.com/devinus/markdown.git", "cd0df79b6f1cc374499d47f6ba6aaab5096f874f", []},
+  "mochiweb": {:hex, :mochiweb, "2.12.2"}}
