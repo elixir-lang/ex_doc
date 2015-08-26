@@ -1,16 +1,16 @@
 defmodule ExDoc.TestHTMLHelpers do
   use ExUnit.Case
 
-  def findElem(content, selector) do
+  def find_elem(content, selector) do
     hd(Floki.find(content, selector))
   end
 
-  def assertText(el, expected) do
+  def assert_text(el, expected) do
     actual = Floki.text(el)
     assert actual === expected
   end
 
-  def assertAttribute(el, attribute, expected) do
+  def assert_attribute(el, attribute, expected) do
     actual = hd(Floki.attribute(el, attribute))
     assert actual === expected
   end

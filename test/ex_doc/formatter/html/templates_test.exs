@@ -38,13 +38,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   test "site title text links to homepage_url when set" do
     content = Templates.sidebar_template(doc_config, [], [], [], false)
 
-    titleLink = findElem content, "h1 a"
-    version = findElem content, "h2"
+    titleLink = find_elem content, "h1 a"
+    version = find_elem content, "h2"
 
-    assertText titleLink, "Elixir"
-    assertText version, "v1.0.1"
+    assert_text titleLink, "Elixir"
+    assert_text version, "v1.0.1"
 
-    assertAttribute titleLink, "href", homepage_url
+    assert_attribute titleLink, "href", homepage_url
   end
 
   test "Disable nav links when module type is empty" do
@@ -53,7 +53,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     links = Floki.find(content, ".sidebar-mainNav li")
 
     Enum.drop(links, 1)
-      |> assertAttribute "class", "disabled"
+      |> assert_attribute "class", "disabled"
   end
 
   test "Enable nav link when module type have at least one element" do
@@ -72,7 +72,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert Floki.attribute(moduleLink, "class") === []
 
     Enum.drop(links, 2)
-      |> assertAttribute "class", "disabled"
+      |> assert_attribute "class", "disabled"
   end
 
   test "site title text links to source_url when there is no homepage_url" do
