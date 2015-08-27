@@ -76,18 +76,29 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   test "site title text links to source_url when there is no homepage_url" do
-    doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                                                  source_url: source_url,
-                                                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [], false)
-    assert content =~ ~r{<h1 class="sidebar-projectName">\n\s*<a href="#{source_url}">Elixir</a>\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">v1.0.1</h2>}
+    config = %ExDoc.Config{project: "Elixir",
+                           version: "1.0.1",
+                           source_root: File.cwd!,
+                           source_url: source_url,
+                           source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
+
+    content = Templates.sidebar_template(config, [], [], [], false)
+    titleLink = find_elem content, ".sidebar-projectName a"
+
+    assert_attribute titleLink, "href", source_url
   end
 
   test "site title text creates no link when there is no homepage_url or source_url" do
-    doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                                                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [], false)
-    assert content =~ ~r{<h1 class="sidebar-projectName">Elixir</h1>\n\s*<h2 class="sidebar-projectVersion">v1.0.1</h2>}
+    config = %ExDoc.Config{project: "Elixir",
+                           version: "1.0.1",
+                           source_root: File.cwd!,
+                           source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
+
+    content = Templates.sidebar_template(config, [], [], [], false)
+    title = find_elem content, ".sidebar-projectName"
+
+    assert_text title, "Elixir"
+    assert Floki.find(title, "a") === []
   end
 
   test "list_page outputs listing for the given nodes" do
@@ -99,19 +110,23 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"functions\".*\"example/2\".*}ms
     assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"macros\".*\"example_1/0\".*}ms
     assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"functions\".*\"example_without_docs/0\".*}ms
-    assert content =~ ~r{.*"CompiledWithDocs.Nested\"}ms
+    assert content =~ ~r{.*"CompiledWithDocs.Nested\"}ms # fix emacs highlighting "
     refute content =~ ~r{.*\"exceptions\":}ms
     refute content =~ ~r{.*\"protocols\":}ms
   end
 
   test "listing page has README link if present" do
     content = Templates.sidebar_template(doc_config, [], [], [], true)
-    assert content =~ ~r{<a href="README.html">README</a>}
+    links = Floki.find(content, ".sidebar-mainNav li")
+
+    assert_text Enum.at(links, 0), "README"
   end
 
   test "listing page doesn't have README link if not present" do
     content = Templates.sidebar_template(doc_config, [], [], [], false)
-    refute content =~ ~r{<a href="README.html">README</a>}
+    links = Floki.find(content, ".sidebar-mainNav li")
+
+    assert_text Enum.at(links, 0), "Overview"
   end
 
   ## MODULES
