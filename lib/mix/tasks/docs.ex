@@ -31,6 +31,7 @@ defmodule Mix.Tasks.Docs do
          source_url: "https://github.com/USER/APP",
          homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
          deps: deps(),
+         formatter: "html",
          docs: [logo: "path/to/logo.png",
                 extras: ["README.md", "CONTRIBUTING.md"]]]
       end
@@ -44,7 +45,8 @@ defmodule Mix.Tasks.Docs do
     * `:output` - output directory for the generated docs; default: "doc".
       May be overriden by command line argument.
 
-    * `:formatter` - doc formatter to use; default: "html".
+    * `:formatter` - doc formatter to use; default: "html",
+      options: "html", "epub".
 
     * `:source_root` - path to the source code root directory;
       default: "." (current directory).
@@ -82,7 +84,7 @@ defmodule Mix.Tasks.Docs do
     Mix.Task.run "compile"
 
     {cli_opts, args, _} = OptionParser.parse(args,
-                            aliases: [o: :output, a: :canonical],
+                            aliases: [o: :output, a: :canonical, f: :formatter],
                             switches: [output: :string, canonical: :string])
 
     if args != [] do

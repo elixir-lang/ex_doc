@@ -10,16 +10,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @doc """
   Receives a list of module nodes and autolink all docs and typespecs.
   """
-  def all(modules) do
+  def all(modules, extension \\ ".html") do
     aliases = Enum.map modules, &(&1.module)
     modules
-    |> Enum.map(&Task.async(fn -> process_module(&1, modules, aliases) end))
+    |> Enum.map(&Task.async(fn -> process_module(&1, modules, aliases, extension) end))
     |> Enum.map(&Task.await(&1, :infinity))
   end
 
-  defp process_module(module, modules, aliases) do
+  defp process_module(module, modules, aliases, extension) do
     module
-    |> all_docs(modules)
+    |> all_docs(modules, extension)
     |> all_typespecs(aliases)
   end
 
@@ -27,7 +27,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     inspect module.module
   end
 
-  defp all_docs(module, modules) do
+  defp all_docs(module, modules, extension) do
     locals = Enum.map(module.docs, &(doc_prefix(&1) <> &1.id)) ++
       Enum.map(module.typespecs, &("t:" <> &1.id))
 
@@ -35,7 +35,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       if module.moduledoc do
         module.moduledoc
         |> local_doc(locals)
-        |> project_doc(modules, module.id)
+        |> project_doc(modules, module.id, extension)
       end
 
     docs = for node <- module.docs do
@@ -43,7 +43,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         if node.doc do
           node.doc
           |> local_doc(locals)
-          |> project_doc(modules, module.id)
+          |> project_doc(modules, module.id, extension)
         end
       %{node | doc: doc}
     end
@@ -53,7 +53,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         if node.doc do
           node.doc
           |> local_doc(locals)
-          |> project_doc(modules, module.id)
+          |> project_doc(modules, module.id, extension)
         end
       %{node | doc: doc}
     end
@@ -113,7 +113,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     typespec_to_string(other, typespecs, aliases)
   end
 
-  defp typespec_to_string(ast, typespecs, aliases) do
+  defp typespec_to_string(ast, typespecs, aliases, extension \\ ".html") do
     Macro.to_string(ast, fn
       {name, _, args}, string when is_atom(name) and is_list(args) ->
         string = strip_parens(string, args)
@@ -129,7 +129,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         alias = expand_alias(alias)
         if source = get_source(alias, aliases) do
           n = enc_h("#{name}")
-          ~s[<a href="#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}">#{h(string)}</a>]
+          ~s[<a href="#{source}#{enc_h(inspect alias)}#{extension}#t:#{n}/#{length(args)}">#{h(string)}</a>]
         else
           string
         end
@@ -190,7 +190,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @doc """
   Creates links to modules and functions defined in the project.
   """
-  def project_doc(bin, modules, module_id \\ nil) when is_binary(bin) do
+  def project_doc(bin, modules, module_id \\ nil, extension \\ ".html") when is_binary(bin) do
     project_funs  = for m <- modules, d <- m.docs, do: doc_prefix(d) <> m.id <> "." <> d.id
     project_types = for m <- modules, d <- m.typespecs, do: "t:" <> m.id <> "." <> d.id
     project_funs  = project_funs ++ project_types
@@ -201,8 +201,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       |> Enum.uniq()
 
     bin
-    |> elixir_functions(project_funs)
-    |> elixir_modules(project_modules, module_id)
+    |> elixir_functions(project_funs, extension)
+    |> elixir_modules(project_modules, module_id, extension)
     |> erlang_functions()
   end
 
@@ -220,7 +220,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   or trailing `]`, e.g. `[my link Module.link/1 is here](url)`, the Module.fun/arity
   will get translated to the new href of the function.
   """
-  def elixir_functions(bin, project_funs) when is_binary(bin) do
+  def elixir_functions(bin, project_funs, extension \\ ".html") when is_binary(bin) do
     module_re = ~r{(([A-Z][A-Za-z_\d]+)\.)+} |> Regex.source
     fun_re = ~r{([ct]:)?(#{module_re}([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)} |> Regex.source
     regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
@@ -231,7 +231,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
       cond do
         match in project_funs ->
-          "[`#{module}.#{function}/#{arity}`](#{module}.html##{prefix}#{enc_h function}/#{arity})"
+          "[`#{module}.#{function}/#{arity}`](#{module}#{extension}##{prefix}#{enc_h function}/#{arity})"
         app = lib_dir_app("Elixir." <> module, lib_dir) ->
           "[`#{module}.#{function}/#{arity}`](#{@elixir_docs}#{app}/#{module}.html##{prefix}#{enc_h function}/#{arity})"
         true ->
@@ -249,16 +249,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   or trailing `]`, e.g. `[my link Module is here](url)`, the Module
   will get translated to the new href of the module.
   """
-  def elixir_modules(bin, modules, module_id \\ nil) when is_binary(bin) do
+  def elixir_modules(bin, modules, module_id \\ nil, extension \\ ".html") when is_binary(bin) do
     regex = ~r{(?<!\[)`\s*(([A-Z][A-Za-z_\d]+\.?)+)\s*`(?!\])}
     lib_dir = elixir_lib_dir()
 
     Regex.replace(regex, bin, fn all, match ->
       cond do
         match == module_id ->
-          "[`#{match}`](#{match}.html#content)"
+          "[`#{match}`](#{match}#{extension}#content)"
         match in modules ->
-          "[`#{match}`](#{match}.html)"
+          "[`#{match}`](#{match}#{extension})"
         app = lib_dir_app("Elixir." <> match, lib_dir) ->
           "[`#{match}`](#{@elixir_docs}#{app}/#{match}.html)"
         true ->
