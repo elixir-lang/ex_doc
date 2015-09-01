@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <%= cond do %>
       <%= page.id == :module -> %>
-        <title><%= page.module %> – <%= config.project %> v<%= config.version %></title>
+        <title><%= page.module %> - <%= config.project %> v<%= config.version %></title>
       <%= page.id == :readme -> %>
         <title>README – <%= config.project %> v<%= config.version %></title>
       <%= page.id == :overview -> %>

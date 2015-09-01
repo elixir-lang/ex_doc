@@ -10,6 +10,11 @@ defmodule ExDoc.TestHTMLHelpers do
     assert actual === expected
   end
 
+  def assert_text_ws(el, expected) do
+    actual = Floki.text(el)
+    assert actual =~ ~r{\s*#{expected}\s*}
+  end
+
   def assert_attribute(el, attribute, expected) do
     actual = hd(Floki.attribute(el, attribute))
     assert actual === expected

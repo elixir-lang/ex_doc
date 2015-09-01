@@ -118,8 +118,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   test "listing page has README link if present" do
     content = Templates.sidebar_template(doc_config, [], [], [], true)
     links = Floki.find(content, ".sidebar-mainNav li")
+    readmeLink = Enum.at(links, 0)
 
-    assert_text Enum.at(links, 0), "README"
+    assert_text readmeLink, "README"
+    assert_attribute Floki.find(readmeLink, "a"), "href", "README.html"
   end
 
   test "listing page doesn't have README link if not present" do
@@ -134,16 +136,22 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   test "module_page generates only the module name when there's no more info" do
     node = %ExDoc.ModuleNode{module: XPTOModule, moduledoc: nil, id: "XPTOModule"}
     content = Templates.module_page(node, doc_config, [node], false)
+    title = find_elem content, "title"
+    heading = find_elem content, ".content h1"
 
-    assert content =~ ~r{<title>XPTOModule [^<]*</title>}
-    assert content =~ ~r{<h1>\s*XPTOModule\s*</h1>}
+    assert_text title, "XPTOModule - Elixir v1.0.1"
+    assert_text_ws heading, "XPTOModule"
   end
 
   test "module_page outputs the functions and docstrings" do
     content = get_module_page([CompiledWithDocs])
+    title = find_elem content, "title"
+    heading = find_elem content, ".content h1"
 
-    assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
-    assert content =~ ~r{<h1>\s*CompiledWithDocs\s*}
+
+    assert_text title, "CompiledWithDocs - Elixir v1.0.1"
+    assert_text_ws heading, "CompiledWithDocs"
+
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
