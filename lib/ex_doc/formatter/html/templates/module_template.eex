@@ -14,24 +14,6 @@
         <% end %>
       </h1>
 
-      <ul class="summary-links">
-        <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
-          <li><a href="#summary_details">Summary</a></li>
-        <% end %>
-        <%= unless Enum.empty?(types) do %>
-          <li><a href="#types_details">Types</a></li>
-        <% end %>
-        <%= unless Enum.empty?(functions) do %>
-          <li><a href="#functions_details">Functions</a></li>
-        <% end %>
-        <%= unless Enum.empty?(macros) do %>
-          <li><a href="#macros_details">Macros</a></li>
-        <% end %>
-        <%= unless Enum.empty?(callbacks) do %>
-          <li><a href="#callbacks_details">Callbacks</a></li>
-        <% end %>
-      </ul>
-
       <%= if module.moduledoc do %>
         <section id="moduledoc" class="docstring">
           <%= to_html(module.moduledoc) %>

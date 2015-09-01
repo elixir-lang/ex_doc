@@ -15,25 +15,38 @@
     to the top of the page itself. --}}
 
     {{#isLocal node.id}}
-      <a href="{{node.id}}.html#content" title="{{node.id}}" class="object-link">{{node.id}}</a>
+      <a href="#content" title="{{node.id}}" class="object-link">{{node.id}}</a>
     {{else}}
       <a href="{{node.id}}.html" title="{{node.id}}" class="object-link">{{node.id}}</a>
     {{/isLocal}}
-  </li>
 
-  {{#if node.functions}}
-    <li class="docs">
-      <ul>
-
-      {{#each node.functions as |function functionId|}}
-        <li>
-          <a href="{{node.id}}.html#{{function.anchor}}" title="{{node.id}}.{{function.id}}" class="object-link">
-            {{function.id}}
-          </a>
+    {{#showSummary node}}
+    <ul>
+      <li>
+        <a href="#summary_details" class="">Summary</a>
+      </li>
+      {{#if node.types}}
+        <li class="docs">
+          <a href="#types_details">Types</a>
         </li>
-      {{/each}}
-      </ul>
-    </li>
-  {{/if}}
+      {{/if}}
+      {{#if node.functions}}
+        <li>
+          <a href="#functions_details">Functions</a>
+        </li>
+      {{/if}}
+      {{#if node.macros}}
+        <li>
+          <a href="#macros_details">Macros</a>
+        </li>
+      {{/if}}
+      {{#if node.callbacks}}
+        <li class="docs">
+          <a href="#callbacks_details">Callbacks</a>
+        </li>
+      {{/if}}
+    </ul>
+    {{/showSummary}}
+  </li>
 {{/each}}
 </ul>
