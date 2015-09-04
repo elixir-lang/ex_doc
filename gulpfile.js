@@ -34,7 +34,7 @@ var webpackConfig = {
   module: {
     loaders: [
       // for handlebars
-      { test: /\.handlebars$/, loader: "handlebars-loader" }
+      { test: /\.handlebars$/, loader: 'handlebars-loader' }
     ]
   }
 }
