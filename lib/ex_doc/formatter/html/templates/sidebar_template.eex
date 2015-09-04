@@ -42,8 +42,6 @@
 
   <ul id="full_list" class="sidebar-fullList"></ul>
   <div class="sidebar-noResults"></div>
-
-  <script src="dist/sidebar_items.js" defer></script>
 </section>
 
 <section class="content">

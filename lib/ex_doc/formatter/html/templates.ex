@@ -98,7 +98,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def create_sidebar_items(input) do
     object = Enum.into(input, [], &(sidebar_items_keys(&1)))
              |> Enum.join(",")
-    "sidebarNodes={#{object}};fillSidebarWithNodes(sidebarNodes);"
+    "sidebarNodes={#{object}}"
   end
 
   templates = [

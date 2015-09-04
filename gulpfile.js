@@ -13,6 +13,8 @@ var LessPluginNpmImport = require('less-plugin-npm-import')
 var LessPluginAutoPrefix = require('less-plugin-autoprefix')
 var Server = require('karma').Server
 
+var webpackConfig = require('./assets/webpack.config')
+
 // Config
 // ------
 
@@ -26,18 +28,6 @@ var npmPlugin = new LessPluginNpmImport()
 var autoprefixPlugin = new LessPluginAutoPrefix({
   browsers: ['last 2 versions']
 })
-
-var webpackConfig = {
-  output: {
-    filename: 'app.js'
-  },
-  module: {
-    loaders: [
-      // for handlebars
-      { test: /\.handlebars$/, loader: 'handlebars-loader' }
-    ]
-  }
-}
 
 if (!isProduction) {
   webpackConfig.debug = true
