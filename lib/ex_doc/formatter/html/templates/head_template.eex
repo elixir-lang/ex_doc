@@ -16,5 +16,6 @@
     <meta name="generator" content="ExDoc v<%= ExDoc.version %>">
     <link href="http://fonts.googleapis.com/css?family=Lato:400,300,700,900|Merriweather:300italic,300,700,700italic|Inconsolata:400,700" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="dist/app.css" />
+    <script src="dist/sidebar_items.js"></script>
   </head>
   <body>

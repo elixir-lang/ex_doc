@@ -1,3 +1,5 @@
+var webpackConfig = require('./webpack.config')
+
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -14,7 +16,8 @@ module.exports = function (config) {
 
     webpack: {
       devtool: 'inline-source-map',
-      debug: true
+      debug: true,
+      module: webpackConfig.module
     },
 
     webpackMiddleware: {

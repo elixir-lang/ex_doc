@@ -5,141 +5,18 @@
 // ------------
 
 var $ = require('jquery')
-var helpers = require('./helpers')
+var search = require('./search')
 var sidebarItemsTemplate = require('./sidebar-items.handlebars')
 
-// Local Variables
-// ---------------
+// Constants
+// ---------
 
-var inSearch = null
-var defaultSearchItemTimeOut = 0 // set to "0" if not testing
-var searchIndex = 0
-var searchCache = []
-var searchString = ''
-var regexSearchString = ''
-var caseSensitiveMatch = false
-var sidebarNav = $('.sidebar-mainNav')
-
-// Local Methods
-// -------------
-
-/**
- * When the search field is empty show the children nodes of the #full_list
- *
- * Also removes the class .search-uncollapsed, .in-search, .found and .loading
- * among other things to reset the sidebar default status
- */
-function showAllResults () {
-  clearTimeout(inSearch)
-  inSearch = defaultSearchItemTimeOut
-  $('.search-uncollapsed').removeClass('search-uncollapsed')
-  $('#sidebar').removeClass('in-search')
-  $('#full_list li').removeClass('found').each(function () {
-    var link = $(this).find('a.object-link:first')
-    link.text(link.text())
-  })
-  $('#no_results').text('')
-  $('#spinning span').removeClass('fa fa-refresh fa-spin')
-  $('.sidebar-search button span.fa-times').addClass('fa-search').removeClass('fa-times')
-}
-
-/**
- * If no results were found, shows a message to the user.
- *
- * Also remove the 'loading' icon and clear the timeout returned
- * initially by setTimeout.
- */
-function searchDone () {
-  if ($('#full_list li.found').size() === 0) {
-    $('#no_results').text('No results were found.').hide().fadeIn()
-  } else {
-    $('#no_results').text('')
-  }
-
-  $('#spinning span').removeClass('fa fa-refresh fa-spin')
-  clearTimeout(inSearch)
-  inSearch = null
-}
-
-function searchItem () {
-  var i
-  var item
-  var searchName
-  var matchString
-  var matchRegexp
-
-  for (i = 0; i < searchCache.length / 50; i += 1) {
-    item = searchCache[searchIndex]
-    searchName = (searchString.indexOf('.') !== -1 ? item.fullName : item.name)
-    matchString = regexSearchString
-    matchRegexp = new RegExp(matchString, caseSensitiveMatch ? '' : 'i')
-
-    if (searchName.match(matchRegexp) === null) {
-      item.node.removeClass('found')
-    } else {
-      item.node.addClass('found')
-      item.node.parents('li').addClass('search-uncollapsed')
-      item.link.html(item.name.replace(matchRegexp, '<strong>$&</strong>'))
-    }
-
-    if (searchCache.length === searchIndex + 1) {
-      searchDone()
-      return
-    }
-    searchIndex += 1
-  }
-  inSearch = setTimeout(function () {
-    searchItem()
-  }, defaultSearchItemTimeOut)
-}
-
-/**
- * Fill the searchCache Array with the links found inside of the #full_list
- *
- * Define the initial set of events for the search field.
- */
-function fullListSearch () {
-  // generate cache
-  searchCache = []
-  $('#spinning span').removeClass('fa fa-refresh fa-spin')
-
-  $('#full_list li').each(function () {
-    var link = $(this).find('a.object-link:first')
-    var fullName
-
-    if (link.attr('title')) {
-      fullName = link.attr('title').split(' ')[0]
-      searchCache.push({
-        name: link.text(),
-        fullName: fullName,
-        node: $(this),
-        link: link
-      })
-    }
-  })
-
-  $('.sidebar-search input').focus()
-}
-
-function performSearch () {
-  searchString = $('.sidebar-search input').val()
-  caseSensitiveMatch = searchString.match(/[A-Z]/) !== null
-  regexSearchString = helpers.escapeText(searchString)
-
-  if (searchString === '') {
-    showAllResults()
-  } else {
-    if (inSearch) {
-      clearTimeout(inSearch)
-    }
-    $('#spinning span').addClass('fa fa-refresh fa-spin')
-    $('.sidebar-search button span.fa-search').addClass('fa-times').removeClass('fa-search')
-    searchIndex = 0
-    $('#sidebar').addClass('in-search')
-    $('#no_results').text('')
-    searchItem()
-  }
-}
+var SIDEBAR_TYPES = [
+  '#modules_list',
+  '#exceptions_list',
+  '#protocols_list'
+]
+var SIDEBAR_NAV = $('.sidebar-mainNav')
 
 /**
  * Identify external links inside of an specific section
@@ -158,7 +35,7 @@ function identifyExternalLinks (section) {
 }
 
 function setupSelected (id) {
-  ['#modules_list', '#exceptions_list', '#protocols_list'].forEach(function (element) {
+  SIDEBAR_TYPES.forEach(function (element) {
     if (element === id) {
       $(element).parent().addClass('selected')
     } else {
@@ -166,15 +43,11 @@ function setupSelected (id) {
     }
   })
 }
+
 function collapse () {
   $('#full_list > li.node:not(.clicked)').each(function () {
     $(this).addClass('collapsed').next('li.docs').addClass('collapsed')
   })
-}
-
-function resetSidebar () {
-  fullListSearch()
-  collapse()
 }
 
 // Public Methods
@@ -211,66 +84,32 @@ function fillSidebarWithNodes (nodes, filter) {
   setupSelected(['#', filter, '_list'].join(''))
 }
 
-function initalize () {
-  sidebarNav.on('click', '#modules_list', function (e) {
-    fillSidebarWithNodes(sidebarNodes, 'modules')
-    resetSidebar()
-    performSearch()
-    e.preventDefault()
-  })
+function createHandler (name) {
+  return function (event) {
+    event.preventDefault()
+    fillSidebarWithNodes(sidebarNodes, name)
+    collapse()
+  }
+}
 
-  sidebarNav.on('click', '#exceptions_list', function (e) {
-    fillSidebarWithNodes(sidebarNodes, 'exceptions')
-    resetSidebar()
-    performSearch()
-    e.preventDefault()
-  })
-
-  sidebarNav.on('click', '#protocols_list', function (e) {
-    fillSidebarWithNodes(sidebarNodes, 'protocols')
-    resetSidebar()
-    performSearch()
-    e.preventDefault()
-  })
-
-  $('[data-toggle="offcanvas"]').on('click', function () {
-    $('.row-offcanvas').toggleClass('active')
-    $('#content').toggleClass('offcanvas-active')
-  })
-
-  $('.sidebar-search button').on('click', function () {
-    $('.sidebar-search input').val('').focus()
-    $('.sidebar-search button span.fa-times').addClass('fa-search').removeClass('fa-times')
-    showAllResults()
-  })
-
-  $(document).on('keyup', function (e) {
-    var searchInput = $('.sidebar-search input')
-    if (e.keyCode === 27 && searchInput.val() !== '') { // escape key maps to 27
-      searchInput.val('').focus()
-      showAllResults()
-    }
-  })
+function addEventListeners () {
+  SIDEBAR_NAV.on('click', '#modules_list', createHandler('modules'))
+  SIDEBAR_NAV.on('click', '#exceptions_list', createHandler('exceptions'))
+  SIDEBAR_NAV.on('click', '#protocols_list', createHandler('protocols'))
 
   $('.sidebar-search input').on('keypress', function (e) {
     if (e.which === 13) { // enter key maps to 13
-      var firstLinkFound = document.querySelectorAll('#full_list li.found a.object-link')[0]
-      firstLinkFound.click()
+      search.start()
     }
   })
+}
 
-  $('.sidebar-search input').on('input', function () {
-    performSearch()
-  })
-
-  fullListSearch()
+function initalize () {
+  fillSidebarWithNodes(sidebarNodes)
+  addEventListeners()
   collapse()
   identifyExternalLinks('#content')
 }
-
-// Set as global, so it's accessible in
-// lib/ex_doc/formatter/html/templates/sidebar_items_template.eex
-window.fillSidebarWithNodes = fillSidebarWithNodes
 
 module.exports = {
   initialize: initalize
