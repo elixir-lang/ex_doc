@@ -22,3 +22,7 @@ before_script:
 script:
   - "mix do local.hex --force, deps.get && mix test --include pandoc"
   - node_modules/.bin/gulp
+cache:
+  directories:
+    - node_modules
+    - deps
