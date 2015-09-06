@@ -10,10 +10,9 @@ notifications:
   recipients:
     - jose.valim@plataformatec.com.br
 before_install:
-  - wget -c https://github.com/jgm/pandoc/releases/download/1.15.0.6/pandoc-1.15.0.6-1-amd64.deb
-  - ar -x pandoc-1.15.0.6-1-amd64.deb
-  - tar xzf data.tar.gz
+  - ./travis-before-install.sh
   - export PATH=$PATH:$PWD/usr/bin/
+  - pandoc --version
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
