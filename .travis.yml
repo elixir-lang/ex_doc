@@ -10,8 +10,18 @@ notifications:
   recipients:
     - jose.valim@plataformatec.com.br
 before_install:
-  - wget -c https://github.com/jgm/pandoc/releases/download/1.15.0.6/pandoc-1.15.0.6-1-amd64.deb
-  - ar -x pandoc-1.15.0.6-1-amd64.deb
+  - package_path="$( \
+      curl -sfI "https://github.com/jgm/pandoc/releases/latest" | \
+      grep "Location: " | tr '\r' '\0' | tr '\n' '\0' | cut -d" " -f2 | \
+      xargs -0 curl -sf | \
+      grep -oP "(?<=(href=\"))/[^>\"]+/releases/download/[^>\"]+-amd64.deb(?=\")" \
+    )"
+  - if [ -z "${package_path}" ]; then
+     echo "Latest Pandoc package couldn't be found" >&2
+     exit 1
+    fi
+  - curl -o "pandoc-latest-amd64.deb" "${package_path}" 
+  - ar -x pandoc-latest-amd64.deb
   - tar xzf data.tar.gz
   - export PATH=$PATH:$PWD/usr/bin/
 before_script:
