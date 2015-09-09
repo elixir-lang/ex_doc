@@ -33,13 +33,15 @@ function cleaner (element) {
   return !!element
 }
 
-function findNested (elements, matcher) {
+function findNested (elements, parentId, matcher) {
   return (elements || []).map(function (element) {
+    // Match things like module.func
+    var parentMatch = (parentId + '.' + element.id).match(matcher)
     var match = element.id && element.id.match(matcher)
 
-    if (match) {
+    if (parentMatch || match) {
       var result = JSON.parse(JSON.stringify(element))
-      result.match = highlight(match)
+      result.match = match ? highlight(match) : element.id
       return result
     }
   }).filter(cleaner)
@@ -47,10 +49,11 @@ function findNested (elements, matcher) {
 
 function findIn (elements, matcher) {
   return elements.map(function (element) {
-    var idMatch = element.id && element.id.match(matcher)
-    var functionMatches = findNested(element.functions, matcher)
-    var macroMatches = findNested(element.macros, matcher)
-    var callbackMatches = findNested(element.callbacks, matcher)
+    var id = element.id
+    var idMatch = id && id.match(matcher)
+    var functionMatches = findNested(element.functions, id, matcher)
+    var macroMatches = findNested(element.macros, id, matcher)
+    var callbackMatches = findNested(element.callbacks, id, matcher)
 
     var result = {
       id: element.id,
