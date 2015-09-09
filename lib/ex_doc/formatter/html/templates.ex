@@ -55,11 +55,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     String.split(doc, ~r/\n\s*\n/) |> hd |> String.strip() |> String.rstrip(?.)
   end
 
-  # A bit of standard HTML to insert the to-top arrow.
-  defp to_top_link() do
-    "<a class=\"to_top_link\" href=\"#content\" title=\"To the top of the page\">&uarr;</a>"
-  end
-
   defp presence([]),    do: nil
   defp presence(other), do: other
 
@@ -70,49 +65,25 @@ defmodule ExDoc.Formatter.HTML.Templates do
     end
   end
 
-  # Get the breadcrumbs HTML.
-  #
-  # If module is :overview generates the breadcrumbs for the overview.
-  defp module_breadcrumbs(config, modules, module) do
-    parts = [root_breadcrumbs(config), {"Overview", "overview.html"}]
-    aliases = Module.split(module.module)
-    modules = Enum.map(modules, &(&1.module))
-
-    {crumbs, _} =
-      Enum.map_reduce(aliases, [], fn item, parents ->
-        path = parents ++ [item]
-        mod  = Module.concat(path)
-        page = if mod in modules, do: inspect(mod) <> ".html#content"
-        {{item, page}, path}
-      end)
-
-    generate_breadcrumbs(parts ++ crumbs)
-  end
-
-  defp page_breadcrumbs(config, title, link) do
-    generate_breadcrumbs [root_breadcrumbs(config), { title, link }]
-  end
-
-  defp root_breadcrumbs(config) do
-    {"#{config.project} v#{config.version}", nil}
-  end
-
-  defp generate_breadcrumbs(crumbs) do
-    Enum.map_join(crumbs, " &rarr; ", fn { name, ref } ->
-      if ref, do: "<a href=\"#{h(ref)}\">#{h(name)}</a>", else: h(name)
-    end)
-  end
-
   defp sidebar_items_object(node) do
     ~s{"id":"#{node.id}","anchor":"#{h link_id(node)}"}
+  end
+
+  defp sidebar_items_by_type({type, node}) do
+    objects = node |> Enum.map_join("},{", &(sidebar_items_object(&1)))
+    ~s/"#{type}":[{#{objects}}]/
   end
 
   defp sidebar_items_entry(node) do
     result = ~s/"id":"#{node.id}"/
     unless Enum.empty?(node.docs) do
-      object = Enum.into(node.docs, [], &(sidebar_items_object(&1)))
-               |> Enum.join("},{")
-      result = ~s/#{result},"docs":[{#{object}}]/
+      types = [types: node.typespecs,
+        functions: Enum.filter(node.docs, & &1.type in [:def]),
+        macros: Enum.filter(node.docs, & &1.type in [:defmacro]),
+        callbacks: Enum.filter(node.docs, & &1.type in [:defcallback, :defmacrocallback])]
+      |> Enum.reject(fn {_type, entries} -> entries == [] end)
+      |> Enum.map_join(",", &sidebar_items_by_type(&1))
+      result = "#{result},#{types}"
     end
     result
   end
@@ -127,7 +98,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def create_sidebar_items(input) do
     object = Enum.into(input, [], &(sidebar_items_keys(&1)))
              |> Enum.join(",")
-    "sidebarNodes={#{object}};fillSidebarWithNodes(sidebarNodes);"
+    "sidebarNodes={#{object}}"
   end
 
   templates = [
@@ -135,6 +106,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     footer_template: [],
     head_template: [:config, :page],
     module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all, :has_readme],
+    not_found_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     overview_entry_template: [:node],
     overview_template: [:config, :modules, :exceptions, :protocols, :has_readme],
     readme_template: [:config, :modules, :exceptions, :protocols, :content],

@@ -5,181 +5,37 @@
 // ------------
 
 var $ = require('jquery')
-var helpers = require('./helpers')
+var search = require('./search')
+var sidebarItemsTemplate = require('./sidebar-items.handlebars')
 
-// Local Variables
-// ---------------
+// Constants
+// ---------
 
-var inSearch = null
-var defaultSearchItemTimeOut = 0 // set to "0" if not testing
-var searchIndex = 0
-var searchCache = []
-var searchString = ''
-var regexSearchString = ''
-var caseSensitiveMatch = false
-var lastRowClass = ''
-var sidebarNav = $('.nav')
-
-// Local Methods
-// -------------
-
-function highlight (no_padding) {
-  var n = 1
-  $('#full_list a.object_link:visible').each(function () {
-    var next = n === 1 ? 2 : 1
-    var li = $(this).parent()
-
-    li.removeClass('r' + next).addClass('r' + n)
-    if (no_padding) {
-      li.addClass('no_padding')
-    } else {
-      li.removeClass('no_padding')
-    }
-    n = next
-  })
-}
-
-/**
- * When the search field is empty show the children nodes of the #full_list
- *
- * Also removes the class .search_uncollapsed, .in_search, .found and .loading
- * among other things to reset the sidebar default status
- */
-function showAllResults () {
-  clearTimeout(inSearch)
-  inSearch = defaultSearchItemTimeOut
-  $('.search_uncollapsed').removeClass('search_uncollapsed')
-  $('#sidebar').removeClass('in_search')
-  $('#full_list li').removeClass('found').each(function () {
-    var link = $(this).find('a.object_link:first')
-    link.text(link.text())
-  })
-  $('#no_results').text('')
-  $('#spinning span').removeClass('glyphicon glyphicon-refresh spinning')
-  $('#search button span.glyphicon-remove').addClass('glyphicon-search').removeClass('glyphicon-remove')
-  highlight()
-}
-
-/**
- * If no results were found, shows a message to the user.
- *
- * Also remove the 'loading' icon and clear the timeout returned
- * initially by setTimeout.
- */
-function searchDone () {
-  highlight(true)
-  if ($('#full_list li.found').size() === 0) {
-    $('#no_results').text('No results were found.').hide().fadeIn()
-  } else {
-    $('#no_results').text('')
-  }
-
-  $('#spinning span').removeClass('glyphicon glyphicon-refresh spinning')
-  clearTimeout(inSearch)
-  inSearch = null
-}
-
-function searchItem () {
-  var i
-  var item
-  var searchName
-  var matchString
-  var matchRegexp
-
-  for (i = 0; i < searchCache.length / 50; i += 1) {
-    item = searchCache[searchIndex]
-    searchName = (searchString.indexOf('.') !== -1 ? item.fullName : item.name)
-    matchString = regexSearchString
-    matchRegexp = new RegExp(matchString, caseSensitiveMatch ? '' : 'i')
-
-    if (searchName.match(matchRegexp) === null) {
-      item.node.removeClass('found')
-    } else {
-      item.node.addClass('found')
-      item.node.parents('li').addClass('search_uncollapsed')
-      item.node.removeClass(lastRowClass).addClass(lastRowClass === 'r1' ? 'r2' : 'r1')
-      lastRowClass = item.node.hasClass('r1') ? 'r1' : 'r2'
-      item.link.html(item.name.replace(matchRegexp, '<strong>$&</strong>'))
-    }
-
-    if (searchCache.length === searchIndex + 1) {
-      searchDone()
-      return
-    }
-    searchIndex += 1
-  }
-  inSearch = setTimeout(function () {
-    searchItem()
-  }, defaultSearchItemTimeOut)
-}
-
-/**
- * Fill the searchCache Array with the links found inside of the #full_list
- *
- * Define the initial set of events for the search field.
- */
-function fullListSearch () {
-  // generate cache
-  searchCache = []
-  $('#spinning span').removeClass('glyphicon glyphicon-refresh spinning')
-
-  $('#full_list li').each(function () {
-    var link = $(this).find('a.object_link:first')
-    var fullName
-
-    if (link.attr('title')) {
-      fullName = link.attr('title').split(' ')[0]
-      searchCache.push({
-        name: link.text(),
-        fullName: fullName,
-        node: $(this),
-        link: link
-      })
-    }
-  })
-
-  $('#search input').focus()
-}
-
-function performSearch () {
-  searchString = $('#search input').val()
-  caseSensitiveMatch = searchString.match(/[A-Z]/) !== null
-  regexSearchString = helpers.escapeText(searchString)
-
-  if (searchString === '') {
-    showAllResults()
-  } else {
-    if (inSearch) {
-      clearTimeout(inSearch)
-    }
-    $('#spinning span').addClass('glyphicon glyphicon-refresh spinning')
-    $('#search button span.glyphicon-search').addClass('glyphicon-remove').removeClass('glyphicon-search')
-    searchIndex = 0
-    lastRowClass = ''
-    $('#sidebar').addClass('in_search')
-    $('#no_results').text('')
-    searchItem()
-  }
-}
+var SIDEBAR_TYPES = [
+  '#modules_list',
+  '#exceptions_list',
+  '#protocols_list'
+]
+var SIDEBAR_NAV = $('.sidebar-mainNav')
 
 /**
  * Identify external links inside of an specific section
  *
  * This function adds an icon to identify an external link.
  *
- * @param {String} section - Section where we want to identify the external links.
+ * @param {String} section  Section where we want to identify the external links.
  */
 function identifyExternalLinks (section) {
   $([section, 'a'].join(' ')).filter(function () {
-    return (this.hostname !== window.location.hostname)
+    return (this.hostname !== window.location.hostname && $(this).attr('rel') !== 'help')
   }).append($('<span/>').attr({
-    'class': 'glyphicon glyphicon-new-window',
+    'class': 'fa fa-external-link',
     'aria-hidden': 'true'
   })).addClass('external')
 }
 
 function setupSelected (id) {
-  ['#modules_list', '#exceptions_list', '#protocols_list'].forEach(function (element) {
+  SIDEBAR_TYPES.forEach(function (element) {
     if (element === id) {
       $(element).parent().addClass('selected')
     } else {
@@ -187,23 +43,11 @@ function setupSelected (id) {
     }
   })
 }
-function collapse () {
-  $('#full_list a.toggle').click(function () {
-    $(this).parent().toggleClass('collapsed').next().toggleClass('collapsed')
-    highlight()
-    return false
-  })
 
+function collapse () {
   $('#full_list > li.node:not(.clicked)').each(function () {
     $(this).addClass('collapsed').next('li.docs').addClass('collapsed')
   })
-
-  highlight()
-}
-
-function resetSidebar () {
-  fullListSearch()
-  collapse()
 }
 
 // Public Methods
@@ -220,71 +64,15 @@ function resetSidebar () {
  * @param {String} filter - Filter of nodes, by default 'modules'.
  */
 function fillSidebarWithNodes (nodes, filter) {
-  var full_list = $('#full_list')
   var module_type
 
   function scope (items) {
     var filtered = nodes[items]
-    var fullList = '<ul id="full_list">'
-
-    if (!filtered) {
-      fullList += '</ul>'
-      full_list.replaceWith(fullList)
-      return
-    }
-
-    filtered.forEach(function (element) {
-      var docs_container
-      var id = element.id
-      var li
-      var ul
-      var current_path
-      var href
-
-      /* li.node */
-      li = '<li class="node">'
-
-      // When visiting a module page, the link to this module page
-      // in the menu should not link to a new page, instead should
-      // link to the top of the page itself.
-      current_path = window.location.pathname.split('/')
-      href = id + '.html'
-      if (href === current_path[current_path.length - 1]) {
-        li = '<li class="node clicked">'
-        href = href + '#content'
-      }
-
-      if (element.hasOwnProperty('docs')) {
-        li += '<a class="toggle"></a>'
-      }
-
-      li += '<a href="' + href + '" title="' + id + '" class="object_link">' + id + '</a>'
-      li += '<span class="node_name">' + id + '</span></li>'
-
-      fullList += li
-
-      if (element.hasOwnProperty('docs')) {
-        /* li.docs */
-        docs_container = '<li class="docs">'
-        ul = '<ul>'
-
-        element.docs.forEach(function (element) {
-          var detail = '<li>'
-
-          detail += '<a href="' + id + '.html#' + element.anchor + '" title="' + id + '.' + element.id + '" class="object_link">' + element.id + '</a>'
-          detail += '<span class="node_name">' + id + '</span></li>'
-
-          ul += detail
-        })
-
-        docs_container += ul + '</ul></li>'
-        fullList += docs_container
-      }
-    })
-    full_list.replaceWith(fullList)
+    var fullList = $('#full_list')
+    fullList.replaceWith(sidebarItemsTemplate(filtered))
   }
 
-  module_type = $('#content h1 small').text()
+  module_type = $('.content h1 small').text()
   if (module_type && (module_type === 'exception' || module_type === 'protocol')) {
     module_type = module_type + 's' // pluralize 'exception' or 'protocol'
   } else {
@@ -296,66 +84,36 @@ function fillSidebarWithNodes (nodes, filter) {
   setupSelected(['#', filter, '_list'].join(''))
 }
 
-function initalize () {
-  sidebarNav.on('click', '#modules_list', function (e) {
-    fillSidebarWithNodes(sidebarNodes, 'modules')
-    resetSidebar()
-    performSearch()
-    e.preventDefault()
-  })
+function createHandler (name) {
+  return function (event) {
+    event.preventDefault()
+    fillSidebarWithNodes(sidebarNodes, name)
+    collapse()
+  }
+}
 
-  sidebarNav.on('click', '#exceptions_list', function (e) {
-    fillSidebarWithNodes(sidebarNodes, 'exceptions')
-    resetSidebar()
-    performSearch()
-    e.preventDefault()
-  })
+function addEventListeners () {
+  SIDEBAR_NAV.on('click', '#modules_list', createHandler('modules'))
+  SIDEBAR_NAV.on('click', '#exceptions_list', createHandler('exceptions'))
+  SIDEBAR_NAV.on('click', '#protocols_list', createHandler('protocols'))
 
-  sidebarNav.on('click', '#protocols_list', function (e) {
-    fillSidebarWithNodes(sidebarNodes, 'protocols')
-    resetSidebar()
-    performSearch()
-    e.preventDefault()
-  })
-
-  $('[data-toggle="offcanvas"]').on('click', function () {
-    $('.row-offcanvas').toggleClass('active')
-    $('#content').toggleClass('offcanvas-active')
-  })
-
-  $('#search button').on('click', function () {
-    $('#search input').val('').focus()
-    $('#search button span.glyphicon-remove').addClass('glyphicon-search').removeClass('glyphicon-remove')
-    showAllResults()
-  })
-
-  $(document).on('keyup', function (e) {
-    var searchInput = $('#search input')
-    if (e.keyCode === 27 && searchInput.val() !== '') { // escape key maps to 27
-      searchInput.val('').focus()
-      showAllResults()
-    }
-  })
-
-  $('#search input').on('keypress', function (e) {
+  $('.sidebar-search input').on('keypress', function (e) {
     if (e.which === 13) { // enter key maps to 13
-      var firstLinkFound = document.querySelectorAll('#full_list li.found a.object_link')[0]
-      firstLinkFound.click()
+      search.start()
     }
   })
 
-  $('#search input').on('input', function () {
-    performSearch()
+  $('.sidebar-search i.fa-search').on('click', function (e) {
+    search.start()
   })
+}
 
-  fullListSearch()
+function initalize () {
+  fillSidebarWithNodes(sidebarNodes)
+  addEventListeners()
   collapse()
   identifyExternalLinks('#content')
 }
-
-// Set as global, so it's accessible in
-// lib/ex_doc/formatter/html/templates/sidebar_items_template.eex
-window.fillSidebarWithNodes = fillSidebarWithNodes
 
 module.exports = {
   initialize: initalize

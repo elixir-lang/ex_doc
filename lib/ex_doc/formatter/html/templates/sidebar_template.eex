@@ -1,64 +1,51 @@
-<div class="row row-offcanvas row-offcanvas-left">
-<section id="sidebar" class="col-xs-6 col-sm-3 sidebar-offcanvas">
-  <p class="pull-right visible-xs">
-  <button type="button" class="btn btn-default btn-sm" data-toggle="offcanvas">
-    <span class="glyphicon glyphicon-search"></span>
-  </button>
-  </p>
+<div class="main">
+<section class="sidebar">
+  <%= if url = config.homepage_url || config.source_url do %>
+    <h1 class="sidebar-projectName">
+      <a href="<%= url %>"><%= config.project %></a>
+    </h1>
+  <% else %>
+    <h1 class="sidebar-projectName"><%= config.project %></h1>
+  <% end %>
+  <h2 class="sidebar-projectVersion">v<%= config.version %></h2>
 
-  <h1 id="full_list_header">
-    <%= if url = config.homepage_url || config.source_url do %>
-      <a href="<%= url %>"><%= config.project %> v<%= config.version %></a>
-    <% else %>
-      <%= config.project %> v<%= config.version %>
-    <% end %>
-  </h1>
-
-  <h2 id="sub_list_header">
+  <ul class="sidebar-mainNav">
     <%= if has_readme do %>
-      <a href="README.html">README</a>
+      <li><a href="README.html">README</a></li>
     <% end %>
-    <a href="overview.html">Overview</a>
-  </h2>
 
-  <div class="nav">
+    <li><a href="overview.html">Overview</a></li>
+
     <%= if Enum.empty?(modules) do %>
-      <span role="presentation" class="disabled">Modules</span>
+      <li role="presentation" class="disabled">Modules</li>
     <% else %>
-      <span><a id="modules_list" href="#full_list">Modules</a></span>
+      <li><a id="modules_list" href="#full_list">Modules</a></li>
     <% end %>
+
     <%= if Enum.empty?(exceptions) do %>
-      <span role="presentation" class="disabled">Exceptions</span>
+      <li role="presentation" class="disabled">Exceptions</li>
     <% else %>
-      <span><a id="exceptions_list" href="#full_list">Exceptions</a></span>
+      <li><a id="exceptions_list" href="#full_list">Exceptions</a></li>
     <% end %>
+
     <%= if Enum.empty?(protocols) do %>
-      <span role="presentation" class="disabled">Protocols</span>
+      <li role="presentation" class="disabled">Protocols</li>
     <% else %>
-      <span><a id="protocols_list" href="#full_list">Protocols</a></span>
+      <li><a id="protocols_list" href="#full_list">Protocols</a></li>
     <% end %>
-  </div>
-
-  <div id="search">
-    <div class="col-xs-10">
-      <div class="input-group input-group-sm">
-        <label for="search_field" class="sr-only">Search</label>
-        <input type="text" id="search_field" class="form-control" placeholder="Search" autocomplete="off" autofocus="autofocus" results="0">
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
-        </span>
-      </div><!-- /input-group -->
-    </div><!-- /.col-xs-10 -->
-    <div class="col-xs-2" id="spinning">
-      <span></span>
-    </div><!-- /.col-xs-2 -->
-  </div><!-- /#search .row -->
-
-  <script src="dist/sidebar_items.js" defer></script>
-
-  <ul id="full_list">
   </ul>
 
-  <div id="no_results"></div>
-</section><!--/.sidebar-offcanvas -->
-<section id="content" class="col-xs-12 col-sm-9">
+  <div class="sidebar-search">
+    <i class="fa fa-search"></i>
+    <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" results="0" />
+  </div>
+
+  <ul id="full_list" class="sidebar-fullList"></ul>
+  <div class="sidebar-noResults"></div>
+</section>
+
+<section class="content">
+  <div class="content-inner">
+    <button class="sidebar-toggle">
+      <i class="fa fa-bars"></i>
+    </button>

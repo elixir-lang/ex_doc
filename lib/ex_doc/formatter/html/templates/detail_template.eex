@@ -1,24 +1,28 @@
-<section class="detail">
-  <div class="detail_header" id="<%=h link_id(node) %>">
-    <span class="signature"><strong><%=h node.signature %></strong></span>
-    <div class="detail_header_links">
-      <span class="detail_type">(<%= pretty_type(node) %>)</span>
-      <a href="#<%=h link_id(node) %>" class="detail_link" title="Link to this <%= pretty_type(node) %>">#</a>
-      <%= to_top_link() %>
-    </div>
+<div class="detail">
+  <div class="detail-header" id="<%=h link_id(node) %>">
+    <a href="#<%=h link_id(node) %>" class="detail-link" title="Link to this <%= pretty_type(node) %>">
+      <i class="fa fa-link"></i>
+    </a>
+    <span class="signature"><%=h node.signature %></span>
+      <%= if node.source do %>
+      <a href="<%= node.source %>" class="view-source" rel="help" title="View Source">
+       <i class="fa fa-code"></i>
+     </a>
+    <% end %>
   </div>
   <%= if specs = get_specs(node) do %>
-    <p>Specs:</p>
-    <ul class="spec">
-      <%= for spec <- specs do %>
-        <li><%= spec %></li>
-      <% end %>
-    </ul>
+    <div class="specs">
+      <h4 class="specs-title">Specs</h4>
+      <ul class="specs-list">
+        <%= for spec <- specs do %>
+          <li>
+            <code><%= spec %></code>
+          </li>
+        <% end %>
+      </ul>
+    </div>
   <% end %>
   <section class="docstring">
     <%= to_html(node.doc) %>
   </section>
-  <%= if node.source do %>
-    <a href="<%= node.source %>" class="view_source">Source</a>
-  <% end %>
-</section>
+</div>

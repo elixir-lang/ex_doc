@@ -1,0 +1,34 @@
+<h1>Search Results for <em>{{value}}</em></h1>
+
+<a href="" class="close-search">
+  Close <i class="fa fa-close"></i>
+</a>
+
+
+<div class="results">
+  {{#each levels}}
+  <h2 class="results-title">{{name}}</h2>
+  {{#each results}}
+    <div class="result">
+      <h3 class="result-id">
+        <a href="{{id}}.html">{{{match}}}</a>
+      </h3>
+      <ul class="functions">
+        {{#each functions}}
+          <li class="result-elem"><a href="{{../id}}.html#{{anchor}}">{{{match}}}</a></li>
+        {{/each}}
+      </ul>
+      <ul class="macros">
+        {{#each macros}}
+          <li class="result-elem"><a href="{{../id}}.html#{{anchor}}">{{{match}}}</a></li>
+        {{/each}}
+      </ul>
+      <ul class="callbacks">
+        {{#each callbacks}}
+          <li class="result-elem"><a href="{{../id}}.html#{{anchor}}">{{{match}}}</a></li>
+        {{/each}}
+      </ul>
+    </div>
+  {{/each}}
+  {{/each}}
+</div>

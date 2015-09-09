@@ -1,0 +1,55 @@
+a.close-search {
+  margin-top: -3em;
+  display: block;
+  float: right;
+
+  text-shadow: none;
+  background-image: none;
+  transition: color .3s ease-in-out;
+
+  &:visited,
+  &:active,
+  &:focus {
+    color: @black;
+  }
+
+  &:hover {
+    color: @purple;
+  }
+}
+
+
+.results {
+  .result-id {
+    font-size: 1.2em;
+
+    a {
+      text-shadow: none;
+      background-image: none;
+      transition: color .3s ease-in-out;
+
+      &:visited,
+      &:active,
+      &:focus {
+        color: @black;
+      }
+
+      &:hover {
+        color: @purple;
+      }
+    }
+  }
+
+  .result-id em,
+  .result-elem em {
+    font-style: italic;
+    color: @purple;
+    padding-right: .3em;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}
