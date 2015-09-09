@@ -22,8 +22,8 @@
 
     {{#showSummary node}}
     <ul>
-      <li>
-        <a href="#summary_details" class="">Summary</a>
+      <li class="docs">
+        <a href="#summary_details">Summary</a>
       </li>
       {{#if node.types}}
         <li class="docs">
@@ -31,12 +31,12 @@
         </li>
       {{/if}}
       {{#if node.functions}}
-        <li>
+        <li class="docs">
           <a href="#functions_details">Functions</a>
         </li>
       {{/if}}
       {{#if node.macros}}
-        <li>
+        <li class="docs">
           <a href="#macros_details">Macros</a>
         </li>
       {{/if}}
