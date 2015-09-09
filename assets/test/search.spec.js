@@ -14,8 +14,7 @@ describe('search', function () {
       var nodes = [{
         id: 'hello world',
         functions: [
-          {id: 'hello world', anchor: 'hello-world'},
-          {id: 'world', anchor: 'world'}
+          {id: 'hello world', anchor: 'hello-world'}
         ]
       }, {
         id: 'world',
@@ -65,6 +64,19 @@ describe('search', function () {
       expect(search.findIn(nodes, 'run')).to.be.eql([{
         id: 'hello', match: 'hello', macros: [
           {id: 'run', match: '<em>run</em>'}
+        ]
+      }])
+    })
+
+    it('searches for nested matches', function () {
+      var nodes = [
+        {id: 'hello', macros: [{id: 'run'}]},
+        {id: 'world'}
+      ]
+
+      expect(search.findIn(nodes, 'hello.run')).to.be.eql([{
+        id: 'hello', match: 'hello', macros: [
+          {id: 'run', match: 'run'}
         ]
       }])
     })
