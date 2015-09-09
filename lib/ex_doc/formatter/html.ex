@@ -23,6 +23,10 @@ defmodule ExDoc.Formatter.HTML do
     exceptions = filter_list(:exceptions, all)
     protocols  = filter_list(:protocols, all)
 
+    if config.logo do
+      config = process_logo_metadata(config)
+    end
+
     has_readme = config.readme && generate_readme(output, module_nodes, config, modules, exceptions, protocols)
     generate_index(output, config)
     generate_overview(modules, exceptions, protocols, output, config, has_readme)
@@ -85,6 +89,21 @@ defmodule ExDoc.Formatter.HTML do
   defp generate_readme(output, module_nodes, config, modules, exceptions, protocols) do
     readme_path = Path.expand(config.readme)
     write_readme(output, File.read(readme_path), module_nodes, config, modules, exceptions, protocols)
+  end
+
+  defp process_logo_metadata(config) do
+    logo_path = Path.expand config.logo
+    output = "#{config.output}/assets"
+    File.mkdir_p! output
+    file_extname = Path.extname(config.logo) |> String.downcase
+
+    if file_extname in ~w(.png .jpg) do
+      file_name = "#{output}/logo#{file_extname}"
+      File.copy(logo_path, file_name)
+      Map.put(config, :logo, Path.basename(file_name))
+    else
+      raise ArgumentError, message: "image format not recognized, allowed formats are: .jpg, .png"
+    end
   end
 
   defp write_readme(output, {:ok, content}, module_nodes, config, modules, exceptions, protocols) do

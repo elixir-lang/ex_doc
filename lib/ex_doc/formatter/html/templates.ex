@@ -101,6 +101,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     "sidebarNodes={#{object}}"
   end
 
+  defp logo_path(%{logo: nil}), do: nil
+  defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
+
   templates = [
     detail_template: [:node, :_module],
     footer_template: [],
