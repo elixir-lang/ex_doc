@@ -101,12 +101,23 @@ function search (nodes, value) {
     })
   }
 
-  $content.hide()
-  $content.html(resultsTemplate({
+  var $results = $(resultsTemplate({
     value: value,
     levels: levels
   }))
-  $content.fadeIn()
+
+  var $oldContent = $content.find('*')
+  $oldContent.hide()
+  $content.append($results)
+
+  $content.find('.close-search').on('click', function (e) {
+    e.preventDefault()
+
+    $results.remove()
+    $oldContent.fadeIn()
+  })
+
+  $results.fadeIn()
 }
 
 // Public Methods
