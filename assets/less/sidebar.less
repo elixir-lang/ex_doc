@@ -111,8 +111,23 @@
         font-weight: 300;
         line-height: 18px;
         border-left: 1px solid @mediumGray;
-      }
 
+        &.active {
+          border-left: none;
+
+          a {
+            color: @white;
+          }
+
+          &:before {
+            .fa-icon;
+            content: '\f105';
+            margin-left: -10px;
+            font-size: 16px;
+            margin-right: 5px;
+          }
+        }
+      }
     }
 
     li {
@@ -121,6 +136,10 @@
 
       &.collapsed ul {
         display: none;
+      }
+
+      &.clicked > a {
+        color: @white;
       }
     }
   }

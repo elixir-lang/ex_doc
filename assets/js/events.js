@@ -6,6 +6,7 @@
 
 var $ = require('jquery')
 var search = require('./search')
+var helpers = require('./helpers')
 var sidebarItemsTemplate = require('./sidebar-items.handlebars')
 
 // Constants
@@ -17,6 +18,7 @@ var SIDEBAR_TYPES = [
   '#protocols_list'
 ]
 var SIDEBAR_NAV = $('.sidebar-mainNav')
+var CONTENT = $('.content')
 
 /**
  * Identify external links inside of an specific section
@@ -48,6 +50,12 @@ function collapse () {
   $('#full_list > li.node:not(.clicked)').each(function () {
     $(this).addClass('collapsed').next('li.docs').addClass('collapsed')
   })
+
+  // Scroll list to the selected one
+  var $fullList = $('#full_list')
+  $fullList.scrollTop(
+    $('#full_list .clicked').offset().top - $fullList.offset().top
+  )
 }
 
 // Public Methods
@@ -82,6 +90,22 @@ function fillSidebarWithNodes (nodes, filter) {
   filter = filter || module_type
   scope(filter)
   setupSelected(['#', filter, '_list'].join(''))
+
+  var $docLinks = $('#full_list .docs a')
+  var $docItems = $('#full_list .docs')
+  $docLinks.on('click', function (e) {
+    e.preventDefault()
+
+    var $target = $(event.target)
+
+    $docItems.removeClass('active')
+    $target.closest('li').addClass('active')
+
+    var href = $target.attr('href')
+    helpers.scrollTo(CONTENT, $.find(href), function () {
+      window.location.hash = href.replace(/^#/, '')
+    })
+  })
 }
 
 function createHandler (name) {
