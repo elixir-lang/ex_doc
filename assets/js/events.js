@@ -102,6 +102,10 @@ function addEventListeners () {
       search.start()
     }
   })
+
+  $('.sidebar-search i.fa-search').on('click', function (e) {
+    search.start()
+  })
 }
 
 function initalize () {
