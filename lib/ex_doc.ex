@@ -14,6 +14,7 @@ defmodule ExDoc do
       source_url: nil,
       source_url_pattern: nil,
       version: nil,
+      logo: nil
     ]
   end
 

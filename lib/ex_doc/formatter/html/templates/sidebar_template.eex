@@ -5,10 +5,10 @@
 <section class="sidebar">
   <%= if url = config.homepage_url || config.source_url do %>
     <h1 class="sidebar-projectName">
-      <a href="<%= url %>"><%= config.project %></a>
+      <a href="<%= url %>"><%= config.project %><%= if config.logo do %><img src="<%= logo_path(config) %>" alt="<%= config.project %>"><% end %></a>
     </h1>
   <% else %>
-    <h1 class="sidebar-projectName"><%= config.project %></h1>
+    <h1 class="sidebar-projectName"><%= config.project %><%= if config.logo do %><img src="<%= logo_path(config) %>" alt="<%= config.project %>"><% end %></h1>
   <% end %>
   <h2 class="sidebar-projectVersion">v<%= config.version %></h2>
 
