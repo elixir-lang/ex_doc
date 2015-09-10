@@ -1,4 +1,7 @@
 <div class="main">
+<button class="sidebar-toggle">
+  <i class="fa fa-bars"></i>
+</button>
 <section class="sidebar">
   <%= if url = config.homepage_url || config.source_url do %>
     <h1 class="sidebar-projectName">
@@ -46,6 +49,3 @@
 
 <section class="content">
   <div class="content-inner">
-    <button class="sidebar-toggle">
-      <i class="fa fa-bars"></i>
-    </button>
