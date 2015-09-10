@@ -139,7 +139,7 @@ function identifyCurrentHash () {
 
   if (!hash) return
 
-  $('#full_list .clicked a[href=' + hash + ']').closest('li').addClass('active')
+  $('#full_list .clicked a[href="' + hash + '"]').closest('li').addClass('active')
 }
 
 function initalize () {
