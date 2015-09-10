@@ -134,11 +134,20 @@ function addEventListeners () {
   })
 }
 
+function identifyCurrentHash () {
+  var hash = window.location.hash
+
+  if (!hash) return
+
+  $('#full_list .clicked a[href=' + hash + ']').closest('li').addClass('active')
+}
+
 function initalize () {
   fillSidebarWithNodes(sidebarNodes)
   addEventListeners()
   collapse()
   identifyExternalLinks('#content')
+  identifyCurrentHash()
 }
 
 module.exports = {
