@@ -121,9 +121,11 @@ function addEventListeners () {
   SIDEBAR_NAV.on('click', '#exceptions_list', createHandler('exceptions'))
   SIDEBAR_NAV.on('click', '#protocols_list', createHandler('protocols'))
 
-  $('.sidebar-search input').on('keypress', function (e) {
+  $('.sidebar-search input').on('keyup', function (e) {
     if (e.which === 13) { // enter key maps to 13
       search.start()
+    } else if (e.which === 27) { // escape key
+      $(this).val('')
     }
   })
 
