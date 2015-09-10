@@ -21,11 +21,12 @@ ExDoc will automatically pull in information from your project, like the applica
 
 ```elixir
 def project do
-  [app: :repo
+  [app: :repo,
    version: "0.1.0-dev",
    name: "REPO",
    source_url: "https://github.com/USER/REPO",
-   homepage_url: "http://YOUR_PROJECT_HOMEPAGE"
+   homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
+   logo: "path/to/logo.png",
    deps: deps]
 end
 ```
@@ -49,7 +50,7 @@ You can ExDoc via the command line as follows:
 
 3. Next invoke the ex_doc executable from your project:
 
-        PATH_TO_YOUR_EXDOC/bin/ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO"
+        PATH_TO_YOUR_EXDOC/bin/ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
 
 For example, here are some acceptable values:
 
