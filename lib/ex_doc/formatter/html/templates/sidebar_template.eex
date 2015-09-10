@@ -18,7 +18,7 @@
   </div>
 
   <ul class="sidebar-mainNav">
-    <%= if has_readme do %>
+    <%= if config.readme do %>
       <li><a href="README.html">README</a></li>
     <% end %>
 

@@ -1,5 +1,5 @@
 <%= head_template(config, %{id: :readme}) %>
-<%= sidebar_template(config, modules, exceptions, protocols, true) %>
+<%= sidebar_template(config, modules, exceptions, protocols) %>
 
 <%= to_html(content) %>
 <%= footer_template %>

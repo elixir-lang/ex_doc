@@ -1,5 +1,5 @@
     <%= head_template(config, %{id: :overview}) %>
-    <%= sidebar_template(config, modules, exceptions, protocols, has_readme) %>
+    <%= sidebar_template(config, modules, exceptions, protocols) %>
 
       <h1><%= config.project %> v<%= config.version %></h1>
 

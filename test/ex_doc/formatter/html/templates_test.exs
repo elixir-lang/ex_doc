@@ -28,18 +28,18 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
            |> ExDoc.Retriever.docs_from_modules(doc_config)
            |> HTML.Autolink.all()
 
-    Templates.module_page(hd(mods), doc_config, mods, false)
+    Templates.module_page(hd(mods), doc_config, mods)
   end
 
   ## LISTING
 
   test "site title text links to homepage_url when set" do
-    content = Templates.sidebar_template(doc_config, [], [], [], false)
+    content = Templates.sidebar_template(doc_config, [], [], [])
     assert content =~ ~r{<h1 class="sidebar-projectName">\n\s*<a href="#{homepage_url}">Elixir</a>\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">v1.0.1</h2>}
   end
 
   test "Disable nav links when module type is empty" do
-    content = Templates.sidebar_template(doc_config, [], [], [], false)
+    content = Templates.sidebar_template(doc_config, [], [], [])
     assert content =~ ~r{<li role="presentation" class="disabled">Modules</li>}
     assert content =~ ~r{<li role="presentation" class="disabled">Exceptions</li>}
     assert content =~ ~r{<li role="presentation" class="disabled">Protocols</li>}
@@ -53,7 +53,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     exceptions = HTML.filter_list(:exceptions, all)
     protocols  = HTML.filter_list(:protocols, all)
 
-    content = Templates.sidebar_template(doc_config, modules, exceptions, protocols, false)
+    content = Templates.sidebar_template(doc_config, modules, exceptions, protocols)
     assert content =~ ~r{<li><a id="modules_list" href="#full_list">Modules</a></li>}
     assert content =~ ~r{<li role="presentation" class="disabled">Exceptions</li>}
     assert content =~ ~r{<li role="presentation" class="disabled">Protocols</li>}
@@ -63,14 +63,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                   source_url: source_url,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [], false)
+    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [])
     assert content =~ ~r{<h1 class="sidebar-projectName">\n\s*<a href="#{source_url}">Elixir</a>\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">v1.0.1</h2>}
   end
 
   test "site title text creates no link when there is no homepage_url or source_url" do
     doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [], false)
+    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [])
     assert content =~ ~r{<h1 class="sidebar-projectName">Elixir</h1>\n\s*<h2 class="sidebar-projectVersion">v1.0.1</h2>}
   end
 
@@ -89,12 +89,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   test "listing page has README link if present" do
-    content = Templates.sidebar_template(doc_config, [], [], [], true)
+    config = Map.put(doc_config, :readme, "README.md")
+    content = Templates.sidebar_template(config, [], [], [])
     assert content =~ ~r{<a href="README.html">README</a>}
   end
 
   test "listing page doesn't have README link if not present" do
-    content = Templates.sidebar_template(doc_config, [], [], [], false)
+    content = Templates.sidebar_template(doc_config, [], [], [])
     refute content =~ ~r{<a href="README.html">README</a>}
   end
 
@@ -102,7 +103,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "module_page generates only the module name when there's no more info" do
     node = %ExDoc.ModuleNode{module: XPTOModule, moduledoc: nil, id: "XPTOModule"}
-    content = Templates.module_page(node, doc_config, [node], false)
+    content = Templates.module_page(node, doc_config, [node])
 
     assert content =~ ~r{<title>XPTOModule [^<]*</title>}
     assert content =~ ~r{<h1>\s*XPTOModule\s*</h1>}
