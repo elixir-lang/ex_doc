@@ -9,6 +9,11 @@
   <% end %>
   <h2 class="sidebar-projectVersion">v<%= config.version %></h2>
 
+  <div class="sidebar-search">
+    <i class="fa fa-search"></i>
+    <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" results="0" />
+  </div>
+
   <ul class="sidebar-mainNav">
     <%= if has_readme do %>
       <li><a href="README.html">README</a></li>
@@ -34,11 +39,6 @@
       <li><a id="protocols_list" href="#full_list">Protocols</a></li>
     <% end %>
   </ul>
-
-  <div class="sidebar-search">
-    <i class="fa fa-search"></i>
-    <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" results="0" />
-  </div>
 
   <ul id="full_list" class="sidebar-fullList"></ul>
   <div class="sidebar-noResults"></div>
