@@ -106,7 +106,8 @@ function search (nodes, value) {
 
   var $results = $(resultsTemplate({
     value: value,
-    levels: levels
+    levels: levels,
+    empty: levels.length === 0
   }))
 
   var $oldContent = $content.find('*')
