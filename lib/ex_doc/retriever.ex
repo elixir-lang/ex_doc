@@ -175,6 +175,15 @@ defmodule ExDoc.Retriever do
   defp get_callback(callback, source_path, source_url, callbacks) do
     {{name, arity}, line, kind, doc} = callback
 
+    # TODO: Remove defcallback and defmacrocallback
+    # once we no longer supported __behaviour__
+    kind =
+      case kind do
+        :def -> :callback
+        :defmacro -> :macrocallback
+        other -> other
+      end
+
     specs = Dict.get(callbacks, {name, arity}, [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
 
@@ -186,7 +195,7 @@ defmodule ExDoc.Retriever do
       signature: "#{name}/#{arity}",
       specs: specs,
       source: source_link(source_path, source_url, line),
-      type: :"#{kind}callback"
+      type: kind
     }
   end
 
@@ -220,18 +229,18 @@ defmodule ExDoc.Retriever do
   # Returns a dict of { name, arity } -> [ behaviour_module ].
   defp callbacks_implemented_by(module) do
     behaviours_implemented_by(module)
-    |> Enum.map(fn behaviour -> Enum.map(callbacks_of(behaviour), &{ &1, behaviour }) end)
+    |> Enum.map(fn behaviour -> Enum.map(callbacks_of(behaviour), &{&1, behaviour}) end)
     |> Enum.reduce(%{}, &Enum.into/2)
   end
 
   defp callbacks_of(module) do
     module.module_info(:attributes)
-    |> Enum.filter_map(&match?({ :callback, _ }, &1), fn {_, [{t,_}|_]} -> t end)
+    |> Enum.filter_map(&match?({:callback, _}, &1), fn {_, [{t,_}|_]} -> t end)
   end
 
   defp behaviours_implemented_by(module) do
     module.module_info(:attributes)
-    |> Stream.filter(&match?({ :behaviour, _ }, &1))
+    |> Stream.filter(&match?({:behaviour, _}, &1))
     |> Stream.map(fn {_, l} -> l end)
     |> Enum.concat()
   end

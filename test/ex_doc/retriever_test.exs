@@ -131,7 +131,7 @@ defmodule ExDoc.RetrieverTest do
     [node] = docs_from_files ["CustomBehaviourOne"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["hello/1"]
-    assert hd(node.docs).type == :defcallback
+    assert hd(node.docs).type == :callback
     assert hd(node.docs).signature == "hello/1"
   end
 
@@ -139,7 +139,7 @@ defmodule ExDoc.RetrieverTest do
     [node] = docs_from_files ["CustomBehaviourTwo"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["bye/1"]
-    assert hd(node.docs).type == :defmacrocallback
+    assert hd(node.docs).type == :macrocallback
     assert hd(node.docs).signature == "bye/1"
   end
 

@@ -161,7 +161,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> erlang_functions
   end
 
-  defp doc_prefix(%{type: c}) when c in [:defcallback, :defmacrocallback], do: "c:"
+  defp doc_prefix(%{type: c}) when c in [:callback, :macrocallback], do: "c:"
   defp doc_prefix(%{type: _}), do: ""
 
   @doc """
