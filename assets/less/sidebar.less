@@ -55,7 +55,8 @@
     color: @white;
   }
 
-  .sidebar-mainNav {
+  .sidebar-mainNav,
+  .sidebar-listNav {
     padding: 0px 40px;
 
     li,
@@ -70,6 +71,20 @@
       transition: all 0.3s linear;
       line-height: 27px;
 
+      &:hover,
+      &:hover a {
+        color: @white;
+      }
+    }
+  }
+
+  .sidebar-listNav {
+    li,
+    li a {
+      font-size: 13px;
+    }
+
+    li {
       &:hover,
       &.selected,
       &:hover a,

@@ -23,7 +23,9 @@
     <% end %>
 
     <li><a href="overview.html">Overview</a></li>
+  </ul>
 
+  <ul class="sidebar-listNav">
     <%= if Enum.empty?(modules) do %>
       <li role="presentation" class="disabled">Modules</li>
     <% else %>

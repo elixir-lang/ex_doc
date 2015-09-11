@@ -17,7 +17,7 @@ var SIDEBAR_TYPES = [
   '#exceptions_list',
   '#protocols_list'
 ]
-var SIDEBAR_NAV = $('.sidebar-mainNav')
+var SIDEBAR_NAV = $('.sidebar-listNav')
 var CONTENT = $('.content')
 
 /**
@@ -53,9 +53,12 @@ function collapse () {
 
   // Scroll list to the selected one
   var $fullList = $('#full_list')
-  $fullList.scrollTop(
-    $('#full_list .clicked').offset().top - $fullList.offset().top
-  )
+  var $clicked = $('#full_list .clicked')
+  if ($clicked.length > 0) {
+    $fullList.scrollTop(
+      $clicked.offset().top - $fullList.offset().top - 40
+    )
+  }
 }
 
 // Public Methods
