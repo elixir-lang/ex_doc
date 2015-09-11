@@ -102,10 +102,10 @@ defmodule ExDoc.Formatter.HTML do
 
     if file_extname in ~w(.png .jpg) do
       file_name = "#{output}/logo#{file_extname}"
-      File.copy(logo_path, file_name)
+      File.copy!(logo_path, file_name)
       Map.put(config, :logo, Path.basename(file_name))
     else
-      raise ArgumentError, message: "image format not recognized, allowed formats are: .jpg, .png"
+      raise ArgumentError, "image format not recognized, allowed formats are: .jpg, .png"
     end
   end
 
