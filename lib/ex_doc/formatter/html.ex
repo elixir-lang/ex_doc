@@ -27,14 +27,17 @@ defmodule ExDoc.Formatter.HTML do
       config = process_logo_metadata(config)
     end
 
-    has_readme = config.readme && generate_readme(output, module_nodes, config, modules, exceptions, protocols)
+    if config.readme do
+      generate_readme(output, module_nodes, config, modules, exceptions, protocols)
+    end
+
     generate_index(output, config)
-    generate_overview(modules, exceptions, protocols, output, config, has_readme)
-    generate_not_found(modules, exceptions, protocols, output, config, has_readme)
+    generate_overview(modules, exceptions, protocols, output, config)
+    generate_not_found(modules, exceptions, protocols, output, config)
     generate_sidebar_items(modules, exceptions, protocols, output)
-    generate_list(modules, all, output, config, has_readme)
-    generate_list(exceptions, all, output, config, has_readme)
-    generate_list(protocols, all, output, config, has_readme)
+    generate_list(modules, all, output, config)
+    generate_list(exceptions, all, output, config)
+    generate_list(protocols, all, output, config)
 
     Path.join(config.output, "index.html")
   end
@@ -53,13 +56,13 @@ defmodule ExDoc.Formatter.HTML do
     generate_redirect(output, "index.html", config, "#{config.main}.html")
   end
 
-  defp generate_overview(modules, exceptions, protocols, output, config, has_readme) do
-    content = Templates.overview_template(config, modules, exceptions, protocols, has_readme)
+  defp generate_overview(modules, exceptions, protocols, output, config) do
+    content = Templates.overview_template(config, modules, exceptions, protocols)
     :ok = File.write("#{output}/overview.html", content)
   end
 
-  defp generate_not_found(modules, exceptions, protocols, output, config, has_readme) do
-    content = Templates.not_found_template(config, modules, exceptions, protocols, has_readme)
+  defp generate_not_found(modules, exceptions, protocols, output, config) do
+    content = Templates.not_found_template(config, modules, exceptions, protocols)
     :ok = File.write("#{output}/404.html", content)
   end
 
@@ -158,14 +161,14 @@ defmodule ExDoc.Formatter.HTML do
     Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:protocol], &1)
   end
 
-  defp generate_list(nodes, all, output, config, has_readme) do
+  defp generate_list(nodes, all, output, config) do
     nodes
-    |> Enum.map(&Task.async(fn -> generate_module_page(&1, all, output, config, has_readme) end))
+    |> Enum.map(&Task.async(fn -> generate_module_page(&1, all, output, config) end))
     |> Enum.map(&Task.await/1)
   end
 
-  defp generate_module_page(node, modules, output, config, has_readme) do
-    content = Templates.module_page(node, config, modules, has_readme)
+  defp generate_module_page(node, modules, output, config) do
+    content = Templates.module_page(node, config, modules)
     File.write("#{output}/#{node.id}.html", content)
   end
 

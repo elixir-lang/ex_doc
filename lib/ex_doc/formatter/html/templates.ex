@@ -8,12 +8,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(node, config, all, has_readme) do
+  def module_page(node, config, all) do
     types       = node.typespecs
     functions   = Enum.filter node.docs, & &1.type in [:def]
     macros      = Enum.filter node.docs, & &1.type in [:defmacro]
     callbacks   = Enum.filter node.docs, & &1.type in [:defcallback, :defmacrocallback]
-    module_template(config, node, types, functions, macros, callbacks, all, has_readme)
+    module_template(config, node, types, functions, macros, callbacks, all)
   end
 
   # Get the full specs from a function, already in HTML form.
@@ -108,12 +108,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
     detail_template: [:node, :_module],
     footer_template: [],
     head_template: [:config, :page],
-    module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all, :has_readme],
-    not_found_template: [:config, :modules, :exceptions, :protocols, :has_readme],
+    module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all],
+    not_found_template: [:config, :modules, :exceptions, :protocols],
     overview_entry_template: [:node],
-    overview_template: [:config, :modules, :exceptions, :protocols, :has_readme],
+    overview_template: [:config, :modules, :exceptions, :protocols],
     readme_template: [:config, :modules, :exceptions, :protocols, :content],
-    sidebar_template: [:config, :modules, :exceptions, :protocols, :has_readme],
+    sidebar_template: [:config, :modules, :exceptions, :protocols],
     summary_template: [:node],
     type_detail_template: [:node, :_module],
     redirect_template: [:config, :redirect_to],
