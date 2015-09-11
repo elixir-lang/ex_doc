@@ -96,7 +96,8 @@ function fillSidebarWithNodes (nodes, filter) {
 
   var $docLinks = $('#full_list .docs a')
   var $docItems = $('#full_list .docs')
-  $docLinks.on('click', function (e) {
+
+  function handleAnchor (e) {
     e.preventDefault()
 
     var $target = $(event.target)
@@ -108,7 +109,10 @@ function fillSidebarWithNodes (nodes, filter) {
     helpers.scrollTo(CONTENT, $.find(href), function () {
       window.location.hash = href.replace(/^#/, '')
     })
-  })
+  }
+
+  $('#full_list .node.clicked > a').on('click', handleAnchor)
+  $docLinks.on('click', handleAnchor)
 }
 
 function createHandler (name) {
@@ -142,7 +146,11 @@ function identifyCurrentHash () {
 
   if (!hash) return
 
-  $('#full_list .clicked a[href="' + hash + '"]').closest('li').addClass('active')
+  $('#full_list .clicked a[href="' + hash + '"]')
+    .closest('li')
+    .addClass('active')
+
+  helpers.scrollTo(CONTENT, $.find(hash))
 }
 
 function initalize () {
