@@ -2,7 +2,7 @@ defmodule ExDoc.CLI do
   def run(args, generator \\ &ExDoc.generate_docs/3) do
     {opts, args, _} = OptionParser.parse(args,
                aliases: [o: :output, f: :formatter, c: :config, r: :source_root,
-                         u: :source_url, m: :main, p: :homepage_url])
+                         u: :source_url, m: :main, p: :homepage_url, l: :logo])
 
     [project, version, source_beam] = parse_args(args)
 
