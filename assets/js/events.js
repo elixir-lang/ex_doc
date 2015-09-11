@@ -20,22 +20,6 @@ var SIDEBAR_TYPES = [
 var SIDEBAR_NAV = $('.sidebar-listNav')
 var CONTENT = $('.content')
 
-/**
- * Identify external links inside of an specific section
- *
- * This function adds an icon to identify an external link.
- *
- * @param {String} section  Section where we want to identify the external links.
- */
-function identifyExternalLinks (section) {
-  $([section, 'a'].join(' ')).filter(function () {
-    return (this.hostname !== window.location.hostname && $(this).attr('rel') !== 'help')
-  }).append($('<span/>').attr({
-    'class': 'fa fa-external-link',
-    'aria-hidden': 'true'
-  })).addClass('external')
-}
-
 function setupSelected (id) {
   SIDEBAR_TYPES.forEach(function (element) {
     if (element === id) {
@@ -157,7 +141,6 @@ function initalize () {
   fillSidebarWithNodes(sidebarNodes)
   addEventListeners()
   collapse()
-  identifyExternalLinks('#content')
   identifyCurrentHash()
 }
 
