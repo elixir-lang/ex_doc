@@ -28,7 +28,11 @@ defmodule ExDoc.Formatter.HTML do
     end
 
     if config.readme do
-      generate_readme(output, module_nodes, config, modules, exceptions, protocols)
+      generate_extra(config.readme, output, module_nodes, config, modules, exceptions, protocols)
+    end
+
+    unless Enum.empty?(config.extras) do
+      generate_extras(output, module_nodes, config, modules, exceptions, protocols)
     end
 
     generate_index(output, config)
@@ -89,9 +93,18 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  defp generate_readme(output, module_nodes, config, modules, exceptions, protocols) do
-    readme_path = Path.expand(config.readme)
-    write_readme(output, File.read(readme_path), module_nodes, config, modules, exceptions, protocols)
+  defp generate_extras(output, module_nodes, config, modules, exceptions, protocols) do
+    config.extras
+    |> Enum.map(&Task.async(fn -> generate_extra(&1, output, module_nodes, config, modules, exceptions, protocols) end))
+    |> Enum.map(&Task.await/1)
+  end
+
+  defp generate_extra(input, output, module_nodes, config, modules, exceptions, protocols) do
+    file_path = Path.expand(input)
+    content = File.read!(file_path) |> Autolink.project_doc(module_nodes)
+    extra_html = Templates.extra_template(config, modules, exceptions, protocols, content) |> pretty_codeblocks
+    file_name = Path.basename(file_path, ".md")
+    File.write!("#{output}/#{file_name}.html", extra_html)
   end
 
   defp process_logo_metadata(config) do
@@ -107,17 +120,6 @@ defmodule ExDoc.Formatter.HTML do
     else
       raise ArgumentError, "image format not recognized, allowed formats are: .jpg, .png"
     end
-  end
-
-  defp write_readme(output, {:ok, content}, module_nodes, config, modules, exceptions, protocols) do
-    content = Autolink.project_doc(content, module_nodes)
-    readme_html = Templates.readme_template(config, modules, exceptions, protocols, content) |> pretty_codeblocks
-    :ok = File.write("#{output}/README.html", readme_html)
-    true
-  end
-
-  defp write_readme(_, _, _, _, _, _, _) do
-    false
   end
 
   defp generate_redirect(output, file_name, config, redirect_to) do
