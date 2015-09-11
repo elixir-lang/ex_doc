@@ -1,6 +1,11 @@
     <footer class="footer">
       <p>
-        This site was built using <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help">ExDoc</a> (v<%= ExDoc.version %>).
+        Designed by
+        <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>
+        and the
+        <a href="https://github.com/elixir-lang/ex_doc/graphs/contributors" target="_blank">ExDoc team</a>.
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v<%= ExDoc.version %>).
       </p>
     </footer>
   </div>
