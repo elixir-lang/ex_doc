@@ -47,6 +47,9 @@ defmodule Mix.Tasks.Docs do
 
   * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
     The image size will be 64x64 when --formatter is "html".
+
+  * `:extras` - List of strings, each one must indicate the path to additional
+    Markdown pages (e.g. `["CHANGELOG.md", "CONTRIBUTING.md"]`); default: `[]`
   """
 
   @doc false
@@ -81,7 +84,9 @@ defmodule Mix.Tasks.Docs do
           options
       end
 
-    options = Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
+    options =
+      Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
+      |> replace_readme_option()
 
     index = generator.(project, version, options)
     log(index)
@@ -99,6 +104,19 @@ defmodule Mix.Tasks.Docs do
       is_function(docs, 0) -> docs.()
       is_nil(docs) -> []
       true -> docs
+    end
+  end
+
+  # At some point we need to mark :readme option as
+  # deprecated. In the meantime, we put the README file
+  # into the :extras option.
+  defp replace_readme_option(opts) do
+    case Keyword.fetch(opts, :readme) do
+      {:ok, readme} ->
+        opts
+          |> Keyword.delete(:readme)
+          |> Keyword.update(:extras, readme, &(&1 ++ [readme]))
+      _ -> opts
     end
   end
 end
