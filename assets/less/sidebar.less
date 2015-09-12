@@ -141,13 +141,30 @@
 
     ul {
       margin: 0 10px;
-      padding: 9px 0 18px;
+      padding: 0 0 9px;
 
       li {
-        padding: 0 10px;
+
         font-weight: 300;
         line-height: 18px;
-        border-left: 1px solid @mediumGray;
+
+        ul {
+          display: none;
+          padding: 9px 0;
+
+          li {
+            border-left: 1px solid @mediumGray;
+            padding: 0 10px;
+
+            &.active:before {
+              .fa-icon;
+              content: '\f105';
+              margin-left: -10px;
+              font-size: 16px;
+              margin-right: 5px;
+            }
+          }
+        }
 
         &.active {
           border-left: none;
@@ -156,12 +173,8 @@
             color: @white;
           }
 
-          &:before {
-            .fa-icon;
-            content: '\f105';
-            margin-left: -10px;
-            font-size: 16px;
-            margin-right: 5px;
+          ul {
+            display: block;
           }
         }
       }

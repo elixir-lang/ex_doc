@@ -23,26 +23,54 @@
     {{#showSummary node}}
     <ul>
       <li class="docs">
-        <a href="#summary_details">Summary</a>
+        <a href="#summary_details" class="doclink">Summary</a>
       </li>
       {{#if node.types}}
         <li class="docs">
-          <a href="#types_details">Types</a>
+          <a href="#types_details" class="doclink">Types</a>
+          <ul class="types-list deflist">
+            {{#each node.types}}
+              <li>
+                <a href="#{{anchor}}" class="deflink">{{id}}</a>
+              </li>
+            {{/each}}
+          </ul>
         </li>
       {{/if}}
       {{#if node.functions}}
         <li class="docs">
-          <a href="#functions_details">Functions</a>
+          <a href="#functions_details" class="doclink">Functions</a>
+          <ul class="functions-list deflist">
+            {{#each node.functions}}
+              <li>
+                <a href="#{{anchor}}" class="deflink">{{id}}</a>
+              </li>
+            {{/each}}
+          </ul>
         </li>
       {{/if}}
       {{#if node.macros}}
         <li class="docs">
-          <a href="#macros_details">Macros</a>
+          <a href="#macros_details" class="doclink">Macros</a>
+          <ul class="macros-list deflist">
+            {{#each node.macros}}
+              <li>
+                <a href="#{{anchor}}" class="deflink">{{id}}</a>
+              </li>
+            {{/each}}
+          </ul>
         </li>
       {{/if}}
       {{#if node.callbacks}}
         <li class="docs">
-          <a href="#callbacks_details">Callbacks</a>
+          <a href="#callbacks_details" class="doclink">Callbacks</a>
+          <ul class="callbacks-list deflist">
+            {{#each node.callbacks}}
+              <li>
+                <a href="#{{anchor}}" class="deflink">{{id}}</a>
+              </li>
+            {{/each}}
+          </ul>
         </li>
       {{/if}}
     </ul>
