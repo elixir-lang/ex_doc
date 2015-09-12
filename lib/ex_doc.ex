@@ -7,7 +7,6 @@ defmodule ExDoc do
       main: nil,
       output: "doc",
       project: nil,
-      readme: nil,
       retriever: ExDoc.Retriever,
       source_beam: nil,
       source_root: nil,
@@ -15,7 +14,8 @@ defmodule ExDoc do
       source_url_pattern: nil,
       version: nil,
       logo: nil,
-      extras: []
+      extras: [],
+      title: nil
     ]
   end
 
