@@ -1,5 +1,4 @@
 /* globals sidebarNodes */
-'use strict'
 
 // Search
 // ======
@@ -7,15 +6,16 @@
 // Dependencies
 // ------------
 
-var $ = require('jquery')
-var helpers = require('./helpers')
-var resultsTemplate = require('./results-template.handlebars')
+import $ from 'jquery'
+import * as helpers from './helpers'
+
+import resultsTemplate from './templates/search-results.handlebars'
 
 // Local Variables
 // ---------------
 
-var $content = $('.content-inner')
-var $input = $('.sidebar-search input')
+const $content = $('.content-inner')
+const $input = $('.sidebar-search input')
 
 // Local Methods
 // -------------
@@ -47,7 +47,7 @@ function findNested (elements, parentId, matcher) {
   }).filter(cleaner)
 }
 
-function findIn (elements, matcher) {
+export function findIn (elements, matcher) {
   return elements.map(function (element) {
     var id = element.id
     var idMatch = id && id.match(matcher)
@@ -132,15 +132,10 @@ function search (nodes, value) {
 // Public Methods
 // --------------
 
-function start () {
+export function start () {
   var searchVal = $input.val()
 
   if (searchVal === '') return
 
   search(sidebarNodes, searchVal)
-}
-
-module.exports = {
-  start: start,
-  findIn: findIn
 }

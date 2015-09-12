@@ -1,4 +1,4 @@
-module.exports = function (nodeId, options) {
+export default function (nodeId, options) {
   var currentPath = window.location.pathname.split('/')
   nodeId = nodeId + '.html'
 

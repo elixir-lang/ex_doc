@@ -1,4 +1,4 @@
-var webpackConfig = require('./webpack.config')
+var webpackConfig = require('./webpack.config').development
 
 module.exports = function (config) {
   config.set({
@@ -14,11 +14,7 @@ module.exports = function (config) {
       'test/*.spec.js': ['webpack', 'sourcemap']
     },
 
-    webpack: {
-      devtool: 'inline-source-map',
-      debug: true,
-      module: webpackConfig.module
-    },
+    webpack: webpackConfig,
 
     webpackMiddleware: {
       noInfo: true

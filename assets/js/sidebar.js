@@ -1,11 +1,17 @@
-var $ = require('jquery')
+// Dependencies
+// ------------
 
-var body = $('body')
-var sidebar = $('.sidebar')
+import $ from 'jquery'
 
-var bodyClass = 'sidebar-open'
-var duration = 300
-var width = '300px'
+// Constants
+// ---------
+
+const body = $('body')
+const sidebar = $('.sidebar')
+
+const bodyClass = 'sidebar-open'
+const duration = 300
+const width = '300px'
 
 function closeSidebar () {
   sidebar.animate({
@@ -38,7 +44,10 @@ function toggleSidebar () {
   }
 }
 
-function init () {
+// Public Methods
+// --------------
+
+export function initialize () {
   $('.sidebar-toggle').click(function () {
     toggleSidebar()
   })
@@ -46,8 +55,4 @@ function init () {
   if ($(window).width() > 768) {
     openSidebar(true)
   }
-}
-
-module.exports = {
-  init: init
 }

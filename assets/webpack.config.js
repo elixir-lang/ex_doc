@@ -6,7 +6,12 @@ var output = {
 
 var loaders = [{
   test: /\.handlebars$/,
-  loader: 'handlebars-loader'
+  loader: 'handlebars-loader',
+  query: {
+    helperDirs: [
+      __dirname + '/js/template-helpers'
+    ]
+  }
 }, {
   test: /\.js$/,
   exclude: /node_modules/,
