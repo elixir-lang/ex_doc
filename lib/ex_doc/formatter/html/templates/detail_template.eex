@@ -13,13 +13,11 @@
   <%= if specs = get_specs(node) do %>
     <div class="specs">
       <h4 class="specs-title">Specs</h4>
-      <ul class="specs-list">
+      <div class="specs-list">
         <%= for spec <- specs do %>
-          <li>
-            <code><%= spec %></code>
-          </li>
+          <pre><code class="elixir"><%= spec %></code></pre>
         <% end %>
-      </ul>
+      </div>
     </div>
   <% end %>
   <section class="docstring">
