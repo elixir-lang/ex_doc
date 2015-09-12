@@ -7,8 +7,8 @@
     <%= cond do %>
       <%= page.id == :module -> %>
         <title><%= page.module %> – <%= config.project %> v<%= config.version %></title>
-      <%= page.id == :readme -> %>
-        <title>README – <%= config.project %> v<%= config.version %></title>
+      <%= page.id == :extra -> %>
+        <title><%= config.title %> – <%= config.project %> v<%= config.version %></title>
       <%= page.id == :overview -> %>
         <title>Overview – <%= config.project %> v<%= config.version %></title>
     <% end %>
