@@ -178,3 +178,21 @@
     }
   }
 }
+
+
+@media screen and (min-width: 768px) {
+  .sidebar {
+    position: relative;
+    .display(flex);
+  }
+}
+
+@media screen and (max-height: 500px) {
+  .sidebar {
+    overflow-y: auto;
+
+    #full_list {
+      overflow: visible;
+    }
+  }
+}
