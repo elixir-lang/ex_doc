@@ -17,6 +17,12 @@ defmodule ExDoc.CLI do
   end
 
   defp merge_config(opts) do
+    opts
+    |> formatter_options
+    |> extra_files_options
+  end
+
+  defp formatter_options(opts) do
     case Keyword.fetch(opts, :config) do
       {:ok, config} ->
         opts
@@ -24,14 +30,17 @@ defmodule ExDoc.CLI do
         |> Keyword.put(:formatter_opts, read_config(config))
       _ -> opts
     end
+  end
 
+  defp extra_files_options(opts) do
     extras = Keyword.get_values(opts, :extra)
-    unless Enum.empty?(extras) do
+    if Enum.empty?(extras) do
+      opts
+    else
       opts
       |> Keyword.delete(:extra)
       |> Keyword.put(:extras, extras)
     end
-    opts
   end
 
   defp read_config(path) do
