@@ -8,7 +8,7 @@
   </button>
 
   <%= if url = config.homepage_url || config.source_url do %>
-    <a href="<%= url %>">
+    <a href="<%= url %>" class="sidebar-projectLink">
       <div class="sidebar-projectDetails">
         <h1 class="sidebar-projectName">
           <%= config.project %>
@@ -22,7 +22,7 @@
       <% end %>
     </a>
   <% else %>
-    <div class="sidebar-projectDetails">
+    <div class="sidebar-projectDetails sidebar-projectLink">
       <h1 class="sidebar-projectName">
         <%= config.project %>
       </h1>

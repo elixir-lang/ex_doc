@@ -35,7 +35,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "site title text links to homepage_url when set" do
     content = Templates.sidebar_template(doc_config, [], [], [])
-    assert content =~ ~r{<a href="#{homepage_url}">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
+    assert content =~ ~r{<a href="#{homepage_url}" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
   end
 
   test "Disable nav links when module type is empty" do
@@ -64,7 +64,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                                                   source_url: source_url,
                                                   source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
     content = Templates.sidebar_template(doc_config_without_source_url, [], [], [])
-    assert content =~ ~r{<a href="#{source_url}">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
+    assert content =~ ~r{<a href="#{source_url}" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
   end
 
   test "site title text creates no link when there is no homepage_url or source_url" do
