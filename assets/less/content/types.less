@@ -1,15 +1,19 @@
 .types {
-  margin: 2em 0 1em;
-
   .types-list {
-    list-style: none;
-    padding: 1em 1.5em;
-    border: 1px solid @lightGray;
+    .type-detail {
+      margin-bottom: 2em;
 
-    li {
-      code {
-        border: none;
-        background: none;
+      pre {
+        margin: .5em 0;
+
+        code {
+          padding: 0 .5em;
+          border: none;
+        }
+      }
+
+      .typespec-doc {
+        padding: 0 1.5em;
       }
     }
   }
