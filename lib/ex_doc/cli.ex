@@ -2,7 +2,8 @@ defmodule ExDoc.CLI do
   def run(args, generator \\ &ExDoc.generate_docs/3) do
     {opts, args, _} = OptionParser.parse(args,
                aliases: [o: :output, f: :formatter, c: :config, r: :source_root,
-                         u: :source_url, m: :main, p: :homepage_url, l: :logo],
+                         u: :source_url, m: :main, p: :homepage_url, l: :logo,
+                         e: :extra],
                switches: [extra: :keep])
 
     [project, version, source_beam] = parse_args(args)
@@ -105,7 +106,7 @@ defmodule ExDoc.CLI do
       -m, --main         The main, entry-point module in docs,
                            default: "overview" when --formatter is "html"
       -p, --homepage-url URL to link to for the site name
-          --extra        Allow users to include additional Markdown files, default: []
+      -e, --extra        Allow users to include additional Markdown files, default: []
       -l, --logo         Path to the image logo of the project (only PNG or JPEG accepted)
                            The image size will be 64x64 when --formatter is "html"
                            default: `nil`
