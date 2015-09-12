@@ -18,7 +18,7 @@ export function escapeText (text) {
 export function scrollTo (target, elem, done) {
   return $(target)
     .animate({
-      scrollTop: $(elem).offset().top
+      scrollTop: $(target).scrollTop() + $(elem).offset().top
     }, 300, done)
 }
 
