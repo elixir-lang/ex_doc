@@ -113,7 +113,7 @@ defmodule ExDoc.Formatter.HTML do
       extra_html = Templates.extra_template(config, modules, exceptions, protocols, content) |> pretty_codeblocks
       File.write!("#{output}/#{file_name}.html", extra_html)
     else
-      raise ArgumentError, "File format not recognized, allowed format is: .md"
+      raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
   end
 
