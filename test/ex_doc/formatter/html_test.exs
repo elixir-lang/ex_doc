@@ -33,7 +33,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       output: "test/tmp/doc",
       source_root: beam_dir,
       source_beam: beam_dir,
-      readme: "test/tmp/README.md",
+      extras: ["test/tmp/README.md"]
     ]
   end
 
@@ -151,7 +151,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run should not generate the readme file" do
-    generate_docs(doc_config([readme: nil]))
+    generate_docs(doc_config([extras: []]))
     refute File.regular?("#{output_dir}/README.html")
     content = File.read!("#{output_dir}/index.html")
     refute content =~ ~r{<title>README [^<]*</title>}
