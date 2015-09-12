@@ -62,9 +62,37 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   Converts the given `ast` to string while linking the locals
   given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs, aliases) do
+  def typespec({:when, _, [{:::, _, [left, {:|, _, _} = center]}, right]}, typespecs, aliases) do
+    strip_if_short(
+      typespec_to_string(left, typespecs, aliases) <>
+      " ::\n  " <> typespec_with_new_line(center, typespecs, aliases) <>
+      " when " <> String.slice(typespec_to_string(right, typespecs, aliases), 1..-2)
+    )
+  end
+
+  def typespec({:::, _, [left, {:|, _, _} = center]}, typespecs, aliases) do
+    strip_if_short(
+      typespec_to_string(left, typespecs, aliases) <>
+      " ::\n  " <> typespec_with_new_line(center, typespecs, aliases)
+    )
+  end
+
+  def typespec(other, typespecs, aliases) do
+    typespec_to_string(other, typespecs, aliases)
+  end
+
+  defp typespec_with_new_line({:|, _, [left, right]}, typespecs, aliases) do
+    typespec_to_string(left, typespecs, aliases) <>
+      " |\n  " <> typespec_with_new_line(right, typespecs, aliases)
+  end
+
+  defp typespec_with_new_line(other, typespecs, aliases) do
+    typespec_to_string(other, typespecs, aliases)
+  end
+
+  defp typespec_to_string(ast, typespecs, aliases) do
     Macro.to_string(ast, fn
-      { name, _, args }, string when is_atom(name) and is_list(args) ->
+      {name, _, args}, string when is_atom(name) and is_list(args) ->
         string = strip_parens(string, args)
         arity = length(args)
         if { name, arity } in typespecs do
@@ -72,7 +100,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         else
           string
         end
-      { { :., _, [alias, name] }, _, args }, string when is_atom(name) and is_list(args) ->
+      {{ :., _, [alias, name] }, _, args}, string when is_atom(name) and is_list(args) ->
         string = strip_parens(string, args)
         alias = expand_alias(alias)
         if source = get_source(alias, aliases) do
@@ -85,6 +113,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end)
   end
 
+  defp strip_if_short(string) when byte_size(string) < 60 do
+    String.replace(string, "\n  ", " ")
+  end
+  defp strip_if_short(string) do
+    string
+  end
+
   defp strip_parens(string, []) do
     if :binary.last(string) == ?) do
       :binary.part(string, 0, byte_size(string)-2)
@@ -95,7 +130,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp strip_parens(string, _), do: string
 
-  defp expand_alias({ :__aliases__, _, [h|t] }) when is_atom(h), do: Module.concat([h|t])
+  defp expand_alias({:__aliases__, _, [h|t]}) when is_atom(h), do: Module.concat([h|t])
   defp expand_alias(atom) when is_atom(atom), do: atom
   defp expand_alias(_), do: nil
 

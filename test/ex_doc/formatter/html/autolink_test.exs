@@ -147,6 +147,20 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
            ~s[bar(foo(1))]
   end
 
+  test "add new lines on |" do
+    assert Autolink.typespec(quote(do: (foo(1) :: bar | baz)), [], []) ==
+           ~s[foo(1) :: bar | baz]
+
+    assert Autolink.typespec(quote(do: (foo(1) :: bar | baz when bat: foo)), [], []) ==
+           ~s[foo(1) :: bar | baz when bat: foo]
+
+    assert Autolink.typespec(quote(do: (really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz)), [], []) ==
+           ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar |\n  baz]
+
+    assert Autolink.typespec(quote(do: (really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz when bat: foo)), [], []) ==
+           ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar |\n  baz when bat: foo]
+  end
+
   test "autolink Elixir types in typespecs" do
     assert Autolink.typespec(quote(do: String.t), [], []) ==
            ~s[<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>]
