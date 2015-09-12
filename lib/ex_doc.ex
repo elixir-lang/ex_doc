@@ -9,6 +9,7 @@ defmodule ExDoc do
       main: nil,
       output: "doc",
       project: nil,
+      readme: nil,
       retriever: ExDoc.Retriever,
       source_beam: nil,
       source_root: nil,
