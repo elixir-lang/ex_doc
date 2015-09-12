@@ -54,7 +54,7 @@ defmodule ExDocTest do
 
     assert project == "ExDoc"
     assert version == "1.2.3"
-    assert Enum.sort(opts) == [formatter_opts: [key: "val"], readme: "README.md", source_beam: "..."]
+    assert Enum.sort(opts) == [extras: ["README.md"], formatter_opts: [key: "val"], source_beam: "..."]
   after
     File.rm!("test.config")
   end
