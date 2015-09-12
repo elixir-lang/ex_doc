@@ -19,6 +19,7 @@ defmodule ExDoc.CLI do
   defp merge_config(opts) do
     opts
     |> formatter_options
+    |> replace_readme_option
     |> extra_files_options
   end
 
@@ -28,6 +29,19 @@ defmodule ExDoc.CLI do
         opts
         |> Keyword.delete(:config)
         |> Keyword.put(:formatter_opts, read_config(config))
+      _ -> opts
+    end
+  end
+
+  # TODO: At some point we need to mark the --readme option
+  # as deprecated. In the meantime, we put the README file
+  # into the extras list.
+  defp replace_readme_option(opts) do
+    case Keyword.fetch(opts, :readme) do
+      {:ok, readme} ->
+        opts
+        |> Keyword.delete(:readme)
+        |> Enum.into([extra: readme])
       _ -> opts
     end
   end
