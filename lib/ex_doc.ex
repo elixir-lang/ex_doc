@@ -1,9 +1,11 @@
 defmodule ExDoc do
   defmodule Config do
     defstruct [
+      extras: [],
       formatter: "html",
       formatter_opts: [],
       homepage_url: nil,
+      logo: nil,
       main: nil,
       output: "doc",
       project: nil,
@@ -12,10 +14,8 @@ defmodule ExDoc do
       source_root: nil,
       source_url: nil,
       source_url_pattern: nil,
-      version: nil,
-      logo: nil,
-      extras: [],
-      title: nil
+      title: nil,
+      version: nil
     ]
   end
 
