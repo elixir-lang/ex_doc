@@ -6,6 +6,7 @@
 import $ from 'jquery'
 import {start as search} from './search'
 import * as helpers from './helpers'
+import cssesc from 'cssesc'
 
 import sidebarItemsTemplate from './templates/sidebar-items.handlebars'
 
@@ -131,7 +132,10 @@ function identifyCurrentHash () {
     .closest('li')
     .addClass('active')
 
-  helpers.scrollTo(CONTENT, $.find(hash))
+  helpers.scrollTo(
+    CONTENT,
+    $(`#${cssesc(hash.replace(/^#/, ''), {isIdentifier: true})}`)
+  )
 }
 
 // Public Methods
