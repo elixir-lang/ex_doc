@@ -26,14 +26,16 @@ body {
 
 
 .sidebar {
-  .flex(0, 1, 0);
+  .flex(0, 1, 300px);
   .flex-direction(column);
   display: none;
   height: 100%;
+  position: absolute;
+  z-index: 999;
 }
 
-body.sidebar-open .sidebar {
-  .display(flex);
+body.sidebar-closed .sidebar {
+  display: none;
 }
 
 .content {
@@ -52,5 +54,12 @@ body.sidebar-open .sidebar {
 @media screen and (max-width: 768px) {
   .content-inner {
     padding: 27px 20px 27px 40px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .sidebar {
+    position: relative;
+    .display(flex);
   }
 }

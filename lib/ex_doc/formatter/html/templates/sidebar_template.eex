@@ -3,14 +3,37 @@
   <i class="fa fa-bars"></i>
 </button>
 <section class="sidebar">
+  <button class="sidebar-toggle">
+    <i class="fa fa-bars"></i>
+  </button>
+
   <%= if url = config.homepage_url || config.source_url do %>
-    <h1 class="sidebar-projectName">
-      <a href="<%= url %>"><%= config.project %><%= if config.logo do %><img src="<%= logo_path(config) %>" alt="<%= config.project %>"><% end %></a>
-    </h1>
+    <a href="<%= url %>">
+      <div class="sidebar-projectDetails">
+        <h1 class="sidebar-projectName">
+          <%= config.project %>
+        </h1>
+        <h2 class="sidebar-projectVersion">
+          v<%= config.version %>
+        </h2>
+      </div>
+      <%= if config.logo do %>
+        <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
+      <% end %>
+    </a>
   <% else %>
-    <h1 class="sidebar-projectName"><%= config.project %><%= if config.logo do %><img src="<%= logo_path(config) %>" alt="<%= config.project %>"><% end %></h1>
+    <div class="sidebar-projectDetails">
+      <h1 class="sidebar-projectName">
+        <%= config.project %>
+      </h1>
+      <h2 class="sidebar-projectVersion">
+        v<%= config.version %>
+      </h2>
+    </div>
+    <%= if config.logo do %>
+      <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
+    <% end %>
   <% end %>
-  <h2 class="sidebar-projectVersion">v<%= config.version %></h2>
 
   <div class="sidebar-search">
     <i class="fa fa-search"></i>
