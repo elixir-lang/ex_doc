@@ -62,19 +62,23 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   Converts the given `ast` to string while linking the locals
   given by `typespecs` as HTML.
   """
-  def typespec({:when, _, [{:::, _, [left, {:|, _, _} = center]}, right]}, typespecs, aliases) do
-    strip_if_short(
+  def typespec({:when, _, [{:::, _, [left, {:|, _, _} = center]}, right]} = ast, typespecs, aliases) do
+    if short_typespec?(ast) do
+      typespec_to_string(ast, typespecs, aliases)
+    else
       typespec_to_string(left, typespecs, aliases) <>
       " ::\n  " <> typespec_with_new_line(center, typespecs, aliases) <>
       " when " <> String.slice(typespec_to_string(right, typespecs, aliases), 1..-2)
-    )
+    end
   end
 
-  def typespec({:::, _, [left, {:|, _, _} = center]}, typespecs, aliases) do
-    strip_if_short(
+  def typespec({:::, _, [left, {:|, _, _} = center]} = ast, typespecs, aliases) do
+    if short_typespec?(ast) do
+      typespec_to_string(ast, typespecs, aliases)
+    else
       typespec_to_string(left, typespecs, aliases) <>
       " ::\n  " <> typespec_with_new_line(center, typespecs, aliases)
-    )
+    end
   end
 
   def typespec(other, typespecs, aliases) do
@@ -113,11 +117,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end)
   end
 
-  defp strip_if_short(string) when byte_size(string) < 60 do
-    String.replace(string, "\n  ", " ")
-  end
-  defp strip_if_short(string) do
-    string
+  defp short_typespec?(ast) do
+    byte_size(Macro.to_string(ast)) < 60
   end
 
   defp strip_parens(string, []) do
