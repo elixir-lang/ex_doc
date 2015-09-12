@@ -1,7 +1,7 @@
-var helpers = require('../js/helpers')
+import * as helpers from '../js/helpers'
 
-describe('helpers', function () {
-  describe('escapeText', function () {
+describe('helpers', () => {
+  describe('escapeText', () => {
     var escapeText = helpers.escapeText
 
     it('escapes -', function () {

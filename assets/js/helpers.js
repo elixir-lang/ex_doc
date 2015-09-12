@@ -4,15 +4,15 @@
 // Dependencies
 // ------------
 
-var $ = require('jquery')
+import $ from 'jquery'
 
 // Escape a string for use in a regular expression
-exports.escapeText = function (text) {
+export function escapeText (text) {
   return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
 }
 
 // Scroll to a given element in the page
-exports.scrollTo = function (target, elem, done) {
+export function scrollTo (target, elem, done) {
   return $(target)
     .animate({
       scrollTop: $(elem).offset().top

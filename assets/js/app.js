@@ -1,24 +1,22 @@
-'use strict'
-
 // Dependencies
 // ------------
 
-var $ = window.$ = require('jquery')
-var hljs = require('highlightjs/highlight.pack')
+import $ from 'jquery'
+import hljs from 'highlightjs/highlight.pack'
 
-var sidebar = require('./sidebar')
-var events = require('./events')
+import {initialize as initEvents} from './events'
+import {initialize as initSidebar} from './sidebar'
 
-require('./fix-anchors')
+window.$ = $
 
-$(function () {
+$(() => {
   // Setup Highlight.js
   hljs.configure({
     tabReplace: '    ', // 4 spaces
     languages: []       // disable auto-detect
   })
 
-  sidebar.init()
-  events.initialize()
+  initSidebar()
+  initEvents()
   hljs.initHighlighting()
 })

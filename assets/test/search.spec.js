@@ -1,8 +1,8 @@
-var search = require('../js/search')
+import * as search from '../js/search'
 
-describe('search', function () {
-  describe('findIn', function () {
-    it('returns a list of matches', function () {
+describe('search', () => {
+  describe('findIn', () => {
+    it('returns a list of matches', () => {
       var nodes = [{id: 'hello world'}, {id: 'world'}]
 
       expect(search.findIn(nodes, 'hello')).to.be.eql([
@@ -10,7 +10,7 @@ describe('search', function () {
       ])
     })
 
-    it('searches for function matches', function () {
+    it('searches for function matches', () => {
       var nodes = [{
         id: 'hello world',
         functions: [
@@ -42,7 +42,7 @@ describe('search', function () {
       }])
     })
 
-    it('searches for callback matches', function () {
+    it('searches for callback matches', () => {
       var nodes = [
         {id: 'hello', callbacks: [{id: 'run'}]},
         {id: 'world'}
@@ -55,7 +55,7 @@ describe('search', function () {
       }])
     })
 
-    it('searches for macro matches', function () {
+    it('searches for macro matches', () => {
       var nodes = [
         {id: 'hello', macros: [{id: 'run'}]},
         {id: 'world'}
@@ -68,7 +68,7 @@ describe('search', function () {
       }])
     })
 
-    it('searches for nested matches', function () {
+    it('searches for nested matches', () => {
       var nodes = [
         {id: 'hello', macros: [{id: 'run'}]},
         {id: 'world'}

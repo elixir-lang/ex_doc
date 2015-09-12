@@ -1,13 +1,13 @@
 /* globals sidebarNodes */
-'use strict'
 
 // Dependencies
 // ------------
 
-var $ = require('jquery')
-var search = require('./search')
-var helpers = require('./helpers')
-var sidebarItemsTemplate = require('./sidebar-items.handlebars')
+import $ from 'jquery'
+import {start as search} from './search'
+import * as helpers from './helpers'
+
+import sidebarItemsTemplate from './templates/sidebar-items.handlebars'
 
 // Constants
 // ---------
@@ -44,9 +44,6 @@ function collapse () {
     )
   }
 }
-
-// Public Methods
-// --------------
 
 /**
  * Fill the sidebar with links to different nodes
@@ -114,14 +111,14 @@ function addEventListeners () {
 
   $('.sidebar-search input').on('keyup', function (e) {
     if (e.which === 13) { // enter key maps to 13
-      search.start()
+      search()
     } else if (e.which === 27) { // escape key
       $(this).val('')
     }
   })
 
   $('.sidebar-search i.fa-search').on('click', function (e) {
-    search.start()
+    search()
   })
 }
 
@@ -137,13 +134,12 @@ function identifyCurrentHash () {
   helpers.scrollTo(CONTENT, $.find(hash))
 }
 
-function initalize () {
+// Public Methods
+// --------------
+
+export function initialize () {
   fillSidebarWithNodes(sidebarNodes)
   addEventListeners()
   collapse()
   identifyCurrentHash()
-}
-
-module.exports = {
-  initialize: initalize
 }

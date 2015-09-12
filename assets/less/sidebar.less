@@ -6,6 +6,17 @@
   color: @lightestGray;
   overflow: hidden;
 
+
+  .sidebar-toggle {
+    display: block;
+    left: 270px;
+    color: @gray;
+
+    &:hover {
+      color: @white;
+    }
+  }
+
   ul {
     list-style: none;
 
@@ -25,30 +36,30 @@
     }
   }
 
+  .sidebar-projectDetails {
+    display: inline-block;
+    margin: 21px 30px 0 40px;
+    text-align: right;
+  }
+
+  .sidebar-projectImage {
+    display: inline-block;
+    max-width: 64px;
+    max-height: 64px;
+  }
+
   .sidebar-projectName {
-    margin: 21px 40px 0;
-    padding: 0 0 10px 0;
     font-weight: 700;
     font-size: 30px;
     line-height: 40px;
     color: @white;
-
-    a {
-      color: @white;
-
-      img {
-        max-width: 64px;
-        max-height: 64px;
-        margin-left: 25px;
-        position: absolute;
-        margin-top: 5px;
-      }
-    }
+    margin: 0;
+    padding: 0;
   }
 
   .sidebar-projectVersion {
-    margin: 0 40px 30px;
-    padding: 0;
+    margin: 0;
+    padding: 10px 0 0 0;
     font-weight: 300;
     font-size: 20px;
     line-height: 20px;
@@ -96,7 +107,7 @@
   }
 
   .sidebar-search {
-    margin: 21px 40px;
+    margin: 31px 40px 20px;
     .display(flex);
 
     i.fa.fa-search {

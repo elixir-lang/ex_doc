@@ -1,9 +1,5 @@
-body.sidebar-open .sidebar-toggle {
-  color: @gray;
-
-  &:hover {
-    color: white;
-  }
+body.sidebar-closed .sidebar-toggle {
+  display: block;
 }
 
 .sidebar-toggle {
@@ -24,5 +20,11 @@ body.sidebar-open .sidebar-toggle {
   &:hover,
   &:focus {
     outline: none;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .sidebar-toggle {
+    display: none;
   }
 }
