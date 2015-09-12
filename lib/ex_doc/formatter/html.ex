@@ -27,10 +27,6 @@ defmodule ExDoc.Formatter.HTML do
       config = process_logo_metadata(config)
     end
 
-    if config.readme do
-      generate_extra(config.readme, output, module_nodes, config, modules, exceptions, protocols)
-    end
-
     unless Enum.empty?(config.extras) do
       generate_extras(output, module_nodes, config, modules, exceptions, protocols)
     end
@@ -101,10 +97,24 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_extra(input, output, module_nodes, config, modules, exceptions, protocols) do
     file_path = Path.expand(input)
-    content = File.read!(file_path) |> Autolink.project_doc(module_nodes)
-    extra_html = Templates.extra_template(config, modules, exceptions, protocols, content) |> pretty_codeblocks
-    file_name = Path.basename(file_path, ".md")
-    File.write!("#{output}/#{file_name}.html", extra_html)
+    file_extname =
+      Path.extname(file_path)
+      |> String.downcase
+
+    if file_extname == ".md" do
+      file_name =
+        Path.basename(file_path, ".md")
+        |> String.upcase
+      content =
+        File.read!(file_path)
+        |> Autolink.project_doc(module_nodes)
+
+      config = Map.put(config, :title, file_name)
+      extra_html = Templates.extra_template(config, modules, exceptions, protocols, content) |> pretty_codeblocks
+      File.write!("#{output}/#{file_name}.html", extra_html)
+    else
+      raise ArgumentError, "File format not recognized, allowed format is: .md"
+    end
   end
 
   defp process_logo_metadata(config) do
