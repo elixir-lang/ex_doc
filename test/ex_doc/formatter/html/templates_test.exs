@@ -19,7 +19,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       source_root: File.cwd!,
       source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}",
       homepage_url: homepage_url,
-      source_url: source_url,
+      source_url: source_url
     }
   end
 
@@ -89,7 +89,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   test "listing page has README link if present" do
-    config = Map.put(doc_config, :readme, "README.md")
+    config = Map.put(doc_config, :extras, ["README.md"])
     content = Templates.sidebar_template(config, [], [], [])
     assert content =~ ~r{<a href="README.html">README</a>}
   end
