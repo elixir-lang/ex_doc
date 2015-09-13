@@ -118,14 +118,13 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp process_logo_metadata(config) do
-    logo_path = Path.expand config.logo
     output = "#{config.output}/assets"
     File.mkdir_p! output
     file_extname = Path.extname(config.logo) |> String.downcase
 
     if file_extname in ~w(.png .jpg) do
       file_name = "#{output}/logo#{file_extname}"
-      File.copy!(logo_path, file_name)
+      File.copy!(config.logo, file_name)
       Map.put(config, :logo, Path.basename(file_name))
     else
       raise ArgumentError, "image format not recognized, allowed formats are: .jpg, .png"

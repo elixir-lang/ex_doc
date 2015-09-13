@@ -1,13 +1,7 @@
 defmodule ExDoc.Formatter.HTMLTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case
 
   alias ExDoc.Formatter.HTML
-
-  setup_all do
-    {:ok, _} = File.copy("test/fixtures/README.md", "test/tmp/README.md")
-
-    :ok
-  end
 
   setup do
     {:ok, _} = File.rm_rf(output_dir)
@@ -33,7 +27,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       output: "test/tmp/doc",
       source_root: beam_dir,
       source_beam: beam_dir,
-      logo: "test/tmp/elixir.png",
+      logo: "test/fixtures/elixir.png",
       extras: ["test/tmp/README.md"]
     ]
   end
@@ -56,7 +50,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "check headers for index.html and module pages" do
-    generate_docs doc_config([main: "RandomError", ])
+    generate_docs doc_config([main: "RandomError"])
 
     content_index  = File.read!("#{output_dir}/index.html")
     content_module = File.read!("#{output_dir}/RandomError.html")
