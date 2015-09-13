@@ -7,6 +7,7 @@ defmodule ExDoc.Mixfile do
      elixir:     "~> 1.0",
      deps:       deps,
      aliases:    aliases,
+     package:    package,
      source_url: "https://github.com/elixir-lang/ex_doc/"]
   end
 
@@ -17,6 +18,11 @@ defmodule ExDoc.Mixfile do
 
   defp aliases do
     [clean: [&clean_test_fixtures/1, "clean"]]
+  end
+
+  defp package do
+   [licenses: ["Apache 2.0"],
+    links: %{"GitHub" => "https://github.com/elixir-lang/ex_doc"}]
   end
 
   defp clean_test_fixtures(_args) do
