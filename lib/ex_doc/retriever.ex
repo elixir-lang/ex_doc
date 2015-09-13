@@ -203,7 +203,7 @@ defmodule ExDoc.Retriever do
       name in [:__ENV__, :__MODULE__, :__DIR__, :__CALLER__, :"%", :"%{}"] ->
         "#{name}"
       true ->
-        Macro.to_string { name, 0, args }
+        Macro.to_string {name, 0, args}
     end
   end
 
@@ -223,7 +223,7 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  # Returns a dict of { name, arity } -> [ behaviour_module ].
+  # Returns a dict of {name, arity} -> [behaviour_module].
   defp callbacks_implemented_by(module) do
     behaviours_implemented_by(module)
     |> Enum.map(fn behaviour -> Enum.map(callbacks_of(behaviour), &{&1, behaviour}) end)
@@ -246,10 +246,10 @@ defmodule ExDoc.Retriever do
     all  = Kernel.Typespec.beam_types(module) || []
     docs = Enum.into(Kernel.Typespec.beam_typedocs(module) || [], %{})
 
-    for { type, { name, _, args } = tuple } <- all, type != :typep do
+    for {type, {name, _, args} = tuple} <- all, type != :typep do
       spec  = process_type_ast(Kernel.Typespec.type_to_ast(tuple), type)
       arity = length(args)
-      doc   = docs[{ name, arity }]
+      doc   = docs[{name, arity}]
       %ExDoc.TypeNode{
         id: "#{name}/#{arity}",
         name: name,
