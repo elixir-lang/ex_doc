@@ -27,10 +27,7 @@ defmodule ExDoc.Formatter.HTML do
       config = process_logo_metadata(config)
     end
 
-    unless Enum.empty?(config.extras) do
-      generate_extras(output, module_nodes, config, modules, exceptions, protocols)
-    end
-
+    generate_extras(output, module_nodes, config, modules, exceptions, protocols)
     generate_index(output, config)
     generate_overview(modules, exceptions, protocols, output, config)
     generate_not_found(modules, exceptions, protocols, output, config)
@@ -96,17 +93,20 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_extra(input, output, module_nodes, config, modules, exceptions, protocols) do
-    file_path = Path.expand(input)
     file_extname =
-      Path.extname(file_path)
+      input
+      |> Path.extname
       |> String.downcase
 
-    if file_extname == ".md" do
+    if file_extname in [".md"] do
       file_name =
-        Path.basename(file_path, ".md")
+        input
+        |> Path.basename(".md")
         |> String.upcase
+
       content =
-        File.read!(file_path)
+        input
+        |> File.read!
         |> Autolink.project_doc(module_nodes)
 
       config = Map.put(config, :title, file_name)

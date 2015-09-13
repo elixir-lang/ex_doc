@@ -35,13 +35,10 @@ defmodule ExDoc.CLI do
 
   defp extra_files_options(opts) do
     extras = Keyword.get_values(opts, :extra)
-    if Enum.empty?(extras) do
-      opts
-    else
-      opts
-      |> Keyword.delete(:extra)
-      |> Keyword.put(:extras, extras)
-    end
+
+    opts
+    |> Keyword.delete(:extra)
+    |> Keyword.put(:extras, extras)
   end
 
   defp read_config(path) do
@@ -79,22 +76,23 @@ defmodule ExDoc.CLI do
       ex_doc "Dynamo" "0.8.0" "_build/shared/lib/dynamo/ebin" -u "https://github.com/elixir-lang/dynamo"
 
     Options:
-      PROJECT            Project name
-      VERSION            Version number
-      BEAMS              Path to compiled beam files
-      -o, --output       Path to output docs, default: "doc"
-      -f, --formatter    Docs formatter to use, default: "html"
-      -c, --config       Path to the formatter's config file
-      -r, --source-root  Path to the source code root, default: "."
-      -u, --source-url   URL to the source code
-          --source-ref   Branch/commit/tag used for source link inference, default: "master"
-      -m, --main         The main, entry-point module in docs,
-                           default: "overview" when --formatter is "html"
-      -p, --homepage-url URL to link to for the site name
-      -e, --extra        Allow users to include additional Markdown files, default: []
-      -l, --logo         Path to the image logo of the project (only PNG or JPEG accepted)
-                           The image size will be 64x64 when --formatter is "html"
-                           default: `nil`
+      PROJECT             Project name
+      VERSION             Version number
+      BEAMS               Path to compiled beam files
+      -o, --output        Path to output docs, default: "doc"
+      -f, --formatter     Docs formatter to use, default: "html"
+      -c, --config        Path to the formatter's config file
+      -r, --source-root   Path to the source code root, default: "."
+      -u, --source-url    URL to the source code
+          --source-ref    Branch/commit/tag used for source link inference, default: "master"
+      -m, --main          The main, entry-point module in docs,
+                          default: "overview" when --formatter is "html"
+      -p, --homepage-url  URL to link to for the site name
+      -e, --extra         Allow users to include additional Markdown files
+                          May be given multiple times
+      -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)
+                          The image size will be 64x64 when --formatter is "html"
+                          default: `nil`
 
     ## Source linking
 

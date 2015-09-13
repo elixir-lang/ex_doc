@@ -44,7 +44,7 @@ defmodule ExDocTest do
   end
 
   test "minimum command-line options" do
-    assert {"ExDoc", "1.2.3", [source_beam: "/"]} == run(["ExDoc", "1.2.3", "/"])
+    assert {"ExDoc", "1.2.3", [extras: [], source_beam: "/"]} == run(["ExDoc", "1.2.3", "/"])
   end
 
   test "command-line config" do

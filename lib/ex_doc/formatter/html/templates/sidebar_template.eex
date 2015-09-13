@@ -41,11 +41,9 @@
   </div>
 
   <ul class="sidebar-mainNav">
-    <%= unless Enum.empty?(config.extras) do %>
-      <%= for extra <- Enum.sort(config.extras) do %>
-        <li><a href="<%= extra_title(extra) %>.html"><%= extra_title(extra) %></a></li>
-      <%= end %>
-    <% end %>
+    <%= for extra <- Enum.sort(config.extras) do %>
+      <li><a href="<%= extra_title(extra) %>.html"><%= extra_title(extra) %></a></li>
+    <%= end %>
 
     <li><a href="overview.html">Overview</a></li>
   </ul>
