@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.9.0-dev
+
+* Enhancements
+  * Whole new clean, readable, usable, responsive layout
+  * Support for adding logo to generated docs (must be 64x64 pixels)
+  * Support for adding extra pages to generated docs
+  * Improve formatting of typespecs and callbacks
+
+* Backwards incompatible changes
+  * `--readme` option and `:readme` configuration have been removed in favor of `:extra`
+
 ## v0.8.4
 
 * Bug fixes
