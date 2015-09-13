@@ -12,6 +12,12 @@ const sidebar = $('.sidebar')
 const bodyClass = 'sidebar-closed'
 const duration = 300
 const width = '300px'
+const displayProps = [
+  '-webkit-flex',
+  '-ms-flexbox',
+  '-ms-flex',
+  'flex'
+]
 
 function closeSidebar () {
   sidebar.animate({
@@ -30,8 +36,11 @@ function closeSidebar () {
 
 function openSidebar (immediate) {
   body.removeClass(bodyClass)
+  displayProps.forEach(prop => {
+    sidebar.css({display: prop})
+  })
+
   sidebar.css({
-    display: 'flex',
     width: 0
   })
   sidebar.animate({
