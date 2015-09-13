@@ -64,7 +64,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     re = %{
       shared: %{
         charset:   ~r{<meta charset="utf-8">},
-        generator: ~r{<meta name="generator" content="ExDoc v\d+.\d+.\d+">},
+        generator: ~r{<meta name="generator" content="ExDoc v#{ExDoc.version}">},
       },
 
       index: %{
