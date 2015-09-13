@@ -149,12 +149,9 @@ defmodule ExDoc.Retriever do
     {{name, arity}, line, type, signature, doc} = function
     behaviour = Map.get(cb_impls, {name, arity})
 
-    doc =
-      if is_nil(doc) && behaviour do
-        "Callback implementation for `c:#{inspect behaviour}.#{name}/#{arity}`."
-      else
-        doc
-      end
+    if is_nil(doc) && behaviour do
+      doc = "Callback implementation for `c:#{inspect behaviour}.#{name}/#{arity}`."
+    end
 
     specs = all_specs
             |> Map.get(spec_name(name, arity, type), [])
