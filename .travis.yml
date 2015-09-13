@@ -19,8 +19,10 @@ before_script:
   - sh -e /etc/init.d/xvfb start
   - npm install -g npm
   - npm install
+env:
+  - MIX_ENV=test
 script:
-  - "mix do local.hex --force, deps.get && mix test --include pandoc"
+  - "mix do local.hex --force, deps.get, test --include pandoc, coveralls.travis"
   - node_modules/.bin/gulp
 cache:
   directories:
