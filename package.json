@@ -58,6 +58,8 @@
     "less-plugin-autoprefix": "^1.4.2",
     "less-plugin-npm-import": "^2.1.0",
     "lodash": "^3.10.1",
+    "lodash.find": "^3.2.1",
+    "lodash.findkey": "^3.0.1",
     "mocha": "^2.2.5",
     "normalize.css": "^3.0.3",
     "run-sequence": "^1.1.2",

@@ -6,7 +6,6 @@
 import $ from 'jquery'
 import {start as search} from './search'
 import * as helpers from './helpers'
-import cssesc from 'cssesc'
 
 import sidebarItemsTemplate from './templates/sidebar-items.handlebars'
 
@@ -57,27 +56,21 @@ function collapse () {
  * @param {String} filter - Filter of nodes, by default 'modules'.
  */
 function fillSidebarWithNodes (nodes, filter) {
-  var module_type
-
   function scope (items) {
     var filtered = nodes[items]
     var fullList = $('#full_list')
     fullList.replaceWith(sidebarItemsTemplate(filtered))
   }
 
-  module_type = $('.content h1 small').text()
-  if (module_type && (module_type === 'exception' || module_type === 'protocol')) {
-    module_type = module_type + 's' // pluralize 'exception' or 'protocol'
-  } else {
-    module_type = 'modules'
-  }
+  const module_type = helpers.getModuleType()
 
   filter = filter || module_type
   scope(filter)
   setupSelected(['#', filter, '_list'].join(''))
 
-  var $docLinks = $('#full_list .docs a')
+  var $docLinks = $('#full_list .doclink')
   var $docItems = $('#full_list .docs')
+  var $defItems = $('#full_list .deflist > li')
 
   function handleAnchor (e) {
     e.preventDefault()
@@ -88,13 +81,27 @@ function fillSidebarWithNodes (nodes, filter) {
     $target.closest('li').addClass('active')
 
     var href = $target.attr('href')
-    helpers.scrollTo(CONTENT, $.find(href), function () {
+    helpers.scrollTo(CONTENT, helpers.saveFind(href), function () {
       window.location.hash = href.replace(/^#/, '')
     })
   }
 
   $('#full_list .node.clicked > a').on('click', handleAnchor)
   $docLinks.on('click', handleAnchor)
+
+  $('#full_list .node.clicked .deflink').on('click', e => {
+    e.preventDefault()
+
+    var $target = $(event.target)
+
+    $defItems.removeClass('active')
+    $target.closest('li').addClass('active')
+
+    var href = $target.attr('href')
+    helpers.scrollTo(CONTENT, helpers.saveFind(href), function () {
+      window.location.hash = href.replace(/^#/, '')
+    })
+  })
 }
 
 function createHandler (name) {
@@ -128,14 +135,18 @@ function identifyCurrentHash () {
 
   if (!hash) return
 
-  $('#full_list .clicked a[href="' + hash + '"]')
+  const nodes = sidebarNodes[helpers.getModuleType()]
+  const category = helpers.findSidebarCategory(nodes, hash.replace(/^#/, ''))
+
+  $(`#full_list .clicked a[href="#${category}_details"]`)
     .closest('li')
     .addClass('active')
 
-  helpers.scrollTo(
-    CONTENT,
-    $(`#${cssesc(hash.replace(/^#/, ''), {isIdentifier: true})}`)
-  )
+  $(`#full_list .clicked a[href="${hash}"]`)
+    .closest('li')
+    .addClass('active')
+
+  helpers.scrollTo(CONTENT, helpers.saveFind(hash))
 }
 
 // Public Methods
