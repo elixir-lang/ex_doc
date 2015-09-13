@@ -9,7 +9,7 @@
   * Improve formatting of typespecs and callbacks
 
 * Backwards incompatible changes
-  * `--readme` option and `:readme` configuration have been removed in favor of `:extra`
+  * `--readme` option and `:readme` configuration have been removed. Use `:extras` in your `mix.exs` file or pass `--extra` / `-e` in the command-line (may be given multiple times)
 
 ## v0.8.4
 
