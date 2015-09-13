@@ -50,7 +50,7 @@ defmodule ExDocTest do
   test "command-line config" do
     File.write!("test.config", ~s([key: "val"]))
 
-    {project, version, opts} = run(["ExDoc", "--readme", "README.md", "1.2.3", "...", "-c", "test.config"])
+    {project, version, opts} = run(["ExDoc", "--extra", "README.md", "1.2.3", "...", "-c", "test.config"])
 
     assert project == "ExDoc"
     assert version == "1.2.3"
