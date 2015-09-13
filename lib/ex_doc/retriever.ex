@@ -161,9 +161,9 @@ defmodule ExDoc.Retriever do
   defp actual_def(name, arity, _), do: {name, arity}
 
   defp get_function(function, source_path, source_url, all_specs, cb_impls, abst_code) do
-    {{name, arity}, _, type, signature, doc} = function
+    {{name, arity}, doc_line, type, signature, doc} = function
     function = actual_def(name, arity, type)
-    line = find_actual_line(abst_code, function, :function)
+    line = find_actual_line(abst_code, function, :function) || doc_line
 
     behaviour = Map.get(cb_impls, {name, arity})
 
@@ -238,8 +238,10 @@ defmodule ExDoc.Retriever do
   end
 
   defp find_actual_line(abst_code, {name, arity}, :function) do
-    Enum.find(abst_code, &match?({:function, _, ^name, ^arity, _}, &1))
-    |> elem(1)
+    case Enum.find(abst_code, &match?({:function, _, ^name, ^arity, _}, &1)) do
+      nil -> nil
+      tuple -> elem(tuple, 1)
+    end
   end
 
   # Detect if a module is an exception, struct,
