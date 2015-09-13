@@ -1,20 +1,21 @@
 defmodule ExDoc do
   defmodule Config do
     defstruct [
+      extras: [],
       formatter: "html",
       formatter_opts: [],
       homepage_url: nil,
+      logo: nil,
       main: nil,
       output: "doc",
       project: nil,
-      readme: nil,
       retriever: ExDoc.Retriever,
       source_beam: nil,
       source_root: nil,
       source_url: nil,
       source_url_pattern: nil,
-      version: nil,
-      logo: nil
+      title: nil,
+      version: nil
     ]
   end
 

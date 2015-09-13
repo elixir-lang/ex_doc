@@ -2,7 +2,9 @@ defmodule ExDoc.CLI do
   def run(args, generator \\ &ExDoc.generate_docs/3) do
     {opts, args, _} = OptionParser.parse(args,
                aliases: [o: :output, f: :formatter, c: :config, r: :source_root,
-                         u: :source_url, m: :main, p: :homepage_url])
+                         u: :source_url, m: :main, p: :homepage_url, l: :logo,
+                         e: :extra],
+               switches: [extra: :keep])
 
     [project, version, source_beam] = parse_args(args)
 
@@ -16,12 +18,29 @@ defmodule ExDoc.CLI do
   end
 
   defp merge_config(opts) do
+    opts
+    |> formatter_options
+    |> extra_files_options
+  end
+
+  defp formatter_options(opts) do
     case Keyword.fetch(opts, :config) do
       {:ok, config} ->
         opts
         |> Keyword.delete(:config)
         |> Keyword.put(:formatter_opts, read_config(config))
       _ -> opts
+    end
+  end
+
+  defp extra_files_options(opts) do
+    extras = Keyword.get_values(opts, :extra)
+    if Enum.empty?(extras) do
+      opts
+    else
+      opts
+      |> Keyword.delete(:extra)
+      |> Keyword.put(:extras, extras)
     end
   end
 
@@ -64,7 +83,6 @@ defmodule ExDoc.CLI do
       VERSION            Version number
       BEAMS              Path to compiled beam files
       -o, --output       Path to output docs, default: "doc"
-          --readme       Path to README.md file to generate a project README, default: `nil`
       -f, --formatter    Docs formatter to use, default: "html"
       -c, --config       Path to the formatter's config file
       -r, --source-root  Path to the source code root, default: "."
@@ -72,8 +90,9 @@ defmodule ExDoc.CLI do
           --source-ref   Branch/commit/tag used for source link inference, default: "master"
       -m, --main         The main, entry-point module in docs,
                            default: "overview" when --formatter is "html"
-      -p  --homepage-url URL to link to for the site name
-      -l  --logo         Path to the image logo of the project (only PNG or JPEG accepted)
+      -p, --homepage-url URL to link to for the site name
+      -e, --extra        Allow users to include additional Markdown files, default: []
+      -l, --logo         Path to the image logo of the project (only PNG or JPEG accepted)
                            The image size will be 64x64 when --formatter is "html"
                            default: `nil`
 

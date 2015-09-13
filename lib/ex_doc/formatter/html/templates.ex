@@ -110,6 +110,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp logo_path(%{logo: nil}), do: nil
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
 
+  defp extra_title(path), do: path |> String.upcase |> Path.basename(".MD")
+
   templates = [
     detail_template: [:node, :_module],
     footer_template: [],
@@ -118,7 +120,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     not_found_template: [:config, :modules, :exceptions, :protocols],
     overview_entry_template: [:node],
     overview_template: [:config, :modules, :exceptions, :protocols],
-    readme_template: [:config, :modules, :exceptions, :protocols, :content],
+    extra_template: [:config, :modules, :exceptions, :protocols, :content],
     sidebar_template: [:config, :modules, :exceptions, :protocols],
     summary_template: [:node],
     type_detail_template: [:node, :_module],

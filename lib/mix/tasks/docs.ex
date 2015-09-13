@@ -26,9 +26,6 @@ defmodule Mix.Tasks.Docs do
   * `:output` - output directory for the generated docs; default: "doc".
     May be overriden by command line argument.
 
-  * `:readme` - string denoting the source file for a project README
-    (e.g., "README.md"); default: `nil` (no README created).
-
   * `:formatter` - doc formatter to use; default: "html".
 
   * `:source_root` - path to the source code root directory;
@@ -47,6 +44,9 @@ defmodule Mix.Tasks.Docs do
 
   * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
     The image size will be 64x64 when --formatter is "html".
+
+  * `:extras` - List of strings, each one must indicate the path to additional
+    Markdown pages (e.g. `["README.md", "CONTRIBUTING.md"]`); default: `[]`
   """
 
   @doc false
