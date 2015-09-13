@@ -7,7 +7,7 @@
 import $ from 'jquery'
 import cssesc from 'cssesc'
 import find from 'lodash.find'
-import findKey from 'lodash.findKey'
+import findKey from 'lodash.findkey'
 
 // Escape a string for use in a regular expression
 export function escapeText (text) {
