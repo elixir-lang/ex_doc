@@ -33,6 +33,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       output: "test/tmp/doc",
       source_root: beam_dir,
       source_beam: beam_dir,
+      logo: "test/tmp/elixir.png",
       extras: ["test/tmp/README.md"]
     ]
   end
@@ -191,4 +192,10 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert {:ok, []} == File.ls "#{output_dir}"
   end
 
+  test "run should fails when logo is not an allowed format" do
+    config = doc_config([logo: "README.md"])
+    assert_raise ArgumentError,
+                 "image format not recognized, allowed formats are: .jpg, .png",
+                 fn -> generate_docs(config) end
+  end
 end
