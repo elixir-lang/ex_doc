@@ -90,9 +90,11 @@ defmodule ExDoc.Retriever do
 
     specs = Enum.into(Kernel.Typespec.beam_specs(module) || [], %{})
     impls = callbacks_implemented_by(module)
+    abst_code = get_abstract_code(module)
 
-    docs = Enum.filter_map Code.get_docs(module, :docs), &has_doc?(&1, type),
-                           &get_function(&1, source_path, source_url, specs, impls)
+    docs = for doc <- Code.get_docs(module, :docs), has_doc?(doc, type) do
+      get_function(doc, source_path, source_url, specs, impls, abst_code)
+    end
 
     if type == :behaviour do
       callbacks = Enum.into(Kernel.Typespec.beam_callbacks(module) || [], %{})
@@ -104,10 +106,11 @@ defmodule ExDoc.Retriever do
           Code.get_docs(module, :all)[:callback_docs]
         end
 
-      docs = docs ++ Enum.map(inner || [], &get_callback(&1, source_path, source_url, callbacks))
+      docs = docs ++ Enum.map(inner || [], &get_callback(&1, source_path, source_url, callbacks, abst_code))
     end
 
-    {line, moduledoc} = Code.get_docs(module, :moduledoc)
+    {_, moduledoc} = Code.get_docs(module, :moduledoc)
+    line = find_actual_line(abst_code, module, :module)
 
     %ExDoc.ModuleNode{
       id: inspect(module),
@@ -121,6 +124,15 @@ defmodule ExDoc.Retriever do
   end
 
   # Helpers
+
+  defp get_abstract_code(module) do
+    {^module, binary, _file} = :code.get_object_code(module)
+    case :beam_lib.chunks(binary, [:abstract_code]) do
+      {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} ->
+        abstract_code
+      _otherwise -> []
+    end
+  end
 
   # Skip impl_for and impl_for! for protocols
   defp has_doc?({{name, _}, _, _, _, nil}, :protocol) when name in [:impl_for, :impl_for!] do
@@ -142,11 +154,16 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp spec_name(name, arity, :defmacro), do: {String.to_atom("MACRO-" <> to_string(name)), arity + 1}
-  defp spec_name(name, arity, _), do: {name, arity}
+  defp actual_def(name, arity, :defmacro) do
+    {String.to_atom("MACRO-" <> to_string(name)), arity + 1}
+  end
+  defp actual_def(name, arity, _), do: {name, arity}
 
-  defp get_function(function, source_path, source_url, all_specs, cb_impls) do
-    {{name, arity}, line, type, signature, doc} = function
+  defp get_function(function, source_path, source_url, all_specs, cb_impls, abst_code) do
+    {{name, arity}, _, type, signature, doc} = function
+    function = actual_def(name, arity, type)
+    line = find_actual_line(abst_code, function, :function)
+
     behaviour = Map.get(cb_impls, {name, arity})
 
     if is_nil(doc) && behaviour do
@@ -154,7 +171,7 @@ defmodule ExDoc.Retriever do
     end
 
     specs = all_specs
-            |> Map.get(spec_name(name, arity, type), [])
+            |> Map.get(function, [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
@@ -169,8 +186,10 @@ defmodule ExDoc.Retriever do
     }
   end
 
-  defp get_callback(callback, source_path, source_url, callbacks) do
-    {{name, arity}, line, kind, doc} = callback
+  defp get_callback(callback, source_path, source_url, callbacks, abst_code) do
+    {{name, arity}, _, kind, doc} = callback
+    function = actual_def(name, arity, kind)
+    line = find_actual_line(abst_code, function, :callback)
 
     # TODO: Remove defcallback and defmacrocallback
     # once we no longer supported __behaviour__
@@ -205,6 +224,21 @@ defmodule ExDoc.Retriever do
       true ->
         Macro.to_string {name, 0, args}
     end
+  end
+
+  defp find_actual_line(abst_code, function, :callback) do
+    Enum.find(abst_code, &match?({:attribute, _, :callback, {^function, _}}, &1))
+    |> elem(1)
+  end
+
+  defp find_actual_line(abst_code, name, :module) do
+    Enum.find(abst_code, &match?({:attribute, _, :module, ^name}, &1))
+    |> elem(1)
+  end
+
+  defp find_actual_line(abst_code, {name, arity}, :function) do
+    Enum.find(abst_code, &match?({:function, _, ^name, ^arity, _}, &1))
+    |> elem(1)
   end
 
   # Detect if a module is an exception, struct,
