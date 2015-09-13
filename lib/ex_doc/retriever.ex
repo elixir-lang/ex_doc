@@ -147,7 +147,7 @@ defmodule ExDoc.Retriever do
 
   defp get_function(function, source_path, source_url, all_specs, cb_impls) do
     {{name, arity}, line, type, signature, doc} = function
-    behaviour = Dict.get(cb_impls, {name, arity})
+    behaviour = Map.get(cb_impls, {name, arity})
 
     doc =
       if is_nil(doc) && behaviour do
@@ -157,7 +157,7 @@ defmodule ExDoc.Retriever do
       end
 
     specs = all_specs
-            |> Dict.get(spec_name(name, arity, type), [])
+            |> Map.get(spec_name(name, arity, type), [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
@@ -184,7 +184,7 @@ defmodule ExDoc.Retriever do
         other -> other
       end
 
-    specs = Dict.get(callbacks, {name, arity}, [])
+    specs = Map.get(callbacks, {name, arity}, [])
             |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
