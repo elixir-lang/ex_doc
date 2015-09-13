@@ -23,6 +23,7 @@ defmodule ExDoc.Retriever do
   """
 
   alias ExDoc.Retriever.Error
+  alias Kernel.Typespec
 
   @doc """
   Extract documentation from all modules in the specified directory
@@ -88,7 +89,7 @@ defmodule ExDoc.Retriever do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
-    specs = Enum.into(Kernel.Typespec.beam_specs(module) || [], %{})
+    specs = Enum.into(Typespec.beam_specs(module) || [], %{})
     impls = callbacks_implemented_by(module)
     abst_code = get_abstract_code(module)
 
@@ -97,7 +98,7 @@ defmodule ExDoc.Retriever do
     end
 
     if type == :behaviour do
-      callbacks = Enum.into(Kernel.Typespec.beam_callbacks(module) || [], %{})
+      callbacks = Enum.into(Typespec.beam_callbacks(module) || [], %{})
 
       inner =
         if function_exported?(module, :__behaviour__, 1) do
@@ -172,7 +173,7 @@ defmodule ExDoc.Retriever do
 
     specs = all_specs
             |> Map.get(function, [])
-            |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
+            |> Enum.map(&Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -201,7 +202,7 @@ defmodule ExDoc.Retriever do
       end
 
     specs = Map.get(callbacks, {name, arity}, [])
-            |> Enum.map(&Kernel.Typespec.spec_to_ast(name, &1))
+            |> Enum.map(&Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -277,11 +278,11 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_types(module) do
-    all  = Kernel.Typespec.beam_types(module) || []
-    docs = Enum.into(Kernel.Typespec.beam_typedocs(module) || [], %{})
+    all  = Typespec.beam_types(module) || []
+    docs = Enum.into(Typespec.beam_typedocs(module) || [], %{})
 
     for {type, {name, _, args} = tuple} <- all, type != :typep do
-      spec  = process_type_ast(Kernel.Typespec.type_to_ast(tuple), type)
+      spec  = process_type_ast(Typespec.type_to_ast(tuple), type)
       arity = length(args)
       doc   = docs[{name, arity}]
       %ExDoc.TypeNode{
