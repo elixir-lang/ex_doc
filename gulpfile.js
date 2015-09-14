@@ -7,10 +7,11 @@
 var gulp = require('gulp')
 var $ = require('gulp-load-plugins')({camelize: true})
 var sequence = require('run-sequence')
-var clean = require('gulp-clean')
+var del = require('del')
 var LessPluginNpmImport = require('less-plugin-npm-import')
 var LessPluginAutoPrefix = require('less-plugin-autoprefix')
 var Server = require('karma').Server
+var webpack = require('webpack-stream')
 
 var config = require('./assets/webpack.config')
 
@@ -32,13 +33,12 @@ var autoprefixPlugin = new LessPluginAutoPrefix({
 // -----
 
 gulp.task('clean', function () {
-  return gulp.src(distPath, {read: false})
-    .pipe(clean())
+  return del(distPath)
 })
 
 gulp.task('javascript', function () {
   return gulp.src('assets/js/app.js')
-    .pipe($.webpack(isProduction ? config.production : config.development))
+    .pipe(webpack(isProduction ? config.production : config.development))
     .pipe($.if(isProduction, $.uglify()))
     .pipe($.size({title: 'js'}))
     .pipe(gulp.dest(distPath))
@@ -49,7 +49,7 @@ gulp.task('javascript-watch', function () {
 
   return gulp.src('assets/js/app.js')
     .pipe($.plumber())
-    .pipe($.webpack(config.development))
+    .pipe(webpack(config.development))
     .pipe($.size({title: 'js'}))
     .pipe(gulp.dest(distPath))
 })
