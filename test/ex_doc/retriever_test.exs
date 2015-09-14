@@ -63,9 +63,9 @@ defmodule ExDoc.RetrieverTest do
     [node] = docs_from_files ["TypesAndSpecs"]
     [add, _, _] = node.docs
 
-    assert add.id     == "add/2"
-    assert add.doc    == nil
-    assert add.type   == :def
+    assert add.id   == "add/2"
+    assert add.doc  == nil
+    assert add.type == :def
     assert Macro.to_string(add.specs) ==
            "[add(integer(), opaque()) :: integer()]"
   end
@@ -88,6 +88,7 @@ defmodule ExDoc.RetrieverTest do
     assert opaque.arity == 0
     assert opaque.id    == "opaque/0"
     assert opaque.type  == :opaque
+    assert opaque.signature == "opaque()"
     assert Macro.to_string(opaque.spec) == "opaque()"
 
     assert public.name  == :public
@@ -95,6 +96,7 @@ defmodule ExDoc.RetrieverTest do
     assert public.id    == "public/1"
     assert public.type  == :type
     assert public.doc   == "A public type"
+    assert public.signature == "public(t)"
     assert Macro.to_string(public.spec) ==
            "public(t) :: {t, String.t(), TypesAndSpecs.Sub.t(), opaque(), :ok | :error}"
 
@@ -102,6 +104,7 @@ defmodule ExDoc.RetrieverTest do
     assert ref.arity == 0
     assert ref.id    == "ref/0"
     assert ref.type  == :type
+    assert ref.signature == "ref()"
     assert Macro.to_string(ref.spec) ==
            "ref() :: {:binary.part(), public(any())}"
   end
@@ -132,7 +135,7 @@ defmodule ExDoc.RetrieverTest do
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["hello/1"]
     assert hd(node.docs).type == :callback
-    assert hd(node.docs).signature == "hello/1"
+    assert hd(node.docs).signature == "hello(integer)"
   end
 
   test "retrieves macro callbacks from behaviours" do
@@ -140,7 +143,7 @@ defmodule ExDoc.RetrieverTest do
     functions = Enum.map node.docs, fn(doc) -> doc.id end
     assert functions == ["bye/1"]
     assert hd(node.docs).type == :macrocallback
-    assert hd(node.docs).signature == "bye/1"
+    assert hd(node.docs).signature == "bye(integer)"
   end
 
   test "undocumented callback implementations get default doc" do

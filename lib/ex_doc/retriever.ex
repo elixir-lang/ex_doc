@@ -10,7 +10,7 @@ end
 
 defmodule ExDoc.TypeNode do
   defstruct id: nil, name: nil, arity: 0, type: nil,
-    spec: nil, doc: nil
+    spec: nil, doc: nil, signature: nil
 end
 
 defmodule ExDoc.Retriever.Error do
@@ -180,7 +180,7 @@ defmodule ExDoc.Retriever do
       name: name,
       arity: arity,
       doc: doc,
-      signature: get_signature(name, signature),
+      signature: get_call_signature(name, signature),
       specs: specs,
       source: source_link(source_path, source_url, line),
       type: type
@@ -201,7 +201,7 @@ defmodule ExDoc.Retriever do
         other -> other
       end
 
-    specs = Map.get(callbacks, {name, arity}, [])
+    specs = Map.get(callbacks, function, [])
             |> Enum.map(&Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
@@ -209,21 +209,48 @@ defmodule ExDoc.Retriever do
       name: name,
       arity: arity,
       doc: doc || nil,
-      signature: "#{name}/#{arity}",
+      signature: get_typespec_signature(hd(specs), arity),
       specs: specs,
       source: source_link(source_path, source_url, line),
       type: kind
     }
   end
 
-  defp get_signature(name, args) do
+  defp get_typespec_signature({:when, _, [{:::, _, [{name, meta, args}, _]}, _]}, arity) do
+    Macro.to_string {name, meta, strip_types(args, arity)}
+  end
+
+  defp get_typespec_signature({:::, _, [{name, meta, args}, _]}, arity) do
+    Macro.to_string {name, meta, strip_types(args, arity)}
+  end
+
+  defp get_typespec_signature({name, meta, args}, arity) do
+    Macro.to_string {name, meta, strip_types(args, arity)}
+  end
+
+  defp strip_types(args, arity) do
+    args
+    |> Enum.take(-arity)
+    |> Enum.with_index()
+    |> Enum.map(fn
+      {{:::, _, [left, _]}, i} -> to_var(left, i)
+      {left, i} -> to_var(left, i)
+    end)
+  end
+
+  defp to_var({name, meta, _}, _) when is_atom(name),
+    do: {name, meta, nil}
+  defp to_var(_, i),
+    do: {:"arg#{i}", [], nil}
+
+  defp get_call_signature(name, args) do
     cond do
       name in [:__aliases__, :__block__] ->
         "#{name}(args)"
       name in [:__ENV__, :__MODULE__, :__DIR__, :__CALLER__, :"%", :"%{}"] ->
         "#{name}"
       true ->
-        Macro.to_string {name, 0, args}
+        Macro.to_string {name, [], args}
     end
   end
 
@@ -293,7 +320,8 @@ defmodule ExDoc.Retriever do
         arity: arity,
         type: type,
         spec: spec,
-        doc: doc
+        doc: doc,
+        signature: get_typespec_signature(spec, arity)
       }
     end
   end

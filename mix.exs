@@ -10,8 +10,7 @@ defmodule ExDoc.Mixfile do
      package: package,
      source_url: "https://github.com/elixir-lang/ex_doc/",
      test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: [coveralls: :test],
-     build_per_environemnt: false]
+     preferred_cli_env: [coveralls: :test]]
   end
 
   defp deps do
