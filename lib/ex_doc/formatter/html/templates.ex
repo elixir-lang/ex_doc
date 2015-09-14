@@ -122,7 +122,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     overview_template: [:config, :modules, :exceptions, :protocols],
     extra_template: [:config, :modules, :exceptions, :protocols, :content],
     sidebar_template: [:config, :modules, :exceptions, :protocols],
-    summary_template: [:node],
+    summary_template: [:name, :nodes],
+    summary_item_template: [:node],
     type_detail_template: [:node, :_module],
     redirect_template: [:config, :redirect_to],
   ]
