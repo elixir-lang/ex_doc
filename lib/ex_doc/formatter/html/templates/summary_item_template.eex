@@ -1,0 +1,8 @@
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#<%=h node.id %>"><%=h node.signature %></a>
+  </div>
+  <%= if node.doc do %>
+    <div class="summary-synopsis"><%= to_html(synopsis(node.doc)) %></div>
+  <% end %>
+</div>

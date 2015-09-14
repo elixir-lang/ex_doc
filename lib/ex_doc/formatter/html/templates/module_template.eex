@@ -20,12 +20,13 @@
         </section>
       <% end %>
 
-      <%= unless Enum.empty?(functions) and Enum.empty?(macros) do %>
+      <%= unless Enum.empty?(types) and Enum.empty?(functions) and Enum.empty?(macros) and Enum.empty?(callbacks) do %>
         <section id="summary_details" class="details-list">
           <h1 id="summary" class="section-heading">Summary</h1>
-          <div class="summary">
-            <%= for node <- Enum.sort(functions ++ macros, &(&1.id <= &2.id)), do: summary_template(node) %>
-          </div>
+          <%= summary_template "types", types %>
+          <%= summary_template "functions", functions %>
+          <%= summary_template "macros", macros %>
+          <%= summary_template "callbacks", callbacks %>
         </section>
       <% end %>
 
@@ -35,7 +36,6 @@
           <div class="types-list">
             <%= for node <- types, do: type_detail_template(node, module) %>
           </div>
-
         </section>
       <% end %>
 
