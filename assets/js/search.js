@@ -48,7 +48,7 @@ function findNested (elements, parentId, matcher) {
 }
 
 export function findIn (elements, matcher) {
-  return elements.map(function (element) {
+  return (elements || []).map(function (element) {
     var id = element.id
     var idMatch = id && id.match(matcher)
     var functionMatches = findNested(element.functions, id, matcher)
