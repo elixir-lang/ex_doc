@@ -7,8 +7,15 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "node_modules/.bin/gulp lint",
+    "test": "node_modules/.bin/gulp test",
+    "build": "node_modules/.bin/gulp build --type production"
   },
+  "pre-commit": [
+    "lint",
+    "test",
+    "build"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/elixir-lang/ex_doc.git"
@@ -63,6 +70,7 @@
     "mocha": "^2.2.5",
     "normalize.css": "^3.0.3",
     "run-sequence": "^1.1.2",
-    "webpack": "^1.11.0"
+    "webpack": "^1.11.0",
+    "pre-commit": "^1.1.1"
   }
 }
