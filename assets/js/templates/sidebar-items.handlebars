@@ -1,4 +1,4 @@
-<ul id="full_list">
+<ul id="full-list">
 {{#each this as |node nodeId|}}
   {{#isLocal node.id}}
     <li class="node clicked">
@@ -23,11 +23,11 @@
     {{#showSummary node}}
     <ul>
       <li class="docs">
-        <a href="#summary_details" class="doclink">Summary</a>
+        <a href="#summary-details" class="doclink">Summary</a>
       </li>
       {{#if node.types}}
         <li class="docs">
-          <a href="#types_details" class="doclink">Types</a>
+          <a href="#types-details" class="doclink">Types</a>
           <ul class="types-list deflist">
             {{#each node.types}}
               <li>
@@ -39,7 +39,7 @@
       {{/if}}
       {{#if node.functions}}
         <li class="docs">
-          <a href="#functions_details" class="doclink">Functions</a>
+          <a href="#functions-details" class="doclink">Functions</a>
           <ul class="functions-list deflist">
             {{#each node.functions}}
               <li>
@@ -51,7 +51,7 @@
       {{/if}}
       {{#if node.macros}}
         <li class="docs">
-          <a href="#macros_details" class="doclink">Macros</a>
+          <a href="#macros-details" class="doclink">Macros</a>
           <ul class="macros-list deflist">
             {{#each node.macros}}
               <li>
@@ -63,7 +63,7 @@
       {{/if}}
       {{#if node.callbacks}}
         <li class="docs">
-          <a href="#callbacks_details" class="doclink">Callbacks</a>
+          <a href="#callbacks-details" class="doclink">Callbacks</a>
           <ul class="callbacks-list deflist">
             {{#each node.callbacks}}
               <li>

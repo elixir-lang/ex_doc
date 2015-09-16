@@ -5,11 +5,11 @@
 ```
 body
   section#sidebar [.in-search]
-    h1#full_list_header
+    h1#full-list_header
     h2#sub_list_header
     div#nav
     div#search [.loading] > input#search_field
-    ul#full_list
+    ul#full-list
       li.node [.collapsed, .search-uncollapsed, .found]
         a.object-link
         span.node-name
@@ -28,7 +28,7 @@ body
     section.docstring#moduledoc
     a.view-source
 
-    section.details-list#summary_details
+    section.details-list#summary-details
       h1
       table.summary
         tr
@@ -36,13 +36,13 @@ body
           td.summary-synopsis > p
         ...
 
-    section.details-list#types_details
+    section.details-list#types-details
       h1
       div.type-detail
         p.typespec > a
       ...
 
-    section.details-list#functions_details
+    section.details-list#functions-details
       h1
       section.detail
         div.detail-header

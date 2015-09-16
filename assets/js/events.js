@@ -13,9 +13,9 @@ import sidebarItemsTemplate from './templates/sidebar-items.handlebars'
 // ---------
 
 var SIDEBAR_TYPES = [
-  '#modules_list',
-  '#exceptions_list',
-  '#protocols_list'
+  '#modules-list',
+  '#exceptions-list',
+  '#protocols-list'
 ]
 var SIDEBAR_NAV = $('.sidebar-listNav')
 var CONTENT = $('.content')
@@ -31,13 +31,13 @@ function setupSelected (id) {
 }
 
 function collapse () {
-  $('#full_list > li.node:not(.clicked)').each(function () {
+  $('#full-list > li.node:not(.clicked)').each(function () {
     $(this).addClass('collapsed').next('li.docs').addClass('collapsed')
   })
 
   // Scroll list to the selected one
-  var $fullList = $('#full_list')
-  var $clicked = $('#full_list .clicked')
+  var $fullList = $('#full-list')
+  var $clicked = $('#full-list .clicked')
   if ($clicked.length > 0) {
     $fullList.scrollTop(
       $clicked.offset().top - $fullList.offset().top - 40
@@ -58,7 +58,7 @@ function collapse () {
 function fillSidebarWithNodes (nodes, filter) {
   function scope (items) {
     var filtered = nodes[items]
-    var fullList = $('#full_list')
+    var fullList = $('#full-list')
     fullList.replaceWith(sidebarItemsTemplate(filtered))
   }
 
@@ -68,9 +68,9 @@ function fillSidebarWithNodes (nodes, filter) {
   scope(filter)
   setupSelected(['#', filter, '_list'].join(''))
 
-  var $docLinks = $('#full_list .doclink')
-  var $docItems = $('#full_list .docs')
-  var $defItems = $('#full_list .deflist > li')
+  var $docLinks = $('#full-list .doclink')
+  var $docItems = $('#full-list .docs')
+  var $defItems = $('#full-list .deflist > li')
 
   function handleAnchor (e) {
     e.preventDefault()
@@ -86,10 +86,10 @@ function fillSidebarWithNodes (nodes, filter) {
     })
   }
 
-  $('#full_list .node.clicked > a').on('click', handleAnchor)
+  $('#full-list .node.clicked > a').on('click', handleAnchor)
   $docLinks.on('click', handleAnchor)
 
-  $('#full_list .node.clicked .deflink').on('click', e => {
+  $('#full-list .node.clicked .deflink').on('click', e => {
     e.preventDefault()
 
     var $target = $(event.target)
@@ -113,9 +113,9 @@ function createHandler (name) {
 }
 
 function addEventListeners () {
-  SIDEBAR_NAV.on('click', '#modules_list', createHandler('modules'))
-  SIDEBAR_NAV.on('click', '#exceptions_list', createHandler('exceptions'))
-  SIDEBAR_NAV.on('click', '#protocols_list', createHandler('protocols'))
+  SIDEBAR_NAV.on('click', '#modules-list', createHandler('modules'))
+  SIDEBAR_NAV.on('click', '#exceptions-list', createHandler('exceptions'))
+  SIDEBAR_NAV.on('click', '#protocols-list', createHandler('protocols'))
 
   $('.sidebar-search input').on('keyup', function (e) {
     if (e.which === 13) { // enter key maps to 13
@@ -138,11 +138,11 @@ function identifyCurrentHash () {
   const nodes = sidebarNodes[helpers.getModuleType()]
   const category = helpers.findSidebarCategory(nodes, hash.replace(/^#/, ''))
 
-  $(`#full_list .clicked a[href="#${category}_details"]`)
+  $(`#full-list .clicked a[href="#${category}-details"]`)
     .closest('li')
     .addClass('active')
 
-  $(`#full_list .clicked a[href="${hash}"]`)
+  $(`#full-list .clicked a[href="${hash}"]`)
     .closest('li')
     .addClass('active')
 
