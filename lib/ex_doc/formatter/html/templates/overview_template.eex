@@ -5,32 +5,32 @@
 
       <ul class="summary-links">
         <%= unless Enum.empty?(modules) do %>
-          <li><a href="#modules-summary">Modules</a></li>
+          <li><a href="#modules">Modules</a></li>
         <% end %>
         <%= unless Enum.empty?(exceptions) do %>
-          <li><a href="#exceptions-summary">Exceptions</a></li>
+          <li><a href="#exceptions">Exceptions</a></li>
         <% end %>
         <%= unless Enum.empty?(protocols) do %>
-          <li><a href="#protocols-summary">Protocols</a></li>
+          <li><a href="#protocols">Protocols</a></li>
         <% end %>
       </ul>
 
       <%= unless Enum.empty?(modules) do %>
-        <h1 id="modules-summary" class="section-heading">Modules summary</h1>
+        <h1 id="modules" class="section-heading">Modules summary</h1>
         <div class="summary">
           <%= for node <- modules, do: overview_entry_template(node) %>
         </div>
       <% end %>
 
       <%= unless Enum.empty?(exceptions) do %>
-        <h1 id="exceptions-summary" class="section-heading">Exceptions summary</h1>
+        <h1 id="exceptions" class="section-heading">Exceptions summary</h1>
         <div class="summary">
           <%= for node <- exceptions, do: overview_entry_template(node) %>
         </div>
       <% end %>
 
       <%= unless Enum.empty?(protocols) do %>
-        <h1 id="protocols-summary" class="section-heading">Protocols summary</h1>
+        <h1 id="protocols" class="section-heading">Protocols summary</h1>
         <div class="summary">
           <%= for node <- protocols, do: overview_entry_template(node) %>
         </div>

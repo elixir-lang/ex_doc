@@ -1,7 +1,7 @@
 <%= unless Enum.empty?(nodes) do %>
   <div class="summary-<%= name %> summary">
     <h2>
-      <a href="#<%= name %>-details"><%= String.capitalize name %></a>
+      <a href="#<%= name %>"><%= String.capitalize name %></a>
     </h2>
     <%= for node <- Enum.sort(nodes), do: summary_item_template(node) %>
   </div>

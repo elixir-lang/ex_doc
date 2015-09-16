@@ -138,7 +138,7 @@ function identifyCurrentHash () {
   const nodes = sidebarNodes[helpers.getModuleType()]
   const category = helpers.findSidebarCategory(nodes, hash.replace(/^#/, ''))
 
-  $(`#full-list .clicked a[href="#${category}-details"]`)
+  $(`#full-list .clicked a[href="#${category}"]`)
     .closest('li')
     .addClass('active')
 

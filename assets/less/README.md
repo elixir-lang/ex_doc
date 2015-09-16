@@ -28,7 +28,7 @@ body
     section.docstring#moduledoc
     a.view-source
 
-    section.details-list#summary-details
+    section.details-list#summary
       h1
       table.summary
         tr
@@ -36,13 +36,13 @@ body
           td.summary-synopsis > p
         ...
 
-    section.details-list#types-details
+    section.details-list#types
       h1
       div.type-detail
         p.typespec > a
       ...
 
-    section.details-list#functions-details
+    section.details-list#functions
       h1
       section.detail
         div.detail-header
