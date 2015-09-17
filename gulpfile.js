@@ -30,6 +30,22 @@ var autoprefixPlugin = new LessPluginAutoPrefix({
   browsers: ['last 2 versions']
 })
 
+var languages = [
+  'bash',
+  'coffeescript',
+  'css',
+  'diff',
+  'elixir',
+  'erlang',
+  'erlang-repl',
+  'xml',
+  'http',
+  'javascript',
+  'json',
+  'markdown',
+  'sql'
+]
+
 // Tasks
 // -----
 
@@ -39,7 +55,7 @@ gulp.task('buildHighlight', function (done) {
   }, function (err, stdout, stderr) {
     if (err) return done(err)
 
-    exec('node tools/build.js -n elixir', {
+    exec('node tools/build.js -n ' + languages.join(' '), {
       cwd: './node_modules/highlight.js'
     }, function (err, stdout, stderr) {
       if (err) return done(err)
