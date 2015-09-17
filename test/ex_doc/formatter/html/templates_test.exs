@@ -64,13 +64,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
     content = Templates.create_sidebar_items(%{modules: nodes})
 
-    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*}ms
-    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"functions\".*\"example/2\".*}ms
-    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"macros\".*\"example_1/0\".*}ms
-    assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"functions\".*\"example_without_docs/0\".*}ms
-    assert content =~ ~r{.*"CompiledWithDocs.Nested\"}ms
-    refute content =~ ~r{.*\"exceptions\":}ms
-    refute content =~ ~r{.*\"protocols\":}ms
+    assert content =~ ~r("modules":\[\{"id":"CompiledWithDocs")ms
+    assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example/2")ms
+    assert content =~ ~r("id":"CompiledWithDocs".*"macros":.*"example_1/0")ms
+    assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example_without_docs/0")ms
+    assert content =~ ~r("id":"CompiledWithDocs.Nested")ms
   end
 
   test "listing page has README link if present" do
