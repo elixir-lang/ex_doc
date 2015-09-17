@@ -7,22 +7,9 @@
     <i class="fa fa-bars"></i>
   </button>
 
-  <%= if url = config.homepage_url || config.source_url do %>
-    <a href="<%= url %>" class="sidebar-projectLink">
-      <div class="sidebar-projectDetails">
-        <h1 class="sidebar-projectName">
-          <%= config.project %>
-        </h1>
-        <h2 class="sidebar-projectVersion">
-          v<%= config.version %>
-        </h2>
-      </div>
-      <%= if config.logo do %>
-        <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
-      <% end %>
-    </a>
-  <% else %>
-    <div class="sidebar-projectDetails sidebar-projectLink">
+  <% url = config.homepage_url || "#{config.main}.html" %>
+  <a href="<%= url %>" class="sidebar-projectLink">
+    <div class="sidebar-projectDetails">
       <h1 class="sidebar-projectName">
         <%= config.project %>
       </h1>
@@ -33,7 +20,7 @@
     <%= if config.logo do %>
       <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
     <% end %>
-  <% end %>
+  </a>
 
   <div class="sidebar-search">
     <i class="fa fa-search"></i>

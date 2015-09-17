@@ -59,19 +59,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{<li role="presentation" class="disabled">Protocols</li>}
   end
 
-  test "site title text links to source_url when there is no homepage_url" do
-    doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                                                  source_url: source_url,
-                                                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [])
-    assert content =~ ~r{<a href="#{source_url}" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
-  end
-
-  test "site title text creates no link when there is no homepage_url or source_url" do
-    doc_config_without_source_url = %ExDoc.Config{project: "Elixir", version: "1.0.1", source_root: File.cwd!,
-                                                  source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}"}
-    content = Templates.sidebar_template(doc_config_without_source_url, [], [], [])
-    assert content =~ ~r{<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>}
+  test "site title text links to main when there is no homepage_url" do
+    config = %ExDoc.Config{project: "Elixir", version: "1.0.1",
+                           source_root: File.cwd!, main: "hello",}
+    content = Templates.sidebar_template(config, [], [], [])
+    assert content =~ ~r{<a href="hello.html" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
   end
 
   test "list_page outputs listing for the given nodes" do
