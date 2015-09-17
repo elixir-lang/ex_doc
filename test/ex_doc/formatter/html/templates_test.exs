@@ -74,7 +74,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   test "listing page has README link if present" do
     config = Map.put(doc_config, :extras, ["README.md"])
     content = Templates.sidebar_template(config, [], [], [])
-    assert content =~ ~r{<a href="README.html">README</a>}
   end
 
   test "listing page doesn't have README link if not present" do

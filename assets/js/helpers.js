@@ -32,7 +32,7 @@ export function getModuleType () {
   if (type && (type === 'exception' || type === 'protocol')) {
     type = type + 's' // pluralize 'exception' or 'protocol'
   } else {
-    type = 'modules'
+    type = 'extras'
   }
 
   return type
