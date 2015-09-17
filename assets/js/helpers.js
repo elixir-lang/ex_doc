@@ -27,13 +27,7 @@ export function saveFind (selector) {
 }
 
 export function getModuleType () {
-  let type = $('.content h1 small').text()
-
-  if (type && (type === 'exception' || type === 'protocol')) {
-    type = type + 's' // pluralize 'exception' or 'protocol'
-  } else {
-    type = 'extras'
-  }
+  const type = $('body').data('type') || 'extras'
 
   return type
 }

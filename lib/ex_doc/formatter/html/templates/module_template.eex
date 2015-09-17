@@ -1,4 +1,4 @@
-    <%= head_template(config, %{id: :module, module: module.id}) %>
+    <%= head_template(config, %{id: :module, module: module.id, type: module.type}) %>
     <%= alias ExDoc.Formatter.HTML, as: H %>
     <%= sidebar_template(config, H.filter_list(:modules, all), H.filter_list(:exceptions, all), H.filter_list(:protocols, all)) %>
 

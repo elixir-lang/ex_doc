@@ -20,4 +20,4 @@
     <link rel="stylesheet" href="dist/app.css" />
     <script src="dist/sidebar_items.js"></script>
   </head>
-  <body>
+  <body <%= if Map.has_key?(page, :type) do %>data-type="<%= dir_type(page.type) %>"<% end %> >

@@ -129,6 +129,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp extra_path(path), do: Path.rootname(Path.basename(path))
 
+  defp dir_type(:protocol), do: "protocols"
+  defp dir_type(:exception), do: "exceptions"
+  defp dir_type(:extra), do: "extras"
+  defp dir_type(_), do: "modules"
+
   templates = [
     detail_template: [:node, :_module],
     footer_template: [],
