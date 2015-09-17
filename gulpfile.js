@@ -12,6 +12,7 @@ var LessPluginNpmImport = require('less-plugin-npm-import')
 var LessPluginAutoPrefix = require('less-plugin-autoprefix')
 var Server = require('karma').Server
 var webpack = require('webpack-stream')
+var exec = require('child_process').exec
 
 var config = require('./assets/webpack.config')
 
@@ -32,11 +33,27 @@ var autoprefixPlugin = new LessPluginAutoPrefix({
 // Tasks
 // -----
 
+gulp.task('buildHighlight', function (done) {
+  exec('npm install', {
+    cwd: './node_modules/highlight.js'
+  }, function (err, stdout, stderr) {
+    if (err) return done(err)
+
+    exec('node tools/build.js -n elixir', {
+      cwd: './node_modules/highlight.js'
+    }, function (err, stdout, stderr) {
+      if (err) return done(err)
+
+      done()
+    })
+  })
+})
+
 gulp.task('clean', function () {
   return del(distPath)
 })
 
-gulp.task('javascript', function () {
+gulp.task('javascript', ['buildHighlight'], function () {
   return gulp.src('assets/js/app.js')
     .pipe(webpack(isProduction ? config.production : config.development))
     .pipe($.if(isProduction, $.uglify()))
@@ -44,7 +61,7 @@ gulp.task('javascript', function () {
     .pipe(gulp.dest(distPath))
 })
 
-gulp.task('javascript-watch', function () {
+gulp.task('javascript-watch', ['buildHighlight'], function () {
   config.development.watch = true
 
   return gulp.src('assets/js/app.js')
