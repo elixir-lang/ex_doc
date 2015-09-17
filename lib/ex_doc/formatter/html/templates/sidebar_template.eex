@@ -49,21 +49,15 @@
   </ul>
 
   <ul class="sidebar-listNav">
-    <%= if Enum.empty?(modules) do %>
-      <li role="presentation" class="disabled">Modules</li>
-    <% else %>
+    <%= unless Enum.empty?(modules) do %>
       <li><a id="modules_list" href="#full_list">Modules</a></li>
     <% end %>
 
-    <%= if Enum.empty?(exceptions) do %>
-      <li role="presentation" class="disabled">Exceptions</li>
-    <% else %>
+    <%= unless Enum.empty?(exceptions) do %>
       <li><a id="exceptions_list" href="#full_list">Exceptions</a></li>
     <% end %>
 
-    <%= if Enum.empty?(protocols) do %>
-      <li role="presentation" class="disabled">Protocols</li>
-    <% else %>
+    <%= unless Enum.empty?(protocols) do %>
       <li><a id="protocols_list" href="#full_list">Protocols</a></li>
     <% end %>
   </ul>
