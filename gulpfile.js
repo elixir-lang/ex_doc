@@ -32,7 +32,6 @@ var autoprefixPlugin = new LessPluginAutoPrefix({
 
 var languages = [
   'bash',
-  'coffeescript',
   'css',
   'diff',
   'elixir',
