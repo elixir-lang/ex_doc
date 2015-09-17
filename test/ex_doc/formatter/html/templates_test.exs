@@ -62,7 +62,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   test "list_page outputs listing for the given nodes" do
     names = [CompiledWithDocs, CompiledWithDocs.Nested]
     nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
-    content = Templates.create_sidebar_items([%{id: "modules", value: nodes}])
+    content = Templates.create_sidebar_items(%{modules: nodes})
 
     assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*}ms
     assert content =~ ~r{.*\"id\":\s*\"CompiledWithDocs\".*\"functions\".*\"example/2\".*}ms

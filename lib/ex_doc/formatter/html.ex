@@ -27,11 +27,11 @@ defmodule ExDoc.Formatter.HTML do
       config = process_logo_metadata(config)
     end
 
-    generate_extras(output, module_nodes, modules, exceptions, protocols, config)
+    extras = generate_extras(output, module_nodes, modules, exceptions, protocols, config)
     generate_index(output, config)
     generate_overview(modules, exceptions, protocols, output, config)
     generate_not_found(modules, exceptions, protocols, output, config)
-    generate_sidebar_items(modules, exceptions, protocols, output)
+    generate_sidebar_items(modules, exceptions, protocols, extras, output)
     generate_list(modules, all, output, config)
     generate_list(exceptions, all, output, config)
     generate_list(protocols, all, output, config)
@@ -63,10 +63,9 @@ defmodule ExDoc.Formatter.HTML do
     :ok = File.write("#{output}/404.html", content)
   end
 
-  defp generate_sidebar_items(modules, exceptions, protocols, output) do
-    nodes = [%{id: "modules", value: modules},
-             %{id: "exceptions", value: exceptions},
-             %{id: "protocols", value: protocols}]
+  defp generate_sidebar_items(modules, exceptions, protocols, extras, output) do
+    nodes = %{modules: modules, protocols: protocols,
+              exceptions: exceptions, extras: extras}
     content = Templates.create_sidebar_items(nodes)
     :ok = File.write("#{output}/dist/sidebar_items.js", content)
   end
@@ -89,11 +88,13 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_extras(output, module_nodes, modules, exceptions, protocols, config) do
-    config.extras
-    |> Enum.map(&Task.async(fn ->
-        generate_extra(&1, output, module_nodes, modules, exceptions, protocols, config)
-       end))
-    |> Enum.map(&Task.await/1)
+    extras =
+      config.extras
+      |> Enum.map(&Task.async(fn ->
+          generate_extra(&1, output, module_nodes, modules, exceptions, protocols, config)
+         end))
+      |> Enum.map(&Task.await/1)
+    [{"overview", []}|extras]
   end
 
   defp generate_extra(input, output, module_nodes, modules, exceptions, protocols, config) do
@@ -113,14 +114,34 @@ defmodule ExDoc.Formatter.HTML do
       html =
         config
         |> Map.put(:title, file_name)
-        |> Templates.extra_template(modules, exceptions, protocols, content)
+        |> Templates.extra_template(modules, exceptions, protocols, link_headers(content))
         |> pretty_codeblocks
 
       File.write!("#{output}/#{file_name}.html", html)
-      file_name
+      {file_name, extract_headers(content)}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
+  end
+
+  @h2_regex ~r/\n##([^#].*)\n/
+
+  defp extract_headers(content) do
+    Regex.scan(@h2_regex, content, capture: :all_but_first)
+    |> List.flatten
+    |> Enum.map(&{&1, header_to_id(&1)})
+  end
+
+  defp link_headers(content) do
+    Regex.replace(@h2_regex, content, fn _, part ->
+      "<h2 id=#{inspect header_to_id(part)}>#{part}</h2>"
+    end)
+  end
+
+  defp header_to_id(header) do
+    header
+    |> String.strip
+    |> String.replace(~r/\W+/, "-")
   end
 
   defp process_logo_metadata(config) do

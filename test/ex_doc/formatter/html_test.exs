@@ -122,11 +122,14 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{.*"CustomProtocol\".*}ms
   end
 
-  test "run generates empty listing files" do
+  test "run generates empty listing files only with extras" do
     generate_docs(doc_config(source_root: "unknown", source_beam: "unknown"))
 
     content = File.read!("#{output_dir}/dist/sidebar_items.js")
-    assert content == ~s(sidebarNodes={"modules":[],"exceptions":[],"protocols":[]})
+    assert content =~ ~s("modules":[])
+    assert content =~ ~s("exceptions":[])
+    assert content =~ ~s("protocols":[])
+    assert content =~ ~s("extras":[{"id":"overview","headers":[]},{"id":"README","headers":[{"id":" Header sample","anchor":"Header-sample"}]}])
   end
 
   test "run generates the overview file" do
@@ -148,6 +151,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     content = File.read!("#{output_dir}/README.html")
     assert content =~ ~r{<a href="README.html">README</a>}
     assert content =~ ~r{<title>README [^<]*</title>}
+    assert content =~ ~r{<h2 id="Header-sample"> Header sample</h2>}
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code>TypesAndSpecs.Sub</code></a>}
