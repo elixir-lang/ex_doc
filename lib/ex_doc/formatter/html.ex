@@ -27,7 +27,7 @@ defmodule ExDoc.Formatter.HTML do
       config = process_logo_metadata(config)
     end
 
-    generate_extras(output, module_nodes, config, modules, exceptions, protocols)
+    generate_extras(output, module_nodes, modules, exceptions, protocols, config)
     generate_index(output, config)
     generate_overview(modules, exceptions, protocols, output, config)
     generate_not_found(modules, exceptions, protocols, output, config)
@@ -88,32 +88,36 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  defp generate_extras(output, module_nodes, config, modules, exceptions, protocols) do
+  defp generate_extras(output, module_nodes, modules, exceptions, protocols, config) do
     config.extras
-    |> Enum.map(&Task.async(fn -> generate_extra(&1, output, module_nodes, config, modules, exceptions, protocols) end))
+    |> Enum.map(&Task.async(fn ->
+        generate_extra(&1, output, module_nodes, modules, exceptions, protocols, config)
+       end))
     |> Enum.map(&Task.await/1)
   end
 
-  defp generate_extra(input, output, module_nodes, config, modules, exceptions, protocols) do
-    file_extname =
+  defp generate_extra(input, output, module_nodes, modules, exceptions, protocols, config) do
+    file_ext =
       input
       |> Path.extname
       |> String.downcase
 
-    if file_extname in [".md"] do
-      file_name =
-        input
-        |> Path.basename(".md")
-        |> String.upcase
+    if file_ext in [".md"] do
+      file_name = Path.rootname(Path.basename(input))
 
       content =
         input
         |> File.read!
         |> Autolink.project_doc(module_nodes)
 
-      config = Map.put(config, :title, file_name)
-      extra_html = Templates.extra_template(config, modules, exceptions, protocols, content) |> pretty_codeblocks
-      File.write!("#{output}/#{file_name}.html", extra_html)
+      html =
+        config
+        |> Map.put(:title, file_name)
+        |> Templates.extra_template(modules, exceptions, protocols, content)
+        |> pretty_codeblocks
+
+      File.write!("#{output}/#{file_name}.html", html)
+      file_name
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end

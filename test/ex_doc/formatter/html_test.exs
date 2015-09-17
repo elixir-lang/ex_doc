@@ -139,13 +139,14 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates the readme file" do
-    config = doc_config([main: "README", ])
+    config = doc_config([main: "README"])
     generate_docs(config)
 
     content = File.read!("#{output_dir}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=README.html">}
 
     content = File.read!("#{output_dir}/README.html")
+    assert content =~ ~r{<a href="README.html">README</a>}
     assert content =~ ~r{<title>README [^<]*</title>}
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}

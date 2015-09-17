@@ -110,7 +110,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp logo_path(%{logo: nil}), do: nil
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
 
-  defp extra_title(path), do: path |> String.upcase |> Path.basename(".MD")
+  defp extra_path(path), do: Path.rootname(Path.basename(path))
 
   templates = [
     detail_template: [:node, :_module],

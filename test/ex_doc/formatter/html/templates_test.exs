@@ -38,14 +38,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{<a href="#{homepage_url}" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
   end
 
-  test "Disable nav links when module type is empty" do
-    content = Templates.sidebar_template(doc_config, [], [], [])
-    assert content =~ ~r{<li role="presentation" class="disabled">Modules</li>}
-    assert content =~ ~r{<li role="presentation" class="disabled">Exceptions</li>}
-    assert content =~ ~r{<li role="presentation" class="disabled">Protocols</li>}
-  end
-
-  test "Enable nav link when module type have at least one element" do
+  test "enables nav link when module type have at least one element" do
     names = [CompiledWithDocs, CompiledWithDocs.Nested]
     nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
     all = HTML.Autolink.all(nodes)
@@ -55,8 +48,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     content = Templates.sidebar_template(doc_config, modules, exceptions, protocols)
     assert content =~ ~r{<li><a id="modules_list" href="#full_list">Modules</a></li>}
-    assert content =~ ~r{<li role="presentation" class="disabled">Exceptions</li>}
-    assert content =~ ~r{<li role="presentation" class="disabled">Protocols</li>}
+    refute content =~ ~r{<li><a id="exceptions_list" href="#full_list">Exceptions</a></li>}
+    refute content =~ ~r{<li><a id="protocols_list" href="#full_list">Protocols</a></li>}
   end
 
   test "site title text links to main when there is no homepage_url" do
