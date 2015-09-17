@@ -2,8 +2,8 @@
   "excoveralls": {:hex, :excoveralls, "0.3.11"},
   "exjsx": {:hex, :exjsx, "3.2.0"},
   "hackney": {:hex, :hackney, "1.3.2"},
-  "hoedown": {:git, "git://github.com/hoedown/hoedown.git", "2a4cf17c70e6572ed42cdca3ea7ca3e768ed17be", []},
+  "hoedown": {:git, "https://github.com/hoedown/hoedown.git", "2a4cf17c70e6572ed42cdca3ea7ca3e768ed17be", []},
   "idna": {:hex, :idna, "1.0.2"},
   "jsx": {:hex, :jsx, "2.6.2"},
-  "markdown": {:git, "git://github.com/devinus/markdown.git", "cd0df79b6f1cc374499d47f6ba6aaab5096f874f", []},
+  "markdown": {:git, "https://github.com/devinus/markdown.git", "cd0df79b6f1cc374499d47f6ba6aaab5096f874f", []},
   "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"}}

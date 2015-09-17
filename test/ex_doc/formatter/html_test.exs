@@ -45,13 +45,13 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     assert File.regular?("#{output_dir}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
+
     content = File.read!("#{output_dir}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html">}
   end
 
   test "check headers for index.html and module pages" do
-    generate_docs doc_config([main: "RandomError"])
-
+    generate_docs doc_config(main: "RandomError")
     content_index  = File.read!("#{output_dir}/index.html")
     content_module = File.read!("#{output_dir}/RandomError.html")
 
@@ -95,7 +95,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates in specified output directory and redirect index.html file" do
-    config = doc_config([output: "#{output_dir}/another_dir", main: "RandomError"])
+    config = doc_config(output: "#{output_dir}/another_dir", main: "RandomError")
     generate_docs(config)
 
     assert File.regular?("#{output_dir}/another_dir/CompiledWithDocs.html")
@@ -122,6 +122,13 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{.*"CustomProtocol\".*}ms
   end
 
+  test "run generates empty listing files" do
+    generate_docs(doc_config(source_root: "unknown", source_beam: "unknown"))
+
+    content = File.read!("#{output_dir}/dist/sidebar_items.js")
+    assert content == ~s(sidebarNodes={"modules":[],"exceptions":[],"protocols":[]})
+  end
+
   test "run generates the overview file" do
     generate_docs(doc_config)
 
@@ -146,7 +153,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run should not generate the readme file" do
-    generate_docs(doc_config([extras: []]))
+    generate_docs(doc_config(extras: []))
     refute File.regular?("#{output_dir}/README.html")
     content = File.read!("#{output_dir}/index.html")
     refute content =~ ~r{<title>README [^<]*</title>}
@@ -171,23 +178,21 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run normalizes options" do
     # 1. Check for output dir having trailing "/" stripped
     # 2. Check for default [main: "overview"]
-    generate_docs doc_config([output: "#{output_dir}//", main: nil])
+    generate_docs doc_config(output: "#{output_dir}//", main: nil)
 
     content = File.read!("#{output_dir}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html">}
     assert File.regular?("#{output_dir}/overview.html")
-  end
 
-  test "run generates trying to set 'main: index', should fail" do
+    # 3. main as index is not allowed
     config = doc_config([main: "index"])
     assert_raise ArgumentError,
                  "\"main\" cannot be set to \"index\", otherwise it will recursively link to itself",
                  fn -> generate_docs(config) end
-    assert {:ok, []} == File.ls "#{output_dir}"
   end
 
-  test "run should fails when logo is not an allowed format" do
-    config = doc_config([logo: "README.md"])
+  test "run fails when logo is not an allowed format" do
+    config = doc_config(logo: "README.md")
     assert_raise ArgumentError,
                  "image format not recognized, allowed formats are: .jpg, .png",
                  fn -> generate_docs(config) end

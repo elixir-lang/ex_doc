@@ -64,14 +64,16 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_sidebar_items(modules, exceptions, protocols, output) do
-    input = for node <- [%{id: "modules", value: modules}, %{id: "exceptions", value: exceptions}, %{id: "protocols", value: protocols}], !Enum.empty?(node.value), do: node
-    content = Templates.create_sidebar_items(input)
+    nodes = [%{id: "modules", value: modules},
+             %{id: "exceptions", value: exceptions},
+             %{id: "protocols", value: protocols}]
+    content = Templates.create_sidebar_items(nodes)
     :ok = File.write("#{output}/dist/sidebar_items.js", content)
   end
 
   defp assets do
-    [{ templates_path("dist/*.{css,js}"), "dist" },
-     { templates_path("fonts/*.{eot,svg,ttf,woff,woff2}"), "fonts" }]
+    [{templates_path("dist/*.{css,js}"), "dist"},
+     {templates_path("fonts/*.{eot,svg,ttf,woff,woff2}"), "fonts"}]
   end
 
   defp generate_assets(output, _config) do

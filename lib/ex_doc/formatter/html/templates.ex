@@ -62,42 +62,42 @@ defmodule ExDoc.Formatter.HTML.Templates do
     end
   end
 
-  defp sidebar_items_object(node) do
-    ~s{"id":"#{node.id}","anchor":"#{h link_id(node)}"}
-  end
-
-  defp sidebar_items_by_type({type, node}) do
-    objects = node |> Enum.map_join("},{", &(sidebar_items_object(&1)))
-    ~s/"#{type}":[{#{objects}}]/
-  end
-
-  defp sidebar_items_entry(node) do
-    if Enum.empty?(node.docs) do
-      ~s/"id":"#{node.id}"/
-    else
-      types =
-        group_types(node)
-        |> Enum.reject(fn {_type, entries} -> entries == [] end)
-        |> Enum.map_join(",", &sidebar_items_by_type(&1))
-      ~s/"id":"#{node.id}",#{types}/
-    end
+  @spec create_sidebar_items(list) :: String.t
+  def create_sidebar_items(input) do
+    object =
+      input
+      |> Enum.into([], &sidebar_items_keys/1)
+      |> Enum.join(",")
+    "sidebarNodes={#{object}}"
   end
 
   defp sidebar_items_keys(node) do
     keys =
       node.value
-      |> Enum.into([], &(sidebar_items_entry(&1)))
-      |> Enum.join("},{")
-    ~s/"#{node.id}":[{#{keys}}]/
+      |> Enum.into([], &sidebar_items_entry/1)
+      |> Enum.join(",")
+    ~s/"#{node.id}":[#{keys}]/
   end
 
-  @spec create_sidebar_items(list) :: String.t
-  def create_sidebar_items(input) do
-    object =
-      input
-      |> Enum.into([], &(sidebar_items_keys(&1)))
-      |> Enum.join(",")
-    "sidebarNodes={#{object}}"
+  defp sidebar_items_entry(node) do
+    if Enum.empty?(node.docs) do
+      ~s/{"id":"#{node.id}"}/
+    else
+      types =
+        group_types(node)
+        |> Enum.reject(fn {_type, entries} -> entries == [] end)
+        |> Enum.map_join(",", &sidebar_items_by_type/1)
+      ~s/{"id":"#{node.id}",#{types}}/
+    end
+  end
+
+  defp sidebar_items_by_type({type, node}) do
+    objects = node |> Enum.map_join(",", &sidebar_items_object/1)
+    ~s/"#{type}":[#{objects}]/
+  end
+
+  defp sidebar_items_object(node) do
+    ~s/{"id":"#{node.id}","anchor":"#{h link_id(node)}"}/
   end
 
   defp group_types(node) do
