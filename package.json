@@ -52,7 +52,7 @@
     "gulp-watch": "^4.3.4",
     "handlebars": "^4.0.2",
     "handlebars-loader": "^1.1.0",
-    "highlightjs": "^8.7.0",
+    "highlight.js": "isagalaev/highlight.js#8.8.0",
     "jquery": "^2.1.4",
     "karma": "^0.13.8",
     "karma-chai-plugins": "^0.6.0",
