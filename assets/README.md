@@ -14,7 +14,7 @@ $ npm install -g gulp
 $ npm install
 ```
 
-Now the following tasks are available
+Now many gulp tasks are available via the `gulp` command line.
 
 ## Available [gulp] tasks
 
@@ -37,7 +37,6 @@ for details.
 ### `javascript`
 
 Build the JavaScript in `js` into a bundled file using [webpack].
-
 
 ### `javascript-watch`
 
