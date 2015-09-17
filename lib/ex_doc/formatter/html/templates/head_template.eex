@@ -11,6 +11,8 @@
         <title><%= config.title %> – <%= config.project %> v<%= config.version %></title>
       <%= page.id == :overview -> %>
         <title>Overview – <%= config.project %> v<%= config.version %></title>
+      <%= page.id == :not_found -> %>
+        <title>404 – <%= config.project %> v<%= config.version %></title>
     <% end %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v<%= ExDoc.version %>">
