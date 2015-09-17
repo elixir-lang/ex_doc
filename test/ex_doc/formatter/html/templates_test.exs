@@ -47,9 +47,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     protocols  = HTML.filter_list(:protocols, all)
 
     content = Templates.sidebar_template(doc_config, modules, exceptions, protocols)
-    assert content =~ ~r{<li><a id="modules_list" href="#full-list">Modules</a></li>}
-    refute content =~ ~r{<li><a id="exceptions_list" href="#full-list">Exceptions</a></li>}
-    refute content =~ ~r{<li><a id="protocols_list" href="#full-list">Protocols</a></li>}
+    assert content =~ ~r{<li><a id="modules-list" href="#full-list">Modules</a></li>}
+    refute content =~ ~r{<li><a id="exceptions-list" href="#full-list">Exceptions</a></li>}
+    refute content =~ ~r{<li><a id="protocols-list" href="#full-list">Protocols</a></li>}
   end
 
   test "site title text links to main when there is no homepage_url" do
