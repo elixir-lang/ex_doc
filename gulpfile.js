@@ -95,7 +95,10 @@ gulp.task('less', function () {
       ]
     }))
     .pipe($.plumber())
-    .pipe($.if(isProduction, $.minifyCss({compatibility: 'ie8'})))
+    .pipe($.if(isProduction, $.minifyCss({
+      compatibility: 'ie8',
+      processImport: false
+    })))
     .pipe($.size({title: 'less'}))
     .pipe(gulp.dest(distPath))
 })
