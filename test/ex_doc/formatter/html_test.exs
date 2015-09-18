@@ -44,7 +44,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
 
     content = File.read!("#{output_dir}/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html">}
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=extras-api-reference.html">}
   end
 
   test "check headers for index.html and module pages" do
@@ -107,16 +107,17 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config)
 
     content = File.read!("#{output_dir}/dist/sidebar_items.js")
-    assert content =~ ~r{.*"CompiledWithDocs\".*}ms
-    assert content =~ ~r{.*"CompiledWithDocs\".*\"example/2\".*}ms
-    assert content =~ ~r{.*"CompiledWithDocs.Nested\".*}ms
-    assert content =~ ~r{.*"UndefParent\.Nested\".*}ms
-    assert content =~ ~r{.*"CustomBehaviourOne\".*}ms
-    assert content =~ ~r{.*"CustomBehaviourTwo\".*}ms
-    refute content =~ ~r{UndefParent\.Undocumented}ms
+    assert content =~ ~r{"id":"CompiledWithDocs\"}ms
+    assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example/2")ms
+    assert content =~ ~r{"id":"CompiledWithDocs\.Nested"}ms
 
-    assert content =~ ~r{.*"RandomError\".*}ms
-    assert content =~ ~r{.*"CustomProtocol\".*}ms
+    assert content =~ ~r{"id":"UndefParent\.Nested"}ms
+    refute content =~ ~r{"id":"UndefParent\.Undocumented"}ms
+
+    assert content =~ ~r{"id":"CustomBehaviourOne"}ms
+    assert content =~ ~r{"id":"CustomBehaviourTwo"}ms
+    assert content =~ ~r{"id":"RandomError"}ms
+    assert content =~ ~r{"id":"CustomProtocol"}ms
   end
 
   test "run generates empty listing files only with extras" do
@@ -126,13 +127,14 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~s("modules":[])
     assert content =~ ~s("exceptions":[])
     assert content =~ ~s("protocols":[])
-    assert content =~ ~s("extras":[{"id":"overview","headers":[]},{"id":"README","headers":[{"id":" Header sample","anchor":"Header-sample"}]}])
+    assert content =~ ~s("extras":[{"id":"extras-api-reference","title":"API Reference","headers":[]},)
+    assert content =~ ~s({"id":"extras-README","title":"README","headers":[{"id":" Header sample","anchor":"Header-sample"}]})
   end
 
-  test "run generates the overview file" do
+  test "run generates the api reference file" do
     generate_docs(doc_config)
 
-    content = File.read!("#{output_dir}/overview.html")
+    content = File.read!("#{output_dir}/extras-api-reference.html")
     assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
     assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
@@ -145,7 +147,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     content = File.read!("#{output_dir}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=README.html">}
 
-    content = File.read!("#{output_dir}/README.html")
+    content = File.read!("#{output_dir}/extras-README.html")
     assert content =~ ~r{<title>README [^<]*</title>}
     assert content =~ ~r{<h2 id="Header-sample"> Header sample</h2>}
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
@@ -162,12 +164,12 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   test "run normalizes options" do
     # 1. Check for output dir having trailing "/" stripped
-    # 2. Check for default [main: "overview"]
+    # 2. Check for default [main: "extras-api-reference"]
     generate_docs doc_config(output: "#{output_dir}//", main: nil)
 
     content = File.read!("#{output_dir}/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=overview.html">}
-    assert File.regular?("#{output_dir}/overview.html")
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=extras-api-reference.html">}
+    assert File.regular?("#{output_dir}/extras-api-reference.html")
 
     # 3. main as index is not allowed
     config = doc_config([main: "index"])

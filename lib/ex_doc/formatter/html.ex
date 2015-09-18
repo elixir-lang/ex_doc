@@ -4,7 +4,7 @@ defmodule ExDoc.Formatter.HTML do
   alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Formatter.HTML.Autolink
 
-  @main "overview"
+  @main "extras-api-reference"
 
   @doc """
   Generate HTML documentation for the given modules
@@ -27,11 +27,13 @@ defmodule ExDoc.Formatter.HTML do
       config = process_logo_metadata(config)
     end
 
+    generate_api_reference(modules, exceptions, protocols, output, config)
     extras = generate_extras(output, module_nodes, modules, exceptions, protocols, config)
+
     generate_index(output, config)
-    generate_overview(modules, exceptions, protocols, output, config)
     generate_not_found(modules, exceptions, protocols, output, config)
     generate_sidebar_items(modules, exceptions, protocols, extras, output)
+
     generate_list(modules, modules, exceptions, protocols, output, config)
     generate_list(exceptions, modules, exceptions, protocols, output, config)
     generate_list(protocols, modules, exceptions, protocols, output, config)
@@ -39,23 +41,20 @@ defmodule ExDoc.Formatter.HTML do
     Path.join(config.output, "index.html")
   end
 
-  # Builds `config` by setting default values and checking for non-valid ones.
-  @spec normalize_config(%ExDoc.Config{}) :: %ExDoc.Config{}
-  defp normalize_config(config) when is_map(config) do
-    if config.main == "index" do
-      raise ArgumentError, message: "\"main\" cannot be set to \"index\", otherwise it will recursively link to itself"
-    end
-
-    Map.put(config, :main, config.main || @main)
+  defp normalize_config(%{main: "index"}) do
+    raise ArgumentError, message: "\"main\" cannot be set to \"index\", otherwise it will recursively link to itself"
+  end
+  defp normalize_config(%{main: main} = config) do
+    %{config | main: main || @main}
   end
 
   defp generate_index(output, config) do
     generate_redirect(output, "index.html", config, "#{config.main}.html")
   end
 
-  defp generate_overview(modules, exceptions, protocols, output, config) do
-    content = Templates.overview_template(config, modules, exceptions, protocols)
-    File.write!("#{output}/overview.html", content)
+  defp generate_api_reference(modules, exceptions, protocols, output, config) do
+    content = Templates.api_reference_template(config, modules, exceptions, protocols)
+    File.write!("#{output}/extras-api-reference.html", content)
   end
 
   defp generate_not_found(modules, exceptions, protocols, output, config) do
@@ -94,7 +93,7 @@ defmodule ExDoc.Formatter.HTML do
           generate_extra(&1, output, module_nodes, modules, exceptions, protocols, config)
          end))
       |> Enum.map(&Task.await/1)
-    [{"overview", []}|extras]
+    [{"extras-api-reference", "API Reference", []}|extras]
   end
 
   defp generate_extra(input, output, module_nodes, modules, exceptions, protocols, config) do
@@ -104,26 +103,25 @@ defmodule ExDoc.Formatter.HTML do
       |> String.downcase
 
     if file_ext in [".md"] do
-      file_name = Path.rootname(Path.basename(input))
+      title = Path.rootname(Path.basename(input))
+      file_name = "extras-" <> String.replace(title, " ", "-")
 
       content =
         input
         |> File.read!
         |> Autolink.project_doc(module_nodes)
 
-      html =
-        config
-        |> Map.put(:title, file_name)
-        |> Templates.extra_template(modules, exceptions, protocols, link_headers(content))
+      html = Templates.extra_template(config, title, modules,
+                                      exceptions, protocols, link_headers(content))
 
       File.write!("#{output}/#{file_name}.html", html)
-      {file_name, extract_headers(content)}
+      {file_name, title, extract_headers(content)}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
   end
 
-  @h2_regex ~r/\n##([^#].*)\n/
+  @h2_regex ~r/^##([^#].*)$/m
 
   defp extract_headers(content) do
     Regex.scan(@h2_regex, content, capture: :all_but_first)

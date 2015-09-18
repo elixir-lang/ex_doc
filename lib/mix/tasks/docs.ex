@@ -39,8 +39,9 @@ defmodule Mix.Tasks.Docs do
   * `:source_ref` - the branch/commit/tag used for source link inference.
     Ignored if `:source_url_pattern` is provided; default: master.
 
-  * `:main` - main page of the documentation. It may be a module or a generated page,
-    like "overview" or "readme"; default: "overview" when --formatter is "html".
+  * `:main` - main page of the documentation. It may be a module or a
+    generated page, like "Plug" or "extras-api-reference";
+    default: "extras-api-reference" when --formatter is "html".
 
   * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
     The image size will be 64x64 when --formatter is "html".
@@ -69,15 +70,16 @@ defmodule Mix.Tasks.Docs do
       options = Keyword.put(options, :source_url, source_url)
     end
 
+    main    = options[:main]
     options =
       cond do
-        is_nil(options[:main]) ->
-          Keyword.put(options, :main, "overview")
+        is_nil(main) ->
+          Keyword.delete(options, :main)
 
-        is_atom(options[:main]) ->
-          Keyword.update!(options, :main, &inspect/1)
+        is_atom(main) ->
+          Keyword.put(options, :main, inspect(main))
 
-        is_binary(options[:main]) ->
+        is_binary(main)->
           options
       end
 

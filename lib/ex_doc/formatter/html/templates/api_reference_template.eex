@@ -1,0 +1,43 @@
+<%= head_template(config, %{title: "API Reference", type: :extra}) %>
+<%= sidebar_template(config, modules, exceptions, protocols) %>
+  <h1>API Reference</h1>
+
+  <ul class="summary-links">
+    <%= unless Enum.empty?(modules) do %>
+      <li><a href="#modules">Modules</a></li>
+    <% end %>
+    <%= unless Enum.empty?(exceptions) do %>
+      <li><a href="#exceptions">Exceptions</a></li>
+    <% end %>
+    <%= unless Enum.empty?(protocols) do %>
+      <li><a href="#protocols">Protocols</a></li>
+    <% end %>
+  </ul>
+
+  <%= unless Enum.empty?(modules) do %>
+    <section id="modules" class="details-list">
+      <h1 class="section-heading">Modules</h1>
+      <div class="summary">
+        <%= for node <- modules, do: api_reference_entry_template(node) %>
+      </div>
+    </section>
+  <% end %>
+
+  <%= unless Enum.empty?(exceptions) do %>
+    <section id="exceptions" class="details-list">
+      <h1 class="section-heading">Exceptions</h1>
+      <div class="summary">
+        <%= for node <- exceptions, do: api_reference_entry_template(node) %>
+      </div>
+    </section>
+  <% end %>
+
+  <%= unless Enum.empty?(protocols) do %>
+    <section id="protocols" class="details-list">
+      <h1 class="section-heading">Protocols</h1>
+      <div class="summary">
+        <%= for node <- protocols, do: api_reference_entry_template(node) %>
+      </div>
+    </section>
+  <% end %>
+<%= footer_template %>

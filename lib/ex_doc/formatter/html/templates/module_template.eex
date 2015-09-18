@@ -1,4 +1,4 @@
-    <%= head_template(config, %{id: :module, module: module.id, type: module.type}) %>
+    <%= head_template(config, %{title: module.id, type: module.type}) %>
     <%= sidebar_template(config, modules, exceptions, protocols) %>
 
       <h1>

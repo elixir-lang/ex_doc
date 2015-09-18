@@ -7,9 +7,9 @@
     to the top of the page itself. --}}
 
     {{#isLocal node.id}}
-      <a href="#content" title="{{node.id}}" class="object-link">{{node.id}}</a>
+      <a href="#content" title="{{node.title}}" class="object-link">{{node.title}}</a>
     {{else}}
-      <a href="{{node.id}}.html" title="{{node.id}}" class="object-link">{{node.id}}</a>
+      <a href="{{node.id}}.html" title="{{node.title}}" class="object-link">{{node.title}}</a>
     {{/isLocal}}
 
     {{!-- Extra pages --}}

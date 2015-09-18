@@ -88,22 +88,22 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~s/"#{id}":[#{keys}]/
   end
 
-  defp sidebar_items_extra({id, headers}) do
+  defp sidebar_items_extra({id, title, headers}) do
     headers = Enum.map_join(headers, ",", fn {header, anchor} ->
       sidebar_items_object(header, anchor)
     end)
-    ~s/{"id":"#{id}","headers":[#{headers}]}/
+    ~s/{"id":"#{h id}","title":"#{h title}","headers":[#{headers}]}/
   end
 
   defp sidebar_items_node(node) do
     if Enum.empty?(node.docs) do
-      ~s/{"id":"#{node.id}"}/
+      ~s/{"id":"#{node.id}","title":"#{node.id}"}/
     else
       types =
         group_types(node)
         |> Enum.reject(fn {_type, entries} -> entries == [] end)
         |> Enum.map_join(",", &sidebar_items_by_type/1)
-      ~s/{"id":"#{node.id}",#{types}}/
+      ~s/{"id":"#{node.id}","title":"#{node.id}",#{types}}/
     end
   end
 
@@ -141,9 +141,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     module_template: [:config, :module, :types, :functions, :macros, :callbacks,
                       :modules, :exceptions, :protocols],
     not_found_template: [:config, :modules, :exceptions, :protocols],
-    overview_entry_template: [:node],
-    overview_template: [:config, :modules, :exceptions, :protocols],
-    extra_template: [:config, :modules, :exceptions, :protocols, :content],
+    api_reference_entry_template: [:node],
+    api_reference_template: [:config, :modules, :exceptions, :protocols],
+    extra_template: [:config, :title, :modules, :exceptions, :protocols, :content],
     sidebar_template: [:config, :modules, :exceptions, :protocols],
     summary_template: [:name, :nodes],
     summary_item_template: [:node],

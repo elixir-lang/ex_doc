@@ -4,16 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <%= cond do %>
-      <%= page.id == :module -> %>
-        <title><%= page.module %> – <%= config.project %> v<%= config.version %></title>
-      <%= page.id == :extra -> %>
-        <title><%= config.title %> – <%= config.project %> v<%= config.version %></title>
-      <%= page.id == :overview -> %>
-        <title>Overview – <%= config.project %> v<%= config.version %></title>
-      <%= page.id == :not_found -> %>
-        <title>404 – <%= config.project %> v<%= config.version %></title>
-    <% end %>
+    <title><%= page.title %> – <%= config.project %> v<%= config.version %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v<%= ExDoc.version %>">
     <link href="http://fonts.googleapis.com/css?family=Lato:400,300,700,900|Merriweather:300italic,300,700,700italic|Inconsolata:400,700" rel="stylesheet" type="text/css">

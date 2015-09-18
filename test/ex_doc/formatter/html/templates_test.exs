@@ -33,11 +33,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   ## LISTING
 
-  test "site title text links to homepage_url when set" do
-    content = Templates.sidebar_template(doc_config, [], [], [])
-    assert content =~ ~r{<a href="#{homepage_url}" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
-  end
-
   test "enables nav link when module type have at least one element" do
     names   = [CompiledWithDocs, CompiledWithDocs.Nested]
     nodes   = ExDoc.Retriever.docs_from_modules(names, doc_config)
@@ -47,6 +42,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{<li><a id="modules-list" href="#full-list">Modules</a></li>}
     refute content =~ ~r{<li><a id="exceptions-list" href="#full-list">Exceptions</a></li>}
     refute content =~ ~r{<li><a id="protocols-list" href="#full-list">Protocols</a></li>}
+  end
+
+  test "site title text links to homepage_url when set" do
+    content = Templates.sidebar_template(doc_config, [], [], [])
+    assert content =~ ~r{<a href="#{homepage_url}" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
   end
 
   test "site title text links to main when there is no homepage_url" do
@@ -61,7 +61,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
     content = Templates.create_sidebar_items(%{modules: nodes})
 
-    assert content =~ ~r("modules":\[\{"id":"CompiledWithDocs")ms
+    assert content =~ ~r("modules":\[\{"id":"CompiledWithDocs","title":"CompiledWithDocs")ms
     assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example/2")ms
     assert content =~ ~r("id":"CompiledWithDocs".*"macros":.*"example_1/0")ms
     assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example_without_docs/0")ms
