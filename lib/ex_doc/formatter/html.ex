@@ -1,5 +1,7 @@
 defmodule ExDoc.Formatter.HTML do
-  @moduledoc false
+  @moduledoc """
+  Generate HTML documentation for Elixir projects
+  """
 
   alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Formatter.HTML.Autolink
@@ -16,7 +18,7 @@ defmodule ExDoc.Formatter.HTML do
     File.rm_rf! output
     :ok = File.mkdir_p output
 
-    generate_assets(output, config)
+    assets |> templates_path |> generate_assets(output)
 
     all = Autolink.all(module_nodes)
     modules    = filter_list(:modules, all)
@@ -70,14 +72,19 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp assets do
-    [{templates_path("dist/*.{css,js}"), "dist"},
-     {templates_path("fonts/*.{eot,svg,ttf,woff,woff2}"), "fonts"}]
+    [{"dist/*.{css,js}", "dist"},
+     {"fonts/*.{eot,svg,ttf,woff,woff2}", "fonts"}]
   end
 
-  defp generate_assets(output, _config) do
-    Enum.each assets, fn({ pattern, dir }) ->
+  # TODO: decouple EPUB/HTML
+  @doc """
+  Copy a list of assets into a given directory
+  """
+  @spec generate_assets(list, String.t) :: :ok
+  def generate_assets(source, output) do
+    Enum.each source, fn({ pattern, dir }) ->
       output = "#{output}/#{dir}"
-      File.mkdir output
+      File.mkdir! output
 
       Enum.map Path.wildcard(pattern), fn(file) ->
         base = Path.basename(file)
@@ -189,7 +196,9 @@ defmodule ExDoc.Formatter.HTML do
     File.write!("#{output}/#{node.id}.html", content)
   end
 
-  defp templates_path(other) do
-    Path.expand("html/templates/#{other}", __DIR__)
+  defp templates_path(patterns) do
+    Enum.into(patterns, [], fn {pattern, dir} ->
+      {Path.expand("html/templates/#{pattern}", __DIR__), dir}
+    end)
   end
 end
