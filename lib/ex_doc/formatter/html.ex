@@ -7,21 +7,6 @@ defmodule ExDoc.Formatter.HTML do
   @main "overview"
 
   @doc """
-  Helper to handle plain code blocks (```...```) with and without
-  language specification and indentation code blocks
-  """
-  def pretty_codeblocks(bin) do
-    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>\s*iex&gt;/,
-                        # Add "elixir" class for now, until we have support for
-                        # "iex" in highlight.js
-                        bin, "<pre><code class=\"iex elixir\">iex&gt;")
-    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>/,
-                        bin, "<pre><code class=\"elixir\">")
-
-    bin
-  end
-
-  @doc """
   Generate HTML documentation for the given modules
   """
   @spec run(list, %ExDoc.Config{}) :: String.t
@@ -130,7 +115,6 @@ defmodule ExDoc.Formatter.HTML do
         config
         |> Map.put(:title, file_name)
         |> Templates.extra_template(modules, exceptions, protocols, link_headers(content))
-        |> pretty_codeblocks
 
       File.write!("#{output}/#{file_name}.html", html)
       {file_name, extract_headers(content)}

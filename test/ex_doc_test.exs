@@ -1,5 +1,5 @@
 defmodule ExDocTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   # Simple retriever that returns whatever is passed into it
   defmodule IdentityRetriever do
@@ -38,42 +38,6 @@ defmodule ExDocTest do
     assert source_dir == options[:source_beam]
   end
 
-  defp run(args) do
-    ExDoc.CLI.run(args, &{&1, &2, &3})
-  end
-
-  test "minimum command-line options" do
-    assert {"ExDoc", "1.2.3", [extras: [], source_beam: "/"]} == run(["ExDoc", "1.2.3", "/"])
-  end
-
-  test "command-line config" do
-    File.write!("test.config", ~s([key: "val"]))
-
-    {project, version, opts} = run(["ExDoc", "--extra", "README.md", "1.2.3", "...", "-c", "test.config"])
-
-    assert project == "ExDoc"
-    assert version == "1.2.3"
-    assert Enum.sort(opts) == [extras: ["README.md"], formatter_opts: [key: "val"], source_beam: "..."]
-  after
-    File.rm!("test.config")
-  end
-
-  test "command-line config does not exists" do
-    assert_raise RuntimeError,
-                 "Could not load config. No such file: test.config",
-                 fn -> run(["ExDoc", "1.2.3", "...", "-c", "test.config"]) end
-  end
-
-  test "command-line config must be a keyword list" do
-    File.write!("test.config", ~s(%{"extras" => "README.md"}))
-
-    assert_raise RuntimeError,
-                 "Bad config. Expected a keyword list",
-                 fn -> run(["ExDoc", "1.2.3", "...", "-c", "test.config"]) end
-  after
-    File.rm!("test.config")
-  end
-
   test "formatter module not found" do
     project = "Elixir"
     version = "1"
@@ -88,5 +52,4 @@ defmodule ExDocTest do
   test "version" do
     assert ExDoc.version =~ ~r{\d+\.\d+\.\d+} 
   end
-
 end

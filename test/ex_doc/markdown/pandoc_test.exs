@@ -1,4 +1,4 @@
-defmodule MarkdownTest.PandocTest do
+defmodule ExDoc.Markdown.PandocTest do
   use ExUnit.Case, async: true
 
   alias ExDoc.Markdown.Pandoc, as: Markdown

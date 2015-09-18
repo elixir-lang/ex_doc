@@ -42,14 +42,11 @@ defmodule ExDoc.CLI do
   end
 
   defp read_config(path) do
-    config_str = case File.read(path) do
-      {:ok, str} -> str
-      _ -> raise "Could not load config. No such file: #{path}"
-    end
+    config = File.read!(path)
+    {result, _} = Code.eval_string(config)
 
-    {result, _} = Code.eval_string(config_str)
     unless is_list(result) do
-      raise "Bad config. Expected a keyword list"
+      raise "expected a keyword list from config file: #{inspect path}"
     end
 
     result
@@ -79,9 +76,9 @@ defmodule ExDoc.CLI do
       PROJECT             Project name
       VERSION             Version number
       BEAMS               Path to compiled beam files
+      -c, --config        Give configuration through a file instead of command line
       -o, --output        Path to output docs, default: "doc"
       -f, --formatter     Docs formatter to use, default: "html"
-      -c, --config        Path to the formatter's config file
       -r, --source-root   Path to the source code root, default: "."
       -u, --source-url    URL to the source code
           --source-ref    Branch/commit/tag used for source link inference, default: "master"

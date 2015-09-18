@@ -1,13 +1,10 @@
 defmodule ExDoc.Formatter.HTMLTest do
   use ExUnit.Case
 
-  alias ExDoc.Formatter.HTML
-
   setup do
     {:ok, _} = File.rm_rf(output_dir)
     :ok = File.mkdir(output_dir)
     {:ok, []} = File.ls(output_dir)
-
     :ok
   end
 
@@ -161,22 +158,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute File.regular?("#{output_dir}/README.html")
     content = File.read!("#{output_dir}/index.html")
     refute content =~ ~r{<title>README [^<]*</title>}
-  end
-
-  test "make markdown codeblocks pretty" do
-    with_empty_class = "<pre><code class=\"\">mix run --no-halt path/to/file.exs"
-    without_class = "<pre><code>mix run --no-halt path/to/file.exs"
-    iex_detected_with_empty_class = "<pre><code class=\"\">iex&gt; max(4, 5)"
-    iex_detected_without_class = "<pre><code>iex&gt; max(4, 5)"
-
-    assert HTML.pretty_codeblocks(with_empty_class) ==
-           "<pre><code class=\"elixir\">mix run --no-halt path/to/file.exs"
-    assert HTML.pretty_codeblocks(without_class) ==
-           "<pre><code class=\"elixir\">mix run --no-halt path/to/file.exs"
-    assert HTML.pretty_codeblocks(iex_detected_with_empty_class) ==
-          "<pre><code class=\"iex elixir\">iex&gt; max(4, 5)"
-    assert HTML.pretty_codeblocks(iex_detected_without_class) ==
-          "<pre><code class=\"iex elixir\">iex&gt; max(4, 5)"
   end
 
   test "run normalizes options" do

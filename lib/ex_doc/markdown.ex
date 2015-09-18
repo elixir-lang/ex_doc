@@ -7,12 +7,26 @@ defmodule ExDoc.Markdown do
 
   @markdown_processor_key :markdown_processor
 
-  import ExDoc.Formatter.HTML, only: [pretty_codeblocks: 1]
-
+  @doc """
+  Converts the given markdown document to HTML.
+  """
   def to_html(text) when is_binary(text) do
-    text = get_markdown_processor().to_html(text) |> pretty_codeblocks
+    get_markdown_processor().to_html(text) |> pretty_codeblocks
+  end
 
-    text
+  @doc """
+  Helper to handle plain code blocks (```...```) with and without
+  language specification and indentation code blocks
+  """
+  def pretty_codeblocks(bin) do
+    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>\s*iex&gt;/,
+                        # Add "elixir" class for now, until we have support for
+                        # "iex" in highlight.js
+                        bin, "<pre><code class=\"iex elixir\">iex&gt;")
+    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>/,
+                        bin, "<pre><code class=\"elixir\">")
+
+    bin
   end
 
   defp get_markdown_processor() do
