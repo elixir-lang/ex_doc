@@ -1,12 +1,12 @@
 <div class="detail">
   <div class="detail-header" id="<%=h link_id(node) %>">
     <a href="#<%=h link_id(node) %>" class="detail-link" title="Link to this <%= pretty_type(node) %>">
-      <i class="fa fa-link"></i>
+      <i class="icon-link"></i>
     </a>
     <span class="signature"><%=h node.signature %></span>
       <%= if node.source do %>
       <a href="<%= node.source %>" class="view-source" rel="help" title="View Source">
-       <i class="fa fa-code"></i>
+       <i class="icon-code"></i>
      </a>
     <% end %>
   </div>

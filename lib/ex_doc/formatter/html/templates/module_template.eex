@@ -8,7 +8,7 @@
         <% end %>
         <%= if module.source do %>
           <a href="<%= module.source %>" title="View Source" class="view-source" rel="help">
-            <i class="fa fa-code"></i>
+            <i class="icon-code"></i>
           </a>
         <% end %>
       </h1>
