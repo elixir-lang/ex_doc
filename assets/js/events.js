@@ -13,6 +13,7 @@ import sidebarItemsTemplate from './templates/sidebar-items.handlebars'
 // ---------
 
 var SIDEBAR_TYPES = [
+  '#extras-list',
   '#modules-list',
   '#exceptions-list',
   '#protocols-list'
@@ -113,6 +114,7 @@ function createHandler (name) {
 }
 
 function addEventListeners () {
+  SIDEBAR_NAV.on('click', '#extras-list', createHandler('extras'))
   SIDEBAR_NAV.on('click', '#modules-list', createHandler('modules'))
   SIDEBAR_NAV.on('click', '#exceptions-list', createHandler('exceptions'))
   SIDEBAR_NAV.on('click', '#protocols-list', createHandler('protocols'))

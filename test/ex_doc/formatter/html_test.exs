@@ -149,7 +149,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=README.html">}
 
     content = File.read!("#{output_dir}/README.html")
-    assert content =~ ~r{<a href="README.html">README</a>}
     assert content =~ ~r{<title>README [^<]*</title>}
     assert content =~ ~r{<h2 id="Header-sample"> Header sample</h2>}
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}

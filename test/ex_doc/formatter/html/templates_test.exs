@@ -71,17 +71,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r("id":"CompiledWithDocs.Nested")ms
   end
 
-  test "listing page has README link if present" do
-    config = Map.put(doc_config, :extras, ["README.md"])
-    content = Templates.sidebar_template(config, [], [], [])
-    assert content =~ ~r{<a href="README.html">README</a>}
-  end
-
-  test "listing page doesn't have README link if not present" do
-    content = Templates.sidebar_template(doc_config, [], [], [])
-    refute content =~ ~r{<a href="README.html">README</a>}
-  end
-
   ## MODULES
 
   test "module_page generates only the module name when there's no more info" do

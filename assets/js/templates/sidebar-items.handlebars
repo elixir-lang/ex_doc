@@ -1,14 +1,6 @@
 <ul id="full-list">
 {{#each this as |node nodeId|}}
-  {{#isLocal node.id}}
-    <li class="node clicked">
-  {{else}}
-    <li class="node">
-  {{/isLocal}}
-
-  {{#if node.docs}}
-    <a class="toggle"></a>
-  {{/if}}
+    <li class="node{{#isLocal node.id}} clicked{{/isLocal}}">
 
     {{!-- When visiting a module page, the link to this module page
     in the menu should not link to a new page, instead should link
@@ -19,6 +11,17 @@
     {{else}}
       <a href="{{node.id}}.html" title="{{node.id}}" class="object-link">{{node.id}}</a>
     {{/isLocal}}
+
+    {{!-- Extra pages --}}
+    {{#if node.headers}}
+      <ul>
+        {{#each node.headers}}
+          <li class="docs">
+            <a href="#{{{anchor}}}" class="doclink">{{id}}</a>
+          </li>
+        {{/each}}
+      </ul>
+    {{/if}}
 
     {{#showSummary node}}
     <ul>

@@ -27,15 +27,9 @@
     <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" results="0" />
   </div>
 
-  <ul class="sidebar-mainNav">
-    <li><a href="overview.html">Overview</a></li>
-
-    <%= for extra <- config.extras do %>
-      <li><a href="<%= extra_path(extra) %>.html"><%= extra_path(extra) %></a></li>
-    <%= end %>
-  </ul>
-
   <ul class="sidebar-listNav">
+    <li><a id="extras_list" href="#full_list">Pages</a></li>
+
     <%= unless Enum.empty?(modules) do %>
       <li><a id="modules-list" href="#full-list">Modules</a></li>
     <% end %>

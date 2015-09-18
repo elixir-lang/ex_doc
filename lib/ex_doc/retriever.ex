@@ -294,12 +294,12 @@ defmodule ExDoc.Retriever do
       function_exported?(module, :__struct__, 0) ->
         case module.__struct__ do
           %{__exception__: true} -> :exception
-          _ -> nil
+          _ -> :module
         end
       function_exported?(module, :__protocol__, 1) -> :protocol
       function_exported?(module, :__impl__, 1) -> :impl
       function_exported?(module, :behaviour_info, 1) -> :behaviour
-      true -> nil
+      true -> :module
     end
   end
 
