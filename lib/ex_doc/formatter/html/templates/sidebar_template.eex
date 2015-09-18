@@ -47,5 +47,5 @@
   <div class="sidebar-noResults"></div>
 </section>
 
-<section id="content" class="content">
-  <div class="content-inner">
+<section class="content">
+  <div id="content" class="content-inner">
