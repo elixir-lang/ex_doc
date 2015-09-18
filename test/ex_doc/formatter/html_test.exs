@@ -187,7 +187,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   test "Generate some assets" do
     output = doc_config[:output]
-    HTML.generate_assets([{"test/fixtures/elixir.png", "images"}], output)
+    ExDoc.Formatter.HTML.generate_assets([{"test/fixtures/elixir.png", "images"}], output)
 
     assert File.regular?("#{output}/images/elixir.png")
   end
