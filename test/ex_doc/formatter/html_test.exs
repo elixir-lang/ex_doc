@@ -184,4 +184,11 @@ defmodule ExDoc.Formatter.HTMLTest do
                  "image format not recognized, allowed formats are: .jpg, .png",
                  fn -> generate_docs(config) end
   end
+
+  test "Generate some assets" do
+    output = doc_config[:output]
+    HTML.generate_assets([{"test/fixtures/elixir.png", "images"}], output)
+
+    assert File.regular?("#{output}/images/elixir.png")
+  end
 end

@@ -74,6 +74,11 @@ defmodule ExDoc.Formatter.HTML do
      {"fonts/*.{eot,svg,ttf,woff,woff2}", "fonts"}]
   end
 
+  # TODO: decouple EPUB/HTML
+  @doc """
+  Copy a list of assets into a given directory
+  """
+  @spec generate_assets(list, String.t) :: :ok
   def generate_assets(source, output) do
     Enum.each source, fn({ pattern, dir }) ->
       output = "#{output}/#{dir}"
