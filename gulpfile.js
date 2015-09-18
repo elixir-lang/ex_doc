@@ -72,6 +72,7 @@ gulp.task('javascript', ['buildHighlight'], function () {
   return gulp.src('assets/js/app.js')
     .pipe(webpack(isProduction ? config.production : config.development))
     .pipe($.if(isProduction, $.uglify()))
+    .pipe($.if(isProduction, $.rev()))
     .pipe($.size({title: 'js'}))
     .pipe(gulp.dest(distPath))
 })
@@ -99,6 +100,7 @@ gulp.task('less', function () {
       compatibility: 'ie8',
       processImport: false
     })))
+    .pipe($.if(isProduction, $.rev()))
     .pipe($.size({title: 'less'}))
     .pipe(gulp.dest(distPath))
 })
