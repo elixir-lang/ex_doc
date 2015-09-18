@@ -5,7 +5,7 @@
 
 <p>Sorry, but the page you were trying to get to, does not exist. You
 may want to try searching this site using the sidebar or using our
-<a href="extras-api-reference.html" title="API Reference">API Reference</a> page to find what
+<a href="extra-api-reference.html" title="API Reference">API Reference</a> page to find what
 you were looking for.</p>
 
 <%= footer_template %>

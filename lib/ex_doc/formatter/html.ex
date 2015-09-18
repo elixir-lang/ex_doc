@@ -4,7 +4,7 @@ defmodule ExDoc.Formatter.HTML do
   alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Formatter.HTML.Autolink
 
-  @main "extras-api-reference"
+  @main "extra-api-reference"
 
   @doc """
   Generate HTML documentation for the given modules
@@ -54,7 +54,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_api_reference(modules, exceptions, protocols, output, config) do
     content = Templates.api_reference_template(config, modules, exceptions, protocols)
-    File.write!("#{output}/extras-api-reference.html", content)
+    File.write!("#{output}/extra-api-reference.html", content)
   end
 
   defp generate_not_found(modules, exceptions, protocols, output, config) do
@@ -93,7 +93,7 @@ defmodule ExDoc.Formatter.HTML do
           generate_extra(&1, output, module_nodes, modules, exceptions, protocols, config)
          end))
       |> Enum.map(&Task.await/1)
-    [{"extras-api-reference", "API Reference", []}|extras]
+    [{"extra-api-reference", "API Reference", []}|extras]
   end
 
   defp generate_extra(input, output, module_nodes, modules, exceptions, protocols, config) do
@@ -104,7 +104,7 @@ defmodule ExDoc.Formatter.HTML do
 
     if file_ext in [".md"] do
       title = Path.rootname(Path.basename(input))
-      file_name = "extras-" <> String.replace(title, " ", "-")
+      file_name = title_to_filename(title)
 
       content =
         input
@@ -133,6 +133,10 @@ defmodule ExDoc.Formatter.HTML do
     Regex.replace(@h2_regex, content, fn _, part ->
       "<h2 id=#{inspect header_to_id(part)}>#{part}</h2>"
     end)
+  end
+
+  defp title_to_filename(title) do
+    "extra-" <> (title |> String.replace(" ", "-") |> String.downcase)
   end
 
   defp header_to_id(header) do

@@ -44,7 +44,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir}/CompiledWithDocs.Nested.html")
 
     content = File.read!("#{output_dir}/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=extras-api-reference.html">}
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=extra-api-reference.html">}
   end
 
   test "check headers for index.html and module pages" do
@@ -127,14 +127,14 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~s("modules":[])
     assert content =~ ~s("exceptions":[])
     assert content =~ ~s("protocols":[])
-    assert content =~ ~s("extras":[{"id":"extras-api-reference","title":"API Reference","headers":[]},)
-    assert content =~ ~s({"id":"extras-README","title":"README","headers":[{"id":" Header sample","anchor":"Header-sample"}]})
+    assert content =~ ~s("extras":[{"id":"extra-api-reference","title":"API Reference","headers":[]},)
+    assert content =~ ~s({"id":"extra-readme","title":"README","headers":[{"id":" Header sample","anchor":"Header-sample"}]})
   end
 
   test "run generates the api reference file" do
     generate_docs(doc_config)
 
-    content = File.read!("#{output_dir}/extras-api-reference.html")
+    content = File.read!("#{output_dir}/extra-api-reference.html")
     assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
     assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
@@ -147,7 +147,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     content = File.read!("#{output_dir}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=README.html">}
 
-    content = File.read!("#{output_dir}/extras-README.html")
+    content = File.read!("#{output_dir}/extra-readme.html")
     assert content =~ ~r{<title>README [^<]*</title>}
     assert content =~ ~r{<h2 id="Header-sample"> Header sample</h2>}
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
@@ -164,12 +164,12 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   test "run normalizes options" do
     # 1. Check for output dir having trailing "/" stripped
-    # 2. Check for default [main: "extras-api-reference"]
+    # 2. Check for default [main: "extra-api-reference"]
     generate_docs doc_config(output: "#{output_dir}//", main: nil)
 
     content = File.read!("#{output_dir}/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=extras-api-reference.html">}
-    assert File.regular?("#{output_dir}/extras-api-reference.html")
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=extra-api-reference.html">}
+    assert File.regular?("#{output_dir}/extra-api-reference.html")
 
     # 3. main as index is not allowed
     config = doc_config([main: "index"])
