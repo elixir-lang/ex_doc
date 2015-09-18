@@ -8,9 +8,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(node, config, all) do
+  def module_page(node, modules, exceptions, protocols, config) do
     types = group_types(node)
-    module_template(config, node, types.types, types.functions, types.macros, types.callbacks, all)
+    module_template(config, node, types.types, types.functions, types.macros, types.callbacks,
+                    modules, exceptions, protocols)
   end
 
   # Get the full specs from a function, already in HTML form.
@@ -137,7 +138,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     detail_template: [:node, :_module],
     footer_template: [],
     head_template: [:config, :page],
-    module_template: [:config, :module, :types, :functions, :macros, :callbacks, :all],
+    module_template: [:config, :module, :types, :functions, :macros, :callbacks,
+                      :modules, :exceptions, :protocols],
     not_found_template: [:config, :modules, :exceptions, :protocols],
     overview_entry_template: [:node],
     overview_template: [:config, :modules, :exceptions, :protocols],

@@ -7,6 +7,21 @@ defmodule ExDoc.Formatter.HTML do
   @main "overview"
 
   @doc """
+  Helper to handle plain code blocks (```...```) with and without
+  language specification and indentation code blocks
+  """
+  def pretty_codeblocks(bin) do
+    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>\s*iex&gt;/,
+                        # Add "elixir" class for now, until we have support for
+                        # "iex" in highlight.js
+                        bin, "<pre><code class=\"iex elixir\">iex&gt;")
+    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>/,
+                        bin, "<pre><code class=\"elixir\">")
+
+    bin
+  end
+
+  @doc """
   Generate HTML documentation for the given modules
   """
   @spec run(list, %ExDoc.Config{}) :: String.t
@@ -32,9 +47,9 @@ defmodule ExDoc.Formatter.HTML do
     generate_overview(modules, exceptions, protocols, output, config)
     generate_not_found(modules, exceptions, protocols, output, config)
     generate_sidebar_items(modules, exceptions, protocols, extras, output)
-    generate_list(modules, all, output, config)
-    generate_list(exceptions, all, output, config)
-    generate_list(protocols, all, output, config)
+    generate_list(modules, modules, exceptions, protocols, output, config)
+    generate_list(exceptions, modules, exceptions, protocols, output, config)
+    generate_list(protocols, modules, exceptions, protocols, output, config)
 
     Path.join(config.output, "index.html")
   end
@@ -55,19 +70,19 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_overview(modules, exceptions, protocols, output, config) do
     content = Templates.overview_template(config, modules, exceptions, protocols)
-    :ok = File.write("#{output}/overview.html", content)
+    File.write!("#{output}/overview.html", content)
   end
 
   defp generate_not_found(modules, exceptions, protocols, output, config) do
     content = Templates.not_found_template(config, modules, exceptions, protocols)
-    :ok = File.write("#{output}/404.html", content)
+    File.write!("#{output}/404.html", content)
   end
 
   defp generate_sidebar_items(modules, exceptions, protocols, extras, output) do
     nodes = %{modules: modules, protocols: protocols,
               exceptions: exceptions, extras: extras}
     content = Templates.create_sidebar_items(nodes)
-    :ok = File.write("#{output}/dist/sidebar_items.js", content)
+    File.write!("#{output}/dist/sidebar_items.js", content)
   end
 
   defp assets do
@@ -160,54 +175,32 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_redirect(output, file_name, config, redirect_to) do
     content = Templates.redirect_template(config, redirect_to)
-    :ok = File.write("#{output}/#{file_name}", content)
+    File.write!("#{output}/#{file_name}", content)
   end
 
-  @doc false
-  # Helper to handle plain code blocks (```...```) with and without
-  # language specification and indentation code blocks
-  def pretty_codeblocks(bin) do
-    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>\s*iex&gt;/,
-                        # Add "elixir" class for now, until we have support for
-                        # "iex" in highlight.js
-                        bin, "<pre><code class=\"iex elixir\">iex&gt;")
-    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>/,
-                        bin, "<pre><code class=\"elixir\">")
-
-    bin
+  defp filter_list(:modules, nodes) do
+    Enum.filter nodes, &(not &1.type in [:exception, :protocol, :impl])
   end
 
-  @doc false
-  # Helper to split modules into different categories.
-  #
-  # Public so that code in Template can use it.
-  def categorize_modules(nodes) do
-    [modules: filter_list(:modules, nodes),
-     exceptions: filter_list(:exceptions, nodes),
-     protocols: filter_list(:protocols, nodes)]
+  defp filter_list(:exceptions, nodes) do
+    Enum.filter nodes, &(&1.type in [:exception])
   end
 
-  def filter_list(:modules, nodes) do
-    Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when not x in [:exception, :protocol, :impl], &1)
+  defp filter_list(:protocols, nodes) do
+    Enum.filter nodes, &(&1.type in [:protocol])
   end
 
-  def filter_list(:exceptions, nodes) do
-    Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:exception], &1)
-  end
-
-  def filter_list(:protocols, nodes) do
-    Enum.filter nodes, &match?(%ExDoc.ModuleNode{type: x} when x in [:protocol], &1)
-  end
-
-  defp generate_list(nodes, all, output, config) do
+  defp generate_list(nodes, modules, exceptions, protocols, output, config) do
     nodes
-    |> Enum.map(&Task.async(fn -> generate_module_page(&1, all, output, config) end))
+    |> Enum.map(&Task.async(fn ->
+        generate_module_page(&1, modules, exceptions, protocols, output, config)
+       end))
     |> Enum.map(&Task.await/1)
   end
 
-  defp generate_module_page(node, modules, output, config) do
-    content = Templates.module_page(node, config, modules)
-    File.write("#{output}/#{node.id}.html", content)
+  defp generate_module_page(node, modules, exceptions, protocols, output, config) do
+    content = Templates.module_page(node, modules, exceptions, protocols, config)
+    File.write!("#{output}/#{node.id}.html", content)
   end
 
   defp templates_path(other) do

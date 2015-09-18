@@ -28,7 +28,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
            |> ExDoc.Retriever.docs_from_modules(doc_config)
            |> HTML.Autolink.all()
 
-    Templates.module_page(hd(mods), doc_config, mods)
+    Templates.module_page(hd(mods), [], [], [], doc_config)
   end
 
   ## LISTING
@@ -39,14 +39,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   test "enables nav link when module type have at least one element" do
-    names = [CompiledWithDocs, CompiledWithDocs.Nested]
-    nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
-    all = HTML.Autolink.all(nodes)
-    modules    = HTML.filter_list(:modules, all)
-    exceptions = HTML.filter_list(:exceptions, all)
-    protocols  = HTML.filter_list(:protocols, all)
+    names   = [CompiledWithDocs, CompiledWithDocs.Nested]
+    nodes   = ExDoc.Retriever.docs_from_modules(names, doc_config)
+    modules = HTML.Autolink.all(nodes)
 
-    content = Templates.sidebar_template(doc_config, modules, exceptions, protocols)
+    content = Templates.sidebar_template(doc_config, modules, [], [])
     assert content =~ ~r{<li><a id="modules-list" href="#full-list">Modules</a></li>}
     refute content =~ ~r{<li><a id="exceptions-list" href="#full-list">Exceptions</a></li>}
     refute content =~ ~r{<li><a id="protocols-list" href="#full-list">Protocols</a></li>}
@@ -73,19 +70,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   ## MODULES
 
-  test "module_page generates only the module name when there's no more info" do
-    node = %ExDoc.ModuleNode{module: XPTOModule, moduledoc: nil, id: "XPTOModule", type: :module}
-    content = Templates.module_page(node, doc_config, [node])
-
-    assert content =~ ~r{<title>XPTOModule [^<]*</title>}
-    assert content =~ ~r{<h1>\s*XPTOModule\s*</h1>}
-  end
-
   test "module_page outputs the functions and docstrings" do
     content = get_module_page([CompiledWithDocs])
 
     assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
     assert content =~ ~r{<h1>\s*CompiledWithDocs\s*}
+    refute content =~ ~r{<small>module</small>}
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
