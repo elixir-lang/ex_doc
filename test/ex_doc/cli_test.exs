@@ -1,6 +1,8 @@
 defmodule ExDoc.CLITest do
   use ExUnit.Case, async: true
 
+  import ExUnit.CaptureIO
+
   defp run(args) do
     ExDoc.CLI.run(args, &{&1, &2, &3})
   end
@@ -35,4 +37,15 @@ defmodule ExDoc.CLITest do
   after
     File.rm!("test.config")
   end
+
+  test "version" do
+    assert capture_io( fn ->
+      run(["--version"])
+    end) == "ExDoc v#{ExDoc.version}\n"
+
+    assert capture_io( fn ->
+      run(["-v"])
+    end) == "ExDoc v#{ExDoc.version}\n"
+  end
+
 end

@@ -3,9 +3,22 @@ defmodule ExDoc.CLI do
     {opts, args, _} = OptionParser.parse(args,
                aliases: [o: :output, f: :formatter, c: :config, r: :source_root,
                          u: :source_url, m: :main, p: :homepage_url, l: :logo,
-                         e: :extra],
+                         e: :extra, v: :version],
                switches: [extra: :keep])
 
+    cond do
+      List.keymember?(opts, :version, 0) ->
+        do_version
+      true ->
+        do_generate(args, opts, generator)
+    end
+  end
+
+  defp do_version do
+    IO.puts "ExDoc v#{ExDoc.version}"
+  end
+
+  defp do_generate(args, opts, generator) do
     [project, version, source_beam] = parse_args(args)
 
     Code.prepend_path(source_beam)
@@ -53,11 +66,13 @@ defmodule ExDoc.CLI do
   end
 
   defp parse_args([_project, _version, _source_beam] = args), do: args
+
   defp parse_args([_, _, _ | _]) do
     IO.puts "Too many arguments.\n"
     print_usage()
     exit {:shutdown, 1}
   end
+
   defp parse_args(_) do
     IO.puts "Too few arguments.\n"
     print_usage()
@@ -90,6 +105,7 @@ defmodule ExDoc.CLI do
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)
                           The image size will be 64x64 when --formatter is "html"
                           default: `nil`
+      -v, --version       Print ExDoc version
 
     ## Source linking
 
