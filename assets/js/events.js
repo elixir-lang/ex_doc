@@ -151,6 +151,11 @@ function identifyCurrentHash () {
   helpers.scrollTo(CONTENT, helpers.saveFind(hash))
 }
 
+function fixLinks () {
+  CONTENT.find('a').has('code').addClass('no-underline')
+  CONTENT.find('a').has('img').addClass('no-underline')
+}
+
 // Public Methods
 // --------------
 
@@ -159,4 +164,5 @@ export function initialize () {
   addEventListeners()
   collapse()
   identifyCurrentHash()
+  fixLinks()
 }
