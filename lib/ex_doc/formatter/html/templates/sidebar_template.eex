@@ -37,19 +37,19 @@
 
   <ul class="sidebar-listNav">
     <%= unless Enum.empty?(modules) do %>
-      <li><a id="modules_list" href="#full_list">Modules</a></li>
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
     <% end %>
 
     <%= unless Enum.empty?(exceptions) do %>
-      <li><a id="exceptions_list" href="#full_list">Exceptions</a></li>
+      <li><a id="exceptions-list" href="#full-list">Exceptions</a></li>
     <% end %>
 
     <%= unless Enum.empty?(protocols) do %>
-      <li><a id="protocols_list" href="#full_list">Protocols</a></li>
+      <li><a id="protocols-list" href="#full-list">Protocols</a></li>
     <% end %>
   </ul>
 
-  <ul id="full_list" class="sidebar-fullList"></ul>
+  <ul id="full-list" class="sidebar-fullList"></ul>
   <div class="sidebar-noResults"></div>
 </section>
 
