@@ -67,7 +67,7 @@ function fillSidebarWithNodes (nodes, filter) {
 
   filter = filter || module_type
   scope(filter)
-  setupSelected(['#', filter, '_list'].join(''))
+  setupSelected(['#', filter, '-list'].join(''))
 
   var $docLinks = $('#full-list .doclink')
   var $docItems = $('#full-list .docs')

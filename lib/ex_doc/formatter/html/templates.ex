@@ -130,7 +130,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:protocol), do: "protocols"
   defp sidebar_type(:exception), do: "exceptions"
   defp sidebar_type(:extra), do: "extras"
-  defp sidebar_type(_), do: "modules"
+  defp sidebar_type(:module), do: "modules"
+  defp sidebar_type(:behaviour), do: "modules"
 
   templates = [
     detail_template: [:node, :_module],

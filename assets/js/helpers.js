@@ -27,9 +27,7 @@ export function saveFind (selector) {
 }
 
 export function getModuleType () {
-  const type = $('body').data('type') || 'extras'
-
-  return type
+  return $('body').data('type')
 }
 
 // Find out if the anchor belongs to either

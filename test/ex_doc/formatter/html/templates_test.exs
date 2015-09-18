@@ -74,7 +74,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   ## MODULES
 
   test "module_page generates only the module name when there's no more info" do
-    node = %ExDoc.ModuleNode{module: XPTOModule, moduledoc: nil, id: "XPTOModule"}
+    node = %ExDoc.ModuleNode{module: XPTOModule, moduledoc: nil, id: "XPTOModule", type: :module}
     content = Templates.module_page(node, doc_config, [node])
 
     assert content =~ ~r{<title>XPTOModule [^<]*</title>}

@@ -4,7 +4,7 @@
 
       <h1>
         <%= module.id %>
-        <%= if module.type do %>
+        <%= if module.type != :module do %>
           <small><%= module.type %></small>
         <% end %>
         <%= if module.source do %>
