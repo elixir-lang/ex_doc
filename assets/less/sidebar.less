@@ -9,7 +9,7 @@
 
   .sidebar-toggle {
     display: block;
-    left: 270px;
+    left: 275px;
     color: @gray;
 
     &:hover {
@@ -37,40 +37,45 @@
   }
 
   .sidebar-projectLink {
-    margin: 21px 40px 0;
+    margin: 23px 30px 0;
   }
 
   .sidebar-projectDetails {
     display: inline-block;
     text-align: right;
+    vertical-align: top;
+    margin-top: 6px;
   }
 
   .sidebar-projectImage {
     display: inline-block;
     max-width: 64px;
     max-height: 64px;
+    margin-left: 15px;
+    vertical-align: bottom;
   }
 
   .sidebar-projectName {
     font-weight: 700;
-    font-size: 30px;
-    line-height: 40px;
+    font-size: 24px;
+    line-height: 30px;
     color: @white;
     margin: 0;
     padding: 0;
+    max-width: 155px;
   }
 
   .sidebar-projectVersion {
     margin: 0;
-    padding: 10px 0 0 0;
+    padding: 0;
     font-weight: 300;
-    font-size: 20px;
+    font-size: 16px;
     line-height: 20px;
     color: @white;
   }
 
   .sidebar-listNav {
-    padding: 0px 40px;
+    padding: 0px 30px;
 
     li,
     li a {
@@ -109,7 +114,7 @@
   }
 
   .sidebar-search {
-    margin: 31px 40px 20px;
+    margin: 23px 30px 18px;
     .display(flex);
 
     i.fa.fa-search {
@@ -132,15 +137,15 @@
   }
 
   #full-list {
-    margin: 4px 0 0 40px;
+    margin: 4px 0 0 30px;
     padding: 0 20px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     .flex(1);
 
     ul {
-      margin: 0 10px;
-      padding: 0 0 9px;
+      margin: 0 20px;
+      padding: 9px 0 18px;
 
       li {
 
