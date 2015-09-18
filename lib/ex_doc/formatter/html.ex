@@ -84,7 +84,7 @@ defmodule ExDoc.Formatter.HTML do
   def generate_assets(source, output) do
     Enum.each source, fn({ pattern, dir }) ->
       output = "#{output}/#{dir}"
-      File.mkdir output
+      File.mkdir! output
 
       Enum.map Path.wildcard(pattern), fn(file) ->
         base = Path.basename(file)
