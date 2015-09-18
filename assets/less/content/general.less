@@ -111,3 +111,24 @@ td, th {
   padding-left: 1em;
   line-height: 2em;
 }
+
+h1.section-heading {
+  &:hover a.hover-link {
+    opacity: 1;
+    text-decoration: none;
+  }
+
+  a.hover-link {
+    transition: opacity 0.3s ease-in-out;
+    display: inline-block;
+    opacity: 0;
+    padding: .3em .6em .6em;
+    line-height: 1em;
+    margin-left: -2.7em;
+    background: none;
+    border: none;
+    text-shadow: none;
+    font-size: 16px;
+    vertical-align: middle;
+  }
+}
