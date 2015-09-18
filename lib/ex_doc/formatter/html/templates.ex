@@ -56,11 +56,17 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp presence([]),    do: nil
   defp presence(other), do: other
 
-  defp h(binary) do
+  @doc false
+  def h(binary) do
     escape_map = [{"&", "&amp;"}, {"<", "&lt;"}, {">", "&gt;"}, {"\"", "&quot;"}]
     Enum.reduce escape_map, binary, fn({pattern, escape}, acc) ->
       String.replace(acc, pattern, escape)
     end
+  end
+
+  @doc false
+  def enc_h(binary) do
+    URI.encode(binary) |> h
   end
 
   @spec create_sidebar_items(list) :: String.t

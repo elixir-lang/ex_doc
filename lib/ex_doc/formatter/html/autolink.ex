@@ -1,4 +1,5 @@
 defmodule ExDoc.Formatter.HTML.Autolink do
+  import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc_h: 1]
   @moduledoc """
   Conveniences for autolinking locals, types and more.
   """
@@ -100,15 +101,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         string = strip_parens(string, args)
         arity = length(args)
         if { name, arity } in typespecs do
-          ~s[<a href="#t:#{name}/#{arity}">#{string}</a>]
+          n = enc_h("#{name}")
+          ~s[<a href="#t:#{n}/#{arity}">#{h(string)}</a>]
         else
-          string
+         string
         end
       {{ :., _, [alias, name] }, _, args}, string when is_atom(name) and is_list(args) ->
         string = strip_parens(string, args)
         alias = expand_alias(alias)
         if source = get_source(alias, aliases) do
-          ~s[<a href="#{source}#{inspect alias}.html#t:#{name}/#{length(args)}">#{string}</a>]
+          n = enc_h("#{name}")
+          ~s[<a href="#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}">#{h(string)}</a>]
         else
           string
         end
