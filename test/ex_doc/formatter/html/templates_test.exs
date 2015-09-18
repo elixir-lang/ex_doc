@@ -82,7 +82,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{example_1/0.*Another example}ms
     assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<i class="icon-code"></i>\n\s*</a>}ms
 
-    assert content =~ ~s{<div class="detail-header" id="example_1/0">}
+    assert content =~ ~s{<div class="detail" id="example_1/0">}
     assert content =~ ~s{example(foo, bar \\\\ Baz)}
     assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\n\s*<i class="icon-link"><\/i>\n\s*<\/a>}ms
   end
@@ -127,12 +127,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     content = get_module_page([CustomBehaviourOne])
     assert content =~ ~r{<h1>\s*CustomBehaviourOne\s*<small>behaviour</small>}m
     assert content =~ ~r{Callbacks}
-    assert content =~ ~r{<div class="detail-header" id="c:hello/1">}
+    assert content =~ ~r{<div class="detail" id="c:hello/1">}
 
     content = get_module_page([CustomBehaviourTwo])
     assert content =~ ~r{<h1>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*}m
     assert content =~ ~r{Callbacks}
-    assert content =~ ~r{<div class="detail-header" id="c:bye/1">}
+    assert content =~ ~r{<div class="detail" id="c:bye/1">}
   end
 
   ## PROTOCOLS
