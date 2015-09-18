@@ -1,10 +1,10 @@
 <div class="main">
 <button class="sidebar-toggle">
-  <i class="fa fa-bars"></i>
+  <i class="icon-menu"></i>
 </button>
 <section class="sidebar">
   <button class="sidebar-toggle">
-    <i class="fa fa-bars"></i>
+    <i class="icon-menu"></i>
   </button>
 
   <% url = config.homepage_url || "#{config.main}.html" %>
@@ -23,7 +23,7 @@
   </a>
 
   <div class="sidebar-search">
-    <i class="fa fa-search"></i>
+    <i class="icon-search"></i>
     <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" results="0" />
   </div>
 

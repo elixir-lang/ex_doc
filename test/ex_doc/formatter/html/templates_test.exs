@@ -80,11 +80,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
     assert content =~ ~r{example_1/0.*Another example}ms
-    assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<i class="fa fa-code"></i>\n\s*</a>}ms
+    assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<i class="icon-code"></i>\n\s*</a>}ms
 
     assert content =~ ~s{<div class="detail-header" id="example_1/0">}
     assert content =~ ~s{example(foo, bar \\\\ Baz)}
-    assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\n\s*<i class="fa fa-link"><\/i>\n\s*<\/a>}ms
+    assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\n\s*<i class="icon-link"><\/i>\n\s*<\/a>}ms
   end
 
   test "module_page outputs the types and function specs" do
