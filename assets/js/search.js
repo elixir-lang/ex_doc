@@ -114,7 +114,11 @@ function search (nodes, value) {
   $oldContent.hide()
   $content.append($results)
 
-  function closeResults () {
+  function closeResults (event) {
+    if (event.metaKey) {
+      return
+    }
+
     $results.remove()
     $oldContent.fadeIn()
   }
