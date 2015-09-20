@@ -98,7 +98,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     headers = Enum.map_join(headers, ",", fn {header, anchor} ->
       sidebar_items_object(header, anchor)
     end)
-    ~s/{"id":"#{h id}","title":"#{h title}","headers":[#{headers}]}/
+    ~s/{"id":"#{id}","title":"#{title}","headers":[#{headers}]}/
   end
 
   defp sidebar_items_node(node) do
@@ -121,7 +121,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   defp sidebar_items_object(id, anchor) do
-    ~s/{"id":"#{id}","anchor":"#{h anchor}"}/
+    ~s/{"id":"#{id}","anchor":"#{anchor}"}/
   end
 
   defp group_types(node) do
