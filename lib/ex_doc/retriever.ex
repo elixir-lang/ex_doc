@@ -90,19 +90,14 @@ defmodule ExDoc.Retriever do
     source_path = source_path(module, config)
 
     specs = get_specs(module)
-    impls = get_callbacks(module)
+    impls = get_impls(module)
     abst_code = get_abstract_code(module)
 
-    {_, moduledoc} = Code.get_docs(module, :moduledoc)
+    moduledoc = get_moduledoc(module)
     line = find_actual_line(abst_code, module, :module)
 
-    docs = for doc <- Code.get_docs(module, :docs), has_doc?(doc, type) do
-      get_function(doc, source_path, source_url, specs, impls, abst_code)
-    end
-
-    if type == :behaviour do
-      docs = docs ++ behaviour_docs(module, source_path, source_url, abst_code)
-    end
+    docs = get_docs(type, module, source_path, source_url, specs, impls, abst_code) ++
+           get_callbacks(type, module, source_path, source_url, abst_code)
 
     %ExDoc.ModuleNode{
       id: inspect(module),
@@ -117,6 +112,11 @@ defmodule ExDoc.Retriever do
 
   # Helpers
 
+  defp get_moduledoc(module) do
+    {_, moduledoc} = Code.get_docs(module, :moduledoc)
+    moduledoc
+  end
+
   defp get_abstract_code(module) do
     {^module, binary, _file} = :code.get_object_code(module)
     case :beam_lib.chunks(binary, [:abstract_code]) do
@@ -126,17 +126,11 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp behaviour_docs(module, source_path, source_url, abst_code) do
-    callbacks = Enum.into(Typespec.beam_callbacks(module) || [], %{})
-
-    inner =
-      if function_exported?(module, :__behaviour__, 1) do
-        module.__behaviour__(:docs)
-      else
-        Code.get_docs(module, :all)[:callback_docs]
-      end
-
-    Enum.map(inner || [], &get_callback(&1, source_path, source_url, callbacks, abst_code))
+  defp get_docs(type, module, source_path, source_url, specs, impls, abst_code) do
+    docs = Enum.sort_by Code.get_docs(module, :docs), &elem(&1, 0)
+    for doc <- docs, has_doc?(doc, type) do
+      get_function(doc, source_path, source_url, specs, impls, abst_code)
+    end
   end
 
   # Skip impl_for and impl_for! for protocols
@@ -158,11 +152,6 @@ defmodule ExDoc.Retriever do
   defp has_doc?(_, _) do
     true
   end
-
-  defp actual_def(name, arity, :defmacro) do
-    {String.to_atom("MACRO-" <> to_string(name)), arity + 1}
-  end
-  defp actual_def(name, arity, _), do: {name, arity}
 
   defp get_function(function, source_path, source_url, all_specs, cb_impls, abst_code) do
     {{name, arity}, doc_line, type, signature, doc} = function
@@ -190,6 +179,22 @@ defmodule ExDoc.Retriever do
       type: type
     }
   end
+
+  defp get_callbacks(:behaviour, module, source_path, source_url, abst_code) do
+    callbacks = Enum.into(Typespec.beam_callbacks(module) || [], %{})
+
+    docs =
+      if function_exported?(module, :__behaviour__, 1) do
+        module.__behaviour__(:docs)
+      else
+        Code.get_docs(module, :all)[:callback_docs]
+      end
+
+    docs = Enum.sort_by docs || [], &elem(&1, 0)
+    Enum.map(docs, &get_callback(&1, source_path, source_url, callbacks, abst_code))
+  end
+
+  defp get_callbacks(_, _, _, _, _), do: []
 
   defp get_callback(callback, source_path, source_url, callbacks, abst_code) do
     {{name, arity}, _, kind, doc} = callback
@@ -274,6 +279,11 @@ defmodule ExDoc.Retriever do
     end
   end
 
+  defp actual_def(name, arity, :defmacro) do
+    {String.to_atom("MACRO-" <> to_string(name)), arity + 1}
+  end
+  defp actual_def(name, arity, _), do: {name, arity}
+
   defp find_actual_line(abst_code, function, :callback) do
     Enum.find(abst_code, &match?({:attribute, _, :callback, {^function, _}}, &1))
     |> elem(1)
@@ -313,7 +323,7 @@ defmodule ExDoc.Retriever do
   end
 
   # Returns a dict of {name, arity} -> behaviour.
-  defp get_callbacks(module) do
+  defp get_impls(module) do
     for behaviour <- behaviours_implemented_by(module),
         callback <- callbacks_defined_by(behaviour),
         do: {callback, behaviour},
@@ -336,20 +346,23 @@ defmodule ExDoc.Retriever do
     all  = Typespec.beam_types(module) || []
     docs = Enum.into(Typespec.beam_typedocs(module) || [], %{})
 
-    for {type, {name, _, args} = tuple} <- all, type != :typep do
-      spec  = process_type_ast(Typespec.type_to_ast(tuple), type)
-      arity = length(args)
-      doc   = docs[{name, arity}]
-      %ExDoc.TypeNode{
-        id: "#{name}/#{arity}",
-        name: name,
-        arity: arity,
-        type: type,
-        spec: spec,
-        doc: doc,
-        signature: get_typespec_signature(spec, arity)
-      }
-    end
+    types =
+      for {type, {name, _, args} = tuple} <- all, type != :typep do
+        spec  = process_type_ast(Typespec.type_to_ast(tuple), type)
+        arity = length(args)
+        doc   = docs[{name, arity}]
+        %ExDoc.TypeNode{
+          id: "#{name}/#{arity}",
+          name: name,
+          arity: arity,
+          type: type,
+          spec: spec,
+          doc: doc,
+          signature: get_typespec_signature(spec, arity)
+        }
+      end
+
+    Enum.sort_by types, &{&1.name, &1.arity}
   end
 
   defp source_link(_source_path, nil, _line), do: nil
