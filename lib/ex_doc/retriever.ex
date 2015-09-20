@@ -22,6 +22,7 @@ defmodule ExDoc.Retriever do
   Functions to extract documentation information from modules.
   """
 
+  require ExDoc
   alias ExDoc.Retriever.Error
   alias Kernel.Typespec
 

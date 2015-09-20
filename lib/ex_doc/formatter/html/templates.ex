@@ -4,6 +4,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   """
 
   require EEx
+  require ExDoc
 
   @doc """
   Generate content from the module template for a given `node`
