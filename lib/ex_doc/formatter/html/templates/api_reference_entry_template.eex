@@ -1,5 +1,5 @@
 <div class="summary-row">
-  <div class="summary-signature"><a href="<%=h node.id %>.html"><%=h node.id %></a></div>
+  <div class="summary-signature"><a href="<%=enc_h node.id %>.html"><%=h node.id %></a></div>
   <%= if node.moduledoc do %>
     <div class="summary-synopsis"><%= to_html(synopsis(node.moduledoc)) %></div>
   <% end %>

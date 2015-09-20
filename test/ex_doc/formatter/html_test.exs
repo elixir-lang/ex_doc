@@ -61,7 +61,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       index: %{
         title:   ~r{<title>Elixir v1.0.1 – Documentation</title>},
-        index:   ~r{<meta name="index" content="noindex"},
+        index:   ~r{<meta name="robots" content="noindex"},
         refresh: ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">},
       },
 
