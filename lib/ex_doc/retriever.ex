@@ -89,29 +89,20 @@ defmodule ExDoc.Retriever do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
-    specs = Enum.into(Typespec.beam_specs(module) || [], %{})
-    impls = callbacks_implemented_by(module)
+    specs = get_specs(module)
+    impls = get_callbacks(module)
     abst_code = get_abstract_code(module)
+
+    {_, moduledoc} = Code.get_docs(module, :moduledoc)
+    line = find_actual_line(abst_code, module, :module)
 
     docs = for doc <- Code.get_docs(module, :docs), has_doc?(doc, type) do
       get_function(doc, source_path, source_url, specs, impls, abst_code)
     end
 
     if type == :behaviour do
-      callbacks = Enum.into(Typespec.beam_callbacks(module) || [], %{})
-
-      inner =
-        if function_exported?(module, :__behaviour__, 1) do
-          module.__behaviour__(:docs)
-        else
-          Code.get_docs(module, :all)[:callback_docs]
-        end
-
-      docs = docs ++ Enum.map(inner || [], &get_callback(&1, source_path, source_url, callbacks, abst_code))
+      docs = docs ++ behaviour_docs(module, source_path, source_url, abst_code)
     end
-
-    {_, moduledoc} = Code.get_docs(module, :moduledoc)
-    line = find_actual_line(abst_code, module, :module)
 
     %ExDoc.ModuleNode{
       id: inspect(module),
@@ -133,6 +124,19 @@ defmodule ExDoc.Retriever do
         abstract_code
       _otherwise -> []
     end
+  end
+
+  defp behaviour_docs(module, source_path, source_url, abst_code) do
+    callbacks = Enum.into(Typespec.beam_callbacks(module) || [], %{})
+
+    inner =
+      if function_exported?(module, :__behaviour__, 1) do
+        module.__behaviour__(:docs)
+      else
+        Code.get_docs(module, :all)[:callback_docs]
+      end
+
+    Enum.map(inner || [], &get_callback(&1, source_path, source_url, callbacks, abst_code))
   end
 
   # Skip impl_for and impl_for! for protocols
@@ -303,14 +307,20 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  # Returns a dict of {name, arity} -> [behaviour_module].
-  defp callbacks_implemented_by(module) do
-    behaviours_implemented_by(module)
-    |> Enum.map(fn behaviour -> Enum.map(callbacks_of(behaviour), &{&1, behaviour}) end)
-    |> Enum.reduce(%{}, &Enum.into/2)
+  # Returns a dict of {name, arity} -> spec.
+  defp get_specs(module) do
+    Enum.into(Typespec.beam_specs(module) || [], %{})
   end
 
-  defp callbacks_of(module) do
+  # Returns a dict of {name, arity} -> behaviour.
+  defp get_callbacks(module) do
+    for behaviour <- behaviours_implemented_by(module),
+        callback <- callbacks_defined_by(behaviour),
+        do: {callback, behaviour},
+        into: %{}
+  end
+
+  defp callbacks_defined_by(module) do
     module.module_info(:attributes)
     |> Enum.filter_map(&match?({:callback, _}, &1), fn {_, [{t,_}|_]} -> t end)
   end
