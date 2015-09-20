@@ -52,6 +52,20 @@ defmodule ExDoc do
     struct(preconfig, options)
   end
 
+  @doc """
+  Sorts ExDoc structs by name and arity.
+  """
+  @spec sort(Enum.t) :: Enum.t
+  def sort(collection) do
+    Enum.sort(collection, fn(x, y) ->
+      if x.name == y.name do
+        x.arity <= y.arity
+      else
+        x.name <= y.name
+      end
+    end)
+  end
+
   # Short path for programmatic interface
   defp find_formatter(modname) when is_atom(modname), do: modname
 

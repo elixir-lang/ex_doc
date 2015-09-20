@@ -43,7 +43,7 @@
             Types
           </h1>
           <div class="types-list">
-            <%= for node <- types, do: type_detail_template(node, module) %>
+            <%= for node <- ExDoc.sort(types), do: type_detail_template(node, module) %>
           </div>
         </section>
       <% end %>
@@ -56,7 +56,7 @@
             </a>
             Functions
           </h1>
-          <%= for node <- functions, do: detail_template(node, module) %>
+          <%= for node <- ExDoc.sort(functions), do: detail_template(node, module) %>
         </section>
       <% end %>
 
@@ -68,7 +68,7 @@
             </a>
             Macros
           </h1>
-          <%= for node <- macros, do: detail_template(node, module) %>
+          <%= for node <- ExDoc.sort(macros), do: detail_template(node, module) %>
         </section>
       <% end %>
 
@@ -80,7 +80,7 @@
             </a>
             Callbacks
           </h1>
-          <%= for node <- callbacks, do: detail_template(node, module) %>
+          <%= for node <- ExDoc.sort(callbacks), do: detail_template(node, module) %>
         </section>
       <% end %>
     <%= footer_template %>

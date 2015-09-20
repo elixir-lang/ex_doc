@@ -52,4 +52,25 @@ defmodule ExDocTest do
   test "version" do
     assert ExDoc.version =~ ~r{\d+\.\d+\.\d+} 
   end
+
+  test "sort" do
+    assert ExDoc.sort([
+      %ExDoc.FunctionNode{arity: 2, id: "//2", name: :/, },
+      %ExDoc.FunctionNode{arity: 2, id: "!=/2", name: :!=, },
+      %ExDoc.FunctionNode{arity: 100, id: "zoom/100", name: :zoom, },
+      %ExDoc.FunctionNode{arity: 1, id: "run/1", name: :run, },
+      %ExDoc.FunctionNode{arity: 3, id: "run/3", name: :run, },
+      %ExDoc.FunctionNode{arity: 2, id: "--/2", name: :--, },
+      %ExDoc.FunctionNode{arity: 2, id: "run/2", name: :run, },
+    ]) == [
+      %ExDoc.FunctionNode{arity: 2, id: "!=/2", name: :!=, },
+      %ExDoc.FunctionNode{arity: 2, id: "--/2", name: :--, },
+      %ExDoc.FunctionNode{arity: 2, id: "//2", name: :/, },
+      %ExDoc.FunctionNode{arity: 1, id: "run/1", name: :run, },
+      %ExDoc.FunctionNode{arity: 2, id: "run/2", name: :run, },
+      %ExDoc.FunctionNode{arity: 3, id: "run/3", name: :run, },
+      %ExDoc.FunctionNode{arity: 100, id: "zoom/100", name: :zoom, },
+    ]
+  end
+
 end
