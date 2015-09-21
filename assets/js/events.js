@@ -76,7 +76,7 @@ function fillSidebarWithNodes (nodes, filter) {
   function handleAnchor (e) {
     e.preventDefault()
 
-    var $target = $(event.target)
+    var $target = $(e.target)
 
     $docItems.removeClass('active')
     $target.closest('li').addClass('active')
@@ -93,7 +93,7 @@ function fillSidebarWithNodes (nodes, filter) {
   $('#full-list .node.clicked .deflink').on('click', e => {
     e.preventDefault()
 
-    var $target = $(event.target)
+    var $target = $(e.target)
 
     $defItems.removeClass('active')
     $target.closest('li').addClass('active')
