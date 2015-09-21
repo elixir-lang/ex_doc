@@ -5,19 +5,14 @@
     {{!-- When visiting a module page, the link to this module page
     in the menu should not link to a new page, instead should link
     to the top of the page itself. --}}
-
-    {{#isLocal node.id}}
-      <a href="#content" title="{{node.title}}" class="object-link">{{node.title}}</a>
-    {{else}}
-      <a href="{{node.id}}.html" title="{{node.title}}" class="object-link">{{node.title}}</a>
-    {{/isLocal}}
+    <a href="{{#isLocal node.id}}#content{{else}}{{node.id}}.html{{/isLocal}}" title="{{node.title}}" class="object-link">{{node.title}}</a>
 
     {{!-- Extra pages --}}
     {{#if node.headers}}
       <ul>
         {{#each node.headers}}
           <li class="docs">
-            <a href="#{{{anchor}}}" class="doclink">{{id}}</a>
+            <a href="{{#isNotLocal node.id}}{{node.id}}.html{{/isNotLocal}}#{{{anchor}}}" class="doclink">{{id}}</a>
           </li>
         {{/each}}
       </ul>
@@ -26,15 +21,15 @@
     {{#showSummary node}}
     <ul>
       <li class="docs">
-        <a href="#summary" class="doclink">Summary</a>
+        <a href="{{#isNotLocal node.id}}{{node.id}}.html{{/isNotLocal}}#summary" class="doclink">Summary</a>
       </li>
       {{#if node.types}}
         <li class="docs">
-          <a href="#types" class="doclink">Types</a>
+          <a href="{{#isNotLocal node.id}}{{node.id}}.html{{/isNotLocal}}#types" class="doclink">Types</a>
           <ul class="types-list deflist">
             {{#each node.types}}
               <li>
-                <a href="#{{anchor}}" class="deflink">{{id}}</a>
+                <a href="{{#isNotLocal node.id}}{{node.id}}.html{{/isNotLocal}}#{{anchor}}" class="deflink">{{id}}</a>
               </li>
             {{/each}}
           </ul>
@@ -42,11 +37,11 @@
       {{/if}}
       {{#if node.functions}}
         <li class="docs">
-          <a href="#functions" class="doclink">Functions</a>
+          <a href="{{#isNotLocal node.id}}{{node.id}}.html{{/isNotLocal}}#functions" class="doclink">Functions</a>
           <ul class="functions-list deflist">
             {{#each node.functions}}
               <li>
-                <a href="#{{anchor}}" class="deflink">{{id}}</a>
+                <a href="{{#isNotLocal node.id}}{{node.id}}.html{{/isNotLocal}}#{{anchor}}" class="deflink">{{id}}</a>
               </li>
             {{/each}}
           </ul>
@@ -54,11 +49,11 @@
       {{/if}}
       {{#if node.macros}}
         <li class="docs">
-          <a href="#macros" class="doclink">Macros</a>
+          <a href="{{#isNotLocal node.id}}{{node.id}}.html{{/isNotLocal}}#macros" class="doclink">Macros</a>
           <ul class="macros-list deflist">
             {{#each node.macros}}
               <li>
-                <a href="#{{anchor}}" class="deflink">{{id}}</a>
+                <a href="{{#isNotLocal node.id}}{{node.id}}.html{{/isNotLocal}}#{{anchor}}" class="deflink">{{id}}</a>
               </li>
             {{/each}}
           </ul>
@@ -66,11 +61,11 @@
       {{/if}}
       {{#if node.callbacks}}
         <li class="docs">
-          <a href="#callbacks" class="doclink">Callbacks</a>
+          <a href="{{#isNotLocal node.id}}{{node.id}}.html{{/isNotLocal}}#callbacks" class="doclink">Callbacks</a>
           <ul class="callbacks-list deflist">
             {{#each node.callbacks}}
               <li>
-                <a href="#{{anchor}}" class="deflink">{{id}}</a>
+                <a href="{{#isNotLocal node.id}}{{node.id}}.html{{/isNotLocal}}#{{anchor}}" class="deflink">{{id}}</a>
               </li>
             {{/each}}
           </ul>
