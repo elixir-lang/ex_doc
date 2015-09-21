@@ -46,15 +46,6 @@ https://highlightjs.org/
 
 ==========================================================================
 
-github.com style
-(c) Vasily Polovnyov <vast@whiteants.net>
-https://github.com/isagalaev/highlight.js/blob/master/src/styles/github.css
-File: assets/less/code.less
-
-  Released under the same license as highlight.js
-
-==========================================================================
-
 jQuery JavaScript Library
 Copyright 2011, John Resig
 http://jquery.org
@@ -77,5 +68,51 @@ https://necolas.github.io/normalize.css/
 
   Released under the MIT License.
   https://github.com/necolas/normalize.css/blob/master/LICENSE.md
+
+==========================================================================
+
+Font Awesome
+By Dave Gandy
+http://fontawesome.io
+
+  Released under SIL OFL 1.1 License
+  http://scripts.sil.org/OFL
+
+==========================================================================
+
+Tomorrow theme for highlight.js
+By Yoshihide Jimbo
+http://jmblog.github.io/color-themes-for-highlightjs/tomorrow/
+
+Based on "Tomorrow Theme" by Chris Kempson.
+https://github.com/chriskempson/tomorrow-theme
+
+  Released under the MIT License.
+  https://github.com/chriskempson/tomorrow-theme/blob/master/LICENSE.md
+
+==========================================================================
+
+webpack
+Copyright (c) 2012, Tobias Koppers
+https://github.com/webpack/webpack
+
+  Released under the MIT License.
+  http://www.opensource.org/licenses/mit-license.php
+
+==========================================================================
+
+loadsh
+https://lodash.com/
+Copyright 2012, The Dojo Foundation
+http://dojofoundation.org/
+
+  Available under MIT license
+  https://lodash.com/license
+
+Based on Underscore.js
+Copyright 2009, Jeremy Ashkenas, DocumentCloud and
+Investigative Reporters & Editors
+ 
+  http://underscorejs.org/LICENSE
 
 ==========================================================================
