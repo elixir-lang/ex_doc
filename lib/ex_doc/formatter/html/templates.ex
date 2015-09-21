@@ -121,7 +121,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   defp sidebar_items_object(id, anchor) do
-    ~s/{"id":"#{id}","anchor":"#{anchor}"}/
+    ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}"}/
   end
 
   defp group_types(node) do
