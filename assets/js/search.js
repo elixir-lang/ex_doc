@@ -125,10 +125,10 @@ function search (nodes, value) {
 
   $content.find('a:not(.close-search)').on('click', closeResults)
 
-  $content.find('.close-search').on('click', function (e) {
+  $content.find('.close-search').on('click', function(e) {
     e.preventDefault()
-    closeResults()
   })
+  $content.find('.close-search').on('click', closeResults)
 
   $results.fadeIn()
 }
