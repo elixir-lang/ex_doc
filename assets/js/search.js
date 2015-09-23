@@ -114,9 +114,13 @@ function search (nodes, value) {
   $oldContent.hide()
   $content.append($results)
 
-  function closeResults (event) {
-    if (event.metaKey) {
-      return
+  function closeResults (e) {
+    var event = e || window.event
+    if (typeof event !== 'undefined' && typeof event === 'object' && event !== null) {
+      if (event.metaKey || event.shiftKey || event.altKey ||
+          event.ctrlKey || event.button === 1 || event.button === 2) {
+        return
+      }
     }
 
     $results.remove()
@@ -127,7 +131,7 @@ function search (nodes, value) {
 
   $content.find('.close-search').on('click', function (e) {
     e.preventDefault()
-    closeResults()
+    closeResults(e)
   })
 
   $results.fadeIn()
