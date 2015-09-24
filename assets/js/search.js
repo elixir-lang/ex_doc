@@ -127,12 +127,11 @@ function search (nodes, value) {
     $oldContent.fadeIn()
   }
 
-  $content.find('a:not(.close-search)').on('click', closeResults)
-
-  $content.find('.close-search').on('click', function (e) {
+  $results.find('.close-search').on('click', function (e) {
     e.preventDefault()
-    closeResults(e)
   })
+
+  $results.find('a').on('click', closeResults)
 
   $results.fadeIn(function() {
     // Scroll the container with all elements
