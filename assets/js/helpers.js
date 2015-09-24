@@ -16,10 +16,12 @@ export function escapeText (text) {
 
 // Scroll to a given element in the page
 export function scrollTo (target, elem, done) {
-  return $(target)
-    .animate({
-      scrollTop: $(target).scrollTop() + $(elem).offset().top
-    }, 300, done)
+  if ($(elem).length) {
+    return $(target)
+      .animate({
+        scrollTop: $(target).scrollTop() + $(elem).offset().top
+      }, 300, done)
+  }
 }
 
 export function saveFind (selector) {
