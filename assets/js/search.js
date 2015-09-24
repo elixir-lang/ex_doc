@@ -127,10 +127,13 @@ function search (nodes, value) {
 
   $content.find('.close-search').on('click', function (e) {
     e.preventDefault()
-    closeResults()
+    closeResults(e)
   })
 
-  $results.fadeIn()
+  $results.fadeIn(function() {
+    // Scroll the container with all elements
+    $content.parent().scrollTop(0)
+  })
 }
 
 // Public Methods
