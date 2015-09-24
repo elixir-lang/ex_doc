@@ -148,7 +148,7 @@ function identifyCurrentHash () {
     .closest('li')
     .addClass('active')
 
-  helpers.scrollTo(CONTENT, helpers.saveFind(hash))
+  helpers.saveFind(hash)
 }
 
 function fixLinks () {
