@@ -1,6 +1,15 @@
 # Changelog
 
-## v0.9.0-dev
+## v0.10.0
+
+* Enhancements
+  * Many improvements and bug fixes in new layout
+  * Reduced build size
+  * Overview has been renamed to API Reference
+  * All extra content, including API Reference, has been moved to inside "Pages"
+  * Extra files are now downcased and prefixed by "extra-"
+
+## v0.9.0
 
 * Enhancements
   * Whole new clean, readable, usable, responsive layout
