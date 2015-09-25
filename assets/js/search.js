@@ -133,7 +133,7 @@ function search (nodes, value) {
 
   $results.find('a').on('click', closeResults)
 
-  $results.fadeIn(function() {
+  $results.fadeIn(function () {
     // Scroll the container with all elements
     $content.parent().scrollTop(0)
   })
