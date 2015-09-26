@@ -28,7 +28,8 @@ defmodule ExDoc.Retriever do
   @doc """
   Extract documentation from all modules in the specified directory
   """
-  def docs_from_dir(dir, config) do
+  @spec docs_from_dir(Path.t, %ExDoc.Config{}) :: [%ExDoc.ModuleNode{}]
+  def docs_from_dir(dir, config) when is_binary(dir) do
     files = Path.wildcard Path.expand("Elixir.*.beam", dir)
     docs_from_files(files, config)
   end
@@ -36,6 +37,7 @@ defmodule ExDoc.Retriever do
   @doc """
   Extract documentation from all modules in the specified list of files
   """
+  @spec docs_from_files([Path.t], %ExDoc.Config{}) :: [%ExDoc.ModuleNode{}]
   def docs_from_files(files, config) when is_list(files) do
     files
     |> Enum.map(&filename_to_module(&1))
@@ -45,6 +47,7 @@ defmodule ExDoc.Retriever do
   @doc """
   Extract documentation from all modules in the list `modules`
   """
+  @spec docs_from_modules([atom], %ExDoc.Config{}) :: [%ExDoc.ModuleNode{}]
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
     |> Enum.map(&get_module(&1, config))
