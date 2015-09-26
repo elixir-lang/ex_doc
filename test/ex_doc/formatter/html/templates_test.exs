@@ -31,6 +31,39 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     Templates.module_page(hd(mods), [], [], [], doc_config)
   end
 
+  test "synopsis" do
+    assert Templates.synopsis(nil) == nil
+    assert Templates.synopsis("") == ""
+    assert Templates.synopsis(".") == ""
+    assert Templates.synopsis(".::.") == ""
+    assert Templates.synopsis(" .= .: :.") == ".="
+    assert Templates.synopsis(" Description: ") == "Description"
+    assert Templates.synopsis("abcd") == "abcd"
+    assert_raise FunctionClauseError, fn ->
+      Templates.synopsis(:abcd)
+    end
+  end
+
+  test "synopsis should not end have trailing periods or semicolons" do
+    doc1 = """
+    Summaries should not be displayed with trailing punctuation . :
+
+    ## Example
+    """
+
+    doc2 = """
+    Example function: Summary should not display trailing puntuation :. 
+
+    ## Example:
+    """
+
+    assert Templates.synopsis(doc1) ==
+      "Summaries should not be displayed with trailing punctuation"
+
+    assert Templates.synopsis(doc2) ==
+      "Example function: Summary should not display trailing puntuation"
+  end
+
   ## LISTING
 
   test "enables nav link when module type have at least one element" do
