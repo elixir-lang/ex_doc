@@ -22,7 +22,7 @@ defmodule ExDoc.Formatter.HTMLTest do
      source_root: beam_dir,
      source_beam: beam_dir,
      logo: "test/fixtures/elixir.png",
-     extras: ["test/tmp/README.md"]]
+     extras: ["test/fixtures/README.md"]]
   end
 
   defp doc_config(config) do
