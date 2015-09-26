@@ -5,6 +5,7 @@ defmodule ExDoc.Mixfile do
     [app: :ex_doc,
      version: "0.10.1-dev",
      elixir: "~> 1.0",
+     elixirc_paths: elixirc_paths(Mix.env),
      deps: deps,
      aliases: aliases,
      package: package,
@@ -13,11 +14,18 @@ defmodule ExDoc.Mixfile do
      preferred_cli_env: [coveralls: :test]]
   end
 
+  def application do
+    [applications: [:logger]]
+  end
+
   defp deps do
     [{:earmark, "~> 0.1.17 or ~> 0.2", optional: true},
-     {:markdown, github: "devinus/markdown", only: [:test]},
-     {:excoveralls, "~> 0.3", only: [:test]}]
+     {:markdown, github: "devinus/markdown", only: :test},
+     {:excoveralls, "~> 0.3", only: :test}]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/fixtures"]
+  defp elixirc_paths(_),     do: ["lib"]
 
   defp aliases do
     [clean: [&clean_test_fixtures/1, "clean"]]

@@ -2,10 +2,8 @@ defmodule ExDoc.Formatter.HTMLTest do
   use ExUnit.Case
 
   setup do
-    {:ok, _} = File.rm_rf(output_dir)
-    :ok = File.mkdir(output_dir)
-    {:ok, []} = File.ls(output_dir)
-    :ok
+    File.rm_rf(output_dir)
+    File.mkdir_p!(output_dir)
   end
 
   defp output_dir do
@@ -13,20 +11,18 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp beam_dir do
-    Path.expand("../../tmp/ebin", __DIR__)
+    Application.app_dir(:ex_doc, "ebin")
   end
 
   defp doc_config do
-    [
-      project: "Elixir",
-      version: "1.0.1",
-      formatter: "html",
-      output: "test/tmp/doc",
-      source_root: beam_dir,
-      source_beam: beam_dir,
-      logo: "test/fixtures/elixir.png",
-      extras: ["test/tmp/README.md"]
-    ]
+    [project: "Elixir",
+     version: "1.0.1",
+     formatter: "html",
+     output: "test/tmp/doc",
+     source_root: beam_dir,
+     source_beam: beam_dir,
+     logo: "test/fixtures/elixir.png",
+     extras: ["test/tmp/README.md"]]
   end
 
   defp doc_config(config) do
