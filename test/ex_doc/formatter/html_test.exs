@@ -18,7 +18,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     [project: "Elixir",
      version: "1.0.1",
      formatter: "html",
-     output: "test/tmp/doc",
+     output: output_dir,
      source_root: beam_dir,
      source_beam: beam_dir,
      logo: "test/fixtures/elixir.png",

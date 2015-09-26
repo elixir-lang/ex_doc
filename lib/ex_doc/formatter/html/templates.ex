@@ -47,10 +47,23 @@ defmodule ExDoc.Formatter.HTML.Templates do
     end
   end
 
-  # Get the first paragraph of the documentation of a node, if any.
-  defp synopsis(nil), do: nil
-  defp synopsis(doc) do
-    String.split(doc, ~r/\n\s*\n/) |> hd |> String.strip() |> String.rstrip(?.)
+  @doc """
+  Gets the first paragraph of the documentation of a node. It strips
+  surrounding spaces and strips traling `:` and `.`.
+
+  If `doc` is `nil`, it returns `nil`.
+  """
+  @spec synopsis(String.t) :: String.t
+  @spec synopsis(nil) :: nil
+
+  def synopsis(nil), do: nil
+  def synopsis(""),  do: ""
+  def synopsis(doc) when is_bitstring(doc) do
+    String.split(doc, ~r/\n\s*\n/)
+    |> hd
+    |> String.strip()
+    |> String.replace(~r{[.:\s]+$}, "")
+    |> String.rstrip()
   end
 
   defp presence([]),    do: nil
