@@ -33,6 +33,22 @@ defmodule ExDoc.Formatter.HTMLTest do
     ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
+  test "guess url base on source_url and source_root options" do
+    generate_docs doc_config(source_url: "https://github.com/elixir-lang/ex_doc", source_root: File.cwd!)
+    content = File.read!("#{output_dir}/CompiledWithDocs.html")
+    assert content =~ "https://github.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L13"
+
+    generate_docs doc_config(source_url: "https://bitbucket.org/elixir-lang/ex_doc", source_root: File.cwd!)
+    content = File.read!("#{output_dir}/CompiledWithDocs.html")
+    assert content =~ "https://bitbucket.org/elixir-lang/ex_doc/src/master/test/fixtures/compiled_with_docs.ex#cl-13"
+  end
+
+  test "find formatter when absolute path to module is given" do
+    generate_docs doc_config(formatter: "ExDoc.Formatter.HTML")
+
+    assert File.regular?("#{output_dir}/CompiledWithDocs.html")
+  end
+
   test "run generates in default directory and redirect index.html file" do
     generate_docs(doc_config)
 
