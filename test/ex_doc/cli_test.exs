@@ -48,4 +48,19 @@ defmodule ExDoc.CLITest do
     end) == "ExDoc v#{ExDoc.version}\n"
   end
 
+  test "too many arguments" do
+    fun = fn ->
+      run(["ExDoc", "1.2.3", "/", "kaboom"])
+    end
+
+    assert catch_exit(capture_io(fun)) == {:shutdown, 1}
+  end
+
+  test "too few arguments" do
+    fun = fn ->
+      run(["ExDoc"])
+    end
+
+    assert catch_exit(capture_io(fun)) == {:shutdown, 1}
+  end
 end
