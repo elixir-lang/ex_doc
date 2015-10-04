@@ -12,11 +12,14 @@ defmodule ExDoc.Markdown.Hoedown do
 
   """
   def to_html(text, opts \\ []) do
-    Markdown.to_html(text,
-      autolink: Keyword.get(opts, :autolink, true),
-      fenced_code: Keyword.get(opts, :fenced_code, true),
-      tables: Keyword.get(opts, :tables, true))
-    |> pretty_codeblocks
+    options =
+      [autolink: Keyword.get(opts, :autolink, true),
+       fenced_code: Keyword.get(opts, :fenced_code, true),
+       tables: Keyword.get(opts, :tables, true)]
+
+    text
+    |> Markdown.to_html(options)
+    |> pretty_codeblocks()
   end
 
   @doc false
@@ -25,7 +28,7 @@ defmodule ExDoc.Markdown.Hoedown do
   defp pretty_codeblocks(bin) do
     # Hoedown parser puts the prefix "language-" as part of the class value
     bin = Regex.replace(~r/<pre><code\s+class=\"language-([^\"]+)\">/,
-                        bin, "<pre><code class=\"\\1\">")
+                        bin, ~S(<pre><code class="\1">))
 
     bin
   end

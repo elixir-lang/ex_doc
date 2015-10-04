@@ -62,15 +62,17 @@ defmodule Mix.Tasks.Docs do
       Mix.raise "Extraneous arguments on the command line"
     end
 
-    project = (config[:name] || config[:app]) |> to_string
+    project =
+      (config[:name] || config[:app])
+      |> to_string()
     version = config[:version] || "dev"
     options = Keyword.merge(get_docs_opts(config), cli_opts)
 
-    if source_url = config[:source_url] do
-      options = Keyword.put(options, :source_url, source_url)
+    if config[:source_url] do
+      options = Keyword.put(options, :source_url, config[:source_url])
     end
 
-    main    = options[:main]
+    main = options[:main]
     options =
       cond do
         is_nil(main) ->

@@ -32,8 +32,9 @@ defmodule ExDoc.CLITest do
     File.write!("test.config", ~s(%{"extras" => "README.md"}))
 
     assert_raise RuntimeError,
-                 "expected a keyword list from config file: \"test.config\"",
-                 fn -> run(["ExDoc", "1.2.3", "...", "-c", "test.config"]) end
+      ~S(expected a keyword list from config file: "test.config"), fn ->
+        run(["ExDoc", "1.2.3", "...", "-c", "test.config"])
+      end
   after
     File.rm!("test.config")
   end

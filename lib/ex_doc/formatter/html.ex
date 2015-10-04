@@ -18,7 +18,7 @@ defmodule ExDoc.Formatter.HTML do
     File.rm_rf! output
     :ok = File.mkdir_p output
 
-    assets |> templates_path |> generate_assets(output)
+    assets |> templates_path() |> generate_assets(output)
 
     all = Autolink.all(module_nodes)
     modules    = filter_list(:modules, all)
@@ -44,7 +44,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp normalize_config(%{main: "index"}) do
-    raise ArgumentError, message: "\"main\" cannot be set to \"index\", otherwise it will recursively link to itself"
+    raise ArgumentError, message: ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
   end
   defp normalize_config(%{main: main} = config) do
     %{config | main: main || @main}
@@ -106,8 +106,8 @@ defmodule ExDoc.Formatter.HTML do
   defp generate_extra(input, output, module_nodes, modules, exceptions, protocols, config) do
     file_ext =
       input
-      |> Path.extname
-      |> String.downcase
+      |> Path.extname()
+      |> String.downcase()
 
     if file_ext in [".md"] do
       title = Path.rootname(Path.basename(input))
@@ -115,7 +115,7 @@ defmodule ExDoc.Formatter.HTML do
 
       content =
         input
-        |> File.read!
+        |> File.read!()
         |> Autolink.project_doc(module_nodes)
 
       html = Templates.extra_template(config, title, modules,
@@ -131,8 +131,9 @@ defmodule ExDoc.Formatter.HTML do
   @h2_regex ~r/^##([^#].*)$/m
 
   defp extract_headers(content) do
-    Regex.scan(@h2_regex, content, capture: :all_but_first)
-    |> List.flatten
+    @h2_regex
+    |> Regex.scan(content, capture: :all_but_first)
+    |> List.flatten()
     |> Enum.map(&{&1, header_to_id(&1)})
   end
 
@@ -148,14 +149,17 @@ defmodule ExDoc.Formatter.HTML do
 
   defp header_to_id(header) do
     header
-    |> String.strip
+    |> String.strip()
     |> String.replace(~r/\W+/, "-")
   end
 
   defp process_logo_metadata(config) do
     output = "#{config.output}/assets"
     File.mkdir_p! output
-    file_extname = Path.extname(config.logo) |> String.downcase
+    file_extname =
+      config.logo
+      |> Path.extname()
+      |> String.downcase()
 
     if file_extname in ~w(.png .jpg) do
       file_name = "#{output}/logo#{file_extname}"

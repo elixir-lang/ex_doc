@@ -19,7 +19,10 @@ defmodule ExDoc.Markdown.Pandoc do
   end
 
   defp text_to_file(text) do
-    id = :crypto.rand_bytes(4) |> Base.encode16
+    id =
+      4
+      |> :crypto.rand_bytes()
+      |> Base.encode16()
     unique_name = "tmpdoc_#{id}.md"
     tmp_path = Path.join(System.tmp_dir, unique_name)
     File.write!(tmp_path, text)
@@ -37,7 +40,9 @@ defmodule ExDoc.Markdown.Pandoc do
   end
 
   defp get_string(opts, key, default) do
-    Keyword.get(opts, key, default) |> to_string
+    opts
+    |> Keyword.get(key, default)
+    |> to_string()
   end
 
   defp process_port(port) do
@@ -62,7 +67,7 @@ defmodule ExDoc.Markdown.Pandoc do
     # Pandoc parser puts the class attribute inside the `pre` tag
     # Move the class attribute to the code element to keep consistency.
     bin = Regex.replace(~r/<pre\s+class=\"([^\"]+)\"><code>/,
-                        bin, "<pre><code class=\"\\1\">")
+                        bin, ~S(<pre><code class="\1">))
 
     bin
   end

@@ -59,8 +59,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def synopsis(nil), do: nil
   def synopsis(""),  do: ""
   def synopsis(doc) when is_bitstring(doc) do
-    String.split(doc, ~r/\n\s*\n/)
-    |> hd
+    doc
+    |> String.split(~r/\n\s*\n/)
+    |> hd()
     |> String.strip()
     |> String.replace(~r{[.:\s]+$}, "")
     |> String.rstrip()
@@ -71,7 +72,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   @doc false
   def h(binary) do
-    escape_map = [{"&", "&amp;"}, {"<", "&lt;"}, {">", "&gt;"}, {"\"", "&quot;"}]
+    escape_map = [{"&", "&amp;"}, {"<", "&lt;"}, {">", "&gt;"}, {~S("), "&quot;"}]
     Enum.reduce escape_map, binary, fn({pattern, escape}, acc) ->
       String.replace(acc, pattern, escape)
     end
@@ -79,7 +80,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   @doc false
   def enc_h(binary) do
-    URI.encode(binary) |> h
+    binary
+    |> URI.encode()
+    |> h()
   end
 
   @spec create_sidebar_items(list) :: String.t
@@ -119,7 +122,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
       ~s/{"id":"#{node.id}","title":"#{node.id}"}/
     else
       types =
-        group_types(node)
+        node
+        |> group_types()
         |> Enum.reject(fn {_type, entries} -> entries == [] end)
         |> Enum.map_join(",", &sidebar_items_by_type/1)
       ~s/{"id":"#{node.id}","title":"#{node.id}",#{types}}/

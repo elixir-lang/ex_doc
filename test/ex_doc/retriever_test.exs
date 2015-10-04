@@ -147,8 +147,10 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "undocumented callback implementations get default doc" do
-    [node] = docs_from_files(["CustomBehaviourOne", "CustomBehaviourTwo", "CustomBehaviourImpl"])
-             |> Enum.filter(&match?(%ExDoc.ModuleNode{id: "CustomBehaviourImpl"}, &1))
+    [node] =
+      ["CustomBehaviourOne", "CustomBehaviourTwo", "CustomBehaviourImpl"]
+      |> docs_from_files()
+      |> Enum.filter(&match?(%ExDoc.ModuleNode{id: "CustomBehaviourImpl"}, &1))
     docs = node.docs
     assert Enum.map(docs, &(&1.id)) == ["bye/1", "hello/1"]
     assert Enum.at(docs, 0).doc ==

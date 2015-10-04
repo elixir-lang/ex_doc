@@ -50,6 +50,6 @@ defmodule ExDocTest do
   end
 
   test "version" do
-    assert ExDoc.version =~ ~r{\d+\.\d+\.\d+} 
+    assert ExDoc.version =~ ~r{\d+\.\d+\.\d+}
   end
 end

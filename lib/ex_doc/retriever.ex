@@ -131,28 +131,28 @@ defmodule ExDoc.Retriever do
 
   defp get_docs(type, module, source_path, source_url, specs, impls, abst_code) do
     docs = Enum.sort_by Code.get_docs(module, :docs), &elem(&1, 0)
-    for doc <- docs, has_doc?(doc, type) do
+    for doc <- docs, doc?(doc, type) do
       get_function(doc, source_path, source_url, specs, impls, abst_code)
     end
   end
 
   # Skip impl_for and impl_for! for protocols
-  defp has_doc?({{name, _}, _, _, _, nil}, :protocol) when name in [:impl_for, :impl_for!] do
+  defp doc?({{name, _}, _, _, _, nil}, :protocol) when name in [:impl_for, :impl_for!] do
     false
   end
 
   # Skip docs explicitly marked as false
-  defp has_doc?({_, _, _, _, false}, _) do
+  defp doc?({_, _, _, _, false}, _) do
     false
   end
 
   # Skip default docs if starting with _
-  defp has_doc?({{name, _}, _, _, _, nil}, _type) do
+  defp doc?({{name, _}, _, _, _, nil}, _type) do
     hd(Atom.to_char_list(name)) != ?_
   end
 
   # Everything else is ok
-  defp has_doc?(_, _) do
+  defp doc?(_, _) do
     true
   end
 
@@ -213,8 +213,10 @@ defmodule ExDoc.Retriever do
         other -> other
       end
 
-    specs = Map.get(callbacks, function, [])
-            |> Enum.map(&Typespec.spec_to_ast(name, &1))
+    specs =
+      callbacks
+      |> Map.get(function, [])
+      |> Enum.map(&Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -288,12 +290,14 @@ defmodule ExDoc.Retriever do
   defp actual_def(name, arity, _), do: {name, arity}
 
   defp find_actual_line(abst_code, function, :callback) do
-    Enum.find(abst_code, &match?({:attribute, _, :callback, {^function, _}}, &1))
+    abst_code
+    |> Enum.find(&match?({:attribute, _, :callback, {^function, _}}, &1))
     |> elem(1)
   end
 
   defp find_actual_line(abst_code, name, :module) do
-    Enum.find(abst_code, &match?({:attribute, _, :module, ^name}, &1))
+    abst_code
+    |> Enum.find(&match?({:attribute, _, :module, ^name}, &1))
     |> elem(1)
   end
 
@@ -334,12 +338,14 @@ defmodule ExDoc.Retriever do
   end
 
   defp callbacks_defined_by(module) do
-    module.module_info(:attributes)
+    :attributes
+    |> module.module_info
     |> Enum.filter_map(&match?({:callback, _}, &1), fn {_, [{t,_}|_]} -> t end)
   end
 
   defp behaviours_implemented_by(module) do
-    module.module_info(:attributes)
+    :attributes
+    |> module.module_info
     |> Stream.filter(&match?({:behaviour, _}, &1))
     |> Stream.map(fn {_, l} -> l end)
     |> Enum.concat()

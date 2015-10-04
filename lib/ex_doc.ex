@@ -56,11 +56,14 @@ defmodule ExDoc do
   defp find_formatter(modname) when is_atom(modname), do: modname
 
   defp find_formatter("ExDoc.Formatter." <> _ = name) do
-    Module.concat([name]) |> check_formatter_module(name)
+    [name]
+    |> Module.concat()
+    |> check_formatter_module(name)
   end
 
   defp find_formatter(name) do
-    Module.concat([ExDoc.Formatter, String.upcase(name)])
+    [ExDoc.Formatter, String.upcase(name)]
+    |> Module.concat()
     |> check_formatter_module(name)
   end
 

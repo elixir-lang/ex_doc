@@ -186,7 +186,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     # 3. main as index is not allowed
     config = doc_config([main: "index"])
     assert_raise ArgumentError,
-                 "\"main\" cannot be set to \"index\", otherwise it will recursively link to itself",
+                 ~S("main" cannot be set to "index", otherwise it will recursively link to itself),
                  fn -> generate_docs(config) end
   end
 
