@@ -34,6 +34,8 @@ end
 
 Now you are ready to generate your project documentation with `mix docs`.
 
+To see all options available when generating docs, run `mix help docs`.   You may have to do `mix docs` or `mix deps.compile` first.
+
 ## Using ExDoc via command line
 
 You can ExDoc via the command line as follows:
@@ -74,8 +76,6 @@ Then add the entry:
     config :ex_doc, :markdown_processor, ExDoc.Markdown.Pandoc  # or ExDoc.Markdown.Hoedown
 
 to your `config/config.exs` file.
-
-To see all options available when generating docs, just run `mix help docs`.
 
 # License
 
