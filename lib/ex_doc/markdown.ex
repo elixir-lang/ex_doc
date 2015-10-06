@@ -11,7 +11,8 @@ defmodule ExDoc.Markdown do
   Converts the given markdown document to HTML.
   """
   def to_html(text) when is_binary(text) do
-    get_markdown_processor().to_html(text) |> pretty_codeblocks
+    get_markdown_processor().to_html(text)
+    |> pretty_codeblocks()
   end
 
   @doc """
@@ -22,9 +23,9 @@ defmodule ExDoc.Markdown do
     bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>\s*iex&gt;/,
                         # Add "elixir" class for now, until we have support for
                         # "iex" in highlight.js
-                        bin, "<pre><code class=\"iex elixir\">iex&gt;")
+                        bin, ~S(<pre><code class="iex elixir">iex&gt;))
     bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>/,
-                        bin, "<pre><code class=\"elixir\">")
+                        bin, ~S(<pre><code class="elixir">))
 
     bin
   end

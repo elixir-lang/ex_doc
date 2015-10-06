@@ -32,8 +32,8 @@ defmodule ExDoc.CLI do
 
   defp merge_config(opts) do
     opts
-    |> formatter_options
-    |> extra_files_options
+    |> formatter_options()
+    |> extra_files_options()
   end
 
   defp formatter_options(opts) do

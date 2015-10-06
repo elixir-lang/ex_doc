@@ -12,7 +12,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def all(modules) do
     aliases = Enum.map modules, &(&1.module)
-    Enum.map modules, &(&1 |> all_docs(modules) |> all_typespecs(aliases))
+    modules
+    |> Enum.map(&Task.async(fn -> process_module(&1, modules, aliases) end))
+    |> Enum.map(&Task.await/1)
+  end
+
+  defp process_module(module, modules, aliases) do
+    module
+    |> all_docs(modules)
+    |> all_typespecs(aliases)
   end
 
   defp module_to_string(module) do
@@ -22,20 +30,29 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp all_docs(module, modules) do
     locals = Enum.map module.docs, &(doc_prefix(&1) <> &1.id)
 
-    if moduledoc = module.moduledoc do
-      moduledoc = moduledoc |> local_doc(locals) |> project_doc(modules, module.id)
+    if module.moduledoc do
+      moduledoc =
+        module.moduledoc
+        |> local_doc(locals)
+        |> project_doc(modules, module.id)
     end
 
     docs = for node <- module.docs do
-      if doc = node.doc do
-        doc = doc |> local_doc(locals) |> project_doc(modules, module.id)
+      if node.doc do
+        doc =
+          node.doc
+          |> local_doc(locals)
+          |> project_doc(modules, module.id)
       end
       %{node | doc: doc}
     end
 
     typedocs = for node <- module.typespecs do
-      if doc = node.doc do
-        doc = doc |> local_doc(locals) |> project_doc(modules, module.id)
+      if node.doc do
+        doc =
+          node.doc
+          |> local_doc(locals)
+          |> project_doc(modules, module.id)
       end
       %{node | doc: doc}
     end
@@ -150,7 +167,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp from_elixir(alias) do
     alias_ebin = alias_ebin(alias)
     if String.starts_with?(alias_ebin, elixir_ebin()) do
-      alias_ebin |> Path.dirname |> Path.dirname |> Path.basename
+      alias_ebin
+      |> Path.dirname()
+      |> Path.dirname()
+      |> Path.basename()
     end
   end
 
@@ -164,7 +184,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp elixir_ebin do
     case :code.where_is_file('Elixir.Kernel.beam') do
       :non_existing -> [0]
-      path -> path |> Path.dirname |> Path.dirname |> Path.dirname
+      path ->
+        path
+        |> Path.dirname()
+        |> Path.dirname()
+        |> Path.dirname()
     end
   end
 
@@ -178,9 +202,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def local_doc(bin, locals) when is_binary(bin) do
-    Regex.scan(~r{(?<!\[)`\s*(([a-z_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)\s*`(?!\])}, bin)
-    |> Enum.uniq
-    |> List.flatten
+    ~r{(?<!\[)`\s*(([a-z_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)\s*`(?!\])}
+    |> Regex.scan(bin)
+    |> Enum.uniq()
+    |> List.flatten()
     |> Enum.filter(&(&1 in locals))
     |> Enum.reduce(bin, fn (x, acc) ->
          escaped = Regex.escape(x)
@@ -193,11 +218,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def project_doc(bin, modules, module_id \\ nil) when is_binary(bin) do
     project_funs = for m <- modules, d <- m.docs, do: doc_prefix(d) <> m.id <> "." <> d.id
-    project_modules = modules |> Enum.map(&module_to_string/1) |> Enum.uniq
+    project_modules =
+      modules
+      |> Enum.map(&module_to_string/1)
+      |> Enum.uniq()
     bin
     |> project_functions(project_funs)
     |> project_modules(project_modules, module_id)
-    |> erlang_functions
+    |> erlang_functions()
   end
 
   defp doc_prefix(%{type: c}) when c in [:callback, :macrocallback], do: "c:"
@@ -213,12 +241,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def project_functions(bin, project_funs) when is_binary(bin) do
-    Regex.scan(~r{(?<!\[)`\s*((c:)?(([A-Z][A-Za-z]+)\.)+([a-z_!\?>\|=&<!~+\.\+*^@-]+)/\d+)\s*`(?!\])}, bin)
-    |> Enum.uniq
-    |> List.flatten
+    ~r{(?<!\[)`\s*((c:)?(([A-Z][A-Za-z]+)\.)+([a-z_!\?>\|=&<!~+\.\+*^@-]+)/\d+)\s*`(?!\])}
+    |> Regex.scan(bin)
+    |> Enum.uniq()
+    |> List.flatten()
     |> Enum.filter(&(&1 in project_funs))
     |> Enum.reduce(bin, fn (x, acc) ->
-         { prefix, mod_str, function_name, arity } = split_function(x)
+         {prefix, mod_str, function_name, arity} = split_function(x)
          escaped = Regex.escape(x)
          Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
            "[`#{mod_str}.#{function_name}/#{arity}`](#{mod_str}.html##{prefix}#{function_name}/#{arity})")
@@ -235,9 +264,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the module.
   """
   def project_modules(bin, modules, module_id \\ nil) when is_binary(bin) do
-    Regex.scan(~r{(?<!\[)`\s*(([A-Z][A-Za-z]+\.?)+)\s*`(?!\])}, bin)
-    |> Enum.uniq
-    |> List.flatten
+    ~r{(?<!\[)`\s*(([A-Z][A-Za-z]+\.?)+)\s*`(?!\])}
+    |> Regex.scan(bin)
+    |> Enum.uniq()
+    |> List.flatten()
     |> Enum.filter(&(&1 in modules))
     |> Enum.reduce(bin, fn (x, acc) ->
          escaped = Regex.escape(x)
@@ -257,11 +287,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp split_function(bin) do
     [modules, arity] = String.split(bin, "/")
-    { mod, name } = modules
+    {mod, name} =
+      modules
       |> String.replace(~r{([^\.])\.}, "\\1 ") # this handles the case of the ".." function
       |> String.split(" ")
       |> Enum.split(-1)
-    { "", Enum.join(mod, "."), hd(name), arity }
+    {"", Enum.join(mod, "."), hd(name), arity}
   end
 
   @doc """
@@ -278,13 +309,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def erlang_functions(bin) when is_binary(bin) do
     lib_dir = erlang_lib_dir()
-    Regex.scan(~r{(?<!\[)`\s*:([a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}, bin)
-    |> Enum.uniq
-    |> List.flatten
+    ~r{(?<!\[)`\s*:([a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}
+    |> Regex.scan(bin)
+    |> Enum.uniq()
+    |> List.flatten()
     |> Enum.filter(&valid_erlang_beam?(&1, lib_dir))
     |> Enum.filter(&module_exports_function?/1)
     |> Enum.reduce(bin, fn (x, acc) ->
-         { _, mod_str, function_name, arity } = split_function(x)
+         {_, mod_str, function_name, arity} = split_function(x)
          escaped = Regex.escape(x)
          Regex.replace(~r/(?<!\[)`(\s*:#{escaped}\s*)`(?!\])/, acc,
            "[`\\1`](#{@erlang_docs}#{mod_str}.html##{function_name}-#{arity})")
@@ -300,15 +332,18 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp on_lib_path?(:non_existing, _base_path), do: false
   defp on_lib_path?(beam_path, base_path) do
-    beam_path |> Path.expand |> String.starts_with?(base_path)
+    beam_path
+    |> Path.expand()
+    |> String.starts_with?(base_path)
   end
 
   defp erlang_lib_dir do
-    :code.lib_dir |> Path.expand
+    :code.lib_dir
+    |> Path.expand()
   end
 
   defp module_exports_function?(function_str) do
-    { _, mod_str, function_name, arity_str } = split_function(function_str)
+    {_, mod_str, function_name, arity_str} = split_function(function_str)
     module = String.to_atom(mod_str)
     function_name = String.to_atom(function_name)
     {arity, _} = Integer.parse(arity_str)

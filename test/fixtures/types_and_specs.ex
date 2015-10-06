@@ -2,7 +2,7 @@ defmodule TypesAndSpecs do
   defmodule Sub do
     @type t :: any
   end
-  
+
   @moduledoc """
   Types and tests fixture.
   """
@@ -14,7 +14,7 @@ defmodule TypesAndSpecs do
   @type ref :: { :binary.part, public(any) }
 
   @spec add(integer, opaque) :: integer
-  def add(x, _), do: x + x 
+  def add(x, _), do: x + x
 
   @spec minus(integer, integer) :: integer
   defp minus(x, y), do: x - y
