@@ -1,19 +1,34 @@
 defmodule ExDoc.ModuleNode do
+  @moduledoc """
+  Structure that represents a *module*
+  """
+
   defstruct id: nil, module: nil, moduledoc: nil,
     docs: [], typespecs: [], source: nil, type: nil
 end
 
 defmodule ExDoc.FunctionNode do
+  @moduledoc """
+  Structure that holds all the elements of an individual *function*
+  """
+
   defstruct id: nil, name: nil, arity: 0, doc: [],
     source: nil, type: nil, signature: nil, specs: []
 end
 
 defmodule ExDoc.TypeNode do
+  @moduledoc """
+  Structure that holds all the elements of an individual *type*
+  """
+
   defstruct id: nil, name: nil, arity: 0, type: nil,
     spec: nil, doc: nil, signature: nil
 end
 
 defmodule ExDoc.Retriever.Error do
+  @moduledoc """
+  Structure that hold the message of a given exception
+  """
   defexception [:message]
 end
 

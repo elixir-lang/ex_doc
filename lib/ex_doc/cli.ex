@@ -1,4 +1,12 @@
 defmodule ExDoc.CLI do
+  @moduledoc """
+  Command line parser for ExDoc
+  """
+
+  @doc """
+  Handle the command line parsing and trigger all the required mechanism to
+  transform the MarkDown documents into a specified format (default: HTML)
+  """
   def run(args, generator \\ &ExDoc.generate_docs/3) do
     {opts, args, _} = OptionParser.parse(args,
                aliases: [o: :output, f: :formatter, c: :config, r: :source_root,
