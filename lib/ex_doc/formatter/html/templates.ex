@@ -85,6 +85,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> h()
   end
 
+  @doc """
+  Create a JS object which holds all the items displayed in the sidebar area
+  """
   @spec create_sidebar_items(list) :: String.t
   def create_sidebar_items(input) do
     object =
@@ -176,6 +179,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   Enum.each templates, fn({ name, args }) ->
     filename = Path.expand("templates/#{name}.eex", __DIR__)
+    @doc false
     EEx.function_from_file :def, name, filename, args
   end
 end

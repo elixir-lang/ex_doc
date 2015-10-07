@@ -1,5 +1,14 @@
 defmodule ExDoc do
+  @moduledoc """
+  Elixir Documentation System. ExDoc produce documentation for Elixir projects
+  """
+
   defmodule Config do
+    @moduledoc """
+    Configuration structure that holds all the available options for ExDoc
+
+    You can find more details about this options in the `ExDoc.CLI` module.
+    """
     defstruct [
       extras: [],
       formatter: "html",

@@ -1,4 +1,12 @@
 defmodule ExDoc.Markdown.Earmark do
+  @moduledoc """
+  ExDoc extension for the Earmark MarkDown parser
+  """
+
+  @doc """
+  Check if the Earmark MarkDown parser module is available. Otherwise, try to
+  load the module
+  """
   def available? do
     Code.ensure_loaded?(Earmark)
   end

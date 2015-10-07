@@ -1,4 +1,11 @@
 defmodule ExDoc.Markdown.Pandoc do
+  @moduledoc """
+  ExDoc extension for the Pandoc MarkDown parser
+  """
+
+  @doc """
+  Check if the Pandoc MarkDown parser executable is available on the system
+  """
   def available? do
     !!System.find_executable("pandoc")
   end
