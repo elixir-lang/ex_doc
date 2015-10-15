@@ -57,7 +57,7 @@ You can ExDoc via the command line as follows:
 
 For example, here are some acceptable values:
 
-    PROJECT_NAME    => Dynamo
+    PROJECT_NAME    => Ecto
     PROJECT_VERSION => 0.1.0
     PROJECT_MODULE  => Ecto (the main module provided by the library)
     GITHUB_USER     => elixir-lang
