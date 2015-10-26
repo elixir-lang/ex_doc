@@ -208,8 +208,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> List.flatten()
     |> Enum.filter(&(&1 in locals))
     |> Enum.reduce(bin, fn (x, acc) ->
+         {prefix, _, function_name, arity} = split_function(x)
          escaped = Regex.escape(x)
-         Regex.replace(~r/(?<!\[)`(\s*(#{escaped})\s*)`(?!\])/, acc, "[`\\1`](#\\2)")
+         Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
+           "[`#{function_name}/#{arity}`](##{prefix}#{enc_h function_name}/#{arity})")
        end)
   end
 
@@ -250,7 +252,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
          {prefix, mod_str, function_name, arity} = split_function(x)
          escaped = Regex.escape(x)
          Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
-           "[`#{mod_str}.#{function_name}/#{arity}`](#{mod_str}.html##{prefix}#{function_name}/#{arity})")
+           "[`#{mod_str}.#{function_name}/#{arity}`](#{mod_str}.html##{prefix}#{enc_h function_name}/#{arity})")
        end)
   end
 
