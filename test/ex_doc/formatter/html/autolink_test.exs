@@ -10,7 +10,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.local_doc("`example/2` then `example/2`",
       ["example/2"]) == "[`example/2`](#example/2) then [`example/2`](#example/2)"
     assert Autolink.local_doc("`  spaces/0  `", ["spaces/0"]) ==
-      "[`  spaces/0  `](#spaces/0)"
+      "[`spaces/0`](#spaces/0)"
     assert Autolink.local_doc("`example/1` and `example/2`",
       ["example/1", "example/2"]) == "[`example/1`](#example/1) and [`example/2`](#example/2)"
     assert Autolink.local_doc("`funny_name\?/1` and `funny_name!/2`",
@@ -33,6 +33,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.local_doc("`!/1`", ["!/1"]) === "[`!/1`](#!/1)"
     assert Autolink.local_doc("`../2`", ["../2"]) === "[`../2`](#../2)"
     assert Autolink.local_doc("`--/2`", ["--/2"]) === "[`--/2`](#--/2)"
+    assert Autolink.local_doc("`<<>>/1`", ["<<>>/1"]) === "[`<<>>/1`](#%3C%3C%3E%3E/1)"
   end
 
   # project_functions
@@ -61,6 +62,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.project_functions("`Mod.!/1`", ["Mod.!/1"]) === "[`Mod.!/1`](Mod.html#!/1)"
     assert Autolink.project_functions("`Mod.../2`", ["Mod.../2"]) === "[`Mod.../2`](Mod.html#../2)"
     assert Autolink.project_functions("`Mod.--/2`", ["Mod.--/2"]) === "[`Mod.--/2`](Mod.html#--/2)"
+    assert Autolink.project_functions("`Mod.<<>>/1`", ["Mod.<<>>/1"]) === "[`Mod.<<>>/1`](Mod.html#%3C%3C%3E%3E/1)"
   end
 
   test "autolink creates links for callbacks" do
