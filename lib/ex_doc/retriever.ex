@@ -97,7 +97,8 @@ defmodule ExDoc.Retriever do
       {_, _} ->
         module
       nil ->
-        raise(Error, message: "module #{inspect module} was not compiled with flag --docs")
+        IO.puts(:stderr, "module #{inspect module} was not compiled with flag --docs")
+        nil
     end
   end
 

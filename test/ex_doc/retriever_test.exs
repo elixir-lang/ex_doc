@@ -121,6 +121,16 @@ defmodule ExDoc.RetrieverTest do
     end
   end
 
+  test "docs_from_modules warns when module was not compiled with flag --docs" do
+    module = ExDoc.RetrieverTest.ModuleNotCompiledWithFlagDocs
+    {:ok, ^module} = :compile.file('#{__DIR__}/retriever_test/#{module}.erl')
+    "Elixir." <> module_name_suffix = module |> to_string
+
+    assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+      Retriever.docs_from_modules([module], %ExDoc.Config{})
+    end) == "module #{module_name_suffix} was not compiled with flag --docs\n"
+  end
+
   ## EXCEPTIONS
 
   test "docs_from_files properly tags exceptions" do
