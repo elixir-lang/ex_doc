@@ -160,9 +160,19 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:module), do: "modules"
   defp sidebar_type(:behaviour), do: "modules"
 
+  defp asset_rev(output, pattern) do
+    output
+    |> Path.join(pattern)
+    |> Path.wildcard()
+    |> relative_asset(output)
+  end
+
+  defp relative_asset([], _), do: nil
+  defp relative_asset([h|_], output), do: Path.relative_to(h, output)
+
   templates = [
     detail_template: [:node, :_module],
-    footer_template: [],
+    footer_template: [:config],
     head_template: [:config, :page],
     module_template: [:config, :module, :types, :functions, :macros, :callbacks,
                       :modules, :exceptions, :protocols],

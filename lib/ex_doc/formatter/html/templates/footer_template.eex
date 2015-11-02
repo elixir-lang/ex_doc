@@ -13,6 +13,6 @@
   </div>
 </section>
 </div>
-    <script src="dist/app.js"></script>
+  <script src="<%= asset_rev Path.expand(config.output), "dist/app-*.js" %>"></script>
   </body>
 </html>

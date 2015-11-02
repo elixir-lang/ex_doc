@@ -2,4 +2,4 @@
 <%= sidebar_template(config, modules, exceptions, protocols) %>
 
 <%= to_html(content) %>
-<%= footer_template %>
+<%= footer_template(config) %>
