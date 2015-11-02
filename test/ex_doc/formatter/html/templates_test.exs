@@ -108,7 +108,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     content = get_module_page([CompiledWithDocs])
 
     assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
-    assert content =~ ~r{<h1>\s*CompiledWithDocs\s*}
+    assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir</small>\n\s*CompiledWithDocs\s*}
     refute content =~ ~r{<small>module</small>}
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
     assert content =~ ~r{example/2.*Some example}ms
@@ -159,12 +159,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "module_page outputs behavior and callbacks" do
     content = get_module_page([CustomBehaviourOne])
-    assert content =~ ~r{<h1>\s*CustomBehaviourOne\s*<small>behaviour</small>}m
+    assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir</small>\n\s*CustomBehaviourOne\s*<small>behaviour</small>}m
     assert content =~ ~r{Callbacks}
     assert content =~ ~r{<div class="detail" id="c:hello/1">}
 
     content = get_module_page([CustomBehaviourTwo])
-    assert content =~ ~r{<h1>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*}m
+    assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir</small>\n\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*}m
     assert content =~ ~r{Callbacks}
     assert content =~ ~r{<div class="detail" id="c:bye/1">}
   end
@@ -173,6 +173,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "module_page outputs the protocol type" do
     content = get_module_page([CustomProtocol])
-    assert content =~ ~r{<h1>\s*CustomProtocol\s*<small>protocol</small>\s*}m
+    assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir</small>\n\s*CustomProtocol\s*<small>protocol</small>\s*}m
   end
 end
