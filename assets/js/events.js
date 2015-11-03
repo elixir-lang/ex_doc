@@ -156,6 +156,22 @@ function fixLinks () {
   CONTENT.find('a').has('img').addClass('no-underline')
 }
 
+/**
+ * Identify external links inside of an specific section
+ *
+ * This function adds an icon to identify an external link.
+ *
+ * @param {String} section - Section where we want to identify the external links.
+ */
+function identifyExternalLinks (section) {
+  $([section, 'a'].join(' ')).filter(function () {
+    return (this.hostname !== location.hostname && !$(this).hasClass('view-source'))
+  }).append($('<span/>').attr({
+    'class': 'icon-new-tab',
+    'aria-hidden': 'true'
+  })).addClass('external')
+}
+
 // Public Methods
 // --------------
 
@@ -165,4 +181,5 @@ export function initialize () {
   collapse()
   identifyCurrentHash()
   fixLinks()
+  identifyExternalLinks('#content')
 }
