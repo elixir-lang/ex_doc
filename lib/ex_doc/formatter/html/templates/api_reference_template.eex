@@ -1,7 +1,7 @@
 <%= head_template(config, %{title: "API Reference", type: :extra}) %>
 <%= sidebar_template(config, modules, exceptions, protocols) %>
   <h1>
-    <small class="visible-xs"><%= config.project %></small>
+    <small class="visible-xs"><%= config.project %> v<%= config.version %></small>
     API Reference
   </h1>
 
