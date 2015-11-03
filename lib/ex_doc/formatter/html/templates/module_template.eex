@@ -2,6 +2,7 @@
     <%= sidebar_template(config, modules, exceptions, protocols) %>
 
       <h1>
+        <small class="visible-xs"><%= config.project %> v<%= config.version %></small>
         <%= module.id %>
         <%= if module.type != :module do %>
           <small><%= module.type %></small>

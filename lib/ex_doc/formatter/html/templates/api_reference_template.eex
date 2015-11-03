@@ -1,6 +1,9 @@
 <%= head_template(config, %{title: "API Reference", type: :extra}) %>
 <%= sidebar_template(config, modules, exceptions, protocols) %>
-  <h1>API Reference</h1>
+  <h1>
+    <small class="visible-xs"><%= config.project %> v<%= config.version %></small>
+    API Reference
+  </h1>
 
   <ul class="summary-links">
     <%= unless Enum.empty?(modules) do %>
