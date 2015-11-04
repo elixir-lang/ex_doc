@@ -40,8 +40,8 @@ defmodule Mix.Tasks.Docs do
     Ignored if `:source_url_pattern` is provided; default: master.
 
   * `:main` - main page of the documentation. It may be a module or a
-    generated page, like "Plug" or "extra-api-reference";
-    default: "extra-api-reference" when --formatter is "html".
+    generated page, like "Plug" or "api-reference";
+    default: "api-reference" when --formatter is "html".
 
   * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
     The image size will be 64x64 when --formatter is "html".
