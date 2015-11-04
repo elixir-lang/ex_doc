@@ -44,8 +44,20 @@ h3 {
 a {
   .linkUnderlines(@white, @black);
 
-  &.external span {
-    padding-left: 3px;
+  &.external {
+    &:link {
+      color: @purple !important;
+    }
+    &:visited {
+      color: @darkGray !important;
+    }
+    &:hover,
+    &:active {
+      color: @purple !important;
+    }
+    span {
+      padding-left: 3px;
+    }
   }
 }
 
