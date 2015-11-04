@@ -43,4 +43,4 @@
       </div>
     </section>
   <% end %>
-<%= footer_template %>
+<%= footer_template(config) %>

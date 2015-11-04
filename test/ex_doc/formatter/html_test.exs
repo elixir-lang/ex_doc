@@ -108,8 +108,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(config)
 
     assert File.regular?("#{output_dir}/another_dir/CompiledWithDocs.html")
-    assert File.regular?("#{output_dir}/another_dir/dist/app.css")
-    assert File.regular?("#{output_dir}/another_dir/dist/app.js")
+    assert "#{output_dir}/another_dir/dist/app-*.css" |> Path.wildcard |> File.regular?
+    assert "#{output_dir}/another_dir/dist/app-*.js" |> Path.wildcard |> File.regular?
     assert File.regular?("#{output_dir}/another_dir/RandomError.html")
     content = File.read!("#{output_dir}/another_dir/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}

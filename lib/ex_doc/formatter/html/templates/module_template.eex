@@ -84,4 +84,4 @@
           <%= for node <- callbacks, do: detail_template(node, module) %>
         </section>
       <% end %>
-    <%= footer_template %>
+    <%= footer_template(config) %>
