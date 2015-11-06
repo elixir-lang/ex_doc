@@ -28,7 +28,7 @@
   </div>
 
   <ul class="sidebar-listNav">
-    <li><a id="extras-list" href="#full-list">Pages</a></li>
+    <li><a id="extras-list" href="#full-list"><%= if config.extra_title do %><%= config.extra_title %><% else %>Pages<% end %></a></li>
 
     <%= unless Enum.empty?(modules) do %>
       <li><a id="modules-list" href="#full-list">Modules</a></li>
