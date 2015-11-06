@@ -46,6 +46,9 @@ defmodule Mix.Tasks.Docs do
   * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
     The image size will be 64x64 when --formatter is "html".
 
+  * `:extra_section` - String that define the section title of the additional
+    Markdown pages (e.g. "GUIDES"); default: "PAGES"
+
   * `:extras` - List of strings, each one must indicate the path to additional
     Markdown pages (e.g. `["README.md", "CONTRIBUTING.md"]`); default: `[]`
   """
