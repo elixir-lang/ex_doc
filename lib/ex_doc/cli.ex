@@ -109,6 +109,8 @@ defmodule ExDoc.CLI do
       -m, --main          The main, entry-point module in docs,
                           default: "extra-api-reference" when --formatter is "html"
       -p, --homepage-url  URL to link to for the site name
+          --extra-section Allow user to define the title for the additional Markdown files,
+                          default: "PAGES"
       -e, --extra         Allow users to include additional Markdown files
                           May be given multiple times
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)

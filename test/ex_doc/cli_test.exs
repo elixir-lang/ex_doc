@@ -14,11 +14,11 @@ defmodule ExDoc.CLITest do
   test "loading config" do
     File.write!("test.config", ~s([key: "val"]))
 
-    {project, version, opts} = run(["ExDoc", "--extra", "README.md", "1.2.3", "...", "-c", "test.config"])
+    {project, version, opts} = run(["ExDoc", "--extra-section", "Guides", "--extra", "README.md", "1.2.3", "...", "-c", "test.config"])
 
     assert project == "ExDoc"
     assert version == "1.2.3"
-    assert Enum.sort(opts) == [extras: ["README.md"], formatter_opts: [key: "val"], source_beam: "..."]
+    assert Enum.sort(opts) == [extra_section: "Guides", extras: ["README.md"], formatter_opts: [key: "val"], source_beam: "..."]
   after
     File.rm!("test.config")
   end

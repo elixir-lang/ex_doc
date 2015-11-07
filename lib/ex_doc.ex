@@ -10,6 +10,7 @@ defmodule ExDoc do
     You can find more details about this options in the `ExDoc.CLI` module.
     """
     defstruct [
+      extra_section: nil,
       extras: [],
       formatter: "html",
       formatter_opts: [],
