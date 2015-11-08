@@ -174,6 +174,23 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute content =~ ~r{<title>README [^<]*</title>}
   end
 
+  test "run should generate the readme input file as getting-started" do
+    generate_docs(doc_config(extras: ["test/fixtures/README.md": [path: "GETTING-STARTED"]]))
+    refute File.regular?("#{output_dir}/readme.html")
+    content = File.read!("#{output_dir}/GETTING-STARTED.html")
+    assert content =~ ~r{<title>README [^<]*</title>}
+    content = File.read!("#{output_dir}/dist/sidebar_items.js")
+    assert content =~ ~r{"id":"GETTING-STARTED","title":"README"}
+  end
+
+  test "run uses custom menu title" do
+    generate_docs(doc_config(extras: ["test/fixtures/README.md": [title: "Getting Started"]]))
+    content = File.read!("#{output_dir}/readme.html")
+    assert content =~ ~r{<title>Getting Started – Elixir v1.0.1</title>}
+    content = File.read!("#{output_dir}/dist/sidebar_items.js")
+    assert content =~ ~r{"id":"readme","title":"Getting Started"}
+   end
+
   test "run normalizes options" do
     # 1. Check for output dir having trailing "/" stripped
     # 2. Check for default [main: "api-reference"]

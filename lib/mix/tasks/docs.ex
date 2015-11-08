@@ -49,8 +49,11 @@ defmodule Mix.Tasks.Docs do
   * `:extra_section` - String that define the section title of the additional
     Markdown pages (e.g. "GUIDES"); default: "PAGES"
 
-  * `:extras` - List of strings, each one must indicate the path to additional
-    Markdown pages (e.g. `["README.md", "CONTRIBUTING.md"]`); default: `[]`
+  * `:extras` - List of keywords, each key must indicate the path to additional
+    Markdown pages, the value for each keyword (optional) gives you more control
+    about the PATH and the title of the output files, please remember that the
+    title also will be used in the sidebar area (under the :extra_section); default: `[]`
+    (e.g. `["README.md", "CONTRIBUTING.md": [path: "CONTRIBUTORS", title: "Help us!"]]`)
   """
 
   @doc false
