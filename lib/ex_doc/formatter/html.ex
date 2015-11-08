@@ -160,11 +160,11 @@ defmodule ExDoc.Formatter.HTML do
       |> Path.extname()
       |> String.downcase()
 
-      if file_ext in [".md"] do
-        true
-      else
-        false
-      end
+    if file_ext in [".md"] do
+      true
+    else
+      false
+    end
   end
 
   @h2_regex ~r/^##([^#].*)\n$/m
