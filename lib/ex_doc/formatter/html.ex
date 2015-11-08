@@ -103,12 +103,11 @@ defmodule ExDoc.Formatter.HTML do
     [{"api-reference", "API Reference", []}|extras]
   end
 
-  defp generate_extra({input_file, output_file_name}, output, module_nodes, modules, exceptions, protocols, config) do
-    title = input_to_title(output_file_name)
+  defp generate_extra({input_file, menu_title}, output, module_nodes, modules, exceptions, protocols, config) do
 
     options = %{
-      title: title,
-      output_file_name: title,
+      title: menu_title,
+      output_file_name: Path.basename(input_file, ".md"),
       input: to_string(input_file),
       output: output
     }
