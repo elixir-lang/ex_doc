@@ -107,7 +107,7 @@ defmodule ExDoc.CLI do
       -u, --source-url    URL to the source code
           --source-ref    Branch/commit/tag used for source link inference, default: "master"
       -m, --main          The main, entry-point module in docs,
-                          default: "extra-api-reference" when --formatter is "html"
+                          default: "api-reference" when --formatter is "html"
       -p, --homepage-url  URL to link to for the site name
           --extra-section Allow user to define the title for the additional Markdown files,
                           default: "PAGES"

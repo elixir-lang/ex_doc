@@ -6,7 +6,7 @@ defmodule ExDoc.Formatter.HTML do
   alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Formatter.HTML.Autolink
 
-  @main "extra-api-reference"
+  @main "api-reference"
 
   @doc """
   Generate HTML documentation for the given modules
@@ -56,7 +56,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_api_reference(modules, exceptions, protocols, output, config) do
     content = Templates.api_reference_template(config, modules, exceptions, protocols)
-    File.write!("#{output}/extra-api-reference.html", content)
+    File.write!("#{output}/api-reference.html", content)
   end
 
   defp generate_not_found(modules, exceptions, protocols, output, config) do
@@ -100,35 +100,74 @@ defmodule ExDoc.Formatter.HTML do
           generate_extra(&1, output, module_nodes, modules, exceptions, protocols, config)
          end))
       |> Enum.map(&Task.await/1)
-    [{"extra-api-reference", "API Reference", []}|extras]
+    [{"api-reference", "API Reference", []}|extras]
+  end
+
+  defp generate_extra({input_file, output_file_name}, output, module_nodes, modules, exceptions, protocols, config) do
+    title = input_to_title(output_file_name)
+
+    options = %{
+      title: title,
+      output_file_name: title,
+      input: to_string(input_file),
+      output: output
+    }
+
+    create_extra_files(module_nodes, modules, exceptions, protocols, config, options)
   end
 
   defp generate_extra(input, output, module_nodes, modules, exceptions, protocols, config) do
-    file_ext =
-      input
-      |> Path.extname()
-      |> String.downcase()
+    title = input_to_title(input)
+    output_file_name = title_to_filename(title)
 
-    if file_ext in [".md"] do
-      title = Path.rootname(Path.basename(input))
-      file_name = title_to_filename(title)
+    options = %{
+      title: title,
+      output_file_name: output_file_name,
+      input: input,
+      output: output
+    }
 
+    create_extra_files(module_nodes, modules, exceptions, protocols, config, options)
+  end
+
+  defp create_extra_files(module_nodes, modules, exceptions, protocols, config, options) do
+    if valid_extension_name?(options.input) do
       content =
-        input
+        options.input
         |> File.read!()
         |> Autolink.project_doc(module_nodes)
 
-      html = Templates.extra_template(config, title, modules,
+      html = Templates.extra_template(config, options.title, modules,
                                       exceptions, protocols, link_headers(content))
 
-      File.write!("#{output}/#{file_name}.html", html)
-      {file_name, title, extract_headers(content)}
+      output = "#{options.output}/#{options.output_file_name}.html"
+
+      if File.regular? output do
+        IO.puts "warning: file #{Path.basename output} already exists"
+      end
+
+      File.write!(output, html)
+
+      {options.output_file_name, options.title, extract_headers(content)}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
   end
 
-  @h2_regex ~r/^##([^#].*)$/m
+  defp valid_extension_name?(input) do
+    file_ext =
+      input
+      |> Path.extname()
+      |> String.downcase()
+
+      if file_ext in [".md"] do
+        true
+      else
+        false
+      end
+  end
+
+  @h2_regex ~r/^##([^#].*)\n$/m
 
   defp extract_headers(content) do
     @h2_regex
@@ -143,8 +182,12 @@ defmodule ExDoc.Formatter.HTML do
     end)
   end
 
+  defp input_to_title(input) do
+    input |> Path.basename() |> Path.rootname()
+  end
+
   defp title_to_filename(title) do
-    "extra-" <> (title |> String.replace(" ", "-") |> String.downcase)
+    title |> String.replace(" ", "-") |> String.downcase()
   end
 
   defp header_to_id(header) do
