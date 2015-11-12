@@ -191,6 +191,14 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{"id":"readme","title":"Getting Started"}
    end
 
+  test "run uses first <h1> as menu title" do
+    generate_docs(doc_config(extras: ["test/fixtures/ExtraPage.md"]))
+    content = File.read!("#{output_dir}/extrapage.html")
+    assert content =~ ~r{<title>Extra Page Title – Elixir v1.0.1</title>}
+    content = File.read!("#{output_dir}/dist/sidebar_items.js")
+    assert content =~ ~r{"id":"extrapage","title":"Extra Page Title"}
+  end
+
   test "run normalizes options" do
     # 1. Check for output dir having trailing "/" stripped
     # 2. Check for default [main: "api-reference"]

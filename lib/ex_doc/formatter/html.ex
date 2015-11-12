@@ -105,11 +105,10 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_extra({input_file, options}, output, module_nodes, modules, exceptions, protocols, config) do
     input_file = to_string(input_file)
-    title = options[:title] || input_to_title(input_file)
     output_file_name = options[:path] || input_file |> input_to_title() |> title_to_filename()
 
     options = %{
-      title: title,
+      title: options[:title],
       output_file_name: output_file_name,
       input: input_file,
       output: output
@@ -119,11 +118,9 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_extra(input, output, module_nodes, modules, exceptions, protocols, config) do
-    title = input_to_title(input)
-    output_file_name = title_to_filename(title)
+     output_file_name = input |> input_to_title |> title_to_filename
 
     options = %{
-      title: title,
       output_file_name: output_file_name,
       input: input,
       output: output
@@ -139,7 +136,9 @@ defmodule ExDoc.Formatter.HTML do
         |> File.read!()
         |> Autolink.project_doc(module_nodes)
 
-      html = Templates.extra_template(config, options.title, modules,
+      title = options[:title] || extract_title(content) || input_to_title(options[:input])
+
+      html = Templates.extra_template(config, title, modules,
                                       exceptions, protocols, link_headers(content))
 
       output = "#{options.output}/#{options.output_file_name}.html"
@@ -150,7 +149,7 @@ defmodule ExDoc.Formatter.HTML do
 
       File.write!(output, html)
 
-      {options.output_file_name, options.title, extract_headers(content)}
+      {options.output_file_name, title, extract_headers(content)}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
@@ -166,6 +165,16 @@ defmodule ExDoc.Formatter.HTML do
       true
     else
       false
+    end
+  end
+
+  @h1_regex ~r/^#([^#].*)\n$/m
+
+  defp extract_title(content) do
+    title = Regex.run(@h1_regex, content, capture: :all_but_first)
+
+    if title do
+      title |> List.first |> String.strip
     end
   end
 
