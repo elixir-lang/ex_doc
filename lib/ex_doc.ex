@@ -1,6 +1,6 @@
 defmodule ExDoc do
   @moduledoc """
-  Elixir Documentation System. ExDoc produce documentation for Elixir projects
+  Elixir Documentation System. ExDoc produces documentation for Elixir projects
   """
 
   defmodule Config do
