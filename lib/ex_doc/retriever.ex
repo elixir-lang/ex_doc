@@ -262,9 +262,9 @@ defmodule ExDoc.Retriever do
     |> Enum.take(-arity)
     |> Enum.with_index()
     |> Enum.map(fn
-      {{:::, _, [left, _]}, i}         -> to_var(left, i)
-      {ast, i} when elem(ast, 0) == :| -> to_var({}, i)
-      {left, i}                        -> to_var(left, i)
+      {{:::, _, [left, _]}, i} -> to_var(left, i)
+      {{:|, _, _}, i}          -> to_var({}, i)
+      {left, i}                -> to_var(left, i)
     end)
   end
 
