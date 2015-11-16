@@ -5,6 +5,7 @@ defmodule CustomBehaviourOne do
   This is a sample callback.
   """
   defcallback hello(integer) :: integer
+  defcallback greet(integer | string) :: integer
 end
 
 defmodule CustomBehaviourTwo do

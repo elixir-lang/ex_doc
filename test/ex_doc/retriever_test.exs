@@ -133,9 +133,12 @@ defmodule ExDoc.RetrieverTest do
   test "ignore behaviours internal functions" do
     [node] = docs_from_files ["CustomBehaviourOne"]
     functions = Enum.map node.docs, fn(doc) -> doc.id end
-    assert functions == ["hello/1"]
-    assert hd(node.docs).type == :callback
-    assert hd(node.docs).signature == "hello(integer)"
+    assert functions == ["greet/1", "hello/1"]
+    [greet, hello] = node.docs
+    assert hello.type == :callback
+    assert hello.signature == "hello(integer)"
+    assert greet.type == :callback
+    assert greet.signature == "greet(arg0)"
   end
 
   test "retrieves macro callbacks from behaviours" do

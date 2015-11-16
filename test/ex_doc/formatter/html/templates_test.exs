@@ -162,6 +162,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CustomBehaviourOne\s*<small>behaviour</small>}m
     assert content =~ ~r{Callbacks}
     assert content =~ ~r{<div class="detail" id="c:hello/1">}
+    assert content =~ ~s[hello(integer)]
+    assert content =~ ~s[greet(arg0)]
 
     content = get_module_page([CustomBehaviourTwo])
     assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*}m
