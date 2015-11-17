@@ -30,30 +30,30 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp all_docs(module, modules) do
     locals = Enum.map module.docs, &(doc_prefix(&1) <> &1.id)
 
-    if module.moduledoc do
-      moduledoc =
+    moduledoc =
+      if module.moduledoc do
         module.moduledoc
         |> local_doc(locals)
         |> project_doc(modules, module.id)
-    end
+      end
 
     docs = for node <- module.docs do
-      if node.doc do
-        doc =
+      doc =
+        if node.doc do
           node.doc
           |> local_doc(locals)
           |> project_doc(modules, module.id)
-      end
+        end
       %{node | doc: doc}
     end
 
     typedocs = for node <- module.typespecs do
-      if node.doc do
-        doc =
+      doc =
+        if node.doc do
           node.doc
           |> local_doc(locals)
           |> project_doc(modules, module.id)
-      end
+        end
       %{node | doc: doc}
     end
 
