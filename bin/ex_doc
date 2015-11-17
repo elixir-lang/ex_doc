@@ -1,12 +1,17 @@
-#!/usr/bin/env elixir
-mix_env = System.get_env["MIX_ENV"] || "dev"
-Code.prepend_path Path.expand("../_build/#{mix_env}/lib/earmark/ebin", __DIR__)
-Code.prepend_path Path.expand("../_build/#{mix_env}/lib/ex_doc/ebin", __DIR__)
+#!/usr/bin/env bash
+# Resolve symlinks if any exist. For example, the following symlink would now work:
+#
+# $ ls -l ~/bin/ex_doc
+# lrwxr-xr-x  1 $USER  staff  56 Nov 17 11:56 /Users/$USER/bin/ex_doc -> /Users/$USER/github.com/elixir-lang/ex_doc/bin/ex_doc
 
-if Code.ensure_loaded?(ExDoc.CLI) do
-  ExDoc.CLI.run(System.argv)
-else
-  IO.puts :stderr, "Error: cannot generate docs because ExDoc.CLI module is not available. " <>
-                   "Please run `mix compile` before or ensure ExDoc is available."
-  exit(1)
-end
+# http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+# launch ex_doc
+exec "${DIR}/ex_doc.exs" "${@}"
