@@ -1,15 +1,15 @@
 defmodule ExDoc.Markdown do
   @moduledoc """
-  Transform a given document in MarkDown to HTML
+  Transform a given document in Markdown to HTML
 
-  ExDoc supports the following MarkDown parsers:
+  ExDoc supports the following Markdown parsers:
 
   * [Hoedown][]
   * [Earmark][]
   * [Pandoc][]
 
   If you don't specify a parser in `config/config.exs`. ExDoc will try to
-  find one of the MarkDown parser from the list in top down fashion. Otherwise, 
+  find one of the Markdown parser from the list in top down fashion. Otherwise, 
   ExDoc will raise an exception.
 
   [Pandoc]: http://johnmacfarlane.net/pandoc/
