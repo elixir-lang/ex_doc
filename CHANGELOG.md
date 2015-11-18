@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.11.0
+
+* Enhancements
+    * From now on it's possible to set the title in the sidebar area for
+      additional content, *default:* "Pages"
+    * Set the path and title of each additional page in `mix.exs` file
+    * Use the first `h1` as menu title if title is not configured
+    * Include the project name as part of the header in small devices
+* Bug fixes
+    * Increase the visual separation between functions
+    * Remove the `extra-` prefix for the additional documentation files
+    * Extra large images do not create an overflow in the content
+
 ## v0.10.0
 
 * Enhancements
