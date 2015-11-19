@@ -11,7 +11,11 @@ defmodule ExDoc.Mixfile do
      package: package,
      source_url: "https://github.com/elixir-lang/ex_doc/",
      test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: [coveralls: :test]]
+     preferred_cli_env: [coveralls: :test],
+     description: """
+     ExDoc is a documentation generation tool for the Elixir programming
+     language
+     """]
   end
 
   def application do
