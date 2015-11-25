@@ -328,11 +328,8 @@ defmodule ExDoc.Retriever do
   # protocol, implementation or simply a module
   defp detect_type(module) do
     cond do
-      function_exported?(module, :__struct__, 0) ->
-        case module.__struct__ do
-          %{__exception__: true} -> :exception
-          _ -> :module
-        end
+      function_exported?(module, :__struct__, 0) and
+        match?(%{__exception__: true}, module.__struct__) -> :exception
       function_exported?(module, :__protocol__, 1) -> :protocol
       function_exported?(module, :__impl__, 1) -> :impl
       function_exported?(module, :behaviour_info, 1) -> :behaviour

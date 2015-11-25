@@ -1,6 +1,9 @@
 defmodule CustomBehaviourOne do
   use Behaviour
 
+  # Defining a struct should not affect the behaviour
+  defstruct [:a, :b]
+
   @doc """
   This is a sample callback.
   """
