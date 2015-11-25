@@ -155,11 +155,11 @@ defmodule ExDoc.RetrieverTest do
       |> docs_from_files()
       |> Enum.filter(&match?(%ExDoc.ModuleNode{id: "CustomBehaviourImpl"}, &1))
     docs = node.docs
-    assert Enum.map(docs, &(&1.id)) == ["bye/1", "hello/1"]
+    assert Enum.map(docs, &(&1.id)) == ["bye/1", "greet/1", "hello/1"]
     assert Enum.at(docs, 0).doc ==
       "A doc for this so it doesn't use 'Callback implementation for'"
     assert Enum.at(docs, 1).doc ==
-      "Callback implementation for `c:CustomBehaviourOne.hello/1`."
+      "Callback implementation for `c:CustomBehaviourOne.greet/1`."
   end
 
   ## PROTOCOLS

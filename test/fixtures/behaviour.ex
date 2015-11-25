@@ -25,6 +25,7 @@ defmodule CustomBehaviourImpl do
   @behaviour CustomBehaviourTwo
 
   def hello(i), do: i
+  def greet(i), do: i
 
   @doc "A doc for this so it doesn't use 'Callback implementation for'"
   defmacro bye(i), do: i

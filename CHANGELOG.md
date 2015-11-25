@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.11.1
+
+  * Bug fixes
+    * Include callbacks even if a module defines a struct
+
 ## v0.11.0
 
   * Enhancements
