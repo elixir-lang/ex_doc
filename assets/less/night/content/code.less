@@ -1,0 +1,30 @@
+a.no-underline,
+code a {
+  color: @nightPurple;
+
+  &:visited,
+  &:active,
+  &:focus,
+  &:hover {
+    color: @nightPurple;
+  }
+}
+
+code {
+  background-color: @nightCodeBlue;
+  border: 1px solid @nightMediumBlue;
+  color: @white;
+}
+
+pre {
+
+  &.spec {
+  }
+
+  &.spec code {
+  }
+
+  code.hljs {
+    background-color: @nightCodeBlue;
+  }
+}
