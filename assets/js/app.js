@@ -6,6 +6,7 @@ import hljs from 'highlight.js/build/highlight.pack'
 
 import {initialize as initEvents} from './events'
 import {initialize as initSidebar} from './sidebar'
+import {initialize as initNightMode} from './night'
 
 window.$ = $
 
@@ -16,6 +17,7 @@ $(() => {
     languages: []       // disable auto-detect
   })
 
+  initNightMode()
   initSidebar()
   initEvents()
   hljs.initHighlighting()
