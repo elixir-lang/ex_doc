@@ -18,4 +18,11 @@
 
 body.night-mode {
   background: @nightGray;
+
+  .night-mode-toggle {
+    &:hover:before {
+      color: @mediumGray;
+      content: 'Day mode ';
+    }
+  }
 }
