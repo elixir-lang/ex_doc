@@ -11,13 +11,24 @@ const sidebar = $('.sidebar')
 
 const bodyClass = 'sidebar-closed'
 const duration = 300
-const width = '300px'
 const displayProps = [
   '-webkit-flex',
   '-ms-flexbox',
   '-ms-flex',
   'flex'
 ]
+
+function getWidth () {
+  const docWidth = $(document).width()
+  if (docWidth >= 1800) {
+    return '425px'
+  } else if (docWidth >= 1600) {
+    return '375px'
+  }
+  return '300px'
+}
+
+let width = getWidth()
 
 function closeSidebar () {
   sidebar.animate({
@@ -35,6 +46,8 @@ function closeSidebar () {
 }
 
 function openSidebar (immediate) {
+  width = getWidth()
+
   body.removeClass(bodyClass)
   displayProps.forEach(prop => {
     sidebar.css({display: prop})
@@ -49,7 +62,9 @@ function openSidebar (immediate) {
     '-ms-flex-basis': width,
     'flex-basis': width,
     width: width
-  }, duration)
+  }, duration, function () {
+    sidebar.attr('style', '')
+  })
 }
 
 function toggleSidebar () {
