@@ -118,7 +118,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates all listing files" do
     generate_docs(doc_config)
 
-    content = File.read!("#{output_dir}/dist/sidebar_items.js")
+    content = File.read!("#{output_dir}/dist/sidebar_items.json")
     assert content =~ ~r{"id":"CompiledWithDocs\"}ms
     assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example/2")ms
     assert content =~ ~r{"id":"CompiledWithDocs\.Nested"}ms
@@ -135,7 +135,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates empty listing files only with extras" do
     generate_docs(doc_config(source_root: "unknown", source_beam: "unknown"))
 
-    content = File.read!("#{output_dir}/dist/sidebar_items.js")
+    content = File.read!("#{output_dir}/dist/sidebar_items.json")
     assert content =~ ~s("modules":[])
     assert content =~ ~s("exceptions":[])
     assert content =~ ~s("protocols":[])
@@ -179,7 +179,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute File.regular?("#{output_dir}/readme.html")
     content = File.read!("#{output_dir}/GETTING-STARTED.html")
     assert content =~ ~r{<title>README [^<]*</title>}
-    content = File.read!("#{output_dir}/dist/sidebar_items.js")
+    content = File.read!("#{output_dir}/dist/sidebar_items.json")
     assert content =~ ~r{"id":"GETTING-STARTED","title":"README"}
   end
 
@@ -187,7 +187,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config(extras: ["test/fixtures/README.md": [title: "Getting Started"]]))
     content = File.read!("#{output_dir}/readme.html")
     assert content =~ ~r{<title>Getting Started – Elixir v1.0.1</title>}
-    content = File.read!("#{output_dir}/dist/sidebar_items.js")
+    content = File.read!("#{output_dir}/dist/sidebar_items.json")
     assert content =~ ~r{"id":"readme","title":"Getting Started"}
    end
 
@@ -195,7 +195,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config(extras: ["test/fixtures/ExtraPage.md"]))
     content = File.read!("#{output_dir}/extrapage.html")
     assert content =~ ~r{<title>Extra Page Title – Elixir v1.0.1</title>}
-    content = File.read!("#{output_dir}/dist/sidebar_items.js")
+    content = File.read!("#{output_dir}/dist/sidebar_items.json")
     assert content =~ ~r{"id":"extrapage","title":"Extra Page Title"}
   end
 

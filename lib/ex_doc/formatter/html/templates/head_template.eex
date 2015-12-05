@@ -8,6 +8,5 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v<%= ExDoc.version %>">
     <link rel="stylesheet" href="<%= asset_rev config.output, "dist/app*.css" %>" />
-    <script src="dist/sidebar_items.js"></script>
   </head>
   <body data-type="<%= sidebar_type(page.type) %>">

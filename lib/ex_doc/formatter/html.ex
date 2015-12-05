@@ -68,11 +68,11 @@ defmodule ExDoc.Formatter.HTML do
     nodes = %{modules: modules, protocols: protocols,
               exceptions: exceptions, extras: extras}
     content = Templates.create_sidebar_items(nodes)
-    File.write!("#{output}/dist/sidebar_items.js", content)
+    File.write!("#{output}/dist/sidebar_items.json", content)
   end
 
   defp assets do
-    [{"dist/*.{css,js}", "dist"},
+    [{"dist/*.{css,js,json}", "dist"},
      {"fonts/*.{eot,svg,ttf,woff,woff2}", "fonts"}]
   end
 

@@ -8,6 +8,7 @@ import {initialize as initEvents} from './events'
 import {initialize as initSidebar} from './sidebar'
 
 window.$ = $
+window.sidebarNodes = {}
 
 $(() => {
   // Setup Highlight.js
@@ -16,7 +17,10 @@ $(() => {
     languages: []       // disable auto-detect
   })
 
-  initSidebar()
-  initEvents()
+  $.getJSON('dist/sidebar_items.json', function (data) {
+    window.sidebarNodes = data
+    initSidebar()
+    initEvents()
+  })
   hljs.initHighlighting()
 })
