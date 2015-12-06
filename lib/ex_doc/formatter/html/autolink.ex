@@ -14,7 +14,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     aliases = Enum.map modules, &(&1.module)
     modules
     |> Enum.map(&Task.async(fn -> process_module(&1, modules, aliases) end))
-    |> Enum.map(&Task.await/1)
+    |> Enum.map(&Task.await(&1, :infinity))
   end
 
   defp process_module(module, modules, aliases) do
