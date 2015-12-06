@@ -99,7 +99,7 @@ defmodule ExDoc.Formatter.HTML do
       |> Enum.map(&Task.async(fn ->
           generate_extra(&1, output, module_nodes, modules, exceptions, protocols, config)
          end))
-      |> Enum.map(&Task.await/1)
+      |> Enum.map(&Task.await(&1, :infinity))
     [{"api-reference", "API Reference", []}|extras]
   end
 
@@ -118,7 +118,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_extra(input, output, module_nodes, modules, exceptions, protocols, config) do
-     output_file_name = input |> input_to_title |> title_to_filename
+    output_file_name = input |> input_to_title |> title_to_filename
 
     options = %{
       output_file_name: output_file_name,
@@ -246,7 +246,7 @@ defmodule ExDoc.Formatter.HTML do
     |> Enum.map(&Task.async(fn ->
         generate_module_page(&1, modules, exceptions, protocols, output, config)
        end))
-    |> Enum.map(&Task.await/1)
+    |> Enum.map(&Task.await(&1, :infinity))
   end
 
   defp generate_module_page(node, modules, exceptions, protocols, output, config) do
