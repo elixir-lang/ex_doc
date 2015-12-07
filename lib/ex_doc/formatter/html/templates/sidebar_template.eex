@@ -48,7 +48,4 @@
 </section>
 
 <section class="content">
-  <button class="night-mode-toggle">
-    <i class="icon-moon"></i>
-  </button>
   <div id="content" class="content-inner">

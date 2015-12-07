@@ -1,23 +1,11 @@
-a.no-underline,
-code a {
-  color: @nightPurple;
-
-  &:visited,
-  &:active,
-  &:focus,
-  &:hover {
-    color: @nightPurple;
-  }
-}
-
 code {
-  background-color: @nightCodeBlue;
-  border: 1px solid @nightMediumBlue;
-  color: @white;
+  background-color: @nightCodeBackground;
+  border: 1px solid @nightCodeBorder;
 }
 
 pre {
   code.hljs {
-    background-color: @nightCodeBlue;
+    background-color: @nightCodeBackground;
+    border: 1px solid @nightCodeBorder;
   }
 }
