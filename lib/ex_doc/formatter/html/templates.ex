@@ -94,7 +94,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
       input
       |> Enum.into([], &sidebar_items_keys/1)
       |> Enum.join(",")
-    "sidebarNodes={#{object}}"
+    "{#{object}}"
   end
 
   defp sidebar_items_keys({:extras, value}) do
