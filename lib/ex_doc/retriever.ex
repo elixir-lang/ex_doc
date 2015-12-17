@@ -91,13 +91,18 @@ defmodule ExDoc.Retriever do
   end
 
   defp verify_module(module) do
-    case Code.get_docs(module, :moduledoc) do
-      {_line, false} ->
-        nil
-      {_, _} ->
-        module
-      nil ->
-        raise(Error, message: "module #{inspect module} was not compiled with flag --docs")
+    if function_exported?(module, :__info__, 1) do
+      case Code.get_docs(module, :moduledoc) do
+        {_line, false} ->
+          nil
+        {_, _} ->
+          module
+        nil ->
+          raise("module #{inspect module} was not compiled with flag --docs")
+      end
+    else
+      IO.puts(:stderr, "module #{inspect module} does not export __info__/1")
+      nil
     end
   end
 
