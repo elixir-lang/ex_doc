@@ -3,7 +3,7 @@ defmodule ExDoc.Mixfile do
 
   def project do
     [app: :ex_doc,
-     version: "0.11.2-dev",
+     version: "0.11.2",
      elixir: "~> 1.0",
      elixirc_paths: elixirc_paths(Mix.env),
      deps: deps,
@@ -12,10 +12,7 @@ defmodule ExDoc.Mixfile do
      source_url: "https://github.com/elixir-lang/ex_doc/",
      test_coverage: [tool: ExCoveralls],
      preferred_cli_env: [coveralls: :test],
-     description: """
-     ExDoc is a documentation generation tool for the Elixir programming
-     language
-     """]
+     description: "ExDoc is a documentation generation tool for Elixir"]
   end
 
   def application do

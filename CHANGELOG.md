@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.11.2
+
+  * Enhancements
+    * Include night mode for docs
+    * Take advantage of extra space on large screens by widening sidebar
+
+  * Bug fixes
+    * Do not attempt to retrieve docs from Erlang modules
+
 ## v0.11.1
 
   * Bug fixes
