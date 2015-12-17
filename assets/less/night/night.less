@@ -1,0 +1,29 @@
+.night-mode-toggle {
+  background: none;
+  border: none;
+
+  &:after {
+    font-size: 12px;
+    color: @lightGray;
+    content: 'Switch to night mode';
+    text-decoration: underline;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+body.night-mode {
+  @import 'npm://highlight.js/src/styles/tomorrow-night';
+
+  background: @nightBackground;
+
+  .night-mode-toggle {
+    &:after {
+      color: @mediumGray;
+      content: 'Switch to day mode';
+      text-decoration: underline;
+    }
+  }
+}
