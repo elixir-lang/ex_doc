@@ -305,6 +305,9 @@ defmodule ExDoc.Retriever do
     end
   end
 
+  defp actual_def(name, arity, :macrocallback) do
+    actual_def(name, arity, :defmacro)
+  end
   defp actual_def(name, arity, :defmacro) do
     {String.to_atom("MACRO-" <> to_string(name)), arity + 1}
   end
