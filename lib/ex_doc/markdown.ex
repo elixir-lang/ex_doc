@@ -7,20 +7,23 @@ defmodule ExDoc.Markdown do
   * [Hoedown][]
   * [Earmark][]
   * [Pandoc][]
+  * [Cmark][]
 
   If you don't specify a parser in `config/config.exs`. ExDoc will try to
-  find one of the Markdown parser from the list in top down fashion. Otherwise, 
+  find one of the Markdown parser from the list in top down fashion. Otherwise,
   ExDoc will raise an exception.
 
   [Pandoc]: http://johnmacfarlane.net/pandoc/
   [Hoedown]: https://github.com/hoedown/hoedown
   [Earmark]: http://github.com/pragdave/earmark
+  [Cmark]: https://github.com/asaaki/cmark.ex
   """
 
   @markdown_processors [
     ExDoc.Markdown.Hoedown,
     ExDoc.Markdown.Earmark,
-    ExDoc.Markdown.Pandoc
+    ExDoc.Markdown.Pandoc,
+    ExDoc.Markdown.Cmark
   ]
 
   @markdown_processor_key :markdown_processor
@@ -74,6 +77,9 @@ defmodule ExDoc.Markdown do
 
     * Add {:markdown, github: "devinus/markdown"} to your mix.exs deps
       to use a C-based markdown processor
+
+    * Add {:cmark, ">= 0.5"} to your mix.exs deps
+      to use another C-based markdown processor
 
     * Ensure pandoc (http://johnmacfarlane.net/pandoc) is available on your system
       to use it as an external tool
