@@ -65,15 +65,17 @@ For example, here are some acceptable values:
 
 ## Changing the Markdown tool
 
-In the examples above, we have used [Earmark](http://github.com/pragdave/earmark) to convert Markdown to HTML. If you prefer, you can also use pandoc or hoedown (in C):
+In the examples above, we have used [Earmark](http://github.com/pragdave/earmark) to convert Markdown to HTML. If you prefer, you can also use pandoc, hoedown (in C), or cmark (in C):
 
   * Install [pandoc](http://johnmacfarlane.net/pandoc/) - which is available in multiple package managers and provides installers for different operating systems. Pandoc must be installed just once and it will be used for all projects;
 
   * To use hoedown - add http://github.com/devinus/markdown as a dependency to your project as: `{:markdown, github: "devinus/markdown"}`
 
+  * To use cmark - add `cmark.ex` as a dependency to your project as: `{:cmark, "~> 0.5"}`
+
 Then add the entry:
 
-    config :ex_doc, :markdown_processor, ExDoc.Markdown.Pandoc  # or ExDoc.Markdown.Hoedown
+    config :ex_doc, :markdown_processor, ExDoc.Markdown.Pandoc  # or ExDoc.Markdown.Hoedown, or ExDoc.Markdown.Cmark
 
 to your `config/config.exs` file.
 
