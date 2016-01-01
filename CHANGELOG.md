@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.11.3
+
+  * Bug fixes
+    * Fix a regression where the sidebar wouldn't stick on small screens
+
 ## v0.11.2
 
   * Enhancements
