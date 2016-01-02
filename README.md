@@ -100,10 +100,10 @@ config :ex_doc, :markdown_processor, ExDoc.Markdown.Hoedown
 
 ### Cmark
 
-[Cmark][cmark] is a CommonMark parser written in C.  To use cmark add the elixir NIF wrapper [cmark.ex][cmark.ex] as a dependency to your project:
+[Cmark][cmark] is a CommonMark parser written in C. To use cmark add the elixir NIF wrapper [cmark.ex][cmark.ex] as a dependency to your project:
 
 ```elixir
-{:markdown, github: "devinus/markdown"}
+{:cmark, "~> 0.6", only: :dev}
 ```
 
 Update your project config to use Cmark:
