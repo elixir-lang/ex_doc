@@ -140,7 +140,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~s("exceptions":[])
     assert content =~ ~s("protocols":[])
     assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","headers":[]},)
-    assert content =~ ~s({"id":"readme","title":"README","headers":[{"id":" Header sample","anchor":"Header-sample"}]})
+    assert content =~ ~s({"id":"readme","title":"README","headers":[{"id":" Header sample","anchor":"header-sample"}]})
   end
 
   test "run generates the api reference file" do
@@ -161,7 +161,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     content = File.read!("#{output_dir}/readme.html")
     assert content =~ ~r{<title>README [^<]*</title>}
-    assert content =~ ~r{<h2 id="Header-sample"> Header sample</h2>}
+    assert content =~ ~r{<h2 id="header-sample"> Header sample</h2>}
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code>TypesAndSpecs.Sub</code></a>}
