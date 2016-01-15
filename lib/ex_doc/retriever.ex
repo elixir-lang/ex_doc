@@ -374,7 +374,12 @@ defmodule ExDoc.Retriever do
 
   defp get_types(module) do
     all  = Typespec.beam_types(module) || []
-    docs = Enum.into(Typespec.beam_typedocs(module) || [], %{})
+    docs = try do
+      Enum.into(Code.get_docs(module, :type_docs) || [], %{},
+                fn {typedoc, _, _, doc} -> {typedoc, doc} end)
+    rescue
+      _ -> Enum.into(Typespec.beam_typedocs(module) || [], %{})
+    end
 
     types =
       for {type, {name, _, args} = tuple} <- all, type != :typep do

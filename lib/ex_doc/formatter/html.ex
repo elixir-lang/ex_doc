@@ -189,7 +189,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp link_headers(content) do
     Regex.replace(@h2_regex, content, fn _, part ->
-      "<h2 id=#{inspect header_to_id(part)}>#{part}</h2>"
+      "<h2 id=\"#{header_to_id(part)}\">#{Templates.h(part)}</h2>\n"
     end)
   end
 
@@ -206,6 +206,7 @@ defmodule ExDoc.Formatter.HTML do
     |> String.strip()
     |> String.replace(~r/\W+/, "-")
     |> String.downcase()
+    |> Templates.h()
   end
 
   defp process_logo_metadata(config) do
