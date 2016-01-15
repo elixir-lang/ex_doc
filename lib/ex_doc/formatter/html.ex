@@ -205,6 +205,7 @@ defmodule ExDoc.Formatter.HTML do
     header
     |> String.strip()
     |> String.replace(~r/\W+/, "-")
+    |> String.downcase()
   end
 
   defp process_logo_metadata(config) do
