@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.11.4
+
+  * Bug fixes
+    * Fix ligature issues in recent browsers
+    * HTML escape headers
+    * Avoid warning on Elixir master (v1.3)
+
 ## v0.11.3
 
   * Bug fixes
