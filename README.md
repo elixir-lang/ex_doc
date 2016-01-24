@@ -22,9 +22,9 @@ ExDoc will automatically pull in information from your project, like the applica
 
 ```elixir
 def project do
-  [app: :repo,
+  [app: :my_app,
    version: "0.1.0-dev",
-   name: "REPO",
+   name: "My App",
    source_url: "https://github.com/USER/REPO",
    homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
    deps: deps,

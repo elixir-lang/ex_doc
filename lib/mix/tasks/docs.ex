@@ -5,8 +5,7 @@ defmodule Mix.Tasks.Docs do
   @recursive true
 
   @moduledoc """
-  Uses ExDoc to generate a static web page from the docstrings extracted from
-  all of the project's modules.
+  Uses ExDoc to generate a static web page from the pboject documentation.
 
   ## Command line options
 
@@ -14,46 +13,57 @@ defmodule Mix.Tasks.Docs do
 
   ## Configuration
 
-  The task uses the project's `:name` key if defined, otherwise it will use the
-  `:app` key as a substitute.
+  ExDoc will automatically pull in information from your project, like the
+  application and version. However, you may want to set `:name`, `:source_url`
+  and `:homepage_url` to have a nicer output from ExDoc, for example:
 
-  It also uses the `:version` key and `:source_url` from the project's configuration.
+      def project do
+        [app: :my_app,
+         version: "0.1.0-dev",
+         name: "My App",
+         source_url: "https://github.com/USER/APP",
+         homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
+         deps: deps,
+         docs: [logo: "path/to/logo.png",
+                extras: ["README.md", "CONTRIBUTING.md"]]]
+      end
 
+  ExDoc also allows configuration specific to the documentation to be set.
   The following options should be put under the `:docs` key in your project's
-  main configuration. The docs options should be a keyword list or a function
+  main configuration. The `:docs` options should be a keyword list or a function
   returning a keyword list that will be lazily executed.
 
-  * `:output` - output directory for the generated docs; default: "doc".
-    May be overriden by command line argument.
+    * `:output` - output directory for the generated docs; default: "doc".
+      May be overriden by command line argument.
 
-  * `:formatter` - doc formatter to use; default: "html".
+    * `:formatter` - doc formatter to use; default: "html".
 
-  * `:source_root` - path to the source code root directory;
-    default: "." (current directory).
+    * `:source_root` - path to the source code root directory;
+      default: "." (current directory).
 
-  * `:source_beam` - path to the beam directory; default: mix's compile path.
+    * `:source_beam` - path to the beam directory; default: mix's compile path.
 
-  * `:source_url_pattern` - public URL of the project.
-    Derived from project's `:source_url` if not present.
+    * `:source_ref` - the branch/commit/tag used for source link inference;
+      default: "master".
 
-  * `:source_ref` - the branch/commit/tag used for source link inference.
-    Ignored if `:source_url_pattern` is provided; default: master.
+    * `:source_url_pattern` - public URL of the project. Derived from
+      project's `:source_url` and `:source_ref`. Example:
+      "https://github.com/USER/APP/blob/master/%{path}#L%{line}"
 
-  * `:main` - main page of the documentation. It may be a module or a
-    generated page, like "Plug" or "api-reference";
-    default: "api-reference" when --formatter is "html".
+    * `:main` - main page of the documentation. It may be a module or a
+      generated page, like "Plug" or "api-reference";
+      default: "api-reference" when --formatter is "html".
 
-  * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
-    The image size will be 64x64 when --formatter is "html".
+    * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
+      The image size will be 64x64 when --formatter is "html".
 
-  * `:extra_section` - String that define the section title of the additional
-    Markdown pages (e.g. "GUIDES"); default: "PAGES"
+    * `:extras` - List of keywords, each key must indicate the path to additional
+      Markdown pages, the value for each keyword (optional) gives you more control
+      about the PATH and the title of the output files; default: `[]`. Example:
+      `["README.md", "CONTRIBUTING.md": [path: "CONTRIBUTORS", title: "Join us!"]]`
 
-  * `:extras` - List of keywords, each key must indicate the path to additional
-    Markdown pages, the value for each keyword (optional) gives you more control
-    about the PATH and the title of the output files, please remember that the
-    title also will be used in the sidebar area (under the :extra_section); default: `[]`
-    (e.g. `["README.md", "CONTRIBUTING.md": [path: "CONTRIBUTORS", title: "Help us!"]]`)
+    * `:extra_section` - String that define the section title of the additional
+      Markdown pages; default: "PAGES". Example: "GUIDES"
   """
 
   @doc false
