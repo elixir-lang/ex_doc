@@ -25,9 +25,10 @@ defmodule ExDoc.Formatter.HTML do
     exceptions = filter_list(:exceptions, all)
     protocols  = filter_list(:protocols, all)
 
-    if config.logo do
-      config = process_logo_metadata(config)
-    end
+    config =
+      if config.logo do
+        process_logo_metadata(config)
+      end
 
     generate_api_reference(modules, exceptions, protocols, output, config)
     extras = generate_extras(output, module_nodes, modules, exceptions, protocols, config)

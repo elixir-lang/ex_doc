@@ -273,10 +273,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> Enum.filter(&(&1 in modules))
     |> Enum.reduce(bin, fn (x, acc) ->
          escaped = Regex.escape(x)
-         suffix = ".html"
-         if module_id && x == module_id do
-           suffix = suffix <> "#content"
-         end
+         suffix =
+           if module_id && x == module_id do
+             ".html#content"
+           else
+             ".html"
+           end
          Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
            "[`\\1`](\\1" <> suffix <> ")")
        end)

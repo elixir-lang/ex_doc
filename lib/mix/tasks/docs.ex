@@ -84,9 +84,12 @@ defmodule Mix.Tasks.Docs do
     version = config[:version] || "dev"
     options = Keyword.merge(get_docs_opts(config), cli_opts)
 
-    if config[:source_url] do
-      options = Keyword.put(options, :source_url, config[:source_url])
-    end
+    options =
+      if config[:source_url] do
+        Keyword.put(options, :source_url, config[:source_url])
+      else
+        options
+      end
 
     main = options[:main]
     options =
