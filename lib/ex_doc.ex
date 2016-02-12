@@ -91,10 +91,10 @@ defmodule ExDoc do
     options = Keyword.put(options, :source_url_pattern, pattern)
 
     if is_bitstring(options[:output]) do
-      options = Keyword.put(options, :output, String.rstrip(options[:output], ?/))
+      Keyword.put(options, :output, String.rstrip(options[:output], ?/))
+    else
+      options
     end
-
-    options
   end
 
   defp guess_url(url = <<"https://github.com/", _ :: binary>>, ref) do

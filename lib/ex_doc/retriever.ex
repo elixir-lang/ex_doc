@@ -183,9 +183,12 @@ defmodule ExDoc.Retriever do
 
     behaviour = Map.get(cb_impls, {name, arity})
 
-    if is_nil(doc) && behaviour do
-      doc = "Callback implementation for `c:#{inspect behaviour}.#{name}/#{arity}`."
-    end
+    doc =
+      if is_nil(doc) && behaviour do
+        "Callback implementation for `c:#{inspect behaviour}.#{name}/#{arity}`."
+      else
+        doc
+      end
 
     specs = all_specs
             |> Map.get(function, [])
