@@ -28,6 +28,8 @@ defmodule ExDoc.Formatter.HTML do
     config =
       if config.logo do
         process_logo_metadata(config)
+      else
+        config
       end
 
     generate_api_reference(modules, exceptions, protocols, output, config)
