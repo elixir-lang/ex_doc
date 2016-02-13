@@ -11,7 +11,7 @@ defmodule ExDoc.CLI do
     {opts, args, _} = OptionParser.parse(args,
                aliases: [o: :output, f: :formatter, c: :config, r: :source_root,
                          u: :source_url, m: :main, p: :homepage_url, l: :logo,
-                         e: :extra, v: :version],
+                         e: :extra, v: :version, a: :canonical],
                switches: [extra: :keep])
 
     cond do
@@ -103,6 +103,7 @@ defmodule ExDoc.CLI do
       -c, --config        Give configuration through a file instead of command line
       -o, --output        Path to output docs, default: "doc"
       -f, --formatter     Docs formatter to use, default: "html"
+      -a, --canonical     Indicate the preferred URL with rel="canonical" link element, default: nil
       -r, --source-root   Path to the source code root, default: "."
       -u, --source-url    URL to the source code
           --source-ref    Branch/commit/tag used for source link inference, default: "master"
