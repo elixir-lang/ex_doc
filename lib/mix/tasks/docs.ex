@@ -5,7 +5,7 @@ defmodule Mix.Tasks.Docs do
   @recursive true
 
   @moduledoc """
-  Uses ExDoc to generate a static web page from the pboject documentation.
+  Uses ExDoc to generate a static web page from the project documentation.
 
   ## Command line options
 
@@ -64,6 +64,9 @@ defmodule Mix.Tasks.Docs do
 
     * `:extra_section` - String that define the section title of the additional
       Markdown pages; default: "PAGES". Example: "GUIDES"
+
+    * `:canonical` - String that define the preferred URL with the rel="canonical"
+      element; default: nil
   """
 
   @doc false

@@ -58,13 +58,17 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_api_reference(modules, exceptions, protocols, output, config) do
+    file_name = "api-reference.html"
+    config = set_canonical_url(config, file_name)
     content = Templates.api_reference_template(config, modules, exceptions, protocols)
-    File.write!("#{output}/api-reference.html", content)
+    File.write!("#{output}/#{file_name}", content)
   end
 
   defp generate_not_found(modules, exceptions, protocols, output, config) do
+    file_name = "404.html"
+    config = set_canonical_url(config, file_name)
     content = Templates.not_found_template(config, modules, exceptions, protocols)
-    File.write!("#{output}/404.html", content)
+    File.write!("#{output}/#{file_name}", content)
   end
 
   defp generate_sidebar_items(modules, exceptions, protocols, extras, output) do
@@ -141,10 +145,12 @@ defmodule ExDoc.Formatter.HTML do
 
       title = options[:title] || extract_title(content) || input_to_title(options[:input])
 
+      output_file_name = "#{options.output_file_name}.html"
+      config = set_canonical_url(config, output_file_name)
       html = Templates.extra_template(config, title, modules,
                                       exceptions, protocols, link_headers(content))
 
-      output = "#{options.output}/#{options.output_file_name}.html"
+      output = "#{options.output}/#{output_file_name}"
 
       if File.regular? output do
         IO.puts "warning: file #{Path.basename output} already exists"
@@ -255,13 +261,28 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_module_page(node, modules, exceptions, protocols, output, config) do
+    file_name = "#{node.id}.html"
+    config = set_canonical_url(config, file_name)
     content = Templates.module_page(node, modules, exceptions, protocols, config)
-    File.write!("#{output}/#{node.id}.html", content)
+    File.write!("#{output}/#{file_name}", content)
   end
 
   defp templates_path(patterns) do
     Enum.into(patterns, [], fn {pattern, dir} ->
       {Path.expand("html/templates/#{pattern}", __DIR__), dir}
     end)
+  end
+
+  defp set_canonical_url(config, file_name) do
+    if config.canonical do
+      canonical_url =
+        config.canonical
+        |> String.rstrip(?/)
+        |> Path.join(file_name)
+
+      Map.put(config, :canonical, canonical_url)
+    else
+      config
+    end
   end
 end

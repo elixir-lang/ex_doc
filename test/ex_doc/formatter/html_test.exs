@@ -223,6 +223,23 @@ defmodule ExDoc.Formatter.HTMLTest do
                  fn -> generate_docs(config) end
   end
 
+  test "run creates a preferred URL with link element when canonical options is specified" do
+    config = doc_config(extras: ["test/fixtures/README.md"], canonical: "http://elixir-lang.org/docs/stable/elixir/")
+    generate_docs(config)
+    content = File.read!("#{output_dir}/api-reference.html")
+    assert content =~ ~r{<link rel="canonical" href="http://elixir-lang.org/docs/stable/elixir/}
+
+    content = File.read!("#{output_dir}/readme.html")
+    assert content =~ ~r{<link rel="canonical" href="http://elixir-lang.org/docs/stable/elixir/}
+  end
+
+  test "run do not create a preferred URL with link element when canonical is nil" do
+    config = doc_config(canonical: nil)
+    generate_docs(config)
+    content = File.read!("#{output_dir}/api-reference.html")
+    refute content =~ ~r{<link rel="canonical" href="}
+  end
+
   test "Generate some assets" do
     output = doc_config[:output]
     ExDoc.Formatter.HTML.generate_assets([{"test/fixtures/elixir.png", "images"}], output)

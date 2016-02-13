@@ -7,6 +7,9 @@
     <meta name="generator" content="ExDoc v<%= ExDoc.version %>">
     <title><%= page.title %> – <%= config.project %> v<%= config.version %></title>
     <link rel="stylesheet" href="<%= asset_rev config.output, "dist/app*.css" %>" />
+    <%= if config.canonical do %>
+      <link rel="canonical" href="<%= config.canonical %>" />
+    <% end %>
     <script src="dist/sidebar_items.js"></script>
   </head>
   <body data-type="<%= sidebar_type(page.type) %>">
