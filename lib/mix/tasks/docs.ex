@@ -5,7 +5,7 @@ defmodule Mix.Tasks.Docs do
   @recursive true
 
   @moduledoc """
-  Uses ExDoc to generate a static web page from the pboject documentation.
+  Uses ExDoc to generate a static web page from the project documentation.
 
   ## Command line options
 
