@@ -9,13 +9,20 @@ defmodule Mix.Tasks.Docs do
 
   ## Command line options
 
-  * `--output`, `-o` - output directory for the generated docs; default: `"doc"`
+    * `--output`, `-o` - output directory for the generated
+      docs, default: `"doc"`
+    * `--canonical`, `-a` - indicate the preferred URL with
+      rel="canonical" link element, default: nil
+
+  The command line options have lower precedence than the options
+  specified in your `mix.exs` file below.
 
   ## Configuration
 
-  ExDoc will automatically pull in information from your project, like the
-  application and version. However, you may want to set `:name`, `:source_url`
-  and `:homepage_url` to have a nicer output from ExDoc, for example:
+  ExDoc will automatically pull in information from your project,
+  like the application and version. However, you may want to set
+  `:name`, `:source_url` and `:homepage_url` to have a nicer output
+  from ExDoc, for example:
 
       def project do
         [app: :my_app,
@@ -28,10 +35,11 @@ defmodule Mix.Tasks.Docs do
                 extras: ["README.md", "CONTRIBUTING.md"]]]
       end
 
-  ExDoc also allows configuration specific to the documentation to be set.
-  The following options should be put under the `:docs` key in your project's
-  main configuration. The `:docs` options should be a keyword list or a function
-  returning a keyword list that will be lazily executed.
+  ExDoc also allows configuration specific to the documentation to
+  be set. The following options should be put under the `:docs` key
+  in your project's main configuration. The `:docs` options should
+  be a keyword list or a function returning a keyword list that will
+  be lazily executed.
 
     * `:output` - output directory for the generated docs; default: "doc".
       May be overriden by command line argument.
@@ -74,18 +82,16 @@ defmodule Mix.Tasks.Docs do
     Mix.Task.run "compile"
 
     {cli_opts, args, _} = OptionParser.parse(args,
-                            aliases: [o: :output],
-                            switches: [output: :string])
+                            aliases: [o: :output, a: :canonical],
+                            switches: [output: :string, canonical: :string])
 
     if args != [] do
       Mix.raise "Extraneous arguments on the command line"
     end
 
-    project =
-      (config[:name] || config[:app])
-      |> to_string()
+    project = (config[:name] || config[:app]) |> to_string()
     version = config[:version] || "dev"
-    options = Keyword.merge(get_docs_opts(config), cli_opts)
+    options = Keyword.merge(cli_opts, get_docs_opts(config))
 
     options =
       if config[:source_url] do
@@ -95,6 +101,7 @@ defmodule Mix.Tasks.Docs do
       end
 
     main = options[:main]
+
     options =
       cond do
         is_nil(main) ->
