@@ -45,7 +45,7 @@ defmodule ExDoc.Retriever do
   """
   @spec docs_from_dir(Path.t, %ExDoc.Config{}) :: [%ExDoc.ModuleNode{}]
   def docs_from_dir(dir, config) when is_binary(dir) do
-    files = Path.wildcard Path.expand("Elixir.*.beam", dir)
+    files = Path.wildcard Path.expand("*.beam", dir)
     docs_from_files(files, config)
   end
 
@@ -86,10 +86,21 @@ defmodule ExDoc.Retriever do
     type = detect_type(module)
 
     module
+    |> check_info()
     |> verify_module()
     |> generate_node(type, config)
   end
 
+  defp check_info(module) do
+    case function_exported?(module, :__info__, 1) do
+      true ->
+        module
+      _ -> 
+        nil
+    end
+  end
+
+  defp verify_module(nil), do: nil
   defp verify_module(module) do
     case Code.get_docs(module, :moduledoc) do
       {_line, false} ->

@@ -251,7 +251,8 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_module_page(node, modules, exceptions, protocols, output, config) do
     content = Templates.module_page(node, modules, exceptions, protocols, config)
-    File.write!("#{output}/#{node.id}.html", content)
+    file_name = to_string(node.id) |> String.replace(":", "")
+    File.write!("#{output}/#{file_name}.html", content)
   end
 
   defp templates_path(patterns) do
