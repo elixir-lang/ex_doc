@@ -193,6 +193,7 @@ defmodule ExDoc.Retriever do
     specs = all_specs
             |> Map.get(function, [])
             |> Enum.map(&Typespec.spec_to_ast(name, &1))
+            |> Enum.reverse()
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",

@@ -131,6 +131,13 @@ defmodule ExDoc.RetrieverTest do
     end) == "module #{inspect(module)} does not export __info__/1\n"
   end
 
+  test "specs order is preserved" do
+    [node] = docs_from_files ["MultipleSpecs"]
+    [function_node] = node.docs
+    specs = Macro.to_string(function_node.specs)
+    assert specs == "[range?(%Range{first: term(), last: term()}) :: true, range?(term()) :: false]"
+  end
+
   ## EXCEPTIONS
 
   test "docs_from_files properly tags exceptions" do
