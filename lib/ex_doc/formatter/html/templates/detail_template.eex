@@ -1,4 +1,4 @@
-<div class="detail" id="<%=enc_h link_id(node) %>">
+<div class="detail" id="<%= link_id(node) %>">
   <div class="detail-header">
     <a href="#<%=enc_h link_id(node) %>" class="detail-link" title="Link to this <%= pretty_type(node) %>">
       <i class="icon-link"></i>
