@@ -138,6 +138,14 @@ defmodule ExDoc.RetrieverTest do
     assert specs == "[range?(%Range{first: term(), last: term()}) :: true, range?(term()) :: false]"
   end
 
+  if Version.match?(System.version(), ">=1.1.0") do
+    test "callbacks with no docs included" do
+      [node] = docs_from_files ["CallbacksNoDocs"]
+      functions = Enum.map node.docs, fn(doc) -> doc.id end
+      assert functions == ["connect/2", "id/1"]
+    end
+  end
+
   ## EXCEPTIONS
 
   test "docs_from_files properly tags exceptions" do
