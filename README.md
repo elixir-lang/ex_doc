@@ -42,7 +42,7 @@ To see all options available when generating docs, run `mix help docs`.   You ma
 You can ExDoc via the command line as follows:
 
 1. First clone and compile it:
-2. 
+
     ```console
     $ git clone https://github.com/elixir-lang/ex_doc.git
     $ cd ex_doc
