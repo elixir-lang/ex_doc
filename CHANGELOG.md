@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.11.5
+
+  * Enhancements
+    * Support canonical URLs
+
+  * Bug fixes
+    * Autolink now allows digits in function names
+    * Sort specs by line to preserve ordering
+    * Focus on content element on document ready
+    * Remove ligature fix on Firefox and Safari as Google Fonts have been updated
+
 ## v0.11.4
 
   * Bug fixes
