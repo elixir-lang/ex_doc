@@ -16,11 +16,11 @@ defmodule ExDoc.Mixfile do
   end
 
   def application do
-    [applications: [:logger]]
+    [applications: []]
   end
 
   defp deps do
-    [{:earmark, "~> 0.1.17 or ~> 0.2", optional: true},
+    [{:earmark, "~> 0.2"},
      {:markdown, github: "devinus/markdown", only: :test},
      {:cmark, "~> 0.5", only: :test},
      {:excoveralls, "~> 0.3", only: :test}]
