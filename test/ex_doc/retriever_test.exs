@@ -114,6 +114,13 @@ defmodule ExDoc.RetrieverTest do
     assert node.source == "http://foo.com/bar/test/fixtures/compiled_with_docs.ex\#L1"
   end
 
+  test "docs_from_files returns the source when source_root set to nil" do
+    files  = Enum.map ["CompiledWithDocs"], fn(n) -> "test/tmp/Elixir.#{n}.beam" end
+    config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: nil}
+    [node] = Retriever.docs_from_files(files, config)
+    assert String.ends_with?(node.source, "/test/fixtures/compiled_with_docs.ex:1")
+  end
+
   test "docs_from_modules fails when module is not available" do
     config = %ExDoc.Config{source_url_pattern: "http://example.com/%{path}#L%{line}", source_root: File.cwd!}
     assert_raise ExDoc.Retriever.Error, "module NotAvailable is not defined/available", fn ->
