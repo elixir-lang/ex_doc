@@ -16,6 +16,7 @@ import resultsTemplate from './templates/search-results.handlebars'
 
 const $content = $('.content-inner')
 const $input = $('.sidebar-search input')
+const $sidebarItems = $('#full-list li')
 
 // Local Methods
 // -------------
@@ -131,7 +132,7 @@ function search (nodes, value) {
     e.preventDefault()
   })
 
-  $results.find('a').on('click', closeResults)
+  $.merge($results.find('a'), $sidebarItems).on('click', closeResults)
 
   $results.fadeIn(function () {
     // Scroll the container with all elements
