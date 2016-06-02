@@ -7,56 +7,26 @@ import $ from 'jquery'
 // ---------
 
 const body = $('body')
-const sidebar = $('.sidebar')
-
-const bodyClass = 'sidebar-closed'
-const duration = 300
-const width = '300px'
-const displayProps = [
-  '-webkit-flex',
-  '-ms-flexbox',
-  '-ms-flex',
-  'flex'
-]
+const breakpoint = 768
+const sidebarOpenedClass = 'sidebar-opened'
+const sidebarClosedClass = 'sidebar-closed'
 
 function closeSidebar () {
-  sidebar.animate({
-    '-webkit-flex-basis': 0,
-    '-moz-flex-basis': 0,
-    '-ms-flex-basis': 0,
-    'flex-basis': 0,
-    width: 0
-  }, duration, function () {
-    body.addClass(bodyClass)
-    sidebar.css({
-      display: 'none'
-    })
-  })
+  body.addClass(sidebarClosedClass).removeClass(sidebarOpenedClass)
 }
 
-function openSidebar (immediate) {
-  body.removeClass(bodyClass)
-  displayProps.forEach(prop => {
-    sidebar.css({display: prop})
-  })
-
-  sidebar.css({
-    width: 0
-  })
-  sidebar.animate({
-    '-webkit-flex-basis': width,
-    '-moz-flex-basis': width,
-    '-ms-flex-basis': width,
-    'flex-basis': width,
-    width: width
-  }, duration)
+function openSidebar () {
+  body.addClass(sidebarOpenedClass).removeClass(sidebarClosedClass)
 }
 
 function toggleSidebar () {
-  if (sidebar.css('display') !== 'none') {
-    closeSidebar()
+  const bodyClass = body.attr('class')
+  // If body has a sidebar class invoke a correct action.
+  if (bodyClass) {
+    bodyClass === sidebarClosedClass ? openSidebar() : closeSidebar()
+  // Otherwise check the width of window to know which action to invoke.
   } else {
-    openSidebar()
+    window.screen.width > breakpoint ? closeSidebar() : openSidebar()
   }
 }
 

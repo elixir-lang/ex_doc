@@ -22,27 +22,80 @@ body {
   .display(flex);
   height: 100%;
   overflow: hidden;
+  justify-content: flex-end;
 }
-
 
 .sidebar {
-  .flex(0, 1, 300px);
+  .display(flex);
   .flex-direction(column);
-  display: none;
+  width: 300px;
   height: 100%;
   position: absolute;
-  z-index: 999;
-}
-
-body.sidebar-closed .sidebar {
-  display: none;
+  top: 0;
+  left: 0;
+  transition: none;
 }
 
 .content {
-  .flex(1);
+  flex-basis: calc(~"100% - 300px");
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   height: 100%;
+  position: relative;
+  z-index: 3;
+  background-color: white;
+  transition: flex-basis 0.3s ease-in-out;
+}
+
+@media screen and (max-width: 768px) {
+  .content {
+    z-index: 0;
+    flex-basis: 100%;
+    transition: none;
+  }
+
+  .sidebar {
+    z-index: 3;
+    transform: translateX(-102%);
+    will-change: transform;
+    transition: transform 0.3s ease-in-out;
+  }
+}
+
+body.sidebar-opened {
+  .content {
+    flex-basis: calc(~"100% - 300px");
+  }
+
+  @media screen and (max-width: 768px) {
+    .content {
+      flex-basis: 100%;
+    }
+
+    .sidebar {
+      transform: translateX(0);
+    }
+
+    .sidebar-toggle {
+      transform: translateX(250px)
+    }
+  }
+}
+
+body.sidebar-closed {
+  .content {
+    flex-basis: 100%;
+  }
+
+  @media screen and (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-102%);
+    }
+  }
+
+  .sidebar-toggle {
+    transform: none;
+  }
 }
 
 .content-inner {
