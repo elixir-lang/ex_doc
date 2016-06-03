@@ -33,64 +33,53 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  transition: none;
+  z-index: 4;
 }
 
 .content {
-  flex-basis: calc(~"100% - 300px");
+  width: 100%;
+  padding-left: 300px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   height: 100%;
   position: relative;
   z-index: 3;
-  background-color: white;
-  transition: flex-basis 0.3s ease-in-out;
 }
 
 @media screen and (max-width: 768px) {
-  .content {
-    z-index: 0;
-    flex-basis: 100%;
-    transition: none;
-  }
+  body {
+    .content {
+      z-index: 0;
+      padding-left: 0;
+    }
 
-  .sidebar {
-    z-index: 3;
-    transform: translateX(-102%);
-    will-change: transform;
-    transition: transform 0.3s ease-in-out;
+    .sidebar {
+      z-index: 3;
+      transform: translateX(-102%);
+      will-change: transform;
+    }
   }
 }
 
-body.sidebar-opened {
-  .content {
-    flex-basis: calc(~"100% - 300px");
+body.sidebar-opened, body.sidebar-opening {
+  .sidebar-toggle {
+    transform: translateX(250px)
   }
 
   @media screen and (max-width: 768px) {
-    .content {
-      flex-basis: 100%;
-    }
-
     .sidebar {
       transform: translateX(0);
     }
-
-    .sidebar-toggle {
-      transform: translateX(250px)
-    }
   }
 }
 
-body.sidebar-closed {
-  .content {
-    flex-basis: 100%;
+body.sidebar-closed, body.sidebar-closing {
+  .sidebar {
+    z-index: 0;
   }
 
-  @media screen and (max-width: 768px) {
-    .sidebar {
-      transform: translateX(-102%);
-    }
+  .content {
+    padding-left: 0;
   }
 
   .sidebar-toggle {
@@ -98,10 +87,60 @@ body.sidebar-closed {
   }
 }
 
+body.sidebar-opening {
+  .sidebar-toggle {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .sidebar {
+    z-index: 0;
+  }
+
+  .content {
+    padding-left: 300px;
+    transition: padding-left 0.3s ease-in-out;
+  }
+
+  @media screen and (max-width: 768px) {
+    .content {
+      padding-left: 0;
+    }
+
+    .sidebar {
+      transition: transform 0.3s ease-in-out;
+      z-index: 3;
+    }
+  }
+}
+
+body.sidebar-closing {
+  .sidebar-toggle {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .content {
+    transition: padding-left 0.3s ease-in-out;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .sidebar {
+      z-index: 3;
+      transition: transform 0.3s ease-in-out;
+      transform: translateX(-102%);
+    }
+  }
+}
+
 .content-inner {
   max-width: 949px;
   margin: 0 auto;
   padding: 3px 60px;
+}
+
+.content-outer {
+  width: 100%;
+  height: 100%;
+  background-color: white;
 }
 
 @media screen and (max-width: 768px) {
