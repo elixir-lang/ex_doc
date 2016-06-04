@@ -49,8 +49,8 @@ function collapse () {
 /**
  * Fill the sidebar with links to different nodes
  *
- * This function replace an empty unordered list with an
- * an unordered list full of links to the different procotols, exceptions
+ * This function replaces an empty unordered list with an
+ * unordered list full of links to the different protocols, exceptions
  * and modules mentioned in the documentation.
  *
  * @param {Object} nodes - Container of protocols, exceptions and modules.
