@@ -1,7 +1,3 @@
-body.sidebar-closed .sidebar-toggle {
-  display: block;
-}
-
 .sidebar-toggle {
   position: fixed;
   z-index: 99;
@@ -12,6 +8,8 @@ body.sidebar-closed .sidebar-toggle {
   padding: 0;
   transition: color 0.3s ease-in-out;
   font-size: 16px;
+  will-change: transform;
+  transform: translateX(250px);
 
   &:hover {
     color: @gray;
@@ -24,8 +22,8 @@ body.sidebar-closed .sidebar-toggle {
   }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (max-width: 768px) {
   .sidebar-toggle {
-    display: none;
+    transform: translateX(0);
   }
 }

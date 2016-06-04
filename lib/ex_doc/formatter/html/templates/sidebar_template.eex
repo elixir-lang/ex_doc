@@ -3,9 +3,6 @@
   <i class="icon-menu"></i>
 </button>
 <section class="sidebar">
-  <button class="sidebar-toggle">
-    <i class="icon-menu"></i>
-  </button>
 
   <% url = config.homepage_url || "#{config.main}.html" %>
   <a href="<%= url %>" class="sidebar-projectLink">
@@ -48,4 +45,5 @@
 </section>
 
 <section class="content">
-  <div id="content" class="content-inner">
+  <div class="content-outer">
+    <div id="content" class="content-inner">

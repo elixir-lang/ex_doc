@@ -7,56 +7,59 @@ import $ from 'jquery'
 // ---------
 
 const body = $('body')
-const sidebar = $('.sidebar')
+const breakpoint = 768
+const animationDuration = 300
 
-const bodyClass = 'sidebar-closed'
-const duration = 300
-const width = '300px'
-const displayProps = [
-  '-webkit-flex',
-  '-ms-flexbox',
-  '-ms-flex',
-  'flex'
-]
+const sidebarOpenedClass = 'sidebar-opened'
+const sidebarOpeningClass = 'sidebar-opening'
+const sidebarClosedClass = 'sidebar-closed'
+const sidebarClosingClass = 'sidebar-closing'
+
+// Current animation state
+// -----------------------
+
+let toggling
 
 function closeSidebar () {
-  sidebar.animate({
-    '-webkit-flex-basis': 0,
-    '-moz-flex-basis': 0,
-    '-ms-flex-basis': 0,
-    'flex-basis': 0,
-    width: 0
-  }, duration, function () {
-    body.addClass(bodyClass)
-    sidebar.css({
-      display: 'none'
-    })
-  })
+  body
+    .addClass(sidebarClosingClass)
+    .removeClass(sidebarOpenedClass)
+    .removeClass(sidebarOpeningClass)
+
+  toggling = setTimeout(
+    () => body.addClass(sidebarClosedClass).removeClass(sidebarClosingClass),
+    animationDuration
+  )
 }
 
-function openSidebar (immediate) {
-  body.removeClass(bodyClass)
-  displayProps.forEach(prop => {
-    sidebar.css({display: prop})
-  })
+function openSidebar () {
+  body
+    .addClass(sidebarOpeningClass)
+    .removeClass(sidebarClosedClass)
+    .removeClass(sidebarClosingClass)
 
-  sidebar.css({
-    width: 0
-  })
-  sidebar.animate({
-    '-webkit-flex-basis': width,
-    '-moz-flex-basis': width,
-    '-ms-flex-basis': width,
-    'flex-basis': width,
-    width: width
-  }, duration)
+  toggling = setTimeout(
+    () => body.addClass(sidebarOpenedClass).removeClass(sidebarOpeningClass),
+    animationDuration
+  )
 }
 
 function toggleSidebar () {
-  if (sidebar.css('display') !== 'none') {
-    closeSidebar()
+  const bodyClass = body.attr('class')
+  // Remove current animation if toggling.
+  clearTimeout(toggling)
+
+  // If body has a sidebar class invoke a correct action.
+  if (bodyClass) {
+    if (bodyClass.includes(sidebarClosedClass) ||
+       bodyClass.includes(sidebarClosingClass)) {
+      openSidebar()
+    } else {
+      closeSidebar()
+    }
+  // Otherwise check the width of window to know which action to invoke.
   } else {
-    openSidebar()
+    window.screen.width > breakpoint ? closeSidebar() : openSidebar()
   }
 }
 
