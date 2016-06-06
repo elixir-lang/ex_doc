@@ -13,7 +13,8 @@ defmodule ExDoc.FunctionNode do
   """
 
   defstruct id: nil, name: nil, arity: 0, doc: [],
-    source: nil, type: nil, signature: nil, specs: []
+    source: nil, type: nil, signature: nil, specs: [],
+    annotations: %{}
 end
 
 defmodule ExDoc.TypeNode do
@@ -209,6 +210,7 @@ defmodule ExDoc.Retriever do
 
   defp get_callbacks(:behaviour, module, source_path, source_url, abst_code) do
     callbacks = Enum.into(Typespec.beam_callbacks(module) || [], %{})
+    optional_callbacks = beam_optional_callbacks(module)
 
     docs =
       if function_exported?(module, :__behaviour__, 1) do
@@ -218,12 +220,12 @@ defmodule ExDoc.Retriever do
       end
 
     docs = Enum.sort_by docs || [], &elem(&1, 0)
-    Enum.map(docs, &get_callback(&1, source_path, source_url, callbacks, abst_code))
+    Enum.map(docs, &get_callback(&1, source_path, source_url, callbacks, optional_callbacks, abst_code))
   end
 
   defp get_callbacks(_, _, _, _, _), do: []
 
-  defp get_callback(callback, source_path, source_url, callbacks, abst_code) do
+  defp get_callback(callback, source_path, source_url, callbacks, optional_callbacks, abst_code) do
     {{name, arity}, _, kind, doc} = callback
     function = actual_def(name, arity, kind)
     line = find_actual_line(abst_code, function, :callback)
@@ -236,6 +238,13 @@ defmodule ExDoc.Retriever do
         :defmacro -> :macrocallback
         other -> other
       end
+
+    name_and_arity =
+      case kind do
+        :callback -> {name, arity}
+        :macrocallback -> {:"MACRO-#{name}", arity + 1}
+      end
+    optional? = Enum.member?(optional_callbacks, name_and_arity)
 
     specs =
       callbacks
@@ -250,7 +259,8 @@ defmodule ExDoc.Retriever do
       signature: get_typespec_signature(hd(specs), arity),
       specs: specs,
       source: source_link(source_path, source_url, line),
-      type: kind
+      type: kind,
+      annotations: %{optional?: optional?},
     }
   end
 
@@ -424,4 +434,9 @@ defmodule ExDoc.Retriever do
   # Cut off the body of an opaque type while leaving it on a normal type.
   defp process_type_ast({:::, _, [d|_]}, :opaque), do: d
   defp process_type_ast(ast, _), do: ast
+
+  defp beam_optional_callbacks(module) do
+    (for {:attribute, _, :optional_callbacks, value} <- get_abstract_code(module), do: value)
+    |> List.flatten()
+  end
 end
