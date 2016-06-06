@@ -46,17 +46,17 @@ function openSidebar () {
 
 function toggleSidebar () {
   const bodyClass = body.attr('class')
+
   // Remove current animation if toggling.
   clearTimeout(toggling)
 
   // If body has a sidebar class invoke a correct action.
-  if (bodyClass) {
-    if (bodyClass.includes(sidebarClosedClass) ||
-       bodyClass.includes(sidebarClosingClass)) {
-      openSidebar()
-    } else {
-      closeSidebar()
-    }
+  if (bodyClass.includes(sidebarClosedClass) ||
+      bodyClass.includes(sidebarClosingClass)) {
+    openSidebar()
+  } else if (bodyClass.includes(sidebarOpenedClass) ||
+             bodyClass.includes(sidebarOpeningClass)) {
+    closeSidebar()
   // Otherwise check the width of window to know which action to invoke.
   } else {
     window.screen.width > breakpoint ? closeSidebar() : openSidebar()
