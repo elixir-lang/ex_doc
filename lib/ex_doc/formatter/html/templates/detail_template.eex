@@ -4,13 +4,13 @@
       <i class="icon-link"></i>
     </a>
     <span class="signature"><%=h node.signature %></span>
-      <%= if node.source do %>
+    <%= if node.source do %>
       <a href="<%= node.source %>" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     <% end %>
-    <%= if Map.get(node, :annotations) && Map.get(node.annotations, :optional?) do %>
-      <span class="note">(optional)</span>
+    <%= for annotation <- node.annotations do %>
+      <span class="note">(<%= annotation %>)</span>
     <% end %>
   </div>
   <%= if specs = get_specs(node) do %>

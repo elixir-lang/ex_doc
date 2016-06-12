@@ -14,7 +14,7 @@ defmodule ExDoc.FunctionNode do
 
   defstruct id: nil, name: nil, arity: 0, doc: [],
     source: nil, type: nil, signature: nil, specs: [],
-    annotations: %{}
+    annotations: []
 end
 
 defmodule ExDoc.TypeNode do
@@ -244,7 +244,13 @@ defmodule ExDoc.Retriever do
         :callback -> {name, arity}
         :macrocallback -> {:"MACRO-#{name}", arity + 1}
       end
-    optional? = Enum.member?(optional_callbacks, name_and_arity)
+
+    annotations =
+      if name_and_arity in optional_callbacks do
+        ["optional"]
+      else
+        []
+      end
 
     specs =
       callbacks
@@ -260,7 +266,7 @@ defmodule ExDoc.Retriever do
       specs: specs,
       source: source_link(source_path, source_url, line),
       type: kind,
-      annotations: %{optional?: optional?},
+      annotations: annotations,
     }
   end
 
