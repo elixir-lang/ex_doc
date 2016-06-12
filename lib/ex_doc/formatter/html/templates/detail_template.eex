@@ -9,6 +9,9 @@
        <i class="icon-code"></i>
      </a>
     <% end %>
+    <%= if Map.get(node, :annotations) && Map.get(node.annotations, :optional?) do %>
+      <span class="note">(optional)</span>
+    <% end %>
   </div>
   <%= if specs = get_specs(node) do %>
     <div class="specs">
