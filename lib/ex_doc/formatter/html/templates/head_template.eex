@@ -12,4 +12,4 @@
     <% end %>
     <script src="dist/sidebar_items.js"></script>
   </head>
-  <body data-type="<%= sidebar_type(page.type) %>">
+  <body data-type="<%= sidebar_type(page.type) %>" class="">
