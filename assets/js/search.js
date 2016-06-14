@@ -111,7 +111,7 @@ function search (nodes, value) {
     empty: levels.length === 0
   }))
 
-  var $oldContent = $content.find('*')
+  var $oldContent = $content.children()
   $oldContent.hide()
   $content.append($results)
 
