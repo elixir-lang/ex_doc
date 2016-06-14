@@ -45,7 +45,7 @@ function openSidebar () {
 }
 
 function toggleSidebar () {
-  const bodyClass = body.attr('class')
+  const bodyClass = body.attr('class') || "";
 
   // Remove current animation if toggling.
   clearTimeout(toggling)
