@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.12.0
+
+  * Enhancements
+    * Remove warnings when running on Elixir v1.3
+    * Support for `@optional_callbacks`
+    * Improve styling for nested lists
+    * Include earmark as a default dependency
+
+  * Bug fixes
+    * Fix many styling and performance front-end related bugs
+
 ## v0.11.5
 
   * Enhancements
