@@ -17,19 +17,19 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       project: "Elixir",
       version: "1.0.1",
       source_root: File.cwd!,
-      source_url_pattern: "#{source_url}/blob/master/%{path}#L%{line}",
-      homepage_url: homepage_url,
-      source_url: source_url
+      source_url_pattern: "#{source_url()}/blob/master/%{path}#L%{line}",
+      homepage_url: homepage_url(),
+      source_url: source_url()
     }
   end
 
   defp get_module_page(names) do
     mods =
       names
-      |> ExDoc.Retriever.docs_from_modules(doc_config)
+      |> ExDoc.Retriever.docs_from_modules(doc_config())
       |> HTML.Autolink.all()
 
-    Templates.module_page(hd(mods), [], [], [], doc_config)
+    Templates.module_page(hd(mods), [], [], [], doc_config())
   end
 
   test "synopsis" do
@@ -53,7 +53,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     """
 
     doc2 = """
-    Example function: Summary should not display trailing puntuation :. 
+    Example function: Summary should not display trailing puntuation :.
 
     ## Example:
     """
@@ -69,18 +69,18 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "enables nav link when module type have at least one element" do
     names   = [CompiledWithDocs, CompiledWithDocs.Nested]
-    nodes   = ExDoc.Retriever.docs_from_modules(names, doc_config)
+    nodes   = ExDoc.Retriever.docs_from_modules(names, doc_config())
     modules = HTML.Autolink.all(nodes)
 
-    content = Templates.sidebar_template(doc_config, modules, [], [])
+    content = Templates.sidebar_template(doc_config(), modules, [], [])
     assert content =~ ~r{<li><a id="modules-list" href="#full-list">Modules</a></li>}
     refute content =~ ~r{<li><a id="exceptions-list" href="#full-list">Exceptions</a></li>}
     refute content =~ ~r{<li><a id="protocols-list" href="#full-list">Protocols</a></li>}
   end
 
   test "site title text links to homepage_url when set" do
-    content = Templates.sidebar_template(doc_config, [], [], [])
-    assert content =~ ~r{<a href="#{homepage_url}" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
+    content = Templates.sidebar_template(doc_config(), [], [], [])
+    assert content =~ ~r{<a href="#{homepage_url()}" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
   end
 
   test "site title text links to main when there is no homepage_url" do
@@ -92,7 +92,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "list_page outputs listing for the given nodes" do
     names = [CompiledWithDocs, CompiledWithDocs.Nested]
-    nodes = ExDoc.Retriever.docs_from_modules(names, doc_config)
+    nodes = ExDoc.Retriever.docs_from_modules(names, doc_config())
     content = Templates.create_sidebar_items(%{modules: nodes})
 
     assert content =~ ~r("modules":\[\{"id":"CompiledWithDocs","title":"CompiledWithDocs")ms
@@ -114,7 +114,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
     assert content =~ ~r{example_1/0.*Another example}ms
-    assert content =~ ~r{<a href="#{source_url}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<i class="icon-code"></i>\n\s*</a>}ms
+    assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<i class="icon-code"></i>\n\s*</a>}ms
 
     assert content =~ ~s{<div class="detail" id="example_1/0">}
     assert content =~ ~s{example(foo, bar \\\\ Baz)}

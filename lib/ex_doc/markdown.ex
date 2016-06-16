@@ -55,7 +55,7 @@ defmodule ExDoc.Markdown do
     case Application.fetch_env(:ex_doc, @markdown_processor_key) do
       {:ok, processor} -> processor
       :error ->
-        processor = find_markdown_processor || raise_no_markdown_processor
+        processor = find_markdown_processor() || raise_no_markdown_processor()
         Application.put_env(:ex_doc, @markdown_processor_key, processor)
         processor
     end

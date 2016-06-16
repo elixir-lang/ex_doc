@@ -26,7 +26,7 @@ def project do
    name: "My App",
    source_url: "https://github.com/USER/REPO",
    homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
-   deps: deps,
+   deps: deps(),
    docs: [logo: "path/to/logo.png",
           extras: ["README.md", "CONTRIBUTING.md"]]]
 end
