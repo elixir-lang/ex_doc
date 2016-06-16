@@ -18,7 +18,7 @@ defmodule ExDoc.Formatter.HTML do
     File.rm_rf! output
     :ok = File.mkdir_p output
 
-    assets |> templates_path() |> generate_assets(output)
+    assets() |> templates_path() |> generate_assets(output)
 
     all = Autolink.all(module_nodes)
     modules    = filter_list(:modules, all)

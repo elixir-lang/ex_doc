@@ -16,7 +16,7 @@ defmodule ExDoc.CLI do
 
     cond do
       List.keymember?(opts, :version, 0) ->
-        do_version
+        do_version()
       true ->
         do_generate(args, opts, generator)
     end
