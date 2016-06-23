@@ -186,6 +186,19 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> h()
   end
 
+  @h2_regex ~r/##([^#].*)\n/m
+  defp link_moduledoc_headings(content) do
+    Regex.replace(@h2_regex, content, fn _, title -> """
+      <h2 class="section-heading" id="#{header_to_id(title)}">
+        <a class="hover-link" href="##{header_to_id(title)}">
+          <i class="icon-link"></i>
+        </a>
+        #{h(title)}
+      </h2>
+      """
+    end)
+  end
+
   templates = [
     detail_template: [:node, :_module],
     footer_template: [:config],
