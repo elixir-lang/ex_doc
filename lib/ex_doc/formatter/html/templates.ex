@@ -174,6 +174,18 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp relative_asset([], _), do: nil
   defp relative_asset([h|_], output), do: Path.relative_to(h, output)
 
+  @doc """
+  Extract a linkable id from a heading
+  """
+  @spec header_to_id(String.t) :: String.t
+  def header_to_id(header) do
+    header
+    |> String.strip()
+    |> String.replace(~r/\W+/, "-")
+    |> String.downcase()
+    |> h()
+  end
+
   templates = [
     detail_template: [:node, :_module],
     footer_template: [:config],

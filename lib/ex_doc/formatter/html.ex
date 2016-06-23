@@ -193,12 +193,12 @@ defmodule ExDoc.Formatter.HTML do
     @h2_regex
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
-    |> Enum.map(&{&1, header_to_id(&1)})
+    |> Enum.map(&{&1, Templates.header_to_id(&1)})
   end
 
   defp link_headers(content) do
     Regex.replace(@h2_regex, content, fn _, part ->
-      "<h2 id=\"#{header_to_id(part)}\">#{Templates.h(part)}</h2>\n"
+      "<h2 id=\"#{Templates.header_to_id(part)}\">#{Templates.h(part)}</h2>\n"
     end)
   end
 
@@ -208,14 +208,6 @@ defmodule ExDoc.Formatter.HTML do
 
   defp title_to_filename(title) do
     title |> String.replace(" ", "-") |> String.downcase()
-  end
-
-  defp header_to_id(header) do
-    header
-    |> String.strip()
-    |> String.replace(~r/\W+/, "-")
-    |> String.downcase()
-    |> Templates.h()
   end
 
   defp process_logo_metadata(config) do
