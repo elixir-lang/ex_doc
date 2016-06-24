@@ -37,8 +37,18 @@
 .icon-cross:before {
 	content: "\e117";
 }
-.icon-menu:before {
+.icon-menu {
+  @media screen and (max-width: 768px) { font-size: 1em; }
+
+  @media screen and (min-width: 769px) { font-size: 1.25em; }
+
+  @media screen and (min-width: 1025px) { font-size: 1.5em; }
+
+  @media screen and (min-width: 1441px) { font-size: 1.75em; }
+
+  &:before {
 	content: "\e120";
+  }
 }
 .icon-angle-right:before {
 	content: "\f105";

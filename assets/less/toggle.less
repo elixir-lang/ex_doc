@@ -20,10 +20,23 @@
   &:focus {
     outline: none;
   }
+
+  i {
+    color: @gray;
+  }
 }
 
 @media screen and (max-width: 768px) {
   .sidebar-toggle {
     transform: translateX(0);
+    left: 5px;
+    top: 5px;
+  }
+
+  .sidebar-opened {
+    .sidebar-toggle {
+      left: 18px;
+      top: 8px;
+    }
   }
 }
