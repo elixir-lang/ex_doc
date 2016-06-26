@@ -31,10 +31,13 @@ defmodule ExDoc.Markdown do
   @doc """
   Converts the given markdown document to HTML.
   """
-  def to_html(%ExDoc.ModuleNode{moduledoc: text, source: file, doc_line: line}) do
+  def to_html(%ExDoc.ModuleNode{moduledoc: text, file: file, doc_line: line}) do
     _to_html(text, file, line)
   end
-  def to_html(%ExDoc.FunctionNode{doc: text, source: file, doc_line: line}) do
+  def to_html(%ExDoc.FunctionNode{doc: text, file: file, doc_line: line}) do
+    _to_html(text, file, line)
+  end
+  def to_html(%ExDoc.TypeNode{doc: text, file: file, doc_line: line}) do
     _to_html(text, file, line)
   end
   def to_html(text) when is_binary(text) do

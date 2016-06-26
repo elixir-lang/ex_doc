@@ -5,7 +5,7 @@ defmodule ExDoc.ModuleNode do
 
   defstruct id: nil, module: nil, moduledoc: nil,
     docs: [], typespecs: [], source: nil, type: nil,
-    doc_line: 2
+    doc_line: 2, file: nil
 end
 
 defmodule ExDoc.FunctionNode do
@@ -15,7 +15,7 @@ defmodule ExDoc.FunctionNode do
 
   defstruct id: nil, name: nil, arity: 0, doc: [],
     source: nil, type: nil, signature: nil, specs: [],
-    annotations: [], doc_line: 1
+    annotations: [], doc_line: 1, file: nil
 end
 
 defmodule ExDoc.TypeNode do
@@ -24,7 +24,7 @@ defmodule ExDoc.TypeNode do
   """
 
   defstruct id: nil, name: nil, arity: 0, type: nil,
-    spec: nil, doc: nil, signature: nil
+    spec: nil, doc: nil, signature: nil, source: nil, doc_line: 1, file: nil
 end
 
 defmodule ExDoc.Retriever.Error do
@@ -132,7 +132,8 @@ defmodule ExDoc.Retriever do
       docs: docs,
       typespecs: get_types(module),
       source: source_link(source_path, source_url, line),
-      doc_line: doc_line
+      doc_line: doc_line,
+      file: source_path
     }
   end
 
@@ -207,7 +208,8 @@ defmodule ExDoc.Retriever do
       specs: specs,
       source: source_link(source_path, source_url, line),
       type: type,
-      doc_line: doc_line
+      doc_line: doc_line,
+      file: source_path
     }
   end
 

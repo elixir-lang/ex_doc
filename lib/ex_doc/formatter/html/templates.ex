@@ -23,7 +23,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   # Convert markdown to HTML.
   defp to_html(nil), do: nil
-  defp to_html(bin_or_node), do: ExDoc.Markdown.to_html(bin_or_node)
+  defp to_html(%{moduledoc: nil}), do: nil
+  defp to_html(%{doc: nil}), do: nil
+  defp to_html(bin), do: ExDoc.Markdown.to_html(bin)
 
   # Get the pretty name of a function node
   defp pretty_type(%ExDoc.FunctionNode{type: t}) do
@@ -55,11 +57,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
   """
   @spec synopsis(%ExDoc.ModuleNode{}) :: ExDoc.ModuleNode
   @spec synopsis(%ExDoc.FunctionNode{}) :: ExDoc.FunctionNode
-  # @spec synopsis(nil) :: nil
+  @spec synopsis(nil) :: nil
+  def synopsis(nil), do: nil
   def synopsis(node = %ExDoc.ModuleNode{moduledoc: doc}) do 
     %{node | moduledoc: _synopsis( doc )} 
   end
-  def synopsis(node = %ExDoc.FunctionNode{doc: doc}) do 
+  def synopsis(node = %{doc: doc}) do 
     %{node | doc: _synopsis( doc )} 
   end
 
