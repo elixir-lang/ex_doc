@@ -4,7 +4,8 @@ defmodule ExDoc.ModuleNode do
   """
 
   defstruct id: nil, module: nil, moduledoc: nil,
-    docs: [], typespecs: [], source: nil, type: nil
+    docs: [], typespecs: [], source: nil, type: nil,
+    doc_line: 2
 end
 
 defmodule ExDoc.FunctionNode do
@@ -14,7 +15,7 @@ defmodule ExDoc.FunctionNode do
 
   defstruct id: nil, name: nil, arity: 0, doc: [],
     source: nil, type: nil, signature: nil, specs: [],
-    annotations: []
+    annotations: [], doc_line: 1
 end
 
 defmodule ExDoc.TypeNode do
@@ -96,8 +97,8 @@ defmodule ExDoc.Retriever do
       case Code.get_docs(module, :moduledoc) do
         {_line, false} ->
           nil
-        {_, _} ->
-          module
+        {doc_line, _} ->
+          {doc_line, module}
         nil ->
           raise("module #{inspect module} was not compiled with flag --docs")
       end
@@ -109,7 +110,7 @@ defmodule ExDoc.Retriever do
 
   defp generate_node(nil, _, _), do: nil
 
-  defp generate_node(module, type, config) do
+  defp generate_node({doc_line, module}, type, config) do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
 
@@ -130,7 +131,8 @@ defmodule ExDoc.Retriever do
       moduledoc: moduledoc,
       docs: docs,
       typespecs: get_types(module),
-      source: source_link(source_path, source_url, line)
+      source: source_link(source_path, source_url, line),
+      doc_line: doc_line
     }
   end
 
@@ -204,7 +206,8 @@ defmodule ExDoc.Retriever do
       signature: get_call_signature(name, signature),
       specs: specs,
       source: source_link(source_path, source_url, line),
-      type: type
+      type: type,
+      doc_line: doc_line
     }
   end
 

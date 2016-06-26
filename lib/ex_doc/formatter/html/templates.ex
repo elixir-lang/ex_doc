@@ -23,7 +23,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   # Convert markdown to HTML.
   defp to_html(nil), do: nil
-  defp to_html(bin) when is_binary(bin), do: ExDoc.Markdown.to_html(bin)
+  defp to_html(bin_or_node), do: ExDoc.Markdown.to_html(bin_or_node)
 
   # Get the pretty name of a function node
   defp pretty_type(%ExDoc.FunctionNode{type: t}) do
