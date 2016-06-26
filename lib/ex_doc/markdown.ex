@@ -47,7 +47,7 @@ defmodule ExDoc.Markdown do
   end
 
   @doc """
-  Helper to handle plain code blocks (```...```) with and without
+  Helper to handle plain `code blocks (```...```) with and without
   language specification and indentation code blocks
   """
   def pretty_codeblocks(bin) do

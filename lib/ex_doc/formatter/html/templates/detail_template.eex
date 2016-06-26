@@ -24,6 +24,6 @@
     </div>
   <% end %>
   <section class="docstring">
-    <%= to_html(node.doc) %>
+    <%= to_html(node) %>
   </section>
 </div>
