@@ -30,7 +30,7 @@ defmodule ExDoc.RetrieverTest do
 
   test "docs_from_files returns the moduledoc info" do
     [node] = docs_from_files ["CompiledWithDocs"]
-    assert node.moduledoc == "moduledoc\n\n\#\# Example\n    CompiledWithDocs.example\n"
+    assert node.moduledoc == "moduledoc\n\n\#\# Example ☃ Unicode\n    CompiledWithDocs.example\n"
   end
 
   test "docs_from_files returns nil if there's no moduledoc info" do
