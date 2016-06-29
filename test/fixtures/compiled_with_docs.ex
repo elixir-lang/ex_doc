@@ -2,7 +2,7 @@ defmodule CompiledWithDocs do
   @moduledoc """
   moduledoc
 
-  ## Example \u2603 Unicode
+  ## Example ☃ Unicode
       CompiledWithDocs.example
   """
 
