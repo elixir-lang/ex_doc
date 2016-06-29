@@ -28,7 +28,7 @@ defmodule ExDoc.Markdown.Pandoc do
   defp text_to_file(text) do
     id =
       4
-      |> :crypto.rand_bytes()
+      |> :crypto.strong_rand_bytes()
       |> Base.encode16()
     unique_name = "tmpdoc_#{id}.md"
     tmp_path = Path.join(System.tmp_dir, unique_name)
