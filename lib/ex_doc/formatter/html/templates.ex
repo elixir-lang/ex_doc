@@ -161,11 +161,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:behaviour), do: "modules"
 
   defp asset_rev(output, pattern) do
-    output =
-      output
-      |> Path.expand()
-
     output
+    |> Path.expand()
     |> Path.join(pattern)
     |> Path.wildcard()
     |> relative_asset(output)
@@ -173,6 +170,37 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp relative_asset([], _), do: nil
   defp relative_asset([h|_], output), do: Path.relative_to(h, output)
+
+  @doc """
+  Extract a linkable id from a heading
+  """
+  @spec header_to_id(String.t) :: String.t
+  def header_to_id(header) do
+    header
+    |> String.replace(~r/\W+/u, "-")
+    |> String.strip(?-)
+    |> String.downcase()
+    |> h()
+  end
+
+  @h2_regex ~r/<h2.*?>(.+)<\/h2>/m
+  defp link_moduledoc_headings(content) do
+    Regex.replace(@h2_regex, content, fn match, title ->
+      id = header_to_id(title)
+      if id == "" do
+        match
+      else
+        """
+        <h2 id="module-#{id}" class="section-heading">
+          <a class="hover-link" href="#module-#{id}">
+            <i class="icon-link"></i>
+          </a>
+          #{title}
+        </h2>
+        """
+      end
+    end)
+  end
 
   templates = [
     detail_template: [:node, :_module],

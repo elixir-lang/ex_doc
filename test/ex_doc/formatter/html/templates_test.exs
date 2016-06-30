@@ -111,6 +111,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CompiledWithDocs\s*}
     refute content =~ ~r{<small>module</small>}
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
+    assert content =~ ~r{<h2 id="module-example-unicode" class="section-heading">.*<a class="hover-link" href="#module-example-unicode">.*<i class="icon-link"></i>.*</a>.*Example.*</h2>}ms
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
     assert content =~ ~r{example_1/0.*Another example}ms
@@ -119,6 +120,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~s{<div class="detail" id="example_1/0">}
     assert content =~ ~s{example(foo, bar \\\\ Baz)}
     assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\n\s*<i class="icon-link"><\/i>\n\s*<\/a>}ms
+  end
+
+  test "header id generation" do
+    assert Templates.header_to_id("“Stale”") == "stale"
+    assert Templates.header_to_id("José") == "josé"
+    assert Templates.header_to_id(" a - b ") == "a-b"
+    assert Templates.header_to_id(" ☃ ") == ""
   end
 
   test "module_page outputs the types and function specs" do
