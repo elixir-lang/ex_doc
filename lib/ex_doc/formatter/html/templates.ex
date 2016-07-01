@@ -161,8 +161,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:behaviour), do: "modules"
 
   defp asset_rev(output, pattern) do
+    output = Path.expand(output)
+
     output
-    |> Path.expand()
     |> Path.join(pattern)
     |> Path.wildcard()
     |> relative_asset(output)
