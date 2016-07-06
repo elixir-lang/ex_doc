@@ -1,5 +1,5 @@
 %{"cmark": {:hex, :cmark, "0.5.7", "7a3304e058dcb62dc73089eb2778aea0c7284ffcf67191cc40910bb36bcf5935", [:mix, :make], []},
-  "earmark": {:hex, :earmark, "0.2.1", "ba6d26ceb16106d069b289df66751734802777a3cbb6787026dd800ffeb850f3", [:mix], []},
+  "earmark": {:hex, :earmark, "1.0.1", "2c2cd903bfdc3de3f189bd9a8d4569a075b88a8981ded9a0d95672f6e2b63141", [:mix], []},
   "excoveralls": {:hex, :excoveralls, "0.3.11", "cd1abaf07db5bed9cf7891d86470247c8b3c8739d7758679071ce1920bb09dbc", [:mix], [{:hackney, ">= 0.12.0", [hex: :hackney, optional: false]}, {:exjsx, "~> 3.0", [hex: :exjsx, optional: false]}]},
   "exjsx": {:hex, :exjsx, "3.2.0", "7136cc739ace295fc74c378f33699e5145bead4fdc1b4799822d0287489136fb", [:mix], [{:jsx, "~> 2.6.2", [hex: :jsx, optional: false]}]},
   "hackney": {:hex, :hackney, "1.3.2", "43bd07ab88753f5e136e38fddd2a09124bee25733b03361eeb459d0173fc17ab", [:rebar, :make], [{:ssl_verify_hostname, "~> 1.0.5", [hex: :ssl_verify_hostname, optional: false]}, {:idna, "~> 1.0.2", [hex: :idna, optional: false]}]},
