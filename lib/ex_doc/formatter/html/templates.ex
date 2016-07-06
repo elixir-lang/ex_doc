@@ -173,7 +173,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp relative_asset([h|_], output), do: Path.relative_to(h, output)
 
   @doc """
-  Extract a linkable id from a heading
+  Extract a linkable ID from a heading
   """
   @spec header_to_id(String.t) :: String.t
   def header_to_id(header) do
@@ -184,23 +184,30 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> h()
   end
 
-  @h2_regex ~r/<h2.*?>(.+)<\/h2>/m
-  defp link_moduledoc_headings(content) do
-    Regex.replace(@h2_regex, content, fn match, title ->
-      link_moduledoc_heading(match, title, header_to_id(title))
+  @doc """
+  Link secondary headings found with `regex` with in the given `content`.
+  IDs are prefixed with `prefix`.
+  """
+  @spec link_headings(String.t, Regex.t, String.t) :: String.t
+  def link_headings(content, regex, prefix \\ "") do
+    Regex.replace(regex, content, fn match, title ->
+      link_heading(match, title, header_to_id(title), prefix)
     end)
   end
 
-  defp link_moduledoc_heading(match, _title, ""), do: match
-  defp link_moduledoc_heading(_match, title, id) do
+  defp link_heading(match, _title, "", _prefix), do: match
+  defp link_heading(_match, title, id, prefix) do
     """
-    <h2 id="module-#{id}" class="section-heading">
-      <a href="#module-#{id}" class="hover-link">
-        <i class="icon-link"></i>
-      </a>
-      #{title}
+    <h2 id="#{prefix}#{id}" class="section-heading">
+      <a href="##{prefix}#{id}" class="hover-link"><i class="icon-link"></i></a>
+      #{h(title)}
     </h2>
     """
+  end
+
+  @h2_regex ~r/<h2.*?>(.+)<\/h2>/m
+  defp link_moduledoc_headings(content) do
+    link_headings(content, @h2_regex, "module-")
   end
 
   templates = [
