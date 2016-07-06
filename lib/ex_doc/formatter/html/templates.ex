@@ -187,20 +187,20 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @h2_regex ~r/<h2.*?>(.+)<\/h2>/m
   defp link_moduledoc_headings(content) do
     Regex.replace(@h2_regex, content, fn match, title ->
-      id = header_to_id(title)
-      if id == "" do
-        match
-      else
-        """
-        <h2 id="module-#{id}" class="section-heading">
-          <a class="hover-link" href="#module-#{id}">
-            <i class="icon-link"></i>
-          </a>
-          #{title}
-        </h2>
-        """
-      end
+      link_moduledoc_heading(match, title, header_to_id(title))
     end)
+  end
+
+  defp link_moduledoc_heading(match, _title, ""), do: match
+  defp link_moduledoc_heading(_match, title, id) do
+    """
+    <h2 id="module-#{id}" class="section-heading">
+      <a href="#module-#{id}" class="hover-link">
+        <i class="icon-link"></i>
+      </a>
+      #{title}
+    </h2>
+    """
   end
 
   templates = [
