@@ -212,13 +212,7 @@ defmodule ExDoc.Retriever do
     callbacks = Enum.into(Typespec.beam_callbacks(module) || [], %{})
     optional_callbacks = beam_optional_callbacks(module)
 
-    docs =
-      if function_exported?(module, :__behaviour__, 1) do
-        module.__behaviour__(:docs)
-      else
-        Code.get_docs(module, :all)[:callback_docs]
-      end
-
+    docs = Code.get_docs(module, :all)[:callback_docs]
     docs = Enum.sort_by docs || [], &elem(&1, 0)
     Enum.map(docs, &get_callback(&1, source_path, source_url, callbacks, optional_callbacks, abst_code))
   end
@@ -229,15 +223,6 @@ defmodule ExDoc.Retriever do
     {{name, arity}, _, kind, doc} = callback
     function = actual_def(name, arity, kind)
     line = find_actual_line(abst_code, function, :callback)
-
-    # TODO: Remove defcallback and defmacrocallback
-    # once we no longer supported __behaviour__
-    kind =
-      case kind do
-        :def -> :callback
-        :defmacro -> :macrocallback
-        other -> other
-      end
 
     name_and_arity =
       case kind do
@@ -379,9 +364,9 @@ defmodule ExDoc.Retriever do
   end
 
   defp callbacks_defined_by(module) do
-    :attributes
-    |> module.module_info
-    |> Enum.filter_map(&match?({:callback, _}, &1), fn {_, [{t,_}|_]} -> t end)
+    module
+    |> Kernel.Typespec.beam_callbacks()
+    |> Keyword.keys
   end
 
   defp behaviours_implemented_by(module) do
