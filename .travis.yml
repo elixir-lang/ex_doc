@@ -1,4 +1,4 @@
-language: erlang
+language: elixir
 sudo: false
 elixir:
   - 1.2.6
