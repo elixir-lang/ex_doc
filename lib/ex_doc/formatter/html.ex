@@ -196,9 +196,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp link_headers(content) do
-    Regex.replace(@h2_regex, content, fn _, part ->
-      "<h2 id=\"#{Templates.header_to_id(part)}\">#{Templates.h(part)}</h2>\n"
-    end)
+    Templates.link_headings(content, @h2_regex)
   end
 
   defp input_to_title(input) do

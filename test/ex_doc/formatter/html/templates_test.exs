@@ -111,7 +111,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CompiledWithDocs\s*}
     refute content =~ ~r{<small>module</small>}
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
-    assert content =~ ~r{<h2 id="module-example-unicode" class="section-heading">.*<a class="hover-link" href="#module-example-unicode">.*<i class="icon-link"></i>.*</a>.*Example.*</h2>}ms
+    assert content =~ ~r{<h2 id="module-example-unicode" class="section-heading">.*<a href="#module-example-unicode" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Example.*</h2>}ms
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
     assert content =~ ~r{example_1/0.*Another example}ms
