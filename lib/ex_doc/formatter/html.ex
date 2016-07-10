@@ -83,13 +83,12 @@ defmodule ExDoc.Formatter.HTML do
      {"fonts/*.{eot,svg,ttf,woff,woff2}", "fonts"}]
   end
 
-  # TODO: decouple EPUB/HTML
   @doc """
   Copy a list of assets into a given directory
   """
   @spec generate_assets(list, String.t) :: :ok
   def generate_assets(source, output) do
-    Enum.each source, fn({ pattern, dir }) ->
+    Enum.each source, fn {pattern, dir} ->
       output = "#{output}/#{dir}"
       File.mkdir! output
 
@@ -193,13 +192,11 @@ defmodule ExDoc.Formatter.HTML do
     @h2_regex
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
-    |> Enum.map(&{&1, header_to_id(&1)})
+    |> Enum.map(&{&1, Templates.header_to_id(&1)})
   end
 
   defp link_headers(content) do
-    Regex.replace(@h2_regex, content, fn _, part ->
-      "<h2 id=\"#{header_to_id(part)}\">#{Templates.h(part)}</h2>\n"
-    end)
+    Templates.link_headings(content, @h2_regex)
   end
 
   defp input_to_title(input) do
@@ -208,14 +205,6 @@ defmodule ExDoc.Formatter.HTML do
 
   defp title_to_filename(title) do
     title |> String.replace(" ", "-") |> String.downcase()
-  end
-
-  defp header_to_id(header) do
-    header
-    |> String.strip()
-    |> String.replace(~r/\W+/, "-")
-    |> String.downcase()
-    |> Templates.h()
   end
 
   defp process_logo_metadata(config) do

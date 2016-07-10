@@ -161,8 +161,8 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     content = File.read!("#{output_dir()}/readme.html")
     assert content =~ ~r{<title>README [^<]*</title>}
-    assert content =~ ~r{<h2 id="header-sample"> Header sample</h2>}
-    assert content =~ ~r{<h2 id="more-than"> more &gt; than</h2>}
+    assert content =~ ~r{<h2 id="header-sample" class="section-heading">.*<a href="#header-sample" class="hover-link"><i class="icon-link"></i></a>.*Header sample.*</h2>}ms
+    assert content =~ ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than" class="hover-link"><i class="icon-link"></i></a>.*more &gt; than.*</h2>}ms
     assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code>TypesAndSpecs.Sub</code></a>}

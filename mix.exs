@@ -3,8 +3,8 @@ defmodule ExDoc.Mixfile do
 
   def project do
     [app: :ex_doc,
-     version: "0.12.0",
-     elixir: "~> 1.0",
+     version: "0.13.0-dev",
+     elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      deps: deps(),
      aliases: aliases(),
@@ -21,10 +21,7 @@ defmodule ExDoc.Mixfile do
   end
 
   defp deps do
-    [
-      # For testing before release of Earmark 1.0.0:
-      # git clone -b release-1.0.0 https://github.com/pragdave/earmark.git ...
-      {:earmark, path: "/home/robert/git/earmark"},
+    [{:earmark, "~> 1.0"},
      {:markdown, github: "devinus/markdown", only: :test},
      {:cmark, "~> 0.5", only: :test},
      {:excoveralls, "~> 0.3", only: :test}]

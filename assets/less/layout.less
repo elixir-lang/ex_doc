@@ -87,6 +87,10 @@ body.sidebar-closed, body.sidebar-closing {
   }
 }
 
+body.sidebar-closed .icon-menu {
+  color: @black;
+}
+
 body.sidebar-opening {
   .sidebar-toggle {
     transition: transform 0.3s ease-in-out;
@@ -121,7 +125,7 @@ body.sidebar-closing {
   .content {
     transition: padding-left 0.3s ease-in-out;
   }
-  
+
   @media screen and (max-width: 768px) {
     .sidebar {
       z-index: 3;
