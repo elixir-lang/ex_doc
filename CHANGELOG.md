@@ -1,9 +1,10 @@
 # Changelog
 
-## v0.13.0-dev
+## v0.13.0
 
   * Bug fixes
     * Fix issue where docs would fail when being built on Erlang 19
+    * Store templates in `priv` rather than in `lib`
 
   * Backwards incompatible changes
     * Require Elixir ~> v1.2
