@@ -23,7 +23,7 @@ var config = require('./assets/webpack.config')
 var environment = $.util.env.type || 'development'
 var isProduction = environment === 'production'
 
-var distPath = 'lib/ex_doc/formatter/html/templates/dist'
+var distPath = 'priv/ex_doc/formatter/html/templates/dist'
 
 var npmPlugin = new LessPluginNpmImport()
 var autoprefixPlugin = new LessPluginAutoPrefix({
