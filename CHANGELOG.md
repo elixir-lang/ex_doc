@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.13.0-dev
+
+  * Bug fixes
+    * Fix issue where docs would fail when being built on Erlang 19
+
+  * Backwards incompatible changes
+    * Require Elixir ~> v1.2
+
 ## v0.12.0
 
   * Enhancements
