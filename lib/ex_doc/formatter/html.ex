@@ -18,7 +18,7 @@ defmodule ExDoc.Formatter.HTML do
     File.rm_rf! output
     :ok = File.mkdir_p output
 
-    assets() |> templates_path() |> generate_assets(output)
+    assets() |> assets_path() |> generate_assets(output)
 
     all = Autolink.all(module_nodes)
     modules    = filter_list(:modules, all)
@@ -256,9 +256,9 @@ defmodule ExDoc.Formatter.HTML do
     File.write!("#{output}/#{file_name}", content)
   end
 
-  defp templates_path(patterns) do
+  defp assets_path(patterns) do
     Enum.into(patterns, [], fn {pattern, dir} ->
-      {Path.expand("html/templates/#{pattern}", __DIR__), dir}
+      {Application.app_dir(:ex_doc, "priv/ex_doc/formatter/html/templates/#{pattern}"), dir}
     end)
   end
 
