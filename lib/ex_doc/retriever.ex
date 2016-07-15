@@ -322,20 +322,25 @@ defmodule ExDoc.Retriever do
     abst_code
     |> Enum.find(&match?({:attribute, _, :callback, {^function, _}}, &1))
     |> elem(1)
+    |> anno_line()
   end
 
   defp find_actual_line(abst_code, name, :module) do
     abst_code
     |> Enum.find(&match?({:attribute, _, :module, ^name}, &1))
     |> elem(1)
+    |> anno_line()
   end
 
   defp find_actual_line(abst_code, {name, arity}, :function) do
     case Enum.find(abst_code, &match?({:function, _, ^name, ^arity, _}, &1)) do
       nil -> nil
-      tuple -> elem(tuple, 1)
+      tuple -> elem(tuple, 1) |> anno_line()
     end
   end
+
+  defp anno_line(line) when is_integer(line), do: line
+  defp anno_line(anno), do: :erl_anno.line(anno)
 
   # Detect if a module is an exception, struct,
   # protocol, implementation or simply a module
