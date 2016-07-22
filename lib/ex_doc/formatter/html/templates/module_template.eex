@@ -15,7 +15,7 @@
       </h1>
 
       <%= if module.moduledoc do %>
-        <section id="moduledoc" class="docstring">
+        <section id="moduledoc">
           <%= module.moduledoc |> to_html() |> link_moduledoc_headings() %>
         </section>
       <% end %>
