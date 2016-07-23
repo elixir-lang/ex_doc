@@ -288,9 +288,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     {"", mod, fun, arity} = split_function(bin)
     {"c:", mod, fun, arity}
   end
+  defp split_function("t:" <> bin) do
+    {"", mod, fun, arity} = split_function(bin)
+    {"t:", mod, fun, arity}
+  end
+
 
   defp split_function(bin) do
-    [modules, arity] = String.split(bin, "/")
+    [modules, arity] = case String.split(bin, "/") do
+      [m, a] -> [m, a]
+      [m]    -> [m, ""]
+    end
     {mod, name} =
       modules
       |> String.replace(~r{([^\.])\.}, "\\1 ") # this handles the case of the ".." function
