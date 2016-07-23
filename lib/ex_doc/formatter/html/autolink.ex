@@ -202,7 +202,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def local_doc(bin, locals) when is_binary(bin) do
-    ~r{(?<!\[)`\s*(([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)\s*`(?!\])}
+    ~r{(?<!\[)`\s*(([ct]:)?([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)\s*`(?!\])}
     |> Regex.scan(bin)
     |> Enum.uniq()
     |> List.flatten()

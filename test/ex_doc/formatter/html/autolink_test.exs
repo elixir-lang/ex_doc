@@ -18,6 +18,12 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       "[`funny_name\?/1`](#funny_name\?/1) and [`funny_name!/2`](#funny_name!/2)"
   end
 
+  test "autolink to local callbacks" do
+    # `split_function` must also return locally defined callbacks
+    # format should be: "c:<fun>/<arity>"
+    assert Autolink.local_doc("`c:fun/2`", ["c:fun/2"]) == "[`fun/2`](#c:fun/2)"
+  end
+
   test "autolink doesn't create links for undefined functions in docs" do
     assert Autolink.local_doc("`example/1`", ["example/2"]) == "`example/1`"
     assert Autolink.local_doc("`example/1`", []) == "`example/1`"
