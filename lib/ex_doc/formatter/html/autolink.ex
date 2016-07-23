@@ -202,16 +202,22 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def local_doc(bin, locals) when is_binary(bin) do
-    ~r{(?<!\[)`\s*((c:)?([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)\s*`(?!\])}
+    fun_re = ~r{((c:)?([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)} |> Regex.source
+    type_re = ~r{(t:([a-z\d_!\\?]+))} |> Regex.source
+    ~r{(?<!\[)`\s*(#{fun_re}|#{type_re})\s*`(?!\])}
     |> Regex.scan(bin)
     |> Enum.uniq()
     |> List.flatten()
     |> Enum.filter(&(&1 in locals))
     |> Enum.reduce(bin, fn (x, acc) ->
          {prefix, _, function_name, arity} = split_function(x)
+         arity = case arity do
+           "" -> ""
+           a -> "/" <> a
+         end
          escaped = Regex.escape(x)
          Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
-           "[`#{function_name}/#{arity}`](##{prefix}#{enc_h function_name}/#{arity})")
+           "[`#{function_name}#{arity}`](##{prefix}#{enc_h function_name}#{arity})")
        end)
   end
 
