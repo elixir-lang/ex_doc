@@ -24,6 +24,10 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.local_doc("`c:fun/2`", ["c:fun/2"]) == "[`fun/2`](#c:fun/2)"
   end
 
+  test "autolink to local types" do
+    assert Autolink.local_doc("`t:my_type`", ["t:my_type"]) == "[`my_type`](#t:my_type)"
+  end
+
   test "autolink doesn't create links for undefined functions in docs" do
     assert Autolink.local_doc("`example/1`", ["example/2"]) == "`example/1`"
     assert Autolink.local_doc("`example/1`", []) == "`example/1`"
