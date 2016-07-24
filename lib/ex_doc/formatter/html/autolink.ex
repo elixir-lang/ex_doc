@@ -222,7 +222,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def project_doc(bin, modules, module_id \\ nil) when is_binary(bin) do
     project_funs = for m <- modules, d <- m.docs, do: doc_prefix(d) <> m.id <> "." <> d.id
-    project_types = for m <- modules, d <- m.typespecs, do: doc_prefix(d) <> m.id <> "." <> d.id
+    project_types = for m <- modules, d <- m.typespecs, do: "t:" <> m.id <> "." <> d.id
     project_funs = project_funs ++ project_types
 
     project_modules =
