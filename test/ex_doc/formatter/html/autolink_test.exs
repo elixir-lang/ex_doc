@@ -113,6 +113,12 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.project_modules("`MyModule.Nested`", ["MyModule.DiffNested"]) == "`MyModule.Nested`"
   end
 
+  test "autolink to types in the project" do
+    # use the same approach for project_functions as for local_docs
+    assert Autolink.project_functions("`t:MyModule.my_type`",
+      ["t:MyModule.my_type"]) ==  "[`MyModule.my_type`](MyModule.html#t:my_type)"
+  end
+
   # erlang functions
 
   @erlang_docs "http://www.erlang.org/doc/man/"
