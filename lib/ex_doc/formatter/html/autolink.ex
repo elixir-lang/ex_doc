@@ -273,7 +273,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the module.
   """
   def project_modules(bin, modules, module_id \\ nil) when is_binary(bin) do
-    ~r{(?<!\[)`\s*(([A-Z][A-Za-z]+\.?)+)\s*`(?!\])}
+    ~r{(?<!\[)`\s*(([A-Z][A-Za-z_\d]+\.?)+)\s*`(?!\])}
     |> Regex.scan(bin)
     |> Enum.uniq()
     |> List.flatten()
