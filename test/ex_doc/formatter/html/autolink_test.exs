@@ -25,7 +25,10 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   end
 
   test "autolink to local types" do
-    assert Autolink.local_doc("`t:my_type`", ["t:my_type"]) == "[`my_type`](#t:my_type)"
+    assert Autolink.local_doc("`t:my_type/0`", ["t:my_type/0"]) == "[`my_type/0`](#t:my_type/0)"
+    assert Autolink.local_doc("`t:my_type/1`", ["t:my_type/1"]) == "[`my_type/1`](#t:my_type/1)"
+    # links to types without arity don't work
+    assert Autolink.local_doc("`t:my_type`", ["t:my_type/0"]) == "`t:my_type`"
   end
 
   test "autolink doesn't create links for undefined functions in docs" do
@@ -115,8 +118,10 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   test "autolink to types in the project" do
     # use the same approach for project_functions as for local_docs
-    assert Autolink.project_functions("`t:MyModule.my_type`",
-      ["t:MyModule.my_type"]) ==  "[`MyModule.my_type`](MyModule.html#t:my_type)"
+    assert Autolink.project_functions("`t:MyModule.my_type/0`",
+      ["t:MyModule.my_type/0"]) ==  "[`MyModule.my_type/0`](MyModule.html#t:my_type/0)"
+      assert Autolink.project_functions("`t:MyModule.my_type`",
+        ["t:MyModule.my_type/0"]) ==  "`t:MyModule.my_type`"
   end
 
   # erlang functions
