@@ -212,7 +212,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> Enum.reduce(bin, fn (x, acc) ->
          {prefix, _, function_name, arity} = split_function(x)
          arity = case arity do
-           "" -> ""
+           "" -> ""  # no arity: x is a type
            a -> "/" <> a
          end
          escaped = Regex.escape(x)
