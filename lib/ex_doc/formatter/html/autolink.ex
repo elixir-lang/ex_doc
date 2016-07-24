@@ -211,7 +211,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> Enum.filter(&(&1 in locals))
     |> Enum.reduce(bin, fn (x, acc) ->
          {prefix, _, function_name, arity} = split_function(x)
-           escaped = Regex.escape(x)
+         escaped = Regex.escape(x)
          Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
            "[`#{function_name}/#{arity}`](##{prefix}#{enc_h function_name}/#{arity})")
        end)
