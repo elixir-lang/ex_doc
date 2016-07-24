@@ -203,22 +203,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def local_doc(bin, locals) when is_binary(bin) do
-    fun_re = ~r{((c:)?([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)} |> Regex.source
-    type_re = ~r{(t:([a-z\d_!\\?]+))} |> Regex.source
-    ~r{(?<!\[)`\s*(#{fun_re}|#{type_re})\s*`(?!\])}
+    fun_re = ~r{(([ct]:)?([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)} |> Regex.source
+    ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
     |> Regex.scan(bin)
     |> Enum.uniq()
     |> List.flatten()
     |> Enum.filter(&(&1 in locals))
     |> Enum.reduce(bin, fn (x, acc) ->
          {prefix, _, function_name, arity} = split_function(x)
-         arity = case arity do
-           "" -> ""  # no arity: x is a type
-           a -> "/" <> a
-         end
-         escaped = Regex.escape(x)
+           escaped = Regex.escape(x)
          Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
-           "[`#{function_name}#{arity}`](##{prefix}#{enc_h function_name}#{arity})")
+           "[`#{function_name}/#{arity}`](##{prefix}#{enc_h function_name}/#{arity})")
        end)
   end
 
@@ -254,22 +249,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def project_functions(bin, project_funs) when is_binary(bin) do
     module_re = ~r{(([A-Z][A-Za-z_\d]+)\.)+} |> Regex.source
-    fun_re = ~r{(c:)?(#{module_re}([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)} |> Regex.source
-    type_re = ~r{(t:#{module_re}([a-z\d_!\\?]+))} |> Regex.source
-    ~r{(?<!\[)`\s*(#{fun_re}|#{type_re})\s*`(?!\])}
+    fun_re = ~r{([ct]:)?(#{module_re}([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)} |> Regex.source
+    ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
     |> Regex.scan(bin)
     |> Enum.uniq()
     |> List.flatten()
     |> Enum.filter(&(&1 in project_funs))
     |> Enum.reduce(bin, fn (x, acc) ->
          {prefix, mod_str, function_name, arity} = split_function(x)
-         arity = case arity do
-           "" -> "" # no arity: x is a type
-           a -> "/" <> a
-         end
          escaped = Regex.escape(x)
          Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
-           "[`#{mod_str}.#{function_name}#{arity}`](#{mod_str}.html##{prefix}#{enc_h function_name}#{arity})")
+           "[`#{mod_str}.#{function_name}/#{arity}`](#{mod_str}.html##{prefix}#{enc_h function_name}/#{arity})")
        end)
   end
 
