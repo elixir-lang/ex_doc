@@ -28,7 +28,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp all_docs(module, modules) do
-    locals = Enum.map module.docs, &(doc_prefix(&1) <> &1.id)
+    locals = Enum.map(module.docs, &(doc_prefix(&1) <> &1.id)) ++
+      Enum.map(module.typespecs, &("t:" <> &1.id))
 
     moduledoc =
       if module.moduledoc do
@@ -202,7 +203,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def local_doc(bin, locals) when is_binary(bin) do
-    ~r{(?<!\[)`\s*((c:)?([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)\s*`(?!\])}
+    fun_re = ~r{(([ct]:)?([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)} |> Regex.source
+    ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
     |> Regex.scan(bin)
     |> Enum.uniq()
     |> List.flatten()
@@ -220,6 +222,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def project_doc(bin, modules, module_id \\ nil) when is_binary(bin) do
     project_funs = for m <- modules, d <- m.docs, do: doc_prefix(d) <> m.id <> "." <> d.id
+    project_types = for m <- modules, d <- m.typespecs, do: "t:" <> m.id <> "." <> d.id
+    project_funs = project_funs ++ project_types
+
     project_modules =
       modules
       |> Enum.map(&module_to_string/1)
@@ -243,7 +248,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def project_functions(bin, project_funs) when is_binary(bin) do
-    ~r{(?<!\[)`\s*((c:)?(([A-Z][A-Za-z]+)\.)+([a-z_!\?>\|=&<!~+\.\+*^@-]+)/\d+)\s*`(?!\])}
+    module_re = ~r{(([A-Z][A-Za-z_\d]+)\.)+} |> Regex.source
+    fun_re = ~r{([ct]:)?(#{module_re}([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)} |> Regex.source
+    ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
     |> Regex.scan(bin)
     |> Enum.uniq()
     |> List.flatten()
@@ -266,7 +273,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the module.
   """
   def project_modules(bin, modules, module_id \\ nil) when is_binary(bin) do
-    ~r{(?<!\[)`\s*(([A-Z][A-Za-z]+\.?)+)\s*`(?!\])}
+    ~r{(?<!\[)`\s*(([A-Z][A-Za-z_\d]+\.?)+)\s*`(?!\])}
     |> Regex.scan(bin)
     |> Enum.uniq()
     |> List.flatten()
@@ -288,6 +295,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     {"", mod, fun, arity} = split_function(bin)
     {"c:", mod, fun, arity}
   end
+  defp split_function("t:" <> bin) do
+    {"", mod, fun, arity} = split_function(bin)
+    {"t:", mod, fun, arity}
+  end
+
 
   defp split_function(bin) do
     [modules, arity] = String.split(bin, "/")
