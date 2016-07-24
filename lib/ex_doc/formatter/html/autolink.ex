@@ -28,7 +28,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp all_docs(module, modules) do
-    locals = Enum.map module.docs, &(doc_prefix(&1) <> &1.id)
+    locals = Enum.map(module.docs, &(doc_prefix(&1) <> &1.id)) ++
+      Enum.map(module.typespecs, &("t:" <> &1.id))
 
     moduledoc =
       if module.moduledoc do
@@ -226,6 +227,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def project_doc(bin, modules, module_id \\ nil) when is_binary(bin) do
     project_funs = for m <- modules, d <- m.docs, do: doc_prefix(d) <> m.id <> "." <> d.id
+    project_types = for m <- modules, d <- m.typespecs, do: doc_prefix(d) <> m.id <> "." <> d.id
+    project_funs = project_funs ++ project_types
+
     project_modules =
       modules
       |> Enum.map(&module_to_string/1)
