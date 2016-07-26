@@ -127,6 +127,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert Templates.header_to_id("José") == "josé"
     assert Templates.header_to_id(" a - b ") == "a-b"
     assert Templates.header_to_id(" ☃ ") == ""
+    assert Templates.header_to_id("Git Options (<code class=\"inline\">:git</code>)") == "git-options"
   end
 
   test "module_page outputs the types and function specs" do

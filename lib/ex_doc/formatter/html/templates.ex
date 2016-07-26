@@ -178,10 +178,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @spec header_to_id(String.t) :: String.t
   def header_to_id(header) do
     header
+    |> String.replace(~r/<.+>/, "")
     |> String.replace(~r/\W+/u, "-")
     |> String.strip(?-)
     |> String.downcase()
-    |> h()
   end
 
   @doc """
@@ -200,7 +200,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     """
     <h2 id="#{prefix}#{id}" class="section-heading">
       <a href="##{prefix}#{id}" class="hover-link"><i class="icon-link"></i></a>
-      #{h(title)}
+      #{title}
     </h2>
     """
   end
