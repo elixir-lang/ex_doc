@@ -9,7 +9,7 @@ defmodule ExDoc.Formatter.EPUB do
   @doc """
   Generate EPUB documentation for the given modules
   """
-  @spec run(list, %ExDoc.Config{}) :: String.t
+  @spec run(list, ExDoc.Config.t) :: String.t
   def run(module_nodes, config) when is_map(config) do
     output = Path.expand(config.output)
     File.rm_rf!(output)
