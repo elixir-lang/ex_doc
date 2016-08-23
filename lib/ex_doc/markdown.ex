@@ -9,9 +9,9 @@ defmodule ExDoc.Markdown do
   * [Pandoc][]
   * [Cmark][]
 
-  If you don't specify a parser in `config/config.exs`. ExDoc will try to
-  find one of the Markdown parser from the list in top down fashion. Otherwise,
-  ExDoc will raise an exception.
+  If you don't specify a parser in `config/config.exs`, ExDoc will try to
+  find one of the Markdown parsers from the list above in top-down fashion.
+  Otherwise, ExDoc will raise an exception.
 
   [Pandoc]: http://johnmacfarlane.net/pandoc/
   [Hoedown]: https://github.com/hoedown/hoedown
