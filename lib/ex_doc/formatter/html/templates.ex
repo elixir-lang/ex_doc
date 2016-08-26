@@ -178,18 +178,22 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @spec header_to_id(String.t) :: String.t
   def header_to_id(header) do
     header
+    |> String.replace(~r/<.+>/, "")
+    |> String.replace(~r/&#\d+;/, "")
+    |> String.replace(~r/&[A-Za-z0-9]+;/, "")
     |> String.replace(~r/\W+/u, "-")
     |> String.strip(?-)
     |> String.downcase()
-    |> h()
   end
 
   @doc """
   Link secondary headings found with `regex` with in the given `content`.
   IDs are prefixed with `prefix`.
   """
+  @h2_regex ~r/<h2.*?>(.+)<\/h2>/m
+
   @spec link_headings(String.t, Regex.t, String.t) :: String.t
-  def link_headings(content, regex, prefix \\ "") do
+  def link_headings(content, regex \\ @h2_regex, prefix \\ "") do
     Regex.replace(regex, content, fn match, title ->
       link_heading(match, title, header_to_id(title), prefix)
     end)
@@ -200,12 +204,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
     """
     <h2 id="#{prefix}#{id}" class="section-heading">
       <a href="##{prefix}#{id}" class="hover-link"><i class="icon-link"></i></a>
-      #{h(title)}
+      #{title}
     </h2>
     """
   end
 
-  @h2_regex ~r/<h2.*?>(.+)<\/h2>/m
   defp link_moduledoc_headings(content) do
     link_headings(content, @h2_regex, "module-")
   end

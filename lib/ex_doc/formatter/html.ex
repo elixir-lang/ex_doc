@@ -147,7 +147,7 @@ defmodule ExDoc.Formatter.HTML do
       output_file_name = "#{options.output_file_name}.html"
       config = set_canonical_url(config, output_file_name)
       html = Templates.extra_template(config, title, modules,
-                                      exceptions, protocols, link_headers(content))
+                                      exceptions, protocols, content)
 
       output = "#{options.output}/#{output_file_name}"
 
@@ -193,10 +193,6 @@ defmodule ExDoc.Formatter.HTML do
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
     |> Enum.map(&{&1, Templates.header_to_id(&1)})
-  end
-
-  defp link_headers(content) do
-    Templates.link_headings(content, @h2_regex)
   end
 
   defp input_to_title(input) do
