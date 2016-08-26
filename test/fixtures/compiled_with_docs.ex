@@ -2,7 +2,7 @@ defmodule CompiledWithDocs do
   @moduledoc """
   moduledoc
 
-  ## Example ☃ Unicode
+  ## Example ☃ Unicode > escaping
       CompiledWithDocs.example
   """
 

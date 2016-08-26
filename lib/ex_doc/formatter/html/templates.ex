@@ -179,6 +179,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def header_to_id(header) do
     header
     |> String.replace(~r/<.+>/, "")
+    |> String.replace(~r/&#\d+;/, "")
+    |> String.replace(~r/&[A-Za-z0-9]+;/, "")
     |> String.replace(~r/\W+/u, "-")
     |> String.strip(?-)
     |> String.downcase()

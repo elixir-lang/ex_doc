@@ -111,7 +111,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CompiledWithDocs\s*}
     refute content =~ ~r{<small>module</small>}
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
-    assert content =~ ~r{<h2 id="module-example-unicode" class="section-heading">.*<a href="#module-example-unicode" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Example.*</h2>}ms
+    assert content =~ ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Example.*</h2>}ms
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
     assert content =~ ~r{example_1/0.*Another example}ms
@@ -127,6 +127,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert Templates.header_to_id("José") == "josé"
     assert Templates.header_to_id(" a - b ") == "a-b"
     assert Templates.header_to_id(" ☃ ") == ""
+    assert Templates.header_to_id(" &sup2; ") == ""
+    assert Templates.header_to_id(" &#9180; ") == ""
     assert Templates.header_to_id("Git Options (<code class=\"inline\">:git</code>)") == "git-options"
   end
 
