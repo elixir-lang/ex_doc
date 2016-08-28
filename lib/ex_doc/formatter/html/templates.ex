@@ -23,7 +23,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   # Convert markdown to HTML.
   defp to_html(nil), do: nil
-  defp to_html(bin) when is_binary(bin), do: ExDoc.Markdown.to_html(bin)
+  defp to_html(%{moduledoc: nil}), do: nil
+  defp to_html(%{doc: nil}), do: nil
+  defp to_html(bin), do: ExDoc.Markdown.to_html(bin)
 
   # Get the pretty name of a function node
   defp pretty_type(%ExDoc.FunctionNode{type: t}) do
@@ -53,12 +55,21 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   If `doc` is `nil`, it returns `nil`.
   """
-  @spec synopsis(String.t) :: String.t
+  @spec synopsis(%ExDoc.ModuleNode{}) :: ExDoc.ModuleNode
+  @spec synopsis(%ExDoc.FunctionNode{}) :: ExDoc.FunctionNode
   @spec synopsis(nil) :: nil
-
   def synopsis(nil), do: nil
-  def synopsis(""),  do: ""
-  def synopsis(doc) when is_bitstring(doc) do
+  def synopsis(node = %ExDoc.ModuleNode{moduledoc: doc}) do 
+    %{node | moduledoc: _synopsis( doc )} 
+  end
+  def synopsis(node = %{doc: doc}) do 
+    %{node | doc: _synopsis( doc )} 
+  end
+
+  @spec _synopsis(String.t) :: String.t
+  defp _synopsis(nil), do: nil
+  defp _synopsis(""),  do: ""
+  defp _synopsis(doc) when is_bitstring(doc) do
     doc
     |> String.split(~r/\n\s*\n/)
     |> hd()

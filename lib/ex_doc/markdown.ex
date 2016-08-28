@@ -31,13 +31,26 @@ defmodule ExDoc.Markdown do
   @doc """
   Converts the given markdown document to HTML.
   """
+  def to_html(%ExDoc.ModuleNode{moduledoc: text, file: file, doc_line: line}) do
+    _to_html(text, file, line)
+  end
+  def to_html(%ExDoc.FunctionNode{doc: text, file: file, doc_line: line}) do
+    _to_html(text, file, line)
+  end
+  def to_html(%ExDoc.TypeNode{doc: text, file: file, doc_line: line}) do
+    _to_html(text, file, line)
+  end
   def to_html(text) when is_binary(text) do
-    get_markdown_processor().to_html(text)
+    _to_html(text, nil, nil)
+  end
+
+  defp _to_html(text, file, line) do
+    get_markdown_processor().to_html(text, line: line, file: file)
     |> pretty_codeblocks()
   end
 
   @doc """
-  Helper to handle plain code blocks (```...```) with and without
+  Helper to handle plain `code blocks (```...```) with and without
   language specification and indentation code blocks
   """
   def pretty_codeblocks(bin) do

@@ -22,6 +22,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       source_url: source_url()
     }
   end
+  
+  defp assert_synopsis(doc, syn) do 
+    assert Templates.synopsis(wrap_doc(doc)).doc == syn
+  end
+
+  defp wrap_doc(doc_str) do 
+    %ExDoc.FunctionNode{doc: doc_str}
+  end
 
   defp get_module_page(names) do
     mods =
@@ -34,14 +42,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "synopsis" do
     assert Templates.synopsis(nil) == nil
-    assert Templates.synopsis("") == ""
-    assert Templates.synopsis(".") == ""
-    assert Templates.synopsis(".::.") == ""
-    assert Templates.synopsis(" .= .: :.") == ".="
-    assert Templates.synopsis(" Description: ") == "Description"
-    assert Templates.synopsis("abcd") == "abcd"
+    assert_synopsis("", "")
+    assert_synopsis(".", "")
+    assert_synopsis(".::.", "")
+    assert_synopsis(" .= .: :.", ".=")
+    assert_synopsis(" Description: ", "Description")
+    assert_synopsis("abcd", "abcd")
     assert_raise FunctionClauseError, fn ->
-      Templates.synopsis(:abcd)
+      Templates.synopsis(wrap_doc(:abcd))
     end
   end
 
@@ -58,10 +66,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     ## Example:
     """
 
-    assert Templates.synopsis(doc1) ==
+    assert Templates.synopsis(wrap_doc(doc1)).doc ==
       "Summaries should not be displayed with trailing punctuation"
 
-    assert Templates.synopsis(doc2) ==
+    assert Templates.synopsis(wrap_doc(doc2)).doc ==
       "Example function: Summary should not display trailing puntuation"
   end
 

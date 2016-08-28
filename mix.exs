@@ -35,11 +35,12 @@ defmodule ExDoc.Mixfile do
   end
 
   defp package do
-   [licenses: ["Apache 2.0"],
-    links: %{"GitHub" => "https://github.com/elixir-lang/ex_doc"}]
+    [licenses: ["Apache 2.0"],
+     links: %{"GitHub" => "https://github.com/elixir-lang/ex_doc"}]
   end
 
   defp clean_test_fixtures(_args) do
     File.rm_rf "test/tmp"
   end
 end
+
