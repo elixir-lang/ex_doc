@@ -24,6 +24,6 @@
     </div>
   <% end %>
   <section class="docstring">
-    <%= to_html(node.doc) %>
+    <%= node.doc |> to_html() |> link_detail_headings(enc_h(link_id(node))) %>
   </section>
 </div>
