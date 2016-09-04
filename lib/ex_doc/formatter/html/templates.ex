@@ -193,7 +193,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @h2_regex ~r/<h2.*?>(.+)<\/h2>/m
 
   @spec link_headings(String.t, Regex.t, String.t) :: String.t
-  def link_headings(content, regex \\ @h2_regex, prefix \\ "") do
+  def link_headings(content, regex \\ @h2_regex, prefix \\ "")
+  def link_headings(nil, _, _), do: nil
+  def link_headings(content, regex, prefix) do
     Regex.replace(regex, content, fn match, title ->
       link_heading(match, title, header_to_id(title), prefix)
     end)
@@ -211,6 +213,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp link_moduledoc_headings(content) do
     link_headings(content, @h2_regex, "module-")
+  end
+
+  defp link_detail_headings(content, prefix) do
+    link_headings(content, @h2_regex, prefix <> "-")
   end
 
   templates = [
