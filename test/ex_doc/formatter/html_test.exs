@@ -246,4 +246,27 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     assert File.regular?("#{output}/images/elixir.png")
   end
+
+  test "generate .build file content" do
+    config = doc_config(extras: ["test/fixtures/README.md"])
+    generate_docs(config)
+    content = File.read!("#{output_dir()}/.build")
+    assert content =~ ~r{readme.html\n}
+    assert content =~ ~r{api-reference.html\n}
+    assert content =~ ~r{dist/sidebar_items.js\n}
+    assert content =~ ~r{index.html\n}
+    assert content =~ ~r{404.html\n}
+  end
+
+  test "run keep files not listed in .build" do
+    keep = "#{output_dir()}/keep"
+    config = doc_config()
+    generate_docs(config)
+    File.touch!(keep)
+    generate_docs(config)
+    assert File.exists?(keep)
+    content = File.read!("#{output_dir()}/.build")
+    refute content =~ ~r{keep}
+  end
+
 end

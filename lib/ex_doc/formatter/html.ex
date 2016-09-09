@@ -15,10 +15,11 @@ defmodule ExDoc.Formatter.HTML do
   def run(module_nodes, config) when is_map(config) do
     config = normalize_config(config)
     output = Path.expand(config.output)
-    File.rm_rf! output
-    :ok = File.mkdir_p output
+    build = Path.join(output, ".build")
 
-    assets() |> assets_path() |> generate_assets(output)
+    output_setup(build, output)
+
+    assets = assets() |> assets_path() |> generate_assets(output)
 
     all = Autolink.all(module_nodes)
     modules    = filter_list(:modules, all)
@@ -35,13 +36,15 @@ defmodule ExDoc.Formatter.HTML do
     generate_api_reference(modules, exceptions, protocols, output, config)
     extras = generate_extras(output, module_nodes, modules, exceptions, protocols, config)
 
-    generate_index(output, config)
-    generate_not_found(modules, exceptions, protocols, output, config)
-    generate_sidebar_items(modules, exceptions, protocols, extras, output)
+    generated_files =
+      generate_index(output, config) ++
+      generate_not_found(modules, exceptions, protocols, output, config) ++
+      generate_sidebar_items(modules, exceptions, protocols, extras, output) ++
+      generate_list(modules, modules, exceptions, protocols, output, config) ++
+      generate_list(exceptions, modules, exceptions, protocols, output, config) ++
+      generate_list(protocols, modules, exceptions, protocols, output, config)
 
-    generate_list(modules, modules, exceptions, protocols, output, config)
-    generate_list(exceptions, modules, exceptions, protocols, output, config)
-    generate_list(protocols, modules, exceptions, protocols, output, config)
+    generate_build(extras, generated_files ++ assets, build)
 
     Path.join(config.output, "index.html")
   end
@@ -53,8 +56,31 @@ defmodule ExDoc.Formatter.HTML do
     %{config | main: main || @main}
   end
 
+  defp output_setup(build, output) do
+    if File.exists? build do
+      Enum.each(File.stream!(build), fn(line) ->
+        line = String.replace(line, "\n", "")
+        File.rm(Path.join(output, line))
+      end)
+      File.rm(build)
+    else
+      File.rm_rf! output
+      File.mkdir_p! output
+    end
+  end
+
+  defp generate_build(extras, generated_files, output) do
+    extras = for {file, _, _} <- extras, do: "#{file}.html"
+    build_files = Enum.map(Enum.uniq(generated_files ++ extras), &[&1, "\n"])
+
+    File.write!(output, build_files)
+  end
+
   defp generate_index(output, config) do
-    generate_redirect(output, "index.html", config, "#{config.main}.html")
+    index_file = "index.html"
+    main_file = "#{config.main}.html"
+    generate_redirect(output, index_file, config, main_file)
+    [index_file, main_file]
   end
 
   defp generate_api_reference(modules, exceptions, protocols, output, config) do
@@ -69,13 +95,16 @@ defmodule ExDoc.Formatter.HTML do
     config = set_canonical_url(config, file_name)
     content = Templates.not_found_template(config, modules, exceptions, protocols)
     File.write!("#{output}/#{file_name}", content)
+    [file_name]
   end
 
   defp generate_sidebar_items(modules, exceptions, protocols, extras, output) do
+    sidebar_items = "dist/sidebar_items.js"
     nodes = %{modules: modules, protocols: protocols,
               exceptions: exceptions, extras: extras}
     content = Templates.create_sidebar_items(nodes)
-    File.write!("#{output}/dist/sidebar_items.js", content)
+    File.write!(Path.join(output, sidebar_items), content)
+    [sidebar_items]
   end
 
   defp assets do
@@ -88,13 +117,14 @@ defmodule ExDoc.Formatter.HTML do
   """
   @spec generate_assets(list, String.t) :: :ok
   def generate_assets(source, output) do
-    Enum.each source, fn {pattern, dir} ->
+    Enum.flat_map source, fn {pattern, dir} ->
       output = "#{output}/#{dir}"
-      File.mkdir! output
+      File.mkdir output
 
       Enum.map Path.wildcard(pattern), fn(file) ->
         base = Path.basename(file)
         File.copy file, "#{output}/#{base}"
+        "#{dir}/#{base}"
       end
     end
   end
@@ -250,6 +280,7 @@ defmodule ExDoc.Formatter.HTML do
     config = set_canonical_url(config, file_name)
     content = Templates.module_page(node, modules, exceptions, protocols, config)
     File.write!("#{output}/#{file_name}", content)
+    file_name
   end
 
   defp assets_path(patterns) do
