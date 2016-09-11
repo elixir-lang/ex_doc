@@ -324,27 +324,34 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def erlang_functions(bin) when is_binary(bin) do
+    regex = ~r{(?<!\[)`\s*:([a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}
     lib_dir = erlang_lib_dir()
-    ~r{(?<!\[)`\s*:([a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}
-    |> Regex.scan(bin)
-    |> Enum.uniq()
-    |> List.flatten()
-    |> Enum.filter(&valid_erlang_beam?(&1, lib_dir))
-    |> Enum.filter(&module_exports_function?/1)
-    |> Enum.reduce(bin, fn (x, acc) ->
-         {_, mod_str, function_name, arity} = split_function(x)
-         escaped = Regex.escape(x)
-         Regex.replace(~r/(?<!\[)`(\s*:#{escaped}\s*)`(?!\])/, acc,
-           "[`\\1`](#{@erlang_docs}#{mod_str}.html##{function_name}-#{arity})")
-       end)
+
+    Regex.replace(regex, bin, fn all, match ->
+      {_, module_str, function_str, arity_str} = split_function(match)
+      if valid_erlang_beam?(module_str, lib_dir) and
+         module_exports_function?(module_str, function_str, arity_str) do
+        "[`:#{match}`](#{@erlang_docs}#{module_str}.html##{function_str}-#{arity_str})"
+      else
+        all
+      end
+    end)
   end
 
-  defp valid_erlang_beam?(function_str, lib_dir) do
-    { _, mod_str, _function_name, _arity } = split_function(function_str)
-    '#{mod_str}.beam'
+  defp valid_erlang_beam?(module_str, lib_dir) do
+    '#{module_str}.beam'
     |> :code.where_is_file
     |> on_lib_path?(lib_dir)
   end
+
+  defp module_exports_function?(mod_str, function_str, arity_str) do
+    module = String.to_atom(mod_str)
+    function = String.to_atom(function_str)
+    {arity, _} = Integer.parse(arity_str)
+    Code.ensure_loaded?(module) and function_exported?(module, function, arity)
+  end
+
+  ## Helpers
 
   defp on_lib_path?(:non_existing, _base_path), do: false
   defp on_lib_path?(beam_path, base_path) do
@@ -356,14 +363,5 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp erlang_lib_dir do
     :code.lib_dir
     |> Path.expand()
-  end
-
-  defp module_exports_function?(function_str) do
-    {_, mod_str, function_name, arity_str} = split_function(function_str)
-    module = String.to_atom(mod_str)
-    function_name = String.to_atom(function_name)
-    {arity, _} = Integer.parse(arity_str)
-    exports = module.module_info(:exports)
-    Enum.member? exports, {function_name, arity}
   end
 end
