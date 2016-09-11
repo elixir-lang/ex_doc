@@ -329,14 +329,22 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp elixir_lib_dir do
-    case :code.where_is_file('Elixir.Kernel.beam') do
-      :non_existing ->
-        [0]
-      path ->
-        path
-        |> Path.dirname()
-        |> Path.dirname()
-        |> Path.dirname()
+    case Application.fetch_env(:ex_doc, :elixir_lib_dir) do
+      {:ok, lib_dir} ->
+        lib_dir
+      :error ->
+        lib_dir =
+          case :code.where_is_file('Elixir.Kernel.beam') do
+            :non_existing ->
+              [0]
+            path ->
+              path
+              |> Path.dirname()
+              |> Path.dirname()
+              |> Path.dirname()
+          end
+        Application.put_env(:ex_doc, :elixir_lib_dir, lib_dir)
+        lib_dir
     end
   end
 
