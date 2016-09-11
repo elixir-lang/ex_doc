@@ -3,6 +3,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   alias ExDoc.Formatter.HTML.Autolink
 
+  @elixir_docs "http://elixir-lang.org/docs/stable/"
+  @erlang_docs "http://www.erlang.org/doc/man/"
+
   # local_doc
 
   test "autolink fun/arity in docs" do
@@ -49,84 +52,98 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.local_doc("`<<>>/1`", ["<<>>/1"]) === "[`<<>>/1`](#%3C%3C%3E%3E/1)"
   end
 
-  # project_functions
+  # elixir_functions
 
-  test "autolink Module.fun/arity in docs" do
-    assert Autolink.project_functions("`Mod.example/2`", ["Mod.example/2"]) ==
+  test "autolink functions Module.fun/arity in docs" do
+    assert Autolink.elixir_functions("`Mod.example/2`", ["Mod.example/2"]) ==
       "[`Mod.example/2`](Mod.html#example/2)"
-    assert Autolink.project_functions("`MyModule.example/2`", ["MyModule.example/2"]) ==
+    assert Autolink.elixir_functions("`MyModule.example/2`", ["MyModule.example/2"]) ==
       "[`MyModule.example/2`](MyModule.html#example/2)"
-    assert Autolink.project_functions("`MyModule.Nested.example/2`", ["MyModule.Nested.example/2"]) ==
+    assert Autolink.elixir_functions("`MyModule.Nested.example/2`", ["MyModule.Nested.example/2"]) ==
       "[`MyModule.Nested.example/2`](MyModule.Nested.html#example/2)"
-    assert Autolink.project_functions("`Mod.example/2` then `Mod.example/2`",
+    assert Autolink.elixir_functions("`Mod.example/2` then `Mod.example/2`",
       ["Mod.example/2"]) == "[`Mod.example/2`](Mod.html#example/2) then [`Mod.example/2`](Mod.html#example/2)"
-    assert Autolink.project_functions("`  MyModule.spaces/0  `", ["MyModule.spaces/0"]) ==
+    assert Autolink.elixir_functions("`  MyModule.spaces/0  `", ["MyModule.spaces/0"]) ==
       "[`MyModule.spaces/0`](MyModule.html#spaces/0)"
-    assert Autolink.project_functions("`ModA.example/1` and `ModB.example/2`",
+    assert Autolink.elixir_functions("`ModA.example/1` and `ModB.example/2`",
       ["ModA.example/1", "ModB.example/2"]) ==
       "[`ModA.example/1`](ModA.html#example/1) and [`ModB.example/2`](ModB.html#example/2)"
-    assert Autolink.project_functions("`Mod.funny_name\?/1` and `Mod.funny_name!/2`",
+    assert Autolink.elixir_functions("`Mod.funny_name\?/1` and `Mod.funny_name!/2`",
       ["Mod.funny_name\?/1", "Mod.funny_name!/2"]) ==
       "[`Mod.funny_name\?/1`](Mod.html#funny_name\?/1) and [`Mod.funny_name!/2`](Mod.html#funny_name!/2)"
   end
 
-  test "autolink creates links for modules special forms" do
-    assert Autolink.project_functions("`Mod.++/2`", ["Mod.++/2"]) === "[`Mod.++/2`](Mod.html#++/2)"
-    assert Autolink.project_functions("`Mod.!/1`", ["Mod.!/1"]) === "[`Mod.!/1`](Mod.html#!/1)"
-    assert Autolink.project_functions("`Mod.../2`", ["Mod.../2"]) === "[`Mod.../2`](Mod.html#../2)"
-    assert Autolink.project_functions("`Mod.--/2`", ["Mod.--/2"]) === "[`Mod.--/2`](Mod.html#--/2)"
-    assert Autolink.project_functions("`Mod.<<>>/1`", ["Mod.<<>>/1"]) === "[`Mod.<<>>/1`](Mod.html#%3C%3C%3E%3E/1)"
+  test "autolink functions Module.fun/arity in elixir" do
+    assert Autolink.elixir_functions("`String.upcase/1`", ["Mod.example/2"]) ==
+           "[`String.upcase/1`](#{@elixir_docs}elixir/String.html#upcase/1)"
+    assert Autolink.elixir_functions("`Mix.env/0`", ["Mod.example/2"]) ==
+           "[`Mix.env/0`](#{@elixir_docs}mix/Mix.html#env/0)"
   end
 
-  test "autolink creates links for callbacks" do
-    assert Autolink.project_functions("`c:Mod.++/2`", ["c:Mod.++/2"]) ===
+  test "autolink functions creates links for modules special forms" do
+    assert Autolink.elixir_functions("`Mod.++/2`", ["Mod.++/2"]) === "[`Mod.++/2`](Mod.html#++/2)"
+    assert Autolink.elixir_functions("`Mod.!/1`", ["Mod.!/1"]) === "[`Mod.!/1`](Mod.html#!/1)"
+    assert Autolink.elixir_functions("`Mod.../2`", ["Mod.../2"]) === "[`Mod.../2`](Mod.html#../2)"
+    assert Autolink.elixir_functions("`Mod.--/2`", ["Mod.--/2"]) === "[`Mod.--/2`](Mod.html#--/2)"
+    assert Autolink.elixir_functions("`Mod.<<>>/1`", ["Mod.<<>>/1"]) === "[`Mod.<<>>/1`](Mod.html#%3C%3C%3E%3E/1)"
+  end
+
+  test "autolink functions creates links for callbacks" do
+    assert Autolink.elixir_functions("`c:Mod.++/2`", ["c:Mod.++/2"]) ===
            "[`Mod.++/2`](Mod.html#c:++/2)"
   end
 
-  test "autolink doesn't create links for undefined Mod.functions in docs" do
-    assert Autolink.project_functions("`Mod.example/1`", ["Mod.example/2"]) == "`Mod.example/1`"
-    assert Autolink.project_functions("`Mod.example/1`", []) == "`Mod.example/1`"
+  test "autolink functions doesn't create links for undefined Mod.functions in docs" do
+    assert Autolink.elixir_functions("`Mod.example/1`", ["Mod.example/2"]) == "`Mod.example/1`"
+    assert Autolink.elixir_functions("`Mod.example/1`", []) == "`Mod.example/1`"
   end
 
-  test "autolink doesn't create links for pre-linked Mod.functions docs" do
-    assert Autolink.project_functions("[`Mod.example/1`]()", ["Mod.example/1"]) == "[`Mod.example/1`]()"
-    assert Autolink.project_functions("[the `Mod.example/1`]()", ["Mod.example/1"]) == "[the `Mod.example/1`]()"
+  test "autolink functions doesn't create links for pre-linked Mod.functions docs" do
+    assert Autolink.elixir_functions("[`Mod.example/1`]()", ["Mod.example/1"]) == "[`Mod.example/1`]()"
+    assert Autolink.elixir_functions("[the `Mod.example/1`]()", ["Mod.example/1"]) == "[the `Mod.example/1`]()"
   end
+
+  test "autolink functions to types in the project" do
+    # use the same approach for elixir_functions as for local_docs
+    assert Autolink.elixir_functions("`t:MyModule.my_type/0`",
+      ["t:MyModule.my_type/0"]) ==  "[`MyModule.my_type/0`](MyModule.html#t:my_type/0)"
+    assert Autolink.elixir_functions("`t:MyModule.my_type`",
+      ["t:MyModule.my_type/0"]) ==  "`t:MyModule.my_type`"
+  end
+
+  # elixir_modules
 
   test "autolink modules in docs" do
-    assert Autolink.project_modules("`MyModule`", ["MyModule"], "MyModule") == "[`MyModule`](MyModule.html#content)"
-    assert Autolink.project_modules("`MyModule.Nested`", ["MyModule.Nested"], "MyModule.Nested") == "[`MyModule.Nested`](MyModule.Nested.html#content)"
-    assert Autolink.project_modules("`MyModule.Nested.Deep`", ["MyModule.Nested.Deep"], "MyModule.Nested.Deep") ==
+    assert Autolink.elixir_modules("`MyModule`", ["MyModule"], "MyModule") == "[`MyModule`](MyModule.html#content)"
+    assert Autolink.elixir_modules("`MyModule.Nested`", ["MyModule.Nested"], "MyModule.Nested") == "[`MyModule.Nested`](MyModule.Nested.html#content)"
+    assert Autolink.elixir_modules("`MyModule.Nested.Deep`", ["MyModule.Nested.Deep"], "MyModule.Nested.Deep") ==
       "[`MyModule.Nested.Deep`](MyModule.Nested.Deep.html#content)"
   end
 
+  test "autolink modules in elixir" do
+    assert Autolink.elixir_modules("`String`", ["MyModule"], "MyModule") ==
+           "[`String`](#{@elixir_docs}elixir/String.html)"
+    assert Autolink.elixir_modules("`Mix`", ["MyModule"], "MyModule") ==
+           "[`Mix`](#{@elixir_docs}mix/Mix.html)"
+  end
+
   test "autolink modules doesn't link functions" do
-    assert Autolink.project_modules("`Mod.example/1`", ["Mod"], "Mod") == "`Mod.example/1`"
+    assert Autolink.elixir_modules("`Mod.example/1`", ["Mod"], "Mod") == "`Mod.example/1`"
   end
 
-  test "autolink doesn't create links for pre-linked Mod docs" do
-    assert Autolink.project_functions("[`Mod`](other.html)", ["Mod"]) == "[`Mod`](other.html)"
-    assert Autolink.project_functions("[the `Mod`](other.html)", ["Mod"]) == "[the `Mod`](other.html)"
-    assert Autolink.project_functions("[the `Mod.Nested`](other.html)", ["Mod.Nested"]) == "[the `Mod.Nested`](other.html)"
+  test "autolink modules doesn't create links for undefined modules"do
+    assert Autolink.elixir_modules("`MyModule`", []) == "`MyModule`"
+    assert Autolink.elixir_modules("`MyModule`", ["DiffModule"]) == "`MyModule`"
+    assert Autolink.elixir_modules("`MyModule.Nested`", ["MyModule.DiffNested"]) == "`MyModule.Nested`"
   end
 
-  test "autolink doesn't create links for undefined modules"do
-    assert Autolink.project_modules("`MyModule`", []) == "`MyModule`"
-    assert Autolink.project_modules("`MyModule`", ["DiffModule"]) == "`MyModule`"
-    assert Autolink.project_modules("`MyModule.Nested`", ["MyModule.DiffNested"]) == "`MyModule.Nested`"
-  end
-
-  test "autolink to types in the project" do
-    # use the same approach for project_functions as for local_docs
-    assert Autolink.project_functions("`t:MyModule.my_type/0`",
-      ["t:MyModule.my_type/0"]) ==  "[`MyModule.my_type/0`](MyModule.html#t:my_type/0)"
-      assert Autolink.project_functions("`t:MyModule.my_type`",
-        ["t:MyModule.my_type/0"]) ==  "`t:MyModule.my_type`"
+  test "autolink modules doesn't create links for pre-linked Mod docs" do
+    assert Autolink.elixir_modules("[`Mod`](other.html)", ["Mod"]) == "[`Mod`](other.html)"
+    assert Autolink.elixir_modules("[the `Mod`](other.html)", ["Mod"]) == "[the `Mod`](other.html)"
+    assert Autolink.elixir_modules("[the `Mod.Nested`](other.html)", ["Mod.Nested"]) == "[the `Mod.Nested`](other.html)"
   end
 
   # erlang functions
-
-  @erlang_docs "http://www.erlang.org/doc/man/"
 
   test "autolink to erlang functions" do
     assert Autolink.erlang_functions("`:erlang.apply/2`") == "[`:erlang.apply/2`](#{@erlang_docs}erlang.html#apply-2)"
@@ -147,10 +164,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   end
 
   test "autolink erlang doesn't create links for functions that aren't part of the erlang distribution" do
-    assert Autolink.erlang_functions("`:erl_prim_loader.adder32_combine/0`") ==
-      "`:erl_prim_loader.adder32_combine/0`"
-    assert Autolink.erlang_functions("`:erl_prim_loader_non.adder32_combine/0`") ==
-      "`:erl_prim_loader_non.adder32_combine/0`"
+    assert Autolink.erlang_functions("`:unknown.foo/0`") == "`:unknown.foo/0`"
   end
 
   # typespec

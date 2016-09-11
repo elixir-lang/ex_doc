@@ -160,36 +160,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     cond do
       is_nil(alias) -> nil
       alias in aliases -> ""
-      dir = from_elixir(alias) -> @elixir_docs <> dir <> "/"
+      app = lib_dir_app(alias, elixir_lib_dir()) -> @elixir_docs <> app <> "/"
       true -> nil
-    end
-  end
-
-  defp from_elixir(alias) do
-    alias_ebin = alias_ebin(alias)
-    if String.starts_with?(alias_ebin, elixir_ebin()) do
-      alias_ebin
-      |> Path.dirname()
-      |> Path.dirname()
-      |> Path.basename()
-    end
-  end
-
-  defp alias_ebin(alias) do
-    case :code.where_is_file('#{alias}.beam') do
-      :non_existing -> ""
-      path -> List.to_string(path)
-    end
-  end
-
-  defp elixir_ebin do
-    case :code.where_is_file('Elixir.Kernel.beam') do
-      :non_existing -> [0]
-      path ->
-        path
-        |> Path.dirname()
-        |> Path.dirname()
-        |> Path.dirname()
     end
   end
 
@@ -204,34 +176,33 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def local_doc(bin, locals) when is_binary(bin) do
     fun_re = ~r{(([ct]:)?([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)} |> Regex.source
-    ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
-    |> Regex.scan(bin)
-    |> Enum.uniq()
-    |> List.flatten()
-    |> Enum.filter(&(&1 in locals))
-    |> Enum.reduce(bin, fn (x, acc) ->
-         {prefix, _, function_name, arity} = split_function(x)
-         escaped = Regex.escape(x)
-         Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
-           "[`#{function_name}/#{arity}`](##{prefix}#{enc_h function_name}/#{arity})")
-       end)
+    regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
+    Regex.replace(regex, bin, fn all, match ->
+      if match in locals do
+        {prefix, _, function, arity} = split_function(match)
+        "[`#{function}/#{arity}`](##{prefix}#{enc_h function}/#{arity})"
+      else
+        all
+      end
+    end)
   end
 
   @doc """
   Creates links to modules and functions defined in the project.
   """
   def project_doc(bin, modules, module_id \\ nil) when is_binary(bin) do
-    project_funs = for m <- modules, d <- m.docs, do: doc_prefix(d) <> m.id <> "." <> d.id
+    project_funs  = for m <- modules, d <- m.docs, do: doc_prefix(d) <> m.id <> "." <> d.id
     project_types = for m <- modules, d <- m.typespecs, do: "t:" <> m.id <> "." <> d.id
-    project_funs = project_funs ++ project_types
+    project_funs  = project_funs ++ project_types
 
     project_modules =
       modules
       |> Enum.map(&module_to_string/1)
       |> Enum.uniq()
+
     bin
-    |> project_functions(project_funs)
-    |> project_modules(project_modules, module_id)
+    |> elixir_functions(project_funs)
+    |> elixir_modules(project_modules, module_id)
     |> erlang_functions()
   end
 
@@ -239,68 +210,71 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp doc_prefix(%{type: _}), do: ""
 
   @doc """
-  Create links to functions defined in the project, specified in `project_funs`
-  as a list of `Module.fun/arity` tuples.
+  Create links to elixir functions defined in the project and Elixir itself.
+
+  Project functions are specified in `project_funs` as a list of
+  `Module.fun/arity` tuples.
 
   Ignores functions which are already wrapped in markdown url syntax,
   e.g. `[Module.test/1](url)`. If the function doesn't touch the leading
   or trailing `]`, e.g. `[my link Module.link/1 is here](url)`, the Module.fun/arity
   will get translated to the new href of the function.
   """
-  def project_functions(bin, project_funs) when is_binary(bin) do
+  def elixir_functions(bin, project_funs) when is_binary(bin) do
     module_re = ~r{(([A-Z][A-Za-z_\d]+)\.)+} |> Regex.source
     fun_re = ~r{([ct]:)?(#{module_re}([a-z\d_!\\?>\\|=&<!~+\\.\\+*^@-]+)/\d+)} |> Regex.source
-    ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
-    |> Regex.scan(bin)
-    |> Enum.uniq()
-    |> List.flatten()
-    |> Enum.filter(&(&1 in project_funs))
-    |> Enum.reduce(bin, fn (x, acc) ->
-         {prefix, mod_str, function_name, arity} = split_function(x)
-         escaped = Regex.escape(x)
-         Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
-           "[`#{mod_str}.#{function_name}/#{arity}`](#{mod_str}.html##{prefix}#{enc_h function_name}/#{arity})")
-       end)
+    regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
+    lib_dir = elixir_lib_dir()
+
+    Regex.replace(regex, bin, fn all, match ->
+      {prefix, module, function, arity} = split_function(match)
+
+      cond do
+        match in project_funs ->
+          "[`#{module}.#{function}/#{arity}`](#{module}.html##{prefix}#{enc_h function}/#{arity})"
+        app = lib_dir_app("Elixir." <> module, lib_dir) ->
+          "[`#{module}.#{function}/#{arity}`](#{@elixir_docs}#{app}/#{module}.html##{prefix}#{enc_h function}/#{arity})"
+        true ->
+          all
+      end
+    end)
   end
 
   @doc """
-  Create links to modules defined in the project, specified in `modules`
-  as a list.
+  Create links to elixir modules defined in the project and
+  in Elixir itself.
 
   Ignores modules which are already wrapped in markdown url syntax,
   e.g. `[Module](url)`. If the module name doesn't touch the leading
   or trailing `]`, e.g. `[my link Module is here](url)`, the Module
   will get translated to the new href of the module.
   """
-  def project_modules(bin, modules, module_id \\ nil) when is_binary(bin) do
-    ~r{(?<!\[)`\s*(([A-Z][A-Za-z_\d]+\.?)+)\s*`(?!\])}
-    |> Regex.scan(bin)
-    |> Enum.uniq()
-    |> List.flatten()
-    |> Enum.filter(&(&1 in modules))
-    |> Enum.reduce(bin, fn (x, acc) ->
-         escaped = Regex.escape(x)
-         suffix =
-           if module_id && x == module_id do
-             ".html#content"
-           else
-             ".html"
-           end
-         Regex.replace(~r/(?<!\[)`(\s*#{escaped}\s*)`(?!\])/, acc,
-           "[`\\1`](\\1" <> suffix <> ")")
-       end)
+  def elixir_modules(bin, modules, module_id \\ nil) when is_binary(bin) do
+    regex = ~r{(?<!\[)`\s*(([A-Z][A-Za-z_\d]+\.?)+)\s*`(?!\])}
+    lib_dir = elixir_lib_dir()
+
+    Regex.replace(regex, bin, fn all, match ->
+      cond do
+        match == module_id ->
+          "[`#{match}`](#{match}.html#content)"
+        match in modules ->
+          "[`#{match}`](#{match}.html)"
+        app = lib_dir_app("Elixir." <> match, lib_dir) ->
+          "[`#{match}`](#{@elixir_docs}#{app}/#{match}.html)"
+        true ->
+          all
+      end
+    end)
   end
 
   defp split_function("c:" <> bin) do
-    {"", mod, fun, arity} = split_function(bin)
+    {_, mod, fun, arity} = split_function(bin)
     {"c:", mod, fun, arity}
   end
   defp split_function("t:" <> bin) do
-    {"", mod, fun, arity} = split_function(bin)
+    {_, mod, fun, arity} = split_function(bin)
     {"t:", mod, fun, arity}
   end
-
-
   defp split_function(bin) do
     [modules, arity] = String.split(bin, "/")
     {mod, name} =
@@ -328,40 +302,45 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     lib_dir = erlang_lib_dir()
 
     Regex.replace(regex, bin, fn all, match ->
-      {_, module_str, function_str, arity_str} = split_function(match)
-      if valid_erlang_beam?(module_str, lib_dir) and
-         module_exports_function?(module_str, function_str, arity_str) do
-        "[`:#{match}`](#{@erlang_docs}#{module_str}.html##{function_str}-#{arity_str})"
+      {_, module, function, arity} = split_function(match)
+      if lib_dir_app(module, lib_dir) do
+        "[`:#{match}`](#{@erlang_docs}#{module}.html##{function}-#{arity})"
       else
         all
       end
     end)
   end
 
-  defp valid_erlang_beam?(module_str, lib_dir) do
-    '#{module_str}.beam'
-    |> :code.where_is_file
-    |> on_lib_path?(lib_dir)
-  end
-
-  defp module_exports_function?(mod_str, function_str, arity_str) do
-    module = String.to_atom(mod_str)
-    function = String.to_atom(function_str)
-    {arity, _} = Integer.parse(arity_str)
-    Code.ensure_loaded?(module) and function_exported?(module, function, arity)
-  end
-
   ## Helpers
 
-  defp on_lib_path?(:non_existing, _base_path), do: false
-  defp on_lib_path?(beam_path, base_path) do
-    beam_path
-    |> Path.expand()
-    |> String.starts_with?(base_path)
+  defp lib_dir_app(module, lib_dir) do
+    case :code.where_is_file('#{module}.beam') do
+      :non_existing ->
+        nil
+      path ->
+        path = List.to_string(path)
+        if String.starts_with?(path, lib_dir) do
+          path
+          |> Path.dirname()
+          |> Path.dirname()
+          |> Path.basename()
+        end
+    end
+  end
+
+  defp elixir_lib_dir do
+    case :code.where_is_file('Elixir.Kernel.beam') do
+      :non_existing ->
+        [0]
+      path ->
+        path
+        |> Path.dirname()
+        |> Path.dirname()
+        |> Path.dirname()
+    end
   end
 
   defp erlang_lib_dir do
-    :code.lib_dir
-    |> Path.expand()
+    Path.expand(:code.lib_dir)
   end
 end
