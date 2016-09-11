@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.13.1
+
+  * Enhancements
+    * Autolink Elixir's stdlib modules and functions
+    * Show callbacks in search results
+    * Reduce size taken by font-sizes
+    * Increase size for headings in the moduledoc
+
+  * Bug fixes
+    * Fix opened sidebar on small screens
+    * Allow horizontal scrolling for code snippets on small screens
+
 ## v0.13.0
 
   * Bug fixes
