@@ -172,7 +172,8 @@ defmodule ExDoc.Formatter.HTML do
         |> File.read!()
         |> Autolink.project_doc(module_nodes)
 
-      title = options[:title] || extract_title(content) || input_to_title(options[:input])
+      html_content = ExDoc.Markdown.to_html(content)
+      title = options[:title] || extract_title(html_content) || input_to_title(options[:input])
 
       output_file_name = "#{options.output_file_name}.html"
       config = set_canonical_url(config, output_file_name)
@@ -187,7 +188,7 @@ defmodule ExDoc.Formatter.HTML do
 
       File.write!(output, html)
 
-      {options.output_file_name, title, extract_headers(content)}
+      {options.output_file_name, title, extract_headers(html_content)}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
@@ -206,17 +207,23 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  @h1_regex ~r/^#([^#].*)\n$/m
+  @tag_regex ~r/<[^>]*>/m
+
+  defp strip_html(header) do
+    Regex.replace(@tag_regex, header, "")
+  end
+
+  @h1_regex ~r/(?<=\<h1\>)(\s*.*\s*)(?=\<\/h1\>)/m
 
   defp extract_title(content) do
     title = Regex.run(@h1_regex, content, capture: :all_but_first)
 
     if title do
-      title |> List.first |> String.strip
+      title |> List.first |> strip_html |> String.strip
     end
   end
 
-  @h2_regex ~r/^##([^#].*)\n$/m
+  @h2_regex ~r/(?<=\<h2\>)(\s*.*\s*)(?=\<\/h2\>)/m
 
   defp extract_headers(content) do
     @h2_regex

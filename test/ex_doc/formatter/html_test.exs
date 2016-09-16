@@ -140,7 +140,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~s("exceptions":[])
     assert content =~ ~s("protocols":[])
     assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","headers":[]},)
-    assert content =~ ~s({"id":"readme","title":"README","headers":[{"id":" Header sample","anchor":"header-sample"},)
+    assert content =~ ~s({"id":"readme","title":"README","headers":[{"id":"Header sample","anchor":"header-sample"},)
   end
 
   test "run generates the api reference file" do
