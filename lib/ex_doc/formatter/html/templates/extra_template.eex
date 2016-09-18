@@ -1,5 +1,5 @@
 <%= head_template(config, %{title: title, type: :extra}) %>
 <%= sidebar_template(config, modules, exceptions, protocols) %>
 
-<%= content |> to_html() |> link_headings() %>
+<%= content |> link_headings() %>
 <%= footer_template(config) %>

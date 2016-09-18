@@ -178,7 +178,7 @@ defmodule ExDoc.Formatter.HTML do
       output_file_name = "#{options.output_file_name}.html"
       config = set_canonical_url(config, output_file_name)
       html = Templates.extra_template(config, title, modules,
-                                      exceptions, protocols, content)
+                                      exceptions, protocols, html_content)
 
       output = "#{options.output}/#{output_file_name}"
 
