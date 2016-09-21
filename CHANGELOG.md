@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.13.2
+
+  * Bug fixes
+    * Avoid scrollbar from appearing on all code snippets
+
 ## v0.13.1
 
   * Enhancements
