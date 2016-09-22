@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Docs do
     * `--canonical`, `-a` - indicate the preferred URL with
       rel="canonical" link element, default: nil
 
-  The command line options have lower precedence than the options
+  The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
 
   ## Configuration
@@ -91,7 +91,7 @@ defmodule Mix.Tasks.Docs do
 
     project = (config[:name] || config[:app]) |> to_string()
     version = config[:version] || "dev"
-    options = Keyword.merge(cli_opts, get_docs_opts(config))
+    options = Keyword.merge(get_docs_opts(config), cli_opts)
 
     options =
       if config[:source_url] do
