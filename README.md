@@ -11,7 +11,7 @@ To use ExDoc in your Mix projects, first add ExDoc as a dependency:
 
 ```elixir
 def deps do
-  [{:ex_doc, "~> 0.12", only: :dev}]
+  [{:ex_doc, "~> 0.13", only: :dev}]
 end
 ```
 
@@ -23,12 +23,14 @@ ExDoc will automatically pull in information from your projects, like the applic
 def project do
   [app: :my_app,
    version: "0.1.0-dev",
-   name: "My App",
-   source_url: "https://github.com/USER/REPO",
-   homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
    deps: deps(),
-   formatter: "html",
+
+   # Docs
+   name: "My App",
+   source_url: "https://github.com/USER/PROJECT",
+   homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
    docs: [logo: "path/to/logo.png",
+          canonical: "https://hexdocs.com/PROJECT"
           extras: ["README.md", "CONTRIBUTING.md"]]]
 end
 ```

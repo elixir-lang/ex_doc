@@ -13,6 +13,8 @@ defmodule Mix.Tasks.Docs do
       docs, default: `"doc"`
     * `--canonical`, `-a` - indicate the preferred URL with
       rel="canonical" link element, default: nil
+    * `--formatter`, `-f` - which formatter to use, "html" or
+      "epub", default: "html"
 
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
@@ -27,12 +29,14 @@ defmodule Mix.Tasks.Docs do
       def project do
         [app: :my_app,
          version: "0.1.0-dev",
-         name: "My App",
-         source_url: "https://github.com/USER/APP",
-         homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
          deps: deps(),
-         formatter: "html",
+
+         # Docs
+         name: "My App",
+         source_url: "https://github.com/USER/PROJECT",
+         homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
          docs: [logo: "path/to/logo.png",
+                canonical: "https://hexdocs.com/PROJECT"
                 extras: ["README.md", "CONTRIBUTING.md"]]]
       end
 
