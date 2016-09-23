@@ -5,6 +5,16 @@ defmodule ExDoc.ModuleNode do
 
   defstruct id: nil, module: nil, moduledoc: nil,
     docs: [], typespecs: [], source: nil, type: nil
+
+  @type t :: %__MODULE__{
+    id: nil | String.t,
+    module: nil | String.t,
+    moduledoc: nil | String.t,
+    docs: list(),
+    typespecs: list(),
+    source: nil | String.t,
+    type: nil | String.t
+  }
 end
 
 defmodule ExDoc.FunctionNode do
@@ -15,6 +25,18 @@ defmodule ExDoc.FunctionNode do
   defstruct id: nil, name: nil, arity: 0, doc: [],
     source: nil, type: nil, signature: nil, specs: [],
     annotations: []
+
+  @type t :: %__MODULE__{
+    id: nil | String.t,
+    name: nil | String.t,
+    arity: non_neg_integer,
+    doc: list(),
+    source: nil | String.t,
+    type: nil | String.t,
+    signature: nil | String.t,
+    specs: list(),
+    annotations: list()
+  }
 end
 
 defmodule ExDoc.TypeNode do
@@ -24,6 +46,16 @@ defmodule ExDoc.TypeNode do
 
   defstruct id: nil, name: nil, arity: 0, type: nil,
     spec: nil, doc: nil, signature: nil
+
+  @type t :: %__MODULE__{
+    id: nil | String.t,
+    name: nil | String.t,
+    arity: non_neg_integer,
+    type: nil | String.t,
+    spec: nil | String.t,
+    doc: nil | String.t,
+    signature: nil | String.t
+  }
 end
 
 defmodule ExDoc.Retriever.Error do
@@ -44,7 +76,7 @@ defmodule ExDoc.Retriever do
   @doc """
   Extract documentation from all modules in the specified directory
   """
-  @spec docs_from_dir(Path.t, %ExDoc.Config{}) :: [%ExDoc.ModuleNode{}]
+  @spec docs_from_dir(Path.t, ExDoc.Config.t) :: [ExDoc.ModuleNode.t]
   def docs_from_dir(dir, config) when is_binary(dir) do
     files = Path.wildcard Path.expand("Elixir.*.beam", dir)
     docs_from_files(files, config)
@@ -53,7 +85,7 @@ defmodule ExDoc.Retriever do
   @doc """
   Extract documentation from all modules in the specified list of files
   """
-  @spec docs_from_files([Path.t], %ExDoc.Config{}) :: [%ExDoc.ModuleNode{}]
+  @spec docs_from_files([Path.t], ExDoc.Config.t) :: [ExDoc.ModuleNode.t]
   def docs_from_files(files, config) when is_list(files) do
     files
     |> Enum.map(&filename_to_module(&1))
@@ -63,7 +95,7 @@ defmodule ExDoc.Retriever do
   @doc """
   Extract documentation from all modules in the list `modules`
   """
-  @spec docs_from_modules([atom], %ExDoc.Config{}) :: [%ExDoc.ModuleNode{}]
+  @spec docs_from_modules([atom], ExDoc.Config.t) :: [ExDoc.ModuleNode.t]
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
     |> Enum.map(&get_module(&1, config))

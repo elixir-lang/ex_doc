@@ -28,6 +28,26 @@ defmodule ExDoc do
       title: nil,
       version: nil
     ]
+
+     @type t :: %__MODULE__{
+       canonical: nil | String.t,
+       extra_section: nil | String.t,
+       extras: list(),
+       formatter: String.t,
+       formatter_opts: list(),
+       homepage_url: nil | String.t,
+       logo: nil | Path.t,
+       main: nil | String.t,
+       output: Path.t,
+       project: nil | String.t,
+       retriever: :atom,
+       source_beam: nil | String.t,
+       source_root: nil | String.t,
+       source_url: nil | String.t,
+       source_url_pattern: nil | String.t,
+       title: nil | String.t,
+       version: nil | String.t
+     }
   end
 
   @ex_doc_version Mix.Project.config[:version]
@@ -50,7 +70,7 @@ defmodule ExDoc do
   end
 
   # Builds configuration by merging `options`, and normalizing the options.
-  @spec build_config(String.t, String.t, Keyword.t) :: %ExDoc.Config{}
+  @spec build_config(String.t, String.t, Keyword.t) :: ExDoc.Config.t
   defp build_config(project, version, options) do
     options = normalize_options(options)
     preconfig = %Config{

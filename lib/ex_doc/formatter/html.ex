@@ -11,7 +11,7 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generate HTML documentation for the given modules
   """
-  @spec run(list, %ExDoc.Config{}) :: String.t
+  @spec run(list, ExDoc.Config.t) :: String.t
   def run(module_nodes, config) when is_map(config) do
     config = normalize_config(config)
     output = Path.expand(config.output)
