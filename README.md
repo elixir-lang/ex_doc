@@ -17,7 +17,7 @@ end
 
 After adding ExDoc as a dependency, run `mix deps.get` to install it.
 
-ExDoc will automatically pull in information from your project, like the application and version. However, you may want to set `:name`, `:source_url` and `:homepage_url` to have a nicer output from ExDoc, for example:
+ExDoc will automatically pull in information from your projects, like the application and version. However, you may want to set `:name`, `:source_url` and `:homepage_url` to have a nicer output from ExDoc, such as:
 
 ```elixir
 def project do
@@ -27,6 +27,7 @@ def project do
    source_url: "https://github.com/USER/REPO",
    homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
    deps: deps(),
+   formatter: "html",
    docs: [logo: "path/to/logo.png",
           extras: ["README.md", "CONTRIBUTING.md"]]]
 end
@@ -48,7 +49,7 @@ You can ExDoc via the command line as follows:
     $ mix do deps.get, compile
     ```
 
-2. Then you are ready to use it in your projects. First move into your project directory and ensure it is compiled:
+2. Then you are ready to use it in your projects. First, move into your project directory and make sure it is already compiled:
 
     ```console
     $ cd PATH_TO_YOUR_PROJECT
@@ -59,6 +60,12 @@ You can ExDoc via the command line as follows:
 
     ```console
     $ PATH_TO_YOUR_EXDOC/bin/ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
+    ```
+
+4. By default, ex_doc produces HTML files, but, you can also create a EPUB document passing the option `--formatter epub`:
+
+    ```console
+    $ PATH_TO_YOUR_EXDOC/bin/ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png -f epub
     ```
 
 For example, here are some acceptable values:
@@ -75,9 +82,9 @@ In the examples above, we have used [Earmark][] to convert Markdown to HTML. If 
 
 ### Pandoc
 
-Install [pandoc][] using whichever means is appropriate for your system.  Odds are good it is available via whatever package manager you have available to you.
+Install [pandoc][] using whichever means is right for your system.  Odds are good it is available via whatever package manager you have available to you.
 
-Update your project config to use pandoc:
+Update your project configuration to use pandoc:
 
 ```elixir
 config :ex_doc, :markdown_processor, ExDoc.Markdown.Pandoc
@@ -85,13 +92,13 @@ config :ex_doc, :markdown_processor, ExDoc.Markdown.Pandoc
 
 ### Hoedown
 
-Hoedown is a standards compliant Markdown parser written in C.  To use hoedown, add the elixir NIF wrapper [markdown][devinus/markdown] as a dependency to your project:
+Hoedown is a standard compliant Markdown parser written in C.  To use hoedown, add the elixir NIF wrapper [markdown][devinus/markdown] as a dependency to your project:
 
 ```elixir
 {:markdown, github: "devinus/markdown"}
 ```
 
-Update your project config to use hoedown:
+Update your project configuration to use hoedown:
 
 ```elixir
 config :ex_doc, :markdown_processor, ExDoc.Markdown.Hoedown
@@ -105,7 +112,7 @@ config :ex_doc, :markdown_processor, ExDoc.Markdown.Hoedown
 {:cmark, "~> 0.6", only: :dev}
 ```
 
-Update your project config to use Cmark:
+Update your project configuration to use Cmark:
 
 ```elixir
 config :ex_doc, :markdown_processor, ExDoc.Markdown.Cmark
@@ -113,7 +120,7 @@ config :ex_doc, :markdown_processor, ExDoc.Markdown.Cmark
 
 # License
 
-ExDoc source code is released under Apache 2 License. The generated contents, however, are under different licenses based on projects used to help render html, including css, js and other assets.
+ExDoc source code is released under Apache 2 License. The generated contents, however, are under different licenses based on projects used to help render HTML, including CSS, JS, and other assets.
 
 Check the [LICENSE](LICENSE) file for more information.
 

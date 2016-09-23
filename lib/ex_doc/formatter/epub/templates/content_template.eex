@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf"
+         unique-identifier="project-<%= config.project %>"
+         version="3.0">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:title><%= config.project %> - <%= config.version %></dc:title>
+    <dc:identifier id="project-<%= config.project %>"><%= uuid %></dc:identifier>
+    <dc:language>en-US</dc:language>
+    <meta property="dcterms:modified"><%= datetime %></meta>
+  </metadata>
+  <manifest>
+    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav scripted"/>
+    <item id="cover" href="title.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+    <%= for extra <- config.extras do %>
+      <item id="<%= extra_title(extra) %>" href="<%= extra_title(extra) %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+    <% end %>
+    <%= for node <- nodes do %>
+      <item id="<%= node.id %>" href="<%= node.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+    <% end %>
+    <item id="css" href="<%= H.asset_rev "#{config.output}/OEBPS", "dist/epub*.css" %>" media-type="text/css"/>
+    <item id="js" href="<%= H.asset_rev "#{config.output}/OEBPS", "dist/app*.js" %>" media-type="text/javascript"/>
+    <%= if config.logo do %>
+      <%= if Path.extname(config.logo) == ".png" do %>
+        <item id="cover-image" href="assets/logo.png" media-type="image/png"/>
+      <% end %>
+      <%= if Path.extname(config.logo) == ".jpg" do %>
+        <item id="cover-image" href="assets/logo.jpg" media-type="image/jpeg"/>
+      <% end %>
+    <% end %>
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="cover" linear="no"/>
+    <itemref idref="nav"/>
+    <%= for extra <- config.extras do %>
+      <itemref idref="<%= extra_title(extra) %>"/>
+    <% end %>
+    <%= for node <- nodes do %>
+      <itemref idref="<%= node.id %>"/>
+    <% end %>
+  </spine>
+</package>

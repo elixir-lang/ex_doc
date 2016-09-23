@@ -1,0 +1,80 @@
+<%= head_template(config, %{title: module.id}) %>
+    <h1 id="content">
+      <%= module.id %>
+      <%= if module.type != :module do %>
+        <small><%= module.type %></small>
+      <% end%>
+    </h1>
+
+    <%= if module.moduledoc do %>
+      <section id="moduledoc" class="docstring">
+        <%= H.to_html(module.moduledoc) %>
+      </section>
+    <% end %>
+
+    <%= unless Enum.empty?(types) and Enum.empty?(functions) and Enum.empty?(macros) and Enum.empty?(callbacks) do %>
+      <section id="summary" class="details-list">
+        <h1 class="section-heading">
+          <a class="hover-link" href="#summary">
+            <i class="icon-link"></i>
+          </a>
+          Summary
+        </h1>
+        <%= H.summary_template "types", types %>
+        <%= H.summary_template "functions", functions %>
+        <%= H.summary_template "macros", macros %>
+        <%= H.summary_template "callbacks", callbacks %>
+      </section>
+    <% end %>
+
+    <%= unless Enum.empty?(types) do %>
+      <section id="types" class="types details-list">
+        <h1 class="section-heading">
+          <a class="hover-link" href="#types">
+            <i class="icon-link"></i>
+          </a>
+          Types
+        </h1>
+        <div class="types-list">
+          <%= for node <- types, do: H.type_detail_template(node, module) %>
+        </div>
+      </section>
+    <% end %>
+
+    <%= unless Enum.empty?(functions) do %>
+      <section id="functions" class="details-list">
+        <h1 class="section-heading">
+          <a class="hover-link" href="#functions">
+            <i class="icon-link"></i>
+          </a>
+          Functions
+        </h1>
+        <%= for node <- functions, do: H.detail_template(node, module) %>
+      </section>
+    <% end %>
+
+    <%= unless Enum.empty?(macros) do %>
+      <section id="macros" class="details-list">
+        <h1 class="section-heading">
+          <a class="hover-link" href="#macros">
+            <i class="icon-link"></i>
+          </a>
+          Macros
+        </h1>
+        <%= for node <- macros, do: H.detail_template(node, module) %>
+      </section>
+    <% end %>
+
+    <%= unless Enum.empty?(callbacks) do %>
+      <section id="callbacks" class="details-list">
+        <h1 class="section-heading">
+          <a class="hover-link" href="#callbacks">
+            <i class="icon-link"></i>
+          </a>
+          Callbacks
+        </h1>
+        <%= for node <- callbacks, do: H.detail_template(node, module) %>
+      </section>
+    <% end %>
+  </body>
+</html>
