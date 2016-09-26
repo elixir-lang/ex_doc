@@ -154,6 +154,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~s({"id":"extrapagewithsettextheader","title":"Extra Page Title","headers":[{"id":"Section One","anchor":"section-one"},{"id":"Section Two","anchor":"section-two"}]}])
   end
 
+  @tag pandoc: true
   test "run using pandoc generates extras containing settext headers while discarding links and attributes on header" do
     old_markdown_processor = Application.fetch_env!(:ex_doc, :markdown_processor)
     try do

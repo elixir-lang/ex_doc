@@ -213,7 +213,7 @@ defmodule ExDoc.Formatter.HTML do
     Regex.replace(@tag_regex, header, "")
   end
 
-  @h1_regex ~r/(?:\<h1.*?\>)(\s*.*\s*)(?=\<\/h1\>)/m
+  @h1_regex ~r/<h1.*?>(.+)<\/h1>/m
 
   defp extract_title(content) do
     title = Regex.run(@h1_regex, content, capture: :all_but_first)
@@ -223,7 +223,7 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  @h2_regex ~r/(?:\<h2.*?\>)(\s*.*\s*)(?=\<\/h2\>)/m
+  @h2_regex  ~r/<h2.*?>(.+)<\/h2>/m
 
   defp extract_headers(content) do
     @h2_regex
