@@ -83,11 +83,11 @@ gulp.task('clean', function (done) {
 })
 
 gulp.task('javascript:html', ['buildHighlight'], function () {
-  return javascript({src: 'assets/js/app.js', dest: distPath.html}, function () {})
+  return javascript({src: 'assets/js/app.js', dest: distPath.html})
 })
 
 gulp.task('javascript:epub', ['buildHighlight'], function () {
-  return javascript({src: 'assets/js/epub.js', dest: distPath.epub}, function () {})
+  return javascript({src: 'assets/js/epub.js', dest: distPath.epub})
 })
 
 gulp.task('javascript', function(done) {
@@ -98,11 +98,11 @@ gulp.task('javascript', function(done) {
 })
 
 gulp.task('less:html', function () {
-  return less({src: 'assets/less/app.less', dest: distPath.html}, function() {})
+  return less({src: 'assets/less/app.less', dest: distPath.html})
 })
 
 gulp.task('less:epub', function () {
-  return less({src: 'assets/less/epub.less', dest: distPath.epub}, function() {})
+  return less({src: 'assets/less/epub.less', dest: distPath.epub})
 })
 
 gulp.task('less', function(done) {
@@ -198,19 +198,17 @@ gulp.task('default', ['lint', 'test'])
 /**
  * Helpers
  */
-var javascript = function (options, cb) {
-  gulp.src(options.src)
+var javascript = function (options) {
+  return gulp.src(options.src)
     .pipe(webpack(isProduction ? config.production : config.development))
     .pipe($.if(isProduction, $.uglify()))
     .pipe($.if(isProduction, $.rev()))
     .pipe($.size({title: 'js'}))
     .pipe(gulp.dest(options.dest))
-
-  cb()
 }
 
-var less = function(options, cb) {
-  gulp.src(options.src)
+var less = function(options) {
+  return gulp.src(options.src)
     .pipe($.less({
       plugins: [
         npmPlugin,
@@ -225,6 +223,4 @@ var less = function(options, cb) {
     .pipe($.if(isProduction, $.rev()))
     .pipe($.size({title: 'less'}))
     .pipe(gulp.dest(options.dest))
-
-  cb()
 }
