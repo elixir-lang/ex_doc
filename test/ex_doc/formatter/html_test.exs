@@ -208,7 +208,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run should generate the readme input file as getting-started" do
-    generate_docs(doc_config(extras: ["test/fixtures/README.md": [path: "GETTING-STARTED"]]))
+    generate_docs(doc_config(extras: ["test/fixtures/README.md": [filename: "GETTING-STARTED"]]))
     refute File.regular?("#{output_dir()}/readme.html")
     content = File.read!("#{output_dir()}/GETTING-STARTED.html")
     assert content =~ ~r{<title>README [^<]*</title>}

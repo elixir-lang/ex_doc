@@ -141,25 +141,26 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_extra({input_file, options}, output, module_nodes, modules, exceptions, protocols, config) do
     input_file = to_string(input_file)
-    output_file_name = options[:path] || input_file |> input_to_title() |> title_to_filename()
+    filename = options[:filename] || input_file |> input_to_title() |> title_to_filename()
 
     options = %{
       title: options[:title],
-      output_file_name: output_file_name,
       input: input_file,
-      output: output
+      output: "#{output}/#{filename}.html",
+      filename: filename
     }
 
     create_extra_files(module_nodes, modules, exceptions, protocols, config, options)
   end
 
   defp generate_extra(input, output, module_nodes, modules, exceptions, protocols, config) do
-    output_file_name = input |> input_to_title |> title_to_filename
+    filename = input |> input_to_title |> title_to_filename
 
     options = %{
-      output_file_name: output_file_name,
+      title: nil,
       input: input,
-      output: output
+      output: "#{output}/#{filename}.html",
+      filename: filename
     }
 
     create_extra_files(module_nodes, modules, exceptions, protocols, config, options)
@@ -173,22 +174,18 @@ defmodule ExDoc.Formatter.HTML do
         |> Autolink.project_doc(module_nodes)
 
       html_content = ExDoc.Markdown.to_html(content)
-      title = options[:title] || extract_title(html_content) || input_to_title(options[:input])
+      title = options.title || extract_title(html_content) || input_to_title(options[:input])
 
-      output_file_name = "#{options.output_file_name}.html"
-      config = set_canonical_url(config, output_file_name)
+      config = set_canonical_url(config, options.filename)
       html = Templates.extra_template(config, title, modules,
                                       exceptions, protocols, html_content)
 
-      output = "#{options.output}/#{output_file_name}"
-
-      if File.regular? output do
-        IO.puts "warning: file #{Path.basename output} already exists"
+      if File.regular? options.output do
+        IO.puts "warning: file #{Path.basename options.output} already exists"
       end
 
-      File.write!(output, html)
-
-      {options.output_file_name, title, extract_headers(html_content)}
+      File.write!(options.output, html)
+      {options.filename, title, extract_headers(html_content)}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
