@@ -140,7 +140,39 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~s("exceptions":[])
     assert content =~ ~s("protocols":[])
     assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","headers":[]},)
-    assert content =~ ~s({"id":"readme","title":"README","headers":[{"id":" Header sample","anchor":"header-sample"},)
+    assert content =~ ~s({"id":"readme","title":"README","headers":[{"id":"Header sample","anchor":"header-sample"},)
+  end
+
+  test "run generates empty listing files and generates extras containing settext headers while discarding links on header" do
+    generate_docs(doc_config(source_root: "unknown", source_beam: "unknown", extras: ["test/fixtures/ExtraPageWithSettextHeader.md"]))
+
+    content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+    assert content =~ ~s("modules":[])
+    assert content =~ ~s("exceptions":[])
+    assert content =~ ~s("protocols":[])
+    assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","headers":[]},)
+    assert content =~ ~s({"id":"extrapagewithsettextheader","title":"Extra Page Title","headers":[{"id":"Section One","anchor":"section-one"},{"id":"Section Two","anchor":"section-two"}]}])
+  end
+
+  @tag pandoc: true
+  test "run using pandoc generates extras containing settext headers while discarding links and attributes on header" do
+    old_markdown_processor = Application.fetch_env!(:ex_doc, :markdown_processor)
+    try do
+      Application.put_env(:ex_doc, :markdown_processor, ExDoc.Markdown.Pandoc)
+      generate_docs(doc_config(source_root: "unknown", source_beam: "unknown", extras: ["test/fixtures/ExtraPageWithSettextHeader.md"]))
+
+      markdown_processor = Application.fetch_env!(:ex_doc, :markdown_processor)
+      assert markdown_processor == ExDoc.Markdown.Pandoc
+
+      content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+      assert content =~ ~s("modules":[])
+      assert content =~ ~s("exceptions":[])
+      assert content =~ ~s("protocols":[])
+      assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","headers":[]},)
+      assert content =~ ~s({"id":"extrapagewithsettextheader","title":"Extra Page Title","headers":[{"id":"Section One","anchor":"section-one"},{"id":"Section Two","anchor":"section-two"}]}])
+    after
+      Application.put_env(:ex_doc, :markdown_processor, old_markdown_processor)
+    end
   end
 
   test "run generates the api reference file" do
