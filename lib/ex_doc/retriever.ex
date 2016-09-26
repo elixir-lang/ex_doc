@@ -403,6 +403,7 @@ defmodule ExDoc.Retriever do
   defp callbacks_defined_by(module) do
     module
     |> Kernel.Typespec.beam_callbacks()
+    |> Kernel.||([]) # In case the module source is not available
     |> Keyword.keys
   end
 
