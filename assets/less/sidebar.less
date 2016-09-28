@@ -6,6 +6,16 @@
   color: @lightestGray;
   overflow: hidden;
 
+  .gradient {
+    background: linear-gradient(rgba(55,63,82,1), rgba(55,63,82,0));
+    height: 20px;
+    margin-top: -20px;
+    pointer-events: none;
+    position: relative;
+    top: 20px;
+    z-index: 100;
+  }
+
   ul {
     list-style: none;
 
@@ -64,7 +74,8 @@
   }
 
   .sidebar-listNav {
-    padding: 0px 30px;
+    padding: 10px 30px 20px 30px;
+    margin: 0;
 
     li,
     li a {
@@ -127,8 +138,8 @@
   }
 
   #full-list {
-    margin: 4px 0 0 30px;
-    padding: 0 20px;
+    margin: 0 0 0 30px;
+    padding: 10px 20px 0 20px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     .flex(1);
