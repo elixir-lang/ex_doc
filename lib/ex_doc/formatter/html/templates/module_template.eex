@@ -44,7 +44,7 @@
             Types
           </h1>
           <div class="types-list">
-            <%= for node <- types, do: type_detail_template(node, module) %>
+            <%= for node <- types, do: detail_template(node, module) %>
           </div>
         </section>
       <% end %>

@@ -45,7 +45,7 @@ defmodule ExDoc.TypeNode do
   """
 
   defstruct id: nil, name: nil, arity: 0, type: nil,
-    spec: nil, doc: nil, signature: nil
+    spec: nil, doc: nil, signature: nil, source: nil, annotations: []
 
   @type t :: %__MODULE__{
     id: nil | String.t,
@@ -54,7 +54,9 @@ defmodule ExDoc.TypeNode do
     type: nil | String.t,
     spec: nil | String.t,
     doc: nil | String.t,
-    signature: nil | String.t
+    signature: nil | String.t,
+    source: nil | String.t,
+    annotations: list()
   }
 end
 
@@ -161,7 +163,7 @@ defmodule ExDoc.Retriever do
       type: type,
       moduledoc: moduledoc,
       docs: docs,
-      typespecs: get_types(module),
+      typespecs: get_types(source_path, source_url, module),
       source: source_link(source_path, source_url, line)
     }
   end
@@ -415,11 +417,11 @@ defmodule ExDoc.Retriever do
     |> Enum.concat()
   end
 
-  defp get_types(module) do
+  defp get_types(source_path, source_url, module) do
     all  = Typespec.beam_types(module) || []
     docs = try do
       Enum.into(Code.get_docs(module, :type_docs) || [], %{},
-                fn {typedoc, _, _, doc} -> {typedoc, doc} end)
+                fn {typedoc, line, _, doc} -> {typedoc, {line, doc}} end)
     rescue
       _ -> Enum.into(Typespec.beam_typedocs(module) || [], %{})
     end
@@ -428,7 +430,7 @@ defmodule ExDoc.Retriever do
       for {type, {name, _, args} = tuple} <- all, type != :typep do
         spec  = process_type_ast(Typespec.type_to_ast(tuple), type)
         arity = length(args)
-        doc   = docs[{name, arity}]
+        {line, doc} = docs[{name, arity}]
         %ExDoc.TypeNode{
           id: "#{name}/#{arity}",
           name: name,
@@ -436,7 +438,8 @@ defmodule ExDoc.Retriever do
           type: type,
           spec: spec,
           doc: doc,
-          signature: get_typespec_signature(spec, arity)
+          signature: get_typespec_signature(spec, arity),
+          source: source_link(source_path, source_url, line)
         }
       end
 

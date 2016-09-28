@@ -1,6 +1,0 @@
-<div id="<%=enc_h link_id(node) %>" class="type-detail">
-  <pre><code class="elixir"><%= node.spec %></code></pre>
-  <%= if node.doc do %>
-    <div class="typespec-doc"><%= to_html(node.doc) %></div>
-  <% end %>
-</div>

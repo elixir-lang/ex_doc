@@ -17,11 +17,15 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Get the full specs from a function, already in HTML form.
   """
+  def get_specs(%ExDoc.TypeNode{spec: spec}) do
+    [spec]
+  end
   def get_specs(%ExDoc.FunctionNode{specs: specs}) when is_list(specs) do
     presence specs
   end
-
-  def get_specs(_node), do: nil
+  def get_specs(_node) do
+    nil
+  end
 
   @doc """
   Convert markdown to HTML.
@@ -32,13 +36,15 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Get the pretty name of a function node
   """
+  def pretty_type(%ExDoc.TypeNode{type: t}) do
+    Atom.to_string(t)
+  end
   def pretty_type(%ExDoc.FunctionNode{type: t}) do
     case t do
       :def           -> "function"
       :defmacro      -> "macro"
       :callback      -> "callback"
       :macrocallback -> "macro callback"
-      :type          -> "type"
     end
   end
 
@@ -240,7 +246,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     sidebar_template: [:config, :modules, :exceptions, :protocols],
     summary_template: [:name, :nodes],
     summary_item_template: [:node],
-    type_detail_template: [:node, :_module],
     redirect_template: [:config, :redirect_to],
   ]
 

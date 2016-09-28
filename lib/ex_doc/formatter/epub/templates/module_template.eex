@@ -28,7 +28,7 @@
     <% end %>
 
     <%= unless Enum.empty?(types) do %>
-      <section id="types" class="types details-list">
+      <section id="types" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#types">
             <i class="icon-link"></i>
@@ -36,7 +36,7 @@
           Types
         </h1>
         <div class="types-list">
-          <%= for node <- types, do: H.type_detail_template(node, module) %>
+          <%= for node <- types, do: H.detail_template(node, module) %>
         </div>
       </section>
     <% end %>

@@ -1,5 +1,5 @@
 .detail-header {
-  margin: 1.5em 0 .5em;
+  margin: 1.5em 0 1.0em;
   padding: .5em 1em;
   background: @detailGray;
   border-left: 3px solid @purple;
@@ -38,25 +38,21 @@
 }
 
 .specs {
-  margin-left: 1.2em;
+  opacity: 0.7;
+  padding-bottom: 0.05em;
 
-  .specs-list {
-    margin: 0 0 2em 0;
-
-    pre {
-      margin: .5em 0;
-
-      code {
-        padding: 0 .5em;
-        border-color: transparent;
-      }
-    }
+  pre {
+    font-family: @monoFontFamily;
+    font-size: 0.9em;
+    font-style: normal;
+    line-height: 24px;
+    margin: 0;
+    padding: 0;
   }
 }
 
 .docstring {
-  margin-left: 1.2em;
-  margin-bottom: 3.5em;
+  margin: 1.2em 0 2.1em 1.2em;
 
   h2,
   h3,

@@ -12,17 +12,14 @@
     <%= for annotation <- node.annotations do %>
       <span class="note">(<%= annotation %>)</span>
     <% end %>
-  </div>
-  <%= if specs = get_specs(node) do %>
-    <div class="specs">
-      <h4 class="specs-title">Specs</h4>
-      <div class="specs-list">
+    <%= if specs = get_specs(node) do %>
+      <div class="specs">
         <%= for spec <- specs do %>
-          <pre><code class="elixir"><%= spec %></code></pre>
+          <pre><%= spec %></pre>
         <% end %>
       </div>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
   <section class="docstring">
     <%= node.doc |> to_html() |> link_detail_headings(enc_h(link_id(node))) %>
   </section>
