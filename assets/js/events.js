@@ -114,7 +114,7 @@ function addEventListeners () {
 
 function identifyCurrentHash () {
   var hash = window.location.hash.replace(/^#/, '')
-  if (!hash) return
+  if (!hash) hash = "content"
 
   const nodes = sidebarNodes[helpers.getModuleType()]
   const category = helpers.findSidebarCategory(nodes, hash)
