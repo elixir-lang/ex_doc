@@ -139,7 +139,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp short_typespec?(ast) do
-    byte_size(Macro.to_string(ast)) < 60
+    byte_size(Macro.to_string(ast)) <= 70
   end
 
   defp strip_parens(string, []) do
