@@ -36,7 +36,7 @@
       <% end %>
 
       <%= unless Enum.empty?(types) do %>
-        <section id="types" class="types details-list">
+        <section id="types" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#types">
               <i class="icon-link"></i>

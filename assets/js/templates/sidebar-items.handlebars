@@ -14,13 +14,13 @@
 
     {{!-- Extra pages --}}
     {{#if node.headers}}
-      <ul>
+      <ol>
         {{#each node.headers}}
           <li class="docs">
             <a href="#{{{anchor}}}" class="doclink">{{id}}</a>
           </li>
         {{/each}}
-      </ul>
+      </ol>
     {{/if}}
 
     {{#showSummary node}}

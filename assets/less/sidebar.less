@@ -1,6 +1,6 @@
 .sidebar {
   font-family: @sansFontFamily;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 18px;
   background: @darkGray;
   color: @lightestGray;
@@ -23,6 +23,11 @@
       margin: 0;
       padding: 0 10px;
     }
+  }
+
+  ol {
+    margin: 9px;
+    padding-left: 20px;
   }
 
   a {
@@ -99,7 +104,7 @@
   .sidebar-listNav {
     li,
     li a {
-      font-size: 13px;
+      font-size: 14px;
     }
 
     li {
@@ -145,21 +150,19 @@
     .flex(1);
 
     ul {
-      margin: 0 20px;
-      padding: 9px 0 18px;
+      margin: 9px 15px;
+      padding: 0;
 
       li {
-
         font-weight: 300;
         line-height: 18px;
 
         ul {
           display: none;
-          padding: 9px 0;
 
           li {
-            border-left: 1px solid @mediumGray;
             padding: 0 10px;
+            border-left: 1px solid @mediumGray;
 
             &.active:before {
               .icon-elem;
@@ -170,18 +173,6 @@
             }
           }
         }
-
-        &.active {
-          border-left: none;
-
-          a {
-            color: @white;
-          }
-
-          ul {
-            display: block;
-          }
-        }
       }
     }
 
@@ -189,8 +180,20 @@
       padding: 0;
       line-height: 27px;
 
-      &.collapsed ul {
+      &.collapsed ul, &.collapsed ol {
         display: none;
+      }
+
+      &.active {
+        border-left: none;
+
+        a {
+          color: @white;
+        }
+
+        ul {
+          display: block;
+        }
       }
 
       &.clicked > a {
@@ -199,7 +202,6 @@
     }
   }
 }
-
 
 @media screen and (max-height: 500px) {
   .sidebar {
