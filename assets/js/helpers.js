@@ -24,8 +24,8 @@ export function scrollTo (target, elem, done) {
   }
 }
 
-export function saveFind (selector) {
-  return $(`#${cssesc(selector.replace(/^#/, ''), {isIdentifier: true})}`)
+export function saveFind (hash) {
+  return $(`#${cssesc(hash, {isIdentifier: true})}`)
 }
 
 export function getModuleType () {
