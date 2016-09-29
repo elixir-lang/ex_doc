@@ -5,27 +5,12 @@
 // ------------
 
 import $ from 'jquery'
-import cssesc from 'cssesc'
 import find from 'lodash.find'
 import findKey from 'lodash.findkey'
 
 // Escape a string for use in a regular expression
 export function escapeText (text) {
   return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
-}
-
-// Scroll to a given element in the page
-export function scrollTo (target, elem, done) {
-  if ($(elem).length) {
-    return $(target)
-      .animate({
-        scrollTop: $(target).scrollTop() + $(elem).offset().top
-      }, 300, done)
-  }
-}
-
-export function saveFind (hash) {
-  return $(`#${cssesc(hash, {isIdentifier: true})}`)
 }
 
 export function getModuleType () {

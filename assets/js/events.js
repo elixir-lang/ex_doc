@@ -74,15 +74,6 @@ function fillSidebarWithNodes (nodes, filter) {
       $(e.target).closest('li').addClass('active')
     }
   })
-
-  $('#full-list .clicked .deflist a').on('click', e => {
-    e.preventDefault()
-    var href = $(e.target).attr('href')
-    var hash = href.split('#')[1]
-    helpers.scrollTo(CONTENT, helpers.saveFind(hash), function () {
-      window.location = href
-    })
-  })
 }
 
 function createHandler (name) {
@@ -126,8 +117,6 @@ function identifyCurrentHash () {
   $(`#full-list .clicked a[href$="#${hash}"]`)
     .closest('li')
     .addClass('active')
-
-  helpers.saveFind(hash)
 }
 
 function fixLinks () {
