@@ -66,7 +66,7 @@ function fillSidebarWithNodes (nodes, filter) {
 
   $('#full-list li a').on('click', e => {
     var $target = $(e.target)
-    if($target.hasClass("expand")){
+    if ($target.hasClass('expand')) {
       e.preventDefault()
       $(e.target).closest('li').toggleClass('open')
     } else {
@@ -105,7 +105,7 @@ function addEventListeners () {
 
 function identifyCurrentHash () {
   var hash = window.location.hash.replace(/^#/, '')
-  if (!hash) hash = "content"
+  if (!hash) hash = 'content'
 
   const nodes = sidebarNodes[helpers.getModuleType()]
   const category = helpers.findSidebarCategory(nodes, hash)
