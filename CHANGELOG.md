@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.14.1
+
+  * Bug fixes
+    * Include "Top" link in pages with no headings
+    * Include "Top" link in modules with no docs
+
 ## v0.14.0
 
   * Enhancements
