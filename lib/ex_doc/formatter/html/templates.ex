@@ -135,15 +135,16 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   defp sidebar_items_node(node) do
-    if Enum.empty?(node.docs) do
+    items =
+      node
+      |> group_types()
+      |> Enum.reject(fn {_type, entries} -> entries == [] end)
+      |> Enum.map_join(",", &sidebar_items_by_type/1)
+
+    if items == "" do
       ~s/{"id":"#{node.id}","title":"#{node.id}"}/
     else
-      types =
-        node
-        |> group_types()
-        |> Enum.reject(fn {_type, entries} -> entries == [] end)
-        |> Enum.map_join(",", &sidebar_items_by_type/1)
-      ~s/{"id":"#{node.id}","title":"#{node.id}",#{types}}/
+      ~s/{"id":"#{node.id}","title":"#{node.id}",#{items}}/
     end
   end
 

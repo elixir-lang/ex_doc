@@ -22,14 +22,15 @@
       </ol>
     {{/isArray}}
 
-    {{#showSummary node}}
     <ul>
       <li>
         <a href="{{node.id}}.html#content">Top</a>
       </li>
+      {{#showSummary node}}
       <li>
         <a href="{{node.id}}.html#summary">Summary</a>
       </li>
+      {{/showSummary}}
       {{#if node.types}}
         <li class="docs">
           <a href="{{node.id}}.html#types" class="expand">Types</a>
@@ -79,7 +80,6 @@
         </li>
       {{/if}}
     </ul>
-    {{/showSummary}}
   </li>
 {{/each}}
 </ul>
