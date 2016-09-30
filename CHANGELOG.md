@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.14.0
+
+  * Enhancements
+    * Add support for the epub formatter
+    * Support extraction from <h2> headers out of the settext format
+
+  * Layout changes
+    * Indent documentation inside the function/macro/type/callback header
+    * Style types the same way as function/macro/callback and include a link to the source
+    * Increase font-sizes in the sidebar and code snippets
+    * Move the specs definition inside the function/macro/type/callback header and make better use of vertical space
+    * Use a gradient on the sidebar to avoid sudden cut-off when scrolling the modules list
+    * Fix the use of the back-button in some browsers
+    * Allow the whole sidebar to be navigated without moving away from the current page. Expand (+) and collapse (-) buttons have been added to aid exploration
+    * Numerically order pages/guides headers
+
 ## v0.13.2
 
   * Bug fixes
