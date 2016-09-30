@@ -4,7 +4,7 @@
 
   * Enhancements
     * Add support for the epub formatter
-    * Support extraction from <h2> headers out of the settext format
+    * Support extraction from `<h2>` headers out of the settext format
 
   * Layout changes
     * Indent documentation inside the function/macro/type/callback header
