@@ -5,18 +5,6 @@
     API Reference
   </h1>
 
-  <ul class="summary-links">
-    <%= unless Enum.empty?(modules) do %>
-      <li><a href="#modules">Modules</a></li>
-    <% end %>
-    <%= unless Enum.empty?(exceptions) do %>
-      <li><a href="#exceptions">Exceptions</a></li>
-    <% end %>
-    <%= unless Enum.empty?(protocols) do %>
-      <li><a href="#protocols">Protocols</a></li>
-    <% end %>
-  </ul>
-
   <%= unless Enum.empty?(modules) do %>
     <section id="modules" class="details-list">
       <h1 class="section-heading">Modules</h1>

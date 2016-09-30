@@ -9,7 +9,7 @@
     <a href="{{node.id}}.html" title="{{node.title}}" class="expand">{{node.title}}</a>
 
     {{!-- Extra pages --}}
-    {{#if node.headers}}
+    {{#isArray node.headers}}
       <ol start="0">
         <li>
           <a href="{{node.id}}.html#content">Top</a>
@@ -20,7 +20,7 @@
           </li>
         {{/each}}
       </ol>
-    {{/if}}
+    {{/isArray}}
 
     {{#showSummary node}}
     <ul>

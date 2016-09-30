@@ -136,7 +136,13 @@ defmodule ExDoc.Formatter.HTML do
           generate_extra(&1, output, module_nodes, modules, exceptions, protocols, config)
          end))
       |> Enum.map(&Task.await(&1, :infinity))
-    [{"api-reference", "API Reference", []}|extras]
+
+    api_reference_headers =
+      if(Enum.empty?(modules),    do: [], else: [{"Modules", "modules"}]) ++
+      if(Enum.empty?(exceptions), do: [], else: [{"Exceptions", "exceptions"}]) ++
+      if(Enum.empty?(protocols),  do: [], else: [{"Protocols", "protocols"}])
+
+    [{"api-reference", "API Reference", api_reference_headers}|extras]
   end
 
   defp generate_extra({input_file, options}, output, module_nodes, modules, exceptions, protocols, config) do
