@@ -9,11 +9,11 @@ defmodule Mix.Tasks.Docs do
 
   ## Command line options
 
-    * `--output`, `-o` - output directory for the generated
+    * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
-    * `--canonical`, `-a` - indicate the preferred URL with
+    * `--canonical`, `-a` - Indicate the preferred URL with
       rel="canonical" link element, default: nil
-    * `--formatter`, `-f` - which formatter to use, "html" or
+    * `--formatter`, `-f` - Which formatter to use, "html" or
       "epub", default: "html"
 
   The command line options have higher precedence than the options
@@ -46,25 +46,25 @@ defmodule Mix.Tasks.Docs do
   be a keyword list or a function returning a keyword list that will
   be lazily executed.
 
-    * `:output` - output directory for the generated docs; default: "doc".
-      May be overriden by command line argument.
+    * `:output` - Output directory for the generated docs; default: "doc".
+      May be overridden by command line argument.
 
-    * `:formatter` - doc formatter to use; default: "html",
+    * `:formatter` - Doc formatter to use; default: "html",
       options: "html", "epub".
 
-    * `:source_root` - path to the source code root directory;
+    * `:source_root` - Path to the source code root directory;
       default: "." (current directory).
 
-    * `:source_beam` - path to the beam directory; default: mix's compile path.
+    * `:source_beam` - Path to the beam directory; default: mix's compile path.
 
-    * `:source_ref` - the branch/commit/tag used for source link inference;
+    * `:source_ref` - The branch/commit/tag used for source link inference;
       default: "master".
 
-    * `:source_url_pattern` - public URL of the project. Derived from
+    * `:source_url_pattern` - Public URL of the project. Derived from
       project's `:source_url` and `:source_ref`. Example:
       "https://github.com/USER/APP/blob/master/%{path}#L%{line}"
 
-    * `:main` - main page of the documentation. It may be a module or a
+    * `:main` - Main page of the documentation. It may be a module or a
       generated page, like "Plug" or "api-reference";
       default: "api-reference" when --formatter is "html".
 
@@ -76,10 +76,10 @@ defmodule Mix.Tasks.Docs do
       about the PATH and the title of the output files; default: `[]`. Example:
       `["README.md", "CONTRIBUTING.md": [path: "CONTRIBUTORS", title: "Join us!"]]`
 
-    * `:extra_section` - String that define the section title of the additional
+    * `:extra_section` - String that defines the section title of the additional
       Markdown pages; default: "PAGES". Example: "GUIDES"
 
-    * `:canonical` - String that define the preferred URL with the rel="canonical"
+    * `:canonical` - String that defines the preferred URL with the rel="canonical"
       element; default: nil
   """
 
