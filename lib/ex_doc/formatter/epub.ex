@@ -134,25 +134,21 @@ defmodule ExDoc.Formatter.EPUB do
 
   ## Helpers
   defp assets do
-   [
-     {"dist/*.{css,js}", "OEBPS/dist" },
-     {"assets/*.xml", "META-INF" },
-     {"assets/mimetype", "." }
-   ]
+   [{"dist/*.{css,js}", "OEBPS/dist" },
+    {"assets/*.xml", "META-INF" },
+    {"assets/mimetype", "." }]
   end
 
   defp files_to_add(path) do
-    File.cd! path, fn ->
-      meta = Path.wildcard("META-INF/*")
-      oebps = Path.wildcard("OEBPS/**/*")
+    meta = Path.wildcard(Path.join(path, "META-INF/*"))
+    oebps = Path.wildcard(Path.join(path, "OEBPS/**/*"))
 
-      Enum.reduce meta ++ oebps ++ ["mimetype"], [], fn(f, acc) ->
-        case File.read(f) do
-          {:ok, bin} ->
-            [{f |> String.to_char_list, bin}|acc]
-          {:error, _} ->
-            acc
-        end
+    Enum.reduce meta ++ oebps ++ [Path.join(path, "mimetype")], [], fn(f, acc) ->
+      case File.read(f) do
+        {:ok, bin} ->
+          [{String.to_char_list(f), bin}|acc]
+        {:error, _} ->
+          acc
       end
     end
   end
