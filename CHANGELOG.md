@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.14.2
+
+  * Enhancements
+    * Automatically generate documentations links to any of your dependencies (by default links to hexdocs.pm but allows the URL to be configured)
+    * Allow documentation to be generated to Erlang modules
+
+  * Bug fixes
+    * Make sure "Top" is not included twice on pages
+
 ## v0.14.1
 
   * Bug fixes
