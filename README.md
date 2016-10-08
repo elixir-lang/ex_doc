@@ -26,10 +26,12 @@ def project do
    deps: deps(),
 
    # Docs
-   name: "My App",
+   name: "MyApp",
    source_url: "https://github.com/USER/PROJECT",
    homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
-   docs: [logo: "path/to/logo.png", extras: ["README.md"]]]
+   docs: [main: "MyApp", # The main page in the docs
+          logo: "path/to/logo.png",
+          extras: ["README.md"]]]
 end
 ```
 
