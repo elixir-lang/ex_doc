@@ -8,7 +8,6 @@
 
     <a href="{{node.id}}.html" title="{{node.title}}" class="expand">{{node.title}}</a>
 
-    {{!-- Extra pages --}}
     {{#isArray node.headers}}
       <ol start="0">
         <li>
@@ -20,66 +19,66 @@
           </li>
         {{/each}}
       </ol>
+    {{else}}
+      <ul>
+        <li>
+          <a href="{{node.id}}.html#content">Top</a>
+        </li>
+        {{#showSummary node}}
+        <li>
+          <a href="{{node.id}}.html#summary">Summary</a>
+        </li>
+        {{/showSummary}}
+        {{#if node.types}}
+          <li class="docs">
+            <a href="{{node.id}}.html#types" class="expand">Types</a>
+            <ul class="types-list deflist">
+              {{#each node.types}}
+                <li>
+                  <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
+                </li>
+              {{/each}}
+            </ul>
+          </li>
+        {{/if}}
+        {{#if node.functions}}
+          <li class="docs">
+            <a href="{{node.id}}.html#functions" class="expand">Functions</a>
+            <ul class="functions-list deflist">
+              {{#each node.functions}}
+                <li>
+                  <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
+                </li>
+              {{/each}}
+            </ul>
+          </li>
+        {{/if}}
+        {{#if node.macros}}
+          <li class="docs">
+            <a href="{{node.id}}.html#macros" class="expand">Macros</a>
+            <ul class="macros-list deflist">
+              {{#each node.macros}}
+                <li>
+                  <a href="{{node.id}}.html#{{anchor}}" class="deflink">{{id}}</a>
+                </li>
+              {{/each}}
+            </ul>
+          </li>
+        {{/if}}
+        {{#if node.callbacks}}
+          <li class="docs">
+            <a href="{{node.id}}.html#callbacks" class="expand">Callbacks</a>
+            <ul class="callbacks-list deflist">
+              {{#each node.callbacks}}
+                <li>
+                  <a href="{{node.id}}.html#{{anchor}}" class="deflink">{{id}}</a>
+                </li>
+              {{/each}}
+            </ul>
+          </li>
+        {{/if}}
+      </ul>
     {{/isArray}}
-
-    <ul>
-      <li>
-        <a href="{{node.id}}.html#content">Top</a>
-      </li>
-      {{#showSummary node}}
-      <li>
-        <a href="{{node.id}}.html#summary">Summary</a>
-      </li>
-      {{/showSummary}}
-      {{#if node.types}}
-        <li class="docs">
-          <a href="{{node.id}}.html#types" class="expand">Types</a>
-          <ul class="types-list deflist">
-            {{#each node.types}}
-              <li>
-                <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
-              </li>
-            {{/each}}
-          </ul>
-        </li>
-      {{/if}}
-      {{#if node.functions}}
-        <li class="docs">
-          <a href="{{node.id}}.html#functions" class="expand">Functions</a>
-          <ul class="functions-list deflist">
-            {{#each node.functions}}
-              <li>
-                <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
-              </li>
-            {{/each}}
-          </ul>
-        </li>
-      {{/if}}
-      {{#if node.macros}}
-        <li class="docs">
-          <a href="{{node.id}}.html#macros" class="expand">Macros</a>
-          <ul class="macros-list deflist">
-            {{#each node.macros}}
-              <li>
-                <a href="{{node.id}}.html#{{anchor}}" class="deflink">{{id}}</a>
-              </li>
-            {{/each}}
-          </ul>
-        </li>
-      {{/if}}
-      {{#if node.callbacks}}
-        <li class="docs">
-          <a href="{{node.id}}.html#callbacks" class="expand">Callbacks</a>
-          <ul class="callbacks-list deflist">
-            {{#each node.callbacks}}
-              <li>
-                <a href="{{node.id}}.html#{{anchor}}" class="deflink">{{id}}</a>
-              </li>
-            {{/each}}
-          </ul>
-        </li>
-      {{/if}}
-    </ul>
   </li>
 {{/each}}
 </ul>
