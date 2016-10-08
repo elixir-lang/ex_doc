@@ -40,18 +40,21 @@ defmodule ExDoc.RetrieverTest do
 
   test "docs_from_files returns the doc info for each module function" do
     [node] = docs_from_files ["CompiledWithDocs"]
-    [ example, example_1, example_without_docs ] = node.docs
+    [example, example_1, example_without_docs] = node.docs
 
     assert example.id   == "example/2"
     assert example.doc  == "Some example"
     assert example.type == :def
+    assert example.defaults == ["example/1"]
     assert example.signature == "example(foo, bar \\\\ Baz)"
 
     assert example_1.id   == "example_1/0"
     assert example_1.type == :defmacro
+    assert example_1.defaults == []
 
     assert example_without_docs.source == "http://example.com/test/fixtures/compiled_with_docs.ex\#L15"
     assert example_without_docs.doc == nil
+    assert example_without_docs.defaults == []
   end
 
   test "docs_from_files returns an empty list if there's no docs info" do

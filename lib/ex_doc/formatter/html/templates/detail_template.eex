@@ -1,4 +1,7 @@
-<div class="detail" id="<%=enc_h link_id(node) %>">
+<div class="detail" id="<%=enc_h link_id(node.id, node.type) %>">
+  <%= for default <- get_defaults(node) do %>
+    <span id="<%=enc_h link_id(default, node.type) %>" />
+  <% end %>
   <div class="detail-header">
     <a href="#<%=enc_h link_id(node) %>" class="detail-link" title="Link to this <%= pretty_type(node) %>">
       <i class="icon-link"></i>

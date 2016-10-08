@@ -22,7 +22,7 @@ defmodule ExDoc.FunctionNode do
   Structure that holds all the elements of an individual *function*
   """
 
-  defstruct id: nil, name: nil, arity: 0, doc: [],
+  defstruct id: nil, name: nil, arity: 0, defaults: [], doc: [],
     source: nil, type: nil, signature: nil, specs: [],
     annotations: []
 
@@ -30,6 +30,7 @@ defmodule ExDoc.FunctionNode do
     id: nil | String.t,
     name: nil | String.t,
     arity: non_neg_integer,
+    defaults: non_neg_integer,
     doc: list(),
     source: nil | String.t,
     type: nil | String.t,
@@ -238,11 +239,19 @@ defmodule ExDoc.Retriever do
       name: name,
       arity: arity,
       doc: doc,
+      defaults: get_defaults(signature, name, arity),
       signature: get_call_signature(name, signature),
       specs: specs,
       source: source_link(source_path, source_url, line),
       type: type
     }
+  end
+
+  defp get_defaults(signature, name, arity) do
+    case Enum.count(signature, &match?({:\\, _, [_, _]}, &1)) do
+      0 -> []
+      defaults -> for default <- (arity-defaults..arity-1), do: "#{name}/#{default}"
+    end
   end
 
   defp get_callbacks(:behaviour, module, source_path, source_url, abst_code) do

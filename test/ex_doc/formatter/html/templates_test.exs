@@ -32,6 +32,16 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     Templates.module_page(hd(mods), [], [], [], doc_config())
   end
 
+  test "header id generation" do
+    assert Templates.header_to_id("“Stale”") == "stale"
+    assert Templates.header_to_id("José") == "josé"
+    assert Templates.header_to_id(" a - b ") == "a-b"
+    assert Templates.header_to_id(" ☃ ") == ""
+    assert Templates.header_to_id(" &sup2; ") == ""
+    assert Templates.header_to_id(" &#9180; ") == ""
+    assert Templates.header_to_id("Git Options (<code class=\"inline\">:git</code>)") == "git-options"
+  end
+
   test "synopsis" do
     assert Templates.synopsis(nil) == nil
     assert Templates.synopsis("") == ""
@@ -67,17 +77,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   ## LISTING
 
-  test "enables nav link when module type have at least one element" do
-    names   = [CompiledWithDocs, CompiledWithDocs.Nested]
-    nodes   = ExDoc.Retriever.docs_from_modules(names, doc_config())
-    modules = HTML.Autolink.all(nodes, ".html", [])
-
-    content = Templates.sidebar_template(doc_config(), modules, [], [])
-    assert content =~ ~r{<li><a id="modules-list" href="#full-list">Modules</a></li>}
-    refute content =~ ~r{<li><a id="exceptions-list" href="#full-list">Exceptions</a></li>}
-    refute content =~ ~r{<li><a id="protocols-list" href="#full-list">Protocols</a></li>}
-  end
-
   test "site title text links to homepage_url when set" do
     content = Templates.sidebar_template(doc_config(), [], [], [])
     assert content =~ ~r{<a href="#{homepage_url()}" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
@@ -88,6 +87,17 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                            source_root: File.cwd!, main: "hello",}
     content = Templates.sidebar_template(config, [], [], [])
     assert content =~ ~r{<a href="hello.html" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
+  end
+
+  test "list_page enables nav link when module type have at least one element" do
+    names   = [CompiledWithDocs, CompiledWithDocs.Nested]
+    nodes   = ExDoc.Retriever.docs_from_modules(names, doc_config())
+    modules = HTML.Autolink.all(nodes, ".html", [])
+
+    content = Templates.sidebar_template(doc_config(), modules, [], [])
+    assert content =~ ~r{<li><a id="modules-list" href="#full-list">Modules</a></li>}
+    refute content =~ ~r{<li><a id="exceptions-list" href="#full-list">Exceptions</a></li>}
+    refute content =~ ~r{<li><a id="protocols-list" href="#full-list">Protocols</a></li>}
   end
 
   test "list_page outputs listing for the given nodes" do
@@ -107,29 +117,26 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   test "module_page outputs the functions and docstrings" do
     content = get_module_page([CompiledWithDocs])
 
+    # Title and headers
     assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
     assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CompiledWithDocs\s*}
     refute content =~ ~r{<small>module</small>}
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
     assert content =~ ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Example.*</h2>}ms
+
+    # Summaries
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
     assert content =~ ~r{example_1/0.*Another example}ms
+
+    # Source
     assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<i class="icon-code"></i>\n\s*</a>}ms
 
-    assert content =~ ~s{<div class="detail" id="example_1/0">}
+    # Functions
+    assert content =~ ~s{<div class="detail" id="example/2">}
+    assert content =~ ~s{<span id="example/1" />}
     assert content =~ ~s{example(foo, bar \\\\ Baz)}
     assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\n\s*<i class="icon-link"><\/i>\n\s*<\/a>}ms
-  end
-
-  test "header id generation" do
-    assert Templates.header_to_id("“Stale”") == "stale"
-    assert Templates.header_to_id("José") == "josé"
-    assert Templates.header_to_id(" a - b ") == "a-b"
-    assert Templates.header_to_id(" ☃ ") == ""
-    assert Templates.header_to_id(" &sup2; ") == ""
-    assert Templates.header_to_id(" &#9180; ") == ""
-    assert Templates.header_to_id("Git Options (<code class=\"inline\">:git</code>)") == "git-options"
   end
 
   test "module_page outputs the types and function specs" do

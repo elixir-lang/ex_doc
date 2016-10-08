@@ -28,6 +28,16 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
+  Get defaults clauses.
+  """
+  def get_defaults(%{defaults: defaults}) do
+    defaults
+  end
+  def get_defaults(_) do
+    []
+  end
+
+  @doc """
   Convert markdown to HTML.
   """
   def to_html(nil), do: nil
@@ -56,8 +66,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     case type do
       :macrocallback -> "c:#{id}"
       :callback      -> "c:#{id}"
-      :type             -> "t:#{id}"
-      _                 -> "#{id}"
+      :type          -> "t:#{id}"
+      _              -> "#{id}"
     end
   end
 
