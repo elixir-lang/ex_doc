@@ -4,7 +4,7 @@ defmodule ExDoc.Mixfile do
   def project do
     [app: :ex_doc,
      version: "0.14.1",
-     elixir: "~> 1.2",
+     elixir: "~> 1.2.3 or ~> 1.3",
      elixirc_paths: elixirc_paths(Mix.env),
      deps: deps(),
      aliases: aliases(),

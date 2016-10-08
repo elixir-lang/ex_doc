@@ -14,7 +14,8 @@ defmodule ExDoc.CLITest do
   test "loading config" do
     File.write!("test.config", ~s([key: "val"]))
 
-    {project, version, opts} = run(["ExDoc", "--extra-section", "Guides", "--extra", "README.md", "1.2.3", "...", "-c", "test.config"])
+    {project, version, opts} =
+      run(["ExDoc", "--extra-section", "Guides", "--extra", "README.md", "1.2.3", "...", "-c", "test.config"])
 
     assert project == "ExDoc"
     assert version == "1.2.3"

@@ -11,6 +11,7 @@ defmodule ExDoc do
     """
     defstruct [
       canonical: nil,
+      deps: [],
       extra_section: nil,
       extras: [],
       formatter: "html",
@@ -31,6 +32,7 @@ defmodule ExDoc do
 
      @type t :: %__MODULE__{
        canonical: nil | String.t,
+       deps: [{ebin_path :: String.t, doc_url :: String.t}],
        extra_section: nil | String.t,
        extras: list(),
        formatter: String.t,

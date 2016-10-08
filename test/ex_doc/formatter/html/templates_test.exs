@@ -27,7 +27,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     mods =
       names
       |> ExDoc.Retriever.docs_from_modules(doc_config())
-      |> HTML.Autolink.all()
+      |> HTML.Autolink.all(".html", [])
 
     Templates.module_page(hd(mods), [], [], [], doc_config())
   end
@@ -70,7 +70,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   test "enables nav link when module type have at least one element" do
     names   = [CompiledWithDocs, CompiledWithDocs.Nested]
     nodes   = ExDoc.Retriever.docs_from_modules(names, doc_config())
-    modules = HTML.Autolink.all(nodes)
+    modules = HTML.Autolink.all(nodes, ".html", [])
 
     content = Templates.sidebar_template(doc_config(), modules, [], [])
     assert content =~ ~r{<li><a id="modules-list" href="#full-list">Modules</a></li>}

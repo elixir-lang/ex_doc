@@ -21,7 +21,7 @@ defmodule ExDoc.Formatter.HTML do
 
     assets = assets() |> assets_path() |> generate_assets(output)
 
-    all = Autolink.all(module_nodes)
+    all = Autolink.all(module_nodes, ".html", config.deps)
     modules    = filter_list(:modules, all)
     exceptions = filter_list(:exceptions, all)
     protocols  = filter_list(:protocols, all)

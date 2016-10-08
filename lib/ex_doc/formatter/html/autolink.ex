@@ -10,9 +10,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @doc """
   Receives a list of module nodes and autolink all docs and typespecs.
   """
-  def all(modules, extension \\ ".html") do
+  def all(modules, extension, extra_lib_dirs) do
     aliases = Enum.map modules, &(&1.module)
-    lib_dirs = elixir_lib_dirs()
+    lib_dirs = extra_lib_dirs ++ elixir_lib_dirs()
     modules
     |> Enum.map(&Task.async(fn -> process_module(&1, modules, aliases, extension, lib_dirs) end))
     |> Enum.map(&Task.await(&1, :infinity))

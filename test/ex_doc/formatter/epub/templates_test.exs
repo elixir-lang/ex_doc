@@ -24,10 +24,10 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
   end
 
   defp get_module_page(names) do
-    mods = names
-           |> ExDoc.Retriever.docs_from_modules(doc_config())
-           |> HTML.Autolink.all()
-
+    mods =
+      names
+      |> ExDoc.Retriever.docs_from_modules(doc_config())
+      |> HTML.Autolink.all(".xhtml", [])
     Templates.module_page(doc_config(), hd(mods))
   end
 

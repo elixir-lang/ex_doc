@@ -35,9 +35,9 @@ defmodule Mix.Tasks.Docs do
          name: "My App",
          source_url: "https://github.com/USER/PROJECT",
          homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
-         docs: [logo: "path/to/logo.png",
-                canonical: "https://hexdocs.com/PROJECT"
-                extras: ["README.md", "CONTRIBUTING.md"]]]
+         docs: [main: "MyApp", # The main page in the docs
+                logo: "path/to/logo.png",
+                extras: ["README.md"]]]
       end
 
   ExDoc also allows configuration specific to the documentation to
@@ -79,6 +79,10 @@ defmodule Mix.Tasks.Docs do
     * `:extra_section` - String that defines the section title of the additional
       Markdown pages; default: "PAGES". Example: "GUIDES"
 
+    * `:deps` - A keyword list application names and their documentation URL.
+      ExDoc will by default include all dependencies and assume they are hosted on
+      HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
+
     * `:canonical` - String that defines the preferred URL with the rel="canonical"
       element; default: nil
   """
@@ -97,39 +101,17 @@ defmodule Mix.Tasks.Docs do
 
     project = (config[:name] || config[:app]) |> to_string()
     version = config[:version] || "dev"
-    options = Keyword.merge(get_docs_opts(config), cli_opts)
-
     options =
-      if config[:source_url] do
-        Keyword.put(options, :source_url, config[:source_url])
-      else
-        options
-      end
-
-    main = options[:main]
-
-    options =
-      cond do
-        is_nil(main) ->
-          Keyword.delete(options, :main)
-
-        is_atom(main) ->
-          Keyword.put(options, :main, inspect(main))
-
-        is_binary(main)->
-          options
-      end
-
-    options = Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
+      get_docs_opts(config)
+      |> Keyword.merge(cli_opts)
+      |> normalize_source_url(config)
+      |> normalize_source_beam()
+      |> normalize_main()
+      |> normalize_deps()
 
     index = generator.(project, version, options)
     log(index)
     index
-  end
-
-  defp log(index) do
-    Mix.shell.info [:green, "Docs successfully generated."]
-    Mix.shell.info [:green, "View them at #{inspect index}."]
   end
 
   defp get_docs_opts(config) do
@@ -138,6 +120,62 @@ defmodule Mix.Tasks.Docs do
       is_function(docs, 0) -> docs.()
       is_nil(docs) -> []
       true -> docs
+    end
+  end
+
+  defp log(index) do
+    Mix.shell.info [:green, "Docs successfully generated."]
+    Mix.shell.info [:green, "View them at #{inspect index}."]
+  end
+
+  defp normalize_source_url(options, config) do
+    if source_url = config[:source_url] do
+      Keyword.put(options, :source_url, source_url)
+    else
+      options
+    end
+  end
+
+  defp normalize_source_beam(options) do
+    Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
+  end
+
+  defp normalize_main(options) do
+    main = options[:main]
+    cond do
+      is_nil(main) ->
+        Keyword.delete(options, :main)
+
+      is_atom(main) ->
+        Keyword.put(options, :main, inspect(main))
+
+      is_binary(main)->
+        options
+    end
+  end
+
+  defp normalize_deps(options) do
+    deps =
+      if deps = options[:deps] do
+        Keyword.merge(get_deps(), deps)
+      else
+        get_deps()
+      end
+
+    deps =
+      for {app, doc} <- deps,
+          lib_dir = :code.lib_dir(app),
+          is_list(lib_dir),
+          do: {List.to_string(lib_dir), doc}
+
+    Keyword.put(options, :deps, deps)
+  end
+
+  defp get_deps() do
+    for {key, _} <- Mix.Project.deps_paths,
+        _ = Application.load(key), # :ok | {:error, _}
+        vsn = Application.spec(key, :vsn) do
+      {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
     end
   end
 end

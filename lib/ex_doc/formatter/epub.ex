@@ -17,7 +17,7 @@ defmodule ExDoc.Formatter.EPUB do
 
     assets() |> HTML.assets_path("epub") |> HTML.generate_assets(output)
 
-    all = HTML.Autolink.all(module_nodes, ".xhtml")
+    all = HTML.Autolink.all(module_nodes, ".xhtml", config.deps)
     modules = HTML.filter_list(:modules, all)
     exceptions = HTML.filter_list(:exceptions, all)
     protocols = HTML.filter_list(:protocols, all)

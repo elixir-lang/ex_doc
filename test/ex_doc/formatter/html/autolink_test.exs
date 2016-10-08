@@ -127,6 +127,12 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
            "[`Mix`](#{@elixir_docs}mix/Mix.html)"
   end
 
+  test "autolink dependencies modules" do
+    lib_dirs = [{Application.app_dir(:earmark), "https://hexdocs.pm/earmark/"}]
+    assert Autolink.elixir_modules("`Earmark`", ["MyModule"], "MyModule", ".html", lib_dirs) ==
+           "[`Earmark`](https://hexdocs.pm/earmark/Earmark.html)"
+  end
+
   test "autolink modules doesn't link functions" do
     assert Autolink.elixir_modules("`Mod.example/1`", ["Mod"], "Mod") == "`Mod.example/1`"
   end
