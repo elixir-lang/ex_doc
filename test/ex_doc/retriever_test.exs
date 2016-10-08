@@ -128,16 +128,6 @@ defmodule ExDoc.RetrieverTest do
     end
   end
 
-  test "docs_from_modules warns when module does not export __info__/1" do
-    module = ExDoc.RetrieverTest.ModuleNotCompiledWithFlagDocs
-    {:ok, ^module, binary} = :compile.file('#{__DIR__}/retriever_test/#{module}.erl', [:binary])
-    :code.load_binary(module, 'exdoc', binary)
-
-    assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-      Retriever.docs_from_modules([module], %ExDoc.Config{})
-    end) == "module #{inspect(module)} does not export __info__/1\n"
-  end
-
   test "specs order is preserved" do
     [node] = docs_from_files ["MultipleSpecs"]
     [function_node] = node.docs
