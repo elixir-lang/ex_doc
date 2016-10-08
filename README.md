@@ -37,7 +37,7 @@ end
 
 Now you are ready to generate your project documentation with `mix docs`.
 
-To see all options available when generating docs, run `mix help docs`.   You may have to do `mix docs` or `mix deps.compile` first.
+To see all options available when generating docs, run `mix help docs`. You may have to run `mix docs` or `mix compile` first.
 
 ## Using ExDoc via command line
 
@@ -77,6 +77,17 @@ For example, here are some acceptable values:
     PROJECT_MODULE  => Ecto (the main module provided by the library)
     GITHUB_USER     => elixir-lang
     GITHUB_REPO     => ecto
+
+## Auto-linking
+
+ExDoc will automatically generate links across modules and functions if you enclose them in backticks:
+
+  * By referring to a module, function, type or callback from your project, such as `` `MyModule` ``, ExDoc will automatically link to those
+  * By referring to a module, function, type or callback from Elixir, such as `` `String` ``, ExDoc will automatically link to Elixir's stable documentation
+  * By referring to a module or function from erlang, such as (`` `:erlang` ``), ExDoc will automatically link to the Erlang documentation
+  * By referring to a module, function, type or callback from any of your dependencies, such as `` `MyDep` ``, ExDoc will autoamtically link to that dependency documentation on [hexdocs.pm](http://hexdocs.pm/) (the link can be configured with the `:deps` option in your `mix.exs`)
+
+ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name, such as `` `function/1` ``.
 
 ## Changing the Markdown tool
 
