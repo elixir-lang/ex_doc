@@ -2,7 +2,8 @@ Mix.start()
 Mix.shell(Mix.Shell.Process)
 
 defmodule Mix.Tasks.DocsTest do
-  use ExUnit.Case, async: true
+  # Cannot run concurrently due to Mix compile/deps calls
+  use ExUnit.Case
 
   def run(args, opts) do
     Mix.Tasks.Docs.run(args, opts, &{ &1, &2, &3 })
