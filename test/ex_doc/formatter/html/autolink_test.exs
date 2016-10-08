@@ -85,6 +85,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.elixir_functions("`Mod.!/1`", ["Mod.!/1"]) === "[`Mod.!/1`](Mod.html#!/1)"
     assert Autolink.elixir_functions("`Mod.../2`", ["Mod.../2"]) === "[`Mod.../2`](Mod.html#../2)"
     assert Autolink.elixir_functions("`Mod.--/2`", ["Mod.--/2"]) === "[`Mod.--/2`](Mod.html#--/2)"
+    assert Autolink.elixir_functions("`Mod.%/2`", ["Mod.%/2"]) === "[`Mod.%/2`](Mod.html#%25/2)"
     assert Autolink.elixir_functions("`Mod.<<>>/1`", ["Mod.<<>>/1"]) === "[`Mod.<<>>/1`](Mod.html#%3C%3C%3E%3E/1)"
   end
 
