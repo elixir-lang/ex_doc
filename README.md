@@ -29,9 +29,7 @@ def project do
    name: "My App",
    source_url: "https://github.com/USER/PROJECT",
    homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
-   docs: [logo: "path/to/logo.png",
-          canonical: "https://hexdocs.com/PROJECT"
-          extras: ["README.md", "CONTRIBUTING.md"]]]
+   docs: [logo: "path/to/logo.png", extras: ["README.md"]]]
 end
 ```
 
