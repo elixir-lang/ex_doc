@@ -80,7 +80,7 @@ defmodule ExDoc.Retriever do
   """
   @spec docs_from_dir(Path.t, ExDoc.Config.t) :: [ExDoc.ModuleNode.t]
   def docs_from_dir(dir, config) when is_binary(dir) do
-    files = Path.wildcard Path.expand("Elixir.*.beam", dir)
+    files = Path.wildcard Path.expand("*.beam", dir)
     docs_from_files(files, config)
   end
 
@@ -101,7 +101,7 @@ defmodule ExDoc.Retriever do
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
     |> Enum.map(&get_module(&1, config))
-    |> Enum.filter(fn(x) -> x end)
+    |> Enum.filter(&(&1))
     |> Enum.sort(&(&1.id <= &2.id))
   end
 
@@ -120,28 +120,25 @@ defmodule ExDoc.Retriever do
 
     type = detect_type(module)
 
-    module
-    |> verify_module()
-    |> generate_node(type, config)
+    if export_docs?(module) do
+      generate_node(module, type, config)
+    end
   end
 
-  defp verify_module(module) do
+  defp export_docs?(module) do
     if function_exported?(module, :__info__, 1) do
       case Code.get_docs(module, :moduledoc) do
         {_line, false} ->
-          nil
+          false
         {_, _} ->
-          module
+          true
         nil ->
           raise("module #{inspect module} was not compiled with flag --docs")
       end
     else
-      IO.puts(:stderr, "module #{inspect module} does not export __info__/1")
-      nil
+      false
     end
   end
-
-  defp generate_node(nil, _, _), do: nil
 
   defp generate_node(module, type, config) do
     source_url  = config.source_url_pattern
@@ -157,8 +154,14 @@ defmodule ExDoc.Retriever do
     docs = get_docs(type, module, source_path, source_url, specs, impls, abst_code) ++
            get_callbacks(type, module, source_path, source_url, abst_code)
 
+    id =
+      case inspect(module) do
+        ":" <> inspected -> inspected
+        inspected -> inspected
+      end
+
     %ExDoc.ModuleNode{
-      id: inspect(module),
+      id: id,
       module: module,
       type: type,
       moduledoc: moduledoc,
