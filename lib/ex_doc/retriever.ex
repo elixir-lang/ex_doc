@@ -178,7 +178,7 @@ defmodule ExDoc.Retriever do
       docs: docs,
       doc: moduledoc,
       doc_line: doc_line,
-      typespecs: get_types(abst_code, source_path, source_url, module),
+      typespecs: get_types(module, source_path, source_url, abst_code),
       source_path: source_path,
       source_url: source_link(source_path, source_url, line)
     }
@@ -264,20 +264,28 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_callbacks(:behaviour, module, source_path, source_url, abst_code) do
-    callbacks = Enum.into(Typespec.beam_callbacks(module) || [], %{})
-    optional_callbacks = beam_optional_callbacks(module)
-
-    docs = Code.get_docs(module, :all)[:callback_docs]
-    docs = Enum.sort_by docs || [], &elem(&1, 0)
-    Enum.map(docs, &get_callback(&1, source_path, source_url, callbacks, optional_callbacks, abst_code))
+    optional_callbacks = get_optional_callbacks(abst_code)
+    (Code.get_docs(module, :callback_docs) || [])
+    |> Enum.sort_by(&elem(&1, 0))
+    |> Enum.map(&get_callback(&1, source_path, source_url, optional_callbacks, abst_code))
   end
 
   defp get_callbacks(_, _, _, _, _), do: []
 
-  defp get_callback(callback, source_path, source_url, callbacks, optional_callbacks, abst_code) do
+  defp get_optional_callbacks(abst_code) do
+    for {:attribute, _, :optional_callbacks, callbacks} <- abst_code,
+        callback <- callbacks,
+        do: callback
+  end
+
+  defp get_callback(callback, source_path, source_url, optional_callbacks, abst_code) do
     {{name, arity}, doc_line, kind, doc} = callback
     function = actual_def(name, arity, kind)
-    line = find_actual_line(abst_code, function, :callback) || doc_line
+
+    {:attribute, anno, :callback, {^function, specs}} =
+      Enum.find(abst_code, &match?({:attribute, _, :callback, {^function, _}}, &1))
+    line  = anno_line(anno) || doc_line
+    specs = Enum.map(specs, &Typespec.spec_to_ast(name, &1))
 
     name_and_arity =
       case kind do
@@ -291,11 +299,6 @@ defmodule ExDoc.Retriever do
       else
         []
       end
-
-    specs =
-      callbacks
-      |> Map.get(function, [])
-      |> Enum.map(&Typespec.spec_to_ast(name, &1))
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -375,22 +378,6 @@ defmodule ExDoc.Retriever do
   end
   defp actual_def(name, arity, _), do: {name, arity}
 
-  defp find_actual_line(abst_code, {name, arity}, :type) do
-    abst_code
-    |> Enum.find(&match?({:attribute, _, type, {^name, _, args}}
-                            when type in [:type, :opaque] and length(args) == arity,
-                         &1))
-    |> elem(1)
-    |> anno_line()
-  end
-
-  defp find_actual_line(abst_code, function, :callback) do
-    abst_code
-    |> Enum.find(&match?({:attribute, _, :callback, {^function, _}}, &1))
-    |> elem(1)
-    |> anno_line()
-  end
-
   defp find_actual_line(abst_code, name, :module) do
     abst_code
     |> Enum.find(&match?({:attribute, _, :module, ^name}, &1))
@@ -442,40 +429,43 @@ defmodule ExDoc.Retriever do
   end
 
   defp behaviours_implemented_by(module) do
-    :attributes
-    |> module.module_info
-    |> Stream.filter(&match?({:behaviour, _}, &1))
-    |> Stream.map(fn {_, l} -> l end)
-    |> Enum.concat()
+    for {:behaviour, list} <- module.module_info(:attributes),
+        behaviour <- list,
+        do: behaviour
   end
 
-  defp get_types(abst_code, source_path, source_url, module) do
-    all  = Typespec.beam_types(module) || []
-    docs = Enum.into(Code.get_docs(module, :type_docs) || [], %{},
-                     fn {typedoc, line, _, doc} -> {typedoc, {line, doc}} end)
+  defp get_types(module, source_path, source_url, abst_code) do
+    exported = for {:attribute, _, :export_type, types} <- abst_code, do: types
+    exported = :lists.flatten(exported)
 
-    types =
-      for {type, {name, _, args} = tuple} <- all, type != :typep do
-        spec  = process_type_ast(Typespec.type_to_ast(tuple), type)
-        arity = length(args)
-        {doc_line, doc} = docs[{name, arity}]
-        line = find_actual_line(abst_code, {name, arity}, :type) || doc_line
+    (Code.get_docs(module, :type_docs) || [])
+    |> Enum.filter(&elem(&1, 0) in exported)
+    |> Enum.sort_by(&elem(&1, 0))
+    |> Enum.map(&get_type(&1, source_path, source_url, abst_code))
+  end
 
-        %ExDoc.TypeNode{
-          id: "#{name}/#{arity}",
-          name: name,
-          arity: arity,
-          type: type,
-          spec: spec,
-          doc: doc || nil,
-          doc_line: doc_line,
-          signature: get_typespec_signature(spec, arity),
-          source_path: source_path,
-          source_url: source_link(source_path, source_url, line)
-        }
-      end
+  defp get_type(type, source_path, source_url, abst_code) do
+    {{name, arity}, doc_line, _, doc} = type
 
-    Enum.sort_by types, &{&1.name, &1.arity}
+    {:attribute, anno, type, spec} =
+      Enum.find(abst_code, &match?({:attribute, _, type, {^name, _, args}}
+                                     when type in [:opaque, :type] and length(args) == arity, &1))
+
+    spec = process_type_ast(Typespec.type_to_ast(spec), type)
+    line = anno_line(anno) || doc_line
+
+    %ExDoc.TypeNode{
+      id: "#{name}/#{arity}",
+      name: name,
+      arity: arity,
+      type: type,
+      spec: spec,
+      doc: doc || nil,
+      doc_line: doc_line,
+      signature: get_typespec_signature(spec, arity),
+      source_path: source_path,
+      source_url: source_link(source_path, source_url, line)
+    }
   end
 
   defp source_link(_source_path, nil, _line), do: nil
@@ -498,9 +488,4 @@ defmodule ExDoc.Retriever do
   # Cut off the body of an opaque type while leaving it on a normal type.
   defp process_type_ast({:::, _, [d|_]}, :opaque), do: d
   defp process_type_ast(ast, _), do: ast
-
-  defp beam_optional_callbacks(module) do
-    (for {:attribute, _, :optional_callbacks, value} <- get_abstract_code(module), do: value)
-    |> List.flatten()
-  end
 end
