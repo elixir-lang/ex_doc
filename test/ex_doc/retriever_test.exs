@@ -30,12 +30,12 @@ defmodule ExDoc.RetrieverTest do
 
   test "docs_from_files returns the moduledoc info" do
     [node] = docs_from_files ["CompiledWithDocs"]
-    assert node.moduledoc == "moduledoc\n\n\#\# Example ☃ Unicode > escaping\n    CompiledWithDocs.example\n"
+    assert node.doc == "moduledoc\n\n\#\# Example ☃ Unicode > escaping\n    CompiledWithDocs.example\n"
   end
 
   test "docs_from_files returns nil if there's no moduledoc info" do
     [node] = docs_from_files ["CompiledWithoutDocs"]
-    assert node.moduledoc == nil
+    assert node.doc == nil
   end
 
   test "docs_from_files returns the doc info for each module function" do
@@ -52,7 +52,7 @@ defmodule ExDoc.RetrieverTest do
     assert example_1.type == :defmacro
     assert example_1.defaults == []
 
-    assert example_without_docs.source == "http://example.com/test/fixtures/compiled_with_docs.ex\#L15"
+    assert example_without_docs.source_url == "http://example.com/test/fixtures/compiled_with_docs.ex\#L15"
     assert example_without_docs.doc == nil
     assert example_without_docs.defaults == []
   end
@@ -114,14 +114,14 @@ defmodule ExDoc.RetrieverTest do
 
   test "docs_from_files returns the source" do
     [node] = docs_from_files ["CompiledWithDocs"], "http://foo.com/bar/%{path}#L%{line}"
-    assert node.source == "http://foo.com/bar/test/fixtures/compiled_with_docs.ex\#L1"
+    assert node.source_url == "http://foo.com/bar/test/fixtures/compiled_with_docs.ex\#L1"
   end
 
   test "docs_from_files returns the source when source_root set to nil" do
     files  = Enum.map ["CompiledWithDocs"], fn(n) -> "test/tmp/Elixir.#{n}.beam" end
     config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: nil}
     [node] = Retriever.docs_from_files(files, config)
-    assert String.ends_with?(node.source, "/test/fixtures/compiled_with_docs.ex:1")
+    assert String.ends_with?(node.source_url, "/test/fixtures/compiled_with_docs.ex:1")
   end
 
   test "docs_from_modules fails when module is not available" do

@@ -3,16 +3,18 @@ defmodule ExDoc.ModuleNode do
   Structure that represents a *module*
   """
 
-  defstruct id: nil, module: nil, moduledoc: nil,
-    docs: [], typespecs: [], source: nil, type: nil
+  defstruct id: nil, module: nil, doc: nil, doc_line: nil,
+    docs: [], typespecs: [], source_path: nil, source_url: nil, type: nil
 
   @type t :: %__MODULE__{
     id: nil | String.t,
     module: nil | String.t,
-    moduledoc: nil | String.t,
     docs: list(),
+    doc: nil | String.t,
+    doc_line: non_neg_integer(),
     typespecs: list(),
-    source: nil | String.t,
+    source_path: nil | String.t,
+    source_url: nil | String.t,
     type: nil | String.t
   }
 end
@@ -23,16 +25,18 @@ defmodule ExDoc.FunctionNode do
   """
 
   defstruct id: nil, name: nil, arity: 0, defaults: [], doc: [],
-    source: nil, type: nil, signature: nil, specs: [],
-    annotations: []
+    type: nil, signature: nil, specs: [], annotations: [],
+    doc_line: nil, source_path: nil, source_url: nil
 
   @type t :: %__MODULE__{
     id: nil | String.t,
     name: nil | String.t,
     arity: non_neg_integer,
     defaults: non_neg_integer,
-    doc: list(),
-    source: nil | String.t,
+    doc: String.t(),
+    doc_line: non_neg_integer,
+    source_path: nil | String.t,
+    source_url: nil | String.t,
     type: nil | String.t,
     signature: nil | String.t,
     specs: list(),
@@ -45,8 +49,9 @@ defmodule ExDoc.TypeNode do
   Structure that holds all the elements of an individual *type*
   """
 
-  defstruct id: nil, name: nil, arity: 0, type: nil,
-    spec: nil, doc: nil, signature: nil, source: nil, annotations: []
+  defstruct id: nil, name: nil, arity: 0, type: nil, doc_line: nil,
+    source_path: nil, source_url: nil, spec: nil, doc: nil,
+    signature: nil, annotations: []
 
   @type t :: %__MODULE__{
     id: nil | String.t,
@@ -55,8 +60,10 @@ defmodule ExDoc.TypeNode do
     type: nil | String.t,
     spec: nil | String.t,
     doc: nil | String.t,
+    doc_line: non_neg_integer,
     signature: nil | String.t,
-    source: nil | String.t,
+    source_url: nil | String.t,
+    source_path: nil | String.t,
     annotations: list()
   }
 end
@@ -152,8 +159,8 @@ defmodule ExDoc.Retriever do
     impls = get_impls(module)
     abst_code = get_abstract_code(module)
 
-    moduledoc = get_moduledoc(module)
-    line = find_actual_line(abst_code, module, :module)
+    {doc_line, moduledoc} = Code.get_docs(module, :moduledoc)
+    line = find_actual_line(abst_code, module, :module) || doc_line
 
     docs = get_docs(type, module, source_path, source_url, specs, impls, abst_code) ++
            get_callbacks(type, module, source_path, source_url, abst_code)
@@ -168,19 +175,16 @@ defmodule ExDoc.Retriever do
       id: id,
       module: module,
       type: type,
-      moduledoc: moduledoc,
       docs: docs,
-      typespecs: get_types(source_path, source_url, module),
-      source: source_link(source_path, source_url, line)
+      doc: moduledoc,
+      doc_line: doc_line,
+      typespecs: get_types(abst_code, source_path, source_url, module),
+      source_path: source_path,
+      source_url: source_link(source_path, source_url, line)
     }
   end
 
   # Helpers
-
-  defp get_moduledoc(module) do
-    {_, moduledoc} = Code.get_docs(module, :moduledoc)
-    moduledoc
-  end
 
   defp get_abstract_code(module) do
     {^module, binary, _file} = :code.get_object_code(module)
@@ -242,10 +246,12 @@ defmodule ExDoc.Retriever do
       name: name,
       arity: arity,
       doc: doc,
+      doc_line: doc_line,
       defaults: get_defaults(signature, name, arity),
       signature: get_call_signature(name, signature),
       specs: specs,
-      source: source_link(source_path, source_url, line),
+      source_path: source_path,
+      source_url: source_link(source_path, source_url, line),
       type: type
     }
   end
@@ -269,9 +275,9 @@ defmodule ExDoc.Retriever do
   defp get_callbacks(_, _, _, _, _), do: []
 
   defp get_callback(callback, source_path, source_url, callbacks, optional_callbacks, abst_code) do
-    {{name, arity}, _, kind, doc} = callback
+    {{name, arity}, doc_line, kind, doc} = callback
     function = actual_def(name, arity, kind)
-    line = find_actual_line(abst_code, function, :callback)
+    line = find_actual_line(abst_code, function, :callback) || doc_line
 
     name_and_arity =
       case kind do
@@ -296,9 +302,11 @@ defmodule ExDoc.Retriever do
       name: name,
       arity: arity,
       doc: doc || nil,
+      doc_line: doc_line,
       signature: get_typespec_signature(hd(specs), arity),
       specs: specs,
-      source: source_link(source_path, source_url, line),
+      source_path: source_path,
+      source_url: source_link(source_path, source_url, line),
       type: kind,
       annotations: annotations,
     }
@@ -367,6 +375,15 @@ defmodule ExDoc.Retriever do
   end
   defp actual_def(name, arity, _), do: {name, arity}
 
+  defp find_actual_line(abst_code, {name, arity}, :type) do
+    abst_code
+    |> Enum.find(&match?({:attribute, _, type, {^name, _, args}}
+                            when type in [:type, :opaque] and length(args) == arity,
+                         &1))
+    |> elem(1)
+    |> anno_line()
+  end
+
   defp find_actual_line(abst_code, function, :callback) do
     abst_code
     |> Enum.find(&match?({:attribute, _, :callback, {^function, _}}, &1))
@@ -432,29 +449,29 @@ defmodule ExDoc.Retriever do
     |> Enum.concat()
   end
 
-  defp get_types(source_path, source_url, module) do
+  defp get_types(abst_code, source_path, source_url, module) do
     all  = Typespec.beam_types(module) || []
-    docs = try do
-      Enum.into(Code.get_docs(module, :type_docs) || [], %{},
-                fn {typedoc, line, _, doc} -> {typedoc, {line, doc}} end)
-    rescue
-      _ -> Enum.into(Typespec.beam_typedocs(module) || [], %{})
-    end
+    docs = Enum.into(Code.get_docs(module, :type_docs) || [], %{},
+                     fn {typedoc, line, _, doc} -> {typedoc, {line, doc}} end)
 
     types =
       for {type, {name, _, args} = tuple} <- all, type != :typep do
         spec  = process_type_ast(Typespec.type_to_ast(tuple), type)
         arity = length(args)
-        {line, doc} = docs[{name, arity}]
+        {doc_line, doc} = docs[{name, arity}]
+        line = find_actual_line(abst_code, {name, arity}, :type) || doc_line
+
         %ExDoc.TypeNode{
           id: "#{name}/#{arity}",
           name: name,
           arity: arity,
           type: type,
           spec: spec,
-          doc: doc,
+          doc: doc || nil,
+          doc_line: doc_line,
           signature: get_typespec_signature(spec, arity),
-          source: source_link(source_path, source_url, line)
+          source_path: source_path,
+          source_url: source_link(source_path, source_url, line)
         }
       end
 

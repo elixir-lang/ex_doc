@@ -38,10 +38,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
-  Convert markdown to HTML.
+  Converts markdown to HTML using the given node file+line.
   """
-  def to_html(nil), do: nil
-  def to_html(bin) when is_binary(bin), do: ExDoc.Markdown.to_html(bin)
+  def to_html(nil, %{source_path: _, doc_line: _}) do
+    nil
+  end
+  def to_html(doc, %{source_path: file, doc_line: line}) when is_binary(doc) do
+    ExDoc.Markdown.to_html(doc, file: file, line: line + 1)
+  end
 
   @doc """
   Get the pretty name of a function node

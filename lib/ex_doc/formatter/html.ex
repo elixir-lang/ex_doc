@@ -179,7 +179,7 @@ defmodule ExDoc.Formatter.HTML do
         |> File.read!()
         |> Autolink.project_doc(module_nodes)
 
-      html_content = ExDoc.Markdown.to_html(content)
+      html_content = ExDoc.Markdown.to_html(content, file: options.input, line: 1)
       title = options.title || extract_title(html_content) || input_to_title(options[:input])
 
       config = set_canonical_url(config, options.filename)

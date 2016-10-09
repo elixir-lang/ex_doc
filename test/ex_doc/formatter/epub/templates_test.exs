@@ -34,7 +34,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
   ## MODULES
 
   test "module_page generates only the module name when there's no more info" do
-    node = %ExDoc.ModuleNode{module: XPTOModule, moduledoc: nil, id: "XPTOModule"}
+    node = %ExDoc.ModuleNode{module: XPTOModule, doc: nil, id: "XPTOModule"}
     content = Templates.module_page(doc_config(), node)
 
     assert content =~ ~r{<title>XPTOModule [^<]*</title>}

@@ -4,10 +4,10 @@ defmodule ExDoc.Markdown do
 
   ExDoc supports the following Markdown parsers:
 
-  * [Hoedown][]
-  * [Earmark][]
-  * [Pandoc][]
-  * [Cmark][]
+    * [Hoedown][]
+    * [Earmark][]
+    * [Pandoc][]
+    * [Cmark][]
 
   If you don't specify a parser in `config/config.exs`, ExDoc will try to
   find one of the Markdown parsers from the list above in top-down fashion.
@@ -31,9 +31,8 @@ defmodule ExDoc.Markdown do
   @doc """
   Converts the given markdown document to HTML.
   """
-  def to_html(text) when is_binary(text) do
-    get_markdown_processor().to_html(text)
-    |> pretty_codeblocks()
+  def to_html(text, opts \\ []) when is_binary(text) do
+    get_markdown_processor().to_html(text, opts) |> pretty_codeblocks()
   end
 
   @doc """
@@ -53,7 +52,8 @@ defmodule ExDoc.Markdown do
 
   defp get_markdown_processor() do
     case Application.fetch_env(:ex_doc, @markdown_processor_key) do
-      {:ok, processor} -> processor
+      {:ok, processor} ->
+        processor
       :error ->
         processor = find_markdown_processor() || raise_no_markdown_processor()
         Application.put_env(:ex_doc, @markdown_processor_key, processor)

@@ -19,7 +19,7 @@ defmodule ExDoc.Markdown.Hoedown do
     * `:tables` - Enables Markdown Extra style tables, defaults to true
 
   """
-  def to_html(text, opts \\ []) do
+  def to_html(text, opts) do
     options =
       [autolink: Keyword.get(opts, :autolink, true),
        fenced_code: Keyword.get(opts, :fenced_code, true),

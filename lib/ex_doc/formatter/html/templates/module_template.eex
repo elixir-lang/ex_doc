@@ -7,16 +7,16 @@
         <%= if module.type != :module do %>
           <small><%= module.type %></small>
         <% end %>
-        <%= if module.source do %>
-          <a href="<%= module.source %>" title="View Source" class="view-source" rel="help">
+        <%= if module.source_url do %>
+          <a href="<%= module.source_url %>" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         <% end %>
       </h1>
 
-      <%= if module.moduledoc do %>
+      <%= if module.doc do %>
         <section id="moduledoc">
-          <%= module.moduledoc |> to_html() |> link_moduledoc_headings() %>
+          <%= module.doc |> to_html(module) |> link_moduledoc_headings() %>
         </section>
       <% end %>
 

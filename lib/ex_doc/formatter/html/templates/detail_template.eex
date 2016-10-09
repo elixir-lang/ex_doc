@@ -7,8 +7,8 @@
       <i class="icon-link"></i>
     </a>
     <span class="signature"><%=h node.signature %></span>
-    <%= if node.source do %>
-      <a href="<%= node.source %>" class="view-source" rel="help" title="View Source">
+    <%= if node.source_url do %>
+      <a href="<%= node.source_url %>" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     <% end %>
@@ -24,6 +24,6 @@
     <% end %>
   </div>
   <section class="docstring">
-    <%= node.doc |> to_html() |> link_detail_headings(enc_h(link_id(node))) %>
+    <%= node.doc |> to_html(node) |> link_detail_headings(enc_h(link_id(node))) %>
   </section>
 </div>

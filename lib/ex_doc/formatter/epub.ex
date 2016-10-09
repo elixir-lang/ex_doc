@@ -70,15 +70,15 @@ defmodule ExDoc.Formatter.EPUB do
         |> File.read!()
         |> HTML.Autolink.project_doc(module_nodes, nil, ".xhtml")
 
+      html_content = ExDoc.Markdown.to_html(content, file: input, line: 1)
+
       file_name =
         input
         |> Path.basename(".md")
         |> String.upcase()
 
       config = Map.put(config, :title, file_name)
-      extra_html =
-        config
-        |> Templates.extra_template(content)
+      extra_html = Templates.extra_template(config, html_content)
 
       File.write!("#{output}/OEBPS/#{file_name}.xhtml", extra_html)
     else

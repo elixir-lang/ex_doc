@@ -33,8 +33,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
              Enum.map(module.typespecs, &("t:" <> &1.id))
 
     moduledoc =
-      if module.moduledoc do
-        module.moduledoc
+      if module.doc do
+        module.doc
         |> local_doc(locals)
         |> project_doc(modules, module.id, extension, lib_dirs)
       end
@@ -59,7 +59,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       %{node | doc: doc}
     end
 
-    %{module | moduledoc: moduledoc, docs: docs, typespecs: typedocs}
+    %{module | doc: moduledoc, docs: docs, typespecs: typedocs}
   end
 
   defp all_typespecs(module, aliases, lib_dirs) do

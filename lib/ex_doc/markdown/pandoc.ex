@@ -17,7 +17,7 @@ defmodule ExDoc.Markdown.Pandoc do
     * `:header_level` - base header level, outputs to 1
 
   """
-  def to_html(text, opts \\ []) when is_binary(text) do
+  def to_html(text, opts) when is_binary(text) do
     text
     |> text_to_file()
     |> open_port(opts)

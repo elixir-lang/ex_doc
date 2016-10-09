@@ -6,9 +6,9 @@
       <% end%>
     </h1>
 
-    <%= if module.moduledoc do %>
+    <%= if module.doc do %>
       <section id="moduledoc" class="docstring">
-        <%= H.to_html(module.moduledoc) %>
+        <%= H.to_html(module.doc, module) %>
       </section>
     <% end %>
 
