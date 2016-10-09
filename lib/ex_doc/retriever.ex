@@ -126,6 +126,9 @@ defmodule ExDoc.Retriever do
     end
   end
 
+  # Special case required for Elixir
+  defp export_docs?(:elixir_bootstrap), do: false
+
   defp export_docs?(module) do
     if function_exported?(module, :__info__, 1) do
       case Code.get_docs(module, :moduledoc) do
