@@ -166,8 +166,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~s("modules":[])
       assert content =~ ~s("exceptions":[])
       assert content =~ ~s("protocols":[])
-      assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","headers":[]},)
-      assert content =~ ~s({"id":"extrapagewithsettextheader","title":"Extra Page Title","headers":[{"id":"Section One","anchor":"section-one"},{"id":"Section Two","anchor":"section-two"}]}])
+      assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","group":"","headers":[]},)
+      assert content =~ ~s({"id":"extrapagewithsettextheader","title":"Extra Page Title","group":"","headers":[{"id":"Section One","anchor":"section-one"},{"id":"Section Two","anchor":"section-two"}]}])
     after
       Application.put_env(:ex_doc, :markdown_processor, old_markdown_processor)
     end
