@@ -55,7 +55,7 @@ function fillSidebarWithNodes (nodes, filter) {
   function scope (items) {
     var filtered = nodes[items]
     var fullList = $('#full-list')
-    fullList.replaceWith(sidebarItemsTemplate(filtered))
+    fullList.replaceWith(sidebarItemsTemplate({'nodes': filtered, 'group': ''}))
   }
 
   const module_type = helpers.getModuleType()

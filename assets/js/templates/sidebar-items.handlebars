@@ -1,5 +1,8 @@
 <ul id="full-list">
-{{#each this as |node nodeId|}}
+{{#each nodes as |node nodeId|}}
+    {{#newGroup ../this node.group}}
+      <li class="group">{{node.group}}</li>
+    {{/newGroup}}
     <li class="{{#isLocal node.id}}clicked open{{/isLocal}}">
 
     {{!-- When visiting a module page, the link to this module page
