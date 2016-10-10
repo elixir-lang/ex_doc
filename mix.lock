@@ -6,5 +6,5 @@
   "hoedown": {:git, "https://github.com/hoedown/hoedown.git", "2a4cf17c70e6572ed42cdca3ea7ca3e768ed17be", []},
   "idna": {:hex, :idna, "1.0.2", "397e3d001c002319da75759b0a81156bf11849c71d565162436d50020cb7265e", [:make], []},
   "jsx": {:hex, :jsx, "2.6.2", "213721e058da0587a4bce3cc8a00ff6684ced229c8f9223245c6ff2c88fbaa5a", [:mix, :rebar], []},
-  "markdown": {:git, "https://github.com/devinus/markdown.git", "cd0df79b6f1cc374499d47f6ba6aaab5096f874f", []},
+  "markdown": {:git, "https://github.com/devinus/markdown.git", "38dc74c88d52fd7569ad4f63d32b344d35a7fcce", []},
   "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5", "2e73e068cd6393526f9fa6d399353d7c9477d6886ba005f323b592d389fb47be", [:make], []}}
