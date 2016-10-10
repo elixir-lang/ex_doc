@@ -74,7 +74,7 @@ defmodule Mix.Tasks.Docs do
     * `:extras` - List of keywords, each key must indicate the path to additional
       Markdown pages, the value for each keyword (optional) gives you more control
       about the PATH and the title of the output files; default: `[]`. Example:
-      `["README.md", "CONTRIBUTING.md": [path: "CONTRIBUTORS", title: "Join us!"]]`
+      `["README.md", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing", group: "Join us!"]]`
 
     * `:extra_section` - String that defines the section title of the additional
       Markdown pages; default: "PAGES". Example: "GUIDES"
