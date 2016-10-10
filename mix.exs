@@ -5,7 +5,6 @@ defmodule ExDoc.Mixfile do
     [app: :ex_doc,
      version: "0.14.2",
      elixir: "~> 1.2.3 or ~> 1.3",
-     elixirc_paths: elixirc_paths(Mix.env),
      deps: deps(),
      aliases: aliases(),
      package: package(),
@@ -26,9 +25,6 @@ defmodule ExDoc.Mixfile do
      {:cmark, "~> 0.5", only: :test},
      {:excoveralls, "~> 0.3", only: :test}]
   end
-
-  defp elixirc_paths(:test), do: ["lib", "test/fixtures"]
-  defp elixirc_paths(_),     do: ["lib"]
 
   defp aliases do
     [clean: [&clean_test_fixtures/1, "clean"]]

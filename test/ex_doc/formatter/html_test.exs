@@ -11,7 +11,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp beam_dir do
-    Application.app_dir(:ex_doc, "ebin")
+    Path.expand("../../tmp/beam", __DIR__)
   end
 
   defp doc_config do
@@ -139,16 +139,17 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~s("modules":[])
     assert content =~ ~s("exceptions":[])
     assert content =~ ~s("protocols":[])
-    assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","headers":[]},)
-    assert content =~ ~s({"id":"readme","title":"README","headers":[{"id":"Header sample","anchor":"header-sample"},)
+    assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","group":"","headers":[]},)
+    assert content =~ ~s({"id":"readme","title":"README","group":"","headers":[{"id":"Header sample","anchor":"header-sample"},)
   end
 
   test "run generates extras containing settext headers while discarding links on header" do
     generate_docs(doc_config(source_root: "unknown", source_beam: "unknown", extras: ["test/fixtures/ExtraPageWithSettextHeader.md"]))
 
     content = File.read!("#{output_dir()}/dist/sidebar_items.js")
-    assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","headers":[]},)
-    assert content =~ ~s({"id":"extrapagewithsettextheader","title":"Extra Page Title","headers":[{"id":"Section One","anchor":"section-one"},{"id":"Section Two","anchor":"section-two"}]}])
+    assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","group":"","headers":[]},)
+    assert content =~ ~s({"id":"extrapagewithsettextheader","title":"Extra Page Title","group":"",) <>
+                      ~s("headers":[{"id":"Section One","anchor":"section-one"},{"id":"Section Two","anchor":"section-two"}]}])
   end
 
   @tag pandoc: true
@@ -211,7 +212,13 @@ defmodule ExDoc.Formatter.HTMLTest do
     content = File.read!("#{output_dir()}/readme.html")
     assert content =~ ~r{<title>Getting Started – Elixir v1.0.1</title>}
     content = File.read!("#{output_dir()}/dist/sidebar_items.js")
-    assert content =~ ~r{"id":"readme","title":"Getting Started"}
+    assert content =~ ~r{"id":"readme","title":"Getting Started","group":""}
+   end
+
+  test "run generates pages with custom group" do
+    generate_docs(doc_config(extras: ["test/fixtures/README.md": [group: "Intro"]]))
+    content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+    assert content =~ ~r{"id":"readme","title":"README","group":"Intro"}
    end
 
   test "run generates with auto-extracted title" do

@@ -70,7 +70,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_build(extras, generated_files, output) do
-    extras = for {file, _, _} <- extras, do: "#{file}.html"
+    extras = for {file, _, _, _} <- extras, do: "#{file}.html"
     build_files = Enum.map(Enum.uniq(generated_files ++ extras), &[&1, "\n"])
 
     File.write!(output, build_files)
@@ -142,7 +142,7 @@ defmodule ExDoc.Formatter.HTML do
       if(Enum.empty?(exceptions), do: [], else: [{"Exceptions", "exceptions"}]) ++
       if(Enum.empty?(protocols),  do: [], else: [{"Protocols", "protocols"}])
 
-    [{"api-reference", "API Reference", api_reference_headers}|extras]
+    [{"api-reference", "API Reference", "", api_reference_headers}|extras]
   end
 
   defp generate_extra({input_file, options}, output, module_nodes, modules, exceptions, protocols, config) do
@@ -153,7 +153,8 @@ defmodule ExDoc.Formatter.HTML do
       title: options[:title],
       input: input_file,
       output: "#{output}/#{filename}.html",
-      filename: filename
+      filename: filename,
+      group: options[:group]
     }
 
     create_extra_files(module_nodes, modules, exceptions, protocols, config, options)
@@ -166,7 +167,8 @@ defmodule ExDoc.Formatter.HTML do
       title: nil,
       input: input,
       output: "#{output}/#{filename}.html",
-      filename: filename
+      filename: filename,
+      group: ""
     }
 
     create_extra_files(module_nodes, modules, exceptions, protocols, config, options)
@@ -187,11 +189,11 @@ defmodule ExDoc.Formatter.HTML do
                                       exceptions, protocols, html_content)
 
       if File.regular? options.output do
-        IO.puts "warning: file #{Path.basename options.output} already exists"
+        IO.puts "warning: file #{Path.relative_to_cwd options.output} already exists"
       end
 
       File.write!(options.output, html)
-      {options.filename, title, extract_headers(html_content)}
+      {options.filename, title, options.group, extract_headers(html_content)}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end

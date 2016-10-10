@@ -11,7 +11,7 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   defp beam_dir do
-    Application.app_dir(:ex_doc, "ebin")
+    Path.expand("../../tmp/beam", __DIR__)
   end
 
   defp doc_config do
