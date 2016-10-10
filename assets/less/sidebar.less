@@ -144,16 +144,6 @@
     -webkit-overflow-scrolling: touch;
     .flex(1);
 
-    ol {
-      display: none;
-      margin: 9px;
-      padding-left: 20px;
-
-      li:first-child {
-        list-style: none;
-      }
-    }
-
     ul {
       display: none;
       margin: 9px 15px;
@@ -162,7 +152,7 @@
       li {
         font-weight: 300;
         line-height: 18px;
-        padding: 0 10px;
+        padding: 2px 10px;
 
         a.expand:before {
           content: "+";
@@ -179,9 +169,11 @@
 
         ul {
           display: none;
+          margin: 9px 6px;
 
           li {
             border-left: 1px solid @mediumGray;
+            padding: 0px 10px;
 
             &.active:before {
               .icon-elem;
@@ -211,7 +203,7 @@
         color: @white;
       }
 
-      &.open > ul, &.open > ol {
+      &.open > ul {
         display: block;
       }
     }

@@ -11,22 +11,18 @@
 
     <a href="{{node.id}}.html" title="{{node.title}}" class="expand">{{node.title}}</a>
 
-    {{#isArray node.headers}}
-      <ol start="0">
-        <li>
-          <a href="{{node.id}}.html#content">Top</a>
-        </li>
+    <ul>
+      <li>
+        <a href="{{node.id}}.html#content">Top</a>
+      </li>
+
+      {{#isArray node.headers}}
         {{#each node.headers}}
           <li>
             <a href="{{node.id}}.html#{{{anchor}}}">{{id}}</a>
           </li>
         {{/each}}
-      </ol>
-    {{else}}
-      <ul>
-        <li>
-          <a href="{{node.id}}.html#content">Top</a>
-        </li>
+      {{else}}
         {{#showSummary node}}
         <li>
           <a href="{{node.id}}.html#summary">Summary</a>
@@ -80,8 +76,8 @@
             </ul>
           </li>
         {{/if}}
-      </ul>
-    {{/isArray}}
+      {{/isArray}}
+    </ul>
   </li>
 {{/each}}
 </ul>
