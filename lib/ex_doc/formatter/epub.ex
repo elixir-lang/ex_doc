@@ -20,8 +20,8 @@ defmodule ExDoc.Formatter.EPUB do
     File.rm_rf!(output)
     File.mkdir_p!(Path.join(output, "OEBPS"))
 
-    HTML.generate_logo("OEBPS/assets", config)
     HTML.generate_assets(output, assets(config))
+    HTML.generate_logo("OEBPS/assets", config)
     generate_mimetype(output)
     generate_extras(output, config, module_nodes)
 

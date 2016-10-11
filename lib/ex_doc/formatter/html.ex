@@ -23,11 +23,11 @@ defmodule ExDoc.Formatter.HTML do
     exceptions = filter_list(:exceptions, all)
     protocols  = filter_list(:protocols, all)
 
+    assets = generate_assets(output, assets(config))
     generate_api_reference(modules, exceptions, protocols, output, config)
     extras = generate_extras(output, module_nodes, modules, exceptions, protocols, config)
 
     generated_files =
-      generate_assets(output, assets(config)) ++
       generate_logo("assets", config) ++
       generate_index(output, config) ++
       generate_not_found(modules, exceptions, protocols, output, config) ++
@@ -36,7 +36,7 @@ defmodule ExDoc.Formatter.HTML do
       generate_list(exceptions, modules, exceptions, protocols, output, config) ++
       generate_list(protocols, modules, exceptions, protocols, output, config)
 
-    generate_build(extras, generated_files, build)
+    generate_build(extras, assets ++ generated_files, build)
     Path.join(config.output, "index.html")
   end
 
