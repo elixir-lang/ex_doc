@@ -10,6 +10,7 @@ defmodule ExDoc do
     You can find more details about this options in the `ExDoc.CLI` module.
     """
     defstruct [
+      assets: nil,
       canonical: nil,
       deps: [],
       extra_section: nil,

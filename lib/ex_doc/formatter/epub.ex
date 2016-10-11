@@ -3,6 +3,7 @@ defmodule ExDoc.Formatter.EPUB do
   Provide EPUB documentation
   """
 
+  @mimetype "application/epub+zip"
   alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.EPUB.Templates
 
@@ -11,20 +12,23 @@ defmodule ExDoc.Formatter.EPUB do
   """
   @spec run(list, ExDoc.Config.t) :: String.t
   def run(module_nodes, config) when is_map(config) do
-    output = Path.expand(config.output)
-    File.rm_rf!(output)
-    File.mkdir_p!("#{output}/OEBPS")
+    output =
+      config.output
+      |> Path.expand()
+      |> Path.join("#{config.project}-v#{config.version}")
 
-    assets() |> HTML.assets_path("epub") |> HTML.generate_assets(output)
+    File.rm_rf!(output)
+    File.mkdir_p!(Path.join(output, "OEBPS"))
+
+    HTML.generate_logo("OEBPS/assets", config)
+    HTML.generate_assets(output, assets(config))
+    generate_mimetype(output)
+    generate_extras(output, config, module_nodes)
 
     all = HTML.Autolink.all(module_nodes, ".xhtml", config.deps)
     modules = HTML.filter_list(:modules, all)
     exceptions = HTML.filter_list(:exceptions, all)
     protocols = HTML.filter_list(:protocols, all)
-
-    HTML.generate_logo("OEBPS/assets", config)
-    generate_mimetype(output)
-    generate_extras(output, config, module_nodes)
 
     uuid = "urn:uuid:#{uuid4()}"
     datetime = format_datetime()
@@ -38,15 +42,13 @@ defmodule ExDoc.Formatter.EPUB do
     generate_list(output, config, exceptions)
     generate_list(output, config, protocols)
 
-    {:ok, epub_file} = generate_epub(output, config)
-    delete_extras(output)
-
+    {:ok, epub_file} = generate_epub(output)
+    File.rm_rf!(output)
     epub_file
   end
 
   defp generate_mimetype(output) do
-    content = "application/epub+zip"
-    File.write("#{output}/mimetype", content)
+    File.write("#{output}/mimetype", @mimetype)
   end
 
   defp generate_extras(output, config, module_nodes) do
@@ -108,43 +110,33 @@ defmodule ExDoc.Formatter.EPUB do
     |> Enum.map(&Task.await(&1, :infinity))
   end
 
-  defp generate_epub(output, config) do
-    output = Path.expand(output)
-    target_path =
-      String.to_char_list("#{output}/#{config.project}-v#{config.version}.epub")
-
-    :zip.create(target_path,
+  defp generate_epub(output) do
+    :zip.create(String.to_char_list("#{output}.epub"),
                 files_to_add(output),
+                cwd: output,
                 compress: ['.css', '.xhtml', '.html', '.ncx',
                            '.opf', '.jpg', '.png', '.xml'])
   end
 
-  defp delete_extras(output) do
-    for target <- ["META-INF", "mimetype", "OEBPS"] do
-      File.rm_rf! "#{output}/#{target}"
-    end
-    :ok
+  ## Helpers
+
+  defp assets(%{assets: nil}), do: assets()
+  defp assets(%{assets: path}), do: [{path, "OEBPS/assets"} | assets()]
+
+  defp assets_path(pattern) do
+    Application.app_dir(:ex_doc, "priv/ex_doc/formatter/epub/templates/#{pattern}")
   end
 
-  ## Helpers
   defp assets do
-   [{"dist/*.{css,js}", "OEBPS/dist" },
-    {"assets/*.xml", "META-INF" },
-    {"assets/mimetype", "." }]
+   [{assets_path("dist"), "OEBPS/dist"},
+    {assets_path("assets"), "META-INF"}]
   end
 
   defp files_to_add(path) do
-    meta = Path.wildcard(Path.join(path, "META-INF/*"))
-    oebps = Path.wildcard(Path.join(path, "OEBPS/**/*"))
-
-    Enum.reduce meta ++ oebps ++ [Path.join(path, "mimetype")], [], fn(f, acc) ->
-      case File.read(f) do
-        {:ok, bin} ->
-          [{String.to_char_list(f), bin}|acc]
-        {:error, _} ->
-          acc
-      end
-    end
+    path
+    |> Path.join("**/*")
+    |> Path.wildcard()
+    |> Enum.map(& &1 |> Path.relative_to(path) |> String.to_char_list())
   end
 
   # Helper to format Erlang datetime tuple

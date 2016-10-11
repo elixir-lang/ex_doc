@@ -27,7 +27,7 @@ defmodule ExDoc.Formatter.HTML do
     extras = generate_extras(output, module_nodes, modules, exceptions, protocols, config)
 
     generated_files =
-      generate_assets(assets_path(assets()), output) ++
+      generate_assets(output, assets(config)) ++
       generate_logo("assets", config) ++
       generate_index(output, config) ++
       generate_not_found(modules, exceptions, protocols, output, config) ++
@@ -98,26 +98,33 @@ defmodule ExDoc.Formatter.HTML do
     [sidebar_items]
   end
 
-  defp assets do
-    [{"dist/*.{css,js}", "dist"},
-     {"fonts/*.{eot,svg,ttf,woff,woff2}", "fonts"}]
-  end
-
   @doc """
   Copy a list of assets into a given directory
   """
   @spec generate_assets(list, String.t) :: :ok
-  def generate_assets(source, output) do
-    Enum.flat_map source, fn {pattern, dir} ->
-      output = "#{output}/#{dir}"
-      File.mkdir output
+  def generate_assets(output, sources) do
+    Enum.flat_map sources, fn {from, to} ->
+      output = "#{output}/#{to}"
 
-      Enum.map Path.wildcard(pattern), fn(file) ->
-        base = Path.basename(file)
-        File.copy file, "#{output}/#{base}"
-        "#{dir}/#{base}"
+      Enum.map Path.wildcard(Path.join(from, "**/*")), fn source ->
+        target = Path.join(output, Path.relative_to(source, from))
+        File.mkdir(Path.dirname(target))
+        File.copy(source, target)
+        target
       end
     end
+  end
+
+  defp assets(%{assets: nil}), do: assets()
+  defp assets(%{assets: path}), do: [{path, "assets"} | assets()]
+
+  defp assets_path(pattern) do
+    Application.app_dir(:ex_doc, "priv/ex_doc/formatter/html/templates/#{pattern}")
+  end
+
+  defp assets do
+    [{assets_path("dist"), "dist"},
+     {assets_path("fonts"), "fonts"}]
   end
 
   defp generate_extras(output, module_nodes, modules, exceptions, protocols, config) do
@@ -292,12 +299,6 @@ defmodule ExDoc.Formatter.HTML do
     content = Templates.module_page(node, modules, exceptions, protocols, config)
     File.write!("#{output}/#{file_name}", content)
     file_name
-  end
-
-  def assets_path(patterns, formatter \\ "html") do
-    Enum.into(patterns, [], fn {pattern, dir} ->
-      {Application.app_dir(:ex_doc, "priv/ex_doc/formatter/#{formatter}/templates/#{pattern}"), dir}
-    end)
   end
 
   defp set_canonical_url(config, file_name) do

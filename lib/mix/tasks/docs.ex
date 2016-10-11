@@ -11,10 +11,10 @@ defmodule Mix.Tasks.Docs do
 
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
-    * `--canonical`, `-a` - Indicate the preferred URL with
-      rel="canonical" link element, default: nil
     * `--formatter`, `-f` - Which formatter to use, "html" or
       "epub", default: "html"
+    * `--canonical`, `-n` - Indicate the preferred URL with
+      rel="canonical" link element, defaults to no canonical path
 
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
@@ -65,11 +65,16 @@ defmodule Mix.Tasks.Docs do
       "https://github.com/USER/APP/blob/master/%{path}#L%{line}"
 
     * `:main` - Main page of the documentation. It may be a module or a
-      generated page, like "Plug" or "api-reference";
-      default: "api-reference" when --formatter is "html".
+      generated page, like "Plug" or "api-reference"; default: "api-reference".
+
+    * `:assets` - Path to a directory that will be copied as is to the "assets"
+      directory in the output path. Its entries may be referenced in your docs
+      under "assets/ASSET.EXTENSION"; defaults to no assets directory.
 
     * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
-      The image size will be 64x64 when --formatter is "html".
+      The image size will be 64x64. When specified, the logo will be placed under
+      the "assets" directory in the output path under the name "logo" and the
+      appropriate extension.
 
     * `:extras` - List of keywords, each key must indicate the path to additional
       Markdown pages, the value for each keyword (optional) gives you more control
@@ -84,7 +89,7 @@ defmodule Mix.Tasks.Docs do
       HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
 
     * `:canonical` - String that defines the preferred URL with the rel="canonical"
-      element; default: nil
+      element; defaults to no canonical path.
   """
 
   @doc false
@@ -92,8 +97,8 @@ defmodule Mix.Tasks.Docs do
     Mix.Task.run "compile"
 
     {cli_opts, args, _} = OptionParser.parse(args,
-                            aliases: [o: :output, a: :canonical, f: :formatter],
-                            switches: [output: :string, canonical: :string])
+                            aliases: [o: :output, n: :canonical, f: :formatter],
+                            switches: [output: :string, canonical: :string, formatter: :string])
 
     if args != [] do
       Mix.raise "Extraneous arguments on the command line"

@@ -1,5 +1,5 @@
 defmodule ExDoc.Formatter.EPUBTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   setup do
     File.rm_rf(output_dir())
@@ -7,7 +7,7 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   defp output_dir do
-    Path.expand("../../tmp/doc", __DIR__)
+    Path.expand("../../tmp/epub", __DIR__)
   end
 
   defp beam_dir do
@@ -18,7 +18,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     [project: "Elixir",
      version: "1.0.1",
      formatter: "epub",
-     output: "test/tmp/doc",
+     output: output_dir(),
      source_root: beam_dir(),
      source_beam: beam_dir(),
      extras: ["test/fixtures/README.md"]]
@@ -38,6 +38,26 @@ defmodule ExDoc.Formatter.EPUBTest do
     "#{doc_config()[:output]}/#{doc_config()[:project]}-v#{doc_config()[:version]}.epub"
     |> String.to_char_list
     |> :zip.unzip([cwd: unzip_dir])
+  end
+
+  test "check headers for module pages" do
+    generate_docs_and_unzip doc_config([main: "RandomError"])
+
+    content = File.read!("#{output_dir()}/OEBPS/RandomError.xhtml")
+    assert content =~ ~r{<html.*xmlns:epub="http://www.idpf.org/2007/ops">}ms
+    assert content =~ ~r{<meta charset="utf-8" />}ms
+    assert content =~ ~r{<meta name="generator" content="ExDoc v[^"]+" />}
+    assert content =~ ~r{<title>RandomError - Elixir v1.0.1</title>}
+  end
+
+  test "run generates assets with logo" do
+    File.mkdir_p!("test/tmp/epub_assets/hello")
+    File.touch!("test/tmp/epub_assets/hello/world")
+    generate_docs_and_unzip(doc_config(assets: "test/tmp/epub_assets", logo: "test/fixtures/elixir.png"))
+    assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world")
+    assert File.regular?("#{output_dir()}/OEBPS/assets/logo.png")
+  after
+    File.rm_rf!("test/tmp/epub_assets")
   end
 
   test "run generates an EPUB file in the default directory" do
@@ -63,8 +83,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{root_dir}/mimetype")
     assert File.regular?("#{meta_dir}/container.xml")
     assert File.regular?("#{meta_dir}/com.apple.ibooks.display-options.xml")
-    assert "#{dist_dir}/epub*.css" |> Path.wildcard() |> List.first() |> File.regular?()
-    assert "#{dist_dir}/app*.js" |> Path.wildcard() |> List.first() |> File.regular?()
     assert File.regular?("#{oebps_dir}/content.opf")
     assert File.regular?("#{oebps_dir}/toc.ncx")
     assert File.regular?("#{oebps_dir}/nav.xhtml")
@@ -72,17 +90,8 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{oebps_dir}/README.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.Nested.xhtml")
-  end
-
-  test "check headers for module pages" do
-    generate_docs_and_unzip doc_config([main: "RandomError", ])
-
-    content = File.read!("#{output_dir()}/OEBPS/RandomError.xhtml")
-
-    assert content =~ ~r{<html.*xmlns:epub="http://www.idpf.org/2007/ops">}ms
-    assert content =~ ~r{<meta charset="utf-8" />}ms
-    assert content =~ ~r{<meta name="generator" content="ExDoc v[^"]+" />}
-    assert content =~ ~r{<title>RandomError - Elixir v1.0.1</title>}
+    assert "#{dist_dir}/epub*.css" |> Path.wildcard() |> List.first() |> File.regular?()
+    assert "#{dist_dir}/app*.js" |> Path.wildcard() |> List.first() |> File.regular?()
   end
 
   test "run generates all listing files" do
@@ -105,7 +114,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     generate_docs_and_unzip(config)
 
     content = File.read!("#{output_dir()}/OEBPS/README.xhtml")
-
     assert content =~ ~r{<title>README [^<]*</title>}
     assert content =~ ~r{<a href="RandomError.xhtml"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.xhtml#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
@@ -120,7 +128,6 @@ defmodule ExDoc.Formatter.EPUBTest do
 
   test "run should not generate the readme file" do
     generate_docs_and_unzip(doc_config([extras: []]))
-
     refute File.regular?("#{output_dir()}/OEBPS/README.xhtml")
 
     content = File.read!("#{output_dir()}/OEBPS/content.opf")

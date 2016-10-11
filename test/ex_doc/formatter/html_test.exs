@@ -1,5 +1,5 @@
 defmodule ExDoc.Formatter.HTMLTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   setup do
     File.rm_rf(output_dir())
@@ -7,7 +7,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp output_dir do
-    Path.expand("../../tmp/doc", __DIR__)
+    Path.expand("../../tmp/html", __DIR__)
   end
 
   defp beam_dir do
@@ -18,6 +18,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     [project: "Elixir",
      version: "1.0.1",
      formatter: "html",
+     assets: "test/tmp/html_assets",
      output: output_dir(),
      source_root: beam_dir(),
      source_beam: beam_dir(),
@@ -47,12 +48,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs doc_config(formatter: "ExDoc.Formatter.HTML")
 
     assert File.regular?("#{output_dir()}/CompiledWithDocs.html")
-  end
-
-  test "generates assets" do
-    output = doc_config()[:output]
-    ExDoc.Formatter.HTML.generate_assets([{"test/fixtures/elixir.png", "images"}], output)
-    assert File.regular?("#{output}/images/elixir.png")
   end
 
   test "check headers for index.html and module pages" do
@@ -251,10 +246,20 @@ defmodule ExDoc.Formatter.HTMLTest do
                  fn -> generate_docs(config) end
   end
 
+  test "run generates assets" do
+    File.mkdir_p!("test/tmp/html_assets/hello")
+    File.touch!("test/tmp/html_assets/hello/world")
+    generate_docs(doc_config(assets: "test/tmp/html_assets", logo: "test/fixtures/elixir.png"))
+    assert File.regular?("#{output_dir()}/assets/logo.png")
+    assert File.regular?("#{output_dir()}/assets/hello/world")
+  after
+    File.rm_rf!("test/tmp/html_assets")
+  end
+
   test "run generates logo overriding previous entries" do
     File.mkdir_p!("#{output_dir()}/assets")
     File.touch!("#{output_dir()}/assets/logo.png")
-    generate_docs(doc_config())
+    generate_docs(doc_config(logo: "test/fixtures/elixir.png"))
     assert File.read!("#{output_dir()}/assets/logo.png") != ""
   end
 
@@ -283,7 +288,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates .build file content" do
-    config = doc_config(extras: ["test/fixtures/README.md"])
+    config = doc_config(extras: ["test/fixtures/README.md"], logo: "test/fixtures/elixir.png")
     generate_docs(config)
     content = File.read!("#{output_dir()}/.build")
     assert content =~ ~r{readme.html\n}

@@ -21,14 +21,14 @@ defmodule ExDocTest do
     options = [formatter: IdentityFormatter, retriever: IdentityRetriever,
                source_root: "root_dir", source_beam: "beam_dir",]
 
-    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/docs"])
-    assert config.output == "test/tmp/docs"
+    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/ex_doc"])
+    assert config.output == "test/tmp/ex_doc"
 
-    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/docs/"])
-    assert config.output == "test/tmp/docs"
+    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/ex_doc/"])
+    assert config.output == "test/tmp/ex_doc"
 
-    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/docs//"])
-    assert config.output == "test/tmp/docs"
+    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/ex_doc//"])
+    assert config.output == "test/tmp/ex_doc"
   end
 
   test "source_beam sets source dir" do
@@ -42,7 +42,7 @@ defmodule ExDocTest do
     project = "Elixir"
     version = "1"
     options = [formatter: "pdf", retriever: IdentityRetriever,
-               source_root: "root_dir", source_beam: "beam_dir",]
+               source_root: "root_dir", source_beam: "beam_dir"]
 
     assert_raise RuntimeError,
                  "Formatter module not found for: pdf",
