@@ -22,13 +22,7 @@ defmodule ExDoc.Formatter.EPUB do
     exceptions = HTML.filter_list(:exceptions, all)
     protocols = HTML.filter_list(:protocols, all)
 
-    config =
-      if config.logo do
-        HTML.process_logo_metadata(config, "#{config.output}/OEBPS/assets")
-      else
-        config
-      end
-
+    HTML.generate_logo("OEBPS/assets", config)
     generate_mimetype(output)
     generate_extras(output, config, module_nodes)
 

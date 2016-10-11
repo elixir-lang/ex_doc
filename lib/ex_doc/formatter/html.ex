@@ -16,27 +16,19 @@ defmodule ExDoc.Formatter.HTML do
     config = normalize_config(config)
     output = Path.expand(config.output)
     build = Path.join(output, ".build")
-
     output_setup(build, output)
-
-    assets = assets() |> assets_path() |> generate_assets(output)
 
     all = Autolink.all(module_nodes, ".html", config.deps)
     modules    = filter_list(:modules, all)
     exceptions = filter_list(:exceptions, all)
     protocols  = filter_list(:protocols, all)
 
-    config =
-      if config.logo do
-        process_logo_metadata(config, "#{config.output}/assets")
-      else
-        config
-      end
-
     generate_api_reference(modules, exceptions, protocols, output, config)
     extras = generate_extras(output, module_nodes, modules, exceptions, protocols, config)
 
     generated_files =
+      generate_assets(assets_path(assets()), output) ++
+      generate_logo("assets", config) ++
       generate_index(output, config) ++
       generate_not_found(modules, exceptions, protocols, output, config) ++
       generate_sidebar_items(modules, exceptions, protocols, extras, output) ++
@@ -44,8 +36,7 @@ defmodule ExDoc.Formatter.HTML do
       generate_list(exceptions, modules, exceptions, protocols, output, config) ++
       generate_list(protocols, modules, exceptions, protocols, output, config)
 
-    generate_build(extras, generated_files ++ assets, build)
-
+    generate_build(extras, generated_files, build)
     Path.join(config.output, "index.html")
   end
 
@@ -245,17 +236,26 @@ defmodule ExDoc.Formatter.HTML do
     title |> String.replace(" ", "-") |> String.downcase()
   end
 
-  def process_logo_metadata(config, output) do
-    File.mkdir_p! output
-    file_extname =
-      config.logo
+  @doc """
+  Generates the logo from config into the given directory
+  and adjusts the logo config key.
+  """
+  def generate_logo(_output, %{logo: nil}) do
+    []
+  end
+  def generate_logo(output, %{output: base, logo: logo}) do
+    output = Path.join(base, output)
+    File.mkdir_p!(output)
+
+    extname =
+      logo
       |> Path.extname()
       |> String.downcase()
 
-    if file_extname in ~w(.png .jpg) do
-      file_name = "#{output}/logo#{file_extname}"
-      File.copy!(config.logo, file_name)
-      Map.put(config, :logo, Path.basename(file_name))
+    if extname in ~w(.png .jpg) do
+      filename = "#{output}/logo#{extname}"
+      File.copy!(logo, filename)
+      [filename]
     else
       raise ArgumentError, "image format not recognized, allowed formats are: .jpg, .png"
     end

@@ -49,14 +49,10 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/CompiledWithDocs.html")
   end
 
-  test "run generates in default directory and redirect index.html file" do
-    generate_docs(doc_config())
-
-    assert File.regular?("#{output_dir()}/CompiledWithDocs.html")
-    assert File.regular?("#{output_dir()}/CompiledWithDocs.Nested.html")
-
-    content = File.read!("#{output_dir()}/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
+  test "generates assets" do
+    output = doc_config()[:output]
+    ExDoc.Formatter.HTML.generate_assets([{"test/fixtures/elixir.png", "images"}], output)
+    assert File.regular?("#{output}/images/elixir.png")
   end
 
   test "check headers for index.html and module pages" do
@@ -101,6 +97,16 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute content_module =~ re[:index][:title]
     refute content_module =~ re[:index][:index]
     refute content_module =~ re[:index][:refresh]
+  end
+
+  test "run generates in default directory and redirect index.html file" do
+    generate_docs(doc_config())
+
+    assert File.regular?("#{output_dir()}/CompiledWithDocs.html")
+    assert File.regular?("#{output_dir()}/CompiledWithDocs.Nested.html")
+
+    content = File.read!("#{output_dir()}/index.html")
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
   end
 
   test "run generates in specified output directory and redirect index.html file" do
@@ -245,6 +251,13 @@ defmodule ExDoc.Formatter.HTMLTest do
                  fn -> generate_docs(config) end
   end
 
+  test "run generates logo overriding previous entries" do
+    File.mkdir_p!("#{output_dir()}/assets")
+    File.touch!("#{output_dir()}/assets/logo.png")
+    generate_docs(doc_config())
+    assert File.read!("#{output_dir()}/assets/logo.png") != ""
+  end
+
   test "run fails when logo is not an allowed format" do
     config = doc_config(logo: "README.md")
     assert_raise ArgumentError,
@@ -269,12 +282,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute content =~ ~r{<link rel="canonical" href="}
   end
 
-  test "run generates assets" do
-    output = doc_config()[:output]
-    ExDoc.Formatter.HTML.generate_assets([{"test/fixtures/elixir.png", "images"}], output)
-    assert File.regular?("#{output}/images/elixir.png")
-  end
-
   test "run generates .build file content" do
     config = doc_config(extras: ["test/fixtures/README.md"])
     generate_docs(config)
@@ -282,6 +289,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{readme.html\n}
     assert content =~ ~r{api-reference.html\n}
     assert content =~ ~r{dist/sidebar_items.js\n}
+    assert content =~ ~r{assets/logo.png\n}
     assert content =~ ~r{index.html\n}
     assert content =~ ~r{404.html\n}
   end
