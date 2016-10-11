@@ -10,6 +10,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   test "autolink fun/arity in docs" do
     assert Autolink.local_doc("`example/2`", ["example/2"]) == "[`example/2`](#example/2)"
+    assert Autolink.local_doc("`__ENV__/0`", ["__ENV__/0"]) == "[`__ENV__/0`](#__ENV__/0)"
     assert Autolink.local_doc("`example/2` then `example/2`",
       ["example/2"]) == "[`example/2`](#example/2) then [`example/2`](#example/2)"
     assert Autolink.local_doc("`  spaces/0  `", ["spaces/0"]) ==
@@ -57,6 +58,8 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   test "autolink functions Module.fun/arity in docs" do
     assert Autolink.elixir_functions("`Mod.example/2`", ["Mod.example/2"]) ==
       "[`Mod.example/2`](Mod.html#example/2)"
+    assert Autolink.elixir_functions("`Mod.__ENV__/2`", ["Mod.__ENV__/2"]) ==
+      "[`Mod.__ENV__/2`](Mod.html#__ENV__/2)"
     assert Autolink.elixir_functions("`MyModule.example/2`", ["MyModule.example/2"]) ==
       "[`MyModule.example/2`](MyModule.html#example/2)"
     assert Autolink.elixir_functions("`MyModule.Nested.example/2`", ["MyModule.Nested.example/2"]) ==
