@@ -29,8 +29,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp all_docs(module, modules, extension, lib_dirs) do
-    locals = Enum.map(module.docs, &(doc_prefix(&1) <> &1.id)) ++
-             Enum.map(module.typespecs, &("t:" <> &1.id))
+    locals =
+      for doc <- module.docs,
+          prefix = doc_prefix(doc),
+          entry <- [doc.id | doc.defaults],
+          do: prefix <> entry,
+          into: Enum.map(module.typespecs, &("t:" <> &1.id))
 
     moduledoc =
       if module.doc do
@@ -195,9 +199,18 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def project_doc(bin, modules, module_id \\ nil,
                   extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) when is_binary(bin) do
-    project_funs  = for m <- modules, d <- m.docs, do: doc_prefix(d) <> m.id <> "." <> d.id
-    project_types = for m <- modules, d <- m.typespecs, do: "t:" <> m.id <> "." <> d.id
-    project_funs  = project_funs ++ project_types
+    project_types =
+      for module <- modules,
+          type <- module.typespecs,
+          do: "t:" <> module.id <> "." <> type.id
+
+    project_docs =
+      for module <- modules,
+          doc <- module.docs,
+          prefix = doc_prefix(doc),
+          entry <- [doc.id | doc.defaults],
+          do: prefix <>  module.id <> "." <> entry,
+          into: project_types
 
     project_modules =
       modules
@@ -205,7 +218,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       |> Enum.uniq()
 
     bin
-    |> elixir_functions(project_funs, extension, lib_dirs)
+    |> elixir_functions(project_docs, extension, lib_dirs)
     |> elixir_modules(project_modules, module_id, extension, lib_dirs)
     |> erlang_functions(lib_dirs)
   end
