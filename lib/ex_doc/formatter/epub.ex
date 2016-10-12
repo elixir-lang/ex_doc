@@ -20,6 +20,7 @@ defmodule ExDoc.Formatter.EPUB do
     File.rm_rf!(output)
     File.mkdir_p!(Path.join(output, "OEBPS"))
 
+    config = normalize_config(config)
     HTML.generate_assets(output, assets(config))
     HTML.generate_logo("OEBPS/assets", config)
     generate_extras(output, config, module_nodes)
@@ -46,6 +47,36 @@ defmodule ExDoc.Formatter.EPUB do
     epub_file
   end
 
+  defp normalize_config(config) do
+    extras = Enum.into(config.extras, [], &normalize_extra(&1))
+    Map.put(config, :extras, extras)
+  end
+
+  defp normalize_extra({input_file, options}) do
+    input_file = to_string(input_file)
+    filename = options[:filename] || input_file |> HTML.input_to_title() |> HTML.title_to_filename()
+
+    %{
+      title: options[:title],
+      input: input_file,
+      output: "OEBPS/#{filename}.xhtml",
+      filename: filename,
+      group: options[:group]
+    }
+  end
+
+  defp normalize_extra(input) do
+    filename = input |> HTML.input_to_title() |> HTML.title_to_filename()
+
+    %{
+      title: HTML.input_to_title(input),
+      input: input,
+      output: "OEBPS/#{filename}.xhtml",
+      filename: filename,
+      group: ""
+    }
+  end
+
   defp generate_extras(output, config, module_nodes) do
     config.extras
     |> Enum.map(&Task.async(fn ->
@@ -54,24 +85,25 @@ defmodule ExDoc.Formatter.EPUB do
     |> Enum.map(&Task.await(&1, :infinity))
   end
 
-  defp create_extra_files(input, output, config, module_nodes) do
-    if HTML.valid_extension_name?(input) do
+  defp create_extra_files(options, output, config, module_nodes) do
+    if HTML.valid_extension_name?(options.input) do
       content =
-        input
+        options.input
         |> File.read!()
         |> HTML.Autolink.project_doc(module_nodes, nil, ".xhtml")
 
-      html_content = ExDoc.Markdown.to_html(content, file: input, line: 1)
+      html_content = ExDoc.Markdown.to_html(content, file: options.input, line: 1)
+      title = options.title || HTML.extract_title(html_content) || HTML.input_to_title(options[:input])
 
-      file_name =
-        input
-        |> Path.basename(".md")
-        |> String.upcase()
+      config = Map.put(config, :title, title)
+      html = Templates.extra_template(config, html_content)
+      output = "#{output}/#{options.output}"
 
-      config = Map.put(config, :title, file_name)
-      extra_html = Templates.extra_template(config, html_content)
+      if File.regular? output do
+        IO.puts "warning: file #{Path.relative_to_cwd output} already exists"
+      end
 
-      File.write!("#{output}/OEBPS/#{file_name}.xhtml", extra_html)
+      File.write!(output, html)
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
@@ -116,14 +148,13 @@ defmodule ExDoc.Formatter.EPUB do
 
   defp assets(%{assets: nil}), do: assets()
   defp assets(%{assets: path}), do: [{path, "OEBPS/assets"} | assets()]
-
-  defp assets_path(pattern) do
-    Application.app_dir(:ex_doc, "priv/ex_doc/formatter/epub/templates/#{pattern}")
-  end
-
   defp assets do
    [{assets_path("dist"), "OEBPS/dist"},
     {assets_path("assets"), "META-INF"}]
+  end
+
+  defp assets_path(pattern) do
+    Application.app_dir(:ex_doc, "priv/ex_doc/formatter/epub/templates/#{pattern}")
   end
 
   defp files_to_add(path) do

@@ -13,7 +13,7 @@
     <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav scripted"/>
     <item id="cover" href="title.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
     <%= for extra <- config.extras do %>
-      <item id="<%= extra_title(extra) %>" href="<%= extra_title(extra) %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+      <item id="<%= extra.filename %>" href="<%= extra.filename %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
     <% end %>
     <%= for node <- nodes do %>
       <item id="<%= node.id %>" href="<%= node.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
@@ -33,7 +33,7 @@
     <itemref idref="cover" linear="no"/>
     <itemref idref="nav"/>
     <%= for extra <- config.extras do %>
-      <itemref idref="<%= extra_title(extra) %>"/>
+      <itemref idref="<%= extra.filename %>"/>
     <% end %>
     <%= for node <- nodes do %>
       <itemref idref="<%= node.id %>"/>
