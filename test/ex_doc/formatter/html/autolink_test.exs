@@ -51,6 +51,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.local_doc("`../2`", ["../2"]) === "[`../2`](#../2)"
     assert Autolink.local_doc("`--/2`", ["--/2"]) === "[`--/2`](#--/2)"
     assert Autolink.local_doc("`<<>>/1`", ["<<>>/1"]) === "[`<<>>/1`](#%3C%3C%3E%3E/1)"
+    assert Autolink.local_doc("`{}/1`", ["{}/1"]) === "[`{}/1`](#%7B%7D/1)"
   end
 
   # elixir_functions

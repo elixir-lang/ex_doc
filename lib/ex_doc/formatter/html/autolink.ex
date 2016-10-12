@@ -182,7 +182,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def local_doc(bin, locals) when is_binary(bin) do
-    fun_re = ~r{(([ct]:)?([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)} |> Regex.source
+    fun_re = ~r{(([ct]:)?([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)} |> Regex.source
     regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
     Regex.replace(regex, bin, fn all, match ->
       if match in locals do
@@ -239,7 +239,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def elixir_functions(bin, project_funs, extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) when is_binary(bin) do
     module_re = ~r{(([A-Z][A-Za-z_\d]+)\.)+} |> Regex.source
-    fun_re = ~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)} |> Regex.source
+    fun_re = ~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)} |> Regex.source
     regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
 
     Regex.replace(regex, bin, fn all, match ->

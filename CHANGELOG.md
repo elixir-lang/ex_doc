@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.14.3
+
+  * Enhancements
+    * Support the `:assets` option that automatically copies all entries in the given directory to `doc/assets`
+    * Remove numbering on Extras subheaders from sidebar
+    * Pass file and line information to markdown formatters for better warnings
+    * Allow extra pages to be grouped together under a given heading
+    * Generate ids for default name/arity pairs so they can be linked (both remotely and locally)
+
+  * Bug fixes
+    * Fix autolink for functions containing `%`, `{`, `}` or uppercase characters in the name
+
 ## v0.14.2
 
   * Enhancements
