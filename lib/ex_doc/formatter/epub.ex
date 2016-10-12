@@ -22,7 +22,6 @@ defmodule ExDoc.Formatter.EPUB do
 
     HTML.generate_assets(output, assets(config))
     HTML.generate_logo("OEBPS/assets", config)
-    generate_mimetype(output)
     generate_extras(output, config, module_nodes)
 
     all = HTML.Autolink.all(module_nodes, ".xhtml", config.deps)
@@ -45,10 +44,6 @@ defmodule ExDoc.Formatter.EPUB do
     {:ok, epub_file} = generate_epub(output)
     File.rm_rf!(output)
     epub_file
-  end
-
-  defp generate_mimetype(output) do
-    File.write("#{output}/mimetype", @mimetype)
   end
 
   defp generate_extras(output, config, module_nodes) do
@@ -112,8 +107,7 @@ defmodule ExDoc.Formatter.EPUB do
 
   defp generate_epub(output) do
     :zip.create(String.to_char_list("#{output}.epub"),
-                files_to_add(output),
-                cwd: output,
+                [{'mimetype', @mimetype} | files_to_add(output)],
                 compress: ['.css', '.xhtml', '.html', '.ncx',
                            '.opf', '.jpg', '.png', '.xml'])
   end
@@ -133,10 +127,14 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp files_to_add(path) do
-    path
-    |> Path.join("**/*")
-    |> Path.wildcard()
-    |> Enum.map(& &1 |> Path.relative_to(path) |> String.to_char_list())
+    Enum.reduce Path.wildcard(Path.join(path, "**/*")), [], fn file, acc ->
+      case File.read(file) do
+        {:ok, bin} ->
+          [{file |> Path.relative_to(path) |> String.to_char_list(), bin} | acc]
+        {:error, _} ->
+          acc
+      end
+    end
   end
 
   # Helper to format Erlang datetime tuple
