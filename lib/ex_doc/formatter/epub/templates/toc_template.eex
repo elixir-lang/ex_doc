@@ -20,11 +20,11 @@
       <content src="title.xhtml"/>
     </navPoint>
     <%= for {extra, index} <- config.extras |> Enum.with_index do %>
-      <navPoint id="<%= extra_title(extra) %>" playOrder="<%= index + 2 %>">
+      <navPoint id="<%= extra.filename %>" playOrder="<%= index + 2 %>">
         <navLabel>
-        <text><%= extra_title(extra) %></text>
+        <text><%= extra.title %></text>
         </navLabel>
-        <content src="<%= extra_title(extra) %>.xhtml"/>
+        <content src="<%= extra.filename %>.xhtml"/>
       </navPoint>
     <% end %>
     <% start_value = Enum.count(config.extras) + 2 %>

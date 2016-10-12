@@ -218,11 +218,14 @@ defmodule ExDoc.Formatter.HTML do
 
   @h1_regex ~r/<h1.*?>(.+)<\/h1>/m
 
-  defp extract_title(content) do
+  @doc """
+  Extract title from h1 header in the content
+  """
+  def extract_title(content) do
     title = Regex.run(@h1_regex, content, capture: :all_but_first)
 
     if title do
-      title |> List.first |> strip_html |> String.strip
+      title |> List.first() |> strip_html() |> String.strip()
     end
   end
 
@@ -235,11 +238,17 @@ defmodule ExDoc.Formatter.HTML do
     |> Enum.map(&{&1, Templates.header_to_id(&1)})
   end
 
-  defp input_to_title(input) do
+  @doc """
+  Convert the input file name into a title
+  """
+  def input_to_title(input) do
     input |> Path.basename() |> Path.rootname()
   end
 
-  defp title_to_filename(title) do
+  @doc """
+  Convert a title into a file name
+  """
+  def title_to_filename(title) do
     title |> String.replace(" ", "-") |> String.downcase()
   end
 

@@ -123,7 +123,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~ ~r{<text>README</text>}
 
     content = File.read!("#{output_dir()}/OEBPS/nav.xhtml")
-    assert content =~ ~r{<li><a href="README.xhtml">README</a></li>}
+    assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
   end
 
   test "run should not generate the readme file" do

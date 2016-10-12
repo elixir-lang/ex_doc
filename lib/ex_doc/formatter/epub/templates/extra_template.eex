@@ -1,5 +1,5 @@
-<%= head_template(config, %{title: extra_title(config.title)}) %>
-  <h1><%= extra_title(config.title) %></h1>
+<%= head_template(config, %{title: config.title}) %>
+  <h1><%= config.title %></h1>
     <%= content %>
   </body>
 </html>
