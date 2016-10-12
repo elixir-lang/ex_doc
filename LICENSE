@@ -101,13 +101,13 @@ https://github.com/webpack/webpack
 
 ==========================================================================
 
-loadsh
+lodash
 https://lodash.com/
 Copyright 2012, The Dojo Foundation
 http://dojofoundation.org/
 
   Available under MIT license
-  https://lodash.com/license
+  https://github.com/lodash/lodash/blob/master/LICENSE
 
 Based on Underscore.js
 Copyright 2009, Jeremy Ashkenas, DocumentCloud and
