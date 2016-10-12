@@ -87,7 +87,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{oebps_dir}/toc.ncx")
     assert File.regular?("#{oebps_dir}/nav.xhtml")
     assert File.regular?("#{oebps_dir}/title.xhtml")
-    assert File.regular?("#{oebps_dir}/README.xhtml")
+    assert File.regular?("#{oebps_dir}/readme.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.Nested.xhtml")
     assert "#{dist_dir}/epub*.css" |> Path.wildcard() |> List.first() |> File.regular?()
@@ -113,7 +113,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     config = doc_config([main: "README", ])
     generate_docs_and_unzip(config)
 
-    content = File.read!("#{output_dir()}/OEBPS/README.xhtml")
+    content = File.read!("#{output_dir()}/OEBPS/readme.xhtml")
     assert content =~ ~r{<title>README [^<]*</title>}
     assert content =~ ~r{<a href="RandomError.xhtml"><code>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.xhtml#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
@@ -128,7 +128,7 @@ defmodule ExDoc.Formatter.EPUBTest do
 
   test "run should not generate the readme file" do
     generate_docs_and_unzip(doc_config([extras: []]))
-    refute File.regular?("#{output_dir()}/OEBPS/README.xhtml")
+    refute File.regular?("#{output_dir()}/OEBPS/readme.xhtml")
 
     content = File.read!("#{output_dir()}/OEBPS/content.opf")
     refute content =~ ~r{<title>README [^<]*</title>}
