@@ -47,17 +47,17 @@ https://highlightjs.org/
 ==========================================================================
 
 jQuery JavaScript Library
-Copyright 2011, John Resig
+Copyright jQuery Foundation and other contributors
 http://jquery.org
 
-  Dual licensed under the MIT or GPL Version 2 licenses.
-  http://jquery.org/license
+  Released under the MIT license.
+  https://github.com/jquery/jquery/blob/master/LICENSE.txt
 
 
 Includes Sizzle.js
-Copyright 2011, The Dojo Foundation
+Copyright jQuery Foundation and other contributors
 
-  Released under the MIT, BSD, and GPL Licenses.
+  Released under the MIT license.
   https://github.com/jquery/sizzle/blob/master/LICENSE.txt
 
 ==========================================================================
