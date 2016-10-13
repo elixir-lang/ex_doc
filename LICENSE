@@ -71,15 +71,6 @@ https://necolas.github.io/normalize.css/
 
 ==========================================================================
 
-Font Awesome
-By Dave Gandy
-http://fontawesome.io
-
-  Released under SIL OFL 1.1 License
-  http://scripts.sil.org/OFL
-
-==========================================================================
-
 Tomorrow theme for highlight.js
 By Yoshihide Jimbo
 http://jmblog.github.io/color-themes-for-highlightjs/tomorrow/
@@ -114,5 +105,14 @@ Copyright 2009, Jeremy Ashkenas, DocumentCloud and
 Investigative Reporters & Editors
  
   http://underscorejs.org/LICENSE
+
+==========================================================================
+
+IcoMoon
+https://icomoon.io/
+
+  Released under the GPL version 3 and the Creative Commons Attribution 4.0 licenses.
+  https://www.gnu.org/licenses/gpl.html
+  https://creativecommons.org/licenses/by/4.0/
 
 ==========================================================================
