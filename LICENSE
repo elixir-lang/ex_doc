@@ -47,17 +47,17 @@ https://highlightjs.org/
 ==========================================================================
 
 jQuery JavaScript Library
-Copyright 2011, John Resig
+Copyright jQuery Foundation and other contributors
 http://jquery.org
 
-  Dual licensed under the MIT or GPL Version 2 licenses.
-  http://jquery.org/license
+  Released under the MIT license.
+  https://github.com/jquery/jquery/blob/master/LICENSE.txt
 
 
 Includes Sizzle.js
-Copyright 2011, The Dojo Foundation
+Copyright jQuery Foundation and other contributors
 
-  Released under the MIT, BSD, and GPL Licenses.
+  Released under the MIT license.
   https://github.com/jquery/sizzle/blob/master/LICENSE.txt
 
 ==========================================================================
@@ -68,15 +68,6 @@ https://necolas.github.io/normalize.css/
 
   Released under the MIT License.
   https://github.com/necolas/normalize.css/blob/master/LICENSE.md
-
-==========================================================================
-
-Font Awesome
-By Dave Gandy
-http://fontawesome.io
-
-  Released under SIL OFL 1.1 License
-  http://scripts.sil.org/OFL
 
 ==========================================================================
 
@@ -114,5 +105,14 @@ Copyright 2009, Jeremy Ashkenas, DocumentCloud and
 Investigative Reporters & Editors
  
   http://underscorejs.org/LICENSE
+
+==========================================================================
+
+IcoMoon
+https://icomoon.io/
+
+  Released under the GPL version 3 and the Creative Commons Attribution 4.0 licenses.
+  https://www.gnu.org/licenses/gpl.html
+  https://creativecommons.org/licenses/by/4.0/
 
 ==========================================================================
