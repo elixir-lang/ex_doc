@@ -66,6 +66,8 @@ function toggleSidebar () {
 // Public Methods
 // --------------
 
+export {breakpoint, closeSidebar}
+
 export function initialize () {
   $('.sidebar-toggle').click(function () {
     toggleSidebar()
