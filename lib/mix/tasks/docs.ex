@@ -2,7 +2,6 @@ defmodule Mix.Tasks.Docs do
   use Mix.Task
 
   @shortdoc "Generate documentation for the project"
-  @recursive true
 
   @moduledoc """
   Uses ExDoc to generate a static web page from the project documentation.
@@ -110,7 +109,7 @@ defmodule Mix.Tasks.Docs do
       get_docs_opts(config)
       |> Keyword.merge(cli_opts)
       |> normalize_source_url(config)
-      |> normalize_source_beam()
+      |> normalize_source_beam(config)
       |> normalize_main()
       |> normalize_deps()
 
@@ -141,8 +140,31 @@ defmodule Mix.Tasks.Docs do
     end
   end
 
-  defp normalize_source_beam(options) do
-    Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
+  defp normalize_source_beam(options, config) do
+    compile_path =
+      if Mix.Project.umbrella?(config) do
+        umbrella_compile_paths()
+      else
+        Mix.Project.compile_path
+      end
+
+    Keyword.put_new(options, :source_beam, compile_path)
+  end
+
+  defp umbrella_compile_paths do
+    Enum.map(umbrella_apps(), fn dep ->
+      dest = Keyword.fetch!(dep.opts, :dest)
+      Mix.Project.in_project(dep.app, dest, fn module ->
+        module.project
+        |> Keyword.put_new(:build_per_environment, true)
+        |> Mix.Project.compile_path()
+      end)
+    end)
+  end
+
+  defp umbrella_apps do
+    Mix.Dep.loaded([])
+    |> Enum.filter(&Keyword.get(&1.opts, :from_umbrella))
   end
 
   defp normalize_main(options) do
