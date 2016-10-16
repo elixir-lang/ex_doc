@@ -152,7 +152,7 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp umbrella_compile_paths do
-    Enum.map(umbrella_apps(), fn dep ->
+    Enum.map(Mix.Dep.Umbrella.unloaded(), fn dep ->
       dest = Keyword.fetch!(dep.opts, :dest)
       Mix.Project.in_project(dep.app, dest, fn module ->
         module.project
@@ -160,11 +160,6 @@ defmodule Mix.Tasks.Docs do
         |> Mix.Project.compile_path()
       end)
     end)
-  end
-
-  defp umbrella_apps do
-    Mix.Dep.loaded([])
-    |> Enum.filter(&Keyword.get(&1.opts, :from_umbrella))
   end
 
   defp normalize_main(options) do
