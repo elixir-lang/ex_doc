@@ -89,6 +89,16 @@ defmodule Mix.Tasks.Docs do
 
     * `:canonical` - String that defines the preferred URL with the rel="canonical"
       element; defaults to no canonical path.
+
+  ## Umbrella project
+
+  ExDoc can be used in an umbrella project and generates a single documentation for all child apps.
+
+  Generating documentation per each child app can be achieved by running:
+
+      mix cmd mix docs
+
+  See `mix help cmd` for more information.
   """
 
   @doc false
@@ -152,14 +162,11 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp umbrella_compile_paths do
-    Enum.map(Mix.Dep.Umbrella.unloaded(), fn dep ->
-      dest = Keyword.fetch!(dep.opts, :dest)
-      Mix.Project.in_project(dep.app, dest, fn module ->
-        module.project
-        |> Keyword.put_new(:build_per_environment, true)
-        |> Mix.Project.compile_path()
-      end)
-    end)
+    # TODO: Use Mix.Project.apps_path when we require Elixir v1.4+
+    build = Mix.Project.build_path()
+    for %{app: app} <- Mix.Dep.Umbrella.unloaded do
+      Path.join([build, "lib", Atom.to_string(app), "ebin"])
+    end
   end
 
   defp normalize_main(options) do
