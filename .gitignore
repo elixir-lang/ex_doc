@@ -6,3 +6,4 @@
 *.ez
 erl_crash.dump
 /npm-debug.log
+/test/fixtures/umbrella/_build

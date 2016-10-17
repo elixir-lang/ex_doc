@@ -84,12 +84,15 @@ defmodule ExDoc.Retriever do
   alias Kernel.Typespec
 
   @doc """
-  Extract documentation from all modules in the specified directory
+  Extract documentation from all modules in the specified directory or directories.
   """
-  @spec docs_from_dir(Path.t, ExDoc.Config.t) :: [ExDoc.ModuleNode.t]
+  @spec docs_from_dir(Path.t | [Path.t], ExDoc.Config.t) :: [ExDoc.ModuleNode.t]
   def docs_from_dir(dir, config) when is_binary(dir) do
     files = Path.wildcard Path.expand("*.beam", dir)
     docs_from_files(files, config)
+  end
+  def docs_from_dir(dirs, config) when is_list(dirs) do
+    Enum.flat_map(dirs, &docs_from_dir(&1, config))
   end
 
   @doc """

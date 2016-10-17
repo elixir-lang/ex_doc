@@ -62,4 +62,16 @@ defmodule Mix.Tasks.DocsTest do
     assert {"ex_doc", "dev", [deps: _, source_beam: _, source_url: "http://github.com/elixir-lang/ex_doc"]} =
            run([], [app: :ex_doc, source_url: "http://github.com/elixir-lang/ex_doc"])
   end
+
+  test "supports umbrella project" do
+    Mix.Project.in_project(:umbrella, "test/fixtures/umbrella", fn _mod ->
+      assert {"umbrella", "dev", [deps: deps, source_beam: _]} =
+             run([], [app: :umbrella, apps_path: "apps/"])
+
+      assert List.keyfind(deps, Application.app_dir(:foo), 0) ==
+             {Application.app_dir(:foo), "https://hexdocs.pm/foo/0.1.0/"}
+      assert List.keyfind(deps, Application.app_dir(:bar), 0) ==
+             {Application.app_dir(:bar), "https://hexdocs.pm/bar/0.1.0/"}
+    end)
+  end
 end

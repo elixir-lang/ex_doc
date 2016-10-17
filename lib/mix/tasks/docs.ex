@@ -2,7 +2,6 @@ defmodule Mix.Tasks.Docs do
   use Mix.Task
 
   @shortdoc "Generate documentation for the project"
-  @recursive true
 
   @moduledoc """
   Uses ExDoc to generate a static web page from the project documentation.
@@ -90,6 +89,16 @@ defmodule Mix.Tasks.Docs do
 
     * `:canonical` - String that defines the preferred URL with the rel="canonical"
       element; defaults to no canonical path.
+
+  ## Umbrella project
+
+  ExDoc can be used in an umbrella project and generates a single documentation for all child apps.
+
+  Generating documentation per each child app can be achieved by running:
+
+      mix cmd mix docs
+
+  See `mix help cmd` for more information.
   """
 
   @doc false
@@ -110,7 +119,7 @@ defmodule Mix.Tasks.Docs do
       get_docs_opts(config)
       |> Keyword.merge(cli_opts)
       |> normalize_source_url(config)
-      |> normalize_source_beam()
+      |> normalize_source_beam(config)
       |> normalize_main()
       |> normalize_deps()
 
@@ -141,8 +150,23 @@ defmodule Mix.Tasks.Docs do
     end
   end
 
-  defp normalize_source_beam(options) do
-    Keyword.put_new(options, :source_beam, Mix.Project.compile_path)
+  defp normalize_source_beam(options, config) do
+    compile_path =
+      if Mix.Project.umbrella?(config) do
+        umbrella_compile_paths()
+      else
+        Mix.Project.compile_path
+      end
+
+    Keyword.put_new(options, :source_beam, compile_path)
+  end
+
+  defp umbrella_compile_paths do
+    # TODO: Use Mix.Project.apps_path when we require Elixir v1.4+
+    build = Mix.Project.build_path()
+    for %{app: app} <- Mix.Dep.Umbrella.unloaded do
+      Path.join([build, "lib", Atom.to_string(app), "ebin"])
+    end
   end
 
   defp normalize_main(options) do
