@@ -90,9 +90,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   def typespec({:when, _, [{:::, _, [left, {:|, _, _} = center]}, right]} = ast, typespecs, aliases, lib_dirs) do
     if short_typespec?(ast) do
-      typespec_to_string(ast, typespecs, aliases, lib_dirs)
+      normalize_left(ast, typespecs, aliases, lib_dirs)
     else
-      typespec_to_string(left, typespecs, aliases, lib_dirs) <>
+      normalize_left(left, typespecs, aliases, lib_dirs) <>
       " ::\n  " <> typespec_with_new_line(center, typespecs, aliases, lib_dirs) <>
       " when " <> String.slice(typespec_to_string(right, typespecs, aliases, lib_dirs), 1..-2)
     end
@@ -100,15 +100,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   def typespec({:::, _, [left, {:|, _, _} = center]} = ast, typespecs, aliases, lib_dirs) do
     if short_typespec?(ast) do
-      typespec_to_string(ast, typespecs, aliases, lib_dirs)
+      normalize_left(ast, typespecs, aliases, lib_dirs)
     else
-      typespec_to_string(left, typespecs, aliases, lib_dirs) <>
+      normalize_left(left, typespecs, aliases, lib_dirs) <>
       " ::\n  " <> typespec_with_new_line(center, typespecs, aliases, lib_dirs)
     end
   end
 
   def typespec(other, typespecs, aliases, lib_dirs) do
-    typespec_to_string(other, typespecs, aliases, lib_dirs)
+    normalize_left(other, typespecs, aliases, lib_dirs)
   end
 
   defp typespec_with_new_line({:|, _, [left, right]}, typespecs, aliases, lib_dirs) do
@@ -120,6 +120,22 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     typespec_to_string(other, typespecs, aliases, lib_dirs)
   end
 
+  defp normalize_left({:::, _, [{name, _, args}, right]}, typespecs, aliases, lib_dirs) do
+    placeholder = {:::, [], [{:_, [], args}, right]}
+    "_" <> rest = typespec_to_string(placeholder, typespecs, aliases, lib_dirs)
+    Atom.to_string(name) <> rest
+  end
+
+  defp normalize_left({:when, _, [{:::, _, [{name, _, args}, center]}, right]}, typespecs, aliases, lib_dirs) do
+    placeholder = {:when, [], [{:::, [], [{:_, [], args}, center]}, right]}
+    "_" <> rest = typespec_to_string(placeholder, typespecs, aliases, lib_dirs)
+    Atom.to_string(name) <> rest
+  end
+
+  defp normalize_left(ast, typespecs, aliases, lib_dirs) do
+    typespec_to_string(ast, typespecs, aliases, lib_dirs)
+  end
+
   defp typespec_to_string(ast, typespecs, aliases, lib_dirs) do
     Macro.to_string(ast, fn
       {name, _, args}, string when is_atom(name) and is_list(args) ->
@@ -129,7 +145,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           n = enc_h("#{name}")
           ~s[<a href="#t:#{n}/#{arity}">#{h(string)}</a>]
         else
-         string
+          string
         end
       {{ :., _, [alias, name] }, _, args}, string when is_atom(name) and is_list(args) ->
         string = strip_parens(string, args)
