@@ -121,9 +121,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp normalize_left({:::, _, [{name, meta, args}, right]}, typespecs, aliases, lib_dirs) do
-    new_args = Enum.map(args, &[self(), typespec_to_string(&1, typespecs, aliases, lib_dirs)])
-    new_left = Macro.to_string {name, meta, new_args}, fn [pid, string], _ when pid == self() -> string; _, string -> string end
-    strip_parens(new_left, args) <> " :: " <> typespec_to_string(right, typespecs, aliases, lib_dirs)
+    new_args =
+      Enum.map(args, &[self(), typespec_to_string(&1, typespecs, aliases, lib_dirs)])
+    new_left =
+      Macro.to_string {name, meta, new_args}, fn
+        [pid, string], _ when pid == self() -> string
+        _, string -> string
+      end
+    new_left <> " :: " <> typespec_to_string(right, typespecs, aliases, lib_dirs)
   end
 
   defp normalize_left({:when, _, [{:::, _, _} = left, right]}, typespecs, aliases, lib_dirs) do
@@ -171,7 +176,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       string
     end
   end
-
   defp strip_parens(string, _), do: string
 
   defp expand_alias({:__aliases__, _, [h|t]}) when is_atom(h), do: Module.concat([h|t])

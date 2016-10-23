@@ -66,7 +66,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>, ] <>
       ~S[<a href="#t:opaque/0">opaque</a>, :ok | :error}]
 
-    ref_html = ~S[ref :: {:binary.part, <a href="#t:public/1">public(any)</a>}]
+    ref_html = ~S[ref() :: {:binary.part, <a href="#t:public/1">public(any)</a>}]
 
     assert content =~ ~s[<a href="#t:public/1">public(t)</a>]
     refute content =~ ~s[<a href="#t:private/0">private</a>]
