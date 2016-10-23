@@ -120,16 +120,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     typespec_to_string(other, typespecs, aliases, lib_dirs)
   end
 
-  defp normalize_left({:::, _, [{name, _, args}, right]}, typespecs, aliases, lib_dirs) do
-    placeholder = {:::, [], [{:_, [], args}, right]}
-    "_" <> rest = typespec_to_string(placeholder, typespecs, aliases, lib_dirs)
-    Atom.to_string(name) <> rest
+  defp normalize_left({:::, _, [{name, meta, args}, right]}, typespecs, aliases, lib_dirs) do
+    new_args = Enum.map(args, &[self(), typespec_to_string(&1, typespecs, aliases, lib_dirs)])
+    new_left = Macro.to_string {name, meta, new_args}, fn [pid, string], _ when pid == self() -> string; _, string -> string end
+    strip_parens(new_left, args) <> " :: " <> typespec_to_string(right, typespecs, aliases, lib_dirs)
   end
 
-  defp normalize_left({:when, _, [{:::, _, [{name, _, args}, center]}, right]}, typespecs, aliases, lib_dirs) do
-    placeholder = {:when, [], [{:::, [], [{:_, [], args}, center]}, right]}
-    "_" <> rest = typespec_to_string(placeholder, typespecs, aliases, lib_dirs)
-    Atom.to_string(name) <> rest
+  defp normalize_left({:when, _, [{:::, _, _} = left, right]}, typespecs, aliases, lib_dirs) do
+    normalize_left(left, typespecs, aliases, lib_dirs) <>
+    " when " <> String.slice(typespec_to_string(right, typespecs, aliases, lib_dirs), 1..-2)
   end
 
   defp normalize_left(ast, typespecs, aliases, lib_dirs) do

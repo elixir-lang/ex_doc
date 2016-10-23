@@ -180,6 +180,14 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   # typespec
 
+  test "operators" do
+    assert Autolink.typespec(quote(do: +number :: number), [], [], []) ==
+           ~s[+number :: number]
+
+    assert Autolink.typespec(quote(do: number + number :: number), [], [], []) ==
+           ~s[number + number :: number]
+  end
+
   test "strip parens in typespecs" do
     assert Autolink.typespec(quote(do: foo({}, bar())), [], []) == ~s[foo({}, bar)]
   end
