@@ -180,6 +180,14 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   # typespec
 
+  test "operators" do
+    assert Autolink.typespec(quote(do: +number :: number), [], [], []) ==
+           ~s[+number :: number]
+
+    assert Autolink.typespec(quote(do: number + number :: number), [], [], []) ==
+           ~s[number + number :: number]
+  end
+
   test "strip parens in typespecs" do
     assert Autolink.typespec(quote(do: foo({}, bar())), [], []) == ~s[foo({}, bar)]
   end
@@ -191,8 +199,31 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.typespec(quote(do: bar(foo(1))), [foo: 1], []) ==
            ~s[bar(<a href="#t:foo/1">foo(1)</a>)]
 
+    assert Autolink.typespec(quote(do: (bar(foo(1)) when bat: foo(1))), [foo: 1], []) ==
+           ~s[bar(<a href="#t:foo/1">foo(1)</a>) when bat: <a href=\"#t:foo/1\">foo(1)</a>]
+
     assert Autolink.typespec(quote(do: bar(foo(1))), [], []) ==
            ~s[bar(foo(1))]
+  end
+
+  test "autolink same type and function name" do
+    assert Autolink.typespec(quote(do: foo() :: foo()), [foo: 0], [], []) ==
+           ~s[foo :: <a href="#t:foo/0">foo</a>]
+
+    assert Autolink.typespec(quote(do: foo(1) :: foo(1)), [foo: 1], [], []) ==
+           ~s[foo(1) :: <a href="#t:foo/1">foo(1)</a>]
+
+    assert Autolink.typespec(quote(do: (foo(1) :: foo(1) when bat: foo(1))), [foo: 1], [], []) ==
+           ~s[foo(1) :: <a href=\"#t:foo/1\">foo(1)</a> when bat: <a href=\"#t:foo/1\">foo(1)</a>]
+
+    assert Autolink.typespec(quote(do: bar(foo(1)) :: foo(1)), [foo: 1], [], []) ==
+           ~s[bar(<a href=\"#t:foo/1\">foo(1)</a>) :: <a href=\"#t:foo/1\">foo(1)</a>]
+
+    assert Autolink.typespec(quote(do: (bar(foo(1)) :: foo(1) when bat: foo(1))), [foo: 1], [], []) ==
+           ~s[bar(<a href=\"#t:foo/1\">foo(1)</a>) :: <a href=\"#t:foo/1\">foo(1)</a> when bat: <a href=\"#t:foo/1\">foo(1)</a>]
+
+    assert Autolink.typespec(quote(do: bar(foo :: foo(1)) :: foo(1)), [foo: 1], [], []) ==
+           ~s[bar(foo :: <a href=\"#t:foo/1\">foo(1)</a>) :: <a href=\"#t:foo/1\">foo(1)</a>]
   end
 
   test "add new lines on |" do

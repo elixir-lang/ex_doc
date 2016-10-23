@@ -145,13 +145,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     mb = "http://elixir-lang.org/docs/stable"
 
     public_html =
-      ~S[<a href="#t:public/1">public(t)</a> :: {t, ] <>
+      ~S[public(t) :: {t, ] <>
       ~s[<a href="#{mb}/elixir/String.html#t:t/0">String.t</a>, ] <>
       ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>, ] <>
       ~S[<a href="#t:opaque/0">opaque</a>, :ok | :error}]
 
-    ref_html = ~S[<a href="#t:ref/0">ref</a> :: ] <>
-               ~S[{:binary.part, <a href="#t:public/1">public(any)</a>}]
+    ref_html = ~S[ref :: {:binary.part, <a href="#t:public/1">public(any)</a>}]
 
     assert content =~ ~s[<a href="#t:public/1">public(t)</a>]
     refute content =~ ~s[<a href="#t:private/0">private</a>]
