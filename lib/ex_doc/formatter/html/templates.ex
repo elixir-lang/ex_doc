@@ -71,6 +71,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
       :macrocallback -> "c:#{id}"
       :callback      -> "c:#{id}"
       :type          -> "t:#{id}"
+      :opaque        -> "t:#{id}"
       _              -> "#{id}"
     end
   end
