@@ -10,6 +10,16 @@ h6 {
 a {
   color: @nightTextHeaders;
   text-decoration: none;
-  text-shadow: none;
-  background-image: none;
+  .linkUnderlines(@nightBackground, @nightTextHeaders);
 }
+
+a.view-source {
+  background: none;
+  text-shadow: none;
+}
+
+.summary h2 a {
+  background: none;
+  text-shadow: none;
+}
+
