@@ -12,7 +12,7 @@ defmodule ExDoc.CLI do
                aliases: [o: :output, f: :formatter, c: :config, r: :source_root,
                          u: :source_url, m: :main, p: :homepage_url, l: :logo,
                          e: :extra, v: :version, n: :canonical, s: :extra_section,
-                         a: :assets],
+                         a: :assets, i: :filter_prefix],
                switches: [extra: :keep])
 
     cond do
@@ -104,6 +104,8 @@ defmodule ExDoc.CLI do
       -c, --config        Give configuration through a file instead of command line
       -o, --output        Path to output docs, default: "doc"
       -f, --formatter     Docs formatter to use (html or epub), default: "html"
+      -i, --filter-prefix Include only modules that match the given prefix in
+                          the generated documentation.
       -r, --source-root   Path to the source code root, default: "."
       -u, --source-url    URL to the source code
           --source-ref    Branch/commit/tag used for source link inference, default: "master"

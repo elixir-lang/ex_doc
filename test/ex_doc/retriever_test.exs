@@ -11,6 +11,17 @@ defmodule ExDoc.RetrieverTest do
 
   ## MODULES
 
+  test "docs_from_dir with filter prefix match docs_from_files" do
+    config = %ExDoc.Config{filter_prefix: "CompiledWithDocs", source_root: File.cwd!}
+    from_dir_nodes = Retriever.docs_from_dir("test/tmp/beam", config)
+    file_nodes =
+      ["Elixir.CompiledWithDocs.beam", "Elixir.CompiledWithDocs.Nested.beam"]
+      |> Enum.map(&Path.join("test/tmp/beam", &1))
+      |> Retriever.docs_from_files(config)
+
+    assert from_dir_nodes == file_nodes
+  end
+
   test "docs_from_files and docs_from_modules match" do
     config = %ExDoc.Config{source_url_pattern: "http://example.com/%{path}#L%{line}", source_root: File.cwd!}
     file_nodes = Retriever.docs_from_files(["test/tmp/Elixir.UndefParent.Undocumented.beam"], config)

@@ -90,6 +90,9 @@ defmodule Mix.Tasks.Docs do
     * `:canonical` - String that defines the preferred URL with the rel="canonical"
       element; defaults to no canonical path.
 
+    * `:filter_prefix` - Include only modules that match the given prefix in
+      the generated documentation. Example: "MyApp.Core"
+
   ## Umbrella project
 
   ExDoc can be used in an umbrella project and generates a single documentation for all child apps.
