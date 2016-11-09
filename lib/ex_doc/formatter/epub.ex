@@ -12,18 +12,14 @@ defmodule ExDoc.Formatter.EPUB do
   """
   @spec run(list, ExDoc.Config.t) :: String.t
   def run(module_nodes, config) when is_map(config) do
-    output =
-      config.output
-      |> Path.expand()
-      |> Path.join("#{config.project}-v#{config.version}")
-
-    File.rm_rf!(output)
-    File.mkdir_p!(Path.join(output, "OEBPS"))
-
     config = normalize_config(config)
-    HTML.generate_assets(output, assets(config))
+
+    File.rm_rf!(config.output)
+    File.mkdir_p!(Path.join(config.output, "OEBPS"))
+
+    HTML.generate_assets(config.output, assets(config))
     HTML.generate_logo("OEBPS/assets", config)
-    generate_extras(output, config, module_nodes)
+    generate_extras(config, module_nodes)
 
     all = HTML.Autolink.all(module_nodes, ".xhtml", config.deps)
     modules = HTML.filter_list(:modules, all)
@@ -34,20 +30,25 @@ defmodule ExDoc.Formatter.EPUB do
     datetime = format_datetime()
     nodes = modules ++ exceptions ++ protocols
 
-    generate_content(output, config, nodes, uuid, datetime)
-    generate_toc(output, config, nodes, uuid)
-    generate_nav(output, config, nodes)
-    generate_title(output, config)
-    generate_list(output, config, modules)
-    generate_list(output, config, exceptions)
-    generate_list(output, config, protocols)
+    generate_content(config, nodes, uuid, datetime)
+    generate_toc(config, nodes, uuid)
+    generate_nav(config, nodes)
+    generate_title(config)
+    generate_list(config, modules)
+    generate_list(config, exceptions)
+    generate_list(config, protocols)
 
-    {:ok, epub_file} = generate_epub(output)
-    File.rm_rf!(output)
+    {:ok, epub_file} = generate_epub(config.output)
+    File.rm_rf!(config.output)
     epub_file
   end
 
   defp normalize_config(config) do
+    output =
+      config.output
+      |> Path.expand()
+      |> Path.join("#{config.project}-v#{config.version}")
+    config = %{config | output: output}
     extras = Enum.into(config.extras, [], &normalize_extra(&1))
     Map.put(config, :extras, extras)
   end
@@ -77,10 +78,10 @@ defmodule ExDoc.Formatter.EPUB do
     }
   end
 
-  defp generate_extras(output, config, module_nodes) do
+  defp generate_extras(config, module_nodes) do
     config.extras
     |> Enum.map(&Task.async(fn ->
-         create_extra_files(&1, output, config, module_nodes)
+         create_extra_files(&1, config.output, config, module_nodes)
        end))
     |> Enum.map(&Task.await(&1, :infinity))
   end
@@ -109,30 +110,30 @@ defmodule ExDoc.Formatter.EPUB do
     end
   end
 
-  defp generate_content(output, config, nodes, uuid, datetime) do
+  defp generate_content(config, nodes, uuid, datetime) do
     content = Templates.content_template(config, nodes, uuid, datetime)
-    File.write("#{output}/OEBPS/content.opf", content)
+    File.write("#{config.output}/OEBPS/content.opf", content)
   end
 
-  defp generate_toc(output, config, nodes, uuid) do
+  defp generate_toc(config, nodes, uuid) do
     content = Templates.toc_template(config, nodes, uuid)
-    File.write("#{output}/OEBPS/toc.ncx", content)
+    File.write("#{config.output}/OEBPS/toc.ncx", content)
   end
 
-  defp generate_nav(output, config, nodes) do
+  defp generate_nav(config, nodes) do
     content = Templates.nav_template(config, nodes)
-    File.write("#{output}/OEBPS/nav.xhtml", content)
+    File.write("#{config.output}/OEBPS/nav.xhtml", content)
   end
 
-  defp generate_title(output, config) do
+  defp generate_title(config) do
     content = Templates.title_template(config)
-    File.write("#{output}/OEBPS/title.xhtml", content)
+    File.write("#{config.output}/OEBPS/title.xhtml", content)
   end
 
-  defp generate_list(output, config, nodes) do
+  defp generate_list(config, nodes) do
     nodes
     |> Enum.map(&Task.async(fn ->
-         generate_module_page(output, config, &1)
+         generate_module_page(config.output, config, &1)
        end))
     |> Enum.map(&Task.await(&1, :infinity))
   end
@@ -140,7 +141,7 @@ defmodule ExDoc.Formatter.EPUB do
   defp generate_epub(output) do
     :zip.create(String.to_char_list("#{output}.epub"),
                 [{'mimetype', @mimetype} | files_to_add(output)],
-                compress: ['.css', '.xhtml', '.html', '.ncx',
+                compress: ['.css', '.xhtml', '.html', '.ncx', '.js',
                            '.opf', '.jpg', '.png', '.xml'])
   end
 
