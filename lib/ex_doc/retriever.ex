@@ -88,7 +88,8 @@ defmodule ExDoc.Retriever do
   """
   @spec docs_from_dir(Path.t | [Path.t], ExDoc.Config.t) :: [ExDoc.ModuleNode.t]
   def docs_from_dir(dir, config) when is_binary(dir) do
-    files = Path.wildcard Path.expand("*.beam", dir)
+    pattern = if config.filter_prefix, do: "Elixir.#{config.filter_prefix}*.beam", else: "*.beam"
+    files = Path.wildcard Path.expand(pattern, dir)
     docs_from_files(files, config)
   end
   def docs_from_dir(dirs, config) when is_list(dirs) do
