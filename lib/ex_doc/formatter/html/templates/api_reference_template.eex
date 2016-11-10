@@ -9,7 +9,7 @@
     <section id="modules" class="details-list">
       <h1 class="section-heading">Modules</h1>
       <div class="summary">
-        <%= for node <- modules, do: api_reference_entry_template(node) %>
+        <%= for module_node <- modules, do: api_reference_entry_template(module_node) %>
       </div>
     </section>
   <% end %>
@@ -18,7 +18,7 @@
     <section id="exceptions" class="details-list">
       <h1 class="section-heading">Exceptions</h1>
       <div class="summary">
-        <%= for node <- exceptions, do: api_reference_entry_template(node) %>
+        <%= for exception_node <- exceptions, do: api_reference_entry_template(exception_node) %>
       </div>
     </section>
   <% end %>
@@ -27,7 +27,7 @@
     <section id="protocols" class="details-list">
       <h1 class="section-heading">Protocols</h1>
       <div class="summary">
-        <%= for node <- protocols, do: api_reference_entry_template(node) %>
+        <%= for protocol_node <- protocols, do: api_reference_entry_template(protocol_node) %>
       </div>
     </section>
   <% end %>

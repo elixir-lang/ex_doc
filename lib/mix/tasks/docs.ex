@@ -116,10 +116,11 @@ defmodule Mix.Tasks.Docs do
       Mix.raise "Extraneous arguments on the command line"
     end
 
-    project = (config[:name] || config[:app]) |> to_string()
+    project = to_string(config[:name] || config[:app])
     version = config[:version] || "dev"
     options =
-      get_docs_opts(config)
+      config
+      |> get_docs_opts()
       |> Keyword.merge(cli_opts)
       |> normalize_source_url(config)
       |> normalize_source_beam(config)
@@ -181,7 +182,7 @@ defmodule Mix.Tasks.Docs do
       is_atom(main) ->
         Keyword.put(options, :main, inspect(main))
 
-      is_binary(main)->
+      is_binary(main) ->
         options
     end
   end

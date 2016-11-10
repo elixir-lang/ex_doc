@@ -5,6 +5,7 @@ defmodule ExDoc.Formatter.HTML do
 
   alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Formatter.HTML.Autolink
+  alias ExDoc.Markdown
 
   @main "api-reference"
 
@@ -23,7 +24,7 @@ defmodule ExDoc.Formatter.HTML do
     exceptions = filter_list(:exceptions, all)
     protocols  = filter_list(:protocols, all)
 
-    assets = generate_assets(output, assets(config))
+    static_files = generate_assets(output, assets(config))
     generate_api_reference(modules, exceptions, protocols, output, config)
     extras = generate_extras(output, module_nodes, modules, exceptions, protocols, config)
 
@@ -36,7 +37,7 @@ defmodule ExDoc.Formatter.HTML do
       generate_list(exceptions, modules, exceptions, protocols, output, config) ++
       generate_list(protocols, modules, exceptions, protocols, output, config)
 
-    generate_build(extras, assets ++ generated_files, build)
+    generate_build(extras, static_files ++ generated_files, build)
     Path.join(config.output, "index.html")
   end
 
@@ -143,9 +144,9 @@ defmodule ExDoc.Formatter.HTML do
       |> Enum.map(&Task.await(&1, :infinity))
 
     api_reference_headers =
-      if(Enum.empty?(modules),    do: [], else: [{"Modules", "modules"}]) ++
-      if(Enum.empty?(exceptions), do: [], else: [{"Exceptions", "exceptions"}]) ++
-      if(Enum.empty?(protocols),  do: [], else: [{"Protocols", "protocols"}])
+      (if Enum.empty?(modules),    do: [], else: [{"Modules", "modules"}]) ++
+      (if Enum.empty?(exceptions), do: [], else: [{"Exceptions", "exceptions"}]) ++
+      (if Enum.empty?(protocols),  do: [], else: [{"Protocols", "protocols"}])
 
     [{"api-reference", "API Reference", "", api_reference_headers}|extras]
   end
@@ -186,7 +187,7 @@ defmodule ExDoc.Formatter.HTML do
         |> File.read!()
         |> Autolink.project_doc(module_nodes)
 
-      html_content = ExDoc.Markdown.to_html(content, file: options.input, line: 1)
+      html_content = Markdown.to_html(content, file: options.input, line: 1)
       title = options.title || extract_title(html_content) || input_to_title(options[:input])
 
       config = set_canonical_url(config, options.filename)
@@ -309,10 +310,10 @@ defmodule ExDoc.Formatter.HTML do
     |> Enum.map(&Task.await(&1, :infinity))
   end
 
-  defp generate_module_page(node, modules, exceptions, protocols, output, config) do
-    file_name = "#{node.id}.html"
+  defp generate_module_page(module_node, modules, exceptions, protocols, output, config) do
+    file_name = "#{module_node.id}.html"
     config = set_canonical_url(config, file_name)
-    content = Templates.module_page(node, modules, exceptions, protocols, config)
+    content = Templates.module_page(module_node, modules, exceptions, protocols, config)
     File.write!("#{output}/#{file_name}", content)
     file_name
   end

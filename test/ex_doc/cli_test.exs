@@ -41,11 +41,11 @@ defmodule ExDoc.CLITest do
   end
 
   test "version" do
-    assert capture_io( fn ->
+    assert capture_io(fn ->
       run(["--version"])
     end) == "ExDoc v#{ExDoc.version}\n"
 
-    assert capture_io( fn ->
+    assert capture_io(fn ->
       run(["-v"])
     end) == "ExDoc v#{ExDoc.version}\n"
   end

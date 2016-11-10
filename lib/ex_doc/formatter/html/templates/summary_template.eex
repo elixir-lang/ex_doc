@@ -3,6 +3,6 @@
     <h2>
       <a href="#<%= name %>"><%= String.capitalize name %></a>
     </h2>
-    <%= for node <- nodes, do: summary_item_template(node) %>
+    <%= for module_node <- nodes, do: summary_item_template(module_node) %>
   </div>
 <% end %>

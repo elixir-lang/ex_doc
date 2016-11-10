@@ -263,7 +263,7 @@ defmodule ExDoc.Retriever do
   defp get_defaults(signature, name, arity) do
     case Enum.count(signature, &match?({:\\, _, [_, _]}, &1)) do
       0 -> []
-      defaults -> for default <- (arity-defaults..arity-1), do: "#{name}/#{default}"
+      defaults -> for default <- (arity - defaults)..(arity - 1), do: "#{name}/#{default}"
     end
   end
 
@@ -392,7 +392,7 @@ defmodule ExDoc.Retriever do
   defp find_actual_line(abst_code, {name, arity}, :function) do
     case Enum.find(abst_code, &match?({:function, _, ^name, ^arity, _}, &1)) do
       nil -> nil
-      tuple -> elem(tuple, 1) |> anno_line()
+      tuple -> tuple |> elem(1) |> anno_line()
     end
   end
 

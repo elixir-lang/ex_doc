@@ -8,10 +8,10 @@ defmodule TypesAndSpecs do
   """
 
   @typedoc "A public type"
-  @type public(t) :: { t, String.t, Sub.t, opaque, :ok | :error }
+  @type public(t) :: {t, String.t, Sub.t, opaque, :ok | :error}
   @typep private :: any
   @opaque opaque :: {Dict.t}
-  @type ref :: { :binary.part, public(any) }
+  @type ref :: {:binary.part, public(any)}
 
   @spec add(integer, opaque) :: integer
   def add(x, _), do: x + x
@@ -19,11 +19,11 @@ defmodule TypesAndSpecs do
   @spec minus(integer, integer) :: integer
   defp minus(x, y), do: x - y
 
-  @spec macro_spec(any) :: { :ok, any }
-  defmacro macro_spec(v), do: { :ok, v }
+  @spec macro_spec(any) :: {:ok, any}
+  defmacro macro_spec(v), do: {:ok, v}
 
-  @spec priv_macro_spec(any) :: { :no, any }
-  defmacrop priv_macro_spec(v), do: { :no, v }
+  @spec priv_macro_spec(any) :: {:no, any}
+  defmacrop priv_macro_spec(v), do: {:no, v}
 
   # This is just to ignore warnings about unused private types/functions.
   @spec ignore(private) :: integer

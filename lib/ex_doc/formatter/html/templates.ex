@@ -8,9 +8,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(node, modules, exceptions, protocols, config) do
-    types = group_types(node)
-    module_template(config, node, types.types, types.functions, types.macros, types.callbacks,
+  def module_page(module_node, modules, exceptions, protocols, config) do
+    types = group_types(module_node)
+    module_template(config, module_node, types.types, types.functions, types.macros, types.callbacks,
                     modules, exceptions, protocols)
   end
 
@@ -65,7 +65,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate a link id
   """
-  def link_id(node), do: link_id(node.id, node.type)
+  def link_id(module_node), do: link_id(module_node.id, module_node.type)
   def link_id(id, type) do
     case type do
       :macrocallback -> "c:#{id}"
@@ -149,17 +149,17 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~s/{"id":"#{id}","title":"#{title}","group":"#{group}","headers":[#{headers}]}/
   end
 
-  defp sidebar_items_node(node) do
+  defp sidebar_items_node(module_node) do
     items =
-      node
+      module_node
       |> group_types()
       |> Enum.reject(fn {_type, entries} -> entries == [] end)
       |> Enum.map_join(",", &sidebar_items_by_type/1)
 
     if items == "" do
-      ~s/{"id":"#{node.id}","title":"#{node.id}"}/
+      ~s/{"id":"#{module_node.id}","title":"#{module_node.id}"}/
     else
-      ~s/{"id":"#{node.id}","title":"#{node.id}",#{items}}/
+      ~s/{"id":"#{module_node.id}","title":"#{module_node.id}",#{items}}/
     end
   end
 
@@ -174,11 +174,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}"}/
   end
 
-  def group_types(node) do
-    %{types: node.typespecs,
-      functions: Enum.filter(node.docs, & &1.type in [:def]),
-      macros: Enum.filter(node.docs, & &1.type in [:defmacro]),
-      callbacks: Enum.filter(node.docs, & &1.type in [:callback, :macrocallback])}
+  def group_types(module_node) do
+    %{types: module_node.typespecs,
+      functions: Enum.filter(module_node.docs, & &1.type in [:def]),
+      macros: Enum.filter(module_node.docs, & &1.type in [:defmacro]),
+      callbacks: Enum.filter(module_node.docs, & &1.type in [:callback, :macrocallback])}
   end
 
   defp logo_path(%{logo: nil}), do: nil
@@ -250,22 +250,22 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    detail_template: [:node, :_module],
+    detail_template: [:module_node, :_module],
     footer_template: [:config],
     head_template: [:config, :page],
     module_template: [:config, :module, :types, :functions, :macros, :callbacks,
                       :modules, :exceptions, :protocols],
     not_found_template: [:config, :modules, :exceptions, :protocols],
-    api_reference_entry_template: [:node],
+    api_reference_entry_template: [:module_node],
     api_reference_template: [:config, :modules, :exceptions, :protocols],
     extra_template: [:config, :title, :modules, :exceptions, :protocols, :content],
     sidebar_template: [:config, :modules, :exceptions, :protocols],
     summary_template: [:name, :nodes],
-    summary_item_template: [:node],
+    summary_item_template: [:module_node],
     redirect_template: [:config, :redirect_to],
   ]
 
-  Enum.each templates, fn({ name, args }) ->
+  Enum.each templates, fn({name, args}) ->
     filename = Path.expand("templates/#{name}.eex", __DIR__)
     @doc false
     EEx.function_from_file :def, name, filename, args
