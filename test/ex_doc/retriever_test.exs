@@ -30,28 +30,28 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "docs_from_files returns the module id" do
-    [node] = docs_from_files ["CompiledWithDocs"]
-    assert node.id == "CompiledWithDocs"
+    [module_node] = docs_from_files ["CompiledWithDocs"]
+    assert module_node.id == "CompiledWithDocs"
   end
 
   test "docs_from_files returns the module" do
-    [node] = docs_from_files ["CompiledWithDocs"]
-    assert node.module == CompiledWithDocs
+    [module_node] = docs_from_files ["CompiledWithDocs"]
+    assert module_node.module == CompiledWithDocs
   end
 
   test "docs_from_files returns the moduledoc info" do
-    [node] = docs_from_files ["CompiledWithDocs"]
-    assert node.doc == "moduledoc\n\n\#\# Example ☃ Unicode > escaping\n    CompiledWithDocs.example\n"
+    [module_node] = docs_from_files ["CompiledWithDocs"]
+    assert module_node.doc == "moduledoc\n\n\#\# Example ☃ Unicode > escaping\n    CompiledWithDocs.example\n"
   end
 
   test "docs_from_files returns nil if there's no moduledoc info" do
-    [node] = docs_from_files ["CompiledWithoutDocs"]
-    assert node.doc == nil
+    [module_node] = docs_from_files ["CompiledWithoutDocs"]
+    assert module_node.doc == nil
   end
 
   test "docs_from_files returns the doc info for each module function" do
-    [node] = docs_from_files ["CompiledWithDocs"]
-    [example, example_1, example_without_docs] = node.docs
+    [module_node] = docs_from_files ["CompiledWithDocs"]
+    [example, example_1, example_without_docs] = module_node.docs
 
     assert example.id   == "example/2"
     assert example.doc  == "Some example"
@@ -69,13 +69,13 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "docs_from_files returns an empty list if there's no docs info" do
-    [node] = docs_from_files ["CompiledWithoutDocs"]
-    assert node.docs == []
+    [module_node] = docs_from_files ["CompiledWithoutDocs"]
+    assert module_node.docs == []
   end
 
   test "docs_from_files returns the specs for each non-private function" do
-    [node] = docs_from_files ["TypesAndSpecs"]
-    [add, _, _] = node.docs
+    [module_node] = docs_from_files ["TypesAndSpecs"]
+    [add, _, _] = module_node.docs
 
     assert add.id   == "add/2"
     assert add.doc  == nil
@@ -85,8 +85,8 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "docs_from_files returns the specs for non-private macros" do
-    [node] = docs_from_files ["TypesAndSpecs"]
-    [_, _, macro] = node.docs
+    [module_node] = docs_from_files ["TypesAndSpecs"]
+    [_, _, macro] = module_node.docs
 
     assert macro.id   == "macro_spec/1"
     assert macro.doc  == nil
@@ -95,8 +95,8 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "docs_from_files returns the spec info for each non-private module type" do
-    [node] = docs_from_files ["TypesAndSpecs"]
-    [ opaque, public, ref ] = node.typespecs
+    [module_node] = docs_from_files ["TypesAndSpecs"]
+    [opaque, public, ref] = module_node.typespecs
 
     assert opaque.name  == :opaque
     assert opaque.arity == 0
@@ -124,15 +124,15 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "docs_from_files returns the source" do
-    [node] = docs_from_files ["CompiledWithDocs"], "http://foo.com/bar/%{path}#L%{line}"
-    assert node.source_url == "http://foo.com/bar/test/fixtures/compiled_with_docs.ex\#L1"
+    [module_node] = docs_from_files ["CompiledWithDocs"], "http://foo.com/bar/%{path}#L%{line}"
+    assert module_node.source_url == "http://foo.com/bar/test/fixtures/compiled_with_docs.ex\#L1"
   end
 
   test "docs_from_files returns the source when source_root set to nil" do
     files  = Enum.map ["CompiledWithDocs"], fn(n) -> "test/tmp/Elixir.#{n}.beam" end
     config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: nil}
-    [node] = Retriever.docs_from_files(files, config)
-    assert String.ends_with?(node.source_url, "/test/fixtures/compiled_with_docs.ex:1")
+    [module_node] = Retriever.docs_from_files(files, config)
+    assert String.ends_with?(module_node.source_url, "/test/fixtures/compiled_with_docs.ex:1")
   end
 
   test "docs_from_modules fails when module is not available" do
@@ -143,16 +143,16 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "specs order is preserved" do
-    [node] = docs_from_files ["MultipleSpecs"]
-    [function_node] = node.docs
+    [module_node] = docs_from_files ["MultipleSpecs"]
+    [function_node] = module_node.docs
     specs = Macro.to_string(function_node.specs)
     assert specs == "[range?(%Range{first: term(), last: term()}) :: true, range?(term()) :: false]"
   end
 
   if Version.match?(System.version(), ">=1.1.0") do
     test "callbacks with no docs included" do
-      [node] = docs_from_files ["CallbacksNoDocs"]
-      functions = Enum.map node.docs, fn(doc) -> doc.id end
+      [module_node] = docs_from_files ["CallbacksNoDocs"]
+      functions = Enum.map module_node.docs, fn(doc) -> doc.id end
       assert functions == ["connect/2", "id/1"]
     end
   end
@@ -160,17 +160,17 @@ defmodule ExDoc.RetrieverTest do
   ## EXCEPTIONS
 
   test "docs_from_files properly tags exceptions" do
-    [node] = docs_from_files ["RandomError"]
-    assert node.type == :exception
+    [module_node] = docs_from_files ["RandomError"]
+    assert module_node.type == :exception
   end
 
   ## BEHAVIOURS
 
   test "ignore behaviours internal functions" do
-    [node] = docs_from_files ["CustomBehaviourOne"]
-    functions = Enum.map node.docs, fn(doc) -> doc.id end
+    [module_node] = docs_from_files ["CustomBehaviourOne"]
+    functions = Enum.map module_node.docs, fn(doc) -> doc.id end
     assert functions == ["greet/1", "hello/1"]
-    [greet, hello] = node.docs
+    [greet, hello] = module_node.docs
     assert hello.type == :callback
     assert hello.signature == "hello(integer)"
     assert greet.type == :callback
@@ -178,19 +178,19 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "retrieves macro callbacks from behaviours" do
-    [node] = docs_from_files ["CustomBehaviourTwo"]
-    functions = Enum.map node.docs, fn(doc) -> doc.id end
+    [module_node] = docs_from_files ["CustomBehaviourTwo"]
+    functions = Enum.map module_node.docs, fn(doc) -> doc.id end
     assert functions == ["bye/1"]
-    assert hd(node.docs).type == :macrocallback
-    assert hd(node.docs).signature == "bye(integer)"
+    assert hd(module_node.docs).type == :macrocallback
+    assert hd(module_node.docs).signature == "bye(integer)"
   end
 
   test "undocumented callback implementations get default doc" do
-    [node] =
+    [module_node] =
       ["CustomBehaviourOne", "CustomBehaviourTwo", "CustomBehaviourImpl"]
       |> docs_from_files()
       |> Enum.filter(&match?(%ExDoc.ModuleNode{id: "CustomBehaviourImpl"}, &1))
-    docs = node.docs
+    docs = module_node.docs
     assert Enum.map(docs, &(&1.id)) == ["bye/1", "greet/1", "hello/1"]
     assert Enum.at(docs, 0).doc ==
       "A doc for this so it doesn't use 'Callback implementation for'"
@@ -201,26 +201,26 @@ defmodule ExDoc.RetrieverTest do
   ## PROTOCOLS
 
   test "docs_from_files properly tag protocols" do
-    [node] = docs_from_files ["CustomProtocol"]
-    assert node.type == :protocol
+    [module_node] = docs_from_files ["CustomProtocol"]
+    assert module_node.type == :protocol
   end
 
   test "ignore protocols internal functions" do
-    [node] = docs_from_files ["CustomProtocol"]
-    functions = Enum.map node.docs, fn(doc) -> doc.id end
+    [module_node] = docs_from_files ["CustomProtocol"]
+    functions = Enum.map module_node.docs, fn(doc) -> doc.id end
     assert functions == ["plus_one/1", "plus_two/1"]
   end
 
   ## IMPLEMENTATIONS
 
   test "docs_from_files properly tag implementations" do
-    [node]  = docs_from_files ["CustomProtocol.Number"]
-    assert node.type == :impl
+    [module_node]  = docs_from_files ["CustomProtocol.Number"]
+    assert module_node.type == :impl
   end
 
   test "ignore impl internal functions" do
-    [node]  = docs_from_files ["CustomProtocol.Number"]
-    functions = Enum.map node.docs, fn(doc) -> doc.id end
+    [module_node]  = docs_from_files ["CustomProtocol.Number"]
+    functions = Enum.map module_node.docs, fn(doc) -> doc.id end
     assert functions == ["plus_one/1", "plus_two/1"]
   end
 end

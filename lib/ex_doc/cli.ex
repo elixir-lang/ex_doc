@@ -15,11 +15,10 @@ defmodule ExDoc.CLI do
                          a: :assets, i: :filter_prefix],
                switches: [extra: :keep])
 
-    cond do
-      List.keymember?(opts, :version, 0) ->
-        do_version()
-      true ->
-        do_generate(args, opts, generator)
+    if List.keymember?(opts, :version, 0) do
+      do_version()
+    else
+      do_generate(args, opts, generator)
     end
   end
 

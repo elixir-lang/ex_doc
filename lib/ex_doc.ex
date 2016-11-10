@@ -64,11 +64,11 @@ defmodule ExDoc do
   def version, do: @ex_doc_version
 
   @doc """
-  Generates documentation for the given `project`, `version`
+  Generates documentation for the given `project`, `vsn` (version)
   and `options`.
   """
   @spec generate_docs(String.t, String.t, Keyword.t) :: atom
-  def generate_docs(project, version, options) when is_binary(project) and is_binary(version) and is_list(options) do
+  def generate_docs(project, vsn, options) when is_binary(project) and is_binary(vsn) and is_list(options) do
     config = build_config(project, version, options)
     docs = config.retriever.docs_from_dir(config.source_beam, config)
     find_formatter(config.formatter).run(docs, config)
@@ -76,11 +76,11 @@ defmodule ExDoc do
 
   # Builds configuration by merging `options`, and normalizing the options.
   @spec build_config(String.t, String.t, Keyword.t) :: ExDoc.Config.t
-  defp build_config(project, version, options) do
+  defp build_config(project, vsn, options) do
     options = normalize_options(options)
     preconfig = %Config{
       project: project,
-      version: version,
+      version: vsn,
       main: options[:main],
       homepage_url: options[:homepage_url],
       source_root: options[:source_root] || File.cwd!,

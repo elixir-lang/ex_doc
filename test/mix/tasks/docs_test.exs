@@ -6,7 +6,7 @@ defmodule Mix.Tasks.DocsTest do
   use ExUnit.Case
 
   def run(args, opts) do
-    Mix.Tasks.Docs.run(args, opts, &{ &1, &2, &3 })
+    Mix.Tasks.Docs.run(args, opts, &{&1, &2, &3})
   end
 
   test "inflects values from app and version" do

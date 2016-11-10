@@ -36,7 +36,7 @@
           Types
         </h1>
         <div class="types-list">
-          <%= for node <- types, do: H.detail_template(node, module) %>
+          <%= for type_node <- types, do: H.detail_template(type_node, module) %>
         </div>
       </section>
     <% end %>
@@ -49,7 +49,7 @@
           </a>
           Functions
         </h1>
-        <%= for node <- functions, do: H.detail_template(node, module) %>
+        <%= for function_node <- functions, do: H.detail_template(function_node, module) %>
       </section>
     <% end %>
 
@@ -61,7 +61,7 @@
           </a>
           Macros
         </h1>
-        <%= for node <- macros, do: H.detail_template(node, module) %>
+        <%= for macro_node <- macros, do: H.detail_template(macro_node, module) %>
       </section>
     <% end %>
 
@@ -73,7 +73,7 @@
           </a>
           Callbacks
         </h1>
-        <%= for node <- callbacks, do: H.detail_template(node, module) %>
+        <%= for callback_node <- callbacks, do: H.detail_template(callback_node, module) %>
       </section>
     <% end %>
   </body>

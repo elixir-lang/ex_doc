@@ -9,9 +9,9 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(config, node) do
-    types = H.group_types(node)
-    module_template(config, node, types.types, types.functions, types.macros, types.callbacks)
+  def module_page(config, module_node) do
+    types = H.group_types(module_node)
+    module_template(config, module_node, types.types, types.functions, types.macros, types.callbacks)
   end
 
   @doc """

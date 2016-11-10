@@ -43,24 +43,24 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         |> project_doc(modules, module.id, extension, lib_dirs)
       end
 
-    docs = for node <- module.docs do
+    docs = for module_node <- module.docs do
       doc =
-        if node.doc do
-          node.doc
+        if module_node.doc do
+          module_node.doc
           |> local_doc(locals)
           |> project_doc(modules, module.id, extension, lib_dirs)
         end
-      %{node | doc: doc}
+      %{module_node | doc: doc}
     end
 
-    typedocs = for node <- module.typespecs do
+    typedocs = for module_node <- module.typespecs do
       doc =
-        if node.doc do
-          node.doc
+        if module_node.doc do
+          module_node.doc
           |> local_doc(locals)
           |> project_doc(modules, module.id, extension, lib_dirs)
         end
-      %{node | doc: doc}
+      %{module_node | doc: doc}
     end
 
     %{module | doc: moduledoc, docs: docs, typespecs: typedocs}
@@ -68,15 +68,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp all_typespecs(module, aliases, lib_dirs) do
     locals = Enum.map module.typespecs, fn
-      %ExDoc.TypeNode{name: name, arity: arity} -> { name, arity }
+      %ExDoc.TypeNode{name: name, arity: arity} -> {name, arity}
     end
 
     typespecs = for typespec <- module.typespecs do
       %{typespec | spec: typespec(typespec.spec, locals, aliases, lib_dirs)}
     end
 
-    docs = for node <- module.docs do
-      %{node | specs: Enum.map(node.specs, &typespec(&1, locals, aliases, lib_dirs))}
+    docs = for module_node <- module.docs do
+      %{module_node | specs: Enum.map(module_node.specs, &typespec(&1, locals, aliases, lib_dirs))}
     end
 
     %{module | typespecs: typespecs, docs: docs}
@@ -145,13 +145,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       {name, _, args}, string when is_atom(name) and is_list(args) ->
         string = strip_parens(string, args)
         arity = length(args)
-        if { name, arity } in typespecs do
+        if {name, arity} in typespecs do
           n = enc_h("#{name}")
           ~s[<a href="#t:#{n}/#{arity}">#{h(string)}</a>]
         else
           string
         end
-      {{ :., _, [alias, name] }, _, args}, string when is_atom(name) and is_list(args) ->
+      {{:., _, [alias, name]}, _, args}, string when is_atom(name) and is_list(args) ->
         string = strip_parens(string, args)
         alias = expand_alias(alias)
         if source = get_source(alias, aliases, lib_dirs) do
@@ -171,7 +171,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp strip_parens(string, []) do
     if :binary.last(string) == ?) do
-      :binary.part(string, 0, byte_size(string)-2)
+      :binary.part(string, 0, byte_size(string) - 2)
     else
       string
     end
@@ -182,11 +182,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp expand_alias(atom) when is_atom(atom), do: atom
   defp expand_alias(_), do: nil
 
-  defp get_source(alias, aliases, elixir_lib_dirs) do
+  defp get_source(alias, aliases, lib_dirs) do
     cond do
       is_nil(alias) -> nil
       alias in aliases -> ""
-      doc = lib_dirs_to_doc(alias, elixir_lib_dirs) -> doc
+      doc = lib_dirs_to_doc(alias, lib_dirs) -> doc
       true -> nil
     end
   end
