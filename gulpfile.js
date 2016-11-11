@@ -24,8 +24,8 @@ var environment = $.util.env.type || 'development'
 var isProduction = environment === 'production'
 
 var distPath = {
-    html: 'priv/ex_doc/formatter/html/templates/dist',
-    epub: 'priv/ex_doc/formatter/epub/templates/dist'
+  html: 'priv/ex_doc/formatter/html/templates/dist',
+  epub: 'priv/ex_doc/formatter/epub/templates/dist'
 }
 
 var npmPlugin = new LessPluginNpmImport()
@@ -90,7 +90,7 @@ gulp.task('javascript:epub', ['buildHighlight'], function () {
   return javascript({src: 'assets/js/epub.js', dest: distPath.epub})
 })
 
-gulp.task('javascript', function(done) {
+gulp.task('javascript', function (done) {
   sequence(
     ['javascript:html', 'javascript:epub'],
     done
@@ -105,7 +105,7 @@ gulp.task('less:epub', function () {
   return less({src: 'assets/less/epub.less', dest: distPath.epub})
 })
 
-gulp.task('less', function(done) {
+gulp.task('less', function (done) {
   sequence(
     ['less:html', 'less:epub'],
     done
@@ -152,7 +152,7 @@ gulp.task('build', function (done) {
   )
 })
 
-gulp.task('watch', function(done) {
+gulp.task('watch', function (done) {
   var source = {
     html: {
       js: ['./assets/js/**/*.js', '!./assets/js/epub.js'],
@@ -166,30 +166,30 @@ gulp.task('watch', function(done) {
 
   // Watch JS for HTML formatter
   $.watch(source.html.js, $.batch(function (events, done) {
-      events
-        .on('data', gulp.start('javascript:html', done))
-        .on('end', done)
+    events
+      .on('data', gulp.start('javascript:html', done))
+      .on('end', done)
   }))
 
   // Watch LESS for HTML formatter
   $.watch(source.html.less, $.batch(function (events, done) {
-      events
-        .on('data', gulp.start('less:html', done))
-        .on('end', done)
+    events
+      .on('data', gulp.start('less:html', done))
+      .on('end', done)
   }))
 
   // Watch JS for EPUB formatter
   $.watch(source.epub.js, $.batch(function (events, done) {
-      events
-        .on('data', gulp.start('javascript:epub', done))
-        .on('end', done)
+    events
+      .on('data', gulp.start('javascript:epub', done))
+      .on('end', done)
   }))
 
   // Watch LESS for HTML formatter
   $.watch(source.epub.less, $.batch(function (events, done) {
-      events
-        .on('data', gulp.start('less:epub', done))
-        .on('end', done)
+    events
+      .on('data', gulp.start('less:epub', done))
+      .on('end', done)
   }))
 })
 
@@ -207,7 +207,7 @@ var javascript = function (options) {
     .pipe(gulp.dest(options.dest))
 }
 
-var less = function(options) {
+var less = function (options) {
   return gulp.src(options.src)
     .pipe($.less({
       plugins: [
