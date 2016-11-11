@@ -58,9 +58,9 @@ function fillSidebarWithNodes (nodes, filter) {
     fullList.replaceWith(sidebarItemsTemplate({'nodes': filtered, 'group': ''}))
   }
 
-  const module_type = helpers.getModuleType()
+  const moduleType = helpers.getModuleType()
 
-  filter = filter || module_type
+  filter = filter || moduleType
   scope(filter)
   setupSelected(['#', filter, '-list'].join(''))
 

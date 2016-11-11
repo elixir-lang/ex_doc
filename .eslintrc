@@ -1,12 +1,15 @@
 {
   "extends": "standard",
-  "ecmaFeatures": {
-    "modules": true
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "module",
+    "allowImportExportEverywhere": false
   },
   "env": {
     "browser": true
   },
   "rules": {
-    "eol-last": 2
+    "no-path-concat": 0,
+    "no-useless-escape": 0
   }
 }

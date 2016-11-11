@@ -22,7 +22,8 @@ describe('search', () => {
           {id: 'hello world', anchor: 'hello-world'}
         ]
       }, {
-        id: 'world2', functions: [
+        id: 'world2',
+        functions: [
           {id: 'world', anchor: 'world'}
         ]
       }]
@@ -49,7 +50,9 @@ describe('search', () => {
       ]
 
       expect(search.findIn(nodes, 'run')).to.be.eql([{
-        id: 'hello', match: 'hello', callbacks: [
+        id: 'hello',
+        match: 'hello',
+        callbacks: [
           {id: 'run', match: '<em>run</em>'}
         ]
       }])
@@ -62,7 +65,9 @@ describe('search', () => {
       ]
 
       expect(search.findIn(nodes, 'run')).to.be.eql([{
-        id: 'hello', match: 'hello', macros: [
+        id: 'hello',
+        match: 'hello',
+        macros: [
           {id: 'run', match: '<em>run</em>'}
         ]
       }])
@@ -75,7 +80,9 @@ describe('search', () => {
       ]
 
       expect(search.findIn(nodes, 'hello.run')).to.be.eql([{
-        id: 'hello', match: 'hello', macros: [
+        id: 'hello',
+        match: 'hello',
+        macros: [
           {id: 'run', match: 'run'}
         ]
       }])
