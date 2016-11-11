@@ -1,0 +1,13 @@
+engines:
+  credo:
+    enabled: true
+  fixme:
+    enabled: true
+  eslint:
+    enabled: false # Disabled until it can play with .eslint rules
+  remark-lint:
+    enabled: true
+exclude_paths:
+- bin
+- priv
+- test
