@@ -1,5 +1,5 @@
     <%= head_template(config, %{title: module.id, type: module.type}) %>
-    <%= sidebar_template(config, modules, exceptions, protocols) %>
+    <%= sidebar_template(config, nodes_map) %>
 
       <h1>
         <small class="visible-xs"><%= config.project %> v<%= config.version %></small>
@@ -20,7 +20,7 @@
         </section>
       <% end %>
 
-      <%= unless Enum.empty?(types) and Enum.empty?(functions) and Enum.empty?(macros) and Enum.empty?(callbacks) do %>
+      <%= if Enum.any?(summary_map, fn {_, v} -> v != [] end) do %>
         <section id="summary" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#summary">
@@ -28,14 +28,14 @@
             </a>
             Summary
           </h1>
-          <%= summary_template "types", types %>
-          <%= summary_template "functions", functions %>
-          <%= summary_template "macros", macros %>
-          <%= summary_template "callbacks", callbacks %>
+          <%= summary_template "types", summary_map.types %>
+          <%= summary_template "functions", summary_map.functions %>
+          <%= summary_template "macros", summary_map.macros %>
+          <%= summary_template "callbacks", summary_map.callbacks %>
         </section>
       <% end %>
 
-      <%= unless Enum.empty?(types) do %>
+      <%= if summary_map.types != [] do %>
         <section id="types" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#types">
@@ -44,12 +44,14 @@
             Types
           </h1>
           <div class="types-list">
-            <%= for type_node <- types, do: detail_template(type_node, module) %>
+            <%= for type_node <- summary_map.types do
+              detail_template(type_node, module)
+            end %>
           </div>
         </section>
       <% end %>
 
-      <%= unless Enum.empty?(functions) do %>
+      <%= if summary_map.functions != [] do %>
         <section id="functions" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#functions">
@@ -57,11 +59,13 @@
             </a>
             Functions
           </h1>
-          <%= for function_node <- functions, do: detail_template(function_node, module) %>
+          <%= for function_node <- summary_map.functions do
+            detail_template(function_node, module)
+          end %>
         </section>
       <% end %>
 
-      <%= unless Enum.empty?(macros) do %>
+      <%= if summary_map.macros != [] do %>
         <section id="macros" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#macros">
@@ -69,11 +73,13 @@
             </a>
             Macros
           </h1>
-          <%= for macro_node <- macros, do: detail_template(macro_node, module) %>
+          <%= for macro_node <- summary_map.macros do
+            detail_template(macro_node, module)
+          end %>
         </section>
       <% end %>
 
-      <%= unless Enum.empty?(callbacks) do %>
+      <%= if summary_map.callbacks != [] do %>
         <section id="callbacks" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#callbacks">
@@ -81,7 +87,9 @@
             </a>
             Callbacks
           </h1>
-          <%= for callback_node <- callbacks, do: detail_template(callback_node, module) %>
+          <%= for callback_node <- summary_map.callbacks do
+            detail_template(callback_node, module)
+          end %>
         </section>
       <% end %>
     <%= footer_template(config) %>

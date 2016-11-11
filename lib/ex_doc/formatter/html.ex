@@ -13,29 +13,31 @@ defmodule ExDoc.Formatter.HTML do
   Generate HTML documentation for the given modules
   """
   @spec run(list, ExDoc.Config.t) :: String.t
-  def run(module_nodes, config) when is_map(config) do
+  def run(project_nodes, config) when is_map(config) do
     config = normalize_config(config)
     output = Path.expand(config.output)
     build = Path.join(output, ".build")
     output_setup(build, output)
 
-    all = Autolink.all(module_nodes, ".html", config.deps)
-    modules    = filter_list(:modules, all)
-    exceptions = filter_list(:exceptions, all)
-    protocols  = filter_list(:protocols, all)
+    linked = Autolink.all(project_nodes, ".html", config.deps)
+    nodes_map = %{
+      modules: filter_list(:modules, linked),
+      exceptions: filter_list(:exceptions, linked),
+      protocols: filter_list(:protocols, linked)
+    }
 
     static_files = generate_assets(output, assets(config))
-    generate_api_reference(modules, exceptions, protocols, output, config)
-    extras = generate_extras(output, module_nodes, modules, exceptions, protocols, config)
+    generate_api_reference(nodes_map, output, config)
+    extras = generate_extras(output, project_nodes, nodes_map, config)
 
     generated_files =
       generate_logo("assets", config) ++
       generate_index(output, config) ++
-      generate_not_found(modules, exceptions, protocols, output, config) ++
-      generate_sidebar_items(modules, exceptions, protocols, extras, output) ++
-      generate_list(modules, modules, exceptions, protocols, output, config) ++
-      generate_list(exceptions, modules, exceptions, protocols, output, config) ++
-      generate_list(protocols, modules, exceptions, protocols, output, config)
+      generate_not_found(nodes_map, output, config) ++
+      generate_sidebar_items(nodes_map, extras, output) ++
+      generate_list(nodes_map.modules, nodes_map, output, config) ++
+      generate_list(nodes_map.exceptions, nodes_map, output, config) ++
+      generate_list(nodes_map.protocols, nodes_map, output, config)
 
     generate_build(extras, static_files ++ generated_files, build)
     Path.join(config.output, "index.html")
@@ -75,25 +77,23 @@ defmodule ExDoc.Formatter.HTML do
     [index_file, main_file]
   end
 
-  defp generate_api_reference(modules, exceptions, protocols, output, config) do
+  defp generate_api_reference(nodes_map, output, config) do
     file_name = "api-reference.html"
     config = set_canonical_url(config, file_name)
-    content = Templates.api_reference_template(config, modules, exceptions, protocols)
+    content = Templates.api_reference_template(config, nodes_map)
     File.write!("#{output}/#{file_name}", content)
   end
 
-  defp generate_not_found(modules, exceptions, protocols, output, config) do
+  defp generate_not_found(nodes_map, output, config) do
     file_name = "404.html"
     config = set_canonical_url(config, file_name)
-    content = Templates.not_found_template(config, modules, exceptions, protocols)
+    content = Templates.not_found_template(config, nodes_map)
     File.write!("#{output}/#{file_name}", content)
     [file_name]
   end
 
-  defp generate_sidebar_items(modules, exceptions, protocols, extras, output) do
-    nodes = %{modules: modules, protocols: protocols,
-              exceptions: exceptions, extras: extras}
-    content = Templates.create_sidebar_items(nodes)
+  defp generate_sidebar_items(nodes_map, extras, output) do
+    content = Templates.create_sidebar_items(nodes_map, extras)
 
     digest =
       content
@@ -135,23 +135,23 @@ defmodule ExDoc.Formatter.HTML do
      {assets_path("fonts"), "fonts"}]
   end
 
-  defp generate_extras(output, module_nodes, modules, exceptions, protocols, config) do
+  defp generate_extras(output, project_nodes, nodes_map, config) do
     extras =
       config.extras
       |> Enum.map(&Task.async(fn ->
-          generate_extra(&1, output, module_nodes, modules, exceptions, protocols, config)
+          generate_extra(&1, output, project_nodes, nodes_map, config)
          end))
       |> Enum.map(&Task.await(&1, :infinity))
 
     api_reference_headers =
-      (if Enum.empty?(modules),    do: [], else: [{"Modules", "modules"}]) ++
-      (if Enum.empty?(exceptions), do: [], else: [{"Exceptions", "exceptions"}]) ++
-      (if Enum.empty?(protocols),  do: [], else: [{"Protocols", "protocols"}])
+      (if nodes_map.modules == [],    do: [], else: [{"Modules", "modules"}]) ++
+      (if nodes_map.exceptions == [], do: [], else: [{"Exceptions", "exceptions"}]) ++
+      (if nodes_map.protocols == [],  do: [], else: [{"Protocols", "protocols"}])
 
     [{"api-reference", "API Reference", "", api_reference_headers}|extras]
   end
 
-  defp generate_extra({input_file, options}, output, module_nodes, modules, exceptions, protocols, config) do
+  defp generate_extra({input_file, options}, output, project_nodes, nodes_map, config) do
     input_file = to_string(input_file)
     filename = options[:filename] || input_file |> input_to_title() |> title_to_filename()
 
@@ -163,10 +163,10 @@ defmodule ExDoc.Formatter.HTML do
       group: options[:group]
     }
 
-    create_extra_files(module_nodes, modules, exceptions, protocols, config, options)
+    create_extra_files(project_nodes, nodes_map, config, options)
   end
 
-  defp generate_extra(input, output, module_nodes, modules, exceptions, protocols, config) do
+  defp generate_extra(input, output, project_nodes, nodes_map, config) do
     filename = input |> input_to_title |> title_to_filename
 
     options = %{
@@ -177,22 +177,21 @@ defmodule ExDoc.Formatter.HTML do
       group: ""
     }
 
-    create_extra_files(module_nodes, modules, exceptions, protocols, config, options)
+    create_extra_files(project_nodes, nodes_map, config, options)
   end
 
-  defp create_extra_files(module_nodes, modules, exceptions, protocols, config, options) do
+  defp create_extra_files(project_nodes, nodes_map, config, options) do
     if valid_extension_name?(options.input) do
       content =
         options.input
         |> File.read!()
-        |> Autolink.project_doc(module_nodes)
+        |> Autolink.project_doc(project_nodes)
 
       html_content = Markdown.to_html(content, file: options.input, line: 1)
       title = options.title || extract_title(html_content) || input_to_title(options[:input])
 
       config = set_canonical_url(config, options.filename)
-      html = Templates.extra_template(config, title, modules,
-                                      exceptions, protocols, html_content)
+      html = Templates.extra_template(config, title, nodes_map, html_content)
 
       if File.regular? options.output do
         IO.puts "warning: file #{Path.relative_to_cwd options.output} already exists"
@@ -302,18 +301,18 @@ defmodule ExDoc.Formatter.HTML do
     Enum.filter nodes, &(&1.type in [:protocol])
   end
 
-  defp generate_list(nodes, modules, exceptions, protocols, output, config) do
+  defp generate_list(nodes, nodes_map, output, config) do
     nodes
     |> Enum.map(&Task.async(fn ->
-        generate_module_page(&1, modules, exceptions, protocols, output, config)
+        generate_module_page(&1, nodes_map, output, config)
        end))
     |> Enum.map(&Task.await(&1, :infinity))
   end
 
-  defp generate_module_page(module_node, modules, exceptions, protocols, output, config) do
+  defp generate_module_page(module_node, nodes_map, output, config) do
     file_name = "#{module_node.id}.html"
     config = set_canonical_url(config, file_name)
-    content = Templates.module_page(module_node, modules, exceptions, protocols, config)
+    content = Templates.module_page(module_node, nodes_map, config)
     File.write!("#{output}/#{file_name}", content)
     file_name
   end

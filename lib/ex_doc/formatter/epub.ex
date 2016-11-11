@@ -12,7 +12,7 @@ defmodule ExDoc.Formatter.EPUB do
   Generate EPUB documentation for the given modules
   """
   @spec run(list, ExDoc.Config.t) :: String.t
-  def run(module_nodes, config) when is_map(config) do
+  def run(project_nodes, config) when is_map(config) do
     config = normalize_config(config)
 
     File.rm_rf!(config.output)
@@ -20,9 +20,9 @@ defmodule ExDoc.Formatter.EPUB do
 
     HTML.generate_assets(config.output, assets(config))
     HTML.generate_logo("OEBPS/assets", config)
-    generate_extras(config, module_nodes)
+    generate_extras(config, project_nodes)
 
-    all = HTML.Autolink.all(module_nodes, ".xhtml", config.deps)
+    all = HTML.Autolink.all(project_nodes, ".xhtml", config.deps)
     modules = HTML.filter_list(:modules, all)
     exceptions = HTML.filter_list(:exceptions, all)
     protocols = HTML.filter_list(:protocols, all)
@@ -79,20 +79,20 @@ defmodule ExDoc.Formatter.EPUB do
     }
   end
 
-  defp generate_extras(config, module_nodes) do
+  defp generate_extras(config, project_nodes) do
     config.extras
     |> Enum.map(&Task.async(fn ->
-         create_extra_files(&1, config.output, config, module_nodes)
+         create_extra_files(&1, config.output, config, project_nodes)
        end))
     |> Enum.map(&Task.await(&1, :infinity))
   end
 
-  defp create_extra_files(options, output, config, module_nodes) do
+  defp create_extra_files(options, output, config, project_nodes) do
     if HTML.valid_extension_name?(options.input) do
       content =
         options.input
         |> File.read!()
-        |> HTML.Autolink.project_doc(module_nodes, nil, ".xhtml")
+        |> HTML.Autolink.project_doc(project_nodes, nil, ".xhtml")
 
       html_content = Markdown.to_html(content, file: options.input, line: 1)
       title = options.title || HTML.extract_title(html_content) || HTML.input_to_title(options[:input])

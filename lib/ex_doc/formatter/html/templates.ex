@@ -8,10 +8,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(module_node, modules, exceptions, protocols, config) do
-    types = group_types(module_node)
-    module_template(config, module_node, types.types, types.functions, types.macros, types.callbacks,
-                    modules, exceptions, protocols)
+  def module_page(module_node, nodes_map, config) do
+    summary_map = group_summary(module_node)
+    module_template(config, module_node, summary_map, nodes_map)
   end
 
   @doc """
@@ -117,19 +116,16 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
   """
-  @spec create_sidebar_items(list) :: String.t
-  def create_sidebar_items(input) do
-    object =
-      input
-      |> Enum.into([], &sidebar_items_keys/1)
-      |> Enum.join(",")
-    "sidebarNodes={#{object}}"
+  def create_sidebar_items(nodes_map, extras) do
+    nodes_map =
+      [sidebar_items_extras(extras) | Enum.map(nodes_map, &sidebar_items_keys/1)]
+    "sidebarNodes={#{Enum.join(nodes_map, ",")}}"
   end
 
-  defp sidebar_items_keys({:extras, value}) do
+  defp sidebar_items_extras(extras) do
     keys =
-      value
-      |> Enum.into([], &sidebar_items_extra/1)
+      extras
+      |> Enum.map(&sidebar_items_extra/1)
       |> Enum.join(",")
     ~s/"extras":[#{keys}]/
   end
@@ -137,7 +133,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_items_keys({id, value}) do
     keys =
       value
-      |> Enum.into([], &sidebar_items_node/1)
+      |> Enum.map(&sidebar_items_node/1)
       |> Enum.join(",")
     ~s/"#{id}":[#{keys}]/
   end
@@ -152,8 +148,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_items_node(module_node) do
     items =
       module_node
-      |> group_types()
-      |> Enum.reject(fn {_type, entries} -> entries == [] end)
+      |> group_summary()
+      |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
       |> Enum.map_join(",", &sidebar_items_by_type/1)
 
     if items == "" do
@@ -174,7 +170,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}"}/
   end
 
-  def group_types(module_node) do
+  def group_summary(module_node) do
     %{types: module_node.typespecs,
       functions: Enum.filter(module_node.docs, & &1.type in [:def]),
       macros: Enum.filter(module_node.docs, & &1.type in [:defmacro]),
@@ -253,13 +249,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
     detail_template: [:module_node, :_module],
     footer_template: [:config],
     head_template: [:config, :page],
-    module_template: [:config, :module, :types, :functions, :macros, :callbacks,
-                      :modules, :exceptions, :protocols],
-    not_found_template: [:config, :modules, :exceptions, :protocols],
+    module_template: [:config, :module, :summary_map, :nodes_map],
+    not_found_template: [:config, :nodes_map],
     api_reference_entry_template: [:module_node],
-    api_reference_template: [:config, :modules, :exceptions, :protocols],
-    extra_template: [:config, :title, :modules, :exceptions, :protocols, :content],
-    sidebar_template: [:config, :modules, :exceptions, :protocols],
+    api_reference_template: [:config, :nodes_map],
+    extra_template: [:config, :title, :nodes_map, :content],
+    sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
     summary_item_template: [:module_node],
     redirect_template: [:config, :redirect_to],

@@ -69,7 +69,7 @@ defmodule ExDoc do
   """
   @spec generate_docs(String.t, String.t, Keyword.t) :: atom
   def generate_docs(project, vsn, options) when is_binary(project) and is_binary(vsn) and is_list(options) do
-    config = build_config(project, version, options)
+    config = build_config(project, vsn, options)
     docs = config.retriever.docs_from_dir(config.source_beam, config)
     find_formatter(config.formatter).run(docs, config)
   end

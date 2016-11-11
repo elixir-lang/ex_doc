@@ -27,15 +27,15 @@
   <ul class="sidebar-listNav">
     <li><a id="extras-list" href="#full-list"><%= config.extra_section || "Pages" %></a></li>
 
-    <%= unless Enum.empty?(modules) do %>
+    <%= if nodes_map.modules != [] do %>
       <li><a id="modules-list" href="#full-list">Modules</a></li>
     <% end %>
 
-    <%= unless Enum.empty?(exceptions) do %>
+    <%= if nodes_map.exceptions != [] do %>
       <li><a id="exceptions-list" href="#full-list">Exceptions</a></li>
     <% end %>
 
-    <%= unless Enum.empty?(protocols) do %>
+    <%= if nodes_map.protocols != [] do %>
       <li><a id="protocols-list" href="#full-list">Protocols</a></li>
     <% end %>
   </ul>

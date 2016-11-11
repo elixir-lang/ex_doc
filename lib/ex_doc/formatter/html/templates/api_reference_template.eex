@@ -1,33 +1,39 @@
 <%= head_template(config, %{title: "API Reference", type: :extra}) %>
-<%= sidebar_template(config, modules, exceptions, protocols) %>
+<%= sidebar_template(config, nodes_map) %>
   <h1>
     <small class="visible-xs"><%= config.project %> v<%= config.version %></small>
     API Reference
   </h1>
 
-  <%= unless Enum.empty?(modules) do %>
+  <%= if nodes_map.modules != [] do %>
     <section id="modules" class="details-list">
       <h1 class="section-heading">Modules</h1>
       <div class="summary">
-        <%= for module_node <- modules, do: api_reference_entry_template(module_node) %>
+        <%= for module_node <- nodes_map.modules do
+          api_reference_entry_template(module_node)
+        end %>
       </div>
     </section>
   <% end %>
 
-  <%= unless Enum.empty?(exceptions) do %>
+  <%= if nodes_map.exceptions != [] do %>
     <section id="exceptions" class="details-list">
       <h1 class="section-heading">Exceptions</h1>
       <div class="summary">
-        <%= for exception_node <- exceptions, do: api_reference_entry_template(exception_node) %>
+        <%= for exception_node <- nodes_map.exceptions do
+          api_reference_entry_template(exception_node)
+        end %>
       </div>
     </section>
   <% end %>
 
-  <%= unless Enum.empty?(protocols) do %>
+  <%= if nodes_map.protocols != [] do %>
     <section id="protocols" class="details-list">
       <h1 class="section-heading">Protocols</h1>
       <div class="summary">
-        <%= for protocol_node <- protocols, do: api_reference_entry_template(protocol_node) %>
+        <%= for protocol_node <- nodes_map.protocols do
+          api_reference_entry_template(protocol_node)
+        end %>
       </div>
     </section>
   <% end %>
