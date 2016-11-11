@@ -14,6 +14,11 @@ defmodule ExDoc.Formatter.HTMLTest do
     Path.expand("../../tmp/beam", __DIR__)
   end
 
+  defp read_wildcard!(path) do
+    [file] = Path.wildcard(path)
+    File.read!(file)
+  end
+
   defp doc_config do
     [project: "Elixir",
      version: "1.0.1",
@@ -109,9 +114,11 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(config)
 
     assert File.regular?("#{output_dir()}/another_dir/CompiledWithDocs.html")
+    assert File.regular?("#{output_dir()}/another_dir/RandomError.html")
+
     assert "#{output_dir()}/another_dir/dist/app-*.css" |> Path.wildcard |> File.regular?
     assert "#{output_dir()}/another_dir/dist/app-*.js" |> Path.wildcard |> File.regular?
-    assert File.regular?("#{output_dir()}/another_dir/RandomError.html")
+
     content = File.read!("#{output_dir()}/another_dir/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}
   end
@@ -119,7 +126,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates all listing files" do
     generate_docs(doc_config())
 
-    content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"CompiledWithDocs\"}ms
     assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example/2")ms
     assert content =~ ~r{"id":"CompiledWithDocs\.Nested"}ms
@@ -136,7 +143,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates empty listing files only with extras" do
     generate_docs(doc_config(source_root: "unknown", source_beam: "unknown"))
 
-    content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~s("modules":[])
     assert content =~ ~s("exceptions":[])
     assert content =~ ~s("protocols":[])
@@ -147,7 +154,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates extras containing settext headers while discarding links on header" do
     generate_docs(doc_config(source_root: "unknown", source_beam: "unknown", extras: ["test/fixtures/ExtraPageWithSettextHeader.md"]))
 
-    content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","group":"","headers":[]},)
     assert content =~ ~s({"id":"extrapagewithsettextheader","title":"Extra Page Title","group":"",) <>
                       ~s("headers":[{"id":"Section One","anchor":"section-one"},{"id":"Section Two","anchor":"section-two"}]}])
@@ -163,7 +170,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       markdown_processor = Application.fetch_env!(:ex_doc, :markdown_processor)
       assert markdown_processor == ExDoc.Markdown.Pandoc
 
-      content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+      content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~s("modules":[])
       assert content =~ ~s("exceptions":[])
       assert content =~ ~s("protocols":[])
@@ -204,7 +211,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute File.regular?("#{output_dir()}/readme.html")
     content = File.read!("#{output_dir()}/GETTING-STARTED.html")
     assert content =~ ~r{<title>README [^<]*</title>}
-    content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"GETTING-STARTED","title":"README"}
   end
 
@@ -212,13 +219,13 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config(extras: ["test/fixtures/README.md": [title: "Getting Started"]]))
     content = File.read!("#{output_dir()}/readme.html")
     assert content =~ ~r{<title>Getting Started – Elixir v1.0.1</title>}
-    content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"readme","title":"Getting Started","group":""}
    end
 
   test "run generates pages with custom group" do
     generate_docs(doc_config(extras: ["test/fixtures/README.md": [group: "Intro"]]))
-    content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"readme","title":"README","group":"Intro"}
    end
 
@@ -226,7 +233,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config(extras: ["test/fixtures/ExtraPage.md"]))
     content = File.read!("#{output_dir()}/extrapage.html")
     assert content =~ ~r{<title>Extra Page Title – Elixir v1.0.1</title>}
-    content = File.read!("#{output_dir()}/dist/sidebar_items.js")
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"extrapage","title":"Extra Page Title"}
   end
 
@@ -291,12 +298,12 @@ defmodule ExDoc.Formatter.HTMLTest do
     config = doc_config(extras: ["test/fixtures/README.md"], logo: "test/fixtures/elixir.png")
     generate_docs(config)
     content = File.read!("#{output_dir()}/.build")
-    assert content =~ ~r{readme.html\n}
-    assert content =~ ~r{api-reference.html\n}
-    assert content =~ ~r{dist/sidebar_items.js\n}
-    assert content =~ ~r{assets/logo.png\n}
-    assert content =~ ~r{index.html\n}
-    assert content =~ ~r{404.html\n}
+    assert content =~ ~r(readme\.html\n)
+    assert content =~ ~r(api-reference\.html\n)
+    assert content =~ ~r(dist/sidebar_items-[\w]{10}\.js\n)
+    assert content =~ ~r(assets/logo\.png\n)
+    assert content =~ ~r(index\.html\n)
+    assert content =~ ~r(404\.html\n)
   end
 
   test "run keeps files not listed in .build" do

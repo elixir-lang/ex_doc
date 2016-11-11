@@ -10,7 +10,7 @@
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
-    <script src="dist/sidebar_items.js"></script>
+    <script src="<%= asset_rev config.output, "dist/sidebar_items*.js" %>"></script>
   </head>
   <body data-type="<%= sidebar_type(page.type) %>">
     <script>if(localStorage.getItem('night-mode')) document.body.className += ' night-mode';</script>

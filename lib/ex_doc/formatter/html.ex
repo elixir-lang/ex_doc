@@ -90,10 +90,17 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_sidebar_items(modules, exceptions, protocols, extras, output) do
-    sidebar_items = "dist/sidebar_items.js"
     nodes = %{modules: modules, protocols: protocols,
               exceptions: exceptions, extras: extras}
     content = Templates.create_sidebar_items(nodes)
+
+    digest =
+      content
+      |> :erlang.md5
+      |> Base.encode16(case: :lower)
+      |> binary_part(0, 10)
+
+    sidebar_items = "dist/sidebar_items-#{digest}.js"
     File.write!(Path.join(output, sidebar_items), content)
     [sidebar_items]
   end
