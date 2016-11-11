@@ -4,7 +4,7 @@ engines:
   fixme:
     enabled: true
   eslint:
-    enabled: false # Disabled until it can play with .eslint rules
+    enabled: true
   remark-lint:
     enabled: true
 exclude_paths:

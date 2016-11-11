@@ -2,5 +2,8 @@
   "extends": "standard",
   "env": {
     "browser": true
+  },
+  "rules": {
+    "eol-last": 2
   }
 }
