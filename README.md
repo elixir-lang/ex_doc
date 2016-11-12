@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/elixir-lang/ex_doc.svg?branch=master "Build Status")][build-status]
 [![Coverage Status](https://coveralls.io/repos/elixir-lang/ex_doc/badge.svg?branch=master&service=github)][coverage-status]
-[![Ebert](https://ebertapp.io/github/elixir-lang/ex_doc.svg)](https://ebertapp.io/github/elixir-lang/ex_doc.svg)
+[![Ebert](https://ebertapp.io/github/elixir-lang/ex_doc.svg)](https://ebertapp.io/github/elixir-lang/ex_doc)
 
 ExDoc is a tool to generate documentation for your Elixir projects. In case you are looking for documentation for Elixir itself, [check out Elixir's website][elixir-lang].
 
