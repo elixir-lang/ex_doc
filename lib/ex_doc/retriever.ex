@@ -158,16 +158,15 @@ defmodule ExDoc.Retriever do
   defp generate_node(module, type, config) do
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
+    source = %{url: source_url, path: source_path}
 
-    specs = get_specs(module)
-    impls = get_impls(module)
-    abst_code = get_abstract_code(module)
+    module_info = get_module_info(module, type)
 
-    {doc_line, moduledoc} = Code.get_docs(module, :moduledoc)
-    line = find_actual_line(abst_code, module, :module) || doc_line
+    {doc_line, moduledoc} = Code.get_docs(module_info.name, :moduledoc)
+    line = find_actual_line(module_info.abst_code, module_info.name, :module) || doc_line
 
-    docs = get_docs(type, module, source_path, source_url, specs, impls, abst_code) ++
-           get_callbacks(type, module, source_path, source_url, abst_code)
+    docs = get_docs(module_info, source) ++
+           get_callbacks(module_info, source)
 
     id =
       case inspect(module) do
@@ -177,18 +176,24 @@ defmodule ExDoc.Retriever do
 
     %ExDoc.ModuleNode{
       id: id,
-      module: module,
+      module: module_info.name,
       type: type,
       docs: docs,
       doc: moduledoc,
       doc_line: doc_line,
-      typespecs: get_types(module, source_path, source_url, abst_code),
+      typespecs: get_types(module_info, source),
       source_path: source_path,
-      source_url: source_link(source_path, source_url, line)
+      source_url: source_link(source, line)
     }
   end
 
   # Helpers
+  defp get_module_info(module, type) do
+    specs = get_specs(module)
+    impls = get_impls(module)
+    abst_code = get_abstract_code(module)
+    %{name: module, type: type, specs: specs, impls: impls, abst_code: abst_code}
+  end
 
   defp get_abstract_code(module) do
     {^module, binary, _file} = :code.get_object_code(module)
@@ -199,10 +204,10 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp get_docs(type, module, source_path, source_url, specs, impls, abst_code) do
-    docs = Enum.sort_by Code.get_docs(module, :docs), &elem(&1, 0)
-    for doc <- docs, doc?(doc, type) do
-      get_function(doc, source_path, source_url, specs, impls, abst_code)
+  defp get_docs(module_info, source) do
+    docs = Enum.sort_by Code.get_docs(module_info.name, :docs), &elem(&1, 0)
+    for doc <- docs, doc?(doc, module_info.type) do
+      get_function(doc, source, module_info)
     end
   end
 
@@ -226,12 +231,12 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function(function, source_path, source_url, all_specs, cb_impls, abst_code) do
+  defp get_function(function, source, module_info) do
     {{name, arity}, doc_line, type, signature, doc} = function
     function = actual_def(name, arity, type)
-    line = find_actual_line(abst_code, function, :function) || doc_line
+    line = find_actual_line(module_info.abst_code, function, :function) || doc_line
 
-    behaviour = Map.get(cb_impls, {name, arity})
+    behaviour = Map.get(module_info.impls, {name, arity})
 
     doc =
       if is_nil(doc) && behaviour do
@@ -240,7 +245,7 @@ defmodule ExDoc.Retriever do
         doc
       end
 
-    specs = all_specs
+    specs = module_info.specs
             |> Map.get(function, [])
             |> Enum.map(&Typespec.spec_to_ast(name, &1))
             |> Enum.reverse()
@@ -254,8 +259,8 @@ defmodule ExDoc.Retriever do
       defaults: get_defaults(signature, name, arity),
       signature: get_call_signature(name, signature),
       specs: specs,
-      source_path: source_path,
-      source_url: source_link(source_path, source_url, line),
+      source_path: source.path,
+      source_url: source_link(source, line),
       type: type
     }
   end
@@ -267,14 +272,14 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp get_callbacks(:behaviour, module, source_path, source_url, abst_code) do
+  defp get_callbacks(%{type: :behaviour, name: name, abst_code: abst_code}, source) do
     optional_callbacks = get_optional_callbacks(abst_code)
-    (Code.get_docs(module, :callback_docs) || [])
+    (Code.get_docs(name, :callback_docs) || [])
     |> Enum.sort_by(&elem(&1, 0))
-    |> Enum.map(&get_callback(&1, source_path, source_url, optional_callbacks, abst_code))
+    |> Enum.map(&get_callback(&1, source, optional_callbacks, abst_code))
   end
 
-  defp get_callbacks(_, _, _, _, _), do: []
+  defp get_callbacks(_, _), do: []
 
   defp get_optional_callbacks(abst_code) do
     for {:attribute, _, :optional_callbacks, callbacks} <- abst_code,
@@ -282,7 +287,7 @@ defmodule ExDoc.Retriever do
         do: callback
   end
 
-  defp get_callback(callback, source_path, source_url, optional_callbacks, abst_code) do
+  defp get_callback(callback, source, optional_callbacks, abst_code) do
     {{name, arity}, doc_line, kind, doc} = callback
     function = actual_def(name, arity, kind)
 
@@ -312,8 +317,8 @@ defmodule ExDoc.Retriever do
       doc_line: doc_line,
       signature: get_typespec_signature(hd(specs), arity),
       specs: specs,
-      source_path: source_path,
-      source_url: source_link(source_path, source_url, line),
+      source_path: source.path,
+      source_url: source_link(source, line),
       type: kind,
       annotations: annotations,
     }
@@ -438,17 +443,17 @@ defmodule ExDoc.Retriever do
         do: behaviour
   end
 
-  defp get_types(module, source_path, source_url, abst_code) do
-    exported = for {:attribute, _, :export_type, types} <- abst_code, do: types
+  defp get_types(module_info, source) do
+    exported = for {:attribute, _, :export_type, types} <- module_info.abst_code, do: types
     exported = :lists.flatten(exported)
 
-    (Code.get_docs(module, :type_docs) || [])
+    (Code.get_docs(module_info.name, :type_docs) || [])
     |> Enum.filter(&elem(&1, 0) in exported)
     |> Enum.sort_by(&elem(&1, 0))
-    |> Enum.map(&get_type(&1, source_path, source_url, abst_code))
+    |> Enum.map(&get_type(&1, source, module_info.abst_code))
   end
 
-  defp get_type(type, source_path, source_url, abst_code) do
+  defp get_type(type, source, abst_code) do
     {{name, arity}, doc_line, _, doc} = type
 
     {:attribute, anno, type, spec} =
@@ -467,15 +472,15 @@ defmodule ExDoc.Retriever do
       doc: doc || nil,
       doc_line: doc_line,
       signature: get_typespec_signature(spec, arity),
-      source_path: source_path,
-      source_url: source_link(source_path, source_url, line)
+      source_path: source.path,
+      source_url: source_link(source, line)
     }
   end
 
-  defp source_link(_source_path, nil, _line), do: nil
+  defp source_link(%{path: _, url: nil}, _line), do: nil
 
-  defp source_link(source_path, source_url, line) do
-    source_url = Regex.replace(~r/%{path}/, source_url, source_path)
+  defp source_link(source, line) do
+    source_url = Regex.replace(~r/%{path}/, source.url, source.path)
     Regex.replace(~r/%{line}/, source_url, to_string(line))
   end
 
