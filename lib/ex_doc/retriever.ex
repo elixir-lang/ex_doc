@@ -236,14 +236,7 @@ defmodule ExDoc.Retriever do
     function = actual_def(name, arity, type)
     line = find_actual_line(module_info.abst_code, function, :function) || doc_line
 
-    behaviour = Map.get(module_info.impls, {name, arity})
-
-    doc =
-      if is_nil(doc) && behaviour do
-        "Callback implementation for `c:#{inspect behaviour}.#{name}/#{arity}`."
-      else
-        doc
-      end
+    doc = docstring(doc, name, arity, Map.fetch(module_info.impls, {name, arity}))
 
     specs = module_info.specs
             |> Map.get(function, [])
@@ -271,6 +264,25 @@ defmodule ExDoc.Retriever do
       defaults -> for default <- (arity - defaults)..(arity - 1), do: "#{name}/#{default}"
     end
   end
+
+  defp docstring(nil, name, arity, {:ok, behaviour}) do
+    callback_docs = Code.get_docs(behaviour, :callback_docs) || []
+    case List.keyfind(callback_docs, {name, arity}, 0) do
+      {{^name, ^arity}, _, :callback, callback_docs} when is_binary(callback_docs) ->
+        [header, body] = String.split(callback_docs, "\n", parts: 2)
+        info = "Documentation for callback `c:#{inspect behaviour}.#{name}/#{arity}`."
+        "#{header}\n\n#{info}\n\n#{trim_leading_newlines(body)}"
+      _ ->
+        "Callback implementation for `c:#{inspect behaviour}.#{name}/#{arity}`."
+    end
+  end
+
+  defp docstring(doc, _name, _arity, _behaviour) do
+    doc
+  end
+
+  defp trim_leading_newlines("\n" <> rest), do: trim_leading_newlines(rest)
+  defp trim_leading_newlines(rest), do: rest
 
   defp get_callbacks(%{type: :behaviour, name: name, abst_code: abst_code}, source) do
     optional_callbacks = get_optional_callbacks(abst_code)
