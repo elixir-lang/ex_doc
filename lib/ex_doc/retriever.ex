@@ -266,23 +266,19 @@ defmodule ExDoc.Retriever do
   end
 
   defp docstring(nil, name, arity, {:ok, behaviour}) do
+    info = "Callback implementation for `c:#{inspect behaviour}.#{name}/#{arity}`."
     callback_docs = Code.get_docs(behaviour, :callback_docs) || []
     case List.keyfind(callback_docs, {name, arity}, 0) do
       {{^name, ^arity}, _, :callback, callback_docs} when is_binary(callback_docs) ->
-        [header, body] = String.split(callback_docs, "\n", parts: 2)
-        info = "Documentation for callback `c:#{inspect behaviour}.#{name}/#{arity}`."
-        "#{header}\n\n#{info}\n\n#{trim_leading_newlines(body)}"
+        "#{callback_docs}\n\n#{info}"
       _ ->
-        "Callback implementation for `c:#{inspect behaviour}.#{name}/#{arity}`."
+        info
     end
   end
 
   defp docstring(doc, _name, _arity, _behaviour) do
     doc
   end
-
-  defp trim_leading_newlines("\n" <> rest), do: trim_leading_newlines(rest)
-  defp trim_leading_newlines(rest), do: rest
 
   defp get_callbacks(%{type: :behaviour, name: name, abst_code: abst_code}, source) do
     optional_callbacks = get_optional_callbacks(abst_code)
