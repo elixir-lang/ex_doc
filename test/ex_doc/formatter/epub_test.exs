@@ -52,10 +52,20 @@ defmodule ExDoc.Formatter.EPUBTest do
 
   test "run generates assets with logo" do
     File.mkdir_p!("test/tmp/epub_assets/hello")
-    File.touch!("test/tmp/epub_assets/hello/world")
+    File.touch!("test/tmp/epub_assets/hello/world.png")
     generate_docs_and_unzip(doc_config(assets: "test/tmp/epub_assets", logo: "test/fixtures/elixir.png"))
-    assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world")
+    assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world.png")
     assert File.regular?("#{output_dir()}/OEBPS/assets/logo.png")
+  after
+    File.rm_rf!("test/tmp/epub_assets")
+  end
+
+  test "run stops when assets are invalid" do
+    File.mkdir_p!("test/tmp/epub_assets/hello")
+    File.touch!("test/tmp/epub_assets/hello/world.pdf")
+    assert_raise(RuntimeError, ~s{asset with extension ".pdf" is not supported by EPUB format}, fn ->
+      generate_docs(doc_config(assets: "test/tmp/epub_assets"))
+    end)
   after
     File.rm_rf!("test/tmp/epub_assets")
   end

@@ -4,6 +4,8 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   """
 
   require EEx
+
+  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates, as: H
 
   @doc """
@@ -22,7 +24,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   """
   EEx.function_from_file(:def, :content_template,
                          Path.expand("templates/content_template.eex", __DIR__),
-                         [:config, :nodes, :uuid, :datetime])
+                         [:config, :nodes, :uuid, :datetime, :static_files])
 
   @doc """
   Creates a chapter which contains all the details about an individual module,
@@ -68,4 +70,18 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   EEx.function_from_file(:defp, :head_template,
                          Path.expand("templates/head_template.eex", __DIR__),
                          [:config, :page])
+
+  "templates/media-types.txt"
+  |> Path.expand(__DIR__)
+  |> File.read!()
+  |> String.split("\n", trim: true)
+  |> Enum.each(fn(line) ->
+    [extension, media] = String.split(line, ",")
+
+    defp media_type("." <> unquote(extension)) do
+      unquote(media)
+    end
+  end)
+
+  defp media_type(arg), do: raise "asset with extension #{inspect arg} is not supported by EPUB format"
 end
