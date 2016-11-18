@@ -138,11 +138,20 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~s/"#{id}":[#{keys}]/
   end
 
-  defp sidebar_items_extra({id, title, group, headers}) do
-    headers = Enum.map_join(headers, ",", fn {header, anchor} ->
-      sidebar_items_object(header, anchor)
-    end)
+  defp sidebar_items_extra({id, title, group, content}) do
+    headers =
+      content
+      |> extract_headers
+      |> Enum.map_join(",", fn {header, anchor} -> sidebar_items_object(header, anchor) end)
     ~s/{"id":"#{id}","title":"#{title}","group":"#{group}","headers":[#{headers}]}/
+  end
+
+  @h2_regex  ~r/<h2.*?>(.+)<\/h2>/m
+  defp extract_headers(content) do
+    @h2_regex
+    |> Regex.scan(content, capture: :all_but_first)
+    |> List.flatten()
+    |> Enum.map(&{&1, header_to_id(&1)})
   end
 
   defp sidebar_items_node(module_node) do
@@ -192,11 +201,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
     output
     |> Path.join(pattern)
     |> Path.wildcard()
-    |> relative_asset(output)
+    |> relative_asset(output, pattern)
   end
 
-  defp relative_asset([], _), do: nil
-  defp relative_asset([h|_], output), do: Path.relative_to(h, output)
+  defp relative_asset([], output, pattern), do: raise "could not find matching #{output}/#{pattern}"
+  defp relative_asset([h|_], output, _pattern), do: Path.relative_to(h, output)
 
   @doc """
   Extract a linkable ID from a heading
@@ -217,7 +226,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   IDs are prefixed with `prefix`.
   """
   @h2_regex ~r/<h2.*?>(.+)<\/h2>/m
-
   @spec link_headings(String.t, Regex.t, String.t) :: String.t
   def link_headings(content, regex \\ @h2_regex, prefix \\ "")
   def link_headings(nil, _, _), do: nil

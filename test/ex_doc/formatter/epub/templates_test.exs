@@ -20,6 +20,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       source_url_pattern: "#{source_url()}/blob/master/%{path}#L%{line}",
       homepage_url: homepage_url(),
       source_url: source_url(),
+      output: "test/tmp/epub_templates"
     }
   end
 
@@ -29,6 +30,12 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       |> ExDoc.Retriever.docs_from_modules(doc_config())
       |> HTML.Autolink.all(".xhtml", [])
     Templates.module_page(doc_config(), hd(mods))
+  end
+
+  setup_all do
+    File.mkdir_p!("test/tmp/epub_templates/OEBPS")
+    File.cp_r!("priv/ex_doc/formatter/epub/templates", "test/tmp/epub_templates/OEBPS")
+    :ok
   end
 
   ## MODULES

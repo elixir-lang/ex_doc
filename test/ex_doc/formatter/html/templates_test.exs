@@ -21,7 +21,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       source_root: File.cwd!,
       source_url_pattern: "#{source_url()}/blob/master/%{path}#L%{line}",
       homepage_url: homepage_url(),
-      source_url: source_url()
+      source_url: source_url(),
+      output: "test/tmp/html_templates"
     }
   end
 
@@ -32,6 +33,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       |> HTML.Autolink.all(".html", [])
 
     Templates.module_page(hd(mods), @empty_nodes_map, doc_config())
+  end
+
+  setup_all do
+    File.mkdir_p!("test/tmp/html_templates")
+    File.cp_r!("priv/ex_doc/formatter/html/templates", "test/tmp/html_templates")
+    File.touch!("test/tmp/html_templates/dist/sidebar_items-123456.js")
+    :ok
   end
 
   test "header id generation" do

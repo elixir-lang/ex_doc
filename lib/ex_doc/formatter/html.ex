@@ -26,15 +26,15 @@ defmodule ExDoc.Formatter.HTML do
       protocols: filter_list(:protocols, linked)
     }
 
+    extras = build_extras(project_nodes, nodes_map, config)
     static_files = generate_assets(output, assets(config))
-    generate_api_reference(nodes_map, output, config)
-    extras = generate_extras(output, project_nodes, nodes_map, config)
 
     generated_files =
+      generate_sidebar_items(nodes_map, extras, output) ++
+      generate_extras(nodes_map, extras, output, config) ++
       generate_logo("assets", config) ++
       generate_index(output, config) ++
       generate_not_found(nodes_map, output, config) ++
-      generate_sidebar_items(nodes_map, extras, output) ++
       generate_list(nodes_map.modules, nodes_map, output, config) ++
       generate_list(nodes_map.exceptions, nodes_map, output, config) ++
       generate_list(nodes_map.protocols, nodes_map, output, config)
@@ -77,19 +77,12 @@ defmodule ExDoc.Formatter.HTML do
     [index_file, main_file]
   end
 
-  defp generate_api_reference(nodes_map, output, config) do
-    file_name = "api-reference.html"
-    config = set_canonical_url(config, file_name)
-    content = Templates.api_reference_template(config, nodes_map)
-    File.write!("#{output}/#{file_name}", content)
-  end
-
   defp generate_not_found(nodes_map, output, config) do
-    file_name = "404.html"
-    config = set_canonical_url(config, file_name)
+    filename = "404.html"
+    config = set_canonical_url(config, filename)
     content = Templates.not_found_template(config, nodes_map)
-    File.write!("#{output}/#{file_name}", content)
-    [file_name]
+    File.write!("#{output}/#{filename}", content)
+    [filename]
   end
 
   defp generate_sidebar_items(nodes_map, extras, output) do
@@ -104,6 +97,19 @@ defmodule ExDoc.Formatter.HTML do
     sidebar_items = "dist/sidebar_items-#{digest}.js"
     File.write!(Path.join(output, sidebar_items), content)
     [sidebar_items]
+  end
+
+  defp generate_extras(nodes_map, extras, output, config) do
+    Enum.map(extras, fn {filename, title, _group, content} ->
+      filename = "#{filename}.html"
+      config = set_canonical_url(config, filename)
+      html = Templates.extra_template(config, title, nodes_map, content)
+      if File.regular? output do
+        IO.puts "warning: file #{Path.relative_to_cwd output} already exists"
+      end
+      File.write!("#{output}/#{filename}", html)
+      filename
+    end)
   end
 
   @doc """
@@ -135,70 +141,39 @@ defmodule ExDoc.Formatter.HTML do
      {assets_path("fonts"), "fonts"}]
   end
 
-  defp generate_extras(output, project_nodes, nodes_map, config) do
+  defp build_extras(project_nodes, nodes_map, config) do
     extras =
       config.extras
       |> Enum.map(&Task.async(fn ->
-          generate_extra(&1, output, project_nodes, nodes_map, config)
+          build_extra(&1, project_nodes)
          end))
       |> Enum.map(&Task.await(&1, :infinity))
 
-    api_reference_headers =
-      (if nodes_map.modules == [],    do: [], else: [{"Modules", "modules"}]) ++
-      (if nodes_map.exceptions == [], do: [], else: [{"Exceptions", "exceptions"}]) ++
-      (if nodes_map.protocols == [],  do: [], else: [{"Protocols", "protocols"}])
-
-    [{"api-reference", "API Reference", "", api_reference_headers}|extras]
+    api_reference = Templates.api_reference_template(config, nodes_map)
+    [{"api-reference", "API Reference", "", api_reference}|extras]
   end
 
-  defp generate_extra({input_file, options}, output, project_nodes, nodes_map, config) do
-    input_file = to_string(input_file)
-    filename = options[:filename] || input_file |> input_to_title() |> title_to_filename()
-
-    options = %{
-      title: options[:title],
-      input: input_file,
-      output: "#{output}/#{filename}.html",
-      filename: filename,
-      group: options[:group]
-    }
-
-    create_extra_files(project_nodes, nodes_map, config, options)
+  defp build_extra({input, options}, project_nodes) do
+    input = to_string(input)
+    filename = options[:filename] || input |> input_to_title() |> title_to_filename()
+    build_extra(input, filename, options[:title], options[:group], project_nodes)
   end
 
-  defp generate_extra(input, output, project_nodes, nodes_map, config) do
+  defp build_extra(input, project_nodes) do
     filename = input |> input_to_title |> title_to_filename
-
-    options = %{
-      title: nil,
-      input: input,
-      output: "#{output}/#{filename}.html",
-      filename: filename,
-      group: ""
-    }
-
-    create_extra_files(project_nodes, nodes_map, config, options)
+    build_extra(input, filename, nil, "", project_nodes)
   end
 
-  defp create_extra_files(project_nodes, nodes_map, config, options) do
-    if valid_extension_name?(options.input) do
+  defp build_extra(input, filename, title, group, project_nodes) do
+    if valid_extension_name?(input) do
       content =
-        options.input
+        input
         |> File.read!()
         |> Autolink.project_doc(project_nodes)
 
-      html_content = Markdown.to_html(content, file: options.input, line: 1)
-      title = options.title || extract_title(html_content) || input_to_title(options[:input])
-
-      config = set_canonical_url(config, options.filename)
-      html = Templates.extra_template(config, title, nodes_map, html_content)
-
-      if File.regular? options.output do
-        IO.puts "warning: file #{Path.relative_to_cwd options.output} already exists"
-      end
-
-      File.write!(options.output, html)
-      {options.filename, title, options.group, extract_headers(html_content)}
+      html_content = Markdown.to_html(content, file: input, line: 1)
+      title = title || extract_title(html_content) || input_to_title(input)
+      {filename, title, group, html_content}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
@@ -218,7 +193,6 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   @tag_regex ~r/<[^>]*>/m
-
   defp strip_html(header) do
     Regex.replace(@tag_regex, header, "")
   end
@@ -234,15 +208,6 @@ defmodule ExDoc.Formatter.HTML do
     if title do
       title |> List.first() |> strip_html() |> String.strip()
     end
-  end
-
-  @h2_regex  ~r/<h2.*?>(.+)<\/h2>/m
-
-  defp extract_headers(content) do
-    @h2_regex
-    |> Regex.scan(content, capture: :all_but_first)
-    |> List.flatten()
-    |> Enum.map(&{&1, Templates.header_to_id(&1)})
   end
 
   @doc """
@@ -284,9 +249,9 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  defp generate_redirect(output, file_name, config, redirect_to) do
+  defp generate_redirect(output, filename, config, redirect_to) do
     content = Templates.redirect_template(config, redirect_to)
-    File.write!("#{output}/#{file_name}", content)
+    File.write!("#{output}/#{filename}", content)
   end
 
   def filter_list(:modules, nodes) do
@@ -310,19 +275,19 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_module_page(module_node, nodes_map, output, config) do
-    file_name = "#{module_node.id}.html"
-    config = set_canonical_url(config, file_name)
+    filename = "#{module_node.id}.html"
+    config = set_canonical_url(config, filename)
     content = Templates.module_page(module_node, nodes_map, config)
-    File.write!("#{output}/#{file_name}", content)
-    file_name
+    File.write!("#{output}/#{filename}", content)
+    filename
   end
 
-  defp set_canonical_url(config, file_name) do
+  defp set_canonical_url(config, filename) do
     if config.canonical do
       canonical_url =
         config.canonical
         |> String.rstrip(?/)
-        |> Path.join(file_name)
+        |> Path.join(filename)
 
       Map.put(config, :canonical, canonical_url)
     else
