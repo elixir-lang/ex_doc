@@ -298,12 +298,14 @@ defmodule ExDoc.Formatter.HTMLTest do
     config = doc_config(extras: ["test/fixtures/README.md"], logo: "test/fixtures/elixir.png")
     generate_docs(config)
     content = File.read!("#{output_dir()}/.build")
-    assert content =~ ~r(readme\.html\n)
-    assert content =~ ~r(api-reference\.html\n)
-    assert content =~ ~r(dist/sidebar_items-[\w]{10}\.js\n)
-    assert content =~ ~r(assets/logo\.png\n)
-    assert content =~ ~r(index\.html\n)
-    assert content =~ ~r(404\.html\n)
+    assert content =~ ~r(^readme\.html$)m
+    assert content =~ ~r(^api-reference\.html$)m
+    assert content =~ ~r(^dist/sidebar_items-[\w]{10}\.js$)m
+    assert content =~ ~r(^dist/app-[\w]{10}\.js$)m
+    assert content =~ ~r(^dist/app-[\w]{10}\.css$)m
+    assert content =~ ~r(^assets/logo\.png$)m
+    assert content =~ ~r(^index\.html$)m
+    assert content =~ ~r(^404\.html$)m
   end
 
   test "run keeps files not listed in .build" do

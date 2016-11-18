@@ -15,9 +15,10 @@ defmodule ExDoc.Formatter.HTML do
   @spec run(list, ExDoc.Config.t) :: String.t
   def run(project_nodes, config) when is_map(config) do
     config = normalize_config(config)
-    output = Path.expand(config.output)
-    build = Path.join(output, ".build")
-    output_setup(build, output)
+    config = %{config | output: Path.expand(config.output)}
+
+    build = Path.join(config.output, ".build")
+    output_setup(build, config)
 
     linked = Autolink.all(project_nodes, ".html", config.deps)
     nodes_map = %{
@@ -26,22 +27,24 @@ defmodule ExDoc.Formatter.HTML do
       protocols: filter_list(:protocols, linked)
     }
 
-    extras = [build_api_reference(nodes_map, config) |
-              build_extras(project_nodes, config, ".html")]
-    static_files = generate_assets(output, assets(config))
+    extras =
+      [build_api_reference(nodes_map, config) |
+       build_extras(project_nodes, config, ".html")]
+
+    static_files = generate_assets(config, assets(config))
 
     generated_files =
-      generate_sidebar_items(nodes_map, extras, output) ++
-      generate_extras(nodes_map, extras, output, config) ++
+      generate_sidebar_items(nodes_map, extras, config) ++
+      generate_extras(nodes_map, extras, config) ++
       generate_logo("assets", config) ++
-      generate_index(output, config) ++
-      generate_not_found(nodes_map, output, config) ++
-      generate_list(nodes_map.modules, nodes_map, output, config) ++
-      generate_list(nodes_map.exceptions, nodes_map, output, config) ++
-      generate_list(nodes_map.protocols, nodes_map, output, config)
+      generate_index(config) ++
+      generate_not_found(nodes_map, config) ++
+      generate_list(nodes_map.modules, nodes_map, config) ++
+      generate_list(nodes_map.exceptions, nodes_map, config) ++
+      generate_list(nodes_map.protocols, nodes_map, config)
 
-    generate_build(extras, static_files ++ generated_files, build)
-    Path.join(config.output, "index.html")
+    generate_build(static_files ++ generated_files, build)
+    "index.html" |> Path.join(config.output) |> Path.relative_to_cwd()
   end
 
   defp normalize_config(%{main: "index"}) do
@@ -51,42 +54,41 @@ defmodule ExDoc.Formatter.HTML do
     %{config | main: main || @main}
   end
 
-  defp output_setup(build, output) do
+  defp output_setup(build, config) do
     if File.exists? build do
-      Enum.each(File.stream!(build), fn(line) ->
-        line = String.replace(line, "\n", "")
-        File.rm(Path.join(output, line))
-      end)
-      File.rm(build)
+      build
+      |> File.read!
+      |> String.split("\n", trim: true)
+      |> Enum.map(&Path.join(config.output, &1))
+      |> Enum.each(&File.rm/1)
+      File.rm build
     else
-      File.rm_rf! output
-      File.mkdir_p! output
+      File.rm_rf! config.output
+      File.mkdir_p! config.output
     end
   end
 
-  defp generate_build(extras, generated_files, output) do
-    extras = for {file, _, _, _} <- extras, do: "#{file}.html"
-    build_files = Enum.map(Enum.uniq(generated_files ++ extras), &[&1, "\n"])
-
-    File.write!(output, build_files)
+  defp generate_build(files, build) do
+    entries = Enum.map(files, &[&1, "\n"])
+    File.write!(build, entries)
   end
 
-  defp generate_index(output, config) do
+  defp generate_index(config) do
     index_file = "index.html"
     main_file = "#{config.main}.html"
-    generate_redirect(output, index_file, config, main_file)
-    [index_file, main_file]
+    generate_redirect(index_file, config, main_file)
+    [index_file]
   end
 
-  defp generate_not_found(nodes_map, output, config) do
+  defp generate_not_found(nodes_map, config) do
     filename = "404.html"
     config = set_canonical_url(config, filename)
     content = Templates.not_found_template(config, nodes_map)
-    File.write!("#{output}/#{filename}", content)
+    File.write!("#{config.output}/#{filename}", content)
     [filename]
   end
 
-  defp generate_sidebar_items(nodes_map, extras, output) do
+  defp generate_sidebar_items(nodes_map, extras, config) do
     content = Templates.create_sidebar_items(nodes_map, extras)
 
     digest =
@@ -96,14 +98,14 @@ defmodule ExDoc.Formatter.HTML do
       |> binary_part(0, 10)
 
     sidebar_items = "dist/sidebar_items-#{digest}.js"
-    File.write!(Path.join(output, sidebar_items), content)
+    File.write!(Path.join(config.output, sidebar_items), content)
     [sidebar_items]
   end
 
-  defp generate_extras(nodes_map, extras, output, config) do
-    Enum.map(extras, fn %{filename: filename, title: title, content: content} ->
-      filename = "#{filename}.html"
-      output = "#{output}/#{filename}"
+  defp generate_extras(nodes_map, extras, config) do
+    Enum.map(extras, fn %{id: id, title: title, content: content} ->
+      filename = "#{id}.html"
+      output = "#{config.output}/#{filename}"
       config = set_canonical_url(config, filename)
       html = Templates.extra_template(config, title, nodes_map, content)
 
@@ -118,15 +120,14 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Copy a list of assets into a given directory
   """
-  def generate_assets(output, sources) do
+  def generate_assets(config, sources) do
     Enum.flat_map sources, fn {from, to} ->
-      output = "#{output}/#{to}"
-
       Enum.map Path.wildcard(Path.join(from, "**/*")), fn source ->
-        target = Path.join(output, Path.relative_to(source, from))
+        filename = Path.join(to, Path.relative_to(source, from))
+        target = Path.join(config.output, filename)
         File.mkdir(Path.dirname(target))
         File.copy(source, target)
-        target
+        filename
       end
     end
   end
@@ -145,7 +146,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp build_api_reference(nodes_map, config) do
     api_reference = Templates.api_reference_template(config, nodes_map)
-    %{filename: "api-reference", title: "API Reference", group: "", content: api_reference}
+    %{id: "api-reference", title: "API Reference", group: "", content: api_reference}
   end
 
   @doc """
@@ -161,16 +162,16 @@ defmodule ExDoc.Formatter.HTML do
 
   defp build_extra({input, options}, project_nodes, extension) do
     input = to_string(input)
-    filename = options[:filename] || input |> input_to_title() |> title_to_filename()
-    build_extra(input, filename, options[:title], options[:group], project_nodes, extension)
+    id = options[:filename] || input |> input_to_title() |> title_to_id()
+    build_extra(input, id, options[:title], options[:group], project_nodes, extension)
   end
 
   defp build_extra(input, project_nodes, extension) do
-    filename = input |> input_to_title |> title_to_filename
-    build_extra(input, filename, nil, "", project_nodes, extension)
+    id = input |> input_to_title() |> title_to_id()
+    build_extra(input, id, nil, "", project_nodes, extension)
   end
 
-  defp build_extra(input, filename, title, group, project_nodes, extension) do
+  defp build_extra(input, id, title, group, project_nodes, extension) do
     if valid_extension_name?(input) do
       content =
         input
@@ -179,7 +180,7 @@ defmodule ExDoc.Formatter.HTML do
 
       html_content = Markdown.to_html(content, file: input, line: 1)
       title = title || extract_title(html_content) || input_to_title(input)
-      %{filename: filename, title: title, group: group, content: html_content}
+      %{id: id, title: title, group: group, content: html_content}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
@@ -216,7 +217,7 @@ defmodule ExDoc.Formatter.HTML do
     input |> Path.basename() |> Path.rootname()
   end
 
-  defp title_to_filename(title) do
+  defp title_to_id(title) do
     title |> String.replace(" ", "-") |> String.downcase()
   end
 
@@ -224,30 +225,29 @@ defmodule ExDoc.Formatter.HTML do
   Generates the logo from config into the given directory
   and adjusts the logo config key.
   """
-  def generate_logo(_output, %{logo: nil}) do
+  def generate_logo(_dir, %{logo: nil}) do
     []
   end
-  def generate_logo(output, %{output: base, logo: logo}) do
-    output = Path.join(base, output)
-    File.mkdir_p!(output)
-
+  def generate_logo(dir, %{output: output, logo: logo}) do
     extname =
       logo
       |> Path.extname()
       |> String.downcase()
 
     if extname in ~w(.png .jpg) do
-      filename = "#{output}/logo#{extname}"
-      File.copy!(logo, filename)
+      filename = Path.join(dir, "logo#{extname}")
+      target = Path.join(output, filename)
+      File.mkdir_p!(Path.dirname(target))
+      File.copy!(logo, target)
       [filename]
     else
       raise ArgumentError, "image format not recognized, allowed formats are: .jpg, .png"
     end
   end
 
-  defp generate_redirect(output, filename, config, redirect_to) do
+  defp generate_redirect(filename, config, redirect_to) do
     content = Templates.redirect_template(config, redirect_to)
-    File.write!("#{output}/#{filename}", content)
+    File.write!("#{config.output}/#{filename}", content)
   end
 
   def filter_list(:modules, nodes) do
@@ -262,19 +262,19 @@ defmodule ExDoc.Formatter.HTML do
     Enum.filter nodes, &(&1.type in [:protocol])
   end
 
-  defp generate_list(nodes, nodes_map, output, config) do
+  defp generate_list(nodes, nodes_map, config) do
     nodes
     |> Enum.map(&Task.async(fn ->
-        generate_module_page(&1, nodes_map, output, config)
+        generate_module_page(&1, nodes_map, config)
        end))
     |> Enum.map(&Task.await(&1, :infinity))
   end
 
-  defp generate_module_page(module_node, nodes_map, output, config) do
+  defp generate_module_page(module_node, nodes_map, config) do
     filename = "#{module_node.id}.html"
     config = set_canonical_url(config, filename)
     content = Templates.module_page(module_node, nodes_map, config)
-    File.write!("#{output}/#{filename}", content)
+    File.write!("#{config.output}/#{filename}", content)
     filename
   end
 

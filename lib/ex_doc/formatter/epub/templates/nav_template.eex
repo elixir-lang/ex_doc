@@ -3,7 +3,7 @@
     <nav epub:type="toc">
       <ul>
         <%= for extra <- config.extras do %>
-          <li><a href="<%= extra.filename %>.xhtml"><%= extra.title %></a></li>
+          <li><a href="<%= extra.id %>.xhtml"><%= extra.title %></a></li>
         <% end %>
         <%= for node <- nodes do %>
         <li><a href="<%= node.id %>.xhtml"><%= node.id %></a></li>

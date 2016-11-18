@@ -19,7 +19,7 @@ defmodule ExDoc.Formatter.EPUB do
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
-    HTML.generate_assets(config.output, assets(config))
+    HTML.generate_assets(config, assets(config))
     HTML.generate_logo("OEBPS/assets", config)
 
     all = HTML.Autolink.all(project_nodes, ".xhtml", config.deps)
@@ -54,8 +54,8 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_extras(config) do
-    Enum.each(config.extras, fn %{filename: filename, title: title, content: content} ->
-      output = "#{config.output}/OEBPS/#{filename}.xhtml"
+    Enum.each(config.extras, fn %{id: id, title: title, content: content} ->
+      output = "#{config.output}/OEBPS/#{id}.xhtml"
       html = Templates.extra_template(config, title, content)
       if File.regular? output do
         IO.puts :stderr, "warning: file #{Path.relative_to_cwd output} already exists"
