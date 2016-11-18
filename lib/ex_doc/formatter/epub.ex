@@ -39,9 +39,9 @@ defmodule ExDoc.Formatter.EPUB do
     generate_list(config, exceptions)
     generate_list(config, protocols)
 
-    {:ok, epub_file} = generate_epub(config.output)
+    {:ok, epub} = generate_epub(config.output)
     File.rm_rf!(config.output)
-    epub_file
+    Path.relative_to_cwd(epub)
   end
 
   defp normalize_config(config) do

@@ -10,8 +10,8 @@ defmodule Mix.Tasks.Docs do
 
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
-    * `--formatter`, `-f` - Which formatter to use, "html" or
-      "epub", default: "html"
+    * `--formatter`, `-f` - Which formatters to use, "html" or
+      "epub", default: "html" (may be given more than once)
     * `--canonical`, `-n` - Indicate the preferred URL with
       rel="canonical" link element, defaults to no canonical path
 
@@ -48,7 +48,7 @@ defmodule Mix.Tasks.Docs do
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
 
-    * `:formatter` - Doc formatter to use; default: "html",
+    * `:formatters` - Formatter to use; default: ["html"],
       options: "html", "epub".
 
     * `:source_root` - Path to the source code root directory;
@@ -106,12 +106,11 @@ defmodule Mix.Tasks.Docs do
 
   @doc false
   def run(args, config \\ Mix.Project.config, generator \\ &ExDoc.generate_docs/3) do
-    Mix.Task.reenable "docs"
     Mix.Task.run "compile"
 
     {cli_opts, args, _} = OptionParser.parse(args,
                             aliases: [o: :output, n: :canonical, f: :formatter],
-                            switches: [output: :string, canonical: :string, formatter: :string])
+                            switches: [output: :string, canonical: :string, formatter: :keep])
 
     if args != [] do
       Mix.raise "Extraneous arguments on the command line"
@@ -128,9 +127,18 @@ defmodule Mix.Tasks.Docs do
       |> normalize_main()
       |> normalize_deps()
 
-    index = generator.(project, version, options)
-    log(index)
-    index
+    for formatter <- get_formatters(options) do
+      index = generator.(project, version, Keyword.put(options, :formatter, formatter))
+      log(index)
+      index
+    end
+  end
+
+  defp get_formatters(options) do
+    case Keyword.get_values(options, :formatter) do
+      [] -> options[:formatters] || ["html"]
+      values -> values
+    end
   end
 
   defp get_docs_opts(config) do
@@ -207,7 +215,7 @@ defmodule Mix.Tasks.Docs do
 
   defp get_deps() do
     for {key, _} <- Mix.Project.deps_paths,
-        _ = Application.load(key),
+        _ = Application.load(key), # :ok | {:error, _}
         vsn = Application.spec(key, :vsn) do
       {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
     end
