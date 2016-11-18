@@ -138,7 +138,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~s/"#{id}":[#{keys}]/
   end
 
-  defp sidebar_items_extra({id, title, group, content}) do
+  defp sidebar_items_extra(%{filename: id, title: title, group: group, content: content}) do
     headers =
       content
       |> extract_headers

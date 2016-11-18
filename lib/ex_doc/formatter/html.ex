@@ -26,7 +26,8 @@ defmodule ExDoc.Formatter.HTML do
       protocols: filter_list(:protocols, linked)
     }
 
-    extras = build_extras(project_nodes, nodes_map, config)
+    extras = [build_api_reference(nodes_map, config) |
+              build_extras(project_nodes, config, ".html")]
     static_files = generate_assets(output, assets(config))
 
     generated_files =
@@ -100,14 +101,16 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_extras(nodes_map, extras, output, config) do
-    Enum.map(extras, fn {filename, title, _group, content} ->
+    Enum.map(extras, fn %{filename: filename, title: title, content: content} ->
       filename = "#{filename}.html"
+      output = "#{output}/#{filename}"
       config = set_canonical_url(config, filename)
       html = Templates.extra_template(config, title, nodes_map, content)
-      if File.regular? output do
-        IO.puts "warning: file #{Path.relative_to_cwd output} already exists"
+
+      if File.regular?(output) do
+        IO.puts :stderr, "warning: file #{Path.relative_to_cwd output} already exists"
       end
-      File.write!("#{output}/#{filename}", html)
+      File.write!(output, html)
       filename
     end)
   end
@@ -115,7 +118,6 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Copy a list of assets into a given directory
   """
-  @spec generate_assets(list, String.t) :: :ok
   def generate_assets(output, sources) do
     Enum.flat_map sources, fn {from, to} ->
       output = "#{output}/#{to}"
@@ -141,39 +143,43 @@ defmodule ExDoc.Formatter.HTML do
      {assets_path("fonts"), "fonts"}]
   end
 
-  defp build_extras(project_nodes, nodes_map, config) do
-    extras =
-      config.extras
-      |> Enum.map(&Task.async(fn ->
-          build_extra(&1, project_nodes)
-         end))
-      |> Enum.map(&Task.await(&1, :infinity))
-
+  defp build_api_reference(nodes_map, config) do
     api_reference = Templates.api_reference_template(config, nodes_map)
-    [{"api-reference", "API Reference", "", api_reference}|extras]
+    %{filename: "api-reference", title: "API Reference", group: "", content: api_reference}
   end
 
-  defp build_extra({input, options}, project_nodes) do
+  @doc """
+  Builds extra nodes by normalizing the config entries.
+  """
+  def build_extras(project_nodes, config, extension) do
+    config.extras
+    |> Enum.map(&Task.async(fn ->
+        build_extra(&1, project_nodes, extension)
+       end))
+    |> Enum.map(&Task.await(&1, :infinity))
+  end
+
+  defp build_extra({input, options}, project_nodes, extension) do
     input = to_string(input)
     filename = options[:filename] || input |> input_to_title() |> title_to_filename()
-    build_extra(input, filename, options[:title], options[:group], project_nodes)
+    build_extra(input, filename, options[:title], options[:group], project_nodes, extension)
   end
 
-  defp build_extra(input, project_nodes) do
+  defp build_extra(input, project_nodes, extension) do
     filename = input |> input_to_title |> title_to_filename
-    build_extra(input, filename, nil, "", project_nodes)
+    build_extra(input, filename, nil, "", project_nodes, extension)
   end
 
-  defp build_extra(input, filename, title, group, project_nodes) do
+  defp build_extra(input, filename, title, group, project_nodes, extension) do
     if valid_extension_name?(input) do
       content =
         input
         |> File.read!()
-        |> Autolink.project_doc(project_nodes)
+        |> Autolink.project_doc(project_nodes, nil, extension)
 
       html_content = Markdown.to_html(content, file: input, line: 1)
       title = title || extract_title(html_content) || input_to_title(input)
-      {filename, title, group, html_content}
+      %{filename: filename, title: title, group: group, content: html_content}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
@@ -198,11 +204,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   @h1_regex ~r/<h1.*?>(.+)<\/h1>/m
-
-  @doc """
-  Extract title from h1 header in the content
-  """
-  def extract_title(content) do
+  defp extract_title(content) do
     title = Regex.run(@h1_regex, content, capture: :all_but_first)
 
     if title do
@@ -210,17 +212,11 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  @doc """
-  Convert the input file name into a title
-  """
-  def input_to_title(input) do
+  defp input_to_title(input) do
     input |> Path.basename() |> Path.rootname()
   end
 
-  @doc """
-  Convert a title into a file name
-  """
-  def title_to_filename(title) do
+  defp title_to_filename(title) do
     title |> String.replace(" ", "-") |> String.downcase()
   end
 

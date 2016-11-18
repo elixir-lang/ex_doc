@@ -110,7 +110,7 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   test "run generates the readme file" do
-    config = doc_config([main: "README", ])
+    config = doc_config([main: "README"])
     generate_docs_and_unzip(config)
 
     content = File.read!("#{output_dir()}/OEBPS/readme.xhtml")

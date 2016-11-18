@@ -46,7 +46,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   """
   EEx.function_from_file(:def, :extra_template,
                          Path.expand("templates/extra_template.eex", __DIR__),
-                         [:config, :content])
+                         [:config, :title, :content])
 
   @doc """
   Creates the cover page for the EPUB document.

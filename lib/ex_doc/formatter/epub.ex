@@ -14,13 +14,13 @@ defmodule ExDoc.Formatter.EPUB do
   @spec run(list, ExDoc.Config.t) :: String.t
   def run(project_nodes, config) when is_map(config) do
     config = normalize_config(config)
+    config = %{config | extras: HTML.build_extras(project_nodes, config, ".xhtml")}
 
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
     HTML.generate_assets(config.output, assets(config))
     HTML.generate_logo("OEBPS/assets", config)
-    config = generate_extras(config, project_nodes)
 
     all = HTML.Autolink.all(project_nodes, ".xhtml", config.deps)
     modules = HTML.filter_list(:modules, all)
@@ -35,6 +35,7 @@ defmodule ExDoc.Formatter.EPUB do
     generate_toc(config, nodes, uuid)
     generate_nav(config, nodes)
     generate_title(config)
+    generate_extras(config)
     generate_list(config, modules)
     generate_list(config, exceptions)
     generate_list(config, protocols)
@@ -49,70 +50,18 @@ defmodule ExDoc.Formatter.EPUB do
       config.output
       |> Path.expand()
       |> Path.join("#{config.project}-v#{config.version}")
-    config = %{config | output: output}
-    extras = Enum.into(config.extras, [], &normalize_extra(&1))
-    Map.put(config, :extras, extras)
+    %{config | output: output}
   end
 
-  defp normalize_extra({input_file, options}) do
-    input_file = to_string(input_file)
-    filename = options[:filename] || input_file |> HTML.input_to_title() |> HTML.title_to_filename()
-
-    %{
-      title: options[:title],
-      input: input_file,
-      output: "OEBPS/#{filename}.xhtml",
-      filename: filename,
-      group: options[:group]
-    }
-  end
-
-  defp normalize_extra(input) do
-    filename = input |> HTML.input_to_title() |> HTML.title_to_filename()
-
-    %{
-      title: HTML.input_to_title(input),
-      input: input,
-      output: "OEBPS/#{filename}.xhtml",
-      filename: filename,
-      group: ""
-    }
-  end
-
-  defp generate_extras(config, project_nodes) do
-    config_extras =
-      config.extras
-      |> Enum.map(&Task.async(fn ->
-           create_extra_files(&1, config.output, config, project_nodes)
-         end))
-      |> Enum.map(&Task.await(&1, :infinity))
-
-    %{config | extras: config_extras}
-  end
-
-  defp create_extra_files(options, output, config, project_nodes) do
-    if HTML.valid_extension_name?(options.input) do
-      content =
-        options.input
-        |> File.read!()
-        |> HTML.Autolink.project_doc(project_nodes, nil, ".xhtml")
-
-      html_content = Markdown.to_html(content, file: options.input, line: 1)
-      title = options.title || HTML.extract_title(html_content) || HTML.input_to_title(options[:input])
-
-      config = Map.put(config, :title, title)
-      html = Templates.extra_template(config, html_content)
-      output = "#{output}/#{options.output}"
-
+  defp generate_extras(config) do
+    Enum.each(config.extras, fn %{filename: filename, title: title, content: content} ->
+      output = "#{config.output}/OEBPS/#{filename}.xhtml"
+      html = Templates.extra_template(config, title, content)
       if File.regular? output do
-        IO.puts "warning: file #{Path.relative_to_cwd output} already exists"
+        IO.puts :stderr, "warning: file #{Path.relative_to_cwd output} already exists"
       end
-
       File.write!(output, html)
-      Map.put(options, :title, title)
-    else
-      raise ArgumentError, "file format not recognized, allowed format is: .md"
-    end
+    end)
   end
 
   defp generate_content(config, nodes, uuid, datetime) do
