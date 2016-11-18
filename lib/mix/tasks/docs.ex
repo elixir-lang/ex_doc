@@ -106,6 +106,7 @@ defmodule Mix.Tasks.Docs do
 
   @doc false
   def run(args, config \\ Mix.Project.config, generator \\ &ExDoc.generate_docs/3) do
+    Mix.Task.reenable "docs"
     Mix.Task.run "compile"
 
     {cli_opts, args, _} = OptionParser.parse(args,
@@ -206,7 +207,7 @@ defmodule Mix.Tasks.Docs do
 
   defp get_deps() do
     for {key, _} <- Mix.Project.deps_paths,
-        _ = Application.load(key), # :ok | {:error, _}
+        _ = Application.load(key),
         vsn = Application.spec(key, :vsn) do
       {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
     end
