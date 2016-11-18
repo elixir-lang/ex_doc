@@ -44,7 +44,7 @@ defmodule ExDoc.Formatter.HTML do
       generate_list(nodes_map.protocols, nodes_map, config)
 
     generate_build(static_files ++ generated_files, build)
-    "index.html" |> Path.join(config.output) |> Path.relative_to_cwd()
+    config.output |> Path.join("index.html") |> Path.relative_to_cwd()
   end
 
   defp normalize_config(%{main: "index"}) do
