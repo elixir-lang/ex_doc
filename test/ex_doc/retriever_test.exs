@@ -196,6 +196,10 @@ defmodule ExDoc.RetrieverTest do
       "A doc for this so it doesn't use 'Callback implementation for'"
     assert Enum.at(docs, 1).doc ==
       "Callback implementation for `c:CustomBehaviourOne.greet/1`."
+    assert Enum.at(docs, 2).doc ==
+      "This is a sample callback.\n\n" <>
+      "Documentation for callback `c:CustomBehaviourOne.hello/1`.\n\n" <>
+      "With description\n"
   end
 
   ## PROTOCOLS

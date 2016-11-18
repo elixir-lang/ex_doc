@@ -4,6 +4,8 @@ defmodule CustomBehaviourOne do
 
   @doc """
   This is a sample callback.
+
+  With description
   """
   @callback hello(integer) :: integer
   @callback greet(integer | String.t) :: integer
