@@ -1,8 +1,10 @@
 <%= head_template(config, %{title: "Cover"}) %>
-    <h1><%= config.project %></h1>
-    <h2>v<%= config.version %></h2>
-    <%= if logo = config.logo do %>
-      <div><img src="assets/logo<%= Path.extname(logo) %>" alt="Logo"/></div>
-    <% end %>
+    <div class="title-container">
+      <h1><%= config.project %></h1>
+      <h2>v<%= config.version %></h2>
+      <%= if logo = config.logo do %>
+        <div><img src="assets/logo<%= Path.extname(logo) %>" alt="Logo"/></div>
+      <% end %>
+    </div>
   </body>
 </html>
