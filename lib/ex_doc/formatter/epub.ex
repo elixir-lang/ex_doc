@@ -20,7 +20,7 @@ defmodule ExDoc.Formatter.EPUB do
 
     HTML.generate_assets(config.output, assets(config))
     HTML.generate_logo("OEBPS/assets", config)
-    generate_extras(config, project_nodes)
+    config = generate_extras(config, project_nodes)
 
     all = HTML.Autolink.all(project_nodes, ".xhtml", config.deps)
     modules = HTML.filter_list(:modules, all)
@@ -80,11 +80,14 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_extras(config, project_nodes) do
-    config.extras
-    |> Enum.map(&Task.async(fn ->
-         create_extra_files(&1, config.output, config, project_nodes)
-       end))
-    |> Enum.map(&Task.await(&1, :infinity))
+    config_extras =
+      config.extras
+      |> Enum.map(&Task.async(fn ->
+           create_extra_files(&1, config.output, config, project_nodes)
+         end))
+      |> Enum.map(&Task.await(&1, :infinity))
+
+    %{config | extras: config_extras}
   end
 
   defp create_extra_files(options, output, config, project_nodes) do
@@ -106,6 +109,7 @@ defmodule ExDoc.Formatter.EPUB do
       end
 
       File.write!(output, html)
+      Map.put(options, :title, title)
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
