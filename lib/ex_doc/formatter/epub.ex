@@ -6,7 +6,6 @@ defmodule ExDoc.Formatter.EPUB do
   @mimetype "application/epub+zip"
   alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.EPUB.Templates
-  alias ExDoc.Markdown
 
   @doc """
   Generate EPUB documentation for the given modules
@@ -19,7 +18,7 @@ defmodule ExDoc.Formatter.EPUB do
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
-    HTML.generate_assets(config, assets(config))
+    static_files = HTML.generate_assets(config, assets(config))
     HTML.generate_logo("OEBPS/assets", config)
 
     all = HTML.Autolink.all(project_nodes, ".xhtml", config.deps)
@@ -31,7 +30,7 @@ defmodule ExDoc.Formatter.EPUB do
     datetime = format_datetime()
     nodes = modules ++ exceptions ++ protocols
 
-    generate_content(config, nodes, uuid, datetime)
+    generate_content(config, nodes, uuid, datetime, static_files)
     generate_toc(config, nodes, uuid)
     generate_nav(config, nodes)
     generate_title(config)
@@ -64,8 +63,13 @@ defmodule ExDoc.Formatter.EPUB do
     end)
   end
 
-  defp generate_content(config, nodes, uuid, datetime) do
-    content = Templates.content_template(config, nodes, uuid, datetime)
+  defp generate_content(config, nodes, uuid, datetime, static_files) do
+    static_files =
+      Enum.filter(static_files, fn(x) ->
+        String.contains?(x, "OEBPS") && config.output |> Path.join(x) |> File.regular?()
+      end)
+
+    content = Templates.content_template(config, nodes, uuid, datetime, static_files)
     File.write("#{config.output}/OEBPS/content.opf", content)
   end
 

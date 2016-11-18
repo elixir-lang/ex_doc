@@ -213,11 +213,17 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  defp input_to_title(input) do
+  @doc """
+  Convert the input file name into a title_to_filename/1
+  """
+  def input_to_title(input) do
     input |> Path.basename() |> Path.rootname()
   end
 
-  defp title_to_id(title) do
+  @doc """
+  Creates an ID from a given title
+  """
+  def title_to_id(title) do
     title |> String.replace(" ", "-") |> String.downcase()
   end
 
