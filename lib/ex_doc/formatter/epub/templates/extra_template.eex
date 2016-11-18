@@ -1,5 +1,4 @@
 <%= head_template(config, %{title: config.title}) %>
-  <h1><%= config.title %></h1>
     <%= content %>
   </body>
 </html>
