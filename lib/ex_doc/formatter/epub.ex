@@ -80,7 +80,14 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_nav(config, nodes) do
-    content = Templates.nav_template(config, nodes)
+    extras_by_group =
+      Enum.reduce(config.extras, %{}, fn(x, acc) ->
+        group = x.group || "Extras"
+        Map.update(acc, group, [x], &([x | &1]))
+      end)
+      |> Enum.map(fn({k, v}) -> {k, Enum.reverse(v)} end)
+
+    content = Templates.nav_template(%{ config | extras: extras_by_group}, nodes)
     File.write("#{config.output}/OEBPS/nav.xhtml", content)
   end
 
