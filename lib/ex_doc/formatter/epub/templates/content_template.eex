@@ -12,11 +12,15 @@
     <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
     <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav scripted"/>
     <item id="cover" href="title.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
-    <%= for extra <- config.extras do %>
-      <item id="<%= extra.id %>" href="<%= extra.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+    <%= for {_title, extras} <- config.extras do %>
+      <%= for extra <- extras do %>
+        <item id="<%= extra.id %>" href="<%= extra.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+      <% end %>
     <% end %>
-    <%= for node <- nodes do %>
-      <item id="<%= node.id %>" href="<%= node.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+    <%= for filter <- [:modules, :exceptions, :protocols] do %>
+      <%= for node <- nodes[filter] do %>
+        <item id="<%= node.id %>" href="<%= node.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+      <% end %>
     <% end %>
     <%= for static_file <- static_files do %>
       <item id="<%= static_file |> HTML.input_to_title() |> HTML.title_to_id() %>" href="<%= static_file %>" media-type="<%= media_type(Path.extname(static_file)) %>"/>
@@ -33,11 +37,15 @@
   <spine toc="ncx">
     <itemref idref="cover" linear="no"/>
     <itemref idref="nav"/>
-    <%= for extra <- config.extras do %>
-      <itemref idref="<%= extra.id %>"/>
+    <%= for {_title, extras} <- config.extras do %>
+      <%= for extra <- extras do %>
+        <itemref idref="<%= extra.id %>"/>
+      <% end %>
     <% end %>
-    <%= for node <- nodes do %>
-      <itemref idref="<%= node.id %>"/>
+    <%= for filter <- [:modules, :exceptions, :protocols] do %>
+      <%= for node <- nodes[filter] do %>
+        <itemref idref="<%= node.id %>"/>
+      <% end %>
     <% end %>
   </spine>
 </package>

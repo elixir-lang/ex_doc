@@ -13,28 +13,25 @@
     <text><%= config.project %> - <%= config.version %></text>
   </docTitle>
   <navMap>
-    <navPoint id="navpoint-1" playOrder="1">
+    <navPoint id="navpoint-1">
       <navLabel>
         <text>Book cover</text>
       </navLabel>
       <content src="title.xhtml"/>
     </navPoint>
-    <%= for {extra, index} <- config.extras |> Enum.with_index do %>
-      <navPoint id="<%= extra.id %>" playOrder="<%= index + 2 %>">
-        <navLabel>
-        <text><%= extra.title %></text>
-        </navLabel>
-        <content src="<%= extra.id %>.xhtml"/>
-      </navPoint>
+    <%= for {_title, extras} <- config.extras do %>
+      <%= for extra <- extras do %>
+        <navPoint id="<%= extra.id %>">
+          <navLabel>
+          <text><%= extra.title %></text>
+          </navLabel>
+          <content src="<%= extra.id %>.xhtml"/>
+        </navPoint>
+      <% end %>
     <% end %>
-    <% start_value = Enum.count(config.extras) + 2 %>
-    <%= for {node, index} <- Enum.with_index(nodes) do %>
-      <navPoint id="<%= node.id %>" playOrder="<%= index + start_value %>">
-      <navLabel>
-        <text><%= node.id %></text>
-      </navLabel>
-      <content src="<%= node.id %>.xhtml"/>
-    </navPoint>
-    <% end %>
+
+    <%= toc_item_template(nodes.modules) %>
+    <%= toc_item_template(nodes.exceptions) %>
+    <%= toc_item_template(nodes.protocols) %>
   </navMap>
 </ncx>

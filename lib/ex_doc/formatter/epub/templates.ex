@@ -77,6 +77,14 @@ defmodule ExDoc.Formatter.EPUB.Templates do
                          Path.expand("templates/head_template.eex", __DIR__),
                          [:config, :page])
 
+  EEx.function_from_file(:defp, :nav_item_template,
+                         Path.expand("templates/nav_item_template.eex", __DIR__),
+                         [:name, :nodes])
+
+  EEx.function_from_file(:defp, :toc_item_template,
+                         Path.expand("templates/toc_item_template.eex", __DIR__),
+                         [:nodes])
+
   "templates/media-types.txt"
   |> Path.expand(__DIR__)
   |> File.read!()
