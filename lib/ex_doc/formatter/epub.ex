@@ -68,6 +68,7 @@ defmodule ExDoc.Formatter.EPUB do
       Enum.filter(static_files, fn(x) ->
         String.contains?(x, "OEBPS") && config.output |> Path.join(x) |> File.regular?()
       end)
+      |> Enum.map(&Path.relative_to(&1, "OEBPS"))
 
     content = Templates.content_template(config, nodes, uuid, datetime, static_files)
     File.write("#{config.output}/OEBPS/content.opf", content)
