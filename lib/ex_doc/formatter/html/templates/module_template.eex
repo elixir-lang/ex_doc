@@ -21,7 +21,7 @@
       <% end %>
 
       <%= if Enum.any?(summary_map, fn {_, v} -> v != [] end) do %>
-        <section id="summary" class="details-list">
+        <section id="summary">
           <h1 class="section-heading">
             <a class="hover-link" href="#summary">
               <i class="icon-link"></i>
@@ -37,7 +37,7 @@
       <% end %>
 
       <%= if summary_map.types != [] do %>
-        <section id="types" class="details-list">
+        <section id="types">
           <h1 class="section-heading">
             <a class="hover-link" href="#types">
               <i class="icon-link"></i>
@@ -54,7 +54,7 @@
       <% end %>
 
       <%= if summary_map.functions != [] do %>
-        <section id="functions" class="details-list">
+        <section id="functions">
           <h1 class="section-heading">
             <a class="hover-link" href="#functions">
               <i class="icon-link"></i>
@@ -69,7 +69,7 @@
       <% end %>
 
       <%= if summary_map.macros != [] do %>
-        <section id="macros" class="details-list">
+        <section id="macros">
           <h1 class="section-heading">
             <a class="hover-link" href="#macros">
               <i class="icon-link"></i>
@@ -84,7 +84,7 @@
       <% end %>
 
       <%= if summary_map.callbacks != [] do %>
-        <section id="callbacks" class="details-list">
+        <section id="callbacks">
           <h1 class="section-heading">
             <a class="hover-link" href="#callbacks">
               <i class="icon-link"></i>

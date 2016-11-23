@@ -1,36 +1,48 @@
-.summary {
-  h2 {
+.summary-table {
+
+  table, th, td {
+    border: 1px solid @gray;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 10px;
+  }
+
+  th {
+    background-color: @mediumGray;
     font-weight: 700;
+    text-align: center;
 
     a {
-        background: none;
-        border: none;
-        text-shadow: none;
+      color: white;
+      background: none;
+      border: none;
+      text-shadow: none;
     }
   }
 
-  .summary-row {
-    .summary-signature {
+  td {
+    background-color: @detailGray;
+    font-family: @serifFontFamily;
+    font-style: italic;
+
+    p {
+      margin: 0;
+      padding: 0;
+    }
+
+    .summary-item-title {
       font-family: @monoFontFamily;
       font-weight: 700;
 
       a {
+        color: #039be5;
         background: none;
         border: none;
         text-shadow: none;
       }
     }
-
-    .summary-synopsis {
-      font-family: @serifFontFamily;
-      font-style: italic;
-      padding: 0 1.2em;
-      margin: 0 0 .5em;
-
-      p {
-        margin: 0;
-        padding: 0;
-      }
-    }
   }
+
 }

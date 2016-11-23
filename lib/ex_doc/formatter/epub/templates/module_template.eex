@@ -13,13 +13,14 @@
     <% end %>
 
     <%= if Enum.any?(summary_map, fn {_, v} -> v != [] end) do %>
-      <section id="summary" class="details-list">
+      <section id="summary" class="summary-table">
         <h1 class="section-heading">
           <a class="hover-link" href="#summary">
             <i class="icon-link"></i>
           </a>
           Summary
         </h1>
+        <hr>
         <%= H.summary_template "types", summary_map.types %>
         <%= H.summary_template "functions", summary_map.functions %>
         <%= H.summary_template "macros", summary_map.macros %>
@@ -28,13 +29,14 @@
     <% end %>
 
     <%= if summary_map.types != [] do %>
-      <section id="types" class="details-list">
+      <section id="types" class="summary-table">
         <h1 class="section-heading">
           <a class="hover-link" href="#types">
             <i class="icon-link"></i>
           </a>
           Types
         </h1>
+        <hr>
         <div class="types-list">
           <%= for type_node <- summary_map.types do
             H.detail_template(type_node, module)
@@ -44,13 +46,14 @@
     <% end %>
 
     <%= if summary_map.functions != [] do %>
-      <section id="functions" class="details-list">
+      <section id="functions" class="summary-table">
         <h1 class="section-heading">
           <a class="hover-link" href="#functions">
             <i class="icon-link"></i>
           </a>
           Functions
         </h1>
+        <hr>
         <%= for function_node <- summary_map.functions do
           H.detail_template(function_node, module)
         end %>
@@ -58,13 +61,14 @@
     <% end %>
 
     <%= if summary_map.macros != [] do %>
-      <section id="macros" class="details-list">
+      <section id="macros" class="summary-table">
         <h1 class="section-heading">
           <a class="hover-link" href="#macros">
             <i class="icon-link"></i>
           </a>
           Macros
         </h1>
+        <hr>
         <%= for macro_node <- summary_map.macros do
           H.detail_template(macro_node, module)
         end %>
@@ -72,13 +76,14 @@
     <% end %>
 
     <%= if summary_map.callbacks != [] do %>
-      <section id="callbacks" class="details-list">
+      <section id="callbacks" class="summary-table">
         <h1 class="section-heading">
           <a class="hover-link" href="#callbacks">
             <i class="icon-link"></i>
           </a>
           Callbacks
         </h1>
+        <hr>
         <%= for callback_node <- summary_map.callbacks do
           H.detail_template(callback_node, module)
         end %>
