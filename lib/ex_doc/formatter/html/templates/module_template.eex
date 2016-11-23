@@ -28,6 +28,7 @@
             </a>
             Summary
           </h1>
+          <hr>
           <%= summary_template "types", summary_map.types %>
           <%= summary_template "functions", summary_map.functions %>
           <%= summary_template "macros", summary_map.macros %>
@@ -43,6 +44,7 @@
             </a>
             Types
           </h1>
+          <hr>
           <div class="types-list">
             <%= for type_node <- summary_map.types do
               detail_template(type_node, module)
@@ -59,6 +61,7 @@
             </a>
             Functions
           </h1>
+          <hr>
           <%= for function_node <- summary_map.functions do
             detail_template(function_node, module)
           end %>
@@ -73,6 +76,7 @@
             </a>
             Macros
           </h1>
+          <hr>
           <%= for macro_node <- summary_map.macros do
             detail_template(macro_node, module)
           end %>
@@ -87,6 +91,7 @@
             </a>
             Callbacks
           </h1>
+          <hr>
           <%= for callback_node <- summary_map.callbacks do
             detail_template(callback_node, module)
           end %>
