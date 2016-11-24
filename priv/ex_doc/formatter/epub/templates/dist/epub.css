@@ -1,0 +1,133 @@
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Tomorrow Comment */
+.hljs-comment {
+  color: #8e908c;
+}
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+  color: #c82829;
+}
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-params,
+.hljs-constant {
+  color: #f5871f;
+}
+/* Tomorrow Yellow */
+.ruby .hljs-class .hljs-title,
+.css .hljs-rule .hljs-attribute {
+  color: #eab700;
+}
+/* Tomorrow Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.hljs-name,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+  color: #718c00;
+}
+/* Tomorrow Aqua */
+.hljs-title,
+.css .hljs-hexcolor {
+  color: #3e999f;
+}
+/* Tomorrow Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+  color: #4271ae;
+}
+/* Tomorrow Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+  color: #8959a8;
+}
+.hljs {
+  display: block;
+  overflow-x: auto;
+  background: white;
+  color: #4d4d4c;
+  padding: 0.5em;
+  -webkit-text-size-adjust: none;
+}
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+  opacity: 0.5;
+}
+body {
+  display: block;
+  font-size: 1em;
+  line-height: 1.2;
+  padding-left: 0;
+  padding-right: 0;
+  margin: 0 5pt;
+}
+a.no-underline,
+pre a {
+  color: #9768d1;
+  text-shadow: none;
+  text-decoration: none;
+  background-image: none;
+}
+a.no-underline:visited,
+pre a:visited,
+a.no-underline:active,
+pre a:active,
+a.no-underline:focus,
+pre a:focus,
+a.no-underline:hover,
+pre a:hover {
+  color: #9768d1;
+  text-decoration: none;
+}
+code {
+  font-family: 'Inconsolata', Menlo, Courier, monospace;
+  font-style: normal;
+  line-height: 24px;
+  font-weight: 400;
+  background-color: #f1f1f1;
+  vertical-align: baseline;
+  border-radius: 2px;
+  padding: .1em .2em;
+}
+pre {
+  margin: 1.5em 0;
+}
+pre.spec {
+  margin: 0;
+}
+pre.spec code {
+  padding: 0;
+}
+pre code.hljs {
+  white-space: inherit;
+  padding: 0.5em 1em;
+  background-color: #f1f1f1;
+}
