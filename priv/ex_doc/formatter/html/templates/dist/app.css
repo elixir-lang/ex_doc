@@ -1440,10 +1440,10 @@ body.night-mode .content-inner .detail-header {
   color: #D2D2D2;
 }
 body.night-mode .content-inner code {
-  background-color: #303036;
+  background-color: #2C2C31;
 }
 body.night-mode .content-inner pre code.hljs {
-  background-color: #303036;
+  background-color: #2C2C31;
 }
 body.night-mode .content-inner pre a {
   text-shadow: none;
@@ -1468,13 +1468,14 @@ body.night-mode .content-inner .summary-table td {
 }
 body.night-mode .content-inner .summary-table th {
   background-color: #373f52;
+  color: white;
 }
 body.night-mode .content-inner .summary-table th a {
   text-shadow: none;
   background-image: none;
 }
 body.night-mode .content-inner .summary-table td {
-  background-color: #303036;
+  background-color: #2C2C31;
 }
 .night-mode .sidebar-toggle i {
   color: #d5dae6;
