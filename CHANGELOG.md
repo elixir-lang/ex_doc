@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.14.4
+
+  * Enhancements
+    * Point to Elixir docs on hexdocs.pm
+    * Many improvements to layout and styling of EPUB formatter
+    * Support multiple formatters to be configured on `mix.exs`
+    * Also digest `sidebar_items.js`
+    * Force parentheses on type signature to remove ambiguity
+    * Generate top-level docs for an umbrella project
+    * Searching on mobile closes menu when the Enter key is hit
+
 ## v0.14.3
 
   * Enhancements
