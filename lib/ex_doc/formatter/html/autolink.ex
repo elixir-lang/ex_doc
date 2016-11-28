@@ -4,7 +4,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   Conveniences for autolinking locals, types and more.
   """
 
-  @elixir_docs "http://elixir-lang.org/docs/stable/"
+  @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
 
   @doc """

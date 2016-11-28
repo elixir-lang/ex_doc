@@ -278,13 +278,13 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run creates a preferred URL with link element when canonical options is specified" do
-    config = doc_config(extras: ["test/fixtures/README.md"], canonical: "http://elixir-lang.org/docs/stable/elixir/")
+    config = doc_config(extras: ["test/fixtures/README.md"], canonical: "https://hexdocs.pm/elixir/")
     generate_docs(config)
     content = File.read!("#{output_dir()}/api-reference.html")
-    assert content =~ ~r{<link rel="canonical" href="http://elixir-lang.org/docs/stable/elixir/}
+    assert content =~ ~r{<link rel="canonical" href="https://hexdocs.pm/elixir/}
 
     content = File.read!("#{output_dir()}/readme.html")
-    assert content =~ ~r{<link rel="canonical" href="http://elixir-lang.org/docs/stable/elixir/}
+    assert content =~ ~r{<link rel="canonical" href="https://hexdocs.pm/elixir/}
   end
 
   test "run does not create a preferred URL with link element when canonical is nil" do

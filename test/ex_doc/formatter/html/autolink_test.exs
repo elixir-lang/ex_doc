@@ -3,7 +3,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   alias ExDoc.Formatter.HTML.Autolink
 
-  @elixir_docs "http://elixir-lang.org/docs/stable/"
+  @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
 
   # local_doc
@@ -242,7 +242,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   test "autolink Elixir types in typespecs" do
     assert Autolink.typespec(quote(do: String.t), [], []) ==
-           ~s[<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>]
+           ~s[<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>]
 
     assert Autolink.typespec(quote(do: Unknown.bar()), [], []) ==
            ~s[Unknown.bar]
