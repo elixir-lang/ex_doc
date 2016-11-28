@@ -4,34 +4,34 @@
 </h1>
 
 <%= if nodes_map.modules != [] do %>
-  <section class="details-list">
-    <h2 id="modules" class="section-heading">Modules</h2>
-    <div class="summary">
-      <%= for module_node <- nodes_map.modules do
-        api_reference_entry_template(module_node)
-      end %>
-    </div>
-  </section>
+  <table class="summary-table">
+    <tr>
+      <th>Modules</th>
+    </tr>
+    <%= for module_node <- nodes_map.modules do
+      api_reference_entry_template(module_node)
+    end %>
+  </table>
 <% end %>
 
 <%= if nodes_map.exceptions != [] do %>
-  <section class="details-list">
-    <h2 id="exceptions" class="section-heading">Exceptions</h2>
-    <div class="summary">
-      <%= for exception_node <- nodes_map.exceptions do
-        api_reference_entry_template(exception_node)
-      end %>
-    </div>
-  </section>
+  <table class="summary-table">
+    <tr>
+      <th>Exceptions</th>
+    </tr>
+    <%= for exception_node <- nodes_map.exceptions do
+      api_reference_entry_template(exception_node)
+    end %>
+  </table>
 <% end %>
 
 <%= if nodes_map.protocols != [] do %>
-  <section class="details-list">
-    <h2 id="protocols" class="section-heading">Protocols</h2>
-    <div class="summary">
-      <%= for protocol_node <- nodes_map.protocols do
-        api_reference_entry_template(protocol_node)
-      end %>
-    </div>
-  </section>
+  <table class="summary-table">
+    <tr>
+      <th>Protocols</th>
+    </tr>
+    <%= for protocol_node <- nodes_map.protocols do
+      api_reference_entry_template(protocol_node)
+    end %>
+  </table>
 <% end %>
