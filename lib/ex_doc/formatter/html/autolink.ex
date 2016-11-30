@@ -1,8 +1,9 @@
 defmodule ExDoc.Formatter.HTML.Autolink do
-  import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc_h: 1]
   @moduledoc """
   Conveniences for autolinking locals, types and more.
   """
+
+  import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc_h: 1]
 
   @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"

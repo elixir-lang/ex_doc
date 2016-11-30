@@ -1,7 +1,5 @@
 defmodule ExDoc.Formatter.EPUB.Templates do
-  @moduledoc """
-  Handle all template interfaces for the EPUB formatter.
-  """
+  @moduledoc false
 
   require EEx
 
@@ -17,18 +15,22 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   end
 
   @doc """
-  Creates the [Package Document Definition](http://www.idpf.org/epub/30/spec/epub30-publications.html#sec-package-def),
+  Creates the Package Document Definition.
+
   this definition encapsulates the publication metadata and the resource
   information that constitute the EPUB publication. This definition also
   includes the default reading order.
+
+  See http://www.idpf.org/epub/30/spec/epub30-publications.html#sec-package-def.
   """
   EEx.function_from_file(:def, :content_template,
                          Path.expand("templates/content_template.eex", __DIR__),
                          [:config, :nodes, :uuid, :datetime, :static_files])
 
   @doc """
-  Creates a chapter which contains all the details about an individual module,
-  this chapter can include the following sections: *functions*, *macros*,
+  Creates a chapter which contains all the details about an individual module.
+
+  This chapter can include the following sections: *functions*, *macros*,
   *types*, *callbacks*.
   """
   EEx.function_from_file(:def, :module_template,
@@ -36,8 +38,11 @@ defmodule ExDoc.Formatter.EPUB.Templates do
                          [:config, :module, :summary_map])
 
   @doc """
-  Creates the table of contents. This template follows the
-  [EPUB Navigation Document Definition](http://www.idpf.org/epub/30/spec/epub30-contentdocs.html#sec-xhtml-nav).
+  Creates the table of contents.
+
+  This template follows the EPUB Navigation Document Definition.
+
+  See http://www.idpf.org/epub/30/spec/epub30-contentdocs.html#sec-xhtml-nav.
   """
   EEx.function_from_file(:def, :nav_template,
                          Path.expand("templates/nav_template.eex", __DIR__),
@@ -58,9 +63,11 @@ defmodule ExDoc.Formatter.EPUB.Templates do
                          [:config])
 
   @doc """
-  Creates an *Navigation Center eXtended* document (as defined in OPF 2.0.1),
-  this is for compatibility purposes with EPUB 2 Reading Systems.  EPUB 3
-  Reading Systems must ignore the NCX in favor of the
+  Creates an *Navigation Center eXtended* document (as defined in OPF 2.0.1).
+
+  This is for compatibility purposes with EPUB 2 Reading Systems.
+
+  EPUB 3 Reading Systems must ignore the NCX in favor of the
   [EPUB Navigation Document](http://www.idpf.org/epub/30/spec/epub30-contentdocs.html#sec-xhtml-nav).
   """
   EEx.function_from_file(:def, :toc_template,
