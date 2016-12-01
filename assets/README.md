@@ -1,7 +1,7 @@
 # Assets
 
 In this directory live all assets for `ExDoc`. The ready to use built
-versions are found in `priv/ex_doc/formatter/{html,epub}/templates/dist`. To
+versions are found in `priv/ex_doc/formatter/{html,epub}/assets/dist`. To
 change any of them read please read the following instructions:
 
 ## Dependencies

@@ -136,7 +136,7 @@ defmodule ExDoc.Formatter.HTML do
   defp assets(%{assets: path}), do: [{path, "assets"} | assets()]
 
   defp assets_path(pattern) do
-    Application.app_dir(:ex_doc, "priv/ex_doc/formatter/html/templates/#{pattern}")
+    Application.app_dir(:ex_doc, "priv/ex_doc/formatter/html/assets/#{pattern}")
   end
 
   defp assets do

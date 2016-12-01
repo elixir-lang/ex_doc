@@ -110,11 +110,11 @@ defmodule ExDoc.Formatter.EPUB do
   defp assets(%{assets: path}), do: [{path, "OEBPS/assets"} | assets()]
   defp assets do
    [{assets_path("dist"), "OEBPS/dist"},
-    {assets_path("assets"), "META-INF"}]
+    {assets_path("metainfo"), "META-INF"}]
   end
 
   defp assets_path(pattern) do
-    Application.app_dir(:ex_doc, "priv/ex_doc/formatter/epub/templates/#{pattern}")
+    Application.app_dir(:ex_doc, "priv/ex_doc/formatter/epub/assets/#{pattern}")
   end
 
   defp files_to_add(path) do
