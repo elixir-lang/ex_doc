@@ -3,8 +3,7 @@ defmodule ExDoc.Formatter.HTML do
   Generate HTML documentation for Elixir projects
   """
 
-  alias ExDoc.Formatter.HTML.Templates
-  alias ExDoc.Formatter.HTML.Autolink
+  alias __MODULE__.{Assets, Autolink, Templates}
   alias ExDoc.Markdown
 
   @main "api-reference"
@@ -31,12 +30,13 @@ defmodule ExDoc.Formatter.HTML do
       [build_api_reference(nodes_map, config) |
        build_extras(project_nodes, config, ".html")]
 
-    static_files = generate_assets(config, assets(config))
+    assets_dir = "assets"
+    static_files = generate_assets(config, assets_dir, default_assets())
 
     generated_files =
       generate_sidebar_items(nodes_map, extras, config) ++
       generate_extras(nodes_map, extras, config) ++
-      generate_logo("assets", config) ++
+      generate_logo(assets_dir, config) ++
       generate_index(config) ++
       generate_not_found(nodes_map, config) ++
       generate_list(nodes_map.modules, nodes_map, config) ++
@@ -117,31 +117,42 @@ defmodule ExDoc.Formatter.HTML do
     end)
   end
 
-  @doc """
-  Copy a list of assets into a given directory
-  """
-  def generate_assets(config, sources) do
-    Enum.flat_map sources, fn {from, to} ->
-      Enum.map Path.wildcard(Path.join(from, "**/*")), fn source ->
-        filename = Path.join(to, Path.relative_to(source, from))
+  @doc false
+  def generate_assets(config, assets_dir, defaults) do
+    write_default_assets(config, defaults) ++ copy_assets(config, assets_dir)
+  end
+
+  defp copy_assets(config, assets_dir) do
+    if path = config.assets do
+      path
+      |> Path.join("**/*")
+      |> Path.wildcard()
+      |> Enum.map(fn source ->
+        filename = Path.join(assets_dir, Path.relative_to(source, path))
         target = Path.join(config.output, filename)
         File.mkdir(Path.dirname(target))
         File.copy(source, target)
         filename
-      end
+      end)
+    else
+      []
     end
   end
 
-  defp assets(%{assets: nil}), do: assets()
-  defp assets(%{assets: path}), do: [{path, "assets"} | assets()]
-
-  defp assets_path(pattern) do
-    Application.app_dir(:ex_doc, "priv/ex_doc/formatter/html/assets/#{pattern}")
+  defp write_default_assets(config, sources) do
+    Enum.flat_map(sources, fn {files, dir} ->
+      target_dir = Path.join(config.output, dir)
+      File.mkdir(target_dir)
+      Enum.map(files, fn {name, content} ->
+        target = Path.join(target_dir, name)
+        File.write(target, content)
+        Path.relative_to(target, config.output)
+      end)
+    end)
   end
 
-  defp assets do
-    [{assets_path("dist"), "dist"},
-     {assets_path("fonts"), "fonts"}]
+  defp default_assets() do
+    [{Assets.dist(), "dist"}, {Assets.fonts(), "fonts"}]
   end
 
   defp build_api_reference(nodes_map, config) do

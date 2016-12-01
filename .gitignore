@@ -7,3 +7,4 @@
 erl_crash.dump
 /npm-debug.log
 /test/fixtures/umbrella/_build
+/ex_doc

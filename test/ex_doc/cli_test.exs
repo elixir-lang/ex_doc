@@ -4,7 +4,7 @@ defmodule ExDoc.CLITest do
   import ExUnit.CaptureIO
 
   defp run(args) do
-    ExDoc.CLI.run(args, &{&1, &2, &3})
+    ExDoc.CLI.main(args, &{&1, &2, &3})
   end
 
   test "minimum command-line options" do

@@ -8,6 +8,7 @@ defmodule ExDoc.Mixfile do
      deps: deps(),
      aliases: aliases(),
      package: package(),
+     escript: escript(),
      source_url: "https://github.com/elixir-lang/ex_doc/",
      test_coverage: [tool: ExCoveralls],
      preferred_cli_env: [coveralls: :test],
@@ -34,6 +35,10 @@ defmodule ExDoc.Mixfile do
    [licenses: ["Apache 2.0"],
     maintainers: ["José Valim", "Eksperimental", "Milton Mazzarri", "Friedel Ziegelmayer"],
     links: %{"GitHub" => "https://github.com/elixir-lang/ex_doc"}]
+  end
+
+  def escript do
+    [main_module: ExDoc.CLI]
   end
 
   defp clean_test_fixtures(_args) do

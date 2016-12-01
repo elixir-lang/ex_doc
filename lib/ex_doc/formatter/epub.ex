@@ -4,8 +4,8 @@ defmodule ExDoc.Formatter.EPUB do
   """
 
   @mimetype "application/epub+zip"
+  alias __MODULE__.{Assets, Templates}
   alias ExDoc.Formatter.HTML
-  alias ExDoc.Formatter.EPUB.Templates
 
   @doc """
   Generate EPUB documentation for the given modules
@@ -18,8 +18,9 @@ defmodule ExDoc.Formatter.EPUB do
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
-    static_files = HTML.generate_assets(config, assets(config))
-    HTML.generate_logo("OEBPS/assets", config)
+    assets_dir = "OEBPS/assets"
+    static_files = HTML.generate_assets(config, assets_dir, default_assets())
+    HTML.generate_logo(assets_dir, config)
 
     all = HTML.Autolink.all(project_nodes, ".xhtml", config.deps)
     modules = HTML.filter_list(:modules, all)
@@ -106,15 +107,8 @@ defmodule ExDoc.Formatter.EPUB do
 
   ## Helpers
 
-  defp assets(%{assets: nil}), do: assets()
-  defp assets(%{assets: path}), do: [{path, "OEBPS/assets"} | assets()]
-  defp assets do
-   [{assets_path("dist"), "OEBPS/dist"},
-    {assets_path("metainfo"), "META-INF"}]
-  end
-
-  defp assets_path(pattern) do
-    Application.app_dir(:ex_doc, "priv/ex_doc/formatter/epub/assets/#{pattern}")
+  defp default_assets() do
+    [{Assets.dist(), "OEBPS/dist"}, {Assets.metainfo(), "META-INF"}]
   end
 
   defp files_to_add(path) do
