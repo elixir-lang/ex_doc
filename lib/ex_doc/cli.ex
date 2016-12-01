@@ -16,17 +16,17 @@ defmodule ExDoc.CLI do
                switches: [extra: :keep])
 
     if List.keymember?(opts, :version, 0) do
-      do_version()
+      print_version()
     else
-      do_generate(args, opts, generator)
+      generate(args, opts, generator)
     end
   end
 
-  defp do_version do
+  defp print_version do
     IO.puts "ExDoc v#{ExDoc.version}"
   end
 
-  defp do_generate(args, opts, generator) do
+  defp generate(args, opts, generator) do
     [project, version, source_beam] = parse_args(args)
 
     Code.prepend_path(source_beam)
