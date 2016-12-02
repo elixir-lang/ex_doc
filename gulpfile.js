@@ -24,8 +24,8 @@ var environment = $.util.env.type || 'development'
 var isProduction = environment === 'production'
 
 var distPath = {
-  html: 'priv/ex_doc/formatter/html/templates/dist',
-  epub: 'priv/ex_doc/formatter/epub/templates/dist'
+  html: 'priv/ex_doc/formatter/html/assets/dist',
+  epub: 'priv/ex_doc/formatter/epub/assets/dist'
 }
 
 var npmPlugin = new LessPluginNpmImport()

@@ -34,7 +34,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
   setup_all do
     File.mkdir_p!("test/tmp/epub_templates/OEBPS")
-    File.cp_r!("priv/ex_doc/formatter/epub/templates", "test/tmp/epub_templates/OEBPS")
+    File.cp_r!("priv/ex_doc/formatter/epub/assets", "test/tmp/epub_templates/OEBPS")
     :ok
   end
 

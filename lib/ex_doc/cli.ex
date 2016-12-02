@@ -4,10 +4,10 @@ defmodule ExDoc.CLI do
   """
 
   @doc """
-  Handle the command line parsing and trigger all the required mechanism to
-  transform the MarkDown documents into a specified format (default: HTML)
+  Handles the command line parsing and triggers the required mechanism to
+  transform the Markdown documents into a specified format (default is HTML).
   """
-  def run(args, generator \\ &ExDoc.generate_docs/3) do
+  def main(args, generator \\ &ExDoc.generate_docs/3) do
     {opts, args, _} = OptionParser.parse(args,
                aliases: [o: :output, f: :formatter, c: :config, r: :source_root,
                          u: :source_url, m: :main, p: :homepage_url, l: :logo,
@@ -16,17 +16,17 @@ defmodule ExDoc.CLI do
                switches: [extra: :keep])
 
     if List.keymember?(opts, :version, 0) do
-      do_version()
+      print_version()
     else
-      do_generate(args, opts, generator)
+      generate(args, opts, generator)
     end
   end
 
-  defp do_version do
+  defp print_version do
     IO.puts "ExDoc v#{ExDoc.version}"
   end
 
-  defp do_generate(args, opts, generator) do
+  defp generate(args, opts, generator) do
     [project, version, source_beam] = parse_args(args)
 
     Code.prepend_path(source_beam)
