@@ -240,7 +240,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     bin
     |> elixir_functions(project_docs, extension, lib_dirs)
     |> elixir_modules(project_modules, module_id, extension, lib_dirs)
-    |> erlang_functions(lib_dirs)
+    |> erlang_functions()
   end
 
   defp doc_prefix(%{type: c}) when c in [:callback, :macrocallback], do: "c:"
@@ -333,7 +333,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   or trailing `]`, e.g. `[my link :module.link/1 is here](url)`, the :module.fun/arity
   will get translated to the new href of the function.
   """
-  def erlang_functions(bin, lib_dirs \\ erlang_lib_dirs()) when is_binary(bin) do
+  def erlang_functions(bin) when is_binary(bin) do
+    lib_dirs = erlang_lib_dirs()
     regex = ~r{(?<!\[)`\s*:([a-z_]+\.[0-9a-zA-Z_!\\?]+/\d+)\s*`(?!\])}
     Regex.replace(regex, bin, fn all, match ->
       {_, module, function, arity} = split_function(match)
@@ -385,6 +386,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp erlang_lib_dirs do
-    [{Path.expand(:code.lib_dir), @erlang_docs}]
+    case Application.fetch_env(:ex_doc, :erlang_lib_dirs) do
+      {:ok, lib_dirs} ->
+        lib_dirs
+      :error ->
+        lib_dirs = [{Path.expand(:code.lib_dir), @erlang_docs}]
+        Application.put_env(:ex_doc, :erlang_lib_dirs, lib_dirs)
+        lib_dirs
+    end
   end
 end
