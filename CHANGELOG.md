@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.14.5
+
+  * Enhancements
+    * Allow ExDoc to work as an escript
+
 ## v0.14.4
 
   * Enhancements
