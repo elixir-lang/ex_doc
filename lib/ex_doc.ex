@@ -127,6 +127,10 @@ defmodule ExDoc do
     append_slash(url) <> "blob/#{ref}/%{path}#L%{line}"
   end
 
+  defp guess_url(url = <<"https://gitlab.com/", _ :: binary>>, ref) do
+    append_slash(url) <> "blob/#{ref}/%{path}#L%{line}"
+  end
+
   defp guess_url(url = <<"https://bitbucket.org/", _ :: binary>>, ref) do
     append_slash(url) <> "src/#{ref}/%{path}#cl-%{line}"
   end

@@ -126,7 +126,7 @@ defmodule ExDoc.CLI do
     ExDoc by default provide links to the source code implementation as
     long as `--source-url` or `--source-url-pattern` is provided. If you
     provide `--source-url`, ExDoc will inflect the url pattern automatically
-    for GitHub and Bitbucket URLs. For example:
+    for GitHub, GitLab, and Bitbucket URLs. For example:
 
         --source-url "https://github.com/elixir-lang/ecto"
 
