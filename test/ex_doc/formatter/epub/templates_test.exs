@@ -56,7 +56,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
-    assert content =~ ~r{example_1/0.*Another example}ms
+    assert content =~ ~r{example_1/0.*<span class="note">\(macro\)</span>}ms
 
     assert content =~ ~s{<div class="detail" id="example_1/0">}
     assert content =~ ~s{example(foo, bar \\\\ Baz)}

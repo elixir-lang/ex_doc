@@ -243,6 +243,13 @@ defmodule ExDoc.Retriever do
             |> Enum.map(&Typespec.spec_to_ast(name, &1))
             |> Enum.reverse()
 
+    annotations = case type do
+      :defmacro ->
+        ["macro"]
+      _ ->
+        []
+    end
+
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
       name: name,
@@ -254,7 +261,8 @@ defmodule ExDoc.Retriever do
       specs: specs,
       source_path: source.path,
       source_url: source_link(source, line),
-      type: type
+      type: type,
+      annotations: annotations
     }
   end
 

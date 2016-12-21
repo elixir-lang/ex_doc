@@ -30,8 +30,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   @doc """
   Creates a chapter which contains all the details about an individual module.
 
-  This chapter can include the following sections: *functions*, *macros*,
-  *types*, *callbacks*.
+  This chapter can include the following sections: *functions*, *types*, *callbacks*.
   """
   EEx.function_from_file(:def, :module_template,
                          Path.expand("templates/module_template.eex", __DIR__),
