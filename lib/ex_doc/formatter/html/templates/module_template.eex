@@ -30,7 +30,6 @@
           </h1>
           <%= summary_template "types", summary_map.types %>
           <%= summary_template "functions", summary_map.functions %>
-          <%= summary_template "macros", summary_map.macros %>
           <%= summary_template "callbacks", summary_map.callbacks %>
         </section>
       <% end %>
@@ -61,20 +60,6 @@
           </h1>
           <%= for function_node <- summary_map.functions do
             detail_template(function_node, module)
-          end %>
-        </section>
-      <% end %>
-
-      <%= if summary_map.macros != [] do %>
-        <section id="macros" class="details-list">
-          <h1 class="section-heading">
-            <a class="hover-link" href="#macros">
-              <i class="icon-link"></i>
-            </a>
-            Macros
-          </h1>
-          <%= for macro_node <- summary_map.macros do
-            detail_template(macro_node, module)
           end %>
         </section>
       <% end %>

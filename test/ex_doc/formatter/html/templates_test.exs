@@ -117,7 +117,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     assert content =~ ~r("modules":\[\{"id":"CompiledWithDocs","title":"CompiledWithDocs")ms
     assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example/2")ms
-    assert content =~ ~r("id":"CompiledWithDocs".*"macros":.*"example_1/0")ms
     assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example_without_docs/0")ms
     assert content =~ ~r("id":"CompiledWithDocs.Nested")ms
   end
@@ -137,7 +136,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     # Summaries
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
-    assert content =~ ~r{example_1/0.*Another example}ms
+    assert content =~ ~r{example_1/0.*<span class="note">\(macro\)</span>}ms
 
     # Source
     assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<i class="icon-code"></i>\n\s*</a>}ms
