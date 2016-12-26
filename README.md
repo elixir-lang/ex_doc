@@ -92,17 +92,7 @@ ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.fu
 
 ## Changing the Markdown tool
 
-In the examples above, we have used [Earmark][] to convert Markdown to HTML. If you prefer, you can also use pandoc, hoedown (in C), or cmark (in C).
-
-### Pandoc
-
-Install [pandoc][] using whichever means is right for your system.  Odds are good it is available via whatever package manager you have available to you.
-
-Update your project configuration to use pandoc:
-
-```elixir
-config :ex_doc, :markdown_processor, ExDoc.Markdown.Pandoc
-```
+In the examples above, we have used [Earmark][] to convert Markdown to HTML. If you prefer, you can also use hoedown (in C) or cmark (in C).
 
 ### Hoedown
 
@@ -143,7 +133,6 @@ Check the [LICENSE](LICENSE) file for more information.
 [build-status]: http://travis-ci.org/elixir-lang/ex_doc
 [earmark]: http://github.com/pragdave/earmark
 [elixir-lang]: http://elixir-lang.org/
-[pandoc]: http://johnmacfarlane.net/pandoc/
 [cmark]: https://github.com/jgm/cmark
 [cmark.ex]: https://github.com/asaaki/cmark.ex
 [devinus/markdown]: http://github.com/devinus/markdown

@@ -10,10 +10,6 @@ notifications:
   recipients:
     - jose.valim@plataformatec.com.br
 before_install:
-  - wget -c https://github.com/jgm/pandoc/releases/download/1.15.0.6/pandoc-1.15.0.6-1-amd64.deb
-  - ar -x pandoc-1.15.0.6-1-amd64.deb
-  - tar xzf data.tar.gz
-  - export PATH=$PATH:$PWD/usr/bin/
   - nvm install 5.3.0
 before_script:
   - export DISPLAY=:99.0
@@ -23,7 +19,7 @@ before_script:
 env:
   - MIX_ENV=test
 script:
-  - "mix do local.hex --force, deps.get, test --include pandoc, coveralls.travis"
+  - "mix do local.hex --force, deps.get, test, coveralls.travis"
   - node_modules/.bin/gulp
 cache:
   directories:
