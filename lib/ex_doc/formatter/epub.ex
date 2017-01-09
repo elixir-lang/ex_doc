@@ -33,7 +33,6 @@ defmodule ExDoc.Formatter.EPUB do
     datetime = format_datetime()
 
     generate_content(config, nodes_map, uuid, datetime, static_files)
-    generate_toc(config, nodes_map, uuid)
     generate_nav(config, nodes_map)
     generate_title(config)
     generate_extras(config)
@@ -76,11 +75,6 @@ defmodule ExDoc.Formatter.EPUB do
 
     content = Templates.content_template(config, nodes, uuid, datetime, static_files)
     File.write("#{config.output}/OEBPS/content.opf", content)
-  end
-
-  defp generate_toc(config, nodes, uuid) do
-    content = Templates.toc_template(config, nodes, uuid)
-    File.write("#{config.output}/OEBPS/toc.ncx", content)
   end
 
   defp generate_nav(config, nodes) do

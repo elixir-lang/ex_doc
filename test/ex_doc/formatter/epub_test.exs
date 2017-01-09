@@ -94,7 +94,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{meta_dir}/container.xml")
     assert File.regular?("#{meta_dir}/com.apple.ibooks.display-options.xml")
     assert File.regular?("#{oebps_dir}/content.opf")
-    assert File.regular?("#{oebps_dir}/toc.ncx")
     assert File.regular?("#{oebps_dir}/nav.xhtml")
     assert File.regular?("#{oebps_dir}/title.xhtml")
     assert File.regular?("#{oebps_dir}/readme.xhtml")
@@ -129,9 +128,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~ ~r{<a href="CustomBehaviourImpl.xhtml#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.xhtml"><code>TypesAndSpecs.Sub</code></a>}
 
-    content = File.read!("#{output_dir()}/OEBPS/toc.ncx")
-    assert content =~ ~r{<text>README</text>}
-
     content = File.read!("#{output_dir()}/OEBPS/nav.xhtml")
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
   end
@@ -142,9 +138,6 @@ defmodule ExDoc.Formatter.EPUBTest do
 
     content = File.read!("#{output_dir()}/OEBPS/content.opf")
     refute content =~ ~r{<title>README [^<]*</title>}
-
-    content = File.read!("#{output_dir()}/OEBPS/toc.ncx")
-    refute content =~ ~r{<text>README</text>}
 
     content = File.read!("#{output_dir()}/OEBPS/nav.xhtml")
     refute content =~ ~r{<li><a href="README.html">README</a></li>}

@@ -61,18 +61,6 @@ defmodule ExDoc.Formatter.EPUB.Templates do
                          Path.expand("templates/title_template.eex", __DIR__),
                          [:config])
 
-  @doc """
-  Creates an *Navigation Center eXtended* document (as defined in OPF 2.0.1).
-
-  This is for compatibility purposes with EPUB 2 Reading Systems.
-
-  EPUB 3 Reading Systems must ignore the NCX in favor of the
-  [EPUB Navigation Document](http://www.idpf.org/epub/30/spec/epub30-contentdocs.html#sec-xhtml-nav).
-  """
-  EEx.function_from_file(:def, :toc_template,
-                         Path.expand("templates/toc_template.eex", __DIR__),
-                         [:config, :nodes, :uuid])
-
   EEx.function_from_file(:defp, :head_template,
                          Path.expand("templates/head_template.eex", __DIR__),
                          [:config, :page])
