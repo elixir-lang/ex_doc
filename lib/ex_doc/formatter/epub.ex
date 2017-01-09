@@ -102,10 +102,7 @@ defmodule ExDoc.Formatter.EPUB do
     groups
     |> Map.to_list()
     |> List.keysort(1)
-    |> Enum.reduce([], fn({k, _}, acc) ->
-         Keyword.put(acc, String.to_atom(k), Enum.reverse(Map.get(extras_by_group, k)))
-       end)
-    |> Enum.reverse()
+    |> Enum.map(fn({k, _}) -> {k, Enum.reverse(Map.get(extras_by_group, k))} end)
   end
 
   defp generate_title(config) do
