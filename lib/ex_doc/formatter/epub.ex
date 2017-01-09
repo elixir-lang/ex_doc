@@ -13,7 +13,7 @@ defmodule ExDoc.Formatter.EPUB do
   @spec run(list, ExDoc.Config.t) :: String.t
   def run(project_nodes, config) when is_map(config) do
     config = normalize_config(config)
-    config = %{config | extras: HTML.build_extras(project_nodes, config, ".xhtml")}
+    config = %{config | extras: project_nodes |> HTML.build_extras(config, ".xhtml") |> group_extras()}
 
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
@@ -23,22 +23,23 @@ defmodule ExDoc.Formatter.EPUB do
     HTML.generate_logo(assets_dir, config)
 
     all = HTML.Autolink.all(project_nodes, ".xhtml", config.deps)
-    modules = HTML.filter_list(:modules, all)
-    exceptions = HTML.filter_list(:exceptions, all)
-    protocols = HTML.filter_list(:protocols, all)
+    nodes_map = %{
+      modules: HTML.filter_list(:modules, all),
+      exceptions: HTML.filter_list(:exceptions, all),
+      protocols: HTML.filter_list(:protocols, all)
+    }
 
     uuid = "urn:uuid:#{uuid4()}"
     datetime = format_datetime()
-    nodes = modules ++ exceptions ++ protocols
 
-    generate_content(config, nodes, uuid, datetime, static_files)
-    generate_toc(config, nodes, uuid)
-    generate_nav(config, nodes)
+    generate_content(config, nodes_map, uuid, datetime, static_files)
+    generate_toc(config, nodes_map, uuid)
+    generate_nav(config, nodes_map)
     generate_title(config)
     generate_extras(config)
-    generate_list(config, modules)
-    generate_list(config, exceptions)
-    generate_list(config, protocols)
+    generate_list(config, nodes_map.modules)
+    generate_list(config, nodes_map.exceptions)
+    generate_list(config, nodes_map.protocols)
 
     {:ok, epub} = generate_epub(config.output)
     File.rm_rf!(config.output)
@@ -54,14 +55,16 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_extras(config) do
-    Enum.each(config.extras, fn %{id: id, title: title, content: content} ->
-      output = "#{config.output}/OEBPS/#{id}.xhtml"
-      html = Templates.extra_template(config, title, content)
-      if File.regular? output do
-        IO.puts :stderr, "warning: file #{Path.relative_to_cwd output} already exists"
-      end
-      File.write!(output, html)
-    end)
+    for {_title, extras} <- config.extras do
+      Enum.each(extras, fn %{id: id, title: title, content: content} ->
+        output = "#{config.output}/OEBPS/#{id}.xhtml"
+        html = Templates.extra_template(config, title, content)
+        if File.regular? output do
+          IO.puts :stderr, "warning: file #{Path.relative_to_cwd output} already exists"
+        end
+        File.write!(output, html)
+      end)
+    end
   end
 
   defp generate_content(config, nodes, uuid, datetime, static_files) do
@@ -83,6 +86,23 @@ defmodule ExDoc.Formatter.EPUB do
   defp generate_nav(config, nodes) do
     content = Templates.nav_template(config, nodes)
     File.write("#{config.output}/OEBPS/nav.xhtml", content)
+  end
+
+  defp group_extras(extras) do
+    {extras_by_group, groups} =
+      extras
+      |> Enum.with_index()
+      |> Enum.reduce({%{}, %{}}, fn({x, index}, {extras_by_group, groups}) ->
+           group = if x.group != "", do: x.group, else: "Extras"
+           extras_by_group = Map.update(extras_by_group, group, [x], &([x | &1]))
+           groups = Map.put_new(groups, group, index)
+           {extras_by_group, groups}
+         end)
+
+    groups
+    |> Map.to_list()
+    |> List.keysort(1)
+    |> Enum.map(fn({k, _}) -> {k, Enum.reverse(Map.get(extras_by_group, k))} end)
   end
 
   defp generate_title(config) do
