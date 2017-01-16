@@ -403,6 +403,7 @@ defmodule ExDoc.Retriever do
   end
   defp actual_def(name, arity, _), do: {name, arity}
 
+  defp find_actual_line([], _name, :module), do: false
   defp find_actual_line(abst_code, name, :module) do
     abst_code
     |> Enum.find(&match?({:attribute, _, :module, ^name}, &1))
