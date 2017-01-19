@@ -1,5 +1,6 @@
 defmodule ExDoc.Formatter.HTMLTest do
   use ExUnit.Case, async: true
+  import ExUnit.CaptureIO
 
   setup do
     File.rm_rf(output_dir())
@@ -234,6 +235,16 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert_raise ArgumentError,
                  ~S("main" cannot be set to "index", otherwise it will recursively link to itself),
                  fn -> generate_docs(config) end
+  end
+
+  test "run warns when generating an index.html file with an invalid redirect" do
+    output = capture_io(:stderr, fn ->
+      generate_docs(doc_config(main: "Unknown"))
+    end)
+
+    assert output == "warning: index.html redirects to Unknown.html, which does not exist\n"
+    assert File.regular?("#{output_dir()}/index.html")
+    refute File.regular?("#{output_dir()}/Unknown.html")
   end
 
   test "run generates assets" do

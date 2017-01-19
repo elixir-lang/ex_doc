@@ -37,11 +37,11 @@ defmodule ExDoc.Formatter.HTML do
       generate_sidebar_items(nodes_map, extras, config) ++
       generate_extras(nodes_map, extras, config) ++
       generate_logo(assets_dir, config) ++
-      generate_index(config) ++
       generate_not_found(nodes_map, config) ++
       generate_list(nodes_map.modules, nodes_map, config) ++
       generate_list(nodes_map.exceptions, nodes_map, config) ++
-      generate_list(nodes_map.protocols, nodes_map, config)
+      generate_list(nodes_map.protocols, nodes_map, config) ++
+      generate_index(config)
 
     generate_build(static_files ++ generated_files, build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
@@ -263,6 +263,9 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_redirect(filename, config, redirect_to) do
+    unless File.regular?("#{config.output}/#{redirect_to}") do
+      IO.puts :stderr, "warning: #{filename} redirects to #{redirect_to}, which does not exist"
+    end
     content = Templates.redirect_template(config, redirect_to)
     File.write!("#{config.output}/#{filename}", content)
   end
