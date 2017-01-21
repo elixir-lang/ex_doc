@@ -29,3 +29,7 @@ export function findSidebarCategory (items, query) {
     if (res) return res
   }
 }
+
+export function getLocationHash () {
+  return window.location.hash.replace(/^#/, '')
+}
