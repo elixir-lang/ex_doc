@@ -120,6 +120,7 @@ function search (nodes, value) {
 
   function closeResults (e) {
     var event = e || window.event
+    var $hashElement = document.getElementById(helpers.getLocationHash())
     if (typeof event === 'object' && event !== null) {
       if (event.metaKey || event.shiftKey || event.altKey ||
           event.ctrlKey || event.button === 1 || event.button === 2) {
@@ -129,6 +130,9 @@ function search (nodes, value) {
 
     $results.remove()
     $oldContent.fadeIn()
+    if ($hashElement && $hashElement.scrollIntoView) {
+      $hashElement.scrollIntoView()
+    }
   }
 
   $results.find('.close-search').on('click', function (e) {
