@@ -6,6 +6,9 @@ defmodule CompiledWithDocs do
       CompiledWithDocs.example
   """
 
+  @doc "Some struct"
+  defstruct [:field]
+
   @doc "Some example"
   def example(foo, bar \\ Baz), do: bar.baz(foo)
 
