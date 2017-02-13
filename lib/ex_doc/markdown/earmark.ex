@@ -31,6 +31,6 @@ defmodule ExDoc.Markdown.Earmark do
              file: Keyword.get(opts, :file),
              breaks: Keyword.get(opts, :breaks, false),
              smartypants: Keyword.get(opts, :smartypants, true))
-    Earmark.to_html(text, options)
+    Earmark.as_html!(text, options)
   end
 end
