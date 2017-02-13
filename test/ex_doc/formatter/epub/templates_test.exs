@@ -62,27 +62,6 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     assert content =~ ~s{example(foo, bar \\\\ Baz)}
   end
 
-  test "module_page outputs the types and function specs" do
-    content = get_module_page([TypesAndSpecs, TypesAndSpecs.Sub])
-
-    public_html =
-      ~S[public(t) :: {t, ] <>
-      ~s[<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>, ] <>
-      ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>, ] <>
-      ~S[<a href="#t:opaque/0">opaque</a>, :ok | :error}]
-
-    ref_html = ~S[ref() :: {:binary.part, <a href="#t:public/1">public(any)</a>}]
-
-    assert content =~ ~s[<a href="#t:public/1">public(t)</a>]
-    refute content =~ ~s[<a href="#t:private/0">private</a>]
-    assert content =~ public_html
-    assert content =~ ref_html
-    refute content =~ ~s[<strong>private\(t\)]
-    assert content =~ ~s[A public type]
-    assert content =~ ~s[add(integer, <a href="#t:opaque/0">opaque</a>) :: integer]
-    refute content =~ ~s[minus(integer, integer) :: integer]
-  end
-
   test "module_page outputs summaries" do
     content = get_module_page([CompiledWithDocs])
     assert content =~ ~r{<div class="summary-signature">\s*<a href="#example_1/0">}

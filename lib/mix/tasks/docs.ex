@@ -213,7 +213,7 @@ defmodule Mix.Tasks.Docs do
     Keyword.put(options, :deps, deps)
   end
 
-  defp get_deps() do
+  defp get_deps do
     for {key, _} <- Mix.Project.deps_paths,
         _ = Application.load(key), # :ok | {:error, _}
         vsn = Application.spec(key, :vsn) do

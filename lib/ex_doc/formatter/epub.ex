@@ -68,8 +68,9 @@ defmodule ExDoc.Formatter.EPUB do
 
   defp generate_content(config, nodes, uuid, datetime, static_files) do
     static_files =
-      Enum.filter(static_files, fn(name) ->
-        String.contains?(name, "OEBPS") and config.output |> Path.join(name) |> File.regular?()
+      static_files
+      |> Enum.filter(fn(name) ->
+           String.contains?(name, "OEBPS") and config.output |> Path.join(name) |> File.regular?()
       end)
       |> Enum.map(&Path.relative_to(&1, "OEBPS"))
 
@@ -121,7 +122,7 @@ defmodule ExDoc.Formatter.EPUB do
 
   ## Helpers
 
-  defp default_assets() do
+  defp default_assets do
     [{Assets.dist(), "OEBPS/dist"}, {Assets.metainfo(), "META-INF"}]
   end
 

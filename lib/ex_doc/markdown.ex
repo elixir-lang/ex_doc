@@ -47,7 +47,7 @@ defmodule ExDoc.Markdown do
     bin
   end
 
-  defp get_markdown_processor() do
+  defp get_markdown_processor do
     case Application.fetch_env(:ex_doc, @markdown_processor_key) do
       {:ok, processor} ->
         processor
@@ -58,13 +58,13 @@ defmodule ExDoc.Markdown do
     end
   end
 
-  defp find_markdown_processor() do
+  defp find_markdown_processor do
     Enum.find @markdown_processors, fn module ->
       Code.ensure_loaded?(module) && module.available?
     end
   end
 
-  defp raise_no_markdown_processor() do
+  defp raise_no_markdown_processor do
     raise """
     Could not find a markdown processor to be used by ex_doc.
     You can either:

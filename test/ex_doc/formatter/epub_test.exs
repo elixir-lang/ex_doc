@@ -34,7 +34,7 @@ defmodule ExDoc.Formatter.EPUBTest do
 
   defp generate_docs_and_unzip(options) do
     generate_docs(options)
-    unzip_dir = "#{doc_config()[:output]}" |> String.to_char_list
+    unzip_dir = String.to_char_list("#{doc_config()[:output]}")
     "#{doc_config()[:output]}/#{doc_config()[:project]}-v#{doc_config()[:version]}.epub"
     |> String.to_char_list
     |> :zip.unzip([cwd: unzip_dir])
