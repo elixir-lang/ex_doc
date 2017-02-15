@@ -54,13 +54,14 @@ function toggleSidebar () {
   if (bodyClass.includes(sidebarClosedClass) ||
       bodyClass.includes(sidebarClosingClass)) {
     openSidebar()
-  } else if (bodyClass.includes(sidebarOpenedClass) ||
-             bodyClass.includes(sidebarOpeningClass)) {
-    closeSidebar()
-  // Otherwise check the width of window to know which action to invoke.
   } else {
-    window.screen.width > breakpoint ? closeSidebar() : openSidebar()
+    closeSidebar()
   }
+}
+
+function setDefaultSidebarState () {
+  body.removeClass()
+  body.addClass(window.innerWidth > breakpoint ? sidebarOpenedClass : sidebarClosedClass)
 }
 
 // Public Methods
@@ -69,6 +70,8 @@ function toggleSidebar () {
 export {breakpoint, closeSidebar}
 
 export function initialize () {
+  setDefaultSidebarState()
+  $(window).resize(setDefaultSidebarState)
   $('.sidebar-toggle').click(function () {
     toggleSidebar()
   })
