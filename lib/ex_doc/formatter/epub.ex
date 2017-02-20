@@ -114,7 +114,7 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_epub(output) do
-    :zip.create(String.to_char_list("#{output}.epub"),
+    :zip.create(String.to_charlist("#{output}.epub"),
                 [{'mimetype', @mimetype} | files_to_add(output)],
                 compress: ['.css', '.xhtml', '.html', '.ncx', '.js',
                            '.opf', '.jpg', '.png', '.xml'])
@@ -130,7 +130,7 @@ defmodule ExDoc.Formatter.EPUB do
     Enum.reduce Path.wildcard(Path.join(path, "**/*")), [], fn file, acc ->
       case File.read(file) do
         {:ok, bin} ->
-          [{file |> Path.relative_to(path) |> String.to_char_list(), bin} | acc]
+          [{file |> Path.relative_to(path) |> String.to_charlist(), bin} | acc]
         {:error, _} ->
           acc
       end

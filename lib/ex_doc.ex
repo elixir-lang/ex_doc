@@ -117,7 +117,7 @@ defmodule ExDoc do
     options = Keyword.put(options, :source_url_pattern, pattern)
 
     if is_bitstring(options[:output]) do
-      Keyword.put(options, :output, String.rstrip(options[:output], ?/))
+      Keyword.put(options, :output, String.trim_trailing(options[:output], "/"))
     else
       options
     end

@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.15.0
+
+  * Enhancements
+    * Closing the search takes you to where you were in the previous page
+    * Handle `__struct__/0` by displaying the struct instead
+    * Warn when redirecting to a non-existent file
+    * List both functions and macros under "Functions"
+    * Automatically detect GitLab source URL patterns
+
+  * Bug fixes
+    * Break long specs into lines
+    * Fix the initial state of the sidebar hamburger
+    * Do not error when abstract code is missing
+    * Properly link to erlang lib dirs
+
+  * Backwards incompatible changes
+    * No longer support Pandoc
+    * Require Earmark 1.1
+
 ## v0.14.5
 
   * Enhancements

@@ -220,7 +220,7 @@ defmodule ExDoc.Formatter.HTML do
     title = Regex.run(@h1_regex, content, capture: :all_but_first)
 
     if title do
-      title |> List.first() |> strip_html() |> String.strip()
+      title |> List.first() |> strip_html() |> String.trim()
     end
   end
 
@@ -302,7 +302,7 @@ defmodule ExDoc.Formatter.HTML do
     if config.canonical do
       canonical_url =
         config.canonical
-        |> String.rstrip(?/)
+        |> String.trim_trailing("/")
         |> Path.join(filename)
 
       Map.put(config, :canonical, canonical_url)

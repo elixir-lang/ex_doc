@@ -87,9 +87,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     doc
     |> String.split(~r/\n\s*\n/)
     |> hd()
-    |> String.strip()
+    |> String.trim()
     |> String.replace(~r{[.:\s]+$}, "")
-    |> String.rstrip()
+    |> String.trim_trailing()
   end
 
   defp presence([]),    do: nil
@@ -213,7 +213,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> String.replace(~r/&#\d+;/, "")
     |> String.replace(~r/&[A-Za-z0-9]+;/, "")
     |> String.replace(~r/\W+/u, "-")
-    |> String.strip(?-)
+    |> String.trim("-")
     |> String.downcase()
   end
 
