@@ -300,20 +300,13 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_callbacks(%{type: :behaviour, name: name, abst_code: abst_code}, source) do
-    optional_callbacks = get_optional_callbacks(abst_code)
+    optional_callbacks = name.behaviour_info(:optional_callbacks)
     (Code.get_docs(name, :callback_docs) || [])
     |> Enum.sort_by(&elem(&1, 0))
     |> Enum.map(&get_callback(&1, source, optional_callbacks, abst_code))
   end
 
   defp get_callbacks(_, _), do: []
-
-  defp get_optional_callbacks(abst_code) do
-    for {:attribute, _, :optional_callbacks, callbacks} <- abst_code,
-        callback <- callbacks,
-        do: callback
-  end
-
   defp get_callback(callback, source, optional_callbacks, abst_code) do
     {{name, arity}, doc_line, kind, doc} = callback
     function = actual_def(name, arity, kind)
