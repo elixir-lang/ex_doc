@@ -13,4 +13,4 @@
     <script src="<%= asset_rev config.output, "dist/sidebar_items*.js" %>"></script>
   </head>
   <body data-type="<%= sidebar_type(page.type) %>">
-    <script>if(localStorage.getItem('night-mode')) document.body.className += ' night-mode';</script>
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>

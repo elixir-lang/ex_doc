@@ -12,19 +12,20 @@ const nightModeToggle = $('.night-mode-toggle')
 
 function activateNightMode () {
   body.addClass(nightMode)
-  localStorage.setItem(nightMode, true)
+  try { localStorage.setItem(nightMode, true) } catch (e) { }
 }
 
 function deactivateNightMode () {
   body.removeClass(nightMode)
-  localStorage.removeItem(nightMode)
+  try { localStorage.removeItem(nightMode) } catch (e) { }
 }
 
 function checkForNightMode () {
-  let night = localStorage.getItem(nightMode)
-  if (night) {
-    activateNightMode()
-  }
+  try {
+    if (localStorage.getItem(nightMode)) {
+      activateNightMode()
+    }
+  } catch (e) { }
 }
 
 function toggleNightMode () {
