@@ -8,12 +8,28 @@ defmodule ExDoc.CLI do
   transform the Markdown documents into a specified format (default is HTML).
   """
   def main(args, generator \\ &ExDoc.generate_docs/3) do
-    {opts, args, _} = OptionParser.parse(args,
-               aliases: [o: :output, f: :formatter, c: :config, r: :source_root,
-                         u: :source_url, m: :main, p: :homepage_url, l: :logo,
-                         e: :extra, v: :version, n: :canonical, s: :extra_section,
-                         a: :assets, i: :filter_prefix],
-               switches: [extra: :keep])
+    {opts, args, _invalid} = OptionParser.parse(args,
+      aliases: [
+        c: :config,
+        o: :output,
+        f: :formatter,
+        i: :filter_prefix,
+        r: :source_root,
+        u: :source_url,
+        m: :main,
+        p: :homepage_url,
+        e: :extra,
+        s: :extra_section,
+        a: :assets,
+        l: :logo,
+        n: :canonical,
+        v: :version,
+      ],
+
+      switches: [
+        extra: :keep,
+      ]
+    )
 
     if List.keymember?(opts, :version, 0) do
       print_version()
