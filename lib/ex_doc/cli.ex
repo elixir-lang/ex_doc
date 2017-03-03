@@ -31,7 +31,7 @@ defmodule ExDoc.CLI do
           extra: :keep,
           source_ref: :string,
           version: :boolean,
-        ]
+        ],
       )
 
     if List.keymember?(opts, :version, 0) do
