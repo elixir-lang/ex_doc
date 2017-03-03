@@ -84,13 +84,7 @@ defmodule ExDoc.CLITest do
         "--extra-section", "Extra",
         "--assets", "foo.css",
         "--logo", "logo.png",
-        "--canonical", "http://example.com/project",
-
-        # invalid options
-        "--nonexistant",
-        "--non_existant",
-        "--idontexist", "baz",
-        "--i_dont_exist", "baz",
+        "--canonical", "http://example.com/project"
       ]
 
     {project, version, opts} = run(args)
