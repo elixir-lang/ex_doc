@@ -33,6 +33,7 @@ defmodule ExDoc do
     ]
 
      @type t :: %__MODULE__{
+       assets: nil | String.t,
        canonical: nil | String.t,
        deps: [{ebin_path :: String.t, doc_url :: String.t}],
        extra_section: nil | String.t,
