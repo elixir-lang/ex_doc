@@ -14,6 +14,12 @@ const sidebarOpenedClass = 'sidebar-opened'
 const sidebarOpeningClass = 'sidebar-opening'
 const sidebarClosedClass = 'sidebar-closed'
 const sidebarClosingClass = 'sidebar-closing'
+const sidebarClasses = [
+  sidebarOpenedClass,
+  sidebarOpeningClass,
+  sidebarClosedClass,
+  sidebarClosingClass
+].join(' ')
 
 // Current animation state
 // -----------------------
@@ -60,7 +66,7 @@ function toggleSidebar () {
 }
 
 function setDefaultSidebarState () {
-  body.removeClass()
+  body.removeClass(sidebarClasses)
   body.addClass(window.innerWidth > breakpoint ? sidebarOpenedClass : sidebarClosedClass)
 }
 
