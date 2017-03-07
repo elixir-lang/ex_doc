@@ -11,19 +11,19 @@ defmodule ExDoc.CLI do
     {opts, args, _invalid} =
       OptionParser.parse(args,
         aliases: [
+          a: :assets,
+          n: :canonical,
           c: :config,
-          o: :output,
-          f: :formatter,
-          i: :filter_prefix,
-          r: :source_root,
-          u: :source_url,
-          m: :main,
-          p: :homepage_url,
           e: :extra,
           s: :extra_section,
-          a: :assets,
+          i: :filter_prefix,
+          f: :formatter,
+          p: :homepage_url,
           l: :logo,
-          n: :canonical,
+          m: :main,
+          o: :output,
+          r: :source_root,
+          u: :source_url,
           v: :version,
         ],
 
@@ -118,25 +118,25 @@ defmodule ExDoc.CLI do
       PROJECT             Project name
       VERSION             Version number
       BEAMS               Path to compiled beam files
+      -a, --assets        Path to a directory that will be copied as is to the "assets"
+                          directory in the output path
+      -n, --canonical     Indicate the preferred URL with rel="canonical" link element
       -c, --config        Give configuration through a file instead of command line
-      -o, --output        Path to output docs, default: "doc"
-      -f, --formatter     Docs formatter to use (html or epub), default: "html"
-      -i, --filter-prefix Include only modules that match the given prefix in
-                          the generated documentation.
-      -r, --source-root   Path to the source code root, default: "."
-      -u, --source-url    URL to the source code
-          --source-ref    Branch/commit/tag used for source link inference, default: "master"
-      -m, --main          The entry-point page in docs, default: "api-reference"
-      -p, --homepage-url  URL to link to for the site name
       -e, --extra         Allow users to include additional Markdown files
                           May be given multiple times
       -s, --extra-section Allow user to define the title for the additional Markdown files,
                           default: "PAGES"
-      -a, --assets        Path to a directory that will be copied as is to the "assets"
-                          directory in the output path
+      -i, --filter-prefix Include only modules that match the given prefix in
+                          the generated documentation.
+      -f, --formatter     Docs formatter to use (html or epub), default: "html"
+      -p, --homepage-url  URL to link to for the site name
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)
                           The image size will be 64x64 and copied to the assets directory
-      -n, --canonical     Indicate the preferred URL with rel="canonical" link element
+      -m, --main          The entry-point page in docs, default: "api-reference"
+          --source-ref    Branch/commit/tag used for source link inference, default: "master"
+      -r, --source-root   Path to the source code root, default: "."
+      -u, --source-url    URL to the source code
+      -o, --output        Path to output docs, default: "doc"
       -v, --version       Print ExDoc version
 
     ## Source linking

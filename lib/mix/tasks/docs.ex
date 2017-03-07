@@ -8,12 +8,14 @@ defmodule Mix.Tasks.Docs do
 
   ## Command line options
 
-    * `--output`, `-o` - Output directory for the generated
-      docs, default: `"doc"`
-    * `--formatter`, `-f` - Which formatters to use, "html" or
-      "epub", default: "html" (may be given more than once)
     * `--canonical`, `-n` - Indicate the preferred URL with
       rel="canonical" link element, defaults to no canonical path
+
+    * `--formatter`, `-f` - Which formatters to use, "html" or
+      "epub", default: "html" (may be given more than once)
+
+    * `--output`, `-o` - Output directory for the generated
+      docs, default: `"doc"`
 
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
@@ -45,53 +47,53 @@ defmodule Mix.Tasks.Docs do
   be a keyword list or a function returning a keyword list that will
   be lazily executed.
 
-    * `:output` - Output directory for the generated docs; default: "doc".
-      May be overridden by command line argument.
-
-    * `:formatters` - Formatter to use; default: ["html"],
-      options: "html", "epub".
-
-    * `:source_root` - Path to the source code root directory;
-      default: "." (current directory).
-
-    * `:source_beam` - Path to the beam directory; default: mix's compile path.
-
-    * `:source_ref` - The branch/commit/tag used for source link inference;
-      default: "master".
-
-    * `:source_url_pattern` - Public URL of the project. Derived from
-      project's `:source_url` and `:source_ref`. Example:
-      "https://github.com/USER/APP/blob/master/%{path}#L%{line}"
-
-    * `:main` - Main page of the documentation. It may be a module or a
-      generated page, like "Plug" or "api-reference"; default: "api-reference".
-
     * `:assets` - Path to a directory that will be copied as is to the "assets"
       directory in the output path. Its entries may be referenced in your docs
       under "assets/ASSET.EXTENSION"; defaults to no assets directory.
 
-    * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
-      The image size will be 64x64. When specified, the logo will be placed under
-      the "assets" directory in the output path under the name "logo" and the
-      appropriate extension.
+    * `:canonical` - String that defines the preferred URL with the rel="canonical"
+      element; defaults to no canonical path.
+
+    * `:deps` - A keyword list application names and their documentation URL.
+      ExDoc will by default include all dependencies and assume they are hosted on
+      HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
+
+    * `:extra_section` - String that defines the section title of the additional
+      Markdown pages; default: "PAGES". Example: "GUIDES"
 
     * `:extras` - List of keywords, each key must indicate the path to additional
       Markdown pages, the value for each keyword (optional) gives you more control
       about the PATH and the title of the output files; default: `[]`. Example:
       `["README.md", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing", group: "Join us!"]]`
 
-    * `:extra_section` - String that defines the section title of the additional
-      Markdown pages; default: "PAGES". Example: "GUIDES"
-
-    * `:deps` - A keyword list application names and their documentation URL.
-      ExDoc will by default include all dependencies and assume they are hosted on
-      HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
-
-    * `:canonical` - String that defines the preferred URL with the rel="canonical"
-      element; defaults to no canonical path.
-
     * `:filter_prefix` - Include only modules that match the given prefix in
       the generated documentation. Example: "MyApp.Core"
+
+    * `:formatters` - Formatter to use; default: ["html"],
+      options: "html", "epub".
+
+    * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
+      The image size will be 64x64. When specified, the logo will be placed under
+      the "assets" directory in the output path under the name "logo" and the
+      appropriate extension.
+
+    * `:main` - Main page of the documentation. It may be a module or a
+      generated page, like "Plug" or "api-reference"; default: "api-reference".
+
+    * `:source_beam` - Path to the beam directory; default: mix's compile path.
+
+    * `:source_ref` - The branch/commit/tag used for source link inference;
+      default: "master".
+
+    * `:source_root` - Path to the source code root directory;
+      default: "." (current directory).
+
+    * `:source_url_pattern` - Public URL of the project. Derived from
+      project's `:source_url` and `:source_ref`. Example:
+      "https://github.com/USER/APP/blob/master/%{path}#L%{line}"
+
+    * `:output` - Output directory for the generated docs; default: "doc".
+      May be overridden by command line argument.
 
   ## Umbrella project
 
@@ -109,8 +111,8 @@ defmodule Mix.Tasks.Docs do
     Mix.Task.run "compile"
 
     {cli_opts, args, _} = OptionParser.parse(args,
-                            aliases: [o: :output, n: :canonical, f: :formatter],
-                            switches: [output: :string, canonical: :string, formatter: :keep])
+                            aliases: [n: :canonical, f: :formatter, o: :output],
+                            switches: [canonical: :string, formatter: :keep, output: :string])
 
     if args != [] do
       Mix.raise "Extraneous arguments on the command line"
