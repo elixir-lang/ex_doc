@@ -422,8 +422,8 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp anno_line(line) when is_integer(line), do: line
-  defp anno_line(anno), do: :erl_anno.line(anno)
+  defp anno_line(line) when is_integer(line), do: line |> abs()
+  defp anno_line(anno), do: :erl_anno.line(anno) |> abs()
 
   # Detect if a module is an exception, struct,
   # protocol, implementation or simply a module
