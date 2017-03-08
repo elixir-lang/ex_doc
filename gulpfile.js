@@ -201,8 +201,10 @@ gulp.task('default', ['lint', 'test'])
 var javascript = function (options) {
   return gulp.src(options.src)
     .pipe(webpack(isProduction ? config.production : config.development))
+    .pipe($.if(isProduction, $.sourcemaps.init()))
     .pipe($.if(isProduction, $.uglify()))
     .pipe($.if(isProduction, $.rev()))
+    .pipe($.if(isProduction, $.sourcemaps.write('./')))
     .pipe($.size({title: 'js'}))
     .pipe(gulp.dest(options.dest))
 }
