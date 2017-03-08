@@ -199,7 +199,7 @@ gulp.task('default', ['lint', 'test'])
  * Helpers
  */
 var javascript = function (options) {
-  var buildSourceMaps = options.sourceMaps && isProduction;
+  var buildSourceMaps = options.sourceMaps && isProduction
 
   return gulp.src(options.src)
     .pipe(webpack(isProduction ? config.production : config.development))
