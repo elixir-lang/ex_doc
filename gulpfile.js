@@ -83,11 +83,11 @@ gulp.task('clean', function (done) {
 })
 
 gulp.task('javascript:html', ['buildHighlight'], function () {
-  return javascript({src: 'assets/js/app.js', dest: distPath.html})
+  return javascript({src: 'assets/js/app.js', dest: distPath.html, sourceMaps: true})
 })
 
 gulp.task('javascript:epub', ['buildHighlight'], function () {
-  return javascript({src: 'assets/js/epub.js', dest: distPath.epub})
+  return javascript({src: 'assets/js/epub.js', dest: distPath.epub, sourceMaps: false})
 })
 
 gulp.task('javascript', function (done) {
@@ -199,10 +199,14 @@ gulp.task('default', ['lint', 'test'])
  * Helpers
  */
 var javascript = function (options) {
+  var buildSourceMaps = options.sourceMaps && isProduction
+
   return gulp.src(options.src)
     .pipe(webpack(isProduction ? config.production : config.development))
+    .pipe($.if(buildSourceMaps, $.sourcemaps.init()))
     .pipe($.if(isProduction, $.uglify()))
     .pipe($.if(isProduction, $.rev()))
+    .pipe($.if(buildSourceMaps, $.sourcemaps.write('./')))
     .pipe($.size({title: 'js'}))
     .pipe(gulp.dest(options.dest))
 }
