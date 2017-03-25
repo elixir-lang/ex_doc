@@ -182,9 +182,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp strip_parens(string, _), do: string
 
   defp split_string_to_link(string) do
-    case :binary.match(string, "(") do
-      {split_at, _} -> String.split_at(string, split_at)
-      :nomatch -> {string, ""}
+    case :binary.split(string, "(") do
+      [head, tail] -> {head, "(" <> tail}
+      [head] -> {head, ""}
     end
   end
 
