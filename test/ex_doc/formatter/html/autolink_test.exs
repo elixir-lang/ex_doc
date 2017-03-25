@@ -194,13 +194,13 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   test "autolink locals in typespecs" do
     assert Autolink.typespec(quote(do: foo(1)), [foo: 1], []) ==
-           ~s[<a href="#t:foo/1">foo(1)</a>]
+           ~s[<a href="#t:foo/1">foo</a>(1)]
 
     assert Autolink.typespec(quote(do: bar(foo(1))), [foo: 1], []) ==
-           ~s[bar(<a href="#t:foo/1">foo(1)</a>)]
+           ~s[bar(<a href="#t:foo/1">foo</a>(1))]
 
     assert Autolink.typespec(quote(do: (bar(foo(1)) when bat: foo(1))), [foo: 1], []) ==
-           ~s[bar(<a href="#t:foo/1">foo(1)</a>) when bat: <a href=\"#t:foo/1\">foo(1)</a>]
+           ~s[bar(<a href="#t:foo/1">foo</a>(1)) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
 
     assert Autolink.typespec(quote(do: bar(foo(1))), [], []) ==
            ~s[bar(foo(1))]
@@ -211,19 +211,19 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
            ~s[foo() :: <a href="#t:foo/0">foo</a>]
 
     assert Autolink.typespec(quote(do: foo(1) :: foo(1)), [foo: 1], [], []) ==
-           ~s[foo(1) :: <a href="#t:foo/1">foo(1)</a>]
+           ~s[foo(1) :: <a href="#t:foo/1">foo</a>(1)]
 
     assert Autolink.typespec(quote(do: (foo(1) :: foo(1) when bat: foo(1))), [foo: 1], [], []) ==
-           ~s[foo(1) :: <a href=\"#t:foo/1\">foo(1)</a> when bat: <a href=\"#t:foo/1\">foo(1)</a>]
+           ~s[foo(1) :: <a href=\"#t:foo/1\">foo</a>(1) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
 
     assert Autolink.typespec(quote(do: bar(foo(1)) :: foo(1)), [foo: 1], [], []) ==
-           ~s[bar(<a href=\"#t:foo/1\">foo(1)</a>) :: <a href=\"#t:foo/1\">foo(1)</a>]
+           ~s[bar(<a href=\"#t:foo/1\">foo</a>(1)) :: <a href=\"#t:foo/1\">foo</a>(1)]
 
     assert Autolink.typespec(quote(do: (bar(foo(1)) :: foo(1) when bat: foo(1))), [foo: 1], [], []) ==
-           ~s[bar(<a href=\"#t:foo/1\">foo(1)</a>) :: <a href=\"#t:foo/1\">foo(1)</a> when bat: <a href=\"#t:foo/1\">foo(1)</a>]
+           ~s[bar(<a href=\"#t:foo/1\">foo</a>(1)) :: <a href=\"#t:foo/1\">foo</a>(1) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
 
     assert Autolink.typespec(quote(do: bar(foo :: foo(1)) :: foo(1)), [foo: 1], [], []) ==
-           ~s[bar(foo :: <a href=\"#t:foo/1\">foo(1)</a>) :: <a href=\"#t:foo/1\">foo(1)</a>]
+           ~s[bar(foo :: <a href=\"#t:foo/1\">foo</a>(1)) :: <a href=\"#t:foo/1\">foo</a>(1)]
   end
 
   test "add new lines on |" do
