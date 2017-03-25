@@ -148,7 +148,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         arity = length(args)
         if {name, arity} in typespecs do
           n = enc_h("#{name}")
-          ~s[<a href="#t:#{n}/#{arity}">#{h(string)}</a>]
+          {string_to_link, string_with_parens} = split_string_to_link(string)
+          ~s[<a href="#t:#{n}/#{arity}">#{h(string_to_link)}</a>#{string_with_parens}]
         else
           string
         end
@@ -157,7 +158,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         alias = expand_alias(alias)
         if source = get_source(alias, aliases, lib_dirs) do
           n = enc_h("#{name}")
-          ~s[<a href="#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}">#{h(string)}</a>]
+          {string_to_link, string_with_parens} = split_string_to_link(string)
+          ~s[<a href="#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}">#{h(string_to_link)}</a>#{string_with_parens}]
         else
           string
         end
@@ -178,6 +180,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end
   end
   defp strip_parens(string, _), do: string
+
+  defp split_string_to_link(string) do
+    case :binary.match(string, "(") do
+      {split_at, _} -> String.split_at(string, split_at)
+      :nomatch -> {string, ""}
+    end
+  end
 
   defp expand_alias({:__aliases__, _, [h|t]}) when is_atom(h), do: Module.concat([h|t])
   defp expand_alias(atom) when is_atom(atom), do: atom
