@@ -252,4 +252,27 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.typespec(quote(do: Foo.t), [], [Foo]) ==
            ~s[<a href="Foo.html#t:t/0">Foo.t</a>]
   end
+
+  test "autolink local and remote types inside parameterized types" do
+    assert Autolink.typespec(quote(do: parameterized_t(foo())), [parameterized_t: 1, foo: 0], []) ==
+           ~s[<a href="#t:parameterized_t/1">parameterized_t</a>(<a href="#t:foo/0">foo</a>)]
+
+    assert Autolink.typespec(quote(do: Parameterized.t(foo())), [foo: 0], [Parameterized]) ==
+           ~s[<a href="Parameterized.html#t:t/1">Parameterized.t</a>(<a href="#t:foo/0">foo</a>)]
+
+    assert Autolink.typespec(quote(do: parameterized_t(Foo.t())), [parameterized_t: 1], [Foo]) ==
+           ~s[<a href="#t:parameterized_t/1">parameterized_t</a>(<a href="Foo.html#t:t/0">Foo.t</a>)]
+
+    assert Autolink.typespec(quote(do: Parameterized.t(Foo.t())), [], [Parameterized, Foo]) ==
+           ~s[<a href="Parameterized.html#t:t/1">Parameterized.t</a>(<a href="Foo.html#t:t/0">Foo.t</a>)]
+
+    assert Autolink.typespec(quote(do: parameterized_t(foo() | bar())), [parameterized_t: 1, foo: 0, bar: 0], []) ==
+           ~s[<a href="#t:parameterized_t/1">parameterized_t</a>(<a href="#t:foo/0">foo</a> | <a href="#t:bar/0">bar</a>)]
+
+    assert Autolink.typespec(quote(do: parameterized_t(parameterized_t(foo()))), [parameterized_t: 1, foo: 0], []) ==
+           ~s[<a href="#t:parameterized_t/1">parameterized_t</a>(<a href="#t:parameterized_t/1">parameterized_t</a>(<a href="#t:foo/0">foo</a>))]
+
+    assert Autolink.typespec(quote(do: parameterized_t(foo())), [foo: 0], []) ==
+           ~s[parameterized_t(<a href="#t:foo/0">foo</a>)]
+  end
 end
