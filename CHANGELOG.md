@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.15.1
+
+  * Bug fixes
+    * Improve project name wrapping on HTML
+    * Properly set link in types with parameter
+    * Fix ExDoc.CLI.main/2 to keep --source-ref on Elixir v1.4
+    * Do not fail if localStorage is not available
+
 ## v0.15.0
 
   * Enhancements
