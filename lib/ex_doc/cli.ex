@@ -112,7 +112,7 @@ defmodule ExDoc.CLI do
 
     Examples:
       ex_doc "Ecto" "0.8.0" "_build/dev/lib/ecto/ebin" -u "https://github.com/elixir-lang/ecto"
-      ex_doc "Project" "1.0.0" "_build/dev/lib/project/ebin" -e "docs/extra_page.md"
+      ex_doc "Project" "1.0.0" "_build/dev/lib/project/ebin" -e "extra_page.md"
 
     Options:
       PROJECT             Project name
