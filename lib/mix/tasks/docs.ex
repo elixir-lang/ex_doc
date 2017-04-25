@@ -124,7 +124,11 @@ defmodule Mix.Tasks.Docs do
       config
       |> get_docs_opts()
       |> Keyword.merge(cli_opts)
-      |> normalize_source_url(config)
+      |> ExDoc.nilify_options()
+      |> ExDoc.normalize_options(:source_ref, config[:source_ref] || ExDoc.Default.config(:source_ref))
+      |> ExDoc.normalize_options(:source_url, config[:source_url])
+      |> ExDoc.normalize_options(:source_url_pattern, config[:source_url_pattern])
+      |> ExDoc.normalize_source_url_pattern(config[:source_ref] || ExDoc.Default.config(:source_ref))
       |> normalize_source_beam(config)
       |> normalize_main()
       |> normalize_deps()
@@ -155,14 +159,6 @@ defmodule Mix.Tasks.Docs do
   defp log(index) do
     Mix.shell.info [:green, "Docs successfully generated."]
     Mix.shell.info [:green, "View them at #{inspect index}."]
-  end
-
-  defp normalize_source_url(options, config) do
-    if source_url = config[:source_url] do
-      Keyword.put(options, :source_url, source_url)
-    else
-      options
-    end
   end
 
   defp normalize_source_beam(options, config) do
