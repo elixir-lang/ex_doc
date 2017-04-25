@@ -3,12 +3,34 @@ defmodule ExDoc do
   Elixir Documentation System. ExDoc produces documentation for Elixir projects
   """
 
+  defmodule Default do
+    @moduledoc false
+
+    @config %{
+      :formatter => "html",
+      :output => "./doc",
+      :source_ref => "master",
+      :retriever => ExDoc.Retriever,
+    }
+
+    @spec config :: map
+    def config do
+      @config
+    end
+
+    @spec config(atom) :: term
+    def config(field) do
+      Map.get(config(), field)
+    end
+  end
+
   defmodule Config do
     @moduledoc """
     Configuration structure that holds all the available options for ExDoc
 
     You can find more details about these options in the `ExDoc.CLI` module.
     """
+
     defstruct [
       assets: nil,
       canonical: nil,
@@ -16,15 +38,16 @@ defmodule ExDoc do
       extra_section: nil,
       extras: [],
       filter_prefix: nil,
-      formatter: "html",
+      formatter: ExDoc.Default.config(:formatter),
       formatter_opts: [],
       homepage_url: nil,
       logo: nil,
       main: nil,
-      output: "doc",
+      output: ExDoc.Default.config(:output),
       project: nil,
-      retriever: ExDoc.Retriever,
+      retriever: ExDoc.Default.config(:retriever),
       source_beam: nil,
+      source_ref: ExDoc.Default.config(:source_ref),
       source_root: nil,
       source_url: nil,
       source_url_pattern: nil,
@@ -48,6 +71,7 @@ defmodule ExDoc do
        project: nil | String.t,
        retriever: :atom,
        source_beam: nil | String.t,
+       source_ref: nil | String.t,
        source_root: nil | String.t,
        source_url: nil | String.t,
        source_url_pattern: nil | String.t,
