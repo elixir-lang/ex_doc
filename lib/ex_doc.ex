@@ -7,7 +7,7 @@ defmodule ExDoc do
     @moduledoc """
     Configuration structure that holds all the available options for ExDoc
 
-    You can find more details about this options in the `ExDoc.CLI` module.
+    You can find more details about these options in the `ExDoc.CLI` module.
     """
     defstruct [
       assets: nil,
