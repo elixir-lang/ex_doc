@@ -17,6 +17,7 @@ import resultsTemplate from './templates/search-results.handlebars'
 const $content = $('.content-inner')
 const $input = $('.sidebar-search input')
 const $sidebarItems = $('#full-list li')
+var $results
 
 // Local Methods
 // -------------
@@ -105,7 +106,11 @@ function search (nodes, value) {
     })
   }
 
-  var $results = $(resultsTemplate({
+  if ($results) {
+    $results.remove()
+  }
+
+  $results = $(resultsTemplate({
     value: value,
     levels: levels,
     empty: levels.length === 0
