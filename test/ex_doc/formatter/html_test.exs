@@ -175,11 +175,11 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "run generates pages" do
-    config = doc_config([main: "README"])
+    config = doc_config([main: "readme"])
     generate_docs(config)
 
     content = File.read!("#{output_dir()}/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=README.html">}
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=readme.html">}
 
     content = File.read!("#{output_dir()}/readme.html")
     assert content =~ ~r{<title>README [^<]*</title>}
