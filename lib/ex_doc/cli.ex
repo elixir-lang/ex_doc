@@ -52,6 +52,7 @@ defmodule ExDoc.CLI do
     opts =
       opts
       |> Keyword.put(:source_beam, source_beam)
+      |> ExDoc.nilify_options()
       |> merge_config()
     generator.(project, version, opts)
   end

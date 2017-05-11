@@ -3,12 +3,34 @@ defmodule ExDoc do
   Elixir Documentation System. ExDoc produces documentation for Elixir projects
   """
 
+  defmodule Default do
+    @moduledoc false
+
+    @config %{
+      :formatter => "html",
+      :output => "./doc",
+      :source_ref => "master",
+      :retriever => ExDoc.Retriever,
+    }
+
+    @spec config :: map
+    def config do
+      @config
+    end
+
+    @spec config(atom) :: term
+    def config(field) do
+      Map.get(config(), field)
+    end
+  end
+
   defmodule Config do
     @moduledoc """
     Configuration structure that holds all the available options for ExDoc
 
     You can find more details about these options in the `ExDoc.CLI` module.
     """
+
     defstruct [
       assets: nil,
       canonical: nil,
@@ -16,15 +38,16 @@ defmodule ExDoc do
       extra_section: nil,
       extras: [],
       filter_prefix: nil,
-      formatter: "html",
+      formatter: ExDoc.Default.config(:formatter),
       formatter_opts: [],
       homepage_url: nil,
       logo: nil,
       main: nil,
-      output: "doc",
+      output: ExDoc.Default.config(:output),
       project: nil,
-      retriever: ExDoc.Retriever,
+      retriever: ExDoc.Default.config(:retriever),
       source_beam: nil,
+      source_ref: ExDoc.Default.config(:source_ref),
       source_root: nil,
       source_url: nil,
       source_url_pattern: nil,
@@ -48,6 +71,7 @@ defmodule ExDoc do
        project: nil | String.t,
        retriever: :atom,
        source_beam: nil | String.t,
+       source_ref: nil | String.t,
        source_root: nil | String.t,
        source_url: nil | String.t,
        source_url_pattern: nil | String.t,
@@ -78,16 +102,45 @@ defmodule ExDoc do
   # Builds configuration by merging `options`, and normalizing the options.
   @spec build_config(String.t, String.t, Keyword.t) :: ExDoc.Config.t
   defp build_config(project, vsn, options) do
-    options = normalize_options(options)
+    options =
+      options
+      |> normalize_directory([:assets, :output, :source_root])
+      |> normalize_source_url_pattern()
+
     preconfig = %Config{
       project: project,
       version: vsn,
-      main: options[:main],
-      homepage_url: options[:homepage_url],
       source_root: options[:source_root] || File.cwd!,
     }
     struct(preconfig, options)
   end
+
+  @doc """
+  Replaces all empty string values in `options` with `nil`.
+  """
+  @spec nilify_options(keyword) :: keyword
+  def nilify_options(options) do
+    for {field, value} <- options do
+      case value do
+        "" -> {field, nil}
+        _  -> {field, value}
+      end
+    end
+  end
+
+  @doc """
+  Updates `field` in `options` if its value is `nil`.
+  """
+  @spec normalize_options(keyword, atom, term) :: keyword
+  def normalize_options(options, field, default) do
+    if is_nil(options[field]) do
+      Keyword.put(options, field, default)
+    else
+      options
+    end
+  end
+
+  # Helpers
 
   # Short path for programmatic interface
   defp find_formatter(modname) when is_atom(modname), do: modname
@@ -111,14 +164,26 @@ defmodule ExDoc do
     modname
   end
 
-  # Helpers
+  @doc false
+  def normalize_directory(options, fields) when is_list(fields) do
+    Enum.reduce(fields, options, fn(field, options_acc) ->
+      normalize_directory(options_acc, field)
+    end)
+  end
 
-  defp normalize_options(options) do
-    pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || "master")
-    options = Keyword.put(options, :source_url_pattern, pattern)
+  def normalize_directory(options, field) when is_atom(field) do
+    if is_binary(options[field]) do
+      Keyword.put(options, field, String.trim_trailing(options[field], "/"))
+    else
+      options
+    end
+  end
 
-    if is_bitstring(options[:output]) do
-      Keyword.put(options, :output, String.trim_trailing(options[:output], "/"))
+  @doc false
+  def normalize_source_url_pattern(options, default_source_ref \\ ExDoc.Default.config(:source_ref)) do
+    if !options[:source_url_pattern] && options[:source_url] do
+      source_ref = options[:source_ref] || default_source_ref
+      Keyword.put(options, :source_url_pattern, guess_url(options[:source_url], source_ref))
     else
       options
     end
