@@ -2,7 +2,7 @@
 `CustomBehaviourImpl.hello/1`
 `TypesAndSpecs.Sub`
 
-## Header sample
+## `Header` sample
 
 hello
 

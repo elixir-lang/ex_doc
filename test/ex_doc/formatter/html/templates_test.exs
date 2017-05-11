@@ -49,7 +49,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert Templates.header_to_id(" ☃ ") == ""
     assert Templates.header_to_id(" &sup2; ") == ""
     assert Templates.header_to_id(" &#9180; ") == ""
-    assert Templates.header_to_id("Git Options (<code class=\"inline\">:git</code>)") == "git-options"
+    assert Templates.header_to_id("Git Options (<code class=\"inline\">:git</code>)") == "git-options-git"
   end
 
   test "synopsis" do
