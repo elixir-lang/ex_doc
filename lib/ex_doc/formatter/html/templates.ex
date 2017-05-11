@@ -144,10 +144,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @h2_regex  ~r/<h2.*?>(.+)<\/h2>/m
+  @clean_html_regex ~r/<(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
   defp extract_headers(content) do
     @h2_regex
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
+    |> Enum.map(&(String.replace(&1, @clean_html_regex, "")))
     |> Enum.map(&{&1, header_to_id(&1)})
   end
 
@@ -209,7 +211,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @spec header_to_id(String.t) :: String.t
   def header_to_id(header) do
     header
-    |> String.replace(~r/<.+>/, "")
+    |> String.replace(@clean_html_regex, "")
     |> String.replace(~r/&#\d+;/, "")
     |> String.replace(~r/&[A-Za-z0-9]+;/, "")
     |> String.replace(~r/\W+/u, "-")
