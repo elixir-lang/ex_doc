@@ -19,7 +19,7 @@ defmodule ExDoc do
 
     @spec default(atom) :: term
     def default(field) do
-      Map.get(@default, field)
+      Map.fetch!(@default, field)
     end
 
     defstruct [
@@ -29,16 +29,16 @@ defmodule ExDoc do
       extra_section: nil,
       extras: [],
       filter_prefix: nil,
-      formatter: @default[:formatter],
+      formatter: @default.formatter,
       formatter_opts: [],
       homepage_url: nil,
       logo: nil,
       main: nil,
-      output: @default[:output],
+      output: @default.output,
       project: nil,
-      retriever: @default[:retriever],
+      retriever: @default.retriever,
       source_beam: nil,
-      source_ref: @default[:source_ref],
+      source_ref: @default.source_ref,
       source_root: nil,
       source_url: nil,
       source_url_pattern: nil,
