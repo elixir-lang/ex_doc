@@ -9,6 +9,24 @@ defmodule ExDoc do
 
     You can find more details about these options in the `ExDoc.CLI` module.
     """
+
+    @default %{
+      :formatter => "html",
+      :output => "./doc",
+      :source_ref => "master",
+      :retriever => ExDoc.Retriever,
+    }
+
+    @spec default :: map
+    def default do
+      @default
+    end
+
+    @spec default(atom) :: term
+    def default(field) do
+      Map.get(default(), field)
+    end
+
     defstruct [
       assets: nil,
       canonical: nil,
@@ -16,15 +34,16 @@ defmodule ExDoc do
       extra_section: nil,
       extras: [],
       filter_prefix: nil,
-      formatter: "html",
+      formatter: @default[:formatter],
       formatter_opts: [],
       homepage_url: nil,
       logo: nil,
       main: nil,
-      output: "doc",
+      output: @default[:output],
       project: nil,
-      retriever: ExDoc.Retriever,
+      retriever: @default[:retriever],
       source_beam: nil,
+      source_ref: @default[:source_ref],
       source_root: nil,
       source_url: nil,
       source_url_pattern: nil,
@@ -48,6 +67,7 @@ defmodule ExDoc do
        project: nil | String.t,
        retriever: :atom,
        source_beam: nil | String.t,
+       source_ref: nil | String.t,
        source_root: nil | String.t,
        source_url: nil | String.t,
        source_url_pattern: nil | String.t,
@@ -114,7 +134,7 @@ defmodule ExDoc do
   # Helpers
 
   defp normalize_options(options) do
-    pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || "master")
+    pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || ExDoc.Config.default(:source_ref))
     options = Keyword.put(options, :source_url_pattern, pattern)
 
     if is_bitstring(options[:output]) do
