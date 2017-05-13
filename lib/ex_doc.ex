@@ -17,14 +17,9 @@ defmodule ExDoc do
       :retriever => ExDoc.Retriever,
     }
 
-    @spec default :: map
-    def default do
-      @default
-    end
-
     @spec default(atom) :: term
     def default(field) do
-      Map.get(default(), field)
+      Map.get(@default, field)
     end
 
     defstruct [
