@@ -138,7 +138,7 @@ defmodule Mix.Tasks.Docs do
 
   defp get_formatters(options) do
     case Keyword.get_values(options, :formatter) do
-      [] -> options[:formatters] || ["html"]
+      [] -> options[:formatters] || [ExDoc.Config.default(:formatter)]
       values -> values
     end
   end
