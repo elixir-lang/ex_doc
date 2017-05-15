@@ -91,22 +91,22 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     </h2>
     """
 
-    assert Templates.link_headings("<h2>Foo</h2><h2></h2>") == """
+    assert Templates.link_headings("<h2>Foo</h2><h2></h2>") == String.rstrip("""
     <h2 id="foo" class="section-heading">
       <a href="#foo" class="hover-link"><i class="icon-link"></i></a>
       Foo
     </h2>
     <h2></h2>
-    """ |> String.rstrip
+    """)
 
-    assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") == """
+    assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") == String.rstrip("""
     <h2 id="foo" class="section-heading">
       <a href="#foo" class="hover-link"><i class="icon-link"></i></a>
       Foo
     </h2>
 
     <h2></h2>
-    """ |> String.rstrip
+    """)
   end
 
   test "sidebar items from headers" do
