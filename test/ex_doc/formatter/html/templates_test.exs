@@ -52,6 +52,84 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert Templates.header_to_id("Git Options (<code class=\"inline\">:git</code>)") == "git-options-git"
   end
 
+  test "link headers" do
+    assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """
+    <h2 id="foo" class="section-heading">
+      <a href="#foo" class="hover-link"><i class="icon-link"></i></a>
+      Foo
+    </h2>
+    <h2 id="bar" class="section-heading">
+      <a href="#bar" class="hover-link"><i class="icon-link"></i></a>
+      Bar
+    </h2>
+    """
+
+    assert Templates.link_headings("<h2>Foo</h2>\n<h2>Bar</h2>") == """
+    <h2 id="foo" class="section-heading">
+      <a href="#foo" class="hover-link"><i class="icon-link"></i></a>
+      Foo
+    </h2>
+
+    <h2 id="bar" class="section-heading">
+      <a href="#bar" class="hover-link"><i class="icon-link"></i></a>
+      Bar
+    </h2>
+    """
+
+    assert Templates.link_headings("<h2></h2><h2>Bar</h2>") == """
+    <h2></h2><h2 id="bar" class="section-heading">
+      <a href="#bar" class="hover-link"><i class="icon-link"></i></a>
+      Bar
+    </h2>
+    """
+
+    assert Templates.link_headings("<h2></h2>\n<h2>Bar</h2>") == """
+    <h2></h2>
+    <h2 id="bar" class="section-heading">
+      <a href="#bar" class="hover-link"><i class="icon-link"></i></a>
+      Bar
+    </h2>
+    """
+
+    assert Templates.link_headings("<h2>Foo</h2><h2></h2>") == String.rstrip("""
+    <h2 id="foo" class="section-heading">
+      <a href="#foo" class="hover-link"><i class="icon-link"></i></a>
+      Foo
+    </h2>
+    <h2></h2>
+    """)
+
+    assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") == String.rstrip("""
+    <h2 id="foo" class="section-heading">
+      <a href="#foo" class="hover-link"><i class="icon-link"></i></a>
+      Foo
+    </h2>
+
+    <h2></h2>
+    """)
+  end
+
+  test "sidebar items from headers" do
+    item = %{content: nil, group: nil, id: nil, title: nil}
+    assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}]) ==
+      ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"},{"id":"Bar","anchor":"bar"}]}]})
+
+    assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}]) ==
+      ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"},{"id":"Bar","anchor":"bar"}]}]})
+
+    assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2></h2><h2>Bar</h2>"}]) ==
+      ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Bar","anchor":"bar"}]}]})
+
+    assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2></h2>\n<h2>Bar</h2>"}]) ==
+      ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Bar","anchor":"bar"}]}]})
+
+    assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}]) ==
+      ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"}]}]})
+
+    assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2></h2>"}]) ==
+      ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"}]}]})
+  end
+
   test "synopsis" do
     assert Templates.synopsis(nil) == nil
     assert Templates.synopsis("") == ""

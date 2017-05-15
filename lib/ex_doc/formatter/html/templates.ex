@@ -143,12 +143,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~s/{"id":"#{id}","title":"#{title}","group":"#{group}","headers":[#{headers}]}/
   end
 
-  @h2_regex  ~r/<h2.*?>(.+)<\/h2>/m
+  @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
   @clean_html_regex ~r/<(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
   defp extract_headers(content) do
     @h2_regex
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
+    |> Enum.filter(&(&1 != ""))
     |> Enum.map(&(String.replace(&1, @clean_html_regex, "")))
     |> Enum.map(&{&1, header_to_id(&1)})
   end
@@ -223,7 +224,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   Link secondary headings found with `regex` with in the given `content`.
   IDs are prefixed with `prefix`.
   """
-  @h2_regex ~r/<h2.*?>(.+)<\/h2>/m
+  @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
   @spec link_headings(String.t, Regex.t, String.t) :: String.t
   def link_headings(content, regex \\ @h2_regex, prefix \\ "")
   def link_headings(nil, _, _), do: nil
