@@ -87,6 +87,7 @@ function search (nodes, value) {
   var modules = findIn(nodes.modules, safeVal)
   var exceptions = findIn(nodes.exceptions, safeVal)
   var protocols = findIn(nodes.protocols, safeVal)
+  var tasks = findIn(nodes.tasks, safeVal)
 
   if (modules.length > 0) {
     levels.push({
@@ -106,6 +107,13 @@ function search (nodes, value) {
     levels.push({
       name: 'Protocols',
       results: protocols
+    })
+  }
+
+  if (tasks.length > 0) {
+    levels.push({
+      name: 'Tasks',
+      results: tasks
     })
   }
 

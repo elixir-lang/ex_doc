@@ -4,7 +4,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates
 
-  @empty_nodes_map %{modules: [], exceptions: [], protocols: []}
+  @empty_nodes_map %{modules: [], exceptions: [], protocols: [], tasks: []}
 
   defp source_url do
     "https://github.com/elixir-lang/elixir"
@@ -182,7 +182,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     nodes   = ExDoc.Retriever.docs_from_modules(names, doc_config())
     modules = HTML.Autolink.all(nodes, ".html", [])
 
-    content = Templates.sidebar_template(doc_config(), %{modules: modules, exceptions: [], protocols: []})
+    content = Templates.sidebar_template(doc_config(), %{modules: modules, exceptions: [], protocols: [], tasks: []})
     assert content =~ ~r{<li><a id="modules-list" href="#full-list">Modules</a></li>}
     refute content =~ ~r{<li><a id="exceptions-list" href="#full-list">Exceptions</a></li>}
     refute content =~ ~r{<li><a id="protocols-list" href="#full-list">Protocols</a></li>}

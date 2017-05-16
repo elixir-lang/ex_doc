@@ -436,6 +436,7 @@ defmodule ExDoc.Retriever do
       function_exported?(module, :__protocol__, 1) -> :protocol
       function_exported?(module, :__impl__, 1) -> :impl
       function_exported?(module, :behaviour_info, 1) -> :behaviour
+      match?("Elixir.Mix.Tasks." <> _, Atom.to_string(module)) -> :task
       true -> :module
     end
   end

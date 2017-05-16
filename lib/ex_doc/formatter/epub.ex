@@ -24,9 +24,10 @@ defmodule ExDoc.Formatter.EPUB do
 
     all = HTML.Autolink.all(project_nodes, ".xhtml", config.deps)
     nodes_map = %{
-      modules: HTML.filter_list(:modules, all),
-      exceptions: HTML.filter_list(:exceptions, all),
-      protocols: HTML.filter_list(:protocols, all)
+      modules: HTML.filter_list(:module, all),
+      exceptions: HTML.filter_list(:exception, all),
+      protocols: HTML.filter_list(:protocol, all),
+      tasks: HTML.filter_list(:task, all)
     }
 
     uuid = "urn:uuid:#{uuid4()}"
@@ -39,6 +40,7 @@ defmodule ExDoc.Formatter.EPUB do
     generate_list(config, nodes_map.modules)
     generate_list(config, nodes_map.exceptions)
     generate_list(config, nodes_map.protocols)
+    generate_list(config, nodes_map.tasks)
 
     {:ok, epub} = generate_epub(config.output)
     File.rm_rf!(config.output)

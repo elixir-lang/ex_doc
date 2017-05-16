@@ -21,9 +21,10 @@ defmodule ExDoc.Formatter.HTML do
 
     linked = Autolink.all(project_nodes, ".html", config.deps)
     nodes_map = %{
-      modules: filter_list(:modules, linked),
-      exceptions: filter_list(:exceptions, linked),
-      protocols: filter_list(:protocols, linked)
+      modules: filter_list(:module, linked),
+      exceptions: filter_list(:exception, linked),
+      protocols: filter_list(:protocol, linked),
+      tasks: filter_list(:task, linked)
     }
 
     extras =
@@ -41,6 +42,7 @@ defmodule ExDoc.Formatter.HTML do
       generate_list(nodes_map.modules, nodes_map, config) ++
       generate_list(nodes_map.exceptions, nodes_map, config) ++
       generate_list(nodes_map.protocols, nodes_map, config) ++
+      generate_list(nodes_map.tasks, nodes_map, config) ++
       generate_index(config)
 
     generate_build(static_files ++ generated_files, build)
@@ -270,16 +272,12 @@ defmodule ExDoc.Formatter.HTML do
     File.write!("#{config.output}/#{filename}", content)
   end
 
-  def filter_list(:modules, nodes) do
-    Enum.filter nodes, &(not &1.type in [:exception, :protocol, :impl])
+  def filter_list(:module, nodes) do
+    Enum.filter(nodes, &(not &1.type in [:exception, :protocol, :impl, :task]))
   end
 
-  def filter_list(:exceptions, nodes) do
-    Enum.filter nodes, &(&1.type in [:exception])
-  end
-
-  def filter_list(:protocols, nodes) do
-    Enum.filter nodes, &(&1.type in [:protocol])
+  def filter_list(type, nodes) do
+    Enum.filter(nodes, &(&1.type == type))
   end
 
   defp generate_list(nodes, nodes_map, config) do

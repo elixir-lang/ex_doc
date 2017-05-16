@@ -193,6 +193,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:extra), do: "extras"
   defp sidebar_type(:module), do: "modules"
   defp sidebar_type(:behaviour), do: "modules"
+  defp sidebar_type(:task), do: "tasks"
 
   def asset_rev(output, pattern) do
     output = Path.expand(output)

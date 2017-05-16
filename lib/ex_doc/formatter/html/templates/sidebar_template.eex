@@ -39,6 +39,10 @@
     <%= if nodes_map.protocols != [] do %>
       <li><a id="protocols-list" href="#full-list">Protocols</a></li>
     <% end %>
+
+    <%= if nodes_map.tasks != [] do %>
+      <li><a id="tasks-list" href="#full-list">Tasks</a></li>
+    <% end %>
   </ul>
   <div class="gradient"></div>
   <ul id="full-list" class="sidebar-fullList"></ul>
