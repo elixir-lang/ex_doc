@@ -73,6 +73,16 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
+  Returns the HTML formatted title for the module page.
+  """
+  def module_title(%{type: :task, title: title}),
+    do: "mix " <> title
+  def module_title(%{type: :module, title: title}),
+    do: title
+  def module_title(%{type: type, title: title}),
+    do: title <> " <small>#{type}</small>"
+
+  @doc """
   Gets the first paragraph of the documentation of a node. It strips
   surrounding spaces and strips traling `:` and `.`.
 
@@ -83,7 +93,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def synopsis(nil), do: nil
   def synopsis(""),  do: ""
-  def synopsis(doc) when is_bitstring(doc) do
+  def synopsis(doc) when is_binary(doc) do
     doc
     |> String.split(~r/\n\s*\n/)
     |> hd()
@@ -162,9 +172,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
       |> Enum.map_join(",", &sidebar_items_by_type/1)
 
     if items == "" do
-      ~s/{"id":"#{module_node.id}","title":"#{module_node.id}"}/
+      ~s/{"id":"#{module_node.id}","title":"#{module_node.title}"}/
     else
-      ~s/{"id":"#{module_node.id}","title":"#{module_node.id}",#{items}}/
+      ~s/{"id":"#{module_node.id}","title":"#{module_node.title}",#{items}}/
     end
   end
 

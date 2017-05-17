@@ -1,9 +1,6 @@
-<%= head_template(config, %{title: module.id}) %>
+<%= head_template(config, %{title: module.title}) %>
     <h1 id="content">
-      <%= module.id %>
-      <%= if module.type != :module do %>
-        <small><%= module.type %></small>
-      <% end%>
+      <%= H.module_title(module) %>
     </h1>
 
     <%= if module.doc do %>

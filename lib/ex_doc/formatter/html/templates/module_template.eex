@@ -1,12 +1,9 @@
-    <%= head_template(config, %{title: module.id, type: module.type}) %>
+    <%= head_template(config, %{title: module.title, type: module.type}) %>
     <%= sidebar_template(config, nodes_map) %>
 
       <h1>
         <small class="visible-xs"><%= config.project %> v<%= config.version %></small>
-        <%= module.id %>
-        <%= if module.type != :module do %>
-          <small><%= module.type %></small>
-        <% end %>
+        <%= module_title(module) %>
         <%= if module.source_url do %>
           <a href="<%= module.source_url %>" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>

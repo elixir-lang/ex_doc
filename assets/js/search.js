@@ -51,16 +51,16 @@ function findNested (elements, parentId, matcher) {
 
 export function findIn (elements, matcher) {
   return elements.map(function (element) {
-    var id = element.id
-    var idMatch = id && id.match(matcher)
-    var functionMatches = findNested(element.functions, id, matcher)
-    var macroMatches = findNested(element.macros, id, matcher)
-    var callbackMatches = findNested(element.callbacks, id, matcher)
-    var typeMatches = findNested(element.types, id, matcher)
+    var title = element.title
+    var titleMatch = title && title.match(matcher)
+    var functionMatches = findNested(element.functions, title, matcher)
+    var macroMatches = findNested(element.macros, title, matcher)
+    var callbackMatches = findNested(element.callbacks, title, matcher)
+    var typeMatches = findNested(element.types, title, matcher)
 
     var result = {
       id: element.id,
-      match: idMatch ? highlight(idMatch) : element.id
+      match: titleMatch ? highlight(titleMatch) : element.title
     }
 
     if (functionMatches.length > 0) result.functions = functionMatches
@@ -68,7 +68,7 @@ export function findIn (elements, matcher) {
     if (callbackMatches.length > 0) result.callbacks = callbackMatches
     if (typeMatches.length > 0) result.types = typeMatches
 
-    if (idMatch ||
+    if (titleMatch ||
         functionMatches.length > 0 ||
         macroMatches.length > 0 ||
         callbackMatches.length > 0 ||
