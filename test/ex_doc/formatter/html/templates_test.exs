@@ -55,30 +55,30 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   test "link headers" do
     assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """
     <h2 id="foo" class="section-heading">
-      <a href="#foo" class="hover-link"><i class="icon-link"></i></a>
+      <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       Foo
     </h2>
     <h2 id="bar" class="section-heading">
-      <a href="#bar" class="hover-link"><i class="icon-link"></i></a>
+      <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       Bar
     </h2>
     """
 
     assert Templates.link_headings("<h2>Foo</h2>\n<h2>Bar</h2>") == """
     <h2 id="foo" class="section-heading">
-      <a href="#foo" class="hover-link"><i class="icon-link"></i></a>
+      <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       Foo
     </h2>
 
     <h2 id="bar" class="section-heading">
-      <a href="#bar" class="hover-link"><i class="icon-link"></i></a>
+      <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       Bar
     </h2>
     """
 
     assert Templates.link_headings("<h2></h2><h2>Bar</h2>") == """
     <h2></h2><h2 id="bar" class="section-heading">
-      <a href="#bar" class="hover-link"><i class="icon-link"></i></a>
+      <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       Bar
     </h2>
     """
@@ -86,14 +86,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert Templates.link_headings("<h2></h2>\n<h2>Bar</h2>") == """
     <h2></h2>
     <h2 id="bar" class="section-heading">
-      <a href="#bar" class="hover-link"><i class="icon-link"></i></a>
+      <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       Bar
     </h2>
     """
 
     assert Templates.link_headings("<h2>Foo</h2><h2></h2>") == String.rstrip("""
     <h2 id="foo" class="section-heading">
-      <a href="#foo" class="hover-link"><i class="icon-link"></i></a>
+      <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       Foo
     </h2>
     <h2></h2>
@@ -101,7 +101,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") == String.rstrip("""
     <h2 id="foo" class="section-heading">
-      <a href="#foo" class="hover-link"><i class="icon-link"></i></a>
+      <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       Foo
     </h2>
 
@@ -209,7 +209,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CompiledWithDocs\s*}
     refute content =~ ~r{<small>module</small>}
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
-    assert content =~ ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Example.*</h2>}ms
+    assert content =~ ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms
 
     # Summaries
     assert content =~ ~r{example/2.*Some example}ms
@@ -217,13 +217,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{example_1/0.*<span class="note">\(macro\)</span>}ms
 
     # Source
-    assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<i class="icon-code"></i>\n\s*</a>}ms
+    assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<span class="icon-code" aria-hidden="true"></span>\n\s*<span class="sr-only">View Source</span>\n\s*</a>}ms
 
     # Functions
     assert content =~ ~s{<div class="detail" id="example/2">}
-    assert content =~ ~s{<span id="example/1" />}
+    assert content =~ ~s{<span id="example/1"></span>}
     assert content =~ ~s{example(foo, bar \\\\ Baz)}
-    assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\n\s*<i class="icon-link"><\/i>\n\s*<\/a>}ms
+    assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\n\s*<span class="icon-link" aria-hidden="true"></span>\n\s*<span class="sr-only">Link to this function</span>\n\s*</a>}ms
   end
 
   test "module_page outputs the types and function specs" do

@@ -15,6 +15,7 @@ defmodule ExDoc do
       :output => "./doc",
       :source_ref => "master",
       :retriever => ExDoc.Retriever,
+      :language => "en",
     }
 
     @spec default(atom) :: term
@@ -32,6 +33,7 @@ defmodule ExDoc do
       formatter: @default.formatter,
       formatter_opts: [],
       homepage_url: nil,
+      language: @default.language,
       logo: nil,
       main: nil,
       output: @default.output,
@@ -56,6 +58,7 @@ defmodule ExDoc do
        formatter: nil | String.t,
        formatter_opts: Keyword.t,
        homepage_url: nil | String.t,
+       language: String.t,
        logo: nil | Path.t,
        main: nil | String.t,
        output: nil | Path.t,

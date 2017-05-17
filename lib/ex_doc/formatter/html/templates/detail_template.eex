@@ -1,15 +1,17 @@
 <div class="detail" id="<%=enc_h link_id(module_node.id, module_node.type) %>">
   <%= for default <- get_defaults(module_node) do %>
-    <span id="<%=enc_h link_id(default, module_node.type) %>" />
+    <span id="<%=enc_h link_id(default, module_node.type) %>"></span>
   <% end %>
   <div class="detail-header">
     <a href="#<%=enc_h link_id(module_node) %>" class="detail-link" title="Link to this <%= pretty_type(module_node) %>">
-      <i class="icon-link"></i>
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this <%= pretty_type(module_node) %></span>
     </a>
     <span class="signature"><%=h module_node.signature %></span>
     <%= if module_node.source_url do %>
       <a href="<%= module_node.source_url %>" class="view-source" rel="help" title="View Source">
-       <i class="icon-code"></i>
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
      </a>
     <% end %>
     <%= for annotation <- module_node.annotations do %>

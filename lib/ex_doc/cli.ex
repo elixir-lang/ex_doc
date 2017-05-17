@@ -29,6 +29,7 @@ defmodule ExDoc.CLI do
 
         switches: [
           extra: :keep,
+          language: :string,
           source_ref: :string,
           version: :boolean,
         ],
@@ -130,6 +131,8 @@ defmodule ExDoc.CLI do
                           the generated documentation.
       -f, --formatter     Docs formatter to use (html or epub), default: "html"
       -p, --homepage-url  URL to link to for the site name
+          --language      Identify the primary language of the documents, its value must be
+                          a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)
                           The image size will be 64x64 and copied to the assets directory
       -m, --main          The entry-point page in docs, default: "api-reference"
