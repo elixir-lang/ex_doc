@@ -115,7 +115,7 @@ defmodule Mix.Tasks.Docs do
 
     {cli_opts, args, _} = OptionParser.parse(args,
                             aliases: [n: :canonical, f: :formatter, o: :output],
-                            switches: [canonical: :string, formatter: :keep, output: :string, language: :string])
+                            switches: [canonical: :string, formatter: :keep, language: :string, output: :string])
 
     if args != [] do
       Mix.raise "Extraneous arguments on the command line"

@@ -12,10 +12,10 @@ defmodule ExDoc do
 
     @default %{
       :formatter => "html",
+      :language => "en",
       :output => "./doc",
       :source_ref => "master",
       :retriever => ExDoc.Retriever,
-      :language => "en",
     }
 
     @spec default(atom) :: term
