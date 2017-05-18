@@ -70,10 +70,22 @@ defmodule Mix.Tasks.DocsTest do
            run([], [app: :ex_doc, docs: fn -> [main: "another"] end])
   end
 
-  test "accepts source_url from root" do
-    assert [{"ex_doc", "dev", [formatter: "html", deps: _, source_beam: _,
-                               source_url: "http://github.com/elixir-lang/ex_doc"]}] =
-           run([], [app: :ex_doc, source_url: "http://github.com/elixir-lang/ex_doc"])
+  test "accepts options from root" do
+    # accepted options are: `app`, `name`, `source_url`, `homepage_url`, `version`
+    assert [{"ExDoc", "1.2.3-dev",
+             [formatter: "html",
+              deps: _, source_beam: _,
+              homepage_url: "http://elixir-lang.org",
+              source_url: "https://github.com/elixir-lang/ex_doc",
+              ]}] =
+           run([], [app: :ex_doc,
+                    name: "ExDoc",
+                    source_url: "https://github.com/elixir-lang/ex_doc",
+                    homepage_url: "http://elixir-lang.org",
+                    version: "1.2.3-dev",
+                   ])
+
+    assert [{"ex_doc", "dev", _}] = run([], [app: :ex_doc])
   end
 
   test "supports umbrella project" do
