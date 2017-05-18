@@ -1,10 +1,55 @@
+defmodule ExDoc.ProjectNode do
+  @moduledoc """
+  Structure that represents a *project*
+  """
+
+  @derive [Poison.Encoder]
+  defstruct [:name, :version, :homepage_url, :description, :icon, :language,
+    :items, :attachments, :extras, about: "ExDoc/version/1"]
+
+  @type t :: %__MODULE__{
+    about: String.t,
+    name: String.t,
+    version: String.t,
+    homepage_url: String.t,
+    description: String.t,
+    icon: String.t,
+    language: String.t,
+    items: map
+  }
+end
+
+defmodule ExDoc.LeanModuleNode do
+  @moduledoc """
+  Alternative structure to represent a *module*
+
+  See: `ExDoc.ModuleNode` is the original structure.
+  """
+
+  @derive [Poison.Encoder]
+  defstruct [:module, :doc, :doc_line, :source_path, :source_url, :title,
+    types: [], functions: [], callbacks: []]
+
+  @type t :: %__MODULE__{
+    title: nil | String.t,
+    module: nil | String.t,
+    types: list(),
+    functions: list(),
+    callbacks: list(),
+    doc: nil | String.t,
+    doc_line: non_neg_integer(),
+    source_path: nil | String.t,
+    source_url: nil | String.t
+  }
+end
+
 defmodule ExDoc.ModuleNode do
   @moduledoc """
   Structure that represents a *module*
   """
 
-  defstruct id: nil, title: nil, module: nil, doc: nil, doc_line: nil,
-    docs: [], typespecs: [], source_path: nil, source_url: nil, type: nil
+  defstruct [:id, :module, :doc, :doc_line, :source_path, :source_url, :type,
+    :title, docs: [], typespecs: []]
 
   @type t :: %__MODULE__{
     id: nil | String.t,
@@ -25,9 +70,9 @@ defmodule ExDoc.FunctionNode do
   Structure that holds all the elements of an individual *function*
   """
 
-  defstruct id: nil, name: nil, arity: 0, defaults: [], doc: [],
-    type: nil, signature: nil, specs: [], annotations: [],
-    doc_line: nil, source_path: nil, source_url: nil
+  @derive {Poison.Encoder, except: [:id, :specs, :type]}
+  defstruct [:id, :name, :type, :signature, :doc_line, :source_path,
+    :source_url, arity: 0, defaults: [], doc: [], specs: [], annotations: []]
 
   @type t :: %__MODULE__{
     id: nil | String.t,
@@ -50,9 +95,9 @@ defmodule ExDoc.TypeNode do
   Structure that holds all the elements of an individual *type*
   """
 
-  defstruct id: nil, name: nil, arity: 0, type: nil, doc_line: nil,
-    source_path: nil, source_url: nil, spec: nil, doc: nil,
-    signature: nil, annotations: []
+  @derive {Poison.Encoder, except: [:id, :spec, :type]}
+  defstruct [:id, :name, :type, :signature, :doc_line, :source_path,
+    :source_url, :spec, :doc, annotations: [], arity: 0]
 
   @type t :: %__MODULE__{
     id: nil | String.t,

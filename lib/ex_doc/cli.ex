@@ -129,7 +129,7 @@ defmodule ExDoc.CLI do
                           default: "PAGES"
       -i, --filter-prefix Include only modules that match the given prefix in
                           the generated documentation.
-      -f, --formatter     Docs formatter to use (html or epub), default: "html"
+      -f, --formatter     Docs formatter to use (html, epub, or json), default: "html"
       -p, --homepage-url  URL to link to for the site name
           --language      Identify the primary language of the documents, its value must be
                           a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
