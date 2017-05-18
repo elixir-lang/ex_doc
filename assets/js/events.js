@@ -98,7 +98,7 @@ function addEventListeners () {
     }
   })
 
-  $('.sidebar-search i.icon-search').on('click', function (e) {
+  $('.sidebar-search .icon-search').on('click', function (e) {
     search()
   })
 }
