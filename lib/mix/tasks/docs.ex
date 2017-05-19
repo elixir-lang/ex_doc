@@ -127,7 +127,8 @@ defmodule Mix.Tasks.Docs do
       config
       |> get_docs_opts()
       |> Keyword.merge(cli_opts)
-      |> normalize_source_url(config)
+      |> normalize_source_url(config)   # accepted at root level config
+      |> normalize_homepage_url(config) # accepted at root level config
       |> normalize_source_beam(config)
       |> normalize_main()
       |> normalize_deps()
@@ -163,6 +164,14 @@ defmodule Mix.Tasks.Docs do
   defp normalize_source_url(options, config) do
     if source_url = config[:source_url] do
       Keyword.put(options, :source_url, source_url)
+    else
+      options
+    end
+  end
+
+  defp normalize_homepage_url(options, config) do
+    if homepage_url = config[:homepage_url] do
+      Keyword.put(options, :homepage_url, homepage_url)
     else
       options
     end
