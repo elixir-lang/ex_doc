@@ -121,8 +121,9 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/another_dir/CompiledWithDocs.html")
     assert File.regular?("#{output_dir()}/another_dir/RandomError.html")
 
-    assert "#{output_dir()}/another_dir/dist/app-*.css" |> Path.wildcard |> File.regular?
-    assert "#{output_dir()}/another_dir/dist/app-*.js" |> Path.wildcard |> File.regular?
+    for file <- Path.wildcard("#{output_dir()}/another_dir/dist/app-*.{js,css}") do
+      assert File.regular?(file)
+    end
 
     content = File.read!("#{output_dir()}/another_dir/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}
