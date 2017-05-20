@@ -91,7 +91,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     </h2>
     """
 
-    assert Templates.link_headings("<h2>Foo</h2><h2></h2>") == String.rstrip("""
+    assert Templates.link_headings("<h2>Foo</h2><h2></h2>") == String.trim_trailing("""
     <h2 id="foo" class="section-heading">
       <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       Foo
@@ -99,7 +99,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     <h2></h2>
     """)
 
-    assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") == String.rstrip("""
+    assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") == String.trim_trailing("""
     <h2 id="foo" class="section-heading">
       <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       Foo
