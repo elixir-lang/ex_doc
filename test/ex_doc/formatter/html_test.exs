@@ -41,17 +41,24 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "guess url base on source_url and source_root options" do
-    generate_docs doc_config(source_url: "https://github.com/elixir-lang/ex_doc", source_root: File.cwd!)
-    content = File.read!("#{output_dir()}/CompiledWithDocs.html")
-    assert content =~ "https://github.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L13"
+    file_path = "#{output_dir()}/CompiledWithDocs.html"
+    for scheme <- ["http", "https"] do
+      generate_docs doc_config(source_url: "#{scheme}://github.com/elixir-lang/ex_doc", source_root: File.cwd!)
+      content = File.read!(file_path)
+      assert content =~ "https://github.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L13"
 
-    generate_docs doc_config(source_url: "https://gitlab.com/elixir-lang/ex_doc", source_root: File.cwd!)
-    content = File.read!("#{output_dir()}/CompiledWithDocs.html")
-    assert content =~ "https://gitlab.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L13"
+      generate_docs doc_config(source_url: "#{scheme}://gitlab.com/elixir-lang/ex_doc", source_root: File.cwd!)
+      content = File.read!(file_path)
+      assert content =~ "https://gitlab.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L13"
 
-    generate_docs doc_config(source_url: "https://bitbucket.org/elixir-lang/ex_doc", source_root: File.cwd!)
-    content = File.read!("#{output_dir()}/CompiledWithDocs.html")
-    assert content =~ "https://bitbucket.org/elixir-lang/ex_doc/src/master/test/fixtures/compiled_with_docs.ex#cl-13"
+      generate_docs doc_config(source_url: "#{scheme}://bitbucket.org/elixir-lang/ex_doc", source_root: File.cwd!)
+      content = File.read!(file_path)
+      assert content =~ "https://bitbucket.org/elixir-lang/ex_doc/src/master/test/fixtures/compiled_with_docs.ex#cl-13"
+
+      generate_docs doc_config(source_url: "#{scheme}://example.com/elixir-lang/ex_doc", source_root: File.cwd!)
+      content = File.read!(file_path)
+      assert content =~ "#{scheme}://example.com/elixir-lang/ex_doc"
+    end
   end
 
   test "find formatter when absolute path to module is given" do
