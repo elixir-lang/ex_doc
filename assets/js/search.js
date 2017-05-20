@@ -56,6 +56,7 @@ export function findIn (elements, matcher) {
     var functionMatches = findNested(element.functions, id, matcher)
     var macroMatches = findNested(element.macros, id, matcher)
     var callbackMatches = findNested(element.callbacks, id, matcher)
+    var typeMatches = findNested(element.types, id, matcher)
 
     var result = {
       id: element.id,
@@ -65,11 +66,13 @@ export function findIn (elements, matcher) {
     if (functionMatches.length > 0) result.functions = functionMatches
     if (macroMatches.length > 0) result.macros = macroMatches
     if (callbackMatches.length > 0) result.callbacks = callbackMatches
+    if (typeMatches.length > 0) result.types = typeMatches
 
     if (idMatch ||
         functionMatches.length > 0 ||
         macroMatches.length > 0 ||
-        callbackMatches.length > 0
+        callbackMatches.length > 0 ||
+        typeMatches.length > 0
        ) {
       return result
     }
