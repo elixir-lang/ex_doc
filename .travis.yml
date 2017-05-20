@@ -19,7 +19,10 @@ before_script:
 env:
   - MIX_ENV=test
 script:
-  - "mix do local.hex --force, deps.get, test && mix coveralls.travis"
+  - mix do local.hex --force
+  - mix deps.get
+  - mix test
+  - mix coveralls.travis
   - node_modules/.bin/gulp
 cache:
   directories:
