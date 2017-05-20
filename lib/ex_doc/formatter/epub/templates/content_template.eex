@@ -5,7 +5,7 @@
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
     <dc:title><%= config.project %> - <%= config.version %></dc:title>
     <dc:identifier id="project-<%= config.project %>"><%= uuid %></dc:identifier>
-    <dc:language>en-US</dc:language>
+    <dc:language><%= config.language %></dc:language>
     <meta property="dcterms:modified"><%= datetime %></meta>
   </metadata>
   <manifest>
