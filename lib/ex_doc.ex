@@ -14,8 +14,8 @@ defmodule ExDoc do
       :formatter => "html",
       :language => "en",
       :output => "./doc",
-      :source_ref => "master",
       :retriever => ExDoc.Retriever,
+      :source_ref => "master",
     }
 
     @spec default(atom) :: term
