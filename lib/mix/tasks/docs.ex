@@ -121,7 +121,7 @@ defmodule Mix.Tasks.Docs do
       Mix.raise "Extraneous arguments on the command line"
     end
 
-    project = to_string(config[:name] || config[:app])
+    project = to_string(config[:name] || Macro.camelize(to_string(config[:app])))
     version = config[:version] || "dev"
     options =
       config
