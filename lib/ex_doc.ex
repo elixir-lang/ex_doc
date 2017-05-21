@@ -16,6 +16,7 @@ defmodule ExDoc do
       :output => "./doc",
       :retriever => ExDoc.Retriever,
       :source_ref => "master",
+      :version => "dev",
     }
 
     @spec default(atom) :: term
@@ -45,7 +46,7 @@ defmodule ExDoc do
       source_url: nil,
       source_url_pattern: nil,
       title: nil,
-      version: nil
+      version: @default.version
     ]
 
      @type t :: %__MODULE__{
