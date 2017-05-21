@@ -64,6 +64,9 @@ defmodule ExDocTest do
 
     assert Map.get(%ExDoc.Config{}, :source_ref) == "master"
     assert ExDoc.Config.default(:source_ref) == "master"
+
+    assert Map.get(%ExDoc.Config{}, :version) == "dev"
+    assert ExDoc.Config.default(:version) == "dev"
   end
 
   test "version" do

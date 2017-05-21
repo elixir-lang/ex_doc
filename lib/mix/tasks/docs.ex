@@ -122,7 +122,7 @@ defmodule Mix.Tasks.Docs do
     end
 
     project = to_string(config[:name] || config[:app])
-    version = config[:version] || "dev"
+    version = config[:version] || ExDoc.Config.default(:version)
     options =
       config
       |> get_docs_opts()
