@@ -93,19 +93,21 @@ defmodule ExDoc do
     find_formatter(config.formatter).run(docs, config)
   end
 
+  @doc false
   # Builds configuration by merging `options`, and normalizing the options.
   @spec build_config(String.t, String.t, Keyword.t) :: ExDoc.Config.t
-  defp build_config(project, vsn, options) do
+  def build_config(project, vsn, options) do
     options = normalize_options(options)
+
     preconfig = %Config{
       project: project,
       version: vsn,
-      main: options[:main],
-      homepage_url: options[:homepage_url],
       source_root: options[:source_root] || File.cwd!,
     }
     struct(preconfig, options)
   end
+
+  # Helpers
 
   # Short path for programmatic interface
   defp find_formatter(modname) when is_atom(modname), do: modname
@@ -129,14 +131,43 @@ defmodule ExDoc do
     modname
   end
 
-  # Helpers
+  @doc false
+  # Removes trailing slash from paths
+  def normalize_paths(options, fields) when is_list(fields) do
+    Enum.reduce(fields, options, fn(field, options_acc) ->
+      if is_binary(options_acc[field]) do
+        Keyword.put(options_acc, field, String.trim_trailing(options_acc[field], "/"))
+      else
+        options_acc
+      end
+    end)
+  end
 
-  defp normalize_options(options) do
-    pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || ExDoc.Config.default(:source_ref))
-    options = Keyword.put(options, :source_url_pattern, pattern)
+  @doc false
+  def normalize_source_url_pattern(options, default_source_ref \\ ExDoc.Config.default(:source_ref)) do
+    if !options[:source_url_pattern] && options[:source_url] do
+      source_ref = options[:source_ref] || default_source_ref
+      Keyword.put(options, :source_url_pattern, guess_url(options[:source_url], source_ref))
+    else
+      options
+    end
+  end
 
-    if is_bitstring(options[:output]) do
-      Keyword.put(options, :output, String.trim_trailing(options[:output], "/"))
+  @doc false
+  def normalize_options(options) do
+    options = normalize_options(options, :source_ref, ExDoc.Config.default(:source_ref))
+
+    options
+    |> normalize_paths([:assets, :output, :source_root])
+    |> normalize_source_url_pattern(options[:source_ref] || ExDoc.Config.default(:source_ref))
+  end
+
+  @doc false
+  # Updates `field` in `options` with `default` value if current value is `nil` or hasn't been set,
+  # and if `default` is not `nil`.
+  def normalize_options(options, field, default) do
+    if is_nil(options[field]) and not is_nil(default) do
+      Keyword.put(options, field, default)
     else
       options
     end

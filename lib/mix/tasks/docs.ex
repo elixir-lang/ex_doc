@@ -126,12 +126,15 @@ defmodule Mix.Tasks.Docs do
     options =
       config
       |> get_docs_opts()
+      # CLI options have precedence over config
       |> Keyword.merge(cli_opts)
-      |> normalize_source_url(config)   # accepted at root level config
-      |> normalize_homepage_url(config) # accepted at root level config
+      # :source_url & :homepage_url accepted at root level config
+      |> ExDoc.normalize_options(:source_url, config[:source_url])
+      |> ExDoc.normalize_options(:homepage_url, config[:homepage_url])
       |> normalize_source_beam(config)
       |> normalize_main()
       |> normalize_deps()
+      |> ExDoc.normalize_options()
 
     for formatter <- get_formatters(options) do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
@@ -159,22 +162,6 @@ defmodule Mix.Tasks.Docs do
   defp log(index) do
     Mix.shell.info [:green, "Docs successfully generated."]
     Mix.shell.info [:green, "View them at #{inspect index}."]
-  end
-
-  defp normalize_source_url(options, config) do
-    if source_url = config[:source_url] do
-      Keyword.put(options, :source_url, source_url)
-    else
-      options
-    end
-  end
-
-  defp normalize_homepage_url(options, config) do
-    if homepage_url = config[:homepage_url] do
-      Keyword.put(options, :homepage_url, homepage_url)
-    else
-      options
-    end
   end
 
   defp normalize_source_beam(options, config) do
