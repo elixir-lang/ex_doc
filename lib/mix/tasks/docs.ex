@@ -122,7 +122,7 @@ defmodule Mix.Tasks.Docs do
     end
 
     project = to_string(config[:name] || config[:app])
-    version = config[:version] || "dev"
+    version = fetch_version!(config)
     options =
       config
       |> get_docs_opts()
@@ -137,6 +137,15 @@ defmodule Mix.Tasks.Docs do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
       log(index)
       index
+    end
+  end
+
+  defp fetch_version!(config) do
+    case Keyword.fetch(config, :version) do
+      {:ok, version} ->
+        version
+      :error ->
+        raise ArgumentError, ":version key is required in config, got: #{inspect(config)}"
     end
   end
 
