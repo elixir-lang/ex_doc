@@ -34,6 +34,11 @@ defmodule ExDoc.RetrieverTest do
     assert module_node.id == "CompiledWithDocs"
   end
 
+  test "docs_from_files returns the module title" do
+    [module_node] = docs_from_files ["CompiledWithDocs"]
+    assert module_node.title == "CompiledWithDocs"
+  end
+
   test "docs_from_files returns the module" do
     [module_node] = docs_from_files ["CompiledWithDocs"]
     assert module_node.module == CompiledWithDocs
@@ -168,6 +173,23 @@ defmodule ExDoc.RetrieverTest do
   test "docs_from_files properly tags exceptions" do
     [module_node] = docs_from_files ["RandomError"]
     assert module_node.type == :exception
+  end
+
+  ## TASKS
+
+  test "docs_from_files properly tags tasks" do
+    [module_node] = docs_from_files ["Mix.Tasks.TaskWithDocs"]
+    assert module_node.type == :task
+  end
+
+  test "docs_from_files returns task id" do
+    [module_node] = docs_from_files ["Mix.Tasks.TaskWithDocs"]
+    assert module_node.id == "Mix.Tasks.TaskWithDocs"
+  end
+
+  test "docs_from_files returns task title" do
+    [module_node] = docs_from_files ["Mix.Tasks.TaskWithDocs"]
+    assert module_node.title == "task_with_docs"
   end
 
   ## BEHAVIOURS

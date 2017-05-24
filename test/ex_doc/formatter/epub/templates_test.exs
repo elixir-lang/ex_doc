@@ -92,4 +92,11 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     content = get_module_page([CustomProtocol])
     assert content =~ ~r{<h1 id="content">\s*CustomProtocol\s*<small>protocol</small>\s*}m
   end
+
+  ## TASKS
+
+  test "module_page outputs the task type" do
+    content = get_module_page([Mix.Tasks.TaskWithDocs])
+    assert content =~ ~r{<h1 id="content">\s*mix task_with_docs\s*}m
+  end
 end

@@ -279,4 +279,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     content = get_module_page([CustomProtocol])
     assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CustomProtocol\s*<small>protocol</small>\s*}m
   end
+
+  ## TASKS
+
+  test "module_page outputs the task type" do
+    content = get_module_page([Mix.Tasks.TaskWithDocs])
+    assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*mix task_with_docs\s*}m
+  end
 end
