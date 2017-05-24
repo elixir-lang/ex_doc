@@ -139,17 +139,18 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config())
 
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
-    assert content =~ ~r{"id":"CompiledWithDocs\"}ms
+    assert content =~ ~r{"id":"CompiledWithDocs","title":"CompiledWithDocs"}ms
     assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example/2")ms
-    assert content =~ ~r{"id":"CompiledWithDocs\.Nested"}ms
+    assert content =~ ~r{"id":"CompiledWithDocs\.Nested","title":"CompiledWithDocs\.Nested"}ms
 
-    assert content =~ ~r{"id":"UndefParent\.Nested"}ms
+    assert content =~ ~r{"id":"UndefParent\.Nested","title":"UndefParent\.Nested"}ms
     refute content =~ ~r{"id":"UndefParent\.Undocumented"}ms
 
-    assert content =~ ~r{"id":"CustomBehaviourOne"}ms
-    assert content =~ ~r{"id":"CustomBehaviourTwo"}ms
-    assert content =~ ~r{"id":"RandomError"}ms
-    assert content =~ ~r{"id":"CustomProtocol"}ms
+    assert content =~ ~r{"id":"CustomBehaviourOne","title":"CustomBehaviourOne"}ms
+    assert content =~ ~r{"id":"CustomBehaviourTwo","title":"CustomBehaviourTwo"}ms
+    assert content =~ ~r{"id":"RandomError","title":"RandomError"}ms
+    assert content =~ ~r{"id":"CustomProtocol","title":"CustomProtocol"}ms
+    assert content =~ ~r{"id":"Mix\.Tasks\.TaskWithDocs","title":"task_with_docs"}ms
   end
 
   test "run generates empty listing files only with extras" do
@@ -179,6 +180,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
     assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
+    assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html">task_with_docs</a>}
   end
 
   test "run generates pages" do

@@ -123,6 +123,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     refute content =~ ~r{UndefParent\.Undocumented}ms
     assert content =~ ~r{.*"RandomError\".*}ms
     assert content =~ ~r{.*"CustomProtocol\".*}ms
+    assert content =~ ~r{.*"Mix\.Tasks\.TaskWithDocs\".*}ms
   end
 
   test "run generates the readme file" do

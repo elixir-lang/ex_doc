@@ -3,11 +3,12 @@ defmodule ExDoc.ModuleNode do
   Structure that represents a *module*
   """
 
-  defstruct id: nil, module: nil, doc: nil, doc_line: nil,
+  defstruct id: nil, title: nil, module: nil, doc: nil, doc_line: nil,
     docs: [], typespecs: [], source_path: nil, source_url: nil, type: nil
 
   @type t :: %__MODULE__{
     id: nil | String.t,
+    title: nil | String.t,
     module: nil | String.t,
     docs: list(),
     doc: nil | String.t,
@@ -15,7 +16,7 @@ defmodule ExDoc.ModuleNode do
     typespecs: list(),
     source_path: nil | String.t,
     source_url: nil | String.t,
-    type: nil | String.t
+    type: nil | :module | :exception | :protocol | :impl | :behaviour | :task
   }
 end
 
@@ -33,7 +34,7 @@ defmodule ExDoc.FunctionNode do
     name: nil | String.t,
     arity: non_neg_integer,
     defaults: non_neg_integer,
-    doc: String.t(),
+    doc: String.t,
     doc_line: non_neg_integer,
     source_path: nil | String.t,
     source_url: nil | String.t,
@@ -168,14 +169,11 @@ defmodule ExDoc.Retriever do
     docs = get_docs(module_info, source) ++
            get_callbacks(module_info, source)
 
-    id =
-      case inspect(module) do
-        ":" <> inspected -> inspected
-        inspected -> inspected
-      end
+    {title, id} = module_title_and_id(module, type)
 
     %ExDoc.ModuleNode{
       id: id,
+      title: title,
       module: module_info.name,
       type: type,
       docs: docs,
@@ -436,8 +434,31 @@ defmodule ExDoc.Retriever do
       function_exported?(module, :__protocol__, 1) -> :protocol
       function_exported?(module, :__impl__, 1) -> :impl
       function_exported?(module, :behaviour_info, 1) -> :behaviour
+      match?("Elixir.Mix.Tasks." <> _, Atom.to_string(module)) -> :task
       true -> :module
     end
+  end
+
+  defp module_title_and_id(module, :task) do
+    {task_name(module), module_id(module)}
+  end
+  defp module_title_and_id(module, _type) do
+    id = module_id(module)
+    {id, id}
+  end
+
+  defp module_id(module) do
+    case inspect(module) do
+      ":" <> inspected -> inspected
+      inspected -> inspected
+    end
+  end
+
+  defp task_name(module) do
+    "Elixir.Mix.Tasks." <> name = Atom.to_string(module)
+    name
+    |> String.split(".")
+    |> Enum.map_join(".", &Macro.underscore/1)
   end
 
   # Returns a dict of {name, arity} -> spec.

@@ -41,7 +41,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
   ## MODULES
 
   test "module_page generates only the module name when there's no more info" do
-    module_node = %ExDoc.ModuleNode{module: XPTOModule, doc: nil, id: "XPTOModule"}
+    module_node = %ExDoc.ModuleNode{module: XPTOModule, doc: nil, id: "XPTOModule", title: "XPTOModule"}
     content = Templates.module_page(doc_config(), module_node)
 
     assert content =~ ~r{<title>XPTOModule [^<]*</title>}
@@ -91,5 +91,12 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
   test "module_page outputs the protocol type" do
     content = get_module_page([CustomProtocol])
     assert content =~ ~r{<h1 id="content">\s*CustomProtocol\s*<small>protocol</small>\s*}m
+  end
+
+  ## TASKS
+
+  test "module_page outputs the task type" do
+    content = get_module_page([Mix.Tasks.TaskWithDocs])
+    assert content =~ ~r{<h1 id="content">\s*mix task_with_docs\s*}m
   end
 end
