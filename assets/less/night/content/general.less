@@ -13,9 +13,18 @@ a {
   .linkUnderlines(@nightBackground, @nightTextHeaders);
 }
 
+a.no-underline {
+  text-shadow: none;
+  background-image: none;
+}
+
 a.view-source {
   background: none;
   text-shadow: none;
+
+  &:hover {
+    color: @white;
+  }
 }
 
 .summary h2 a {

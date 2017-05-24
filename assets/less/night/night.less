@@ -29,7 +29,15 @@ body.night-mode {
     }
   }
 
-  .close-search, .results .result-id a {
+  .content-inner a.close-search {
+    text-shadow: none;
+    background-image: none;
+    &:hover {
+      color: @white;
+    }
+  }
+
+  .results .result-id a {
     &:visited,
     &:active,
     &:focus {
