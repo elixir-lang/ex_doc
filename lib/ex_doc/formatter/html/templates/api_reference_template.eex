@@ -38,7 +38,7 @@
 
 <%= if nodes_map.tasks != [] do %>
   <section class="details-list">
-    <h2 id="tasks" class="section-heading">Tasks</h2>
+    <h2 id="tasks" class="section-heading">Mix Tasks</h2>
     <div class="summary">
       <%= for task_node <- nodes_map.tasks do
         api_reference_entry_template(task_node)

@@ -112,7 +112,7 @@ function search (nodes, value) {
 
   if (tasks.length > 0) {
     levels.push({
-      name: 'Tasks',
+      name: 'Mix Tasks',
       results: tasks
     })
   }

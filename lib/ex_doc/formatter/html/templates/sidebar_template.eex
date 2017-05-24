@@ -41,7 +41,7 @@
     <% end %>
 
     <%= if nodes_map.tasks != [] do %>
-      <li><a id="tasks-list" href="#full-list">Tasks</a></li>
+      <li><a id="tasks-list" href="#full-list">Mix Tasks</a></li>
     <% end %>
   </ul>
   <div class="gradient"></div>
