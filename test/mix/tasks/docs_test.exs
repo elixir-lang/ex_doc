@@ -90,19 +90,13 @@ defmodule Mix.Tasks.DocsTest do
 
   test "supports umbrella project" do
     Mix.Project.in_project(:umbrella, "test/fixtures/umbrella", fn _mod ->
-      assert [{"umbrella", "1.2.3-dev", [formatter: "html", deps: deps, source_beam: _]}] =
-             run([], [app: :umbrella, apps_path: "apps/", version: "1.2.3-dev"])
+      assert [{"umbrella", nil, [formatter: "html", deps: deps, source_beam: _]}] =
+             run([], [app: :umbrella, apps_path: "apps/"])
 
       assert List.keyfind(deps, Application.app_dir(:foo), 0) ==
              {Application.app_dir(:foo), "https://hexdocs.pm/foo/0.1.0/"}
       assert List.keyfind(deps, Application.app_dir(:bar), 0) ==
              {Application.app_dir(:bar), "https://hexdocs.pm/bar/0.1.0/"}
     end)
-  end
-
-  test "raise when version is not provided" do
-    assert_raise ArgumentError, ~r/:version key is required in config, got: /, fn ->
-      run([], [app: :ex_doc])
-    end
   end
 end

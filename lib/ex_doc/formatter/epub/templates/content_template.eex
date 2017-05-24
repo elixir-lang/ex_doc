@@ -3,7 +3,7 @@
          unique-identifier="project-<%= config.project %>"
          version="3.0">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <dc:title><%= config.project %> - <%= config.version %></dc:title>
+    <dc:title><%= config.project %> <%= if config.version do %> - <%= config.version %><% end %></dc:title>
     <dc:identifier id="project-<%= config.project %>"><%= uuid %></dc:identifier>
     <dc:language><%= config.language %></dc:language>
     <meta property="dcterms:modified"><%= datetime %></meta>
