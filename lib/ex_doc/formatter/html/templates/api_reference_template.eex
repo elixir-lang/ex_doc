@@ -1,5 +1,5 @@
 <h1>
-  <small class="visible-xs"><%= config.project %> v<%= config.version %></small>
+  <small class="visible-xs"><%= config.project %> <%= if config.version do %>v<%= config.version %><% end %></small>
   API Reference
 </h1>
 

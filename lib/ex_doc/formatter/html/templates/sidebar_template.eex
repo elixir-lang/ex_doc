@@ -11,9 +11,11 @@
       <h1 class="sidebar-projectName">
         <%= config.project %>
       </h1>
-      <h2 class="sidebar-projectVersion">
-        v<%= config.version %>
-      </h2>
+      <%= if config.version do %>
+        <h2 class="sidebar-projectVersion">
+          v<%= config.version %>
+        </h2>
+      <% end %>
     </div>
     <%= if config.logo do %>
       <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">

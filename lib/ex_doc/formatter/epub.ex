@@ -51,8 +51,16 @@ defmodule ExDoc.Formatter.EPUB do
     output =
       config.output
       |> Path.expand()
-      |> Path.join("#{config.project}-v#{config.version}")
+      |> Path.join(project_directory(config))
     %{config | output: output}
+  end
+
+  defp project_directory(config) do
+    if config.version do
+      "#{config.project}-v#{config.version}"
+    else
+      config.project
+    end
   end
 
   defp generate_extras(config) do
