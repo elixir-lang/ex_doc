@@ -3,7 +3,7 @@ defmodule ExDoc.Mixfile do
 
   def project do
     [app: :ex_doc,
-     version: "0.15.1",
+     version: "0.16.0",
      elixir: "~> 1.3",
      deps: deps(),
      aliases: aliases(),
