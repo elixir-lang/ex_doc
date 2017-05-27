@@ -8,7 +8,7 @@ environment:
 install:
   - ps: Start-FileDownload "https://github.com/elixir-lang/elixir/releases/download/v1.4.2/Precompiled.zip"
   - 7z x -oelixir Precompiled.zip
-  - SET PATH=%PATH%;C:\Program Files\erl8.3\bin
+  - SET PATH=%PATH%;C:\Program Files\erl8.3\bin;C:\MinGW\msys\1.0\bin
 
 cache:
   - deps
@@ -18,9 +18,6 @@ build_script:
   - elixir/bin/mix local.rebar --force
   - elixir/bin/mix deps.get
   - elixir/bin/mix compile
-
-before_test:
-  SET PATH=%PATH%;C:\MinGW\msys\1.0\bin
 
 test_script:
   elixir/bin/mix test
