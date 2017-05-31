@@ -40,10 +40,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
-  defp normalize_eol(line) do
-    String.replace(line, "\r\n", "\n")
-  end
-
   test "guess url base on source_url and source_root options" do
     file_path = "#{output_dir()}/CompiledWithDocs.html"
     for scheme <- ["http", "https"] do
@@ -180,7 +176,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates the api reference file" do
     generate_docs(doc_config())
 
-    content = "#{output_dir()}/api-reference.html" |> File.read!() |> normalize_eol()
+    content = File.read!("#{output_dir()}/api-reference.html")
     assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
     assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
@@ -191,10 +187,10 @@ defmodule ExDoc.Formatter.HTMLTest do
     config = doc_config([main: "readme"])
     generate_docs(config)
 
-    content = "#{output_dir()}/index.html" |> File.read!() |> normalize_eol()
+    content = File.read!("#{output_dir()}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=readme.html">}
 
-    content = "#{output_dir()}/readme.html" |> File.read!() |> normalize_eol()
+    content = File.read!("#{output_dir()}/readme.html")
     assert content =~ ~r{<title>README [^<]*</title>}
     assert content =~ ~r{<h2 id="header-sample" class="section-heading">.*<a href="#header-sample" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>.*<code(\sclass="inline")?>Header</code> sample.*</h2>}ms
     assert content =~ ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>.*more &gt; than.*</h2>}ms

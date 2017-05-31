@@ -35,10 +35,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     Templates.module_page(hd(mods), @empty_nodes_map, doc_config())
   end
 
-  defp normalize_eol(line) do
-    String.replace(line, "\r\n", "\n")
-  end
-
   setup_all do
     File.mkdir_p!("test/tmp/html_templates")
     File.cp_r!("priv/ex_doc/formatter/html/assets", "test/tmp/html_templates")
@@ -170,15 +166,15 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   ## LISTING
 
   test "site title text links to homepage_url when set" do
-    content = doc_config() |> Templates.sidebar_template(@empty_nodes_map) |> normalize_eol()
-    assert content =~ ~r{<a href="#{homepage_url()}" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
+    content = Templates.sidebar_template(doc_config(), @empty_nodes_map)
+    assert content =~ ~r{<a href="#{homepage_url()}" class="sidebar-projectLink">\s*<div class="sidebar-projectDetails">\s*<h1 class="sidebar-projectName">\s*Elixir\s*</h1>\s*<h2 class="sidebar-projectVersion">\s*v1.0.1\s*</h2>\s*</div>\s*</a>}
   end
 
   test "site title text links to main when there is no homepage_url" do
     config = %ExDoc.Config{project: "Elixir", version: "1.0.1",
                            source_root: File.cwd!, main: "hello",}
-    content = config |> Templates.sidebar_template(@empty_nodes_map) |> normalize_eol()
-    assert content =~ ~r{<a href="hello.html" class="sidebar-projectLink">\n\s*<div class="sidebar-projectDetails">\n\s*<h1 class="sidebar-projectName">\n\s*Elixir\n\s*</h1>\n\s*<h2 class="sidebar-projectVersion">\n\s*v1.0.1\n\s*</h2>\n\s*</div>\n\s*</a>}
+    content = Templates.sidebar_template(config, @empty_nodes_map)
+    assert content =~ ~r{<a href="hello.html" class="sidebar-projectLink">\s*<div class="sidebar-projectDetails">\s*<h1 class="sidebar-projectName">\s*Elixir\s*</h1>\s*<h2 class="sidebar-projectVersion">\s*v1.0.1\s*</h2>\s*</div>\s*</a>}
   end
 
   test "list_page enables nav link when module type have at least one element" do
@@ -206,11 +202,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   ## MODULES
 
   test "module_page outputs the functions and docstrings" do
-    content = [CompiledWithDocs] |> get_module_page() |> normalize_eol()
+    content = get_module_page([CompiledWithDocs])
 
     # Title and headers
     assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
-    assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CompiledWithDocs\s*}
+    assert content =~ ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CompiledWithDocs\s*}
     refute content =~ ~r{<small>module</small>}
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
     assert content =~ ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms
@@ -221,13 +217,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{example_1/0.*<span class="note">\(macro\)</span>}ms
 
     # Source
-    assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<span class="icon-code" aria-hidden="true"></span>\n\s*<span class="sr-only">View Source</span>\n\s*</a>}ms
+    assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\s*<span class="icon-code" aria-hidden="true"></span>\s*<span class="sr-only">View Source</span>\s*</a>}ms
 
     # Functions
     assert content =~ ~s{<div class="detail" id="example/2">}
     assert content =~ ~s{<span id="example/1"></span>}
     assert content =~ ~s{example(foo, bar \\\\ Baz)}
-    assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\n\s*<span class="icon-link" aria-hidden="true"></span>\n\s*<span class="sr-only">Link to this function</span>\n\s*</a>}ms
+    assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\s*<span class="icon-link" aria-hidden="true"></span>\s*<span class="sr-only">Link to this function</span>\s*</a>}ms
   end
 
   test "module_page outputs the types and function specs" do
@@ -264,15 +260,15 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   ## BEHAVIOURS
 
   test "module_page outputs behavior and callbacks" do
-    content = [CustomBehaviourOne] |> get_module_page() |> normalize_eol()
-    assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CustomBehaviourOne\s*<small>behaviour</small>}m
+    content = get_module_page([CustomBehaviourOne])
+    assert content =~ ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CustomBehaviourOne\s*<small>behaviour</small>}m
     assert content =~ ~r{Callbacks}
     assert content =~ ~r{<div class="detail" id="c:hello/1">}
     assert content =~ ~s[hello(integer)]
     assert content =~ ~s[greet(arg0)]
 
-    content = [CustomBehaviourTwo] |> get_module_page() |> normalize_eol()
-    assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*}m
+    content = get_module_page([CustomBehaviourTwo])
+    assert content =~ ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*}m
     assert content =~ ~r{Callbacks}
     assert content =~ ~r{<div class="detail" id="c:bye/1">}
   end
@@ -280,14 +276,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   ## PROTOCOLS
 
   test "module_page outputs the protocol type" do
-    content = [CustomProtocol] |> get_module_page() |> normalize_eol()
-    assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*CustomProtocol\s*<small>protocol</small>\s*}m
+    content = get_module_page([CustomProtocol])
+    assert content =~ ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CustomProtocol\s*<small>protocol</small>\s*}m
   end
 
   ## TASKS
 
   test "module_page outputs the task type" do
-    content = [Mix.Tasks.TaskWithDocs] |> get_module_page() |> normalize_eol()
-    assert content =~ ~r{<h1>\n\s*<small class="visible-xs">Elixir v1.0.1</small>\n\s*mix task_with_docs\s*}m
+    content = get_module_page([Mix.Tasks.TaskWithDocs])
+    assert content =~ ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*mix task_with_docs\s*}m
   end
 end
