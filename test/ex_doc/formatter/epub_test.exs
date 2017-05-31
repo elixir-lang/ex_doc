@@ -40,10 +40,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     |> :zip.unzip([cwd: unzip_dir])
   end
 
-  defp normalize_eol(line) do
-    String.replace(line, "\r\n", "\n")
-  end
-
   test "check headers for module pages" do
     generate_docs_and_unzip doc_config([main: "RandomError"])
 
@@ -134,13 +130,13 @@ defmodule ExDoc.Formatter.EPUBTest do
     config = doc_config([main: "README"])
     generate_docs_and_unzip(config)
 
-    content = "#{output_dir()}/OEBPS/readme.xhtml" |> File.read!() |> normalize_eol()
+    content = File.read!("#{output_dir()}/OEBPS/readme.xhtml")
     assert content =~ ~r{<title>README [^<]*</title>}
     assert content =~ ~r{<a href="RandomError.xhtml"><code(\sclass="inline")?>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.xhtml#hello/1"><code(\sclass="inline")?>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.xhtml"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
 
-    content = "#{output_dir()}/OEBPS/nav.xhtml" |> File.read!() |> normalize_eol()
+    content = File.read!("#{output_dir()}/OEBPS/nav.xhtml")
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
   end
 
