@@ -6,6 +6,8 @@
 
 ExDoc is a tool to generate documentation for your Elixir projects. In case you are looking for documentation for Elixir itself, [check out Elixir's website][elixir-lang].
 
+To learn about how to document your projects check out [Elixir's writing documentation page][hex-writing-docs].
+
 ## Using ExDoc with Mix
 
 To use ExDoc in your Mix projects, first add ExDoc as a dependency:
@@ -136,3 +138,4 @@ Check the [LICENSE](LICENSE) file for more information.
 [cmark]: https://github.com/jgm/cmark
 [cmark.ex]: https://github.com/asaaki/cmark.ex
 [devinus/markdown]: http://github.com/devinus/markdown
+[hex-writing-docs]: https://hexdocs.pm/elixir/writing-documentation.html

@@ -34,7 +34,8 @@ defmodule ExDoc.Mixfile do
   defp package do
    [licenses: ["Apache 2.0"],
     maintainers: ["José Valim", "Eksperimental", "Milton Mazzarri", "Friedel Ziegelmayer"],
-    links: %{"GitHub" => "https://github.com/elixir-lang/ex_doc"}]
+    links: %{"GitHub" => "https://github.com/elixir-lang/ex_doc",
+             "Writing documentation" => "https://hexdocs.pm/elixir/writing-documentation.html"}]
   end
 
   def escript do
