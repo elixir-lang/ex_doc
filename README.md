@@ -18,6 +18,8 @@ def deps do
 end
 ```
 
+Consider using `[:dev, :test]` if you wish to fetch docs from modules under `test` folder.
+
 After adding ExDoc as a dependency, run `mix deps.get` to install it.
 
 ExDoc will automatically pull in information from your projects, like the application and version. However, you may want to set `:name`, `:source_url` and `:homepage_url` to have a nicer output from ExDoc, such as:
@@ -38,7 +40,7 @@ def project do
 end
 ```
 
-Now you are ready to generate your project documentation with `mix docs`.
+Now you are ready to generate your project documentation with `mix docs`. Use `MIX_ENV=test mix docs` for additional docs from `test` folder.
 
 To see all options available when generating docs, run `mix help docs`. You may have to run `mix docs` or `mix compile` first.
 
