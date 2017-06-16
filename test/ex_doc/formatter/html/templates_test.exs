@@ -107,6 +107,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     <h2></h2>
     """)
+
+    assert Templates.link_headings("<h3>Foo</h3>") == """
+    <h3 id="foo" class="section-heading">
+      <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+      Foo
+    </h3>
+    """
   end
 
   test "sidebar items from headers" do
@@ -163,6 +170,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       "Example function: Summary should not display trailing puntuation"
   end
 
+  test "<h3> tags in method `@doc`s are linked" do
+    content = get_module_page([CompiledWithDocs])
+    assert content =~ ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
+  end
+
   ## LISTING
 
   test "site title text links to homepage_url when set" do
@@ -210,6 +222,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     refute content =~ ~r{<small>module</small>}
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
     assert content =~ ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms
+    assert content =~ ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example H3 heading.*</h3>}ms
 
     # Summaries
     assert content =~ ~r{example/2.*Some example}ms
@@ -217,7 +230,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{example_1/0.*<span class="note">\(macro\)</span>}ms
 
     # Source
-    assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\s*<span class="icon-code" aria-hidden="true"></span>\s*<span class="sr-only">View Source</span>\s*</a>}ms
+    assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L14"[^>]*>\s*<span class="icon-code" aria-hidden="true"></span>\s*<span class="sr-only">View Source</span>\s*</a>}ms
 
     # Functions
     assert content =~ ~s{<div class="detail" id="example/2">}

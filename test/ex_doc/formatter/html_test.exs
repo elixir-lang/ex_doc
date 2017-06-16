@@ -45,15 +45,15 @@ defmodule ExDoc.Formatter.HTMLTest do
     for scheme <- ["http", "https"] do
       generate_docs doc_config(source_url: "#{scheme}://github.com/elixir-lang/ex_doc", source_root: File.cwd!)
       content = File.read!(file_path)
-      assert content =~ "https://github.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L13"
+      assert content =~ "https://github.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L14"
 
       generate_docs doc_config(source_url: "#{scheme}://gitlab.com/elixir-lang/ex_doc", source_root: File.cwd!)
       content = File.read!(file_path)
-      assert content =~ "https://gitlab.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L13"
+      assert content =~ "https://gitlab.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L14"
 
       generate_docs doc_config(source_url: "#{scheme}://bitbucket.org/elixir-lang/ex_doc", source_root: File.cwd!)
       content = File.read!(file_path)
-      assert content =~ "https://bitbucket.org/elixir-lang/ex_doc/src/master/test/fixtures/compiled_with_docs.ex#cl-13"
+      assert content =~ "https://bitbucket.org/elixir-lang/ex_doc/src/master/test/fixtures/compiled_with_docs.ex#cl-14"
 
       generate_docs doc_config(source_url: "#{scheme}://example.com/elixir-lang/ex_doc", source_root: File.cwd!)
       content = File.read!(file_path)

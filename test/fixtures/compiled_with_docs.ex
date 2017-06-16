@@ -4,6 +4,10 @@ defmodule CompiledWithDocs do
 
   ## Example ☃ Unicode > escaping
       CompiledWithDocs.example
+
+  ### Example H3 heading
+
+  example
   """
 
   @doc "Some struct"
@@ -14,6 +18,13 @@ defmodule CompiledWithDocs do
 
   @doc "Another example"
   defmacro example_1, do: 1
+
+  @doc """
+  Does example action.
+
+  ### Examples
+  """
+  def example_with_h3, do: 1
 
   def example_without_docs, do: nil
 
