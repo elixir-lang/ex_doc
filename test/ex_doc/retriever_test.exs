@@ -46,7 +46,7 @@ defmodule ExDoc.RetrieverTest do
 
   test "docs_from_files returns the moduledoc info" do
     [module_node] = docs_from_files ["CompiledWithDocs"]
-    assert module_node.doc == "moduledoc\n\n\#\# Example ☃ Unicode > escaping\n    CompiledWithDocs.example\n"
+    assert module_node.doc == "moduledoc\n\n\#\# Example ☃ Unicode > escaping\n    CompiledWithDocs.example\n\n### Example H3 heading\n\nexample\n"
   end
 
   test "docs_from_files returns nil if there's no moduledoc info" do
@@ -56,7 +56,7 @@ defmodule ExDoc.RetrieverTest do
 
   test "docs_from_files returns the doc info for each module function" do
     [module_node] = docs_from_files ["CompiledWithDocs"]
-    [struct, example, example_1, example_without_docs] = module_node.docs
+    [struct, example, example_1, _example_with_h3, example_without_docs] = module_node.docs
 
     assert struct.id == "__struct__/0"
     assert struct.doc == "Some struct"
@@ -74,7 +74,7 @@ defmodule ExDoc.RetrieverTest do
     assert example_1.type == :defmacro
     assert example_1.defaults == []
 
-    assert example_without_docs.source_url == "http://example.com/test/fixtures/compiled_with_docs.ex\#L18"
+    assert example_without_docs.source_url == "http://example.com/test/fixtures/compiled_with_docs.ex\#L29"
     assert example_without_docs.doc == nil
     assert example_without_docs.defaults == []
   end
