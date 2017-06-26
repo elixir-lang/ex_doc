@@ -2,6 +2,7 @@
 // ------------
 
 import $ from 'jquery'
+import {throttle} from 'lodash'
 
 // Constants
 // ---------
@@ -77,7 +78,13 @@ export {breakpoint, closeSidebar}
 
 export function initialize () {
   setDefaultSidebarState()
-  $(window).resize(setDefaultSidebarState)
+  let lastWindowWidth = window.innerWidth
+  $(window).resize(throttle(function () {
+    if (lastWindowWidth !== window.innerWidth) {
+      lastWindowWidth = window.innerWidth
+      setDefaultSidebarState()
+    }
+  }, 100))
   $('.sidebar-toggle').click(function () {
     toggleSidebar()
   })
