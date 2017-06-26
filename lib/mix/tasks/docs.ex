@@ -70,7 +70,7 @@ defmodule Mix.Tasks.Docs do
       the generated documentation. Example: "MyApp.Core"
 
     * `:formatters` - Formatter to use; default: ["html"],
-      options: "html", "epub".
+      options: "html", "epub", "json".
 
     * `:language` - Identify the primary language of the documents, its value must be
       a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
