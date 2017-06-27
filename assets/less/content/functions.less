@@ -1,6 +1,18 @@
+@keyframes blink-background {
+  from {
+    background-color: @detailGray;
+  }
+
+  to {
+    background-color: @yellow;
+  }
+}
+
 .detail {
   &:target .detail-header {
-    border-left-color: @yellow;
+    animation-duration: 0.55s;
+    animation-name: blink-background;
+    animation-iteration-count: 3;
   }
 }
 
