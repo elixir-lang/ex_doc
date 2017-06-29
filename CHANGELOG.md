@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.16.2
+
+  * Enhancements
+    * Link `<h3>` headers as well
+    * Add border to code tag
+  * Bug fixes
+    * Fix sidebar on mobile devices
+
 ## v0.16.1
 
   * Bug fixes
