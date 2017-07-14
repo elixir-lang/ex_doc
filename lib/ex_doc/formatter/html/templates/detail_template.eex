@@ -1,4 +1,7 @@
 <div class="detail" id="<%=enc_h link_id(module_node.id, module_node.type) %>">
+  <%= if is_enc? link_id(module_node.id, module_node.type) do %>
+    <span id="<%=h link_id(module_node.id, module_node.type) %>"></span>
+  <% end %>
   <%= for default <- get_defaults(module_node) do %>
     <span id="<%=enc_h link_id(default, module_node.type) %>"></span>
   <% end %>
