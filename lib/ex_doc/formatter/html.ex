@@ -38,6 +38,7 @@ defmodule ExDoc.Formatter.HTML do
       generate_sidebar_items(nodes_map, extras, config) ++
       generate_extras(nodes_map, extras, config) ++
       generate_logo(assets_dir, config) ++
+      generate_search(nodes_map, config) ++
       generate_not_found(nodes_map, config) ++
       generate_list(nodes_map.modules, nodes_map, config) ++
       generate_list(nodes_map.exceptions, nodes_map, config) ++
@@ -86,6 +87,14 @@ defmodule ExDoc.Formatter.HTML do
     filename = "404.html"
     config = set_canonical_url(config, filename)
     content = Templates.not_found_template(config, nodes_map)
+    File.write!("#{config.output}/#{filename}", content)
+    [filename]
+  end
+
+  defp generate_search(nodes_map, config) do
+    filename = "search.html"
+    config = set_canonical_url(config, filename)
+    content = Templates.search_template(config, nodes_map)
     File.write!("#{config.output}/#{filename}", content)
     [filename]
   end
