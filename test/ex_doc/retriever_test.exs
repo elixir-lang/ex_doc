@@ -102,7 +102,7 @@ defmodule ExDoc.RetrieverTest do
     assert macro.id   == "macro_spec/1"
     assert macro.doc  == nil
     assert macro.type == :defmacro
-    assert Macro.to_string(macro.specs) == "[macro_spec(term(), any()) :: {:ok, any()}]"
+    assert Macro.to_string(macro.specs) == "[macro_spec(any()) :: {:ok, any()}]"
   end
 
   test "docs_from_files returns the spec info for each non-private module type" do
