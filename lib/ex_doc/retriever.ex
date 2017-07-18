@@ -241,11 +241,12 @@ defmodule ExDoc.Retriever do
             |> Enum.map(&Typespec.spec_to_ast(name, &1))
             |> Enum.reverse()
 
-    specs = if type == :defmacro do
-      Enum.map(specs, &remove_first_macro_arg/1)
-    else
-      specs
-    end
+    specs =
+      if type == :defmacro do
+        Enum.map(specs, &remove_first_macro_arg/1)
+      else
+        specs
+      end
 
     annotations =
       case {type, name, arity} do
@@ -281,9 +282,9 @@ defmodule ExDoc.Retriever do
     }
   end
 
-  defp remove_first_macro_arg(
-    {:::, info, [{name, info2, [_term_arg | rest_args]}, return]}
-  ), do: {:::, info, [{name, info2, rest_args}, return]}
+  defp remove_first_macro_arg({:::, info, [{name, info2, [_term_arg | rest_args]}, return]}) do
+    {:::, info, [{name, info2, rest_args}, return]}
+  end
 
   defp get_defaults(signature, name, arity) do
     case Enum.count(signature, &match?({:\\, _, [_, _]}, &1)) do
