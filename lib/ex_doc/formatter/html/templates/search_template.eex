@@ -1,0 +1,4 @@
+<%= head_template(config, %{title: "Search", type: :extra}) %>
+<%= sidebar_template(config, nodes_map) %>
+
+<%= footer_template(config) %>

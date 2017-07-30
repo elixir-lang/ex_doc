@@ -276,6 +276,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     api_reference_entry_template: [:module_node],
     api_reference_template: [:config, :nodes_map],
     extra_template: [:config, :title, :nodes_map, :content],
+    search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
     summary_item_template: [:module_node],

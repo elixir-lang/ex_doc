@@ -4,7 +4,7 @@
 // ------------
 
 import $ from 'jquery'
-import {start as search} from './search'
+import {start as search, popstateHandler, getParameterByName} from './search'
 import * as helpers from './helpers'
 
 import sidebarItemsTemplate from './templates/sidebar-items.handlebars'
@@ -103,6 +103,14 @@ function addEventListeners () {
   $('.sidebar-search .icon-search').on('click', function (e) {
     search()
   })
+
+  $(window).on('popstate', popstateHandler)
+
+  // if the search stub is refreshed or loaded perform the search.
+  if (window.location.pathname === '/search.html') {
+    const qs = getParameterByName('q')
+    search(qs, false)
+  }
 }
 
 function identifyCurrentHash () {
