@@ -107,7 +107,8 @@ function addEventListeners () {
   $(window).on('popstate', popstateHandler)
 
   // if the search stub is refreshed or loaded perform the search.
-  if (window.location.pathname === '/search.html') {
+  var pathname = window.location.pathname
+  if (pathname.substr(pathname.lastIndexOf('/') + 1) == 'search.html') {
     const qs = getParameterByName('q')
     search(qs, false)
   }

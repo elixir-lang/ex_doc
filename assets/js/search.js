@@ -117,7 +117,7 @@ function search (nodes, value, addHistory) {
   if (addHistory !== false && location.protocol !== 'file:') {
     // we use this to track searches that are in the history
     searchCount++
-    history.pushState({searchValue: value}, 'Searching for ' + value, '/search.html?q=' + value)
+    history.pushState({searchValue: value}, 'Searching for ' + value, 'search.html?q=' + value)
   }
 
   // add to the results
