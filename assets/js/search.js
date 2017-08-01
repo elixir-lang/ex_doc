@@ -114,7 +114,7 @@ function search (nodes, value, addHistory) {
   var tasks = findIn(nodes.tasks, safeVal)
 
   // sometimes we need to stop adding to the history if it already exists.
-  if (addHistory !== false) {
+  if (addHistory !== false && location.protocol !== 'file:') {
     // we use this to track searches that are in the history
     searchCount++
     history.pushState({searchValue: value}, 'Searching for ' + value, '/search.html?q=' + value)
