@@ -5,10 +5,11 @@ defmodule ExDoc.Markdown.Earmark do
 
   @doc """
   Check if the Earmark MarkDown parser module is available. Otherwise, try to
-  load the module
+  load the module.
   """
   def available? do
-    Code.ensure_loaded?(Earmark)
+    match?({:ok, _}, Application.ensure_all_started(:earmark)) and
+      Code.ensure_loaded?(Earmark)
   end
 
   @doc """

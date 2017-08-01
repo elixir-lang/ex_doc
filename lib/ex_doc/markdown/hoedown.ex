@@ -1,11 +1,11 @@
 defmodule ExDoc.Markdown.Hoedown do
   @moduledoc """
-  ExDoc extension for the Hoedown MarkDown parser
+  ExDoc extension for the Hoedown MarkDown parser.
   """
 
   @doc """
   Check if the Hoedown MarkDown parser module is available. Otherwise, try to
-  load the module
+  load the module.
   """
   def available? do
     Code.ensure_loaded?(Markdown)
