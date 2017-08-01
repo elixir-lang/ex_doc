@@ -26,6 +26,7 @@ defmodule ExDoc do
     defstruct [
       assets: nil,
       canonical: nil,
+      debug: false,
       deps: [],
       extra_section: nil,
       extras: [],
@@ -51,6 +52,7 @@ defmodule ExDoc do
      @type t :: %__MODULE__{
        assets: nil | String.t,
        canonical: nil | String.t,
+       debug: boolean(),
        deps: [{ebin_path :: String.t, doc_url :: String.t}],
        extra_section: nil | String.t,
        extras: list(),

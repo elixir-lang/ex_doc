@@ -32,7 +32,7 @@ defmodule ExDoc.Formatter.HTML do
        build_extras(project_nodes, config, ".html")]
 
     assets_dir = "assets"
-    static_files = generate_assets(config, assets_dir, default_assets())
+    static_files = generate_assets(config, assets_dir, default_assets(config))
 
     generated_files =
       generate_sidebar_items(nodes_map, extras, config) ++
@@ -162,8 +162,9 @@ defmodule ExDoc.Formatter.HTML do
     end)
   end
 
-  defp default_assets do
-    [{Assets.dist(), "dist"}, {Assets.fonts(), "fonts"}]
+  defp default_assets(config) do
+    debug = if config.debug, do: [{Assets.debug(), "dist"}], else: []
+    [{Assets.dist(), "dist"}, {Assets.fonts(), "fonts"} | debug]
   end
 
   defp build_api_reference(nodes_map, config) do

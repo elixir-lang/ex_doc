@@ -28,6 +28,7 @@ defmodule ExDoc.CLI do
         ],
 
         switches: [
+          debug: :boolean,
           extra: :keep,
           language: :string,
           source_ref: :string,
@@ -123,6 +124,7 @@ defmodule ExDoc.CLI do
                           directory in the output path
       -n, --canonical     Indicate the preferred URL with rel="canonical" link element
       -c, --config        Give configuration through a file instead of command line
+          --debug         When given include debug files, source as source maps
       -e, --extra         Allow users to include additional Markdown files
                           May be given multiple times
       -s, --extra-section Allow user to define the title for the additional Markdown files,

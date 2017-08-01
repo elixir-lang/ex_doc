@@ -17,6 +17,9 @@ defmodule Mix.Tasks.Docs do
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
 
+    * `--debug` - When given, output source maps and other debug files,
+      default: `false`
+
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
 
@@ -109,13 +112,20 @@ defmodule Mix.Tasks.Docs do
   See `mix help cmd` for more information.
   """
 
+  @switches [
+    canonical: :string,
+    debug: :boolean,
+    formatter: :keep,
+    language: :string,
+    output: :string
+  ]
+
+  @aliases [n: :canonical, f: :formatter, o: :output]
+
   @doc false
   def run(args, config \\ Mix.Project.config, generator \\ &ExDoc.generate_docs/3) do
     Mix.Task.run "compile"
-
-    {cli_opts, args, _} = OptionParser.parse(args,
-                            aliases: [n: :canonical, f: :formatter, o: :output],
-                            switches: [canonical: :string, formatter: :keep, language: :string, output: :string])
+    {cli_opts, args, _} = OptionParser.parse(args, aliases: @aliases, switches: @switches)
 
     if args != [] do
       Mix.raise "Extraneous arguments on the command line"

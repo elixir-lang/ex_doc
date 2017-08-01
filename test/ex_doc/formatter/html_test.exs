@@ -117,19 +117,24 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir()}/CompiledWithDocs.Nested.html")
 
+    assert [_] = "#{output_dir()}/dist/app-*.css" |> Path.wildcard
+    assert [_] = "#{output_dir()}/dist/app-*.js" |> Path.wildcard
+    assert [] = "#{output_dir()}/another_dir/dist/app-*.js.map" |> Path.wildcard
+
     content = File.read!("#{output_dir()}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
   end
 
-  test "run generates in specified output directory and redirect index.html file" do
-    config = doc_config(output: "#{output_dir()}/another_dir", main: "RandomError")
+  test "run generates in specified output directory with redirect index.html file and debug options" do
+    config = doc_config(output: "#{output_dir()}/another_dir", main: "RandomError", debug: true)
     generate_docs(config)
 
     assert File.regular?("#{output_dir()}/another_dir/CompiledWithDocs.html")
     assert File.regular?("#{output_dir()}/another_dir/RandomError.html")
 
-    assert "#{output_dir()}/another_dir/dist/app-*.css" |> Path.wildcard |> File.regular?
-    assert "#{output_dir()}/another_dir/dist/app-*.js" |> Path.wildcard |> File.regular?
+    assert [_] = "#{output_dir()}/another_dir/dist/app-*.css" |> Path.wildcard
+    assert [_] = "#{output_dir()}/another_dir/dist/app-*.js" |> Path.wildcard
+    assert [_] = "#{output_dir()}/another_dir/dist/app-*.js.map" |> Path.wildcard
 
     content = File.read!("#{output_dir()}/another_dir/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}
