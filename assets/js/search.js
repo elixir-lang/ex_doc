@@ -205,7 +205,7 @@ export function popstateHandler (event) {
     //       on back after navigating away the page (clicking a result in the search)
     //       there is no original page content i.e. all that was display none is gone
     //       note this doesn't happen in Safari, just FF and Chrome.
-    document.location.reload(true)
+    // document.location.reload(true)
   } else if ('searchValue' in event.originalEvent.state) {
     // when we have a searchValue, show the search but clearly don't push a history state
     var searchValue = event.originalEvent.state.searchValue
