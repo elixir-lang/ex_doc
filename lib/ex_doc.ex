@@ -3,6 +3,8 @@ defmodule ExDoc do
   Elixir Documentation System. ExDoc produces documentation for Elixir projects
   """
 
+  alias ExDoc.Markdown
+
   defmodule Config do
     @moduledoc """
     Configuration structure that holds all the available options for ExDoc
@@ -39,6 +41,7 @@ defmodule ExDoc do
       language: @default.language,
       logo: nil,
       main: nil,
+      markdown_processor: nil,
       output: @default.output,
       project: nil,
       retriever: @default.retriever,
@@ -67,6 +70,7 @@ defmodule ExDoc do
        language: String.t,
        logo: nil | Path.t,
        main: nil | String.t,
+       markdown_processor: nil | atom,
        output: nil | Path.t,
        project: nil | String.t,
        retriever: :atom,
@@ -102,6 +106,12 @@ defmodule ExDoc do
   # Builds configuration by merging `options`, and normalizing the options.
   @spec build_config(String.t, String.t, Keyword.t) :: ExDoc.Config.t
   defp build_config(project, vsn, options) do
+    # The app environment has priority over the mix config
+    processor_from_env = Markdown.get_markdown_processor_from_app_env()
+    if !processor_from_env && options[:markdown_processor] do
+      Markdown.set_markdown_processor(options[:markdown_processor])
+    end
+    # After this, we have no use for the :markdown processor option
     options = normalize_options(options)
     preconfig = %Config{
       project: project,
