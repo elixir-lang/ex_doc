@@ -15,6 +15,6 @@ defmodule ExDoc.Markdown.Cmark do
   Generate HTML output. Cmark takes no options.
   """
   def to_html(text, _opts) do
-    Cmark.to_html(text)
+    Cmark.to_html(text)  |> ExDoc.Markdown.pretty_codeblocks
   end
 end
