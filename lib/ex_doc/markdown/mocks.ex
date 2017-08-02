@@ -12,7 +12,7 @@ defmodule ExDoc.Markdown.MockMarkdownProcessor do
   def to_html(_, _) do
     # When we get an exception, we know this processor's been used
     # This seems to be the easiest way to ensure we're choosing the right processor
-    # without instrumenting the code 
+    # without instrumenting the code
     raise ExDoc.Markdown.MockMarkdownProcessor.MockMarkdownProcessorError
   end
 end

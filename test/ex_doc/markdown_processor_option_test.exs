@@ -1,6 +1,6 @@
 defmodule ExDoc.MarkdownProcessorOptionTest do
   use ExUnit.Case
-  
+
   alias ExDoc.Markdown.MockMarkdownProcessor
   alias ExDoc.Markdown.MockMarkdownProcessor.MockMarkdownProcessorError
 
@@ -30,10 +30,11 @@ defmodule ExDoc.MarkdownProcessorOptionTest do
   end
 
   defp doc_config_markdown_processor_set do
-    doc_config_markdown_processor_not_set()
     # MockMarkdownProcessor will raise an exception if used to process files
     # This exception will be our way to tell that someting's not right.
-    |> Keyword.put(:markdown_processor, MockMarkdownProcessor)
+    Keyword.put(doc_config_markdown_processor_not_set(),
+                :markdown_processor,
+                MockMarkdownProcessor)
   end
 
   def generate_docs(config) do
@@ -81,4 +82,3 @@ defmodule ExDoc.MarkdownProcessorOptionTest do
   end
 
 end
-
