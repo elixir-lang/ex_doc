@@ -54,6 +54,14 @@ defmodule Mix.Tasks.Docs do
       directory in the output path. Its entries may be referenced in your docs
       under "assets/ASSET.EXTENSION"; defaults to no assets directory.
 
+    * `:before_closing_body_tag` - Literal HTML to be included just before the closing body tag (`</body>`)
+      Useful to inject custom assets, such as Javascript. 
+      Only works with the HTML formatter.
+
+    * `:before_closing_head_tag` - Literal HTML to be included just before the closing head tag (`</head>`);
+      Useful to inject custom assets, such as CSS.
+      Only works with the HTML formatter.
+
     * `:canonical` - String that defines the preferred URL with the rel="canonical"
       element; defaults to no canonical path.
 
