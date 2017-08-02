@@ -51,30 +51,18 @@ defmodule ExDoc.Formatter.HTMLTest do
       generate_docs doc_config(source_url: "#{scheme}://github.com/elixir-lang/ex_doc", source_root: File.cwd!)
       content = File.read!(file_path)
       assert content =~ "https://github.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L14"
-      # before_closing_*_tag comes is just before the respective tag
-      assert content =~ ~r[#{@before_closing_head_tag}\s*</head>]
-      assert content =~ ~r[#{@before_closing_body_tag}\s*</body>]
 
       generate_docs doc_config(source_url: "#{scheme}://gitlab.com/elixir-lang/ex_doc", source_root: File.cwd!)
       content = File.read!(file_path)
       assert content =~ "https://gitlab.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L14"
-      # before_closing_*_tag comes is just before the respective tag
-      assert content =~ ~r[#{@before_closing_head_tag}\s*</head>]
-      assert content =~ ~r[#{@before_closing_body_tag}\s*</body>]
 
       generate_docs doc_config(source_url: "#{scheme}://bitbucket.org/elixir-lang/ex_doc", source_root: File.cwd!)
       content = File.read!(file_path)
       assert content =~ "https://bitbucket.org/elixir-lang/ex_doc/src/master/test/fixtures/compiled_with_docs.ex#cl-14"
-      # before_closing_*_tag comes is just before the respective tag
-      assert content =~ ~r[#{@before_closing_head_tag}\s*</head>]
-      assert content =~ ~r[#{@before_closing_body_tag}\s*</body>]
 
       generate_docs doc_config(source_url: "#{scheme}://example.com/elixir-lang/ex_doc", source_root: File.cwd!)
       content = File.read!(file_path)
       assert content =~ "#{scheme}://example.com/elixir-lang/ex_doc"
-      # before_closing_*_tag comes is just before the respective tag
-      assert content =~ ~r[#{@before_closing_head_tag}\s*</head>]
-      assert content =~ ~r[#{@before_closing_body_tag}\s*</body>]
     end
   end
 
@@ -203,9 +191,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<p>moduledoc</p>}
     assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
     assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html">task_with_docs</a>}
-    # before_closing_*_tag comes is just before the respective tag
-    assert content =~ ~r[#{@before_closing_head_tag}\s*</head>]
-    assert content =~ ~r[#{@before_closing_body_tag}\s*</body>]
   end
 
   test "run generates pages" do
@@ -222,7 +207,21 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<a href="RandomError.html"><code(\sclass="inline")?>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code(\sclass="inline")?>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
-    # before_closing_*_tag comes is just before the respective tag
+  end
+
+  test "before_closing_*_tags are placed in the right place - api reference file" do
+    generate_docs(doc_config())
+
+    content = File.read!("#{output_dir()}/api-reference.html")
+    assert content =~ ~r[#{@before_closing_head_tag}\s*</head>]
+    assert content =~ ~r[#{@before_closing_body_tag}\s*</body>]
+  end
+
+  test "before_closing_*_tags are placed in the right place - generated pages" do
+    config = doc_config([main: "readme"])
+    generate_docs(config)
+    
+    content = File.read!("#{output_dir()}/readme.html")
     assert content =~ ~r[#{@before_closing_head_tag}\s*</head>]
     assert content =~ ~r[#{@before_closing_body_tag}\s*</body>]
   end
