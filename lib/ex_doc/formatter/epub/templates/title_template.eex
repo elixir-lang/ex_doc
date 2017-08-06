@@ -6,5 +6,6 @@
         <div><img src="assets/logo<%= Path.extname(logo) %>" alt="Logo"/></div>
       <% end %>
     </div>
+    <%= config.before_closing_body_tag.(:epub) %>
   </body>
 </html>

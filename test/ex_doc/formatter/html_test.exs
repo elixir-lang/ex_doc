@@ -20,8 +20,16 @@ defmodule ExDoc.Formatter.HTMLTest do
     File.read!(file)
   end
 
-  @before_closing_head_tag "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG</dont-escape>"
-  @before_closing_body_tag "UNIQUE:<dont-escape>&copyBEFORE-CLOSING-BODY-TAG</dont-escape>"
+  @before_closing_head_tag_content_html "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
+  @before_closing_body_tag_content_html "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
+  @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-EPUB</dont-escape>"
+  @before_closing_body_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-EPUB</dont-escape>"
+
+  defp before_closing_head_tag(:html), do: @before_closing_head_tag_content_html
+  defp before_closing_head_tag(:epub), do: @before_closing_head_tag_content_epub
+
+  defp before_closing_body_tag(:html), do: @before_closing_body_tag_content_html
+  defp before_closing_body_tag(:epub), do: @before_closing_body_tag_content_epub
 
   defp doc_config do
     [project: "Elixir",
@@ -33,8 +41,8 @@ defmodule ExDoc.Formatter.HTMLTest do
      source_beam: beam_dir(),
      logo: "test/fixtures/elixir.png",
      extras: ["test/fixtures/README.md"],
-     before_closing_head_tag: @before_closing_head_tag,
-     before_closing_body_tag: @before_closing_body_tag]
+     before_closing_head_tag: &before_closing_head_tag/1,
+     before_closing_body_tag: &before_closing_body_tag/1]
   end
 
   defp doc_config(config) do
@@ -213,8 +221,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config())
 
     content = File.read!("#{output_dir()}/api-reference.html")
-    assert content =~ ~r[#{@before_closing_head_tag}\s*</head>]
-    assert content =~ ~r[#{@before_closing_body_tag}\s*</body>]
+    assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
+    assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
   end
 
   test "before_closing_*_tags are placed in the right place - generated pages" do
@@ -222,8 +230,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(config)
     
     content = File.read!("#{output_dir()}/readme.html")
-    assert content =~ ~r[#{@before_closing_head_tag}\s*</head>]
-    assert content =~ ~r[#{@before_closing_body_tag}\s*</body>]
+    assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
+    assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
   end
 
   test "run generates pages with custom names" do

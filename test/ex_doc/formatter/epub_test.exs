@@ -14,6 +14,17 @@ defmodule ExDoc.Formatter.EPUBTest do
     Path.expand("../../tmp/beam", __DIR__)
   end
 
+  @before_closing_head_tag_content_html "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
+  @before_closing_body_tag_content_html "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
+  @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-EPUB</dont-escape>"
+  @before_closing_body_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-EPUB</dont-escape>"
+
+  defp before_closing_head_tag(:html), do: @before_closing_head_tag_content_html
+  defp before_closing_head_tag(:epub), do: @before_closing_head_tag_content_epub
+
+  defp before_closing_body_tag(:html), do: @before_closing_body_tag_content_html
+  defp before_closing_body_tag(:epub), do: @before_closing_body_tag_content_epub
+
   defp doc_config do
     [project: "Elixir",
      version: "1.0.1",
@@ -21,7 +32,9 @@ defmodule ExDoc.Formatter.EPUBTest do
      output: output_dir(),
      source_root: beam_dir(),
      source_beam: beam_dir(),
-     extras: ["test/fixtures/README.md"]]
+     extras: ["test/fixtures/README.md"],
+     before_closing_head_tag: &before_closing_head_tag/1,
+     before_closing_body_tag: &before_closing_body_tag/1]
   end
 
   defp doc_config(config) do
@@ -149,5 +162,37 @@ defmodule ExDoc.Formatter.EPUBTest do
 
     content = File.read!("#{output_dir()}/OEBPS/nav.xhtml")
     refute content =~ ~r{<li><a href="README.html">README</a></li>}
+  end
+
+  test "before_closing_*_tags are in the right place" do
+    generate_docs_and_unzip(doc_config())
+
+    oebps_dir = "#{output_dir()}/OEBPS"
+
+    # "structural pages"
+    content = File.read!("#{oebps_dir}/nav.xhtml")
+    assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
+    assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
+
+    content = File.read!("#{oebps_dir}/title.xhtml")
+    assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
+    assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
+
+    content = File.read!("#{oebps_dir}/readme.xhtml")
+    assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
+    assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
+
+    content = File.read!("#{oebps_dir}/CompiledWithDocs.xhtml")
+    assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
+    assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
+
+    content = File.read!("#{oebps_dir}/CompiledWithDocs.Nested.xhtml")
+    assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
+    assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
+
+    # Example of a "module page"
+    content = File.read!("#{oebps_dir}/MultipleSpecs.xhtml")
+    assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
+    assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
   end
 end

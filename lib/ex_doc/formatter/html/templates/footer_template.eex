@@ -16,6 +16,6 @@
 </section>
 </div>
   <script src="<%= asset_rev config.output, "dist/app*.js" %>"></script>
-  <%= config.before_closing_body_tag %>
+  <%= config.before_closing_body_tag.(:html) %>
   </body>
 </html>

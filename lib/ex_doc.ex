@@ -23,10 +23,13 @@ defmodule ExDoc do
       Map.fetch!(@default, field)
     end
 
+    def before_closing_head_tag(_), do: ""
+    def before_closing_body_tag(_), do: ""
+
     defstruct [
       assets: nil,
-      before_closing_head_tag: "",
-      before_closing_body_tag: "",
+      before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
+      before_closing_body_tag: &__MODULE__.before_closing_body_tag/1,
       canonical: nil,
       debug: false,
       deps: [],
@@ -53,8 +56,8 @@ defmodule ExDoc do
 
      @type t :: %__MODULE__{
        assets: nil | String.t,
-       before_closing_head_tag: String.t,
-       before_closing_body_tag: String.t,
+       before_closing_head_tag: term,
+       before_closing_body_tag: term,
        canonical: nil | String.t,
        debug: boolean(),
        deps: [{ebin_path :: String.t, doc_url :: String.t}],
