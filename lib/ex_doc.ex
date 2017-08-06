@@ -56,8 +56,8 @@ defmodule ExDoc do
 
      @type t :: %__MODULE__{
        assets: nil | String.t,
-       before_closing_head_tag: term,
-       before_closing_body_tag: term,
+       before_closing_head_tag: (atom() -> String.t),
+       before_closing_body_tag: (atom() -> String.t),
        canonical: nil | String.t,
        debug: boolean(),
        deps: [{ebin_path :: String.t, doc_url :: String.t}],
