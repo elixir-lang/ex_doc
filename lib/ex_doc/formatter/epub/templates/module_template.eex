@@ -70,5 +70,6 @@
         end %>
       </section>
     <% end %>
+    <%= config.before_closing_body_tag.(:epub) %>
   </body>
 </html>

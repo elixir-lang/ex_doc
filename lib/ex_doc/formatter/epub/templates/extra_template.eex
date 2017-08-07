@@ -1,4 +1,5 @@
 <%= head_template(config, %{title: title}) %>
     <%= content %>
+    <%= config.before_closing_body_tag.(:epub) %>
   </body>
 </html>
