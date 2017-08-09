@@ -4,7 +4,7 @@
 // ------------
 
 import $ from 'jquery'
-import {start as search, popstateHandler, getParameterByName} from './search'
+import {search} from './search'
 import * as helpers from './helpers'
 
 import sidebarItemsTemplate from './templates/sidebar-items.handlebars'
@@ -17,7 +17,8 @@ var SIDEBAR_TYPES = [
   '#modules-list',
   '#exceptions-list',
   '#protocols-list',
-  '#tasks-list'
+  '#tasks-list',
+  '#search-list'
 ]
 var SIDEBAR_NAV = $('.sidebar-listNav')
 var CONTENT = $('.content')
@@ -53,16 +54,12 @@ function collapse () {
  * @param {String} filter - Filter of nodes, by default 'modules'.
  */
 function fillSidebarWithNodes (nodes, filter) {
-  function scope (items) {
-    var filtered = nodes[items]
-    var fullList = $('#full-list')
-    fullList.replaceWith(sidebarItemsTemplate({'nodes': filtered, 'group': ''}))
-  }
-
   const moduleType = helpers.getModuleType()
 
   filter = filter || moduleType
-  scope(filter)
+  var filtered = nodes[filter] || []
+  var fullList = $('#full-list')
+  fullList.replaceWith(sidebarItemsTemplate({'nodes': filtered, 'group': ''}))
   setupSelected(['#', filter, '-list'].join(''))
 
   $('#full-list li a').on('click', e => {
@@ -92,26 +89,29 @@ function addEventListeners () {
   SIDEBAR_NAV.on('click', '#protocols-list', createHandler('protocols'))
   SIDEBAR_NAV.on('click', '#tasks-list', createHandler('tasks'))
 
-  $('.sidebar-search input').on('keyup', function (e) {
-    if (e.which === 13) { // enter key maps to 13
-      search()
-    } else if (e.which === 27) { // escape key
+  $('.sidebar-search input').on('keydown', function (e) {
+    if (e.keyCode === 27) { // escape key
       $(this).val('')
+    } else if ((event.metaKey || event.ctrlKey) && e.keyCode === 13) { // cmd+enter
+      $(this).parent().attr('target', '_blank').submit().removeAttr('')
+      e.preventDefault()
     }
   })
 
-  $('.sidebar-search .icon-search').on('click', function (e) {
-    search()
-  })
-
-  $(window).on('popstate', popstateHandler)
-
-  // if the search stub is refreshed or loaded perform the search.
   var pathname = window.location.pathname
   if (pathname.substr(pathname.lastIndexOf('/') + 1) === 'search.html') {
-    const qs = getParameterByName('q')
-    search(qs, false)
+    search(getParameterByName('q'))
   }
+}
+
+function getParameterByName (name) {
+  const url = window.location.href
+  const param = name.replace(/[\[\]]/g, '\\$&')
+  const regex = new RegExp('[?&]' + param + '(=([^&#]*)|&|#|$)')
+  const results = regex.exec(url)
+  if (!results) return ''
+  if (!results[2]) return ''
+  return decodeURIComponent(results[2].replace(/\+/g, ' '))
 }
 
 function identifyCurrentHash () {

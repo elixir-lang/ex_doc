@@ -1,45 +1,36 @@
-<div class="search-results">
-  <h1>Search Results for <em>{{value}}</em></h1>
+<h1>Search Results for <em>{{value}}</em></h1>
 
-  <a href="" class="close-search">
-    <span class="icon-cross" aria-hidden="true"></span>
-    <span class="sr-only">Close search</span>
-  </a>
-</div>
-
-<div class="results">
-  {{#if empty}}
-    Sorry, we couldn't find anything for <em>{{value}}</em>.
-  {{else}}
-    {{#each levels}}
-      <h2 class="results-title">{{name}}</h2>
-      {{#each results}}
-        <div class="result">
-          <h3 class="result-id">
-            <a href="{{id}}.html">{{{match}}}</a>
-          </h3>
-          <ul class="functions">
-            {{#each functions}}
-              <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a></li>
-            {{/each}}
-          </ul>
-          <ul class="macros">
-            {{#each macros}}
-              <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a></li>
-            {{/each}}
-          </ul>
-          <ul class="callbacks">
-            {{#each callbacks}}
-              <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a> (callback)</li>
-            {{/each}}
-          </ul>
-          <ul class="types">
-            {{#each types}}
-              <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a> (type)</li>
-            {{/each}}
-          </ul>
-        </div>
-      {{/each}}
+{{#if empty}}
+  Sorry, we couldn't find anything for <em>{{value}}</em>.
+{{else}}
+  {{#each levels}}
+    <h2 class="results-title">{{name}}</h2>
+    {{#each results}}
+      <div class="result">
+        <h3 class="result-id">
+          <a href="{{id}}.html">{{{match}}}</a>
+        </h3>
+        <ul class="functions">
+          {{#each functions}}
+            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a></li>
+          {{/each}}
+        </ul>
+        <ul class="macros">
+          {{#each macros}}
+            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a></li>
+          {{/each}}
+        </ul>
+        <ul class="callbacks">
+          {{#each callbacks}}
+            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a> (callback)</li>
+          {{/each}}
+        </ul>
+        <ul class="types">
+          {{#each types}}
+            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a> (type)</li>
+          {{/each}}
+        </ul>
+      </div>
     {{/each}}
-  {{/if}}
-</div>
+  {{/each}}
+{{/if}}
