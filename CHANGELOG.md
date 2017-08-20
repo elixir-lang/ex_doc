@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.16.3
+
+  * Enhancements
+    * Make sure its own search.html page and provide history
+    * Generate source maps only if the `--debug` flag is given
+    * Users can now add custom HTML before the closing head tag and the closing body tag
+    * Highlight the target function/macro/type/callback when clicked
+
+  * Bug fixes
+    * Remove extra `term()` argument at start of macro spec
+    * Add unencoded link target for functions with special chars to cope with different behaviour in browsers
+
 ## v0.16.2
 
   * Enhancements
