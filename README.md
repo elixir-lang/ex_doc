@@ -14,7 +14,7 @@ To use ExDoc in your Mix projects, first add ExDoc as a dependency:
 
 ```elixir
 def deps do
-  [{:ex_doc, "~> 0.14", only: :dev, runtime: false}]
+  [{:ex_doc, "~> 0.16", only: :dev, runtime: false}]
 end
 ```
 
