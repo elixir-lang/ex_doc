@@ -130,9 +130,9 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir()}/CompiledWithDocs.Nested.html")
 
-    assert [_] = "#{output_dir()}/dist/app-*.css" |> Path.wildcard
-    assert [_] = "#{output_dir()}/dist/app-*.js" |> Path.wildcard
-    assert [] = "#{output_dir()}/another_dir/dist/app-*.js.map" |> Path.wildcard
+    assert [_] = Path.wildcard("#{output_dir()}/dist/app-*.css")
+    assert [_] = Path.wildcard("#{output_dir()}/dist/app-*.js")
+    assert [] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.js.map")
 
     content = File.read!("#{output_dir()}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
@@ -145,9 +145,9 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/another_dir/CompiledWithDocs.html")
     assert File.regular?("#{output_dir()}/another_dir/RandomError.html")
 
-    assert [_] = "#{output_dir()}/another_dir/dist/app-*.css" |> Path.wildcard
-    assert [_] = "#{output_dir()}/another_dir/dist/app-*.js" |> Path.wildcard
-    assert [_] = "#{output_dir()}/another_dir/dist/app-*.js.map" |> Path.wildcard
+    assert [_] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.css")
+    assert [_] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.js")
+    assert [_] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.js.map")
 
     content = File.read!("#{output_dir()}/another_dir/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}
@@ -228,7 +228,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "before_closing_*_tags are placed in the right place - generated pages" do
     config = doc_config([main: "readme"])
     generate_docs(config)
-    
+
     content = File.read!("#{output_dir()}/readme.html")
     assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
     assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
