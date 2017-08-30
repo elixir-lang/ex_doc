@@ -18,8 +18,12 @@ defmodule ExDocTest do
   test "build_config & normalize_options" do
     project = "Elixir"
     version = "1"
-    options = [formatter: IdentityFormatter, retriever: IdentityRetriever,
-               source_root: "root_dir", source_beam: "beam_dir",]
+    options = [
+      formatter: IdentityFormatter,
+      retriever: IdentityRetriever,
+      source_root: "root_dir",
+      source_beam: "beam_dir",
+    ]
 
     {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/ex_doc"])
     assert config.output == "test/tmp/ex_doc"
