@@ -10,6 +10,14 @@
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
+    <%= if config.logo do %>
+      <%= if Path.extname(config.logo) == ".png" do %>
+        <link rel="icon" type="image/png" href="assets/logo.png" />
+      <% end %>
+      <%= if Path.extname(config.logo) == ".jpg" do %>
+        <link rel="icon" type="image/jpeg" href="assets/logo.jpg" />
+      <% end %>
+    <% end %>
     <script src="<%= asset_rev config.output, "dist/sidebar_items*.js" %>"></script>
     <%= config.before_closing_head_tag.(:html) %>
   </head>
