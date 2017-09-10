@@ -48,7 +48,7 @@ defmodule ExDoc.Formatter.EPUBTest do
   defp generate_docs_and_unzip(options) do
     generate_docs(options)
     unzip_dir = String.to_charlist("#{doc_config()[:output]}")
-    "#{doc_config()[:output]}/#{doc_config()[:project]}-v#{doc_config()[:version]}.epub"
+    "#{doc_config()[:output]}/#{doc_config()[:project]}.epub"
     |> String.to_charlist
     |> :zip.unzip([cwd: unzip_dir])
   end
@@ -92,14 +92,14 @@ defmodule ExDoc.Formatter.EPUBTest do
 
   test "run generates an EPUB file in the default directory" do
     generate_docs(doc_config())
-    assert File.regular?("#{output_dir()}/#{doc_config()[:project]}-v#{doc_config()[:version]}.epub")
+    assert File.regular?("#{output_dir()}/#{doc_config()[:project]}.epub")
   end
 
   test "run generates an EPUB file in specified output directory" do
     config = doc_config([output: "#{output_dir()}/another_dir", main: "RandomError"])
     generate_docs(config)
 
-    assert File.regular?("#{output_dir()}/another_dir/#{doc_config()[:project]}-v#{doc_config()[:version]}.epub")
+    assert File.regular?("#{output_dir()}/another_dir/#{doc_config()[:project]}.epub")
   end
 
   test "run generates an EPUB file with a standardized structure" do
