@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.16.4
+
+  * Enhancements
+    * Generate favicon link if a logo is available
+
+  * Bug fixes
+    * Do not version epub filename as the doc directory is likely already versioned
+
 ## v0.16.3
 
   * Enhancements
