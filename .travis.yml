@@ -29,3 +29,5 @@ cache:
   directories:
     - node_modules
     - deps
+addons:
+  firefox: "54.0"
