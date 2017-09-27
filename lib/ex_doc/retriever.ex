@@ -472,13 +472,13 @@ defmodule ExDoc.Retriever do
   end
 
   defp module_in_patterns(module, patterns) do
-    "Elixir." <> module_string = Atom.to_string module
+    id = module_id module
 
     Enum.any?(patterns, fn pattern ->
       case pattern do
-        %Regex{} = regex -> Regex.match?(regex, module_string)
-        string when is_binary(string) -> module_string === string
-        atom -> atom === module
+        %Regex{} = regex -> Regex.match?(regex, id)
+        string when is_binary(string) -> id == string
+        atom -> atom == module
       end
     end)
   end

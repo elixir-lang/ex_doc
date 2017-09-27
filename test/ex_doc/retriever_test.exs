@@ -3,17 +3,12 @@ defmodule ExDoc.RetrieverTest do
 
   alias ExDoc.Retriever
 
-  defp docs_from_files(names, url_pattern \\ "http://example.com/%{path}#L%{line}") do
+  defp docs_from_files(names, config \\ []) do
     files  = Enum.map names, fn(n) -> "test/tmp/Elixir.#{n}.beam" end
-    config = %ExDoc.Config{
-      source_url_pattern: url_pattern,
-      source_root: File.cwd!,
-      module_groups: [
-        "Group Atom": [GroupedExplicitlyAtom],
-        "Group String": ["GroupedExplicitlyString"],
-        "Group Implicit": ~r/GroupedImplicitly.?/
-      ]
-    }
+    config = 
+      %ExDoc.Config{source_url_pattern: "http://example.com/%{path}#L%{line}", source_root: File.cwd!}
+      |> struct(config)
+
     Retriever.docs_from_files(files, config)
   end
 
@@ -54,18 +49,24 @@ defmodule ExDoc.RetrieverTest do
 
   describe "docs_from_files returns the group" do
     test "atom" do
-      [module_node] = docs_from_files ["GroupedExplicitlyAtom"]
-      assert module_node.group == "Group Atom"
+      [module_node] = docs_from_files ["CompiledWithDocs"], module_groups: [
+        "Group": [CompiledWithDocs]
+      ]
+      assert module_node.group == "Group"
     end
 
     test "string" do
-      [module_node] = docs_from_files ["GroupedExplicitlyString"]
-      assert module_node.group == "Group String"
+      [module_node] = docs_from_files ["CompiledWithDocs"], module_groups: [
+        "Group": ["CompiledWithDocs"]
+      ]
+      assert module_node.group == "Group"
     end
 
     test "regex" do
-      [module_node] = docs_from_files ["GroupedImplicitlyRegex"]
-      assert module_node.group == "Group Implicit"
+      [module_node] = docs_from_files ["CompiledWithDocs"], module_groups: [
+        "Group": ~r/^CompiledWith.?/
+      ]
+      assert module_node.group == "Group"
     end
   end
 
@@ -160,7 +161,7 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "docs_from_files returns the source" do
-    [module_node] = docs_from_files ["CompiledWithDocs"], "http://foo.com/bar/%{path}#L%{line}"
+    [module_node] = docs_from_files ["CompiledWithDocs"], source_url_pattern: "http://foo.com/bar/%{path}#L%{line}"
     assert module_node.source_url == "http://foo.com/bar/test/fixtures/compiled_with_docs.ex\#L1"
   end
 
@@ -172,9 +173,8 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "docs_from_modules fails when module is not available" do
-    config = %ExDoc.Config{source_url_pattern: "http://example.com/%{path}#L%{line}", source_root: File.cwd!}
     assert_raise ExDoc.Retriever.Error, "module NotAvailable is not defined/available", fn ->
-      docs_from_files(["NotAvailable"], config)
+      docs_from_files(["NotAvailable"])
     end
   end
 
