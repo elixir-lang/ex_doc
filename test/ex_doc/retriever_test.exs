@@ -5,11 +5,9 @@ defmodule ExDoc.RetrieverTest do
 
   defp docs_from_files(names, config \\ []) do
     files  = Enum.map names, fn(n) -> "test/tmp/Elixir.#{n}.beam" end
-    config = 
-      %ExDoc.Config{source_url_pattern: "http://example.com/%{path}#L%{line}", source_root: File.cwd!}
-      |> struct(config)
+    default = %ExDoc.Config{source_url_pattern: "http://example.com/%{path}#L%{line}", source_root: File.cwd!}
 
-    Retriever.docs_from_files(files, config)
+    Retriever.docs_from_files(files, struct(default, config))
   end
 
   ## MODULES

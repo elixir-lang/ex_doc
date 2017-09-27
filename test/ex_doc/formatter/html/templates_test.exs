@@ -15,7 +15,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   defp doc_config(config \\ []) do
-    %ExDoc.Config{
+    default = %ExDoc.Config{
       project: "Elixir",
       version: "1.0.1",
       source_root: File.cwd!,
@@ -24,7 +24,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       source_url: source_url(),
       output: "test/tmp/html_templates"
     }
-    |> struct(config)
+
+    struct(default, config)
   end
 
   defp get_module_page(names) do
@@ -211,7 +212,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example_without_docs/0")ms
     assert content =~ ~r("id":"CompiledWithDocs.Nested")ms
   end
-  
+
   test "list_page outputs groups for the given nodes" do
     names = [CompiledWithDocs, CompiledWithDocs.Nested]
     group_mapping = [module_groups: ["Group": [CompiledWithDocs]]]
