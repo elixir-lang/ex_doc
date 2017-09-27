@@ -117,7 +117,10 @@ defmodule ExDoc.Retriever do
     modules
     |> Enum.map(&get_module(&1, config))
     |> Enum.filter(&(&1))
-    |> Enum.sort_by(&({&1.group, &1.id}))
+    |> Enum.sort_by(fn module ->
+      group_index = Enum.find_index(config.module_groups, fn {k, _v} -> Atom.to_string(k) == module.group end)
+      {group_index || -1, module.id}
+    end)
   end
 
   defp filename_to_module(name) do
