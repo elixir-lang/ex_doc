@@ -5,7 +5,15 @@ defmodule ExDoc.RetrieverTest do
 
   defp docs_from_files(names, url_pattern \\ "http://example.com/%{path}#L%{line}") do
     files  = Enum.map names, fn(n) -> "test/tmp/Elixir.#{n}.beam" end
-    config = %ExDoc.Config{source_url_pattern: url_pattern, source_root: File.cwd!}
+    config = %ExDoc.Config{
+      source_url_pattern: url_pattern,
+      source_root: File.cwd!,
+      module_groups: [
+        "Group Atom": [GroupedExplicitlyAtom],
+        "Group String": ["GroupedExplicitlyString"],
+        "Group Implicit": ~r/GroupedImplicitly.?/
+      ]
+    }
     Retriever.docs_from_files(files, config)
   end
 
@@ -42,6 +50,23 @@ defmodule ExDoc.RetrieverTest do
   test "docs_from_files returns the module" do
     [module_node] = docs_from_files ["CompiledWithDocs"]
     assert module_node.module == CompiledWithDocs
+  end
+
+  describe "docs_from_files returns the group" do
+    test "atom" do
+      [module_node] = docs_from_files ["GroupedExplicitlyAtom"]
+      assert module_node.group == "Group Atom"
+    end
+
+    test "string" do
+      [module_node] = docs_from_files ["GroupedExplicitlyString"]
+      assert module_node.group == "Group String"
+    end
+
+    test "regex" do
+      [module_node] = docs_from_files ["GroupedImplicitlyRegex"]
+      assert module_node.group == "Group Implicit"
+    end
   end
 
   test "docs_from_files returns the moduledoc info" do

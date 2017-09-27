@@ -3,13 +3,15 @@ defmodule ExDoc.ModuleNode do
   Structure that represents a *module*
   """
 
-  defstruct id: nil, title: nil, module: nil, doc: nil, doc_line: nil,
-    docs: [], typespecs: [], source_path: nil, source_url: nil, type: nil
+  defstruct id: nil, title: nil, module: nil, group: nil, doc: nil,
+    doc_line: nil, docs: [], typespecs: [], source_path: nil,
+    source_url: nil, type: nil
 
   @type t :: %__MODULE__{
     id: nil | String.t,
     title: nil | String.t,
     module: nil | String.t,
+    group: nil | String.t,
     docs: list(),
     doc: nil | String.t,
     doc_line: non_neg_integer(),
@@ -115,7 +117,7 @@ defmodule ExDoc.Retriever do
     modules
     |> Enum.map(&get_module(&1, config))
     |> Enum.filter(&(&1))
-    |> Enum.sort(&(&1.id <= &2.id))
+    |> Enum.sort_by(&({&1.group, &1.id}))
   end
 
   defp filename_to_module(name) do
@@ -157,6 +159,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp generate_node(module, type, config) do
+    module_group_patterns = config.module_groups
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
@@ -171,10 +174,13 @@ defmodule ExDoc.Retriever do
 
     {title, id} = module_title_and_id(module, type)
 
+    module_group = module_group(module, module_group_patterns)
+
     %ExDoc.ModuleNode{
       id: id,
       title: title,
       module: module_info.name,
+      group: module_group,
       type: type,
       docs: docs,
       doc: moduledoc,
@@ -456,6 +462,25 @@ defmodule ExDoc.Retriever do
   defp module_title_and_id(module, _type) do
     id = module_id(module)
     {id, id}
+  end
+
+  defp module_group(module, group_patterns) do
+    Enum.find_value(group_patterns, fn {group, patterns} ->
+      patterns = List.wrap patterns
+      module_in_patterns(module, patterns) && Atom.to_string(group)
+    end)
+  end
+
+  defp module_in_patterns(module, patterns) do
+    "Elixir." <> module_string = Atom.to_string module
+
+    Enum.any?(patterns, fn pattern ->
+      case pattern do
+        %Regex{} = regex -> Regex.match?(regex, module_string)
+        string when is_binary(string) -> module_string === string
+        atom -> atom === module
+      end
+    end)
   end
 
   defp module_id(module) do
