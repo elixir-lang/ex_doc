@@ -1,5 +1,8 @@
 defmodule ExDoc.GroupMatcher do
   @moduledoc """
+  Match modules or extra pages to groups.
+
+  Matching does happen by explicitly matching names or using regular expressions.
   """
   @type pattern :: Regex.t | module() | String.t
   @type patterns :: pattern | [pattern]

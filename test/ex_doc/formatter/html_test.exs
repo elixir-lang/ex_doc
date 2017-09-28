@@ -254,7 +254,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "run generates pages with custom group" do
     extra_config = [
       extras: ["test/fixtures/README.md"],
-      extra_groups: ["Intro": ~r/fixtures\/READ.?/]
+      groups_for_extras: ["Intro": ~r/fixtures\/READ.?/]
     ]
     generate_docs(doc_config(extra_config))
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")

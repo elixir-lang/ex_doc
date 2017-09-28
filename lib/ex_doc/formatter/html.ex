@@ -201,7 +201,7 @@ defmodule ExDoc.Formatter.HTML do
         |> File.read!()
         |> Autolink.project_doc(project_nodes, nil, extension)
 
-      group_pattern = GroupMatcher.match_extra config.extra_groups, input
+      group_pattern = GroupMatcher.match_extra config.groups_for_extras, input
 
       html_content = Markdown.to_html(content, file: input, line: 1)
       title = title || extract_title(html_content) || input_to_title(input)

@@ -215,7 +215,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "list_page outputs groups for the given nodes" do
     names = [CompiledWithDocs, CompiledWithDocs.Nested]
-    group_mapping = [module_groups: ["Group": [CompiledWithDocs]]]
+    group_mapping = [groups_for_modules: ["Group": [CompiledWithDocs]]]
     nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(group_mapping))
     content = Templates.create_sidebar_items(%{modules: nodes}, [])
 

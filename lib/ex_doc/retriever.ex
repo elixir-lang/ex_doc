@@ -119,7 +119,7 @@ defmodule ExDoc.Retriever do
     |> Enum.map(&get_module(&1, config))
     |> Enum.filter(&(&1))
     |> Enum.sort_by(fn module ->
-      group_index = Enum.find_index(config.module_groups, fn {k, _v} -> Atom.to_string(k) == module.group end)
+      group_index = Enum.find_index(config.groups_for_modules, fn {k, _v} -> Atom.to_string(k) == module.group end)
       {group_index || -1, module.id}
     end)
   end
@@ -163,7 +163,6 @@ defmodule ExDoc.Retriever do
   end
 
   defp generate_node(module, type, config) do
-    module_group_patterns = config.module_groups
     source_url  = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
@@ -178,7 +177,7 @@ defmodule ExDoc.Retriever do
 
     {title, id} = module_title_and_id(module, type)
 
-    module_group = GroupMatcher.match_module module_group_patterns, module, id
+    module_group = GroupMatcher.match_module config.groups_for_modules, module, id
 
     %ExDoc.ModuleNode{
       id: id,
