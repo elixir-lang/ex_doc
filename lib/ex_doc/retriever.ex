@@ -83,6 +83,7 @@ defmodule ExDoc.Retriever do
   Functions to extract documentation information from modules.
   """
 
+  alias ExDoc.GroupMatcher
   alias ExDoc.Retriever.Error
   alias Kernel.Typespec
 
@@ -177,7 +178,7 @@ defmodule ExDoc.Retriever do
 
     {title, id} = module_title_and_id(module, type)
 
-    module_group = module_group(module, module_group_patterns)
+    module_group = GroupMatcher.match_module module_group_patterns, module, id
 
     %ExDoc.ModuleNode{
       id: id,
@@ -465,25 +466,6 @@ defmodule ExDoc.Retriever do
   defp module_title_and_id(module, _type) do
     id = module_id(module)
     {id, id}
-  end
-
-  defp module_group(module, group_patterns) do
-    Enum.find_value(group_patterns, fn {group, patterns} ->
-      patterns = List.wrap patterns
-      module_in_patterns(module, patterns) && Atom.to_string(group)
-    end)
-  end
-
-  defp module_in_patterns(module, patterns) do
-    id = module_id module
-
-    Enum.any?(patterns, fn pattern ->
-      case pattern do
-        %Regex{} = regex -> Regex.match?(regex, id)
-        string when is_binary(string) -> id == string
-        atom -> atom == module
-      end
-    end)
   end
 
   defp module_id(module) do

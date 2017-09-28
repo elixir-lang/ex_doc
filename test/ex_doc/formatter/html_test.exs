@@ -260,7 +260,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"readme","title":"README","group":"Intro"}
   end
-  
+
   test "run generates pages with custom group via the deprecated method as keyword opts" do
     generate_docs(doc_config(extras: ["test/fixtures/README.md": [group: "Intro"]]))
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")

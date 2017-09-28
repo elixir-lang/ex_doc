@@ -4,7 +4,7 @@ defmodule ExDoc.Formatter.HTML do
   """
 
   alias __MODULE__.{Assets, Autolink, Templates}
-  alias ExDoc.Markdown
+  alias ExDoc.{Markdown, GroupMatcher}
 
   @main "api-reference"
 
@@ -201,7 +201,7 @@ defmodule ExDoc.Formatter.HTML do
         |> File.read!()
         |> Autolink.project_doc(project_nodes, nil, extension)
 
-      group_pattern = extra_group input, config.extra_groups
+      group_pattern = GroupMatcher.match_extra config.extra_groups, input
 
       html_content = Markdown.to_html(content, file: input, line: 1)
       title = title || extract_title(html_content) || input_to_title(input)
@@ -209,22 +209,6 @@ defmodule ExDoc.Formatter.HTML do
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
-  end
-  
-  defp extra_group(input, group_patterns) do
-    Enum.find_value(group_patterns, fn {group, patterns} ->
-      patterns = List.wrap patterns
-      extra_in_patterns(input, patterns) && Atom.to_string(group)
-    end)
-  end
-
-  defp extra_in_patterns(input, patterns) do
-    Enum.any?(patterns, fn pattern ->
-      case pattern do
-        %Regex{} = regex -> Regex.match?(regex, input)
-        string -> input == string
-      end
-    end)
   end
 
   def valid_extension_name?(input) do
