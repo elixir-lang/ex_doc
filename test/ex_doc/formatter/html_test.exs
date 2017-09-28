@@ -249,13 +249,23 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<title>Getting Started – Elixir v1.0.1</title>}
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"readme","title":"Getting Started","group":""}
-   end
+  end
 
   test "run generates pages with custom group" do
+    extra_config = [
+      extras: ["test/fixtures/README.md"],
+      extra_groups: ["Intro": ~r/fixtures\/READ.?/]
+    ]
+    generate_docs(doc_config(extra_config))
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+    assert content =~ ~r{"id":"readme","title":"README","group":"Intro"}
+  end
+  
+  test "run generates pages with custom group via the deprecated method as keyword opts" do
     generate_docs(doc_config(extras: ["test/fixtures/README.md": [group: "Intro"]]))
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"readme","title":"README","group":"Intro"}
-   end
+  end
 
   test "run generates with auto-extracted title" do
     generate_docs(doc_config(extras: ["test/fixtures/ExtraPage.md"]))
