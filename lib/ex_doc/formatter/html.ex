@@ -4,7 +4,7 @@ defmodule ExDoc.Formatter.HTML do
   """
 
   alias __MODULE__.{Assets, Autolink, Templates}
-  alias ExDoc.Markdown
+  alias ExDoc.{Markdown, GroupMatcher}
 
   @main "api-reference"
 
@@ -178,32 +178,34 @@ defmodule ExDoc.Formatter.HTML do
   def build_extras(project_nodes, config, extension) do
     config.extras
     |> Enum.map(&Task.async(fn ->
-        build_extra(&1, project_nodes, extension)
+        build_extra(&1, project_nodes, extension, config)
        end))
     |> Enum.map(&Task.await(&1, :infinity))
   end
 
-  defp build_extra({input, options}, project_nodes, extension) do
+  defp build_extra({input, options}, project_nodes, extension, config) do
     input = to_string(input)
     id = options[:filename] || input |> input_to_title() |> title_to_id()
-    build_extra(input, id, options[:title], options[:group], project_nodes, extension)
+    build_extra(input, id, options[:title], options[:group], project_nodes, extension, config)
   end
 
-  defp build_extra(input, project_nodes, extension) do
+  defp build_extra(input, project_nodes, extension, config) do
     id = input |> input_to_title() |> title_to_id()
-    build_extra(input, id, nil, "", project_nodes, extension)
+    build_extra(input, id, nil, "", project_nodes, extension, config)
   end
 
-  defp build_extra(input, id, title, group, project_nodes, extension) do
+  defp build_extra(input, id, title, group, project_nodes, extension, config) do
     if valid_extension_name?(input) do
       content =
         input
         |> File.read!()
         |> Autolink.project_doc(project_nodes, nil, extension)
 
+      group_pattern = GroupMatcher.match_extra config.groups_for_extras, input
+
       html_content = Markdown.to_html(content, file: input, line: 1)
       title = title || extract_title(html_content) || input_to_title(input)
-      %{id: id, title: title, group: group, content: html_content}
+      %{id: id, title: title, group: group_pattern || group, content: html_content}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end

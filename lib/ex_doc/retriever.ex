@@ -3,13 +3,15 @@ defmodule ExDoc.ModuleNode do
   Structure that represents a *module*
   """
 
-  defstruct id: nil, title: nil, module: nil, doc: nil, doc_line: nil,
-    docs: [], typespecs: [], source_path: nil, source_url: nil, type: nil
+  defstruct id: nil, title: nil, module: nil, group: nil, doc: nil,
+    doc_line: nil, docs: [], typespecs: [], source_path: nil,
+    source_url: nil, type: nil
 
   @type t :: %__MODULE__{
     id: nil | String.t,
     title: nil | String.t,
     module: nil | String.t,
+    group: nil | String.t,
     docs: list(),
     doc: nil | String.t,
     doc_line: non_neg_integer(),
@@ -81,6 +83,7 @@ defmodule ExDoc.Retriever do
   Functions to extract documentation information from modules.
   """
 
+  alias ExDoc.GroupMatcher
   alias ExDoc.Retriever.Error
   alias Kernel.Typespec
 
@@ -115,7 +118,10 @@ defmodule ExDoc.Retriever do
     modules
     |> Enum.map(&get_module(&1, config))
     |> Enum.filter(&(&1))
-    |> Enum.sort(&(&1.id <= &2.id))
+    |> Enum.sort_by(fn module ->
+      group_index = Enum.find_index(config.groups_for_modules, fn {k, _v} -> Atom.to_string(k) == module.group end)
+      {group_index || -1, module.id}
+    end)
   end
 
   defp filename_to_module(name) do
@@ -171,10 +177,13 @@ defmodule ExDoc.Retriever do
 
     {title, id} = module_title_and_id(module, type)
 
+    module_group = GroupMatcher.match_module config.groups_for_modules, module, id
+
     %ExDoc.ModuleNode{
       id: id,
       title: title,
       module: module_info.name,
+      group: module_group,
       type: type,
       docs: docs,
       doc: moduledoc,
