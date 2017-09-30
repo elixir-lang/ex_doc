@@ -3,7 +3,7 @@ defmodule Mix.Tasks.Docs do
 
   @shortdoc "Generate documentation for the project"
 
-  @moduledoc """
+  @moduledoc ~S"""
   Uses ExDoc to generate a static web page from the project documentation.
 
   ## Command line options
@@ -79,13 +79,14 @@ defmodule Mix.Tasks.Docs do
     * `:extras` - List of keywords, each key must indicate the path to additional
       Markdown pages, the value for each keyword (optional) gives you more control
       about the PATH and the title of the output files; default: `[]`. Example:
-      `["README.md", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing", group: "Join us!"]]`
+      `["README.md", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing"]]`
 
     * `:filter_prefix` - Include only modules that match the given prefix in
       the generated documentation. Example: "MyApp.Core"
 
-    * `:formatters` - Formatter to use; default: ["html"],
-      options: "html", "epub".
+    * `:formatters` - Formatter to use; default: ["html"], options: "html", "epub".
+
+    * `:groups_for_extras`, `:groups_for_modules` - See next section
 
     * `:language` - Identify the primary language of the documents, its value must be
       a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
@@ -113,9 +114,50 @@ defmodule Mix.Tasks.Docs do
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
 
+  ## Groups
+
+  ExDoc content can be organized in groups. This is done via the `:groups_for_extras`
+  and `:groups_for_modules`. For example, imagine you are storing extra guides in
+  your documentation which are organized per directory. In the extras section you
+  have:
+
+      extras: [
+        "guides/introduction/foo.md",
+        "guides/introduction/bar.md",
+
+        ...
+
+        "guides/advanced/baz.md",
+        "guides/advanced/bat.md",
+      ]
+
+  You can have those grouped as follows:
+
+      groups_for_extras: [
+        "Introduction": Path.wildcard("guides/introduction/*.md"),
+        "Advanced": Path.wildcard("guides/introduction/*.md")
+      ]
+
+  Or via a regex:
+
+      groups_for_extras: [
+        "Introduction": ~r"/introduction/"
+        "Advanced": ~r"/advanced/"
+      ]
+
+  Similar can be done for modules:
+
+      groups_for_modules: [
+        "Data types": [Atom, Regex, URI],
+        "Collections": [Enum, MapSet, Stream],
+      ]
+
+  A regex or the string name of the module is also supported.
+
   ## Umbrella project
 
-  ExDoc can be used in an umbrella project and generates a single documentation for all child apps.
+  ExDoc can be used in an umbrella project and generates a single documentation
+  for all child apps.
 
   Generating documentation per each child app can be achieved by running:
 

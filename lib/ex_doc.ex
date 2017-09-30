@@ -11,11 +11,11 @@ defmodule ExDoc do
     """
 
     @default %{
-      :formatter => "html",
-      :language => "en",
-      :output => "./doc",
-      :retriever => ExDoc.Retriever,
-      :source_ref => "master",
+      formatter: "html",
+      language: "en",
+      output: "./doc",
+      retriever: ExDoc.Retriever,
+      source_ref: "master",
     }
 
     @spec default(atom) :: term
@@ -35,15 +35,15 @@ defmodule ExDoc do
       deps: [],
       extra_section: nil,
       extras: [],
-      groups_for_extras: [],
       filter_prefix: nil,
       formatter: @default.formatter,
       formatter_opts: [],
+      groups_for_extras: [],
+      groups_for_modules: [],
       homepage_url: nil,
       language: @default.language,
       logo: nil,
       main: nil,
-      groups_for_modules: [],
       output: @default.output,
       project: nil,
       retriever: @default.retriever,

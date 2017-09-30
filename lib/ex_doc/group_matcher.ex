@@ -1,15 +1,19 @@
 defmodule ExDoc.GroupMatcher do
-  @moduledoc """
-  Match modules or extra pages to groups.
+  @moduledoc false
 
-  Matching does happen by explicitly matching names or using regular expressions.
-  """
   @type pattern :: Regex.t | module() | String.t
   @type patterns :: pattern | [pattern]
   @type group_patterns :: keyword(patterns)
 
   @doc """
-  Does try to find a matching group for the given module name or id
+  Finds the index of a given group.
+  """
+  def group_index(groups, group) do
+    Enum.find_index(groups, fn {k, _v} -> Atom.to_string(k) == group end) || -1
+  end
+
+  @doc """
+  Finds a matching group for the given module name or id.
   """
   @spec match_module(group_patterns, module(), String.t) :: String.t | nil
   def match_module(group_patterns, module, id) do
@@ -23,7 +27,7 @@ defmodule ExDoc.GroupMatcher do
   end
 
   @doc """
-  Does try to find a matching group for the given extra filename
+  Finds a matching group for the given extra filename
   """
   @spec match_extra(group_patterns, String.t) :: String.t | nil
   def match_extra(group_patterns, filename) do
@@ -38,11 +42,7 @@ defmodule ExDoc.GroupMatcher do
   defp match_group_patterns(group_patterns, matcher) do
     Enum.find_value(group_patterns, fn {group, patterns} ->
       patterns = List.wrap patterns
-      match_patterns(patterns, matcher) && Atom.to_string(group)
+      Enum.any?(patterns, matcher) && Atom.to_string(group)
     end)
-  end
-
-  defp match_patterns(patterns, matcher) do
-    Enum.any?(patterns, matcher) || nil
   end
 end

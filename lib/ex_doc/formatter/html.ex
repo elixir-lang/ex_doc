@@ -176,36 +176,39 @@ defmodule ExDoc.Formatter.HTML do
   Builds extra nodes by normalizing the config entries.
   """
   def build_extras(project_nodes, config, extension) do
+    groups = config.groups_for_extras
+
     config.extras
     |> Enum.map(&Task.async(fn ->
-        build_extra(&1, project_nodes, extension, config)
+        build_extra(&1, project_nodes, extension, groups)
        end))
     |> Enum.map(&Task.await(&1, :infinity))
+    |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
 
-  defp build_extra({input, options}, project_nodes, extension, config) do
+  defp build_extra({input, options}, project_nodes, extension, groups) do
     input = to_string(input)
     id = options[:filename] || input |> input_to_title() |> title_to_id()
-    build_extra(input, id, options[:title], options[:group], project_nodes, extension, config)
+    build_extra(input, id, options[:title], project_nodes, extension, groups)
   end
 
-  defp build_extra(input, project_nodes, extension, config) do
+  defp build_extra(input, project_nodes, extension, groups) do
     id = input |> input_to_title() |> title_to_id()
-    build_extra(input, id, nil, "", project_nodes, extension, config)
+    build_extra(input, id, nil, project_nodes, extension, groups)
   end
 
-  defp build_extra(input, id, title, group, project_nodes, extension, config) do
+  defp build_extra(input, id, title, project_nodes, extension, groups) do
     if valid_extension_name?(input) do
       content =
         input
         |> File.read!()
         |> Autolink.project_doc(project_nodes, nil, extension)
 
-      group_pattern = GroupMatcher.match_extra config.groups_for_extras, input
-
+      group = GroupMatcher.match_extra groups, input
       html_content = Markdown.to_html(content, file: input, line: 1)
+
       title = title || extract_title(html_content) || input_to_title(input)
-      %{id: id, title: title, group: group_pattern || group, content: html_content}
+      %{id: id, title: title, group: group, content: html_content}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
     end
