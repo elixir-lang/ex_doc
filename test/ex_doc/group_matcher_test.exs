@@ -7,27 +7,27 @@ defmodule ExDoc.GroupMatcherTest do
       patterns = [
         "Group": [MyApp.SomeModule, :lists]
       ]
-      assert "Group" == match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule")
-      assert "Group" == match_module(patterns, :lists, ":lists")
-      assert nil == match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule")
+      assert match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule") == :"Group"
+      assert match_module(patterns, :lists, ":lists") == :"Group"
+      assert match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule") == nil
     end
 
     test "it can match modules by their string names" do
       patterns = [
         "Group": ["MyApp.SomeModule", ":lists"]
       ]
-      assert "Group" == match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule")
-      assert "Group" == match_module(patterns, :lists, ":lists")
-      assert nil == match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule")
+      assert match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule") == :"Group"
+      assert match_module(patterns, :lists, ":lists") == :"Group"
+      assert match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule") == nil
     end
 
     test "it can match modules by regular expressions" do
       patterns = [
         "Group": ~r/MyApp\..?/
       ]
-      assert "Group" == match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule")
-      assert "Group" == match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule")
-      assert nil == match_module(patterns, MyAppWeb.SomeOtherModule, "MyAppWeb.SomeOtherModule")
+      assert match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule") == :"Group"
+      assert match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule") == :"Group"
+      assert match_module(patterns, MyAppWeb.SomeOtherModule, "MyAppWeb.SomeOtherModule") == nil
     end
   end
 
@@ -36,17 +36,17 @@ defmodule ExDoc.GroupMatcherTest do
       patterns = [
         "Group": ["docs/handling/testing.md"]
       ]
-      assert "Group" == match_extra(patterns, "docs/handling/testing.md")
-      assert nil == match_extra(patterns, "docs/handling/setup.md")
+      assert match_extra(patterns, "docs/handling/testing.md") == :"Group"
+      assert match_extra(patterns, "docs/handling/setup.md") == nil
     end
 
     test "it can match extra files by regular expressions" do
       patterns = [
         "Group": ~r/docs\/handling?/
       ]
-      assert "Group" == match_extra(patterns, "docs/handling/testing.md")
-      assert "Group" == match_extra(patterns, "docs/handling/setup.md")
-      assert nil == match_extra(patterns, "docs/introduction.md")
+      assert match_extra(patterns, "docs/handling/testing.md") == :"Group"
+      assert match_extra(patterns, "docs/handling/setup.md") == :"Group"
+      assert match_extra(patterns, "docs/introduction.md") == nil
     end
   end
 end

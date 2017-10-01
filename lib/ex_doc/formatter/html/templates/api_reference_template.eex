@@ -7,7 +7,7 @@
   <section class="details-list">
     <h2 id="modules" class="section-heading">Modules</h2>
     <div class="summary">
-      <%= for module_node <- nodes_map.modules do
+      <%= for module_node <- Enum.sort(nodes_map.modules) do
         api_reference_entry_template(module_node)
       end %>
     </div>

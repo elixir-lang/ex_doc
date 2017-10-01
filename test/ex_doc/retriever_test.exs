@@ -50,21 +50,21 @@ defmodule ExDoc.RetrieverTest do
       [module_node] = docs_from_files ["CompiledWithDocs"], groups_for_modules: [
         "Group": [CompiledWithDocs]
       ]
-      assert module_node.group == "Group"
+      assert module_node.group == :"Group"
     end
 
     test "string" do
       [module_node] = docs_from_files ["CompiledWithDocs"], groups_for_modules: [
         "Group": ["CompiledWithDocs"]
       ]
-      assert module_node.group == "Group"
+      assert module_node.group == :"Group"
     end
 
     test "regex" do
       [module_node] = docs_from_files ["CompiledWithDocs"], groups_for_modules: [
         "Group": ~r/^CompiledWith.?/
       ]
-      assert module_node.group == "Group"
+      assert module_node.group == :"Group"
     end
   end
 

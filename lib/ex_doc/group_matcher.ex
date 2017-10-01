@@ -9,13 +9,13 @@ defmodule ExDoc.GroupMatcher do
   Finds the index of a given group.
   """
   def group_index(groups, group) do
-    Enum.find_index(groups, fn {k, _v} -> Atom.to_string(k) == group end) || -1
+    Enum.find_index(groups, fn {k, _v} -> k == group end) || -1
   end
 
   @doc """
   Finds a matching group for the given module name or id.
   """
-  @spec match_module(group_patterns, module(), String.t) :: String.t | nil
+  @spec match_module(group_patterns, module(), String.t) :: atom() | nil
   def match_module(group_patterns, module, id) do
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do
@@ -29,7 +29,7 @@ defmodule ExDoc.GroupMatcher do
   @doc """
   Finds a matching group for the given extra filename
   """
-  @spec match_extra(group_patterns, String.t) :: String.t | nil
+  @spec match_extra(group_patterns, String.t) :: atom() | nil
   def match_extra(group_patterns, filename) do
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do
@@ -42,7 +42,7 @@ defmodule ExDoc.GroupMatcher do
   defp match_group_patterns(group_patterns, matcher) do
     Enum.find_value(group_patterns, fn {group, patterns} ->
       patterns = List.wrap patterns
-      Enum.any?(patterns, matcher) && Atom.to_string(group)
+      Enum.any?(patterns, matcher) && group
     end)
   end
 end
