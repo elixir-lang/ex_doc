@@ -91,13 +91,11 @@ export function search (value) {
 
     var modules = findIn(nodes.modules, safeVal)
     var exceptions = findIn(nodes.exceptions, safeVal)
-    var protocols = findIn(nodes.protocols, safeVal)
     var tasks = findIn(nodes.tasks, safeVal)
 
     // add to the results
     pushLevel(levels, modules, 'Modules')
     pushLevel(levels, exceptions, 'Exceptions')
-    pushLevel(levels, protocols, 'Protocols')
     pushLevel(levels, tasks, 'Mix Tasks')
 
     var results = resultsTemplate({

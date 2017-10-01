@@ -25,17 +25,6 @@
   </section>
 <% end %>
 
-<%= if nodes_map.protocols != [] do %>
-  <section class="details-list">
-    <h2 id="protocols" class="section-heading">Protocols</h2>
-    <div class="summary">
-      <%= for protocol_node <- nodes_map.protocols do
-        api_reference_entry_template(protocol_node)
-      end %>
-    </div>
-  </section>
-<% end %>
-
 <%= if nodes_map.tasks != [] do %>
   <section class="details-list">
     <h2 id="tasks" class="section-heading">Mix Tasks</h2>

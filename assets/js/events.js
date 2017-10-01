@@ -16,7 +16,6 @@ var SIDEBAR_TYPES = [
   '#extras-list',
   '#modules-list',
   '#exceptions-list',
-  '#protocols-list',
   '#tasks-list',
   '#search-list'
 ]
@@ -47,10 +46,10 @@ function collapse () {
  * Fill the sidebar with links to different nodes
  *
  * This function replaces an empty unordered list with an
- * unordered list full of links to the different protocols, exceptions
+ * unordered list full of links to the different tasks, exceptions
  * and modules mentioned in the documentation.
  *
- * @param {Object} nodes - Container of protocols, exceptions and modules.
+ * @param {Object} nodes - Container of tasks, exceptions and modules.
  * @param {String} filter - Filter of nodes, by default 'modules'.
  */
 function fillSidebarWithNodes (nodes, filter) {
@@ -86,7 +85,6 @@ function addEventListeners () {
   SIDEBAR_NAV.on('click', '#extras-list', createHandler('extras'))
   SIDEBAR_NAV.on('click', '#modules-list', createHandler('modules'))
   SIDEBAR_NAV.on('click', '#exceptions-list', createHandler('exceptions'))
-  SIDEBAR_NAV.on('click', '#protocols-list', createHandler('protocols'))
   SIDEBAR_NAV.on('click', '#tasks-list', createHandler('tasks'))
 
   $('.sidebar-search input').on('keydown', function (e) {

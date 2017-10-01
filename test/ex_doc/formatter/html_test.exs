@@ -177,7 +177,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~s("modules":[])
     assert content =~ ~s("exceptions":[])
-    assert content =~ ~s("protocols":[])
     assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","group":"","headers":[]},)
     assert content =~ ~s({"id":"readme","title":"README","group":"","headers":[{"id":"Header sample","anchor":"header-sample"},)
   end

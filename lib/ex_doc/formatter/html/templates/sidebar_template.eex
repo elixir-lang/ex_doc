@@ -38,10 +38,6 @@
       <li><a id="exceptions-list" href="#full-list">Exceptions</a></li>
     <% end %>
 
-    <%= if nodes_map.protocols != [] do %>
-      <li><a id="protocols-list" href="#full-list">Protocols</a></li>
-    <% end %>
-
     <%= if nodes_map.tasks != [] do %>
       <li><a id="tasks-list" href="#full-list">Mix Tasks</a></li>
     <% end %>
