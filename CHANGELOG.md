@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.17.0
+
+  * Enhancements
+    * Allow modules to be grouped on the sidebar with the `:groups_for_modules` option
+    * Allow extras to be grouped on the sidebar with the `:groups_for_extras` option
+
+  * Backwards incompatible changes
+    * The previous `:group` option that could be specified for each entry in `:extras` is no longer supported
+    * No longer add a specific section for "Protocols". If you would like to segregate the protocols in your application, use the new `:groups_for_modules` functionality
+
 ## v0.16.4
 
   * Enhancements
