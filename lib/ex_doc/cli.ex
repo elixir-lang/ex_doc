@@ -54,23 +54,19 @@ defmodule ExDoc.CLI do
     opts =
       opts
       |> Keyword.put(:source_beam, source_beam)
+      |> extra_files_options()
       |> merge_config()
     generator.(project, version, opts)
   end
 
   defp merge_config(opts) do
-    opts
-    |> formatter_options()
-    |> extra_files_options()
-  end
-
-  defp formatter_options(opts) do
     case Keyword.fetch(opts, :config) do
       {:ok, config} ->
         opts
         |> Keyword.delete(:config)
-        |> Keyword.put(:formatter_opts, read_config(config))
-      _ -> opts
+        |> Keyword.merge(read_config(config))
+      _ ->
+        opts
     end
   end
 
