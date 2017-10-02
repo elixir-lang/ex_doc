@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.17.1
+
+  * Bug fixes
+    * Fix broken search caused by outdated JavaScript files
+
 ## v0.17.0
 
   * Enhancements
