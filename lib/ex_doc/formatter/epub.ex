@@ -1,6 +1,6 @@
 defmodule ExDoc.Formatter.EPUB do
   @moduledoc """
-  Provide EPUB documentation
+  Generates EPUB documentation for Elixir projects.
   """
 
   @mimetype "application/epub+zip"
@@ -8,7 +8,7 @@ defmodule ExDoc.Formatter.EPUB do
   alias ExDoc.Formatter.HTML
 
   @doc """
-  Generate EPUB documentation for the given modules
+  Generate EPUB documentation for the given modules.
   """
   @spec run(list, ExDoc.Config.t) :: String.t
   def run(project_nodes, config) when is_map(config) do

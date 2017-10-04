@@ -1,6 +1,6 @@
 defmodule ExDoc.Formatter.HTML do
   @moduledoc """
-  Generate HTML documentation for Elixir projects
+  Generates HTML documentation for Elixir projects.
   """
 
   alias __MODULE__.{Assets, Autolink, Templates}
@@ -9,7 +9,7 @@ defmodule ExDoc.Formatter.HTML do
   @main "api-reference"
 
   @doc """
-  Generate HTML documentation for the given modules
+  Generate HTML documentation for the given modules.
   """
   @spec run(list, ExDoc.Config.t) :: String.t
   def run(project_nodes, config) when is_map(config) do

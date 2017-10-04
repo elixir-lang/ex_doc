@@ -1,11 +1,8 @@
 defmodule ExDoc.CLI do
-  @moduledoc """
-  Command line parser for ExDoc
-  """
+  @moduledoc false
 
   @doc """
-  Handles the command line parsing and triggers the required mechanism to
-  transform the Markdown documents into a specified format (default is HTML).
+  Handles the command line parsing for the escript.
   """
   def main(args, generator \\ &ExDoc.generate_docs/3) do
     {opts, args, _invalid} =

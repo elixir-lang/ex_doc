@@ -1,6 +1,6 @@
 defmodule ExDoc.ModuleNode do
   @moduledoc """
-  Structure that represents a *module*
+  Structure that represents a module.
   """
 
   defstruct id: nil, title: nil, module: nil, group: nil, doc: nil,
@@ -24,7 +24,7 @@ end
 
 defmodule ExDoc.FunctionNode do
   @moduledoc """
-  Structure that holds all the elements of an individual *function*
+  Structure that represents an individual function.
   """
 
   defstruct id: nil, name: nil, arity: 0, defaults: [], doc: [],
@@ -49,7 +49,7 @@ end
 
 defmodule ExDoc.TypeNode do
   @moduledoc """
-  Structure that holds all the elements of an individual *type*
+  Structure that represents an individual type.
   """
 
   defstruct id: nil, name: nil, arity: 0, type: nil, doc_line: nil,
@@ -71,17 +71,14 @@ defmodule ExDoc.TypeNode do
   }
 end
 
-defmodule ExDoc.Retriever.Error do
-  @moduledoc """
-  Structure that hold the message of a given exception
-  """
-  defexception [:message]
-end
-
 defmodule ExDoc.Retriever do
-  @moduledoc """
-  Functions to extract documentation information from modules.
-  """
+  # Functions to extract documentation information from modules.
+  @moduledoc false
+
+  defmodule Error do
+    @moduledoc false
+    defexception [:message]
+  end
 
   alias ExDoc.GroupMatcher
   alias ExDoc.Retriever.Error
