@@ -24,8 +24,8 @@ var environment = $.util.env.type || 'development'
 var isProduction = environment === 'production'
 
 var distPath = {
-  html: 'priv/ex_doc/formatter/html/assets/dist',
-  epub: 'priv/ex_doc/formatter/epub/assets/dist'
+  html: 'formatters/html/dist',
+  epub: 'formatters/epub/dist'
 }
 
 var npmPlugin = new LessPluginNpmImport()
@@ -52,18 +52,12 @@ var languages = [
 // -----
 
 gulp.task('buildHighlight', function (done) {
-  exec('npm install', {
+  exec('node tools/build.js -n ' + languages.join(' '), {
     cwd: './node_modules/highlight.js'
   }, function (err, stdout, stderr) {
     if (err) return done(err)
 
-    exec('node tools/build.js -n ' + languages.join(' '), {
-      cwd: './node_modules/highlight.js'
-    }, function (err, stdout, stderr) {
-      if (err) return done(err)
-
-      done()
-    })
+    done()
   })
 })
 

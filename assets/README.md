@@ -1,8 +1,8 @@
 # Assets
 
 In this directory live all assets for `ExDoc`. The ready to use built
-versions are found in `priv/ex_doc/formatter/{html,epub}/assets/dist`. To
-change any of them read please read the following instructions:
+versions are found in `formatters/{html,epub}/dist`. To change any of
+them read please read the following instructions:
 
 ## Dependencies
 
@@ -10,8 +10,8 @@ To work on these assets you need to install [Node.js] and [npm] first (probably
 as superuser or administrator). After that execute the following commands:
 
 ```bash
-$ npm install -g gulp
-$ npm install
+$ yarn global add gulp
+$ yarn install
 ```
 
 Now many gulp tasks are available via the `gulp` command line.
