@@ -1,15 +1,15 @@
 defmodule ExDoc.Formatter.HTML do
   @moduledoc """
-  Generate HTML documentation for Elixir projects
+  Generates HTML documentation for Elixir projects.
   """
 
   alias __MODULE__.{Assets, Autolink, Templates}
-  alias ExDoc.Markdown
+  alias ExDoc.{Markdown, GroupMatcher}
 
   @main "api-reference"
 
   @doc """
-  Generate HTML documentation for the given modules
+  Generate HTML documentation for the given modules.
   """
   @spec run(list, ExDoc.Config.t) :: String.t
   def run(project_nodes, config) when is_map(config) do
@@ -18,12 +18,11 @@ defmodule ExDoc.Formatter.HTML do
 
     build = Path.join(config.output, ".build")
     output_setup(build, config)
-
     linked = Autolink.all(project_nodes, ".html", config.deps)
+
     nodes_map = %{
       modules: filter_list(:module, linked),
       exceptions: filter_list(:exception, linked),
-      protocols: filter_list(:protocol, linked),
       tasks: filter_list(:task, linked)
     }
 
@@ -42,7 +41,6 @@ defmodule ExDoc.Formatter.HTML do
       generate_not_found(nodes_map, config) ++
       generate_list(nodes_map.modules, nodes_map, config) ++
       generate_list(nodes_map.exceptions, nodes_map, config) ++
-      generate_list(nodes_map.protocols, nodes_map, config) ++
       generate_list(nodes_map.tasks, nodes_map, config) ++
       generate_index(config)
 
@@ -176,32 +174,37 @@ defmodule ExDoc.Formatter.HTML do
   Builds extra nodes by normalizing the config entries.
   """
   def build_extras(project_nodes, config, extension) do
+    groups = config.groups_for_extras
+
     config.extras
     |> Enum.map(&Task.async(fn ->
-        build_extra(&1, project_nodes, extension)
+        build_extra(&1, project_nodes, extension, groups)
        end))
     |> Enum.map(&Task.await(&1, :infinity))
+    |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
 
-  defp build_extra({input, options}, project_nodes, extension) do
+  defp build_extra({input, options}, project_nodes, extension, groups) do
     input = to_string(input)
     id = options[:filename] || input |> input_to_title() |> title_to_id()
-    build_extra(input, id, options[:title], options[:group], project_nodes, extension)
+    build_extra(input, id, options[:title], project_nodes, extension, groups)
   end
 
-  defp build_extra(input, project_nodes, extension) do
+  defp build_extra(input, project_nodes, extension, groups) do
     id = input |> input_to_title() |> title_to_id()
-    build_extra(input, id, nil, "", project_nodes, extension)
+    build_extra(input, id, nil, project_nodes, extension, groups)
   end
 
-  defp build_extra(input, id, title, group, project_nodes, extension) do
+  defp build_extra(input, id, title, project_nodes, extension, groups) do
     if valid_extension_name?(input) do
       content =
         input
         |> File.read!()
         |> Autolink.project_doc(project_nodes, nil, extension)
 
+      group = GroupMatcher.match_extra groups, input
       html_content = Markdown.to_html(content, file: input, line: 1)
+
       title = title || extract_title(html_content) || input_to_title(input)
       %{id: id, title: title, group: group, content: html_content}
     else
@@ -283,7 +286,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   def filter_list(:module, nodes) do
-    Enum.filter(nodes, &(not &1.type in [:exception, :protocol, :impl, :task]))
+    Enum.filter(nodes, &(not &1.type in [:exception, :impl, :task]))
   end
 
   def filter_list(type, nodes) do

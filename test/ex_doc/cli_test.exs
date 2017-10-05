@@ -12,14 +12,15 @@ defmodule ExDoc.CLITest do
   end
 
   test "loading config" do
-    File.write!("test.config", ~s([key: "val"]))
+    File.write!("test.config", ~s([extras: ["README.md"]]))
 
     {project, version, opts} =
-      run(["ExDoc", "--extra-section", "Guides", "--extra", "README.md", "1.2.3", "...", "-c", "test.config"])
+      run(["ExDoc", "--extra-section", "Guides", "1.2.3", "...", "-c", "test.config"])
 
     assert project == "ExDoc"
     assert version == "1.2.3"
-    assert Enum.sort(opts) == [extra_section: "Guides", extras: ["README.md"], formatter_opts: [key: "val"], source_beam: "..."]
+    assert Enum.sort(opts) ==
+           [extra_section: "Guides", extras: ["README.md"], source_beam: "..."]
   after
     File.rm!("test.config")
   end
@@ -67,7 +68,7 @@ defmodule ExDoc.CLITest do
   end
 
   test "arguments that are not aliased" do
-    File.write!("not_aliased.config", ~s([extra: "README2.md"]))
+    File.write!("not_aliased.config", ~s([key: "val"]))
 
     args = [
         "ExDoc", "1.2.3", "ebin",
@@ -97,8 +98,8 @@ defmodule ExDoc.CLITest do
       extras: ["README.md", "Foo", "Bar"],
       filter_prefix: "prefix_",
       formatter: "html",
-      formatter_opts: [extra: "README2.md"],
       homepage_url: "http://example.com",
+      key: "val",
       logo: "logo.png",
       main: "Main",
       output: "html",

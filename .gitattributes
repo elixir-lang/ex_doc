@@ -1,1 +1,2 @@
-/priv/ex_doc/formatter/html/assets/dist/* -diff
+/formatters/html/dist/* -diff
+/formatters/html/dist/* -diff

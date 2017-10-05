@@ -1,11 +1,8 @@
 defmodule ExDoc.CLI do
-  @moduledoc """
-  Command line parser for ExDoc
-  """
+  @moduledoc false
 
   @doc """
-  Handles the command line parsing and triggers the required mechanism to
-  transform the Markdown documents into a specified format (default is HTML).
+  Handles the command line parsing for the escript.
   """
   def main(args, generator \\ &ExDoc.generate_docs/3) do
     {opts, args, _invalid} =
@@ -54,23 +51,19 @@ defmodule ExDoc.CLI do
     opts =
       opts
       |> Keyword.put(:source_beam, source_beam)
+      |> extra_files_options()
       |> merge_config()
     generator.(project, version, opts)
   end
 
   defp merge_config(opts) do
-    opts
-    |> formatter_options()
-    |> extra_files_options()
-  end
-
-  defp formatter_options(opts) do
     case Keyword.fetch(opts, :config) do
       {:ok, config} ->
         opts
         |> Keyword.delete(:config)
-        |> Keyword.put(:formatter_opts, read_config(config))
-      _ -> opts
+        |> Keyword.merge(read_config(config))
+      _ ->
+        opts
     end
   end
 

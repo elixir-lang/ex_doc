@@ -1,5 +1,5 @@
 defmodule ExDocTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   # Simple retriever that returns whatever is passed into it
   defmodule IdentityRetriever do
@@ -18,8 +18,12 @@ defmodule ExDocTest do
   test "build_config & normalize_options" do
     project = "Elixir"
     version = "1"
-    options = [formatter: IdentityFormatter, retriever: IdentityRetriever,
-               source_root: "root_dir", source_beam: "beam_dir",]
+    options = [
+      formatter: IdentityFormatter,
+      retriever: IdentityRetriever,
+      source_root: "root_dir",
+      source_beam: "beam_dir",
+    ]
 
     {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/ex_doc"])
     assert config.output == "test/tmp/ex_doc"
@@ -29,6 +33,24 @@ defmodule ExDocTest do
 
     {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/ex_doc//"])
     assert config.output == "test/tmp/ex_doc"
+  end
+
+  test "uses custom markdown processor" do
+    project = "Elixir"
+    version = "1"
+    options = [
+      formatter: IdentityFormatter,
+      markdown_processor: Sample,
+      output: "test/tmp/ex_doc",
+      retriever: IdentityRetriever,
+      source_root: "root_dir",
+      source_beam: "beam_dir",
+    ]
+
+    ExDoc.generate_docs(project, version, options)
+    assert Application.fetch_env!(:ex_doc, :markdown_processor) == Sample
+  after
+    Application.delete_env(:ex_doc, :markdown_processor)
   end
 
   test "source_beam sets source dir" do

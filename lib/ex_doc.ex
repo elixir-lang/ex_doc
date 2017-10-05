@@ -1,7 +1,5 @@
 defmodule ExDoc do
-  @moduledoc """
-  Elixir Documentation System. ExDoc produces documentation for Elixir projects
-  """
+  @moduledoc false
 
   defmodule Config do
     @moduledoc """
@@ -11,11 +9,11 @@ defmodule ExDoc do
     """
 
     @default %{
-      :formatter => "html",
-      :language => "en",
-      :output => "./doc",
-      :retriever => ExDoc.Retriever,
-      :source_ref => "master",
+      formatter: "html",
+      language: "en",
+      output: "./doc",
+      retriever: ExDoc.Retriever,
+      source_ref: "master",
     }
 
     @spec default(atom) :: term
@@ -37,7 +35,8 @@ defmodule ExDoc do
       extras: [],
       filter_prefix: nil,
       formatter: @default.formatter,
-      formatter_opts: [],
+      groups_for_extras: [],
+      groups_for_modules: [],
       homepage_url: nil,
       language: @default.language,
       logo: nil,
@@ -63,13 +62,14 @@ defmodule ExDoc do
        deps: [{ebin_path :: String.t, doc_url :: String.t}],
        extra_section: nil | String.t,
        extras: list(),
+       groups_for_extras: keyword(),
        filter_prefix: nil | String.t,
        formatter: nil | String.t,
-       formatter_opts: Keyword.t,
        homepage_url: nil | String.t,
        language: String.t,
        logo: nil | Path.t,
        main: nil | String.t,
+       groups_for_modules: keyword(),
        output: nil | Path.t,
        project: nil | String.t,
        retriever: :atom,
@@ -98,6 +98,9 @@ defmodule ExDoc do
   @spec generate_docs(String.t, String.t, Keyword.t) :: atom
   def generate_docs(project, vsn, options) when is_binary(project) and is_binary(vsn) and is_list(options) do
     config = build_config(project, vsn, options)
+    if processor = options[:markdown_processor] do
+      ExDoc.Markdown.put_markdown_processor(processor)
+    end
     docs = config.retriever.docs_from_dir(config.source_beam, config)
     find_formatter(config.formatter).run(docs, config)
   end

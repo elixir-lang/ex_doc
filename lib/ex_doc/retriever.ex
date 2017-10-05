@@ -1,15 +1,17 @@
 defmodule ExDoc.ModuleNode do
   @moduledoc """
-  Structure that represents a *module*
+  Structure that represents a module.
   """
 
-  defstruct id: nil, title: nil, module: nil, doc: nil, doc_line: nil,
-    docs: [], typespecs: [], source_path: nil, source_url: nil, type: nil
+  defstruct id: nil, title: nil, module: nil, group: nil, doc: nil,
+    doc_line: nil, docs: [], typespecs: [], source_path: nil,
+    source_url: nil, type: nil
 
   @type t :: %__MODULE__{
     id: nil | String.t,
     title: nil | String.t,
     module: nil | String.t,
+    group: nil | String.t,
     docs: list(),
     doc: nil | String.t,
     doc_line: non_neg_integer(),
@@ -22,7 +24,7 @@ end
 
 defmodule ExDoc.FunctionNode do
   @moduledoc """
-  Structure that holds all the elements of an individual *function*
+  Structure that represents an individual function.
   """
 
   defstruct id: nil, name: nil, arity: 0, defaults: [], doc: [],
@@ -47,7 +49,7 @@ end
 
 defmodule ExDoc.TypeNode do
   @moduledoc """
-  Structure that holds all the elements of an individual *type*
+  Structure that represents an individual type.
   """
 
   defstruct id: nil, name: nil, arity: 0, type: nil, doc_line: nil,
@@ -69,18 +71,16 @@ defmodule ExDoc.TypeNode do
   }
 end
 
-defmodule ExDoc.Retriever.Error do
-  @moduledoc """
-  Structure that hold the message of a given exception
-  """
-  defexception [:message]
-end
-
 defmodule ExDoc.Retriever do
-  @moduledoc """
-  Functions to extract documentation information from modules.
-  """
+  # Functions to extract documentation information from modules.
+  @moduledoc false
 
+  defmodule Error do
+    @moduledoc false
+    defexception [:message]
+  end
+
+  alias ExDoc.GroupMatcher
   alias ExDoc.Retriever.Error
   alias Kernel.Typespec
 
@@ -115,7 +115,9 @@ defmodule ExDoc.Retriever do
     modules
     |> Enum.map(&get_module(&1, config))
     |> Enum.filter(&(&1))
-    |> Enum.sort(&(&1.id <= &2.id))
+    |> Enum.sort_by(fn module ->
+      {GroupMatcher.group_index(config.groups_for_modules, module.group), module.id}
+    end)
   end
 
   defp filename_to_module(name) do
@@ -171,10 +173,13 @@ defmodule ExDoc.Retriever do
 
     {title, id} = module_title_and_id(module, type)
 
+    module_group = GroupMatcher.match_module config.groups_for_modules, module, id
+
     %ExDoc.ModuleNode{
       id: id,
       title: title,
       module: module_info.name,
+      group: module_group,
       type: type,
       docs: docs,
       doc: moduledoc,
@@ -433,8 +438,8 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp anno_line(line) when is_integer(line), do: line |> abs()
-  defp anno_line(anno), do: :erl_anno.line(anno) |> abs()
+  defp anno_line(line) when is_integer(line), do: abs(line)
+  defp anno_line(anno), do: anno |> :erl_anno.line() |> abs()
 
   # Detect if a module is an exception, struct,
   # protocol, implementation or simply a module

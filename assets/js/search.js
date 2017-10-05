@@ -8,18 +8,13 @@
 
 import $ from 'jquery'
 import * as helpers from './helpers'
-import {closeSidebar, breakpoint} from './sidebar'
 import resultsTemplate from './templates/search-results.handlebars'
 
 // Local Variables
 // ---------------
 
-const $content = $('.content-inner')
+const $search = $('#search')
 const $input = $('.sidebar-search input')
-const $sidebarItems = $('#full-list li')
-let $results
-let $oldContent
-let searchCount = 0
 
 // Local Methods
 // -------------
@@ -49,6 +44,12 @@ function findNested (elements, parentId, matcher) {
       return result
     }
   }).filter(cleaner)
+}
+
+function pushLevel (levels, searchEntity, name) {
+  if (searchEntity.length > 0) {
+    levels.push({name: name, results: searchEntity})
+  }
 }
 
 export function findIn (elements, matcher) {
@@ -81,135 +82,29 @@ export function findIn (elements, matcher) {
   }).filter(cleaner)
 }
 
-export function getParameterByName (name, url) {
-  if (!url) {
-    url = window.location.href
-  }
-  const param = name.replace(/[\[\]]/g, '\\$&')
-  const regex = new RegExp('[?&]' + param + '(=([^&#]*)|&|#|$)')
-  const results = regex.exec(url)
-  if (!results) {
-    return null
-  }
-  if (!results[2]) {
-    return ''
-  }
-  return decodeURIComponent(results[2].replace(/\+/g, ' '))
-}
+export function search (value) {
+  var nodes = sidebarNodes
 
-function pushLevel (levels, searchEntity, name) {
-  if (searchEntity.length > 0) {
-    levels.push({name: name, results: searchEntity})
-  }
-}
+  if (value.replace(/\s/, '') !== '') {
+    var safeVal = new RegExp(helpers.escapeText(value), 'i')
+    var levels = []
 
-function search (nodes, value, addHistory) {
-  var safeVal = new RegExp(helpers.escapeText(value), 'i')
+    var modules = findIn(nodes.modules, safeVal)
+    var exceptions = findIn(nodes.exceptions, safeVal)
+    var tasks = findIn(nodes.tasks, safeVal)
 
-  var levels = []
+    // add to the results
+    pushLevel(levels, modules, 'Modules')
+    pushLevel(levels, exceptions, 'Exceptions')
+    pushLevel(levels, tasks, 'Mix Tasks')
 
-  var modules = findIn(nodes.modules, safeVal)
-  var exceptions = findIn(nodes.exceptions, safeVal)
-  var protocols = findIn(nodes.protocols, safeVal)
-  var tasks = findIn(nodes.tasks, safeVal)
+    var results = resultsTemplate({
+      value: value,
+      levels: levels,
+      empty: levels.length === 0
+    })
 
-  // sometimes we need to stop adding to the history if it already exists.
-  if (addHistory !== false && location.protocol !== 'file:') {
-    // we use this to track searches that are in the history
-    searchCount++
-    history.pushState({searchValue: value}, 'Searching for ' + value, 'search.html?q=' + value)
-  }
-
-  // add to the results
-  pushLevel(levels, modules, 'Modules')
-  pushLevel(levels, exceptions, 'Exceptions')
-  pushLevel(levels, protocols, 'Protocols')
-  pushLevel(levels, tasks, 'Mix Tasks')
-
-  if ($results) {
-    $results.remove()
-  }
-
-  $results = $(resultsTemplate({
-    value: value,
-    levels: levels,
-    empty: levels.length === 0
-  }))
-
-  $oldContent = $content.children()
-  $oldContent.hide()
-  $content.append($results)
-
-  // Auto-hide Menu if on Mobile device
-  window.screen.width < breakpoint ? closeSidebar() : null
-
-  // we use history to close the search
-  $results.find('.close-search').on('click', function (e) {
-    e.preventDefault()
-    closeResults(e)
-    history.go(-searchCount)
-  })
-
-  // every other link closes the search
-  $.merge($results.find('a').not('.close-search'), $sidebarItems).on('click', function (e) {
-    closeResults(e, false)
-  })
-
-  $results.fadeIn(function () {
-    // Scroll the container with all elements
-    $content.parent().scrollTop(0)
-  })
-}
-
-function closeResults (e, removeResults) {
-  var event = e || window.event
-  var $hashElement = document.getElementById(helpers.getLocationHash())
-  if (typeof event === 'object' && event !== null) {
-    if (event.metaKey || event.shiftKey || event.altKey ||
-        event.ctrlKey || event.button === 1 || event.button === 2) {
-      return
-    }
-  }
-  if ($hashElement && $hashElement.scrollIntoView) {
-    $hashElement.scrollIntoView()
-  }
-
-  if (removeResults !== false) {
-    // clear the search bar if someone closes results.
-    $input.val('')
-    if ($results) {
-      $results.remove()
-    }
-    if ($oldContent) {
-      $oldContent.fadeIn()
-    }
-  }
-}
-
-// Public Methods
-// --------------
-
-export function start (val, addHistory) {
-  var searchVal = val || $input.val()
-  if (searchVal === '') return
-  search(sidebarNodes, searchVal, addHistory)
-}
-
-export function popstateHandler (event) {
-  if (searchCount > 0) {
-    searchCount--
-  }
-
-  if (event.originalEvent.state == null) {
-    // NOTE: for reasons only known to the browser makers we need to reload here,
-    //       on back after navigating away the page (clicking a result in the search)
-    //       there is no original page content i.e. all that was display none is gone
-    //       note this doesn't happen in Safari, just FF and Chrome.
-    // document.location.reload(true)
-  } else if ('searchValue' in event.originalEvent.state) {
-    // when we have a searchValue, show the search but clearly don't push a history state
-    var searchValue = event.originalEvent.state.searchValue
-    $input.val(searchValue) // set the search box to the searchValue for this state
-    search(sidebarNodes, searchValue, false) // no history here, we already have one
+    $input.val(value)
+    $search.html(results)
   }
 }

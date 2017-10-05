@@ -176,9 +176,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
       |> Enum.map_join(",", &sidebar_items_by_type/1)
 
     if items == "" do
-      ~s/{"id":"#{module_node.id}","title":"#{module_node.title}"}/
+      ~s/{"id":"#{module_node.id}","title":"#{module_node.title}","group":"#{module_node.group}"}/
     else
-      ~s/{"id":"#{module_node.id}","title":"#{module_node.title}",#{items}}/
+      ~s/{"id":"#{module_node.id}","title":"#{module_node.title}","group":"#{module_node.group}",#{items}}/
     end
   end
 
@@ -202,12 +202,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp logo_path(%{logo: nil}), do: nil
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
 
-  defp sidebar_type(:protocol), do: "protocols"
   defp sidebar_type(:exception), do: "exceptions"
   defp sidebar_type(:extra), do: "extras"
   defp sidebar_type(:module), do: "modules"
   defp sidebar_type(:behaviour), do: "modules"
+  defp sidebar_type(:protocol), do: "modules"
   defp sidebar_type(:task), do: "tasks"
+  defp sidebar_type(:search), do: "search"
 
   def asset_rev(output, pattern) do
     output = Path.expand(output)

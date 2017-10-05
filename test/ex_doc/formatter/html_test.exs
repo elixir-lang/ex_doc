@@ -130,9 +130,9 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir()}/CompiledWithDocs.Nested.html")
 
-    assert [_] = "#{output_dir()}/dist/app-*.css" |> Path.wildcard
-    assert [_] = "#{output_dir()}/dist/app-*.js" |> Path.wildcard
-    assert [] = "#{output_dir()}/another_dir/dist/app-*.js.map" |> Path.wildcard
+    assert [_] = Path.wildcard("#{output_dir()}/dist/app-*.css")
+    assert [_] = Path.wildcard("#{output_dir()}/dist/app-*.js")
+    assert [] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.js.map")
 
     content = File.read!("#{output_dir()}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
@@ -145,9 +145,9 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/another_dir/CompiledWithDocs.html")
     assert File.regular?("#{output_dir()}/another_dir/RandomError.html")
 
-    assert [_] = "#{output_dir()}/another_dir/dist/app-*.css" |> Path.wildcard
-    assert [_] = "#{output_dir()}/another_dir/dist/app-*.js" |> Path.wildcard
-    assert [_] = "#{output_dir()}/another_dir/dist/app-*.js.map" |> Path.wildcard
+    assert [_] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.css")
+    assert [_] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.js")
+    assert [_] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.js.map")
 
     content = File.read!("#{output_dir()}/another_dir/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}
@@ -177,7 +177,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~s("modules":[])
     assert content =~ ~s("exceptions":[])
-    assert content =~ ~s("protocols":[])
     assert content =~ ~s("extras":[{"id":"api-reference","title":"API Reference","group":"","headers":[]},)
     assert content =~ ~s({"id":"readme","title":"README","group":"","headers":[{"id":"Header sample","anchor":"header-sample"},)
   end
@@ -228,7 +227,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "before_closing_*_tags are placed in the right place - generated pages" do
     config = doc_config([main: "readme"])
     generate_docs(config)
-    
+
     content = File.read!("#{output_dir()}/readme.html")
     assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
     assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
@@ -249,13 +248,17 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<title>Getting Started – Elixir v1.0.1</title>}
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"readme","title":"Getting Started","group":""}
-   end
+  end
 
   test "run generates pages with custom group" do
-    generate_docs(doc_config(extras: ["test/fixtures/README.md": [group: "Intro"]]))
+    extra_config = [
+      extras: ["test/fixtures/README.md"],
+      groups_for_extras: ["Intro": ~r/fixtures\/READ.?/]
+    ]
+    generate_docs(doc_config(extra_config))
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"readme","title":"README","group":"Intro"}
-   end
+  end
 
   test "run generates with auto-extracted title" do
     generate_docs(doc_config(extras: ["test/fixtures/ExtraPage.md"]))

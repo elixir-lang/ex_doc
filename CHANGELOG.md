@@ -1,5 +1,40 @@
 # Changelog
 
+## v0.17.1
+
+  * Bug fixes
+    * Fix broken search caused by outdated JavaScript files
+
+## v0.17.0
+
+  * Enhancements
+    * Allow modules to be grouped on the sidebar with the `:groups_for_modules` option
+    * Allow extras to be grouped on the sidebar with the `:groups_for_extras` option
+
+  * Backwards incompatible changes
+    * The previous `:group` option that could be specified for each entry in `:extras` is no longer supported
+    * No longer add a specific section for "Protocols". If you would like to segregate the protocols in your application, use the new `:groups_for_modules` functionality
+
+## v0.16.4
+
+  * Enhancements
+    * Generate favicon link if a logo is available
+
+  * Bug fixes
+    * Do not version epub filename as the doc directory is likely already versioned
+
+## v0.16.3
+
+  * Enhancements
+    * Make sure its own search.html page and provide history
+    * Generate source maps only if the `--debug` flag is given
+    * Users can now add custom HTML before the closing head tag and the closing body tag
+    * Highlight the target function/macro/type/callback when clicked
+
+  * Bug fixes
+    * Remove extra `term()` argument at start of macro spec
+    * Add unencoded link target for functions with special chars to cope with different behaviour in browsers
+
 ## v0.16.2
 
   * Enhancements

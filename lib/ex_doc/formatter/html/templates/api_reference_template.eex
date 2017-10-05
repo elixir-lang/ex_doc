@@ -7,7 +7,7 @@
   <section class="details-list">
     <h2 id="modules" class="section-heading">Modules</h2>
     <div class="summary">
-      <%= for module_node <- nodes_map.modules do
+      <%= for module_node <- Enum.sort_by(nodes_map.modules, & &1.id) do
         api_reference_entry_template(module_node)
       end %>
     </div>
@@ -20,17 +20,6 @@
     <div class="summary">
       <%= for exception_node <- nodes_map.exceptions do
         api_reference_entry_template(exception_node)
-      end %>
-    </div>
-  </section>
-<% end %>
-
-<%= if nodes_map.protocols != [] do %>
-  <section class="details-list">
-    <h2 id="protocols" class="section-heading">Protocols</h2>
-    <div class="summary">
-      <%= for protocol_node <- nodes_map.protocols do
-        api_reference_entry_template(protocol_node)
       end %>
     </div>
   </section>

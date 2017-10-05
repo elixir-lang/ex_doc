@@ -53,9 +53,13 @@ defmodule ExDoc.Markdown do
         processor
       :error ->
         processor = find_markdown_processor() || raise_no_markdown_processor()
-        Application.put_env(:ex_doc, @markdown_processor_key, processor)
+        put_markdown_processor(processor)
         processor
     end
+  end
+
+  def put_markdown_processor(processor) do
+    Application.put_env(:ex_doc, @markdown_processor_key, processor)
   end
 
   defp find_markdown_processor do

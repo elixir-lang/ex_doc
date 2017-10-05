@@ -1,7 +1,7 @@
 # ExDoc
 
-[![Build Status](https://secure.travis-ci.org/elixir-lang/ex_doc.svg?branch=master "Build Status")][build-status]
-[![Coverage Status](https://coveralls.io/repos/github/elixir-lang/ex_doc/badge.svg?branch=master)][coverage-status]
+[![Build Status](https://secure.travis-ci.org/elixir-lang/ex_doc.svg?branch=master "Build Status")](http://travis-ci.org/elixir-lang/ex_doc)
+[![Coverage Status](https://coveralls.io/repos/github/elixir-lang/ex_doc/badge.svg?branch=master)](https://coveralls.io/github/elixir-lang/ex_doc?branch=master)
 [![Ebert](https://ebertapp.io/github/elixir-lang/ex_doc.svg)](https://ebertapp.io/github/elixir-lang/ex_doc)
 
 ExDoc is a tool to generate documentation for your Elixir projects. In case you are looking for documentation for Elixir itself, [check out Elixir's website][elixir-lang].
@@ -14,7 +14,7 @@ To use ExDoc in your Mix projects, first add ExDoc as a dependency:
 
 ```elixir
 def deps do
-  [{:ex_doc, "~> 0.14", only: :dev, runtime: false}]
+  [{:ex_doc, "~> 0.16", only: :dev, runtime: false}]
 end
 ```
 
@@ -46,12 +46,10 @@ To see all options available when generating docs, run `mix help docs`. You may 
 
 You can ExDoc via the command line as follows:
 
-1. First clone and compile it:
+1. Install ExDoc as an escript:
 
     ```console
-    $ git clone https://github.com/elixir-lang/ex_doc.git
-    $ cd ex_doc
-    $ mix do deps.get, compile
+    $ mix escript.install hex ex_doc
     ```
 
 2. Then you are ready to use it in your projects. First, move into your project directory and make sure it is already compiled:
@@ -64,7 +62,7 @@ You can ExDoc via the command line as follows:
 3. Next invoke the ex_doc executable from your project:
 
     ```console
-    $ PATH_TO_YOUR_EXDOC/bin/ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
+    $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
     ```
 
 4. By default, ex_doc produces HTML files, but, you can also create a EPUB document passing the option `--formatter epub`:
@@ -130,9 +128,6 @@ ExDoc source code is released under Apache 2 License. The generated contents, ho
 
 Check the [LICENSE](LICENSE) file for more information.
 
-
-[coverage-status]: https://coveralls.io/github/elixir-lang/ex_doc?branch=master
-[build-status]: http://travis-ci.org/elixir-lang/ex_doc
 [earmark]: http://github.com/pragdave/earmark
 [elixir-lang]: http://elixir-lang.org/
 [cmark]: https://github.com/jgm/cmark
