@@ -1,5 +1,5 @@
 defmodule ExDocTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   # Simple retriever that returns whatever is passed into it
   defmodule IdentityRetriever do
