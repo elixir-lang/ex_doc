@@ -99,6 +99,8 @@ defmodule Mix.Tasks.Docs do
     * `:main` - Main page of the documentation. It may be a module or a
       generated page, like "Plug" or "api-reference"; default: "api-reference".
 
+    * `:markdown_processor` - The markdown processor to use;
+
     * `:source_beam` - Path to the beam directory; default: mix's compile path.
 
     * `:source_ref` - The branch/commit/tag used for source link inference;

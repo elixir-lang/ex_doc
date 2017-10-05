@@ -35,6 +35,24 @@ defmodule ExDocTest do
     assert config.output == "test/tmp/ex_doc"
   end
 
+  test "uses custom markdown processor" do
+    project = "Elixir"
+    version = "1"
+    options = [
+      formatter: IdentityFormatter,
+      markdown_processor: Sample,
+      output: "test/tmp/ex_doc",
+      retriever: IdentityRetriever,
+      source_root: "root_dir",
+      source_beam: "beam_dir",
+    ]
+
+    ExDoc.generate_docs(project, version, options)
+    assert Application.fetch_env!(:ex_doc, :markdown_processor) == Sample
+  after
+    Application.delete_env(:ex_doc, :markdown_processor)
+  end
+
   test "source_beam sets source dir" do
     options = [formatter: IdentityFormatter, retriever: IdentityRetriever,
                source_root: "root_dir", source_beam: "beam_dir"]
