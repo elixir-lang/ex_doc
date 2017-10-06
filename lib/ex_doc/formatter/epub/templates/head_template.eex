@@ -9,7 +9,7 @@
     <script src="<%= H.asset_rev "#{config.output}/OEBPS", "dist/app*.js" %>"></script>
     <%# Extra content needed by the current markdown processor (i.e. custom CSS) %>
     <%= ExDoc.Markdown.get_markdown_processor().before_closing_head_tag(:epub) %>
-    <%# Ectra content specified by the user (i.g. custom CSS) %>
+    <%# Extra content specified by the user (i.g. custom CSS) %>
     <%= config.before_closing_head_tag.(:epub) %>
   </head>
   <body>
