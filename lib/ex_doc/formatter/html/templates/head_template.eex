@@ -11,6 +11,9 @@
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
     <script src="<%= asset_rev config.output, "dist/sidebar_items*.js" %>"></script>
+    <%# Extra content needed by the current markdown processor (i.e. custom CSS) %>
+    <%= ExDoc.Markdown.get_markdown_processor().before_closing_head_tag(:html) %>
+    <%# Ectra content specified by the user (i.g. custom CSS) %>
     <%= config.before_closing_head_tag.(:html) %>
   </head>
   <body data-type="<%= sidebar_type(page.type) %>">

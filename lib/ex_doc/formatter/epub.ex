@@ -123,7 +123,9 @@ defmodule ExDoc.Formatter.EPUB do
   ## Helpers
 
   defp default_assets do
-    [{Assets.dist(), "OEBPS/dist"}, {Assets.metainfo(), "META-INF"}]
+    [{Assets.dist(), "OEBPS/dist"},
+     {Assets.metainfo(), "META-INF"},
+     {Assets.markdown_processor_assets(), ""}]
   end
 
   defp files_to_add(path) do

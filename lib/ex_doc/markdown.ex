@@ -47,7 +47,8 @@ defmodule ExDoc.Markdown do
     bin
   end
 
-  defp get_markdown_processor do
+  @doc false
+  def get_markdown_processor do
     case Application.fetch_env(:ex_doc, @markdown_processor_key) do
       {:ok, processor} ->
         processor

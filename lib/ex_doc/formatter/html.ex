@@ -162,7 +162,9 @@ defmodule ExDoc.Formatter.HTML do
 
   defp default_assets(config) do
     debug = if config.debug, do: [{Assets.debug(), "dist"}], else: []
-    [{Assets.dist(), "dist"}, {Assets.fonts(), "fonts"} | debug]
+    [{Assets.dist(), "dist"},
+     {Assets.fonts(), "fonts"},
+     {Assets.markdown_processor_assets(), ""} | debug]
   end
 
   defp build_api_reference(nodes_map, config) do
