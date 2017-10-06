@@ -34,7 +34,7 @@ defmodule ExDoc.MarkdownProcessor do
 
   ## Example
       def callback before_closing_head_tag(:html) do
-        # Include the Javascript specified in the assets/1 callback
+        # Include the CSS specified in the assets/1 callback
         ~S(<link rel="stylesheet" href="dist/custom.css"/>)
       end 
   """
