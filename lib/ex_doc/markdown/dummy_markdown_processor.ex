@@ -27,4 +27,4 @@ defmodule ExDoc.Markdown.DummyMarkdownProcessor do
       do: "UNIQUE:<dont-escape>&copy;MARKDOWN-PROCESSOR-BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
     def before_closing_body_tag(:epub),
       do: "UNIQUE:<dont-escape>&copy;MARKDOWN-PROCESSOR-BEFORE-CLOSING-BODY-TAG-EPUB</dont-escape>"
-  end
+end
