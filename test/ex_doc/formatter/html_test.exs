@@ -1,6 +1,7 @@
 defmodule ExDoc.Formatter.HTMLTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   import ExUnit.CaptureIO
+  alias ExDoc.Markdown.DummyMarkdownProcessor
 
   setup do
     File.rm_rf(output_dir())
@@ -20,6 +21,9 @@ defmodule ExDoc.Formatter.HTMLTest do
     File.read!(file)
   end
 
+  # The following module attributes contain the values for user-required content.
+  # Content required by the custom markdown processor is defined in its own module,
+  # and will be accessed as `DummyMarkdownProcessor.before_closing_*_tag(:html)`
   @before_closing_head_tag_content_html "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
   @before_closing_body_tag_content_html "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
   @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-EPUB</dont-escape>"
@@ -40,9 +44,7 @@ defmodule ExDoc.Formatter.HTMLTest do
      source_root: beam_dir(),
      source_beam: beam_dir(),
      logo: "test/fixtures/elixir.png",
-     extras: ["test/fixtures/README.md"],
-     before_closing_head_tag: &before_closing_head_tag/1,
-     before_closing_body_tag: &before_closing_body_tag/1]
+     extras: ["test/fixtures/README.md"]]
   end
 
   defp doc_config(config) do
@@ -216,22 +218,119 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
   end
 
-  test "before_closing_*_tags are placed in the right place - api reference file" do
-    generate_docs(doc_config())
+  # There are 3 possibilities for the `before_closing_*_tags`:
+  # - required by the user alone
+  # - required by the markdown processor alone
+  # - required by both the markdown processor and the user
+  # We will test the three possibilities independently
+
+  # 1. Required by the user alone
+  test "before_closing_*_tags required by the user are placed in the right place - api reference file" do
+    generate_docs(doc_config(
+      before_closing_head_tag: &before_closing_head_tag/1,
+      before_closing_body_tag: &before_closing_body_tag/1
+    ))
 
     content = File.read!("#{output_dir()}/api-reference.html")
     assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
     assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
   end
 
-  test "before_closing_*_tags are placed in the right place - generated pages" do
-    config = doc_config([main: "readme"])
+  test "before_closing_*_tags required by the user are placed in the right place - generated pages" do
+    config = doc_config(
+      main: "readme",
+      before_closing_head_tag: &before_closing_head_tag/1,
+      before_closing_body_tag: &before_closing_body_tag/1)
     generate_docs(config)
 
     content = File.read!("#{output_dir()}/readme.html")
     assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
     assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
   end
+
+  test "before_closing_*_tags required by the user - api reference file: no before_closing_*_tags required by the user" do
+    generate_docs(doc_config(
+      before_closing_head_tag: &before_closing_head_tag/1,
+      before_closing_body_tag: &before_closing_body_tag/1
+    ))
+
+    content = File.read!("#{output_dir()}/api-reference.html")
+    assert not (content =~ ~r[#{DummyMarkdownProcessor.before_closing_head_tag(:html)}\s*</head>])
+    assert not (content =~ ~r[#{DummyMarkdownProcessor.before_closing_body_tag(:html)}\s*</body>])
+  end
+
+  test "before_closing_*_tags required by the user - generated pages: no before_closing_*_tags required by the user" do
+    config = doc_config(
+      main: "readme",
+      before_closing_head_tag: &before_closing_head_tag/1,
+      before_closing_body_tag: &before_closing_body_tag/1)
+    generate_docs(config)
+
+    content = File.read!("#{output_dir()}/readme.html")
+    assert not (content =~ ~r[#{DummyMarkdownProcessor.before_closing_head_tag(:html)}\s*</head>])
+    assert not (content =~ ~r[#{DummyMarkdownProcessor.before_closing_body_tag(:html)}\s*</body>])
+  end
+
+  # 2. Required by the markdown processor alone
+  test "before_closing_*_tags required by the markdown processor are placed in the right place - api reference file" do
+    generate_docs(doc_config(markdown_processor: DummyMarkdownProcessor))
+
+    content = File.read!("#{output_dir()}/api-reference.html")
+    assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_head_tag(:html)}\s*</head>]
+    assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_body_tag(:html)}\s*</body>]
+  end
+
+  test "before_closing_*_tags required by the markdown processor are placed in the right place - generated pages" do
+    config = doc_config(markdown_processor: DummyMarkdownProcessor, main: "readme")
+    generate_docs(config)
+
+    content = File.read!("#{output_dir()}/readme.html")
+    assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_head_tag(:html)}\s*</head>]
+    assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_body_tag(:html)}\s*</body>]
+  end
+
+  test "before_closing_*_tags required by the markdown processor - api reference file: no before_closing_*_tags required by the user" do
+    generate_docs(doc_config(markdown_processor: DummyMarkdownProcessor))
+
+    content = File.read!("#{output_dir()}/api-reference.html")
+    assert not (content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>])
+    assert not (content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>])
+  end
+
+  test "before_closing_*_tags required by the markdown processor - generated pages: no before_closing_*_tags required by the user" do
+    config = doc_config(markdown_processor: DummyMarkdownProcessor, main: "readme")
+    generate_docs(config)
+
+    content = File.read!("#{output_dir()}/readme.html")
+    assert not (content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>])
+    assert not (content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>])
+  end
+
+  # 3. Required by both the user and the markdown processor
+  test "before_closing_*_tags required by (1) the user and (2) the markdown processor are placed in the right place - api reference file" do
+    generate_docs(doc_config(
+      before_closing_head_tag: &before_closing_head_tag/1,
+      before_closing_body_tag: &before_closing_body_tag/1,
+      markdown_processor: DummyMarkdownProcessor))
+
+    content = File.read!("#{output_dir()}/api-reference.html")
+    assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_head_tag(:html)}\s*#{@before_closing_head_tag_content_html}\s*</head>]
+    assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_body_tag(:html)}\s*#{@before_closing_body_tag_content_html}\s*</body>]
+  end
+
+  test "before_closing_*_tags required by (1) the user and (2) the markdown processor are placed in the right place - generated pages" do
+    config = doc_config(
+      markdown_processor: DummyMarkdownProcessor,
+      before_closing_head_tag: &before_closing_head_tag/1,
+      before_closing_body_tag: &before_closing_body_tag/1,
+      main: "readme")
+    generate_docs(config)
+
+    content = File.read!("#{output_dir()}/readme.html")
+    assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_head_tag(:html)}\s*#{@before_closing_head_tag_content_html}\s*</head>]
+    assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_body_tag(:html)}\s*#{@before_closing_body_tag_content_html}\s*</body>]
+  end
+  # End of the tests for the `before_closing_*_tag` setting.
 
   test "run generates pages with custom names" do
     generate_docs(doc_config(extras: ["test/fixtures/README.md": [filename: "GETTING-STARTED"]]))
@@ -294,7 +393,14 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute File.regular?("#{output_dir()}/Unknown.html")
   end
 
-  test "run generates assets" do
+  # There are 3 possibilities when requiring:
+  # - required by the user alone
+  # - required by the markdown processor alone
+  # - required by both the markdown processor and the user
+  # We will test the three possibilities independently
+
+  # 1. Required by the user alone
+  test "assets required by the user end up in the right place" do
     File.mkdir_p!("test/tmp/html_assets/hello")
     File.touch!("test/tmp/html_assets/hello/world")
     generate_docs(doc_config(assets: "test/tmp/html_assets", logo: "test/fixtures/elixir.png"))
@@ -303,6 +409,36 @@ defmodule ExDoc.Formatter.HTMLTest do
   after
     File.rm_rf!("test/tmp/html_assets")
   end
+
+  # 2. Required by the markdown processor alone
+  test "assets required by the markdown processor end up in the right place" do
+    generate_docs(doc_config(markdown_processor: DummyMarkdownProcessor))
+    # Test the assets added by the markdown processor
+    for [{filename, content}] <- DummyMarkdownProcessor.assets(:html) do
+      # Filename matches
+      assert File.regular?("#{output_dir()}/#{filename}")
+      # Content matches
+      assert File.read!("#{output_dir()}/#{filename}") == content
+    end
+  end
+
+  # 3. Required by both the user and the markdown processor
+  test "assets required by the user and markdown processor end up in the right place" do
+   File.mkdir_p!("test/tmp/html_assets/hello")
+    File.touch!("test/tmp/html_assets/hello/world")
+    generate_docs(doc_config(
+      assets: "test/tmp/html_assets",
+      markdown_processor: DummyMarkdownProcessor,
+      logo: "test/fixtures/elixir.png"))
+    # Test the assets added by the markdown processor
+    for [{filename, content}] <- DummyMarkdownProcessor.assets(:html) do
+      # Filename matches
+      assert File.regular?("#{output_dir()}/#{filename}")
+      # Content matches
+      assert File.read!("#{output_dir()}/#{filename}") == content
+    end
+  end
+  # End of the tests for asset definition.
 
   test "run generates logo overriding previous entries" do
     File.mkdir_p!("#{output_dir()}/assets")
