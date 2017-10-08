@@ -6,9 +6,9 @@
         <div><img src="assets/logo<%= Path.extname(logo) %>" alt="Logo"/></div>
       <% end %>
     </div>
-    <%# Extra content needed by the current markdown processor (i.e. custom CSS) %>
+    <%# Extra content needed by the current markdown processor (e.g. custom Javascipt) %>
     <%= ExDoc.Markdown.get_markdown_processor().before_closing_body_tag(:epub) %>
-    <%# Extra content specified by the user (i.g. custom CSS) %>
+    <%# Extra content specified by the user (e.g. custom Javascipt) %>
     <%= config.before_closing_body_tag.(:epub) %>
   </body>
 </html>
