@@ -37,7 +37,7 @@ defmodule ExDoc.MarkdownProcessor do
   - `custom.css` becomes `custom-css.css`
 
   ## Example
-      def callback before_closing_head_tag(_) do
+      def callback assets(_) do
         [{"dist/custom-css.css", custom_css_content()},
          {"dist/custom-js.js", custom_js_content()}]
       end
