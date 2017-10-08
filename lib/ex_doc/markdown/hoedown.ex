@@ -4,14 +4,11 @@ defmodule ExDoc.Markdown.Hoedown do
   """
   @behaviour ExDoc.MarkdownProcessor
 
-  def assets(:html), do: []
-  def assets(:epub), do: []
-  
-  def before_closing_head_tag(:html), do: ""
-  def before_closing_head_tag(:epub), do: ""
-  
-  def before_closing_body_tag(:html), do: ""
-  def before_closing_body_tag(:epub), do: ""
+  def assets(_), do: []
+
+  def before_closing_head_tag(_), do: ""
+
+  def before_closing_body_tag(_), do: ""
 
   @doc """
   Check if the Hoedown MarkDown parser module is available. Otherwise, try to
