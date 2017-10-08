@@ -125,7 +125,15 @@ defmodule ExDoc.Formatter.EPUB do
   defp default_assets do
     [{Assets.dist(), "OEBPS/dist"},
      {Assets.metainfo(), "META-INF"},
-     {Assets.markdown_processor_assets(), ""}]
+     # Implementation Note:
+     # --------------------
+     # In the EPUB format, extra files such as CSS and Javascript must
+     # be included inside the OEBPS directory.
+     # The file "OEBPS/file.ext" will be referenced inside pages as "file.ext".
+     # This means that as long as the assets are included with the "OEBPS" prefix,
+     # they will be accessible as if it were an HTML document.
+     # This allows us to reuse pretty much all logic between the `:epub` and the `:html` formats.
+     {Assets.markdown_processor_assets(), "OEBPS"}]
   end
 
   defp files_to_add(path) do
