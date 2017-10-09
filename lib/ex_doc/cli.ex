@@ -30,7 +30,7 @@ defmodule ExDoc.CLI do
           language: :string,
           source_ref: :string,
           version: :boolean,
-        ],
+        ]
       )
 
     if List.keymember?(opts, :version, 0) do
