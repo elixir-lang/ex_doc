@@ -18,6 +18,8 @@ defmodule ExDoc.Markdown.DummyMarkdownProcessor do
 
     def available?(), do: true
 
+    def configure(_), do: :ok
+
     def before_closing_head_tag(:html),
       do: "UNIQUE:<dont-escape>&copy;MARKDOWN-PROCESSOR-BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
     def before_closing_head_tag(:epub),

@@ -10,6 +10,8 @@ defmodule ExDoc.Markdown.Hoedown do
 
   def before_closing_body_tag(_), do: ""
 
+  def configure(_), do: :ok
+
   @doc """
   Check if the Hoedown MarkDown parser module is available. Otherwise, try to
   load the module.

@@ -10,6 +10,8 @@ defmodule ExDoc.Markdown.Earmark do
 
   def before_closing_body_tag(_), do: ""
 
+  def configure(_), do: :ok
+
   @doc """
   Check if the Earmark MarkDown parser module is available. Otherwise, try to
   load the module.

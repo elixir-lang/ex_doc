@@ -10,6 +10,8 @@ defmodule ExDoc.Markdown.Cmark do
 
   def before_closing_body_tag(_), do: ""
 
+  def configure(_), do: :ok
+
   @doc """
   Check if the Cmark Markdown parser module is available. Otherwise, try to
   load the module

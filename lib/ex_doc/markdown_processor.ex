@@ -75,4 +75,16 @@ defmodule ExDoc.MarkdownProcessor do
   """
   @callback before_closing_body_tag(atom) :: String.t
 
+  @doc """
+  A function that accepts configuration options and configures the markdown processor.
+
+  It is run once when `ex_doc` is loaded, and the return value is discarded.
+  Modules that implement this behaviour will probably store the options somewhere
+  so that they can be accessed when needed.
+
+  The format of the options as well as what the function does with them is
+  completely up to the module that implements the behaviour.
+  """
+  @callback configure(any) :: :ok
+
 end
