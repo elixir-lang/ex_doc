@@ -1,8 +1,9 @@
 defmodule ExDoc.Markdown.Earmark do
   @moduledoc """
-  ExDoc extension for the Earmark MarkDown parser
+  ExDoc extension for the Earmark MarkDown parser.
   """
-  @behaviour ExDoc.MarkdownProcessor
+
+  @behaviour ExDoc.Markdown
 
   def assets(_), do: []
 
@@ -13,8 +14,7 @@ defmodule ExDoc.Markdown.Earmark do
   def configure(_), do: :ok
 
   @doc """
-  Check if the Earmark MarkDown parser module is available. Otherwise, try to
-  load the module.
+  Check if the Earmark Markdown parser module is available.
   """
   def available? do
     match?({:ok, _}, Application.ensure_all_started(:earmark)) and
@@ -24,12 +24,12 @@ defmodule ExDoc.Markdown.Earmark do
   @doc """
   Earmark specific options:
 
-    * `gfm` - boolean. Turns on Github Flavored Markdown extensions. True by default
+    * `:gfm` - boolean. Turns on Github Flavored Markdown extensions. True by default
 
-    * `breaks` - boolean. Only applicable if `gfm` is enabled. Makes all line
+    * `:breaks` - boolean. Only applicable if `gfm` is enabled. Makes all line
       breaks significant (so every line in the input is a new line in the output)
 
-    * `smartypants`: boolean. Turns on smartypants processing, so quotes become curly,
+    * `:smartypants` - boolean. Turns on smartypants processing, so quotes become curly,
       two or three hyphens become en and em dashes, and so on. True by default
 
   """

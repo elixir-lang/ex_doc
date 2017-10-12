@@ -2,6 +2,7 @@ defmodule ExDoc.Markdown.Hoedown do
   @moduledoc """
   ExDoc extension for the Hoedown MarkDown parser.
   """
+
   @behaviour ExDoc.MarkdownProcessor
 
   def assets(_), do: []
@@ -13,8 +14,7 @@ defmodule ExDoc.Markdown.Hoedown do
   def configure(_), do: :ok
 
   @doc """
-  Check if the Hoedown MarkDown parser module is available. Otherwise, try to
-  load the module.
+  Check if the Hoedown Markdown parser module is available.
   """
   def available? do
     Code.ensure_loaded?(Markdown)
@@ -39,9 +39,6 @@ defmodule ExDoc.Markdown.Hoedown do
     |> pretty_codeblocks()
   end
 
-  @doc false
-  # Helper to handle fenced code blocks (```...```) with
-  # language specification
   defp pretty_codeblocks(bin) do
     # Hoedown parser puts the prefix "language-" as part of the class value
     bin = Regex.replace(~r/<pre><code\s+class=\"language-([^\"]+)\">/,

@@ -1,6 +1,6 @@
 defmodule ExDoc.Formatter.EPUBTest do
   use ExUnit.Case
-  alias ExDoc.Markdown.DummyMarkdownProcessor
+  alias ExDoc.Markdown.DummyProcessor
 
   setup do
     File.rm_rf(output_dir())
@@ -17,7 +17,7 @@ defmodule ExDoc.Formatter.EPUBTest do
 
   # The following module attributes contain the values for user-required content.
   # Content required by the custom markdown processor is defined in its own module,
-  # and will be accessed as `DummyMarkdownProcessor.before_closing_*_tag(:html)`
+  # and will be accessed as `DummyProcessor.before_closing_*_tag(:html)`
   @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
   @before_closing_body_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
   @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-EPUB</dont-escape>"
@@ -91,9 +91,9 @@ defmodule ExDoc.Formatter.EPUBTest do
 
   # 2. Required by the markdown processor
   test "assets required by the markdown processor end up in the right place" do
-    generate_docs_and_unzip(doc_config(markdown_processor: DummyMarkdownProcessor))
+    generate_docs_and_unzip(doc_config(markdown_processor: DummyProcessor))
     # Test the assets added by the markdown processor
-    for [{filename, content}] <- DummyMarkdownProcessor.assets(:html) do
+    for [{filename, content}] <- DummyProcessor.assets(:html) do
       # Filename matches
       assert File.regular?("#{output_dir()}/#{filename}")
       # Content matches
@@ -108,13 +108,13 @@ defmodule ExDoc.Formatter.EPUBTest do
     File.mkdir_p!("test/tmp/epub_assets/hello")
     File.touch!("test/tmp/epub_assets/hello/world.png")
     generate_docs_and_unzip(doc_config(
-      markdown_processor: DummyMarkdownProcessor,
+      markdown_processor: DummyProcessor,
       assets: "test/tmp/epub_assets",
       logo: "test/fixtures/elixir.png"))
     assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world.png")
     assert File.regular?("#{output_dir()}/OEBPS/assets/logo.png")
     # Test the assets added by the markdown processor
-    for [{filename, content}] <- DummyMarkdownProcessor.assets(:html) do
+    for [{filename, content}] <- DummyProcessor.assets(:html) do
       # Filename matches
       assert File.regular?("#{output_dir()}/#{filename}")
       # Content matches
@@ -248,25 +248,25 @@ defmodule ExDoc.Formatter.EPUBTest do
 
     for basename <- @example_basenames do
       content = File.read!(Path.join(oebps_dir, basename))
-      assert not (content =~ ~r[#{DummyMarkdownProcessor.before_closing_head_tag(:epub)}\s*</head>])
-      assert not (content =~ ~r[#{DummyMarkdownProcessor.before_closing_body_tag(:epub)}\s*</body>])
+      assert not (content =~ ~r[#{DummyProcessor.before_closing_head_tag(:epub)}\s*</head>])
+      assert not (content =~ ~r[#{DummyProcessor.before_closing_body_tag(:epub)}\s*</body>])
     end
   end
 
   # 2. Required by the markdown processor
   test "before_closing_*_tags required by the markdown processor are in the right place" do
-    generate_docs_and_unzip(doc_config(markdown_processor: DummyMarkdownProcessor))
+    generate_docs_and_unzip(doc_config(markdown_processor: DummyProcessor))
     oebps_dir = "#{output_dir()}/OEBPS"
 
     for basename <- @example_basenames do
       content = File.read!(Path.join(oebps_dir, basename))
-      assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_head_tag(:epub)}\s*</head>]
-      assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_body_tag(:epub)}\s*</body>]
+      assert content =~ ~r[#{DummyProcessor.before_closing_head_tag(:epub)}\s*</head>]
+      assert content =~ ~r[#{DummyProcessor.before_closing_body_tag(:epub)}\s*</body>]
     end
   end
 
   test "before_closing_*_tags required by the markdown processor: no before_closing_*_tags required by the markdown processor" do
-    generate_docs_and_unzip(doc_config(markdown_processor: DummyMarkdownProcessor))
+    generate_docs_and_unzip(doc_config(markdown_processor: DummyProcessor))
     oebps_dir = "#{output_dir()}/OEBPS"
 
     for basename <- @example_basenames do
@@ -281,14 +281,14 @@ defmodule ExDoc.Formatter.EPUBTest do
     generate_docs_and_unzip(doc_config(
       before_closing_head_tag: &before_closing_head_tag/1,
       before_closing_body_tag: &before_closing_body_tag/1,
-      markdown_processor: DummyMarkdownProcessor
+      markdown_processor: DummyProcessor
     ))
     oebps_dir = "#{output_dir()}/OEBPS"
 
     for basename <- @example_basenames do
       content = File.read!(Path.join(oebps_dir, basename))
-      assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_head_tag(:epub)}\s*#{@before_closing_head_tag_content_epub}\s*</head>]
-      assert content =~ ~r[#{DummyMarkdownProcessor.before_closing_body_tag(:epub)}\s*#{@before_closing_body_tag_content_epub}\s*</body>]
+      assert content =~ ~r[#{DummyProcessor.before_closing_head_tag(:epub)}\s*#{@before_closing_head_tag_content_epub}\s*</head>]
+      assert content =~ ~r[#{DummyProcessor.before_closing_body_tag(:epub)}\s*#{@before_closing_body_tag_content_epub}\s*</body>]
     end
   end
 end

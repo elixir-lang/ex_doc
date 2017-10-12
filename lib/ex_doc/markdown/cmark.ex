@@ -1,8 +1,9 @@
 defmodule ExDoc.Markdown.Cmark do
   @moduledoc """
-  ExDoc extension for the Cmark Markdown parser
+  ExDoc extension for the Cmark Markdown parser.
   """
-  @behaviour ExDoc.MarkdownProcessor
+
+  @behaviour ExDoc.Markdown
 
   def assets(_), do: []
 
@@ -13,8 +14,7 @@ defmodule ExDoc.Markdown.Cmark do
   def configure(_), do: :ok
 
   @doc """
-  Check if the Cmark Markdown parser module is available. Otherwise, try to
-  load the module
+  Check if the Cmark Markdown parser module is available.
   """
   def available? do
     Code.ensure_loaded?(Cmark)
