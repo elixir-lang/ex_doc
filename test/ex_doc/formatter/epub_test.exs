@@ -189,10 +189,5 @@ defmodule ExDoc.Formatter.EPUBTest do
     content = File.read!("#{oebps_dir}/CompiledWithDocs.Nested.xhtml")
     assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
     assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
-
-    # Example of a "module page"
-    content = File.read!("#{oebps_dir}/MultipleSpecs.xhtml")
-    assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
-    assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
   end
 end
