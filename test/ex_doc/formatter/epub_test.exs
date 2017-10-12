@@ -221,8 +221,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     "readme.xhtml",
     # "module pages"
     "CompiledWithDocs.xhtml",
-    "CompiledWithDocs.Nested.xhtml",
-    "MultipleSpecs.xhtml"
+    "CompiledWithDocs.Nested.xhtml"
   ]
 
   # 1. required by the user

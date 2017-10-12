@@ -144,7 +144,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp typespec_to_string(ast, typespecs, aliases, lib_dirs) do
     Macro.to_string(ast, fn
       {name, _, args}, string when is_atom(name) and is_list(args) ->
-        string = strip_parens(string, args)
         arity = length(args)
         if {name, arity} in typespecs do
           n = enc_h("#{name}")
@@ -154,7 +153,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           string
         end
       {{:., _, [alias, name]}, _, args}, string when is_atom(name) and is_list(args) ->
-        string = strip_parens(string, args)
         alias = expand_alias(alias)
         if source = get_source(alias, aliases, lib_dirs) do
           n = enc_h("#{name}")
@@ -171,15 +169,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp short_typespec?(ast) do
     byte_size(Macro.to_string(ast)) <= 70
   end
-
-  defp strip_parens(string, []) do
-    if :binary.last(string) == ?) do
-      :binary.part(string, 0, byte_size(string) - 2)
-    else
-      string
-    end
-  end
-  defp strip_parens(string, _), do: string
 
   defp split_string_to_link(string) do
     case :binary.split(string, "(") do

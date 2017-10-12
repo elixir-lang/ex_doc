@@ -244,7 +244,6 @@ defmodule ExDoc.Retriever do
     specs = module_info.specs
             |> Map.get(function, [])
             |> Enum.map(&Typespec.spec_to_ast(name, &1))
-            |> Enum.reverse()
 
     specs =
       if type == :defmacro do

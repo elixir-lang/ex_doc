@@ -176,13 +176,6 @@ defmodule ExDoc.RetrieverTest do
     end
   end
 
-  test "specs order is preserved" do
-    [module_node] = docs_from_files ["MultipleSpecs"]
-    [function_node] = module_node.docs
-    specs = Macro.to_string(function_node.specs)
-    assert specs == "[range?(%Range{first: term(), last: term()}) :: true, range?(term()) :: false]"
-  end
-
   if Version.match?(System.version(), ">=1.1.0") do
     test "callbacks with no docs included" do
       [module_node] = docs_from_files ["CallbacksNoDocs"]
