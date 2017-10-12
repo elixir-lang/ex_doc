@@ -7,6 +7,9 @@
     <meta name="generator" content="ExDoc v<%= ExDoc.version %>" />
     <link type="text/css" rel="stylesheet" href="<%= H.asset_rev "#{config.output}/OEBPS", "dist/epub*.css" %>" />
     <script src="<%= H.asset_rev "#{config.output}/OEBPS", "dist/app*.js" %>"></script>
+    <%# Extra content needed by the current markdown processor (e.g. custom CSS) %>
+    <%= ExDoc.Markdown.get_markdown_processor().before_closing_head_tag(:epub) %>
+    <%# Extra content specified by the user (e.g. custom CSS) %>
     <%= config.before_closing_head_tag.(:epub) %>
   </head>
   <body>

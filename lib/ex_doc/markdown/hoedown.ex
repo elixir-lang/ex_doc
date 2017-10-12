@@ -2,6 +2,15 @@ defmodule ExDoc.Markdown.Hoedown do
   @moduledoc """
   ExDoc extension for the Hoedown MarkDown parser.
   """
+  @behaviour ExDoc.MarkdownProcessor
+
+  def assets(_), do: []
+
+  def before_closing_head_tag(_), do: ""
+
+  def before_closing_body_tag(_), do: ""
+
+  def configure(_), do: :ok
 
   @doc """
   Check if the Hoedown MarkDown parser module is available. Otherwise, try to

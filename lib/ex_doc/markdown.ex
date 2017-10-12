@@ -47,7 +47,8 @@ defmodule ExDoc.Markdown do
     bin
   end
 
-  defp get_markdown_processor do
+  @doc false
+  def get_markdown_processor do
     case Application.fetch_env(:ex_doc, @markdown_processor_key) do
       {:ok, processor} ->
         processor
@@ -58,8 +59,17 @@ defmodule ExDoc.Markdown do
     end
   end
 
+  @doc false
   def put_markdown_processor(processor) do
     Application.put_env(:ex_doc, @markdown_processor_key, processor)
+  end
+
+  @doc false
+  def configure_processor(options) do
+    # This function configures the markdown processor with the given options.
+    # It's called exactly once when ExDoc reads its own configuration options.
+    # It's supposed to be called for its side-effects.
+    get_markdown_processor().configure(options)
   end
 
   defp find_markdown_processor do

@@ -2,6 +2,15 @@ defmodule ExDoc.Markdown.Earmark do
   @moduledoc """
   ExDoc extension for the Earmark MarkDown parser
   """
+  @behaviour ExDoc.MarkdownProcessor
+
+  def assets(_), do: []
+
+  def before_closing_head_tag(_), do: ""
+
+  def before_closing_body_tag(_), do: ""
+
+  def configure(_), do: :ok
 
   @doc """
   Check if the Earmark MarkDown parser module is available. Otherwise, try to

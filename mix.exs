@@ -71,6 +71,10 @@ defmodule ExDoc.Mixfile do
           ExDoc.Markdown.Hoedown
         ],
 
+        "Custom Markdown Processors": [
+          ExDoc.MarkdownProcessor
+        ],
+
         "Formatter API": [
           ExDoc.Config,
           ExDoc.Formatter.EPUB,

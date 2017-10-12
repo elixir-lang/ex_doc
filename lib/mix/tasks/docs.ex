@@ -101,6 +101,8 @@ defmodule Mix.Tasks.Docs do
 
     * `:markdown_processor` - The markdown processor to use;
 
+    * `:markdown_processor_options` - Configuration options for the markdown processor;
+
     * `:source_beam` - Path to the beam directory; default: mix's compile path.
 
     * `:source_ref` - The branch/commit/tag used for source link inference;
