@@ -10,7 +10,6 @@ defmodule ExDoc.Markdown do
   ExDoc supports the following Markdown parsers out of the box:
 
     * [Earmark](http://github.com/pragdave/earmark)
-    * [Hoedown](https://github.com/hoedown/hoedown)
     * [Cmark](https://github.com/asaaki/cmark.ex)
 
   ExDoc uses Earmark by default.

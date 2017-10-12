@@ -92,21 +92,7 @@ ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.fu
 
 ## Changing the Markdown tool
 
-In the examples above, we have used [Earmark][] to convert Markdown to HTML. If you prefer, you can also use hoedown (in C) or cmark (in C).
-
-### Hoedown
-
-Hoedown is a standard compliant Markdown parser written in C.  To use hoedown, add the elixir NIF wrapper [markdown][devinus/markdown] as a dependency to your project:
-
-```elixir
-{:markdown, github: "devinus/markdown"}
-```
-
-Update your project configuration to use hoedown:
-
-```elixir
-config :ex_doc, :markdown_processor, ExDoc.Markdown.Hoedown
-```
+In the examples above, we have used [Earmark][] to convert Markdown to HTML. If you prefer, you can also use cmark (in C).
 
 ### Cmark
 
@@ -119,7 +105,7 @@ config :ex_doc, :markdown_processor, ExDoc.Markdown.Hoedown
 Update your project configuration to use Cmark:
 
 ```elixir
-config :ex_doc, :markdown_processor, ExDoc.Markdown.Cmark
+docs: [markdown_processor: ExDoc.Markdown.Cmark]
 ```
 
 # License
