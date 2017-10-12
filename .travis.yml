@@ -19,8 +19,10 @@ script:
   - mix deps.get
   - mix test
   - mix coveralls.travis
-  - node_modules/.bin/gulp
+  - yarn run lint
+  - yarn run test
 cache:
+  yarn: true
   directories:
     - node_modules
     - deps
