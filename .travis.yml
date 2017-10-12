@@ -19,7 +19,8 @@ script:
   - mix deps.get
   - mix test
   - mix coveralls.travis
-  - node_modules/.bin/gulp
+  - yarn global add gulp
+  - gulp
 cache:
   directories:
     - node_modules
