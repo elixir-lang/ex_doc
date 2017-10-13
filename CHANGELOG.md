@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.18.1
+
+  * Bug fixes
+    * Include missing formatter files
+
 ## v0.18.0
 
   * Enhancements

@@ -1,10 +1,10 @@
 /_build
 /deps
 /doc
-/node_modules
-/test/tmp
-*.ez
-erl_crash.dump
-/npm-debug.log
 /test/fixtures/umbrella/_build
-/ex_doc
+/test/tmp
+/ex_doc-*.ez
+/ex_doc-*.tar
+/erl_crash.dump
+/node_modules
+/npm-debug.log

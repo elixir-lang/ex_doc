@@ -1,7 +1,7 @@
 defmodule ExDoc.Mixfile do
   use Mix.Project
 
-  @version "0.18.0"
+  @version "0.18.1"
 
   def project do
     [
@@ -43,6 +43,7 @@ defmodule ExDoc.Mixfile do
    [
       licenses: ["Apache 2.0"],
       maintainers: ["José Valim", "Eksperimental", "Milton Mazzarri", "Friedel Ziegelmayer"],
+      files: ["formatters", "lib", "mix.exs", "LICENSE", "CHANGELOG.md", "README.md"],
       links: %{
         "GitHub" => "https://github.com/elixir-lang/ex_doc",
         "Writing documentation" => "https://hexdocs.pm/elixir/writing-documentation.html"
