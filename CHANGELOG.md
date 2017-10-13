@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.18.0
+
+  * Enhancements
+    * No longer strip empty parens from types
+    * Provide more extension point for markdown processors
+    * Remove assets from priv since they are now embedded at compile time
+
+  * Backwards incompatible changes
+    * Remove built-in support for hoedown markdown processor
+    * No longer add favicon when logo option is present (this was added in 0.17.0 but it was reported the logo almost never fits as a favicon)
+
 ## v0.17.1
 
   * Bug fixes
