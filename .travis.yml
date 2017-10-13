@@ -19,6 +19,7 @@ script:
   - mix deps.get
   - mix test
   - mix coveralls.travis
+  - bash test/prerelease.sh
   - yarn
   - yarn run lint
   - yarn run test
