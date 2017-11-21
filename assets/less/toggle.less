@@ -1,8 +1,7 @@
-.sidebar-toggle {
+.sidebar-button {
   position: fixed;
   z-index: 99;
   left: 18px;
-  top: 8px;
   color: @gray;
   background-color: transparent;
   border: none;
@@ -21,19 +20,22 @@
   &:focus {
     outline: none;
   }
+
+  .sidebar-toggle {
+    top: 8px;
+  }
 }
 
 @media screen and (max-width: 768px) {
-  .sidebar-toggle {
+  .sidebar-button {
     transform: translateX(0);
     left: 5px;
     top: 5px;
   }
 
   .sidebar-opened {
-    .sidebar-toggle {
+    .sidebar-button {
       left: 18px;
-      top: 5px;
     }
   }
 }
