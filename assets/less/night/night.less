@@ -1,15 +1,18 @@
 .night-mode-toggle {
-  background: none;
-  border: none;
-
-  &:after {
-    font-size: 12px;
-    content: 'Switch to night mode';
-    text-decoration: underline;
-  }
+  top: 1.5em;
 
   &:focus {
     outline: none;
+  }
+
+  .icon-theme::before {
+    @media screen and (max-width: 768px) { font-size: 1em; }
+
+    @media screen and (min-width: 769px) { font-size: 1.25em; }
+
+    @media screen and (min-width: 1281px) { font-size: 1.5em; }
+
+    content: "\e900";
   }
 }
 
@@ -21,12 +24,8 @@ body.night-mode {
     background: @nightBackground;
   }
 
-  .night-mode-toggle {
-    &:after {
-      color: @mediumGray;
-      content: 'Switch to day mode';
-      text-decoration: underline;
-    }
+  .night-mode-toggle .icon-theme::before {
+    content: "\e901";
   }
 
   #search .result-id a {
@@ -41,4 +40,18 @@ body.night-mode {
     }
   }
 
+}
+
+@media screen and (max-width: 768px) {
+  .night-mode-toggle {
+    transform: translateX(0);
+    left: 5px;
+    top: 1.5em;
+  }
+
+  .sidebar-opened {
+    .night-mode-toggle {
+      left: 18px;
+    }
+  }
 }

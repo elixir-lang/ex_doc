@@ -1,7 +1,11 @@
 <div class="main">
-<button class="sidebar-toggle">
+<button class="sidebar-button sidebar-toggle">
   <span class="icon-menu" aria-hidden="true"></span>
   <span class="sr-only">Toggle Sidebar</span>
+</button>
+<button class="sidebar-button night-mode-toggle">
+  <span class="icon-theme" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Theme</span>
 </button>
 <section class="sidebar">
 

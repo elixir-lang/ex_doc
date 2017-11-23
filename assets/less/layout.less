@@ -61,8 +61,8 @@ body {
 }
 
 body.sidebar-opened, body.sidebar-opening {
-  .sidebar-toggle {
-    transform: translateX(250px)
+  .sidebar-button {
+    transform: translateX(250px);
   }
 
   @media screen and (max-width: 768px) {
@@ -81,17 +81,17 @@ body.sidebar-closed, body.sidebar-closing {
     padding-left: 0;
   }
 
-  .sidebar-toggle {
+  .sidebar-button {
     transform: none;
   }
 }
 
-body.sidebar-closed .sidebar-toggle {
+body.sidebar-closed .sidebar-button {
   color: @black;
 }
 
 body.sidebar-opening {
-  .sidebar-toggle {
+  .sidebar-button {
     transition: transform 0.3s ease-in-out;
   }
 
@@ -117,7 +117,7 @@ body.sidebar-opening {
 }
 
 body.sidebar-closing {
-  .sidebar-toggle {
+  .sidebar-button {
     transition: transform 0.3s ease-in-out;
   }
 
