@@ -240,6 +240,27 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
            ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar |\n  baz when bat: foo]
   end
 
+  test "complex types" do
+    ast = quote do
+      t() :: %{
+        foo: term(),
+        really_long_name_that_will_trigger_multiple_line_breaks: String.t()
+      }
+    end
+
+    if function_exported?(Code, :format_string!, 2) do
+      assert Autolink.typespec(ast, [], []) == String.trim("""
+             t() :: %{
+               foo: term(),
+               really_long_name_that_will_trigger_multiple_line_breaks: <a href=\"https://hexdocs.pm/elixir/String.html#t:t/0\">String.t</a>()
+             }
+             """)
+    else
+      assert Autolink.typespec(ast, [], []) ==
+             ~s[t() :: %{foo: term(), really_long_name_that_will_trigger_multiple_line_breaks: <a href=\"https://hexdocs.pm/elixir/String.html#t:t/0\">String.t</a>()}]
+    end
+  end
+
   test "autolink Elixir types in typespecs" do
     assert Autolink.typespec(quote(do: String.t), [], []) ==
            ~s[<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()]

@@ -142,32 +142,78 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp typespec_to_string(ast, typespecs, aliases, lib_dirs) do
-    Macro.to_string(ast, fn
-      {name, _, args}, string when is_atom(name) and is_list(args) ->
-        arity = length(args)
-        if {name, arity} in typespecs do
-          n = enc_h("#{name}")
-          {string_to_link, string_with_parens} = split_string_to_link(string)
-          ~s[<a href="#t:#{n}/#{arity}">#{h(string_to_link)}</a>#{string_with_parens}]
-        else
-          string
-        end
-      {{:., _, [alias, name]}, _, args}, string when is_atom(name) and is_list(args) ->
-        alias = expand_alias(alias)
-        if source = get_source(alias, aliases, lib_dirs) do
-          n = enc_h("#{name}")
-          {string_to_link, string_with_parens} = split_string_to_link(string)
-          ~s[<a href="#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}">#{h(string_to_link)}</a>#{string_with_parens}]
-        else
-          string
-        end
-      _, string ->
-        string
-    end)
+    {ast, placeholders} =
+      Macro.prewalk(ast, %{}, fn
+        {name, _, args} = form, placeholders when is_atom(name) and is_list(args) ->
+          arity = length(args)
+
+          if {name, arity} in typespecs do
+            string = Macro.to_string(form)
+            n = enc_h("#{name}")
+            {string_to_link, _string_with_parens} = split_string_to_link(string)
+            string = ~s[<a href="#t:#{n}/#{arity}">#{h(string_to_link)}</a>]
+
+            put_placeholder(form, string, placeholders)
+          else
+            {form, placeholders}
+          end
+
+        {{:., _, [alias, name]}, _, args} = form, placeholders when is_atom(name) and is_list(args) ->
+          alias = expand_alias(alias)
+
+          if source = get_source(alias, aliases, lib_dirs) do
+            string = Macro.to_string(form)
+            n = enc_h("#{name}")
+            {string_to_link, _string_with_parens} = split_string_to_link(string)
+            string = ~s[<a href="#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}">#{h(string_to_link)}</a>]
+
+            put_placeholder(form, string, placeholders)
+          else
+            {form, placeholders}
+          end
+
+        form, placeholders ->
+          {form, placeholders}
+      end)
+
+    ast
+    |> format_ast()
+    |> replace_placeholders(placeholders)
+  end
+
+  defp put_placeholder(form, string, placeholders) do
+    id = zero_pad(map_size(placeholders), 3)
+    placeholder = :"_p#{id}_"
+    form = put_elem(form, 0, placeholder)
+    {form, Map.put(placeholders, Atom.to_string(placeholder), string)}
+  end
+
+  defp zero_pad(val, count) do
+    num = Integer.to_string(val)
+    pad_length = max(count - byte_size(num), 0)
+    :binary.copy("0", pad_length) <> num
+  end
+
+  defp replace_placeholders(string, placeholders) do
+    Regex.replace(~r"_p\d{3}_", string, &Map.fetch!(placeholders, &1))
+  end
+
+  @line_length 70
+
+  defp format_ast(ast) do
+    string = Macro.to_string(ast)
+
+    if function_exported?(Code, :format_string!, 2) do
+      string
+      |> Code.format_string!(line_length: @line_length)
+      |> IO.iodata_to_binary()
+    else
+      string
+    end
   end
 
   defp short_typespec?(ast) do
-    byte_size(Macro.to_string(ast)) <= 70
+    byte_size(Macro.to_string(ast)) <= @line_length
   end
 
   defp split_string_to_link(string) do
