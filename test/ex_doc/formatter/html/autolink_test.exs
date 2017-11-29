@@ -233,11 +233,20 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.typespec(quote(do: (foo(1) :: bar | baz when bat: foo)), [], []) ==
            ~s[foo(1) :: bar | baz when bat: foo]
 
-    assert Autolink.typespec(quote(do: (really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz)), [], []) ==
-           ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar |\n  baz]
+    if formatter_available?() do
+      assert Autolink.typespec(quote(do: (really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz)), [], []) ==
+             ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar | baz]
 
-    assert Autolink.typespec(quote(do: (really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz when bat: foo)), [], []) ==
-           ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar |\n  baz when bat: foo]
+      assert Autolink.typespec(quote(do: (really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz when bat: foo)), [], []) ==
+             ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar | baz\nwhen bat: foo]
+    else
+      assert Autolink.typespec(quote(do: (really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz)), [], []) ==
+             ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar |\n  baz]
+
+      assert Autolink.typespec(quote(do: (really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz when bat: foo)), [], []) ==
+             ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar |\n  baz when bat: foo]
+    end
+
   end
 
   test "complex types" do
@@ -248,7 +257,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       }
     end
 
-    if function_exported?(Code, :format_string!, 2) do
+    if formatter_available?() do
       assert Autolink.typespec(ast, [], []) == String.trim("""
              t() :: %{
                foo: term(),
@@ -295,5 +304,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
     assert Autolink.typespec(quote(do: parameterized_t(foo())), [foo: 0], []) ==
            ~s[parameterized_t(<a href="#t:foo/0">foo</a>())]
+  end
+
+  defp formatter_available? do
+    function_exported?(Code, :format_string!, 2)
   end
 end

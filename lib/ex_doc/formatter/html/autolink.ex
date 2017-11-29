@@ -87,37 +87,49 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   Converts the given `ast` to string while linking the locals
   given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs, aliases, lib_dirs \\ elixir_lib_dirs())
+  def typespec(ast, typespecs, aliases, lib_dirs \\ elixir_lib_dirs()) do
+    if formatter_available?() do
+      typespec_to_string(ast, typespecs, aliases, lib_dirs)
+    else
+      format_typespec(ast, typespecs, aliases, lib_dirs)
+    end
+  end
 
-  def typespec({:when, _, [{:::, _, [left, {:|, _, _} = center]}, right]} = ast, typespecs, aliases, lib_dirs) do
+  defp format_typespec({:when, _, [{:::, _, [left, {:|, _, _} = center]}, right]} = ast, typespecs, aliases, lib_dirs) do
     if short_typespec?(ast) do
       normalize_left(ast, typespecs, aliases, lib_dirs)
     else
       normalize_left(left, typespecs, aliases, lib_dirs) <>
-      " ::\n  " <> typespec_with_new_line(center, typespecs, aliases, lib_dirs) <>
+      " ::\n  " <> format_typespec_with_new_line(center, typespecs, aliases, lib_dirs) <>
       " when " <> String.slice(typespec_to_string(right, typespecs, aliases, lib_dirs), 1..-2)
     end
   end
 
-  def typespec({:::, _, [left, {:|, _, _} = center]} = ast, typespecs, aliases, lib_dirs) do
+  defp format_typespec({:::, _, [left, {:|, _, _} = center]} = ast, typespecs, aliases, lib_dirs) do
     if short_typespec?(ast) do
       normalize_left(ast, typespecs, aliases, lib_dirs)
     else
       normalize_left(left, typespecs, aliases, lib_dirs) <>
-      " ::\n  " <> typespec_with_new_line(center, typespecs, aliases, lib_dirs)
+      " ::\n  " <> format_typespec_with_new_line(center, typespecs, aliases, lib_dirs)
     end
   end
 
-  def typespec(other, typespecs, aliases, lib_dirs) do
+  defp format_typespec(other, typespecs, aliases, lib_dirs) do
     normalize_left(other, typespecs, aliases, lib_dirs)
   end
 
-  defp typespec_with_new_line({:|, _, [left, right]}, typespecs, aliases, lib_dirs) do
-    typespec_to_string(left, typespecs, aliases, lib_dirs) <>
-      " |\n  " <> typespec_with_new_line(right, typespecs, aliases, lib_dirs)
+  @line_length 70
+
+  defp short_typespec?(ast) do
+    byte_size(Macro.to_string(ast)) <= @line_length
   end
 
-  defp typespec_with_new_line(other, typespecs, aliases, lib_dirs) do
+  defp format_typespec_with_new_line({:|, _, [left, right]}, typespecs, aliases, lib_dirs) do
+    typespec_to_string(left, typespecs, aliases, lib_dirs) <>
+      " |\n  " <> format_typespec_with_new_line(right, typespecs, aliases, lib_dirs)
+  end
+
+  defp format_typespec_with_new_line(other, typespecs, aliases, lib_dirs) do
     typespec_to_string(other, typespecs, aliases, lib_dirs)
   end
 
@@ -142,8 +154,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp typespec_to_string(ast, typespecs, aliases, lib_dirs) do
+    ref = make_ref()
+
     {ast, placeholders} =
       Macro.prewalk(ast, %{}, fn
+        {:::, _, [{name, meta, args}, right]}, placeholders when is_atom(name) and is_list(args) ->
+          {{:::, [], [{{ref, name}, meta, args}, right]}, placeholders}
+
+        # Consume this form so that we don't autolink `foo` in `foo :: bar`
+        {{^ref, name}, _, args}, placeholders when is_atom(name) and is_list(args) ->
+          {{name, [], args}, placeholders}
+
         {name, _, args} = form, placeholders when is_atom(name) and is_list(args) ->
           arity = length(args)
 
@@ -198,12 +219,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     Regex.replace(~r"_p\d{3}_", string, &Map.fetch!(placeholders, &1))
   end
 
-  @line_length 70
-
   defp format_ast(ast) do
     string = Macro.to_string(ast)
 
-    if function_exported?(Code, :format_string!, 2) do
+    if formatter_available?() do
       string
       |> Code.format_string!(line_length: @line_length)
       |> IO.iodata_to_binary()
@@ -212,8 +231,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end
   end
 
-  defp short_typespec?(ast) do
-    byte_size(Macro.to_string(ast)) <= @line_length
+  # TODO: remove when we require Elixir v1.6+
+  defp formatter_available? do
+    function_exported?(Code, :format_string!, 2)
   end
 
   defp split_string_to_link(string) do
