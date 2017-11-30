@@ -89,32 +89,32 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def typespec(ast, typespecs, aliases, lib_dirs \\ elixir_lib_dirs()) do
     if formatter_available?() do
-      typespec_to_string(ast, typespecs, aliases, lib_dirs)
-    else
       format_typespec(ast, typespecs, aliases, lib_dirs)
+    else
+      typespec_to_string(ast, typespecs, aliases, lib_dirs)
     end
   end
 
-  defp format_typespec({:when, _, [{:::, _, [left, {:|, _, _} = center]}, right]} = ast, typespecs, aliases, lib_dirs) do
+  defp typespec_to_string({:when, _, [{:::, _, [left, {:|, _, _} = center]}, right]} = ast, typespecs, aliases, lib_dirs) do
     if short_typespec?(ast) do
       normalize_left(ast, typespecs, aliases, lib_dirs)
     else
       normalize_left(left, typespecs, aliases, lib_dirs) <>
-      " ::\n  " <> format_typespec_with_new_line(center, typespecs, aliases, lib_dirs) <>
-      " when " <> String.slice(typespec_to_string(right, typespecs, aliases, lib_dirs), 1..-2)
+      " ::\n  " <> typespec_with_new_line(center, typespecs, aliases, lib_dirs) <>
+      " when " <> String.slice(format_typespec(right, typespecs, aliases, lib_dirs), 1..-2)
     end
   end
 
-  defp format_typespec({:::, _, [left, {:|, _, _} = center]} = ast, typespecs, aliases, lib_dirs) do
+  defp typespec_to_string({:::, _, [left, {:|, _, _} = center]} = ast, typespecs, aliases, lib_dirs) do
     if short_typespec?(ast) do
       normalize_left(ast, typespecs, aliases, lib_dirs)
     else
       normalize_left(left, typespecs, aliases, lib_dirs) <>
-      " ::\n  " <> format_typespec_with_new_line(center, typespecs, aliases, lib_dirs)
+      " ::\n  " <> typespec_with_new_line(center, typespecs, aliases, lib_dirs)
     end
   end
 
-  defp format_typespec(other, typespecs, aliases, lib_dirs) do
+  defp typespec_to_string(other, typespecs, aliases, lib_dirs) do
     normalize_left(other, typespecs, aliases, lib_dirs)
   end
 
@@ -122,36 +122,36 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     byte_size(Macro.to_string(ast)) <= 70
   end
 
-  defp format_typespec_with_new_line({:|, _, [left, right]}, typespecs, aliases, lib_dirs) do
-    typespec_to_string(left, typespecs, aliases, lib_dirs) <>
-      " |\n  " <> format_typespec_with_new_line(right, typespecs, aliases, lib_dirs)
+  defp typespec_with_new_line({:|, _, [left, right]}, typespecs, aliases, lib_dirs) do
+    format_typespec(left, typespecs, aliases, lib_dirs) <>
+      " |\n  " <> typespec_with_new_line(right, typespecs, aliases, lib_dirs)
   end
 
-  defp format_typespec_with_new_line(other, typespecs, aliases, lib_dirs) do
-    typespec_to_string(other, typespecs, aliases, lib_dirs)
+  defp typespec_with_new_line(other, typespecs, aliases, lib_dirs) do
+    format_typespec(other, typespecs, aliases, lib_dirs)
   end
 
   defp normalize_left({:::, _, [{name, meta, args}, right]}, typespecs, aliases, lib_dirs) do
     new_args =
-      Enum.map(args, &[self(), typespec_to_string(&1, typespecs, aliases, lib_dirs)])
+      Enum.map(args, &[self(), format_typespec(&1, typespecs, aliases, lib_dirs)])
     new_left =
       Macro.to_string {name, meta, new_args}, fn
         [pid, string], _ when pid == self() -> string
         _, string -> string
       end
-    new_left <> " :: " <> typespec_to_string(right, typespecs, aliases, lib_dirs)
+    new_left <> " :: " <> format_typespec(right, typespecs, aliases, lib_dirs)
   end
 
   defp normalize_left({:when, _, [{:::, _, _} = left, right]}, typespecs, aliases, lib_dirs) do
     normalize_left(left, typespecs, aliases, lib_dirs) <>
-    " when " <> String.slice(typespec_to_string(right, typespecs, aliases, lib_dirs), 1..-2)
+    " when " <> String.slice(format_typespec(right, typespecs, aliases, lib_dirs), 1..-2)
   end
 
   defp normalize_left(ast, typespecs, aliases, lib_dirs) do
-    typespec_to_string(ast, typespecs, aliases, lib_dirs)
+    format_typespec(ast, typespecs, aliases, lib_dirs)
   end
 
-  defp typespec_to_string(ast, typespecs, aliases, lib_dirs) do
+  defp format_typespec(ast, typespecs, aliases, lib_dirs) do
     ref = make_ref()
 
     {ast, placeholders} =
