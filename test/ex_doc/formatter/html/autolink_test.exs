@@ -236,11 +236,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   @tag :formatter
   test "add new lines on | with formatter" do
-    assert Autolink.typespec(quote(do: (really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz)), [], []) ==
-           ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar | baz]
+    assert Autolink.typespec(quote(do: (really_really_really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz)), [], []) ==
+           ~s[really_really_really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar | baz]
 
-    assert Autolink.typespec(quote(do: (really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz when bat: foo)), [], []) ==
-           ~s[really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar | baz\nwhen bat: foo]
+    assert Autolink.typespec(quote(do: (really_really_really_long_name_that_will_trigger_multiple_line_breaks(1) :: bar | baz when bat: foo)), [], []) ==
+           ~s[really_really_really_long_name_that_will_trigger_multiple_line_breaks(1) ::\n  bar | baz\nwhen bat: foo]
   end
 
   @tag :no_formatter

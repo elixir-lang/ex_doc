@@ -118,10 +118,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     normalize_left(other, typespecs, aliases, lib_dirs)
   end
 
-  @line_length 70
-
   defp short_typespec?(ast) do
-    byte_size(Macro.to_string(ast)) <= @line_length
+    byte_size(Macro.to_string(ast)) <= 70
   end
 
   defp format_typespec_with_new_line({:|, _, [left, right]}, typespecs, aliases, lib_dirs) do
@@ -218,7 +216,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     if formatter_available?() do
       string
-      |> Code.format_string!(line_length: @line_length)
+      |> Code.format_string!(line_length: 80)
       |> IO.iodata_to_binary()
     else
       string
