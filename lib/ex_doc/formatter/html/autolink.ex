@@ -87,19 +87,25 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   Converts the given `ast` to string while linking the locals
   given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs, aliases, lib_dirs \\ elixir_lib_dirs())
+  def typespec(ast, typespecs, aliases, lib_dirs \\ elixir_lib_dirs()) do
+    if formatter_available?() do
+      format_typespec(ast, typespecs, aliases, lib_dirs)
+    else
+      typespec_to_string(ast, typespecs, aliases, lib_dirs)
+    end
+  end
 
-  def typespec({:when, _, [{:::, _, [left, {:|, _, _} = center]}, right]} = ast, typespecs, aliases, lib_dirs) do
+  defp typespec_to_string({:when, _, [{:::, _, [left, {:|, _, _} = center]}, right]} = ast, typespecs, aliases, lib_dirs) do
     if short_typespec?(ast) do
       normalize_left(ast, typespecs, aliases, lib_dirs)
     else
       normalize_left(left, typespecs, aliases, lib_dirs) <>
       " ::\n  " <> typespec_with_new_line(center, typespecs, aliases, lib_dirs) <>
-      " when " <> String.slice(typespec_to_string(right, typespecs, aliases, lib_dirs), 1..-2)
+      " when " <> String.slice(format_typespec(right, typespecs, aliases, lib_dirs), 1..-2)
     end
   end
 
-  def typespec({:::, _, [left, {:|, _, _} = center]} = ast, typespecs, aliases, lib_dirs) do
+  defp typespec_to_string({:::, _, [left, {:|, _, _} = center]} = ast, typespecs, aliases, lib_dirs) do
     if short_typespec?(ast) do
       normalize_left(ast, typespecs, aliases, lib_dirs)
     else
@@ -108,66 +114,118 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end
   end
 
-  def typespec(other, typespecs, aliases, lib_dirs) do
+  defp typespec_to_string(other, typespecs, aliases, lib_dirs) do
     normalize_left(other, typespecs, aliases, lib_dirs)
   end
 
+  defp short_typespec?(ast) do
+    byte_size(Macro.to_string(ast)) <= 70
+  end
+
   defp typespec_with_new_line({:|, _, [left, right]}, typespecs, aliases, lib_dirs) do
-    typespec_to_string(left, typespecs, aliases, lib_dirs) <>
+    format_typespec(left, typespecs, aliases, lib_dirs) <>
       " |\n  " <> typespec_with_new_line(right, typespecs, aliases, lib_dirs)
   end
 
   defp typespec_with_new_line(other, typespecs, aliases, lib_dirs) do
-    typespec_to_string(other, typespecs, aliases, lib_dirs)
+    format_typespec(other, typespecs, aliases, lib_dirs)
   end
 
   defp normalize_left({:::, _, [{name, meta, args}, right]}, typespecs, aliases, lib_dirs) do
     new_args =
-      Enum.map(args, &[self(), typespec_to_string(&1, typespecs, aliases, lib_dirs)])
+      Enum.map(args, &[self(), format_typespec(&1, typespecs, aliases, lib_dirs)])
     new_left =
       Macro.to_string {name, meta, new_args}, fn
         [pid, string], _ when pid == self() -> string
         _, string -> string
       end
-    new_left <> " :: " <> typespec_to_string(right, typespecs, aliases, lib_dirs)
+    new_left <> " :: " <> format_typespec(right, typespecs, aliases, lib_dirs)
   end
 
   defp normalize_left({:when, _, [{:::, _, _} = left, right]}, typespecs, aliases, lib_dirs) do
     normalize_left(left, typespecs, aliases, lib_dirs) <>
-    " when " <> String.slice(typespec_to_string(right, typespecs, aliases, lib_dirs), 1..-2)
+    " when " <> String.slice(format_typespec(right, typespecs, aliases, lib_dirs), 1..-2)
   end
 
   defp normalize_left(ast, typespecs, aliases, lib_dirs) do
-    typespec_to_string(ast, typespecs, aliases, lib_dirs)
+    format_typespec(ast, typespecs, aliases, lib_dirs)
   end
 
-  defp typespec_to_string(ast, typespecs, aliases, lib_dirs) do
-    Macro.to_string(ast, fn
-      {name, _, args}, string when is_atom(name) and is_list(args) ->
-        arity = length(args)
-        if {name, arity} in typespecs do
-          n = enc_h("#{name}")
-          {string_to_link, string_with_parens} = split_string_to_link(string)
-          ~s[<a href="#t:#{n}/#{arity}">#{h(string_to_link)}</a>#{string_with_parens}]
-        else
-          string
-        end
-      {{:., _, [alias, name]}, _, args}, string when is_atom(name) and is_list(args) ->
-        alias = expand_alias(alias)
-        if source = get_source(alias, aliases, lib_dirs) do
-          n = enc_h("#{name}")
-          {string_to_link, string_with_parens} = split_string_to_link(string)
-          ~s[<a href="#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}">#{h(string_to_link)}</a>#{string_with_parens}]
-        else
-          string
-        end
-      _, string ->
-        string
-    end)
+  defp format_typespec(ast, typespecs, aliases, lib_dirs) do
+    ref = make_ref()
+
+    {ast, placeholders} =
+      Macro.prewalk(ast, %{}, fn
+        {:::, _, [{name, meta, args}, right]}, placeholders when is_atom(name) and is_list(args) ->
+          {{:::, [], [{{ref, name}, meta, args}, right]}, placeholders}
+
+        # Consume this form so that we don't autolink `foo` in `foo :: bar`
+        {{^ref, name}, _, args}, placeholders when is_atom(name) and is_list(args) ->
+          {{name, [], args}, placeholders}
+
+        {name, _, args} = form, placeholders when is_atom(name) and is_list(args) ->
+          arity = length(args)
+
+          if {name, arity} in typespecs do
+            string = Macro.to_string(form)
+            n = enc_h("#{name}")
+            {string_to_link, _string_with_parens} = split_string_to_link(string)
+            string = ~s[<a href="#t:#{n}/#{arity}">#{h(string_to_link)}</a>]
+
+            put_placeholder(form, string, placeholders)
+          else
+            {form, placeholders}
+          end
+
+        {{:., _, [alias, name]}, _, args} = form, placeholders when is_atom(name) and is_list(args) ->
+          alias = expand_alias(alias)
+
+          if source = get_source(alias, aliases, lib_dirs) do
+            string = Macro.to_string(form)
+            n = enc_h("#{name}")
+            {string_to_link, _string_with_parens} = split_string_to_link(string)
+            string = ~s[<a href="#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}">#{h(string_to_link)}</a>]
+
+            put_placeholder(form, string, placeholders)
+          else
+            {form, placeholders}
+          end
+
+        form, placeholders ->
+          {form, placeholders}
+      end)
+
+    ast
+    |> format_ast()
+    |> replace_placeholders(placeholders)
   end
 
-  defp short_typespec?(ast) do
-    byte_size(Macro.to_string(ast)) <= 70
+  defp put_placeholder(form, string, placeholders) do
+    id = map_size(placeholders)
+    placeholder = :"_p#{id}_"
+    form = put_elem(form, 0, placeholder)
+    {form, Map.put(placeholders, Atom.to_string(placeholder), string)}
+  end
+
+  defp replace_placeholders(string, placeholders) do
+    Regex.replace(~r"_p\d+_", string, &Map.fetch!(placeholders, &1))
+  end
+
+  defp format_ast(ast) do
+    string = Macro.to_string(ast)
+
+    if formatter_available?() do
+      string
+      |> Code.format_string!(line_length: 80)
+      |> IO.iodata_to_binary()
+    else
+      string
+    end
+  end
+
+  # TODO: remove when we require Elixir v1.6+
+  defp formatter_available? do
+    function_exported?(Code, :format_string!, 2)
   end
 
   defp split_string_to_link(string) do
