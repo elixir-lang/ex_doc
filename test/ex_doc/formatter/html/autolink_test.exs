@@ -300,6 +300,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
            ~s[<a href=\"https://hexdocs.pm/elixir/typespecs.html#built-in-types\">term</a>()]
   end
 
+  test "autolink Elixir built-in types in Elixir typespecs" do
+    assert Autolink.typespec(quote(do: term()), [], [Kernel]) ==
+           ~s[<a href=\"typespecs.html#built-in-types\">term</a>()]
+  end
+
   test "autolink local takes precedence over basic/built-in types in typespecs" do
     assert Autolink.typespec(quote(do: term()), [term: 0], []) ==
            ~s[<a href=\"#t:term/0\">term</a>()]

@@ -163,15 +163,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     reference: 0,
     struct: 0,
     tuple: 0,
-
-    # Numbers
     integer: 0,
     float: 0,
     neg_integer: 0,
     non_neg_integer: 0,
     pos_integer: 0,
-
-    # Lists
     list: 1,
     nonempty_list: 1,
     improper_list: 2,
@@ -232,12 +228,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
               put_placeholder(form, string, placeholders)
 
             {name, arity} in @basic_types ->
-              url = @elixir_docs <> "elixir/" <> @basic_types_page
+              source = get_source(Kernel, aliases, lib_dirs)
+              url = source <> @basic_types_page
               string = format_typespec_form(form, url)
               put_placeholder(form, string, placeholders)
 
             {name, arity} in @built_in_types ->
-              url = @elixir_docs <> "elixir/" <> @built_in_types_page
+              source = get_source(Kernel, aliases, lib_dirs)
+              url = source <> @built_in_types_page
               string = format_typespec_form(form, url)
               put_placeholder(form, string, placeholders)
 
