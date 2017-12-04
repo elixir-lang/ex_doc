@@ -305,11 +305,6 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
            ~s[<a href=\"typespecs.html#built-in-types\">term</a>()]
   end
 
-  test "autolink local takes precedence over basic/built-in types in typespecs" do
-    assert Autolink.typespec(quote(do: term()), [term: 0], []) ==
-           ~s[<a href=\"#t:term/0\">term</a>()]
-  end
-
   test "autolink shared aliases in typespecs" do
     assert Autolink.typespec(quote(do: Foo.t), [], [Foo]) ==
            ~s[<a href="Foo.html#t:t/0">Foo.t</a>()]

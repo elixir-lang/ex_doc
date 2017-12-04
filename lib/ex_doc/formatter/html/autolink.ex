@@ -222,12 +222,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           arity = length(args)
 
           cond do
-            {name, arity} in typespecs ->
-              n = enc_h("#{name}")
-              url = "#t:#{n}/#{arity}"
-              string = format_typespec_form(form, url)
-              put_placeholder(form, string, placeholders)
-
             {name, arity} in @basic_types ->
               url = elixir_source <> @basic_types_page
               string = format_typespec_form(form, url)
@@ -235,6 +229,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
             {name, arity} in @built_in_types ->
               url = elixir_source <> @built_in_types_page
+              string = format_typespec_form(form, url)
+              put_placeholder(form, string, placeholders)
+
+            {name, arity} in typespecs ->
+              n = enc_h("#{name}")
+              url = "#t:#{n}/#{arity}"
               string = format_typespec_form(form, url)
               put_placeholder(form, string, placeholders)
 
