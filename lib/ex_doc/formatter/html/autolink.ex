@@ -271,14 +271,18 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp put_placeholder(form, string, placeholders) do
-    id = map_size(placeholders)
-    placeholder = :"_p#{id}_"
+    count = map_size(placeholders) + 1
+    type_size = form |> Macro.to_string() |> byte_size()
+    int_size = count |> Integer.to_string() |> byte_size()
+    parens_size = 2
+    pad = String.duplicate("p", max(type_size - int_size - parens_size, 1))
+    placeholder = :"#{pad}#{count}"
     form = put_elem(form, 0, placeholder)
     {form, Map.put(placeholders, Atom.to_string(placeholder), string)}
   end
 
   defp replace_placeholders(string, placeholders) do
-    Regex.replace(~r"_p\d+_", string, &Map.fetch!(placeholders, &1))
+    Regex.replace(~r"p+\d+", string, &Map.fetch!(placeholders, &1))
   end
 
   defp format_ast(ast) do
