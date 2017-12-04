@@ -10,6 +10,58 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @basic_types_page "typespecs.html#basic-types"
   @built_in_types_page "typespecs.html#built-in-types"
 
+  @basic_types [
+    any: 0,
+    none: 0,
+    atom: 0,
+    map: 0,
+    pid: 0,
+    port: 0,
+    reference: 0,
+    struct: 0,
+    tuple: 0,
+    integer: 0,
+    float: 0,
+    neg_integer: 0,
+    non_neg_integer: 0,
+    pos_integer: 0,
+    list: 1,
+    nonempty_list: 1,
+    improper_list: 2,
+    maybe_improper_list: 2,
+  ]
+
+  @built_in_types [
+    term: 0,
+    arity: 0,
+    as_boolean: 1,
+    binary: 0,
+    bitstring: 0,
+    boolean: 0,
+    byte: 0,
+    char: 0,
+    charlist: 0,
+    nonempty_charlist: 0,
+    fun: 0,
+    function: 0,
+    identifier: 0,
+    iodata: 0,
+    iolist: 0,
+    keyword: 0,
+    keyword: 1,
+    list: 0,
+    nonempty_list: 0,
+    maybe_improper_list: 0,
+    nonempty_maybe_improper_list: 0,
+    mfa: 0,
+    module: 0,
+    no_return: 0,
+    node: 0,
+    number: 0,
+    struct: 0,
+    timeout: 0
+  ]
+
   @doc """
   Receives a list of module nodes and autolink all docs and typespecs.
   """
@@ -153,60 +205,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     format_typespec(ast, typespecs, aliases, lib_dirs)
   end
 
-  @basic_types [
-    any: 0,
-    none: 0,
-    atom: 0,
-    map: 0,
-    pid: 0,
-    port: 0,
-    reference: 0,
-    struct: 0,
-    tuple: 0,
-    integer: 0,
-    float: 0,
-    neg_integer: 0,
-    non_neg_integer: 0,
-    pos_integer: 0,
-    list: 1,
-    nonempty_list: 1,
-    improper_list: 2,
-    maybe_improper_list: 2,
-  ]
-
-  @built_in_types [
-    term: 0,
-    arity: 0,
-    as_boolean: 1,
-    binary: 0,
-    bitstring: 0,
-    boolean: 0,
-    byte: 0,
-    char: 0,
-    charlist: 0,
-    nonempty_charlist: 0,
-    fun: 0,
-    function: 0,
-    identifier: 0,
-    iodata: 0,
-    iolist: 0,
-    keyword: 0,
-    keyword: 1,
-    list: 0,
-    nonempty_list: 0,
-    maybe_improper_list: 0,
-    nonempty_maybe_improper_list: 0,
-    mfa: 0,
-    module: 0,
-    no_return: 0,
-    node: 0,
-    number: 0,
-    struct: 0,
-    timeout: 0
-  ]
-
   defp format_typespec(ast, typespecs, aliases, lib_dirs) do
     ref = make_ref()
+    elixir_source = get_source(Kernel, aliases, lib_dirs)
 
     {ast, placeholders} =
       Macro.prewalk(ast, %{}, fn
@@ -228,14 +229,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
               put_placeholder(form, string, placeholders)
 
             {name, arity} in @basic_types ->
-              source = get_source(Kernel, aliases, lib_dirs)
-              url = source <> @basic_types_page
+              url = elixir_source <> @basic_types_page
               string = format_typespec_form(form, url)
               put_placeholder(form, string, placeholders)
 
             {name, arity} in @built_in_types ->
-              source = get_source(Kernel, aliases, lib_dirs)
-              url = source <> @built_in_types_page
+              url = elixir_source <> @built_in_types_page
               string = format_typespec_form(form, url)
               put_placeholder(form, string, placeholders)
 
