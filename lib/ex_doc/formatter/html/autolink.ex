@@ -7,6 +7,60 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
+  @basic_types_page "typespecs.html#basic-types"
+  @built_in_types_page "typespecs.html#built-in-types"
+
+  @basic_types [
+    any: 0,
+    none: 0,
+    atom: 0,
+    map: 0,
+    pid: 0,
+    port: 0,
+    reference: 0,
+    struct: 0,
+    tuple: 0,
+    integer: 0,
+    float: 0,
+    neg_integer: 0,
+    non_neg_integer: 0,
+    pos_integer: 0,
+    list: 1,
+    nonempty_list: 1,
+    improper_list: 2,
+    maybe_improper_list: 2,
+  ]
+
+  @built_in_types [
+    term: 0,
+    arity: 0,
+    as_boolean: 1,
+    binary: 0,
+    bitstring: 0,
+    boolean: 0,
+    byte: 0,
+    char: 0,
+    charlist: 0,
+    nonempty_charlist: 0,
+    fun: 0,
+    function: 0,
+    identifier: 0,
+    iodata: 0,
+    iolist: 0,
+    keyword: 0,
+    keyword: 1,
+    list: 0,
+    nonempty_list: 0,
+    maybe_improper_list: 0,
+    nonempty_maybe_improper_list: 0,
+    mfa: 0,
+    module: 0,
+    no_return: 0,
+    node: 0,
+    number: 0,
+    struct: 0,
+    timeout: 0
+  ]
 
   @doc """
   Receives a list of module nodes and autolink all docs and typespecs.
@@ -153,6 +207,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp format_typespec(ast, typespecs, aliases, lib_dirs) do
     ref = make_ref()
+    elixir_source = get_source(Kernel, aliases, lib_dirs)
 
     {ast, placeholders} =
       Macro.prewalk(ast, %{}, fn
@@ -166,26 +221,34 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         {name, _, args} = form, placeholders when is_atom(name) and is_list(args) ->
           arity = length(args)
 
-          if {name, arity} in typespecs do
-            string = Macro.to_string(form)
-            n = enc_h("#{name}")
-            {string_to_link, _string_with_parens} = split_string_to_link(string)
-            string = ~s[<a href="#t:#{n}/#{arity}">#{h(string_to_link)}</a>]
+          cond do
+            {name, arity} in @basic_types ->
+              url = elixir_source <> @basic_types_page
+              string = format_typespec_form(form, url)
+              put_placeholder(form, string, placeholders)
 
-            put_placeholder(form, string, placeholders)
-          else
-            {form, placeholders}
+            {name, arity} in @built_in_types ->
+              url = elixir_source <> @built_in_types_page
+              string = format_typespec_form(form, url)
+              put_placeholder(form, string, placeholders)
+
+            {name, arity} in typespecs ->
+              n = enc_h("#{name}")
+              url = "#t:#{n}/#{arity}"
+              string = format_typespec_form(form, url)
+              put_placeholder(form, string, placeholders)
+
+            true ->
+              {form, placeholders}
           end
 
         {{:., _, [alias, name]}, _, args} = form, placeholders when is_atom(name) and is_list(args) ->
           alias = expand_alias(alias)
 
           if source = get_source(alias, aliases, lib_dirs) do
-            string = Macro.to_string(form)
             n = enc_h("#{name}")
-            {string_to_link, _string_with_parens} = split_string_to_link(string)
-            string = ~s[<a href="#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}">#{h(string_to_link)}</a>]
-
+            url = "#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}"
+            string = format_typespec_form(form, url)
             put_placeholder(form, string, placeholders)
           else
             {form, placeholders}
@@ -200,15 +263,25 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> replace_placeholders(placeholders)
   end
 
+  defp format_typespec_form(form, url) do
+    string = Macro.to_string(form)
+    {string_to_link, _string_with_parens} = split_string_to_link(string)
+    ~s[<a href="#{url}">#{h(string_to_link)}</a>]
+  end
+
   defp put_placeholder(form, string, placeholders) do
-    id = map_size(placeholders)
-    placeholder = :"_p#{id}_"
+    count = map_size(placeholders) + 1
+    type_size = form |> Macro.to_string() |> byte_size()
+    int_size = count |> Integer.to_string() |> byte_size()
+    parens_size = 2
+    pad = String.duplicate("p", max(type_size - int_size - parens_size, 1))
+    placeholder = :"#{pad}#{count}"
     form = put_elem(form, 0, placeholder)
     {form, Map.put(placeholders, Atom.to_string(placeholder), string)}
   end
 
   defp replace_placeholders(string, placeholders) do
-    Regex.replace(~r"_p\d+_", string, &Map.fetch!(placeholders, &1))
+    Regex.replace(~r"p+\d+", string, &Map.fetch!(placeholders, &1))
   end
 
   defp format_ast(ast) do

@@ -252,6 +252,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "module_page outputs the types and function specs" do
     content = get_module_page([TypesAndSpecs, TypesAndSpecs.Sub])
+    any = ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()]
+    integer = ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>()]
 
     public_html =
       ~S[public(t) :: {t, ] <>
@@ -259,7 +261,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>(), ] <>
       ~S[<a href="#t:opaque/0">opaque</a>(), :ok | :error}]
 
-    ref_html = ~S[ref() :: {:binary.part(), <a href="#t:public/1">public</a>(any())}]
+    ref_html = ~s[ref() :: {:binary.part(), <a href="#t:public/1">public</a>(#{any})}]
 
     assert content =~ ~s[<a href="#t:public/1">public(t)</a>]
     refute content =~ ~s[<a href="#t:private/0">private</a>]
@@ -267,8 +269,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ref_html
     refute content =~ ~s[<strong>private\(t\)]
     assert content =~ ~s[A public type]
-    assert content =~ ~s[add(integer(), <a href="#t:opaque/0">opaque</a>()) :: integer()]
-    refute content =~ ~s[minus(integer(), integer()) :: integer()]
+    assert content =~ ~s[add(#{integer}, <a href="#t:opaque/0">opaque</a>()) :: #{integer}]
+    refute content =~ ~s[minus(#{integer}, #{integer}) :: #{integer}]
   end
 
   test "module_page outputs summaries" do

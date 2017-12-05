@@ -181,11 +181,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   # typespec
 
   test "operators" do
-    assert Autolink.typespec(quote(do: +number() :: number()), [], [], []) ==
-           ~s[+number() :: number()]
+    assert Autolink.typespec(quote(do: +foo() :: foo()), [], [], []) ==
+           ~s[+foo() :: foo()]
 
-    assert Autolink.typespec(quote(do: number() + number() :: number()), [], [], []) ==
-           ~s[number() + number() :: number()]
+    assert Autolink.typespec(quote(do: foo() + foo() :: foo()), [], [], []) ==
+           ~s[foo() + foo() :: foo()]
   end
 
   test "strip parens in typespecs" do
@@ -256,14 +256,14 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   test "complex types with formatter" do
     ast = quote do
       t() :: %{
-        foo: term(),
+        foo: bar(),
         really_long_name_that_will_trigger_multiple_line_breaks: String.t()
       }
     end
 
     assert Autolink.typespec(ast, [], []) == String.trim("""
            t() :: %{
-             foo: term(),
+             foo: bar(),
              really_long_name_that_will_trigger_multiple_line_breaks: <a href=\"https://hexdocs.pm/elixir/String.html#t:t/0\">String.t</a>()
            }
            """)
@@ -273,13 +273,13 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   test "complex types without formatter" do
     ast = quote do
       t() :: %{
-        foo: term(),
+        foo: bar(),
         really_long_name_that_will_trigger_multiple_line_breaks: String.t()
       }
     end
 
     assert Autolink.typespec(ast, [], []) ==
-           ~s[t() :: %{foo: term(), really_long_name_that_will_trigger_multiple_line_breaks: <a href=\"https://hexdocs.pm/elixir/String.html#t:t/0\">String.t</a>()}]
+           ~s[t() :: %{foo: bar(), really_long_name_that_will_trigger_multiple_line_breaks: <a href=\"https://hexdocs.pm/elixir/String.html#t:t/0\">String.t</a>()}]
   end
 
   test "autolink Elixir types in typespecs" do
@@ -290,12 +290,27 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
            ~s[Unknown.bar()]
   end
 
+  test "autolink Elixir basic types in typespecs" do
+    assert Autolink.typespec(quote(do: atom()), [], []) ==
+           ~s[<a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\">atom</a>()]
+  end
+
+  test "autolink Elixir built-in types in typespecs" do
+    assert Autolink.typespec(quote(do: term()), [], []) ==
+           ~s[<a href=\"https://hexdocs.pm/elixir/typespecs.html#built-in-types\">term</a>()]
+  end
+
+  test "autolink Elixir built-in types in Elixir typespecs" do
+    assert Autolink.typespec(quote(do: term()), [], [Kernel]) ==
+           ~s[<a href=\"typespecs.html#built-in-types\">term</a>()]
+  end
+
   test "autolink shared aliases in typespecs" do
     assert Autolink.typespec(quote(do: Foo.t), [], [Foo]) ==
            ~s[<a href="Foo.html#t:t/0">Foo.t</a>()]
   end
 
-  test "autolink local and remote types inside parameterized types" do
+  test "autolink local remote basic built-in types inside parameterized types" do
     assert Autolink.typespec(quote(do: parameterized_t(foo())), [parameterized_t: 1, foo: 0], []) ==
            ~s[<a href="#t:parameterized_t/1">parameterized_t</a>(<a href="#t:foo/0">foo</a>())]
 
@@ -316,5 +331,13 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
     assert Autolink.typespec(quote(do: parameterized_t(foo())), [foo: 0], []) ==
            ~s[parameterized_t(<a href="#t:foo/0">foo</a>())]
+
+    assert Autolink.typespec(quote(do: parameterized_t(atom())), [], []) ==
+           ~s[parameterized_t(<a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\">atom</a>())]
+
+    assert Autolink.typespec(quote(do: parameterized_t(atom()) :: list(function())), [], []) ==
+      ~s[parameterized_t(<a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\">atom</a>()) :: ] <>
+        ~s[<a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\">list</a>(] <>
+        ~s[<a href=\"https://hexdocs.pm/elixir/typespecs.html#built-in-types\">function</a>())]
   end
 end
