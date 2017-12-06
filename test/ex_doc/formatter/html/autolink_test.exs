@@ -305,6 +305,17 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
            ~s[<a href=\"typespecs.html#built-in-types\">term</a>()]
   end
 
+  test "autolink Erlang types in typespecs" do
+    assert Autolink.typespec(quote(do: :sets.set()), [], []) ==
+           ~s[<a href=\"#{@erlang_docs}sets.html#type-set\">:sets.set</a>()]
+
+    assert Autolink.typespec(quote(do: :sets.set(foo())), [], []) ==
+           ~s[<a href=\"#{@erlang_docs}sets.html#type-set\">:sets.set</a>(foo())]
+
+    assert Autolink.typespec(quote(do: :sets.set(foo())), [foo: 0], []) ==
+           ~s[<a href=\"#{@erlang_docs}sets.html#type-set\">:sets.set</a>(<a href=\"#t:foo/0\">foo</a>())]
+  end
+
   test "autolink shared aliases in typespecs" do
     assert Autolink.typespec(quote(do: Foo.t), [], [Foo]) ==
            ~s[<a href="Foo.html#t:t/0">Foo.t</a>()]
