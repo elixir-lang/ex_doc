@@ -67,7 +67,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def all(modules, extension, extra_lib_dirs) do
     aliases = Enum.map modules, &(&1.module)
-    lib_dirs = extra_lib_dirs ++ elixir_lib_dirs()
+    lib_dirs = extra_lib_dirs ++ elixir_lib_dirs() ++ erlang_lib_dirs()
     modules
     |> Enum.map(&Task.async(fn -> process_module(&1, modules, aliases, extension, lib_dirs) end))
     |> Enum.map(&Task.await(&1, :infinity))
@@ -141,7 +141,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   Converts the given `ast` to string while linking the locals
   given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs, aliases, lib_dirs \\ elixir_lib_dirs()) do
+  def typespec(ast, typespecs, aliases, lib_dirs \\ elixir_lib_dirs() ++ erlang_lib_dirs()) do
     if formatter_available?() do
       format_typespec(ast, typespecs, aliases, lib_dirs)
     else
@@ -246,8 +246,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           alias = expand_alias(alias)
 
           if source = get_source(alias, aliases, lib_dirs) do
-            n = enc_h("#{name}")
-            url = "#{source}#{enc_h(inspect alias)}.html#t:#{n}/#{length(args)}"
+            url = remote_url(source, alias, name, args)
             string = format_typespec_form(form, url)
             put_placeholder(form, string, placeholders)
           else
@@ -261,6 +260,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     ast
     |> format_ast()
     |> replace_placeholders(placeholders)
+  end
+
+  defp remote_url(@erlang_docs = source, module, name, _args) do
+    module = enc_h("#{module}")
+    name = enc_h("#{name}")
+    "#{source}#{module}.html#type-#{name}"
+  end
+  defp remote_url(source, alias, name, args) do
+    name = enc_h("#{name}")
+    "#{source}#{enc_h(inspect alias)}.html#t:#{name}/#{length(args)}"
   end
 
   defp format_typespec_form(form, url) do
