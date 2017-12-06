@@ -261,7 +261,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>(), ] <>
       ~S[<a href="#t:opaque/0">opaque</a>(), :ok | :error}]
 
-    ref_html = ~s[ref() :: {:binary.part(), <a href="#t:public/1">public</a>(#{any})}]
+    ref_html = ~s[ref() :: {<a href="http://www.erlang.org/doc/man/binary.html#type-part">:binary.part</a>(), <a href="#t:public/1">public</a>(#{any})}]
 
     assert content =~ ~s[<a href="#t:public/1">public(t)</a>]
     refute content =~ ~s[<a href="#t:private/0">private</a>]
