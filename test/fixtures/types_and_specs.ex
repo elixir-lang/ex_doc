@@ -5,6 +5,9 @@ defmodule TypesAndSpecs do
 
   @moduledoc """
   Types and tests fixture.
+
+  Basic type: `t:atom/0`.
+  Special form: `import/2`.
   """
 
   @typedoc "A public type"

@@ -62,6 +62,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     timeout: 0
   ]
 
+  @basic_type_strings (for {f, a} <- @basic_types, do: "t:#{f}/#{a}")
+  @built_in_type_strings (for {f, a} <- @built_in_types, do: "t:#{f}/#{a}")
+  @special_form_strings (for {f, a} <- Kernel.SpecialForms.__info__(:macros), do: "#{f}/#{a}")
+
   @doc """
   Receives a list of module nodes and autolink all docs and typespecs.
   """
@@ -94,7 +98,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     moduledoc =
       if module.doc do
         module.doc
-        |> local_doc(locals)
+        |> local_doc(locals, extension, lib_dirs)
         |> project_doc(modules, module.id, extension, lib_dirs)
       end
 
@@ -102,7 +106,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       doc =
         if module_node.doc do
           module_node.doc
-          |> local_doc(locals)
+          |> local_doc(locals, extension, lib_dirs)
           |> project_doc(modules, module.id, extension, lib_dirs)
         end
       %{module_node | doc: doc}
@@ -112,7 +116,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       doc =
         if module_node.doc do
           module_node.doc
-          |> local_doc(locals)
+          |> local_doc(locals, extension, lib_dirs)
           |> project_doc(modules, module.id, extension, lib_dirs)
         end
       %{module_node | doc: doc}
@@ -339,15 +343,29 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   or trailing `]`, e.g. `[my link link/1 is here](url)`, the fun/arity
   will get translated to the new href of the function.
   """
-  def local_doc(bin, locals) when is_binary(bin) do
+  def local_doc(bin, locals, extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) when is_binary(bin) do
     fun_re = Regex.source(~r{(([ct]:)?([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
     regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
+    elixir_doc = get_source(Kernel, [], lib_dirs)
+
     Regex.replace(regex, bin, fn all, match ->
-      if match in locals do
-        {prefix, _, function, arity} = split_function(match)
-        "[`#{function}/#{arity}`](##{prefix}#{enc_h function}/#{arity})"
-      else
-        all
+      {prefix, _, function, arity} = split_function(match)
+
+      cond do
+        match in locals ->
+          "[`#{function}/#{arity}`](##{prefix}#{enc_h function}/#{arity})"
+
+        match in @basic_type_strings ->
+          "[`#{function}/#{arity}`](#{elixir_doc}#{@basic_types_page})"
+
+        match in @built_in_type_strings ->
+          "[`#{function}/#{arity}`](#{elixir_doc}#{@built_in_types_page})"
+
+        match in @special_form_strings ->
+          "[`#{function}/#{arity}`](#{elixir_doc}Kernel.SpecialForms#{extension}##{prefix}#{enc_h function}/#{arity})"
+
+        true ->
+          all
       end
     end)
   end
@@ -406,8 +424,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       cond do
         match in project_funs ->
           "[`#{module}.#{function}/#{arity}`](#{module}#{extension}##{prefix}#{enc_h function}/#{arity})"
+
         doc = lib_dirs_to_doc("Elixir." <> module, lib_dirs) ->
           "[`#{module}.#{function}/#{arity}`](#{doc}#{module}.html##{prefix}#{enc_h function}/#{arity})"
+
         true ->
           all
       end

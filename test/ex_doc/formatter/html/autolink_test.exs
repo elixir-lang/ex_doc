@@ -34,6 +34,13 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     # links to types without arity don't work
     assert Autolink.local_doc("`t:my_type`", ["t:my_type/0"]) == "`t:my_type`"
   end
+  test "autolink to basic and built-in types" do
+    assert Autolink.local_doc("`t:atom/0`", []) ==
+      "[`atom/0`](#{@elixir_docs}elixir/typespecs.html#basic-types)"
+
+    assert Autolink.local_doc("`t:term/0`", []) ==
+      "[`term/0`](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
+  end
 
   test "autolink doesn't create links for undefined functions in docs" do
     assert Autolink.local_doc("`example/1`", ["example/2"]) == "`example/1`"
@@ -52,6 +59,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.local_doc("`--/2`", ["--/2"]) === "[`--/2`](#--/2)"
     assert Autolink.local_doc("`<<>>/1`", ["<<>>/1"]) === "[`<<>>/1`](#%3C%3C%3E%3E/1)"
     assert Autolink.local_doc("`{}/1`", ["{}/1"]) === "[`{}/1`](#%7B%7D/1)"
+  end
+
+  test "autolink creates links for Kernel special forms" do
+    assert Autolink.local_doc("`<<>>/1`", []) ===
+           "[`<<>>/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
   end
 
   # elixir_functions
