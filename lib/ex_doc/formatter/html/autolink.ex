@@ -83,7 +83,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp process_module(module, modules, aliases, extension, lib_dirs) do
     module
-    |> all_docs(modules, extension, lib_dirs)
+    |> all_docs(modules, aliases, extension, lib_dirs)
     |> all_typespecs(aliases, lib_dirs)
   end
 
@@ -91,7 +91,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     inspect module.module
   end
 
-  defp all_docs(module, modules, extension, lib_dirs) do
+  defp all_docs(module, modules, aliases, extension, lib_dirs) do
     locals =
       for doc <- module.docs,
           prefix = doc_prefix(doc),
@@ -102,7 +102,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     moduledoc =
       if module.doc do
         module.doc
-        |> local_doc(locals, extension, lib_dirs)
+        |> local_doc(locals, aliases, extension, lib_dirs)
         |> project_doc(modules, module.id, extension, lib_dirs)
       end
 
@@ -110,7 +110,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       doc =
         if module_node.doc do
           module_node.doc
-          |> local_doc(locals, extension, lib_dirs)
+          |> local_doc(locals, aliases, extension, lib_dirs)
           |> project_doc(modules, module.id, extension, lib_dirs)
         end
       %{module_node | doc: doc}
@@ -120,7 +120,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       doc =
         if module_node.doc do
           module_node.doc
-          |> local_doc(locals, extension, lib_dirs)
+          |> local_doc(locals, aliases, extension, lib_dirs)
           |> project_doc(modules, module.id, extension, lib_dirs)
         end
       %{module_node | doc: doc}
@@ -347,10 +347,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   or trailing `]`, e.g. `[my link link/1 is here](url)`, the fun/arity
   will get translated to the new href of the function.
   """
-  def local_doc(bin, locals, extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) when is_binary(bin) do
+  def local_doc(bin, locals, aliases \\ [], extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) when is_binary(bin) do
     fun_re = Regex.source(~r{(([ct]:)?([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
     regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
-    elixir_doc = get_source(Kernel, [], lib_dirs)
+    elixir_doc = get_source(Kernel, aliases, lib_dirs)
 
     Regex.replace(regex, bin, fn all, match ->
       {prefix, _, function, arity} = split_function(match)
