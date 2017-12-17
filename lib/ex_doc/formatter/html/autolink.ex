@@ -62,9 +62,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     timeout: 0
   ]
 
+  kernel_exports = Kernel.__info__(:functions) ++ Kernel.__info__(:macros)
+  special_form_exports = Kernel.SpecialForms.__info__(:macros)
+
   @basic_type_strings (for {f, a} <- @basic_types, do: "t:#{f}/#{a}")
   @built_in_type_strings (for {f, a} <- @built_in_types, do: "t:#{f}/#{a}")
-  @special_form_strings (for {f, a} <- Kernel.SpecialForms.__info__(:macros), do: "#{f}/#{a}")
+  @kernel_function_strings (for {f, a} <- kernel_exports, do: "#{f}/#{a}")
+  @special_form_strings (for {f, a} <- special_form_exports, do: "#{f}/#{a}")
 
   @doc """
   Receives a list of module nodes and autolink all docs and typespecs.
@@ -360,6 +364,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
         match in @built_in_type_strings ->
           "[`#{function}/#{arity}`](#{elixir_doc}#{@built_in_types_page})"
+
+        match in @kernel_function_strings ->
+          "[`#{function}/#{arity}`](#{elixir_doc}Kernel#{extension}##{prefix}#{enc_h function}/#{arity})"
 
         match in @special_form_strings ->
           "[`#{function}/#{arity}`](#{elixir_doc}Kernel.SpecialForms#{extension}##{prefix}#{enc_h function}/#{arity})"
