@@ -53,17 +53,17 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   end
 
   test "autolink creates links for special forms" do
-    assert Autolink.local_doc("`++/2`", ["++/2"]) === "[`++/2`](#++/2)"
-    assert Autolink.local_doc("`!/1`", ["!/1"]) === "[`!/1`](#!/1)"
-    assert Autolink.local_doc("`../2`", ["../2"]) === "[`../2`](#../2)"
-    assert Autolink.local_doc("`--/2`", ["--/2"]) === "[`--/2`](#--/2)"
-    assert Autolink.local_doc("`<<>>/1`", ["<<>>/1"]) === "[`<<>>/1`](#%3C%3C%3E%3E/1)"
     assert Autolink.local_doc("`{}/1`", ["{}/1"]) === "[`{}/1`](#%7B%7D/1)"
-  end
-
-  test "autolink creates links for Kernel special forms" do
+    assert Autolink.local_doc("`<<>>/1`", ["<<>>/1"]) === "[`<<>>/1`](#%3C%3C%3E%3E/1)"
     assert Autolink.local_doc("`<<>>/1`", []) ===
            "[`<<>>/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
+  end
+
+  test "autolink creates links for Kernel functions" do
+    assert Autolink.local_doc("`abs/1`", ["abs/1"]) === "[`abs/1`](#abs/1)"
+    assert Autolink.local_doc("`abs/1`", []) === "[`abs/1`](#{@elixir_docs}elixir/Kernel.html#abs/1)"
+    assert Autolink.local_doc("`!/1`", ["!/1"]) === "[`!/1`](#!/1)"
+    assert Autolink.local_doc("`!/1`", []) === "[`!/1`](#{@elixir_docs}elixir/Kernel.html#!/1)"
   end
 
   # elixir_functions
