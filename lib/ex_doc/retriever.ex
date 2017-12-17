@@ -252,16 +252,6 @@ defmodule ExDoc.Retriever do
         specs
       end
 
-    annotations =
-      case {type, name, arity} do
-        {:defmacro, _, _} ->
-          ["macro"]
-        {_, :__struct__, 0} ->
-          ["struct"]
-        _ ->
-          []
-      end
-
     node_signature =
       case {name, arity} do
         {:__struct__, 0} ->
@@ -282,8 +272,22 @@ defmodule ExDoc.Retriever do
       source_path: source.path,
       source_url: source_link(source, line),
       type: type,
-      annotations: annotations
+      annotations: function_annotations(module_info, type, name, arity)
     }
+  end
+
+  defp function_annotations(%{name: Kernel.SpecialForms}, _, _, _) do
+    ["special form"]
+  end
+  defp function_annotations(_module_info, type, name, arity) do
+    case {type, name, arity} do
+      {:defmacro, _, _} ->
+        ["macro"]
+      {_, :__struct__, 0} ->
+        ["struct"]
+      _ ->
+        []
+    end
   end
 
   defp remove_first_macro_arg({:::, info, [{name, info2, [_term_arg | rest_args]}, return]}) do
