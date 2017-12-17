@@ -271,6 +271,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~s[A public type]
     assert content =~ ~s[add(#{integer}, <a href="#t:opaque/0">opaque</a>()) :: #{integer}]
     refute content =~ ~s[minus(#{integer}, #{integer}) :: #{integer}]
+    assert content =~ ~s[Basic type: <a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\"><code class=\"inline\">atom/0</code></a>.]
+    assert content =~ ~s[Special form: <a href=\"https://hexdocs.pm/elixir/Kernel.SpecialForms.html#import/2\"><code class=\"inline\">import/2</code></a>.]
   end
 
   test "module_page outputs summaries" do
