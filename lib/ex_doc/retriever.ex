@@ -522,6 +522,8 @@ defmodule ExDoc.Retriever do
     spec = process_type_ast(Typespec.type_to_ast(spec), type)
     line = anno_line(anno) || doc_line
 
+    annotations = if type == :opaque, do: ["opaque"], else: []
+
     %ExDoc.TypeNode{
       id: "#{name}/#{arity}",
       name: name,
@@ -532,7 +534,8 @@ defmodule ExDoc.Retriever do
       doc_line: doc_line,
       signature: get_typespec_signature(spec, arity),
       source_path: source.path,
-      source_url: source_link(source, line)
+      source_url: source_link(source, line),
+      annotations: annotations
     }
   end
 
