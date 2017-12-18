@@ -421,19 +421,28 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def elixir_functions(bin, project_funs, extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) when is_binary(bin) do
-    module_re = Regex.source(~r{(([A-Z][A-Za-z_\d]+)\.)+})
-    fun_re = Regex.source(~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
-    regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
+    module_re = ~r{(?|(?|[A-Z][A-Za-z_\d]+)\.)*}.source
+    fun_re = ~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)}.source
+    normal_link_re = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}.source
+    custom_link_re = ~r{(?|\[(.*)\])\(`(#{fun_re})`\)}.source
+    re = ~r{#{custom_link_re}|#{normal_link_re}}
 
-    Regex.replace(regex, bin, fn all, match ->
-      {prefix, module, function, arity} = split_function(match)
+    Regex.replace(re, bin, fn all, custom_text, custom_match, _, _, _, normal_match ->
+      {text, match, prefix, module, function, arity} =
+        if custom_match == "" do
+          {prefix, module, function, arity} = split_function(normal_match)
+          {"`#{module}.#{function}/#{arity}`", normal_match, prefix, module, function, arity}
+        else
+          {prefix, module, function, arity} = split_function(custom_match)
+          {custom_text, custom_match, prefix, module, function, arity}
+        end
 
       cond do
         match in project_funs ->
-          "[`#{module}.#{function}/#{arity}`](#{module}#{extension}##{prefix}#{enc_h function}/#{arity})"
+          "[#{text}](#{module}#{extension}##{prefix}#{enc_h function}/#{arity})"
 
         doc = lib_dirs_to_doc("Elixir." <> module, lib_dirs) ->
-          "[`#{module}.#{function}/#{arity}`](#{doc}#{module}.html##{prefix}#{enc_h function}/#{arity})"
+          "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h function}/#{arity})"
 
         true ->
           all

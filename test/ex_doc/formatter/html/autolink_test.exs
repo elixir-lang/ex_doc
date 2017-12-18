@@ -121,14 +121,32 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   test "autolink functions doesn't create links for pre-linked Mod.functions docs" do
     assert Autolink.elixir_functions("[`Mod.example/1`]()", ["Mod.example/1"]) == "[`Mod.example/1`]()"
     assert Autolink.elixir_functions("[the `Mod.example/1`]()", ["Mod.example/1"]) == "[the `Mod.example/1`]()"
+
+    assert Autolink.elixir_functions("[`Mod.example/1`](foo)", ["Mod.example/1"]) == "[`Mod.example/1`](foo)"
+    assert Autolink.elixir_functions("[the `Mod.example/1`](foo)", ["Mod.example/1"]) == "[the `Mod.example/1`](foo)"
+  end
+
+  test "autolink functions create custom links" do
+    assert Autolink.elixir_functions("[`example`](`Mod.example/1`)", ["Mod.example/1"]) ==
+           "[`example`](Mod.html#example/1)"
+    assert Autolink.elixir_functions("[the `example`](`Mod.example/1`)", ["Mod.example/1"]) ==
+           "[the `example`](Mod.html#example/1)"
+    assert Autolink.elixir_functions("[the `Mod.example/1`](`Mod.example/1`)", ["Mod.example/1"]) ==
+           "[the `Mod.example/1`](Mod.html#example/1)"
+
+    assert Autolink.elixir_functions("[`callback(a)`](`c:Foo.foo/1`)", ["c:Foo.foo/1"]) ==
+           "[`callback(a)`](Foo.html#c:foo/1)"
+
+    assert Autolink.elixir_functions("[the `upcase`](`String.upcase/1`)", []) ==
+           "[the `upcase`](#{@elixir_docs}elixir/String.html#upcase/1)"
   end
 
   test "autolink functions to types in the project" do
     # use the same approach for elixir_functions as for local_docs
     assert Autolink.elixir_functions("`t:MyModule.my_type/0`",
-      ["t:MyModule.my_type/0"]) ==  "[`MyModule.my_type/0`](MyModule.html#t:my_type/0)"
+      ["t:MyModule.my_type/0"]) == "[`MyModule.my_type/0`](MyModule.html#t:my_type/0)"
     assert Autolink.elixir_functions("`t:MyModule.my_type`",
-      ["t:MyModule.my_type/0"]) ==  "`t:MyModule.my_type`"
+      ["t:MyModule.my_type/0"]) == "`t:MyModule.my_type`"
   end
 
   # elixir_modules
