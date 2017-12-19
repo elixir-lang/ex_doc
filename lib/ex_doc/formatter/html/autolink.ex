@@ -426,46 +426,36 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> replace_normal_links(project_funs, extension, lib_dirs)
   end
 
+  module_re = Regex.source(~r{(([A-Z][A-Za-z_\d]+)\.)+})
+  fun_re = Regex.source(~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
+  @custom_re ~r{\[(.*)\]\(`(#{fun_re})`\)}
+  @normal_re ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
+
   def replace_custom_links(bin, project_funs, extension, lib_dirs) when is_binary(bin) do
-    module_re = Regex.source(~r{(([A-Z][A-Za-z_\d]+)\.)+})
-    fun_re = Regex.source(~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
-    custom_re = ~r{\[(.*)\]\(`(#{fun_re})`\)}
-
-    Regex.replace(custom_re, bin, fn all, text, match ->
-      {prefix, module, function, arity} = split_function(match)
-
-      cond do
-        match in project_funs ->
-          "[#{text}](#{module}#{extension}##{prefix}#{enc_h function}/#{arity})"
-
-        doc = lib_dirs_to_doc("Elixir." <> module, lib_dirs) ->
-          "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h function}/#{arity})"
-
-        true ->
-          all
-      end
+    Regex.replace(@custom_re, bin, fn all, text, match ->
+      replacement(all, match, project_funs, extension, lib_dirs)
     end)
   end
 
   def replace_normal_links(bin, project_funs, extension, lib_dirs) when is_binary(bin) do
-    module_re = Regex.source(~r{(([A-Z][A-Za-z_\d]+)\.)+})
-    fun_re = Regex.source(~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
-    normal_re = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
-
-    Regex.replace(normal_re, bin, fn all, match ->
-      {prefix, module, function, arity} = split_function(match)
-
-      cond do
-        match in project_funs ->
-          "[`#{module}.#{function}/#{arity}`](#{module}#{extension}##{prefix}#{enc_h function}/#{arity})"
-
-        doc = lib_dirs_to_doc("Elixir." <> module, lib_dirs) ->
-          "[`#{module}.#{function}/#{arity}`](#{doc}#{module}.html##{prefix}#{enc_h function}/#{arity})"
-
-        true ->
-          all
-      end
+    Regex.replace(@normal_re, bin, fn all, match ->
+      replacement(all, match, project_funs, extension, lib_dirs)
     end)
+  end
+
+  def replacement(all, match, project_funs, extension, lib_dirs) do
+    {prefix, module, function, arity} = split_function(match)
+
+    cond do
+      match in project_funs ->
+        "[`#{module}.#{function}/#{arity}`](#{module}#{extension}##{prefix}#{enc_h function}/#{arity})"
+
+      doc = lib_dirs_to_doc("Elixir." <> module, lib_dirs) ->
+        "[`#{module}.#{function}/#{arity}`](#{doc}#{module}.html##{prefix}#{enc_h function}/#{arity})"
+
+      true ->
+        all
+    end
   end
 
   @doc """
