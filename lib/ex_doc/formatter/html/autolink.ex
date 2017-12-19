@@ -421,11 +421,38 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def elixir_functions(bin, project_funs, extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) when is_binary(bin) do
+    bin
+    |> replace_custom_links(project_funs, extension, lib_dirs)
+    |> replace_normal_links(project_funs, extension, lib_dirs)
+  end
+
+  def replace_custom_links(bin, project_funs, extension, lib_dirs) when is_binary(bin) do
     module_re = Regex.source(~r{(([A-Z][A-Za-z_\d]+)\.)+})
     fun_re = Regex.source(~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
-    regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
+    custom_re = ~r{\[(.*)\]\(`(#{fun_re})`\)}
 
-    Regex.replace(regex, bin, fn all, match ->
+    Regex.replace(custom_re, bin, fn all, text, match ->
+      {prefix, module, function, arity} = split_function(match)
+
+      cond do
+        match in project_funs ->
+          "[#{text}](#{module}#{extension}##{prefix}#{enc_h function}/#{arity})"
+
+        doc = lib_dirs_to_doc("Elixir." <> module, lib_dirs) ->
+          "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h function}/#{arity})"
+
+        true ->
+          all
+      end
+    end)
+  end
+
+  def replace_normal_links(bin, project_funs, extension, lib_dirs) when is_binary(bin) do
+    module_re = Regex.source(~r{(([A-Z][A-Za-z_\d]+)\.)+})
+    fun_re = Regex.source(~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
+    normal_re = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
+
+    Regex.replace(normal_re, bin, fn all, match ->
       {prefix, module, function, arity} = split_function(match)
 
       cond do
@@ -458,10 +485,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       cond do
         match == module_id ->
           "[`#{match}`](#{match}#{extension}#content)"
+
         match in modules ->
           "[`#{match}`](#{match}#{extension})"
+
         doc = lib_dirs_to_doc("Elixir." <> match, lib_dirs) ->
           "[`#{match}`](#{doc}#{match}.html)"
+
         true ->
           all
       end
