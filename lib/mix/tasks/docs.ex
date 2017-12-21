@@ -108,9 +108,6 @@ defmodule Mix.Tasks.Docs do
     * `:source_ref` - The branch/commit/tag used for source link inference;
       default: "master".
 
-    * `:source_root` - Path to the source code root directory;
-      default: "." (current directory).
-
     * `:source_url_pattern` - Public URL of the project. Derived from
       project's `:source_url` and `:source_ref`. Example:
       "https://github.com/USER/APP/blob/master/%{path}#L%{line}"
