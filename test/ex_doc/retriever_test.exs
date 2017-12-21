@@ -230,10 +230,7 @@ defmodule ExDoc.RetrieverTest do
   end
 
   test "undocumented callback implementations get default doc" do
-    [module_node] =
-      ["CustomBehaviourOne", "CustomBehaviourTwo", "CustomBehaviourImpl"]
-      |> docs_from_files()
-      |> Enum.filter(&match?(%ExDoc.ModuleNode{id: "CustomBehaviourImpl"}, &1))
+    [module_node] = docs_from_files ["CustomBehaviourImpl"]
     docs = module_node.docs
     assert Enum.map(docs, &(&1.id)) == ["bye/1", "greet/1", "hello/1"]
     assert Enum.at(docs, 0).doc ==
@@ -243,6 +240,17 @@ defmodule ExDoc.RetrieverTest do
     assert Enum.at(docs, 2).doc ==
       "This is a sample callback.\n\n\n" <>
       "Callback implementation for `c:CustomBehaviourOne.hello/1`."
+  end
+
+  test "callback implementations get specs from behaviour" do
+    [module_node] = docs_from_files ["CustomBehaviourImpl"]
+
+    [_, greet, hello] = module_node.docs
+    assert greet.name == :greet
+    assert Macro.to_string(greet.specs) == "[greet(integer() | String.t()) :: integer()]"
+
+    assert hello.name == :hello
+    assert Macro.to_string(hello.specs) == "[hello(non_neg_integer()) :: non_neg_integer()]"
   end
 
   ## PROTOCOLS

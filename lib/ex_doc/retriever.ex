@@ -239,18 +239,9 @@ defmodule ExDoc.Retriever do
     function = actual_def(name, arity, type)
     line = find_actual_line(module_info.abst_code, function, :function) || doc_line
 
-    doc = docstring(doc, name, arity, Map.fetch(module_info.impls, {name, arity}))
-
-    specs = module_info.specs
-            |> Map.get(function, [])
-            |> Enum.map(&Typespec.spec_to_ast(name, &1))
-
-    specs =
-      if type == :defmacro do
-        Enum.map(specs, &remove_first_macro_arg/1)
-      else
-        specs
-      end
+    impl = Map.fetch(module_info.impls, {name, arity})
+    doc = docstring(doc, name, arity, impl)
+    specs = get_specs(module_info, type, function, name, arity, impl)
 
     annotations =
       case {type, name, arity} do
@@ -295,6 +286,31 @@ defmodule ExDoc.Retriever do
       0 -> []
       defaults -> for default <- (arity - defaults)..(arity - 1), do: "#{name}/#{default}"
     end
+  end
+
+  defp get_specs(module_info, type, function, name, arity, impl) do
+    specs =
+      module_info.specs
+      |> Map.get(function, [])
+      |> Enum.map(&Typespec.spec_to_ast(name, &1))
+
+    specs =
+      if type == :defmacro do
+        Enum.map(specs, &remove_first_macro_arg/1)
+      else
+        specs
+      end
+
+    copy_callback_specs(specs, name, arity, impl)
+  end
+
+  defp copy_callback_specs([], name, arity, {:ok, behaviour}) do
+    callbacks = Kernel.Typespec.beam_callbacks(behaviour)
+    {_, specs} = List.keyfind(callbacks, {name, arity}, 0)
+    Enum.map(specs, &Typespec.spec_to_ast(name, &1))
+  end
+  defp copy_callback_specs(specs, _, _, _) do
+    specs
   end
 
   defp docstring(nil, name, arity, {:ok, behaviour}) do
