@@ -20,7 +20,9 @@ defmodule CustomBehaviourImpl do
   @behaviour CustomBehaviourOne
   @behaviour CustomBehaviourTwo
 
+  @spec hello(non_neg_integer()) :: non_neg_integer()
   def hello(i), do: i
+
   def greet(i), do: i
 
   @doc "A doc for this so it doesn't use 'Callback implementation for'"
