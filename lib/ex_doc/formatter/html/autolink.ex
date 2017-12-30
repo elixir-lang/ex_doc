@@ -429,7 +429,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   module_re = Regex.source(~r{(([A-Z][A-Za-z_\d]+)\.)+})
   fun_re = Regex.source(~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
-  @custom_re ~r{\[(.*)\]\(`(#{fun_re})`\)}
+  @custom_re ~r{\[(.*?)\]\(`(#{fun_re})`\)}
   @normal_re ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
 
   def replace_custom_links(bin, project_funs, extension, lib_dirs) do

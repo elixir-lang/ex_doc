@@ -139,6 +139,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
     assert Autolink.elixir_functions("[the `upcase`](`String.upcase/1`)", []) ==
            "[the `upcase`](#{@elixir_docs}elixir/String.html#upcase/1)"
+
+    assert Autolink.elixir_functions("[`f`](`Foo.foo/1`), [`f`](`Foo.foo/1`)", ["Foo.foo/1"]) ==
+           "[`f`](Foo.html#foo/1), [`f`](Foo.html#foo/1)"
   end
 
   test "autolink functions to types in the project" do
