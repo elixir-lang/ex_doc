@@ -354,22 +354,23 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     Regex.replace(regex, bin, fn all, match ->
       {prefix, _, function, arity} = split_function(match)
+      text = "`#{function}/#{arity}`"
 
       cond do
         match in locals ->
-          "[`#{function}/#{arity}`](##{prefix}#{enc_h function}/#{arity})"
+          "[#{text}](##{prefix}#{enc_h function}/#{arity})"
 
         match in @basic_type_strings ->
-          "[`#{function}/#{arity}`](#{elixir_doc}#{@basic_types_page})"
+          "[#{text}](#{elixir_doc}#{@basic_types_page})"
 
         match in @built_in_type_strings ->
-          "[`#{function}/#{arity}`](#{elixir_doc}#{@built_in_types_page})"
+          "[#{text}](#{elixir_doc}#{@built_in_types_page})"
 
         match in @kernel_function_strings ->
-          "[`#{function}/#{arity}`](#{elixir_doc}Kernel#{extension}##{prefix}#{enc_h function}/#{arity})"
+          "[#{text}](#{elixir_doc}Kernel#{extension}##{prefix}#{enc_h function}/#{arity})"
 
         match in @special_form_strings ->
-          "[`#{function}/#{arity}`](#{elixir_doc}Kernel.SpecialForms#{extension}##{prefix}#{enc_h function}/#{arity})"
+          "[#{text}](#{elixir_doc}Kernel.SpecialForms#{extension}##{prefix}#{enc_h function}/#{arity})"
 
         true ->
           all
@@ -432,19 +433,19 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @custom_re ~r{\[(.*?)\]\(`(#{fun_re})`\)}
   @normal_re ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
 
-  def replace_custom_links(bin, project_funs, extension, lib_dirs) do
+  defp replace_custom_links(bin, project_funs, extension, lib_dirs) do
     Regex.replace(@custom_re, bin, fn all, text, match ->
       replacement(all, match, project_funs, extension, lib_dirs, text)
     end)
   end
 
-  def replace_normal_links(bin, project_funs, extension, lib_dirs) do
+  defp replace_normal_links(bin, project_funs, extension, lib_dirs) do
     Regex.replace(@normal_re, bin, fn all, match ->
       replacement(all, match, project_funs, extension, lib_dirs)
     end)
   end
 
-  def replacement(all, match, project_funs, extension, lib_dirs, text \\ nil) do
+  defp replacement(all, match, project_funs, extension, lib_dirs, text \\ nil) do
     {prefix, module, function, arity} = split_function(match)
     text = text || "`#{module}.#{function}/#{arity}`"
 
