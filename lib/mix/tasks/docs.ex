@@ -79,7 +79,7 @@ defmodule Mix.Tasks.Docs do
     * `:extras` - List of keywords, each key must indicate the path to additional
       Markdown pages, the value for each keyword (optional) gives you more control
       about the PATH and the title of the output files; default: `[]`. Example:
-      `["README.md", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing"]]`
+      `["README.md", {"CONTRIBUTING.md", [filename: "contributing", title: "Contributing"]}]`
 
     * `:filter_prefix` - Include only modules that match the given prefix in
       the generated documentation. Example: "MyApp.Core"
