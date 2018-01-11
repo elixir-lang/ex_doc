@@ -136,7 +136,7 @@ defmodule Mix.Tasks.Docs do
 
       groups_for_extras: [
         "Introduction": Path.wildcard("guides/introduction/*.md"),
-        "Advanced": Path.wildcard("guides/introduction/*.md")
+        "Advanced": Path.wildcard("guides/advanced/*.md")
       ]
 
   Or via a regex:
