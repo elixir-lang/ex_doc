@@ -217,6 +217,11 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<a href="RandomError.html"><code(\sclass="inline")?>RandomError</code>}
     assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code(\sclass="inline")?>CustomBehaviourImpl.hello/1</code>}
     assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
+    assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
+    assert content =~ ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#is_atom/1"><code(\sclass="inline")?>is_atom/1</code></a>}
+    assert content =~ ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#==/2"><code(\sclass="inline")?>==/2</code></a>}
+    assert content =~ ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#===/2"><code(\sclass="inline")?>===</code></a>}
+    assert content =~ ~r{<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types"><code(\sclass="inline")?>atom/0</code></a>}
   end
 
   # There are 3 possibilities for the `before_closing_*_tags`:
