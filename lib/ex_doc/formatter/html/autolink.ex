@@ -402,6 +402,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       |> Enum.uniq()
 
     bin
+    |> local_doc(project_docs, [], extension, lib_dirs)
     |> elixir_functions(project_docs, extension, lib_dirs)
     |> elixir_modules(project_modules, module_id, extension, lib_dirs)
     |> erlang_functions()
