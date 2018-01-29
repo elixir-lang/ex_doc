@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.18.2
+
+  * Enhancements
+    * Improve documentation pages for printing
+    * Autolink Kernel, Kernel.SpecialForms, and built-in types
+    * Annotate opaque types
+    * Add vertical-align:top to tables
+    * Allow module-function-arity references in links, for example: [some code](`MyMod.fun/2`)
+    * Remove underscore from view source link
+    * Run code formatter on typespecs (if one is available)
+    * Make night mode switch link more obvious
+
 ## v0.18.1
 
   * Bug fixes
