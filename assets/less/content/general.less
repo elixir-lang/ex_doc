@@ -41,12 +41,11 @@ h3 {
 }
 
 a {
-  .linkUnderlines(@white, @black);
+  .linkUnderlines(@black);
 }
 
 a.no-underline {
-  text-shadow: none;
-  background-image: none;
+  text-decoration: none;
 }
 
 ul {
@@ -62,12 +61,10 @@ ul {
 a.view-source {
   float: right;
   color: @mediumGray;
-  background: none;
+  text-decoration: none;
   border: none;
-  text-shadow: none;
   transition: color 0.3s ease-in-out;
   margin-top: 1px;
-  text-decoration: none;
 
   &:hover {
     color: @darkGray;
@@ -137,9 +134,8 @@ td, th {
     padding: .3em .6em .6em;
     line-height: 1em;
     margin-left: -2.7em;
-    background: none;
+    text-decoration: none;
     border: none;
-    text-shadow: none;
     font-size: 16px;
     vertical-align: middle;
   }
