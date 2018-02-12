@@ -285,8 +285,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     string = Macro.to_string(form)
     link = typespec_string_to_link(string, url)
     count = map_size(placeholders) + 1
-    type_size = byte_size(string)
-    int_size = count |> Integer.to_string() |> byte_size()
+    type_size = String.length(string)
+    int_size = count |> Integer.digits() |> length()
     extra_size = 4 # _, (, ), _
     pad = String.duplicate("p", max(type_size - int_size - extra_size, 1))
     placeholder = :"_#{pad}#{count}_"
