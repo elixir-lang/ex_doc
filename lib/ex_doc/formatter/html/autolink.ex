@@ -288,10 +288,18 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp put_placeholder(form, url, placeholders) do
     string = Macro.to_string(form)
     link = typespec_string_to_link(string, url)
-    count = map_size(placeholders) + 1
-    placeholder = placeholder(string, count)
-    form = put_elem(form, 0, placeholder)
-    {form, Map.put(placeholders, Atom.to_string(placeholder), link)}
+
+    case Enum.find(placeholders, fn {_key, value} -> value == link end) do
+      {placeholder, _} ->
+        form = put_elem(form, 0, String.to_atom(placeholder))
+        {form, placeholders}
+
+      nil ->
+        count = map_size(placeholders) + 1
+        placeholder = placeholder(string, count)
+        form = put_elem(form, 0, placeholder)
+        {form, Map.put(placeholders, Atom.to_string(placeholder), link)}
+    end
   end
 
   defp placeholder(string, count) do

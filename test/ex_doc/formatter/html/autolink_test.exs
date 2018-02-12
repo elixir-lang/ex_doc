@@ -356,6 +356,12 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       [],
       [Mod]
     )
+
+    assert_typespec_placeholders(
+      "foobar(foobar(barbaz()))",
+      "_ppp1_(_ppp1_(_ppp2_()))",
+      [foobar: 1, barbaz: 0]
+    )
   end
 
   test "autolink Elixir types in typespecs" do
