@@ -291,14 +291,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     case Enum.find(placeholders, fn {_key, value} -> value == link end) do
       {placeholder, _} ->
-        form = put_elem(form, 0, String.to_atom(placeholder))
+        form = put_elem(form, 0, placeholder)
         {form, placeholders}
 
       nil ->
         count = map_size(placeholders) + 1
         placeholder = placeholder(string, count)
         form = put_elem(form, 0, placeholder)
-        {form, Map.put(placeholders, Atom.to_string(placeholder), link)}
+        {form, Map.put(placeholders, placeholder, link)}
     end
   end
 
@@ -312,7 +312,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp replace_placeholders(string, placeholders) do
-    Regex.replace(~r"_p+\d+_", string, &Map.fetch!(placeholders, &1))
+    Regex.replace(~r"_p+\d+_", string, &Map.fetch!(placeholders, String.to_atom(&1)))
   end
 
   defp format_ast(ast) do
