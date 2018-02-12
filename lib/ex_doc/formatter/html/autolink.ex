@@ -285,13 +285,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     string = Macro.to_string(form)
     link = typespec_string_to_link(string, url)
     count = map_size(placeholders) + 1
+    placeholder = placeholder(string, count)
+    form = put_elem(form, 0, placeholder)
+    {form, Map.put(placeholders, Atom.to_string(placeholder), link)}
+  end
+
+  defp placeholder(string, count) do
     type_size = String.length(string)
     int_size = count |> Integer.digits() |> length()
     extra_size = 4 # _, (, ), _
     pad = String.duplicate("p", max(type_size - int_size - extra_size, 1))
-    placeholder = :"_#{pad}#{count}_"
-    form = put_elem(form, 0, placeholder)
-    {form, Map.put(placeholders, Atom.to_string(placeholder), link)}
+    :"_#{pad}#{count}_"
   end
 
   defp replace_placeholders(string, placeholders) do
