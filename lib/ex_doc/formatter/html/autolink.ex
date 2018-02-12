@@ -254,7 +254,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           alias = expand_alias(alias)
 
           if source = get_source(alias, aliases, lib_dirs) do
-            url = remote_url(source, alias, name, args)
+            url = type_remote_url(source, alias, name, args)
             string = format_typespec_form(form, url)
             put_placeholder(form, string, placeholders)
           else
@@ -270,12 +270,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> replace_placeholders(placeholders)
   end
 
-  defp remote_url(@erlang_docs = source, module, name, _args) do
+  defp type_remote_url(@erlang_docs = source, module, name, _args) do
     module = enc_h("#{module}")
     name = enc_h("#{name}")
     "#{source}#{module}.html#type-#{name}"
   end
-  defp remote_url(source, alias, name, args) do
+  defp type_remote_url(source, alias, name, args) do
     name = enc_h("#{name}")
     "#{source}#{enc_h(inspect alias)}.html#t:#{name}/#{length(args)}"
   end
@@ -310,31 +310,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       |> IO.iodata_to_binary()
     else
       string
-    end
-  end
-
-  # TODO: remove when we require Elixir v1.6+
-  defp formatter_available? do
-    function_exported?(Code, :format_string!, 2)
-  end
-
-  defp split_string_to_link(string) do
-    case :binary.split(string, "(") do
-      [head, tail] -> {head, "(" <> tail}
-      [head] -> {head, ""}
-    end
-  end
-
-  defp expand_alias({:__aliases__, _, [h|t]}) when is_atom(h), do: Module.concat([h|t])
-  defp expand_alias(atom) when is_atom(atom), do: atom
-  defp expand_alias(_), do: nil
-
-  defp get_source(alias, aliases, lib_dirs) do
-    cond do
-      is_nil(alias) -> nil
-      alias in aliases -> ""
-      doc = lib_dirs_to_doc(alias, lib_dirs) -> doc
-      true -> nil
     end
   end
 
@@ -583,5 +558,30 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         Application.put_env(:ex_doc, :erlang_lib_dirs, lib_dirs)
         lib_dirs
     end
+  end
+
+  defp split_string_to_link(string) do
+    case :binary.split(string, "(") do
+      [head, tail] -> {head, "(" <> tail}
+      [head] -> {head, ""}
+    end
+  end
+
+  defp expand_alias({:__aliases__, _, [h|t]}) when is_atom(h), do: Module.concat([h|t])
+  defp expand_alias(atom) when is_atom(atom), do: atom
+  defp expand_alias(_), do: nil
+
+  defp get_source(alias, aliases, lib_dirs) do
+    cond do
+      is_nil(alias) -> nil
+      alias in aliases -> ""
+      doc = lib_dirs_to_doc(alias, lib_dirs) -> doc
+      true -> nil
+    end
+  end
+
+  # TODO: remove when we require Elixir v1.6+
+  defp formatter_available? do
+    function_exported?(Code, :format_string!, 2)
   end
 end
