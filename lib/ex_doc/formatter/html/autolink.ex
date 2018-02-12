@@ -214,10 +214,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp format_typespec(ast, typespecs, aliases, lib_dirs) do
+    {formatted, placeholders} = format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs)
+    replace_placeholders(formatted, placeholders)
+  end
+
+  @doc false
+  def format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs) do
     ref = make_ref()
     elixir_source = get_source(Kernel, aliases, lib_dirs)
 
-    {ast, placeholders} =
+    {formatted_ast, placeholders} =
       Macro.prewalk(ast, %{}, fn
         {:::, _, [{name, meta, args}, right]}, placeholders when is_atom(name) and is_list(args) ->
           {{:::, [], [{{ref, name}, meta, args}, right]}, placeholders}
@@ -261,9 +267,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           {form, placeholders}
       end)
 
-    ast
-    |> format_ast()
-    |> replace_placeholders(placeholders)
+    {format_ast(formatted_ast), placeholders}
   end
 
   defp type_remote_url(@erlang_docs = source, module, name, _args) do

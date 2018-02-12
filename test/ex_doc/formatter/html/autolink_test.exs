@@ -323,6 +323,15 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
            ~s[p1() :: <a href=\"#t:foo/0\">foo</a>()]
   end
 
+  @tag :formatter
+  test "placeholders" do
+    assert_typespec_placeholders(
+      "foobar()",
+      "_ppp1_()",
+      [foobar: 0]
+    )
+  end
+
   test "autolink Elixir types in typespecs" do
     assert Autolink.typespec(quote(do: String.t), [], []) ==
            ~s[<a href="#{@elixir_docs}elixir/String.html#t:t/0">String.t</a>()]
@@ -391,5 +400,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       ~s[parameterized_t(<a href=\"#{@elixir_docs}elixir/typespecs.html#basic-types\">atom</a>()) :: ] <>
         ~s[<a href=\"#{@elixir_docs}elixir/typespecs.html#basic-types\">list</a>(] <>
         ~s[<a href=\"#{@elixir_docs}elixir/typespecs.html#built-in-types\">function</a>())]
+  end
+
+  defp assert_typespec_placeholders(original, expected, typespecs) do
+    ast = Code.string_to_quoted!(original)
+    {actual, _} = Autolink.format_and_extract_typespec_placeholders(ast, typespecs, [], [])
+    assert actual == expected, "Original: #{original}\nExpected: #{expected}\nActual:   #{actual}"
   end
 end
