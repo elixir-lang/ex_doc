@@ -295,10 +295,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp placeholder(string, count) do
-    type_size = String.length(string)
+    [name | _] = String.split(string, "(", trim: true)
+    name_size = String.length(name)
     int_size = count |> Integer.digits() |> length()
-    extra_size = 4 # _, (, ), _
-    pad = String.duplicate("p", max(type_size - int_size - extra_size, 1))
+    underscores_size = 2
+    pad = String.duplicate("p", max(name_size - int_size - underscores_size, 1))
     :"_#{pad}#{count}_"
   end
 
