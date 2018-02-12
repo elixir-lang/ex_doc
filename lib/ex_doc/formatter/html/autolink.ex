@@ -232,19 +232,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           cond do
             {name, arity} in @basic_types ->
               url = elixir_source <> @basic_types_page
-              string = format_typespec_form(form, url)
-              put_placeholder(form, string, placeholders)
+              put_placeholder(form, url, placeholders)
 
             {name, arity} in @built_in_types ->
               url = elixir_source <> @built_in_types_page
-              string = format_typespec_form(form, url)
-              put_placeholder(form, string, placeholders)
+              put_placeholder(form, url, placeholders)
 
             {name, arity} in typespecs ->
               n = enc_h("#{name}")
               url = "#t:#{n}/#{arity}"
-              string = format_typespec_form(form, url)
-              put_placeholder(form, string, placeholders)
+              put_placeholder(form, url, placeholders)
 
             true ->
               {form, placeholders}
@@ -255,8 +252,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
           if source = get_source(alias, aliases, lib_dirs) do
             url = type_remote_url(source, alias, name, args)
-            string = format_typespec_form(form, url)
-            put_placeholder(form, string, placeholders)
+            put_placeholder(form, url, placeholders)
           else
             {form, placeholders}
           end
@@ -286,7 +282,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     ~s[<a href="#{url}">#{h(string_to_link)}</a>]
   end
 
-  defp put_placeholder(form, string, placeholders) do
+  defp put_placeholder(form, url, placeholders) do
+    string = format_typespec_form(form, url)
     count = map_size(placeholders) + 1
     type_size = form |> Macro.to_string() |> byte_size()
     int_size = count |> Integer.to_string() |> byte_size()
