@@ -318,6 +318,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
            ~s[t() :: %{foo: bar(), really_long_name_that_will_trigger_multiple_line_breaks: <a href=\"#{@elixir_docs}elixir/String.html#t:t/0\">String.t</a>()}]
   end
 
+  test "autolink types that look like formatter placeholders" do
+    assert Autolink.typespec(quote(do: p1() :: foo()), [foo: 0], []) ==
+           ~s[p1() :: <a href=\"#t:foo/0\">foo</a>()]
+  end
+
   test "autolink Elixir types in typespecs" do
     assert Autolink.typespec(quote(do: String.t), [], []) ==
            ~s[<a href="#{@elixir_docs}elixir/String.html#t:t/0">String.t</a>()]
