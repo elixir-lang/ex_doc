@@ -276,22 +276,22 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     "#{source}#{enc_h(inspect alias)}.html#t:#{name}/#{length(args)}"
   end
 
-  defp format_typespec_form(form, url) do
-    string = Macro.to_string(form)
+  defp typespec_string_to_link(string, url) do
     {string_to_link, _string_with_parens} = split_string_to_link(string)
     ~s[<a href="#{url}">#{h(string_to_link)}</a>]
   end
 
   defp put_placeholder(form, url, placeholders) do
-    string = format_typespec_form(form, url)
+    string = Macro.to_string(form)
+    link = typespec_string_to_link(string, url)
     count = map_size(placeholders) + 1
-    type_size = form |> Macro.to_string() |> byte_size()
+    type_size = byte_size(string)
     int_size = count |> Integer.to_string() |> byte_size()
     extra_size = 4 # _, (, ), _
     pad = String.duplicate("p", max(type_size - int_size - extra_size, 1))
     placeholder = :"_#{pad}#{count}_"
     form = put_elem(form, 0, placeholder)
-    {form, Map.put(placeholders, Atom.to_string(placeholder), string)}
+    {form, Map.put(placeholders, Atom.to_string(placeholder), link)}
   end
 
   defp replace_placeholders(string, placeholders) do
