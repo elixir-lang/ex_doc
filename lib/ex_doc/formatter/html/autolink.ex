@@ -214,10 +214,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp format_typespec(ast, typespecs, aliases, lib_dirs) do
+    {formatted, placeholders} = format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs)
+    replace_placeholders(formatted, placeholders)
+  end
+
+  @doc false
+  def format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs) do
     ref = make_ref()
     elixir_source = get_source(Kernel, aliases, lib_dirs)
 
-    {ast, placeholders} =
+    {formatted_ast, placeholders} =
       Macro.prewalk(ast, %{}, fn
         {:::, _, [{name, meta, args}, right]}, placeholders when is_atom(name) and is_list(args) ->
           {{:::, [], [{{ref, name}, meta, args}, right]}, placeholders}
@@ -232,19 +238,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           cond do
             {name, arity} in @basic_types ->
               url = elixir_source <> @basic_types_page
-              string = format_typespec_form(form, url)
-              put_placeholder(form, string, placeholders)
+              put_placeholder(form, url, placeholders)
 
             {name, arity} in @built_in_types ->
               url = elixir_source <> @built_in_types_page
-              string = format_typespec_form(form, url)
-              put_placeholder(form, string, placeholders)
+              put_placeholder(form, url, placeholders)
 
             {name, arity} in typespecs ->
               n = enc_h("#{name}")
               url = "#t:#{n}/#{arity}"
-              string = format_typespec_form(form, url)
-              put_placeholder(form, string, placeholders)
+              put_placeholder(form, url, placeholders)
 
             true ->
               {form, placeholders}
@@ -254,9 +257,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           alias = expand_alias(alias)
 
           if source = get_source(alias, aliases, lib_dirs) do
-            url = remote_url(source, alias, name, args)
-            string = format_typespec_form(form, url)
-            put_placeholder(form, string, placeholders)
+            url = type_remote_url(source, alias, name, args)
+            put_placeholder(form, url, placeholders)
           else
             {form, placeholders}
           end
@@ -265,40 +267,52 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           {form, placeholders}
       end)
 
-    ast
-    |> format_ast()
-    |> replace_placeholders(placeholders)
+    {format_ast(formatted_ast), placeholders}
   end
 
-  defp remote_url(@erlang_docs = source, module, name, _args) do
+  defp type_remote_url(@erlang_docs = source, module, name, _args) do
     module = enc_h("#{module}")
     name = enc_h("#{name}")
     "#{source}#{module}.html#type-#{name}"
   end
-  defp remote_url(source, alias, name, args) do
+  defp type_remote_url(source, alias, name, args) do
     name = enc_h("#{name}")
     "#{source}#{enc_h(inspect alias)}.html#t:#{name}/#{length(args)}"
   end
 
-  defp format_typespec_form(form, url) do
-    string = Macro.to_string(form)
+  defp typespec_string_to_link(string, url) do
     {string_to_link, _string_with_parens} = split_string_to_link(string)
     ~s[<a href="#{url}">#{h(string_to_link)}</a>]
   end
 
-  defp put_placeholder(form, string, placeholders) do
-    count = map_size(placeholders) + 1
-    type_size = form |> Macro.to_string() |> byte_size()
-    int_size = count |> Integer.to_string() |> byte_size()
-    parens_size = 2
-    pad = String.duplicate("p", max(type_size - int_size - parens_size, 1))
-    placeholder = :"#{pad}#{count}"
-    form = put_elem(form, 0, placeholder)
-    {form, Map.put(placeholders, Atom.to_string(placeholder), string)}
+  defp put_placeholder(form, url, placeholders) do
+    string = Macro.to_string(form)
+    link = typespec_string_to_link(string, url)
+
+    case Enum.find(placeholders, fn {_key, value} -> value == link end) do
+      {placeholder, _} ->
+        form = put_elem(form, 0, placeholder)
+        {form, placeholders}
+
+      nil ->
+        count = map_size(placeholders) + 1
+        placeholder = placeholder(string, count)
+        form = put_elem(form, 0, placeholder)
+        {form, Map.put(placeholders, placeholder, link)}
+    end
+  end
+
+  defp placeholder(string, count) do
+    [name | _] = String.split(string, "(", trim: true)
+    name_size = String.length(name)
+    int_size = count |> Integer.digits() |> length()
+    underscores_size = 2
+    pad = String.duplicate("p", max(name_size - int_size - underscores_size, 1))
+    :"_#{pad}#{count}_"
   end
 
   defp replace_placeholders(string, placeholders) do
-    Regex.replace(~r"p+\d+", string, &Map.fetch!(placeholders, &1))
+    Regex.replace(~r"_p+\d+_", string, &Map.fetch!(placeholders, String.to_atom(&1)))
   end
 
   defp format_ast(ast) do
@@ -310,31 +324,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       |> IO.iodata_to_binary()
     else
       string
-    end
-  end
-
-  # TODO: remove when we require Elixir v1.6+
-  defp formatter_available? do
-    function_exported?(Code, :format_string!, 2)
-  end
-
-  defp split_string_to_link(string) do
-    case :binary.split(string, "(") do
-      [head, tail] -> {head, "(" <> tail}
-      [head] -> {head, ""}
-    end
-  end
-
-  defp expand_alias({:__aliases__, _, [h|t]}) when is_atom(h), do: Module.concat([h|t])
-  defp expand_alias(atom) when is_atom(atom), do: atom
-  defp expand_alias(_), do: nil
-
-  defp get_source(alias, aliases, lib_dirs) do
-    cond do
-      is_nil(alias) -> nil
-      alias in aliases -> ""
-      doc = lib_dirs_to_doc(alias, lib_dirs) -> doc
-      true -> nil
     end
   end
 
@@ -583,5 +572,30 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         Application.put_env(:ex_doc, :erlang_lib_dirs, lib_dirs)
         lib_dirs
     end
+  end
+
+  defp split_string_to_link(string) do
+    case :binary.split(string, "(") do
+      [head, tail] -> {head, "(" <> tail}
+      [head] -> {head, ""}
+    end
+  end
+
+  defp expand_alias({:__aliases__, _, [h|t]}) when is_atom(h), do: Module.concat([h|t])
+  defp expand_alias(atom) when is_atom(atom), do: atom
+  defp expand_alias(_), do: nil
+
+  defp get_source(alias, aliases, lib_dirs) do
+    cond do
+      is_nil(alias) -> nil
+      alias in aliases -> ""
+      doc = lib_dirs_to_doc(alias, lib_dirs) -> doc
+      true -> nil
+    end
+  end
+
+  # TODO: remove when we require Elixir v1.6+
+  defp formatter_available? do
+    function_exported?(Code, :format_string!, 2)
   end
 end
