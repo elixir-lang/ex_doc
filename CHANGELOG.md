@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.18.3
+
+  * Bug fix
+    * Fix formatting of typespecs causing errors
+    * Update jQuery
+    * Properly remove underscore from typespec links
+
 ## v0.18.2
 
   * Enhancements
