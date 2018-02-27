@@ -48,7 +48,7 @@
     "gulp-watch": "^4.3.4",
     "handlebars": "^4.0.2",
     "handlebars-loader": "^1.1.0",
-    "highlight.js": "elixir-lang/highlight.js#bafb1d9669",
+    "highlight.js": "elixir-lang/highlight.js#278960a2ca",
     "jquery": "^3.3.1",
     "karma": "^0.13.8",
     "karma-chai-plugins": "^0.6.0",
