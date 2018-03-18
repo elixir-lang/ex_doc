@@ -32,6 +32,10 @@ defmodule ExDoc.Markdown.Earmark do
     * `:smartypants` - boolean. Turns on smartypants processing, so quotes become curly,
       two or three hyphens become en and em dashes, and so on. True by default
 
+    * `:plugins` - map of strings to modules. Register custom plugins to be used with
+      Earmark. See [Plugins](http://github.com/pragdave/earmark#plugins) for details on
+      how to write custom plugins.
+
   """
   def to_html(text, opts) do
     options =
@@ -40,7 +44,8 @@ defmodule ExDoc.Markdown.Earmark do
              line: Keyword.get(opts, :line, 1),
              file: Keyword.get(opts, :file),
              breaks: Keyword.get(opts, :breaks, false),
-             smartypants: Keyword.get(opts, :smartypants, true))
+             smartypants: Keyword.get(opts, :smartypants, true),
+             plugins: Keyword.get(opts, :plugins, %{}))
     text |> Earmark.as_html!(options) |> ExDoc.Markdown.pretty_codeblocks()
   end
 end
