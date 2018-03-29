@@ -7,6 +7,10 @@ defmodule ExDoc.CLITest do
     ExDoc.CLI.main(args, &{&1, &2, &3})
   end
 
+  setup_all do
+    on_exit(fn -> Application.put_env(:ex_doc, :running_as_escript, false) end)
+  end
+
   test "minimum command-line options" do
     assert {"ExDoc", "1.2.3", [extras: [], source_beam: "/"]} == run(["ExDoc", "1.2.3", "/"])
   end

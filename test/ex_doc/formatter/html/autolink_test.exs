@@ -34,6 +34,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     # links to types without arity don't work
     assert Autolink.local_doc("`t:my_type`", ["t:my_type/0"]) == "`t:my_type`"
   end
+
   test "autolink to basic and built-in types" do
     assert Autolink.local_doc("`t:atom/0`", []) ==
       "[`atom/0`](#{@elixir_docs}elixir/typespecs.html#basic-types)"

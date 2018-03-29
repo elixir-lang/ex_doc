@@ -5,6 +5,8 @@ defmodule ExDoc.CLI do
   Handles the command line parsing for the escript.
   """
   def main(args, generator \\ &ExDoc.generate_docs/3) do
+    Application.put_env(:ex_doc, :running_as_escript, true)
+
     {opts, args, _invalid} =
       OptionParser.parse(args,
         aliases: [
