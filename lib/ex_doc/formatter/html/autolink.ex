@@ -561,15 +561,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         path -> List.to_string(path)
       end
 
-    if Application.get_env(:ex_doc, :running_as_escript) do
-      Path.dirname(path)
-    else
+    if File.exists?(path) do
       path =
         path
         |> Path.dirname()
         |> Path.dirname()
         |> Path.dirname()
       path <> "/" <> app <> "/ebin"
+    else
+      # if beam file doesn't exists it's likely an escript
+      Path.dirname(path)
     end
   end
 
