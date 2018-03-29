@@ -221,7 +221,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @doc false
   def format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs) do
     ref = make_ref()
-    elixir_source = get_source(Kernel, aliases, lib_dirs)
+    elixir_docs = get_elixir_docs(aliases, lib_dirs)
 
     {formatted_ast, placeholders} =
       Macro.prewalk(ast, %{}, fn
@@ -237,11 +237,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
           cond do
             {name, arity} in @basic_types ->
-              url = elixir_source <> @basic_types_page
+              url = elixir_docs <> @basic_types_page
               put_placeholder(form, url, placeholders)
 
             {name, arity} in @built_in_types ->
-              url = elixir_source <> @built_in_types_page
+              url = elixir_docs <> @built_in_types_page
               put_placeholder(form, url, placeholders)
 
             {name, arity} in typespecs ->
@@ -339,7 +339,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   def local_doc(bin, locals, aliases \\ [], extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) when is_binary(bin) do
     fun_re = Regex.source(~r{(([ct]:)?([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
     regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
-    elixir_doc = get_source(Kernel, aliases, lib_dirs)
+    elixir_docs = get_elixir_docs(aliases, lib_dirs)
 
     Regex.replace(regex, bin, fn all, match ->
       {prefix, _, function, arity} = split_function(match)
@@ -350,16 +350,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           "[#{text}](##{prefix}#{enc_h function}/#{arity})"
 
         match in @basic_type_strings ->
-          "[#{text}](#{elixir_doc}#{@basic_types_page})"
+          "[#{text}](#{elixir_docs}#{@basic_types_page})"
 
         match in @built_in_type_strings ->
-          "[#{text}](#{elixir_doc}#{@built_in_types_page})"
+          "[#{text}](#{elixir_docs}#{@built_in_types_page})"
 
         match in @kernel_function_strings ->
-          "[#{text}](#{elixir_doc}Kernel#{extension}##{prefix}#{enc_h function}/#{arity})"
+          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc_h function}/#{arity})"
 
         match in @special_form_strings ->
-          "[#{text}](#{elixir_doc}Kernel.SpecialForms#{extension}##{prefix}#{enc_h function}/#{arity})"
+          "[#{text}](#{elixir_docs}Kernel.SpecialForms#{extension}##{prefix}#{enc_h function}/#{arity})"
 
         true ->
           all
@@ -592,6 +592,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       doc = lib_dirs_to_doc(alias, lib_dirs) -> doc
       true -> nil
     end
+  end
+
+  defp get_elixir_docs(aliases, lib_dirs) do
+    get_source(Kernel, aliases, lib_dirs)
   end
 
   # TODO: remove when we require Elixir v1.6+
