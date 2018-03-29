@@ -557,7 +557,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp elixir_lib_dir(app) do
     path =
       case :code.where_is_file('Elixir.Kernel.beam') do
-        :non_existing -> raise "foo"
+        :non_existing -> ""
         path -> List.to_string(path)
       end
 
