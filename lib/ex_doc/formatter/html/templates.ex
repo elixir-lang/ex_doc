@@ -176,13 +176,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
       |> Enum.map_join(",", &sidebar_items_by_type/1)
 
       if items == "" do
-        ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)},"group":"#{
-          module_node.group
-        }"}/
+        ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)},"group":"#{module_node.group}"}/
       else
-        ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)},"group":"#{
-          module_node.group
-        }",#{items}}/
+        ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)},"group":"#{module_node.group}",#{items}}/
       end
   end
 
