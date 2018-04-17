@@ -175,11 +175,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
       |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
       |> Enum.map_join(",", &sidebar_items_by_type/1)
 
-      if items == "" do
-        ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)},"group":"#{module_node.group}"}/
-      else
-        ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)},"group":"#{module_node.group}",#{items}}/
-      end
+    if items == "" do
+      ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)},"group":"#{module_node.group}"}/
+    else
+      ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)},"group":"#{module_node.group}",#{items}}/
+    end
   end
 
   defp sidebar_items_by_type({type, docs}) do
