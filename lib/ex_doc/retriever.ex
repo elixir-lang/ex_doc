@@ -407,7 +407,7 @@ defmodule ExDoc.Retriever do
     cond do
       name in [:__aliases__, :__block__] ->
         "#{name}(args)"
-      name in [:__ENV__, :__MODULE__, :__DIR__, :__CALLER__, :"%", :"%{}"] ->
+      name in [:__CALLER__, :__DIR__, :__ENV__, :__MODULE__, :__STACKTRACE__, :"%", :"%{}"] ->
         "#{name}"
       true ->
         Macro.to_string {name, [], args}
