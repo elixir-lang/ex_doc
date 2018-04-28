@@ -91,12 +91,11 @@ defmodule ExDoc.Mixfile do
   end
 
   defp setup_assets(_args) do
-    cmd("npm", ~w(install))
+    cmd("yarn", ~w(install))
   end
 
   defp build_assets(_args) do
-    {_, 0} = System.cmd("npm", ["run", "build"])
-    cmd("npm", ~w(run build))
+    cmd("yarn", ~w(run build))
   end
 
   defp cmd(cmd, args, opts \\ []) do
