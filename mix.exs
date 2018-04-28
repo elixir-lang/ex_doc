@@ -35,7 +35,9 @@ defmodule ExDoc.Mixfile do
 
   defp aliases do
     [
-      clean: [&clean_test_fixtures/1, "clean"]
+      clean: [&clean_test_fixtures/1, "clean"],
+      setup: ["deps.get", &setup_assets/1],
+      docs: [&maybe_build_assets/1, "compile --force", "docs"]
     ]
   end
 
@@ -85,6 +87,25 @@ defmodule ExDoc.Mixfile do
   end
 
   defp clean_test_fixtures(_args) do
-    File.rm_rf "test/tmp"
+    File.rm_rf("test/tmp")
+  end
+
+  defp setup_assets(_args) do
+    cmd("yarn", ~w(install))
+  end
+
+  defp maybe_build_assets(_args) do
+    if Mix.env() == :dev do
+      cmd("yarn", ~w(run build))
+    end
+  end
+
+  defp cmd(cmd, args, opts \\ []) do
+    opts = Keyword.merge([into: IO.stream(:stdio, :line), stderr_to_stdout: true], opts)
+    {_, result} = System.cmd(cmd, args, opts)
+
+    if result != 0 do
+      raise "Non-zero result (#{result}) from: #{cmd} #{Enum.map_join(args, " ", &inspect/1)}"
+    end
   end
 end

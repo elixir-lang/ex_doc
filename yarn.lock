@@ -2364,9 +2364,9 @@ hawk@~6.0.2:
     hoek "4.x.x"
     sntp "2.x.x"
 
-highlight.js@isagalaev/highlight.js#9.12.0:
+highlight.js@elixir-lang/highlight.js#278960a2ca:
   version "9.12.0"
-  resolved "https://codeload.github.com/isagalaev/highlight.js/tar.gz/16ab6f3b5f9a432e6e8825807103b6bb5cefef15"
+  resolved "https://codeload.github.com/elixir-lang/highlight.js/tar.gz/278960a2ca269fab9aad39dfe1a9dccbb0bd6027"
 
 hoek@0.9.x:
   version "0.9.1"

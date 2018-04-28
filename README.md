@@ -108,7 +108,16 @@ Update your project configuration to use Cmark:
 docs: [markdown_processor: ExDoc.Markdown.Cmark]
 ```
 
-# License
+## Contributing
+
+The easiest way to test changes to ExDoc is to locally re-generate it's own docs:
+
+1. Run `mix setup` to install all dependencies
+2. Run `mix docs` to generate docs. Note, ExDoc defines `docs` alias for local development,
+   see [`mix.exs`](./mix.exs) for more details
+3. Commit both `assets/*` and (after running `mix docs`) `formatters/*` changes
+
+## License
 
 ExDoc source code is released under Apache 2 License. The generated contents, however, are under different licenses based on projects used to help render HTML, including CSS, JS, and other assets.
 
