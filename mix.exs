@@ -37,7 +37,7 @@ defmodule ExDoc.Mixfile do
     [
       clean: [&clean_test_fixtures/1, "clean"],
       setup: ["deps.get", &setup_assets/1],
-      docs: ["compile --force", &build_assets/1, "docs"]
+      docs: ["compile --force", &maybe_build_assets/1, "docs"]
     ]
   end
 
@@ -87,15 +87,17 @@ defmodule ExDoc.Mixfile do
   end
 
   defp clean_test_fixtures(_args) do
-    File.rm_rf "test/tmp"
+    File.rm_rf("test/tmp")
   end
 
   defp setup_assets(_args) do
     cmd("yarn", ~w(install))
   end
 
-  defp build_assets(_args) do
-    cmd("yarn", ~w(run build))
+  defp maybe_build_assets(_args) do
+    if Mix.env() == :dev do
+      cmd("yarn", ~w(run build))
+    end
   end
 
   defp cmd(cmd, args, opts \\ []) do
