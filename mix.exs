@@ -37,7 +37,7 @@ defmodule ExDoc.Mixfile do
     [
       clean: [&clean_test_fixtures/1, "clean"],
       setup: ["deps.get", &setup_assets/1],
-      docs: ["compile --force", &maybe_build_assets/1, "docs"]
+      docs: [&maybe_build_assets/1, "compile --force", "docs"]
     ]
   end
 
