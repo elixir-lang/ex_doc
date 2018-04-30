@@ -10,7 +10,6 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   test "autolink fun/arity in docs" do
     assert Autolink.local_doc("`example/2`", ["example/2"]) == "[`example/2`](#example/2)"
-
     assert Autolink.local_doc("`__ENV__/0`", ["__ENV__/0"]) == "[`__ENV__/0`](#__ENV__/0)"
     assert Autolink.local_doc("`example/2` then `example/2`",
       ["example/2"]) == "[`example/2`](#example/2) then [`example/2`](#example/2)"
@@ -21,7 +20,6 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.local_doc("`funny_name\?/1` and `funny_name!/2`",
       ["funny_name\?/1", "funny_name!/2"]) ==
       "[`funny_name\?/1`](#funny_name\?/1) and [`funny_name!/2`](#funny_name!/2)"
-
     assert Autolink.local_doc("`//2`", ["//2"]) == "[`//2`](#//2)"
   end
 
