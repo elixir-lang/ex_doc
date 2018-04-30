@@ -337,7 +337,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   will get translated to the new href of the function.
   """
   def local_doc(bin, locals, aliases \\ [], extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) when is_binary(bin) do
-    fun_re = Regex.source(~r{(([ct]:)?([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
+    fun_re = Regex.source(~r{(([ct]:)?([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-\/]+)/\d+)})
     regex = ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
     elixir_docs = get_elixir_docs(aliases, lib_dirs)
 
@@ -419,7 +419,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   module_re = Regex.source(~r{(([A-Z][A-Za-z_\d]+)\.)+})
-  fun_re = Regex.source(~r{([ct]:)?(#{module_re}([a-z_]+[A-Za-z_\d]*[\\?\\!]?|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-]+)/\d+)})
+  fun_re = Regex.source(~r{([ct]:)?(#{module_re}(([a-z_]+[A-Za-z_\d]*[\\?\\!]?)|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-\/]+)/\d+)})
   @custom_re ~r{\[(.*?)\]\(`(#{fun_re})`\)}
   @normal_re ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
 
@@ -489,14 +489,19 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     {_, mod, fun, arity} = split_function(bin)
     {"t:", mod, fun, arity}
   end
-  defp split_function(bin) do
-    [modules, arity] = String.split(bin, "/")
+  defp split_function(bin) when is_binary(bin) do
+    split_function(String.split(bin, "/"))
+  end
+  defp split_function([modules, arity]) do
     {mod, name} =
       modules
       |> String.replace(~r{([^\.])\.}, "\\1 ") # this handles the case of the ".." function
       |> String.split(" ")
       |> Enum.split(-1)
     {"", Enum.join(mod, "."), hd(name), arity}
+  end
+  defp split_function([modules, "", arity]) do # handles "/" function
+    split_function([modules <> "/", arity])
   end
 
   @doc """
