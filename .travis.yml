@@ -20,7 +20,7 @@ script:
   - mix test
   - mix coveralls.travis
   - bash test/prerelease.sh
-  - npm
+  - npm install
   - npm run lint
   - npm run test
 cache:
