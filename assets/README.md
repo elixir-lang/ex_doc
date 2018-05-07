@@ -6,12 +6,13 @@ them read please read the following instructions:
 
 ## Dependencies
 
-To work on these assets you need to install [Node.js] and [npm] first (probably
-as superuser or administrator). After that execute the following commands:
+To work on these assets you need to install [Node.js] (version 10) and
+[npm] (version 5.6) first (maybe as superuser or administrator). After
+that execute the following commands:
 
 ```bash
-$ yarn global add gulp
-$ yarn install
+$ npm install -g gulp
+$ npm install
 ```
 
 Now many gulp tasks are available via the `gulp` command line.
@@ -30,9 +31,6 @@ working on.
 #### `build`
 
 This will build a complete bundle, including JavaScript and CSS.
-
-Using the flag `--type production` will result in minified JavaScript and CSS
-bundles.
 
 #### `clean`
 

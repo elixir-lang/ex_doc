@@ -91,12 +91,12 @@ defmodule ExDoc.Mixfile do
   end
 
   defp setup_assets(_args) do
-    cmd("yarn", ~w(install))
+    cmd("npm", ~w(install))
   end
 
   defp maybe_build_assets(_args) do
     if Mix.env() == :dev do
-      cmd("yarn", ~w(run build))
+      cmd("npm", ~w(run build))
     end
   end
 

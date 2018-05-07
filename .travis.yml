@@ -20,11 +20,10 @@ script:
   - mix test
   - mix coveralls.travis
   - bash test/prerelease.sh
-  - yarn
-  - yarn run lint
-  - yarn run test
+  - npm
+  - npm run lint
+  - npm run test
 cache:
-  yarn: true
   directories:
     - node_modules
     - deps

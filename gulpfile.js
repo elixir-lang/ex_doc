@@ -19,9 +19,7 @@ var config = require('./assets/webpack.config')
 // Config
 // ------
 
-// Set variable via $ gulp --type production
-var environment = $.util.env.type || 'development'
-var isProduction = environment === 'production'
+var isProduction = true
 
 var distPath = {
   html: 'formatters/html/dist',
