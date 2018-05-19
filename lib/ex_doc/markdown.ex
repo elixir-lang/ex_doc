@@ -102,6 +102,7 @@ defmodule ExDoc.Markdown do
   @callback configure(any) :: :ok
 
   @markdown_processors [
+    ExDocMakeup,
     ExDoc.Markdown.Hoedown,
     ExDoc.Markdown.Earmark,
     ExDoc.Markdown.Cmark
