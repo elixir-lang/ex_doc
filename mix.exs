@@ -28,7 +28,9 @@ defmodule ExDoc.Mixfile do
   defp deps do
     [
       {:earmark, "~> 1.1"},
-      {:ex_doc_makeup, "~> 0.4.1"},
+      # Syntax highlighting (independent of the markdown implementation)
+      {:makeup, "~> 0.5.1"},
+      {:makeup_elixir, "~> 0.6.0"},
       {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
     ]
