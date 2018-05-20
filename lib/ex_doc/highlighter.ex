@@ -11,22 +11,19 @@ defmodule ExDoc.Highlighter do
     Regex.replace(~r/<pre><code class="(\w+)">([^<]*)<\/code><\/pre>/, html, &highlight_code_block/3)
   end
 
-  defp highlight_code_block(_full_block, lang, code) do
-    highlighted = render_code(lang, code)
-    ~s(<pre><code class="nohighlight makeup #{lang}">#{highlighted}</code></pre>)
+  defp highlight_code_block(full_block, lang, code) do
+    case pick_lexer(lang) do
+      nil -> full_block
+      lexer -> render_code(lang, lexer, code)
+    end
   end
 
-  defp render_code(lang, code) do
-    lexer = pick_lexer(lang)
-    if lexer == nil do
-      # The language is not yet supported
-      code
-    else
-      # We know how to highlight this language
+  defp render_code(lang, lexer, code) do
+    highlighted =
       code
       |> unescape_html_entities()
       |> Makeup.highlight_inner_html(lexer: lexer)
-    end
+    ~s(<pre><code class="nohighlight makeup #{lang}">#{highlighted}</code></pre>)
   end
 
   # TODO: this implementation is probably not very efficient.
