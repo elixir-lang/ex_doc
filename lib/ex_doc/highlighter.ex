@@ -5,13 +5,11 @@ defmodule ExDoc.Highlighter do
   defp pick_lexer("elixir"), do: Makeup.Lexers.ElixirLexer
   defp pick_lexer(_other), do: nil
 
-
   # Public API for the module.
   # Highlights all code block in an already generated HTML document.
   def highlight_code_blocks(html) do
     Regex.replace(~r/<pre><code class="(\w+)">([^<]*)<\/code><\/pre>/, html, &highlight_code_block/3)
   end
-
 
   defp highlight_code_block(_full_block, lang, code) do
     highlighted = render_code(lang, code)
