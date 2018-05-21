@@ -64,7 +64,6 @@ defmodule ExDoc.Markdown.Earmark do
              plugins: Keyword.get(opts, :plugins, %{}))
     text
     |> Earmark.as_html!(options)
-    |> ExDoc.Markdown.pretty_codeblocks()
     |> ExDoc.Highlighter.highlight_code_blocks()
   end
 end

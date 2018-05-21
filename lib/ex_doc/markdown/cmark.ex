@@ -42,7 +42,6 @@ defmodule ExDoc.Markdown.Cmark do
   def to_html(text, _opts) do
     text
     |> Cmark.to_html()
-    |> ExDoc.Markdown.pretty_codeblocks()
     |> ExDoc.Highlighter.highlight_code_blocks()
   end
 end
