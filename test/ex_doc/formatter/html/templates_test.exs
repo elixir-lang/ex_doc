@@ -227,9 +227,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   test "module_page outputs the functions and docstrings" do
     content = get_module_page([CompiledWithDocs])
 
-    # Debug
-    File.write!("test/debug/example1.html", content)
-
     # Title and headers
     assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
     assert content =~ ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CompiledWithDocs\s*}
