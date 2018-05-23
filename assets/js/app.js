@@ -7,6 +7,7 @@ import hljs from 'highlight.js/build/highlight.pack'
 import {initialize as initEvents} from './events'
 import {initialize as initSidebar} from './sidebar'
 import {initialize as initNightMode} from './night'
+import {initialize as initMakeup} from './makeup'
 
 window.$ = $
 
@@ -20,5 +21,6 @@ $(() => {
   initNightMode()
   initSidebar()
   initEvents()
+  initMakeup()
   hljs.initHighlighting()
 })
