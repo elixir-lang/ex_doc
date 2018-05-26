@@ -1,5 +1,6 @@
 defmodule ExDoc.Highlighter do
   @moduledoc false
+  alias ExDoc.Highlighter.HtmlDecoder
 
   # Assets are included in the bundles and don't need to be declared here.
   def assets(_), do: []
@@ -29,17 +30,8 @@ defmodule ExDoc.Highlighter do
   defp render_code(lang, lexer, code) do
     highlighted =
       code
-      |> unescape_html_entities()
+      |> HtmlDecoder.unescape_html_entities()
       |> Makeup.highlight_inner_html(lexer: lexer)
     ~s(<pre><code class="nohighlight makeup #{lang}">#{highlighted}</code></pre>)
-  end
-
-  # TODO: this implementation is probably not very efficient.
-  # benchmark and make this faster if apropriate
-  defp unescape_html_entities(string) do
-    escape_map = [{"&amp;", "&"}, {"&lt;", ">"}, {"&gt;", ">"}, {"&quot;", ~S(")}, {"&#39;", "'"}]
-    Enum.reduce escape_map, string, fn {pattern, escape}, acc ->
-      String.replace(acc, pattern, escape)
-    end
   end
 end
