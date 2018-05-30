@@ -1,19 +1,17 @@
 export default function (node, options) {
   var nodeItems = [
+    node.headers,
     node.types,
     node.functions,
     node.macros,
-    node.callbacks,
-    node.headers
-  ].filter(Array.isArray);
+    node.callbacks
+  ]
 
-  if (flatten(nodeItems).length === 0){
-    return options.fn(this);
-  } else {
-    return options.inverse(this);
+  for (var i = 0; i < nodeItems.length; i++) {
+    if (Array.isArray(nodeItems[i]) && (nodeItems[i].length > 0)) {
+      return options.inverse(this)
+    }
   }
-}
 
-function flatten(array) {
-  return array.reduce(function(a, b){ return a.concat(b);}, [])
+  return options.fn(this)
 }
