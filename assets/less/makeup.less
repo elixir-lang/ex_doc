@@ -9,90 +9,93 @@ code.makeup {
   white-space: pre;
 }
 
-.makeup .unselectable {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+.makeup {
+  .unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .hll {background-color: #ffffcc}
+  .bp {color: #3465a4; } /* :name_builtin_pseudo */
+  .c {color: #8E908C; } /* :comment */
+  .c1 {color: #8E908C; } /* :comment_single */
+  .ch {color: #8E908C; } /* :comment_hashbang */
+  .cm {color: #8E908C; } /* :comment_multiline */
+  .cp {color: #8E908C; } /* :comment_preproc */
+  .cpf {color: #8E908C; } /* :comment_preproc_file */
+  .cs {color: #8E908C; font-style: italic; } /* :comment_special */
+  .dl {color: #4e9a06; } /* :string_delimiter */
+  .err {color: #a40000; border: #ef2929; } /* :error */
+  .fm {color: #000000; } /* :name_function_magic */
+  .g {color: #000000; } /* :generic */
+  .gd {color: #a40000; } /* :generic_deleted */
+  .ge {color: #000000; font-style: italic; } /* :generic_emph */
+  .gh {color: #000080; font-weight: bold; } /* :generic_heading */
+  .gi {color: #00A000; } /* :generic_inserted */
+  .go {color: #000000; font-style: italic; } /* :generic_output */
+  .gp {color: #8f5902; } /* :generic_prompt */
+  .gr {color: #ef2929; } /* :generic_error */
+  .gs {color: #000000; font-weight: bold; } /* :generic_strong */
+  .gt {color: #a40000; font-weight: bold; } /* :generic_traceback */
+  .gu {color: #800080; font-weight: bold; } /* :generic_subheading */
+  .il {color: #0000cf; font-weight: bold; } /* :number_integer_long */
+  .k {color: #204a87; font-weight: bold; } /* :keyword */
+  .kc {color: #204a87; font-weight: bold; } /* :keyword_constant */
+  .kd {color: #204a87; font-weight: bold; } /* :keyword_declaration */
+  .kn {color: #204a87; font-weight: bold; } /* :keyword_namespace */
+  .kp {color: #204a87; font-weight: bold; } /* :keyword_pseudo */
+  .kr {color: #204a87; font-weight: bold; } /* :keyword_reserved */
+  .kt {color: #204a87; font-weight: bold; } /* :keyword_type */
+  .l {color: #000000; } /* :literal */
+  .ld {color: #8f5902; } /* :literal_date */
+  .m {color: #0000cf; font-weight: bold; } /* :number */
+  .mb {color: #0000cf; font-weight: bold; } /* :number_bin */
+  .mf {color: #0000cf; font-weight: bold; } /* :number_float */
+  .mh {color: #0000cf; font-weight: bold; } /* :number_hex */
+  .mi {color: #0000cf; font-weight: bold; } /* :number_integer */
+  .mo {color: #0000cf; font-weight: bold; } /* :number_oct */
+  .n {color: #000000; } /* :name */
+  .na {color: #c4a000; } /* :name_attribute */
+  .nb {color: #204a87; } /* :name_builtin */
+  .nc {color: #5c35cc; } /* :name_class */
+  .nd {color: #5c35cc; font-weight: bold; } /* :name_decorator */
+  .ne {color: #cc0000; font-weight: bold; } /* :name_exception */
+  .nf {color: #ce5c00; } /* :name_function */
+  .ni {color: #ce5c00; } /* :name_entity */
+  .nl {color: #f57900; } /* :name_label */
+  .nn {color: #000000; } /* :name_namespace */
+  .no {color: #0000cf; } /* :name_constant */
+  .nt {color: #204a87; font-weight: bold; } /* :name_tag */
+  .nv {color: #000000; } /* :name_variable */
+  .nx {color: #000000; } /* :name_other */
+  .o {color: #ce5c00; font-weight: bold; } /* :operator */
+  .ow {color: #204a87; font-weight: bold; } /* :operator_word */
+  .p {color: #000000; } /* :punctuation */
+  .py {color: #000000; } /* :name_property */
+  .s {color: #4e9a06; } /* :string */
+  .s1 {color: #c4a000 } /* :string_single */
+  .s2 {color: #4e9a06; } /* :string_double */
+  .sa {color: #4e9a06; } /* :string_affix */
+  .sb {color: #4e9a06; } /* :string_backtick */
+  .sc {color: #4e9a06; } /* :string_char */
+  .sd {color: #8f5902; font-style: italic; } /* :string_doc */
+  .se {color: #204a87; } /* :string_escape */
+  .sh {color: #4e9a06; } /* :string_heredoc */
+  .si {color: #5c35cc; } /* :string_interpol */
+  .sr {color: #cc0000; } /* :string_regex */
+  .ss {color: #f57900; } /* :string_symbol */
+  .sx {color: #4e9a06; } /* :string_other */
+  .sx {color: #f56900; } /* :string_sigil */
+  .vc {color: #000000; } /* :name_variable_class */
+  .vg {color: #000000; } /* :name_variable_global */
+  .vi {color: #000000; } /* :name_variable_instance */
+  .vm {color: #000000; } /* :name_variable_magic */
+  .x {color: #000000; } /* :other */
 }
-.makeup .hll {background-color: #ffffcc}
-.makeup .bp {color: #3465a4; } /* :name_builtin_pseudo */
-.makeup .c {color: #8E908C; } /* :comment */
-.makeup .c1 {color: #8E908C; } /* :comment_single */
-.makeup .ch {color: #8E908C; } /* :comment_hashbang */
-.makeup .cm {color: #8E908C; } /* :comment_multiline */
-.makeup .cp {color: #8E908C; } /* :comment_preproc */
-.makeup .cpf {color: #8E908C; } /* :comment_preproc_file */
-.makeup .cs {color: #8E908C; font-style: italic; } /* :comment_special */
-.makeup .dl {color: #4e9a06; } /* :string_delimiter */
-.makeup .err {color: #a40000; border: #ef2929; } /* :error */
-.makeup .fm {color: #000000; } /* :name_function_magic */
-.makeup .g {color: #000000; } /* :generic */
-.makeup .gd {color: #a40000; } /* :generic_deleted */
-.makeup .ge {color: #000000; font-style: italic; } /* :generic_emph */
-.makeup .gh {color: #000080; font-weight: bold; } /* :generic_heading */
-.makeup .gi {color: #00A000; } /* :generic_inserted */
-.makeup .go {color: #000000; font-style: italic; } /* :generic_output */
-.makeup .gp {color: #8f5902; } /* :generic_prompt */
-.makeup .gr {color: #ef2929; } /* :generic_error */
-.makeup .gs {color: #000000; font-weight: bold; } /* :generic_strong */
-.makeup .gt {color: #a40000; font-weight: bold; } /* :generic_traceback */
-.makeup .gu {color: #800080; font-weight: bold; } /* :generic_subheading */
-.makeup .il {color: #0000cf; font-weight: bold; } /* :number_integer_long */
-.makeup .k {color: #204a87; font-weight: bold; } /* :keyword */
-.makeup .kc {color: #204a87; font-weight: bold; } /* :keyword_constant */
-.makeup .kd {color: #204a87; font-weight: bold; } /* :keyword_declaration */
-.makeup .kn {color: #204a87; font-weight: bold; } /* :keyword_namespace */
-.makeup .kp {color: #204a87; font-weight: bold; } /* :keyword_pseudo */
-.makeup .kr {color: #204a87; font-weight: bold; } /* :keyword_reserved */
-.makeup .kt {color: #204a87; font-weight: bold; } /* :keyword_type */
-.makeup .l {color: #000000; } /* :literal */
-.makeup .ld {color: #8f5902; } /* :literal_date */
-.makeup .m {color: #0000cf; font-weight: bold; } /* :number */
-.makeup .mb {color: #0000cf; font-weight: bold; } /* :number_bin */
-.makeup .mf {color: #0000cf; font-weight: bold; } /* :number_float */
-.makeup .mh {color: #0000cf; font-weight: bold; } /* :number_hex */
-.makeup .mi {color: #0000cf; font-weight: bold; } /* :number_integer */
-.makeup .mo {color: #0000cf; font-weight: bold; } /* :number_oct */
-.makeup .n {color: #000000; } /* :name */
-.makeup .na {color: #c4a000; } /* :name_attribute */
-.makeup .nb {color: #204a87; } /* :name_builtin */
-.makeup .nc {color: #5c35cc; } /* :name_class */
-.makeup .nd {color: #5c35cc; font-weight: bold; } /* :name_decorator */
-.makeup .ne {color: #cc0000; font-weight: bold; } /* :name_exception */
-.makeup .nf {color: #ce5c00; } /* :name_function */
-.makeup .ni {color: #ce5c00; } /* :name_entity */
-.makeup .nl {color: #f57900; } /* :name_label */
-.makeup .nn {color: #000000; } /* :name_namespace */
-.makeup .no {color: #0000cf; } /* :name_constant */
-.makeup .nt {color: #204a87; font-weight: bold; } /* :name_tag */
-.makeup .nv {color: #000000; } /* :name_variable */
-.makeup .nx {color: #000000; } /* :name_other */
-.makeup .o {color: #ce5c00; font-weight: bold; } /* :operator */
-.makeup .ow {color: #204a87; font-weight: bold; } /* :operator_word */
-.makeup .p {color: #000000; } /* :punctuation */
-.makeup .py {color: #000000; } /* :name_property */
-.makeup .s {color: #4e9a06; } /* :string */
-.makeup .s1 {color: #c4a000 } /* :string_single */
-.makeup .s2 {color: #4e9a06; } /* :string_double */
-.makeup .sa {color: #4e9a06; } /* :string_affix */
-.makeup .sb {color: #4e9a06; } /* :string_backtick */
-.makeup .sc {color: #4e9a06; } /* :string_char */
-.makeup .sd {color: #8f5902; font-style: italic; } /* :string_doc */
-.makeup .se {color: #204a87; } /* :string_escape */
-.makeup .sh {color: #4e9a06; } /* :string_heredoc */
-.makeup .si {color: #5c35cc; } /* :string_interpol */
-.makeup .sr {color: #cc0000; } /* :string_regex */
-.makeup .ss {color: #f57900; } /* :string_symbol */
-.makeup .sx {color: #4e9a06; } /* :string_other */
-.makeup .sx {color: #f56900; } /* :string_sigil */
-.makeup .vc {color: #000000; } /* :name_variable_class */
-.makeup .vg {color: #000000; } /* :name_variable_global */
-.makeup .vi {color: #000000; } /* :name_variable_instance */
-.makeup .vm {color: #000000; } /* :name_variable_magic */
-.makeup .x {color: #000000; } /* :other */
 
 .night-mode code.makeup {
   display: block;
@@ -104,75 +107,81 @@ code.makeup {
   white-space: pre;
 }
 
-.night-mode .makeup .hll {background-color: #4f424c}
-.night-mode .makeup {color: #e7e9db; background-color: #2f1e2e}
-.night-mode .makeup .bp {color: #e7e9db; } /* :name_builtin_pseudo */
-.night-mode .makeup .c {color: #776e71; } /* :comment */
-.night-mode .makeup .c1 {color: #776e71; } /* :comment_single */
-.night-mode .makeup .ch {color: #776e71; } /* :comment_hashbang */
-.night-mode .makeup .cm {color: #776e71; } /* :comment_multiline */
-.night-mode .makeup .cp {color: #776e71; } /* :comment_preproc */
-.night-mode .makeup .cpf {color: #776e71; } /* :comment_preproc_file */
-.night-mode .makeup .cs {color: #776e71; } /* :comment_special */
-.night-mode .makeup .dl {color: #48b685; } /* :string_delimiter */
-.night-mode .makeup .err {color: #ef6155; } /* :error */
-.night-mode .makeup .fm {color: #06b6ef; } /* :name_function_magic */
-.night-mode .makeup .gd {color: #ef6155; } /* :generic_deleted */
-.night-mode .makeup .ge {font-style: italic; } /* :generic_emph */
-.night-mode .makeup .gh {color: #e7e9db; font-weight: bold; } /* :generic_heading */
-.night-mode .makeup .gi {color: #48b685; } /* :generic_inserted */
-.night-mode .makeup .gp {color: #776e71; font-weight: bold; } /* :generic_prompt */
-.night-mode .makeup .gs {font-weight: bold; } /* :generic_strong */
-.night-mode .makeup .gu {color: #5bc4bf; font-weight: bold; } /* :generic_subheading */
-.night-mode .makeup .il {color: #f99b15; } /* :number_integer_long */
-.night-mode .makeup .k {color: #815ba4; font-weight: normal } /* :keyword */
-.night-mode .makeup .kc {color: #815ba4; font-weight: normal } /* :keyword_constant */
-.night-mode .makeup .kd {color: #815ba4; font-weight: normal } /* :keyword_declaration */
-.night-mode .makeup .kn {color: #5bc4bf; font-weight: normal } /* :keyword_namespace */
-.night-mode .makeup .kp {color: #815ba4; font-weight: normal } /* :keyword_pseudo */
-.night-mode .makeup .kr {color: #815ba4; font-weight: normal } /* :keyword_reserved */
-.night-mode .makeup .kt {color: #fec418; font-weight: normal } /* :keyword_type */
-.night-mode .makeup .l {color: #f99b15; } /* :literal */
-.night-mode .makeup .ld {color: #776e71; } /* :literal_date */
-.night-mode .makeup .m {color: #f99b15; } /* :number */
-.night-mode .makeup .mb {color: #f99b15; font-weight: normal } /* :number_bin */
-.night-mode .makeup .mf {color: #f99b15; font-weight: normal } /* :number_float */
-.night-mode .makeup .mh {color: #f99b15; font-weight: normal } /* :number_hex */
-.night-mode .makeup .mi {color: #f99b15; font-weight: normal } /* :number_integer */
-.night-mode .makeup .mo {color: #f99b15; font-weight: normal } /* :number_oct */
-.night-mode .makeup .n {color: #e7e9db; } /* :name */
-.night-mode .makeup .na {color: #06b6ef; } /* :name_attribute */
-.night-mode .makeup .nb {color: #e7e9db; } /* :name_builtin */
-.night-mode .makeup .nc {color: #fec418; } /* :name_class */
-.night-mode .makeup .nd {color: #5bc4bf; } /* :name_decorator */
-.night-mode .makeup .ne {color: #ef6155; } /* :name_exception */
-.night-mode .makeup .nf {color: #06b6ef; } /* :name_function */
-.night-mode .makeup .ni {color: #ef6155; } /* :name_entity */
-.night-mode .makeup .nl {color: #e7e9db; } /* :name_label */
-.night-mode .makeup .nn {color: #fec418; } /* :name_namespace */
-.night-mode .makeup .no {color: #ef6155; } /* :name_constant */
-.night-mode .makeup .nt {color: #5bc4bf; } /* :name_tag */
-.night-mode .makeup .nv {color: #ef6155; } /* :name_variable */
-.night-mode .makeup .nx {color: #06b6ef; } /* :name_other */
-.night-mode .makeup .o {color: #5bc4bf; font-weight: normal } /* :operator */
-.night-mode .makeup .ow {color: #5bc4bf; font-weight: normal } /* :operator_word */
-.night-mode .makeup .p {color: #e7e9db; } /* :punctuation */
-.night-mode .makeup .py {color: #e7e9db; } /* :name_property */
-.night-mode .makeup .s {color: #48b685; } /* :string */
-.night-mode .makeup .s1 {color: #48b685; } /* :string_single */
-.night-mode .makeup .s2 {color: #48b685; } /* :string_double */
-.night-mode .makeup .sa {color: #48b685; } /* :string_affix */
-.night-mode .makeup .sb {color: #48b685; } /* :string_backtick */
-.night-mode .makeup .sc {color: #e7e9db; } /* :string_char */
-.night-mode .makeup .sd {color: #776e71; } /* :string_doc */
-.night-mode .makeup .se {color: #f99b15; } /* :string_escape */
-.night-mode .makeup .sh {color: #48b685; } /* :string_heredoc */
-.night-mode .makeup .si {color: #f99b15; } /* :string_interpol */
-.night-mode .makeup .sr {color: #48b685; } /* :string_regex */
-.night-mode .makeup .ss {color: #48b685; } /* :string_symbol */
-.night-mode .makeup .sx {color: #48b685; } /* :string_other */
-.night-mode .makeup .sx {color: #48b685; } /* :string_sigil */
-.night-mode .makeup .vc {color: #ef6155; } /* :name_variable_class */
-.night-mode .makeup .vg {color: #ef6155; } /* :name_variable_global */
-.night-mode .makeup .vi {color: #ef6155; } /* :name_variable_instance */
-.night-mode .makeup .vm {color: #ef6155; } /* :name_variable_magic */
+.night-mode .makeup {
+  color: #e7e9db;
+  background-color: #2f1e2e;
+}
+
+.night-mode .makeup {
+  .hll {background-color: #4f424c}
+  .bp {color: #e7e9db; } /* :name_builtin_pseudo */
+  .c {color: #776e71; } /* :comment */
+  .c1 {color: #776e71; } /* :comment_single */
+  .ch {color: #776e71; } /* :comment_hashbang */
+  .cm {color: #776e71; } /* :comment_multiline */
+  .cp {color: #776e71; } /* :comment_preproc */
+  .cpf {color: #776e71; } /* :comment_preproc_file */
+  .cs {color: #776e71; } /* :comment_special */
+  .dl {color: #48b685; } /* :string_delimiter */
+  .err {color: #ef6155; } /* :error */
+  .fm {color: #06b6ef; } /* :name_function_magic */
+  .gd {color: #ef6155; } /* :generic_deleted */
+  .ge {font-style: italic; } /* :generic_emph */
+  .gh {color: #e7e9db; font-weight: bold; } /* :generic_heading */
+  .gi {color: #48b685; } /* :generic_inserted */
+  .gp {color: #776e71; font-weight: bold; } /* :generic_prompt */
+  .gs {font-weight: bold; } /* :generic_strong */
+  .gu {color: #5bc4bf; font-weight: bold; } /* :generic_subheading */
+  .il {color: #f99b15; } /* :number_integer_long */
+  .k {color: #815ba4; font-weight: normal } /* :keyword */
+  .kc {color: #815ba4; font-weight: normal } /* :keyword_constant */
+  .kd {color: #815ba4; font-weight: normal } /* :keyword_declaration */
+  .kn {color: #5bc4bf; font-weight: normal } /* :keyword_namespace */
+  .kp {color: #815ba4; font-weight: normal } /* :keyword_pseudo */
+  .kr {color: #815ba4; font-weight: normal } /* :keyword_reserved */
+  .kt {color: #fec418; font-weight: normal } /* :keyword_type */
+  .l {color: #f99b15; } /* :literal */
+  .ld {color: #776e71; } /* :literal_date */
+  .m {color: #f99b15; } /* :number */
+  .mb {color: #f99b15; font-weight: normal } /* :number_bin */
+  .mf {color: #f99b15; font-weight: normal } /* :number_float */
+  .mh {color: #f99b15; font-weight: normal } /* :number_hex */
+  .mi {color: #f99b15; font-weight: normal } /* :number_integer */
+  .mo {color: #f99b15; font-weight: normal } /* :number_oct */
+  .n {color: #e7e9db; } /* :name */
+  .na {color: #06b6ef; } /* :name_attribute */
+  .nb {color: #e7e9db; } /* :name_builtin */
+  .nc {color: #fec418; } /* :name_class */
+  .nd {color: #5bc4bf; } /* :name_decorator */
+  .ne {color: #ef6155; } /* :name_exception */
+  .nf {color: #06b6ef; } /* :name_function */
+  .ni {color: #ef6155; } /* :name_entity */
+  .nl {color: #e7e9db; } /* :name_label */
+  .nn {color: #fec418; } /* :name_namespace */
+  .no {color: #ef6155; } /* :name_constant */
+  .nt {color: #5bc4bf; } /* :name_tag */
+  .nv {color: #ef6155; } /* :name_variable */
+  .nx {color: #06b6ef; } /* :name_other */
+  .o {color: #5bc4bf; font-weight: normal } /* :operator */
+  .ow {color: #5bc4bf; font-weight: normal } /* :operator_word */
+  .p {color: #e7e9db; } /* :punctuation */
+  .py {color: #e7e9db; } /* :name_property */
+  .s {color: #48b685; } /* :string */
+  .s1 {color: #48b685; } /* :string_single */
+  .s2 {color: #48b685; } /* :string_double */
+  .sa {color: #48b685; } /* :string_affix */
+  .sb {color: #48b685; } /* :string_backtick */
+  .sc {color: #e7e9db; } /* :string_char */
+  .sd {color: #776e71; } /* :string_doc */
+  .se {color: #f99b15; } /* :string_escape */
+  .sh {color: #48b685; } /* :string_heredoc */
+  .si {color: #f99b15; } /* :string_interpol */
+  .sr {color: #48b685; } /* :string_regex */
+  .ss {color: #48b685; } /* :string_symbol */
+  .sx {color: #48b685; } /* :string_other */
+  .sx {color: #48b685; } /* :string_sigil */
+  .vc {color: #ef6155; } /* :name_variable_class */
+  .vg {color: #ef6155; } /* :name_variable_global */
+  .vi {color: #ef6155; } /* :name_variable_instance */
+  .vm {color: #ef6155; } /* :name_variable_magic */
+}
