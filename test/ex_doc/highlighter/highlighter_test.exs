@@ -29,4 +29,23 @@ defmodule ExDoc.Highlighter.HtmlDecoderTest do
       assert HtmlDecoder.unescape_html_entities(encoded_snippet) == decoded_snippet
     end
   end
+
+  # Test os all entities are decoded correctly
+  test "all entities" do
+    assert HtmlDecoder.unescape_html_entities("&amp;") == "&"
+    assert HtmlDecoder.unescape_html_entities("&lt;") == "<"
+    assert HtmlDecoder.unescape_html_entities("&gt;") == ">"
+    assert HtmlDecoder.unescape_html_entities("&quot;") == "\""
+    assert HtmlDecoder.unescape_html_entities("&#39;") == "'"
+  end
+
+  # Some simple examples, which include all quoted entities
+  # (entities in context)
+  test "more examples" do
+    assert HtmlDecoder.unescape_html_entities("a &amp; b") == "a & b"
+    assert HtmlDecoder.unescape_html_entities("a &gt; b") == "a > b"
+    assert HtmlDecoder.unescape_html_entities("a &lt; b") == "a < b"
+    assert HtmlDecoder.unescape_html_entities("&quot;string&quot;") == "\"string\""
+    assert HtmlDecoder.unescape_html_entities("&#39;string&#39;") == "'string'"
+  end
 end

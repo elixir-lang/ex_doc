@@ -1,6 +1,6 @@
 defmodule ExDoc.Highlighter.HtmlDecoder do
   @moduledoc false
-  entities = [{"&amp;", ?&}, {"&lt;", ?>}, {"&gt;", ?>}, {"&quot;", ?"}, {"&#39;", ?'}]
+  entities = [{"&amp;", ?&}, {"&lt;", ?<}, {"&gt;", ?>}, {"&quot;", ?"}, {"&#39;", ?'}]
 
   for {encoded, decoded} <- entities do
     defp to_iodata(unquote(encoded) <> rest) do

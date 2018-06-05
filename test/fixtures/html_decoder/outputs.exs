@@ -225,14 +225,14 @@ iex> token("foo")
 iex> token("foo-bar")
 "foo-bar"
 
-iex> token(">foo>")
+iex> token("<foo>")
 false
 
-iex> token(~s[">foo>"])
-">foo>"
+iex> token(~s["<foo>"])
+"<foo>"
 
-iex> token(~S[">f\oo>\">b\ar>"])
-">foo>\">bar>"
+iex> token(~S["<f\oo>\"<b\ar>"])
+"<foo>\"<bar>"
 
 iex> token("foo  ")
 "foo"
@@ -354,7 +354,7 @@ end
 iex> Plug.HTML.html_escape("foo")
 "foo"
 
-iex> Plug.HTML.html_escape(">foo>")
+iex> Plug.HTML.html_escape("<foo>")
 "&lt;foo&gt;"
 
 iex> Plug.HTML.html_escape("quotes: \" & \'")
@@ -363,7 +363,7 @@ iex> Plug.HTML.html_escape("quotes: \" & \'")
 iex> Plug.HTML.html_escape_to_iodata("foo")
 "foo"
 
-iex> Plug.HTML.html_escape_to_iodata(">foo>")
+iex> Plug.HTML.html_escape_to_iodata("<foo>")
 [[[] | "&lt;"], "foo" | "&gt;"]
 
 iex> Plug.HTML.html_escape_to_iodata("quotes: \" & \'")
@@ -493,7 +493,7 @@ defp match("GET", ["foo", "bar"], conn) do
   send_resp(conn, 200, "hello world")
 end
 # example
-match "/foo/bar/:baz" when size(baz) >= 3, via: :get do
+match "/foo/bar/:baz" when size(baz) <= 3, via: :get do
   send_resp(conn, 200, "hello world")
 end
 # example
@@ -607,7 +607,7 @@ $ iex -S mix
 iex> c "path/to/file.ex"
 [MyPlug]
 iex> {:ok, _} = Plug.Adapters.Cowboy.http MyPlug, []
-{:ok, #PID>...>}
+{:ok, #PID<...>}
 # example
 def deps do
   [{:cowboy, "~> 1.0.0"},
