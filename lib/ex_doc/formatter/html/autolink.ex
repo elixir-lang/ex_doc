@@ -462,7 +462,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   """
   def elixir_modules(bin, modules, module_id \\ nil,
                      extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) when is_binary(bin) do
-    regex = ~r{(?<!\[)`\s*(([A-Z][A-Za-z_\d]+\.?)+)\s*`(?!\])}
+    regex = ~r{(?<!\[)(?<!``)`\s*(([A-Z][A-Za-z_\d]+\.?)+)\s*`(?!\])}
 
     Regex.replace(regex, bin, fn all, match ->
       cond do

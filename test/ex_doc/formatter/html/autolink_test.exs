@@ -164,6 +164,8 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     assert Autolink.elixir_modules("`MyModule.Nested`", ["MyModule.Nested"], "MyModule.Nested") == "[`MyModule.Nested`](MyModule.Nested.html#content)"
     assert Autolink.elixir_modules("`MyModule.Nested.Deep`", ["MyModule.Nested.Deep"], "MyModule.Nested.Deep") ==
       "[`MyModule.Nested.Deep`](MyModule.Nested.Deep.html#content)"
+    assert Autolink.elixir_modules("```\nThis is a test.\n```\n\nSee `MyModule`.", ["MyModule"], "MyModule") ==
+      "```\nThis is a test.\n```\n\nSee [`MyModule`](MyModule.html#content)."
   end
 
   test "autolink modules in elixir" do
