@@ -507,9 +507,18 @@ defmodule ExDoc.Retriever do
     exported = :lists.flatten(exported)
 
     (Code.get_docs(module_info.name, :type_docs) || [])
-    |> Enum.filter(&elem(&1, 0) in exported)
+    |> Enum.filter(&(elem(&1, 0) in exported && typedoc?(&1)))
     |> Enum.sort_by(&elem(&1, 0))
     |> Enum.map(&get_type(&1, source, module_info.abst_code))
+  end
+
+  # Skip typedocs explicitly marked as false
+  defp typedoc?({_, _, _, false}) do
+    false
+  end
+
+  defp typedoc?({_, _, _, _}) do
+    true
   end
 
   defp get_type(type, source, abst_code) do
