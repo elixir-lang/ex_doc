@@ -419,7 +419,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   module_re = Regex.source(~r{(([A-Z][A-Za-z_\d]+)\.)+})
-  fun_re = Regex.source(~r{([ct]:)?(#{module_re}(([a-z_]+[A-Za-z_\d]*[\\?\\!]?)|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-\/]+)/\d+)})
+  fun_re = Regex.source(~r{([ct]:)?((#{module_re})?(([a-z_]+[A-Za-z_\d]*[\\?\\!]?)|[\{\}=&\\|\\.<>~*^@\\+\\%\\!-\/]+)/\d+)})
   @custom_re ~r{\[(.*?)\]\(`(#{fun_re})`\)}
   @normal_re ~r{(?<!\[)`\s*(#{fun_re})\s*`(?!\])}
 
@@ -439,9 +439,18 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     {prefix, module, function, arity} = split_function(match)
     text = text || "`#{module}.#{function}/#{arity}`"
 
+    aliases = []
+    elixir_docs = get_elixir_docs(aliases, lib_dirs)
+
     cond do
       match in project_funs ->
         "[#{text}](#{module}#{extension}##{prefix}#{enc_h function}/#{arity})"
+
+      match in @kernel_function_strings ->
+        "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc_h function}/#{arity})"
+
+      match in @special_form_strings ->
+        "[#{text}](#{elixir_docs}Kernel.SpecialForms#{extension}##{prefix}#{enc_h function}/#{arity})"
 
       doc = lib_dirs_to_doc("Elixir." <> module, lib_dirs) ->
         "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h function}/#{arity})"

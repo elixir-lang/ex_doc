@@ -147,6 +147,18 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
     assert Autolink.elixir_functions("[`foo`](`Foo.//2`)", ["Foo.//2"]) ==
            "[`foo`](Foo.html#//2)"
+
+    assert Autolink.elixir_functions("[`for`](`Kernel.SpecialForms.for/1`)", []) ==
+      "[`for`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#for/1)"
+
+    assert Autolink.elixir_functions("[`for`](`for/1`)", []) ==
+      "[`for`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#for/1)"
+
+    assert Autolink.elixir_functions("[`is_boolean`](`Kernel.is_boolean/1`)", []) ==
+      "[`is_boolean`](#{@elixir_docs}elixir/Kernel.html#is_boolean/1)"
+
+    assert Autolink.elixir_functions("[`is_boolean`](`is_boolean/1`)", []) ==
+      "[`is_boolean`](#{@elixir_docs}elixir/Kernel.html#is_boolean/1)"
   end
 
   test "autolink functions to types in the project" do
