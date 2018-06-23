@@ -570,37 +570,37 @@ defmodule ExDoc.Retriever do
 
   # Since Elixir 1.7.0-dev, functions from Kernel.Typespec related with the
   # runtime aspects, such as reading from .beam files, were moved to Code.Typespec
-  if Version.compare(System.version(), "1.7.0-dev") == :lt do
-    defp spec_to_quoted(name, spec), do: Kernel.Typespec.spec_to_ast(name, spec)
-  else
+  if Code.ensure_loaded?(Code.Typespec) do
     defp spec_to_quoted(name, spec), do: Code.Typespec.spec_to_quoted(name, spec)
+  else
+    defp spec_to_quoted(name, spec), do: Kernel.Typespec.spec_to_ast(name, spec)
   end
 
-  if Version.compare(System.version, "1.7.0-dev") == :lt do
-    defp fetch_specs(module), do: Kernel.Typespec.beam_specs(module)
-  else
+  if Code.ensure_loaded?(Code.Typespec) do
     defp fetch_specs(module) do
       case Code.Typespec.fetch_specs(module) do
         {:ok, specs} -> specs
         :error -> nil
       end
     end
+  else
+    defp fetch_specs(module), do: Kernel.Typespec.beam_specs(module)
   end
 
-  if Version.compare(System.version, "1.7.0-dev") == :lt do
-    defp type_to_quoted(type), do: Kernel.Typespec.type_to_ast(type)
-  else
+  if Code.ensure_loaded?(Code.Typespec) do
     defp type_to_quoted(type), do: Code.Typespec.type_to_quoted(type)
+  else
+    defp type_to_quoted(type), do: Kernel.Typespec.type_to_ast(type)
   end
 
-  if Version.compare(System.version(), "1.7.0-dev") == :lt do
-    defp fetch_callbacks(module), do: Kernel.Typespec.beam_callbacks(module)
-  else
+  if Code.ensure_loaded?(Code.Typespec) do
     defp fetch_callbacks(module) do
       case Code.Typespec.fetch_callbacks(module) do
         {:ok, callbacks} -> callbacks
         :error -> nil
       end
     end
+  else
+    defp fetch_callbacks(module), do: Kernel.Typespec.beam_callbacks(module)
   end
 end
