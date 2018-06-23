@@ -82,7 +82,6 @@ defmodule ExDoc.Retriever do
 
   alias ExDoc.GroupMatcher
   alias ExDoc.Retriever.Error
-  alias Kernel.Typespec
 
   @doc """
   Extract documentation from all modules in the specified directory or directories.
@@ -243,7 +242,7 @@ defmodule ExDoc.Retriever do
 
     specs = module_info.specs
             |> Map.get(function, [])
-            |> Enum.map(&Typespec.spec_to_ast(name, &1))
+            |> Enum.map(&spec_to_quoted(name, &1))
 
     specs =
       if type == :defmacro do
@@ -327,7 +326,7 @@ defmodule ExDoc.Retriever do
     {:attribute, anno, :callback, {^function, specs}} =
       Enum.find(abst_code, &match?({:attribute, _, :callback, {^function, _}}, &1))
     line  = anno_line(anno) || doc_line
-    specs = Enum.map(specs, &Typespec.spec_to_ast(name, &1))
+    specs = Enum.map(specs, &spec_to_quoted(name, &1))
 
     name_and_arity =
       case kind do
@@ -478,7 +477,7 @@ defmodule ExDoc.Retriever do
 
   # Returns a dict of {name, arity} -> spec.
   defp get_specs(module) do
-    Enum.into(Typespec.beam_specs(module) || [], %{})
+    Enum.into(fetch_specs(module) || [], %{})
   end
 
   # Returns a dict of {name, arity} -> behaviour.
@@ -491,7 +490,7 @@ defmodule ExDoc.Retriever do
 
   defp callbacks_defined_by(module) do
     module
-    |> Kernel.Typespec.beam_callbacks()
+    |> fetch_callbacks()
     |> Kernel.||([]) # In case the module source is not available
     |> Keyword.keys
   end
@@ -528,7 +527,7 @@ defmodule ExDoc.Retriever do
       Enum.find(abst_code, &match?({:attribute, _, type, {^name, _, args}}
                                      when type in [:opaque, :type] and length(args) == arity, &1))
 
-    spec = process_type_ast(Typespec.type_to_ast(spec), type)
+    spec = spec |> type_to_quoted() |> process_type_ast(type)
     line = anno_line(anno) || doc_line
 
     annotations = if type == :opaque, do: ["opaque"], else: []
@@ -568,4 +567,40 @@ defmodule ExDoc.Retriever do
   # Cut off the body of an opaque type while leaving it on a normal type.
   defp process_type_ast({:::, _, [d|_]}, :opaque), do: d
   defp process_type_ast(ast, _), do: ast
+
+  # Since Elixir 1.7.0-dev, functions from Kernel.Typespec related with the
+  # runtime aspects, such as reading from .beam files, were moved to Code.Typespec
+  if Code.ensure_loaded?(Code.Typespec) do
+    defp spec_to_quoted(name, spec), do: Code.Typespec.spec_to_quoted(name, spec)
+  else
+    defp spec_to_quoted(name, spec), do: Kernel.Typespec.spec_to_ast(name, spec)
+  end
+
+  if Code.ensure_loaded?(Code.Typespec) do
+    defp fetch_specs(module) do
+      case Code.Typespec.fetch_specs(module) do
+        {:ok, specs} -> specs
+        :error -> nil
+      end
+    end
+  else
+    defp fetch_specs(module), do: Kernel.Typespec.beam_specs(module)
+  end
+
+  if Code.ensure_loaded?(Code.Typespec) do
+    defp type_to_quoted(type), do: Code.Typespec.type_to_quoted(type)
+  else
+    defp type_to_quoted(type), do: Kernel.Typespec.type_to_ast(type)
+  end
+
+  if Code.ensure_loaded?(Code.Typespec) do
+    defp fetch_callbacks(module) do
+      case Code.Typespec.fetch_callbacks(module) do
+        {:ok, callbacks} -> callbacks
+        :error -> nil
+      end
+    end
+  else
+    defp fetch_callbacks(module), do: Kernel.Typespec.beam_callbacks(module)
+  end
 end
