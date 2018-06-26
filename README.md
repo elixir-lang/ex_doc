@@ -8,7 +8,7 @@ ExDoc is a tool to generate documentation for your Elixir projects. In case you 
 
 To learn about how to document your projects check out [Elixir's writing documentation page][hex-writing-docs].
 
-Note to learn more about `ExDoc` read [ExDoc Documentation](https://hexdocs.pm/ex_doc/)
+See the [ExDoc Documentation](https://hexdocs.pm/ex_doc/).
 
 ## Using ExDoc with Mix
 
