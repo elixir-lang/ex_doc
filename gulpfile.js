@@ -35,7 +35,6 @@ var languages = [
   'bash',
   'css',
   'diff',
-  'elixir',
   'erlang',
   'erlang-repl',
   'xml',

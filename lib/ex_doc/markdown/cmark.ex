@@ -2,14 +2,14 @@ defmodule ExDoc.Markdown.Cmark do
   @moduledoc """
   ExDoc extension for the Cmark Markdown parser.
   """
-
   @behaviour ExDoc.Markdown
 
-  def assets(_), do: []
+  # Callback implementations
+  def assets(arg), do: ExDoc.Highlighter.assets(arg)
 
-  def before_closing_head_tag(_), do: ""
+  def before_closing_head_tag(arg), do: ExDoc.Highlighter.before_closing_head_tag(arg)
 
-  def before_closing_body_tag(_), do: ""
+  def before_closing_body_tag(arg), do: ExDoc.Highlighter.before_closing_body_tag(arg)
 
   def configure(_), do: :ok
 
@@ -24,6 +24,8 @@ defmodule ExDoc.Markdown.Cmark do
   Generate HTML output. Cmark takes no options.
   """
   def to_html(text, _opts) do
-    text |> Cmark.to_html()  |> ExDoc.Markdown.pretty_codeblocks()
+    text
+    |> Cmark.to_html()
+    |> ExDoc.Highlighter.highlight_code_blocks()
   end
 end
