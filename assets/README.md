@@ -1,102 +1,41 @@
 # Assets
 
 In this directory live all assets for `ExDoc`. The ready to use built
-versions are found in `formatters/{html,epub}/dist`. To change any of
-them read please read the following instructions:
-
-## Dependencies
+versions are found in `formatters/{html,epub}/dist`.
 
 To work on these assets you need to install [Node.js] (version 10) and
-[npm] (version 5.6) first (maybe as superuser or administrator). After
-that execute the following commands:
+[npm] (version 5.6) first (maybe as superuser or administrator).
 
-```bash
-$ npm install -g gulp
-$ npm install
-```
+## npm run scripts
 
-Now many gulp tasks are available via the `gulp` command line.
+The following scripts are available
 
-## Available [gulp] tasks
+### `build`
 
-If you run [gulp] without any option by default you will lint all JavaScript
-files using [ESLint] and then you will run all the available tests for
-JavaScript using [Karma].
+This will build a complete production bundle, including JavaScript and CSS.
 
-### Common tasks
-
-The following tasks do not depend on the format (HTML or EPUB) that you're
-working on.
-
-#### `build`
-
-This will build a complete bundle, including JavaScript and CSS.
-
-#### `clean`
+### `clean`
 
 Clean all content in the build folder `dist` for each format.
 
-#### `javascript`
-
-Build the JavaScript in `js` into a bundled file using [webpack] for each
-format.
-
-#### `less`
-
-Build the [less] files in `less` into a bundled CSS file for each format.
-
-#### `lint`
+### `lint`
 
 Lint all JavaScript files in `js` using [ESLint].
 
-#### `test`
+### `test`
 
 Run all the available tests for JavaScript using [Karma].
 
-#### `watch`
+### `watch`
 
 Builds JavaScript and CSS on file changes in `assets/less/**/*.less` or
 `assets/js/**/*.js` for each format.
 
-### Sub-Tasks used with the HTML format
+## Gulp
 
-If you're working with the HTML format, you should use the following tasks:
-
-#### `build:html`
-
-Same as the `build` task, but this one apply for the HTML format.
-
-#### `clean:html`
-
-Clean all content in the build folder `dist` of the HTML format.
-
-#### `javascript:html`
-
-Same as the `javascript` task, but this one apply for the HTML format.
-
-#### `less:html`
-
-Same as the `less` task, but this one apply for the HTML format.
-
-### Sub-Tasks used with the EPUB format
-
-If you're working with the EPUB format, you should use the following tasks:
-
-#### `build:epub`
-
-Same as the `build` task, but this one apply for the EPUB format.
-
-#### `clean:epub`
-
-Clean all content in the build folder `dist` of the EPUB format.
-
-#### `javascript:epub`
-
-Same as the `javascript` task, but this one apply for the EPUB format.
-
-#### `less:epub`
-
-Same as the `less:html` task, but this one apply for the EPUB format.
+Internally we use [gulp]. The project is organized in tasks
+(`watch`, `build`, etc) and subtasks based on HTML and EPUB
+formats. We also use [webpack] and [less].
 
 [Node.js]: https://nodejs.org/
 [npm]: https://www.npmjs.com/

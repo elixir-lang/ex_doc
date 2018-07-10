@@ -26,17 +26,21 @@ ExDoc will automatically pull in information from your projects, like the applic
 
 ```elixir
 def project do
-  [app: :my_app,
-   version: "0.1.0-dev",
-   deps: deps(),
+  [
+    app: :my_app,
+    version: "0.1.0-dev",
+    deps: deps(),
 
-   # Docs
-   name: "MyApp",
-   source_url: "https://github.com/USER/PROJECT",
-   homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
-   docs: [main: "MyApp", # The main page in the docs
-          logo: "path/to/logo.png",
-          extras: ["README.md"]]]
+    # Docs
+    name: "MyApp",
+    source_url: "https://github.com/USER/PROJECT",
+    homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
+    docs: [
+      main: "MyApp", # The main page in the docs
+      logo: "path/to/logo.png",
+      extras: ["README.md"]
+    ]
+  ]
 end
 ```
 

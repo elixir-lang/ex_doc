@@ -9,7 +9,9 @@
   "scripts": {
     "lint": "node_modules/.bin/gulp lint",
     "test": "node_modules/.bin/gulp test",
-    "build": "node_modules/.bin/gulp build"
+    "clean": "node_modules/.bin/gulp clean",
+    "watch": "node_modules/.bin/gulp watch",
+    "build": "node_modules/.bin/gulp build --production"
   },
   "repository": {
     "type": "git",
