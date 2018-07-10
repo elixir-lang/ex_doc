@@ -2,14 +2,14 @@ defmodule ExDoc.Markdown.Earmark do
   @moduledoc """
   ExDoc extension for the Earmark MarkDown parser.
   """
-
   @behaviour ExDoc.Markdown
 
-  def assets(_), do: []
+  # Callback implementations
+  def assets(arg), do: ExDoc.Highlighter.assets(arg)
 
-  def before_closing_head_tag(_), do: ""
+  def before_closing_head_tag(arg), do: ExDoc.Highlighter.before_closing_head_tag(arg)
 
-  def before_closing_body_tag(_), do: ""
+  def before_closing_body_tag(arg), do: ExDoc.Highlighter.before_closing_body_tag(arg)
 
   def configure(_), do: :ok
 
@@ -46,6 +46,8 @@ defmodule ExDoc.Markdown.Earmark do
              breaks: Keyword.get(opts, :breaks, false),
              smartypants: Keyword.get(opts, :smartypants, true),
              plugins: Keyword.get(opts, :plugins, %{}))
-    text |> Earmark.as_html!(options) |> ExDoc.Markdown.pretty_codeblocks()
+    text
+    |> Earmark.as_html!(options)
+    |> ExDoc.Highlighter.highlight_code_blocks()
   end
 end

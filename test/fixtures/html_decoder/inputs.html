@@ -1,0 +1,699 @@
+children = [
+  {Plug.Adapters.Cowboy, scheme: :http, plug: MyApp, options: [port: 4040]}
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+<!-- example -->
+# Starts a new interface
+Plug.Adapters.Cowboy.http MyPlug, [], port: 80
+
+# The interface above can be shutdown with
+Plug.Adapters.Cowboy.shutdown MyPlug.HTTP
+<!-- example -->
+# Starts a new interface
+Plug.Adapters.Cowboy.https MyPlug, [],
+  port: 443,
+  password: &quot;SECRET&quot;,
+  otp_app: :my_app,
+  keyfile: &quot;priv/ssl/key.pem&quot;,
+  certfile: &quot;priv/ssl/cert.pem&quot;,
+  dhfile: &quot;priv/ssl/dhparam.pem&quot;
+
+# The interface above can be shutdown with
+Plug.Adapters.Cowboy.shutdown MyPlug.HTTPS
+<!-- example -->
+children = [
+  {Plug.Adapters.Cowboy2, scheme: :http, plug: MyApp, options: [port: 4040]}
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+<!-- example -->
+# Starts a new interface
+Plug.Adapters.Cowboy2.http MyPlug, [], port: 80
+
+# The interface above can be shutdown with
+Plug.Adapters.Cowboy2.shutdown MyPlug.HTTP
+<!-- example -->
+# Starts a new interface
+Plug.Adapters.Cowboy2.https MyPlug, [],
+  port: 443,
+  password: &quot;SECRET&quot;,
+  otp_app: :my_app,
+  keyfile: &quot;priv/ssl/key.pem&quot;,
+  certfile: &quot;priv/ssl/cert.pem&quot;,
+  dhfile: &quot;priv/ssl/dhparam.pem&quot;
+
+# The interface above can be shutdown with
+Plug.Adapters.Cowboy2.shutdown MyPlug.HTTPS
+<!-- example -->
+defmodule MyApp do
+  use Plug.Builder
+
+  plug Plug.Logger
+  plug :hello, upper: true
+
+  # A function from another module can be plugged too, provided it&#39;s
+  # imported into the current module first.
+  import AnotherModule, only: [interesting_plug: 2]
+  plug :interesting_plug
+
+  def hello(conn, opts) do
+    body = if opts[:upper], do: &quot;WORLD&quot;, else: &quot;world&quot;
+    send_resp(conn, 200, body)
+  end
+end
+<!-- example -->
+defmodule PlugWithCustomOptions do
+  use Plug.Builder
+  plug Plug.Logger
+
+  def init(opts) do
+    opts
+  end
+end
+<!-- example -->
+defmodule PlugWithCustomCall do
+  use Plug.Builder
+  plug Plug.Logger
+  plug Plug.Head
+
+  def call(conn, opts) do
+    conn
+    |&gt; super(opts) # calls Plug.Logger and Plug.Head
+    |&gt; assign(:called_all_plugs, true)
+  end
+end
+<!-- example -->
+defmodule PlugUsingHalt do
+  use Plug.Builder
+
+  plug :stopper
+  plug Plug.Logger
+
+  def stopper(conn, _opts) do
+    halt(conn)
+  end
+end
+<!-- example -->
+{plug_name, options, guards}
+<!-- example -->
+Plug.Builder.compile(env, [
+  {Plug.Logger, [], true}, # no guards, as added by the Plug.Builder.plug/2 macro
+  {Plug.Head, [], quote(do: a when is_binary(a))}
+], [])
+<!-- example -->
+plug Plug.Logger               # plug module
+plug :foo, some_options: true  # plug function
+<!-- example -->
+plug Plug.Session, ...
+plug :fetch_session
+plug Plug.CSRFProtection
+<!-- example -->
+iex&gt; decode(&quot;key1=value1, key2=value2&quot;)
+%{&quot;key1&quot; =&gt; &quot;value1&quot;, &quot;key2&quot; =&gt; &quot;value2&quot;}
+<!-- example -->
+iex&gt; decode(&quot;foo=bar&quot;)[&quot;foo&quot;]
+&quot;bar&quot;
+<!-- example -->
+iex&gt; decode(&quot;foo=bar&amp;foo=baz&quot;)[&quot;foo&quot;]
+&quot;baz&quot;
+<!-- example -->
+iex&gt; decode(&quot;foo[bar]=baz&quot;)[&quot;foo&quot;][&quot;bar&quot;]
+&quot;baz&quot;
+<!-- example -->
+iex&gt; decode(&quot;foo[]=bar&amp;foo[]=baz&quot;)[&quot;foo&quot;]
+[&quot;bar&quot;, &quot;baz&quot;]
+<!-- example -->
+iex&gt; encode(%{foo: &quot;bar&quot;, baz: &quot;bat&quot;})
+&quot;baz=bat&amp;foo=bar&quot;
+<!-- example -->
+iex&gt; encode([foo: &quot;bar&quot;, baz: &quot;bat&quot;])
+&quot;foo=bar&amp;baz=bat&quot;
+<!-- example -->
+iex&gt; encode([foo: &quot;bar&quot;, foo: &quot;bat&quot;])
+&quot;foo=bar&quot;
+<!-- example -->
+iex&gt; encode(%{foo: [&quot;bar&quot;, &quot;baz&quot;]})
+&quot;foo[]=bar&amp;foo[]=baz&quot;
+<!-- example -->
+iex&gt; encode(%{foo: %{bar: &quot;baz&quot;}})
+&quot;foo[bar]=baz&quot;
+<!-- example -->
+unfetched = %Plug.Conn.Unfetched{aspect: :cookies}
+<!-- example -->
+iex&gt; content_type &quot;x-sample/json; charset=utf-8&quot;
+{:ok, &quot;x-sample&quot;, &quot;json&quot;, %{&quot;charset&quot; =&gt; &quot;utf-8&quot;}}
+
+iex&gt; content_type &quot;x-sample/json  ; charset=utf-8  ; foo=bar&quot;
+{:ok, &quot;x-sample&quot;, &quot;json&quot;, %{&quot;charset&quot; =&gt; &quot;utf-8&quot;, &quot;foo&quot; =&gt; &quot;bar&quot;}}
+
+iex&gt; content_type &quot;\r\n text/plain;\r\n charset=utf-8\r\n&quot;
+{:ok, &quot;text&quot;, &quot;plain&quot;, %{&quot;charset&quot; =&gt; &quot;utf-8&quot;}}
+
+iex&gt; content_type &quot;text/plain&quot;
+{:ok, &quot;text&quot;, &quot;plain&quot;, %{}}
+
+iex&gt; content_type &quot;x/*&quot;
+:error
+
+iex&gt; content_type &quot;*/*&quot;
+:error
+<!-- example -->
+iex&gt; list(&quot;foo, bar&quot;)
+[&quot;foo&quot;, &quot;bar&quot;]
+
+iex&gt; list(&quot;foobar&quot;)
+[&quot;foobar&quot;]
+
+iex&gt; list(&quot;&quot;)
+[]
+
+iex&gt; list(&quot;empties, , are,, filtered&quot;)
+[&quot;empties&quot;, &quot;are&quot;, &quot;filtered&quot;]
+<!-- example -->
+iex&gt; media_type &quot;text/plain&quot;
+{:ok, &quot;text&quot;, &quot;plain&quot;, %{}}
+
+iex&gt; media_type &quot;APPLICATION/vnd.ms-data+XML&quot;
+{:ok, &quot;application&quot;, &quot;vnd.ms-data+xml&quot;, %{}}
+
+iex&gt; media_type &quot;text/*; q=1.0&quot;
+{:ok, &quot;text&quot;, &quot;*&quot;, %{&quot;q&quot; =&gt; &quot;1.0&quot;}}
+
+iex&gt; media_type &quot;*/*; q=1.0&quot;
+{:ok, &quot;*&quot;, &quot;*&quot;, %{&quot;q&quot; =&gt; &quot;1.0&quot;}}
+
+iex&gt; media_type &quot;x y&quot;
+:error
+
+iex&gt; media_type &quot;*/html&quot;
+:error
+
+iex&gt; media_type &quot;/&quot;
+:error
+
+iex&gt; media_type &quot;x/y z&quot;
+:error
+<!-- example -->
+iex&gt; params(&quot;foo=bar&quot;)
+%{&quot;foo&quot; =&gt; &quot;bar&quot;}
+
+iex&gt; params(&quot;  foo=bar  &quot;)
+%{&quot;foo&quot; =&gt; &quot;bar&quot;}
+
+iex&gt; params(&quot;FOO=bar&quot;)
+%{&quot;foo&quot; =&gt; &quot;bar&quot;}
+
+iex&gt; params(&quot;Foo=bar; baz=BOING&quot;)
+%{&quot;foo&quot; =&gt; &quot;bar&quot;, &quot;baz&quot; =&gt; &quot;BOING&quot;}
+
+iex&gt; params(&quot;foo=BAR ; wat&quot;)
+%{&quot;foo&quot; =&gt; &quot;BAR&quot;}
+
+iex&gt; params(&quot;foo=\&quot;bar\&quot;; baz=\&quot;boing\&quot;&quot;)
+%{&quot;foo&quot; =&gt; &quot;bar&quot;, &quot;baz&quot; =&gt; &quot;boing&quot;}
+
+iex&gt; params(&quot;foo=\&quot;bar;\&quot;; baz=\&quot;boing\&quot;&quot;)
+%{&quot;foo&quot; =&gt; &quot;bar;&quot;, &quot;baz&quot; =&gt; &quot;boing&quot;}
+
+iex&gt; params(&quot;=&quot;)
+%{}
+<!-- example -->
+iex&gt; token(&quot;foo&quot;)
+&quot;foo&quot;
+
+iex&gt; token(&quot;foo-bar&quot;)
+&quot;foo-bar&quot;
+
+iex&gt; token(&quot;&lt;foo&gt;&quot;)
+false
+
+iex&gt; token(~s[&quot;&lt;foo&gt;&quot;])
+&quot;&lt;foo&gt;&quot;
+
+iex&gt; token(~S[&quot;&lt;f\oo&gt;\&quot;&lt;b\ar&gt;&quot;])
+&quot;&lt;foo&gt;\&quot;&lt;bar&gt;&quot;
+
+iex&gt; token(&quot;foo  &quot;)
+&quot;foo&quot;
+
+iex&gt; token(&quot;foo bar&quot;)
+false
+<!-- example -->
+# Send the chunked response headers
+conn = send_chunked(conn, 200)
+
+# Pipe the given list into a connection
+# Each item is emitted as a chunk
+Enum.into(~w(each chunk as a word), conn)
+<!-- example -->
+config :plug, :statuses, %{
+  404 =&gt; &quot;Actually This Was Found&quot;,
+  451 =&gt; &quot;Unavailable For Legal Reasons&quot;
+}
+<!-- example -->
+mix deps.clean --build plug
+<!-- example -->
+put_status(conn, :not_found)                     # 404
+put_status(conn, :actually_this_was_found)       # 404
+put_status(conn, :unavailable_for_legal_reasons) # 451
+<!-- example -->
+iex&gt; conn.assigns[:hello]
+nil
+iex&gt; conn = assign(conn, :hello, :world)
+iex&gt; conn.assigns[:hello]
+:world
+<!-- example -->
+~w(each chunk as a word)
+|&gt; Enum.reduce_while(conn, fn (chunk, conn) -&gt;
+  case Plug.Conn.chunk(conn, chunk) do
+    {:ok, conn} -&gt;
+      {:cont, conn}
+    {:error, :closed} -&gt;
+      {:halt, conn}
+  end
+end)
+<!-- example -->
+iex&gt; conn = %{conn | resp_headers: [{&quot;content-type&quot;, &quot;text/plain&quot;}]}
+iex&gt; get_resp_header(conn, &quot;content-type&quot;)
+[&quot;text/plain&quot;]
+<!-- example -->
+iex&gt; conn.assigns[:hello]
+nil
+iex&gt; conn = merge_assigns(conn, hello: :world)
+iex&gt; conn.assigns[:hello]
+:world
+<!-- example -->
+iex&gt; conn.private[:plug_hello]
+nil
+iex&gt; conn = merge_private(conn, plug_hello: :world)
+iex&gt; conn.private[:plug_hello]
+:world
+<!-- example -->
+iex&gt; conn = merge_resp_headers(conn, [{&quot;content-type&quot;, &quot;text/plain&quot;}, {&quot;X-1337&quot;, &quot;5P34K&quot;}])
+<!-- example -->
+iex&gt; conn.private[:plug_hello]
+nil
+iex&gt; conn = put_private(conn, :plug_hello, :world)
+iex&gt; conn.private[:plug_hello]
+:world
+<!-- example -->
+{:ok, body, conn} = Plug.Conn.read_body(conn, length: 1_000_000)
+<!-- example -->
+Plug.Conn.send_file(conn, 200, &quot;README.md&quot;)
+<!-- example -->
+secret_key_base = &quot;072d1e0157c008193fe48a670cce031faa4e...&quot;
+encrypted_cookie_salt = &quot;encrypted cookie&quot;
+encrypted_signed_cookie_salt = &quot;signed encrypted cookie&quot;
+
+secret = KeyGenerator.generate(secret_key_base, encrypted_cookie_salt)
+sign_secret = KeyGenerator.generate(secret_key_base, encrypted_signed_cookie_salt)
+
+data = &quot;José&quot;
+encrypted = MessageEncryptor.encrypt(data, secret, sign_secret)
+decrypted = MessageEncryptor.decrypt(encrypted, secret, sign_secret)
+decrypted # =&gt; {:ok, &quot;José&quot;}
+<!-- example -->
+defmodule MyApp do
+  use Plug.Builder
+
+  if Mix.env == :dev do
+    use Plug.Debugger, otp_app: :my_app
+  end
+
+  plug :boom
+
+  def boom(conn, _) do
+    # Error raised here will be caught and displayed in a debug page
+    # complete with a stacktrace and other helpful info.
+    raise &quot;oops&quot;
+  end
+end
+<!-- example -->
+use Plug.Debugger, style:
+  [primary: &quot;#c0392b&quot;, logo: &quot;data:image/png;base64,...&quot;]
+<!-- example -->
+txmt://open/?url=file://__FILE__&amp;line=__LINE__
+<!-- example -->
+defmodule AppRouter do
+  use Plug.Router
+  use Plug.ErrorHandler
+
+  plug :match
+  plug :dispatch
+
+  get &quot;/hello&quot; do
+    send_resp(conn, 200, &quot;world&quot;)
+  end
+
+  def handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
+    send_resp(conn, conn.status, &quot;Something went wrong&quot;)
+  end
+end
+<!-- example -->
+iex&gt; Plug.HTML.html_escape(&quot;foo&quot;)
+&quot;foo&quot;
+
+iex&gt; Plug.HTML.html_escape(&quot;&lt;foo&gt;&quot;)
+&quot;&amp;lt;foo&amp;gt;&quot;
+
+iex&gt; Plug.HTML.html_escape(&quot;quotes: \&quot; &amp; \&#39;&quot;)
+&quot;quotes: &amp;quot; &amp;amp; &amp;#39;&quot;
+<!-- example -->
+iex&gt; Plug.HTML.html_escape_to_iodata(&quot;foo&quot;)
+&quot;foo&quot;
+
+iex&gt; Plug.HTML.html_escape_to_iodata(&quot;&lt;foo&gt;&quot;)
+[[[] | &quot;&amp;lt;&quot;], &quot;foo&quot; | &quot;&amp;gt;&quot;]
+
+iex&gt; Plug.HTML.html_escape_to_iodata(&quot;quotes: \&quot; &amp; \&#39;&quot;)
+[[[[], &quot;quotes: &quot; | &quot;&amp;quot;&quot;], &quot; &quot; | &quot;&amp;amp;&quot;], &quot; &quot; | &quot;&amp;#39;&quot;]
+<!-- example -->
+Plug.Head.call(conn, [])
+<!-- example -->
+GET /index.html
+Sent 200 in 572ms
+<!-- example -->
+plug Plug.Logger, log: :debug
+<!-- example -->
+Plug.MethodOverride.call(conn, [])
+<!-- example -->
+plug Plug.Parsers, parsers: [:urlencoded, :multipart]
+
+plug Plug.Parsers, parsers: [:urlencoded, :json],
+                   pass: [&quot;text/*&quot;],
+                   json_decoder: Jason
+<!-- example -->
+plug Plug.Parsers,
+     parsers: [
+       :url_encoded,
+       {:multipart, length: 20_000_000} # Increase to 20MB max upload
+     ]
+<!-- example -->
+defmodule CacheBodyReader do
+  def read_body(conn, opts, verified_providers, verifiers) do
+    {:ok, body, conn} = Plug.Conn.read_body(conn, opts)
+    conn = update_in(conn.assigns[:raw_body], &amp;[body | (&amp;1 || [])])
+    {:ok, body, conn}
+  end
+end
+<!-- example -->
+plug Plug.Parsers,
+  parsers: [:urlencoded, :json],
+  pass: [&quot;text/*&quot;],
+  body_reader: {CacheBodyReader, :read_body, []},
+  json_decoder: Jason
+<!-- example -->
+config :logger, :console, metadata: [:request_id]
+<!-- example -->
+plug Plug.RequestId
+<!-- example -->
+defmodule AppRouter do
+  use Plug.Router
+
+  plug :match
+  plug :dispatch
+
+  get &quot;/hello&quot; do
+    send_resp(conn, 200, &quot;world&quot;)
+  end
+
+  match _ do
+    send_resp(conn, 404, &quot;oops&quot;)
+  end
+end
+<!-- example -->
+AppRouter.call(conn, AppRouter.init([]))
+<!-- example -->
+get &quot;/hello&quot;, private: %{an_option: :a_value} do
+  send_resp(conn, 200, &quot;world&quot;)
+end
+<!-- example -->
+get &quot;/hello&quot; do
+  send_resp(conn, 200, &quot;world&quot;)
+end
+<!-- example -->
+get &quot;/hello/:name&quot; do
+  send_resp(conn, 200, &quot;hello #{name}&quot;)
+end
+<!-- example -->
+get &quot;/hello/*_rest&quot; do
+  send_resp(conn, 200, &quot;matches all routes starting with /hello&quot;)
+end
+
+get &quot;/hello/*glob&quot; do
+  send_resp(conn, 200, &quot;route after /hello: #{inspect glob}&quot;)
+end
+<!-- example -->
+match &quot;/hello&quot; do
+  send_resp(conn, 200, &quot;world&quot;)
+end
+<!-- example -->
+defmodule AppRouter do
+  use Plug.Router
+
+  plug :match
+  plug Plug.Parsers, parsers: [:json],
+                     pass:  [&quot;application/json&quot;],
+                     json_decoder: Jason
+  plug :dispatch
+
+  post &quot;/hello&quot; do
+    IO.inspect conn.body_params # Prints JSON POST body
+    send_resp(conn, 200, &quot;Success!&quot;)
+  end
+end
+<!-- example -->
+defmodule AppRouter do
+  use Plug.Router
+
+  if Mix.env == :dev do
+    use Plug.Debugger
+  end
+
+  use Plug.ErrorHandler
+
+  plug :match
+  plug :dispatch
+
+  get &quot;/hello&quot; do
+    send_resp(conn, 200, &quot;world&quot;)
+  end
+
+  defp handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
+    send_resp(conn, conn.status, &quot;Something went wrong&quot;)
+  end
+end
+<!-- example -->
+match &quot;/foo/bar&quot;, via: :get do
+  send_resp(conn, 200, &quot;hello world&quot;)
+end
+<!-- example -->
+defp match(&quot;GET&quot;, [&quot;foo&quot;, &quot;bar&quot;], conn) do
+  send_resp(conn, 200, &quot;hello world&quot;)
+end
+<!-- example -->
+match &quot;/foo/bar/:baz&quot; when size(baz) &lt;= 3, via: :get do
+  send_resp(conn, 200, &quot;hello world&quot;)
+end
+<!-- example -->
+forward &quot;/users&quot;, to: UserRouter
+<!-- example -->
+forward &quot;/foo/:bar/qux&quot;, to: FooPlug
+<!-- example -->
+forward &quot;/foo/bar&quot;, to: :foo_bar_plug, host: &quot;foobar.&quot;
+forward &quot;/baz&quot;, to: BazPlug, init_opts: [plug_specific_option: true]
+<!-- example -->
+match &quot;/foo/bar&quot;, via: :get do
+  send_resp(conn, 200, &quot;hello world&quot;)
+end
+
+match &quot;/baz&quot;, to: MyPlug, init_opts: [an_option: :a_value]
+<!-- example -->
+plug Plug.SSL, rewrite_on: [:x_forwarded_proto]
+<!-- example -->
+plug :put_secret_key_base
+
+def put_secret_key_base(conn, _) do
+  put_in conn.secret_key_base, &quot;-- LONG STRING WITH AT LEAST 64 BYTES --&quot;
+end
+<!-- example -->
+# Use the session plug with the table name
+plug Plug.Session, store: :cookie,
+                   key: &quot;_my_app_session&quot;,
+                   encryption_salt: &quot;cookie store encryption salt&quot;,
+                   signing_salt: &quot;cookie store signing salt&quot;,
+                   key_length: 64,
+                   log: :debug
+<!-- example -->
+{sid :: String.t, data :: map, timestamp :: :erlang.timestamp}
+<!-- example -->
+# Create an ETS table when the application starts
+:ets.new(:session, [:named_table, :public, read_concurrency: true])
+
+# Use the session plug with the table name
+plug Plug.Session, store: :ets, key: &quot;sid&quot;, table: :session
+<!-- example -->
+plug Plug.Session, store: :ets, key: &quot;_my_app_session&quot;, table: :session
+<!-- example -->
+plug Plug.Static, from: &quot;priv/app/path&quot;
+<!-- example -->
+plug Plug.Static, from: {:app_name, &quot;priv/app/path&quot;}
+<!-- example -->
+defmodule MyPlug do
+  use Plug.Builder
+
+  plug Plug.Static,
+    at: &quot;/public&quot;,
+    from: :my_app,
+    only: ~w(images robots.txt)
+  plug :not_found
+
+  def not_found(conn, _) do
+    send_resp(conn, 404, &quot;not found&quot;)
+  end
+end
+<!-- example -->
+use ExUnit.Case, async: true
+use Plug.Test
+<!-- example -->
+config :plug, :validate_header_keys_during_test, true
+<!-- example -->
+conn(:get, &quot;/foo?bar=10&quot;)
+conn(:get, &quot;/foo&quot;, %{bar: 10})
+conn(:post, &quot;/&quot;)
+conn(&quot;patch&quot;, &quot;/&quot;, &quot;&quot;) |&gt; put_req_header(&quot;content-type&quot;, &quot;application/json&quot;)
+<!-- example -->
+conn = conn(:get, &quot;/foo?bar=10&quot;)
+pushes = Plug.Test.sent_pushes(conn)
+assert {&quot;/static/application.css&quot;, [{&quot;accept&quot;, &quot;text/css&quot;}]} in pushes
+assert {&quot;/static/application.js&quot;, [{&quot;accept&quot;, &quot;application/javascript&quot;}]} in pushes
+<!-- example -->
+(Plug.Conn.t, Plug.opts) :: Plug.Conn.t
+<!-- example -->
+def json_header_plug(conn, opts) do
+  Plug.Conn.put_resp_content_type(conn, &quot;application/json&quot;)
+end
+<!-- example -->
+defmodule JSONHeaderPlug do
+  import Plug.Conn
+
+  def init(opts) do
+    opts
+  end
+
+  def call(conn, _opts) do
+    put_resp_content_type(conn, &quot;application/json&quot;)
+  end
+end
+<!-- example -->
+defmodule MyPlug do
+  import Plug.Conn
+
+  def init(options) do
+    # initialize options
+
+    options
+  end
+
+  def call(conn, _opts) do
+    conn
+    |&gt; put_resp_content_type(&quot;text/plain&quot;)
+    |&gt; send_resp(200, &quot;Hello world&quot;)
+  end
+end
+<!-- example -->
+$ iex -S mix
+iex&gt; c &quot;path/to/file.ex&quot;
+[MyPlug]
+iex&gt; {:ok, _} = Plug.Adapters.Cowboy.http MyPlug, []
+{:ok, #PID&lt;...&gt;}
+<!-- example -->
+def deps do
+  [{:cowboy, &quot;~&gt; 1.0.0&quot;},
+   {:plug, &quot;~&gt; 1.0&quot;}]
+end
+<!-- example -->
+def application do
+  [applications: [:cowboy, :plug]]
+end
+<!-- example -->
+def hello_world_plug(conn, _opts) do
+  conn
+  |&gt; put_resp_content_type(&quot;text/plain&quot;)
+  |&gt; send_resp(200, &quot;Hello world&quot;)
+end
+<!-- example -->
+defmodule MyPlug do
+  def init([]), do: false
+  def call(conn, _opts), do: conn
+end
+<!-- example -->
+%Plug.Conn{host: &quot;www.example.com&quot;,
+           path_info: [&quot;bar&quot;, &quot;baz&quot;],
+           ...}
+<!-- example -->
+conn = put_resp_content_type(conn, &quot;text/plain&quot;)
+conn = send_resp(conn, 200, &quot;ok&quot;)
+conn
+<!-- example -->
+defmodule MyRouter do
+  use Plug.Router
+
+  plug :match
+  plug :dispatch
+
+  get &quot;/hello&quot; do
+    send_resp(conn, 200, &quot;world&quot;)
+  end
+
+  forward &quot;/users&quot;, to: UsersRouter
+
+  match _ do
+    send_resp(conn, 404, &quot;oops&quot;)
+  end
+end
+<!-- example -->
+plug Plug.Logger
+plug :match
+plug :dispatch
+<!-- example -->
+$ mix new my_app --sup
+<!-- example -->
+defmodule MyApp do
+  use Application
+
+  # See https://hexdocs.pm/elixir/Application.html
+  # for more information on OTP Applications
+  def start(_type, _args) do
+    children = [
+      # Define workers and child supervisors to be supervised
+      Plug.Adapters.Cowboy.child_spec(scheme: :http, plug: MyRouter, options: [port: 4001])
+    ]
+
+    # See https://hexdocs.pm/elixir/Supervisor.html
+    # for other strategies and supported options
+    opts = [strategy: :one_for_one, name: MyApp.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+end
+<!-- example -->
+defmodule MyPlugTest do
+  use ExUnit.Case, async: true
+  use Plug.Test
+
+  @opts MyRouter.init([])
+
+  test &quot;returns hello world&quot; do
+    # Create a test connection
+    conn = conn(:get, &quot;/hello&quot;)
+
+    # Invoke the plug
+    conn = MyRouter.call(conn, @opts)
+
+    # Assert the response and status
+    assert conn.state == :sent
+    assert conn.status == 200
+    assert conn.resp_body == &quot;world&quot;
+  end
+end

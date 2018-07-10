@@ -117,21 +117,6 @@ defmodule ExDoc.Markdown do
   end
 
   @doc """
-  Helper to handle plain code blocks (```...```) with and without
-  language specification and indentation code blocks.
-  """
-  def pretty_codeblocks(bin) do
-    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>\s*iex&gt;/,
-                        # Add "elixir" class for now, until we have support for
-                        # "iex" in highlight.js
-                        bin, ~S(<pre><code class="iex elixir">iex&gt;))
-    bin = Regex.replace(~r/<pre><code(\s+class=\"\")?>/,
-                        bin, ~S(<pre><code class="elixir">))
-
-    bin
-  end
-
-  @doc """
   Gets the current markdown processor set globally.
   """
   def get_markdown_processor do
