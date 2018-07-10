@@ -46,16 +46,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Get the pretty name of a function node
   """
-  def pretty_type(%ExDoc.TypeNode{type: t}) do
+  def pretty_type(%{type: t}) do
     Atom.to_string(t)
-  end
-  def pretty_type(%ExDoc.FunctionNode{type: t}) do
-    case t do
-      :def           -> "function"
-      :defmacro      -> "macro"
-      :callback      -> "callback"
-      :macrocallback -> "macro callback"
-    end
   end
 
   @doc """
@@ -195,7 +187,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def group_summary(module_node) do
     %{types: module_node.typespecs,
-      functions: Enum.filter(module_node.docs, & &1.type in [:def, :defmacro]),
+      functions: Enum.filter(module_node.docs, & &1.type in [:function, :macro]),
       callbacks: Enum.filter(module_node.docs, & &1.type in [:callback, :macrocallback])}
   end
 
