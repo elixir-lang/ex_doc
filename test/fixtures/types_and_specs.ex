@@ -15,6 +15,8 @@ defmodule TypesAndSpecs do
   @typep private :: any
   @opaque opaque :: {Dict.t}
   @type ref :: {:binary.part, public(any)}
+  @typedoc false
+  @type internal :: any
 
   @spec add(integer, opaque) :: integer
   def add(x, _), do: x + x

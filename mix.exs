@@ -1,13 +1,13 @@
 defmodule ExDoc.Mixfile do
   use Mix.Project
 
-  @version "0.18.3"
+  @version "0.19.0"
 
   def project do
     [
       app: :ex_doc,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.7-dev",
       deps: deps(),
       aliases: aliases(),
       package: package(),
@@ -28,7 +28,6 @@ defmodule ExDoc.Mixfile do
   defp deps do
     [
       {:earmark, "~> 1.1"},
-      # Syntax highlighting (independent of the Markdown implementation)
       {:makeup_elixir, "~> 0.6.0"},
       {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}

@@ -178,22 +178,25 @@ defmodule Mix.Tasks.Docs do
   @aliases [n: :canonical, f: :formatter, o: :output]
 
   @doc false
-  def run(args, config \\ Mix.Project.config, generator \\ &ExDoc.generate_docs/3) do
-    Mix.Task.run "compile"
+  def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate_docs/3) do
+    Mix.Task.run("compile")
     {cli_opts, args, _} = OptionParser.parse(args, aliases: @aliases, switches: @switches)
 
     if args != [] do
-      Mix.raise "Extraneous arguments on the command line"
+      Mix.raise("Extraneous arguments on the command line")
     end
 
     project = to_string(config[:name] || config[:app])
     version = config[:version] || "dev"
+
     options =
       config
       |> get_docs_opts()
       |> Keyword.merge(cli_opts)
-      |> normalize_source_url(config)   # accepted at root level config
-      |> normalize_homepage_url(config) # accepted at root level config
+      # accepted at root level config
+      |> normalize_source_url(config)
+      # accepted at root level config
+      |> normalize_homepage_url(config)
       |> normalize_source_beam(config)
       |> normalize_main()
       |> normalize_deps()
@@ -207,13 +210,14 @@ defmodule Mix.Tasks.Docs do
 
   defp get_formatters(options) do
     case Keyword.get_values(options, :formatter) do
-      [] -> options[:formatters] || [ExDoc.Config.default(:formatter)]
+      [] -> options[:formatters] || [ExDoc.Config.default_formatter()]
       values -> values
     end
   end
 
   defp get_docs_opts(config) do
     docs = config[:docs]
+
     cond do
       is_function(docs, 0) -> docs.()
       is_nil(docs) -> []
@@ -222,8 +226,8 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp log(index) do
-    Mix.shell.info [:green, "Docs successfully generated."]
-    Mix.shell.info [:green, "View them at #{inspect index}."]
+    Mix.shell().info([:green, "Docs successfully generated."])
+    Mix.shell().info([:green, "View them at #{inspect(index)}."])
   end
 
   defp normalize_source_url(options, config) do
@@ -247,22 +251,23 @@ defmodule Mix.Tasks.Docs do
       if Mix.Project.umbrella?(config) do
         umbrella_compile_paths()
       else
-        Mix.Project.compile_path
+        Mix.Project.compile_path()
       end
 
     Keyword.put_new(options, :source_beam, compile_path)
   end
 
   defp umbrella_compile_paths do
-    # TODO: Use Mix.Project.apps_path when we require Elixir v1.4+
     build = Mix.Project.build_path()
-    for %{app: app} <- Mix.Dep.Umbrella.unloaded do
+
+    for {app, _} <- Mix.Project.apps_paths() do
       Path.join([build, "lib", Atom.to_string(app), "ebin"])
     end
   end
 
   defp normalize_main(options) do
     main = options[:main]
+
     cond do
       is_nil(main) ->
         Keyword.delete(options, :main)
@@ -276,15 +281,10 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp normalize_deps(options) do
-    deps =
-      if deps = options[:deps] do
-        Keyword.merge(get_deps(), deps)
-      else
-        get_deps()
-      end
+    user_deps = Keyword.get(options, :deps, [])
 
     deps =
-      for {app, doc} <- deps,
+      for {app, doc} <- Keyword.merge(get_deps(), user_deps),
           lib_dir = :code.lib_dir(app),
           is_list(lib_dir),
           do: {List.to_string(lib_dir), doc}
@@ -293,8 +293,8 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp get_deps do
-    for {key, _} <- Mix.Project.deps_paths,
-        _ = Application.load(key), # :ok | {:error, _}
+    for {key, _} <- Mix.Project.deps_paths(),
+        _ = Application.load(key),
         vsn = Application.spec(key, :vsn) do
       {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
     end

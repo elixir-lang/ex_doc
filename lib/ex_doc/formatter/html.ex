@@ -18,7 +18,9 @@ defmodule ExDoc.Formatter.HTML do
 
     build = Path.join(config.output, ".build")
     output_setup(build, config)
-    linked = Autolink.all(project_nodes, ".html", config.deps)
+
+    autolink = Autolink.compile(project_nodes, ".html", config.deps)
+    linked = Autolink.all(project_nodes, autolink)
 
     nodes_map = %{
       modules: filter_list(:module, linked),
@@ -28,7 +30,7 @@ defmodule ExDoc.Formatter.HTML do
 
     extras =
       [build_api_reference(nodes_map, config) |
-       build_extras(project_nodes, config, ".html")]
+       build_extras(config, autolink)]
 
     assets_dir = "assets"
     static_files = generate_assets(config, assets_dir, default_assets(config))
@@ -175,34 +177,32 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Builds extra nodes by normalizing the config entries.
   """
-  def build_extras(project_nodes, config, extension) do
+  def build_extras(config, autolink) do
     groups = config.groups_for_extras
 
     config.extras
-    |> Enum.map(&Task.async(fn ->
-        build_extra(&1, project_nodes, extension, groups)
-       end))
-    |> Enum.map(&Task.await(&1, :infinity))
+    |> Task.async_stream(&build_extra(&1, autolink, groups), timeout: :infinity)
+    |> Enum.map(&elem(&1, 1))
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
 
-  defp build_extra({input, options}, project_nodes, extension, groups) do
+  defp build_extra({input, options}, autolink, groups) do
     input = to_string(input)
     id = options[:filename] || input |> input_to_title() |> title_to_id()
-    build_extra(input, id, options[:title], project_nodes, extension, groups)
+    build_extra(input, id, options[:title], autolink, groups)
   end
 
-  defp build_extra(input, project_nodes, extension, groups) do
+  defp build_extra(input, autolink, groups) do
     id = input |> input_to_title() |> title_to_id()
-    build_extra(input, id, nil, project_nodes, extension, groups)
+    build_extra(input, id, nil, autolink, groups)
   end
 
-  defp build_extra(input, id, title, project_nodes, extension, groups) do
+  defp build_extra(input, id, title, autolink, groups) do
     if valid_extension_name?(input) do
       content =
         input
         |> File.read!()
-        |> Autolink.project_doc(project_nodes, nil, extension)
+        |> Autolink.project_doc(autolink)
 
       group = GroupMatcher.match_extra groups, input
       html_content = Markdown.to_html(content, file: input, line: 1)
@@ -297,10 +297,8 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_list(nodes, nodes_map, config) do
     nodes
-    |> Enum.map(&Task.async(fn ->
-        generate_module_page(&1, nodes_map, config)
-       end))
-    |> Enum.map(&Task.await(&1, :infinity))
+    |> Task.async_stream(&generate_module_page(&1, nodes_map, config), timeout: :infinity)
+    |> Enum.map(&elem(&1, 1))
   end
 
   defp generate_module_page(module_node, nodes_map, config) do
