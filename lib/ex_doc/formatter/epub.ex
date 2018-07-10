@@ -110,7 +110,7 @@ defmodule ExDoc.Formatter.EPUB do
 
   defp generate_list(config, nodes) do
     nodes
-    |> Task.async_stream(&generate_module_page(&1, config))
+    |> Task.async_stream(&generate_module_page(&1, config), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
   end
 
