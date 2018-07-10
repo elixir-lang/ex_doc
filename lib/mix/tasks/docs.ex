@@ -258,10 +258,9 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp umbrella_compile_paths do
-    # TODO: Use Mix.Project.apps_path when we require Elixir v1.4+
     build = Mix.Project.build_path()
 
-    for %{app: app} <- Mix.Dep.Umbrella.unloaded() do
+    for {app, _} <- Mix.Project.apps_paths() do
       Path.join([build, "lib", Atom.to_string(app), "ebin"])
     end
   end

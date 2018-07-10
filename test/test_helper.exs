@@ -1,8 +1,6 @@
 exclude = [
   cmark: !ExDoc.Markdown.Cmark.available?,
-  earmark: !ExDoc.Markdown.Earmark.available?,
-  formatter: !function_exported?(Code, :format_string!, 2),
-  no_formatter: function_exported?(Code, :format_string!, 2)
+  earmark: !ExDoc.Markdown.Earmark.available?
 ]
 
 ExUnit.start(exclude: Enum.filter(exclude, &elem(&1, 1)))
