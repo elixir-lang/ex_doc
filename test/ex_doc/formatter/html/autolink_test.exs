@@ -127,6 +127,18 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "[`Mix.env/0`](#{@elixir_docs}mix/Mix.html#env/0)"
     end
 
+    test "autolinks to the longest libdir" do
+      lib_dir = :code.where_is_file('Elixir.CompiledWithDocs.beam')
+
+      lib_dirs = [
+        {Path.dirname(Path.dirname(lib_dir)), "http://short/"},
+        {Path.dirname(lib_dir), "http://long/"}
+      ]
+
+      assert Autolink.elixir_functions("`CompiledWithDocs.example/2`", [], ".html", lib_dirs) ==
+               "[`CompiledWithDocs.example/2`](http://long/CompiledWithDocs.html#example/2)"
+    end
+
     test "autolinks special forms" do
       assert Autolink.elixir_functions("`Mod.++/2`", ["Mod.++/2"]) === "[`Mod.++/2`](Mod.html#++/2)"
       assert Autolink.elixir_functions("`Mod.!/1`", ["Mod.!/1"]) === "[`Mod.!/1`](Mod.html#!/1)"

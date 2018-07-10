@@ -281,15 +281,10 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp normalize_deps(options) do
-    deps =
-      if deps = options[:deps] do
-        Keyword.merge(get_deps(), deps)
-      else
-        get_deps()
-      end
+    user_deps = Keyword.get(options, :deps, [])
 
     deps =
-      for {app, doc} <- deps,
+      for {app, doc} <- Keyword.merge(get_deps(), user_deps),
           lib_dir = :code.lib_dir(app),
           is_list(lib_dir),
           do: {List.to_string(lib_dir), doc}

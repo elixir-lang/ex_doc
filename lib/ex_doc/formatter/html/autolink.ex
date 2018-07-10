@@ -529,9 +529,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       path ->
         path = List.to_string(path)
 
-        Enum.find_value(lib_dirs, fn {lib_dir, doc} ->
-          String.starts_with?(path, lib_dir) and doc
-        end)
+        lib_dirs
+        |> Enum.filter(fn {lib_dir, _} -> String.starts_with?(path, lib_dir) end)
+        |> Enum.sort_by(fn {lib_dir, _} -> -byte_size(lib_dir) end)
+        |> case do
+          [{_, doc} | _] -> doc
+          _ -> nil
+        end
     end
   end
 
