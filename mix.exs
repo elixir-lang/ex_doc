@@ -44,7 +44,7 @@ defmodule ExDoc.Mixfile do
   defp package do
    [
       licenses: ["Apache 2.0"],
-      maintainers: ["José Valim", "Eksperimental", "Milton Mazzarri", "Friedel Ziegelmayer"],
+      maintainers: ["José Valim", "Eksperimental", "Milton Mazzarri", "Friedel Ziegelmayer", "Dmitry"],
       files: ["formatters", "lib", "mix.exs", "LICENSE", "CHANGELOG.md", "README.md"],
       links: %{
         "GitHub" => "https://github.com/elixir-lang/ex_doc",
