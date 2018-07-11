@@ -279,6 +279,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   Enum.each templates, fn({name, args}) ->
     filename = Path.expand("templates/#{name}.eex", __DIR__)
     @doc false
-    EEx.function_from_file :def, name, filename, args
+    EEx.function_from_file :def, name, filename, args, trim: true
   end
 end
