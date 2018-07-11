@@ -87,9 +87,10 @@ defmodule ExDoc.RetrieverTest do
       assert example_1.id == "example_1/0"
       assert example_1.type == :macro
       assert example_1.defaults == []
+      assert example_1.annotations == ["macro", "since 1.3.0"]
 
       assert example_without_docs.source_url ==
-               "http://example.com/test/fixtures/compiled_with_docs.ex\#L30"
+               "http://example.com/test/fixtures/compiled_with_docs.ex\#L31"
 
       assert example_without_docs.doc == nil
       assert example_without_docs.defaults == []
@@ -159,8 +160,14 @@ defmodule ExDoc.RetrieverTest do
 
     test "returns callbacks with no docs included" do
       [module_node] = docs_from_files(["CallbacksNoDocs"])
-      functions = Enum.map(module_node.docs, fn doc -> doc.id end)
-      assert functions == ["connect/2", "id/1"]
+      [connect, id] = module_node.docs
+
+      assert connect.id == "connect/2"
+      assert connect.annotations == []
+
+      assert id.id == "id/1"
+      assert id.deprecated == "Use another id"
+      assert id.annotations == ["optional", "since 1.3.0"]
     end
 
     test "fails when module is not available" do

@@ -18,6 +18,7 @@ defmodule CompiledWithDocs do
   def example(foo, bar \\ Baz), do: bar.baz(foo)
 
   @doc "Another example"
+  @doc since: "1.3.0"
   defmacro example_1, do: 1
 
   @doc """

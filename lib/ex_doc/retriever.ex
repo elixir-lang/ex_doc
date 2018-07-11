@@ -213,6 +213,7 @@ defmodule ExDoc.Retriever do
     {{type, name, arity}, anno, signature, doc, metadata} = function
     actual_def = actual_def(name, arity, type)
     doc_line = anno_line(anno)
+    annotations = annotations_from_metadata(metadata)
 
     line = find_function_line(module_data, actual_def) || doc_line
     doc = docstring(doc, name, arity, type, Map.fetch(module_data.impls, {name, arity}))
@@ -232,9 +233,9 @@ defmodule ExDoc.Retriever do
 
     annotations =
       case {type, name, arity} do
-        {:macro, _, _} -> ["macro"]
-        {_, :__struct__, 0} -> ["struct"]
-        _ -> []
+        {:macro, _, _} -> ["macro" | annotations]
+        {_, :__struct__, 0} -> ["struct" | annotations]
+        _ -> annotations
       end
 
     %ExDoc.FunctionNode{
@@ -291,21 +292,25 @@ defmodule ExDoc.Retriever do
   defp get_callbacks(_, _), do: []
 
   defp get_callback(callback, source, optional_callbacks, abst_code) do
-    {{kind, name, arity}, anno, _, doc, _} = callback
+    {{kind, name, arity}, anno, _, doc, metadata} = callback
     actual_def = actual_def(name, arity, kind)
     doc_line = anno_line(anno)
+    annotations = annotations_from_metadata(metadata)
 
     {:attribute, anno, :callback, {^actual_def, specs}} =
       Enum.find(abst_code, &match?({:attribute, _, :callback, {^actual_def, _}}, &1))
 
     line = anno_line(anno) || doc_line
     specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
-    annotations = if actual_def in optional_callbacks, do: ["optional"], else: []
+
+    annotations =
+      if actual_def in optional_callbacks, do: ["optional" | annotations], else: annotations
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
       name: name,
       arity: arity,
+      deprecated: Map.get(metadata, :deprecated),
       doc: docstring(doc),
       doc_line: doc_line,
       signature: get_typespec_signature(hd(specs), arity),
@@ -359,6 +364,7 @@ defmodule ExDoc.Retriever do
   defp get_type(type, source, abst_code) do
     {{_, name, arity}, anno, _, doc, metadata} = type
     doc_line = anno_line(anno)
+    annotations = annotations_from_metadata(metadata)
 
     {:attribute, anno, type, spec} =
       Enum.find(abst_code, fn
@@ -372,7 +378,7 @@ defmodule ExDoc.Retriever do
     spec = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(type)
     line = anno_line(anno) || doc_line
 
-    annotations = if type == :opaque, do: ["opaque"], else: []
+    annotations = if type == :opaque, do: ["opaque" | annotations], else: annotations
 
     %ExDoc.TypeNode{
       id: "#{name}/#{arity}",
@@ -440,6 +446,19 @@ defmodule ExDoc.Retriever do
   end
 
   defp actual_def(name, arity, _), do: {name, arity}
+
+  defp annotations_from_metadata(metadata) do
+    annotations = []
+
+    annotations =
+      if since = Map.get(metadata, :since) do
+        ["since #{since}" | annotations]
+      else
+        annotations
+      end
+
+    annotations
+  end
 
   defp remove_first_macro_arg({:::, info, [{name, info2, [_term_arg | rest_args]}, return]}) do
     {:::, info, [{name, info2, rest_args}, return]}
