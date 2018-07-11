@@ -41,7 +41,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     :ok
   end
 
-  describe "header" do
+  describe "header_to_id" do
     test "id generation" do
       assert Templates.header_to_id("“Stale”") == "stale"
       assert Templates.header_to_id("José") == "josé"
@@ -55,8 +55,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
   end
 
-  describe "link" do
-    test "headers" do
+  describe "link_headings" do
+    test "generates headers with hovers" do
       assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """
              <h2 id="foo" class="section-heading">
                <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
@@ -123,30 +123,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
   end
 
-  describe "sidebar" do
-    test "items from headers" do
-      item = %{content: nil, group: nil, id: nil, title: nil}
-
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"},{"id":"Bar","anchor":"bar"}]}]})
-
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"},{"id":"Bar","anchor":"bar"}]}]})
-
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2></h2><h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Bar","anchor":"bar"}]}]})
-
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2></h2>\n<h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Bar","anchor":"bar"}]}]})
-
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"}]}]})
-
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2></h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"}]}]})
-    end
-  end
-
   describe "synopsis" do
     test "functionality" do
       assert Templates.synopsis(nil) == nil
@@ -183,8 +159,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
   end
 
-  ## LISTING
-  describe "site_title" do
+  describe "sidebar" do
     test "text links to homepage_url when set" do
       content = Templates.sidebar_template(doc_config(), @empty_nodes_map)
 
@@ -205,9 +180,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~
                ~r{<a href="hello.html" class="sidebar-projectLink">\s*<div class="sidebar-projectDetails">\s*<h1 class="sidebar-projectName">\s*Elixir\s*</h1>\s*<h2 class="sidebar-projectVersion">\s*v1.0.1\s*</h2>\s*</div>\s*</a>}
     end
-  end
 
-  describe "list_page" do
     test "enables nav link when module type have at least one element" do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       modules = ExDoc.Retriever.docs_from_modules(names, doc_config())
@@ -244,9 +217,30 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert content =~ ~r("id":"CompiledWithDocs","title":"CompiledWithDocs","group":"Group")ms
     end
+
+    test "outputs extras with headers" do
+      item = %{content: nil, group: nil, id: nil, title: nil}
+
+      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}]) ==
+               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"},{"id":"Bar","anchor":"bar"}]}]})
+
+      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}]) ==
+               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"},{"id":"Bar","anchor":"bar"}]}]})
+
+      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2></h2><h2>Bar</h2>"}]) ==
+               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Bar","anchor":"bar"}]}]})
+
+      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2></h2>\n<h2>Bar</h2>"}]) ==
+               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Bar","anchor":"bar"}]}]})
+
+      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}]) ==
+               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"}]}]})
+
+      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2></h2>"}]) ==
+               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"}]}]})
+    end
   end
 
-  ## MODULES
   describe "module_page" do
     test "outputs the functions and docstrings" do
       content = get_module_page([CompiledWithDocs])
@@ -340,6 +334,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       refute content =~ ~r{types}
     end
 
+    test "add hovers to <h3> tags" do
+      content = get_module_page([CompiledWithDocs])
+
+      assert content =~
+               ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
+    end
+
     ## BEHAVIOURS
 
     test "outputs behavior and callbacks" do
@@ -379,12 +380,5 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~
                ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*mix task_with_docs\s*}m
     end
-  end
-
-  test "<h3> tags in method `@doc`s are linked" do
-    content = get_module_page([CompiledWithDocs])
-
-    assert content =~
-             ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
   end
 end

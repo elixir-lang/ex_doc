@@ -36,7 +36,6 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     :ok
   end
 
-  ## MODULES
   describe "module_page" do
     test "generates only the module name when there's no more info" do
       module_node = %ExDoc.ModuleNode{
