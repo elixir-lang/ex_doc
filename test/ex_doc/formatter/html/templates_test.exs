@@ -246,6 +246,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{<a href="#example/2" class="detail-link" title="Link to this function">\s*<span class="icon-link" aria-hidden="true"></span>\s*<span class="sr-only">Link to this function</span>\s*</a>}ms
   end
 
+  test "module_page outputs deprecation information" do
+    content = get_module_page([CompiledWithDocs])
+    assert content =~ ~s{<span class="deprecated" title="Use something else instead">deprecated</span>}
+    assert content =~ ~r{<div class="deprecated">\s*This function is deprecated. Use something else instead.}
+  end
+
   test "module_page outputs the types and function specs" do
     content = get_module_page([TypesAndSpecs, TypesAndSpecs.Sub])
     any = ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()]

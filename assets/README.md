@@ -12,7 +12,7 @@ The following scripts are available
 
 ### `build`
 
-This will build a complete production bundle, including JavaScript and CSS.
+This will build a complete production bundle, including JavaScript and CSS. You will have to run `mix compile --force` for your new assets to be embedded into ExDoc.
 
 ### `clean`
 

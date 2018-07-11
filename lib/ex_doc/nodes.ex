@@ -7,6 +7,7 @@ defmodule ExDoc.ModuleNode do
             title: nil,
             module: nil,
             group: nil,
+            deprecated: nil,
             doc: nil,
             doc_line: nil,
             docs: [],
@@ -20,6 +21,7 @@ defmodule ExDoc.ModuleNode do
           title: nil | String.t(),
           module: nil | String.t(),
           group: nil | String.t(),
+          deprecated: nil | String.t(),
           docs: list(),
           doc: nil | String.t(),
           doc_line: non_neg_integer(),
@@ -39,6 +41,7 @@ defmodule ExDoc.FunctionNode do
             name: nil,
             arity: 0,
             defaults: [],
+            deprecated: nil,
             doc: [],
             type: nil,
             signature: nil,
@@ -60,7 +63,8 @@ defmodule ExDoc.FunctionNode do
           type: nil | String.t(),
           signature: nil | String.t(),
           specs: list(),
-          annotations: list()
+          annotations: list(),
+          deprecated: nil | String.t()
         }
 end
 
@@ -73,11 +77,12 @@ defmodule ExDoc.TypeNode do
             name: nil,
             arity: 0,
             type: nil,
+            deprecated: nil,
+            doc: nil,
             doc_line: nil,
             source_path: nil,
             source_url: nil,
             spec: nil,
-            doc: nil,
             signature: nil,
             annotations: []
 
@@ -87,6 +92,7 @@ defmodule ExDoc.TypeNode do
           arity: non_neg_integer,
           type: nil | String.t(),
           spec: nil | String.t(),
+          deprecated: nil | String.t(),
           doc: nil | String.t(),
           doc_line: non_neg_integer,
           signature: nil | String.t(),

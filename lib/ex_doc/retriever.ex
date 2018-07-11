@@ -98,7 +98,7 @@ defmodule ExDoc.Retriever do
     source = %{url: source_url, path: source_path}
 
     module_data = get_module_data(module, docs_chunk)
-    {doc_line, moduledoc} = get_module_docs(module_data)
+    {doc_line, moduledoc, metadata} = get_module_docs(module_data)
     line = find_module_line(module_data) || doc_line
 
     docs = get_docs(module_data, source) ++ get_callbacks(module_data, source)
@@ -112,6 +112,7 @@ defmodule ExDoc.Retriever do
       module: module_data.name,
       group: module_group,
       type: module_data.type,
+      deprecated: Map.get(metadata, :deprecated),
       docs: Enum.sort_by(docs, & &1.id),
       doc: moduledoc,
       doc_line: doc_line,
@@ -159,8 +160,8 @@ defmodule ExDoc.Retriever do
 
   defp get_module_docs(%{docs: docs}) do
     case docs do
-      {:docs_v1, anno, _, _, %{"en" => doc}, _, _} -> {anno_line(anno), doc}
-      {:docs_v1, anno, _, _, _, _, _} -> {anno_line(anno), nil}
+      {:docs_v1, anno, _, _, %{"en" => doc}, metadata, _} -> {anno_line(anno), doc, metadata}
+      {:docs_v1, anno, _, _, _, metadata, _} -> {anno_line(anno), nil, metadata}
     end
   end
 
@@ -240,6 +241,7 @@ defmodule ExDoc.Retriever do
       id: "#{name}/#{arity}",
       name: name,
       arity: arity,
+      deprecated: Map.get(metadata, :deprecated),
       doc: doc,
       doc_line: doc_line,
       defaults: defaults,
@@ -355,7 +357,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_type(type, source, abst_code) do
-    {{_, name, arity}, anno, _, doc, _} = type
+    {{_, name, arity}, anno, _, doc, metadata} = type
     doc_line = anno_line(anno)
 
     {:attribute, anno, type, spec} =
@@ -378,6 +380,7 @@ defmodule ExDoc.Retriever do
       arity: arity,
       type: type,
       spec: spec,
+      deprecated: Map.get(metadata, :deprecated),
       doc: docstring(doc),
       doc_line: doc_line,
       signature: get_typespec_signature(spec, arity),

@@ -272,7 +272,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
-    summary_item_template: [:module_node],
+    summary_entry_template: [:module_node],
     redirect_template: [:config, :redirect_to],
   ]
 

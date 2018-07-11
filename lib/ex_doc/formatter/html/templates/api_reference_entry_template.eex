@@ -1,5 +1,10 @@
 <div class="summary-row">
-  <div class="summary-signature"><a href="<%=enc_h module_node.id %>.html"><%=h module_node.title %></a></div>
+  <div class="summary-signature">
+    <a href="<%=enc_h module_node.id %>.html"><%=h module_node.title %></a>
+    <%= if deprecated = module_node.deprecated do %>
+      <span class="deprecated" title="<%= h(deprecated) %>">deprecated</span>
+    <% end %>
+  </div>
   <%= if module_node.doc do %>
     <div class="summary-synopsis"><%= to_html(synopsis(module_node.doc), module_node) %></div>
   <% end %>

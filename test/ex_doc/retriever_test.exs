@@ -82,13 +82,14 @@ defmodule ExDoc.RetrieverTest do
       assert example.type == :function
       assert example.defaults == ["example/1"]
       assert example.signature == "example(foo, bar \\\\ Baz)"
+      assert example.deprecated == "Use something else instead"
 
       assert example_1.id == "example_1/0"
       assert example_1.type == :macro
       assert example_1.defaults == []
 
       assert example_without_docs.source_url ==
-               "http://example.com/test/fixtures/compiled_with_docs.ex\#L29"
+               "http://example.com/test/fixtures/compiled_with_docs.ex\#L30"
 
       assert example_without_docs.doc == nil
       assert example_without_docs.defaults == []

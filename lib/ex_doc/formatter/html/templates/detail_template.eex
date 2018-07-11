@@ -28,6 +28,11 @@
       </div>
     <% end %>
   </div>
+  <%= if deprecated = module_node.deprecated do %>
+    <div class="deprecated">
+      This <%= module_node.type %> is deprecated. <%= h(deprecated) %>.
+    </div>
+  <% end %>
   <section class="docstring">
     <%= module_node.doc |> to_html(module_node) |> link_detail_headings(enc_h(link_id(module_node))) %>
   </section>

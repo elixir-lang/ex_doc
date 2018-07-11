@@ -14,6 +14,7 @@ defmodule CompiledWithDocs do
   defstruct [:field]
 
   @doc "Some example"
+  @deprecated "Use something else instead"
   def example(foo, bar \\ Baz), do: bar.baz(foo)
 
   @doc "Another example"

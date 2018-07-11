@@ -5,7 +5,7 @@
   color: @gray;
   background-color: transparent;
   border: none;
-  padding: 0;
+  padding: 0.3em 0 0 0;
   transition: color 0.3s ease-in-out;
   font-size: 16px;
   will-change: transform;
@@ -20,22 +20,17 @@
   &:focus {
     outline: none;
   }
-
-  .sidebar-toggle {
-    top: 8px;
-  }
 }
 
 @media screen and (max-width: 768px) {
   .sidebar-button {
     transform: translateX(0);
-    left: 5px;
-    top: 5px;
+    left: 8px;
   }
 
   .sidebar-opened {
     .sidebar-button {
-      left: 18px;
+      left: 20px;
     }
   }
 }

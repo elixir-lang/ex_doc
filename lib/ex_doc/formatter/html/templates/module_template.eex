@@ -12,6 +12,12 @@
         <% end %>
       </h1>
 
+      <%= if deprecated = module.deprecated do %>
+        <div class="deprecated">
+          This <%= module.type %> is deprecated. <%= h(deprecated) %>.
+        </div>
+      <% end %>
+
       <%= if module.doc do %>
         <section id="moduledoc">
           <%= module.doc |> to_html(module) |> link_moduledoc_headings() %>
