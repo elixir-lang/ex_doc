@@ -12,7 +12,10 @@ The following scripts are available
 
 ### `build`
 
-This will build a complete production bundle, including JavaScript and CSS. You will have to run `mix compile --force` for your new assets to be embedded into ExDoc.
+This will build a complete production bundle, including JavaScript and CSS.
+If you run `mix docs` at `ExDoc` root after changing your assets, it will
+automatically recompile the assets, invoke `mix compile --force` and generate
+fresh docs with your changes.
 
 ### `clean`
 

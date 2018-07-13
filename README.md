@@ -126,10 +126,9 @@ docs: [markdown_processor: ExDoc.Markdown.Cmark]
 
 The easiest way to test changes to ExDoc is to locally re-generate it's own docs:
 
-1. Run `mix setup` to install all dependencies
-2. Run `mix docs` to generate docs. Note, ExDoc defines `docs` alias for local development,
-   see [`mix.exs`](./mix.exs) for more details
-3. Commit both `assets/*` and (after running `mix docs`) `formatters/*` changes
+  1. Run `mix setup` to install all dependencies
+  2. Run `mix docs` to generate docs. This is a custom alias that will build assets, recompile ExDoc, and output fresh docs into the `doc/` directory
+  3. Commit both `assets/*` and `formatters/*` changes (after running `mix docs`)
 
 ## License
 
