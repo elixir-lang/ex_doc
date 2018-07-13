@@ -144,6 +144,12 @@ defmodule ExDoc.Retriever do
   defp export_docs?(:elixir_bootstrap), do: false
 
   defp export_docs?(module) do
+    if function_exported?(Code, :fetch_docs, 1) do
+      raise Error,
+            "your ExDoc version (#{ExDoc.version()} does not support Elixir v1.7 and later. " <>
+              "For recent Elixir versions, make sure to depend on {:ex_doc, \"~> 0.19\"}"
+    end
+
     if function_exported?(module, :__info__, 1) do
       case Code.get_docs(module, :moduledoc) do
         {_line, false} ->
