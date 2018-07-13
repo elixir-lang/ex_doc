@@ -249,7 +249,7 @@ defmodule Mix.Tasks.Docs do
   defp normalize_source_beam(options, config) do
     compile_path =
       if Mix.Project.umbrella?(config) do
-        umbrella_compile_paths()
+        umbrella_compile_paths(get_ignored_apps(options))
       else
         Mix.Project.compile_path()
       end
@@ -257,11 +257,15 @@ defmodule Mix.Tasks.Docs do
     Keyword.put_new(options, :source_beam, compile_path)
   end
 
-  defp umbrella_compile_paths do
+  defp umbrella_compile_paths(ignored_apps) do
     build = Mix.Project.build_path()
 
     for {app, _} <- Mix.Project.apps_paths() do
-      Path.join([build, "lib", Atom.to_string(app), "ebin"])
+      app_name = Atom.to_string(app)
+
+      unless(Enum.member?(ignored_apps, app_name)) do
+        Path.join([build, "lib", app_name, "ebin"])
+      end
     end
   end
 
@@ -277,6 +281,18 @@ defmodule Mix.Tasks.Docs do
 
       is_binary(main) ->
         options
+    end
+  end
+
+  defp get_ignored_apps(options) do
+    ignored_apps = options[:ignored_apps]
+
+    cond do
+      is_nil(ignored_apps) ->
+        Keyword.put(options, :ignored_apps, [])
+
+      is_list(ignored_apps) ->
+        ignored_apps
     end
   end
 

@@ -40,7 +40,8 @@ defmodule ExDoc.Config do
             source_url: nil,
             source_url_pattern: nil,
             title: nil,
-            version: nil
+            version: nil,
+            ignored_apps: []
 
   @type t :: %__MODULE__{
           assets: nil | String.t(),
@@ -68,6 +69,7 @@ defmodule ExDoc.Config do
           source_url: nil | String.t(),
           source_url_pattern: nil | String.t(),
           title: nil | String.t(),
-          version: nil | String.t()
+          version: nil | String.t(),
+          ignored_apps: list()
         }
 end
