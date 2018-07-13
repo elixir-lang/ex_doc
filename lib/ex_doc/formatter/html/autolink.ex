@@ -141,12 +141,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp all_docs(module, compiled) do
-    locals =
+    funs =
       for doc <- module.docs,
           prefix = doc_prefix(doc),
           entry <- [doc.id | doc.defaults],
-          do: prefix <> entry,
-          into: Enum.map(module.typespecs, &("t:" <> &1.id))
+          do: prefix <> entry
+
+    types = Enum.map(module.typespecs, &("t:" <> &1.id))
+    locals = funs ++ types
 
     moduledoc = project_doc(module.doc, module.id, locals, compiled)
 

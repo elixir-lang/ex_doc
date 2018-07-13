@@ -13,7 +13,7 @@ Code.prepend_path("test/tmp/beam")
 # Compile module fixtures
 "test/fixtures/*.ex"
 |> Path.wildcard()
-|> Kernel.ParallelCompiler.files_to_path("test/tmp/beam")
+|> Kernel.ParallelCompiler.compile_to_path("test/tmp/beam")
 
 defmodule ExDoc.Markdown.DummyProcessor do
   @moduledoc false
