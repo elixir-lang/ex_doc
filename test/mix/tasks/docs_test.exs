@@ -111,7 +111,7 @@ defmodule Mix.Tasks.DocsTest do
     end)
   end
 
-  test "supports umbrella project with ignored_apps" do
+  test "supports umbrella project with ignore_apps" do
     Mix.Project.in_project(:umbrella, "test/fixtures/umbrella", fn _mod ->
       [
         {"umbrella", "dev",
@@ -119,9 +119,9 @@ defmodule Mix.Tasks.DocsTest do
            formatter: "html",
            deps: _,
            source_beam: _,
-           ignored_apps: ["foo"]
+           ignore_apps: [:foo]
          ]}
-      ] = run([], app: :umbrella, apps_path: "apps/", docs: [ignored_apps: ["foo"]])
+      ] = run([], app: :umbrella, apps_path: "apps/", docs: [ignore_apps: [:foo]])
     end)
   end
 end

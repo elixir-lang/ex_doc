@@ -114,6 +114,9 @@ defmodule Mix.Tasks.Docs do
 
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
+    
+    *`:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
+      Receives a list of atoms. Example: `[:first_app, :second_app]`.
 
   ## Groups
 
@@ -163,6 +166,8 @@ defmodule Mix.Tasks.Docs do
   Generating documentation per each child app can be achieved by running:
 
       mix cmd mix docs
+
+  As said, ignoring documentation for nested projects can be achieved by utilizing the `:ignore_apps` configuration.
 
   See `mix help cmd` for more information.
   """
@@ -249,7 +254,7 @@ defmodule Mix.Tasks.Docs do
   defp normalize_source_beam(options, config) do
     compile_path =
       if Mix.Project.umbrella?(config) do
-        umbrella_compile_paths(get_ignored_apps(options))
+        umbrella_compile_paths(Keyword.get(options, :ignore_apps, []))
       else
         Mix.Project.compile_path()
       end
@@ -261,10 +266,8 @@ defmodule Mix.Tasks.Docs do
     build = Mix.Project.build_path()
 
     for {app, _} <- Mix.Project.apps_paths() do
-      app_name = Atom.to_string(app)
-
-      unless(Enum.member?(ignored_apps, app_name)) do
-        Path.join([build, "lib", app_name, "ebin"])
+      unless(Enum.member?(ignored_apps, app)) do
+        Path.join([build, "lib", Atom.to_string(app), "ebin"])
       end
     end
   end
@@ -281,18 +284,6 @@ defmodule Mix.Tasks.Docs do
 
       is_binary(main) ->
         options
-    end
-  end
-
-  defp get_ignored_apps(options) do
-    ignored_apps = options[:ignored_apps]
-
-    cond do
-      is_nil(ignored_apps) ->
-        Keyword.put(options, :ignored_apps, [])
-
-      is_list(ignored_apps) ->
-        ignored_apps
     end
   end
 
