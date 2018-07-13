@@ -1,7 +1,7 @@
 defmodule ExDoc.Mixfile do
   use Mix.Project
 
-  @version "0.19.0"
+  @version "0.19.0-rc"
 
   def project do
     [
@@ -16,7 +16,7 @@ defmodule ExDoc.Mixfile do
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
       description: "ExDoc is a documentation generation tool for Elixir",
-      xref: [exclude: [Cmark, Markdown]],
+      xref: [exclude: [Cmark]],
       docs: docs()
    ]
   end
@@ -28,7 +28,6 @@ defmodule ExDoc.Mixfile do
   defp deps do
     [
       {:earmark, "~> 1.1"},
-      # Syntax highlighting (independent of the Markdown implementation)
       {:makeup_elixir, "~> 0.7.0"},
       {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
@@ -71,8 +70,7 @@ defmodule ExDoc.Mixfile do
         "Markdown": [
           ExDoc.Markdown,
           ExDoc.Markdown.Cmark,
-          ExDoc.Markdown.Earmark,
-          ExDoc.Markdown.Hoedown
+          ExDoc.Markdown.Earmark
         ],
 
         "Formatter API": [
