@@ -161,13 +161,12 @@ defmodule Mix.Tasks.Docs do
   ## Umbrella project
 
   ExDoc can be used in an umbrella project and generates a single documentation
-  for all child apps.
+  for all child apps. You can use the `:ignore_apps` configuration to exclude
+  certain projects in the umbrella from documentation.
 
   Generating documentation per each child app can be achieved by running:
 
       mix cmd mix docs
-
-  As said, ignoring documentation for nested projects can be achieved by utilizing the `:ignore_apps` configuration.
 
   See `mix help cmd` for more information.
   """
