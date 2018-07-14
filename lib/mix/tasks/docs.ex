@@ -264,10 +264,9 @@ defmodule Mix.Tasks.Docs do
   defp umbrella_compile_paths(ignored_apps) do
     build = Mix.Project.build_path()
 
-    for {app, _} <- Mix.Project.apps_paths() do
-      unless(Enum.member?(ignored_apps, app)) do
-        Path.join([build, "lib", Atom.to_string(app), "ebin"])
-      end
+    for {app, _} <- Mix.Project.apps_paths(),
+        app not in ignored_apps do
+      Path.join([build, "lib", Atom.to_string(app), "ebin"])
     end
   end
 
