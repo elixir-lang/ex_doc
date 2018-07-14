@@ -114,6 +114,9 @@ defmodule Mix.Tasks.Docs do
 
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
+    
+    *`:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
+      Receives a list of atoms. Example: `[:first_app, :second_app]`.
 
   ## Groups
 
@@ -158,7 +161,8 @@ defmodule Mix.Tasks.Docs do
   ## Umbrella project
 
   ExDoc can be used in an umbrella project and generates a single documentation
-  for all child apps.
+  for all child apps. You can use the `:ignore_apps` configuration to exclude
+  certain projects in the umbrella from documentation.
 
   Generating documentation per each child app can be achieved by running:
 
@@ -249,7 +253,7 @@ defmodule Mix.Tasks.Docs do
   defp normalize_source_beam(options, config) do
     compile_path =
       if Mix.Project.umbrella?(config) do
-        umbrella_compile_paths()
+        umbrella_compile_paths(Keyword.get(options, :ignore_apps, []))
       else
         Mix.Project.compile_path()
       end
@@ -257,10 +261,11 @@ defmodule Mix.Tasks.Docs do
     Keyword.put_new(options, :source_beam, compile_path)
   end
 
-  defp umbrella_compile_paths do
+  defp umbrella_compile_paths(ignored_apps) do
     build = Mix.Project.build_path()
 
-    for {app, _} <- Mix.Project.apps_paths() do
+    for {app, _} <- Mix.Project.apps_paths(),
+        app not in ignored_apps do
       Path.join([build, "lib", Atom.to_string(app), "ebin"])
     end
   end
