@@ -62,16 +62,16 @@ describe('search', () => {
       }])
     })
 
-    it('searches for macro matches', () => {
+    it('searches for guard matches', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', macros: [{id: 'run'}]},
+        {id: 'hello', title: 'hello', guards: [{id: 'run'}]},
         {id: 'world', title: 'world'}
       ]
 
       expect(search.findIn(nodes, 'run')).to.be.eql([{
         id: 'hello',
         match: 'hello',
-        macros: [
+        guards: [
           {id: 'run', match: '<em>run</em>'}
         ]
       }])
@@ -79,14 +79,14 @@ describe('search', () => {
 
     it('searches for nested matches', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', macros: [{id: 'run'}]},
+        {id: 'hello', title: 'hello', guards: [{id: 'run'}]},
         {id: 'world', title: 'world'}
       ]
 
       expect(search.findIn(nodes, 'hello.run')).to.be.eql([{
         id: 'hello',
         match: 'hello',
-        macros: [
+        guards: [
           {id: 'run', match: 'run'}
         ]
       }])
