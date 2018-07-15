@@ -98,7 +98,7 @@ defmodule ExDoc.RetrieverTest do
 
       assert is_zero.id == "is_zero/1"
       assert is_zero.doc == "A simple guard"
-      assert is_zero.type == :guard
+      assert is_zero.type in [:guard, :macro] # TODO: Remove :macro when ~> 1.8
       assert is_zero.defaults == []
     end
 
