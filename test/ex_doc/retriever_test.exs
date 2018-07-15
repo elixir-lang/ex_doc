@@ -69,7 +69,8 @@ defmodule ExDoc.RetrieverTest do
 
     test "returns the function nodes for each module" do
       [module_node] = docs_from_files(["CompiledWithDocs"])
-      [struct, example, example_1, _example_with_h3, example_without_docs] = module_node.docs
+      [struct, example, example_1, _example_with_h3, example_without_docs, is_zero] =
+        module_node.docs
 
       assert struct.id == "__struct__/0"
       assert struct.doc == "Some struct"
@@ -89,11 +90,16 @@ defmodule ExDoc.RetrieverTest do
       assert example_1.defaults == []
       assert example_1.annotations == ["macro", "since 1.3.0"]
 
-      assert example_without_docs.source_url ==
-               "http://example.com/test/fixtures/compiled_with_docs.ex\#L31"
-
+      assert example_without_docs.id == "example_without_docs/0"
       assert example_without_docs.doc == nil
       assert example_without_docs.defaults == []
+      assert example_without_docs.source_url ==
+               "http://example.com/test/fixtures/compiled_with_docs.ex\#L34"
+
+      assert is_zero.id == "is_zero/1"
+      assert is_zero.doc == "A simple guard"
+      assert is_zero.type == :guard
+      assert is_zero.defaults == []
     end
 
     test "returns the specs for each non-private function" do

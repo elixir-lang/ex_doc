@@ -114,7 +114,7 @@ defmodule ExDoc.Retriever do
       module: module_data.name,
       group: module_group,
       type: module_data.type,
-      deprecated: Map.get(metadata, :deprecated),
+      deprecated: metadata[:deprecated],
       docs: Enum.sort_by(docs, & &1.id),
       doc: moduledoc,
       doc_line: doc_line,
@@ -244,7 +244,7 @@ defmodule ExDoc.Retriever do
       id: "#{name}/#{arity}",
       name: name,
       arity: arity,
-      deprecated: Map.get(metadata, :deprecated),
+      deprecated: metadata[:deprecated],
       doc: doc,
       doc_line: doc_line,
       defaults: defaults,
@@ -252,7 +252,7 @@ defmodule ExDoc.Retriever do
       specs: specs,
       source_path: source.path,
       source_url: source_link(source, line),
-      type: type,
+      type: if(metadata[:guard], do: :guard, else: type),
       annotations: annotations
     }
   end
@@ -312,7 +312,7 @@ defmodule ExDoc.Retriever do
       id: "#{name}/#{arity}",
       name: name,
       arity: arity,
-      deprecated: Map.get(metadata, :deprecated),
+      deprecated: metadata[:deprecated],
       doc: docstring(doc),
       doc_line: doc_line,
       signature: get_typespec_signature(hd(specs), arity),
@@ -388,7 +388,7 @@ defmodule ExDoc.Retriever do
       arity: arity,
       type: type,
       spec: spec,
-      deprecated: Map.get(metadata, :deprecated),
+      deprecated: metadata[:deprecated],
       doc: docstring(doc),
       doc_line: doc_line,
       signature: get_typespec_signature(spec, arity),
@@ -453,7 +453,7 @@ defmodule ExDoc.Retriever do
     annotations = []
 
     annotations =
-      if since = Map.get(metadata, :since) do
+      if since = metadata[:since] do
         ["since #{since}" | annotations]
       else
         annotations

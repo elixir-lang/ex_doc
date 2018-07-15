@@ -10,7 +10,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   Generate content from the module template for a given `node`
   """
   def module_page(config, module_node) do
-    summary_map = H.group_summary(module_node)
+    summary_map = H.module_summary(module_node)
     module_template(config, module_node, summary_map)
   end
 

@@ -34,6 +34,7 @@
             Summary
           </h1>
           <%= summary_template "types", summary_map.types %>
+          <%= summary_template "guards", summary_map.guards %>
           <%= summary_template "functions", summary_map.functions %>
           <%= summary_template "callbacks", summary_map.callbacks %>
         </section>
@@ -53,6 +54,21 @@
               detail_template(type_node, module)
             end %>
           </div>
+        </section>
+      <% end %>
+
+      <%= if summary_map.guards != [] do %>
+        <section id="guards" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#guards">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Guards
+          </h1>
+          <%= for guard_node <- summary_map.guards do
+            detail_template(guard_node, module)
+          end %>
         </section>
       <% end %>
 

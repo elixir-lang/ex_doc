@@ -16,7 +16,7 @@ describe('helpers', () => {
         functions: [{anchor: 'world'}]
       }, {
         callbacks: [{anchor: 'one'}],
-        macros: [{anchor: 'two'}]
+        guards: [{anchor: 'two'}]
       }]
 
       expect(helpers.findSidebarCategory(nodes, 'world')).to.be.eql('functions')

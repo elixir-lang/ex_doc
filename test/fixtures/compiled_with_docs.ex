@@ -21,6 +21,9 @@ defmodule CompiledWithDocs do
   @doc since: "1.3.0"
   defmacro example_1, do: 1
 
+  @doc "A simple guard"
+  defguard is_zero(number) when number == 0
+
   @doc """
   Does example action.
 

@@ -3,7 +3,7 @@ export default function (node, options) {
     node.headers,
     node.types,
     node.functions,
-    node.macros,
+    node.guards,
     node.callbacks
   ]
 

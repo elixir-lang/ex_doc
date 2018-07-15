@@ -42,6 +42,18 @@
               </ul>
             </li>
           {{/if}}
+          {{#if node.guards}}
+            <li class="docs">
+              <a href="{{node.id}}.html#guards" class="expand">Guards</a>
+              <ul class="guards-list deflist">
+                {{#each node.guards}}
+                  <li>
+                    <a href="{{node.id}}.html#{{anchor}}" class="deflink">{{id}}</a>
+                  </li>
+                {{/each}}
+              </ul>
+            </li>
+          {{/if}}
           {{#if node.functions}}
             <li class="docs">
               <a href="{{node.id}}.html#functions" class="expand">Functions</a>
@@ -49,18 +61,6 @@
                 {{#each node.functions}}
                   <li>
                     <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
-                  </li>
-                {{/each}}
-              </ul>
-            </li>
-          {{/if}}
-          {{#if node.macros}}
-            <li class="docs">
-              <a href="{{node.id}}.html#macros" class="expand">Macros</a>
-              <ul class="macros-list deflist">
-                {{#each node.macros}}
-                  <li>
-                    <a href="{{node.id}}.html#{{anchor}}" class="deflink">{{id}}</a>
                   </li>
                 {{/each}}
               </ul>

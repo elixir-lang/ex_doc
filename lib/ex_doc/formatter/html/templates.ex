@@ -6,7 +6,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   Generate content from the module template for a given `node`
   """
   def module_page(module_node, nodes_map, config) do
-    summary_map = group_summary(module_node)
+    summary_map = module_summary(module_node)
     module_template(config, module_node, summary_map, nodes_map)
   end
 
@@ -163,7 +163,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_items_node(module_node) do
     items =
       module_node
-      |> group_summary()
+      |> module_summary()
       |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
       |> Enum.map_join(",", &sidebar_items_by_type/1)
 
@@ -185,10 +185,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}"}/
   end
 
-  def group_summary(module_node) do
-    %{types: module_node.typespecs,
+  def module_summary(module_node) do
+    %{
+      callbacks: Enum.filter(module_node.docs, & &1.type in [:callback, :macrocallback]),
       functions: Enum.filter(module_node.docs, & &1.type in [:function, :macro]),
-      callbacks: Enum.filter(module_node.docs, & &1.type in [:callback, :macrocallback])}
+      guards: Enum.filter(module_node.docs, & &1.type in [:guard]),
+      types: module_node.typespecs
+    }
   end
 
   defp logo_path(%{logo: nil}), do: nil
