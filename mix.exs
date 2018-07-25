@@ -38,7 +38,7 @@ defmodule ExDoc.Mixfile do
     [
       clean: [&clean_test_fixtures/1, "clean"],
       setup: ["deps.get", &setup_assets/1],
-      docs: [&maybe_build_assets/1, "compile --force", "docs"]
+      build: [&build_assets/1, "compile --force", "docs"]
     ]
   end
 
@@ -94,10 +94,8 @@ defmodule ExDoc.Mixfile do
     cmd("npm", ~w(install))
   end
 
-  defp maybe_build_assets(_args) do
-    if Mix.env() == :dev do
-      cmd("npm", ~w(run build))
-    end
+  defp build_assets(_args) do
+    cmd("npm", ~w(run build))
   end
 
   defp cmd(cmd, args, opts \\ []) do
