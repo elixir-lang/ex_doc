@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.19.0
+
+This release requires Elixir v1.7 and later. For earlier Elixir versions, use ExDoc ~> 0.18.0.
+
+  * Enhancements
+    * Do not select "iex>" when selecting code samples
+    * Use makeup to perform ELixir's syntax highlighting (other languages still use highlight.js)
+    * Use `[rel="noopener"] on external links
+    * Link directly to page if sidebar item has no subitems
+    * Autolink Kernel and Kernel functions and special forms with shorthands (for example, only `is_atom/1` is necessary)
+    * Trim EEx contents to reduce HTML size
+    * Allow apps to be excluded from umbrella app docs
+
+  * Bug fixes
+    * Exclude types with `@typedoc false` from the docs
+    * Make sure autolink considers the longest matching dependency name in case of shared prefixes
+
 ## v0.18.3
 
   * Bug fix
