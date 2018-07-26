@@ -132,18 +132,6 @@ function fixLinks () {
   CONTENT.find('a').has('img').addClass('no-underline')
 }
 
-/**
- * Focus on the content element.
- *
- * This is required so that the space bar (and similar key bindings)
- * work as soon as you visit a module's documentation. Without this,
- * the user would be forced to first click on the content element
- * before these keybindings worked.
- */
-function fixSpacebar () {
-  CONTENT.attr('tabindex', -1).focus()
-}
-
 // Public Methods
 // --------------
 
@@ -153,5 +141,4 @@ export function initialize () {
   collapse()
   identifyCurrentHash()
   fixLinks()
-  fixSpacebar()
 }
