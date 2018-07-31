@@ -10,6 +10,7 @@ defmodule ExDoc.ModuleNode do
             deprecated: nil,
             doc: nil,
             doc_line: nil,
+            function_groups: [],
             docs: [],
             typespecs: [],
             source_path: nil,
@@ -22,6 +23,7 @@ defmodule ExDoc.ModuleNode do
           module: nil | String.t(),
           group: nil | String.t(),
           deprecated: nil | String.t(),
+          function_groups: list(),
           docs: list(),
           doc: nil | String.t(),
           doc_line: non_neg_integer(),
@@ -47,6 +49,7 @@ defmodule ExDoc.FunctionNode do
             signature: nil,
             specs: [],
             annotations: [],
+            groups: [],
             doc_line: nil,
             source_path: nil,
             source_url: nil
@@ -64,6 +67,7 @@ defmodule ExDoc.FunctionNode do
           signature: nil | String.t(),
           specs: list(),
           annotations: list(),
+          groups: list(),
           deprecated: nil | String.t()
         }
 end

@@ -67,9 +67,15 @@ defmodule ExDoc.RetrieverTest do
     end
 
     test "returns the function nodes for each module" do
-      [module_node] = docs_from_files(["CompiledWithDocs"])
+      [module_node] =
+        docs_from_files(["CompiledWithDocs"],
+          groups_for_functions: [
+            Example: &(&1[:purpose] == :example),
+            Legacy: &is_binary(&1[:deprecated])
+          ]
+        )
 
-      [struct, example, example_1, _example_with_h3, example_without_docs, is_zero] =
+      [struct, example, example_1, example_with_h3, example_without_docs, is_zero] =
         module_node.docs
 
       assert struct.id == "__struct__/0"
@@ -77,6 +83,7 @@ defmodule ExDoc.RetrieverTest do
       assert struct.type == :function
       assert struct.defaults == []
       assert struct.signature == "%CompiledWithDocs{}"
+      assert struct.groups == [:Functions]
 
       assert example.id == "example/2"
       assert example.doc == "Some example"
@@ -84,23 +91,29 @@ defmodule ExDoc.RetrieverTest do
       assert example.defaults == ["example/1"]
       assert example.signature == "example(foo, bar \\\\ Baz)"
       assert example.deprecated == "Use something else instead"
+      assert example.groups == [:Example, :Legacy]
 
       assert example_1.id == "example_1/0"
       assert example_1.type == :macro
       assert example_1.defaults == []
       assert example_1.annotations == ["macro", "since 1.3.0"]
 
+      assert example_with_h3.id == "example_with_h3/0"
+      assert example_with_h3.groups == [:Example]
+
       assert example_without_docs.id == "example_without_docs/0"
       assert example_without_docs.doc == nil
       assert example_without_docs.defaults == []
+      assert example_without_docs.groups == [:Example]
 
       assert example_without_docs.source_url ==
-               "http://example.com/test/fixtures/compiled_with_docs.ex\#L34"
+               "http://example.com/test/fixtures/compiled_with_docs.ex\#L39"
 
       assert is_zero.id == "is_zero/1"
       assert is_zero.doc == "A simple guard"
       # TODO: Remove :macro when ~> 1.8
       assert is_zero.type in [:guard, :macro]
+      assert is_zero.groups == [:Guards]
       assert is_zero.defaults == []
     end
 

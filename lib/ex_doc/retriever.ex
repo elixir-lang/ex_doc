@@ -103,7 +103,8 @@ defmodule ExDoc.Retriever do
     {doc_line, moduledoc, metadata} = get_module_docs(module_data)
     line = find_module_line(module_data) || doc_line
 
-    docs = get_docs(module_data, source) ++ get_callbacks(module_data, source)
+    {function_groups, function_docs} = get_docs(module_data, source, config)
+    docs = function_docs ++ get_callbacks(module_data, source)
     types = get_types(module_data, source)
     {title, id} = module_title_and_id(module_data)
     module_group = GroupMatcher.match_module(config.groups_for_modules, module, id)
@@ -115,6 +116,7 @@ defmodule ExDoc.Retriever do
       group: module_group,
       type: module_data.type,
       deprecated: metadata[:deprecated],
+      function_groups: function_groups,
       docs: Enum.sort_by(docs, & &1.id),
       doc: moduledoc,
       doc_line: doc_line,
@@ -175,12 +177,16 @@ defmodule ExDoc.Retriever do
 
   ## Function helpers
 
-  defp get_docs(%{type: type, docs: docs} = module_data, source) do
+  defp get_docs(%{type: type, docs: docs} = module_data, source, config) do
     {:docs_v1, _, _, _, _, _, docs} = docs
+    groups_for_functions = [Guards: &(&1[:guard] == true)] ++ config.groups_for_functions
 
-    for doc <- docs, doc?(doc, type) do
-      get_function(doc, source, module_data)
-    end
+    function_docs =
+      for doc <- docs, doc?(doc, type) do
+        get_function(doc, source, module_data, groups_for_functions)
+      end
+
+    {Keyword.keys(groups_for_functions) ++ [:Functions], function_docs}
   end
 
   # We are only interested in functions and macros for now
@@ -208,7 +214,7 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function(function, source, module_data) do
+  defp get_function(function, source, module_data, groups_for_functions) do
     {{type, name, arity}, anno, signature, doc, metadata} = function
     actual_def = actual_def(name, arity, type)
     doc_line = anno_line(anno)
@@ -237,6 +243,9 @@ defmodule ExDoc.Retriever do
         _ -> annotations
       end
 
+    groups = for {group, filter} <- groups_for_functions, filter.(metadata), do: group
+    groups = if groups == [], do: [:Functions], else: groups
+
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
       name: name,
@@ -250,6 +259,7 @@ defmodule ExDoc.Retriever do
       source_path: source.path,
       source_url: source_link(source, line),
       type: if(metadata[:guard], do: :guard, else: type),
+      groups: groups,
       annotations: annotations
     }
   end
