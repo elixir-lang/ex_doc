@@ -160,11 +160,8 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp get_module_docs(%{docs: docs}) do
-    case docs do
-      {:docs_v1, anno, _, _, %{"en" => doc}, metadata, _} -> {anno_line(anno), doc, metadata}
-      {:docs_v1, anno, _, _, _, metadata, _} -> {anno_line(anno), nil, metadata}
-    end
+  defp get_module_docs(%{docs: {:docs_v1, anno, _, _, moduledoc, metadata, _}}) do
+    {anno_line(anno), docstring(moduledoc), metadata}
   end
 
   defp get_abstract_code(module) do
@@ -262,8 +259,9 @@ defmodule ExDoc.Retriever do
 
     with {:docs_v1, _, _, _, _, _, docs} <- Code.fetch_docs(behaviour),
          key = {definition_to_callback(type), name, arity},
-         {_, _, _, %{"en" => doc}, _} <- List.keyfind(docs, key, 0) do
-      "#{doc}\n\n#{info}"
+         {_, _, _, doc, _} <- List.keyfind(docs, key, 0),
+         docstring when is_binary(docstring) <- docstring(doc) do
+      "#{docstring}\n\n#{info}"
     else
       _ -> info
     end
@@ -326,7 +324,7 @@ defmodule ExDoc.Retriever do
 
   ## Typespecs
 
-  # Returns a map of {name, arity} -> spec.
+  # Returns a map of {name, arity} => spec.
   defp get_specs(module) do
     case Code.Typespec.fetch_specs(module) do
       {:ok, specs} -> Map.new(specs)
@@ -334,7 +332,7 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  # Returns a map of {name, arity} -> behaviour.
+  # Returns a map of {name, arity} => behaviour.
   defp get_impls(module) do
     for behaviour <- behaviours_implemented_by(module),
         callback <- callbacks_defined_by(behaviour),
