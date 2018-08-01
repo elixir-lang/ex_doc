@@ -8,10 +8,6 @@ defmodule ExDoc.Formatter.HTML.Assets do
     |> Enum.map(&{Path.basename(&1), File.read!(&1)})
   end
 
-  def debug do
-    embed_pattern("dist/*.map")
-  end
-
   def dist do
     embed_pattern("dist/*.{css,js}")
   end

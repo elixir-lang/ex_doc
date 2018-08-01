@@ -168,12 +168,10 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp default_assets(config) do
-    debug = if config.debug, do: [{Assets.debug(), "dist"}], else: []
-
     [
       {Assets.dist(), "dist"},
       {Assets.fonts(), "fonts"},
-      {Assets.markdown_processor_assets(), ""} | debug
+      {Assets.markdown_processor_assets(), ""}
     ]
   end
 

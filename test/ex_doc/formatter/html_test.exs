@@ -142,21 +142,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
   end
 
-  test "generates in specified output directory with redirect index.html file and debug options" do
-    config = doc_config(output: "#{output_dir()}/another_dir", main: "RandomError", debug: true)
-    generate_docs(config)
-
-    assert File.regular?("#{output_dir()}/another_dir/CompiledWithDocs.html")
-    assert File.regular?("#{output_dir()}/another_dir/RandomError.html")
-
-    assert [_] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.css")
-    assert [_] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.js")
-    assert [_] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.js.map")
-
-    content = File.read!("#{output_dir()}/another_dir/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}
-  end
-
   test "generates all listing files" do
     generate_docs(doc_config())
 

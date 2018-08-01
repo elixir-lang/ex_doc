@@ -17,9 +17,6 @@ defmodule Mix.Tasks.Docs do
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
 
-    * `--debug` - When given, output source maps and other debug files,
-      default: `false`
-
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
 
@@ -173,7 +170,6 @@ defmodule Mix.Tasks.Docs do
 
   @switches [
     canonical: :string,
-    debug: :boolean,
     formatter: :keep,
     language: :string,
     output: :string
