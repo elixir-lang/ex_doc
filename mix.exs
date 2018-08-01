@@ -18,7 +18,7 @@ defmodule ExDoc.Mixfile do
       description: "ExDoc is a documentation generation tool for Elixir",
       xref: [exclude: [Cmark]],
       docs: docs()
-   ]
+    ]
   end
 
   def application do
@@ -43,9 +43,15 @@ defmodule ExDoc.Mixfile do
   end
 
   defp package do
-   [
+    [
       licenses: ["Apache 2.0"],
-      maintainers: ["José Valim", "Eksperimental", "Milton Mazzarri", "Friedel Ziegelmayer", "Dmitry"],
+      maintainers: [
+        "José Valim",
+        "Eksperimental",
+        "Milton Mazzarri",
+        "Friedel Ziegelmayer",
+        "Dmitry"
+      ],
       files: ["formatters", "lib", "mix.exs", "LICENSE", "CHANGELOG.md", "README.md"],
       links: %{
         "GitHub" => "https://github.com/elixir-lang/ex_doc",
@@ -67,12 +73,11 @@ defmodule ExDoc.Mixfile do
       source_ref: "v#{@version}",
       source_url: "https://github.com/elixir-lang/ex_doc",
       groups_for_modules: [
-        "Markdown": [
+        Markdown: [
           ExDoc.Markdown,
           ExDoc.Markdown.Cmark,
           ExDoc.Markdown.Earmark
         ],
-
         "Formatter API": [
           ExDoc.Config,
           ExDoc.Formatter.EPUB,
@@ -80,7 +85,7 @@ defmodule ExDoc.Mixfile do
           ExDoc.Formatter.HTML.Autolink,
           ExDoc.FunctionNode,
           ExDoc.ModuleNode,
-          ExDoc.TypeNode,
+          ExDoc.TypeNode
         ]
       ]
     ]

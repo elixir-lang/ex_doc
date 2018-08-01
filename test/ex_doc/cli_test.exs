@@ -19,8 +19,7 @@ defmodule ExDoc.CLITest do
 
     assert project == "ExDoc"
     assert version == "1.2.3"
-    assert Enum.sort(opts) ==
-           [extra_section: "Guides", extras: ["README.md"], source_beam: "..."]
+    assert Enum.sort(opts) == [extra_section: "Guides", extras: ["README.md"], source_beam: "..."]
   after
     File.rm!("test.config")
   end
@@ -33,22 +32,21 @@ defmodule ExDoc.CLITest do
   test "config must be a keyword list" do
     File.write!("test.config", ~s(%{"extras" => "README.md"}))
 
-    assert_raise RuntimeError,
-      ~S(expected a keyword list from config file: "test.config"), fn ->
-        run(["ExDoc", "1.2.3", "...", "-c", "test.config"])
-      end
+    assert_raise RuntimeError, ~S(expected a keyword list from config file: "test.config"), fn ->
+      run(["ExDoc", "1.2.3", "...", "-c", "test.config"])
+    end
   after
     File.rm!("test.config")
   end
 
   test "version" do
     assert capture_io(fn ->
-      run(["--version"])
-    end) == "ExDoc v#{ExDoc.version}\n"
+             run(["--version"])
+           end) == "ExDoc v#{ExDoc.version()}\n"
 
     assert capture_io(fn ->
-      run(["-v"])
-    end) == "ExDoc v#{ExDoc.version}\n"
+             run(["-v"])
+           end) == "ExDoc v#{ExDoc.version()}\n"
   end
 
   test "too many arguments" do
@@ -70,44 +68,47 @@ defmodule ExDoc.CLITest do
   test "arguments that are not aliased" do
     File.write!("not_aliased.config", ~s([key: "val"]))
 
-    args = [
-        "ExDoc", "1.2.3", "ebin",
-        "--config", "not_aliased.config",
-        "--output", "html",
-        "--formatter", "html",
-        "--filter-prefix", "prefix_",
-        "--source-root", "./",
-        "--source-url", "http://example.com/username/project",
-        "--source-ref", "abcdefg",
-        "--main", "Main",
-        "--homepage-url", "http://example.com",
-        "--extra", "README.md", "--extra", "Foo", "--extra", "Bar",
-        "--extra-section", "Extra",
-        "--assets", "foo.css",
-        "--logo", "logo.png",
-        "--canonical", "http://example.com/project"
-      ]
+    args = ~w(
+      ExDoc 1.2.3 ebin
+      --config not_aliased.config
+      --output html
+      --formatter html
+      --filter-prefix prefix_
+      --source-root ./
+      --source-url http://example.com/username/project
+      --source-ref abcdefg
+      --main Main
+      --homepage-url http://example.com
+      --extra README.md
+      --extra Foo
+      --extra Bar
+      --extra-section Extra
+      --assets foo.css
+      --logo logo.png
+      --canonical http://example.com/project
+    )
 
     {project, version, opts} = run(args)
     assert project == "ExDoc"
     assert version == "1.2.3"
+
     assert Enum.sort(opts) == [
-      assets: "foo.css",
-      canonical: "http://example.com/project",
-      extra_section: "Extra",
-      extras: ["README.md", "Foo", "Bar"],
-      filter_prefix: "prefix_",
-      formatter: "html",
-      homepage_url: "http://example.com",
-      key: "val",
-      logo: "logo.png",
-      main: "Main",
-      output: "html",
-      source_beam: "ebin",
-      source_ref: "abcdefg",
-      source_root: "./",
-      source_url: "http://example.com/username/project",
-    ]
+             assets: "foo.css",
+             canonical: "http://example.com/project",
+             extra_section: "Extra",
+             extras: ["README.md", "Foo", "Bar"],
+             filter_prefix: "prefix_",
+             formatter: "html",
+             homepage_url: "http://example.com",
+             key: "val",
+             logo: "logo.png",
+             main: "Main",
+             output: "html",
+             source_beam: "ebin",
+             source_ref: "abcdefg",
+             source_root: "./",
+             source_url: "http://example.com/username/project"
+           ]
   after
     File.rm!("not_aliased.config")
   end

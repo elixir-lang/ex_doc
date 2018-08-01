@@ -10,7 +10,7 @@ defmodule ExDoc.Formatter.EPUB do
   @doc """
   Generate EPUB documentation for the given modules.
   """
-  @spec run(list, ExDoc.Config.t) :: String.t
+  @spec run(list, ExDoc.Config.t()) :: String.t()
   def run(project_nodes, config) when is_map(config) do
     config = normalize_config(config)
     File.rm_rf!(config.output)
@@ -53,6 +53,7 @@ defmodule ExDoc.Formatter.EPUB do
       config.output
       |> Path.expand()
       |> Path.join("#{config.project}")
+
     %{config | output: output}
   end
 
@@ -61,9 +62,11 @@ defmodule ExDoc.Formatter.EPUB do
       Enum.each(extras, fn %{id: id, title: title, content: content} ->
         output = "#{config.output}/OEBPS/#{id}.xhtml"
         html = Templates.extra_template(config, title, content)
-        if File.regular? output do
-          IO.puts :stderr, "warning: file #{Path.relative_to_cwd output} already exists"
+
+        if File.regular?(output) do
+          IO.puts(:stderr, "warning: file #{Path.relative_to_cwd(output)} already exists")
         end
+
         File.write!(output, html)
       end)
     end
@@ -72,8 +75,8 @@ defmodule ExDoc.Formatter.EPUB do
   defp generate_content(config, nodes, uuid, datetime, static_files) do
     static_files =
       static_files
-      |> Enum.filter(fn(name) ->
-           String.contains?(name, "OEBPS") and config.output |> Path.join(name) |> File.regular?()
+      |> Enum.filter(fn name ->
+        String.contains?(name, "OEBPS") and config.output |> Path.join(name) |> File.regular?()
       end)
       |> Enum.map(&Path.relative_to(&1, "OEBPS"))
 
@@ -90,17 +93,17 @@ defmodule ExDoc.Formatter.EPUB do
     {extras_by_group, groups} =
       extras
       |> Enum.with_index()
-      |> Enum.reduce({%{}, %{}}, fn({x, index}, {extras_by_group, groups}) ->
-           group = if x.group != "", do: x.group, else: "Extras"
-           extras_by_group = Map.update(extras_by_group, group, [x], &([x | &1]))
-           groups = Map.put_new(groups, group, index)
-           {extras_by_group, groups}
-         end)
+      |> Enum.reduce({%{}, %{}}, fn {x, index}, {extras_by_group, groups} ->
+        group = if x.group != "", do: x.group, else: "Extras"
+        extras_by_group = Map.update(extras_by_group, group, [x], &[x | &1])
+        groups = Map.put_new(groups, group, index)
+        {extras_by_group, groups}
+      end)
 
     groups
     |> Map.to_list()
     |> List.keysort(1)
-    |> Enum.map(fn({k, _}) -> {k, Enum.reverse(Map.get(extras_by_group, k))} end)
+    |> Enum.map(fn {k, _} -> {k, Enum.reverse(Map.get(extras_by_group, k))} end)
   end
 
   defp generate_title(config) do
@@ -115,43 +118,48 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_epub(output) do
-    :zip.create(String.to_charlist("#{output}.epub"),
-                [{'mimetype', @mimetype} | files_to_add(output)],
-                compress: ['.css', '.xhtml', '.html', '.ncx', '.js',
-                           '.opf', '.jpg', '.png', '.xml'])
+    :zip.create(
+      String.to_charlist("#{output}.epub"),
+      [{'mimetype', @mimetype} | files_to_add(output)],
+      compress: ['.css', '.xhtml', '.html', '.ncx', '.js', '.opf', '.jpg', '.png', '.xml']
+    )
   end
 
   ## Helpers
 
   defp default_assets do
-    [{Assets.dist(), "OEBPS/dist"},
-     {Assets.metainfo(), "META-INF"},
-     # Implementation Note:
-     # --------------------
-     # In the EPUB format, extra files such as CSS and Javascript must
-     # be included inside the OEBPS directory.
-     # The file "OEBPS/file.ext" will be referenced inside pages as "file.ext".
-     # This means that as long as the assets are included with the "OEBPS" prefix,
-     # they will be accessible as if it were an HTML document.
-     # This allows us to reuse pretty much all logic between the `:epub` and the `:html` formats.
-     {Assets.markdown_processor_assets(), "OEBPS"}]
+    [
+      {Assets.dist(), "OEBPS/dist"},
+      {Assets.metainfo(), "META-INF"},
+      # Implementation Note:
+      # --------------------
+      # In the EPUB format, extra files such as CSS and Javascript must
+      # be included inside the OEBPS directory.
+      # The file "OEBPS/file.ext" will be referenced inside pages as "file.ext".
+      # This means that as long as the assets are included with the "OEBPS" prefix,
+      # they will be accessible as if it were an HTML document.
+      # This allows us to reuse pretty much all logic between the `:epub` and the `:html` formats.
+      {Assets.markdown_processor_assets(), "OEBPS"}
+    ]
   end
 
   defp files_to_add(path) do
-    Enum.reduce Path.wildcard(Path.join(path, "**/*")), [], fn file, acc ->
+    Enum.reduce(Path.wildcard(Path.join(path, "**/*")), [], fn file, acc ->
       case File.read(file) do
         {:ok, bin} ->
           [{file |> Path.relative_to(path) |> String.to_charlist(), bin} | acc]
+
         {:error, _} ->
           acc
       end
-    end
+    end)
   end
 
   # Helper to format Erlang datetime tuple
   defp format_datetime do
     {{year, month, day}, {hour, min, sec}} = :calendar.universal_time()
     list = [year, month, day, hour, min, sec]
+
     "~4..0B-~2..0B-~2..0BT~2..0B:~2..0B:~2..0BZ"
     |> :io_lib.format(list)
     |> IO.iodata_to_binary()
@@ -169,7 +177,10 @@ defmodule ExDoc.Formatter.EPUB do
     bin = <<u0::48, 4::4, u1::12, 2::2, u2::62>>
     <<u0::32, u1::16, u2::16, u3::16, u4::48>> = bin
 
-    Enum.map_join([<<u0::32>>, <<u1::16>>, <<u2::16>>, <<u3::16>>, <<u4::48>>], <<45>>,
-                  &(Base.encode16(&1, case: :lower)))
+    Enum.map_join(
+      [<<u0::32>>, <<u1::16>>, <<u2::16>>, <<u3::16>>, <<u4::48>>],
+      <<45>>,
+      &Base.encode16(&1, case: :lower)
+    )
   end
 end

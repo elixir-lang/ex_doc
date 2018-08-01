@@ -17,8 +17,7 @@ defmodule ExDoc.Markdown.Earmark do
   Check if the Earmark Markdown parser module is available.
   """
   def available? do
-    match?({:ok, _}, Application.ensure_all_started(:earmark)) and
-      Code.ensure_loaded?(Earmark)
+    match?({:ok, _}, Application.ensure_all_started(:earmark)) and Code.ensure_loaded?(Earmark)
   end
 
   @doc """
@@ -40,12 +39,14 @@ defmodule ExDoc.Markdown.Earmark do
   def to_html(text, opts) do
     options =
       struct(Earmark.Options,
-             gfm: Keyword.get(opts, :gfm, true),
-             line: Keyword.get(opts, :line, 1),
-             file: Keyword.get(opts, :file),
-             breaks: Keyword.get(opts, :breaks, false),
-             smartypants: Keyword.get(opts, :smartypants, true),
-             plugins: Keyword.get(opts, :plugins, %{}))
+        gfm: Keyword.get(opts, :gfm, true),
+        line: Keyword.get(opts, :line, 1),
+        file: Keyword.get(opts, :file),
+        breaks: Keyword.get(opts, :breaks, false),
+        smartypants: Keyword.get(opts, :smartypants, true),
+        plugins: Keyword.get(opts, :plugins, %{})
+      )
+
     text
     |> Earmark.as_html!(options)
     |> ExDoc.Highlighter.highlight_code_blocks()

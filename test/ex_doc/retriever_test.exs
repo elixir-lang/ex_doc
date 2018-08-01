@@ -35,8 +35,7 @@ defmodule ExDoc.RetrieverTest do
       assert module_node.title == "CompiledWithDocs"
       assert module_node.module == CompiledWithDocs
 
-      assert module_node.source_url ==
-               "http://example.com/test/fixtures/compiled_with_docs.ex#L1"
+      assert module_node.source_url == "http://example.com/test/fixtures/compiled_with_docs.ex#L1"
 
       assert module_node.doc == """
              moduledoc
@@ -69,6 +68,7 @@ defmodule ExDoc.RetrieverTest do
 
     test "returns the function nodes for each module" do
       [module_node] = docs_from_files(["CompiledWithDocs"])
+
       [struct, example, example_1, _example_with_h3, example_without_docs, is_zero] =
         module_node.docs
 
@@ -93,12 +93,14 @@ defmodule ExDoc.RetrieverTest do
       assert example_without_docs.id == "example_without_docs/0"
       assert example_without_docs.doc == nil
       assert example_without_docs.defaults == []
+
       assert example_without_docs.source_url ==
                "http://example.com/test/fixtures/compiled_with_docs.ex\#L34"
 
       assert is_zero.id == "is_zero/1"
       assert is_zero.doc == "A simple guard"
-      assert is_zero.type in [:guard, :macro] # TODO: Remove :macro when ~> 1.8
+      # TODO: Remove :macro when ~> 1.8
+      assert is_zero.type in [:guard, :macro]
       assert is_zero.defaults == []
     end
 

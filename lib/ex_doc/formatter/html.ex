@@ -11,7 +11,7 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generate HTML documentation for the given modules.
   """
-  @spec run(list, ExDoc.Config.t) :: String.t
+  @spec run(list, ExDoc.Config.t()) :: String.t()
   def run(project_nodes, config) when is_map(config) do
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
@@ -28,46 +28,49 @@ defmodule ExDoc.Formatter.HTML do
       tasks: filter_list(:task, linked)
     }
 
-    extras =
-      [build_api_reference(nodes_map, config) |
-       build_extras(config, autolink)]
+    extras = [
+      build_api_reference(nodes_map, config)
+      | build_extras(config, autolink)
+    ]
 
     assets_dir = "assets"
     static_files = generate_assets(config, assets_dir, default_assets(config))
 
     generated_files =
       generate_sidebar_items(nodes_map, extras, config) ++
-      generate_extras(nodes_map, extras, config) ++
-      generate_logo(assets_dir, config) ++
-      generate_search(nodes_map, config) ++
-      generate_not_found(nodes_map, config) ++
-      generate_list(nodes_map.modules, nodes_map, config) ++
-      generate_list(nodes_map.exceptions, nodes_map, config) ++
-      generate_list(nodes_map.tasks, nodes_map, config) ++
-      generate_index(config)
+        generate_extras(nodes_map, extras, config) ++
+        generate_logo(assets_dir, config) ++
+        generate_search(nodes_map, config) ++
+        generate_not_found(nodes_map, config) ++
+        generate_list(nodes_map.modules, nodes_map, config) ++
+        generate_list(nodes_map.exceptions, nodes_map, config) ++
+        generate_list(nodes_map.tasks, nodes_map, config) ++ generate_index(config)
 
     generate_build(static_files ++ generated_files, build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
   end
 
   defp normalize_config(%{main: "index"}) do
-    raise ArgumentError, message: ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
+    raise ArgumentError,
+      message: ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
   end
+
   defp normalize_config(%{main: main} = config) do
     %{config | main: main || @main}
   end
 
   defp output_setup(build, config) do
-    if File.exists? build do
+    if File.exists?(build) do
       build
-      |> File.read!
+      |> File.read!()
       |> String.split("\n", trim: true)
       |> Enum.map(&Path.join(config.output, &1))
       |> Enum.each(&File.rm/1)
-      File.rm build
+
+      File.rm(build)
     else
-      File.rm_rf! config.output
-      File.mkdir_p! config.output
+      File.rm_rf!(config.output)
+      File.mkdir_p!(config.output)
     end
   end
 
@@ -104,7 +107,7 @@ defmodule ExDoc.Formatter.HTML do
 
     digest =
       content
-      |> :erlang.md5
+      |> :erlang.md5()
       |> Base.encode16(case: :lower)
       |> binary_part(0, 10)
 
@@ -121,8 +124,9 @@ defmodule ExDoc.Formatter.HTML do
       html = Templates.extra_template(config, title, nodes_map, content)
 
       if File.regular?(output) do
-        IO.puts :stderr, "warning: file #{Path.relative_to_cwd output} already exists"
+        IO.puts(:stderr, "warning: file #{Path.relative_to_cwd(output)} already exists")
       end
+
       File.write!(output, html)
       filename
     end)
@@ -154,6 +158,7 @@ defmodule ExDoc.Formatter.HTML do
     Enum.flat_map(sources, fn {files, dir} ->
       target_dir = Path.join(config.output, dir)
       File.mkdir(target_dir)
+
       Enum.map(files, fn {name, content} ->
         target = Path.join(target_dir, name)
         File.write(target, content)
@@ -164,9 +169,12 @@ defmodule ExDoc.Formatter.HTML do
 
   defp default_assets(config) do
     debug = if config.debug, do: [{Assets.debug(), "dist"}], else: []
-    [{Assets.dist(), "dist"},
-     {Assets.fonts(), "fonts"},
-     {Assets.markdown_processor_assets(), ""} | debug]
+
+    [
+      {Assets.dist(), "dist"},
+      {Assets.fonts(), "fonts"},
+      {Assets.markdown_processor_assets(), ""} | debug
+    ]
   end
 
   defp build_api_reference(nodes_map, config) do
@@ -204,7 +212,7 @@ defmodule ExDoc.Formatter.HTML do
         |> File.read!()
         |> Autolink.project_doc(autolink)
 
-      group = GroupMatcher.match_extra groups, input
+      group = GroupMatcher.match_extra(groups, input)
       html_content = Markdown.to_html(content, file: input, line: 1)
 
       title = title || extract_title(html_content) || input_to_title(input)
@@ -262,6 +270,7 @@ defmodule ExDoc.Formatter.HTML do
   def generate_logo(_dir, %{logo: nil}) do
     []
   end
+
   def generate_logo(dir, %{output: output, logo: logo}) do
     extname =
       logo
@@ -281,14 +290,15 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_redirect(filename, config, redirect_to) do
     unless File.regular?("#{config.output}/#{redirect_to}") do
-      IO.puts :stderr, "warning: #{filename} redirects to #{redirect_to}, which does not exist"
+      IO.puts(:stderr, "warning: #{filename} redirects to #{redirect_to}, which does not exist")
     end
+
     content = Templates.redirect_template(config, redirect_to)
     File.write!("#{config.output}/#{filename}", content)
   end
 
   def filter_list(:module, nodes) do
-    Enum.filter(nodes, &not(&1.type in [:exception, :impl, :task]))
+    Enum.filter(nodes, &(not (&1.type in [:exception, :impl, :task])))
   end
 
   def filter_list(type, nodes) do
