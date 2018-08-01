@@ -18,7 +18,7 @@ defmodule ExDoc.Markdown do
   @doc """
   Converts markdown into HTML.
   """
-  @callback to_html(String.t, Keyword.t) :: String.t
+  @callback to_html(String.t(), Keyword.t()) :: String.t()
 
   @doc """
   Assets specific to the markdown implementation.
@@ -53,7 +53,7 @@ defmodule ExDoc.Markdown do
       end
 
   """
-  @callback assets(atom) :: [{String.t, String.t}]
+  @callback assets(atom) :: [{String.t(), String.t()}]
 
   @doc """
   Literal content to be written to the file just before the closing head tag.
@@ -70,7 +70,7 @@ defmodule ExDoc.Markdown do
       end
 
   """
-  @callback before_closing_head_tag(atom) :: String.t
+  @callback before_closing_head_tag(atom) :: String.t()
 
   @doc """
   Literal content to be written to the file just before the closing body tag.
@@ -87,7 +87,7 @@ defmodule ExDoc.Markdown do
       end
 
   """
-  @callback before_closing_body_tag(atom) :: String.t
+  @callback before_closing_body_tag(atom) :: String.t()
 
   @doc """
   A function that accepts configuration options and configures the markdown processor.
@@ -123,6 +123,7 @@ defmodule ExDoc.Markdown do
     case Application.fetch_env(:ex_doc, @markdown_processor_key) do
       {:ok, processor} ->
         processor
+
       :error ->
         processor = find_markdown_processor() || raise_no_markdown_processor()
         put_markdown_processor(processor)
@@ -146,9 +147,9 @@ defmodule ExDoc.Markdown do
   end
 
   defp find_markdown_processor do
-    Enum.find @markdown_processors, fn module ->
+    Enum.find(@markdown_processors, fn module ->
       Code.ensure_loaded?(module) && module.available?
-    end
+    end)
   end
 
   defp raise_no_markdown_processor do

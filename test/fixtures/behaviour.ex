@@ -6,7 +6,7 @@ defmodule CustomBehaviourOne do
   This is a sample callback.
   """
   @callback hello(integer) :: integer
-  @callback greet(integer | String.t) :: integer
+  @callback greet(integer | String.t()) :: integer
 end
 
 defmodule CustomBehaviourTwo do

@@ -18,33 +18,37 @@ defmodule ExDocTest do
   test "build_config & normalize_options" do
     project = "Elixir"
     version = "1"
-    options = [
-      formatter: IdentityFormatter,
-      retriever: IdentityRetriever,
-      source_root: "root_dir",
-      source_beam: "beam_dir",
-    ]
 
-    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/ex_doc"])
+    opts_with_output =
+      &[
+        formatter: IdentityFormatter,
+        retriever: IdentityRetriever,
+        source_root: "root_dir",
+        source_beam: "beam_dir",
+        output: &1
+      ]
+
+    {_, config} = ExDoc.generate_docs(project, version, opts_with_output.("test/tmp/ex_doc"))
     assert config.output == "test/tmp/ex_doc"
 
-    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/ex_doc/"])
+    {_, config} = ExDoc.generate_docs(project, version, opts_with_output.("test/tmp/ex_doc/"))
     assert config.output == "test/tmp/ex_doc"
 
-    {_, config} = ExDoc.generate_docs project, version, Keyword.merge(options, [output: "test/tmp/ex_doc//"])
+    {_, config} = ExDoc.generate_docs(project, version, opts_with_output.("test/tmp/ex_doc//"))
     assert config.output == "test/tmp/ex_doc"
   end
 
   test "uses custom markdown processor" do
     project = "Elixir"
     version = "1"
+
     options = [
       formatter: IdentityFormatter,
       markdown_processor: Sample,
       output: "test/tmp/ex_doc",
       retriever: IdentityRetriever,
       source_root: "root_dir",
-      source_beam: "beam_dir",
+      source_beam: "beam_dir"
     ]
 
     ExDoc.generate_docs(project, version, options)
@@ -54,24 +58,34 @@ defmodule ExDocTest do
   end
 
   test "source_beam sets source dir" do
-    options = [formatter: IdentityFormatter, retriever: IdentityRetriever,
-               source_root: "root_dir", source_beam: "beam_dir"]
-    {{source_dir, _retr_config}, _config} = ExDoc.generate_docs "Elixir", "1", options
+    options = [
+      formatter: IdentityFormatter,
+      retriever: IdentityRetriever,
+      source_root: "root_dir",
+      source_beam: "beam_dir"
+    ]
+
+    {{source_dir, _retr_config}, _config} = ExDoc.generate_docs("Elixir", "1", options)
     assert source_dir == options[:source_beam]
   end
 
   test "formatter module not found" do
     project = "Elixir"
     version = "1"
-    options = [formatter: "pdf", retriever: IdentityRetriever,
-               source_root: "root_dir", source_beam: "beam_dir"]
+
+    options = [
+      formatter: "pdf",
+      retriever: IdentityRetriever,
+      source_root: "root_dir",
+      source_beam: "beam_dir"
+    ]
 
     assert_raise RuntimeError,
                  "formatter module \"pdf\" not found",
-                 fn -> ExDoc.generate_docs project, version, options end
+                 fn -> ExDoc.generate_docs(project, version, options) end
   end
 
   test "version" do
-    assert ExDoc.version =~ ~r{\d+\.\d+\.\d+}
+    assert ExDoc.version() =~ ~r{\d+\.\d+\.\d+}
   end
 end

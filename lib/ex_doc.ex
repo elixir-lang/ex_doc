@@ -66,7 +66,7 @@ defmodule ExDoc do
     if Code.ensure_loaded?(modname) do
       modname
     else
-      raise "formatter module #{inspect argname} not found"
+      raise "formatter module #{inspect(argname)} not found"
     end
   end
 

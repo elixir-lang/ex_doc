@@ -1,7 +1,7 @@
 defmodule ExDoc.GroupMatcher do
   @moduledoc false
 
-  @type pattern :: Regex.t | module() | String.t
+  @type pattern :: Regex.t() | module() | String.t()
   @type patterns :: pattern | [pattern]
   @type group_patterns :: keyword(patterns)
 
@@ -15,7 +15,7 @@ defmodule ExDoc.GroupMatcher do
   @doc """
   Finds a matching group for the given module name or id.
   """
-  @spec match_module(group_patterns, module(), String.t) :: atom() | nil
+  @spec match_module(group_patterns, module(), String.t()) :: atom() | nil
   def match_module(group_patterns, module, id) do
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do
@@ -29,7 +29,7 @@ defmodule ExDoc.GroupMatcher do
   @doc """
   Finds a matching group for the given extra filename
   """
-  @spec match_extra(group_patterns, String.t) :: atom() | nil
+  @spec match_extra(group_patterns, String.t()) :: atom() | nil
   def match_extra(group_patterns, filename) do
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do
@@ -41,7 +41,7 @@ defmodule ExDoc.GroupMatcher do
 
   defp match_group_patterns(group_patterns, matcher) do
     Enum.find_value(group_patterns, fn {group, patterns} ->
-      patterns = List.wrap patterns
+      patterns = List.wrap(patterns)
       Enum.any?(patterns, matcher) && group
     end)
   end

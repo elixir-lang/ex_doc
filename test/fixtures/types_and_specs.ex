@@ -11,10 +11,10 @@ defmodule TypesAndSpecs do
   """
 
   @typedoc "A public type"
-  @type public(t) :: {t, String.t, Sub.t, opaque, :ok | :error}
+  @type public(t) :: {t, String.t(), Sub.t(), opaque, :ok | :error}
   @typep private :: any
-  @opaque opaque :: {Dict.t}
-  @type ref :: {:binary.part, public(any)}
+  @opaque opaque :: {Dict.t()}
+  @type ref :: {:binary.part(), public(any)}
   @typedoc false
   @type internal :: any
 
