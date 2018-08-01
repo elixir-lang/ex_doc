@@ -13,7 +13,6 @@ var LessPluginAutoPrefix = require('less-plugin-autoprefix')
 var Server = require('karma').Server
 var webpack = require('webpack-stream')
 var exec = require('child_process').exec
-
 var config = require('./assets/webpack.config')
 
 // Config
@@ -190,7 +189,7 @@ gulp.task('default', ['lint', 'test'])
  * Helpers
  */
 var javascript = function (options) {
-  var buildSourceMaps = options.sourceMaps && isProduction
+  var buildSourceMaps = options.sourceMaps && !isProduction
 
   return gulp.src(options.src)
     .pipe(webpack(isProduction ? config.production : config.development))
