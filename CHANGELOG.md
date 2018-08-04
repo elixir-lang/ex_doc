@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.19.1
+
+  * Enhancements
+    * Update CSS styles
+    * Remove sourcemaps from package
+
 ## v0.19.0
 
 This release requires Elixir v1.7 and later. For earlier Elixir versions, use ExDoc ~> 0.18.0.
