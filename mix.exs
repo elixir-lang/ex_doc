@@ -55,6 +55,7 @@ defmodule ExDoc.Mixfile do
       files: ["formatters", "lib", "mix.exs", "LICENSE", "CHANGELOG.md", "README.md"],
       links: %{
         "GitHub" => "https://github.com/elixir-lang/ex_doc",
+        "Changelog" => "https://github.com/elixir-lang/ex_doc/blob/master/CHANGELOG.md",
         "Writing documentation" => "https://hexdocs.pm/elixir/writing-documentation.html"
       }
     ]
