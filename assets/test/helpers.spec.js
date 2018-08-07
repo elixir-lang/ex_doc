@@ -13,13 +13,13 @@ describe('helpers', () => {
     it('finds the correct category', () => {
       const nodes = [{
         nodeGroups: [
-          {key: "callbacks", nodes: [{anchor: 'hello'}]},
-          {key: "functions", nodes: [{anchor: 'world'}]}
+          {key: 'callbacks', nodes: [{anchor: 'hello'}]},
+          {key: 'functions', nodes: [{anchor: 'world'}]}
         ]
       }, {
         nodeGroups: [
-          {key: "callbacks", nodes: [{anchor: 'one'}]},
-          {key: "guards", nodes: [{anchor: 'two'}]}
+          {key: 'callbacks', nodes: [{anchor: 'one'}]},
+          {key: 'guards', nodes: [{anchor: 'two'}]}
         ]
       }]
 

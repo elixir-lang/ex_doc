@@ -16,19 +16,19 @@ describe('search', () => {
         id: 'id1',
         title: 'hello world',
         nodeGroups: [
-          {key: "functions", nodes: [{id: 'hello world', anchor: 'hello-world'}]}
+          {key: 'functions', nodes: [{id: 'hello world', anchor: 'hello-world'}]}
         ]
       }, {
         id: 'id2',
         title: 'world',
         nodeGroups: [
-          {key: "examples", nodes: [{id: 'hello world', anchor: 'hello-world'}]}
+          {key: 'examples', nodes: [{id: 'hello world', anchor: 'hello-world'}]}
         ]
       }, {
         id: 'world2',
         title: 'world2',
         nodeGroups: [
-          {key: "functions", nodes: [{id: 'world', anchor: 'world'}]}
+          {key: 'functions', nodes: [{id: 'world', anchor: 'world'}]}
         ]
       }]
 
@@ -49,9 +49,13 @@ describe('search', () => {
 
     it('searches for callback matches', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', nodeGroups: [
-          {key: "callbacks", nodes: [{id: 'run'}]}
-        ]},
+        {
+          id: 'hello',
+          title: 'hello',
+          nodeGroups: [
+            {key: 'callbacks', nodes: [{id: 'run'}]}
+          ]
+        },
         {id: 'world', title: 'world'}
       ]
 
@@ -66,9 +70,13 @@ describe('search', () => {
 
     it('searches for guard matches', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', nodeGroups: [
-          {key: "guards", nodes: [{id: 'run'}]}
-        ]},
+        {
+          id: 'hello',
+          title: 'hello',
+          nodeGroups: [
+            {key: 'guards', nodes: [{id: 'run'}]}
+          ]
+        },
         {id: 'world', title: 'world'}
       ]
 
@@ -83,9 +91,13 @@ describe('search', () => {
 
     it('searches for nested matches', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', nodeGroups: [
-          {key: "guards", nodes: [{id: 'run'}]}
-        ]},
+        {
+          id: 'hello',
+          title: 'hello',
+          nodeGroups: [
+            {key: 'guards', nodes: [{id: 'run'}]}
+          ]
+        },
         {id: 'world', title: 'world'}
       ]
 

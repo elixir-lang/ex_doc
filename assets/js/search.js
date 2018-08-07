@@ -69,7 +69,7 @@ export function findIn (elements, matcher) {
         let matches = findNested(nodes, title, matcher, result[key])
         if (Object.keys(matches).length > 0) {
           hasMatch = true
-          if (key == "types" || key == "guards" || key == "callbacks") {
+          if (key === 'types' || key === 'guards' || key === 'callbacks') {
             result[key] = matches
           } else {
             result.functions = matches
@@ -80,7 +80,7 @@ export function findIn (elements, matcher) {
 
     if (hasMatch) {
       for (let key in result) {
-        if (key != "id" && key != "match") {
+        if (key !== 'id' && key !== 'match') {
           result[key] = Object.values(result[key]).sort((a, b) => a.id.localeCompare(b.id))
         }
       }

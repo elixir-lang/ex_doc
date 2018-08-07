@@ -14,6 +14,6 @@ export default function (node, options) {
   return options.fn(this)
 }
 
-function hasItems(items) {
+function hasItems (items) {
   return Array.isArray(items) && (items.length > 0)
 }
