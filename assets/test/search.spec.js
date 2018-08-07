@@ -15,20 +15,20 @@ describe('search', () => {
       var nodes = [{
         id: 'id1',
         title: 'hello world',
-        functions: [
-          {id: 'hello world', anchor: 'hello-world'}
+        nodeGroups: [
+          {key: "functions", nodes: [{id: 'hello world', anchor: 'hello-world'}]}
         ]
       }, {
         id: 'id2',
         title: 'world',
-        functions: [
-          {id: 'hello world', anchor: 'hello-world'}
+        nodeGroups: [
+          {key: "examples", nodes: [{id: 'hello world', anchor: 'hello-world'}]}
         ]
       }, {
         id: 'world2',
         title: 'world2',
-        functions: [
-          {id: 'world', anchor: 'world'}
+        nodeGroups: [
+          {key: "functions", nodes: [{id: 'world', anchor: 'world'}]}
         ]
       }]
 
@@ -49,7 +49,9 @@ describe('search', () => {
 
     it('searches for callback matches', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', callbacks: [{id: 'run'}]},
+        {id: 'hello', title: 'hello', nodeGroups: [
+          {key: "callbacks", nodes: [{id: 'run'}]}
+        ]},
         {id: 'world', title: 'world'}
       ]
 
@@ -64,7 +66,9 @@ describe('search', () => {
 
     it('searches for guard matches', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', guards: [{id: 'run'}]},
+        {id: 'hello', title: 'hello', nodeGroups: [
+          {key: "guards", nodes: [{id: 'run'}]}
+        ]},
         {id: 'world', title: 'world'}
       ]
 
@@ -79,7 +83,9 @@ describe('search', () => {
 
     it('searches for nested matches', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', guards: [{id: 'run'}]},
+        {id: 'hello', title: 'hello', nodeGroups: [
+          {key: "guards", nodes: [{id: 'run'}]}
+        ]},
         {id: 'world', title: 'world'}
       ]
 

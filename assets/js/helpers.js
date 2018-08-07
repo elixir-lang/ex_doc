@@ -6,7 +6,6 @@
 
 import $ from 'jquery'
 import find from 'lodash.find'
-import findKey from 'lodash.findkey'
 
 // Escape a string for use in a regular expression
 export function escapeText (text) {
@@ -20,13 +19,14 @@ export function getModuleType () {
 // Find out if the anchor belongs to either
 // Types, Functions, Macros or Callbacks
 export function findSidebarCategory (items, query) {
+  if (!items) return
+
   for (let item of items) {
-    const res = findKey(item, (value, key) => {
-      const a = find(value, ({anchor}) => anchor === query)
-      return a
+    const res = find(item.nodeGroups, ({nodes}) => {
+      return find(nodes, ({anchor}) => anchor === query)
     })
 
-    if (res) return res
+    if (res) return res.key
   }
 }
 

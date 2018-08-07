@@ -1,5 +1,5 @@
 export default function (node, options) {
-  if (node.types || node.functions || node.guards || node.callbacks) {
+  if (node.nodeGroups) {
     return options.fn(this)
   }
 }

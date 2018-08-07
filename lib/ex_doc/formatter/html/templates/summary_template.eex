@@ -1,7 +1,7 @@
 <%= unless Enum.empty?(nodes) do %>
-  <div class="summary-<%= name %> summary">
+  <div class="summary-<%= group_name_to_id(name) %> summary">
     <h2>
-      <a href="#<%= name %>"><%= String.capitalize name %></a>
+      <a href="#<%= group_name_to_id(name) %>"><%= name %></a>
     </h2>
     <%= for module_node <- nodes, do: summary_entry_template(module_node) %>
   </div>

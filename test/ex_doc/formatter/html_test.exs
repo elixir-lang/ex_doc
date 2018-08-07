@@ -147,7 +147,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"CompiledWithDocs","title":"CompiledWithDocs"}ms
-    assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example/2")ms
+    assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example/2")ms
     assert content =~ ~r{"id":"CompiledWithDocs\.Nested","title":"CompiledWithDocs\.Nested"}ms
 
     assert content =~ ~r{"id":"UndefParent\.Nested","title":"UndefParent\.Nested"}ms
