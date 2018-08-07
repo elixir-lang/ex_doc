@@ -69,7 +69,10 @@ defmodule ExDoc.Mixfile do
   defp docs do
     [
       main: "readme",
-      extras: ["README.md"],
+      extras: [
+        "README.md",
+        "CHANGELOG.md"
+      ],
       source_ref: "v#{@version}",
       source_url: "https://github.com/elixir-lang/ex_doc",
       groups_for_modules: [

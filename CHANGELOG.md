@@ -13,7 +13,7 @@ This release requires Elixir v1.7 and later. For earlier Elixir versions, use Ex
   * Enhancements
     * Do not select "iex>" when selecting code samples
     * Use makeup to perform ELixir's syntax highlighting (other languages still use highlight.js)
-    * Use `[rel="noopener"] on external links
+    * Use `[rel="noopener"]` on external links
     * Link directly to page if sidebar item has no subitems
     * Autolink Kernel and Kernel functions and special forms with shorthands (for example, only `is_atom/1` is necessary)
     * Trim EEx contents to reduce HTML size
