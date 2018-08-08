@@ -82,8 +82,8 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
       assert content =~ ~r{id="example-functions".*href="#example-functions".*Example functions}ms
       assert content =~ ~r{id="legacy".*href="#legacy".*Legacy}ms
-      assert content =~ ~r{id="example-functions".*id="example-functions:example/2"}ms
-      assert content =~ ~r{id="legacy".*id="legacy:example/2"}ms
+      assert content =~ ~r{id="example-functions".*id="example/2"}ms
+      refute content =~ ~r{id="legacy".*id="example/2"}ms
       refute content =~ ~r{id="functions".*id="example/2"}ms
       assert content =~ ~r{id="functions".*id="example_1/0"}ms
       assert content =~ ~r{id="guards".*href="#guards".*Guards}ms

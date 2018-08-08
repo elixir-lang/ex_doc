@@ -179,14 +179,18 @@ defmodule ExDoc.Retriever do
 
   defp get_docs(%{type: type, docs: docs} = module_data, source, config) do
     {:docs_v1, _, _, _, _, _, docs} = docs
-    groups_for_functions = [Guards: &(&1[:guard] == true)] ++ config.groups_for_functions
+
+    groups_for_functions =
+      Enum.map(config.groups_for_functions, fn {group, filter} ->
+        {Atom.to_string(group), filter}
+      end) ++ [{"Guards", &(&1[:guard] == true)}, {"Functions", fn _ -> true end}]
 
     function_docs =
       for doc <- docs, doc?(doc, type) do
         get_function(doc, source, module_data, groups_for_functions)
       end
 
-    {Keyword.keys(groups_for_functions) ++ [:Functions], function_docs}
+    {Enum.map(groups_for_functions, &elem(&1, 0)), function_docs}
   end
 
   # We are only interested in functions and macros for now
@@ -243,8 +247,10 @@ defmodule ExDoc.Retriever do
         _ -> annotations
       end
 
-    groups = for {group, filter} <- groups_for_functions, filter.(metadata), do: group
-    groups = if groups == [], do: [:Functions], else: groups
+    group =
+      Enum.find_value(groups_for_functions, fn {group, filter} ->
+        filter.(metadata) && group
+      end)
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -259,7 +265,7 @@ defmodule ExDoc.Retriever do
       source_path: source.path,
       source_url: source_link(source, line),
       type: if(metadata[:guard], do: :guard, else: type),
-      groups: groups,
+      group: group,
       annotations: annotations
     }
   end

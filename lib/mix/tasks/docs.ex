@@ -171,7 +171,7 @@ defmodule Mix.Tasks.Docs do
         @doc section: :auth
         def refresh_token(params \\ [])
 
-        @doc subject: :object, permission: :write_object
+        @doc subject: :object
         def update_status(id, new_status)
 
         @doc permission: :grant
@@ -183,12 +183,13 @@ defmodule Mix.Tasks.Docs do
       groups_for_functions: [
         Authentication: & &1[:section] == :auth,
         Resource: & &1[:subject] == :object,
-        Admin: & &1[:permission] in [:grant, :write_object]
+        Admin: & &1[:permission] in [:grant, :write]
       ]
 
-  Functions that don't appear in at least one group will be listed under the
-  default "Functions" group. In addition to your custom groups ExDoc will always
-  group guards.
+  A function can belong to a single group only. If multiple group filters match,
+  the first will take precedence. Functions that don't have a custom group will
+  be listed under the default "Functions" group. Beginning with Elixir 1.8 in
+  addition to your custom groups ExDoc will also create a Guards group.
 
   ## Umbrella project
 

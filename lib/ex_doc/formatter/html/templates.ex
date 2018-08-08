@@ -188,21 +188,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   defp sidebar_items_by_group({group, docs}) do
-    group_key = group_name_to_id(group)
-
-    anchor_prefix =
-      if group_key in ["types", "guards", "functions", "callbacks"] do
-        ""
-      else
-        group_key <> ":"
-      end
-
     objects =
       Enum.map_join(docs, ",", fn doc ->
-        sidebar_items_object(doc.id, anchor_prefix <> link_id(doc))
+        sidebar_items_object(doc.id, link_id(doc))
       end)
 
-    ~s/{"key":"#{group_key}","name":"#{group}","nodes":[#{objects}]}/
+    ~s/{"key":"#{group_name_to_id(group)}","name":"#{group}","nodes":[#{objects}]}/
   end
 
   defp sidebar_items_object(id, anchor) do
@@ -216,7 +207,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   defp function_groups(groups, docs) do
-    for group <- groups, do: {group, Enum.filter(docs, &(group in &1.groups))}
+    for group <- groups, do: {group, Enum.filter(docs, &(&1.group == group))}
   end
 
   defp logo_path(%{logo: nil}), do: nil
@@ -308,7 +299,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    detail_template: [:module_node, :_module, :group_key],
+    detail_template: [:module_node, :_module],
     footer_template: [:config],
     head_template: [:config, :page],
     module_template: [:config, :module, :summary, :nodes_map],

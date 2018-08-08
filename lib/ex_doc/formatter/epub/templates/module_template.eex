@@ -32,7 +32,7 @@
           <%= name %>
         </h1>
         <div class="<%= key %>-list">
-          <%= for node <- nodes, do: H.detail_template(node, module, key) %>
+          <%= for node <- nodes, do: H.detail_template(node, module) %>
         </div>
       </section>
     <% end %>

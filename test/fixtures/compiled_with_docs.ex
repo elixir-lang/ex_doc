@@ -35,7 +35,7 @@ defmodule CompiledWithDocs do
   @doc purpose: :example
   def example_with_h3, do: 1
 
-  @doc purpose: :example
+  @deprecated "Use something else instead"
   def example_without_docs, do: nil
 
   defmodule Nested do

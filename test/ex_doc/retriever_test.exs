@@ -83,7 +83,7 @@ defmodule ExDoc.RetrieverTest do
       assert struct.type == :function
       assert struct.defaults == []
       assert struct.signature == "%CompiledWithDocs{}"
-      assert struct.groups == [:Functions]
+      assert struct.group == "Functions"
 
       assert example.id == "example/2"
       assert example.doc == "Some example"
@@ -91,7 +91,7 @@ defmodule ExDoc.RetrieverTest do
       assert example.defaults == ["example/1"]
       assert example.signature == "example(foo, bar \\\\ Baz)"
       assert example.deprecated == "Use something else instead"
-      assert example.groups == [:Example, :Legacy]
+      assert example.group == "Example"
 
       assert example_1.id == "example_1/0"
       assert example_1.type == :macro
@@ -99,12 +99,12 @@ defmodule ExDoc.RetrieverTest do
       assert example_1.annotations == ["macro", "since 1.3.0"]
 
       assert example_with_h3.id == "example_with_h3/0"
-      assert example_with_h3.groups == [:Example]
+      assert example_with_h3.group == "Example"
 
       assert example_without_docs.id == "example_without_docs/0"
       assert example_without_docs.doc == nil
       assert example_without_docs.defaults == []
-      assert example_without_docs.groups == [:Example]
+      assert example_without_docs.group == "Legacy"
 
       assert example_without_docs.source_url ==
                "http://example.com/test/fixtures/compiled_with_docs.ex\#L39"
@@ -113,7 +113,7 @@ defmodule ExDoc.RetrieverTest do
       assert is_zero.doc == "A simple guard"
       # TODO: Remove :macro when ~> 1.8
       assert is_zero.type in [:guard, :macro]
-      assert is_zero.groups == [:Guards]
+      assert is_zero.group == "Guards"
       assert is_zero.defaults == []
     end
 

@@ -5,9 +5,6 @@
   <%= for default <- get_defaults(module_node) do %>
     <span id="<%=enc_h link_id(default, module_node.type) %>"></span>
   <% end %>
-  <%= if group_key not in ["types", "guards", "functions", "callbacks"] do %>
-    <span id="<%= group_key %>:<%=enc_h link_id(module_node.id, module_node.type) %>"></span>
-  <% end %>
   <div class="detail-header">
     <a href="#<%=enc_h link_id(module_node) %>" class="detail-link" title="Link to this <%= pretty_type(module_node) %>">
       <span class="icon-link" aria-hidden="true"></span>
