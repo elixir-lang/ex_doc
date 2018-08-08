@@ -86,8 +86,6 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       refute content =~ ~r{id="legacy".*id="example/2"}ms
       refute content =~ ~r{id="functions".*id="example/2"}ms
       assert content =~ ~r{id="functions".*id="example_1/0"}ms
-      assert content =~ ~r{id="guards".*href="#guards".*Guards}ms
-      assert content =~ ~r{id="guards".*id="is_zero/1"}ms
     end
 
     test "outputs summaries" do

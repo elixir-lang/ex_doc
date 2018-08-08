@@ -188,8 +188,7 @@ defmodule Mix.Tasks.Docs do
 
   A function can belong to a single group only. If multiple group filters match,
   the first will take precedence. Functions that don't have a custom group will
-  be listed under the default "Functions" group. Beginning with Elixir 1.8 in
-  addition to your custom groups ExDoc will also create a Guards group.
+  be listed under the default "Functions" group.
 
   ## Umbrella project
 

@@ -24,7 +24,6 @@ defmodule CompiledWithDocs do
 
   @doc "A simple guard"
   # TODO: remove explicit guard: true when ~> 1.8
-  @doc guard: true
   defguard is_zero(number) when number == 0
 
   @doc """

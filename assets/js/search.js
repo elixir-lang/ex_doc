@@ -69,7 +69,7 @@ export function findIn (elements, matcher) {
         let matches = findNested(nodes, title, matcher, result[key])
         if (Object.keys(matches).length > 0) {
           hasMatch = true
-          if (key === 'types' || key === 'guards' || key === 'callbacks') {
+          if (key === 'types' || key === 'callbacks') {
             result[key] = matches
           } else {
             result.functions = matches

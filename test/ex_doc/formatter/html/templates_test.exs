@@ -234,7 +234,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = Templates.create_sidebar_items(%{modules: nodes}, [])
 
       assert content =~ ~s("modules":\[\{"id":"CompiledWithDocs","title":"CompiledWithDocs")
-      assert content =~ ~r("key":"guards".*"is_zero/1")ms
       assert content =~ ~r("key":"example-functions".*"example/2")ms
       refute content =~ ~r("key":"legacy".*"example/2")ms
       refute content =~ ~r("key":"functions".*"example/2")ms
@@ -328,8 +327,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       refute content =~ ~r{id="legacy".*id="example/2"}ms
       refute content =~ ~r{id="functions".*id="example/2"}ms
       assert content =~ ~r{id="functions".*id="example_1/0"}ms
-      assert content =~ ~r{id="guards".*href="#guards".*Guards}ms
-      assert content =~ ~r{id="guards".*id="is_zero/1"}ms
     end
 
     test "outputs deprecation information" do

@@ -68,13 +68,13 @@ describe('search', () => {
       }])
     })
 
-    it('searches for guard matches', () => {
+    it('searches for matches in custom groups', () => {
       var nodes = [
         {
           id: 'hello',
           title: 'hello',
           nodeGroups: [
-            {key: 'guards', nodes: [{id: 'run'}]}
+            {key: 'examples', nodes: [{id: 'run'}]}
           ]
         },
         {id: 'world', title: 'world'}
@@ -83,7 +83,7 @@ describe('search', () => {
       expect(search.findIn(nodes, 'run')).to.be.eql([{
         id: 'hello',
         match: 'hello',
-        guards: [
+        functions: [
           {id: 'run', match: '<em>run</em>'}
         ]
       }])
@@ -92,10 +92,9 @@ describe('search', () => {
     it('searches for nested matches', () => {
       var nodes = [
         {
-          id: 'hello',
-          title: 'hello',
+          id: 'hello', title: 'hello',
           nodeGroups: [
-            {key: 'guards', nodes: [{id: 'run'}]}
+            {key: 'examples', nodes: [{id: 'run'}]}
           ]
         },
         {id: 'world', title: 'world'}
@@ -104,7 +103,7 @@ describe('search', () => {
       expect(search.findIn(nodes, 'hello.run')).to.be.eql([{
         id: 'hello',
         match: 'hello',
-        guards: [
+        functions: [
           {id: 'run', match: 'run'}
         ]
       }])

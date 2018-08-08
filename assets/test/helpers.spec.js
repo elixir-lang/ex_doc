@@ -19,7 +19,7 @@ describe('helpers', () => {
       }, {
         nodeGroups: [
           {key: 'callbacks', nodes: [{anchor: 'one'}]},
-          {key: 'guards', nodes: [{anchor: 'two'}]}
+          {key: 'examples', nodes: [{anchor: 'two'}]}
         ]
       }]
 
