@@ -264,7 +264,7 @@ defmodule ExDoc.Retriever do
       specs: specs,
       source_path: source.path,
       source_url: source_link(source, line),
-      type: if(metadata[:guard], do: :guard, else: type),
+      type: type,
       group: group,
       annotations: annotations
     }

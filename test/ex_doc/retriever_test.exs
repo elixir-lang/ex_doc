@@ -107,12 +107,11 @@ defmodule ExDoc.RetrieverTest do
       assert example_without_docs.group == "Legacy"
 
       assert example_without_docs.source_url ==
-               "http://example.com/test/fixtures/compiled_with_docs.ex\#L39"
+               "http://example.com/test/fixtures/compiled_with_docs.ex\#L38"
 
       assert is_zero.id == "is_zero/1"
       assert is_zero.doc == "A simple guard"
-      # TODO: Remove :macro when ~> 1.8
-      assert is_zero.type in [:guard, :macro]
+      assert is_zero.type == :macro
       assert is_zero.defaults == []
     end
 
