@@ -92,7 +92,8 @@ describe('search', () => {
     it('searches for nested matches', () => {
       var nodes = [
         {
-          id: 'hello', title: 'hello',
+          id: 'hello',
+          title: 'hello',
           nodeGroups: [
             {key: 'examples', nodes: [{id: 'run'}]}
           ]
