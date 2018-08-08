@@ -3,6 +3,6 @@
     <h2>
       <a href="#<%= group_name_to_id(name) %>"><%= name %></a>
     </h2>
-    <%= for module_node <- nodes, do: summary_entry_template(module_node) %>
+    <%= for node <- nodes, do: summary_entry_template(node) %>
   </div>
 <% end %>

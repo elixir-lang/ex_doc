@@ -57,7 +57,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate a link id
   """
-  def link_id(module_node), do: link_id(module_node.id, module_node.type)
+  def link_id(node), do: link_id(node.id, node.type)
 
   def link_id(id, type) do
     case type do
@@ -299,7 +299,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    detail_template: [:module_node, :_module],
+    detail_template: [:node, :_module],
     footer_template: [:config],
     head_template: [:config, :page],
     module_template: [:config, :module, :summary, :nodes_map],
@@ -310,7 +310,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
-    summary_entry_template: [:module_node],
+    summary_entry_template: [:node],
     redirect_template: [:config, :redirect_to]
   ]
 
