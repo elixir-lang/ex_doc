@@ -115,7 +115,7 @@ function getParameterByName (name) {
 function identifyCurrentHash () {
   var hash = helpers.getLocationHash() || 'content'
 
-  const nodes = sidebarNodes[helpers.getModuleType()]
+  const nodes = sidebarNodes[helpers.getModuleType()] || []
   const category = helpers.findSidebarCategory(nodes, hash)
 
   $(`#full-list .clicked a.expand[href$="#${category}"]`)
