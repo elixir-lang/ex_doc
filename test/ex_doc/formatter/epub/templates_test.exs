@@ -12,8 +12,8 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     "http://elixir-lang.org"
   end
 
-  defp doc_config do
-    %ExDoc.Config{
+  defp doc_config(config \\ []) do
+    default = %ExDoc.Config{
       project: "Elixir",
       version: "1.0.1",
       source_root: File.cwd!(),
@@ -22,12 +22,15 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       source_url: source_url(),
       output: "test/tmp/epub_templates"
     }
+
+    struct(default, config)
   end
 
-  defp get_module_page(names) do
-    mods = ExDoc.Retriever.docs_from_modules(names, doc_config())
+  defp get_module_page(names, config \\ []) do
+    config = doc_config(config)
+    mods = ExDoc.Retriever.docs_from_modules(names, config)
     mods = HTML.Autolink.all(mods, HTML.Autolink.compile(mods, ".xhtml", []))
-    Templates.module_page(doc_config(), hd(mods))
+    Templates.module_page(config, hd(mods))
   end
 
   setup_all do
@@ -66,6 +69,23 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
       assert content =~ ~s{<div class="detail" id="example_1/0">}
       assert content =~ ~s{example(foo, bar \\\\ Baz)}
+    end
+
+    test "outputs function groups" do
+      content =
+        get_module_page([CompiledWithDocs],
+          groups_for_functions: [
+            "Example functions": &(&1[:purpose] == :example),
+            Legacy: &is_binary(&1[:deprecated])
+          ]
+        )
+
+      assert content =~ ~r{id="example-functions".*href="#example-functions".*Example functions}ms
+      assert content =~ ~r{id="legacy".*href="#legacy".*Legacy}ms
+      assert content =~ ~r{id="example-functions".*id="example/2"}ms
+      refute content =~ ~r{id="legacy".*id="example/2"}ms
+      refute content =~ ~r{id="functions".*id="example/2"}ms
+      assert content =~ ~r{id="functions".*id="example_1/0"}ms
     end
 
     test "outputs summaries" do

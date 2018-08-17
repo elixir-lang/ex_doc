@@ -9,7 +9,7 @@
       </section>
     <% end %>
 
-    <%= if Enum.any?(summary_map, fn {_, v} -> v != [] end) do %>
+    <%= if Enum.any?(summary, fn {_, v} -> v != [] end) do %>
       <section id="summary" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#summary">
@@ -18,72 +18,22 @@
           </a>
           Summary
         </h1>
-        <%= H.summary_template "types", summary_map.types %>
-        <%= H.summary_template "guards", summary_map.guards %>
-        <%= H.summary_template "functions", summary_map.functions %>
-        <%= H.summary_template "callbacks", summary_map.callbacks %>
+        <%= for {name, nodes} <- summary, do: H.summary_template(name, nodes) %>
       </section>
     <% end %>
 
-    <%= if summary_map.types != [] do %>
-      <section id="types" class="details-list">
+    <%= for {name, nodes} <- summary, nodes != [], key = HTML.text_to_id(name) do %>
+      <section id="<%= key %>" class="details-list">
         <h1 class="section-heading">
-          <a class="hover-link" href="#types">
+          <a class="hover-link" href="#<%= key %>">
             <span class="icon-link" aria-hidden="true"></span>
             <span class="sr-only">Anchor for this section</span>
           </a>
-          Types
+          <%= name %>
         </h1>
-        <div class="types-list">
-          <%= for type_node <- summary_map.types do
-            H.detail_template(type_node, module)
-          end %>
+        <div class="<%= key %>-list">
+          <%= for node <- nodes, do: H.detail_template(node, module) %>
         </div>
-      </section>
-    <% end %>
-
-    <%= if summary_map.guards != [] do %>
-      <section id="guards" class="details-list">
-        <h1 class="section-heading">
-          <a class="hover-link" href="#guards">
-            <span class="icon-link" aria-hidden="true"></span>
-            <span class="sr-only">Anchor for this section</span>
-          </a>
-          Guards
-        </h1>
-        <%= for guard_node <- summary_map.guards do
-          H.detail_template(guard_node, module)
-        end %>
-      </section>
-    <% end %>
-
-    <%= if summary_map.functions != [] do %>
-      <section id="functions" class="details-list">
-        <h1 class="section-heading">
-          <a class="hover-link" href="#functions">
-            <span class="icon-link" aria-hidden="true"></span>
-            <span class="sr-only">Anchor for this section</span>
-          </a>
-          Functions
-        </h1>
-        <%= for function_node <- summary_map.functions do
-          H.detail_template(function_node, module)
-        end %>
-      </section>
-    <% end %>
-
-    <%= if summary_map.callbacks != [] do %>
-      <section id="callbacks" class="details-list">
-        <h1 class="section-heading">
-          <a class="hover-link" href="#callbacks">
-            <span class="icon-link" aria-hidden="true"></span>
-            <span class="sr-only">Anchor for this section</span>
-          </a>
-          Callbacks
-        </h1>
-        <%= for callback_node <- summary_map.callbacks do
-          H.detail_template(callback_node, module)
-        end %>
       </section>
     <% end %>
     <%# Extra content needed by the current markdown processor (e.g. custom Javascript) %>

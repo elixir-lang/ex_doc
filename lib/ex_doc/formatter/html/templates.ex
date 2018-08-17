@@ -2,12 +2,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
 
+  alias ExDoc.Formatter.HTML
+
   @doc """
   Generate content from the module template for a given `node`
   """
   def module_page(module_node, nodes_map, config) do
-    summary_map = module_summary(module_node)
-    module_template(config, module_node, summary_map, nodes_map)
+    summary = module_summary(module_node)
+    module_template(config, module_node, summary, nodes_map)
   end
 
   @doc """
@@ -57,7 +59,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate a link id
   """
-  def link_id(module_node), do: link_id(module_node.id, module_node.type)
+  def link_id(node), do: link_id(node.id, node.type)
 
   def link_id(id, type) do
     case type do
@@ -161,14 +163,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
-  @clean_html_regex ~r/<(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
   defp extract_headers(content) do
     @h2_regex
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
     |> Enum.filter(&(&1 != ""))
-    |> Enum.map(&String.replace(&1, @clean_html_regex, ""))
-    |> Enum.map(&{&1, header_to_id(&1)})
+    |> Enum.map(&HTML.strip_tags/1)
+    |> Enum.map(&{&1, HTML.text_to_id(&1)})
   end
 
   defp sidebar_items_node(module_node) do
@@ -176,24 +177,24 @@ defmodule ExDoc.Formatter.HTML.Templates do
       module_node
       |> module_summary()
       |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
-      |> Enum.map_join(",", &sidebar_items_by_type/1)
+      |> Enum.map_join(",", &sidebar_items_by_group/1)
 
     if items == "" do
       ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)}/ <>
         ~s/,"group":"#{module_node.group}"}/
     else
       ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)}/ <>
-        ~s/,"group":"#{module_node.group}",#{items}}/
+        ~s/,"group":"#{module_node.group}","nodeGroups":[#{items}]}/
     end
   end
 
-  defp sidebar_items_by_type({type, docs}) do
+  defp sidebar_items_by_group({group, docs}) do
     objects =
       Enum.map_join(docs, ",", fn doc ->
         sidebar_items_object(doc.id, link_id(doc))
       end)
 
-    ~s/"#{type}":[#{objects}]/
+    ~s/{"key":"#{HTML.text_to_id(group)}","name":"#{group}","nodes":[#{objects}]}/
   end
 
   defp sidebar_items_object(id, anchor) do
@@ -201,12 +202,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   def module_summary(module_node) do
-    %{
-      callbacks: Enum.filter(module_node.docs, &(&1.type in [:callback, :macrocallback])),
-      functions: Enum.filter(module_node.docs, &(&1.type in [:function, :macro])),
-      guards: Enum.filter(module_node.docs, &(&1.type in [:guard])),
-      types: module_node.typespecs
-    }
+    [Types: module_node.typespecs] ++
+      function_groups(module_node.function_groups, module_node.docs) ++
+      [Callbacks: Enum.filter(module_node.docs, &(&1.type in [:callback, :macrocallback]))]
+  end
+
+  defp function_groups(groups, docs) do
+    for group <- groups, do: {group, Enum.filter(docs, &(&1.group == group))}
   end
 
   defp logo_path(%{logo: nil}), do: nil
@@ -235,20 +237,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp relative_asset([h | _], output, _pattern), do: Path.relative_to(h, output)
 
   @doc """
-  Extract a linkable ID from a heading
-  """
-  @spec header_to_id(String.t()) :: String.t()
-  def header_to_id(header) do
-    header
-    |> String.replace(@clean_html_regex, "")
-    |> String.replace(~r/&#\d+;/, "")
-    |> String.replace(~r/&[A-Za-z0-9]+;/, "")
-    |> String.replace(~r/\W+/u, "-")
-    |> String.trim("-")
-    |> String.downcase()
-  end
-
-  @doc """
   Link headings found with `regex` with in the given `content`. IDs are
   prefixed with `prefix`.
   """
@@ -259,7 +247,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def link_headings(content, regex, prefix) do
     Regex.replace(regex, content, fn match, tag, title ->
-      link_heading(match, tag, title, header_to_id(title), prefix)
+      link_heading(match, tag, title, HTML.text_to_id(title), prefix)
     end)
   end
 
@@ -283,10 +271,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    detail_template: [:module_node, :_module],
+    detail_template: [:node, :_module],
     footer_template: [:config],
     head_template: [:config, :page],
-    module_template: [:config, :module, :summary_map, :nodes_map],
+    module_template: [:config, :module, :summary, :nodes_map],
     not_found_template: [:config, :nodes_map],
     api_reference_entry_template: [:module_node],
     api_reference_template: [:config, :nodes_map],
@@ -294,7 +282,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
-    summary_entry_template: [:module_node],
+    summary_entry_template: [:node],
     redirect_template: [:config, :redirect_to]
   ]
 

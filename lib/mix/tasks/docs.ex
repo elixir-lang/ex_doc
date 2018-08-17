@@ -83,7 +83,7 @@ defmodule Mix.Tasks.Docs do
 
     * `:formatters` - Formatter to use; default: ["html"], options: "html", "epub".
 
-    * `:groups_for_extras`, `:groups_for_modules` - See next section
+    * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See next sections
 
     * `:language` - Identify the primary language of the documents, its value must be
       a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
@@ -111,7 +111,7 @@ defmodule Mix.Tasks.Docs do
 
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
-    
+
     *`:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
 
@@ -154,6 +154,41 @@ defmodule Mix.Tasks.Docs do
       ]
 
   A regex or the string name of the module is also supported.
+
+  ## Grouping functions
+
+  Functions inside a module can also be organized in groups. This is done via
+  the `:groups_for_functions` configuration which is a keyword list of group
+  titles and filtering functions that receive the documentation metadata of
+  functions as argument.
+
+  For example, imagine that you have an API client library with a large surface
+  area for all the API endpoints you need to support. It would be helpful to
+  group the functions with similar responsibilities together. In this case in
+  your module you might have:
+
+      defmodule APIClient do
+        @doc section: :auth
+        def refresh_token(params \\ [])
+
+        @doc subject: :object
+        def update_status(id, new_status)
+
+        @doc permission: :grant
+        def grant_privilege(resource, privilege)
+      end
+
+  And then in the congiruation you can group these with:
+
+      groups_for_functions: [
+        Authentication: & &1[:section] == :auth,
+        Resource: & &1[:subject] == :object,
+        Admin: & &1[:permission] in [:grant, :write]
+      ]
+
+  A function can belong to a single group only. If multiple group filters match,
+  the first will take precedence. Functions that don't have a custom group will
+  be listed under the default "Functions" group.
 
   ## Umbrella project
 

@@ -15,20 +15,20 @@ describe('search', () => {
       var nodes = [{
         id: 'id1',
         title: 'hello world',
-        functions: [
-          {id: 'hello world', anchor: 'hello-world'}
+        nodeGroups: [
+          {key: 'functions', nodes: [{id: 'hello world', anchor: 'hello-world'}]}
         ]
       }, {
         id: 'id2',
         title: 'world',
-        functions: [
-          {id: 'hello world', anchor: 'hello-world'}
+        nodeGroups: [
+          {key: 'examples', nodes: [{id: 'hello world', anchor: 'hello-world'}]}
         ]
       }, {
         id: 'world2',
         title: 'world2',
-        functions: [
-          {id: 'world', anchor: 'world'}
+        nodeGroups: [
+          {key: 'functions', nodes: [{id: 'world', anchor: 'world'}]}
         ]
       }]
 
@@ -49,7 +49,13 @@ describe('search', () => {
 
     it('searches for callback matches', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', callbacks: [{id: 'run'}]},
+        {
+          id: 'hello',
+          title: 'hello',
+          nodeGroups: [
+            {key: 'callbacks', nodes: [{id: 'run'}]}
+          ]
+        },
         {id: 'world', title: 'world'}
       ]
 
@@ -62,16 +68,22 @@ describe('search', () => {
       }])
     })
 
-    it('searches for guard matches', () => {
+    it('searches for matches in custom groups', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', guards: [{id: 'run'}]},
+        {
+          id: 'hello',
+          title: 'hello',
+          nodeGroups: [
+            {key: 'examples', nodes: [{id: 'run'}]}
+          ]
+        },
         {id: 'world', title: 'world'}
       ]
 
       expect(search.findIn(nodes, 'run')).to.be.eql([{
         id: 'hello',
         match: 'hello',
-        guards: [
+        functions: [
           {id: 'run', match: '<em>run</em>'}
         ]
       }])
@@ -79,14 +91,20 @@ describe('search', () => {
 
     it('searches for nested matches', () => {
       var nodes = [
-        {id: 'hello', title: 'hello', guards: [{id: 'run'}]},
+        {
+          id: 'hello',
+          title: 'hello',
+          nodeGroups: [
+            {key: 'examples', nodes: [{id: 'run'}]}
+          ]
+        },
         {id: 'world', title: 'world'}
       ]
 
       expect(search.findIn(nodes, 'hello.run')).to.be.eql([{
         id: 'hello',
         match: 'hello',
-        guards: [
+        functions: [
           {id: 'run', match: 'run'}
         ]
       }])

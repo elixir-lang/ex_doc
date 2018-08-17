@@ -32,18 +32,20 @@ function cleaner (element) {
   return !!element
 }
 
-function findNested (elements, parentId, matcher) {
-  return (elements || []).map(function (element) {
+function findNested (elements, parentId, matcher, acc) {
+  return (elements || []).reduce((acc, element) => {
     // Match things like module.func
     var parentMatch = (parentId + '.' + element.id).match(matcher)
     var match = element.id && element.id.match(matcher)
 
-    if (parentMatch || match) {
+    if ((parentMatch || match) && !acc[element.id]) {
       var result = JSON.parse(JSON.stringify(element))
       result.match = match ? highlight(match) : element.id
-      return result
+      acc[result.id] = result
     }
-  }).filter(cleaner)
+
+    return acc
+  }, acc || {})
 }
 
 function pushLevel (levels, searchEntity, name) {
@@ -54,29 +56,35 @@ function pushLevel (levels, searchEntity, name) {
 
 export function findIn (elements, matcher) {
   return elements.map(function (element) {
-    var title = element.title
-    var titleMatch = title && title.match(matcher)
-    var functionMatches = findNested(element.functions, title, matcher)
-    var guardMatches = findNested(element.guards, title, matcher)
-    var callbackMatches = findNested(element.callbacks, title, matcher)
-    var typeMatches = findNested(element.types, title, matcher)
-
-    var result = {
+    let title = element.title
+    let titleMatch = title && title.match(matcher)
+    let result = {
       id: element.id,
       match: titleMatch ? highlight(titleMatch) : element.title
     }
+    let hasMatch = !!titleMatch
 
-    if (functionMatches.length > 0) result.functions = functionMatches
-    if (guardMatches.length > 0) result.guards = guardMatches
-    if (callbackMatches.length > 0) result.callbacks = callbackMatches
-    if (typeMatches.length > 0) result.types = typeMatches
+    if (element.nodeGroups) {
+      for (let {key, nodes} of element.nodeGroups) {
+        let matches = findNested(nodes, title, matcher, result[key])
+        if (Object.keys(matches).length > 0) {
+          hasMatch = true
+          if (key === 'types' || key === 'callbacks') {
+            result[key] = matches
+          } else {
+            result.functions = matches
+          }
+        }
+      }
+    }
 
-    if (titleMatch ||
-        functionMatches.length > 0 ||
-        guardMatches.length > 0 ||
-        callbackMatches.length > 0 ||
-        typeMatches.length > 0
-       ) {
+    if (hasMatch) {
+      for (let key in result) {
+        if (key !== 'id' && key !== 'match') {
+          result[key] = Object.values(result[key]).sort((a, b) => a.id.localeCompare(b.id))
+        }
+      }
+
       return result
     }
   }).filter(cleaner)
