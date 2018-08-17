@@ -194,12 +194,12 @@ defmodule ExDoc.Formatter.HTML do
 
   defp build_extra({input, options}, autolink, groups) do
     input = to_string(input)
-    id = options[:filename] || input |> input_to_title() |> title_to_id()
+    id = options[:filename] || input |> filename_to_title() |> text_to_id()
     build_extra(input, id, options[:title], autolink, groups)
   end
 
   defp build_extra(input, autolink, groups) do
-    id = input |> input_to_title() |> title_to_id()
+    id = input |> filename_to_title() |> text_to_id()
     build_extra(input, id, nil, autolink, groups)
   end
 
@@ -213,7 +213,7 @@ defmodule ExDoc.Formatter.HTML do
       group = GroupMatcher.match_extra(groups, input)
       html_content = Markdown.to_html(content, file: input, line: 1)
 
-      title = title || extract_title(html_content) || input_to_title(input)
+      title = title || extract_title(html_content) || filename_to_title(input)
       %{id: id, title: title, group: group, content: html_content}
     else
       raise ArgumentError, "file format not recognized, allowed format is: .md"
@@ -248,17 +248,36 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   @doc """
-  Convert the input file name into a title_to_filename/1
+  Convert the input file name into a title
   """
-  def input_to_title(input) do
+  def filename_to_title(input) do
     input |> Path.basename() |> Path.rootname()
   end
 
+  @clean_html_regex ~r/<(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
+
   @doc """
-  Creates an ID from a given title
+  Strips html tags from text leaving their text content
   """
-  def title_to_id(title) do
-    title |> String.replace(" ", "-") |> String.downcase()
+  def strip_tags(text) when is_binary(text) do
+    String.replace(text, @clean_html_regex, "")
+  end
+
+  @doc """
+  Generates an ID from some text
+
+  Used primarily with titles, headings and functions group names.
+  """
+  def text_to_id(atom) when is_atom(atom), do: text_to_id(Atom.to_string(atom))
+
+  def text_to_id(text) when is_binary(text) do
+    text
+    |> strip_tags()
+    |> String.replace(~r/&#\d+;/, "")
+    |> String.replace(~r/&[A-Za-z0-9]+;/, "")
+    |> String.replace(~r/\W+/u, "-")
+    |> String.trim("-")
+    |> String.downcase()
   end
 
   @doc """

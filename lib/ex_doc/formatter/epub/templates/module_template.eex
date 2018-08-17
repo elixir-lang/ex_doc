@@ -22,7 +22,7 @@
       </section>
     <% end %>
 
-    <%= for {name, nodes} <- summary, nodes != [], key = H.group_name_to_id(name) do %>
+    <%= for {name, nodes} <- summary, nodes != [], key = HTML.text_to_id(name) do %>
       <section id="<%= key %>" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#<%= key %>">

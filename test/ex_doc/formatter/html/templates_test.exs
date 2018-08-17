@@ -42,29 +42,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     :ok
   end
 
-  describe "header_to_id" do
-    test "id generation" do
-      assert Templates.header_to_id("“Stale”") == "stale"
-      assert Templates.header_to_id("José") == "josé"
-      assert Templates.header_to_id(" a - b ") == "a-b"
-      assert Templates.header_to_id(" ☃ ") == ""
-      assert Templates.header_to_id(" &sup2; ") == ""
-      assert Templates.header_to_id(" &#9180; ") == ""
-
-      assert Templates.header_to_id("Git Options (<code class=\"inline\">:git</code>)") ==
-               "git-options-git"
-    end
-  end
-
-  describe "group_name_to_id" do
-    test "id generation" do
-      assert Templates.group_name_to_id(:Types) == "types"
-      assert Templates.group_name_to_id(:Functions) == "functions"
-      assert Templates.group_name_to_id(:" Auth  &  Sign-up ") == "auth-and-sign-up"
-      assert Templates.group_name_to_id(:"José's favorites") == "josés-favorites"
-    end
-  end
-
   describe "link_headings" do
     test "generates headers with hovers" do
       assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """

@@ -2,6 +2,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
 
+  alias ExDoc.Formatter.HTML
+
   @doc """
   Generate content from the module template for a given `node`
   """
@@ -161,14 +163,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
-  @clean_html_regex ~r/<(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
   defp extract_headers(content) do
     @h2_regex
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
     |> Enum.filter(&(&1 != ""))
-    |> Enum.map(&String.replace(&1, @clean_html_regex, ""))
-    |> Enum.map(&{&1, header_to_id(&1)})
+    |> Enum.map(&HTML.strip_tags/1)
+    |> Enum.map(&{&1, HTML.text_to_id(&1)})
   end
 
   defp sidebar_items_node(module_node) do
@@ -193,7 +194,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
         sidebar_items_object(doc.id, link_id(doc))
       end)
 
-    ~s/{"key":"#{group_name_to_id(group)}","name":"#{group}","nodes":[#{objects}]}/
+    ~s/{"key":"#{HTML.text_to_id(group)}","name":"#{group}","nodes":[#{objects}]}/
   end
 
   defp sidebar_items_object(id, anchor) do
@@ -236,20 +237,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp relative_asset([h | _], output, _pattern), do: Path.relative_to(h, output)
 
   @doc """
-  Extract a linkable ID from a heading
-  """
-  @spec header_to_id(String.t()) :: String.t()
-  def header_to_id(header) do
-    header
-    |> String.replace(@clean_html_regex, "")
-    |> String.replace(~r/&#\d+;/, "")
-    |> String.replace(~r/&[A-Za-z0-9]+;/, "")
-    |> String.replace(~r/\W+/u, "-")
-    |> String.trim("-")
-    |> String.downcase()
-  end
-
-  @doc """
   Link headings found with `regex` with in the given `content`. IDs are
   prefixed with `prefix`.
   """
@@ -260,7 +247,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def link_headings(content, regex, prefix) do
     Regex.replace(regex, content, fn match, tag, title ->
-      link_heading(match, tag, title, header_to_id(title), prefix)
+      link_heading(match, tag, title, HTML.text_to_id(title), prefix)
     end)
   end
 
@@ -281,21 +268,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp link_detail_headings(content, prefix) do
     link_headings(content, @heading_regex, prefix <> "-")
-  end
-
-  @doc """
-  Generates a string from a node group name that can be used as id and in CSS
-  class names.
-  """
-  def group_name_to_id(name) when is_atom(name), do: group_name_to_id(Atom.to_string(name))
-
-  def group_name_to_id(string) when is_binary(string) do
-    string
-    |> String.downcase()
-    |> String.trim()
-    |> String.replace("&", " and ")
-    |> String.replace(~r/[^\w\s_-]/u, "")
-    |> String.replace(~r/\s+/, "-")
   end
 
   templates = [
