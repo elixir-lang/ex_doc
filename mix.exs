@@ -27,7 +27,7 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [
-      {:earmark, "~> 1.1"},
+      {:earmark, "~> 1.2"},
       {:makeup_elixir, "~> 0.7"},
       {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
@@ -69,7 +69,10 @@ defmodule ExDoc.Mixfile do
   defp docs do
     [
       main: "readme",
-      extras: ["README.md"],
+      extras: [
+        "README.md",
+        "CHANGELOG.md"
+      ],
       source_ref: "v#{@version}",
       source_url: "https://github.com/elixir-lang/ex_doc",
       groups_for_modules: [

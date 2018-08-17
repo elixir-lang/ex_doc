@@ -294,7 +294,7 @@ defmodule ExDoc.Formatter.HTML do
       |> Path.extname()
       |> String.downcase()
 
-    if extname in ~w(.png .jpg) do
+    if extname in ~w(.png .jpg .svg) do
       filename = Path.join(dir, "logo#{extname}")
       target = Path.join(output, filename)
       File.mkdir_p!(Path.dirname(target))
