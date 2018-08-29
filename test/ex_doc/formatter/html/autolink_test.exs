@@ -224,6 +224,18 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert Autolink.elixir_functions("[`is_boolean`](`is_boolean/1`)", []) ==
                "[`is_boolean`](#{@elixir_docs}elixir/Kernel.html#is_boolean/1)"
+
+      assert Autolink.elixir_functions("[term()](`t:term/0`)", []) ==
+               "[term()](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
+
+      assert Autolink.elixir_functions("[term\(\)](`t:term/0`)", []) ==
+               "[term\(\)](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
+
+      assert Autolink.elixir_functions("[`term()`](`t:term/0`)", []) ==
+               "[`term()`](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
+
+      assert Autolink.elixir_functions("[`term()`](`t:term/0`)", []) ==
+               "[`term()`](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
     end
   end
 
@@ -282,6 +294,36 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
   end
 
+  describe "Erlang modules" do
+    test "autolinks to Erlang modules" do
+      assert Autolink.erlang_modules("`:erlang`") == "[`:erlang`](#{@erlang_docs}erlang.html)"
+
+      assert Autolink.erlang_modules("`:erl_prim_loader`") ==
+               "[`:erl_prim_loader`](#{@erlang_docs}erl_prim_loader.html)"
+    end
+
+    test "autolinks to Erlang modules with custom links" do
+      assert Autolink.erlang_modules("[`example`](`:lists`)") ==
+               "[`example`](#{@erlang_docs}lists.html)"
+
+      assert Autolink.erlang_modules("[example](`:lists`)") ==
+               "[example](#{@erlang_docs}lists.html)"
+    end
+
+    test "does not autolink pre-linked docs" do
+      assert Autolink.erlang_modules("[`:erlang`](other.html)") == "[`:erlang`](other.html)"
+
+      assert Autolink.erlang_modules("[the `:erlang` module](other.html)") ==
+               "[the `:erlang` module](other.html)"
+
+      assert Autolink.erlang_modules("`:erlang`") == "[`:erlang`](#{@erlang_docs}erlang.html)"
+    end
+
+    test "does not autolink functions that aren't part of the Erlang distribution" do
+      assert Autolink.erlang_modules("`:unknown.foo/0`") == "`:unknown.foo/0`"
+    end
+  end
+
   describe "erlang functions" do
     test "autolinks to erlang functions" do
       assert Autolink.erlang_functions("`:erlang.apply/2`") ==
@@ -302,12 +344,29 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "[`:zlib.deflateInit/2`](#{@erlang_docs}zlib.html#deflateInit-2)"
     end
 
+    test "autolinks to Erlang functions with custom links" do
+      assert Autolink.erlang_functions("[`example`](`:lists.reverse/1`)") ==
+               "[`example`](#{@erlang_docs}lists.html#reverse-1)"
+
+      assert Autolink.erlang_functions("[example](`:lists.reverse/1`)") ==
+               "[example](#{@erlang_docs}lists.html#reverse-1)"
+    end
+
     test "does not autolink pre-linked docs" do
       assert Autolink.erlang_functions("[`:erlang.apply/2`](other.html)") ==
                "[`:erlang.apply/2`](other.html)"
 
       assert Autolink.erlang_functions("[the `:erlang.apply/2`](other.html)") ==
                "[the `:erlang.apply/2`](other.html)"
+
+      assert Autolink.erlang_functions("[the `:erlang.apply/2` function](`Kernel.apply/2`)") ==
+               "[the `:erlang.apply/2` function](`Kernel.apply/2`)"
+
+      assert Autolink.erlang_functions("[the :erlang.apply/2 function](`Kernel.apply/2`)") ==
+               "[the :erlang.apply/2 function](`Kernel.apply/2`)"
+
+      assert Autolink.erlang_functions("[the `:erlang.apply/2` function](other.html)") ==
+               "[the `:erlang.apply/2` function](other.html)"
 
       assert Autolink.erlang_functions("`:erlang`") == "`:erlang`"
     end
