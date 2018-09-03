@@ -159,9 +159,6 @@ defmodule ExDoc.Markdown do
     * Add {:earmark, ">= 0.0.0"} to your mix.exs deps
       to use an Elixir-based markdown processor
 
-    * Add {:markdown, github: "devinus/markdown"} to your mix.exs deps
-      to use a C-based markdown processor
-
     * Add {:cmark, ">= 0.5"} to your mix.exs deps
       to use another C-based markdown processor
     """

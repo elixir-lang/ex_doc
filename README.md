@@ -141,5 +141,4 @@ Check the [LICENSE](LICENSE) file for more information.
 [elixir-lang]: http://elixir-lang.org/
 [cmark]: https://github.com/jgm/cmark
 [cmark.ex]: https://github.com/asaaki/cmark.ex
-[devinus/markdown]: http://github.com/devinus/markdown
 [hex-writing-docs]: https://hexdocs.pm/elixir/writing-documentation.html
