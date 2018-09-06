@@ -178,7 +178,7 @@ defmodule Mix.Tasks.Docs do
         def grant_privilege(resource, privilege)
       end
 
-  And then in the congiruation you can group these with:
+  And then in the configuration you can group these with:
 
       groups_for_functions: [
         Authentication: & &1[:section] == :auth,
