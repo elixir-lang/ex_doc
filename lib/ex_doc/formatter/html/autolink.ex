@@ -1,9 +1,11 @@
 defmodule ExDoc.SyntaxRule do
+  @moduledoc false
+
   @type language :: :elixir | :erlang | :markdown
 
   @spec re_source(atom, language) :: String.t()
   def re_source(name, language \\ :elixir) do
-    re(name, language) |> Regex.source()
+    Regex.source(re(name, language))
   end
 
   @spec re(atom, language) :: Regex.t()
@@ -110,7 +112,7 @@ defmodule ExDoc.SyntaxRule do
       `\s*                                      # leading backtick
       (#{function_re_source})                   # CAPTURE 1
       \s*`                                      # trailing backtick
-      (?!`)                                     
+      (?!`)
       (?!\])(?!\))                              # it shouldn't be followed by "]", ")"
     }x
   end
@@ -265,7 +267,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp project_doc(bin, module_id, locals, compiled) when is_binary(bin) do
     options =
-      Map.merge(compiled, %{
+      compiled
+      |> Map.merge(%{
         module_id: module_id,
         locals: locals
       })
@@ -623,18 +626,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     case language do
       :erlang ->
-        cond do
-          doc = module_docs(:erlang, module, lib_dirs) ->
-            case kind do
-              :module ->
-                "[#{text}](#{doc}#{module}.html)"
+        if doc = module_docs(:erlang, module, lib_dirs) do
+          case kind do
+            :module ->
+              "[#{text}](#{doc}#{module}.html)"
 
-              :function ->
-                "[#{text}](#{doc}#{module}.html##{function}-#{arity})"
-            end
-
-          true ->
-            string
+            :function ->
+              "[#{text}](#{doc}#{module}.html##{function}-#{arity})"
+          end
+        else
+          string
         end
 
       :elixir ->

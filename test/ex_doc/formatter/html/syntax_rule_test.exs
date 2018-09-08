@@ -1,4 +1,3 @@
-@moduledoc false
 defmodule ExDoc.Formatter.HTML.SyntaxRuleTest do
   use ExUnit.Case, async: true
 
