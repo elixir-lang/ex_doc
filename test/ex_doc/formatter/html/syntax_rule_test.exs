@@ -1,7 +1,7 @@
 defmodule ExDoc.Formatter.HTML.SyntaxRuleTest do
   use ExUnit.Case, async: true
 
-  import ExDoc.SyntaxRule
+  import ExDoc.Formatter.HTML.SyntaxRule
   import Regex, only: [run: 2]
 
   describe "Elixir: basic parts" do

@@ -191,6 +191,18 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "[the `Mod.example/1`](foo)"
     end
 
+    test "supports normal links" do
+      assert Autolink.elixir_functions("`Mod.example/1`", ["Mod.example/1"]) ==
+               "[`Mod.example/1`](Mod.html#example/1)"
+
+      assert Autolink.elixir_functions("(`Mod.example/1`)", ["Mod.example/1"]) ==
+               "([`Mod.example/1`](Mod.html#example/1))"
+
+      # It ignores links preceded by "]("
+      assert Autolink.elixir_functions("](`Mod.example/1`)", ["Mod.example/1"]) ==
+               "](`Mod.example/1`)"
+    end
+
     test "supports custom links" do
       assert Autolink.elixir_functions("[`example`](`Mod.example/1`)", ["Mod.example/1"]) ==
                "[`example`](Mod.html#example/1)"
@@ -291,6 +303,15 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert Autolink.elixir_modules("[the `Mod.Nested`](other.html)", ["Mod.Nested"]) ==
                "[the `Mod.Nested`](other.html)"
+
+      assert Autolink.elixir_modules("[in the `Kernel` module](Kernel.html#guards)", ["Kernel"]) ==
+               "[in the `Kernel` module](Kernel.html#guards)"
+
+      assert Autolink.elixir_modules("[in the `Kernel` module](Kernel.html#guards)", []) ==
+               "[in the `Kernel` module](Kernel.html#guards)"
+
+      assert Autolink.link_everything("[in the `Kernel` module](Kernel.html#guards)", []) ==
+               "[in the `Kernel` module](Kernel.html#guards)"
     end
   end
 
@@ -528,6 +549,19 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
         foobar: 1,
         barbaz: 0
       )
+    end
+  end
+
+  describe "corner-cases" do
+    test "accepts functions around () and []" do
+      assert Autolink.locals("`===/2`", [], [Kernel]) === "[`===/2`](Kernel.html#===/2)"
+      assert Autolink.locals("(`===/2`)", [], [Kernel]) === "([`===/2`](Kernel.html#===/2))"
+      assert Autolink.locals("[`===/2`]", [], [Kernel]) === "[[`===/2`](Kernel.html#===/2)]"
+
+      output = Autolink.link_everything("`===/2`", [])
+      assert output === "[`===/2`](#{@elixir_docs}elixir/Kernel.html#===/2)"
+      assert Autolink.link_everything("(`===/2`)", []) === "(" <> output <> ")"
+      assert Autolink.link_everything("[`===/2`]", []) === "[" <> output <> "]"
     end
   end
 

@@ -1,4 +1,4 @@
-defmodule ExDoc.SyntaxRule do
+defmodule ExDoc.Formatter.HTML.SyntaxRule do
   @moduledoc false
 
   @type language :: :elixir | :erlang | :markdown
@@ -107,13 +107,13 @@ defmodule ExDoc.SyntaxRule do
 
   def re({:normal_link, function_re_source}, :markdown) do
     ~r{
-      (?<!\[)(?<!\()                            # it shouldn't be preceded by "[", "("
+      (?<!\]\()                                 # it shouldn't be preceded by "]("
       (?<!``)
       `\s*                                      # leading backtick
       (#{function_re_source})                   # CAPTURE 1
       \s*`                                      # trailing backtick
       (?!`)
-      (?!\])(?!\))                              # it shouldn't be followed by "]", ")"
+      # (?!\)\])                                # it shouldn't be followed by ")]"
     }x
   end
 
@@ -149,10 +149,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @moduledoc """
   Conveniences for autolinking.
   """
-  import ExDoc.SyntaxRule
+  import ExDoc.Formatter.HTML.SyntaxRule
   import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc_h: 1]
 
-  @type language :: ExDoc.SyntaxRule.language()
+  @type language :: ExDoc.Formatter.HTML.SyntaxRule.language()
   @type kind :: :function | :module
   @type link_type :: :normal | :custom
 
@@ -554,20 +554,41 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   It accepts a list of `options` used in the replacement functions.
   - `:aliases
   - `:docs_refs`
-  - `extension` - Default value is `".html"`
-  - `lib_dirs`
-  - `locals` - A list of local functions
-  - `module_id` - Module of the current doc. Default value is `nil`
-  - `modules_refs` - List of modules available
+  - `:extension` - Default value is `".html"`
+  - `:lib_dirs`
+  - `:locals` - A list of local functions
+  - `:module_id` - Module of the current doc. Default value is `nil`
+  - `:modules_refs` - List of modules available
+
+  Internal options:
+  - `:preprocess?` - `true` or `false`. Do preprocessing and postprocessing, such as replacing backticks
+                      with a token
 
   """
   @spec link(String.t(), language, kind, keyword) :: String.t()
   def link(string, language, kind, options) do
+    options = Keyword.put_new(options, :preprocess?, true)
+
+    string =
+      if options[:preprocess?] do
+        preprocess(string)
+      else
+        string
+      end
+
+    string =
+      string
+      |> link(language, kind, :normal, options)
+      |> link(language, kind, :custom, options)
+
+    string =
+      if options[:preprocess?] do
+        postprocess(string)
+      else
+        string
+      end
+
     string
-    |> preprocess()
-    |> link(language, kind, :normal, options)
-    |> link(language, kind, :custom, options)
-    |> postprocess()
   end
 
   defp link(string, language, kind, link_type, options) do
@@ -577,15 +598,25 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     Regex.replace(regex, string, replace_fun)
   end
 
-  defp link_everything(string, options) do
-    Enum.reduce(@regexes, string, fn %{
-                                       kind: kind,
-                                       language: language,
-                                       link_type: link_type
-                                     },
-                                     acc ->
-      link(acc, language, kind, link_type, options)
-    end)
+  @doc false
+  def link_everything(string, options) when is_list(options) do
+    # disable preprocess every time we run link/4,
+    # and transform string manually before and after Enum.reduce
+    options = Keyword.put_new(options, :preprocess?, false)
+
+    string = preprocess(string)
+
+    string =
+      Enum.reduce(@regexes, string, fn %{
+                                         kind: kind,
+                                         language: language,
+                                         link_type: link_type
+                                       },
+                                       acc ->
+        link(acc, language, kind, link_type, options)
+      end)
+
+    postprocess(string)
   end
 
   # Replaces all backticks inside the text of custom links with @backtick_replacement.
