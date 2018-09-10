@@ -75,7 +75,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @kernel_function_strings for {f, a} <- kernel_exports, do: "#{f}/#{a}"
   @special_form_strings for {f, a} <- special_form_exports, do: "#{f}/#{a}"
 
-
   @doc """
   Compiles information used during autolinking.
   """
@@ -744,8 +743,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   # Returns a regular expression
   # given the `name` and `language`
-  defp re(name, language \\ :elixir)
-
   defp re(:prefix, :elixir) do
     ~r{
       [ct]:                                     # c:, t:
