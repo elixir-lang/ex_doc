@@ -1,163 +1,14 @@
-defmodule ExDoc.Formatter.HTML.SyntaxRule do
-  @moduledoc false
-
-  @type language :: :elixir | :erlang | :markdown
-
-  @spec re_source(atom, language) :: String.t()
-  def re_source(name, language \\ :elixir) do
-    Regex.source(re(name, language))
-  end
-
-  @spec re(atom, language) :: Regex.t()
-  def re(name, language \\ :elixir)
-
-  def re(:prefix, :elixir) do
-    ~r{
-      [ct]:                                     # c:, t:
-    }x
-  end
-
-  def re(:m, :elixir) do
-    ~r{
-      ( [A-Z]                                 # start with uppercase letter
-        [_a-zA-Z0-9]*\.?                      # followed by optional letter, number or underscore
-      )+                                      # this pattern could be repeated
-      (?<!\.)                                 # it must not end with a "."
-    }x
-  end
-
-  def re(:m, :erlang) do
-    ~r{
-      :                                       # prefix
-      # TODO: revise the erlang rules for module names 
-      [a-z_]+                                 # module
-    }x
-  end
-
-  def re(:f, :elixir) do
-    ~r{
-      ([a-z_][_a-zA-Z0-9]*[\\?\\!]?)          # regular function name
-      |                                       # OR
-      [\{\}=&\\|\\.<>~*^@\\+\\%\\!-\/]+       # special form
-    }x
-  end
-
-  def re(:f, :erlang) do
-    ~r{
-      # TODO: revise the erlang rules for function names
-      [0-9a-zA-Z_!\\?]+
-    }x
-  end
-
-  def re(:fa, language) when language in [:elixir, :erlang] do
-    ~r{
-      (#{re_source(:f, language)})            # function name
-      /\d+                                    # slash + arity
-    }x
-  end
-
-  def re(:mfa, :elixir) do
-    ~r{
-      (#{re_source(:prefix)})?                # optional callback/type identifier or ":"
-      (
-        (#{re_source(:m)}\.)
-        #{re_source(:fa)}
-      )
-    }x
-  end
-
-  def re(:mfa, :erlang) do
-    ~r{
-      #{re_source(:m, :erlang)}               # module name
-      \.                                      # "."
-      #{re_source(:fa, :erlang)}              # function name
-    }x
-  end
-
-  def re(:local, :elixir) do
-    ~r{
-      (#{re_source(:prefix)})?               # optional callback or type identifier
-      #{re_source(:fa)}                      # function name + arity
-    }x
-  end
-
-  def re(:modules, :elixir) do
-    ~r{
-      #{re_source(:m)}
-    }x
-  end
-
-  def re(:modules, :erlang) do
-    ~r{
-      #{re_source(:m, :erlang)}
-    }x
-  end
-
-  def re(:functions, :elixir) do
-    ~r{
-      (#{re_source(:local)}) | (#{re_source(:mfa)})
-    }x
-  end
-
-  def re(:functions, :erlang) do
-    ~r{
-      #{re_source(:mfa, :erlang)}
-    }x
-  end
-
-  def re({:normal_link, function_re_source}, :markdown) do
-    ~r{
-      (?<!\]\()                                 # it shouldn't be preceded by "]("
-      (?<!``)
-      `\s*                                      # leading backtick
-      (#{function_re_source})                   # CAPTURE 1
-      \s*`                                      # trailing backtick
-      (?!`)
-      # (?!\)\])                                # it shouldn't be followed by ")]"
-    }x
-  end
-
-  def re({:custom_link, function_re_source}, :markdown) do
-    re({:custom_link, "(.*?)", function_re_source}, :markdown)
-  end
-
-  def re({:custom_link, text_re_source, function_re_source}, :markdown) do
-    ~r{
-      \[#{text_re_source}\]                     # CAPTURE 1
-      \(`(#{function_re_source})`\)             # CAPTURE 2
-    }x
-  end
-
-  def regex_link_type(language, kind, link_type) do
-    group =
-      case kind do
-        :function -> :functions
-        :module -> :modules
-      end
-
-    case link_type do
-      :normal ->
-        re({:normal_link, re_source(group, language)}, :markdown)
-
-      :custom ->
-        re({:custom_link, re_source(group, language)}, :markdown)
-    end
-  end
-end
-
 defmodule ExDoc.Formatter.HTML.Autolink do
   @moduledoc """
   Conveniences for autolinking.
   """
-  import ExDoc.Formatter.HTML.SyntaxRule
   import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc_h: 1]
 
-  @type language :: ExDoc.Formatter.HTML.SyntaxRule.language()
+  @type language :: :elixir | :erlang | :markdown
   @type kind :: :function | :module
   @type link_type :: :normal | :custom
 
-  random_string = 1..10_000_000 |> Enum.random() |> Integer.to_charlist(36)
-  @backtick_replacement "<bt_#{random_string}>"
+  @backtick_replacement "<B706848484895T>"
 
   @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
@@ -223,6 +74,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @built_in_type_strings for {f, a} <- @built_in_types, do: "t:#{f}/#{a}"
   @kernel_function_strings for {f, a} <- kernel_exports, do: "#{f}/#{a}"
   @special_form_strings for {f, a} <- special_form_exports, do: "#{f}/#{a}"
+
 
   @doc """
   Compiles information used during autolinking.
@@ -542,29 +394,27 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end
   end
 
-  @doc """
-  Helper function for autolinking functions and modules.
-
-  It autolinks all links for a certain `language` and of a certain `kind`.
-
-  `language` can be: `:elixir`, `:erlang` or `:markdown`.
-
-  `kind` is either `:function` or `:module`.
-
-  It accepts a list of `options` used in the replacement functions.
-  - `:aliases
-  - `:docs_refs`
-  - `:extension` - Default value is `".html"`
-  - `:lib_dirs`
-  - `:locals` - A list of local functions
-  - `:module_id` - Module of the current doc. Default value is `nil`
-  - `:modules_refs` - List of modules available
-
-  Internal options:
-  - `:preprocess?` - `true` or `false`. Do preprocessing and postprocessing, such as replacing backticks
-                      with a token
-
-  """
+  # Helper function for autolinking functions and modules.
+  #
+  # It autolinks all links for a certain `language` and of a certain `kind`.
+  #
+  # `language` can be: `:elixir`, `:erlang` or `:markdown`.
+  #
+  # `kind` is either `:function` or `:module`.
+  #
+  # It accepts a list of `options` used in the replacement functions.
+  # - `:aliases
+  # - `:docs_refs`
+  # - `:extension` - Default value is `".html"`
+  # - `:lib_dirs`
+  # - `:locals` - A list of local functions
+  # - `:module_id` - Module of the current doc. Default value is `nil`
+  # - `:modules_refs` - List of modules available
+  #
+  # Internal options:
+  # - `:preprocess?` - `true` or `false`. Do preprocessing and postprocessing, such as replacing backticks
+  #                     with a token
+  @doc false
   @spec link(String.t(), language, kind, keyword) :: String.t()
   def link(string, language, kind, options) do
     options = Keyword.put_new(options, :preprocess?, true)
@@ -882,5 +732,150 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp get_elixir_docs(aliases, lib_dirs) do
     get_source(Kernel, aliases, lib_dirs)
+  end
+
+  ## REGULAR EXPRESSION HELPERS
+
+  # Returns a the string source of a regular expression,
+  # given the `name` and `language`
+  defp re_source(name, language \\ :elixir) do
+    Regex.source(re(name, language))
+  end
+
+  # Returns a regular expression
+  # given the `name` and `language`
+  defp re(name, language \\ :elixir)
+
+  defp re(:prefix, :elixir) do
+    ~r{
+      [ct]:                                     # c:, t:
+    }x
+  end
+
+  defp re(:m, :elixir) do
+    ~r{
+      ( [A-Z]                                 # start with uppercase letter
+        [_a-zA-Z0-9]*\.?                      # followed by optional letter, number or underscore
+      )+                                      # this pattern could be repeated
+      (?<!\.)                                 # it must not end with a "."
+    }x
+  end
+
+  defp re(:m, :erlang) do
+    ~r{
+      :                                       # prefix
+      # TODO: revise the erlang rules for module names 
+      [a-z_]+                                 # module_name
+    }x
+  end
+
+  defp re(:f, :elixir) do
+    ~r{
+      ([a-z_][_a-zA-Z0-9]*[\\?\\!]?)          # regular function_name
+      |                                       # OR
+      [\{\}=&\\|\\.<>~*^@\\+\\%\\!-\/]+       # special_form
+    }x
+  end
+
+  defp re(:f, :erlang) do
+    ~r{
+      # TODO: revise the erlang rules for function names
+      [0-9a-zA-Z_!\\?]+
+    }x
+  end
+
+  defp re(:fa, language) when language in [:elixir, :erlang] do
+    ~r{
+      (#{re_source(:f, language)})            # function_name
+      /\d+                                    # /arity
+    }x
+  end
+
+  defp re(:mfa, :elixir) do
+    ~r{
+      (#{re_source(:prefix)})?                # optional callback/type identifier or ":"
+      (
+        (#{re_source(:m)}\.)
+        #{re_source(:fa)}
+      )
+    }x
+  end
+
+  defp re(:mfa, :erlang) do
+    ~r{
+      #{re_source(:m, :erlang)}               # module_name
+      \.                                      # "."
+      #{re_source(:fa, :erlang)}              # function_name/arity
+    }x
+  end
+
+  defp re(:local, :elixir) do
+    ~r{
+      (#{re_source(:prefix)})?               # optional callback or type identifier
+      #{re_source(:fa)}                      # function_name/arity
+    }x
+  end
+
+  defp re(:modules, :elixir) do
+    ~r{
+      #{re_source(:m)}
+    }x
+  end
+
+  defp re(:modules, :erlang) do
+    ~r{
+      #{re_source(:m, :erlang)}
+    }x
+  end
+
+  defp re(:functions, :elixir) do
+    ~r{
+      (#{re_source(:local)}) | (#{re_source(:mfa)})
+    }x
+  end
+
+  defp re(:functions, :erlang) do
+    ~r{
+      #{re_source(:mfa, :erlang)}
+    }x
+  end
+
+  defp re({:normal_link, function_re_source}, :markdown) do
+    ~r{
+      (?<!\]\()                                 # it shouldn't be preceded by "]("
+      (?<!``)
+      `\s*                                      # leading backtick
+      (#{function_re_source})                   # CAPTURE 1
+      \s*`                                      # trailing backtick
+      (?!`)
+      # (?!\)\])                                # it shouldn't be followed by ")]"
+    }x
+  end
+
+  defp re({:custom_link, function_re_source}, :markdown) do
+    re({:custom_link, "(.*?)", function_re_source}, :markdown)
+  end
+
+  defp re({:custom_link, text_re_source, function_re_source}, :markdown) do
+    ~r{
+      \[#{text_re_source}\]                     # CAPTURE 1
+      \(`(#{function_re_source})`\)             # CAPTURE 2
+    }x
+  end
+
+  defp regex_link_type(language, kind, link_type) do
+    group =
+      case kind do
+        :function -> :functions
+        :module -> :modules
+      end
+
+    case link_type do
+      :normal ->
+        re({:normal_link, re_source(group, language)}, :markdown)
+
+      :custom ->
+        re({:custom_link, re_source(group, language)}, :markdown)
+    end
   end
 end
