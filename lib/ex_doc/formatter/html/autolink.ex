@@ -8,8 +8,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @type kind :: :function | :module
   @type link_type :: :normal | :custom
 
-  @backtick_replacement "<B706848484895T>"
-
+  @backtick_token "<B706848484895T>"
   @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
   @basic_types_page "typespecs.html#basic-types"
@@ -418,33 +417,25 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   def link(string, language, kind, options) do
     options = Keyword.put_new(options, :preprocess?, true)
 
-    string =
-      if options[:preprocess?] do
-        preprocess(string)
-      else
-        string
-      end
-
-    string =
-      string
-      |> link(language, kind, :normal, options)
-      |> link(language, kind, :custom, options)
-
-    string =
-      if options[:preprocess?] do
-        postprocess(string)
-      else
-        string
-      end
-
     string
+    |> link_process(:preprocess, options[:preprocess?])
+    |> link(language, kind, :custom, options)
+    |> link(language, kind, :normal, options)
+    |> link_process(:postprocess, options[:preprocess?])
   end
 
-  defp link(string, language, kind, link_type, options) do
+  @doc false
+  @spec link(String.t(), language, link_type, kind, keyword) :: String.t()
+  def link(string, language, kind, link_type, options) do
     regex = regex_link_type(language, kind, link_type)
     replace_fun = replace_fun(language, kind, link_type, options)
 
-    Regex.replace(regex, string, replace_fun)
+    result = link_process(string, :preprocess, options[:preprocess?])
+    result = Regex.replace(regex, result, replace_fun)
+    result = link_process(result, :postprocess, options[:preprocess?])
+
+    # output([before: string, after: result], options[:module_id], [Version, "Version"])
+    result
   end
 
   @doc false
@@ -463,28 +454,55 @@ defmodule ExDoc.Formatter.HTML.Autolink do
                                        },
                                        acc ->
         link(acc, language, kind, link_type, options)
+        # link(acc, language, kind, options)
       end)
 
     postprocess(string)
   end
 
-  # Replaces all backticks inside the text of custom links with @backtick_replacement.
-  defp preprocess(string) do
+  defp link_process(string, _, false),
+    do: string
+
+  defp link_process(string, :preprocess, true),
+    do: preprocess(string)
+
+  defp link_process(string, :postprocess, true),
+    do: postprocess(string)
+
+  defp output(term, module_id, module_id) do
+    IO.puts(inspect(term))
+    exit(:output)
+    term
+  end
+
+  # used temporarily for debugging
+  defp output(term, module_id, print_only_module_list) do
+    if module_id in print_only_module_list do
+      IO.puts(inspect(term))
+      IO.puts("****************")
+    end
+
+    term
+  end
+
+  @doc false
+  # Replaces all backticks inside the text of custom links with @backtick_token.
+  def preprocess(string) do
     regex = ~r{
-        \[(.*?`.*?)\]
-        \((.*?)\)
+        \[([^\]]*?`[^\]]*?)\]
+        \(([^\)]*?)\)
       }x
 
     Regex.replace(regex, string, fn _all, text, link ->
-      new_text = String.replace(text, :binary.compile_pattern("`"), @backtick_replacement)
+      new_text = String.replace(text, :binary.compile_pattern("`"), @backtick_token)
       "[#{new_text}](#{link})"
     end)
   end
 
+  @doc false
   # Reverts the changes done by `preprocess/1`.
-  defp postprocess(string) do
-    String.replace(string, :binary.compile_pattern(@backtick_replacement), "`")
-    # string
+  def postprocess(string) do
+    String.replace(string, :binary.compile_pattern(@backtick_token), "`")
   end
 
   @doc false
@@ -875,4 +893,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         re({:custom_link, re_source(group, language)}, :markdown)
     end
   end
+
+  @doc false
+  def backtick_token(), do: @backtick_token
 end

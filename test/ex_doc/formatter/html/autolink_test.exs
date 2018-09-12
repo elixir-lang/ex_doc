@@ -160,7 +160,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "autolinks types" do
-      # use the same approach for elixir_functions as for localss
+      # use the same approach for elixir_functions as for locals
       assert Autolink.elixir_functions(
                "`t:MyModule.my_type/0`",
                ["t:MyModule.my_type/0"]
@@ -248,6 +248,17 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert Autolink.elixir_functions("[`term()`](`t:term/0`)", []) ==
                "[`term()`](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
+
+      assert Autolink.elixir_functions("[version](`t:Version.version/0`)", ["t:Version.version/0"]) ==
+               "[version](Version.html#t:version/0)"
+
+      assert Autolink.link_everything("[version](`t:Version.version/0`)",
+               docs_refs: ["t:Version.version/0"]
+             ) == "[version](Version.html#t:version/0)"
+
+      # assert Autolink.link_everything("[version](`t:version/0`)", [locals: ["t:Version.version/0"]]) ==
+      assert Autolink.link_everything("[version](`t:version/0`)", locals: ["t:version/0"]) ==
+               "[version](#t:version/0)"
     end
   end
 
@@ -569,5 +580,42 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     ast = Code.string_to_quoted!(original)
     {actual, _} = Autolink.format_and_extract_typespec_placeholders(ast, typespecs, aliases, [])
     assert actual == expected, "Original: #{original}\nExpected: #{expected}\nActual:   #{actual}"
+  end
+
+  describe "backtick preprocessing" do
+    test "replace backticks" do
+      assert Autolink.preprocess("[`===/2`](foo)") ===
+               "[#{Autolink.backtick_token()}===/2#{Autolink.backtick_token()}](foo)"
+    end
+
+    test "do not touch backticks" do
+      assert Autolink.preprocess("`===/2`") === "`===/2`"
+      assert Autolink.preprocess("(`===/2`)") === "(`===/2`)"
+      assert Autolink.preprocess("(foo)[`Module`]") === "(foo)[`Module`]"
+
+      # this tests for a bug in the regex that it was being too greedy and streaching several links
+      string = """
+      A [version](`t:version/0`) is a [string](`t:String.t/0`) in a specific
+      format or a [version](`t:Version.t/0`) struct
+      generated after parsing a version string with `Version.parse/1`.
+      """
+
+      assert Autolink.preprocess(string) === string
+    end
+
+    test "replace backtick tokens" do
+      assert Autolink.postprocess(
+               "[#{Autolink.backtick_token()}===/2#{Autolink.backtick_token()}](foo)"
+             ) === "[`===/2`](foo)"
+
+      string = """
+      [A `version` is](`t:version/0`) a [beautiful `string` in a](`t:String.t/0`) specific
+      format or a [`version`](`t:Version.t/0`) struct
+      generated after parsing a version string with `Version.parse/1`.
+      """
+
+      refute Autolink.preprocess(string) === string
+      assert Autolink.preprocess(string) |> Autolink.postprocess() === string
+    end
   end
 end
