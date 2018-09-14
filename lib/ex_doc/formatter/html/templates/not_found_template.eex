@@ -4,8 +4,10 @@
 <h2>Page not found</h2>
 
 <p>Sorry, but the page you were trying to get to, does not exist. You
-may want to try searching this site using the sidebar or using our
-<a href="api-reference.html" title="API Reference">API Reference</a> page to find what
-you were looking for.</p>
+may want to try searching this site using the sidebar
+<%= if config.api_reference do %>
+  or using our <a href="api-reference.html" title="API Reference">API Reference</a> page
+<% end %>
+to find what you were looking for.</p>
 
 <%= footer_template(config) %>

@@ -341,6 +341,16 @@ defmodule ExDoc.Formatter.HTMLTest do
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~r{"id":"extrapage","title":"Extra Page Title"}
     end
+
+    test "without api-reference" do
+      generate_docs(
+        doc_config(api_reference: false, extras: ["test/fixtures/README.md"], main: "readme")
+      )
+
+      refute File.exists?("#{output_dir()}/api-reference.html")
+      content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+      refute content =~ ~r{"id":"api-reference","title":"API Reference"}
+    end
   end
 
   describe ".build" do

@@ -28,10 +28,15 @@ defmodule ExDoc.Formatter.HTML do
       tasks: filter_list(:task, linked)
     }
 
-    extras = [
-      build_api_reference(nodes_map, config)
-      | build_extras(config, autolink)
-    ]
+    extras =
+      if config.api_reference do
+        [
+          build_api_reference(nodes_map, config)
+          | build_extras(config, autolink)
+        ]
+      else
+        build_extras(config, autolink)
+      end
 
     assets_dir = "assets"
     static_files = generate_assets(config, assets_dir, default_assets(config))
