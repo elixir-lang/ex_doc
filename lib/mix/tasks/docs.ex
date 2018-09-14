@@ -47,6 +47,9 @@ defmodule Mix.Tasks.Docs do
   be a keyword list or a function returning a keyword list that will
   be lazily executed.
 
+    * `:api_reference` - Whether to generate `api-reference.html`; default: `true`.
+      If this is set to false, `:main` must also be set.
+
     * `:assets` - Path to a directory that will be copied as is to the "assets"
       directory in the output path. Its entries may be referenced in your docs
       under "assets/ASSET.EXTENSION"; defaults to no assets directory.
@@ -112,7 +115,7 @@ defmodule Mix.Tasks.Docs do
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
 
-    *`:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
+    * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
 
   ## Groups

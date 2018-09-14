@@ -15,7 +15,8 @@ defmodule ExDoc.Config do
   def before_closing_head_tag(_), do: ""
   def before_closing_body_tag(_), do: ""
 
-  defstruct assets: nil,
+  defstruct api_reference: true,
+            assets: nil,
             before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
             before_closing_body_tag: &__MODULE__.before_closing_body_tag/1,
             canonical: nil,
@@ -43,6 +44,7 @@ defmodule ExDoc.Config do
             version: nil
 
   @type t :: %__MODULE__{
+          api_reference: boolean(),
           assets: nil | String.t(),
           before_closing_head_tag: (atom() -> String.t()),
           before_closing_body_tag: (atom() -> String.t()),
