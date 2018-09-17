@@ -11,7 +11,7 @@
     "test": "node_modules/.bin/gulp test",
     "clean": "node_modules/.bin/gulp clean",
     "watch": "node_modules/.bin/gulp watch",
-    "build": "node_modules/.bin/gulp build --production"
+    "build": "webpack --config ./webpack/production.js"
   },
   "repository": {
     "type": "git",
@@ -34,6 +34,8 @@
     "eslint-plugin-promise": "^3.3.2",
     "eslint-plugin-standard": "^2.0.0",
     "flex.less": "^1.1.0",
+    "gear": "^0.9.7",
+    "gear-lib": "^0.9.2",
     "gulp": "^3.9.0",
     "gulp-batch": "^1.0.5",
     "gulp-eslint": "^3.0.1",
@@ -49,7 +51,7 @@
     "gulp-util": "^3.0.6",
     "gulp-watch": "^4.3.4",
     "handlebars": "^4.0.2",
-    "handlebars-loader": "^1.1.0",
+    "handlebars-loader": "^1.7.0",
     "highlight.js": "isagalaev/highlight.js#9.12.0",
     "jquery": "^3.3.1",
     "karma": "^0.13.8",
@@ -59,8 +61,6 @@
     "karma-mocha": "^0.2.0",
     "karma-sourcemap-loader": "^0.3.5",
     "karma-webpack": "^1.7.0",
-    "gear": "^0.9.7",
-    "gear-lib": "^0.9.2",
     "less": "^2.0.0",
     "less-plugin-autoprefix": "^1.4.2",
     "less-plugin-npm-import": "^2.1.0",
@@ -70,7 +70,8 @@
     "mocha": "^2.2.5",
     "normalize.css": "^3.0.3",
     "run-sequence": "^1.1.2",
-    "webpack": "^1.11.0",
-    "webpack-stream": "^2.1.0"
+    "webpack": "^4.19.0",
+    "webpack-command": "^0.4.1",
+    "webpack-merge": "^4.1.4"
   }
 }
