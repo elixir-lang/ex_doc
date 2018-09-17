@@ -17,7 +17,8 @@
 }
 
 body.night-mode {
-  @import 'npm://highlight.js/src/styles/tomorrow-night';
+  @import '../variables';
+  @import (css) '~highlight.js/styles/tomorrow-night.css';
   background: @nightBackground;
 
   .content-outer {

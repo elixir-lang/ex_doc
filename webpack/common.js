@@ -3,7 +3,8 @@ const { resolve } = require('path')
 
 const pathsToClean = [
   './formatters/epub/dist',
-  './formatters/html/dist'
+  './formatters/html/dist',
+  './formatters/html/fonts'
 ]
 
 const cleanOptions = {
@@ -12,15 +13,21 @@ const cleanOptions = {
 
 module.exports = {
   entry: {
-    epub: ['./assets/js/epub.js'],
-    html: ['./assets/js/app.js']
+    epub: [
+      './assets/js/epub.js',
+      './assets/less/epub.less'
+    ],
+    html: [
+      './assets/js/app.js',
+      './assets/less/app.less'
+    ]
   },
   output: {
     path: resolve(__dirname, '../formatters'),
     filename: '[name]/dist/[name].js'
   },
   resolve: {
-    extensions: ['.js']
+    extensions: ['.js', '.less']
   },
   module: {
     rules: [
@@ -29,7 +36,7 @@ module.exports = {
         loader: 'handlebars-loader',
         query: {
           helperDirs: [
-            __dirname + '/js/template-helpers'
+            resolve(__dirname, 'js', 'template-helpers')
           ]
         }
       },
@@ -43,6 +50,22 @@ module.exports = {
             cacheDirectory: true
           }
         }
+      },
+      {
+        test: /\.less$/,
+        use: ['style-loader', 'css-loader', 'postcss-loader', 'less-loader']
+      },
+      {
+        test: /\.(eot|svg|ttf|woff)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'html/fonts/'
+            }
+          }
+        ]
       }
     ]
   },
