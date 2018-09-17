@@ -2,7 +2,7 @@
 // ------------
 
 import $ from 'jquery'
-import {throttle} from 'lodash'
+import throttle from 'lodash.throttle'
 
 // Constants
 // ---------
