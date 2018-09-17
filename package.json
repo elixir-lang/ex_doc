@@ -72,6 +72,7 @@
     "mocha": "^2.2.5",
     "normalize.css": "^3.0.3",
     "run-sequence": "^1.1.2",
+    "uglifyjs-webpack-plugin": "^2.0.0",
     "webpack": "^4.19.0",
     "webpack-command": "^0.4.1",
     "webpack-merge": "^4.1.4"
