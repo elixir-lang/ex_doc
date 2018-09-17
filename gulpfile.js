@@ -10,9 +10,6 @@ var sequence = require('run-sequence')
 var LessPluginNpmImport = require('less-plugin-npm-import')
 var LessPluginAutoPrefix = require('less-plugin-autoprefix')
 var Server = require('karma').Server
-var webpack = require('webpack-stream')
-var exec = require('child_process').exec
-var config = require('./assets/webpack.config')
 
 // Config
 // ------
@@ -29,47 +26,8 @@ var autoprefixPlugin = new LessPluginAutoPrefix({
   browsers: ['last 2 versions']
 })
 
-var languages = [
-  'bash',
-  'css',
-  'diff',
-  'erlang',
-  'erlang-repl',
-  'xml',
-  'http',
-  'javascript',
-  'json',
-  'markdown',
-  'sql'
-]
-
 // Tasks
 // -----
-
-gulp.task('buildHighlight', function (done) {
-  exec('node tools/build.js -n ' + languages.join(' '), {
-    cwd: './node_modules/highlight.js'
-  }, function (err, stdout, stderr) {
-    if (err) return done(err)
-
-    done()
-  })
-})
-
-gulp.task('javascript:html', ['buildHighlight'], function () {
-  return javascript({src: 'assets/js/app.js', dest: distPath.html})
-})
-
-gulp.task('javascript:epub', ['buildHighlight'], function () {
-  return javascript({src: 'assets/js/epub.js', dest: distPath.epub})
-})
-
-gulp.task('javascript', function (done) {
-  sequence(
-    ['javascript:html', 'javascript:epub'],
-    done
-  )
-})
 
 gulp.task('less:html', function () {
   return less({src: 'assets/less/app.less', dest: distPath.html})
@@ -105,14 +63,14 @@ gulp.task('test', function (done) {
 
 gulp.task('build:html', function (done) {
   sequence(
-    ['javascript:html', 'less:html'],
+    ['less:html'],
     done
   )
 })
 
 gulp.task('build:epub', function (done) {
   sequence(
-    ['javascript:epub', 'less:epub'],
+    ['less:epub'],
     done
   )
 })
@@ -170,15 +128,6 @@ gulp.task('default', ['lint', 'test'])
 /**
  * Helpers
  */
-var javascript = function (options) {
-  return gulp.src(options.src)
-    .pipe(webpack(isProduction ? config.production : config.development))
-    .pipe($.if(isProduction, $.uglify()))
-    .pipe($.if(isProduction, $.rev()))
-    .pipe($.size({title: 'js'}))
-    .pipe(gulp.dest(options.dest))
-}
-
 var less = function (options) {
   return gulp.src(options.src)
     .pipe($.less({
