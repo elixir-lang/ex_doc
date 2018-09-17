@@ -8,8 +8,7 @@
   },
   "scripts": {
     "lint": "npx eslint .",
-    "test": "node_modules/.bin/gulp test",
-    "clean": "node_modules/.bin/gulp clean",
+    "test": "npx karma start ./assets/karma.conf.js --single-run",
     "watch": "webpack --config ./webpack/development.js --watch",
     "build": "webpack --config ./webpack/production.js"
   },
@@ -42,9 +41,6 @@
     "eslint-plugin-standard": "^4.0.0",
     "file-loader": "^2.0.0",
     "flex.less": "^1.1.0",
-    "gear": "^0.9.7",
-    "gear-lib": "^0.9.2",
-    "gulp": "^3.9.0",
     "handlebars": "^4.0.2",
     "handlebars-loader": "^1.7.0",
     "highlight.js": "9.11.x",
