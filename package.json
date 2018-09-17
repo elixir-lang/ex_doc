@@ -1,8 +1,6 @@
 {
   "name": "ex_doc",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "ExDoc produces HTML and EPUB documentation for Elixir projects.",
   "directories": {
     "test": "test"
   },
@@ -16,7 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/elixir-lang/ex_doc.git"
   },
-  "author": "",
+  "author": "Plataformatec",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/elixir-lang/ex_doc/issues"
