@@ -1,49 +1,41 @@
 # Assets
 
-In this directory live all assets for `ExDoc`. The ready to use built
+In this directory live all assets for `ExDoc`. The built, ready-to-use
 versions are found in `formatters/{html,epub}/dist`.
 
 To work on these assets you need to install [Node.js] (version 10) and
-[npm] (version 5.6) first (maybe as superuser or administrator).
+[NPM] (version 5.6) first (maybe as superuser or administrator).
 
-## npm run scripts
+## `npm run` scripts
 
 The following scripts are available
 
 ### `build`
 
 This will build a complete production bundle, including JavaScript and CSS.
-If you run `mix build` at `ExDoc` root after changing your assets, it will
-automatically recompile the assets, invoke `mix compile --force` and generate
+If you run `mix build` at the `ExDoc` root after changing your assets, it will
+automatically recompile the assets, invoke `mix compile --force`, and generate
 fresh docs with your changes.
-
-### `clean`
-
-Clean all content in the build folder `dist` for each format.
 
 ### `lint`
 
-Lint all JavaScript files in `js` using [ESLint].
+Lint all JavaScript files using [ESLint].
 
 ### `test`
 
-Run all the available tests for JavaScript using [Karma].
+Run all the available JavaScript tests using [Karma].
 
 ### `watch`
 
-Builds JavaScript and CSS on file changes in `assets/less/**/*.less` or
-`assets/js/**/*.js` for each format.
+Builds JavaScript and CSS on file changes for each format.
 
-## Gulp
+## Webpack
 
-Internally we use [gulp]. The project is organized in tasks
-(`watch`, `build`, etc) and subtasks based on HTML and EPUB
-formats. We also use [webpack] and [less].
+Internally we use [Webpack]. We also use [Less] for organizing stylesheets.
 
 [Node.js]: https://nodejs.org/
-[npm]: https://www.npmjs.com/
-[gulp]: https://www.npmjs.com/package/gulp
-[webpack]: http://webpack.github.io/
-[less]: http://lesscss.org/
-[ESLint]: http://eslint.org/
-[Karma]: http://karma-runner.github.io/
+[NPM]: https://www.npmjs.com/
+[ESLint]: https://eslint.org/
+[Karma]: https://karma-runner.github.io/
+[Webpack]: https://webpack.js.org/
+[Less]: http://lesscss.org/
