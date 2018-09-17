@@ -162,7 +162,7 @@ defmodule ExDoc.Formatter.HTML do
   defp write_default_assets(config, sources) do
     Enum.flat_map(sources, fn {files, dir} ->
       target_dir = Path.join(config.output, dir)
-      File.mkdir(target_dir)
+      File.mkdir_p!(target_dir)
 
       Enum.map(files, fn {name, content} ->
         target = Path.join(target_dir, name)
@@ -175,7 +175,7 @@ defmodule ExDoc.Formatter.HTML do
   defp default_assets(_config) do
     [
       {Assets.dist(), "dist"},
-      {Assets.fonts(), "fonts"},
+      {Assets.fonts(), "dist/html/fonts"},
       {Assets.markdown_processor_assets(), ""}
     ]
   end
