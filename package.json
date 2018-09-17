@@ -10,7 +10,7 @@
     "lint": "node_modules/.bin/gulp lint",
     "test": "node_modules/.bin/gulp test",
     "clean": "node_modules/.bin/gulp clean",
-    "watch": "node_modules/.bin/gulp watch",
+    "watch": "webpack --config ./webpack/development.js --watch",
     "build": "webpack --config ./webpack/production.js"
   },
   "repository": {
@@ -44,7 +44,6 @@
     "gulp": "^3.9.0",
     "gulp-eslint": "^3.0.1",
     "gulp-load-plugins": "^0.10.0",
-    "gulp-watch": "^4.3.4",
     "handlebars": "^4.0.2",
     "handlebars-loader": "^1.7.0",
     "highlight.js": "9.11.x",
