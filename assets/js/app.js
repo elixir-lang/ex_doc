@@ -41,7 +41,7 @@ $(() => {
   // Set up Highlight.js
   hljs.configure({
     tabReplace: '    ', // 4 spaces
-    languages: []       // disable auto-detect
+    languages: [] // disable auto-detect
   })
   hljs.registerLanguage('bash', bash)
   hljs.registerLanguage('css', css)

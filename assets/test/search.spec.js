@@ -4,7 +4,7 @@ describe('search', () => {
   describe('findIn', () => {
     it('returns a list of matches', () => {
       var nodes = [{id: 'hello world', title: 'hello world'},
-                   {id: 'world', title: 'world'}]
+        {id: 'world', title: 'world'}]
 
       expect(search.findIn(nodes, 'hello')).to.be.eql([
         {id: 'hello world', match: '<em>hello</em> world'}
