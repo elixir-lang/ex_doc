@@ -1,4 +1,14 @@
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 const { resolve } = require('path')
+
+const pathsToClean = [
+  './formatters/epub/dist',
+  './formatters/html/dist'
+]
+
+const cleanOptions = {
+  root: resolve(__dirname, '..')
+}
 
 module.exports = {
   entry: {
@@ -24,5 +34,8 @@ module.exports = {
         }
       }
     ]
-  }
+  },
+  plugins: [
+    new CleanWebpackPlugin(pathsToClean, cleanOptions)
+  ]
 }

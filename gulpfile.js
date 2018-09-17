@@ -7,7 +7,6 @@
 var gulp = require('gulp')
 var $ = require('gulp-load-plugins')({camelize: true})
 var sequence = require('run-sequence')
-var del = require('del')
 var LessPluginNpmImport = require('less-plugin-npm-import')
 var LessPluginAutoPrefix = require('less-plugin-autoprefix')
 var Server = require('karma').Server
@@ -55,21 +54,6 @@ gulp.task('buildHighlight', function (done) {
 
     done()
   })
-})
-
-gulp.task('clean:html', function () {
-  return del(distPath.html)
-})
-
-gulp.task('clean:epub', function () {
-  return del(distPath.epub)
-})
-
-gulp.task('clean', function (done) {
-  sequence(
-    ['clean:html', 'clean:epub'],
-    done
-  )
 })
 
 gulp.task('javascript:html', ['buildHighlight'], function () {
@@ -121,7 +105,6 @@ gulp.task('test', function (done) {
 
 gulp.task('build:html', function (done) {
   sequence(
-    'clean:html',
     ['javascript:html', 'less:html'],
     done
   )
@@ -129,7 +112,6 @@ gulp.task('build:html', function (done) {
 
 gulp.task('build:epub', function (done) {
   sequence(
-    'clean:epub',
     ['javascript:epub', 'less:epub'],
     done
   )
