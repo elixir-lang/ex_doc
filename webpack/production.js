@@ -1,8 +1,21 @@
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+
+const { resolve } = require('path')
 const merge = require('webpack-merge')
 const common = require('./common.js')
+
+const pathsToClean = [
+  './formatters/epub/dist',
+  './formatters/html/dist',
+  './formatters/html/fonts'
+]
+
+const cleanOptions = {
+  root: resolve(__dirname, '..')
+}
 
 module.exports = merge(common, {
   mode: 'production',
@@ -29,6 +42,7 @@ module.exports = merge(common, {
   plugins: [
     new MiniCSSExtractPlugin({
       filename: './[name]/dist/[name]-[chunkhash].css'
-    })
+    }),
+    new CleanWebpackPlugin(pathsToClean, cleanOptions)
   ]
 })

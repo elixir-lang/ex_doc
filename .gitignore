@@ -8,3 +8,7 @@
 /erl_crash.dump
 /node_modules
 /npm-debug.log
+
+# Ignore artifacts from non-production builds
+formatters/epub/dist/epub.js
+formatters/html/dist/html.js
