@@ -4,6 +4,10 @@
   "directories": {
     "test": "test"
   },
+  "engines": {
+    "node": ">= 10.0.0",
+    "npm": ">= 5.6.0"
+  },
   "scripts": {
     "lint": "npx eslint .",
     "test": "npx karma start ./assets/karma.conf.js --single-run",
