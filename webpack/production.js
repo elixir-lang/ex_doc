@@ -4,6 +4,9 @@ const common = require('./common.js')
 
 module.exports = merge(common, {
   mode: 'production',
+  output: {
+    filename: '[name]/dist/[name]-[chunkhash].js'
+  },
   optimization: {
     minimizer: [
       new UglifyJSPlugin({

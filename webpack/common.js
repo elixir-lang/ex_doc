@@ -17,7 +17,7 @@ module.exports = {
   },
   output: {
     path: resolve(__dirname, '../formatters'),
-    filename: '[name]/dist/[name]-[hash].js'
+    filename: '[name]/dist/[name].js'
   },
   resolve: {
     extensions: ['.js']
