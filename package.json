@@ -9,7 +9,7 @@
     "npm": ">= 5.6.0"
   },
   "scripts": {
-    "lint": "npx eslint .",
+    "lint": "npx eslint \"./assets/js/**/*.js\"",
     "test": "npx karma start ./assets/karma.conf.js --single-run",
     "watch": "webpack --config ./webpack/development.js --watch",
     "build": "webpack --config ./webpack/production.js"
