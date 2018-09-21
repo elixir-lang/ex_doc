@@ -63,26 +63,26 @@ You can ExDoc via the command line as follows:
 
 1. Install ExDoc as an escript:
 
-    ```console
+    ```bash
     $ mix escript.install hex ex_doc
     ```
 
 2. Then you are ready to use it in your projects. First, move into your project directory and make sure it is already compiled:
 
-    ```console
+    ```bash
     $ cd PATH_TO_YOUR_PROJECT
     $ mix compile
     ```
 
 3. Next invoke the ex_doc executable from your project:
 
-    ```console
+    ```bash
     $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
     ```
 
 4. By default, ex_doc produces HTML files, but, you can also create a EPUB document passing the option `--formatter epub`:
 
-    ```console
+    ```bash
     $ PATH_TO_YOUR_EXDOC/bin/ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png -f epub
     ```
 
