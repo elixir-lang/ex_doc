@@ -14,7 +14,7 @@ const pathsToClean = [
 ]
 
 const cleanOptions = {
-  root: resolve(__dirname, '..')
+  root: resolve(__dirname, '../..')
 }
 
 module.exports = merge(common, {
