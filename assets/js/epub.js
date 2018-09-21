@@ -5,6 +5,7 @@ import hljs from 'highlight.js/lib/highlight'
 import bash from 'highlight.js/lib/languages/bash'
 import css from 'highlight.js/lib/languages/css'
 import diff from 'highlight.js/lib/languages/diff'
+import elixir from 'highlight.js/lib/languages/elixir'
 import erlang from 'highlight.js/lib/languages/erlang'
 import erlangRepl from 'highlight.js/lib/languages/erlang-repl'
 import http from 'highlight.js/lib/languages/http'
@@ -24,6 +25,7 @@ hljs.configure({
 hljs.registerLanguage('bash', bash)
 hljs.registerLanguage('css', css)
 hljs.registerLanguage('diff', diff)
+hljs.registerLanguage('elixir', elixir)
 hljs.registerLanguage('erlang', erlang)
 hljs.registerLanguage('erlang-repl', erlangRepl)
 hljs.registerLanguage('http', http)
