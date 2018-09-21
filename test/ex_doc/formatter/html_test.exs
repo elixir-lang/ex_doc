@@ -155,9 +155,9 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir()}/CompiledWithDocs.Nested.html")
 
-    assert [_] = Path.wildcard("#{output_dir()}/dist/app-*.css")
-    assert [_] = Path.wildcard("#{output_dir()}/dist/app-*.js")
-    assert [] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.js.map")
+    assert [_] = Path.wildcard("#{output_dir()}/dist/html-*.css")
+    assert [_] = Path.wildcard("#{output_dir()}/dist/html-*.js")
+    assert [] = Path.wildcard("#{output_dir()}/another_dir/dist/html-*.js.map")
 
     content = File.read!("#{output_dir()}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
@@ -361,8 +361,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r(^readme\.html$)m
       assert content =~ ~r(^api-reference\.html$)m
       assert content =~ ~r(^dist/sidebar_items-[\w]{10}\.js$)m
-      assert content =~ ~r(^dist/app-[\w]{10}\.js$)m
-      assert content =~ ~r(^dist/app-[\w]{10}\.css$)m
+      assert content =~ ~r(^dist/html-[\w]{20}\.js$)m
+      assert content =~ ~r(^dist/html-[\w]{20}\.css$)m
       assert content =~ ~r(^assets/logo\.png$)m
       assert content =~ ~r(^index\.html$)m
       assert content =~ ~r(^404\.html$)m
