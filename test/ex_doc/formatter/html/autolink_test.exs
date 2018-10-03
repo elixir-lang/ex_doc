@@ -253,11 +253,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "[version](Version.html#t:version/0)"
 
       assert Autolink.link_everything("[version](`t:Version.version/0`)",
-               docs_refs: ["t:Version.version/0"]
+               %{docs_refs: ["t:Version.version/0"]}
              ) == "[version](Version.html#t:version/0)"
 
-      # assert Autolink.link_everything("[version](`t:version/0`)", [locals: ["t:Version.version/0"]]) ==
-      assert Autolink.link_everything("[version](`t:version/0`)", locals: ["t:version/0"]) ==
+      # assert Autolink.link_everything("[version](`t:version/0`)", %{locals: ["t:Version.version/0"]}) ==
+      assert Autolink.link_everything("[version](`t:version/0`)", %{locals: ["t:version/0"]}) ==
                "[version](#t:version/0)"
     end
   end
@@ -321,7 +321,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert Autolink.elixir_modules("[in the `Kernel` module](Kernel.html#guards)", []) ==
                "[in the `Kernel` module](Kernel.html#guards)"
 
-      assert Autolink.link_everything("[in the `Kernel` module](Kernel.html#guards)", []) ==
+      assert Autolink.link_everything("[in the `Kernel` module](Kernel.html#guards)") ==
                "[in the `Kernel` module](Kernel.html#guards)"
     end
   end
@@ -569,10 +569,10 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert Autolink.locals("(`===/2`)", [], [Kernel]) === "([`===/2`](Kernel.html#===/2))"
       assert Autolink.locals("[`===/2`]", [], [Kernel]) === "[[`===/2`](Kernel.html#===/2)]"
 
-      output = Autolink.link_everything("`===/2`", [])
+      output = Autolink.link_everything("`===/2`")
       assert output === "[`===/2`](#{@elixir_docs}elixir/Kernel.html#===/2)"
-      assert Autolink.link_everything("(`===/2`)", []) === "(" <> output <> ")"
-      assert Autolink.link_everything("[`===/2`]", []) === "[" <> output <> "]"
+      assert Autolink.link_everything("(`===/2`)") === "(" <> output <> ")"
+      assert Autolink.link_everything("[`===/2`]") === "[" <> output <> "]"
     end
   end
 
