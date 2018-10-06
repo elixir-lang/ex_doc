@@ -581,41 +581,4 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     {actual, _} = Autolink.format_and_extract_typespec_placeholders(ast, typespecs, aliases, [])
     assert actual == expected, "Original: #{original}\nExpected: #{expected}\nActual:   #{actual}"
   end
-
-  describe "backtick preprocessing" do
-    test "replace backticks" do
-      assert Autolink.preprocess("[`===/2`](foo)") ===
-               "[#{Autolink.backtick_token()}===/2#{Autolink.backtick_token()}](foo)"
-    end
-
-    test "do not touch backticks" do
-      assert Autolink.preprocess("`===/2`") === "`===/2`"
-      assert Autolink.preprocess("(`===/2`)") === "(`===/2`)"
-      assert Autolink.preprocess("(foo)[`Module`]") === "(foo)[`Module`]"
-
-      # this tests a bug in the regex that was being too greedy and stretching for several links
-      string = """
-      A [version](`t:version/0`) is a [string](`t:String.t/0`) in a specific
-      format or a [version](`t:Version.t/0`) struct
-      generated after parsing a version string with `Version.parse/1`.
-      """
-
-      assert Autolink.preprocess(string) === string
-    end
-
-    test "replace backtick tokens" do
-      assert Autolink.postprocess(
-               "[#{Autolink.backtick_token()}===/2#{Autolink.backtick_token()}](foo)"
-             ) === "[`===/2`](foo)"
-
-      string = """
-      [A `version` is](`t:version/0`) a [beautiful `string` in a](`t:String.t/0`) specific
-      format or a [`version`](`t:Version.t/0`) struct
-      generated after parsing a version string with `Version.parse/1`.
-      """
-
-      refute Autolink.preprocess(string) === string
-      assert string |> Autolink.preprocess() |> Autolink.postprocess() === string
-    end
-  end
 end

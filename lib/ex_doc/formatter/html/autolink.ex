@@ -316,11 +316,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @regexes (for link_type <- @link_types,
                 language <- @languages,
                 kind <- @kinds do
-              %{
-                kind: kind,
-                language: language,
-                link_type: link_type
-              }
+              {kind, language, link_type}
             end)
 
   @doc """
@@ -345,7 +341,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     link(string, :elixir, :function, options)
   end
 
-  @doc false
+  @doc """
+  Helper function for autolinking elixir modules.
+
+  Ignores modules which are already wrapped in markdown url syntax,
+  e.g. `[Module](url)`. If the module name doesn't touch the leading
+  or trailing `]`, e.g. `[my link Module is here](url)`, the Module
+  will get translated to the new href of the module.
+  """
   def elixir_modules(
         string,
         module_refs,
@@ -388,7 +391,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   @doc """
-  Helper function for autolinking elixir modules.
+  Helper function for autolinking erlang modules.
 
   Ignores modules which are already wrapped in markdown url syntax,
   e.g. `[Module](url)`. If the module name doesn't touch the leading
@@ -446,8 +449,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp link(string, language, kind, link_type, options) when is_map(options) do
-    regex = regex_link_type(language, kind, link_type)
-    replace_fun = replace_fun(language, kind, link_type, options)
+    regex = re_kind_language_link_type(kind, language, link_type)
+    replace_fun = replace_fun(kind, language, link_type, options)
 
     result = link_process(string, :preprocess, options.preprocess?)
     result = Regex.replace(regex, result, replace_fun)
@@ -465,12 +468,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     string = preprocess(string)
 
     string =
-      Enum.reduce(@regexes, string, fn %{
-                                         kind: kind,
-                                         language: language,
-                                         link_type: link_type
-                                       },
-                                       acc ->
+      Enum.reduce(@regexes, string, fn {kind, language, link_type}, acc ->
         link(acc, language, kind, link_type, options)
       end)
 
@@ -486,9 +484,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp link_process(string, :postprocess, true),
     do: postprocess(string)
 
-  @doc false
-  # Replaces all backticks inside the text of custom links with @backtick_token
-  def preprocess(string) do
+  defp preprocess(string) do
     regex = ~r{
         \[([^\]]*?`[^\]]*?)\]
         \(([^\)]*?)\)
@@ -500,113 +496,105 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end)
   end
 
-  @doc false
-  # Reverts the changes done by `preprocess/1`.
-  def postprocess(string) do
+  defp postprocess(string) do
     String.replace(string, :binary.compile_pattern(@backtick_token), "`")
   end
 
-  defp replace_fun(language, kind, :normal, options) do
-    fn all, match ->
-      replacement(all, language, kind, match, options)
-    end
-  end
-
-  defp replace_fun(language, kind, :custom, options) do
-    fn all, text, match ->
-      replacement(all, language, kind, match, text, options)
-    end
-  end
-
   # The heart of the autolinking logic
-  defp replacement(string, language, kind, match, text \\ nil, options)
+  defp replace_fun(kind, :erlang, link_type, options) do
+    lib_dirs = options[:lib_dirs] || default_lib_dirs(:erlang)
 
-  defp replacement(string, :erlang, kind, match, text, options) do
-    lib_dirs = Map.get(options, :lib_dirs, default_lib_dirs(:erlang))
+    fn all, text, match ->
+      pmfa = {_prefix, module, function, arity} = split_function(match)
+      text = default_text(:erlang, link_type, match, pmfa, text)
 
-    pmfa = {_prefix, module, function, arity} = split_function(match)
-    text = text || default_text(:erlang, kind, match, pmfa)
+      if doc = module_docs(:erlang, module, lib_dirs) do
+        case kind do
+          :module ->
+            "[#{text}](#{doc}#{module}.html)"
 
-    if doc = module_docs(:erlang, module, lib_dirs) do
-      case kind do
-        :module ->
-          "[#{text}](#{doc}#{module}.html)"
-
-        :function ->
-          "[#{text}](#{doc}#{module}.html##{function}-#{arity})"
+          :function ->
+            "[#{text}](#{doc}#{module}.html##{function}-#{arity})"
+        end
+      else
+        all
       end
-    else
-      string
     end
   end
 
-  defp replacement(string, :elixir, kind, match, text, options) do
-    aliases = Map.get(options, :aliases, [])
-    docs_refs = Map.get(options, :docs_refs, [])
-    extension = Map.get(options, :extension, ".html")
-    lib_dirs = Map.get(options, :lib_dirs, default_lib_dirs(:elixir))
-    locals = Map.get(options, :locals, [])
-    module_id = Map.get(options, :module_id, nil)
-    modules_refs = Map.get(options, :modules_refs, [])
+  defp replace_fun(:module, :elixir, _link_type, options) do
+    extension = options[:extension] || ".html"
+    lib_dirs = options[:lib_dirs] || default_lib_dirs(:elixir)
+    module_id = options[:module_id] || nil
+    modules_refs = options[:modules_refs] || []
 
-    pmfa = {prefix, module, function, arity} = split_function(match)
-    text = text || default_text(:elixir, kind, match, pmfa)
+    fn all, _text, match ->
+      cond do
+        match == module_id ->
+          "[`#{match}`](#{match}#{extension}#content)"
 
+        match in modules_refs ->
+          "[`#{match}`](#{match}#{extension})"
+
+        doc = module_docs(:elixir, match, lib_dirs) ->
+          "[`#{match}`](#{doc}#{match}.html)"
+
+        true ->
+          all
+      end
+    end
+  end
+
+  defp replace_fun(:function, :elixir, link_type, options) do
+    aliases = options[:aliases] || []
+    docs_refs = options[:docs_refs] || []
+    extension = options[:extension] || ".html"
+    lib_dirs = options[:lib_dirs] || default_lib_dirs(:elixir)
+    locals = options[:locals] || []
     elixir_docs = get_elixir_docs(aliases, lib_dirs)
 
-    case kind do
-      :module ->
-        cond do
-          match == module_id ->
-            "[`#{match}`](#{match}#{extension}#content)"
+    fn all, text, match ->
+      pmfa = {prefix, module, function, arity} = split_function(match)
+      text = default_text(:elixir, link_type, match, pmfa, text)
 
-          match in modules_refs ->
-            "[`#{match}`](#{match}#{extension})"
+      cond do
+        match in locals ->
+          "[#{text}](##{prefix}#{enc_h(function)}/#{arity})"
 
-          doc = module_docs(:elixir, match, lib_dirs) ->
-            "[`#{match}`](#{doc}#{match}.html)"
+        match in docs_refs ->
+          "[#{text}](#{module}#{extension}##{prefix}#{enc_h(function)}/#{arity})"
 
-          true ->
-            string
-        end
+        match in @basic_type_strings ->
+          "[#{text}](#{elixir_docs}#{@basic_types_page})"
 
-      :function ->
-        cond do
-          match in locals ->
-            "[#{text}](##{prefix}#{enc_h(function)}/#{arity})"
+        match in @built_in_type_strings ->
+          "[#{text}](#{elixir_docs}#{@built_in_types_page})"
 
-          match in docs_refs ->
-            "[#{text}](#{module}#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+        match in @kernel_function_strings ->
+          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc_h(function)}/#{arity})"
 
-          match in @basic_type_strings ->
-            "[#{text}](#{elixir_docs}#{@basic_types_page})"
+        match in @special_form_strings ->
+          "[#{text}](#{elixir_docs}Kernel.SpecialForms" <>
+            "#{extension}##{prefix}#{enc_h(function)}/#{arity})"
 
-          match in @built_in_type_strings ->
-            "[#{text}](#{elixir_docs}#{@built_in_types_page})"
+        doc = module_docs(:elixir, module, lib_dirs) ->
+          "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h(function)}/#{arity})"
 
-          match in @kernel_function_strings ->
-            "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc_h(function)}/#{arity})"
-
-          match in @special_form_strings ->
-            "[#{text}](#{elixir_docs}Kernel.SpecialForms#{extension}##{prefix}#{enc_h(function)}/#{
-              arity
-            })"
-
-          doc = module_docs(:elixir, module, lib_dirs) ->
-            "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h(function)}/#{arity})"
-
-          true ->
-            string
-        end
+        true ->
+          all
+      end
     end
   end
 
   ## Helpers
 
-  defp default_text(:erlang, _kind, match, {_prefix, _module, _function, _arity}),
+  defp default_text(_, :custom, _match, _pmfa, text),
+    do: text
+
+  defp default_text(:erlang, _link_type, match, _pmfa, _text),
     do: "`#{match}`"
 
-  defp default_text(:elixir, _kind, _match, {_prefix, module, function, arity}) do
+  defp default_text(:elixir, _link_type, _match, {_prefix, module, function, arity}, _text) do
     if module == "" do
       # local
       "`#{function}/#{arity}`"
@@ -798,8 +786,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp re(:m, :erlang) do
     ~r{
       :                                   # prefix
-# TODO: revise the erlang rules for module names
-      [a-z_]+                             # module_name
+      [A-Za-z_]+                          # module_name
     }x
   end
 
@@ -813,8 +800,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp re(:f, :erlang) do
     ~r{
-# TODO: revise the erlang rules for function names
-      [0-9a-zA-Z_!\\?]+
+      ([a-z_][_a-zA-Z0-9]*[\\?\\!]?)
     }x
   end
 
@@ -850,66 +836,51 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     }x
   end
 
-  defp re(:modules, :elixir) do
+  defp re_kind_language(:module, :elixir) do
     ~r{
       #{re_source(:m)}
     }x
   end
 
-  defp re(:modules, :erlang) do
+  defp re_kind_language(:module, :erlang) do
     ~r{
       #{re_source(:m, :erlang)}
     }x
   end
 
-  defp re(:functions, :elixir) do
+  defp re_kind_language(:function, :elixir) do
     ~r{
       (#{re_source(:local)}) | (#{re_source(:mfa)})
     }x
   end
 
-  defp re(:functions, :erlang) do
+  defp re_kind_language(:function, :erlang) do
     ~r{
       #{re_source(:mfa, :erlang)}
     }x
   end
 
-  defp re({:normal_link, function_re_source}, :markdown) do
-    ~r{
-      (?<!\]\()                            # it shouldn't be preceded by "]("
-      (?<!``)
-      `\s*                                 # leading backtick
-      (#{function_re_source})              # CAPTURE 1
-      \s*`                                 # trailing backtick
-      (?!`)
-      # (?!\)\])                           # it shouldn't be followed by ")]"
-    }x
-  end
-
-  defp re({:custom_link, function_re_source}, :markdown) do
-    re({:custom_link, "(.*?)", function_re_source}, :markdown)
-  end
-
-  defp re({:custom_link, text_re_source, function_re_source}, :markdown) do
-    ~r{
-      \[#{text_re_source}\]                # CAPTURE 1
-      \(`(#{function_re_source})`\)        # CAPTURE 2
-    }x
-  end
-
-  defp regex_link_type(language, kind, link_type) do
-    group =
-      case kind do
-        :function -> :functions
-        :module -> :modules
-      end
+  defp re_kind_language_link_type(kind, language, link_type) do
+    source = Regex.source(re_kind_language(kind, language))
 
     case link_type do
       :normal ->
-        re({:normal_link, re_source(group, language)}, :markdown)
+        # Capture 1 is ignored
+        ~r{
+          (?<!\]\()                            # it shouldn't be preceded by "]("
+          (?<!``)
+          (`\s*                                # leading backtick
+          (#{source})                          # CAPTURE 2
+          \s*`)                                # trailing backtick
+          (?!`)
+          # (?!\)\])                           # it shouldn't be followed by ")]"
+        }x
 
       :custom ->
-        re({:custom_link, re_source(group, language)}, :markdown)
+        ~r{
+          \[(.*?)\]          # CAPTURE 1
+          \(`(#{source})`\)  # CAPTURE 2
+        }x
     end
   end
 end
