@@ -252,7 +252,8 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert Autolink.elixir_functions("[version](`t:Version.version/0`)", ["t:Version.version/0"]) ==
                "[version](Version.html#t:version/0)"
 
-      assert Autolink.link_everything("[version](`t:Version.version/0`)",
+      assert Autolink.link_everything(
+               "[version](`t:Version.version/0`)",
                %{docs_refs: ["t:Version.version/0"]}
              ) == "[version](Version.html#t:version/0)"
 
