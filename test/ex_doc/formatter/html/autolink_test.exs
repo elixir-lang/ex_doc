@@ -160,7 +160,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "autolinks types" do
-      # use the same approach for elixir_functions as for localss
+      # use the same approach for elixir_functions as for locals
       assert Autolink.elixir_functions(
                "`t:MyModule.my_type/0`",
                ["t:MyModule.my_type/0"]
@@ -189,6 +189,18 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert Autolink.elixir_functions("[the `Mod.example/1`](foo)", ["Mod.example/1"]) ==
                "[the `Mod.example/1`](foo)"
+    end
+
+    test "supports normal links" do
+      assert Autolink.elixir_functions("`Mod.example/1`", ["Mod.example/1"]) ==
+               "[`Mod.example/1`](Mod.html#example/1)"
+
+      assert Autolink.elixir_functions("(`Mod.example/1`)", ["Mod.example/1"]) ==
+               "([`Mod.example/1`](Mod.html#example/1))"
+
+      # It ignores links preceded by "]("
+      assert Autolink.elixir_functions("](`Mod.example/1`)", ["Mod.example/1"]) ==
+               "](`Mod.example/1`)"
     end
 
     test "supports custom links" do
@@ -224,6 +236,29 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert Autolink.elixir_functions("[`is_boolean`](`is_boolean/1`)", []) ==
                "[`is_boolean`](#{@elixir_docs}elixir/Kernel.html#is_boolean/1)"
+
+      assert Autolink.elixir_functions("[term()](`t:term/0`)", []) ==
+               "[term()](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
+
+      assert Autolink.elixir_functions("[term\(\)](`t:term/0`)", []) ==
+               "[term\(\)](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
+
+      assert Autolink.elixir_functions("[`term()`](`t:term/0`)", []) ==
+               "[`term()`](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
+
+      assert Autolink.elixir_functions("[`term()`](`t:term/0`)", []) ==
+               "[`term()`](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
+
+      assert Autolink.elixir_functions("[version](`t:Version.version/0`)", ["t:Version.version/0"]) ==
+               "[version](Version.html#t:version/0)"
+
+      assert Autolink.link_everything("[version](`t:Version.version/0`)",
+               %{docs_refs: ["t:Version.version/0"]}
+             ) == "[version](Version.html#t:version/0)"
+
+      # assert Autolink.link_everything("[version](`t:version/0`)", %{locals: ["t:Version.version/0"]}) ==
+      assert Autolink.link_everything("[version](`t:version/0`)", %{locals: ["t:version/0"]}) ==
+               "[version](#t:version/0)"
     end
   end
 
@@ -279,6 +314,45 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert Autolink.elixir_modules("[the `Mod.Nested`](other.html)", ["Mod.Nested"]) ==
                "[the `Mod.Nested`](other.html)"
+
+      assert Autolink.elixir_modules("[in the `Kernel` module](Kernel.html#guards)", ["Kernel"]) ==
+               "[in the `Kernel` module](Kernel.html#guards)"
+
+      assert Autolink.elixir_modules("[in the `Kernel` module](Kernel.html#guards)", []) ==
+               "[in the `Kernel` module](Kernel.html#guards)"
+
+      assert Autolink.link_everything("[in the `Kernel` module](Kernel.html#guards)") ==
+               "[in the `Kernel` module](Kernel.html#guards)"
+    end
+  end
+
+  describe "Erlang modules" do
+    test "autolinks to Erlang modules" do
+      assert Autolink.erlang_modules("`:erlang`") == "[`:erlang`](#{@erlang_docs}erlang.html)"
+
+      assert Autolink.erlang_modules("`:erl_prim_loader`") ==
+               "[`:erl_prim_loader`](#{@erlang_docs}erl_prim_loader.html)"
+    end
+
+    test "autolinks to Erlang modules with custom links" do
+      assert Autolink.erlang_modules("[`example`](`:lists`)") ==
+               "[`example`](#{@erlang_docs}lists.html)"
+
+      assert Autolink.erlang_modules("[example](`:lists`)") ==
+               "[example](#{@erlang_docs}lists.html)"
+    end
+
+    test "does not autolink pre-linked docs" do
+      assert Autolink.erlang_modules("[`:erlang`](other.html)") == "[`:erlang`](other.html)"
+
+      assert Autolink.erlang_modules("[the `:erlang` module](other.html)") ==
+               "[the `:erlang` module](other.html)"
+
+      assert Autolink.erlang_modules("`:erlang`") == "[`:erlang`](#{@erlang_docs}erlang.html)"
+    end
+
+    test "does not autolink functions that aren't part of the Erlang distribution" do
+      assert Autolink.erlang_modules("`:unknown.foo/0`") == "`:unknown.foo/0`"
     end
   end
 
@@ -302,12 +376,29 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "[`:zlib.deflateInit/2`](#{@erlang_docs}zlib.html#deflateInit-2)"
     end
 
+    test "autolinks to Erlang functions with custom links" do
+      assert Autolink.erlang_functions("[`example`](`:lists.reverse/1`)") ==
+               "[`example`](#{@erlang_docs}lists.html#reverse-1)"
+
+      assert Autolink.erlang_functions("[example](`:lists.reverse/1`)") ==
+               "[example](#{@erlang_docs}lists.html#reverse-1)"
+    end
+
     test "does not autolink pre-linked docs" do
       assert Autolink.erlang_functions("[`:erlang.apply/2`](other.html)") ==
                "[`:erlang.apply/2`](other.html)"
 
       assert Autolink.erlang_functions("[the `:erlang.apply/2`](other.html)") ==
                "[the `:erlang.apply/2`](other.html)"
+
+      assert Autolink.erlang_functions("[the `:erlang.apply/2` function](`Kernel.apply/2`)") ==
+               "[the `:erlang.apply/2` function](`Kernel.apply/2`)"
+
+      assert Autolink.erlang_functions("[the :erlang.apply/2 function](`Kernel.apply/2`)") ==
+               "[the :erlang.apply/2 function](`Kernel.apply/2`)"
+
+      assert Autolink.erlang_functions("[the `:erlang.apply/2` function](other.html)") ==
+               "[the `:erlang.apply/2` function](other.html)"
 
       assert Autolink.erlang_functions("`:erlang`") == "`:erlang`"
     end
@@ -472,9 +563,59 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
   end
 
+  describe "corner-cases" do
+    test "accepts functions around () and []" do
+      assert Autolink.locals("`===/2`", [], [Kernel]) === "[`===/2`](Kernel.html#===/2)"
+      assert Autolink.locals("(`===/2`)", [], [Kernel]) === "([`===/2`](Kernel.html#===/2))"
+      assert Autolink.locals("[`===/2`]", [], [Kernel]) === "[[`===/2`](Kernel.html#===/2)]"
+
+      output = Autolink.link_everything("`===/2`")
+      assert output === "[`===/2`](#{@elixir_docs}elixir/Kernel.html#===/2)"
+      assert Autolink.link_everything("(`===/2`)") === "(" <> output <> ")"
+      assert Autolink.link_everything("[`===/2`]") === "[" <> output <> "]"
+    end
+  end
+
   defp assert_typespec_placeholders(original, expected, typespecs, aliases \\ []) do
     ast = Code.string_to_quoted!(original)
     {actual, _} = Autolink.format_and_extract_typespec_placeholders(ast, typespecs, aliases, [])
     assert actual == expected, "Original: #{original}\nExpected: #{expected}\nActual:   #{actual}"
+  end
+
+  describe "backtick preprocessing" do
+    test "replace backticks" do
+      assert Autolink.preprocess("[`===/2`](foo)") ===
+               "[#{Autolink.backtick_token()}===/2#{Autolink.backtick_token()}](foo)"
+    end
+
+    test "do not touch backticks" do
+      assert Autolink.preprocess("`===/2`") === "`===/2`"
+      assert Autolink.preprocess("(`===/2`)") === "(`===/2`)"
+      assert Autolink.preprocess("(foo)[`Module`]") === "(foo)[`Module`]"
+
+      # this tests a bug in the regex that was being too greedy and stretching for several links
+      string = """
+      A [version](`t:version/0`) is a [string](`t:String.t/0`) in a specific
+      format or a [version](`t:Version.t/0`) struct
+      generated after parsing a version string with `Version.parse/1`.
+      """
+
+      assert Autolink.preprocess(string) === string
+    end
+
+    test "replace backtick tokens" do
+      assert Autolink.postprocess(
+               "[#{Autolink.backtick_token()}===/2#{Autolink.backtick_token()}](foo)"
+             ) === "[`===/2`](foo)"
+
+      string = """
+      [A `version` is](`t:version/0`) a [beautiful `string` in a](`t:String.t/0`) specific
+      format or a [`version`](`t:Version.t/0`) struct
+      generated after parsing a version string with `Version.parse/1`.
+      """
+
+      refute Autolink.preprocess(string) === string
+      assert string |> Autolink.preprocess() |> Autolink.postprocess() === string
+    end
   end
 end
