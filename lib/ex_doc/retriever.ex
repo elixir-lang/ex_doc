@@ -109,6 +109,9 @@ defmodule ExDoc.Retriever do
     {title, id} = module_title_and_id(module_data)
     module_group = GroupMatcher.match_module(config.groups_for_modules, module, id)
 
+    module_aliases = Map.get(config, :nest_module_aliases)
+    {module_group, title} = apply_nested_module_aliases(module_group, title, module_aliases)
+
     %ExDoc.ModuleNode{
       id: id,
       title: title,
@@ -172,6 +175,35 @@ defmodule ExDoc.Retriever do
     case :beam_lib.chunks(binary, [:abstract_code]) do
       {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} -> abstract_code
       _otherwise -> []
+    end
+  end
+
+  defp apply_nested_module_aliases(group_name, title, aliases) do
+    case truncate_if_aliased(title, aliases) do
+      {nil, title} ->
+        {group_name, title}
+
+      {prefix, unprefixed_title} ->
+        group_name =
+          if group_name == nil do
+            aliases
+            |> Map.get(prefix)
+            |> String.to_atom()
+          else
+            group_name
+          end
+
+        {group_name, unprefixed_title}
+    end
+  end
+
+  defp truncate_if_aliased(title, aliases) do
+    aliases
+    |> Map.keys()
+    |> Enum.find(&String.starts_with?(title, &1))
+    |> case do
+      nil -> {nil, title}
+      prefix -> {prefix, String.trim_leading(title, prefix <> ".")}
     end
   end
 
