@@ -77,13 +77,43 @@ defmodule ExDoc do
       options[:source_url_pattern] ||
         guess_url(options[:source_url], options[:source_ref] || ExDoc.Config.default_source_ref())
 
-    options = Keyword.put(options, :source_url_pattern, pattern)
+    options
+    |> Keyword.put(:source_url_pattern, pattern)
+    |> normalize_output()
+    |> normalize_nest_module_aliases()
+  end
 
+  defp normalize_output(options) do
     if is_binary(options[:output]) do
       Keyword.put(options, :output, String.trim_trailing(options[:output], "/"))
     else
       options
     end
+  end
+
+  defp normalize_nest_module_aliases(options) do
+    normalized_aliases =
+      options
+      |> Keyword.get(:nest_module_aliases)
+      |> Enum.into(%{}, &normalize_nest_module_alias/1)
+
+    Keyword.put(options, :nest_module_aliases, normalized_aliases)
+  end
+
+  defp normalize_nest_module_alias(module) when is_atom(module),
+    do: normalize_nest_module_alias({module, as: module})
+
+  defp normalize_nest_module_alias({module, keyword}) when is_atom(module) and is_list(keyword) do
+    alias_name = Keyword.fetch!(keyword, :as)
+
+    alias_name =
+      if is_binary(alias_name) do
+        alias_name
+      else
+        inspect(alias_name)
+      end
+
+    {inspect(module), alias_name}
   end
 
   defp guess_url(url, ref) do
