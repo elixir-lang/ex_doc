@@ -178,6 +178,8 @@ defmodule ExDoc.Retriever do
     end
   end
 
+  defp apply_nested_module_aliases(group_name, title, []), do: {group_name, title}
+
   defp apply_nested_module_aliases(group_name, title, aliases) do
     case truncate_if_aliased(title, aliases) do
       {nil, title} ->
