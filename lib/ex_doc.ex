@@ -94,7 +94,7 @@ defmodule ExDoc do
   defp normalize_nest_module_aliases(options) do
     normalized_aliases =
       options
-      |> Keyword.get(:nest_module_aliases)
+      |> Keyword.get(:nest_module_aliases, [])
       |> Enum.into(%{}, &normalize_nest_module_alias/1)
 
     Keyword.put(options, :nest_module_aliases, normalized_aliases)
