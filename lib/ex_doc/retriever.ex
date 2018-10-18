@@ -107,11 +107,17 @@ defmodule ExDoc.Retriever do
     docs = function_docs ++ get_callbacks(module_data, source)
     types = get_types(module_data, source)
     {title, id} = module_title_and_id(module_data)
+
+    {prefix, collapsed_title} =
+      collapsed_prefix_and_title(title, config.collapse_nested_module_names)
+
     module_group = GroupMatcher.match_module(config.groups_for_modules, module, id)
 
     %ExDoc.ModuleNode{
       id: id,
       title: title,
+      title_prefix: prefix,
+      title_collapsed: collapsed_title,
       module: module_data.name,
       group: module_group,
       type: module_data.type,
@@ -531,6 +537,30 @@ defmodule ExDoc.Retriever do
       ":" <> inspected -> inspected
       inspected -> inspected
     end
+  end
+
+  defp collapsed_prefix_and_title(_title, [] = _prefixes), do: {nil, nil}
+
+  defp collapsed_prefix_and_title(title, prefixes) do
+    # match with appended "." so that we don't fully collapse a full module name,
+    # only modules that are nested in that namespace
+    prefixes
+    |> Enum.find(&String.starts_with?(title, &1 <> "."))
+    |> case do
+      nil ->
+        {nil, nil}
+
+      prefix ->
+        prefix = prefix <> "."
+        {prefix |> collapse_module_name(), String.trim_leading(title, prefix)}
+    end
+  end
+
+  defp collapse_module_name(name) do
+    name
+    |> String.split(".")
+    |> Enum.map(&String.first/1)
+    |> Enum.join(".")
   end
 
   defp task_name(module) do

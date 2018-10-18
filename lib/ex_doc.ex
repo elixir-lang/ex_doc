@@ -77,13 +77,30 @@ defmodule ExDoc do
       options[:source_url_pattern] ||
         guess_url(options[:source_url], options[:source_ref] || ExDoc.Config.default_source_ref())
 
-    options = Keyword.put(options, :source_url_pattern, pattern)
+    options
+    |> Keyword.put(:source_url_pattern, pattern)
+    |> normalize_output()
+    |> normalize_module_collapsing_prefixes()
+  end
 
+  defp normalize_output(options) do
     if is_binary(options[:output]) do
       Keyword.put(options, :output, String.trim_trailing(options[:output], "/"))
     else
       options
     end
+  end
+
+  defp normalize_module_collapsing_prefixes(options) do
+    # sort in descending order to facilitate finding longest match
+    normalized_prefixes =
+      options
+      |> Keyword.get(:collapse_nested_module_names, [])
+      |> Enum.map(&inspect/1)
+      |> Enum.sort()
+      |> Enum.reverse()
+
+    Keyword.put(options, :collapse_nested_module_names, normalized_prefixes)
   end
 
   defp guess_url(url, ref) do
