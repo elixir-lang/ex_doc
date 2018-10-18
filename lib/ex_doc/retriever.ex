@@ -552,7 +552,7 @@ defmodule ExDoc.Retriever do
 
       prefix ->
         prefix = prefix <> "."
-        {prefix |> collapse_module_name(), String.trim_leading(title, prefix)}
+        {collapse_module_name(prefix), String.trim_leading(title, prefix)}
     end
   end
 
