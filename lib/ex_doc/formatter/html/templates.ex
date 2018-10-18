@@ -179,13 +179,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
       |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
       |> Enum.map_join(",", &sidebar_items_by_group/1)
 
-    if items == "" do
-      ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)}/ <>
-        ~s/,"group":"#{module_node.group}"}/
-    else
-      ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)}/ <>
-        ~s/,"group":"#{module_node.group}","nodeGroups":[#{items}]}/
-    end
+    sidebar_items_json_string(module_node, items)
   end
 
   defp sidebar_items_by_group({group, docs}) do
@@ -199,6 +193,24 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp sidebar_items_object(id, anchor) do
     ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}"}/
+  end
+
+  defp sidebar_items_json_string(module_node, items) do
+    json_attrs =
+      [:id, :title, :title_prefix, :title_collapsed]
+      |> Enum.map(&{&1, Map.get(module_node, &1)})
+      |> Enum.reject(fn {_k, v} -> is_nil(v) end)
+      |> Enum.map_join(",", fn {k, v} -> ~s/"#{k}":#{inspect(v)}/ end)
+
+    json_attrs = json_attrs <> ~s/,"group":"#{module_node.group}"/
+
+    json_attrs =
+      case items do
+        "" -> json_attrs
+        items -> json_attrs <> ~s/,"nodeGroups":[#{items}]/
+      end
+
+    "{#{json_attrs}}"
   end
 
   def module_summary(module_node) do
