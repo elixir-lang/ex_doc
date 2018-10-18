@@ -69,6 +69,14 @@ defmodule Mix.Tasks.Docs do
     * `:canonical` - String that defines the preferred URL with the rel="canonical"
       element; defaults to no canonical path.
 
+    * `:collapse_nested_module_names` - A list of module atoms that will be collapsed to
+      display only the first letter of each section. This option is intended to improve
+      the display of long module names in the sidebar: avoid using it if your module names
+      aren't long enough to overflow. Modules nested within a matching prefix will have
+      their matching namespace sections collapsed. Longest match wins. Example:
+      `collapse_nested_module_names: [Some.Module.With.A]` will display the
+      `Some.Module.With.A.Very.Long.Name` module as `S.M.W.A.Very.Long.Name` in the sidebar.
+
     * `:deps` - A keyword list application names and their documentation URL.
       ExDoc will by default include all dependencies and assume they are hosted on
       HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
