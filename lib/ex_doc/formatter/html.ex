@@ -4,7 +4,7 @@ defmodule ExDoc.Formatter.HTML do
   """
 
   alias __MODULE__.{Assets, Autolink, Templates}
-  alias ExDoc.{Markdown, GroupMatcher}
+  alias ExDoc.{GroupMatcher, Markdown, ModuleNode}
 
   @main "api-reference"
 
@@ -20,7 +20,10 @@ defmodule ExDoc.Formatter.HTML do
     output_setup(build, config)
 
     autolink = Autolink.compile(project_nodes, ".html", config.deps)
-    linked = Autolink.all(project_nodes, autolink)
+    linked =
+      project_nodes
+      |> Autolink.all(autolink)
+      |> collapse_context_modules(config)
 
     nodes_map = %{
       modules: filter_list(:module, linked),
@@ -77,6 +80,138 @@ defmodule ExDoc.Formatter.HTML do
       File.rm_rf!(config.output)
       File.mkdir_p!(config.output)
     end
+  end
+
+  defp collapse_context_modules(nodes, %{collapse_nested_module_names: []}), do: nodes
+
+  defp collapse_context_modules(nodes, %{collapse_nested_module_names: prefixes} = config) do
+    # At this stage, nodes have already been sorted by group and id
+
+    %{group: g} = hd(nodes)
+
+    # We want to treat each group of modules (as defined in :groups_for_modules) as its own context
+    # with respect to displaying collapsed module prefixes, so we track that information as we reduce in
+    # context_group (the current module group we're processing) and context_modules (the modules
+    # we've come across so far in this group).
+    # processed_modules accumulates processed modules (and newly inserted collapse context nodes)
+    # across all groups.
+    acc = %{
+      context_group: g,
+      context_modules: [],
+      prefixes_to_collapse: prefixes,
+      processed_modules: []
+    }
+
+    Enum.reduce(nodes, acc, &process_uncollapsed_node/2)
+    |> Map.get(:processed_modules)
+    |> Enum.sort_by(fn module ->
+      {GroupMatcher.group_index(config.groups_for_modules, module.group), module.id}
+    end)
+  end
+
+  defp process_uncollapsed_node(%ModuleNode{} = n, acc) do
+    n
+    |> maybe_collapse_node_title(acc.prefixes_to_collapse)
+    |> maybe_insert_collapse_context_node(acc)
+  end
+
+  defp maybe_collapse_node_title(%ModuleNode{title: title} = module_node, prefixes) do
+    case collapsed_prefix_and_title(title, prefixes) do
+      {nil, nil} ->
+        module_node
+
+      {prefix, collapsed_title} ->
+        %{module_node | title_prefix: prefix, title_collapsed: collapsed_title}
+    end
+  end
+
+  defp collapsed_prefix_and_title(_title, [] = _prefixes), do: {nil, nil}
+
+  defp collapsed_prefix_and_title(title, prefixes) do
+    # match with appended "." so that we don't fully collapse a full module name,
+    # only modules that are nested in that namespace
+    prefixes
+    |> Enum.find(&String.starts_with?(title, &1 <> "."))
+    |> case do
+      nil ->
+        {nil, nil}
+
+      prefix ->
+        prefix = prefix <> "."
+        {collapse_module_name(prefix), String.trim_leading(title, prefix)}
+    end
+  end
+
+  defp collapse_module_name(name) do
+    name
+    |> String.split(".")
+    |> Enum.map(&String.first/1)
+    |> Enum.join(".")
+  end
+
+  defp maybe_insert_collapse_context_node(
+         %ModuleNode{group: module_group} = n,
+         %{context_group: context_group} = acc
+       )
+       when context_group != module_group do
+    acc = %{acc | context_group: module_group, context_modules: []}
+    maybe_insert_collapse_context_node(n, acc)
+  end
+
+  defp maybe_insert_collapse_context_node(%ModuleNode{title_prefix: nil} = n, acc) do
+    %ModuleNode{module: module} = n
+    context = [module | acc.context_modules]
+    processed = [n | acc.processed_modules]
+
+    %{acc | context_modules: context, processed_modules: processed}
+  end
+
+  defp maybe_insert_collapse_context_node(%ModuleNode{} = module_node, acc) do
+    %ModuleNode{module: module} = module_node
+
+    context_modules = [module | acc.context_modules]
+    processed_modules = [module_node | acc.processed_modules]
+    acc = %{acc | context_modules: context_modules, processed_modules: processed_modules}
+
+    {context_module_name, context_module_atom} = get_context_module_info(module_node)
+
+    if Enum.member?(acc.context_modules, context_module_atom) do
+      acc
+    else
+      # There is a module with a collapsed module name (e.g. F.B.MyModule), but no other module
+      # in this group provides context for the collapsed name. We therefore insert a fake module
+      # (e.g. Foo.Bar) so that the sidebar will be able to display relevant context for the
+      # collapsed module names.
+
+      title_prefix =
+        case collapsed_prefix_and_title(context_module_name, acc.prefixes_to_collapse) do
+          {nil, nil} -> context_module_name
+          {prefix, collapsed} -> prefix <> collapsed
+        end
+
+      context_node = %ModuleNode{
+        id: context_module_name,
+        group: module_node.group,
+        module: context_module_atom,
+        title: context_module_name,
+        title_prefix: title_prefix,
+        type: module_node.type
+      }
+
+      acc = %{acc | context_modules: acc.context_modules}
+      maybe_insert_collapse_context_node(context_node, acc)
+    end
+  end
+
+  defp get_context_module_info(%ModuleNode{title: title, title_collapsed: collapsed}) do
+    name =
+      if collapsed == nil do
+        title
+      else
+        String.trim_trailing(title, "." <> collapsed)
+      end
+
+    {name, :"Elixir.#{name}"}
   end
 
   defp generate_build(files, build) do
