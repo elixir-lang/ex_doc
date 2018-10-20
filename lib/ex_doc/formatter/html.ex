@@ -20,15 +20,16 @@ defmodule ExDoc.Formatter.HTML do
     output_setup(build, config)
 
     autolink = Autolink.compile(project_nodes, ".html", config.deps)
-    linked =
-      project_nodes
-      |> Autolink.all(autolink)
-      |> collapse_context_modules(config)
+    linked = Autolink.all(project_nodes, autolink)
+
+    build_nodes_list = fn type ->
+      type |> filter_list(linked) |> collapse_context_modules(config)
+    end
 
     nodes_map = %{
-      modules: filter_list(:module, linked),
-      exceptions: filter_list(:exception, linked),
-      tasks: filter_list(:task, linked)
+      modules: build_nodes_list.(:module),
+      exceptions: build_nodes_list.(:exception),
+      tasks: build_nodes_list.(:task)
     }
 
     extras =
@@ -81,6 +82,8 @@ defmodule ExDoc.Formatter.HTML do
       File.mkdir_p!(config.output)
     end
   end
+
+  defp collapse_context_modules([], _), do: []
 
   defp collapse_context_modules(nodes, %{collapse_nested_module_names: []}), do: nodes
 
