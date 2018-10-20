@@ -19,6 +19,7 @@ import xml from 'highlight.js/lib/languages/xml'
 
 import hasContent from './template-helpers/hasContent'
 import isArray from './template-helpers/isArray'
+import isContextNode from './template-helpers/isContextNode'
 import isLocal from './template-helpers/isLocal'
 import newGroup from './template-helpers/newGroup'
 import showSummary from './template-helpers/showSummary'
@@ -34,6 +35,7 @@ $(() => {
   // Set up Handlebars.js
   Handlebars.registerHelper('hasContent', hasContent)
   Handlebars.registerHelper('isArray', isArray)
+  Handlebars.registerHelper('isContextNode', isContextNode)
   Handlebars.registerHelper('isLocal', isLocal)
   Handlebars.registerHelper('newGroup', newGroup)
   Handlebars.registerHelper('showSummary', showSummary)
