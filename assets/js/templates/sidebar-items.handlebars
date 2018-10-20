@@ -5,26 +5,18 @@
     {{/newGroup}}
     <li class="{{#isLocal node.id}}clicked open{{/isLocal}}">
 
-    {{!-- When visiting a module page, the link to this module page
+    {{! When visiting a module page, the link to this module page
     in the menu should not link to a new page, instead should link
-    to the top of the page itself. --}}
-    {{#isEmptyNode node}}
-      <a href="{{node.id}}.html" title="{{node.title}}">
-        {{#if node.title_prefix}}
-          <span class="prefix">{{node.title_prefix}}</span>{{node.title_collapsed}}
-        {{else}}
-          {{node.title}}
-        {{/if}}
-      </a>
-    {{else}}
-      <a href="{{node.id}}.html" title="{{node.title}}" class="expand">
-        {{#if node.title_prefix}}
-          <span class="prefix">{{node.title_prefix}}</span>{{node.title_collapsed}}
-        {{else}}
-          {{node.title}}
-        {{/if}}
-      </a>
+    to the top of the page itself. }}
+    <a href="{{node.id}}.html" title="{{node.title}}" {{#hasContent node}}class="expand"{{/hasContent}}>
+      {{#if node.title_prefix}}
+        <span class="prefix">{{node.title_prefix}}</span>{{node.title_collapsed}}
+      {{else}}
+        {{node.title}}
+      {{/if}}
+    </a>
 
+    {{#hasContent node}}
       <ul>
         <li>
           <a href="{{node.id}}.html#content">Top</a>
@@ -56,7 +48,7 @@
           {{/each}}
         {{/isArray}}
       </ul>
-    {{/isEmptyNode}}
+    {{/hasContent}}
   </li>
 {{/each}}
 </ul>
