@@ -107,7 +107,6 @@ defmodule ExDoc.Retriever do
     docs = function_docs ++ get_callbacks(module_data, source)
     types = get_types(module_data, source)
     {title, id} = module_title_and_id(module_data)
-
     module_group = GroupMatcher.match_module(config.groups_for_modules, module, id)
 
     %ExDoc.ModuleNode{

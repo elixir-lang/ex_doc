@@ -5,21 +5,14 @@
     {{/newGroup}}
     <li class="{{#isLocal node.id}}clicked open{{/isLocal}}">
 
-      {{#if node.context_module}}
-        <span title="{{node.title}}" class="context" aria-hidden="true">
-          {{#if node.title_collapsed}}
-            <span class="prefix"></span>{{node.title_collapsed}}
-          {{else}}
-            {{node.title}}
-          {{/if}}
-        </span>
-      {{else}}
+      {{! Nodes added purely for nesting purposes (i.e. don't exist in the source) have no id }}
+      {{#if node.id}}
         {{! When visiting a module page, the link to this module page
         in the menu should not link to a new page, instead should link
         to the top of the page itself. }}
         <a href="{{node.id}}.html" title="{{node.title}}" {{#hasContent node}}class="expand"{{/hasContent}}>
-          {{#if node.title_prefix}}
-            <span class="prefix"></span>{{node.title_collapsed}}
+          {{#if node.title_truncated}}
+            <span class="nested"></span>{{node.title_truncated}}
           {{else}}
             {{node.title}}
           {{/if}}
@@ -58,6 +51,14 @@
               {{/isArray}}
             </ul>
           {{/hasContent}}
+      {{else}}
+        <span title="{{node.title}}" class="context" aria-hidden="true">
+          {{#if node.title_truncated}}
+            <span class="nested"></span>{{node.title_truncated}}
+          {{else}}
+            {{node.title}}
+          {{/if}}
+        </span>
       {{/if}}
     </li>
   {{/each}}

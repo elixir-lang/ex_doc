@@ -80,7 +80,7 @@ defmodule ExDoc do
     options
     |> Keyword.put(:source_url_pattern, pattern)
     |> normalize_output()
-    |> normalize_module_collapsing_prefixes()
+    |> normalize_module_nesting_prefixes()
   end
 
   defp normalize_output(options) do
@@ -91,16 +91,16 @@ defmodule ExDoc do
     end
   end
 
-  defp normalize_module_collapsing_prefixes(options) do
+  defp normalize_module_nesting_prefixes(options) do
     # sort in descending order to facilitate finding longest match
     normalized_prefixes =
       options
-      |> Keyword.get(:collapse_nested_module_names, [])
+      |> Keyword.get(:group_modules_by_nesting, [])
       |> Enum.map(&inspect/1)
       |> Enum.sort()
       |> Enum.reverse()
 
-    Keyword.put(options, :collapse_nested_module_names, normalized_prefixes)
+    Keyword.put(options, :group_modules_by_nesting, normalized_prefixes)
   end
 
   defp guess_url(url, ref) do

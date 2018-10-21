@@ -197,7 +197,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp sidebar_items_json_string(module_node, items) do
     json_attrs =
-      [:id, :title, :title_prefix, :title_collapsed]
+      [:id, :title, :title_truncated]
       |> Enum.map(&{&1, Map.get(module_node, &1)})
       |> Enum.reject(fn {_k, v} -> is_nil(v) end)
       |> Enum.map_join(",", fn {k, v} -> ~s/"#{k}":#{inspect(v)}/ end)
@@ -208,13 +208,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
       case items do
         "" -> json_attrs
         items -> json_attrs <> ~s/,"nodeGroups":[#{items}]/
-      end
-
-    json_attrs =
-      if module_node.context_module do
-        json_attrs <> ~s/,"context_module":true/
-      else
-        json_attrs
       end
 
     "{#{json_attrs}}"

@@ -5,10 +5,8 @@ defmodule ExDoc.ModuleNode do
 
   defstruct id: nil,
             title: nil,
-            title_prefix: nil,
-            title_collapsed: nil,
+            title_truncated: nil,
             module: nil,
-            context_module: false,
             group: nil,
             deprecated: nil,
             doc: nil,
@@ -23,10 +21,8 @@ defmodule ExDoc.ModuleNode do
   @type t :: %__MODULE__{
           id: nil | String.t(),
           title: nil | String.t(),
-          title_prefix: nil | String.t(),
-          title_collapsed: nil | String.t(),
+          title_truncated: nil | String.t(),
           module: nil | String.t(),
-          context_module: boolean(),
           group: nil | String.t(),
           deprecated: nil | String.t(),
           function_groups: list(String.t()),

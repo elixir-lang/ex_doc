@@ -63,8 +63,8 @@ function fillSidebarWithNodes (nodes, filter) {
 
   $('#full-list li a').on('click', e => {
     var $target = $(e.target)
-    // the user might have clicked on the prefix span
-    var linkTag = $target.is('a') ? $target : $target.closest('a');
+    // the user might have clicked on the nesting indicator
+    var linkTag = $target.is('a') ? $target : $target.closest('a')
     if (linkTag.hasClass('expand')) {
       e.preventDefault()
       $(e.target).closest('li').toggleClass('open')
