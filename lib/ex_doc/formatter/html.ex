@@ -152,7 +152,10 @@ defmodule ExDoc.Formatter.HTML do
     |> Enum.join(".")
   end
 
-  defp maybe_insert_collapse_context_node(%ModuleNode{group: module_group} = n, %{context_group: context_group} = acc)
+  defp maybe_insert_collapse_context_node(
+         %ModuleNode{group: module_group} = n,
+         %{context_group: context_group} = acc
+       )
        when context_group != module_group do
     acc = %{acc | context_group: module_group, context_modules: []}
     maybe_insert_collapse_context_node(n, acc)
@@ -191,6 +194,7 @@ defmodule ExDoc.Formatter.HTML do
         title: context_module_name,
         type: module_node.type
       }
+
       context_node = maybe_collapse_node_title(context_node, acc.prefixes_to_collapse)
 
       acc = %{acc | context_modules: acc.context_modules}
