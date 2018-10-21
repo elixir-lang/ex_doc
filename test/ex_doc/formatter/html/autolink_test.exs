@@ -1,126 +1,130 @@
 defmodule ExDoc.Formatter.HTML.AutolinkTest do
   use ExUnit.Case, async: true
   alias ExDoc.Formatter.HTML.Autolink
+  import Autolink, only: [project_doc: 2]
 
   @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
 
   describe "local" do
     test "autolinks fun/arity in docs" do
-      assert Autolink.locals("`example/2`", ["example/2"]) == "[`example/2`](#example/2)"
+      assert project_doc("`example/2`", %{locals: ["example/2"]}) == "[`example/2`](#example/2)"
 
-      assert Autolink.locals("`__ENV__/0`", ["__ENV__/0"]) == "[`__ENV__/0`](#__ENV__/0)"
+      assert project_doc("`__ENV__/0`", %{locals: ["__ENV__/0"]}) == "[`__ENV__/0`](#__ENV__/0)"
 
-      assert Autolink.locals("`example/2` then `example/2`", ["example/2"]) ==
+      assert project_doc("`example/2` then `example/2`", %{locals: ["example/2"]}) ==
                "[`example/2`](#example/2) then [`example/2`](#example/2)"
 
-      assert Autolink.locals("`  spaces/0  `", ["spaces/0"]) == "[`spaces/0`](#spaces/0)"
+      assert project_doc("`  spaces/0  `", %{locals: ["spaces/0"]}) == "[`spaces/0`](#spaces/0)"
 
-      assert Autolink.locals("`example/1` and `example/2`", ["example/1", "example/2"]) ==
+      assert project_doc("`example/1` and `example/2`", %{locals: ["example/1", "example/2"]}) ==
                "[`example/1`](#example/1) and [`example/2`](#example/2)"
 
-      assert Autolink.locals(
+      assert project_doc(
                "`funny_name\?/1` and `funny_name!/2`",
-               ["funny_name\?/1", "funny_name!/2"]
+               %{locals: ["funny_name\?/1", "funny_name!/2"]}
              ) == "[`funny_name\?/1`](#funny_name\?/1) and [`funny_name!/2`](#funny_name!/2)"
 
-      assert Autolink.locals("`//2`", ["//2"]) == "[`//2`](#//2)"
+      assert project_doc("`//2`", %{locals: ["//2"]}) == "[`//2`](#//2)"
     end
 
     test "autolinks to local callbacks" do
       # `split_function` must also return locally defined callbacks
       # format should be: "c:<fun>/<arity>"
-      assert Autolink.locals("`c:fun/2`", ["c:fun/2"]) == "[`fun/2`](#c:fun/2)"
+      assert project_doc("`c:fun/2`", %{locals: ["c:fun/2"]}) == "[`fun/2`](#c:fun/2)"
     end
 
     test "autolinks to local types" do
-      assert Autolink.locals("`t:my_type/0`", ["t:my_type/0"]) == "[`my_type/0`](#t:my_type/0)"
-      assert Autolink.locals("`t:my_type/1`", ["t:my_type/1"]) == "[`my_type/1`](#t:my_type/1)"
+      assert project_doc("`t:my_type/0`", %{locals: ["t:my_type/0"]}) ==
+               "[`my_type/0`](#t:my_type/0)"
+
+      assert project_doc("`t:my_type/1`", %{locals: ["t:my_type/1"]}) ==
+               "[`my_type/1`](#t:my_type/1)"
+
       # links to types without arity don't work
-      assert Autolink.locals("`t:my_type`", ["t:my_type/0"]) == "`t:my_type`"
+      assert project_doc("`t:my_type`", %{locals: ["t:my_type/0"]}) == "`t:my_type`"
     end
 
     test "autolinks to basic and built-in types" do
-      assert Autolink.locals("`t:atom/0`", []) ==
+      assert project_doc("`t:atom/0`", %{}) ==
                "[`atom/0`](#{@elixir_docs}elixir/typespecs.html#basic-types)"
 
-      assert Autolink.locals("`t:term/0`", []) ==
+      assert project_doc("`t:term/0`", %{}) ==
                "[`term/0`](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
     end
 
     test "does not autolink undefined functions" do
-      assert Autolink.locals("`example/1`", ["example/2"]) == "`example/1`"
-      assert Autolink.locals("`example/1`", []) == "`example/1`"
+      assert project_doc("`example/1`", %{locals: ["example/2"]}) == "`example/1`"
+      assert project_doc("`example/1`", %{}) == "`example/1`"
     end
 
     test "does not autolink pre-linked functions" do
-      assert Autolink.locals("[`example/1`]()", ["example/1"]) == "[`example/1`]()"
-      assert Autolink.locals("[the `example/1`]()", ["example/1"]) == "[the `example/1`]()"
+      assert project_doc("[`example/1`]()", %{locals: ["example/1"]}) == "[`example/1`]()"
+      assert project_doc("[the `example/1`]()", %{locals: ["example/1"]}) == "[the `example/1`]()"
     end
 
     test "autolinks special forms" do
-      assert Autolink.locals("`{}/1`", ["{}/1"]) === "[`{}/1`](#%7B%7D/1)"
-      assert Autolink.locals("`<<>>/1`", ["<<>>/1"]) === "[`<<>>/1`](#%3C%3C%3E%3E/1)"
+      assert project_doc("`{}/1`", %{locals: ["{}/1"]}) === "[`{}/1`](#%7B%7D/1)"
+      assert project_doc("`<<>>/1`", %{locals: ["<<>>/1"]}) === "[`<<>>/1`](#%3C%3C%3E%3E/1)"
 
-      assert Autolink.locals("`<<>>/1`", []) ===
+      assert project_doc("`<<>>/1`", %{}) ===
                "[`<<>>/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
 
-      assert Autolink.locals("`<<>>/1`", [], [Kernel]) ===
+      assert project_doc("`<<>>/1`", %{aliases: [Kernel]}) ===
                "[`<<>>/1`](Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
     end
 
     test "autolinks Kernel functions" do
-      assert Autolink.locals("`abs/1`", ["abs/1"]) === "[`abs/1`](#abs/1)"
+      assert project_doc("`abs/1`", %{locals: ["abs/1"]}) === "[`abs/1`](#abs/1)"
 
-      assert Autolink.locals("`abs/1`", []) ===
-               "[`abs/1`](#{@elixir_docs}elixir/Kernel.html#abs/1)"
+      assert project_doc("`abs/1`", %{}) === "[`abs/1`](#{@elixir_docs}elixir/Kernel.html#abs/1)"
 
-      assert Autolink.locals("`!/1`", ["!/1"]) === "[`!/1`](#!/1)"
-      assert Autolink.locals("`!/1`", []) === "[`!/1`](#{@elixir_docs}elixir/Kernel.html#!/1)"
-      assert Autolink.locals("`!/1`", [], [Kernel]) === "[`!/1`](Kernel.html#!/1)"
+      assert project_doc("`!/1`", %{locals: ["!/1"]}) === "[`!/1`](#!/1)"
+      assert project_doc("`!/1`", %{}) === "[`!/1`](#{@elixir_docs}elixir/Kernel.html#!/1)"
+      assert project_doc("`!/1`", %{aliases: [Kernel]}) === "[`!/1`](Kernel.html#!/1)"
     end
   end
 
   describe "elixir functions" do
     test "autolinks Module.fun/arity in docs" do
-      assert Autolink.elixir_functions("`Mod.example/2`", ["Mod.example/2"]) ==
+      assert project_doc("`Mod.example/2`", %{docs_refs: ["Mod.example/2"]}) ==
                "[`Mod.example/2`](Mod.html#example/2)"
 
-      assert Autolink.elixir_functions("`Mod.__ENV__/2`", ["Mod.__ENV__/2"]) ==
+      assert project_doc("`Mod.__ENV__/2`", %{docs_refs: ["Mod.__ENV__/2"]}) ==
                "[`Mod.__ENV__/2`](Mod.html#__ENV__/2)"
 
-      assert Autolink.elixir_functions("`MyModule.example/2`", ["MyModule.example/2"]) ==
+      assert project_doc("`MyModule.example/2`", %{docs_refs: ["MyModule.example/2"]}) ==
                "[`MyModule.example/2`](MyModule.html#example/2)"
 
-      assert Autolink.elixir_functions(
+      assert project_doc(
                "`MyModule.Nested.example/2`",
-               ["MyModule.Nested.example/2"]
+               %{docs_refs: ["MyModule.Nested.example/2"]}
              ) == "[`MyModule.Nested.example/2`](MyModule.Nested.html#example/2)"
 
-      assert Autolink.elixir_functions("`Mod.example/2` then `Mod.example/2`", ["Mod.example/2"]) ==
+      assert project_doc("`Mod.example/2` then `Mod.example/2`", %{docs_refs: ["Mod.example/2"]}) ==
                "[`Mod.example/2`](Mod.html#example/2) then [`Mod.example/2`](Mod.html#example/2)"
 
-      assert Autolink.elixir_functions("`  MyModule.spaces/0  `", ["MyModule.spaces/0"]) ==
+      assert project_doc("`  MyModule.spaces/0  `", %{docs_refs: ["MyModule.spaces/0"]}) ==
                "[`MyModule.spaces/0`](MyModule.html#spaces/0)"
 
-      assert Autolink.elixir_functions(
+      assert project_doc(
                "`ModA.example/1` and `ModB.example/2`",
-               ["ModA.example/1", "ModB.example/2"]
+               %{docs_refs: ["ModA.example/1", "ModB.example/2"]}
              ) ==
                "[`ModA.example/1`](ModA.html#example/1) and [`ModB.example/2`](ModB.html#example/2)"
 
-      assert Autolink.elixir_functions(
+      assert project_doc(
                "`Mod.funny_name\?/1` and `Mod.funny_name!/2`",
-               ["Mod.funny_name\?/1", "Mod.funny_name!/2"]
+               %{docs_refs: ["Mod.funny_name\?/1", "Mod.funny_name!/2"]}
              ) ==
                "[`Mod.funny_name\?/1`](Mod.html#funny_name\?/1) and [`Mod.funny_name!/2`](Mod.html#funny_name!/2)"
     end
 
     test "autolinks functions Module.fun/arity in elixir" do
-      assert Autolink.elixir_functions("`String.upcase/1`", ["Mod.example/2"]) ==
+      assert project_doc("`String.upcase/1`", %{docs_refs: ["Mod.example/2"]}) ==
                "[`String.upcase/1`](#{@elixir_docs}elixir/String.html#upcase/1)"
 
-      assert Autolink.elixir_functions("`Mix.env/0`", ["Mod.example/2"]) ==
+      assert project_doc("`Mix.env/0`", %{docs_refs: ["Mod.example/2"]}) ==
                "[`Mix.env/0`](#{@elixir_docs}mix/Mix.html#env/0)"
     end
 
@@ -132,124 +136,129 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
         {Path.dirname(lib_dir), "http://long/"}
       ]
 
-      assert Autolink.elixir_functions("`CompiledWithDocs.example/2`", [], ".html", lib_dirs) ==
-               "[`CompiledWithDocs.example/2`](http://long/CompiledWithDocs.html#example/2)"
+      assert project_doc("`CompiledWithDocs.example/2`", %{
+               docs_refs: [],
+               extension: ".html",
+               lib_dirs: lib_dirs
+             }) == "[`CompiledWithDocs.example/2`](http://long/CompiledWithDocs.html#example/2)"
     end
 
     test "autolinks special forms" do
-      assert Autolink.elixir_functions("`Mod.++/2`", ["Mod.++/2"]) ===
+      assert project_doc("`Mod.++/2`", %{docs_refs: ["Mod.++/2"]}) ===
                "[`Mod.++/2`](Mod.html#++/2)"
 
-      assert Autolink.elixir_functions("`Mod.!/1`", ["Mod.!/1"]) === "[`Mod.!/1`](Mod.html#!/1)"
+      assert project_doc("`Mod.!/1`", %{docs_refs: ["Mod.!/1"]}) ===
+               "[`Mod.!/1`](Mod.html#!/1)"
 
-      assert Autolink.elixir_functions("`Mod.../2`", ["Mod.../2"]) ===
+      assert project_doc("`Mod.../2`", %{docs_refs: ["Mod.../2"]}) ===
                "[`Mod.../2`](Mod.html#../2)"
 
-      assert Autolink.elixir_functions("`Mod.--/2`", ["Mod.--/2"]) ===
+      assert project_doc("`Mod.--/2`", %{docs_refs: ["Mod.--/2"]}) ===
                "[`Mod.--/2`](Mod.html#--/2)"
 
-      assert Autolink.elixir_functions("`Mod.%/2`", ["Mod.%/2"]) === "[`Mod.%/2`](Mod.html#%25/2)"
+      assert project_doc("`Mod.%/2`", %{docs_refs: ["Mod.%/2"]}) ===
+                "[`Mod.%/2`](Mod.html#%25/2)"
 
-      assert Autolink.elixir_functions("`Mod.<<>>/1`", ["Mod.<<>>/1"]) ===
+      assert project_doc("`Mod.<<>>/1`", %{docs_refs: ["Mod.<<>>/1"]}) ===
                "[`Mod.<<>>/1`](Mod.html#%3C%3C%3E%3E/1)"
     end
 
     test "autolinks callbacks" do
-      assert Autolink.elixir_functions("`c:Mod.++/2`", ["c:Mod.++/2"]) ===
+      assert project_doc("`c:Mod.++/2`", %{docs_refs: ["c:Mod.++/2"]}) ===
                "[`Mod.++/2`](Mod.html#c:++/2)"
     end
 
     test "autolinks types" do
       # use the same approach for elixir_functions as for locals
-      assert Autolink.elixir_functions(
+      assert project_doc(
                "`t:MyModule.my_type/0`",
-               ["t:MyModule.my_type/0"]
+               %{docs_refs: ["t:MyModule.my_type/0"]}
              ) == "[`MyModule.my_type/0`](MyModule.html#t:my_type/0)"
 
-      assert Autolink.elixir_functions(
+      assert project_doc(
                "`t:MyModule.my_type`",
-               ["t:MyModule.my_type/0"]
+               %{docs_refs: ["t:MyModule.my_type/0"]}
              ) == "`t:MyModule.my_type`"
     end
 
     test "does not autolink undefined Mod.functions" do
-      assert Autolink.elixir_functions("`Mod.example/1`", ["Mod.example/2"]) == "`Mod.example/1`"
-      assert Autolink.elixir_functions("`Mod.example/1`", []) == "`Mod.example/1`"
+      assert project_doc("`Mod.example/1`", %{docs_refs: ["Mod.example/2"]}) == "`Mod.example/1`"
+      assert project_doc("`Mod.example/1`", %{}) == "`Mod.example/1`"
     end
 
     test "does not autolink pre-linked Mod.functions" do
-      assert Autolink.elixir_functions("[`Mod.example/1`]()", ["Mod.example/1"]) ==
+      assert project_doc("[`Mod.example/1`]()", %{docs_refs: ["Mod.example/1"]}) ==
                "[`Mod.example/1`]()"
 
-      assert Autolink.elixir_functions("[the `Mod.example/1`]()", ["Mod.example/1"]) ==
+      assert project_doc("[the `Mod.example/1`]()", %{docs_refs: ["Mod.example/1"]}) ==
                "[the `Mod.example/1`]()"
 
-      assert Autolink.elixir_functions("[`Mod.example/1`](foo)", ["Mod.example/1"]) ==
+      assert project_doc("[`Mod.example/1`](foo)", %{docs_refs: ["Mod.example/1"]}) ==
                "[`Mod.example/1`](foo)"
 
-      assert Autolink.elixir_functions("[the `Mod.example/1`](foo)", ["Mod.example/1"]) ==
+      assert project_doc("[the `Mod.example/1`](foo)", %{docs_refs: ["Mod.example/1"]}) ==
                "[the `Mod.example/1`](foo)"
     end
 
     test "supports normal links" do
-      assert Autolink.elixir_functions("`Mod.example/1`", ["Mod.example/1"]) ==
+      assert project_doc("`Mod.example/1`", %{docs_refs: ["Mod.example/1"]}) ==
                "[`Mod.example/1`](Mod.html#example/1)"
 
-      assert Autolink.elixir_functions("(`Mod.example/1`)", ["Mod.example/1"]) ==
+      assert project_doc("(`Mod.example/1`)", %{docs_refs: ["Mod.example/1"]}) ==
                "([`Mod.example/1`](Mod.html#example/1))"
 
       # It ignores links preceded by "]("
-      assert Autolink.elixir_functions("](`Mod.example/1`)", ["Mod.example/1"]) ==
+      assert project_doc("](`Mod.example/1`)", %{docs_refs: ["Mod.example/1"]}) ==
                "](`Mod.example/1`)"
     end
 
     test "supports custom links" do
-      assert Autolink.elixir_functions("[`example`](`Mod.example/1`)", ["Mod.example/1"]) ==
+      assert project_doc("[`example`](`Mod.example/1`)", %{docs_refs: ["Mod.example/1"]}) ==
                "[`example`](Mod.html#example/1)"
 
-      assert Autolink.elixir_functions("[the `example`](`Mod.example/1`)", ["Mod.example/1"]) ==
+      assert project_doc("[the `example`](`Mod.example/1`)", %{docs_refs: ["Mod.example/1"]}) ==
                "[the `example`](Mod.html#example/1)"
 
-      assert Autolink.elixir_functions("[the `Mod.example/1`](`Mod.example/1`)", ["Mod.example/1"]) ==
+      assert project_doc("[the `Mod.example/1`](`Mod.example/1`)", %{docs_refs: ["Mod.example/1"]}) ==
                "[the `Mod.example/1`](Mod.html#example/1)"
 
-      assert Autolink.elixir_functions("[`callback(a)`](`c:Foo.foo/1`)", ["c:Foo.foo/1"]) ==
+      assert project_doc("[`callback(a)`](`c:Foo.foo/1`)", %{docs_refs: ["c:Foo.foo/1"]}) ==
                "[`callback(a)`](Foo.html#c:foo/1)"
 
-      assert Autolink.elixir_functions("[the `upcase`](`String.upcase/1`)", []) ==
+      assert project_doc("[the `upcase`](`String.upcase/1`)", %{docs_refs: []}) ==
                "[the `upcase`](#{@elixir_docs}elixir/String.html#upcase/1)"
 
-      assert Autolink.elixir_functions("[`f`](`Foo.foo/1`), [`f`](`Foo.foo/1`)", ["Foo.foo/1"]) ==
+      assert project_doc("[`f`](`Foo.foo/1`), [`f`](`Foo.foo/1`)", %{docs_refs: ["Foo.foo/1"]}) ==
                "[`f`](Foo.html#foo/1), [`f`](Foo.html#foo/1)"
 
-      assert Autolink.elixir_functions("[`foo`](`Foo.//2`)", ["Foo.//2"]) ==
+      assert project_doc("[`foo`](`Foo.//2`)", %{docs_refs: ["Foo.//2"]}) ==
                "[`foo`](Foo.html#//2)"
 
-      assert Autolink.elixir_functions("[`for`](`Kernel.SpecialForms.for/1`)", []) ==
+      assert project_doc("[`for`](`Kernel.SpecialForms.for/1`)", %{docs_refs: []}) ==
                "[`for`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#for/1)"
 
-      assert Autolink.elixir_functions("[`for`](`for/1`)", []) ==
+      assert project_doc("[`for`](`for/1`)", %{docs_refs: []}) ==
                "[`for`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#for/1)"
 
-      assert Autolink.elixir_functions("[`is_boolean`](`Kernel.is_boolean/1`)", []) ==
+      assert project_doc("[`is_boolean`](`Kernel.is_boolean/1`)", %{docs_refs: []}) ==
                "[`is_boolean`](#{@elixir_docs}elixir/Kernel.html#is_boolean/1)"
 
-      assert Autolink.elixir_functions("[`is_boolean`](`is_boolean/1`)", []) ==
+      assert project_doc("[`is_boolean`](`is_boolean/1`)", %{docs_refs: []}) ==
                "[`is_boolean`](#{@elixir_docs}elixir/Kernel.html#is_boolean/1)"
 
-      assert Autolink.elixir_functions("[term()](`t:term/0`)", []) ==
+      assert project_doc("[term()](`t:term/0`)", %{docs_refs: []}) ==
                "[term()](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
 
-      assert Autolink.elixir_functions("[term\(\)](`t:term/0`)", []) ==
+      assert project_doc("[term\(\)](`t:term/0`)", %{docs_refs: []}) ==
                "[term\(\)](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
 
-      assert Autolink.elixir_functions("[`term()`](`t:term/0`)", []) ==
+      assert project_doc("[`term()`](`t:term/0`)", %{docs_refs: []}) ==
                "[`term()`](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
 
-      assert Autolink.elixir_functions("[`term()`](`t:term/0`)", []) ==
+      assert project_doc("[`term()`](`t:term/0`)", %{docs_refs: []}) ==
                "[`term()`](#{@elixir_docs}elixir/typespecs.html#built-in-types)"
 
-      assert Autolink.elixir_functions("[version](`t:Version.version/0`)", ["t:Version.version/0"]) ==
+      assert project_doc("[version](`t:Version.version/0`)", %{docs_refs: ["t:Version.version/0"]}) ==
                "[version](Version.html#t:version/0)"
 
       assert Autolink.link_everything(
@@ -265,61 +274,67 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   describe "elixir modules" do
     test "autolinks modules in docs" do
-      assert Autolink.elixir_modules("`MyModule`", ["MyModule"], "MyModule") ==
+      assert Autolink.project_doc("`MyModule`", %{docs_refs: ["MyModule"], module_id: "MyModule"}) ==
                "[`MyModule`](MyModule.html#content)"
 
-      assert Autolink.elixir_modules("`MyModule.Nested`", ["MyModule.Nested"], "MyModule.Nested") ==
-               "[`MyModule.Nested`](MyModule.Nested.html#content)"
+      assert Autolink.project_doc("`MyModule.Nested`", %{
+               docs_refs: ["MyModule.Nested"],
+               module_id: "MyModule.Nested"
+             }) == "[`MyModule.Nested`](MyModule.Nested.html#content)"
 
-      assert Autolink.elixir_modules(
-               "`MyModule.Nested.Deep`",
-               ["MyModule.Nested.Deep"],
-               "MyModule.Nested.Deep"
-             ) == "[`MyModule.Nested.Deep`](MyModule.Nested.Deep.html#content)"
+      assert Autolink.project_doc("`MyModule.Nested.Deep`", %{
+               docs_refs: ["MyModule.Nested.Deep"],
+               module_id: "MyModule.Nested.Deep"
+             }) == "[`MyModule.Nested.Deep`](MyModule.Nested.Deep.html#content)"
 
-      assert Autolink.elixir_modules(
-               "```\nThis is a test.\n```\n\nSee `MyModule`.",
-               ["MyModule"],
-               "MyModule"
-             ) == "```\nThis is a test.\n```\n\nSee [`MyModule`](MyModule.html#content)."
+      assert Autolink.project_doc("```\nThis is a test.\n```\n\nSee `MyModule`.", %{
+               docs_refs: ["MyModule"],
+               module_id: "MyModule"
+             }) == "```\nThis is a test.\n```\n\nSee [`MyModule`](MyModule.html#content)."
     end
 
     test "autolinks modules in elixir" do
-      assert Autolink.elixir_modules("`String`", ["MyModule"], "MyModule") ==
+      assert Autolink.project_doc("`String`", %{docs_refs: ["MyModule"], module_id: "MyModule"}) ==
                "[`String`](#{@elixir_docs}elixir/String.html)"
 
-      assert Autolink.elixir_modules("`Mix`", ["MyModule"], "MyModule") ==
+      assert Autolink.project_doc("`Mix`", %{docs_refs: ["MyModule"], module_id: "MyModule"}) ==
                "[`Mix`](#{@elixir_docs}mix/Mix.html)"
     end
 
     test "autolinks dependencies modules" do
       lib_dirs = [{Application.app_dir(:earmark), "#{@elixir_docs}earmark/"}]
 
-      assert Autolink.elixir_modules("`Earmark`", ["MyModule"], "MyModule", ".html", lib_dirs) ==
-               "[`Earmark`](#{@elixir_docs}earmark/Earmark.html)"
+      assert Autolink.project_doc("`Earmark`", %{
+               docs_refs: ["MyModule"],
+               module_id: "MyModule",
+               extension: ".html",
+               lib_dirs: lib_dirs
+             }) == "[`Earmark`](#{@elixir_docs}earmark/Earmark.html)"
     end
 
     test "does not autolink undefined modules" do
-      assert Autolink.elixir_modules("`MyModule`", []) == "`MyModule`"
-      assert Autolink.elixir_modules("`MyModule`", ["DiffModule"]) == "`MyModule`"
+      assert Autolink.project_doc("`MyModule`", %{docs_refs: []}) == "`MyModule`"
+      assert Autolink.project_doc("`MyModule`", %{docs_refs: ["DiffModule"]}) == "`MyModule`"
 
-      assert Autolink.elixir_modules("`MyModule.Nested`", ["MyModule.DiffNested"]) ==
+      assert Autolink.project_doc("`MyModule.Nested`", %{docs_refs: ["MyModule.DiffNested"]}) ==
                "`MyModule.Nested`"
     end
 
     test "does not autolink pre-linked modules" do
-      assert Autolink.elixir_modules("[`Mod`](other.html)", ["Mod"]) == "[`Mod`](other.html)"
+      assert Autolink.project_doc("[`Mod`](other.html)", %{docs_refs: ["Mod"]}) ==
+               "[`Mod`](other.html)"
 
-      assert Autolink.elixir_modules("[the `Mod`](other.html)", ["Mod"]) ==
+      assert Autolink.project_doc("[the `Mod`](other.html)", %{docs_refs: ["Mod"]}) ==
                "[the `Mod`](other.html)"
 
-      assert Autolink.elixir_modules("[the `Mod.Nested`](other.html)", ["Mod.Nested"]) ==
+      assert Autolink.project_doc("[the `Mod.Nested`](other.html)", %{docs_refs: ["Mod.Nested"]}) ==
                "[the `Mod.Nested`](other.html)"
 
-      assert Autolink.elixir_modules("[in the `Kernel` module](Kernel.html#guards)", ["Kernel"]) ==
-               "[in the `Kernel` module](Kernel.html#guards)"
+      assert Autolink.project_doc("[in the `Kernel` module](Kernel.html#guards)", %{
+               docs_refs: ["Kernel"]
+             }) == "[in the `Kernel` module](Kernel.html#guards)"
 
-      assert Autolink.elixir_modules("[in the `Kernel` module](Kernel.html#guards)", []) ==
+      assert Autolink.project_doc("[in the `Kernel` module](Kernel.html#guards)", %{docs_refs: []}) ==
                "[in the `Kernel` module](Kernel.html#guards)"
 
       assert Autolink.link_everything("[in the `Kernel` module](Kernel.html#guards)") ==
@@ -329,83 +344,79 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   describe "Erlang modules" do
     test "autolinks to Erlang modules" do
-      assert Autolink.erlang_modules("`:erlang`") == "[`:erlang`](#{@erlang_docs}erlang.html)"
+      assert Autolink.project_doc("`:erlang`", %{}) == "[`:erlang`](#{@erlang_docs}erlang.html)"
 
-      assert Autolink.erlang_modules("`:erl_prim_loader`") ==
+      assert Autolink.project_doc("`:erl_prim_loader`", %{}) ==
                "[`:erl_prim_loader`](#{@erlang_docs}erl_prim_loader.html)"
     end
 
     test "autolinks to Erlang modules with custom links" do
-      assert Autolink.erlang_modules("[`example`](`:lists`)") ==
+      assert Autolink.project_doc("[`example`](`:lists`)", %{}) ==
                "[`example`](#{@erlang_docs}lists.html)"
 
-      assert Autolink.erlang_modules("[example](`:lists`)") ==
+      assert Autolink.project_doc("[example](`:lists`)", %{}) ==
                "[example](#{@erlang_docs}lists.html)"
     end
 
     test "does not autolink pre-linked docs" do
-      assert Autolink.erlang_modules("[`:erlang`](other.html)") == "[`:erlang`](other.html)"
+      assert Autolink.project_doc("[`:erlang`](other.html)", %{}) == "[`:erlang`](other.html)"
 
-      assert Autolink.erlang_modules("[the `:erlang` module](other.html)") ==
+      assert Autolink.project_doc("[the `:erlang` module](other.html)", %{}) ==
                "[the `:erlang` module](other.html)"
-
-      assert Autolink.erlang_modules("`:erlang`") == "[`:erlang`](#{@erlang_docs}erlang.html)"
     end
 
     test "does not autolink functions that aren't part of the Erlang distribution" do
-      assert Autolink.erlang_modules("`:unknown.foo/0`") == "`:unknown.foo/0`"
+      assert Autolink.project_doc("`:unknown.foo/0`", %{}) == "`:unknown.foo/0`"
     end
   end
 
   describe "erlang functions" do
     test "autolinks to erlang functions" do
-      assert Autolink.erlang_functions("`:erlang.apply/2`") ==
+      assert Autolink.project_doc("`:erlang.apply/2`", %{}) ==
                "[`:erlang.apply/2`](#{@erlang_docs}erlang.html#apply-2)"
 
-      assert Autolink.erlang_functions("`:erlang.adler32/2`") ==
+      assert Autolink.project_doc("`:erlang.adler32/2`", %{}) ==
                "[`:erlang.adler32/2`](#{@erlang_docs}erlang.html#adler32-2)"
 
-      assert Autolink.erlang_functions("`:erlang.apply/2` `:erlang.apply/3`") ==
+      assert Autolink.project_doc("`:erlang.apply/2` `:erlang.apply/3`", %{}) ==
                "[`:erlang.apply/2`](#{@erlang_docs}erlang.html#apply-2) [`:erlang.apply/3`](#{
                  @erlang_docs
                }erlang.html#apply-3)"
 
-      assert Autolink.erlang_functions("`:erl_prim_loader.get_file/1`") ==
+      assert Autolink.project_doc("`:erl_prim_loader.get_file/1`", %{}) ==
                "[`:erl_prim_loader.get_file/1`](#{@erlang_docs}erl_prim_loader.html#get_file-1)"
 
-      assert Autolink.erlang_functions("`:zlib.deflateInit/2`") ==
+      assert Autolink.project_doc("`:zlib.deflateInit/2`", %{}) ==
                "[`:zlib.deflateInit/2`](#{@erlang_docs}zlib.html#deflateInit-2)"
     end
 
     test "autolinks to Erlang functions with custom links" do
-      assert Autolink.erlang_functions("[`example`](`:lists.reverse/1`)") ==
+      assert Autolink.project_doc("[`example`](`:lists.reverse/1`)", %{}) ==
                "[`example`](#{@erlang_docs}lists.html#reverse-1)"
 
-      assert Autolink.erlang_functions("[example](`:lists.reverse/1`)") ==
+      assert Autolink.project_doc("[example](`:lists.reverse/1`)", %{}) ==
                "[example](#{@erlang_docs}lists.html#reverse-1)"
     end
 
     test "does not autolink pre-linked docs" do
-      assert Autolink.erlang_functions("[`:erlang.apply/2`](other.html)") ==
+      assert Autolink.project_doc("[`:erlang.apply/2`](other.html)", %{}) ==
                "[`:erlang.apply/2`](other.html)"
 
-      assert Autolink.erlang_functions("[the `:erlang.apply/2`](other.html)") ==
+      assert Autolink.project_doc("[the `:erlang.apply/2`](other.html)", %{}) ==
                "[the `:erlang.apply/2`](other.html)"
 
-      assert Autolink.erlang_functions("[the `:erlang.apply/2` function](`Kernel.apply/2`)") ==
-               "[the `:erlang.apply/2` function](`Kernel.apply/2`)"
+      assert Autolink.project_doc("[the `:erlang.apply/2` function](`Kernel.apply/2`)", %{}) ==
+               "[the `:erlang.apply/2` function](#{@elixir_docs}elixir/Kernel.html#apply/2)"
 
-      assert Autolink.erlang_functions("[the :erlang.apply/2 function](`Kernel.apply/2`)") ==
-               "[the :erlang.apply/2 function](`Kernel.apply/2`)"
+      assert Autolink.project_doc("[the :erlang.apply/2 function](`Kernel.apply/2`)", %{}) ==
+               "[the :erlang.apply/2 function](#{@elixir_docs}elixir/Kernel.html#apply/2)"
 
-      assert Autolink.erlang_functions("[the `:erlang.apply/2` function](other.html)") ==
+      assert Autolink.project_doc("[the `:erlang.apply/2` function](other.html)", %{}) ==
                "[the `:erlang.apply/2` function](other.html)"
-
-      assert Autolink.erlang_functions("`:erlang`") == "`:erlang`"
     end
 
     test "does not autolink for functions that aren't part of the erlang distribution" do
-      assert Autolink.erlang_functions("`:unknown.foo/0`") == "`:unknown.foo/0`"
+      assert Autolink.project_doc("`:unknown.foo/0`", %{}) == "`:unknown.foo/0`"
     end
   end
 
@@ -566,9 +577,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   describe "corner-cases" do
     test "accepts functions around () and []" do
-      assert Autolink.locals("`===/2`", [], [Kernel]) === "[`===/2`](Kernel.html#===/2)"
-      assert Autolink.locals("(`===/2`)", [], [Kernel]) === "([`===/2`](Kernel.html#===/2))"
-      assert Autolink.locals("[`===/2`]", [], [Kernel]) === "[[`===/2`](Kernel.html#===/2)]"
+      assert project_doc("`===/2`", %{aliases: [Kernel]}) === "[`===/2`](Kernel.html#===/2)"
+      assert project_doc("(`===/2`)", %{aliases: [Kernel]}) === "([`===/2`](Kernel.html#===/2))"
+      assert project_doc("[`===/2`]", %{aliases: [Kernel]}) === "[[`===/2`](Kernel.html#===/2)]"
 
       output = Autolink.link_everything("`===/2`")
       assert output === "[`===/2`](#{@elixir_docs}elixir/Kernel.html#===/2)"
@@ -576,6 +587,8 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert Autolink.link_everything("[`===/2`]") === "[" <> output <> "]"
     end
   end
+
+  ##  Helpers
 
   defp assert_typespec_placeholders(original, expected, typespecs, aliases \\ []) do
     ast = Code.string_to_quoted!(original)
