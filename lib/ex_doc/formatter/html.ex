@@ -22,14 +22,10 @@ defmodule ExDoc.Formatter.HTML do
     autolink = Autolink.compile(project_nodes, ".html", config.deps)
     linked = Autolink.all(project_nodes, autolink)
 
-    build_nodes_list = fn type ->
-      type |> filter_list(linked) |> collapse_context_modules(config)
-    end
-
     nodes_map = %{
-      modules: build_nodes_list.(:module),
-      exceptions: build_nodes_list.(:exception),
-      tasks: build_nodes_list.(:task)
+      modules: filter_list(:module, linked),
+      exceptions: filter_list(:exception, linked),
+      tasks: filter_list(:task, linked)
     }
 
     extras =
@@ -45,9 +41,13 @@ defmodule ExDoc.Formatter.HTML do
     assets_dir = "assets"
     static_files = generate_assets(config, assets_dir, default_assets(config))
 
+    sidebar_files =
+      nodes_map
+      |> Enum.into(%{}, fn {k, v} -> {k, collapse_context_modules(v, config)} end)
+      |> generate_sidebar_items(extras, config)
+
     generated_files =
-      generate_sidebar_items(nodes_map, extras, config) ++
-        generate_extras(nodes_map, extras, config) ++
+      generate_extras(nodes_map, extras, config) ++
         generate_logo(assets_dir, config) ++
         generate_search(nodes_map, config) ++
         generate_not_found(nodes_map, config) ++
@@ -55,7 +55,7 @@ defmodule ExDoc.Formatter.HTML do
         generate_list(nodes_map.exceptions, nodes_map, config) ++
         generate_list(nodes_map.tasks, nodes_map, config) ++ generate_index(config)
 
-    generate_build(static_files ++ generated_files, build)
+    generate_build(static_files ++ sidebar_files ++ generated_files, build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
   end
 
@@ -152,10 +152,7 @@ defmodule ExDoc.Formatter.HTML do
     |> Enum.join(".")
   end
 
-  defp maybe_insert_collapse_context_node(
-         %ModuleNode{group: module_group} = n,
-         %{context_group: context_group} = acc
-       )
+  defp maybe_insert_collapse_context_node(%ModuleNode{group: module_group} = n, %{context_group: context_group} = acc)
        when context_group != module_group do
     acc = %{acc | context_group: module_group, context_modules: []}
     maybe_insert_collapse_context_node(n, acc)
@@ -181,25 +178,20 @@ defmodule ExDoc.Formatter.HTML do
     if Enum.member?(acc.context_modules, context_module_atom) do
       acc
     else
-      # There is a module with a collapsed module name (e.g. F.B.MyModule), but no other module
-      # in this group provides context for the collapsed name. We therefore insert a fake module
-      # (e.g. Foo.Bar) so that the sidebar will be able to display relevant context for the
-      # collapsed module names.
-
-      title_prefix =
-        case collapsed_prefix_and_title(context_module_name, acc.prefixes_to_collapse) do
-          {nil, nil} -> context_module_name
-          {prefix, collapsed} -> prefix <> collapsed
-        end
+      # There is a module with a collapsed module name (e.g. Foo.Bar.MyModule -> MyModule),
+      # but no other module in this group provides context for the collapsed name. We
+      # therefore insert a fake module (e.g. Foo.Bar) so that the sidebar will be able to
+      # display relevant context for the collapsed module names.
 
       context_node = %ModuleNode{
         id: context_module_name,
+        context_module: true,
         group: module_node.group,
         module: context_module_atom,
         title: context_module_name,
-        title_prefix: title_prefix,
         type: module_node.type
       }
+      context_node = maybe_collapse_node_title(context_node, acc.prefixes_to_collapse)
 
       acc = %{acc | context_modules: acc.context_modules}
       maybe_insert_collapse_context_node(context_node, acc)

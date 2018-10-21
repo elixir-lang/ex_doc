@@ -210,6 +210,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
         items -> json_attrs <> ~s/,"nodeGroups":[#{items}]/
       end
 
+    json_attrs =
+      if module_node.context_module do
+        json_attrs <> ~s/,"context_module":true/
+      else
+        json_attrs
+      end
+
     "{#{json_attrs}}"
   end
 

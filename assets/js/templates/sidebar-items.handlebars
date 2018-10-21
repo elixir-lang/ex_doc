@@ -5,54 +5,60 @@
     {{/newGroup}}
     <li class="{{#isLocal node.id}}clicked open{{/isLocal}}">
 
-    {{#isContextNode node}}
-      <span title="{{node.title}}" class="context" aria-hidden="true">{{node.title_prefix}}</span>
-    {{else}}
-      {{! When visiting a module page, the link to this module page
-      in the menu should not link to a new page, instead should link
-      to the top of the page itself. }}
-      <a href="{{node.id}}.html" title="{{node.title}}" {{#hasContent node}}class="expand"{{/hasContent}}>
-        {{#if node.title_prefix}}
-          <span class="prefix">{{node.title_prefix}}</span>{{node.title_collapsed}}
-        {{else}}
-          {{node.title}}
-        {{/if}}
-      </a>
+      {{#if node.context_module}}
+        <span title="{{node.title}}" class="context" aria-hidden="true">
+          {{#if node.title_collapsed}}
+            <span class="prefix"></span>{{node.title_collapsed}}
+          {{else}}
+            {{node.title}}
+          {{/if}}
+        </span>
+      {{else}}
+        {{! When visiting a module page, the link to this module page
+        in the menu should not link to a new page, instead should link
+        to the top of the page itself. }}
+        <a href="{{node.id}}.html" title="{{node.title}}" {{#hasContent node}}class="expand"{{/hasContent}}>
+          {{#if node.title_prefix}}
+            <span class="prefix"></span>{{node.title_collapsed}}
+          {{else}}
+            {{node.title}}
+          {{/if}}
+        </a>
 
-      {{#hasContent node}}
-        <ul>
-          <li>
-            <a href="{{node.id}}.html#content">Top</a>
-          </li>
+        {{#hasContent node}}
+          <ul>
+            <li>
+              <a href="{{node.id}}.html#content">Top</a>
+            </li>
 
-            {{#isArray node.headers}}
-              {{#each node.headers}}
-                <li>
-                  <a href="{{node.id}}.html#{{{anchor}}}">{{id}}</a>
-                </li>
-              {{/each}}
-            {{else}}
-              {{#showSummary node}}
-                <li>
-                  <a href="{{node.id}}.html#summary">Summary</a>
-                </li>
-              {{/showSummary}}
-              {{#each node.nodeGroups as |group|}}
-                <li class="docs">
-                  <a href="{{node.id}}.html#{{group.key}}" class="expand">{{group.name}}</a>
-                  <ul class="{{group.key}}-list deflist">
-                    {{#each group.nodes}}
-                      <li>
-                        <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
-                      </li>
-                    {{/each}}
-                  </ul>
-                </li>
-              {{/each}}
-            {{/isArray}}
-          </ul>
-        {{/hasContent}}
-      {{/isContextNode}}
+              {{#isArray node.headers}}
+                {{#each node.headers}}
+                  <li>
+                    <a href="{{node.id}}.html#{{{anchor}}}">{{id}}</a>
+                  </li>
+                {{/each}}
+              {{else}}
+                {{#showSummary node}}
+                  <li>
+                    <a href="{{node.id}}.html#summary">Summary</a>
+                  </li>
+                {{/showSummary}}
+                {{#each node.nodeGroups as |group|}}
+                  <li class="docs">
+                    <a href="{{node.id}}.html#{{group.key}}" class="expand">{{group.name}}</a>
+                    <ul class="{{group.key}}-list deflist">
+                      {{#each group.nodes}}
+                        <li>
+                          <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
+                        </li>
+                      {{/each}}
+                    </ul>
+                  </li>
+                {{/each}}
+              {{/isArray}}
+            </ul>
+          {{/hasContent}}
+      {{/if}}
     </li>
   {{/each}}
 </ul>

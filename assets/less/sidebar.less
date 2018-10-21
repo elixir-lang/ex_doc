@@ -208,8 +208,17 @@
         display: block;
       }
 
-      .context, .prefix {
-        opacity: 0.4;
+      .context {
+        opacity: 0.5;
+      }
+
+      .prefix {
+        opacity: 0.3;
+        padding-right: 2px;
+
+        &::before {
+          content: "⤷";
+        }
       }
     }
 
