@@ -102,6 +102,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     }
   end
 
+  @regexes (for link_type <- [:custom, :normal],
+                language <- [:elixir, :erlang],
+                kind <- [:module, :function] do
+              {kind, language, link_type}
+            end)
+
   @doc """
   Autolinks any documentation in the project.
 
@@ -114,7 +120,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       |> Map.put_new(:module_id, nil)
       |> Map.put_new(:locals, [])
 
-    link_everything(string, config)
+    string = preprocess(string)
+
+    string =
+      Enum.reduce(@regexes, string, fn {kind, language, link_type}, acc ->
+        link(acc, language, kind, link_type, config)
+      end)
+
+    postprocess(string)
   end
 
   @doc """
@@ -305,115 +318,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> IO.iodata_to_binary()
   end
 
-  @kinds [:module, :function]
-  @languages [:elixir, :erlang]
-  @link_types [:custom, :normal]
-
-  @regexes (for link_type <- @link_types,
-                language <- @languages,
-                kind <- @kinds do
-              {kind, language, link_type}
-            end)
-
-  @doc """
-  Helper function for autolinking locals.
-
-  Create links to locally defined functions, specified in `locals`
-  as a list of `fun/arity` strings.
-
-  Ignores functions which are already wrapped in markdown url syntax,
-  e.g. `[test/1](url)`. If the function doesn't touch the leading
-  or trailing `]`, e.g. `[my link link/1 is here](url)`, the fun/arity
-  will get translated to the new href of the function.
-  """
-  def locals(string, locals, aliases \\ [], extension \\ ".html", lib_dirs \\ elixir_lib_dirs()) do
-    options = %{
-      locals: locals,
-      aliases: aliases,
-      extension: extension,
-      lib_dirs: lib_dirs
-    }
-
-    link(string, :elixir, :function, options)
-  end
-
-  @doc """
-  Helper function for autolinking elixir modules.
-
-  Ignores modules which are already wrapped in markdown url syntax,
-  e.g. `[Module](url)`. If the module name doesn't touch the leading
-  or trailing `]`, e.g. `[my link Module is here](url)`, the Module
-  will get translated to the new href of the module.
-  """
-  def elixir_modules(
-        string,
-        module_refs,
-        module_id \\ nil,
-        extension \\ ".html",
-        lib_dirs \\ elixir_lib_dirs()
-      )
-      when is_binary(string) do
-    options = %{
-      module_refs: module_refs,
-      module_id: module_id,
-      extension: extension,
-      lib_dirs: lib_dirs
-    }
-
-    link(string, :elixir, :module, options)
-  end
-
-  @doc """
-  Helper function for autolinking elixir functions.
-
-  Project functions are specified in `project_funs` as a list of
-  `Module.fun/arity` tuples.
-
-  Functions wrapped in markdown url syntax can link to other docs if
-  the url is wrapped in backticks, otherwise the url is used as is.
-  If the function doesn't touch the leading or trailing `]`, e.g.
-  `[my link Module.link/1 is here](url)`, the Module.fun/arity
-  will get translated to the new href of the function.
-  """
-  def elixir_functions(string, docs_refs, extension \\ ".html", lib_dirs \\ elixir_lib_dirs())
-      when is_binary(string) do
-    options = %{
-      docs_refs: docs_refs,
-      extension: extension,
-      lib_dirs: lib_dirs
-    }
-
-    link(string, :elixir, :function, options)
-  end
-
-  @doc """
-  Helper function for autolinking erlang modules.
-
-  Ignores modules which are already wrapped in markdown url syntax,
-  e.g. `[Module](url)`. If the module name doesn't touch the leading
-  or trailing `]`, e.g. `[my link Module is here](url)`, the Module
-  will get translated to the new href of the module.
-  """
-  def erlang_modules(string) when is_binary(string) do
-    link(string, :erlang, :module, %{})
-  end
-
-  @doc """
-  Helper function for autolinking erlang functions.
-
-  Only links modules that are in the Erlang distribution `lib_dir`
-  and only link functions in those modules that export a function of the
-  same name and arity.
-
-  Ignores functions which are already wrapped in markdown url syntax,
-  e.g. `[:module.test/1](url)`. If the function doesn't touch the leading
-  or trailing `]`, e.g. `[my link :module.link/1 is here](url)`, the :module.fun/arity
-  will get translated to the new href of the function.
-  """
-  def erlang_functions(string) when is_binary(string) do
-    link(string, :erlang, :function, %{})
-  end
-
   # Helper function for autolinking functions and modules.
   #
   # It autolinks all links for a certain `language` and of a certain `kind`.
@@ -434,51 +338,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   # Internal options:
   # - `:preprocess?` - `true` or `false`. Do preprocessing and postprocessing, such as replacing backticks
   #                     with a token
-  defp link(string, language, kind, options) when is_map(options) do
-    options = Map.put_new(options, :preprocess?, true)
-
-    string
-    |> link_process(:preprocess, options.preprocess?)
-    |> link(language, kind, :custom, options)
-    |> link(language, kind, :normal, options)
-    |> link_process(:postprocess, options.preprocess?)
-  end
-
   defp link(string, language, kind, link_type, options) when is_map(options) do
     regex = re_kind_language_link_type(kind, language, link_type)
     replace_fun = replace_fun(kind, language, link_type, options)
-
-    result = link_process(string, :preprocess, options.preprocess?)
-    result = Regex.replace(regex, result, replace_fun)
-    result = link_process(result, :postprocess, options.preprocess?)
-
-    result
+    Regex.replace(regex, string, replace_fun)
   end
-
-  @doc false
-  def link_everything(string, options \\ %{}) when is_map(options) do
-    # disable preprocess every time we run link/4,
-    # and transform the string manually before and after Enum.reduce
-    options = Map.put_new(options, :preprocess?, false)
-
-    string = preprocess(string)
-
-    string =
-      Enum.reduce(@regexes, string, fn {kind, language, link_type}, acc ->
-        link(acc, language, kind, link_type, options)
-      end)
-
-    postprocess(string)
-  end
-
-  defp link_process(string, _, false),
-    do: string
-
-  defp link_process(string, :preprocess, true),
-    do: preprocess(string)
-
-  defp link_process(string, :postprocess, true),
-    do: postprocess(string)
 
   defp preprocess(string) do
     regex = ~r{
