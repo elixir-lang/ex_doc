@@ -107,22 +107,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   This is the main API to autolink any project documentation.
   """
-  def project_doc(bin, compiled) when is_binary(bin) do
-    project_doc(bin, nil, [], compiled)
-  end
+  def project_doc(nil, _compiled), do: nil
+  def project_doc(string, compiled) when is_binary(string) and is_map(compiled) do
+    config =
+      compiled
+      |> Map.put_new(:module_id, nil)
+      |> Map.put_new(:locals, [])
 
-  defp project_doc(nil, _module_id, _locals, _compiled) do
-    nil
-  end
-
-  defp project_doc(bin, module_id, locals, compiled) when is_binary(bin) do
-    options =
-      Map.merge(compiled, %{
-        module_id: module_id,
-        locals: locals
-      })
-
-    link_everything(bin, options)
+    link_everything(string, config)
   end
 
   @doc """
@@ -146,19 +138,23 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           do: prefix <> entry
 
     types = Enum.map(module.typespecs, &("t:" <> &1.id))
-    locals = funs ++ types
 
-    moduledoc = project_doc(module.doc, module.id, locals, compiled)
+    compiled =
+      compiled
+      |> Map.put(:module_id, module.id)
+      |> Map.put(:locals, funs ++ types)
+
+    moduledoc = project_doc(module.doc, compiled)
 
     docs =
       for module_node <- module.docs do
-        doc = project_doc(module_node.doc, module.id, locals, compiled)
+        doc = project_doc(module_node.doc, compiled)
         %{module_node | doc: doc}
       end
 
     typedocs =
       for module_node <- module.typespecs do
-        doc = project_doc(module_node.doc, module.id, locals, compiled)
+        doc = project_doc(module_node.doc, compiled)
         %{module_node | doc: doc}
       end
 
