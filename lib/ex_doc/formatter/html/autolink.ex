@@ -114,6 +114,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   This is the main API to autolink any project documentation.
   """
   def project_doc(nil, _compiled), do: nil
+
   def project_doc(string, compiled) when is_binary(string) and is_map(compiled) do
     config =
       compiled

@@ -147,8 +147,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert project_doc("`Mod.++/2`", %{docs_refs: ["Mod.++/2"]}) ===
                "[`Mod.++/2`](Mod.html#++/2)"
 
-      assert project_doc("`Mod.!/1`", %{docs_refs: ["Mod.!/1"]}) ===
-               "[`Mod.!/1`](Mod.html#!/1)"
+      assert project_doc("`Mod.!/1`", %{docs_refs: ["Mod.!/1"]}) === "[`Mod.!/1`](Mod.html#!/1)"
 
       assert project_doc("`Mod.../2`", %{docs_refs: ["Mod.../2"]}) ===
                "[`Mod.../2`](Mod.html#../2)"
@@ -156,8 +155,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert project_doc("`Mod.--/2`", %{docs_refs: ["Mod.--/2"]}) ===
                "[`Mod.--/2`](Mod.html#--/2)"
 
-      assert project_doc("`Mod.%/2`", %{docs_refs: ["Mod.%/2"]}) ===
-                "[`Mod.%/2`](Mod.html#%25/2)"
+      assert project_doc("`Mod.%/2`", %{docs_refs: ["Mod.%/2"]}) === "[`Mod.%/2`](Mod.html#%25/2)"
 
       assert project_doc("`Mod.<<>>/1`", %{docs_refs: ["Mod.<<>>/1"]}) ===
                "[`Mod.<<>>/1`](Mod.html#%3C%3C%3E%3E/1)"
@@ -312,8 +310,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "does not autolink pre-linked modules" do
-      assert project_doc("[`Mod`](other.html)", %{docs_refs: ["Mod"]}) ==
-               "[`Mod`](other.html)"
+      assert project_doc("[`Mod`](other.html)", %{docs_refs: ["Mod"]}) == "[`Mod`](other.html)"
 
       assert project_doc("[the `Mod`](other.html)", %{docs_refs: ["Mod"]}) ==
                "[the `Mod`](other.html)"
@@ -339,11 +336,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "autolinks to Erlang modules with custom links" do
-      assert project_doc("[`example`](`:lists`)", %{}) ==
-               "[`example`](#{@erlang_docs}lists.html)"
+      assert project_doc("[`example`](`:lists`)", %{}) == "[`example`](#{@erlang_docs}lists.html)"
 
-      assert project_doc("[example](`:lists`)", %{}) ==
-               "[example](#{@erlang_docs}lists.html)"
+      assert project_doc("[example](`:lists`)", %{}) == "[example](#{@erlang_docs}lists.html)"
     end
 
     test "does not autolink pre-linked docs" do
