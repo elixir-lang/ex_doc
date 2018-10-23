@@ -21,6 +21,7 @@ import hasContent from './template-helpers/hasContent'
 import isArray from './template-helpers/isArray'
 import isLocal from './template-helpers/isLocal'
 import newGroup from './template-helpers/newGroup'
+import nestingContextChanged from './template-helpers/nestingContextChanged'
 import showSummary from './template-helpers/showSummary'
 
 import {initialize as initEvents} from './events'
@@ -36,6 +37,7 @@ $(() => {
   Handlebars.registerHelper('isArray', isArray)
   Handlebars.registerHelper('isLocal', isLocal)
   Handlebars.registerHelper('newGroup', newGroup)
+  Handlebars.registerHelper('nestingContextChanged', nestingContextChanged)
   Handlebars.registerHelper('showSummary', showSummary)
 
   // Set up Highlight.js

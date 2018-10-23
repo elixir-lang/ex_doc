@@ -197,7 +197,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp sidebar_items_json_string(module_node, items) do
     json_attrs =
-      [:id, :title, :nested_title]
+      [:id, :title, :nested_title, :nested_context]
       |> Enum.map(&{&1, Map.get(module_node, &1)})
       |> Enum.reject(fn {_k, v} -> is_nil(v) end)
       |> Enum.map_join(",", fn {k, v} -> ~s/"#{k}":#{inspect(v)}/ end)

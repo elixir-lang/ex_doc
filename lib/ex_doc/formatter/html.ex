@@ -20,7 +20,11 @@ defmodule ExDoc.Formatter.HTML do
     output_setup(build, config)
 
     autolink = Autolink.compile(project_nodes, ".html", config.deps)
-    linked = Autolink.all(project_nodes, autolink)
+
+    linked =
+      project_nodes
+      |> Autolink.all(autolink)
+      |> add_nesting_info(config.group_modules_by_nesting)
 
     nodes_map = %{
       modules: filter_list(:module, linked),
@@ -41,13 +45,9 @@ defmodule ExDoc.Formatter.HTML do
     assets_dir = "assets"
     static_files = generate_assets(config, assets_dir, default_assets(config))
 
-    sidebar_files =
-      nodes_map
-      |> Enum.into(%{}, fn {k, v} -> {k, group_by_nesting(v, config)} end)
-      |> generate_sidebar_items(extras, config)
-
     generated_files =
-      generate_extras(nodes_map, extras, config) ++
+      generate_sidebar_items(nodes_map, extras, config) ++
+        generate_extras(nodes_map, extras, config) ++
         generate_logo(assets_dir, config) ++
         generate_search(nodes_map, config) ++
         generate_not_found(nodes_map, config) ++
@@ -55,7 +55,7 @@ defmodule ExDoc.Formatter.HTML do
         generate_list(nodes_map.exceptions, nodes_map, config) ++
         generate_list(nodes_map.tasks, nodes_map, config) ++ generate_index(config)
 
-    generate_build(static_files ++ sidebar_files ++ generated_files, build)
+    generate_build(static_files ++ generated_files, build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
   end
 
@@ -83,111 +83,33 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  defp group_by_nesting([], _), do: []
+  defp add_nesting_info([], _), do: []
 
-  defp group_by_nesting(nodes, %{group_modules_by_nesting: []}), do: nodes
+  defp add_nesting_info(nodes, []) when is_list(nodes), do: nodes
 
-  defp group_by_nesting(nodes, %{group_modules_by_nesting: prefixes}) do
-    # At this stage, nodes have already been sorted by group and id. We preserve the
-    # ordering of the processed nodes as we insert new ones, since the inserted context
-    # nodes have no `id` property. This enables the sidebar UI code to determine if a
-    # node is only for context (because it has no `id`), but prevents sorting nodes
-    # again using the `GroupMatcher` as it relies in part on the `id`.
-
-    %{group: g} = hd(nodes)
-
-    # * `context_group` tracks the current module group (as defined in `:groups_for_modules`)
-    #   we're processing: we want to treat each group independently with respect to displaying
-    #   module prefixes for nesting.
-    # * `nesting_context` is the module name of the module node we most recently
-    #   inserted to provide context about the nested modules. Note that the same module name
-    #   might have to be inserted multiple times as the context changes.
-    # * `processed_nodes` accumulates processed nodes (and newly inserted nesting context nodes)
-    #   across all groups.
-    acc = %{
-      context_group: g,
-      nesting_context: nil,
-      prefixes_to_nest: prefixes,
-      processed_nodes: []
-    }
-
-    Enum.reduce(nodes, acc, &process_unnested_node/2)
-    |> Map.get(:processed_nodes)
-    |> Enum.reverse()
+  defp add_nesting_info(nodes, prefixes) when is_list(nodes) do
+    Enum.map(nodes, &add_nesting_info(&1, prefixes))
   end
 
-  defp process_unnested_node(%ModuleNode{} = module_node, acc) do
-    module_node
-    |> maybe_truncate_node_title(acc.prefixes_to_nest)
-    |> maybe_insert_nesting_context_node(acc)
-  end
+  defp add_nesting_info(%ModuleNode{title: title} = module_node, prefixes) do
+    case split_nested_title(title, prefixes) do
+      :error ->
+        module_node
 
-  defp maybe_truncate_node_title(%ModuleNode{title: title} = module_node, prefixes) do
-    case truncate_title(title, prefixes) do
-      {:ok, truncated_title} -> %{module_node | nested_title: truncated_title}
-      _ -> module_node
+      {prefix, truncated_title} ->
+        %{module_node | nested_title: truncated_title, nested_context: prefix}
     end
   end
 
-  defp truncate_title(_title, [] = _prefixes), do: :error
+  defp split_nested_title(_title, [] = _prefixes), do: :error
 
-  defp truncate_title(title, prefixes) do
+  defp split_nested_title(title, prefixes) do
     prefixes
     |> Enum.find(&String.starts_with?(title, &1 <> "."))
     |> case do
       nil -> :error
-      prefix -> {:ok, String.trim_leading(title, prefix <> ".")}
+      prefix -> {prefix, String.trim_leading(title, prefix <> ".")}
     end
-  end
-
-  defp maybe_insert_nesting_context_node(
-         %ModuleNode{group: module_group} = module_node,
-         %{context_group: context_group} = acc
-       )
-       when context_group != module_group do
-    acc = %{acc | context_group: module_group, nesting_context: nil}
-    maybe_insert_nesting_context_node(module_node, acc)
-  end
-
-  defp maybe_insert_nesting_context_node(%ModuleNode{nested_title: nil} = module_node, acc) do
-    %{acc | processed_nodes: [module_node | acc.processed_nodes]}
-  end
-
-  defp maybe_insert_nesting_context_node(%ModuleNode{} = module_node, acc) do
-    {context_module_name, context_module_atom} = get_context_module_info(module_node)
-
-    processed_nodes =
-      if context_module_atom == acc.nesting_context do
-        [module_node | acc.processed_nodes]
-      else
-        # There is a module with a truncated module name, but it has no immediate context.
-        # We therefore insert a new module so that the sidebar will be able to display a
-        # "group title" module for the nested modules.
-
-        context_node = %ModuleNode{
-          group: module_node.group,
-          module: context_module_atom,
-          title: context_module_name,
-          type: module_node.type
-        }
-
-        # the ordering of processed nodes must be preserved:
-        # when the list gets reversed, `context_node` will be displayed before `module_node`
-        [module_node, context_node | acc.processed_nodes]
-      end
-
-    %{acc | nesting_context: context_module_atom, processed_nodes: processed_nodes}
-  end
-
-  defp get_context_module_info(%ModuleNode{title: title, nested_title: truncated}) do
-    name =
-      if truncated == nil do
-        title
-      else
-        String.trim_trailing(title, "." <> truncated)
-      end
-
-    {name, :"Elixir.#{name}"}
   end
 
   defp generate_build(files, build) do
