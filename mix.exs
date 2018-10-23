@@ -90,9 +90,6 @@ defmodule ExDoc.Mixfile do
           ExDoc.ModuleNode,
           ExDoc.TypeNode
         ]
-      ],
-      group_modules_by_nesting: [
-        ExDoc.Formatter
       ]
     ]
   end
