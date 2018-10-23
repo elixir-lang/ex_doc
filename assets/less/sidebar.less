@@ -208,18 +208,12 @@
         display: block;
       }
 
-      .context {
-        opacity: 0.6;
-        font-style: italic;
+      &.nested {
+        margin-left: 2ex;
       }
 
-      .nested {
-        opacity: 0.3;
-        padding-right: 2px;
-
-        &::before {
-          content: "⤷";
-        }
+      .nesting-context {
+        opacity: 0.6;
       }
     }
 
