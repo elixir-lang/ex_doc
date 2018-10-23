@@ -5,7 +5,7 @@ defmodule ExDoc.ModuleNode do
 
   defstruct id: nil,
             title: nil,
-            title_truncated: nil,
+            nested_title: nil,
             module: nil,
             group: nil,
             deprecated: nil,
@@ -21,7 +21,7 @@ defmodule ExDoc.ModuleNode do
   @type t :: %__MODULE__{
           id: nil | String.t(),
           title: nil | String.t(),
-          title_truncated: nil | String.t(),
+          nested_title: nil | String.t(),
           module: nil | String.t(),
           group: nil | String.t(),
           deprecated: nil | String.t(),

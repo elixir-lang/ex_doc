@@ -3,7 +3,7 @@
     {{#newGroup ../this node.group}}
       <li class="group">{{node.group}}</li>
     {{/newGroup}}
-    <li class="{{#isLocal node.id}}clicked open{{/isLocal}} {{#if node.title_truncated}}nested{{/if}}">
+    <li class="{{#isLocal node.id}}clicked open{{/isLocal}} {{#if node.nested_title}}nested{{/if}}">
 
       {{! Nodes added purely for nesting purposes (i.e. don't exist in the source) have no id }}
       {{#if node.id}}
@@ -11,8 +11,8 @@
         in the menu should not link to a new page, instead should link
         to the top of the page itself. }}
         <a href="{{node.id}}.html" title="{{node.title}}" {{#hasContent node}}class="expand"{{/hasContent}}>
-          {{#if node.title_truncated}}
-            {{node.title_truncated}}
+          {{#if node.nested_title}}
+            {{node.nested_title}}
           {{else}}
             {{node.title}}
           {{/if}}

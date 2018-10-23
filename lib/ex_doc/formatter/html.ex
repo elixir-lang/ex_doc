@@ -124,7 +124,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp maybe_truncate_node_title(%ModuleNode{title: title} = module_node, prefixes) do
     case truncate_title(title, prefixes) do
-      {:ok, truncated_title} -> %{module_node | title_truncated: truncated_title}
+      {:ok, truncated_title} -> %{module_node | nested_title: truncated_title}
       _ -> module_node
     end
   end
@@ -149,7 +149,7 @@ defmodule ExDoc.Formatter.HTML do
     maybe_insert_nesting_context_node(module_node, acc)
   end
 
-  defp maybe_insert_nesting_context_node(%ModuleNode{title_truncated: nil} = module_node, acc) do
+  defp maybe_insert_nesting_context_node(%ModuleNode{nested_title: nil} = module_node, acc) do
     %{acc | processed_nodes: [module_node | acc.processed_nodes]}
   end
 
@@ -179,7 +179,7 @@ defmodule ExDoc.Formatter.HTML do
     %{acc | nesting_context: context_module_atom, processed_nodes: processed_nodes}
   end
 
-  defp get_context_module_info(%ModuleNode{title: title, title_truncated: truncated}) do
+  defp get_context_module_info(%ModuleNode{title: title, nested_title: truncated}) do
     name =
       if truncated == nil do
         title
