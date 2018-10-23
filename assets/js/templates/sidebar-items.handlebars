@@ -53,11 +53,7 @@
           {{/hasContent}}
       {{else}}
         <span title="{{node.title}}" class="context" aria-hidden="true">
-          {{#if node.title_truncated}}
-            <span class="nested"></span>{{node.title_truncated}}
-          {{else}}
-            {{node.title}}
-          {{/if}}
+          {{node.title}}
         </span>
       {{/if}}
     </li>
