@@ -197,21 +197,22 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp sidebar_items_json_string(module_node, items) do
     json_attrs =
-      [:id, :title, :nested_title, :nested_context]
-      |> Enum.map(&{&1, Map.get(module_node, &1)})
-      |> Enum.reject(fn {_k, v} -> is_nil(v) end)
-      |> Enum.map_join(",", fn {k, v} -> ~s/"#{k}":#{inspect(v)}/ end)
+      for key <- [:id, :title, :nested_title, :nested_context],
+          value = Map.get(module_node, key),
+          do: [json_kv(key, inspect(value)), ?,]
 
-    json_attrs = json_attrs <> ~s/,"group":"#{module_node.group}"/
+    json_attrs = [json_attrs | ~s("group":"#{module_node.group}")]
 
     json_attrs =
       case items do
         "" -> json_attrs
-        items -> json_attrs <> ~s/,"nodeGroups":[#{items}]/
+        items -> [json_attrs, ?, | json_kv(:nodeGroups, "[#{items}]")]
       end
 
-    "{#{json_attrs}}"
+    IO.iodata_to_binary([?{, json_attrs, ?}])
   end
+
+  defp json_kv(key, value), do: [?", Atom.to_string(key), ?", ?:, value]
 
   def module_summary(module_node) do
     [Types: module_node.typespecs] ++
