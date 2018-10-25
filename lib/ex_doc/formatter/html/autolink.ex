@@ -106,7 +106,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
                 language <- [:elixir, :erlang],
                 kind <- [:module, :function] do
               {kind, language, link_type}
-            end)
+            end) ++ [{:mix_task, :elixir, :normal}]
 
   @doc """
   Autolinks any documentation in the project.
@@ -447,6 +447,37 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end
   end
 
+  defp replace_fun(:mix_task, :elixir, _link_type, options) do
+    extension = options[:extension] || ".html"
+    lib_dirs = options[:lib_dirs] || default_lib_dirs(:elixir)
+    module_id = options[:module_id] || nil
+    modules_refs = options[:modules_refs] || []
+
+    fn all, text, "mix " <> task_name ->
+      task_module =
+        task_name
+        |> String.split(".")
+        |> Enum.map(&Macro.camelize/1)
+        |> Enum.join(".")
+
+      match = "Mix.Tasks." <> task_module
+
+      cond do
+        match == module_id ->
+          "[#{text}](#{match}#{extension}#content)"
+
+        match in modules_refs ->
+          "[#{text}](#{match}#{extension})"
+
+        doc = module_docs(:elixir, match, lib_dirs) ->
+          "[#{text}](#{doc}#{match}.html)"
+
+        true ->
+          all
+      end
+    end
+  end
+
   ## Helpers
 
   defp default_text(_, :custom, _match, _pmfa, text),
@@ -718,6 +749,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp re_kind_language(:function, :erlang) do
     ~r{
       #{re_source(:mfa, :erlang)}
+    }x
+  end
+
+  defp re_kind_language(:mix_task, :elixir) do
+    ~r{
+      mix\ ([a-z]+[a-z0-9\._]*)
     }x
   end
 

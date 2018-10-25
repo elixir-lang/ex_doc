@@ -268,6 +268,9 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       assert content =~
                ~r{<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types"><code(\sclass="inline")?>atom/0</code></a>}
+
+      assert content =~
+               ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code(\sclass="inline")?>mix compile.elixir</code></a>}
     end
 
     test "without any other content" do

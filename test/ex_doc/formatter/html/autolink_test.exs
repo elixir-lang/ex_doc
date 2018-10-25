@@ -327,6 +327,38 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
   end
 
+  describe "mix tasks" do
+    test "autolinks built-in tasks" do
+      assert project_doc("`mix test`", %{}) ==
+               "[`mix test`](#{@elixir_docs}mix/Mix.Tasks.Test.html)"
+    end
+
+    test "autolinks custom tasks" do
+      assert project_doc("`mix foo.bar.baz`", %{modules_refs: ["Mix.Tasks.Foo.Bar.Baz"]}) ==
+               "[`mix foo.bar.baz`](Mix.Tasks.Foo.Bar.Baz.html)"
+    end
+
+    test "autolinks tasks from dependencies" do
+      # using hex (archive) as we don't depend on any packages with mix tasks
+      lib_dirs = [{Application.app_dir(:hex), "#{@elixir_docs}hex/"}]
+
+      assert project_doc("`mix hex.publish`", %{
+               docs_refs: ["MyModule"],
+               module_id: "MyModule",
+               extension: ".html",
+               lib_dirs: lib_dirs
+             }) == "[`mix hex.publish`](#{@elixir_docs}hex/Mix.Tasks.Hex.Publish.html)"
+    end
+
+    test "does not autolink task with arguments" do
+      assert project_doc("`mix test test/`", %{}) == "`mix test test/`"
+    end
+
+    test "does not autolink unknown task" do
+      assert project_doc("`mix foo`", %{}) == "`mix foo`"
+    end
+  end
+
   describe "Erlang modules" do
     test "autolinks to Erlang modules" do
       assert project_doc("`:erlang`", %{}) == "[`:erlang`](#{@erlang_docs}erlang.html)"
