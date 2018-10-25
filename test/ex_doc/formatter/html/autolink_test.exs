@@ -339,8 +339,10 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "autolinks task in the same module" do
-      assert project_doc("`mix foo`", %{modules_refs: ["Mix.Tasks.Foo"], module_id: "Mix.Tasks.Foo"}) ==
-               "[`mix foo`](Mix.Tasks.Foo.html#content)"
+      assert project_doc("`mix foo`", %{
+               modules_refs: ["Mix.Tasks.Foo"],
+               module_id: "Mix.Tasks.Foo"
+             }) == "[`mix foo`](Mix.Tasks.Foo.html#content)"
     end
 
     test "autolinks tasks from dependencies" do
