@@ -338,6 +338,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "[`mix foo.bar.baz`](Mix.Tasks.Foo.Bar.Baz.html)"
     end
 
+    test "autolinks task in the same module" do
+      assert project_doc("`mix foo`", %{modules_refs: ["Mix.Tasks.Foo"], module_id: "Mix.Tasks.Foo"}) ==
+               "[`mix foo`](Mix.Tasks.Foo.html#content)"
+    end
+
     test "autolinks tasks from dependencies" do
       # using hex (archive) as we don't depend on any packages with mix tasks
       lib_dirs = [{Application.app_dir(:hex), "#{@elixir_docs}hex/"}]
