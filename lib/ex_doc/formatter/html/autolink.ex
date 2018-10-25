@@ -5,7 +5,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc_h: 1]
 
   @type language :: :elixir | :erlang | :markdown
-  @type kind :: :function | :module
+  @type kind :: :function | :module | :mix_task
   @type link_type :: :normal | :custom
 
   @backtick_token "<B706848484895T>"
