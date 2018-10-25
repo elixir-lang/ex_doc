@@ -325,7 +325,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   #
   # `language` can be: `:elixir`, `:erlang` or `:markdown`.
   #
-  # `kind` is either `:function` or `:module`.
+  # `kind` is either `:function`, `:module`, or `:mix_task`.
   #
   # It accepts a list of `options` used in the replacement functions.
   # - `:aliases
