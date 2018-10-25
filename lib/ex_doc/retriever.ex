@@ -7,7 +7,7 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.GroupMatcher
+  alias ExDoc.{GroupMatcher, ModuleNode}
   alias ExDoc.Retriever.Error
 
   @doc """
@@ -44,6 +44,7 @@ defmodule ExDoc.Retriever do
     |> Enum.sort_by(fn module ->
       {GroupMatcher.group_index(config.groups_for_modules, module.group), module.id}
     end)
+    |> add_nesting_info(config.group_modules_by_nesting)
   end
 
   defp filename_to_module(name) do
@@ -64,6 +65,35 @@ defmodule ExDoc.Retriever do
       [generate_node(module, docs_chunk, config)]
     else
       []
+    end
+  end
+
+  defp add_nesting_info([], _), do: []
+
+  defp add_nesting_info(nodes, []) when is_list(nodes), do: nodes
+
+  defp add_nesting_info(nodes, prefixes) when is_list(nodes) do
+    Enum.map(nodes, &add_nesting_info(&1, prefixes))
+  end
+
+  defp add_nesting_info(%ModuleNode{title: title} = module_node, prefixes) do
+    case split_nested_title(title, prefixes) do
+      :error ->
+        module_node
+
+      {prefix, truncated_title} ->
+        %{module_node | nested_title: truncated_title, nested_context: prefix}
+    end
+  end
+
+  defp split_nested_title(_title, [] = _prefixes), do: :error
+
+  defp split_nested_title(title, prefixes) do
+    prefixes
+    |> Enum.find(&String.starts_with?(title, &1 <> "."))
+    |> case do
+      nil -> :error
+      prefix -> {prefix, String.trim_leading(title, prefix <> ".")}
     end
   end
 

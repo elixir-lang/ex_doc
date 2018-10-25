@@ -66,6 +66,30 @@ defmodule ExDoc.RetrieverTest do
       assert module_node.group == :Group
     end
 
+    test "returns nesting information" do
+      name = "CompiledWithDocs"
+      [module_node] = docs_from_files([name])
+
+      refute module_node.nested_context
+      refute module_node.nested_title
+
+      prefix = "Common.Nesting.Prefix"
+
+      module_nodes =
+        docs_from_files([prefix <> ".Foo", prefix <> ".Bar"], group_modules_by_nesting: [prefix])
+
+      for module_node <- module_nodes do
+        assert Map.get(module_node, :nested_context) == prefix
+        assert Map.get(module_node, :nested_title) in ~w(Foo Bar)
+      end
+
+      name = "Common.Nesting.Prefix.Foo"
+      [module_node] = docs_from_files([name], group_modules_by_nesting: [name])
+
+      refute module_node.nested_context
+      refute module_node.nested_title
+    end
+
     test "returns the function nodes for each module" do
       [module_node] =
         docs_from_files(["CompiledWithDocs"],

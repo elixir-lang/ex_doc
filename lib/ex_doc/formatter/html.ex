@@ -4,7 +4,7 @@ defmodule ExDoc.Formatter.HTML do
   """
 
   alias __MODULE__.{Assets, Autolink, Templates}
-  alias ExDoc.{GroupMatcher, Markdown, ModuleNode}
+  alias ExDoc.{Markdown, GroupMatcher}
 
   @main "api-reference"
 
@@ -20,11 +20,7 @@ defmodule ExDoc.Formatter.HTML do
     output_setup(build, config)
 
     autolink = Autolink.compile(project_nodes, ".html", config.deps)
-
-    linked =
-      project_nodes
-      |> Autolink.all(autolink)
-      |> add_nesting_info(config.group_modules_by_nesting)
+    linked = Autolink.all(project_nodes, autolink)
 
     nodes_map = %{
       modules: filter_list(:module, linked),
@@ -80,35 +76,6 @@ defmodule ExDoc.Formatter.HTML do
     else
       File.rm_rf!(config.output)
       File.mkdir_p!(config.output)
-    end
-  end
-
-  defp add_nesting_info([], _), do: []
-
-  defp add_nesting_info(nodes, []) when is_list(nodes), do: nodes
-
-  defp add_nesting_info(nodes, prefixes) when is_list(nodes) do
-    Enum.map(nodes, &add_nesting_info(&1, prefixes))
-  end
-
-  defp add_nesting_info(%ModuleNode{title: title} = module_node, prefixes) do
-    case split_nested_title(title, prefixes) do
-      :error ->
-        module_node
-
-      {prefix, truncated_title} ->
-        %{module_node | nested_title: truncated_title, nested_context: prefix}
-    end
-  end
-
-  defp split_nested_title(_title, [] = _prefixes), do: :error
-
-  defp split_nested_title(title, prefixes) do
-    prefixes
-    |> Enum.find(&String.starts_with?(title, &1 <> "."))
-    |> case do
-      nil -> :error
-      prefix -> {prefix, String.trim_leading(title, prefix <> ".")}
     end
   end
 
