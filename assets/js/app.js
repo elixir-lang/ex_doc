@@ -20,8 +20,8 @@ import xml from 'highlight.js/lib/languages/xml'
 import hasContent from './template-helpers/hasContent'
 import isArray from './template-helpers/isArray'
 import isLocal from './template-helpers/isLocal'
-import newGroup from './template-helpers/newGroup'
-import nestingContextChanged from './template-helpers/nestingContextChanged'
+import groupChanged from './template-helpers/groupChanged'
+import nestingChanged from './template-helpers/nestingChanged'
 import showSummary from './template-helpers/showSummary'
 
 import {initialize as initEvents} from './events'
@@ -36,8 +36,8 @@ $(() => {
   Handlebars.registerHelper('hasContent', hasContent)
   Handlebars.registerHelper('isArray', isArray)
   Handlebars.registerHelper('isLocal', isLocal)
-  Handlebars.registerHelper('newGroup', newGroup)
-  Handlebars.registerHelper('nestingContextChanged', nestingContextChanged)
+  Handlebars.registerHelper('groupChanged', groupChanged)
+  Handlebars.registerHelper('nestingChanged', nestingChanged)
   Handlebars.registerHelper('showSummary', showSummary)
 
   // Set up Highlight.js
