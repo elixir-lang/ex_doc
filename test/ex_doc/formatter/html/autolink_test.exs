@@ -346,7 +346,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "autolinks tasks from dependencies" do
-      # using hex (archive) as we don't depend on any packages with mix tasks
+      # Using Hex (archive) as we don't depend on any packages with Mix tasks
       lib_dirs = [{Application.app_dir(:hex), "#{@elixir_docs}hex/"}]
 
       assert project_doc("`mix hex.publish`", %{
