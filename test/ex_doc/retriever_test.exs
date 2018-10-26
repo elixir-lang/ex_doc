@@ -34,7 +34,9 @@ defmodule ExDoc.RetrieverTest do
       assert module_node.id == "CompiledWithDocs"
       assert module_node.title == "CompiledWithDocs"
       assert module_node.module == CompiledWithDocs
-
+      refute module_node.group
+      refute module_node.nested_context
+      refute module_node.nested_title
       assert module_node.source_url == "http://example.com/test/fixtures/compiled_with_docs.ex#L1"
 
       assert module_node.doc == """
@@ -67,20 +69,16 @@ defmodule ExDoc.RetrieverTest do
     end
 
     test "returns nesting information" do
-      name = "CompiledWithDocs"
-      [module_node] = docs_from_files([name])
-
-      refute module_node.nested_context
-      refute module_node.nested_title
-
       prefix = "Common.Nesting.Prefix"
 
       module_nodes =
         docs_from_files([prefix <> ".Foo", prefix <> ".Bar"], group_modules_by_nesting: [prefix])
 
+      assert length(module_nodes) > 0
+
       for module_node <- module_nodes do
-        assert Map.get(module_node, :nested_context) == prefix
-        assert Map.get(module_node, :nested_title) in ~w(Foo Bar)
+        assert module_node.nested_context == prefix
+        assert module_node.nested_title in ~w(Foo Bar)
       end
 
       name = "Common.Nesting.Prefix.Foo"
