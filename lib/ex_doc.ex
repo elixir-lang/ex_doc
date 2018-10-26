@@ -95,12 +95,12 @@ defmodule ExDoc do
     # sort in descending order to facilitate finding longest match
     normalized_prefixes =
       options
-      |> Keyword.get(:group_modules_by_nesting, [])
+      |> Keyword.get(:nest_modules_by_prefix, [])
       |> Enum.map(&inspect/1)
       |> Enum.sort()
       |> Enum.reverse()
 
-    Keyword.put(options, :group_modules_by_nesting, normalized_prefixes)
+    Keyword.put(options, :nest_modules_by_prefix, normalized_prefixes)
   end
 
   defp guess_url(url, ref) do

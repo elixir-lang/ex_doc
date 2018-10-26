@@ -193,7 +193,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   test "groups modules by nesting" do
     doc_config()
-    |> Keyword.put(:group_modules_by_nesting, [Common.Nesting.Prefix])
+    |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix])
     |> generate_docs()
 
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")

@@ -86,16 +86,9 @@ defmodule Mix.Tasks.Docs do
 
     * `:formatters` - Formatter to use; default: ["html"], options: "html", "epub".
 
-    * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See next sections
+    * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See the "Groups" section
 
-    * `:group_modules_by_nesting` - A list of atoms (e.g. `Foo.Bar`) that will be truncated
-      if they prefix a module name. These truncated modules will then be displayed nested as
-      a group beneath the given "module" atom (so `Foo.Bar.Baz.Bat` will be displayed as
-      `Baz.Bat` nested within `Foo.Bar`). This option is mainly intended to improve the
-      display of long module names in the sidebar, particularly when they are too long for
-      the sidebar or when many modules share a long prefix. If you mean to group modules
-      logically or call attention to them in the docs, you should probably use
-      `:groups_for_modules` (which can be used in conjuction with `:group_modules_by_nesting`).
+    * `:nest_modules_by_prefix` - See the "Nesting" section
 
     * `:language` - Identify the primary language of the documents, its value must be
       a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
@@ -167,7 +160,7 @@ defmodule Mix.Tasks.Docs do
 
   A regex or the string name of the module is also supported.
 
-  ## Grouping functions
+  ### Grouping functions
 
   Functions inside a module can also be organized in groups. This is done via
   the `:groups_for_functions` configuration which is a keyword list of group
@@ -201,6 +194,20 @@ defmodule Mix.Tasks.Docs do
   A function can belong to a single group only. If multiple group filters match,
   the first will take precedence. Functions that don't have a custom group will
   be listed under the default "Functions" group.
+
+  ## Nesting
+
+  ExDoc also allows module names in the sidebar to appear nested under a given
+  prefix. The `:nest_modules_by_prefix` expects a list of module names, such as
+  `[Foo.Bar, Bar.Baz]`. In this case, a module named `Foo.Bar.Baz` will appear
+  nested within `Foo.Bar` and only the name `Baz` will be shown in the sidebar.
+  Note the `Foo.Bar` module itself is not affected.
+
+  This option is mainly intended to improve the display of long module names in
+  the sidebar, particularly when they are too long for the sidebar or when many
+  modules share a long prefix. If you mean to group modules logically or call
+  attention to them in the docs, you should probably use `:groups_for_modules`
+  (which can be used in conjuction with `:nest_modules_by_prefix`).
 
   ## Umbrella project
 

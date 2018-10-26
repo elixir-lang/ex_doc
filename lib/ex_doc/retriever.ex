@@ -117,7 +117,7 @@ defmodule ExDoc.Retriever do
     types = get_types(module_data, source)
     {title, id} = module_title_and_id(module_data)
     module_group = GroupMatcher.match_module(config.groups_for_modules, module, id)
-    {nested_title, nested_context} = nesting_info(title, config.group_modules_by_nesting)
+    {nested_title, nested_context} = nesting_info(title, config.nest_modules_by_prefix)
 
     %ExDoc.ModuleNode{
       id: id,

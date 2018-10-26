@@ -72,7 +72,7 @@ defmodule ExDoc.RetrieverTest do
       prefix = "Common.Nesting.Prefix"
 
       module_nodes =
-        docs_from_files([prefix <> ".Foo", prefix <> ".Bar"], group_modules_by_nesting: [prefix])
+        docs_from_files([prefix <> ".Foo", prefix <> ".Bar"], nest_modules_by_prefix: [prefix])
 
       assert length(module_nodes) > 0
 
@@ -82,7 +82,7 @@ defmodule ExDoc.RetrieverTest do
       end
 
       name = "Common.Nesting.Prefix.Foo"
-      [module_node] = docs_from_files([name], group_modules_by_nesting: [name])
+      [module_node] = docs_from_files([name], nest_modules_by_prefix: [name])
 
       refute module_node.nested_context
       refute module_node.nested_title
