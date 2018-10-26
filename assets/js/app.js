@@ -17,10 +17,11 @@ import markdown from 'highlight.js/lib/languages/markdown'
 import sql from 'highlight.js/lib/languages/sql'
 import xml from 'highlight.js/lib/languages/xml'
 
+import hasContent from './template-helpers/hasContent'
 import isArray from './template-helpers/isArray'
-import isEmptyNode from './template-helpers/isEmptyNode'
 import isLocal from './template-helpers/isLocal'
-import newGroup from './template-helpers/newGroup'
+import groupChanged from './template-helpers/groupChanged'
+import nestingChanged from './template-helpers/nestingChanged'
 import showSummary from './template-helpers/showSummary'
 
 import {initialize as initEvents} from './events'
@@ -32,10 +33,11 @@ window.$ = $
 
 $(() => {
   // Set up Handlebars.js
+  Handlebars.registerHelper('hasContent', hasContent)
   Handlebars.registerHelper('isArray', isArray)
-  Handlebars.registerHelper('isEmptyNode', isEmptyNode)
   Handlebars.registerHelper('isLocal', isLocal)
-  Handlebars.registerHelper('newGroup', newGroup)
+  Handlebars.registerHelper('groupChanged', groupChanged)
+  Handlebars.registerHelper('nestingChanged', nestingChanged)
   Handlebars.registerHelper('showSummary', showSummary)
 
   // Set up Highlight.js

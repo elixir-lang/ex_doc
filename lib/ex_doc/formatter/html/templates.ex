@@ -179,13 +179,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
       |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
       |> Enum.map_join(",", &sidebar_items_by_group/1)
 
-    if items == "" do
-      ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)}/ <>
-        ~s/,"group":"#{module_node.group}"}/
-    else
-      ~s/{"id":#{inspect(module_node.id)},"title":#{inspect(module_node.title)}/ <>
-        ~s/,"group":"#{module_node.group}","nodeGroups":[#{items}]}/
-    end
+    sidebar_items_json_string(module_node, items)
   end
 
   defp sidebar_items_by_group({group, docs}) do
@@ -200,6 +194,25 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_items_object(id, anchor) do
     ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}"}/
   end
+
+  defp sidebar_items_json_string(module_node, items) do
+    json_attrs =
+      for key <- [:id, :title, :nested_title, :nested_context],
+          value = Map.get(module_node, key),
+          do: [json_kv(key, inspect(value)), ?,]
+
+    json_attrs = [json_attrs | ~s("group":"#{module_node.group}")]
+
+    json_attrs =
+      case items do
+        "" -> json_attrs
+        items -> [json_attrs, ?, | json_kv(:nodeGroups, "[#{items}]")]
+      end
+
+    IO.iodata_to_binary([?{, json_attrs, ?}])
+  end
+
+  defp json_kv(key, value), do: [?", Atom.to_string(key), ?", ?:, value]
 
   def module_summary(module_node) do
     [Types: module_node.typespecs] ++

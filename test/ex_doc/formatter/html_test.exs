@@ -191,6 +191,20 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html">task_with_docs</a>}
   end
 
+  test "groups modules by nesting" do
+    doc_config()
+    |> Keyword.put(:group_modules_by_nesting, [Common.Nesting.Prefix])
+    |> generate_docs()
+
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+
+    assert content =~
+             ~r{"id":"Common\.Nesting\.Prefix\.Foo","title":"Common\.Nesting\.Prefix\.Foo","nested_title":"Foo","nested_context":"Common\.Nesting\.Prefix"}ms
+
+    assert content =~
+             ~r{"id":"Common\.Nesting\.Prefix\.Bar","title":"Common\.Nesting\.Prefix\.Bar","nested_title":"Bar","nested_context":"Common\.Nesting\.Prefix"}ms
+  end
+
   describe "generates logo" do
     test "overriding previous entries" do
       File.mkdir_p!("#{output_dir()}/assets")

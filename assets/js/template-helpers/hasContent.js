@@ -1,17 +1,17 @@
 export default function (node, options) {
   if (hasItems(node.headers)) {
-    return options.inverse(this)
+    return options.fn(this)
   }
 
   if (node.nodeGroups) {
     for (let {nodes} of node.nodeGroups) {
       if (hasItems(nodes)) {
-        return options.inverse(this)
+        return options.fn(this)
       }
     }
   }
 
-  return options.fn(this)
+  return options.inverse(this)
 }
 
 function hasItems (items) {

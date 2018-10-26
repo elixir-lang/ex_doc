@@ -88,6 +88,15 @@ defmodule Mix.Tasks.Docs do
 
     * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See next sections
 
+    * `:group_modules_by_nesting` - A list of atoms (e.g. `Foo.Bar`) that will be truncated
+      if they prefix a module name. These truncated modules will then be displayed nested as
+      a group beneath the given "module" atom (so `Foo.Bar.Baz.Bat` will be displayed as
+      `Baz.Bat` nested within `Foo.Bar`). This option is mainly intended to improve the
+      display of long module names in the sidebar, particularly when they are too long for
+      the sidebar or when many modules share a long prefix. If you mean to group modules
+      logically or call attention to them in the docs, you should probably use
+      `:groups_for_modules` (which can be used in conjuction with `:group_modules_by_nesting`).
+
     * `:language` - Identify the primary language of the documents, its value must be
       a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
 
