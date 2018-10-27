@@ -327,7 +327,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
   end
 
-  describe "mix tasks" do
+  describe "Mix tasks" do
     test "autolinks built-in tasks" do
       assert project_doc("`mix test`", %{}) ==
                "[`mix test`](#{@elixir_docs}mix/Mix.Tasks.Test.html)"

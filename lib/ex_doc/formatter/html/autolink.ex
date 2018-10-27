@@ -447,7 +447,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end
   end
 
-  defp replace_fun(:mix_task, :elixir, _link_type, options) do
+  defp replace_fun(:mix_task, :elixir, :normal, options) do
     extension = options[:extension] || ".html"
     lib_dirs = options[:lib_dirs] || default_lib_dirs(:elixir)
     module_id = options[:module_id] || nil
@@ -754,7 +754,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp re_kind_language(:mix_task, :elixir) do
     ~r{
-      mix\ ([a-z]+[a-z0-9\._]*)
+      mix\ ([a-z][a-z0-9\._]*)
     }x
   end
 
