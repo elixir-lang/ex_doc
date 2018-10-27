@@ -93,11 +93,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           entry <- [doc.id | doc.defaults],
           do: prefix <> module.id <> "." <> entry
 
+    lib_dirs = extra_lib_dirs ++ elixir_lib_dirs() ++ erlang_lib_dirs()
+    lib_dirs = Enum.map(lib_dirs, fn {path, url} -> {Path.expand(path), url} end)
+
     %{
       aliases: aliases,
       docs_refs: docs_refs ++ types_refs,
       extension: extension,
-      lib_dirs: extra_lib_dirs ++ elixir_lib_dirs() ++ erlang_lib_dirs(),
+      lib_dirs: lib_dirs,
       modules_refs: modules_refs
     }
   end
@@ -562,7 +565,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         nil
 
       path ->
-        path = List.to_string(path)
+        path = path |> List.to_string() |> Path.expand()
 
         lib_dirs
         |> Enum.filter(fn {lib_dir, _} -> String.starts_with?(path, lib_dir) end)
@@ -594,17 +597,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     path =
       case :code.where_is_file('Elixir.Kernel.beam') do
         :non_existing -> ""
-        path -> List.to_string(path)
+        path -> path |> List.to_string() |> Path.expand()
       end
 
     if File.exists?(path) do
-      path =
+      elixir_root_lib =
         path
         |> Path.dirname()
         |> Path.dirname()
         |> Path.dirname()
 
-      path <> "/" <> app <> "/ebin"
+      elixir_root_lib <> "/" <> app <> "/ebin"
     else
       # if beam file doesn't exists it's likely an escript
       Path.dirname(path)
