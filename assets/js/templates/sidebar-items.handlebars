@@ -23,28 +23,28 @@
       {{#hasContent node}}
         <ul>
           <li>
-            <a href="{{node.id}}.html#content">Top</a>
+            <a href="{{#isLocal node.id}}#content{{else}}{{node.id}}.html#content{{/isLocal}}">Top</a>
           </li>
 
             {{#isArray node.headers}}
               {{#each node.headers}}
                 <li>
-                  <a href="{{node.id}}.html#{{{anchor}}}">{{id}}</a>
+                  <a href="{{#isLocal node.id}}#{{anchor}}{{else}}{{node.id}}.html#{{anchor}}{{/isLocal}}">{{id}}</a>
                 </li>
               {{/each}}
             {{else}}
               {{#showSummary node}}
                 <li>
-                  <a href="{{node.id}}.html#summary">Summary</a>
+                  <a href="{{#isLocal node.id}}#summary{{else}}{{node.id}}.html#summary{{/isLocal}}">Summary</a>
                 </li>
               {{/showSummary}}
               {{#each node.nodeGroups as |group|}}
                 <li class="docs">
-                  <a href="{{node.id}}.html#{{group.key}}" class="expand">{{group.name}}</a>
+                  <a href="{{#isLocal node.id}}#{{group.key}}{{else}}{{node.id}}.html#{{group.key}}{{/isLocal}}" class="expand">{{group.name}}</a>
                   <ul class="{{group.key}}-list deflist">
                     {{#each group.nodes}}
                       <li>
-                        <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
+                        <a href="{{#isLocal node.id}}#{{anchor}}{{else}}{{node.id}}.html#{{anchor}}{{/isLocal}}">{{id}}</a>
                       </li>
                     {{/each}}
                   </ul>
