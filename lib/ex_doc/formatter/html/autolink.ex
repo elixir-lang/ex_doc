@@ -102,11 +102,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     }
   end
 
-  @regexes (for link_type <- [:custom, :normal],
-                language <- [:elixir, :erlang],
-                kind <- [:module, :function] do
-              {kind, language, link_type}
-            end) ++ [{:mix_task, :elixir, :normal}]
+  @regexes [
+    {:module, :elixir, :normal},
+    {:module, :elixir, :custom},
+    {:function, :elixir, :normal},
+    {:function, :elixir, :custom},
+    {:function, :erlang, :normal},
+    {:function, :erlang, :custom},
+    {:mix_task, :elixir, :normal}
+  ]
 
   @doc """
   Autolinks any documentation in the project.

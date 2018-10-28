@@ -366,32 +366,6 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
   end
 
-  describe "Erlang modules" do
-    test "autolinks to Erlang modules" do
-      assert project_doc("`:erlang`", %{}) == "[`:erlang`](#{@erlang_docs}erlang.html)"
-
-      assert project_doc("`:erl_prim_loader`", %{}) ==
-               "[`:erl_prim_loader`](#{@erlang_docs}erl_prim_loader.html)"
-    end
-
-    test "autolinks to Erlang modules with custom links" do
-      assert project_doc("[`example`](`:lists`)", %{}) == "[`example`](#{@erlang_docs}lists.html)"
-
-      assert project_doc("[example](`:lists`)", %{}) == "[example](#{@erlang_docs}lists.html)"
-    end
-
-    test "does not autolink pre-linked docs" do
-      assert project_doc("[`:erlang`](other.html)", %{}) == "[`:erlang`](other.html)"
-
-      assert project_doc("[the `:erlang` module](other.html)", %{}) ==
-               "[the `:erlang` module](other.html)"
-    end
-
-    test "does not autolink functions that aren't part of the Erlang distribution" do
-      assert project_doc("`:unknown.foo/0`", %{}) == "`:unknown.foo/0`"
-    end
-  end
-
   describe "erlang functions" do
     test "autolinks to erlang functions" do
       assert project_doc("`:erlang.apply/2`", %{}) ==
@@ -401,9 +375,8 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "[`:erlang.adler32/2`](#{@erlang_docs}erlang.html#adler32-2)"
 
       assert project_doc("`:erlang.apply/2` `:erlang.apply/3`", %{}) ==
-               "[`:erlang.apply/2`](#{@erlang_docs}erlang.html#apply-2) [`:erlang.apply/3`](#{
-                 @erlang_docs
-               }erlang.html#apply-3)"
+               "[`:erlang.apply/2`](#{@erlang_docs}erlang.html#apply-2) " <>
+               "[`:erlang.apply/3`](#{@erlang_docs}erlang.html#apply-3)"
 
       assert project_doc("`:erl_prim_loader.get_file/1`", %{}) ==
                "[`:erl_prim_loader.get_file/1`](#{@erlang_docs}erl_prim_loader.html#get_file-1)"
