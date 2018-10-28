@@ -94,7 +94,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           do: prefix <> module.id <> "." <> entry
 
     lib_dirs = extra_lib_dirs ++ elixir_lib_dirs() ++ erlang_lib_dirs()
-    lib_dirs = Enum.map(lib_dirs, fn {path, url} -> {Path.expand(path), url} end)
 
     %{
       aliases: aliases,
