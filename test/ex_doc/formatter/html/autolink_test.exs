@@ -376,7 +376,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert project_doc("`:erlang.apply/2` `:erlang.apply/3`", %{}) ==
                "[`:erlang.apply/2`](#{@erlang_docs}erlang.html#apply-2) " <>
-               "[`:erlang.apply/3`](#{@erlang_docs}erlang.html#apply-3)"
+                 "[`:erlang.apply/3`](#{@erlang_docs}erlang.html#apply-3)"
 
       assert project_doc("`:erl_prim_loader.get_file/1`", %{}) ==
                "[`:erl_prim_loader.get_file/1`](#{@erlang_docs}erl_prim_loader.html#get_file-1)"
