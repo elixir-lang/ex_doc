@@ -348,10 +348,8 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     test "autolinks tasks from dependencies" do
       lib_dirs = [{Application.app_dir(:nimble_parsec), "#{@elixir_docs}nimble_parsec/"}]
 
-      assert project_doc("`mix nimble_parsec.compile`", %{
-               extension: ".html",
-               lib_dirs: lib_dirs
-             }) == "[`mix nimble_parsec.compile`](#{@elixir_docs}nimble_parsec/Mix.Tasks.NimbleParsec.Compile.html)"
+      assert project_doc("`mix nimble_parsec.compile`", %{lib_dirs: lib_dirs}) ==
+               "[`mix nimble_parsec.compile`](#{@elixir_docs}nimble_parsec/Mix.Tasks.NimbleParsec.Compile.html)"
     end
 
     test "autolinks Hex tasks" do

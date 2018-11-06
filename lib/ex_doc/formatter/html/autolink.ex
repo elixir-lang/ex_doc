@@ -93,7 +93,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           entry <- [doc.id | doc.defaults],
           do: prefix <> module.id <> "." <> entry
 
-    lib_dirs = extra_lib_dirs ++ default_lib_dirs(:elixir) ++ default_lib_dirs(:erlang)
+    lib_dirs = extra_lib_dirs ++ default_lib_dirs()
 
     %{
       aliases: aliases,
@@ -211,7 +211,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   It converts the given `ast` to string while linking
   the locals given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs, aliases \\ [], lib_dirs \\ default_lib_dirs(:elixir) ++ default_lib_dirs(:erlang)) do
+  def typespec(ast, typespecs, aliases \\ [], lib_dirs \\ default_lib_dirs()) do
     {formatted, placeholders} =
       format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs)
 
@@ -500,6 +500,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       "`#{module}.#{function}/#{arity}`"
     end
   end
+
+  defp default_lib_dirs(),
+    do: default_lib_dirs(:elixir) ++ default_lib_dirs(:erlang)
 
   defp default_lib_dirs(:elixir),
     do: elixir_lib_dirs() ++ hex_lib_dirs()
