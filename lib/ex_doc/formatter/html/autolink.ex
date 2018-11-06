@@ -618,22 +618,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp hex_lib_dirs() do
-    [{hex_ebin_path(), @elixir_docs <> "hex/"}]
-  end
-
-  defp hex_ebin_path() do
-    # TODO: Private Elixir API
-    # TODO: Not available when running ex_doc as escript
-    archive_path = Mix.Local.path_for(:archive)
-
-    hex_archive =
-      archive_path
-      |> Path.join("hex-*")
-      |> Path.wildcard()
-      |> List.first()
-      |> Path.basename()
-
-    Path.join(archive_path, Mix.Local.archive_ebin(hex_archive))
+    if Application.spec(:hex, :vsn) do
+      [{Application.app_dir(:hex, "ebin"), @elixir_docs <> "hex/"}]
+    else
+      # if Hex is not loaded it's likely an escript
+      []
+    end
   end
 
   defp erlang_lib_dirs do
