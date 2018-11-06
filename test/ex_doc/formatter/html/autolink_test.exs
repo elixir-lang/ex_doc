@@ -346,15 +346,17 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "autolinks tasks from dependencies" do
-      # Using Hex (archive) as we don't depend on any packages with Mix tasks
-      lib_dirs = [{Application.app_dir(:hex), "#{@elixir_docs}hex/"}]
+      lib_dirs = [{Application.app_dir(:nimble_parsec), "#{@elixir_docs}nimble_parsec/"}]
 
-      assert project_doc("`mix hex.publish`", %{
-               docs_refs: ["MyModule"],
-               module_id: "MyModule",
+      assert project_doc("`mix nimble_parsec.compile`", %{
                extension: ".html",
                lib_dirs: lib_dirs
-             }) == "[`mix hex.publish`](#{@elixir_docs}hex/Mix.Tasks.Hex.Publish.html)"
+             }) == "[`mix nimble_parsec.compile`](#{@elixir_docs}nimble_parsec/Mix.Tasks.NimbleParsec.Compile.html)"
+    end
+
+    test "autolinks Hex tasks" do
+      assert project_doc("`mix hex.publish`", %{}) ==
+               "[`mix hex.publish`](#{@elixir_docs}hex/Mix.Tasks.Hex.Publish.html)"
     end
 
     test "does not autolink task with arguments" do
