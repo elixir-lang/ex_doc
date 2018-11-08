@@ -460,13 +460,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     modules_refs = options[:modules_refs] || []
 
     fn all, text, "mix " <> task_name ->
-      task_module =
-        task_name
-        |> String.split(".")
-        |> Enum.map(&Macro.camelize/1)
-        |> Enum.join(".")
-
-      match = "Mix.Tasks." <> task_module
+      match = task_module(task_name)
 
       cond do
         match == module_id ->
@@ -482,6 +476,20 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           all
       end
     end
+  end
+
+  defp task_module("help " <> task_name) do
+    task_module(task_name)
+  end
+
+  defp task_module(task_name) do
+    task_module =
+      task_name
+      |> String.split(".")
+      |> Enum.map(&Macro.camelize/1)
+      |> Enum.join(".")
+
+    "Mix.Tasks." <> task_module
   end
 
   ## Helpers
@@ -772,7 +780,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp re_kind_language(:mix_task, :elixir) do
     ~r{
-      mix\ ([a-z][a-z0-9\._]*)
+      mix\ (help\ )?([a-z][a-z0-9\._]*)
     }x
   end
 

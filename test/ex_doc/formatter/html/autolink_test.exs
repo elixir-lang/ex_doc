@@ -357,12 +357,21 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "[`mix hex.publish`](#{@elixir_docs}hex/Mix.Tasks.Hex.Publish.html)"
     end
 
+    test "autolinks task help" do
+      assert project_doc("`mix help compile.app`", %{}) ==
+               "[`mix help compile.app`](#{@elixir_docs}mix/Mix.Tasks.Compile.App.html)"
+    end
+
     test "does not autolink task with arguments" do
       assert project_doc("`mix test test/`", %{}) == "`mix test test/`"
     end
 
     test "does not autolink unknown task" do
       assert project_doc("`mix foo`", %{}) == "`mix foo`"
+    end
+
+    test "does not autolink unknown task help" do
+      assert project_doc("`mix help foo`", %{}) == "`mix help foo`"
     end
   end
 
