@@ -93,7 +93,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           entry <- [doc.id | doc.defaults],
           do: prefix <> module.id <> "." <> entry
 
-    lib_dirs = extra_lib_dirs ++ elixir_lib_dirs() ++ erlang_lib_dirs()
+    lib_dirs = extra_lib_dirs ++ default_lib_dirs()
 
     %{
       aliases: aliases,
@@ -211,7 +211,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   It converts the given `ast` to string while linking
   the locals given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs, aliases \\ [], lib_dirs \\ elixir_lib_dirs() ++ erlang_lib_dirs()) do
+  def typespec(ast, typespecs, aliases \\ [], lib_dirs \\ default_lib_dirs()) do
     {formatted, placeholders} =
       format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs)
 
@@ -501,8 +501,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end
   end
 
+  defp default_lib_dirs(),
+    do: default_lib_dirs(:elixir) ++ default_lib_dirs(:erlang)
+
   defp default_lib_dirs(:elixir),
-    do: elixir_lib_dirs()
+    do: elixir_lib_dirs() ++ hex_lib_dirs()
 
   defp default_lib_dirs(:erlang),
     do: erlang_lib_dirs()
@@ -614,6 +617,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     else
       # if beam file doesn't exists it's likely an escript
       Path.dirname(path)
+    end
+  end
+
+  defp hex_lib_dirs() do
+    if Application.spec(:hex, :vsn) do
+      [{Application.app_dir(:hex, "ebin"), @elixir_docs <> "hex/"}]
+    else
+      # if Hex is not loaded it's likely an escript
+      []
     end
   end
 
