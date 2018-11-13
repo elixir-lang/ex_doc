@@ -1,4 +1,4 @@
-<div class="detail" id="<%=enc_h link_id(node.id, node.type) %>">
+<section class="detail" id="<%=enc_h link_id(node.id, node.type) %>">
   <%= if is_enc? link_id(node.id, node.type) do %>
     <span id="<%=h link_id(node.id, node.type) %>"></span>
   <% end %>
@@ -10,7 +10,7 @@
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this <%= pretty_type(node) %></span>
     </a>
-    <span class="signature"><%=h node.signature %></span>
+    <h1 class="signature"><%=h node.signature %></span>
     <%= if node.source_url do %>
       <a href="<%= node.source_url %>" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
@@ -36,4 +36,4 @@
   <section class="docstring">
     <%= node.doc |> to_html(node) |> link_detail_headings(enc_h(link_id(node))) %>
   </section>
-</div>
+</section>

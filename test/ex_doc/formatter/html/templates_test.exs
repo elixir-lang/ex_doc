@@ -281,7 +281,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L14"[^>]*>\s*<span class="icon-code" aria-hidden="true"></span>\s*<span class="sr-only">View Source</span>\s*</a>}ms
 
       # Functions
-      assert content =~ ~s{<div class="detail" id="example/2">}
+      assert content =~ ~s{<section class="detail" id="example/2">}
       assert content =~ ~s{<span id="example/1"></span>}
       assert content =~ ~s{example(foo, bar \\\\ Baz)}
 
@@ -376,7 +376,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CustomBehaviourOne\s*<small>behaviour</small>}m
 
       assert content =~ ~r{Callbacks}
-      assert content =~ ~r{<div class="detail" id="c:hello/1">}
+      assert content =~ ~r{<section class="detail" id="c:hello/1">}
       assert content =~ ~s[hello(integer)]
       assert content =~ ~s[greet(arg0)]
 
@@ -386,7 +386,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*}m
 
       assert content =~ ~r{Callbacks}
-      assert content =~ ~r{<div class="detail" id="c:bye/1">}
+      assert content =~ ~r{<section class="detail" id="c:bye/1">}
     end
 
     ## PROTOCOLS
