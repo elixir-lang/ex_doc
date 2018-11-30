@@ -29,7 +29,7 @@ defmodule ExDoc.Markdown.Earmark do
       breaks significant (so every line in the input is a new line in the output)
 
     * `:smartypants` - boolean. Turns on smartypants processing, so quotes become curly,
-      two or three hyphens become en and em dashes, and so on. True by default
+      two or three hyphens become en and em dashes, and so on. False by default
 
     * `:plugins` - map of strings to modules. Register custom plugins to be used with
       Earmark. See [Plugins](http://github.com/pragdave/earmark#plugins) for details on
@@ -43,7 +43,7 @@ defmodule ExDoc.Markdown.Earmark do
         line: Keyword.get(opts, :line, 1),
         file: Keyword.get(opts, :file),
         breaks: Keyword.get(opts, :breaks, false),
-        smartypants: Keyword.get(opts, :smartypants, true),
+        smartypants: Keyword.get(opts, :smartypants, false),
         plugins: Keyword.get(opts, :plugins, %{})
       )
 

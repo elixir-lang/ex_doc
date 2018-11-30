@@ -12,4 +12,8 @@ defmodule ExDoc.Markdown.EarmarkTest do
   test "to_html handles empty input" do
     assert Markdown.to_html("", []) == ""
   end
+
+  test "to_html does not generate smart quotes by default" do
+    assert Markdown.to_html("\"hi\"", []) =~ "&quot;hi&quot;"
+  end
 end
