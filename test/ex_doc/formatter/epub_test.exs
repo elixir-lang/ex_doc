@@ -38,7 +38,7 @@ defmodule ExDoc.Formatter.EPUBTest do
       source_root: beam_dir(),
       source_beam: beam_dir(),
       extras: ["test/fixtures/README.md"],
-      warn_on_undefined_functions: false
+      warn_on_undefined_references: false
     ]
   end
 

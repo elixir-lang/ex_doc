@@ -101,7 +101,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       extension: extension,
       lib_dirs: lib_dirs,
       modules_refs: modules_refs,
-      warn_on_undefined_functions: config.warn_on_undefined_functions
+      warn_on_undefined_references: config.warn_on_undefined_references
     }
   end
 
@@ -454,7 +454,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
             "#{extension}##{prefix}#{enc_h(function)}/#{arity})"
 
         module in modules_refs && id ->
-          if options[:warn_on_undefined_functions] do
+          if options[:warn_on_undefined_references] do
             IO.warn("#{match} is not found (parsing #{id} docs)", [])
           end
 

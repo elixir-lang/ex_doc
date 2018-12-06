@@ -126,7 +126,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
         docs_refs: ["Mod.example/1"],
         id: "Mod.foo/0",
         modules_refs: ["Mod"],
-        warn_on_undefined_functions: true
+        warn_on_undefined_references: true
       }
 
       assert capture_io(:stderr, fn ->
