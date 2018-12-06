@@ -1,5 +1,6 @@
 defmodule ExDoc.Formatter.HTML.AutolinkTest do
   use ExUnit.Case, async: true
+  import ExUnit.CaptureIO
   alias ExDoc.Formatter.HTML.Autolink
   import Autolink, only: [project_doc: 2]
 
@@ -118,6 +119,18 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                %{docs_refs: ["Mod.funny_name\?/1", "Mod.funny_name!/2"]}
              ) ==
                "[`Mod.funny_name\?/1`](Mod.html#funny_name\?/1) and [`Mod.funny_name!/2`](Mod.html#funny_name!/2)"
+    end
+
+    test "warns when module exists but the function does not" do
+      compiled = %{docs_refs: ["Mod.example/1"], module_id: "Mod", modules_refs: ["Mod"]}
+
+      assert capture_io(:stderr, fn ->
+               assert project_doc("`Mod.example/2`", compiled) == "`Mod.example/2`"
+             end) =~ "Mod.example/2 is not found (parsing Mod docs)"
+
+      # don't warn when parsing extras
+      assert assert project_doc("`Mod.example/2`", %{compiled | module_id: nil}) ==
+                      "`Mod.example/2`"
     end
 
     test "autolinks functions Module.fun/arity in elixir" do

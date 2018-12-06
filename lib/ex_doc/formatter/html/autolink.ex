@@ -415,10 +415,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp replace_fun(:function, :elixir, link_type, options) do
     aliases = options[:aliases] || []
     docs_refs = options[:docs_refs] || []
+    modules_refs = options[:modules_refs] || []
     extension = options[:extension] || ".html"
     lib_dirs = options[:lib_dirs] || default_lib_dirs(:elixir)
     locals = options[:locals] || []
     elixir_docs = get_elixir_docs(aliases, lib_dirs)
+    module_id = options[:module_id]
 
     fn all, text, match ->
       pmfa = {prefix, module, function, arity} = split_function(match)
@@ -443,6 +445,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         match in @special_form_strings ->
           "[#{text}](#{elixir_docs}Kernel.SpecialForms" <>
             "#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+
+        module in modules_refs && module_id ->
+          IO.warn("#{match} is not found (parsing #{module_id} docs)", [])
+          all
 
         doc = module_docs(:elixir, module, lib_dirs) ->
           "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h(function)}/#{arity})"
