@@ -43,7 +43,7 @@ defmodule ExDoc.Config do
             source_url_pattern: nil,
             title: nil,
             version: nil,
-            warn_on_undefined_functions: false
+            warn_on_undefined_functions: true
 
   @type t :: %__MODULE__{
           api_reference: boolean(),
