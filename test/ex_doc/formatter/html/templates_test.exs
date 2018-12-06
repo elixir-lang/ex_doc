@@ -31,7 +31,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   defp get_module_page(names, config \\ []) do
     config = doc_config(config)
     mods = ExDoc.Retriever.docs_from_modules(names, config)
-    mods = HTML.Autolink.all(mods, HTML.Autolink.compile(mods, ".html", []))
+    mods = HTML.Autolink.all(mods, HTML.Autolink.compile(mods, ".html", config))
     Templates.module_page(hd(mods), @empty_nodes_map, config)
   end
 

@@ -16,7 +16,7 @@ defmodule ExDoc.Formatter.EPUB do
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
-    autolink = HTML.Autolink.compile(project_nodes, ".xhtml", config.deps)
+    autolink = HTML.Autolink.compile(project_nodes, ".xhtml", config)
     linked = HTML.Autolink.all(project_nodes, autolink)
 
     nodes_map = %{

@@ -122,14 +122,19 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "warns when module exists but the function does not" do
-      compiled = %{docs_refs: ["Mod.example/1"], module_id: "Mod", modules_refs: ["Mod"]}
+      compiled = %{
+        docs_refs: ["Mod.example/1"],
+        id: "Mod.foo/0",
+        modules_refs: ["Mod"],
+        warn_on_undefined_functions: true
+      }
 
       assert capture_io(:stderr, fn ->
                assert project_doc("`Mod.example/2`", compiled) == "`Mod.example/2`"
-             end) =~ "Mod.example/2 is not found (parsing Mod docs)"
+             end) =~ "Mod.example/2 is not found (parsing Mod.foo/0 docs)"
 
       # don't warn when parsing extras
-      assert assert project_doc("`Mod.example/2`", %{compiled | module_id: nil}) ==
+      assert assert project_doc("`Mod.example/2`", %{compiled | id: nil}) ==
                       "`Mod.example/2`"
     end
 

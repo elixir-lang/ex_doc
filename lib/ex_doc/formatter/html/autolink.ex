@@ -77,7 +77,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @doc """
   Compiles information used during autolinking.
   """
-  def compile(modules, extension, extra_lib_dirs) do
+  def compile(modules, extension, config) do
     aliases = Enum.map(modules, & &1.module)
     modules_refs = Enum.map(aliases, &inspect/1)
 
@@ -93,14 +93,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           entry <- [doc.id | doc.defaults],
           do: prefix <> module.id <> "." <> entry
 
-    lib_dirs = extra_lib_dirs ++ default_lib_dirs()
+    lib_dirs = config.deps ++ default_lib_dirs()
 
     %{
       aliases: aliases,
       docs_refs: docs_refs ++ types_refs,
       extension: extension,
       lib_dirs: lib_dirs,
-      modules_refs: modules_refs
+      modules_refs: modules_refs,
+      warn_on_undefined_functions: config.warn_on_undefined_functions
     }
   end
 
@@ -161,25 +162,31 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     compiled =
       compiled
+      |> Map.put(:id, nil)
       |> Map.put(:module_id, module.id)
       |> Map.put(:locals, funs ++ types)
 
-    moduledoc = project_doc(module.doc, compiled)
+    moduledoc = project_doc(module.doc, %{compiled | id: id(module, nil)})
 
     docs =
-      for module_node <- module.docs do
-        doc = project_doc(module_node.doc, compiled)
-        %{module_node | doc: doc}
+      for node <- module.docs do
+        doc = project_doc(node.doc, %{compiled | id: id(module, node)})
+        %{node | doc: doc}
       end
 
     typedocs =
-      for module_node <- module.typespecs do
-        doc = project_doc(module_node.doc, compiled)
-        %{module_node | doc: doc}
+      for node <- module.typespecs do
+        doc = project_doc(node.doc, %{compiled | id: id(module, node)})
+        %{node | doc: doc}
       end
 
     %{module | doc: moduledoc, docs: docs, typespecs: typedocs}
   end
+
+  defp id(%{id: id}, nil), do: id
+  defp id(%{id: mod_id}, %ExDoc.FunctionNode{id: id, type: :callback}), do: "c:#{mod_id}.#{id}"
+  defp id(%{id: mod_id}, %ExDoc.FunctionNode{id: id}), do: "#{mod_id}.#{id}"
+  defp id(%{id: mod_id}, %ExDoc.TypeNode{id: id}), do: "t:#{mod_id}.#{id}"
 
   defp all_typespecs(module, compiled) do
     %{aliases: aliases, lib_dirs: lib_dirs} = compiled
@@ -420,7 +427,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     lib_dirs = options[:lib_dirs] || default_lib_dirs(:elixir)
     locals = options[:locals] || []
     elixir_docs = get_elixir_docs(aliases, lib_dirs)
-    module_id = options[:module_id]
+    id = options[:id]
 
     fn all, text, match ->
       pmfa = {prefix, module, function, arity} = split_function(match)
@@ -446,8 +453,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           "[#{text}](#{elixir_docs}Kernel.SpecialForms" <>
             "#{extension}##{prefix}#{enc_h(function)}/#{arity})"
 
-        module in modules_refs && module_id ->
-          IO.warn("#{match} is not found (parsing #{module_id} docs)", [])
+        module in modules_refs && id ->
+          if options[:warn_on_undefined_functions] do
+            IO.warn("#{match} is not found (parsing #{id} docs)", [])
+          end
+
           all
 
         doc = module_docs(:elixir, module, lib_dirs) ->
