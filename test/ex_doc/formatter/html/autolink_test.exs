@@ -134,8 +134,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
              end) =~ "Mod.example/2 is not found (parsing Mod.foo/0 docs)"
 
       # don't warn when parsing extras
-      assert assert project_doc("`Mod.example/2`", %{compiled | id: nil}) ==
-                      "`Mod.example/2`"
+      assert assert project_doc("`Mod.example/2`", %{compiled | id: nil}) == "`Mod.example/2`"
     end
 
     test "autolinks functions Module.fun/arity in elixir" do
