@@ -19,7 +19,7 @@ defmodule ExDoc.Formatter.HTML do
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
-    autolink = Autolink.compile(project_nodes, ".html", config.deps)
+    autolink = Autolink.compile(project_nodes, ".html", config)
     linked = Autolink.all(project_nodes, autolink)
 
     nodes_map = %{
@@ -213,7 +213,7 @@ defmodule ExDoc.Formatter.HTML do
       content =
         input
         |> File.read!()
-        |> Autolink.project_doc(autolink)
+        |> Autolink.project_doc(id, autolink)
 
       group = GroupMatcher.match_extra(groups, input)
       html_content = Markdown.to_html(content, file: input, line: 1)

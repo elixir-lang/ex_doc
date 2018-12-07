@@ -1,4 +1,8 @@
 defprotocol CustomProtocol do
+  @moduledoc """
+  See `plus_one/1`.
+  """
+
   def plus_one(foo)
   def plus_two(bar)
 end

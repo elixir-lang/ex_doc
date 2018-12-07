@@ -56,6 +56,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp generate_docs(config) do
+    config = Keyword.put_new(config, :skip_undefined_reference_warnings_on, ["Warnings"])
     ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
@@ -105,6 +106,18 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert output == "warning: index.html redirects to Unknown.html, which does not exist\n"
     assert File.regular?("#{output_dir()}/index.html")
     refute File.regular?("#{output_dir()}/Unknown.html")
+  end
+
+  test "warns on undefined functions" do
+    output =
+      capture_io(:stderr, fn ->
+        generate_docs(doc_config(skip_undefined_reference_warnings_on: []))
+      end)
+
+    assert output =~ "Warnings.bar/0 is not found (parsing Warnings docs)"
+    assert output =~ "Warnings.bar/0 is not found (parsing Warnings.foo/0 docs)"
+    assert output =~ "Warnings.bar/0 is not found (parsing c:Warnings.handle_foo/0 docs)"
+    assert output =~ "Warnings.bar/0 is not found (parsing t:Warnings.t/0 docs)"
   end
 
   test "generates headers for index.html and module pages" do

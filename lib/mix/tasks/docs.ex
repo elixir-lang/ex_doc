@@ -120,6 +120,11 @@ defmodule Mix.Tasks.Docs do
     * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
 
+    * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
+      reference in the current project docs e.g. because of a typo. This list controls
+      which docs pages to skip the warnings on, which is useful for e.g. deprecation pages;
+      default: `[]`.
+
   ## Groups
 
   ExDoc content can be organized in groups. This is done via the `:groups_for_extras`

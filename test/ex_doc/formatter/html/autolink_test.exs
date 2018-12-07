@@ -1,7 +1,7 @@
 defmodule ExDoc.Formatter.HTML.AutolinkTest do
   use ExUnit.Case, async: true
+  import ExUnit.CaptureIO
   alias ExDoc.Formatter.HTML.Autolink
-  import Autolink, only: [project_doc: 2]
 
   @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
@@ -118,6 +118,31 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                %{docs_refs: ["Mod.funny_name\?/1", "Mod.funny_name!/2"]}
              ) ==
                "[`Mod.funny_name\?/1`](Mod.html#funny_name\?/1) and [`Mod.funny_name!/2`](Mod.html#funny_name!/2)"
+    end
+
+    test "warns when module exists but the function does not" do
+      compiled = %{
+        docs_refs: ["Mod.example/1"],
+        modules_refs: ["Mod"],
+        skip_undefined_reference_warnings_on: ["Bar", "deprecations"]
+      }
+
+      assert capture_io(:stderr, fn ->
+               assert Autolink.project_doc("`Mod.example/2`", "Mod.foo/0", compiled) ==
+                        "`Mod.example/2`"
+             end) =~ "Mod.example/2 is not found (parsing Mod.foo/0 docs)"
+
+      assert capture_io(:stderr, fn ->
+               assert Autolink.project_doc("`Mod.example/2`", "extras", compiled) ==
+                        "`Mod.example/2`"
+             end) =~ "Mod.example/2 is not found (parsing extras docs)"
+
+      # skip warning when module page is blacklisted
+      overwritten = Map.put(compiled, :module_id, "Bar")
+      assert assert project_doc("`Mod.example/2`", "Mod.bar/0", overwritten) == "`Mod.example/2`"
+
+      # skip warning when extras page is blacklisted
+      assert assert project_doc("`Mod.example/2`", "deprecations", compiled) == "`Mod.example/2`"
     end
 
     test "autolinks functions Module.fun/arity in elixir" do
@@ -593,5 +618,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     ast = Code.string_to_quoted!(original)
     {actual, _} = Autolink.format_and_extract_typespec_placeholders(ast, typespecs, aliases, [])
     assert actual == expected, "Original: #{original}\nExpected: #{expected}\nActual:   #{actual}"
+  end
+
+  defp project_doc(string, id \\ nil, compiled) do
+    Autolink.project_doc(string, id, compiled)
   end
 end

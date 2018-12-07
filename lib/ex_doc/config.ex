@@ -42,7 +42,8 @@ defmodule ExDoc.Config do
             source_url: nil,
             source_url_pattern: nil,
             title: nil,
-            version: nil
+            version: nil,
+            skip_undefined_reference_warnings_on: []
 
   @type t :: %__MODULE__{
           api_reference: boolean(),
@@ -72,6 +73,7 @@ defmodule ExDoc.Config do
           source_url: nil | String.t(),
           source_url_pattern: nil | String.t(),
           title: nil | String.t(),
-          version: nil | String.t()
+          version: nil | String.t(),
+          skip_undefined_reference_warnings_on: [String.t()]
         }
 end
