@@ -238,125 +238,94 @@ defmodule Mix.Tasks.Docs do
 
   @doc false
   def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate_docs/3) do
-    Mix.Task.run("compile")
+    Mix.Task.run("compile") # needed to gen source code that will be used for docs?
+
     {cli_opts, args, _} = OptionParser.parse(args, aliases: @aliases, switches: @switches)
 
-    if args != [] do
-      Mix.raise("Extraneous arguments on the command line")
-    end
+    if args != [], do: Mix.raise("Extraneous arguments on the command line")
 
     project = to_string(config[:name] || config[:app])
     version = config[:version] || "dev"
-
-    options =
-      config
-      |> get_docs_opts()
-      |> Keyword.merge(cli_opts)
-      # accepted at root level config
-      |> normalize_source_url(config)
-      # accepted at root level config
-      |> normalize_homepage_url(config)
-      |> normalize_source_beam(config)
-      |> normalize_main()
-      |> normalize_deps()
+    options = config[:docs]
+              |> get_docs_opts
+              |> Keyword.merge(cli_opts)
+              |> normalize(config, [:source_url, :homepage_url]) # accepted at root level config
+              |> normalize_source_beam(config)
+              |> normalize_main
+              |> normalize_deps()
 
     for formatter <- get_formatters(options) do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
-      log(index)
+
+      Mix.shell().info([:green, "Docs successfully generated."])
+      Mix.shell().info([:green, "View them at #{inspect(index)}."])
+
       index
     end
   end
 
-  defp get_formatters(options) do
-    case Keyword.get_values(options, :formatter) do
-      [] -> options[:formatters] || [ExDoc.Config.default_formatter()]
-      values -> values
-    end
-  end
+  defp get_docs_opts(docs) when is_function(docs, 0), do: docs.()
+  defp get_docs_opts(docs) when is_nil(docs),         do: []
+  defp get_docs_opts(docs),                           do: docs
 
-  defp get_docs_opts(config) do
-    docs = config[:docs]
-
-    cond do
-      is_function(docs, 0) -> docs.()
-      is_nil(docs) -> []
-      true -> docs
-    end
-  end
-
-  defp log(index) do
-    Mix.shell().info([:green, "Docs successfully generated."])
-    Mix.shell().info([:green, "View them at #{inspect(index)}."])
-  end
-
-  defp normalize_source_url(options, config) do
-    if source_url = config[:source_url] do
-      Keyword.put(options, :source_url, source_url)
-    else
-      options
-    end
-  end
-
-  defp normalize_homepage_url(options, config) do
-    if homepage_url = config[:homepage_url] do
-      Keyword.put(options, :homepage_url, homepage_url)
-    else
-      options
-    end
-  end
-
-  defp normalize_source_beam(options, config) do
-    compile_path =
-      if Mix.Project.umbrella?(config) do
-        umbrella_compile_paths(Keyword.get(options, :ignore_apps, []))
-      else
-        Mix.Project.compile_path()
+  defp normalize(options, config, keys) do
+    Enum.reduce(keys, options, fn key, options_ ->
+      case config[key] do
+          nil -> options
+        value -> Keyword.put(options_, key, value)
       end
-
-    Keyword.put_new(options, :source_beam, compile_path)
+    end)
   end
 
-  defp umbrella_compile_paths(ignored_apps) do
-    build = Mix.Project.build_path()
+  def normalize_source_beam(options, config) do
+    source_beam = compile_path(opts, Mix.Project.umbrella?(config))
 
-    for {app, _} <- Mix.Project.apps_paths(),
-        app not in ignored_apps do
-      Path.join([build, "lib", Atom.to_string(app), "ebin"])
-    end
+    Keyword.put_new(options, :source_beam, source_beam)
   end
 
-  defp normalize_main(options) do
-    main = options[:main]
+  defp compile_path(_options, false), do: Mix.Project.compile_path()
+  defp compile_path(options,  true) do
+    ignored_apps = Keyword.get(options, :ignore_apps, [])
+    build        = Mix.Project.build_path()
 
-    cond do
-      is_nil(main) ->
-        Keyword.delete(options, :main)
-
-      is_atom(main) ->
-        Keyword.put(options, :main, inspect(main))
-
-      is_binary(main) ->
-        options
-    end
+    for {app, _} <- Mix.Project.apps_paths(), app not in ignored_apps,
+      do: Path.join([build, "lib", Atom.to_string(app), "ebin"])
   end
+
+  defp normalize_main(options), do: normalize_main(options, options[:main])
+
+  defp normalize_main(options, nil),                       do: Keyword.delete(options, :main)
+  defp normalize_main(options, main) when is_atom(main),   do: Keyword.put(options, :main, inspect(main))
+  defp normalize_main(options, main) when is_binary(main), do: options
 
   defp normalize_deps(options) do
     user_deps = Keyword.get(options, :deps, [])
 
-    deps =
-      for {app, doc} <- Keyword.merge(get_deps(), user_deps),
-          lib_dir = :code.lib_dir(app),
-          is_list(lib_dir),
-          do: {List.to_string(lib_dir), doc}
+    deps      = for {app, doc} <- Keyword.merge(get_deps(), user_deps),
+                    lib_dir = :code.lib_dir(app),
+                    is_list(lib_dir),
+                      do: {List.to_string(lib_dir), doc}
 
     Keyword.put(options, :deps, deps)
   end
 
-  defp get_deps do
+  defp get_deps, do:
     for {key, _} <- Mix.Project.deps_paths(),
-        _ = Application.load(key),
-        vsn = Application.spec(key, :vsn) do
-      {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
+        _   = Application.load(key),
+        vsn = Application.spec(key, :vsn),
+          do: {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
+
+  defp get_formatters(options) do
+    case Keyword.get_values(options, :formatter) do
+          [] -> options[:formatters] || [ExDoc.Config.default_formatter()]
+      values -> values
     end
   end
 end
+
+# TODO: Review docs.
+# TODO: Add commit message w/ explanation.
+# THEN, put up a PR. Also, offer to just work on the fork and PR the finished product...
+#       Explain that I tried to create a PR a few months ago, but got lost in the code.
+#       As the team didn't have the bandwidth to provide documentation,
+#       I'm trying to do that (along with cleaning up the code) in my fork.
