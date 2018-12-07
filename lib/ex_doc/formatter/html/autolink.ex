@@ -101,7 +101,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       extension: extension,
       lib_dirs: lib_dirs,
       modules_refs: modules_refs,
-      warn_on_undefined_references: config.warn_on_undefined_references
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
     }
   end
 
@@ -429,6 +429,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     locals = options[:locals] || []
     elixir_docs = get_elixir_docs(aliases, lib_dirs)
     id = options[:id]
+    module_id = options[:module_id]
+    skip_warnings_on = options[:skip_undefined_reference_warnings_on] || []
 
     fn all, text, match ->
       pmfa = {prefix, module, function, arity} = split_function(match)
@@ -454,8 +456,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           "[#{text}](#{elixir_docs}Kernel.SpecialForms" <>
             "#{extension}##{prefix}#{enc_h(function)}/#{arity})"
 
-        module in modules_refs && id ->
-          if options[:warn_on_undefined_references] do
+        module in modules_refs ->
+          if module_id not in skip_warnings_on and id not in skip_warnings_on do
             IO.warn("#{match} is not found (parsing #{id} docs)", [])
           end
 

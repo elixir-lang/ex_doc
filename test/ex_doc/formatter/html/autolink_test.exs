@@ -124,7 +124,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       compiled = %{
         docs_refs: ["Mod.example/1"],
         modules_refs: ["Mod"],
-        warn_on_undefined_references: true
+        skip_undefined_reference_warnings_on: ["Bar", "deprecations"]
       }
 
       assert capture_io(:stderr, fn ->
@@ -132,8 +132,17 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                         "`Mod.example/2`"
              end) =~ "Mod.example/2 is not found (parsing Mod.foo/0 docs)"
 
-      # don't warn when parsing extras
-      assert assert project_doc("`Mod.example/2`", nil, compiled) == "`Mod.example/2`"
+      assert capture_io(:stderr, fn ->
+               assert Autolink.project_doc("`Mod.example/2`", "extras", compiled) ==
+                        "`Mod.example/2`"
+             end) =~ "Mod.example/2 is not found (parsing extras docs)"
+
+      # skip warning when module page is blacklisted
+      overwritten = Map.put(compiled, :module_id, "Bar")
+      assert assert project_doc("`Mod.example/2`", "Mod.bar/0", overwritten) == "`Mod.example/2`"
+
+      # skip warning when extras page is blacklisted
+      assert assert project_doc("`Mod.example/2`", "deprecations", compiled) == "`Mod.example/2`"
     end
 
     test "autolinks functions Module.fun/arity in elixir" do

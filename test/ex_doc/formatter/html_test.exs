@@ -56,7 +56,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp generate_docs(config) do
-    config = Keyword.put_new(config, :warn_on_undefined_references, false)
+    config = Keyword.put_new(config, :skip_undefined_reference_warnings_on, ["Warnings"])
     ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
@@ -111,7 +111,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "warns on undefined functions" do
     output =
       capture_io(:stderr, fn ->
-        generate_docs(doc_config(warn_on_undefined_references: true))
+        generate_docs(doc_config(skip_undefined_reference_warnings_on: []))
       end)
 
     assert output =~ "Warnings.bar/0 is not found (parsing Warnings docs)"

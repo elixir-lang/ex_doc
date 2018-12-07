@@ -213,7 +213,7 @@ defmodule ExDoc.Formatter.HTML do
       content =
         input
         |> File.read!()
-        |> Autolink.project_doc(nil, autolink)
+        |> Autolink.project_doc(id, autolink)
 
       group = GroupMatcher.match_extra(groups, input)
       html_content = Markdown.to_html(content, file: input, line: 1)
