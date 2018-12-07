@@ -457,7 +457,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
         module in modules_refs ->
           if module_id not in skip_warnings_on and id not in skip_warnings_on do
-            IO.warn("#{match} is not found (parsing #{id} docs)", [])
+            IO.warn(
+              "documentation references #{match} but it doesn't exist " <>
+                "or it's listed as @doc false (parsing #{id} docs)",
+              []
+            )
           end
 
           all

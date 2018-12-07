@@ -114,10 +114,10 @@ defmodule ExDoc.Formatter.HTMLTest do
         generate_docs(doc_config(skip_undefined_reference_warnings_on: []))
       end)
 
-    assert output =~ "Warnings.bar/0 is not found (parsing Warnings docs)"
-    assert output =~ "Warnings.bar/0 is not found (parsing Warnings.foo/0 docs)"
-    assert output =~ "Warnings.bar/0 is not found (parsing c:Warnings.handle_foo/0 docs)"
-    assert output =~ "Warnings.bar/0 is not found (parsing t:Warnings.t/0 docs)"
+    assert output =~ ~r"Warnings.bar/0 .* \(parsing Warnings docs\)"
+    assert output =~ ~r"Warnings.bar/0 .* \(parsing Warnings.foo/0 docs\)"
+    assert output =~ ~r"Warnings.bar/0 .* \(parsing c:Warnings.handle_foo/0 docs\)"
+    assert output =~ ~r"Warnings.bar/0 .* \(parsing t:Warnings.t/0 docs\)"
   end
 
   test "generates headers for index.html and module pages" do
