@@ -320,7 +320,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   def filter_list(:module, nodes) do
-    Enum.filter(nodes, &(not (&1.type in [:exception, :impl, :task])))
+    Enum.filter(nodes, &(not (&1.type in [:exception, :task])))
   end
 
   def filter_list(type, nodes) do

@@ -61,7 +61,7 @@ defmodule ExDoc.Retriever do
     end
 
     if docs_chunk = docs_chunk(module) do
-      [generate_node(module, docs_chunk, config)]
+      generate_node(module, docs_chunk, config)
     else
       []
     end
@@ -104,11 +104,19 @@ defmodule ExDoc.Retriever do
   end
 
   defp generate_node(module, docs_chunk, config) do
+    module_data = get_module_data(module, docs_chunk)
+
+    case module_data do
+      %{type: :impl} -> []
+      _ -> [do_generate_node(module, module_data, config)]
+    end
+  end
+
+  defp do_generate_node(module, module_data, config) do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
 
-    module_data = get_module_data(module, docs_chunk)
     {doc_line, moduledoc, metadata} = get_module_docs(module_data)
     line = find_module_line(module_data) || doc_line
 

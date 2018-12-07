@@ -292,15 +292,8 @@ defmodule ExDoc.RetrieverTest do
   end
 
   describe "implementations" do
-    test "are properly tagged" do
-      [module_node] = docs_from_files(["CustomProtocol.Number"])
-      assert module_node.type == :impl
-    end
-
-    test "ignores internal functions" do
-      [module_node] = docs_from_files(["CustomProtocol.Number"])
-      functions = Enum.map(module_node.docs, fn doc -> doc.id end)
-      assert functions == ["plus_one/1", "plus_two/1"]
+    test "are skipped" do
+      assert [] = docs_from_files(["CustomProtocol.Number"])
     end
   end
 end
