@@ -163,7 +163,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     compiled =
       compiled
-      |> Map.put(:id, nil)
       |> Map.put(:module_id, module.id)
       |> Map.put(:locals, funs ++ types)
 
