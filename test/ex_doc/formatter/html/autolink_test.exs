@@ -2,7 +2,6 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureIO
   alias ExDoc.Formatter.HTML.Autolink
-  import Autolink, only: [project_doc: 2]
 
   @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
@@ -124,17 +123,17 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     test "warns when module exists but the function does not" do
       compiled = %{
         docs_refs: ["Mod.example/1"],
-        id: "Mod.foo/0",
         modules_refs: ["Mod"],
         warn_on_undefined_references: true
       }
 
       assert capture_io(:stderr, fn ->
-               assert project_doc("`Mod.example/2`", compiled) == "`Mod.example/2`"
+               assert Autolink.project_doc("`Mod.example/2`", "Mod.foo/0", compiled) ==
+                        "`Mod.example/2`"
              end) =~ "Mod.example/2 is not found (parsing Mod.foo/0 docs)"
 
       # don't warn when parsing extras
-      assert assert project_doc("`Mod.example/2`", %{compiled | id: nil}) == "`Mod.example/2`"
+      assert assert project_doc("`Mod.example/2`", nil, compiled) == "`Mod.example/2`"
     end
 
     test "autolinks functions Module.fun/arity in elixir" do
@@ -610,5 +609,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     ast = Code.string_to_quoted!(original)
     {actual, _} = Autolink.format_and_extract_typespec_placeholders(ast, typespecs, aliases, [])
     assert actual == expected, "Original: #{original}\nExpected: #{expected}\nActual:   #{actual}"
+  end
+
+  defp project_doc(string, id \\ nil, compiled) do
+    Autolink.project_doc(string, id, compiled)
   end
 end

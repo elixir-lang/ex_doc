@@ -120,11 +120,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   This is the main API to autolink any project documentation.
   """
-  def project_doc(nil, _compiled), do: nil
+  def project_doc(nil, _id, _compiled), do: nil
 
-  def project_doc(string, compiled) when is_binary(string) and is_map(compiled) do
+  def project_doc(string, id, compiled) when is_binary(string) and is_map(compiled) do
     config =
       compiled
+      |> Map.put(:id, id)
       |> Map.put_new(:module_id, nil)
       |> Map.put_new(:locals, [])
 
@@ -166,17 +167,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       |> Map.put(:module_id, module.id)
       |> Map.put(:locals, funs ++ types)
 
-    moduledoc = project_doc(module.doc, %{compiled | id: id(module, nil)})
+    moduledoc = project_doc(module.doc, id(module, nil), compiled)
 
     docs =
       for node <- module.docs do
-        doc = project_doc(node.doc, %{compiled | id: id(module, node)})
+        doc = project_doc(node.doc, id(module, node), compiled)
         %{node | doc: doc}
       end
 
     typedocs =
       for node <- module.typespecs do
-        doc = project_doc(node.doc, %{compiled | id: id(module, node)})
+        doc = project_doc(node.doc, id(module, node), compiled)
         %{node | doc: doc}
       end
 
