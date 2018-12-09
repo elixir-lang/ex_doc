@@ -317,9 +317,9 @@ defmodule Mix.Tasks.Docs do
     main = options[:main]
 
     cond do
-      is_binary(main) -> options
-      is_atom(main)   -> Keyword.put(options, :main, inspect(main))
       is_nil(main)    -> Keyword.delete(options, :main)
+      is_atom(main)   -> Keyword.put(options, :main, inspect(main))
+      is_binary(main) -> options
     end
     |> normalize_deps()
   end
