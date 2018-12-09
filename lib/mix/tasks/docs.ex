@@ -265,7 +265,16 @@ defmodule Mix.Tasks.Docs do
     end
   end
 
-
+  # Table of Contents:
+  #
+  # config
+  # |> get_docs_opts()
+  # |> Keyword.merge(cli_opts)
+  # |> normalize_urls(config, [:source_url, :homepage_url]) # accepted at root level config
+  # |> normalize_source_beam(config)
+  # |> normalize_main()
+  # |> normalize_deps()
+  #
   defp get_docs_opts(config, cli_opts) do
     docs = config[:docs]
 
@@ -275,10 +284,10 @@ defmodule Mix.Tasks.Docs do
       true                 -> docs
     end
     |> Keyword.merge(cli_opts)
-    |> normalize(config, [:source_url, :homepage_url]) # accepted at root level config
+    |> normalize_urls(config, [:source_url, :homepage_url]) # accepted at root level config
   end
 
-  defp normalize(options, config, keys) do
+  defp normalize_urls(options, config, keys) do
     Enum.reduce(keys, options, fn key, options_ ->
       case Keyword.get(config, key) do
           nil -> options_
