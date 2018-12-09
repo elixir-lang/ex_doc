@@ -6,30 +6,32 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.{GroupMatcher, ModuleData}
+  alias ExDoc.{Config, GroupMatcher, ModuleData}
   alias ExDoc.Retriever.Error
 
   @doc "Extract docs from all modules in the specified directory/-ies."
-  @spec docs_from_dir(Path.t | [Path.t], ExDoc.Config.t) :: [ExDoc.ModuleNode.t]
-  def docs_from_dir(config = %ExDoc.Config{source_beam: dirs}) when is_list(dirs),
+  @spec docs_from_dir(Config.t) :: [ExDoc.ModuleNode.t]
+  def docs_from_dir(config = %Config{source_beam: dirs}) when is_list(dirs),
     do: Enum.flat_map(dirs, &docs_from_dir(%{config | source_beam: &1}))
 
-  def docs_from_dir(config = %ExDoc.Config{filter_prefix:      prefix,
-                                           groups_for_modules: mod_groups,
-                                           source_beam:        dir}) when is_binary(dir), do:
-    if(prefix, do:   "Elixir.#{prefix}*.beam",
-               else: "*.beam")
-    |> Path.expand(dir)
-    |> Path.wildcard()
-    |> Enum.map(fn name -> name
-                           |> Path.basename(".beam")
-                           |> String.to_atom() end)
-    |> Enum.flat_map(&get_module(&1, config))
-    |> Enum.sort_by(fn %{group: group, id: id} -> {GroupMatcher.group_index(mod_groups, group), id} end)
+  def docs_from_dir(config = %Config{filter_prefix: prefix,
+                                     source_beam:   dir}) when is_binary(dir),
+    do: if(prefix, do:   "Elixir.#{prefix}*.beam",
+                   else: "*.beam")
+        |> Path.expand(dir)
+        |> Path.wildcard()
+        |> docs_from_files(config) # Used in tests.
+  def docs_from_files(files, config = %Config{groups_for_modules: mod_groups}),
+    do: files
+        |> Enum.map(fn name -> name
+                               |> Path.basename(".beam")
+                               |> String.to_atom() end)
+        |> Enum.flat_map(&get_module(&1, config))
+        |> Enum.sort_by(fn %{group: group, id: id} -> {GroupMatcher.group_index(mod_groups, group), id} end)
 
-  # Get all the information from the module and compile it.
-  defp get_module(:elixir_bootstrap, _config), do: []
-  defp get_module(module, config) do
+  @doc "Get all the information from the module and compile it."
+  def get_module(:elixir_bootstrap, _config), do: []
+  def get_module(module, config) do
     check_compilation(module)
 
     docs_chunk =

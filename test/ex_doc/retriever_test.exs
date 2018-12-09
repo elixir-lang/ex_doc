@@ -1,12 +1,12 @@
 defmodule ExDoc.RetrieverTest do
   use ExUnit.Case, async: true
 
-  alias ExDoc.Retriever
+  alias ExDoc.{Config, Retriever}
 
   defp docs_from_files(names, config \\ []) do
     files = Enum.map(names, fn n -> "test/tmp/Elixir.#{n}.beam" end)
 
-    default = %ExDoc.Config{
+    default = %Config{
       source_url_pattern: "http://example.com/%{path}#L%{line}",
       source_root: File.cwd!()
     }
@@ -16,15 +16,12 @@ defmodule ExDoc.RetrieverTest do
 
   describe "docs_from_dir" do
     test "matches files with filter prefix" do
-      config = %ExDoc.Config{filter_prefix: "CompiledWithDocs", source_root: File.cwd!()}
-      from_dir_nodes = Retriever.docs_from_dir("test/tmp/beam", config)
+      config = %Config{filter_prefix: "CompiledWithDocs", source_beam: "test/tmp/beam", source_root: File.cwd!()}
 
-      file_nodes =
+      assert Retriever.docs_from_dir(config) ==
         ["Elixir.CompiledWithDocs.beam", "Elixir.CompiledWithDocs.Nested.beam"]
         |> Enum.map(&Path.join("test/tmp/beam", &1))
         |> Retriever.docs_from_files(config)
-
-      assert from_dir_nodes == file_nodes
     end
   end
 
@@ -188,7 +185,7 @@ defmodule ExDoc.RetrieverTest do
 
     test "returns the source when source_root set to nil" do
       files = Enum.map(["CompiledWithDocs"], fn n -> "test/tmp/Elixir.#{n}.beam" end)
-      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: nil}
+      config = %Config{source_url_pattern: "%{path}:%{line}", source_root: nil}
       [module_node] = Retriever.docs_from_files(files, config)
       assert String.ends_with?(module_node.source_url, "/test/fixtures/compiled_with_docs.ex:1")
     end

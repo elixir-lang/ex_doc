@@ -1,4 +1,8 @@
 defmodule ExDoc.ModuleData do
+  @moduledoc false
+
+  alias ExDoc.{GroupMatcher}
+
   def generate_node(module, docs_chunk, config) do
     module_data = %{
       name:      module,
