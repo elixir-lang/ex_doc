@@ -6,11 +6,11 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.{Config, GroupMatcher, ModuleData}
+  alias ExDoc.{Config, GroupMatcher, ModuleData, ModuleNode}
   alias ExDoc.Retriever.Error
 
   @doc "Extract docs from all modules in the specified directory/-ies."
-  @spec docs_from_dir(Config.t) :: [ExDoc.ModuleNode.t]
+  @spec docs_from_dir(Config.t) :: [ModuleNode.t]
   def docs_from_dir(config = %Config{source_beam: dirs}) when is_list(dirs),
     do: Enum.flat_map(dirs, &docs_from_dir(%{config | source_beam: &1}))
 
