@@ -246,7 +246,8 @@ defmodule Mix.Tasks.Docs do
 
     project = to_string(config[:name] || config[:app])
     version = config[:version] || "dev"
-    options = get_docs_opts(config, cli_opts) # def'd after `get_formatters/1`
+    options = get_docs_opts(config, cli_opts)
+    # def'd after `get_formatters/1`
 
     for formatter <- get_formatters(options) do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
@@ -260,7 +261,7 @@ defmodule Mix.Tasks.Docs do
 
   defp get_formatters(options) do
     case Keyword.get_values(options, :formatter) do
-      []     -> options[:formatters] || [ExDoc.Config.default_formatter()]
+      [] -> options[:formatters] || [ExDoc.Config.default_formatter()]
       values -> values
     end
   end
@@ -280,17 +281,18 @@ defmodule Mix.Tasks.Docs do
 
     cond do
       is_function(docs, 0) -> docs.()
-      is_nil(docs)         -> []
-      true                 -> docs
+      is_nil(docs) -> []
+      true -> docs
     end
     |> Keyword.merge(cli_opts)
-    |> normalize_urls(config, [:source_url, :homepage_url]) # accepted at root level config
+    # accepted at root level config
+    |> normalize_urls(config, [:source_url, :homepage_url])
   end
 
   defp normalize_urls(options, config, keys) do
     Enum.reduce(keys, options, fn key, options_ ->
       case Keyword.get(config, key) do
-        nil   -> options_
+        nil -> options_
         value -> Keyword.put(options_, key, value)
       end
     end)
@@ -300,13 +302,16 @@ defmodule Mix.Tasks.Docs do
   def normalize_source_beam(options, config) do
     source_beam =
       case Mix.Project.umbrella?(config) do
-        false -> Mix.Project.compile_path()
+        false ->
+          Mix.Project.compile_path()
 
-        true  -> ignored_apps = Keyword.get(options, :ignore_apps, [])
-                 build        = Mix.Project.build_path()
+        true ->
+          ignored_apps = Keyword.get(options, :ignore_apps, [])
+          build = Mix.Project.build_path()
 
-                 for {app, _} <- Mix.Project.apps_paths(), app not in ignored_apps,
-                   do: Path.join([build, "lib", Atom.to_string(app), "ebin"])
+          for {app, _} <- Mix.Project.apps_paths(),
+              app not in ignored_apps,
+              do: Path.join([build, "lib", Atom.to_string(app), "ebin"])
       end
 
     Keyword.put_new(options, :source_beam, source_beam)
@@ -317,26 +322,30 @@ defmodule Mix.Tasks.Docs do
     main = options[:main]
 
     cond do
-      is_nil(main)    -> Keyword.delete(options, :main)
-      is_atom(main)   -> Keyword.put(options, :main, inspect(main))
+      is_nil(main) -> Keyword.delete(options, :main)
+      is_atom(main) -> Keyword.put(options, :main, inspect(main))
       is_binary(main) -> options
     end
     |> normalize_deps()
   end
 
   defp normalize_deps(options) do
-    deps = for {app, doc} <- Keyword.merge( get_deps(), Keyword.get(options, :deps, []) ),
-               lib_dir = :code.lib_dir(app),
-               is_list(lib_dir),
-                 do: {List.to_string(lib_dir), doc}
+    deps =
+      for {app, doc} <- Keyword.merge(get_deps(), Keyword.get(options, :deps, [])),
+          lib_dir = :code.lib_dir(app),
+          is_list(lib_dir),
+          do: {List.to_string(lib_dir), doc}
 
     Keyword.put(options, :deps, deps)
     # call stack returns to `run/1`
   end
 
-  defp get_deps, do:
-    for {key, _} <- Mix.Project.deps_paths(),
-        _   = Application.load(key),
+  defp get_deps,
+    do:
+      for(
+        {key, _} <- Mix.Project.deps_paths(),
+        _ = Application.load(key),
         vsn = Application.spec(key, :vsn),
-          do: {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
+        do: {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
+      )
 end
