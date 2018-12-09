@@ -238,7 +238,7 @@ defmodule Mix.Tasks.Docs do
 
   @doc false
   def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate_docs/3) do
-    Mix.Task.run("compile") # needed to gen source code that will be used for docs?
+    Mix.Task.run("compile")
 
     {cli_opts, args, _} = OptionParser.parse(args, aliases: @aliases, switches: @switches)
 
@@ -246,13 +246,7 @@ defmodule Mix.Tasks.Docs do
 
     project = to_string(config[:name] || config[:app])
     version = config[:version] || "dev"
-    options = config[:docs]
-              |> get_docs_opts
-              |> Keyword.merge(cli_opts)
-              |> normalize(config, [:source_url, :homepage_url]) # accepted at root level config
-              |> normalize_source_beam(config)
-              |> normalize_main
-              |> normalize_deps()
+    options = get_docs_opts(config, cli_opts) # def'd after `get_formatters/1`
 
     for formatter <- get_formatters(options) do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
@@ -264,39 +258,62 @@ defmodule Mix.Tasks.Docs do
     end
   end
 
-  defp get_docs_opts(docs) when is_function(docs, 0), do: docs.()
-  defp get_docs_opts(docs) when is_nil(docs),         do: []
-  defp get_docs_opts(docs),                           do: docs
+  defp get_formatters(options) do
+    case Keyword.get_values(options, :formatter) do
+          [] -> options[:formatters] || [ExDoc.Config.default_formatter()]
+      values -> values
+    end
+  end
+
+
+  defp get_docs_opts(config, cli_opts) do
+    docs = config[:docs]
+
+    cond do
+      is_function(docs, 0) -> docs.()
+      is_nil(docs)         -> []
+      true                 -> docs
+    end
+    |> Keyword.merge(cli_opts)
+    |> normalize(config, [:source_url, :homepage_url]) # accepted at root level config
+  end
 
   defp normalize(options, config, keys) do
     Enum.reduce(keys, options, fn key, options_ ->
-      case config[key] do
-          nil -> options
+      case Keyword.get(config, key) do
+          nil -> options_
         value -> Keyword.put(options_, key, value)
       end
     end)
+    |> normalize_source_beam(config)
   end
 
   def normalize_source_beam(options, config) do
-    source_beam = compile_path(opts, Mix.Project.umbrella?(config))
+    source_beam =
+      case Mix.Project.umbrella?(config) do
+        false -> Mix.Project.compile_path()
+
+        true  -> ignored_apps = Keyword.get(options, :ignore_apps, [])
+                 build        = Mix.Project.build_path()
+
+                 for {app, _} <- Mix.Project.apps_paths(), app not in ignored_apps,
+                   do: Path.join([build, "lib", Atom.to_string(app), "ebin"])
+      end
 
     Keyword.put_new(options, :source_beam, source_beam)
+    |> normalize_main()
   end
 
-  defp compile_path(_options, false), do: Mix.Project.compile_path()
-  defp compile_path(options,  true) do
-    ignored_apps = Keyword.get(options, :ignore_apps, [])
-    build        = Mix.Project.build_path()
+  defp normalize_main(options) do
+    main = options[:main]
 
-    for {app, _} <- Mix.Project.apps_paths(), app not in ignored_apps,
-      do: Path.join([build, "lib", Atom.to_string(app), "ebin"])
+    cond do
+      is_binary(main) -> options
+      is_atom(main)   -> Keyword.put(options, :main, inspect(main))
+      is_nil(main)    -> Keyword.delete(options, :main)
+    end
+    |> normalize_deps()
   end
-
-  defp normalize_main(options), do: normalize_main(options, options[:main])
-
-  defp normalize_main(options, nil),                       do: Keyword.delete(options, :main)
-  defp normalize_main(options, main) when is_atom(main),   do: Keyword.put(options, :main, inspect(main))
-  defp normalize_main(options, main) when is_binary(main), do: options
 
   defp normalize_deps(options) do
     user_deps = Keyword.get(options, :deps, [])
@@ -307,6 +324,7 @@ defmodule Mix.Tasks.Docs do
                       do: {List.to_string(lib_dir), doc}
 
     Keyword.put(options, :deps, deps)
+    # call stack returns to `run/1`
   end
 
   defp get_deps, do:
@@ -314,18 +332,4 @@ defmodule Mix.Tasks.Docs do
         _   = Application.load(key),
         vsn = Application.spec(key, :vsn),
           do: {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
-
-  defp get_formatters(options) do
-    case Keyword.get_values(options, :formatter) do
-          [] -> options[:formatters] || [ExDoc.Config.default_formatter()]
-      values -> values
-    end
-  end
 end
-
-# TODO: Review docs.
-# TODO: Add commit message w/ explanation.
-# THEN, put up a PR. Also, offer to just work on the fork and PR the finished product...
-#       Explain that I tried to create a PR a few months ago, but got lost in the code.
-#       As the team didn't have the bandwidth to provide documentation,
-#       I'm trying to do that (along with cleaning up the code) in my fork.
