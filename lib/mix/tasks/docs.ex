@@ -260,7 +260,7 @@ defmodule Mix.Tasks.Docs do
 
   defp get_formatters(options) do
     case Keyword.get_values(options, :formatter) do
-          [] -> options[:formatters] || [ExDoc.Config.default_formatter()]
+      []     -> options[:formatters] || [ExDoc.Config.default_formatter()]
       values -> values
     end
   end
@@ -290,7 +290,7 @@ defmodule Mix.Tasks.Docs do
   defp normalize_urls(options, config, keys) do
     Enum.reduce(keys, options, fn key, options_ ->
       case Keyword.get(config, key) do
-          nil -> options_
+        nil   -> options_
         value -> Keyword.put(options_, key, value)
       end
     end)
@@ -325,12 +325,10 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp normalize_deps(options) do
-    user_deps = Keyword.get(options, :deps, [])
-
-    deps      = for {app, doc} <- Keyword.merge(get_deps(), user_deps),
-                    lib_dir = :code.lib_dir(app),
-                    is_list(lib_dir),
-                      do: {List.to_string(lib_dir), doc}
+    deps = for {app, doc} <- Keyword.merge( get_deps(), Keyword.get(options, :deps, []) ),
+               lib_dir = :code.lib_dir(app),
+               is_list(lib_dir),
+                 do: {List.to_string(lib_dir), doc}
 
     Keyword.put(options, :deps, deps)
     # call stack returns to `run/1`
