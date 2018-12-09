@@ -2,15 +2,10 @@ defmodule ExDoc.Config do
   @moduledoc false
 
   @default_formatter "html"
+  def default_formatter, do: @default_formatter
+
   @default_source_ref "master"
-
-  def default_source_ref do
-    @default_source_ref
-  end
-
-  def default_formatter do
-    @default_formatter
-  end
+  def default_source_ref, do: @default_source_ref
 
   def before_closing_head_tag(_), do: ""
   def before_closing_body_tag(_), do: ""
