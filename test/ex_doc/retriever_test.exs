@@ -16,12 +16,16 @@ defmodule ExDoc.RetrieverTest do
 
   describe "docs_from_dir" do
     test "matches files with filter prefix" do
-      config = %Config{filter_prefix: "CompiledWithDocs", source_beam: "test/tmp/beam", source_root: File.cwd!()}
+      config = %Config{
+        filter_prefix: "CompiledWithDocs",
+        source_beam: "test/tmp/beam",
+        source_root: File.cwd!()
+      }
 
       assert Retriever.docs_from_dir(config) ==
-        ["Elixir.CompiledWithDocs.beam", "Elixir.CompiledWithDocs.Nested.beam"]
-        |> Enum.map(&Path.join("test/tmp/beam", &1))
-        |> Retriever.docs_from_files(config)
+               ["Elixir.CompiledWithDocs.beam", "Elixir.CompiledWithDocs.Nested.beam"]
+               |> Enum.map(&Path.join("test/tmp/beam", &1))
+               |> Retriever.docs_from_files(config)
     end
   end
 
