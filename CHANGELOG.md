@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.19.2
+
+  * Enhancements
+    * Allow logo in SVG extension
+    * Allow functions to be grouped based on metadata
+    * Allow api-reference.html page to be disabled
+    * Allow nesting of modules by prefix
+    * Autolink `mix help TASK`
+    * Warn on undefined remote functions from project's docs
+
+  * Bug fixes
+    * Sort function names alphabetically in the sidebar
+    * Fix search input color
+    * Disable earmark smartypants option
+
 ## v0.19.1
 
   * Enhancements

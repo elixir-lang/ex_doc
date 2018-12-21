@@ -137,10 +137,10 @@ defmodule ExDoc.Retriever do
       type: module_data.type,
       deprecated: metadata[:deprecated],
       function_groups: function_groups,
-      docs: Enum.sort_by(docs, &{&1.name, &1.id}),
+      docs: Enum.sort_by(docs, &{&1.name, &1.arity}),
       doc: moduledoc,
       doc_line: doc_line,
-      typespecs: Enum.sort_by(types, & &1.id),
+      typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
       source_path: source_path,
       source_url: source_link(source, line)
     }
