@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title><%= config.project %> v<%= config.version %> – Documentation</title>
+    <title><%= config.project %> v<%= config.version %> — Documentation</title>
     <meta http-equiv="refresh" content="0; url=<%= h(redirect_to) %>">
     <meta name="robots" content="noindex">
     <meta name="generator" content="ExDoc v<%= ExDoc.version %>">

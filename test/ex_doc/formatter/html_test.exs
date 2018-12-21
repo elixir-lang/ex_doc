@@ -132,12 +132,12 @@ defmodule ExDoc.Formatter.HTMLTest do
         generator: ~r{<meta name="generator" content="ExDoc v#{ExDoc.version()}">}
       },
       index: %{
-        title: ~r{<title>Elixir v1.0.1 – Documentation</title>},
+        title: ~r{<title>Elixir v1.0.1 — Documentation</title>},
         index: ~r{<meta name="robots" content="noindex"},
         refresh: ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}
       },
       module: %{
-        title: ~r{<title>RandomError – Elixir v1.0.1</title>},
+        title: ~r{<title>RandomError — Elixir v1.0.1</title>},
         viewport: ~r{<meta name="viewport" content="width=device-width, initial-scale=1.0">},
         x_ua: ~r{<meta http-equiv="x-ua-compatible" content="ie=edge">}
       }
@@ -348,7 +348,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     test "with custom title" do
       generate_docs(doc_config(extras: ["test/fixtures/README.md": [title: "Getting Started"]]))
       content = File.read!("#{output_dir()}/readme.html")
-      assert content =~ ~r{<title>Getting Started – Elixir v1.0.1</title>}
+      assert content =~ ~r{<title>Getting Started — Elixir v1.0.1</title>}
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~r{"id":"readme","title":"Getting Started","group":""}
     end
@@ -367,7 +367,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     test "with auto-extracted titles" do
       generate_docs(doc_config(extras: ["test/fixtures/ExtraPage.md"]))
       content = File.read!("#{output_dir()}/extrapage.html")
-      assert content =~ ~r{<title>Extra Page Title – Elixir v1.0.1</title>}
+      assert content =~ ~r{<title>Extra Page Title — Elixir v1.0.1</title>}
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~r{"id":"extrapage","title":"Extra Page Title"}
     end
