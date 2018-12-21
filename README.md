@@ -19,7 +19,9 @@ If you are using Elixir v1.7 and later:
 
 ```elixir
 def deps do
-  [{:ex_doc, "~> 0.19", only: :dev, runtime: false}]
+  [
+    {:ex_doc, "~> 0.19", only: :dev, runtime: false},
+  ]
 end
 ```
 
@@ -27,7 +29,9 @@ If you are using Elixir v1.6 and earlier:
 
 ```elixir
 def deps do
-  [{:ex_doc, "~> 0.18.0", only: :dev, runtime: false}]
+  [
+    {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
+  ]
 end
 ```
 
