@@ -405,7 +405,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     fn all, _text, match ->
       cond do
         match == module_id ->
-          "[`#{match}`](#{match}#{extension}#content)"
+          "[`#{match}`](#content)"
 
         match in modules_refs ->
           "[`#{match}`](#{match}#{extension})"
@@ -486,7 +486,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
       cond do
         match == module_id ->
-          "[#{text}](#{match}#{extension}#content)"
+          "[#{text}](#content)"
 
         match in modules_refs ->
           "[#{text}](#{match}#{extension})"
