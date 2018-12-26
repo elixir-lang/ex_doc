@@ -287,24 +287,41 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   end
 
   describe "elixir modules" do
-    test "autolinks modules in docs" do
-      assert project_doc("`MyModule`", %{docs_refs: ["MyModule"], module_id: "MyModule"}) ==
-               "[`MyModule`](#content)"
-
-      assert project_doc("`MyModule.Nested`", %{
-               docs_refs: ["MyModule.Nested"],
-               module_id: "MyModule.Nested"
-             }) == "[`MyModule.Nested`](#content)"
-
-      assert project_doc("`MyModule.Nested.Deep`", %{
-               docs_refs: ["MyModule.Nested.Deep"],
-               module_id: "MyModule.Nested.Deep"
-             }) == "[`MyModule.Nested.Deep`](#content)"
-
-      assert project_doc("```\nThis is a test.\n```\n\nSee `MyModule`.", %{
-               docs_refs: ["MyModule"],
+    test "autolinks modules in docs, but does not auto-link modules within the same
+          moduledoc when using normal links" do
+      # Does not auto-link to the same module when using normal links.
+      assert project_doc("`MyModule` and `AnotherModule`", %{
+               modules_refs: ["MyModule", "AnotherModule"],
                module_id: "MyModule"
-             }) == "```\nThis is a test.\n```\n\nSee [`MyModule`](#content)."
+             }) ==
+               "`MyModule` and [`AnotherModule`](AnotherModule.html)"
+
+      # Does auto-link to same module when using custom links.
+      assert project_doc(
+               "[this is `my` module](`MyModule`) and [this is `another` module](`AnotherModule`)",
+               %{
+                 modules_refs: ["MyModule", "AnotherModule"],
+                 module_id: "MyModule"
+               }
+             ) ==
+               "[this is `my` module](#content) and [this is `another` module](AnotherModule.html)"
+
+      assert project_doc("`MyModule.Nested` and `AnotherModule.Nested`", %{
+               modules_refs: ["MyModule", "AnotherModule.Nested"],
+               module_id: "MyModule.Nested"
+             }) == "`MyModule.Nested` and [`AnotherModule.Nested`](AnotherModule.Nested.html)"
+
+      assert project_doc("`MyModule.Nested.Deep` and `AnotherModule.Nested.Deep`", %{
+               modules_refs: ["MyModule.Nested.Deep", "AnotherModule.Nested.Deep"],
+               module_id: "MyModule.Nested.Deep"
+             }) ==
+               "`MyModule.Nested.Deep` and [`AnotherModule.Nested.Deep`](AnotherModule.Nested.Deep.html)"
+
+      assert project_doc("```\nThis is a test.\n```\n\nSee `MyModule` and `AnotherModule`.", %{
+               modules_refs: ["MyModule", "AnotherModule"],
+               module_id: "MyModule"
+             }) ==
+               "```\nThis is a test.\n```\n\nSee `MyModule` and [`AnotherModule`](AnotherModule.html)."
     end
 
     test "autolinks modules in elixir" do
@@ -380,11 +397,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "[`mix foo.bar.baz`](Mix.Tasks.Foo.Bar.Baz.html)"
     end
 
-    test "autolinks task in the same module" do
-      assert project_doc("`mix foo`", %{
-               modules_refs: ["Mix.Tasks.Foo"],
+    test "does not autolink task in the same module using normal links" do
+      assert project_doc("`mix foo` and `mix bar`", %{
+               modules_refs: ["Mix.Tasks.Foo", "Mix.Tasks.Bar"],
                module_id: "Mix.Tasks.Foo"
-             }) == "[`mix foo`](#content)"
+             }) == "`mix foo` and [`mix bar`](Mix.Tasks.Bar.html)"
     end
 
     test "autolinks tasks from dependencies" do
