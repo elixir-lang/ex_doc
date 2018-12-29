@@ -289,22 +289,22 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
   describe "elixir modules" do
     test "autolinks modules in docs" do
       assert project_doc("`MyModule`", %{docs_refs: ["MyModule"], module_id: "MyModule"}) ==
-               "[`MyModule`](MyModule.html#content)"
+               "[`MyModule`](#content)"
 
       assert project_doc("`MyModule.Nested`", %{
                docs_refs: ["MyModule.Nested"],
                module_id: "MyModule.Nested"
-             }) == "[`MyModule.Nested`](MyModule.Nested.html#content)"
+             }) == "[`MyModule.Nested`](#content)"
 
       assert project_doc("`MyModule.Nested.Deep`", %{
                docs_refs: ["MyModule.Nested.Deep"],
                module_id: "MyModule.Nested.Deep"
-             }) == "[`MyModule.Nested.Deep`](MyModule.Nested.Deep.html#content)"
+             }) == "[`MyModule.Nested.Deep`](#content)"
 
       assert project_doc("```\nThis is a test.\n```\n\nSee `MyModule`.", %{
                docs_refs: ["MyModule"],
                module_id: "MyModule"
-             }) == "```\nThis is a test.\n```\n\nSee [`MyModule`](MyModule.html#content)."
+             }) == "```\nThis is a test.\n```\n\nSee [`MyModule`](#content)."
     end
 
     test "autolinks modules in elixir" do
@@ -367,7 +367,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert project_doc("`mix foo`", %{
                modules_refs: ["Mix.Tasks.Foo"],
                module_id: "Mix.Tasks.Foo"
-             }) == "[`mix foo`](Mix.Tasks.Foo.html#content)"
+             }) == "[`mix foo`](#content)"
     end
 
     test "autolinks tasks from dependencies" do
