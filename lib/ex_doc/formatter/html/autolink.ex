@@ -521,10 +521,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp default_text(_, :custom, _, text),
     do: text
+
   defp default_text(_, _, {_, "", fun, arity}, _text),
     do: "`#{fun}/#{arity}`"
+
   defp default_text(prefix, _, {_, module, "", ""}, _text),
     do: "`#{prefix}#{module}`"
+
   defp default_text(prefix, _, {_, module, fun, arity}, _text),
     do: "`#{prefix}#{module}.#{fun}/#{arity}`"
 
