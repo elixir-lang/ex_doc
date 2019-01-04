@@ -396,22 +396,40 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end
   end
 
-  defp replace_fun(:module, :elixir, _link_type, options) do
+  defp replace_fun(:module, :elixir, link_type, options) do
     extension = options[:extension] || ".html"
     lib_dirs = options[:lib_dirs] || default_lib_dirs(:elixir)
     module_id = options[:module_id] || nil
     modules_refs = options[:modules_refs] || []
 
-    fn all, _text, match ->
+    fn all, text, match ->
       cond do
         match == module_id ->
-          "[`#{match}`](#content)"
+          case link_type do
+            :normal ->
+              "[`#{match}`](#content)"
+
+            :custom ->
+              "[#{text}](#content)"
+          end
 
         match in modules_refs ->
-          "[`#{match}`](#{match}#{extension})"
+          case link_type do
+            :normal ->
+              "[`#{match}`](#{match}#{extension})"
+
+            :custom ->
+              "[#{text}](#{match}#{extension})"
+          end
 
         doc = module_docs(:elixir, match, lib_dirs) ->
-          "[`#{match}`](#{doc}#{match}.html)"
+          case link_type do
+            :normal ->
+              "[`#{match}`](#{doc}#{match}.html)"
+
+            :custom ->
+              "[#{text}](#{doc}#{match}.html)"
+          end
 
         true ->
           all

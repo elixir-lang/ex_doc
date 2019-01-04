@@ -350,6 +350,23 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert project_doc("[in the `Kernel` module](Kernel.html#guards)", %{docs_refs: []}) ==
                "[in the `Kernel` module](Kernel.html#guards)"
     end
+
+    test "supports custom links" do
+      assert project_doc("[`example`](`Example`)", %{modules_refs: ["Example"]}) ==
+               "[`example`](Example.html)"
+
+      assert project_doc("[the `example` module](`Example`)", %{modules_refs: ["Example"]}) ==
+               "[the `example` module](Example.html)"
+
+      assert project_doc("[the `Example` module](`Example`)", %{modules_refs: ["Example"]}) ==
+               "[the `Example` module](Example.html)"
+
+      assert project_doc("[the `string` module](`String`)", %{modules_refs: []}) ==
+               "[the `string` module](#{@elixir_docs}elixir/String.html)"
+
+      assert project_doc("[the `String` module](`String`)", %{modules_refs: []}) ==
+               "[the `String` module](#{@elixir_docs}elixir/String.html)"
+    end
   end
 
   describe "Mix tasks" do
