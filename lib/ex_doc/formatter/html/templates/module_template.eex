@@ -2,7 +2,7 @@
     <%= sidebar_template(config, nodes_map) %>
 
       <h1>
-        <small class="visible-xs"><%= config.project %> v<%= config.version %></small>
+        <small class="app-vsn"><%= config.project %> v<%= config.version %></small>
         <%= module_title(module) %>
         <%= if module.source_url do %>
           <a href="<%= module.source_url %>" title="View Source" class="view-source" rel="help">
@@ -18,31 +18,31 @@
         </div>
       <% end %>
 
-      <%= if module.doc do %>
+      <%= if doc = module.rendered_doc do %>
         <section id="moduledoc">
-          <%= module.doc |> to_html(module) |> link_moduledoc_headings() %>
+          <%= link_moduledoc_headings(doc, module.title) %>
         </section>
       <% end %>
 
       <%= if Enum.any?(summary, fn {_, v} -> v != [] end) do %>
         <section id="summary" class="details-list">
           <h1 class="section-heading">
-            <a class="hover-link" href="#summary">
+            <a class="hover-link" href="#summary" title="Link to <%= module.title %> Summary">
               <span class="icon-link" aria-hidden="true"></span>
-              <span class="sr-only">Link to this section</span>
+              <span class="sr-only">Link to this section <%= module.title %> Summary</span>
             </a>
             Summary
           </h1>
-          <%= for {name, nodes} <- summary, do: summary_template(name, nodes) %>
+          <%= for {name, nodes} <- summary, do: summary_template(name, nodes, module) %>
         </section>
       <% end %>
 
       <%= for {name, nodes} <- summary, nodes != [], key = HTML.text_to_id(name) do %>
         <section id="<%= key %>" class="details-list">
           <h1 class="section-heading">
-            <a class="hover-link" href="#<%= key %>">
+            <a class="hover-link" href="#<%= key %>" title="Link to <%= module.title %> <%= name %>">
               <span class="icon-link" aria-hidden="true"></span>
-              <span class="sr-only">Link to this section</span>
+              <span class="sr-only">Link to this section <%= module.title %> <%= name %></span>
             </a>
             <%= name %>
           </h1>

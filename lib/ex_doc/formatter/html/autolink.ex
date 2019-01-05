@@ -1,7 +1,5 @@
 defmodule ExDoc.Formatter.HTML.Autolink do
-  @moduledoc """
-  Conveniences for autolinking.
-  """
+  @moduledoc false
   import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc_h: 1]
 
   @type language :: :elixir | :erlang | :markdown
@@ -12,7 +10,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
   @basic_types_page "typespecs.html#basic-types"
+  @basic_types_link_title "Basic types — Typespecs"
   @built_in_types_page "typespecs.html#built-in-types"
+  @built_in_types_link_title "Built-in types — Typespecs"
 
   @basic_types [
     any: 0,
@@ -190,6 +190,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp all_typespecs(module, compiled) do
     %{aliases: aliases, lib_dirs: lib_dirs} = compiled
+    module_name = module.title
 
     locals =
       Enum.map(module.typespecs, fn
@@ -198,14 +199,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     typespecs =
       for typespec <- module.typespecs do
-        %{typespec | spec: typespec(typespec.spec, locals, aliases, lib_dirs)}
+        %{typespec | spec: typespec(typespec.spec, locals, module_name, aliases, lib_dirs)}
       end
 
     docs =
       for module_node <- module.docs do
         %{
           module_node
-          | specs: Enum.map(module_node.specs, &typespec(&1, locals, aliases, lib_dirs))
+          | specs:
+              Enum.map(module_node.specs, &typespec(&1, locals, module_name, aliases, lib_dirs))
         }
       end
 
@@ -218,15 +220,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   It converts the given `ast` to string while linking
   the locals given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs, aliases \\ [], lib_dirs \\ default_lib_dirs()) do
+  def typespec(ast, typespecs, module_name, aliases \\ [], lib_dirs \\ default_lib_dirs()) do
     {formatted, placeholders} =
-      format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs)
+      format_and_extract_typespec_placeholders(ast, typespecs, module_name, aliases, lib_dirs)
 
     replace_placeholders(formatted, placeholders)
   end
 
   @doc false
-  def format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs) do
+  def format_and_extract_typespec_placeholders(ast, typespecs, module_name, aliases, lib_dirs) do
     ref = make_ref()
     elixir_docs = get_elixir_docs(aliases, lib_dirs)
 
@@ -246,16 +248,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           cond do
             {name, arity} in @basic_types ->
               url = elixir_docs <> @basic_types_page
-              put_placeholder(form, url, placeholders)
+              put_placeholder(form, url, @basic_types_link_title, placeholders)
 
             {name, arity} in @built_in_types ->
               url = elixir_docs <> @built_in_types_page
-              put_placeholder(form, url, placeholders)
+              put_placeholder(form, url, @built_in_types_link_title, placeholders)
 
             {name, arity} in typespecs ->
               n = enc_h("#{name}")
               url = "#t:#{n}/#{arity}"
-              put_placeholder(form, url, placeholders)
+              title = "t:#{module_name}.#{n}/#{arity}"
+              put_placeholder(form, url, title, placeholders)
 
             true ->
               {form, placeholders}
@@ -267,7 +270,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
           if source = get_source(alias, aliases, lib_dirs) do
             url = type_remote_url(source, alias, name, args)
-            put_placeholder(form, url, placeholders)
+            title = type_remote_link_title(source, alias, name, args)
+            put_placeholder(form, url, title, placeholders)
           else
             {form, placeholders}
           end
@@ -290,14 +294,22 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     "#{source}#{enc_h(inspect(alias))}.html#t:#{name}/#{length(args)}"
   end
 
-  defp typespec_string_to_link(string, url) do
-    {string_to_link, _string_with_parens} = split_string_to_link(string)
-    ~s[<a href="#{url}">#{h(string_to_link)}</a>]
+  defp type_remote_link_title(@erlang_docs, module, name, _args) do
+    "#{module}:#{name}"
   end
 
-  defp put_placeholder(form, url, placeholders) do
+  defp type_remote_link_title(_source, alias, name, args) do
+    "t:#{inspect(alias)}.#{name}/#{length(args)}"
+  end
+
+  defp typespec_string_to_link(string, url, title) do
+    {string_to_link, _string_with_parens} = split_string_to_link(string)
+    ~s[<a href="#{url}" title="#{title}">#{h(string_to_link)}</a>]
+  end
+
+  defp put_placeholder(form, url, title, placeholders) do
     string = Macro.to_string(form)
-    link = typespec_string_to_link(string, url)
+    link = typespec_string_to_link(string, url, title)
 
     case Enum.find(placeholders, fn {_key, value} -> value == link end) do
       {placeholder, _} ->
@@ -377,18 +389,20 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   # The heart of the autolinking logic
   defp replace_fun(kind, :erlang, link_type, options) do
     lib_dirs = options[:lib_dirs] || default_lib_dirs(:erlang)
+    module_id = options[:module_id] || nil
 
     fn all, text, match ->
       pmfa = {_prefix, module, function, arity} = split_match(kind, match)
       text = default_text(":", link_type, pmfa, text)
+      title = default_title({":", module, function, arity}, module_id)
 
       if doc = module_docs(:erlang, module, lib_dirs) do
         case kind do
           :module ->
-            "[#{text}](#{doc}#{module}.html)"
+            "[#{text}](#{doc}#{module}.html '#{title}')"
 
           :function ->
-            "[#{text}](#{doc}#{module}.html##{function}-#{arity})"
+            "[#{text}](#{doc}#{module}.html##{function}-#{arity} '#{title}')"
         end
       else
         all
@@ -408,13 +422,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
       cond do
         match == module_id ->
-          "[#{text}](#content)"
+          "[#{text}](#content '#{match} module')"
 
         match in modules_refs ->
-          "[#{text}](#{match}#{extension})"
+          "[#{text}](#{match}#{extension} '#{match} module')"
 
         doc = module_docs(:elixir, match, lib_dirs) ->
-          "[#{text}](#{doc}#{match}.html)"
+          "[#{text}](#{doc}#{match}.html '#{match} module')"
 
         true ->
           all
@@ -437,26 +451,29 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     fn all, text, match ->
       pmfa = {prefix, module, function, arity} = split_match(:function, match)
       text = default_text("", link_type, pmfa, text)
+      title = default_title(pmfa, module_id)
 
       cond do
         match in locals ->
-          "[#{text}](##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](##{prefix}#{enc_h(function)}/#{arity} '#{title}')"
 
         match in docs_refs ->
-          "[#{text}](#{module}#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](#{module}#{extension}##{prefix}#{enc_h(function)}/#{arity} '#{title}')"
 
         match in @basic_type_strings ->
-          "[#{text}](#{elixir_docs}#{@basic_types_page})"
+          "[#{text}](#{elixir_docs}#{@basic_types_page} '#{@basic_types_link_title}')"
 
         match in @built_in_type_strings ->
-          "[#{text}](#{elixir_docs}#{@built_in_types_page})"
+          "[#{text}](#{elixir_docs}#{@built_in_types_page} '#{@built_in_types_link_title}')"
 
         match in @kernel_function_strings ->
-          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc_h(function)}/#{arity}" <>
+            " 'Kernel.#{function}/#{arity}')"
 
         match in @special_form_strings ->
           "[#{text}](#{elixir_docs}Kernel.SpecialForms" <>
-            "#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+            "#{extension}##{prefix}#{enc_h(function)}/#{arity}" <>
+            " 'Kernel.SpecialForms.#{function}/#{arity}')"
 
         module in modules_refs ->
           if module_id not in skip_warnings_on and id not in skip_warnings_on do
@@ -470,7 +487,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           all
 
         doc = module_docs(:elixir, module, lib_dirs) ->
-          "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h(function)}/#{arity} '#{title}')"
 
         true ->
           all
@@ -489,13 +506,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
       cond do
         match == module_id ->
-          "[#{text}](#content)"
+          "[#{text}](#content '#{match}')"
 
         match in modules_refs ->
-          "[#{text}](#{match}#{extension})"
+          "[#{text}](#{match}#{extension} '#{match}')"
 
         doc = module_docs(:elixir, match, lib_dirs) ->
-          "[#{text}](#{doc}#{match}.html)"
+          "[#{text}](#{doc}#{match}.html '#{match}')"
 
         true ->
           all
@@ -518,18 +535,29 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   ## Helpers
+  defp default_text(module_prefix, link_type, pmfa, link_text)
 
-  defp default_text(_, :custom, _, text),
-    do: text
+  defp default_text(_, :custom, _, link_text),
+    do: link_text
 
-  defp default_text(_, _, {_, "", fun, arity}, _text),
+  defp default_text(_, _, {_, "", fun, arity}, _link_text),
     do: "`#{fun}/#{arity}`"
 
-  defp default_text(prefix, _, {_, module, "", ""}, _text),
-    do: "`#{prefix}#{module}`"
+  defp default_text(module_prefix, _, {_, module, "", ""}, _link_text),
+    do: "`#{module_prefix}#{module}`"
 
-  defp default_text(prefix, _, {_, module, fun, arity}, _text),
-    do: "`#{prefix}#{module}.#{fun}/#{arity}`"
+  defp default_text(module_prefix, _, {_, module, fun, arity}, _link_text),
+    do: "`#{module_prefix}#{module}.#{fun}/#{arity}`"
+
+  defp default_title(pmfa, module_id)
+
+  defp default_title({prefix, "", fun, arity}, nil), do: "#{prefix}#{fun}/#{arity}"
+
+  defp default_title({prefix, "", fun, arity}, module_id),
+    do: "#{prefix}#{module_id}.#{fun}/#{arity}"
+
+  defp default_title({prefix, module, fun, arity}, _),
+    do: "#{prefix}#{module}.#{fun}/#{arity}"
 
   defp default_lib_dirs(),
     do: default_lib_dirs(:elixir) ++ default_lib_dirs(:erlang)

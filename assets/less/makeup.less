@@ -1,12 +1,4 @@
 code.makeup {
-  display: block;
-  overflow-x: auto;
-  padding-top: 0.3em !important;
-  padding-bottom: 0.3em !important;
-  padding-right: 0.5em !important;
-  padding-left: 0.5em !important;
-  white-space: pre;
-
   .unselectable {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -17,6 +9,7 @@ code.makeup {
   }
 }
 
+@default-text-color: #4d4d4c;
 /* https://tmbb.github.io/makeup_demo/elixir.html#tango */
 .makeup {
   .hll {background-color: #ffffcc}
@@ -30,16 +23,16 @@ code.makeup {
   .cs {color: #999999; } /* :comment_special */
   .dl {color: #4e9a06; } /* :string_delimiter */
   .err {color: #a40000; border: #ef2929; } /* :error */
-  .fm {color: #000000; } /* :name_function_magic */
-  .g {color: #000000; } /* :generic */
+  .fm {color: @default-text-color; } /* :name_function_magic */
+  .g {color: @default-text-color; } /* :generic */
   .gd {color: #a40000; } /* :generic_deleted */
-  .ge {color: #000000; font-style: italic; } /* :generic_emph */
+  .ge {color: @default-text-color; font-style: italic; } /* :generic_emph */
   .gh {color: #000080; font-weight: bold; } /* :generic_heading */
   .gi {color: #00A000; } /* :generic_inserted */
-  .go {color: #000000; font-style: italic; } /* :generic_output */
+  .go {color: @default-text-color; font-style: italic; } /* :generic_output */
   .gp {color: #999999; } /* :generic_prompt */
   .gr {color: #ef2929; } /* :generic_error */
-  .gs {color: #000000; font-weight: bold; } /* :generic_strong */
+  .gs {color: @default-text-color; font-weight: bold; } /* :generic_strong */
   .gt {color: #a40000; font-weight: bold; } /* :generic_traceback */
   .gu {color: #800080; font-weight: bold; } /* :generic_subheading */
   .il {color: #0000cf; font-weight: bold; } /* :number_integer_long */
@@ -50,7 +43,7 @@ code.makeup {
   .kp {color: #204a87; } /* :keyword_pseudo */
   .kr {color: #204a87; } /* :keyword_reserved */
   .kt {color: #204a87; } /* :keyword_type */
-  .l {color: #000000; } /* :literal */
+  .l {color: @default-text-color; } /* :literal */
   .ld {color: #cc0000; } /* :literal_date */
   .m {color: #2937ab; } /* :number */
   .mb {color: #2937ab; } /* :number_bin */
@@ -58,7 +51,7 @@ code.makeup {
   .mh {color: #2937ab; } /* :number_hex */
   .mi {color: #2937ab; } /* :number_integer */
   .mo {color: #2937ab; } /* :number_oct */
-  .n {color: #000000; } /* :name */
+  .n {color: @default-text-color; } /* :name */
   .na {color: #c4a000; } /* :name_attribute */
   .nb {color: #204a87; } /* :name_builtin */
   .nc {color: #0000cf; } /* :name_class */
@@ -67,15 +60,15 @@ code.makeup {
   .nf {color: #f57900; } /* :name_function */
   .ni {color: #ce5c00; } /* :name_entity */
   .nl {color: #f57900; } /* :name_label */
-  .nn {color: #000000; } /* :name_namespace */
+  .nn {color: @default-text-color; } /* :name_namespace */
   .no {color: #c17d11; } /* :name_constant */
   .nt {color: #204a87; font-weight: bold; } /* :name_tag */
-  .nv {color: #000000; } /* :name_variable */
-  .nx {color: #000000; } /* :name_other */
+  .nv {color: @default-text-color; } /* :name_variable */
+  .nx {color: @default-text-color; } /* :name_other */
   .o {color: #ce5c00; } /* :operator */
   .ow {color: #204a87; } /* :operator_word */
-  .p {color: #000000; } /* :punctuation */
-  .py {color: #000000; } /* :name_property */
+  .p {color: @default-text-color; } /* :punctuation */
+  .py {color: @default-text-color; } /* :name_property */
   .s {color: #4e9a06; } /* :string */
   .s1 {color: #4e9a06; } /* :string_single */
   .s2 {color: #4e9a06; } /* :string_double */
@@ -90,11 +83,11 @@ code.makeup {
   .ss {color: #c17d11; } /* :string_symbol */
   .sx {color: #4e9a06; } /* :string_other */
   .sx {color: #4e9a06; } /* :string_sigil */
-  .vc {color: #000000; } /* :name_variable_class */
-  .vg {color: #000000; } /* :name_variable_global */
-  .vi {color: #000000; } /* :name_variable_instance */
-  .vm {color: #000000; } /* :name_variable_magic */
-  .x {color: #000000; } /* :other */
+  .vc {color: @default-text-color; } /* :name_variable_class */
+  .vg {color: @default-text-color; } /* :name_variable_global */
+  .vi {color: @default-text-color; } /* :name_variable_instance */
+  .vm {color: @default-text-color; } /* :name_variable_magic */
+  .x {color: @default-text-color; } /* :other */
 }
 
 /* https://tmbb.github.io/makeup_demo/elixir.html#monokai */

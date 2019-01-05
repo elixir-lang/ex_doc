@@ -39,17 +39,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
-  Converts markdown to HTML using the given node file+line.
-  """
-  def to_html(nil, %{source_path: _, doc_line: _}) do
-    nil
-  end
-
-  def to_html(doc, %{source_path: file, doc_line: line}) when is_binary(doc) do
-    ExDoc.Markdown.to_html(doc, file: file, line: line + 1)
-  end
-
-  @doc """
   Get the pretty name of a function node
   """
   def pretty_type(%{type: t}) do
@@ -72,6 +61,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
+  Generate a link title
+  """
+  def link_title(module, node) do
+    mfa_without_prefix = "#{module.id}.#{node.id}"
+    link_id(mfa_without_prefix, node.type)
+  end
+
+  @doc """
   Returns the HTML formatted title for the module page.
   """
   def module_title(%{type: :task, title: title}),
@@ -85,23 +82,19 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   @doc """
   Gets the first paragraph of the documentation of a node. It strips
-  surrounding spaces and strips traling `:` and `.`.
+  surrounding white-spaces and traling `:`.
 
   If `doc` is `nil`, it returns `nil`.
   """
   @spec synopsis(String.t()) :: String.t()
   @spec synopsis(nil) :: nil
-
   def synopsis(nil), do: nil
-  def synopsis(""), do: ""
 
   def synopsis(doc) when is_binary(doc) do
-    doc
-    |> String.split(~r/\n\s*\n/)
-    |> hd()
-    |> String.trim()
-    |> String.replace(~r{[.:\s]+$}, "")
-    |> String.trim_trailing()
+    case :binary.split(doc, "</p>") do
+      [left, _] -> String.trim_trailing(left, ":") <> "</p>"
+      [all] -> all
+    end
   end
 
   defp presence([]), do: nil
@@ -157,9 +150,18 @@ defmodule ExDoc.Formatter.HTML.Templates do
     headers =
       content
       |> extract_headers
-      |> Enum.map_join(",", fn {header, anchor} -> sidebar_items_object(header, anchor) end)
+      |> Enum.map_join(",", fn {header, anchor} ->
+        sidebar_items_object(header, anchor, hyphenize(id, title))
+      end)
 
     ~s/{"id":"#{id}","title":"#{title}","group":"#{group}","headers":[#{headers}]}/
+  end
+
+  defp hyphenize(id, title) do
+    [id, title]
+    |> Enum.filter(&(&1 != ""))
+    |> Enum.filter(&(&1 != nil))
+    |> Enum.join(" — ")
   end
 
   @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
@@ -173,26 +175,30 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   defp sidebar_items_node(module_node) do
+    sidebar_items_by_group_with_module = fn group ->
+      sidebar_items_by_group(module_node, group)
+    end
+
     items =
       module_node
       |> module_summary()
       |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
-      |> Enum.map_join(",", &sidebar_items_by_group/1)
+      |> Enum.map_join(",", fn group -> sidebar_items_by_group_with_module.(group) end)
 
     sidebar_items_json_string(module_node, items)
   end
 
-  defp sidebar_items_by_group({group, docs}) do
+  defp sidebar_items_by_group(module_node, {group, docs}) do
     objects =
       Enum.map_join(docs, ",", fn doc ->
-        sidebar_items_object(doc.id, link_id(doc))
+        sidebar_items_object(doc.id, HTML.link_id(doc), link_title(module_node, doc)
       end)
 
     ~s/{"key":"#{HTML.text_to_id(group)}","name":"#{group}","nodes":[#{objects}]}/
   end
 
-  defp sidebar_items_object(id, anchor) do
-    ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}"}/
+  defp sidebar_items_object(id, anchor, title) do
+    ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}","link_title":"#{title}"}/
   end
 
   defp sidebar_items_json_string(module_node, items) do
@@ -254,37 +260,43 @@ defmodule ExDoc.Formatter.HTML.Templates do
   prefixed with `prefix`.
   """
   @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
-  @spec link_headings(String.t(), Regex.t(), String.t()) :: String.t()
-  def link_headings(content, regex \\ @heading_regex, prefix \\ "")
-  def link_headings(nil, _, _), do: nil
+  @spec link_headings(String.t(), Regex.t(), String.t(), String.t()) :: String.t()
+  def link_headings(content, regex \\ @heading_regex, prefix \\ "", link_title \\ "")
+  def link_headings(nil, _, _, _), do: nil
 
-  def link_headings(content, regex, prefix) do
+  def link_headings(content, regex, prefix, link_title) do
     Regex.replace(regex, content, fn match, tag, title ->
-      link_heading(match, tag, title, HTML.text_to_id(title), prefix)
+      link_heading(match, tag, title, HTML.text_to_id(title), prefix, link_title)
     end)
   end
 
-  defp link_heading(match, _tag, _title, "", _prefix), do: match
+  defp link_heading(match, _tag, _title, "", _prefix, _link_title), do: match
 
-  defp link_heading(_match, tag, title, id, prefix) do
+  defp link_heading(_match, tag, title, id, prefix, link_title) do
+    link_title = "Link to #{link_title} #{HTML.strip_tags(title)}"
+
     """
     <#{tag} id="#{prefix}#{id}" class="section-heading">
-      <a href="##{prefix}#{id}" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+      <a href="##{prefix}#{id}" class="hover-link" title="#{link_title}"><span class="icon-link" aria-hidden="true"></span></a>
       #{title}
     </#{tag}>
     """
   end
 
-  defp link_moduledoc_headings(content) do
-    link_headings(content, @heading_regex, "module-")
+  defp link_moduledoc_headings(content, link_title) do
+    link_headings(content, @heading_regex, "module-", link_title)
   end
 
-  defp link_detail_headings(content, prefix) do
-    link_headings(content, @heading_regex, prefix <> "-")
+  defp link_detail_headings(content, prefix, link_title) do
+    link_headings(content, @heading_regex, prefix <> "-", link_title)
+  end
+
+  defp link_extras_headings(content, page_title) do
+    link_headings(content, @heading_regex, "", page_title)
   end
 
   templates = [
-    detail_template: [:node, :_module],
+    detail_template: [:node, :module],
     footer_template: [:config],
     head_template: [:config, :page],
     module_template: [:config, :module, :summary, :nodes_map],
@@ -294,8 +306,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     extra_template: [:config, :title, :nodes_map, :content],
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
-    summary_template: [:name, :nodes],
-    summary_entry_template: [:node],
+    summary_template: [:name, :nodes, :module],
+    summary_entry_template: [:node, :module],
     redirect_template: [:config, :redirect_to]
   ]
 

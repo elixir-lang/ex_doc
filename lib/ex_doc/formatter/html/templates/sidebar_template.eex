@@ -1,49 +1,57 @@
 <div class="main">
+
 <button class="sidebar-button sidebar-toggle">
-  <span class="icon-menu" aria-hidden="true"></span>
-  <span class="sr-only">Toggle Sidebar</span>
+  <span class="icon-menu" title="Collapse/expand sidebar"></span>
 </button>
-<button class="sidebar-button night-mode-toggle">
-  <span class="icon-theme" aria-hidden="true"></span>
-  <span class="sr-only">Toggle Theme</span>
-</button>
+
 <section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button">
+      <span class="icon-cross" title="Cancel search"></span>
+    </button>
+    <label class="search-label">
+      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Search" autocomplete="off" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
 
   <% url = config.homepage_url || "#{config.main}.html" %>
-  <a href="<%= url %>" class="sidebar-projectLink">
+  <div class="sidebar-header">
     <div class="sidebar-projectDetails">
-      <h1 class="sidebar-projectName">
+      <a href="<%= url %>" class="sidebar-projectName">
         <%= config.project %>
-      </h1>
+      </a>
       <h2 class="sidebar-projectVersion">
         v<%= config.version %>
       </h2>
     </div>
     <%= if config.logo do %>
-      <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
+      <a href="<%= url %>">
+        <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
+      </a>
     <% end %>
-  </a>
-
-  <form class="sidebar-search" action="search.html">
-    <button type="submit" class="search-button">
-      <span class="icon-search" aria-hidden="true"></span>
-    </button>
-    <input name="q" type="text" id="search-list" class="search-input" placeholder="Search" aria-label="Search" autocomplete="off" />
-  </form>
+  </div>
 
   <ul class="sidebar-listNav">
-    <li><a id="extras-list" href="#full-list"><%= config.extra_section || "Pages" %></a></li>
+    <li><a id="extras-list" href="#full-list" title="<%= config.project %> <%= config.extra_section || "Pages" %>"><%= config.extra_section || "Pages" %></a></li>
 
     <%= if nodes_map.modules != [] do %>
-      <li><a id="modules-list" href="#full-list">Modules</a></li>
+      <li><a id="modules-list" href="#full-list" title="<%= config.project %> Modules">Modules</a></li>
     <% end %>
 
     <%= if nodes_map.exceptions != [] do %>
-      <li><a id="exceptions-list" href="#full-list">Exceptions</a></li>
+      <li><a id="exceptions-list" href="#full-list" title="<%= config.project %> Exceptions">Exceptions</a></li>
     <% end %>
 
     <%= if nodes_map.tasks != [] do %>
-      <li><a id="tasks-list" href="#full-list">Mix Tasks</a></li>
+      <li><a id="tasks-list" href="#full-list" title="<%= config.project %> Mix Tasks">Mix Tasks</a></li>
     <% end %>
   </ul>
   <div class="gradient"></div>

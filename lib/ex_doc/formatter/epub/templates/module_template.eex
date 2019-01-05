@@ -3,29 +3,29 @@
       <%= H.module_title(module) %>
     </h1>
 
-    <%= if module.doc do %>
+    <%= if doc = module.rendered_doc do %>
       <section id="moduledoc" class="docstring">
-        <%= H.to_html(module.doc, module) %>
+        <%= doc %>
       </section>
     <% end %>
 
     <%= if Enum.any?(summary, fn {_, v} -> v != [] end) do %>
       <section id="summary" class="details-list">
         <h1 class="section-heading">
-          <a class="hover-link" href="#summary">
+          <a class="hover-link" href="#summary" title="Link to module-summary">
             <span class="icon-link" aria-hidden="true"></span>
             <span class="sr-only">Anchor for this section</span>
           </a>
           Summary
         </h1>
-        <%= for {name, nodes} <- summary, do: H.summary_template(name, nodes) %>
+        <%= for {name, nodes} <- summary, do: H.summary_template(name, nodes, module) %>
       </section>
     <% end %>
 
     <%= for {name, nodes} <- summary, nodes != [], key = HTML.text_to_id(name) do %>
       <section id="<%= key %>" class="details-list">
         <h1 class="section-heading">
-          <a class="hover-link" href="#<%= key %>">
+          <a class="hover-link" href="#<%= key %>" title="Link to <%= key %>">
             <span class="icon-link" aria-hidden="true"></span>
             <span class="sr-only">Anchor for this section</span>
           </a>

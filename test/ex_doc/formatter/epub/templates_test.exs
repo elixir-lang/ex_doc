@@ -29,8 +29,8 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
   defp get_module_page(names, config \\ []) do
     config = doc_config(config)
     mods = ExDoc.Retriever.docs_from_modules(names, config)
-    mods = HTML.Autolink.all(mods, HTML.Autolink.compile(mods, ".xhtml", config))
-    Templates.module_page(config, hd(mods))
+    {[mod | _], _} = HTML.autolink_and_render(mods, ".xhtml", config)
+    Templates.module_page(config, mod)
   end
 
   setup_all do
@@ -90,7 +90,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
     test "outputs summaries" do
       content = get_module_page([CompiledWithDocs])
-      assert content =~ ~r{<div class="summary-signature">\s*<a href="#example_1/0">}
+      assert content =~ ~r{<div class="summary-signature">\s*<a href="#example_1/0"}
     end
 
     test "contains links to summary sections when those exist" do

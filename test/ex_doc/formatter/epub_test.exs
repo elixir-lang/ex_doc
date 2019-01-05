@@ -144,13 +144,15 @@ defmodule ExDoc.Formatter.EPUBTest do
 
     content = File.read!("#{output_dir()}/OEBPS/readme.xhtml")
     assert content =~ ~r{<title>README [^<]*</title>}
-    assert content =~ ~r{<a href="RandomError.xhtml"><code(\sclass="inline")?>RandomError</code>}
 
     assert content =~
-             ~r{<a href="CustomBehaviourImpl.xhtml#hello/1"><code(\sclass="inline")?>CustomBehaviourImpl.hello/1</code>}
+             ~r{<a href="RandomError.xhtml" title="RandomError module"><code(\sclass="inline")?>RandomError</code>}
 
     assert content =~
-             ~r{<a href="TypesAndSpecs.Sub.xhtml"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
+             ~r{<a href="CustomBehaviourImpl.xhtml#hello/1" title="CustomBehaviourImpl.hello/1"><code(\sclass="inline")?>CustomBehaviourImpl.hello/1</code>}
+
+    assert content =~
+             ~r{<a href="TypesAndSpecs.Sub.xhtml" title="TypesAndSpecs.Sub module"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
 
     content = File.read!("#{output_dir()}/OEBPS/nav.xhtml")
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}

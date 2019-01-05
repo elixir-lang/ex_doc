@@ -1,5 +1,34 @@
 # Changelog
 
+## v0.20.0-dev
+
+  * Enhancements
+    * Rework the search bar to provide autocompletion
+    * Provide full-text search
+    * Automatically generate documentation for `defdelegate` definitions (requires Elixir v1.8+)
+    * Provide keyboard shortcuts (press shift+? to see all available outputs) or click the link at the bottom of the page
+    * Add support for versions dropdown to the HTML sidebar. This requires adding a `ex_doc_config.js` (also configurable) that sets a `versionNodes` JavaScript variable.
+    * Improve mouseover titles on sidebar navigation
+
+  * Bug fixes
+    * Do not hide structs in type/callback summary signatures
+    * No longer require double click to open up a sidebar on Mobile Safari
+    * Keep trailing periods in summaries
+    * Fix typespec `arg` number to start from 1 instead of 0
+
+## v0.19.3
+
+  * Enhancements
+    * Include a "goto" link on mouseover for expandable menu items
+
+  * Bug fixes
+    * Always expand menu items, even if has a single child
+    * Fix sidebar bottom margin on Firefox
+    * Fix anchor links sometimes not working by moving js to html head
+    * Unify code styling for makeup and hljs
+    * Do not replace the content of custom links pointing to Elixir modules
+    * Remove border-left on deprecated to not mistake it with a heading
+
 ## v0.19.2
 
   * Enhancements

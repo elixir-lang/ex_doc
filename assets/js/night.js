@@ -8,7 +8,7 @@ import $ from 'jquery'
 
 const body = $('body')
 const nightMode = 'night-mode'
-const nightModeToggle = $('.night-mode-toggle')
+const nightModeToggleSelector = '.night-mode-toggle'
 
 function activateNightMode () {
   body.addClass(nightMode)
@@ -39,10 +39,12 @@ function toggleNightMode () {
 // Public Methods
 // --------------
 
+export {toggleNightMode}
+
 export function initialize () {
   checkForNightMode()
 
-  nightModeToggle.click(function () {
+  body.on('click', nightModeToggleSelector, function () {
     toggleNightMode()
   })
 }

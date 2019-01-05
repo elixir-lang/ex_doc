@@ -1,12 +1,11 @@
 defmodule ExDoc.Formatter.HTML do
-  @moduledoc """
-  Generates HTML documentation for Elixir projects.
-  """
+  @moduledoc false
 
-  alias __MODULE__.{Assets, Autolink, Templates}
+  alias __MODULE__.{Assets, Autolink, Templates, SearchItems}
   alias ExDoc.{Markdown, GroupMatcher}
 
   @main "api-reference"
+  @assets_dir "assets"
 
   @doc """
   Generate HTML documentation for the given modules.
@@ -19,39 +18,39 @@ defmodule ExDoc.Formatter.HTML do
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
-    autolink = Autolink.compile(project_nodes, ".html", config)
-    linked = Autolink.all(project_nodes, autolink)
+    {project_nodes, autolink} = autolink_and_render(project_nodes, ".html", config)
+    extras = build_extras(config, autolink)
+
+    # Generate search early on without api reference in extras
+    static_files = generate_assets(config, @assets_dir, default_assets(config))
+    search_items = generate_search_items(project_nodes, extras, config)
 
     nodes_map = %{
-      modules: filter_list(:module, linked),
-      exceptions: filter_list(:exception, linked),
-      tasks: filter_list(:task, linked)
+      modules: filter_list(:module, project_nodes),
+      exceptions: filter_list(:exception, project_nodes),
+      tasks: filter_list(:task, project_nodes)
     }
 
     extras =
       if config.api_reference do
-        [
-          build_api_reference(nodes_map, config)
-          | build_extras(config, autolink)
-        ]
+        [build_api_reference(nodes_map, config) | extras]
       else
-        build_extras(config, autolink)
+        extras
       end
 
-    assets_dir = "assets"
-    static_files = generate_assets(config, assets_dir, default_assets(config))
-
-    generated_files =
-      generate_sidebar_items(nodes_map, extras, config) ++
+    all_files =
+      search_items ++
+        static_files ++
+        generate_sidebar_items(nodes_map, extras, config) ++
         generate_extras(nodes_map, extras, config) ++
-        generate_logo(assets_dir, config) ++
+        generate_logo(@assets_dir, config) ++
         generate_search(nodes_map, config) ++
         generate_not_found(nodes_map, config) ++
         generate_list(nodes_map.modules, nodes_map, config) ++
         generate_list(nodes_map.exceptions, nodes_map, config) ++
         generate_list(nodes_map.tasks, nodes_map, config) ++ generate_index(config)
 
-    generate_build(static_files ++ generated_files, build)
+    generate_build(all_files, build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
   end
 
@@ -63,6 +62,28 @@ defmodule ExDoc.Formatter.HTML do
   defp normalize_config(%{main: main} = config) do
     %{config | main: main || @main}
   end
+
+  @doc """
+  Autolinks and renders all docs.
+  """
+  def autolink_and_render(project_nodes, ext, config) do
+    autolink = Autolink.compile(project_nodes, ext, config)
+    {project_nodes |> Autolink.all(autolink) |> render_docs(), autolink}
+  end
+
+  defp render_docs(nodes) do
+    for module <- nodes do
+      docs = Enum.map(module.docs, &render_doc/1)
+      typespecs = Enum.map(module.typespecs, &render_doc/1)
+      %{render_doc(module) | docs: docs, typespecs: typespecs}
+    end
+  end
+
+  defp render_doc(%{doc: nil} = node),
+    do: node
+
+  defp render_doc(%{doc: doc, source_path: file, doc_line: line} = node),
+    do: %{node | rendered_doc: ExDoc.Markdown.to_html(doc, file: file, line: line + 1)}
 
   defp output_setup(build, config) do
     if File.exists?(build) do
@@ -109,16 +130,23 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_sidebar_items(nodes_map, extras, config) do
     content = Templates.create_sidebar_items(nodes_map, extras)
-
-    digest =
-      content
-      |> :erlang.md5()
-      |> Base.encode16(case: :lower)
-      |> binary_part(0, 10)
-
-    sidebar_items = "dist/sidebar_items-#{digest}.js"
+    sidebar_items = "dist/sidebar_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, sidebar_items), content)
     [sidebar_items]
+  end
+
+  defp generate_search_items(linked, extras, config) do
+    content = SearchItems.create(linked, extras)
+    search_items = "dist/search_items-#{digest(content)}.js"
+    File.write!(Path.join(config.output, search_items), content)
+    [search_items]
+  end
+
+  defp digest(content) do
+    content
+    |> :erlang.md5()
+    |> Base.encode16(case: :lower)
+    |> binary_part(0, 10)
   end
 
   defp generate_extras(nodes_map, extras, config) do
@@ -137,7 +165,9 @@ defmodule ExDoc.Formatter.HTML do
     end)
   end
 
-  @doc false
+  @doc """
+  Generate assets from configs with the given default assets.
+  """
   def generate_assets(config, assets_dir, defaults) do
     write_default_assets(config, defaults) ++ copy_assets(config, assets_dir)
   end
@@ -283,6 +313,24 @@ defmodule ExDoc.Formatter.HTML do
     |> String.replace(~r/\W+/u, "-")
     |> String.trim("-")
     |> String.downcase()
+  end
+
+  @doc """
+  Generate a link id for the given node.
+  """
+  def link_id(node), do: link_id(node.id, node.type)
+
+  @doc """
+  Generate a link id for the given id and type.
+  """
+  def link_id(id, type) do
+    case type do
+      :macrocallback -> "c:#{id}"
+      :callback -> "c:#{id}"
+      :type -> "t:#{id}"
+      :opaque -> "t:#{id}"
+      _ -> "#{id}"
+    end
   end
 
   @doc """

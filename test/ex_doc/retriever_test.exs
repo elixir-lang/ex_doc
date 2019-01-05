@@ -97,7 +97,7 @@ defmodule ExDoc.RetrieverTest do
           ]
         )
 
-      [struct, example, example_1, example_with_h3, example_without_docs, is_zero] =
+      [struct, example, example_1, example_with_h3, example_without_docs, flatten, is_zero] =
         module_node.docs
 
       assert struct.id == "__struct__/0"
@@ -130,6 +130,13 @@ defmodule ExDoc.RetrieverTest do
 
       assert example_without_docs.source_url ==
                "http://example.com/test/fixtures/compiled_with_docs.ex\#L38"
+
+      assert flatten.id == "flatten/1"
+      assert flatten.type == :function
+
+      if Version.match?(System.version(), ">= 1.8.0") do
+        assert flatten.doc == "See `List.flatten/1`."
+      end
 
       assert is_zero.id == "is_zero/1"
       assert is_zero.doc == "A simple guard"
@@ -237,15 +244,15 @@ defmodule ExDoc.RetrieverTest do
   ## BEHAVIOURS
 
   describe "behaviours" do
-    test "ignores internal functions" do
+    test "returns callbacks (minus internal functions)" do
       [module_node] = docs_from_files(["CustomBehaviourOne"])
       functions = Enum.map(module_node.docs, fn doc -> doc.id end)
       assert functions == ["greet/1", "hello/1"]
       [greet, hello] = module_node.docs
       assert hello.type == :callback
-      assert hello.signature == "hello(integer)"
+      assert hello.signature == "hello(%URI{})"
       assert greet.type == :callback
-      assert greet.signature == "greet(arg0)"
+      assert greet.signature == "greet(arg1)"
     end
 
     test "returns macro callbacks" do

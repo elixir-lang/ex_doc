@@ -39,7 +39,9 @@ pre {
     padding: 0;
   }
 
-  code.hljs {
+  code:not(.inline) {
+    display: block;
+    overflow-x: auto;
     white-space: inherit;
     padding: 0.5em 1em;
     background-color: @codeBackground;
