@@ -14,7 +14,6 @@
   </div>
 </section>
 </div>
-  <script src="<%= asset_rev config.output, "dist/html*.js" %>"></script>
   <%# Extra content needed by the current markdown processor (e.g. custom Javascript) %>
   <%= ExDoc.Markdown.get_markdown_processor().before_closing_body_tag(:html) %>
   <%# Extra content specified by the user (e.g. custom Javascript) %>
