@@ -97,6 +97,11 @@ defmodule ExDoc.Retriever do
         {:error, reason} ->
           raise Error,
                 "module #{inspect(module)} was not compiled with flag --docs: #{inspect(reason)}"
+
+        _ ->
+          raise Error,
+                "unknown format in Docs chunk. This likely means you are running on " <>
+                  "a more recent Elixir version that is not supported by ExDoc. Please update."
       end
     else
       false
