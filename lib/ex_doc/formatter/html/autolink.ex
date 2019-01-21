@@ -1,7 +1,5 @@
 defmodule ExDoc.Formatter.HTML.Autolink do
-  @moduledoc """
-  Conveniences for autolinking.
-  """
+  @moduledoc false
   import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc_h: 1]
 
   @type language :: :elixir | :erlang | :markdown

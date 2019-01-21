@@ -1,7 +1,5 @@
 defmodule ExDoc.Formatter.HTML do
-  @moduledoc """
-  Generates HTML documentation for Elixir projects.
-  """
+  @moduledoc false
 
   alias __MODULE__.{Assets, Autolink, Templates}
   alias ExDoc.{Markdown, GroupMatcher}

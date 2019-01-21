@@ -1,7 +1,5 @@
 defmodule ExDoc.Formatter.EPUB do
-  @moduledoc """
-  Generates EPUB documentation for Elixir projects.
-  """
+  @moduledoc false
 
   @mimetype "application/epub+zip"
   alias __MODULE__.{Assets, Templates}
