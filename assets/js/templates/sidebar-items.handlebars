@@ -41,7 +41,10 @@
           {{/showSummary}}
           {{#each node.nodeGroups as |group|}}
             <li class="docs">
-              <a href="{{node.id}}.html#{{group.key}}" class="expand">{{group.name}}</a>
+              <a href="{{node.id}}.html#{{group.key}}" class="expand">
+                {{group.name}}
+                <span class="icon-goto" title="Go to"></span>
+              </a>
               <ul class="{{group.key}}-list deflist">
                 {{#each group.nodes}}
                   <li>
