@@ -34,10 +34,10 @@ function setupSelected (id) {
 
 function collapse () {
   var $fullList = $('#full-list')
-  var $clicked = $('#full-list .clicked')
-  if ($clicked.length > 0) {
+  var $currentPage = $('#full-list li.current-page')
+  if ($currentPage.length > 0) {
     $fullList.scrollTop(
-      $clicked.offset().top - $fullList.offset().top - 40
+      $currentPage.offset().top - $fullList.offset().top - 40
     )
   }
 }
@@ -65,12 +65,12 @@ function fillSidebarWithNodes (nodes, filter) {
     var $target = $(e.target)
     // the user might have clicked on the nesting indicator
     var linkTag = $target.is('a') ? $target : $target.closest('a')
-    if (linkTag.hasClass('expand')) {
+    if (linkTag.hasClass('expand') && !$target.is('span') && !e.shiftKey) {
       e.preventDefault()
       $(e.target).closest('li').toggleClass('open')
     } else {
-      $('#full-list .clicked li.active').removeClass('active')
-      $(e.target).closest('li').addClass('active')
+      $('#full-list li.current-page li.current-hash').removeClass('current-hash')
+      $(e.target).closest('li').addClass('current-hash')
     }
   })
 }
@@ -120,13 +120,13 @@ function identifyCurrentHash () {
   const nodes = sidebarNodes[helpers.getModuleType()] || []
   const category = helpers.findSidebarCategory(nodes, hash)
 
-  $(`#full-list .clicked a.expand[href$="#${category}"]`)
+  $(`#full-list li.current-page a.expand[href$="#${category}"]`)
     .closest('li')
     .addClass('open')
 
-  $(`#full-list .clicked a[href$="#${hash}"]`)
+  $(`#full-list li.current-page a[href$="#${hash}"]`)
     .closest('li')
-    .addClass('active')
+    .addClass('current-hash')
 }
 
 function fixLinks () {

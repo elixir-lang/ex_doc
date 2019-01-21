@@ -17,7 +17,6 @@ import markdown from 'highlight.js/lib/languages/markdown'
 import sql from 'highlight.js/lib/languages/sql'
 import xml from 'highlight.js/lib/languages/xml'
 
-import hasContent from './template-helpers/hasContent'
 import isArray from './template-helpers/isArray'
 import isLocal from './template-helpers/isLocal'
 import groupChanged from './template-helpers/groupChanged'
@@ -33,7 +32,6 @@ window.$ = $
 
 $(() => {
   // Set up Handlebars.js
-  Handlebars.registerHelper('hasContent', hasContent)
   Handlebars.registerHelper('isArray', isArray)
   Handlebars.registerHelper('isLocal', isLocal)
   Handlebars.registerHelper('groupChanged', groupChanged)

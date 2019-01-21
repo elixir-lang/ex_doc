@@ -8,51 +8,51 @@
       <li class="nesting-context" title="{{node.nested_context}}" aria-hidden="true">{{node.nested_context}}</li>
     {{/nestingChanged}}
 
-    <li class="{{#isLocal node.id}}clicked open{{/isLocal}} {{#if node.nested_title}}nested{{/if}}">
+    <li class="{{#isLocal node.id}}current-page open{{/isLocal}} {{#if node.nested_title}}nested{{/if}}">
       {{! When visiting a module page, the link to this module page
       in the menu should not link to a new page, instead should link
       to the top of the page itself. }}
-      <a href="{{node.id}}.html" title="{{node.title}}" {{#hasContent node}}class="expand"{{/hasContent}}>
+      <a href="{{node.id}}.html" title="{{node.title}}" class="expand">
         {{#if node.nested_title}}
           {{node.nested_title}}
         {{else}}
           {{node.title}}
         {{/if}}
+
+        <span class="icon-goto" title="Go to"></span>
       </a>
 
-      {{#hasContent node}}
-        <ul>
-          <li>
-            <a href="{{node.id}}.html#content">Top</a>
-          </li>
+      <ul>
+        <li>
+          <a href="{{node.id}}.html#content">Top</a>
+        </li>
 
-            {{#isArray node.headers}}
-              {{#each node.headers}}
-                <li>
-                  <a href="{{node.id}}.html#{{{anchor}}}">{{id}}</a>
-                </li>
-              {{/each}}
-            {{else}}
-              {{#showSummary node}}
-                <li>
-                  <a href="{{node.id}}.html#summary">Summary</a>
-                </li>
-              {{/showSummary}}
-              {{#each node.nodeGroups as |group|}}
-                <li class="docs">
-                  <a href="{{node.id}}.html#{{group.key}}" class="expand">{{group.name}}</a>
-                  <ul class="{{group.key}}-list deflist">
-                    {{#each group.nodes}}
-                      <li>
-                        <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
-                      </li>
-                    {{/each}}
-                  </ul>
-                </li>
-              {{/each}}
-            {{/isArray}}
-          </ul>
-        {{/hasContent}}
+        {{#isArray node.headers}}
+          {{#each node.headers}}
+            <li>
+              <a href="{{node.id}}.html#{{{anchor}}}">{{id}}</a>
+            </li>
+          {{/each}}
+        {{else}}
+          {{#showSummary node}}
+            <li>
+              <a href="{{node.id}}.html#summary">Summary</a>
+            </li>
+          {{/showSummary}}
+          {{#each node.nodeGroups as |group|}}
+            <li class="docs">
+              <a href="{{node.id}}.html#{{group.key}}" class="expand">{{group.name}}</a>
+              <ul class="{{group.key}}-list deflist">
+                {{#each group.nodes}}
+                  <li>
+                    <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
+                  </li>
+                {{/each}}
+              </ul>
+            </li>
+          {{/each}}
+        {{/isArray}}
+        </ul>
     </li>
   {{/each}}
 </ul>
