@@ -245,7 +245,7 @@ defmodule ExDoc.RetrieverTest do
       assert hello.type == :callback
       assert hello.signature == "hello(integer)"
       assert greet.type == :callback
-      assert greet.signature == "greet(arg0)"
+      assert greet.signature == "greet(arg1)"
     end
 
     test "returns macro callbacks" do

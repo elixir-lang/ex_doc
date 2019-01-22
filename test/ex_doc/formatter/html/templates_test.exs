@@ -378,7 +378,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:hello/1">}
       assert content =~ ~s[hello(integer)]
-      assert content =~ ~s[greet(arg0)]
+      assert content =~ ~s[greet(arg1)]
 
       content = get_module_page([CustomBehaviourTwo])
 
