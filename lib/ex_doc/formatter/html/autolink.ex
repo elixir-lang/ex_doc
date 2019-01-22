@@ -516,18 +516,19 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   ## Helpers
+  defp default_text(module_prefix, link_type, pmfa, link_text)
 
-  defp default_text(_, :custom, _, text),
-    do: text
+  defp default_text(_, :custom, _, link_text),
+    do: link_text
 
-  defp default_text(_, _, {_, "", fun, arity}, _text),
+  defp default_text(_, _, {_, "", fun, arity}, _link_text),
     do: "`#{fun}/#{arity}`"
 
-  defp default_text(prefix, _, {_, module, "", ""}, _text),
-    do: "`#{prefix}#{module}`"
+  defp default_text(module_prefix, _, {_, module, "", ""}, _link_text),
+    do: "`#{module_prefix}#{module}`"
 
-  defp default_text(prefix, _, {_, module, fun, arity}, _text),
-    do: "`#{prefix}#{module}.#{fun}/#{arity}`"
+  defp default_text(module_prefix, _, {_, module, fun, arity}, _link_text),
+    do: "`#{module_prefix}#{module}.#{fun}/#{arity}`"
 
   defp default_lib_dirs(),
     do: default_lib_dirs(:elixir) ++ default_lib_dirs(:erlang)
