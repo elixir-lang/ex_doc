@@ -19,7 +19,7 @@
           {{node.title}}
         {{/if}}
 
-        <span class="icon-goto" title="Go to"></span>
+        <span class="icon-goto" title="Go to {{node.title}}"></span>
       </a>
 
       <ul>
@@ -43,7 +43,7 @@
             <li class="docs">
               <a href="{{node.id}}.html#{{group.key}}" class="expand">
                 {{group.name}}
-                <span class="icon-goto" title="Go to"></span>
+                <span class="icon-goto" title="Go to {{group.name}}"></span>
               </a>
               <ul class="{{group.key}}-list deflist">
                 {{#each group.nodes}}

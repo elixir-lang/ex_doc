@@ -173,6 +173,7 @@
       }
 
       a.expand span {
+        color: @lightestGray;
         visibility: hidden;
         padding: 0 8px 0 2px;
         font-size: 0.8em;
@@ -180,6 +181,10 @@
 
       a.expand:hover span {
         visibility: visible;
+      }
+
+      a.expand span:hover {
+        color: @white;
       }
     }
 
