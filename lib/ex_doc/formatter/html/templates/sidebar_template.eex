@@ -8,19 +8,21 @@
 <section class="sidebar">
 
   <% url = config.homepage_url || "#{config.main}.html" %>
-  <a href="<%= url %>" class="sidebar-projectLink">
+  <div class="sidebar-header">
     <div class="sidebar-projectDetails">
-      <h1 class="sidebar-projectName">
+      <a href="<%= url %>" class="sidebar-projectName">
         <%= config.project %>
-      </h1>
+      </a>
       <h2 class="sidebar-projectVersion">
         v<%= config.version %>
       </h2>
     </div>
     <%= if config.logo do %>
-      <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
+      <a href="<%= url %>">
+        <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
+      </a>
     <% end %>
-  </a>
+  </div>
 
   <form class="sidebar-search" action="search.html">
     <button type="submit" class="search-button">

@@ -11,6 +11,9 @@
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
     <script src="<%= asset_rev config.output, "dist/sidebar_items*.js" %>"></script>
+    <%= if config.javascript_script_path do %>
+      <script src="<%= config.javascript_script_path %>"></script>
+    <% end %>
     <script async src="<%= asset_rev config.output, "dist/html*.js" %>"></script>
     <%# Extra content needed by the current markdown processor (e.g. custom CSS) %>
     <%= ExDoc.Markdown.get_markdown_processor().before_closing_head_tag(:html) %>

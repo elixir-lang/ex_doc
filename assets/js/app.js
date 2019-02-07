@@ -25,6 +25,7 @@ import showSummary from './template-helpers/showSummary'
 
 import {initialize as initEvents} from './events'
 import {initialize as initSidebar} from './sidebar'
+import {initialize as initVersions} from './versions'
 import {initialize as initNightMode} from './night'
 import {initialize as initMakeup} from './makeup'
 
@@ -57,6 +58,7 @@ $(() => {
 
   initNightMode()
   initSidebar()
+  initVersions()
   initEvents()
   initMakeup()
   hljs.initHighlighting()
