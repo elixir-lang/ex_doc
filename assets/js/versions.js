@@ -4,17 +4,27 @@
 // Dependencies
 // ------------
 import $ from 'jquery'
+import find from 'lodash.find'
+import versionsTemplate from './templates/versions-dropdown.handlebars'
 
-function versionOption (currentVersion) {
-  return function (versionObject) {
-    return '<option ' + optionAttributes(versionObject, versionObject.version === currentVersion) + '>' +
-      versionObject.version +
-      '</option>'
+// Local Variables
+// ---------------
+
+const sidebarProjectVersion = $('.sidebar-projectVersion')
+const currentVersion = sidebarProjectVersion.text().trim()
+
+// Local Methods
+// -------------
+
+function addCurrentVersionIfNotPresent () {
+  if (!find(versionNodes, function (element) { return element.version === currentVersion })) {
+    versionNodes.unshift({ version: currentVersion, url: '#' })
   }
 }
 
-function optionAttributes (versionObject, isCurrentVersion) {
-  return `value="${versionObject.url}"${(isCurrentVersion ? ' selected disabled' : '')}`
+function addIsCurrentVersion (element) {
+  element.isCurrentVersion = element.version === currentVersion
+  return element
 }
 
 // Public Methods
@@ -22,19 +32,9 @@ function optionAttributes (versionObject, isCurrentVersion) {
 
 export function initialize () {
   if (typeof versionNodes !== 'undefined') {
-    let sidebarProjectVersion = $('.sidebar-projectVersion')
-    let currentVersion = sidebarProjectVersion.text().trim()
+    addCurrentVersionIfNotPresent()
 
-    if (!versionNodes.find(function (element) { return element.version === currentVersion })) {
-      versionNodes.unshift({ version: currentVersion, url: '#' })
-    }
-
-    let versionsDropdown =
-      '<form autocomplete="off">' +
-      '<select class="sidebar-projectVersionsDropdown">' +
-      (versionNodes.map(versionOption(currentVersion)).join('')) +
-      '</select>' +
-      '</form>'
+    let versionsDropdown = versionsTemplate({nodes: versionNodes.map(addIsCurrentVersion), currentVersion: currentVersion})
     sidebarProjectVersion.text('')
     sidebarProjectVersion.append(versionsDropdown)
 
