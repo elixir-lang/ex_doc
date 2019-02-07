@@ -30,8 +30,7 @@ defmodule ExDoc.Config do
             groups_for_modules: [],
             groups_for_functions: [],
             homepage_url: nil,
-            # TODO default to a path that can be supported on hexdocs
-            javascript_script_path: nil,
+            javascript_config_path: "config.js",
             language: "en",
             logo: nil,
             main: nil,
@@ -61,7 +60,7 @@ defmodule ExDoc.Config do
           filter_prefix: nil | String.t(),
           formatter: nil | String.t(),
           homepage_url: nil | String.t(),
-          javascript_script_path: nil | String.t(),
+          javascript_config_path: nil | String.t(),
           language: String.t(),
           logo: nil | Path.t(),
           main: nil | String.t(),

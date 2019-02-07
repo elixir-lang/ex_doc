@@ -88,9 +88,9 @@ defmodule Mix.Tasks.Docs do
 
     * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See the "Groups" section
 
-    * `:javascript_script_path` - Path of an additional javascript file to be included on all pages
+    * `:javascript_config_path` - Path of an additional javascript file to be included on all pages
       to provide up-to-date data for features like the version dropdown - See the "Additional
-      JavaScript script" section. Example: `"../versions.js"`
+      JavaScript config" section. Example: `"../versions.js"`
 
     * `:nest_modules_by_prefix` - See the "Nesting" section
 
@@ -204,16 +204,15 @@ defmodule Mix.Tasks.Docs do
   the first will take precedence. Functions that don't have a custom group will
   be listed under the default "Functions" group.
 
-  ## Additional JavaScript script
+  ## Additional JavaScript config
 
-  Since version `0.19.4` ExDoc includes a way to enrich the documentation
+  Since version `0.20.0` ExDoc includes a way to enrich the documentation
   with new information without having to re-generate it, through a JavaScript
   file that can be shared across documentation for multiple versions of the
-  package. If `:javascript_script_path` is configured when building
-  the documentation, this script will be referenced in each page's `<head>`
-  using a `<script>` tag. The script should define data in global JavaScript
-  variables that will be interpreted by `ex_doc` when viewing the
-  documentation.
+  package. If `:javascript_config_path` is set when building the documentation,
+  this script will be referenced in each page's `<head>` using a `<script>` tag.
+  The script should define data in global JavaScript variables that will be
+  interpreted by `ex_doc` when viewing the documentation.
 
   Currenly supported variables:
 
