@@ -204,7 +204,7 @@ defmodule Mix.Tasks.Docs do
   the first will take precedence. Functions that don't have a custom group will
   be listed under the default "Functions" group.
 
-  ## Additional javascript script
+  ## Additional JavaScript script
 
   Since version `0.19.4` ExDoc includes a way to enrich the documentation
   with new information without having to re-generate it, through a javascript
