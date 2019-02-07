@@ -34,7 +34,7 @@ export function initialize () {
   if (typeof versionNodes !== 'undefined') {
     addCurrentVersionIfNotPresent()
 
-    let versionsDropdown = versionsTemplate({nodes: versionNodes.map(addIsCurrentVersion), currentVersion: currentVersion})
+    let versionsDropdown = versionsTemplate({nodes: versionNodes.map(addIsCurrentVersion)})
     sidebarProjectVersion.text('')
     sidebarProjectVersion.append(versionsDropdown)
 
