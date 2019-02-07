@@ -90,7 +90,7 @@ defmodule Mix.Tasks.Docs do
 
     * `:javascript_script_path` - Path of an additional javascript file to be included on all pages
       to provide up-to-date data for features like the version dropdown - See the "Additional
-      javascript script" section. Example: `"../versions.js"`
+      JavaScript script" section. Example: `"../versions.js"`
 
     * `:nest_modules_by_prefix` - See the "Nesting" section
 
