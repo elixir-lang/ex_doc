@@ -88,7 +88,7 @@ defmodule Mix.Tasks.Docs do
 
     * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See the "Groups" section
 
-    * `:javascript_config_path` - Path of an additional javascript file to be included on all pages
+    * `:javascript_config_path` - Path of an additional JavaScript file to be included on all pages
       to provide up-to-date data for features like the version dropdown - See the "Additional
       JavaScript config" section. Example: `"../versions.js"`
 
