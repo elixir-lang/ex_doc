@@ -1,4 +1,5 @@
 // sidebar versions dropdown
+/* globals versionNodes */
 
 // Dependencies
 // ------------
@@ -19,7 +20,6 @@ function optionAttributes (versionObject, isCurrentVersion) {
 // Public Methods
 // --------------
 
-/* eslint-disable no-undef */
 export function initialize () {
   if (typeof versionNodes !== 'undefined') {
     let sidebarProjectVersion = $('.sidebar-projectVersion')
@@ -43,4 +43,3 @@ export function initialize () {
     })
   }
 }
-/* eslint-enable no-undef */
