@@ -207,7 +207,7 @@ defmodule Mix.Tasks.Docs do
   ## Additional JavaScript script
 
   Since version `0.19.4` ExDoc includes a way to enrich the documentation
-  with new information without having to re-generate it, through a javascript
+  with new information without having to re-generate it, through a JavaScript
   file that can be shared across documentation for multiple versions of the
   package. If `:javascript_script_path` is configured when building
   the documentation, this script will be referenced in each page's `<head>`
