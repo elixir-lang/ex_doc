@@ -211,7 +211,7 @@ defmodule Mix.Tasks.Docs do
   file that can be shared across documentation for multiple versions of the
   package. If `:javascript_script_path` is configured when building
   the documentation, this script will be referenced in each page's `<head>`
-  using a `<script>` tag. The script should define data in global javascript
+  using a `<script>` tag. The script should define data in global JavaScript
   variables that will be interpreted by `ex_doc` when viewing the
   documentation.
 
