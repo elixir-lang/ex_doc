@@ -219,7 +219,7 @@ defmodule Mix.Tasks.Docs do
 
   ### `versionNodes`
 
-  This global javascript variable should be providing an array of objects that
+  This global JavaScript variable should be providing an array of objects that
   define all versions of this mix package which should appear in the package
   versions dropdown in the documentation sidebar. The versions dropdown allows
   for switching between package versions' documentation.
