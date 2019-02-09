@@ -151,7 +151,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = Templates.sidebar_template(doc_config(), @empty_nodes_map)
 
       assert content =~
-               ~r{<a href="#{homepage_url()}" class="sidebar-projectLink">\s*<div class="sidebar-projectDetails">\s*<h1 class="sidebar-projectName">\s*Elixir\s*</h1>\s*<h2 class="sidebar-projectVersion">\s*v1.0.1\s*</h2>\s*</div>\s*</a>}
+               ~r{<div class="sidebar-header">\s*<div class="sidebar-projectDetails">\s*<a href="#{
+                 homepage_url()
+               }" class="sidebar-projectName">\s*Elixir\s*</a>\s*<h2 class="sidebar-projectVersion">\s*v1.0.1\s*</h2>\s*</div>\s*</div>}
     end
 
     test "text links to main when there is no homepage_url" do
@@ -165,7 +167,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = Templates.sidebar_template(config, @empty_nodes_map)
 
       assert content =~
-               ~r{<a href="hello.html" class="sidebar-projectLink">\s*<div class="sidebar-projectDetails">\s*<h1 class="sidebar-projectName">\s*Elixir\s*</h1>\s*<h2 class="sidebar-projectVersion">\s*v1.0.1\s*</h2>\s*</div>\s*</a>}
+               ~r{<div class="sidebar-header">\s*<div class="sidebar-projectDetails">\s*<a href="hello.html" class="sidebar-projectName">\s*Elixir\s*</a>\s*<h2 class="sidebar-projectVersion">\s*v1.0.1\s*</h2>\s*</div>\s*</div>}
     end
 
     test "enables nav link when module type have at least one element" do
