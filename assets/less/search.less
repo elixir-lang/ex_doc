@@ -5,9 +5,16 @@
     display: inline-block;
   }
 
-  .result-id {
-    font-size: 1.2em;
+  .result {
+    margin: 2em 0em;
+    p {
+      margin: 0em;
+    }
+  }
 
+  .result-id {
+    font-size: 1.4em;
+    margin: 0em;
     a {
       text-decoration: none;
       transition: color .3s ease-in-out;
@@ -28,6 +35,9 @@
   .result-elem em {
     font-style: normal;
     color: @purple;
+  }
+  .result-id small {
+    font-weight: normal;
   }
 
   ul {

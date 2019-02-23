@@ -60,6 +60,7 @@
     "less-plugin-npm-import": "^2.1.0",
     "lodash.find": "^4.6.0",
     "lodash.throttle": "^4.1.1",
+    "lunr": "^2.3.5",
     "mini-css-extract-plugin": "^0.4.2",
     "mocha": "^5.2.0",
     "normalize.css": "^8.0.0",
