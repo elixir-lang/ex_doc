@@ -40,8 +40,8 @@ function getExcerpts (item, metadata, value) {
     if ('doc' in metadata[term]) {
       metadata[term].doc.position.forEach(function (matchPos) {
         var startPos = matchPos[0] - nchars > 0 ? matchPos[0] - nchars : 0
-        var endPos = matchPos[0] + matchPos[1] + nchars > item.doc.length ?
-                     item.doc.length : matchPos[0] + matchPos[1] + nchars
+        var endPos = matchPos[0] + matchPos[1] + nchars > item.doc.length
+          ? item.doc.length : matchPos[0] + matchPos[1] + nchars
         var excerpt =
           (startPos > 0 ? '...' : '') +
           item.doc.slice(startPos, matchPos[0]) +
@@ -54,7 +54,7 @@ function getExcerpts (item, metadata, value) {
       })
     }
   })
-  if (excerpts.length == 0) {
+  if (excerpts.length === 0) {
     excerpts.push(item.doc.slice(0, nchars * 2))
   }
   return excerpts.slice(0, 1)
