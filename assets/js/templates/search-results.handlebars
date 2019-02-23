@@ -3,29 +3,14 @@
 {{#if empty}}
   <p>Sorry, we couldn't find anything for <em>{{value}}</em>.</p>
 {{else}}
-  {{#each levels}}
-    <h2 class="results-title">{{name}}</h2>
-    {{#each results}}
-      <div class="result">
-        <h3 class="result-id">
-          <a href="{{id}}.html">{{{match}}}</a>
-        </h3>
-        <ul class="functions">
-          {{#each functions}}
-            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a></li>
-          {{/each}}
-        </ul>
-        <ul class="callbacks">
-          {{#each callbacks}}
-            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a> (callback)</li>
-          {{/each}}
-        </ul>
-        <ul class="types">
-          {{#each types}}
-            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a> (type)</li>
-          {{/each}}
-        </ul>
-      </div>
-    {{/each}}
+  {{#each results}}
+    <div class="result">
+      <h2 class="result-id">
+        <a href="{{this.ref}}">{{this.title}} <small>({{this.type}})</small></a>
+      </h2>
+        {{#each excerpts}}
+          <p class="result-elem">{{{this}}}</p>
+        {{/each}}
+    </div>
   {{/each}}
 {{/if}}
