@@ -260,7 +260,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
 
       assert content =~
-               ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CompiledWithDocs\s*}
+               ~r{<h1>\s*<small class="app-vsn">Elixir v1.0.1</small>\s*CompiledWithDocs\s*}
 
       refute content =~ ~r{<small>module</small>}
 
@@ -375,7 +375,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomBehaviourOne])
 
       assert content =~
-               ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CustomBehaviourOne\s*<small>behaviour</small>}m
+               ~r{<h1>\s*<small class="app-vsn">Elixir v1.0.1</small>\s*CustomBehaviourOne\s*<small>behaviour</small>}m
 
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:hello/1">}
@@ -385,7 +385,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomBehaviourTwo])
 
       assert content =~
-               ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*}m
+               ~r{<h1>\s*<small class="app-vsn">Elixir v1.0.1</small>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*}m
 
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:bye/1">}
@@ -397,7 +397,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomProtocol])
 
       assert content =~
-               ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*CustomProtocol\s*<small>protocol</small>\s*}m
+               ~r{<h1>\s*<small class="app-vsn">Elixir v1.0.1</small>\s*CustomProtocol\s*<small>protocol</small>\s*}m
     end
 
     ## TASKS
@@ -406,7 +406,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([Mix.Tasks.TaskWithDocs])
 
       assert content =~
-               ~r{<h1>\s*<small class="visible-xs">Elixir v1.0.1</small>\s*mix task_with_docs\s*}m
+               ~r{<h1>\s*<small class="app-vsn">Elixir v1.0.1</small>\s*mix task_with_docs\s*}m
     end
   end
 end

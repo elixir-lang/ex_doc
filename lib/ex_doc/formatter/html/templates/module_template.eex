@@ -2,7 +2,7 @@
     <%= sidebar_template(config, nodes_map) %>
 
       <h1>
-        <small class="visible-xs"><%= config.project %> v<%= config.version %></small>
+        <small class="app-vsn"><%= config.project %> v<%= config.version %></small>
         <%= module_title(module) %>
         <%= if module.source_url do %>
           <a href="<%= module.source_url %>" title="View Source" class="view-source" rel="help">
