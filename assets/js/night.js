@@ -39,6 +39,8 @@ function toggleNightMode () {
 // Public Methods
 // --------------
 
+export {toggleNightMode}
+
 export function initialize () {
   checkForNightMode()
 

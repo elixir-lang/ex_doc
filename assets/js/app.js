@@ -28,6 +28,7 @@ import {initialize as initSidebar} from './sidebar'
 import {initialize as initVersions} from './versions'
 import {initialize as initNightMode} from './night'
 import {initialize as initMakeup} from './makeup'
+import {initialize as initKeyboardShortcuts} from './keyboard-shortcuts'
 
 window.$ = $
 
@@ -61,5 +62,6 @@ $(() => {
   initVersions()
   initEvents()
   initMakeup()
+  initKeyboardShortcuts()
   hljs.initHighlighting()
 })

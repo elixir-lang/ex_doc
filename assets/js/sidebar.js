@@ -8,6 +8,7 @@ import throttle from 'lodash.throttle'
 // ---------
 
 const body = $('body')
+const searchInput = $('#search-list')
 const breakpoint = 768
 const animationDuration = 300
 
@@ -66,6 +67,10 @@ function toggleSidebar () {
   }
 }
 
+function focusSearchInput () {
+  searchInput.focus()
+}
+
 function setDefaultSidebarState () {
   body.removeClass(sidebarClasses)
   body.addClass(window.innerWidth > breakpoint ? sidebarOpenedClass : sidebarClosedClass)
@@ -74,7 +79,7 @@ function setDefaultSidebarState () {
 // Public Methods
 // --------------
 
-export {breakpoint, closeSidebar}
+export {breakpoint, closeSidebar, openSidebar, toggleSidebar, focusSearchInput}
 
 export function initialize () {
   setDefaultSidebarState()
