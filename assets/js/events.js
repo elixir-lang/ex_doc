@@ -4,6 +4,7 @@
 // ------------
 
 import $ from 'jquery'
+import {updateAutocomplete} from './autocomplete'
 import {search} from './search'
 import * as helpers from './helpers'
 
@@ -95,6 +96,8 @@ function addEventListeners () {
     } else if ((event.metaKey || event.ctrlKey) && event.keyCode === 13) { // cmd+enter
       $(this).parent().attr('target', '_blank').submit().removeAttr('')
       event.preventDefault()
+    } else {
+      updateAutocomplete($(this).val())
     }
   })
 

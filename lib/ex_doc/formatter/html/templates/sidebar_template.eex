@@ -31,6 +31,11 @@
     <input name="q" type="text" id="search-list" class="search-input" placeholder="Search" aria-label="Search" autocomplete="off" />
   </form>
 
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
   <ul class="sidebar-listNav">
     <li><a id="extras-list" href="#full-list"><%= config.extra_section || "Pages" %></a></li>
 
