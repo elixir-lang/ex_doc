@@ -4,7 +4,7 @@
 // ------------
 
 import $ from 'jquery'
-import {updateAutocomplete} from './autocomplete'
+import {updateAutocomplete, moveAutocompleteSelection, hideAutocomplete, selectedAutocompleteElement} from './autocomplete'
 import {search} from './search'
 import * as helpers from './helpers'
 
@@ -90,15 +90,56 @@ function addEventListeners () {
   SIDEBAR_NAV.on('click', '#exceptions-list', createHandler('exceptions'))
   SIDEBAR_NAV.on('click', '#tasks-list', createHandler('tasks'))
 
-  $('.sidebar-search input').on('keydown', function (event) {
-    if (event.keyCode === 27) { // escape key
+  $('.sidebar-search input').on('keydown', function (e) {
+    var commandKey = (event.metaKey || event.ctrlKey)
+
+    if (e.keyCode === 27) { // escape key
       $(this).val('').blur()
-    } else if ((event.metaKey || event.ctrlKey) && event.keyCode === 13) { // cmd+enter
-      $(this).parent().attr('target', '_blank').submit().removeAttr('')
-      event.preventDefault()
+    } else if (e.keyCode === 13) { // enter
+      var selection = selectedAutocompleteElement()
+
+      if (selection) {
+        var target = commandKey ? '_blank' : '_self'
+        var originalValue = $(this).val()
+
+        $(this).removeAttr('name').val('')
+
+        $(this).parent()
+          .attr('action', selection.attr('href'))
+          .attr('target', target)
+          .submit()
+          .attr('action', 'search.html')
+
+        $(this).val(originalValue).attr('name', 'q')
+
+        e.preventDefault()
+      } else if (commandKey) {
+        $(this).parent()
+          .attr('target', '_blank')
+          .submit()
+          .removeAttr('')
+        e.preventDefault()
+      }
+    } else if (e.keyCode === 38) {
+      moveAutocompleteSelection(-1)
+      e.preventDefault()
+    } else if (e.keyCode === 40) {
+      moveAutocompleteSelection(1)
+      e.preventDefault()
     } else {
+      !commandKey && updateAutocomplete($(this).val())
+    }
+  })
+
+  $('.sidebar-search input').on('keyup', function (e) {
+    var commandKey = (event.metaKey || event.ctrlKey)
+    if (e.keyCode !== 38 && e.keyCode !== 40 && !commandKey) { // Left and right arrow keys
       updateAutocomplete($(this).val())
     }
+  })
+
+  $('.sidebar-search input').on('blur', function (e) {
+    hideAutocomplete()
   })
 
   var pathname = window.location.pathname

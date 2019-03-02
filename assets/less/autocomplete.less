@@ -1,0 +1,50 @@
+.autocomplete {
+  display: none;
+  height: 0;
+  margin: 0 5px 0 20px;
+  overflow: visible;
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-results {
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.25);
+  border-top: 1px solid @mediumGray;
+  background-color: darken(@darkGray, 11%);
+  left: 0;
+  position: absolute;
+  top: -19px;
+  width: 260px;
+  z-index: 200;
+}
+
+.autocomplete-result {
+  color: inherit;
+  display: block;
+  padding: 10px;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+
+  &:hover, &.selected {
+    background-color: darken(@darkGray, 7%);
+    border-left: 3px solid @purple;
+  }
+
+  em {
+    font-style: normal;
+    font-weight: bold;
+  }
+
+  .description {
+    opacity: 0.6;
+    padding-top: 3px;
+  }
+
+  .title,
+  .description {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
