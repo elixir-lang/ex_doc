@@ -107,10 +107,9 @@ function selectedAutocompleteElement () {
   var currentlySelectedElement = $('.autocomplete-result.selected')
   if (currentlySelectedElement.length === 0) {
     return null
-  } else {
-    return currentlySelectedElement
   }
 
+  return currentlySelectedElement
 }
 
 function moveAutocompleteSelection (direction) {

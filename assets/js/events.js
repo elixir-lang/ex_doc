@@ -98,7 +98,7 @@ function addEventListeners () {
     } else if (e.keyCode === 13) { // enter
       var selection = selectedAutocompleteElement()
 
-      if (selection) {
+      if (selection && selection.attr('data-index') !== '-1') {
         var target = commandKey ? '_blank' : '_self'
         var originalValue = $(this).val()
 
@@ -139,6 +139,12 @@ function addEventListeners () {
   })
 
   $('.sidebar-search input').on('blur', function (e) {
+    var relatedTarget = $(e.relatedTarget)
+
+    if (relatedTarget.hasClass('autocomplete-result')) {
+      return null
+    }
+
     hideAutocomplete()
   })
 
