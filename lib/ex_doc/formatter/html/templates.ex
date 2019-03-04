@@ -85,7 +85,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   @doc """
   Gets the first paragraph of the documentation of a node. It strips
-  surrounding spaces and strips traling `:` and `.`.
+  surrounding white-spaces and traling `:`.
 
   If `doc` is `nil`, it returns `nil`.
   """
@@ -100,7 +100,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> String.split(~r/\n\s*\n/)
     |> hd()
     |> String.trim()
-    |> String.replace(~r{[.:\s]+$}, "")
+    |> String.replace(~r{[:\s]+$}, "")
     |> String.trim_trailing()
   end
 

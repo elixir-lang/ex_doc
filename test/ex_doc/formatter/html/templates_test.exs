@@ -114,9 +114,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "functionality" do
       assert Templates.synopsis(nil) == nil
       assert Templates.synopsis("") == ""
-      assert Templates.synopsis(".") == ""
-      assert Templates.synopsis(".::.") == ""
-      assert Templates.synopsis(" .= .: :.") == ".="
+      assert Templates.synopsis(".") == "."
+      assert Templates.synopsis("::") == ""
+      assert Templates.synopsis(" = : :") == "="
       assert Templates.synopsis(" Description: ") == "Description"
       assert Templates.synopsis("abcd") == "abcd"
 
@@ -127,22 +127,22 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     test "should not end have trailing periods or semicolons" do
       doc1 = """
-      Summaries should not be displayed with trailing punctuation . :
+      Summaries should not be displayed with trailing semicolons :
 
       ## Example
       """
 
       doc2 = """
-      Example function: Summary should not display trailing puntuation :.
+      Example function: Summary should display trailing period :.
 
       ## Example:
       """
 
       assert Templates.synopsis(doc1) ==
-               "Summaries should not be displayed with trailing punctuation"
+               "Summaries should not be displayed with trailing semicolons"
 
       assert Templates.synopsis(doc2) ==
-               "Example function: Summary should not display trailing puntuation"
+               "Example function: Summary should display trailing period :."
     end
   end
 
