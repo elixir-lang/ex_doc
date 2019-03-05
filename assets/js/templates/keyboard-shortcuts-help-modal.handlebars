@@ -1,0 +1,25 @@
+<div id="keyboard-shortcuts-modal-wrapper">
+  <div id="keyboard-shortcuts-modal" tabindex="-1">
+    <div class="modal-contents">
+      <div class="modal-header">
+        <div class="modal-title">Keyboard Shortcuts</div>
+        <div class="modal-close">×</div>
+      </div>
+      <div class="modal-body">
+        {{#each shortcuts}}
+          <dl class="shortcut-row">
+            <dt class="shortcut-keys">
+              {{#if this.requiresShiftKey}}
+                <kbd class="shortcut-key">shift</kbd>
+              {{/if}}
+              <kbd class="shortcut-key">{{this.name}}</kbd>
+            </dt>
+            <dd class="shortcut-description">
+              {{this.description}}
+            </dd>
+          </dl>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>

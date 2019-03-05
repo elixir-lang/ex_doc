@@ -91,7 +91,7 @@ function addEventListeners () {
 
   $('.sidebar-search input').on('keydown', function (e) {
     if (e.keyCode === 27) { // escape key
-      $(this).val('')
+      $(this).val('').blur()
     } else if ((event.metaKey || event.ctrlKey) && e.keyCode === 13) { // cmd+enter
       $(this).parent().attr('target', '_blank').submit().removeAttr('')
       e.preventDefault()

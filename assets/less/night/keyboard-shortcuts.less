@@ -1,0 +1,23 @@
+body.night-mode {
+  #keyboard-shortcuts-modal {
+    background-color: rgba(0, 0, 0, 0.75);
+
+    .modal-contents {
+      background-color: @nightBackground;
+      color: @nightTextBody;
+
+      dl.shortcut-row {
+        border-bottom: 1px solid @nightCodeBorder;
+        &:last-of-type {
+          border-bottom-style: none;
+        }
+      }
+
+      kbd {
+        color: @nightTextBody;
+        background-color: @nightCodeBackground;
+        border: 1px solid @nightCodeBorder;
+      }
+    }
+  }
+}
