@@ -25,7 +25,7 @@
   </div>
 
   <form class="sidebar-search" action="search.html">
-    <button type="submit" class="search-button">
+    <button type="submit" class="search-button" aria-label="Submit search">
       <span class="icon-search" aria-hidden="true"></span>
     </button>
     <input name="q" type="text" id="search-list" class="search-input" placeholder="Search" aria-label="Search" autocomplete="off" />
