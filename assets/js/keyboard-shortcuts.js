@@ -94,6 +94,6 @@ export function initialize () {
   })
 
   $(document).on('keydown', function (e) {
-    triggerShortcut(event)
+    triggerShortcut(e)
   })
 }
