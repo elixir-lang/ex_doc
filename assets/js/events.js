@@ -89,12 +89,12 @@ function addEventListeners () {
   SIDEBAR_NAV.on('click', '#exceptions-list', createHandler('exceptions'))
   SIDEBAR_NAV.on('click', '#tasks-list', createHandler('tasks'))
 
-  $('.sidebar-search input').on('keydown', function (e) {
-    if (e.keyCode === 27) { // escape key
+  $('.sidebar-search input').on('keydown', function (event) {
+    if (event.keyCode === 27) { // escape key
       $(this).val('').blur()
-    } else if ((event.metaKey || event.ctrlKey) && e.keyCode === 13) { // cmd+enter
+    } else if ((event.metaKey || event.ctrlKey) && event.keyCode === 13) { // cmd+enter
       $(this).parent().attr('target', '_blank').submit().removeAttr('')
-      e.preventDefault()
+      event.preventDefault()
     }
   })
 
