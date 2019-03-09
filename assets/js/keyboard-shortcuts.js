@@ -2,6 +2,7 @@
 // ------------
 
 import $ from 'jquery'
+import find from 'lodash.find'
 import {focusSearchInput, openSidebar, toggleSidebar} from './sidebar'
 import {toggleNightMode} from './night'
 import helpModalTemplate from './templates/keyboard-shortcuts-help-modal.handlebars'
@@ -12,34 +13,46 @@ import helpModalTemplate from './templates/keyboard-shortcuts-help-modal.handleb
 const helpModalSelector = '#keyboard-shortcuts-modal'
 const closeButtonSelector = '.modal-close'
 const inputElements = ['input', 'textarea']
-const keyboardShortcuts = {
-  67: {
+const keyboardShortcuts = [
+  {
     name: 'c',
+    keyCode: 67,
     description: 'Toggle sidebar',
     action: toggleSidebar
   },
-  78: {
+  {
     name: 'n',
+    keyCode: 78,
     description: 'Toggle night mode',
     action: toggleNightMode
   },
-  83: {
+  {
     name: 's',
+    keyCode: 83,
     description: 'Focus search bar',
-    action: (event) => {
-      openSidebar()
-      closeHelpModal()
-      focusSearchInput()
-      event.preventDefault()
-    }
+    displayAs: '<kbd>/</kbd> or <kbd>s</kdb>',
+    action: searchKeyAction
   },
-  191: {
+  {
     name: '/',
-    description: 'Bring up this help dialog',
+    keyCode: 191,
+    action: searchKeyAction
+  },
+  {
+    name: '?',
+    keyCode: 191,
     requiresShiftKey: true,
+    displayAs: '<kbd>shift</kbd> + <kbd>/</kbd>',
+    description: 'Bring up this help dialog',
     action: toggleHelpModal
   }
-}
+]
+
+// State
+// -----
+
+// Stores shortcut info to prevent multiple activations ok keyDown event
+let shortcutBeingPressed = null
 
 // Local Methods
 // ---------------
@@ -49,15 +62,22 @@ function triggerShortcut (event) {
   const keyCode = event.keyCode
   const isShiftPressed = event.shiftKey
 
+  if (shortcutBeingPressed) { return }
+
   if (inputElements.indexOf(elementTagName) >= 0) { return }
 
-  const shortcut = keyboardShortcuts[keyCode]
-  if (!shortcut) { return true }
+  if (event.ctrlKey || event.metaKey || event.altKey) { return }
 
-  const isShiftRequired = !!shortcut.requiresShiftKey
-  if (isShiftRequired !== isShiftPressed) { return }
+  const foundShortcut = find(keyboardShortcuts, function (shortcut) {
+    const isShiftRequired = !!shortcut.requiresShiftKey
+    return shortcut.keyCode === keyCode && isShiftRequired === isShiftPressed
+  })
 
-  shortcut.action(event)
+  if (!foundShortcut) { return }
+
+  shortcutBeingPressed = foundShortcut
+
+  foundShortcut.action(event)
 }
 
 function closeHelpModal () {
@@ -74,6 +94,13 @@ function toggleHelpModal () {
   } else {
     openHelpModal()
   }
+}
+
+function searchKeyAction () {
+  openSidebar()
+  closeHelpModal()
+  focusSearchInput()
+  event.preventDefault()
 }
 
 // Public Methods
@@ -95,5 +122,9 @@ export function initialize () {
 
   $(document).on('keydown', function (e) {
     triggerShortcut(e)
+  })
+
+  $(document).on('keyup', function (e) {
+    shortcutBeingPressed = null
   })
 }
