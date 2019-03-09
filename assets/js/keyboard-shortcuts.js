@@ -24,8 +24,7 @@ const keyboardShortcuts = [
     name: 'n',
     keyCode: 78,
     description: 'Toggle night mode',
-    action: toggleNightMode,
-    eventType: 'keyup'
+    action: toggleNightMode
   },
   {
     name: 's',
@@ -49,6 +48,12 @@ const keyboardShortcuts = [
   }
 ]
 
+// State
+// -----
+
+// Stores shortcut info to prevent multiple activations ok keyDown event
+let shortcutBeingPressed = null
+
 // Local Methods
 // ---------------
 
@@ -56,7 +61,8 @@ function triggerShortcut (event) {
   const elementTagName = event.target.tagName.toLowerCase()
   const keyCode = event.keyCode
   const isShiftPressed = event.shiftKey
-  const eventType = event.type
+
+  if (shortcutBeingPressed) { return }
 
   if (inputElements.indexOf(elementTagName) >= 0) { return }
 
@@ -69,9 +75,7 @@ function triggerShortcut (event) {
 
   if (!foundShortcut) { return }
 
-  const shortcutEventType = foundShortcut.eventType || 'keydown'
-
-  if (shortcutEventType !== eventType) { return }
+  shortcutBeingPressed = foundShortcut
 
   foundShortcut.action(event)
 }
@@ -121,6 +125,6 @@ export function initialize () {
   })
 
   $(document).on('keyup', function (e) {
-    triggerShortcut(e)
+    shortcutBeingPressed = null
   })
 }
