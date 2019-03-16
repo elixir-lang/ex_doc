@@ -77,14 +77,24 @@ export function search (value) {
 }
 
 function getIndex () {
-  if (sessionStorage.getItem('idx') == null) {
-    createIndex()
+  var idx = null
+  var stored = sessionStorage.getItem(getProjectMeta())
+  if (stored == null) {
+    idx = createIndex()
+    sessionStorage.setItem(getProjectMeta(), JSON.stringify(idx))
+  } else {
+    idx = JSON.parse(stored)
   }
-  return lunr.Index.load(JSON.parse(sessionStorage.getItem('idx')))
+
+  return lunr.Index.load(idx)
 }
 
-export function createIndex () {
-  var idx = lunr(function () {
+function getProjectMeta () {
+  return document.head.querySelector('[name=project][content]').content
+}
+
+function createIndex () {
+  return lunr(function () {
     this.ref('ref')
     this.field('text')
     this.field('title')
@@ -96,5 +106,4 @@ export function createIndex () {
       this.add(doc)
     }, this)
   })
-  sessionStorage.setItem('idx', JSON.stringify(idx))
 }
