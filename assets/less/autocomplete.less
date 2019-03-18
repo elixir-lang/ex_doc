@@ -1,7 +1,7 @@
 .autocomplete {
   display: none;
   height: 0;
-  margin: 0 5px 0 20px;
+  margin: 0 5px 0 12px;
   overflow: visible;
   position: relative;
   width: 100%;
@@ -9,12 +9,12 @@
 
 .autocomplete-results {
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.25);
-  border-top: 1px solid @mediumGray;
   background-color: darken(@darkGray, 11%);
+  border-top: 1px solid @darkGray;
   left: 0;
   position: absolute;
-  top: -19px;
-  width: 260px;
+  top: -2px;
+  width: 276px;
   z-index: 200;
 }
 
@@ -22,7 +22,6 @@
   color: inherit;
   display: block;
   padding: 10px;
-  border-left: 3px solid transparent;
   text-decoration: none;
 
   &:hover, &.selected {
@@ -40,11 +39,26 @@
     padding-top: 3px;
   }
 
+  // Todo: it's now a type desc. not a prefix!
+  .prefix {
+    /*
+    border-radius: 2px;
+    background-color: @darkGray;
+    display: inline-block;
+    font-weight: bold;
+    opacity: 0.7;
+    padding: 0px 4px 1px 4px;
+    */
+    padding-left: 2px;
+    opacity: 0.75;
+  }
+
+
   .title,
   .description {
-    width: 100%;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
   }
 }

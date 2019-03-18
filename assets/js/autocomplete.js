@@ -15,22 +15,40 @@ var AUTOCOMPLETE = $('.autocomplete')
 var RESULTS_COUNT = 5
 
 function flattenResults (resultsItem) {
+  console.log("Flattening ", resultsItem)
   var functions = resultsItem.functions || []
   var callbacks = resultsItem.callbacks || []
+  var types = resultsItem.types || []
 
-  var foundFunctions = [...functions, ...callbacks]
+  types = types.map((type) => {
+    type.prefix = 'type'
+    return type
+  })
+
+  callbacks = callbacks.map((callback) => {
+    callback.prefix = 'callback'
+    return callback
+  })
+
+  console.log("f/c/t", functions, callbacks, types)
+
+  var foundFunctions = [...functions, ...callbacks, ...types]
 
   var results =
     foundFunctions.filter(function (result) {
       return result.match !== result.id
     })
       .map(function (result) {
+        console.log(result)
+
         return {
           anchor: result.anchor,
           title: result.match,
           moduleTitle: resultsItem.id,
           description: '',
-          isFunction: true
+          isFunction: true,
+          typeName: 'Function',
+          prefix: result.prefix
         }
       })
 
@@ -40,11 +58,19 @@ function flattenResults (resultsItem) {
       title: resultsItem.match,
       moduleTitle: resultsItem.id,
       description: '',
-      isModule: true
+      isModule: true,
+      typeName: resultsItem.typeName
     })
   }
 
   return results
+}
+
+function addTypeName (modules, typeName) {
+  return modules.map((module) => {
+    module.typeName = typeName
+    return module
+  })
 }
 
 function updateSuggestions (term) {
@@ -54,6 +80,10 @@ function updateSuggestions (term) {
   var modules = findIn(nodes.modules, safeVal)
   var exceptions = findIn(nodes.exceptions, safeVal)
   var tasks = findIn(nodes.tasks, safeVal)
+
+  modules = addTypeName(modules, 'Module')
+  exceptions = addTypeName(exceptions, 'Exception')
+  tasks = addTypeName(tasks, 'Mix Task')
 
   var results = [...modules, ...exceptions, ...tasks]
 
@@ -66,14 +96,17 @@ function updateSuggestions (term) {
   console.log('after flatten', results)
 
   results.sort(function (item1, item2) {
-    if (item1.isModule) {
-      if (item2.isModule) {
-        return 0
-      }
-      return -1
+    var priorities = {
+      'Module': 3,
+      'Function': 2,
+      'Exception': 1,
+      'Mix Task': 0
     }
 
-    return 1
+    var weight1 = priorities[item1.typeName] || -1
+    var weight2 = priorities[item2.typeName] || -1
+
+    return weight2 - weight1
   })
 
   results = results.slice(0, RESULTS_COUNT)

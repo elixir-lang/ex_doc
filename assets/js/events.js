@@ -22,6 +22,7 @@ var SIDEBAR_TYPES = [
 ]
 var SIDEBAR_NAV = $('.sidebar-listNav')
 var CONTENT = $('.content')
+var BODY = $('body')
 
 function setupSelected (id) {
   SIDEBAR_TYPES.forEach(function (element) {
@@ -90,6 +91,12 @@ function addEventListeners () {
   SIDEBAR_NAV.on('click', '#exceptions-list', createHandler('exceptions'))
   SIDEBAR_NAV.on('click', '#tasks-list', createHandler('tasks'))
 
+  // TODO - just a quick hack!
+  $('body').on('click', '.search-close-button', function (e) {
+    $('.sidebar-search input').val('')
+    $('.sidebar-search input').blur()
+  })
+
   $('.sidebar-search input').on('keydown', function (e) {
     var commandKey = (event.metaKey || event.ctrlKey)
 
@@ -104,7 +111,9 @@ function addEventListeners () {
 
         $(this).removeAttr('name').val('')
 
+        // TODO: Cleanup :)
         $(this).parent()
+          .parent()
           .attr('action', selection.attr('href'))
           .attr('target', target)
           .submit()
@@ -138,6 +147,11 @@ function addEventListeners () {
     }
   })
 
+  $('.sidebar-search input').on('focus', function (e) {
+    BODY.addClass('search-focused')
+    updateAutocomplete($(this).val())
+  })
+
   $('.sidebar-search input').on('blur', function (e) {
     var relatedTarget = $(e.relatedTarget)
 
@@ -145,6 +159,7 @@ function addEventListeners () {
       return null
     }
 
+    BODY.removeClass('search-focused');
     hideAutocomplete()
   })
 
@@ -205,5 +220,4 @@ export function initialize () {
   collapse()
   identifyCurrentHash()
   fixLinks()
-  fixSpacebar()
 }

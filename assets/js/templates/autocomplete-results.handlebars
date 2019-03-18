@@ -5,11 +5,14 @@
   </a>
   {{#each results}}
     <a href="{{moduleTitle}}.html#{{anchor}}" class="autocomplete-result" data-index="{{@index}}">
-      <div class="title">{{{title}}}</div>
+      <div class="title">
+        {{{title}}}
+        {{#if prefix}}
+          <span class="prefix">({{prefix}})</span>
+        {{/if}}
+      </div>
       <div class="description">
-        {{#if isModule}}
-          Module
-        {{else if isFunction}}
+        {{#if isFunction}}
           {{{moduleTitle}}}
         {{/if}}
       </div>
