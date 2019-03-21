@@ -13,9 +13,24 @@ import autocompleteResultsTemplate from './templates/autocomplete-results.handle
 
 var AUTOCOMPLETE = $('.autocomplete')
 var RESULTS_COUNT = 5
+var SORTING_PRIORITIES = {
+  'Module': 3,
+  'Function': 2,
+  'Exception': 1,
+  'Mix Task': 0
+}
 
-function flattenResults (resultsItem) {
-  console.log("Flattening ", resultsItem)
+/**
+ * Transform into a non-nested array.
+ *
+ * This function replaces an empty unordered list with an
+ * unordered list full of links to the different tasks, exceptions
+ * and modules mentioned in the documentation.
+ *
+ * @param {Object} resultItem - module, exception or mix task
+ */
+
+function flattenResultItem (resultsItem) {
   var functions = resultsItem.functions || []
   var callbacks = resultsItem.callbacks || []
   var types = resultsItem.types || []
@@ -30,8 +45,6 @@ function flattenResults (resultsItem) {
     return callback
   })
 
-  console.log("f/c/t", functions, callbacks, types)
-
   var foundFunctions = [...functions, ...callbacks, ...types]
 
   var results =
@@ -39,8 +52,6 @@ function flattenResults (resultsItem) {
       return result.match !== result.id
     })
       .map(function (result) {
-        console.log(result)
-
         return {
           anchor: result.anchor,
           title: result.match,
@@ -66,6 +77,10 @@ function flattenResults (resultsItem) {
   return results
 }
 
+function serializeItem() {
+  return {}
+}
+
 function addTypeName (modules, typeName) {
   return modules.map((module) => {
     module.typeName = typeName
@@ -75,11 +90,11 @@ function addTypeName (modules, typeName) {
 
 function updateSuggestions (term) {
   var nodes = sidebarNodes
-  var safeVal = new RegExp(helpers.escapeText(term), 'i')
+  var regExp = new RegExp(helpers.escapeText(term), 'i')
 
-  var modules = findIn(nodes.modules, safeVal)
-  var exceptions = findIn(nodes.exceptions, safeVal)
-  var tasks = findIn(nodes.tasks, safeVal)
+  var modules = findIn(nodes.modules, regExp)
+  var exceptions = findIn(nodes.exceptions, regExp)
+  var tasks = findIn(nodes.tasks, regExp)
 
   modules = addTypeName(modules, 'Module')
   exceptions = addTypeName(exceptions, 'Exception')
@@ -87,24 +102,13 @@ function updateSuggestions (term) {
 
   var results = [...modules, ...exceptions, ...tasks]
 
-  console.log('before flattern', results)
-
-  results = results.reduce(function (acc, resultsItem) {
-    return acc.concat(flattenResults(resultsItem))
+  results = results.reduce(function (acc, resultItem) {
+    return acc.concat(flattenResultItem(resultItem))
   }, [])
 
-  console.log('after flatten', results)
-
   results.sort(function (item1, item2) {
-    var priorities = {
-      'Module': 3,
-      'Function': 2,
-      'Exception': 1,
-      'Mix Task': 0
-    }
-
-    var weight1 = priorities[item1.typeName] || -1
-    var weight2 = priorities[item2.typeName] || -1
+    var weight1 = SORTING_PRIORITIES[item1.typeName] || -1
+    var weight2 = SORTING_PRIORITIES[item2.typeName] || -1
 
     return weight2 - weight1
   })
@@ -116,6 +120,7 @@ function updateSuggestions (term) {
     results: results,
     term: term
   })
+
   AUTOCOMPLETE.html(template)
 }
 

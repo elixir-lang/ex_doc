@@ -7,7 +7,15 @@
           <span class="line">
             designed by
             <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
-            </span>
+          </span>
+        </p>
+        <p>
+          <button class="line night-mode-toggle">
+            Toggle Nightmode
+          </button>
+          <button class="line">
+            <a href="https://github.com/elixir-lang/ex_doc" title="Display vailable keyboard shortcuts">Display available keyboard shortcuts</a>
+          </button>
         </p>
       </footer>
     </div>
