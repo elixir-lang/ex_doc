@@ -20,65 +20,11 @@ var SORTING_PRIORITIES = {
   'Mix Task': 0
 }
 
-/**
- * Transform into a non-nested array.
- *
- * This function replaces an empty unordered list with an
- * unordered list full of links to the different tasks, exceptions
- * and modules mentioned in the documentation.
- *
- * @param {Object} resultItem - module, exception or mix task
- */
-
-function flattenResultItem (resultsItem) {
-  var functions = resultsItem.functions || []
-  var callbacks = resultsItem.callbacks || []
-  var types = resultsItem.types || []
-
-  types = types.map((type) => {
-    type.prefix = 'type'
-    return type
+function addPrefix (items, prefixName) {
+  return items.map((item) => {
+    item.prefix = prefixName
+    return item
   })
-
-  callbacks = callbacks.map((callback) => {
-    callback.prefix = 'callback'
-    return callback
-  })
-
-  var foundFunctions = [...functions, ...callbacks, ...types]
-
-  var results =
-    foundFunctions.filter(function (result) {
-      return result.match !== result.id
-    })
-      .map(function (result) {
-        return {
-          anchor: result.anchor,
-          title: result.match,
-          moduleTitle: resultsItem.id,
-          description: '',
-          isFunction: true,
-          typeName: 'Function',
-          prefix: result.prefix
-        }
-      })
-
-  if (resultsItem.match !== resultsItem.id) {
-    results.unshift({
-      anchor: '',
-      title: resultsItem.match,
-      moduleTitle: resultsItem.id,
-      description: '',
-      isModule: true,
-      typeName: resultsItem.typeName
-    })
-  }
-
-  return results
-}
-
-function serializeItem() {
-  return {}
 }
 
 function addTypeName (modules, typeName) {
@@ -88,7 +34,74 @@ function addTypeName (modules, typeName) {
   })
 }
 
-function updateSuggestions (term) {
+/**
+ * Returns `true` if the given module/function name matches the search query.
+ */
+function isMatch (item) {
+  return item.match !== item.id
+}
+
+/**
+ * Extracts data about functions, callbacks and types.
+ *
+ * This function replaces an empty unordered list with an
+ * unordered list full of links to the different tasks, exceptions
+ * and modules mentioned in the documentation.
+ *
+ * @param {Object} module - module, exception or mix task
+ */
+
+function parseModuleResults (moduleResults) {
+  console.log(moduleResults)
+  var functions = moduleResults.functions || []
+  var callbacks = moduleResults.callbacks || []
+  var types = moduleResults.types || []
+
+  types = addPrefix(types, 'type')
+  callbacks = addPrefix(callbacks, 'callback')
+
+  const results =
+    [...functions, ...callbacks, ...types]
+      .filter(isMatch)
+      .map((item) => serialize(item, moduleResults.id))
+
+  if (isMatch(moduleResults)) {
+    const serializedModuleData = serialize(moduleResults, moduleResults.id, false)
+    results.unshift(serializedModuleData)
+  }
+
+  return results
+}
+
+/**
+ *
+ * @param {Object} item
+ * @param {string} moduleId
+ * @param {boolean} isFunction
+ * @returns {Object} Serialized object that can be used directly by the autocomplete template
+ */
+
+function serialize (item, moduleId, isFunction = true) {
+  const anchor = isFunction ? item.anchor : ''
+  const typeName = isFunction ? 'Function' : item.typeName
+  const description = isFunction ? moduleId : null
+  const prefix = item.prefix || null
+
+  return {
+    anchor: anchor, // ie "floor/1", will be used to construct a link to the item
+    title: item.match, // Displayed as the main
+    moduleTitle: moduleId, // If the result is a Function, Callback or a Type, parent's module name will be displayed under it
+    description: description,
+    prefix: prefix,
+    typeName: typeName
+  }
+}
+
+function find (term = '') {
+  if (term.trim().length === 0) {
+    return []
+  }
+
   var nodes = sidebarNodes
   var regExp = new RegExp(helpers.escapeText(term), 'i')
 
@@ -102,8 +115,8 @@ function updateSuggestions (term) {
 
   var results = [...modules, ...exceptions, ...tasks]
 
-  results = results.reduce(function (acc, resultItem) {
-    return acc.concat(flattenResultItem(resultItem))
+  results = results.reduce(function (acc, moduleResults) {
+    return acc.concat(parseModuleResults(moduleResults))
   }, [])
 
   results.sort(function (item1, item2) {
@@ -113,8 +126,11 @@ function updateSuggestions (term) {
     return weight2 - weight1
   })
 
-  results = results.slice(0, RESULTS_COUNT)
+  return results.slice(0, RESULTS_COUNT)
+}
 
+function updateSuggestions (term) {
+  var results = find(term)
   var template = autocompleteResultsTemplate({
     empty: results.length === 0,
     results: results,
@@ -175,4 +191,4 @@ function moveAutocompleteSelection (direction) {
 // Public Methods
 // --------------
 
-export { updateAutocomplete, moveAutocompleteSelection, hideAutocomplete, selectedAutocompleteElement }
+export { find, updateAutocomplete, moveAutocompleteSelection, hideAutocomplete, selectedAutocompleteElement }

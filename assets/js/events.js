@@ -23,6 +23,7 @@ var SIDEBAR_TYPES = [
 var SIDEBAR_NAV = $('.sidebar-listNav')
 var CONTENT = $('.content')
 var BODY = $('body')
+var SEARCH_FORM = $('form.sidebar-search')
 
 function setupSelected (id) {
   SIDEBAR_TYPES.forEach(function (element) {
@@ -98,35 +99,16 @@ function addEventListeners () {
   })
 
   $('.sidebar-search input').on('keydown', function (e) {
-    var commandKey = (event.metaKey || event.ctrlKey)
+    var newWindowKeyDown = (event.metaKey || event.ctrlKey)
 
     if (e.keyCode === 27) { // escape key
       $(this).val('').blur()
     } else if (e.keyCode === 13) { // enter
-      var selection = selectedAutocompleteElement()
-
-      if (selection && selection.attr('data-index') !== '-1') {
-        var target = commandKey ? '_blank' : '_self'
-        var originalValue = $(this).val()
-
-        $(this).removeAttr('name').val('')
-
-        // TODO: Cleanup :)
-        $(this).parent()
-          .parent()
-          .attr('action', selection.attr('href'))
-          .attr('target', target)
-          .submit()
-          .attr('action', 'search.html')
-
-        $(this).val(originalValue).attr('name', 'q')
-
+      // enter + one of the autocomplete options selected with keyboard
+      if (handleAutocompleteEnterKey($(this), newWindowKeyDown)) {
         e.preventDefault()
-      } else if (commandKey) {
-        $(this).parent()
-          .attr('target', '_blank')
-          .submit()
-          .removeAttr('')
+      } else if (newWindowKeyDown) {
+        SEARCH_FORM.attr('target', '_blank').submit().removeAttr('')
         e.preventDefault()
       }
     } else if (e.keyCode === 38) {
@@ -136,7 +118,7 @@ function addEventListeners () {
       moveAutocompleteSelection(1)
       e.preventDefault()
     } else {
-      !commandKey && updateAutocomplete($(this).val())
+      !newWindowKeyDown && updateAutocomplete($(this).val())
     }
   })
 
@@ -159,7 +141,7 @@ function addEventListeners () {
       return null
     }
 
-    BODY.removeClass('search-focused');
+    BODY.removeClass('search-focused')
     hideAutocomplete()
   })
 
@@ -167,6 +149,29 @@ function addEventListeners () {
   if (pathname.substr(pathname.lastIndexOf('/') + 1) === 'search.html') {
     search(getParameterByName('q'))
   }
+}
+
+function handleAutocompleteEnterKey (inputElement, newWindowKeyDown) {
+  var autocompleteSelection = selectedAutocompleteElement()
+
+  if (!autocompleteSelection || autocompleteSelection.attr('data-index') === '-1') {
+    return false
+  }
+
+  var target = newWindowKeyDown ? '_blank' : '_self'
+  var originalValue = inputElement.val()
+
+  inputElement.removeAttr('name').val('')
+
+  SEARCH_FORM
+    .attr('action', autocompleteSelection.attr('href'))
+    .attr('target', target)
+    .submit()
+    .attr('action', 'search.html')
+
+  inputElement.val(originalValue).attr('name', 'q')
+
+  return true
 }
 
 function getParameterByName (name) {
@@ -220,4 +225,5 @@ export function initialize () {
   collapse()
   identifyCurrentHash()
   fixLinks()
+  //fixSpacebar()
 }

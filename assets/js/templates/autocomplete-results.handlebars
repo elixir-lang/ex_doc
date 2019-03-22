@@ -11,11 +11,12 @@
           <span class="prefix">({{prefix}})</span>
         {{/if}}
       </div>
-      <div class="description">
-        {{#if isFunction}}
-          {{{moduleTitle}}}
-        {{/if}}
-      </div>
+
+      {{#if description}}
+        <div class="description">
+          {{{description}}}
+        </div>
+      {{/if}}
     </a>
   {{/each}}
 </div>
