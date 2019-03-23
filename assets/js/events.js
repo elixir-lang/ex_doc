@@ -92,20 +92,21 @@ function addEventListeners () {
   SIDEBAR_NAV.on('click', '#exceptions-list', createHandler('exceptions'))
   SIDEBAR_NAV.on('click', '#tasks-list', createHandler('tasks'))
 
-  // TODO - just a quick hack!
-  $('body').on('click', '.search-close-button', function (e) {
+  $('.sidebar-search').on('click', '.search-close-button', function (e) {
     $('.sidebar-search input').val('')
     $('.sidebar-search input').blur()
   })
 
   $('.sidebar-search input').on('keydown', function (e) {
     var newWindowKeyDown = (event.metaKey || event.ctrlKey)
+    var autocompleteSelection = selectedAutocompleteElement()
 
     if (e.keyCode === 27) { // escape key
       $(this).val('').blur()
     } else if (e.keyCode === 13) { // enter
-      // enter + one of the autocomplete options selected with keyboard
-      if (handleAutocompleteEnterKey($(this), newWindowKeyDown)) {
+      if (autocompleteSelection && autocompleteSelection.attr('data-index') !== '-1') {
+        var href = autocompleteSelection.attr('href')
+        handleAutocompleteEnterKey($(this), newWindowKeyDown, href)
         e.preventDefault()
       } else if (newWindowKeyDown) {
         SEARCH_FORM.attr('target', '_blank').submit().removeAttr('')
@@ -151,20 +152,14 @@ function addEventListeners () {
   }
 }
 
-function handleAutocompleteEnterKey (inputElement, newWindowKeyDown) {
-  var autocompleteSelection = selectedAutocompleteElement()
-
-  if (!autocompleteSelection || autocompleteSelection.attr('data-index') === '-1') {
-    return false
-  }
-
+function handleAutocompleteEnterKey (inputElement, newWindowKeyDown, href) {
   var target = newWindowKeyDown ? '_blank' : '_self'
   var originalValue = inputElement.val()
 
   inputElement.removeAttr('name').val('')
 
   SEARCH_FORM
-    .attr('action', autocompleteSelection.attr('href'))
+    .attr('action', href)
     .attr('target', target)
     .submit()
     .attr('action', 'search.html')

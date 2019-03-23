@@ -20,9 +20,9 @@ var SORTING_PRIORITIES = {
   'Mix Task': 0
 }
 
-function addPrefix (items, prefixName) {
+function addLabel (items, labelName) {
   return items.map((item) => {
-    item.prefix = prefixName
+    item.label = labelName
     return item
   })
 }
@@ -57,8 +57,8 @@ function parseModuleResults (moduleResults) {
   var callbacks = moduleResults.callbacks || []
   var types = moduleResults.types || []
 
-  types = addPrefix(types, 'type')
-  callbacks = addPrefix(callbacks, 'callback')
+  types = addLabel(types, 'type')
+  callbacks = addLabel(callbacks, 'callback')
 
   const results =
     [...functions, ...callbacks, ...types]
@@ -76,23 +76,23 @@ function parseModuleResults (moduleResults) {
 /**
  *
  * @param {Object} item
- * @param {string} moduleId
- * @param {boolean} isFunction
- * @returns {Object} Serialized object that can be used directly by the autocomplete template
+ * @param {String} moduleId
+ * @param {Boolean} isFunction
+ * @returns {Object} Serialized object that can be used directly in the autocomplete template
  */
 
 function serialize (item, moduleId, isFunction = true) {
   const anchor = isFunction ? item.anchor : ''
   const typeName = isFunction ? 'Function' : item.typeName
   const description = isFunction ? moduleId : null
-  const prefix = item.prefix || null
+  const label = item.label || null
 
   return {
-    anchor: anchor, // ie "floor/1", will be used to construct a link to the item
-    title: item.match, // Displayed as the main
-    moduleTitle: moduleId, // If the result is a Function, Callback or a Type, parent's module name will be displayed under it
-    description: description,
-    prefix: prefix,
+    anchor: anchor, // ie "floor/1", will be used to construct a link to the item.
+    title: item.match, // Main text displayed for each autocomplete result.
+    moduleTitle: moduleId, // Used to construct a link to the item.
+    description: description, // Displayed under the title.
+    label: label, // ie "Callback", special label dispyed next to the title.
     typeName: typeName
   }
 }
