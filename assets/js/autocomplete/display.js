@@ -2,7 +2,7 @@
 // ------------
 
 import $ from 'jquery'
-import autocompleteResultsTemplate from '../templates/autocomplete-results.handlebars'
+import autocompleteResultsTemplate from '../templates/autocomplete-suggestions.handlebars'
 import { getSuggestions } from './suggestions'
 
 // Constants
@@ -45,7 +45,7 @@ function update (searchTerm) {
  * @returns {Object} jQuery element
  */
 function selectedElement () {
-  var currentlySelectedElement = $('.autocomplete-result.selected')
+  var currentlySelectedElement = $('.autocomplete-suggestion.selected')
   if (currentlySelectedElement.length === 0) {
     return null
   }
@@ -61,23 +61,23 @@ function selectedElement () {
  * @param {Number} direction - '-1' to move the selection down, '1' to move it up
  */
 function moveSelection (direction) {
-  var currentlySelectedElement = $('.autocomplete-result.selected')
+  var currentlySelectedElement = $('.autocomplete-suggestion.selected')
   var indexToSelect = -1
   if (currentlySelectedElement.length) {
     indexToSelect = parseInt(currentlySelectedElement.attr('data-index')) + direction
   }
 
-  var elementToSelect = $(`.autocomplete-result[data-index="${indexToSelect}"]`)
+  var elementToSelect = $(`.autocomplete-suggestion[data-index="${indexToSelect}"]`)
 
   if (!elementToSelect.length) {
     if (indexToSelect < 0) {
-      elementToSelect = $('.autocomplete-result:last')
+      elementToSelect = $('.autocomplete-suggestion:last')
     } else {
-      elementToSelect = $('.autocomplete-result:first')
+      elementToSelect = $('.autocomplete-suggestion:first')
     }
   }
 
-  $('.autocomplete-result').each(function () {
+  $('.autocomplete-suggestion').each(function () {
     $(this).toggleClass('selected', $(this).is(elementToSelect))
   })
 }

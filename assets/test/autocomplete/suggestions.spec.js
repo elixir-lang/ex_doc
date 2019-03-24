@@ -127,5 +127,11 @@ describe('getSuggestions', () => {
 
       expect(firstResult.label).to.eql('type')
     })
+
+    it('generates a link for each suggestion', () => {
+      expect(getSuggestions('has_many')[0].link).to.eql('Ecto.Schema.html#t:has_many/1')
+      expect(getSuggestions('map')[0].link).to.eql('Map.html')
+      expect(getSuggestions('fetch')[0].link).to.eql('Map.html#fetch/2')
+    })
   })
 })

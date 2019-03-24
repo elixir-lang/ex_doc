@@ -139,7 +139,7 @@ function addEventListeners () {
   $('.sidebar-search input').on('blur', function (e) {
     var relatedTarget = $(e.relatedTarget)
 
-    if (relatedTarget.hasClass('autocomplete-result')) {
+    if (relatedTarget.hasClass('autocomplete-suggestion')) {
       return null
     }
 

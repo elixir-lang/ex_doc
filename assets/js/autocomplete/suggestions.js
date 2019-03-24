@@ -81,11 +81,11 @@ function serialize (item, moduleId, isChild = true) {
   const category = isChild ? 'Child' : item.category
   const description = isChild ? moduleId : null
   const label = item.label || null
+  const link = anchor ? `${moduleId}.html#${anchor}` : `${moduleId}.html`
 
   return {
-    anchor: anchor, // i.e. "floor/1", will be used to construct a link to the item.
+    link: link, // Link to the result. Used in the 'href' tag.
     title: item.match, // Main text displayed for each autocomplete result.
-    moduleTitle: moduleId, // Used to construct a link to the item.
     description: description, // Displayed under the title.
     label: label, // 'Callback' or 'Type' - if set it will be displayed next to the title.
     category: category

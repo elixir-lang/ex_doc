@@ -1,10 +1,10 @@
-<div class="autocomplete-results">
-  <a class="autocomplete-result" href="search.html?q={{term}}" data-index="-1">
+<div class="autocomplete-suggestions">
+  <a class="autocomplete-suggestion" href="search.html?q={{term}}" data-index="-1">
     <div class="title">"<em>{{term}}</em>"</div>
     <div class="description">Search the documentation</div>
   </a>
   {{#each results}}
-    <a href="{{moduleTitle}}.html#{{anchor}}" class="autocomplete-result" data-index="{{@index}}">
+    <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}">
       <div class="title">
         {{{title}}}
         {{#if label}}
