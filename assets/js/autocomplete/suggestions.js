@@ -3,15 +3,12 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
-import * as helpers from './helpers'
-import {findIn} from './search'
-import autocompleteResultsTemplate from './templates/autocomplete-results.handlebars'
+import * as helpers from '../helpers'
+import {findIn} from '../search'
 
 // Constants
 // ---------
 
-var AUTOCOMPLETE = $('.autocomplete')
 var RESULTS_COUNT = 5
 var SORTING_PRIORITY = {
   'Module': 3,
@@ -103,7 +100,7 @@ function serialize (item, moduleId, isChild = true) {
  *
  * @returns {Object[]}
  */
-function find (term = '') {
+function getSuggestions (term = '') {
   if (term.trim().length === 0) {
     return []
   }
@@ -126,8 +123,8 @@ function find (term = '') {
   }, [])
 
   results.sort(function (item1, item2) {
-    var weight1 = SORTING_PRIORITY[item1.typeName] || -1
-    var weight2 = SORTING_PRIORITY[item2.typeName] || -1
+    var weight1 = SORTING_PRIORITY[item1.category] || -1
+    var weight2 = SORTING_PRIORITY[item2.category] || -1
 
     return weight2 - weight1
   })
@@ -135,78 +132,7 @@ function find (term = '') {
   return results.slice(0, RESULTS_COUNT)
 }
 
-function updateSuggestions (term) {
-  var results = find(term)
-  var template = autocompleteResultsTemplate({
-    empty: results.length === 0,
-    results: results,
-    term: term
-  })
-
-  AUTOCOMPLETE.html(template)
-}
-
-function hide () {
-  AUTOCOMPLETE.hide()
-}
-
-function show () {
-  AUTOCOMPLETE.show()
-}
-
-function update (searchTerm) {
-  if (!searchTerm) {
-    hide()
-  } else {
-    show()
-    updateSuggestions(searchTerm)
-  }
-}
-
-/**
- * Autocomplete element that was selected using keyboard arrows.
- *
- * @returns {Object} jQuery element
- */
-function selectedElement () {
-  var currentlySelectedElement = $('.autocomplete-result.selected')
-  if (currentlySelectedElement.length === 0) {
-    return null
-  }
-
-  return currentlySelectedElement
-}
-
-/**
- * Moves the autocomplete selection up or down.
- * When moving past the last element, selects the first one.
- * When moving before the first element, selects the last one
- *
- * @param {Number} direction - '-1' to move the selection down, '1' to move it up
- */
-function moveSelection (direction) {
-  var currentlySelectedElement = $('.autocomplete-result.selected')
-  var indexToSelect = -1
-  if (currentlySelectedElement.length) {
-    indexToSelect = parseInt(currentlySelectedElement.attr('data-index')) + direction
-  }
-
-  var elementToSelect = $(`.autocomplete-result[data-index="${indexToSelect}"]`)
-
-  if (!elementToSelect.length) {
-    if (indexToSelect < 0) {
-      elementToSelect = $('.autocomplete-result:last')
-    } else {
-      elementToSelect = $('.autocomplete-result:first')
-    }
-  }
-
-  $('.autocomplete-result').each(function () {
-    $(this).toggleClass('selected', $(this).is(elementToSelect))
-  })
-}
-
 // Public Methods
 // --------------
 
-export { find, update, moveSelection, hide, selectedElement }
+export { getSuggestions }

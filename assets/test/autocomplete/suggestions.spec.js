@@ -1,6 +1,6 @@
-import * as autocomplete from '../js/autocomplete'
+import {getSuggestions} from '../../js/autocomplete/suggestions'
 
-describe('autocomplete', () => {
+describe('getSuggestions', () => {
   before(() => {
     window.sidebarNodes = {
       exceptions: [{
@@ -59,71 +59,71 @@ describe('autocomplete', () => {
 
   describe('find', () => {
     it('returns matching modules, tasks and exceptions', () => {
-      expect(autocomplete.find('Map').length).to.eql(1)
-      expect(autocomplete.find('Ecto.Repo').length).to.eql(1)
-      expect(autocomplete.find('phx.server').length).to.eql(1)
+      expect(getSuggestions('Map').length).to.eql(1)
+      expect(getSuggestions('Ecto.Repo').length).to.eql(1)
+      expect(getSuggestions('phx.server').length).to.eql(1)
     })
 
     it('returns matching functions, callbacks and types', () => {
-      expect(autocomplete.find('get_by').length).to.eql(1)
-      expect(autocomplete.find('fetch').length).to.eql(1)
-      expect(autocomplete.find('has_many').length).to.eql(1)
+      expect(getSuggestions('get_by').length).to.eql(1)
+      expect(getSuggestions('fetch').length).to.eql(1)
+      expect(getSuggestions('has_many').length).to.eql(1)
     })
 
     it('ignores matching extras', () => {
-      expect(autocomplete.find('api-reference').length).to.eql(0)
+      expect(getSuggestions('api-reference').length).to.eql(0)
     })
 
     it('handles special characters', () => {
-      expect(autocomplete.find('&&/2').length).to.eql(1)
-      expect(autocomplete.find('<>').length).to.eql(1)
-      expect(autocomplete.find('@').length).to.eql(1)
-      expect(autocomplete.find('match?').length).to.eql(1)
+      expect(getSuggestions('&&/2').length).to.eql(1)
+      expect(getSuggestions('<>').length).to.eql(1)
+      expect(getSuggestions('@').length).to.eql(1)
+      expect(getSuggestions('match?').length).to.eql(1)
     })
 
     it('sorts results, putting found modules at the top', () => {
-      const results = autocomplete.find('e')
-      expect(results[0].typeName).to.eq('Module')
-      expect(results[1].typeName).to.eq('Module')
-      expect(results[2].typeName).to.eq('Module')
-      expect(results[3].typeName).to.eq('Function')
+      const results = getSuggestions('e')
+      expect(results[0].category).to.eq('Module')
+      expect(results[1].category).to.eq('Module')
+      expect(results[2].category).to.eq('Module')
+      expect(results[3].category).to.eq('Child')
     })
 
     it('is case insensitive', () => {
-      expect(autocomplete.find('My ExCePtIoN')).to.eql(autocomplete.find('my exception'))
+      expect(getSuggestions('My ExCePtIoN')).to.eql(getSuggestions('my exception'))
     })
 
     it('returns max 5 results', () => {
-      expect(autocomplete.find('e').length).to.eql(5)
+      expect(getSuggestions('e').length).to.eql(5)
     })
 
     it('returns no results if no match found', () => {
-      expect(autocomplete.find('does not exist')).to.eql([])
+      expect(getSuggestions('does not exist')).to.eql([])
     })
 
     it('returns no results if no search term provided', () => {
-      expect(autocomplete.find()).to.eql([])
+      expect(getSuggestions()).to.eql([])
     })
 
     it('returns no results if search term consists of whitespace characters', () => {
       const searchTerm = '  '
-      expect(autocomplete.find(searchTerm)).to.eql([])
+      expect(getSuggestions(searchTerm)).to.eql([])
     })
 
     it('highlights matched fragment', () => {
-      const firstResult = autocomplete.find('get_')[0]
+      const firstResult = getSuggestions('get_')[0]
 
       expect(firstResult.title).to.eql('<em>get_</em>by/3')
     })
 
     it('marks callbacks with a special label', () => {
-      const firstResult = autocomplete.find('get_by')[0]
+      const firstResult = getSuggestions('get_by')[0]
 
       expect(firstResult.label).to.eql('callback')
     })
 
     it('marks types with a special label', () => {
-      const firstResult = autocomplete.find('has_many')[0]
+      const firstResult = getSuggestions('has_many')[0]
 
       expect(firstResult.label).to.eql('type')
     })

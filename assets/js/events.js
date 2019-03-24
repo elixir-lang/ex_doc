@@ -4,7 +4,7 @@
 // ------------
 
 import $ from 'jquery'
-import * as autocomplete from './autocomplete'
+import * as autocomplete from './autocomplete/display'
 import {search} from './search'
 import * as helpers from './helpers'
 
@@ -119,8 +119,8 @@ function addEventListeners () {
     } else if (e.keyCode === 40) {
       autocomplete.moveSelection(1)
       e.preventDefault()
-    } else {
-      !newWindowKeyDown && autocomplete.update($(this).val())
+    } else if (!newWindowKeyDown) {
+      autocomplete.update($(this).val())
     }
   })
 
@@ -153,21 +153,19 @@ function addEventListeners () {
   }
 }
 
-function handleAutocompleteEnterKey (inputElement, newWindowKeyDown, href) {
+function handleAutocompleteEnterKey (inputElement, newWindowKeyDown, link) {
   var target = newWindowKeyDown ? '_blank' : '_self'
   var originalValue = inputElement.val()
 
   inputElement.removeAttr('name').val('')
 
   SEARCH_FORM
-    .attr('action', href)
+    .attr('action', link)
     .attr('target', target)
     .submit()
     .attr('action', 'search.html')
 
   inputElement.val(originalValue).attr('name', 'q')
-
-  return true
 }
 
 function getParameterByName (name) {
@@ -221,5 +219,5 @@ export function initialize () {
   collapse()
   identifyCurrentHash()
   fixLinks()
-  //fixSpacebar()
+  fixSpacebar()
 }
