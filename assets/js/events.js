@@ -4,7 +4,7 @@
 // ------------
 
 import $ from 'jquery'
-import {updateAutocomplete, moveAutocompleteSelection, hideAutocomplete, selectedAutocompleteElement} from './autocomplete'
+import * as autocomplete from './autocomplete'
 import {search} from './search'
 import * as helpers from './helpers'
 
@@ -99,40 +99,41 @@ function addEventListeners () {
 
   $('.sidebar-search input').on('keydown', function (e) {
     var newWindowKeyDown = (event.metaKey || event.ctrlKey)
-    var autocompleteSelection = selectedAutocompleteElement()
+    var autocompleteSelection = autocomplete.selectedElement()
 
     if (e.keyCode === 27) { // escape key
       $(this).val('').blur()
     } else if (e.keyCode === 13) { // enter
       if (autocompleteSelection && autocompleteSelection.attr('data-index') !== '-1') {
-        var href = autocompleteSelection.attr('href')
-        handleAutocompleteEnterKey($(this), newWindowKeyDown, href)
+        // One of the autocomplete options selected with keyboard
+        var link = autocompleteSelection.attr('href')
+        handleAutocompleteEnterKey($(this), newWindowKeyDown, link)
         e.preventDefault()
       } else if (newWindowKeyDown) {
         SEARCH_FORM.attr('target', '_blank').submit().removeAttr('')
         e.preventDefault()
       }
     } else if (e.keyCode === 38) {
-      moveAutocompleteSelection(-1)
+      autocomplete.moveSelection(-1)
       e.preventDefault()
     } else if (e.keyCode === 40) {
-      moveAutocompleteSelection(1)
+      autocomplete.moveSelection(1)
       e.preventDefault()
     } else {
-      !newWindowKeyDown && updateAutocomplete($(this).val())
+      !newWindowKeyDown && autocomplete.update($(this).val())
     }
   })
 
   $('.sidebar-search input').on('keyup', function (e) {
     var commandKey = (event.metaKey || event.ctrlKey)
     if (e.keyCode !== 38 && e.keyCode !== 40 && !commandKey) { // Left and right arrow keys
-      updateAutocomplete($(this).val())
+      autocomplete.update($(this).val())
     }
   })
 
   $('.sidebar-search input').on('focus', function (e) {
     BODY.addClass('search-focused')
-    updateAutocomplete($(this).val())
+    autocomplete.update($(this).val())
   })
 
   $('.sidebar-search input').on('blur', function (e) {
@@ -143,7 +144,7 @@ function addEventListeners () {
     }
 
     BODY.removeClass('search-focused')
-    hideAutocomplete()
+    autocomplete.hide()
   })
 
   var pathname = window.location.pathname

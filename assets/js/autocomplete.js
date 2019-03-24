@@ -13,9 +13,9 @@ import autocompleteResultsTemplate from './templates/autocomplete-results.handle
 
 var AUTOCOMPLETE = $('.autocomplete')
 var RESULTS_COUNT = 5
-var SORTING_PRIORITIES = {
+var SORTING_PRIORITY = {
   'Module': 3,
-  'Function': 2,
+  'Child': 2,
   'Exception': 1,
   'Mix Task': 0
 }
@@ -27,32 +27,30 @@ function addLabel (items, labelName) {
   })
 }
 
-function addTypeName (modules, typeName) {
+function addCategory (modules, category) {
   return modules.map((module) => {
-    module.typeName = typeName
+    module.category = category
     return module
   })
 }
 
 /**
- * Returns `true` if the given module/function name matches the search query.
+ * Checks if given module/function matches the search term.
+ *
+ * @returns {boolean}
  */
 function isMatch (item) {
   return item.match !== item.id
 }
 
 /**
- * Extracts data about functions, callbacks and types.
+ * Quick summary
  *
- * This function replaces an empty unordered list with an
- * unordered list full of links to the different tasks, exceptions
- * and modules mentioned in the documentation.
+ * Full description.
  *
- * @param {Object} module - module, exception or mix task
+ * @param {Object} moduleResults results
  */
-
 function parseModuleResults (moduleResults) {
-  console.log(moduleResults)
   var functions = moduleResults.functions || []
   var callbacks = moduleResults.callbacks || []
   var types = moduleResults.types || []
@@ -75,28 +73,36 @@ function parseModuleResults (moduleResults) {
 
 /**
  *
+ *
  * @param {Object} item
- * @param {String} moduleId
- * @param {Boolean} isFunction
- * @returns {Object} Serialized object that can be used directly in the autocomplete template
+ * @param {string} moduleId
+ * @param {boolean} isChild
+ * @returns {Object} Serialized object that can be used directly in the autocomplete template.
  */
-
-function serialize (item, moduleId, isFunction = true) {
-  const anchor = isFunction ? item.anchor : ''
-  const typeName = isFunction ? 'Function' : item.typeName
-  const description = isFunction ? moduleId : null
+function serialize (item, moduleId, isChild = true) {
+  const anchor = isChild ? item.anchor : ''
+  const category = isChild ? 'Child' : item.category
+  const description = isChild ? moduleId : null
   const label = item.label || null
 
   return {
-    anchor: anchor, // ie "floor/1", will be used to construct a link to the item.
+    anchor: anchor, // i.e. "floor/1", will be used to construct a link to the item.
     title: item.match, // Main text displayed for each autocomplete result.
     moduleTitle: moduleId, // Used to construct a link to the item.
     description: description, // Displayed under the title.
-    label: label, // ie "Callback", special label dispyed next to the title.
-    typeName: typeName
+    label: label, // 'Callback' or 'Type' - if set it will be displayed next to the title.
+    category: category
+    // 'Module', 'Mix Task', 'Exception' or 'Child'.
+    // Used to sort the results according to the 'SORTING_PRIORITY'.
+    // 'Child' means an item that belongs to a module (like Function, Callback or Type).
   }
 }
 
+/**
+ * @param {string} [term=''] Text we want to search for.
+ *
+ * @returns {Object[]}
+ */
 function find (term = '') {
   if (term.trim().length === 0) {
     return []
@@ -109,9 +115,9 @@ function find (term = '') {
   var exceptions = findIn(nodes.exceptions, regExp)
   var tasks = findIn(nodes.tasks, regExp)
 
-  modules = addTypeName(modules, 'Module')
-  exceptions = addTypeName(exceptions, 'Exception')
-  tasks = addTypeName(tasks, 'Mix Task')
+  modules = addCategory(modules, 'Module')
+  exceptions = addCategory(exceptions, 'Exception')
+  tasks = addCategory(tasks, 'Mix Task')
 
   var results = [...modules, ...exceptions, ...tasks]
 
@@ -120,8 +126,8 @@ function find (term = '') {
   }, [])
 
   results.sort(function (item1, item2) {
-    var weight1 = SORTING_PRIORITIES[item1.typeName] || -1
-    var weight2 = SORTING_PRIORITIES[item2.typeName] || -1
+    var weight1 = SORTING_PRIORITY[item1.typeName] || -1
+    var weight2 = SORTING_PRIORITY[item2.typeName] || -1
 
     return weight2 - weight1
   })
@@ -140,24 +146,29 @@ function updateSuggestions (term) {
   AUTOCOMPLETE.html(template)
 }
 
-function hideAutocomplete () {
+function hide () {
   AUTOCOMPLETE.hide()
 }
 
-function showAutocomplete () {
+function show () {
   AUTOCOMPLETE.show()
 }
 
-function updateAutocomplete (searchTerm) {
+function update (searchTerm) {
   if (!searchTerm) {
-    hideAutocomplete()
+    hide()
   } else {
-    showAutocomplete()
+    show()
     updateSuggestions(searchTerm)
   }
 }
 
-function selectedAutocompleteElement () {
+/**
+ * Autocomplete element that was selected using keyboard arrows.
+ *
+ * @returns {Object} jQuery element
+ */
+function selectedElement () {
   var currentlySelectedElement = $('.autocomplete-result.selected')
   if (currentlySelectedElement.length === 0) {
     return null
@@ -166,7 +177,14 @@ function selectedAutocompleteElement () {
   return currentlySelectedElement
 }
 
-function moveAutocompleteSelection (direction) {
+/**
+ * Moves the autocomplete selection up or down.
+ * When moving past the last element, selects the first one.
+ * When moving before the first element, selects the last one
+ *
+ * @param {Number} direction - '-1' to move the selection down, '1' to move it up
+ */
+function moveSelection (direction) {
   var currentlySelectedElement = $('.autocomplete-result.selected')
   var indexToSelect = -1
   if (currentlySelectedElement.length) {
@@ -191,4 +209,4 @@ function moveAutocompleteSelection (direction) {
 // Public Methods
 // --------------
 
-export { find, updateAutocomplete, moveAutocompleteSelection, hideAutocomplete, selectedAutocompleteElement }
+export { find, update, moveSelection, hide, selectedElement }
