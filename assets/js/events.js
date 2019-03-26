@@ -104,8 +104,7 @@ function addEventListeners () {
     if (e.keyCode === 27) { // escape key
       $(this).val('').blur()
     } else if (e.keyCode === 13) { // enter
-      if (autocompleteSelection && autocompleteSelection.attr('data-index') !== '-1') {
-        // One of the autocomplete options selected with keyboard
+      if (autocompleteSelection) {
         var link = autocompleteSelection.attr('href')
         handleAutocompleteEnterKey($(this), newWindowKeyDown, link)
         e.preventDefault()
@@ -126,7 +125,11 @@ function addEventListeners () {
 
   $('.sidebar-search input').on('keyup', function (e) {
     var commandKey = (event.metaKey || event.ctrlKey)
-    if (e.keyCode !== 38 && e.keyCode !== 40 && !commandKey) { // Left and right arrow keys
+    if (commandKey) {
+      return null
+    }
+
+    if (e.keyCode !== 38 && e.keyCode !== 40) { // Left and right arrow keys
       autocomplete.update($(this).val())
     }
   })

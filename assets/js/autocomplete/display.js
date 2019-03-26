@@ -42,11 +42,16 @@ function update (searchTerm) {
 /**
  * Autocomplete element that was selected using keyboard arrows.
  *
- * @returns {Object} jQuery element
+ * @returns {(Object|null)} jQuery element or null if no autocomplete result is currently selected.
  */
 function selectedElement () {
   var currentlySelectedElement = $('.autocomplete-suggestion.selected')
   if (currentlySelectedElement.length === 0) {
+    return null
+  }
+
+  if (currentlySelectedElement.attr('data-index') === '-1') {
+    // -1 marks the deafult 'Search for "phrase"...' element
     return null
   }
 
@@ -56,7 +61,7 @@ function selectedElement () {
 /**
  * Moves the autocomplete selection up or down.
  * When moving past the last element, selects the first one.
- * When moving before the first element, selects the last one
+ * When moving before the first element, selects the last one.
  *
  * @param {Number} direction - '-1' to move the selection down, '1' to move it up
  */
