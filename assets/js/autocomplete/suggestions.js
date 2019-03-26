@@ -76,7 +76,7 @@ function serialize (item, moduleId, isChild = true) {
     label: label, // 'Callback' or 'Type' - if set it will be displayed next to the title.
     category: category
     // 'Module', 'Mix Task', 'Exception' or 'Child'.
-    // Used to sort the results according to the 'SORTING_PRIORITY'.
+    // Used to sort the results according to the 'sortingPriority'.
     // 'Child' means an item that belongs to a module (like Function, Callback or Type).
   }
 }
