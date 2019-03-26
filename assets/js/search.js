@@ -72,7 +72,7 @@ export function search (value) {
   if (value.replace(/\s/, '') !== '') {
     $input.val(value)
     var idx = getIndex()
-    var results = idx.search(value)
+    var results = idx.search(value.replace(':', ''))
     results = fillResults(results, value)
     var resultsHtml = resultsTemplate({
       value: value,
