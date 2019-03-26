@@ -2,33 +2,28 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
   @moduledoc false
 
   alias ExDoc.Formatter.HTML
-  alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Markdown
 
-  def create_search_items(nodes_map, extras) do
-    items = search_items_keys(nodes_map) ++ search_items_extras(extras)
+  def create(nodes, extras) do
+    items = Enum.flat_map(nodes, &module_node/1) ++ Enum.flat_map(extras, &extra/1)
     ["searchNodes=[", Enum.intersperse(items, ?,), "]"]
-  end
-
-  defp search_items_extras(extras) do
-    Enum.flat_map(extras, &search_items_extra/1)
   end
 
   @h2_split_regex ~r/<h2.*?>/
   @header_body_regex ~r/(?<header>.*)<\/h2>(?<body>.*)/s
-  defp search_items_extra(%{id: id, title: title, content: content}) do
+  defp extra(%{id: id, title: title, content: content}) do
     [intro | sections] = Regex.split(@h2_split_regex, content)
     intro_json_item = encode("#{id}.html", title, id, :extras, intro)
 
     section_json_items =
       sections
       |> Enum.map(&Regex.named_captures(@header_body_regex, &1))
-      |> Enum.map(&search_items_extra_section(title, &1["header"], &1["body"], id))
+      |> Enum.map(&extra_section(title, &1["header"], &1["body"], id))
 
     [intro_json_item | section_json_items]
   end
 
-  defp search_items_extra_section(title, header, body, id) do
+  defp extra_section(title, header, body, id) do
     header = HTML.strip_tags(header)
 
     encode(
@@ -40,23 +35,16 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     )
   end
 
-  defp search_items_keys(nodes_map) do
-    for {_type, nodes} <- nodes_map,
-        node <- nodes,
-        entry <- search_items_node(node),
-        do: entry
-  end
-
-  defp search_items_node(node = %ExDoc.ModuleNode{id: id, type: type, doc: doc}) do
+  defp module_node(node = %ExDoc.ModuleNode{id: id, type: type, doc: doc}) do
     module = encode("#{id}.html", id, id, type, Markdown.to_html(doc || ""))
-    functions = Enum.map(node.docs, &search_items_node_child(&1, id))
-    types = Enum.map(node.typespecs, &search_items_node_child(&1, id))
+    functions = Enum.map(node.docs, &node_child(&1, id))
+    types = Enum.map(node.typespecs, &node_child(&1, id))
     [module] ++ functions ++ types
   end
 
-  defp search_items_node_child(%{id: id, type: type, doc: doc}, module) do
+  defp node_child(%{id: id, type: type, doc: doc}, module) do
     encode(
-      "#{module}.html##{Templates.link_id(id, type)}",
+      "#{module}.html##{HTML.link_id(id, type)}",
       "#{module}.#{id}",
       module,
       type,

@@ -41,7 +41,7 @@ defmodule ExDoc.Formatter.HTML do
 
     generated_files =
       generate_sidebar_items(nodes_map, extras, config) ++
-        generate_search_items(nodes_map, extras, config) ++
+        generate_search_items(linked, extras, config) ++
         generate_extras(nodes_map, extras, config) ++
         generate_logo(assets_dir, config) ++
         generate_search(nodes_map, config) ++
@@ -113,8 +113,8 @@ defmodule ExDoc.Formatter.HTML do
     [sidebar_items]
   end
 
-  defp generate_search_items(nodes_map, extras, config) do
-    content = SearchItems.create_search_items(nodes_map, extras)
+  defp generate_search_items(linked, extras, config) do
+    content = SearchItems.create(linked, extras)
     search_items = "dist/search_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, search_items), content)
     [search_items]
@@ -289,6 +289,24 @@ defmodule ExDoc.Formatter.HTML do
     |> String.replace(~r/\W+/u, "-")
     |> String.trim("-")
     |> String.downcase()
+  end
+
+  @doc """
+  Generate a link id for the given node.
+  """
+  def link_id(node), do: link_id(node.id, node.type)
+
+  @doc """
+  Generate a link id for the given id and type.
+  """
+  def link_id(id, type) do
+    case type do
+      :macrocallback -> "c:#{id}"
+      :callback -> "c:#{id}"
+      :type -> "t:#{id}"
+      :opaque -> "t:#{id}"
+      _ -> "#{id}"
+    end
   end
 
   @doc """
