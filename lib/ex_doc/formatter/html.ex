@@ -41,7 +41,7 @@ defmodule ExDoc.Formatter.HTML do
 
     generated_files =
       generate_sidebar_items(nodes_map, extras, config) ++
-        generate_contents_json(nodes_map, extras, config) ++
+        generate_search_items(nodes_map, extras, config) ++
         generate_extras(nodes_map, extras, config) ++
         generate_logo(assets_dir, config) ++
         generate_search(nodes_map, config) ++
@@ -120,8 +120,8 @@ defmodule ExDoc.Formatter.HTML do
     [sidebar_items]
   end
 
-  defp generate_contents_json(nodes_map, extras, config) do
-    content = SearchContents.create_contents_json(nodes_map, extras)
+  defp generate_search_items(nodes_map, extras, config) do
+    content = SearchContents.create_search_items(nodes_map, extras)
 
     digest =
       content
@@ -129,9 +129,9 @@ defmodule ExDoc.Formatter.HTML do
       |> Base.encode16(case: :lower)
       |> binary_part(0, 10)
 
-    contents_json = "dist/contents_json-#{digest}.js"
-    File.write!(Path.join(config.output, contents_json), content)
-    [contents_json]
+    search_items = "dist/search_items-#{digest}.js"
+    File.write!(Path.join(config.output, search_items), content)
+    [search_items]
   end
 
   defp generate_extras(nodes_map, extras, config) do

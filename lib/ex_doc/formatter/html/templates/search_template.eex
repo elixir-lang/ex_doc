@@ -2,5 +2,7 @@
 <%= sidebar_template(config, nodes_map) %>
 <div id="search">
   <h1>Search</h1>
+  <div class="loading"><div></div><div></div><div></div><div></div></div>
 </div>
 <%= footer_template(config) %>
+<script src="<%= asset_rev config.output, "dist/search_items*.js" %>"></script>

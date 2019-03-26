@@ -8,55 +8,55 @@ defmodule ExDoc.Formatter.HTML.SearchContents do
   alias ExDoc.Formatter.HTML.Templates
   alias ExDoc.Markdown
 
-  def create_contents_json(nodes_map, extras) do
+  def create_search_items(nodes_map, extras) do
     nodes_map =
       nodes_map
-      |> Enum.map(&contents_json_keys/1)
+      |> Enum.map(&search_items_keys/1)
       |> List.flatten()
 
-    nodes_map = List.flatten([nodes_map | contents_json_extras(extras)])
+    nodes_map = List.flatten([nodes_map | search_items_extras(extras)])
 
-    "contentsJSON=[#{Enum.join(nodes_map, ",")}]"
+    "searchNodes=[#{Enum.join(nodes_map, ",")}]"
   end
 
-  defp contents_json_extras(extras) do
+  defp search_items_extras(extras) do
     extras
-    |> Enum.map(&contents_json_extra/1)
+    |> Enum.map(&search_items_extra/1)
     |> List.flatten()
   end
 
   @h2_split_regex ~r/<h2.*?>/
   @header_body_regex ~r/(?<header>.*)<\/h2>(?<body>.*)/s
-  defp contents_json_extra(%{id: id, title: title, content: content}) do
+  defp search_items_extra(%{id: id, title: title, content: content}) do
     [intro | sections] = Regex.split(@h2_split_regex, content)
     intro_json_item = encode_extra(title, id, intro)
 
     section_json_items =
       sections
       |> Enum.map(&Regex.named_captures(@header_body_regex, &1))
-      |> Enum.map(&contents_json_extra_section(title, &1["header"], &1["body"], id))
+      |> Enum.map(&search_items_extra_section(title, &1["header"], &1["body"], id))
 
     [intro_json_item | section_json_items]
   end
 
-  defp contents_json_extra_section(title, header, body, id) do
+  defp search_items_extra_section(title, header, body, id) do
     header = HTML.strip_tags(header)
     encode_extra(title, id, body, header)
   end
 
-  defp contents_json_keys({_type, value}) do
+  defp search_items_keys({_type, value}) do
     value
-    |> Enum.map(&contents_json_node/1)
+    |> Enum.map(&search_items_node/1)
   end
 
-  defp contents_json_node(node = %ExDoc.ModuleNode{}) do
+  defp search_items_node(node = %ExDoc.ModuleNode{}) do
     modules = encode_node(node.id, node.id, node.type, node.doc)
-    functions = Enum.map(node.docs, &contents_json_node(&1, node))
-    types = Enum.map(node.typespecs, &contents_json_node(&1, node))
+    functions = Enum.map(node.docs, &search_items_node(&1, node))
+    types = Enum.map(node.typespecs, &search_items_node(&1, node))
     [modules | [functions | types]]
   end
 
-  defp contents_json_node(node, parent) do
+  defp search_items_node(node, parent) do
     encode_node(parent.id, node.id, node.type, node.doc)
   end
 
@@ -108,10 +108,12 @@ defmodule ExDoc.Formatter.HTML.SearchContents do
   defp split_title(title) do
     match = Regex.named_captures(~r/(?<name>\w+[\?|!]?)\/(?<arity>\d)/, title)
     title = "#{match["name"]}/#{match["arity"]} #{match["name"]}"
+    name = match["name"]
 
-    case match["name"] =~ "_" do
-      true -> "#{title} " <> String.replace(match["name"], "_", " ")
-      false -> title
+    if name && name =~ "_" do
+      "#{title} " <> String.replace(name, "_", " ")
+    else
+      title
     end
   end
 

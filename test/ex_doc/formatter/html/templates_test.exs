@@ -39,7 +39,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     File.mkdir_p!("test/tmp/html_templates")
     File.cp_r!("formatters/html", "test/tmp/html_templates")
     File.touch!("test/tmp/html_templates/dist/sidebar_items-123456.js")
-    File.touch!("test/tmp/html_templates/dist/contents_json-123456.js")
+    File.touch!("test/tmp/html_templates/dist/search_items-123456.js")
     :ok
   end
 

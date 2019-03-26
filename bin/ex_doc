@@ -5,6 +5,7 @@ Code.prepend_path Path.expand("../_build/#{mix_env}/lib/makeup/ebin", __DIR__)
 Code.prepend_path Path.expand("../_build/#{mix_env}/lib/makeup_elixir/ebin", __DIR__)
 Code.prepend_path Path.expand("../_build/#{mix_env}/lib/earmark/ebin", __DIR__)
 Code.prepend_path Path.expand("../_build/#{mix_env}/lib/ex_doc/ebin", __DIR__)
+Code.prepend_path Path.expand("../_build/#{mix_env}/lib/poison/ebin", __DIR__)
 
 if Code.ensure_loaded?(ExDoc.CLI) do
   ExDoc.CLI.main(System.argv)
