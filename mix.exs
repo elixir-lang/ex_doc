@@ -29,7 +29,6 @@ defmodule ExDoc.Mixfile do
     [
       {:earmark, "~> 1.2"},
       {:makeup_elixir, "~> 0.10"},
-      {:poison, "~> 4.0"},
       {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
     ]

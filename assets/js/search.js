@@ -21,14 +21,22 @@ const $input = $('.sidebar-search input')
 
 function fillResults (results, value) {
   var contents = searchNodes
+  var matches = []
 
-  return results.map(function (element) {
+  results.forEach(function (element) {
+    // If the docs are regenerated without changing its version,
+    // a reference may have been doc'ed false in the code but
+    // still available in the cached index, so we skip it here.
     var item = contents.find(i => i.ref === element.ref)
-    var metadata = element.matchData.metadata
-    item.metadata = metadata
-    item.excerpts = getExcerpts(item, metadata, value)
-    return item
+    if (item) {
+      var metadata = element.matchData.metadata
+      item.metadata = metadata
+      item.excerpts = getExcerpts(item, metadata, value)
+      matches.push(item)
+    }
   })
+
+  return matches
 }
 
 function getExcerpts (item, metadata, value) {
@@ -97,7 +105,6 @@ function getProjectMeta () {
 function createIndex () {
   return lunr(function () {
     this.ref('ref')
-    this.field('text')
     this.field('title')
     this.field('module')
     this.field('type')

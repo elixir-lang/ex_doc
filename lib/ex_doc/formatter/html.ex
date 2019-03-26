@@ -1,7 +1,7 @@
 defmodule ExDoc.Formatter.HTML do
   @moduledoc false
 
-  alias __MODULE__.{Assets, Autolink, Templates, SearchContents}
+  alias __MODULE__.{Assets, Autolink, Templates, SearchItems}
   alias ExDoc.{Markdown, GroupMatcher}
 
   @main "api-reference"
@@ -108,30 +108,23 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_sidebar_items(nodes_map, extras, config) do
     content = Templates.create_sidebar_items(nodes_map, extras)
-
-    digest =
-      content
-      |> :erlang.md5()
-      |> Base.encode16(case: :lower)
-      |> binary_part(0, 10)
-
-    sidebar_items = "dist/sidebar_items-#{digest}.js"
+    sidebar_items = "dist/sidebar_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, sidebar_items), content)
     [sidebar_items]
   end
 
   defp generate_search_items(nodes_map, extras, config) do
-    content = SearchContents.create_search_items(nodes_map, extras)
-
-    digest =
-      content
-      |> :erlang.md5()
-      |> Base.encode16(case: :lower)
-      |> binary_part(0, 10)
-
-    search_items = "dist/search_items-#{digest}.js"
+    content = SearchItems.create_search_items(nodes_map, extras)
+    search_items = "dist/search_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, search_items), content)
     [search_items]
+  end
+
+  defp digest(content) do
+    content
+    |> :erlang.md5()
+    |> Base.encode16(case: :lower)
+    |> binary_part(0, 10)
   end
 
   defp generate_extras(nodes_map, extras, config) do
