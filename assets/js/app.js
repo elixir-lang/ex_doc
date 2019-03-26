@@ -19,6 +19,7 @@ import xml from 'highlight.js/lib/languages/xml'
 
 import isArray from './template-helpers/isArray'
 import isLocal from './template-helpers/isLocal'
+import isNonEmptyArray from './template-helpers/isNonEmptyArray'
 import groupChanged from './template-helpers/groupChanged'
 import nestingChanged from './template-helpers/nestingChanged'
 import showSummary from './template-helpers/showSummary'
@@ -36,6 +37,7 @@ $(() => {
   // Set up Handlebars.js
   Handlebars.registerHelper('isArray', isArray)
   Handlebars.registerHelper('isLocal', isLocal)
+  Handlebars.registerHelper('isNonEmptyArray', isNonEmptyArray)
   Handlebars.registerHelper('groupChanged', groupChanged)
   Handlebars.registerHelper('nestingChanged', nestingChanged)
   Handlebars.registerHelper('showSummary', showSummary)

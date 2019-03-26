@@ -19,7 +19,7 @@ const $input = $('.sidebar-search input')
 // Local Methods
 // -------------
 
-function fillResults (results, value) {
+function fillResults (results) {
   var contents = searchNodes
   var matches = []
 
@@ -31,7 +31,7 @@ function fillResults (results, value) {
     if (item) {
       var metadata = element.matchData.metadata
       item.metadata = metadata
-      item.excerpts = getExcerpts(item, metadata, value)
+      item.excerpts = getExcerpts(item, metadata)
       matches.push(item)
     }
   })
@@ -39,11 +39,11 @@ function fillResults (results, value) {
   return matches
 }
 
-function getExcerpts (item, metadata, value) {
-  var terms = value.split(' ')
+function getExcerpts (item, metadata) {
+  var terms = terms = Object.keys(metadata)
   var excerpts = []
   var nchars = 80
-  terms = Object.keys(metadata)
+
   terms.forEach(function (term) {
     if ('doc' in metadata[term]) {
       metadata[term].doc.position.forEach(function (matchPos) {
@@ -72,13 +72,20 @@ export function search (value) {
   if (value.replace(/\s/, '') !== '') {
     $input.val(value)
     var idx = getIndex()
-    var results = idx.search(value.replace(':', ''))
-    results = fillResults(results, value)
+    var results, errorMessage
+
+    try {
+      results = fillResults(idx.search(value.replace(':', '')))
+    } catch (error) {
+      errorMessage = error.message
+    }
+
     var resultsHtml = resultsTemplate({
       value: value,
       results: results,
-      empty: results.length === 0
+      errorMessage: errorMessage
     })
+
     $search.html(resultsHtml)
   }
 }
