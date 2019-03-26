@@ -9,8 +9,8 @@ import {findIn} from '../search'
 // Constants
 // ---------
 
-var RESULTS_COUNT = 5
-var SORTING_PRIORITY = {
+const resultsCount = 5
+const sortingPriority = {
   'Module': 3,
   'Child': 2,
   'Exception': 1,
@@ -33,9 +33,9 @@ function isMatch (item) {
  * @param {Object} moduleResults results
  */
 function parseModuleResults (moduleResults) {
-  var functions = moduleResults.functions || []
-  var callbacks = moduleResults.callbacks || []
-  var types = moduleResults.types || []
+  const functions = moduleResults.functions || []
+  let callbacks = moduleResults.callbacks || []
+  let types = moduleResults.types || []
 
   types = addLabel(types, 'type')
   callbacks = addLabel(callbacks, 'callback')
@@ -91,31 +91,31 @@ function getSuggestions (term = '') {
     return []
   }
 
-  var nodes = sidebarNodes
-  var regExp = new RegExp(helpers.escapeText(term), 'i')
+  const nodes = sidebarNodes
+  const regExp = new RegExp(helpers.escapeText(term), 'i')
 
-  var modules = findIn(nodes.modules, regExp)
-  var exceptions = findIn(nodes.exceptions, regExp)
-  var tasks = findIn(nodes.tasks, regExp)
+  let modules = findIn(nodes.modules, regExp)
+  let exceptions = findIn(nodes.exceptions, regExp)
+  let tasks = findIn(nodes.tasks, regExp)
 
   modules = addCategory(modules, 'Module')
   exceptions = addCategory(exceptions, 'Exception')
   tasks = addCategory(tasks, 'Mix Task')
 
-  var results = [...modules, ...exceptions, ...tasks]
+  let results = [...modules, ...exceptions, ...tasks]
 
   results = results.reduce(function (acc, moduleResults) {
     return acc.concat(parseModuleResults(moduleResults))
   }, [])
 
   results.sort(function (item1, item2) {
-    var weight1 = SORTING_PRIORITY[item1.category] || -1
-    var weight2 = SORTING_PRIORITY[item2.category] || -1
+    const weight1 = sortingPriority[item1.category] || -1
+    const weight2 = sortingPriority[item2.category] || -1
 
     return weight2 - weight1
   })
 
-  return results.slice(0, RESULTS_COUNT)
+  return results.slice(0, resultsCount)
 }
 
 /**

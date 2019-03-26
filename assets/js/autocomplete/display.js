@@ -12,8 +12,8 @@ const autocompleteElement = $('.autocomplete')
 
 // Updates list of results inside the autocomplete.
 function updateSuggestions (term) {
-  var results = getSuggestions(term)
-  var template = autocompleteResultsTemplate({
+  const results = getSuggestions(term)
+  const template = autocompleteResultsTemplate({
     empty: results.length === 0,
     results: results,
     term: term
@@ -45,7 +45,7 @@ function update (searchTerm) {
  * @returns {(Object|null)} jQuery element or null if no autocomplete result is currently selected.
  */
 function selectedElement () {
-  var currentlySelectedElement = $('.autocomplete-suggestion.selected')
+  const currentlySelectedElement = $('.autocomplete-suggestion.selected')
   if (currentlySelectedElement.length === 0) {
     return null
   }
@@ -66,13 +66,13 @@ function selectedElement () {
  * @param {Number} direction - '-1' to move the selection down, '1' to move it up
  */
 function moveSelection (direction) {
-  var currentlySelectedElement = $('.autocomplete-suggestion.selected')
-  var indexToSelect = -1
+  const currentlySelectedElement = $('.autocomplete-suggestion.selected')
+  let indexToSelect = -1
   if (currentlySelectedElement.length) {
     indexToSelect = parseInt(currentlySelectedElement.attr('data-index')) + direction
   }
 
-  var elementToSelect = $(`.autocomplete-suggestion[data-index="${indexToSelect}"]`)
+  let elementToSelect = $(`.autocomplete-suggestion[data-index="${indexToSelect}"]`)
 
   if (!elementToSelect.length) {
     if (indexToSelect < 0) {

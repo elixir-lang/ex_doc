@@ -12,6 +12,8 @@ import helpModalTemplate from './templates/keyboard-shortcuts-help-modal.handleb
 
 const helpModalSelector = '#keyboard-shortcuts-modal'
 const closeButtonSelector = '.modal-close'
+const footer = 'footer'
+const helpLinkSelector = '.display-shortcuts-help'
 const inputElements = ['input', 'textarea']
 const keyboardShortcuts = [
   {
@@ -118,6 +120,10 @@ export function initialize () {
 
   $(helpModalSelector).on('click', closeButtonSelector, function () {
     closeHelpModal()
+  })
+
+  $(footer).on('click', helpLinkSelector, function () {
+    openHelpModal()
   })
 
   $(document).on('keydown', function (e) {
