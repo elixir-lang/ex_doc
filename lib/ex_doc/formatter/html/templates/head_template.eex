@@ -5,12 +5,14 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v<%= ExDoc.version %>">
+    <meta name="project" content="<%= config.project %> v<%= config.version%>">
     <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
     <link rel="stylesheet" href="<%= asset_rev config.output, "dist/html*.css" %>" />
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
     <script src="<%= asset_rev config.output, "dist/sidebar_items*.js" %>"></script>
+    <script src="<%= asset_rev config.output, "dist/contents_json*.js" %>"></script>
     <%= if config.javascript_config_path do %>
       <script src="<%= config.javascript_config_path %>"></script>
     <% end %>

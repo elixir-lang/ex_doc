@@ -1,7 +1,7 @@
 defmodule ExDoc.Formatter.HTML do
   @moduledoc false
 
-  alias __MODULE__.{Assets, Autolink, Templates}
+  alias __MODULE__.{Assets, Autolink, Templates, SearchContents}
   alias ExDoc.{Markdown, GroupMatcher}
 
   @main "api-reference"
@@ -41,6 +41,7 @@ defmodule ExDoc.Formatter.HTML do
 
     generated_files =
       generate_sidebar_items(nodes_map, extras, config) ++
+        generate_contents_json(nodes_map, extras, config) ++
         generate_extras(nodes_map, extras, config) ++
         generate_logo(assets_dir, config) ++
         generate_search(nodes_map, config) ++
@@ -117,6 +118,20 @@ defmodule ExDoc.Formatter.HTML do
     sidebar_items = "dist/sidebar_items-#{digest}.js"
     File.write!(Path.join(config.output, sidebar_items), content)
     [sidebar_items]
+  end
+
+  defp generate_contents_json(nodes_map, extras, config) do
+    content = SearchContents.create_contents_json(nodes_map, extras)
+
+    digest =
+      content
+      |> :erlang.md5()
+      |> Base.encode16(case: :lower)
+      |> binary_part(0, 10)
+
+    contents_json = "dist/contents_json-#{digest}.js"
+    File.write!(Path.join(config.output, contents_json), content)
+    [contents_json]
   end
 
   defp generate_extras(nodes_map, extras, config) do
