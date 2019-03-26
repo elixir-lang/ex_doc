@@ -17,20 +17,6 @@ var SORTING_PRIORITY = {
   'Mix Task': 0
 }
 
-function addLabel (items, labelName) {
-  return items.map((item) => {
-    item.label = labelName
-    return item
-  })
-}
-
-function addCategory (modules, category) {
-  return modules.map((module) => {
-    module.category = category
-    return module
-  })
-}
-
 /**
  * Checks if given module/function matches the search term.
  *
@@ -41,9 +27,8 @@ function isMatch (item) {
 }
 
 /**
- * Quick summary
- *
- * Full description.
+ * Get results found returned by search.findIn and transform them into a flat data structure,
+ * that can be used in autocomplete.
  *
  * @param {Object} moduleResults results
  */
@@ -69,7 +54,8 @@ function parseModuleResults (moduleResults) {
 }
 
 /**
- *
+ * Transform an object containing data about a search result and transforms it into a simple
+ * data structure that can be used directly in the autocomplete template.
  *
  * @param {Object} item
  * @param {string} moduleId
@@ -98,7 +84,7 @@ function serialize (item, moduleId, isChild = true) {
 /**
  * @param {string} [term=''] Text we want to search for.
  *
- * @returns {Object[]}
+ * @returns {Object[]} sorted results of the search.
  */
 function getSuggestions (term = '') {
   if (term.trim().length === 0) {
@@ -130,6 +116,32 @@ function getSuggestions (term = '') {
   })
 
   return results.slice(0, RESULTS_COUNT)
+}
+
+/**
+ * @param {Object[]} items Array of objects containing information about Functions, Types or Callbacks.
+ * @param {string} labelName Name of the label that will be added to all items.
+ *
+ * @returns {Object[]} Array of objects, where each object has an 'label' attribute set to 'labelName'.
+ */
+function addLabel (items, labelName) {
+  return items.map((item) => {
+    item.label = labelName
+    return item
+  })
+}
+
+/**
+ * @param {Object[]} items Array of modules.
+ * @param {string} categoryName Name of the category that will be added to all modules.
+ *
+ * @returns {Object[]} Array of objects, where each object has an 'category' attribute set to 'categoryName'.
+ */
+function addCategory (modules, categoryName) {
+  return modules.map((module) => {
+    module.category = categoryName
+    return module
+  })
 }
 
 // Public Methods
