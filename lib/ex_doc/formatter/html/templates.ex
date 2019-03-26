@@ -39,17 +39,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
-  Converts markdown to HTML using the given node file+line.
-  """
-  def to_html(nil, %{source_path: _, doc_line: _}) do
-    nil
-  end
-
-  def to_html(doc, %{source_path: file, doc_line: line}) when is_binary(doc) do
-    ExDoc.Markdown.to_html(doc, file: file, line: line + 1)
-  end
-
-  @doc """
   Get the pretty name of a function node
   """
   def pretty_type(%{type: t}) do
@@ -76,17 +65,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   """
   @spec synopsis(String.t()) :: String.t()
   @spec synopsis(nil) :: nil
-
   def synopsis(nil), do: nil
-  def synopsis(""), do: ""
 
   def synopsis(doc) when is_binary(doc) do
-    doc
-    |> String.split(~r/\n\s*\n/)
-    |> hd()
-    |> String.trim()
-    |> String.replace(~r{[:\s]+$}, "")
-    |> String.trim_trailing()
+    case :binary.split(doc, "</p>") do
+      [left, _] -> String.trim_trailing(left, ":") <> "</p>"
+      [all] -> all
+    end
   end
 
   defp presence([]), do: nil

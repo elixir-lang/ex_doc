@@ -5,7 +5,7 @@
       <span class="deprecated" title="<%= h(deprecated) %>">deprecated</span>
     <% end %>
   </div>
-  <%= if node.doc do %>
-    <div class="summary-synopsis"><%= to_html(synopsis(node.doc), node) %></div>
+  <%= if doc = node.rendered_doc do %>
+    <div class="summary-synopsis"><%= synopsis(doc) %></div>
   <% end %>
 </div>

@@ -13,14 +13,12 @@ defmodule ExDoc.Formatter.EPUB do
     config = normalize_config(config)
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
-
-    autolink = HTML.Autolink.compile(project_nodes, ".xhtml", config)
-    linked = HTML.Autolink.all(project_nodes, autolink)
+    {project_nodes, autolink} = HTML.autolink_and_render(project_nodes, ".xhtml", config)
 
     nodes_map = %{
-      modules: HTML.filter_list(:module, linked),
-      exceptions: HTML.filter_list(:exception, linked),
-      tasks: HTML.filter_list(:task, linked)
+      modules: HTML.filter_list(:module, project_nodes),
+      exceptions: HTML.filter_list(:exception, project_nodes),
+      tasks: HTML.filter_list(:task, project_nodes)
     }
 
     extras = HTML.build_extras(config, autolink) |> group_extras()

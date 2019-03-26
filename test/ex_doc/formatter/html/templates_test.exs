@@ -31,8 +31,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   defp get_module_page(names, config \\ []) do
     config = doc_config(config)
     mods = ExDoc.Retriever.docs_from_modules(names, config)
-    mods = HTML.Autolink.all(mods, HTML.Autolink.compile(mods, ".html", config))
-    Templates.module_page(hd(mods), @empty_nodes_map, config)
+    {[mod | _], _} = HTML.autolink_and_render(mods, ".html", config)
+    Templates.module_page(mod, @empty_nodes_map, config)
   end
 
   setup_all do
@@ -115,15 +115,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "functionality" do
       assert Templates.synopsis(nil) == nil
       assert Templates.synopsis("") == ""
-      assert Templates.synopsis(".") == "."
-      assert Templates.synopsis("::") == ""
-      assert Templates.synopsis(" = : :") == "="
-      assert Templates.synopsis(" Description: ") == "Description"
-      assert Templates.synopsis("abcd") == "abcd"
-
-      assert_raise FunctionClauseError, fn ->
-        Templates.synopsis(:abcd)
-      end
+      assert Templates.synopsis("<p>.</p>") == "<p>.</p>"
+      assert Templates.synopsis("<p>::</p>") == "<p></p>"
+      assert Templates.synopsis("<p>Description:</p>") == "<p>Description</p>"
+      assert Templates.synopsis("<p>abcd</p>") == "<p>abcd</p>"
     end
 
     test "should not end have trailing periods or semicolons" do
@@ -139,11 +134,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       ## Example:
       """
 
-      assert Templates.synopsis(doc1) ==
-               "Summaries should not be displayed with trailing semicolons"
+      assert Templates.synopsis(ExDoc.Markdown.to_html(doc1)) ==
+               "<p>Summaries should not be displayed with trailing semicolons </p>"
 
-      assert Templates.synopsis(doc2) ==
-               "Example function: Summary should display trailing period :."
+      assert Templates.synopsis(ExDoc.Markdown.to_html(doc2)) ==
+               "<p>Example function: Summary should display trailing period :.</p>"
     end
   end
 

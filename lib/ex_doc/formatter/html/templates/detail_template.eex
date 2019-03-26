@@ -34,6 +34,6 @@
     </div>
   <% end %>
   <section class="docstring">
-    <%= node.doc |> to_html(node) |> link_detail_headings(enc_h(HTML.link_id(node))) %>
+    <%= node.rendered_doc |> link_detail_headings(enc_h(HTML.link_id(node))) %>
   </section>
 </section>

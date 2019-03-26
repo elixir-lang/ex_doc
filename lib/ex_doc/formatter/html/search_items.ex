@@ -1,8 +1,6 @@
 defmodule ExDoc.Formatter.HTML.SearchItems do
   @moduledoc false
-
   alias ExDoc.Formatter.HTML
-  alias ExDoc.Markdown
 
   def create(nodes, extras) do
     items = Enum.flat_map(nodes, &module_node/1) ++ Enum.flat_map(extras, &extra/1)
@@ -35,20 +33,20 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     )
   end
 
-  defp module_node(node = %ExDoc.ModuleNode{id: id, type: type, doc: doc}) do
-    module = encode("#{id}.html", id, id, type, Markdown.to_html(doc || ""))
+  defp module_node(node = %ExDoc.ModuleNode{id: id, type: type, rendered_doc: doc}) do
+    module = encode("#{id}.html", id, id, type, doc)
     functions = Enum.map(node.docs, &node_child(&1, id))
     types = Enum.map(node.typespecs, &node_child(&1, id))
     [module] ++ functions ++ types
   end
 
-  defp node_child(%{id: id, type: type, doc: doc}, module) do
+  defp node_child(%{id: id, type: type, rendered_doc: doc}, module) do
     encode(
       "#{module}.html##{HTML.link_id(id, type)}",
       "#{module}.#{id}",
       module,
       type,
-      Markdown.to_html(doc || "")
+      doc
     )
   end
 

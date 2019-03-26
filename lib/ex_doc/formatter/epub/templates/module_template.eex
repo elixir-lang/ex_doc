@@ -3,9 +3,9 @@
       <%= H.module_title(module) %>
     </h1>
 
-    <%= if module.doc do %>
+    <%= if doc = module.rendered_doc do %>
       <section id="moduledoc" class="docstring">
-        <%= H.to_html(module.doc, module) %>
+        <%= doc %>
       </section>
     <% end %>
 

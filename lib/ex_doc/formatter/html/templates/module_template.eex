@@ -18,9 +18,9 @@
         </div>
       <% end %>
 
-      <%= if module.doc do %>
+      <%= if doc = module.rendered_doc do %>
         <section id="moduledoc">
-          <%= module.doc |> to_html(module) |> link_moduledoc_headings() %>
+          <%= link_moduledoc_headings(doc) %>
         </section>
       <% end %>
 
