@@ -40,7 +40,7 @@ function fillResults (results) {
 }
 
 function getExcerpts (item, metadata) {
-  var terms = terms = Object.keys(metadata)
+  var terms = Object.keys(metadata)
   var excerpts = []
   var nchars = 80
 
