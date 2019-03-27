@@ -4,7 +4,6 @@
 // ------------
 
 import * as helpers from '../helpers'
-import {findIn} from '../search'
 
 // Constants
 // ---------
@@ -92,11 +91,10 @@ function getSuggestions (term = '') {
   }
 
   const nodes = sidebarNodes
-  const regExp = new RegExp(helpers.escapeText(term), 'i')
 
-  let modules = findIn(nodes.modules, regExp)
-  let exceptions = findIn(nodes.exceptions, regExp)
-  let tasks = findIn(nodes.tasks, regExp)
+  let modules = findIn(nodes.modules, term)
+  let exceptions = findIn(nodes.exceptions, term)
+  let tasks = findIn(nodes.tasks, term)
 
   modules = addCategory(modules, 'Module')
   exceptions = addCategory(exceptions, 'Exception')
@@ -142,6 +140,74 @@ function addCategory (modules, categoryName) {
     module.category = categoryName
     return module
   })
+}
+
+function findIn (elements, term) {
+  const matcher = new RegExp(helpers.escapeText(term), 'i')
+
+  return elements.map(function (element) {
+    let title = element.title
+    let titleMatch = title && title.match(matcher)
+    let result = {
+      id: element.id,
+      match: titleMatch ? highlight(titleMatch) : element.title
+    }
+    let hasMatch = !!titleMatch
+
+    if (element.nodeGroups) {
+      for (let {key, nodes} of element.nodeGroups) {
+        let matches = findNested(nodes, title, matcher, term, result[key])
+        if (Object.keys(matches).length > 0) {
+          hasMatch = true
+          if (key === 'types' || key === 'callbacks') {
+            result[key] = matches
+          } else {
+            result.functions = matches
+          }
+        }
+      }
+    }
+
+    if (hasMatch) {
+      for (let key in result) {
+        if (key !== 'id' && key !== 'match') {
+          result[key] = Object.values(result[key]).sort((a, b) => a.id.localeCompare(b.id))
+        }
+      }
+
+      return result
+    }
+  }).filter((element) => !!element)
+}
+
+function highlight (match) {
+  return match.input.replace(match, `<em>${match[0]}</em>`)
+}
+
+function findNested (elements, parentId, matcher, term, acc) {
+  return (elements || []).reduce((acc, element) => {
+    if (acc[element.id]) { return acc }
+
+    // Match things like module.func
+    const fullTitle = `${parentId}.${element.id}`
+    var fullTitleMatch = !(parentId + '.').match(matcher) && fullTitle.match(matcher)
+    var match = element.id && element.id.match(matcher)
+    var result = JSON.parse(JSON.stringify(element))
+
+    if (match) {
+      result.match = highlight(match)
+    } else if (fullTitleMatch) {
+      term = term.split('.').pop()
+      const matcherWithoutParent = new RegExp(helpers.escapeText(term), 'i')
+      const matchWithoutParent = element.id && element.id.match(matcherWithoutParent)
+      result.match = highlight(matchWithoutParent)
+    } else {
+      result.match = element.id
+    }
+    acc[result.id] = result
+
+    return acc
+  }, acc || {})
 }
 
 // Public Methods

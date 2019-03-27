@@ -90,70 +90,7 @@ export function search (value) {
   }
 }
 
-export function findIn (elements, matcher) {
-  return elements.map(function (element) {
-    let title = element.title
-    let titleMatch = title && title.match(matcher)
-    let result = {
-      id: element.id,
-      match: titleMatch ? highlight(titleMatch) : element.title
-    }
-    let hasMatch = !!titleMatch
 
-    if (element.nodeGroups) {
-      for (let {key, nodes} of element.nodeGroups) {
-        let matches = findNested(nodes, title, matcher, result[key])
-        if (Object.keys(matches).length > 0) {
-          hasMatch = true
-          if (key === 'types' || key === 'callbacks') {
-            result[key] = matches
-          } else {
-            result.functions = matches
-          }
-        }
-      }
-    }
-
-    if (hasMatch) {
-      for (let key in result) {
-        if (key !== 'id' && key !== 'match') {
-          result[key] = Object.values(result[key]).sort((a, b) => a.id.localeCompare(b.id))
-        }
-      }
-
-      return result
-    }
-  }).filter(cleaner)
-}
-
-function highlight (match) {
-  var start = match.index
-  var end = match.index + match[0].length
-  var input = match.input
-  var highlighted = '<em>' + match[0] + '</em>'
-
-  return input.slice(0, start) + highlighted + input.slice(end)
-}
-
-function cleaner (element) {
-  return !!element
-}
-
-function findNested (elements, parentId, matcher, acc) {
-  return (elements || []).reduce((acc, element) => {
-    // Match things like module.func
-    var parentMatch = (parentId + '.' + element.id).match(matcher)
-    var match = element.id && element.id.match(matcher)
-
-    if ((parentMatch || match) && !acc[element.id]) {
-      var result = JSON.parse(JSON.stringify(element))
-      result.match = match ? highlight(match) : element.id
-      acc[result.id] = result
-    }
-
-    return acc
-  }, acc || {})
-}
 
 function getIndex () {
   var idx = null

@@ -111,9 +111,10 @@ describe('getSuggestions', () => {
     })
 
     it('highlights matched fragment', () => {
-      const firstResult = getSuggestions('get_')[0]
-
-      expect(firstResult.title).to.eql('<em>get_</em>by/3')
+      expect(getSuggestions('get')[0].title).to.eql('<em>get</em>_by/3')
+      expect(getSuggestions('Repo.get_')[0].title).to.eql('<em>get_</em>by/3')
+      expect(getSuggestions('Ecto.Repo.get_by')[0].title).to.eql('<em>get_by</em>/3')
+      expect(getSuggestions('po.get_by')[0].title).to.eql('<em>get_by</em>/3')
     })
 
     it('marks callbacks with a special label', () => {
