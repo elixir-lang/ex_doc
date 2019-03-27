@@ -10,7 +10,7 @@
     <button type="submit" class="search-button">
       <span class="icon-search" aria-hidden="true"></span>
     </button>
-    <button type="button" class="search-close-button">
+    <button type="button" tabindex="-1" class="search-close-button">
       <span class="icon-cross" title="Cancel search"></span>
     </button>
     <label class="search-label">

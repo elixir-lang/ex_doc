@@ -93,8 +93,8 @@ function addEventListeners () {
   SIDEBAR_NAV.on('click', '#tasks-list', createHandler('tasks'))
 
   $('.sidebar-search').on('click', '.search-close-button', function (e) {
-    $('.sidebar-search input').val('')
-    $('.sidebar-search input').blur()
+    closeSearch()
+    e.preventDefault()
   })
 
   $('.sidebar-search input').on('keydown', function (e) {
@@ -146,6 +146,10 @@ function addEventListeners () {
       return null
     }
 
+    if (relatedTarget.hasClass('search-close-button')) {
+      closeSearch()
+    }
+
     BODY.removeClass('search-focused')
     autocomplete.hide()
   })
@@ -194,6 +198,11 @@ function identifyCurrentHash () {
   $(`#full-list li.current-page a[href$="#${hash}"]`)
     .closest('li')
     .addClass('current-hash')
+}
+
+function closeSearch () {
+  $('.sidebar-search input').val('')
+  $('.sidebar-search input').blur()
 }
 
 function fixLinks () {
