@@ -21,36 +21,6 @@ const labels = {
 }
 
 /**
- * Checks if given module/function matches the search term.
- *
- * @returns {boolean}
- */
-function isMatch (item) {
-  return item.match !== item.id
-}
-
-/**
- * Get results found returned by search.findIn and transform them into a flat data structure,
- * that can be used in autocomplete.
- *
- * @param {Object} moduleResults results
- */
-function parseModuleResults (moduleResults) {
-  console.log("moduleResults", moduleResults)
-  const results =
-    moduleResults.children
-      .filter(isMatch)
-      .map((item) => serialize(item, moduleResults.id))
-
-  if (isMatch(moduleResults)) {
-    const serializedModuleData = serialize(moduleResults, moduleResults.id, false)
-    results.unshift(serializedModuleData)
-  }
-
-  return results
-}
-
-/**
  * Transform an object containing data about a search result and transforms it into a simple
  * data structure that can be used directly in the autocomplete template.
  *
@@ -72,6 +42,7 @@ function serialize (item, moduleId = null) {
     title: item.match, // Main text displayed for each autocomplete result.
     description: description, // Displayed under the title.
     label: label, // 'Callback' or 'Type' - if set it will be displayed next to the title.
+    matchQuality: item.matchQuality, // 0..1 - How well result matches the search term. Higher is better.
     category: category
     // 'Module', 'Mix Task', 'Exception' or 'Child'.
     // Used to sort the results according to the 'sortingPriority'.
@@ -108,64 +79,37 @@ function sort (items) {
     const weight2 = sortingPriority[item2.category] || -1
 
     return weight2 - weight1
-  })
-}
-
-/**
- * @param {Object[]} items Array of objects containing information about Functions, Types or Callbacks.
- * @param {string} labelName Name of the label that will be added to all items.
- *
- * @returns {Object[]} Array of objects, where each object has an 'label' attribute set to 'labelName'.
- */
-function addLabel (items, labelName) {
-  if (!labelName) { return items }
-
-  return items.map((item) => {
-    item.label = labelName
-    return item
-  })
-}
-
-/**
- * @param {Object[]} items Array of modules.
- * @param {string} categoryName Name of the category that will be added to all modules.
- *
- * @returns {Object[]} Array of objects, where each object has an 'category' attribute set to 'categoryName'.
- */
-function addCategory (modules, categoryName) {
-  return modules.map((module) => {
-    module.category = categoryName
-    return module
+  }).sort(function (item1, item2) {
+    return item2.matchQuality - item1.matchQuality
   })
 }
 
 // WIP: TODO: Add description
 function findIn (elements, term, categoryName) {
   const regExp = new RegExp(helpers.escapeText(term), 'i')
-  let results = []
 
-  // WIP: TODO: Reduce instead
-  elements.map(function (element) {
+  return elements.reduce(function (results, element) {
     const title = element.title
     const titleMatch = title && title.match(regExp)
 
     if (titleMatch) {
-      const serializedModuleInfo = serialize({
+      const parentResult = serialize({
         id: element.id,
         match: highlight(titleMatch),
-        category: categoryName
+        category: categoryName,
+        matchQuality: matchQuality(titleMatch)
       }, element.id)
 
-      results.push(serializedModuleInfo)
+      results.push(parentResult)
     }
 
     if (element.nodeGroups) {
       for (let {key, nodes} of element.nodeGroups) {
         let matches = findNested(nodes, title, regExp, term, key)
+
         if (Object.keys(matches).length > 0) {
-          console.log("matches", matches)
-          //result.children.concat(addLabel(matches, labels[key]))
           let foundChildren = Object.values(matches)
+
           foundChildren = foundChildren.map((child) => {
             child.category = 'Child'
             child.label = labels[key]
@@ -177,9 +121,9 @@ function findIn (elements, term, categoryName) {
         }
       }
     }
-  })
 
-  return results.filter((result) => !!result)
+    return results
+  }, []).filter((result) => !!result)
 }
 
 function highlight (match) {
@@ -198,10 +142,12 @@ function findNested (elements, parentId, matcher, term, key) {
 
     if (match) {
       result.match = highlight(match)
+      result.matchQuality = matchQuality(match)
     } else if (fullTitleMatch) {
       const lastSegment = term.split('.').pop()
       const lastSegmentMatcher = new RegExp(helpers.escapeText(lastSegment), 'i')
       const lastSegmentMatch = element.id.match(lastSegmentMatcher)
+      result.matchQuality = matchQuality(lastSegmentMatch)
       result.match = highlight(lastSegmentMatch)
     } else {
       return acc
@@ -211,6 +157,20 @@ function findNested (elements, parentId, matcher, term, key) {
 
     return acc
   }, {})
+}
+
+function matchQuality (match) {
+  if (!match) {
+    return 0
+  }
+
+  const textLength = match.input.length
+
+  if (!textLength) {
+    return 0
+  }
+
+  return match.length / textLength
 }
 
 // Public Methods
