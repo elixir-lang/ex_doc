@@ -24,9 +24,8 @@ const labels = {
  * Transform an object containing data about a search result and transforms it into a simple
  * data structure that can be used directly in the autocomplete template.
  *
- * @param {Object} item
- * @param {string} moduleId
- * @param {boolean} isChild
+ * @param {Object} item Result to be serialized
+ * @param {(string|null)} [moduleId=null] Id of the parent module. If null it means we are serializing the parent module info.
  *
  * @returns {Object} Serialized object that can be used directly in the autocomplete template.
  */
