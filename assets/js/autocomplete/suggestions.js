@@ -15,6 +15,10 @@ const sortingPriority = {
   'Exception': 1,
   'Mix Task': 0
 }
+const labels = {
+  'callbacks': 'callback',
+  'types': 'type'
+}
 
 /**
  * Checks if given module/function matches the search term.
@@ -32,15 +36,9 @@ function isMatch (item) {
  * @param {Object} moduleResults results
  */
 function parseModuleResults (moduleResults) {
-  const functions = moduleResults.functions || []
-  let callbacks = moduleResults.callbacks || []
-  let types = moduleResults.types || []
-
-  types = addLabel(types, 'type')
-  callbacks = addLabel(callbacks, 'callback')
-
+  console.log("moduleResults", moduleResults)
   const results =
-    [...functions, ...callbacks, ...types]
+    moduleResults.children
       .filter(isMatch)
       .map((item) => serialize(item, moduleResults.id))
 
@@ -61,7 +59,8 @@ function parseModuleResults (moduleResults) {
  * @param {boolean} isChild
  * @returns {Object} Serialized object that can be used directly in the autocomplete template.
  */
-function serialize (item, moduleId, isChild = true) {
+function serialize (item, moduleId = null) {
+  const isChild = item.category === 'Child'
   const anchor = isChild ? item.anchor : ''
   const category = isChild ? 'Child' : item.category
   const description = isChild ? moduleId : null
@@ -92,28 +91,24 @@ function getSuggestions (term = '') {
 
   const nodes = sidebarNodes
 
-  let modules = findIn(nodes.modules, term)
-  let exceptions = findIn(nodes.exceptions, term)
-  let tasks = findIn(nodes.tasks, term)
-
-  modules = addCategory(modules, 'Module')
-  exceptions = addCategory(exceptions, 'Exception')
-  tasks = addCategory(tasks, 'Mix Task')
+  let modules = findIn(nodes.modules, term, 'Module')
+  let exceptions = findIn(nodes.exceptions, term, 'Exception')
+  let tasks = findIn(nodes.tasks, term, 'Mix Task')
 
   let results = [...modules, ...exceptions, ...tasks]
 
-  results = results.reduce(function (acc, moduleResults) {
-    return acc.concat(parseModuleResults(moduleResults))
-  }, [])
+  results = sort(results)
 
-  results.sort(function (item1, item2) {
+  return results.slice(0, resultsCount)
+}
+
+function sort (items) {
+  return items.sort(function (item1, item2) {
     const weight1 = sortingPriority[item1.category] || -1
     const weight2 = sortingPriority[item2.category] || -1
 
     return weight2 - weight1
   })
-
-  return results.slice(0, resultsCount)
 }
 
 /**
@@ -123,6 +118,8 @@ function getSuggestions (term = '') {
  * @returns {Object[]} Array of objects, where each object has an 'label' attribute set to 'labelName'.
  */
 function addLabel (items, labelName) {
+  if (!labelName) { return items }
+
   return items.map((item) => {
     item.label = labelName
     return item
@@ -142,51 +139,56 @@ function addCategory (modules, categoryName) {
   })
 }
 
-function findIn (elements, term) {
-  const matcher = new RegExp(helpers.escapeText(term), 'i')
+// WIP: TODO: Add description
+function findIn (elements, term, categoryName) {
+  const regExp = new RegExp(helpers.escapeText(term), 'i')
+  let results = []
 
-  return elements.map(function (element) {
-    let title = element.title
-    let titleMatch = title && title.match(matcher)
-    let result = {
-      id: element.id,
-      match: titleMatch ? highlight(titleMatch) : element.title
+  // WIP: TODO: Reduce instead
+  elements.map(function (element) {
+    const title = element.title
+    const titleMatch = title && title.match(regExp)
+
+    if (titleMatch) {
+      const serializedModuleInfo = serialize({
+        id: element.id,
+        match: highlight(titleMatch),
+        category: categoryName
+      }, element.id)
+
+      results.push(serializedModuleInfo)
     }
-    let hasMatch = !!titleMatch
 
     if (element.nodeGroups) {
       for (let {key, nodes} of element.nodeGroups) {
-        let matches = findNested(nodes, title, matcher, term, result[key])
+        let matches = findNested(nodes, title, regExp, term, key)
         if (Object.keys(matches).length > 0) {
-          hasMatch = true
-          if (key === 'types' || key === 'callbacks') {
-            result[key] = matches
-          } else {
-            result.functions = matches
-          }
+          console.log("matches", matches)
+          //result.children.concat(addLabel(matches, labels[key]))
+          let foundChildren = Object.values(matches)
+          foundChildren = foundChildren.map((child) => {
+            child.category = 'Child'
+            child.label = labels[key]
+
+            return serialize(child, element.id)
+          })
+
+          results = results.concat(foundChildren)
         }
       }
     }
+  })
 
-    if (hasMatch) {
-      for (let key in result) {
-        if (key !== 'id' && key !== 'match') {
-          result[key] = Object.values(result[key]).sort((a, b) => a.id.localeCompare(b.id))
-        }
-      }
-
-      return result
-    }
-  }).filter((element) => !!element)
+  return results.filter((result) => !!result)
 }
 
 function highlight (match) {
   return match.input.replace(match, `<em>${match[0]}</em>`)
 }
 
-function findNested (elements, parentId, matcher, term, acc) {
+function findNested (elements, parentId, matcher, term, key) {
   return (elements || []).reduce((acc, element) => {
-    if (acc[element.id]) { return acc }
+    if (acc[key + element.id]) { return acc }
 
     // Match things like module.func
     const fullTitle = `${parentId}.${element.id}`
@@ -197,17 +199,18 @@ function findNested (elements, parentId, matcher, term, acc) {
     if (match) {
       result.match = highlight(match)
     } else if (fullTitleMatch) {
-      term = term.split('.').pop()
-      const matcherWithoutParent = new RegExp(helpers.escapeText(term), 'i')
-      const matchWithoutParent = element.id && element.id.match(matcherWithoutParent)
-      result.match = highlight(matchWithoutParent)
+      const lastSegment = term.split('.').pop()
+      const lastSegmentMatcher = new RegExp(helpers.escapeText(lastSegment), 'i')
+      const lastSegmentMatch = element.id.match(lastSegmentMatcher)
+      result.match = highlight(lastSegmentMatch)
     } else {
-      result.match = element.id
+      return acc
     }
-    acc[result.id] = result
+
+    acc[key + result.id] = result
 
     return acc
-  }, acc || {})
+  }, {})
 }
 
 // Public Methods
