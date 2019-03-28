@@ -27,6 +27,7 @@ const labels = {
  * @param {Object} item
  * @param {string} moduleId
  * @param {boolean} isChild
+ *
  * @returns {Object} Serialized object that can be used directly in the autocomplete template.
  */
 function serialize (item, moduleId = null) {
@@ -53,7 +54,7 @@ function serialize (item, moduleId = null) {
 /**
  * @param {string} [term=''] Text we want to search for.
  *
- * @returns {Object[]} sorted results of the search.
+ * @returns {Object[]} List of suggestions sorted and limited to 5.
  */
 function getSuggestions (term = '') {
   if (term.trim().length === 0) {
@@ -73,6 +74,13 @@ function getSuggestions (term = '') {
   return results.slice(0, resultsCount)
 }
 
+/**
+ * Sorts suggestions, putting best results first.
+ *
+ * @param {Object[]} items Unsorted list of results.
+ *
+ * @returns {Object[]} Results sorted according to match quality and category.
+ */
 function sort (items) {
   return items.sort(function (item1, item2) {
     const weight1 = sortingPriority[item1.category] || -1
@@ -80,11 +88,22 @@ function sort (items) {
 
     return weight2 - weight1
   }).sort(function (item1, item2) {
-    return item2.matchQuality - item1.matchQuality
+    const matchQuality1 = item1.matchQuality || 0
+    const matchQuality2 = item2.matchQuality || 0
+
+    return matchQuality2 - matchQuality1
   })
 }
 
-// WIP: TODO: Add description
+/**
+ * Finds matching results in a list of elements.
+ *
+ * @param {Object[]} elements Array containing information about modules/exceptions/tasks.
+ * @param {string} term Text we are searching form
+ * @param {string} category "Module"/"Exception"/"Mix Task" - category that elements belong to.
+ *
+ * @returns {Object[]} List of elements matching the provided term.
+ */
 function findIn (elements, term, categoryName) {
   const regExp = new RegExp(helpers.escapeText(term), 'i')
 
@@ -105,7 +124,7 @@ function findIn (elements, term, categoryName) {
 
     if (element.nodeGroups) {
       for (let {key, nodes} of element.nodeGroups) {
-        let matches = findNested(nodes, title, regExp, term, key)
+        let matches = findMatchingChildren(nodes, title, term, key)
 
         if (Object.keys(matches).length > 0) {
           let foundChildren = Object.values(matches)
@@ -126,24 +145,45 @@ function findIn (elements, term, categoryName) {
   }, []).filter((result) => !!result)
 }
 
+/**
+ * Highlight matching part of the string.
+ *
+ * @param {Array} match Information about the matched text (returned by String.match()).
+ *
+ * @returns {string} Text with matching part highlighted with html <em> tag.
+ */
 function highlight (match) {
   return match.input.replace(match, `<em>${match[0]}</em>`)
 }
 
-function findNested (elements, parentId, matcher, term, key) {
+/**
+ * Find all matches in the list of elements belonging to a given module.
+ *
+ * @param {Object[]} elements List of elements
+ * @param {string} parentId Id of the Module that elements belong to.
+ * @param {string} term Search term
+ * @param {string} key Key of the module group we are checking (i.e. "callbacks", "types")
+ *
+ * @returns {Object[]} List of elements matching the provided term.
+ */
+function findMatchingChildren (elements, parentId, term, key) {
+  const regExp = new RegExp(helpers.escapeText(term), 'i')
+
   return (elements || []).reduce((acc, element) => {
     if (acc[key + element.id]) { return acc }
 
-    // Match things like module.func
+    // Match "Module.funcion" format.
     const fullTitle = `${parentId}.${element.id}`
-    var fullTitleMatch = !(parentId + '.').match(matcher) && fullTitle.match(matcher)
-    var match = element.id && element.id.match(matcher)
-    var result = JSON.parse(JSON.stringify(element))
+    const fullTitleMatch = !(parentId + '.').match(regExp) && fullTitle.match(regExp)
+    const match = element.id && element.id.match(regExp)
+    let result = JSON.parse(JSON.stringify(element))
 
     if (match) {
       result.match = highlight(match)
       result.matchQuality = matchQuality(match)
     } else if (fullTitleMatch) {
+      // When match spans both module and function name (i.e. ">Map.fe<tch")
+      // let's return just ">fe<tch" as the title. Module will already be displayed under the title.
       const lastSegment = term.split('.').pop()
       const lastSegmentMatcher = new RegExp(helpers.escapeText(lastSegment), 'i')
       const lastSegmentMatch = element.id.match(lastSegmentMatcher)
@@ -159,16 +199,19 @@ function findNested (elements, parentId, matcher, term, key) {
   }, {})
 }
 
+/**
+ * How good th
+ *
+ * @param {(Array|null)} match Information about the matched text (returned by String.match()).
+ *
+ * @returns {number} (0..1) Match quality. Higher is better.
+ */
 function matchQuality (match) {
-  if (!match) {
-    return 0
-  }
+  if (!match) { return 0 }
 
   const textLength = match.input.length
 
-  if (!textLength) {
-    return 0
-  }
+  if (!textLength) { return 0 }
 
   return match.length / textLength
 }

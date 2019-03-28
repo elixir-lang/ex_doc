@@ -81,14 +81,6 @@ describe('getSuggestions', () => {
       expect(getSuggestions('match?').length).to.eql(1)
     })
 
-    it('sorts results, putting found modules at the top', () => {
-      const results = getSuggestions('e')
-      expect(results[0].category).to.eq('Module')
-      expect(results[1].category).to.eq('Module')
-      expect(results[2].category).to.eq('Module')
-      expect(results[3].category).to.eq('Child')
-    })
-
     it('is case insensitive', () => {
       expect(getSuggestions('My ExCePtIoN')).to.eql(getSuggestions('my exception'))
     })
@@ -115,6 +107,12 @@ describe('getSuggestions', () => {
       expect(getSuggestions('Repo.get_')[0].title).to.eql('<em>get_</em>by/3')
       expect(getSuggestions('Ecto.Repo.get_by')[0].title).to.eql('<em>get_by</em>/3')
       expect(getSuggestions('po.get_by')[0].title).to.eql('<em>get_by</em>/3')
+    })
+
+    it('sorts results, putting closer matches at the top', () => {
+      let results = getSuggestions('insert')
+      expect(results[0].title).to.eql('<em>insert</em>/2')
+      expect(results[1].title).to.eql('<em>insert</em>_all/3')
     })
 
     it('marks callbacks with a special label', () => {
