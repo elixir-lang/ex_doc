@@ -7,7 +7,7 @@
     * Provide full-text search
     * Automatically generate documentation for `defdelegate` definitions (requires Elixir v1.8+)
     * Provide keyboard shortcuts (press shift+? to see all available outputs) or click the link at the bottom of the page
-    * Add support for versions dropdown to the HTML sidebar. This requires adding a `ex_doc_config.js` (also configurable) that sets a `versionNodes` JavaScript variable.
+    * Add support for versions dropdown to the HTML sidebar. This requires adding a `docs_config.js` (also configurable) that sets a `versionNodes` JavaScript variable.
     * Improve mouseover titles on sidebar navigation
 
   * Bug fixes
