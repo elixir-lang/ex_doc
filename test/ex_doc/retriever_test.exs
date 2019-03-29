@@ -134,7 +134,7 @@ defmodule ExDoc.RetrieverTest do
       assert flatten.id == "flatten/1"
       assert flatten.type == :function
 
-      if Version.match?(System.version, ">= 1.8.0") do
+      if Version.match?(System.version(), ">= 1.8.0") do
         assert flatten.doc == "See `List.flatten/1`."
       end
 
