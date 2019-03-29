@@ -1,6 +1,5 @@
 <div class="main">
 
-
 <button class="sidebar-button sidebar-toggle">
   <span class="icon-menu" title="Collapse/expand sidebar"></span>
 </button>
