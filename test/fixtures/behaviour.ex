@@ -5,7 +5,7 @@ defmodule CustomBehaviourOne do
   @doc """
   This is a sample callback.
   """
-  @callback hello(integer) :: integer
+  @callback hello(%URI{}) :: integer
   @callback greet(integer | String.t()) :: integer
 end
 

@@ -438,14 +438,14 @@ defmodule ExDoc.Retriever do
   end
 
   # Cut off the body of an opaque type while leaving it on a normal type.
-  defp process_type_ast({:::, _, [d | _]}, :opaque), do: d
+  defp process_type_ast({:"::", _, [d | _]}, :opaque), do: d
   defp process_type_ast(ast, _), do: ast
 
-  defp get_typespec_signature({:when, _, [{:::, _, [{name, meta, args}, _]}, _]}, arity) do
+  defp get_typespec_signature({:when, _, [{:"::", _, [{name, meta, args}, _]}, _]}, arity) do
     Macro.to_string({name, meta, strip_types(args, arity)})
   end
 
-  defp get_typespec_signature({:::, _, [{name, meta, args}, _]}, arity) do
+  defp get_typespec_signature({:"::", _, [{name, meta, args}, _]}, arity) do
     Macro.to_string({name, meta, strip_types(args, arity)})
   end
 
@@ -458,12 +458,13 @@ defmodule ExDoc.Retriever do
     |> Enum.take(-arity)
     |> Enum.with_index(1)
     |> Enum.map(fn
-      {{:::, _, [left, _]}, position} -> to_var(left, position)
+      {{:"::", _, [left, _]}, position} -> to_var(left, position)
       {{:|, _, _}, position} -> to_var({}, position)
       {left, position} -> to_var(left, position)
     end)
   end
 
+  defp to_var({:%, meta, [name, _]}, _), do: {:%, meta, [name, {:%{}, meta, []}]}
   defp to_var({name, meta, _}, _) when is_atom(name), do: {name, meta, nil}
   defp to_var([{:->, _, _} | _], _), do: {:function, [], nil}
   defp to_var({:<<>>, _, _}, _), do: {:binary, [], nil}
@@ -501,8 +502,8 @@ defmodule ExDoc.Retriever do
     annotations
   end
 
-  defp remove_first_macro_arg({:::, info, [{name, info2, [_term_arg | rest_args]}, return]}) do
-    {:::, info, [{name, info2, rest_args}, return]}
+  defp remove_first_macro_arg({:"::", info, [{name, info2, [_term_arg | rest_args]}, return]}) do
+    {:"::", info, [{name, info2, rest_args}, return]}
   end
 
   defp find_module_line(%{abst_code: abst_code, name: name}) do

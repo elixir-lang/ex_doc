@@ -237,13 +237,13 @@ defmodule ExDoc.RetrieverTest do
   ## BEHAVIOURS
 
   describe "behaviours" do
-    test "ignores internal functions" do
+    test "returns callbacks (minus internal functions)" do
       [module_node] = docs_from_files(["CustomBehaviourOne"])
       functions = Enum.map(module_node.docs, fn doc -> doc.id end)
       assert functions == ["greet/1", "hello/1"]
       [greet, hello] = module_node.docs
       assert hello.type == :callback
-      assert hello.signature == "hello(integer)"
+      assert hello.signature == "hello(%URI{})"
       assert greet.type == :callback
       assert greet.signature == "greet(arg1)"
     end
