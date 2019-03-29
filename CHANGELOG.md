@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.20.0-dev
+
+  * Enhancements
+    * Rework the search bar to provide autocompletion
+    * Provide full-text search
+    * Automatically generate documentation for `defdelegate` definitions (requires Elixir v1.8+)
+    * Provide keyboard shortcuts (press shift+? to see all available outputs) or click the link at the bottom of the page
+    * Add support for versions dropdown to the HTML sidebar. This requires adding a `config.js` (also configurable) that sets a `versionNodes` JavaScript variable.
+    * Improve mouseover titles on sidebar navigation
+
+  * Bug fixes
+    * Do not hide structs in type/callback summary signatures
+    * No longer require double click to open up a sidebar on Mobile Safari
+    * Keep trailing periods in summaries
+    * Fix typespec `arg` number to start from 1 instead of 0
+
 ## v0.19.3
 
   * Enhancements
