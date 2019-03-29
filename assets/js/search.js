@@ -90,8 +90,6 @@ export function search (value) {
   }
 }
 
-
-
 function getIndex () {
   var idx = null
   var projectMeta = getProjectMeta()
