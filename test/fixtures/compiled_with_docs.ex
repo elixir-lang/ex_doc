@@ -37,6 +37,9 @@ defmodule CompiledWithDocs do
   @deprecated "Use something else instead"
   def example_without_docs, do: nil
 
+  # Check that delegate autogenerate docs
+  defdelegate flatten(hello), to: List
+
   defmodule Nested do
   end
 end

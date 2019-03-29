@@ -282,7 +282,7 @@ defmodule ExDoc.Retriever do
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
-      doc: doc,
+      doc: doc || delegate_doc(metadata[:delegate_to]),
       doc_line: doc_line,
       defaults: defaults,
       signature: Enum.join(signature, " "),
@@ -294,6 +294,9 @@ defmodule ExDoc.Retriever do
       annotations: annotations
     }
   end
+
+  defp delegate_doc(nil), do: nil
+  defp delegate_doc({m, f, a}), do: "See `#{Exception.format_mfa(m, f, a)}`."
 
   defp docstring(:none, name, arity, type, {:ok, behaviour}) do
     info = "Callback implementation for `c:#{inspect(behaviour)}.#{name}/#{arity}`."

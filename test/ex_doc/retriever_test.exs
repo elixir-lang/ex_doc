@@ -97,7 +97,7 @@ defmodule ExDoc.RetrieverTest do
           ]
         )
 
-      [struct, example, example_1, example_with_h3, example_without_docs, is_zero] =
+      [struct, example, example_1, example_with_h3, example_without_docs, flatten, is_zero] =
         module_node.docs
 
       assert struct.id == "__struct__/0"
@@ -130,6 +130,13 @@ defmodule ExDoc.RetrieverTest do
 
       assert example_without_docs.source_url ==
                "http://example.com/test/fixtures/compiled_with_docs.ex\#L38"
+
+      assert flatten.id == "flatten/1"
+      assert flatten.type == :function
+
+      if Version.match?(System.version, ">= 1.8.0") do
+        assert flatten.doc == "See `List.flatten/1`."
+      end
 
       assert is_zero.id == "is_zero/1"
       assert is_zero.doc == "A simple guard"
