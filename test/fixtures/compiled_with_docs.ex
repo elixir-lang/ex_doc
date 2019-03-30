@@ -14,6 +14,7 @@ defmodule CompiledWithDocs do
   defstruct [:field]
 
   @doc "Some example"
+  @doc purpose: :example
   @deprecated "Use something else instead"
   def example(foo, bar \\ Baz), do: bar.baz(foo)
 
@@ -22,6 +23,7 @@ defmodule CompiledWithDocs do
   defmacro example_1, do: 1
 
   @doc "A simple guard"
+  # TODO: remove explicit guard: true when ~> 1.8
   defguard is_zero(number) when number == 0
 
   @doc """
@@ -29,9 +31,14 @@ defmodule CompiledWithDocs do
 
   ### Examples
   """
+  @doc purpose: :example
   def example_with_h3, do: 1
 
+  @deprecated "Use something else instead"
   def example_without_docs, do: nil
+
+  # Check that delegate autogenerate docs
+  defdelegate flatten(hello), to: List
 
   defmodule Nested do
   end

@@ -34,7 +34,9 @@ defmodule ExDoc.RetrieverTest do
       assert module_node.id == "CompiledWithDocs"
       assert module_node.title == "CompiledWithDocs"
       assert module_node.module == CompiledWithDocs
-
+      refute module_node.group
+      refute module_node.nested_context
+      refute module_node.nested_title
       assert module_node.source_url == "http://example.com/test/fixtures/compiled_with_docs.ex#L1"
 
       assert module_node.doc == """
@@ -66,10 +68,36 @@ defmodule ExDoc.RetrieverTest do
       assert module_node.group == :Group
     end
 
-    test "returns the function nodes for each module" do
-      [module_node] = docs_from_files(["CompiledWithDocs"])
+    test "returns nesting information" do
+      prefix = "Common.Nesting.Prefix"
 
-      [struct, example, example_1, _example_with_h3, example_without_docs, is_zero] =
+      module_nodes =
+        docs_from_files([prefix <> ".Foo", prefix <> ".Bar"], nest_modules_by_prefix: [prefix])
+
+      assert length(module_nodes) > 0
+
+      for module_node <- module_nodes do
+        assert module_node.nested_context == prefix
+        assert module_node.nested_title in ~w(Foo Bar)
+      end
+
+      name = "Common.Nesting.Prefix.Foo"
+      [module_node] = docs_from_files([name], nest_modules_by_prefix: [name])
+
+      refute module_node.nested_context
+      refute module_node.nested_title
+    end
+
+    test "returns the function nodes for each module" do
+      [module_node] =
+        docs_from_files(["CompiledWithDocs"],
+          groups_for_functions: [
+            Example: &(&1[:purpose] == :example),
+            Legacy: &is_binary(&1[:deprecated])
+          ]
+        )
+
+      [struct, example, example_1, example_with_h3, example_without_docs, flatten, is_zero] =
         module_node.docs
 
       assert struct.id == "__struct__/0"
@@ -77,6 +105,7 @@ defmodule ExDoc.RetrieverTest do
       assert struct.type == :function
       assert struct.defaults == []
       assert struct.signature == "%CompiledWithDocs{}"
+      assert struct.group == "Functions"
 
       assert example.id == "example/2"
       assert example.doc == "Some example"
@@ -84,23 +113,34 @@ defmodule ExDoc.RetrieverTest do
       assert example.defaults == ["example/1"]
       assert example.signature == "example(foo, bar \\\\ Baz)"
       assert example.deprecated == "Use something else instead"
+      assert example.group == "Example"
 
       assert example_1.id == "example_1/0"
       assert example_1.type == :macro
       assert example_1.defaults == []
       assert example_1.annotations == ["macro", "since 1.3.0"]
 
+      assert example_with_h3.id == "example_with_h3/0"
+      assert example_with_h3.group == "Example"
+
       assert example_without_docs.id == "example_without_docs/0"
       assert example_without_docs.doc == nil
       assert example_without_docs.defaults == []
+      assert example_without_docs.group == "Legacy"
 
       assert example_without_docs.source_url ==
-               "http://example.com/test/fixtures/compiled_with_docs.ex\#L34"
+               "http://example.com/test/fixtures/compiled_with_docs.ex\#L38"
+
+      assert flatten.id == "flatten/1"
+      assert flatten.type == :function
+
+      if Version.match?(System.version(), ">= 1.8.0") do
+        assert flatten.doc == "See `List.flatten/1`."
+      end
 
       assert is_zero.id == "is_zero/1"
       assert is_zero.doc == "A simple guard"
-      # TODO: Remove :macro when ~> 1.8
-      assert is_zero.type in [:guard, :macro]
+      assert is_zero.type == :macro
       assert is_zero.defaults == []
     end
 
@@ -204,15 +244,15 @@ defmodule ExDoc.RetrieverTest do
   ## BEHAVIOURS
 
   describe "behaviours" do
-    test "ignores internal functions" do
+    test "returns callbacks (minus internal functions)" do
       [module_node] = docs_from_files(["CustomBehaviourOne"])
       functions = Enum.map(module_node.docs, fn doc -> doc.id end)
       assert functions == ["greet/1", "hello/1"]
       [greet, hello] = module_node.docs
       assert hello.type == :callback
-      assert hello.signature == "hello(integer)"
+      assert hello.signature == "hello(%URI{})"
       assert greet.type == :callback
-      assert greet.signature == "greet(arg0)"
+      assert greet.signature == "greet(arg1)"
     end
 
     test "returns macro callbacks" do
@@ -259,15 +299,8 @@ defmodule ExDoc.RetrieverTest do
   end
 
   describe "implementations" do
-    test "are properly tagged" do
-      [module_node] = docs_from_files(["CustomProtocol.Number"])
-      assert module_node.type == :impl
-    end
-
-    test "ignores internal functions" do
-      [module_node] = docs_from_files(["CustomProtocol.Number"])
-      functions = Enum.map(module_node.docs, fn doc -> doc.id end)
-      assert functions == ["plus_one/1", "plus_two/1"]
+    test "are skipped" do
+      assert [] = docs_from_files(["CustomProtocol.Number"])
     end
   end
 end

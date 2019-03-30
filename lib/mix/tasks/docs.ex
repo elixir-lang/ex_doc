@@ -47,6 +47,9 @@ defmodule Mix.Tasks.Docs do
   be a keyword list or a function returning a keyword list that will
   be lazily executed.
 
+    * `:api_reference` - Whether to generate `api-reference.html`; default: `true`.
+      If this is set to false, `:main` must also be set.
+
     * `:assets` - Path to a directory that will be copied as is to the "assets"
       directory in the output path. Its entries may be referenced in your docs
       under "assets/ASSET.EXTENSION"; defaults to no assets directory.
@@ -83,7 +86,13 @@ defmodule Mix.Tasks.Docs do
 
     * `:formatters` - Formatter to use; default: ["html"], options: "html", "epub".
 
-    * `:groups_for_extras`, `:groups_for_modules` - See next section
+    * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See the "Groups" section
+
+    * `:javascript_config_path` - Path of an additional JavaScript file to be included on all pages
+      to provide up-to-date data for features like the version dropdown - See the "Additional
+      JavaScript config" section. Example: `"../versions.js"`
+
+    * `:nest_modules_by_prefix` - See the "Nesting" section
 
     * `:language` - Identify the primary language of the documents, its value must be
       a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
@@ -111,9 +120,14 @@ defmodule Mix.Tasks.Docs do
 
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
-    
-    *`:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
+
+    * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
+
+    * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
+      reference in the current project docs e.g. because of a typo. This list controls
+      which docs pages to skip the warnings on, which is useful for e.g. deprecation pages;
+      default: `[]`.
 
   ## Groups
 
@@ -154,6 +168,85 @@ defmodule Mix.Tasks.Docs do
       ]
 
   A regex or the string name of the module is also supported.
+
+  ### Grouping functions
+
+  Functions inside a module can also be organized in groups. This is done via
+  the `:groups_for_functions` configuration which is a keyword list of group
+  titles and filtering functions that receive the documentation metadata of
+  functions as argument.
+
+  For example, imagine that you have an API client library with a large surface
+  area for all the API endpoints you need to support. It would be helpful to
+  group the functions with similar responsibilities together. In this case in
+  your module you might have:
+
+      defmodule APIClient do
+        @doc section: :auth
+        def refresh_token(params \\ [])
+
+        @doc subject: :object
+        def update_status(id, new_status)
+
+        @doc permission: :grant
+        def grant_privilege(resource, privilege)
+      end
+
+  And then in the configuration you can group these with:
+
+      groups_for_functions: [
+        Authentication: & &1[:section] == :auth,
+        Resource: & &1[:subject] == :object,
+        Admin: & &1[:permission] in [:grant, :write]
+      ]
+
+  A function can belong to a single group only. If multiple group filters match,
+  the first will take precedence. Functions that don't have a custom group will
+  be listed under the default "Functions" group.
+
+  ## Additional JavaScript config
+
+  Since version `0.20.0` ExDoc includes a way to enrich the documentation
+  with new information without having to re-generate it, through a JavaScript
+  file that can be shared across documentation for multiple versions of the
+  package. If `:javascript_config_path` is set when building the documentation,
+  this script will be referenced in each page's `<head>` using a `<script>` tag.
+  The script should define data in global JavaScript variables that will be
+  interpreted by `ex_doc` when viewing the documentation.
+
+  Currenly supported variables:
+
+  ### `versionNodes`
+
+  This global JavaScript variable should be providing an array of objects that
+  define all versions of this Mix package which should appear in the package
+  versions dropdown in the documentation sidebar. The versions dropdown allows
+  for switching between package versions' documentation.
+
+  Example:
+
+  ```javascript
+  var versionNodes = [
+    {
+      version: "v0.0.0", // version number or name (required)
+      url: "https://hexdocs.pm/ex_doc/0.19.3/" // documentation URL (required)
+    }
+  ]
+  ```
+
+  ## Nesting
+
+  ExDoc also allows module names in the sidebar to appear nested under a given
+  prefix. The `:nest_modules_by_prefix` expects a list of module names, such as
+  `[Foo.Bar, Bar.Baz]`. In this case, a module named `Foo.Bar.Baz` will appear
+  nested within `Foo.Bar` and only the name `Baz` will be shown in the sidebar.
+  Note the `Foo.Bar` module itself is not affected.
+
+  This option is mainly intended to improve the display of long module names in
+  the sidebar, particularly when they are too long for the sidebar or when many
+  modules share a long prefix. If you mean to group modules logically or call
+  attention to them in the docs, you should probably use `:groups_for_modules`
+  (which can be used in conjuction with `:nest_modules_by_prefix`).
 
   ## Umbrella project
 

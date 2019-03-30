@@ -7,7 +7,7 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.GroupMatcher
+  alias ExDoc.{GroupMatcher}
   alias ExDoc.Retriever.Error
 
   @doc """
@@ -61,9 +61,18 @@ defmodule ExDoc.Retriever do
     end
 
     if docs_chunk = docs_chunk(module) do
-      [generate_node(module, docs_chunk, config)]
+      generate_node(module, docs_chunk, config)
     else
       []
+    end
+  end
+
+  defp nesting_info(title, prefixes) do
+    prefixes
+    |> Enum.find(&String.starts_with?(title, &1 <> "."))
+    |> case do
+      nil -> {nil, nil}
+      prefix -> {String.trim_leading(title, prefix <> "."), prefix}
     end
   end
 
@@ -88,6 +97,11 @@ defmodule ExDoc.Retriever do
         {:error, reason} ->
           raise Error,
                 "module #{inspect(module)} was not compiled with flag --docs: #{inspect(reason)}"
+
+        _ ->
+          raise Error,
+                "unknown format in Docs chunk. This likely means you are running on " <>
+                  "a more recent Elixir version that is not supported by ExDoc. Please update."
       end
     else
       false
@@ -95,30 +109,43 @@ defmodule ExDoc.Retriever do
   end
 
   defp generate_node(module, docs_chunk, config) do
+    module_data = get_module_data(module, docs_chunk)
+
+    case module_data do
+      %{type: :impl} -> []
+      _ -> [do_generate_node(module, module_data, config)]
+    end
+  end
+
+  defp do_generate_node(module, module_data, config) do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
 
-    module_data = get_module_data(module, docs_chunk)
     {doc_line, moduledoc, metadata} = get_module_docs(module_data)
     line = find_module_line(module_data) || doc_line
 
-    docs = get_docs(module_data, source) ++ get_callbacks(module_data, source)
+    {function_groups, function_docs} = get_docs(module_data, source, config)
+    docs = function_docs ++ get_callbacks(module_data, source)
     types = get_types(module_data, source)
     {title, id} = module_title_and_id(module_data)
     module_group = GroupMatcher.match_module(config.groups_for_modules, module, id)
+    {nested_title, nested_context} = nesting_info(title, config.nest_modules_by_prefix)
 
     %ExDoc.ModuleNode{
       id: id,
       title: title,
+      nested_title: nested_title,
+      nested_context: nested_context,
       module: module_data.name,
       group: module_group,
       type: module_data.type,
       deprecated: metadata[:deprecated],
-      docs: Enum.sort_by(docs, & &1.id),
+      function_groups: function_groups,
+      docs: Enum.sort_by(docs, &{&1.name, &1.arity}),
       doc: moduledoc,
       doc_line: doc_line,
-      typespecs: Enum.sort_by(types, & &1.id),
+      typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
       source_path: source_path,
       source_url: source_link(source, line)
     }
@@ -160,11 +187,8 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp get_module_docs(%{docs: docs}) do
-    case docs do
-      {:docs_v1, anno, _, _, %{"en" => doc}, metadata, _} -> {anno_line(anno), doc, metadata}
-      {:docs_v1, anno, _, _, _, metadata, _} -> {anno_line(anno), nil, metadata}
-    end
+  defp get_module_docs(%{docs: {:docs_v1, anno, _, _, moduledoc, metadata, _}}) do
+    {anno_line(anno), docstring(moduledoc), metadata}
   end
 
   defp get_abstract_code(module) do
@@ -178,12 +202,20 @@ defmodule ExDoc.Retriever do
 
   ## Function helpers
 
-  defp get_docs(%{type: type, docs: docs} = module_data, source) do
+  defp get_docs(%{type: type, docs: docs} = module_data, source, config) do
     {:docs_v1, _, _, _, _, _, docs} = docs
 
-    for doc <- docs, doc?(doc, type) do
-      get_function(doc, source, module_data)
-    end
+    groups_for_functions =
+      Enum.map(config.groups_for_functions, fn {group, filter} ->
+        {Atom.to_string(group), filter}
+      end) ++ [{"Functions", fn _ -> true end}]
+
+    function_docs =
+      for doc <- docs, doc?(doc, type) do
+        get_function(doc, source, module_data, groups_for_functions)
+      end
+
+    {Enum.map(groups_for_functions, &elem(&1, 0)), function_docs}
   end
 
   # We are only interested in functions and macros for now
@@ -211,7 +243,7 @@ defmodule ExDoc.Retriever do
     true
   end
 
-  defp get_function(function, source, module_data) do
+  defp get_function(function, source, module_data, groups_for_functions) do
     {{type, name, arity}, anno, signature, doc, metadata} = function
     actual_def = actual_def(name, arity, type)
     doc_line = anno_line(anno)
@@ -240,30 +272,40 @@ defmodule ExDoc.Retriever do
         _ -> annotations
       end
 
+    group =
+      Enum.find_value(groups_for_functions, fn {group, filter} ->
+        filter.(metadata) && group
+      end)
+
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
-      doc: doc,
+      doc: doc || delegate_doc(metadata[:delegate_to]),
       doc_line: doc_line,
       defaults: defaults,
       signature: Enum.join(signature, " "),
       specs: specs,
       source_path: source.path,
       source_url: source_link(source, line),
-      type: if(metadata[:guard], do: :guard, else: type),
+      type: type,
+      group: group,
       annotations: annotations
     }
   end
+
+  defp delegate_doc(nil), do: nil
+  defp delegate_doc({m, f, a}), do: "See `#{Exception.format_mfa(m, f, a)}`."
 
   defp docstring(:none, name, arity, type, {:ok, behaviour}) do
     info = "Callback implementation for `c:#{inspect(behaviour)}.#{name}/#{arity}`."
 
     with {:docs_v1, _, _, _, _, _, docs} <- Code.fetch_docs(behaviour),
          key = {definition_to_callback(type), name, arity},
-         {_, _, _, %{"en" => doc}, _} <- List.keyfind(docs, key, 0) do
-      "#{doc}\n\n#{info}"
+         {_, _, _, doc, _} <- List.keyfind(docs, key, 0),
+         docstring when is_binary(docstring) <- docstring(doc) do
+      "#{docstring}\n\n#{info}"
     else
       _ -> info
     end
@@ -326,7 +368,7 @@ defmodule ExDoc.Retriever do
 
   ## Typespecs
 
-  # Returns a map of {name, arity} -> spec.
+  # Returns a map of {name, arity} => spec.
   defp get_specs(module) do
     case Code.Typespec.fetch_specs(module) do
       {:ok, specs} -> Map.new(specs)
@@ -334,7 +376,7 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  # Returns a map of {name, arity} -> behaviour.
+  # Returns a map of {name, arity} => behaviour.
   defp get_impls(module) do
     for behaviour <- behaviours_implemented_by(module),
         callback <- callbacks_defined_by(behaviour),
@@ -417,14 +459,15 @@ defmodule ExDoc.Retriever do
   defp strip_types(args, arity) do
     args
     |> Enum.take(-arity)
-    |> Enum.with_index()
+    |> Enum.with_index(1)
     |> Enum.map(fn
-      {{:::, _, [left, _]}, i} -> to_var(left, i)
-      {{:|, _, _}, i} -> to_var({}, i)
-      {left, i} -> to_var(left, i)
+      {{:::, _, [left, _]}, position} -> to_var(left, position)
+      {{:|, _, _}, position} -> to_var({}, position)
+      {left, position} -> to_var(left, position)
     end)
   end
 
+  defp to_var({:%, meta, [name, _]}, _), do: {:%, meta, [name, {:%{}, meta, []}]}
   defp to_var({name, meta, _}, _) when is_atom(name), do: {name, meta, nil}
   defp to_var([{:->, _, _} | _], _), do: {:function, [], nil}
   defp to_var({:<<>>, _, _}, _), do: {:binary, [], nil}
@@ -435,7 +478,7 @@ defmodule ExDoc.Retriever do
   defp to_var(float, _) when is_integer(float), do: {:float, [], nil}
   defp to_var(list, _) when is_list(list), do: {:list, [], nil}
   defp to_var(atom, _) when is_atom(atom), do: {:atom, [], nil}
-  defp to_var(_, i), do: {:"arg#{i}", [], nil}
+  defp to_var(_, position), do: {:"arg#{position}", [], nil}
 
   ## General helpers
 

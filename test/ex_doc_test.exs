@@ -86,6 +86,6 @@ defmodule ExDocTest do
   end
 
   test "version" do
-    assert ExDoc.version() =~ ~r{\d+\.\d+\.\d+}
+    assert {:ok, _version} = Version.parse(ExDoc.version())
   end
 end

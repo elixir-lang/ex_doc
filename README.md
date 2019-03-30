@@ -2,7 +2,6 @@
 
 [![Build Status](https://secure.travis-ci.org/elixir-lang/ex_doc.svg?branch=master "Build Status")](http://travis-ci.org/elixir-lang/ex_doc)
 [![Coverage Status](https://coveralls.io/repos/github/elixir-lang/ex_doc/badge.svg?branch=master)](https://coveralls.io/github/elixir-lang/ex_doc?branch=master)
-[![Ebert](https://ebertapp.io/github/elixir-lang/ex_doc.svg)](https://ebertapp.io/github/elixir-lang/ex_doc)
 
 ExDoc is a tool to generate documentation for your Elixir projects. In case you are looking for documentation for Elixir itself, [check out Elixir's website][elixir-lang].
 
@@ -19,7 +18,9 @@ If you are using Elixir v1.7 and later:
 
 ```elixir
 def deps do
-  [{:ex_doc, "~> 0.19", only: :dev, runtime: false}]
+  [
+    {:ex_doc, "~> 0.19", only: :dev, runtime: false},
+  ]
 end
 ```
 
@@ -27,7 +28,9 @@ If you are using Elixir v1.6 and earlier:
 
 ```elixir
 def deps do
-  [{:ex_doc, "~> 0.18.0", only: :dev, runtime: false}]
+  [
+    {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
+  ]
 end
 ```
 
@@ -63,26 +66,26 @@ You can ExDoc via the command line as follows:
 
 1. Install ExDoc as an escript:
 
-    ```console
+    ```bash
     $ mix escript.install hex ex_doc
     ```
 
 2. Then you are ready to use it in your projects. First, move into your project directory and make sure it is already compiled:
 
-    ```console
+    ```bash
     $ cd PATH_TO_YOUR_PROJECT
     $ mix compile
     ```
 
 3. Next invoke the ex_doc executable from your project:
 
-    ```console
+    ```bash
     $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
     ```
 
 4. By default, ex_doc produces HTML files, but, you can also create a EPUB document passing the option `--formatter epub`:
 
-    ```console
+    ```bash
     $ PATH_TO_YOUR_EXDOC/bin/ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png -f epub
     ```
 
@@ -141,5 +144,4 @@ Check the [LICENSE](LICENSE) file for more information.
 [elixir-lang]: http://elixir-lang.org/
 [cmark]: https://github.com/jgm/cmark
 [cmark.ex]: https://github.com/asaaki/cmark.ex
-[devinus/markdown]: http://github.com/devinus/markdown
 [hex-writing-docs]: https://hexdocs.pm/elixir/writing-documentation.html

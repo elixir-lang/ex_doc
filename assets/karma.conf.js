@@ -1,4 +1,4 @@
-var webpackConfig = require('./webpack.config').development
+const webpackConfig = require('./webpack/development.js')
 
 module.exports = function (config) {
   config.set({
@@ -7,11 +7,11 @@ module.exports = function (config) {
     frameworks: ['mocha', 'chai'],
 
     files: [
-      'test/*.spec.js'
+      'test/**/*.spec.js'
     ],
 
     preprocessors: {
-      'test/*.spec.js': ['webpack', 'sourcemap']
+      'test/**/*.spec.js': ['webpack', 'sourcemap']
     },
 
     webpack: webpackConfig,

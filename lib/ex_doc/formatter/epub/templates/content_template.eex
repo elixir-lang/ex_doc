@@ -22,7 +22,7 @@
       <% end %>
     <% end %>
     <%= for static_file <- static_files do %>
-      <item id="<%= static_file |> HTML.input_to_title() |> HTML.title_to_id() %>" href="<%= static_file %>" media-type="<%= media_type(Path.extname(static_file)) %>"/>
+      <item id="<%= static_file |> HTML.filename_to_title() |> HTML.text_to_id() %>" href="<%= static_file %>" media-type="<%= media_type(Path.extname(static_file)) %>"/>
     <% end %>
     <%= if config.logo do %>
       <%= if Path.extname(config.logo) == ".png" do %>

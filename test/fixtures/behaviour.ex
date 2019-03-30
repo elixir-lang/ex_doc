@@ -1,11 +1,11 @@
 defmodule CustomBehaviourOne do
-  # Defining a struct should not affect the behaviour
+  # Even if we define a struct, this module should still be listed as a behaviour.
   defstruct [:a, :b]
 
   @doc """
   This is a sample callback.
   """
-  @callback hello(integer) :: integer
+  @callback hello(%URI{}) :: integer
   @callback greet(integer | String.t()) :: integer
 end
 

@@ -1,4 +1,6 @@
 .footer {
+  @import '../variables';
+
   margin: 4em auto 1em;
   text-align: center;
   font-style: italic;
@@ -7,6 +9,17 @@
 
   .line {
     display: inline-block;
+  }
+
+  .footer-button {
+    background-color: transparent;
+    border: 0;
+    color: @mediumGray;
+    cursor: pointer;
+    font-style: italic;
+    outline: none;
+    padding: 0 4px;
+    .linkUnderlines(@mediumGray)
   }
 
   a {

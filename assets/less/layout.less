@@ -72,6 +72,19 @@ body.sidebar-opened, body.sidebar-opening {
   }
 }
 
+body.search-focused {
+  .sidebar-button {
+    transform: translateX(250px) scaleY(0);
+    transition: all 0.15s ease-out;
+    opacity: 0;
+  }
+
+  .sidebar-search .search-close-button {
+    transform: scaleY(1);
+    transition: transform 0.15s ease-out 0.15s;
+  }
+}
+
 body.sidebar-closed, body.sidebar-closing {
   .sidebar {
     z-index: 0;
@@ -88,6 +101,7 @@ body.sidebar-closed, body.sidebar-closing {
 
 body.sidebar-closed .sidebar-button {
   color: @black;
+  transform: translateY(-8px);
 }
 
 body.sidebar-opening {
