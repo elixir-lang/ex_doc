@@ -1,7 +1,7 @@
 defmodule ExDoc.Mixfile do
   use Mix.Project
 
-  @version "0.19.1"
+  @version "0.19.3"
 
   def project do
     [
@@ -27,8 +27,8 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [
-      {:earmark, "~> 1.2"},
-      {:makeup_elixir, "~> 0.7"},
+      {:earmark, "~> 1.3"},
+      {:makeup_elixir, "~> 0.10"},
       {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
     ]
