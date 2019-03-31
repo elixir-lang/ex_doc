@@ -29,8 +29,10 @@ import {initialize as initSidebar} from './sidebar'
 import {initialize as initVersions} from './versions'
 import {initialize as initNightMode} from './night'
 import {initialize as initMakeup} from './makeup'
+import {initialize as initFocusMode} from './focus_mode'
 import {initialize as initKeyboardShortcuts} from './keyboard-shortcuts'
 import {initialize as initQuickSwitch} from './quick-switch'
+import {initialize as initPopovers} from './popovers'
 
 window.$ = $
 
@@ -67,5 +69,7 @@ $(() => {
   initMakeup()
   initKeyboardShortcuts()
   initQuickSwitch()
+  initFocusMode()
+  initPopovers()
   hljs.initHighlighting()
 })
