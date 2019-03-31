@@ -1,0 +1,25 @@
+#popover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.10);
+  display: none;
+  position: absolute;
+  z-index: 99;
+
+  &.popover-visible {
+    display: block;
+    transform: translateY(20px);
+    transition: 0.2s all ease-out;
+    opacity: 0;
+  }
+
+  &.popover-shown {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .popover-iframe {
+    border: 1px solid @mediumGray;
+    height: 160px;
+    width: 500px;
+  }
+}
+
