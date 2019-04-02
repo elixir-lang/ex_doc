@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.20.0-dev
+## v0.20.0
 
   * Enhancements
     * Rework the search bar to provide autocompletion
