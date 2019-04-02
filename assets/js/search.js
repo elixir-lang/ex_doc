@@ -87,6 +87,8 @@ export function search (value) {
     })
 
     $search.html(resultsHtml)
+  } else {
+    $search.html("<h1>Search</h1>")
   }
 }
 
