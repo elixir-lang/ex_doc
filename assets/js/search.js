@@ -93,16 +93,21 @@ export function search (value) {
 }
 
 function getIndex () {
-  var idx = null
   var projectMeta = getProjectMeta()
   var stored = sessionStorage.getItem(projectMeta)
 
   try {
-    if (stored == null) throw null
+    if (stored == null) throw 'create and save'
     return lunr.Index.load(JSON.parse(stored))
   } catch {
-    idx = createIndex()
-    sessionStorage.setItem(projectMeta, JSON.stringify(idx))
+    var idx = createIndex()
+    var stringified = JSON.stringify(idx)
+
+    try {
+      sessionStorage.setItem(projectMeta, stringified)
+    } catch {
+    }
+
     return idx
   }
 }
