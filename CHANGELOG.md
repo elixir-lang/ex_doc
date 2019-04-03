@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.20.1
+
+  * Bug fixes
+    * Hide the spinner when no term is searched
+    * Use `?` for the shortcut hint text
+    * Improve style of the version dropdown
+
 ## v0.20.0
 
   * Enhancements
