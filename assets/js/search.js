@@ -79,7 +79,6 @@ export function search (value) {
     } catch (error) {
       errorMessage = error.message
     }
-  }
 
     var resultsHtml = resultsTemplate({
       value: value,
@@ -109,40 +108,6 @@ function getIndex () {
     } catch {
     }
 
-    return idx
-  }
-}
-
-function getProjectMeta () {
-  return document.head.querySelector('meta[name=project][content]').content
-}
-
-function createIndex () {
-  return lunr(function () {
-    this.ref('ref')
-    this.field('title')
-    this.field('module')
-    this.field('type')
-    this.field('doc')
-    this.metadataWhitelist = ['position']
-
-    searchNodes.forEach(function (doc) {
-      this.add(doc)
-    }, this)
-  })
-}
-
-function getIndex () {
-  var idx = null
-  var projectMeta = getProjectMeta()
-  var stored = sessionStorage.getItem(projectMeta)
-
-  try {
-    if (stored == null) throw null
-    return lunr.Index.load(JSON.parse(stored))
-  } catch {
-    idx = createIndex()
-    sessionStorage.setItem(projectMeta, JSON.stringify(idx))
     return idx
   }
 }
