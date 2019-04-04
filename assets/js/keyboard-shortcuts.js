@@ -44,7 +44,7 @@ const keyboardShortcuts = [
     name: '?',
     keyCode: 191,
     requiresShiftKey: true,
-    displayAs: '<kbd>shift</kbd> + <kbd>/</kbd>',
+    displayAs: '<kbd>?</kbd>',
     description: 'Bring up this help dialog',
     action: toggleHelpModal
   }

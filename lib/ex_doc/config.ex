@@ -30,7 +30,7 @@ defmodule ExDoc.Config do
             groups_for_modules: [],
             groups_for_functions: [],
             homepage_url: nil,
-            javascript_config_path: "ex_doc_config.js",
+            javascript_config_path: "docs_config.js",
             language: "en",
             logo: nil,
             main: nil,

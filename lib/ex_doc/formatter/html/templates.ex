@@ -46,6 +46,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
+  <<<<<<< HEAD
   Generate a link id
   """
   def link_id(node), do: link_id(node.id, node.type)
@@ -69,6 +70,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
+  =======
+  >>>>>>> 9dd03bd0163184e3569df7138abf68fac3075e9f
   Returns the HTML formatted title for the module page.
   """
   def module_title(%{type: :task, title: title}),
@@ -191,7 +194,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_items_by_group(module_node, {group, docs}) do
     objects =
       Enum.map_join(docs, ",", fn doc ->
-        sidebar_items_object(doc.id, HTML.link_id(doc), link_title(module_node, doc)
+        sidebar_items_object(doc.id, HTML.link_id(doc), link_title(module_node, doc))
       end)
 
     ~s/{"key":"#{HTML.text_to_id(group)}","name":"#{group}","nodes":[#{objects}]}/

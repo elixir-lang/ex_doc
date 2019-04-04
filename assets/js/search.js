@@ -79,6 +79,7 @@ export function search (value) {
     } catch (error) {
       errorMessage = error.message
     }
+  }
 
     var resultsHtml = resultsTemplate({
       value: value,
@@ -87,7 +88,48 @@ export function search (value) {
     })
 
     $search.html(resultsHtml)
+  } else {
+    $search.html('<h1>Search</h1>')
   }
+}
+
+function getIndex () {
+  var projectMeta = getProjectMeta()
+  var stored = sessionStorage.getItem(projectMeta)
+
+  try {
+    if (stored == null) throw 'create and save'
+    return lunr.Index.load(JSON.parse(stored))
+  } catch {
+    var idx = createIndex()
+    var stringified = JSON.stringify(idx)
+
+    try {
+      sessionStorage.setItem(projectMeta, stringified)
+    } catch {
+    }
+
+    return idx
+  }
+}
+
+function getProjectMeta () {
+  return document.head.querySelector('meta[name=project][content]').content
+}
+
+function createIndex () {
+  return lunr(function () {
+    this.ref('ref')
+    this.field('title')
+    this.field('module')
+    this.field('type')
+    this.field('doc')
+    this.metadataWhitelist = ['position']
+
+    searchNodes.forEach(function (doc) {
+      this.add(doc)
+    }, this)
+  })
 }
 
 function getIndex () {
