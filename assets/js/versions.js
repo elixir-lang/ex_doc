@@ -33,12 +33,13 @@ function addIsCurrentVersion (element) {
 export function initialize () {
   if (typeof versionNodes !== 'undefined') {
     addCurrentVersionIfNotPresent()
+    var width = $(".sidebar-projectVersion").width()
 
     let versionsDropdown = versionsTemplate({nodes: versionNodes.map(addIsCurrentVersion)})
     sidebarProjectVersion.text('')
     sidebarProjectVersion.append(versionsDropdown)
 
-    $('.sidebar-projectVersionsDropdown').change(function () {
+    $('.sidebar-projectVersionsDropdown').width(width).change(function () {
       window.location.href = $(this).val()
     })
   }
