@@ -191,7 +191,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{"id":"CustomBehaviourTwo","title":"CustomBehaviourTwo"}ms
     assert content =~ ~r{"id":"RandomError","title":"RandomError"}ms
     assert content =~ ~r{"id":"CustomProtocol","title":"CustomProtocol"}ms
-    assert content =~ ~r{"id":"Mix\.Tasks\.TaskWithDocs","title":"task_with_docs"}ms
+    assert content =~ ~r{"id":"Mix\.Tasks\.TaskWithDocs","title":"mix task_with_docs"}ms
   end
 
   test "generates the api reference file" do
@@ -201,7 +201,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
     assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
-    assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html">task_with_docs</a>}
+    assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html">mix task_with_docs</a>}
   end
 
   test "groups modules by nesting" do

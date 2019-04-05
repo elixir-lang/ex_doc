@@ -237,7 +237,7 @@ defmodule ExDoc.RetrieverTest do
       [module_node] = docs_from_files(["Mix.Tasks.TaskWithDocs"])
       assert module_node.type == :task
       assert module_node.id == "Mix.Tasks.TaskWithDocs"
-      assert module_node.title == "task_with_docs"
+      assert module_node.title == "mix task_with_docs"
     end
   end
 
