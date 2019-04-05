@@ -547,7 +547,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp module_title_and_id(%{name: module, type: :task}) do
-    {task_name(module), module_id(module)}
+    {"mix " <> task_name(module), module_id(module)}
   end
 
   defp module_title_and_id(%{name: module}) do

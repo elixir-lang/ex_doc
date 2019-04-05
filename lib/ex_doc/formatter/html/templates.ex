@@ -49,7 +49,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   Returns the HTML formatted title for the module page.
   """
   def module_title(%{type: :task, title: title}),
-    do: "mix " <> title
+    do: title
 
   def module_title(%{type: :module, title: title}),
     do: title
