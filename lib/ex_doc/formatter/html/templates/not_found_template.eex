@@ -6,7 +6,7 @@
 <p>Sorry, but the page you were trying to get to, does not exist. You
 may want to try searching this site using the sidebar
 <%= if config.api_reference do %>
-  or using our <a href="api-reference.html" title="API Reference">API Reference</a> page
+  or using our <a href="api-reference.html">API Reference</a> page
 <% end %>
 to find what you were looking for.</p>
 
