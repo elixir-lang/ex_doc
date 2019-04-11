@@ -116,10 +116,10 @@ function getProjectMeta () {
   return document.head.querySelector('meta[name=project][content]').content
 }
 
-function titleExtractor(document) {
+function titleExtractor (document) {
   var title = document['title']
 
-  if(document['type'] != 'extras') {
+  if (document['type'] !== 'extras') {
     title = title + ' ' + title.replace(/\.|\//g, ' ')
   }
 
