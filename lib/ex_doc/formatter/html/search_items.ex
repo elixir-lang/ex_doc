@@ -11,7 +11,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
   @header_body_regex ~r/(?<header>.*)<\/h2>(?<body>.*)/s
   defp extra(%{id: id, title: title, content: content}) do
     [intro | sections] = Regex.split(@h2_split_regex, content)
-    intro_json_item = encode("#{id}.html", title, id, :extras, intro)
+    intro_json_item = encode("#{id}.html", title, :extras, intro)
 
     section_json_items =
       sections
@@ -27,14 +27,13 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     encode(
       "#{id}.html##{HTML.text_to_id(header)}",
       "#{title} - #{header}",
-      id,
       :extras,
       body
     )
   end
 
   defp module_node(node = %ExDoc.ModuleNode{id: id, type: type, rendered_doc: doc}) do
-    module = encode("#{id}.html", id, id, type, doc)
+    module = encode("#{id}.html", id, type, doc)
     functions = Enum.map(node.docs, &node_child(&1, id))
     types = Enum.map(node.typespecs, &node_child(&1, id))
     [module] ++ functions ++ types
@@ -44,20 +43,17 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     encode(
       "#{module}.html##{HTML.link_id(id, type)}",
       "#{module}.#{id}",
-      module,
       type,
       doc
     )
   end
 
-  defp encode(ref, title, module, type, doc) do
+  defp encode(ref, title, type, doc) do
     [
       "{\"ref\":",
       [?", ref, ?"],
       ",\"title\":",
       [?", title, ?"],
-      ",\"module\":",
-      [?", module, ?"],
       ",\"type\":",
       [?", Atom.to_string(type), ?"],
       ",\"doc\":",

@@ -116,14 +116,23 @@ function getProjectMeta () {
   return document.head.querySelector('meta[name=project][content]').content
 }
 
+function titleExtractor(document) {
+  var title = document['title']
+
+  if(document['type'] != 'extras') {
+    title = title + ' ' + title.replace(/\.|\//g, ' ')
+  }
+
+  return title
+}
+
 function createIndex () {
   return lunr(function () {
     this.ref('ref')
-    this.field('title')
-    this.field('module')
-    this.field('type')
+    this.field('title', {extractor: titleExtractor})
     this.field('doc')
     this.metadataWhitelist = ['position']
+    this.pipeline.remove(lunr.stopWordFilter)
 
     searchNodes.forEach(function (doc) {
       this.add(doc)

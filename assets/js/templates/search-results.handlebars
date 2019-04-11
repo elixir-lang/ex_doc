@@ -18,7 +18,7 @@
     <p>Invalid search: {{errorMessage}}.</p>
   {{/isArray}}
 
-  <p>Here are some search tips:</p>
+  <p>Here are some tips when performing a full-text search:</p>
 
   <dl>
     <li>Multiple words (such as <code>foo bar</code>) are searched as <code>OR</code></li>
@@ -28,4 +28,6 @@
     <li>Use <code>WORD^NUMBER</code> (such as <code>foo^2</code>) to boost the given word</li>
     <li>Use <code>WORD~NUMBER</code> (such as <code>foo~2</code>) to do a search with edit distance on word</li>
   </dl>
+
+  <p>To quickly go to a module, type, or function, use the autocompletion feature in the sidebar search.</p>
 {{/isNonEmptyArray}}
