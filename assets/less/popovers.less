@@ -1,7 +1,10 @@
 #popover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.10);
   display: none;
+  height: 160px;
+  padding: 0;
   position: absolute;
+  margin: 0;
   z-index: 99;
 
   &.popover-visible {
@@ -17,8 +20,10 @@
   }
 
   .popover-iframe {
-    border: 1px solid @mediumGray;
+    border: 1px solid fade(@mediumGray, 30%);
     height: 160px;
+    margin: 0;
+    padding: 0;
     width: 500px;
   }
 }

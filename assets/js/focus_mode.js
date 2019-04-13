@@ -9,7 +9,7 @@ import $ from 'jquery'
 const body = 'body'
 
 function escapeSlashes (selector) {
-  return selector.replace('/', '\\/').replace(':', '\\:')
+  return selector.replace('/', '\\/').replace(':', '\\:').replace('?', '\\?')
 }
 
 function focusFromHash () {

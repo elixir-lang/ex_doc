@@ -63,6 +63,7 @@ $(() => {
   hljs.registerLanguage('xml', xml)
 
   initNightMode()
+  initFocusMode()
   initSidebar()
   initVersions()
   initEvents()
