@@ -22,6 +22,7 @@ var SIDEBAR_TYPES = [
 ]
 var SIDEBAR_NAV = $('.sidebar-listNav')
 var CONTENT = $('.content')
+var CONTENT_INNER = $('.content-inner')
 var BODY = $('body')
 var SEARCH_FORM = $('form.sidebar-search')
 
@@ -219,7 +220,7 @@ function fixLinks () {
  * before these keybindings worked.
  */
 function fixSpacebar () {
-  CONTENT.attr('tabindex', -1).focus()
+  CONTENT_INNER.attr('tabindex', -1).focus()
 }
 
 // Public Methods

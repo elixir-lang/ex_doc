@@ -38,8 +38,6 @@ body {
 .content {
   width: 100%;
   padding-left: 300px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   height: 100%;
   position: relative;
   z-index: 3;
@@ -156,6 +154,10 @@ body.sidebar-closed .sidebar {
   max-width: 949px;
   margin: 0 auto;
   padding: 3px 60px;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .content-outer {
