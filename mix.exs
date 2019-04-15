@@ -1,7 +1,7 @@
 defmodule ExDoc.Mixfile do
   use Mix.Project
 
-  @version "0.20.1"
+  @version "0.20.2"
 
   def project do
     [

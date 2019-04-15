@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.20.2
+
+  * Enhancements
+    * Add "mix " prefix to Mix tasks
+
+  * Bug fixes
+    * Improve scrolling on Safari
+    * Prevent text casing of codes
+    * Do not remove stop words from search and make sure function names are searchable in isolation
+    * Reduce the size of the search metadata
+    * Remove outline on focus and keep width in version dropdown
+    * Do not fail if we can't persist index
+
 ## v0.20.1
 
   * Bug fixes
