@@ -229,9 +229,19 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def link_headings(nil, _, _), do: nil
 
   def link_headings(content, regex, prefix) do
-    Regex.replace(regex, content, fn match, tag, title ->
-      link_heading(match, tag, title, HTML.text_to_id(title), prefix)
+    regex
+    |> Regex.scan(content)
+    |> Enum.reduce({content, %{}}, fn [match, tag, title], {content, occurrences} ->
+      possible_id = HTML.text_to_id(title)
+      id_occurred = Map.get(occurrences, possible_id, 0)
+
+      anchor_id = if id_occurred >= 1, do: "#{possible_id}-#{id_occurred}", else: possible_id
+      replacement = link_heading(match, tag, title, anchor_id, prefix)
+      linked_content = String.replace(content, match, replacement, global: false)
+      incremented_occs = Map.put(occurrences, possible_id, id_occurred + 1)
+      {linked_content, incremented_occs}
     end)
+    |> elem(0)
   end
 
   defp link_heading(match, _tag, _title, "", _prefix), do: match
