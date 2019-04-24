@@ -128,7 +128,7 @@ docs: [markdown_processor: ExDoc.Markdown.Cmark]
 
 ## Contributing
 
-The easiest way to test changes to ExDoc is to locally re-generate it's own docs:
+The easiest way to test changes to ExDoc is to locally re-generate its own docs:
 
   1. Run `mix setup` to install all dependencies
   2. Run `mix build` to generate docs. This is a custom alias that will build assets, recompile ExDoc, and output fresh docs into the `doc/` directory
