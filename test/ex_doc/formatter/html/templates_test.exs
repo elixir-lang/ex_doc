@@ -109,6 +109,20 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              </h3>
              """
     end
+
+    test "generates headers with unique id's" do
+      assert Templates.link_headings("<h3>Foo</h3>\n<h3>Foo</h3>") == """
+             <h3 id="foo" class="section-heading">
+               <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               Foo
+             </h3>
+
+             <h3 id="foo-1" class="section-heading">
+               <a href="#foo-1" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               Foo
+             </h3>
+             """
+    end
   end
 
   describe "synopsis" do
