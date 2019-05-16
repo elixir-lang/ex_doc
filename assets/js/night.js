@@ -23,7 +23,7 @@ function deactivateNightMode () {
 function checkForNightMode () {
   try {
     const userWantsNightMode = localStorage.getItem(nightMode)
-    
+
     if (userWantsNightMode != null) {
       if (userWantsNightMode === true) {
         activateNightMode()
