@@ -17,12 +17,14 @@ function activateNightMode () {
 
 function deactivateNightMode () {
   body.removeClass(nightMode)
-  try { localStorage.removeItem(nightMode) } catch (e) { }
+  try { localStorage.setItem(nightMode, false) } catch (e) { }
 }
 
 function checkForNightMode () {
   try {
-    if (localStorage.getItem(nightMode)) {
+    if (localStorage.getItem(nightMode) === true) {
+      activateNightMode()
+    } else if (matchMedia('(prefers-color-scheme: dark)').matches) {
       activateNightMode()
     }
   } catch (e) { }
