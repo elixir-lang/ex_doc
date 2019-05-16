@@ -22,8 +22,12 @@ function deactivateNightMode () {
 
 function checkForNightMode () {
   try {
-    if (localStorage.getItem(nightMode) === true) {
-      activateNightMode()
+    const userWantsNightMode = localStorage.getItem(nightMode)
+    
+    if (userWantsNightMode != null) {
+      if (userWantsNightMode === true) {
+        activateNightMode()
+      }
     } else if (matchMedia('(prefers-color-scheme: dark)').matches) {
       activateNightMode()
     }
