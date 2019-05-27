@@ -121,7 +121,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   def project_doc(nil, _id, _compiled), do: nil
 
   def project_doc(string, id, compiled) when is_binary(string) and is_map(compiled) do
-    config =
+    options =
       compiled
       |> Map.put(:id, id)
       |> Map.put_new(:module_id, nil)
@@ -131,7 +131,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     string =
       Enum.reduce(@regexes, string, fn {kind, language, link_type}, acc ->
-        link(acc, language, kind, link_type, config)
+        link(acc, language, kind, link_type, options)
       end)
 
     postprocess(string)

@@ -18,8 +18,8 @@ defmodule ExDoc.Formatter.HTML do
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
-    {project_nodes, autolink} = autolink_and_render(project_nodes, ".html", config)
-    extras = build_extras(config, autolink)
+    {project_nodes, compiled} = autolink_and_render(project_nodes, ".html", config)
+    extras = build_extras(config, compiled)
 
     # Generate search early on without api reference in extras
     static_files = generate_assets(config, @assets_dir, default_assets(config))
@@ -67,8 +67,8 @@ defmodule ExDoc.Formatter.HTML do
   Autolinks and renders all docs.
   """
   def autolink_and_render(project_nodes, ext, config) do
-    autolink = Autolink.compile(project_nodes, ext, config)
-    {project_nodes |> Autolink.all(autolink) |> render_docs(), autolink}
+    compiled = Autolink.compile(project_nodes, ext, config)
+    {project_nodes |> Autolink.all(compiled) |> render_docs(), compiled}
   end
 
   defp render_docs(nodes) do
@@ -218,32 +218,32 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Builds extra nodes by normalizing the config entries.
   """
-  def build_extras(config, autolink) do
+  def build_extras(config, compiled) do
     groups = config.groups_for_extras
 
     config.extras
-    |> Task.async_stream(&build_extra(&1, autolink, groups), timeout: :infinity)
+    |> Task.async_stream(&build_extra(&1, compiled, groups), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
 
-  defp build_extra({input, options}, autolink, groups) do
+  defp build_extra({input, options}, compiled, groups) do
     input = to_string(input)
     id = options[:filename] || input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, options[:title], autolink, groups)
+    build_extra(input, id, options[:title], compiled, groups)
   end
 
-  defp build_extra(input, autolink, groups) do
+  defp build_extra(input, compiled, groups) do
     id = input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, nil, autolink, groups)
+    build_extra(input, id, nil, compiled, groups)
   end
 
-  defp build_extra(input, id, title, autolink, groups) do
+  defp build_extra(input, id, title, compiled, groups) do
     if valid_extension_name?(input) do
       content =
         input
         |> File.read!()
-        |> Autolink.project_doc(id, autolink)
+        |> Autolink.project_doc(id, compiled)
 
       group = GroupMatcher.match_extra(groups, input)
       html_content = Markdown.to_html(content, file: input, line: 1)
