@@ -95,6 +95,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     %{
       aliases: aliases,
+      config: config,
       docs_refs: docs_refs ++ types_refs,
       extension: extension,
       lib_dirs: lib_dirs,
@@ -121,7 +122,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   def project_doc(nil, _id, _compiled), do: nil
 
   def project_doc(string, id, compiled) when is_binary(string) and is_map(compiled) do
-    config =
+    options =
       compiled
       |> Map.put(:id, id)
       |> Map.put_new(:module_id, nil)
@@ -131,7 +132,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     string =
       Enum.reduce(@regexes, string, fn {kind, language, link_type}, acc ->
-        link(acc, language, kind, link_type, config)
+        link(acc, language, kind, link_type, options)
       end)
 
     postprocess(string)
@@ -340,12 +341,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   #
   # It accepts a list of `options` used in the replacement functions.
   # - `:aliases
-  # - `:docs_refs`
+  # - `:config`
+  # - `:docs_refs` - Docs and types references
   # - `:extension` - Default value is `".html"`
   # - `:lib_dirs`
   # - `:locals` - A list of local functions
   # - `:module_id` - Module of the current doc. Default value is `nil`
   # - `:modules_refs` - List of modules available
+  # - `:skip_undefined_reference_warnings_on`
   #
   # Internal options:
   # - `:preprocess?` - `true` or `false`. Do preprocessing and postprocessing, such as replacing backticks
@@ -380,7 +383,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       pmfa = {_prefix, module, function, arity} = split_match(kind, match)
       text = default_text(":", link_type, pmfa, text)
 
-      if doc = module_docs(:erlang, module, lib_dirs) do
+      module_or_mfa =
+        case kind do
+          :module ->
+            module
+
+          :function ->
+            {module, function, arity}
+        end
+
+      if doc = module_docs(:erlang, module_or_mfa, lib_dirs) do
         case kind do
           :module ->
             "[#{text}](#{doc}#{module}.html)"
@@ -467,7 +479,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
           all
 
-        doc = module_docs(:elixir, module, lib_dirs) ->
+        doc = module_docs(:elixir, {module, function, arity}, lib_dirs) ->
           "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h(function)}/#{arity})"
 
         true ->
@@ -539,8 +551,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp default_lib_dirs(:erlang),
     do: erlang_lib_dirs()
 
+  defp module_docs(:elixir, {module, function, arity}, lib_dirs),
+    do: lib_dirs_to_doc({"Elixir." <> module, function, arity}, lib_dirs)
+
   defp module_docs(:elixir, module, lib_dirs),
     do: lib_dirs_to_doc("Elixir." <> module, lib_dirs)
+
+  defp module_docs(:erlang, {module, function, arity}, lib_dirs),
+    do: lib_dirs_to_doc({module, function, arity}, lib_dirs)
 
   defp module_docs(:erlang, module, lib_dirs),
     do: lib_dirs_to_doc(module, lib_dirs)
@@ -588,7 +606,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp doc_prefix(%{type: c}) when c in [:callback, :macrocallback], do: "c:"
   defp doc_prefix(%{type: _}), do: ""
 
-  defp lib_dirs_to_doc(module, lib_dirs) do
+  defp lib_dirs_to_doc(module, lib_dirs) when is_atom(module) do
+    lib_dirs_to_doc({"#{module}", "", ""}, lib_dirs)
+  end
+
+  defp lib_dirs_to_doc(module, lib_dirs) when is_binary(module) do
+    lib_dirs_to_doc({module, "", ""}, lib_dirs)
+  end
+
+  defp lib_dirs_to_doc({module, function, arity}, lib_dirs)
+       when is_binary(module) and is_binary(function) and is_binary(arity) do
     case :code.where_is_file('#{module}.beam') do
       :non_existing ->
         nil
@@ -600,7 +627,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         |> Enum.filter(fn {lib_dir, _} -> String.starts_with?(path, lib_dir) end)
         |> Enum.sort_by(fn {lib_dir, _} -> -byte_size(lib_dir) end)
         |> case do
-          [{_, doc} | _] -> doc
+          [{_doc_path, doc} | _] -> doc
           _ -> nil
         end
     end

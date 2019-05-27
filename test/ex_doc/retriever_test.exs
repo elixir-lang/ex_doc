@@ -51,6 +51,13 @@ defmodule ExDoc.RetrieverTest do
              """
     end
 
+    test "returns modules with @doc false" do
+      assert [CompiledWithDocs, CompiledWithDocs] ==
+               ["CompiledWithDocs", "ModuledocFalse", "CompiledWithDocs"]
+               |> docs_from_files()
+               |> Enum.map(& &1.module)
+    end
+
     test "returns module group" do
       [module_node] =
         docs_from_files(["CompiledWithDocs"], groups_for_modules: [Group: [CompiledWithDocs]])

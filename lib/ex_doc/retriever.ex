@@ -11,17 +11,25 @@ defmodule ExDoc.Retriever do
   alias ExDoc.Retriever.Error
 
   @doc """
-  Extract documentation from all modules in the specified directory or directories.
+  Extracts documentation from all modules in the specified directory or directories.
   """
   @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
   def docs_from_dir(dir, config) when is_binary(dir) do
-    pattern = if config.filter_prefix, do: "Elixir.#{config.filter_prefix}*.beam", else: "*.beam"
-    files = Path.wildcard(Path.expand(pattern, dir))
-    docs_from_files(files, config)
+    dir
+    |> __docs_from_dir__(config)
+    |> reject_docs_with_moduledoc_false()
   end
 
   def docs_from_dir(dirs, config) when is_list(dirs) do
-    Enum.flat_map(dirs, &docs_from_dir(&1, config))
+    dirs
+    |> Enum.flat_map(&__docs_from_dir__(&1, config))
+    |> reject_docs_with_moduledoc_false()
+  end
+
+  defp __docs_from_dir__(dir, config) do
+    dir
+    |> files_from_pattern(config)
+    |> docs_from_files(config)
   end
 
   @doc """
@@ -35,20 +43,44 @@ defmodule ExDoc.Retriever do
   end
 
   @doc """
-  Extract documentation from all modules in the list `modules`
+  Extracts documentation from all modules in the list `modules`
   """
-  @spec docs_from_modules([atom], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
+  @spec docs_from_modules([module], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
     |> Enum.flat_map(&get_module(&1, config))
+    |> reject_docs_with_moduledoc_false()
     |> Enum.sort_by(fn module ->
       {GroupMatcher.group_index(config.groups_for_modules, module.group), module.id}
     end)
   end
 
+  ## Helpers
+
+  defp reject_docs_with_moduledoc_false(docs) do
+    Enum.reject(docs, fn
+      {:module_doc_hidden, _} -> true
+      _ -> false
+    end)
+  end
+
+  defp files_from_pattern(dir, config) do
+    pattern =
+      if config.filter_prefix do
+        "Elixir.#{config.filter_prefix}*.beam"
+      else
+        "*.beam"
+      end
+
+    pattern
+    |> Path.expand(dir)
+    |> Path.wildcard()
+  end
+
   defp filename_to_module(name) do
-    name = Path.basename(name, ".beam")
-    String.to_atom(name)
+    name
+    |> Path.basename(".beam")
+    |> String.to_atom()
   end
 
   # Get all the information from the module and compile
@@ -60,10 +92,15 @@ defmodule ExDoc.Retriever do
       raise Error, "module #{inspect(module)} is not defined/available"
     end
 
-    if docs_chunk = docs_chunk(module) do
-      generate_node(module, docs_chunk, config)
-    else
-      []
+    case docs_chunk(module) do
+      false ->
+        []
+
+      :hidden ->
+        %{module_doc_hidden: module}
+
+      docs_chunk ->
+        generate_node(module, docs_chunk, config)
     end
   end
 
@@ -89,7 +126,7 @@ defmodule ExDoc.Retriever do
     if function_exported?(module, :__info__, 1) do
       case Code.fetch_docs(module) do
         {:docs_v1, _, _, _, :hidden, _, _} ->
-          false
+          :hidden
 
         {:docs_v1, _, _, _, _, _, _} = docs ->
           docs
