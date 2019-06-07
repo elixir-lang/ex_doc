@@ -1,6 +1,24 @@
 body.focus-mode {
+  &.sidebar-opened .content {
+    padding-left: 0;
+  }
+
+  button.sidebar-button {
+    display: none;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
   .content-inner {
+    display: block;
     padding: 0;
+
+    .view-source,
+    .detail-link {
+      display: none;
+    }
 
     .detail-header {
       border-width: 0;

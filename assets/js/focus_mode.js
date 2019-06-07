@@ -7,9 +7,19 @@ import $ from 'jquery'
 // ---------
 
 const body = 'body'
+const contentInner = '.content-inner'
+const message = {elementHTML: null, ready: false}
 
-function escapeSlashes (selector) {
-  return selector.replace('/', '\\/').replace(':', '\\:').replace('?', '\\?')
+function hashToElement (hash) {
+  if (!hash) { return null }
+  hash = hash.substr(1)
+
+  if (!hash) { return null }
+  hash = $.escapeSelector(hash)
+
+  if (hash === '') { return null }
+
+  return $(`#${hash}.detail`)
 }
 
 function focusFromHash () {
@@ -17,17 +27,29 @@ function focusFromHash () {
 
   if (!params.has('focused')) { return }
 
-  const hash = escapeSlashes(window.location.hash)
-  const infoElement = $(`${hash}.detail`)
+  const infoElement = hashToElement(window.location.hash)
 
-  // .detail-link
-  // .view-source
-  if (infoElement.length <= 0) { return }
+  if (!infoElement || infoElement.length <= 0) { return }
 
-  $(body).html(`<div class="content-inner">${infoElement.html()}</div>`)
-  $(body).addClass('focus-mode')
-  $('.detail-link').remove()
-  $('.view-source').remove()
+  $(document).ready(function () {
+    const summary = prepareSummary(infoElement)
+    postMessage(summary)
+  })
+}
+
+function postMessage (elementHTML) {
+  if (window.self !== window.parent) {
+    message.elementHTML = elementHTML
+    message.ready = true
+    window.parent.postMessage(message, '*')
+  }
+}
+
+function prepareSummary (element) {
+  element.find('.detail-link').remove()
+  element.find('.signature a').remove()
+  element.find('.docstring > *').not(':first').remove()
+  return element.html()
 }
 
 // Public Methods
