@@ -9,13 +9,17 @@ const popoverable = '.content a code' //, .signature .specs a
 const popoverSelector = '#popover'
 const popoverIframeSelector = '#popover .popover-iframe'
 const contentInner = 'body .content-inner'
-const popoverHeight = 150
 const popoverWidth = 500
+let popoverHeight = null
+let popoverElement = null
+let linkElement = null
 let showTimeoutVisibility = null
 let showTimeoutAnimation = null
 let hideTimeoutVisibility = null
 
-function updatePopoverPosition (linkElement) {
+function updatePopoverPosition () {
+  if (!linkElement) { return }
+
   const popoverElement = $(popoverSelector)
 
   let popoverableBoundingRect = linkElement[0].getBoundingClientRect()
@@ -23,6 +27,10 @@ function updatePopoverPosition (linkElement) {
 
   console.log("rect1", popoverableBoundingRect)
   console.log("rect inner", contentInnerBoundingRect)
+
+  popoverHeight = popoverElement[0].getBoundingClientRect().height
+
+  console.log("popoverHeight", popoverHeight)
 
   const rect = {
     top: popoverableBoundingRect.top - contentInnerBoundingRect.top,
@@ -44,12 +52,14 @@ function updatePopoverPosition (linkElement) {
     bottom: window.innerHeight - (rect.y - window.scrollY) + rect.height
   }
 
+
+
   console.log("space", space)
 
   if (space.bottom > popoverHeight + 50) {
     popoverElement.css('top', rect.bottom + 10)
   } else {
-    popoverElement.css('top', rect.top - 30 - popoverHeight)
+    popoverElement.css('top', rect.top - popoverHeight - 10)
   }
 
   if (space.left + popoverWidth < window.innerWidth) {
@@ -61,28 +71,27 @@ function updatePopoverPosition (linkElement) {
   }
 }
 
-function loadPopover (linkElement) {
+function loadPopover () {
+  if (!linkElement) { return }
+
   const href = linkElement.attr('href')
 
   if (!href) { return }
 
   const focusedHref = href.replace('.html', '.html?focused=true&_t=' + Date.now())
   $(popoverIframeSelector).attr('src', focusedHref)
-
-  updatePopoverPosition(linkElement)
 }
 
 function showPopover (html) {
-  const popoverElement = $(popoverSelector)
-  popoverElement.addClass('popover-visible')
   popoverElement.find('.popover-body').html(html)
+  popoverElement.addClass('popover-visible')
+  updatePopoverPosition()
   showTimeoutAnimation = setTimeout(() => {
     popoverElement.addClass('popover-shown')
   }, 10)
 }
 
 function hidePopover () {
-  const popoverElement = $(popoverSelector)
   popoverElement.removeClass('popover-shown')
   hideTimeoutVisibility = setTimeout(() => {
     popoverElement.removeClass('popover-visible')
@@ -92,7 +101,6 @@ function hidePopover () {
 function receivePopupMessage (event) {
   console.log('receivePopupMessage', event)
   if (event.data.ready && event.data.ready === true) {
-    hideTimeoutVisibility && clearTimeout(hideTimeoutVisibility)
     showPopover(event.data.elementHTML)
   }
 }
@@ -106,16 +114,24 @@ export function initialize () {
   $(contentInner).append('<div id="popover"><div class="popover-body"></div><iframe class="popover-iframe"></iframe></div>')
 
   $(popoverable).hover(function () {
+    popoverElement = $(popoverSelector)
+
     if (window.innerWidth < 768 || window.innerHeight < 400) {
       return
     }
 
-    const linkElement = $(this).parent()
-    loadPopover(linkElement)
+    if (hideTimeoutVisibility) {
+      clearTimeout(hideTimeoutVisibility)
+      popoverElement.removeClass('popover-visible')
+    }
+
+    linkElement = $(this).parent()
+    loadPopover()
   }, function () {
     showTimeoutVisibility && clearTimeout(showTimeoutVisibility)
     showTimeoutAnimation && clearTimeout(showTimeoutAnimation)
 
-    hidePopover()
+    //linkElement = null
+    //hidePopover()
   })
 }
