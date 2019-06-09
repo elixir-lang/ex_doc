@@ -12,17 +12,18 @@ const contentInner = 'body .content-inner'
 const popoverWidth = 500
 let popoverHeight = null
 let popoverElement = null
-let linkElement = null
+let currentLinkElement = null
+let currentRequestId = null
 let showTimeoutVisibility = null
 let showTimeoutAnimation = null
 let hideTimeoutVisibility = null
 
 function updatePopoverPosition () {
-  if (!linkElement) { return }
+  if (!currentLinkElement) { return }
 
   const popoverElement = $(popoverSelector)
 
-  let popoverableBoundingRect = linkElement[0].getBoundingClientRect()
+  let popoverableBoundingRect = currentLinkElement[0].getBoundingClientRect()
   let contentInnerBoundingRect = $(contentInner)[0].getBoundingClientRect()
 
   console.log("rect1", popoverableBoundingRect)
@@ -72,13 +73,18 @@ function updatePopoverPosition () {
 }
 
 function loadPopover () {
-  if (!linkElement) { return }
+  console.log('load popover')
+  if (!currentLinkElement) { return }
 
-  const href = linkElement.attr('href')
+  const href = currentLinkElement.attr('href')
 
   if (!href) { return }
 
-  const focusedHref = href.replace('.html', '.html?focused=true&_t=' + Date.now())
+  // TODO: replace hash with full url
+
+  const focusedHref = href.replace('.html', '.html?focused=true&requestId=' + currentRequestId)
+  // TODO: Better reload
+  $(popoverIframeSelector).attr('src', '')
   $(popoverIframeSelector).attr('src', focusedHref)
 }
 
@@ -100,9 +106,15 @@ function hidePopover () {
 
 function receivePopupMessage (event) {
   console.log('receivePopupMessage', event)
-  if (event.data.ready && event.data.ready === true) {
-    showPopover(event.data.elementHTML)
-  }
+  if (event.data.requestId !== currentRequestId) { return }
+
+  if (event.data.ready !== true) { return }
+
+  showPopover(event.data.elementHTML)
+}
+
+function uid () {
+  return Math.random().toString(36).substr(2, 9)
 }
 
 // Public Methods
@@ -125,13 +137,15 @@ export function initialize () {
       popoverElement.removeClass('popover-visible')
     }
 
-    linkElement = $(this).parent()
+    currentLinkElement = $(this).parent()
+    currentRequestId = uid()
+
     loadPopover()
   }, function () {
     showTimeoutVisibility && clearTimeout(showTimeoutVisibility)
     showTimeoutAnimation && clearTimeout(showTimeoutAnimation)
 
-    //linkElement = null
-    //hidePopover()
+    currentLinkElement = null
+    hidePopover()
   })
 }
