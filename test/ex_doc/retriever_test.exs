@@ -166,7 +166,7 @@ defmodule ExDoc.RetrieverTest do
 
     test "returns the spec info for each non-private module type" do
       [module_node] = docs_from_files(["TypesAndSpecs"])
-      [opaque, public, ref] = module_node.typespecs
+      [opaque, public, ref, t] = module_node.typespecs
 
       assert opaque.name == :opaque
       assert opaque.arity == 0
@@ -184,6 +184,9 @@ defmodule ExDoc.RetrieverTest do
 
       assert Macro.to_string(public.spec) ==
                "public(t) :: {t, String.t(), TypesAndSpecs.Sub.t(), opaque(), :ok | :error}"
+
+      assert Macro.to_string(t.spec) ==
+      "t() :: %TypesAndSpecs{a01: String.t(), a02: String.t(), a03: String.t(), a04: String.t(), a05: String.t(), a06: String.t(), a07: String.t(), a08: String.t(), a09: String.t(), a10: String.t(), a11: String.t(), a12: String.t(), a13: String.t(), a14: String.t(), a15: String.t(), a16: String.t(), a17: String.t(), a18: String.t(), a19: String.t(), a20: String.t(), a21: String.t(), a22: String.t(), a23: String.t(), a24: String.t(), a25: String.t(), a26: String.t(), a27: String.t(), a28: String.t(), a29: String.t(), a30: String.t(), a31: String.t(), a32: String.t(), a33: String.t()}"
 
       assert ref.name == :ref
       assert ref.arity == 0
