@@ -1,0 +1,16 @@
+<div class="detail-header">
+    {{#if this.isTypeFunction}}
+      <h1 class="signature">
+        {{this.summary.signatureTitle}}
+        <div class="specs">{{this.summary.signatureSpecs}}</div>
+      </h1>
+    {{/if}}
+    {{#if this.isTypePage}}
+      <h2>{{this.summary.title}}</h2>
+    {{/if}}
+</div>
+<section class="docstring">
+  <p>
+    {{this.summary.description}}
+  </p>
+</section>

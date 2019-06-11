@@ -1,5 +1,5 @@
 #popover {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 0 10px fade(@black, 90%);
   display: none;
   max-height: 300px;
   padding: 0;
@@ -11,7 +11,7 @@
   &.popover-visible {
     display: block;
     transform: translateY(20px);
-    transition: 0.2s transform ease-out, 0.2s opacity ease-out;
+    transition: 0.15s transform ease-out, 0.1s opacity ease-out;
     opacity: 0;
   }
 
@@ -28,6 +28,10 @@
     .detail-header {
       margin-top: 0;
       border-left: 0;
+
+      h2 {
+        margin: 0 0 0.2rem 0;
+      }
     }
 
     .docstring {

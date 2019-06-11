@@ -2,6 +2,7 @@
 // ------------
 
 import $ from 'jquery'
+import popoverTemplate from './templates/popover.handlebars'
 
 // Constants
 // ---------
@@ -17,6 +18,8 @@ let currentRequestId = null
 let showTimeoutVisibility = null
 let showTimeoutAnimation = null
 let hideTimeoutVisibility = null
+let hoverDelayTimeout = null
+const hoverDelayTime = 150
 
 function updatePopoverPosition () {
   if (!currentLinkElement) { return }
@@ -53,8 +56,6 @@ function updatePopoverPosition () {
     bottom: window.innerHeight - (rect.y - window.scrollY) + rect.height
   }
 
-
-
   console.log("space", space)
 
   if (space.bottom > popoverHeight + 50) {
@@ -73,24 +74,35 @@ function updatePopoverPosition () {
 }
 
 function loadPopover () {
-  console.log('load popover')
+  updatePopoverPosition()
+
   if (!currentLinkElement) { return }
 
-  const href = currentLinkElement.attr('href')
+  let href = currentLinkElement.attr('href')
 
   if (!href) { return }
 
-  // TODO: replace hash with full url
+  if (href.charAt(0) === '#') {
+    href = `${window.location.pathname}${href}`
+  }
 
   const focusedHref = href.replace('.html', '.html?focused=true&requestId=' + currentRequestId)
   // TODO: Better reload
-  $(popoverIframeSelector).attr('src', '')
+  //$(popoverIframeSelector).attr('src', '')
   $(popoverIframeSelector).attr('src', focusedHref)
 }
 
-function showPopover (html) {
+function showPopover (summary) {
+  const html = popoverTemplate({
+    isTypePage: summary.type === 'page',
+    isTypeFunction: summary.type === 'function',
+    summary: summary
+  })
+
   popoverElement.find('.popover-body').html(html)
+
   popoverElement.addClass('popover-visible')
+
   updatePopoverPosition()
   showTimeoutAnimation = setTimeout(() => {
     popoverElement.addClass('popover-shown')
@@ -110,7 +122,7 @@ function receivePopupMessage (event) {
 
   if (event.data.ready !== true) { return }
 
-  showPopover(event.data.elementHTML)
+  showPopover(event.data.summary)
 }
 
 function uid () {
@@ -124,26 +136,28 @@ export function initialize () {
   window.addEventListener('message', receivePopupMessage, false)
 
   $(contentInner).append('<div id="popover"><div class="popover-body"></div><iframe class="popover-iframe"></iframe></div>')
+  popoverElement = $(popoverSelector)
 
   $(popoverable).hover(function () {
-    popoverElement = $(popoverSelector)
-
     if (window.innerWidth < 768 || window.innerHeight < 400) {
       return
-    }
-
-    if (hideTimeoutVisibility) {
-      clearTimeout(hideTimeoutVisibility)
-      popoverElement.removeClass('popover-visible')
     }
 
     currentLinkElement = $(this).parent()
     currentRequestId = uid()
 
-    loadPopover()
+    hoverDelayTimeout = setTimeout(function () {
+      hideTimeoutVisibility && clearTimeout(hideTimeoutVisibility)
+
+      popoverElement.removeClass('popover-visible')
+      popoverElement.removeClass('popover-shown')
+
+      loadPopover()
+    }, hoverDelayTime)
   }, function () {
     showTimeoutVisibility && clearTimeout(showTimeoutVisibility)
     showTimeoutAnimation && clearTimeout(showTimeoutAnimation)
+    hoverDelayTimeout && clearTimeout(hoverDelayTimeout)
 
     currentLinkElement = null
     hidePopover()

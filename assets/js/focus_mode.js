@@ -8,7 +8,7 @@ import $ from 'jquery'
 
 const body = 'body'
 const contentInner = '.content-inner'
-const message = {elementHTML: null, ready: false, requestId: null}
+const message = {summary: '', ready: false, requestId: null}
 
 function hashToElement (hash) {
   if (!hash) { return null }
@@ -44,9 +44,9 @@ function focusFromHash () {
   })
 }
 
-function postMessage (elementHTML, requestId) {
+function postMessage (summary, requestId) {
   if (window.self !== window.parent) {
-    message.elementHTML = elementHTML
+    message.summary = summary
     message.ready = true
     message.requestId = requestId
     window.parent.postMessage(message, '*')
@@ -54,17 +54,28 @@ function postMessage (elementHTML, requestId) {
 }
 
 function prepareFunctionSummary (element) {
-  element.find('.detail-link').remove()
-  element.find('.signature a').remove()
-  element.find('.docstring > *').not(':first').remove()
-  return element.html()
+  const signatureSpecs = element.find('h1 .specs').text()
+  element.find('h1 > *').remove()
+  const signatureTitle = element.find('h1').text()
+  const description = element.find('.docstring > p:first').text()
+
+  return {
+    type: 'function',
+    signatureTitle: signatureTitle,
+    signatureSpecs: signatureSpecs,
+    description: description
+  }
 }
 
 function preparePageSummary () {
   let content = $(contentInner)
-  let title = content.find('h1:first').text()
-  let desc = content.find('#moduledoc p:first').text()
-  return title + desc
+  content.find('h1:first > *').remove()
+
+  return {
+    type: 'page',
+    title: content.find('h1:first').text(),
+    description: content.find('#moduledoc p:first').text()
+  }
 }
 
 // Public Methods
