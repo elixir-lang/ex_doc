@@ -8,7 +8,7 @@ defmodule ExDoc.CLITest do
   end
 
   test "minimum command-line options" do
-    assert {"ExDoc", "1.2.3", [extras: [], source_beam: "/"]} == run(["ExDoc", "1.2.3", "/"])
+    assert {"ExDoc", "1.2.3", [source_beam: "/"]} == run(["ExDoc", "1.2.3", "/"])
   end
 
   test "loading config" do
@@ -73,17 +73,11 @@ defmodule ExDoc.CLITest do
       --config not_aliased.config
       --output html
       --formatter html
-      --filter-prefix prefix_
       --source-root ./
       --source-url http://example.com/username/project
       --source-ref abcdefg
       --main Main
       --homepage-url http://example.com
-      --extra README.md
-      --extra Foo
-      --extra Bar
-      --extra-section Extra
-      --assets foo.css
       --logo logo.png
       --canonical http://example.com/project
     )
@@ -93,11 +87,7 @@ defmodule ExDoc.CLITest do
     assert version == "1.2.3"
 
     assert Enum.sort(opts) == [
-             assets: "foo.css",
              canonical: "http://example.com/project",
-             extra_section: "Extra",
-             extras: ["README.md", "Foo", "Bar"],
-             filter_prefix: "prefix_",
              formatter: "html",
              homepage_url: "http://example.com",
              key: "val",
