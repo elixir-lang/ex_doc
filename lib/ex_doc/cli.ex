@@ -8,12 +8,8 @@ defmodule ExDoc.CLI do
     {opts, args, _invalid} =
       OptionParser.parse(args,
         aliases: [
-          a: :assets,
           n: :canonical,
           c: :config,
-          e: :extra,
-          s: :extra_section,
-          i: :filter_prefix,
           f: :formatter,
           p: :homepage_url,
           l: :logo,
@@ -24,7 +20,6 @@ defmodule ExDoc.CLI do
           v: :version
         ],
         switches: [
-          extra: :keep,
           language: :string,
           source_ref: :string,
           version: :boolean
@@ -50,7 +45,6 @@ defmodule ExDoc.CLI do
     opts =
       opts
       |> Keyword.put(:source_beam, source_beam)
-      |> extra_files_options()
       |> merge_config()
 
     generator.(project, version, opts)
@@ -66,14 +60,6 @@ defmodule ExDoc.CLI do
       _ ->
         opts
     end
-  end
-
-  defp extra_files_options(opts) do
-    extras = Keyword.get_values(opts, :extra)
-
-    opts
-    |> Keyword.delete(:extra)
-    |> Keyword.put(:extras, extras)
   end
 
   defp read_config(path) do
@@ -108,22 +94,14 @@ defmodule ExDoc.CLI do
 
     Examples:
       ex_doc "Ecto" "0.8.0" "_build/dev/lib/ecto/ebin" -u "https://github.com/elixir-lang/ecto"
-      ex_doc "Project" "1.0.0" "_build/dev/lib/project/ebin" -e "docs/extra_page.md"
+      ex_doc "Project" "1.0.0" "_build/dev/lib/project/ebin" -c "docs.exs"
 
     Options:
       PROJECT             Project name
       VERSION             Version number
       BEAMS               Path to compiled beam files
-      -a, --assets        Path to a directory that will be copied as is to the "assets"
-                          directory in the output path
       -n, --canonical     Indicate the preferred URL with rel="canonical" link element
       -c, --config        Give configuration through a file instead of command line
-      -e, --extra         Allow users to include additional Markdown files
-                          May be given multiple times
-      -s, --extra-section Allow user to define the title for the additional Markdown files,
-                          default: "PAGES"
-      -i, --filter-prefix Include only modules that match the given prefix in
-                          the generated documentation.
       -f, --formatter     Docs formatter to use (html or epub), default: "html"
       -p, --homepage-url  URL to link to for the site name
           --language      Identify the primary language of the documents, its value must be
@@ -136,6 +114,23 @@ defmodule ExDoc.CLI do
       -u, --source-url    URL to the source code
       -o, --output        Path to output docs, default: "doc"
       -v, --version       Print ExDoc version
+
+    ## Custom config
+
+    A custom config can be given with the `--config` option. The file must
+    be an Elixir script that returns a keyyword list with the same options
+    declare in `Mix.Tasks.Docs`.
+
+        [
+          extras: Path.wildcard("lib/elixir/pages/*.md"),
+          groups_for_functions: [
+            Guards: & &1[:guard] == true
+          ],
+          skip_undefined_reference_warnings_on: ["compatibility-and-deprecations"],
+          groups_for_modules: [
+            ...
+          ]
+        ]
 
     ## Source linking
 

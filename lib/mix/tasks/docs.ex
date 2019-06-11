@@ -17,6 +17,9 @@ defmodule Mix.Tasks.Docs do
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
 
+    * `--language` - Specifies the language to annotate the
+      EPUB output in valid [BCP 47](https://tools.ietf.org/html/bcp47)
+
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
 
