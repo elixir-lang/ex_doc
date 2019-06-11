@@ -63,7 +63,7 @@ function prepareFunctionSummary (element) {
     type: 'function',
     signatureTitle: signatureTitle,
     signatureSpecs: signatureSpecs,
-    description: description
+    description: description.trim()
   }
 }
 
@@ -74,7 +74,7 @@ function preparePageSummary () {
   return {
     type: 'page',
     title: content.find('h1:first').text(),
-    description: content.find('#moduledoc p:first').text()
+    description: content.find('#moduledoc p:first').text().trim()
   }
 }
 

@@ -9,8 +9,8 @@
       <h2>{{this.summary.title}}</h2>
     {{/if}}
 </div>
-<section class="docstring">
-  <p>
+{{#if this.summary.description}}
+  <section class="docstring">
     {{this.summary.description}}
-  </p>
-</section>
+  </section>
+{{/if}}

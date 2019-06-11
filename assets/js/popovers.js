@@ -6,11 +6,15 @@ import popoverTemplate from './templates/popover.handlebars'
 
 // Constants
 // ---------
-const popoverable = '.content a code' //, .signature .specs a
+const popoverable = '.content a code, .signature .specs a'
 const popoverSelector = '#popover'
 const popoverIframeSelector = '#popover .popover-iframe'
 const contentInner = 'body .content-inner'
 const popoverWidth = 500
+const minBottomSpacing = 50
+const spacingAroundLink = 10
+const hoverDelayTime = 150
+const disabledDestinations = ['typespecs.html']
 let popoverHeight = null
 let popoverElement = null
 let currentLinkElement = null
@@ -19,7 +23,6 @@ let showTimeoutVisibility = null
 let showTimeoutAnimation = null
 let hideTimeoutVisibility = null
 let hoverDelayTimeout = null
-const hoverDelayTime = 150
 
 function updatePopoverPosition () {
   if (!currentLinkElement) { return }
@@ -29,14 +32,9 @@ function updatePopoverPosition () {
   let popoverableBoundingRect = currentLinkElement[0].getBoundingClientRect()
   let contentInnerBoundingRect = $(contentInner)[0].getBoundingClientRect()
 
-  console.log("rect1", popoverableBoundingRect)
-  console.log("rect inner", contentInnerBoundingRect)
-
   popoverHeight = popoverElement[0].getBoundingClientRect().height
 
-  console.log("popoverHeight", popoverHeight)
-
-  const rect = {
+  const absoluteBoundingRect = {
     top: popoverableBoundingRect.top - contentInnerBoundingRect.top,
     bottom: popoverableBoundingRect.bottom - contentInnerBoundingRect.top,
     left: popoverableBoundingRect.left - contentInnerBoundingRect.left,
@@ -47,28 +45,24 @@ function updatePopoverPosition () {
     height: popoverableBoundingRect.height
   }
 
-  console.log("rect2", rect)
-
   let space = {
     left: popoverableBoundingRect.x,
-    right: window.innerWidth - popoverableBoundingRect.x + rect.width,
-    top: rect.y - window.scrollY,
-    bottom: window.innerHeight - (rect.y - window.scrollY) + rect.height
+    right: contentInnerBoundingRect.width - popoverableBoundingRect.x + popoverableBoundingRect.width,
+    top: absoluteBoundingRect.y - window.scrollY,
+    bottom: window.innerHeight - (absoluteBoundingRect.y - window.scrollY) + absoluteBoundingRect.height
   }
 
-  console.log("space", space)
-
-  if (space.bottom > popoverHeight + 50) {
-    popoverElement.css('top', rect.bottom + 10)
+  if (space.bottom > popoverHeight + minBottomSpacing) {
+    popoverElement.css('top', absoluteBoundingRect.bottom + spacingAroundLink)
   } else {
-    popoverElement.css('top', rect.top - popoverHeight - 10)
+    popoverElement.css('top', absoluteBoundingRect.top - popoverHeight - spacingAroundLink)
   }
 
   if (space.left + popoverWidth < window.innerWidth) {
-    popoverElement.css('left', rect.left)
+    popoverElement.css('left', absoluteBoundingRect.left)
     popoverElement.css('right', 'auto')
   } else {
-    popoverElement.css('left', rect.right - popoverWidth)
+    popoverElement.css('left', absoluteBoundingRect.right - popoverWidth)
     popoverElement.css('right', 'auto')
   }
 }
@@ -82,13 +76,13 @@ function loadPopover () {
 
   if (!href) { return }
 
+  if (linkDisabled(href)) { return }
+
   if (href.charAt(0) === '#') {
     href = `${window.location.pathname}${href}`
   }
 
-  const focusedHref = href.replace('.html', '.html?focused=true&requestId=' + currentRequestId)
-  // TODO: Better reload
-  //$(popoverIframeSelector).attr('src', '')
+  const focusedHref = rewriteHref(href)
   $(popoverIframeSelector).attr('src', focusedHref)
 }
 
@@ -125,6 +119,22 @@ function receivePopupMessage (event) {
   showPopover(event.data.summary)
 }
 
+function rewriteHref (href) {
+  return href.replace('.html', `.html?focused=true&requestId=${currentRequestId}`)
+}
+
+function linkDisabled (href) {
+  return disabledDestinations.reduce(function (isDisabled, linkFragment) {
+    const currentDisabled = (href.indexOf(linkFragment) === 0 || href.indexOf(`/${linkFragment}`) >= 0)
+
+    if (currentDisabled) {
+      return true
+    } else {
+      return isDisabled
+    }
+  }, false)
+}
+
 function uid () {
   return Math.random().toString(36).substr(2, 9)
 }
@@ -143,7 +153,14 @@ export function initialize () {
       return
     }
 
-    currentLinkElement = $(this).parent()
+    currentLinkElement = $(this)
+    console.log("tagname", currentLinkElement.prop('tagName'))
+    if (currentLinkElement.prop('tagName') !== 'A') {
+      currentLinkElement = $(this).parent()
+    } else {
+      console.log("loading type")
+    }
+
     currentRequestId = uid()
 
     hoverDelayTimeout = setTimeout(function () {
@@ -160,6 +177,6 @@ export function initialize () {
     hoverDelayTimeout && clearTimeout(hoverDelayTimeout)
 
     currentLinkElement = null
-    hidePopover()
+    //hidePopover()
   })
 }
