@@ -118,7 +118,7 @@ defmodule ExDoc.CLI do
     ## Custom config
 
     A custom config can be given with the `--config` option. The file must
-    be an Elixir script that returns a keyyword list with the same options
+    be an Elixir script that returns a keyword list with the same options
     declare in `Mix.Tasks.Docs`.
 
         [
