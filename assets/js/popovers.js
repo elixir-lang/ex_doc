@@ -14,6 +14,8 @@ const spacingBase = 10
 const minBottomSpacing = spacingBase * 5
 const hoverDelayTime = 150
 const typesPage = 'typespecs.html'
+const popoversToggleSelector = '.popovers-toggle'
+const popoversDisabledStorageKey = 'popoversDisabled'
 let popoverElement = null
 let currentLinkElement = null
 let currentRequestId = null
@@ -22,6 +24,38 @@ let showTimeoutAnimation = null
 let hideTimeoutVisibility = null
 let hoverDelayTimeout = null
 
+function deactivatePopovers () {
+  try { localStorage.setItem(popoversDisabledStorageKey, true) } catch (e) { }
+  updateToggleLink()
+}
+
+function activatePopovers () {
+  try { localStorage.removeItem(popoversDisabledStorageKey) } catch (e) { }
+  updateToggleLink()
+}
+
+function arePopoversDisabled () {
+  try {
+    return !!localStorage.getItem(popoversDisabledStorageKey)
+  } catch (e) { }
+
+  return false
+}
+
+function togglePopoversDisabled () {
+  try {
+    if (!localStorage.getItem(popoversDisabledStorageKey)) {
+      deactivatePopovers()
+    } else {
+      activatePopovers()
+    }
+  } catch (e) { }
+}
+
+function updateToggleLink () {
+  $(popoversToggleSelector).attr('data-is-disabled', arePopoversDisabled().toString())
+}
+
 function updatePopoverPosition () {
   if (!currentLinkElement) { return }
 
@@ -29,10 +63,8 @@ function updatePopoverPosition () {
 
   const popoverableBoundingRect = currentLinkElement[0].getBoundingClientRect()
   const contentInnerBoundingRect = $(contentInner)[0].getBoundingClientRect()
-  const popoverBoundingRect = popoverElement[0].getBoundingClientRect()
 
-  const popoverHeight = popoverBoundingRect.height
-  const popoverWidth = popoverBoundingRect.height
+  const popoverWidth = measurePopoverWidth(popoverElement)
 
   // Since the popover is displayed inside the contentInner (this way it can easily inherit all the basic styles),
   // we will need to know it's relative coordinates to position it correctly.
@@ -58,13 +90,7 @@ function updatePopoverPosition () {
   console.log('relativeBoundingRect', relativeBoundingRect)
   console.log('contentInnerBoundingRect', contentInnerBoundingRect)
 
-  if (space.bottom > popoverHeight + minBottomSpacing) {
-    popoverElement.css('top', relativeBoundingRect.bottom + spacingBase)
-  } else {
-    popoverElement.css('top', relativeBoundingRect.top - popoverHeight - spacingBase)
-  }
-
-  if (space.left + popoverWidth < window.innerWidth) {
+  if (space.left + popoverWidth + spacingBase < window.innerWidth) {
     popoverElement.css('left', relativeBoundingRect.left)
     popoverElement.css('right', 'auto')
   } else {
@@ -75,6 +101,14 @@ function updatePopoverPosition () {
     }
     popoverElement.css('left', left)
     popoverElement.css('right', 'auto')
+  }
+
+  const popoverHeight = measurePopoverHeight(popoverElement)
+
+  if (space.bottom > popoverHeight + minBottomSpacing) {
+    popoverElement.css('top', relativeBoundingRect.bottom + spacingBase)
+  } else {
+    popoverElement.css('top', relativeBoundingRect.top - popoverHeight - spacingBase)
   }
 }
 
@@ -152,6 +186,14 @@ function uid () {
   return Math.random().toString(36).substr(2, 9)
 }
 
+function measurePopoverHeight (popoverElement) {
+  return popoverElement[0].getBoundingClientRect().height
+}
+
+function measurePopoverWidth (popoverElement) {
+  return popoverElement[0].getBoundingClientRect().width
+}
+
 // Public Methods
 // --------------
 
@@ -162,16 +204,14 @@ export function initialize () {
   popoverElement = $(popoverSelector)
 
   $(popoverable).hover(function () {
+    if (arePopoversDisabled()) { return }
     if (window.innerWidth < 768 || window.innerHeight < 400) {
       return
     }
 
     currentLinkElement = $(this)
-    console.log("tagname", currentLinkElement.prop('tagName'))
     if (currentLinkElement.prop('tagName') !== 'A') {
       currentLinkElement = $(this).parent()
-    } else {
-      console.log("loading type")
     }
 
     currentRequestId = uid()
@@ -185,6 +225,8 @@ export function initialize () {
       preparePopover()
     }, hoverDelayTime)
   }, function () {
+    if (arePopoversDisabled()) { return }
+
     showTimeoutVisibility && clearTimeout(showTimeoutVisibility)
     showTimeoutAnimation && clearTimeout(showTimeoutAnimation)
     hoverDelayTimeout && clearTimeout(hoverDelayTimeout)
@@ -192,4 +234,6 @@ export function initialize () {
     currentLinkElement = null
     //hidePopover()
   })
+
+  updateToggleLink()
 }

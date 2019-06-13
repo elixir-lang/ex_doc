@@ -2,6 +2,7 @@
   box-shadow: 0 0 10px fade(@black, 10%);
   display: none;
   max-height: 300px;
+  max-width: 500px;
   padding: 0;
   position: absolute;
   pointer-events: none;
@@ -21,9 +22,7 @@
   }
 
   .popover-body {
-    background-color: @white;
     border: 1px solid fade(@mediumGray, 30%);
-    width: 500px;
 
     .detail-header {
       border-left: 0;
@@ -36,7 +35,15 @@
     }
 
     .docstring {
-      margin: 1.2em;
+      background-color: @white;
+      padding: 1.2em;
+      margin: 0;
+      width: 498px; // Taking 2 * 1px of border into account
+    }
+
+    .docstring-type {
+      max-width: 498px;
+      width: auto;
     }
   }
 

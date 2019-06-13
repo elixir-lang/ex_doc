@@ -12,9 +12,9 @@ const message = {summary: '', ready: false, requestId: null}
 const typespecs = {
   pathnameEnd: '/typespecs.html',
   categories: [
-    { name: 'basicType', hint: 'Basic Type', hash: '#basic-types', detailsAvailable: false },
+    { name: 'basicType', hint: 'Basic type', hash: '#basic-types', detailsAvailable: false },
     { name: 'literal', hint: 'Literal', hash: '#literals', detailsAvailable: false },
-    { name: 'builtInType', hint: 'Built in Type', hash: '#built-in-types', detailsAvailable: true }
+    { name: 'builtInType', hint: 'Built-in type', hash: '#built-in-types', detailsAvailable: true }
   ]
 }
 
