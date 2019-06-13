@@ -380,7 +380,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       pmfa = {_prefix, module, function, arity} = split_match(kind, match)
       text = default_text(":", link_type, pmfa, text)
 
-      if doc = module_docs(:erlang, module, lib_dirs) do
+      module_or_mfa =
+        case kind do
+          :module ->
+            module
+
+          :function ->
+            {module, function, arity}
+        end
+
+      if doc = module_docs(:erlang, module_or_mfa, lib_dirs) do
         case kind do
           :module ->
             "[#{text}](#{doc}#{module}.html)"
@@ -467,7 +476,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
           all
 
-        doc = module_docs(:elixir, module, lib_dirs) ->
+        doc = module_docs(:elixir, {module, function, arity}, lib_dirs) ->
           "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h(function)}/#{arity})"
 
         true ->
@@ -539,8 +548,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp default_lib_dirs(:erlang),
     do: erlang_lib_dirs()
 
+  defp module_docs(:elixir, {module, function, arity}, lib_dirs),
+    do: lib_dirs_to_doc({"Elixir." <> module, function, arity}, lib_dirs)
+
   defp module_docs(:elixir, module, lib_dirs),
     do: lib_dirs_to_doc("Elixir." <> module, lib_dirs)
+
+  defp module_docs(:erlang, {module, function, arity}, lib_dirs),
+    do: lib_dirs_to_doc({module, function, arity}, lib_dirs)
 
   defp module_docs(:erlang, module, lib_dirs),
     do: lib_dirs_to_doc(module, lib_dirs)
@@ -588,7 +603,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp doc_prefix(%{type: c}) when c in [:callback, :macrocallback], do: "c:"
   defp doc_prefix(%{type: _}), do: ""
 
-  defp lib_dirs_to_doc(module, lib_dirs) do
+  defp lib_dirs_to_doc(module, lib_dirs) when is_atom(module) do
+    lib_dirs_to_doc({"#{module}", "", ""}, lib_dirs)
+  end
+
+  defp lib_dirs_to_doc(module, lib_dirs) when is_binary(module) do
+    lib_dirs_to_doc({module, "", ""}, lib_dirs)
+  end
+
+  defp lib_dirs_to_doc({module, function, arity}, lib_dirs)
+       when is_binary(module) and is_binary(function) and is_binary(arity) do
     case :code.where_is_file('#{module}.beam') do
       :non_existing ->
         nil
@@ -600,8 +624,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         |> Enum.filter(fn {lib_dir, _} -> String.starts_with?(path, lib_dir) end)
         |> Enum.sort_by(fn {lib_dir, _} -> -byte_size(lib_dir) end)
         |> case do
-          [{_, doc} | _] -> doc
-          _ -> nil
+          [{_doc_path, doc_url} | _] ->
+            case ExDoc.Retriever.docs_chunk(String.to_atom(module)) do
+              :hidden ->
+                nil
+
+              _ ->
+                doc_url
+            end
+
+          _ ->
+            nil
         end
     end
   end

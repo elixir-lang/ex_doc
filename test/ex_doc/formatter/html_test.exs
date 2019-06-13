@@ -544,4 +544,21 @@ defmodule ExDoc.Formatter.HTMLTest do
       end
     end
   end
+
+  describe "does not link to local modules with @moduledoc false" do
+    test "links" do
+      generate_docs(doc_config())
+
+      content = File.read!("#{output_dir()}/LinkToModuledocFalse.html")
+      assert content =~ ~r[<li><code class="inline">ModuledocFalse</code>]
+      assert content =~ ~r[<li><code class="inline">ModuledocFalse.foo/0</code>]
+      assert content =~ ~r[<li><code class="inline">t:ModuledocFalse.t/0</code>]
+
+      assert content =~
+               ~r[<li><a href=\"https://hexdocs.pm/elixir/Kernel.ParallelCompiler.html#require/2\"><code class=\"inline\">Kernel.ParallelCompiler.require/2</code></a>]
+
+      content = File.read("#{output_dir()}/ModuledocFalse.html")
+      assert content == {:error, :enoent}
+    end
+  end
 end
