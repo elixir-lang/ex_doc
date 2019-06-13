@@ -1,16 +1,25 @@
-<div class="detail-header">
-    {{#if this.isTypeFunction}}
-      <h1 class="signature">
-        {{this.summary.signatureTitle}}
-        <div class="specs">{{this.summary.signatureSpecs}}</div>
-      </h1>
-    {{/if}}
-    {{#if this.isTypePage}}
-      <h2>{{this.summary.title}}</h2>
-    {{/if}}
-</div>
-{{#if this.summary.description}}
+{{#if isType}}
   <section class="docstring">
-    {{this.summary.description}}
+    {{#if isBuiltInType}}
+      Built-in type defined as <code>{{this.summary.description}}</code>
+    {{else}}
+      {{this.summary.description}}
+    {{/if}}
   </section>
+{{else}}
+  <div class="detail-header">
+      {{#if this.isModule}}
+        <h2>{{this.summary.title}}</h2>
+      {{else}}
+        <h1 class="signature">
+          {{this.summary.title}}
+          <div class="specs">{{this.summary.signatureSpecs}}</div>
+        </h1>
+      {{/if}}
+  </div>
+  {{#if this.summary.description}}
+    <section class="docstring">
+      {{this.summary.description}}
+    </section>
+  {{/if}}
 {{/if}}

@@ -10,12 +10,10 @@ const popoverable = '.content a code, .signature .specs a'
 const popoverSelector = '#popover'
 const popoverIframeSelector = '#popover .popover-iframe'
 const contentInner = 'body .content-inner'
-const popoverWidth = 500
-const minBottomSpacing = 50
-const spacingAroundLink = 10
+const spacingBase = 10
+const minBottomSpacing = spacingBase * 5
 const hoverDelayTime = 150
-const disabledDestinations = ['typespecs.html']
-let popoverHeight = null
+const typesPage = 'typespecs.html'
 let popoverElement = null
 let currentLinkElement = null
 let currentRequestId = null
@@ -29,12 +27,16 @@ function updatePopoverPosition () {
 
   const popoverElement = $(popoverSelector)
 
-  let popoverableBoundingRect = currentLinkElement[0].getBoundingClientRect()
-  let contentInnerBoundingRect = $(contentInner)[0].getBoundingClientRect()
+  const popoverableBoundingRect = currentLinkElement[0].getBoundingClientRect()
+  const contentInnerBoundingRect = $(contentInner)[0].getBoundingClientRect()
+  const popoverBoundingRect = popoverElement[0].getBoundingClientRect()
 
-  popoverHeight = popoverElement[0].getBoundingClientRect().height
+  const popoverHeight = popoverBoundingRect.height
+  const popoverWidth = popoverBoundingRect.height
 
-  const absoluteBoundingRect = {
+  // Since the popover is displayed inside the contentInner (this way it can easily inherit all the basic styles),
+  // we will need to know it's relative coordinates to position it correctly.
+  const relativeBoundingRect = {
     top: popoverableBoundingRect.top - contentInnerBoundingRect.top,
     bottom: popoverableBoundingRect.bottom - contentInnerBoundingRect.top,
     left: popoverableBoundingRect.left - contentInnerBoundingRect.left,
@@ -48,26 +50,36 @@ function updatePopoverPosition () {
   let space = {
     left: popoverableBoundingRect.x,
     right: contentInnerBoundingRect.width - popoverableBoundingRect.x + popoverableBoundingRect.width,
-    top: absoluteBoundingRect.y - window.scrollY,
-    bottom: window.innerHeight - (absoluteBoundingRect.y - window.scrollY) + absoluteBoundingRect.height
+    top: relativeBoundingRect.y - window.scrollY,
+    bottom: window.innerHeight - (relativeBoundingRect.y - window.scrollY) + relativeBoundingRect.height
   }
 
+  console.log('popoverableBoudingRect', popoverableBoundingRect)
+  console.log('relativeBoundingRect', relativeBoundingRect)
+  console.log('contentInnerBoundingRect', contentInnerBoundingRect)
+
   if (space.bottom > popoverHeight + minBottomSpacing) {
-    popoverElement.css('top', absoluteBoundingRect.bottom + spacingAroundLink)
+    popoverElement.css('top', relativeBoundingRect.bottom + spacingBase)
   } else {
-    popoverElement.css('top', absoluteBoundingRect.top - popoverHeight - spacingAroundLink)
+    popoverElement.css('top', relativeBoundingRect.top - popoverHeight - spacingBase)
   }
 
   if (space.left + popoverWidth < window.innerWidth) {
-    popoverElement.css('left', absoluteBoundingRect.left)
+    popoverElement.css('left', relativeBoundingRect.left)
     popoverElement.css('right', 'auto')
   } else {
-    popoverElement.css('left', absoluteBoundingRect.right - popoverWidth)
+    // Popover looks better if there is some space between it and the menu.
+    let left = relativeBoundingRect.right - popoverWidth
+    if (left < spacingBase) {
+      left = spacingBase
+    }
+    popoverElement.css('left', left)
     popoverElement.css('right', 'auto')
   }
 }
 
-function loadPopover () {
+// Prepares popover without showing it.
+function preparePopover () {
   updatePopoverPosition()
 
   if (!currentLinkElement) { return }
@@ -75,8 +87,6 @@ function loadPopover () {
   let href = currentLinkElement.attr('href')
 
   if (!href) { return }
-
-  if (linkDisabled(href)) { return }
 
   if (href.charAt(0) === '#') {
     href = `${window.location.pathname}${href}`
@@ -86,10 +96,12 @@ function loadPopover () {
   $(popoverIframeSelector).attr('src', focusedHref)
 }
 
+// Show popover and start it's animation.
 function showPopover (summary) {
   const html = popoverTemplate({
-    isTypePage: summary.type === 'page',
-    isTypeFunction: summary.type === 'function',
+    isModule: summary.type === 'page',
+    isType: summary.type === 'type',
+    isBuiltInType: summary.typeCategory === 'builtInType',
     summary: summary
   })
 
@@ -113,26 +125,27 @@ function hidePopover () {
 function receivePopupMessage (event) {
   console.log('receivePopupMessage', event)
   if (event.data.requestId !== currentRequestId) { return }
-
   if (event.data.ready !== true) { return }
 
   showPopover(event.data.summary)
 }
 
 function rewriteHref (href) {
-  return href.replace('.html', `.html?focused=true&requestId=${currentRequestId}`)
+  let typeInfo = ''
+
+  if (isTypesPageLink(href)) {
+    console.log('is type page - adding link')
+    typeInfo = `&typeName=${currentLinkElement.text()}`
+  } else {
+    console.log('not a type page')
+  }
+
+  return href.replace('.html', `.html?focused=true&requestId=${currentRequestId}${typeInfo}`)
 }
 
-function linkDisabled (href) {
-  return disabledDestinations.reduce(function (isDisabled, linkFragment) {
-    const currentDisabled = (href.indexOf(linkFragment) === 0 || href.indexOf(`/${linkFragment}`) >= 0)
-
-    if (currentDisabled) {
-      return true
-    } else {
-      return isDisabled
-    }
-  }, false)
+function isTypesPageLink (href) {
+  console.log("typesPage href", href, typesPage)
+  return (href.indexOf(typesPage) === 0 || href.indexOf(`/${typesPage}`) >= 0)
 }
 
 function uid () {
@@ -169,7 +182,7 @@ export function initialize () {
       popoverElement.removeClass('popover-visible')
       popoverElement.removeClass('popover-shown')
 
-      loadPopover()
+      preparePopover()
     }, hoverDelayTime)
   }, function () {
     showTimeoutVisibility && clearTimeout(showTimeoutVisibility)
