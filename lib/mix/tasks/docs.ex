@@ -105,6 +105,11 @@ defmodule Mix.Tasks.Docs do
       the "assets" directory in the output path under the name "logo" and the
       appropriate extension.
 
+    * `:cover` - Path to the epub cover image (only PNG or JPEG accepted)
+      The image size should be around 1600x2400. When specified, the cover will be placed under
+      the "assets" directory in the output path under the name "cover" and the
+      appropriate extension. This option has no effect when using the "html" formatter.
+
     * `:main` - Main page of the documentation. It may be a module or a
       generated page, like "Plug" or "api-reference"; default: "api-reference".
 

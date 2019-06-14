@@ -249,11 +249,16 @@ defmodule ExDoc.Formatter.EPUBTest do
       File.touch!("test/tmp/epub_assets/hello/world.png")
 
       generate_docs_and_unzip(
-        doc_config(assets: "test/tmp/epub_assets", logo: "test/fixtures/elixir.png")
+        doc_config(
+          assets: "test/tmp/epub_assets",
+          logo: "test/fixtures/elixir.png",
+          cover: "test/fixtures/elixir.png"
+        )
       )
 
       assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world.png")
       assert File.regular?("#{output_dir()}/OEBPS/assets/logo.png")
+      assert File.regular?("#{output_dir()}/OEBPS/assets/cover.png")
     after
       File.rm_rf!("test/tmp/epub_assets")
     end
@@ -281,12 +286,14 @@ defmodule ExDoc.Formatter.EPUBTest do
         doc_config(
           markdown_processor: DummyProcessor,
           assets: "test/tmp/epub_assets",
-          logo: "test/fixtures/elixir.png"
+          logo: "test/fixtures/elixir.png",
+          cover: "test/fixtures/elixir.png"
         )
       )
 
       assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world.png")
       assert File.regular?("#{output_dir()}/OEBPS/assets/logo.png")
+      assert File.regular?("#{output_dir()}/OEBPS/assets/cover.png")
       # Test the assets added by the markdown processor
       for [{filename, content}] <- DummyProcessor.assets(:html) do
         # Filename matches

@@ -334,24 +334,38 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   @doc """
-  Generates the logo from config into the given directory
-  and adjusts the logo config key.
+  Generates the logo from config into the given directory.
   """
   def generate_logo(_dir, %{logo: nil}) do
     []
   end
 
   def generate_logo(dir, %{output: output, logo: logo}) do
+    generate_image(output, dir, logo, "logo")
+  end
+
+  @doc """
+  Generates the cover from config into the given directory.
+  """
+  def generate_cover(_dir, %{cover: nil}) do
+    []
+  end
+
+  def generate_cover(dir, %{output: output, cover: cover}) do
+    generate_image(output, dir, cover, "cover")
+  end
+
+  defp generate_image(output, dir, image, name) do
     extname =
-      logo
+      image
       |> Path.extname()
       |> String.downcase()
 
     if extname in ~w(.png .jpg .svg) do
-      filename = Path.join(dir, "logo#{extname}")
+      filename = Path.join(dir, "#{name}#{extname}")
       target = Path.join(output, filename)
       File.mkdir_p!(Path.dirname(target))
-      File.copy!(logo, target)
+      File.copy!(image, target)
       [filename]
     else
       raise ArgumentError, "image format not recognized, allowed formats are: .jpg, .png"

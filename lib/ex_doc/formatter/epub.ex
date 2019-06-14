@@ -27,6 +27,7 @@ defmodule ExDoc.Formatter.EPUB do
     assets_dir = "OEBPS/assets"
     static_files = HTML.generate_assets(config, assets_dir, default_assets())
     HTML.generate_logo(assets_dir, config)
+    HTML.generate_cover(assets_dir, config)
 
     uuid = "urn:uuid:#{uuid4()}"
     datetime = format_datetime()
