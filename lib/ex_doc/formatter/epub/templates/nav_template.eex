@@ -3,13 +3,17 @@
     <nav epub:type="toc">
       <ol>
         <%= for {title, extras} <- config.extras do %>
-        <li><span><%= title %></span>
-          <ol>
+          <%= if title do %>
+          <li><span><%= title %></span>
+            <ol>
+          <% end %>
           <%= for extra <- extras do %>
             <li><a href="<%= extra.id %>.xhtml"><%= extra.title %></a></li>
           <% end %>
-          </ol>
-        </li>
+          <%= if title do %>
+            </ol>
+          </li>
+          <% end %>
         <% end %>
 
         <%= nav_item_template "Modules", nodes.modules %>
