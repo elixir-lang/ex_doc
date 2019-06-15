@@ -13,8 +13,9 @@
           <button class="line footer-button night-mode-toggle">
             Toggle night mode
           </button>
-          <button class="line footer-button tooltips-toggle">
-            Disable tooltips
+          <button class="line footer-button popovers-toggle">
+            <span class="popovers-option-disable">Disable tooltips</span>
+            <span class="popovers-option-enable">Enable tooltips</span>
           </button>
           <button class="line footer-button display-shortcuts-help">
             Display keyboard shortcuts

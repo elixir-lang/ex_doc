@@ -2,15 +2,16 @@
 // ------------
 
 import $ from 'jquery'
-import popoverTemplate from './templates/popover.handlebars'
+import popoverTemplate from '../templates/popover.handlebars'
 
 // Constants
 // ---------
-const popoverable = '.content a code, .signature .specs a'
+const footerSelector = 'footer'
+const popoverable = '.content a code, .signature .specs a' // Elements that can activate the Popover
 const popoverSelector = '#popover'
 const popoverIframeSelector = '#popover .popover-iframe'
 const contentInner = 'body .content-inner'
-const spacingBase = 10
+const spacingBase = 10 // Used as the min. distance from window edges and links
 const minBottomSpacing = spacingBase * 5
 const hoverDelayTime = 150
 const typesPage = 'typespecs.html'
@@ -169,12 +170,13 @@ function rewriteHref (href) {
 
   if (isTypesPageLink(href)) {
     console.log('is type page - adding link')
-    typeInfo = `&typeName=${currentLinkElement.text()}`
+    const typeName = encodeURIComponent(currentLinkElement.text())
+    typeInfo = `&typeName=${typeName}`
   } else {
     console.log('not a type page')
   }
 
-  return href.replace('.html', `.html?focused=true&requestId=${currentRequestId}${typeInfo}`)
+  return href.replace('.html', `.html?hint=true&requestId=${currentRequestId}${typeInfo}`)
 }
 
 function isTypesPageLink (href) {
@@ -232,7 +234,11 @@ export function initialize () {
     hoverDelayTimeout && clearTimeout(hoverDelayTimeout)
 
     currentLinkElement = null
-    //hidePopover()
+    hidePopover()
+  })
+
+  $(footerSelector).on('click', popoversToggleSelector, function () {
+    togglePopoversDisabled()
   })
 
   updateToggleLink()

@@ -54,3 +54,19 @@
   }
 }
 
+.popovers-toggle {
+  .popovers-option-enable {
+    display: none;
+  }
+
+  &[data-is-disabled="true"] {
+    .popovers-option-enable {
+      display: inline;
+    }
+
+    .popovers-option-disable {
+      display: none;
+    }
+  }
+}
+
