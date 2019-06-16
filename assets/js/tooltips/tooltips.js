@@ -2,22 +2,22 @@
 // ------------
 
 import $ from 'jquery'
-import popoverTemplate from '../templates/popover.handlebars'
+import tooltipTemplate from '../templates/tooltip.handlebars'
 
 // Constants
 // ---------
 const footerSelector = 'footer'
-const popoverable = '.content a code, .signature .specs a' // Elements that can activate the Popover
-const popoverSelector = '#popover'
-const popoverIframeSelector = '#popover .popover-iframe'
+const tooltipActivators = '.content a code, .signature .specs a' // Elements that can activate the tooltip
+const tooltipSelector = '#tooltip'
+const tooltipIframeSelector = '#tooltip .tooltip-iframe'
 const contentInner = 'body .content-inner'
 const spacingBase = 10 // Used as the min. distance from window edges and links
 const minBottomSpacing = spacingBase * 5
 const hoverDelayTime = 150
 const typesPage = 'typespecs.html'
-const popoversToggleSelector = '.popovers-toggle'
-const popoversDisabledStorageKey = 'popoversDisabled'
-let popoverElement = null
+const tooltipsToggleSelector = '.tooltips-toggle'
+const tooltipsDisabledStorageKey = 'tooltipsDisabled'
+let tooltipElement = null
 let currentLinkElement = null
 let currentRequestId = null
 let showTimeoutVisibility = null
@@ -25,97 +25,179 @@ let showTimeoutAnimation = null
 let hideTimeoutVisibility = null
 let hoverDelayTimeout = null
 
-function deactivatePopovers () {
-  try { localStorage.setItem(popoversDisabledStorageKey, true) } catch (e) { }
+// Switches tooltips OFF and stores the choice in localStorage.
+function deactivateTooltips () {
+  try { localStorage.setItem(tooltipsDisabledStorageKey, true) } catch (e) { }
   updateToggleLink()
 }
 
-function activatePopovers () {
-  try { localStorage.removeItem(popoversDisabledStorageKey) } catch (e) { }
+// Switches tooltips ON and stores the choice in localStorage.
+function activateTooltips () {
+  try { localStorage.removeItem(tooltipsDisabledStorageKey) } catch (e) { }
   updateToggleLink()
 }
 
-function arePopoversDisabled () {
+/**
+ * Checks if tooltips are disabled.
+ *
+ * @returns {boolean} `true` if tooltips are disabled, `false` otherwise.
+ */
+function areTooltipsDisabled () {
   try {
-    return !!localStorage.getItem(popoversDisabledStorageKey)
+    return !!localStorage.getItem(tooltipsDisabledStorageKey)
   } catch (e) { }
 
   return false
 }
 
-function togglePopoversDisabled () {
-  try {
-    if (!localStorage.getItem(popoversDisabledStorageKey)) {
-      deactivatePopovers()
-    } else {
-      activatePopovers()
-    }
-  } catch (e) { }
+// If tooltips are disabled switches them on. If they are enabled switches them on.
+function toggleTooltipsDisabled () {
+  areTooltipsDisabled() ? activateTooltips() : deactivateTooltips()
 }
 
+/**
+ * Updates text of the link used to disable/enable tooltips.
+ *
+ * If tooltips are disabled `Enable tooltips` text is displayed.
+ * If tooltips are enabled `Disable tooltips` text is displayed.
+ */
 function updateToggleLink () {
-  $(popoversToggleSelector).attr('data-is-disabled', arePopoversDisabled().toString())
+  $(tooltipsToggleSelector).attr('data-is-disabled', areTooltipsDisabled().toString())
 }
 
-function updatePopoverPosition () {
+/**
+ * Check how much free space there is areound the tooltip.
+ *
+ * @param {Object} event `message` event data
+ */
+
+function receivePopupMessage (event) {
+  console.log('receivePopupMessage', event)
+  if (event.data.requestId !== currentRequestId) { return }
+  if (event.data.ready !== true) { return }
+
+  showTooltip(event.data.summary)
+}
+
+// Triggered when the mouse cursor is over a link that supports the tooltip.
+function hoverStart () {
+  if (areTooltipsDisabled()) { return }
+  if (window.innerWidth < 768 || window.innerHeight < 400) {
+    return
+  }
+
+  currentLinkElement = $(this)
+  if (currentLinkElement.prop('tagName') !== 'A') {
+    currentLinkElement = $(this).parent()
+  }
+
+  currentRequestId = uid()
+
+  hoverDelayTimeout = setTimeout(function () {
+    hideTimeoutVisibility && clearTimeout(hideTimeoutVisibility)
+
+    tooltipElement.removeClass('tooltip-visible')
+    tooltipElement.removeClass('tooltip-shown')
+
+    prepareTooltips()
+  }, hoverDelayTime)
+}
+
+// Triggered when the mouse cursor leaves the tooltip-enabled link
+function hoverEnd () {
+  if (areTooltipsDisabled()) { return }
+
+  showTimeoutVisibility && clearTimeout(showTimeoutVisibility)
+  showTimeoutAnimation && clearTimeout(showTimeoutAnimation)
+  hoverDelayTimeout && clearTimeout(hoverDelayTimeout)
+
+  currentLinkElement = null
+  hideTooltip()
+}
+
+// Checks position and scroll of content and link elements and chooses the best position for the tooltip.
+function updateTooltipPosition () {
   if (!currentLinkElement) { return }
 
-  const popoverElement = $(popoverSelector)
+  const tooltipElement = $(tooltipSelector)
 
-  const popoverableBoundingRect = currentLinkElement[0].getBoundingClientRect()
+  const tooltipActivatorBoundingRect = currentLinkElement[0].getBoundingClientRect()
   const contentInnerBoundingRect = $(contentInner)[0].getBoundingClientRect()
 
-  const popoverWidth = measurePopoverWidth(popoverElement)
+  const tooltipWidth = measureTooltipWidth(tooltipElement)
+  const relativeBoundingRect = getRelativeBoudningRect(tooltipActivatorBoundingRect, contentInnerBoundingRect)
+  const space = calculateSpaceAroundLink(relativeBoundingRect, tooltipActivatorBoundingRect, contentInnerBoundingRect)
 
-  // Since the popover is displayed inside the contentInner (this way it can easily inherit all the basic styles),
-  // we will need to know it's relative coordinates to position it correctly.
-  const relativeBoundingRect = {
-    top: popoverableBoundingRect.top - contentInnerBoundingRect.top,
-    bottom: popoverableBoundingRect.bottom - contentInnerBoundingRect.top,
-    left: popoverableBoundingRect.left - contentInnerBoundingRect.left,
-    right: popoverableBoundingRect.right - contentInnerBoundingRect.left,
-    x: popoverableBoundingRect.x - contentInnerBoundingRect.x,
-    y: popoverableBoundingRect.y - contentInnerBoundingRect.y,
-    width: popoverableBoundingRect.width,
-    height: popoverableBoundingRect.height
-  }
-
-  let space = {
-    left: popoverableBoundingRect.x,
-    right: contentInnerBoundingRect.width - popoverableBoundingRect.x + popoverableBoundingRect.width,
-    top: relativeBoundingRect.y - window.scrollY,
-    bottom: window.innerHeight - (relativeBoundingRect.y - window.scrollY) + relativeBoundingRect.height
-  }
-
-  console.log('popoverableBoudingRect', popoverableBoundingRect)
+  console.log('tooltipActivatorsBoudingRect', tooltipActivatorBoundingRect)
   console.log('relativeBoundingRect', relativeBoundingRect)
   console.log('contentInnerBoundingRect', contentInnerBoundingRect)
 
-  if (space.left + popoverWidth + spacingBase < window.innerWidth) {
-    popoverElement.css('left', relativeBoundingRect.left)
-    popoverElement.css('right', 'auto')
+  if (space.left + tooltipWidth + spacingBase < window.innerWidth) {
+    tooltipElement.css('left', relativeBoundingRect.left)
+    tooltipElement.css('right', 'auto')
   } else {
-    // Popover looks better if there is some space between it and the menu.
-    let left = relativeBoundingRect.right - popoverWidth
+    // Tooltip looks better if there is some space between it and the left menu.
+    let left = relativeBoundingRect.right - tooltipWidth
     if (left < spacingBase) {
       left = spacingBase
     }
-    popoverElement.css('left', left)
-    popoverElement.css('right', 'auto')
+    tooltipElement.css('left', left)
+    tooltipElement.css('right', 'auto')
   }
 
-  const popoverHeight = measurePopoverHeight(popoverElement)
+  const tooltipHeight = measureTooltipHeight(tooltipElement)
 
-  if (space.bottom > popoverHeight + minBottomSpacing) {
-    popoverElement.css('top', relativeBoundingRect.bottom + spacingBase)
+  if (space.bottom > tooltipHeight + minBottomSpacing) {
+    tooltipElement.css('top', relativeBoundingRect.bottom + spacingBase)
   } else {
-    popoverElement.css('top', relativeBoundingRect.top - popoverHeight - spacingBase)
+    tooltipElement.css('top', relativeBoundingRect.top - tooltipHeight - spacingBase)
   }
 }
 
-// Prepares popover without showing it.
-function preparePopover () {
-  updatePopoverPosition()
+/**
+ * Since the tooltip is displayed inside the contentInner (this way it can easily inherit all the basic styles),
+ * we calculate it's relative coordinates to position it correctly.
+ *
+ * @param {DOMRect} linkRect dimensions and position of the link that triggered the tooltip
+ * @param {DOMRect} contentRect dimensions and position of the contentInner
+ *
+ * @returns {DOMRect} dimensions and position of the link element relative to the contentInner
+ */
+function getRelativeBoudningRect (linkRect, contentRect) {
+  return {
+    top: linkRect.top - contentRect.top,
+    bottom: linkRect.bottom - contentRect.top,
+    left: linkRect.left - contentRect.left,
+    right: linkRect.right - contentRect.left,
+    x: linkRect.x - contentRect.x,
+    y: linkRect.y - contentRect.y,
+    width: linkRect.width,
+    height: linkRect.height
+  }
+}
+
+/**
+ * Check how much free space there is areound the tooltip.
+ * we calculate it's relative coordinates to position it correctly.
+ *
+ * @param {DOMRect} linkRect dimensions and position of the link that triggered the tooltip
+ * @param {DOMRect} contentRect dimensions and position of the contentInner
+ * @param {DOMRect} relativeRect dimensions and position of the link relative to the contentInner
+ *
+ * @returns {Object} free space on the top/right/bottom/left of the link that triggered the tooltip
+ */
+function calculateSpaceAroundLink (relativeRect, linkRect, contentRect) {
+  return {
+    left: linkRect.x,
+    right: contentRect.width - linkRect.x + linkRect.width,
+    top: relativeRect.y - window.scrollY,
+    bottom: window.innerHeight - (relativeRect.y - window.scrollY) + relativeRect.height
+  }
+}
+
+// Prepares the tooltip DOM (without showing it).
+function prepareTooltips () {
+  updateTooltipPosition()
 
   if (!currentLinkElement) { return }
 
@@ -128,41 +210,34 @@ function preparePopover () {
   }
 
   const focusedHref = rewriteHref(href)
-  $(popoverIframeSelector).attr('src', focusedHref)
+  $(tooltipIframeSelector).attr('src', focusedHref)
 }
 
-// Show popover and start it's animation.
-function showPopover (summary) {
-  const html = popoverTemplate({
+// Shows tooltip and starts it's animation.
+function showTooltip (summary) {
+  const html = tooltipTemplate({
     isModule: summary.type === 'page',
     isType: summary.type === 'type',
     isBuiltInType: summary.typeCategory === 'builtInType',
     summary: summary
   })
 
-  popoverElement.find('.popover-body').html(html)
+  tooltipElement.find('.tooltip-body').html(html)
 
-  popoverElement.addClass('popover-visible')
+  tooltipElement.addClass('tooltip-visible')
 
-  updatePopoverPosition()
+  updateTooltipPosition()
   showTimeoutAnimation = setTimeout(() => {
-    popoverElement.addClass('popover-shown')
+    tooltipElement.addClass('tooltip-shown')
   }, 10)
 }
 
-function hidePopover () {
-  popoverElement.removeClass('popover-shown')
+// Hides the tooltip
+function hideTooltip () {
+  tooltipElement.removeClass('tooltip-shown')
   hideTimeoutVisibility = setTimeout(() => {
-    popoverElement.removeClass('popover-visible')
+    tooltipElement.removeClass('tooltip-visible')
   }, 300)
-}
-
-function receivePopupMessage (event) {
-  console.log('receivePopupMessage', event)
-  if (event.data.requestId !== currentRequestId) { return }
-  if (event.data.ready !== true) { return }
-
-  showPopover(event.data.summary)
 }
 
 function rewriteHref (href) {
@@ -184,16 +259,34 @@ function isTypesPageLink (href) {
   return (href.indexOf(typesPage) === 0 || href.indexOf(`/${typesPage}`) >= 0)
 }
 
+/**
+ * Generates an id that will be included, as a param, in the iFrame URL.
+ * Message that comes back from the iFrame will send back this id - this will help to avoid reace conditions.
+ */
 function uid () {
   return Math.random().toString(36).substr(2, 9)
 }
 
-function measurePopoverHeight (popoverElement) {
-  return popoverElement[0].getBoundingClientRect().height
+/**
+ * Measures height of the tooltips. Used when positioning the tooltip vertically.
+ *
+ * @param {object} tooltipElement jQuery element targeting the tooltip
+ *
+ * @returns {number} height of the tooltip
+ */
+function measureTooltipHeight (tooltipElement) {
+  return tooltipElement[0].getBoundingClientRect().height
 }
 
-function measurePopoverWidth (popoverElement) {
-  return popoverElement[0].getBoundingClientRect().width
+/**
+ * Measures width of the tooltips. Used when positioning the tooltip horizontally.
+ *
+ * @param {object} tooltipElement jQuery element targeting the tooltip
+ *
+ * @returns {number} width of the tooltip
+ */
+function measureTooltipWidth (tooltipElement) {
+  return tooltipElement[0].getBoundingClientRect().width
 }
 
 // Public Methods
@@ -202,43 +295,13 @@ function measurePopoverWidth (popoverElement) {
 export function initialize () {
   window.addEventListener('message', receivePopupMessage, false)
 
-  $(contentInner).append('<div id="popover"><div class="popover-body"></div><iframe class="popover-iframe"></iframe></div>')
-  popoverElement = $(popoverSelector)
+  $(contentInner).append('<div id="tooltip"><div class="tooltip-body"></div><iframe class="tooltip-iframe"></iframe></div>')
+  tooltipElement = $(tooltipSelector)
 
-  $(popoverable).hover(function () {
-    if (arePopoversDisabled()) { return }
-    if (window.innerWidth < 768 || window.innerHeight < 400) {
-      return
-    }
+  $(tooltipActivators).hover(hoverStart, hoverEnd)
 
-    currentLinkElement = $(this)
-    if (currentLinkElement.prop('tagName') !== 'A') {
-      currentLinkElement = $(this).parent()
-    }
-
-    currentRequestId = uid()
-
-    hoverDelayTimeout = setTimeout(function () {
-      hideTimeoutVisibility && clearTimeout(hideTimeoutVisibility)
-
-      popoverElement.removeClass('popover-visible')
-      popoverElement.removeClass('popover-shown')
-
-      preparePopover()
-    }, hoverDelayTime)
-  }, function () {
-    if (arePopoversDisabled()) { return }
-
-    showTimeoutVisibility && clearTimeout(showTimeoutVisibility)
-    showTimeoutAnimation && clearTimeout(showTimeoutAnimation)
-    hoverDelayTimeout && clearTimeout(hoverDelayTimeout)
-
-    currentLinkElement = null
-    hidePopover()
-  })
-
-  $(footerSelector).on('click', popoversToggleSelector, function () {
-    togglePopoversDisabled()
+  $(footerSelector).on('click', tooltipsToggleSelector, function () {
+    toggleTooltipsDisabled()
   })
 
   updateToggleLink()

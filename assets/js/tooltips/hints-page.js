@@ -19,18 +19,9 @@ const typespecs = {
   ]
 }
 
-function descriptionElementFromHash (hash) {
-  if (!hash) { return null }
-  hash = hash.substr(1) // removes the `#` in `#hash`
-
-  if (!hash) { return null }
-  hash = $.escapeSelector(hash)
-
-  if (!hash) { return null }
-
-  return $(`#${hash}.detail`)
-}
-
+/**
+ *  Will try to extract hint info, and if successful triggers a message to the parent page.
+ */
 function sendHint () {
   const params = new URLSearchParams(window.location.search)
   const requestId = params.get('requestId')
@@ -62,6 +53,9 @@ function sendHint () {
   postMessage(summary, requestId)
 }
 
+/**
+ * Sends a message (containing everything needed to display a tooltip hint) to the parent page.
+ */
 function postMessage (summary, requestId) {
   console.log('focus_mod - sending messages', summary)
   if (window.self !== window.parent) {
@@ -73,7 +67,7 @@ function postMessage (summary, requestId) {
 }
 
 /**
- * Checks if the current page is dedicated to an Elixir module.
+ * Checks if the current page is dedicated to a module.
  *
  * @returns {boolean} `true` if current page contains module documentation.
  */
@@ -85,7 +79,6 @@ function isModulePage () {
  * Checks if the current page is the typespecs page and if we're requesting type info.
  *
  * @param {Object} params URLSearchParams object, parsed parameters from the URL
- * @param {(string|null)} [moduleId=null] Id of the parent module. If null it means we are serializing the parent module info.
  *
  * @returns {boolean} `true` if current page is the typespecs page and a type is being requested
  */
@@ -99,8 +92,36 @@ function isTypesPage (params) {
   return isThisTypespecsPage && isTypesHashPresent && isTypeRequested
 }
 
+/**
+ * Finds to which category type specified in the hash belongs to.
+ * We get category information back, which let us know which type we're dealing with and how to
+ * prepare a hint for it.
+ *
+ * @param {string} hash ie. `#basic-types`
+ *
+ * @returns {object} Obect containing information about the selcted category
+ */
 function typeCategoryFromHash (hash) {
   return find(typespecs.categories, {hash: hash})
+}
+
+/**
+ * Constructs a jQuery selector targeting an element
+ *
+ * @param {Object} params URLSearchParams object, parsed parameters from the URL
+ *
+ * @returns {object} jquery selector
+ */
+function descriptionElementFromHash (hash) {
+  if (!hash) { return null }
+  hash = hash.substr(1) // removes the `#` in `#hash`
+
+  if (!hash) { return null }
+  hash = $.escapeSelector(hash)
+
+  if (!hash) { return null }
+
+  return $(`#${hash}.detail`)
 }
 
 // Public Methods

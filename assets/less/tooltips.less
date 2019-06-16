@@ -1,4 +1,4 @@
-#popover {
+#tooltip {
   box-shadow: 0 0 10px fade(@black, 10%);
   display: none;
   max-height: 300px;
@@ -9,19 +9,19 @@
   margin: 0;
   z-index: 99;
 
-  &.popover-visible {
+  &.tooltip-visible {
     display: block;
     transform: translateY(20px);
     transition: 0.15s transform ease-out, 0.1s opacity ease-out;
     opacity: 0;
   }
 
-  &.popover-shown {
+  &.tooltip-shown {
     transform: translateY(0);
     opacity: 1;
   }
 
-  .popover-body {
+  .tooltip-body {
     border: 1px solid fade(@mediumGray, 30%);
 
     .detail-header {
@@ -47,24 +47,24 @@
     }
   }
 
-  .popover-iframe {
+  .tooltip-iframe {
     display: none;
     margin: 0;
     padding: 0;
   }
 }
 
-.popovers-toggle {
-  .popovers-option-enable {
+.tooltips-toggle {
+  .tooltips-option-enable {
     display: none;
   }
 
   &[data-is-disabled="true"] {
-    .popovers-option-enable {
+    .tooltips-option-enable {
       display: inline;
     }
 
-    .popovers-option-disable {
+    .tooltips-option-disable {
       display: none;
     }
   }

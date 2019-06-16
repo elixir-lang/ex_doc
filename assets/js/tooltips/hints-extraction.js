@@ -1,6 +1,16 @@
 
+// Dependencies
+// ------------
+
 import $ from 'jquery'
 
+/**
+ * Extracts info about a function, callback or a type defined inside a module.
+ *
+ * @param {Object} element jQuery selector pointing to a div containing relevant data
+ *
+ * @returns {Object} hint info object
+ */
 function extractFunctionSummary (element) {
   const signatureSpecs = element.find('h1 .specs').text()
   element.find('h1 > *').remove()
@@ -87,5 +97,8 @@ function extractTypeDetails (contentElement, category, typeName) {
     }
   }
 }
+
+// Public Methods
+// --------------
 
 export {extractTypeSummary, extractModuleSummary, extractFunctionSummary}
