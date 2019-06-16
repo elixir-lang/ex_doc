@@ -2,28 +2,35 @@
 // ------------
 
 import $ from 'jquery'
-import tooltipTemplate from '../templates/tooltip.handlebars'
+import tooltipBodyTemplate from '../templates/tooltip-body.handlebars'
+import tooltipLayoutTemplate from '../templates/tooltip-layout.handlebars'
 
 // Constants
 // ---------
-const footerSelector = 'footer'
+const footerSelector = 'footer' // `Enable/Disable tooltips` button will be displayed in the footer
 const tooltipActivators = '.content a code, .signature .specs a' // Elements that can activate the tooltip
-const tooltipSelector = '#tooltip'
-const tooltipIframeSelector = '#tooltip .tooltip-iframe'
-const contentInner = 'body .content-inner'
+const tooltipSelector = '#tooltip' // Tooltip root
+const tooltipIframeSelector = '#tooltip .tooltip-iframe' // Iframe inisde the tooltip, will be used to load external pages
+const contentInner = 'body .content-inner' // Element containing the documentation text
 const spacingBase = 10 // Used as the min. distance from window edges and links
-const minBottomSpacing = spacingBase * 5
+const minBottomSpacing = spacingBase * 5 // Min. space needed between the bottom of the bottom of the page and the bottom edge of the tooltip
+const minWindowSize = { // Tooltips won't be displayed if width/height of the viewport is smaller than this
+  height: 450,
+  width: 768
+}
+// Tooltip will appear only if the mouse cursor stays on the link for at least 150ms.
+// This way tooltips will not appear if we are scrooling the page or just moving the cursor around.
 const hoverDelayTime = 150
-const typesPage = 'typespecs.html'
-const tooltipsToggleSelector = '.tooltips-toggle'
-const tooltipsDisabledStorageKey = 'tooltipsDisabled'
-let tooltipElement = null
-let currentLinkElement = null
-let currentRequestId = null
-let showTimeoutVisibility = null
-let showTimeoutAnimation = null
-let hideTimeoutVisibility = null
-let hoverDelayTimeout = null
+const typesPage = 'typespecs.html' // Page containing info about basic type, built-in types and literals.
+const tooltipsToggleSelector = '.tooltips-toggle' // `Enable/Disable tooltips` button
+const tooltipsDisabledStorageKey = 'tooltipsDisabled' // Local Storage key Used to store tooltips settings
+
+let tooltipElement = null // Will store the jQuery selector for the tooltip root
+let currentLinkElement = null // Element that the cursor is hovering over
+let currentRequestId = null // ID of the request we're waiting for
+let showTimeoutAnimation = null // Timeout ID related to the tooltip show animation
+let hideTimeoutVisibility = null // Timeout ID related to the tooltip hide animation
+let hoverDelayTimeout = null // Timeout ID related to the `hoverDelayTime` described above
 
 // Switches tooltips OFF and stores the choice in localStorage.
 function deactivateTooltips () {
@@ -82,7 +89,7 @@ function receivePopupMessage (event) {
 // Triggered when the mouse cursor is over a link that supports the tooltip.
 function hoverStart () {
   if (areTooltipsDisabled()) { return }
-  if (window.innerWidth < 768 || window.innerHeight < 400) {
+  if (window.innerWidth < minWindowSize.width || window.innerHeight < minWindowSize.height) {
     return
   }
 
@@ -107,7 +114,6 @@ function hoverStart () {
 function hoverEnd () {
   if (areTooltipsDisabled()) { return }
 
-  showTimeoutVisibility && clearTimeout(showTimeoutVisibility)
   showTimeoutAnimation && clearTimeout(showTimeoutAnimation)
   hoverDelayTimeout && clearTimeout(hoverDelayTimeout)
 
@@ -177,7 +183,7 @@ function getRelativeBoudningRect (linkRect, contentRect) {
 }
 
 /**
- * Check how much free space there is areound the tooltip.
+ * Check how much free space there is around the tooltip.
  * we calculate it's relative coordinates to position it correctly.
  *
  * @param {DOMRect} linkRect dimensions and position of the link that triggered the tooltip
@@ -215,7 +221,7 @@ function prepareTooltips () {
 
 // Shows tooltip and starts it's animation.
 function showTooltip (summary) {
-  const html = tooltipTemplate({
+  const html = tooltipBodyTemplate({
     isModule: summary.type === 'page',
     isType: summary.type === 'type',
     isBuiltInType: summary.typeCategory === 'builtInType',
@@ -240,6 +246,13 @@ function hideTooltip () {
   }, 300)
 }
 
+/**
+ * Modifies the link, adding parameters needed to trigger hints extraction.
+ *
+ * @param {string} href link to the page
+ *
+ * @returns {string} link with parameters added
+ */
 function rewriteHref (href) {
   let typeInfo = ''
 
@@ -254,14 +267,22 @@ function rewriteHref (href) {
   return href.replace('.html', `.html?hint=true&requestId=${currentRequestId}${typeInfo}`)
 }
 
+/**
+ * Is the current link poinitng to the typespecs page?
+ *
+ * @param {string} href link to the page
+ *
+ * @returns {boolean} `true` if link points to the typespecs page, `false` otherwise
+ */
 function isTypesPageLink (href) {
-  console.log("typesPage href", href, typesPage)
   return (href.indexOf(typesPage) === 0 || href.indexOf(`/${typesPage}`) >= 0)
 }
 
 /**
  * Generates an id that will be included, as a param, in the iFrame URL.
  * Message that comes back from the iFrame will send back this id - this will help to avoid reace conditions.
+ *
+ * @returns {string} unique ID
  */
 function uid () {
   return Math.random().toString(36).substr(2, 9)
@@ -295,7 +316,7 @@ function measureTooltipWidth (tooltipElement) {
 export function initialize () {
   window.addEventListener('message', receivePopupMessage, false)
 
-  $(contentInner).append('<div id="tooltip"><div class="tooltip-body"></div><iframe class="tooltip-iframe"></iframe></div>')
+  $(contentInner).append(tooltipLayoutTemplate())
   tooltipElement = $(tooltipSelector)
 
   $(tooltipActivators).hover(hoverStart, hoverEnd)
