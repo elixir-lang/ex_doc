@@ -17,10 +17,6 @@ pre a {
 }
 
 code {
-  font-family: @monoFontFamily;
-  font-style: normal;
-  line-height: 24px;
-  font-weight: 400;
   background-color: @codeBackground;
   vertical-align: baseline;
   border-radius: 2px;
@@ -32,15 +28,7 @@ code {
 pre {
   margin: @baseLineHeight 0;
 
-  &.spec {
-    margin: 0;
-  }
-
-  &.spec code {
-    padding: 0;
-  }
-
-  code:not(.inline) {
+  code {
     display: block;
     overflow-x: auto;
     white-space: inherit;

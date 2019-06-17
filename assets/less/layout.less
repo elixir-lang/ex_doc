@@ -36,6 +36,16 @@ body {
   z-index: 4;
 }
 
+.sidebar-button {
+  position: fixed;
+  z-index: 99;
+  left: 0;
+  top: 8px;
+  transition: color 0.3s ease-in-out, transform 0.15s ease-out 0.1s, opacity 0.15s ease-out 0.1s;
+  will-change: transform;
+  transform: translateX(250px);
+}
+
 .content {
   width: 100%;
   padding-left: 300px;

@@ -315,6 +315,25 @@
   }
 }
 
+.sidebar-button {
+  color: @gray;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  padding: 10px 11px;
+  font-size: 16px;
+
+  &:hover {
+    color: @white;
+  }
+
+  &:active,
+  &:hover,
+  &:focus {
+    outline: none;
+  }
+}
+
 @media screen and (max-height: 500px) {
   .sidebar {
     overflow-y: auto;
