@@ -26,14 +26,7 @@ module.exports = merge(common, {
     minimizer: [
       new UglifyJSPlugin({
         cache: true,
-        parallel: true,
-        uglifyOptions: {
-          compress: {
-            drop_console: false,
-            drop_debugger: false
-          },
-          keep_fnames: true
-        }
+        parallel: true
       }),
       new OptimizeCSSAssetsPlugin({})
     ]
