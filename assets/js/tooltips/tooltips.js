@@ -79,7 +79,6 @@ function updateToggleLink () {
  */
 
 function receivePopupMessage (event) {
-  console.log('receivePopupMessage', event)
   if (event.data.requestId !== currentRequestId) { return }
   if (event.data.ready !== true) { return }
 
@@ -133,10 +132,6 @@ function updateTooltipPosition () {
   const tooltipWidth = measureTooltipWidth(tooltipElement)
   const relativeBoundingRect = getRelativeBoudningRect(tooltipActivatorBoundingRect, contentInnerBoundingRect)
   const space = calculateSpaceAroundLink(relativeBoundingRect, tooltipActivatorBoundingRect, contentInnerBoundingRect)
-
-  console.log('tooltipActivatorsBoudingRect', tooltipActivatorBoundingRect)
-  console.log('relativeBoundingRect', relativeBoundingRect)
-  console.log('contentInnerBoundingRect', contentInnerBoundingRect)
 
   if (space.left + tooltipWidth + spacingBase < window.innerWidth) {
     tooltipElement.css('left', relativeBoundingRect.left)
@@ -257,11 +252,8 @@ function rewriteHref (href) {
   let typeInfo = ''
 
   if (isTypesPageLink(href)) {
-    console.log('is type page - adding link')
     const typeName = encodeURIComponent(currentLinkElement.text())
     typeInfo = `&typeName=${typeName}`
-  } else {
-    console.log('not a type page')
   }
 
   return href.replace('.html', `.html?hint=true&requestId=${currentRequestId}${typeInfo}`)
