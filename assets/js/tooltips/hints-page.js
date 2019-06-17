@@ -46,8 +46,6 @@ function sendHint () {
     hint = extractModuleHint(content)
   }
 
-  console.log("focus_mode - got hint", hint)
-
   if (!hint) { return }
 
   postMessage(hint, requestId)
@@ -57,7 +55,6 @@ function sendHint () {
  * Sends a message (containing everything needed to display a tooltip hint) to the parent page.
  */
 function postMessage (hint, requestId) {
-  console.log('focus_mod - sending messages', hint)
   if (window.self !== window.parent) {
     message.hint = hint
     message.ready = true
@@ -86,8 +83,6 @@ function isTypesPage (params) {
   const isThisTypespecsPage = window.location.pathname.indexOf(typespecs.pathnameEnd) > 0
   const isTypesHashPresent = !!typeCategoryFromHash(window.location.hash)
   const isTypeRequested = !!params.get('typeName')
-
-  console.log("focus_mode - isTypesPage", isThisTypespecsPage, isTypesHashPresent, isTypeRequested)
 
   return isThisTypespecsPage && isTypesHashPresent && isTypeRequested
 }

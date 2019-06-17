@@ -12,8 +12,7 @@ import $ from 'jquery'
  * @returns {Object} hint info object
  */
 function extractFunctionHint (element) {
-  const signatureSpecs = element.find('h1 .specs').text()
-  element.find('h1 > *').remove()
+  const signatureSpecs = element.find('.specs').text()
   const title = element.find('h1').text()
   const description = element.find('.docstring > p:first').text()
 
@@ -76,13 +75,9 @@ function extractTypeDetails (contentElement, category, typeName) {
 
     if (detailsTable.length === 0) { return }
 
-    console.log("focus_mode - details tale", detailsTable.text())
-
     const foundRow = detailsTable.find('tr').filter(function () {
       return $(this).find(`td:first:contains('${fullTypeName}')`).length > 0
     })
-
-    console.log("focus_mode - foundRow", foundRow.text())
 
     let description = foundRow.find('td:last-child').text().trim()
 
