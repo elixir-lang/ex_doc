@@ -41,20 +41,19 @@ describe('hints extraction', () => {
             <span class="icon-link" aria-hidden="true"></span>
             <span class="sr-only">Link to this callback</span>
           </a>
-          <h1 class="signature">
-            configure(any)
 
-            <a href="https://github.com/" class="view-source" rel="help" title="View Source">
-              <span class="icon-code" aria-hidden="true"></span>
-              <span class="sr-only">View Source</span>
-            </a>
+          <h1 class="signature">configure(any)</h1>
 
-            <div class="specs">
-              <pre>
-                configure(<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()) :: :ok
-              </pre>
-            </div>
-          </h1>
+          <a href="https://github.com/" class="view-source" rel="help" title="View Source">
+            <span class="icon-code" aria-hidden="true"></span>
+            <span class="sr-only">View Source</span>
+          </a>
+
+          <div class="specs">
+            <pre>
+              configure(<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()) :: :ok
+            </pre>
+          </div>
         </div>
         <section class="docstring">
           <p>First line of description.</p>
@@ -100,9 +99,10 @@ describe('hints extraction', () => {
         </h3>
 
         <table>
-          <tr><td> byte()         </td><td> 0..255 </td></tr>
-          <tr><td> my_type_name() </td><td> any()  </td></tr>
-          <tr><td> function()     </td><td> fun()  </td></tr>
+          <tr><td> byte()             </td><td> 0..255 </td></tr>
+          <tr><td> my_type_name()     </td><td> any()  </td></tr>
+          <tr><td> not_my_type_name() </td><td> term() </td></tr>
+          <tr><td> function()         </td><td> fun()  </td></tr>
         </table>
       </div>
     `))

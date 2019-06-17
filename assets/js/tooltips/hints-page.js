@@ -40,8 +40,7 @@ function sendHint () {
     hint = extractFunctionHint(infoElement)
   } else if (isTypesPage(params)) {
     const typeName = params.get('typeName')
-    const category = typeCategory(hash)
-    hint = extractTypeHint(content, typeName, category)
+    hint = extractTypeHint(content, typeName, typeCategory)
   } else if (isModulePage()) {
     hint = extractModuleHint(content)
   }

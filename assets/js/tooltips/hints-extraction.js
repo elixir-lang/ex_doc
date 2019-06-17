@@ -44,7 +44,7 @@ function extractModuleHint (content) {
  * @returns {Object|null} hint info object or `null` if type info could not be found
  */
 function extractTypeHint (contentElement, typeName, typeCategory) {
-  const typeDetails = extractTypeDetails(contentElement, typeCategory, typeName)
+  const typeDetails = extractTypeDetails(contentElement, typeName, typeCategory)
 
   if (!typeDetails) { return }
   if (!typeCategory) { return }
@@ -67,7 +67,7 @@ function extractTypeHint (contentElement, typeName, typeCategory) {
  *
  * @returns {Object|null} object containing the hint info or null if detailed info is not available
  */
-function extractTypeDetails (contentElement, category, typeName) {
+function extractTypeDetails (contentElement, typeName, category) {
   const fullTypeName = `${typeName}()`
 
   if (category.detailsAvailable) {
@@ -76,7 +76,7 @@ function extractTypeDetails (contentElement, category, typeName) {
     if (detailsTable.length === 0) { return }
 
     const foundRow = detailsTable.find('tr').filter(function () {
-      return $(this).find(`td:first:contains('${fullTypeName}')`).length > 0
+      return $(this).find('td:first').text().trim() === fullTypeName
     })
 
     let description = foundRow.find('td:last-child').text().trim()

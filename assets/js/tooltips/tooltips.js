@@ -8,7 +8,7 @@ import tooltipLayoutTemplate from '../templates/tooltip-layout.handlebars'
 // Constants
 // ---------
 const footerSelector = 'footer' // `Enable/Disable tooltips` button will be displayed in the footer
-const tooltipActivators = '.content a code, .signature .specs a' // Elements that can activate the tooltip
+const tooltipActivators = '.content a code, .detail-header .specs a' // Elements that can activate the tooltip
 const tooltipSelector = '#tooltip' // Tooltip root
 const tooltipIframeSelector = '#tooltip .tooltip-iframe' // Iframe inisde the tooltip, will be used to load external pages
 const contentInner = 'body .content-inner' // Element containing the documentation text
