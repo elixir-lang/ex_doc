@@ -11,26 +11,26 @@ import $ from 'jquery'
  *
  * @returns {Object} hint info object
  */
-function extractFunctionSummary (element) {
+function extractFunctionHint (element) {
   const signatureSpecs = element.find('h1 .specs').text()
   element.find('h1 > *').remove()
   const title = element.find('h1').text()
   const description = element.find('.docstring > p:first').text()
 
   return {
-    type: 'function',
-    title: title,
-    signatureSpecs: signatureSpecs,
+    kind: 'function',
+    title: title.trim(),
+    signatureSpecs: signatureSpecs.trim(),
     description: description.trim()
   }
 }
 
-function extractModuleSummary (content) {
+function extractModuleHint (content) {
   content.find('h1:first > *').remove()
 
   return {
-    type: 'page',
-    title: content.find('h1:first').text(),
+    kind: 'module',
+    title: content.find('h1:first').text().trim(),
     description: content.find('#moduledoc p:first').text().trim()
   }
 }
@@ -44,14 +44,14 @@ function extractModuleSummary (content) {
  *
  * @returns {Object|null} hint info object or `null` if type info could not be found
  */
-function extractTypeSummary (contentElement, typeName, typeCategory) {
+function extractTypeHint (contentElement, typeName, typeCategory) {
   const typeDetails = extractTypeDetails(contentElement, typeCategory, typeName)
 
   if (!typeDetails) { return }
   if (!typeCategory) { return }
 
   return {
-    type: 'type',
+    kind: 'type',
     typeCategory: typeCategory.name,
     title: typeDetails.title,
     description: typeDetails.description
@@ -84,7 +84,7 @@ function extractTypeDetails (contentElement, category, typeName) {
 
     console.log("focus_mode - foundRow", foundRow.text())
 
-    let description = foundRow.find('td:last-child').text()
+    let description = foundRow.find('td:last-child').text().trim()
 
     return {
       title: fullTypeName,
@@ -101,4 +101,4 @@ function extractTypeDetails (contentElement, category, typeName) {
 // Public Methods
 // --------------
 
-export {extractTypeSummary, extractModuleSummary, extractFunctionSummary}
+export {extractTypeHint, extractModuleHint, extractFunctionHint}

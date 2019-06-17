@@ -83,7 +83,7 @@ function receivePopupMessage (event) {
   if (event.data.requestId !== currentRequestId) { return }
   if (event.data.ready !== true) { return }
 
-  showTooltip(event.data.summary)
+  showTooltip(event.data.hint)
 }
 
 // Triggered when the mouse cursor is over a link that supports the tooltip.
@@ -220,12 +220,12 @@ function prepareTooltips () {
 }
 
 // Shows tooltip and starts it's animation.
-function showTooltip (summary) {
+function showTooltip (hint) {
   const html = tooltipBodyTemplate({
-    isModule: summary.type === 'page',
-    isType: summary.type === 'type',
-    isBuiltInType: summary.typeCategory === 'builtInType',
-    summary: summary
+    isModule: hint.kind === 'module',
+    isType: hint.kind === 'type',
+    isBuiltInType: hint.typeCategory === 'builtInType',
+    hint: hint
   })
 
   tooltipElement.find('.tooltip-body').html(html)

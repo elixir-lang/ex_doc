@@ -2,8 +2,10 @@ body.night-mode {
   #tooltip {
     box-shadow: 0 0 10px fade(@black, 50%);
     .tooltip-body {
-      background: @nightBackground;
       border: 1px solid @nightHeader;
+      .docstring {
+        background: @nightBackground;
+      }
     }
   }
 }

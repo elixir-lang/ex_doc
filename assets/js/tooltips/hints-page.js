@@ -1,7 +1,7 @@
 // Dependencies
 // ------------
 
-import {extractTypeSummary, extractModuleSummary, extractFunctionSummary} from './hints-extraction'
+import {extractTypeHint, extractModuleHint, extractFunctionHint} from './hints-extraction'
 import $ from 'jquery'
 import find from 'lodash.find'
 
@@ -9,7 +9,7 @@ import find from 'lodash.find'
 // ---------
 
 const contentInner = '.content-inner'
-const message = {summary: {}, ready: false, requestId: null}
+const message = {hint: {}, ready: false, requestId: null}
 const typespecs = {
   pathnameEnd: '/typespecs.html',
   categories: [
@@ -27,7 +27,7 @@ function sendHint () {
   const requestId = params.get('requestId')
   const hash = window.location.hash
   const content = $(contentInner)
-  let summary = null
+  let hint = null
 
   if (!params.has('hint')) { return }
 
@@ -37,29 +37,29 @@ function sendHint () {
   const typeCategory = typeCategoryFromHash(hash)
 
   if (infoElement && infoElement.length > 0) {
-    summary = extractFunctionSummary(infoElement)
+    hint = extractFunctionHint(infoElement)
   } else if (isTypesPage(params)) {
     const typeName = params.get('typeName')
     const category = typeCategory(hash)
-    summary = extractTypeSummary(content, typeName, category)
+    hint = extractTypeHint(content, typeName, category)
   } else if (isModulePage()) {
-    summary = extractModuleSummary(content)
+    hint = extractModuleHint(content)
   }
 
-  console.log("focus_mode - got summary", summary)
+  console.log("focus_mode - got hint", hint)
 
-  if (!summary) { return }
+  if (!hint) { return }
 
-  postMessage(summary, requestId)
+  postMessage(hint, requestId)
 }
 
 /**
  * Sends a message (containing everything needed to display a tooltip hint) to the parent page.
  */
-function postMessage (summary, requestId) {
-  console.log('focus_mod - sending messages', summary)
+function postMessage (hint, requestId) {
+  console.log('focus_mod - sending messages', hint)
   if (window.self !== window.parent) {
-    message.summary = summary
+    message.hint = hint
     message.ready = true
     message.requestId = requestId
     window.parent.postMessage(message, '*')
