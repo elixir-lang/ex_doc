@@ -71,6 +71,11 @@ function focusSearchInput () {
   searchInput.focus()
 }
 
+function focusVersionSelect () {
+  const versionSelect = $('#version-select')
+  versionSelect.focus()
+}
+
 function setDefaultSidebarState () {
   body.removeClass(sidebarClasses)
   body.addClass(window.innerWidth > breakpoint ? sidebarOpenedClass : sidebarClosedClass)
@@ -79,7 +84,7 @@ function setDefaultSidebarState () {
 // Public Methods
 // --------------
 
-export {breakpoint, closeSidebar, openSidebar, toggleSidebar, focusSearchInput}
+export {breakpoint, closeSidebar, openSidebar, toggleSidebar, focusSearchInput, focusVersionSelect}
 
 export function initialize () {
   setDefaultSidebarState()

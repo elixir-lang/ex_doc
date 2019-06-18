@@ -1,9 +1,12 @@
+// keyboard shortcuts
+/* globals versionNodes */
+
 // Dependencies
 // ------------
 
 import $ from 'jquery'
 import find from 'lodash.find'
-import {focusSearchInput, openSidebar, toggleSidebar} from './sidebar'
+import {focusSearchInput, focusVersionSelect, openSidebar, toggleSidebar} from './sidebar'
 import {toggleNightMode} from './night'
 import helpModalTemplate from './templates/keyboard-shortcuts-help-modal.handlebars'
 
@@ -39,16 +42,29 @@ const keyboardShortcuts = [
     name: '/',
     keyCode: 191,
     action: searchKeyAction
-  },
-  {
-    name: '?',
-    keyCode: 191,
-    requiresShiftKey: true,
-    displayAs: '<kbd>?</kbd>',
-    description: 'Bring up this help dialog',
-    action: toggleHelpModal
   }
 ]
+
+// Display version shortcut only if the version dropdown is enabled
+if (typeof versionNodes !== 'undefined') {
+  keyboardShortcuts.push({
+    name: 'v',
+    keyCode: 86,
+    description: 'Focus version select',
+    displayAs: '<kbd>v</kbd>',
+    action: versionKeyAction
+  })
+}
+
+// Help shortcut is always displayed last
+keyboardShortcuts.push({
+  name: '?',
+  keyCode: 191,
+  requiresShiftKey: true,
+  displayAs: '<kbd>?</kbd>',
+  description: 'Bring up this help dialog',
+  action: toggleHelpModal
+})
 
 // State
 // -----
@@ -102,6 +118,13 @@ function searchKeyAction () {
   openSidebar()
   closeHelpModal()
   focusSearchInput()
+  event.preventDefault()
+}
+
+function versionKeyAction() {
+  openSidebar()
+  closeHelpModal()
+  focusVersionSelect()
   event.preventDefault()
 }
 
