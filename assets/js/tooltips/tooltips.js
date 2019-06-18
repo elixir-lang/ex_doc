@@ -272,7 +272,7 @@ function isTypesPageLink (href) {
 
 /**
  * Generates an id that will be included, as a param, in the iFrame URL.
- * Message that comes back from the iFrame will send back this id - this will help to avoid reace conditions.
+ * Message that comes back from the iFrame will send back this id - this will help to avoid race conditions.
  *
  * @returns {string} unique ID
  */
