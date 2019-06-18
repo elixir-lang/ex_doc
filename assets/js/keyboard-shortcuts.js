@@ -5,7 +5,7 @@ import $ from 'jquery'
 import find from 'lodash.find'
 import {focusSearchInput, openSidebar, toggleSidebar} from './sidebar'
 import {toggleNightMode} from './night'
-import {showQuickSwichModal} from './quick-switch'
+import {openQuickSwichModal} from './quick-switch'
 import helpModalTemplate from './templates/keyboard-shortcuts-help-modal.handlebars'
 
 // Constants
@@ -58,7 +58,7 @@ if (supportsQuickSwitch) {
     keyCode: 71,
     description: 'Quick-swith to other docs',
     displayAs: '<kbd>g</kdb>',
-    action: showQuickSwichModal
+    action: openQuickSwichModal
   })
 }
 
