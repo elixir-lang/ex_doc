@@ -57,7 +57,7 @@ function areTooltipsDisabled () {
   return false
 }
 
-// If tooltips are disabled switches them on. If they are enabled switches them on.
+// If tooltips are disabled switches them on. If they are enabled switches them off.
 function toggleTooltipsDisabled () {
   areTooltipsDisabled() ? activateTooltips() : deactivateTooltips()
 }
