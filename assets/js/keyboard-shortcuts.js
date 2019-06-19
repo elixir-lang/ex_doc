@@ -121,7 +121,7 @@ function searchKeyAction () {
   event.preventDefault()
 }
 
-function versionKeyAction() {
+function versionKeyAction () {
   openSidebar()
   closeHelpModal()
   focusVersionSelect()

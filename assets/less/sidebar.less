@@ -1,3 +1,16 @@
+@keyframes select-pulse {
+  0% {
+    color: @white;
+  }
+  50% {
+    color: @purple;
+  }
+  100% {
+    color: @white;
+  }
+}
+
+
 .sidebar {
   font-family: @sansFontFamily;
   font-size: 16px;
@@ -92,6 +105,9 @@
 
     &:focus {
       outline: none;
+      animation-name: select-pulse;
+      animation-duration: 0.3s;
+      animation-iteration-count: 1;
     }
   }
 
