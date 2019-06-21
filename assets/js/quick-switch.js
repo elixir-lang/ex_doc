@@ -12,8 +12,22 @@ const quickSwitchModalSelector = '#quick-switch-modal'
 const quickSwitchInputSelector = '#quick-switch-input'
 const quickSwitchResultSelector = '#quick-switch-results'
 const closeButtonSelector = '.modal-close'
-const debugKeypressTimeout = 300
+const debounceKeypressTimeout = 300
+const numberOfSuggestions = 9
+const usedModifierKeys = [
+  13, // enter
+  27, // escape
+  37, // left arrow
+  38, // up arrow
+  39, // right arrow
+  40  // down arrow
+]
+
+// State
+// -----
 let debounceTimeout = null
+let autoCompleteResults = []
+let autoCompleteSelected = -1
 
 function openQuickSwichModal (e) {
   $(quickSwitchModalSelector).show()
@@ -22,11 +36,25 @@ function openQuickSwichModal (e) {
 }
 
 function closeQuickSwitchModal () {
-  $(quickSwitchInputSelector).val('')
+  debounceTimeout = null
+  autoCompleteResults = []
+  autoCompleteSelected = -1
+
+  $(quickSwitchResultSelector).html('')
+  $(quickSwitchInputSelector).val('').removeClass('completed')
   $(quickSwitchModalSelector).hide()
 }
 
 function quickSwitchToPackage (packageSlug) {
+  if (autoCompleteSelected === -1) {
+    switchToExDocPackage(packageSlug)
+  } else {
+    const selectedResult = autoCompleteResults[autoCompleteSelected];
+    switchToExDocPackage(selectedResult.name)
+  }
+}
+
+function switchToExDocPackage(packageSlug) {
   window.location = `https://hexdocs.pm/${packageSlug}`
 }
 
@@ -36,23 +64,82 @@ function debouceAutocomplete (packageSlug) {
   clearTimeout(debounceTimeout)
   debounceTimeout = setTimeout(() => {
     queryForAutocomplete(packageSlug)
-  }, debugKeypressTimeout)
+  }, debounceKeypressTimeout)
 }
 
 function queryForAutocomplete (packageSlug) {
   $.get(hexSearchEndpoint.replace('%%', packageSlug), (payload) => {
     if (Array.isArray(payload)) {
-      const results = payload.slice(0, 9)
-      const template = quickSwitchResultsTemplate({results})
+      autoCompleteResults = payload.slice(0, numberOfSuggestions)
+      autoCompleteSelected = -1
+
+      const template = quickSwitchResultsTemplate({
+        results: autoCompleteResults
+      })
       $(quickSwitchResultSelector).html(template);
 
-      if (results.length > 0) {
-        $(quickSwitchInputSelector).addClass('with-results')
+      if (autoCompleteResults.length > 0) {
+        $(quickSwitchInputSelector).addClass('completed')
       } else {
-        $(quickSwitchInputSelector).removeClass('with-results')
+        $(quickSwitchInputSelector).removeClass('completed')
       }
     }
   })
+}
+
+function moveAutocompleteSelection(e, updown) {
+  const selectedElement = $('.quick-switch-result.selected')
+
+  if (selectedElement.length !== 0) {
+    if (updown === 'up') {
+      selectPrevAcResult(selectedElement)
+    } else {
+      selectNextAcResult(selectedElement)
+    }
+  } else {
+    selectFirstAcResult()
+  }
+
+  e.preventDefault()
+}
+
+function selectFirstAcResult() {
+  $('.quick-switch-result').first().addClass('selected')
+  autoCompleteSelected = 0
+}
+
+function selectLastAcResult() {
+  $('.quick-switch-result').last().addClass('selected')
+  autoCompleteSelected = numberOfSuggestions
+}
+
+function selectNextAcResult(selectedElement) {
+  const nextResult = selectedElement.next()
+  selectedElement.removeClass('selected')
+
+  if (nextResult.length !== 0) {
+    nextResult.addClass('selected')
+    autoCompleteSelected += 1
+  } else {
+    selectFirstAcResult()
+  }
+}
+
+function selectPrevAcResult(selectedElement) {
+  const prevResult = selectedElement.prev()
+  selectedElement.removeClass('selected')
+
+  if (prevResult.length !== 0) {
+    prevResult.addClass('selected')
+    autoCompleteSelected -= 1
+  } else {
+    selectLastAcResult()
+  }
+}
+
+function deselectAcResult() {
+  $('.quick-switch-result.selected').removeClass('selected')
+  autoCompleteSelected = -1
 }
 
 // Public Methods
@@ -74,12 +161,22 @@ export function initialize () {
     closeQuickSwitchModal()
   })
 
-  $(quickSwitchInputSelector).on('keyup', function (e) {
+  $(quickSwitchInputSelector).on('keydown', function (e) {
     const packageSlug = $(quickSwitchInputSelector).val()
 
     if (e.keyCode === 13) { // enter key
       quickSwitchToPackage(packageSlug)
-    } else {
+    } 
+  
+    if (e.keyCode === 37 || e.keyCode === 39) deselectAcResult()
+    if (e.keyCode === 38) moveAutocompleteSelection(e, 'up')
+    if (e.keyCode === 40) moveAutocompleteSelection(e, 'down')
+  })
+
+  $(quickSwitchInputSelector).on('keyup', function (e) {
+    const packageSlug = $(quickSwitchInputSelector).val()
+
+    if (usedModifierKeys.indexOf(e.keyCode) === -1) {
       debouceAutocomplete(packageSlug)
     }
   })
