@@ -6,6 +6,9 @@
     <dc:title><%= config.project %> - <%= config.version %></dc:title>
     <dc:identifier id="project-<%= config.project %>"><%= uuid %></dc:identifier>
     <dc:language><%= config.language %></dc:language>
+    <%= for {author, index} <- Enum.with_index(config.authors || []) do %>
+      <dc:creator id="author<%= index + 1 %>"><%= author %></dc:creator>
+    <% end %>
     <meta property="dcterms:modified"><%= datetime %></meta>
     <%= if config.cover do %>
       <meta name="cover" content="cover-image"/>

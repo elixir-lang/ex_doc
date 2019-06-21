@@ -45,6 +45,7 @@ defmodule ExDoc.Config do
             source_url_pattern: nil,
             title: nil,
             version: nil,
+            authors: nil,
             skip_undefined_reference_warnings_on: []
 
   @type t :: %__MODULE__{
@@ -78,6 +79,7 @@ defmodule ExDoc.Config do
           source_url_pattern: nil | String.t(),
           title: nil | String.t(),
           version: nil | String.t(),
+          authors: nil | [String.t()],
           skip_undefined_reference_warnings_on: [String.t()]
         }
 end

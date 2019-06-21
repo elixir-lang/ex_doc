@@ -162,6 +162,13 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute content_module =~ re[:index][:refresh]
   end
 
+  test "allows to set the authors of the document" do
+    generate_docs(doc_config(authors: ["John Doe", "Jane Doe"]))
+    content_index = File.read!("#{output_dir()}/api-reference.html")
+
+    assert content_index =~ ~r{<meta name="author" content="John Doe, Jane Doe">}
+  end
+
   test "generates in default directory with redirect index.html file" do
     generate_docs(doc_config())
 
