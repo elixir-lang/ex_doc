@@ -79,7 +79,7 @@ defmodule ExDoc.Formatter.EPUBTest do
   test "allows to set the authors of the book" do
     generate_docs_and_unzip(doc_config(authors: ["John Doe", "Jane Doe"]))
 
-    content = File.read!("#{output_dir()}/OEBPS/Content.opf")
+    content = File.read!("#{output_dir()}/OEBPS/content.opf")
     assert content =~ ~r{<dc:creator id="author1">John Doe</dc:creator>}
     assert content =~ ~r{<dc:creator id="author2">Jane Doe</dc:creator>}
   end
