@@ -1,3 +1,5 @@
+/* globals supportsQuickSwitch */
+
 // Dependencies
 // ------------
 
@@ -40,14 +42,6 @@ const keyboardShortcuts = [
     name: '/',
     keyCode: 191,
     action: searchKeyAction
-  },
-  {
-    name: '?',
-    keyCode: 191,
-    requiresShiftKey: true,
-    displayAs: '<kbd>?</kbd>',
-    description: 'Bring up this help dialog',
-    action: toggleHelpModal
   }
 ]
 
@@ -61,6 +55,16 @@ if (supportsQuickSwitch) {
     action: openQuickSwichModal
   })
 }
+
+// Always display help shortcut last
+keyboardShortcuts.push({
+  name: '?',
+  keyCode: 191,
+  requiresShiftKey: true,
+  displayAs: '<kbd>?</kbd>',
+  description: 'Bring up this help dialog',
+  action: toggleHelpModal
+})
 
 // State
 // -----
