@@ -76,6 +76,14 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~ ~r{<html.*lang="fr".*xmlns:epub="http://www.idpf.org/2007/ops">}ms
   end
 
+  test "allows to set the authors of the book" do
+    generate_docs_and_unzip(doc_config(authors: ["John Doe", "Jane Doe"]))
+
+    content = File.read!("#{output_dir()}/OEBPS/content.opf")
+    assert content =~ ~r{<dc:creator id="author1">John Doe</dc:creator>}
+    assert content =~ ~r{<dc:creator id="author2">Jane Doe</dc:creator>}
+  end
+
   test "raises when assets are invalid" do
     File.mkdir_p!("test/tmp/epub_assets/hello")
     File.touch!("test/tmp/epub_assets/hello/world.pdf")

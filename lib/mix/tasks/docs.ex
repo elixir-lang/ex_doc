@@ -110,6 +110,8 @@ defmodule Mix.Tasks.Docs do
       the "assets" directory in the output path under the name "cover" and the
       appropriate extension. This option has no effect when using the "html" formatter.
 
+    * `:authors` - List of authors for the generated docs or epub.
+
     * `:main` - Main page of the documentation. It may be a module or a
       generated page, like "Plug" or "api-reference"; default: "api-reference".
 
