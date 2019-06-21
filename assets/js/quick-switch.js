@@ -20,7 +20,7 @@ const usedModifierKeys = [
   37, // left arrow
   38, // up arrow
   39, // right arrow
-  40  // down arrow
+  40 // down arrow
 ]
 
 // State
@@ -49,12 +49,12 @@ function quickSwitchToPackage (packageSlug) {
   if (autoCompleteSelected === -1) {
     switchToExDocPackage(packageSlug)
   } else {
-    const selectedResult = autoCompleteResults[autoCompleteSelected];
+    const selectedResult = autoCompleteResults[autoCompleteSelected]
     switchToExDocPackage(selectedResult.name)
   }
 }
 
-function switchToExDocPackage(packageSlug) {
+function switchToExDocPackage (packageSlug) {
   window.location = `https://hexdocs.pm/${packageSlug}`
 }
 
@@ -76,7 +76,7 @@ function queryForAutocomplete (packageSlug) {
       const template = quickSwitchResultsTemplate({
         results: autoCompleteResults
       })
-      $(quickSwitchResultSelector).html(template);
+      $(quickSwitchResultSelector).html(template)
 
       if (autoCompleteResults.length > 0) {
         $(quickSwitchInputSelector).addClass('completed')
@@ -87,7 +87,7 @@ function queryForAutocomplete (packageSlug) {
   })
 }
 
-function moveAutocompleteSelection(e, updown) {
+function moveAutocompleteSelection (e, updown) {
   const selectedElement = $('.quick-switch-result.selected')
 
   if (selectedElement.length !== 0) {
@@ -103,17 +103,17 @@ function moveAutocompleteSelection(e, updown) {
   e.preventDefault()
 }
 
-function selectFirstAcResult() {
+function selectFirstAcResult () {
   $('.quick-switch-result').first().addClass('selected')
   autoCompleteSelected = 0
 }
 
-function selectLastAcResult() {
+function selectLastAcResult () {
   $('.quick-switch-result').last().addClass('selected')
   autoCompleteSelected = numberOfSuggestions
 }
 
-function selectNextAcResult(selectedElement) {
+function selectNextAcResult (selectedElement) {
   const nextResult = selectedElement.next()
   selectedElement.removeClass('selected')
 
@@ -125,7 +125,7 @@ function selectNextAcResult(selectedElement) {
   }
 }
 
-function selectPrevAcResult(selectedElement) {
+function selectPrevAcResult (selectedElement) {
   const prevResult = selectedElement.prev()
   selectedElement.removeClass('selected')
 
@@ -137,7 +137,7 @@ function selectPrevAcResult(selectedElement) {
   }
 }
 
-function deselectAcResult() {
+function deselectAcResult () {
   $('.quick-switch-result.selected').removeClass('selected')
   autoCompleteSelected = -1
 }
@@ -166,8 +166,8 @@ export function initialize () {
 
     if (e.keyCode === 13) { // enter key
       quickSwitchToPackage(packageSlug)
-    } 
-  
+    }
+
     if (e.keyCode === 37 || e.keyCode === 39) deselectAcResult()
     if (e.keyCode === 38) moveAutocompleteSelection(e, 'up')
     if (e.keyCode === 40) moveAutocompleteSelection(e, 'down')
