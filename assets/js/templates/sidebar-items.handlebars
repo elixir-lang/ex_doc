@@ -19,36 +19,36 @@
           {{node.title}}
         {{/if}}
 
-        <span class="icon-goto" title="Go to {{node.title}}"></span>
+        <span class="icon-goto" title="{{ useTranslation "Go to" ../translations }} {{node.title}}"></span>
       </a>
 
       <ul>
         <li>
-          <a href="{{node.id}}.html#content">Top</a>
+          <a href="{{node.id}}.html#content">{{ useTranslation "Top" ../translations }}</a>
         </li>
 
         {{#isArray node.headers}}
           {{#each node.headers}}
             <li>
-              <a href="{{node.id}}.html#{{{anchor}}}">{{{id}}}</a>
+              <a href="{{node.id}}.html#{{{anchor}}}">{{{ useTranslation id ../../translations }}}</a>
             </li>
           {{/each}}
         {{else}}
           {{#showSummary node}}
             <li>
-              <a href="{{node.id}}.html#summary">Summary</a>
+              <a href="{{node.id}}.html#summary">{{ useTranslation "Summary" ../translations }}</a>
             </li>
           {{/showSummary}}
           {{#each node.nodeGroups as |group|}}
             <li class="docs">
               <a href="{{node.id}}.html#{{group.key}}" class="expand">
-                {{group.name}}
-                <span class="icon-goto" title="Go to {{group.name}}"></span>
+                {{useTranslation group.name ../../translations}}
+                <span class="icon-goto" title="{{ useTranslation "Go to" ../../translations }} {{group.name}}"></span>
               </a>
               <ul class="{{group.key}}-list deflist">
                 {{#each group.nodes}}
                   <li>
-                    <a href="{{node.id}}.html#{{anchor}}">{{{id}}}</a>
+                    <a href="{{node.id}}.html#{{anchor}}">{{{ useTranslation id ../../../translations }}}</a>
                   </li>
                 {{/each}}
               </ul>

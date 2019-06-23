@@ -3,15 +3,15 @@
     <span id="<%=enc HTML.link_id(default, node.type) %>"></span>
   <% end %>
   <div class="detail-header">
-    <a href="#<%=enc HTML.link_id(node) %>" class="detail-link" title="Link to this <%= pretty_type(node) %>">
+    <a href="#<%=enc HTML.link_id(node) %>" class="detail-link" title="<%= translate(config, "Link to this #{pretty_type(node)}") %>">
       <span class="icon-link" aria-hidden="true"></span>
-      <span class="sr-only">Link to this <%= pretty_type(node) %></span>
+      <span class="sr-only"><%= translate(config, "Link to this #{pretty_type(node)}") %></span>
     </a>
     <h1 class="signature"><%=h node.signature %></h1>
     <%= if node.source_url do %>
-      <a href="<%= node.source_url %>" class="view-source" rel="help" title="View Source">
+      <a href="<%= node.source_url %>" class="view-source" rel="help" title="<%= translate(config, "View Source") %>">
        <span class="icon-code" aria-hidden="true"></span>
-       <span class="sr-only">View Source</span>
+       <span class="sr-only"><%= translate(config, "View Source") %></span>
      </a>
     <% end %>
     <%= for annotation <- node.annotations do %>
@@ -27,7 +27,7 @@
   </div>
   <%= if deprecated = node.deprecated do %>
     <div class="deprecated">
-      This <%= node.type %> is deprecated. <%= h(deprecated) %>.
+      <%= translate(config, "This #{node.type} is deprecated") %>. <%= translate(config, h(deprecated)) %>.
     </div>
   <% end %>
   <section class="docstring">

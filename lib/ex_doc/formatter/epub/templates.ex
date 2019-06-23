@@ -5,6 +5,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
 
   alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates, as: H
+  import ExDoc.Translation
 
   @doc """
   Generate content from the module template for a given `node`
@@ -93,7 +94,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :defp,
     :nav_item_template,
     Path.expand("templates/nav_item_template.eex", __DIR__),
-    [:name, :nodes],
+    [:name, :nodes, :config],
     trim: true
   )
 

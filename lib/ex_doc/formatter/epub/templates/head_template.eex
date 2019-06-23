@@ -3,7 +3,7 @@
       xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
     <meta charset="utf-8" />
-    <title><%= page.title %> - <%= config.project %> v<%= config.version %></title>
+    <title><%= translate(config, page.title) %> - <%= config.project %> v<%= config.version %></title>
     <meta name="generator" content="ExDoc v<%= ExDoc.version %>" />
     <link type="text/css" rel="stylesheet" href="<%= H.asset_rev "#{config.output}/OEBPS", "dist/epub*.css" %>" />
     <script src="<%= H.asset_rev "#{config.output}/OEBPS", "dist/epub*.js" %>"></script>

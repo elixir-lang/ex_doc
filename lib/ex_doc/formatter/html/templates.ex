@@ -3,6 +3,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   require EEx
 
   alias ExDoc.Formatter.HTML
+  import ExDoc.Translation
 
   @doc """
   Generate content from the module template for a given `node`
@@ -255,19 +256,50 @@ defmodule ExDoc.Formatter.HTML.Templates do
     link_headings(content, @heading_regex, prefix <> "-")
   end
 
+  @doc """
+  Create a JS object which holds all translated labels for the sidebar area
+  """
+  def create_sidebar_translated_labels(config) do
+    default_labels = [
+      callback: "callback",
+      callbacks: "Callbacks",
+      contributing: "Contributing",
+      extras: "extras",
+      function: "function",
+      functions: "Functions",
+      go_to: "Go to",
+      keyboard_shortcuts: "Keyboard Shortcuts",
+      license: "License",
+      search_documentation: "Search the documentation",
+      search_results: "Search results for",
+      summary: "Summary",
+      task: "task",
+      top: "Top",
+      types: "Types"
+    ]
+
+    sidebar_labels =
+      for {key, text} <- default_labels do
+        label = translate(config, text)
+        "\"#{key}\": \"#{label}\""
+      end
+
+    "translations={#{Enum.join(sidebar_labels, ",")}}"
+  end
+
   templates = [
-    detail_template: [:node, :_module],
+    detail_template: [:node, :_module, :config],
     footer_template: [:config],
     head_template: [:config, :page],
     module_template: [:config, :module, :summary, :nodes_map],
     not_found_template: [:config, :nodes_map],
-    api_reference_entry_template: [:module_node],
+    api_reference_entry_template: [:module_node, :config],
     api_reference_template: [:config, :nodes_map],
     extra_template: [:config, :title, :nodes_map, :content],
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
-    summary_template: [:name, :nodes],
-    summary_entry_template: [:node],
+    summary_template: [:name, :nodes, :config],
+    summary_entry_template: [:node, :config],
     redirect_template: [:config, :redirect_to]
   ]
 

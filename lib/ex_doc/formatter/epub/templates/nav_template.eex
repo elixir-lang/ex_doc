@@ -1,14 +1,14 @@
-<%= head_template(config, %{title: "Table Of Contents"}) %>
-    <h1>Table of contents</h1>
+<%= head_template(config, %{title: translate(config, "Table of contents")}) %>
+    <h1><%= translate(config, "Table of contents") %></h1>
     <nav epub:type="toc">
       <ol>
         <%= for {title, extras} <- config.extras do %>
           <%= if title do %>
-          <li><span><%= title %></span>
+          <li><span><%= translate(config, title) %></span>
             <ol>
           <% end %>
           <%= for extra <- extras do %>
-            <li><a href="<%= extra.id %>.xhtml"><%= extra.title %></a></li>
+            <li><a href="<%= extra.id %>.xhtml"><%= translate(config, extra.title) %></a></li>
           <% end %>
           <%= if title do %>
             </ol>
@@ -16,9 +16,9 @@
           <% end %>
         <% end %>
 
-        <%= nav_item_template "Modules", nodes.modules %>
-        <%= nav_item_template "Exceptions", nodes.exceptions %>
-        <%= nav_item_template "Mix Tasks", nodes.tasks %>
+        <%= nav_item_template translate(config, "Modules"), nodes.modules, config %>
+        <%= nav_item_template translate(config, "Exceptions"), nodes.exceptions, config %>
+        <%= nav_item_template translate(config, "Mix Tasks"), nodes.tasks, config %>
       </ol>
     </nav>
     <%# Extra content needed by the current markdown processor (e.g. custom Javascript) %>

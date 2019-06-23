@@ -1,4 +1,4 @@
-/* globals searchNodes */
+/* globals searchNodes, translations */
 
 // Search
 // ======
@@ -83,7 +83,8 @@ export function search (value) {
     var resultsHtml = resultsTemplate({
       value: value,
       results: results,
-      errorMessage: errorMessage
+      errorMessage: errorMessage,
+      translations: translations
     })
 
     $search.html(resultsHtml)

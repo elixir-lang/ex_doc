@@ -1,10 +1,10 @@
-<h1>Search results for <em>{{value}}</em></h1>
+<h1>{{ translations.search_results }} <em>{{value}}</em></h1>
 
 {{#isNonEmptyArray results}}
   {{#each results}}
     <div class="result">
       <h2 class="result-id">
-        <a href="{{this.ref}}">{{this.title}} <small>({{this.type}})</small></a>
+        <a href="{{this.ref}}">{{this.title}} <small>({{useTranslation this.type ../translations}})</small></a>
       </h2>
         {{#each excerpts}}
           <p class="result-elem">{{{this}}}</p>

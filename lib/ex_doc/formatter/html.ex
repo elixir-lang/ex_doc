@@ -3,6 +3,7 @@ defmodule ExDoc.Formatter.HTML do
 
   alias __MODULE__.{Assets, Autolink, Templates, SearchItems}
   alias ExDoc.{Markdown, GroupMatcher}
+  import ExDoc.Translation
 
   @main "api-reference"
   @assets_dir "assets"
@@ -130,8 +131,9 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_sidebar_items(nodes_map, extras, config) do
     content = Templates.create_sidebar_items(nodes_map, extras)
+    translated_labels = Templates.create_sidebar_translated_labels(config)
     sidebar_items = "dist/sidebar_items-#{digest(content)}.js"
-    File.write!(Path.join(config.output, sidebar_items), content)
+    File.write!(Path.join(config.output, sidebar_items), content <> "\n" <> translated_labels)
     [sidebar_items]
   end
 
@@ -212,7 +214,15 @@ defmodule ExDoc.Formatter.HTML do
 
   defp build_api_reference(nodes_map, config) do
     api_reference = Templates.api_reference_template(config, nodes_map)
-    %{id: "api-reference", title: "API Reference", group: "", content: api_reference}
+
+    %{
+      content: api_reference,
+      group: "",
+      id: "api-reference",
+      title: translate(config, "API Reference")
+    }
+
+    # %{id: "api-reference", title: "API Reference", group: "", content: api_reference}
   end
 
   @doc """

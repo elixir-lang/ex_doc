@@ -1,14 +1,14 @@
 <h1>
   <small class="app-vsn"><%= config.project %> v<%= config.version %></small>
-  API Reference
+  <%= translate(config, "API Reference") %>
 </h1>
 
 <%= if nodes_map.modules != [] do %>
   <section class="details-list">
-    <h2 id="modules" class="section-heading">Modules</h2>
+    <h2 id="modules" class="section-heading"><%= translate(config, "Modules") %></h2>
     <div class="summary">
       <%= for module_node <- Enum.sort_by(nodes_map.modules, & &1.id) do
-        api_reference_entry_template(module_node)
+        api_reference_entry_template(module_node, config)
       end %>
     </div>
   </section>
@@ -16,10 +16,10 @@
 
 <%= if nodes_map.exceptions != [] do %>
   <section class="details-list">
-    <h2 id="exceptions" class="section-heading">Exceptions</h2>
+    <h2 id="exceptions" class="section-heading"><%= translate(config, "Exceptions") %></h2>
     <div class="summary">
       <%= for exception_node <- nodes_map.exceptions do
-        api_reference_entry_template(exception_node)
+        api_reference_entry_template(exception_node, config)
       end %>
     </div>
   </section>
@@ -27,10 +27,10 @@
 
 <%= if nodes_map.tasks != [] do %>
   <section class="details-list">
-    <h2 id="tasks" class="section-heading">Mix Tasks</h2>
+    <h2 id="tasks" class="section-heading"><%= translate(config, "Mix Tasks") %></h2>
     <div class="summary">
       <%= for task_node <- nodes_map.tasks do
-        api_reference_entry_template(task_node)
+        api_reference_entry_template(task_node, config)
       end %>
     </div>
   </section>
