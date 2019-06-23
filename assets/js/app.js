@@ -23,6 +23,7 @@ import isNonEmptyArray from './template-helpers/isNonEmptyArray'
 import groupChanged from './template-helpers/groupChanged'
 import nestingChanged from './template-helpers/nestingChanged'
 import showSummary from './template-helpers/showSummary'
+import useTranslation from './template-helpers/useTranslation'
 
 import {initialize as initEvents} from './events'
 import {initialize as initSidebar} from './sidebar'
@@ -40,10 +41,11 @@ $(() => {
   // Set up Handlebars.js
   Handlebars.registerHelper('isArray', isArray)
   Handlebars.registerHelper('isLocal', isLocal)
-  Handlebars.registerHelper('isNonEmptyArray', isNonEmptyArray)
   Handlebars.registerHelper('groupChanged', groupChanged)
+  Handlebars.registerHelper('isNonEmptyArray', isNonEmptyArray)
   Handlebars.registerHelper('nestingChanged', nestingChanged)
   Handlebars.registerHelper('showSummary', showSummary)
+  Handlebars.registerHelper('useTranslation', useTranslation)
 
   // Set up Highlight.js
   hljs.configure({

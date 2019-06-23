@@ -1,4 +1,4 @@
-/* globals sidebarNodes */
+/* globals sidebarNodes, translations */
 
 // Dependencies
 // ------------
@@ -62,7 +62,7 @@ function fillSidebarWithNodes (nodes, filter) {
   filter = filter || moduleType
   var filtered = nodes[filter] || []
   var fullList = $('#full-list')
-  fullList.replaceWith(sidebarItemsTemplate({'nodes': filtered, 'group': ''}))
+  fullList.replaceWith(sidebarItemsTemplate({'nodes': filtered, 'group': '', 'translations': translations}))
   setupSelected(['#', filter, '-list'].join(''))
 
   $('#full-list li a').on('click', e => {

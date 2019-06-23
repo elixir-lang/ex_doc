@@ -1,4 +1,4 @@
-<%= head_template(config, %{title: title, type: :extra}) %>
+<%= head_template(config, %{title: translate(config, title), type: :extra}) %>
 <%= sidebar_template(config, nodes_map) %>
 
 <%= link_headings(content) %>

@@ -1,24 +1,24 @@
       <footer class="footer">
         <p>
           <span class="line">
-            Built using
+            <%= translate(config, "Built using") %>
             <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener">ExDoc</a> (v<%= ExDoc.version %>),
           </span>
           <span class="line">
-            designed by
+            <%= translate(config, "designed by") %>
             <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
           </span>
         </p>
         <p>
           <button class="line footer-button night-mode-toggle">
-            Toggle night mode
+            <%= translate(config, "Toggle night mode") %>
           </button>
           <button class="line footer-button tooltips-toggle">
             <span class="tooltips-option-disable">Disable tooltips</span>
             <span class="tooltips-option-enable">Enable tooltips</span>
           </button>
           <button class="line footer-button display-shortcuts-help">
-            Display keyboard shortcuts
+            <%= translate(config, "Display keyboard shortcuts") %>
           </button>
           <button class="line footer-button display-quick-switch">
             Go to a HexDocs package

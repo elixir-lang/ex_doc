@@ -1,4 +1,4 @@
-<%= head_template(config, %{title: "Cover"}) %>
+<%= head_template(config, %{title: translate(config, "Cover")}) %>
     <div class="title-container">
       <%= if cover = config.cover do %>
         <div><img src="assets/cover<%= Path.extname(cover) %>"/></div>

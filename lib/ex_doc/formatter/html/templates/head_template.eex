@@ -9,7 +9,7 @@
     <%= if config.authors do %>
       <meta name="author" content="<%= Enum.join(config.authors, ", ") %>">
     <% end %>
-    <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
+    <title><%= translate(config, page.title) %> — <%= config.project %> v<%= config.version %></title>
     <link rel="stylesheet" href="<%= asset_rev config.output, "dist/html*.css" %>" />
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />
