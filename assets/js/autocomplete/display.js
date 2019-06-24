@@ -20,6 +20,18 @@ function updateSuggestions (term) {
   })
 
   autocompleteElement.html(template)
+  setupAutocompleteListeners()
+}
+
+function setupAutocompleteListeners () {
+  $('.autocomplete-suggestion').mouseenter(function () {
+    $('.autocomplete-suggestion').removeClass('selected')
+    $(this).addClass('selected')
+  })
+
+  $('.autocomplete-suggestion').mouseleave(function () {
+    $(this).removeClass('selected')
+  })
 }
 
 function hide () {
