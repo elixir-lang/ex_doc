@@ -61,7 +61,7 @@ function closeQuickSwitchModal () {
 
 /**
  * Switch to another package on HexDocs.
- * If an auto-complete entry is selected, it will be used instead of the packageSlug.
+ * If an autocomplete entry is selected, it will be used instead of the packageSlug.
  *
  * @param {String} packageSlug The searched package name
  */
@@ -84,7 +84,7 @@ function switchToExDocPackage (packageSlug) {
 }
 
 /**
- * Debounces API calls to HexDocs for auto-completing package names.
+ * Debounces API calls to HexDocs for autocompleting package names.
  *
  * @param {String} packageSlug The searched package name
  */
@@ -96,7 +96,7 @@ function debouceAutocomplete (packageSlug) {
 }
 
 /**
- * Queries the HexDocs API for auto-complete results for a given package name.
+ * Queries the HexDocs API for autocomplete results for a given package name.
  *
  * @param {String} packageSlug The searched package name
  */
@@ -122,7 +122,7 @@ function queryForAutocomplete (packageSlug) {
 }
 
 /**
- * Registers jQuery listeners for auto-complete search results.
+ * Registers jQuery listeners for autocomplete search results.
  */
 function setupAutocompleteListeners () {
   $(quickSwitchResultSelector).click(function () {
@@ -131,18 +131,20 @@ function setupAutocompleteListeners () {
   })
 
   $(quickSwitchResultSelector).mouseenter(function () {
+    deselectAcResult()
     autoCompleteSelected = $(this).attr('data-index')
     $(this).addClass('selected')
   })
 
   $(quickSwitchResultSelector).mouseleave(function () {
+    deselectAcResult()
     autoCompleteSelected = -1
     $(this).removeClass('selected')
   })
 }
 
 /**
- * Moves the auto-complete selection up or down.
+ * Moves the autocomplete selection up or down.
  *
  * @param {Object} e The keypress event that triggered the moving
  * @param {String} updown Whether to move up or down the list
@@ -164,7 +166,7 @@ function moveAutocompleteSelection (e, updown) {
 }
 
 /**
- * Select the first result in the auto-complete result list.
+ * Select the first result in the autocomplete result list.
  */
 function selectFirstAcResult () {
   $(quickSwitchResultSelector).first().addClass('selected')
@@ -172,7 +174,7 @@ function selectFirstAcResult () {
 }
 
 /**
- * Select the last result in the auto-complete result list.
+ * Select the last result in the autocomplete result list.
  */
 function selectLastAcResult () {
   $(quickSwitchResultSelector).last().addClass('selected')
@@ -180,10 +182,10 @@ function selectLastAcResult () {
 }
 
 /**
- * Select next auto-complete result.
+ * Select next autocomplete result.
  * If the end of the list is reached, the first element is selected instead.
  *
- * @param {(Object|null)} selectedElement jQuery element of selected auto-complete result
+ * @param {(Object|null)} selectedElement jQuery element of selected autocomplete result
  */
 function selectNextAcResult (selectedElement) {
   const nextResult = selectedElement.next()
@@ -198,10 +200,10 @@ function selectNextAcResult (selectedElement) {
 }
 
 /**
- * Select previous auto-complete result.
+ * Select previous autocomplete result.
  * If the beginning of the list is reached, the last element is selected instead.
  *
- * @param {(Object|null)} selectedElement jQuery element of selected auto-complete result
+ * @param {(Object|null)} selectedElement jQuery element of selected autocomplete result
  */
 function selectPrevAcResult (selectedElement) {
   const prevResult = selectedElement.prev()
@@ -216,7 +218,7 @@ function selectPrevAcResult (selectedElement) {
 }
 
 /**
- * De-select the currently selected auto-complete result
+ * De-select the currently selected autocomplete result
  */
 function deselectAcResult () {
   $('.quick-switch-result.selected').removeClass('selected')
