@@ -1,5 +1,8 @@
 // quick switch modal
 
+// Dependencies
+// ------------
+
 import $ from 'jquery'
 import quickSwitchModalTemplate from './templates/quick-switch-modal.handlebars'
 import quickSwitchResultsTemplate from './templates/quick-switch-results.handlebars'
@@ -27,16 +30,25 @@ const usedModifierKeys = [
 
 // State
 // -----
+
 let debounceTimeout = null
 let autoCompleteResults = []
 let autoCompleteSelected = -1
 
+/**
+ * Opens the quick switch modal dialog.
+ *
+ * @param {Object} e Keybord shortcut press event
+ */
 function openQuickSwitchModal (e) {
   $(quickSwitchModalSelector).show()
   $(quickSwitchInputSelector).focus()
   event.preventDefault()
 }
 
+/**
+ * Closes the quick switch modal dialog.
+ */
 function closeQuickSwitchModal () {
   debounceTimeout = null
   autoCompleteResults = []
@@ -47,6 +59,12 @@ function closeQuickSwitchModal () {
   $(quickSwitchModalSelector).hide()
 }
 
+/**
+ * Switch to another package on HexDocs.
+ * If an auto-complete entry is selected, it will be used instead of the packageSlug.
+ *
+ * @param {String} packageSlug The searched package name
+ */
 function quickSwitchToPackage (packageSlug) {
   if (autoCompleteSelected === -1) {
     switchToExDocPackage(packageSlug)
@@ -56,10 +74,20 @@ function quickSwitchToPackage (packageSlug) {
   }
 }
 
+/**
+ * Navigates to HexDocs of a specific package.
+ *
+ * @param {String} packageSlug The package name to navigate to
+ */
 function switchToExDocPackage (packageSlug) {
   window.location = `https://hexdocs.pm/${packageSlug}`
 }
 
+/**
+ * Debounces API calls to HexDocs for auto-completing package names.
+ *
+ * @param {String} packageSlug The searched package name
+ */
 function debouceAutocomplete (packageSlug) {
   clearTimeout(debounceTimeout)
   debounceTimeout = setTimeout(() => {
@@ -67,6 +95,11 @@ function debouceAutocomplete (packageSlug) {
   }, debounceKeypressTimeout)
 }
 
+/**
+ * Queries the HexDocs API for auto-complete results for a given package name.
+ *
+ * @param {String} packageSlug The searched package name
+ */
 function queryForAutocomplete (packageSlug) {
   $.get(hexSearchEndpoint.replace('%%', packageSlug), (payload) => {
     if (Array.isArray(payload)) {
@@ -88,6 +121,9 @@ function queryForAutocomplete (packageSlug) {
   })
 }
 
+/**
+ * Registers jQuery listeners for auto-complete search results.
+ */
 function setupAutocompleteListeners () {
   $(quickSwitchResultSelector).click(function () {
     const selectedResult = autoCompleteResults[$(this).attr('data-index')]
@@ -105,6 +141,12 @@ function setupAutocompleteListeners () {
   })
 }
 
+/**
+ * Moves the auto-complete selection up or down.
+ *
+ * @param {Object} e The keypress event that triggered the moving
+ * @param {String} updown Whether to move up or down the list
+ */
 function moveAutocompleteSelection (e, updown) {
   const selectedElement = $('.quick-switch-result.selected')
 
@@ -121,16 +163,28 @@ function moveAutocompleteSelection (e, updown) {
   e.preventDefault()
 }
 
+/**
+ * Select the first result in the auto-complete result list.
+ */
 function selectFirstAcResult () {
   $(quickSwitchResultSelector).first().addClass('selected')
   autoCompleteSelected = 0
 }
 
+/**
+ * Select the last result in the auto-complete result list.
+ */
 function selectLastAcResult () {
   $(quickSwitchResultSelector).last().addClass('selected')
   autoCompleteSelected = numberOfSuggestions
 }
 
+/**
+ * Select next auto-complete result.
+ * If the end of the list is reached, the first element is selected instead.
+ *
+ * @param {(Object|null)} selectedElement jQuery element of selected auto-complete result
+ */
 function selectNextAcResult (selectedElement) {
   const nextResult = selectedElement.next()
   selectedElement.removeClass('selected')
@@ -143,6 +197,12 @@ function selectNextAcResult (selectedElement) {
   }
 }
 
+/**
+ * Select previous auto-complete result.
+ * If the beginning of the list is reached, the last element is selected instead.
+ *
+ * @param {(Object|null)} selectedElement jQuery element of selected auto-complete result
+ */
 function selectPrevAcResult (selectedElement) {
   const prevResult = selectedElement.prev()
   selectedElement.removeClass('selected')
@@ -155,6 +215,9 @@ function selectPrevAcResult (selectedElement) {
   }
 }
 
+/**
+ * De-select the currently selected auto-complete result
+ */
 function deselectAcResult () {
   $('.quick-switch-result.selected').removeClass('selected')
   autoCompleteSelected = -1
