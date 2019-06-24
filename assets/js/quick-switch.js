@@ -109,37 +109,17 @@ function queryForAutocomplete (packageSlug) {
       const template = quickSwitchResultsTemplate({
         results: autoCompleteResults
       })
-      $(quickSwitchResultsSelector).html(template)
-      setupAutocompleteListeners()
 
-      if (autoCompleteResults.length > 0) {
-        $(quickSwitchInputSelector).addClass('completed')
-      } else {
-        $(quickSwitchInputSelector).removeClass('completed')
+      // Only append results if string is still long enough
+      const currentTerm = $(quickSwitchInputSelector).val()
+      if (currentTerm && currentTerm.length > 3) {
+        $(quickSwitchResultsSelector).html(template)
+        $(quickSwitchResultSelector).click(function () {
+          const selectedResult = autoCompleteResults[$(this).attr('data-index')]
+          switchToExDocPackage(selectedResult.name)
+        })
       }
     }
-  })
-}
-
-/**
- * Registers jQuery listeners for autocomplete search results.
- */
-function setupAutocompleteListeners () {
-  $(quickSwitchResultSelector).click(function () {
-    const selectedResult = autoCompleteResults[$(this).attr('data-index')]
-    switchToExDocPackage(selectedResult.name)
-  })
-
-  $(quickSwitchResultSelector).mouseenter(function () {
-    deselectAcResult()
-    autoCompleteSelected = $(this).attr('data-index')
-    $(this).addClass('selected')
-  })
-
-  $(quickSwitchResultSelector).mouseleave(function () {
-    deselectAcResult()
-    autoCompleteSelected = -1
-    $(this).removeClass('selected')
   })
 }
 
