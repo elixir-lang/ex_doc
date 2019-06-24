@@ -17,7 +17,7 @@
             Display keyboard shortcuts
           </button>
           <button class="line footer-button display-quick-switch">
-            Go to another package on HexDocs
+            Go to a HexDocs package
           </button>
         </p>
       </footer>

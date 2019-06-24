@@ -60,7 +60,7 @@ function closeQuickSwitchModal () {
 }
 
 /**
- * Switch to another package on HexDocs.
+ * Switch to a package on HexDocs.
  * If an autocomplete entry is selected, it will be used instead of the packageSlug.
  *
  * @param {String} packageSlug The searched package name

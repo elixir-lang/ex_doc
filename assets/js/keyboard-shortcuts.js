@@ -44,7 +44,7 @@ const keyboardShortcuts = [
   {
     name: 'g',
     keyCode: 71,
-    description: 'Go to another package on HexDocs',
+    description: 'Go to a HexDocs package',
     displayAs: '<kbd>g</kdb>',
     action: openQuickSwitchModal
   },
