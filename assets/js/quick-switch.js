@@ -8,6 +8,7 @@ import quickSwitchResultsTemplate from './templates/quick-switch-results.handleb
 // ---------
 
 const hexSearchEndpoint = 'https://hex.pm/api/packages?search=name:%%*'
+const quickSwitchLinkSelector = '.display-quick-switch'
 const quickSwitchModalSelector = '#quick-switch-modal'
 const quickSwitchInputSelector = '#quick-switch-input'
 const quickSwitchResultSelector = '#quick-switch-results'
@@ -150,6 +151,8 @@ export { openQuickSwichModal }
 export function initialize () {
   const quickSwitchModal = quickSwitchModalTemplate()
   $('body').append(quickSwitchModal)
+
+  $(quickSwitchLinkSelector).click(openQuickSwichModal)
 
   $(quickSwitchModalSelector).on('keydown', function (e) {
     if (e.keyCode === 27) { // escape key

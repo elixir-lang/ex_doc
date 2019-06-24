@@ -16,6 +16,9 @@
           <button class="line footer-button display-shortcuts-help">
             Display keyboard shortcuts
           </button>
+          <button class="line footer-button display-quick-switch">
+            Go to another package on HexDocs
+          </button>
         </p>
       </footer>
     </div>

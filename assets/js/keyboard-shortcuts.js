@@ -1,5 +1,3 @@
-/* globals supportsQuickSwitch */
-
 // Dependencies
 // ------------
 
@@ -42,29 +40,23 @@ const keyboardShortcuts = [
     name: '/',
     keyCode: 191,
     action: searchKeyAction
-  }
-]
-
-// Add quick-switch shortcut only if the config specifies support
-if (supportsQuickSwitch) {
-  keyboardShortcuts.push({
+  },
+  {
     name: 'g',
     keyCode: 71,
-    description: 'Quick-swith to other docs',
+    description: 'Go to another package on HexDocs',
     displayAs: '<kbd>g</kdb>',
     action: openQuickSwichModal
-  })
-}
-
-// Always display help shortcut last
-keyboardShortcuts.push({
-  name: '?',
-  keyCode: 191,
-  requiresShiftKey: true,
-  displayAs: '<kbd>?</kbd>',
-  description: 'Bring up this help dialog',
-  action: toggleHelpModal
-})
+  },
+  {
+    name: '?',
+    keyCode: 191,
+    requiresShiftKey: true,
+    displayAs: '<kbd>?</kbd>',
+    description: 'Bring up this help dialog',
+    action: toggleHelpModal
+  }
+]
 
 // State
 // -----
