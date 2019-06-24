@@ -31,7 +31,7 @@ let debounceTimeout = null
 let autoCompleteResults = []
 let autoCompleteSelected = -1
 
-function openQuickSwichModal (e) {
+function openQuickSwitchModal (e) {
   $(quickSwitchModalSelector).show()
   $(quickSwitchInputSelector).focus()
   event.preventDefault()
@@ -163,13 +163,13 @@ function deselectAcResult () {
 // Public Methods
 // --------------
 
-export { openQuickSwichModal }
+export { openQuickSwitchModal }
 
 export function initialize () {
   const quickSwitchModal = quickSwitchModalTemplate()
   $('body').append(quickSwitchModal)
 
-  $(quickSwitchLinkSelector).click(openQuickSwichModal)
+  $(quickSwitchLinkSelector).click(openQuickSwitchModal)
 
   $(quickSwitchModalSelector).on('keydown', function (e) {
     if (e.keyCode === 27) { // escape key
