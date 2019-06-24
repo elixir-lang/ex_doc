@@ -11,7 +11,8 @@ const hexSearchEndpoint = 'https://hex.pm/api/packages?search=name:%%*'
 const quickSwitchLinkSelector = '.display-quick-switch'
 const quickSwitchModalSelector = '#quick-switch-modal'
 const quickSwitchInputSelector = '#quick-switch-input'
-const quickSwitchResultSelector = '#quick-switch-results'
+const quickSwitchResultsSelector = '#quick-switch-results'
+const quickSwitchResultSelector = '.quick-switch-result'
 const closeButtonSelector = '.modal-close'
 const debounceKeypressTimeout = 300
 const numberOfSuggestions = 9
@@ -41,7 +42,7 @@ function closeQuickSwitchModal () {
   autoCompleteResults = []
   autoCompleteSelected = -1
 
-  $(quickSwitchResultSelector).html('')
+  $(quickSwitchResultsSelector).html('')
   $(quickSwitchInputSelector).val('').removeClass('completed')
   $(quickSwitchModalSelector).hide()
 }
@@ -60,8 +61,6 @@ function switchToExDocPackage (packageSlug) {
 }
 
 function debouceAutocomplete (packageSlug) {
-  if (!packageSlug || packageSlug.length < 3) return
-
   clearTimeout(debounceTimeout)
   debounceTimeout = setTimeout(() => {
     queryForAutocomplete(packageSlug)
@@ -77,7 +76,8 @@ function queryForAutocomplete (packageSlug) {
       const template = quickSwitchResultsTemplate({
         results: autoCompleteResults
       })
-      $(quickSwitchResultSelector).html(template)
+      $(quickSwitchResultsSelector).html(template)
+      setupAutocompleteListeners()
 
       if (autoCompleteResults.length > 0) {
         $(quickSwitchInputSelector).addClass('completed')
@@ -85,6 +85,23 @@ function queryForAutocomplete (packageSlug) {
         $(quickSwitchInputSelector).removeClass('completed')
       }
     }
+  })
+}
+
+function setupAutocompleteListeners () {
+  $(quickSwitchResultSelector).click(function () {
+    const selectedResult = autoCompleteResults[$(this).attr('data-index')]
+    switchToExDocPackage(selectedResult.name)
+  })
+
+  $(quickSwitchResultSelector).mouseenter(function () {
+    autoCompleteSelected = $(this).attr('data-index')
+    $(this).addClass('selected')
+  })
+
+  $(quickSwitchResultSelector).mouseleave(function () {
+    autoCompleteSelected = -1
+    $(this).removeClass('selected')
   })
 }
 
@@ -105,12 +122,12 @@ function moveAutocompleteSelection (e, updown) {
 }
 
 function selectFirstAcResult () {
-  $('.quick-switch-result').first().addClass('selected')
+  $(quickSwitchResultSelector).first().addClass('selected')
   autoCompleteSelected = 0
 }
 
 function selectLastAcResult () {
-  $('.quick-switch-result').last().addClass('selected')
+  $(quickSwitchResultSelector).last().addClass('selected')
   autoCompleteSelected = numberOfSuggestions
 }
 
@@ -177,9 +194,13 @@ export function initialize () {
   })
 
   $(quickSwitchInputSelector).on('keyup', function (e) {
-    const packageSlug = $(quickSwitchInputSelector).val()
+    const packageSlug = $(quickSwitchInputSelector).val() || ''
 
-    if (usedModifierKeys.indexOf(e.keyCode) === -1) {
+    if (e.keyCode === 8 && packageSlug.length < 3) {
+      $(quickSwitchResultsSelector).html('')
+    }
+
+    if (usedModifierKeys.indexOf(e.keyCode) === -1 && packageSlug.length >= 3) {
       debouceAutocomplete(packageSlug)
     }
   })
