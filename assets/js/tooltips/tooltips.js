@@ -2,6 +2,7 @@
 // ------------
 
 import $ from 'jquery'
+import find from 'lodash.find'
 import tooltipBodyTemplate from '../templates/tooltip-body.handlebars'
 import tooltipLayoutTemplate from '../templates/tooltip-layout.handlebars'
 
@@ -21,7 +22,12 @@ const minWindowSize = { // Tooltips won't be displayed if width/height of the vi
 // Tooltip will appear only if the mouse cursor stays on the link for at least 150ms.
 // This way tooltips will not appear if we are scrooling the page or just moving the cursor around.
 const hoverDelayTime = 150
-const typesPage = 'typespecs.html' // Page containing info about basic type, built-in types and literals.
+// Info that will be shown when hovering over links pointing to the typespecs page.
+const typesCategories = [
+  {description: 'Basic type', href: 'typespecs.html#basic-types'},
+  {description: 'Literal', href: 'typespecs.html#literals'},
+  {description: 'Built-in type', href: 'typespecs.html#built-in-types'}
+]
 const tooltipsToggleSelector = '.tooltips-toggle' // `Enable/Disable tooltips` button
 const tooltipsDisabledStorageKey = 'tooltipsDisabled' // Local Storage key Used to store tooltips settings
 
@@ -196,7 +202,8 @@ function calculateSpaceAroundLink (relativeRect, linkRect, contentRect) {
   }
 }
 
-// Prepares the tooltip DOM (without showing it).
+// Prepares the tooltip DOM.
+// Shows the tooltip immediately when hovering over built-in or basic types.
 function prepareTooltips () {
   updateTooltipPosition()
 
@@ -210,8 +217,21 @@ function prepareTooltips () {
     href = `${window.location.pathname}${href}`
   }
 
-  const focusedHref = rewriteHref(href)
-  $(tooltipIframeSelector).attr('src', focusedHref)
+  if (isSelfLink(href)) { return }
+
+  const typeCategory = findTypeCategory(href)
+
+  if (typeCategory) {
+    showTooltip({
+      kind: 'type',
+      description: typeCategory.description
+    })
+  } else {
+    const hintHref = rewriteHref(href)
+    let iframe = $(tooltipIframeSelector).detach()
+    iframe.attr('src', hintHref)
+    tooltipElement.append(iframe)
+  }
 }
 
 // Shows tooltip and starts it's animation.
@@ -219,7 +239,6 @@ function showTooltip (hint) {
   const html = tooltipBodyTemplate({
     isModule: hint.kind === 'module',
     isType: hint.kind === 'type',
-    isBuiltInType: hint.typeCategory === 'builtInType',
     hint: hint
   })
 
@@ -249,14 +268,7 @@ function hideTooltip () {
  * @returns {string} link with parameters added
  */
 function rewriteHref (href) {
-  let typeInfo = ''
-
-  if (isTypesPageLink(href)) {
-    const typeName = encodeURIComponent(currentLinkElement.text())
-    typeInfo = `&typeName=${typeName}`
-  }
-
-  return href.replace('.html', `.html?hint=true&requestId=${currentRequestId}${typeInfo}`)
+  return href.replace('.html', `.html?hint=true&requestId=${currentRequestId}`)
 }
 
 /**
@@ -264,10 +276,25 @@ function rewriteHref (href) {
  *
  * @param {string} href link to the page
  *
- * @returns {boolean} `true` if link points to the typespecs page, `false` otherwise
+ * @returns {(Object|null)} returns type category info if the link points to a literal, built-in or basic type page.
+ *   Returns `null` if current link does not point to a typespecs page.
  */
-function isTypesPageLink (href) {
-  return (href.indexOf(typesPage) === 0 || href.indexOf(`/${typesPage}`) >= 0)
+function findTypeCategory (href) {
+  return find(typesCategories, category => href.indexOf(category.href) >= 0)
+}
+
+/**
+ * Is the current link poinitng to the module we're just browsing?
+ *
+ * @param {string} href link to the page
+ *
+ * @returns {boolean}
+ */
+function isSelfLink (href) {
+  const pathname = window.location.pathname
+  const pathnameEnding = pathname.substring(pathname.length - href.length, pathname.length)
+
+  return pathnameEnding === href
 }
 
 /**

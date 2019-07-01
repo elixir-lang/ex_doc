@@ -1,23 +1,15 @@
 // Dependencies
 // ------------
 
-import {extractTypeHint, extractModuleHint, extractFunctionHint} from './hints-extraction'
+import {extractModuleHint, extractFunctionHint} from './hints-extraction'
 import $ from 'jquery'
-import find from 'lodash.find'
 
 // Constants
 // ---------
 
 const contentInner = '.content-inner'
+const projectMetaTag = 'meta[name="project"]'
 const message = {hint: {}, ready: false, requestId: null}
-const typespecs = {
-  pathnameEnd: '/typespecs.html',
-  categories: [
-    { name: 'basicType', description: 'Basic type', hash: '#basic-types', detailsAvailable: false },
-    { name: 'literal', description: 'Literal', hash: '#literals', detailsAvailable: false },
-    { name: 'builtInType', description: 'Built-in type', hash: '#built-in-types', detailsAvailable: true }
-  ]
-}
 
 /**
  *  Will try to extract hint info, and if successful triggers a message to the parent page.
@@ -34,18 +26,16 @@ function sendHint () {
   if (!requestId) { return }
 
   const infoElement = descriptionElementFromHash(hash)
-  const typeCategory = typeCategoryFromHash(hash)
 
   if (infoElement && infoElement.length > 0) {
     hint = extractFunctionHint(infoElement)
-  } else if (isTypesPage(params)) {
-    const typeName = params.get('typeName')
-    hint = extractTypeHint(content, typeName, typeCategory)
   } else if (isModulePage()) {
     hint = extractModuleHint(content)
   }
 
   if (!hint) { return }
+
+  hint.version = getProjectVersion()
 
   postMessage(hint, requestId)
 }
@@ -72,34 +62,6 @@ function isModulePage () {
 }
 
 /**
- * Checks if the current page is the typespecs page and if we're requesting type info.
- *
- * @param {Object} params URLSearchParams object, parsed parameters from the URL
- *
- * @returns {boolean} `true` if current page is the typespecs page and a type is being requested
- */
-function isTypesPage (params) {
-  const isThisTypespecsPage = window.location.pathname.indexOf(typespecs.pathnameEnd) > 0
-  const isTypesHashPresent = !!typeCategoryFromHash(window.location.hash)
-  const isTypeRequested = !!params.get('typeName')
-
-  return isThisTypespecsPage && isTypesHashPresent && isTypeRequested
-}
-
-/**
- * Finds to which category type specified in the hash belongs to.
- * We get category information back, which let us know which type we're dealing with and how to
- * prepare a hint for it.
- *
- * @param {string} hash ie. `#basic-types`
- *
- * @returns {object} Obect containing information about the selcted category
- */
-function typeCategoryFromHash (hash) {
-  return find(typespecs.categories, {hash: hash})
-}
-
-/**
  * Constructs a jQuery selector targeting an element
  *
  * @param {Object} params URLSearchParams object, parsed parameters from the URL
@@ -116,6 +78,10 @@ function descriptionElementFromHash (hash) {
   if (!hash) { return null }
 
   return $(`#${hash}.detail`)
+}
+
+function getProjectVersion () {
+  return $(projectMetaTag).attr('content')
 }
 
 // Public Methods

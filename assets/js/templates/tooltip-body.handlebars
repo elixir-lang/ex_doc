@@ -1,10 +1,6 @@
 {{#if isType}}
   <section class="docstring docstring-type">
-    {{#if isBuiltInType}}
-      Built-in type defined as <code>{{this.hint.description}}</code>
-    {{else}}
-      {{this.hint.description}}
-    {{/if}}
+    {{this.hint.description}}
   </section>
 {{else}}
   <div class="detail-header">
@@ -13,6 +9,7 @@
       {{else}}
         <h1 class="signature">
           {{this.hint.title}}
+          <div class="version-info">{{this.hint.version}}</div>
           <div class="specs">{{this.hint.signatureSpecs}}</div>
         </h1>
       {{/if}}
