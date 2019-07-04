@@ -4,15 +4,13 @@
   </section>
 {{else}}
   <div class="detail-header">
-      {{#if this.isModule}}
-        <h2>{{this.hint.title}}</h2>
-      {{else}}
-        <h1 class="signature">
-          {{this.hint.title}}
-          <div class="version-info">{{this.hint.version}}</div>
-          <div class="specs">{{this.hint.signatureSpecs}}</div>
-        </h1>
-      {{/if}}
+    <h1 class="signature">
+      {{this.hint.title}}
+      <div class="version-info">{{this.hint.version}}</div>
+      {{#unless this.isModule}}
+        <div class="specs">{{this.hint.signatureSpecs}}</div>
+      {{/unless}}
+    </h1>
   </div>
   {{#if this.hint.description}}
     <section class="docstring">

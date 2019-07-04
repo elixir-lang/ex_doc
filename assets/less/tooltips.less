@@ -24,6 +24,10 @@
   .tooltip-body {
     border: 1px solid fade(@mediumGray, 30%);
 
+    .signature {
+      min-width: 320px;
+    }
+
     .detail-header {
       border-left: 0;
       margin-bottom: 0;
@@ -31,6 +35,10 @@
 
       h2 {
         margin: 0 0 0.2rem 0;
+      }
+
+      .specs {
+        white-space: pre-wrap;
       }
     }
 
@@ -48,11 +56,13 @@
 
     .version-info {
       float: right;
-      line-height: 1.6em;
-      font-size: 0.9em;
+      line-height: 1.6rem;
+      font-family: @monoFontFamily;
+      font-size: 0.9rem;
       font-weight: normal;
       margin-bottom: -6px;
       opacity: 0.3;
+      padding-left: 0.3em;
     }
   }
 

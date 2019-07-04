@@ -30,6 +30,7 @@ const typesCategories = [
 ]
 const tooltipsToggleSelector = '.tooltips-toggle' // `Enable/Disable tooltips` button
 const tooltipsDisabledStorageKey = 'tooltipsDisabled' // Local Storage key Used to store tooltips settings
+const moduleContentHash = '#content' // Hash included in links pointing to module pages
 
 let tooltipElement = null // Will store the jQuery selector for the tooltip root
 let currentLinkElement = null // Element that the cursor is hovering over
@@ -291,6 +292,8 @@ function findTypeCategory (href) {
  * @returns {boolean}
  */
 function isSelfLink (href) {
+  href = href.replace(moduleContentHash, '')
+
   const pathname = window.location.pathname
   const pathnameEnding = pathname.substring(pathname.length - href.length, pathname.length)
 
