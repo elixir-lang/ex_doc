@@ -25,4 +25,4 @@
     <%= config.before_closing_head_tag.(:html) %>
   </head>
   <body data-type="<%= sidebar_type(page.type) %>">
-    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+    <script>try { if(localStorage.getItem('night-mode') === 'true') document.body.className += ' night-mode'; } catch (e) { }</script>
