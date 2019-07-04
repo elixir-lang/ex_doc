@@ -21,7 +21,7 @@ const minWindowSize = { // Tooltips won't be displayed if width/height of the vi
 }
 // Tooltip will appear only if the mouse cursor stays on the link for at least 150ms.
 // This way tooltips will not appear if we are scrooling the page or just moving the cursor around.
-const hoverDelayTime = 150
+const hoverDelayTime = 100
 // Info that will be shown when hovering over links pointing to the typespecs page.
 const typesCategories = [
   {description: 'Basic type', href: 'typespecs.html#basic-types'},

@@ -80,6 +80,11 @@ function descriptionElementFromHash (hash) {
   return $(`#${hash}.detail`)
 }
 
+/**
+ * Grabs project version name from the meta tag.
+ *
+ * @returns {string} Project version name (ie. "Elixir v1.2.3")
+ */
 function getProjectVersion () {
   return $(projectMetaTag).attr('content')
 }
