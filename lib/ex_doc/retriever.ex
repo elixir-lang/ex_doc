@@ -16,20 +16,12 @@ defmodule ExDoc.Retriever do
   @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
   def docs_from_dir(dir, config) when is_binary(dir) do
     dir
-    |> __docs_from_dir__(config)
-    |> reject_docs_with_moduledoc_false()
+    |> files_from_pattern(config)
+    |> docs_from_files(config)
   end
 
   def docs_from_dir(dirs, config) when is_list(dirs) do
-    dirs
-    |> Enum.flat_map(&__docs_from_dir__(&1, config))
-    |> reject_docs_with_moduledoc_false()
-  end
-
-  defp __docs_from_dir__(dir, config) do
-    dir
-    |> files_from_pattern(config)
-    |> docs_from_files(config)
+    Enum.flat_map(dirs, &docs_from_dir(&1, config))
   end
 
   @doc """
@@ -49,20 +41,12 @@ defmodule ExDoc.Retriever do
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
     |> Enum.flat_map(&get_module(&1, config))
-    |> reject_docs_with_moduledoc_false()
     |> Enum.sort_by(fn module ->
       {GroupMatcher.group_index(config.groups_for_modules, module.group), module.id}
     end)
   end
 
   ## Helpers
-
-  defp reject_docs_with_moduledoc_false(docs) do
-    Enum.reject(docs, fn
-      {:module_doc_hidden, _} -> true
-      _ -> false
-    end)
-  end
 
   defp files_from_pattern(dir, config) do
     pattern =
@@ -96,7 +80,7 @@ defmodule ExDoc.Retriever do
         []
 
       :hidden ->
-        %{module_doc_hidden: module}
+        []
 
       docs_chunk ->
         generate_node(module, docs_chunk, config)
