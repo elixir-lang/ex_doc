@@ -5,6 +5,7 @@ import $ from 'jquery'
 import find from 'lodash.find'
 import {focusSearchInput, openSidebar, toggleSidebar} from './sidebar'
 import {toggleNightMode} from './night'
+import {openQuickSwitchModal} from './quick-switch'
 import helpModalTemplate from './templates/keyboard-shortcuts-help-modal.handlebars'
 
 // Constants
@@ -39,6 +40,13 @@ const keyboardShortcuts = [
     name: '/',
     keyCode: 191,
     action: searchKeyAction
+  },
+  {
+    name: 'g',
+    keyCode: 71,
+    description: 'Go to a HexDocs package',
+    displayAs: '<kbd>g</kdb>',
+    action: openQuickSwitchModal
   },
   {
     name: '?',

@@ -30,6 +30,7 @@ import {initialize as initVersions} from './versions'
 import {initialize as initNightMode} from './night'
 import {initialize as initMakeup} from './makeup'
 import {initialize as initKeyboardShortcuts} from './keyboard-shortcuts'
+import {initialize as initQuickSwitch} from './quick-switch'
 
 window.$ = $
 
@@ -65,5 +66,6 @@ $(() => {
   initEvents()
   initMakeup()
   initKeyboardShortcuts()
+  initQuickSwitch()
   hljs.initHighlighting()
 })
