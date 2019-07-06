@@ -1,32 +1,32 @@
 language: elixir
 sudo: false
-elixir: 1.7.1
-otp_release: 20.3
-notifications:
-  recipients:
-    - jose.valim@plataformatec.com.br
-env:
-  global:
-    - MIX_ENV=test
-    - DISPLAY=:99.0
-    - NODE_VERSION="10.10.0"
 before_script:
   - sh -e /etc/init.d/xvfb start
-  - mix local.hex --force
-  - mix deps.get
 before_install:
   - nvm install $NODE_VERSION
 script:
-  - mix format --check-formatted
+  - if [ "$CHECK_FORMATTED" = true ]; then mix format --check-formatted; fi
   - mix test
-  - mix coveralls.travis
   - bash test/prerelease.sh
-  - npm install
-  - npm run lint
-  - npm run test
+  - if [ "$CHECK_JS" = true ];  then npm install; npm run lint; npm run test; fi
 cache:
   directories:
     - node_modules
     - deps
 addons:
   firefox: "54.0"
+env:
+  global:
+    - MIX_ENV=test
+    - DISPLAY=:99.0
+    - NODE_VERSION="10.10.0"
+matrix:
+  include:
+    - elixir: 1.5.3
+      otp_release: 19.3
+    - elixir: 1.8.1
+      otp_release: 21.2
+    - elixir: 1.9.0
+      otp_release: 22.0
+      env: CHECK_FORMATTED=true
+      env: CHECK_JS=true
