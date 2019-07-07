@@ -1,3 +1,5 @@
+/* globals translations */
+
 // Dependencies
 // ------------
 
@@ -7,6 +9,7 @@ import {focusSearchInput, openSidebar, toggleSidebar} from './sidebar'
 import {toggleNightMode} from './night'
 import {openQuickSwitchModal} from './quick-switch'
 import helpModalTemplate from './templates/keyboard-shortcuts-help-modal.handlebars'
+import translate from './template-helpers/useTranslation'
 
 // Constants
 // ---------
@@ -20,19 +23,19 @@ const keyboardShortcuts = [
   {
     name: 'c',
     keyCode: 67,
-    description: 'Toggle sidebar',
+    description: translate('Toggle sidebar', translations),
     action: toggleSidebar
   },
   {
     name: 'n',
     keyCode: 78,
-    description: 'Toggle night mode',
+    description: translate('Toggle night mode', translations),
     action: toggleNightMode
   },
   {
     name: 's',
     keyCode: 83,
-    description: 'Focus search bar',
+    description: translate('Focus search bar', translations),
     displayAs: '<kbd>/</kbd> or <kbd>s</kdb>',
     action: searchKeyAction
   },
@@ -44,7 +47,7 @@ const keyboardShortcuts = [
   {
     name: 'g',
     keyCode: 71,
-    description: 'Go to a HexDocs package',
+    description: translate('Go to a HexDocs package', translations),
     displayAs: '<kbd>g</kdb>',
     action: openQuickSwitchModal
   },
@@ -53,7 +56,7 @@ const keyboardShortcuts = [
     keyCode: 191,
     requiresShiftKey: true,
     displayAs: '<kbd>?</kbd>',
-    description: 'Bring up this help dialog',
+    description: translate('Bring up this help dialog', translations),
     action: toggleHelpModal
   }
 ]
@@ -117,7 +120,7 @@ function searchKeyAction () {
 // --------------
 
 export function initialize () {
-  const helpModal = helpModalTemplate({shortcuts: keyboardShortcuts})
+  const helpModal = helpModalTemplate({shortcuts: keyboardShortcuts, translations: translations})
   $('body').append(helpModal)
 
   $(helpModalSelector).on('keydown', function (e) {

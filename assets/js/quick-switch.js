@@ -212,7 +212,7 @@ function deselectAcResult () {
 export { openQuickSwitchModal }
 
 export function initialize () {
-  const quickSwitchModal = quickSwitchModalTemplate()
+  const quickSwitchModal = quickSwitchModalTemplate({translations: translations})
   $('body').append(quickSwitchModal)
 
   $(quickSwitchLinkSelector).click(openQuickSwitchModal)

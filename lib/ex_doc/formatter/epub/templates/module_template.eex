@@ -1,6 +1,6 @@
 <%= head_template(config, %{title: translate(config, module.title)}) %>
     <h1 id="content">
-      <%= translate(config, H.module_title(module)) %>
+      <%= H.module_title(module, config) %>
     </h1>
 
     <%= if doc = module.rendered_doc do %>

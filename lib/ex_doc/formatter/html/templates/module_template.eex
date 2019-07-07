@@ -3,7 +3,7 @@
 
       <h1>
         <small class="app-vsn"><%= config.project %> v<%= config.version %></small>
-        <%= translate(config, module_title(module)) %>
+        <%= module_title(module, config) %>
         <%= if module.source_url do %>
           <a href="<%= module.source_url %>" title="<%= translate(config, "View Source") %>" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>

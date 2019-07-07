@@ -39,9 +39,9 @@ window.$ = $
 
 $(() => {
   // Set up Handlebars.js
+  Handlebars.registerHelper('groupChanged', groupChanged)
   Handlebars.registerHelper('isArray', isArray)
   Handlebars.registerHelper('isLocal', isLocal)
-  Handlebars.registerHelper('groupChanged', groupChanged)
   Handlebars.registerHelper('isNonEmptyArray', isNonEmptyArray)
   Handlebars.registerHelper('nestingChanged', nestingChanged)
   Handlebars.registerHelper('showSummary', showSummary)

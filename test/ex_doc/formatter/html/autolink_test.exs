@@ -154,8 +154,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert project_doc("`String.upcase/1`", %{}) ==
                "[`String.upcase/1`](#{@elixir_docs}elixir/String.html#upcase/1)"
 
-      assert project_doc("`Mix.env/0`", %{}) ==
-               "[`Mix.env/0`](#{@elixir_docs}mix/Mix.html#env/0)"
+      assert project_doc("`Mix.env/0`", %{}) == "[`Mix.env/0`](#{@elixir_docs}mix/Mix.html#env/0)"
     end
 
     test "autolinks to the longest libdir" do

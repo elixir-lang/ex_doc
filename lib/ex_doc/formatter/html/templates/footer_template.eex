@@ -14,14 +14,14 @@
             <%= translate(config, "Toggle night mode") %>
           </button>
           <button class="line footer-button tooltips-toggle">
-            <span class="tooltips-option-disable">Disable tooltips</span>
-            <span class="tooltips-option-enable">Enable tooltips</span>
+            <span class="tooltips-option-disable"><%= translate(config, "Disable tooltips") %></span>
+            <span class="tooltips-option-enable"><%= translate(config, "Enable tooltips") %></span>
           </button>
           <button class="line footer-button display-shortcuts-help">
             <%= translate(config, "Display keyboard shortcuts") %>
           </button>
           <button class="line footer-button display-quick-switch">
-            Go to a HexDocs package
+            <%= translate(config, "Go to a HexDocs package") %>
           </button>
         </p>
       </footer>

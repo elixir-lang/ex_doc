@@ -49,14 +49,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Returns the HTML formatted title for the module page.
   """
-  def module_title(%{type: :task, title: title}),
+  def module_title(%{type: :task, title: title}, _config),
     do: title
 
-  def module_title(%{type: :module, title: title}),
+  def module_title(%{type: :module, title: title}, _config),
     do: title
 
-  def module_title(%{type: type, title: title}),
-    do: title <> " <small>#{type}</small>"
+  def module_title(%{type: type, title: title}, config),
+    do: title <> " <small>" <> translate(config, "#{type}") <> "</small>"
 
   @doc """
   Gets the first paragraph of the documentation of a node. It strips
@@ -261,20 +261,47 @@ defmodule ExDoc.Formatter.HTML.Templates do
   """
   def create_sidebar_translated_labels(config) do
     default_labels = [
+      bring_dialog: "Bring up this help dialog",
       callback: "callback",
       callbacks: "Callbacks",
       contributing: "Contributing",
+      exception: "exception",
       extras: "extras",
+      focus_search_bar: "Focus search bar",
       function: "function",
       functions: "Functions",
       go_to: "Go to",
+      go_to_hex: "Go to a HexDocs package",
+      jump_to: "Jump to",
       keyboard_shortcuts: "Keyboard Shortcuts",
       license: "License",
+      macro: "macro",
+      module: "module",
+      opaque: "opaque",
+      not_found_search: "Sorry, we couldn't find anything for",
+      not_found_search_hint: "Here are some tips when performing a full-text search:",
+      not_found_search_hint_1:
+        "Multiple words (such as <code>foo bar</code>) are searched as <code>OR</code>",
+      not_found_search_hint_2:
+        "Use <code>*</code> anywhere (such as <code>fo*</code>) as wildcard",
+      not_found_search_hint_3:
+        "Use <code>+</code> before a word (such as <code>+foo</code>) to make its presence required",
+      not_found_search_hint_4:
+        "Use <code>-</code> before a word (such as <code>-foo</code>) to make its absence required",
+      not_found_search_hint_5:
+        "Use <code>WORD^NUMBER</code> (such as <code>foo^2</code>) to boost the given word",
+      not_found_search_hint_6:
+        "Use <code>WORD~NUMBER</code> (such as <code>foo~2</code>) to do a search with edit distance on word",
+      not_found_search_hint_7:
+        "To quickly go to a module, type, or function, use the autocompletion feature in the sidebar search.",
       search_documentation: "Search the documentation",
       search_results: "Search results for",
       summary: "Summary",
       task: "task",
+      toggle_night_mode: "Toggle night mode",
+      toggle_sidebar: "Toggle sidebar",
       top: "Top",
+      type: "type",
       types: "Types"
     ]
 

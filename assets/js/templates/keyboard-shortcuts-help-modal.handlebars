@@ -2,7 +2,7 @@
   <div id="keyboard-shortcuts-modal" class="modal" tabindex="-1">
     <div class="modal-contents">
       <div class="modal-header">
-        <div class="modal-title">{{ translate.keyboard_shortcuts }}</div>
+        <div class="modal-title">{{ useTranslation "Keyboard Shortcuts" translations }}</div>
         <div class="modal-close">×</div>
       </div>
       <div class="modal-body">
@@ -17,7 +17,7 @@
                 {{/if}}
               </dt>
               <dd class="shortcut-description">
-                {{this.description}}
+                {{ this.description }}
               </dd>
             </dl>
           {{/if}}
