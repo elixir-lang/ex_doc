@@ -175,8 +175,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir()}/CompiledWithDocs.Nested.html")
 
-    assert [_] = Path.wildcard("#{output_dir()}/dist/html-*.css")
-    assert [_] = Path.wildcard("#{output_dir()}/dist/html-*.js")
+    refute [] == Path.wildcard("#{output_dir()}/dist/html-*.css")
+    refute [] == Path.wildcard("#{output_dir()}/dist/html-*.js")
     assert [] = Path.wildcard("#{output_dir()}/another_dir/dist/html-*.js.map")
 
     content = File.read!("#{output_dir()}/index.html")
