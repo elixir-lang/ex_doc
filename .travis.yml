@@ -1,33 +1,53 @@
 language: elixir
+
 sudo: false
-before_script:
-  - sh -e /etc/init.d/xvfb start
-before_install:
-  - nvm install $NODE_VERSION
-script:
-  - if [ "$CHECK_FORMATTED" = true ]; then mix format --check-formatted; fi
-  - mix test
-  - bash test/prerelease.sh
-  - if [ "$CHECK_JS" = true ];  then npm install; npm run lint; npm run test; fi
-cache:
-  directories:
-    - node_modules
-    - deps
-addons:
-  firefox: "54.0"
+
+# Erlang and Elixir default versions (overridden in some jobs).
+elixir: 1.9.0
+otp_release: 22.0
+
+stages:
+  - check formatted
+  - test
+  - check js
+
 env:
   global:
     - MIX_ENV=test
     - DISPLAY=:99.0
     - NODE_VERSION="10.10.0"
-matrix:
+
+before_script:
+  - sh -e /etc/init.d/xvfb start
+
+cache:
+  directories:
+    - node_modules
+    - deps
+
+addons:
+  firefox: "54.0"
+
+jobs:
   include:
-    - elixir: 1.9.0
-      otp_release: 22.0
-      env:
-        - CHECK_FORMATTED=true
-        - CHECK_JS=true
+    - stage: test
+      script:
+        - mix test
+        - bash test/prerelease.sh
+
     - elixir: 1.8.1
       otp_release: 21.2
+
     - elixir: 1.7.3
       otp_release: 19.3
+
+    - stage: check formatted
+      script: mix format --check-formatted
+      before_install: skip
+
+    - stage: check js
+      script:
+        - nvm install $NODE_VERSION
+        - npm install
+        - npm run lint
+        - npm run test
