@@ -79,7 +79,13 @@ function descriptionElementFromHash (hash) {
 
   if (!hash) { return null }
 
-  return $(`#${hash}.detail`)
+  const mainSelector = $(`#${hash}.detail`)
+
+  if (mainSelector.length > 0) {
+    return mainSelector
+  } else {
+    return $(`.detail > span#${hash}`).parent()
+  }
 }
 
 /**
