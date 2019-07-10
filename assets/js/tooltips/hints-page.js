@@ -77,7 +77,9 @@ function descriptionElementFromHash (hash) {
 
   if (!hash) { return null }
 
-  return $(`#${hash}.detail`)
+  const encodedHash = encodeURI(hash)
+
+  return $(`#${encodedHash}.detail`)
 }
 
 /**
