@@ -73,9 +73,6 @@ function descriptionElementFromHash (hash) {
   hash = hash.substr(1) // removes the `#` in `#hash`
 
   if (!hash) { return null }
-  hash = $.escapeSelector(hash)
-
-  if (!hash) { return null }
 
   const encodedHash = encodeURI(hash)
 
