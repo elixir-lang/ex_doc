@@ -46,7 +46,7 @@ defmodule ExDoc.Highlighter do
       code
       |> unescape_html()
       |> IO.iodata_to_binary()
-      |> Makeup.highlight_inner_html(lexer: lexer)
+      |> Makeup.highlight_inner_html(lexer: lexer, formatter_options: [highlight_tag: "samp"])
 
     ~s(<pre><code class="nohighlight makeup #{lang}">#{highlighted}</code></pre>)
   end
