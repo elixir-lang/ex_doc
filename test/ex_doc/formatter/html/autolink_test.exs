@@ -636,14 +636,31 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "[`<<>>/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
     end
 
-    test "removes optional Elixir namespace" do
-      assert project_doc("`Elixir.Enum`", %{}) == "[`Enum`](#{@elixir_docs}elixir/Enum.html)"
+    test "deals with optional Elixir namespace" do
+      assert project_doc("`Elixir.Enum`", %{}) ==
+               "[`Elixir.Enum`](#{@elixir_docs}elixir/Enum.html)"
 
       assert project_doc("`Elixir.Enum.concat/1`", %{}) ==
-               "[`Enum.concat/1`](#{@elixir_docs}elixir/Enum.html#concat/1)"
+               "[`Elixir.Enum.concat/1`](#{@elixir_docs}elixir/Enum.html#concat/1)"
 
       assert project_doc("`t:Elixir.Enum.t/0`", %{}) ==
-               "[`Enum.t/0`](#{@elixir_docs}elixir/Enum.html#t:t/0)"
+               "[`Elixir.Enum.t/0`](#{@elixir_docs}elixir/Enum.html#t:t/0)"
+
+      assert project_doc(
+               "The fully namespaced module `Elixir.Enum` and the alias `Enum` resolve to the same module.",
+               %{}
+             ) ==
+               "The fully namespaced module [`Elixir.Enum`](#{@elixir_docs}elixir/Enum.html) and the alias [`Enum`](#{
+                 @elixir_docs
+               }elixir/Enum.html) resolve to the same module."
+
+      assert project_doc(
+               "`Elixir.Enum.reduce/3` and `Enum.reduce/3` resolve to the same function.",
+               %{}
+             ) ==
+               "[`Elixir.Enum.reduce/3`](#{@elixir_docs}elixir/Enum.html#reduce/3) and [`Enum.reduce/3`](#{
+                 @elixir_docs
+               }elixir/Enum.html#reduce/3) resolve to the same function."
     end
   end
 
