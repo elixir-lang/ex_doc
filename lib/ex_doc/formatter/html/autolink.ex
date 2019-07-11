@@ -251,7 +251,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
               put_placeholder(form, url, placeholders)
 
             {name, arity} in typespecs ->
-              n = enc_h("#{name}")
+              n = URI.encode("#{name}")
               url = "#t:#{n}/#{arity}"
               put_placeholder(form, url, placeholders)
 
@@ -279,12 +279,12 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp type_remote_url(@erlang_docs = source, module, name, _args) do
     module = enc_h("#{module}")
-    name = enc_h("#{name}")
+    name = URI.encode("#{name}")
     "#{source}#{module}.html#type-#{name}"
   end
 
   defp type_remote_url(source, alias, name, args) do
-    name = enc_h("#{name}")
+    name = URI.encode("#{name}")
     "#{source}#{enc_h(inspect(alias))}.html#t:#{name}/#{length(args)}"
   end
 
@@ -438,10 +438,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
       cond do
         match in locals ->
-          "[#{text}](##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](##{prefix}#{URI.encode(function)}/#{arity})"
 
         match in docs_refs ->
-          "[#{text}](#{module}#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](#{module}#{extension}##{prefix}#{URI.encode(function)}/#{arity})"
 
         match in @basic_type_strings ->
           "[#{text}](#{elixir_docs}#{@basic_types_page})"
@@ -450,11 +450,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           "[#{text}](#{elixir_docs}#{@built_in_types_page})"
 
         match in @kernel_function_strings ->
-          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{URI.encode(function)}/#{arity})"
 
         match in @special_form_strings ->
           "[#{text}](#{elixir_docs}Kernel.SpecialForms" <>
-            "#{extension}##{prefix}#{enc_h(function)}/#{arity})"
+            "#{extension}##{prefix}#{URI.encode(function)}/#{arity})"
 
         module in modules_refs ->
           if module_id not in skip_warnings_on and id not in skip_warnings_on do
@@ -468,7 +468,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           all
 
         doc = module_docs(:elixir, module, lib_dirs) ->
-          "[#{text}](#{doc}#{module}.html##{prefix}#{enc_h(function)}/#{arity})"
+          "[#{text}](#{doc}#{module}.html##{prefix}#{URI.encode(function)}/#{arity})"
 
         true ->
           all
