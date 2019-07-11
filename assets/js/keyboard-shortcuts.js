@@ -61,7 +61,7 @@ const keyboardShortcuts = [
 // State
 // -----
 
-// Stores shortcut info to prevent multiple activations ok keyDown event
+// Stores shortcut info to prevent multiple activations on keyDown event
 let shortcutBeingPressed = null
 
 // Local Methods

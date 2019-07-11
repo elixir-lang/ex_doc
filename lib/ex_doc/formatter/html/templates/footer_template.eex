@@ -13,6 +13,10 @@
           <button class="line footer-button night-mode-toggle">
             Toggle night mode
           </button>
+          <button class="line footer-button tooltips-toggle">
+            <span class="tooltips-option-disable">Disable tooltips</span>
+            <span class="tooltips-option-enable">Enable tooltips</span>
+          </button>
           <button class="line footer-button display-shortcuts-help">
             Display keyboard shortcuts
           </button>

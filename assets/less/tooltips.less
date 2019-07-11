@@ -1,0 +1,92 @@
+#tooltip {
+  box-shadow: 0 0 10px fade(@black, 10%);
+  display: none;
+  max-height: 300px;
+  max-width: 500px;
+  padding: 0;
+  position: absolute;
+  pointer-events: none;
+  margin: 0;
+  z-index: 99;
+
+  &.tooltip-visible {
+    display: block;
+    transform: translateY(20px);
+    transition: 0.15s transform ease-out, 0.1s opacity ease-out;
+    opacity: 0;
+  }
+
+  &.tooltip-shown {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .tooltip-body {
+    border: 1px solid fade(@mediumGray, 30%);
+
+    .signature {
+      min-width: 320px;
+      width: 100%;
+    }
+
+    .detail-header {
+      border-left: 0;
+      margin-bottom: 0;
+      margin-top: 0;
+
+      h2 {
+        margin: 0 0 0.2rem 0;
+      }
+
+      .specs {
+        white-space: pre-wrap;
+      }
+    }
+
+    .docstring {
+      background-color: @white;
+      padding: 1.2em;
+      margin: 0;
+      width: 498px; // Taking 2 * 1px of border into account
+    }
+
+    .docstring-type {
+      max-width: 498px;
+      width: auto;
+    }
+
+    .version-info {
+      float: right;
+      line-height: 1.6rem;
+      font-family: @monoFontFamily;
+      font-size: 0.9rem;
+      font-weight: normal;
+      margin-bottom: -6px;
+      opacity: 0.3;
+      padding-left: 0.3em;
+    }
+  }
+
+  .tooltip-iframe {
+    display: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.tooltips-toggle {
+  .tooltips-option-enable {
+    display: none;
+  }
+
+  &[data-is-disabled="true"] {
+    .tooltips-option-enable {
+      display: inline;
+    }
+
+    .tooltips-option-disable {
+      display: none;
+    }
+  }
+}
+
