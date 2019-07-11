@@ -1,6 +1,6 @@
 defmodule ExDoc.Formatter.HTML.Autolink do
   @moduledoc false
-  import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc_h: 1]
+  import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc: 1]
 
   @type language :: :elixir | :erlang | :markdown
   @type kind :: :function | :module | :mix_task
@@ -251,7 +251,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
               put_placeholder(form, url, placeholders)
 
             {name, arity} in typespecs ->
-              n = URI.encode("#{name}")
+              n = enc("#{name}")
               url = "#t:#{n}/#{arity}"
               put_placeholder(form, url, placeholders)
 
@@ -278,14 +278,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp type_remote_url(@erlang_docs = source, module, name, _args) do
-    module = enc_h("#{module}")
-    name = URI.encode("#{name}")
+    module = enc("#{module}")
+    name = enc("#{name}")
     "#{source}#{module}.html#type-#{name}"
   end
 
   defp type_remote_url(source, alias, name, args) do
-    name = URI.encode("#{name}")
-    "#{source}#{enc_h(inspect(alias))}.html#t:#{name}/#{length(args)}"
+    name = enc("#{name}")
+    "#{source}#{enc(inspect(alias))}.html#t:#{name}/#{length(args)}"
   end
 
   defp typespec_string_to_link(string, url) do
@@ -438,10 +438,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
       cond do
         match in locals ->
-          "[#{text}](##{prefix}#{URI.encode(function)}/#{arity})"
+          "[#{text}](##{prefix}#{enc(function)}/#{arity})"
 
         match in docs_refs ->
-          "[#{text}](#{module}#{extension}##{prefix}#{URI.encode(function)}/#{arity})"
+          "[#{text}](#{module}#{extension}##{prefix}#{enc(function)}/#{arity})"
 
         match in @basic_type_strings ->
           "[#{text}](#{elixir_docs}#{@basic_types_page})"
@@ -450,11 +450,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           "[#{text}](#{elixir_docs}#{@built_in_types_page})"
 
         match in @kernel_function_strings ->
-          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{URI.encode(function)}/#{arity})"
+          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc(function)}/#{arity})"
 
         match in @special_form_strings ->
           "[#{text}](#{elixir_docs}Kernel.SpecialForms" <>
-            "#{extension}##{prefix}#{URI.encode(function)}/#{arity})"
+            "#{extension}##{prefix}#{enc(function)}/#{arity})"
 
         module in modules_refs ->
           if module_id not in skip_warnings_on and id not in skip_warnings_on do
@@ -468,7 +468,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           all
 
         doc = module_docs(:elixir, module, lib_dirs) ->
-          "[#{text}](#{doc}#{module}.html##{prefix}#{URI.encode(function)}/#{arity})"
+          "[#{text}](#{doc}#{module}.html##{prefix}#{enc(function)}/#{arity})"
 
         true ->
           all

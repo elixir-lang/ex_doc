@@ -87,15 +87,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc false
-  def enc_h(binary) do
-    binary
-    |> URI.encode()
-    |> h()
-  end
-
-  defp is_enc?(binary) do
-    h(binary) != enc_h(binary)
-  end
+  def enc(binary), do: URI.encode(binary)
 
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
