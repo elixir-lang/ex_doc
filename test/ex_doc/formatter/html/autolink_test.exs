@@ -83,6 +83,14 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert project_doc("`!/1`", %{}) === "[`!/1`](#{@elixir_docs}elixir/Kernel.html#!/1)"
       assert project_doc("`!/1`", %{aliases: [Kernel]}) === "[`!/1`](Kernel.html#!/1)"
     end
+
+    test "escape special characters in URL fragments, and leave reserved untouched" do
+      assert project_doc("`&/1`", %{}) ===
+               "[`&/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#&/1)"
+
+      assert project_doc("`<<>>/1`", %{}) ===
+               "[`<<>>/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
+    end
   end
 
   describe "elixir functions" do
