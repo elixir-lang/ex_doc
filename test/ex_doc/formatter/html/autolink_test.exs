@@ -64,32 +64,24 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "autolinks special forms" do
-      assert project_doc("`{}/1`", %{locals: ["{}/1"]}) === "[`{}/1`](#%7B%7D/1)"
-      assert project_doc("`<<>>/1`", %{locals: ["<<>>/1"]}) === "[`<<>>/1`](#%3C%3C%3E%3E/1)"
+      assert project_doc("`{}/1`", %{locals: ["{}/1"]}) == "[`{}/1`](#%7B%7D/1)"
+      assert project_doc("`<<>>/1`", %{locals: ["<<>>/1"]}) == "[`<<>>/1`](#%3C%3C%3E%3E/1)"
 
-      assert project_doc("`<<>>/1`", %{}) ===
+      assert project_doc("`<<>>/1`", %{}) ==
                "[`<<>>/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
 
-      assert project_doc("`<<>>/1`", %{aliases: [Kernel]}) ===
+      assert project_doc("`<<>>/1`", %{aliases: [Kernel]}) ==
                "[`<<>>/1`](Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
     end
 
     test "autolinks Kernel functions" do
-      assert project_doc("`abs/1`", %{locals: ["abs/1"]}) === "[`abs/1`](#abs/1)"
+      assert project_doc("`abs/1`", %{locals: ["abs/1"]}) == "[`abs/1`](#abs/1)"
 
-      assert project_doc("`abs/1`", %{}) === "[`abs/1`](#{@elixir_docs}elixir/Kernel.html#abs/1)"
+      assert project_doc("`abs/1`", %{}) == "[`abs/1`](#{@elixir_docs}elixir/Kernel.html#abs/1)"
 
-      assert project_doc("`!/1`", %{locals: ["!/1"]}) === "[`!/1`](#!/1)"
-      assert project_doc("`!/1`", %{}) === "[`!/1`](#{@elixir_docs}elixir/Kernel.html#!/1)"
-      assert project_doc("`!/1`", %{aliases: [Kernel]}) === "[`!/1`](Kernel.html#!/1)"
-    end
-
-    test "escape special characters in URL fragments, and leave reserved untouched" do
-      assert project_doc("`&/1`", %{}) ===
-               "[`&/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#&/1)"
-
-      assert project_doc("`<<>>/1`", %{}) ===
-               "[`<<>>/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
+      assert project_doc("`!/1`", %{locals: ["!/1"]}) == "[`!/1`](#!/1)"
+      assert project_doc("`!/1`", %{}) == "[`!/1`](#{@elixir_docs}elixir/Kernel.html#!/1)"
+      assert project_doc("`!/1`", %{aliases: [Kernel]}) == "[`!/1`](Kernel.html#!/1)"
     end
   end
 
@@ -154,10 +146,10 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "autolinks functions Module.fun/arity in elixir" do
-      assert project_doc("`String.upcase/1`", %{docs_refs: ["Mod.example/2"]}) ==
+      assert project_doc("`String.upcase/1`", %{}) ==
                "[`String.upcase/1`](#{@elixir_docs}elixir/String.html#upcase/1)"
 
-      assert project_doc("`Mix.env/0`", %{docs_refs: ["Mod.example/2"]}) ==
+      assert project_doc("`Mix.env/0`", %{}) ==
                "[`Mix.env/0`](#{@elixir_docs}mix/Mix.html#env/0)"
     end
 
@@ -177,25 +169,25 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     end
 
     test "autolinks special forms" do
-      assert project_doc("`Mod.++/2`", %{docs_refs: ["Mod.++/2"]}) ===
+      assert project_doc("`Mod.++/2`", %{docs_refs: ["Mod.++/2"]}) ==
                "[`Mod.++/2`](Mod.html#++/2)"
 
-      assert project_doc("`Mod.!/1`", %{docs_refs: ["Mod.!/1"]}) === "[`Mod.!/1`](Mod.html#!/1)"
+      assert project_doc("`Mod.!/1`", %{docs_refs: ["Mod.!/1"]}) == "[`Mod.!/1`](Mod.html#!/1)"
 
-      assert project_doc("`Mod.../2`", %{docs_refs: ["Mod.../2"]}) ===
+      assert project_doc("`Mod.../2`", %{docs_refs: ["Mod.../2"]}) ==
                "[`Mod.../2`](Mod.html#../2)"
 
-      assert project_doc("`Mod.--/2`", %{docs_refs: ["Mod.--/2"]}) ===
+      assert project_doc("`Mod.--/2`", %{docs_refs: ["Mod.--/2"]}) ==
                "[`Mod.--/2`](Mod.html#--/2)"
 
-      assert project_doc("`Mod.%/2`", %{docs_refs: ["Mod.%/2"]}) === "[`Mod.%/2`](Mod.html#%25/2)"
+      assert project_doc("`Mod.%/2`", %{docs_refs: ["Mod.%/2"]}) == "[`Mod.%/2`](Mod.html#%25/2)"
 
-      assert project_doc("`Mod.<<>>/1`", %{docs_refs: ["Mod.<<>>/1"]}) ===
+      assert project_doc("`Mod.<<>>/1`", %{docs_refs: ["Mod.<<>>/1"]}) ==
                "[`Mod.<<>>/1`](Mod.html#%3C%3C%3E%3E/1)"
     end
 
     test "autolinks callbacks" do
-      assert project_doc("`c:Mod.++/2`", %{docs_refs: ["c:Mod.++/2"]}) ===
+      assert project_doc("`c:Mod.++/2`", %{docs_refs: ["c:Mod.++/2"]}) ==
                "[`Mod.++/2`](Mod.html#c:++/2)"
     end
 
@@ -631,9 +623,27 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
   describe "corner-cases" do
     test "accepts functions around () and []" do
-      assert project_doc("`===/2`", %{aliases: [Kernel]}) === "[`===/2`](Kernel.html#===/2)"
-      assert project_doc("(`===/2`)", %{aliases: [Kernel]}) === "([`===/2`](Kernel.html#===/2))"
-      assert project_doc("[`===/2`]", %{aliases: [Kernel]}) === "[[`===/2`](Kernel.html#===/2)]"
+      assert project_doc("`===/2`", %{aliases: [Kernel]}) == "[`===/2`](Kernel.html#===/2)"
+      assert project_doc("(`===/2`)", %{aliases: [Kernel]}) == "([`===/2`](Kernel.html#===/2))"
+      assert project_doc("[`===/2`]", %{aliases: [Kernel]}) == "[[`===/2`](Kernel.html#===/2)]"
+    end
+
+    test "escape special characters in URL fragments, and leave reserved untouched" do
+      assert project_doc("`&/1`", %{}) ==
+               "[`&/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#&/1)"
+
+      assert project_doc("`<<>>/1`", %{}) ==
+               "[`<<>>/1`](#{@elixir_docs}elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
+    end
+
+    test "removes optional Elixir namespace" do
+      assert project_doc("`Elixir.Enum`", %{}) == "[`Enum`](#{@elixir_docs}elixir/Enum.html)"
+
+      assert project_doc("`Elixir.Enum.concat/1`", %{}) ==
+               "[`Enum.concat/1`](#{@elixir_docs}elixir/Enum.html#concat/1)"
+
+      assert project_doc("`t:Elixir.Enum.t/0`", %{}) ==
+               "[`Enum.t/0`](#{@elixir_docs}elixir/Enum.html#t:t/0)"
     end
   end
 

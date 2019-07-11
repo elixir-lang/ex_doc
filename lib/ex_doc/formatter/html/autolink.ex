@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @moduledoc false
   import ExDoc.Formatter.HTML.Templates, only: [h: 1, enc: 1]
 
-  @type language :: :elixir | :erlang | :markdown
+  @type language :: :elixir | :erlang
   @type kind :: :function | :module | :mix_task
   @type link_type :: :normal | :custom
 
@@ -334,22 +334,20 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   #
   # It autolinks all links for a certain `language` and of a certain `kind`.
   #
-  # `language` can be: `:elixir`, `:erlang` or `:markdown`.
+  # `language` can be: `:elixir`, `:erlang`.
   #
   # `kind` is either `:function`, `:module`, or `:mix_task`.
   #
   # It accepts a list of `options` used in the replacement functions.
-  # - `:aliases
-  # - `:docs_refs`
-  # - `:extension` - Default value is `".html"`
-  # - `:lib_dirs`
-  # - `:locals` - A list of local functions
-  # - `:module_id` - Module of the current doc. Default value is `nil`
-  # - `:modules_refs` - List of modules available
   #
-  # Internal options:
-  # - `:preprocess?` - `true` or `false`. Do preprocessing and postprocessing, such as replacing backticks
-  #                     with a token
+  #   * `:aliases
+  #   * `:docs_refs`
+  #   * `:extension` - Default value is `".html"`
+  #   * `:lib_dirs`
+  #   * `:locals` - A list of local functions
+  #   * `:module_id` - Module of the current doc. Default value is `nil`
+  #   * `:modules_refs` - List of modules available
+  #
   defp link(string, language, kind, link_type, options) when is_map(options) do
     regex = re_kind_language_link_type(kind, language, link_type)
     replace_fun = replace_fun(kind, language, link_type, options)
@@ -401,18 +399,18 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     modules_refs = options[:modules_refs] || []
 
     fn all, text, match ->
-      pmfa = split_match(:module, match)
+      pmfa = {_, module, _, _} = split_match(:module, match)
       text = default_text("", link_type, pmfa, text)
 
       cond do
-        match == module_id ->
+        module == module_id ->
           "[#{text}](#content)"
 
-        match in modules_refs ->
-          "[#{text}](#{match}#{extension})"
+        module in modules_refs ->
+          "[#{text}](#{module}#{extension})"
 
-        doc = module_docs(:elixir, match, lib_dirs) ->
-          "[#{text}](#{doc}#{match}.html)"
+        doc = module_docs(:elixir, module, lib_dirs) ->
+          "[#{text}](#{doc}#{module}.html)"
 
         true ->
           all
@@ -546,17 +544,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     do: lib_dirs_to_doc(module, lib_dirs)
 
   @doc false
-  defp split_match(:module, string), do: {"", string, "", ""}
+  defp split_match(:module, string), do: {"", strip_elixir_namespace(string), "", ""}
   defp split_match(:function, string), do: split_function(string)
 
   defp split_function("c:" <> string) do
     {_, mod, fun, arity} = split_function(string)
-    {"c:", mod, fun, arity}
+    {"c:", strip_elixir_namespace(mod), fun, arity}
   end
 
   defp split_function("t:" <> string) do
     {_, mod, fun, arity} = split_function(string)
-    {"t:", mod, fun, arity}
+    {"t:", strip_elixir_namespace(mod), fun, arity}
   end
 
   defp split_function(":" <> string) do
@@ -569,10 +567,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     |> split_function_list()
   end
 
-  defp split_function_list([modules, arity]) do
+  defp split_function_list([mod, arity]) do
     {mod, name} =
-      modules
-      # this handles the case of the ".." function
+      mod
+      |> strip_elixir_namespace()
+      # handles the ".." function
       |> String.replace(~r{([^\.])\.}, "\\1 ")
       |> String.split(" ")
       |> Enum.split(-1)
@@ -584,6 +583,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp split_function_list([modules, "", arity]) when is_binary(modules) do
     split_function_list([modules <> "/", arity])
   end
+
+  defp strip_elixir_namespace("Elixir." <> rest), do: rest
+  defp strip_elixir_namespace(rest), do: rest
 
   defp doc_prefix(%{type: c}) when c in [:callback, :macrocallback], do: "c:"
   defp doc_prefix(%{type: _}), do: ""
