@@ -1,3 +1,5 @@
+/* globals translations */
+
 // Dependencies
 // ------------
 
@@ -117,7 +119,7 @@ function searchKeyAction () {
 // --------------
 
 export function initialize () {
-  const helpModal = helpModalTemplate({shortcuts: keyboardShortcuts})
+  const helpModal = helpModalTemplate({shortcuts: keyboardShortcuts, translations: translations})
   $('body').append(helpModal)
 
   $(helpModalSelector).on('keydown', function (e) {

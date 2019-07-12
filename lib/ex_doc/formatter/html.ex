@@ -55,9 +55,13 @@ defmodule ExDoc.Formatter.HTML do
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
   end
 
-  defp normalize_config(%{main: "index"}) do
+  defp normalize_config(%{main: "index"} = config) do
     raise ArgumentError,
-      message: ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
+      message:
+        translate(
+          config,
+          ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
+        )
   end
 
   defp normalize_config(%{main: main} = config) do
@@ -232,23 +236,23 @@ defmodule ExDoc.Formatter.HTML do
     groups = config.groups_for_extras
 
     config.extras
-    |> Task.async_stream(&build_extra(&1, autolink, groups), timeout: :infinity)
+    |> Task.async_stream(&build_extra(&1, autolink, groups, config), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
 
-  defp build_extra({input, options}, autolink, groups) do
+  defp build_extra({input, options}, autolink, groups, config) do
     input = to_string(input)
     id = options[:filename] || input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, options[:title], autolink, groups)
+    build_extra(input, id, options[:title], autolink, groups, config)
   end
 
-  defp build_extra(input, autolink, groups) do
+  defp build_extra(input, autolink, groups, config) do
     id = input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, nil, autolink, groups)
+    build_extra(input, id, nil, autolink, groups, config)
   end
 
-  defp build_extra(input, id, title, autolink, groups) do
+  defp build_extra(input, id, title, autolink, groups, config) do
     if valid_extension_name?(input) do
       content =
         input
@@ -261,7 +265,7 @@ defmodule ExDoc.Formatter.HTML do
       title = title || extract_title(html_content) || filename_to_title(input)
       %{id: id, title: title, group: group, content: html_content}
     else
-      raise ArgumentError, "file format not recognized, allowed format is: .md"
+      raise ArgumentError, translate(config, "file format not recognized, allowed format is: .md")
     end
   end
 
@@ -350,8 +354,8 @@ defmodule ExDoc.Formatter.HTML do
     []
   end
 
-  def generate_logo(dir, %{output: output, logo: logo}) do
-    generate_image(output, dir, logo, "logo")
+  def generate_logo(dir, %{output: output, logo: logo} = config) do
+    generate_image(output, dir, logo, "logo", config)
   end
 
   @doc """
@@ -361,11 +365,11 @@ defmodule ExDoc.Formatter.HTML do
     []
   end
 
-  def generate_cover(dir, %{output: output, cover: cover}) do
-    generate_image(output, dir, cover, "cover")
+  def generate_cover(dir, %{output: output, cover: cover} = config) do
+    generate_image(output, dir, cover, "cover", config)
   end
 
-  defp generate_image(output, dir, image, name) do
+  defp generate_image(output, dir, image, name, config) do
     extname =
       image
       |> Path.extname()
@@ -378,13 +382,20 @@ defmodule ExDoc.Formatter.HTML do
       File.copy!(image, target)
       [filename]
     else
-      raise ArgumentError, "image format not recognized, allowed formats are: .jpg, .png"
+      raise ArgumentError,
+            translate(config, "image format not recognized, allowed formats are: .jpg, .png")
     end
   end
 
   defp generate_redirect(filename, config, redirect_to) do
     unless File.regular?("#{config.output}/#{redirect_to}") do
-      IO.puts(:stderr, "warning: #{filename} redirects to #{redirect_to}, which does not exist")
+      IO.puts(
+        :stderr,
+        translate(config, "warning") <>
+          ": #{filename} " <>
+          translate(config, "redirects to") <>
+          " #{redirect_to}, " <> translate(config, "which does not exist")
+      )
     end
 
     content = Templates.redirect_template(config, redirect_to)
