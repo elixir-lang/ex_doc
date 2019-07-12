@@ -4,6 +4,7 @@
   <% end %>
   <div class="detail-header">
     <a href="#<%=enc HTML.link_id(node) %>" class="detail-link" title="<%= translate(config, "Link to this #{pretty_type(node)}") %>">
+    <!-- <a href="#<%=enc HTML.link_id(node) %>" class="detail-link" title="Link to this <%= pretty_type(node) %>"> -->
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only"><%= translate(config, "Link to this #{pretty_type(node)}") %></span>
     </a>
