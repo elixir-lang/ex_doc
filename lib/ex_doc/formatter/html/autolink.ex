@@ -230,9 +230,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     {formatted_ast, placeholders} =
       Macro.prewalk(ast, %{}, fn
-        {:::, _, [{name, meta, args}, right]}, placeholders
+        {:"::", _, [{name, meta, args}, right]}, placeholders
         when is_atom(name) and is_list(args) ->
-          {{:::, [], [{{ref, name}, meta, args}, right]}, placeholders}
+          {{:"::", [], [{{ref, name}, meta, args}, right]}, placeholders}
 
         # Consume this form so that we don't autolink `foo` in `foo :: bar`
         {{^ref, name}, _, args}, placeholders when is_atom(name) and is_list(args) ->
