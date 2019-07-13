@@ -399,8 +399,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     modules_refs = options[:modules_refs] || []
 
     fn all, text, match ->
-      pmfa = {_, module, _, _} = split_match(:module, match)
+      pmfa = {_, original_module, _, _} = split_match(:module, match)
       text = default_text("", link_type, pmfa, text)
+      module = strip_elixir_namespace(original_module)
 
       cond do
         module == module_id ->
@@ -430,9 +431,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     module_id = options[:module_id]
     skip_warnings_on = options[:skip_undefined_reference_warnings_on] || []
 
-    fn all, text, match ->
-      pmfa = {prefix, module, function, arity} = split_match(:function, match)
+    fn all, text, original_match ->
+      pmfa = {prefix, original_module, function, arity} = split_match(:function, original_match)
       text = default_text("", link_type, pmfa, text)
+      match = strip_elixir_namespace(original_match)
+      module = strip_elixir_namespace(original_module)
 
       cond do
         match in locals ->
@@ -544,17 +547,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     do: lib_dirs_to_doc(module, lib_dirs)
 
   @doc false
-  defp split_match(:module, string), do: {"", strip_elixir_namespace(string), "", ""}
+  defp split_match(:module, string), do: {"", string, "", ""}
   defp split_match(:function, string), do: split_function(string)
 
   defp split_function("c:" <> string) do
     {_, mod, fun, arity} = split_function(string)
-    {"c:", strip_elixir_namespace(mod), fun, arity}
+    {"c:", mod, fun, arity}
   end
 
   defp split_function("t:" <> string) do
     {_, mod, fun, arity} = split_function(string)
-    {"t:", strip_elixir_namespace(mod), fun, arity}
+    {"t:", mod, fun, arity}
   end
 
   defp split_function(":" <> string) do
@@ -570,7 +573,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp split_function_list([mod, arity]) do
     {mod, name} =
       mod
-      |> strip_elixir_namespace()
       # handles the ".." function
       |> String.replace(~r{([^\.])\.}, "\\1 ")
       |> String.split(" ")
