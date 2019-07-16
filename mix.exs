@@ -28,11 +28,8 @@ defmodule ExDoc.Mixfile do
   defp deps do
     [
       {:earmark, "~> 1.3"},
-      {:makeup,
-       git: "https://github.com/tmbb/makeup.git",
-       ref: "43973961de9b7f8da07791d8f1a99904673afd36",
-       override: true},
-      {:makeup_elixir, "~> 0.10"},
+      {:makeup, "~> 1.0"},
+      {:makeup_elixir, "~> 0.13"},
       {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
     ]
