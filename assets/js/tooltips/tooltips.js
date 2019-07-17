@@ -34,7 +34,7 @@ const moduleContentHash = '#content' // Hash included in links pointing to modul
 
 let tooltipElement = null // Will store the jQuery selector for the tooltip root
 let currentLinkElement = null // Element that the cursor is hovering over
-let currentRequestId = null // ID of the request we're waiting for
+let currentHintHref = null // ID of the request we're waiting for
 let showTimeoutAnimation = null // Timeout ID related to the tooltip show animation
 let hideTimeoutVisibility = null // Timeout ID related to the tooltip hide animation
 let hoverDelayTimeout = null // Timeout ID related to the `hoverDelayTime` described above
@@ -86,7 +86,7 @@ function updateToggleLink () {
  */
 
 function receivePopupMessage (event) {
-  if (event.data.requestId !== currentRequestId) { return }
+  if (!isHrefExpected(event.data.href)) { return }
   if (event.data.ready !== true) { return }
 
   showTooltip(event.data.hint)
@@ -103,8 +103,6 @@ function hoverStart () {
   if (currentLinkElement.prop('tagName') !== 'A') {
     currentLinkElement = $(this).parent()
   }
-
-  currentRequestId = uid()
 
   hoverDelayTimeout = setTimeout(function () {
     hideTimeoutVisibility && clearTimeout(hideTimeoutVisibility)
@@ -229,6 +227,7 @@ function prepareTooltips () {
     })
   } else {
     const hintHref = rewriteHref(href)
+    currentHintHref = hintHref
     let iframe = $(tooltipIframeSelector).detach()
     iframe.attr('src', hintHref)
     tooltipElement.append(iframe)
@@ -269,7 +268,7 @@ function hideTooltip () {
  * @returns {string} link with parameters added
  */
 function rewriteHref (href) {
-  return href.replace('.html', `.html?hint=true&requestId=${currentRequestId}`)
+  return href.replace('.html', `.html?hint=true`)
 }
 
 /**
@@ -293,21 +292,22 @@ function findTypeCategory (href) {
  */
 function isSelfLink (href) {
   href = href.replace(moduleContentHash, '')
-
   const pathname = window.location.pathname
-  const pathnameEnding = pathname.substring(pathname.length - href.length, pathname.length)
 
-  return pathnameEnding === href
+  return pathnameEndsWith(pathname, href)
 }
 
 /**
- * Generates an id that will be included, as a param, in the iFrame URL.
- * Message that comes back from the iFrame will send back this id - this will help to avoid race conditions.
+ * Checks if the pathanme ens with the provided href
  *
- * @returns {string} unique ID
+ * @param {string} href href to check
+ *
+ * @returns {boolean} returns true if the pathname end with the provided href
  */
-function uid () {
-  return Math.random().toString(36).substr(2, 9)
+function pathnameEndsWith (pathname, href) {
+  const pathnameEnding = pathname.substring(pathname.length - href.length, pathname.length)
+
+  return pathnameEnding === href
 }
 
 /**
@@ -330,6 +330,17 @@ function measureTooltipHeight (tooltipElement) {
  */
 function measureTooltipWidth (tooltipElement) {
   return tooltipElement[0].getBoundingClientRect().width
+}
+
+/**
+ * Checks if we are currently waiting for data from the provided href.
+ *
+ * @param {string} href href to check
+ *
+ * @returns {boolean} true if we're expecting data from the provided href.
+ */
+function isHrefExpected (href) {
+  return currentHintHref === href || pathnameEndsWith(href, currentHintHref)
 }
 
 // Public Methods
