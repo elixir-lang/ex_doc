@@ -80,7 +80,7 @@ function updateToggleLink () {
 }
 
 /**
- * Check how much free space there is areound the tooltip.
+ * Check how much free space there is around the tooltip.
  *
  * @param {Object} event `message` event data
  */
