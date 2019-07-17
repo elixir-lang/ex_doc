@@ -28,8 +28,7 @@ defmodule ExDoc.Mixfile do
   defp deps do
     [
       {:earmark, "~> 1.3"},
-      {:makeup, "~> 1.0"},
-      {:makeup_elixir, "~> 0.13"},
+      {:makeup_elixir, "~> 0.14"},
       {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
     ]
