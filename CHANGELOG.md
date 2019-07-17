@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.21.0
+
+  * Enhancements
+    * [HTML] Add support for reference popovers
+    * [HTML] Provide a "g" shortcut to Go To a Hexdocs package (with autocomplete)
+    * [HTML] Detect if browser prefers night mode
+    * [EPUB] Add support for covers and the authors field
+
+  * Bug fixes
+    * [HTML+EPUB] Ensure that link headers generate unique IDs
+    * [HTML+EPUB] Sort structs fields so field names are always ordered
+    * [HTML+EPUB] Do not strip "Elixir." prefix from module names
+    * [HTML] Support URLs with non-HTML safe characters
+    * [EPUB] Fix table of contents without groups
+
 ## v0.20.2
 
   * Enhancements
