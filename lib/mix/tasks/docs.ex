@@ -282,7 +282,9 @@ defmodule Mix.Tasks.Docs do
 
   @doc false
   def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate_docs/3) do
+    {:ok, _} = Application.ensure_all_started(:ex_doc)
     Mix.Task.run("compile")
+
     {cli_opts, args, _} = OptionParser.parse(args, aliases: @aliases, switches: @switches)
 
     if args != [] do
