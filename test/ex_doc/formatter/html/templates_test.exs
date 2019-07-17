@@ -275,7 +275,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       refute content =~ ~r{<small>module</small>}
 
       assert content =~
-               ~r{moduledoc.*Example.*<span class="nc">CompiledWithDocs</span><span class="o">\.</span><span class="n">example</span>.*}ms
+               ~r{moduledoc.*Example.*<samp class="nc">CompiledWithDocs</samp><samp class="o">\.</samp><samp class="n">example</samp>.*}ms
 
       assert content =~
                ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms
