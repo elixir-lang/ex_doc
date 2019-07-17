@@ -285,6 +285,13 @@ defmodule Mix.Tasks.Docs do
     {:ok, _} = Application.ensure_all_started(:ex_doc)
     Mix.Task.run("compile")
 
+    unless Code.ensure_loaded?(ExDoc.Config) do
+      Mix.raise(
+        "Could not load ExDoc configuration. Please make sure you are running the " <>
+          "docs task in the same Mix environment it is listed in your deps"
+      )
+    end
+
     {cli_opts, args, _} = OptionParser.parse(args, aliases: @aliases, switches: @switches)
 
     if args != [] do
