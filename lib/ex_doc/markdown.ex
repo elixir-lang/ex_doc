@@ -4,8 +4,7 @@ defmodule ExDoc.Markdown do
 
   ExDoc is compatible with any markdown processor that implements the
   functions defined in this module. The markdown processor can be changed
-  via the `:markdown_processor` option in your `mix.exs` or via the
-  `:markdown_processor` configuration in the `:ex_doc` configuration.
+  via the `:markdown_processor` option in your `mix.exs.
 
   ExDoc supports the following Markdown parsers out of the box:
 
@@ -13,6 +12,19 @@ defmodule ExDoc.Markdown do
     * [Cmark](https://github.com/asaaki/cmark.ex)
 
   ExDoc uses Earmark by default.
+
+  ### Using cmark
+
+  [Cmark](https://github.com/jgm/cmark) is a CommonMark parser written in C.
+  To use cmark, add the Elixir NIF wrapper [cmark.ex](https://github.com/asaaki/cmark.ex)
+  as a dependency to your project:
+
+      {:cmark, "~> 0.6", only: :dev}
+
+  And then update your project configuration to use Cmark:
+
+      docs: [markdown_processor: ExDoc.Markdown.Cmark]
+
   """
 
   @doc """
