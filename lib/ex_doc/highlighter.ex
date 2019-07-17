@@ -19,9 +19,17 @@ defmodule ExDoc.Highlighter do
   def before_closing_body_tag(_), do: ""
 
   # If new lexers are available, add them here:
-  defp pick_language_and_lexer(""), do: {"elixir", Makeup.Lexers.ElixirLexer}
-  defp pick_language_and_lexer("elixir"), do: {"elixir", Makeup.Lexers.ElixirLexer}
-  defp pick_language_and_lexer(other), do: {other, nil}
+  defp pick_language_and_lexer(""), do: {"elixir", Makeup.Lexers.ElixirLexer, []}
+
+  defp pick_language_and_lexer(lang) do
+    case Makeup.Registry.fetch_lexer_by_name(lang) do
+      {:ok, {lexer, opts}} ->
+        {lang, lexer, opts}
+
+      :error ->
+        {lang, nil, []}
+    end
+  end
 
   @doc """
   Highlights all code block in an already generated HTML document.
@@ -36,17 +44,21 @@ defmodule ExDoc.Highlighter do
 
   defp highlight_code_block(full_block, lang, code) do
     case pick_language_and_lexer(lang) do
-      {_language, nil} -> full_block
-      {language, lexer} -> render_code(language, lexer, code)
+      {_language, nil, _opts} -> full_block
+      {language, lexer, opts} -> render_code(language, lexer, opts, code)
     end
   end
 
-  defp render_code(lang, lexer, code) do
+  defp render_code(lang, lexer, lexer_opts, code) do
     highlighted =
       code
       |> unescape_html()
       |> IO.iodata_to_binary()
-      |> Makeup.highlight_inner_html(lexer: lexer, formatter_options: [highlight_tag: "samp"])
+      |> Makeup.highlight_inner_html(
+        lexer: lexer,
+        lexer_options: lexer_opts,
+        formatter_options: [highlight_tag: "samp"]
+      )
 
     ~s(<pre><code class="nohighlight makeup #{lang}">#{highlighted}</code></pre>)
   end
