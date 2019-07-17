@@ -223,7 +223,7 @@ function prepareTooltips () {
 
   if (isSelfLink(href)) { return }
 
-  currentCacheKey = href;
+  currentCacheKey = href
 
   const typeCategory = findTypeCategory(href)
 
