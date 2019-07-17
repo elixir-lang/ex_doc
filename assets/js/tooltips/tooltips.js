@@ -35,6 +35,7 @@ const moduleContentHash = '#content' // Hash included in links pointing to modul
 let tooltipElement = null // Will store the jQuery selector for the tooltip root
 let currentLinkElement = null // Element that the cursor is hovering over
 let currentRequestId = null // ID of the request we're waiting for
+let currentCacheKey = null // Cache key for the html to be requested
 let showTimeoutAnimation = null // Timeout ID related to the tooltip show animation
 let hideTimeoutVisibility = null // Timeout ID related to the tooltip hide animation
 let hoverDelayTimeout = null // Timeout ID related to the `hoverDelayTime` described above
@@ -88,6 +89,8 @@ function updateToggleLink () {
 function receivePopupMessage (event) {
   if (event.data.requestId !== currentRequestId) { return }
   if (event.data.ready !== true) { return }
+
+  sessionStorage.setItem(currentCacheKey, JSON.stringify(event.data.hint))
 
   showTooltip(event.data.hint)
 }
@@ -220,6 +223,8 @@ function prepareTooltips () {
 
   if (isSelfLink(href)) { return }
 
+  currentCacheKey = href;
+
   const typeCategory = findTypeCategory(href)
 
   if (typeCategory) {
@@ -227,6 +232,8 @@ function prepareTooltips () {
       kind: 'type',
       description: typeCategory.description
     })
+  } else if (currentCacheKey in sessionStorage) {
+    showTooltip(JSON.parse(sessionStorage.getItem(currentCacheKey)))
   } else {
     const hintHref = rewriteHref(href)
     let iframe = $(tooltipIframeSelector).detach()
