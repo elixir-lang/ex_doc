@@ -54,6 +54,7 @@ function closeQuickSwitchModal () {
   autoCompleteResults = []
   autoCompleteSelected = -1
 
+  $(quickSwitchInputSelector).blur()
   $(quickSwitchResultsSelector).html('')
   $(quickSwitchInputSelector).val('').removeClass('completed')
   $(quickSwitchModalSelector).hide()
