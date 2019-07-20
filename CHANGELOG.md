@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.21.1
+
+  * Bug fixes
+    * [HTML] Make sure package selector can be reopened after closed with `ESC`
+    * [HTML] Ensure tooltip pages can be cached
+    * [HTML] Support large version numbers on the version dropdown
+    * [mix docs] Raise nice exception for missing ExDoc.Config
+
 ## v0.21.0
 
   * Enhancements
