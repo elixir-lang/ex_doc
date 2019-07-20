@@ -163,7 +163,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
   end
 
-
   test "uses samp as highlight tag for markdown" do
     generate_docs_and_unzip(doc_config())
 
