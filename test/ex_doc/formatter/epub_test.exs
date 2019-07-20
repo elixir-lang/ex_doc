@@ -132,7 +132,6 @@ defmodule ExDoc.Formatter.EPUBTest do
 
   test "generates all listing files" do
     generate_docs_and_unzip(doc_config())
-
     content = File.read!("#{output_dir()}/OEBPS/content.opf")
 
     assert content =~ ~r{.*"CompiledWithDocs\".*}ms
@@ -162,6 +161,14 @@ defmodule ExDoc.Formatter.EPUBTest do
 
     content = File.read!("#{output_dir()}/OEBPS/nav.xhtml")
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
+  end
+
+
+  test "uses samp as highlight tag for markdown" do
+    generate_docs_and_unzip(doc_config())
+
+    assert File.read!("#{output_dir()}/OEBPS/CompiledWithDocs.xhtml") =~
+             "<samp class=\"nc\">CompiledWithDocs<\/samp>"
   end
 
   describe "before_closing_*_tags" do

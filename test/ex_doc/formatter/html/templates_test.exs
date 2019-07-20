@@ -31,7 +31,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   defp get_module_page(names, config \\ []) do
     config = doc_config(config)
     mods = ExDoc.Retriever.docs_from_modules(names, config)
-    {[mod | _], _} = HTML.autolink_and_render(mods, ".html", config)
+    {[mod | _], _} = HTML.autolink_and_render(mods, ".html", config, [])
     Templates.module_page(mod, @empty_nodes_map, config)
   end
 
@@ -275,7 +275,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       refute content =~ ~r{<small>module</small>}
 
       assert content =~
-               ~r{moduledoc.*Example.*<samp class="nc">CompiledWithDocs</samp><samp class="o">\.</samp><samp class="n">example</samp>.*}ms
+               ~r{moduledoc.*Example.*<span class="nc">CompiledWithDocs</span><span class="o">\.</span><span class="n">example</span>.*}ms
 
       assert content =~
                ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms

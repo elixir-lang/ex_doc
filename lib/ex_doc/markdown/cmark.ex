@@ -21,11 +21,15 @@ defmodule ExDoc.Markdown.Cmark do
   end
 
   @doc """
-  Generate HTML output. Cmark takes no options.
+  Generate HTML output.
+
+  ## Options
+
+    * `:highlight_tag` - the tag used for highlighting code, defaults to "span"
   """
-  def to_html(text, _opts) do
+  def to_html(text, opts) do
     text
     |> Cmark.to_html()
-    |> ExDoc.Highlighter.highlight_code_blocks()
+    |> ExDoc.Highlighter.highlight_code_blocks(opts)
   end
 end

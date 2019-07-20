@@ -13,7 +13,9 @@ defmodule ExDoc.Formatter.EPUB do
     config = normalize_config(config)
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
-    {project_nodes, autolink} = HTML.autolink_and_render(project_nodes, ".xhtml", config)
+
+    {project_nodes, autolink} =
+      HTML.autolink_and_render(project_nodes, ".xhtml", config, highlight_tag: "samp")
 
     nodes_map = %{
       modules: HTML.filter_list(:module, project_nodes),

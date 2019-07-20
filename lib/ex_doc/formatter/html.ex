@@ -18,7 +18,7 @@ defmodule ExDoc.Formatter.HTML do
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
-    {project_nodes, autolink} = autolink_and_render(project_nodes, ".html", config)
+    {project_nodes, autolink} = autolink_and_render(project_nodes, ".html", config, [])
     extras = build_extras(config, autolink)
 
     # Generate search early on without api reference in extras
@@ -66,24 +66,26 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Autolinks and renders all docs.
   """
-  def autolink_and_render(project_nodes, ext, config) do
+  def autolink_and_render(project_nodes, ext, config, opts) do
     autolink = Autolink.compile(project_nodes, ext, config)
-    {project_nodes |> Autolink.all(autolink) |> render_docs(), autolink}
+
+    rendered =
+      project_nodes
+      |> Autolink.all(autolink)
+      |> Enum.map(fn node ->
+        docs = Enum.map(node.docs, &render_doc(&1, opts))
+        typespecs = Enum.map(node.typespecs, &render_doc(&1, opts))
+        %{render_doc(node, opts) | docs: docs, typespecs: typespecs}
+      end)
+
+    {rendered, autolink}
   end
 
-  defp render_docs(nodes) do
-    for module <- nodes do
-      docs = Enum.map(module.docs, &render_doc/1)
-      typespecs = Enum.map(module.typespecs, &render_doc/1)
-      %{render_doc(module) | docs: docs, typespecs: typespecs}
-    end
-  end
-
-  defp render_doc(%{doc: nil} = node),
+  defp render_doc(%{doc: nil} = node, _opts),
     do: node
 
-  defp render_doc(%{doc: doc, source_path: file, doc_line: line} = node),
-    do: %{node | rendered_doc: ExDoc.Markdown.to_html(doc, file: file, line: line + 1)}
+  defp render_doc(%{doc: doc, source_path: file, doc_line: line} = node, opts),
+    do: %{node | rendered_doc: ExDoc.Markdown.to_html(doc, [file: file, line: line + 1] ++ opts)}
 
   defp output_setup(build, config) do
     if File.exists?(build) do

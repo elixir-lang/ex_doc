@@ -21,7 +21,9 @@ defmodule ExDoc.Markdown.Earmark do
   end
 
   @doc """
-  Earmark specific options:
+  Generate HTML output.
+
+  ## Options
 
     * `:gfm` - boolean. Turns on Github Flavored Markdown extensions. True by default
 
@@ -34,6 +36,8 @@ defmodule ExDoc.Markdown.Earmark do
     * `:plugins` - map of strings to modules. Register custom plugins to be used with
       Earmark. See [Plugins](http://github.com/pragdave/earmark#plugins) for details on
       how to write custom plugins.
+
+    * `:highlight_tag` - the tag used for highlighting code, defaults to "span"
 
   """
   def to_html(text, opts) do
@@ -49,6 +53,6 @@ defmodule ExDoc.Markdown.Earmark do
 
     text
     |> Earmark.as_html!(options)
-    |> ExDoc.Highlighter.highlight_code_blocks()
+    |> ExDoc.Highlighter.highlight_code_blocks(opts)
   end
 end

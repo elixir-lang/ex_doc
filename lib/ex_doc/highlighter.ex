@@ -34,22 +34,24 @@ defmodule ExDoc.Highlighter do
   @doc """
   Highlights all code block in an already generated HTML document.
   """
-  def highlight_code_blocks(html) do
+  def highlight_code_blocks(html, opts \\ []) do
     Regex.replace(
       ~r/<pre><code(?:\s+class="(\w*)")?>([^<]*)<\/code><\/pre>/,
       html,
-      &highlight_code_block/3
+      &highlight_code_block(&1, &2, &3, opts)
     )
   end
 
-  defp highlight_code_block(full_block, lang, code) do
+  defp highlight_code_block(full_block, lang, code, outer_opts) do
     case pick_language_and_lexer(lang) do
       {_language, nil, _opts} -> full_block
-      {language, lexer, opts} -> render_code(language, lexer, opts, code)
+      {language, lexer, opts} -> render_code(language, lexer, opts, code, outer_opts)
     end
   end
 
-  defp render_code(lang, lexer, lexer_opts, code) do
+  defp render_code(lang, lexer, lexer_opts, code, opts) do
+    highlight_tag = Keyword.get(opts, :highlight_tag, "span")
+
     highlighted =
       code
       |> unescape_html()
@@ -57,7 +59,7 @@ defmodule ExDoc.Highlighter do
       |> Makeup.highlight_inner_html(
         lexer: lexer,
         lexer_options: lexer_opts,
-        formatter_options: [highlight_tag: "samp"]
+        formatter_options: [highlight_tag: highlight_tag]
       )
 
     ~s(<pre><code class="nohighlight makeup #{lang}">#{highlighted}</code></pre>)
