@@ -1,4 +1,4 @@
-<%= head_template(config, %{title: translate(config, module.title), type: module.type}) %>
+<%= head_template(config, %{title: module.title, type: module.type}) %>
     <%= sidebar_template(config, nodes_map) %>
 
       <h1>
@@ -14,7 +14,7 @@
 
       <%= if deprecated = module.deprecated do %>
         <div class="deprecated">
-          <%= translate(config, "This #{module.type} is deprecated #{h(deprecated)}.") %> <%= translate(config, h(deprecated)) %>.
+          <%= translate(config, "This #{module.type} is deprecated. #{h(deprecated)}.") %> <%= translate(config, h(deprecated)) %>.
         </div>
       <% end %>
 

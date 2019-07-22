@@ -1,3 +1,5 @@
+/* globals translations */
+
 // Dependencies
 // ------------
 
@@ -16,7 +18,8 @@ function updateSuggestions (term) {
   const template = autocompleteResultsTemplate({
     empty: results.length === 0,
     results: results,
-    term: term
+    term: term,
+    translations: translations
   })
 
   autocompleteElement.html(template)

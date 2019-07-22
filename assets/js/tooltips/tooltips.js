@@ -1,3 +1,5 @@
+/* globals translations */
+
 // Dependencies
 // ------------
 
@@ -5,6 +7,7 @@ import $ from 'jquery'
 import find from 'lodash.find'
 import tooltipBodyTemplate from '../templates/tooltip-body.handlebars'
 import tooltipLayoutTemplate from '../templates/tooltip-layout.handlebars'
+import translate from '../template-helpers/useTranslation'
 
 // Constants
 // ---------
@@ -24,9 +27,9 @@ const minWindowSize = { // Tooltips won't be displayed if width/height of the vi
 const hoverDelayTime = 100
 // Info that will be shown when hovering over links pointing to the typespecs page.
 const typesCategories = [
-  {description: 'Basic type', href: 'typespecs.html#basic-types'},
-  {description: 'Literal', href: 'typespecs.html#literals'},
-  {description: 'Built-in type', href: 'typespecs.html#built-in-types'}
+  {description: translate('Basic Type', translations), href: 'typespecs.html#basic-types'},
+  {description: translate('Literal', translations), href: 'typespecs.html#literals'},
+  {description: translate('Built-in Type', translations), href: 'typespecs.html#built-in-types'}
 ]
 const tooltipsToggleSelector = '.tooltips-toggle' // `Enable/Disable tooltips` button
 const tooltipsDisabledStorageKey = 'tooltipsDisabled' // Local Storage key Used to store tooltips settings

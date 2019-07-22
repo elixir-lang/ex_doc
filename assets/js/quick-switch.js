@@ -1,3 +1,5 @@
+/* globals translations */
+
 // quick switch modal
 
 // Dependencies

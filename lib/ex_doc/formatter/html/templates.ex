@@ -261,7 +261,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   """
   def create_sidebar_translated_labels(config) do
     default_labels = [
+      basic_type: "Basic Type",
       bring_dialog: "Bring up this help dialog",
+      built_in_type: "Built-in Type",
       callback: "callback",
       callbacks: "Callbacks",
       contributing: "Contributing",
@@ -272,9 +274,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
       functions: "Functions",
       go_to: "Go to",
       go_to_hex: "Go to a HexDocs package",
-      jump_to: "Jump to",
+      jump_to: "Jump to...",
       keyboard_shortcuts: "Keyboard Shortcuts",
       license: "License",
+      literal: "Literal",
       macro: "macro",
       module: "module",
       opaque: "opaque",

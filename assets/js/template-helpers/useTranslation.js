@@ -1,7 +1,11 @@
 export default function (string, translations, options) {
   switch (string) {
+    case 'Basic Type':
+      return translations.basic_type
     case 'Bring up this help dialog':
       return translations.bring_dialog
+    case 'Built-in Type':
+      return translations.built_in_type
     case 'callback':
       return translations.callback
     case 'Callbacks':
@@ -22,12 +26,14 @@ export default function (string, translations, options) {
       return translations.go_to_hex
     case 'Here are some tips when performing a full-text search:':
       return translations.not_found_search_hint
-    case 'Jump to':
+    case 'Jump to...':
       return translations.jump_to
     case 'Keyboard Shortcuts':
       return translations.keyboard_shortcuts
     case 'License':
       return translations.license
+    case 'Literal':
+      return translations.literal
     case 'macro':
       return translations.macro
     case 'module':
