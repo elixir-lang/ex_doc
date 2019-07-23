@@ -27,7 +27,7 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [
-      {:earmark, "~> 1.3.3"}, # Min version for %Option{pure_links: ...}
+      {:earmark, "~> 1.3.3 or ~> 1.4"},
       {:makeup_elixir, "~> 0.14"},
       {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
