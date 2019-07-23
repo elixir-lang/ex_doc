@@ -44,6 +44,13 @@ defmodule ExDoc.Markdown.Earmark do
         file: Keyword.get(opts, :file),
         breaks: Keyword.get(opts, :breaks, false),
         smartypants: Keyword.get(opts, :smartypants, true),
+        # As discussed, this enables pure links
+        pure_links: true,
+        # Alternatively this would not enable them and surpress deprecation warnings
+        # pure_links: false,
+        # Or the default behavior, deprecation warnings
+        # pure_links: nil,
+
         plugins: Keyword.get(opts, :plugins, %{})
       )
 
