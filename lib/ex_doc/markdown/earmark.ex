@@ -48,6 +48,7 @@ defmodule ExDoc.Markdown.Earmark do
         file: Keyword.get(opts, :file),
         breaks: Keyword.get(opts, :breaks, false),
         smartypants: Keyword.get(opts, :smartypants, false),
+        pure_links: true,
         plugins: Keyword.get(opts, :plugins, %{})
       )
 
