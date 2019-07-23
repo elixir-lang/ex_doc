@@ -12,11 +12,15 @@ describe('helpers', () => {
   describe('findSidebarCategory', () => {
     it('finds the correct category', () => {
       const nodes = [{
-        callbacks: [{anchor: 'hello'}],
-        functions: [{anchor: 'world'}]
+        nodeGroups: [
+          {key: 'callbacks', nodes: [{anchor: 'hello'}]},
+          {key: 'functions', nodes: [{anchor: 'world'}]}
+        ]
       }, {
-        callbacks: [{anchor: 'one'}],
-        guards: [{anchor: 'two'}]
+        nodeGroups: [
+          {key: 'callbacks', nodes: [{anchor: 'one'}]},
+          {key: 'examples', nodes: [{anchor: 'two'}]}
+        ]
       }]
 
       expect(helpers.findSidebarCategory(nodes, 'world')).to.be.eql('functions')

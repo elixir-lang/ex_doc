@@ -2,24 +2,41 @@
 
 [![Build Status](https://secure.travis-ci.org/elixir-lang/ex_doc.svg?branch=master "Build Status")](http://travis-ci.org/elixir-lang/ex_doc)
 [![Coverage Status](https://coveralls.io/repos/github/elixir-lang/ex_doc/badge.svg?branch=master)](https://coveralls.io/github/elixir-lang/ex_doc?branch=master)
-[![Ebert](https://ebertapp.io/github/elixir-lang/ex_doc.svg)](https://ebertapp.io/github/elixir-lang/ex_doc)
 
-ExDoc is a tool to generate documentation for your Elixir projects. In case you are looking for documentation for Elixir itself, [check out Elixir's website][elixir-lang].
+ExDoc is a tool to generate documentation for your Elixir projects. To see an example, [you can access Elixir's official docs](https://hexdocs.pm/elixir/).
 
-To learn about how to document your projects check out [Elixir's writing documentation page][hex-writing-docs].
+To learn about how to document your projects, see [Elixir's writing documentation page](https://hexdocs.pm/elixir/writing-documentation.html).
 
-See the [ExDoc Documentation](https://hexdocs.pm/ex_doc/).
+## Features
+
+ExDoc ships with many features:
+
+  * Automatically generates HTML and EPUB documents from your API documentation
+  * The generated HTML documentation is accessible online and offline
+  * Responsive design with built-in layout for phones and tablets
+  * Customizable logo on the generated documentation
+  * Support for custom pages and guides (in addition to the API reference)
+  * Support for custom grouping of modules and functions in the sidebar
+  * Full-text search
+  * Keyboard shortcuts (press `?` inside an existing documentation to bring the help dialog)
+  * Quick search with autocompletion support on the API reference (`s` keyboard shortcut)
+  * Go-to shortcut to take to any HexDocs package documentation with autocomplete support (`g` keyboard shortcut)
+  * Support for night-mode (automatically detected according to the browser preferences)
+  * Show tooltips when mousing over a link to a module/function (works for the current project and across projects)
+  * Upon configuration, a version dropdown is shown to quickly switch to other versions (automatically configured when hosted on HexDocs)
+  * Upon configuration, documentation includes link to the source code
 
 ## Using ExDoc with Mix
 
 To use ExDoc in your Mix projects, first add ExDoc as a dependency.
 
-
 If you are using Elixir v1.7 and later:
 
 ```elixir
 def deps do
-  [{:ex_doc, "~> 0.19", only: :dev, runtime: false}]
+  [
+    {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+  ]
 end
 ```
 
@@ -27,7 +44,9 @@ If you are using Elixir v1.6 and earlier:
 
 ```elixir
 def deps do
-  [{:ex_doc, "~> 0.18.0", only: :dev, runtime: false}]
+  [
+    {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
+  ]
 end
 ```
 
@@ -63,26 +82,26 @@ You can ExDoc via the command line as follows:
 
 1. Install ExDoc as an escript:
 
-    ```console
+    ```bash
     $ mix escript.install hex ex_doc
     ```
 
 2. Then you are ready to use it in your projects. First, move into your project directory and make sure it is already compiled:
 
-    ```console
+    ```bash
     $ cd PATH_TO_YOUR_PROJECT
     $ mix compile
     ```
 
 3. Next invoke the ex_doc executable from your project:
 
-    ```console
+    ```bash
     $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
     ```
 
 4. By default, ex_doc produces HTML files, but, you can also create a EPUB document passing the option `--formatter epub`:
 
-    ```console
+    ```bash
     $ PATH_TO_YOUR_EXDOC/bin/ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png -f epub
     ```
 
@@ -105,27 +124,9 @@ ExDoc will automatically generate links across modules and functions if you encl
 
 ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name, such as `` `function/1` ``.
 
-## Changing the Markdown tool
-
-In the examples above, we have used [Earmark][] to convert Markdown to HTML. If you prefer, you can also use cmark (in C).
-
-### Cmark
-
-[Cmark][cmark] is a CommonMark parser written in C. To use cmark add the elixir NIF wrapper [cmark.ex][cmark.ex] as a dependency to your project:
-
-```elixir
-{:cmark, "~> 0.6", only: :dev}
-```
-
-Update your project configuration to use Cmark:
-
-```elixir
-docs: [markdown_processor: ExDoc.Markdown.Cmark]
-```
-
 ## Contributing
 
-The easiest way to test changes to ExDoc is to locally re-generate it's own docs:
+The easiest way to test changes to ExDoc is to locally re-generate its own docs:
 
   1. Run `mix setup` to install all dependencies
   2. Run `mix build` to generate docs. This is a custom alias that will build assets, recompile ExDoc, and output fresh docs into the `doc/` directory
@@ -135,11 +136,4 @@ The easiest way to test changes to ExDoc is to locally re-generate it's own docs
 
 ExDoc source code is released under Apache 2 License. The generated contents, however, are under different licenses based on projects used to help render HTML, including CSS, JS, and other assets.
 
-Check the [LICENSE](LICENSE) file for more information.
-
-[earmark]: http://github.com/pragdave/earmark
-[elixir-lang]: http://elixir-lang.org/
-[cmark]: https://github.com/jgm/cmark
-[cmark.ex]: https://github.com/asaaki/cmark.ex
-[devinus/markdown]: http://github.com/devinus/markdown
-[hex-writing-docs]: https://hexdocs.pm/elixir/writing-documentation.html
+Check the [LICENSE](LICENSE) file for more information. Any documentation generated by ExDoc, or any documentation generated by any "Derivative Works" (as specified in the Apache 2 License), must include a direct link to [ExDoc repository](https://github.com/elixir-lang/ex_doc) on every page.

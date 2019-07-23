@@ -12,8 +12,8 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     "http://elixir-lang.org"
   end
 
-  defp doc_config do
-    %ExDoc.Config{
+  defp doc_config(config \\ []) do
+    default = %ExDoc.Config{
       project: "Elixir",
       version: "1.0.1",
       source_root: File.cwd!(),
@@ -22,12 +22,15 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       source_url: source_url(),
       output: "test/tmp/epub_templates"
     }
+
+    struct(default, config)
   end
 
-  defp get_module_page(names) do
-    mods = ExDoc.Retriever.docs_from_modules(names, doc_config())
-    mods = HTML.Autolink.all(mods, HTML.Autolink.compile(mods, ".xhtml", []))
-    Templates.module_page(doc_config(), hd(mods))
+  defp get_module_page(names, config \\ []) do
+    config = doc_config(config)
+    mods = ExDoc.Retriever.docs_from_modules(names, config)
+    {[mod | _], _} = HTML.autolink_and_render(mods, ".xhtml", config, highlight_tag: "samp")
+    Templates.module_page(config, mod)
   end
 
   setup_all do
@@ -58,14 +61,31 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~r{<h1 id="content">\s*CompiledWithDocs\s*}
 
       assert content =~
-               ~r{moduledoc.*Example.*<span class="nc">CompiledWithDocs</span><span class="o">\.</span><span class="n">example</span>.*}ms
+               ~r{moduledoc.*Example.*<samp class="nc">CompiledWithDocs</samp><samp class="o">\.</samp><samp class="n">example</samp>.*}ms
 
       assert content =~ ~r{example/2.*Some example}ms
       assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
       assert content =~ ~r{example_1/0.*<span class="note">\(macro\)</span>}ms
 
-      assert content =~ ~s{<div class="detail" id="example_1/0">}
+      assert content =~ ~s{<section class="detail" id="example_1/0">}
       assert content =~ ~s{example(foo, bar \\\\ Baz)}
+    end
+
+    test "outputs function groups" do
+      content =
+        get_module_page([CompiledWithDocs],
+          groups_for_functions: [
+            "Example functions": &(&1[:purpose] == :example),
+            Legacy: &is_binary(&1[:deprecated])
+          ]
+        )
+
+      assert content =~ ~r{id="example-functions".*href="#example-functions".*Example functions}ms
+      assert content =~ ~r{id="legacy".*href="#legacy".*Legacy}ms
+      assert content =~ ~r{id="example-functions".*id="example/2"}ms
+      refute content =~ ~r{id="legacy".*id="example/2"}ms
+      refute content =~ ~r{id="functions".*id="example/2"}ms
+      assert content =~ ~r{id="functions".*id="example_1/0"}ms
     end
 
     test "outputs summaries" do
@@ -87,7 +107,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
                ~r{<h1 id="content">\s*CustomBehaviourOne\s*<small>behaviour</small>\s*</h1>}m
 
       assert content =~ ~r{Callbacks}
-      assert content =~ ~r{<div class="detail" id="c:hello/1">}
+      assert content =~ ~r{<section class="detail" id="c:hello/1">}
 
       content = get_module_page([CustomBehaviourTwo])
 
@@ -95,7 +115,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
                ~r{<h1 id="content">\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*</h1>}m
 
       assert content =~ ~r{Callbacks}
-      assert content =~ ~r{<div class="detail" id="c:bye/1">}
+      assert content =~ ~r{<section class="detail" id="c:bye/1">}
     end
 
     ## PROTOCOLS

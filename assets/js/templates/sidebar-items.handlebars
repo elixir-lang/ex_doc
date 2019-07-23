@@ -1,17 +1,26 @@
 <ul id="full-list">
-{{#each nodes as |node nodeId|}}
-    {{#newGroup ../this node.group}}
+  {{#each nodes as |node nodeId|}}
+    {{#groupChanged ../this node.group}}
       <li class="group">{{node.group}}</li>
-    {{/newGroup}}
-    <li class="{{#isLocal node.id}}clicked open{{/isLocal}}">
+    {{/groupChanged}}
 
-    {{!-- When visiting a module page, the link to this module page
-    in the menu should not link to a new page, instead should link
-    to the top of the page itself. --}}
-    {{#isEmptyNode node}}
-      <a href="{{node.id}}.html" title="{{node.title}}">{{node.title}}</a>
-    {{else}}
-      <a href="{{node.id}}.html" title="{{node.title}}" class="expand">{{node.title}}</a>
+    {{#nestingChanged ../this node}}
+      <li class="nesting-context" aria-hidden="true">{{node.nested_context}}</li>
+    {{/nestingChanged}}
+
+    <li class="{{#isLocal node.id}}current-page open{{/isLocal}} {{#if node.nested_title}}nested{{/if}}">
+      {{! When visiting a module page, the link to this module page
+      in the menu should not link to a new page, instead should link
+      to the top of the page itself. }}
+      <a href="{{node.id}}.html" class="expand">
+        {{#if node.nested_title}}
+          {{node.nested_title}}
+        {{else}}
+          {{node.title}}
+        {{/if}}
+
+        <span class="icon-goto" title="Go to {{node.title}}"></span>
+      </a>
 
       <ul>
         <li>
@@ -21,7 +30,7 @@
         {{#isArray node.headers}}
           {{#each node.headers}}
             <li>
-              <a href="{{node.id}}.html#{{{anchor}}}">{{id}}</a>
+              <a href="{{node.id}}.html#{{{anchor}}}">{{{id}}}</a>
             </li>
           {{/each}}
         {{else}}
@@ -30,57 +39,23 @@
               <a href="{{node.id}}.html#summary">Summary</a>
             </li>
           {{/showSummary}}
-          {{#if node.types}}
+          {{#each node.nodeGroups as |group|}}
             <li class="docs">
-              <a href="{{node.id}}.html#types" class="expand">Types</a>
-              <ul class="types-list deflist">
-                {{#each node.types}}
+              <a href="{{node.id}}.html#{{group.key}}" class="expand">
+                {{group.name}}
+                <span class="icon-goto" title="Go to {{group.name}}"></span>
+              </a>
+              <ul class="{{group.key}}-list deflist">
+                {{#each group.nodes}}
                   <li>
-                    <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
+                    <a href="{{node.id}}.html#{{anchor}}">{{{id}}}</a>
                   </li>
                 {{/each}}
               </ul>
             </li>
-          {{/if}}
-          {{#if node.guards}}
-            <li class="docs">
-              <a href="{{node.id}}.html#guards" class="expand">Guards</a>
-              <ul class="guards-list deflist">
-                {{#each node.guards}}
-                  <li>
-                    <a href="{{node.id}}.html#{{anchor}}" class="deflink">{{id}}</a>
-                  </li>
-                {{/each}}
-              </ul>
-            </li>
-          {{/if}}
-          {{#if node.functions}}
-            <li class="docs">
-              <a href="{{node.id}}.html#functions" class="expand">Functions</a>
-              <ul class="functions-list deflist">
-                {{#each node.functions}}
-                  <li>
-                    <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
-                  </li>
-                {{/each}}
-              </ul>
-            </li>
-          {{/if}}
-          {{#if node.callbacks}}
-            <li class="docs">
-              <a href="{{node.id}}.html#callbacks" class="expand">Callbacks</a>
-              <ul class="callbacks-list deflist">
-                {{#each node.callbacks}}
-                  <li>
-                    <a href="{{node.id}}.html#{{anchor}}" class="deflink">{{id}}</a>
-                  </li>
-                {{/each}}
-              </ul>
-            </li>
-          {{/if}}
+          {{/each}}
         {{/isArray}}
-      </ul>
-    {{/isEmptyNode}}
-  </li>
-{{/each}}
+        </ul>
+    </li>
+  {{/each}}
 </ul>

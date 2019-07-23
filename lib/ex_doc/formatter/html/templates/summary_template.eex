@@ -1,8 +1,8 @@
 <%= unless Enum.empty?(nodes) do %>
-  <div class="summary-<%= name %> summary">
+  <div class="summary-<%= HTML.text_to_id(name) %> summary">
     <h2>
-      <a href="#<%= name %>"><%= String.capitalize name %></a>
+      <a href="#<%= HTML.text_to_id(name) %>"><%= name %></a>
     </h2>
-    <%= for module_node <- nodes, do: summary_entry_template(module_node) %>
+    <%= for node <- nodes, do: summary_entry_template(node) %>
   </div>
 <% end %>

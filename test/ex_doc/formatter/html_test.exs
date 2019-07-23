@@ -2,6 +2,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   use ExUnit.Case
 
   import ExUnit.CaptureIO
+  alias ExDoc.Formatter.HTML
   alias ExDoc.Markdown.DummyProcessor
 
   setup do
@@ -55,6 +56,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp generate_docs(config) do
+    config = Keyword.put_new(config, :skip_undefined_reference_warnings_on, ["Warnings"])
     ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
@@ -75,6 +77,26 @@ defmodule ExDoc.Formatter.HTMLTest do
                  fn -> generate_docs(config) end
   end
 
+  describe "strip_tags" do
+    test "removes html tags from text leaving the content" do
+      assert HTML.strip_tags("<em>Hello</em> World!<br/>") == "Hello World!"
+      assert HTML.strip_tags("Go <a href=\"#top\" class='small' disabled>back</a>") == "Go back"
+      assert HTML.strip_tags("Git opts (<code class=\"inline\">:git</code>)") == "Git opts (:git)"
+    end
+  end
+
+  describe "text_to_id" do
+    test "id generation" do
+      assert HTML.text_to_id("“Stale”") == "stale"
+      assert HTML.text_to_id("José") == "josé"
+      assert HTML.text_to_id(" a - b ") == "a-b"
+      assert HTML.text_to_id(" ☃ ") == ""
+      assert HTML.text_to_id(" &sup2; ") == ""
+      assert HTML.text_to_id(" &#9180; ") == ""
+      assert HTML.text_to_id("Git opts (<code class=\"inline\">:git</code>)") == "git-opts-git"
+    end
+  end
+
   test "warns when generating an index.html file with an invalid redirect" do
     output =
       capture_io(:stderr, fn ->
@@ -84,6 +106,18 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert output == "warning: index.html redirects to Unknown.html, which does not exist\n"
     assert File.regular?("#{output_dir()}/index.html")
     refute File.regular?("#{output_dir()}/Unknown.html")
+  end
+
+  test "warns on undefined functions" do
+    output =
+      capture_io(:stderr, fn ->
+        generate_docs(doc_config(skip_undefined_reference_warnings_on: []))
+      end)
+
+    assert output =~ ~r"Warnings.bar/0 .* \(parsing Warnings docs\)"
+    assert output =~ ~r"Warnings.bar/0 .* \(parsing Warnings.foo/0 docs\)"
+    assert output =~ ~r"Warnings.bar/0 .* \(parsing c:Warnings.handle_foo/0 docs\)"
+    assert output =~ ~r"Warnings.bar/0 .* \(parsing t:Warnings.t/0 docs\)"
   end
 
   test "generates headers for index.html and module pages" do
@@ -98,12 +132,12 @@ defmodule ExDoc.Formatter.HTMLTest do
         generator: ~r{<meta name="generator" content="ExDoc v#{ExDoc.version()}">}
       },
       index: %{
-        title: ~r{<title>Elixir v1.0.1 – Documentation</title>},
+        title: ~r{<title>Elixir v1.0.1 — Documentation</title>},
         index: ~r{<meta name="robots" content="noindex"},
         refresh: ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}
       },
       module: %{
-        title: ~r{<title>RandomError – Elixir v1.0.1</title>},
+        title: ~r{<title>RandomError — Elixir v1.0.1</title>},
         viewport: ~r{<meta name="viewport" content="width=device-width, initial-scale=1.0">},
         x_ua: ~r{<meta http-equiv="x-ua-compatible" content="ie=edge">}
       }
@@ -128,15 +162,22 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute content_module =~ re[:index][:refresh]
   end
 
+  test "allows to set the authors of the document" do
+    generate_docs(doc_config(authors: ["John Doe", "Jane Doe"]))
+    content_index = File.read!("#{output_dir()}/api-reference.html")
+
+    assert content_index =~ ~r{<meta name="author" content="John Doe, Jane Doe">}
+  end
+
   test "generates in default directory with redirect index.html file" do
     generate_docs(doc_config())
 
     assert File.regular?("#{output_dir()}/CompiledWithDocs.html")
     assert File.regular?("#{output_dir()}/CompiledWithDocs.Nested.html")
 
-    assert [_] = Path.wildcard("#{output_dir()}/dist/app-*.css")
-    assert [_] = Path.wildcard("#{output_dir()}/dist/app-*.js")
-    assert [] = Path.wildcard("#{output_dir()}/another_dir/dist/app-*.js.map")
+    assert [_] = Path.wildcard("#{output_dir()}/dist/html-*.css")
+    assert [_] = Path.wildcard("#{output_dir()}/dist/html-*.js")
+    assert [] = Path.wildcard("#{output_dir()}/another_dir/dist/html-*.js.map")
 
     content = File.read!("#{output_dir()}/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
@@ -147,7 +188,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"CompiledWithDocs","title":"CompiledWithDocs"}ms
-    assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example/2")ms
+    assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example/2")ms
     assert content =~ ~r{"id":"CompiledWithDocs\.Nested","title":"CompiledWithDocs\.Nested"}ms
 
     assert content =~ ~r{"id":"UndefParent\.Nested","title":"UndefParent\.Nested"}ms
@@ -157,7 +198,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{"id":"CustomBehaviourTwo","title":"CustomBehaviourTwo"}ms
     assert content =~ ~r{"id":"RandomError","title":"RandomError"}ms
     assert content =~ ~r{"id":"CustomProtocol","title":"CustomProtocol"}ms
-    assert content =~ ~r{"id":"Mix\.Tasks\.TaskWithDocs","title":"task_with_docs"}ms
+    assert content =~ ~r{"id":"Mix\.Tasks\.TaskWithDocs","title":"mix task_with_docs"}ms
   end
 
   test "generates the api reference file" do
@@ -167,7 +208,21 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
     assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
-    assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html">task_with_docs</a>}
+    assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html">mix task_with_docs</a>}
+  end
+
+  test "groups modules by nesting" do
+    doc_config()
+    |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix])
+    |> generate_docs()
+
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+
+    assert content =~
+             ~r{"id":"Common\.Nesting\.Prefix\.Foo","title":"Common\.Nesting\.Prefix\.Foo","nested_title":"Foo","nested_context":"Common\.Nesting\.Prefix"}ms
+
+    assert content =~
+             ~r{"id":"Common\.Nesting\.Prefix\.Bar","title":"Common\.Nesting\.Prefix\.Bar","nested_title":"Bar","nested_context":"Common\.Nesting\.Prefix"}ms
   end
 
   describe "generates logo" do
@@ -247,6 +302,9 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       assert content =~
                ~r{<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types"><code(\sclass="inline")?>atom/0</code></a>}
+
+      assert content =~
+               ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code(\sclass="inline")?>mix compile.elixir</code></a>}
     end
 
     test "without any other content" do
@@ -297,7 +355,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     test "with custom title" do
       generate_docs(doc_config(extras: ["test/fixtures/README.md": [title: "Getting Started"]]))
       content = File.read!("#{output_dir()}/readme.html")
-      assert content =~ ~r{<title>Getting Started – Elixir v1.0.1</title>}
+      assert content =~ ~r{<title>Getting Started — Elixir v1.0.1</title>}
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~r{"id":"readme","title":"Getting Started","group":""}
     end
@@ -316,9 +374,19 @@ defmodule ExDoc.Formatter.HTMLTest do
     test "with auto-extracted titles" do
       generate_docs(doc_config(extras: ["test/fixtures/ExtraPage.md"]))
       content = File.read!("#{output_dir()}/extrapage.html")
-      assert content =~ ~r{<title>Extra Page Title – Elixir v1.0.1</title>}
+      assert content =~ ~r{<title>Extra Page Title — Elixir v1.0.1</title>}
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~r{"id":"extrapage","title":"Extra Page Title"}
+    end
+
+    test "without api-reference" do
+      generate_docs(
+        doc_config(api_reference: false, extras: ["test/fixtures/README.md"], main: "readme")
+      )
+
+      refute File.exists?("#{output_dir()}/api-reference.html")
+      content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+      refute content =~ ~r{"id":"api-reference","title":"API Reference"}
     end
   end
 
@@ -330,8 +398,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r(^readme\.html$)m
       assert content =~ ~r(^api-reference\.html$)m
       assert content =~ ~r(^dist/sidebar_items-[\w]{10}\.js$)m
-      assert content =~ ~r(^dist/app-[\w]{10}\.js$)m
-      assert content =~ ~r(^dist/app-[\w]{10}\.css$)m
+      assert content =~ ~r(^dist/html-[\w]{20}\.js$)m
+      assert content =~ ~r(^dist/html-[\w]{20}\.css$)m
       assert content =~ ~r(^assets/logo\.png$)m
       assert content =~ ~r(^index\.html$)m
       assert content =~ ~r(^404\.html$)m

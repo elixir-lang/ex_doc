@@ -1,0 +1,9 @@
+<form autocomplete="off">
+  <select class="sidebar-projectVersionsDropdown" dir="rtl">
+    {{#each nodes}}
+      <option value="{{url}}"{{#if isCurrentVersion}} selected disabled{{/if}}>
+        {{version}}
+      </option>
+    {{/each}}
+  </select>
+</form>

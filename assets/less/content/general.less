@@ -1,3 +1,4 @@
+@import '../variables';
 
 h1,
 h2,
@@ -14,6 +15,10 @@ h6 {
 h1 {
   font-size: 2em;
   margin: 1em 0 .5em;
+
+  &.signature {
+    margin: 0;
+  }
 
   &.section-heading {
     margin: 1.5em 0 .5em;
@@ -86,7 +91,6 @@ blockquote {
   }
 }
 
-
 table {
   margin: 2em 0;
 }
@@ -135,16 +139,25 @@ td, th {
   margin-left: 0.3em;
 }
 
-.visible-xs {
+.app-vsn {
   display: none !important;
+  font-size: 0.6em;
+  line-height: 1.5em;
 }
 
 @media screen and (max-width: 768px) {
-  .visible-xs {
+  .app-vsn {
     display: block !important;
   }
 }
 
 img {
   max-width: 100%;
+}
+
+code {
+  font-family: @monoFontFamily;
+  font-style: normal;
+  line-height: 24px;
+  font-weight: 400;
 }

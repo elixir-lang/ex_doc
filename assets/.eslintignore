@@ -1,0 +1,7 @@
+# Ignore build artifacts
+formatters/*
+doc/*
+test/*
+
+# Ignore JavaScript files in dependencies
+deps/*

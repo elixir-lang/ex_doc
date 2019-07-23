@@ -1,0 +1,20 @@
+{{#if isType}}
+  <section class="docstring docstring-type">
+    {{this.hint.description}}
+  </section>
+{{else}}
+  <div class="detail-header">
+    <h1 class="signature">
+      {{this.hint.title}}
+      <div class="version-info">{{this.hint.version}}</div>
+    </h1>
+    {{#unless this.isModule}}
+      <div class="specs">{{this.hint.signatureSpecs}}</div>
+    {{/unless}}
+  </div>
+  {{#if this.hint.description}}
+    <section class="docstring">
+      {{this.hint.description}}
+    </section>
+  {{/if}}
+{{/if}}

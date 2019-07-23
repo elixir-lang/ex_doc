@@ -1,9 +1,13 @@
 <%= head_template(config, %{title: "Cover"}) %>
     <div class="title-container">
-      <h1><%= config.project %></h1>
-      <h2>v<%= config.version %></h2>
-      <%= if logo = config.logo do %>
-        <div><img src="assets/logo<%= Path.extname(logo) %>" alt="Logo"/></div>
+      <%= if cover = config.cover do %>
+        <div><img src="assets/cover<%= Path.extname(cover) %>"/></div>
+      <% else %>
+        <h1><%= config.project %></h1>
+        <h2>v<%= config.version %></h2>
+        <%= if logo = config.logo do %>
+          <div><img src="assets/logo<%= Path.extname(logo) %>" alt="Logo"/></div>
+        <% end %>
       <% end %>
     </div>
     <%# Extra content needed by the current markdown processor (e.g. custom Javascipt) %>

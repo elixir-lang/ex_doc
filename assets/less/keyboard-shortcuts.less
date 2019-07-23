@@ -1,0 +1,50 @@
+#keyboard-shortcuts-modal {
+  dl.shortcut-row {
+    margin: 0;
+    border-bottom: 1px solid @lightestGray;
+    padding: 12px 0;
+    &:last-of-type {
+      border-bottom-style: none;
+    }
+  }
+
+  .shortcut-keys {
+    display: inline-block;
+  }
+
+  .shortcut-description {
+    display: inline-block;
+  }
+
+  kbd {
+    background-color: @lightestGray;
+    border-radius: 3px;
+    color: @darkGray;
+    font-family: inherit;
+    font-weight: bold;
+    display: inline-block;
+    line-height: 1;
+    padding: 4px 7px 6px 7px;
+    min-width: 26px;
+    text-align: center;
+    margin-left: 3px;
+  }
+
+  .shortcut-keys,
+  .shortcut-description {
+    margin: 0;
+  }
+
+  .shortcut-keys {
+    float: right;
+    text-align: right;
+    min-width: 100px;
+    vertical-align: top;
+  }
+
+  .shortcut-description {
+    position: relative;
+    top: 2px;
+    width: 250px;
+  }
+}

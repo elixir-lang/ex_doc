@@ -5,16 +5,24 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v<%= ExDoc.version %>">
-    <title><%= page.title %> – <%= config.project %> v<%= config.version %></title>
-    <link rel="stylesheet" href="<%= asset_rev config.output, "dist/app*.css" %>" />
+    <meta name="project" content="<%= config.project %> v<%= config.version%>">
+    <%= if config.authors do %>
+      <meta name="author" content="<%= Enum.join(config.authors, ", ") %>">
+    <% end %>
+    <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
+    <link rel="stylesheet" href="<%= asset_rev config.output, "dist/html*.css" %>" />
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
     <script src="<%= asset_rev config.output, "dist/sidebar_items*.js" %>"></script>
+    <%= if config.javascript_config_path do %>
+      <script src="<%= config.javascript_config_path %>"></script>
+    <% end %>
+    <script async src="<%= asset_rev config.output, "dist/html*.js" %>"></script>
     <%# Extra content needed by the current markdown processor (e.g. custom CSS) %>
     <%= ExDoc.Markdown.get_markdown_processor().before_closing_head_tag(:html) %>
     <%# Extra content specified by the user (e.g. custom CSS) %>
     <%= config.before_closing_head_tag.(:html) %>
   </head>
   <body data-type="<%= sidebar_type(page.type) %>">
-    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+    <script>try { if(localStorage.getItem('night-mode') === 'true') document.body.className += ' night-mode'; } catch (e) { }</script>

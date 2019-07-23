@@ -8,7 +8,7 @@ import $ from 'jquery'
 
 const body = $('body')
 const nightMode = 'night-mode'
-const nightModeToggle = $('.night-mode-toggle')
+const nightModeToggleSelector = '.night-mode-toggle'
 
 function activateNightMode () {
   body.addClass(nightMode)
@@ -17,12 +17,18 @@ function activateNightMode () {
 
 function deactivateNightMode () {
   body.removeClass(nightMode)
-  try { localStorage.removeItem(nightMode) } catch (e) { }
+  try { localStorage.setItem(nightMode, false) } catch (e) { }
 }
 
 function checkForNightMode () {
   try {
-    if (localStorage.getItem(nightMode)) {
+    const userWantsNightMode = localStorage.getItem(nightMode)
+
+    if (userWantsNightMode != null) {
+      if (userWantsNightMode === true) {
+        activateNightMode()
+      }
+    } else if (matchMedia('(prefers-color-scheme: dark)').matches) {
       activateNightMode()
     }
   } catch (e) { }
@@ -39,10 +45,12 @@ function toggleNightMode () {
 // Public Methods
 // --------------
 
+export {toggleNightMode}
+
 export function initialize () {
   checkForNightMode()
 
-  nightModeToggle.click(function () {
+  body.on('click', nightModeToggleSelector, function () {
     toggleNightMode()
   })
 }

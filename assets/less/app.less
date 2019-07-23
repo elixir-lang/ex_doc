@@ -1,8 +1,8 @@
 @import (inline) './fonts.css';
 
-@import 'npm://highlight.js/src/styles/tomorrow';
-@import 'npm://normalize.css/normalize';
-@import 'npm://flex.less/flex';
+@import (css) '~highlight.js/styles/tomorrow.css';
+@import (css) '~normalize.css/normalize.css';
+@import '~flex.less/flex.less';
 
 @import './mixins';
 @import './variables';
@@ -10,14 +10,20 @@
 
 @import './layout';
 
-@import './toggle';
 @import './sidebar';
 @import './content';
 @import './search';
+@import './modal';
+@import './keyboard-shortcuts';
+@import './quick-switch';
+@import './autocomplete';
+@import './tooltips';
 
 @import './night/night';
 @import './night/content';
 @import './night/sidebar';
+@import './night/keyboard-shortcuts';
+@import './night/tooltips';
 
 @import './screen-reader';
 @import './print';

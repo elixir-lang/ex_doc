@@ -7,14 +7,28 @@
           <span class="line">
             designed by
             <a href="https://twitter.com/dignifiedquire" target="_blank" rel="noopener" title="@dignifiedquire">Friedel Ziegelmayer</a>.
-            </span>
+          </span>
+        </p>
+        <p>
+          <button class="line footer-button night-mode-toggle">
+            Toggle night mode
+          </button>
+          <button class="line footer-button tooltips-toggle">
+            <span class="tooltips-option-disable">Disable tooltips</span>
+            <span class="tooltips-option-enable">Enable tooltips</span>
+          </button>
+          <button class="line footer-button display-shortcuts-help">
+            Display keyboard shortcuts
+          </button>
+          <button class="line footer-button display-quick-switch">
+            Go to a HexDocs package
+          </button>
         </p>
       </footer>
     </div>
   </div>
 </section>
 </div>
-  <script src="<%= asset_rev config.output, "dist/app*.js" %>"></script>
   <%# Extra content needed by the current markdown processor (e.g. custom Javascript) %>
   <%= ExDoc.Markdown.get_markdown_processor().before_closing_body_tag(:html) %>
   <%# Extra content specified by the user (e.g. custom Javascript) %>

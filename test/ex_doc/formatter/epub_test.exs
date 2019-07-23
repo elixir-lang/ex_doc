@@ -37,7 +37,8 @@ defmodule ExDoc.Formatter.EPUBTest do
       output: output_dir(),
       source_root: beam_dir(),
       source_beam: beam_dir(),
-      extras: ["test/fixtures/README.md"]
+      extras: ["test/fixtures/README.md"],
+      skip_undefined_reference_warnings_on: ["Warnings"]
     ]
   end
 
@@ -73,6 +74,14 @@ defmodule ExDoc.Formatter.EPUBTest do
 
     content = File.read!("#{output_dir()}/OEBPS/RandomError.xhtml")
     assert content =~ ~r{<html.*lang="fr".*xmlns:epub="http://www.idpf.org/2007/ops">}ms
+  end
+
+  test "allows to set the authors of the book" do
+    generate_docs_and_unzip(doc_config(authors: ["John Doe", "Jane Doe"]))
+
+    content = File.read!("#{output_dir()}/OEBPS/content.opf")
+    assert content =~ ~r{<dc:creator id="author1">John Doe</dc:creator>}
+    assert content =~ ~r{<dc:creator id="author2">Jane Doe</dc:creator>}
   end
 
   test "raises when assets are invalid" do
@@ -118,12 +127,11 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.Nested.xhtml")
     assert "#{dist_dir}/epub*.css" |> Path.wildcard() |> List.first() |> File.regular?()
-    assert "#{dist_dir}/app*.js" |> Path.wildcard() |> List.first() |> File.regular?()
+    assert "#{dist_dir}/epub*.js" |> Path.wildcard() |> List.first() |> File.regular?()
   end
 
   test "generates all listing files" do
     generate_docs_and_unzip(doc_config())
-
     content = File.read!("#{output_dir()}/OEBPS/content.opf")
 
     assert content =~ ~r{.*"CompiledWithDocs\".*}ms
@@ -153,6 +161,13 @@ defmodule ExDoc.Formatter.EPUBTest do
 
     content = File.read!("#{output_dir()}/OEBPS/nav.xhtml")
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
+  end
+
+  test "uses samp as highlight tag for markdown" do
+    generate_docs_and_unzip(doc_config())
+
+    assert File.read!("#{output_dir()}/OEBPS/CompiledWithDocs.xhtml") =~
+             "<samp class=\"nc\">CompiledWithDocs<\/samp>"
   end
 
   describe "before_closing_*_tags" do
@@ -248,11 +263,16 @@ defmodule ExDoc.Formatter.EPUBTest do
       File.touch!("test/tmp/epub_assets/hello/world.png")
 
       generate_docs_and_unzip(
-        doc_config(assets: "test/tmp/epub_assets", logo: "test/fixtures/elixir.png")
+        doc_config(
+          assets: "test/tmp/epub_assets",
+          logo: "test/fixtures/elixir.png",
+          cover: "test/fixtures/elixir.png"
+        )
       )
 
       assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world.png")
       assert File.regular?("#{output_dir()}/OEBPS/assets/logo.png")
+      assert File.regular?("#{output_dir()}/OEBPS/assets/cover.png")
     after
       File.rm_rf!("test/tmp/epub_assets")
     end
@@ -280,12 +300,14 @@ defmodule ExDoc.Formatter.EPUBTest do
         doc_config(
           markdown_processor: DummyProcessor,
           assets: "test/tmp/epub_assets",
-          logo: "test/fixtures/elixir.png"
+          logo: "test/fixtures/elixir.png",
+          cover: "test/fixtures/elixir.png"
         )
       )
 
       assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world.png")
       assert File.regular?("#{output_dir()}/OEBPS/assets/logo.png")
+      assert File.regular?("#{output_dir()}/OEBPS/assets/cover.png")
       # Test the assets added by the markdown processor
       for [{filename, content}] <- DummyProcessor.assets(:html) do
         # Filename matches

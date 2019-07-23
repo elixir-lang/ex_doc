@@ -1,7 +1,5 @@
 defmodule ExDoc.Formatter.EPUB do
-  @moduledoc """
-  Generates EPUB documentation for Elixir projects.
-  """
+  @moduledoc false
 
   @mimetype "application/epub+zip"
   alias __MODULE__.{Assets, Templates}
@@ -16,13 +14,13 @@ defmodule ExDoc.Formatter.EPUB do
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
-    autolink = HTML.Autolink.compile(project_nodes, ".xhtml", config.deps)
-    linked = HTML.Autolink.all(project_nodes, autolink)
+    {project_nodes, autolink} =
+      HTML.autolink_and_render(project_nodes, ".xhtml", config, highlight_tag: "samp")
 
     nodes_map = %{
-      modules: HTML.filter_list(:module, linked),
-      exceptions: HTML.filter_list(:exception, linked),
-      tasks: HTML.filter_list(:task, linked)
+      modules: HTML.filter_list(:module, project_nodes),
+      exceptions: HTML.filter_list(:exception, project_nodes),
+      tasks: HTML.filter_list(:task, project_nodes)
     }
 
     extras = HTML.build_extras(config, autolink) |> group_extras()
@@ -31,6 +29,7 @@ defmodule ExDoc.Formatter.EPUB do
     assets_dir = "OEBPS/assets"
     static_files = HTML.generate_assets(config, assets_dir, default_assets())
     HTML.generate_logo(assets_dir, config)
+    HTML.generate_cover(assets_dir, config)
 
     uuid = "urn:uuid:#{uuid4()}"
     datetime = format_datetime()

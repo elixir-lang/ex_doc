@@ -7,6 +7,7 @@ body {
 
 body {
   background-color: @white;
+  color: @black;
   font-size: 16px;
   font-family: @sansFontFamily;
   line-height: 1.6875em;
@@ -35,11 +36,19 @@ body {
   z-index: 4;
 }
 
+.sidebar-button {
+  position: fixed;
+  z-index: 99;
+  left: 0;
+  top: 8px;
+  transition: color 0.3s ease-in-out, transform 0.15s ease-out 0.1s, opacity 0.15s ease-out 0.1s;
+  will-change: transform;
+  transform: translateX(250px);
+}
+
 .content {
   width: 100%;
   padding-left: 300px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   height: 100%;
   position: relative;
   z-index: 3;
@@ -72,6 +81,19 @@ body.sidebar-opened, body.sidebar-opening {
   }
 }
 
+body.search-focused {
+  .sidebar-button {
+    transform: translateX(250px) scaleY(0);
+    transition: all 0.15s ease-out;
+    opacity: 0;
+  }
+
+  .sidebar-search .search-close-button {
+    transform: scaleY(1);
+    transition: transform 0.15s ease-out 0.15s;
+  }
+}
+
 body.sidebar-closed, body.sidebar-closing {
   .sidebar {
     z-index: 0;
@@ -88,6 +110,7 @@ body.sidebar-closed, body.sidebar-closing {
 
 body.sidebar-closed .sidebar-button {
   color: @black;
+  transform: translateY(-8px);
 }
 
 body.sidebar-opening {
@@ -142,6 +165,10 @@ body.sidebar-closed .sidebar {
   max-width: 949px;
   margin: 0 auto;
   padding: 3px 60px;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .content-outer {

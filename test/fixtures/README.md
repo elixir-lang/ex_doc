@@ -5,6 +5,7 @@
 `==/2`
 [`===`](`Kernel.===/2`)
 `t:atom/0`
+`mix compile.elixir`
 
 ## `Header` sample
 

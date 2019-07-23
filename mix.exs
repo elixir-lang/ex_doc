@@ -1,7 +1,7 @@
 defmodule ExDoc.Mixfile do
   use Mix.Project
 
-  @version "0.19.3"
+  @version "0.21.1"
 
   def project do
     [
@@ -28,7 +28,7 @@ defmodule ExDoc.Mixfile do
   defp deps do
     [
       {:earmark, "~> 1.3.3"}, # Min version for %Option{pure_links: ...}
-      {:makeup_elixir, "~> 0.10"},
+      {:makeup_elixir, "~> 0.14"},
       {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
     ]

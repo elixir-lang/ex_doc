@@ -1,14 +1,17 @@
+@import '../../variables';
+
 code {
   background-color: @nightCodeBackground;
   border-color: lighten(@nightCodeBackground, 10%);
 }
 
 pre {
-  code.hljs {
+  code {
     background-color: @nightCodeBackground;
   }
 
-  a {
+  a, a:visited {
+    color: @purple;
     text-decoration: none;
   }
 }

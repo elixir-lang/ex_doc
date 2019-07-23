@@ -1,28 +1,53 @@
 language: elixir
+
 sudo: false
-elixir: 1.7.1
-otp_release: 20.3
-notifications:
-  recipients:
-    - jose.valim@plataformatec.com.br
-before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - mix local.hex --force
-  - mix deps.get
+
+# Erlang and Elixir default versions (overridden in some jobs).
+elixir: 1.9.0
+otp_release: 22.0
+
+stages:
+  - check formatted
+  - test
+  - check js
+
 env:
-  - MIX_ENV=test
-script:
-  - mix format --check-formatted
-  - mix test
-  - mix coveralls.travis
-  - bash test/prerelease.sh
-  - npm install
-  - npm run lint
-  - npm run test
+  global:
+    - MIX_ENV=test
+    - DISPLAY=:99.0
+    - NODE_VERSION="10.10.0"
+
+before_script:
+  - sh -e /etc/init.d/xvfb start
+
 cache:
   directories:
     - node_modules
     - deps
+
 addons:
   firefox: "54.0"
+
+jobs:
+  include:
+    - stage: test
+      script:
+        - mix test
+        - bash test/prerelease.sh
+
+    - elixir: 1.8.1
+      otp_release: 21.2
+
+    - elixir: 1.7.3
+      otp_release: 19.3
+
+    - stage: check formatted
+      script: mix format --check-formatted
+      before_install: skip
+
+    - stage: check js
+      script:
+        - nvm install $NODE_VERSION
+        - npm install
+        - npm run lint
+        - npm run test

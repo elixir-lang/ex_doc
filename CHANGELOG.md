@@ -1,5 +1,92 @@
 # Changelog
 
+## v0.21.1
+
+  * Bug fixes
+    * [HTML] Make sure package selector can be reopened after closed with `ESC`
+    * [HTML] Ensure tooltip pages can be cached
+    * [HTML] Support large version numbers on the version dropdown
+    * [mix docs] Raise nice exception for missing ExDoc.Config
+
+## v0.21.0
+
+  * Enhancements
+    * [HTML] Add support for reference popovers
+    * [HTML] Provide a "g" shortcut to Go To a Hexdocs package (with autocomplete)
+    * [HTML] Detect if browser prefers night mode
+    * [EPUB] Add support for covers and the authors field
+
+  * Bug fixes
+    * [HTML+EPUB] Ensure that link headers generate unique IDs
+    * [HTML+EPUB] Sort structs fields so field names are always ordered
+    * [HTML+EPUB] Do not strip "Elixir." prefix from module names
+    * [HTML] Support URLs with non-HTML safe characters
+    * [EPUB] Fix table of contents without groups
+
+## v0.20.2
+
+  * Enhancements
+    * Add "mix " prefix to Mix tasks
+
+  * Bug fixes
+    * Improve scrolling on Safari
+    * Prevent text casing of codes
+    * Do not remove stop words from search and make sure function names are searchable in isolation
+    * Reduce the size of the search metadata
+    * Remove outline on focus and keep width in version dropdown
+    * Do not fail if we can't persist index
+
+## v0.20.1
+
+  * Bug fixes
+    * Hide the spinner when no term is searched
+    * Use `?` for the shortcut hint text
+    * Improve style of the version dropdown
+
+## v0.20.0
+
+  * Enhancements
+    * Rework the search bar to provide autocompletion
+    * Provide full-text search
+    * Automatically generate documentation for `defdelegate` definitions (requires Elixir v1.8+)
+    * Provide keyboard shortcuts (press `?` to see all available outputs) or click the link at the bottom of the page
+    * Add support for versions dropdown to the HTML sidebar. This requires adding a `docs_config.js` (also configurable) that sets a `versionNodes` JavaScript variable.
+    * Improve mouseover titles on sidebar navigation
+
+  * Bug fixes
+    * Do not hide structs in type/callback summary signatures
+    * No longer require double click to open up a sidebar on Mobile Safari
+    * Keep trailing periods in summaries
+    * Fix typespec `arg` number to start from 1 instead of 0
+
+## v0.19.3
+
+  * Enhancements
+    * Include a "goto" link on mouseover for expandable menu items
+
+  * Bug fixes
+    * Always expand menu items, even if has a single child
+    * Fix sidebar bottom margin on Firefox
+    * Fix anchor links sometimes not working by moving js to html head
+    * Unify code styling for makeup and hljs
+    * Do not replace the content of custom links pointing to Elixir modules
+    * Remove border-left on deprecated to not mistake it with a heading
+
+## v0.19.2
+
+  * Enhancements
+    * Allow logo in SVG extension
+    * Allow functions to be grouped based on metadata
+    * Allow api-reference.html page to be disabled
+    * Allow nesting of modules by prefix
+    * Autolink `mix help TASK`
+    * Warn on undefined remote functions from project's docs
+
+  * Bug fixes
+    * Sort function names alphabetically in the sidebar
+    * Fix search input color
+    * Disable earmark smartypants option
+
 ## v0.19.1
 
   * Enhancements

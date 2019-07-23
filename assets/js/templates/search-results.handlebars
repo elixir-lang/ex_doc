@@ -1,36 +1,33 @@
-<h1>Search Results for <em>{{value}}</em></h1>
+<h1>Search results for <em>{{value}}</em></h1>
 
-{{#if empty}}
-  <p>Sorry, we couldn't find anything for <em>{{value}}</em>.</p>
-{{else}}
-  {{#each levels}}
-    <h2 class="results-title">{{name}}</h2>
-    {{#each results}}
-      <div class="result">
-        <h3 class="result-id">
-          <a href="{{id}}.html">{{{match}}}</a>
-        </h3>
-        <ul class="guards">
-          {{#each guards}}
-            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a></li>
-          {{/each}}
-        </ul>
-        <ul class="functions">
-          {{#each functions}}
-            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a></li>
-          {{/each}}
-        </ul>
-        <ul class="callbacks">
-          {{#each callbacks}}
-            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a> (callback)</li>
-          {{/each}}
-        </ul>
-        <ul class="types">
-          {{#each types}}
-            <li class="result-elem"><a href="{{../id}}.html#{{{anchor}}}">{{{match}}}</a> (type)</li>
-          {{/each}}
-        </ul>
-      </div>
-    {{/each}}
+{{#isNonEmptyArray results}}
+  {{#each results}}
+    <div class="result">
+      <h2 class="result-id">
+        <a href="{{this.ref}}">{{this.title}} <small>({{this.type}})</small></a>
+      </h2>
+        {{#each excerpts}}
+          <p class="result-elem">{{{this}}}</p>
+        {{/each}}
+    </div>
   {{/each}}
-{{/if}}
+{{else}}
+  {{#isArray results}}
+    <p>Sorry, we couldn't find anything for <em>{{value}}</em>.</p>
+  {{else}}
+    <p>Invalid search: {{errorMessage}}.</p>
+  {{/isArray}}
+
+  <p>Here are some tips when performing a full-text search:</p>
+
+  <dl>
+    <li>Multiple words (such as <code>foo bar</code>) are searched as <code>OR</code></li>
+    <li>Use <code>*</code> anywhere (such as <code>fo*</code>) as wildcard</li>
+    <li>Use <code>+</code> before a word (such as <code>+foo</code>) to make its presence required</li>
+    <li>Use <code>-</code> before a word (such as <code>-foo</code>) to make its absence required</li>
+    <li>Use <code>WORD^NUMBER</code> (such as <code>foo^2</code>) to boost the given word</li>
+    <li>Use <code>WORD~NUMBER</code> (such as <code>foo~2</code>) to do a search with edit distance on word</li>
+  </dl>
+
+  <p>To quickly go to a module, type, or function, use the autocompletion feature in the sidebar search.</p>
+{{/isNonEmptyArray}}
