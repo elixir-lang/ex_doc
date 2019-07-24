@@ -285,7 +285,17 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp type_remote_url(source, alias, name, args) do
     name = enc("#{name}")
-    "#{source}#{enc(inspect(alias))}.html#t:#{name}/#{length(args)}"
+
+    if erlang_alias?(alias) do
+      "#{source}#{enc(to_string(alias))}.html#type-#{name}"
+    else
+      "#{source}#{enc(inspect(alias))}.html#t:#{name}/#{length(args)}"
+    end
+  end
+
+  defp erlang_alias?(alias) do
+    first_char = alias |> to_string() |> String.at(0)
+    first_char == String.downcase(first_char)
   end
 
   defp typespec_string_to_link(string, url) do
