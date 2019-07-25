@@ -133,6 +133,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
              end) =~ ~r"references Mod.example/2 .* \(parsing Mod.foo/0 docs\)"
 
       assert capture_io(:stderr, fn ->
+               assert Autolink.project_doc("[title](`Mod.example/2`)", "Mod.foo/0", compiled) ==
+                        "title"
+             end) =~ ~r"references Mod.example/2 .* \(parsing Mod.foo/0 docs\)"
+
+      assert capture_io(:stderr, fn ->
                assert Autolink.project_doc("`Mod.example/2`", "extras", compiled) ==
                         "`Mod.example/2`"
              end) =~ ~r"references Mod.example/2 .* \(parsing extras docs\)"

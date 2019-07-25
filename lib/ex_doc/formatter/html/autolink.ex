@@ -464,9 +464,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
                 "or it's listed as @doc false (parsing #{id} docs)",
               []
             )
-          end
 
-          all
+            text
+          else
+            all
+          end
 
         doc = module_docs(:elixir, module, lib_dirs) ->
           "[#{text}](#{doc}#{module}.html##{prefix}#{enc(function)}/#{arity})"
