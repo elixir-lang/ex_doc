@@ -393,10 +393,12 @@ defmodule ExDoc.Formatter.HTML do
     unless File.regular?("#{config.output}/#{redirect_to}") do
       IO.puts(
         :stderr,
-        translate(config, "warning") <>
-          ": #{filename} " <>
-          translate(config, "redirects to") <>
-          " #{redirect_to}, " <> translate(config, "which does not exist")
+        translate(
+          config,
+          "warning: \#{filename} redirects to \#{redirect_to}, which does not exist",
+          filename: filename,
+          redirect_to: redirect_to
+        )
       )
     end
 

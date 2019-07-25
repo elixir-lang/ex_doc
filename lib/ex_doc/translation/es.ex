@@ -2,7 +2,6 @@ defmodule ExDoc.Translation.Es do
   @moduledoc false
 
   # Translations for Locale Spanish International
-
   def t("Anchor for this section"), do: "Ancla para esta sección"
   def t("API Reference"), do: "Referencia de la API"
 
@@ -219,12 +218,19 @@ defmodule ExDoc.Translation.Es do
   def t("type"), do: "tipo"
   def t("types"), do: "tipos"
   def t("version"), do: "versión"
-  def t("redirects to"), do: "redirige a"
-
-  def t("warning"), do: "advertencia"
-  def t("which does not exist"), do: "el cual no existe"
 
   # Catch-all clause
   def t(text),
     do: text
+
+  # Text with arguments
+  def t("warning: \#{filename} redirects to \#{redirect_to}, which does not exist",
+        filename: filename,
+        redirect_to: redirect_to
+      ),
+      do: "advertencia #{filename} redirige a #{redirect_to} el cual no existe"
+
+  # Catch-all clause
+  def t(text, args),
+    do: ExDoc.Translation.replace(text, args)
 end
