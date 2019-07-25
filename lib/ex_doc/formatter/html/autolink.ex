@@ -458,18 +458,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
             "#{extension}##{prefix}#{enc(function)}/#{arity})"
 
         module in modules_refs ->
-          if module_id not in skip_warnings_on and id not in skip_warnings_on do
-            IO.warn(
-              "documentation references #{match} but it doesn't exist " <>
-                "or it's listed as @doc false (parsing #{id} docs)",
-              []
-            )
-          end
-
-          text
+          maybe_warn(text, match, module_id, id, skip_warnings_on)
 
         doc = module_docs(:elixir, module, lib_dirs) ->
           "[#{text}](#{doc}#{module}.html##{prefix}#{enc(function)}/#{arity})"
+
+        link_type == :custom ->
+          maybe_warn(text, match, module_id, id, skip_warnings_on)
 
         true ->
           all
@@ -500,6 +495,18 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           all
       end
     end
+  end
+
+  defp maybe_warn(text, match, module_id, id, skip_warnings_on) do
+    if module_id not in skip_warnings_on and id not in skip_warnings_on do
+      IO.warn(
+        "documentation references #{match} but it doesn't exist " <>
+          "or it's listed as @doc false (parsing #{id} docs)",
+        []
+      )
+    end
+
+    text
   end
 
   defp task_module("help " <> task_name) do
