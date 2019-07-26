@@ -5,11 +5,14 @@
 
 <p>
   <%= translate(config, "Sorry, but the page you were trying to get to, does not exist.") %>
-  <%= translate(config, "You may want to try searching this site using the sidebar") %>
+
   <%= if config.api_reference do %>
-    <%= translate(config, "or using our page") %> <a href="api-reference.html"><%= translate(config, "API Reference") %></a>
+    <%= translate(config,
+                  "You may want to try searching this site using the sidebar or using our page <a href=\"api-reference.html\">\#{api_reference}</a> to find what you were looking for.",
+                  [api_reference: translate(config, "API Reference")]) %>
+  <% else %>
+    <%= translate(config, "You may want to try searching this site using the sidebar to find what you were looking for.") %>
   <% end %>
-  <%= translate(config, "to find what you were looking for.") %>
 </p>
 
 <%= footer_template(config) %>

@@ -10,8 +10,6 @@ export default function (string, translations, options) {
       return translations.callback
     case 'Callbacks':
       return translations.callbacks
-    case 'Contributing':
-      return translations.contributing
     case 'extras':
       return translations.extras
     case 'Focus search bar':

@@ -4,27 +4,16 @@ defmodule ExDoc.Translation.Es do
   # Translations for Locale Spanish International
   def t("Anchor for this section"), do: "Ancla para esta sección"
   def t("API Reference"), do: "Referencia de la API"
-
-  def t("Bring up this help dialog"),
-    do: "Abrir este diálogo de ayuda"
-
+  def t("Bring up this help dialog"), do: "Abrir este diálogo de ayuda"
   def t("Basic Type"), do: "Tipo Básico"
   def t("Built using"), do: "Construido con"
   def t("Built-in Type"), do: "Tipo Incorporado"
   def t("Callbacks"), do: "Devoluciones de llamada"
   def t("Cancel search"), do: "Cancelar búsqueda"
-
-  def t("Collapse/expand sidebar"),
-    do: "Contraer/expandir barra lateral"
-
-  def t("Contributing"), do: "Cómo contribuir"
+  def t("Collapse/expand sidebar"), do: "Contraer/expandir barra lateral"
   def t("Cover"), do: "Portada"
-
   def t("Disable tooltips"), do: "Deshabilitar tooltips"
-
-  def t("Display keyboard shortcuts"),
-    do: "Mostrar combinaciones de teclas"
-
+  def t("Display keyboard shortcuts"), do: "Mostrar combinaciones de teclas"
   def t("Documentation"), do: "Documentación"
   def t("Enable tooltips"), do: "Habilitar tooltips"
   def t("Example"), do: "Ejemplo"
@@ -40,28 +29,14 @@ defmodule ExDoc.Translation.Es do
     do: "Aquí están algunos consejos para realizar una búsqueda textual:"
 
   def t("Invalid search:"), do: "Búsqueda no válida:"
-
   def t("Jump to..."), do: "Saltar a"
-
-  def t("Keyboard Shortcuts"),
-    do: "Atajos de Teclado"
-
-  def t("License"), do: "Licenciamiento"
+  def t("Keyboard Shortcuts"), do: "Atajos de Teclado"
   def t("Link"), do: "Enlace"
   def t("Link to this"), do: "Enlace a esto"
-
-  def t("Link to this callback"),
-    do: "Enlace a esta devolución de llamada"
-
-  def t("Link to this function"),
-    do: "Enlace a esta función"
-
-  def t("Link to this section"),
-    do: "Enlace a esta sección"
-
-  def t("Link to this type"),
-    do: "Enlace a este tipo"
-
+  def t("Link to this callback"), do: "Enlace a esta devolución de llamada"
+  def t("Link to this function"), do: "Enlace a esta función"
+  def t("Link to this section"), do: "Enlace a esta sección"
+  def t("Link to this type"), do: "Enlace a este tipo"
   def t("Literal"), do: "Literal"
 
   def t("\"main\" cannot be set to \"index\", otherwise it will recursively link to itself"),
@@ -76,37 +51,24 @@ defmodule ExDoc.Translation.Es do
 
   def t("Mix Tasks"), do: "Tareas de Mix"
   def t("Modules"), do: "Módulos"
-
   def t("Option"), do: "Opción"
   def t("Options"), do: "Opciones"
   def t("Page not found"), do: "Página no encontrada"
   def t("Pages"), do: "Páginas"
   def t("Search"), do: "Buscar"
   def t("Search..."), do: "Buscar..."
-
-  def t("Search results for"),
-    do: "Resultados de la búsqueda para"
-
-  def t("Search the documentation"),
-    do: "Buscar en la documentación"
+  def t("Search results for"), do: "Resultados de la búsqueda para"
+  def t("Search the documentation"), do: "Buscar en la documentación"
 
   def t("Sorry, but the page you were trying to get to, does not exist."),
     do: "Lo sentimos, pero la página a la que estás intentando acceder no existe."
 
-  def t("Sorry, we couldn't find anything for"),
-    do: "Lo sentimos, no se pudo encontrar nada para"
-
+  def t("Sorry, we couldn't find anything for"), do: "Lo sentimos, no se pudo encontrar nada para"
   def t("Summary"), do: "Resumen"
   def t("Table of contents"), do: "Tabla de contenidos"
-
   def t("This is deprecated"), do: "Esto quedó obsoleto"
-
-  def t("This callback is deprecated"),
-    do: "Esta devolución de llamada quedó obsoleta"
-
-  def t("This function is deprecated"),
-    do: "Esta función quedó obsoleta"
-
+  def t("This callback is deprecated"), do: "Esta devolución de llamada quedó obsoleta"
+  def t("This function is deprecated"), do: "Esta función quedó obsoleta"
   def t("This type is deprecated"), do: "Este tipo quedó obsoleto"
 
   def t("Multiple words (such as <code>foo bar</code>) are searched as <code>OR</code>"),
@@ -150,8 +112,11 @@ defmodule ExDoc.Translation.Es do
   def t("Types"), do: "Tipos"
   def t("View Source"), do: "Ver Código Fuente"
 
-  def t("You may want to try searching this site using the sidebar"),
-    do: "Quizás quieras intentar buscar este sitio usando la barra lateral"
+  def t(
+        "You may want to try searching this site using the sidebar to find what you were looking for."
+      ),
+      do:
+        "Quizás quieras intentar buscar este sitio usando la barra lateral para encontrar lo que buscas."
 
   def t("annotation"), do: "anotación"
   def t("author"), do: "autor"
@@ -192,14 +157,9 @@ defmodule ExDoc.Translation.Es do
   def t("option"), do: "opción"
   def t("optional"), do: "opcional"
   def t("options"), do: "opciones"
-
-  def t("or using our page"),
-    do: "o utilizar nuestra página"
-
   def t("project"), do: "proyecto"
   def t("protocol"), do: "protocolo"
   def t("search"), do: "buscar"
-
   def t("sidebar"), do: "barra lateral"
   def t("since " <> version_number), do: "desde " <> version_number
   def t("spec"), do: "especificación"
@@ -211,10 +171,6 @@ defmodule ExDoc.Translation.Es do
   def t("task"), do: "tarea"
   def t("tasks"), do: "tareas"
   def t("title"), do: "título"
-
-  def t("to find what you were looking for."),
-    do: "para encontrar lo que buscas."
-
   def t("type"), do: "tipo"
   def t("types"), do: "tipos"
   def t("version"), do: "versión"
@@ -224,6 +180,15 @@ defmodule ExDoc.Translation.Es do
     do: text
 
   # Text with arguments
+  def t(
+        "You may want to try searching this site using the sidebar or using our page <a href=\"api-reference.html\">\#{api_reference}</a> to find what you were looking for.",
+        api_reference: api_reference
+      ),
+      do:
+        "Quizás quieras intentar buscar este sitio usando la barra lateral o utilizar nuestra página <a href=\"api-reference.html\">#{
+          api_reference
+        }</a> para encontrar lo que buscas."
+
   def t("warning: \#{filename} redirects to \#{redirect_to}, which does not exist",
         filename: filename,
         redirect_to: redirect_to
