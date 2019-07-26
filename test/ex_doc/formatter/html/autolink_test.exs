@@ -142,6 +142,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                         "`Mod.example/2`"
              end) =~ ~r"references Mod.example/2 .* \(parsing extras docs\)"
 
+      assert capture_io(:stderr, fn ->
+               assert Autolink.project_doc("[title](`example/2`)", "Mod.foo/0", compiled) ==
+                        "title"
+             end) =~ ~r"references example/2 .* \(parsing Mod.foo/0 docs\)"
+
       # skip warning when module page is blacklisted
       overwritten = Map.put(compiled, :module_id, "Bar")
       assert assert project_doc("`Mod.example/2`", "Mod.bar/0", overwritten) == "`Mod.example/2`"
