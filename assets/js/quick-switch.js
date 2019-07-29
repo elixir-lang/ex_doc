@@ -10,6 +10,7 @@ import quickSwitchResultsTemplate from './templates/quick-switch-results.handleb
 // Constants
 // ---------
 
+const hexDocsEndpoint = 'https://hexdocs.pm/%%'
 const hexSearchEndpoint = 'https://hex.pm/api/packages?search=name:%%*'
 const quickSwitchLinkSelector = '.display-quick-switch'
 const quickSwitchModalSelector = '#quick-switch-modal'
@@ -27,6 +28,15 @@ const usedModifierKeys = [
   39, // right arrow
   40 // down arrow
 ]
+const staticSearchResults = [
+  'elixir',
+  'eex',
+  'ex_unit',
+  'hex',
+  'iex',
+  'logger',
+  'mix'
+].map((pkg) => { return {name: pkg} })
 
 // State
 // -----
@@ -81,7 +91,7 @@ function quickSwitchToPackage (packageSlug) {
  * @param {String} packageSlug The package name to navigate to
  */
 function switchToExDocPackage (packageSlug) {
-  window.location = `https://hexdocs.pm/${packageSlug}`
+  window.location = hexDocsEndpoint.replace('%%', packageSlug)
 }
 
 /**
@@ -104,7 +114,7 @@ function debouceAutocomplete (packageSlug) {
 function queryForAutocomplete (packageSlug) {
   $.get(hexSearchEndpoint.replace('%%', packageSlug), (payload) => {
     if (Array.isArray(payload)) {
-      autoCompleteResults = payload.slice(0, numberOfSuggestions)
+      autoCompleteResults = resultsFromPayload(packageSlug, payload)
       autoCompleteSelected = -1
 
       const template = quickSwitchResultsTemplate({
@@ -113,7 +123,7 @@ function queryForAutocomplete (packageSlug) {
 
       // Only append results if string is still long enough
       const currentTerm = $(quickSwitchInputSelector).val()
-      if (currentTerm && currentTerm.length > 3) {
+      if (currentTerm && currentTerm.length >= 3) {
         $(quickSwitchResultsSelector).html(template)
         $(quickSwitchResultSelector).click(function () {
           const selectedResult = autoCompleteResults[$(this).attr('data-index')]
@@ -122,6 +132,20 @@ function queryForAutocomplete (packageSlug) {
       }
     }
   })
+}
+
+/**
+ * Extracts the first `numberOfSuggestions` results from the payload response
+ * and the hardcoded, available packages in `staticSearchResults`.
+ *
+ * @param {String} packageSlug The searched package name
+ * @param {Array} payload The payload returned by the search request
+ */
+function resultsFromPayload (packageSlug, payload) {
+  return staticSearchResults
+    .concat(payload)
+    .filter(result => result.name.indexOf(packageSlug) !== -1)
+    .slice(0, numberOfSuggestions)
 }
 
 /**
