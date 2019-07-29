@@ -3,6 +3,12 @@
       <%= H.module_title(module) %>
     </h1>
 
+    <%= if deprecated = module.deprecated do %>
+      <div class="deprecated">
+        This <%= module.type %> is deprecated. <%= H.h(deprecated) %>.
+      </div>
+    <% end %>
+
     <%= if doc = module.rendered_doc do %>
       <section id="moduledoc" class="docstring">
         <%= doc %>
