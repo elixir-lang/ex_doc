@@ -137,6 +137,7 @@ function queryForAutocomplete (packageSlug) {
 /**
  * Extracts the first `numberOfSuggestions` results from the payload response
  * and the hardcoded, available packages in `staticSearchResults`.
+ * This also filters out packages that do not have their docs published on HexDocs.
  *
  * @param {String} packageSlug The searched package name
  * @param {Array} payload The payload returned by the search request
@@ -145,6 +146,7 @@ function resultsFromPayload (packageSlug, payload) {
   return staticSearchResults
     .concat(payload)
     .filter(result => result.name.indexOf(packageSlug) !== -1)
+    .filter(result => result.releases === undefined || result.releases[0].has_docs === true)
     .slice(0, numberOfSuggestions)
 }
 
