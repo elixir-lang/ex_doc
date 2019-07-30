@@ -11,14 +11,13 @@ stages:
   - test
   - check js
 
+services:
+  - xvfb
+
 env:
   global:
     - MIX_ENV=test
-    - DISPLAY=:99.0
     - NODE_VERSION="10.10.0"
-
-before_script:
-  - sh -e /etc/init.d/xvfb start
 
 cache:
   directories:
