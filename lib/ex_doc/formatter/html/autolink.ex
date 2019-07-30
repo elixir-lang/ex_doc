@@ -9,8 +9,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   @backtick_token "<B706848484895T>"
   @elixir_docs "https://hexdocs.pm/"
   @erlang_docs "http://www.erlang.org/doc/man/"
-  @basic_types_page "typespecs.html#basic-types"
-  @built_in_types_page "typespecs.html#built-in-types"
 
   @basic_types [
     any: 0,
@@ -187,7 +185,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp id(%{id: mod_id}, %ExDoc.TypeNode{id: id}), do: "t:#{mod_id}.#{id}"
 
   defp all_typespecs(module, compiled) do
-    %{aliases: aliases, lib_dirs: lib_dirs} = compiled
+    %{aliases: aliases, lib_dirs: lib_dirs, extension: extension} = compiled
 
     locals =
       Enum.map(module.typespecs, fn
@@ -196,14 +194,14 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     typespecs =
       for typespec <- module.typespecs do
-        %{typespec | spec: typespec(typespec.spec, locals, aliases, lib_dirs)}
+        %{typespec | spec: typespec(typespec.spec, locals, aliases, lib_dirs, extension)}
       end
 
     docs =
       for module_node <- module.docs do
         %{
           module_node
-          | specs: Enum.map(module_node.specs, &typespec(&1, locals, aliases, lib_dirs))
+          | specs: Enum.map(module_node.specs, &typespec(&1, locals, aliases, lib_dirs, extension))
         }
       end
 
@@ -216,15 +214,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   It converts the given `ast` to string while linking
   the locals given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs, aliases \\ [], lib_dirs \\ default_lib_dirs()) do
+  def typespec(ast, typespecs, aliases \\ [], lib_dirs \\ default_lib_dirs(), extension \\ ".html") do
     {formatted, placeholders} =
-      format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs)
+      format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs, extension)
 
     replace_placeholders(formatted, placeholders)
   end
 
   @doc false
-  def format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs) do
+  def format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs, extension \\ ".html") do
     ref = make_ref()
     elixir_docs = get_elixir_docs(aliases, lib_dirs)
 
@@ -243,11 +241,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
           cond do
             {name, arity} in @basic_types ->
-              url = elixir_docs <> @basic_types_page
+              url = basic_types_page_for(elixir_docs, extension)
               put_placeholder(form, url, placeholders)
 
             {name, arity} in @built_in_types ->
-              url = elixir_docs <> @built_in_types_page
+              url = built_in_types_page_for(elixir_docs, extension)
               put_placeholder(form, url, placeholders)
 
             {name, arity} in typespecs ->
@@ -411,7 +409,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           "[#{text}](#{module}#{extension})"
 
         doc = module_docs(:elixir, module, lib_dirs) ->
-          "[#{text}](#{doc}#{module}.html)"
+          "[#{text}](#{doc}#{module}#{extension})"
 
         true ->
           all
@@ -445,10 +443,10 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           "[#{text}](#{module}#{extension}##{prefix}#{enc(function)}/#{arity})"
 
         match in @basic_type_strings ->
-          "[#{text}](#{elixir_docs}#{@basic_types_page})"
+          "[#{text}](#{basic_types_page_for(elixir_docs, extension)})"
 
         match in @built_in_type_strings ->
-          "[#{text}](#{elixir_docs}#{@built_in_types_page})"
+          "[#{text}](#{built_in_types_page_for(elixir_docs, extension)})"
 
         match in @kernel_function_strings ->
           "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc(function)}/#{arity})"
@@ -461,7 +459,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           maybe_warn(text, match, module_id, id, skip_warnings_on)
 
         doc = module_docs(:elixir, module, lib_dirs) ->
-          "[#{text}](#{doc}#{module}.html##{prefix}#{enc(function)}/#{arity})"
+          "[#{text}](#{doc}#{module}#{extension}##{prefix}#{enc(function)}/#{arity})"
 
         link_type == :custom ->
           maybe_warn(text, match, module_id, id, skip_warnings_on)
@@ -489,7 +487,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           "[#{text}](#{match}#{extension})"
 
         doc = module_docs(:elixir, match, lib_dirs) ->
-          "[#{text}](#{doc}#{match}.html)"
+          "[#{text}](#{doc}#{match}#{extension})"
 
         true ->
           all
@@ -832,5 +830,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           \(`(#{source})`\)  # CAPTURE 2
         }x
     end
+  end
+
+  defp basic_types_page_for(elixir_docs, extension) do
+    "#{elixir_docs}typespecs#{extension}#basic-types"
+  end
+
+  defp built_in_types_page_for(elixir_docs, extension) do
+    "#{elixir_docs}typespecs#{extension}#built-in-types"
   end
 end
