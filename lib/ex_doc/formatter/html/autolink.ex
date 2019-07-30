@@ -201,7 +201,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       for module_node <- module.docs do
         %{
           module_node
-          | specs: Enum.map(module_node.specs, &typespec(&1, locals, aliases, lib_dirs, extension))
+          | specs:
+              Enum.map(module_node.specs, &typespec(&1, locals, aliases, lib_dirs, extension))
         }
       end
 
@@ -214,7 +215,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   It converts the given `ast` to string while linking
   the locals given by `typespecs` as HTML.
   """
-  def typespec(ast, typespecs, aliases \\ [], lib_dirs \\ default_lib_dirs(), extension \\ ".html") do
+  def typespec(
+        ast,
+        typespecs,
+        aliases \\ [],
+        lib_dirs \\ default_lib_dirs(),
+        extension \\ ".html"
+      ) do
     {formatted, placeholders} =
       format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs, extension)
 
@@ -222,7 +229,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   @doc false
-  def format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs, extension \\ ".html") do
+  def format_and_extract_typespec_placeholders(
+        ast,
+        typespecs,
+        aliases,
+        lib_dirs,
+        extension \\ ".html"
+      ) do
     ref = make_ref()
     elixir_docs = get_elixir_docs(aliases, lib_dirs)
 
@@ -262,7 +275,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           alias = expand_alias(alias)
 
           if source = get_source(alias, aliases, lib_dirs) do
-            url = type_remote_url(source, alias, name, args)
+            url = type_remote_url(source, alias, name, args, extension)
             put_placeholder(form, url, placeholders)
           else
             {form, placeholders}
@@ -275,15 +288,15 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     {format_ast(formatted_ast), placeholders}
   end
 
-  defp type_remote_url(@erlang_docs = source, module, name, _args) do
+  defp type_remote_url(@erlang_docs = source, module, name, _args, _extension) do
     module = enc("#{module}")
     name = enc("#{name}")
     "#{source}#{module}.html#type-#{name}"
   end
 
-  defp type_remote_url(source, alias, name, args) do
+  defp type_remote_url(source, alias, name, args, extension) do
     name = enc("#{name}")
-    "#{source}#{enc(inspect(alias))}.html#t:#{name}/#{length(args)}"
+    "#{source}#{enc(inspect(alias))}#{extension}#t:#{name}/#{length(args)}"
   end
 
   defp typespec_string_to_link(string, url) do
