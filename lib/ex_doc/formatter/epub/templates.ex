@@ -15,6 +15,16 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   end
 
   @doc """
+  Generated ID for static file
+  """
+  def static_file_to_id(static_file) do
+    prefix = static_file |> HTML.filename_to_title() |> HTML.text_to_id()
+    extension = static_file |> Path.extname() |> String.replace_prefix(".", "-")
+
+    "#{prefix}#{extension}"
+  end
+
+  @doc """
   Creates the Package Document Definition.
 
   this definition encapsulates the publication metadata and the resource
