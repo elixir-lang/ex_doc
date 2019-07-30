@@ -28,7 +28,7 @@
       <% end %>
     <% end %>
     <%= for static_file <- static_files do %>
-      <item id="<%= static_file |> HTML.filename_to_title() |> HTML.text_to_id() %>" href="<%= static_file %>" media-type="<%= media_type(Path.extname(static_file)) %>"/>
+      <item id="<%= static_file_to_id(static_file) %>" href="<%= static_file %>" media-type="<%= media_type(Path.extname(static_file)) %>"/>
     <% end %>
     <%= if config.cover do %>
       <%= if Path.extname(config.cover) == ".png" do %>
