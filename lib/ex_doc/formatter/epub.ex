@@ -23,7 +23,7 @@ defmodule ExDoc.Formatter.EPUB do
       tasks: HTML.filter_list(:task, project_nodes)
     }
 
-    extras = HTML.build_extras(config, autolink) |> group_extras()
+    extras = config |> HTML.build_extras(autolink) |> group_extras()
     config = %{config | extras: extras}
 
     assets_dir = "OEBPS/assets"
