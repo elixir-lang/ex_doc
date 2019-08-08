@@ -386,8 +386,7 @@ defmodule ExDoc.Formatter.HTML do
   defp case_sensitive_file_regular?(path) do
     if File.regular?(path) do
       files = path |> Path.dirname() |> File.ls!()
-      file = path |> Path.basename()
-      Enum.member?(files, file)
+      Path.basename(path) in files
     else
       false
     end
