@@ -100,12 +100,12 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "warns when generating an index.html file with an invalid redirect" do
     output =
       capture_io(:stderr, fn ->
-        generate_docs(doc_config(main: "Unknown"))
+        generate_docs(doc_config(main: "Randomerror"))
       end)
 
-    assert output == "warning: index.html redirects to Unknown.html, which does not exist\n"
+    assert output == "warning: index.html redirects to Randomerror.html, which does not exist\n"
     assert File.regular?("#{output_dir()}/index.html")
-    refute File.regular?("#{output_dir()}/Unknown.html")
+    assert File.regular?("#{output_dir()}/RandomError.html")
   end
 
   test "warns on undefined functions" do

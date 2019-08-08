@@ -375,12 +375,22 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_redirect(filename, config, redirect_to) do
-    unless File.regular?("#{config.output}/#{redirect_to}") do
+    unless case_sensitive_file_regular?("#{config.output}/#{redirect_to}") do
       IO.puts(:stderr, "warning: #{filename} redirects to #{redirect_to}, which does not exist")
     end
 
     content = Templates.redirect_template(config, redirect_to)
     File.write!("#{config.output}/#{filename}", content)
+  end
+
+  defp case_sensitive_file_regular?(path) do
+    if File.regular?(path) do
+      files = path |> Path.dirname() |> File.ls!()
+      file = path |> Path.basename()
+      Enum.member?(files, file)
+    else
+      false
+    end
   end
 
   def filter_list(:module, nodes) do
