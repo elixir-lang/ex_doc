@@ -95,7 +95,7 @@ defmodule ExDoc.Retriever do
           not Code.ensure_loaded?(module) ->
             raise Error, "module #{inspect(module)} is not defined/available"
 
-          function_exported?(module, :__info__, 1) ->
+          not function_exported?(module, :__info__, 1) ->
             # Not an Elixir module, ignore until we have Erlang support
             false
 
