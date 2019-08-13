@@ -56,10 +56,6 @@ defmodule ExDoc.Retriever do
   # the module is not available or it was not compiled
   # with --docs flag), we raise an exception.
   defp get_module(module, config) do
-    unless Code.ensure_loaded?(module) do
-      raise Error, "module #{inspect(module)} is not defined/available"
-    end
-
     if docs_chunk = docs_chunk(module) do
       generate_node(module, docs_chunk, config)
     else
@@ -86,25 +82,32 @@ defmodule ExDoc.Retriever do
               "For earlier Elixir versions, make sure to depend on {:ex_doc, \"~> 0.18.0\"}"
     end
 
-    if function_exported?(module, :__info__, 1) do
-      case Code.fetch_docs(module) do
-        {:docs_v1, _, _, _, :hidden, _, _} ->
-          false
+    case Code.fetch_docs(module) do
+      {:docs_v1, _, _, _, :hidden, _, _} ->
+        false
 
-        {:docs_v1, _, _, _, _, _, _} = docs ->
-          docs
+      {:docs_v1, _, _, _, _, _, _} = docs ->
+        _ = Code.ensure_loaded(module)
+        docs
 
-        {:error, reason} ->
-          raise Error,
-                "module #{inspect(module)} was not compiled with flag --docs: #{inspect(reason)}"
+      {:error, reason} ->
+        cond do
+          not Code.ensure_loaded?(module) ->
+            raise Error, "module #{inspect(module)} is not defined/available"
 
-        _ ->
-          raise Error,
-                "unknown format in Docs chunk. This likely means you are running on " <>
-                  "a more recent Elixir version that is not supported by ExDoc. Please update."
-      end
-    else
-      false
+          function_exported?(module, :__info__, 1) ->
+            # Not an Elixir module, ignore until we have Erlang support
+            false
+
+          true ->
+            raise Error,
+                  "module #{inspect(module)} was not compiled with flag --docs: #{inspect(reason)}"
+        end
+
+      _ ->
+        raise Error,
+              "unknown format in Docs chunk. This likely means you are running on " <>
+                "a more recent Elixir version that is not supported by ExDoc. Please update."
     end
   end
 
