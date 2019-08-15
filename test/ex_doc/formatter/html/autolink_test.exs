@@ -10,6 +10,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     test "autolinks fun/arity in docs" do
       assert project_doc("`example/2`", %{locals: ["example/2"]}) == "[`example/2`](#example/2)"
 
+      assert project_doc("`example/1,2`", %{locals: ["example/1", "example/2"]}) ==
+               "[`example/1,2`](#example/1)"
+
       assert project_doc("`__ENV__/0`", %{locals: ["__ENV__/0"]}) == "[`__ENV__/0`](#__ENV__/0)"
 
       assert project_doc("`example/2` then `example/2`", %{locals: ["example/2"]}) ==
@@ -32,6 +35,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       # `split_function` must also return locally defined callbacks
       # format should be: "c:<fun>/<arity>"
       assert project_doc("`c:fun/2`", %{locals: ["c:fun/2"]}) == "[`fun/2`](#c:fun/2)"
+
+      assert project_doc("`c:fun/1,2`", %{locals: ["c:fun/1", "c:fun/2"]}) ==
+               "[`fun/1,2`](#c:fun/1)"
     end
 
     test "autolinks to local types" do
@@ -40,6 +46,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert project_doc("`t:my_type/1`", %{locals: ["t:my_type/1"]}) ==
                "[`my_type/1`](#t:my_type/1)"
+
+      assert project_doc("`t:my_type/1,2`", %{locals: ["t:my_type/1", "t:my_type/2"]}) ==
+               "[`my_type/1,2`](#t:my_type/1)"
 
       # links to types without arity don't work
       assert project_doc("`t:my_type`", %{locals: ["t:my_type/0"]}) == "`t:my_type`"
@@ -61,6 +70,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     test "does not autolink pre-linked functions" do
       assert project_doc("[`example/1`]()", %{locals: ["example/1"]}) == "[`example/1`]()"
       assert project_doc("[the `example/1`]()", %{locals: ["example/1"]}) == "[the `example/1`]()"
+    end
+
+    test "does not autolink to functions with multiple arities in the wrong order" do
+      assert project_doc("`example/2,1`", %{locals: ["example/1", "example/2"]}) ==
+               "`example/2,1`"
     end
 
     test "autolinks special forms" do
@@ -89,6 +103,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     test "autolinks Module.fun/arity in docs" do
       assert project_doc("`Mod.example/2`", %{docs_refs: ["Mod.example/2"]}) ==
                "[`Mod.example/2`](Mod.html#example/2)"
+
+      multiple_refs = %{docs_refs: ["Mod.example/1", "Mod.example/2"]}
+
+      assert project_doc("`Mod.example/1,2`", multiple_refs) ==
+               "[`Mod.example/1,2`](Mod.html#example/1)"
 
       assert project_doc("`Mod.__ENV__/2`", %{docs_refs: ["Mod.__ENV__/2"]}) ==
                "[`Mod.__ENV__/2`](Mod.html#__ENV__/2)"
@@ -199,6 +218,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     test "autolinks callbacks" do
       assert project_doc("`c:Mod.++/2`", %{docs_refs: ["c:Mod.++/2"]}) ==
                "[`Mod.++/2`](Mod.html#c:++/2)"
+
+      assert project_doc(
+               "`c:Mod.++/1,2`",
+               %{docs_refs: ["c:Mod.++/1", "c:Mod.++/2"]}
+             ) == "[`Mod.++/1,2`](Mod.html#c:++/1)"
     end
 
     test "autolinks types" do
@@ -207,6 +231,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                "`t:MyModule.my_type/0`",
                %{docs_refs: ["t:MyModule.my_type/0"]}
              ) == "[`MyModule.my_type/0`](MyModule.html#t:my_type/0)"
+
+      assert project_doc(
+               "`t:MyModule.my_type/0,1`",
+               %{docs_refs: ["t:MyModule.my_type/0", "t:MyModule.my_type/1"]}
+             ) == "[`MyModule.my_type/0,1`](MyModule.html#t:my_type/0)"
 
       assert project_doc(
                "`t:MyModule.my_type`",
