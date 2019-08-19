@@ -386,7 +386,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     lib_dirs = options[:lib_dirs] || default_lib_dirs(:erlang)
 
     fn all, text, match ->
-      pmfa = {_prefix, module, function, arity} = split_match(kind, match)
+      pmfa = {_prefix, module, function, arities} = split_match(kind, match)
       text = default_text(":", link_type, pmfa, text)
 
       if doc = module_docs(:erlang, module, lib_dirs) do
@@ -395,7 +395,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
             "[#{text}](#{doc}#{module}.html)"
 
           :function ->
-            "[#{text}](#{doc}#{module}.html##{function}-#{first_arity_of(arity)})"
+            "[#{text}](#{doc}#{module}.html##{function}-#{first_arity_of(arities)})"
         end
       else
         all
@@ -443,23 +443,28 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     skip_warnings_on = options[:skip_undefined_reference_warnings_on] || []
 
     fn all, text, original_match ->
-      pmfa = {prefix, original_module, function, arity} = split_match(:function, original_match)
+      pmfa = {prefix, original_module, function, arities} = split_match(:function, original_match)
       text = default_text("", link_type, pmfa, text)
-      first_arity = first_arity_of(arity)
       match = strip_elixir_namespace(original_match)
       module = strip_elixir_namespace(original_module)
+      multiple_arities? = Enum.count(arities) > 1
+      first_arity = first_arity_of(arities)
 
       cond do
-        is_list(arity) and arity != Enum.sort(arity) ->
+        multiple_arities? and not arities_sorted?(arities) ->
           all
 
-        is_list(arity) and
-            Enum.all?(arity, fn a -> "#{prefix}#{enc(function)}/#{a}" in locals end) ->
+        multiple_arities? and
+            Enum.all?(arities, fn a -> "#{prefix}#{enc(function)}/#{a}" in locals end) ->
           "[#{text}](##{prefix}#{enc(function)}/#{first_arity})"
 
-        is_list(arity) and
-            Enum.all?(arity, fn a -> "#{prefix}#{module}.#{enc(function)}/#{a}" in docs_refs end) ->
+        multiple_arities? and
+            Enum.all?(arities, fn a -> "#{prefix}#{module}.#{enc(function)}/#{a}" in docs_refs end) ->
           "[#{text}](#{module}#{extension}##{prefix}#{enc(function)}/#{first_arity})"
+
+        multiple_arities? and
+            Enum.all?(arities, fn a -> "#{enc(function)}/#{a}" in @kernel_function_strings end) ->
+          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc(function)}/#{first_arity})"
 
         match in locals ->
           "[#{text}](##{prefix}#{enc(function)}/#{first_arity})"
@@ -553,13 +558,13 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     do: link_text
 
   defp default_text(_, _, {_, "", fun, arity}, _link_text),
-    do: "`#{fun}/#{print_arity(arity)}`"
+    do: "`#{fun}/#{print_arities(arity)}`"
 
   defp default_text(module_prefix, _, {_, module, "", ""}, _link_text),
     do: "`#{module_prefix}#{module}`"
 
   defp default_text(module_prefix, _, {_, module, fun, arity}, _link_text),
-    do: "`#{module_prefix}#{module}.#{fun}/#{print_arity(arity)}`"
+    do: "`#{module_prefix}#{module}.#{fun}/#{print_arities(arity)}`"
 
   defp default_lib_dirs(),
     do: default_lib_dirs(:elixir) ++ default_lib_dirs(:erlang)
@@ -616,20 +621,19 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     split_function_list([modules <> "/", arity])
   end
 
-  defp split_arities(arities) do
-    if String.contains?(arities, ","), do: String.split(arities, ","), else: arities
-  end
+  defp split_arities(arities), do: String.split(arities, ",", trim: true)
+
+  defp print_arities(arities), do: arities |> Enum.join(",")
+
+  defp arities_sorted?(arities), do: arities == Enum.sort(arities)
+
+  defp first_arity_of([arity | _]), do: arity
 
   defp strip_elixir_namespace("Elixir." <> rest), do: rest
   defp strip_elixir_namespace(rest), do: rest
 
   defp doc_prefix(%{type: c}) when c in [:callback, :macrocallback], do: "c:"
   defp doc_prefix(%{type: _}), do: ""
-
-  defp print_arity(arities) when is_list(arities),
-    do: arities |> Enum.sort() |> Enum.join(",")
-
-  defp print_arity(arity), do: arity
 
   defp lib_dirs_to_doc(module, lib_dirs) do
     case :code.where_is_file('#{module}.beam') do
@@ -733,9 +737,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   @doc false
   def backtick_token(), do: @backtick_token
-
-  defp first_arity_of([arity | _]), do: arity
-  defp first_arity_of(arity), do: arity
 
   ## REGULAR EXPRESSION HELPERS
 

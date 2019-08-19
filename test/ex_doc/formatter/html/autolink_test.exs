@@ -96,6 +96,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert project_doc("`!/1`", %{locals: ["!/1"]}) == "[`!/1`](#!/1)"
       assert project_doc("`!/1`", %{}) == "[`!/1`](#{@elixir_docs}elixir/Kernel.html#!/1)"
       assert project_doc("`!/1`", %{aliases: [Kernel]}) == "[`!/1`](Kernel.html#!/1)"
+
+      assert project_doc("`raise/1,2`", %{aliases: [Kernel]}) ==
+               "[`raise/1,2`](Kernel.html#raise/1)"
     end
   end
 
@@ -104,9 +107,7 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
       assert project_doc("`Mod.example/2`", %{docs_refs: ["Mod.example/2"]}) ==
                "[`Mod.example/2`](Mod.html#example/2)"
 
-      multiple_refs = %{docs_refs: ["Mod.example/1", "Mod.example/2"]}
-
-      assert project_doc("`Mod.example/1,2`", multiple_refs) ==
+      assert project_doc("`Mod.example/1,2`", %{docs_refs: ["Mod.example/1", "Mod.example/2"]}) ==
                "[`Mod.example/1,2`](Mod.html#example/1)"
 
       assert project_doc("`Mod.__ENV__/2`", %{docs_refs: ["Mod.__ENV__/2"]}) ==
@@ -177,6 +178,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     test "autolinks functions Module.fun/arity in elixir" do
       assert project_doc("`String.upcase/1`", %{}) ==
                "[`String.upcase/1`](#{@elixir_docs}elixir/String.html#upcase/1)"
+
+      assert project_doc("`File.cd!/1,2`", %{}) ==
+               "[`File.cd!/1,2`](#{@elixir_docs}elixir/File.html#cd!/1)"
 
       assert project_doc("`Mix.env/0`", %{}) ==
                "[`Mix.env/0`](#{@elixir_docs}mix/Mix.html#env/0)"
@@ -473,10 +477,16 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert project_doc("`:zlib.deflateInit/2`", %{}) ==
                "[`:zlib.deflateInit/2`](#{@erlang_docs}zlib.html#deflateInit-2)"
+
+      assert project_doc("`:file.change_owner/2,3`", %{}) ==
+               "[`:file.change_owner/2,3`](#{@erlang_docs}file.html#change_owner-2)"
     end
 
     test "autolinks to Erlang functions with custom links" do
       assert project_doc("[`example`](`:lists.reverse/1`)", %{}) ==
+               "[`example`](#{@erlang_docs}lists.html#reverse-1)"
+
+      assert project_doc("[`example`](`:lists.reverse/1,2`)", %{}) ==
                "[`example`](#{@erlang_docs}lists.html#reverse-1)"
 
       assert project_doc("[example](`:lists.reverse/1`)", %{}) ==
