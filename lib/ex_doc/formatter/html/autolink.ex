@@ -623,7 +623,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
   defp split_arities(arities), do: String.split(arities, ",", trim: true)
 
-  defp print_arities(arities), do: arities |> Enum.join(",")
+  defp print_arities(arities), do: Enum.join(arities, ",")
 
   defp arities_sorted?(arities), do: arities == Enum.sort(arities)
 

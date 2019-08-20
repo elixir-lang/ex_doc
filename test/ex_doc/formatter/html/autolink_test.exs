@@ -64,6 +64,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
     test "does not autolink undefined functions" do
       assert project_doc("`example/1`", %{locals: ["example/2"]}) == "`example/1`"
+      assert project_doc("`example/1,2`", %{locals: ["example/1"]}) == "`example/1,2`"
+
+      assert project_doc("`example/1,2,3`", %{locals: ["example/1", "example/2"]}) ==
+               "`example/1,2,3`"
+
       assert project_doc("`example/1`", %{}) == "`example/1`"
     end
 
@@ -166,6 +171,11 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
                assert Autolink.project_doc("[title](`example/2`)", "Mod.foo/0", compiled) ==
                         "title"
              end) =~ ~r"references example/2 .* \(parsing Mod.foo/0 docs\)"
+
+      assert capture_io(:stderr, fn ->
+               assert Autolink.project_doc("[title](`Mod.example/1,2`)", "Mod.foo/0", compiled) ==
+                        "title"
+             end) =~ ~r"references Mod.example/1,2 .* \(parsing Mod.foo/0 docs\)"
 
       # skip warning when module page is blacklisted
       overwritten = Map.put(compiled, :module_id, "Bar")
