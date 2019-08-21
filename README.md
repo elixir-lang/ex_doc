@@ -14,19 +14,19 @@ To see all supported options, see the documetation for [mix docs](https://hexdoc
 ExDoc ships with many features:
 
   * Automatically generates HTML and EPUB documents from your API documentation
-  * The generated HTML documentation is accessible online and offline
+  * Support for custom pages and guides (in addition to the API reference)
+  * Support for custom grouping of modules, functions, and pages in the sidebar
+  * Generates HTML documentation is accessible online and offline
   * Responsive design with built-in layout for phones and tablets
   * Customizable logo on the generated documentation
-  * Support for custom pages and guides (in addition to the API reference)
-  * Support for custom grouping of modules and functions in the sidebar
+  * Each documented entry contains a direct link back to the source code
   * Full-text search
   * Keyboard shortcuts (press `?` inside an existing documentation to bring the help dialog)
-  * Quick search with autocompletion support on the API reference (`s` keyboard shortcut)
+  * Quick search with autocompletion support (`s` keyboard shortcut)
   * Go-to shortcut to take to any HexDocs package documentation with autocomplete support (`g` keyboard shortcut)
   * Support for night-mode (automatically detected according to the browser preferences)
   * Show tooltips when mousing over a link to a module/function (works for the current project and across projects)
-  * Upon configuration, a version dropdown is shown to quickly switch to other versions (automatically configured when hosted on HexDocs)
-  * Upon configuration, documentation includes link to the source code
+  * A version dropdown to quickly switch to other versions (automatically configured when hosted on HexDocs)
 
 ## Using ExDoc with Mix
 
