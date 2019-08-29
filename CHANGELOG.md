@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.21.2
+
+  * Enhancements
+    * [HTML] Add hardcoded packages to the quick-switch search results
+    * [HTML] Filter out packages without docs on HexDocs in quick-switch
+    * [HTML+EPUB] Support autolinking for multiple arities
+    * [mix docs] Avoid deprecation warnings on more recent earmark versions
+    * [mix docs] Warn on unavailable local functions
+    * [mix docs] Make invalid index redirect warning case-sensitive
+    * [mix docs] Ignore non-Elixir modules when missing chunk
+
+  * Bug fixes
+    * [HTML+EPUB] Do not create a custom link when destination does not exist
+    * [EPUB] Hide screen reader elements
+
 ## v0.21.1
 
   * Bug fixes
@@ -124,7 +139,7 @@ This release requires Elixir v1.7 and later. For earlier Elixir versions, use Ex
     * Autolink Kernel, Kernel.SpecialForms, and built-in types
     * Annotate opaque types
     * Add vertical-align:top to tables
-    * Allow module-function-arity references in links, for example: [some code](`MyMod.fun/2`)
+    * Allow module-function-arity references in links
     * Remove underscore from view source link
     * Run code formatter on typespecs (if one is available)
     * Make night mode switch link more obvious
