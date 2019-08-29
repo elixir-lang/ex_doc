@@ -124,25 +124,26 @@ defmodule Mix.Tasks.Docs do
     * `:source_ref` - The branch/commit/tag used for source link inference;
       default: "master".
 
-    * `:source_url_pattern` - Public URL of the project. This is derived
+    * `:source_url_pattern` - Public URL of the project for source links. This is derived
       automatically from the project's `:source_url` and `:source_ref` when using one of
-      the supported public hosting services (currently github, gitlab, or bitbucket). If
-      using one of those services with their default public hostname, you do not need to
-      set this configuration.
+      the supported public hosting services (currently GitHub, GitLab, or Bitbucket). If
+      you are using one of those services with their default public hostname, you do not
+      need to set this configuration.
 
       However, if using a different solution, or self-hosting, you will need to set this
       configuration variable to a pattern for source code links. The value must be a string
       of the full URI to use for links with the following variables available for interpolation:
-        * %{path}: the path of a file in the repo
-        * %{line}: the line number in the file
 
-      Examples:
-        * gitlab/github:
+        * `%{path}`: the path of a file in the repo
+        * `%{line}`: the line number in the file
 
-          "https://mydomain.org/user_or_team/repo_name/blob/master/%{path}#L%{line}"
-        * bitbucket:
+      For GitLab/GitHub:
 
-          "https://mydomain.org/user_or_team/repo_name/src/master/%{path}#cl-%{line}"
+          https://mydomain.org/user_or_team/repo_name/blob/master/%{path}#L%{line}"
+
+      For Bitbucket:
+
+          https://mydomain.org/user_or_team/repo_name/src/master/%{path}#cl-%{line}
 
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
