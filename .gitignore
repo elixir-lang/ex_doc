@@ -30,3 +30,6 @@ ex_doc-*.tar
 # Ignore artifacts from non-production builds
 formatters/epub/dist/epub.js
 formatters/html/dist/html.js
+
+# Ignore escript when built
+/ex_doc
