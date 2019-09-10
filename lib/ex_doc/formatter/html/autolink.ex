@@ -333,7 +333,11 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   defp replace_placeholders(string, placeholders) do
-    Regex.replace(~r"_#{@placeholder}+\d+_"u, string, &Map.fetch!(placeholders, String.to_atom(&1)))
+    Regex.replace(
+      ~r"_#{@placeholder}+\d+_"u,
+      string,
+      &Map.fetch!(placeholders, String.to_atom(&1))
+    )
   end
 
   defp format_ast(ast) do
