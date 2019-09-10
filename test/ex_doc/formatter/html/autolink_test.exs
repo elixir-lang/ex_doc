@@ -640,40 +640,40 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     test "placeholders" do
       assert_typespec_placeholders(
         "t()",
-        "_p1_()",
+        "_ó1_()",
         t: 0
       )
 
       assert_typespec_placeholders(
         "foobar()",
-        "_ppp1_()",
+        "_óóó1_()",
         foobar: 0
       )
 
       assert_typespec_placeholders(
         "Mod.foobar()",
-        "_ppppppp1_()",
+        "_óóóóóóó1_()",
         [],
         [Mod]
       )
 
       assert_typespec_placeholders(
         "foobar(barbaz())",
-        "_ppp1_(_ppp2_())",
+        "_óóó1_(_óóó2_())",
         foobar: 1,
         barbaz: 0
       )
 
       assert_typespec_placeholders(
         "Mod.foobar(Mod.barbaz())",
-        "_ppppppp1_(_ppppppp2_())",
+        "_óóóóóóó1_(_óóóóóóó2_())",
         [],
         [Mod]
       )
 
       assert_typespec_placeholders(
         "foobar(foobar(barbaz()))",
-        "_ppp1_(_ppp1_(_ppp2_()))",
+        "_óóó1_(_óóó1_(_óóó2_()))",
         foobar: 1,
         barbaz: 0
       )
