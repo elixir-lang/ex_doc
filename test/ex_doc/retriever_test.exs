@@ -272,14 +272,11 @@ defmodule ExDoc.RetrieverTest do
       docs = module_node.docs
       assert Enum.map(docs, & &1.id) == ["bye/1", "greet/1", "hello/1"]
 
-      assert Enum.at(docs, 0).doc ==
-               "A doc for this so it doesn't use 'Callback implementation for'"
+      assert Enum.at(docs, 0).doc == "Callback implementation for `c:CustomBehaviourTwo.bye/1`."
 
-      assert Enum.at(docs, 1).doc == "Callback implementation for `c:CustomBehaviourOne.greet/1`."
+      assert Enum.at(docs, 1).doc == "A doc so it doesn't use 'Callback implementation for'"
 
-      assert Enum.at(docs, 2).doc ==
-               "This is a sample callback.\n\n\n" <>
-                 "Callback implementation for `c:CustomBehaviourOne.hello/1`."
+      assert Enum.at(docs, 2).doc == "Callback implementation for `c:CustomBehaviourOne.hello/1`."
     end
   end
 

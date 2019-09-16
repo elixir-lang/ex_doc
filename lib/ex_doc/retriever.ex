@@ -253,7 +253,8 @@ defmodule ExDoc.Retriever do
     annotations = annotations_from_metadata(metadata)
 
     line = find_function_line(module_data, actual_def) || doc_line
-    doc = docstring(doc, name, arity, type, Map.fetch(module_data.impls, {name, arity}))
+    impl = Map.fetch(module_data.impls, actual_def)
+    doc = docstring(doc, name, arity, impl)
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
     specs =
@@ -301,23 +302,11 @@ defmodule ExDoc.Retriever do
   defp delegate_doc(nil), do: nil
   defp delegate_doc({m, f, a}), do: "See `#{Exception.format_mfa(m, f, a)}`."
 
-  defp docstring(:none, name, arity, type, {:ok, behaviour}) do
-    info = "Callback implementation for `c:#{inspect(behaviour)}.#{name}/#{arity}`."
-
-    with {:docs_v1, _, _, _, _, _, docs} <- Code.fetch_docs(behaviour),
-         key = {definition_to_callback(type), name, arity},
-         {_, _, _, doc, _} <- List.keyfind(docs, key, 0),
-         docstring when is_binary(docstring) <- docstring(doc) do
-      "#{docstring}\n\n#{info}"
-    else
-      _ -> info
-    end
+  defp docstring(:none, name, arity, {:ok, behaviour}) do
+    "Callback implementation for `c:#{inspect(behaviour)}.#{name}/#{arity}`."
   end
 
-  defp docstring(doc, _, _, _, _), do: docstring(doc)
-
-  defp definition_to_callback(:function), do: :callback
-  defp definition_to_callback(:macro), do: :macrocallback
+  defp docstring(doc, _, _, _), do: docstring(doc)
 
   defp get_defaults(_name, _arity, 0), do: []
 
