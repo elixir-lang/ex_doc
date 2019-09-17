@@ -677,6 +677,10 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
         foobar: 1,
         barbaz: 0
       )
+
+      assert_raise RuntimeError, ~r"typespec cannot contain `eXx`", fn ->
+        assert_typespec_placeholders("eXx(foo)", "", [])
+      end
     end
   end
 
