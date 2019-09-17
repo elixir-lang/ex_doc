@@ -640,43 +640,47 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
     test "placeholders" do
       assert_typespec_placeholders(
         "t()",
-        "_p1_()",
+        "eXx1_()",
         t: 0
       )
 
       assert_typespec_placeholders(
         "foobar()",
-        "_ppp1_()",
+        "eXxx1_()",
         foobar: 0
       )
 
       assert_typespec_placeholders(
         "Mod.foobar()",
-        "_ppppppp1_()",
+        "eXxxxxxx1_()",
         [],
         [Mod]
       )
 
       assert_typespec_placeholders(
         "foobar(barbaz())",
-        "_ppp1_(_ppp2_())",
+        "eXxx1_(eXxx2_())",
         foobar: 1,
         barbaz: 0
       )
 
       assert_typespec_placeholders(
         "Mod.foobar(Mod.barbaz())",
-        "_ppppppp1_(_ppppppp2_())",
+        "eXxxxxxx1_(eXxxxxxx2_())",
         [],
         [Mod]
       )
 
       assert_typespec_placeholders(
         "foobar(foobar(barbaz()))",
-        "_ppp1_(_ppp1_(_ppp2_()))",
+        "eXxx1_(eXxx1_(eXxx2_()))",
         foobar: 1,
         barbaz: 0
       )
+
+      assert_raise RuntimeError, ~r"typespec cannot contain `eXx`", fn ->
+        assert_typespec_placeholders("eXx(foo)", "", [])
+      end
     end
   end
 

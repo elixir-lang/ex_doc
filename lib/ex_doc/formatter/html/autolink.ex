@@ -250,6 +250,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
           {{name, [], args}, placeholders}
 
         {name, _, args} = form, placeholders when is_atom(name) and is_list(args) ->
+          ensure_no_placeholder!(name)
           arity = length(args)
 
           cond do
@@ -272,6 +273,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
         {{:., _, [alias, name]}, _, args} = form, placeholders
         when is_atom(name) and is_list(args) ->
+          ensure_no_placeholder!(name)
           alias = expand_alias(alias)
 
           if source = get_source(alias, aliases, lib_dirs) do
@@ -325,13 +327,23 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     [name | _] = String.split(string, "(", trim: true)
     name_size = String.length(name)
     int_size = count |> Integer.digits() |> length()
-    underscores_size = 2
-    pad = String.duplicate("p", max(name_size - int_size - underscores_size, 1))
-    :"_#{pad}#{count}_"
+    markers_size = 3
+    pad = String.duplicate("x", max(name_size - int_size - markers_size, 1))
+    :"eX#{pad}#{count}_"
+  end
+
+  defp ensure_no_placeholder!(name) when is_atom(name) do
+    if String.starts_with?(Atom.to_string(name), "eXx") do
+      raise "typespec cannot contain `eXx` because it is used as marker for autolinking"
+    end
   end
 
   defp replace_placeholders(string, placeholders) do
-    Regex.replace(~r"_p+\d+_", string, &Map.fetch!(placeholders, String.to_atom(&1)))
+    Regex.replace(
+      ~r"eXx*\d+_"u,
+      string,
+      &Map.fetch!(placeholders, String.to_atom(&1))
+    )
   end
 
   defp format_ast(ast) do
