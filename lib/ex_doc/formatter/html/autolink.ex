@@ -321,20 +321,18 @@ defmodule ExDoc.Formatter.HTML.Autolink do
     end
   end
 
-  @placeholder "ó"
-
   defp placeholder(string, count) do
     [name | _] = String.split(string, "(", trim: true)
     name_size = String.length(name)
     int_size = count |> Integer.digits() |> length()
-    underscores_size = 2
-    pad = String.duplicate(@placeholder, max(name_size - int_size - underscores_size, 1))
-    :"_#{pad}#{count}_"
+    markers_size = 3
+    pad = String.duplicate("x", max(name_size - int_size - markers_size, 1))
+    :"eX#{pad}#{count}_"
   end
 
   defp replace_placeholders(string, placeholders) do
     Regex.replace(
-      ~r"_#{@placeholder}+\d+_"u,
+      ~r"eXx*\d+_"u,
       string,
       &Map.fetch!(placeholders, String.to_atom(&1))
     )
