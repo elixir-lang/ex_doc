@@ -63,7 +63,7 @@ function getExcerpts (item, metadata) {
     }
   })
   if (excerpts.length === 0) {
-    excerpts.push(item.doc.slice(0, nchars * 2))
+    excerpts.push(item.doc.slice(0, nchars * 2) + (nchars * 2 < item.doc.length ? '...' : ''))
   }
   return excerpts.slice(0, 1)
 }
@@ -118,9 +118,10 @@ function getProjectMeta () {
 
 function titleExtractor (document) {
   var title = document['title']
+  var type = document['type']
 
-  if (document['type'] !== 'extras') {
-    title = title + ' ' + title.replace(/\.|\//g, ' ')
+  if (type === 'function' || type === 'callback' || type === 'type') {
+    title = title + ' ' + title.replace(/\/\d+/g, '') + ' ' + title.replace(/\.|\//g, ' ')
   }
 
   return title
