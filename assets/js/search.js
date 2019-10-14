@@ -121,10 +121,10 @@ function titleExtractor (document) {
   var type = document['type']
 
   if (type === 'function' || type === 'callback' || type === 'type') {
-    var mod_fun = title.replace(/\/\d+/, '')
-    var mod_or_fun = mod_fun.replace('.', ' ')
-    var fun_arity = title.split('.')[1]
-    title = title + ' ' + mod_fun + ' ' + mod_or_fun + ' ' + (fun_arity ? fun_arity : '')
+    var modFun = title.replace(/\/\d+/, '')
+    var modOrFun = modFun.replace('.', ' ')
+    var funArity = title.split('.')[1]
+    title = title + ' ' + modFun + ' ' + modOrFun + ' ' + (funArity || '')
   }
 
   return title
