@@ -123,8 +123,8 @@ function titleExtractor (document) {
   if (type === 'function' || type === 'callback' || type === 'type') {
     var modFun = title.replace(/\/\d+/, '')
     var modOrFun = modFun.replace('.', ' ')
-    var funArity = title.split('.')[1]
-    title = title + ' ' + modFun + ' ' + modOrFun + ' ' + (funArity || '')
+    var parts = title.split('.')
+    title = title + ' ' + modFun + ' ' + modOrFun + ' ' + parts[parts.length - 1]
   }
 
   return title
