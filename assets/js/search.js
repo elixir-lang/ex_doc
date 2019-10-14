@@ -121,7 +121,10 @@ function titleExtractor (document) {
   var type = document['type']
 
   if (type === 'function' || type === 'callback' || type === 'type') {
-    title = title + ' ' + title.replace(/\/\d+/g, '') + ' ' + title.replace(/\.|\//g, ' ')
+    var mod_fun = title.replace(/\/\d+/, '')
+    var mod_or_fun = mod_fun.replace('.', ' ')
+    var fun_arity = title.split('.')[1]
+    title = title + ' ' + mod_fun + ' ' + mod_or_fun + ' ' + (fun_arity ? fun_arity : '')
   }
 
   return title
@@ -130,7 +133,7 @@ function titleExtractor (document) {
 function createIndex () {
   return lunr(function () {
     this.ref('ref')
-    this.field('title', {extractor: titleExtractor})
+    this.field('title', {boost: 3, extractor: titleExtractor})
     this.field('doc')
     this.metadataWhitelist = ['position']
     this.pipeline.remove(lunr.stopWordFilter)

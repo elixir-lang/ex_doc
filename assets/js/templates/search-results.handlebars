@@ -18,16 +18,16 @@
     <p>Invalid search: {{errorMessage}}.</p>
   {{/isArray}}
 
-  <p>Here are some tips when performing a full-text search:</p>
+  <p>The search functionality is full-text based. Here are some tips:</p>
 
-  <dl>
+  <ul>
     <li>Multiple words (such as <code>foo bar</code>) are searched as <code>OR</code></li>
     <li>Use <code>*</code> anywhere (such as <code>fo*</code>) as wildcard</li>
     <li>Use <code>+</code> before a word (such as <code>+foo</code>) to make its presence required</li>
     <li>Use <code>-</code> before a word (such as <code>-foo</code>) to make its absence required</li>
     <li>Use <code>WORD^NUMBER</code> (such as <code>foo^2</code>) to boost the given word</li>
     <li>Use <code>WORD~NUMBER</code> (such as <code>foo~2</code>) to do a search with edit distance on word</li>
-  </dl>
+  </ul>
 
   <p>To quickly go to a module, type, or function, use the autocompletion feature in the sidebar search.</p>
 {{/isNonEmptyArray}}
