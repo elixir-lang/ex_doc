@@ -16,7 +16,7 @@ ExDoc ships with many features:
   * Automatically generates HTML and EPUB documents from your API documentation
   * Support for custom pages and guides (in addition to the API reference)
   * Support for custom grouping of modules, functions, and pages in the sidebar
-  * Generates HTML documentation is accessible online and offline
+  * Generates HTML documentation accessible online and offline
   * Responsive design with built-in layout for phones and tablets
   * Customizable logo on the generated documentation
   * Each documented entry contains a direct link back to the source code
