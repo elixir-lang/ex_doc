@@ -3,21 +3,6 @@ defmodule ExDoc.Highlighter do
   Performs code highlighting.
   """
 
-  @doc """
-  Highlighter specific assets.
-  """
-  def assets(_), do: []
-
-  @doc """
-  Highlighter specific annotations.
-  """
-  def before_closing_head_tag(_), do: ""
-
-  @doc """
-  Highlighter specific annotations.
-  """
-  def before_closing_body_tag(_), do: ""
-
   # If new lexers are available, add them here:
   defp pick_language_and_lexer(""), do: {"elixir", Makeup.Lexers.ElixirLexer, []}
 

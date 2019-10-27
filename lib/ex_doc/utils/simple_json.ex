@@ -1,4 +1,4 @@
-defmodule ExDoc.SimpleJSON do
+defmodule ExDoc.Utils.SimpleJSON do
   # We want to miniminize the number of dependencies
   # ExDoc has, because we don't want someone to be allowed
   # to not upgrade their app due to an ExDoc restriction,
@@ -31,7 +31,7 @@ defmodule ExDoc.SimpleJSON do
   end
 
   def encode(binary) when is_binary(binary) do
-    inspect(binary)
+    inspect(binary, printable_limit: :infinity)
   end
 
   def encode(integer) when is_integer(integer) do

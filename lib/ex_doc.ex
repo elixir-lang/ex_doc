@@ -23,10 +23,6 @@ defmodule ExDoc do
       ExDoc.Markdown.put_markdown_processor(processor)
     end
 
-    if markdown_processor_options = options[:markdown_processor_options] do
-      ExDoc.Markdown.configure_processor(markdown_processor_options)
-    end
-
     docs = config.retriever.docs_from_dir(config.source_beam, config)
     find_formatter(config.formatter).run(docs, config)
   end

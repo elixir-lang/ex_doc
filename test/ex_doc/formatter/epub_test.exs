@@ -1,6 +1,5 @@
 defmodule ExDoc.Formatter.EPUBTest do
   use ExUnit.Case
-  alias ExDoc.Markdown.DummyProcessor
 
   setup do
     File.rm_rf(output_dir())
@@ -15,18 +14,10 @@ defmodule ExDoc.Formatter.EPUBTest do
     Path.expand("../../tmp/beam", __DIR__)
   end
 
-  # The following module attributes contain the values for user-required content.
-  # Content required by the custom markdown processor is defined in its own module,
-  # and will be accessed as `DummyProcessor.before_closing_*_tag(:html)`
   @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
   @before_closing_body_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
-  @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-EPUB</dont-escape>"
-  @before_closing_body_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-EPUB</dont-escape>"
 
-  defp before_closing_head_tag(:html), do: @before_closing_head_tag_content_epub
   defp before_closing_head_tag(:epub), do: @before_closing_head_tag_content_epub
-
-  defp before_closing_body_tag(:html), do: @before_closing_body_tag_content_epub
   defp before_closing_body_tag(:epub), do: @before_closing_body_tag_content_epub
 
   defp doc_config do
@@ -170,153 +161,49 @@ defmodule ExDoc.Formatter.EPUBTest do
              "<samp class=\"nc\">CompiledWithDocs<\/samp>"
   end
 
-  describe "before_closing_*_tags" do
-    # There are 3 possibilities for the `before_closing_*_tags`:
-    # - required by the user alone
-    # - required by the markdown processor alone
-    # - required by both the markdown processor and the user
-    # We will test the three possibilities independently
+  @example_basenames [
+    # "structural" pages
+    "nav.xhtml",
+    "title.xhtml",
+    "readme.xhtml",
+    # "module pages"
+    "CompiledWithDocs.xhtml",
+    "CompiledWithDocs.Nested.xhtml"
+  ]
 
-    @example_basenames [
-      # "structural" pages
-      "nav.xhtml",
-      "title.xhtml",
-      "readme.xhtml",
-      # "module pages"
-      "CompiledWithDocs.xhtml",
-      "CompiledWithDocs.Nested.xhtml"
-    ]
-
-    # 1. required by the user
-    test "required by the user are in the right place" do
-      generate_docs_and_unzip(
-        doc_config(
-          before_closing_head_tag: &before_closing_head_tag/1,
-          before_closing_body_tag: &before_closing_body_tag/1
-        )
+  test "before_closing_*_tags required by the user are in the right place" do
+    generate_docs_and_unzip(
+      doc_config(
+        before_closing_head_tag: &before_closing_head_tag/1,
+        before_closing_body_tag: &before_closing_body_tag/1
       )
+    )
 
-      oebps_dir = "#{output_dir()}/OEBPS"
+    oebps_dir = "#{output_dir()}/OEBPS"
 
-      for basename <- @example_basenames do
-        content = File.read!(Path.join(oebps_dir, basename))
-        assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
-        assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
-
-        assert not (content =~ ~r[#{DummyProcessor.before_closing_head_tag(:epub)}\s*</head>])
-        assert not (content =~ ~r[#{DummyProcessor.before_closing_body_tag(:epub)}\s*</body>])
-      end
-    end
-
-    # 2. Required by the markdown processor
-    test "required by the markdown processor are in the right place" do
-      generate_docs_and_unzip(doc_config(markdown_processor: DummyProcessor))
-      oebps_dir = "#{output_dir()}/OEBPS"
-
-      for basename <- @example_basenames do
-        content = File.read!(Path.join(oebps_dir, basename))
-        assert content =~ ~r[#{DummyProcessor.before_closing_head_tag(:epub)}\s*</head>]
-        assert content =~ ~r[#{DummyProcessor.before_closing_body_tag(:epub)}\s*</body>]
-        assert not (content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>])
-        assert not (content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>])
-      end
-    end
-
-    # 3. Required by both the user and the markdown processor
-    test "required by (1) the user and (2) the markdown processor are in the right place" do
-      generate_docs_and_unzip(
-        doc_config(
-          before_closing_head_tag: &before_closing_head_tag/1,
-          before_closing_body_tag: &before_closing_body_tag/1,
-          markdown_processor: DummyProcessor
-        )
-      )
-
-      oebps_dir = "#{output_dir()}/OEBPS"
-
-      for basename <- @example_basenames do
-        content = File.read!(Path.join(oebps_dir, basename))
-
-        assert content =~
-                 ~r[#{DummyProcessor.before_closing_head_tag(:epub)}\s*#{
-                   @before_closing_head_tag_content_epub
-                 }\s*</head>]
-
-        assert content =~
-                 ~r[#{DummyProcessor.before_closing_body_tag(:epub)}\s*#{
-                   @before_closing_body_tag_content_epub
-                 }\s*</body>]
-      end
+    for basename <- @example_basenames do
+      content = File.read!(Path.join(oebps_dir, basename))
+      assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
+      assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
     end
   end
 
-  describe "assets" do
-    # There are 3 possibilities when requiring:
-    # - required by the user alone
-    # - required by the markdown processor alone
-    # - required by both the markdown processor and the user
-    # We will test the three possibilities independently
+  test "assets required by the user end up in the right place" do
+    File.mkdir_p!("test/tmp/epub_assets/hello")
+    File.touch!("test/tmp/epub_assets/hello/world.png")
 
-    # 1. Required by the user alone
-    test "required by the user end up in the right place" do
-      File.mkdir_p!("test/tmp/epub_assets/hello")
-      File.touch!("test/tmp/epub_assets/hello/world.png")
-
-      generate_docs_and_unzip(
-        doc_config(
-          assets: "test/tmp/epub_assets",
-          logo: "test/fixtures/elixir.png",
-          cover: "test/fixtures/elixir.png"
-        )
+    generate_docs_and_unzip(
+      doc_config(
+        assets: "test/tmp/epub_assets",
+        logo: "test/fixtures/elixir.png",
+        cover: "test/fixtures/elixir.png"
       )
+    )
 
-      assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world.png")
-      assert File.regular?("#{output_dir()}/OEBPS/assets/logo.png")
-      assert File.regular?("#{output_dir()}/OEBPS/assets/cover.png")
-    after
-      File.rm_rf!("test/tmp/epub_assets")
-    end
-
-    # 2. Required by the markdown processor
-    test "required by the markdown processor end up in the right place" do
-      generate_docs_and_unzip(doc_config(markdown_processor: DummyProcessor))
-      # Test the assets added by the markdown processor
-      for [{filename, content}] <- DummyProcessor.assets(:html) do
-        # Filename matches
-        assert File.regular?("#{output_dir()}/#{filename}")
-        # Content matches
-        assert File.read!("#{output_dir()}/#{filename}") == content
-      end
-    after
-      File.rm_rf!("test/tmp/epub_assets")
-    end
-
-    # 3. Required by the user and markdown processor
-    test "required by the user and markdown processor end up in the right place" do
-      File.mkdir_p!("test/tmp/epub_assets/hello")
-      File.touch!("test/tmp/epub_assets/hello/world.png")
-
-      generate_docs_and_unzip(
-        doc_config(
-          markdown_processor: DummyProcessor,
-          assets: "test/tmp/epub_assets",
-          logo: "test/fixtures/elixir.png",
-          cover: "test/fixtures/elixir.png"
-        )
-      )
-
-      assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world.png")
-      assert File.regular?("#{output_dir()}/OEBPS/assets/logo.png")
-      assert File.regular?("#{output_dir()}/OEBPS/assets/cover.png")
-      # Test the assets added by the markdown processor
-      for [{filename, content}] <- DummyProcessor.assets(:html) do
-        # Filename matches
-        assert File.regular?("#{output_dir()}/#{filename}")
-        # Content matches
-        assert File.read!("#{output_dir()}/#{filename}") == content
-      end
-    after
-      File.rm_rf!("test/tmp/epub_assets")
-    end
+    assert File.regular?("#{output_dir()}/OEBPS/assets/hello/world.png")
+    assert File.regular?("#{output_dir()}/OEBPS/assets/logo.png")
+    assert File.regular?("#{output_dir()}/OEBPS/assets/cover.png")
+  after
+    File.rm_rf!("test/tmp/epub_assets")
   end
 end

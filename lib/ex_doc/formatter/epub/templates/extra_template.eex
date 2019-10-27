@@ -1,7 +1,5 @@
 <%= head_template(config, %{title: title}) %>
     <%= content %>
-    <%# Extra content needed by the current markdown processor (i.g. custom Javascript) %>
-    <%= ExDoc.Markdown.get_markdown_processor().before_closing_body_tag(:epub) %>
     <%# Extra content specified by the user (e.g. custom Javascript) %>
     <%= config.before_closing_body_tag.(:epub) %>
   </body>

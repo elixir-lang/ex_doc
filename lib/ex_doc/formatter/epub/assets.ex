@@ -15,8 +15,4 @@ defmodule ExDoc.Formatter.EPUB.Assets do
   def metainfo do
     embed_pattern("metainfo/*")
   end
-
-  def markdown_processor_assets do
-    ExDoc.Markdown.get_markdown_processor().assets(:epub)
-  end
 end

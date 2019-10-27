@@ -2,7 +2,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
 
-  alias ExDoc.SimpleJSON
+  # TODO: It should not depend on the parent module
+  # TODO: Add tests that assert on the returned structured, not on JSON
+  alias ExDoc.Utils.SimpleJSON
   alias ExDoc.Formatter.HTML
 
   @doc """

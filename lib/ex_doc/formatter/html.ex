@@ -207,8 +207,7 @@ defmodule ExDoc.Formatter.HTML do
   defp default_assets(_config) do
     [
       {Assets.dist(), "dist"},
-      {Assets.fonts(), "dist/html/fonts"},
-      {Assets.markdown_processor_assets(), ""}
+      {Assets.fonts(), "dist/html/fonts"}
     ]
   end
 

@@ -4,15 +4,6 @@ defmodule ExDoc.Markdown.Cmark do
   """
   @behaviour ExDoc.Markdown
 
-  # Callback implementations
-  def assets(arg), do: ExDoc.Highlighter.assets(arg)
-
-  def before_closing_head_tag(arg), do: ExDoc.Highlighter.before_closing_head_tag(arg)
-
-  def before_closing_body_tag(arg), do: ExDoc.Highlighter.before_closing_body_tag(arg)
-
-  def configure(_), do: :ok
-
   @doc """
   Check if the Cmark Markdown parser module is available.
   """

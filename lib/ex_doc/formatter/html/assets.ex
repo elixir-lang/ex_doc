@@ -15,8 +15,4 @@ defmodule ExDoc.Formatter.HTML.Assets do
   def fonts do
     embed_pattern("fonts/*")
   end
-
-  def markdown_processor_assets do
-    ExDoc.Markdown.get_markdown_processor().assets(:html)
-  end
 end

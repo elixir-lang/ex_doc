@@ -1,6 +1,6 @@
 exclude = [
-  cmark: !ExDoc.Markdown.Cmark.available?(),
-  earmark: !ExDoc.Markdown.Earmark.available?()
+  cmark: not ExDoc.Markdown.Cmark.available?(),
+  earmark: not ExDoc.Markdown.Earmark.available?()
 ]
 
 ExUnit.start(exclude: Enum.filter(exclude, &elem(&1, 1)))
@@ -14,41 +14,3 @@ Code.prepend_path("test/tmp/beam")
 "test/fixtures/*.ex"
 |> Path.wildcard()
 |> Kernel.ParallelCompiler.compile_to_path("test/tmp/beam")
-
-defmodule ExDoc.Markdown.DummyProcessor do
-  @moduledoc false
-  @behaviour ExDoc.Markdown
-
-  def to_html(text, opts), do: ExDoc.Markdown.Earmark.to_html(text, opts)
-
-  def assets(:html) do
-    [{"html_assets.css", "HTML assets - CSS"}, {"html_assets.js", "HTML assets - Javascript"}]
-  end
-
-  def assets(:epub) do
-    [
-      {"epub_assets-css.css", "EPUB assets - CSS"},
-      {"epub_assets-js.js", "EPUB assets - Javascript"}
-    ]
-  end
-
-  def available?(), do: true
-
-  def configure(_), do: :ok
-
-  def before_closing_head_tag(:html) do
-    "UNIQUE:<dont-escape>&copy;MARKDOWN-PROCESSOR-BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
-  end
-
-  def before_closing_head_tag(:epub) do
-    "UNIQUE:<dont-escape>&copy;MARKDOWN-PROCESSOR-BEFORE-CLOSING-HEAD-TAG-EPUB</dont-escape>"
-  end
-
-  def before_closing_body_tag(:html) do
-    "UNIQUE:<dont-escape>&copy;MARKDOWN-PROCESSOR-BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
-  end
-
-  def before_closing_body_tag(:epub) do
-    "UNIQUE:<dont-escape>&copy;MARKDOWN-PROCESSOR-BEFORE-CLOSING-BODY-TAG-EPUB</dont-escape>"
-  end
-end

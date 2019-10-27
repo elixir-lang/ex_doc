@@ -1,10 +1,14 @@
 defmodule ExDoc.Formatter.HTML.SearchItems do
   @moduledoc false
+
+  # TODO: It should not depend on the parent module
+  # TODO: Add tests that assert on the returned structured, not on JSON
   alias ExDoc.Formatter.HTML
+  alias ExDoc.Utils.SimpleJSON
 
   def create(nodes, extras) do
-    items = Enum.flat_map(nodes, &module_node/1) ++ Enum.flat_map(extras, &extra/1)
-    ["searchNodes=[", Enum.intersperse(items, ?,), "]"]
+    items = Enum.flat_map(nodes, &module/1) ++ Enum.flat_map(extras, &extra/1)
+    ["searchNodes=" | SimpleJSON.encode(items)]
   end
 
   @h2_split_regex ~r/<h2.*?>/
@@ -32,7 +36,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     )
   end
 
-  defp module_node(node = %ExDoc.ModuleNode{id: id, type: type, rendered_doc: doc}) do
+  defp module(node = %ExDoc.ModuleNode{id: id, type: type, rendered_doc: doc}) do
     module = encode("#{id}.html", id, type, doc)
     functions = Enum.map(node.docs, &node_child(&1, id))
     types = Enum.map(node.typespecs, &node_child(&1, id))
@@ -49,17 +53,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
   end
 
   defp encode(ref, title, type, doc) do
-    [
-      "{\"ref\":",
-      [?", ref, ?"],
-      ",\"title\":",
-      [?", title, ?"],
-      ",\"type\":",
-      [?", Atom.to_string(type), ?"],
-      ",\"doc\":",
-      clean_doc(doc),
-      "}"
-    ]
+    %{ref: URI.encode(ref), title: title, type: type, doc: clean_doc(doc)}
   end
 
   defp clean_doc(doc) do
@@ -68,6 +62,5 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     |> HTML.strip_tags()
     |> String.replace(~r/\s+/, " ")
     |> String.trim()
-    |> inspect(printable_limit: :infinity)
   end
 end

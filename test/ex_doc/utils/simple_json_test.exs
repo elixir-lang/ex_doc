@@ -1,4 +1,4 @@
-defmodule ExDoc.SimpleJSONTest do
+defmodule ExDoc.Utils.SimpleJSONTest do
   use ExUnit.Case, async: true
 
   test "encode" do
@@ -15,7 +15,7 @@ defmodule ExDoc.SimpleJSONTest do
              ],
              integer: 1
            }
-           |> ExDoc.SimpleJSON.encode()
+           |> ExDoc.Utils.SimpleJSON.encode()
            |> IO.iodata_to_binary() == """
            {\
            "atom":"hello",\
