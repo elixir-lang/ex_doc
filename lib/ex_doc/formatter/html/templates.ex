@@ -2,6 +2,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
 
+  alias ExDoc.SimpleJSON
   alias ExDoc.Formatter.HTML
 
   @doc """
@@ -93,35 +94,49 @@ defmodule ExDoc.Formatter.HTML.Templates do
   Create a JS object which holds all the items displayed in the sidebar area
   """
   def create_sidebar_items(nodes_map, extras) do
-    nodes_map = [sidebar_items_extras(extras) | Enum.map(nodes_map, &sidebar_items_keys/1)]
-    "sidebarNodes={#{Enum.join(nodes_map, ",")}}"
+    nodes = [{:extras, sidebar_extras(extras)} | Enum.map(nodes_map, &sidebar_module/1)]
+    ["sidebarNodes=" | SimpleJSON.encode(Map.new(nodes))]
   end
 
-  defp sidebar_items_extras(extras) do
-    keys =
-      extras
-      |> Enum.map(&sidebar_items_extra/1)
-      |> Enum.join(",")
+  defp sidebar_extras(extras) do
+    for extra <- extras do
+      %{id: id, title: title, group: group, content: content} = extra
 
-    ~s/"extras":[#{keys}]/
+      %{
+        id: to_string(id),
+        title: to_string(title),
+        group: to_string(group),
+        headers: extract_headers(content)
+      }
+    end
   end
 
-  defp sidebar_items_keys({id, value}) do
-    keys =
-      value
-      |> Enum.map(&sidebar_items_node/1)
-      |> Enum.join(",")
+  defp sidebar_module({id, modules}) do
+    modules =
+      for module <- modules do
+        extra =
+          module
+          |> module_summary()
+          |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
+          |> case do
+            [] -> []
+            entries -> [nodeGroups: Enum.map(entries, &sidebar_entries/1)]
+          end
 
-    ~s/"#{id}":[#{keys}]/
+        pairs =
+          for key <- [:id, :title, :nested_title, :nested_context],
+              value = Map.get(module, key),
+              do: {key, value}
+
+        Map.new([group: to_string(module.group)] ++ extra ++ pairs)
+      end
+
+    {id, modules}
   end
 
-  defp sidebar_items_extra(%{id: id, title: title, group: group, content: content}) do
-    headers =
-      content
-      |> extract_headers
-      |> Enum.map_join(",", fn {header, anchor} -> sidebar_items_object(header, anchor) end)
-
-    ~s/{"id":"#{id}","title":"#{title}","group":"#{group}","headers":[#{headers}]}/
+  defp sidebar_entries({group, docs}) do
+    nodes = Enum.map(docs, fn doc -> %{id: doc.id, anchor: URI.encode(HTML.link_id(doc))} end)
+    %{key: HTML.text_to_id(group), name: group, nodes: nodes}
   end
 
   @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
@@ -131,50 +146,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> List.flatten()
     |> Enum.filter(&(&1 != ""))
     |> Enum.map(&HTML.strip_tags/1)
-    |> Enum.map(&{&1, HTML.text_to_id(&1)})
+    |> Enum.map(&%{id: &1, anchor: URI.encode(HTML.text_to_id(&1))})
   end
-
-  defp sidebar_items_node(module_node) do
-    items =
-      module_node
-      |> module_summary()
-      |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
-      |> Enum.map_join(",", &sidebar_items_by_group/1)
-
-    sidebar_items_json_string(module_node, items)
-  end
-
-  defp sidebar_items_by_group({group, docs}) do
-    objects =
-      Enum.map_join(docs, ",", fn doc ->
-        sidebar_items_object(doc.id, HTML.link_id(doc))
-      end)
-
-    ~s/{"key":"#{HTML.text_to_id(group)}","name":"#{group}","nodes":[#{objects}]}/
-  end
-
-  defp sidebar_items_object(id, anchor) do
-    ~s/{"id":"#{id}","anchor":"#{URI.encode(anchor)}"}/
-  end
-
-  defp sidebar_items_json_string(module_node, items) do
-    json_attrs =
-      for key <- [:id, :title, :nested_title, :nested_context],
-          value = Map.get(module_node, key),
-          do: [json_kv(key, inspect(value)), ?,]
-
-    json_attrs = [json_attrs | ~s("group":"#{module_node.group}")]
-
-    json_attrs =
-      case items do
-        "" -> json_attrs
-        items -> [json_attrs, ?, | json_kv(:nodeGroups, "[#{items}]")]
-      end
-
-    IO.iodata_to_binary([?{, json_attrs, ?}])
-  end
-
-  defp json_kv(key, value), do: [?", Atom.to_string(key), ?", ?:, value]
 
   def module_summary(module_node) do
     [Types: module_node.typespecs] ++

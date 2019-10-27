@@ -188,21 +188,20 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
         Templates.sidebar_template(doc_config(), %{
           modules: modules,
           exceptions: [],
-          protocols: [],
           tasks: []
         })
 
       assert content =~ ~r{<li><a id="modules-list" href="#full-list">Modules</a></li>}
       refute content =~ ~r{<li><a id="exceptions-list" href="#full-list">Exceptions</a></li>}
-      refute content =~ ~r{<li><a id="protocols-list" href="#full-list">Protocols</a></li>}
+      refute content =~ ~r{<li><a id="tasks-list" href="#full-list">Mix Tasks</a></li>}
     end
 
     test "outputs listing for the given nodes" do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       nodes = ExDoc.Retriever.docs_from_modules(names, doc_config())
-      content = Templates.create_sidebar_items(%{modules: nodes}, [])
+      content = create_sidebar_items(%{modules: nodes}, [])
 
-      assert content =~ ~r("modules":\[\{"id":"CompiledWithDocs","title":"CompiledWithDocs")ms
+      assert content =~ ~r("modules":\[\{.*"id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
       assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example/2")ms
       assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example_without_docs/0")ms
       assert content =~ ~r("id":"CompiledWithDocs.Nested")ms
@@ -220,9 +219,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           )
         )
 
-      content = Templates.create_sidebar_items(%{modules: nodes}, [])
+      content = create_sidebar_items(%{modules: nodes}, [])
 
-      assert content =~ ~s("modules":\[\{"id":"CompiledWithDocs","title":"CompiledWithDocs")
+      assert content =~ ~r("modules":\[\{"group":"","id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
       assert content =~ ~r("key":"example-functions".*"example/2")ms
       refute content =~ ~r("key":"legacy".*"example/2")ms
       refute content =~ ~r("key":"functions".*"example/2")ms
@@ -234,31 +233,31 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       group_mapping = [groups_for_modules: [Group: [CompiledWithDocs]]]
       nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(group_mapping))
-      content = Templates.create_sidebar_items(%{modules: nodes}, [])
+      content = create_sidebar_items(%{modules: nodes}, [])
 
-      assert content =~ ~r("id":"CompiledWithDocs","title":"CompiledWithDocs","group":"Group")ms
+      assert content =~ ~r("group":"Group","id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
     end
 
     test "outputs extras with headers" do
       item = %{content: nil, group: nil, id: nil, title: nil}
 
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"},{"id":"Bar","anchor":"bar"}]}]})
+      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}]) ==
+               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"},{"anchor":"bar","id":"Bar"}],"id":"","title":""}]})
 
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"},{"id":"Bar","anchor":"bar"}]}]})
+      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}]) ==
+               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"},{"anchor":"bar","id":"Bar"}],"id":"","title":""}]})
 
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2></h2><h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Bar","anchor":"bar"}]}]})
+      assert create_sidebar_items(%{}, [%{item | content: "<h2></h2><h2>Bar</h2>"}]) ==
+               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"bar","id":"Bar"}],"id":"","title":""}]})
 
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2></h2>\n<h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Bar","anchor":"bar"}]}]})
+      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}]) ==
+               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"}],"id":"","title":""}]})
+    end
 
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"}]}]})
-
-      assert Templates.create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2></h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"id":"","title":"","group":"","headers":[{"id":"Foo","anchor":"foo"}]}]})
+    defp create_sidebar_items(nodes_map, extras) do
+      nodes_map
+      |> Templates.create_sidebar_items(extras)
+      |> IO.iodata_to_binary()
     end
   end
 

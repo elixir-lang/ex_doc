@@ -187,18 +187,18 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config())
 
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
-    assert content =~ ~r{"id":"CompiledWithDocs","title":"CompiledWithDocs"}ms
-    assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example/2")ms
-    assert content =~ ~r{"id":"CompiledWithDocs\.Nested","title":"CompiledWithDocs\.Nested"}ms
+    assert content =~ ~r{"id":"CompiledWithDocs",.*"title":"CompiledWithDocs"}ms
+    assert content =~ ~r("id":"CompiledWithDocs",.*"key":"functions".*"example/2")ms
+    assert content =~ ~r{"id":"CompiledWithDocs\.Nested",.*"title":"CompiledWithDocs\.Nested"}ms
 
-    assert content =~ ~r{"id":"UndefParent\.Nested","title":"UndefParent\.Nested"}ms
+    assert content =~ ~r{"id":"UndefParent\.Nested",.*"title":"UndefParent\.Nested"}ms
     refute content =~ ~r{"id":"UndefParent\.Undocumented"}ms
 
-    assert content =~ ~r{"id":"CustomBehaviourOne","title":"CustomBehaviourOne"}ms
-    assert content =~ ~r{"id":"CustomBehaviourTwo","title":"CustomBehaviourTwo"}ms
-    assert content =~ ~r{"id":"RandomError","title":"RandomError"}ms
-    assert content =~ ~r{"id":"CustomProtocol","title":"CustomProtocol"}ms
-    assert content =~ ~r{"id":"Mix\.Tasks\.TaskWithDocs","title":"mix task_with_docs"}ms
+    assert content =~ ~r{"id":"CustomBehaviourOne",.*"title":"CustomBehaviourOne"}ms
+    assert content =~ ~r{"id":"CustomBehaviourTwo",.*"title":"CustomBehaviourTwo"}ms
+    assert content =~ ~r{"id":"RandomError",.*"title":"RandomError"}ms
+    assert content =~ ~r{"id":"CustomProtocol",.*"title":"CustomProtocol"}ms
+    assert content =~ ~r{"id":"Mix\.Tasks\.TaskWithDocs",.*"title":"mix task_with_docs"}ms
   end
 
   test "generates the api reference file" do
@@ -219,10 +219,10 @@ defmodule ExDoc.Formatter.HTMLTest do
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
 
     assert content =~
-             ~r{"id":"Common\.Nesting\.Prefix\.Foo","title":"Common\.Nesting\.Prefix\.Foo","nested_title":"Foo","nested_context":"Common\.Nesting\.Prefix"}ms
+             ~r{"id":"Common\.Nesting\.Prefix\.Foo","nested_context":"Common\.Nesting\.Prefix","nested_title":"Foo","title":"Common\.Nesting\.Prefix\.Foo"}ms
 
     assert content =~
-             ~r{"id":"Common\.Nesting\.Prefix\.Bar","title":"Common\.Nesting\.Prefix\.Bar","nested_title":"Bar","nested_context":"Common\.Nesting\.Prefix"}ms
+             ~r{"id":"Common\.Nesting\.Prefix\.Bar","nested_context":"Common\.Nesting\.Prefix","nested_title":"Bar","title":"Common\.Nesting\.Prefix\.Bar"}ms
   end
 
   describe "generates logo" do
@@ -315,10 +315,10 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~s("exceptions":[])
 
       assert content =~
-               ~s("extras":[{"id":"api-reference","title":"API Reference","group":"","headers":[]},)
+               ~s("extras":[{"group":"","headers":[],"id":"api-reference","title":"API Reference"},)
 
       assert content =~
-               ~s({"id":"readme","title":"README","group":"","headers":[{"id":"Header sample","anchor":"header-sample"},)
+               ~s({"group":"","headers":[{"anchor":"header-sample","id":"Header sample"},{"anchor":"more-than","id":"more &gt; than"}],"id":"readme","title":"README"})
     end
 
     test "containing settext headers while discarding links on header" do
@@ -333,11 +333,11 @@ defmodule ExDoc.Formatter.HTMLTest do
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
 
       assert content =~
-               ~s("extras":[{"id":"api-reference","title":"API Reference","group":"","headers":[]},)
+                ~s("extras":[{"group":"","headers":[],"id":"api-reference","title":"API Reference"},)
 
       assert content =~
-               ~s({"id":"extrapagewithsettextheader","title":"Extra Page Title","group":"",) <>
-                 ~s("headers":[{"id":"Section One","anchor":"section-one"},{"id":"Section Two","anchor":"section-two"}]}])
+                ~s({"group":"","headers":[{"anchor":"section-one","id":"Section One"},{"anchor":"section-two","id":"Section Two"}],") <>
+                ~s(id":"extrapagewithsettextheader","title":"Extra Page Title"}])
     end
 
     test "with custom names" do
@@ -357,7 +357,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       content = File.read!("#{output_dir()}/readme.html")
       assert content =~ ~r{<title>Getting Started — Elixir v1.0.1</title>}
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
-      assert content =~ ~r{"id":"readme","title":"Getting Started","group":""}
+      assert content =~ ~r{"group":"","headers":\[[^\]]+\],"id":"readme","title":"Getting Started"}
     end
 
     test "with custom groups" do
@@ -368,7 +368,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       generate_docs(doc_config(extra_config))
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
-      assert content =~ ~r{"id":"readme","title":"README","group":"Intro"}
+      assert content =~ ~r{"group":"Intro","headers":\[[^\]]+\],"id":"readme","title":"README"}
     end
 
     test "with auto-extracted titles" do

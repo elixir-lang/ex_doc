@@ -1,6 +1,5 @@
 defmodule ExDoc.CLITest do
   use ExUnit.Case, async: true
-
   import ExUnit.CaptureIO
 
   defp run(args) do
@@ -9,34 +8,6 @@ defmodule ExDoc.CLITest do
 
   test "minimum command-line options" do
     assert {"ExDoc", "1.2.3", [source_beam: "/"]} == run(["ExDoc", "1.2.3", "/"])
-  end
-
-  test "loading config" do
-    File.write!("test.config", ~s([extras: ["README.md"]]))
-
-    {project, version, opts} =
-      run(["ExDoc", "--extra-section", "Guides", "1.2.3", "...", "-c", "test.config"])
-
-    assert project == "ExDoc"
-    assert version == "1.2.3"
-    assert Enum.sort(opts) == [extra_section: "Guides", extras: ["README.md"], source_beam: "..."]
-  after
-    File.rm!("test.config")
-  end
-
-  test "config does not exists" do
-    assert_raise File.Error,
-                 fn -> run(["ExDoc", "1.2.3", "...", "-c", "test.config"]) end
-  end
-
-  test "config must be a keyword list" do
-    File.write!("test.config", ~s(%{"extras" => "README.md"}))
-
-    assert_raise RuntimeError, ~S(expected a keyword list from config file: "test.config"), fn ->
-      run(["ExDoc", "1.2.3", "...", "-c", "test.config"])
-    end
-  after
-    File.rm!("test.config")
   end
 
   test "version" do
@@ -66,11 +37,11 @@ defmodule ExDoc.CLITest do
   end
 
   test "arguments that are not aliased" do
-    File.write!("not_aliased.config", ~s([key: "val"]))
+    File.write!("not_aliased.exs", ~s([key: "val"]))
 
     args = ~w(
       ExDoc 1.2.3 ebin
-      --config not_aliased.config
+      --config not_aliased.exs
       --output html
       --formatter html
       --source-root ./
@@ -100,6 +71,43 @@ defmodule ExDoc.CLITest do
              source_url: "http://example.com/username/project"
            ]
   after
-    File.rm!("not_aliased.config")
+    File.rm!("not_aliased.exs")
+  end
+
+  describe ".exs config" do
+    test "loading" do
+      File.write!("test.exs", ~s([extras: ["README.md"]]))
+
+      {project, version, opts} =
+        run(["ExDoc", "--extra-section", "Guides", "1.2.3", "...", "-c", "test.exs"])
+
+      assert project == "ExDoc"
+      assert version == "1.2.3"
+
+      assert Enum.sort(opts) == [
+               extra_section: "Guides",
+               extras: ["README.md"],
+               source_beam: "..."
+             ]
+    after
+      File.rm!("test.exs")
+    end
+
+    test "missing" do
+      assert_raise File.Error,
+                   fn -> run(["ExDoc", "1.2.3", "...", "-c", "test.exs"]) end
+    end
+
+    test "invalid" do
+      File.write!("test.exs", ~s(%{"extras" => "README.md"}))
+
+      assert_raise RuntimeError,
+                   ~S(expected a keyword list from config file: "test.exs"),
+                   fn ->
+                     run(["ExDoc", "1.2.3", "...", "-c", "test.exs"])
+                   end
+    after
+      File.rm!("test.exs")
+    end
   end
 end
