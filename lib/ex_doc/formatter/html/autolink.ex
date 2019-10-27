@@ -466,36 +466,26 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         multiple_arities? and not arities_sorted?(arities) ->
           all
 
-        multiple_arities? and
-            Enum.all?(arities, fn a -> "#{prefix}#{enc(function)}/#{a}" in locals end) ->
+        Enum.all?(arities, fn a -> "#{prefix}#{function}/#{a}" in locals end) ->
           "[#{text}](##{prefix}#{enc(function)}/#{first_arity})"
 
-        multiple_arities? and
-            Enum.all?(arities, fn a -> "#{prefix}#{module}.#{enc(function)}/#{a}" in docs_refs end) ->
+        Enum.all?(arities, fn a -> "#{prefix}#{module}.#{function}/#{a}" in docs_refs end) ->
           "[#{text}](#{module}#{extension}##{prefix}#{enc(function)}/#{first_arity})"
-
-        multiple_arities? and
-            Enum.all?(arities, fn a -> "#{enc(function)}/#{a}" in @kernel_function_strings end) ->
-          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc(function)}/#{first_arity})"
 
         match in locals ->
           "[#{text}](##{prefix}#{enc(function)}/#{first_arity})"
 
-        match in docs_refs ->
-          "[#{text}](#{module}#{extension}##{prefix}#{enc(function)}/#{first_arity})"
+        Enum.all?(arities, fn a -> "#{function}/#{a}" in @kernel_function_strings end) ->
+          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc(function)}/#{first_arity})"
+
+        Enum.all?(arities, fn a -> "#{function}/#{a}" in @special_form_strings end) ->
+          "[#{text}](#{elixir_docs}Kernel.SpecialForms#{extension}##{prefix}#{enc(function)}/#{first_arity})"
 
         match in @basic_type_strings ->
           "[#{text}](#{basic_types_page_for(elixir_docs, extension)})"
 
         match in @built_in_type_strings ->
           "[#{text}](#{built_in_types_page_for(elixir_docs, extension)})"
-
-        match in @kernel_function_strings ->
-          "[#{text}](#{elixir_docs}Kernel#{extension}##{prefix}#{enc(function)}/#{first_arity})"
-
-        match in @special_form_strings ->
-          "[#{text}](#{elixir_docs}Kernel.SpecialForms" <>
-            "#{extension}##{prefix}#{enc(function)}/#{first_arity})"
 
         module in modules_refs ->
           maybe_warn(text, match, module_id, id, skip_warnings_on)
