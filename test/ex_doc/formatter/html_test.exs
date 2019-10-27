@@ -333,11 +333,11 @@ defmodule ExDoc.Formatter.HTMLTest do
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
 
       assert content =~
-                ~s("extras":[{"group":"","headers":[],"id":"api-reference","title":"API Reference"},)
+               ~s("extras":[{"group":"","headers":[],"id":"api-reference","title":"API Reference"},)
 
       assert content =~
-                ~s({"group":"","headers":[{"anchor":"section-one","id":"Section One"},{"anchor":"section-two","id":"Section Two"}],") <>
-                ~s(id":"extrapagewithsettextheader","title":"Extra Page Title"}])
+               ~s({"group":"","headers":[{"anchor":"section-one","id":"Section One"},{"anchor":"section-two","id":"Section Two"}],") <>
+                 ~s(id":"extrapagewithsettextheader","title":"Extra Page Title"}])
     end
 
     test "with custom names" do
@@ -357,7 +357,9 @@ defmodule ExDoc.Formatter.HTMLTest do
       content = File.read!("#{output_dir()}/readme.html")
       assert content =~ ~r{<title>Getting Started — Elixir v1.0.1</title>}
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
-      assert content =~ ~r{"group":"","headers":\[[^\]]+\],"id":"readme","title":"Getting Started"}
+
+      assert content =~
+               ~r{"group":"","headers":\[[^\]]+\],"id":"readme","title":"Getting Started"}
     end
 
     test "with custom groups" do

@@ -221,7 +221,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       content = create_sidebar_items(%{modules: nodes}, [])
 
-      assert content =~ ~r("modules":\[\{"group":"","id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
+      assert content =~
+               ~r("modules":\[\{"group":"","id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
+
       assert content =~ ~r("key":"example-functions".*"example/2")ms
       refute content =~ ~r("key":"legacy".*"example/2")ms
       refute content =~ ~r("key":"functions".*"example/2")ms
