@@ -7,7 +7,7 @@
   overflow: hidden;
 
   .gradient {
-    background: linear-gradient(rgba(55,63,82,1), rgba(55,63,82,0));
+    background: linear-gradient(fade(@darkGray, 1), fade(@darkGray, 0));
     height: 20px;
     margin-top: -20px;
     pointer-events: none;
@@ -129,7 +129,7 @@
       &.selected,
       &:hover a,
       &.selected a {
-        border-color: @purple;
+        border-color: @main;
         color: @white;
       }
     }
@@ -140,7 +140,7 @@
 
     &.selected .search-button,
     .search-button:hover {
-      color: @purple;
+      color: @main;
       opacity: 1;
     }
 
