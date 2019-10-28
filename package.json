@@ -11,8 +11,7 @@
   "scripts": {
     "lint": "npx eslint \"./assets/js/**/*.js\"",
     "test": "npx karma start ./assets/karma.conf.js --single-run",
-    "watch": "webpack --config ./assets/webpack/development.js --watch",
-    "build": "webpack --config ./assets/webpack/production.js"
+    "build": "webpack --config ./assets/webpack.js"
   },
   "repository": {
     "type": "git",
@@ -30,10 +29,10 @@
     "@babel/core": "^7.0.1",
     "@babel/preset-env": "^7.0.0",
     "@babel/runtime": "^7.0.0",
-    "autoprefixer": "^9.1.5",
+    "autoprefixer": "^9.7.0",
     "babel-eslint": "^9.0.0",
     "babel-loader": "^8.0.2",
-    "clean-webpack-plugin": "^0.1.19",
+    "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^1.0.0",
     "eslint": "^5.6.0",
     "eslint-config-standard": "^12.0.0",
@@ -61,7 +60,7 @@
     "lodash.find": "^4.6.0",
     "lodash.throttle": "^4.1.1",
     "lunr": "^2.3.5",
-    "mini-css-extract-plugin": "^0.4.2",
+    "mini-css-extract-plugin": "^0.8.0",
     "mocha": "^5.2.0",
     "normalize.css": "^8.0.0",
     "optimize-css-assets-webpack-plugin": "^5.0.1",

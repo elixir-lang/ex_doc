@@ -10,7 +10,7 @@
       <meta name="author" content="<%= Enum.join(config.authors, ", ") %>">
     <% end %>
     <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
-    <link rel="stylesheet" href="<%= asset_rev config.output, "dist/html*.css" %>" />
+    <link rel="stylesheet" href="<%= asset_rev config.output, "dist/elixir*.css" %>" />
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
@@ -18,7 +18,7 @@
     <%= if config.javascript_config_path do %>
       <script src="<%= config.javascript_config_path %>"></script>
     <% end %>
-    <script async src="<%= asset_rev config.output, "dist/html*.js" %>"></script>
+    <script async src="<%= asset_rev config.output, "dist/app*.js" %>"></script>
     <%# Extra content specified by the user (e.g. custom CSS) %>
     <%= config.before_closing_head_tag.(:html) %>
   </head>

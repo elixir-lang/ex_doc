@@ -25,10 +25,6 @@ Lint all JavaScript files using [ESLint].
 
 Run all the available JavaScript tests using [Karma].
 
-### `watch`
-
-Builds JavaScript and CSS on file changes for each format.
-
 ## Webpack
 
 Internally we use [Webpack]. We also use [Less] for organizing stylesheets.

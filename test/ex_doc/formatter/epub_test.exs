@@ -117,8 +117,8 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{oebps_dir}/readme.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.Nested.xhtml")
-    assert "#{dist_dir}/epub*.css" |> Path.wildcard() |> List.first() |> File.regular?()
-    assert "#{dist_dir}/epub*.js" |> Path.wildcard() |> List.first() |> File.regular?()
+    assert [_] = Path.wildcard("#{dist_dir}/app*.js")
+    assert [_] = Path.wildcard("#{dist_dir}/elixir*.css")
   end
 
   test "generates all listing files" do
