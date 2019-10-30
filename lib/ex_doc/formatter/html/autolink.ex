@@ -245,23 +245,22 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   def do_typespec(string, typespecs, aliases, lib_dirs, extension) do
-    regex = ~r/(((:[a-z][_a-zA-Z]+\.)|([A-Z][_a-zA-Z\.]+)))?(\w+)(\(.*\))/
+    regex = ~r/((?:((?:\:[a-z][_a-zA-Z0-9]*)|(?:[A-Z][_a-zA-Z0-9]*(?:\.[A-Z][_a-zA-Z0-9]*)*))\.)?(\w+))(\(.*\))/
 
-    Regex.replace(regex, string, fn _, _, module_string, _, _, name_string, rest ->
+    Regex.replace(regex, string, fn _all, call_string, module_string, name_string, rest ->
       name = String.to_atom(name_string)
-      arity = count_args(rest)
-      module = if module_string != "", do: module_string |> String.trim_trailing(".") |> module()
+      arity = count_args(rest, 0, 0)
+      module = if module_string != "", do: module_string |> module()
       url = url(module, name, arity, typespecs, aliases, lib_dirs, extension)
 
       if url do
-        ~s[<a href="#{url}">#{enc(module_string)}#{h(name_string)}</a>]
+        ~s[<a href="#{url}">#{h(call_string)}</a>]
       else
-        module_string <> name_string
+        call_string
       end <> do_typespec(rest, typespecs, aliases, lib_dirs, extension)
     end)
   end
 
-  defp count_args(rest), do: count_args(rest, 0, 0)
   defp count_args("()" <> _, 0, 0), do: 0
   defp count_args("(" <> rest, counter, acc), do: count_args(rest, counter + 1, acc)
   defp count_args("[" <> rest, counter, acc), do: count_args(rest, counter + 1, acc)
@@ -666,10 +665,9 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   defp re(:m, :elixir) do
     ~r{
       (
-        (?:Elixir.)?                 # optional Elixir prefix (not part of the module itself)
-        ((?:[A-Z][_a-zA-Z0-9]*\.?)+) # then start with uppercase letter, followed by letter, number or underscore
+        (?:Elixir.)?   # optional Elixir prefix (not part of the module itself)
+        ((?:[A-Z][_a-zA-Z0-9]*(?:\.[A-Z][_a-zA-Z0-9]*)*))
       )
-      (?<!\.)                        # it must not end with a "."
     }x
   end
 

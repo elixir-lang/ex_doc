@@ -547,6 +547,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert Autolink.typespec(:t, quote(do: t() :: bar(foo(1))), []) ==
                ~s[t() :: bar(foo(1))]
+
+      assert Autolink.typespec(:t, quote(do: t() :: foo(bar(), bar())), foo: 2) ==
+               ~s[t() :: <a href="#t:foo/2">foo</a>(bar(), bar())]
     end
 
     test "autolinks same type and function name" do
