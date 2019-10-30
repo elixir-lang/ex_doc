@@ -245,7 +245,8 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   end
 
   def do_typespec(string, typespecs, aliases, lib_dirs, extension) do
-    regex = ~r/((?:((?:\:[a-z][_a-zA-Z0-9]*)|(?:[A-Z][_a-zA-Z0-9]*(?:\.[A-Z][_a-zA-Z0-9]*)*))\.)?(\w+))(\(.*\))/
+    regex =
+      ~r/((?:((?:\:[a-z][_a-zA-Z0-9]*)|(?:[A-Z][_a-zA-Z0-9]*(?:\.[A-Z][_a-zA-Z0-9]*)*))\.)?(\w+))(\(.*\))/
 
     Regex.replace(regex, string, fn _all, call_string, module_string, name_string, rest ->
       name = String.to_atom(name_string)
