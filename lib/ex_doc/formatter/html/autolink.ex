@@ -194,16 +194,16 @@ defmodule ExDoc.Formatter.HTML.Autolink do
 
     typespecs =
       for typespec <- module.typespecs do
-        %{typespec | spec: typespec(typespec.spec, locals, aliases, lib_dirs, extension)}
+        spec = typespec(typespec.name, typespec.spec, locals, aliases, lib_dirs, extension)
+        %{typespec | spec: spec}
       end
 
     docs =
-      for module_node <- module.docs do
-        %{
-          module_node
-          | specs:
-              Enum.map(module_node.specs, &typespec(&1, locals, aliases, lib_dirs, extension))
-        }
+      for node <- module.docs do
+        specs =
+          Enum.map(node.specs, &typespec(node.name, &1, locals, aliases, lib_dirs, extension))
+
+        %{node | specs: specs}
       end
 
     %{module | typespecs: typespecs, docs: docs}
@@ -216,141 +216,114 @@ defmodule ExDoc.Formatter.HTML.Autolink do
   the locals given by `typespecs` as HTML.
   """
   def typespec(
+        name,
         ast,
         typespecs,
         aliases \\ [],
         lib_dirs \\ default_lib_dirs(),
         extension \\ ".html"
       ) do
-    {formatted, placeholders} =
-      format_and_extract_typespec_placeholders(ast, typespecs, aliases, lib_dirs, extension)
+    string =
+      ast
+      |> Macro.to_string()
+      |> Code.format_string!(line_length: 80)
+      |> IO.iodata_to_binary()
 
-    replace_placeholders(formatted, placeholders)
+    name = Atom.to_string(name)
+    {name, rest} = split_name(string, name)
+    name <> do_typespec(rest, typespecs, aliases, lib_dirs, extension)
   end
 
-  @doc false
-  def format_and_extract_typespec_placeholders(
-        ast,
-        typespecs,
-        aliases,
-        lib_dirs,
-        extension \\ ".html"
-      ) do
-    ref = make_ref()
-    elixir_docs = get_elixir_docs(aliases, lib_dirs)
-
-    {formatted_ast, placeholders} =
-      Macro.prewalk(ast, %{}, fn
-        {:"::", _, [{name, meta, args}, right]}, placeholders
-        when is_atom(name) and is_list(args) ->
-          {{:"::", [], [{{ref, name}, meta, args}, right]}, placeholders}
-
-        # Consume this form so that we don't autolink `foo` in `foo :: bar`
-        {{^ref, name}, _, args}, placeholders when is_atom(name) and is_list(args) ->
-          {{name, [], args}, placeholders}
-
-        {name, _, args} = form, placeholders when is_atom(name) and is_list(args) ->
-          ensure_no_placeholder!(name)
-          arity = length(args)
-
-          cond do
-            {name, arity} in @basic_types ->
-              url = basic_types_page_for(elixir_docs, extension)
-              put_placeholder(form, url, placeholders)
-
-            {name, arity} in @built_in_types ->
-              url = built_in_types_page_for(elixir_docs, extension)
-              put_placeholder(form, url, placeholders)
-
-            {name, arity} in typespecs ->
-              n = enc("#{name}")
-              url = "#t:#{n}/#{arity}"
-              put_placeholder(form, url, placeholders)
-
-            true ->
-              {form, placeholders}
-          end
-
-        {{:., _, [alias, name]}, _, args} = form, placeholders
-        when is_atom(name) and is_list(args) ->
-          ensure_no_placeholder!(name)
-          alias = expand_alias(alias)
-
-          if source = get_source(alias, aliases, lib_dirs) do
-            url = type_remote_url(source, alias, name, args, extension)
-            put_placeholder(form, url, placeholders)
-          else
-            {form, placeholders}
-          end
-
-        form, placeholders ->
-          {form, placeholders}
-      end)
-
-    {format_ast(formatted_ast), placeholders}
+  # extract out function name so we don't process it. This is to avoid linking it when there's
+  # a type with the same name
+  defp split_name(string, name) do
+    if String.starts_with?(string, name) do
+      {name, binary_part(string, byte_size(name), byte_size(string) - byte_size(name))}
+    else
+      {"", string}
+    end
   end
 
-  defp type_remote_url(@erlang_docs = source, module, name, _args, _extension) do
+  def do_typespec(string, typespecs, aliases, lib_dirs, extension) do
+    regex = ~r/(((:[a-z][_a-zA-Z]+\.)|([A-Z][_a-zA-Z\.]+)))?(\w+)(\(.*\))/
+
+    Regex.replace(regex, string, fn _, _, module_string, _, _, name_string, rest ->
+      name = String.to_atom(name_string)
+      arity = count_args(rest)
+      module = if module_string != "", do: module_string |> String.trim_trailing(".") |> module()
+      url = url(module, name, arity, typespecs, aliases, lib_dirs, extension)
+
+      if url do
+        ~s[<a href="#{url}">#{enc(module_string)}#{h(name_string)}</a>]
+      else
+        module_string <> name_string
+      end <> do_typespec(rest, typespecs, aliases, lib_dirs, extension)
+    end)
+  end
+
+  defp count_args(rest), do: count_args(rest, 0, 0)
+  defp count_args("()" <> _, 0, 0), do: 0
+  defp count_args("(" <> rest, counter, acc), do: count_args(rest, counter + 1, acc)
+  defp count_args("[" <> rest, counter, acc), do: count_args(rest, counter + 1, acc)
+  defp count_args("{" <> rest, counter, acc), do: count_args(rest, counter + 1, acc)
+  defp count_args(")" <> _, 1, acc), do: acc + 1
+  defp count_args(")" <> rest, counter, acc), do: count_args(rest, counter - 1, acc)
+  defp count_args("]" <> rest, counter, acc), do: count_args(rest, counter - 1, acc)
+  defp count_args("}" <> rest, counter, acc), do: count_args(rest, counter - 1, acc)
+  defp count_args("," <> rest, 1, acc), do: count_args(rest, 1, acc + 1)
+  defp count_args(<<_>> <> rest, counter, acc), do: count_args(rest, counter, acc)
+  defp count_args("", _counter, acc), do: acc
+
+  defp module(string) do
+    if String.starts_with?(string, ":") do
+      string |> String.trim_leading(":") |> String.to_atom()
+    else
+      Module.concat([string])
+    end
+  end
+
+  # local
+  defp url(nil, name, arity, typespecs, aliases, lib_dirs, extension) do
+    cond do
+      {name, arity} in typespecs ->
+        "#t:#{name}/#{arity}"
+
+      {name, arity} in @basic_types ->
+        elixir_docs = get_elixir_docs(aliases, lib_dirs)
+        basic_types_page_for(elixir_docs, extension)
+
+      {name, arity} in @built_in_types ->
+        elixir_docs = get_elixir_docs(aliases, lib_dirs)
+        built_in_types_page_for(elixir_docs, extension)
+
+      true ->
+        nil
+    end
+  end
+
+  # remote
+  defp url(module, name, arity, _typespecs, aliases, lib_dirs, extension) do
+    cond do
+      module in aliases ->
+        external_url("", module, name, arity, extension)
+
+      source = get_source(module, aliases, lib_dirs) ->
+        external_url(source, module, name, arity, extension)
+
+      true ->
+        nil
+    end
+  end
+
+  defp external_url(@erlang_docs, module, name, _arity, _extension) do
     module = enc("#{module}")
     name = enc("#{name}")
-    "#{source}#{module}.html#type-#{name}"
+    "#{@erlang_docs}#{module}.html#type-#{name}"
   end
 
-  defp type_remote_url(source, alias, name, args, extension) do
+  defp external_url(source, module, name, arity, extension) do
     name = enc("#{name}")
-    "#{source}#{enc(inspect(alias))}#{extension}#t:#{name}/#{length(args)}"
-  end
-
-  defp typespec_string_to_link(string, url) do
-    {string_to_link, _string_with_parens} = split_string_to_link(string)
-    ~s[<a href="#{url}">#{h(string_to_link)}</a>]
-  end
-
-  defp put_placeholder(form, url, placeholders) do
-    string = Macro.to_string(form)
-    link = typespec_string_to_link(string, url)
-
-    case Enum.find(placeholders, fn {_key, value} -> value == link end) do
-      {placeholder, _} ->
-        form = put_elem(form, 0, placeholder)
-        {form, placeholders}
-
-      nil ->
-        count = map_size(placeholders) + 1
-        placeholder = placeholder(string, count)
-        form = put_elem(form, 0, placeholder)
-        {form, Map.put(placeholders, placeholder, link)}
-    end
-  end
-
-  defp placeholder(string, count) do
-    [name | _] = String.split(string, "(", trim: true)
-    name_size = String.length(name)
-    int_size = count |> Integer.digits() |> length()
-    markers_size = 3
-    pad = String.duplicate("x", max(name_size - int_size - markers_size, 1))
-    :"eX#{pad}#{count}_"
-  end
-
-  defp ensure_no_placeholder!(name) when is_atom(name) do
-    if String.starts_with?(Atom.to_string(name), "eXx") do
-      raise "typespec cannot contain `eXx` because it is used as marker for autolinking"
-    end
-  end
-
-  defp replace_placeholders(string, placeholders) do
-    Regex.replace(
-      ~r"eXx*\d+_"u,
-      string,
-      &Map.fetch!(placeholders, String.to_atom(&1))
-    )
-  end
-
-  defp format_ast(ast) do
-    ast
-    |> Macro.to_string()
-    |> Code.format_string!(line_length: 80)
-    |> IO.iodata_to_binary()
+    "#{source}#{enc(inspect(module))}#{extension}#t:#{name}/#{arity}"
   end
 
   # Helper function for autolinking functions and modules.
@@ -665,17 +638,6 @@ defmodule ExDoc.Formatter.HTML.Autolink do
         lib_dirs
     end
   end
-
-  defp split_string_to_link(string) do
-    case :binary.split(string, "(") do
-      [head, tail] -> {head, "(" <> tail}
-      [head] -> {head, ""}
-    end
-  end
-
-  defp expand_alias({:__aliases__, _, [h | t]}) when is_atom(h), do: Module.concat([h | t])
-  defp expand_alias(atom) when is_atom(atom), do: atom
-  defp expand_alias(_), do: nil
 
   defp get_source(alias, aliases, lib_dirs) do
     cond do
