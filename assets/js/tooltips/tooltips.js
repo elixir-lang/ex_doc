@@ -9,7 +9,7 @@ import tooltipLayoutTemplate from '../templates/tooltip-layout.handlebars'
 // Constants
 // ---------
 const footerSelector = 'footer' // `Enable/Disable tooltips` button will be displayed in the footer
-const tooltipActivators = '.content a code, .detail-header .specs a' // Elements that can activate the tooltip
+const tooltipActivators = '.content a, .detail-header .specs a' // Elements that can activate the tooltip
 const tooltipSelector = '#tooltip' // Tooltip root
 const tooltipIframeSelector = '#tooltip .tooltip-iframe' // Iframe inisde the tooltip, will be used to load external pages
 const contentInner = 'body .content-inner' // Element containing the documentation text
@@ -31,6 +31,7 @@ const typesCategories = [
 const tooltipsToggleSelector = '.tooltips-toggle' // `Enable/Disable tooltips` button
 const tooltipsDisabledStorageKey = 'tooltipsDisabled' // Local Storage key Used to store tooltips settings
 const moduleContentHash = '#content' // Hash included in links pointing to module pages
+const iframePermissions = 'allow-scripts allow-same-origin' // Minimal permissions needed for the iframe to run JavaScript and communicate with the tooltip
 
 let tooltipElement = null // Will store the jQuery selector for the tooltip root
 let currentLinkElement = null // Element that the cursor is hovering over
@@ -230,6 +231,7 @@ function prepareTooltips () {
     currentHintHref = hintHref
     let iframe = $(tooltipIframeSelector).detach()
     iframe.attr('src', hintHref)
+    iframe.attr('sandbox', iframePermissions)
     tooltipElement.append(iframe)
   }
 }
