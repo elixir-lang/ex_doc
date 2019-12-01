@@ -17,7 +17,7 @@ function activateNightMode () {
 
 function deactivateNightMode () {
   body.removeClass(nightMode)
-  try { localStorage.setItem(nightMode, false) } catch (e) { }
+  try { localStorage.removeItem(nightMode) } catch (e) { }
 }
 
 function checkForNightMode () {
@@ -29,7 +29,7 @@ function checkForNightMode () {
         activateNightMode()
       }
     } else if (matchMedia('(prefers-color-scheme: dark)').matches) {
-      activateNightMode()
+      body.addClass(nightMode)
     }
   } catch (e) { }
 }
