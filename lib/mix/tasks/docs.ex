@@ -330,7 +330,7 @@ defmodule Mix.Tasks.Docs do
       |> normalize_main()
       |> normalize_deps()
 
-    generator = generator || options[:generator] || &ExDoc.generate_docs/3
+    generator = generator || options[:generator] || (&ExDoc.generate_docs/3)
 
     for formatter <- get_formatters(options) do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
