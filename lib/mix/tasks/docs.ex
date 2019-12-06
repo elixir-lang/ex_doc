@@ -298,7 +298,7 @@ defmodule Mix.Tasks.Docs do
   @aliases [n: :canonical, f: :formatter, o: :output]
 
   @doc false
-  def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate_docs/3) do
+  def run(args, config \\ Mix.Project.config(), generator \\ nil) do
     {:ok, _} = Application.ensure_all_started(:ex_doc)
     Mix.Task.run("compile")
 
@@ -329,6 +329,8 @@ defmodule Mix.Tasks.Docs do
       |> normalize_source_beam(config)
       |> normalize_main()
       |> normalize_deps()
+
+    generator = generator || options[:generator] || &ExDoc.generate_docs/3
 
     for formatter <- get_formatters(options) do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))

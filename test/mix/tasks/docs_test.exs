@@ -70,6 +70,11 @@ defmodule Mix.Tasks.DocsTest do
              {Application.app_dir(:earmark), "foo"}
   end
 
+  test "allow custom generators" do
+    assert [{"ex_doc", "0.1.0", [formatter: "html", deps: _, source_beam: _, generator: _]}] =
+             Mix.Tasks.Docs.run([], app: :ex_doc, version: "0.1.0", generator: &{&1, &2, &3})
+  end
+
   test "accepts lazy docs" do
     assert [{"ex_doc", "dev", [formatter: "html", deps: _, source_beam: _, main: "another"]}] =
              run([], app: :ex_doc, docs: fn -> [main: "another"] end)
