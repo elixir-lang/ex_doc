@@ -21,7 +21,7 @@ const labels = {
 }
 
 /**
- * Transform an object containing data about a search result and transforms it into a simple
+ * Takes an object containing data about a search result and transforms it into a simple
  * data structure that can be used directly in the autocomplete template.
  *
  * @param {Object} item Result to be serialized
@@ -32,8 +32,8 @@ const labels = {
 function serialize (item, moduleId = null) {
   const isChild = item.category === 'Child'
   const anchor = isChild ? item.anchor : ''
-  const category = isChild ? 'Child' : item.category
-  const description = isChild ? moduleId : null
+  const category = isChild ? 'Child' : 'Module'
+  const description = getDescription(item, isChild, moduleId)
   const label = item.label || null
   const link = anchor ? `${moduleId}.html#${anchor}` : `${moduleId}.html`
 
@@ -63,10 +63,9 @@ function getSuggestions (term = '') {
   const nodes = sidebarNodes
 
   let modules = findIn(nodes.modules, term, 'Module')
-  let exceptions = findIn(nodes.exceptions, term, 'Exception')
   let tasks = findIn(nodes.tasks, term, 'Mix Task')
 
-  let results = [...modules, ...exceptions, ...tasks]
+  let results = [...modules, ...tasks]
 
   results = sort(results)
 
@@ -198,8 +197,16 @@ function findMatchingChildren (elements, parentId, term, key) {
   }, {})
 }
 
+function getDescription(item, isChild, moduleId) {
+  if (isChild) { return moduleId }
+
+  if (item.type === "Exception") { return "Exception" }
+
+  return null
+}
+
 /**
- * How good th
+ * How well search result marches the current query.
  *
  * @param {(Array|null)} match Information about the matched text (returned by String.match()).
  *

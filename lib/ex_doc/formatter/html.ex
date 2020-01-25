@@ -26,8 +26,7 @@ defmodule ExDoc.Formatter.HTML do
     search_items = generate_search_items(project_nodes, extras, config)
 
     nodes_map = %{
-      modules: filter_list(:module, project_nodes),
-      exceptions: filter_list(:exception, project_nodes),
+      modules: filter_list(:module, project_nodes) |> group_exceptions(),
       tasks: filter_list(:task, project_nodes)
     }
 
@@ -47,7 +46,6 @@ defmodule ExDoc.Formatter.HTML do
         generate_search(nodes_map, config) ++
         generate_not_found(nodes_map, config) ++
         generate_list(nodes_map.modules, nodes_map, config) ++
-        generate_list(nodes_map.exceptions, nodes_map, config) ++
         generate_list(nodes_map.tasks, nodes_map, config) ++ generate_index(config)
 
     generate_build(all_files, build)
@@ -392,11 +390,23 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   def filter_list(:module, nodes) do
-    Enum.filter(nodes, &(not (&1.type in [:exception, :task])))
+    Enum.filter(nodes, &(&1.type != :task))
   end
 
   def filter_list(type, nodes) do
     Enum.filter(nodes, &(&1.type == type))
+  end
+
+  @exceptions_group_name "Exceptions"
+  defp group_exceptions(module_nodes) do
+    module_nodes
+    |> Enum.map(fn module_node ->
+      case module_node.type do
+        :exception -> %{module_node | group: @exceptions_group_name}
+        _ -> module_node
+      end
+    end)
+    |> Enum.sort(fn %{type: type}, _ -> type != :exception end)
   end
 
   defp generate_list(nodes, nodes_map, config) do

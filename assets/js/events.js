@@ -16,7 +16,6 @@ import sidebarItemsTemplate from './templates/sidebar-items.handlebars'
 var SIDEBAR_TYPES = [
   '#extras-list',
   '#modules-list',
-  '#exceptions-list',
   '#tasks-list',
   '#search-list'
 ]
