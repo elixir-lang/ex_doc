@@ -33,7 +33,7 @@ function serialize (item, moduleId = null) {
   const isChild = item.category === 'Child'
   const anchor = isChild ? item.anchor : ''
   const category = isChild ? 'Child' : item.category
-  const description = getDescription(item, isChild, moduleId)
+  const description = isChild ? moduleId : null
   const label = item.label || null
   const link = anchor ? `${moduleId}.html#${anchor}` : `${moduleId}.html`
 
@@ -196,23 +196,6 @@ function findMatchingChildren (elements, parentId, term, key) {
 
     return acc
   }, {})
-}
-
-/**
- * Chooses the right description for the given item.
- *
- * @param {Object} item Search result item.
- * @param {boolean} isChild Does this item have a parent module?
- * @param {string} moduleId Id of the parent module.
- *
- * @returns {string} Description for the given item.
- */
-function getDescription (item, isChild, moduleId) {
-  if (isChild) { return moduleId }
-
-  if (isException(item)) { return 'Exception' }
-
-  return null
 }
 
 /**

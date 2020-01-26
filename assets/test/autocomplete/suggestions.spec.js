@@ -130,13 +130,7 @@ describe('getSuggestions', () => {
       expect(firstResult.label).to.eql('type')
     })
 
-    it('marks exceptions with a special description', () => {
-      const firstResult = getSuggestions('My exception')[0]
-
-      expect(firstResult.description).to.eql('Exception')
-    })
-
-    it('for functions, includes module name in the description', () => {
+    it('includes module name in function description', () => {
       const firstResult = getSuggestions('get_by')[0]
 
       expect(firstResult.description).to.eql('Ecto.Repo')
