@@ -32,7 +32,7 @@ const labels = {
 function serialize (item, moduleId = null) {
   const isChild = item.category === 'Child'
   const anchor = isChild ? item.anchor : ''
-  const category = isChild ? 'Child' : 'Module'
+  const category = isChild ? 'Child' : null
   const description = getDescription(item, isChild, moduleId)
   const label = item.label || null
   const link = anchor ? `${moduleId}.html#${anchor}` : `${moduleId}.html`
@@ -44,7 +44,7 @@ function serialize (item, moduleId = null) {
     label: label, // 'Callback' or 'Type' - if set it will be displayed next to the title.
     matchQuality: item.matchQuality, // 0..1 - How well result matches the search term. Higher is better.
     category: category
-    // 'Module', 'Mix Task', 'Exception' or 'Child'.
+    // 'Module', 'Mix Task' or 'Child'.
     // Used to sort the results according to the 'sortingPriority'.
     // 'Child' means an item that belongs to a module (like Function, Callback or Type).
   }
@@ -81,8 +81,8 @@ function getSuggestions (term = '') {
  */
 function sort (items) {
   return items.sort(function (item1, item2) {
-    const weight1 = sortingPriority[item1.category] || -1
-    const weight2 = sortingPriority[item2.category] || -1
+    const weight1 = getSortingPriority(item1)
+    const weight2 = getSortingPriority(item2)
 
     return weight2 - weight1
   }).sort(function (item1, item2) {
@@ -114,7 +114,8 @@ function findIn (elements, term, categoryName) {
         id: element.id,
         match: highlight(titleMatch),
         category: categoryName,
-        matchQuality: matchQuality(titleMatch)
+        matchQuality: matchQuality(titleMatch),
+        group: element.group
       }, element.id)
 
       results.push(parentResult)
@@ -197,12 +198,47 @@ function findMatchingChildren (elements, parentId, term, key) {
   }, {})
 }
 
-function getDescription(item, isChild, moduleId) {
+/**
+ * Chooses the right description for the given item.
+ *
+ * @param {Object} item Search result item.
+ * @param {boolean} isChild Does this item have a parent module?
+ * @param {string} moduleId Id of the parent module.
+ *
+ * @returns {string} Description for the given item.
+ */
+function getDescription (item, isChild, moduleId) {
   if (isChild) { return moduleId }
 
-  if (item.type === "Exception") { return "Exception" }
+  if (isException(item)) { return 'Exception' }
 
   return null
+}
+
+/**
+ * Chooses the right sorting priority for the given item.
+ *
+ * @param {Object} item Search result item.
+ *
+ * @returns {number} Sorting priority for a given item. Higher priority means higher position in search results.
+ */
+function getSortingPriority (item) {
+  if (isException(item)) {
+    return sortingPriority['Exception']
+  }
+
+  return sortingPriority[item.category] || -1
+}
+
+/**
+ * Is the given item an exception?
+ *
+ * @param {Object} item Search result item.
+ *
+ * @returns {boolean}
+ */
+function isException (item) {
+  return item.group === 'Exceptions'
 }
 
 /**

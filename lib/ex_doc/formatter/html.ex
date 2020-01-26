@@ -406,7 +406,7 @@ defmodule ExDoc.Formatter.HTML do
         _ -> module_node
       end
     end)
-    |> Enum.sort(fn %{type: type}, _ -> type != :exception end)
+    |> Enum.sort_by(&(&1.type == :exception))
   end
 
   defp generate_list(nodes, nodes_map, config) do
