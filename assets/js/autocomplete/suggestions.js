@@ -32,7 +32,7 @@ const labels = {
 function serialize (item, moduleId = null) {
   const isChild = item.category === 'Child'
   const anchor = isChild ? item.anchor : ''
-  const category = isChild ? 'Child' : null
+  const category = isChild ? 'Child' : item.category
   const description = getDescription(item, isChild, moduleId)
   const label = item.label || null
   const link = anchor ? `${moduleId}.html#${anchor}` : `${moduleId}.html`
