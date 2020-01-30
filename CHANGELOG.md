@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.21.3
+
+  * Enhancements
+    * [HTML] Make "Exceptions" a module sub-grouping instead of a top-level group
+    * [HTML] Automatically group deprecated modules
+    * [HTML] Rely on `prefers-color-scheme` w/o night mode set
+    * [HTML] Boost title on search results, add fun/arity to title
+    * [mix docs] Initial work on support for multiple languages
+
+  * Bug fixes
+    * [HTML] Many improvements to the search engine
+    * [mix docs] Link to callback docs instead of copying them
+
 ## v0.21.2
 
   * Enhancements
