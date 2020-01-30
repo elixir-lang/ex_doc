@@ -14,17 +14,6 @@
   </section>
 <% end %>
 
-<%= if nodes_map.exceptions != [] do %>
-  <section class="details-list">
-    <h2 id="exceptions" class="section-heading">Exceptions</h2>
-    <div class="summary">
-      <%= for exception_node <- nodes_map.exceptions do
-        api_reference_entry_template(exception_node)
-      end %>
-    </div>
-  </section>
-<% end %>
-
 <%= if nodes_map.tasks != [] do %>
   <section class="details-list">
     <h2 id="tasks" class="section-heading">Mix Tasks</h2>

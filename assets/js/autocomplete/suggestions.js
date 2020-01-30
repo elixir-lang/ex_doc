@@ -21,7 +21,7 @@ const labels = {
 }
 
 /**
- * Transform an object containing data about a search result and transforms it into a simple
+ * Takes an object containing data about a search result and transforms it into a simple
  * data structure that can be used directly in the autocomplete template.
  *
  * @param {Object} item Result to be serialized
@@ -44,7 +44,7 @@ function serialize (item, moduleId = null) {
     label: label, // 'Callback' or 'Type' - if set it will be displayed next to the title.
     matchQuality: item.matchQuality, // 0..1 - How well result matches the search term. Higher is better.
     category: category
-    // 'Module', 'Mix Task', 'Exception' or 'Child'.
+    // 'Module', 'Mix Task' or 'Child'.
     // Used to sort the results according to the 'sortingPriority'.
     // 'Child' means an item that belongs to a module (like Function, Callback or Type).
   }
@@ -63,10 +63,9 @@ function getSuggestions (term = '') {
   const nodes = sidebarNodes
 
   let modules = findIn(nodes.modules, term, 'Module')
-  let exceptions = findIn(nodes.exceptions, term, 'Exception')
   let tasks = findIn(nodes.tasks, term, 'Mix Task')
 
-  let results = [...modules, ...exceptions, ...tasks]
+  let results = [...modules, ...tasks]
 
   results = sort(results)
 
@@ -82,8 +81,8 @@ function getSuggestions (term = '') {
  */
 function sort (items) {
   return items.sort(function (item1, item2) {
-    const weight1 = sortingPriority[item1.category] || -1
-    const weight2 = sortingPriority[item2.category] || -1
+    const weight1 = getSortingPriority(item1)
+    const weight2 = getSortingPriority(item2)
 
     return weight2 - weight1
   }).sort(function (item1, item2) {
@@ -115,7 +114,8 @@ function findIn (elements, term, categoryName) {
         id: element.id,
         match: highlight(titleMatch),
         category: categoryName,
-        matchQuality: matchQuality(titleMatch)
+        matchQuality: matchQuality(titleMatch),
+        group: element.group
       }, element.id)
 
       results.push(parentResult)
@@ -199,7 +199,33 @@ function findMatchingChildren (elements, parentId, term, key) {
 }
 
 /**
- * How good th
+ * Chooses the right sorting priority for the given item.
+ *
+ * @param {Object} item Search result item.
+ *
+ * @returns {number} Sorting priority for a given item. Higher priority means higher position in search results.
+ */
+function getSortingPriority (item) {
+  if (isException(item)) {
+    return sortingPriority['Exception']
+  }
+
+  return sortingPriority[item.category] || -1
+}
+
+/**
+ * Is the given item an exception?
+ *
+ * @param {Object} item Search result item.
+ *
+ * @returns {boolean}
+ */
+function isException (item) {
+  return item.group === 'Exceptions'
+}
+
+/**
+ * How well search result marches the current query.
  *
  * @param {(Array|null)} match Information about the matched text (returned by String.match()).
  *

@@ -164,7 +164,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp logo_path(%{logo: nil}), do: nil
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
 
-  defp sidebar_type(:exception), do: "exceptions"
+  defp sidebar_type(:exception), do: "modules"
   defp sidebar_type(:extra), do: "extras"
   defp sidebar_type(:module), do: "modules"
   defp sidebar_type(:behaviour), do: "modules"

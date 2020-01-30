@@ -215,6 +215,15 @@ defmodule ExDoc.Formatter.HTMLTest do
              ~r{"id":"Common\.Nesting\.Prefix\.Bar","nested_context":"Common\.Nesting\.Prefix","nested_title":"Bar","title":"Common\.Nesting\.Prefix\.Bar"}ms
   end
 
+  test "groups exceptions" do
+    generate_docs(doc_config())
+
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+
+    assert content =~
+             ~r{"group":"Exceptions","id":"RandomError","title":"RandomError"}ms
+  end
+
   describe "generates logo" do
     test "overriding previous entries" do
       File.mkdir_p!("#{output_dir()}/assets")
@@ -302,7 +311,6 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~s("modules":[])
-      assert content =~ ~s("exceptions":[])
 
       assert content =~
                ~s("extras":[{"group":"","headers":[],"id":"api-reference","title":"API Reference"},)

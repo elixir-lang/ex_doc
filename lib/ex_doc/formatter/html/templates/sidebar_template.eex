@@ -46,10 +46,6 @@
       <li><a id="modules-list" href="#full-list">Modules</a></li>
     <% end %>
 
-    <%= if nodes_map.exceptions != [] do %>
-      <li><a id="exceptions-list" href="#full-list">Exceptions</a></li>
-    <% end %>
-
     <%= if nodes_map.tasks != [] do %>
       <li><a id="tasks-list" href="#full-list">Mix Tasks</a></li>
     <% end %>

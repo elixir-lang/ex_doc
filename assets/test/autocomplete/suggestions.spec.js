@@ -3,11 +3,12 @@ import {getSuggestions} from '../../js/autocomplete/suggestions'
 describe('getSuggestions', () => {
   before(() => {
     window.sidebarNodes = {
-      exceptions: [{
-        id: 'My exception',
-        title: 'My exception'
-      }],
       modules: [
+        {
+          id: 'My exception',
+          title: 'My exception',
+          group: 'Exceptions'
+        },
         {
           id: 'Map',
           title: 'Map',
@@ -62,6 +63,7 @@ describe('getSuggestions', () => {
       expect(getSuggestions('Map').length).to.eql(1)
       expect(getSuggestions('Ecto.Repo').length).to.eql(1)
       expect(getSuggestions('phx.server').length).to.eql(1)
+      expect(getSuggestions('My exception').length).to.eql(1)
     })
 
     it('returns matching functions, callbacks and types', () => {
@@ -82,6 +84,7 @@ describe('getSuggestions', () => {
     })
 
     it('is case insensitive', () => {
+      expect(getSuggestions('My ExCePtIoN').length).to.eql(1)
       expect(getSuggestions('My ExCePtIoN')).to.eql(getSuggestions('my exception'))
     })
 
@@ -125,6 +128,12 @@ describe('getSuggestions', () => {
       const firstResult = getSuggestions('has_many')[0]
 
       expect(firstResult.label).to.eql('type')
+    })
+
+    it('includes module name in function description', () => {
+      const firstResult = getSuggestions('get_by')[0]
+
+      expect(firstResult.description).to.eql('Ecto.Repo')
     })
 
     it('generates a link for each suggestion', () => {
