@@ -134,23 +134,22 @@ defmodule ExDoc.Retriever do
     {title, id} = module_title_and_id(module_data)
     {nested_title, nested_context} = nesting_info(title, config.nest_modules_by_prefix)
 
-    node =
-      %ExDoc.ModuleNode{
-        id: id,
-        title: title,
-        nested_title: nested_title,
-        nested_context: nested_context,
-        module: module,
-        type: module_data.type,
-        deprecated: metadata[:deprecated],
-        function_groups: function_groups,
-        docs: Enum.sort_by(docs, &{&1.name, &1.arity}),
-        doc: moduledoc,
-        doc_line: doc_line,
-        typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
-        source_path: source_path,
-        source_url: source_link(source, line)
-      }
+    node = %ExDoc.ModuleNode{
+      id: id,
+      title: title,
+      nested_title: nested_title,
+      nested_context: nested_context,
+      module: module,
+      type: module_data.type,
+      deprecated: metadata[:deprecated],
+      function_groups: function_groups,
+      docs: Enum.sort_by(docs, &{&1.name, &1.arity}),
+      doc: moduledoc,
+      doc_line: doc_line,
+      typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
+      source_path: source_path,
+      source_url: source_link(source, line)
+    }
 
     put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
   end

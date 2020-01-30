@@ -10,7 +10,9 @@ defmodule ExDoc.GroupMatcherTest do
 
       assert match_module(patterns, %{module: MyApp.SomeModule, id: "MyApp.SomeModule"}) == :Group
       assert match_module(patterns, %{module: :lists, id: ":lists"}) == :Group
-      assert match_module(patterns, %{module: MyApp.SomeOtherModule, id: "MyApp.SomeOtherModule"}) == nil
+
+      assert match_module(patterns, %{module: MyApp.SomeOtherModule, id: "MyApp.SomeOtherModule"}) ==
+               nil
     end
 
     test "it can match modules by their string names" do
@@ -20,7 +22,9 @@ defmodule ExDoc.GroupMatcherTest do
 
       assert match_module(patterns, %{module: MyApp.SomeModule, id: "MyApp.SomeModule"}) == :Group
       assert match_module(patterns, %{module: :lists, id: ":lists"}) == :Group
-      assert match_module(patterns, %{module: MyApp.SomeOtherModule, id: "MyApp.SomeOtherModule"}) == nil
+
+      assert match_module(patterns, %{module: MyApp.SomeOtherModule, id: "MyApp.SomeOtherModule"}) ==
+               nil
     end
 
     test "it can match modules by regular expressions" do
@@ -29,8 +33,14 @@ defmodule ExDoc.GroupMatcherTest do
       ]
 
       assert match_module(patterns, %{module: MyApp.SomeModule, id: "MyApp.SomeModule"}) == :Group
-      assert match_module(patterns, %{module: MyApp.SomeOtherModule, id: "MyApp.SomeOtherModule"}) == :Group
-      assert match_module(patterns, %{module: MyAppWeb.SomeOtherModule, id: "MyAppWeb.SomeOtherModule"}) == nil
+
+      assert match_module(patterns, %{module: MyApp.SomeOtherModule, id: "MyApp.SomeOtherModule"}) ==
+               :Group
+
+      assert match_module(patterns, %{
+               module: MyAppWeb.SomeOtherModule,
+               id: "MyAppWeb.SomeOtherModule"
+             }) == nil
     end
   end
 
