@@ -132,26 +132,27 @@ defmodule ExDoc.Retriever do
     docs = function_docs ++ get_callbacks(module_data, source)
     types = get_types(module_data, source)
     {title, id} = module_title_and_id(module_data)
-    module_group = GroupMatcher.match_module(config.groups_for_modules, module, id)
     {nested_title, nested_context} = nesting_info(title, config.nest_modules_by_prefix)
 
-    %ExDoc.ModuleNode{
-      id: id,
-      title: title,
-      nested_title: nested_title,
-      nested_context: nested_context,
-      module: module_data.name,
-      group: module_group,
-      type: module_data.type,
-      deprecated: metadata[:deprecated],
-      function_groups: function_groups,
-      docs: Enum.sort_by(docs, &{&1.name, &1.arity}),
-      doc: moduledoc,
-      doc_line: doc_line,
-      typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
-      source_path: source_path,
-      source_url: source_link(source, line)
-    }
+    node =
+      %ExDoc.ModuleNode{
+        id: id,
+        title: title,
+        nested_title: nested_title,
+        nested_context: nested_context,
+        module: module,
+        type: module_data.type,
+        deprecated: metadata[:deprecated],
+        function_groups: function_groups,
+        docs: Enum.sort_by(docs, &{&1.name, &1.arity}),
+        doc: moduledoc,
+        doc_line: doc_line,
+        typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
+        source_path: source_path,
+        source_url: source_link(source, line)
+      }
+
+    put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
   end
 
   # Module Helpers

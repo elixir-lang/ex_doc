@@ -15,13 +15,16 @@ defmodule ExDoc.GroupMatcher do
   @doc """
   Finds a matching group for the given module name or id.
   """
-  @spec match_module(group_patterns, module(), String.t()) :: atom() | nil
-  def match_module(group_patterns, module, id) do
+  @spec match_module(group_patterns, ExDoc.ModuleNode.t()) :: atom() | nil
+  def match_module(group_patterns, node) do
+    %{id: id, module: module} = node
+
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do
         %Regex{} = regex -> Regex.match?(regex, id)
         string when is_binary(string) -> id == string
-        atom -> atom == module
+        atom when is_atom(atom) -> atom == module
+        function when is_function(function) -> function.(node)
       end
     end)
   end
