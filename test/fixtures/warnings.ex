@@ -3,6 +3,8 @@ defmodule Warnings do
   `Warnings.bar/0`
   """
 
+  @moduledoc deprecated: "Use something without warnings"
+
   @typedoc """
   `Warnings.bar/0`
   """

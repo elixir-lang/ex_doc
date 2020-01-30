@@ -6,12 +6,20 @@ defmodule ExDoc.RetrieverTest do
   defp docs_from_files(names, config \\ []) do
     files = Enum.map(names, fn n -> "test/tmp/Elixir.#{n}.beam" end)
 
-    default = %ExDoc.Config{
-      source_url_pattern: "http://example.com/%{path}#L%{line}",
-      source_root: File.cwd!()
-    }
+    config =
+      ExDoc.build_config(
+        "foobar",
+        "0.1",
+        Keyword.merge(
+          [
+            source_url_pattern: "http://example.com/%{path}#L%{line}",
+            source_root: File.cwd!()
+          ],
+          config
+        )
+      )
 
-    Retriever.docs_from_files(files, struct(default, config))
+    Retriever.docs_from_files(files, config)
   end
 
   describe "docs_from_dir" do
@@ -229,6 +237,14 @@ defmodule ExDoc.RetrieverTest do
     test "are properly tagged" do
       [module_node] = docs_from_files(["RandomError"])
       assert module_node.type == :exception
+      assert module_node.group == :Exceptions
+    end
+  end
+
+  describe "deprecated" do
+    test "are properly tagged" do
+      [module_node] = docs_from_files(["Warnings"])
+      assert module_node.group == :Deprecated
     end
   end
 

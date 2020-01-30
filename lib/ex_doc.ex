@@ -27,9 +27,9 @@ defmodule ExDoc do
     find_formatter(config.formatter).run(docs, config)
   end
 
-  # Builds configuration by merging `options`, and normalizing the options.
+  @doc false
   @spec build_config(String.t(), String.t(), Keyword.t()) :: ExDoc.Config.t()
-  defp build_config(project, vsn, options) do
+  def build_config(project, vsn, options) do
     {output, options} = Keyword.pop(options, :output, "./doc")
     {groups_for_modules, options} = Keyword.pop(options, :groups_for_modules, [])
     {nest_modules_by_prefix, options} = Keyword.pop(options, :nest_modules_by_prefix, [])
