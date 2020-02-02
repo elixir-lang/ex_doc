@@ -10,9 +10,8 @@ import * as helpers from '../helpers'
 
 const resultsCount = 5
 const sortingPriority = {
-  'Module': 3,
-  'Child': 2,
-  'Exception': 1,
+  'Module': 2,
+  'Child': 1,
   'Mix Task': 0
 }
 const labels = {
@@ -81,8 +80,8 @@ function getSuggestions (term = '') {
  */
 function sort (items) {
   return items.sort(function (item1, item2) {
-    const weight1 = getSortingPriority(item1)
-    const weight2 = getSortingPriority(item2)
+    const weight1 = sortingPriority[item1.category] || -1
+    const weight2 = sortingPriority[item2.category] || -1
 
     return weight2 - weight1
   }).sort(function (item1, item2) {
@@ -96,9 +95,9 @@ function sort (items) {
 /**
  * Finds matching results in a list of elements.
  *
- * @param {Object[]} elements Array containing information about modules/exceptions/tasks.
+ * @param {Object[]} elements Array containing information about modules/tasks.
  * @param {string} term Text we are searching form
- * @param {string} category "Module"/"Exception"/"Mix Task" - category that elements belong to.
+ * @param {string} category "Module"/"Mix Task" - category that elements belong to.
  *
  * @returns {Object[]} List of elements matching the provided term.
  */
@@ -196,32 +195,6 @@ function findMatchingChildren (elements, parentId, term, key) {
 
     return acc
   }, {})
-}
-
-/**
- * Chooses the right sorting priority for the given item.
- *
- * @param {Object} item Search result item.
- *
- * @returns {number} Sorting priority for a given item. Higher priority means higher position in search results.
- */
-function getSortingPriority (item) {
-  if (isException(item)) {
-    return sortingPriority['Exception']
-  }
-
-  return sortingPriority[item.category] || -1
-}
-
-/**
- * Is the given item an exception?
- *
- * @param {Object} item Search result item.
- *
- * @returns {boolean}
- */
-function isException (item) {
-  return item.group === 'Exceptions'
 }
 
 /**
