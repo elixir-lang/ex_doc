@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <title><%= page.title %> - <%= config.project %> v<%= config.version %></title>
-    <meta name="generator" content="ExDoc v<%= ExDoc.version %>" />
+    <meta name="generator" content="ExDoc v<%= ExDoc.version() %>" />
     <link type="text/css" rel="stylesheet" href="<%= H.asset_rev "#{config.output}/OEBPS", "dist/elixir*.css" %>" />
     <script src="<%= H.asset_rev "#{config.output}/OEBPS", "dist/app*.js" %>"></script>
     <%# Extra content specified by the user (e.g. custom CSS) %>
