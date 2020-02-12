@@ -1,15 +1,10 @@
 defmodule ExDoc.Config do
   @moduledoc false
 
-  @default_formatter "html"
   @default_source_ref "master"
 
   def default_source_ref do
     @default_source_ref
-  end
-
-  def default_formatter do
-    @default_formatter
   end
 
   def before_closing_head_tag(_), do: ""
@@ -25,7 +20,7 @@ defmodule ExDoc.Config do
             extra_section: nil,
             extras: [],
             filter_prefix: nil,
-            formatter: @default_formatter,
+            formatter: "html",
             groups_for_extras: [],
             groups_for_modules: [],
             groups_for_functions: [],
