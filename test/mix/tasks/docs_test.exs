@@ -10,8 +10,10 @@ defmodule Mix.Tasks.DocsTest do
   end
 
   test "inflects values from app and version" do
-    assert [{"ex_doc", "0.1.0", [formatter: "html", deps: _, source_beam: _]}] =
-             run([], app: :ex_doc, version: "0.1.0")
+    assert [
+             {"ex_doc", "0.1.0", [formatter: "html", deps: _, source_beam: _]},
+             {"ex_doc", "0.1.0", [formatter: "epub", deps: _, source_beam: _]}
+           ] = run([], app: :ex_doc, version: "0.1.0")
   end
 
   test "accepts multiple formatters from CLI" do
@@ -29,33 +31,45 @@ defmodule Mix.Tasks.DocsTest do
   end
 
   test "uses the given name" do
-    assert [{"ExDoc", "0.1.0", [formatter: "html", deps: _, source_beam: _]}] =
-             run([], app: :ex_doc, version: "0.1.0", name: "ExDoc")
+    assert [
+             {"ExDoc", "0.1.0", [formatter: "html", deps: _, source_beam: _]},
+             {"ExDoc", "0.1.0", [formatter: "epub", deps: _, source_beam: _]}
+           ] = run([], app: :ex_doc, version: "0.1.0", name: "ExDoc")
   end
 
   test "accepts modules in :main" do
-    assert [{"ex_doc", "dev", [formatter: "html", deps: _, main: "Sample", source_beam: _]}] =
-             run([], app: :ex_doc, docs: [main: Sample])
+    assert [
+             {"ex_doc", "dev", [formatter: "html", deps: _, main: "Sample", source_beam: _]},
+             {"ex_doc", "dev", [formatter: "epub", deps: _, main: "Sample", source_beam: _]}
+           ] = run([], app: :ex_doc, docs: [main: Sample])
   end
 
   test "accepts files in :main" do
-    assert [{"ex_doc", "dev", [formatter: "html", deps: _, source_beam: _, main: "another"]}] =
-             run([], app: :ex_doc, docs: [main: "another"])
+    assert [
+             {"ex_doc", "dev", [formatter: "html", deps: _, source_beam: _, main: "another"]},
+             {"ex_doc", "dev", [formatter: "epub", deps: _, source_beam: _, main: "another"]}
+           ] = run([], app: :ex_doc, docs: [main: "another"])
   end
 
   test "accepts output in :output" do
-    assert [{"ex_doc", "dev", [formatter: "html", deps: _, source_beam: _, output: "hello"]}] =
-             run([], app: :ex_doc, docs: [output: "hello"])
+    assert [
+             {"ex_doc", "dev", [formatter: "html", deps: _, source_beam: _, output: "hello"]},
+             {"ex_doc", "dev", [formatter: "epub", deps: _, source_beam: _, output: "hello"]}
+           ] = run([], app: :ex_doc, docs: [output: "hello"])
   end
 
   test "parses output with lower preference than options" do
-    assert [{"ex_doc", "dev", [formatter: "html", deps: _, source_beam: _, output: "world"]}] =
-             run(~w(-o world), app: :ex_doc, docs: [output: "world"])
+    assert [
+             {"ex_doc", "dev", [formatter: "html", deps: _, source_beam: _, output: "world"]},
+             {"ex_doc", "dev", [formatter: "epub", deps: _, source_beam: _, output: "world"]}
+           ] = run(~w(-o world), app: :ex_doc, docs: [output: "world"])
   end
 
   test "includes dependencies" do
-    assert [{"ex_doc", "dev", [formatter: "html", deps: deps, source_beam: _]}] =
-             run([], app: :ex_doc, docs: [])
+    assert [
+             {"ex_doc", "dev", [formatter: "html", deps: deps, source_beam: _]},
+             {"ex_doc", "dev", [formatter: "epub", deps: deps, source_beam: _]}
+           ] = run([], app: :ex_doc, docs: [])
 
     assert List.keyfind(deps, Application.app_dir(:earmark), 0) ==
              {Application.app_dir(:earmark),
@@ -63,16 +77,20 @@ defmodule Mix.Tasks.DocsTest do
   end
 
   test "allows custom dependency paths" do
-    assert [{"ex_doc", "dev", [formatter: "html", deps: deps, source_beam: _]}] =
-             run([], app: :ex_doc, docs: [deps: [earmark: "foo"]])
+    assert [
+             {"ex_doc", "dev", [formatter: "html", deps: deps, source_beam: _]},
+             {"ex_doc", "dev", [formatter: "epub", deps: deps, source_beam: _]}
+           ] = run([], app: :ex_doc, docs: [deps: [earmark: "foo"]])
 
     assert List.keyfind(deps, Application.app_dir(:earmark), 0) ==
              {Application.app_dir(:earmark), "foo"}
   end
 
   test "accepts lazy docs" do
-    assert [{"ex_doc", "dev", [formatter: "html", deps: _, source_beam: _, main: "another"]}] =
-             run([], app: :ex_doc, docs: fn -> [main: "another"] end)
+    assert [
+             {"ex_doc", "dev", [formatter: "html", deps: _, source_beam: _, main: "another"]},
+             {"ex_doc", "dev", [formatter: "epub", deps: _, source_beam: _, main: "another"]}
+           ] = run([], app: :ex_doc, docs: fn -> [main: "another"] end)
   end
 
   test "accepts options from root" do
@@ -81,6 +99,14 @@ defmodule Mix.Tasks.DocsTest do
              {"ExDoc", "1.2.3-dev",
               [
                 formatter: "html",
+                deps: _,
+                source_beam: _,
+                homepage_url: "http://elixir-lang.org",
+                source_url: "https://github.com/elixir-lang/ex_doc"
+              ]},
+             {"ExDoc", "1.2.3-dev",
+              [
+                formatter: "epub",
                 deps: _,
                 source_beam: _,
                 homepage_url: "http://elixir-lang.org",
@@ -95,7 +121,7 @@ defmodule Mix.Tasks.DocsTest do
                version: "1.2.3-dev"
              )
 
-    assert [{"ex_doc", "dev", _}] = run([], app: :ex_doc)
+    assert [{"ex_doc", "dev", _}, {"ex_doc", "dev", _}] = run([], app: :ex_doc)
   end
 
   test "supports umbrella project" do
@@ -104,6 +130,12 @@ defmodule Mix.Tasks.DocsTest do
         {"umbrella", "dev",
          [
            formatter: "html",
+           deps: _,
+           source_beam: _
+         ]},
+        {"umbrella", "dev",
+         [
+           formatter: "epub",
            deps: _,
            source_beam: _
          ]}
@@ -117,6 +149,13 @@ defmodule Mix.Tasks.DocsTest do
         {"umbrella", "dev",
          [
            formatter: "html",
+           deps: _,
+           source_beam: _,
+           ignore_apps: [:foo]
+         ]},
+        {"umbrella", "dev",
+         [
+           formatter: "epub",
            deps: _,
            source_beam: _,
            ignore_apps: [:foo]

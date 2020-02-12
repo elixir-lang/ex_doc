@@ -12,7 +12,8 @@ defmodule Mix.Tasks.Docs do
       rel="canonical" link element, defaults to no canonical path
 
     * `--formatter`, `-f` - Which formatters to use, "html" or
-      "epub", default: "html" (may be given more than once)
+      "epub". This option can be given more than once. By default,
+      both html and epub are generated.
 
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
@@ -339,7 +340,7 @@ defmodule Mix.Tasks.Docs do
 
   defp get_formatters(options) do
     case Keyword.get_values(options, :formatter) do
-      [] -> options[:formatters] || [ExDoc.Config.default_formatter()]
+      [] -> options[:formatters] || ["html", "epub"]
       values -> values
     end
   end
