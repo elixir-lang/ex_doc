@@ -12,7 +12,7 @@ defmodule Mix.Tasks.Docs do
       rel="canonical" link element, defaults to no canonical path
 
     * `--formatter`, `-f` - Which formatters to use, "html" or
-      "epub". This option can be given more than once, by default,
+      "epub". This option can be given more than once. By default,
       both html and epub are generated.
 
     * `--output`, `-o` - Output directory for the generated
