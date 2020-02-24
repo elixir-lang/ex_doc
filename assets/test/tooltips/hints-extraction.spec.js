@@ -44,12 +44,6 @@ describe('hints extraction', () => {
             <span class="icon-code" aria-hidden="true"></span>
             <span class="sr-only">View Source</span>
           </a>
-
-          <div class="specs">
-            <pre>
-              configure(<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()) :: :ok
-            </pre>
-          </div>
         </div>
         <section class="docstring">
           <p>First line of description.</p>
@@ -64,7 +58,6 @@ describe('hints extraction', () => {
       expect(hint.title).to.eql('configure(any)')
       expect(hint.description).to.eql('First line of description.')
       expect(hint.kind).to.eql('function')
-      expect(hint.signatureSpecs).to.eql('configure(any()) :: :ok')
     })
   })
 })
