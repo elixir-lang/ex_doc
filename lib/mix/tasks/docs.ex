@@ -331,10 +331,11 @@ defmodule Mix.Tasks.Docs do
       |> normalize_main()
       |> normalize_deps()
 
+    Mix.shell().info("Generating docs...")
+
     for formatter <- get_formatters(options) do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
-      log(index)
-      index
+      Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{index}"])
     end
   end
 
@@ -353,11 +354,6 @@ defmodule Mix.Tasks.Docs do
       is_nil(docs) -> []
       true -> docs
     end
-  end
-
-  defp log(index) do
-    Mix.shell().info([:green, "Docs successfully generated."])
-    Mix.shell().info([:green, "View them at #{inspect(index)}."])
   end
 
   defp normalize_source_url(options, config) do
