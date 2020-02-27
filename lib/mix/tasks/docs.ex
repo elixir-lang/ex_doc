@@ -335,7 +335,8 @@ defmodule Mix.Tasks.Docs do
 
     for formatter <- get_formatters(options) do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
-      Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{index}"])
+      Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"])
+      index
     end
   end
 
