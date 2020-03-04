@@ -22,7 +22,9 @@ defmodule ExDoc.Mixfile do
   end
 
   def application do
-    []
+    [
+      extra_applications: [:eex, :crypto]
+    ]
   end
 
   defp deps do
