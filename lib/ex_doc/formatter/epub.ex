@@ -14,8 +14,7 @@ defmodule ExDoc.Formatter.EPUB do
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
-    {project_nodes, autolink} =
-      HTML.autolink_and_render(project_nodes, ".xhtml", config, highlight_tag: "samp")
+    project_nodes = HTML.render_all(project_nodes, ".xhtml", config, highlight_tag: "samp")
 
     nodes_map = %{
       modules: HTML.filter_list(:module, project_nodes),
@@ -23,7 +22,7 @@ defmodule ExDoc.Formatter.EPUB do
       tasks: HTML.filter_list(:task, project_nodes)
     }
 
-    extras = config |> HTML.build_extras(autolink) |> group_extras()
+    extras = config |> HTML.build_extras(".xhtml") |> group_extras()
     config = %{config | extras: extras}
 
     assets_dir = "OEBPS/assets"

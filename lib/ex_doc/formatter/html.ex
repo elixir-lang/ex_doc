@@ -1,8 +1,8 @@
 defmodule ExDoc.Formatter.HTML do
   @moduledoc false
 
-  alias __MODULE__.{Assets, Autolink, Templates, SearchItems}
-  alias ExDoc.{Markdown, GroupMatcher}
+  alias __MODULE__.{Assets, Templates, SearchItems}
+  alias ExDoc.{Autolink, Markdown, GroupMatcher}
 
   @main "api-reference"
   @assets_dir "assets"
@@ -18,8 +18,8 @@ defmodule ExDoc.Formatter.HTML do
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
-    {project_nodes, autolink} = autolink_and_render(project_nodes, ".html", config, [])
-    extras = build_extras(config, autolink)
+    project_nodes = render_all(project_nodes, ".html", config, [])
+    extras = build_extras(config, ".html")
 
     # Generate search early on without api reference in extras
     static_files = generate_assets(config, @assets_dir, default_assets(config))
@@ -64,26 +64,68 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Autolinks and renders all docs.
   """
-  def autolink_and_render(project_nodes, ext, config, opts) do
-    autolink = Autolink.compile(project_nodes, ext, config)
+  def render_all(project_nodes, ext, config, opts) do
+    project_nodes
+    |> Enum.map(fn node ->
+      autolink_opts = [
+        app: config.app,
+        current_module: node.module,
+        ext: ext,
+        skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
+        module_id: node.id
+      ]
 
-    rendered =
-      project_nodes
-      |> Autolink.all(autolink)
-      |> Enum.map(fn node ->
-        docs = Enum.map(node.docs, &render_doc(&1, opts))
-        typespecs = Enum.map(node.typespecs, &render_doc(&1, opts))
-        %{render_doc(node, opts) | docs: docs, typespecs: typespecs}
-      end)
+      docs =
+        for child_node <- node.docs do
+          id = id(node, child_node)
+          autolink_opts = [{:id, id} | autolink_opts]
+          specs = Enum.map(child_node.specs, &Autolink.typespec(&1, autolink_opts))
+          child_node = %{child_node | specs: specs}
+          render_doc(child_node, autolink_opts, opts)
+        end
 
-    {rendered, autolink}
+      typespecs =
+        for child_node <- node.typespecs do
+          id = id(node, child_node)
+          autolink_opts = [{:id, id} | autolink_opts]
+          child_node = %{child_node | spec: Autolink.typespec(child_node.spec, autolink_opts)}
+          render_doc(child_node, autolink_opts, opts)
+        end
+
+      id = id(node, nil)
+      %{render_doc(node, [{:id, id} | autolink_opts], opts) | docs: docs, typespecs: typespecs}
+    end)
   end
 
-  defp render_doc(%{doc: nil} = node, _opts),
+  defp render_doc(%{doc: nil} = node, _autolink_opts, _opts),
     do: node
 
-  defp render_doc(%{doc: doc, source_path: file, doc_line: line} = node, opts),
-    do: %{node | rendered_doc: ExDoc.Markdown.to_html(doc, [file: file, line: line + 1] ++ opts)}
+  defp render_doc(%{doc: doc} = node, autolink_opts, opts) do
+    rendered = autolink_and_render(doc, autolink_opts, opts)
+    %{node | rendered_doc: rendered}
+  end
+
+  defp id(%{id: id}, nil), do: id
+  defp id(%{id: mod_id}, %ExDoc.FunctionNode{id: id, type: :callback}), do: "c:#{mod_id}.#{id}"
+  defp id(%{id: mod_id}, %ExDoc.FunctionNode{id: id}), do: "#{mod_id}.#{id}"
+  defp id(%{id: mod_id}, %ExDoc.TypeNode{id: id}), do: "t:#{mod_id}.#{id}"
+
+  defp autolink_and_render(doc, autolink_opts, opts) do
+    doc
+    |> Autolink.doc(autolink_opts)
+    |> ast_to_html()
+    |> IO.iodata_to_binary()
+    |> ExDoc.Highlighter.highlight_code_blocks(opts)
+  end
+
+  defp ast_to_html(list) when is_list(list), do: Enum.map(list, &ast_to_html/1)
+  defp ast_to_html(binary) when is_binary(binary), do: Templates.h(binary)
+
+  defp ast_to_html({tag, attrs, ast}) do
+    attrs = Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
+    ["<#{tag}", attrs, ">", ast_to_html(ast), "</#{tag}>"]
+    ["<#{tag}#{attrs}>", ast_to_html(ast), "</#{tag}>"]
+  end
 
   defp output_setup(build, config) do
     if File.exists?(build) do
@@ -217,35 +259,44 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Builds extra nodes by normalizing the config entries.
   """
-  def build_extras(config, autolink) do
+  def build_extras(config, ext) do
     groups = config.groups_for_extras
 
     config.extras
-    |> Task.async_stream(&build_extra(&1, autolink, groups), timeout: :infinity)
+    |> Task.async_stream(&build_extra(&1, groups, config, ext), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
 
-  defp build_extra({input, options}, autolink, groups) do
+  defp build_extra({input, options}, groups, config, ext) do
     input = to_string(input)
     id = options[:filename] || input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, options[:title], autolink, groups)
+    build_extra(input, id, options[:title], groups, config, ext)
   end
 
-  defp build_extra(input, autolink, groups) do
+  defp build_extra(input, groups, config, ext) do
     id = input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, nil, autolink, groups)
+    build_extra(input, id, nil, groups, config, ext)
   end
 
-  defp build_extra(input, id, title, autolink, groups) do
+  defp build_extra(input, id, title, groups, config, ext) do
+    autolink_opts = [
+      app: config.app,
+      id: id,
+      ext: ext,
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
+    ]
+
     if valid_extension_name?(input) do
-      content =
+      opts = [file: input, line: 1]
+
+      html_content =
         input
         |> File.read!()
-        |> Autolink.project_doc(id, autolink)
+        |> Markdown.to_ast(opts)
+        |> autolink_and_render(autolink_opts, opts)
 
       group = GroupMatcher.match_extra(groups, input)
-      html_content = Markdown.to_html(content, file: input, line: 1)
 
       title = title || extract_title(html_content) || filename_to_title(input)
       %{id: id, title: title, group: group, content: html_content}
@@ -272,7 +323,7 @@ defmodule ExDoc.Formatter.HTML do
     Regex.replace(@tag_regex, header, "")
   end
 
-  @h1_regex ~r/<h1.*?>(.+)<\/h1>/m
+  @h1_regex ~r/<h1.*?>(.+?)<\/h1>/m
   defp extract_title(content) do
     title = Regex.run(@h1_regex, content, capture: :all_but_first)
 

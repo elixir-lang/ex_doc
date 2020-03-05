@@ -16,7 +16,7 @@ defmodule ExDoc.Markdown do
   @doc """
   Converts markdown into HTML.
   """
-  @callback to_html(String.t(), Keyword.t()) :: String.t()
+  @callback to_ast(String.t(), Keyword.t()) :: term()
 
   @markdown_processors [
     ExDoc.Markdown.Earmark
@@ -25,10 +25,10 @@ defmodule ExDoc.Markdown do
   @markdown_processor_key :markdown_processor
 
   @doc """
-  Converts the given markdown document to HTML.
+  Converts the given markdown document to HTML AST.
   """
-  def to_html(text, opts \\ []) when is_binary(text) do
-    get_markdown_processor().to_html(text, opts)
+  def to_ast(text, opts \\ []) when is_binary(text) do
+    get_markdown_processor().to_ast(text, opts)
   end
 
   @doc """

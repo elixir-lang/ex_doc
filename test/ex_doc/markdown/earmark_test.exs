@@ -5,15 +5,14 @@ defmodule ExDoc.Markdown.EarmarkTest do
 
   @moduletag :earmark
 
-  test "to_html generate the HTML from the markdown" do
-    assert Markdown.to_html("# Test\n\nHello", []) =~ ~s(<h1>Test</h1>\n<p>Hello</p>)
-  end
+  describe "to_ast/1" do
+    test "generate AST" do
+      assert Markdown.to_ast("# Test\n\nHello", []) == [{:h1, [], ["Test"]}, {:p, [], ["Hello"]}]
+      assert Markdown.to_ast("[foo](bar)", []) == [{:p, [], [{:a, [href: "bar"], ["foo"]}]}]
+    end
 
-  test "to_html handles empty input" do
-    assert Markdown.to_html("", []) == ""
-  end
-
-  test "to_html does not generate smart quotes by default" do
-    assert Markdown.to_html("\"hi\"", []) =~ "&quot;hi&quot;"
+    test "empty input" do
+      assert Markdown.to_ast("", []) == []
+    end
   end
 end

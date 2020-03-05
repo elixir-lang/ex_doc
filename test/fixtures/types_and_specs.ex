@@ -7,14 +7,12 @@ defmodule TypesAndSpecs do
   Types and tests fixture.
 
   Basic type: `t:atom/0`.
-  Special form: `import/2`.
   """
 
   @typedoc "A public type"
   @type public(t) :: {t, String.t(), Sub.t(), opaque, :ok | :error}
   @typep private :: any
   @opaque opaque :: {Dict.t()}
-  @type ref :: {:binary.part(), public(any)}
   @typedoc false
   @type internal :: any
 

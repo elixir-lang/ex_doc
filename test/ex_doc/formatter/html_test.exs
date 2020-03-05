@@ -30,6 +30,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   defp doc_config do
     [
+      app: :elixir,
       project: "Elixir",
       version: "1.0.1",
       formatter: "html",
@@ -282,16 +283,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~r{<a href="TypesAndSpecs.Sub.html"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
 
       assert content =~
-               ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#is_atom/1"><code(\sclass="inline")?>is_atom/1</code></a>}
-
-      assert content =~
-               ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#==/2"><code(\sclass="inline")?>==/2</code></a>}
-
-      assert content =~
-               ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#===/2"><code(\sclass="inline")?>===</code></a>}
-
-      assert content =~
-               ~r{<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types"><code(\sclass="inline")?>atom/0</code></a>}
+               ~r{<a href="typespecs.html#basic-types"><code(\sclass="inline")?>t:atom/0</code></a>}
 
       assert content =~
                ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code(\sclass="inline")?>mix compile.elixir</code></a>}

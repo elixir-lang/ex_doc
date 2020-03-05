@@ -7,7 +7,7 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.{GroupMatcher}
+  alias ExDoc.{GroupMatcher, Refs, Markdown}
   alias ExDoc.Retriever.Error
 
   @doc """
@@ -82,7 +82,10 @@ defmodule ExDoc.Retriever do
               "For earlier Elixir versions, make sure to depend on {:ex_doc, \"~> 0.18.0\"}"
     end
 
-    case ExDoc.Utils.Code.fetch_docs(module) do
+    result = ExDoc.Utils.Code.fetch_docs(module)
+    Refs.from_chunk(module, result)
+
+    case result do
       {:docs_v1, _, _, _, :hidden, _, _} ->
         false
 
@@ -125,7 +128,7 @@ defmodule ExDoc.Retriever do
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
 
-    {doc_line, moduledoc, metadata} = get_module_docs(module_data)
+    {doc_line, moduledoc, metadata} = get_module_docs(module_data, source_path)
     line = find_module_line(module_data) || doc_line
 
     {function_groups, function_docs} = get_docs(module_data, source, config)
@@ -153,6 +156,11 @@ defmodule ExDoc.Retriever do
 
     put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
   end
+
+  defp doc_ast(_, nil, _options), do: nil
+  defp doc_ast(_, :none, _options), do: nil
+  defp doc_ast("text/markdown", %{"en" => doc}, options), do: Markdown.to_ast(doc, options)
+  defp doc_ast(other, _, _options), do: raise("content type #{inspect(other)} is not supported")
 
   # Module Helpers
 
@@ -190,8 +198,11 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp get_module_docs(%{docs: {:docs_v1, anno, _, _, moduledoc, metadata, _}}) do
-    {anno_line(anno), docstring(moduledoc), metadata}
+  defp get_module_docs(module_data, source_path) do
+    {:docs_v1, anno, _, content_type, moduledoc, metadata, _} = module_data.docs
+    doc_line = anno_line(anno)
+    options = [file: source_path, line: doc_line + 1]
+    {doc_line, doc_ast(content_type, moduledoc, options), metadata}
   end
 
   defp get_abstract_code(module) do
@@ -247,6 +258,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_function(function, source, module_data, groups_for_functions) do
+    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{type, name, arity}, anno, signature, doc, metadata} = function
     actual_def = actual_def(name, arity, type)
     doc_line = anno_line(anno)
@@ -281,12 +293,16 @@ defmodule ExDoc.Retriever do
         filter.(metadata) && group
       end)
 
+    doc_ast =
+      (doc && doc_ast(content_type, %{"en" => doc}, file: source.path, line: doc_line + 1)) ||
+        delegate_doc(metadata[:delegate_to])
+
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
-      doc: doc || delegate_doc(metadata[:delegate_to]),
+      doc: doc_ast,
       doc_line: doc_line,
       defaults: defaults,
       signature: Enum.join(signature, " "),
@@ -300,7 +316,9 @@ defmodule ExDoc.Retriever do
   end
 
   defp delegate_doc(nil), do: nil
-  defp delegate_doc({m, f, a}), do: "See `#{Exception.format_mfa(m, f, a)}`."
+
+  defp delegate_doc({m, f, a}),
+    do: [{:p, [], ["See ", {:code, [], [Exception.format_mfa(m, f, a)]}, "."]}]
 
   defp docstring(:none, name, arity, {:ok, behaviour}) do
     "Callback implementation for `c:#{inspect(behaviour)}.#{name}/#{arity}`."
@@ -316,25 +334,26 @@ defmodule ExDoc.Retriever do
 
   ## Callback helpers
 
-  defp get_callbacks(%{type: :behaviour, name: name, abst_code: abst_code, docs: docs}, source) do
-    {:docs_v1, _, _, _, _, _, docs} = docs
-    optional_callbacks = name.behaviour_info(:optional_callbacks)
+  defp get_callbacks(%{type: :behaviour} = module_data, source) do
+    {:docs_v1, _, _, _, _, _, docs} = module_data.docs
+    optional_callbacks = module_data.name.behaviour_info(:optional_callbacks)
 
     for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in [:callback, :macrocallback] do
-      get_callback(doc, source, optional_callbacks, abst_code)
+      get_callback(doc, source, optional_callbacks, module_data)
     end
   end
 
   defp get_callbacks(_, _), do: []
 
-  defp get_callback(callback, source, optional_callbacks, abst_code) do
+  defp get_callback(callback, source, optional_callbacks, module_data) do
+    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{kind, name, arity}, anno, _, doc, metadata} = callback
     actual_def = actual_def(name, arity, kind)
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
 
     {:attribute, anno, :callback, {^actual_def, specs}} =
-      Enum.find(abst_code, &match?({:attribute, _, :callback, {^actual_def, _}}, &1))
+      Enum.find(module_data.abst_code, &match?({:attribute, _, :callback, {^actual_def, _}}, &1))
 
     line = anno_line(anno) || doc_line
     specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
@@ -342,12 +361,14 @@ defmodule ExDoc.Retriever do
     annotations =
       if actual_def in optional_callbacks, do: ["optional" | annotations], else: annotations
 
+    doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
+
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
-      doc: docstring(doc),
+      doc: doc_ast,
       doc_line: doc_line,
       signature: get_typespec_signature(hd(specs), arity),
       specs: specs,
@@ -389,21 +410,22 @@ defmodule ExDoc.Retriever do
         do: behaviour
   end
 
-  defp get_types(%{docs: docs} = module_data, source) do
-    {:docs_v1, _, _, _, _, _, docs} = docs
+  defp get_types(module_data, source) do
+    {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
     for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
-      get_type(doc, source, module_data.abst_code)
+      get_type(doc, source, module_data)
     end
   end
 
-  defp get_type(type, source, abst_code) do
+  defp get_type(type, source, module_data) do
+    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{_, name, arity}, anno, _, doc, metadata} = type
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
 
     {:attribute, anno, type, spec} =
-      Enum.find(abst_code, fn
+      Enum.find(module_data.abst_code, fn
         {:attribute, _, type, {^name, _, args}} ->
           type in [:opaque, :type] and length(args) == arity
 
@@ -416,6 +438,8 @@ defmodule ExDoc.Retriever do
 
     annotations = if type == :opaque, do: ["opaque" | annotations], else: annotations
 
+    doc_ast = doc_ast(content_type, doc, file: source.path)
+
     %ExDoc.TypeNode{
       id: "#{name}/#{arity}",
       name: name,
@@ -423,7 +447,7 @@ defmodule ExDoc.Retriever do
       type: type,
       spec: spec,
       deprecated: metadata[:deprecated],
-      doc: docstring(doc),
+      doc: doc_ast,
       doc_line: doc_line,
       signature: get_typespec_signature(spec, arity),
       source_path: source.path,

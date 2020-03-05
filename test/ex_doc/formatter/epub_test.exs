@@ -22,6 +22,7 @@ defmodule ExDoc.Formatter.EPUBTest do
 
   defp doc_config do
     [
+      app: :elixir,
       project: "Elixir",
       version: "1.0.1",
       formatter: "epub",

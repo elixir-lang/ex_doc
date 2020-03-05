@@ -10,7 +10,8 @@ defmodule ExDoc.Config do
   def before_closing_head_tag(_), do: ""
   def before_closing_body_tag(_), do: ""
 
-  defstruct api_reference: true,
+  defstruct app: nil,
+            api_reference: true,
             assets: nil,
             before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
             before_closing_body_tag: &__MODULE__.before_closing_body_tag/1,
@@ -44,6 +45,7 @@ defmodule ExDoc.Config do
             skip_undefined_reference_warnings_on: []
 
   @type t :: %__MODULE__{
+          app: atom(),
           api_reference: boolean(),
           assets: nil | String.t(),
           before_closing_head_tag: (atom() -> String.t()),
