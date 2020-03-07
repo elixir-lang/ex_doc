@@ -1,5 +1,4 @@
 exclude = [
-  cmark: not ExDoc.Markdown.Cmark.available?(),
   earmark: not ExDoc.Markdown.Earmark.available?()
 ]
 

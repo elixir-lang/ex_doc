@@ -16,7 +16,6 @@ defmodule ExDoc.Mixfile do
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
       description: "ExDoc is a documentation generation tool for Elixir",
-      xref: [exclude: [Cmark]],
       docs: docs()
     ]
   end
@@ -31,7 +30,6 @@ defmodule ExDoc.Mixfile do
     [
       {:earmark, "~> 1.4"},
       {:makeup_elixir, "~> 0.14"},
-      {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
     ]
   end
@@ -80,7 +78,6 @@ defmodule ExDoc.Mixfile do
       groups_for_modules: [
         Markdown: [
           ExDoc.Markdown,
-          ExDoc.Markdown.Cmark,
           ExDoc.Markdown.Earmark
         ],
         "Formatter API": [
