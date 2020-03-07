@@ -82,7 +82,7 @@ defmodule ExDoc.Retriever do
               "For earlier Elixir versions, make sure to depend on {:ex_doc, \"~> 0.18.0\"}"
     end
 
-    case Code.fetch_docs(module) do
+    case ExDoc.Utils.Code.fetch_docs(module) do
       {:docs_v1, _, _, _, :hidden, _, _} ->
         false
 
