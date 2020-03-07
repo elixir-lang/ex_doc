@@ -12,6 +12,7 @@ defmodule ExDoc.Mixfile do
       aliases: aliases(),
       package: package(),
       escript: escript(),
+      elixirc_paths: elixirc_paths(Mix.env()),
       source_url: "https://github.com/elixir-lang/ex_doc/",
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
@@ -22,7 +23,8 @@ defmodule ExDoc.Mixfile do
 
   def application do
     [
-      extra_applications: [:eex, :crypto]
+      extra_applications: [:eex, :crypto],
+      mod: {ExDoc.Application, []}
     ]
   end
 
@@ -65,6 +67,9 @@ defmodule ExDoc.Mixfile do
       main_module: ExDoc.CLI
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp docs do
     [
