@@ -105,6 +105,9 @@ function hoverStart () {
     currentLinkElement = $(this).parent()
   }
 
+  // Skip tooltips on the permalink icon (the on-hover one next to the function name).
+  if (currentLinkElement.hasClass('detail-link')) { return }
+
   hoverDelayTimeout = setTimeout(function () {
     hideTimeoutVisibility && clearTimeout(hideTimeoutVisibility)
 
