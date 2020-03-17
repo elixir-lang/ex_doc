@@ -4,6 +4,7 @@ defmodule ExDoc.Highlighter do
   """
 
   # If new lexers are available, add them here:
+  # TODO: use language from chunk to pick the default lexer?
   defp pick_language_and_lexer(""), do: {"elixir", Makeup.Lexers.ElixirLexer, []}
 
   defp pick_language_and_lexer(lang) do

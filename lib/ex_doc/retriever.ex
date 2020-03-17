@@ -130,7 +130,7 @@ defmodule ExDoc.Retriever do
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
 
-    {doc_line, moduledoc, metadata} = get_module_docs(module_data, source_path)
+    {language, doc_line, moduledoc, metadata} = get_module_docs(module_data, source_path)
     line = find_module_line(module_data) || doc_line
 
     {function_groups, function_docs} = get_docs(module_data, source, config)
@@ -153,7 +153,8 @@ defmodule ExDoc.Retriever do
       doc_line: doc_line,
       typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
       source_path: source_path,
-      source_url: source_link(source, line)
+      source_url: source_link(source, line),
+      language: language(language)
     }
 
     put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
@@ -164,10 +165,25 @@ defmodule ExDoc.Retriever do
     {first in ?a..?z, name, arity}
   end
 
+  defp language(:elixir), do: ExDoc.Language.Elixir
+  defp language(:erlang), do: ExDoc.Language.Erlang
+
   defp doc_ast(_, nil, _options), do: nil
   defp doc_ast(_, :none, _options), do: nil
   defp doc_ast("text/markdown", %{"en" => doc}, options), do: Markdown.to_ast(doc, options)
+  defp doc_ast("application/erlang+html", %{"en" => doc}, _options), do: fixup_erlang_html(doc)
   defp doc_ast(other, _, _options), do: raise("content type #{inspect(other)} is not supported")
+
+  # TODO: this is only to convert `{attr_name, attr_value :: charlist}` to `{attr_name, attr_value :: binary}`,
+  # this should be done in OTP instead
+  defp fixup_erlang_html(list) when is_list(list), do: Enum.map(list, &fixup_erlang_html/1)
+  defp fixup_erlang_html(binary) when is_binary(binary), do: binary
+
+  defp fixup_erlang_html({tag, attrs, ast}) do
+    new_attrs = for {key, val} <- attrs, do: {key, to_string(val)}
+    new_ast = fixup_erlang_html(ast)
+    {tag, new_attrs, new_ast}
+  end
 
   # Module Helpers
 
@@ -206,10 +222,10 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_module_docs(module_data, source_path) do
-    {:docs_v1, anno, _, content_type, moduledoc, metadata, _} = module_data.docs
+    {:docs_v1, anno, language, content_type, moduledoc, metadata, _} = module_data.docs
     doc_line = anno_line(anno)
     options = [file: source_path, line: doc_line + 1]
-    {doc_line, doc_ast(content_type, moduledoc, options), metadata}
+    {language, doc_line, doc_ast(content_type, moduledoc, options), metadata}
   end
 
   defp get_abstract_code(module) do
@@ -560,7 +576,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp source_path(module, config) do
-    source = String.Chars.to_string(module.__info__(:compile)[:source])
+    source = String.Chars.to_string(module.module_info(:compile)[:source])
 
     if root = config.source_root do
       Path.relative_to(source, root)

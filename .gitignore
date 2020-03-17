@@ -33,3 +33,5 @@ formatters/html/dist/html.js
 
 # Ignore escript when built
 /ex_doc
+
+/otp_docs

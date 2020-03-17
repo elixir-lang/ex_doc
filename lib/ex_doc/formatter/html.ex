@@ -75,6 +75,8 @@ defmodule ExDoc.Formatter.HTML do
         module_id: node.id,
         file: node.source_path,
         line: node.doc_line
+        # TODO: don't hardcode here, get from the chunk instead!
+        language: node.language
       ]
 
       docs =

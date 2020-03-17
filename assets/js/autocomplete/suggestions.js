@@ -171,7 +171,8 @@ function findMatchingChildren (elements, parentId, term, key) {
     if (acc[key + element.id]) { return acc }
 
     // Match "Module.funcion" format.
-    const fullTitle = `${parentId}.${element.id}`
+    // TODO: make configurable
+    const fullTitle = `${parentId}:${element.id}`
     const fullTitleMatch = !(parentId + '.').match(regExp) && fullTitle.match(regExp)
     const match = element.id && element.id.match(regExp)
     let result = JSON.parse(JSON.stringify(element))
@@ -182,7 +183,8 @@ function findMatchingChildren (elements, parentId, term, key) {
     } else if (fullTitleMatch) {
       // When match spans both module and function name (i.e. ">Map.fe<tch")
       // let's return just ">fe<tch" as the title. Module will already be displayed under the title.
-      const lastSegment = term.split('.').pop()
+      // TODO: make configurable
+      const lastSegment = term.split(':').pop()
       const lastSegmentMatcher = new RegExp(helpers.escapeText(lastSegment), 'i')
       const lastSegmentMatch = element.id.match(lastSegmentMatcher)
       result.matchQuality = matchQuality(lastSegmentMatch)
