@@ -686,7 +686,7 @@ defmodule ExDoc.Formatter.HTML.Autolink do
       (
         (?:[a-z_][_a-zA-Z0-9]*[\?\!]?)     # regular function_name
         |                                  # OR
-        [\{\}=&\\|\\.<>~*^@\\+\\%\\!-\/]+  # special_form
+        [\{\}=&\\|\\.:<>~*^@\\+\\%\\!-\/]+ # special_form
       )
     }x
   end

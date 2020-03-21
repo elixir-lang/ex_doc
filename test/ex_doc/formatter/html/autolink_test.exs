@@ -91,6 +91,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert project_doc("`<<>>/1`", %{aliases: [Kernel]}) ==
                "[`<<>>/1`](Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
+
+      assert project_doc("`::/2`", %{aliases: [Kernel]}) ==
+               "[`::/2`](Kernel.SpecialForms.html#::/2)"
     end
 
     test "autolinks Kernel functions" do
@@ -227,6 +230,9 @@ defmodule ExDoc.Formatter.HTML.AutolinkTest do
 
       assert project_doc("`Mod.<<>>/1`", %{docs_refs: ["Mod.<<>>/1"]}) ==
                "[`Mod.<<>>/1`](Mod.html#%3C%3C%3E%3E/1)"
+
+      assert project_doc("`Mod.::/2`", %{docs_refs: ["Mod.::/2"]}) ==
+               "[`Mod.::/2`](Mod.html#::/2)"
     end
 
     test "autolinks callbacks" do
