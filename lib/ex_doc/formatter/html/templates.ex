@@ -132,8 +132,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
         Map.new([group: to_string(module.group)] ++ extra ++ pairs)
       end
+      |> sort_modules()
 
     {id, modules}
+  end
+
+  defp sort_modules(modules) do
+    modules
+    |> Enum.sort_by(fn module -> {module[:nested_context], module[:nested_title]} end)
   end
 
   defp sidebar_entries({group, docs}) do
