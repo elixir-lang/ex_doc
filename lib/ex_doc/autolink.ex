@@ -30,7 +30,6 @@ defmodule ExDoc.Autolink do
 
   def doc(ast, options \\ []) do
     config = struct!(__MODULE__, options)
-
     walk(ast, config)
   end
 
@@ -200,9 +199,21 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp parse_module(string, mode) do
+  defp parse_module(<<first>> <> _ = string, _mode) when first in ?A..?Z do
+    do_parse_module(string)
+  end
+
+  defp parse_module(<<?:>> <> _ = string, :custom_link) do
+    do_parse_module(string)
+  end
+
+  defp parse_module(_, _) do
+    :error
+  end
+
+  defp do_parse_module(string) do
     case Code.string_to_quoted(string, warn_on_unnecessary_quotes: false) do
-      {:ok, module} when mode == :custom_link and is_atom(module) -> {:module, module}
+      {:ok, module} when is_atom(module) -> {:module, module}
       {:ok, {:__aliases__, _, parts}} -> {:module, Module.concat(parts)}
       _ -> :error
     end
