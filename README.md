@@ -126,7 +126,10 @@ ExDoc will automatically generate links across modules and functions if you encl
 
 ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name, such as `` `function/1` ``.
 
-ExDoc also supports linking with a custom text, e.g.: `` [function](`MyModule.function/1`) ``. This also allows to refer to OTP modules, e.g.: `` [`:array`](`:array`) ``.
+You can also use a custom text, e.g.: `` [custom text](`MyModule.function/1`) ``. This also allows to refer to OTP modules, e.g.: `` [`:array`](`:array`) ``.
+
+Link to extra pages like this: `` [Up and running](pages/Up and running.md) ``, the final link
+will be automatically converted to `pages/up-and-running.html`.
 
 ## Contributing
 
