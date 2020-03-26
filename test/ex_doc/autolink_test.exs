@@ -170,10 +170,10 @@ defmodule ExDoc.AutolinkTest do
     end
 
     test "extras" do
-      assert autolinked({:a, [href: "foo.md"], ["Foo"]}) == "foo.html"
+      assert autolinked({:a, [href: "Foo Bar.md"], ["Foo"]}) == "foo-bar.html"
 
-      assert autolinked({:a, [href: "foo.md"], ["Foo"]}, ext: ".xhtml") ==
-               "foo.xhtml"
+      assert autolinked({:a, [href: "Foo Bar.md"], ["Foo"]}, ext: ".xhtml") ==
+               "foo-bar.xhtml"
 
       assert_unchanged({:a, [href: "https://github.com/foo/bar/blob/master/foo.md"], ["Foo"]})
     end
