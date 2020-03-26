@@ -203,16 +203,13 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   test "groups modules by nesting" do
     doc_config()
-    |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix])
+    |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix.B, Common.Nesting.Prefix.B.B])
     |> generate_docs()
 
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
 
     assert content =~
-             ~r{"id":"Common\.Nesting\.Prefix\.Foo","nested_context":"Common\.Nesting\.Prefix","nested_title":"Foo","title":"Common\.Nesting\.Prefix\.Foo"}ms
-
-    assert content =~
-             ~r{"id":"Common\.Nesting\.Prefix\.Bar","nested_context":"Common\.Nesting\.Prefix","nested_title":"Bar","title":"Common\.Nesting\.Prefix\.Bar"}ms
+             ~r/{"group":"","id":"Common\.Nesting\.Prefix\.B\.C","nested_context":"Common\.Nesting\.Prefix\.B","nested_title":"C","title":"Common\.Nesting\.Prefix\.B\.C"},{"group":"","id":"Common\.Nesting\.Prefix\.B\.B\.A","nested_context":"Common\.Nesting\.Prefix\.B\.B","nested_title":"A","title":"Common.Nesting.Prefix\.B\.B\.A"}/ms
   end
 
   describe "generates logo" do
