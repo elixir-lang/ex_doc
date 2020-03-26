@@ -46,9 +46,9 @@ defmodule ExDoc.Autolink do
     ast
   end
 
-  defp walk({:a, attrs, _} = ast, config) do
+  defp walk({:a, attrs, inner} = ast, config) do
     if url = custom_link(attrs, config) do
-      {:a, Keyword.put(attrs, :href, url), ast}
+      {:a, Keyword.put(attrs, :href, url), inner}
     else
       ast
     end
