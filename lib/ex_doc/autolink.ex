@@ -82,10 +82,13 @@ defmodule ExDoc.Autolink do
 
   defp extra_link(attrs, config) do
     with {:ok, href} <- Keyword.fetch(attrs, :href),
-         true <- href == Path.basename(href),
-         ".md" <- Path.extname(href) do
-      without_ext = String.trim_trailing(href, ".md")
-      HTML.text_to_id(without_ext) <> config.ext
+         uri <- URI.parse(href),
+         nil <- uri.host,
+         true <- uri.path == Path.basename(uri.path),
+         ".md" <- Path.extname(uri.path) do
+      without_ext = String.trim_trailing(uri.path, ".md")
+      fragment = (uri.fragment && "#" <> uri.fragment) || ""
+      HTML.text_to_id(without_ext) <> config.ext <> fragment
     else
       _ -> nil
     end
