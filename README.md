@@ -121,10 +121,12 @@ ExDoc will automatically generate links across modules and functions if you encl
 
   * By referring to a module, function, type or callback from your project, such as `` `MyModule` ``, ExDoc will automatically link to those
   * By referring to a module, function, type or callback from Elixir, such as `` `String` ``, ExDoc will automatically link to Elixir's stable documentation
-  * By referring to a module or function from erlang, such as (`` `:erlang` ``), ExDoc will automatically link to the Erlang documentation
+  * By referring to a function, type, or callback from OTP, such as (`` `:queue.new/0` ``), ExDoc will automatically link to the OTP documentation
   * By referring to a module, function, type or callback from any of your dependencies, such as `` `MyDep` ``, ExDoc will automatically link to that dependency documentation on [hexdocs.pm](http://hexdocs.pm/) (the link can be configured by setting `docs: [deps: [my_dep: "https://path/to/docs/"]]` in your `mix.exs`)
 
 ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name, such as `` `function/1` ``.
+
+ExDoc also supports linking with a custom text, e.g.: `` [function](`MyModule.function/1`) ``. This also allows to refer to OTP modules, e.g.: `` [`:array`](`:array`) ``.
 
 ## Contributing
 

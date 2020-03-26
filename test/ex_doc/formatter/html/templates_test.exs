@@ -31,7 +31,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   defp get_module_page(names, config \\ []) do
     config = doc_config(config)
     mods = ExDoc.Retriever.docs_from_modules(names, config)
-    {[mod | _], _} = HTML.autolink_and_render(mods, ".html", config, [])
+    [mod | _] = HTML.render_all(mods, ".html", config, [])
     Templates.module_page(mod, @empty_nodes_map, config)
   end
 
@@ -148,10 +148,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       ## Example:
       """
 
-      assert Templates.synopsis(ExDoc.Markdown.to_html(doc1)) ==
+      assert Templates.synopsis(Earmark.as_html!(doc1)) ==
                "<p>Summaries should not be displayed with trailing semicolons </p>"
 
-      assert Templates.synopsis(ExDoc.Markdown.to_html(doc2)) ==
+      assert Templates.synopsis(Earmark.as_html!(doc2)) ==
                "<p>Example function: Summary should display trailing period :.</p>"
     end
   end
@@ -331,7 +331,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     test "outputs the types and function specs" do
       content = get_module_page([TypesAndSpecs, TypesAndSpecs.Sub])
-      any = ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()]
       integer = ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>()]
 
       public_html =
@@ -340,25 +339,16 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>(), ] <>
           ~S[<a href="#t:opaque/0">opaque</a>(), :ok | :error}]
 
-      ref_html =
-        ~s[ref() :: {<a href="http://www.erlang.org/doc/man/binary.html#type-part">:binary.part</a>(), <a href="#t:public/1">public</a>(#{
-          any
-        })}]
-
       assert content =~ ~s[<a href="#t:public/1">public(t)</a>]
       refute content =~ ~s[<a href="#t:private/0">private</a>]
       assert content =~ public_html
-      assert content =~ ref_html
       refute content =~ ~s[<strong>private\(t\)]
       assert content =~ ~s[A public type]
       assert content =~ ~s[add(#{integer}, <a href="#t:opaque/0">opaque</a>()) :: #{integer}]
       refute content =~ ~s[minus(#{integer}, #{integer}) :: #{integer}]
 
       assert content =~
-               ~s[Basic type: <a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\"><code class=\"inline\">atom/0</code></a>.]
-
-      assert content =~
-               ~s[Special form: <a href=\"https://hexdocs.pm/elixir/Kernel.SpecialForms.html#import/2\"><code class=\"inline\">import/2</code></a>.]
+               ~s[Basic type: <a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\"><code class=\"inline\">t:atom/0</code></a>.]
 
       assert content =~ ~r{opaque/0.*<span class="note">\(opaque\)</span>}ms
     end

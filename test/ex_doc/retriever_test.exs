@@ -12,6 +12,7 @@ defmodule ExDoc.RetrieverTest do
         "0.1",
         Keyword.merge(
           [
+            app: :test_app,
             source_url_pattern: "http://example.com/%{path}#L%{line}",
             source_root: File.cwd!()
           ],
@@ -47,16 +48,14 @@ defmodule ExDoc.RetrieverTest do
       refute module_node.nested_title
       assert module_node.source_url == "http://example.com/test/fixtures/compiled_with_docs.ex#L1"
 
-      assert module_node.doc == """
-             moduledoc
-
-             ## Example ☃ Unicode > escaping
-                 CompiledWithDocs.example
-
-             ### Example H3 heading
-
-             example
-             """
+      assert module_node.doc ==
+               [
+                 {:p, [], ["moduledoc"]},
+                 {:h2, [], ["Example ☃ Unicode > escaping"]},
+                 {:pre, [], [{:code, [], ["CompiledWithDocs.example"]}]},
+                 {:h3, [], ["Example H3 heading"]},
+                 {:p, [], ["example"]}
+               ]
     end
 
     test "returns module group" do
@@ -109,14 +108,14 @@ defmodule ExDoc.RetrieverTest do
         module_node.docs
 
       assert struct.id == "__struct__/0"
-      assert struct.doc == "Some struct"
+      assert struct.doc == [{:p, [], ["Some struct"]}]
       assert struct.type == :function
       assert struct.defaults == []
       assert struct.signature == "%CompiledWithDocs{}"
       assert struct.group == "Functions"
 
       assert example.id == "example/2"
-      assert example.doc == "Some example"
+      assert example.doc == [{:p, [], ["Some example"]}]
       assert example.type == :function
       assert example.defaults == ["example/1"]
       assert example.signature == "example(foo, bar \\\\ Baz)"
@@ -143,11 +142,13 @@ defmodule ExDoc.RetrieverTest do
       assert flatten.type == :function
 
       if Version.match?(System.version(), ">= 1.8.0") do
-        assert flatten.doc == "See `List.flatten/1`."
+        assert flatten.doc == [
+                 {:p, [], ["See ", {:code, [], ["List.flatten/1"]}, "."]}
+               ]
       end
 
       assert is_zero.id == "is_zero/1"
-      assert is_zero.doc == "A simple guard"
+      assert is_zero.doc == [{:p, [], ["A simple guard"]}]
       assert is_zero.type == :macro
       assert is_zero.defaults == []
     end
@@ -174,7 +175,7 @@ defmodule ExDoc.RetrieverTest do
 
     test "returns the spec info for each non-private module type" do
       [module_node] = docs_from_files(["TypesAndSpecs"])
-      [opaque, public, ref] = module_node.typespecs
+      [opaque, public] = module_node.typespecs
 
       assert opaque.name == :opaque
       assert opaque.arity == 0
@@ -187,18 +188,11 @@ defmodule ExDoc.RetrieverTest do
       assert public.arity == 1
       assert public.id == "public/1"
       assert public.type == :type
-      assert public.doc == "A public type"
+      assert public.doc == [{:p, [], ["A public type"]}]
       assert public.signature == "public(t)"
 
       assert Macro.to_string(public.spec) ==
                "public(t) :: {t, String.t(), TypesAndSpecs.Sub.t(), opaque(), :ok | :error}"
-
-      assert ref.name == :ref
-      assert ref.arity == 0
-      assert ref.id == "ref/0"
-      assert ref.type == :type
-      assert ref.signature == "ref()"
-      assert Macro.to_string(ref.spec) == "ref() :: {:binary.part(), public(any())}"
     end
 
     test "returns the source when source_root set to nil" do
@@ -288,11 +282,27 @@ defmodule ExDoc.RetrieverTest do
       docs = module_node.docs
       assert Enum.map(docs, & &1.id) == ["bye/1", "greet/1", "hello/1"]
 
-      assert Enum.at(docs, 0).doc == "Callback implementation for `c:CustomBehaviourTwo.bye/1`."
+      assert Enum.at(docs, 0).doc == [
+               {:p, [],
+                [
+                  "Callback implementation for ",
+                  {:code, [class: "inline"], ["c:CustomBehaviourTwo.bye/1"]},
+                  "."
+                ]}
+             ]
 
-      assert Enum.at(docs, 1).doc == "A doc so it doesn't use 'Callback implementation for'"
+      assert Enum.at(docs, 1).doc == [
+               {:p, [], ["A doc so it doesn't use 'Callback implementation for'"]}
+             ]
 
-      assert Enum.at(docs, 2).doc == "Callback implementation for `c:CustomBehaviourOne.hello/1`."
+      assert Enum.at(docs, 2).doc == [
+               {:p, [],
+                [
+                  "Callback implementation for ",
+                  {:code, [class: "inline"], ["c:CustomBehaviourOne.hello/1"]},
+                  "."
+                ]}
+             ]
     end
   end
 

@@ -47,9 +47,20 @@ defmodule ExDoc.CLI do
     opts =
       opts
       |> Keyword.put(:source_beam, source_beam)
+      |> Keyword.put(:app, app(source_beam))
       |> merge_config()
 
     generator.(project, version, opts)
+  end
+
+  defp app(source_beam) do
+    case Path.wildcard(Path.join([source_beam, "*.app"])) do
+      [path] ->
+        path |> Path.basename(".app") |> String.to_atom()
+
+      _ ->
+        raise "cannot find .app file in #{inspect(source_beam)}"
+    end
   end
 
   defp merge_config(opts) do

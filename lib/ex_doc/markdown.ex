@@ -9,41 +9,26 @@ defmodule ExDoc.Markdown do
   ExDoc supports the following Markdown parsers out of the box:
 
     * [Earmark](http://github.com/pragdave/earmark)
-    * [Cmark](https://github.com/asaaki/cmark.ex)
 
   ExDoc uses Earmark by default.
-
-  ### Using cmark
-
-  [Cmark](https://github.com/jgm/cmark) is a CommonMark parser written in C.
-  To use cmark, add the Elixir NIF wrapper [cmark.ex](https://github.com/asaaki/cmark.ex)
-  as a dependency to your project:
-
-      {:cmark, "~> 0.6", only: :dev}
-
-  And then update your project configuration to use Cmark:
-
-      docs: [markdown_processor: ExDoc.Markdown.Cmark]
-
   """
 
   @doc """
   Converts markdown into HTML.
   """
-  @callback to_html(String.t(), Keyword.t()) :: String.t()
+  @callback to_ast(String.t(), Keyword.t()) :: term()
 
   @markdown_processors [
-    ExDoc.Markdown.Earmark,
-    ExDoc.Markdown.Cmark
+    ExDoc.Markdown.Earmark
   ]
 
   @markdown_processor_key :markdown_processor
 
   @doc """
-  Converts the given markdown document to HTML.
+  Converts the given markdown document to HTML AST.
   """
-  def to_html(text, opts \\ []) when is_binary(text) do
-    get_markdown_processor().to_html(text, opts)
+  def to_ast(text, opts \\ []) when is_binary(text) do
+    get_markdown_processor().to_ast(text, opts)
   end
 
   @doc """
@@ -81,9 +66,6 @@ defmodule ExDoc.Markdown do
 
     * Add {:earmark, ">= 0.0.0"} to your mix.exs deps
       to use an Elixir-based markdown processor
-
-    * Add {:cmark, ">= 0.5"} to your mix.exs deps
-      to use another C-based markdown processor
     """
   end
 end

@@ -12,18 +12,19 @@ defmodule ExDoc.Mixfile do
       aliases: aliases(),
       package: package(),
       escript: escript(),
+      elixirc_paths: elixirc_paths(Mix.env()),
       source_url: "https://github.com/elixir-lang/ex_doc/",
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
       description: "ExDoc is a documentation generation tool for Elixir",
-      xref: [exclude: [Cmark]],
       docs: docs()
     ]
   end
 
   def application do
     [
-      extra_applications: [:eex, :crypto]
+      extra_applications: [:eex, :crypto],
+      mod: {ExDoc.Application, []}
     ]
   end
 
@@ -31,7 +32,6 @@ defmodule ExDoc.Mixfile do
     [
       {:earmark, "~> 1.4"},
       {:makeup_elixir, "~> 0.14"},
-      {:cmark, "~> 0.5", only: :test},
       {:excoveralls, "~> 0.3", only: :test}
     ]
   end
@@ -68,6 +68,9 @@ defmodule ExDoc.Mixfile do
     ]
   end
 
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   defp docs do
     [
       main: "readme",
@@ -80,7 +83,6 @@ defmodule ExDoc.Mixfile do
       groups_for_modules: [
         Markdown: [
           ExDoc.Markdown,
-          ExDoc.Markdown.Cmark,
           ExDoc.Markdown.Earmark
         ],
         "Formatter API": [

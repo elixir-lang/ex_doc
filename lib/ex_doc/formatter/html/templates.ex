@@ -82,7 +82,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   @doc false
   def h(binary) do
-    escape_map = [{"&", "&amp;"}, {"<", "&lt;"}, {">", "&gt;"}, {~S("), "&quot;"}]
+    escape_map = [
+      {"&", "&amp;"},
+      {"<", "&lt;"},
+      {">", "&gt;"},
+      {~S("), "&quot;"}
+    ]
 
     Enum.reduce(escape_map, binary, fn {pattern, escape}, acc ->
       String.replace(acc, pattern, escape)

@@ -322,6 +322,7 @@ defmodule Mix.Tasks.Docs do
     options =
       config
       |> get_docs_opts()
+      |> Keyword.put(:app, config[:app])
       |> Keyword.merge(cli_opts)
       # accepted at root level config
       |> normalize_source_url(config)
