@@ -72,8 +72,7 @@ defmodule ExDoc.Formatter.HTML do
         current_module: node.module,
         ext: ext,
         skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-        module_id: node.id,
-        extras: config.extras
+        module_id: node.id
       ]
 
       docs =
@@ -285,8 +284,7 @@ defmodule ExDoc.Formatter.HTML do
       app: config.app,
       id: id,
       ext: ext,
-      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-      extras: config.extras
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
     ]
 
     if valid_extension_name?(input) do

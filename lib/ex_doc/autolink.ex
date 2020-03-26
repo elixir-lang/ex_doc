@@ -13,19 +13,16 @@ defmodule ExDoc.Autolink do
   # * `:ext` - the extension (`".html"`, "`.xhtml"`, etc)
   #
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
-  #
-  # * `:extras` - extras paths
   defstruct [
     :app,
     :current_module,
     :module_id,
     :id,
     ext: ".html",
-    skip_undefined_reference_warnings_on: [],
-    extras: []
+    skip_undefined_reference_warnings_on: []
   ]
 
-  alias ExDoc.Formatter.HTML, as: HTML
+  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates, as: T
   alias ExDoc.Refs
 
@@ -85,9 +82,10 @@ defmodule ExDoc.Autolink do
 
   defp extra_link(attrs, config) do
     with {:ok, href} <- Keyword.fetch(attrs, :href),
-         true <- href in config.extras do
-      basename = Path.basename(href, ".md")
-      HTML.text_to_id(basename) <> config.ext
+         true <- href == Path.basename(href),
+         ".md" <- Path.extname(href) do
+      without_ext = String.trim_trailing(href, ".md")
+      HTML.text_to_id(without_ext) <> config.ext
     else
       _ -> nil
     end

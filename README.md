@@ -128,8 +128,8 @@ ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.fu
 
 You can also use a custom text, e.g.: `` [custom text](`MyModule.function/1`) ``. This also allows to refer to OTP modules, e.g.: `` [`:array`](`:array`) ``.
 
-Link to extra pages like this: `` [Up and running](pages/Up and running.md) ``, the final link
-will be automatically converted to `pages/up-and-running.html`.
+Link to extra pages like this: `` [Up and running](Up and running.md) `` (skipping the directory
+the page is in), the final link will be automatically converted to `up-and-running.html`.
 
 ## Contributing
 
