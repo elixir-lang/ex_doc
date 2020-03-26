@@ -22,6 +22,7 @@ defmodule ExDoc.Autolink do
     skip_undefined_reference_warnings_on: []
   ]
 
+  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates, as: T
   alias ExDoc.Refs
 
@@ -46,10 +47,15 @@ defmodule ExDoc.Autolink do
   end
 
   defp walk({:a, attrs, inner} = ast, config) do
-    if url = custom_link(attrs, config) do
-      {:a, Keyword.put(attrs, :href, url), inner}
-    else
-      ast
+    cond do
+      url = custom_link(attrs, config) ->
+        {:a, Keyword.put(attrs, :href, url), inner}
+
+      url = extra_link(attrs, config) ->
+        {:a, Keyword.put(attrs, :href, url), inner}
+
+      true ->
+        ast
     end
   end
 
@@ -69,6 +75,17 @@ defmodule ExDoc.Autolink do
     with {:ok, href} <- Keyword.fetch(attrs, :href),
          [[_, text]] <- Regex.scan(~r/^`(.+)`$/, href) do
       url(text, :custom_link, config)
+    else
+      _ -> nil
+    end
+  end
+
+  defp extra_link(attrs, config) do
+    with {:ok, href} <- Keyword.fetch(attrs, :href),
+         true <- href == Path.basename(href),
+         ".md" <- Path.extname(href) do
+      without_ext = String.trim_trailing(href, ".md")
+      HTML.text_to_id(without_ext) <> config.ext
     else
       _ -> nil
     end
