@@ -178,6 +178,8 @@ defmodule ExDoc.AutolinkTest do
       assert autolinked({:a, [href: "Foo Bar.md#baz"], ["Foo"]}) == "foo-bar.html#baz"
 
       assert_unchanged({:a, [href: "https://github.com/foo/bar/blob/master/foo.md"], ["Foo"]})
+
+      assert_unchanged({:a, [href: "#baz"], ["Foo"]})
     end
 
     test "other link" do

@@ -84,6 +84,7 @@ defmodule ExDoc.Autolink do
     with {:ok, href} <- Keyword.fetch(attrs, :href),
          uri <- URI.parse(href),
          nil <- uri.host,
+         true <- is_binary(uri.path),
          true <- uri.path == Path.basename(uri.path),
          ".md" <- Path.extname(uri.path) do
       without_ext = String.trim_trailing(uri.path, ".md")
