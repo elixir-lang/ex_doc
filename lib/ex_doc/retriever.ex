@@ -146,7 +146,7 @@ defmodule ExDoc.Retriever do
       type: module_data.type,
       deprecated: metadata[:deprecated],
       function_groups: function_groups,
-      docs: Enum.sort_by(docs, &{&1.name, &1.arity}),
+      docs: Enum.sort_by(docs, &sort_key(&1.name, &1.arity)),
       doc: moduledoc,
       doc_line: doc_line,
       typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
@@ -155,6 +155,11 @@ defmodule ExDoc.Retriever do
     }
 
     put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
+  end
+
+  defp sort_key(name, arity) do
+    first = name |> Atom.to_charlist() |> hd()
+    {first in ?a..?z, name, arity}
   end
 
   defp doc_ast(_, nil, _options), do: nil
