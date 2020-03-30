@@ -76,19 +76,19 @@ defmodule ExDoc.RetrieverTest do
     end
 
     test "returns nesting information" do
-      prefix = "Common.Nesting.Prefix"
+      prefix = "Common.Nesting.Prefix.B"
 
       module_nodes =
-        docs_from_files([prefix <> ".Foo", prefix <> ".Bar"], nest_modules_by_prefix: [prefix])
+        docs_from_files([prefix <> ".A", prefix <> ".C"], nest_modules_by_prefix: [prefix])
 
       assert length(module_nodes) > 0
 
       for module_node <- module_nodes do
         assert module_node.nested_context == prefix
-        assert module_node.nested_title in ~w(Foo Bar)
+        assert module_node.nested_title in ~w(A C)
       end
 
-      name = "Common.Nesting.Prefix.Foo"
+      name = "Common.Nesting.Prefix.B.B.A"
       [module_node] = docs_from_files([name], nest_modules_by_prefix: [name])
 
       refute module_node.nested_context

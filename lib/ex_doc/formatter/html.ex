@@ -442,10 +442,16 @@ defmodule ExDoc.Formatter.HTML do
 
   def filter_list(:module, nodes) do
     Enum.filter(nodes, &(&1.type != :task))
+    |> sort_module_node_list
   end
 
   def filter_list(type, nodes) do
     Enum.filter(nodes, &(&1.type == type))
+  end
+
+  defp sort_module_node_list(modules) do
+    modules
+    |> Enum.sort_by(fn module -> {module.nested_context, module.nested_title} end)
   end
 
   defp generate_list(nodes, nodes_map, config) do
