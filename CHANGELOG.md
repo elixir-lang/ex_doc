@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.22.0-dev (unreleased)
+
+  * Enhancements
+    * [EPUB] Add epub to the default formatters
+    * [HTML+EPUB] Move specs out of signature
+    * [HTML+EPUB] Auto-link "erlang" types & callbacks
+    * [HTML+EPUB] Auto-link "erlang" modules in custom links
+    * [mix docs] Warn on broken references in dependencies (e.g. `` `String.upcase/9` ``)
+    * [escript] Add `--app`
+    * [HTML+EPUB] Auto-link to extras (e.g. `[foo](foo.md)`)
+
+  * Bug fixes
+    * [HTML] Fix hidden text selection, hide tooltips for details link
+    * [HTML+EPUB] Fix function name sorting (group operators together)
+    * [HTML+EPUB] Fix displaying nested modules
+
+  * Backwards incompatible changes
+    * [mix docs] Remove built-in support for cmark markdown processor
+    * [mix docs] Replace `ExDoc.Markdown.to_html/2` with `to_ast/2`
+    * [HTML+EPUB] Remove auto-linking for local calls to Kernel & Kernel.SpecialForms,
+      use fully qualified calls instead. (e.g. replace `` `==/2` `` with `` `Kernel.==/2` ``.)
+
 ## v0.21.3
 
   * Enhancements
