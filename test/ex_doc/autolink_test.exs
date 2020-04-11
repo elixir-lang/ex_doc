@@ -210,7 +210,8 @@ defmodule ExDoc.AutolinkTest do
       ExDoc.Refs.insert([
         {{:module, MyModule}, true},
         {{:type, MyModule, :foo, 1}, true},
-        {{:type, MyModule, :foo, 2}, true}
+        {{:type, MyModule, :foo, 2}, true},
+        {{:type, MyModule, :foo!, 1}, true}
       ])
 
       assert typespec(quote(do: t() :: foo(1))) ==
@@ -227,6 +228,9 @@ defmodule ExDoc.AutolinkTest do
 
       assert typespec(quote(do: t() :: foo(bar(), bar()))) ==
                ~s[t() :: <a href="#t:foo/2">foo</a>(bar(), bar())]
+
+      assert typespec(quote(do: t() :: foo!(bar()))) ==
+               ~s[t() :: <a href="#t:foo!/1">foo!</a>(bar())]
     end
 
     test "remotes" do
