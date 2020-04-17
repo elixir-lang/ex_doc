@@ -42,7 +42,8 @@ defmodule ExDoc.Retriever do
     modules
     |> Enum.flat_map(&get_module(&1, config))
     |> Enum.sort_by(fn module ->
-      {GroupMatcher.group_index(config.groups_for_modules, module.group), module.id}
+      {GroupMatcher.group_index(config.groups_for_modules, module.group), module.nested_context,
+       module.nested_title, module.id}
     end)
   end
 
