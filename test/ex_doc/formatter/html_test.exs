@@ -213,6 +213,29 @@ defmodule ExDoc.Formatter.HTMLTest do
              ~r/{"group":"","id":"Common\.Nesting\.Prefix\.B\.C","nested_context":"Common\.Nesting\.Prefix\.B","nested_title":"C","title":"Common\.Nesting\.Prefix\.B\.C"},{"group":"","id":"Common\.Nesting\.Prefix\.B\.B\.A","nested_context":"Common\.Nesting\.Prefix\.B\.B","nested_title":"A","title":"Common.Nesting.Prefix\.B\.B\.A"}/ms
   end
 
+  test "groups modules by nesting respecting groups" do
+    groups = [
+      Group1: [
+        Common.Nesting.Prefix.B.A,
+        Common.Nesting.Prefix.B.C
+      ],
+      Group2: [
+        Common.Nesting.Prefix.B.B.A,
+        Common.Nesting.Prefix.C
+      ]
+    ]
+
+    doc_config()
+    |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix.B, Common.Nesting.Prefix.B.B])
+    |> Keyword.put(:groups_for_modules, groups)
+    |> generate_docs()
+
+    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+
+    assert content =~
+             ~r/{"group":"Group1","id":"Common\.Nesting\.Prefix\.B\.A","nested_context":"Common\.Nesting\.Prefix\.B","nested_title":"A","title":"Common\.Nesting\.Prefix\.B\.A"},{"group":"Group1","id":"Common\.Nesting\.Prefix\.B\.C","nested_context":"Common\.Nesting\.Prefix\.B","nested_title":"C","title":"Common\.Nesting\.Prefix\.B\.C"},{"group":"Group2","id":"Common\.Nesting\.Prefix\.C","title":"Common\.Nesting\.Prefix\.C"},{"group":"Group2","id":"Common\.Nesting\.Prefix\.B\.B\.A","nested_context":"Common\.Nesting\.Prefix\.B\.B","nested_title":"A","title":"Common\.Nesting\.Prefix\.B\.B\.A"}/ms
+  end
+
   describe "generates logo" do
     test "overriding previous entries" do
       File.mkdir_p!("#{output_dir()}/assets")
