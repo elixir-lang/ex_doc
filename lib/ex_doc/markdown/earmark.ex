@@ -57,17 +57,9 @@ defmodule ExDoc.Markdown.Earmark do
 
   defp fixup(list) when is_list(list), do: Enum.map(list, &fixup/1)
   defp fixup(binary) when is_binary(binary), do: binary
+  defp fixup({tag, attrs, ast}), do: {fixup_tag(tag), Enum.map(attrs, &fixup_attr/1), fixup(ast)}
 
-  @tags ~w(a br code h1 h2 h3 h4 h5 h6 ul ol li p pre img em strong table thead tbody tr th td blockquote)
+  defp fixup_tag(tag), do: String.to_atom(tag)
 
-  defp fixup({tag, attrs, ast}) when tag in @tags do
-    attrs = Enum.map(attrs, &fixup_attr/1)
-    {String.to_atom(tag), attrs, fixup(ast)}
-  end
-
-  @attrs ~w(href class src alt style title)
-
-  defp fixup_attr({name, value}) when name in @attrs do
-    {String.to_atom(name), value}
-  end
+  defp fixup_attr({name, value}), do: {String.to_atom(name), value}
 end
