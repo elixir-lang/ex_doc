@@ -256,6 +256,34 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"}],"id":"","title":""}]})
     end
 
+    test "it pulls sections out of moduledocs" do
+      names = [CompiledWithDocs, DuplicateHeadings]
+      config = doc_config()
+      nodes = ExDoc.Retriever.docs_from_modules(names, config)
+      nodes = HTML.render_all(nodes, ".html", config, [])
+
+      assert "sidebarNodes=" <> json = create_sidebar_items(%{modules: nodes}, [])
+
+      assert {:ok, %{modules: [compiled_with_docs, duplicate_headings]}} =
+               Jason.decode(json, keys: :atoms)
+
+      assert compiled_with_docs.sections == [
+               %{
+                 anchor: "module-example-unicode-escaping",
+                 id: "Example ☃ Unicode &gt; escaping"
+               }
+             ]
+
+      assert duplicate_headings.sections == [
+               %{anchor: "module-one", id: "One"},
+               %{anchor: "module-two", id: "Two"},
+               %{anchor: "module-one-1", id: "One"},
+               %{anchor: "module-two-1", id: "Two"},
+               %{anchor: "module-one-2", id: "One"},
+               %{anchor: "module-two-2", id: "Two"}
+             ]
+    end
+
     defp create_sidebar_items(nodes_map, extras) do
       nodes_map
       |> Templates.create_sidebar_items(extras)

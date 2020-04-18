@@ -101,8 +101,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   Create a JS object which holds all the items displayed in the sidebar area
   """
   def create_sidebar_items(nodes_map, extras) do
-    nodes = [{:extras, sidebar_extras(extras)} | Enum.map(nodes_map, &sidebar_module/1)]
-    ["sidebarNodes=" | SimpleJSON.encode(Map.new(nodes))]
+    nodes =
+      nodes_map
+      |> Enum.map(&sidebar_module/1)
+      |> Map.new()
+      |> Map.put(:extras, sidebar_extras(extras))
+
+    ["sidebarNodes=" | SimpleJSON.encode(nodes)]
   end
 
   defp sidebar_extras(extras) do
@@ -130,12 +135,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
             entries -> [nodeGroups: Enum.map(entries, &sidebar_entries/1)]
           end
 
+        sections = module_sections(module)
+
         pairs =
           for key <- [:id, :title, :nested_title, :nested_context],
               value = Map.get(module, key),
               do: {key, value}
 
-        Map.new([group: to_string(module.group)] ++ extra ++ pairs)
+        Map.new([group: to_string(module.group)] ++ extra ++ pairs ++ sections)
       end
 
     {id, modules}
@@ -144,6 +151,31 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_entries({group, docs}) do
     nodes = Enum.map(docs, fn doc -> %{id: doc.id, anchor: URI.encode(HTML.link_id(doc))} end)
     %{key: HTML.text_to_id(group), name: group, nodes: nodes}
+  end
+
+  defp module_sections(module) do
+    sections =
+      case module.rendered_doc do
+        nil ->
+          []
+
+        moduledoc ->
+          moduledoc
+          |> extract_headers()
+          |> Enum.map_reduce(%{}, fn header, acc ->
+            case Map.fetch(acc, header.id) do
+              {:ok, id} ->
+                {%{header | anchor: "module-#{header.anchor}-#{id}"},
+                 Map.put(acc, header.id, id + 1)}
+
+              :error ->
+                {%{header | anchor: "module-#{header.anchor}"}, Map.put(acc, header.id, 1)}
+            end
+          end)
+          |> elem(0)
+      end
+
+    [sections: sections]
   end
 
   @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m

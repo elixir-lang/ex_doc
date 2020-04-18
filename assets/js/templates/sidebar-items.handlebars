@@ -34,6 +34,20 @@
             </li>
           {{/each}}
         {{else}}
+          {{#showSections node}}
+            <li class="docs open">
+              <a href="#" class="expand">
+                Sections
+              </a>
+              <ul class="sections-list deflist">
+                {{#each sections}}
+                  <li>
+                    <a href="{{node.id}}.html#{{anchor}}">{{{id}}}</a>
+                  </li>
+                {{/each}}
+              </ul>
+            </li>
+          {{/showSections}}
           {{#showSummary node}}
             <li>
               <a href="{{node.id}}.html#summary">Summary</a>
