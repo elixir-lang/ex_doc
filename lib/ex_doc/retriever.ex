@@ -75,6 +75,7 @@ defmodule ExDoc.Retriever do
 
   # Special case required for Elixir
   defp docs_chunk(:elixir_bootstrap), do: false
+  defp docs_chunk(Elixir), do: false
 
   defp docs_chunk(module) do
     unless function_exported?(Code, :fetch_docs, 1) do
