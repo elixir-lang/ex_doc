@@ -4,11 +4,6 @@ defmodule ExDoc.Utils.Code do
   # TODO: this is vendored from Elixir v1.11.0.
   #       Remove and use Code.fetch_docs/1 in the future.
 
-  # special case required for Elixir
-  def fetch_docs(Elixir) do
-    false
-  end
-
   def fetch_docs(module) when is_atom(module) do
     case :code.get_object_code(module) do
       {_module, bin, beam_path} ->

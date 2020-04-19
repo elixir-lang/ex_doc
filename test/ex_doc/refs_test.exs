@@ -32,4 +32,9 @@ defmodule ExDoc.RefsTest do
     assert Refs.public?({:type, :sets, :set, 0})
     assert Refs.public?({:type, :sets, :set, 9}) in [true, false]
   end
+
+  test "from_chunk/2 with module that doesn't exist" do
+    result = ExDoc.Utils.Code.fetch_docs(:elixir)
+    assert {:none, _} = ExDoc.Refs.from_chunk(Elixir, result)
+  end
 end
