@@ -1,5 +1,6 @@
 defmodule ExDoc.Refs do
   @moduledoc false
+
   # A read-through cache of documentation references.
   #
   # The cache consists of entries:
@@ -88,13 +89,18 @@ defmodule ExDoc.Refs do
         {:chunk, entries}
 
       {:error, :chunk_not_found} ->
-        entries =
-          for {name, arity} <- exports(module) do
-            {{:function, module, name, arity}, true}
-          end
+        if Code.ensure_loaded?(module) do
+          entries =
+            for {name, arity} <- exports(module) do
+              {{:function, module, name, arity}, true}
+            end
 
-        entries = [{{:module, module}, true} | entries]
-        {:exports, entries}
+          entries = [{{:module, module}, true} | entries]
+          {:exports, entries}
+        else
+          entries = [{{:module, module}, false}]
+          {:none, entries}
+        end
 
       _ ->
         entries = [{{:module, module}, false}]
