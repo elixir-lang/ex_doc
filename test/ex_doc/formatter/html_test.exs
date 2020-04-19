@@ -106,10 +106,21 @@ defmodule ExDoc.Formatter.HTMLTest do
         generate_docs(doc_config(skip_undefined_reference_warnings_on: []))
       end)
 
-    assert output =~ ~r"Warnings.bar/0 .* \(parsing Warnings docs\)"
-    assert output =~ ~r"Warnings.bar/0 .* \(parsing Warnings.foo/0 docs\)"
-    assert output =~ ~r"Warnings.bar/0 .* \(parsing c:Warnings.handle_foo/0 docs\)"
-    assert output =~ ~r"Warnings.bar/0 .* \(parsing t:Warnings.t/0 docs\)"
+    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex: Warnings"
+    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex: Warnings.foo/0"
+    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex: c:Warnings.handle_foo/0"
+    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex: t:Warnings.t/0"
+  end
+
+  test "warns on undefined functions in file" do
+    output =
+      capture_io(:stderr, fn ->
+        generate_docs(
+          doc_config(skip_undefined_reference_warnings_on: ["test/fixtures/warnings.ex"])
+        )
+      end)
+
+    assert output == ""
   end
 
   test "generates headers for index.html and module pages" do

@@ -8,16 +8,22 @@ defmodule ExDoc.Autolink do
   #
   # * `:module_id` - id of the module being documented (e.g.: `"String"`)
   #
-  # * `:id` - id of the thing being documented (e.g.: `"String.upcase/2"`, `"library-guidelines"`, etc)
+  # * `:file` - source file location
+  #
+  # * `:id` - a module/function/etc being documented (e.g.: `"String.upcase/2"`)
   #
   # * `:ext` - the extension (`".html"`, "`.xhtml"`, etc)
   #
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
+
+  @enforce_keys [:app, :file]
+
   defstruct [
     :app,
     :current_module,
     :module_id,
     :id,
+    :file,
     ext: ".html",
     skip_undefined_reference_warnings_on: []
   ]
@@ -446,17 +452,20 @@ defmodule ExDoc.Autolink do
 
   defp maybe_warn({kind, module, name, arity}, config) do
     skipped = config.skip_undefined_reference_warnings_on
+    file = Path.relative_to(config.file, File.cwd!())
 
-    if config.module_id not in skipped and config.id not in skipped do
-      warn({kind, module, name, arity}, config.id)
+    unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
+      warn({kind, module, name, arity}, file, config.id)
     end
   end
 
-  defp warn({kind, module, name, arity}, id) do
+  defp warn({kind, module, name, arity}, file, id) do
     message =
       "documentation references #{kind} #{inspect(module)}.#{name}/#{arity}" <>
-        " but it doesn't exist or isn't public (parsing #{id} docs)"
+        " but it is undefined or private"
 
-    IO.warn(message, [])
+    warning = IO.ANSI.format([:yellow, "warning: ", :reset])
+    stacktrace = "  #{file}" <> ((id && ": " <> id) || "")
+    IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
   end
 end

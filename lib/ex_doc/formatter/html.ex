@@ -72,7 +72,8 @@ defmodule ExDoc.Formatter.HTML do
         current_module: node.module,
         ext: ext,
         skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-        module_id: node.id
+        module_id: node.id,
+        file: node.source_path
       ]
 
       docs =
@@ -282,7 +283,7 @@ defmodule ExDoc.Formatter.HTML do
   defp build_extra(input, id, title, groups, config, ext) do
     autolink_opts = [
       app: config.app,
-      id: id,
+      file: input,
       ext: ext,
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
     ]
