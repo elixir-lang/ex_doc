@@ -1,5 +1,6 @@
 defmodule ExDoc.Refs do
   @moduledoc false
+
   # A read-through cache of documentation references.
   #
   # The cache consists of entries:
