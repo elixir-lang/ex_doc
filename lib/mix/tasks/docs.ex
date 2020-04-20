@@ -153,9 +153,9 @@ defmodule Mix.Tasks.Docs do
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
 
     * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
-      reference in the current project docs e.g. because of a typo. This list controls
-      which docs pages to skip the warnings on, which is useful for e.g. deprecation pages;
-      default: `[]`.
+      reference in the current project docs e.g. because of a typo. This list controls where to
+      skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
+      or on a given file (e.g.: `["pages/deprecations.md"]`); default: `[]`.
 
   ## Groups
 

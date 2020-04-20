@@ -94,7 +94,8 @@ defmodule ExDoc.Mixfile do
           ExDoc.ModuleNode,
           ExDoc.TypeNode
         ]
-      ]
+      ],
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
     ]
   end
 

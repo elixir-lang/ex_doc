@@ -1,6 +1,7 @@
 defmodule ExDoc.AutolinkTest do
   use ExUnit.Case, async: true
   doctest ExDoc.Autolink
+  import ExUnit.CaptureIO
 
   defp sigil_t(text, []) do
     {:code, [], [text]}
@@ -297,9 +298,21 @@ defmodule ExDoc.AutolinkTest do
       {{:type, Foo, :bad, 0}, false}
     ])
 
-    assert_warn(fn ->
-      assert_unchanged(~t"Foo.bar/1")
-    end)
+    captured =
+      assert_warn(fn ->
+        assert_unchanged(~t"Foo.bar/1", file: "lib/foo.ex", id: nil)
+      end)
+
+    assert captured =~ "documentation references function Foo.bar/1"
+    assert captured =~ ~r{lib/foo.ex\n$}
+
+    captured =
+      assert_warn(fn ->
+        assert_unchanged(~t"Foo.bar/1", file: "lib/foo.ex", id: "Foo.foo/0")
+      end)
+
+    assert captured =~ "documentation references function Foo.bar/1"
+    assert captured =~ ~r{lib/foo.ex: Foo.foo/0\n$}
 
     assert_warn(fn ->
       assert_unchanged(~t"String.upcase/9")
@@ -329,7 +342,7 @@ defmodule ExDoc.AutolinkTest do
 
   ## Helpers
 
-  @default_options [app: :myapp, current_module: MyModule, module_id: "MyModule"]
+  @default_options [app: :myapp, current_module: MyModule, module_id: "MyModule", file: "nofile"]
 
   defp autolinked(node, options \\ []) do
     case ExDoc.Autolink.doc(node, Keyword.merge(@default_options, options)) do
@@ -338,12 +351,14 @@ defmodule ExDoc.AutolinkTest do
     end
   end
 
-  defp assert_unchanged(node, options \\ []) do
-    assert ExDoc.Autolink.doc(node, Keyword.merge(@default_options, options)) == node
+  defp assert_warn(fun) do
+    captured = capture_io(:stderr, fun)
+    captured =~ "documentation references"
+    captured
   end
 
-  defp assert_warn(fun) do
-    assert ExUnit.CaptureIO.capture_io(:stderr, fun) =~ "documentation references"
+  defp assert_unchanged(node, options \\ []) do
+    assert ExDoc.Autolink.doc(node, Keyword.merge(@default_options, options)) == node
   end
 
   defp typespec(ast, options \\ []) do
