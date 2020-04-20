@@ -10,6 +10,8 @@
     * [mix docs] Warn on broken references in dependencies (e.g. `` `String.upcase/9` ``)
     * [escript] Add `--app`
     * [HTML+EPUB] Auto-link to extras (e.g. `[foo](foo.md)`)
+    * [mix docs] Undefined references warning now includes the filename
+    * [mix docs] `:skip_undefined_reference_warnings_on` now also accepts a filename
 
   * Bug fixes
     * [HTML] Fix hidden text selection, hide tooltips for details link
@@ -21,6 +23,8 @@
     * [mix docs] Replace `ExDoc.Markdown.to_html/2` with `to_ast/2`
     * [HTML+EPUB] Remove auto-linking for local calls to Kernel & Kernel.SpecialForms,
       use fully qualified calls instead. (e.g. replace `` `==/2` `` with `` `Kernel.==/2` ``.)
+    * [mix docs] `:skip_undefined_reference_warnings_on` no longer accepts extras id, use
+      extras filename instead.
 
 ## v0.21.3
 
