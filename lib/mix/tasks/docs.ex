@@ -300,8 +300,8 @@ defmodule Mix.Tasks.Docs do
 
   @doc false
   def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate_docs/3) do
-    {:ok, _} = Application.ensure_all_started(:ex_doc)
     Mix.Task.run("compile")
+    {:ok, _} = Application.ensure_all_started(:ex_doc)
 
     unless Code.ensure_loaded?(ExDoc.Config) do
       Mix.raise(
