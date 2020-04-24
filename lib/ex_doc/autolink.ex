@@ -207,6 +207,7 @@ defmodule ExDoc.Autolink do
     end
   end
 
+  # TODO: module.function is Elixir specific, move to ExDoc.Language.Elixir
   defp parse_module_function(string) do
     case string |> String.split(".") |> Enum.reverse() do
       [string] ->
@@ -273,6 +274,7 @@ defmodule ExDoc.Autolink do
 
     string =
       ast
+      # TODO: use options.language.format_typespec() instead
       |> Macro.to_string()
       |> Code.format_string!(line_length: 80)
       |> IO.iodata_to_binary()
