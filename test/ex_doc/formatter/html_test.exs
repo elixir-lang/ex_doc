@@ -218,10 +218,14 @@ defmodule ExDoc.Formatter.HTMLTest do
     |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix.B, Common.Nesting.Prefix.B.B])
     |> generate_docs()
 
-    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+    "sidebarNodes=" <> content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+    assert {:ok, %{"modules" => modules}} = Jason.decode(content)
 
-    assert content =~
-             ~r/{"group":"","id":"Common\.Nesting\.Prefix\.B\.C","nested_context":"Common\.Nesting\.Prefix\.B","nested_title":"C","title":"Common\.Nesting\.Prefix\.B\.C"},{"group":"","id":"Common\.Nesting\.Prefix\.B\.B\.A","nested_context":"Common\.Nesting\.Prefix\.B\.B","nested_title":"A","title":"Common.Nesting.Prefix\.B\.B\.A"}/ms
+    assert %{"nested_context" => "Common.Nesting.Prefix.B"} =
+             Enum.find(modules, fn %{"id" => id} -> id == "Common.Nesting.Prefix.B.C" end)
+
+    assert %{"nested_context" => "Common.Nesting.Prefix.B.B"} =
+             Enum.find(modules, fn %{"id" => id} -> id == "Common.Nesting.Prefix.B.B.A" end)
   end
 
   test "groups modules by nesting respecting groups" do
@@ -241,10 +245,11 @@ defmodule ExDoc.Formatter.HTMLTest do
     |> Keyword.put(:groups_for_modules, groups)
     |> generate_docs()
 
-    content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+    "sidebarNodes=" <> content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+    assert {:ok, %{"modules" => modules}} = Jason.decode(content)
 
-    assert content =~
-             ~r/{"group":"Group1","id":"Common\.Nesting\.Prefix\.B\.A","nested_context":"Common\.Nesting\.Prefix\.B","nested_title":"A","title":"Common\.Nesting\.Prefix\.B\.A"},{"group":"Group1","id":"Common\.Nesting\.Prefix\.B\.C","nested_context":"Common\.Nesting\.Prefix\.B","nested_title":"C","title":"Common\.Nesting\.Prefix\.B\.C"},{"group":"Group2","id":"Common\.Nesting\.Prefix\.C","title":"Common\.Nesting\.Prefix\.C"},{"group":"Group2","id":"Common\.Nesting\.Prefix\.B\.B\.A","nested_context":"Common\.Nesting\.Prefix\.B\.B","nested_title":"A","title":"Common\.Nesting\.Prefix\.B\.B\.A"}/ms
+    assert %{"Group1" => [_, _], "Group2" => [_, _]} =
+             Enum.group_by(modules, &Map.get(&1, "group"))
   end
 
   describe "generates logo" do
