@@ -257,14 +257,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
 
     test "builds sections out of moduledocs" do
-      names = [CompiledWithDocs, DuplicateHeadings]
+      names = [CompiledWithDocs, CompiledWithoutDocs, DuplicateHeadings]
       config = doc_config()
       nodes = ExDoc.Retriever.docs_from_modules(names, config)
       nodes = HTML.render_all(nodes, ".html", config, [])
 
       assert "sidebarNodes=" <> json = create_sidebar_items(%{modules: nodes}, [])
 
-      assert {:ok, %{modules: [compiled_with_docs, duplicate_headings]}} =
+      assert {:ok, %{modules: [compiled_with_docs, compiled_without_docs, duplicate_headings]}} =
                Jason.decode(json, keys: :atoms)
 
       assert compiled_with_docs.sections == [
@@ -273,6 +273,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  id: "Example ☃ Unicode &gt; escaping"
                }
              ]
+
+      assert compiled_without_docs.sections == []
 
       assert duplicate_headings.sections == [
                %{anchor: "module-one", id: "One"},
