@@ -256,7 +256,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"}],"id":"","title":""}]})
     end
 
-    test "it pulls sections out of moduledocs" do
+    test "builds sections out of moduledocs" do
       names = [CompiledWithDocs, DuplicateHeadings]
       config = doc_config()
       nodes = ExDoc.Retriever.docs_from_modules(names, config)
