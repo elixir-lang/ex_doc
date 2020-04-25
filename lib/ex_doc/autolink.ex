@@ -10,6 +10,8 @@ defmodule ExDoc.Autolink do
   #
   # * `:file` - source file location
   #
+  # * `:line` - line number of the beginning of the documentation
+  #
   # * `:id` - a module/function/etc being documented (e.g.: `"String.upcase/2"`)
   #
   # * `:ext` - the extension (`".html"`, "`.xhtml"`, etc)
@@ -24,6 +26,7 @@ defmodule ExDoc.Autolink do
     :module_id,
     :id,
     :file,
+    :line,
     ext: ".html",
     skip_undefined_reference_warnings_on: []
   ]
@@ -453,19 +456,25 @@ defmodule ExDoc.Autolink do
   defp maybe_warn({kind, module, name, arity}, config) do
     skipped = config.skip_undefined_reference_warnings_on
     file = Path.relative_to(config.file, File.cwd!())
+    line = config.line
 
     unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
-      warn({kind, module, name, arity}, file, config.id)
+      warn({kind, module, name, arity}, file, line, config.id)
     end
   end
 
-  defp warn({kind, module, name, arity}, file, id) do
+  defp warn({kind, module, name, arity}, file, line, id) do
     message =
       "documentation references #{kind} #{inspect(module)}.#{name}/#{arity}" <>
         " but it is undefined or private"
 
     warning = IO.ANSI.format([:yellow, "warning: ", :reset])
-    stacktrace = "  #{file}" <> ((id && ": " <> id) || "")
+
+    stacktrace =
+      "  #{file}" <>
+        if(line, do: ":#{line}", else: "") <>
+        if(id, do: ": #{id}", else: "")
+
     IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
   end
 end

@@ -300,11 +300,11 @@ defmodule ExDoc.AutolinkTest do
 
     captured =
       assert_warn(fn ->
-        assert_unchanged(~t"Foo.bar/1", file: "lib/foo.ex", id: nil)
+        assert_unchanged(~t"Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
       end)
 
     assert captured =~ "documentation references function Foo.bar/1"
-    assert captured =~ ~r{lib/foo.ex\n$}
+    assert captured =~ ~r{lib/foo.ex:1\n$}
 
     captured =
       assert_warn(fn ->

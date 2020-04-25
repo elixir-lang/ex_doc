@@ -106,10 +106,10 @@ defmodule ExDoc.Formatter.HTMLTest do
         generate_docs(doc_config(skip_undefined_reference_warnings_on: []))
       end)
 
-    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex: Warnings"
-    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex: Warnings.foo/0"
-    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex: c:Warnings.handle_foo/0"
-    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex: t:Warnings.t/0"
+    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:2: Warnings"
+    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:18: Warnings.foo/0"
+    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:13: c:Warnings.handle_foo/0"
+    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:8: t:Warnings.t/0"
   end
 
   test "warns on undefined functions in file" do

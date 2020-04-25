@@ -73,13 +73,14 @@ defmodule ExDoc.Formatter.HTML do
         ext: ext,
         skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
         module_id: node.id,
-        file: node.source_path
+        file: node.source_path,
+        line: node.doc_line
       ]
 
       docs =
         for child_node <- node.docs do
           id = id(node, child_node)
-          autolink_opts = [{:id, id} | autolink_opts]
+          autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
           specs = Enum.map(child_node.specs, &Autolink.typespec(&1, autolink_opts))
           child_node = %{child_node | specs: specs}
           render_doc(child_node, autolink_opts, opts)
@@ -88,7 +89,7 @@ defmodule ExDoc.Formatter.HTML do
       typespecs =
         for child_node <- node.typespecs do
           id = id(node, child_node)
-          autolink_opts = [{:id, id} | autolink_opts]
+          autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
           child_node = %{child_node | spec: Autolink.typespec(child_node.spec, autolink_opts)}
           render_doc(child_node, autolink_opts, opts)
         end
