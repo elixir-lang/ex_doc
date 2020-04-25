@@ -35,7 +35,7 @@
           {{/each}}
         {{else}}
           {{#showSections node}}
-            <li class="docs open">
+            <li class="docs {{#isLocal node.id}}open{{/isLocal}}">
               <a href="#" class="expand">
                 Sections
               </a>
