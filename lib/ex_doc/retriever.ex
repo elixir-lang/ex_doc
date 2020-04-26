@@ -172,7 +172,9 @@ defmodule ExDoc.Retriever do
   defp doc_ast(_, :none, _options), do: nil
   defp doc_ast("text/markdown", %{"en" => doc}, options), do: Markdown.to_ast(doc, options)
   defp doc_ast("application/erlang+html", %{"en" => doc}, _options), do: fixup_erlang_html(doc)
-  defp doc_ast(other, _, _options), do: raise("content type #{inspect(other)} is not supported")
+
+  defp doc_ast(other, %{"en" => _}, _),
+    do: raise("content type #{inspect(other)} is not supported")
 
   # TODO: this is only to convert `{attr_name, attr_value :: charlist}` to `{attr_name, attr_value :: binary}`,
   # this should be done in OTP instead
@@ -370,13 +372,22 @@ defmodule ExDoc.Retriever do
 
   defp get_callback(callback, source, optional_callbacks, module_data) do
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
-    {{kind, name, arity}, anno, _, doc, metadata} = callback
+    {{kind, name, arity}, anno, signatures, doc, metadata} = callback
     actual_def = actual_def(name, arity, kind)
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
 
-    {:attribute, anno, :callback, {^actual_def, specs}} =
-      Enum.find(module_data.abst_code, &match?({:attribute, _, :callback, {^actual_def, _}}, &1))
+    {anno, specs} =
+      case Enum.find(
+             module_data.abst_code,
+             &match?({:attribute, _, :callback, {^actual_def, _}}, &1)
+           ) do
+        {:attribute, anno, :callback, {^actual_def, specs}} ->
+          {anno, specs}
+
+        nil ->
+          {anno, []}
+      end
 
     line = anno_line(anno) || doc_line
     specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
@@ -384,7 +395,23 @@ defmodule ExDoc.Retriever do
     annotations =
       if actual_def in optional_callbacks, do: ["optional" | annotations], else: annotations
 
+    # TODO: https://github.com/erlef/documentation-wg/issues/3#issuecomment-619600634
+    doc =
+      if doc == %{} do
+        IO.puts("callback #{module_data.name}.#{name}/#{arity}: doc is \#{}")
+        :none
+      else
+        doc
+      end
+
     doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
+
+    signature =
+      if signatures == [] do
+        get_typespec_signature(hd(specs), arity)
+      else
+        hd(signatures)
+      end
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -393,7 +420,7 @@ defmodule ExDoc.Retriever do
       deprecated: metadata[:deprecated],
       doc: doc_ast,
       doc_line: doc_line,
-      signature: get_typespec_signature(hd(specs), arity),
+      signature: signature,
       specs: specs,
       source_path: source.path,
       source_url: source_link(source, line),
@@ -460,6 +487,15 @@ defmodule ExDoc.Retriever do
     line = anno_line(anno) || doc_line
 
     annotations = if type == :opaque, do: ["opaque" | annotations], else: annotations
+
+    # TODO: https://github.com/erlef/documentation-wg/issues/3#issuecomment-619600634
+    doc =
+      if doc == %{} do
+        IO.puts("type #{module_data.name}.#{name}/#{arity}: doc is \#{}")
+        :none
+      else
+        doc
+      end
 
     doc_ast = doc_ast(content_type, doc, file: source.path)
 
