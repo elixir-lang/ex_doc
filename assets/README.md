@@ -12,6 +12,10 @@ The following scripts are available
 
 ### `build`
 
+```bash
+$ npm run --prefix build
+```
+
 This will build a complete production bundle, including JavaScript and CSS.
 If you run `mix build` at the `ExDoc` root after changing your assets, it will
 automatically recompile the assets, invoke `mix compile --force`, and generate
@@ -19,9 +23,17 @@ fresh docs with your changes.
 
 ### `lint`
 
+```bash
+$ npm run --prefix lint
+```
+
 Lint all JavaScript files using [ESLint].
 
 ### `test`
+
+```bash
+$ npm run --prefix test
+```
 
 Run all the available JavaScript tests using [Karma].
 

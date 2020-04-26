@@ -14,7 +14,7 @@ const cleanOptions = {
   root: resolve(__dirname, '..')
 }
 
-const buildFilename = function(name, extension) {
+function buildFilename(name, extension) {
   name = name.split("-")
   folder = name[0]
   file = name[1]
@@ -24,12 +24,12 @@ const buildFilename = function(name, extension) {
 module.exports = {
   mode: 'production',
   entry: {
-    "epub-app": './assets/js/epub.js',
-    "epub-elixir": './assets/less/entry/epub-elixir.less',
-    "epub-erlang": './assets/less/entry/epub-erlang.less',
-    "html-app": './assets/js/html.js',
-    "html-elixir": './assets/less/entry/html-elixir.less',
-    "html-erlang": './assets/less/entry/html-erlang.less',
+    "epub-app": './js/epub.js',
+    "epub-elixir": './less/entry/epub-elixir.less',
+    "epub-erlang": './less/entry/epub-erlang.less',
+    "html-app": './js/html.js',
+    "html-elixir": './less/entry/html-elixir.less',
+    "html-erlang": './less/entry/html-erlang.less',
   },
   output: {
     path: resolve(__dirname, '../formatters'),

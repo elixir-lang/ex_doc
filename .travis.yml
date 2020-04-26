@@ -47,6 +47,6 @@ jobs:
     - stage: check js
       script:
         - nvm install $NODE_VERSION
-        - npm install
-        - npm run lint
-        - npm run test
+        - npm install --prefix assets
+        - npm run --prefix assets lint
+        - npm run --prefix assets test
