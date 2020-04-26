@@ -22,7 +22,7 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 ex_doc-*.tar
 
-/node_modules/
+node_modules/
 /test/fixtures/umbrella/_build/
 /test/tmp/
 /npm-debug.log

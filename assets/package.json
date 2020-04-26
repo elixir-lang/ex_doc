@@ -9,9 +9,9 @@
     "npm": ">= 5.6.0"
   },
   "scripts": {
-    "lint": "npx eslint \"./assets/js/**/*.js\"",
-    "test": "npx karma start ./assets/karma.conf.js --single-run",
-    "build": "webpack --config ./assets/webpack.js"
+    "lint": "npx eslint \"./js/**/*.js\"",
+    "test": "npx karma start ./karma.conf.js --single-run",
+    "build": "webpack --config ./webpack.js"
   },
   "repository": {
     "type": "git",
@@ -68,6 +68,7 @@
     "style-loader": "^0.23.0",
     "uglifyjs-webpack-plugin": "^2.0.0",
     "webpack": "^4.19.0",
+    "webpack-bundle-analyzer": "^3.7.0",
     "webpack-command": "^0.4.1",
     "webpack-merge": "^4.1.4"
   }
