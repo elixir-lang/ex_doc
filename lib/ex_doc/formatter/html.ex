@@ -74,7 +74,7 @@ defmodule ExDoc.Formatter.HTML do
         skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
         module_id: node.id,
         file: node.source_path,
-        line: node.doc_line
+        line: node.doc_line,
         # TODO: don't hardcode here, get from the chunk instead!
         language: node.language
       ]
