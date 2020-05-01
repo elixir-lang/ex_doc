@@ -42,7 +42,7 @@ defmodule ExDoc.Refs do
   end
 
   def public?(ref) do
-    case :ets.lookup(@name, ref) do
+    case lookup(ref) do
       [{^ref, true}] ->
         true
 
@@ -61,6 +61,13 @@ defmodule ExDoc.Refs do
             {ref, true} in entries
         end
     end
+  end
+
+  defp lookup(ref) do
+    :ets.lookup(@name, ref)
+  rescue
+    _ ->
+      [{ref, false}]
   end
 
   def insert(entries) do
