@@ -164,10 +164,12 @@ defmodule ExDoc.Retriever do
     {first in ?a..?z, name, arity}
   end
 
-  defp doc_ast(_, nil, _options), do: nil
   defp doc_ast(_, :none, _options), do: nil
+  defp doc_ast(_, :hidden, _options), do: nil
   defp doc_ast("text/markdown", %{"en" => doc}, options), do: Markdown.to_ast(doc, options)
-  defp doc_ast(other, _, _options), do: raise("content type #{inspect(other)} is not supported")
+
+  defp doc_ast(other, %{"en" => _}, _),
+    do: raise("content type #{inspect(other)} is not supported")
 
   # Module Helpers
 
