@@ -71,6 +71,7 @@ defmodule ExDoc.Formatter.HTML do
         app: config.app,
         current_module: node.module,
         ext: ext,
+        extras: extra_paths(config),
         skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
         module_id: node.id,
         file: node.source_path,
@@ -286,6 +287,7 @@ defmodule ExDoc.Formatter.HTML do
       app: config.app,
       file: input,
       ext: ext,
+      extras: extra_paths(config),
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
     ]
 
@@ -475,5 +477,15 @@ defmodule ExDoc.Formatter.HTML do
     else
       config
     end
+  end
+
+  defp extra_paths(config) do
+    Enum.map(config.extras, fn
+      path when is_binary(path) ->
+        Path.basename(path)
+
+      {path, _} ->
+        path |> Atom.to_string() |> Path.basename()
+    end)
   end
 end
