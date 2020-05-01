@@ -18,6 +18,10 @@ defmodule ExDoc.AutolinkTest do
       assert autolinked(~t"Elixir.String") == "https://hexdocs.pm/elixir/String.html"
     end
 
+    test "other elixir core module" do
+      assert autolinked(~t"IEx.Helpers") == "https://hexdocs.pm/iex/IEx.Helpers.html"
+    end
+
     test "private module" do
       assert_unchanged(~t"String.Unicode")
     end
