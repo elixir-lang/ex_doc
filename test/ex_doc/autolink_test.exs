@@ -175,16 +175,18 @@ defmodule ExDoc.AutolinkTest do
     end
 
     test "extras" do
-      assert autolinked({:a, [href: "Foo Bar.md"], ["Foo"]}) == "foo-bar.html"
+      opts = [extras: ["Foo Bar.md"]]
 
-      assert autolinked({:a, [href: "Foo Bar.md"], ["Foo"]}, ext: ".xhtml") ==
+      assert autolinked({:a, [href: "Foo Bar.md"], ["Foo"]}, opts) == "foo-bar.html"
+
+      assert autolinked({:a, [href: "Foo Bar.md"], ["Foo"]}, [ext: ".xhtml"] ++ opts) ==
                "foo-bar.xhtml"
 
-      assert autolinked({:a, [href: "Foo Bar.md#baz"], ["Foo"]}) == "foo-bar.html#baz"
+      assert autolinked({:a, [href: "Foo Bar.md#baz"], ["Foo"]}, opts) == "foo-bar.html#baz"
 
-      assert_unchanged({:a, [href: "https://github.com/foo/bar/blob/master/foo.md"], ["Foo"]})
+      assert_unchanged({:a, [href: "http://example.com/foo.md"], ["Foo"]}, opts)
 
-      assert_unchanged({:a, [href: "#baz"], ["Foo"]})
+      assert_unchanged({:a, [href: "#baz"], ["Foo"]}, opts)
     end
 
     test "other link" do
@@ -339,6 +341,14 @@ defmodule ExDoc.AutolinkTest do
       assert typespec(quote(do: t() :: String.bad())) ==
                ~s[t() :: String.bad()]
     end)
+
+    captured =
+      assert_warn(fn ->
+        opts = [extras: []]
+        assert_unchanged({:a, [href: "Foo Bar.md"], ["Foo"]}, opts)
+      end)
+
+    assert captured =~ "documentation references file `Foo Bar.md` but it doesn't exists"
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged(~t"String.upcase/9", options)

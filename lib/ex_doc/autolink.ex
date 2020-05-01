@@ -1,5 +1,6 @@
 defmodule ExDoc.Autolink do
   @moduledoc false
+
   # * `:app` - the app that the docs are being generated for. When linking modules they are
   #   checked if they are part of the app and based on that the links are relative or absolute.
   #
@@ -16,6 +17,8 @@ defmodule ExDoc.Autolink do
   #
   # * `:ext` - the extension (`".html"`, "`.xhtml"`, etc)
   #
+  # * `:extras` - list of extras
+  #
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
 
   @enforce_keys [:app, :file]
@@ -27,6 +30,7 @@ defmodule ExDoc.Autolink do
     :id,
     :file,
     :line,
+    extras: [],
     ext: ".html",
     skip_undefined_reference_warnings_on: []
   ]
@@ -96,9 +100,15 @@ defmodule ExDoc.Autolink do
          true <- is_binary(uri.path),
          true <- uri.path == Path.basename(uri.path),
          ".md" <- Path.extname(uri.path) do
-      without_ext = String.trim_trailing(uri.path, ".md")
-      fragment = (uri.fragment && "#" <> uri.fragment) || ""
-      HTML.text_to_id(without_ext) <> config.ext <> fragment
+      if uri.path in config.extras do
+        without_ext = String.trim_trailing(uri.path, ".md")
+        fragment = (uri.fragment && "#" <> uri.fragment) || ""
+        HTML.text_to_id(without_ext) <> config.ext <> fragment
+      else
+        message = "documentation references file `#{uri.path}` but it doesn't exists"
+        warn(message, config.file, config.line, config.id)
+        nil
+      end
     else
       _ -> nil
     end
@@ -468,6 +478,10 @@ defmodule ExDoc.Autolink do
       "documentation references #{kind} #{inspect(module)}.#{name}/#{arity}" <>
         " but it is undefined or private"
 
+    warn(message, file, line, id)
+  end
+
+  defp warn(message, file, line, id) do
     warning = IO.ANSI.format([:yellow, "warning: ", :reset])
 
     stacktrace =
