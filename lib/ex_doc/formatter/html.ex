@@ -65,6 +65,9 @@ defmodule ExDoc.Formatter.HTML do
   Autolinks and renders all docs.
   """
   def render_all(project_nodes, ext, config, opts) do
+    # Load all Elixir built-in apps
+    Enum.each([:eex, :ex_unit, :iex, :logger, :mix], &Application.ensure_loaded/1)
+
     project_nodes
     |> Enum.map(fn node ->
       autolink_opts = [
