@@ -408,7 +408,7 @@ defmodule ExDoc.Retriever do
 
   defp callbacks_defined_by(module) do
     case Code.Typespec.fetch_callbacks(module) do
-      {:ok, callbacks} -> Keyword.keys(callbacks)
+      {:ok, callbacks} -> Enum.map(callbacks, &elem(&1, 0))
       :error -> []
     end
   end
