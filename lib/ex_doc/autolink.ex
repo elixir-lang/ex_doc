@@ -438,19 +438,18 @@ defmodule ExDoc.Autolink do
     name = Atom.to_string(module)
 
     if name == String.downcase(name) do
-      case :code.which(module) do
-        :preloaded ->
+      case {:code.which(module), function_exported?(module, :__info__, 1)} do
+        {:preloaded, _} ->
           :otp
 
-        :non_existing ->
+        {:non_existing, _} ->
           :no_tool
 
-        path ->
-          if String.starts_with?(List.to_string(path), List.to_string(:code.lib_dir())) do
-            :otp
-          else
-            :no_tool
-          end
+        {_, true} ->
+          :ex_doc
+
+        {_, false} ->
+          :otp
       end
     else
       :ex_doc
