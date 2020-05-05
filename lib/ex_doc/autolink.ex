@@ -272,16 +272,22 @@ defmodule ExDoc.Autolink do
   def typespec(ast, options) do
     config = struct!(__MODULE__, options)
 
-    string =
-      ast
-      # TODO: use options.language.format_typespec() instead
-      |> Macro.to_string()
-      |> Code.format_string!(line_length: 80)
-      |> IO.iodata_to_binary()
+    case config.language do
+      ExDoc.Language.Erlang ->
+        ## TODO: find out what to print here - AST signature from metadata or the docs_v1 sig?
+        ## config.id looked reasonable, but not 100% accurate
+        config.id
+      ExDoc.Language.Elixir ->
+        string =
+          ast
+          |> Macro.to_string()
+          |> Code.format_string!(line_length: 80)
+          |> IO.iodata_to_binary()
 
-    name = typespec_name(ast)
-    {name, rest} = split_name(string, name)
-    name <> do_typespec(rest, config)
+        name = typespec_name(ast)
+        {name, rest} = split_name(string, name)
+        name <> do_typespec(rest, config)
+    end
   end
 
   defp typespec_name({:"::", _, [{name, _, _}, _]}), do: Atom.to_string(name)
