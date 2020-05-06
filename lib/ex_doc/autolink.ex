@@ -276,7 +276,7 @@ defmodule ExDoc.Autolink do
       ExDoc.Language.Erlang ->
         ## TODO: find out what to print here - AST signature from metadata or the docs_v1 sig?
         ## config.id looked reasonable, but not 100% accurate
-        config.id
+        "#{config.id} TODO: erlang-typespec"
       ExDoc.Language.Elixir ->
         string =
           ast
