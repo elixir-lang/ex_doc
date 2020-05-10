@@ -3,8 +3,9 @@ defmodule ExDoc.AutolinkTest do
   doctest ExDoc.Autolink
   import ExUnit.CaptureIO
 
-  defp sigil_t(text, []) do
-    {:code, [], [text]}
+  defp sigil_m(text, []) do
+    [{:p, _, [ast]}] = ExDoc.Markdown.to_ast(text, [])
+    ast
   end
 
   setup do
@@ -14,25 +15,28 @@ defmodule ExDoc.AutolinkTest do
 
   describe "doc/3" do
     test "elixir stdlib module" do
-      assert autolinked(~t"String") == "https://hexdocs.pm/elixir/String.html"
-      assert autolinked(~t"Elixir.String") == "https://hexdocs.pm/elixir/String.html"
+      assert autolink("String") == ~m"[`String`](https://hexdocs.pm/elixir/String.html)"
+
+      assert autolink("Elixir.String") ==
+               ~m"[`Elixir.String`](https://hexdocs.pm/elixir/String.html)"
     end
 
     test "other elixir core module" do
-      assert autolinked(~t"IEx.Helpers") == "https://hexdocs.pm/iex/IEx.Helpers.html"
+      assert autolink("IEx.Helpers") ==
+               ~m"[`IEx.Helpers`](https://hexdocs.pm/iex/IEx.Helpers.html)"
     end
 
     test "private module" do
-      assert_unchanged(~t"String.Unicode")
+      assert_unchanged("String.Unicode")
     end
 
     test "erlang module" do
-      assert_unchanged(~t":array")
+      assert_unchanged(":array")
     end
 
     test "unknown module" do
-      assert_unchanged(~t"Unknown")
-      assert_unchanged(~t":unknown")
+      assert_unchanged("Unknown")
+      assert_unchanged(":unknown")
     end
 
     test "project-local module" do
@@ -40,9 +44,9 @@ defmodule ExDoc.AutolinkTest do
         {{:module, Foo}, true}
       ])
 
-      assert autolinked(~t"Foo") == "Foo.html"
-      assert autolinked(~t"String", app: :elixir) == "String.html"
-      assert autolinked(~t"Foo", current_module: Foo) == "#content"
+      assert autolink("Foo") == ~m"[`Foo`](Foo.html)"
+      assert autolink("String", app: :elixir) == ~m"[`String`](String.html)"
+      assert autolink("Foo", current_module: Foo) == ~m"[`Foo`](#content)"
     end
 
     test "remote function" do
@@ -51,23 +55,24 @@ defmodule ExDoc.AutolinkTest do
         {{:function, Foo, :foo, 1}, true}
       ])
 
-      assert autolinked(~t"Foo.foo/1") == "Foo.html#foo/1"
+      assert autolink("Foo.foo/1") == ~m"[`Foo.foo/1`](Foo.html#foo/1)"
 
-      assert_unchanged(~t"Bad.bar/1")
+      assert_unchanged("Bad.bar/1")
     end
 
     test "elixir stdlib function" do
-      assert autolinked(~t"String.upcase/2") ==
-               "https://hexdocs.pm/elixir/String.html#upcase/2"
+      assert autolink("String.upcase/2") ==
+               ~m"[`String.upcase/2`](https://hexdocs.pm/elixir/String.html#upcase/2)"
     end
 
     test "elixir function with default argument" do
-      assert autolinked(~t"Enum.join/1") == "https://hexdocs.pm/elixir/Enum.html#join/1"
+      assert autolink("Enum.join/1") ==
+               ~m"[`Enum.join/1`](https://hexdocs.pm/elixir/Enum.html#join/1)"
     end
 
     test "erlang stdlib function" do
-      assert autolinked(~t":lists.all/2") ==
-               "http://www.erlang.org/doc/man/lists.html#all-2"
+      assert autolink(":lists.all/2") ==
+               ~m"[`:lists.all/2`](http://www.erlang.org/doc/man/lists.html#all-2)"
     end
 
     test "local function" do
@@ -76,130 +81,131 @@ defmodule ExDoc.AutolinkTest do
         {{:function, Foo, :foo, 1}, true}
       ])
 
-      assert autolinked(~t"foo/1", current_module: Foo) == "#foo/1"
-      assert_unchanged(~t"bar/1", current_module: Foo)
+      assert autolink("foo/1", current_module: Foo) == ~m"[`foo/1`](#foo/1)"
+      assert_unchanged("bar/1", current_module: Foo)
     end
 
     test "elixir callback" do
-      assert autolinked(~t"c:GenServer.handle_call/3") ==
-               "https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3"
+      assert autolink("c:GenServer.handle_call/3") ==
+               ~m"[`c:GenServer.handle_call/3`](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3)"
+
+      # TODO: there should be no `c:` in the link _text_!
+      # assert autolink("c:GenServer.handle_call/3") ==
+      #          ~m"[`GenServer.handle_call/3`](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3)"
     end
 
-    # TODO: enable when OTP 23.0-rc2 is out (it should have callbacks support)
-    # test "erlang callback" do
-    #   assert autolinked(~t"c::gen_server.handle_call/3") ==
-    #            "http://www.erlang.org/doc/man/gen_server.html#Module:handle_call-3"
-    # end
+    test "erlang callback" do
+      assert autolink("c::gen_server.handle_call/3") ==
+               ~m"[`c::gen_server.handle_call/3`](http://www.erlang.org/doc/man/gen_server.html#Module:handle_call-3)"
+    end
 
     test "elixir type" do
-      assert autolinked(~t"t:Calendar.date/0") ==
-               "https://hexdocs.pm/elixir/Calendar.html#t:date/0"
+      assert autolink("t:Calendar.date/0") ==
+               ~m"[`t:Calendar.date/0`](https://hexdocs.pm/elixir/Calendar.html#t:date/0)"
     end
 
     test "elixir basic & built-in types" do
-      assert autolinked(~t"t:atom/0") ==
-               "https://hexdocs.pm/elixir/typespecs.html#basic-types"
+      assert autolink("t:atom/0") ==
+               ~m"[`t:atom/0`](https://hexdocs.pm/elixir/typespecs.html#basic-types)"
 
-      assert autolinked(~t"t:keyword/0") ==
-               "https://hexdocs.pm/elixir/typespecs.html#built-in-types"
+      assert autolink("t:keyword/0") ==
+               ~m"[`t:keyword/0`](https://hexdocs.pm/elixir/typespecs.html#built-in-types)"
 
-      assert autolinked(~t"t:keyword/0", app: :elixir) ==
-               "typespecs.html#built-in-types"
+      assert autolink("t:keyword/0", app: :elixir) ==
+               ~m"[`t:keyword/0`](typespecs.html#built-in-types)"
     end
 
     test "erlang type" do
-      assert autolinked(~t"t::array.array/0") ==
-               "http://www.erlang.org/doc/man/array.html#type-array"
+      assert autolink("t::array.array/0") ==
+               ~m"[`t::array.array/0`](http://www.erlang.org/doc/man/array.html#type-array)"
     end
 
     test "special forms" do
-      assert autolinked(~t"__block__/1", current_module: Kernel.SpecialForms) ==
-               "#__block__/1"
+      assert autolink("__block__/1", current_module: Kernel.SpecialForms) ==
+               ~m"[`__block__/1`](#__block__/1)"
 
-      assert autolinked(~t"__aliases__/1", current_module: Kernel.SpecialForms) ==
-               "#__aliases__/1"
+      assert autolink("__aliases__/1", current_module: Kernel.SpecialForms) ==
+               ~m"[`__aliases__/1`](#__aliases__/1)"
     end
 
     test "escaping" do
-      assert autolinked(~t"Kernel.SpecialForms.\"%{}\"/1") ==
-               "https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%25%7B%7D/1"
+      assert autolink("Kernel.SpecialForms.%{}/1") ==
+               ~m"[`Kernel.SpecialForms.%{}/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%25%7B%7D/1)"
 
-      assert autolinked(~t"Kernel.SpecialForms.{}/1") ==
-               "https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%7B%7D/1"
+      assert autolink("Kernel.SpecialForms.{}/1") ==
+               ~m"[`Kernel.SpecialForms.{}/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%7B%7D/1)"
 
-      assert autolinked(~t"Kernel.SpecialForms.\"<<>>\"/1") ==
-               "https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1"
+      assert autolink("Kernel.SpecialForms.<<>>/1") ==
+               ~m"[`Kernel.SpecialForms.<<>>/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1)"
     end
 
     test "custom link" do
-      assert autolinked({:a, [href: "`String`"], ["custom", "text"]}) ==
-               "https://hexdocs.pm/elixir/String.html"
+      assert autolink(~m"[custom text](`String`)") ==
+               ~m"[custom text](https://hexdocs.pm/elixir/String.html)"
 
-      assert autolinked({:a, [href: "`:lists`"], ["custom", "text"]}) ==
-               "http://www.erlang.org/doc/man/lists.html"
+      assert autolink(~m"[custom text](`:lists`)") ==
+               ~m"[custom text](http://www.erlang.org/doc/man/lists.html)"
 
-      assert autolinked({:a, [href: "`:lists.all/2`"], ["custom", "text"]}) ==
-               "http://www.erlang.org/doc/man/lists.html#all-2"
+      assert autolink(~m"[custom text](`:lists.all/2`)") ==
+               ~m"[custom text](http://www.erlang.org/doc/man/lists.html#all-2)"
 
       # TODO: with custom links and backticks there are no false positives (you
       #       always mean to link) so we should always warn on mismatches?
       #       Though backticks are markdown specific, is that ok?
       # assert_warn(fn ->
-      assert autolinked({:a, [href: "`unknown`"], ["custom", "text"]}) ==
-               "`unknown`"
+      assert_unchanged(~m"[custom text](`Unknown`)")
     end
 
     test "mix task" do
-      assert autolinked(~t"mix compile.elixir") ==
-               "https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"
+      assert autolink("mix compile.elixir") ==
+               ~m"[`mix compile.elixir`](https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html)"
 
-      assert autolinked(~t"mix help compile.elixir") ==
-               "https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"
+      assert autolink("mix help compile.elixir") ==
+               ~m"[`mix help compile.elixir`](https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html)"
 
-      assert autolinked(~t"mix help help") ==
-               "https://hexdocs.pm/mix/Mix.Tasks.Help.html"
+      assert autolink("mix help help") ==
+               ~m"[`mix help help`](https://hexdocs.pm/mix/Mix.Tasks.Help.html)"
 
-      assert autolinked(~t"mix compile.elixir", app: :mix) ==
-               "Mix.Tasks.Compile.Elixir.html"
+      assert autolink("mix compile.elixir", app: :mix) ==
+               ~m"[`mix compile.elixir`](Mix.Tasks.Compile.Elixir.html)"
 
-      assert_unchanged(~t"mix compile.elixir --verbose")
+      assert_unchanged("mix compile.elixir --verbose")
 
-      assert_unchanged(~t"mix unknown.task")
+      assert_unchanged("mix unknown.task")
     end
 
     test "3rd party links" do
-      assert autolinked(~t"Earmark.as_ast/2") ==
-               "https://hexdocs.pm/earmark/Earmark.html#as_ast/2"
+      assert autolink("Earmark.as_ast/2") ==
+               ~m"[`Earmark.as_ast/2`](https://hexdocs.pm/earmark/Earmark.html#as_ast/2)"
 
-      assert_unchanged(~t":test_module.foo/0")
+      assert_unchanged(":test_module.foo/0")
     end
 
     test "extras" do
       opts = [extras: ["Foo Bar.md"]]
 
-      assert autolinked({:a, [href: "Foo Bar.md"], ["Foo"]}, opts) == "foo-bar.html"
+      assert autolink(~m"[Foo](Foo Bar.md)", opts) == ~m"[Foo](foo-bar.html)"
 
-      assert autolinked({:a, [href: "Foo Bar.md"], ["Foo"]}, [ext: ".xhtml"] ++ opts) ==
-               "foo-bar.xhtml"
+      assert autolink(~m"[Foo](Foo Bar.md)", [ext: ".xhtml"] ++ opts) == ~m"[Foo](foo-bar.xhtml)"
 
-      assert autolinked({:a, [href: "Foo Bar.md#baz"], ["Foo"]}, opts) == "foo-bar.html#baz"
+      assert autolink(~m"[Foo](Foo Bar.md#baz)", opts) == ~m"[Foo](foo-bar.html#baz)"
 
-      assert_unchanged({:a, [href: "http://example.com/foo.md"], ["Foo"]}, opts)
+      assert_unchanged(~m"[Foo](http://example.com/foo.md)", opts)
 
-      assert_unchanged({:a, [href: "#baz"], ["Foo"]}, opts)
+      assert_unchanged(~m"[Foo](#baz)", opts)
     end
 
     test "other link" do
-      assert_unchanged({:a, [href: "foo.html"], [~t"String"]})
-      assert_unchanged({:a, [href: "foo.html"], ["custom", "text"]})
+      assert_unchanged(~m"[`String`](foo.html)")
+      assert_unchanged(~m"[custom text](foo.html)")
     end
 
     test "other" do
-      assert_unchanged(~t"String.upcase() / 2")
-      assert_unchanged(~t"String.upcase()/2  ")
-      assert_unchanged(~t"  String.upcase()/2")
-      assert_unchanged(~t":\"atom\"")
-      assert_unchanged(~t"1 + 2")
+      assert_unchanged("String.upcase() / 2")
+      assert_unchanged("String.upcase()/2  ")
+      assert_unchanged("  String.upcase()/2")
+      assert_unchanged(":\"atom\"")
+      assert_unchanged("1 + 2")
       assert_unchanged({:p, [], ["hello"]})
     end
   end
@@ -306,7 +312,7 @@ defmodule ExDoc.AutolinkTest do
 
     captured =
       assert_warn(fn ->
-        assert_unchanged(~t"Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
+        assert_unchanged("Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
       end)
 
     assert captured =~ "documentation references function Foo.bar/1"
@@ -314,22 +320,22 @@ defmodule ExDoc.AutolinkTest do
 
     captured =
       assert_warn(fn ->
-        assert_unchanged(~t"Foo.bar/1", file: "lib/foo.ex", id: "Foo.foo/0")
+        assert_unchanged("Foo.bar/1", file: "lib/foo.ex", id: "Foo.foo/0")
       end)
 
     assert captured =~ "documentation references function Foo.bar/1"
     assert captured =~ ~r{lib/foo.ex: Foo.foo/0\n$}
 
     assert_warn(fn ->
-      assert_unchanged(~t"String.upcase/9")
+      assert_unchanged("String.upcase/9")
     end)
 
     assert_warn(fn ->
-      assert_unchanged(~t"c:GenServer.handle_call/9")
+      assert_unchanged("c:GenServer.handle_call/9")
     end)
 
     assert_warn(fn ->
-      assert_unchanged(~t"t:Calendar.date/9")
+      assert_unchanged("t:Calendar.date/9")
     end)
 
     assert_warn(fn ->
@@ -345,34 +351,34 @@ defmodule ExDoc.AutolinkTest do
     captured =
       assert_warn(fn ->
         opts = [extras: []]
-        assert_unchanged({:a, [href: "Foo Bar.md"], ["Foo"]}, opts)
+        assert_unchanged(~m"[Foo](Foo Bar.md)", opts)
       end)
 
     assert captured =~ "documentation references file `Foo Bar.md` but it doesn't exists"
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
-    assert_unchanged(~t"String.upcase/9", options)
+    assert_unchanged("String.upcase/9", options)
   end
 
   ## Helpers
 
   @default_options [app: :myapp, current_module: MyModule, module_id: "MyModule", file: "nofile"]
 
-  defp autolinked(node, options \\ []) do
-    case ExDoc.Autolink.doc(node, Keyword.merge(@default_options, options)) do
-      {:a, [href: url], _} when is_binary(url) -> url
-      _ -> raise "could not build link for `#{inspect(node)}`"
-    end
+  defp autolink(ast_or_text, options \\ []) do
+    ExDoc.Autolink.doc(ast(ast_or_text), Keyword.merge(@default_options, options))
   end
+
+  defp assert_unchanged(ast_or_text, options \\ []) do
+    assert autolink(ast_or_text, options) == ast(ast_or_text)
+  end
+
+  defp ast(text) when is_binary(text), do: {:code, [class: "inline"], [text]}
+  defp ast({_, _, _} = ast), do: ast
 
   defp assert_warn(fun) do
     captured = capture_io(:stderr, fun)
     captured =~ "documentation references"
     captured
-  end
-
-  defp assert_unchanged(node, options \\ []) do
-    assert ExDoc.Autolink.doc(node, Keyword.merge(@default_options, options)) == node
   end
 
   defp typespec(ast, options \\ []) do
