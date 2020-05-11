@@ -88,7 +88,7 @@ defmodule Mix.Tasks.Docs do
     * `:filter_prefix` - Include only modules that match the given prefix in
       the generated documentation. Example: "MyApp.Core"
 
-    * `:formatters` - Formatter to use; default: ["html"], options: "html", "epub".
+    * `:formatters` - Formatter to use; default: ["html", "epub"], options: "html", "epub".
 
     * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See the "Groups" section
 
