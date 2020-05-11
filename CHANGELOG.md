@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.22.0-dev (unreleased)
+## v0.22.0 (2020-05-11)
 
   * Enhancements
     * [EPUB] Add epub to the default formatters
@@ -12,6 +12,7 @@
     * [HTML+EPUB] Auto-link to extras (e.g. `[foo](foo.md)`)
     * [mix docs] Undefined references warning now includes the filename
     * [mix docs] `:skip_undefined_reference_warnings_on` now also accepts a filename
+    * [HTML+EPUB] Display moduledoc headings in the sidebar
 
   * Bug fixes
     * [HTML] Fix hidden text selection, hide tooltips for details link

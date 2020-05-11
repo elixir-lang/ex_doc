@@ -1,7 +1,7 @@
 defmodule ExDoc.Mixfile do
   use Mix.Project
 
-  @version "0.22.0-dev"
+  @version "0.22.0"
 
   def project do
     [
@@ -47,7 +47,7 @@ defmodule ExDoc.Mixfile do
 
   defp package do
     [
-      licenses: ["Apache 2.0"],
+      licenses: ["Apache-2.0"],
       maintainers: [
         "José Valim",
         "Eksperimental",
