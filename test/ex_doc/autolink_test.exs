@@ -87,37 +87,33 @@ defmodule ExDoc.AutolinkTest do
 
     test "elixir callback" do
       assert autolink("c:GenServer.handle_call/3") ==
-               ~m"[`c:GenServer.handle_call/3`](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3)"
-
-      # TODO: there should be no `c:` in the link _text_!
-      # assert autolink("c:GenServer.handle_call/3") ==
-      #          ~m"[`GenServer.handle_call/3`](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3)"
+               ~m"[`GenServer.handle_call/3`](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3)"
     end
 
     test "erlang callback" do
       assert autolink("c::gen_server.handle_call/3") ==
-               ~m"[`c::gen_server.handle_call/3`](http://www.erlang.org/doc/man/gen_server.html#Module:handle_call-3)"
+               ~m"[`:gen_server.handle_call/3`](http://www.erlang.org/doc/man/gen_server.html#Module:handle_call-3)"
     end
 
     test "elixir type" do
       assert autolink("t:Calendar.date/0") ==
-               ~m"[`t:Calendar.date/0`](https://hexdocs.pm/elixir/Calendar.html#t:date/0)"
+               ~m"[`Calendar.date/0`](https://hexdocs.pm/elixir/Calendar.html#t:date/0)"
     end
 
     test "elixir basic & built-in types" do
       assert autolink("t:atom/0") ==
-               ~m"[`t:atom/0`](https://hexdocs.pm/elixir/typespecs.html#basic-types)"
+               ~m"[`atom/0`](https://hexdocs.pm/elixir/typespecs.html#basic-types)"
 
       assert autolink("t:keyword/0") ==
-               ~m"[`t:keyword/0`](https://hexdocs.pm/elixir/typespecs.html#built-in-types)"
+               ~m"[`keyword/0`](https://hexdocs.pm/elixir/typespecs.html#built-in-types)"
 
       assert autolink("t:keyword/0", app: :elixir) ==
-               ~m"[`t:keyword/0`](typespecs.html#built-in-types)"
+               ~m"[`keyword/0`](typespecs.html#built-in-types)"
     end
 
     test "erlang type" do
       assert autolink("t::array.array/0") ==
-               ~m"[`t::array.array/0`](http://www.erlang.org/doc/man/array.html#type-array)"
+               ~m"[`:array.array/0`](http://www.erlang.org/doc/man/array.html#type-array)"
     end
 
     test "special forms" do

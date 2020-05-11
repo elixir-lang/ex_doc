@@ -319,7 +319,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~r{<a href="TypesAndSpecs.Sub.html"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
 
       assert content =~
-               ~r{<a href="typespecs.html#basic-types"><code(\sclass="inline")?>t:atom/0</code></a>}
+               ~r{<a href="typespecs.html#basic-types"><code(\sclass="inline")?>atom/0</code></a>}
 
       assert content =~
                ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code(\sclass="inline")?>mix compile.elixir</code></a>}

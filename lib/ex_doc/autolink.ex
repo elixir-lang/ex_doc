@@ -72,9 +72,10 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp walk({:code, _, [code]} = ast, config) do
+  defp walk({:code, attrs, [code]} = ast, config) do
     if url = url(code, :regular, config) do
-      {:a, [href: url], [ast]}
+      code = remove_prefix(code)
+      {:a, [href: url], [{:code, attrs, [code]}]}
     else
       ast
     end
@@ -204,9 +205,13 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp kind("t:" <> rest), do: {:type, rest}
   defp kind("c:" <> rest), do: {:callback, rest}
+  defp kind("t:" <> rest), do: {:type, rest}
   defp kind(rest), do: {:function, rest}
+
+  defp remove_prefix("c:" <> rest), do: rest
+  defp remove_prefix("t:" <> rest), do: rest
+  defp remove_prefix(rest), do: rest
 
   defp parse_arity(string) do
     case Integer.parse(string) do

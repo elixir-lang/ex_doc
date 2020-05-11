@@ -378,7 +378,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       refute content =~ ~s[minus(#{integer}, #{integer}) :: #{integer}]
 
       assert content =~
-               ~s[Basic type: <a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\"><code class=\"inline\">t:atom/0</code></a>.]
+               ~s[Basic type: <a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\"><code class=\"inline\">atom/0</code></a>.]
 
       assert content =~ ~r{opaque/0.*<span class="note">\(opaque\)</span>}ms
     end
