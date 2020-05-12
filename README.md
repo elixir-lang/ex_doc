@@ -100,7 +100,6 @@ You can ExDoc via the command line as follows:
     ```bash
     $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
     ```
-    By default, ex_doc produces HTML files and a EPUB document.  
 
 For example, here are some acceptable values:
 
