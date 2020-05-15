@@ -58,6 +58,7 @@ defmodule ExDoc.Markdown.Earmark do
   defp fixup(list) when is_list(list), do: Enum.map(list, &fixup/1)
   defp fixup(binary) when is_binary(binary), do: binary
   defp fixup({tag, attrs, ast}), do: {fixup_tag(tag), Enum.map(attrs, &fixup_attr/1), fixup(ast)}
+  defp fixup({tag, attrs, ast, _meta}), do: fixup({tag, attrs, ast})
 
   defp fixup_tag(tag), do: String.to_atom(tag)
 
