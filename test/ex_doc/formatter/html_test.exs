@@ -74,6 +74,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert HTML.strip_tags("<em>Hello</em> World!<br/>") == "Hello World!"
       assert HTML.strip_tags("Go <a href=\"#top\" class='small' disabled>back</a>") == "Go back"
       assert HTML.strip_tags("Git opts (<code class=\"inline\">:git</code>)") == "Git opts (:git)"
+      assert HTML.strip_tags("<p>P1.</p><p>P2</p>") == "P1.P2"
+      assert HTML.strip_tags("<p>P1.</p><p>P2</p>", " ") == " P1.  P2 "
     end
   end
 

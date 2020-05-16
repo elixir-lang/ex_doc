@@ -59,7 +59,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
   defp clean_doc(doc) do
     doc
     |> Kernel.||("")
-    |> HTML.strip_tags()
+    |> HTML.strip_tags(" ")
     |> String.replace(~r/\s+/, " ")
     |> String.trim()
   end

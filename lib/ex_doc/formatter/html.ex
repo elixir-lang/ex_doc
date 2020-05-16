@@ -348,8 +348,8 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Strips html tags from text leaving their text content
   """
-  def strip_tags(text) when is_binary(text) do
-    String.replace(text, @clean_html_regex, "")
+  def strip_tags(text, replace_with \\ "") when is_binary(text) do
+    String.replace(text, @clean_html_regex, replace_with)
   end
 
   @doc """
