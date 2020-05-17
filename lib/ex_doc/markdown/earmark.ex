@@ -71,7 +71,12 @@ defmodule ExDoc.Markdown.Earmark do
     fixup({tag, attrs, ast})
   end
 
-  defp fixup({:comment, _, _}) do
+  # E.g. `{:comment, _, _}`
+  defp fixup({_, _, _}) do
+    []
+  end
+
+  defp fixup({_, _, _, _}) do
     []
   end
 
