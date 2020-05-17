@@ -55,12 +55,45 @@ defmodule ExDoc.Markdown.Earmark do
     end
   end
 
-  defp fixup(list) when is_list(list), do: Enum.map(list, &fixup/1)
-  defp fixup(binary) when is_binary(binary), do: binary
-  defp fixup({tag, attrs, ast}), do: {fixup_tag(tag), Enum.map(attrs, &fixup_attr/1), fixup(ast)}
-  defp fixup({tag, attrs, ast, _meta}), do: fixup({tag, attrs, ast})
+  defp fixup(list) when is_list(list) do
+    fixup_list(list, [])
+  end
 
-  defp fixup_tag(tag), do: String.to_atom(tag)
+  defp fixup(binary) when is_binary(binary) do
+    binary
+  end
 
-  defp fixup_attr({name, value}), do: {String.to_atom(name), value}
+  defp fixup({tag, attrs, ast}) when is_binary(tag) do
+    {fixup_tag(tag), Enum.map(attrs, &fixup_attr/1), fixup(ast)}
+  end
+
+  defp fixup({tag, attrs, ast, _meta}) when is_binary(tag) do
+    fixup({tag, attrs, ast})
+  end
+
+  defp fixup({:comment, _, _}) do
+    []
+  end
+
+  defp fixup_list([head | tail], acc) do
+    fixed = fixup(head)
+
+    if fixed == [] do
+      fixup_list(tail, acc)
+    else
+      fixup_list(tail, [fixed | acc])
+    end
+  end
+
+  defp fixup_list([], acc) do
+    Enum.reverse(acc)
+  end
+
+  defp fixup_tag(tag) do
+    String.to_atom(tag)
+  end
+
+  defp fixup_attr({name, value}) do
+    {String.to_atom(name), value}
+  end
 end

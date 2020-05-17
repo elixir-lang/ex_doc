@@ -15,5 +15,9 @@ defmodule ExDoc.Markdown.EarmarkTest do
     test "empty input" do
       assert Markdown.to_ast("", []) == []
     end
+
+    test "comments" do
+      assert Markdown.to_ast("<!-- INCLUDE -->", []) == []
+    end
   end
 end
