@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.22.1 (2020-05-19)
+
+  * Bug fixes
+    * [mix docs] Depend on earmark `~> 1.4.0`
+    * [mix docs] Don't crash on comments in markdown
+    * [mix docs] Don't crash on HTML in markdown
+
 ## v0.22.0 (2020-05-11)
 
   * Enhancements
