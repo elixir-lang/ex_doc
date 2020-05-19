@@ -17,6 +17,9 @@ defmodule ExDoc.Autolink do
   #
   # * `:ext` - the extension (`".html"`, "`.xhtml"`, etc)
   #
+  # * `:siblings` - applications in the same umbrella project as `:app`. When linking modules,
+  #   links to these applications are relative.
+  #
   # * `:extras` - list of extras
   #
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
@@ -32,6 +35,7 @@ defmodule ExDoc.Autolink do
     :line,
     extras: [],
     ext: ".html",
+    siblings: [],
     skip_undefined_reference_warnings_on: []
   ]
 
@@ -421,7 +425,7 @@ defmodule ExDoc.Autolink do
 
     case :application.get_application(module) do
       {:ok, ^app} -> ""
-      {:ok, app} -> @hexdocs <> "#{app}/"
+      {:ok, app} -> if app in config.siblings, do: "", else: @hexdocs <> "#{app}/"
       _ -> ""
     end
   end

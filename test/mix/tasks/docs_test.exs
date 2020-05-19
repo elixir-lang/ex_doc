@@ -145,6 +145,7 @@ defmodule Mix.Tasks.DocsTest do
          [
            formatter: "html",
            deps: _,
+           siblings: [:bar, :foo],
            source_beam: _,
            app: _
          ]},
@@ -152,6 +153,7 @@ defmodule Mix.Tasks.DocsTest do
          [
            formatter: "epub",
            deps: _,
+           siblings: [:bar, :foo],
            source_beam: _,
            app: _
          ]}
@@ -166,6 +168,7 @@ defmodule Mix.Tasks.DocsTest do
          [
            formatter: "html",
            deps: _,
+           siblings: [:bar],
            source_beam: _,
            app: _,
            ignore_apps: [:foo]
@@ -174,6 +177,7 @@ defmodule Mix.Tasks.DocsTest do
          [
            formatter: "epub",
            deps: _,
+           siblings: [:bar],
            source_beam: _,
            app: _,
            ignore_apps: [:foo]

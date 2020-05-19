@@ -329,6 +329,7 @@ defmodule Mix.Tasks.Docs do
       # accepted at root level config
       |> normalize_homepage_url(config)
       |> normalize_source_beam(config)
+      |> normalize_siblings(config)
       |> normalize_main()
       |> normalize_deps()
 
@@ -391,6 +392,21 @@ defmodule Mix.Tasks.Docs do
     for {app, _} <- Mix.Project.apps_paths(),
         app not in ignored_apps do
       Path.join([build, "lib", Atom.to_string(app), "ebin"])
+    end
+  end
+
+  defp normalize_siblings(options, config) do
+    if Mix.Project.umbrella?(config) do
+      ignore = Keyword.get(options, :ignore_apps, [])
+
+      siblings =
+        for {app, _} <- Mix.Project.apps_paths(), app not in ignore do
+          app
+        end
+
+      Keyword.put(options, :siblings, siblings)
+    else
+      options
     end
   end
 
