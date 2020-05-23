@@ -85,6 +85,11 @@ defmodule ExDoc.AutolinkTest do
       assert_unchanged("bar/1", current_module: Foo)
     end
 
+    test "sibling function" do
+      assert autolink("Earmark.as_ast/2", siblings: [:earmark]) ==
+               ~m"[`Earmark.as_ast/2`](Earmark.html#as_ast/2)"
+    end
+
     test "elixir callback" do
       assert autolink("c:GenServer.handle_call/3") ==
                ~m"[`GenServer.handle_call/3`](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3)"
