@@ -5,8 +5,6 @@ import hljs from 'highlight.js/lib/highlight'
 import bash from 'highlight.js/lib/languages/bash'
 import css from 'highlight.js/lib/languages/css'
 import diff from 'highlight.js/lib/languages/diff'
-import erlang from 'highlight.js/lib/languages/erlang'
-import erlangRepl from 'highlight.js/lib/languages/erlang-repl'
 import http from 'highlight.js/lib/languages/http'
 import javascript from 'highlight.js/lib/languages/javascript'
 import json from 'highlight.js/lib/languages/json'
@@ -24,8 +22,6 @@ hljs.configure({
 hljs.registerLanguage('bash', bash)
 hljs.registerLanguage('css', css)
 hljs.registerLanguage('diff', diff)
-hljs.registerLanguage('erlang', erlang)
-hljs.registerLanguage('erlang-repl', erlangRepl)
 hljs.registerLanguage('http', http)
 hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('json', json)

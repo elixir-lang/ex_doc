@@ -29,6 +29,7 @@ defmodule ExDoc.Config do
             homepage_url: nil,
             javascript_config_path: "docs_config.js",
             language: "en",
+            proglang: :elixir,
             logo: nil,
             cover: nil,
             main: nil,

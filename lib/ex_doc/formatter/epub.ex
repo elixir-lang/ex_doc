@@ -26,7 +26,7 @@ defmodule ExDoc.Formatter.EPUB do
     config = %{config | extras: extras}
 
     assets_dir = "OEBPS/assets"
-    static_files = HTML.generate_assets(config, assets_dir, default_assets())
+    static_files = HTML.generate_assets(config, assets_dir, default_assets(config))
     HTML.generate_logo(assets_dir, config)
     HTML.generate_cover(assets_dir, config)
 
@@ -125,9 +125,9 @@ defmodule ExDoc.Formatter.EPUB do
 
   ## Helpers
 
-  defp default_assets do
+  defp default_assets(config) do
     [
-      {Assets.dist(), "OEBPS/dist"},
+      {Assets.dist(config.proglang), "OEBPS/dist"},
       {Assets.metainfo(), "META-INF"}
     ]
   end

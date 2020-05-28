@@ -248,9 +248,9 @@ defmodule ExDoc.Formatter.HTML do
     end)
   end
 
-  defp default_assets(_config) do
+  defp default_assets(config) do
     [
-      {Assets.dist(), "dist"},
+      {Assets.dist(config.proglang), "dist"},
       {Assets.fonts(), "dist/html/fonts"}
     ]
   end
