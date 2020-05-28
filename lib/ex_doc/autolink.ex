@@ -393,12 +393,11 @@ defmodule ExDoc.Autolink do
     module = config.current_module
     ref = {kind, module, name, arity}
 
-    if Refs.public?(ref) do
-      fragment(tool(module), kind, name, arity)
-    else
-      if kind == :function do
-        try_autoimported_function(name, arity, config)
-      end
+    cond do
+      Refs.public?(ref) -> fragment(tool(module), kind, name, arity)
+      kind == :function -> try_autoimported_function(name, arity, config)
+      true -> nil
+    end
     end
   end
 
