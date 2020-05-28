@@ -90,6 +90,17 @@ defmodule ExDoc.AutolinkTest do
                ~m"[`Earmark.as_ast/2`](Earmark.html#as_ast/2)"
     end
 
+    test "auto-imported function" do
+      assert autolink("+/2") ==
+               ~m"[`+/2`](https://hexdocs.pm/elixir/Kernel.html#+/2)"
+
+      assert autolink("for/1") ==
+               ~m"[`for/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#for/1)"
+
+      assert autolink("for/1", app: :elixir) ==
+               ~m"[`for/1`](Kernel.SpecialForms.html#for/1)"
+    end
+
     test "elixir callback" do
       assert autolink("c:GenServer.handle_call/3") ==
                ~m"[`GenServer.handle_call/3`](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3)"
