@@ -46,6 +46,8 @@ defmodule ExDoc.Autolink do
   @hexdocs "https://hexdocs.pm/"
   @otpdocs "http://www.erlang.org/doc/man/"
 
+  @autoimported_modules [Kernel, Kernel.SpecialForms]
+
   def doc(ast, options \\ []) do
     config = struct!(__MODULE__, options)
     walk(ast, config)
@@ -393,10 +395,21 @@ defmodule ExDoc.Autolink do
 
     if Refs.public?(ref) do
       fragment(tool(module), kind, name, arity)
+    else
+      if kind == :function do
+        try_autoimported_function(name, arity, config)
+      end
     end
   end
 
-  defp remote_url(kind, module, name, arity, config) do
+  defp try_autoimported_function(name, arity, config) do
+    Enum.find_value(@autoimported_modules, fn module ->
+      remote_url(:function, module, name, arity, config, warn?: false)
+    end)
+  end
+
+  defp remote_url(kind, module, name, arity, config, opts \\ []) do
+    warn? = Keyword.get(opts, :warn?, true)
     ref = {kind, module, name, arity}
 
     if Refs.public?(ref) do
@@ -412,7 +425,7 @@ defmodule ExDoc.Autolink do
           end
       end
     else
-      if Refs.public?({:module, module}) do
+      if warn? and Refs.public?({:module, module}) do
         maybe_warn({kind, module, name, arity}, config)
       end
 
