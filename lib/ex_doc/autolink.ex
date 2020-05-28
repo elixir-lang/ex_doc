@@ -398,7 +398,6 @@ defmodule ExDoc.Autolink do
       kind == :function -> try_autoimported_function(name, arity, config)
       true -> nil
     end
-    end
   end
 
   defp try_autoimported_function(name, arity, config) do
