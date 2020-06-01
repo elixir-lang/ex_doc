@@ -112,7 +112,7 @@ defmodule ExDoc.Autolink do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
         HTML.text_to_id(without_ext) <> config.ext <> fragment
       else
-        message = "documentation references file `#{uri.path}` but it doesn't exists"
+        message = "documentation references file `#{uri.path}` but it doesn't exist"
         warn(message, config.file, config.line, config.id)
         nil
       end

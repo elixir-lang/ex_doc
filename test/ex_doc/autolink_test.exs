@@ -366,7 +366,7 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged(~m"[Foo](Foo Bar.md)", opts)
       end)
 
-    assert captured =~ "documentation references file `Foo Bar.md` but it doesn't exists"
+    assert captured =~ "documentation references file `Foo Bar.md` but it doesn't exist"
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
