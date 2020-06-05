@@ -122,12 +122,27 @@ function titleExtractor (document) {
 
   if (type === 'function' || type === 'callback' || type === 'type') {
     var modFun = title.replace(/\/\d+/, '')
-    var modOrFun = modFun.replace('.', ' ')
+    var modOrFun = modFun.replace(/\./g, ' ')
     var parts = title.split('.')
     title = title + ' ' + modFun + ' ' + modOrFun + ' ' + parts[parts.length - 1]
   }
 
   return title
+}
+
+function snakeCaseSplitter (builder) {
+  function snakeCaseFunction (token) {
+    var snakeTokens =  token.toString().split("_").map(function (str) {
+      return token.clone().update(function () { return str })
+    })
+    if (snakeTokens.length > 1) {
+      snakeTokens.push(token)
+    }
+    return snakeTokens
+  }
+
+  lunr.Pipeline.registerFunction(snakeCaseFunction, 'snakeCaseSplitter')
+  builder.pipeline.before(lunr.stemmer, snakeCaseFunction)
 }
 
 function createIndex () {
@@ -137,6 +152,7 @@ function createIndex () {
     this.field('doc')
     this.metadataWhitelist = ['position']
     this.pipeline.remove(lunr.stopWordFilter)
+    this.use(snakeCaseSplitter)
 
     searchNodes.forEach(function (doc) {
       this.add(doc)
