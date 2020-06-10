@@ -128,7 +128,6 @@ defmodule ExDoc.Formatter.HTML do
   defp ast_to_html({tag, attrs, ast}) do
     attrs = Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
     ["<#{tag}", attrs, ">", ast_to_html(ast), "</#{tag}>"]
-    ["<#{tag}#{attrs}>", ast_to_html(ast), "</#{tag}>"]
   end
 
   defp output_setup(build, config) do
