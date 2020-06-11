@@ -202,6 +202,8 @@ defmodule ExDoc.AutolinkTest do
 
       assert autolink(~m"[Foo](Foo Bar.md#baz)", opts) == ~m"[Foo](foo-bar.html#baz)"
 
+      assert autolink(~m"[Foo](../guide/Foo Bar.md)", opts) == ~m"[Foo](foo-bar.html)"
+
       assert_unchanged(~m"[Foo](http://example.com/foo.md)", opts)
 
       assert_unchanged(~m"[Foo](#baz)", opts)
