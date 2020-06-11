@@ -107,6 +107,7 @@ defmodule ExDoc.Autolink do
          true <- is_binary(uri.path),
          ".md" <- Path.extname(uri.path) do
       md_file = Path.basename(uri.path)
+
       if md_file in config.extras do
         without_ext = String.trim_trailing(md_file, ".md")
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
