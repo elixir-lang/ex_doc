@@ -140,11 +140,15 @@ defmodule Mix.Tasks.Docs do
 
       For GitLab/GitHub:
 
-          https://mydomain.org/user_or_team/repo_name/blob/master/%{path}#L%{line}"
+      ```
+      https://mydomain.org/user_or_team/repo_name/blob/master/%{path}#L%{line}"
+      ```
 
       For Bitbucket:
 
-          https://mydomain.org/user_or_team/repo_name/src/master/%{path}#cl-%{line}
+      ```
+      https://mydomain.org/user_or_team/repo_name/src/master/%{path}#cl-%{line}
+      ```
 
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
