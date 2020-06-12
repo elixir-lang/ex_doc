@@ -140,13 +140,13 @@ defmodule Mix.Tasks.Docs do
 
       For GitLab/GitHub:
 
-      ```
-      https://mydomain.org/user_or_team/repo_name/blob/master/%{path}#L%{line}"
+      ```text
+      https://mydomain.org/user_or_team/repo_name/blob/master/%{path}#L%{line}
       ```
 
       For Bitbucket:
 
-      ```
+      ```text
       https://mydomain.org/user_or_team/repo_name/src/master/%{path}#cl-%{line}
       ```
 
