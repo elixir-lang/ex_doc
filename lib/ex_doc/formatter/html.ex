@@ -122,10 +122,11 @@ defmodule ExDoc.Formatter.HTML do
     |> ExDoc.Highlighter.highlight_code_blocks(opts)
   end
 
-  defp ast_to_html(list) when is_list(list), do: Enum.map(list, &ast_to_html/1)
-  defp ast_to_html(binary) when is_binary(binary), do: Templates.h(binary)
+  @doc false
+  def ast_to_html(list) when is_list(list), do: Enum.map(list, &ast_to_html/1)
+  def ast_to_html(binary) when is_binary(binary), do: Templates.h(binary)
 
-  defp ast_to_html({tag, attrs, ast}) do
+  def ast_to_html({tag, attrs, ast}) do
     attrs = Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
     ["<#{tag}", attrs, ">", ast_to_html(ast), "</#{tag}>"]
   end

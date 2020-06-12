@@ -148,12 +148,19 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       ## Example:
       """
 
-      assert Templates.synopsis(Earmark.as_html!(doc1)) ==
+      assert Templates.synopsis(to_html(doc1)) ==
                "<p>Summaries should not be displayed with trailing semicolons </p>"
 
-      assert Templates.synopsis(Earmark.as_html!(doc2)) ==
+      assert Templates.synopsis(to_html(doc2)) ==
                "<p>Example function: Summary should display trailing period :.</p>"
     end
+  end
+
+  defp to_html(markdown) do
+    markdown
+    |> ExDoc.Markdown.to_ast()
+    |> ExDoc.Formatter.HTML.ast_to_html()
+    |> IO.iodata_to_binary()
   end
 
   describe "sidebar" do
