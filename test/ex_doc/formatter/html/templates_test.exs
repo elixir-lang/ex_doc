@@ -411,7 +411,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CompiledWithDocs])
 
       assert content =~
-               ~s{&mdash; & &ndash; : EM-DASH & EN-DASH}
+               ~s{Another example with &mdash; & &ndash;}
     end
 
     ## BEHAVIOURS

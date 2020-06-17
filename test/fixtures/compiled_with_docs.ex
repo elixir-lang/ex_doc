@@ -18,16 +18,13 @@ defmodule CompiledWithDocs do
   @deprecated "Use something else instead"
   def example(foo, bar \\ Baz), do: bar.baz(foo)
 
-  @doc "Another example"
+  @doc "Another example with &mdash; & &ndash;"
   @doc since: "1.3.0"
   defmacro example_1, do: 1
 
   @doc "A simple guard"
   # TODO: remove explicit guard: true when ~> 1.8
   defguard is_zero(number) when number == 0
-
-  @doc "&mdash; & &ndash; : EM-DASH & EN-DASH"
-  def example_with_special_HTML_chars_in_doc, do: nil
 
   @doc """
   Does example action.
