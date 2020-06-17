@@ -23,7 +23,6 @@ defmodule CompiledWithDocs do
   defmacro example_1, do: 1
 
   @doc "A simple guard"
-  # TODO: remove explicit guard: true when ~> 1.8
   defguard is_zero(number) when number == 0
 
   @doc """
