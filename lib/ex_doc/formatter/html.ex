@@ -124,7 +124,7 @@ defmodule ExDoc.Formatter.HTML do
 
   @doc false
   def ast_to_html(list) when is_list(list), do: Enum.map(list, &ast_to_html/1)
-  def ast_to_html(binary) when is_binary(binary), do: Templates.h(binary)
+  def ast_to_html(binary) when is_binary(binary), do: binary
 
   def ast_to_html({tag, attrs, ast}) do
     attrs = Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)

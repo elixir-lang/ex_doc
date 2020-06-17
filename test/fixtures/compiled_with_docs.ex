@@ -26,6 +26,9 @@ defmodule CompiledWithDocs do
   # TODO: remove explicit guard: true when ~> 1.8
   defguard is_zero(number) when number == 0
 
+  @doc "&mdash; & &ndash; : EM-DASH & EN-DASH"
+  def example_with_special_HTML_chars_in_doc, do: nil
+
   @doc """
   Does example action.
 

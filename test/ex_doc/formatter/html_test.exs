@@ -305,7 +305,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~r{<h2 id="header-sample" class="section-heading">.*<a href="#header-sample" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>.*<code(\sclass="inline")?>Header</code> sample.*</h2>}ms
 
       assert content =~
-               ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>.*more &gt; than.*</h2>}ms
+               ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>.*more > than.*</h2>}ms
 
       assert content =~ ~r{<a href="RandomError.html"><code(\sclass="inline")?>RandomError</code>}
 
@@ -335,7 +335,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~s("extras":[{"group":"","headers":[],"id":"api-reference","title":"API Reference"},)
 
       assert content =~
-               ~s({"group":"","headers":[{"anchor":"header-sample","id":"Header sample"},{"anchor":"more-than","id":"more &gt; than"}],"id":"readme","title":"README"})
+               ~s({"group":"","headers":[{"anchor":"header-sample","id":"Header sample"},{"anchor":"more-than","id":"more > than"}],"id":"readme","title":"README"})
     end
 
     test "containing settext headers while discarding links on header" do
@@ -396,6 +396,19 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r{<title>Extra Page Title — Elixir v1.0.1</title>}
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~r{"id":"extrapage","title":"Extra Page Title"}
+    end
+
+    test "with HTML" do
+      generate_docs(doc_config(extras: ["test/fixtures/ExtraPageWithHTML.md"]))
+      content = File.read!("#{output_dir()}/extrapagewithhtml.html")
+      assert content =~ ~r{<title>Extra Page with HTML — Elixir v1.0.1</title>}
+      assert content =~ ~r{<h1 align="center">\s*Extra Page with HTML\s*</h1>}
+      assert content =~ ~r{<h1>\s*Second Main Title\s*</h1>}
+      assert content =~ ~r{<p align="center">\s*<img src="image\.svg"/>\s*</p>}
+      assert content =~ ~s{Elixir & Erlang}
+
+      content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+      assert content =~ ~r{"id":"extrapagewithhtml","title":"Extra Page with HTML"}
     end
 
     test "without api-reference" do

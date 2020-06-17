@@ -277,7 +277,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert compiled_with_docs.sections == [
                %{
                  anchor: "module-example-unicode-escaping",
-                 id: "Example ☃ Unicode &gt; escaping"
+                 id: "Example ☃ Unicode > escaping"
                }
              ]
 
@@ -405,6 +405,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert content =~
                ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
+    end
+
+    test "deals with special HTML characters" do
+      content = get_module_page([CompiledWithDocs])
+
+      assert content =~
+               ~s{&mdash; & &ndash; : EM-DASH & EN-DASH}
     end
 
     ## BEHAVIOURS

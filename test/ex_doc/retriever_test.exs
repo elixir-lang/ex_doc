@@ -104,8 +104,16 @@ defmodule ExDoc.RetrieverTest do
           ]
         )
 
-      [struct, example, example_1, example_with_h3, example_without_docs, flatten, is_zero] =
-        module_node.docs
+      [
+        struct,
+        example,
+        example_1,
+        example_with_h3,
+        example_with_special_HTML_chars_in_doc,
+        example_without_docs,
+        flatten,
+        is_zero
+      ] = module_node.docs
 
       assert struct.id == "__struct__/0"
       assert struct.doc == [{:p, [], ["Some struct"]}]
@@ -136,7 +144,7 @@ defmodule ExDoc.RetrieverTest do
       assert example_without_docs.group == "Legacy"
 
       assert example_without_docs.source_url ==
-               "http://example.com/test/fixtures/compiled_with_docs.ex\#L38"
+               "http://example.com/test/fixtures/compiled_with_docs.ex\#L41"
 
       assert flatten.id == "flatten/1"
       assert flatten.type == :function
@@ -151,6 +159,10 @@ defmodule ExDoc.RetrieverTest do
       assert is_zero.doc == [{:p, [], ["A simple guard"]}]
       assert is_zero.type == :macro
       assert is_zero.defaults == []
+
+      assert example_with_special_HTML_chars_in_doc.doc == [
+               {:p, [], ["&mdash; & &ndash; : EM-DASH & EN-DASH"]}
+             ]
     end
 
     test "returns the specs for each non-private function" do
