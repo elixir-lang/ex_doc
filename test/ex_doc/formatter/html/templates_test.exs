@@ -159,8 +159,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   defp to_html(markdown) do
     markdown
     |> ExDoc.Markdown.to_ast()
-    |> ExDoc.Formatter.HTML.ast_to_html()
-    |> IO.iodata_to_binary()
+    |> ExDoc.Markdown.AST.to_html()
   end
 
   describe "sidebar" do
@@ -303,7 +302,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   describe "module_page" do
     test "outputs the functions and docstrings" do
       content = get_module_page([CompiledWithDocs])
-
       # Title and headers
       assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
 
@@ -405,6 +403,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert content =~
                ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
+    end
+
+    test "deals with special HTML characters" do
+      content = get_module_page([CompiledWithDocs])
+
+      assert content =~
+               ~s{Another example with &mdash; &amp; &ndash;}
     end
 
     ## BEHAVIOURS

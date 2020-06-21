@@ -48,7 +48,7 @@ defmodule ExDoc.Autolink do
 
   @autoimported_modules [Kernel, Kernel.SpecialForms]
 
-  def doc(ast, options \\ []) do
+  def doc(ast, options) do
     config = struct!(__MODULE__, options)
     walk(ast, config)
   end
@@ -61,34 +61,34 @@ defmodule ExDoc.Autolink do
     binary
   end
 
-  defp walk({:pre, _, _} = ast, _config) do
+  defp walk({:pre, _metadata, _, _} = ast, _config) do
     ast
   end
 
-  defp walk({:a, attrs, inner} = ast, config) do
+  defp walk({:a, metadata, attrs, inner} = ast, config) do
     cond do
       url = custom_link(attrs, config) ->
-        {:a, Keyword.put(attrs, :href, url), inner}
+        {:a, metadata, Keyword.put(attrs, :href, url), inner}
 
       url = extra_link(attrs, config) ->
-        {:a, Keyword.put(attrs, :href, url), inner}
+        {:a, metadata, Keyword.put(attrs, :href, url), inner}
 
       true ->
         ast
     end
   end
 
-  defp walk({:code, attrs, [code]} = ast, config) do
+  defp walk({:code, metadata, attrs, [code]} = ast, config) do
     if url = url(code, :regular, config) do
       code = remove_prefix(code)
-      {:a, [href: url], [{:code, attrs, [code]}]}
+      {:a, metadata, [href: url], [{:code, metadata, attrs, [code]}]}
     else
       ast
     end
   end
 
-  defp walk({tag, attrs, ast}, config) do
-    {tag, attrs, walk(ast, config)}
+  defp walk({tag, metadata, attrs, ast}, config) do
+    {tag, metadata, attrs, walk(ast, config)}
   end
 
   defp custom_link(attrs, config) do

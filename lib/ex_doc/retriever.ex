@@ -327,7 +327,8 @@ defmodule ExDoc.Retriever do
   defp delegate_doc(nil), do: nil
 
   defp delegate_doc({m, f, a}),
-    do: [{:p, [], ["See ", {:code, [], [Exception.format_mfa(m, f, a)]}, "."]}]
+    # TODO: Add metadata once we introduce :line and :column
+    do: [{:p, %{}, [], ["See ", {:code, %{}, [], [Exception.format_mfa(m, f, a)]}, "."]}]
 
   defp docstring(:none, name, arity, {:ok, behaviour}) do
     "Callback implementation for `c:#{inspect(behaviour)}.#{name}/#{arity}`."

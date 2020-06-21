@@ -4,7 +4,7 @@ defmodule ExDoc.AutolinkTest do
   import ExUnit.CaptureIO
 
   defp sigil_m(text, []) do
-    [{:p, _, [ast]}] = ExDoc.Markdown.to_ast(text, [])
+    [{:p, _metadata, _attributes, [ast]}] = ExDoc.Markdown.to_ast(text, [])
     ast
   end
 
@@ -227,7 +227,7 @@ defmodule ExDoc.AutolinkTest do
       assert_unchanged("  String.upcase()/2")
       assert_unchanged(":\"atom\"")
       assert_unchanged("1 + 2")
-      assert_unchanged({:p, [], ["hello"]})
+      assert_unchanged({:p, %{}, [], ["hello"]})
     end
   end
 
@@ -393,8 +393,8 @@ defmodule ExDoc.AutolinkTest do
     assert autolink(ast_or_text, options) == ast(ast_or_text)
   end
 
-  defp ast(text) when is_binary(text), do: {:code, [class: "inline"], [text]}
-  defp ast({_, _, _} = ast), do: ast
+  defp ast(text) when is_binary(text), do: {:code, %{}, [class: "inline"], [text]}
+  defp ast({_, _, _, _} = ast), do: ast
 
   defp assert_warn(fun) do
     captured = capture_io(:stderr, fun)

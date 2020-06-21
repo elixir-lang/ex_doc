@@ -27,7 +27,7 @@ defmodule ExDoc.Markdown.Earmark do
 
   """
   @impl true
-  def to_ast(text, opts) do
+  def to_ast(text, opts) when is_binary(text) do
     options = [
       gfm: Keyword.get(opts, :gfm, true),
       line: Keyword.get(opts, :line, 1),
@@ -37,13 +37,33 @@ defmodule ExDoc.Markdown.Earmark do
       pure_links: true
     ]
 
-    case EarmarkParser.as_ast(text, options) do
-      {:ok, ast, messages} ->
-        print_messages(messages, options)
-        fixup(ast)
+    as_ast(text, options)
+  end
 
-      {:error, ast, messages} ->
-        print_messages(messages, options)
+  defp as_ast(binary, options, meta \\ %{}) do
+    {response, ast, messages} = EarmarkParser.as_ast(binary, options)
+    print_messages(messages, options)
+
+    verbatim = meta[:verbatim] || false
+
+    case response do
+      :ok when verbatim and is_tuple(ast) ->
+        case ast do
+          {tag, attrs, children, ast_meta} ->
+            fixup(
+              {tag, attrs, children, Kernel.put_in(ast_meta, :verbatim, true)},
+              options,
+              meta
+            )
+
+          {tag, attrs, children} ->
+            fixup({tag, attrs, children, %{meta: %{verbatim: true}}}, options, meta)
+        end
+
+      :ok ->
+        fixup(ast, options, meta)
+
+      :error ->
         ast
     end
   end
@@ -55,38 +75,58 @@ defmodule ExDoc.Markdown.Earmark do
     end
   end
 
-  defp fixup(list) when is_list(list) do
-    fixup_list(list, [])
+  defp fixup(list, options, meta) when is_list(list) do
+    fixup_list(list, [], options, meta)
   end
 
-  defp fixup(binary) when is_binary(binary) do
-    binary
-  end
+  defp fixup(binary, options, %{verbatim: true} = meta) when is_binary(binary) do
+    case Floki.parse_document(binary) do
+      {:ok, [head]} when is_binary(head) ->
+        head
 
-  defp fixup({tag, attrs, ast}) when is_binary(tag) do
-    {fixup_tag(tag), Enum.map(attrs, &fixup_attr/1), fixup(ast)}
-  end
-
-  defp fixup({tag, attrs, ast, _meta}) when is_binary(tag) do
-    fixup({tag, attrs, ast})
-  end
-
-  # E.g. `{:comment, _}`
-  defp fixup(_) do
-    []
-  end
-
-  defp fixup_list([head | tail], acc) do
-    fixed = fixup(head)
-
-    if fixed == [] do
-      fixup_list(tail, acc)
-    else
-      fixup_list(tail, [fixed | acc])
+      {:ok, ast_floki} ->
+        fixup(ast_floki, options, meta)
     end
   end
 
-  defp fixup_list([], acc) do
+  defp fixup(binary, _options, _meta) when is_binary(binary) do
+    binary
+  end
+
+  defp fixup({tag, attrs, ast, ast_meta}, options, meta) when is_binary(tag) do
+    verbatim = meta[:verbatim] || ast_meta[:meta][:verbatim] || false
+
+    {
+      fixup_tag(tag),
+      fixup_meta(ast_meta),
+      Enum.map(attrs, &fixup_attr/1),
+      fixup(
+        ast,
+        options,
+        Map.put(meta, :verbatim, verbatim)
+      )
+    }
+  end
+
+  defp fixup({tag, attrs, ast}, options, meta) when is_binary(tag) do
+    fixup({tag, attrs, ast, %{}}, options, meta)
+  end
+
+  defp fixup({:comment, children}, _options, meta) do
+    {nil, Map.put(meta, :comment, true), [], children}
+  end
+
+  defp fixup_list([head | tail], acc, options, meta) do
+    case fixup(head, options, meta) do
+      [] ->
+        fixup_list(tail, acc, options, meta)
+
+      fixed ->
+        fixup_list(tail, [fixed | acc], options, meta)
+    end
+  end
+
+  defp fixup_list([], acc, _options, _meta) do
     Enum.reverse(acc)
   end
 
@@ -95,6 +135,29 @@ defmodule ExDoc.Markdown.Earmark do
   end
 
   defp fixup_attr({name, value}) do
-    {String.to_atom(name), value}
+    {String.to_atom(name), to_string(value)}
   end
+
+  defp fixup_meta(meta) do
+    fixup_meta(meta, %{})
+  end
+
+  defp fixup_meta(%{line_number: line_number} = meta, acc),
+    do: fixup_meta(Map.delete(meta, :line_number), Map.put(acc, :line_number, line_number))
+
+  defp fixup_meta(%{lnb: line_number} = meta, acc),
+    do: fixup_meta(Map.delete(meta, :lnb), Map.put(acc, :line_number, line_number))
+
+  defp fixup_meta(%{meta: %{verbatim: verbatim}} = meta, acc),
+    # Delete the whole meta, since it only holds :verbatim
+    do: fixup_meta(Map.delete(meta, :meta), Map.put(acc, :verbatim, verbatim))
+
+  defp fixup_meta(%{verbatim: verbatim} = meta, acc),
+    do: fixup_meta(Map.delete(meta, :verbatim), Map.put(acc, :verbatim, verbatim))
+
+  defp fixup_meta(%{comment: comment} = meta, acc),
+    do: fixup_meta(Map.delete(meta, :comment), Map.put(acc, :comment, comment))
+
+  defp fixup_meta(meta, acc),
+    do: Map.merge(meta, acc)
 end

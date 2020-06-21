@@ -421,6 +421,30 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r{"id":"extrapage","title":"Extra Page Title"}
     end
 
+    test "with HTML" do
+      generate_docs(doc_config(extras: ["test/fixtures/ExtraPageWithHTML.md"]))
+      content = File.read!("#{output_dir()}/extrapagewithhtml.html")
+      assert content =~ ~r{<title>Extra Page with HTML — Elixir v1.0.1</title>}
+      assert content =~ ~r{<h1 align="center">\s*Extra Page with HTML\s*</h1>}
+      assert content =~ ~r{<h1>\s*Second Main Title\s*</h1>}
+      assert content =~ ~r{<p align="center">\s*<img src="image\.svg" />\s*</p>}
+
+      assert content =~
+               ~r{<p align="center">\s*<div class="image">\s*<div class="frame">\s*<img src="picture\.png" />\s*</div>\s*</div>\s*</p>}
+
+      assert content =~ ~s{Elixir &amp; Erlang}
+
+      # Do not escape inside <pre>
+      assert content =~
+               ~r{<pre>\s*<hr />\s+inside pre & > <\s+<samp>Sample inside PRE</samp>\s*</pre>}
+
+      assert content =~
+               ~r{<pre>\s*<code class="html">\s*&lt;samp&gt;\s*Sample inside backticks\s*&lt;/samp&gt;\s*</code>\s*</pre>}
+
+      content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
+      assert content =~ ~r{"id":"extrapagewithhtml","title":"Extra Page with HTML"}
+    end
+
     test "without api-reference" do
       generate_docs(
         doc_config(api_reference: false, extras: ["test/fixtures/README.md"], main: "readme")

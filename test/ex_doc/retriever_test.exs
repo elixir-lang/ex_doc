@@ -50,11 +50,11 @@ defmodule ExDoc.RetrieverTest do
 
       assert module_node.doc ==
                [
-                 {:p, [], ["moduledoc"]},
-                 {:h2, [], ["Example ☃ Unicode > escaping"]},
-                 {:pre, [], [{:code, [], ["CompiledWithDocs.example"]}]},
-                 {:h3, [], ["Example H3 heading"]},
-                 {:p, [], ["example"]}
+                 {:p, %{}, [], ["moduledoc"]},
+                 {:h2, %{}, [], ["Example ☃ Unicode > escaping"]},
+                 {:pre, %{}, [], [{:code, %{}, [], ["CompiledWithDocs.example"]}]},
+                 {:h3, %{}, [], ["Example H3 heading"]},
+                 {:p, %{}, [], ["example"]}
                ]
     end
 
@@ -108,14 +108,14 @@ defmodule ExDoc.RetrieverTest do
         module_node.docs
 
       assert struct.id == "__struct__/0"
-      assert struct.doc == [{:p, [], ["Some struct"]}]
+      assert struct.doc == [{:p, %{}, [], ["Some struct"]}]
       assert struct.type == :function
       assert struct.defaults == []
       assert struct.signature == "%CompiledWithDocs{}"
       assert struct.group == "Functions"
 
       assert example.id == "example/2"
-      assert example.doc == [{:p, [], ["Some example"]}]
+      assert example.doc == [{:p, %{}, [], ["Some example"]}]
       assert example.type == :function
       assert example.defaults == ["example/1"]
       assert example.signature == "example(foo, bar \\\\ Baz)"
@@ -123,6 +123,11 @@ defmodule ExDoc.RetrieverTest do
       assert example.group == "Example"
 
       assert example_1.id == "example_1/0"
+
+      assert example_1.doc == [
+               {:p, %{}, [], ["Another example with &mdash; & &ndash; (— & –)"]}
+             ]
+
       assert example_1.type == :macro
       assert example_1.defaults == []
       assert example_1.annotations == ["macro", "since 1.3.0"]
@@ -143,12 +148,17 @@ defmodule ExDoc.RetrieverTest do
 
       if Version.match?(System.version(), ">= 1.8.0") do
         assert flatten.doc == [
-                 {:p, [], ["See ", {:code, [], ["List.flatten/1"]}, "."]}
+                 {:p, %{}, [],
+                  [
+                    "See ",
+                    {:code, %{}, [], ["List.flatten/1"]},
+                    "."
+                  ]}
                ]
       end
 
       assert is_zero.id == "is_zero/1"
-      assert is_zero.doc == [{:p, [], ["A simple guard"]}]
+      assert is_zero.doc == [{:p, %{}, [], ["A simple guard"]}]
       assert is_zero.type == :macro
       assert is_zero.defaults == []
     end
@@ -188,7 +198,7 @@ defmodule ExDoc.RetrieverTest do
       assert public.arity == 1
       assert public.id == "public/1"
       assert public.type == :type
-      assert public.doc == [{:p, [], ["A public type"]}]
+      assert public.doc == [{:p, %{}, [], ["A public type"]}]
       assert public.signature == "public(t)"
 
       assert Macro.to_string(public.spec) ==
@@ -283,23 +293,23 @@ defmodule ExDoc.RetrieverTest do
       assert Enum.map(docs, & &1.id) == ["bye/1", "greet/1", "hello/1"]
 
       assert Enum.at(docs, 0).doc == [
-               {:p, [],
+               {:p, %{}, [],
                 [
                   "Callback implementation for ",
-                  {:code, [class: "inline"], ["c:CustomBehaviourTwo.bye/1"]},
+                  {:code, %{}, [class: "inline"], ["c:CustomBehaviourTwo.bye/1"]},
                   "."
                 ]}
              ]
 
       assert Enum.at(docs, 1).doc == [
-               {:p, [], ["A doc so it doesn't use 'Callback implementation for'"]}
+               {:p, %{}, [], ["A doc so it doesn't use 'Callback implementation for'"]}
              ]
 
       assert Enum.at(docs, 2).doc == [
-               {:p, [],
+               {:p, %{}, [],
                 [
                   "Callback implementation for ",
-                  {:code, [class: "inline"], ["c:CustomBehaviourOne.hello/1"]},
+                  {:code, %{}, [class: "inline"], ["c:CustomBehaviourOne.hello/1"]},
                   "."
                 ]}
              ]

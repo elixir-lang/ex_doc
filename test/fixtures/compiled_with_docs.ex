@@ -18,7 +18,7 @@ defmodule CompiledWithDocs do
   @deprecated "Use something else instead"
   def example(foo, bar \\ Baz), do: bar.baz(foo)
 
-  @doc "Another example"
+  @doc "Another example with &mdash; & &ndash; (— & –)"
   @doc since: "1.3.0"
   defmacro example_1, do: 1
 

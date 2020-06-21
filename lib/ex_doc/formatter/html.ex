@@ -1,6 +1,8 @@
 defmodule ExDoc.Formatter.HTML do
   @moduledoc false
 
+  alias ExDoc.Markdown.AST
+
   alias __MODULE__.{Assets, Templates, SearchItems}
   alias ExDoc.{Autolink, Markdown, GroupMatcher}
 
@@ -117,18 +119,8 @@ defmodule ExDoc.Formatter.HTML do
   defp autolink_and_render(doc, autolink_opts, opts) do
     doc
     |> Autolink.doc(autolink_opts)
-    |> ast_to_html()
-    |> IO.iodata_to_binary()
+    |> AST.to_html()
     |> ExDoc.Highlighter.highlight_code_blocks(opts)
-  end
-
-  @doc false
-  def ast_to_html(list) when is_list(list), do: Enum.map(list, &ast_to_html/1)
-  def ast_to_html(binary) when is_binary(binary), do: Templates.h(binary)
-
-  def ast_to_html({tag, attrs, ast}) do
-    attrs = Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
-    ["<#{tag}", attrs, ">", ast_to_html(ast), "</#{tag}>"]
   end
 
   defp output_setup(build, config) do
