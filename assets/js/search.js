@@ -132,7 +132,7 @@ function titleExtractor (document) {
 
 function snakeCaseSplitter (builder) {
   function snakeCaseFunction (token) {
-    var snakeTokens =  token.toString().split("_").map(function (str) {
+    var snakeTokens = token.toString().split('_').map(function (str) {
       return token.clone().update(function () { return str })
     })
     if (snakeTokens.length > 1) {
