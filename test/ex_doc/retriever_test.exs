@@ -136,7 +136,7 @@ defmodule ExDoc.RetrieverTest do
       assert example_without_docs.group == "Legacy"
 
       assert example_without_docs.source_url ==
-               "http://example.com/test/fixtures/compiled_with_docs.ex\#L38"
+               "http://example.com/test/fixtures/compiled_with_docs.ex\#L37"
 
       assert flatten.id == "flatten/1"
       assert flatten.type == :function
