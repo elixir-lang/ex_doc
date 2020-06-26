@@ -83,6 +83,7 @@ export {breakpoint, closeSidebar, openSidebar, toggleSidebar, focusSearchInput}
 
 export function initialize () {
   setDefaultSidebarState()
+
   let lastWindowWidth = window.innerWidth
   $(window).resize(throttle(function () {
     if (lastWindowWidth !== window.innerWidth) {
@@ -90,7 +91,11 @@ export function initialize () {
       setDefaultSidebarState()
     }
   }, 100))
-  $('.sidebar-toggle').click(function () {
-    toggleSidebar()
+
+  $('.sidebar-toggle').click(toggleSidebar)
+
+  $(".content").click((e) => {
+    const sidebarCoversContent = window.innerWidth <= breakpoint
+    if (sidebarCoversContent) { closeSidebar() }
   })
 }
