@@ -168,11 +168,55 @@ defmodule ExDoc.AutolinkTest do
       assert autolink(~m"[custom text](`:lists.all/2`)") ==
                ~m"[custom text](http://www.erlang.org/doc/man/lists.html#all-2)"
 
-      # TODO: with custom links and backticks there are no false positives (you
-      #       always mean to link) so we should always warn on mismatches?
-      #       Though backticks are markdown specific, is that ok?
-      # assert_warn(fn ->
-      assert_unchanged(~m"[custom text](`Unknown`)")
+      captured =
+        assert_warn(fn ->
+          assert_unchanged(~m"[custom text](`Unknown`)")
+        end)
+
+      assert captured =~
+               "documentation references module or file \"`Unknown`\" but it doesn't exist"
+
+      captured =
+        assert_warn(fn ->
+          assert_unchanged(~m"[custom text](Unknown)")
+        end)
+
+      # No backticks
+      assert captured =~
+               "documentation references file \"Unknown\" but it doesn't exist"
+
+      options = [
+        extras: [
+          "LICENSE"
+        ]
+      ]
+
+      # File LICENSE exist, so we warn due to the use of backticks and advice to remove them.
+      captured =
+        assert_warn(fn ->
+          assert_unchanged(~m"[custom text](`LICENSE`)", options)
+        end)
+
+      assert captured =~
+               "file name surrounded by backticks \"`LICENSE`\", " <>
+                 "please remove them to link to the existing file \"LICENSE\""
+
+      # No options
+      captured =
+        assert_warn(fn ->
+          assert_unchanged(~m"[custom text](`LICENSE`)")
+        end)
+
+      assert captured =~
+               "documentation references module or file \"`LICENSE`\" but it doesn't exist"
+
+      captured =
+        assert_warn(fn ->
+          assert_unchanged(~m"[custom text](`NOTHING`)", options)
+        end)
+
+      assert captured =~
+               "documentation references module or file \"`NOTHING`\" but it doesn't exist"
     end
 
     test "mix task" do
@@ -375,7 +419,7 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged(~m"[Foo](Foo Bar.md)", opts)
       end)
 
-    assert captured =~ "documentation references file `Foo Bar.md` but it doesn't exist"
+    assert captured =~ "documentation references file \"Foo Bar.md\" but it doesn't exist"
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
