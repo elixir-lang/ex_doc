@@ -33,7 +33,7 @@ const keyboardShortcuts = [
     name: 's',
     keyCode: 83,
     description: 'Focus search bar',
-    displayAs: '<kbd>/</kbd> or <kbd>s</kdb>',
+    displayAs: '<kbd><kbd>/</kbd></kbd> or <kbd><kbd>s</kdb></kdb>',
     action: searchKeyAction
   },
   {
@@ -45,14 +45,14 @@ const keyboardShortcuts = [
     name: 'g',
     keyCode: 71,
     description: 'Go to a HexDocs package',
-    displayAs: '<kbd>g</kdb>',
+    displayAs: '<kbd><kbd>g</kdb></kdb>',
     action: openQuickSwitchModal
   },
   {
     name: '?',
     keyCode: 191,
     requiresShiftKey: true,
-    displayAs: '<kbd>?</kbd>',
+    displayAs: '<kbd><kbd>?</kbd></kbd>',
     description: 'Bring up this help dialog',
     action: toggleHelpModal
   }
