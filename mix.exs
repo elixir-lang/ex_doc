@@ -77,7 +77,8 @@ defmodule ExDoc.Mixfile do
       main: "readme",
       extras: [
         "README.md",
-        "CHANGELOG.md"
+        "CHANGELOG.md",
+        "LICENSE",
       ],
       source_ref: "v#{@version}",
       source_url: "https://github.com/elixir-lang/ex_doc",

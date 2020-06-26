@@ -105,7 +105,7 @@ defmodule ExDoc.Autolink do
          uri <- URI.parse(href),
          nil <- uri.host,
          true <- is_binary(uri.path),
-         ".md" <- Path.extname(uri.path) do
+         extension  when extension in [".md", ""] <- Path.extname(uri.path) do
       md_file = Path.basename(uri.path)
 
       if md_file in config.extras do

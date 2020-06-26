@@ -128,7 +128,14 @@ defmodule ExDoc.Formatter.HTML do
 
   def ast_to_html({tag, attrs, ast}) do
     attrs = Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
-    ["<#{tag}", attrs, ">", ast_to_html(ast), "</#{tag}>"]
+
+    case tag do
+      tag when tag in [:pre, :code] ->
+        ["<#{tag}", attrs, ">", Enum.intersperse(ast_to_html(ast), "\n"), "</#{tag}>"]
+
+      _ ->
+        ["<#{tag}", attrs, ">", ast_to_html(ast), "</#{tag}>"]
+    end
   end
 
   defp output_setup(build, config) do
@@ -292,35 +299,36 @@ defmodule ExDoc.Formatter.HTML do
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
     ]
 
-    if valid_extension_name?(input) do
-      opts = [file: input, line: 1]
+    opts = [file: input, line: 1]
 
-      html_content =
-        input
-        |> File.read!()
-        |> Markdown.to_ast(opts)
-        |> autolink_and_render(autolink_opts, opts)
+    html_content =
+      case extension_name(input) do
+        "" ->
+          content = ("\n" <> File.read!(input)) |> String.split(~R{\n|\r\n})
 
-      group = GroupMatcher.match_extra(groups, input)
+          [{:pre, [], content}]
+          |> autolink_and_render(autolink_opts, opts)
 
-      title = title || extract_title(html_content) || filename_to_title(input)
-      %{id: id, title: title, group: group, content: html_content}
-    else
-      raise ArgumentError, "file format not recognized, allowed format is: .md"
-    end
+        ".md" ->
+          input
+          |> File.read!()
+          |> Markdown.to_ast(opts)
+          |> autolink_and_render(autolink_opts, opts)
+
+        _ ->
+          raise ArgumentError, "file extension not recognized, allowed extension is either .md or no extension"
+      end
+
+    group = GroupMatcher.match_extra(groups, input)
+    title = title || extract_title(html_content) || filename_to_title(input)
+
+    %{id: id, title: title, group: group, content: html_content}
   end
 
-  def valid_extension_name?(input) do
-    file_ext =
-      input
-      |> Path.extname()
-      |> String.downcase()
-
-    if file_ext in [".md"] do
-      true
-    else
-      false
-    end
+  defp extension_name(input) do
+    input
+    |> Path.extname()
+    |> String.downcase()
   end
 
   @tag_regex ~r/<[^>]*>/m
