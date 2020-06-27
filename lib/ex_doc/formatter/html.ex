@@ -128,14 +128,7 @@ defmodule ExDoc.Formatter.HTML do
 
   def ast_to_html({tag, attrs, ast}) do
     attrs = Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
-
-    case tag do
-      tag when tag in [:pre, :code] ->
-        ["<#{tag}", attrs, ">", Enum.intersperse(ast_to_html(ast), "\n"), "</#{tag}>"]
-
-      _ ->
-        ["<#{tag}", attrs, ">", ast_to_html(ast), "</#{tag}>"]
-    end
+    ["<#{tag}", attrs, ">", ast_to_html(ast), "</#{tag}>"]
   end
 
   defp output_setup(build, config) do
@@ -301,24 +294,22 @@ defmodule ExDoc.Formatter.HTML do
 
     opts = [file: input, line: 1]
 
-    html_content =
+    ast =
       case extension_name(input) do
         extension when extension in ["", ".txt"] ->
-          content = ("\n" <> File.read!(input)) |> String.split(~R{\n|\r\n})
-
-          [{:pre, [], content}]
-          |> autolink_and_render(autolink_opts, opts)
+          [{:pre, [], "\n" <> File.read!(input)}]
 
         ".md" ->
           input
           |> File.read!()
           |> Markdown.to_ast(opts)
-          |> autolink_and_render(autolink_opts, opts)
 
         _ ->
           raise ArgumentError,
                 "file extension not recognized, allowed extension is either .md, .txt or no extension"
       end
+
+    html_content = autolink_and_render(ast, autolink_opts, opts)
 
     group = GroupMatcher.match_extra(groups, input)
     title = title || extract_title(html_content) || filename_to_title(input)
