@@ -7,6 +7,7 @@ otp_release: 22.3
 stages:
   - check formatted
   - test
+  - build docs
   - check js
 
 services:
@@ -43,6 +44,12 @@ jobs:
 
     - elixir: "1.10.3"
       otp_release: "21.3"
+
+    - stage: build docs
+      script:
+        - mix docs
+        - test -f doc/index.html && echo "doc/index.html exists."
+        - test -f doc/ex_doc.epub && echo "doc/ex_doc.epub exists."
 
     - stage: check formatted
       script: mix format --check-formatted
