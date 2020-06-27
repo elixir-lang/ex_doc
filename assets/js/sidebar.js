@@ -94,7 +94,7 @@ export function initialize () {
 
   $('.sidebar-toggle').click(toggleSidebar)
 
-  $(".content").click((e) => {
+  $('.content').click((e) => {
     const sidebarCoversContent = window.innerWidth <= breakpoint
     if (sidebarCoversContent) { closeSidebar() }
   })
