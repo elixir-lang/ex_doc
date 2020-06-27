@@ -1,7 +1,5 @@
 language: elixir
 
-sudo: false
-
 # Erlang and Elixir default versions (overridden in some jobs).
 elixir: 1.10.3
 otp_release: 22.3
