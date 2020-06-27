@@ -303,7 +303,7 @@ defmodule ExDoc.Formatter.HTML do
 
     html_content =
       case extension_name(input) do
-        "" ->
+        extension when extension in ["", ".txt"] ->
           content = ("\n" <> File.read!(input)) |> String.split(~R{\n|\r\n})
 
           [{:pre, [], content}]
@@ -316,7 +316,8 @@ defmodule ExDoc.Formatter.HTML do
           |> autolink_and_render(autolink_opts, opts)
 
         _ ->
-          raise ArgumentError, "file extension not recognized, allowed extension is either .md or no extension"
+          raise ArgumentError,
+                "file extension not recognized, allowed extension is either .md, .txt or no extension"
       end
 
     group = GroupMatcher.match_extra(groups, input)

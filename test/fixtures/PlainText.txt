@@ -1,0 +1,9 @@
+This is plain
+  text and nothing
+    should be linked `Kernel`
+
+      `t:term/0`
+
+## Neither formatted
+
+        good bye

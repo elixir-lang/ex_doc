@@ -105,11 +105,11 @@ defmodule ExDoc.Autolink do
          uri <- URI.parse(href),
          nil <- uri.host,
          true <- is_binary(uri.path),
-         extension  when extension in [".md", ""] <- Path.extname(uri.path) do
-      md_file = Path.basename(uri.path)
+         extension when extension in [".md", ".txt", ""] <- Path.extname(uri.path) do
+      file = Path.basename(uri.path)
 
-      if md_file in config.extras do
-        without_ext = String.trim_trailing(md_file, ".md")
+      if file in config.extras do
+        without_ext = trim_extension(file, extension)
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
         HTML.text_to_id(without_ext) <> config.ext <> fragment
       else
@@ -121,6 +121,12 @@ defmodule ExDoc.Autolink do
       _ -> nil
     end
   end
+
+  defp trim_extension(file, ""),
+    do: file
+
+  defp trim_extension(file, extension),
+    do: String.trim_trailing(file, extension)
 
   @basic_types [
     any: 0,

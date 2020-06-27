@@ -39,7 +39,12 @@ defmodule ExDoc.Formatter.HTMLTest do
       source_root: beam_dir(),
       source_beam: beam_dir(),
       logo: "test/fixtures/elixir.png",
-      extras: ["test/fixtures/README.md"]
+      extras: [
+        "test/fixtures/LICENSE",
+        "test/fixtures/PlainText.txt",
+        "test/fixtures/PlainTextFiles.md",
+        "test/fixtures/README.md"
+      ]
     ]
   end
 
@@ -323,6 +328,24 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       assert content =~
                ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code(\sclass="inline")?>mix compile.elixir</code></a>}
+
+      content = File.read!("#{output_dir()}/plaintextfiles.html")
+
+      assert content =~
+               ~R{<p>Read the <a href="license.html">license</a> and the <a href="plaintext.html">plain-text file</a>.}
+
+      plain_text_file = File.read!("#{output_dir()}/plaintext.html")
+
+      assert plain_text_file =~
+               ~R{<pre>\nThis is plain\n  text and nothing\n.+\s+good bye\n</pre>}s
+
+      assert plain_text_file =~ ~R{\n## Neither formatted\n}
+      assert plain_text_file =~ ~R{\n      `t:term/0`\n}
+
+      plain_text_file = File.read!("#{output_dir()}/license.html")
+
+      assert plain_text_file =~
+               ~R{<pre>\nLicensed under the Apache License, Version 2\.0 \(the \&quot;License\&quot;\);\n.+\nlimitations under the License.\n</pre>}s
     end
 
     test "without any other content" do
