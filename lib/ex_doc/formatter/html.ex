@@ -292,35 +292,35 @@ defmodule ExDoc.Formatter.HTML do
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
     ]
 
-    if valid_extension_name?(input) do
-      opts = [file: input, line: 1]
+    opts = [file: input, line: 1]
 
-      html_content =
-        input
-        |> File.read!()
-        |> Markdown.to_ast(opts)
-        |> autolink_and_render(autolink_opts, opts)
+    ast =
+      case extension_name(input) do
+        extension when extension in ["", ".txt"] ->
+          [{:pre, [], "\n" <> File.read!(input)}]
 
-      group = GroupMatcher.match_extra(groups, input)
+        ".md" ->
+          input
+          |> File.read!()
+          |> Markdown.to_ast(opts)
 
-      title = title || extract_title(html_content) || filename_to_title(input)
-      %{id: id, title: title, group: group, content: html_content}
-    else
-      raise ArgumentError, "file format not recognized, allowed format is: .md"
-    end
+        _ ->
+          raise ArgumentError,
+                "file extension not recognized, allowed extension is either .md, .txt or no extension"
+      end
+
+    html_content = autolink_and_render(ast, autolink_opts, opts)
+
+    group = GroupMatcher.match_extra(groups, input)
+    title = title || extract_title(html_content) || filename_to_title(input)
+
+    %{id: id, title: title, group: group, content: html_content}
   end
 
-  def valid_extension_name?(input) do
-    file_ext =
-      input
-      |> Path.extname()
-      |> String.downcase()
-
-    if file_ext in [".md"] do
-      true
-    else
-      false
-    end
+  defp extension_name(input) do
+    input
+    |> Path.extname()
+    |> String.downcase()
   end
 
   @tag_regex ~r/<[^>]*>/m
