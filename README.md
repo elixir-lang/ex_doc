@@ -127,11 +127,11 @@ the page is in), the final link will be automatically converted to `up-and-runni
 
 ## Contributing
 
-The easiest way to test changes to ExDoc is to locally re-generate its own docs:
+The easiest way to test changes to ExDoc is to locally rebuild the app and its own documentation:
 
   1. Run `mix setup` to install all dependencies
   2. Run `mix build` to generate docs. This is a custom alias that will build assets, recompile ExDoc, and output fresh docs into the `doc/` directory
-  3. Commit both `assets/*` and `formatters/*` changes (after running `mix build`)
+  3. If you want to contribute a pull request, please do not add to your commits the files generated in the `assets/` and `formatters/` folders
 
 ## License
 
