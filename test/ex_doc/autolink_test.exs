@@ -52,11 +52,14 @@ defmodule ExDoc.AutolinkTest do
     test "remote function" do
       ExDoc.Refs.insert([
         {{:module, Foo}, true},
-        {{:function, Foo, :foo, 1}, true}
+        {{:function, Foo, :foo, 1}, true},
+        {{:function, Foo, :., 2}, true},
+        {{:function, Foo, :.., 2}, true}
       ])
 
       assert autolink("Foo.foo/1") == ~m"[`Foo.foo/1`](Foo.html#foo/1)"
-
+      assert autolink("Foo../2") == ~m"[`Foo../2`](Foo.html#./2)"
+      assert autolink("Foo.../2") == ~m"[`Foo.../2`](Foo.html#../2)"
       assert_unchanged("Bad.bar/1")
     end
 
@@ -78,10 +81,14 @@ defmodule ExDoc.AutolinkTest do
     test "local function" do
       ExDoc.Refs.insert([
         {{:module, Foo}, true},
-        {{:function, Foo, :foo, 1}, true}
+        {{:function, Foo, :foo, 1}, true},
+        {{:function, Foo, :., 2}, true},
+        {{:function, Foo, :.., 2}, true}
       ])
 
       assert autolink("foo/1", current_module: Foo) == ~m"[`foo/1`](#foo/1)"
+      assert autolink("./2", current_module: Foo) == ~m"[`./2`](#./2)"
+      assert autolink("../2", current_module: Foo) == ~m"[`../2`](#../2)"
       assert_unchanged("bar/1", current_module: Foo)
     end
 
