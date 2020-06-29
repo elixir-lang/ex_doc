@@ -240,6 +240,19 @@ defmodule ExDoc.Autolink do
           {:local, function}
         end
 
+      ["", "", ""] ->
+        {:local, :..}
+
+      ["", ""] ->
+        {:local, :.}
+
+      ["", "", "" | rest] ->
+        module_string = rest |> Enum.reverse() |> Enum.join(".")
+
+        with {:module, module} <- parse_module(module_string, :custom_link) do
+          {:remote, module, :..}
+        end
+
       ["", "" | rest] ->
         module_string = rest |> Enum.reverse() |> Enum.join(".")
 
