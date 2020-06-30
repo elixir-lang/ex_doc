@@ -1,14 +1,15 @@
 defmodule ExDoc.Markdown.Earmark do
   @moduledoc """
-  ExDoc extension for the Earmark MarkDown parser.
+  ExDoc extension for the EarmarkParseer MarkDown parser.
   """
   @behaviour ExDoc.Markdown
 
   @doc """
-  Check if the Earmark Markdown parser module is available.
+  Check if the EarmarkParser Markdown parser module is available.
   """
   def available? do
-    match?({:ok, _}, Application.ensure_all_started(:earmark)) and Code.ensure_loaded?(Earmark)
+    match?({:ok, _}, Application.ensure_all_started(:earmark_parser)) and
+      Code.ensure_loaded?(EarmarkParser)
   end
 
   @doc """
@@ -27,17 +28,16 @@ defmodule ExDoc.Markdown.Earmark do
   """
   @impl true
   def to_ast(text, opts) do
-    options =
-      struct(Earmark.Options,
-        gfm: Keyword.get(opts, :gfm, true),
-        line: Keyword.get(opts, :line, 1),
-        file: Keyword.get(opts, :file, "nofile"),
-        breaks: Keyword.get(opts, :breaks, false),
-        smartypants: Keyword.get(opts, :smartypants, false),
-        pure_links: true
-      )
+    options = [
+      gfm: Keyword.get(opts, :gfm, true),
+      line: Keyword.get(opts, :line, 1),
+      file: Keyword.get(opts, :file, "nofile"),
+      breaks: Keyword.get(opts, :breaks, false),
+      smartypants: Keyword.get(opts, :smartypants, false),
+      pure_links: true
+    ]
 
-    case Earmark.as_ast(text, options) do
+    case EarmarkParser.as_ast(text, options) do
       {:ok, ast, messages} ->
         print_messages(messages, options)
         fixup(ast)
