@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  mix_test:
+    name: "${{matrix.elixir}} x ${{matrix.otp}} (Elixir x Erlang/OTP) mix test"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - otp: 19.3.6.13
+            elixir: 1.7.4
+          - otp: 20.3.8.26
+            elixir: 1.8.2
+          - otp: 20.3.8.26
+            elixir: 1.9.4
+          - otp: 21.3.8.16
+            elixir: 1.10.3
+          - otp: 23.0.2
+            elixir: 1.10.3
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-elixir@v1.3.0
+      with:
+        otp-version: ${{matrix.otp}}
+        elixir-version: ${{matrix.elixir}}
+    - name: Install Dependencies
+      run: |
+        mix local.rebar --force
+        mix local.hex --force
+        mix deps.get
+    - name: Run Tests
+      run: mix test
+    - name: Prerelease
+      run: test/prerelease.sh
+
+  build_docs:
+    name: "Build docs"
+    steps:
+    - run: mix docs
+    - run: test -f doc/index.html && echo "doc/index.html exists."
+    - run: test -f doc/ex_doc.epub && echo "doc/ex_doc.epub exists."
+ 
+  check_formatted:
+    steps:
+      - run: script: mix format --check-formatted
+
+    - stage: check js
+      script:
+        - nvm install $NODE_VERSION
+        - npm install --prefix assets
+        - npm run --prefix assets lint
+        - npm run --prefix assets test
+
+  check_js:
+    name: npm test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.1
+      - name: Set up Node.js 10.x
+        uses: actions/setup-node@v1.4.2
+        with:
+          node-version: '10.10.0'
+      - run: npm install --prefix assets
+      - run: npm run --prefix assets lint
+      - run: npm run --prefix assets test
