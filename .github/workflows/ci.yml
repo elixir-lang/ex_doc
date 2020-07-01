@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  mix_test:
+    name: mix test (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - otp: 19.3.6.13
+            elixir: 1.7.4
+          - otp: 20.3.8.26
+            elixir: 1.8.2
+          - otp: 20.3.8.26
+            elixir: 1.9.4
+          - otp: 21.3.8.16
+            elixir: 1.10.3
+          - otp: 23.0.2
+            elixir: 1.10.3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.1
+      - uses: actions/setup-elixir@v1.3.0
+        with:
+          otp-version: '${{matrix.otp}}'
+          elixir-version: '${{matrix.elixir}}'
+      - name: Install Dependencies
+        run: |
+          mix local.rebar --force
+          mix local.hex --force
+          mix deps.get
+      - name: Run Tests
+        run: mix test
+      - name: Prerelease
+        run: test/prerelease.sh
+      - name: Generate docs
+      - run: |
+          mix docs
+          test -f doc/index.html && echo "doc/index.html exists."
+          test -f doc/ex_doc.epub && echo "doc/ex_doc.epub exists."
+
+  check_js:
+    name: Check JS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.1
+      - name: Set up Node.js 10.x
+        uses: actions/setup-node@v1.4.2
+        with:
+          node-version: 10.10.0
+      - run: npm install --prefix assets
+      - run: npm run --prefix assets lint
+
+      - run: sudo apt-get install xvfb
+      - name: npm install, build, and test
+        run: |
+          xvfb-run --auto-servernum npm run --prefix assets test
+        env:
+          CI: true
