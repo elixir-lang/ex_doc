@@ -40,7 +40,7 @@ jobs:
       - name: Prerelease
         run: test/prerelease.sh
       - name: Generate docs
-      - run: |
+        run: |
           mix docs
           test -f doc/index.html && echo "doc/index.html exists."
           test -f doc/ex_doc.epub && echo "doc/ex_doc.epub exists."
