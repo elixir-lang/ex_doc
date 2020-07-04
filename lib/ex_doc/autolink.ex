@@ -105,16 +105,13 @@ defmodule ExDoc.Autolink do
   end
 
   defp build_custom_link(link, config) do
-    cond do
-      url = url(link, :custom_link, config) ->
-        url
+    if url = url(link, :custom_link, config) do
+      url
+    else
+      message = "documentation references \"#{link}\" but it doesn't exist"
 
-      true ->
-        uri = URI.parse(link)
-        message = "documentation references module \"#{uri.path}\" but it doesn't exist"
-
-        warn(message, config.file, config.line, config.id)
-        nil
+      warn(message, config.file, config.line, config.id)
+      nil
     end
   end
 
@@ -534,7 +531,7 @@ defmodule ExDoc.Autolink do
 
   defp warn({kind, module, name, arity}, file, line, id) do
     message =
-      "documentation references #{kind} #{inspect(module)}.#{name}/#{arity}" <>
+      "documentation references #{kind} \"#{inspect(module)}.#{name}/#{arity}\"" <>
         " but it is undefined or private"
 
     warn(message, file, line, id)

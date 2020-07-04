@@ -174,14 +174,13 @@ defmodule ExDoc.AutolinkTest do
         end)
 
       assert captured =~
-               "documentation references module \"Unknown\" but it doesn't exist"
+               "documentation references \"Unknown\" but it doesn't exist"
 
       captured =
         assert_warn(fn ->
           assert_unchanged(~m"[custom text](Unknown)")
         end)
 
-      # File LICENSE exists, but backticks are meant for modules
       assert captured =~
                "documentation references file \"Unknown\" but it doesn't exist"
 
@@ -191,7 +190,7 @@ defmodule ExDoc.AutolinkTest do
         end)
 
       assert captured =~
-               "documentation references module \"LICENSE\" but it doesn't exist"
+               "documentation references \"LICENSE\" but it doesn't exist"
     end
 
     test "mix task" do
@@ -355,7 +354,7 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged("Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
       end)
 
-    assert captured =~ "documentation references function Foo.bar/1"
+    assert captured =~ "documentation references function \"Foo.bar/1\""
     assert captured =~ ~r{lib/foo.ex:1\n$}
 
     captured =
@@ -363,7 +362,7 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged("Foo.bar/1", file: "lib/foo.ex", id: "Foo.foo/0")
       end)
 
-    assert captured =~ "documentation references function Foo.bar/1"
+    assert captured =~ "documentation references function \"Foo.bar/1\""
     assert captured =~ ~r{lib/foo.ex: Foo.foo/0\n$}
 
     assert_warn(fn ->
@@ -398,6 +397,15 @@ defmodule ExDoc.AutolinkTest do
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
+
+    captured =
+      assert_warn(fn ->
+        opts = [extras: []]
+        assert_unchanged(~m"[bad](`String.upcase/9`)", opts)
+      end)
+
+    assert captured =~ "documentation references function \"String.upcase/9\" but it is undefined or private"
+    refute captured =~ "documentation references \"String.upcase/9\" but it doesn't exist"
   end
 
   ## Helpers
