@@ -174,49 +174,24 @@ defmodule ExDoc.AutolinkTest do
         end)
 
       assert captured =~
-               "documentation references module or file \"`Unknown`\" but it doesn't exist"
+               "documentation references module \"Unknown\" but it doesn't exist"
 
       captured =
         assert_warn(fn ->
           assert_unchanged(~m"[custom text](Unknown)")
         end)
 
-      # No backticks
+      # File LICENSE exists, but backticks are meant for modules
       assert captured =~
                "documentation references file \"Unknown\" but it doesn't exist"
 
-      options = [
-        extras: [
-          "LICENSE"
-        ]
-      ]
-
-      # File LICENSE exist, so we warn due to the use of backticks and advice to remove them.
       captured =
         assert_warn(fn ->
-          assert_unchanged(~m"[custom text](`LICENSE`)", options)
+          assert_unchanged(~m"[custom text](`LICENSE`)", extras: ["LICENSE"])
         end)
 
       assert captured =~
-               "file name surrounded by backticks \"`LICENSE`\", " <>
-                 "please remove them to link to the existing file \"LICENSE\""
-
-      # No options
-      captured =
-        assert_warn(fn ->
-          assert_unchanged(~m"[custom text](`LICENSE`)")
-        end)
-
-      assert captured =~
-               "documentation references module or file \"`LICENSE`\" but it doesn't exist"
-
-      captured =
-        assert_warn(fn ->
-          assert_unchanged(~m"[custom text](`NOTHING`)", options)
-        end)
-
-      assert captured =~
-               "documentation references module or file \"`NOTHING`\" but it doesn't exist"
+               "documentation references module \"LICENSE\" but it doesn't exist"
     end
 
     test "mix task" do

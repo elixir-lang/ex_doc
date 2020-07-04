@@ -91,67 +91,53 @@ defmodule ExDoc.Autolink do
   defp custom_link(attrs, config) do
     case Keyword.fetch(attrs, :href) do
       {:ok, href} ->
-        custom_link_href(href, config)
+        case Regex.scan(~r/^`(.+)`$/, href) do
+          [[_, custom_link]] ->
+            build_custom_link(custom_link, config)
+
+          [] ->
+            build_extra_link(href, config)
+        end
 
       _ ->
         nil
     end
   end
 
-  defp custom_link_href(href, config) do
-    {href_without_backticks, surrounded_by_backticks?} =
-      case Regex.scan(~r/^`(.+)`$/, href) do
-        [[_, href_without_backticks]] -> {href_without_backticks, true}
-        [] -> {href, false}
-      end
-
+  defp build_custom_link(link, config) do
     cond do
-      url = url(href_without_backticks, :custom_link, config) ->
+      url = url(link, :custom_link, config) ->
         url
 
       true ->
-        with uri <- URI.parse(href_without_backticks),
-             nil <- uri.host,
-             true <- is_binary(uri.path),
-             extension when extension in [".md", ".txt", ""] <- Path.extname(uri.path) do
-          extra_link(uri, config, extension, surrounded_by_backticks?)
-        else
-          _ -> nil
-        end
+        uri = URI.parse(link)
+        message = "documentation references module \"#{uri.path}\" but it doesn't exist"
+
+        warn(message, config.file, config.line, config.id)
+        nil
     end
   end
 
-  defp extra_link(uri, config, extension, _surrounded_by_backticks? = false) do
-    file = Path.basename(uri.path)
+  defp build_extra_link(link, config) do
+    with uri <- URI.parse(link),
+         nil <- uri.host,
+         true <- is_binary(uri.path),
+         extension when extension in [".md", ".txt", ""] <- Path.extname(uri.path) do
+      file = Path.basename(uri.path)
 
-    if file in config.extras do
-      without_ext = trim_extension(file, extension)
-      fragment = (uri.fragment && "#" <> uri.fragment) || ""
-      HTML.text_to_id(without_ext) <> config.ext <> fragment
-    else
-      # TODO: We could check if the module is available, and sugest to use backticks
-      message = "documentation references file \"#{uri.path}\" but it doesn't exist"
-      warn(message, config.file, config.line, config.id)
+      if file in config.extras do
+        without_ext = trim_extension(file, extension)
+        fragment = (uri.fragment && "#" <> uri.fragment) || ""
+        HTML.text_to_id(without_ext) <> config.ext <> fragment
+      else
+        message = "documentation references file \"#{uri.path}\" but it doesn't exist"
+        warn(message, config.file, config.line, config.id)
 
-      nil
-    end
-  end
-
-  defp extra_link(uri, config, _extension, true) do
-    file = Path.basename(uri.path)
-
-    message =
-      cond do
-        file in config.extras ->
-          "file name surrounded by backticks \"`#{uri.path}`\", " <>
-            "please remove them to link to the existing file \"#{uri.path}\""
-
-        true ->
-          "documentation references module or file \"`#{uri.path}`\" but it doesn't exist"
+        nil
       end
-
-    warn(message, config.file, config.line, config.id)
-    nil
+    else
+      _ -> nil
+    end
   end
 
   defp trim_extension(file, ""),

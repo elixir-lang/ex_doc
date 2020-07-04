@@ -296,7 +296,6 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   describe "generates extras" do
-    @tag :build_html
     test "alongside other content" do
       config = doc_config(main: "readme")
       generate_docs(config)
