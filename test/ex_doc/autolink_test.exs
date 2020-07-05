@@ -27,7 +27,13 @@ defmodule ExDoc.AutolinkTest do
     end
 
     test "private module" do
-      assert_unchanged("String.Unicode")
+      captured =
+        assert_warn(fn ->
+          assert_unchanged("String.Unicode")
+        end)
+
+      assert captured =~
+               "documentation references module \"String.Unicode\" but it is undefined or private"
     end
 
     test "erlang module" do
@@ -35,7 +41,14 @@ defmodule ExDoc.AutolinkTest do
     end
 
     test "unknown module" do
-      assert_unchanged("Unknown")
+      captured =
+        assert_warn(fn ->
+          assert_unchanged("Unknown")
+        end)
+
+      assert captured =~
+               "documentation references module \"Unknown\" but it is undefined or private"
+
       assert_unchanged(":unknown")
     end
 
@@ -60,7 +73,14 @@ defmodule ExDoc.AutolinkTest do
       assert autolink("Foo.foo/1") == ~m"[`Foo.foo/1`](Foo.html#foo/1)"
       assert autolink("Foo../2") == ~m"[`Foo../2`](Foo.html#./2)"
       assert autolink("Foo.../2") == ~m"[`Foo.../2`](Foo.html#../2)"
-      assert_unchanged("Bad.bar/1")
+
+      captured =
+        assert_warn(fn ->
+          assert_unchanged("Bad.bar/1")
+        end)
+
+      assert captured =~
+               "documentation references function \"Bad.bar/1\" but it is undefined or private"
     end
 
     test "elixir stdlib function" do
@@ -174,7 +194,7 @@ defmodule ExDoc.AutolinkTest do
         end)
 
       assert captured =~
-               "documentation references \"Unknown\" but it doesn't exist"
+               "documentation references module \"Unknown\" but it is undefined or private"
 
       captured =
         assert_warn(fn ->
@@ -190,7 +210,7 @@ defmodule ExDoc.AutolinkTest do
         end)
 
       assert captured =~
-               "documentation references \"LICENSE\" but it doesn't exist"
+               "documentation references module \"LICENSE\" but it is undefined or private"
     end
 
     test "mix task" do
@@ -208,7 +228,13 @@ defmodule ExDoc.AutolinkTest do
 
       assert_unchanged("mix compile.elixir --verbose")
 
-      assert_unchanged("mix unknown.task")
+      captured =
+        assert_warn(fn ->
+          assert_unchanged("mix unknown.task")
+        end)
+
+      assert captured =~
+               "documentation references module \"unknown.task\" but it is undefined or private"
     end
 
     test "3rd party links" do
@@ -404,8 +430,18 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged(~m"[bad](`String.upcase/9`)", opts)
       end)
 
-    assert captured =~ "documentation references function \"String.upcase/9\" but it is undefined or private"
+    assert captured =~
+             "documentation references function \"String.upcase/9\" but it is undefined or private"
+
     refute captured =~ "documentation references \"String.upcase/9\" but it doesn't exist"
+
+    captured =
+      assert_warn(fn ->
+        assert_unchanged(~m"[Unknown](`Unknown`)")
+      end)
+
+    assert captured =~
+             "documentation references module \"Unknown\" but it is undefined or private"
   end
 
   ## Helpers

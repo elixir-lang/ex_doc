@@ -105,14 +105,7 @@ defmodule ExDoc.Autolink do
   end
 
   defp build_custom_link(link, config) do
-    if url = url(link, :custom_link, config) do
-      url
-    else
-      message = "documentation references \"#{link}\" but it doesn't exist"
-
-      warn(message, config.file, config.line, config.id)
-      nil
-    end
+    url(link, :custom_link, config)
   end
 
   defp build_extra_link(link, config) do
@@ -223,7 +216,7 @@ defmodule ExDoc.Autolink do
       [string] ->
         case parse_module(string, mode) do
           {:module, module} ->
-            module_url(module, config)
+            module_url(module, string, config)
 
           :error ->
             nil
@@ -316,7 +309,7 @@ defmodule ExDoc.Autolink do
   defp mix_task(name, config) do
     if name =~ ~r/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/ do
       parts = name |> String.split(".") |> Enum.map(&Macro.camelize/1)
-      module_url(Module.concat([Mix, Tasks | parts]), config)
+      module_url(Module.concat([Mix, Tasks | parts]), name, config)
     end
   end
 
@@ -399,21 +392,28 @@ defmodule ExDoc.Autolink do
 
   ## Internals
 
-  defp module_url(module, config) do
+  defp module_url(module, module_string, config) do
     if module == config.current_module do
       "#content"
     else
       if Refs.public?({:module, module}) do
-        module_url(tool(module), module, config)
+        module_url_app(tool(module), module, config)
+      else
+        message =
+          "documentation references module \"#{module_string}\" but it is undefined or private"
+
+        maybe_warn(message, config)
+
+        nil
       end
     end
   end
 
-  defp module_url(:ex_doc, module, config) do
+  defp module_url_app(:ex_doc, module, config) do
     ex_doc_app_url(module, config) <> inspect(module) <> config.ext
   end
 
-  defp module_url(:otp, module, _config) do
+  defp module_url_app(:otp, module, _config) do
     @otpdocs <> "#{module}.html"
   end
 
@@ -455,11 +455,11 @@ defmodule ExDoc.Autolink do
           if module == config.current_module do
             fragment(tool, kind, name, arity)
           else
-            module_url(tool, module, config) <> fragment(tool, kind, name, arity)
+            module_url_app(tool, module, config) <> fragment(tool, kind, name, arity)
           end
       end
     else
-      if warn? and Refs.public?({:module, module}) do
+      if warn? do
         maybe_warn({kind, module, name, arity}, config)
       end
 
@@ -519,13 +519,20 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp maybe_warn({kind, module, name, arity}, config) do
+  defp maybe_warn(arg, config) do
     skipped = config.skip_undefined_reference_warnings_on
     file = Path.relative_to(config.file, File.cwd!())
     line = config.line
+    id = config.id
 
-    unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
-      warn({kind, module, name, arity}, file, line, config.id)
+    unless Enum.any?([id, config.module_id, file], &(&1 in skipped)) do
+      case arg do
+        {kind, module, name, arity} ->
+          warn({kind, module, name, arity}, file, line, id)
+
+        message when is_binary(message) ->
+          warn(message, file, line, id)
+      end
     end
   end
 
