@@ -40,7 +40,13 @@ export function initialize () {
     sidebarProjectVersion.append(versionsDropdown)
 
     $('.sidebar-projectVersionsDropdown').width(width).change(function () {
-      window.location.href = $(this).val()
+      let url = $(this).val()
+      const otherVersionWithPath = url + '/' + window.location.href.split('/').pop()
+      $.get(otherVersionWithPath, function () {
+        window.location.href = otherVersionWithPath
+      }).fail(function () {
+        window.location.href = url
+      })
     })
   }
 }
