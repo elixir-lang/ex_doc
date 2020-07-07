@@ -69,6 +69,7 @@ let shortcutBeingPressed = null
 
 function triggerShortcut (event) {
   const elementTagName = event.target.tagName.toLowerCase()
+  const key = event.key
   const keyCode = event.keyCode
   const isShiftPressed = event.shiftKey
 
@@ -79,6 +80,9 @@ function triggerShortcut (event) {
   if (event.ctrlKey || event.metaKey || event.altKey) { return }
 
   const foundShortcut = find(keyboardShortcuts, function (shortcut) {
+    if (key) return shortcut.name === key
+
+    // legacy fallback
     const isShiftRequired = !!shortcut.requiresShiftKey
     return shortcut.keyCode === keyCode && isShiftRequired === isShiftPressed
   })
