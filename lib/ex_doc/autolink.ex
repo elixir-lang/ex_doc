@@ -76,7 +76,7 @@ defmodule ExDoc.Autolink do
   end
 
   defp walk({:code, attrs, [code]} = ast, config) do
-    if url = url(code, :regular, config) do
+    if url = url(code, :regular_link, config) do
       code = remove_prefix(code)
       {:a, [href: url], [{:code, attrs, [code]}]}
     else
@@ -121,7 +121,7 @@ defmodule ExDoc.Autolink do
         HTML.text_to_id(without_ext) <> config.ext <> fragment
       else
         message = "documentation references file \"#{uri.path}\" but it doesn't exist"
-        warn(message, config.file, config.line, config.id)
+        maybe_warn(message, config, :undefined)
 
         nil
       end
@@ -189,8 +189,8 @@ defmodule ExDoc.Autolink do
   ]
 
   defp url("", _mode, _config), do: nil
-  defp url("mix help " <> name, _mode, config), do: mix_task(name, config)
-  defp url("mix " <> name, _mode, config), do: mix_task(name, config)
+  defp url("mix help " <> name, mode, config), do: mix_task(name, mode, config)
+  defp url("mix " <> name, mode, config), do: mix_task(name, mode, config)
 
   defp url(code, mode, config) do
     case String.split(code, "/") do
@@ -216,7 +216,7 @@ defmodule ExDoc.Autolink do
       [string] ->
         case parse_module(string, mode) do
           {:module, module} ->
-            module_url(module, string, config)
+            module_url(module, string, mode, config)
 
           :error ->
             nil
@@ -306,10 +306,10 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp mix_task(name, config) do
+  defp mix_task(name, mode, config) do
     if name =~ ~r/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/ do
       parts = name |> String.split(".") |> Enum.map(&Macro.camelize/1)
-      module_url(Module.concat([Mix, Tasks | parts]), name, config)
+      module_url(Module.concat([Mix, Tasks | parts]), name, mode, config, true)
     end
   end
 
@@ -392,20 +392,32 @@ defmodule ExDoc.Autolink do
 
   ## Internals
 
-  defp module_url(module, module_string, config) do
-    if module == config.current_module do
-      "#content"
-    else
-      if Refs.public?({:module, module}) do
-        module_url_app(tool(module), module, config)
-      else
-        message =
-          "documentation references module \"#{module_string}\" but it is undefined or private"
+  defp module_url(module, module_string, mode, config, mix_task? \\ false)
 
-        maybe_warn(message, config)
+  defp module_url(module, _module_string, _mode, %{current_module: module}, _mix_task?),
+    do: "#content"
+
+  defp module_url(module, module_string, mode, config, mix_task?) do
+    case {mode, Refs.get_visibility({:module, module})} do
+      {_, :public} ->
+        module_url_app(tool(module), module, config)
+
+      {:regular_link, :undefined} ->
+        nil
+
+      {_, visibility} ->
+        module_string =
+          if mix_task? do
+            "mix " <> module_string
+          else
+            module_string
+          end
+
+        message = "documentation references module \"#{module_string}\" but it is #{visibility}"
+
+        maybe_warn(message, config, visibility)
 
         nil
-      end
     end
   end
 
@@ -444,26 +456,27 @@ defmodule ExDoc.Autolink do
 
   defp remote_url(kind, module, name, arity, config, opts \\ []) do
     warn? = Keyword.get(opts, :warn?, true)
-    ref = {kind, module, name, arity}
 
-    if Refs.public?(ref) do
-      case tool(module) do
-        :no_tool ->
-          nil
+    case Refs.get_visibility({kind, module, name, arity}) do
+      :public ->
+        case tool(module) do
+          :no_tool ->
+            nil
 
-        tool ->
-          if module == config.current_module do
-            fragment(tool, kind, name, arity)
-          else
-            module_url_app(tool, module, config) <> fragment(tool, kind, name, arity)
-          end
-      end
-    else
-      if warn? do
-        maybe_warn({kind, module, name, arity}, config)
-      end
+          tool ->
+            if module == config.current_module do
+              fragment(tool, kind, name, arity)
+            else
+              module_url_app(tool, module, config) <> fragment(tool, kind, name, arity)
+            end
+        end
 
-      nil
+      visibility ->
+        if warn? do
+          maybe_warn({kind, module, name, arity}, config, visibility)
+        end
+
+        nil
     end
   end
 
@@ -519,32 +532,32 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp maybe_warn(arg, config) do
+  defp maybe_warn(kmfa_or_message, config, visibility) do
     skipped = config.skip_undefined_reference_warnings_on
     file = Path.relative_to(config.file, File.cwd!())
     line = config.line
     id = config.id
 
     unless Enum.any?([id, config.module_id, file], &(&1 in skipped)) do
-      case arg do
+      case kmfa_or_message do
         {kind, module, name, arity} ->
-          warn({kind, module, name, arity}, file, line, id)
+          warn({kind, module, name, arity}, {file, line}, id, visibility)
 
         message when is_binary(message) ->
-          warn(message, file, line, id)
+          warn(message, {file, line}, id, visibility)
       end
     end
   end
 
-  defp warn({kind, module, name, arity}, file, line, id) do
+  defp warn({kind, module, name, arity}, {file, line}, id, visibility) do
     message =
       "documentation references #{kind} \"#{inspect(module)}.#{name}/#{arity}\"" <>
-        " but it is undefined or private"
+        " but it is #{visibility}"
 
-    warn(message, file, line, id)
+    warn(message, {file, line}, id, visibility)
   end
 
-  defp warn(message, file, line, id) do
+  defp warn(message, {file, line}, id, _visibility) do
     warning = IO.ANSI.format([:yellow, "warning: ", :reset])
 
     stacktrace =

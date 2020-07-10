@@ -33,7 +33,7 @@ defmodule ExDoc.AutolinkTest do
         end)
 
       assert captured =~
-               "documentation references module \"String.Unicode\" but it is undefined or private"
+               "documentation references module \"String.Unicode\" but it is private"
     end
 
     test "erlang module" do
@@ -46,15 +46,15 @@ defmodule ExDoc.AutolinkTest do
           assert_unchanged("Unknown")
         end)
 
-      assert captured =~
-               "documentation references module \"Unknown\" but it is undefined or private"
+      refute captured =~
+               "documentation references module \"Unknown\" but it is undefined"
 
       assert_unchanged(":unknown")
     end
 
     test "project-local module" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, true}
+        {{:module, Foo}, :public}
       ])
 
       assert autolink("Foo") == ~m"[`Foo`](Foo.html)"
@@ -64,10 +64,10 @@ defmodule ExDoc.AutolinkTest do
 
     test "remote function" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, true},
-        {{:function, Foo, :foo, 1}, true},
-        {{:function, Foo, :., 2}, true},
-        {{:function, Foo, :.., 2}, true}
+        {{:module, Foo}, :public},
+        {{:function, Foo, :foo, 1}, :public},
+        {{:function, Foo, :., 2}, :public},
+        {{:function, Foo, :.., 2}, :public}
       ])
 
       assert autolink("Foo.foo/1") == ~m"[`Foo.foo/1`](Foo.html#foo/1)"
@@ -80,7 +80,7 @@ defmodule ExDoc.AutolinkTest do
         end)
 
       assert captured =~
-               "documentation references function \"Bad.bar/1\" but it is undefined or private"
+               "documentation references function \"Bad.bar/1\" but it is undefined"
     end
 
     test "elixir stdlib function" do
@@ -100,10 +100,10 @@ defmodule ExDoc.AutolinkTest do
 
     test "local function" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, true},
-        {{:function, Foo, :foo, 1}, true},
-        {{:function, Foo, :., 2}, true},
-        {{:function, Foo, :.., 2}, true}
+        {{:module, Foo}, :public},
+        {{:function, Foo, :foo, 1}, :public},
+        {{:function, Foo, :., 2}, :public},
+        {{:function, Foo, :.., 2}, :public}
       ])
 
       assert autolink("foo/1", current_module: Foo) == ~m"[`foo/1`](#foo/1)"
@@ -194,7 +194,7 @@ defmodule ExDoc.AutolinkTest do
         end)
 
       assert captured =~
-               "documentation references module \"Unknown\" but it is undefined or private"
+               "documentation references module \"Unknown\" but it is undefined"
 
       captured =
         assert_warn(fn ->
@@ -210,7 +210,15 @@ defmodule ExDoc.AutolinkTest do
         end)
 
       assert captured =~
-               "documentation references module \"LICENSE\" but it is undefined or private"
+               "documentation references module \"LICENSE\" but it is undefined"
+
+      captured =
+        assert_warn(fn ->
+          assert_unchanged(~m"[an unknown task](`mix unknown.task`)")
+        end)
+
+      assert captured =~
+               "documentation references module \"mix unknown.task\" but it is undefined"
     end
 
     test "mix task" do
@@ -233,8 +241,8 @@ defmodule ExDoc.AutolinkTest do
           assert_unchanged("mix unknown.task")
         end)
 
-      assert captured =~
-               "documentation references module \"unknown.task\" but it is undefined or private"
+      refute captured =~
+               "documentation references module \"unknown.task\" but it is undefined"
     end
 
     test "3rd party links" do
@@ -286,10 +294,10 @@ defmodule ExDoc.AutolinkTest do
 
     test "locals" do
       ExDoc.Refs.insert([
-        {{:module, MyModule}, true},
-        {{:type, MyModule, :foo, 1}, true},
-        {{:type, MyModule, :foo, 2}, true},
-        {{:type, MyModule, :foo!, 1}, true}
+        {{:module, MyModule}, :public},
+        {{:type, MyModule, :foo, 1}, :public},
+        {{:type, MyModule, :foo, 2}, :public},
+        {{:type, MyModule, :foo!, 1}, :public}
       ])
 
       assert typespec(quote(do: t() :: foo(1))) ==
@@ -313,8 +321,8 @@ defmodule ExDoc.AutolinkTest do
 
     test "remotes" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, true},
-        {{:type, Foo, :t, 0}, true}
+        {{:module, Foo}, :public},
+        {{:type, Foo, :t, 0}, :public}
       ])
 
       assert typespec(quote(do: t() :: Foo.t())) ==
@@ -323,9 +331,9 @@ defmodule ExDoc.AutolinkTest do
 
     test "autolinks same type and function name" do
       ExDoc.Refs.insert([
-        {{:module, MyModule}, true},
-        {{:type, MyModule, :foo, 0}, true},
-        {{:type, MyModule, :foo, 1}, true}
+        {{:module, MyModule}, :public},
+        {{:type, MyModule, :foo, 0}, :public},
+        {{:type, MyModule, :foo, 1}, :public}
       ])
 
       assert typespec(quote(do: foo() :: foo()))
@@ -370,9 +378,9 @@ defmodule ExDoc.AutolinkTest do
 
   test "warnings" do
     ExDoc.Refs.insert([
-      {{:module, Foo}, true},
-      {{:function, Foo, :bar, 1}, false},
-      {{:type, Foo, :bad, 0}, false}
+      {{:module, Foo}, :public},
+      {{:function, Foo, :bar, 1}, :private},
+      {{:type, Foo, :bad, 0}, :private}
     ])
 
     captured =
@@ -431,9 +439,9 @@ defmodule ExDoc.AutolinkTest do
       end)
 
     assert captured =~
-             "documentation references function \"String.upcase/9\" but it is undefined or private"
+             "documentation references function \"String.upcase/9\" but it is undefined"
 
-    refute captured =~ "documentation references \"String.upcase/9\" but it doesn't exist"
+    refute captured =~ "documentation references file \"String.upcase/9\" but it doesn't exist"
 
     captured =
       assert_warn(fn ->
@@ -441,7 +449,7 @@ defmodule ExDoc.AutolinkTest do
       end)
 
     assert captured =~
-             "documentation references module \"Unknown\" but it is undefined or private"
+             "documentation references module \"Unknown\" but it is undefined"
   end
 
   ## Helpers

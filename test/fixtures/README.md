@@ -4,7 +4,7 @@
 `t:atom/0`
 `mix compile.elixir`
 
-## `CompiledWithDocs` sample
+## `Header` sample
 
 hello
 

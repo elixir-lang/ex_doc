@@ -2,6 +2,36 @@ defmodule ExDoc.RefsTest do
   use ExUnit.Case, async: true
   alias ExDoc.Refs
 
+  test "get_visibility/1" do
+    assert Refs.get_visibility({:module, String}) == :public
+    assert Refs.get_visibility({:module, String.Unicode}) == :private
+    assert Refs.get_visibility({:module, Unknown}) == :undefined
+
+    assert Refs.get_visibility({:function, Enum, :join, 1}) == :public
+    assert Refs.get_visibility({:function, Enum, :join, 2}) == :public
+    # TODO: make this test pass
+    # assert Refs.get_visibility({:function, String.Unicode, :version, 0}) == :private
+    assert Refs.get_visibility({:function, String.Unicode, :version, 9}) == :undefined
+    assert Refs.get_visibility({:function, Enum, :join, 9}) == :undefined
+
+    assert Refs.get_visibility({:function, Unknown, :unknown, 0}) == :undefined
+
+    # macros are classified as functions
+    assert Refs.get_visibility({:function, Kernel, :def, 2}) == :public
+
+    assert Refs.get_visibility({:type, String, :t, 0}) == :public
+    assert Refs.get_visibility({:type, String, :t, 1}) == :undefined
+
+    assert Refs.get_visibility({:callback, GenServer, :handle_call, 3}) == :public
+    assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :undefined
+
+    assert Refs.get_visibility({:function, :lists, :all, 2}) == :public
+    assert Refs.get_visibility({:function, :lists, :all, 9}) == :undefined
+
+    assert Refs.get_visibility({:type, :sets, :set, 0}) == :public
+    assert Refs.get_visibility({:type, :sets, :set, 9}) == :undefined
+  end
+
   test "public?/1" do
     assert Refs.public?({:module, String})
     refute Refs.public?({:module, String.Unicode})
