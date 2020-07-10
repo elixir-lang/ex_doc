@@ -4,13 +4,13 @@ defmodule ExDoc.RefsTest do
 
   test "get_visibility/1" do
     assert Refs.get_visibility({:module, String}) == :public
-    assert Refs.get_visibility({:module, String.Unicode}) == :private
+    assert Refs.get_visibility({:module, String.Unicode}) == :hidden
     assert Refs.get_visibility({:module, Unknown}) == :undefined
 
     assert Refs.get_visibility({:function, Enum, :join, 1}) == :public
     assert Refs.get_visibility({:function, Enum, :join, 2}) == :public
     # TODO: make this test pass
-    # assert Refs.get_visibility({:function, String.Unicode, :version, 0}) == :private
+    # assert Refs.get_visibility({:function, String.Unicode, :version, 0}) == :hidden
     assert Refs.get_visibility({:function, String.Unicode, :version, 9}) == :undefined
     assert Refs.get_visibility({:function, Enum, :join, 9}) == :undefined
 

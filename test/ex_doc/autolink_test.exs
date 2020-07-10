@@ -26,14 +26,14 @@ defmodule ExDoc.AutolinkTest do
                ~m"[`IEx.Helpers`](https://hexdocs.pm/iex/IEx.Helpers.html)"
     end
 
-    test "private module" do
+    test "hidden module" do
       captured =
         assert_warn(fn ->
           assert_unchanged("String.Unicode")
         end)
 
       assert captured =~
-               "documentation references module \"String.Unicode\" but it is private"
+               "documentation references module \"String.Unicode\" but it is hidden"
     end
 
     test "erlang module" do
@@ -379,8 +379,8 @@ defmodule ExDoc.AutolinkTest do
   test "warnings" do
     ExDoc.Refs.insert([
       {{:module, Foo}, :public},
-      {{:function, Foo, :bar, 1}, :private},
-      {{:type, Foo, :bad, 0}, :private}
+      {{:function, Foo, :bar, 1}, :hidden},
+      {{:type, Foo, :bad, 0}, :hidden}
     ])
 
     captured =

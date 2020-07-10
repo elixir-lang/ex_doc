@@ -5,7 +5,7 @@ defmodule ExDoc.Refs do
   #
   # The cache consists of entries:
   #
-  #     entry() :: {ref(), visibility :: :private | :public | :undefined}
+  #     entry() :: {ref(), visibility :: :hidden | :public | :undefined}
   #
   #     ref() ::
   #       {:module, module()}
@@ -88,14 +88,14 @@ defmodule ExDoc.Refs do
   def from_chunk(module, result) do
     case result do
       {:docs_v1, _, _, _, :hidden, _, _} ->
-        {:chunk, [{{:module, module}, :private}]}
+        {:chunk, [{{:module, module}, :hidden}]}
 
       {:docs_v1, _, _, _, _, _, docs} ->
         entries =
           for {{kind, name, arity}, _, _, doc, metadata} <- docs do
             tag =
               if doc == :hidden do
-                :private
+                :hidden
               else
                 :public
               end
