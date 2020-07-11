@@ -41,14 +41,7 @@ defmodule ExDoc.AutolinkTest do
     end
 
     test "unknown module" do
-      captured =
-        assert_warn(fn ->
-          assert_unchanged("Unknown")
-        end)
-
-      refute captured =~
-               "documentation references module \"Unknown\" but it is undefined"
-
+      assert_unchanged("Unknown")
       assert_unchanged(":unknown")
     end
 
@@ -218,7 +211,7 @@ defmodule ExDoc.AutolinkTest do
         end)
 
       assert captured =~
-               "documentation references module \"mix unknown.task\" but it is undefined"
+               "documentation references \"mix unknown.task\" but such task is undefined"
     end
 
     test "mix task" do
@@ -236,13 +229,7 @@ defmodule ExDoc.AutolinkTest do
 
       assert_unchanged("mix compile.elixir --verbose")
 
-      captured =
-        assert_warn(fn ->
-          assert_unchanged("mix unknown.task")
-        end)
-
-      refute captured =~
-               "documentation references module \"unknown.task\" but it is undefined"
+      assert_unchanged("mix unknown.task")
     end
 
     test "3rd party links" do
