@@ -23,13 +23,17 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:type, String, :t, 1}) == :undefined
 
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 3}) == :public
-    assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :undefined
+    if (opt_release() >= 23) do
+      assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :public
+    else
+      assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :undefined
+    end
 
     assert Refs.get_visibility({:function, :lists, :all, 2}) == :public
     assert Refs.get_visibility({:function, :lists, :all, 9}) == :undefined
 
     assert Refs.get_visibility({:type, :sets, :set, 0}) == :public
-    assert Refs.get_visibility({:type, :sets, :set, 9}) == :undefined
+    assert Refs.get_visibility({:type, :sets, :set, 9}) == :public
   end
 
   test "public?/1" do
@@ -55,9 +59,10 @@ defmodule ExDoc.RefsTest do
     assert Refs.public?({:function, :lists, :all, 2})
     refute Refs.public?({:function, :lists, :all, 9})
 
-    # TODO: enable when OTP 23.0-rc2 is out (it should have callbacks support)
-    # assert Refs.public?({:callback, :gen_server, :handle_call, 3})
-    # assert Refs.public?({:callback, :gen_server, :handle_call, 9}) in [true, false]
+    if (opt_release() >= 23) do
+      assert Refs.public?({:callback, :gen_server, :handle_call, 3})
+      assert Refs.public?({:callback, :gen_server, :handle_call, 9}) in [true, false]
+    end
 
     assert Refs.public?({:type, :sets, :set, 0})
     assert Refs.public?({:type, :sets, :set, 9}) in [true, false]
@@ -66,5 +71,10 @@ defmodule ExDoc.RefsTest do
   test "from_chunk/2 with module that doesn't exist" do
     result = ExDoc.Utils.Code.fetch_docs(:elixir)
     assert {:none, _} = ExDoc.Refs.from_chunk(Elixir, result)
+  end
+
+  defp opt_release() do
+    System.otp_release()
+    |> String.to_integer()
   end
 end

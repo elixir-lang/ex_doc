@@ -406,14 +406,12 @@ defmodule ExDoc.Autolink do
         nil
 
       {_, visibility} ->
-        module_string =
+        message =
           if mix_task? do
-            "mix " <> module_string
+            "documentation references \"mix #{module_string}\" but such task is #{visibility}"
           else
-            module_string
+            "documentation references module \"#{module_string}\" but it is #{visibility}"
           end
-
-        message = "documentation references module \"#{module_string}\" but it is #{visibility}"
 
         maybe_warn(message, config, visibility)
 
