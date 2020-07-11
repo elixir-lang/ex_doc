@@ -23,11 +23,7 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:type, String, :t, 1}) == :undefined
 
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 3}) == :public
-    if (opt_release() >= 23) do
-      assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :public
-    else
-      assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :undefined
-    end
+    assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :undefined
 
     assert Refs.get_visibility({:function, :lists, :all, 2}) == :public
     assert Refs.get_visibility({:function, :lists, :all, 9}) == :undefined
