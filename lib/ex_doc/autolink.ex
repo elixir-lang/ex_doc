@@ -200,10 +200,10 @@ defmodule ExDoc.Autolink do
 
           case parse_module_function(rest) do
             {:local, function} ->
-              local_url(kind, function, arity, config)
+              local_url(kind, function, arity, config, mode: mode)
 
             {:remote, module, function} ->
-              remote_url(kind, module, function, arity, config)
+              remote_url({kind, module, function, arity}, config, mode: mode)
 
             :error ->
               nil
@@ -355,7 +355,7 @@ defmodule ExDoc.Autolink do
 
       url =
         if module do
-          remote_url(:type, module, name, arity, config)
+          remote_url({:type, module, name, arity}, config)
         else
           local_url(:type, name, arity, config)
         end
@@ -427,36 +427,48 @@ defmodule ExDoc.Autolink do
     @otpdocs <> "#{module}.html"
   end
 
-  defp local_url(:type, name, arity, config) when {name, arity} in @basic_types do
+  defp local_url(kind, name, arity, config, options \\ [])
+
+  defp local_url(:type, name, arity, config, _options) when {name, arity} in @basic_types do
     ex_doc_app_url(Kernel, config) <> "typespecs" <> config.ext <> "#basic-types"
   end
 
-  defp local_url(:type, name, arity, config) when {name, arity} in @built_in_types do
+  defp local_url(:type, name, arity, config, _options) when {name, arity} in @built_in_types do
     ex_doc_app_url(Kernel, config) <> "typespecs" <> config.ext <> "#built-in-types"
   end
 
-  defp local_url(kind, name, arity, config) do
+  defp local_url(kind, name, arity, config, options) do
     module = config.current_module
     ref = {kind, module, name, arity}
+    mode = Keyword.get(options, :mode, :regular_link)
+    visibility = Refs.get_visibility(ref)
 
     cond do
-      Refs.public?(ref) -> fragment(tool(module), kind, name, arity)
-      kind == :function -> try_autoimported_function(name, arity, config)
-      true -> nil
+      visibility == :public ->
+        fragment(tool(module), kind, name, arity)
+
+      kind == :function ->
+        try_autoimported_function(name, arity, mode, config)
+
+      true ->
+        maybe_warn(ref, config, visibility)
+        nil
     end
   end
 
-  defp try_autoimported_function(name, arity, config) do
+  defp try_autoimported_function(name, arity, mode, config) do
     Enum.find_value(@autoimported_modules, fn module ->
-      remote_url(:function, module, name, arity, config, warn?: false)
+      remote_url({:function, module, name, arity}, config, warn?: false, mode: mode)
     end)
   end
 
-  defp remote_url(kind, module, name, arity, config, opts \\ []) do
+  defp remote_url({kind, module, name, arity} = ref, config, opts \\ []) do
     warn? = Keyword.get(opts, :warn?, true)
+    mode = Keyword.get(opts, :mode, :regular_link)
+    same_module? = module == config.current_module
 
-    case Refs.get_visibility({kind, module, name, arity}) do
-      :public ->
+    case {mode, Refs.get_visibility(ref)} do
+      {_, :public} ->
         case tool(module) do
           :no_tool ->
             nil
@@ -469,10 +481,11 @@ defmodule ExDoc.Autolink do
             end
         end
 
-      visibility ->
-        if warn? do
-          maybe_warn({kind, module, name, arity}, config, visibility)
-        end
+      {:regular_link, :undefined} when not same_module? ->
+        nil
+
+      {_, visibility} ->
+        if warn?, do: maybe_warn({kind, module, name, arity}, config, visibility)
 
         nil
     end
@@ -488,15 +501,23 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp fragment(:ex_doc, kind, name, arity) do
-    prefix =
-      case kind do
-        :function -> ""
-        :callback -> "c:"
-        :type -> "t:"
-      end
+  defp strip_elixir_namespace(module) when is_atom(module),
+    do: strip_elixir_namespace("#{module}")
 
-    "#" <> prefix <> "#{T.enc(Atom.to_string(name))}/#{arity}"
+  defp strip_elixir_namespace("Elixir." <> rest), do: rest
+  defp strip_elixir_namespace(rest) when is_binary(rest), do: rest
+
+  defp prefix(kind)
+  defp prefix(:function), do: ""
+  defp prefix(:callback), do: "c:"
+  defp prefix(:type), do: "t:"
+
+  defp ref_id({kind, module, name, arity}) do
+    prefix(kind) <> "#{strip_elixir_namespace(module)}.#{name}/#{arity}"
+  end
+
+  defp fragment(:ex_doc, kind, name, arity) do
+    "#" <> prefix(kind) <> "#{T.enc(Atom.to_string(name))}/#{arity}"
   end
 
   defp fragment(:otp, kind, name, arity) do
@@ -530,20 +551,23 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp maybe_warn(kmfa_or_message, config, visibility) do
+  defp maybe_warn(ref_or_message, config, visibility) do
     skipped = config.skip_undefined_reference_warnings_on
     file = Path.relative_to(config.file, File.cwd!())
     line = config.line
     id = config.id
 
-    unless Enum.any?([id, config.module_id, file], &(&1 in skipped)) do
-      case kmfa_or_message do
-        {kind, module, name, arity} ->
-          warn({kind, module, name, arity}, {file, line}, id, visibility)
+    list = [id, config.module_id, file]
 
-        message when is_binary(message) ->
-          warn(message, {file, line}, id, visibility)
+    list =
+      if match?({_, _, _, _}, ref_or_message) do
+        [ref_id(ref_or_message) | list]
+      else
+        list
       end
+
+    unless Enum.any?(list, &(&1 in skipped)) do
+      warn(ref_or_message, {file, line}, id, visibility)
     end
   end
 

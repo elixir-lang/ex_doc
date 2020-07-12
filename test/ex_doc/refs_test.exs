@@ -9,8 +9,7 @@ defmodule ExDoc.RefsTest do
 
     assert Refs.get_visibility({:function, Enum, :join, 1}) == :public
     assert Refs.get_visibility({:function, Enum, :join, 2}) == :public
-    # TODO: make this test pass
-    # assert Refs.get_visibility({:function, String.Unicode, :version, 0}) == :hidden
+    assert Refs.get_visibility({:function, String.Unicode, :version, 0}) == :hidden
     assert Refs.get_visibility({:function, String.Unicode, :version, 9}) == :undefined
     assert Refs.get_visibility({:function, Enum, :join, 9}) == :undefined
 
@@ -55,7 +54,7 @@ defmodule ExDoc.RefsTest do
     assert Refs.public?({:function, :lists, :all, 2})
     refute Refs.public?({:function, :lists, :all, 9})
 
-    if (opt_release() >= 23) do
+    if opt_release() >= 23 do
       assert Refs.public?({:callback, :gen_server, :handle_call, 3})
       assert Refs.public?({:callback, :gen_server, :handle_call, 9}) in [true, false]
     end

@@ -87,25 +87,29 @@ defmodule ExDoc.Refs do
   @doc false
   def from_chunk(module, result) do
     case result do
-      {:docs_v1, _, _, _, :hidden, _, _} ->
-        {:chunk, [{{:module, module}, :hidden}]}
+      {:docs_v1, _, _, _, module_visibility, _, docs} ->
+        module_visibility =
+          if module_visibility == :hidden do
+            :hidden
+          else
+            :public
+          end
 
-      {:docs_v1, _, _, _, _, _, docs} ->
         entries =
           for {{kind, name, arity}, _, _, doc, metadata} <- docs do
-            tag =
-              if doc == :hidden do
+            ref_visibility =
+              if doc == :hidden or module_visibility == :hidden do
                 :hidden
               else
                 :public
               end
 
             for arity <- (arity - (metadata[:defaults] || 0))..arity do
-              {{kind(kind), module, name, arity}, tag}
+              {{kind(kind), module, name, arity}, ref_visibility}
             end
           end
 
-        entries = [{{:module, module}, :public} | List.flatten(entries)]
+        entries = [{{:module, module}, module_visibility} | List.flatten(entries)]
         {:chunk, entries}
 
       {:error, :chunk_not_found} ->

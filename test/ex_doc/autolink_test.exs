@@ -67,13 +67,7 @@ defmodule ExDoc.AutolinkTest do
       assert autolink("Foo../2") == ~m"[`Foo../2`](Foo.html#./2)"
       assert autolink("Foo.../2") == ~m"[`Foo.../2`](Foo.html#../2)"
 
-      captured =
-        assert_warn(fn ->
-          assert_unchanged("Bad.bar/1")
-        end)
-
-      assert captured =~
-               "documentation references function \"Bad.bar/1\" but it is undefined"
+      assert_unchanged("Bad.bar/1")
     end
 
     test "elixir stdlib function" do
@@ -272,9 +266,16 @@ defmodule ExDoc.AutolinkTest do
 
   describe "typespec/3" do
     test "operators" do
-      assert typespec(quote(do: +foo() :: foo())) == ~s[+foo() :: foo()]
+      ExDoc.Refs.insert([
+        {{:module, MyModule}, :public},
+        {{:type, MyModule, :foo, 0}, :public}
+      ])
 
-      assert typespec(quote(do: foo() + foo() :: foo())) == ~s[foo() + foo() :: foo()]
+      assert typespec(quote(do: +foo() :: foo())) ==
+               ~s[+<a href="#t:foo/0">foo</a>() :: <a href="#t:foo/0">foo</a>()]
+
+      assert typespec(quote(do: foo() + foo() :: foo())) ==
+               ~s[<a href=\"#t:foo/0\">foo</a>() + <a href=\"#t:foo/0\">foo</a>() :: <a href=\"#t:foo/0\">foo</a>()]
 
       assert typespec(quote(do: -0 :: 0)) == ~s[-0 :: 0]
     end
@@ -284,26 +285,29 @@ defmodule ExDoc.AutolinkTest do
         {{:module, MyModule}, :public},
         {{:type, MyModule, :foo, 1}, :public},
         {{:type, MyModule, :foo, 2}, :public},
-        {{:type, MyModule, :foo!, 1}, :public}
+        {{:type, MyModule, :foo!, 1}, :public},
+        {{:type, MyModule, :bar, 0}, :public},
+        {{:type, MyModule, :bar, 1}, :public},
+        {{:type, MyModule, :baz, 1}, :public}
       ])
 
       assert typespec(quote(do: t() :: foo(1))) ==
                ~s[t() :: <a href="#t:foo/1">foo</a>(1)]
 
       assert typespec(quote(do: t() :: bar(foo(1)))) ==
-               ~s[t() :: bar(<a href="#t:foo/1">foo</a>(1))]
+               ~s[t() :: <a href=\"#t:bar/1\">bar</a>(<a href=\"#t:foo/1\">foo</a>(1))]
 
       assert typespec(quote(do: (t() :: bar(foo(1)) when bat: foo(1)))) ==
-               ~s[t() :: bar(<a href="#t:foo/1">foo</a>(1)) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
+               ~s[t() :: <a href=\"#t:bar/1\">bar</a>(<a href="#t:foo/1">foo</a>(1)) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
 
       assert typespec(quote(do: t() :: bar(baz(1)))) ==
-               ~s[t() :: bar(baz(1))]
+               ~s[t() :: <a href=\"#t:bar/1\">bar</a>(<a href=\"#t:baz/1\">baz</a>(1))]
 
       assert typespec(quote(do: t() :: foo(bar(), bar()))) ==
-               ~s[t() :: <a href="#t:foo/2">foo</a>(bar(), bar())]
+               ~s[t() :: <a href="#t:foo/2">foo</a>(<a href=\"#t:bar/0\">bar</a>(), <a href=\"#t:bar/0\">bar</a>())]
 
       assert typespec(quote(do: t() :: foo!(bar()))) ==
-               ~s[t() :: <a href="#t:foo!/1">foo!</a>(bar())]
+               ~s[t() :: <a href="#t:foo!/1">foo!</a>(<a href=\"#t:bar/0\">bar</a>())]
     end
 
     test "remotes" do
@@ -427,8 +431,6 @@ defmodule ExDoc.AutolinkTest do
 
     assert captured =~
              "documentation references function \"String.upcase/9\" but it is undefined"
-
-    refute captured =~ "documentation references file \"String.upcase/9\" but it doesn't exist"
 
     captured =
       assert_warn(fn ->

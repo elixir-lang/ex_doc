@@ -53,7 +53,12 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp generate_docs(config) do
-    config = Keyword.put_new(config, :skip_undefined_reference_warnings_on, ["Warnings"])
+    config =
+      Keyword.put_new(config, :skip_undefined_reference_warnings_on, [
+        "Warnings",
+        "t:TypesAndSpecs.private/0"
+      ])
+
     ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
@@ -105,7 +110,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/RandomError.html")
   end
 
-  test "warns on undefined functions" do
+  test "warns on undefined function within the same module" do
     output =
       capture_io(:stderr, fn ->
         generate_docs(doc_config(skip_undefined_reference_warnings_on: []))
@@ -121,7 +126,12 @@ defmodule ExDoc.Formatter.HTMLTest do
     output =
       capture_io(:stderr, fn ->
         generate_docs(
-          doc_config(skip_undefined_reference_warnings_on: ["test/fixtures/warnings.ex"])
+          doc_config(
+            skip_undefined_reference_warnings_on: [
+              "test/fixtures/warnings.ex",
+              "t:TypesAndSpecs.private/0"
+            ]
+          )
         )
       end)
 
