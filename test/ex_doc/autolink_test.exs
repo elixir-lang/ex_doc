@@ -41,7 +41,7 @@ defmodule ExDoc.AutolinkTest do
 
     test "project-local module" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, true}
+        {{:module, Foo}, :public}
       ])
 
       assert autolink("Foo") == ~m"[`Foo`](Foo.html)"
@@ -51,10 +51,10 @@ defmodule ExDoc.AutolinkTest do
 
     test "remote function" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, true},
-        {{:function, Foo, :foo, 1}, true},
-        {{:function, Foo, :., 2}, true},
-        {{:function, Foo, :.., 2}, true}
+        {{:module, Foo}, :public},
+        {{:function, Foo, :foo, 1}, :public},
+        {{:function, Foo, :., 2}, :public},
+        {{:function, Foo, :.., 2}, :public}
       ])
 
       assert autolink("Foo.foo/1") == ~m"[`Foo.foo/1`](Foo.html#foo/1)"
@@ -80,10 +80,10 @@ defmodule ExDoc.AutolinkTest do
 
     test "local function" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, true},
-        {{:function, Foo, :foo, 1}, true},
-        {{:function, Foo, :., 2}, true},
-        {{:function, Foo, :.., 2}, true}
+        {{:module, Foo}, :public},
+        {{:function, Foo, :foo, 1}, :public},
+        {{:function, Foo, :., 2}, :public},
+        {{:function, Foo, :.., 2}, :public}
       ])
 
       assert autolink("foo/1", current_module: Foo) == ~m"[`foo/1`](#foo/1)"
@@ -242,10 +242,10 @@ defmodule ExDoc.AutolinkTest do
 
     test "locals" do
       ExDoc.Refs.insert([
-        {{:module, MyModule}, true},
-        {{:type, MyModule, :foo, 1}, true},
-        {{:type, MyModule, :foo, 2}, true},
-        {{:type, MyModule, :foo!, 1}, true}
+        {{:module, MyModule}, :public},
+        {{:type, MyModule, :foo, 1}, :public},
+        {{:type, MyModule, :foo, 2}, :public},
+        {{:type, MyModule, :foo!, 1}, :public}
       ])
 
       assert typespec(quote(do: t() :: foo(1))) ==
@@ -269,8 +269,8 @@ defmodule ExDoc.AutolinkTest do
 
     test "remotes" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, true},
-        {{:type, Foo, :t, 0}, true}
+        {{:module, Foo}, :public},
+        {{:type, Foo, :t, 0}, :public}
       ])
 
       assert typespec(quote(do: t() :: Foo.t())) ==
@@ -279,9 +279,9 @@ defmodule ExDoc.AutolinkTest do
 
     test "autolinks same type and function name" do
       ExDoc.Refs.insert([
-        {{:module, MyModule}, true},
-        {{:type, MyModule, :foo, 0}, true},
-        {{:type, MyModule, :foo, 1}, true}
+        {{:module, MyModule}, :public},
+        {{:type, MyModule, :foo, 0}, :public},
+        {{:type, MyModule, :foo, 1}, :public}
       ])
 
       assert typespec(quote(do: foo() :: foo()))
@@ -326,9 +326,9 @@ defmodule ExDoc.AutolinkTest do
 
   test "warnings" do
     ExDoc.Refs.insert([
-      {{:module, Foo}, true},
-      {{:function, Foo, :bar, 1}, false},
-      {{:type, Foo, :bad, 0}, false}
+      {{:module, Foo}, :public},
+      {{:function, Foo, :bar, 1}, :hidden},
+      {{:type, Foo, :bad, 0}, :hidden}
     ])
 
     captured =
