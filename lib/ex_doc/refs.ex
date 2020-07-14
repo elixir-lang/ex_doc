@@ -5,7 +5,7 @@ defmodule ExDoc.Refs do
   #
   # The cache consists of entries:
   #
-  #     entry() :: {ref(), public? :: boolean()}
+  #     entry() :: {ref(), visibility :: :hidden | :public | :undefined}
   #
   #     ref() ::
   #       {:module, module()}
@@ -41,33 +41,41 @@ defmodule ExDoc.Refs do
     :ok
   end
 
-  def public?(ref) do
+  def get_visibility(ref) do
     case lookup(ref) do
-      [{^ref, true}] ->
-        true
-
-      [{^ref, false}] ->
-        false
+      [{^ref, visibility}] ->
+        visibility
 
       [] ->
         case load(ref) do
           # when we only have exports, consider all types and callbacks refs as matching
           {:exports, entries} when elem(ref, 0) in [:type, :callback] ->
-            :ok = insert([{ref, true} | entries])
-            true
+            :ok = insert([{ref, :public} | entries])
+            :public
 
           {_, entries} ->
             :ok = insert(entries)
-            {ref, true} in entries
+
+            Enum.find_value(entries, :undefined, fn
+              {^ref, visibility} ->
+                visibility
+
+              _ ->
+                false
+            end)
         end
     end
   end
 
-  defp lookup(ref) do
+  def public?(ref) do
+    get_visibility(ref) == :public
+  end
+
+  def lookup(ref) do
     :ets.lookup(@name, ref)
   rescue
     _ ->
-      [{ref, false}]
+      [{ref, :undefined}]
   end
 
   def insert(entries) do
@@ -79,38 +87,47 @@ defmodule ExDoc.Refs do
   @doc false
   def from_chunk(module, result) do
     case result do
-      {:docs_v1, _, _, _, :hidden, _, _} ->
-        {:chunk, [{{:module, module}, false}]}
+      {:docs_v1, _, _, _, module_visibility, _, docs} ->
+        module_visibility =
+          if module_visibility == :hidden do
+            :hidden
+          else
+            :public
+          end
 
-      {:docs_v1, _, _, _, _, _, docs} ->
         entries =
           for {{kind, name, arity}, _, _, doc, metadata} <- docs do
-            tag = doc != :hidden
+            ref_visibility =
+              if doc == :hidden or module_visibility == :hidden do
+                :hidden
+              else
+                :public
+              end
 
             for arity <- (arity - (metadata[:defaults] || 0))..arity do
-              {{kind(kind), module, name, arity}, tag}
+              {{kind(kind), module, name, arity}, ref_visibility}
             end
           end
 
-        entries = [{{:module, module}, true} | List.flatten(entries)]
+        entries = [{{:module, module}, module_visibility} | List.flatten(entries)]
         {:chunk, entries}
 
       {:error, :chunk_not_found} ->
         if Code.ensure_loaded?(module) do
           entries =
             for {name, arity} <- exports(module) do
-              {{:function, module, name, arity}, true}
+              {{:function, module, name, arity}, :public}
             end
 
-          entries = [{{:module, module}, true} | entries]
+          entries = [{{:module, module}, :public} | entries]
           {:exports, entries}
         else
-          entries = [{{:module, module}, false}]
+          entries = [{{:module, module}, :undefined}]
           {:none, entries}
         end
 
       _ ->
-        entries = [{{:module, module}, false}]
+        entries = [{{:module, module}, :undefined}]
         {:none, entries}
     end
   end
