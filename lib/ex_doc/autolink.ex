@@ -138,15 +138,16 @@ defmodule ExDoc.Autolink do
     reference: 0,
     struct: 0,
     tuple: 0,
-    integer: 0,
     float: 0,
+    integer: 0,
     neg_integer: 0,
     non_neg_integer: 0,
     pos_integer: 0,
     list: 1,
     nonempty_list: 1,
-    improper_list: 2,
-    maybe_improper_list: 2
+    maybe_improper_list: 2,
+    nonempty_improper_list: 2,
+    nonempty_maybe_improper_list: 2
   ]
 
   @built_in_types [
