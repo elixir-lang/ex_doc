@@ -44,6 +44,7 @@ defmodule ExDoc.Config do
             title: nil,
             version: nil,
             authors: nil,
+            skip_reference_warnings_to: [],
             skip_undefined_reference_warnings_on: []
 
   @type t :: %__MODULE__{
@@ -80,6 +81,7 @@ defmodule ExDoc.Config do
           title: nil | String.t(),
           version: nil | String.t(),
           authors: nil | [String.t()],
+          skip_reference_warnings_to: [String.t()],
           skip_undefined_reference_warnings_on: [String.t()]
         }
 end

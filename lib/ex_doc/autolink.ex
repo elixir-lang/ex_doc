@@ -22,7 +22,9 @@ defmodule ExDoc.Autolink do
   #
   # * `:extras` - list of extras
   #
-  # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
+  # * `:skip_reference_warnings_to` - list of references and/or files, to skip warning when calling the given reference
+  #
+  # * `:skip_undefined_reference_warnings_on` - list of references and/or files to skip the warning on
 
   @enforce_keys [:app, :file]
 
@@ -36,6 +38,7 @@ defmodule ExDoc.Autolink do
     extras: [],
     ext: ".html",
     siblings: [],
+    skip_reference_warnings_to: [],
     skip_undefined_reference_warnings_on: []
   ]
 
@@ -50,6 +53,18 @@ defmodule ExDoc.Autolink do
 
   def doc(ast, options \\ []) do
     config = struct!(__MODULE__, options)
+
+    config =
+      config
+      |> Map.update!(
+        :skip_reference_warnings_to,
+        &Enum.map(&1, fn x -> strip_elixir_namespace(x) end)
+      )
+      |> Map.update!(
+        :skip_undefined_reference_warnings_on,
+        &Enum.map(&1, fn x -> strip_elixir_namespace(x) end)
+      )
+
     walk(ast, config)
   end
 
@@ -544,11 +559,29 @@ defmodule ExDoc.Autolink do
   end
 
   defp maybe_warn(ref, config, visibility, metadata) do
-    skipped = config.skip_undefined_reference_warnings_on
     file = Path.relative_to(config.file, File.cwd!())
+    file_path = Map.get(metadata, :file_path, nil)
     line = config.line
+    skip_on = config.skip_undefined_reference_warnings_on
+    skip_to = config.skip_reference_warnings_to
+    ref_list_on = [config.id, config.module_id, file]
 
-    unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
+    ref_list_to =
+      cond do
+        match?({_, _, _, _}, ref) or match?({:module, _}, ref) ->
+          [ref_id(ref)]
+
+        file_path != nil ->
+          [file_path]
+
+        true ->
+          []
+      end
+
+    if Enum.any?(ref_list_on, &(&1 in skip_on)) or
+         Enum.any?(ref_list_to, &(&1 in skip_to)) do
+      nil
+    else
       warn(ref, {file, line}, config.id, visibility, metadata)
     end
   end

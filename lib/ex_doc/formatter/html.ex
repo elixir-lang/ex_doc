@@ -73,6 +73,7 @@ defmodule ExDoc.Formatter.HTML do
         current_module: node.module,
         ext: ext,
         extras: extra_paths(config),
+        skip_reference_warnings_to: config.skip_reference_warnings_to,
         skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
         module_id: node.id,
         file: node.source_path,
@@ -289,6 +290,7 @@ defmodule ExDoc.Formatter.HTML do
       file: input,
       ext: ext,
       extras: extra_paths(config),
+      skip_reference_warnings_to: config.skip_reference_warnings_to,
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
     ]
 

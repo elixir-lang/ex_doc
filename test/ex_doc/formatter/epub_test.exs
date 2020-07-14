@@ -30,7 +30,8 @@ defmodule ExDoc.Formatter.EPUBTest do
       source_root: beam_dir(),
       source_beam: beam_dir(),
       extras: ["test/fixtures/README.md"],
-      skip_undefined_reference_warnings_on: ["Warnings"]
+      skip_reference_warnings_to: [],
+      skip_undefined_reference_warnings_on: ["Warnings", "Warnings.Submodule"]
     ]
   end
 

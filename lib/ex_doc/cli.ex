@@ -139,7 +139,8 @@ defmodule ExDoc.CLI do
           groups_for_functions: [
             Guards: & &1[:guard] == true
           ],
-          skip_undefined_reference_warnings_on: ["compatibility-and-deprecations"],
+          skip_reference_warnings_to: ["t:ModuleWithDocFalse.element/0"],
+          skip_undefined_reference_warnings_on: ["lib/elixir/pages/compatibility-and-deprecations.md"],
           groups_for_modules: [
             ...
           ]

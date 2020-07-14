@@ -53,7 +53,11 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   defp generate_docs(config) do
-    config = Keyword.put_new(config, :skip_undefined_reference_warnings_on, ["Warnings"])
+    config =
+      config
+      |> Keyword.put_new(:skip_reference_warnings_to, [])
+      |> Keyword.put_new(:skip_undefined_reference_warnings_on, ["Warnings", "Warnings.Submodule"])
+
     ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
@@ -121,11 +125,79 @@ defmodule ExDoc.Formatter.HTMLTest do
     output =
       capture_io(:stderr, fn ->
         generate_docs(
-          doc_config(skip_undefined_reference_warnings_on: ["test/fixtures/warnings.ex"])
+          doc_config(
+            skip_undefined_reference_warnings_on: [
+              "test/fixtures/warnings.ex"
+            ]
+          )
         )
       end)
 
     assert output == ""
+  end
+
+  describe "skip_reference_warnings_to" do
+    test "emit warnings" do
+      output =
+        capture_io(:stderr, fn ->
+          generate_docs(doc_config(skip_undefined_reference_warnings_on: ["Warnings"]))
+        end)
+
+      assert output =~ ~r{documentation references file \"unknown.md\" but it does not exist\n}
+      assert output =~ ~r{documentation references module \"UknownModule\" but it is undefined\n}
+
+      assert output =~
+               ~r{documentation references module \"Elixir.UknownModule\" but it is undefined\n}
+
+      assert output =~
+               ~r{documentation references \"CompiledWithDocs.function/0\" but it is undefined or private\n}
+
+      assert output =~
+               ~r{documentation references \"c:CompiledWithDocs.callback/1\" but it is undefined\n}
+
+      assert output =~
+               ~r{documentation references \"t:CompiledWithDocs.type/2\" but it is undefined or private\n}
+    end
+
+    test "skip warnings" do
+      output =
+        capture_io(:stderr, fn ->
+          generate_docs(
+            doc_config(
+              skip_reference_warnings_to: [
+                "unknown.md",
+                "UknownModule",
+                "CompiledWithDocs.function/0",
+                "c:CompiledWithDocs.callback/1",
+                "t:CompiledWithDocs.type/2"
+              ],
+              skip_undefined_reference_warnings_on: ["Warnings"]
+            )
+          )
+        end)
+
+      assert output == ""
+    end
+
+    test "skip warnings withing Elixir namespace" do
+      output =
+        capture_io(:stderr, fn ->
+          generate_docs(
+            doc_config(
+              skip_reference_warnings_to: [
+                "unknown.md",
+                "Elixir.UknownModule",
+                "Elixir.CompiledWithDocs.function/0",
+                "c:Elixir.CompiledWithDocs.callback/1",
+                "t:Elixir.CompiledWithDocs.type/2"
+              ],
+              skip_undefined_reference_warnings_on: ["Warnings"]
+            )
+          )
+        end)
+
+      assert output == ""
+    end
   end
 
   test "generates headers for index.html and module pages" do

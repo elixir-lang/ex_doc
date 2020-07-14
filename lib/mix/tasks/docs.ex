@@ -156,10 +156,13 @@ defmodule Mix.Tasks.Docs do
     * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
 
-    * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
+    * `:skip_reference_warnings_to` - Ignores warnings emitted when a given reference or file is linked to; default: `[]`.
+
+    * `:skip_undefined_reference_warnings_on` - Ignores warnings emitted within a given reference or file. ExDoc warns when it can't create a `Mod.fun/arity`
       reference in the current project docs e.g. because of a typo. This list controls where to
-      skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
-      or on a given file (e.g.: `["pages/deprecations.md"]`); default: `[]`.
+      skip the warnings for a given module/function/callback/type defined in the listed references (e.g.: `["Foo", "Bar.baz/0"]`)
+      or on a give file (e.g.: `["pages/deprecations.md"]`); default: `[]`.
+
 
   ## Groups
 
