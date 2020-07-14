@@ -20,6 +20,7 @@ defmodule ExDoc.RefsTest do
 
     assert Refs.get_visibility({:type, String, :t, 0}) == :public
     assert Refs.get_visibility({:type, String, :t, 1}) == :undefined
+    assert Refs.get_visibility({:type, Module, :definition, 0}) == :private
 
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 3}) == :public
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :undefined
@@ -47,6 +48,7 @@ defmodule ExDoc.RefsTest do
 
     assert Refs.public?({:type, String, :t, 0})
     refute Refs.public?({:type, String, :t, 1})
+    refute Refs.public?({:type, Module, :definition, 0})
 
     assert Refs.public?({:callback, GenServer, :handle_call, 3})
     refute Refs.public?({:callback, GenServer, :handle_call, 9})

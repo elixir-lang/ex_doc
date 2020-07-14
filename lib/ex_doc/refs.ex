@@ -5,7 +5,7 @@ defmodule ExDoc.Refs do
   #
   # The cache consists of entries:
   #
-  #     entry() :: {ref(), visibility :: :hidden | :public | :undefined}
+  #     entry() :: {ref(), visibility :: :hidden | :private | :public | :undefined}
   #
   #     ref() ::
   #       {:module, module()}
@@ -49,9 +49,13 @@ defmodule ExDoc.Refs do
       [] ->
         case load(ref) do
           # when we only have exports, consider all types and callbacks refs as matching
-          {:exports, entries} when elem(ref, 0) in [:type, :callback] ->
+          {:exports_and_privates, entries} when elem(ref, 0) in [:type, :callback] ->
             :ok = insert([{ref, :public} | entries])
             :public
+
+          {:exports_and_privates, entries} when elem(ref, 0) == :typep ->
+            :ok = insert([{ref, :private} | entries])
+            :private
 
           {_, entries} ->
             :ok = insert(entries)
@@ -109,18 +113,21 @@ defmodule ExDoc.Refs do
             end
           end
 
-        entries = [{{:module, module}, module_visibility} | List.flatten(entries)]
+        entries = [
+          {{:module, module}, module_visibility} | List.flatten(entries ++ private_types(module))
+        ]
+
         {:chunk, entries}
 
       {:error, :chunk_not_found} ->
         if Code.ensure_loaded?(module) do
-          entries =
+          public_functions =
             for {name, arity} <- exports(module) do
               {{:function, module, name, arity}, :public}
             end
 
-          entries = [{{:module, module}, :public} | entries]
-          {:exports, entries}
+          entries = [{{:module, module}, :public} | public_functions ++ private_types(module)]
+          {:exports_and_privates, entries}
         else
           entries = [{{:module, module}, :undefined}]
           {:none, entries}
@@ -137,6 +144,27 @@ defmodule ExDoc.Refs do
       module.__info__(:functions) ++ module.__info__(:macros)
     else
       module.module_info(:exports)
+    end
+  end
+
+  def private_types(module) when is_atom(module) do
+    refs =
+      case Code.Typespec.fetch_types(module) do
+        {:ok, types} ->
+          Enum.reduce(types, [], fn
+            {:typep, {type, _, args}}, acc ->
+              [{type, length(args)} | acc]
+
+            _, acc ->
+              acc
+          end)
+
+        :error ->
+          []
+      end
+
+    for {name, arity} <- refs do
+      {{:type, module, name, arity}, :private}
     end
   end
 
