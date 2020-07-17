@@ -93,8 +93,8 @@ defmodule ExDoc.AutolinkTest do
     end
 
     test "sibling function" do
-      assert autolink("Earmark.as_ast/2", siblings: [:earmark]) ==
-               ~m"[`Earmark.as_ast/2`](Earmark.html#as_ast/2)"
+      assert autolink("EarmarkParser.as_ast/2", siblings: [:earmark_parser]) ==
+               ~m"[`EarmarkParser.as_ast/2`](EarmarkParser.html#as_ast/2)"
     end
 
     test "auto-imported function" do
@@ -194,8 +194,8 @@ defmodule ExDoc.AutolinkTest do
     end
 
     test "3rd party links" do
-      assert autolink("Earmark.as_ast/2") ==
-               ~m"[`Earmark.as_ast/2`](https://hexdocs.pm/earmark/Earmark.html#as_ast/2)"
+      assert autolink("EarmarkParser.as_ast/2") ==
+               ~m"[`EarmarkParser.as_ast/2`](https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2)"
 
       assert_unchanged(":test_module.foo/0")
     end

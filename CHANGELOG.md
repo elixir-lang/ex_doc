@@ -1,5 +1,7 @@
 # Changelog
 
+  * [mix docs] Depend on earmark_parser `~> 1.4.0`
+
 ## v0.22.1 (2020-05-19)
 
   * Bug fixes
