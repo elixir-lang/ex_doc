@@ -54,18 +54,15 @@ defmodule ExDoc.Refs do
           :undefined
         else
           _ ->
+            kind = elem(ref, 0)
             case load(ref) do
               # when we only have exports, consider all types and callbacks refs as matching
               {:exports, entries} when elem(ref, 0) in [:type, :callback] ->
                 :ok = insert([{ref, :public} | entries])
                 :public
 
-              {:none, [{^ref = {:module, _module}, :undefined}] = entries} ->
-                :ok = insert(entries)
-                :undefined
-
               # if module is :undefined, then the ref is :undefined
-              {:none, entries = [{{:module, _module}, :undefined}]}->
+              {:none, entries = [{{:module, _module}, :undefined}]} when kind != :module ->
                 :ok = insert([{ref, :undefined} | entries])
                 :undefined
 

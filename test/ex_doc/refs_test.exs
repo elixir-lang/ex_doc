@@ -14,6 +14,7 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:function, Enum, :join, 9}) == :undefined
 
     assert Refs.get_visibility({:function, Unknown, :unknown, 0}) == :undefined
+    assert Refs.get_visibility({:function, Unknown2, :unknown, 0}) == :undefined
 
     # macros are classified as functions
     assert Refs.get_visibility({:function, Kernel, :def, 2}) == :public
