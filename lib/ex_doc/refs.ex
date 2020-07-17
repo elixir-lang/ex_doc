@@ -47,22 +47,39 @@ defmodule ExDoc.Refs do
         visibility
 
       [] ->
-        case load(ref) do
-          # when we only have exports, consider all types and callbacks refs as matching
-          {:exports, entries} when elem(ref, 0) in [:type, :callback] ->
-            :ok = insert([{ref, :public} | entries])
-            :public
+        # If module is cached, we don't load it, and declared the ref as :undefined
+        with module <- elem(ref, 1),
+             [{{:module, ^module}, _module_visibility}] <- lookup({:module, module}) do
+          :ok = insert([{ref, :undefined}])
+          :undefined
+        else
+          _ ->
+            case load(ref) do
+              # when we only have exports, consider all types and callbacks refs as matching
+              {:exports, entries} when elem(ref, 0) in [:type, :callback] ->
+                :ok = insert([{ref, :public} | entries])
+                :public
 
-          {_, entries} ->
-            :ok = insert(entries)
+              {:none, [{^ref = {:module, _module}, :undefined}] = entries} ->
+                :ok = insert(entries)
+                :undefined
 
-            Enum.find_value(entries, :undefined, fn
-              {^ref, visibility} ->
-                visibility
+              # if module is :undefined, then the ref is :undefined
+              {:none, entries = [{{:module, _module}, :undefined}]}->
+                :ok = insert([{ref, :undefined} | entries])
+                :undefined
 
-              _ ->
-                false
-            end)
+              {_, entries} ->
+                :ok = insert(entries)
+
+                Enum.find_value(entries, :undefined, fn
+                  {^ref, visibility} ->
+                    visibility
+
+                  _ ->
+                    false
+                end)
+            end
         end
     end
   end

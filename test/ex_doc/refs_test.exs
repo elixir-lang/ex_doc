@@ -28,7 +28,7 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:function, :lists, :all, 9}) == :undefined
 
     assert Refs.get_visibility({:type, :sets, :set, 0}) == :public
-    assert Refs.get_visibility({:type, :sets, :set, 9}) == :public
+    assert Refs.get_visibility({:type, :sets, :set, 9}) == :undefined
   end
 
   test "public?/1" do
