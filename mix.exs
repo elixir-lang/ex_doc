@@ -32,7 +32,6 @@ defmodule ExDoc.Mixfile do
     [
       {:earmark_parser, "~> 1.4.0"},
       {:makeup_elixir, "~> 0.14"},
-      {:floki, "~> 0.26.0"},
       {:excoveralls, "~> 0.3", only: :test},
       {:jason, "~> 1.2", only: :test}
     ]

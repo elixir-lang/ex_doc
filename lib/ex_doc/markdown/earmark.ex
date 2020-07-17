@@ -79,16 +79,6 @@ defmodule ExDoc.Markdown.Earmark do
     fixup_list(list, [], options, meta)
   end
 
-  defp fixup(binary, options, %{verbatim: true} = meta) when is_binary(binary) do
-    case Floki.parse_document(binary) do
-      {:ok, [head]} when is_binary(head) ->
-        head
-
-      {:ok, ast_floki} ->
-        fixup(ast_floki, options, meta)
-    end
-  end
-
   defp fixup(binary, _options, _meta) when is_binary(binary) do
     binary
   end
