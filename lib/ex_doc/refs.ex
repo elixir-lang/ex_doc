@@ -5,13 +5,15 @@ defmodule ExDoc.Refs do
   #
   # The cache consists of entries:
   #
-  #     entry() :: {ref(), visibility :: :hidden | :public | :undefined}
+  #     entry() :: {ref(), visibility()}
   #
   #     ref() ::
   #       {:module, module()}
   #       | {kind(), module(), name :: atom(), arity()}
   #
   #     kind() :: :function | :callback | :type
+  #
+  #     visibility() :: :hidden | ::public | :undefined
   #
   # A given ref is always associated with a module. If we don't have a ref in the cache we fetch
   # the module's chunk and fill in the cache. This means that if we keep asking for references
@@ -23,24 +25,35 @@ defmodule ExDoc.Refs do
   # such module whether it has given types or callbacks we need to say "yes" (and cache that)
   # as we can't know.
 
+  @typep entry() :: {ref(), visibility()}
+  @typep ref() ::
+           {:module, module()}
+           | {kind(), module(), name :: atom(), arity()}
+  @typep kind() :: :function | :callback | :type
+  @typep visibility() :: :hidden | :public | :undefined
+
   @name __MODULE__
 
   use GenServer
 
+  @spec start_link(any()) :: GenServer.on_start()
   def start_link(arg) do
     GenServer.start_link(__MODULE__, arg, name: @name)
   end
 
+  @spec init(any()) :: {:ok, nil}
   def init(_) do
     :ets.new(@name, [:named_table, :public, :set])
     {:ok, nil}
   end
 
+  @spec clear() :: :ok
   def clear() do
     :ets.delete_all_objects(@name)
     :ok
   end
 
+  @spec get_visibility(ref()) :: visibility()
   def get_visibility(ref) do
     case lookup(ref) do
       [{^ref, visibility}] ->
@@ -67,10 +80,12 @@ defmodule ExDoc.Refs do
     end
   end
 
+  @spec public?(ref()) :: boolean
   def public?(ref) do
     get_visibility(ref) == :public
   end
 
+  @spec lookup(ref()) :: [entry()]
   def lookup(ref) do
     :ets.lookup(@name, ref)
   rescue
@@ -78,6 +93,7 @@ defmodule ExDoc.Refs do
       [{ref, :undefined}]
   end
 
+  @spec insert([entry()]) :: :ok
   def insert(entries) do
     true = :ets.insert(@name, entries)
     :ok
@@ -85,6 +101,7 @@ defmodule ExDoc.Refs do
 
   # Returns refs for `module` from the result of calling `Code.fetch_docs/1`.
   @doc false
+  @spec from_chunk(module, tuple()) :: {:chunk | :exports | :none, [entry()]}
   def from_chunk(module, result) do
     case result do
       {:docs_v1, _, _, _, module_visibility, _, docs} ->
