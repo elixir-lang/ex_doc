@@ -1,6 +1,6 @@
 defmodule ExDoc.Markdown.Earmark do
   @moduledoc """
-  ExDoc extension for the EarmarkParseer MarkDown parser.
+  ExDoc extension for the EarmarkParser Markdown parser.
   """
   @behaviour ExDoc.Markdown
 
