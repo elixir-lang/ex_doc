@@ -54,7 +54,7 @@ defmodule ExDoc.RefsTest do
     assert Refs.public?({:function, :lists, :all, 2})
     refute Refs.public?({:function, :lists, :all, 9})
 
-    if opt_release() >= 23 do
+    if System.otp_release() >= "23" do
       assert Refs.public?({:callback, :gen_server, :handle_call, 3})
       assert Refs.public?({:callback, :gen_server, :handle_call, 9}) in [true, false]
     end
@@ -66,10 +66,5 @@ defmodule ExDoc.RefsTest do
   test "from_chunk/2 with module that doesn't exist" do
     result = ExDoc.Utils.Code.fetch_docs(:elixir)
     assert {:none, _} = ExDoc.Refs.from_chunk(Elixir, result)
-  end
-
-  defp opt_release() do
-    System.otp_release()
-    |> String.to_integer()
   end
 end
