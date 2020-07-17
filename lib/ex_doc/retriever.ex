@@ -179,7 +179,7 @@ defmodule ExDoc.Retriever do
       type: get_type(module),
       specs: get_specs(module),
       impls: get_impls(module),
-      abst_code: get_abstract_code(module),
+      abst_code: ExDoc.Utils.Code.get_abstract_code(module),
       docs: docs_chunk
     }
   end
@@ -212,15 +212,6 @@ defmodule ExDoc.Retriever do
     doc_line = anno_line(anno)
     options = [file: source_path, line: doc_line + 1]
     {doc_line, doc_ast(content_type, moduledoc, options), metadata}
-  end
-
-  defp get_abstract_code(module) do
-    {^module, binary, _file} = :code.get_object_code(module)
-
-    case :beam_lib.chunks(binary, [:abstract_code]) do
-      {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} -> abstract_code
-      _otherwise -> []
-    end
   end
 
   ## Function helpers
