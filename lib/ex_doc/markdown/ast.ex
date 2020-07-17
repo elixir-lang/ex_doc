@@ -74,6 +74,15 @@ defmodule ExDoc.Markdown.AST do
     ]
   end
 
+  # TODO: remove this when this AST format is deprecate in EarkMarkParser
+  defp to_html({:pre, attributes, text}, _options, _verbatim) when is_binary(text) do
+    [
+      open_element(:pre, attributes),
+      to_html([text]),
+      "</pre>\n"
+    ]
+  end
+
   # Element with no children
   defp to_html({tag, _metadata, attributes, []}, _options, _verbatim) do
     [open_element(tag, attributes), "</#{tag}>", "\n"]

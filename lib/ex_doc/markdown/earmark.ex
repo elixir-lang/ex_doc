@@ -102,7 +102,7 @@ defmodule ExDoc.Markdown.Earmark do
     fixup({tag, attrs, ast, %{}}, options, meta)
   end
 
-  defp fixup({:comment, children}, _options, meta) do
+  defp fixup({:comment, _, children, %{comment: true}}, _options, meta) do
     {nil, Map.put(meta, :comment, true), [], children}
   end
 

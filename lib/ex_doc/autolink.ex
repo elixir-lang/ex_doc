@@ -65,6 +65,11 @@ defmodule ExDoc.Autolink do
     ast
   end
 
+  # TODO: remove this when this AST format is deprecate in EarkMarkParser
+  defp walk({:pre, _metadata, _} = ast, _config) do
+    ast
+  end
+
   defp walk({:a, metadata, attrs, inner} = ast, config) do
     cond do
       url = custom_link(attrs, config) ->
