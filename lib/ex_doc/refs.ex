@@ -3,29 +3,14 @@ defmodule ExDoc.Refs do
 
   # A read-through cache of documentation references.
   #
-  # The cache consists of entries:
+  # A given ref is always associated with a module. If we don't have a ref
+  # in the cache we fetch the module's docs chunk and fill in the cache.
   #
-  #     entry() :: {ref(), visibility()}
-  #
-  #     ref() ::
-  #       {:module, module()}
-  #       | {kind(), module(), name :: atom(), arity()}
-  #
-  #     kind() :: :function | :callback | :type
-  #
-  #     visibility() :: :hidden | ::public | :undefined
-  #
-  # A given ref is always associated with a module. If we don't have a ref in the cache we fetch
-  # the module's chunk and fill in the cache. This means that if we keep asking for references
-  # that don't exist (e.g.: `Foo.bar/9`, `Foo.bar/10`, etc) we will keep fetching the chunk;
-  # this could be optimized in the future however users will get a warning and hopefully fix
-  # their broken refs.
-  #
-  # If the module does not have a chunk, we fill in the cache with it's exports. Anytime we ask
-  # such module whether it has given types or callbacks we need to say "yes" (and cache that)
-  # as we can't know.
+  # If the module does not have the docs chunk, we fetch it's functions,
+  # callbacks and types from other sources.
 
   @typep entry() :: {ref(), visibility()}
+
   @typep ref() ::
            {:module, module()}
            | {kind(), module(), name :: atom(), arity()}
@@ -56,41 +41,30 @@ defmodule ExDoc.Refs do
   @spec get_visibility(ref()) :: visibility()
   def get_visibility(ref) do
     case lookup(ref) do
-      [{^ref, visibility}] ->
+      {:ok, visibility} ->
         visibility
 
-      [] ->
-        case load(ref) do
-          # when we only have exports, consider all types and callbacks refs as matching
-          {:exports, entries} when elem(ref, 0) in [:type, :callback] ->
-            :ok = insert([{ref, :public} | entries])
-            :public
-
-          {_, entries} ->
-            :ok = insert(entries)
-
-            Enum.find_value(entries, :undefined, fn
-              {^ref, visibility} ->
-                visibility
-
-              _ ->
-                false
-            end)
-        end
+      :error ->
+        fetch(ref)
     end
+  end
+
+  defp lookup(ref) do
+    case :ets.lookup(@name, ref) do
+      [{^ref, visibility}] ->
+        {:ok, visibility}
+
+      [] ->
+        :error
+    end
+  rescue
+    _ ->
+      :error
   end
 
   @spec public?(ref()) :: boolean
   def public?(ref) do
     get_visibility(ref) == :public
-  end
-
-  @spec lookup(ref()) :: [entry()]
-  def lookup(ref) do
-    :ets.lookup(@name, ref)
-  rescue
-    _ ->
-      [{ref, :undefined}]
   end
 
   @spec insert([entry()]) :: :ok
@@ -99,55 +73,62 @@ defmodule ExDoc.Refs do
     :ok
   end
 
-  # Returns refs for `module` from the result of calling `Code.fetch_docs/1`.
-  @doc false
-  @spec from_chunk(module, tuple()) :: {:chunk | :exports | :none, [entry()]}
-  def from_chunk(module, result) do
+  @spec insert_from_chunk(module, tuple()) :: :ok
+  def insert_from_chunk(module, result) do
+    entries = fetch_entries(module, result)
+    insert(entries)
+    :ok
+  end
+
+  defp fetch({:module, module} = ref) do
+    entries = fetch_entries(module, ExDoc.Utils.Code.fetch_docs(module))
+    insert(entries)
+    Map.get(Map.new(entries), ref, :undefined)
+  end
+
+  defp fetch({_kind, module, _name, _arity} = ref) do
+    entries = fetch_entries(module, ExDoc.Utils.Code.fetch_docs(module))
+    insert(entries)
+    Map.get(Map.new(entries), ref, :undefined)
+  end
+
+  defp fetch_entries(module, result) do
     case result do
-      {:docs_v1, _, _, _, module_visibility, _, docs} ->
-        module_visibility =
-          if module_visibility == :hidden do
-            :hidden
-          else
-            :public
-          end
+      {:docs_v1, _, _, _, module_doc, _, docs} ->
+        module_visibility = visibility(module_doc)
 
-        entries =
-          for {{kind, name, arity}, _, _, doc, metadata} <- docs do
-            ref_visibility =
-              if doc == :hidden or module_visibility == :hidden do
-                :hidden
-              else
-                :public
-              end
-
-            for arity <- (arity - (metadata[:defaults] || 0))..arity do
-              {{kind(kind), module, name, arity}, ref_visibility}
-            end
-          end
-
-        entries = [{{:module, module}, module_visibility} | List.flatten(entries)]
-        {:chunk, entries}
-
-      {:error, :chunk_not_found} ->
-        if Code.ensure_loaded?(module) do
-          entries =
-            for {name, arity} <- exports(module) do
-              {{:function, module, name, arity}, :public}
+        for {{kind, name, arity}, _, _, doc, metadata} <- docs do
+          visibility =
+            case {module_visibility, visibility(doc)} do
+              {:hidden, :public} -> :hidden
+              {_, visibility} -> visibility
             end
 
-          entries = [{{:module, module}, :public} | entries]
-          {:exports, entries}
-        else
-          entries = [{{:module, module}, :undefined}]
-          {:none, entries}
+          for arity <- (arity - (metadata[:defaults] || 0))..arity do
+            {{kind(kind), module, name, arity}, visibility}
+          end
         end
+        |> List.flatten()
+        |> Enum.concat([{{:module, module}, module_visibility}])
 
-      _ ->
-        entries = [{{:module, module}, :undefined}]
-        {:none, entries}
+      {:error, _} ->
+        if Code.ensure_loaded?(module) do
+          (to_refs(exports(module), module, :function) ++
+             to_refs(callbacks(module), module, :callback) ++
+             to_refs(types(module), module, :type))
+          |> Enum.concat([{{:module, module}, :public}])
+        else
+          [{{:module, module}, :undefined}]
+        end
     end
   end
+
+  defp visibility(:hidden), do: :hidden
+  defp visibility(_), do: :public
+
+  defp kind(:macro), do: :function
+  defp kind(:macrocallback), do: :callback
+  defp kind(other), do: other
 
   defp exports(module) do
     if function_exported?(module, :__info__, 1) do
@@ -157,15 +138,30 @@ defmodule ExDoc.Refs do
     end
   end
 
-  defp load({:module, module}) do
-    from_chunk(module, ExDoc.Utils.Code.fetch_docs(module))
+  defp callbacks(module) do
+    if function_exported?(module, :behaviour_info, 1) do
+      module.behaviour_info(:callbacks)
+    else
+      []
+    end
   end
 
-  defp load({_kind, module, _name, _arity}) do
-    load({:module, module})
+  defp types(module) do
+    case Code.Typespec.fetch_types(module) do
+      {:ok, list} ->
+        for {kind, {name, _, args}} <- list,
+            kind in [:type, :opaque] do
+          {name, length(args)}
+        end
+
+      :error ->
+        []
+    end
   end
 
-  defp kind(:macro), do: :function
-  defp kind(:macrocallback), do: :callback
-  defp kind(other), do: other
+  defp to_refs(list, module, kind) do
+    for {name, arity} <- list do
+      {{kind, module, name, arity}, :public}
+    end
+  end
 end
