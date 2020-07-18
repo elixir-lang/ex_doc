@@ -85,7 +85,7 @@ defmodule ExDoc.Retriever do
     end
 
     result = ExDoc.Utils.Code.fetch_docs(module)
-    Refs.from_chunk(module, result)
+    Refs.insert_from_chunk(module, result)
 
     case result do
       {:docs_v1, _, _, _, :hidden, _, _} ->
