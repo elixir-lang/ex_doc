@@ -87,9 +87,14 @@ defmodule ExDoc.Refs do
   end
 
   defp fetch({_kind, module, _name, _arity} = ref) do
-    entries = fetch_entries(module, ExDoc.Utils.Code.fetch_docs(module))
-    insert(entries)
-    Map.get(Map.new(entries), ref, :undefined)
+    with mod_visibility <- fetch({:module, module}),
+         true <- mod_visibility in [:public, :hidden],
+         {:ok, visibility} <- lookup(ref) do
+      visibility
+    else
+      _ ->
+        :undefined
+    end
   end
 
   defp fetch_entries(module, result) do
