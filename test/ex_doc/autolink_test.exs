@@ -216,6 +216,20 @@ defmodule ExDoc.AutolinkTest do
       assert_unchanged(~m"[Foo](#baz)", opts)
     end
 
+    test "special case links" do
+      assert autolink(~m"`//2`") ==
+                {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], [ast("//2")]}
+
+      assert autolink(~m"[division](`//2`)") ==
+                {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], ["division"]}
+
+      assert autolink(~m"`Kernel.//2`") ==
+                {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], [ast("Kernel.//2")]}
+
+      assert autolink(~m"[division](`Kernel.//2`)") ==
+                {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], ["division"]}
+    end
+
     test "other link" do
       assert_unchanged(~m"[`String`](foo.html)")
       assert_unchanged(~m"[custom text](foo.html)")
