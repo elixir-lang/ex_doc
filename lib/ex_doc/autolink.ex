@@ -185,8 +185,8 @@ defmodule ExDoc.Autolink do
   defp url("mix " <> name, _mode, config), do: mix_task(name, config)
 
   defp url(code, mode, config) do
-    case String.split(code, "/") do
-      [left, right] ->
+    case Regex.run(~r{^(.+)/(\d+)$}, code) do
+      [_, left, right] ->
         with {:ok, arity} <- parse_arity(right) do
           {kind, rest} = kind(left)
 
@@ -205,8 +205,8 @@ defmodule ExDoc.Autolink do
             nil
         end
 
-      [string] ->
-        case parse_module(string, mode) do
+      nil ->
+        case parse_module(code, mode) do
           {:module, module} ->
             module_url(module, config)
 
