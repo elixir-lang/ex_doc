@@ -322,6 +322,11 @@ defmodule ExDoc.AutolinkTest do
       assert typespec(quote(do: t() :: :sets.set())) ==
                ~s[t() :: <a href=\"http://www.erlang.org/doc/man/sets.html#type-set\">:sets.set</a>()]
     end
+
+    test "escape special HTML characters" do
+      assert typespec(quote(do: term() < term() :: boolean())) ==
+               ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>() &lt; <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">boolean</a>()]
+    end
   end
 
   test "warnings" do

@@ -316,9 +316,11 @@ defmodule ExDoc.Autolink do
       |> Macro.to_string()
       |> Code.format_string!(line_length: 80)
       |> IO.iodata_to_binary()
+      |> T.h()
 
     name = typespec_name(ast)
     {name, rest} = split_name(string, name)
+
     name <> do_typespec(rest, config)
   end
 
