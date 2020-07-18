@@ -39,6 +39,9 @@ defmodule ExDoc.RefsTest do
     # types are in abstract_code chunk so not available for in-memory modules
     assert Refs.get_visibility({:type, InMemory, :t, 0}) == :undefined
 
+    # @typep
+    assert Refs.get_visibility({:type, :sets, :seg, 0}) == :undefined
+
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 3}) == :public
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :undefined
     assert Refs.get_visibility({:callback, :gen_server, :handle_call, 3}) == :public
