@@ -1,6 +1,27 @@
 # Changelog
 
-  * [mix docs] Depend on earmark_parser `~> 1.4.0`
+## HEAD (unreleased)
+
+  * Enhancements
+    * [HTML+EPUB] Add support for path dependent markdown autolink (`feeddc1`)
+    * [HTML+EPUB] Improve auto-linking to callbacks and types (`12c0a01`)
+    * [HTML+EPUB] Replace `<kbd>` with `<kbd><kbd>` when it represents keys to be hit (`bd2b8df`)
+    * [HTML] Hide sidebar-over-content on click/tap outside it (`b050775`)
+    * [HTML] Redirect to correct file when changing version (`0f6f24b`)
+    * [mix docs] Allow files with no extension in extra files (`26b93b6`)
+    * [mix docs] Link to siblings in an umbrella (`b0d6fdd`)
+    * [mix docs] Switch to `earmark_parser` (`021c772`)
+
+  * Bug fixes
+    * [HTML+EPUB] Bring back auto-linking to Kernel and Kernel.SpecialForms (`fa174eb`)
+    * [HTML+EPUB] Escape HTML special characters in signature (`5fed479`)
+    * [HTML+EPUB] Fix auto-linking `./2` and `../2` (`2e40acb`)
+    * [HTML+EPUB] Fix list of basic types to auto-link (`6df4a3b`)
+    * [HTML+EPUB] Make HTML valid (`1187ace`)
+    * [HTML] Escape HTML special characters in sidebar (`d26ca71`)
+    * [HTML] Fix keyboard shortcuts on non US keyboard layouts (`829c4ee`)
+    * [HTML] Fix text overflow in sidebar (`a4ff547`)
+    * [HTML] Handle snake case terms in search results (`d511d55`)
 
 ## v0.22.1 (2020-05-19)
 
