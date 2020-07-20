@@ -5,7 +5,7 @@ defmodule ExDoc.Markdown.EarmarkTest do
 
   @moduletag :earmark
 
-  describe "to_ast/1" do
+  describe "to_ast/2" do
     test "generate AST" do
       assert Markdown.to_ast("# Test\n\nHello", []) == [{:h1, [], ["Test"]}, {:p, [], ["Hello"]}]
       assert Markdown.to_ast("[foo](bar)", []) == [{:p, [], [{:a, [href: "bar"], ["foo"]}]}]
@@ -18,6 +18,12 @@ defmodule ExDoc.Markdown.EarmarkTest do
 
     test "comments" do
       assert Markdown.to_ast("<!-- INCLUDE -->", []) == []
+    end
+
+    test "warnings" do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               Markdown.to_ast("`foo", [])
+             end) =~ "(warning) nofile:1 Closing unclosed backquotes ` at end of input"
     end
 
     test "bug #1222" do
