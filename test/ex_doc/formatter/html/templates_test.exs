@@ -407,6 +407,22 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
     end
 
+    test "do not output overlapping functions, causing duplicate IDs" do
+      content = get_module_page([OverlappingDefaults])
+
+      assert content =~ ~s{<section class="detail" id="overlapping_defaults/2">}
+      assert content =~ ~s{<section class="detail" id="overlapping_defaults/3">}
+      refute content =~ ~s{<span id="overlapping_defaults/2"></span>}
+
+      assert content =~ ~s{<section class="detail" id="special_case/2">}
+
+      assert content =~
+               ~r{<section class="detail" id="special_case/4">\s*<span id="special_case/1"></span>\s*<span id="special_case/3"></span>}
+
+      # This Regex checks for duplicate IDs
+      refute content =~ ~r{id=("[^"]+").*id=\1}s
+    end
+
     ## BEHAVIOURS
 
     test "outputs behavior and callbacks" do

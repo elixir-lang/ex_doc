@@ -117,7 +117,7 @@ defmodule ExDoc.RetrieverTest do
       assert example.id == "example/2"
       assert example.doc == [{:p, [], ["Some example"]}]
       assert example.type == :function
-      assert example.defaults == ["example/1"]
+      assert example.defaults == [example: 1]
       assert example.signature == "example(foo, bar \\\\ Baz)"
       assert example.deprecated == "Use something else instead"
       assert example.group == "Example"
@@ -151,6 +151,30 @@ defmodule ExDoc.RetrieverTest do
       assert is_zero.doc == [{:p, [], ["A simple guard"]}]
       assert is_zero.type == :macro
       assert is_zero.defaults == []
+    end
+
+    test "overlapping defaults" do
+      [module_node] = docs_from_files(["OverlappingDefaults"])
+
+      overlapping_defaults_2 = Enum.find(module_node.docs, &(&1.id == "overlapping_defaults/2"))
+      overlapping_defaults_3 = Enum.find(module_node.docs, &(&1.id == "overlapping_defaults/3"))
+      assert overlapping_defaults_2.defaults == []
+      assert overlapping_defaults_3.defaults == []
+
+      two_defaults_2 = Enum.find(module_node.docs, &(&1.id == "two_defaults/2"))
+      two_defaults_4 = Enum.find(module_node.docs, &(&1.id == "two_defaults/4"))
+      assert two_defaults_2.defaults == []
+      assert two_defaults_4.defaults == [{:two_defaults, 3}]
+
+      special_case_2 = Enum.find(module_node.docs, &(&1.id == "special_case/2"))
+      special_case_4 = Enum.find(module_node.docs, &(&1.id == "special_case/4"))
+      assert special_case_2.defaults == []
+      assert special_case_4.defaults == [special_case: 1, special_case: 3]
+
+      in_the_middle_2 = Enum.find(module_node.docs, &(&1.id == "in_the_middle/2"))
+      in_the_middle_3 = Enum.find(module_node.docs, &(&1.id == "in_the_middle/3"))
+      assert in_the_middle_2.defaults == []
+      assert in_the_middle_3.defaults == []
     end
 
     test "returns the specs for each non-private function" do
