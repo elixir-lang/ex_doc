@@ -91,9 +91,11 @@ defmodule ExDoc.Autolink do
     {tag, attrs, walk(ast, config)}
   end
 
+  @ref_regex ~r/^`(.+)`$/
+
   defp custom_link(attrs, config) do
     with {:ok, href} <- Keyword.fetch(attrs, :href),
-         [[_, text]] <- Regex.scan(~r/^`(.+)`$/, href) do
+         [[_, text]] <- Regex.scan(@ref_regex, href) do
       url(text, :custom_link, config)
     else
       _ -> nil
@@ -105,6 +107,7 @@ defmodule ExDoc.Autolink do
          uri <- URI.parse(href),
          nil <- uri.host,
          true <- is_binary(uri.path),
+         false <- uri.path =~ @ref_regex,
          extension when extension in [".md", ".txt", ""] <- Path.extname(uri.path) do
       file = Path.basename(uri.path)
 
