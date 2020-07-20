@@ -22,6 +22,8 @@
     * [HTML] Fix keyboard shortcuts on non US keyboard layouts (`829c4ee`)
     * [HTML] Fix text overflow in sidebar (`a4ff547`)
     * [HTML] Handle snake case terms in search results (`d511d55`)
+    * [mix docs] Don't crash on markdown that triggers warning (`e7cb79c`)
+    
 
 ## v0.22.1 (2020-05-19)
 
