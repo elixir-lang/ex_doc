@@ -238,7 +238,7 @@ defmodule ExDoc.Retriever do
         get_function(doc, source, module_data, groups_for_functions)
       end
 
-    {Enum.map(groups_for_functions, &elem(&1, 0)), function_docs}
+    {Enum.map(groups_for_functions, &elem(&1, 0)), filter_defaults(function_docs)}
   end
 
   # We are only interested in functions and macros for now
@@ -313,7 +313,7 @@ defmodule ExDoc.Retriever do
       deprecated: metadata[:deprecated],
       doc: doc_ast,
       doc_line: doc_line,
-      defaults: defaults,
+      defaults: Enum.sort_by(defaults, fn {name, arity} -> sort_key(name, arity) end),
       signature: Enum.join(signature, " "),
       specs: specs,
       source_path: source.path,
@@ -338,7 +338,19 @@ defmodule ExDoc.Retriever do
   defp get_defaults(_name, _arity, 0), do: []
 
   defp get_defaults(name, arity, defaults) do
-    for default <- (arity - defaults)..(arity - 1), do: "#{name}/#{default}"
+    for default <- (arity - defaults)..(arity - 1), do: {name, default}
+  end
+
+  defp filter_defaults(docs) do
+    Enum.map(docs, &filter_defaults(&1, docs))
+  end
+
+  defp filter_defaults(doc, docs) do
+    update_in(doc.defaults, fn defaults ->
+      Enum.reject(defaults, fn {name, arity} ->
+        Enum.any?(docs, &match?(%{name: ^name, arity: ^arity}, &1))
+      end)
+    end)
   end
 
   ## Callback helpers
