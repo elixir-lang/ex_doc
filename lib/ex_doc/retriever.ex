@@ -41,7 +41,6 @@ defmodule ExDoc.Retriever do
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
     |> Enum.flat_map(&get_module(&1, config))
-    |> delete_overlapping_defaults()
     |> Enum.sort_by(fn module ->
       {GroupMatcher.group_index(config.groups_for_modules, module.group), module.nested_context,
        module.nested_title, module.id}
@@ -72,75 +71,6 @@ defmodule ExDoc.Retriever do
       nil -> {nil, nil}
       prefix -> {String.trim_leading(title, prefix <> "."), prefix}
     end
-  end
-
-  defp delete_overlapping_defaults(nodes) when is_list(nodes) do
-    for node <- nodes do
-      delete_overlapping_defaults(node)
-    end
-  end
-
-  defp delete_overlapping_defaults(%ExDoc.ModuleNode{} = module_node) do
-    id_to_defaults =
-      for %ExDoc.FunctionNode{} = function_node <- module_node.docs,
-          name_arity <- function_node.defaults ++ [{function_node.name, function_node.arity}] do
-        {function_node.id, name_arity}
-      end
-
-    filtered = filter_overlapping(id_to_defaults)
-
-    if length(filtered) == length(id_to_defaults) do
-      # return node unchanged
-      module_node
-    else
-      defaults_to_remove = build_defaults_map(id_to_defaults -- filtered)
-      affected_ids = Map.keys(defaults_to_remove)
-
-      module_docs =
-        for function_node <- module_node.docs do
-          if function_node.id in affected_ids do
-            delete_overlapping_defaults(function_node, defaults_to_remove)
-          else
-            function_node
-          end
-        end
-
-      %{module_node | docs: module_docs}
-    end
-  end
-
-  defp delete_overlapping_defaults(%ExDoc.FunctionNode{} = function_node, defaults_to_remove)
-       when defaults_to_remove == %{},
-       do: function_node
-
-  defp delete_overlapping_defaults(%ExDoc.FunctionNode{} = function_node, defaults_to_remove)
-       when is_map(defaults_to_remove) do
-    remove_list = Map.get(defaults_to_remove, function_node.id, [])
-    new_defaults = function_node.defaults -- remove_list
-
-    %{function_node | defaults: new_defaults}
-  end
-
-  defp filter_overlapping(id_to_defaults) do
-    {result, _acc} =
-      Enum.reduce(id_to_defaults, {[], MapSet.new()}, fn
-        {_id, name_arity} = entry, {defaults, defaults_acc} ->
-          if MapSet.member?(defaults_acc, name_arity) do
-            {defaults, defaults_acc}
-          else
-            {[entry | defaults], MapSet.put(defaults_acc, name_arity)}
-          end
-      end)
-
-    result
-  end
-
-  defp build_defaults_map(list) do
-    Enum.reduce(list, %{}, fn
-      {key, {name, arity}}, acc ->
-        value = Map.get(acc, key, [])
-        Map.put(acc, key, [{name, arity} | value])
-    end)
   end
 
   # Special case required for Elixir
@@ -308,7 +238,7 @@ defmodule ExDoc.Retriever do
         get_function(doc, source, module_data, groups_for_functions)
       end
 
-    {Enum.map(groups_for_functions, &elem(&1, 0)), function_docs}
+    {Enum.map(groups_for_functions, &elem(&1, 0)), filter_defaults(function_docs)}
   end
 
   # We are only interested in functions and macros for now
@@ -409,6 +339,18 @@ defmodule ExDoc.Retriever do
 
   defp get_defaults(name, arity, defaults) do
     for default <- (arity - defaults)..(arity - 1), do: {name, default}
+  end
+
+  defp filter_defaults(docs) do
+    Enum.map(docs, &filter_defaults(&1, docs))
+  end
+
+  defp filter_defaults(doc, docs) do
+    update_in(doc.defaults, fn defaults ->
+      Enum.reject(defaults, fn {name, arity} ->
+        Enum.any?(docs, &match?(%{name: ^name, arity: ^arity}, &1))
+      end)
+    end)
   end
 
   ## Callback helpers
