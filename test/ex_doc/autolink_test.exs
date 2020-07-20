@@ -218,16 +218,16 @@ defmodule ExDoc.AutolinkTest do
 
     test "special case links" do
       assert autolink(~m"`//2`") ==
-                {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], [ast("//2")]}
+               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], [ast("//2")]}
 
       assert autolink(~m"[division](`//2`)") ==
-                {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], ["division"]}
+               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], ["division"]}
 
       assert autolink(~m"`Kernel.//2`") ==
-                {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], [ast("Kernel.//2")]}
+               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], [ast("Kernel.//2")]}
 
       assert autolink(~m"[division](`Kernel.//2`)") ==
-                {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], ["division"]}
+               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], ["division"]}
     end
 
     test "other link" do

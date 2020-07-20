@@ -44,13 +44,13 @@ defmodule ExDoc.Markdown.Earmark do
 
       {:error, ast, messages} ->
         print_messages(messages, options)
-        ast
+        fixup(ast)
     end
   end
 
   defp print_messages(messages, options) do
     for {severity, line, message} <- messages do
-      file = options.file
+      file = options[:file]
       IO.warn("#{inspect(__MODULE__)} (#{severity}) #{file}:#{line} #{message}", [])
     end
   end
@@ -71,8 +71,7 @@ defmodule ExDoc.Markdown.Earmark do
     fixup({tag, attrs, ast})
   end
 
-  # E.g. `{:comment, _}`
-  defp fixup(_) do
+  defp fixup({:comment, _, _, _}) do
     []
   end
 

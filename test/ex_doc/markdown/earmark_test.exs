@@ -19,5 +19,12 @@ defmodule ExDoc.Markdown.EarmarkTest do
     test "comments" do
       assert Markdown.to_ast("<!-- INCLUDE -->", []) == []
     end
+
+    test "bug #1222" do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert [{:p, [], _}] =
+                        Markdown.to_ast("{:ok, status, %MyApp.User{}} on success", [])
+             end) =~ "ExDoc.Markdown.Earmark (warning)"
+    end
   end
 end
