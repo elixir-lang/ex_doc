@@ -2,6 +2,8 @@
 
 ## HEAD (unreleased)
 
+## v0.22.2 (2020-07-20)
+
   * Enhancements
     * [HTML+EPUB] Add support for path dependent markdown autolink (`feeddc1`)
     * [HTML+EPUB] Improve auto-linking to callbacks and types (`12c0a01`)
