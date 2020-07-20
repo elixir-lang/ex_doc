@@ -10,7 +10,8 @@
     * [HTML] Redirect to correct file when changing version (`0f6f24b`)
     * [mix docs] Allow files with no extension in extra files (`26b93b6`)
     * [mix docs] Link to siblings in an umbrella (`b0d6fdd`)
-    * [mix docs] Switch to `earmark_parser` (`021c772`)
+    * [mix docs] Switch to `earmark_parser`. Run `mix deps.unlock --unused` to remove the now
+      unused `earmark` dependency.  (`021c772`)
 
   * Bug fixes
     * [HTML+EPUB] Bring back auto-linking to Kernel and Kernel.SpecialForms (`fa174eb`)
@@ -23,7 +24,6 @@
     * [HTML] Fix text overflow in sidebar (`a4ff547`)
     * [HTML] Handle snake case terms in search results (`d511d55`)
     * [mix docs] Don't crash on markdown that triggers warning (`e7cb79c`)
-    
 
 ## v0.22.1 (2020-05-19)
 
