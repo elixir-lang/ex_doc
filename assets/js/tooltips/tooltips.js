@@ -32,6 +32,7 @@ const tooltipsToggleSelector = '.tooltips-toggle' // `Enable/Disable tooltips` b
 const tooltipsDisabledStorageKey = 'tooltipsDisabled' // Local Storage key Used to store tooltips settings
 const moduleContentHash = '#content' // Hash included in links pointing to module pages
 const iframePermissions = 'allow-scripts allow-same-origin' // Minimal permissions needed for the iframe to run JavaScript and communicate with the tooltip
+const supportedHashRegex = /#.*\// // Regex for hashes that will trigger the tooltip. Allows us to avoid displaying hashes for module sections (ie. `module.html#functions`)
 
 let tooltipElement = null // Will store the jQuery selector for the tooltip root
 let currentLinkElement = null // Element that the cursor is hovering over
@@ -220,9 +221,9 @@ function prepareTooltips () {
     href = `${window.location.pathname}${href}`
   }
 
-  if (isSelfLink(href)) { return }
-
   const typeCategory = findTypeCategory(href)
+
+  if (!isLinkSupported(href, typeCategory)) { return }
 
   if (typeCategory) {
     showTooltip({
@@ -300,6 +301,27 @@ function isSelfLink (href) {
   const pathname = window.location.pathname
 
   return pathnameEndsWith(pathname, href)
+}
+
+/**
+ * Does the link we're hovering over support tooltip hints?
+ *
+ * Ensures we're not displaying tootips for non-html pages, module sections or to the page we're already on.
+ *
+ * @param {string} href link to the page
+ * @param {(Object|null)} typeCategory type category information (if the link points to a type category description)
+ *
+ * @returns {boolean}
+ */
+function isLinkSupported (href, typeCategory) {
+  if (isSelfLink(href)) { return false }
+
+  const unsupportedHash = href.indexOf('#') !== -1 && !supportedHashRegex.test(href)
+  const validExtension = href.indexOf('.html') !== -1
+
+  if (unsupportedHash && !typeCategory) { return false }
+
+  return validExtension
 }
 
 /**

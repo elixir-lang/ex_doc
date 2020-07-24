@@ -71,7 +71,6 @@ function descriptionElementFromHash (hash) {
 
   if (!hash) { return null }
 
-  hash = decodeURI(hash)
   hash = $.escapeSelector(hash)
 
   if (!hash) { return null }
