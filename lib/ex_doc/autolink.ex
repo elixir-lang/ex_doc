@@ -116,8 +116,8 @@ defmodule ExDoc.Autolink do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
         HTML.text_to_id(without_ext) <> config.ext <> fragment
       else
-        message = "documentation references file `#{uri.path}` but it doesn't exist"
-        warn(message, config.file, config.line, config.id)
+        maybe_warn(nil, config, nil, %{file_path: uri.path})
+
         nil
       end
     else
@@ -450,7 +450,7 @@ defmodule ExDoc.Autolink do
       end
     else
       if warn? and Refs.public?({:module, module}) do
-        maybe_warn({kind, module, name, arity}, config)
+        maybe_warn(ref, config, Refs.get_visibility(ref))
       end
 
       nil
@@ -509,25 +509,17 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp maybe_warn({kind, module, name, arity}, config) do
+  defp maybe_warn(ref, config, visibility, metadata \\ %{}) do
     skipped = config.skip_undefined_reference_warnings_on
     file = Path.relative_to(config.file, File.cwd!())
     line = config.line
 
     unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
-      warn({kind, module, name, arity}, file, line, config.id)
+      warn(ref, {file, line}, config.id, visibility, metadata)
     end
   end
 
-  defp warn({kind, module, name, arity}, file, line, id) do
-    message =
-      "documentation references #{kind} #{inspect(module)}.#{name}/#{arity}" <>
-        " but it is undefined or private"
-
-    warn(message, file, line, id)
-  end
-
-  defp warn(message, file, line, id) do
+  defp warn(_ref, {file, line}, id, _visibility, %{message: message}) do
     warning = IO.ANSI.format([:yellow, "warning: ", :reset])
 
     stacktrace =
@@ -537,4 +529,53 @@ defmodule ExDoc.Autolink do
 
     IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
   end
+
+  defp warn(
+         {:module, _module},
+         {file, line},
+         id,
+         visibility,
+         %{mix_task: true, module_id: module_id} = metadata
+       ) do
+    message =
+      "documentation references \"mix #{module_id}\" but such task is #{
+        format_visibility(visibility, :module)
+      }"
+
+    warn(message, {file, line}, id, visibility, Map.put(metadata, :message, message))
+  end
+
+  defp warn({:module, _module}, {file, line}, id, visibility, %{module_id: module_id} = metadata) do
+    message =
+      "documentation references module \"#{module_id}\" but it is #{
+        format_visibility(visibility, :module)
+      }"
+
+    warn(message, {file, line}, id, visibility, Map.put(metadata, :message, message))
+  end
+
+  defp warn(nil, {file, line}, id, visibility, %{file_path: file_path} = metadata) do
+    message = "documentation references file \"#{file_path}\" but it doesn't exist"
+
+    warn(message, {file, line}, id, visibility, Map.put(metadata, :message, message))
+  end
+
+  defp warn({kind, module, name, arity}, {file, line}, id, visibility, metadata) do
+    message =
+      "documentation references #{kind} \"#{inspect(module)}.#{name}/#{arity}\"" <>
+        " but it is #{format_visibility(visibility, kind)}"
+
+    warn(message, {file, line}, id, visibility, Map.put(metadata, :message, message))
+  end
+
+  # there is not such a thing as private callback or private module
+  defp format_visibility(visibility, kind) when kind in [:module, :callback], do: "#{visibility}"
+
+  # typep is defined as :hidden, since there is no :private visibility value
+  # but type defined with @doc false also is the stored the same way.
+  defp format_visibility(:hidden, :type), do: "hidden or private"
+
+  # for the rest, it can either be undefined or private
+  defp format_visibility(:undefined, _kind), do: "undefined or private"
+  defp format_visibility(visibility, _kind), do: "#{visibility}"
 end

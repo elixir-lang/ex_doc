@@ -355,7 +355,7 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged("Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
       end)
 
-    assert captured =~ "documentation references function Foo.bar/1"
+    assert captured =~ "documentation references function \"Foo.bar/1\" but it is hidden"
     assert captured =~ ~r{lib/foo.ex:1\n$}
 
     captured =
@@ -363,7 +363,7 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged("Foo.bar/1", file: "lib/foo.ex", id: "Foo.foo/0")
       end)
 
-    assert captured =~ "documentation references function Foo.bar/1"
+    assert captured =~ "documentation references function \"Foo.bar/1\" but it is hidden"
     assert captured =~ ~r{lib/foo.ex: Foo.foo/0\n$}
 
     assert_warn(fn ->
@@ -394,7 +394,7 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged(~m"[Foo](Foo Bar.md)", opts)
       end)
 
-    assert captured =~ "documentation references file `Foo Bar.md` but it doesn't exist"
+    assert captured =~ "documentation references file \"Foo Bar.md\" but it doesn't exist"
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
