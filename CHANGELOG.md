@@ -2,6 +2,13 @@
 
 ## HEAD (unreleased)
 
+## v0.22.3 (2020-07-25)
+
+  * Bug fixes
+    * [HTML+EPUB] Remove overlapping functions from defaults
+    * [HTML] Don't show tooltip for module sections and non-html files
+    * [HTML] Make sure tooltips work with escape ids.
+
 ## v0.22.2 (2020-07-20)
 
   * Enhancements
