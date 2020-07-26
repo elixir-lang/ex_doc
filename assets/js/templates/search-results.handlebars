@@ -1,4 +1,9 @@
-<h1>Search results for <em>{{value}}</em></h1>
+
+{{#if value}}
+  <h1>Search results for <em>{{value}}</em></h1>
+{{else}}
+  <h1>All results</h1>
+{{/if}}
 
 {{#isNonEmptyArray results}}
   {{#each results}}
