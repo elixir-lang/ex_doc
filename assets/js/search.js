@@ -69,7 +69,10 @@ function getExcerpts (item, metadata) {
 }
 
 export function search (value) {
-  if (value.replace(/\s/, '') !== '') {
+  if (
+    value.replace(/\s/, '') !== null ||
+    value.replace(/\s/, '') !== undefined
+  ) {
     $input.val(value)
     var idx = getIndex()
     var results, errorMessage
@@ -87,8 +90,6 @@ export function search (value) {
     })
 
     $search.html(resultsHtml)
-  } else {
-    $search.html('<h1>Search</h1>')
   }
 }
 
