@@ -80,7 +80,7 @@ export function search (value) {
       errorMessage = error.message
     }
 
-    var resultsHtml = resultsTemplate({
+    const resultsHtml = resultsTemplate({
       value: value,
       results: results,
       errorMessage: errorMessage
@@ -88,7 +88,11 @@ export function search (value) {
 
     $search.html(resultsHtml)
   } else {
-    $search.html('<h1>Search</h1>')
+    const resultsHtml = resultsTemplate({
+      value
+    })
+
+    $search.html(resultsHtml)
   }
 }
 

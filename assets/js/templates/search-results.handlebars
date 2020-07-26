@@ -1,4 +1,8 @@
-<h1>Search results for <em>{{value}}</em></h1>
+{{#if value}}
+  <h1>Search results for <em>{{value}}</em></h1>
+{{else}}
+  <h1>Invalid Search</h1>
+{{/if}}
 
 {{#isNonEmptyArray results}}
   {{#each results}}
@@ -14,8 +18,10 @@
 {{else}}
   {{#isArray results}}
     <p>Sorry, we couldn't find anything for <em>{{value}}</em>.</p>
-  {{else}}
+  {{else if value}}
     <p>Invalid search: {{errorMessage}}.</p>
+  {{else}}
+    <p>Please type something into the search bar to perform a search.</p>
   {{/isArray}}
 
   <p>The search functionality is full-text based. Here are some tips:</p>
