@@ -355,16 +355,30 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged("Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
       end)
 
-    assert captured =~ "documentation references function \"Foo.bar/1\" but it is hidden"
+    assert captured =~ "documentation references \"Foo.bar/1\" but it is hidden\n"
     assert captured =~ ~r{lib/foo.ex:1\n$}
 
     captured =
       assert_warn(fn ->
-        assert_unchanged("Foo.bar/1", file: "lib/foo.ex", id: "Foo.foo/0")
+        assert_unchanged("t:Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0")
       end)
 
-    assert captured =~ "documentation references function \"Foo.bar/1\" but it is hidden"
-    assert captured =~ ~r{lib/foo.ex: Foo.foo/0\n$}
+    assert captured =~ "documentation references \"t:Foo.bad/0\" but it is hidden or private\n"
+
+    captured =
+      assert_warn(fn ->
+        assert_unchanged("t:Elixir.Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0")
+      end)
+
+    assert captured =~
+             "documentation references \"t:Elixir.Foo.bad/0\" but it is hidden or private\n"
+
+    captured =
+      assert_warn(fn ->
+        assert_unchanged("t:Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0")
+      end)
+
+    assert captured =~ "documentation references \"t:Foo.bad/0\" but it is hidden or private\n"
 
     assert_warn(fn ->
       assert_unchanged("String.upcase/9")
@@ -394,7 +408,7 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged(~m"[Foo](Foo Bar.md)", opts)
       end)
 
-    assert captured =~ "documentation references file \"Foo Bar.md\" but it doesn't exist"
+    assert captured =~ "documentation references file \"Foo Bar.md\" but it does not exist"
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
