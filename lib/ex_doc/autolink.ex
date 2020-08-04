@@ -558,7 +558,7 @@ defmodule ExDoc.Autolink do
          %{mix_task: true, original_text: original_text}
        ) do
     message =
-      "documentation references \"#{original_text}\" but such task is " <>
+      "documentation references \"#{original_text}\" but it is " <>
         format_visibility(visibility, :module)
 
     warn(message, {file, line}, id)

@@ -433,7 +433,7 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged(~m"[Foo task](`mix foo`)")
       end)
 
-    assert captured =~ "documentation references \"mix foo\" but such task is undefined\n"
+    assert captured =~ "documentation references \"mix foo\" but it is undefined\n"
 
     assert_unchanged(~m"`mix foo`")
   end
