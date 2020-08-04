@@ -71,16 +71,13 @@ defmodule ExDoc.Autolink do
       url = custom_link(attrs, config) ->
         {:a, Keyword.put(attrs, :href, url), inner}
 
-      url = extra_link(attrs, config) ->
-        {:a, Keyword.put(attrs, :href, url), inner}
-
       true ->
         ast
     end
   end
 
   defp walk({:code, attrs, [code]} = ast, config) do
-    if url = url(code, :regular, config) do
+    if url = url(code, :regular_link, config) do
       code = remove_prefix(code)
       {:a, [href: url], [{:code, attrs, [code]}]}
     else
@@ -95,17 +92,23 @@ defmodule ExDoc.Autolink do
   @ref_regex ~r/^`(.+)`$/
 
   defp custom_link(attrs, config) do
-    with {:ok, href} <- Keyword.fetch(attrs, :href),
-         [[_, text]] <- Regex.scan(@ref_regex, href) do
-      url(text, :custom_link, config)
-    else
-      _ -> nil
+    case Keyword.fetch(attrs, :href) do
+      {:ok, href} ->
+        case Regex.scan(@ref_regex, href) do
+          [[_, custom_link]] ->
+            url(custom_link, :custom_link, config)
+
+          [] ->
+            build_extra_link(href, config)
+        end
+
+      _ ->
+        nil
     end
   end
 
-  defp extra_link(attrs, config) do
-    with {:ok, href} <- Keyword.fetch(attrs, :href),
-         uri <- URI.parse(href),
+  defp build_extra_link(link, config) do
+    with uri <- URI.parse(link),
          nil <- uri.host,
          true <- is_binary(uri.path),
          false <- uri.path =~ @ref_regex,
@@ -117,7 +120,7 @@ defmodule ExDoc.Autolink do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
         HTML.text_to_id(without_ext) <> config.ext <> fragment
       else
-        maybe_warn(nil, config, nil, %{file_path: uri.path, original_text: href})
+        maybe_warn(nil, config, nil, %{file_path: uri.path, original_text: link})
 
         nil
       end
@@ -185,6 +188,7 @@ defmodule ExDoc.Autolink do
     timeout: 0
   ]
 
+  defp url("", _mode, _config), do: nil
   defp url(string = "mix help " <> name, mode, config), do: mix_task(name, string, mode, config)
   defp url(string = "mix " <> name, mode, config), do: mix_task(name, string, mode, config)
 
@@ -196,10 +200,10 @@ defmodule ExDoc.Autolink do
 
           case parse_module_function(rest) do
             {:local, function} ->
-              local_url(kind, function, arity, config, string)
+              local_url(kind, function, arity, config, string, mode: mode)
 
             {:remote, module, function} ->
-              remote_url(kind, module, function, arity, config, string)
+              remote_url({kind, module, function, arity}, config, string, mode: mode)
 
             :error ->
               nil
@@ -308,7 +312,7 @@ defmodule ExDoc.Autolink do
         parts = name |> String.split(".") |> Enum.map(&Macro.camelize/1)
         module = Module.concat([Mix, Tasks | parts])
 
-        {module, module_url(module, :regular, config, string),
+        {module, module_url(module, :regular_link, config, string),
          Refs.get_visibility({:module, module})}
       else
         {nil, nil, :undefined}
@@ -381,7 +385,7 @@ defmodule ExDoc.Autolink do
 
       url =
         if module do
-          remote_url(:type, module, name, arity, config, string)
+          remote_url({:type, module, name, arity}, config, string)
         else
           local_url(:type, name, arity, config, string)
         end
@@ -418,20 +422,24 @@ defmodule ExDoc.Autolink do
 
   ## Internals
 
+  defp module_url(module, _mode, %{current_module: module}, _string) do
+    "#content"
+  end
+
   defp module_url(module, mode, config, string) do
-    if module == config.current_module do
-      "#content"
-    else
-      if Refs.public?({:module, module}) do
+    ref = {:module, module}
+
+    case {mode, Refs.get_visibility(ref)} do
+      {_, :public} ->
         app_module_url(tool(module), module, config)
-      else
-        if mode == :custom_link do
-          ref = {:module, module}
-          maybe_warn(ref, config, Refs.get_visibility(ref), %{original_text: string})
-        end
+
+      {:regular_link, :undefined} ->
+        nil
+
+      {_, visibility} ->
+        maybe_warn(ref, config, visibility, %{original_text: string})
 
         nil
-      end
     end
   end
 
@@ -443,54 +451,77 @@ defmodule ExDoc.Autolink do
     @otpdocs <> "#{module}.html"
   end
 
-  defp local_url(:type, name, arity, config, _original_text) when {name, arity} in @basic_types do
+  defp local_url(kind, name, arity, config, original_text, options \\ [])
+
+  defp local_url(:type, name, arity, config, _original_text, _options)
+       when {name, arity} in @basic_types do
     ex_doc_app_url(Kernel, config) <> "typespecs" <> config.ext <> "#basic-types"
   end
 
-  defp local_url(:type, name, arity, config, _original_text)
+  defp local_url(:type, name, arity, config, _original_text, _options)
        when {name, arity} in @built_in_types do
     ex_doc_app_url(Kernel, config) <> "typespecs" <> config.ext <> "#built-in-types"
   end
 
-  defp local_url(kind, name, arity, config, original_text) do
+  defp local_url(kind, name, arity, config, original_text, options) do
     module = config.current_module
     ref = {kind, module, name, arity}
+    mode = Keyword.get(options, :mode, :regular_link)
+    visibility = Refs.get_visibility(ref)
 
-    cond do
-      Refs.public?(ref) -> fragment(tool(module), kind, name, arity)
-      kind == :function -> try_autoimported_function(name, arity, config, original_text)
-      true -> nil
+    case {kind, visibility} do
+      {_kind, :public} ->
+        fragment(tool(module), kind, name, arity)
+
+      {:function, _visibility} ->
+        try_autoimported_function(name, arity, mode, config, original_text)
+
+      {:type, :hidden} ->
+        nil
+
+      _ ->
+        maybe_warn(ref, config, visibility, %{original_text: original_text})
+
+        nil
     end
   end
 
-  defp try_autoimported_function(name, arity, config, original_text) do
+  defp try_autoimported_function(name, arity, mode, config, original_text) do
     Enum.find_value(@autoimported_modules, fn module ->
-      remote_url(:function, module, name, arity, config, original_text, warn?: false)
+      remote_url({:function, module, name, arity}, config, original_text, warn?: false, mode: mode)
     end)
   end
 
-  defp remote_url(kind, module, name, arity, config, original_text, opts \\ []) do
+  defp remote_url({kind, module, name, arity} = ref, config, original_text, opts \\ []) do
     warn? = Keyword.get(opts, :warn?, true)
-    ref = {kind, module, name, arity}
+    mode = Keyword.get(opts, :mode, :regular_link)
+    same_module? = module == config.current_module
 
-    if Refs.public?(ref) do
-      case tool(module) do
-        :no_tool ->
-          nil
+    case {mode, Refs.get_visibility({:module, module}), Refs.get_visibility(ref)} do
+      {_mode, _module_visibility, :public} ->
+        case tool(module) do
+          :no_tool ->
+            nil
 
-        tool ->
-          if module == config.current_module do
-            fragment(tool, kind, name, arity)
-          else
-            app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
-          end
-      end
-    else
-      if warn? and Refs.public?({:module, module}) do
-        maybe_warn(ref, config, Refs.get_visibility(ref), %{original_text: original_text})
-      end
+          tool ->
+            if module == config.current_module do
+              fragment(tool, kind, name, arity)
+            else
+              app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
+            end
+        end
 
-      nil
+      {:regular_link, :public, :undefined} ->
+        if warn?, do: maybe_warn(ref, config, :undefined, %{original_text: original_text})
+        nil
+
+      {:regular_link, _module_visibility, :undefined} when not same_module? ->
+        nil
+
+      {_mode, _module_visibility, visibility} ->
+        if warn?, do: maybe_warn(ref, config, visibility, %{original_text: original_text})
+
+        nil
     end
   end
 
@@ -513,15 +544,13 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp fragment(:ex_doc, kind, name, arity) do
-    prefix =
-      case kind do
-        :function -> ""
-        :callback -> "c:"
-        :type -> "t:"
-      end
+  defp prefix(kind)
+  defp prefix(:function), do: ""
+  defp prefix(:callback), do: "c:"
+  defp prefix(:type), do: "t:"
 
-    "#" <> prefix <> "#{T.enc(Atom.to_string(name))}/#{arity}"
+  defp fragment(:ex_doc, kind, name, arity) do
+    "#" <> prefix(kind) <> "#{T.enc(Atom.to_string(name))}/#{arity}"
   end
 
   defp fragment(:otp, kind, name, arity) do
