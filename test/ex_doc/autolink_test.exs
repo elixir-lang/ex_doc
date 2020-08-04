@@ -344,96 +344,50 @@ defmodule ExDoc.AutolinkTest do
       {{:type, Foo, :bad, 0}, :hidden}
     ])
 
-    captured =
-      assert_warn(fn ->
-        assert_unchanged("Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
-      end)
-
+    captured = warn("Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
     assert captured =~ "documentation references \"Foo.bar/1\" but it is hidden\n"
     assert captured =~ ~r{lib/foo.ex:1\n$}
 
-    captured =
-      assert_warn(fn ->
-        assert_unchanged("t:Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0")
-      end)
+    assert warn("t:Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0") =~
+             "documentation references \"t:Foo.bad/0\" but it is hidden or private\n"
 
-    assert captured =~ "documentation references \"t:Foo.bad/0\" but it is hidden or private\n"
-
-    captured =
-      assert_warn(fn ->
-        assert_unchanged("t:Elixir.Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0")
-      end)
-
-    assert captured =~
+    assert warn("t:Elixir.Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0") =~
              "documentation references \"t:Elixir.Foo.bad/0\" but it is hidden or private\n"
 
-    captured =
-      assert_warn(fn ->
-        assert_unchanged("t:Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0")
-      end)
+    assert warn("t:Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0") =~
+             "documentation references \"t:Foo.bad/0\" but it is hidden or private\n"
 
-    assert captured =~ "documentation references \"t:Foo.bad/0\" but it is hidden or private\n"
+    warn("String.upcase/9", [])
 
-    assert_warn(fn ->
-      assert_unchanged("String.upcase/9")
-    end)
+    warn("c:GenServer.handle_call/9", [])
 
-    assert_warn(fn ->
-      assert_unchanged("c:GenServer.handle_call/9")
-    end)
+    warn("t:Calendar.date/9", [])
 
-    assert_warn(fn ->
-      assert_unchanged("t:Calendar.date/9")
-    end)
-
-    assert_warn(fn ->
+    warn(fn ->
       assert typespec(quote(do: t() :: Foo.bad())) ==
                ~s[t() :: Foo.bad()]
     end)
 
-    assert_warn(fn ->
+    warn(fn ->
       assert typespec(quote(do: t() :: String.bad())) ==
                ~s[t() :: String.bad()]
     end)
 
-    captured =
-      assert_warn(fn ->
-        opts = [extras: []]
-        assert_unchanged(~m"[Foo](Foo Bar.md)", opts)
-      end)
-
-    assert captured =~ "documentation references file \"Foo Bar.md\" but it does not exist"
+    assert warn(~m"[Foo](Foo Bar.md)", extras: []) =~
+             "documentation references file \"Foo Bar.md\" but it does not exist"
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
 
-    captured =
-      assert_warn(fn ->
-        assert_unchanged(~m"[Bar A](`Bar.A`)")
-      end)
+    assert warn(~m"[Bar A](`Bar.A`)", []) =~ "module \"Bar.A\" but it is undefined\n"
 
-    assert captured =~ "\"Bar.A\" but it is undefined\n"
+    assert_unchanged(~m"`Bar.A`")
 
-    captured =
-      assert_warn(fn ->
-        assert_unchanged(~m"`Bar.A`")
-      end)
+    assert warn(~m"[custom text](`Elixir.Unknown`)", []) =~
+             "documentation references module \"Elixir.Unknown\" but it is undefined\n"
 
-    assert captured == ""
-
-    captured =
-      assert_warn(fn ->
-        assert_unchanged(~m"[custom text](`Elixir.Unknown`)")
-      end)
-
-    assert captured =~ "documentation references module \"Elixir.Unknown\" but it is undefined\n"
-
-    captured =
-      assert_warn(fn ->
-        assert_unchanged(~m"[Foo task](`mix foo`)")
-      end)
-
-    assert captured =~ "documentation references \"mix foo\" but it is undefined\n"
+    assert warn(~m"[Foo task](`mix foo`)", []) =~
+             "documentation references \"mix foo\" but it is undefined\n"
 
     assert_unchanged(~m"`mix foo`")
   end
@@ -453,9 +407,20 @@ defmodule ExDoc.AutolinkTest do
   defp ast(text) when is_binary(text), do: {:code, [class: "inline"], [text]}
   defp ast({_, _, _} = ast), do: ast
 
-  defp assert_warn(fun) do
+  defp warn(ast_or_text, options) do
+    warn(fn ->
+      assert_unchanged(ast_or_text, options)
+    end)
+  end
+
+  defp warn(fun) when is_function(fun, 0) do
     captured = capture_io(:stderr, fun)
-    captured =~ "documentation references"
+
+    case Regex.scan(~r/documentation references/, captured) do
+      [_] -> :ok
+      items -> raise "got #{length(items)} warnings in:\n\n#{captured}"
+    end
+
     captured
   end
 
