@@ -26,8 +26,11 @@ defmodule ExDoc.AutolinkTest do
                ~m"[`IEx.Helpers`](https://hexdocs.pm/iex/IEx.Helpers.html)"
     end
 
-    test "private module" do
-      assert_unchanged("Code.Typespec")
+    test "hidden module" do
+      assert warn("Code.Typespec") =~
+               "documentation references module \"Code.Typespec\" but it is hidden"
+
+      assert_unchanged("String.Unicode")
     end
 
     test "erlang module" do
@@ -175,6 +178,22 @@ defmodule ExDoc.AutolinkTest do
 
       assert autolink(~m"[custom text](`:lists.all/2`)") ==
                ~m"[custom text](http://www.erlang.org/doc/man/lists.html#all-2)"
+
+      assert warn(~m"[custom text](`Unknown`)") =~
+               "documentation references module \"Unknown\" but it is undefined"
+
+      assert_unchanged(~m"[custom text](`Unknown`)")
+
+      assert warn(~m"[custom text](Unknown)") =~
+               "documentation references file \"Unknown\" but it does not exist"
+
+      assert warn(~m"[custom text](`LICENSE`)", extras: ["LICENSE"]) =~
+               "documentation references module \"LICENSE\" but it is undefined"
+
+      assert warn(~m"[an unknown task](`mix unknown.task`)") =~
+               "documentation references \"mix unknown.task\" but it is undefined"
+
+      assert_unchanged(~m"[an unknown task](`mix unknown.task`)")
     end
 
     test "mix task" do
@@ -252,9 +271,16 @@ defmodule ExDoc.AutolinkTest do
 
   describe "typespec/3" do
     test "operators" do
-      assert typespec(quote(do: +foo() :: foo())) == ~s[+foo() :: foo()]
+      ExDoc.Refs.insert([
+        {{:module, MyModule}, :public},
+        {{:type, MyModule, :foo, 0}, :public}
+      ])
 
-      assert typespec(quote(do: foo() + foo() :: foo())) == ~s[foo() + foo() :: foo()]
+      assert typespec(quote(do: +foo() :: foo())) ==
+               ~s[+<a href="#t:foo/0">foo</a>() :: <a href="#t:foo/0">foo</a>()]
+
+      assert typespec(quote(do: foo() + foo() :: foo())) ==
+               ~s[<a href=\"#t:foo/0\">foo</a>() + <a href=\"#t:foo/0\">foo</a>() :: <a href=\"#t:foo/0\">foo</a>()]
 
       assert typespec(quote(do: -0 :: 0)) == ~s[-0 :: 0]
     end
@@ -265,29 +291,33 @@ defmodule ExDoc.AutolinkTest do
         {{:type, MyModule, :foo, 1}, :public},
         {{:type, MyModule, :foo, 2}, :public},
         {{:type, MyModule, :foo?, 1}, :public},
-        {{:type, MyModule, :foo!, 1}, :public}
+        {{:type, MyModule, :foo!, 1}, :public},
+        {{:type, MyModule, :bar, 0}, :public},
+        {{:type, MyModule, :bar, 1}, :public},
+        {{:type, MyModule, :baz, 1}, :public}
       ])
 
       assert typespec(quote(do: t() :: foo(1))) ==
                ~s[t() :: <a href="#t:foo/1">foo</a>(1)]
 
       assert typespec(quote(do: t() :: bar(foo(1)))) ==
-               ~s[t() :: bar(<a href="#t:foo/1">foo</a>(1))]
+               ~s[t() :: <a href=\"#t:bar/1\">bar</a>(<a href=\"#t:foo/1\">foo</a>(1))]
 
       assert typespec(quote(do: (t() :: bar(foo(1)) when bat: foo(1)))) ==
-               ~s[t() :: bar(<a href="#t:foo/1">foo</a>(1)) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
+               ~s[t() :: <a href=\"#t:bar/1\">bar</a>(<a href="#t:foo/1">foo</a>(1)) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
 
       assert typespec(quote(do: t() :: bar(baz(1)))) ==
-               ~s[t() :: bar(baz(1))]
+               ~s[t() :: <a href=\"#t:bar/1\">bar</a>(<a href=\"#t:baz/1\">baz</a>(1))]
 
       assert typespec(quote(do: t() :: foo(bar(), bar()))) ==
-               ~s[t() :: <a href="#t:foo/2">foo</a>(bar(), bar())]
+               ~s[t() :: <a href="#t:foo/2">foo</a>(<a href=\"#t:bar/0\">bar</a>(), <a href=\"#t:bar/0\">bar</a>())]
 
       assert typespec(quote(do: t() :: foo!(bar()))) ==
-               ~s[t() :: <a href="#t:foo!/1">foo!</a>(bar())]
+               ~s[t() :: <a href="#t:foo!/1">foo!</a>(<a href=\"#t:bar/0\">bar</a>())]
 
+      # TODO: probably update this according to the previous test's changes
       assert typespec(quote(do: t() :: foo?(bar()))) ==
-               ~s[t() :: <a href="#t:foo?/1">foo?</a>(bar())]
+               ~s[t() :: <a href="#t:foo?/1">foo?</a>(<a href=\"#t:bar/0\">bar</a>())]
     end
 
     test "remotes" do
@@ -375,11 +405,11 @@ defmodule ExDoc.AutolinkTest do
     assert warn("t:AutolinkTest.Foo.bad/0", file: "lib/foo.ex", id: "AutolinkTest.Foo.foo/0") =~
              "documentation references \"t:AutolinkTest.Foo.bad/0\" but it is hidden or private\n"
 
-    warn("String.upcase/9", [])
+    warn("String.upcase/9")
 
-    warn("c:GenServer.handle_call/9", [])
+    warn("c:GenServer.handle_call/9")
 
-    warn("t:Calendar.date/9", [])
+    warn("t:Calendar.date/9")
 
     warn(fn ->
       assert typespec(quote(do: t() :: AutolinkTest.Foo.bad())) ==
@@ -408,6 +438,14 @@ defmodule ExDoc.AutolinkTest do
              "documentation references \"mix foo\" but it is undefined\n"
 
     assert_unchanged(~m"`mix foo`")
+
+    assert warn(~m"[bad](`String.upcase/9`)", extras: []) =~
+             "documentation references \"String.upcase/9\" but it is undefined or private"
+
+    assert warn(~m"[Unknown](`Unknown`)") =~
+             "documentation references module \"Unknown\" but it is undefined"
+
+    assert_unchanged(~m"`Unknown`")
   end
 
   ## Helpers
@@ -419,17 +457,15 @@ defmodule ExDoc.AutolinkTest do
   end
 
   defp assert_unchanged(ast_or_text, options \\ []) do
-    assert autolink(ast_or_text, options) == ast(ast_or_text)
+    fun = fn ->
+      assert autolink(ast_or_text, options) == ast(ast_or_text)
+    end
+
+    capture_io(:stderr, fun)
   end
 
   defp ast(text) when is_binary(text), do: {:code, [class: "inline"], [text]}
   defp ast({_, _, _} = ast), do: ast
-
-  defp warn(ast_or_text, options) do
-    warn(fn ->
-      assert_unchanged(ast_or_text, options)
-    end)
-  end
 
   defp warn(fun) when is_function(fun, 0) do
     captured = capture_io(:stderr, fun)
@@ -440,6 +476,12 @@ defmodule ExDoc.AutolinkTest do
     end
 
     captured
+  end
+
+  defp warn(ast_or_text, options \\ []) do
+    warn(fn ->
+      assert_unchanged(ast_or_text, options)
+    end)
   end
 
   defp typespec(ast, options \\ []) do
