@@ -306,7 +306,7 @@ defmodule ExDoc.Autolink do
       with true <- name =~ ~r/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/,
            parts <- name |> String.split(".") |> Enum.map(&Macro.camelize/1),
            module <- Module.concat([Mix, Tasks | parts]) do
-        {module, module_url(module, mode, config, string), Refs.get_visibility({:module, module})}
+        {module, module_url(module, :regular, config, string), Refs.get_visibility({:module, module})}
       else
         _ -> {nil, nil, :undefined}
       end
