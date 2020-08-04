@@ -114,13 +114,17 @@ defmodule ExDoc.Refs do
           end
         end
         |> List.flatten()
-        |> Enum.concat([{{:module, module}, module_visibility}])
+        |> Enum.concat([
+          {{:module, module}, module_visibility}
+          | to_refs(types(module, [:typep]), module, :type, :hidden)
+        ])
 
       {:error, _} ->
         if Code.ensure_loaded?(module) do
           (to_refs(exports(module), module, :function) ++
              to_refs(callbacks(module), module, :callback) ++
-             to_refs(types(module), module, :type))
+             to_refs(types(module), module, :type) ++
+             to_refs(types(module, [:typep]), module, :type, :hidden))
           |> Enum.concat([{{:module, module}, :public}])
         else
           [{{:module, module}, :undefined}]
@@ -151,11 +155,11 @@ defmodule ExDoc.Refs do
     end
   end
 
-  defp types(module) do
+  defp types(module, kind_list \\ [:type, :opaque]) do
     case Code.Typespec.fetch_types(module) do
       {:ok, list} ->
         for {kind, {name, _, args}} <- list,
-            kind in [:type, :opaque] do
+            kind in kind_list do
           {name, length(args)}
         end
 
@@ -164,9 +168,9 @@ defmodule ExDoc.Refs do
     end
   end
 
-  defp to_refs(list, module, kind) do
+  defp to_refs(list, module, kind, visibility \\ :public) do
     for {name, arity} <- list do
-      {{kind, module, name, arity}, :public}
+      {{kind, module, name, arity}, visibility}
     end
   end
 end

@@ -40,7 +40,7 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:type, InMemory, :t, 0}) == :undefined
 
     # @typep
-    assert Refs.get_visibility({:type, :sets, :seg, 0}) == :undefined
+    assert Refs.get_visibility({:type, :sets, :seg, 0}) == :hidden
 
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 3}) == :public
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :undefined
