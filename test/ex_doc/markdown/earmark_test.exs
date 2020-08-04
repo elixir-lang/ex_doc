@@ -1,5 +1,5 @@
 defmodule ExDoc.Markdown.EarmarkTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   alias ExDoc.Markdown.Earmark, as: Markdown
 
