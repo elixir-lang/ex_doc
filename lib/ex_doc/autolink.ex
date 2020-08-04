@@ -303,12 +303,14 @@ defmodule ExDoc.Autolink do
 
   defp mix_task(name, string, mode, config) do
     {module, url, visibility} =
-      with true <- name =~ ~r/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/,
-           parts <- name |> String.split(".") |> Enum.map(&Macro.camelize/1),
-           module <- Module.concat([Mix, Tasks | parts]) do
-        {module, module_url(module, :regular, config, string), Refs.get_visibility({:module, module})}
+      if name =~ ~r/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/ do
+        parts = name |> String.split(".") |> Enum.map(&Macro.camelize/1)
+        module = Module.concat([Mix, Tasks | parts])
+
+        {module, module_url(module, :regular, config, string),
+         Refs.get_visibility({:module, module})}
       else
-        _ -> {nil, nil, :undefined}
+        {nil, nil, :undefined}
       end
 
     if is_nil(url) and mode == :custom_link do
