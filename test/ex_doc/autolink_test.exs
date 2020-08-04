@@ -167,12 +167,6 @@ defmodule ExDoc.AutolinkTest do
 
       assert autolink(~m"[custom text](`:lists.all/2`)") ==
                ~m"[custom text](http://www.erlang.org/doc/man/lists.html#all-2)"
-
-      # TODO: with custom links and backticks there are no false positives (you
-      #       always mean to link) so we should always warn on mismatches?
-      #       Though backticks are markdown specific, is that ok?
-      # assert_warn(fn ->
-      assert_unchanged(~m"[custom text](`Unknown`)")
     end
 
     test "mix task" do
@@ -412,6 +406,45 @@ defmodule ExDoc.AutolinkTest do
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
+
+    captured =
+      assert_warn(fn ->
+        opts = [extras: []]
+        assert_unchanged(~m"[Bar A](`Bar.A`)", opts)
+      end)
+
+    assert captured =~ "\"Bar.A\" but it is undefined\n"
+
+    captured =
+      assert_warn(fn ->
+        opts = [extras: []]
+        assert_unchanged(~m"`Bar.A`", opts)
+      end)
+
+    assert captured == ""
+
+    captured =
+      assert_warn(fn ->
+        assert_unchanged(~m"[custom text](`Elixir.Unknown`)")
+      end)
+
+    assert captured =~ "documentation references module \"Elixir.Unknown\" but it is undefined\n"
+
+    captured =
+      assert_warn(fn ->
+        opts = [extras: []]
+        assert_unchanged(~m"[Foo task](`mix foo`)", opts)
+      end)
+
+    assert captured =~ "documentation references \"mix foo\" but such task is undefined\n"
+
+    captured =
+      assert_warn(fn ->
+        opts = [extras: []]
+        assert_unchanged(~m"`mix foo`", opts)
+      end)
+
+    assert captured == ""
   end
 
   ## Helpers

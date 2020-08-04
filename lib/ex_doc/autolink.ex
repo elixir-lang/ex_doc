@@ -184,8 +184,8 @@ defmodule ExDoc.Autolink do
     timeout: 0
   ]
 
-  defp url("mix help " <> name, _mode, config), do: mix_task(name, config)
-  defp url("mix " <> name, _mode, config), do: mix_task(name, config)
+  defp url(string = "mix help " <> name, mode, config), do: mix_task(name, string, mode, config)
+  defp url(string = "mix " <> name, mode, config), do: mix_task(name, string, mode, config)
 
   defp url(string, mode, config) do
     case Regex.run(~r{^(.+)/(\d+)$}, string) do
@@ -211,7 +211,7 @@ defmodule ExDoc.Autolink do
       nil ->
         case parse_module(string, mode) do
           {:module, module} ->
-            module_url(module, config)
+            module_url(module, mode, config, string)
 
           :error ->
             nil
@@ -301,11 +301,21 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp mix_task(name, config) do
-    if name =~ ~r/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/ do
-      parts = name |> String.split(".") |> Enum.map(&Macro.camelize/1)
-      module_url(Module.concat([Mix, Tasks | parts]), config)
+  defp mix_task(name, string, mode, config) do
+    {module, url, visibility} =
+      with true <- name =~ ~r/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/,
+           parts <- name |> String.split(".") |> Enum.map(&Macro.camelize/1),
+           module <- Module.concat([Mix, Tasks | parts]) do
+        {module, module_url(module, mode, config, string), Refs.get_visibility({:module, module})}
+      else
+        _ -> {nil, nil, :undefined}
+      end
+
+    if is_nil(url) and mode == :custom_link do
+      maybe_warn({:module, module}, config, visibility, %{mix_task: true, original_text: string})
     end
+
+    url
   end
 
   @doc """
@@ -389,21 +399,28 @@ defmodule ExDoc.Autolink do
 
   ## Internals
 
-  defp module_url(module, config) do
+  defp module_url(module, mode, config, string) do
     if module == config.current_module do
       "#content"
     else
       if Refs.public?({:module, module}) do
-        module_url(tool(module), module, config)
+        app_module_url(tool(module), module, config)
+      else
+        if mode == :custom_link do
+          ref = {:module, module}
+          maybe_warn(ref, config, Refs.get_visibility(ref), %{original_text: string})
+        end
+
+        nil
       end
     end
   end
 
-  defp module_url(:ex_doc, module, config) do
+  defp app_module_url(:ex_doc, module, config) do
     ex_doc_app_url(module, config) <> inspect(module) <> config.ext
   end
 
-  defp module_url(:otp, module, _config) do
+  defp app_module_url(:otp, module, _config) do
     @otpdocs <> "#{module}.html"
   end
 
@@ -446,7 +463,7 @@ defmodule ExDoc.Autolink do
           if module == config.current_module do
             fragment(tool, kind, name, arity)
           else
-            module_url(tool, module, config) <> fragment(tool, kind, name, arity)
+            app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
           end
       end
     else
@@ -520,7 +537,7 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp warn(_ref, {file, line}, id, _visibility, %{message: message}) do
+  defp warn(message, {file, line}, id) do
     warning = IO.ANSI.format([:yellow, "warning: ", :reset])
 
     stacktrace =
@@ -531,18 +548,20 @@ defmodule ExDoc.Autolink do
     IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
   end
 
+  defp warn(ref, file_line, id, visibility, metadata)
+
   defp warn(
          {:module, _module},
          {file, line},
          id,
          visibility,
-         %{mix_task: true, original_text: original_text} = metadata
+         %{mix_task: true, original_text: original_text}
        ) do
     message =
-      "documentation references \"#{original_text}\" but such task is" <>
+      "documentation references \"#{original_text}\" but such task is " <>
         format_visibility(visibility, :module)
 
-    warn(message, {file, line}, id, visibility, Map.put(metadata, :message, message))
+    warn(message, {file, line}, id)
   end
 
   defp warn(
@@ -550,25 +569,25 @@ defmodule ExDoc.Autolink do
          {file, line},
          id,
          visibility,
-         %{original_text: original_text} = metadata
+         %{original_text: original_text}
        ) do
     message =
-      "documentation references module \"#{original_text}\" but it is" <>
+      "documentation references module \"#{original_text}\" but it is " <>
         format_visibility(visibility, :module)
 
-    warn(message, {file, line}, id, visibility, Map.put(metadata, :message, message))
+    warn(message, {file, line}, id)
   end
 
   defp warn(
          nil,
          {file, line},
          id,
-         visibility,
-         %{file_path: _file_path, original_text: original_text} = metadata
+         _visibility,
+         %{file_path: _file_path, original_text: original_text}
        ) do
     message = "documentation references file \"#{original_text}\" but it does not exist"
 
-    warn(message, {file, line}, id, visibility, Map.put(metadata, :message, message))
+    warn(message, {file, line}, id)
   end
 
   defp warn(
@@ -576,13 +595,13 @@ defmodule ExDoc.Autolink do
          {file, line},
          id,
          visibility,
-         %{original_text: original_text} = metadata
+         %{original_text: original_text}
        ) do
     message =
       "documentation references \"#{original_text}\" but it is " <>
         format_visibility(visibility, kind)
 
-    warn(message, {file, line}, id, visibility, Map.put(metadata, :message, message))
+    warn(message, {file, line}, id)
   end
 
   # there is not such a thing as private callback or private module
