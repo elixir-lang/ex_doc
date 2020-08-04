@@ -116,8 +116,8 @@ defmodule ExDoc.Autolink do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
         HTML.text_to_id(without_ext) <> config.ext <> fragment
       else
-        message = "documentation references file `#{uri.path}` but it doesn't exist"
-        warn(message, config.file, config.line, config.id)
+        maybe_warn(nil, config, nil, %{file_path: uri.path, original_text: href})
+
         nil
       end
     else
@@ -184,21 +184,21 @@ defmodule ExDoc.Autolink do
     timeout: 0
   ]
 
-  defp url("mix help " <> name, _mode, config), do: mix_task(name, config)
-  defp url("mix " <> name, _mode, config), do: mix_task(name, config)
+  defp url(string = "mix help " <> name, mode, config), do: mix_task(name, string, mode, config)
+  defp url(string = "mix " <> name, mode, config), do: mix_task(name, string, mode, config)
 
-  defp url(code, mode, config) do
-    case Regex.run(~r{^(.+)/(\d+)$}, code) do
+  defp url(string, mode, config) do
+    case Regex.run(~r{^(.+)/(\d+)$}, string) do
       [_, left, right] ->
         with {:ok, arity} <- parse_arity(right) do
           {kind, rest} = kind(left)
 
           case parse_module_function(rest) do
             {:local, function} ->
-              local_url(kind, function, arity, config)
+              local_url(kind, function, arity, config, string)
 
             {:remote, module, function} ->
-              remote_url(kind, module, function, arity, config)
+              remote_url(kind, module, function, arity, config, string)
 
             :error ->
               nil
@@ -209,9 +209,9 @@ defmodule ExDoc.Autolink do
         end
 
       nil ->
-        case parse_module(code, mode) do
+        case parse_module(string, mode) do
           {:module, module} ->
-            module_url(module, config)
+            module_url(module, mode, config, string)
 
           :error ->
             nil
@@ -301,11 +301,21 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp mix_task(name, config) do
-    if name =~ ~r/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/ do
-      parts = name |> String.split(".") |> Enum.map(&Macro.camelize/1)
-      module_url(Module.concat([Mix, Tasks | parts]), config)
+  defp mix_task(name, string, mode, config) do
+    {module, url, visibility} =
+      with true <- name =~ ~r/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/,
+           parts <- name |> String.split(".") |> Enum.map(&Macro.camelize/1),
+           module <- Module.concat([Mix, Tasks | parts]) do
+        {module, module_url(module, mode, config, string), Refs.get_visibility({:module, module})}
+      else
+        _ -> {nil, nil, :undefined}
+      end
+
+    if is_nil(url) and mode == :custom_link do
+      maybe_warn({:module, module}, config, visibility, %{mix_task: true, original_text: string})
     end
+
+    url
   end
 
   @doc """
@@ -352,9 +362,9 @@ defmodule ExDoc.Autolink do
 
       url =
         if module do
-          remote_url(:type, module, name, arity, config)
+          remote_url(:type, module, name, arity, config, string)
         else
-          local_url(:type, name, arity, config)
+          local_url(:type, name, arity, config, string)
         end
 
       if url do
@@ -389,50 +399,58 @@ defmodule ExDoc.Autolink do
 
   ## Internals
 
-  defp module_url(module, config) do
+  defp module_url(module, mode, config, string) do
     if module == config.current_module do
       "#content"
     else
       if Refs.public?({:module, module}) do
-        module_url(tool(module), module, config)
+        app_module_url(tool(module), module, config)
+      else
+        if mode == :custom_link do
+          ref = {:module, module}
+          maybe_warn(ref, config, Refs.get_visibility(ref), %{original_text: string})
+        end
+
+        nil
       end
     end
   end
 
-  defp module_url(:ex_doc, module, config) do
+  defp app_module_url(:ex_doc, module, config) do
     ex_doc_app_url(module, config) <> inspect(module) <> config.ext
   end
 
-  defp module_url(:otp, module, _config) do
+  defp app_module_url(:otp, module, _config) do
     @otpdocs <> "#{module}.html"
   end
 
-  defp local_url(:type, name, arity, config) when {name, arity} in @basic_types do
+  defp local_url(:type, name, arity, config, _original_text) when {name, arity} in @basic_types do
     ex_doc_app_url(Kernel, config) <> "typespecs" <> config.ext <> "#basic-types"
   end
 
-  defp local_url(:type, name, arity, config) when {name, arity} in @built_in_types do
+  defp local_url(:type, name, arity, config, _original_text)
+       when {name, arity} in @built_in_types do
     ex_doc_app_url(Kernel, config) <> "typespecs" <> config.ext <> "#built-in-types"
   end
 
-  defp local_url(kind, name, arity, config) do
+  defp local_url(kind, name, arity, config, original_text) do
     module = config.current_module
     ref = {kind, module, name, arity}
 
     cond do
       Refs.public?(ref) -> fragment(tool(module), kind, name, arity)
-      kind == :function -> try_autoimported_function(name, arity, config)
+      kind == :function -> try_autoimported_function(name, arity, config, original_text)
       true -> nil
     end
   end
 
-  defp try_autoimported_function(name, arity, config) do
+  defp try_autoimported_function(name, arity, config, original_text) do
     Enum.find_value(@autoimported_modules, fn module ->
-      remote_url(:function, module, name, arity, config, warn?: false)
+      remote_url(:function, module, name, arity, config, original_text, warn?: false)
     end)
   end
 
-  defp remote_url(kind, module, name, arity, config, opts \\ []) do
+  defp remote_url(kind, module, name, arity, config, original_text, opts \\ []) do
     warn? = Keyword.get(opts, :warn?, true)
     ref = {kind, module, name, arity}
 
@@ -445,12 +463,12 @@ defmodule ExDoc.Autolink do
           if module == config.current_module do
             fragment(tool, kind, name, arity)
           else
-            module_url(tool, module, config) <> fragment(tool, kind, name, arity)
+            app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
           end
       end
     else
       if warn? and Refs.public?({:module, module}) do
-        maybe_warn({kind, module, name, arity}, config)
+        maybe_warn(ref, config, Refs.get_visibility(ref), %{original_text: original_text})
       end
 
       nil
@@ -509,25 +527,17 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp maybe_warn({kind, module, name, arity}, config) do
+  defp maybe_warn(ref, config, visibility, metadata) do
     skipped = config.skip_undefined_reference_warnings_on
     file = Path.relative_to(config.file, File.cwd!())
     line = config.line
 
     unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
-      warn({kind, module, name, arity}, file, line, config.id)
+      warn(ref, {file, line}, config.id, visibility, metadata)
     end
   end
 
-  defp warn({kind, module, name, arity}, file, line, id) do
-    message =
-      "documentation references #{kind} #{inspect(module)}.#{name}/#{arity}" <>
-        " but it is undefined or private"
-
-    warn(message, file, line, id)
-  end
-
-  defp warn(message, file, line, id) do
+  defp warn(message, {file, line}, id) do
     warning = IO.ANSI.format([:yellow, "warning: ", :reset])
 
     stacktrace =
@@ -537,4 +547,71 @@ defmodule ExDoc.Autolink do
 
     IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
   end
+
+  defp warn(ref, file_line, id, visibility, metadata)
+
+  defp warn(
+         {:module, _module},
+         {file, line},
+         id,
+         visibility,
+         %{mix_task: true, original_text: original_text}
+       ) do
+    message =
+      "documentation references \"#{original_text}\" but such task is " <>
+        format_visibility(visibility, :module)
+
+    warn(message, {file, line}, id)
+  end
+
+  defp warn(
+         {:module, _module},
+         {file, line},
+         id,
+         visibility,
+         %{original_text: original_text}
+       ) do
+    message =
+      "documentation references module \"#{original_text}\" but it is " <>
+        format_visibility(visibility, :module)
+
+    warn(message, {file, line}, id)
+  end
+
+  defp warn(
+         nil,
+         {file, line},
+         id,
+         _visibility,
+         %{file_path: _file_path, original_text: original_text}
+       ) do
+    message = "documentation references file \"#{original_text}\" but it does not exist"
+
+    warn(message, {file, line}, id)
+  end
+
+  defp warn(
+         {kind, _module, _name, _arity},
+         {file, line},
+         id,
+         visibility,
+         %{original_text: original_text}
+       ) do
+    message =
+      "documentation references \"#{original_text}\" but it is " <>
+        format_visibility(visibility, kind)
+
+    warn(message, {file, line}, id)
+  end
+
+  # there is not such a thing as private callback or private module
+  defp format_visibility(visibility, kind) when kind in [:module, :callback], do: "#{visibility}"
+
+  # typep is defined as :hidden, since there is no :private visibility value
+  # but type defined with @doc false also is the stored the same way.
+  defp format_visibility(:hidden, :type), do: "hidden or private"
+
+  # for the rest, it can either be undefined or private
+  defp format_visibility(:undefined, _kind), do: "undefined or private"
+  defp format_visibility(visibility, _kind), do: "#{visibility}"
 end

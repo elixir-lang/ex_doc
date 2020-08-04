@@ -167,12 +167,6 @@ defmodule ExDoc.AutolinkTest do
 
       assert autolink(~m"[custom text](`:lists.all/2`)") ==
                ~m"[custom text](http://www.erlang.org/doc/man/lists.html#all-2)"
-
-      # TODO: with custom links and backticks there are no false positives (you
-      #       always mean to link) so we should always warn on mismatches?
-      #       Though backticks are markdown specific, is that ok?
-      # assert_warn(fn ->
-      assert_unchanged(~m"[custom text](`Unknown`)")
     end
 
     test "mix task" do
@@ -355,16 +349,30 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged("Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
       end)
 
-    assert captured =~ "documentation references function Foo.bar/1"
+    assert captured =~ "documentation references \"Foo.bar/1\" but it is hidden\n"
     assert captured =~ ~r{lib/foo.ex:1\n$}
 
     captured =
       assert_warn(fn ->
-        assert_unchanged("Foo.bar/1", file: "lib/foo.ex", id: "Foo.foo/0")
+        assert_unchanged("t:Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0")
       end)
 
-    assert captured =~ "documentation references function Foo.bar/1"
-    assert captured =~ ~r{lib/foo.ex: Foo.foo/0\n$}
+    assert captured =~ "documentation references \"t:Foo.bad/0\" but it is hidden or private\n"
+
+    captured =
+      assert_warn(fn ->
+        assert_unchanged("t:Elixir.Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0")
+      end)
+
+    assert captured =~
+             "documentation references \"t:Elixir.Foo.bad/0\" but it is hidden or private\n"
+
+    captured =
+      assert_warn(fn ->
+        assert_unchanged("t:Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0")
+      end)
+
+    assert captured =~ "documentation references \"t:Foo.bad/0\" but it is hidden or private\n"
 
     assert_warn(fn ->
       assert_unchanged("String.upcase/9")
@@ -394,10 +402,49 @@ defmodule ExDoc.AutolinkTest do
         assert_unchanged(~m"[Foo](Foo Bar.md)", opts)
       end)
 
-    assert captured =~ "documentation references file `Foo Bar.md` but it doesn't exist"
+    assert captured =~ "documentation references file \"Foo Bar.md\" but it does not exist"
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
+
+    captured =
+      assert_warn(fn ->
+        opts = [extras: []]
+        assert_unchanged(~m"[Bar A](`Bar.A`)", opts)
+      end)
+
+    assert captured =~ "\"Bar.A\" but it is undefined\n"
+
+    captured =
+      assert_warn(fn ->
+        opts = [extras: []]
+        assert_unchanged(~m"`Bar.A`", opts)
+      end)
+
+    assert captured == ""
+
+    captured =
+      assert_warn(fn ->
+        assert_unchanged(~m"[custom text](`Elixir.Unknown`)")
+      end)
+
+    assert captured =~ "documentation references module \"Elixir.Unknown\" but it is undefined\n"
+
+    captured =
+      assert_warn(fn ->
+        opts = [extras: []]
+        assert_unchanged(~m"[Foo task](`mix foo`)", opts)
+      end)
+
+    assert captured =~ "documentation references \"mix foo\" but such task is undefined\n"
+
+    captured =
+      assert_warn(fn ->
+        opts = [extras: []]
+        assert_unchanged(~m"`mix foo`", opts)
+      end)
+
+    assert captured == ""
   end
 
   ## Helpers
