@@ -409,16 +409,14 @@ defmodule ExDoc.AutolinkTest do
 
     captured =
       assert_warn(fn ->
-        opts = [extras: []]
-        assert_unchanged(~m"[Bar A](`Bar.A`)", opts)
+        assert_unchanged(~m"[Bar A](`Bar.A`)")
       end)
 
     assert captured =~ "\"Bar.A\" but it is undefined\n"
 
     captured =
       assert_warn(fn ->
-        opts = [extras: []]
-        assert_unchanged(~m"`Bar.A`", opts)
+        assert_unchanged(~m"`Bar.A`")
       end)
 
     assert captured == ""
@@ -432,19 +430,12 @@ defmodule ExDoc.AutolinkTest do
 
     captured =
       assert_warn(fn ->
-        opts = [extras: []]
-        assert_unchanged(~m"[Foo task](`mix foo`)", opts)
+        assert_unchanged(~m"[Foo task](`mix foo`)")
       end)
 
     assert captured =~ "documentation references \"mix foo\" but such task is undefined\n"
 
-    captured =
-      assert_warn(fn ->
-        opts = [extras: []]
-        assert_unchanged(~m"`mix foo`", opts)
-      end)
-
-    assert captured == ""
+    assert_unchanged(~m"`mix foo`")
   end
 
   ## Helpers
