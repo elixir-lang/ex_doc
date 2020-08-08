@@ -1,5 +1,5 @@
 defmodule ExDoc.RefsTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   alias ExDoc.Refs
 
   defmodule InMemory do
