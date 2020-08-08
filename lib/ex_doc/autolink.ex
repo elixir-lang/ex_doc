@@ -480,7 +480,9 @@ defmodule ExDoc.Autolink do
         nil
 
       _ ->
-        maybe_warn(ref, config, visibility, %{original_text: original_text})
+        unless kind == :type and name in [:required, :optional] and arity == 1 do
+          maybe_warn(ref, config, visibility, %{original_text: original_text})
+        end
 
         nil
     end
