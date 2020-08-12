@@ -10,6 +10,10 @@ defmodule ExDoc.RefsTest do
     def foo(), do: :ok
   end
 
+  setup do
+    ExDoc.Refs.clear()
+  end
+
   test "get_visibility/1" do
     assert Refs.get_visibility({:module, String}) == :public
     assert Refs.get_visibility({:module, String.Unicode}) == :hidden
