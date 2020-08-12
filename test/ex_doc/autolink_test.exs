@@ -27,7 +27,7 @@ defmodule ExDoc.AutolinkTest do
     end
 
     test "private module" do
-      assert_unchanged("String.Unicode")
+      assert_unchanged("Code.Typespec")
     end
 
     test "erlang module" do
