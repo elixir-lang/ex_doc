@@ -149,7 +149,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   defp sidebar_entries({group, docs}) do
-    nodes = Enum.map(docs, fn doc -> %{id: h(doc.id), anchor: URI.encode(HTML.link_id(doc))} end)
+    nodes = Enum.map(docs, fn doc -> %{id: doc.id, anchor: URI.encode(HTML.link_id(doc))} end)
     %{key: HTML.text_to_id(group), name: group, nodes: nodes}
   end
 
