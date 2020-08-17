@@ -8,12 +8,12 @@ To work on these assets you need to install [Node.js] (version 10) and
 
 ## `npm run` scripts
 
-The following scripts are available
+The following scripts are available from the root folder of the project.
 
 ### `build`
 
 ```bash
-$ npm run --prefix build
+$ npm run --prefix assets build
 ```
 
 This will build a complete production bundle, including JavaScript and CSS.
@@ -24,7 +24,7 @@ fresh docs with your changes.
 ### `lint`
 
 ```bash
-$ npm run --prefix lint
+$ npm run --prefix assets lint
 ```
 
 Lint all JavaScript files using [ESLint].
@@ -32,7 +32,7 @@ Lint all JavaScript files using [ESLint].
 ### `test`
 
 ```bash
-$ npm run --prefix test
+$ npm run --prefix assets test
 ```
 
 Run all the available JavaScript tests using [Karma].
