@@ -154,10 +154,11 @@ function highlight (match) {
   const EmOpen = '###EM_OPEN###'
   const EmClose = '###EM_CLOSE###'
 
-  let result = match.input
-  result = result.replace(match, EmOpen + match[0] + EmClose)
-  result = escapeHtmlEntities(result)
-  return result.replace(EmOpen, '<em>').replace(EmClose, '<\/em>')
+  let result = match.input.replace(match, EmOpen + match[0] + EmClose)
+
+  return escapeHtmlEntities(result)
+    .replace(EmOpen, '<em>')
+    .replace(EmClose, '<\/em>')
 }
 
 /**
