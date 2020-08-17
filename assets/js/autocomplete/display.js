@@ -4,7 +4,6 @@
 import $ from 'jquery'
 import autocompleteResultsTemplate from '../templates/autocomplete-suggestions.handlebars'
 import { getSuggestions } from './suggestions'
-import { escapeHtmlEntities } from '../helpers'
 
 // Constants
 // ---------
@@ -17,7 +16,7 @@ function updateSuggestions (term) {
   const template = autocompleteResultsTemplate({
     empty: results.length === 0,
     results: results,
-    term: escapeHtmlEntities(term)
+    term: term
   })
 
   autocompleteElement.html(template)
