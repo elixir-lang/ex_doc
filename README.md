@@ -132,7 +132,8 @@ The easiest way to test changes to ExDoc is to locally rebuild the app and its o
   1. Run `mix setup` to install all dependencies
   2. Run `mix build` to generate docs. This is a custom alias that will build assets, recompile ExDoc, and output fresh docs into the `doc/` directory
   3. If you want to contribute a pull request, please do not add to your commits the files generated in the `assets/` and `formatters/` folders
-  4. Run `mix lint` to format and lint all Elixir and JavaScript files before submitting your pull request
+  4. Run `mix lint.` to check if the Elixir and JavaScript files are properly formatted.
+     You can run `mix lint.fix` to let the JavaScript linter and Elixir formatter fix the code automatically before submitting your pull request
 
 ## License
 

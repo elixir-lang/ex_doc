@@ -29,6 +29,14 @@ $ npm run --prefix assets lint
 
 Lint all JavaScript files using [ESLint].
 
+### `lint:fix`
+
+```bash
+$ npm run --prefix lint:fix
+```
+
+Lint and automatically fix all JavaScript files using [ESLint].
+
 ### `test`
 
 ```bash
