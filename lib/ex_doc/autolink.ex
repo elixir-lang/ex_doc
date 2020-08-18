@@ -487,15 +487,29 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp fragment(:ex_doc, kind, name, arity) do
-    prefix =
-      case kind do
-        :function -> ""
-        :callback -> "c:"
-        :type -> "t:"
-      end
+  defp strip_elixir_namespace(module) when is_atom(module),
+    do: strip_elixir_namespace("#{module}")
 
-    "#" <> prefix <> "#{T.enc(Atom.to_string(name))}/#{arity}"
+  defp strip_elixir_namespace("Elixir." <> rest), do: rest
+  defp strip_elixir_namespace("c:Elixir." <> rest), do: "c:" <> rest
+  defp strip_elixir_namespace("t:Elixir." <> rest), do: "t:" <> rest
+  defp strip_elixir_namespace(rest) when is_binary(rest), do: rest
+
+  defp prefix(kind)
+  defp prefix(:function), do: ""
+  defp prefix(:callback), do: "c:"
+  defp prefix(:type), do: "t:"
+
+  defp ref_id({:module, module}) do
+    strip_elixir_namespace(module)
+  end
+
+  defp ref_id({kind, module, name, arity}) do
+    prefix(kind) <> "#{strip_elixir_namespace(module)}.#{name}/#{arity}"
+  end
+
+  defp fragment(:ex_doc, kind, name, arity) do
+    "#" <> prefix(kind) <> "#{T.enc(Atom.to_string(name))}/#{arity}"
   end
 
   defp fragment(:otp, kind, name, arity) do
