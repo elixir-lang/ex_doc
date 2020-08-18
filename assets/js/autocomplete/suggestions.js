@@ -3,7 +3,7 @@
 // Dependencies
 // ------------
 
-import * as helpers from '../helpers'
+import { escapeText, escapeHtmlEntities } from '../helpers'
 
 // Constants
 // ---------
@@ -102,7 +102,7 @@ function sort (items) {
  * @returns {Object[]} List of elements matching the provided term.
  */
 function findIn (elements, term, categoryName) {
-  const regExp = new RegExp(helpers.escapeText(term), 'i')
+  const regExp = new RegExp(escapeText(term), 'i')
 
   return elements.reduce(function (results, element) {
     const title = element.title
@@ -151,7 +151,14 @@ function findIn (elements, term, categoryName) {
  * @returns {string} Text with matching part highlighted with html <em> tag.
  */
 function highlight (match) {
-  return match.input.replace(match, `<em>${match[0]}</em>`)
+  const EmOpen = '###EM_OPEN###'
+  const EmClose = '###EM_CLOSE###'
+
+  let result = match.input.replace(match, EmOpen + match[0] + EmClose)
+
+  return escapeHtmlEntities(result)
+    .replace(EmOpen, '<em>')
+    .replace(EmClose, '<\/em>')
 }
 
 /**
@@ -165,7 +172,7 @@ function highlight (match) {
  * @returns {Object[]} List of elements matching the provided term.
  */
 function findMatchingChildren (elements, parentId, term, key) {
-  const regExp = new RegExp(helpers.escapeText(term), 'i')
+  const regExp = new RegExp(escapeText(term), 'i')
 
   return (elements || []).reduce((acc, element) => {
     if (acc[key + element.id]) { return acc }
@@ -183,7 +190,7 @@ function findMatchingChildren (elements, parentId, term, key) {
       // When match spans both module and function name (i.e. ">Map.fe<tch")
       // let's return just ">fe<tch" as the title. Module will already be displayed under the title.
       const lastSegment = term.split('.').pop()
-      const lastSegmentMatcher = new RegExp(helpers.escapeText(lastSegment), 'i')
+      const lastSegmentMatcher = new RegExp(escapeText(lastSegment), 'i')
       const lastSegmentMatch = element.id.match(lastSegmentMatcher)
       result.matchQuality = matchQuality(lastSegmentMatch)
       result.match = highlight(lastSegmentMatch)

@@ -9,6 +9,7 @@
 import $ from 'jquery'
 import lunr from 'lunr'
 import resultsTemplate from './templates/search-results.handlebars'
+import { escapeHtmlEntities } from './helpers'
 
 // Local Variables
 // ---------------
@@ -54,7 +55,7 @@ function getExcerpts (item, metadata) {
           (startPos > 0 ? '...' : '') +
           item.doc.slice(startPos, matchPos[0]) +
           '<em>' +
-          item.doc.slice(matchPos[0], matchPos[0] + matchPos[1]) +
+          escapeHtmlEntities(item.doc.slice(matchPos[0], matchPos[0] + matchPos[1])) +
           '</em> ' +
           item.doc.slice(matchPos[0] + matchPos[1], endPos) +
           (endPos < item.doc.length ? '...' : '')

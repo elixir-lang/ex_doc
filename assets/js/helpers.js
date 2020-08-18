@@ -12,6 +12,15 @@ export function escapeText (text) {
   return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
 }
 
+// Escape HTML entities
+export function escapeHtmlEntities (text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
 export function getModuleType () {
   return $('body').data('type')
 }
