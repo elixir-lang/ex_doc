@@ -25,13 +25,13 @@ defmodule Warnings.Submodule do
   @moduledoc """
   Refer to:
   - [this file](unknown.md)
-  - [this module](`UknownModule`)
+  - [this module](`UnknownModule`)
   - [this function](`CompiledWithDocs.function/0`)
   - [this callback](`c:CompiledWithDocs.callback/1`)
   - [this type](`t:CompiledWithDocs.type/2`)
 
   Refer to with Elixir namespace:
-  - [this module](`Elixir.UknownModule`)
+  - [this module](`Elixir.UnknownModule`)
   - [this function](`Elixir.CompiledWithDocs.function/0`)
   - [this callback](`c:Elixir.CompiledWithDocs.callback/1`)
   - [this type](`t:Elixir.CompiledWithDocs.type/2`)

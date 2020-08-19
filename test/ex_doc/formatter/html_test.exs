@@ -144,10 +144,10 @@ defmodule ExDoc.Formatter.HTMLTest do
         end)
 
       assert output =~ ~r{documentation references file \"unknown.md\" but it does not exist\n}
-      assert output =~ ~r{documentation references module \"UknownModule\" but it is undefined\n}
+      assert output =~ ~r{documentation references module \"UnknownModule\" but it is undefined\n}
 
       assert output =~
-               ~r{documentation references module \"Elixir.UknownModule\" but it is undefined\n}
+               ~r{documentation references module \"Elixir.UnknownModule\" but it is undefined\n}
 
       assert output =~
                ~r{documentation references \"CompiledWithDocs.function/0\" but it is undefined or private\n}
@@ -166,7 +166,7 @@ defmodule ExDoc.Formatter.HTMLTest do
             doc_config(
               skip_reference_warnings_to: [
                 "unknown.md",
-                "UknownModule",
+                "UnknownModule",
                 "CompiledWithDocs.function/0",
                 "c:CompiledWithDocs.callback/1",
                 "t:CompiledWithDocs.type/2"
@@ -186,7 +186,7 @@ defmodule ExDoc.Formatter.HTMLTest do
             doc_config(
               skip_reference_warnings_to: [
                 "unknown.md",
-                "Elixir.UknownModule",
+                "Elixir.UnknownModule",
                 "Elixir.CompiledWithDocs.function/0",
                 "c:Elixir.CompiledWithDocs.callback/1",
                 "t:Elixir.CompiledWithDocs.type/2"
