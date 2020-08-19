@@ -41,8 +41,8 @@ defmodule ExDoc.Mixfile do
     [
       build: ["cmd npm run --prefix assets build", "compile --force", "docs"],
       clean: [&clean_test_fixtures/1, "clean"],
+      fix: ["format", "cmd npm run --prefix assets lint:fix"],
       lint: ["format --check-formatted", "cmd npm run --prefix assets lint"],
-      "lint.fix": ["format", "cmd npm run --prefix assets lint:fix"],
       setup: ["deps.get", "cmd npm install --prefix assets"]
     ]
   end
