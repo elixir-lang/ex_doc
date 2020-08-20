@@ -175,7 +175,7 @@ defmodule Mix.Tasks.Docs do
         ...
 
         "guides/advanced/baz.md",
-        "guides/advanced/bat.md",
+        "guides/advanced/bat.md"
       ]
 
   You can have those grouped as follows:
@@ -188,7 +188,7 @@ defmodule Mix.Tasks.Docs do
   Or via a regex:
 
       groups_for_extras: [
-        "Introduction": ~r"/introduction/"
+        "Introduction": ~r"/introduction/",
         "Advanced": ~r"/advanced/"
       ]
 
@@ -196,7 +196,7 @@ defmodule Mix.Tasks.Docs do
 
       groups_for_modules: [
         "Data types": [Atom, Regex, URI],
-        "Collections": [Enum, MapSet, Stream],
+        "Collections": [Enum, MapSet, Stream]
       ]
 
   A regex or the string name of the module is also supported.
