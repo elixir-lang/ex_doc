@@ -328,6 +328,15 @@ defmodule ExDoc.RetrieverTest do
                 ]}
              ]
     end
+
+    test "lists implemented behaviours on implementation modules" do
+      [module_node] =
+        ["CustomBehaviourOne", "CustomBehaviourTwo", "CustomBehaviourImpl"]
+        |> docs_from_files()
+        |> Enum.filter(&match?(%ExDoc.ModuleNode{id: "CustomBehaviourImpl"}, &1))
+
+      assert module_node.behaviours == [CustomBehaviourOne, CustomBehaviourTwo]
+    end
   end
 
   ## PROTOCOLS

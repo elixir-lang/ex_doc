@@ -125,6 +125,12 @@ defmodule ExDoc.Retriever do
     end
   end
 
+  defp behaviours(module) do
+    module.module_info(:attributes)
+    |> Keyword.get_values(:behaviour)
+    |> List.flatten()
+  end
+
   defp do_generate_node(module, module_data, config) do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
@@ -138,6 +144,7 @@ defmodule ExDoc.Retriever do
     types = get_types(module_data, source)
     {title, id} = module_title_and_id(module_data)
     {nested_title, nested_context} = nesting_info(title, config.nest_modules_by_prefix)
+    behaviours = behaviours(module)
 
     node = %ExDoc.ModuleNode{
       id: id,
@@ -145,6 +152,7 @@ defmodule ExDoc.Retriever do
       nested_title: nested_title,
       nested_context: nested_context,
       module: module,
+      behaviours: behaviours,
       type: module_data.type,
       deprecated: metadata[:deprecated],
       function_groups: function_groups,
