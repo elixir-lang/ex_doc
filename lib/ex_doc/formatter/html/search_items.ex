@@ -11,8 +11,8 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     ["searchNodes=" | SimpleJSON.encode(items)]
   end
 
-  @h2_split_regex ~r/<h2.*?>/
-  @header_body_regex ~r/(?<header>.*)<\/h2>(?<body>.*)/s
+  @h2_split_regex ~r/<h2\b.*?>/
+  @header_body_regex ~r/(?<header>.+)<\/h2>(?<body>.*)/s
   defp extra(%{id: id, title: title, content: content}) do
     [intro | sections] = Regex.split(@h2_split_regex, content)
     intro_json_item = encode("#{id}.html", title, :extras, intro)

@@ -358,7 +358,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~s("extras":[{"group":"","headers":[],"id":"api-reference","title":"API Reference"},)
 
       assert content =~
-               ~s({"group":"","headers":[{"anchor":"header-sample","id":"Header sample"},{"anchor":"more-than","id":"more &gt; than"}],"id":"readme","title":"README"})
+               ~s({"group":"","headers":[{"anchor":"heading-without-content","id":"Heading without content"},{"anchor":"header-sample","id":"Header sample"},{"anchor":"more-than","id":"more &gt; than"}],"id":"readme","title":"README"})
     end
 
     test "containing settext headers while discarding links on header" do
