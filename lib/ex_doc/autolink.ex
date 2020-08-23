@@ -355,7 +355,7 @@ defmodule ExDoc.Autolink do
 
   defp do_typespec(string, config) do
     regex =
-      ~r/((?:((?:\:[a-z][_a-zA-Z0-9]*)|(?:[A-Z][_a-zA-Z0-9]*(?:\.[A-Z][_a-zA-Z0-9]*)*))\.)?(\w+!?))(\(.*\))/
+      ~r/((?:((?:\:[a-z][_a-zA-Z0-9]*)|(?:[A-Z][_a-zA-Z0-9]*(?:\.[A-Z][_a-zA-Z0-9]*)*))\.)?([a-z_][_a-zA-Z0-9]*[\?\!]?))(\(.*\))/
 
     Regex.replace(regex, string, fn _all, call_string, module_string, name_string, rest ->
       module = string_to_module(module_string)

@@ -253,6 +253,7 @@ defmodule ExDoc.AutolinkTest do
         {{:module, MyModule}, :public},
         {{:type, MyModule, :foo, 1}, :public},
         {{:type, MyModule, :foo, 2}, :public},
+        {{:type, MyModule, :foo?, 1}, :public},
         {{:type, MyModule, :foo!, 1}, :public}
       ])
 
@@ -273,6 +274,9 @@ defmodule ExDoc.AutolinkTest do
 
       assert typespec(quote(do: t() :: foo!(bar()))) ==
                ~s[t() :: <a href="#t:foo!/1">foo!</a>(bar())]
+
+      assert typespec(quote(do: t() :: foo?(bar()))) ==
+               ~s[t() :: <a href="#t:foo?/1">foo?</a>(bar())]
     end
 
     test "remotes" do
