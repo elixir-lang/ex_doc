@@ -18,16 +18,8 @@ h1 {
     margin: 0;
   }
 
-  &.section-heading {
-    margin: 1.5em 0 .5em;
-  }
-
   & small {
     font-weight: 300;
-  }
-
-  a.view-source {
-    font-size: 1.2rem;
   }
 }
 
@@ -52,8 +44,9 @@ a.no-underline {
 }
 
 a.view-source {
+  display: inline-block;
   float: right;
-  color: @mediumGray;
+  color: #727272;
   text-decoration: none;
   border: none;
   transition: color 0.3s ease-in-out;
@@ -65,9 +58,9 @@ a.view-source {
 }
 
 .note {
-  color: #959595;
+  color: #727272;
   margin-right: 5px;
-  font-size: 14px;
+  font-size: 0.875em;
   font-weight: normal;
 }
 
@@ -113,10 +106,30 @@ td, th {
   vertical-align: top;
 }
 
+.main-header {
+  margin-top: 2em;
+
+  h1 {
+    display: inline;
+
+    & ~ a.view-source {
+      font-size: 1.2rem;
+      line-height: 3rem;
+    }
+  }
+}
+
 .section-heading {
+  margin: 3em 0 1em;
+
   &:hover a.hover-link {
     opacity: 1;
     text-decoration: none;
+  }
+
+  h1 {
+    display: inline-block;
+    margin: 0;
   }
 
   a.hover-link {

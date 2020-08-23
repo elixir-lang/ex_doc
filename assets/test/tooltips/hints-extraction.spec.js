@@ -4,21 +4,28 @@ import $ from 'jquery'
 describe('hints extraction', () => {
   describe('extractModuleHint', () => {
     var modulePageObject = $($.parseHTML(`
-      <div>
-        <h1>
-          <small class="app-vsn">ex_doc v0.0.1</small>
-          Some module
+      <div id="content" class="content-inner">
+        <div class="main-header">
+          <h1>
+            Some module
+            <small class="app-vsn">(ExDoc v0.0.1)</small>
+          </h1>
+
           <a href="https://github.com/" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
             <span class="sr-only">View Source</span>
           </a>
-        </h1>
+        </div>
+
         <section id="moduledoc">
           <p>
             Module <strong>description</strong> here
           </p>
         </section>
-        <section id="summary">List of functions with summaries</section>
+
+        <section id="summary" class="details-list">
+          List of functions with summaries
+        </section>
       </div>
     `))
 

@@ -1,7 +1,8 @@
-<h1>
-  <small class="app-vsn"><%= config.project %> v<%= config.version %></small>
-  API Reference
-</h1>
+<div>
+  <h1 style="display: inline">
+    API Reference <small class="app-vsn"><%= config.project %> v<%= config.version %></small>
+  </h1>
+</div>
 
 <%= if nodes_map.modules != [] do %>
   <section class="details-list">
