@@ -4,6 +4,8 @@
 `t:atom/0`
 `mix compile.elixir`
 
+## Heading without content
+
 ## `Header` sample
 
 hello
@@ -11,4 +13,3 @@ hello
 ## more > than
 
 world
-
