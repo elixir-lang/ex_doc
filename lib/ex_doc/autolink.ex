@@ -354,8 +354,24 @@ defmodule ExDoc.Autolink do
   end
 
   defp do_typespec(string, config) do
-    regex =
-      ~r/((?:((?:\:[a-z][_a-zA-Z0-9]*)|(?:[A-Z][_a-zA-Z0-9]*(?:\.[A-Z][_a-zA-Z0-9]*)*))\.)?([a-z_][_a-zA-Z0-9]*[\?\!]?))(\(.*\))/
+    regex = ~r{
+        (                                             # <call_string>
+          (?:
+            (                                         # <module_string>
+              (?:
+                \:[a-z][_a-zA-Z0-9]*                  # Erlang module
+              )|
+              (?:
+                [A-Z][_a-zA-Z0-9]*                    # Elixir module
+                (?:\.[A-Z][_a-zA-Z0-9]*)*             # Elixir submodule
+              )
+            )                                         # </module_string>
+            \.                                        # Dot operator
+          )?
+          ([a-z_][_a-zA-Z0-9]*[\?\!]?)                # Name <name_string />
+        )                                             # </call_string>
+        (\(.*\))                                      # Arguments <rest />
+      }x
 
     Regex.replace(regex, string, fn _all, call_string, module_string, name_string, rest ->
       module = string_to_module(module_string)
