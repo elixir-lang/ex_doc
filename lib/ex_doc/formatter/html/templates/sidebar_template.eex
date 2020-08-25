@@ -28,9 +28,9 @@
       <a href="<%= url %>" class="sidebar-projectName">
         <%= config.project %>
       </a>
-      <h2 class="sidebar-projectVersion">
+      <strong class="sidebar-projectVersion">
         v<%= config.version %>
-      </h2>
+      </strong>
     </div>
     <%= if config.logo do %>
       <a href="<%= url %>">

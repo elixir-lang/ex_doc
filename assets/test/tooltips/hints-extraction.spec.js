@@ -6,8 +6,8 @@ describe('hints extraction', () => {
     var modulePageObject = $($.parseHTML(`
       <div>
         <h1>
-          <small class="app-vsn">ex_doc v0.0.1</small>
-          Some module
+          Some module <small class="app-vsn">(ExDoc v0.0.1)</small>
+
           <a href="https://github.com/" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
             <span class="sr-only">View Source</span>
