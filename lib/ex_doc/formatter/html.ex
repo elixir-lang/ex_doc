@@ -48,7 +48,7 @@ defmodule ExDoc.Formatter.HTML do
         generate_list(nodes_map.modules, nodes_map, config) ++
         generate_list(nodes_map.tasks, nodes_map, config) ++ generate_index(config)
 
-    generate_build(all_files, build)
+    generate_build(Enum.sort(all_files), build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
   end
 
