@@ -94,7 +94,7 @@ defmodule Mix.Tasks.Docs do
 
     * `:javascript_config_path` - Path of an additional JavaScript file to be included on all pages
       to provide up-to-date data for features like the version dropdown - See the "Additional
-      JavaScript config" section. Example: `"../versions.js"`
+      JavaScript config" section. Example: `"../docs_config.js"`. Defaults to `nil`.
 
     * `:nest_modules_by_prefix` - See the "Nesting" section
 

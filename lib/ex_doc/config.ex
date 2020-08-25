@@ -27,7 +27,7 @@ defmodule ExDoc.Config do
             groups_for_modules: [],
             groups_for_functions: [],
             homepage_url: nil,
-            javascript_config_path: "docs_config.js",
+            javascript_config_path: nil,
             language: "en",
             proglang: :elixir,
             logo: nil,
