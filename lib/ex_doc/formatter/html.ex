@@ -22,7 +22,10 @@ defmodule ExDoc.Formatter.HTML do
     extras = build_extras(config, ".html")
 
     # Generate search early on without api reference in extras
-    static_files = generate_assets(config, @assets_dir, default_assets(config))
+    static_files =
+      generate_assets(config, @assets_dir, default_assets(config)) ++
+        generate_robots_txt(config)
+
     search_items = generate_search_items(project_nodes, extras, config)
 
     nodes_map = %{
@@ -386,6 +389,22 @@ defmodule ExDoc.Formatter.HTML do
       :opaque -> "t:#{id}"
       _ -> "#{id}"
     end
+  end
+
+  @doc """
+  Generates the robots.txt file from config into the given directory.
+  """
+  def generate_robots_txt(%{output: output}) do
+    target = Path.join(output, "robots.txt")
+
+    contents = ~S"""
+    User-agent: *
+    Disallow: .build
+    Disallow: dist/
+    """
+
+    File.write!(target, contents)
+    ["robots.txt"]
   end
 
   @doc """

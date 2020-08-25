@@ -274,6 +274,14 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
   end
 
+  describe "generates robots.txt" do
+    test "writes robots.txt" do
+      generate_docs(doc_config())
+      assert File.read!("#{output_dir()}/robots.txt") =~ "Disallow: .build\n"
+      assert File.read!("#{output_dir()}/robots.txt") =~ "Disallow: dist/\n"
+    end
+  end
+
   describe "canonical URL" do
     test "is included when canonical options is specified" do
       config =
