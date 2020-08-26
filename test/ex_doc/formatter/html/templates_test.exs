@@ -170,7 +170,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~
                ~r{<div class="sidebar-header">\s*<div class="sidebar-projectDetails">\s*<a href="#{
                  homepage_url()
-               }" class="sidebar-projectName">\s*Elixir\s*</a>\s*<h2 class="sidebar-projectVersion">\s*v1.0.1\s*</h2>\s*</div>\s*</div>}
+               }" class="sidebar-projectName">\s*Elixir\s*</a>\s*<strong class="sidebar-projectVersion">\s*v1.0.1\s*</strong>\s*</div>\s*</div>}
     end
 
     test "text links to main when there is no homepage_url" do
@@ -184,7 +184,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = Templates.sidebar_template(config, @empty_nodes_map)
 
       assert content =~
-               ~r{<div class="sidebar-header">\s*<div class="sidebar-projectDetails">\s*<a href="hello.html" class="sidebar-projectName">\s*Elixir\s*</a>\s*<h2 class="sidebar-projectVersion">\s*v1.0.1\s*</h2>\s*</div>\s*</div>}
+               ~r{<div class="sidebar-header">\s*<div class="sidebar-projectDetails">\s*<a href="hello.html" class="sidebar-projectName">\s*Elixir\s*</a>\s*<strong class="sidebar-projectVersion">\s*v1.0.1\s*</strong>\s*</div>\s*</div>}
     end
 
     test "enables nav link when module type have at least one element" do
@@ -308,7 +308,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
 
       assert content =~
-               ~r{<h1>\s*<small class="app-vsn">Elixir v1.0.1</small>\s*CompiledWithDocs\s*}
+               ~r{<h1>\s*CompiledWithDocs <small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
 
       refute content =~ ~r{<small>module</small>}
 
@@ -429,7 +429,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomBehaviourOne])
 
       assert content =~
-               ~r{<h1>\s*<small class="app-vsn">Elixir v1.0.1</small>\s*CustomBehaviourOne\s*<small>behaviour</small>}m
+               ~r{<h1>\s*CustomBehaviourOne\s*<small>behaviour</small>\s*<small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
 
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:hello/1">}
@@ -439,7 +439,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomBehaviourTwo])
 
       assert content =~
-               ~r{<h1>\s*<small class="app-vsn">Elixir v1.0.1</small>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*}m
+               ~r{<h1>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*<small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
 
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:bye/1">}
@@ -451,7 +451,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomProtocol])
 
       assert content =~
-               ~r{<h1>\s*<small class="app-vsn">Elixir v1.0.1</small>\s*CustomProtocol\s*<small>protocol</small>\s*}m
+               ~r{<h1>\s*CustomProtocol\s*<small>protocol</small>\s*<small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
     end
 
     ## TASKS
@@ -460,7 +460,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([Mix.Tasks.TaskWithDocs])
 
       assert content =~
-               ~r{<h1>\s*<small class="app-vsn">Elixir v1.0.1</small>\s*mix task_with_docs\s*}m
+               ~r{<h1>\s*mix task_with_docs\s*<small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
     end
   end
 end
