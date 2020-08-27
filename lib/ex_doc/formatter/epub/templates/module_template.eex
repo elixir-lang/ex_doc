@@ -17,26 +17,28 @@
 
     <%= if Enum.any?(summary, fn {_, v} -> v != [] end) do %>
       <section id="summary" class="details-list">
-        <h1 class="section-heading">
+        <div class="section-heading">
           <a class="hover-link" href="#summary">
             <span class="icon-link" aria-hidden="true"></span>
             <span class="sr-only">Anchor for this section</span>
           </a>
-          Summary
-        </h1>
+
+          <h1>Summary</h1>
+        </div>
         <%= for {name, nodes} <- summary, do: H.summary_template(name, nodes) %>
       </section>
     <% end %>
 
     <%= for {name, nodes} <- summary, nodes != [], key = HTML.text_to_id(name) do %>
       <section id="<%= key %>" class="details-list">
-        <h1 class="section-heading">
+        <div class="section-heading">
           <a class="hover-link" href="#<%= key %>">
             <span class="icon-link" aria-hidden="true"></span>
             <span class="sr-only">Anchor for this section</span>
           </a>
-          <%= name %>
-        </h1>
+
+          <h1><%= name %></h1>
+        </div>
         <div class="<%= key %>-list">
           <%= for node <- nodes, do: H.detail_template(node, module) %>
         </div>
