@@ -6,9 +6,8 @@
           <%= module_title(module) %> <small class="app-vsn">(<%= config.project %> v<%= config.version %>)</small>
         </h1>
         <%= if module.source_url do %>
-          <a href="<%= module.source_url %>" title="View Source" class="view-source" rel="help">
+          <a href="<%= module.source_url %>" title="View source" aria-label="View source of <%= module_title(module) %>" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
-            <span class="sr-only">View Source</span>
           </a>
         <% end %>
       </div>
@@ -28,9 +27,8 @@
       <%= if Enum.any?(summary, fn {_, v} -> v != [] end) do %>
         <section id="summary" class="details-list">
           <div class="section-heading">
-            <a class="hover-link" href="#summary">
+            <a class="hover-link" href="#summary" title="Link to this section" aria-label="Link to Summary">
               <span class="icon-link" aria-hidden="true"></span>
-              <span class="sr-only">Link to this section</span>
             </a>
             <h1>
               Summary
@@ -43,9 +41,8 @@
       <%= for {name, nodes} <- summary, nodes != [], key = HTML.text_to_id(name) do %>
         <section id="<%= key %>" class="details-list">
           <div class="section-heading">
-            <a class="hover-link" href="#<%= key %>">
+            <a class="hover-link" href="#<%= key %>" title="Link to this section" aria-label="Link to <%= name %>">
               <span class="icon-link" aria-hidden="true"></span>
-              <span class="sr-only">Link to this section</span>
             </a>
 
             <h1>
