@@ -15,7 +15,7 @@ defmodule ExDoc.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env()),
       source_url: "https://github.com/elixir-lang/ex_doc/",
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test],
+      preferred_cli_env: [coveralls: :test, "test.all": :test],
       description: "ExDoc is a documentation generation tool for Elixir",
       docs: docs()
     ]
@@ -43,7 +43,17 @@ defmodule ExDoc.Mixfile do
       clean: [&clean_test_fixtures/1, "clean"],
       fix: ["format", "cmd npm run --prefix assets lint:fix"],
       lint: ["format --check-formatted", "cmd npm run --prefix assets lint"],
-      setup: ["deps.get", "cmd npm install --prefix assets"]
+      setup: ["deps.get", "cmd npm install --prefix assets"],
+      "test.js": ["cmd npm run --prefix assets test"],
+      "test.all": [
+        "lint",
+        "test",
+        "test.js",
+        "docs",
+        &generated_docs_exists?/1,
+        "cmd test/prerelease.sh",
+        fn _ -> IO.puts("All tests have been succesfully executed.") end
+      ]
     ]
   end
 
@@ -105,5 +115,18 @@ defmodule ExDoc.Mixfile do
 
   defp clean_test_fixtures(_args) do
     File.rm_rf("test/tmp")
+  end
+
+  defp generated_docs_exists?(_args) do
+    file_exists!("doc/index.html")
+    file_exists!("doc/ex_doc.epub")
+  end
+
+  defp file_exists!(path) do
+    if File.exists?(path) do
+      IO.puts("#{path} exists.")
+    else
+      raise("File #{path} could not be found.")
+    end
   end
 end

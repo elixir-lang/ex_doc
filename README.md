@@ -134,6 +134,7 @@ The easiest way to test changes to ExDoc is to locally rebuild the app and its o
   3. If you want to contribute a pull request, please do not add to your commits the files generated in the `assets/` and `formatters/` folders
   4. Run `mix lint.` to check if the Elixir and JavaScript files are properly formatted.
      You can run `mix fix` to let the JavaScript linter and Elixir formatter fix the code automatically before submitting your pull request
+  5. You can make sure all Elixir tests pass by running `mix test`, and  all JavaScript tests by running `mix test.js`. If you want to make sure all the test in the continuous integration will pass, you can locally run `mix test.all` before submitting your PR, which includes lint checking, tests and building of docs.
 
 ## License
 
