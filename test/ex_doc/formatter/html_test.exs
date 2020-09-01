@@ -485,4 +485,48 @@ defmodule ExDoc.Formatter.HTMLTest do
   after
     File.rm_rf!("test/tmp/html_assets")
   end
+
+  describe "javascript_config_path option" do
+    test "generates empty file, adds entry in .build" do
+      generate_docs(doc_config())
+
+      assert File.read!("#{output_dir()}/docs_config.js") == ""
+
+      {:ok, build} = File.read("#{output_dir()}/.build")
+      assert "docs_config.js" in String.split(build)
+    end
+
+    test "file is out of output folder, so it does not create it, and it does not list it in .build" do
+      generate_docs(doc_config(javascript_config_path: "../docs_config.js"))
+
+      assert {:error, :enoent} == File.read("#{output_dir()}/docs_config.js")
+      assert {:error, :enoent} == File.read(Path.expand("#{output_dir()}/../docs_config.js"))
+
+      {:ok, build} = File.read("#{output_dir()}/.build")
+      refute "../docs_config.js" in String.split(build)
+    end
+
+    test "does not overwrite existing file, and it does not list it in .build" do
+      File.write!("#{output_dir()}/.build", "")
+      File.write!("#{output_dir()}/versions.js", "foo")
+      generate_docs(doc_config(javascript_config_path: "versions.js"))
+
+      {:ok, "foo"} = File.read("#{output_dir()}/versions.js")
+      assert {:error, :enoent} == File.read("#{output_dir()}/docs_config.js")
+
+      {:ok, build} = File.read("#{output_dir()}/.build")
+      refute "versions.js" in String.split(build)
+    end
+
+    test "javascript_config_path is nil" do
+      generate_docs(doc_config(javascript_config_path: nil))
+
+      assert {:error, :enoent} == File.read("#{output_dir()}/nil")
+      assert {:error, :enoent} == File.read("#{output_dir()}/docs_config.js")
+
+      {:ok, build} = File.read("#{output_dir()}/.build")
+      refute "nil" in String.split(build)
+      refute "docs_config.js" in String.split(build)
+    end
+  end
 end

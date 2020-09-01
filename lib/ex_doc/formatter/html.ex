@@ -22,7 +22,10 @@ defmodule ExDoc.Formatter.HTML do
     extras = build_extras(config, ".html")
 
     # Generate search early on without api reference in extras
-    static_files = generate_assets(config, @assets_dir, default_assets(config))
+    static_files =
+      generate_assets(config, @assets_dir, default_assets(config)) ++
+        generate_javascript_config(config)
+
     search_items = generate_search_items(project_nodes, extras, config)
 
     nodes_map = %{
@@ -386,6 +389,30 @@ defmodule ExDoc.Formatter.HTML do
       :opaque -> "t:#{id}"
       _ -> "#{id}"
     end
+  end
+
+  defp generate_javascript_config(%{javascript_config_path: nil}) do
+    []
+  end
+
+  defp generate_javascript_config(%{
+         javascript_config_path: javascript_config_path,
+         output: output
+       }) when is_binary(javascript_config_path) do
+    target_absolute = Path.expand(javascript_config_path, output)
+    target_relative = Path.relative_to(target_absolute, output)
+
+    if inside_path?(target_absolute, Path.expand(output)) and File.exists?(target_absolute) == false do
+      File.write!(target_absolute, "")
+      [target_relative]
+    else
+      []
+    end
+  end
+
+  defp inside_path?(path, from) do
+    relative = Path.relative_to(path, from)
+    String.length(relative) < String.length(path)
   end
 
   @doc """
