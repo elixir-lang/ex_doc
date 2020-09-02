@@ -1,7 +1,7 @@
 defmodule ExDoc.Formatter.HTML.Assets do
   @moduledoc false
 
-  defmacrop embed_pattern(pattern) do
+  defp embed_pattern(pattern) do
     ["formatters/html", pattern]
     |> Path.join()
     |> Path.wildcard()

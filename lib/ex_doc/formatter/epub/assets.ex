@@ -1,7 +1,7 @@
 defmodule ExDoc.Formatter.EPUB.Assets do
   @moduledoc false
 
-  defmacrop embed_pattern(pattern) do
+  defp embed_pattern(pattern) do
     ["formatters/epub", pattern]
     |> Path.join()
     |> Path.wildcard()
