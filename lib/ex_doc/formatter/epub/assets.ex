@@ -5,7 +5,10 @@ defmodule ExDoc.Formatter.EPUB.Assets do
     ["formatters/epub", pattern]
     |> Path.join()
     |> Path.wildcard()
-    |> Enum.map(&{Path.basename(&1), File.read!(&1)})
+    |> Enum.map(fn path ->
+      Module.put_attribute(__CALLER__.module, :external_resource, path)
+      {Path.basename(path), File.read!(path)}
+    end)
   end
 
   def dist(proglang), do: dist_js() ++ dist_css(proglang)
@@ -14,7 +17,5 @@ defmodule ExDoc.Formatter.EPUB.Assets do
   defp dist_css(:elixir), do: embed_pattern("dist/elixir-*.css")
   defp dist_css(:erlang), do: embed_pattern("dist/erlang-*.css")
 
-  def metainfo do
-    embed_pattern("metainfo/*")
-  end
+  def metainfo, do: embed_pattern("metainfo/*")
 end
