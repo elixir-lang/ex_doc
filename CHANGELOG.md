@@ -2,6 +2,12 @@
 
 ## HEAD (unreleased)
 
+## v0.22.4 (2020-09-12)
+
+  * Enhancements
+    * Improve accessibility and add aria labels
+    * Show different title and message for a empty search value
+
 ## v0.22.3 (2020-07-25)
 
   * Bug fixes

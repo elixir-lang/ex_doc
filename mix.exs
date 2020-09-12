@@ -1,7 +1,7 @@
 defmodule ExDoc.Mixfile do
   use Mix.Project
 
-  @version "0.22.3"
+  @version "0.22.4"
 
   def project do
     [
@@ -55,7 +55,8 @@ defmodule ExDoc.Mixfile do
         "Eksperimental",
         "Milton Mazzarri",
         "Friedel Ziegelmayer",
-        "Dmitry"
+        "Dmitry",
+        "Wojtek Mach"
       ],
       files: ["formatters", "lib", "mix.exs", "LICENSE", "CHANGELOG.md", "README.md"],
       links: %{
