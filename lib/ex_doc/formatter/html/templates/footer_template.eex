@@ -11,6 +11,9 @@
           </span>
         </p>
         <p>
+          <%= if config.api_reference do %>
+            <a href="api-reference.html" title="API reference" class="line footer-button">API Reference</a>
+          <% end %>
           <button class="line footer-button display-shortcuts-help">
             Display keyboard shortcuts
           </button>
