@@ -36,8 +36,9 @@
         {{else}}
           {{#showSections node}}
             <li class="docs {{#isLocal node.id}}open{{/isLocal}}">
-              <a href="#" class="expand">
+              <a href="{{node.id}}.html#content" class="expand">
                 Sections
+                <span class="icon-goto" title="Go to Sections"></span>
               </a>
               <ul class="sections-list deflist">
                 {{#each sections}}
