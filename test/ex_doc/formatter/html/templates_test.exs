@@ -46,103 +46,81 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   describe "link_headings" do
     test "generates headers with hovers" do
       assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """
-             <div class="section-heading">
+             <h2 id="foo" class="section-heading">
                <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-               <h2 id="foo">
-                 Foo
-               </h2>
-             </div>
-             <div class="section-heading">
+               Foo
+             </h2>
+             <h2 id="bar" class="section-heading">
                <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-               <h2 id="bar">
-                 Bar
-               </h2>
-             </div>
+               Bar
+             </h2>
              """
 
       assert Templates.link_headings("<h2>Foo</h2>\n<h2>Bar</h2>") == """
-             <div class="section-heading">
+             <h2 id="foo" class="section-heading">
                <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-               <h2 id="foo">
-                 Foo
-               </h2>
-             </div>
+               Foo
+             </h2>
 
-             <div class="section-heading">
+             <h2 id="bar" class="section-heading">
                <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-               <h2 id="bar">
-                 Bar
-               </h2>
-             </div>
+               Bar
+             </h2>
              """
 
       assert Templates.link_headings("<h2></h2><h2>Bar</h2>") == """
-             <h2></h2><div class="section-heading">
+             <h2></h2><h2 id="bar" class="section-heading">
                <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-               <h2 id="bar">
-                 Bar
-               </h2>
-             </div>
+               Bar
+             </h2>
              """
 
       assert Templates.link_headings("<h2></h2>\n<h2>Bar</h2>") == """
              <h2></h2>
-             <div class="section-heading">
+             <h2 id="bar" class="section-heading">
                <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-               <h2 id="bar">
-                 Bar
-               </h2>
-             </div>
+               Bar
+             </h2>
              """
 
       assert Templates.link_headings("<h2>Foo</h2><h2></h2>") ==
                String.trim_trailing("""
-               <div class="section-heading">
+               <h2 id="foo" class="section-heading">
                  <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-                 <h2 id="foo">
-                   Foo
-                 </h2>
-               </div>
+                 Foo
+               </h2>
                <h2></h2>
                """)
 
       assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") ==
                String.trim_trailing("""
-               <div class="section-heading">
+               <h2 id="foo" class="section-heading">
                  <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-                 <h2 id="foo">
-                   Foo
-                 </h2>
-               </div>
+                 Foo
+               </h2>
 
                <h2></h2>
                """)
 
       assert Templates.link_headings("<h3>Foo</h3>") == """
-             <div class="section-heading">
+             <h3 id="foo" class="section-heading">
                <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-               <h3 id="foo">
-                 Foo
-               </h3>
-             </div>
+               Foo
+             </h3>
              """
     end
 
     test "generates headers with unique id's" do
       assert Templates.link_headings("<h3>Foo</h3>\n<h3>Foo</h3>") == """
-             <div class="section-heading">
+             <h3 id="foo" class="section-heading">
                <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-               <h3 id="foo">
-                 Foo
-               </h3>
-             </div>
+               Foo
+             </h3>
 
-             <div class="section-heading">
+             <h3 id="foo-1" class="section-heading">
                <a href="#foo-1" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-               <h3 id="foo-1">
-                 Foo
-               </h3>
-             </div>
+               Foo
+             </h3>
              """
     end
   end
@@ -338,10 +316,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{moduledoc.*Example.*<span class="nc">CompiledWithDocs</span><span class="o">\.</span><span class="n">example</span>.*}ms
 
       assert content =~
-               ~r{<div class="section-heading">\s*<a href="#module-example-unicode-escaping" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>\s*<h2 id="module-example-unicode-escaping">\s*Example[^<]+</h2>\s*</div>}ms
+               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms
 
       assert content =~
-               ~r{<div class="section-heading">\s*<a href="#module-example-h3-heading" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span></a>\s*<h3 id="module-example-h3-heading">\s*Example H3 heading[^<]+</h3>\s*</div>}ms
+               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example H3 heading.*</h3>}ms
 
       # Summaries
       assert content =~ ~r{example/2.*Some example}ms
@@ -426,7 +404,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CompiledWithDocs])
 
       assert content =~
-               ~r{<div class="section-heading">\s*<a href="#example_with_h3/0-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>\s*<h3 id="example_with_h3/0-examples">\s*Examples[^<]+</h3>\s*</div>}ms
+               ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
     end
 
     test "do not output overlapping functions, causing duplicate IDs" do

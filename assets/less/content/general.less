@@ -8,28 +8,38 @@ h6 {
   font-weight: 700;
   line-height: 1.5em;
   word-wrap: break-word;
-  margin: 1em 0 .5em;
 }
 
 h1 {
   font-size: 2em;
+  margin: 1em 0 .5em;
 
   &.signature {
     margin: 0;
   }
 
+  &.section-heading {
+    margin: 1.5em 0 .5em;
+  }
+
   & small {
     font-weight: 300;
+  }
+
+  a.view-source {
+    font-size: 1.2rem;
   }
 }
 
 h2 {
   font-size: 1.6em;
+  margin: 1em 0 .5em;
   font-weight: 700;
 }
 
 h3 {
   font-size: 1.375em;
+  margin: 1em 0 .5em;
   font-weight: 700;
 }
 
@@ -42,7 +52,6 @@ a.no-underline {
 }
 
 a.view-source {
-  display: inline-block;
   float: right;
   color: #727272;
   text-decoration: none;
@@ -58,7 +67,7 @@ a.view-source {
 .note {
   color: #727272;
   margin-right: 5px;
-  font-size: 0.875em;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -105,8 +114,6 @@ td, th {
 }
 
 .section-heading {
-  margin-bottom: inherit;
-
   &:hover a.hover-link {
     opacity: 1;
     text-decoration: none;
@@ -124,24 +131,9 @@ td, th {
     font-size: 16px;
     vertical-align: middle;
   }
-
-  h1, h2, h3,
-  h4, h5, h6 {
-    display: inline-block;
-  }
-
-  h1 {
-    display: inline-block;
-
-    ~ a.view-source {
-      font-size: 1.2rem;
-      margin-top: 3rem;
-    }
-  }
 }
 
-
-.detail .section-heading h2 {
+.detail h2.section-heading {
   margin-left: 0.3em;
 }
 
