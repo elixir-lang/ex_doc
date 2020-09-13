@@ -1,6 +1,9 @@
 # Changelog
 
-## HEAD (unreleased)
+## v0.22.5 (2020-09-13)
+
+  * Bug fix
+    * Fix CSS bug on headings
 
 ## v0.22.4 (2020-09-12)
 
