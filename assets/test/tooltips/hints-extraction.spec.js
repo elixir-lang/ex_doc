@@ -7,11 +7,12 @@ describe('hints extraction', () => {
       <div id="content" class="content-inner">
         <div class="section-headeing">
           <h1>
-            SomeModule <small class="app-vsn">(ExDoc v0.0.1)</small>
+            Some module <small class="app-vsn">(ExDoc v0.0.1)</small>
           </h1>
 
-          <a href="https://github.com/" title="View source" aria-label="View source of SomeModule" class="view-source" rel="help">
+          <a href="https://github.com/" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
+            <span class="sr-only">View Source</span>
           </a>
         </div>
 
@@ -28,7 +29,7 @@ describe('hints extraction', () => {
     `))
 
     it('extracts hint info', () => {
-      expect(extractModuleHint(modulePageObject).title).to.eql('SomeModule')
+      expect(extractModuleHint(modulePageObject).title).to.eql('Some module')
       expect(extractModuleHint(modulePageObject).description).to.eql('Module description here')
       expect(extractModuleHint(modulePageObject).kind).to.eql('module')
     })

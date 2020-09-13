@@ -1,6 +1,6 @@
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#<%=enc HTML.link_id(node) %>" data-title="Go to <%= h node.id %>" aria-label="Go to <%= pretty_type(node) %> <%= h node.id %>"><%=h node.signature %></a>
+    <a href="#<%=enc HTML.link_id(node) %>"><%=h node.signature %></a>
     <%= if deprecated = node.deprecated do %>
       <span class="deprecated" title="<%= h(deprecated) %>">deprecated</span>
     <% end %>

@@ -307,10 +307,10 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r{<title>README [^<]*</title>}
 
       assert content =~
-               ~r{<div class="section-heading">\s*<a href="#header-sample" class="hover-link" title="Link to this section" aria-label="Link to Header sample"><span class="icon-link" aria-hidden="true"></span></a>\s*<h2 id="header-sample">\s*<code(\sclass="inline")?>Header</code> sample\s*</h2>\s*</div>}ms
+               ~r{<div class="section-heading">\s*<a href="#header-sample" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>\s*<h2 id="header-sample">\s*<code(\sclass="inline")?>Header</code> sample\s*</h2>\s*</div>}ms
 
       assert content =~
-               ~r{<div class="section-heading">\s*<a href="#more-than" class="hover-link" title="Link to this section" aria-label="Link to more &gt; than"><span class="icon-link" aria-hidden="true"></span></a>\s*<h2 id="more-than">\s*more &gt; than\s*</h2>\s*</div>}ms
+               ~r{<div class="section-heading">\s*<a href="#more-than" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>\s*<h2 id="more-than">\s*more &gt; than\s*</h2>\s*</div>}ms
 
       assert content =~ ~r{<a href="RandomError.html"><code(\sclass="inline")?>RandomError</code>}
 
