@@ -1,5 +1,5 @@
 defmodule ExDoc.AutolinkTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest ExDoc.Autolink
   import ExUnit.CaptureIO
 
