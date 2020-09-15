@@ -41,26 +41,34 @@ defmodule ExDoc.AutolinkTest do
 
     test "project-local module" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, :public}
+        {{:module, AutolinkTest.Foo}, :public}
       ])
 
-      assert autolink("Foo") == ~m"[`Foo`](Foo.html)"
+      assert autolink("AutolinkTest.Foo") == ~m"[`AutolinkTest.Foo`](AutolinkTest.Foo.html)"
       assert autolink("String", app: :elixir) == ~m"[`String`](String.html)"
-      assert autolink("Foo", current_module: Foo) == ~m"[`Foo`](#content)"
+
+      assert autolink("AutolinkTest.Foo", current_module: AutolinkTest.Foo) ==
+               ~m"[`AutolinkTest.Foo`](#content)"
     end
 
     test "remote function" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, :public},
-        {{:function, Foo, :foo, 1}, :public},
-        {{:function, Foo, :., 2}, :public},
-        {{:function, Foo, :.., 2}, :public}
+        {{:module, AutolinkTest.Foo}, :public},
+        {{:function, AutolinkTest.Foo, :foo, 1}, :public},
+        {{:function, AutolinkTest.Foo, :., 2}, :public},
+        {{:function, AutolinkTest.Foo, :.., 2}, :public}
       ])
 
-      assert autolink("Foo.foo/1") == ~m"[`Foo.foo/1`](Foo.html#foo/1)"
-      assert autolink("Foo../2") == ~m"[`Foo../2`](Foo.html#./2)"
-      assert autolink("Foo.../2") == ~m"[`Foo.../2`](Foo.html#../2)"
-      assert_unchanged("Bad.bar/1")
+      assert autolink("AutolinkTest.Foo.foo/1") ==
+               ~m"[`AutolinkTest.Foo.foo/1`](AutolinkTest.Foo.html#foo/1)"
+
+      assert autolink("AutolinkTest.Foo../2") ==
+               ~m"[`AutolinkTest.Foo../2`](AutolinkTest.Foo.html#./2)"
+
+      assert autolink("AutolinkTest.Foo.../2") ==
+               ~m"[`AutolinkTest.Foo.../2`](AutolinkTest.Foo.html#../2)"
+
+      assert_unchanged("AutolinkTest.Bad.bar/1")
     end
 
     test "elixir stdlib function" do
@@ -80,16 +88,16 @@ defmodule ExDoc.AutolinkTest do
 
     test "local function" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, :public},
-        {{:function, Foo, :foo, 1}, :public},
-        {{:function, Foo, :., 2}, :public},
-        {{:function, Foo, :.., 2}, :public}
+        {{:module, AutolinkTest.Foo}, :public},
+        {{:function, AutolinkTest.Foo, :foo, 1}, :public},
+        {{:function, AutolinkTest.Foo, :., 2}, :public},
+        {{:function, AutolinkTest.Foo, :.., 2}, :public}
       ])
 
-      assert autolink("foo/1", current_module: Foo) == ~m"[`foo/1`](#foo/1)"
-      assert autolink("./2", current_module: Foo) == ~m"[`./2`](#./2)"
-      assert autolink("../2", current_module: Foo) == ~m"[`../2`](#../2)"
-      assert_unchanged("bar/1", current_module: Foo)
+      assert autolink("foo/1", current_module: AutolinkTest.Foo) == ~m"[`foo/1`](#foo/1)"
+      assert autolink("./2", current_module: AutolinkTest.Foo) == ~m"[`./2`](#./2)"
+      assert autolink("../2", current_module: AutolinkTest.Foo) == ~m"[`../2`](#../2)"
+      assert_unchanged("bar/1", current_module: AutolinkTest.Foo)
     end
 
     test "sibling function" do
@@ -281,12 +289,12 @@ defmodule ExDoc.AutolinkTest do
 
     test "remotes" do
       ExDoc.Refs.insert([
-        {{:module, Foo}, :public},
-        {{:type, Foo, :t, 0}, :public}
+        {{:module, AutolinkTest.Foo}, :public},
+        {{:type, AutolinkTest.Foo, :t, 0}, :public}
       ])
 
-      assert typespec(quote(do: t() :: Foo.t())) ==
-               ~s[t() :: <a href="Foo.html#t:t/0">Foo.t</a>()]
+      assert typespec(quote(do: t() :: AutolinkTest.Foo.t())) ==
+               ~s[t() :: <a href="AutolinkTest.Foo.html#t:t/0">AutolinkTest.Foo.t</a>()]
     end
 
     test "autolinks same type and function name" do
@@ -343,23 +351,26 @@ defmodule ExDoc.AutolinkTest do
 
   test "warnings" do
     ExDoc.Refs.insert([
-      {{:module, Foo}, :public},
-      {{:function, Foo, :bar, 1}, :hidden},
-      {{:type, Foo, :bad, 0}, :hidden}
+      {{:module, AutolinkTest.Foo}, :public},
+      {{:function, AutolinkTest.Foo, :bar, 1}, :hidden},
+      {{:type, AutolinkTest.Foo, :bad, 0}, :hidden}
     ])
 
-    captured = warn("Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
-    assert captured =~ "documentation references \"Foo.bar/1\" but it is hidden\n"
+    captured = warn("AutolinkTest.Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
+    assert captured =~ "documentation references \"AutolinkTest.Foo.bar/1\" but it is hidden\n"
     assert captured =~ ~r{lib/foo.ex:1\n$}
 
-    assert warn("t:Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0") =~
-             "documentation references \"t:Foo.bad/0\" but it is hidden or private\n"
+    assert warn("t:AutolinkTest.Foo.bad/0", file: "lib/foo.ex", id: "AutolinkTest.Foo.foo/0") =~
+             "documentation references \"t:AutolinkTest.Foo.bad/0\" but it is hidden or private\n"
 
-    assert warn("t:Elixir.Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0") =~
-             "documentation references \"t:Elixir.Foo.bad/0\" but it is hidden or private\n"
+    assert warn("t:Elixir.AutolinkTest.Foo.bad/0",
+             file: "lib/foo.ex",
+             id: "AutolinkTest.Foo.foo/0"
+           ) =~
+             "documentation references \"t:Elixir.AutolinkTest.Foo.bad/0\" but it is hidden or private\n"
 
-    assert warn("t:Foo.bad/0", file: "lib/foo.ex", id: "Foo.foo/0") =~
-             "documentation references \"t:Foo.bad/0\" but it is hidden or private\n"
+    assert warn("t:AutolinkTest.Foo.bad/0", file: "lib/foo.ex", id: "AutolinkTest.Foo.foo/0") =~
+             "documentation references \"t:AutolinkTest.Foo.bad/0\" but it is hidden or private\n"
 
     warn("String.upcase/9", [])
 
@@ -368,8 +379,8 @@ defmodule ExDoc.AutolinkTest do
     warn("t:Calendar.date/9", [])
 
     warn(fn ->
-      assert typespec(quote(do: t() :: Foo.bad())) ==
-               ~s[t() :: Foo.bad()]
+      assert typespec(quote(do: t() :: AutolinkTest.Foo.bad())) ==
+               ~s[t() :: AutolinkTest.Foo.bad()]
     end)
 
     warn(fn ->
