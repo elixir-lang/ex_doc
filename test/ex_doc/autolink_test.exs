@@ -171,23 +171,14 @@ defmodule ExDoc.AutolinkTest do
       assert autolink(~m"[custom text](`String`)") ==
                ~m"[custom text](https://hexdocs.pm/elixir/String.html)"
 
+      assert autolink(~m"[custom text](`String.at/2`)") ==
+               ~m"[custom text](https://hexdocs.pm/elixir/String.html#at/2)"
+
       assert autolink(~m"[custom text](`:lists`)") ==
                ~m"[custom text](http://www.erlang.org/doc/man/lists.html)"
 
       assert autolink(~m"[custom text](`:lists.all/2`)") ==
                ~m"[custom text](http://www.erlang.org/doc/man/lists.html#all-2)"
-
-      assert warn(~m"[custom text](`Unknown`)") =~
-               "documentation references module \"Unknown\" but it is undefined"
-
-      assert warn(~m"[custom text](Unknown)") =~
-               "documentation references file \"Unknown\" but it does not exist"
-
-      assert warn(~m"[custom text](`LICENSE`)", extras: ["LICENSE"]) =~
-               "documentation references module \"LICENSE\" but it is undefined"
-
-      assert warn(~m"[an unknown task](`mix unknown.task`)") =~
-               "documentation references \"mix unknown.task\" but it is undefined"
     end
 
     test "mix task" do
@@ -425,9 +416,6 @@ defmodule ExDoc.AutolinkTest do
 
     assert_unchanged(~m"`Bar.A`")
 
-    assert warn(~m"[custom text](`Elixir.Unknown`)", []) =~
-             "documentation references module \"Elixir.Unknown\" but it is undefined\n"
-
     assert warn(~m"[Foo task](`mix foo`)", []) =~
              "documentation references \"mix foo\" but it is undefined\n"
 
@@ -435,6 +423,9 @@ defmodule ExDoc.AutolinkTest do
 
     assert warn(~m"[bad](`String.upcase/9`)", extras: []) =~
              "documentation references \"String.upcase/9\" but it is undefined or private"
+
+    assert warn(~m"[custom text](`Elixir.Unknown`)", []) =~
+             "documentation references module \"Elixir.Unknown\" but it is undefined\n"
 
     assert warn(~m"[Unknown](`Unknown`)") =~
              "documentation references module \"Unknown\" but it is undefined"
