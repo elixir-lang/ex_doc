@@ -26,11 +26,6 @@ defmodule ExDoc.AutolinkTest do
                ~m"[`IEx.Helpers`](https://hexdocs.pm/iex/IEx.Helpers.html)"
     end
 
-    test "hidden module" do
-      assert warn("Code.Typespec") =~
-               "documentation references module \"Code.Typespec\" but it is hidden"
-    end
-
     test "erlang module" do
       assert_unchanged(":array")
     end
@@ -389,6 +384,9 @@ defmodule ExDoc.AutolinkTest do
 
     assert warn("t:AutolinkTest.Foo.bad/0", file: "lib/foo.ex", id: "AutolinkTest.Foo.foo/0") =~
              "documentation references \"t:AutolinkTest.Foo.bad/0\" but it is hidden or private\n"
+
+    assert warn("Code.Typespec") =~
+             "documentation references module \"Code.Typespec\" but it is hidden"
 
     warn("String.upcase/9")
 
