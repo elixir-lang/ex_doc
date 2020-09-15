@@ -29,8 +29,6 @@ defmodule ExDoc.AutolinkTest do
     test "hidden module" do
       assert warn("Code.Typespec") =~
                "documentation references module \"Code.Typespec\" but it is hidden"
-
-      assert_unchanged("String.Unicode")
     end
 
     test "erlang module" do
@@ -182,8 +180,6 @@ defmodule ExDoc.AutolinkTest do
       assert warn(~m"[custom text](`Unknown`)") =~
                "documentation references module \"Unknown\" but it is undefined"
 
-      assert_unchanged(~m"[custom text](`Unknown`)")
-
       assert warn(~m"[custom text](Unknown)") =~
                "documentation references file \"Unknown\" but it does not exist"
 
@@ -192,8 +188,6 @@ defmodule ExDoc.AutolinkTest do
 
       assert warn(~m"[an unknown task](`mix unknown.task`)") =~
                "documentation references \"mix unknown.task\" but it is undefined"
-
-      assert_unchanged(~m"[an unknown task](`mix unknown.task`)")
     end
 
     test "mix task" do
@@ -457,11 +451,7 @@ defmodule ExDoc.AutolinkTest do
   end
 
   defp assert_unchanged(ast_or_text, options \\ []) do
-    fun = fn ->
-      assert autolink(ast_or_text, options) == ast(ast_or_text)
-    end
-
-    capture_io(:stderr, fun)
+    assert autolink(ast_or_text, options) == ast(ast_or_text)
   end
 
   defp ast(text) when is_binary(text), do: {:code, [class: "inline"], [text]}
