@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.22.6 (2020-09-16)
+
+  * Bug fix
+    * Properly fix CSS bug on headings
+    * Add expansion arrow to sections on sidebar
+
 ## v0.22.5 (2020-09-13)
 
   * Bug fix
