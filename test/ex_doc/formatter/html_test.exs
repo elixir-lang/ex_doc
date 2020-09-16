@@ -141,7 +141,6 @@ defmodule ExDoc.Formatter.HTMLTest do
       },
       index: %{
         title: ~r{<title>Elixir v1.0.1 — Documentation</title>},
-        index: ~r{<meta name="robots" content="noindex"},
         refresh: ~r{<meta http-equiv="refresh" content="0; url=RandomError.html">}
       },
       module: %{
@@ -154,7 +153,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content_index =~ re[:shared][:charset]
     assert content_index =~ re[:shared][:generator]
     assert content_index =~ re[:index][:title]
-    assert content_index =~ re[:index][:index]
     assert content_index =~ re[:index][:refresh]
     refute content_index =~ re[:module][:title]
     refute content_index =~ re[:module][:viewport]
@@ -166,7 +164,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content_module =~ re[:module][:viewport]
     assert content_module =~ re[:module][:x_ua]
     refute content_module =~ re[:index][:title]
-    refute content_module =~ re[:index][:index]
     refute content_module =~ re[:index][:refresh]
   end
 
