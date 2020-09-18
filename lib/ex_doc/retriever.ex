@@ -88,6 +88,7 @@ defmodule ExDoc.Retriever do
     Refs.insert_from_chunk(module, result)
 
     case result do
+      # TODO: Once we require Elixir v1.12, we only keep modules that have map contents
       {:docs_v1, _, _, _, :hidden, _, _} ->
         false
 
@@ -164,12 +165,14 @@ defmodule ExDoc.Retriever do
     {first in ?a..?z, name, arity}
   end
 
-  defp doc_ast(_, :none, _options), do: nil
-  defp doc_ast(_, :hidden, _options), do: nil
-  defp doc_ast("text/markdown", %{"en" => doc}, options), do: Markdown.to_ast(doc, options)
+  defp doc_ast("text/markdown", %{"en" => doc}, options),
+    do: Markdown.to_ast(doc, options)
 
   defp doc_ast(other, %{"en" => _}, _),
     do: raise("content type #{inspect(other)} is not supported")
+
+  defp doc_ast(_, _, _options),
+    do: nil
 
   # Module Helpers
 
@@ -247,23 +250,25 @@ defmodule ExDoc.Retriever do
   end
 
   # Skip impl_for and impl_for! for protocols
-  defp doc?({{_, name, _}, _, _, :none, _}, :protocol) when name in [:impl_for, :impl_for!] do
+  defp doc?({{_, name, _}, _, _, _, _}, :protocol) when name in [:impl_for, :impl_for!] do
     false
   end
 
-  # Skip docs explicitly marked as hidden
-  defp doc?({_, _, _, :hidden, _}, _) do
-    false
+  # If content is a map, then it is ok.
+  defp doc?({_, _, _, %{}, _}, _) do
+    true
   end
 
-  # Skip default docs if starting with _
+  # We keep this clause with backwards compatibility with Elixir,
+  # from v1.12+, functions not starting with _ always default to %{}.
+  # TODO: Remove me once we require Elixir v1.12.
   defp doc?({{_, name, _}, _, _, :none, _}, _type) do
     hd(Atom.to_charlist(name)) != ?_
   end
 
-  # Everything else is ok
-  defp doc?(_, _) do
-    true
+  # Everything else is hidden.
+  defp doc?({_, _, _, _, _}, _) do
+    false
   end
 
   defp get_function(function, source, module_data, groups_for_functions) do
@@ -275,7 +280,6 @@ defmodule ExDoc.Retriever do
 
     line = find_function_line(module_data, actual_def) || doc_line
     impl = Map.fetch(module_data.impls, actual_def)
-    doc = docstring(doc, name, arity, impl)
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
     specs =
@@ -303,8 +307,9 @@ defmodule ExDoc.Retriever do
       end)
 
     doc_ast =
-      (doc && doc_ast(content_type, %{"en" => doc}, file: source.path, line: doc_line + 1)) ||
-        delegate_doc(metadata[:delegate_to])
+      (doc && doc_ast(content_type, doc, file: source.path, line: doc_line + 1)) ||
+        callback_doc_ast(name, arity, impl) ||
+        delegate_doc_ast(metadata[:delegate_to])
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -324,16 +329,24 @@ defmodule ExDoc.Retriever do
     }
   end
 
-  defp delegate_doc(nil), do: nil
+  defp delegate_doc_ast({m, f, a}),
+    do: [{:p, [], ["See ", {:code, [class: "inline"], [Exception.format_mfa(m, f, a)]}, "."]}]
 
-  defp delegate_doc({m, f, a}),
-    do: [{:p, [], ["See ", {:code, [], [Exception.format_mfa(m, f, a)]}, "."]}]
+  defp delegate_doc_ast(nil),
+    do: nil
 
-  defp docstring(:none, name, arity, {:ok, behaviour}) do
-    "Callback implementation for `c:#{inspect(behaviour)}.#{name}/#{arity}`."
-  end
+  defp callback_doc_ast(name, arity, {:ok, behaviour}),
+    do: [
+      {:p, [],
+       [
+         "Callback implementation for ",
+         {:code, [class: "inline"], ["c:#{inspect(behaviour)}.#{name}/#{arity}"]},
+         "."
+       ]}
+    ]
 
-  defp docstring(doc, _, _, _), do: docstring(doc)
+  defp callback_doc_ast(_, _, _),
+    do: nil
 
   defp get_defaults(_name, _arity, 0), do: []
 
@@ -434,6 +447,7 @@ defmodule ExDoc.Retriever do
   defp get_types(module_data, source) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
+    # TODO: When we require Elixir v1.12, we only keep contents that are maps
     for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
       get_type(doc, source, module_data)
     end
@@ -458,7 +472,6 @@ defmodule ExDoc.Retriever do
     line = anno_line(anno) || doc_line
 
     annotations = if type == :opaque, do: ["opaque" | annotations], else: annotations
-
     doc_ast = doc_ast(content_type, doc, file: source.path)
 
     %ExDoc.TypeNode{
@@ -559,9 +572,6 @@ defmodule ExDoc.Retriever do
       _ -> nil
     end)
   end
-
-  defp docstring(%{"en" => doc}), do: doc
-  defp docstring(_), do: nil
 
   defp anno_line(line) when is_integer(line), do: abs(line)
   defp anno_line(anno), do: anno |> :erl_anno.line() |> abs()

@@ -143,7 +143,7 @@ defmodule ExDoc.RetrieverTest do
 
       if Version.match?(System.version(), ">= 1.8.0") do
         assert flatten.doc == [
-                 {:p, [], ["See ", {:code, [], ["List.flatten/1"]}, "."]}
+                 {:p, [], ["See ", {:code, [class: "inline"], ["List.flatten/1"]}, "."]}
                ]
       end
 
