@@ -34,6 +34,7 @@ defmodule ExDoc.Autolink do
     :file,
     :line,
     extras: [],
+    deps: [],
     ext: ".html",
     siblings: [],
     skip_undefined_reference_warnings_on: []
@@ -497,9 +498,18 @@ defmodule ExDoc.Autolink do
     app = config.app
 
     case :application.get_application(module) do
-      {:ok, ^app} -> ""
-      {:ok, app} -> if app in config.siblings, do: "", else: @hexdocs <> "#{app}/"
-      _ -> ""
+      {:ok, ^app} ->
+        ""
+
+      {:ok, app} ->
+        if app in config.siblings do
+          ""
+        else
+          Keyword.get_lazy(config.deps, app, fn -> @hexdocs <> "#{app}/" end)
+        end
+
+      _ ->
+        ""
     end
   end
 

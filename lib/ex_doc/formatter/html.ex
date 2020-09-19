@@ -289,7 +289,8 @@ defmodule ExDoc.Formatter.HTML do
       file: input,
       ext: ext,
       extras: extra_paths(config),
-      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
+      deps: config.deps
     ]
 
     opts = [file: input, line: 1]
