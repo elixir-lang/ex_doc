@@ -86,7 +86,9 @@ defmodule Mix.Tasks.Docs do
       `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing"]]`
 
     * `:filter_prefix` - Include only modules that match the given prefix in
-      the generated documentation. Example: "MyApp.Core"
+      the generated documentation. Example: "MyApp.Core". If you set this option,
+      remember to also set the `:main` option to a module that will be included
+      , for example `main: "MyApp.Core.Inner"`.
 
     * `:formatters` - Formatter to use; default: ["html", "epub"], options: "html", "epub".
 
