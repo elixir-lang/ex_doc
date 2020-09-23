@@ -438,7 +438,7 @@ defmodule Mix.Tasks.Docs do
       for {app, doc} <- Keyword.merge(get_deps(), user_deps),
           lib_dir = :code.lib_dir(app),
           is_list(lib_dir),
-          do: {List.to_string(lib_dir), doc}
+          do: {app, doc}
 
     Keyword.put(options, :deps, deps)
   end
