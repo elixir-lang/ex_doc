@@ -76,7 +76,8 @@ defmodule ExDoc.Formatter.HTML do
         skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
         module_id: node.id,
         file: node.source_path,
-        line: node.doc_line
+        line: node.doc_line,
+        deps: config.deps
       ]
 
       docs =
