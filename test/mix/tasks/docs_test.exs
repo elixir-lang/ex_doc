@@ -81,9 +81,8 @@ defmodule Mix.Tasks.DocsTest do
              {"ex_doc", "dev", [formatter: "epub", deps: deps, source_beam: _, app: _]}
            ] = run([], app: :ex_doc, docs: [])
 
-    assert List.keyfind(deps, Application.app_dir(:earmark_parser), 0) ==
-             {Application.app_dir(:earmark_parser),
-              "https://hexdocs.pm/earmark_parser/#{Application.spec(:earmark_parser, :vsn)}/"}
+    assert List.keyfind(deps, :earmark_parser, 0) ==
+             {:earmark_parser, "https://hexdocs.pm/earmark_parser/#{Application.spec(:earmark_parser, :vsn)}/"}
   end
 
   test "allows custom dependency paths" do
@@ -92,8 +91,8 @@ defmodule Mix.Tasks.DocsTest do
              {"ex_doc", "dev", [formatter: "epub", deps: deps, source_beam: _, app: _]}
            ] = run([], app: :ex_doc, docs: [deps: [earmark_parser: "foo"]])
 
-    assert List.keyfind(deps, Application.app_dir(:earmark_parser), 0) ==
-             {Application.app_dir(:earmark_parser), "foo"}
+    assert List.keyfind(deps, :earmark_parser, 0) ==
+             {:earmark_parser, "foo"}
   end
 
   test "accepts lazy docs" do
