@@ -479,11 +479,12 @@ defmodule ExDoc.Autolink do
       {:type, :hidden} ->
         nil
 
-      _ ->
-        unless kind == :type and name in [:required, :optional] and arity == 1 do
-          maybe_warn(ref, config, visibility, %{original_text: original_text})
-        end
+      # skip `@type %{required(...), optional(...), ...}`
+      {:type, _visibility} when name in [:required, :optional] and arity == 1 ->
+        nil
 
+      _ ->
+        maybe_warn(ref, config, visibility, %{original_text: original_text})
         nil
     end
   end
@@ -506,7 +507,7 @@ defmodule ExDoc.Autolink do
             nil
 
           tool ->
-            if module == config.current_module do
+            if same_module? do
               fragment(tool, kind, name, arity)
             else
               app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)

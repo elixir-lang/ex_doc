@@ -123,7 +123,7 @@ defmodule ExDoc.Refs do
         if Code.ensure_loaded?(module) do
           (to_refs(exports(module), module, :function) ++
              to_refs(callbacks(module), module, :callback) ++
-             to_refs(types(module), module, :type) ++
+             to_refs(types(module, [:type, :opaque]), module, :type) ++
              to_refs(types(module, [:typep]), module, :type, :hidden))
           |> Enum.concat([{{:module, module}, :public}])
         else
@@ -155,7 +155,7 @@ defmodule ExDoc.Refs do
     end
   end
 
-  defp types(module, kind_list \\ [:type, :opaque]) do
+  defp types(module, kind_list) do
     case Code.Typespec.fetch_types(module) do
       {:ok, list} ->
         for {kind, {name, _, args}} <- list,
