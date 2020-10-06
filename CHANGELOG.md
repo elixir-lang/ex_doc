@@ -1,5 +1,9 @@
 # Changelog
 
+## HEAD
+
+Require Elixir v1.10.
+
 ## v0.22.6 (2020-09-16)
 
   * Bug fix
