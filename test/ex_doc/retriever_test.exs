@@ -179,7 +179,7 @@ defmodule ExDoc.RetrieverTest do
 
     test "returns the specs for each non-private function" do
       [module_node] = docs_from_files(["TypesAndSpecs"])
-      [add, _, _] = module_node.docs
+      [add, _, _, _] = module_node.docs
 
       assert add.id == "add/2"
       assert add.doc == nil
