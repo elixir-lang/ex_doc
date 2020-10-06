@@ -188,7 +188,6 @@ defmodule ExDoc.Autolink do
     timeout: 0
   ]
 
-  defp url("", _mode, _config), do: nil
   defp url(string = "mix help " <> name, mode, config), do: mix_task(name, string, mode, config)
   defp url(string = "mix " <> name, mode, config), do: mix_task(name, string, mode, config)
 
