@@ -189,12 +189,17 @@ defmodule ExDoc.RetrieverTest do
 
     test "returns the specs for non-private macros" do
       [module_node] = docs_from_files(["TypesAndSpecs"])
-      [_, _, macro] = module_node.docs
+      [_, _, macro1, macro2] = module_node.docs
 
-      assert macro.id == "macro_spec/1"
-      assert macro.doc == nil
-      assert macro.type == :macro
-      assert Macro.to_string(macro.specs) == "[macro_spec(any()) :: {:ok, any()}]"
+      assert macro1.id == "macro_spec/1"
+      assert macro1.doc == nil
+      assert macro1.type == :macro
+      assert Macro.to_string(macro1.specs) == "[macro_spec(any()) :: {:ok, any()}]"
+
+      assert macro2.id == "macro_with_spec/1"
+      assert macro2.doc == nil
+      assert macro2.type == :macro
+      assert Macro.to_string(macro2.specs) == "[macro_with_spec(v) :: {:ok, v} when v: any()]"
     end
 
     test "returns the spec info for each non-private module type" do

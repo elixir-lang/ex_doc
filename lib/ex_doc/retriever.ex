@@ -559,6 +559,10 @@ defmodule ExDoc.Retriever do
     {:"::", info, [{name, info2, rest_args}, return]}
   end
 
+  defp remove_first_macro_arg({:when, meta, [lhs, rhs]}) do
+    {:when, meta, [remove_first_macro_arg(lhs), rhs]}
+  end
+
   defp find_module_line(%{abst_code: abst_code, name: name}) do
     Enum.find_value(abst_code, fn
       {:attribute, anno, :module, ^name} -> anno_line(anno)
