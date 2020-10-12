@@ -1,7 +1,7 @@
 defmodule ExDoc.Autolink do
   @moduledoc false
 
-  # * `:app` - the app that the docs are being generated for. When linking modules they are
+  # * `:apps` - the app that the docs are being generated for. When linking modules they are
   #   checked if they are part of the app and based on that the links are relative or absolute.
   #
   # * `:current_module` - the module that the docs are being generated for. Used to link local
@@ -17,22 +17,18 @@ defmodule ExDoc.Autolink do
   #
   # * `:ext` - the extension (`".html"`, "`.xhtml"`, etc)
   #
-  # * `:siblings` - applications in the same umbrella project as `:app`. When linking modules,
-  #   links to these applications are relative.
-  #
   # * `:extras` - list of extras
   #
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
 
-  @enforce_keys [:app, :file]
-
+  @enforce_keys [:file]
   defstruct [
-    :app,
     :current_module,
     :module_id,
     :id,
     :file,
     :line,
+    apps: [],
     extras: [],
     deps: [],
     ext: ".html",
@@ -528,14 +524,9 @@ defmodule ExDoc.Autolink do
   end
 
   defp ex_doc_app_url(module, config) do
-    app = config.app
-
     case :application.get_application(module) do
-      {:ok, ^app} ->
-        ""
-
       {:ok, app} ->
-        if app in config.siblings do
+        if app in config.apps do
           ""
         else
           Keyword.get_lazy(config.deps, app, fn -> @hexdocs <> "#{app}/" end)

@@ -30,7 +30,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   defp doc_config do
     [
-      app: :elixir,
+      apps: [:elixir],
       project: "Elixir",
       version: "1.0.1",
       formatter: "html",

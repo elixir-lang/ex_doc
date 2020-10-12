@@ -21,7 +21,7 @@ defmodule ExDocTest do
 
     opts_with_output =
       &[
-        app: :test_app,
+        apps: [:test_app],
         formatter: IdentityFormatter,
         retriever: IdentityRetriever,
         source_root: "root_dir",
@@ -44,7 +44,7 @@ defmodule ExDocTest do
     version = "1"
 
     options = [
-      app: :test_app,
+      apps: [:test_app],
       formatter: IdentityFormatter,
       markdown_processor: Sample,
       output: "test/tmp/ex_doc",
@@ -61,7 +61,7 @@ defmodule ExDocTest do
 
   test "source_beam sets source dir" do
     options = [
-      app: :test_app,
+      apps: [:test_app],
       formatter: IdentityFormatter,
       retriever: IdentityRetriever,
       source_root: "root_dir",
@@ -77,7 +77,7 @@ defmodule ExDocTest do
     version = "1"
 
     options = [
-      app: :test_app,
+      apps: [:test_app],
       formatter: "pdf",
       retriever: IdentityRetriever,
       source_root: "root_dir",

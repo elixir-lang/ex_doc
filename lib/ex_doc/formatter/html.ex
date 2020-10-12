@@ -68,8 +68,7 @@ defmodule ExDoc.Formatter.HTML do
     project_nodes
     |> Enum.map(fn node ->
       autolink_opts = [
-        app: config.app,
-        siblings: config.siblings,
+        apps: config.apps,
         current_module: node.module,
         ext: ext,
         extras: extra_paths(config),
@@ -286,7 +285,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp build_extra(input, id, title, groups, config, ext) do
     autolink_opts = [
-      app: config.app,
+      apps: config.apps,
       file: input,
       ext: ext,
       extras: extra_paths(config),

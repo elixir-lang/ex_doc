@@ -10,7 +10,7 @@ defmodule ExDoc.Config do
   def before_closing_head_tag(_), do: ""
   def before_closing_body_tag(_), do: ""
 
-  defstruct app: nil,
+  defstruct apps: [],
             api_reference: true,
             assets: nil,
             before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
@@ -18,7 +18,6 @@ defmodule ExDoc.Config do
             canonical: nil,
             nest_modules_by_prefix: [],
             deps: [],
-            siblings: [],
             extra_section: nil,
             extras: [],
             filter_prefix: nil,
@@ -47,7 +46,7 @@ defmodule ExDoc.Config do
             skip_undefined_reference_warnings_on: []
 
   @type t :: %__MODULE__{
-          app: atom(),
+          apps: [atom()],
           api_reference: boolean(),
           assets: nil | String.t(),
           before_closing_head_tag: (atom() -> String.t()),
@@ -55,7 +54,6 @@ defmodule ExDoc.Config do
           canonical: nil | String.t(),
           nest_modules_by_prefix: [String.t()],
           deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
-          siblings: [atom()],
           extra_section: nil | String.t(),
           extras: list(),
           groups_for_extras: keyword(),

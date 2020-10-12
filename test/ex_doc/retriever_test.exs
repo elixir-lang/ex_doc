@@ -12,7 +12,7 @@ defmodule ExDoc.RetrieverTest do
         "0.1",
         Keyword.merge(
           [
-            app: :test_app,
+            apps: [:test_app],
             source_url_pattern: "http://example.com/%{path}#L%{line}",
             source_root: File.cwd!()
           ],

@@ -40,7 +40,6 @@ defmodule ExDoc do
       end)
 
     preconfig = %Config{
-      app: Keyword.fetch!(options, :app),
       project: project,
       version: vsn,
       main: options[:main],

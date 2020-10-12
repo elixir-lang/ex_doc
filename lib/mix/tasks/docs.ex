@@ -333,14 +333,13 @@ defmodule Mix.Tasks.Docs do
     options =
       config
       |> get_docs_opts()
-      |> Keyword.put(:app, config[:app])
       |> Keyword.merge(cli_opts)
       # accepted at root level config
       |> normalize_source_url(config)
       # accepted at root level config
       |> normalize_homepage_url(config)
       |> normalize_source_beam(config)
-      |> normalize_siblings(config)
+      |> normalize_apps(config)
       |> normalize_main()
       |> normalize_deps()
 
@@ -406,18 +405,18 @@ defmodule Mix.Tasks.Docs do
     end
   end
 
-  defp normalize_siblings(options, config) do
+  defp normalize_apps(options, config) do
     if Mix.Project.umbrella?(config) do
       ignore = Keyword.get(options, :ignore_apps, [])
 
-      siblings =
+      apps =
         for {app, _} <- Mix.Project.apps_paths(), app not in ignore do
           app
         end
 
-      Keyword.put(options, :siblings, siblings)
+      Keyword.put(options, :apps, apps)
     else
-      options
+      Keyword.put(options, :apps, List.wrap(config[:app]))
     end
   end
 

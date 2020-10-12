@@ -41,7 +41,7 @@ defmodule ExDoc.AutolinkTest do
       ])
 
       assert autolink("AutolinkTest.Foo") == ~m"[`AutolinkTest.Foo`](AutolinkTest.Foo.html)"
-      assert autolink("String", app: :elixir) == ~m"[`String`](String.html)"
+      assert autolink("String", apps: [:elixir]) == ~m"[`String`](String.html)"
 
       assert autolink("AutolinkTest.Foo", current_module: AutolinkTest.Foo) ==
                ~m"[`AutolinkTest.Foo`](#content)"
@@ -96,11 +96,6 @@ defmodule ExDoc.AutolinkTest do
       assert_unchanged("bar/1", current_module: AutolinkTest.Foo)
     end
 
-    test "sibling function" do
-      assert autolink("EarmarkParser.as_ast/2", siblings: [:earmark_parser]) ==
-               ~m"[`EarmarkParser.as_ast/2`](EarmarkParser.html#as_ast/2)"
-    end
-
     test "auto-imported function" do
       assert autolink("+/2") ==
                ~m"[`+/2`](https://hexdocs.pm/elixir/Kernel.html#+/2)"
@@ -108,7 +103,7 @@ defmodule ExDoc.AutolinkTest do
       assert autolink("for/1") ==
                ~m"[`for/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#for/1)"
 
-      assert autolink("for/1", app: :elixir) ==
+      assert autolink("for/1", apps: [:elixir]) ==
                ~m"[`for/1`](Kernel.SpecialForms.html#for/1)"
     end
 
@@ -134,7 +129,7 @@ defmodule ExDoc.AutolinkTest do
       assert autolink("t:keyword/0") ==
                ~m"[`keyword/0`](https://hexdocs.pm/elixir/typespecs.html#built-in-types)"
 
-      assert autolink("t:keyword/0", app: :elixir) ==
+      assert autolink("t:keyword/0", apps: [:elixir]) ==
                ~m"[`keyword/0`](typespecs.html#built-in-types)"
     end
 
@@ -186,7 +181,7 @@ defmodule ExDoc.AutolinkTest do
       assert autolink("mix help help") ==
                ~m"[`mix help help`](https://hexdocs.pm/mix/Mix.Tasks.Help.html)"
 
-      assert autolink("mix compile.elixir", app: :mix) ==
+      assert autolink("mix compile.elixir", apps: [:mix]) ==
                ~m"[`mix compile.elixir`](Mix.Tasks.Compile.Elixir.html)"
 
       assert_unchanged("mix compile.elixir --verbose")
@@ -433,7 +428,7 @@ defmodule ExDoc.AutolinkTest do
 
   ## Helpers
 
-  @default_options [app: :myapp, current_module: MyModule, module_id: "MyModule", file: "nofile"]
+  @default_options [apps: [:myapp], current_module: MyModule, module_id: "MyModule", file: "nofile"]
 
   defp autolink(ast_or_text, options \\ []) do
     ExDoc.Autolink.doc(ast(ast_or_text), Keyword.merge(@default_options, options))
