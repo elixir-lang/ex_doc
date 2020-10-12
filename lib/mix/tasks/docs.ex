@@ -322,7 +322,12 @@ defmodule Mix.Tasks.Docs do
       Mix.raise("Extraneous arguments on the command line")
     end
 
-    project = to_string(config[:name] || config[:app])
+    project =
+      to_string(
+        config[:name] || config[:app] ||
+          raise("expected :name or :app to be found in the project definition in mix.exs")
+      )
+
     version = config[:version] || "dev"
 
     options =
