@@ -33,6 +33,7 @@ defmodule ExDoc.AutolinkTest do
     test "unknown module" do
       assert_unchanged("Unknown")
       assert_unchanged(":unknown")
+      assert_unchanged("A.b.C")
     end
 
     test "project-local module" do

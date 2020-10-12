@@ -288,9 +288,18 @@ defmodule ExDoc.Autolink do
 
   defp do_parse_module(string) do
     case Code.string_to_quoted(string, warn_on_unnecessary_quotes: false) do
-      {:ok, module} when is_atom(module) -> {:module, module}
-      {:ok, {:__aliases__, _, parts}} -> {:module, Module.concat(parts)}
-      _ -> :error
+      {:ok, module} when is_atom(module) ->
+        {:module, module}
+
+      {:ok, {:__aliases__, _, parts}} ->
+        if Enum.all?(parts, &is_atom/1) do
+          {:module, Module.concat(parts)}
+        else
+          :error
+        end
+
+      _ ->
+        :error
     end
   end
 
