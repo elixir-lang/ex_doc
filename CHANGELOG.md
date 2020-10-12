@@ -1,18 +1,29 @@
 # Changelog
 
-## HEAD
+## v0.23.0 (2020-10-12)
 
-Require Elixir v1.10.
+Requires Elixir v1.10.
+
+  * Enhancements
+    * Improve warnings on broken references
+    * Support Elixir v1.12-dev
+
+  * Bug fixes:
+    * Respect deps config in autolink
+    * Fix html escaping in the sidebar entries
+    * Fix retrieving specs for macros with `when`
+    * Raise if none of :name or :app are found in mix.exs
+    * Don't crash on code blocks like "A.b.C"
 
 ## v0.22.6 (2020-09-16)
 
-  * Bug fix
+  * Bug fixes:
     * Properly fix CSS bug on headings
     * Add expansion arrow to sections on sidebar
 
 ## v0.22.5 (2020-09-13)
 
-  * Bug fix
+  * Bug fixes:
     * Fix CSS bug on headings
 
 ## v0.22.4 (2020-09-12)
