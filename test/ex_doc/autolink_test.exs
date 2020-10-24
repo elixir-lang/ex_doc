@@ -197,6 +197,10 @@ defmodule ExDoc.AutolinkTest do
       assert autolink("EarmarkParser.as_ast/2", deps: [earmark_parser: "https://example.com/"]) ==
                ~m"[`EarmarkParser.as_ast/2`](https://example.com/EarmarkParser.html#as_ast/2)"
 
+      # exrtensions are ignored as they are external links
+      assert autolink("EarmarkParser.as_ast/2", ext: ".xhtml") ==
+               ~m"[`EarmarkParser.as_ast/2`](https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2)"
+
       assert_unchanged(":test_module.foo/0")
     end
 

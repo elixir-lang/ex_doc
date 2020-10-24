@@ -448,7 +448,7 @@ defmodule ExDoc.Autolink do
   end
 
   defp app_module_url(:ex_doc, module, config) do
-    ex_doc_app_url(module, config) <> inspect(module) <> config.ext
+    ex_doc_app_url(module, config, inspect(module), config.ext, "")
   end
 
   defp app_module_url(:otp, module, _config) do
@@ -459,12 +459,12 @@ defmodule ExDoc.Autolink do
 
   defp local_url(:type, name, arity, config, _original_text, _options)
        when {name, arity} in @basic_types do
-    ex_doc_app_url(Kernel, config) <> "typespecs" <> config.ext <> "#basic-types"
+    ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#basic-types")
   end
 
   defp local_url(:type, name, arity, config, _original_text, _options)
        when {name, arity} in @built_in_types do
-    ex_doc_app_url(Kernel, config) <> "typespecs" <> config.ext <> "#built-in-types"
+    ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#built-in-types")
   end
 
   defp local_url(kind, name, arity, config, original_text, options) do
@@ -532,17 +532,18 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp ex_doc_app_url(module, config) do
+  defp ex_doc_app_url(module, config, path, ext, suffix) do
     case :application.get_application(module) do
       {:ok, app} ->
         if app in config.apps do
-          ""
+          path <> ext <> suffix
         else
-          Keyword.get_lazy(config.deps, app, fn -> @hexdocs <> "#{app}/" end)
+          Keyword.get_lazy(config.deps, app, fn -> @hexdocs <> "#{app}/" end) <>
+            path <> ".html" <> suffix
         end
 
       _ ->
-        ""
+        path <> ext <> suffix
     end
   end
 
