@@ -429,6 +429,8 @@ defmodule ExDoc.AutolinkTest do
              "documentation references module \"Unknown\" but it is undefined"
 
     assert_unchanged(~m"`Unknown`")
+
+    assert_unchanged(~m"[Blank](about:blank)")
   end
 
   ## Helpers
