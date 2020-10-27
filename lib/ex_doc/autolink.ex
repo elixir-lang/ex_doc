@@ -105,6 +105,7 @@ defmodule ExDoc.Autolink do
 
   defp build_extra_link(link, config) do
     with uri <- URI.parse(link),
+         nil <- uri.scheme,
          nil <- uri.host,
          true <- is_binary(uri.path),
          false <- uri.path =~ @ref_regex,
