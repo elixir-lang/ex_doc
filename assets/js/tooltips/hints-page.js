@@ -2,7 +2,7 @@
 // ------------
 
 import {extractModuleHint, extractFunctionHint} from './hints-extraction'
-import $ from 'jquery'
+import {onDocumentReady, qs} from '../helpers'
 
 // Constants
 // ---------
@@ -17,14 +17,14 @@ const message = {hint: {}, ready: false, href: ''}
 function sendHint () {
   const params = new URLSearchParams(window.location.search)
   const hash = window.location.hash
-  const content = $(contentInner)
+  const content = qs(contentInner)
   let hint = null
 
   if (!params.has('hint')) { return }
 
   const infoElement = descriptionElementFromHash(hash)
 
-  if (infoElement && infoElement.length > 0) {
+  if (infoElement) {
     hint = extractFunctionHint(infoElement)
   } else if (isModulePage()) {
     hint = extractModuleHint(content)
@@ -55,15 +55,15 @@ function postMessage (hint, href) {
  * @returns {boolean} `true` if current page contains module documentation.
  */
 function isModulePage () {
-  return $(contentInner).find('#moduledoc').length > 0
+  return qs(contentInner).querySelector('#moduledoc') != null
 }
 
 /**
- * Constructs a jQuery selector targeting an element
+ * Finds an element by a URL hash
  *
- * @param {Object} params URLSearchParams object, parsed parameters from the URL
+ * @param {String} hash the hash part of a URL
  *
- * @returns {object} jquery selector
+ * @returns {Object} an element
  */
 function descriptionElementFromHash (hash) {
   if (!hash) { return null }
@@ -71,16 +71,12 @@ function descriptionElementFromHash (hash) {
 
   if (!hash) { return null }
 
-  hash = $.escapeSelector(hash)
+  const mainSelector = document.getElementById(hash)
 
-  if (!hash) { return null }
-
-  const mainSelector = $(`#${hash}.detail`)
-
-  if (mainSelector.length > 0) {
+  if (mainSelector) {
     return mainSelector
   } else {
-    return $(`.detail > span#${hash}`).parent()
+    return document.getElementById(hash).parentElement
   }
 }
 
@@ -90,14 +86,12 @@ function descriptionElementFromHash (hash) {
  * @returns {string} Project version name (ie. "Elixir v1.2.3")
  */
 function getProjectVersion () {
-  return $(projectMetaTag).attr('content')
+  return qs(projectMetaTag).getAttribute('content')
 }
 
 // Public Methods
 // --------------
 
 export function initialize () {
-  $(document).ready(function () {
-    sendHint()
-  })
+  onDocumentReady(() => sendHint())
 }

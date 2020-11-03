@@ -1,7 +1,6 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
 import Handlebars from 'handlebars/runtime'
 
 import hljs from 'highlight.js/lib/highlight'
@@ -22,6 +21,8 @@ import groupChanged from './template-helpers/groupChanged'
 import nestingChanged from './template-helpers/nestingChanged'
 import showSummary from './template-helpers/showSummary'
 
+import { onDocumentReady } from './helpers'
+
 import {initialize as initEvents} from './events'
 import {initialize as initSidebar} from './sidebar'
 import {initialize as initVersions} from './versions'
@@ -32,9 +33,7 @@ import {initialize as initQuickSwitch} from './quick-switch'
 import {initialize as initTooltips} from './tooltips/tooltips'
 import {initialize as initHintsPage} from './tooltips/hints-page'
 
-window.$ = $
-
-$(() => {
+onDocumentReady(() => {
   // Set up Handlebars.js
   Handlebars.registerHelper('isArray', isArray)
   Handlebars.registerHelper('isLocal', isLocal)

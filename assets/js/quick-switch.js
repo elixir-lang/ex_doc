@@ -3,9 +3,9 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
 import quickSwitchModalTemplate from './templates/quick-switch-modal.handlebars'
 import quickSwitchResultsTemplate from './templates/quick-switch-results.handlebars'
+import {qs, qsAll} from './helpers'
 
 // Constants
 // ---------
@@ -48,11 +48,11 @@ let autoCompleteSelected = -1
 /**
  * Opens the quick switch modal dialog.
  *
- * @param {Object} e Keybord shortcut press event
+ * @param {Object} event Keybord shortcut press event
  */
-function openQuickSwitchModal (e) {
-  $(quickSwitchModalSelector).show()
-  $(quickSwitchInputSelector).focus()
+function openQuickSwitchModal (event) {
+  qs(quickSwitchModalSelector).classList.add('shown')
+  qs(quickSwitchInputSelector).focus()
   event.preventDefault()
 }
 
@@ -64,10 +64,10 @@ function closeQuickSwitchModal () {
   autoCompleteResults = []
   autoCompleteSelected = -1
 
-  $(quickSwitchInputSelector).blur()
-  $(quickSwitchResultsSelector).html('')
-  $(quickSwitchInputSelector).val('').removeClass('completed')
-  $(quickSwitchModalSelector).hide()
+  qs(quickSwitchModalSelector).classList.remove('shown')
+  qs(quickSwitchInputSelector).blur()
+  qs(quickSwitchInputSelector).value = ''
+  qs(quickSwitchResultsSelector).innerHTML = ''
 }
 
 /**
@@ -99,7 +99,7 @@ function switchToExDocPackage (packageSlug) {
  *
  * @param {String} packageSlug The searched package name
  */
-function debouceAutocomplete (packageSlug) {
+function debounceAutocomplete (packageSlug) {
   clearTimeout(debounceTimeout)
   debounceTimeout = setTimeout(() => {
     queryForAutocomplete(packageSlug)
@@ -112,26 +112,32 @@ function debouceAutocomplete (packageSlug) {
  * @param {String} packageSlug The searched package name
  */
 function queryForAutocomplete (packageSlug) {
-  $.get(hexSearchEndpoint.replace('%%', packageSlug), (payload) => {
-    if (Array.isArray(payload)) {
-      autoCompleteResults = resultsFromPayload(packageSlug, payload)
-      autoCompleteSelected = -1
+  const url = hexSearchEndpoint.replace('%%', packageSlug)
+  fetch(url)
+    .then(response => response.json())
+    .then(payload => {
+      if (Array.isArray(payload)) {
+        autoCompleteResults = resultsFromPayload(packageSlug, payload)
+        autoCompleteSelected = -1
 
-      const template = quickSwitchResultsTemplate({
-        results: autoCompleteResults
-      })
-
-      // Only append results if string is still long enough
-      const currentTerm = $(quickSwitchInputSelector).val()
-      if (currentTerm && currentTerm.length >= 3) {
-        $(quickSwitchResultsSelector).html(template)
-        $(quickSwitchResultSelector).click(function () {
-          const selectedResult = autoCompleteResults[$(this).attr('data-index')]
-          switchToExDocPackage(selectedResult.name)
+        const template = quickSwitchResultsTemplate({
+          results: autoCompleteResults
         })
+
+        // Only append results if string is still long enough
+        const currentTerm = qs(quickSwitchInputSelector).value
+        if (currentTerm && currentTerm.length >= 3) {
+          qs(quickSwitchResultsSelector).innerHTML = template
+          qsAll(quickSwitchResultSelector).forEach(quickSwitchResult => {
+            quickSwitchResult.addEventListener('click', function () {
+              const index = quickSwitchResult.getAttribute('data-index')
+              const selectedResult = autoCompleteResults[index]
+              switchToExDocPackage(selectedResult.name)
+            })
+          })
+        }
       }
-    }
-  })
+    })
 }
 
 /**
@@ -153,13 +159,13 @@ function resultsFromPayload (packageSlug, payload) {
 /**
  * Moves the autocomplete selection up or down.
  *
- * @param {Object} e The keypress event that triggered the moving
+ * @param {Object} event The keypress event that triggered the moving
  * @param {String} updown Whether to move up or down the list
  */
-function moveAutocompleteSelection (e, updown) {
-  const selectedElement = $('.quick-switch-result.selected')
+function moveAutocompleteSelection (event, updown) {
+  const selectedElement = qs('.quick-switch-result.selected')
 
-  if (selectedElement.length !== 0) {
+  if (selectedElement) {
     if (updown === 'up') {
       selectPrevAcResult(selectedElement)
     } else {
@@ -169,14 +175,14 @@ function moveAutocompleteSelection (e, updown) {
     selectFirstAcResult()
   }
 
-  e.preventDefault()
+  event.preventDefault()
 }
 
 /**
  * Select the first result in the autocomplete result list.
  */
 function selectFirstAcResult () {
-  $(quickSwitchResultSelector).first().addClass('selected')
+  qs(quickSwitchResultSelector + ':first-child').classList.add('selected')
   autoCompleteSelected = 0
 }
 
@@ -184,7 +190,7 @@ function selectFirstAcResult () {
  * Select the last result in the autocomplete result list.
  */
 function selectLastAcResult () {
-  $(quickSwitchResultSelector).last().addClass('selected')
+  qs(quickSwitchResultSelector + ':last-child').classList.add('selected')
   autoCompleteSelected = numberOfSuggestions
 }
 
@@ -192,14 +198,14 @@ function selectLastAcResult () {
  * Select next autocomplete result.
  * If the end of the list is reached, the first element is selected instead.
  *
- * @param {(Object|null)} selectedElement jQuery element of selected autocomplete result
+ * @param {Object} selectedElement element of selected autocomplete result
  */
 function selectNextAcResult (selectedElement) {
-  const nextResult = selectedElement.next()
-  selectedElement.removeClass('selected')
+  const nextResult = selectedElement.nextElementSibling
+  selectedElement.classList.remove('selected')
 
-  if (nextResult.length !== 0) {
-    nextResult.addClass('selected')
+  if (nextResult) {
+    nextResult.classList.add('selected')
     autoCompleteSelected += 1
   } else {
     selectFirstAcResult()
@@ -210,14 +216,14 @@ function selectNextAcResult (selectedElement) {
  * Select previous autocomplete result.
  * If the beginning of the list is reached, the last element is selected instead.
  *
- * @param {(Object|null)} selectedElement jQuery element of selected autocomplete result
+ * @param {Object} selectedElement element of selected autocomplete result
  */
 function selectPrevAcResult (selectedElement) {
-  const prevResult = selectedElement.prev()
-  selectedElement.removeClass('selected')
+  const prevResult = selectedElement.previousElementSibling
+  selectedElement.classList.remove('selected')
 
-  if (prevResult.length !== 0) {
-    prevResult.addClass('selected')
+  if (prevResult) {
+    prevResult.classList.add('selected')
     autoCompleteSelected -= 1
   } else {
     selectLastAcResult()
@@ -228,8 +234,11 @@ function selectPrevAcResult (selectedElement) {
  * De-select the currently selected autocomplete result
  */
 function deselectAcResult () {
-  $('.quick-switch-result.selected').removeClass('selected')
-  autoCompleteSelected = -1
+  const selectedElement = qs('.quick-switch-result.selected')
+  if (selectedElement) {
+    selectedElement.classList.remove('selected')
+    autoCompleteSelected = -1
+  }
 }
 
 // Public Methods
@@ -239,41 +248,43 @@ export { openQuickSwitchModal }
 
 export function initialize () {
   const quickSwitchModal = quickSwitchModalTemplate()
-  $('body').append(quickSwitchModal)
+  qs('body').insertAdjacentHTML('beforeend', quickSwitchModal)
 
-  $(quickSwitchLinkSelector).click(openQuickSwitchModal)
+  qs(quickSwitchLinkSelector).addEventListener('click', openQuickSwitchModal)
 
-  $(quickSwitchModalSelector).on('keydown', function (e) {
-    if (e.keyCode === 27) { // escape key
+  qs(quickSwitchModalSelector).addEventListener('keydown', function (event) {
+    if (event.keyCode === 27) { // escape key
       closeQuickSwitchModal()
     }
   })
 
-  $(quickSwitchModalSelector).on('click', closeButtonSelector, function () {
-    closeQuickSwitchModal()
+  qs(quickSwitchModalSelector).addEventListener('click', function (event) {
+    if (event.target === qs(closeButtonSelector)) {
+      closeQuickSwitchModal()
+    }
   })
 
-  $(quickSwitchInputSelector).on('keydown', function (e) {
-    const packageSlug = $(quickSwitchInputSelector).val()
+  qs(quickSwitchInputSelector).addEventListener('keydown', function (event) {
+    const packageSlug = event.target.value
 
-    if (e.keyCode === 13) { // enter key
+    if (event.keyCode === 13) { // enter key
       quickSwitchToPackage(packageSlug)
     }
 
-    if (e.keyCode === 37 || e.keyCode === 39) deselectAcResult()
-    if (e.keyCode === 38) moveAutocompleteSelection(e, 'up')
-    if (e.keyCode === 40) moveAutocompleteSelection(e, 'down')
+    if (event.keyCode === 37 || event.keyCode === 39) deselectAcResult()
+    if (event.keyCode === 38) moveAutocompleteSelection(event, 'up')
+    if (event.keyCode === 40) moveAutocompleteSelection(event, 'down')
   })
 
-  $(quickSwitchInputSelector).on('keyup', function (e) {
-    const packageSlug = $(quickSwitchInputSelector).val() || ''
+  qs(quickSwitchInputSelector).addEventListener('keyup', function (event) {
+    const packageSlug = qs(quickSwitchInputSelector).value
 
-    if (e.keyCode === 8 && packageSlug.length < 3) {
-      $(quickSwitchResultsSelector).html('')
+    if (event.keyCode === 8 && packageSlug.length < 3) {
+      qs(quickSwitchResultsSelector).innerHTML = ''
     }
 
-    if (usedModifierKeys.indexOf(e.keyCode) === -1 && packageSlug.length >= 3) {
-      debouceAutocomplete(packageSlug)
+    if (usedModifierKeys.indexOf(event.keyCode) === -1 && packageSlug.length >= 3) {
+      debounceAutocomplete(packageSlug)
     }
   })
 }

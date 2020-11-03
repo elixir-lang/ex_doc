@@ -5,13 +5,16 @@
 /**
  * Extracts info about a function, callback or a type defined inside a module.
  *
- * @param {Object} element jQuery selector pointing to a div containing relevant data
+ * @param {Object} element a div containing the relevant data
  *
  * @returns {Object} hint info object
  */
 function extractFunctionHint (element) {
-  const title = element.find('h1').text()
-  const description = element.find('.docstring > p:first').text()
+  const heading = element.querySelector('h1')
+  const title = heading.textContent
+
+  const firstParagraph = element.querySelector('.docstring > p')
+  const description = firstParagraph ? firstParagraph.textContent : ''
 
   return {
     kind: 'function',
@@ -21,12 +24,19 @@ function extractFunctionHint (element) {
 }
 
 function extractModuleHint (content) {
-  content.find('h1:first > *').remove()
+  const heading = content.querySelector('h1')
+  while (heading.firstElementChild) {
+    heading.removeChild(heading.firstElementChild)
+  }
+  const title = heading.textContent
+
+  const firstParagraph = content.querySelector('#moduledoc p')
+  const description = firstParagraph ? firstParagraph.textContent : ''
 
   return {
     kind: 'module',
-    title: content.find('h1:first').text().trim(),
-    description: content.find('#moduledoc p:first').text().trim()
+    title: title.trim(),
+    description: description.trim()
   }
 }
 

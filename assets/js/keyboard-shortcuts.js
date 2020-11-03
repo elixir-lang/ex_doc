@@ -1,19 +1,18 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
 import find from 'lodash.find'
 import {focusSearchInput, openSidebar, toggleSidebar} from './sidebar'
 import {toggleNightMode} from './night'
 import {openQuickSwitchModal} from './quick-switch'
 import helpModalTemplate from './templates/keyboard-shortcuts-help-modal.handlebars'
+import {qs} from './helpers'
 
 // Constants
 // ---------
 
 const helpModalSelector = '#keyboard-shortcuts-modal'
 const closeButtonSelector = '.modal-close'
-const footer = 'footer'
 const helpLinkSelector = '.display-shortcuts-help'
 const inputElements = ['input', 'textarea']
 const keyboardShortcuts = [
@@ -95,22 +94,23 @@ function triggerShortcut (event) {
 }
 
 function closeHelpModal () {
-  $(helpModalSelector).hide()
+  qs(helpModalSelector).classList.remove('shown')
 }
 
 function openHelpModal () {
-  $(helpModalSelector).show().focus()
+  qs(helpModalSelector).classList.add('shown')
+  qs(helpModalSelector).focus()
 }
 
 function toggleHelpModal () {
-  if ($(helpModalSelector).is(':visible')) {
+  if (qs(helpModalSelector).classList.contains('shown')) {
     closeHelpModal()
   } else {
     openHelpModal()
   }
 }
 
-function searchKeyAction () {
+function searchKeyAction (event) {
   openSidebar()
   closeHelpModal()
   focusSearchInput()
@@ -122,27 +122,29 @@ function searchKeyAction () {
 
 export function initialize () {
   const helpModal = helpModalTemplate({shortcuts: keyboardShortcuts})
-  $('body').append(helpModal)
+  qs('body').insertAdjacentHTML('beforeend', helpModal)
 
-  $(helpModalSelector).on('keydown', function (e) {
-    if (e.keyCode === 27) { // escape key
+  qs(helpModalSelector).addEventListener('keydown', function (event) {
+    if (event.keyCode === 27) { // escape key
       closeHelpModal()
     }
   })
 
-  $(helpModalSelector).on('click', closeButtonSelector, function () {
-    closeHelpModal()
+  qs(helpModalSelector).addEventListener('click', function (event) {
+    if (event.target === qs(closeButtonSelector)) {
+      closeHelpModal()
+    }
   })
 
-  $(footer).on('click', helpLinkSelector, function () {
+  qs(helpLinkSelector).addEventListener('click', function (event) {
     openHelpModal()
   })
 
-  $(document).on('keydown', function (e) {
-    triggerShortcut(e)
+  document.addEventListener('keydown', function (event) {
+    triggerShortcut(event)
   })
 
-  $(document).on('keyup', function (e) {
+  document.addEventListener('keyup', function (event) {
     shortcutBeingPressed = null
   })
 }

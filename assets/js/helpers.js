@@ -4,8 +4,11 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
 import find from 'lodash.find'
+
+export const qs = document.querySelector.bind(document)
+
+export const qsAll = document.querySelectorAll.bind(document)
 
 // Escape a string for use in a regular expression
 export function escapeText (text) {
@@ -22,7 +25,7 @@ export function escapeHtmlEntities (text) {
 }
 
 export function getModuleType () {
-  return $('body').data('type')
+  return qs('body').dataset.type
 }
 
 // Find out if the anchor belongs to either
@@ -41,4 +44,18 @@ export function findSidebarCategory (items, query) {
 
 export function getLocationHash () {
   return window.location.hash.replace(/^#/, '')
+}
+
+export function checkUrlExists (url) {
+  return fetch(url)
+    .then(response => response.ok)
+    .catch(() => false)
+}
+
+export function onDocumentReady (callback) {
+  if (document.readyState !== 'loading') {
+    callback()
+  } else {
+    document.addEventListener('DOMContentLoaded', callback)
+  }
 }

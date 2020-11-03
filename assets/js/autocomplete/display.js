@@ -1,14 +1,14 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
 import autocompleteResultsTemplate from '../templates/autocomplete-suggestions.handlebars'
-import { getSuggestions } from './suggestions'
+import {getSuggestions} from './suggestions'
+import {qs, qsAll} from '../helpers'
 
 // Constants
 // ---------
 
-const autocompleteElement = $('.autocomplete')
+const autocompleteElement = qs('.autocomplete')
 
 // Updates list of results inside the autocomplete.
 function updateSuggestions (term) {
@@ -19,15 +19,15 @@ function updateSuggestions (term) {
     term: term
   })
 
-  autocompleteElement.html(template)
+  autocompleteElement.innerHTML = template
 }
 
 function hide () {
-  autocompleteElement.hide()
+  autocompleteElement.classList.remove('shown')
 }
 
 function show () {
-  autocompleteElement.show()
+  autocompleteElement.classList.add('shown')
 }
 
 function update (searchTerm) {
@@ -42,15 +42,15 @@ function update (searchTerm) {
 /**
  * Autocomplete element that was selected using keyboard arrows.
  *
- * @returns {(Object|null)} jQuery element or null if no autocomplete result is currently selected.
+ * @returns {(Object|null)} element or null if no autocomplete result is currently selected.
  */
 function selectedElement () {
-  const currentlySelectedElement = $('.autocomplete-suggestion.selected')
-  if (currentlySelectedElement.length === 0) {
+  const currentlySelectedElement = qs('.autocomplete-suggestion.selected')
+  if (!currentlySelectedElement) {
     return null
   }
 
-  if (currentlySelectedElement.attr('data-index') === '-1') {
+  if (currentlySelectedElement.dataset.index === '-1') {
     // -1 marks the deafult 'Search for "phrase"...' element
     return null
   }
@@ -66,24 +66,24 @@ function selectedElement () {
  * @param {Number} direction - '-1' to move the selection down, '1' to move it up
  */
 function moveSelection (direction) {
-  const currentlySelectedElement = $('.autocomplete-suggestion.selected')
+  const currentlySelectedElement = qs('.autocomplete-suggestion.selected')
   let indexToSelect = -1
-  if (currentlySelectedElement.length) {
-    indexToSelect = parseInt(currentlySelectedElement.attr('data-index')) + direction
+  if (currentlySelectedElement) {
+    indexToSelect = parseInt(currentlySelectedElement.dataset.index) + direction
   }
 
-  let elementToSelect = $(`.autocomplete-suggestion[data-index="${indexToSelect}"]`)
+  let elementToSelect = qs(`.autocomplete-suggestion[data-index="${indexToSelect}"]`)
 
-  if (!elementToSelect.length) {
+  if (!elementToSelect) {
     if (indexToSelect < 0) {
-      elementToSelect = $('.autocomplete-suggestion:last')
+      elementToSelect = qs('.autocomplete-suggestion:last-child')
     } else {
-      elementToSelect = $('.autocomplete-suggestion:first')
+      elementToSelect = qs('.autocomplete-suggestion:first-child')
     }
   }
 
-  $('.autocomplete-suggestion').each(function () {
-    $(this).toggleClass('selected', $(this).is(elementToSelect))
+  qsAll('.autocomplete-suggestion').forEach(suggestion => {
+    suggestion.classList.toggle('selected', suggestion === elementToSelect)
   })
 }
 

@@ -1,14 +1,14 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
 import throttle from 'lodash.throttle'
+import {qs} from './helpers'
 
 // Constants
 // ---------
 
-const body = $('body')
-const searchInput = $('#search-list')
+const body = qs('body')
+const searchInput = qs('#search-list')
 const breakpoint = 768
 const animationDuration = 300
 
@@ -21,7 +21,7 @@ const sidebarClasses = [
   sidebarOpeningClass,
   sidebarClosedClass,
   sidebarClosingClass
-].join(' ')
+]
 
 // Current animation state
 // -----------------------
@@ -29,38 +29,32 @@ const sidebarClasses = [
 let toggling
 
 function closeSidebar () {
-  body
-    .addClass(sidebarClosingClass)
-    .removeClass(sidebarOpenedClass)
-    .removeClass(sidebarOpeningClass)
+  body.classList.add(sidebarClosingClass)
+  body.classList.remove(sidebarOpenedClass, sidebarOpeningClass)
 
-  toggling = setTimeout(
-    () => body.addClass(sidebarClosedClass).removeClass(sidebarClosingClass),
-    animationDuration
-  )
+  toggling = setTimeout(() => {
+    body.classList.add(sidebarClosedClass)
+    body.classList.remove(sidebarClosingClass)
+  }, animationDuration)
 }
 
 function openSidebar () {
-  body
-    .addClass(sidebarOpeningClass)
-    .removeClass(sidebarClosedClass)
-    .removeClass(sidebarClosingClass)
+  body.classList.add(sidebarOpeningClass)
+  body.classList.remove(sidebarClosedClass, sidebarClosingClass)
 
-  toggling = setTimeout(
-    () => body.addClass(sidebarOpenedClass).removeClass(sidebarOpeningClass),
-    animationDuration
-  )
+  toggling = setTimeout(() => {
+    body.classList.add(sidebarOpenedClass)
+    body.classList.remove(sidebarOpeningClass)
+  }, animationDuration)
 }
 
 function toggleSidebar () {
-  const bodyClass = body.attr('class') || ''
-
   // Remove current animation if toggling.
   clearTimeout(toggling)
 
   // If body has a sidebar class invoke a correct action.
-  if (bodyClass.includes(sidebarClosedClass) ||
-      bodyClass.includes(sidebarClosingClass)) {
+  if (body.classList.contains(sidebarClosedClass) ||
+      body.classList.contains(sidebarClosingClass)) {
     openSidebar()
   } else {
     closeSidebar()
@@ -71,9 +65,13 @@ function focusSearchInput () {
   searchInput.focus()
 }
 
+function isScreenSmall () {
+  return window.innerWidth <= breakpoint
+}
+
 function setDefaultSidebarState () {
-  body.removeClass(sidebarClasses)
-  body.addClass(window.innerWidth > breakpoint ? sidebarOpenedClass : sidebarClosedClass)
+  body.classList.remove(...sidebarClasses)
+  body.classList.add(isScreenSmall() ? sidebarClosedClass : sidebarOpenedClass)
 }
 
 // Public Methods
@@ -85,17 +83,17 @@ export function initialize () {
   setDefaultSidebarState()
 
   let lastWindowWidth = window.innerWidth
-  $(window).resize(throttle(function () {
+  window.addEventListener('resize', throttle(function () {
     if (lastWindowWidth !== window.innerWidth) {
       lastWindowWidth = window.innerWidth
       setDefaultSidebarState()
     }
   }, 100))
 
-  $('.sidebar-toggle').click(toggleSidebar)
+  qs('.sidebar-toggle').addEventListener('click', toggleSidebar)
 
-  $('.content').click((e) => {
-    const sidebarCoversContent = window.innerWidth <= breakpoint
+  qs('.content').addEventListener('click', (event) => {
+    const sidebarCoversContent = isScreenSmall()
     if (sidebarCoversContent) { closeSidebar() }
   })
 }

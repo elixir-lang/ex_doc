@@ -6,16 +6,15 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
 import lunr from 'lunr'
 import resultsTemplate from './templates/search-results.handlebars'
-import { escapeHtmlEntities } from './helpers'
+import {qs, escapeHtmlEntities} from './helpers'
 
 // Local Variables
 // ---------------
 
-const $search = $('#search')
-const $input = $('.sidebar-search input')
+const searchContainer = qs('#search')
+const input = qs('.sidebar-search input')
 
 // Local Methods
 // -------------
@@ -71,7 +70,7 @@ function getExcerpts (item, metadata) {
 
 export function search (value) {
   if (value.replace(/\s/, '') !== '') {
-    $input.val(value)
+    input.value = value
     var idx = getIndex()
     var results, errorMessage
 
@@ -87,13 +86,13 @@ export function search (value) {
       errorMessage: errorMessage
     })
 
-    $search.html(resultsHtml)
+    searchContainer.innerHTML = resultsHtml
   } else {
     const resultsHtml = resultsTemplate({
       value
     })
 
-    $search.html(resultsHtml)
+    searchContainer.innerHTML = resultsHtml
   }
 }
 

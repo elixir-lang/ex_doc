@@ -1,14 +1,13 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
 import find from 'lodash.find'
 import tooltipBodyTemplate from '../templates/tooltip-body.handlebars'
 import tooltipLayoutTemplate from '../templates/tooltip-layout.handlebars'
+import {qs, qsAll} from '../helpers'
 
 // Constants
 // ---------
-const footerSelector = 'footer' // `Enable/Disable tooltips` button will be displayed in the footer
 const tooltipActivators = '.content a, .detail-header .specs a' // Elements that can activate the tooltip
 const tooltipSelector = '#tooltip' // Tooltip root
 const tooltipIframeSelector = '#tooltip .tooltip-iframe' // Iframe inisde the tooltip, will be used to load external pages
@@ -28,13 +27,13 @@ const typesCategories = [
   {description: 'Literal', href: 'typespecs.html#literals'},
   {description: 'Built-in type', href: 'typespecs.html#built-in-types'}
 ]
-const tooltipsToggleSelector = '.tooltips-toggle' // `Enable/Disable tooltips` button
+const tooltipsToggleSelector = 'footer .tooltips-toggle' // `Enable/Disable tooltips` button
 const tooltipsDisabledStorageKey = 'tooltipsDisabled' // Local Storage key Used to store tooltips settings
 const moduleContentHash = '#content' // Hash included in links pointing to module pages
 const iframePermissions = 'allow-scripts allow-same-origin' // Minimal permissions needed for the iframe to run JavaScript and communicate with the tooltip
 const supportedHashRegex = /#.*\// // Regex for hashes that will trigger the tooltip. Allows us to avoid displaying hashes for module sections (ie. `module.html#functions`)
 
-let tooltipElement = null // Will store the jQuery selector for the tooltip root
+let tooltipElement = null // Will store the tooltip root element
 let currentLinkElement = null // Element that the cursor is hovering over
 let currentHintHref = null // ID of the request we're waiting for
 let showTimeoutAnimation = null // Timeout ID related to the tooltip show animation
@@ -78,7 +77,7 @@ function toggleTooltipsDisabled () {
  * If tooltips are enabled `Disable tooltips` text is displayed.
  */
 function updateToggleLink () {
-  $(tooltipsToggleSelector).attr('data-is-disabled', areTooltipsDisabled().toString())
+  qs(tooltipsToggleSelector).setAttribute('data-is-disabled', areTooltipsDisabled().toString())
 }
 
 /**
@@ -95,32 +94,31 @@ function receivePopupMessage (event) {
 }
 
 // Triggered when the mouse cursor is over a link that supports the tooltip.
-function hoverStart () {
+function hoverStart (event) {
   if (areTooltipsDisabled()) { return }
   if (window.innerWidth < minWindowSize.width || window.innerHeight < minWindowSize.height) {
     return
   }
 
-  currentLinkElement = $(this)
-  if (currentLinkElement.prop('tagName') !== 'A') {
-    currentLinkElement = $(this).parent()
+  currentLinkElement = event.target
+  if (!currentLinkElement.matches('a')) {
+    currentLinkElement = event.target.parentNode
   }
 
   // Skip tooltips on the permalink icon (the on-hover one next to the function name).
-  if (currentLinkElement.hasClass('detail-link')) { return }
+  if (currentLinkElement.classList.contains('detail-link')) { return }
 
   hoverDelayTimeout = setTimeout(function () {
     hideTimeoutVisibility && clearTimeout(hideTimeoutVisibility)
 
-    tooltipElement.removeClass('tooltip-visible')
-    tooltipElement.removeClass('tooltip-shown')
+    tooltipElement.classList.remove('tooltip-visible', 'tooltip-shown')
 
     prepareTooltips()
   }, hoverDelayTime)
 }
 
 // Triggered when the mouse cursor leaves the tooltip-enabled link
-function hoverEnd () {
+function hoverEnd (event) {
   if (areTooltipsDisabled()) { return }
 
   showTimeoutAnimation && clearTimeout(showTimeoutAnimation)
@@ -134,34 +132,34 @@ function hoverEnd () {
 function updateTooltipPosition () {
   if (!currentLinkElement) { return }
 
-  const tooltipElement = $(tooltipSelector)
+  const tooltipElement = qs(tooltipSelector)
 
-  const tooltipActivatorBoundingRect = currentLinkElement[0].getBoundingClientRect()
-  const contentInnerBoundingRect = $(contentInner)[0].getBoundingClientRect()
+  const tooltipActivatorBoundingRect = currentLinkElement.getBoundingClientRect()
+  const contentInnerBoundingRect = qs(contentInner).getBoundingClientRect()
 
   const tooltipWidth = measureTooltipWidth(tooltipElement)
   const relativeBoundingRect = getRelativeBoudningRect(tooltipActivatorBoundingRect, contentInnerBoundingRect)
   const space = calculateSpaceAroundLink(relativeBoundingRect, tooltipActivatorBoundingRect, contentInnerBoundingRect)
 
   if (space.left + tooltipWidth + spacingBase < window.innerWidth) {
-    tooltipElement.css('left', relativeBoundingRect.left)
-    tooltipElement.css('right', 'auto')
+    tooltipElement.style.left = `${relativeBoundingRect.left}px`
+    tooltipElement.style.right = 'auto'
   } else {
     // Tooltip looks better if there is some space between it and the left menu.
     let left = relativeBoundingRect.right - tooltipWidth
     if (left < spacingBase) {
       left = spacingBase
     }
-    tooltipElement.css('left', left)
-    tooltipElement.css('right', 'auto')
+    tooltipElement.style.left = `${left}px`
+    tooltipElement.style.right = 'auto'
   }
 
   const tooltipHeight = measureTooltipHeight(tooltipElement)
 
   if (space.bottom > tooltipHeight + minBottomSpacing) {
-    tooltipElement.css('top', relativeBoundingRect.bottom + spacingBase)
+    tooltipElement.style.top = `${relativeBoundingRect.bottom + spacingBase}px`
   } else {
-    tooltipElement.css('top', relativeBoundingRect.top - tooltipHeight - spacingBase)
+    tooltipElement.style.top = `${relativeBoundingRect.top - tooltipHeight - spacingBase}px`
   }
 }
 
@@ -213,7 +211,7 @@ function prepareTooltips () {
 
   if (!currentLinkElement) { return }
 
-  let href = currentLinkElement.attr('href')
+  let href = currentLinkElement.getAttribute('href')
 
   if (!href) { return }
 
@@ -233,10 +231,11 @@ function prepareTooltips () {
   } else {
     const hintHref = rewriteHref(href)
     currentHintHref = hintHref
-    let iframe = $(tooltipIframeSelector).detach()
-    iframe.attr('src', hintHref)
-    iframe.attr('sandbox', iframePermissions)
-    tooltipElement.append(iframe)
+    const iframe = qs(tooltipIframeSelector)
+    iframe.parentNode.removeChild(iframe)
+    iframe.setAttribute('src', hintHref)
+    iframe.setAttribute('sandbox', iframePermissions)
+    tooltipElement.appendChild(iframe)
   }
 }
 
@@ -248,21 +247,21 @@ function showTooltip (hint) {
     hint: hint
   })
 
-  tooltipElement.find('.tooltip-body').html(html)
+  tooltipElement.querySelector('.tooltip-body').innerHTML = html
 
-  tooltipElement.addClass('tooltip-visible')
+  tooltipElement.classList.add('tooltip-visible')
 
   updateTooltipPosition()
   showTimeoutAnimation = setTimeout(() => {
-    tooltipElement.addClass('tooltip-shown')
+    tooltipElement.classList.add('tooltip-shown')
   }, 10)
 }
 
 // Hides the tooltip
 function hideTooltip () {
-  tooltipElement.removeClass('tooltip-shown')
+  tooltipElement.classList.remove('tooltip-shown')
   hideTimeoutVisibility = setTimeout(() => {
-    tooltipElement.removeClass('tooltip-visible')
+    tooltipElement.classList.remove('tooltip-visible')
   }, 300)
 }
 
@@ -340,23 +339,23 @@ function pathnameEndsWith (pathname, href) {
 /**
  * Measures height of the tooltips. Used when positioning the tooltip vertically.
  *
- * @param {object} tooltipElement jQuery element targeting the tooltip
+ * @param {object} tooltipElement element targeting the tooltip
  *
  * @returns {number} height of the tooltip
  */
 function measureTooltipHeight (tooltipElement) {
-  return tooltipElement[0].getBoundingClientRect().height
+  return tooltipElement.getBoundingClientRect().height
 }
 
 /**
  * Measures width of the tooltips. Used when positioning the tooltip horizontally.
  *
- * @param {object} tooltipElement jQuery element targeting the tooltip
+ * @param {object} tooltipElement element targeting the tooltip
  *
  * @returns {number} width of the tooltip
  */
 function measureTooltipWidth (tooltipElement) {
-  return tooltipElement[0].getBoundingClientRect().width
+  return tooltipElement.getBoundingClientRect().width
 }
 
 /**
@@ -376,12 +375,15 @@ function isHrefExpected (href) {
 export function initialize () {
   window.addEventListener('message', receivePopupMessage, false)
 
-  $(contentInner).append(tooltipLayoutTemplate())
-  tooltipElement = $(tooltipSelector)
+  qs(contentInner).insertAdjacentHTML('beforeend', tooltipLayoutTemplate())
+  tooltipElement = qs(tooltipSelector)
 
-  $(tooltipActivators).hover(hoverStart, hoverEnd)
+  qsAll(tooltipActivators).forEach(element => {
+    element.addEventListener('mouseenter', hoverStart)
+    element.addEventListener('mouseleave', hoverEnd)
+  })
 
-  $(footerSelector).on('click', tooltipsToggleSelector, function () {
+  qs(tooltipsToggleSelector).addEventListener('click', function () {
     toggleTooltipsDisabled()
   })
 

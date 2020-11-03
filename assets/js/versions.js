@@ -3,15 +3,15 @@
 
 // Dependencies
 // ------------
-import $ from 'jquery'
 import find from 'lodash.find'
 import versionsTemplate from './templates/versions-dropdown.handlebars'
+import {qs, checkUrlExists} from './helpers'
 
 // Local Variables
 // ---------------
 
-const sidebarProjectVersion = $('.sidebar-projectVersion')
-const currentVersion = sidebarProjectVersion.text().trim()
+const sidebarProjectVersion = qs('.sidebar-projectVersion')
+const currentVersion = sidebarProjectVersion.textContent.trim()
 
 // Local Methods
 // -------------
@@ -33,20 +33,24 @@ function addIsCurrentVersion (element) {
 export function initialize () {
   if (typeof versionNodes !== 'undefined') {
     addCurrentVersionIfNotPresent()
-    var width = $('.sidebar-projectVersion').width() + 10
+    const width = qs('.sidebar-projectVersion').offsetWidth + 10
 
-    let versionsDropdown = versionsTemplate({nodes: versionNodes.map(addIsCurrentVersion)})
-    sidebarProjectVersion.text('')
-    sidebarProjectVersion.append(versionsDropdown)
+    const versionsDropdown = versionsTemplate({nodes: versionNodes.map(addIsCurrentVersion)})
+    sidebarProjectVersion.innerHTML = versionsDropdown
 
-    $('.sidebar-projectVersionsDropdown').width(width).change(function () {
-      let url = $(this).val()
+    const dropdown = qs('.sidebar-projectVersionsDropdown')
+    dropdown.style.width = `${width}px`
+    dropdown.addEventListener('change', function (event) {
+      const url = event.target.value
       const otherVersionWithPath = url + '/' + window.location.href.split('/').pop()
-      $.get(otherVersionWithPath, function () {
-        window.location.href = otherVersionWithPath
-      }).fail(function () {
-        window.location.href = url
-      })
+      checkUrlExists(otherVersionWithPath)
+        .then(exists => {
+          if (exists) {
+            window.location.href = otherVersionWithPath
+          } else {
+            window.location.href = url
+          }
+        })
     })
   }
 }

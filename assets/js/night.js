@@ -1,22 +1,22 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
+import {qs} from './helpers'
 
 // Constants
 // ---------
 
-const body = $('body')
+const body = qs('body')
 const nightMode = 'night-mode'
 const nightModeToggleSelector = '.night-mode-toggle'
 
 function activateNightMode () {
-  body.addClass(nightMode)
+  body.classList.add(nightMode)
   try { localStorage.setItem(nightMode, true) } catch (e) { }
 }
 
 function deactivateNightMode () {
-  body.removeClass(nightMode)
+  body.classList.remove(nightMode)
   try { localStorage.removeItem(nightMode) } catch (e) { }
 }
 
@@ -29,13 +29,13 @@ function checkForNightMode () {
         activateNightMode()
       }
     } else if (matchMedia('(prefers-color-scheme: dark)').matches) {
-      body.addClass(nightMode)
+      body.classList.add(nightMode)
     }
   } catch (e) { }
 }
 
 function toggleNightMode () {
-  if (body.hasClass(nightMode)) {
+  if (body.classList.contains(nightMode)) {
     deactivateNightMode()
   } else {
     activateNightMode()
@@ -50,7 +50,7 @@ export {toggleNightMode}
 export function initialize () {
   checkForNightMode()
 
-  body.on('click', nightModeToggleSelector, function () {
+  qs(nightModeToggleSelector).addEventListener('click', function () {
     toggleNightMode()
   })
 }

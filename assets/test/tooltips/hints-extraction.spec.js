@@ -1,9 +1,8 @@
-import {extractTypeHint, extractModuleHint, extractFunctionHint} from '../../js/tooltips/hints-extraction'
-import $ from 'jquery'
+import {extractModuleHint, extractFunctionHint} from '../../js/tooltips/hints-extraction'
 
 describe('hints extraction', () => {
   describe('extractModuleHint', () => {
-    var modulePageObject = $($.parseHTML(`
+    var modulePageObject = parseHTML(`
       <div>
         <h1>
           Some module <small class="app-vsn">(ExDoc v0.0.1)</small>
@@ -20,7 +19,7 @@ describe('hints extraction', () => {
         </section>
         <section id="summary">List of functions with summaries</section>
       </div>
-    `))
+    `)[0]
 
     it('extracts hint info', () => {
       expect(extractModuleHint(modulePageObject).title).to.eql('Some module')
@@ -30,7 +29,7 @@ describe('hints extraction', () => {
   })
 
   describe('extractFunctionHint', () => {
-    var functionDetailObject = $($.parseHTML(`
+    var functionDetailObject = parseHTML(`
       <div>
         <div class="detail-header">
           <a href="#c:configure/1" class="detail-link" title="Link to this callback">
@@ -50,7 +49,7 @@ describe('hints extraction', () => {
           <p>Second line of description.</p>
         </section>
       </div>
-    `))
+    `)[0]
 
     it('extracts hint info', () => {
       let hint = extractFunctionHint(functionDetailObject)
@@ -61,3 +60,9 @@ describe('hints extraction', () => {
     })
   })
 })
+
+function parseHTML (html) {
+  const doc = document.implementation.createHTMLDocument();
+  doc.body.innerHTML = html;
+  return doc.body.children;
+}

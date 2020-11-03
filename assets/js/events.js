@@ -3,10 +3,10 @@
 // Dependencies
 // ------------
 
-import $ from 'jquery'
 import * as autocomplete from './autocomplete/display'
 import {search} from './search'
 import * as helpers from './helpers'
+import {qs} from './helpers'
 
 import sidebarItemsTemplate from './templates/sidebar-items.handlebars'
 
@@ -19,29 +19,24 @@ var SIDEBAR_TYPES = [
   '#tasks-list',
   '#search-list'
 ]
-var SIDEBAR_NAV = $('.sidebar-listNav')
-var CONTENT = $('.content')
-var CONTENT_INNER = $('.content-inner')
-var BODY = $('body')
-var SEARCH_FORM = $('form.sidebar-search')
+var SIDEBAR_NAV = qs('.sidebar-listNav')
+var CONTENT = qs('.content')
+var CONTENT_INNER = qs('.content-inner')
+var BODY = qs('body')
+var SEARCH_FORM = qs('form.sidebar-search')
 
 function setupSelected (id) {
-  SIDEBAR_TYPES.forEach(function (element) {
-    if (element === id) {
-      $(element).parent().addClass('selected')
-    } else {
-      $(element).parent().removeClass('selected')
-    }
+  SIDEBAR_TYPES.forEach(function (selector) {
+    qs(selector).parentElement.classList.toggle('selected', selector === id)
   })
 }
 
 function collapse () {
-  var $fullList = $('#full-list')
-  var $currentPage = $('#full-list li.current-page')
-  if ($currentPage.length > 0) {
-    $fullList.scrollTop(
-      $currentPage.offset().top - $fullList.offset().top - 40
-    )
+  const fullList = qs('#full-list')
+  const currentPage = qs('#full-list li.current-page')
+  if (currentPage) {
+    currentPage.scrollIntoView()
+    fullList.scrollTop -= 40
   }
 }
 
@@ -59,98 +54,110 @@ function fillSidebarWithNodes (nodes, filter) {
   const moduleType = helpers.getModuleType()
 
   filter = filter || moduleType
-  var filtered = nodes[filter] || []
-  var fullList = $('#full-list')
-  fullList.replaceWith(sidebarItemsTemplate({'nodes': filtered, 'group': ''}))
+  const filtered = nodes[filter] || []
+  const fullList = qs('#full-list')
+  const listContent = sidebarItemsTemplate({'nodes': filtered, 'group': ''})
+  fullList.innerHTML = listContent
   setupSelected(['#', filter, '-list'].join(''))
 
-  $('#full-list li a').on('click', e => {
-    var $target = $(e.target)
-    // the user might have clicked on the nesting indicator
-    var linkTag = $target.is('a') ? $target : $target.closest('a')
-    if (linkTag.hasClass('expand') && !$target.is('span') && !e.shiftKey) {
-      e.preventDefault()
-      $(e.target).closest('li').toggleClass('open')
-    } else {
-      $('#full-list li.current-page li.current-hash').removeClass('current-hash')
-      $(e.target).closest('li').addClass('current-hash')
-    }
+  fullList.querySelectorAll('li a').forEach(anchor => {
+    anchor.addEventListener('click', event => {
+      const target = event.target
+      if (anchor.classList.contains('expand') && !target.matches('span') && !event.shiftKey) {
+        event.preventDefault()
+        target.closest('li').classList.toggle('open')
+      } else {
+        const current = fullList.querySelector('li.current-page li.current-hash')
+        if (current) {
+          current.classList.remove('current-hash')
+        }
+        target.closest('li').classList.add('current-hash')
+      }
+    })
   })
 }
 
-function createHandler (name) {
-  return function (event) {
-    event.preventDefault()
-    fillSidebarWithNodes(sidebarNodes, name)
-    collapse()
+function registerHandler (selector, name) {
+  const anchor = SIDEBAR_NAV.querySelector(selector)
+  if (anchor) {
+    anchor.addEventListener('click', function (event) {
+      event.preventDefault()
+      fillSidebarWithNodes(sidebarNodes, name)
+      collapse()
+    })
   }
 }
 
 function addEventListeners () {
-  SIDEBAR_NAV.on('click', '#extras-list', createHandler('extras'))
-  SIDEBAR_NAV.on('click', '#modules-list', createHandler('modules'))
-  SIDEBAR_NAV.on('click', '#exceptions-list', createHandler('exceptions'))
-  SIDEBAR_NAV.on('click', '#tasks-list', createHandler('tasks'))
+  registerHandler('#extras-list', 'extras')
+  registerHandler('#modules-list', 'modules')
+  registerHandler('#exceptions-list', 'exceptions')
+  registerHandler('#tasks-list', 'tasks')
 
-  $('.sidebar-search').on('click', '.search-close-button', function (e) {
+  qs('.sidebar-search .search-close-button').addEventListener('click', function (event) {
     closeSearch()
-    e.preventDefault()
+    event.preventDefault()
   })
 
-  $('.sidebar-search input').on('keydown', function (e) {
+  qs('.sidebar-search input').addEventListener('keydown', function (event) {
     var newWindowKeyDown = (event.metaKey || event.ctrlKey)
     var autocompleteSelection = autocomplete.selectedElement()
 
-    if (e.keyCode === 27) { // escape key
-      $(this).val('').blur()
-    } else if (e.keyCode === 13) { // enter
+    if (event.keyCode === 27) { // escape key
+      event.target.value = ''
+      event.target.blur()
+    } else if (event.keyCode === 13) { // enter
       if (autocompleteSelection) {
-        var link = autocompleteSelection.attr('href')
-        handleAutocompleteEnterKey($(this), newWindowKeyDown, link)
-        e.preventDefault()
+        var link = autocompleteSelection.getAttribute('href')
+        handleAutocompleteEnterKey(event.target, newWindowKeyDown, link)
+        event.preventDefault()
       } else if (newWindowKeyDown) {
-        SEARCH_FORM.attr('target', '_blank').submit().removeAttr('')
-        e.preventDefault()
+        SEARCH_FORM.setAttribute('target', '_blank')
+        SEARCH_FORM.submit()
+        SEARCH_FORM.removeAttribute('target')
+        event.preventDefault()
       }
-    } else if (e.keyCode === 38) {
+    } else if (event.keyCode === 38) {
       autocomplete.moveSelection(-1)
-      e.preventDefault()
-    } else if (e.keyCode === 40) {
+      event.preventDefault()
+    } else if (event.keyCode === 40) {
       autocomplete.moveSelection(1)
-      e.preventDefault()
+      event.preventDefault()
     } else if (!newWindowKeyDown) {
-      autocomplete.update($(this).val())
+      autocomplete.update(event.target.value)
     }
   })
 
-  $('.sidebar-search input').on('keyup', function (e) {
+  qs('.sidebar-search input').addEventListener('keyup', function (event) {
     var commandKey = (event.metaKey || event.ctrlKey)
     if (commandKey) {
       return null
     }
 
-    if (e.keyCode !== 38 && e.keyCode !== 40) { // Left and right arrow keys
-      autocomplete.update($(this).val())
+    if (event.keyCode !== 38 && event.keyCode !== 40) { // Left and right arrow keys
+      autocomplete.update(event.target.value)
     }
   })
 
-  $('.sidebar-search input').on('focus', function (e) {
-    BODY.addClass('search-focused')
-    autocomplete.update($(this).val())
+  qs('.sidebar-search input').addEventListener('focus', function (event) {
+    BODY.classList.add('search-focused')
+    autocomplete.update(event.target.value)
   })
 
-  $('.sidebar-search input').on('blur', function (e) {
-    var relatedTarget = $(e.relatedTarget)
+  qs('.sidebar-search input').addEventListener('blur', function (event) {
+    const relatedTarget = event.relatedTarget
 
-    if (relatedTarget.hasClass('autocomplete-suggestion')) {
-      return null
+    if (relatedTarget) {
+      if (relatedTarget.classList.contains('autocomplete-suggestion')) {
+        return null
+      }
+
+      if (relatedTarget.classList.contains('search-close-button')) {
+        closeSearch()
+      }
     }
 
-    if (relatedTarget.hasClass('search-close-button')) {
-      closeSearch()
-    }
-
-    BODY.removeClass('search-focused')
+    BODY.classList.remove('search-focused')
     autocomplete.hide()
   })
 
@@ -162,17 +169,18 @@ function addEventListeners () {
 
 function handleAutocompleteEnterKey (inputElement, newWindowKeyDown, link) {
   var target = newWindowKeyDown ? '_blank' : '_self'
-  var originalValue = inputElement.val()
+  var originalValue = inputElement.value
 
-  inputElement.removeAttr('name').val('')
+  inputElement.removeAttribute('name')
+  inputElement.value = ''
 
-  SEARCH_FORM
-    .attr('action', link)
-    .attr('target', target)
-    .submit()
-    .attr('action', 'search.html')
+  SEARCH_FORM.setAttribute('action', link)
+  SEARCH_FORM.setAttribute('target', target)
+  SEARCH_FORM.submit()
+  SEARCH_FORM.setAttribute('action', 'search.html')
 
-  inputElement.val(originalValue).attr('name', 'q')
+  inputElement.value = originalValue
+  inputElement.setAttribute('name', 'q')
 }
 
 function getParameterByName (name) {
@@ -191,23 +199,29 @@ function identifyCurrentHash () {
   const nodes = sidebarNodes[helpers.getModuleType()] || []
   const category = helpers.findSidebarCategory(nodes, hash)
 
-  $(`#full-list li.current-page a.expand[href$="#${category}"]`)
-    .closest('li')
-    .addClass('open')
+  const categoryEl = qs(`#full-list li.current-page a.expand[href$="#${category}"]`)
+  if (categoryEl) {
+    categoryEl.closest('li').classList.add('open')
+  }
 
-  $(`#full-list li.current-page a[href$="#${hash}"]`)
-    .closest('li')
-    .addClass('current-hash')
+  const hashEl = qs(`#full-list li.current-page a[href$="#${hash}"]`)
+  if (hashEl) {
+    hashEl.closest('li').classList.add('current-hash')
+  }
 }
 
 function closeSearch () {
-  $('.sidebar-search input').val('')
-  $('.sidebar-search input').blur()
+  const input = qs('.sidebar-search input')
+  input.value = ''
+  input.blur()
 }
 
 function fixLinks () {
-  CONTENT.find('a').has('code').addClass('no-underline')
-  CONTENT.find('a').has('img').addClass('no-underline')
+  CONTENT.querySelectorAll('a').forEach(anchor => {
+    if (anchor.querySelector('code, img')) {
+      anchor.classList.add('no-underline')
+    }
+  })
 }
 
 /**
@@ -219,7 +233,8 @@ function fixLinks () {
  * before these keybindings worked.
  */
 function fixSpacebar () {
-  CONTENT_INNER.attr('tabindex', -1).focus()
+  CONTENT_INNER.setAttribute('tabindex', -1)
+  CONTENT_INNER.focus()
 }
 
 // Public Methods
