@@ -3,7 +3,6 @@
 
 // Dependencies
 // ------------
-import find from 'lodash.find'
 import versionsTemplate from './templates/versions-dropdown.handlebars'
 import {qs, checkUrlExists} from './helpers'
 
@@ -17,7 +16,7 @@ const currentVersion = sidebarProjectVersion.textContent.trim()
 // -------------
 
 function addCurrentVersionIfNotPresent () {
-  if (!find(versionNodes, function (element) { return element.version === currentVersion })) {
+  if (!versionNodes.find((element) => element.version === currentVersion)) {
     versionNodes.unshift({ version: currentVersion, url: '#' })
   }
 }

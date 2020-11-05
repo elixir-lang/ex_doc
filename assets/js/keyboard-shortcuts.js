@@ -1,7 +1,6 @@
 // Dependencies
 // ------------
 
-import find from 'lodash.find'
 import {focusSearchInput, openSidebar, toggleSidebar} from './sidebar'
 import {toggleNightMode} from './night'
 import {openQuickSwitchModal} from './quick-switch'
@@ -78,7 +77,7 @@ function triggerShortcut (event) {
 
   if (event.ctrlKey || event.metaKey || event.altKey) { return }
 
-  const foundShortcut = find(keyboardShortcuts, function (shortcut) {
+  const foundShortcut = keyboardShortcuts.find(function (shortcut) {
     if (key) return shortcut.name === key
 
     // legacy fallback

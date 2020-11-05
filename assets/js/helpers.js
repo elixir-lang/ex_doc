@@ -4,8 +4,6 @@
 // Dependencies
 // ------------
 
-import find from 'lodash.find'
-
 export const qs = document.querySelector.bind(document)
 
 export const qsAll = document.querySelectorAll.bind(document)
@@ -34,8 +32,8 @@ export function findSidebarCategory (items, query) {
   if (!items) return
 
   for (let item of items) {
-    const res = find(item.nodeGroups, ({nodes}) => {
-      return find(nodes, ({anchor}) => anchor === query)
+    const res = item.nodeGroups && item.nodeGroups.find(({nodes}) => {
+      return nodes.some(({anchor}) => anchor === query)
     })
 
     if (res) return res.key

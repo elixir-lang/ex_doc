@@ -1,7 +1,6 @@
 // Dependencies
 // ------------
 
-import find from 'lodash.find'
 import tooltipBodyTemplate from '../templates/tooltip-body.handlebars'
 import tooltipLayoutTemplate from '../templates/tooltip-layout.handlebars'
 import {qs, qsAll} from '../helpers'
@@ -285,7 +284,7 @@ function rewriteHref (href) {
  *   Returns `null` if current link does not point to a typespecs page.
  */
 function findTypeCategory (href) {
-  return find(typesCategories, category => href.indexOf(category.href) >= 0)
+  return typesCategories.find(category => href.indexOf(category.href) >= 0)
 }
 
 /**
