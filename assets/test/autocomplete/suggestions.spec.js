@@ -1,4 +1,4 @@
-import {getSuggestions} from '../../js/autocomplete/suggestions'
+import { getSuggestions } from '../../js/autocomplete/suggestions'
 
 describe('getSuggestions', () => {
   before(() => {
@@ -97,7 +97,7 @@ describe('getSuggestions', () => {
     })
 
     it('returns no results if no search term provided', () => {
-      expect(getSuggestions()).to.eql([])
+      expect(getSuggestions('')).to.eql([])
     })
 
     it('returns no results if search term consists of whitespace characters', () => {

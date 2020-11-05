@@ -433,7 +433,12 @@ defmodule ExDoc.AutolinkTest do
 
   ## Helpers
 
-  @default_options [apps: [:myapp], current_module: MyModule, module_id: "MyModule", file: "nofile"]
+  @default_options [
+    apps: [:myapp],
+    current_module: MyModule,
+    module_id: "MyModule",
+    file: "nofile"
+  ]
 
   defp autolink(ast_or_text, options \\ []) do
     ExDoc.Autolink.doc(ast(ast_or_text), Keyword.merge(@default_options, options))

@@ -198,9 +198,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           tasks: []
         })
 
-      assert content =~ ~r{<li><a id="modules-list" href="#full-list">Modules</a></li>}
+      assert content =~ ~r{<li><a id="modules-list-link" href="#full-list">Modules</a></li>}
       refute content =~ ~r{<li><a id="exceptions-list" href="#full-list">Exceptions</a></li>}
-      refute content =~ ~r{<li><a id="tasks-list" href="#full-list">Mix Tasks</a></li>}
+      refute content =~ ~r{<li><a id="tasks-list-link" href="#full-list">Mix Tasks</a></li>}
     end
 
     test "outputs listing for the given nodes" do

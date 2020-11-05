@@ -1,149 +1,113 @@
-// Dependencies
-// ------------
+import keyboardShortcutsModalBodyTemplate from './handlebars/templates/keyboard-shortcuts-modal-body.handlebars'
+import { qs } from './helpers'
+import { openSidebar, toggleSidebar } from './sidebar/sidebar-drawer'
+import { focusSearchInput } from './sidebar/sidebar-search'
+import { toggleNightMode } from './night'
+import { openQuickSwitchModal } from './quick-switch'
+import { closeModal, isModalOpen, openModal } from './modal'
 
-import {focusSearchInput, openSidebar, toggleSidebar} from './sidebar'
-import {toggleNightMode} from './night'
-import {openQuickSwitchModal} from './quick-switch'
-import helpModalTemplate from './templates/keyboard-shortcuts-help-modal.handlebars'
-import {qs} from './helpers'
+const HELP_LINK_SELECTOR = '.display-shortcuts-help'
+const HELP_MODAL_BODY_SELECTOR = '#keyboard-shortcuts-modal-body'
 
-// Constants
-// ---------
-
-const helpModalSelector = '#keyboard-shortcuts-modal'
-const closeButtonSelector = '.modal-close'
-const helpLinkSelector = '.display-shortcuts-help'
-const inputElements = ['input', 'textarea']
 const keyboardShortcuts = [
   {
-    name: 'c',
-    keyCode: 67,
+    key: 'c',
     description: 'Toggle sidebar',
     action: toggleSidebar
   },
   {
-    name: 'n',
-    keyCode: 78,
+    key: 'n',
     description: 'Toggle night mode',
     action: toggleNightMode
   },
   {
-    name: 's',
-    keyCode: 83,
+    key: 's',
     description: 'Focus search bar',
     displayAs: '<kbd><kbd>/</kbd></kbd> or <kbd><kbd>s</kdb></kdb>',
     action: searchKeyAction
   },
   {
-    name: '/',
-    keyCode: 191,
+    key: '/',
     action: searchKeyAction
   },
   {
-    name: 'g',
-    keyCode: 71,
+    key: 'g',
     description: 'Go to a HexDocs package',
     displayAs: '<kbd><kbd>g</kdb></kdb>',
     action: openQuickSwitchModal
   },
   {
-    name: '?',
-    keyCode: 191,
-    requiresShiftKey: true,
+    key: '?',
     displayAs: '<kbd><kbd>?</kbd></kbd>',
     description: 'Bring up this help dialog',
     action: toggleHelpModal
   }
 ]
 
-// State
-// -----
+const state = {
+  // Stores shortcut info to prevent multiple activations on long press (continuous keydown events)
+  shortcutBeingPressed: null
+}
 
-// Stores shortcut info to prevent multiple activations on keyDown event
-let shortcutBeingPressed = null
+/**
+ * Registers keyboard shortcuts and sets up a help modal
+ * listing all available options.
+ */
+export function initialize () {
+  addEventListeners()
+}
 
-// Local Methods
-// ---------------
-
-function triggerShortcut (event) {
-  const elementTagName = event.target.tagName.toLowerCase()
-  const key = event.key
-  const keyCode = event.keyCode
-  const isShiftPressed = event.shiftKey
-
-  if (shortcutBeingPressed) { return }
-
-  if (inputElements.indexOf(elementTagName) >= 0) { return }
-
-  if (event.ctrlKey || event.metaKey || event.altKey) { return }
-
-  const foundShortcut = keyboardShortcuts.find(function (shortcut) {
-    if (key) return shortcut.name === key
-
-    // legacy fallback
-    const isShiftRequired = !!shortcut.requiresShiftKey
-    return shortcut.keyCode === keyCode && isShiftRequired === isShiftPressed
+function addEventListeners () {
+  qs(HELP_LINK_SELECTOR).addEventListener('click', event => {
+    openHelpModal()
   })
 
-  if (!foundShortcut) { return }
-
-  shortcutBeingPressed = foundShortcut
-
-  foundShortcut.action(event)
+  document.addEventListener('keydown', handleKeyDown)
+  document.addEventListener('keyup', handleKeyUp)
 }
 
-function closeHelpModal () {
-  qs(helpModalSelector).classList.remove('shown')
+function handleKeyDown (event) {
+  if (state.shortcutBeingPressed) { return }
+  if (event.target.matches('input, textarea')) { return }
+  if (event.ctrlKey || event.metaKey || event.altKey) { return }
+
+  const matchingShortcut = keyboardShortcuts.find(shortcut => shortcut.key === event.key)
+  if (!matchingShortcut) { return }
+  state.shortcutBeingPressed = matchingShortcut
+
+  event.preventDefault()
+  matchingShortcut.action(event)
 }
 
-function openHelpModal () {
-  qs(helpModalSelector).classList.add('shown')
-  qs(helpModalSelector).focus()
+function handleKeyUp (event) {
+  state.shortcutBeingPressed = null
+}
+
+// Additional shortcut actions
+
+function searchKeyAction (event) {
+  closeModal()
+  openSidebar()
+    .then(() => {
+      focusSearchInput()
+    })
 }
 
 function toggleHelpModal () {
-  if (qs(helpModalSelector).classList.contains('shown')) {
-    closeHelpModal()
+  if (isHelpModalOpen()) {
+    closeModal()
   } else {
     openHelpModal()
   }
 }
 
-function searchKeyAction (event) {
-  openSidebar()
-  closeHelpModal()
-  focusSearchInput()
-  event.preventDefault()
+function isHelpModalOpen () {
+  return isModalOpen() && qs(HELP_MODAL_BODY_SELECTOR)
 }
 
-// Public Methods
-// --------------
-
-export function initialize () {
-  const helpModal = helpModalTemplate({shortcuts: keyboardShortcuts})
-  qs('body').insertAdjacentHTML('beforeend', helpModal)
-
-  qs(helpModalSelector).addEventListener('keydown', function (event) {
-    if (event.keyCode === 27) { // escape key
-      closeHelpModal()
-    }
-  })
-
-  qs(helpModalSelector).addEventListener('click', function (event) {
-    if (event.target === qs(closeButtonSelector)) {
-      closeHelpModal()
-    }
-  })
-
-  qs(helpLinkSelector).addEventListener('click', function (event) {
-    openHelpModal()
-  })
-
-  document.addEventListener('keydown', function (event) {
-    triggerShortcut(event)
-  })
-
-  document.addEventListener('keyup', function (event) {
-    shortcutBeingPressed = null
+function openHelpModal () {
+  openModal({
+    title: 'Keyboard Shortcuts',
+    body: keyboardShortcutsModalBodyTemplate({ shortcuts: keyboardShortcuts })
   })
 }

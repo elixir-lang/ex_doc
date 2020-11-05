@@ -24,10 +24,10 @@ function buildFilename(name, extension) {
 module.exports = {
   mode: 'production',
   entry: {
-    "epub-app": './js/epub.js',
+    "epub-app": './js/entry/epub.js',
     "epub-elixir": './less/entry/epub-elixir.less',
     "epub-erlang": './less/entry/epub-erlang.less',
-    "html-app": './js/html.js',
+    "html-app": './js/entry/html.js',
     "html-elixir": './less/entry/html-elixir.less',
     "html-erlang": './less/entry/html-erlang.less',
   },
@@ -52,7 +52,7 @@ module.exports = {
         loader: 'handlebars-loader',
         query: {
           helperDirs: [
-            resolve(__dirname, 'js', 'template-helpers')
+            resolve(__dirname, 'js/handlebars/template-helpers')
           ]
         }
       },

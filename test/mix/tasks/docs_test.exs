@@ -115,7 +115,7 @@ defmodule Mix.Tasks.DocsTest do
                 apps: _,
                 source_beam: _,
                 homepage_url: "http://elixir-lang.org",
-                source_url: "https://github.com/elixir-lang/ex_doc",
+                source_url: "https://github.com/elixir-lang/ex_doc"
               ]},
              {"ExDoc", "1.2.3-dev",
               [
@@ -146,7 +146,7 @@ defmodule Mix.Tasks.DocsTest do
            formatter: "html",
            deps: _,
            apps: [:bar, :foo],
-           source_beam: _,
+           source_beam: _
          ]},
         {"umbrella", "dev",
          [

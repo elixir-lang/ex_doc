@@ -1,5 +1,5 @@
 export default function (context, nodeGroup, options) {
-  var group = nodeGroup || ''
+  const group = nodeGroup || ''
   if (context.group !== group) {
     // reset the nesting context for the #nestingChanged block helper
     delete context.nestedContext

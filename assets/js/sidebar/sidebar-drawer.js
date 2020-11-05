@@ -1,0 +1,137 @@
+import throttle from 'lodash.throttle'
+import { qs } from '../helpers'
+
+const BREAKPOINT = 768
+const ANIMATION_DURATION = 300
+
+const SIDEBAR_TOGGLE_SELECTOR = '.sidebar-toggle'
+const CONTENT_SELECTOR = '.content'
+
+const SIDEBAR_CLASS = {
+  opened: 'sidebar-opened',
+  opening: 'sidebar-opening',
+  closed: 'sidebar-closed',
+  closing: 'sidebar-closing'
+}
+
+const SIDEBAR_CLASSES = Object.values(SIDEBAR_CLASS)
+
+const state = {
+  // Keep track of the current timeout to clear it if needed
+  togglingTimeout: null,
+  // Record window width on resize to update sidebar state only when it actually changes
+  lastWindowWidth: window.innerWidth
+}
+
+/**
+ * Initializes the toggleable sidebar drawer.
+ */
+export function initialize () {
+  setDefaultSidebarState()
+  addEventListeners()
+}
+
+function setDefaultSidebarState () {
+  setClass(
+    isScreenSmall()
+      ? SIDEBAR_CLASS.closed
+      : SIDEBAR_CLASS.opened
+  )
+}
+
+function isScreenSmall () {
+  return window.matchMedia(`screen and (max-width: ${BREAKPOINT}px)`).matches
+}
+
+function setClass (...classes) {
+  document.body.classList.remove(...SIDEBAR_CLASSES)
+  document.body.classList.add(...classes)
+}
+
+function addEventListeners () {
+  qs(SIDEBAR_TOGGLE_SELECTOR).addEventListener('click', event => {
+    toggleSidebar()
+  })
+
+  qs(CONTENT_SELECTOR).addEventListener('click', event => {
+    closeSidebarIfSmallScreen()
+  })
+
+  window.addEventListener('resize', throttle(event => {
+    adoptSidebarToWindowSize()
+  }, 100))
+}
+
+/**
+ * Either opens or closes the sidebar depending on the current state.
+ *
+ * @returns {Promise} A promise resolving once the animation is finished.
+ */
+export function toggleSidebar () {
+  if (isSidebarOpen()) {
+    return closeSidebar()
+  } else {
+    return openSidebar()
+  }
+}
+
+function isSidebarOpen () {
+  return document.body.classList.contains(SIDEBAR_CLASS.opened) ||
+    document.body.classList.contains(SIDEBAR_CLASS.opening)
+}
+
+/**
+ * Opens the sidebar by applying an animation.
+ *
+ * @returns {Promise} A promise resolving once the animation is finished.
+ */
+export function openSidebar () {
+  clearTimeoutIfAny()
+  setClass(SIDEBAR_CLASS.opening)
+
+  return new Promise((resolve, reject) => {
+    state.togglingTimeout = setTimeout(() => {
+      setClass(SIDEBAR_CLASS.opened)
+      resolve()
+    }, ANIMATION_DURATION)
+  })
+}
+
+/**
+ * Closes the sidebar by applying an animation.
+ *
+ * @returns {Promise} A promise resolving once the animation is finished.
+ */
+export function closeSidebar () {
+  clearTimeoutIfAny()
+  setClass(SIDEBAR_CLASS.closing)
+
+  return new Promise((resolve, reject) => {
+    state.togglingTimeout = setTimeout(() => {
+      setClass(SIDEBAR_CLASS.closed)
+      resolve()
+    }, ANIMATION_DURATION)
+  })
+}
+
+function clearTimeoutIfAny () {
+  if (state.togglingTimeout) {
+    clearTimeout(state.togglingTimeout)
+    state.togglingTimeout = null
+  }
+}
+
+function adoptSidebarToWindowSize () {
+  // See https://github.com/elixir-lang/ex_doc/issues/736#issuecomment-307371291
+  if (state.lastWindowWidth !== window.innerWidth) {
+    state.lastWindowWidth = window.innerWidth
+    setDefaultSidebarState()
+  }
+}
+
+function closeSidebarIfSmallScreen () {
+  const sidebarCoversContent = isScreenSmall()
+  if (sidebarCoversContent && isSidebarOpen()) {
+    closeSidebar()
+  }
+}
