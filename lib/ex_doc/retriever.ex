@@ -165,6 +165,9 @@ defmodule ExDoc.Retriever do
     {first in ?a..?z, name, arity}
   end
 
+  defp doc_ast("application/erlang+html", %{"en" => doc}, options),
+    do: ExDoc.Language.Erlang.to_ast(doc, options)
+
   defp doc_ast("text/markdown", %{"en" => doc}, options),
     do: Markdown.to_ast(doc, options)
 
