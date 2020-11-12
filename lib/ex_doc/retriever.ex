@@ -588,7 +588,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp source_path(module, config) do
-    source = String.Chars.to_string(module.__info__(:compile)[:source])
+    source = String.Chars.to_string(module.module_info(:compile)[:source])
 
     if root = config.source_root do
       Path.relative_to(source, root)
