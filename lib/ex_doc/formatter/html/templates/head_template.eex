@@ -10,7 +10,7 @@
       <meta name="author" content="<%= Enum.join(config.authors, ", ") %>">
     <% end %>
     <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
-    <link rel="stylesheet" href="<%= asset_rev config.output, "dist/elixir*.css" %>" />
+    <link rel="stylesheet" href="<%= asset_rev config.output, "dist/#{config.proglang}*.css" %>" />
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
