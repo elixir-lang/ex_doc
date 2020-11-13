@@ -33,6 +33,7 @@ defmodule ExDoc do
     {output, options} = Keyword.pop(options, :output, "./doc")
     {groups_for_modules, options} = Keyword.pop(options, :groups_for_modules, [])
     {nest_modules_by_prefix, options} = Keyword.pop(options, :nest_modules_by_prefix, [])
+    {proglang, options} = Keyword.pop(options, :proglang, :elixir)
 
     {source_url_pattern, options} =
       Keyword.pop_lazy(options, :source_url_pattern, fn ->
@@ -45,6 +46,7 @@ defmodule ExDoc do
       main: options[:main],
       output: normalize_output(output),
       homepage_url: options[:homepage_url],
+      proglang: normalize_proglang(proglang),
       source_root: options[:source_root] || File.cwd!(),
       source_url_pattern: source_url_pattern,
       nest_modules_by_prefix: normalize_nest_modules_by_prefix(nest_modules_by_prefix),
@@ -82,6 +84,9 @@ defmodule ExDoc do
   defp normalize_output(output) do
     String.trim_trailing(output, "/")
   end
+
+  defp normalize_proglang(elixir) when elixir in [:elixir, "elixir"], do: :elixir
+  defp normalize_proglang(erlang) when erlang in [:erlang, "erlang"], do: :erlang
 
   defp normalize_groups_for_modules(groups_for_modules) do
     default_groups = [Deprecated: &deprecated?/1, Exceptions: &exception?/1]

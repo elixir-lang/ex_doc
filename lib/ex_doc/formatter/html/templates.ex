@@ -262,6 +262,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     link_headings(content, @heading_regex, prefix <> "-")
   end
 
+  defp stylesheet_path(:elixir), do: "dist/elixir*.css"
+  defp stylesheet_path(:erlang), do: "dist/erlang*.css"
+
   templates = [
     detail_template: [:node, :_module],
     footer_template: [:config],
