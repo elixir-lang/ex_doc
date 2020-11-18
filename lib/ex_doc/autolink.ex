@@ -336,17 +336,22 @@ defmodule ExDoc.Autolink do
   def typespec(ast, options) do
     config = struct!(__MODULE__, options)
 
-    string =
-      ast
-      |> Macro.to_string()
-      |> Code.format_string!(line_length: 80)
-      |> IO.iodata_to_binary()
-      |> T.h()
+    case tool(config.current_module) do
+      erlang when erlang in [:erlang, :erlang_otp] ->
+        ## TODO: print the docs_v1 signature / AST snippet
+        config.id
+      :ex_doc ->
+        string =
+          ast
+          |> Macro.to_string()
+          |> Code.format_string!(line_length: 80)
+          |> IO.iodata_to_binary()
+          |> T.h()
 
-    name = typespec_name(ast)
-    {name, rest} = split_name(string, name)
-
-    name <> do_typespec(rest, config)
+        name = typespec_name(ast)
+        {name, rest} = split_name(string, name)
+        name <> do_typespec(rest, config)
+    end
   end
 
   defp typespec_name({:"::", _, [{name, _, _}, _]}), do: Atom.to_string(name)
