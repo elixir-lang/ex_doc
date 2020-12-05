@@ -360,6 +360,16 @@ defmodule ExDoc.AutolinkTest do
       assert typespec(quote(do: term() < term() :: boolean())) ==
                ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>() &lt; <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">boolean</a>()]
     end
+
+    test "indent after line break" do
+      assert typespec(
+               quote do
+                 ascii_printable?([...], limit) :: boolean() when limit: :infinity | pos_integer()
+               end
+             ) ==
+               "ascii_printable?([...], limit) :: <a href=\"https://hexdocs.pm/elixir/typespecs.html#built-in-types\">boolean</a>()\n" <>
+                 "    when limit: :infinity | <a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\">pos_integer</a>()"
+    end
   end
 
   test "warnings" do
@@ -433,7 +443,12 @@ defmodule ExDoc.AutolinkTest do
 
   ## Helpers
 
-  @default_options [apps: [:myapp], current_module: MyModule, module_id: "MyModule", file: "nofile"]
+  @default_options [
+    apps: [:myapp],
+    current_module: MyModule,
+    module_id: "MyModule",
+    file: "nofile"
+  ]
 
   defp autolink(ast_or_text, options \\ []) do
     ExDoc.Autolink.doc(ast(ast_or_text), Keyword.merge(@default_options, options))
