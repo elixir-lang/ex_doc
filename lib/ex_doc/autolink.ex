@@ -341,6 +341,7 @@ defmodule ExDoc.Autolink do
       |> Macro.to_string()
       |> Code.format_string!(line_length: 80)
       |> IO.iodata_to_binary()
+      |> String.replace("\n", "\n    ")
       |> T.h()
 
     name = typespec_name(ast)
