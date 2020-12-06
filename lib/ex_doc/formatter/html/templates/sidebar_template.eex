@@ -13,7 +13,7 @@
       <span class="icon-cross" aria-hidden="true" title="Cancel search"></span>
     </button>
     <label class="search-label">
-      <input name="q" type="text" id="search-list" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" />
+      <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" />
     </label>
   </form>
 
@@ -40,14 +40,14 @@
   </div>
 
   <ul class="sidebar-listNav">
-    <li><a id="extras-list" href="#full-list"><%= config.extra_section || "Pages" %></a></li>
+    <li><a id="extras-list-link" href="#full-list"><%= config.extra_section || "Pages" %></a></li>
 
     <%= if nodes_map.modules != [] do %>
-      <li><a id="modules-list" href="#full-list">Modules</a></li>
+      <li><a id="modules-list-link" href="#full-list">Modules</a></li>
     <% end %>
 
     <%= if nodes_map.tasks != [] do %>
-      <li><a id="tasks-list" href="#full-list">Mix Tasks</a></li>
+      <li><a id="tasks-list-link" href="#full-list">Mix Tasks</a></li>
     <% end %>
   </ul>
   <div class="gradient"></div>

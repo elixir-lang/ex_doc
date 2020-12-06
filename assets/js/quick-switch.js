@@ -1,34 +1,19 @@
-// quick switch modal
+import quickSwitchModalBodyTemplate from './handlebars/templates/quick-switch-modal-body.handlebars'
+import quickSwitchResultsTemplate from './handlebars/templates/quick-switch-results.handlebars'
+import { debounce, qs, qsAll } from './helpers'
+import { openModal } from './modal'
 
-// Dependencies
-// ------------
+const HEX_DOCS_ENDPOINT = 'https://hexdocs.pm/%%'
+const HEX_SEARCH_ENDPOINT = 'https://hex.pm/api/packages?search=name:%%*'
+const QUICK_SWITCH_LINK_SELECTOR = '.display-quick-switch'
+const QUICK_SWITCH_INPUT_SELECTOR = '#quick-switch-input'
+const QUICK_SWITCH_RESULTS_SELECTOR = '#quick-switch-results'
+const QUICK_SWITCH_RESULT_SELECTOR = '.quick-switch-result'
+const DEBOUNCE_KEYPRESS_TIMEOUT = 300
+const NUMBER_OF_SUGGESTIONS = 9
 
-import $ from 'jquery'
-import quickSwitchModalTemplate from './templates/quick-switch-modal.handlebars'
-import quickSwitchResultsTemplate from './templates/quick-switch-results.handlebars'
-
-// Constants
-// ---------
-
-const hexDocsEndpoint = 'https://hexdocs.pm/%%'
-const hexSearchEndpoint = 'https://hex.pm/api/packages?search=name:%%*'
-const quickSwitchLinkSelector = '.display-quick-switch'
-const quickSwitchModalSelector = '#quick-switch-modal'
-const quickSwitchInputSelector = '#quick-switch-input'
-const quickSwitchResultsSelector = '#quick-switch-results'
-const quickSwitchResultSelector = '.quick-switch-result'
-const closeButtonSelector = '.modal-close'
-const debounceKeypressTimeout = 300
-const numberOfSuggestions = 9
-const usedModifierKeys = [
-  13, // enter
-  27, // escape
-  37, // left arrow
-  38, // up arrow
-  39, // right arrow
-  40 // down arrow
-]
-const staticSearchResults = [
+// Core elixir packages to include in the autocomplete results
+const STATIC_SEARCH_RESULTS = [
   'elixir',
   'eex',
   'ex_unit',
@@ -36,52 +21,83 @@ const staticSearchResults = [
   'iex',
   'logger',
   'mix'
-].map((pkg) => { return {name: pkg} })
+].map(name => ({ name }))
 
-// State
-// -----
+const state = {
+  autocompleteResults: [],
+  selectedIdx: null
+}
 
-let debounceTimeout = null
-let autoCompleteResults = []
-let autoCompleteSelected = -1
+/**
+ * Initializes the quick switch modal.
+ */
+export function initialize () {
+  addEventListeners()
+}
+
+function addEventListeners () {
+  qs(QUICK_SWITCH_LINK_SELECTOR).addEventListener('click', event => {
+    openQuickSwitchModal()
+  })
+}
+
+function handleKeyDown (event) {
+  const packageSlug = event.target.value
+
+  if (event.key === 'Enter') {
+    quickSwitchToPackage(packageSlug)
+    event.preventDefault()
+  } else if (event.key === 'ArrowUp') {
+    moveAutocompleteSelection(-1)
+    event.preventDefault()
+  } else if (event.key === 'ArrowDown') {
+    moveAutocompleteSelection(1)
+    event.preventDefault()
+  }
+}
+
+function handleInput (event) {
+  const packageSlug = event.target.value
+
+  if (packageSlug.length < 3) {
+    const resultsContainer = qs(QUICK_SWITCH_RESULTS_SELECTOR)
+    resultsContainer.innerHTML = ''
+  } else {
+    debouncedQueryForAutocomplete(packageSlug)
+  }
+}
 
 /**
  * Opens the quick switch modal dialog.
- *
- * @param {Object} e Keybord shortcut press event
  */
-function openQuickSwitchModal (e) {
-  $(quickSwitchModalSelector).show()
-  $(quickSwitchInputSelector).focus()
-  event.preventDefault()
+export function openQuickSwitchModal () {
+  openModal({
+    title: 'Go to a HexDocs package',
+    body: quickSwitchModalBodyTemplate()
+  })
+
+  qs(QUICK_SWITCH_INPUT_SELECTOR).focus()
+
+  const quickSwitchInput = qs(QUICK_SWITCH_INPUT_SELECTOR)
+  quickSwitchInput.addEventListener('keydown', handleKeyDown)
+  quickSwitchInput.addEventListener('input', handleInput)
+
+  state.autocompleteResults = []
+  state.selectedIdx = null
 }
 
 /**
- * Closes the quick switch modal dialog.
- */
-function closeQuickSwitchModal () {
-  debounceTimeout = null
-  autoCompleteResults = []
-  autoCompleteSelected = -1
-
-  $(quickSwitchInputSelector).blur()
-  $(quickSwitchResultsSelector).html('')
-  $(quickSwitchInputSelector).val('').removeClass('completed')
-  $(quickSwitchModalSelector).hide()
-}
-
-/**
- * Switch to a package on HexDocs.
- * If an autocomplete entry is selected, it will be used instead of the packageSlug.
+ * Navigate to a package on HexDocs.
+ * If an autocomplete entry is selected, it will be used instead of the input text.
  *
  * @param {String} packageSlug The searched package name
  */
 function quickSwitchToPackage (packageSlug) {
-  if (autoCompleteSelected === -1) {
-    switchToExDocPackage(packageSlug)
+  if (state.selectedIdx === null) {
+    navigateToHexDocPackage(packageSlug)
   } else {
-    const selectedResult = autoCompleteResults[autoCompleteSelected]
-    switchToExDocPackage(selectedResult.name)
+    const selectedResult = state.autocompleteResults[state.selectedIdx]
+    navigateToHexDocPackage(selectedResult.name)
   }
 }
 
@@ -90,21 +106,11 @@ function quickSwitchToPackage (packageSlug) {
  *
  * @param {String} packageSlug The package name to navigate to
  */
-function switchToExDocPackage (packageSlug) {
-  window.location = hexDocsEndpoint.replace('%%', packageSlug)
+function navigateToHexDocPackage (packageSlug) {
+  window.location = HEX_DOCS_ENDPOINT.replace('%%', packageSlug)
 }
 
-/**
- * Debounces API calls to HexDocs for autocompleting package names.
- *
- * @param {String} packageSlug The searched package name
- */
-function debouceAutocomplete (packageSlug) {
-  clearTimeout(debounceTimeout)
-  debounceTimeout = setTimeout(() => {
-    queryForAutocomplete(packageSlug)
-  }, debounceKeypressTimeout)
-}
+const debouncedQueryForAutocomplete = debounce(queryForAutocomplete, DEBOUNCE_KEYPRESS_TIMEOUT)
 
 /**
  * Queries the HexDocs API for autocomplete results for a given package name.
@@ -112,168 +118,80 @@ function debouceAutocomplete (packageSlug) {
  * @param {String} packageSlug The searched package name
  */
 function queryForAutocomplete (packageSlug) {
-  $.get(hexSearchEndpoint.replace('%%', packageSlug), (payload) => {
-    if (Array.isArray(payload)) {
-      autoCompleteResults = resultsFromPayload(packageSlug, payload)
-      autoCompleteSelected = -1
-
-      const template = quickSwitchResultsTemplate({
-        results: autoCompleteResults
-      })
-
-      // Only append results if string is still long enough
-      const currentTerm = $(quickSwitchInputSelector).val()
-      if (currentTerm && currentTerm.length >= 3) {
-        $(quickSwitchResultsSelector).html(template)
-        $(quickSwitchResultSelector).click(function () {
-          const selectedResult = autoCompleteResults[$(this).attr('data-index')]
-          switchToExDocPackage(selectedResult.name)
-        })
+  const url = HEX_SEARCH_ENDPOINT.replace('%%', packageSlug)
+  fetch(url)
+    .then(response => response.json())
+    .then(payload => {
+      if (Array.isArray(payload)) {
+        state.autocompleteResults = resultsFromPayload(packageSlug, payload)
+        state.selectedIdx = null
+        // Only render results if the serach string is still long enough
+        const currentTerm = qs(QUICK_SWITCH_INPUT_SELECTOR).value
+        if (currentTerm.length >= 3) {
+          renderResults({ results: state.autocompleteResults })
+        }
       }
-    }
+    })
+}
+
+function renderResults ({ results }) {
+  const resultsContainer = qs(QUICK_SWITCH_RESULTS_SELECTOR)
+  const resultsHtml = quickSwitchResultsTemplate({ results })
+  resultsContainer.innerHTML = resultsHtml
+
+  qsAll(QUICK_SWITCH_RESULT_SELECTOR).forEach(result => {
+    result.addEventListener('click', event => {
+      const index = result.getAttribute('data-index')
+      const selectedResult = state.autocompleteResults[index]
+      navigateToHexDocPackage(selectedResult.name)
+    })
   })
 }
 
 /**
- * Extracts the first `numberOfSuggestions` results from the payload response
- * and the hardcoded, available packages in `staticSearchResults`.
+ * Extracts the first `NUMBER_OF_SUGGESTIONS` results from the payload response
+ * and the hardcoded, available packages in `STATIC_SEARCH_RESULT`.
  * This also filters out packages that do not have their docs published on HexDocs.
  *
  * @param {String} packageSlug The searched package name
  * @param {Array} payload The payload returned by the search request
  */
 function resultsFromPayload (packageSlug, payload) {
-  return staticSearchResults
+  return STATIC_SEARCH_RESULTS
     .concat(payload)
-    .filter(result => result.name.indexOf(packageSlug) !== -1)
-    .filter(result => result.releases === undefined || result.releases[0].has_docs === true)
-    .slice(0, numberOfSuggestions)
+    .filter(result => result.name.includes(packageSlug))
+    .filter(result => result.releases === undefined || result.releases[0]['has_docs'] === true)
+    .slice(0, NUMBER_OF_SUGGESTIONS)
 }
 
 /**
  * Moves the autocomplete selection up or down.
  *
- * @param {Object} e The keypress event that triggered the moving
- * @param {String} updown Whether to move up or down the list
+ * @param {Number} offset How much to move down (or up) the list.
  */
-function moveAutocompleteSelection (e, updown) {
-  const selectedElement = $('.quick-switch-result.selected')
+function moveAutocompleteSelection (offset) {
+  state.selectedIdx = newAutocompleteIndex(offset)
 
-  if (selectedElement.length !== 0) {
-    if (updown === 'up') {
-      selectPrevAcResult(selectedElement)
-    } else {
-      selectNextAcResult(selectedElement)
-    }
-  } else {
-    selectFirstAcResult()
+  const selectedElement = qs('.quick-switch-result.selected')
+  const elementToSelect = qs(`.quick-switch-result[data-index="${state.selectedIdx}"]`)
+
+  if (selectedElement) {
+    selectedElement.classList.remove('selected')
   }
 
-  e.preventDefault()
-}
-
-/**
- * Select the first result in the autocomplete result list.
- */
-function selectFirstAcResult () {
-  $(quickSwitchResultSelector).first().addClass('selected')
-  autoCompleteSelected = 0
-}
-
-/**
- * Select the last result in the autocomplete result list.
- */
-function selectLastAcResult () {
-  $(quickSwitchResultSelector).last().addClass('selected')
-  autoCompleteSelected = numberOfSuggestions
-}
-
-/**
- * Select next autocomplete result.
- * If the end of the list is reached, the first element is selected instead.
- *
- * @param {(Object|null)} selectedElement jQuery element of selected autocomplete result
- */
-function selectNextAcResult (selectedElement) {
-  const nextResult = selectedElement.next()
-  selectedElement.removeClass('selected')
-
-  if (nextResult.length !== 0) {
-    nextResult.addClass('selected')
-    autoCompleteSelected += 1
-  } else {
-    selectFirstAcResult()
+  if (elementToSelect) {
+    elementToSelect.classList.add('selected')
   }
 }
 
-/**
- * Select previous autocomplete result.
- * If the beginning of the list is reached, the last element is selected instead.
- *
- * @param {(Object|null)} selectedElement jQuery element of selected autocomplete result
- */
-function selectPrevAcResult (selectedElement) {
-  const prevResult = selectedElement.prev()
-  selectedElement.removeClass('selected')
+function newAutocompleteIndex (offset) {
+  const length = state.autocompleteResults.length
 
-  if (prevResult.length !== 0) {
-    prevResult.addClass('selected')
-    autoCompleteSelected -= 1
-  } else {
-    selectLastAcResult()
+  if (state.selectedIdx === null) {
+    if (offset >= 0) return 0
+    if (offset < 0) return length - 1
   }
-}
 
-/**
- * De-select the currently selected autocomplete result
- */
-function deselectAcResult () {
-  $('.quick-switch-result.selected').removeClass('selected')
-  autoCompleteSelected = -1
-}
-
-// Public Methods
-// --------------
-
-export { openQuickSwitchModal }
-
-export function initialize () {
-  const quickSwitchModal = quickSwitchModalTemplate()
-  $('body').append(quickSwitchModal)
-
-  $(quickSwitchLinkSelector).click(openQuickSwitchModal)
-
-  $(quickSwitchModalSelector).on('keydown', function (e) {
-    if (e.keyCode === 27) { // escape key
-      closeQuickSwitchModal()
-    }
-  })
-
-  $(quickSwitchModalSelector).on('click', closeButtonSelector, function () {
-    closeQuickSwitchModal()
-  })
-
-  $(quickSwitchInputSelector).on('keydown', function (e) {
-    const packageSlug = $(quickSwitchInputSelector).val()
-
-    if (e.keyCode === 13) { // enter key
-      quickSwitchToPackage(packageSlug)
-    }
-
-    if (e.keyCode === 37 || e.keyCode === 39) deselectAcResult()
-    if (e.keyCode === 38) moveAutocompleteSelection(e, 'up')
-    if (e.keyCode === 40) moveAutocompleteSelection(e, 'down')
-  })
-
-  $(quickSwitchInputSelector).on('keyup', function (e) {
-    const packageSlug = $(quickSwitchInputSelector).val() || ''
-
-    if (e.keyCode === 8 && packageSlug.length < 3) {
-      $(quickSwitchResultsSelector).html('')
-    }
-
-    if (usedModifierKeys.indexOf(e.keyCode) === -1 && packageSlug.length >= 3) {
-      debouceAutocomplete(packageSlug)
-    }
-  })
+  const index = state.selectedIdx + offset
+  return (index + length) % length
 }

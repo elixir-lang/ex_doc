@@ -1,227 +1,239 @@
-/* globals sidebarNodes */
+import { getSidebarNodes } from '../globals'
+import { escapeRegexModifiers, escapeHtmlEntities, isBlank } from '../helpers'
 
-// Dependencies
-// ------------
+/**
+ * @typedef Suggestion
+ * @type {Object}
+ * @property {String} link URL of the relevant documentation page.
+ * @property {String} title A title of the documentation page.
+ * @property {String|null} label A short text describing suggestion type (to be displayed alongside title).
+ * @property {String|null} description An additional information (to be displayed below the title).
+ * @property {Number} matchQuality How well the suggestion matches the given query string.
+ * @property {String} category The group of suggestions that the suggestion belongs to.
+ */
 
-import { escapeText, escapeHtmlEntities } from '../helpers'
-
-// Constants
-// ---------
-
-const resultsCount = 5
-const sortingPriority = {
-  'Module': 2,
-  'Child': 1,
-  'Mix Task': 0
-}
-const labels = {
-  'callbacks': 'callback',
-  'types': 'type'
+const SUGGESTION_CATEGORY = {
+  module: 'module',
+  moduleChild: 'module-child',
+  mixTask: 'mix-task'
 }
 
 /**
- * Takes an object containing data about a search result and transforms it into a simple
- * data structure that can be used directly in the autocomplete template.
+ * Returns a list of autocomplete suggestion objects matching the given term.
  *
- * @param {Object} item Result to be serialized
- * @param {(string|null)} [moduleId=null] Id of the parent module. If null it means we are serializing the parent module info.
- *
- * @returns {Object} Serialized object that can be used directly in the autocomplete template.
+ * @param {String} query The query string to search for.
+ * @param {Number} limit The maximum number of results to return.
+ * @returns {Suggestion[]} List of suggestions sorted and limited.
  */
-function serialize (item, moduleId = null) {
-  const isChild = item.category === 'Child'
-  const anchor = isChild ? item.anchor : ''
-  const category = isChild ? 'Child' : item.category
-  const description = isChild ? moduleId : null
-  const label = item.label || null
-  const link = anchor ? `${moduleId}.html#${anchor}` : `${moduleId}.html`
-
-  return {
-    link: link, // Link to the result. Used in the 'href' tag.
-    title: item.match, // Main text displayed for each autocomplete result.
-    description: description, // Displayed under the title.
-    label: label, // 'Callback' or 'Type' - if set it will be displayed next to the title.
-    matchQuality: item.matchQuality, // 0..1 - How well result matches the search term. Higher is better.
-    category: category
-    // 'Module', 'Mix Task' or 'Child'.
-    // Used to sort the results according to the 'sortingPriority'.
-    // 'Child' means an item that belongs to a module (like Function, Callback or Type).
-  }
-}
-
-/**
- * @param {string} [term=''] Text we want to search for.
- *
- * @returns {Object[]} List of suggestions sorted and limited to 5.
- */
-function getSuggestions (term = '') {
-  if (term.trim().length === 0) {
+export function getSuggestions (query, limit = 5) {
+  if (isBlank(query)) {
     return []
   }
 
-  const nodes = sidebarNodes
+  const nodes = getSidebarNodes()
 
-  let modules = findIn(nodes.modules, term, 'Module')
-  let tasks = findIn(nodes.tasks, term, 'Mix Task')
+  const suggestions = [
+    ...findSuggestionsInTopLevelNodes(nodes.modules, query, SUGGESTION_CATEGORY.module),
+    ...findSuggestionsInChildNodes(nodes.modules, query, SUGGESTION_CATEGORY.moduleChild),
+    ...findSuggestionsInTopLevelNodes(nodes.tasks, query, SUGGESTION_CATEGORY.mixTask)
+  ]
 
-  let results = [...modules, ...tasks]
-
-  results = sort(results)
-
-  return results.slice(0, resultsCount)
+  return sort(suggestions).slice(0, limit)
 }
 
 /**
- * Sorts suggestions, putting best results first.
- *
- * @param {Object[]} items Unsorted list of results.
- *
- * @returns {Object[]} Results sorted according to match quality and category.
+ * Finds suggestions in top level sidebar nodes.
  */
-function sort (items) {
-  return items.sort(function (item1, item2) {
-    const weight1 = sortingPriority[item1.category] || -1
-    const weight2 = sortingPriority[item2.category] || -1
+function findSuggestionsInTopLevelNodes (nodes, query, category) {
+  return nodes
+    .map(node => nodeSuggestion(node, query, category))
+    .filter(suggestion => suggestion !== null)
+}
 
-    return weight2 - weight1
-  }).sort(function (item1, item2) {
-    const matchQuality1 = item1.matchQuality || 0
-    const matchQuality2 = item2.matchQuality || 0
+/**
+ * Finds suggestions in node groups of the given parent nodes.
+ */
+function findSuggestionsInChildNodes (nodes, query, category) {
+  return nodes
+    .filter(node => node.nodeGroups)
+    .flatMap(node => {
+      return node.nodeGroups.flatMap(({ key, nodes: childNodes }) => {
+        const label = nodeGroupKeyToLabel(key)
 
-    return matchQuality2 - matchQuality1
+        return childNodes.map(childNode =>
+          childNodeSuggestion(childNode, node.id, query, category, label) ||
+          moduleChildNodeSuggestion(childNode, node.id, query, category, label)
+        )
+      })
+    })
+    .filter(suggestion => suggestion !== null)
+}
+
+/**
+ * Builds a suggestion for a top level node.
+ * Returns null if the node doesn't match the query.
+ */
+function nodeSuggestion (node, query, category) {
+  if (!matchesAll(node.title, query)) { return null }
+
+  return {
+    link: `${node.id}.html`,
+    title: highlightMatches(node.title, query),
+    label: null,
+    description: null,
+    matchQuality: matchQuality(node.title, query),
+    category: category
+  }
+}
+
+/**
+ * Builds a suggestion for a child node.
+ * Returns null if the node doesn't match the query.
+ */
+function childNodeSuggestion (childNode, parentId, query, category, label) {
+  if (!matchesAll(childNode.id, query)) { return null }
+
+  return {
+    link: `${parentId}.html#${childNode.anchor}`,
+    title: highlightMatches(childNode.id, query),
+    label: label,
+    description: parentId,
+    matchQuality: matchQuality(childNode.id, query),
+    category: category
+  }
+}
+
+/**
+ * Builds a suggestion for a child node assuming the parent node is a module.
+ * Returns null if the node doesn't match the query.
+ */
+function moduleChildNodeSuggestion (childNode, parentId, query, category, label) {
+  // Match "Module.function" format.
+  const modFun = `${parentId}.${childNode.id}`
+  if (!matchesAll(modFun, query)) { return null }
+
+  // When match spans both module and function name (i.e. ">Map.fe<tch")
+  // let's return just ">fe<tch" as the title.
+  // Module will already be displayed as the description under the title.
+  const tokenizedQuery = query.replace(/\./g, ' ')
+  // Make sure some token actually matches the child id (and not just the module prefix).
+  if (!matchesAny(childNode.id, tokenizedQuery)) return null
+
+  return {
+    link: `${parentId}.html#${childNode.anchor}`,
+    title: highlightMatches(childNode.id, tokenizedQuery),
+    label: label,
+    description: parentId,
+    matchQuality: matchQuality(modFun, query),
+    category: category
+  }
+}
+
+function nodeGroupKeyToLabel (key) {
+  switch (key) {
+    case 'callbacks': return 'callback'
+    case 'types': return 'type'
+    default: return null
+  }
+}
+
+/**
+ * Sorts suggestions, putting most accurate results first
+ * (according to match quality and suggestion category).
+ */
+function sort (suggestions) {
+  return suggestions.slice().sort((suggestion1, suggestion2) => {
+    if (suggestion1.matchQuality !== suggestion2.matchQuality) {
+      return suggestion2.matchQuality - suggestion1.matchQuality
+    } else {
+      return categoryPriority(suggestion1.category) - categoryPriority(suggestion2.category)
+    }
   })
 }
 
 /**
- * Finds matching results in a list of elements.
- *
- * @param {Object[]} elements Array containing information about modules/tasks.
- * @param {string} term Text we are searching form
- * @param {string} category "Module"/"Mix Task" - category that elements belong to.
- *
- * @returns {Object[]} List of elements matching the provided term.
+ * Returns a priority for the given suggestion category. The lower the better.
  */
-function findIn (elements, term, categoryName) {
-  const regExp = new RegExp(escapeText(term), 'i')
-
-  return elements.reduce(function (results, element) {
-    const title = element.title
-    const titleMatch = title && title.match(regExp)
-
-    if (titleMatch) {
-      const parentResult = serialize({
-        id: element.id,
-        match: highlight(titleMatch),
-        category: categoryName,
-        matchQuality: matchQuality(titleMatch),
-        group: element.group
-      }, element.id)
-
-      results.push(parentResult)
-    }
-
-    if (element.nodeGroups) {
-      for (let {key, nodes} of element.nodeGroups) {
-        let matches = findMatchingChildren(nodes, title, term, key)
-
-        if (Object.keys(matches).length > 0) {
-          let foundChildren = Object.values(matches)
-
-          foundChildren = foundChildren.map((child) => {
-            child.category = 'Child'
-            child.label = labels[key]
-
-            return serialize(child, element.id)
-          })
-
-          results = results.concat(foundChildren)
-        }
-      }
-    }
-
-    return results
-  }, []).filter((result) => !!result)
+function categoryPriority (category) {
+  switch (category) {
+    case SUGGESTION_CATEGORY.module: return 1
+    case SUGGESTION_CATEGORY.moduleChild: return 2
+    case SUGGESTION_CATEGORY.mixTask: return 3
+    default: return 4
+  }
 }
 
 /**
- * Highlight matching part of the string.
- *
- * @param {Array} match Information about the matched text (returned by String.match()).
- *
- * @returns {string} Text with matching part highlighted with html <em> tag.
+ * Checks if the given text matches any token from the query.
  */
-function highlight (match) {
-  const EmOpen = '###EM_OPEN###'
-  const EmClose = '###EM_CLOSE###'
-
-  let result = match.input.replace(match, EmOpen + match[0] + EmClose)
-
-  return escapeHtmlEntities(result)
-    .replace(EmOpen, '<em>')
-    .replace(EmClose, '<\/em>')
+function matchesAny (text, query) {
+  const terms = tokenize(query)
+  return terms.some(term => includes(text, term))
 }
 
 /**
- * Find all matches in the list of elements belonging to a given module.
- *
- * @param {Object[]} elements List of elements
- * @param {string} parentId Id of the Module that elements belong to.
- * @param {string} term Search term
- * @param {string} key Key of the module group we are checking (i.e. "callbacks", "types")
- *
- * @returns {Object[]} List of elements matching the provided term.
+ * Checks if the given text matches all tokens from the query.
  */
-function findMatchingChildren (elements, parentId, term, key) {
-  const regExp = new RegExp(escapeText(term), 'i')
-
-  return (elements || []).reduce((acc, element) => {
-    if (acc[key + element.id]) { return acc }
-
-    // Match "Module.funcion" format.
-    const fullTitle = `${parentId}.${element.id}`
-    const fullTitleMatch = !(parentId + '.').match(regExp) && fullTitle.match(regExp)
-    const match = element.id && element.id.match(regExp)
-    let result = JSON.parse(JSON.stringify(element))
-
-    if (match) {
-      result.match = highlight(match)
-      result.matchQuality = matchQuality(match)
-    } else if (fullTitleMatch) {
-      // When match spans both module and function name (i.e. ">Map.fe<tch")
-      // let's return just ">fe<tch" as the title. Module will already be displayed under the title.
-      const lastSegment = term.split('.').pop()
-      const lastSegmentMatcher = new RegExp(escapeText(lastSegment), 'i')
-      const lastSegmentMatch = element.id.match(lastSegmentMatcher)
-      result.matchQuality = matchQuality(lastSegmentMatch)
-      result.match = highlight(lastSegmentMatch)
-    } else {
-      return acc
-    }
-
-    acc[key + result.id] = result
-
-    return acc
-  }, {})
+function matchesAll (text, query) {
+  const terms = tokenize(query)
+  return terms.every(term => includes(text, term))
 }
 
 /**
- * How well search result marches the current query.
- *
- * @param {(Array|null)} match Information about the matched text (returned by String.match()).
- *
- * @returns {number} (0..1) Match quality. Higher is better.
+ * Case-insensitive inclusion check.
  */
-function matchQuality (match) {
-  if (!match) { return 0 }
-
-  const textLength = match.input.length
-
-  if (!textLength) { return 0 }
-
-  return match.length / textLength
+function includes (text, subtext) {
+  return text.toLowerCase().includes(subtext.toLowerCase())
 }
 
-// Public Methods
-// --------------
+/**
+ * Match quality metric, the higher the better.
+ */
+function matchQuality (text, query) {
+  const terms = tokenize(query)
+  const termsLength = terms.map(term => term.length).reduce((x, y) => x + y, 0)
 
-export { getSuggestions }
+  const quality = termsLength / text.length
+  // Add bonus points if the query matches text at the very start.
+  const bonus = startsWith(text, terms[0]) ? 1 : 0
+
+  return quality + bonus
+}
+
+/**
+ * Case-insensitive `String.startsWith`.
+ */
+function startsWith (text, subtext) {
+  return text.toLowerCase().startsWith(subtext.toLowerCase())
+}
+
+/**
+ * Returns a list of tokens from the given query string.
+ */
+function tokenize (query) {
+  return query.trim().split(/\s+/)
+}
+
+/**
+ * Returns an HTML string highlighting the individual tokens from the query string.
+ */
+function highlightMatches (text, query) {
+  // Sort terms length, so that the longest are highlighted first.
+  const terms = tokenize(query).sort((term1, term2) => term2.length - term1.length)
+  return highlightTerms(text, terms)
+}
+
+function highlightTerms (text, terms) {
+  if (terms.length === 0) return text
+
+  const [firstTerm, ...otherTerms] = terms
+  const match = text.match(new RegExp(`(.*)(${escapeRegexModifiers(firstTerm)})(.*)`, 'i'))
+
+  if (match) {
+    const [, before, matching, after] = match
+    // Note: this has exponential complexity, but we expect just a few terms, so that's fine.
+    return highlightTerms(before, terms) + '<em>' + escapeHtmlEntities(matching) + '</em>' + highlightTerms(after, terms)
+  } else {
+    return highlightTerms(text, otherTerms)
+  }
+}

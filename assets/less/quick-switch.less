@@ -1,51 +1,49 @@
-#quick-switch-modal {
-  .quick-switch-wrapper {
+#quick-switch-modal-body {
+  width: 100%;
+  position: relative;
+
+  .icon-search {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 8px 2px;
+    color: @mediumGray;
+  }
+
+  #quick-switch-input {
     width: 100%;
-    position: relative;
+    padding: 8px 6px 6px 26px;
+    border: none;
+    border-bottom: 1px solid @mediumGray;
+    box-sizing: border-box;
+    transition: all .12s ease-out;
 
-    .icon-search {
-      position: absolute;
-      left: 0;
-      top: 0;
-      padding: 8px 2px;
-      color: @mediumGray;
+    &:focus {
+      border-bottom: 1px solid @darkGray;
+      outline: none;
     }
+  }
 
-    #quick-switch-input {
-      width: 100%;
-      padding: 8px 6px 6px 26px;
-      border: none;
-      border-bottom: 1px solid @mediumGray;
-      box-sizing: border-box;
+  #quick-switch-results {
+    margin: 0;
+
+    .quick-switch-result {
+      padding: 2px 5px;
+      border-bottom: 1px dotted @mediumGray;
       transition: all .12s ease-out;
 
-      &:focus {
-        border-bottom: 1px solid @darkGray;
-        outline: none;
+      &:last-child {
+        border-bottom: none;
       }
-    }
 
-    #quick-switch-results {
-      margin: 0;
+      &:hover {
+        cursor: pointer;
+      }
 
-      .quick-switch-result {
-        padding: 2px 5px;
-        border-bottom: 1px dotted @mediumGray;
-        transition: all .12s ease-out;
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        &:hover {
-          cursor: pointer;
-        }
-
-        &:hover,
-        &.selected {
-          border-left: 4px solid @main;
-          background: @codeBackground;
-        }
+      &:hover,
+      &.selected {
+        border-left: 4px solid @main;
+        background: @codeBackground;
       }
     }
   }

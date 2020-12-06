@@ -1,74 +1,99 @@
-// Dependencies
-// ------------
+import tooltipBodyTemplate from '../handlebars/templates/tooltip-body.handlebars'
+import tooltipLayoutTemplate from '../handlebars/templates/tooltip-layout.handlebars'
+import { qs, qsAll } from '../helpers'
+import { cancelHintFetchingIfAny, getHint, HINT_KIND, isValidHintHref } from './hints'
 
-import $ from 'jquery'
-import find from 'lodash.find'
-import tooltipBodyTemplate from '../templates/tooltip-body.handlebars'
-import tooltipLayoutTemplate from '../templates/tooltip-layout.handlebars'
+// Elements that can activate the tooltip.
+const TOOLTIP_ACTIVATORS_SELECTOR = '.content a'
+// Tooltip root element.
+const TOOLTIP_SELECTOR = '#tooltip'
+// Tooltip content element.
+const TOOLTIP_BODY_SELECTOR = '#tooltip .tooltip-body'
+// Element containing the documentation text.
+const CONTENT_INNER_SELECTOR = 'body .content-inner'
+// 'Enable/Disable tooltips' button.
+const TOOLTIPS_TOGGLE_SELECTOR = 'footer .tooltips-toggle'
 
-// Constants
-// ---------
-const footerSelector = 'footer' // `Enable/Disable tooltips` button will be displayed in the footer
-const tooltipActivators = '.content a, .detail-header .specs a' // Elements that can activate the tooltip
-const tooltipSelector = '#tooltip' // Tooltip root
-const tooltipIframeSelector = '#tooltip .tooltip-iframe' // Iframe inisde the tooltip, will be used to load external pages
-const contentInner = 'body .content-inner' // Element containing the documentation text
-const spacingBase = 10 // Used as the min. distance from window edges and links
-const minBottomSpacing = spacingBase * 5 // Min. space needed between the bottom of the bottom of the page and the bottom edge of the tooltip
-const minWindowSize = { // Tooltips won't be displayed if width/height of the viewport is smaller than this
-  height: 450,
-  width: 768
-}
-// Tooltip will appear only if the mouse cursor stays on the link for at least 150ms.
-// This way tooltips will not appear if we are scrooling the page or just moving the cursor around.
-const hoverDelayTime = 100
-// Info that will be shown when hovering over links pointing to the typespecs page.
-const typesCategories = [
-  {description: 'Basic type', href: 'typespecs.html#basic-types'},
-  {description: 'Literal', href: 'typespecs.html#literals'},
-  {description: 'Built-in type', href: 'typespecs.html#built-in-types'}
-]
-const tooltipsToggleSelector = '.tooltips-toggle' // `Enable/Disable tooltips` button
-const tooltipsDisabledStorageKey = 'tooltipsDisabled' // Local Storage key Used to store tooltips settings
-const moduleContentHash = '#content' // Hash included in links pointing to module pages
-const iframePermissions = 'allow-scripts allow-same-origin' // Minimal permissions needed for the iframe to run JavaScript and communicate with the tooltip
-const supportedHashRegex = /#.*\// // Regex for hashes that will trigger the tooltip. Allows us to avoid displaying hashes for module sections (ie. `module.html#functions`)
+// Local Storage key Used to store tooltips settings.
+const TOOLTIPS_DISABLED_STORAGE_KEY = 'tooltipsDisabled'
+// Hash included in links pointing to module pages
+const MODULE_CONTENT_HASH = '#content'
 
-let tooltipElement = null // Will store the jQuery selector for the tooltip root
-let currentLinkElement = null // Element that the cursor is hovering over
-let currentHintHref = null // ID of the request we're waiting for
-let showTimeoutAnimation = null // Timeout ID related to the tooltip show animation
-let hideTimeoutVisibility = null // Timeout ID related to the tooltip hide animation
-let hoverDelayTimeout = null // Timeout ID related to the `hoverDelayTime` described above
+const TOOLTIP_SHOWN_CLASS = 'tooltip-shown'
+// The minimum distance from window edges and links.
+const SPACING_BASE = 10
+// The minimum space needed between the bottom of the page and the bottom edge of the tooltip.
+const MIN_BOTTOM_SPACING = SPACING_BASE * 4
+// The minimum required viewport size to show tooltips.
+const MIN_WINDOW_SIZE = { height: 450, width: 768 }
+// The minimum time mouse cursor must stay on link for the tooltip to be loaded.
+// This prevents from triggering tooltips by accident while scrolling and moving the cursor around.
+const HOVER_DELAY_MS = 100
 
-// Switches tooltips OFF and stores the choice in localStorage.
-function deactivateTooltips () {
-  try { localStorage.setItem(tooltipsDisabledStorageKey, true) } catch (e) { }
-  updateToggleLink()
-}
-
-// Switches tooltips ON and stores the choice in localStorage.
-function activateTooltips () {
-  try { localStorage.removeItem(tooltipsDisabledStorageKey) } catch (e) { }
-  updateToggleLink()
+const state = {
+  // Element that the cursor is hovering over
+  currentLinkElement: null,
+  // The timeout used for delaying the hover action.
+  hoverDelayTimeout: null
 }
 
 /**
- * Checks if tooltips are disabled.
- *
- * @returns {boolean} `true` if tooltips are disabled, `false` otherwise.
+ * Initializes tooltips handling.
  */
-function areTooltipsDisabled () {
+export function initialize () {
+  renderTooltipLayout()
+  addEventListeners()
+  updateToggleLinkText()
+}
+
+function renderTooltipLayout () {
+  const tooltipLayoutHtml = tooltipLayoutTemplate()
+  qs(CONTENT_INNER_SELECTOR).insertAdjacentHTML('beforeend', tooltipLayoutHtml)
+}
+
+function addEventListeners () {
+  qs(TOOLTIPS_TOGGLE_SELECTOR).addEventListener('click', event => {
+    toggleTooltipsDisabled()
+  })
+
+  qsAll(TOOLTIP_ACTIVATORS_SELECTOR).forEach(element => {
+    if (!linkElementEligibleForTooltip(element)) { return }
+
+    element.addEventListener('mouseenter', event => {
+      handleHoverStart(element)
+    })
+
+    element.addEventListener('mouseleave', event => {
+      handleHoverEnd(element)
+    })
+  })
+}
+
+/**
+ * Toggles tooltips mode and saves the preference in local storage.
+ */
+function toggleTooltipsDisabled () {
+  const disabled = getTooltipsDisabledPreference()
+  setTooltipsDisabledPreference(!disabled)
+  updateToggleLinkText()
+}
+
+function getTooltipsDisabledPreference () {
   try {
-    return !!localStorage.getItem(tooltipsDisabledStorageKey)
-  } catch (e) { }
+    return !!localStorage.getItem(TOOLTIPS_DISABLED_STORAGE_KEY)
+  } catch (error) { }
 
   return false
 }
 
-// If tooltips are disabled switches them on. If they are enabled switches them off.
-function toggleTooltipsDisabled () {
-  areTooltipsDisabled() ? activateTooltips() : deactivateTooltips()
+function setTooltipsDisabledPreference (disabled) {
+  try {
+    if (disabled) {
+      localStorage.setItem(TOOLTIPS_DISABLED_STORAGE_KEY, 'true')
+    } else {
+      localStorage.removeItem(TOOLTIPS_DISABLED_STORAGE_KEY)
+    }
+  } catch (error) { }
 }
 
 /**
@@ -77,313 +102,139 @@ function toggleTooltipsDisabled () {
  * If tooltips are disabled `Enable tooltips` text is displayed.
  * If tooltips are enabled `Disable tooltips` text is displayed.
  */
-function updateToggleLink () {
-  $(tooltipsToggleSelector).attr('data-is-disabled', areTooltipsDisabled().toString())
+function updateToggleLinkText () {
+  qs(TOOLTIPS_TOGGLE_SELECTOR).setAttribute('data-is-disabled', getTooltipsDisabledPreference().toString())
 }
 
 /**
- * Check how much free space there is around the tooltip.
- *
- * @param {Object} event `message` event data
+ * Decides whether we may attempt to load a tooltip for the given
+ * link element, or if it should just be ignored up-front.
  */
-
-function receivePopupMessage (event) {
-  if (!isHrefExpected(event.data.href)) { return }
-  if (event.data.ready !== true) { return }
-
-  showTooltip(event.data.hint)
-}
-
-// Triggered when the mouse cursor is over a link that supports the tooltip.
-function hoverStart () {
-  if (areTooltipsDisabled()) { return }
-  if (window.innerWidth < minWindowSize.width || window.innerHeight < minWindowSize.height) {
-    return
-  }
-
-  currentLinkElement = $(this)
-  if (currentLinkElement.prop('tagName') !== 'A') {
-    currentLinkElement = $(this).parent()
-  }
-
+function linkElementEligibleForTooltip (linkElement) {
   // Skip tooltips on the permalink icon (the on-hover one next to the function name).
-  if (currentLinkElement.hasClass('detail-link')) { return }
+  if (linkElement.classList.contains('detail-link')) { return false }
 
-  hoverDelayTimeout = setTimeout(function () {
-    hideTimeoutVisibility && clearTimeout(hideTimeoutVisibility)
+  // Skip link to the module page we are already on.
+  if (isHrefToSelf(linkElement.href)) { return false }
 
-    tooltipElement.removeClass('tooltip-visible')
-    tooltipElement.removeClass('tooltip-shown')
+  // Skip unsupported URLs right away.
+  if (!isValidHintHref(linkElement.href)) { return false }
 
-    prepareTooltips()
-  }, hoverDelayTime)
-}
-
-// Triggered when the mouse cursor leaves the tooltip-enabled link
-function hoverEnd () {
-  if (areTooltipsDisabled()) { return }
-
-  showTimeoutAnimation && clearTimeout(showTimeoutAnimation)
-  hoverDelayTimeout && clearTimeout(hoverDelayTimeout)
-
-  currentLinkElement = null
-  hideTooltip()
-}
-
-// Checks position and scroll of content and link elements and chooses the best position for the tooltip.
-function updateTooltipPosition () {
-  if (!currentLinkElement) { return }
-
-  const tooltipElement = $(tooltipSelector)
-
-  const tooltipActivatorBoundingRect = currentLinkElement[0].getBoundingClientRect()
-  const contentInnerBoundingRect = $(contentInner)[0].getBoundingClientRect()
-
-  const tooltipWidth = measureTooltipWidth(tooltipElement)
-  const relativeBoundingRect = getRelativeBoudningRect(tooltipActivatorBoundingRect, contentInnerBoundingRect)
-  const space = calculateSpaceAroundLink(relativeBoundingRect, tooltipActivatorBoundingRect, contentInnerBoundingRect)
-
-  if (space.left + tooltipWidth + spacingBase < window.innerWidth) {
-    tooltipElement.css('left', relativeBoundingRect.left)
-    tooltipElement.css('right', 'auto')
-  } else {
-    // Tooltip looks better if there is some space between it and the left menu.
-    let left = relativeBoundingRect.right - tooltipWidth
-    if (left < spacingBase) {
-      left = spacingBase
-    }
-    tooltipElement.css('left', left)
-    tooltipElement.css('right', 'auto')
-  }
-
-  const tooltipHeight = measureTooltipHeight(tooltipElement)
-
-  if (space.bottom > tooltipHeight + minBottomSpacing) {
-    tooltipElement.css('top', relativeBoundingRect.bottom + spacingBase)
-  } else {
-    tooltipElement.css('top', relativeBoundingRect.top - tooltipHeight - spacingBase)
-  }
+  return true
 }
 
 /**
- * Since the tooltip is displayed inside the contentInner (this way it can easily inherit all the basic styles),
- * we calculate it's relative coordinates to position it correctly.
- *
- * @param {DOMRect} linkRect dimensions and position of the link that triggered the tooltip
- * @param {DOMRect} contentRect dimensions and position of the contentInner
- *
- * @returns {DOMRect} dimensions and position of the link element relative to the contentInner
+ * Checks if the given link points to the module page we are currently on.
  */
-function getRelativeBoudningRect (linkRect, contentRect) {
-  return {
-    top: linkRect.top - contentRect.top,
-    bottom: linkRect.bottom - contentRect.top,
-    left: linkRect.left - contentRect.left,
-    right: linkRect.right - contentRect.left,
-    x: linkRect.x - contentRect.x,
-    y: linkRect.y - contentRect.y,
-    width: linkRect.width,
-    height: linkRect.height
-  }
+function isHrefToSelf (href) {
+  const targetPage = href.replace(MODULE_CONTENT_HASH, '')
+  const currentPage = window.location.href.split('#')[0]
+
+  return currentPage === targetPage
 }
 
-/**
- * Check how much free space there is around the tooltip.
- * we calculate it's relative coordinates to position it correctly.
- *
- * @param {DOMRect} linkRect dimensions and position of the link that triggered the tooltip
- * @param {DOMRect} contentRect dimensions and position of the contentInner
- * @param {DOMRect} relativeRect dimensions and position of the link relative to the contentInner
- *
- * @returns {Object} free space on the top/right/bottom/left of the link that triggered the tooltip
- */
-function calculateSpaceAroundLink (relativeRect, linkRect, contentRect) {
-  return {
-    left: linkRect.x,
-    right: contentRect.width - linkRect.x + linkRect.width,
-    top: relativeRect.y - window.scrollY,
-    bottom: window.innerHeight - (relativeRect.y - window.scrollY) + relativeRect.height
-  }
+function handleHoverStart (element) {
+  if (!shouldShowTooltips()) { return }
+
+  state.currentLinkElement = element
+
+  state.hoverDelayTimeout = setTimeout(() => {
+    getHint(element.href)
+      .then(hint => {
+        renderTooltip(hint)
+        animateTooltipIn()
+      })
+      .catch(() => {})
+  }, HOVER_DELAY_MS)
 }
 
-// Prepares the tooltip DOM.
-// Shows the tooltip immediately when hovering over built-in or basic types.
-function prepareTooltips () {
-  updateTooltipPosition()
+function shouldShowTooltips () {
+  const tooltipsEnabled = !getTooltipsDisabledPreference()
+  const windowToSmall = (window.innerWidth < MIN_WINDOW_SIZE.width || window.innerHeight < MIN_WINDOW_SIZE.height)
 
-  if (!currentLinkElement) { return }
-
-  let href = currentLinkElement.attr('href')
-
-  if (!href) { return }
-
-  if (href.charAt(0) === '#') {
-    href = `${window.location.pathname}${href}`
-  }
-
-  const typeCategory = findTypeCategory(href)
-
-  if (!isLinkSupported(href, typeCategory)) { return }
-
-  if (typeCategory) {
-    showTooltip({
-      kind: 'type',
-      description: typeCategory.description
-    })
-  } else {
-    const hintHref = rewriteHref(href)
-    currentHintHref = hintHref
-    let iframe = $(tooltipIframeSelector).detach()
-    iframe.attr('src', hintHref)
-    iframe.attr('sandbox', iframePermissions)
-    tooltipElement.append(iframe)
-  }
+  return tooltipsEnabled && !windowToSmall
 }
 
-// Shows tooltip and starts it's animation.
-function showTooltip (hint) {
-  const html = tooltipBodyTemplate({
-    isModule: hint.kind === 'module',
-    isType: hint.kind === 'type',
+function renderTooltip (hint) {
+  const tooltipBodyHtml = tooltipBodyTemplate({
+    isPlain: hint.kind === HINT_KIND.plain,
     hint: hint
   })
 
-  tooltipElement.find('.tooltip-body').html(html)
-
-  tooltipElement.addClass('tooltip-visible')
+  qs(TOOLTIP_BODY_SELECTOR).innerHTML = tooltipBodyHtml
 
   updateTooltipPosition()
-  showTimeoutAnimation = setTimeout(() => {
-    tooltipElement.addClass('tooltip-shown')
-  }, 10)
 }
 
-// Hides the tooltip
-function hideTooltip () {
-  tooltipElement.removeClass('tooltip-shown')
-  hideTimeoutVisibility = setTimeout(() => {
-    tooltipElement.removeClass('tooltip-visible')
-  }, 300)
+function animateTooltipIn () {
+  const tooltipElement = qs(TOOLTIP_SELECTOR)
+  tooltipElement.classList.add(TOOLTIP_SHOWN_CLASS)
 }
 
-/**
- * Modifies the link, adding parameters needed to trigger hints extraction.
- *
- * @param {string} href link to the page
- *
- * @returns {string} link with parameters added
- */
-function rewriteHref (href) {
-  return href.replace('.html', `.html?hint=true`)
+function handleHoverEnd (element) {
+  if (getTooltipsDisabledPreference()) { return }
+
+  clearTimeout(state.hoverDelayTimeout)
+  cancelHintFetchingIfAny()
+  state.currentLinkElement = null
+  animateTooltipOut()
+}
+
+function animateTooltipOut () {
+  const tooltipElement = qs(TOOLTIP_SELECTOR)
+  tooltipElement.classList.remove(TOOLTIP_SHOWN_CLASS)
 }
 
 /**
- * Is the current link poinitng to the typespecs page?
- *
- * @param {string} href link to the page
- *
- * @returns {(Object|null)} returns type category info if the link points to a literal, built-in or basic type page.
- *   Returns `null` if current link does not point to a typespecs page.
+ * Updates the tooltip position to the best placement next to the hovered link.
  */
-function findTypeCategory (href) {
-  return find(typesCategories, category => href.indexOf(category.href) >= 0)
+function updateTooltipPosition () {
+  if (!state.currentLinkElement) { return }
+
+  const tooltipElement = qs(TOOLTIP_SELECTOR)
+
+  const linkBoundingRect = state.currentLinkElement.getBoundingClientRect()
+  const contentInnerBoundingRect = qs(CONTENT_INNER_SELECTOR).getBoundingClientRect()
+  const tooltipBoundingRect = tooltipElement.getBoundingClientRect()
+  const relativeBoundingRect = getRelativeBoundingRect(linkBoundingRect, contentInnerBoundingRect)
+
+  // Since the tooltip is displayed inside `contentInner` (this way it can easily inherit all the basic styles),
+  // we calculate it's coordinates relatively to this `contentInner`.
+
+  if (linkBoundingRect.left + tooltipBoundingRect.width + SPACING_BASE < window.innerWidth) {
+    tooltipElement.style.left = `${relativeBoundingRect.left}px`
+    tooltipElement.style.right = 'auto'
+  } else {
+    // Tooltip looks better if there is some space between it and the left menu.
+    const left = Math.max(relativeBoundingRect.right - tooltipBoundingRect.width, SPACING_BASE)
+    tooltipElement.style.left = `${left}px`
+    tooltipElement.style.right = 'auto'
+  }
+
+  if (linkBoundingRect.bottom + tooltipBoundingRect.height + MIN_BOTTOM_SPACING < window.innerHeight) {
+    tooltipElement.style.top = `${relativeBoundingRect.bottom + SPACING_BASE}px`
+  } else {
+    tooltipElement.style.top = `${relativeBoundingRect.top - tooltipBoundingRect.height - SPACING_BASE}px`
+  }
 }
 
 /**
- * Is the current link poinitng to the module we're just browsing?
+ * Calculates position of an element with respect to the given container element,
+ * so that all the returned properties are relative.
  *
- * @param {string} href link to the page
- *
- * @returns {boolean}
+ * @param {DOMRect} elementRect Dimensions and position of an element.
+ * @param {DOMRect} containerRect Dimensions and position of a container used as the reference for positioning.
+ * @returns {DOMRect} Dimensions and position of the given element relative to the container.
  */
-function isSelfLink (href) {
-  href = href.replace(moduleContentHash, '')
-  const pathname = window.location.pathname
-
-  return pathnameEndsWith(pathname, href)
-}
-
-/**
- * Does the link we're hovering over support tooltip hints?
- *
- * Ensures we're not displaying tootips for non-html pages, module sections or to the page we're already on.
- *
- * @param {string} href link to the page
- * @param {(Object|null)} typeCategory type category information (if the link points to a type category description)
- *
- * @returns {boolean}
- */
-function isLinkSupported (href, typeCategory) {
-  if (isSelfLink(href)) { return false }
-
-  const unsupportedHash = href.indexOf('#') !== -1 && !supportedHashRegex.test(href)
-  const validExtension = href.indexOf('.html') !== -1
-
-  if (unsupportedHash && !typeCategory) { return false }
-
-  return validExtension
-}
-
-/**
- * Checks if the pathanme ens with the provided href
- *
- * @param {string} href href to check
- *
- * @returns {boolean} returns true if the pathname end with the provided href
- */
-function pathnameEndsWith (pathname, href) {
-  const pathnameEnding = pathname.substring(pathname.length - href.length, pathname.length)
-
-  return pathnameEnding === href
-}
-
-/**
- * Measures height of the tooltips. Used when positioning the tooltip vertically.
- *
- * @param {object} tooltipElement jQuery element targeting the tooltip
- *
- * @returns {number} height of the tooltip
- */
-function measureTooltipHeight (tooltipElement) {
-  return tooltipElement[0].getBoundingClientRect().height
-}
-
-/**
- * Measures width of the tooltips. Used when positioning the tooltip horizontally.
- *
- * @param {object} tooltipElement jQuery element targeting the tooltip
- *
- * @returns {number} width of the tooltip
- */
-function measureTooltipWidth (tooltipElement) {
-  return tooltipElement[0].getBoundingClientRect().width
-}
-
-/**
- * Checks if we are currently waiting for data from the provided href.
- *
- * @param {string} href href to check
- *
- * @returns {boolean} true if we're expecting data from the provided href.
- */
-function isHrefExpected (href) {
-  return currentHintHref === href || pathnameEndsWith(href, currentHintHref)
-}
-
-// Public Methods
-// --------------
-
-export function initialize () {
-  window.addEventListener('message', receivePopupMessage, false)
-
-  $(contentInner).append(tooltipLayoutTemplate())
-  tooltipElement = $(tooltipSelector)
-
-  $(tooltipActivators).hover(hoverStart, hoverEnd)
-
-  $(footerSelector).on('click', tooltipsToggleSelector, function () {
-    toggleTooltipsDisabled()
-  })
-
-  updateToggleLink()
+function getRelativeBoundingRect (elementRect, containerRect) {
+  return {
+    top: elementRect.top - containerRect.top,
+    bottom: elementRect.bottom - containerRect.top,
+    left: elementRect.left - containerRect.left,
+    right: elementRect.right - containerRect.left,
+    x: elementRect.x - containerRect.x,
+    y: elementRect.y - containerRect.y,
+    width: elementRect.width,
+    height: elementRect.height
+  }
 }

@@ -1,25 +1,35 @@
-var HIGHLIGHT_CLASS = 'hll'
-function onMouseEnter (evt) {
-  var groupId = evt.target.getAttribute('data-group-id')
-  var siblings = document.querySelectorAll('[data-group-id=\'' + groupId + '\']')
-  for (var i = 0; i < siblings.length; ++i) {
-    siblings[i].classList.add(HIGHLIGHT_CLASS)
-  }
-}
+import { qsAll } from './helpers'
 
-function onMouseLeave (evt) {
-  var groupId = evt.target.getAttribute('data-group-id')
-  var siblings = document.querySelectorAll('[data-group-id=\'' + groupId + '\']')
-  for (var i = 0; i < siblings.length; ++i) {
-    siblings[i].classList.remove(HIGHLIGHT_CLASS)
-  }
-}
+const HIGHLIGHT_CLASS = 'hll'
 
+/**
+ * Sets up dynamic behaviour for code blocks processed with *makeup*.
+ */
 export function initialize () {
-  var delims = document.querySelectorAll('[data-group-id]')
-  for (var i = 0; i < delims.length; i++) {
-    var elem = delims[i]
-    elem.addEventListener('mouseenter', onMouseEnter)
-    elem.addEventListener('mouseleave', onMouseLeave)
-  }
+  initializeDelimitersHighlighting()
+}
+
+// Hovering over a delimiter (bracket, parenthesis, do/end)
+// highlights the relevant pair of delimiters.
+function initializeDelimitersHighlighting () {
+  const delimiters = qsAll('[data-group-id]')
+
+  delimiters.forEach(delimiter => {
+    const groupId = delimiter.getAttribute('data-group-id')
+
+    delimiter.addEventListener('mouseenter', event => {
+      toggleDelimitersHighlight(groupId, true)
+    })
+
+    delimiter.addEventListener('mouseleave', event => {
+      toggleDelimitersHighlight(groupId, false)
+    })
+  })
+}
+
+function toggleDelimitersHighlight (groupId, force) {
+  const delimiters = qsAll(`[data-group-id="${groupId}"]`)
+  delimiters.forEach(delimiter => {
+    delimiter.classList.toggle(HIGHLIGHT_CLASS, force)
+  })
 }

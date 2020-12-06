@@ -1,56 +1,64 @@
-// Dependencies
-// ------------
+import { qs } from './helpers'
 
-import $ from 'jquery'
+const NIGHT_MODE_TOGGLE_SELECTOR = '.night-mode-toggle'
+const NIGHT_MODE_CLASS = 'night-mode'
+const NIGHT_MODE_KEY = 'night-mode'
 
-// Constants
-// ---------
+/**
+ * Sets initial night mode state and registers toggling.
+ */
+export function initialize () {
+  document.body.classList.toggle(NIGHT_MODE_CLASS, shouldUseNightMode())
 
-const body = $('body')
-const nightMode = 'night-mode'
-const nightModeToggleSelector = '.night-mode-toggle'
-
-function activateNightMode () {
-  body.addClass(nightMode)
-  try { localStorage.setItem(nightMode, true) } catch (e) { }
+  qs(NIGHT_MODE_TOGGLE_SELECTOR).addEventListener('click', event => {
+    toggleNightMode()
+  })
 }
 
-function deactivateNightMode () {
-  body.removeClass(nightMode)
-  try { localStorage.removeItem(nightMode) } catch (e) { }
-}
+/**
+ * Toggles night mode theme and saves the preference in local storage.
+ */
+export function toggleNightMode () {
+  const enabled = document.body.classList.contains(NIGHT_MODE_CLASS)
 
-function checkForNightMode () {
-  try {
-    const userWantsNightMode = localStorage.getItem(nightMode)
-
-    if (userWantsNightMode != null) {
-      if (userWantsNightMode === true) {
-        activateNightMode()
-      }
-    } else if (matchMedia('(prefers-color-scheme: dark)').matches) {
-      body.addClass(nightMode)
-    }
-  } catch (e) { }
-}
-
-function toggleNightMode () {
-  if (body.hasClass(nightMode)) {
+  if (enabled) {
     deactivateNightMode()
   } else {
     activateNightMode()
   }
 }
 
-// Public Methods
-// --------------
+function activateNightMode () {
+  document.body.classList.add(NIGHT_MODE_CLASS)
+  setNightModePreference(true)
+}
 
-export {toggleNightMode}
+function deactivateNightMode () {
+  document.body.classList.remove(NIGHT_MODE_CLASS)
+  setNightModePreference(false)
+}
 
-export function initialize () {
-  checkForNightMode()
+function shouldUseNightMode () {
+  const nightModePreference = getNightModePreference()
 
-  body.on('click', nightModeToggleSelector, function () {
-    toggleNightMode()
-  })
+  return (nightModePreference === true) ||
+    (nightModePreference === null && prefersDarkColorScheme())
+}
+
+function prefersDarkColorScheme () {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+}
+
+function getNightModePreference () {
+  try {
+    return JSON.parse(localStorage.getItem(NIGHT_MODE_KEY))
+  } catch (error) {
+    return null
+  }
+}
+
+function setNightModePreference (enabled) {
+  try {
+    localStorage.setItem(NIGHT_MODE_KEY, JSON.stringify(enabled))
+  } catch (error) { }
 }
