@@ -12,7 +12,6 @@ import { initialize as initKeyboardShortcuts } from '../keyboard-shortcuts'
 import { initialize as initQuickSwitch } from '../quick-switch'
 import { initialize as initTooltips } from '../tooltips/tooltips'
 import { initialize as initHintsPage } from '../tooltips/hint-page'
-import { initialize as initHighlight } from '../highlight'
 
 onDocumentReady(() => {
   initNightMode()
@@ -28,5 +27,4 @@ onDocumentReady(() => {
   initTooltips()
   initHintsPage()
   initSearchPage()
-  initHighlight()
 })
