@@ -45,7 +45,7 @@ defmodule ExDoc.AutolinkTest do
       assert autolink("String", apps: [:elixir]) == ~m"[`String`](String.html)"
 
       assert autolink("AutolinkTest.Foo", current_module: AutolinkTest.Foo) ==
-               ~m"[`AutolinkTest.Foo`](#content)"
+               ~m"[`AutolinkTest.Foo`](AutolinkTest.Foo.html#content)"
     end
 
     test "remote function" do

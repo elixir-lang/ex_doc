@@ -427,10 +427,6 @@ defmodule ExDoc.Autolink do
 
   ## Internals
 
-  defp module_url(module, _mode, %{current_module: module}, _string) do
-    "#content"
-  end
-
   defp module_url(module, mode, config, string) do
     ref = {:module, module}
 
@@ -446,6 +442,10 @@ defmodule ExDoc.Autolink do
 
         nil
     end
+  end
+
+  defp app_module_url(:ex_doc, module, %{current_module: module} = config) do
+    ex_doc_app_url(module, config, inspect(module), config.ext, "#content")
   end
 
   defp app_module_url(:ex_doc, module, config) do
