@@ -270,12 +270,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
     not_found_template: [:config, :nodes_map],
     api_reference_entry_template: [:module_node],
     api_reference_template: [:config, :nodes_map],
-    extra_template: [:config, :title, :nodes_map, :content],
+    extra_template: [:config, :title, :nodes_map, :content, :refs],
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
     summary_entry_template: [:node],
-    redirect_template: [:config, :redirect_to]
+    redirect_template: [:config, :redirect_to],
+    bottom_actions_template: [:refs]
   ]
 
   Enum.each(templates, fn {name, args} ->
