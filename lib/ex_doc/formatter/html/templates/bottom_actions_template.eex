@@ -3,7 +3,7 @@
     <%= if refs.prev do %>
       <a href="<%= refs.prev.path %>" class="bottom-actions-button" rel="prev">
         <span class="subheader">
-          ← Go Back
+          ← Previous Page
         </span>
         <span class="title">
           <%= refs.prev.title %>
@@ -15,7 +15,7 @@
     <%= if refs.next do %>
       <a href="<%= refs.next.path %>" class="bottom-actions-button" rel="next">
         <span class="subheader">
-          Continue Reading →
+          Next Page →
         </span>
         <span class="title">
           <%= refs.next.title %>

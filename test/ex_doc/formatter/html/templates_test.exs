@@ -463,4 +463,33 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{<h1>\s*mix task_with_docs\s*<small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
     end
   end
+
+  describe "bottom actions" do
+    test "does not render next/prev links when the refs are nil" do
+      refs = %{
+        prev: nil,
+        next: nil
+      }
+
+      content = Templates.bottom_actions_template(refs)
+
+      refute content =~ ~r{Previous Page}
+      refute content =~ ~r{Next Page}
+    end
+  end
+
+  test "renders next/prev links when their refs are given" do
+    refs = %{
+      prev: %{path: "Prev.html", title: "Left"},
+      next: %{path: "Next.html", title: "Right"}
+    }
+
+    content = Templates.bottom_actions_template(refs)
+
+    assert content =~
+             ~r{<a href="Prev.html" class="bottom-actions-button" rel="prev">\s*<span class="subheader">\s*← Previous Page\s*</span>\s*<span class="title">\s*Left\s*</span>\s*</a>}
+
+    assert content =~
+             ~r{<a href="Next.html" class="bottom-actions-button" rel="next">\s*<span class="subheader">\s*Next Page →\s*</span>\s*<span class="title">\s*Right\s*</span>\s*</a>}
+  end
 end
