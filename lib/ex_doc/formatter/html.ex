@@ -196,11 +196,19 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_extras(nodes_map, extras, config) do
-    Enum.map(extras, fn %{id: id, title: title, content: content} ->
+    extras
+    |> with_prev_next()
+    |> Enum.map(fn {%{id: id, title: title, content: content}, prev, next} ->
       filename = "#{id}.html"
       output = "#{config.output}/#{filename}"
       config = set_canonical_url(config, filename)
-      html = Templates.extra_template(config, title, nodes_map, content)
+
+      refs = %{
+        prev: prev && %{path: "#{prev.id}.html", title: prev.title},
+        next: next && %{path: "#{next.id}.html", title: next.title}
+      }
+
+      html = Templates.extra_template(config, title, nodes_map, content, refs)
 
       if File.regular?(output) do
         IO.puts(:stderr, "warning: file #{Path.relative_to_cwd(output)} already exists")
@@ -209,6 +217,12 @@ defmodule ExDoc.Formatter.HTML do
       File.write!(output, html)
       filename
     end)
+  end
+
+  defp with_prev_next([]), do: []
+
+  defp with_prev_next([head | tail]) do
+    Enum.zip([[head | tail], [nil, head | tail], tail ++ [nil]])
   end
 
   @doc """

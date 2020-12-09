@@ -427,6 +427,41 @@ defmodule ExDoc.Formatter.HTMLTest do
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       refute content =~ ~r{"id":"api-reference","title":"API Reference"}
     end
+
+    test "pages include links to the previous/next page if applicable" do
+      generate_docs(
+        doc_config(
+          extras: [
+            "test/fixtures/LICENSE",
+            "test/fixtures/README.md"
+          ]
+        )
+      )
+
+      # We have three extras: API Reference, LICENSE and README
+
+      content_first = File.read!("#{output_dir()}/api-reference.html")
+
+      refute content_first =~ ~r{Previous Page}
+
+      assert content_first =~
+               ~r{<a href="license.html" class="bottom-actions-button" rel="next">\s*<span class="subheader">\s*Next Page →\s*</span>\s*<span class="title">\s*LICENSE\s*</span>\s*</a>}
+
+      content_middle = File.read!("#{output_dir()}/license.html")
+
+      assert content_middle =~
+               ~r{<a href="api-reference.html" class="bottom-actions-button" rel="prev">\s*<span class="subheader">\s*← Previous Page\s*</span>\s*<span class="title">\s*API Reference\s*</span>\s*</a>}
+
+      assert content_middle =~
+               ~r{<a href="readme.html" class="bottom-actions-button" rel="next">\s*<span class="subheader">\s*Next Page →\s*</span>\s*<span class="title">\s*README\s*</span>\s*</a>}
+
+      content_last = File.read!("#{output_dir()}/readme.html")
+
+      assert content_last =~
+               ~r{<a href="license.html" class="bottom-actions-button" rel="prev">\s*<span class="subheader">\s*← Previous Page\s*</span>\s*<span class="title">\s*LICENSE\s*</span>\s*</a>}
+
+      refute content_last =~ ~r{Next Page}
+    end
   end
 
   describe ".build" do
