@@ -19,9 +19,10 @@ jobs:
             elixir: 1.10.3
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.3
-      - uses: actions/setup-elixir@v1.4.2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-elixir@v1
         with:
+          experimental-otp: true
           otp-version: '${{matrix.otp}}'
           elixir-version: '${{matrix.elixir}}'
       - name: Install Dependencies
