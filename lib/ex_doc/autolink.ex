@@ -387,12 +387,13 @@ defmodule ExDoc.Autolink do
       module = string_to_module(module_string)
       name = String.to_atom(name_string)
       arity = count_args(rest, 0, 0)
+      original_text = call_string <> "()"
 
       url =
         if module do
-          remote_url({:type, module, name, arity}, config, string)
+          remote_url({:type, module, name, arity}, config, original_text)
         else
-          local_url(:type, name, arity, config, string)
+          local_url(:type, name, arity, config, original_text)
         end
 
       if url do

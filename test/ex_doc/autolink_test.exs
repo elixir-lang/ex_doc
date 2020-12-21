@@ -394,15 +394,23 @@ defmodule ExDoc.AutolinkTest do
 
     warn("t:Calendar.date/9")
 
-    warn(fn ->
-      assert typespec(quote(do: t() :: AutolinkTest.Foo.bad())) ==
-               ~s[t() :: AutolinkTest.Foo.bad()]
-    end)
+    assert warn(fn ->
+             typespec(quote(do: t() :: bad()))
+           end) =~ "documentation references \"bad()\""
 
-    warn(fn ->
-      assert typespec(quote(do: t() :: String.bad())) ==
-               ~s[t() :: String.bad()]
-    end)
+    assert warn(fn ->
+             typespec(quote(do: t() :: String.bad()))
+           end) =~ "documentation references \"String.bad()\""
+
+    assert warn(fn ->
+             typespec(
+               quote do
+                 t() :: %{
+                   name: String.bad()
+                 }
+               end
+             )
+           end) =~ "documentation references \"String.bad()\""
 
     assert warn(~m"[Foo](Foo Bar.md)", extras: []) =~
              "documentation references file \"Foo Bar.md\" but it does not exist"
