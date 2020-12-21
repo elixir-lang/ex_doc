@@ -300,13 +300,14 @@ defmodule ExDoc.AutolinkTest do
                ~s[t() :: <a href="#t:foo?/1">foo?</a>(<a href=\"#t:bar/0\">bar</a>())]
 
       assert typespec(
-        quote do
-          t() :: %{
-            required(bar()) => bar(),
-            optional(bar()) => bar()
-          }
-        end
-      ) == "t() :: %{required(<a href=\"#t:bar/0\">bar</a>()) =&gt; <a href=\"#t:bar/0\">bar</a>(), optional(<a href=\"#t:bar/0\">bar</a>()) =&gt; <a href=\"#t:bar/0\">bar</a>()}"
+               quote do
+                 t() :: %{
+                   required(bar()) => bar(),
+                   optional(bar()) => bar()
+                 }
+               end
+             ) ==
+               "t() :: %{required(<a href=\"#t:bar/0\">bar</a>()) =&gt; <a href=\"#t:bar/0\">bar</a>(), optional(<a href=\"#t:bar/0\">bar</a>()) =&gt; <a href=\"#t:bar/0\">bar</a>()}"
     end
 
     test "remotes" do
