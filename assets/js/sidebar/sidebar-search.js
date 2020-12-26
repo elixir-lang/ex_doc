@@ -1,8 +1,15 @@
-import { hideAutocompleteList, moveAutocompleteSelection, selectedAutocompleteSuggestion, updateAutocompleteList } from '../autocomplete/autocomplete-list'
+import {
+  hideAutocompleteList,
+  moveAutocompleteSelection,
+  selectedAutocompleteSuggestion,
+  updateAutocompleteList,
+  AUTOCOMPLETE_CONTAINER_SELECTOR,
+  AUTOCOMPLETE_SUGGESTION_SELECTOR
+} from '../autocomplete/autocomplete-list'
 import { qs } from '../helpers'
 
-const SEARCH_FORM_SELECTOR = 'form.sidebar-search'
 const SEARCH_INPUT_SELECTOR = 'form.sidebar-search input'
+const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-close-button'
 
 /**
  * Initializes the sidebar search box.
@@ -34,7 +41,8 @@ function addEventListeners () {
 
   searchInput.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
-      closeSearch()
+      clearSearch()
+      searchInput.blur()
     } else if (event.key === 'Enter') {
       handleAutocompleteFormSubmission(event)
     } else if (event.key === 'ArrowUp') {
@@ -59,22 +67,32 @@ function addEventListeners () {
     const relatedTarget = event.relatedTarget
 
     if (relatedTarget) {
-      if (relatedTarget.classList.contains('autocomplete-suggestion')) {
+      // If blur is triggered caused by clicking on an autocomplete result,
+      // then ignore it, because it's handled in the click handler below.
+      if (relatedTarget.matches(AUTOCOMPLETE_SUGGESTION_SELECTOR)) {
         return null
       }
 
-      if (relatedTarget.classList.contains('search-close-button')) {
-        closeSearch()
+      if (relatedTarget.matches(SEARCH_CLOSE_BUTTON_SELECTOR)) {
+        clearSearch()
       }
     }
 
-    document.body.classList.remove('search-focused')
-    hideAutocompleteList()
+    hideAutocomplete()
+  })
+
+  qs(AUTOCOMPLETE_CONTAINER_SELECTOR).addEventListener('click', event => {
+    const newWindowKeyDown = (event.shiftKey || event.ctrlKey)
+    if (newWindowKeyDown) {
+      searchInput.focus()
+    } else {
+      clearSearch()
+      hideAutocomplete()
+    }
   })
 }
 
 function handleAutocompleteFormSubmission (event) {
-  const searchForm = qs(SEARCH_FORM_SELECTOR)
   const searchInput = qs(SEARCH_INPUT_SELECTOR)
   const newWindowKeyDown = (event.shiftKey || event.ctrlKey)
   const autocompleteSuggestion = selectedAutocompleteSuggestion()
@@ -82,21 +100,30 @@ function handleAutocompleteFormSubmission (event) {
   event.preventDefault()
 
   const target = newWindowKeyDown ? '_blank' : '_self'
-  searchForm.setAttribute('target', target)
+  const anchor = document.createElement('a')
+
+  anchor.setAttribute('target', target)
 
   if (autocompleteSuggestion) {
-    searchForm.setAttribute('action', autocompleteSuggestion.link)
-    searchInput.removeAttribute('name')
+    anchor.setAttribute('href', autocompleteSuggestion.link)
   } else {
-    searchForm.setAttribute('action', 'search.html')
-    searchInput.setAttribute('name', 'q')
+    anchor.setAttribute('href', `search.html?q=${encodeURIComponent(searchInput.value)}`)
   }
 
-  searchForm.submit()
+  anchor.click()
+
+  if (!newWindowKeyDown) {
+    clearSearch()
+    hideAutocomplete()
+  }
 }
 
-function closeSearch () {
+function clearSearch () {
   const input = qs(SEARCH_INPUT_SELECTOR)
   input.value = ''
-  input.blur()
+}
+
+function hideAutocomplete () {
+  document.body.classList.remove('search-focused')
+  hideAutocompleteList()
 }
