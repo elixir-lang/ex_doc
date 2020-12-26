@@ -2,8 +2,8 @@ import autocompleteSuggestionsTemplate from '../handlebars/templates/autocomplet
 import { getSuggestions } from './suggestions'
 import { isBlank, qs } from '../helpers'
 
-const AUTOCOMPLETE_CONTAINER_SELECTOR = '.autocomplete'
-const AUTOCOMPLETE_SUGGESTION_SELECTOR = '.autocomplete-suggestion'
+export const AUTOCOMPLETE_CONTAINER_SELECTOR = '.autocomplete'
+export const AUTOCOMPLETE_SUGGESTION_SELECTOR = '.autocomplete-suggestion'
 
 const state = {
   autocompleteSuggestions: [],
