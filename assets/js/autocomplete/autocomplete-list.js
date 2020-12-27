@@ -25,6 +25,13 @@ export function hideAutocompleteList () {
 }
 
 /**
+ * Checks if the search autocomplete list is open.
+ */
+export function isAutocompleteListOpen () {
+  return qs(AUTOCOMPLETE_CONTAINER_SELECTOR).classList.contains('shown')
+}
+
+/**
  * Shows autocomplete suggestions for the given term.
  *
  * For blank terms the list is not shown.
