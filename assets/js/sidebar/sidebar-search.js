@@ -1,5 +1,6 @@
 import {
   hideAutocompleteList,
+  isAutocompleteListOpen,
   moveAutocompleteSelection,
   selectedAutocompleteSuggestion,
   updateAutocompleteList,
@@ -9,7 +10,7 @@ import {
 import { qs } from '../helpers'
 
 const SEARCH_INPUT_SELECTOR = 'form.sidebar-search input'
-const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-close-button'
+const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.sidebar-search .search-close-button'
 
 /**
  * Initializes the sidebar search box.
@@ -70,6 +71,13 @@ function addEventListeners () {
       // If blur is triggered caused by clicking on an autocomplete result,
       // then ignore it, because it's handled in the click handler below.
       if (relatedTarget.matches(AUTOCOMPLETE_SUGGESTION_SELECTOR)) {
+        // Focus the input after a while, so that it's easier to close
+        // or get back to after an accidental blur
+        setTimeout(() => {
+          if (isAutocompleteListOpen()) {
+            searchInput.focus()
+          }
+        }, 1000)
         return null
       }
 
