@@ -17,13 +17,13 @@ defmodule ExDoc.Markdown.Earmark do
 
   ## Options
 
-    * `:gfm` - boolean. Turns on Github Flavored Markdown extensions. True by default
+    * `:gfm` - (boolean) turns on Github Flavored Markdown extensions. Defaults to `true`.
 
-    * `:breaks` - boolean. Only applicable if `gfm` is enabled. Makes all line
-      breaks significant (so every line in the input is a new line in the output)
+    * `:breaks` - (boolean) only applicable if `gfm` is enabled. Makes all line
+      breaks significant (so every line in the input is a new line in the output).
 
-    * `:smartypants` - boolean. Turns on smartypants processing, so quotes become curly,
-      two or three hyphens become en and em dashes, and so on. False by default
+    * `:smartypants` - (boolean) turns on smartypants processing, so quotes become curly,
+      two or three hyphens become en and em dashes, and so on. Defaults to `false`.
 
   """
   @impl true
