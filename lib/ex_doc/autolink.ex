@@ -339,14 +339,23 @@ defmodule ExDoc.Autolink do
     string =
       ast
       |> Macro.to_string()
-      |> Code.format_string!(line_length: 80)
-      |> IO.iodata_to_binary()
+      |> safe_format_string!()
       |> T.h()
 
     name = typespec_name(ast)
     {name, rest} = split_name(string, name)
 
     name <> do_typespec(rest, config)
+  end
+
+  defp safe_format_string!(string) do
+    try do
+      string
+      |> Code.format_string!(line_length: 80)
+      |> IO.iodata_to_binary()
+    rescue
+      _ -> string
+    end
   end
 
   defp typespec_name({:"::", _, [{name, _, _}, _]}), do: Atom.to_string(name)

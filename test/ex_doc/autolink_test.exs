@@ -277,6 +277,9 @@ defmodule ExDoc.AutolinkTest do
         {{:type, MyModule, :baz, 1}, :public}
       ])
 
+      assert typespec(quote(do: unquote(:"/=")() :: :ok)) ==
+               ~s[/=() :: :ok]
+
       assert typespec(quote(do: t() :: foo(1))) ==
                ~s[t() :: <a href="#t:foo/1">foo</a>(1)]
 
