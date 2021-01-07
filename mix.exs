@@ -1,6 +1,7 @@
 defmodule ExDoc.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/elixir-lang/ex_doc"
   @version "0.23.0"
 
   def project do
@@ -13,7 +14,7 @@ defmodule ExDoc.Mixfile do
       package: package(),
       escript: escript(),
       elixirc_paths: elixirc_paths(Mix.env()),
-      source_url: "https://github.com/elixir-lang/ex_doc/",
+      source_url: @source_url,
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
       description: "ExDoc is a documentation generation tool for Elixir",
@@ -61,7 +62,8 @@ defmodule ExDoc.Mixfile do
       ],
       files: ["formatters", "lib", "mix.exs", "LICENSE", "CHANGELOG.md", "README.md"],
       links: %{
-        "GitHub" => "https://github.com/elixir-lang/ex_doc",
+        "GitHub" => @source_url,
+        "Changelog" => "https://hexdocs.pm/ex_doc/changelog.html",
         "Writing documentation" => "https://hexdocs.pm/elixir/writing-documentation.html"
       }
     ]
@@ -85,7 +87,7 @@ defmodule ExDoc.Mixfile do
         "LICENSE"
       ],
       source_ref: "v#{@version}",
-      source_url: "https://github.com/elixir-lang/ex_doc",
+      source_url: @source_url,
       groups_for_modules: [
         Markdown: [
           ExDoc.Markdown,

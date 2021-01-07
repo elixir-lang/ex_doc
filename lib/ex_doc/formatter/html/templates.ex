@@ -62,7 +62,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   @doc """
   Gets the first paragraph of the documentation of a node. It strips
-  surrounding white-spaces and traling `:`.
+  surrounding white-spaces and trailing `:`.
 
   If `doc` is `nil`, it returns `nil`.
   """

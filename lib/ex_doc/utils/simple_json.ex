@@ -1,5 +1,5 @@
 defmodule ExDoc.Utils.SimpleJSON do
-  # We want to miniminize the number of dependencies
+  # We want to minimize the number of dependencies
   # ExDoc has, because we don't want someone to be allowed
   # to not upgrade their app due to an ExDoc restriction,
   # so we ship with a simple JSON implementation.
