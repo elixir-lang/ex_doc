@@ -248,7 +248,7 @@ defmodule Mix.Tasks.Docs do
   The script should define data in global JavaScript variables that will be
   interpreted by `ex_doc` when viewing the documentation.
 
-  Currenly supported variables:
+  Currently supported variables:
 
   ### `versionNodes`
 
@@ -280,7 +280,7 @@ defmodule Mix.Tasks.Docs do
   the sidebar, particularly when they are too long for the sidebar or when many
   modules share a long prefix. If you mean to group modules logically or call
   attention to them in the docs, you should probably use `:groups_for_modules`
-  (which can be used in conjuction with `:nest_modules_by_prefix`).
+  (which can be used in conjunction with `:nest_modules_by_prefix`).
 
   ## Umbrella project
 
