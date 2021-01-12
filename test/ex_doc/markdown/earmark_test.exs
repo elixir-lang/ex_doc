@@ -35,7 +35,7 @@ defmodule ExDoc.Markdown.EarmarkTest do
              end) =~ "(warning) nofile:1 Closing unclosed backquotes ` at end of input"
     end
 
-    test "bug #1222" do
+    test "handles warnings" do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert [{:p, [], _, %{}}] =
                         Markdown.to_ast("{:ok, status, %MyApp.User{}} on success", [])
