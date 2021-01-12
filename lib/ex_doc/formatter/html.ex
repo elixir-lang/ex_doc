@@ -124,11 +124,20 @@ defmodule ExDoc.Formatter.HTML do
 
   @doc false
   def ast_to_html(list) when is_list(list), do: Enum.map(list, &ast_to_html/1)
+
   def ast_to_html(binary) when is_binary(binary), do: Templates.h(binary)
 
-  def ast_to_html({tag, attrs, ast}) do
-    attrs = Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
-    ["<#{tag}", attrs, ">", ast_to_html(ast), "</#{tag}>"]
+  def ast_to_html({tag, attrs, ast, %{verbatim: true}}) do
+    [text] = ast
+    ["<#{tag}", ast_attributes_to_html(attrs), ">", text, "</#{tag}>"]
+  end
+
+  def ast_to_html({tag, attrs, ast, %{}}) do
+    ["<#{tag}", ast_attributes_to_html(attrs), ">", ast_to_html(ast), "</#{tag}>"]
+  end
+
+  defp ast_attributes_to_html(attrs) do
+    Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
   end
 
   defp output_setup(build, config) do
@@ -312,7 +321,7 @@ defmodule ExDoc.Formatter.HTML do
     ast =
       case extension_name(input) do
         extension when extension in ["", ".txt"] ->
-          [{:pre, [], "\n" <> File.read!(input)}]
+          [{:pre, [], "\n" <> File.read!(input), %{}}]
 
         ".md" ->
           input

@@ -4,7 +4,7 @@ defmodule ExDoc.AutolinkTest do
   import ExUnit.CaptureIO
 
   defp sigil_m(text, []) do
-    [{:p, _, [ast]}] = ExDoc.Markdown.to_ast(text, [])
+    [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, [])
     ast
   end
 
@@ -222,16 +222,16 @@ defmodule ExDoc.AutolinkTest do
 
     test "special case links" do
       assert autolink(~m"`//2`") ==
-               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], [ast("//2")]}
+               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], [ast("//2")], %{}}
 
       assert autolink(~m"[division](`//2`)") ==
-               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], ["division"]}
+               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], ["division"], %{}}
 
       assert autolink(~m"`Kernel.//2`") ==
-               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], [ast("Kernel.//2")]}
+               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], [ast("Kernel.//2")], %{}}
 
       assert autolink(~m"[division](`Kernel.//2`)") ==
-               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], ["division"]}
+               {:a, [href: "https://hexdocs.pm/elixir/Kernel.html#//2"], ["division"], %{}}
     end
 
     test "other link" do
@@ -245,7 +245,7 @@ defmodule ExDoc.AutolinkTest do
       assert_unchanged("  String.upcase()/2")
       assert_unchanged(":\"atom\"")
       assert_unchanged("1 + 2")
-      assert_unchanged({:p, [], ["hello"]})
+      assert_unchanged({:p, [], ["hello"], %{}})
     end
   end
 
@@ -471,8 +471,8 @@ defmodule ExDoc.AutolinkTest do
     assert autolink(ast_or_text, options) == ast(ast_or_text)
   end
 
-  defp ast(text) when is_binary(text), do: {:code, [class: "inline"], [text]}
-  defp ast({_, _, _} = ast), do: ast
+  defp ast(text) when is_binary(text), do: {:code, [class: "inline"], [text], %{}}
+  defp ast({_, _, _, _} = ast), do: ast
 
   defp warn(fun) when is_function(fun, 0) do
     captured = capture_io(:stderr, fun)

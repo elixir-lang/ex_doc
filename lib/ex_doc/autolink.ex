@@ -58,31 +58,31 @@ defmodule ExDoc.Autolink do
     binary
   end
 
-  defp walk({:pre, _, _} = ast, _config) do
+  defp walk({:pre, _, _, _} = ast, _config) do
     ast
   end
 
-  defp walk({:a, attrs, inner} = ast, config) do
+  defp walk({:a, attrs, inner, meta} = ast, config) do
     cond do
       url = custom_link(attrs, config) ->
-        {:a, Keyword.put(attrs, :href, url), inner}
+        {:a, Keyword.put(attrs, :href, url), inner, meta}
 
       true ->
         ast
     end
   end
 
-  defp walk({:code, attrs, [code]} = ast, config) do
+  defp walk({:code, attrs, [code], meta} = ast, config) do
     if url = url(code, :regular_link, config) do
       code = remove_prefix(code)
-      {:a, [href: url], [{:code, attrs, [code]}]}
+      {:a, [href: url], [{:code, attrs, [code], meta}], %{}}
     else
       ast
     end
   end
 
-  defp walk({tag, attrs, ast}, config) do
-    {tag, attrs, walk(ast, config)}
+  defp walk({tag, attrs, ast, meta}, config) do
+    {tag, attrs, walk(ast, config), meta}
   end
 
   @ref_regex ~r/^`(.+)`$/

@@ -329,24 +329,31 @@ defmodule ExDoc.Retriever do
     }
   end
 
-  defp delegate_doc_ast({m, f, a}),
-    do: [{:p, [], ["See ", {:code, [class: "inline"], [Exception.format_mfa(m, f, a)]}, "."]}]
+  defp delegate_doc_ast({m, f, a}) do
+    [
+      {:p, [], ["See ", {:code, [class: "inline"], [Exception.format_mfa(m, f, a)], %{}}, "."],
+       %{}}
+    ]
+  end
 
-  defp delegate_doc_ast(nil),
-    do: nil
+  defp delegate_doc_ast(nil) do
+    nil
+  end
 
-  defp callback_doc_ast(name, arity, {:ok, behaviour}),
-    do: [
+  defp callback_doc_ast(name, arity, {:ok, behaviour}) do
+    [
       {:p, [],
        [
          "Callback implementation for ",
-         {:code, [class: "inline"], ["c:#{inspect(behaviour)}.#{name}/#{arity}"]},
+         {:code, [class: "inline"], ["c:#{inspect(behaviour)}.#{name}/#{arity}"], %{}},
          "."
-       ]}
+       ], %{}}
     ]
+  end
 
-  defp callback_doc_ast(_, _, _),
-    do: nil
+  defp callback_doc_ast(_, _, _) do
+    nil
+  end
 
   defp get_defaults(_name, _arity, 0), do: []
 

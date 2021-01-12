@@ -12,4 +12,4 @@ hello
 
 ## more > than
 
-world
+<p><strong>raw content</strong></p>

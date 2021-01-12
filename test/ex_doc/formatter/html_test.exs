@@ -326,6 +326,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~
                ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code(\sclass="inline")?>mix compile.elixir</code></a>}
 
+      assert content =~ "<p><strong>raw content</strong></p>"
+
       content = File.read!("#{output_dir()}/plaintextfiles.html")
 
       assert content =~
@@ -342,7 +344,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       plain_text_file = File.read!("#{output_dir()}/license.html")
 
       assert plain_text_file =~
-               ~R{<pre>\nLicensed under the Apache License, Version 2\.0 \(the \&quot;License\&quot;\);\n.+\nlimitations under the License.\n</pre>}s
+               ~s{<pre>\nLicensed under the Apache License, Version 2.0 (the &quot;License&quot;)}
     end
 
     test "without any other content" do
@@ -516,5 +518,14 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?("#{output_dir()}/assets/hello/world")
   after
     File.rm_rf!("test/tmp/html_assets")
+  end
+
+  describe "ast_to_html/1" do
+    test "handles raw html" do
+      assert "<strong><em>bar</em></strong>"
+             |> ExDoc.Markdown.Earmark.to_ast([])
+             |> HTML.ast_to_html()
+             |> IO.iodata_to_binary() == "<strong><em>bar</em></strong>"
+    end
   end
 end

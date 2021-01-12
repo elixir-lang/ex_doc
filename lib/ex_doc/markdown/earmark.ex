@@ -2,6 +2,7 @@ defmodule ExDoc.Markdown.Earmark do
   @moduledoc """
   ExDoc extension for the EarmarkParser Markdown parser.
   """
+
   @behaviour ExDoc.Markdown
 
   @doc """
@@ -63,12 +64,12 @@ defmodule ExDoc.Markdown.Earmark do
     binary
   end
 
-  defp fixup({tag, attrs, ast}) when is_binary(tag) do
-    {fixup_tag(tag), Enum.map(attrs, &fixup_attr/1), fixup(ast)}
+  defp fixup({tag, attrs, ast}) do
+    fixup({tag, attrs, ast, %{}})
   end
 
-  defp fixup({tag, attrs, ast, _meta}) when is_binary(tag) do
-    fixup({tag, attrs, ast})
+  defp fixup({tag, attrs, ast, meta}) when is_binary(tag) and is_list(attrs) and is_map(meta) do
+    {fixup_tag(tag), Enum.map(attrs, &fixup_attr/1), fixup(ast), meta}
   end
 
   defp fixup({:comment, _, _, _}) do
