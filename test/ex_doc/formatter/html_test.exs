@@ -344,7 +344,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       plain_text_file = File.read!("#{output_dir()}/license.html")
 
       assert plain_text_file =~
-               ~R{<pre>\nLicensed under the Apache License, Version 2\.0 \(the \&quot;License\&quot;\);\n.+\nlimitations under the License.\n</pre>}s
+               ~s{<pre>\nLicensed under the Apache License, Version 2.0 (the &quot;License&quot;)}
     end
 
     test "without any other content" do
