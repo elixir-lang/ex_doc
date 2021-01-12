@@ -7,9 +7,18 @@ defmodule ExDoc.Markdown.EarmarkTest do
 
   describe "to_ast/2" do
     test "generate AST" do
-      assert Markdown.to_ast("# Test\n\nHello", []) == [{:h1, [], ["Test"]}, {:p, [], ["Hello"]}]
-      assert Markdown.to_ast("[foo](bar)", []) == [{:p, [], [{:a, [href: "bar"], ["foo"]}]}]
-      assert Markdown.to_ast("<p>\nTest\n</p>", []) == [{:p, '', ["Test"]}]
+      assert Markdown.to_ast("# Test\n\nHello", []) == [
+               {:h1, [], ["Test"], %{}},
+               {:p, [], ["Hello"], %{}}
+             ]
+
+      assert Markdown.to_ast("[foo](bar)", []) == [
+               {:p, [], [{:a, [href: "bar"], ["foo"], %{}}], %{}}
+             ]
+
+      assert Markdown.to_ast("<p><em>Test</em></p>", []) == [
+               {:p, [], ["<em>Test</em>"], %{verbatim: true}}
+             ]
     end
 
     test "empty input" do
@@ -28,7 +37,7 @@ defmodule ExDoc.Markdown.EarmarkTest do
 
     test "bug #1222" do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert [{:p, [], _}] =
+               assert [{:p, [], _, %{}}] =
                         Markdown.to_ast("{:ok, status, %MyApp.User{}} on success", [])
              end) =~ "ExDoc.Markdown.Earmark (warning)"
     end

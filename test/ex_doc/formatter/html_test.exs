@@ -326,6 +326,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~
                ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code(\sclass="inline")?>mix compile.elixir</code></a>}
 
+      assert content =~ "<p><strong>raw content</strong></p>"
+
       content = File.read!("#{output_dir()}/plaintextfiles.html")
 
       assert content =~
