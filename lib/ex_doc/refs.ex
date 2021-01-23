@@ -100,11 +100,11 @@ defmodule ExDoc.Refs do
   defp fetch_entries(module, result) do
     case result do
       {:docs_v1, _, _, _, module_doc, _, docs} ->
-        module_visibility = visibility({module, module_doc})
+        module_visibility = visibility(module_doc)
 
         for {{kind, name, arity}, _, _, doc, metadata} <- docs do
           ref_kind = to_ref_kind(kind)
-          visibility = visibility({module, module_doc}, {ref_kind, name, doc})
+          visibility = visibility(module_doc, {ref_kind, name, doc})
 
           for arity <- (arity - (metadata[:defaults] || 0))..arity do
             {{ref_kind, module, name, arity}, visibility}
@@ -133,23 +133,24 @@ defmodule ExDoc.Refs do
 
   defp starts_with_underscore?(name), do: hd(Atom.to_charlist(name)) == ?_
 
-  defp visibility({_module, :hidden}),
+  defp visibility(:hidden),
     do: :hidden
 
-  defp visibility({_module, _module_doc}),
+  defp visibility(_module_doc),
     do: :public
 
-  defp visibility({_module, _module_doc}, {kind, _name, _doc})
+  defp visibility(_module_doc, {kind, _name, _doc})
        when kind not in [:callback, :function, :type],
        do: raise(ArgumentError, "Unknown kind #{inspect(kind)}")
 
-  defp visibility({_module, :hidden}, {_kind, _name, _doc}),
+  defp visibility(:hidden, {_kind, _name, _doc}),
     do: :hidden
 
-  defp visibility({_, _}, {_kind, _name, :hidden}),
-    do: :hidden
+  defp visibility(_, {_kind, _name, :hidden}) do
+    :hidden
+  end
 
-  defp visibility({_, _}, {kind, name, doc}) when has_no_docs(doc) do
+  defp visibility(_, {kind, name, doc}) when has_no_docs(doc) do
     cond do
       kind in [:callback, :type] ->
         :public
@@ -162,7 +163,7 @@ defmodule ExDoc.Refs do
     end
   end
 
-  defp visibility({_, _}, {_, _, _}) do
+  defp visibility(_, {_, _, _}) do
     :public
   end
 
