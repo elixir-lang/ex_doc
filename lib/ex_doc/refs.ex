@@ -146,9 +146,8 @@ defmodule ExDoc.Refs do
   defp visibility(:hidden, {_kind, _name, _doc}),
     do: :hidden
 
-  defp visibility(_, {_kind, _name, :hidden}) do
-    :hidden
-  end
+  defp visibility(_, {_kind, _name, :hidden}),
+    do: :hidden
 
   defp visibility(_, {kind, name, doc}) when has_no_docs(doc) do
     cond do
