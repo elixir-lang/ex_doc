@@ -18,7 +18,12 @@ defmodule ExDoc.Mixfile do
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
       description: "ExDoc is a documentation generation tool for Elixir",
-      docs: docs()
+      docs: docs(),
+      dialyzer: [
+        plt_add_apps: [:mix],
+        check_plt: true,
+        ignore_warnings: ".dialyzer_ignore.exs"
+      ]
     ]
   end
 
@@ -35,7 +40,8 @@ defmodule ExDoc.Mixfile do
       {:makeup_elixir, "~> 0.14"},
       {:makeup_erlang, "~> 0.1"},
       {:excoveralls, "~> 0.3", only: :test},
-      {:jason, "~> 1.2", only: :test}
+      {:jason, "~> 1.2", only: :test},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 

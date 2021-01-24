@@ -396,7 +396,7 @@ defmodule ExDoc.Retriever do
     {:attribute, anno, :callback, {^actual_def, specs}} =
       Enum.find(module_data.abst_code, &match?({:attribute, _, :callback, {^actual_def, _}}, &1))
 
-    line = anno_line(anno) || doc_line
+    line = anno_line(anno)
     specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
 
     annotations =
@@ -476,7 +476,7 @@ defmodule ExDoc.Retriever do
       end)
 
     spec = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(type)
-    line = anno_line(anno) || doc_line
+    line = anno_line(anno)
 
     annotations = if type == :opaque, do: ["opaque" | annotations], else: annotations
     doc_ast = doc_ast(content_type, doc, file: source.path)
