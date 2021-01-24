@@ -87,8 +87,8 @@ defmodule ExDoc.Refs do
   end
 
   defp fetch({_kind, module, _name, _arity} = ref) do
-    with mod_visibility <- fetch({:module, module}),
-         true <- mod_visibility in [:public, :hidden],
+    with module_visibility <- fetch({:module, module}),
+         true <- module_visibility in [:public, :hidden],
          {:ok, visibility} <- lookup(ref) do
       visibility
     else
@@ -103,14 +103,11 @@ defmodule ExDoc.Refs do
         module_visibility = visibility(module_doc)
 
         for {{kind, name, arity}, _, _, doc, metadata} <- docs do
-          visibility =
-            case {module_visibility, visibility(doc)} do
-              {:hidden, :public} -> :hidden
-              {_, visibility} -> visibility
-            end
+          ref_kind = to_ref_kind(kind)
+          visibility = visibility(module_doc, {ref_kind, name, doc})
 
           for arity <- (arity - (metadata[:defaults] || 0))..arity do
-            {{kind(kind), module, name, arity}, visibility}
+            {{ref_kind, module, name, arity}, visibility}
           end
         end
         |> List.flatten()
@@ -132,12 +129,46 @@ defmodule ExDoc.Refs do
     end
   end
 
-  defp visibility(:hidden), do: :hidden
-  defp visibility(_), do: :public
+  defguardp has_no_docs(doc) when doc == :none or doc == %{}
 
-  defp kind(:macro), do: :function
-  defp kind(:macrocallback), do: :callback
-  defp kind(other), do: other
+  defp starts_with_underscore?(name), do: hd(Atom.to_charlist(name)) == ?_
+
+  defp visibility(:hidden),
+    do: :hidden
+
+  defp visibility(_module_doc),
+    do: :public
+
+  defp visibility(_module_doc, {kind, _name, _doc})
+       when kind not in [:callback, :function, :type],
+       do: raise(ArgumentError, "Unknown kind #{inspect(kind)}")
+
+  defp visibility(:hidden, {_kind, _name, _doc}),
+    do: :hidden
+
+  defp visibility(_, {_kind, _name, :hidden}),
+    do: :hidden
+
+  defp visibility(_, {kind, name, doc}) when has_no_docs(doc) do
+    cond do
+      kind in [:callback, :type] ->
+        :public
+
+      kind == :function and starts_with_underscore?(name) ->
+        :hidden
+
+      kind == :function ->
+        :public
+    end
+  end
+
+  defp visibility(_, {_, _, _}) do
+    :public
+  end
+
+  defp to_ref_kind(:macro), do: :function
+  defp to_ref_kind(:macrocallback), do: :callback
+  defp to_ref_kind(other), do: other
 
   defp exports(module) do
     if function_exported?(module, :__info__, 1) do
