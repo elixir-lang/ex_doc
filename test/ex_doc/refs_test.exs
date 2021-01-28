@@ -69,11 +69,6 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:callback, InMemory, :a_callback, 9}) == :undefined
   end
 
-  test "public?/1" do
-    assert Refs.public?({:module, Code})
-    refute Refs.public?({:module, Code.Typespec})
-  end
-
   test "insert_from_chunk/2 with module that doesn't exist" do
     result = ExDoc.Utils.Code.fetch_docs(:elixir)
     assert :ok = ExDoc.Refs.insert_from_chunk(Elixir, result)

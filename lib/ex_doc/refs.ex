@@ -62,11 +62,6 @@ defmodule ExDoc.Refs do
       :error
   end
 
-  @spec public?(ref()) :: boolean
-  def public?(ref) do
-    get_visibility(ref) == :public
-  end
-
   @spec insert([entry()]) :: :ok
   def insert(entries) do
     true = :ets.insert(@name, entries)
