@@ -128,7 +128,7 @@ defmodule ExDoc.Formatter.HTML do
   def ast_to_html(binary) when is_binary(binary), do: Templates.h(binary)
 
   def ast_to_html({tag, attrs, ast, %{verbatim: true}}) do
-    [text] = ast
+    text = (ast != [] && Enum.join(ast, "")) || ""
     ["<#{tag}", ast_attributes_to_html(attrs), ">", text, "</#{tag}>"]
   end
 
