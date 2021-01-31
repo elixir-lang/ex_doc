@@ -128,8 +128,7 @@ defmodule ExDoc.Formatter.HTML do
   def ast_to_html(binary) when is_binary(binary), do: Templates.h(binary)
 
   def ast_to_html({tag, attrs, ast, %{verbatim: true}}) do
-    [text] = ast
-    ["<#{tag}", ast_attributes_to_html(attrs), ">", text, "</#{tag}>"]
+    ["<#{tag}", ast_attributes_to_html(attrs), ">", ast, "</#{tag}>"]
   end
 
   def ast_to_html({tag, attrs, ast, %{}}) do

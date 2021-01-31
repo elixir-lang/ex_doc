@@ -527,5 +527,18 @@ defmodule ExDoc.Formatter.HTMLTest do
              |> HTML.ast_to_html()
              |> IO.iodata_to_binary() == "<strong><em>bar</em></strong>"
     end
+
+    test "handles multiple empty elements" do
+      assert """
+             <span>
+             <i></i>
+             <i></i>
+             </span>
+             """
+             |> ExDoc.Markdown.Earmark.to_ast([])
+             |> HTML.ast_to_html()
+             |> IO.iodata_to_binary() ==
+               "<span><i></i><i></i></span>"
+    end
   end
 end
