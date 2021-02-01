@@ -117,26 +117,8 @@ defmodule ExDoc.Formatter.HTML do
   defp autolink_and_render(doc, autolink_opts, opts) do
     doc
     |> Autolink.doc(autolink_opts)
-    |> ast_to_html()
-    |> IO.iodata_to_binary()
+    |> ExDoc.DocAST.to_string()
     |> ExDoc.Highlighter.highlight_code_blocks(opts)
-  end
-
-  @doc false
-  def ast_to_html(list) when is_list(list), do: Enum.map(list, &ast_to_html/1)
-
-  def ast_to_html(binary) when is_binary(binary), do: Templates.h(binary)
-
-  def ast_to_html({tag, attrs, ast, %{verbatim: true}}) do
-    ["<#{tag}", ast_attributes_to_html(attrs), ">", ast, "</#{tag}>"]
-  end
-
-  def ast_to_html({tag, attrs, ast, %{}}) do
-    ["<#{tag}", ast_attributes_to_html(attrs), ">", ast_to_html(ast), "</#{tag}>"]
-  end
-
-  defp ast_attributes_to_html(attrs) do
-    Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
   end
 
   defp output_setup(build, config) do

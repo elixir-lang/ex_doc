@@ -7,7 +7,7 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.{GroupMatcher, Refs, Markdown}
+  alias ExDoc.{DocAST, GroupMatcher, Refs}
   alias ExDoc.Retriever.Error
 
   @doc """
@@ -165,11 +165,8 @@ defmodule ExDoc.Retriever do
     {first in ?a..?z, name, arity}
   end
 
-  defp doc_ast("text/markdown", %{"en" => doc}, options),
-    do: Markdown.to_ast(doc, options)
-
-  defp doc_ast(other, %{"en" => _}, _),
-    do: raise("content type #{inspect(other)} is not supported")
+  defp doc_ast(format, %{"en" => doc}, options),
+    do: DocAST.parse!(doc, format, options)
 
   defp doc_ast(_, _, _options),
     do: nil

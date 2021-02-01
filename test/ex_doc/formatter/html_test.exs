@@ -519,26 +519,4 @@ defmodule ExDoc.Formatter.HTMLTest do
   after
     File.rm_rf!("test/tmp/html_assets")
   end
-
-  describe "ast_to_html/1" do
-    test "handles raw html" do
-      assert "<strong><em>bar</em></strong>"
-             |> ExDoc.Markdown.Earmark.to_ast([])
-             |> HTML.ast_to_html()
-             |> IO.iodata_to_binary() == "<strong><em>bar</em></strong>"
-    end
-
-    test "handles multiple empty elements" do
-      assert """
-             <span>
-             <i></i>
-             <i></i>
-             </span>
-             """
-             |> ExDoc.Markdown.Earmark.to_ast([])
-             |> HTML.ast_to_html()
-             |> IO.iodata_to_binary() ==
-               "<span><i></i><i></i></span>"
-    end
-  end
 end
