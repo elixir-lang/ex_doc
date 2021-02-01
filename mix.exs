@@ -40,7 +40,7 @@ defmodule ExDoc.Mixfile do
       {:makeup_erlang, "~> 0.1"},
       {:excoveralls, "~> 0.3", only: :test},
       {:jason, "~> 1.2", only: :test},
-      {:dialyxir, "~> 1.0", only: [:dialyzer], runtime: false}
+      {:dialyxir, "~> 1.0", only: :dialyzer, runtime: false}
     ]
   end
 
