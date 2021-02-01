@@ -16,13 +16,12 @@ defmodule ExDoc.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env()),
       source_url: @source_url,
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test],
+      preferred_cli_env: [coveralls: :test, dialyzer: :dialyzer],
       description: "ExDoc is a documentation generation tool for Elixir",
       docs: docs(),
       dialyzer: [
         plt_add_apps: [:mix],
-        check_plt: true,
-        ignore_warnings: ".dialyzer_ignore.exs"
+        check_plt: true
       ]
     ]
   end
