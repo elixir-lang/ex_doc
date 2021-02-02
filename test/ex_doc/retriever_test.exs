@@ -22,9 +22,7 @@ defmodule ExDoc.RetrieverTest do
       end
       """)
 
-      config = %ExDoc.Config{}
-
-      [mod] = Retriever.docs_from_modules([Mod], config)
+      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
 
       assert %ExDoc.ModuleNode{
                doc: [{:p, [], ["Mod docs."], %{}}],
@@ -480,7 +478,7 @@ defmodule ExDoc.RetrieverTest do
     end
     """)
 
-    ebin_dir = Path.dirname(:code.which(A))
+    ebin_dir = Path.join(c.tmp_dir, "ebin")
     config = %ExDoc.Config{filter_prefix: "A"}
     [a, a_a] = Retriever.docs_from_dir(ebin_dir, config)
 
