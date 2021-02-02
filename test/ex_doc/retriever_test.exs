@@ -1,6 +1,6 @@
 defmodule ExDoc.RetrieverTest do
   use ExUnit.Case, async: true
-  alias ExDoc.Retriever
+  alias ExDoc.{Retriever, DocAST}
   import TestHelper
 
   setup :create_tmp_dir
@@ -25,7 +25,6 @@ defmodule ExDoc.RetrieverTest do
       [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
 
       assert %ExDoc.ModuleNode{
-               doc: [{:p, [], ["Mod docs."], %{}}],
                doc_line: 2,
                id: "Mod",
                module: Mod,
@@ -35,12 +34,13 @@ defmodule ExDoc.RetrieverTest do
                docs: [empty_doc_and_specs, function]
              } = mod
 
+      assert DocAST.to_string(mod.doc) == "<p>Mod docs.</p>"
+
       assert %ExDoc.FunctionNode{
                arity: 0,
                annotations: [],
                defaults: [],
                deprecated: nil,
-               doc: [{:p, [], ["function/0 docs."], %{}}],
                doc_line: 4,
                group: "Functions",
                id: "function/0",
@@ -52,6 +52,8 @@ defmodule ExDoc.RetrieverTest do
                specs: [spec],
                type: :function
              } = function
+
+      assert DocAST.to_string(function.doc) == "<p>function/0 docs.</p>"
 
       assert %ExDoc.FunctionNode{
                id: "empty_doc_and_specs/0",
@@ -115,7 +117,7 @@ defmodule ExDoc.RetrieverTest do
       assert callback1.id == "callback1/0"
       assert callback1.type == :callback
       assert callback1.annotations == []
-      assert callback1.doc == [{:p, [], ["callback1/0 docs."], %{}}]
+      assert DocAST.to_string(callback1.doc) == "<p>callback1/0 docs.</p>"
       assert Macro.to_string(callback1.specs) == "[callback1() :: :ok]"
 
       assert optional_callback1.id == "optional_callback1/0"
@@ -156,7 +158,7 @@ defmodule ExDoc.RetrieverTest do
 
       assert optional_callback1.id == "optional_callback1/0"
       assert optional_callback1.type == :function
-      assert optional_callback1.doc == [{:p, [], ["optional_callback1/0 docs."], %{}}]
+      assert DocAST.to_string(optional_callback1.doc) == "<p>optional_callback1/0 docs.</p>"
     end
 
     test "protocols", c do
@@ -339,7 +341,6 @@ defmodule ExDoc.RetrieverTest do
 
       %ExDoc.ModuleNode{
         deprecated: nil,
-        doc: [{:p, [], ["mod docs."], %{}}],
         doc_line: 0,
         docs: [function],
         function_groups: ["Functions"],
@@ -356,12 +357,13 @@ defmodule ExDoc.RetrieverTest do
         typespecs: []
       } = mod
 
+      assert DocAST.to_string(mod.doc) == "<p>mod docs.</p>"
+
       %ExDoc.FunctionNode{
         annotations: [],
         arity: 0,
         defaults: [],
         deprecated: nil,
-        doc: [{:a, [id: "function-0"], [], %{}}, {:p, [], ["function/0 docs."], %{}}],
         doc_line: 0,
         group: "Functions",
         id: "function/0",
@@ -373,6 +375,8 @@ defmodule ExDoc.RetrieverTest do
         specs: [],
         type: :function
       } = function
+
+      assert DocAST.to_string(function.doc) =~ "<p>function/0 docs.</p>"
     end
 
     test "module with no chunk", c do
