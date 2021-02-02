@@ -3,9 +3,11 @@ defmodule ExDoc.RetrieverTest do
   alias ExDoc.Retriever
   import TestHelper
 
+  setup :create_tmp_dir
+
   describe "docs_from_modules/2: Elixir" do
-    test "module" do
-      elixirc(~S"""
+    test "module", c do
+      elixirc(c, ~S"""
       defmodule Mod do
         @moduledoc "Mod docs."
 
@@ -62,8 +64,8 @@ defmodule ExDoc.RetrieverTest do
       assert Macro.to_string(spec) == "function() :: atom()"
     end
 
-    test "Elixir functions with defaults" do
-      elixirc(~S"""
+    test "Elixir functions with defaults", c do
+      elixirc(c, ~S"""
       defmodule Mod do
         def foo(a, b \\ nil), do: {a, b}
       end
@@ -77,8 +79,8 @@ defmodule ExDoc.RetrieverTest do
       assert foo.signature == "foo(a, b \\\\ nil)"
     end
 
-    test "macros" do
-      elixirc(~S"""
+    test "macros", c do
+      elixirc(c, ~S"""
       defmodule Mod do
         @spec macro(Macro.t) :: Macro.t
         defmacro macro(quoted), do: quoted
@@ -93,8 +95,8 @@ defmodule ExDoc.RetrieverTest do
       assert Macro.to_string(macro.specs) == "[macro(Macro.t()) :: Macro.t()]"
     end
 
-    test "callbacks" do
-      elixirc(~S"""
+    test "callbacks", c do
+      elixirc(c, ~S"""
       defmodule Mod do
         @doc "callback1/0 docs."
         @callback callback1() :: :ok
@@ -130,7 +132,7 @@ defmodule ExDoc.RetrieverTest do
       refute macrocallback1.doc
       assert Macro.to_string(macrocallback1.specs) == "[macrocallback1(term()) :: :ok]"
 
-      elixirc(~S"""
+      elixirc(c, ~S"""
       defmodule Impl do
         @behaviour Mod
 
@@ -159,8 +161,8 @@ defmodule ExDoc.RetrieverTest do
       assert optional_callback1.doc == [{:p, [], ["optional_callback1/0 docs."], %{}}]
     end
 
-    test "protocols" do
-      elixirc(~S"""
+    test "protocols", c do
+      elixirc(c, ~S"""
       defprotocol Mod do
         def foo(thing)
       end
@@ -177,8 +179,8 @@ defmodule ExDoc.RetrieverTest do
       assert foo.id == "foo/1"
     end
 
-    test "structs" do
-      elixirc(~S"""
+    test "structs", c do
+      elixirc(c, ~S"""
       defmodule MyStruct do
         @doc "MyStruct docs."
         defstruct [:field]
@@ -193,8 +195,8 @@ defmodule ExDoc.RetrieverTest do
       assert my_struct.signature == "%MyStruct{}"
     end
 
-    test "exceptions" do
-      elixirc(~S"""
+    test "exceptions", c do
+      elixirc(c, ~S"""
       defmodule MyException do
         defexception [:message]
       end
@@ -214,8 +216,8 @@ defmodule ExDoc.RetrieverTest do
       refute mod.group
     end
 
-    test "defdelegate" do
-      elixirc(~S"""
+    test "defdelegate", c do
+      elixirc(c, ~S"""
       defmodule Mod do
         @doc "Doc override."
         defdelegate downcase(str), to: String
@@ -238,8 +240,8 @@ defmodule ExDoc.RetrieverTest do
       assert upcase.doc == ExDoc.Markdown.to_ast("See `String.upcase/1`.")
     end
 
-    test "Mix tasks" do
-      elixirc(~S"""
+    test "Mix tasks", c do
+      elixirc(c, ~S"""
       defmodule Mix.Tasks.MyTask do
         use Mix.Task
 
@@ -258,8 +260,8 @@ defmodule ExDoc.RetrieverTest do
       assert Retriever.docs_from_modules([:elixir_bootstrap, Elixir], %ExDoc.Config{}) == []
     end
 
-    test "overlapping defaults" do
-      elixirc(~S"""
+    test "overlapping defaults", c do
+      elixirc(c, ~S"""
       defmodule Mod do
         @doc "Basic example"
         def overlapping_defaults(one, two) when is_list(two),
@@ -319,8 +321,8 @@ defmodule ExDoc.RetrieverTest do
   end
 
   describe "docs_from_modules/2: Generic" do
-    test "module with no docs" do
-      elixirc(~S"""
+    test "module with no docs", c do
+      elixirc(c, ~S"""
       defmodule Mod do
       end
       """)
@@ -329,8 +331,8 @@ defmodule ExDoc.RetrieverTest do
       assert mod.doc == nil
     end
 
-    test "metadata" do
-      elixirc(~S"""
+    test "metadata", c do
+      elixirc(c, ~S"""
       defmodule Mod do
         @doc since: "1.0.0"
         @doc deprecated: "deprecation message"
@@ -346,8 +348,8 @@ defmodule ExDoc.RetrieverTest do
       assert foo.deprecated == "deprecation message"
     end
 
-    test "module groups" do
-      elixirc(~S"""
+    test "module groups", c do
+      elixirc(c, ~S"""
       defmodule Foo do
       end
 
@@ -375,8 +377,8 @@ defmodule ExDoc.RetrieverTest do
       assert %{module: Qux, group: nil} = qux
     end
 
-    test "function groups" do
-      elixirc(~S"""
+    test "function groups", c do
+      elixirc(c, ~S"""
       defmodule Mod do
         @doc group: 1
         def foo(), do: :ok
@@ -404,8 +406,8 @@ defmodule ExDoc.RetrieverTest do
       assert %{id: "baz/0", group: "Group 2"} = baz
     end
 
-    test "nesting" do
-      elixirc(~S"""
+    test "nesting", c do
+      elixirc(c, ~S"""
       defmodule Nesting.Prefix.B.A do
       end
 
@@ -448,26 +450,26 @@ defmodule ExDoc.RetrieverTest do
       end
     end
 
-    test "source_url is relative to source_root" do
-      elixirc("tmp/foo.ex", ~S"""
+    test "source_url is relative to source_root", c do
+      tmp_dir = Path.expand(c.tmp_dir)
+
+      elixirc(c, "foo.ex", ~S"""
       defmodule Foo do
       end
       """)
 
-      assert Foo.module_info(:compile)[:source] == '#{File.cwd!()}/tmp/foo.ex'
-
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: nil}
       [mod] = Retriever.docs_from_modules([Foo], config)
-      assert mod.source_url == File.cwd!() <> "/tmp/foo.ex:1"
+      assert mod.source_url == "#{tmp_dir}/foo.ex:1"
 
-      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: File.cwd!()}
+      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: tmp_dir}
       [mod] = Retriever.docs_from_modules([Foo], config)
-      assert mod.source_url == "tmp/foo.ex:1"
+      assert mod.source_url == "foo.ex:1"
     end
   end
 
-  test "docs_from_dir/2: filter_prefix" do
-    elixirc(~S"""
+  test "docs_from_dir/2: filter_prefix", c do
+    elixirc(c, ~S"""
     defmodule A do
     end
 
@@ -477,11 +479,6 @@ defmodule ExDoc.RetrieverTest do
     defmodule B do
     end
     """)
-
-    # TODO: move to elixirc/1? but then we get a bunch of warnings :-(
-    :code.load_file(A)
-    :code.load_file(A.A)
-    :code.load_file(B)
 
     ebin_dir = Path.dirname(:code.which(A))
     config = %ExDoc.Config{filter_prefix: "A"}

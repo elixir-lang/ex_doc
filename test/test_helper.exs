@@ -15,32 +15,42 @@ Code.prepend_path("test/tmp/beam")
 |> Kernel.ParallelCompiler.compile_to_path("test/tmp/beam")
 
 defmodule TestHelper do
-  def elixirc(filename \\ "nofile", code) do
-    dir = tmp_dir(code)
-    true = Code.prepend_path(dir)
+  def elixirc(context, filename \\ "nofile", code) do
+    dir = context.tmp_dir
 
-    for {module, bytecode} <- Code.compile_string(code, filename) do
-      beam_path = "#{dir}/#{module}.beam"
-      File.write!(beam_path, bytecode)
+    src_path = Path.join([dir, filename])
+    src_path |> Path.dirname() |> File.mkdir_p!()
+    File.write!(src_path, code)
 
-      ExUnit.Callbacks.on_exit(fn ->
-        :code.purge(module)
-        :code.delete(module)
-      end)
-    end
+    ebin_dir = Path.join(dir, "ebin")
+    File.mkdir_p!(ebin_dir)
+    {:ok, modules, []} = Kernel.ParallelCompiler.compile_to_path([src_path], ebin_dir)
+    Code.prepend_path(ebin_dir)
 
     ExUnit.Callbacks.on_exit(fn ->
-      Code.delete_path(dir)
+      for module <- modules do
+        :code.purge(module)
+        :code.delete(module)
+      end
+
       File.rm_rf!(dir)
     end)
-
-    :ok
   end
 
-  defp tmp_dir(code) do
-    hash = :crypto.hash(:sha256, code) |> Base.url_encode64(case: :lower)
-    dir = Path.join([File.cwd!(), "tmp", hash])
+  # TODO: replace with ExUnit @tag :tmp_dir feature when we require Elixir v1.11.
+  def create_tmp_dir(context) do
+    module = escape_path(inspect(context.module))
+    name = escape_path(to_string(context.test))
+    dir = Path.join(["tmp", module, name])
+    File.rm_rf!(dir)
     File.mkdir_p!(dir)
-    String.to_charlist(dir)
+
+    Map.put(context, :tmp_dir, dir)
+  end
+
+  @escape Enum.map(' [~#%&*{}\\:<>?/+|"]', &<<&1::utf8>>)
+
+  defp escape_path(path) do
+    String.replace(path, @escape, "-")
   end
 end
