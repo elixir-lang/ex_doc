@@ -300,6 +300,8 @@ defmodule ExDoc.Retriever do
 
     group =
       Enum.find_value(groups_for_functions, fn {group, filter} ->
+        # TODO: should we call filter with the whole %FunctionNode{}, not just metadata?
+        #       also, should we save off metadata on the node?
         filter.(metadata) && group
       end)
 
@@ -316,6 +318,7 @@ defmodule ExDoc.Retriever do
       doc: doc_ast,
       doc_line: doc_line,
       defaults: Enum.sort_by(defaults, fn {name, arity} -> sort_key(name, arity) end),
+      # TODO: Enum.join(signature, ""),
       signature: Enum.join(signature, " "),
       specs: specs,
       source_path: source.path,
