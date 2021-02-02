@@ -1,358 +1,493 @@
 defmodule ExDoc.RetrieverTest do
   use ExUnit.Case, async: true
-
   alias ExDoc.Retriever
+  import TestHelper
 
-  defp docs_from_files(names, config \\ []) do
-    files = Enum.map(names, fn n -> "test/tmp/Elixir.#{n}.beam" end)
+  describe "docs_from_modules/2: Elixir" do
+    test "module" do
+      elixirc(~S"""
+      defmodule Mod do
+        @moduledoc "Mod docs."
 
-    config =
-      ExDoc.build_config(
-        "foobar",
-        "0.1",
-        Keyword.merge(
-          [
-            apps: [:test_app],
-            source_url_pattern: "http://example.com/%{path}#L%{line}",
-            source_root: File.cwd!()
-          ],
-          config
-        )
-      )
+        @doc "function/0 docs."
+        @spec function() :: atom()
+        def function(), do: :ok
 
-    Retriever.docs_from_files(files, config)
-  end
+        def empty_doc_and_specs(), do: :ok
 
-  describe "docs_from_dir" do
-    test "matches files with filter prefix" do
-      config = %ExDoc.Config{filter_prefix: "CompiledWithDocs", source_root: File.cwd!()}
-      from_dir_nodes = Retriever.docs_from_dir("test/tmp/beam", config)
+        @doc false
+        def doc_false(), do: :ok
+      end
+      """)
 
-      file_nodes =
-        ["Elixir.CompiledWithDocs.beam", "Elixir.CompiledWithDocs.Nested.beam"]
-        |> Enum.map(&Path.join("test/tmp/beam", &1))
-        |> Retriever.docs_from_files(config)
+      config = %ExDoc.Config{}
 
-      assert from_dir_nodes == file_nodes
-    end
-  end
+      [mod] = Retriever.docs_from_modules([Mod], config)
 
-  describe "modules" do
-    test "returns module nodes" do
-      [module_node] = docs_from_files(["CompiledWithDocs"])
-      assert module_node.id == "CompiledWithDocs"
-      assert module_node.title == "CompiledWithDocs"
-      assert module_node.module == CompiledWithDocs
-      refute module_node.group
-      refute module_node.nested_context
-      refute module_node.nested_title
-      assert module_node.source_url == "http://example.com/test/fixtures/compiled_with_docs.ex#L1"
+      assert %ExDoc.ModuleNode{
+               doc: [{:p, [], ["Mod docs."], %{}}],
+               doc_line: 2,
+               id: "Mod",
+               module: Mod,
+               title: "Mod",
+               type: :module,
+               typespecs: [],
+               docs: [empty_doc_and_specs, function]
+             } = mod
 
-      assert module_node.doc ==
-               [
-                 {:p, [], ["moduledoc"], %{}},
-                 {:h2, [], ["Example ☃ Unicode > escaping"], %{}},
-                 {:pre, [], [{:code, [], ["CompiledWithDocs.example"], %{}}], %{}},
-                 {:h3, [], ["Example H3 heading"], %{}},
-                 {:p, [], ["example"], %{}}
-               ]
-    end
+      assert %ExDoc.FunctionNode{
+               arity: 0,
+               annotations: [],
+               defaults: [],
+               deprecated: nil,
+               doc: [{:p, [], ["function/0 docs."], %{}}],
+               doc_line: 4,
+               group: "Functions",
+               id: "function/0",
+               name: :function,
+               rendered_doc: nil,
+               signature: "function()",
+               source_path: _,
+               source_url: nil,
+               specs: [spec],
+               type: :function
+             } = function
 
-    test "returns module group" do
-      [module_node] =
-        docs_from_files(["CompiledWithDocs"], groups_for_modules: [Group: [CompiledWithDocs]])
+      assert %ExDoc.FunctionNode{
+               id: "empty_doc_and_specs/0",
+               doc: nil,
+               specs: []
+             } = empty_doc_and_specs
 
-      assert module_node.group == :Group
-
-      [module_node] =
-        docs_from_files(["CompiledWithDocs"], groups_for_modules: [Group: ["CompiledWithDocs"]])
-
-      assert module_node.group == :Group
-
-      [module_node] =
-        docs_from_files(["CompiledWithDocs"], groups_for_modules: [Group: ~r/^CompiledWith.?/])
-
-      assert module_node.group == :Group
+      assert Macro.to_string(spec) == "function() :: atom()"
     end
 
-    test "returns nesting information" do
-      prefix = "Common.Nesting.Prefix.B"
+    test "Elixir functions with defaults" do
+      elixirc(~S"""
+      defmodule Mod do
+        def foo(a, b \\ nil), do: {a, b}
+      end
+      """)
 
-      module_nodes =
-        docs_from_files([prefix <> ".A", prefix <> ".C"], nest_modules_by_prefix: [prefix])
+      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      [foo] = mod.docs
 
-      assert length(module_nodes) > 0
+      assert foo.id == "foo/2"
+      assert foo.defaults == [foo: 1]
+      assert foo.signature == "foo(a, b \\\\ nil)"
+    end
 
-      for module_node <- module_nodes do
-        assert module_node.nested_context == prefix
-        assert module_node.nested_title in ~w(A C)
+    test "macros" do
+      elixirc(~S"""
+      defmodule Mod do
+        @spec macro(Macro.t) :: Macro.t
+        defmacro macro(quoted), do: quoted
+      end
+      """)
+
+      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      [macro] = mod.docs
+
+      assert macro.id == "macro/1"
+      assert macro.annotations == ["macro"]
+      assert Macro.to_string(macro.specs) == "[macro(Macro.t()) :: Macro.t()]"
+    end
+
+    test "callbacks" do
+      elixirc(~S"""
+      defmodule Mod do
+        @doc "callback1/0 docs."
+        @callback callback1() :: :ok
+
+        @callback optional_callback1() :: :ok
+
+        @optional_callbacks optional_callback1: 0
+
+        @macrocallback macrocallback1() :: :ok
+      end
+      """)
+
+      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      assert mod.type == :behaviour
+
+      [callback1, macrocallback1, optional_callback1] = mod.docs
+
+      assert callback1.id == "callback1/0"
+      assert callback1.type == :callback
+      assert callback1.annotations == []
+      assert callback1.doc == [{:p, [], ["callback1/0 docs."], %{}}]
+      assert Macro.to_string(callback1.specs) == "[callback1() :: :ok]"
+
+      assert optional_callback1.id == "optional_callback1/0"
+      assert optional_callback1.type == :callback
+      assert optional_callback1.annotations == ["optional"]
+      refute optional_callback1.doc
+      assert Macro.to_string(optional_callback1.specs) == "[optional_callback1() :: :ok]"
+
+      assert macrocallback1.id == "macrocallback1/0"
+      assert macrocallback1.type == :macrocallback
+      assert macrocallback1.annotations == []
+      refute macrocallback1.doc
+      assert Macro.to_string(macrocallback1.specs) == "[macrocallback1(term()) :: :ok]"
+
+      elixirc(~S"""
+      defmodule Impl do
+        @behaviour Mod
+
+        def callback1(), do: :ok
+
+        @doc "optional_callback1/0 docs."
+        def optional_callback1(), do: :ok
+
+        @doc false
+        defmacro macrocallback1(), do: :ok
+      end
+      """)
+
+      [impl] = Retriever.docs_from_modules([Impl], %ExDoc.Config{})
+      [callback1, optional_callback1] = impl.docs
+
+      assert callback1.id == "callback1/0"
+      assert callback1.type == :function
+      assert callback1.annotations == []
+
+      assert callback1.doc ==
+               ExDoc.Markdown.to_ast("Callback implementation for `c:Mod.callback1/0`.")
+
+      assert optional_callback1.id == "optional_callback1/0"
+      assert optional_callback1.type == :function
+      assert optional_callback1.doc == [{:p, [], ["optional_callback1/0 docs."], %{}}]
+    end
+
+    test "protocols" do
+      elixirc(~S"""
+      defprotocol Mod do
+        def foo(thing)
       end
 
-      name = "Common.Nesting.Prefix.B.B.A"
-      [module_node] = docs_from_files([name], nest_modules_by_prefix: [name])
+      defimpl Mod, for: Atom do
+        def foo(thing), do: thing
+      end
+      """)
 
-      refute module_node.nested_context
-      refute module_node.nested_title
+      [mod] = Retriever.docs_from_modules([Mod, Mod.Atom], %ExDoc.Config{})
+      assert mod.type == :protocol
+
+      [foo] = mod.docs
+      assert foo.id == "foo/1"
     end
 
-    test "returns the function nodes for each module" do
-      [module_node] =
-        docs_from_files(["CompiledWithDocs"],
-          groups_for_functions: [
-            Example: &(&1[:purpose] == :example),
-            Legacy: &is_binary(&1[:deprecated])
-          ]
-        )
-
-      [struct, example, example_1, example_with_h3, example_without_docs, flatten, is_zero] =
-        module_node.docs
-
-      assert struct.id == "__struct__/0"
-      assert struct.doc == [{:p, [], ["Some struct"], %{}}]
-      assert struct.type == :function
-      assert struct.defaults == []
-      assert struct.signature == "%CompiledWithDocs{}"
-      assert struct.group == "Functions"
-
-      assert example.id == "example/2"
-      assert example.doc == [{:p, [], ["Some example"], %{}}]
-      assert example.type == :function
-      assert example.defaults == [example: 1]
-      assert example.signature == "example(foo, bar \\\\ Baz)"
-      assert example.deprecated == "Use something else instead"
-      assert example.group == "Example"
-
-      assert example_1.id == "example_1/0"
-      assert example_1.type == :macro
-      assert example_1.defaults == []
-      assert example_1.annotations == ["macro", "since 1.3.0"]
-
-      assert example_with_h3.id == "example_with_h3/0"
-      assert example_with_h3.group == "Example"
-
-      assert example_without_docs.id == "example_without_docs/0"
-      assert example_without_docs.doc == nil
-      assert example_without_docs.defaults == []
-      assert example_without_docs.group == "Legacy"
-
-      assert example_without_docs.source_url ==
-               "http://example.com/test/fixtures/compiled_with_docs.ex\#L37"
-
-      assert flatten.id == "flatten/1"
-      assert flatten.type == :function
-
-      if Version.match?(System.version(), ">= 1.8.0") do
-        assert flatten.doc == [
-                 {:p, [], ["See ", {:code, [class: "inline"], ["List.flatten/1"], %{}}, "."], %{}}
-               ]
+    test "structs" do
+      elixirc(~S"""
+      defmodule MyStruct do
+        @doc "MyStruct docs."
+        defstruct [:field]
       end
+      """)
 
-      assert is_zero.id == "is_zero/1"
-      assert is_zero.doc == [{:p, [], ["A simple guard"], %{}}]
-      assert is_zero.type == :macro
-      assert is_zero.defaults == []
+      [mod] = Retriever.docs_from_modules([MyStruct], %ExDoc.Config{})
+      [my_struct] = mod.docs
+
+      assert my_struct.id == "__struct__/0"
+      assert my_struct.annotations == ["struct"]
+      assert my_struct.signature == "%MyStruct{}"
+    end
+
+    test "exceptions" do
+      elixirc(~S"""
+      defmodule MyException do
+        defexception [:message]
+      end
+      """)
+
+      [mod] = Retriever.docs_from_modules([MyException], %ExDoc.Config{})
+      assert mod.title == "MyException"
+      assert mod.type == :exception
+
+      # TODO: this is because `%ExDoc.Config{}.groups_for_modules == []`.
+      #
+      # We build the default groups (Exceptions, Deprecated) in lib/ex_doc.ex,
+      # maybe we should do that in the retriever instead?
+      #
+      # Remember Exceptions is an Elixir specific thing so the default should
+      # probably be language specific.
+      refute mod.group
+    end
+
+    test "defdelegate" do
+      elixirc(~S"""
+      defmodule Mod do
+        @doc "Doc override."
+        defdelegate downcase(str), to: String
+
+        defdelegate upcase(str), to: String
+      end
+      """)
+
+      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      [downcase, upcase] = mod.docs
+
+      assert downcase.id == "downcase/1"
+      assert downcase.signature == "downcase(str)"
+      assert downcase.specs == []
+      assert downcase.doc == ExDoc.Markdown.to_ast("Doc override.")
+
+      assert upcase.id == "upcase/1"
+      assert upcase.signature == "upcase(str)"
+      assert upcase.specs == []
+      assert upcase.doc == ExDoc.Markdown.to_ast("See `String.upcase/1`.")
+    end
+
+    test "Mix tasks" do
+      elixirc(~S"""
+      defmodule Mix.Tasks.MyTask do
+        use Mix.Task
+
+        @impl true
+        def run(_), do: :ok
+      end
+      """)
+
+      [mod] = Retriever.docs_from_modules([Mix.Tasks.MyTask], %ExDoc.Config{})
+      assert mod.title == "mix my_task"
+      assert mod.type == :task
+      refute mod.group
+    end
+
+    test "Elixir special modules" do
+      assert Retriever.docs_from_modules([:elixir_bootstrap, Elixir], %ExDoc.Config{}) == []
     end
 
     test "overlapping defaults" do
-      [module_node] = docs_from_files(["OverlappingDefaults"])
+      elixirc(~S"""
+      defmodule Mod do
+        @doc "Basic example"
+        def overlapping_defaults(one, two) when is_list(two),
+          do: {one, two}
 
-      overlapping_defaults_2 = Enum.find(module_node.docs, &(&1.id == "overlapping_defaults/2"))
-      overlapping_defaults_3 = Enum.find(module_node.docs, &(&1.id == "overlapping_defaults/3"))
+        @doc "Third default arg overrides previous def clause"
+        def overlapping_defaults(one, two, three \\ []),
+          do: {one, two, three}
+
+        def two_defaults(one, two) when is_atom(one) and is_atom(two),
+          do: {one, two}
+
+        @doc "Two default args"
+        def two_defaults(one, two, three \\ [], four \\ [])
+            when is_list(one) and is_list(two) and is_list(three) and is_list(four),
+            do: {one, two, three, four}
+
+        def special_case(one, two) when is_atom(one) and is_atom(two),
+          do: {one, two}
+
+        @doc "This function defines an arity that is less than the one in the previous clause"
+        def special_case(one, two \\ [], three \\ [], four \\ [])
+            when is_list(one) and is_list(two) and is_list(three) and is_list(four),
+            do: {one, two, three, four}
+
+        defmacro in_the_middle(foo, bar) when is_list(foo) and is_list(bar),
+          do: quote(do: {unquote(foo), unquote(bar)})
+
+        @doc "default arg is in the middle"
+        defmacro in_the_middle(foo, bar \\ Baz, baz),
+          do: quote(do: {unquote(foo), unquote(bar), unquote(baz)})
+      end
+      """)
+
+      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+
+      overlapping_defaults_2 = Enum.find(mod.docs, &(&1.id == "overlapping_defaults/2"))
+      overlapping_defaults_3 = Enum.find(mod.docs, &(&1.id == "overlapping_defaults/3"))
       assert overlapping_defaults_2.defaults == []
       assert overlapping_defaults_3.defaults == []
 
-      two_defaults_2 = Enum.find(module_node.docs, &(&1.id == "two_defaults/2"))
-      two_defaults_4 = Enum.find(module_node.docs, &(&1.id == "two_defaults/4"))
+      two_defaults_2 = Enum.find(mod.docs, &(&1.id == "two_defaults/2"))
+      two_defaults_4 = Enum.find(mod.docs, &(&1.id == "two_defaults/4"))
       assert two_defaults_2.defaults == []
       assert two_defaults_4.defaults == [{:two_defaults, 3}]
 
-      special_case_2 = Enum.find(module_node.docs, &(&1.id == "special_case/2"))
-      special_case_4 = Enum.find(module_node.docs, &(&1.id == "special_case/4"))
+      special_case_2 = Enum.find(mod.docs, &(&1.id == "special_case/2"))
+      special_case_4 = Enum.find(mod.docs, &(&1.id == "special_case/4"))
       assert special_case_2.defaults == []
       assert special_case_4.defaults == [special_case: 1, special_case: 3]
 
-      in_the_middle_2 = Enum.find(module_node.docs, &(&1.id == "in_the_middle/2"))
-      in_the_middle_3 = Enum.find(module_node.docs, &(&1.id == "in_the_middle/3"))
+      in_the_middle_2 = Enum.find(mod.docs, &(&1.id == "in_the_middle/2"))
+      in_the_middle_3 = Enum.find(mod.docs, &(&1.id == "in_the_middle/3"))
       assert in_the_middle_2.defaults == []
       assert in_the_middle_3.defaults == []
     end
+  end
 
-    test "returns the specs for each non-private function" do
-      [module_node] = docs_from_files(["TypesAndSpecs"])
-      [add, _, _, _] = module_node.docs
+  describe "docs_from_modules/2: Generic" do
+    test "module with no docs" do
+      elixirc(~S"""
+      defmodule Mod do
+      end
+      """)
 
-      assert add.id == "add/2"
-      assert add.doc == nil
-      assert add.type == :function
-      assert Macro.to_string(add.specs) == "[add(integer(), opaque()) :: integer()]"
+      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      assert mod.doc == nil
     end
 
-    test "returns the specs for non-private macros" do
-      [module_node] = docs_from_files(["TypesAndSpecs"])
-      [_, _, macro1, macro2] = module_node.docs
+    test "metadata" do
+      elixirc(~S"""
+      defmodule Mod do
+        @doc since: "1.0.0"
+        @doc deprecated: "deprecation message"
+        @doc foo: true
+        def foo(), do: :ok
+      end
+      """)
 
-      assert macro1.id == "macro_spec/1"
-      assert macro1.doc == nil
-      assert macro1.type == :macro
-      assert Macro.to_string(macro1.specs) == "[macro_spec(any()) :: {:ok, any()}]"
-
-      assert macro2.id == "macro_with_spec/1"
-      assert macro2.doc == nil
-      assert macro2.type == :macro
-      assert Macro.to_string(macro2.specs) == "[macro_with_spec(v) :: {:ok, v} when v: any()]"
+      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      [foo] = mod.docs
+      assert foo.id == "foo/0"
+      assert foo.annotations == ["since 1.0.0"]
+      assert foo.deprecated == "deprecation message"
     end
 
-    test "returns the spec info for each non-private module type" do
-      [module_node] = docs_from_files(["TypesAndSpecs"])
-      [opaque, public] = module_node.typespecs
+    test "module groups" do
+      elixirc(~S"""
+      defmodule Foo do
+      end
 
-      assert opaque.name == :opaque
-      assert opaque.arity == 0
-      assert opaque.id == "opaque/0"
-      assert opaque.type == :opaque
-      assert opaque.signature == "opaque()"
-      assert Macro.to_string(opaque.spec) == "opaque()"
+      defmodule Bar do
+      end
 
-      assert public.name == :public
-      assert public.arity == 1
-      assert public.id == "public/1"
-      assert public.type == :type
-      assert public.doc == [{:p, [], ["A public type"], %{}}]
-      assert public.signature == "public(t)"
+      defmodule Baz do
+      end
 
-      assert Macro.to_string(public.spec) ==
-               "public(t) :: {t, String.t(), TypesAndSpecs.Sub.t(), opaque(), :ok | :error}"
+      defmodule Qux do
+      end
+      """)
+
+      config = %ExDoc.Config{
+        groups_for_modules: [
+          "Group 1": [Foo, Bar],
+          "Group 2": [Baz]
+        ]
+      }
+
+      [qux, bar, foo, baz] = Retriever.docs_from_modules([Foo, Bar, Baz, Qux], config)
+      assert %{module: Foo, group: :"Group 1"} = foo
+      assert %{module: Bar, group: :"Group 1"} = bar
+      assert %{module: Baz, group: :"Group 2"} = baz
+      assert %{module: Qux, group: nil} = qux
     end
 
-    test "returns the source when source_root set to nil" do
-      files = Enum.map(["CompiledWithDocs"], fn n -> "test/tmp/Elixir.#{n}.beam" end)
-      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: nil}
-      [module_node] = Retriever.docs_from_files(files, config)
-      assert String.ends_with?(module_node.source_url, "/test/fixtures/compiled_with_docs.ex:1")
+    test "function groups" do
+      elixirc(~S"""
+      defmodule Mod do
+        @doc group: 1
+        def foo(), do: :ok
+
+        @doc group: 1
+        def bar(), do: :ok
+
+        @doc group: 2
+        def baz(), do: :ok
+      end
+      """)
+
+      config = %ExDoc.Config{
+        groups_for_functions: [
+          "Group 1": &(&1.group == 1),
+          "Group 2": &(&1.group == 2)
+        ]
+      }
+
+      [mod] = Retriever.docs_from_modules([Mod], config)
+      [bar, baz, foo] = mod.docs
+
+      assert %{id: "foo/0", group: "Group 1"} = foo
+      assert %{id: "bar/0", group: "Group 1"} = bar
+      assert %{id: "baz/0", group: "Group 2"} = baz
     end
 
-    test "returns for modules without docs" do
-      [module_node] = docs_from_files(["CompiledWithoutDocs"])
-      assert module_node.doc == nil
-      assert module_node.docs == []
-    end
+    test "nesting" do
+      elixirc(~S"""
+      defmodule Nesting.Prefix.B.A do
+      end
 
-    test "returns callbacks with no docs included" do
-      [module_node] = docs_from_files(["CallbacksNoDocs"])
-      [connect, id] = module_node.docs
+      defmodule Nesting.Prefix.B.B.A do
+      end
 
-      assert connect.id == "connect/2"
-      assert connect.annotations == []
+      defmodule Nesting.Prefix.B.C do
+      end
 
-      assert id.id == "id/1"
-      assert id.deprecated == "Use another id"
-      assert id.annotations == ["optional", "since 1.3.0"]
+      defmodule Nesting.Prefix.C do
+      end
+      """)
+
+      mods =
+        Retriever.docs_from_modules(
+          [Nesting.Prefix.B.A, Nesting.Prefix.B.C],
+          %ExDoc.Config{nest_modules_by_prefix: ["Nesting.Prefix.B"]}
+        )
+
+      assert length(mods) == 2
+
+      assert Enum.at(mods, 0).nested_context == "Nesting.Prefix.B"
+      assert Enum.at(mods, 0).nested_title == "A"
+
+      assert Enum.at(mods, 1).nested_context == "Nesting.Prefix.B"
+      assert Enum.at(mods, 1).nested_title == "C"
+
+      [mod] =
+        Retriever.docs_from_modules([Nesting.Prefix.B.B.A], %ExDoc.Config{
+          nest_modules_by_prefix: ["Nesting.Prefix.B.B.A"]
+        })
+
+      refute mod.nested_context
+      refute mod.nested_title
     end
 
     test "fails when module is not available" do
-      assert_raise ExDoc.Retriever.Error, "module NotAvailable is not defined/available", fn ->
-        docs_from_files(["NotAvailable"])
+      assert_raise Retriever.Error, "module NotAvailable is not defined/available", fn ->
+        Retriever.docs_from_modules([NotAvailable], %ExDoc.Config{})
       end
     end
-  end
 
-  describe "exceptions" do
-    test "are properly tagged" do
-      [module_node] = docs_from_files(["RandomError"])
-      assert module_node.type == :exception
-      assert module_node.group == :Exceptions
+    test "source_url is relative to source_root" do
+      elixirc("tmp/foo.ex", ~S"""
+      defmodule Foo do
+      end
+      """)
+
+      assert Foo.module_info(:compile)[:source] == '#{File.cwd!()}/tmp/foo.ex'
+
+      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: nil}
+      [mod] = Retriever.docs_from_modules([Foo], config)
+      assert mod.source_url == File.cwd!() <> "/tmp/foo.ex:1"
+
+      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: File.cwd!()}
+      [mod] = Retriever.docs_from_modules([Foo], config)
+      assert mod.source_url == "tmp/foo.ex:1"
     end
   end
 
-  describe "deprecated" do
-    test "are properly tagged" do
-      [module_node] = docs_from_files(["Warnings"])
-      assert module_node.group == :Deprecated
-    end
-  end
-
-  describe "tasks" do
-    test "are properly tagged" do
-      [module_node] = docs_from_files(["Mix.Tasks.TaskWithDocs"])
-      assert module_node.type == :task
-      assert module_node.id == "Mix.Tasks.TaskWithDocs"
-      assert module_node.title == "mix task_with_docs"
-    end
-  end
-
-  ## BEHAVIOURS
-
-  describe "behaviours" do
-    test "returns callbacks (minus internal functions)" do
-      [module_node] = docs_from_files(["CustomBehaviourOne"])
-      functions = Enum.map(module_node.docs, fn doc -> doc.id end)
-      assert functions == ["greet/1", "hello/1"]
-      [greet, hello] = module_node.docs
-      assert hello.type == :callback
-      assert hello.signature == "hello(%URI{})"
-      assert greet.type == :callback
-      assert greet.signature == "greet(arg1)"
+  test "docs_from_dir/2: filter_prefix" do
+    elixirc(~S"""
+    defmodule A do
     end
 
-    test "returns macro callbacks" do
-      [module_node] = docs_from_files(["CustomBehaviourTwo"])
-      functions = Enum.map(module_node.docs, fn doc -> doc.id end)
-      assert functions == ["bye/1"]
-      assert hd(module_node.docs).type == :macrocallback
-      assert hd(module_node.docs).signature == "bye(integer)"
+    defmodule A.A do
     end
 
-    test "undocumented callback implementations get default doc" do
-      [module_node] =
-        ["CustomBehaviourOne", "CustomBehaviourTwo", "CustomBehaviourImpl"]
-        |> docs_from_files()
-        |> Enum.filter(&match?(%ExDoc.ModuleNode{id: "CustomBehaviourImpl"}, &1))
-
-      docs = module_node.docs
-      assert Enum.map(docs, & &1.id) == ["bye/1", "greet/1", "hello/1"]
-
-      assert Enum.at(docs, 0).doc == [
-               {:p, [],
-                [
-                  "Callback implementation for ",
-                  {:code, [class: "inline"], ["c:CustomBehaviourTwo.bye/1"], %{}},
-                  "."
-                ], %{}}
-             ]
-
-      assert Enum.at(docs, 1).doc == [
-               {:p, [], ["A doc so it doesn't use 'Callback implementation for'"], %{}}
-             ]
-
-      assert Enum.at(docs, 2).doc == [
-               {:p, [],
-                [
-                  "Callback implementation for ",
-                  {:code, [class: "inline"], ["c:CustomBehaviourOne.hello/1"], %{}},
-                  "."
-                ], %{}}
-             ]
+    defmodule B do
     end
-  end
+    """)
 
-  ## PROTOCOLS
+    # TODO: move to elixirc/1? but then we get a bunch of warnings :-(
+    :code.load_file(A)
+    :code.load_file(A.A)
+    :code.load_file(B)
 
-  describe "protocols" do
-    test "are properly tagged" do
-      [module_node] = docs_from_files(["CustomProtocol"])
-      assert module_node.type == :protocol
-    end
+    ebin_dir = Path.dirname(:code.which(A))
+    config = %ExDoc.Config{filter_prefix: "A"}
+    [a, a_a] = Retriever.docs_from_dir(ebin_dir, config)
 
-    test "ignores internal functions" do
-      [module_node] = docs_from_files(["CustomProtocol"])
-      functions = Enum.map(module_node.docs, fn doc -> doc.id end)
-      assert functions == ["plus_one/1", "plus_two/1"]
-    end
-  end
-
-  describe "implementations" do
-    test "are skipped" do
-      assert [] = docs_from_files(["CustomProtocol.Number"])
-    end
+    assert a.id == "A"
+    assert a_a.id == "A.A"
   end
 end
