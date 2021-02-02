@@ -158,9 +158,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   defp to_html(markdown) do
     markdown
-    |> ExDoc.Markdown.to_ast()
-    |> ExDoc.Formatter.HTML.ast_to_html()
-    |> IO.iodata_to_binary()
+    |> ExDoc.DocAST.parse!("text/markdown")
+    |> ExDoc.DocAST.to_string()
   end
 
   describe "sidebar" do
