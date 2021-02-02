@@ -318,6 +318,74 @@ defmodule ExDoc.RetrieverTest do
     end
   end
 
+  describe "docs_from_modules/2: Erlang" do
+    @describetag :otp23
+
+    test "module", c do
+      erlc(c, :mod, ~S"""
+      %% @doc
+      %% mod docs.
+      -module(mod).
+      -export([function/0]).
+
+      %% @doc
+      %% function/0 docs.
+      function() -> ok.
+      """)
+
+      edoc_to_chunk(:mod)
+
+      [mod] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
+
+      %ExDoc.ModuleNode{
+        deprecated: nil,
+        doc: [{:p, [], ["mod docs."], %{}}],
+        doc_line: 0,
+        docs: [function],
+        function_groups: ["Functions"],
+        group: nil,
+        id: "mod",
+        module: :mod,
+        nested_context: nil,
+        nested_title: nil,
+        rendered_doc: nil,
+        source_path: _,
+        source_url: nil,
+        title: "mod",
+        type: :module,
+        typespecs: []
+      } = mod
+
+      %ExDoc.FunctionNode{
+        annotations: [],
+        arity: 0,
+        defaults: [],
+        deprecated: nil,
+        doc: [{:a, [id: "function-0"], [], %{}}, {:p, [], ["function/0 docs."], %{}}],
+        doc_line: 0,
+        group: "Functions",
+        id: "function/0",
+        name: :function,
+        rendered_doc: nil,
+        signature: "function() -> term()\n",
+        source_path: _,
+        source_url: nil,
+        specs: [],
+        type: :function
+      } = function
+    end
+
+    test "module with no chunk", c do
+      erlc(c, :no_chunk, ~S"""
+      -module(no_chunk).
+      """)
+
+      assert_raise Retriever.Error, "module :no_chunk was not compiled with docs", fn ->
+        Retriever.docs_from_modules([:no_chunk], %ExDoc.Config{})
+      end
+    end
+  end
+
   describe "docs_from_modules/2: Generic" do
     test "module with no docs", c do
       elixirc(c, ~S"""

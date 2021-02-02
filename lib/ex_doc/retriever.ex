@@ -96,19 +96,16 @@ defmodule ExDoc.Retriever do
         _ = Code.ensure_loaded(module)
         docs
 
-      {:error, reason} ->
-        cond do
-          not Code.ensure_loaded?(module) ->
-            raise Error, "module #{inspect(module)} is not defined/available"
+      {:error, :chunk_not_found} ->
+        raise Error, "module #{inspect(module)} was not compiled with docs"
 
-          not function_exported?(module, :__info__, 1) ->
-            # Not an Elixir module, ignore until we have Erlang support
-            false
-
-          true ->
-            raise Error,
-                  "module #{inspect(module)} was not compiled with flag --docs: #{inspect(reason)}"
+      {:error, :module_not_found} ->
+        unless Code.ensure_loaded?(module) do
+          raise Error, "module #{inspect(module)} is not defined/available"
         end
+
+      {:error, _} = error ->
+        raise Error, "error accessing #{inspect(module)}: #{inspect(error)}"
 
       _ ->
         raise Error,
@@ -595,7 +592,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp source_path(module, config) do
-    source = String.Chars.to_string(module.__info__(:compile)[:source])
+    source = String.Chars.to_string(module.module_info(:compile)[:source])
 
     if root = config.source_root do
       Path.relative_to(source, root)
