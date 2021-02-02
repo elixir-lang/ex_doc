@@ -1,5 +1,6 @@
 exclude = [
-  earmark: not ExDoc.Markdown.Earmark.available?()
+  earmark: not ExDoc.Markdown.Earmark.available?(),
+  otp23: System.otp_release() < "23"
 ]
 
 ExUnit.start(exclude: Enum.filter(exclude, &elem(&1, 1)))
@@ -25,7 +26,7 @@ defmodule TestHelper do
     ebin_dir = Path.join(dir, "ebin")
     File.mkdir_p!(ebin_dir)
     {:ok, modules, []} = Kernel.ParallelCompiler.compile_to_path([src_path], ebin_dir)
-    Code.prepend_path(ebin_dir)
+    true = Code.prepend_path(ebin_dir)
 
     ExUnit.Callbacks.on_exit(fn ->
       for module <- modules do
@@ -35,6 +36,55 @@ defmodule TestHelper do
 
       File.rm_rf!(dir)
     end)
+  end
+
+  def erlc(context, module, code) do
+    dir = context.tmp_dir
+
+    src_path = Path.join([dir, "#{module}.erl"])
+    src_path |> Path.dirname() |> File.mkdir_p!()
+    File.write!(src_path, code)
+
+    ebin_dir = Path.join(dir, "ebin")
+    File.mkdir_p!(ebin_dir)
+
+    {:ok, module} =
+      :compile.file(String.to_charlist(src_path), [
+        :debug_info,
+        outdir: String.to_charlist(ebin_dir)
+      ])
+
+    true = Code.prepend_path(ebin_dir)
+    {:module, ^module} = :code.load_file(module)
+
+    ExUnit.Callbacks.on_exit(fn ->
+      :code.purge(module)
+      :code.delete(module)
+      File.rm_rf!(dir)
+    end)
+
+    :ok
+  end
+
+  def edoc_to_chunk(module) do
+    source_path = module.module_info(:compile)[:source]
+    beam_path = :code.which(module)
+    dir = :filename.dirname(source_path)
+    xml_path = '#{dir}/#{module}.xml'
+    chunk_path = '#{dir}/#{module}.chunk'
+
+    docgen_dir = :code.lib_dir(:erl_docgen)
+    cmd!("escript #{docgen_dir}/priv/bin/xml_from_edoc.escript -dir #{dir} #{source_path}")
+
+    :docgen_xml_to_chunk.main(["app", xml_path, beam_path, "", chunk_path])
+    docs_chunk = File.read!(chunk_path)
+    {:ok, ^module, chunks} = :beam_lib.all_chunks(beam_path)
+    {:ok, beam} = :beam_lib.build_module([{'Docs', docs_chunk} | chunks])
+    File.write!(beam_path, beam)
+  end
+
+  defp cmd!(command) do
+    0 = Mix.shell().cmd(command)
   end
 
   # TODO: replace with ExUnit @tag :tmp_dir feature when we require Elixir v1.11.
