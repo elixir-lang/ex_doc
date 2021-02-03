@@ -78,12 +78,6 @@ defmodule ExDoc.Retriever do
   defp docs_chunk(Elixir), do: false
 
   defp docs_chunk(module) do
-    unless function_exported?(Code, :fetch_docs, 1) do
-      raise Error,
-            "ExDoc 0.19+ requires Elixir v1.7 and later. " <>
-              "For earlier Elixir versions, make sure to depend on {:ex_doc, \"~> 0.18.0\"}"
-    end
-
     result = ExDoc.Utils.Code.fetch_docs(module)
     Refs.insert_from_chunk(module, result)
 
