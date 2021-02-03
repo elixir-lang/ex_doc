@@ -4,6 +4,12 @@ defmodule ExDoc.DocAST do
   alias ExDoc.Markdown
   alias ExDoc.Formatter.HTML.Templates
 
+  @opaque t() :: [ast]
+
+  @typep ast() ::
+           {tag :: atom(), attrs :: [{atom(), binary()}], [ast()], meta :: map()}
+           | binary()
+
   @doc """
   Parse given `doc` according to `doc_format`.
   """

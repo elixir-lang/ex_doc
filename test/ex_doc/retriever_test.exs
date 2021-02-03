@@ -347,7 +347,6 @@ defmodule ExDoc.RetrieverTest do
       """)
 
       edoc_to_chunk(:mod)
-
       [mod] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
 
       %ExDoc.ModuleNode{
