@@ -384,9 +384,7 @@ defmodule ExDoc.RetrieverTest do
       -module(no_chunk).
       """)
 
-      assert_raise Retriever.Error, "module :no_chunk was not compiled with docs", fn ->
-        Retriever.docs_from_modules([:no_chunk], %ExDoc.Config{})
-      end
+      assert Retriever.docs_from_modules([:no_chunk], %ExDoc.Config{}) == []
     end
   end
 
