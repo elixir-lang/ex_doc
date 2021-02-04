@@ -91,7 +91,7 @@ defmodule ExDoc.Retriever do
         docs
 
       {:error, :chunk_not_found} ->
-        raise Error, "module #{inspect(module)} was not compiled with docs"
+        false
 
       {:error, :module_not_found} ->
         unless Code.ensure_loaded?(module) do
