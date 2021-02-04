@@ -434,7 +434,7 @@ defmodule ExDoc.Retriever do
   # Returns a map of {name, arity} => behaviour.
   defp get_impls(module) do
     for behaviour <- behaviours_implemented_by(module),
-        callback <- Map.keys(get_callbacks(behaviour)),
+        {callback, _} <- get_callbacks(behaviour),
         do: {callback, behaviour},
         into: %{}
   end
