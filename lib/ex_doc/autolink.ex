@@ -567,7 +567,7 @@ defmodule ExDoc.Autolink do
     "#" <> prefix(kind) <> "#{T.enc(Atom.to_string(name))}/#{arity}"
   end
 
-  defp fragment(:otp, kind, name, arity) do
+  defp fragment(_, kind, name, arity) do
     case kind do
       :function -> "##{name}-#{arity}"
       :callback -> "#Module:#{name}-#{arity}"

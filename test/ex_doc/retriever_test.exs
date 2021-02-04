@@ -332,6 +332,7 @@ defmodule ExDoc.RetrieverTest do
 
       %% @doc
       %% function/0 docs.
+      -spec function() -> atom().
       function() -> ok.
       """)
 
@@ -369,14 +370,15 @@ defmodule ExDoc.RetrieverTest do
         id: "function/0",
         name: :function,
         rendered_doc: nil,
-        signature: "function() -> term()\n",
+        signature: "function() -> atom()",
         source_path: _,
         source_url: nil,
-        specs: [],
+        specs: _,
         type: :function
       } = function
 
-      assert DocAST.to_string(function.doc) =~ "<p>function/0 docs.</p>"
+      assert DocAST.to_string(function.doc) =~ "function/0 docs."
+      assert Macro.to_string(function.specs) == "[function() :: atom()]"
     end
 
     test "module with no chunk", c do

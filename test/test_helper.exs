@@ -73,8 +73,8 @@ defmodule TestHelper do
     xml_path = '#{dir}/#{module}.xml'
     chunk_path = '#{dir}/#{module}.chunk'
 
-    docgen_dir = :code.lib_dir(:erl_docgen)
-    cmd!("escript #{docgen_dir}/priv/bin/xml_from_edoc.escript -dir #{dir} #{source_path}")
+    docgen_priv_dir = :code.priv_dir(:erl_docgen)
+    cmd!("escript #{docgen_priv_dir}/bin/xml_from_edoc.escript -dir #{dir} #{source_path}")
 
     :docgen_xml_to_chunk.main(["app", xml_path, beam_path, "", chunk_path])
     docs_chunk = File.read!(chunk_path)
