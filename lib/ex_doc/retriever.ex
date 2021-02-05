@@ -310,7 +310,7 @@ defmodule ExDoc.Retriever do
       doc: doc_ast,
       doc_line: doc_line,
       defaults: Enum.sort_by(defaults, fn {name, arity} -> sort_key(name, arity) end),
-      signature: Enum.join(signature, " "),
+      signature: signature(signature),
       specs: specs,
       source_path: source.path,
       source_url: source_link(source, line),
@@ -382,7 +382,7 @@ defmodule ExDoc.Retriever do
     {{kind, name, arity}, anno, signature, doc, metadata} = callback
     actual_def = actual_def(name, arity, kind)
     doc_line = anno_line(anno)
-    signature = if signature == [], do: nil, else: Enum.join(signature, " ")
+    signature = signature(signature)
 
     {specs, line, signature} =
       case Map.fetch(module_data.callbacks, actual_def) do
@@ -463,7 +463,7 @@ defmodule ExDoc.Retriever do
 
   defp get_type(type, source, module_data) do
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
-    {{_, name, arity}, anno, _, doc, metadata} = type
+    {{_, name, arity}, anno, signature, doc, metadata} = type
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
 
@@ -478,6 +478,7 @@ defmodule ExDoc.Retriever do
 
     spec = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(type)
     line = anno_line(anno)
+    signature = signature(signature) || get_typespec_signature(spec, arity)
 
     annotations = if type == :opaque, do: ["opaque" | annotations], else: annotations
     doc_ast = doc_ast(content_type, doc, file: source.path)
@@ -491,7 +492,7 @@ defmodule ExDoc.Retriever do
       deprecated: metadata[:deprecated],
       doc: doc_ast,
       doc_line: doc_line,
-      signature: get_typespec_signature(spec, arity),
+      signature: signature,
       source_path: source.path,
       source_url: source_link(source, line),
       annotations: annotations
@@ -539,6 +540,9 @@ defmodule ExDoc.Retriever do
   defp to_var(_, position), do: {:"arg#{position}", [], nil}
 
   ## General helpers
+
+  defp signature([]), do: nil
+  defp signature(list) when is_list(list), do: Enum.join(list, " ")
 
   defp actual_def(name, arity, :macrocallback) do
     {String.to_atom("MACRO-" <> to_string(name)), arity + 1}
