@@ -397,8 +397,8 @@ defmodule ExDoc.RetrieverTest do
       erlc(c, :mod, ~S"""
       -module(mod).
 
-      -callback callback1() -> ok.
-      %% callback1 docs.
+      -callback callback1() -> atom().
+      %% callback1/0 docs.
       """)
 
       edoc_to_chunk(:mod)
@@ -408,9 +408,42 @@ defmodule ExDoc.RetrieverTest do
 
       assert callback1.id == "callback1/0"
       assert callback1.type == :callback
+      assert DocAST.to_string(callback1.doc) == "callback1/0 docs."
       assert Path.basename(callback1.source_url) == "mod.erl:3"
       # this is an edoc bug, it should be 4
       assert callback1.doc_line == 3
+      assert Macro.to_string(callback1.specs) == "[callback1() :: atom()]"
+    end
+
+    @tag :otp24
+    test "Erlang types", c do
+      erlc(c, :mod, ~S"""
+      -module(mod).
+      -export_type([type1/0, opaque1/0]).
+
+      -type type1() :: atom().
+      %% type1/0 docs.
+
+      -opaque opaque1() :: atom().
+      %% opaque1/0 docs.
+      """)
+
+      edoc_to_chunk(:mod)
+      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
+      [mod] = Retriever.docs_from_modules([:mod], config)
+      [opaque1, type1] = mod.typespecs
+
+      assert opaque1.id == "opaque1/0"
+      assert opaque1.type == :opaque
+      assert opaque1.signature == "opaque1/0"
+      assert DocAST.to_string(opaque1.doc) == "opaque1/0 docs."
+      assert Macro.to_string(opaque1.spec) == "opaque1()"
+
+      assert type1.id == "type1/0"
+      assert type1.type == :type
+      assert type1.signature == "type1/0"
+      assert DocAST.to_string(type1.doc) == "type1/0 docs."
+      assert Macro.to_string(type1.spec) == "type1() :: atom()"
     end
 
     test "module with no chunk", c do
