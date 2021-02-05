@@ -379,24 +379,24 @@ defmodule ExDoc.Retriever do
 
   defp get_callback(callback, source, optional_callbacks, module_data) do
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
-    {{kind, name, arity}, anno, _, doc, metadata} = callback
+    {{kind, name, arity}, anno, signature, doc, metadata} = callback
     actual_def = actual_def(name, arity, kind)
     doc_line = anno_line(anno)
+    signature = if signature == [], do: nil, else: Enum.join(signature, " ")
 
-    specs =
+    {specs, line, signature} =
       case Map.fetch(module_data.callbacks, actual_def) do
         {:ok, specs} ->
-          specs
+          {:type, anno, _, _} = hd(specs)
+          line = anno_line(anno)
+
+          specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
+          signature = signature || get_typespec_signature(hd(specs), arity)
+          {specs, line, signature}
 
         :error ->
-          # gen_statem:state_name/3 is stored as StateName/3 in the docs chunk
-          name = name |> Atom.to_string() |> Macro.underscore() |> String.to_atom()
-          Map.fetch!(module_data.callbacks, {name, arity})
+          {[], doc_line, signature || "#{name}/#{arity}"}
       end
-
-    {:type, anno, _, _} = hd(specs)
-    line = anno_line(anno)
-    specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
 
     annotations = annotations_from_metadata(metadata)
 
@@ -412,7 +412,7 @@ defmodule ExDoc.Retriever do
       deprecated: metadata[:deprecated],
       doc: doc_ast,
       doc_line: doc_line,
-      signature: get_typespec_signature(hd(specs), arity),
+      signature: signature,
       specs: specs,
       source_path: source.path,
       source_url: source_link(source, line),

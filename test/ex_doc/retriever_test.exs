@@ -116,6 +116,7 @@ defmodule ExDoc.RetrieverTest do
       [callback1, macrocallback1, optional_callback1] = mod.docs
 
       assert callback1.id == "callback1/0"
+      assert callback1.signature == "callback1()"
       assert callback1.type == :callback
       assert callback1.annotations == []
       assert callback1.doc_line == 2
@@ -124,6 +125,7 @@ defmodule ExDoc.RetrieverTest do
       assert Macro.to_string(callback1.specs) == "[callback1() :: :ok]"
 
       assert optional_callback1.id == "optional_callback1/0"
+      assert optional_callback1.signature == "optional_callback1()"
       assert optional_callback1.type == :callback
       assert optional_callback1.annotations == ["optional"]
       assert optional_callback1.doc_line == 5
@@ -132,6 +134,7 @@ defmodule ExDoc.RetrieverTest do
       assert Macro.to_string(optional_callback1.specs) == "[optional_callback1() :: :ok]"
 
       assert macrocallback1.id == "macrocallback1/0"
+      assert macrocallback1.signature == "macrocallback1()"
       assert macrocallback1.type == :macrocallback
       assert macrocallback1.annotations == []
       assert macrocallback1.doc_line == 9
