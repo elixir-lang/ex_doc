@@ -1,6 +1,7 @@
 exclude = [
   earmark: not ExDoc.Markdown.Earmark.available?(),
-  otp23: System.otp_release() < "23"
+  otp23: System.otp_release() < "23",
+  otp24: System.otp_release() < "24"
 ]
 
 ExUnit.start(exclude: Enum.filter(exclude, &elem(&1, 1)))
@@ -66,25 +67,40 @@ defmodule TestHelper do
     :ok
   end
 
-  def edoc_to_chunk(module) do
-    source_path = module.module_info(:compile)[:source]
-    beam_path = :code.which(module)
-    dir = :filename.dirname(source_path)
-    xml_path = '#{dir}/#{module}.xml'
-    chunk_path = '#{dir}/#{module}.chunk'
+  if Code.ensure_loaded?(:edoc_doclet_chunks) and false do
+    def edoc_to_chunk(module) do
+      source_path = module.module_info(:compile)[:source]
+      dir = :filename.dirname(source_path)
 
-    docgen_priv_dir = :code.priv_dir(:erl_docgen)
-    cmd!("escript #{docgen_priv_dir}/bin/xml_from_edoc.escript -dir #{dir} #{source_path}")
+      :ok =
+        :edoc.files([source_path],
+          preprocess: true,
+          doclet: :edoc_doclet_chunks,
+          layout: :edoc_layout_chunks,
+          dir: dir ++ '/doc'
+        )
+    end
+  else
+    def edoc_to_chunk(module) do
+      source_path = module.module_info(:compile)[:source]
+      beam_path = :code.which(module)
+      dir = :filename.dirname(source_path)
+      xml_path = '#{dir}/#{module}.xml'
+      chunk_path = '#{dir}/#{module}.chunk'
 
-    :docgen_xml_to_chunk.main(["app", xml_path, beam_path, "", chunk_path])
-    docs_chunk = File.read!(chunk_path)
-    {:ok, ^module, chunks} = :beam_lib.all_chunks(beam_path)
-    {:ok, beam} = :beam_lib.build_module([{'Docs', docs_chunk} | chunks])
-    File.write!(beam_path, beam)
-  end
+      docgen_priv_dir = :code.priv_dir(:erl_docgen)
+      cmd!("escript #{docgen_priv_dir}/bin/xml_from_edoc.escript -dir #{dir} #{source_path}")
 
-  defp cmd!(command) do
-    0 = Mix.shell().cmd(command)
+      :docgen_xml_to_chunk.main(["app", xml_path, beam_path, "", chunk_path])
+      docs_chunk = File.read!(chunk_path)
+      {:ok, ^module, chunks} = :beam_lib.all_chunks(beam_path)
+      {:ok, beam} = :beam_lib.build_module([{'Docs', docs_chunk} | chunks])
+      File.write!(beam_path, beam)
+    end
+
+    defp cmd!(command) do
+      0 = Mix.shell().cmd(command)
+    end
   end
 
   # TODO: replace with ExUnit @tag :tmp_dir feature when we require Elixir v1.11.
@@ -94,7 +110,6 @@ defmodule TestHelper do
     dir = Path.join(["tmp", module, name])
     File.rm_rf!(dir)
     File.mkdir_p!(dir)
-
     Map.put(context, :tmp_dir, dir)
   end
 

@@ -109,26 +109,36 @@ defmodule ExDoc.RetrieverTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
+      [mod] = Retriever.docs_from_modules([Mod], config)
       assert mod.type == :behaviour
 
       [callback1, macrocallback1, optional_callback1] = mod.docs
 
       assert callback1.id == "callback1/0"
+      assert callback1.signature == "callback1()"
       assert callback1.type == :callback
       assert callback1.annotations == []
+      assert callback1.doc_line == 2
+      assert Path.basename(callback1.source_url) == "nofile:3"
       assert DocAST.to_string(callback1.doc) == "<p>callback1/0 docs.</p>"
       assert Macro.to_string(callback1.specs) == "[callback1() :: :ok]"
 
       assert optional_callback1.id == "optional_callback1/0"
+      assert optional_callback1.signature == "optional_callback1()"
       assert optional_callback1.type == :callback
       assert optional_callback1.annotations == ["optional"]
+      assert optional_callback1.doc_line == 5
+      assert Path.basename(optional_callback1.source_url) == "nofile:5"
       refute optional_callback1.doc
       assert Macro.to_string(optional_callback1.specs) == "[optional_callback1() :: :ok]"
 
       assert macrocallback1.id == "macrocallback1/0"
+      assert macrocallback1.signature == "macrocallback1()"
       assert macrocallback1.type == :macrocallback
       assert macrocallback1.annotations == []
+      assert macrocallback1.doc_line == 9
+      assert Path.basename(macrocallback1.source_url) == "nofile:9"
       refute macrocallback1.doc
       assert Macro.to_string(macrocallback1.specs) == "[macrocallback1(term()) :: :ok]"
 
@@ -342,7 +352,7 @@ defmodule ExDoc.RetrieverTest do
 
       %ExDoc.ModuleNode{
         deprecated: nil,
-        doc_line: 0,
+        doc_line: _,
         docs: [function],
         function_groups: ["Functions"],
         group: nil,
@@ -358,19 +368,20 @@ defmodule ExDoc.RetrieverTest do
         typespecs: []
       } = mod
 
-      assert DocAST.to_string(mod.doc) == "<p>mod docs.</p>"
+      assert DocAST.to_string(mod.doc) =~ "mod docs."
 
       %ExDoc.FunctionNode{
         annotations: [],
         arity: 0,
         defaults: [],
         deprecated: nil,
-        doc_line: 0,
+        doc_line: _,
         group: "Functions",
         id: "function/0",
         name: :function,
         rendered_doc: nil,
-        signature: "function() -> atom()",
+        # TODO: assert when edoc is fixed
+        signature: _,
         source_path: _,
         source_url: nil,
         specs: _,

@@ -170,6 +170,7 @@ defmodule ExDoc.Retriever do
       type: get_type(module),
       specs: get_specs(module),
       impls: get_impls(module),
+      callbacks: get_callbacks(module),
       abst_code: get_abstract_code(module),
       docs: docs_chunk
     }
@@ -309,7 +310,6 @@ defmodule ExDoc.Retriever do
       doc: doc_ast,
       doc_line: doc_line,
       defaults: Enum.sort_by(defaults, fn {name, arity} -> sort_key(name, arity) end),
-      # TODO: Enum.join(signature, ""),
       signature: Enum.join(signature, " "),
       specs: specs,
       source_path: source.path,
@@ -379,16 +379,26 @@ defmodule ExDoc.Retriever do
 
   defp get_callback(callback, source, optional_callbacks, module_data) do
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
-    {{kind, name, arity}, anno, _, doc, metadata} = callback
+    {{kind, name, arity}, anno, signature, doc, metadata} = callback
     actual_def = actual_def(name, arity, kind)
     doc_line = anno_line(anno)
+    signature = if signature == [], do: nil, else: Enum.join(signature, " ")
+
+    {specs, line, signature} =
+      case Map.fetch(module_data.callbacks, actual_def) do
+        {:ok, specs} ->
+          {:type, anno, _, _} = hd(specs)
+          line = anno_line(anno)
+
+          specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
+          signature = signature || get_typespec_signature(hd(specs), arity)
+          {specs, line, signature}
+
+        :error ->
+          {[], doc_line, signature || "#{name}/#{arity}"}
+      end
+
     annotations = annotations_from_metadata(metadata)
-
-    {:attribute, anno, :callback, {^actual_def, specs}} =
-      Enum.find(module_data.abst_code, &match?({:attribute, _, :callback, {^actual_def, _}}, &1))
-
-    line = anno_line(anno)
-    specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
 
     annotations =
       if actual_def in optional_callbacks, do: ["optional" | annotations], else: annotations
@@ -402,7 +412,7 @@ defmodule ExDoc.Retriever do
       deprecated: metadata[:deprecated],
       doc: doc_ast,
       doc_line: doc_line,
-      signature: get_typespec_signature(hd(specs), arity),
+      signature: signature,
       specs: specs,
       source_path: source.path,
       source_url: source_link(source, line),
@@ -424,15 +434,15 @@ defmodule ExDoc.Retriever do
   # Returns a map of {name, arity} => behaviour.
   defp get_impls(module) do
     for behaviour <- behaviours_implemented_by(module),
-        callback <- callbacks_defined_by(behaviour),
+        {callback, _} <- get_callbacks(behaviour),
         do: {callback, behaviour},
         into: %{}
   end
 
-  defp callbacks_defined_by(module) do
+  defp get_callbacks(module) do
     case Code.Typespec.fetch_callbacks(module) do
-      {:ok, callbacks} -> Enum.map(callbacks, &elem(&1, 0))
-      :error -> []
+      {:ok, callbacks} -> Map.new(callbacks)
+      :error -> %{}
     end
   end
 
