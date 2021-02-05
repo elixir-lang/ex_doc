@@ -392,6 +392,27 @@ defmodule ExDoc.RetrieverTest do
       assert Macro.to_string(function.specs) == "[function() :: atom()]"
     end
 
+    @tag :otp24
+    test "Erlang callbacks", c do
+      erlc(c, :mod, ~S"""
+      -module(mod).
+
+      -callback callback1() -> ok.
+      %% callback1 docs.
+      """)
+
+      edoc_to_chunk(:mod)
+      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
+      [mod] = Retriever.docs_from_modules([:mod], config)
+      [callback1] = mod.docs
+
+      assert callback1.id == "callback1/0"
+      assert callback1.type == :callback
+      assert Path.basename(callback1.source_url) == "mod.erl:3"
+      # this is an edoc bug, it should be 4
+      assert callback1.doc_line == 3
+    end
+
     test "module with no chunk", c do
       erlc(c, :no_chunk, ~S"""
       -module(no_chunk).

@@ -67,7 +67,7 @@ defmodule TestHelper do
     :ok
   end
 
-  if Code.ensure_loaded?(:edoc_doclet_chunks) and false do
+  if Code.ensure_loaded?(:edoc_doclet_chunks) do
     def edoc_to_chunk(module) do
       source_path = module.module_info(:compile)[:source]
       dir = :filename.dirname(source_path)
