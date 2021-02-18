@@ -80,7 +80,7 @@ defmodule ExDoc.AutolinkTest do
 
     test "erlang stdlib function" do
       assert autolink(":lists.all/2") ==
-               ~m"[`:lists.all/2`](http://www.erlang.org/doc/man/lists.html#all-2)"
+               ~m"[`:lists.all/2`](https://erlang.org/doc/man/lists.html#all-2)"
     end
 
     test "local function" do
@@ -115,7 +115,7 @@ defmodule ExDoc.AutolinkTest do
 
     test "erlang callback" do
       assert autolink("c::gen_server.handle_call/3") ==
-               ~m"[`:gen_server.handle_call/3`](http://www.erlang.org/doc/man/gen_server.html#Module:handle_call-3)"
+               ~m"[`:gen_server.handle_call/3`](https://erlang.org/doc/man/gen_server.html#Module:handle_call-3)"
     end
 
     test "elixir type" do
@@ -136,7 +136,7 @@ defmodule ExDoc.AutolinkTest do
 
     test "erlang type" do
       assert autolink("t::array.array/0") ==
-               ~m"[`:array.array/0`](http://www.erlang.org/doc/man/array.html#type-array)"
+               ~m"[`:array.array/0`](https://erlang.org/doc/man/array.html#type-array)"
     end
 
     test "special forms" do
@@ -166,10 +166,10 @@ defmodule ExDoc.AutolinkTest do
                ~m"[custom text](https://hexdocs.pm/elixir/String.html#at/2)"
 
       assert autolink(~m"[custom text](`:lists`)") ==
-               ~m"[custom text](http://www.erlang.org/doc/man/lists.html)"
+               ~m"[custom text](https://erlang.org/doc/man/lists.html)"
 
       assert autolink(~m"[custom text](`:lists.all/2`)") ==
-               ~m"[custom text](http://www.erlang.org/doc/man/lists.html#all-2)"
+               ~m"[custom text](https://erlang.org/doc/man/lists.html#all-2)"
     end
 
     test "mix task" do
@@ -366,7 +366,7 @@ defmodule ExDoc.AutolinkTest do
 
     test "Erlang stdlib types" do
       assert typespec(quote(do: t() :: :sets.set())) ==
-               ~s[t() :: <a href=\"http://www.erlang.org/doc/man/sets.html#type-set\">:sets.set</a>()]
+               ~s[t() :: <a href=\"https://erlang.org/doc/man/sets.html#type-set\">:sets.set</a>()]
     end
 
     test "escape special HTML characters" do

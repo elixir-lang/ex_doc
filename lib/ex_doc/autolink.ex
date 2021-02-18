@@ -41,7 +41,7 @@ defmodule ExDoc.Autolink do
   alias ExDoc.Refs
 
   @hexdocs "https://hexdocs.pm/"
-  @otpdocs "http://www.erlang.org/doc/man/"
+  @otpdocs "https://erlang.org/doc/man/"
 
   @autoimported_modules [Kernel, Kernel.SpecialForms]
 
