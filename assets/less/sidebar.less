@@ -230,7 +230,6 @@
       line-height: 27px;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
 
       &.open > ul {
         display: block;
@@ -251,6 +250,10 @@
         margin: 2.0em 0 0;
         line-height: 1.8em;
         color: @groupGray;
+      }
+
+      a.expand {
+        text-overflow: ellipsis;
       }
 
       a.expand span {
