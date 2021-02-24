@@ -8,32 +8,47 @@ on:
 
 jobs:
   mix_test:
-    name: mix test (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}})
+    runs-on: ubuntu-16.04
+    env:
+      MIX_ENV: test
     strategy:
       fail-fast: false
       matrix:
         include:
-          - otp: 21.3.8.16
-            elixir: 1.10.3
-          - otp: 23.0.2
-            elixir: 1.10.3
-    runs-on: ubuntu-latest
+          - pair:
+              elixir: 1.10.4
+              otp: 21.3.8.21
+          - pair:
+              elixir: 1.11.3
+              otp: 23.2.5
+            lint: lint
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-elixir@v1
+
+      - uses: erlef/setup-elixir@v1
         with:
-          experimental-otp: true
-          otp-version: '${{matrix.otp}}'
-          elixir-version: '${{matrix.elixir}}'
+          otp-version: ${{matrix.pair.otp}}
+          elixir-version: ${{matrix.pair.elixir}}
+
       - name: Install Dependencies
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          mix deps.get
-      - name: Run Tests
-        run: mix test
+        run: mix deps.get --only test
+
+      - run: mix format --check-formatted
+        if: ${{ matrix.lint }}
+
+      - run: mix deps.get && mix deps.unlock --check-unused
+        if: ${{ matrix.lint }}
+
+      - run: mix deps.compile
+
+      - run: mix compile --warnings-as-errors
+        if: ${{ matrix.lint }}
+
+      - run: mix test
+
       - name: Prerelease
         run: test/prerelease.sh
+
       - name: Generate docs
         run: |
           mix docs
