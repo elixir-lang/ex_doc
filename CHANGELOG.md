@@ -50,7 +50,7 @@ Requires Elixir v1.10.
     * [mix docs] Allow files with no extension in extra files (`26b93b6`)
     * [mix docs] Link to siblings in an umbrella (`b0d6fdd`)
     * [mix docs] Switch to `earmark_parser`. Run `mix deps.unlock --unused` to remove the now
-      unused `earmark` dependency.  (`021c772`)
+      unused `earmark` dependency. (`021c772`)
 
   * Bug fixes
     * [HTML+EPUB] Bring back auto-linking to Kernel and Kernel.SpecialForms (`fa174eb`)
