@@ -11,7 +11,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   defp homepage_url do
-    "http://elixir-lang.org"
+    "https://elixir-lang.org"
   end
 
   defp doc_config(config \\ []) do
