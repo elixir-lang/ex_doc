@@ -114,7 +114,7 @@ defmodule Mix.Tasks.DocsTest do
                 deps: _,
                 apps: _,
                 source_beam: _,
-                homepage_url: "http://elixir-lang.org",
+                homepage_url: "https://elixir-lang.org",
                 source_url: "https://github.com/elixir-lang/ex_doc"
               ]},
              {"ExDoc", "1.2.3-dev",
@@ -123,7 +123,7 @@ defmodule Mix.Tasks.DocsTest do
                 deps: _,
                 apps: _,
                 source_beam: _,
-                homepage_url: "http://elixir-lang.org",
+                homepage_url: "https://elixir-lang.org",
                 source_url: "https://github.com/elixir-lang/ex_doc"
               ]}
            ] =
@@ -131,7 +131,7 @@ defmodule Mix.Tasks.DocsTest do
                app: :ex_doc,
                name: "ExDoc",
                source_url: "https://github.com/elixir-lang/ex_doc",
-               homepage_url: "http://elixir-lang.org",
+               homepage_url: "https://elixir-lang.org",
                version: "1.2.3-dev"
              )
 

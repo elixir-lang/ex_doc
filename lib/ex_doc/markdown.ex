@@ -8,7 +8,7 @@ defmodule ExDoc.Markdown do
 
   ExDoc supports the following Markdown parsers out of the box:
 
-    * [EarmarkParser](http://github.com/robertdober/earmark_parser)
+    * [EarmarkParser](https://github.com/robertdober/earmark_parser)
 
   ExDoc uses EarmarkParser by default.
   """
