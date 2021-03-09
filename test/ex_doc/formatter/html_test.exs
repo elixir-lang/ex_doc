@@ -190,11 +190,11 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "generates module entry pages" do
     generate_docs(doc_config())
 
-    content = File.read!("#{output_dir()}/CompiledWithDocs-function-example-2.html")
-    assert content =~ "You're seeing just the function <code>example/2</code>"
+    content = File.read!("#{output_dir()}/CompiledWithDocs-function-example.html")
+    assert content =~ "You're seeing just the function <code>example</code>"
 
-    content = File.read!("#{output_dir()}/CustomBehaviourOne-callback-greet-1.html")
-    assert content =~ "You're seeing just the callback <code>greet/1</code>"
+    content = File.read!("#{output_dir()}/CustomBehaviourOne-callback-greet.html")
+    assert content =~ "You're seeing just the callback <code>greet</code>"
   end
 
   test "generates all listing files" do
