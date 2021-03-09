@@ -465,11 +465,21 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_module_page(module_node, nodes_map, config) do
+    generate_module_entry_pages(module_node, nodes_map, config)
     filename = "#{module_node.id}.html"
     config = set_canonical_url(config, filename)
     content = Templates.module_page(module_node, nodes_map, config)
     File.write!("#{config.output}/#{filename}", content)
     filename
+  end
+
+  defp generate_module_entry_pages(module_node, nodes_map, config) do
+    for node <- module_node.docs do
+      content = Templates.module_entry_page(module_node, node, nodes_map, config)
+      filename = "#{module_node.id}-#{node.type}-#{node.name}-#{node.arity}.html"
+      File.write!("#{config.output}/#{filename}", content)
+      filename
+    end
   end
 
   defp set_canonical_url(config, filename) do

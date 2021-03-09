@@ -1,0 +1,12 @@
+<%= head_template(config, %{title: module.id <> "." <> node.id, type: module.type}) %>
+<%= sidebar_template(config, nodes_map) %>
+
+<h1><%= module.title <> "." <> node.id %></h1>
+
+<div class="deprecated">
+  You're seeing just the <%= node.type %> <code><%= node.id %></code>, go back to <a href="<%= module.id %>.html"><%= module.title %></a> module for more information.
+</div>
+
+<%= detail_template(node, module) %>
+
+<%= footer_template(config) %>
