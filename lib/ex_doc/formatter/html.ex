@@ -465,11 +465,22 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_module_page(module_node, nodes_map, config) do
+    generate_module_entry_pages(module_node, nodes_map, config)
     filename = "#{module_node.id}.html"
     config = set_canonical_url(config, filename)
     content = Templates.module_page(module_node, nodes_map, config)
     File.write!("#{config.output}/#{filename}", content)
     filename
+  end
+
+  defp generate_module_entry_pages(module_node, nodes_map, config) do
+    module_node.docs
+    |> Enum.group_by(&{&1.type, &1.name})
+    |> Enum.each(fn {{type, name}, nodes} ->
+      content = Templates.module_entry_page(module_node, type, name, nodes, nodes_map, config)
+      filename = "#{module_node.id}-#{type}-#{name}.html"
+      File.write!("#{config.output}/#{filename}", content)
+    end)
   end
 
   defp set_canonical_url(config, filename) do
