@@ -1,5 +1,25 @@
 # Changelog
 
+## HEAD
+
+  * Enhancements
+    * Drop jQuery and refactor JavaScript codebase
+    * Remove highlight.js in favour of migration to Makeup
+    * Change autolink to return both path and hash for the current module
+    * Add next/previous at the end of extra pages
+    * Improve search input blur handling
+    * Update erlang.org/man URL
+    * Add function landing page
+
+  * Bug fixes:
+    * Ignore extensions when generating external links
+    * Fix autolink to handle URIs with arbitrary scheme part without warning
+    * Fix undefined reference warning for typespecs
+    * Fix search click behavior when a suggestion refers the current page
+    * Don't crash when we can't format spec
+    * Fix HTML escaping
+
+
 ## v0.23.0 (2020-10-12)
 
 Requires Elixir v1.10.
