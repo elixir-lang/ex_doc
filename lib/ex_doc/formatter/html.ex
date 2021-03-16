@@ -477,9 +477,17 @@ defmodule ExDoc.Formatter.HTML do
     module_node.docs
     |> Enum.group_by(&{&1.type, &1.name})
     |> Enum.each(fn {{type, name}, nodes} ->
-      content = Templates.module_entry_page(module_node, type, name, nodes, nodes_map, config)
-      filename = "#{module_node.id}-#{type}-#{name}.html"
-      File.write!("#{config.output}/#{filename}", content)
+      name =
+        name
+        |> Atom.to_string()
+        |> String.replace("?", "-question-mark")
+        |> String.replace("!", "-exclamation-mark")
+
+      if name =~ ~r/[a-z_-]/i do
+        content = Templates.module_entry_page(module_node, type, name, nodes, nodes_map, config)
+        filename = "#{module_node.id}-#{type}-#{name}.html"
+        File.write!("#{config.output}/#{filename}", content)
+      end
     end)
   end
 
