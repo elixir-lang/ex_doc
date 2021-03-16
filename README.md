@@ -37,7 +37,7 @@ If you are using Elixir v1.10, or later:
 ```elixir
 def deps do
   [
-    {:ex_doc, "~> 0.23", only: :dev, runtime: false},
+    {:ex_doc, "~> 0.24", only: :dev, runtime: false},
   ]
 end
 ```
