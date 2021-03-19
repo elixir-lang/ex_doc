@@ -39,6 +39,8 @@ defmodule CompiledWithDocs do
   # Check that delegate autogenerate docs
   defdelegate flatten(hello), to: List
 
+  def unquote(:"name/with/slashes")(), do: :ok
+
   defmodule Nested do
   end
 end

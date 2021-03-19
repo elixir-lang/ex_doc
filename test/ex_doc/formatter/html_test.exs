@@ -195,6 +195,8 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     content = File.read!("#{output_dir()}/CustomBehaviourOne-callback-greet.html")
     assert content =~ "You're seeing just the callback <code>greet</code>"
+
+    assert Path.wildcard("#{output_dir()}/CompiledWithDocs-*slashes.html") == []
   end
 
   test "generates all listing files" do
