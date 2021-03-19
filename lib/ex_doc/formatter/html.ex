@@ -483,7 +483,7 @@ defmodule ExDoc.Formatter.HTML do
         |> String.replace("?", "-question-mark")
         |> String.replace("!", "-exclamation-mark")
 
-      if name =~ ~r/[a-z_-]/i do
+      if name =~ ~r/^[a-z0-9_-]+$/i do
         content = Templates.module_entry_page(module_node, type, name, nodes, nodes_map, config)
         filename = "#{module_node.id}-#{type}-#{name}.html"
         File.write!("#{config.output}/#{filename}", content)
