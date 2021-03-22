@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.24.1 (2021-03-22)
+
+  * Bug fixes
+    * Fix generating function landing pages
+
 ## v0.24.0 (2021-03-16)
 
   * Enhancements
