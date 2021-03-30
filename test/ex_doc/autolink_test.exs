@@ -104,6 +104,9 @@ defmodule ExDoc.AutolinkTest do
       assert autolink("for/1") ==
                ~m"[`for/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#for/1)"
 
+      assert autolink("..///3") ==
+               ~m"[`..///3`](https://hexdocs.pm/elixir/Kernel.html#..///3)"
+
       assert autolink("for/1", apps: [:elixir]) ==
                ~m"[`for/1`](Kernel.SpecialForms.html#for/1)"
     end
