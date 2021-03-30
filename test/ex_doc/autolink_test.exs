@@ -3,8 +3,6 @@ defmodule ExDoc.AutolinkTest do
   doctest ExDoc.Autolink
   import ExUnit.CaptureIO
 
-  @elixir_version System.build_info()[:version]
-
   defp sigil_m(text, []) do
     [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, [])
     ast
@@ -110,7 +108,7 @@ defmodule ExDoc.AutolinkTest do
                ~m"[`for/1`](Kernel.SpecialForms.html#for/1)"
 
       # TODO: Remove check once Elixir v1.12+ is required
-      if Version.compare(@elixir_version, "1.12.0-rc.0") in [:gt, :eq] do
+      if Version.match?(System.version(), ">= 1.12.0-rc.0") do
         assert autolink("..///3") ==
                  ~m"[`..///3`](https://hexdocs.pm/elixir/Kernel.html#..///3)"
       end
