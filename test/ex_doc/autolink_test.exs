@@ -109,6 +109,7 @@ defmodule ExDoc.AutolinkTest do
       assert autolink("for/1", apps: [:elixir]) ==
                ~m"[`for/1`](Kernel.SpecialForms.html#for/1)"
 
+      # TODO: Remove check once Elixir v1.12+ is required
       if Version.compare(@elixir_version, "1.12.0-rc.0") in [:gt, :eq] do
         assert autolink("..///3") ==
                  ~m"[`..///3`](https://hexdocs.pm/elixir/Kernel.html#..///3)"
