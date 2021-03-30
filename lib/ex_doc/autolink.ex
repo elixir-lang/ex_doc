@@ -249,7 +249,7 @@ defmodule ExDoc.Autolink do
         {:local, :..}
 
       ["//", "", ""] ->
-        {:local, :..//}
+        {:local, :"..//"}
 
       ["", ""] ->
         {:local, :.}
