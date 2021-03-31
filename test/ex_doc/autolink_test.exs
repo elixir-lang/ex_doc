@@ -384,6 +384,7 @@ defmodule ExDoc.AutolinkTest do
   test "warnings" do
     ExDoc.Refs.insert([
       {{:module, AutolinkTest.Foo}, :public},
+      {{:module, AutolinkTest.Hidden}, :hidden},
       {{:function, AutolinkTest.Foo, :bar, 1}, :hidden},
       {{:type, AutolinkTest.Foo, :bad, 0}, :hidden}
     ])
@@ -437,7 +438,7 @@ defmodule ExDoc.AutolinkTest do
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
 
-    assert warn(~m"[Bar A](`Bar.A`)", []) =~ "module \"Bar.A\" but it is undefined\n"
+    assert_and_warn(~m"[Bar A](`Bar.A`)", ["Bar A"], "module \"Bar.A\" but it is undefined\n")
 
     assert_unchanged(~m"`Bar.A`")
 
@@ -449,11 +450,17 @@ defmodule ExDoc.AutolinkTest do
     assert warn(~m"[bad](`String.upcase/9`)", extras: []) =~
              "documentation references \"String.upcase/9\" but it is undefined or private"
 
-    assert warn(~m"[custom text](`Elixir.Unknown`)", []) =~
-             "documentation references module \"Elixir.Unknown\" but it is undefined\n"
+    assert_and_warn(
+      ~m"[custom text](`Elixir.Unknown`)",
+      ["custom text"],
+      "documentation references module \"Elixir.Unknown\" but it is undefined\n"
+    )
 
-    assert warn(~m"[Unknown](`Unknown`)") =~
-             "documentation references module \"Unknown\" but it is undefined"
+    assert_and_warn(
+      ~m"[It is Unknown](`Unknown`)",
+      ["It is Unknown"],
+      "documentation references module \"Unknown\" but it is undefined"
+    )
 
     assert_unchanged(~m"`Unknown`")
 
@@ -495,6 +502,12 @@ defmodule ExDoc.AutolinkTest do
     warn(fn ->
       assert_unchanged(ast_or_text, options)
     end)
+  end
+
+  defp assert_and_warn(ast_or_text1, text2, warn_string, options \\ []) do
+    assert warn(fn ->
+             assert autolink(ast_or_text1, options) == text2
+           end) =~ warn_string
   end
 
   defp typespec(ast, options \\ []) do

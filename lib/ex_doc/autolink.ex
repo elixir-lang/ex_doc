@@ -63,27 +63,38 @@ defmodule ExDoc.Autolink do
   end
 
   defp walk({:a, attrs, inner, meta} = ast, config) do
-    cond do
-      url = custom_link(attrs, config) ->
-        {:a, Keyword.put(attrs, :href, url), inner, meta}
+    case custom_link(attrs, config) do
+      :remove_link ->
+        remove_link(ast)
 
-      true ->
+      nil ->
         ast
+
+      url ->
+        {:a, Keyword.put(attrs, :href, url), inner, meta}
     end
   end
 
   defp walk({:code, attrs, [code], meta} = ast, config) do
-    if url = url(code, :regular_link, config) do
-      code = remove_prefix(code)
-      {:a, [href: url], [{:code, attrs, [code], meta}], %{}}
-    else
-      ast
+    case url(code, :regular_link, config) do
+      nil ->
+        ast
+
+      url ->
+        code = remove_prefix(code)
+        {:a, [href: url], [{:code, attrs, [code], meta}], %{}}
     end
   end
 
   defp walk({tag, attrs, ast, meta}, config) do
     {tag, attrs, walk(ast, config), meta}
   end
+
+  defp remove_link({:a, _attrs, inner, _meta}),
+    do: inner
+
+  defp remove_link(ast),
+    do: ast
 
   @ref_regex ~r/^`(.+)`$/
 
@@ -326,7 +337,7 @@ defmodule ExDoc.Autolink do
         {nil, nil, :undefined}
       end
 
-    if is_nil(url) and mode == :custom_link do
+    if url in [nil, :remove_link] and mode == :custom_link do
       maybe_warn({:module, module}, config, visibility, %{mix_task: true, original_text: string})
     end
 
@@ -444,15 +455,18 @@ defmodule ExDoc.Autolink do
     ref = {:module, module}
 
     case {mode, Refs.get_visibility(ref)} do
-      {_, :public} ->
+      {_link_type, :public} ->
         app_module_url(tool(module), module, config)
 
       {:regular_link, :undefined} ->
         nil
 
-      {_, visibility} ->
+      {:custom_link, visibility} when visibility in [:hidden, :undefined] ->
         maybe_warn(ref, config, visibility, %{original_text: string})
+        :remove_link
 
+      {_link_type, visibility} ->
+        maybe_warn(ref, config, visibility, %{original_text: string})
         nil
     end
   end
@@ -541,7 +555,6 @@ defmodule ExDoc.Autolink do
 
       {_mode, _module_visibility, visibility} ->
         if warn?, do: maybe_warn(ref, config, visibility, %{original_text: original_text})
-
         nil
     end
   end
