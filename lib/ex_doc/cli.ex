@@ -48,7 +48,7 @@ defmodule ExDoc.CLI do
     opts =
       opts
       |> Keyword.put(:source_beam, source_beam)
-      |> Keyword.put(:app, app(source_beam))
+      |> Keyword.put(:apps, [app(source_beam)])
       |> merge_config()
 
     generator.(project, version, opts)
