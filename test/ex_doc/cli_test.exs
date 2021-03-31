@@ -9,7 +9,7 @@ defmodule ExDoc.CLITest do
   end
 
   test "minimum command-line options" do
-    assert {"ExDoc", "1.2.3", [app: :ex_doc, source_beam: @ebin]} ==
+    assert {"ExDoc", "1.2.3", [apps: [:ex_doc], source_beam: @ebin]} ==
              run(["ExDoc", "1.2.3", @ebin])
   end
 
@@ -61,7 +61,7 @@ defmodule ExDoc.CLITest do
     assert version == "1.2.3"
 
     assert Enum.sort(opts) == [
-             app: :ex_doc,
+             apps: [:ex_doc],
              canonical: "http://example.com/project",
              formatter: "html",
              homepage_url: "http://example.com",
@@ -89,7 +89,7 @@ defmodule ExDoc.CLITest do
       assert version == "1.2.3"
 
       assert Enum.sort(opts) == [
-               app: :ex_doc,
+               apps: [:ex_doc],
                extra_section: "Guides",
                extras: ["README.md"],
                source_beam: @ebin

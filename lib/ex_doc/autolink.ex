@@ -1,7 +1,7 @@
 defmodule ExDoc.Autolink do
   @moduledoc false
 
-  # * `:apps` - the app that the docs are being generated for. When linking modules they are
+  # * `:apps` - the apps that the docs are being generated for. When linking modules they are
   #   checked if they are part of the app and based on that the links are relative or absolute.
   #
   # * `:current_module` - the module that the docs are being generated for. Used to link local
