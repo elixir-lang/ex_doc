@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.24.2 (2021-04-06)
+
+  * Enhancements
+    * Support stepped range syntax
+
+  * Bug fixes
+    * Add spaces on paragraph endings for search results
+    * Fix bug defining app name in config
+    * Fix rendering void elements (`<br>` etc)
+
 ## v0.24.1 (2021-03-22)
 
   * Bug fixes
