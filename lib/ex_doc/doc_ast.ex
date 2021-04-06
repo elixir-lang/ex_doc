@@ -21,6 +21,10 @@ defmodule ExDoc.DocAST do
     raise "content type #{inspect(other)} is not supported"
   end
 
+  # https://www.w3.org/TR/2011/WD-html-markup-20110113/syntax.html#void-element
+  @void_elements ~W(area base br col command embed hr img input keygen link 
+    meta param source track wbr)a
+
   @doc """
   Transform AST into string.
   """
@@ -33,6 +37,11 @@ defmodule ExDoc.DocAST do
   def to_string(list, fun) when is_list(list) do
     result = Enum.map_join(list, "", &to_string(&1, fun))
     fun.(list, result)
+  end
+
+  def to_string({tag, attrs, _inner, _meta} = ast, fun) when tag in @void_elements do
+    result = "<#{tag}#{ast_attributes_to_string(attrs)}/>"
+    fun.(ast, result)
   end
 
   def to_string({tag, attrs, inner, %{verbatim: true}} = ast, fun) do
