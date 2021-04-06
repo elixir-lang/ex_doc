@@ -81,5 +81,16 @@ defmodule ExDoc.DocASTTest do
       assert DocAST.to_string(ast, f) ==
                "<p>foo <STRONG>BAR</STRONG> baz</p>"
     end
+
+    test "void elements" do
+      markdown = """
+      foo  
+      bar
+      """
+
+      ast = DocAST.parse!(markdown, "text/markdown")
+
+      assert DocAST.to_string(ast) == ~s{<p>foo<br/>bar</p>}
+    end
   end
 end
