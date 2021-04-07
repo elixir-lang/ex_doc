@@ -156,8 +156,8 @@ defmodule ExDoc.Retriever do
     {first in ?a..?z, name, arity}
   end
 
-  defp doc_ast(format, %{"en" => doc}, options),
-    do: DocAST.parse!(doc, format, options)
+  defp doc_ast(format, %{"en" => doc_content_binary}, options),
+    do: DocAST.parse!(doc_content_binary, format, options)
 
   defp doc_ast(_, _, _options),
     do: nil
