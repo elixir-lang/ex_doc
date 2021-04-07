@@ -5,9 +5,9 @@ defmodule ExDoc.DocAST do
   alias ExDoc.Formatter.HTML.Templates
 
   @doc """
-  Parse given `doc` according to `doc_format`.
+  Parses given `doc_content` according to `doc_format`.
   """
-  def parse!(doc, doc_format, options \\ [])
+  def parse!(doc_content, doc_format, options \\ [])
 
   def parse!(markdown, "text/markdown", opts) do
     parse_markdown(markdown, opts)

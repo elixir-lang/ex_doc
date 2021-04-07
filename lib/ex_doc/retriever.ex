@@ -218,19 +218,19 @@ defmodule ExDoc.Retriever do
   ## Function helpers
 
   defp get_docs(%{type: type, docs: docs} = module_data, source, config) do
-    {:docs_v1, _, _, _, _, _, docs} = docs
+    {:docs_v1, _, _, _, _, _, doc_elements} = docs
 
     groups_for_functions =
       Enum.map(config.groups_for_functions, fn {group, filter} ->
         {Atom.to_string(group), filter}
       end) ++ [{"Functions", fn _ -> true end}]
 
-    function_docs =
-      for doc <- docs, doc?(doc, type) do
-        get_function(doc, source, module_data, groups_for_functions)
+    function_doc_elements =
+      for doc_element <- doc_elements, doc?(doc_element, type) do
+        get_function(doc_element, source, module_data, groups_for_functions)
       end
 
-    {Enum.map(groups_for_functions, &elem(&1, 0)), filter_defaults(function_docs)}
+    {Enum.map(groups_for_functions, &elem(&1, 0)), filter_defaults(function_doc_elements)}
   end
 
   # We are only interested in functions and macros for now
@@ -260,9 +260,9 @@ defmodule ExDoc.Retriever do
     false
   end
 
-  defp get_function(function, source, module_data, groups_for_functions) do
+  defp get_function(doc_element, source, module_data, groups_for_functions) do
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
-    {{type, name, arity}, anno, signature, doc, metadata} = function
+    {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
     actual_def = actual_def(name, arity, type)
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
@@ -298,7 +298,7 @@ defmodule ExDoc.Retriever do
       end)
 
     doc_ast =
-      (doc && doc_ast(content_type, doc, file: source.path, line: doc_line + 1)) ||
+      (doc_content && doc_ast(content_type, doc_content, file: source.path, line: doc_line + 1)) ||
         callback_doc_ast(name, arity, impl) ||
         delegate_doc_ast(metadata[:delegate_to])
 
