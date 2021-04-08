@@ -101,6 +101,8 @@ defmodule ExDoc.RetrieverTest do
         @doc "callback1/0 docs."
         @callback callback1() :: :ok
 
+        @callback callback2() :: :ok
+
         @callback optional_callback1() :: :ok
 
         @optional_callbacks optional_callback1: 0
@@ -113,7 +115,7 @@ defmodule ExDoc.RetrieverTest do
       [mod] = Retriever.docs_from_modules([Mod], config)
       assert mod.type == :behaviour
 
-      [callback1, macrocallback1, optional_callback1] = mod.docs
+      [callback1, _callback2, macrocallback1, optional_callback1] = mod.docs
 
       assert callback1.id == "callback1/0"
       assert callback1.signature == "callback1()"
@@ -128,8 +130,8 @@ defmodule ExDoc.RetrieverTest do
       assert optional_callback1.signature == "optional_callback1()"
       assert optional_callback1.type == :callback
       assert optional_callback1.annotations == ["optional"]
-      assert optional_callback1.doc_line == 5
-      assert Path.basename(optional_callback1.source_url) == "nofile:5"
+      assert optional_callback1.doc_line == 7
+      assert Path.basename(optional_callback1.source_url) == "nofile:7"
       refute optional_callback1.doc
       assert Macro.to_string(optional_callback1.specs) == "[optional_callback1() :: :ok]"
 
@@ -137,8 +139,8 @@ defmodule ExDoc.RetrieverTest do
       assert macrocallback1.signature == "macrocallback1()"
       assert macrocallback1.type == :macrocallback
       assert macrocallback1.annotations == []
-      assert macrocallback1.doc_line == 9
-      assert Path.basename(macrocallback1.source_url) == "nofile:9"
+      assert macrocallback1.doc_line == 11
+      assert Path.basename(macrocallback1.source_url) == "nofile:11"
       refute macrocallback1.doc
       assert Macro.to_string(macrocallback1.specs) == "[macrocallback1(term()) :: :ok]"
 
@@ -147,6 +149,9 @@ defmodule ExDoc.RetrieverTest do
         @behaviour Mod
 
         def callback1(), do: :ok
+
+        @doc "callback2 docs."
+        def callback2(), do: :ok
 
         @doc "optional_callback1/0 docs."
         def optional_callback1(), do: :ok
@@ -157,17 +162,45 @@ defmodule ExDoc.RetrieverTest do
       """)
 
       [impl] = Retriever.docs_from_modules([Impl], %ExDoc.Config{})
-      [callback1, optional_callback1] = impl.docs
+      [callback1, callback2, optional_callback1] = impl.docs
 
       assert callback1.id == "callback1/0"
       assert callback1.type == :function
       assert callback1.annotations == []
+      refute callback1.doc
 
-      assert callback1.doc ==
-               ExDoc.Markdown.to_ast("Callback implementation for `c:Mod.callback1/0`.")
+      assert DocAST.to_string(callback2.doc) == "<p>callback2 docs.</p>"
 
       assert optional_callback1.id == "optional_callback1/0"
       assert optional_callback1.type == :function
+      assert DocAST.to_string(optional_callback1.doc) == "<p>optional_callback1/0 docs.</p>"
+
+      elixirc(c, ~S"""
+      defmodule ImplTrue do
+        @behaviour Mod
+
+        @impl true
+        def callback1(), do: :ok
+
+        @impl true
+        @doc "callback2 docs."
+        def callback2(), do: :ok
+
+        @impl true
+        @doc "optional_callback1/0 docs."
+        def optional_callback1(), do: :ok
+
+        @impl true
+        @doc false
+        defmacro macrocallback1(), do: :ok
+      end
+      """)
+
+      [impl] = Retriever.docs_from_modules([Impl], %ExDoc.Config{})
+      [callback1, callback2, optional_callback1] = impl.docs
+
+      refute callback1.doc
+      assert DocAST.to_string(callback2.doc) == "<p>callback2 docs.</p>"
       assert DocAST.to_string(optional_callback1.doc) == "<p>optional_callback1/0 docs.</p>"
     end
 

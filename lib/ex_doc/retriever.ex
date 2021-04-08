@@ -10,6 +10,8 @@ defmodule ExDoc.Retriever do
   alias ExDoc.{DocAST, GroupMatcher, Refs}
   alias ExDoc.Retriever.Error
 
+  defguardp has_doc(doc_content) when is_map(doc_content) and is_map_key(doc_content, "en")
+
   @doc """
   Extract documentation from all modules in the specified directory or directories.
   """
@@ -230,7 +232,10 @@ defmodule ExDoc.Retriever do
         get_function(doc_element, source, module_data, groups_for_functions)
       end
 
-    {Enum.map(groups_for_functions, &elem(&1, 0)), filter_defaults(function_doc_elements)}
+    filtered_function_doc_elements =
+      function_doc_elements |> filter_skipped() |> filter_defaults()
+
+    {Enum.map(groups_for_functions, &elem(&1, 0)), filtered_function_doc_elements}
   end
 
   # We are only interested in functions and macros for now
@@ -261,63 +266,68 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_function(doc_element, source, module_data, groups_for_functions) do
-    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
     actual_def = actual_def(name, arity, type)
-    doc_line = anno_line(anno)
-    annotations = annotations_from_metadata(metadata)
-
-    line = find_function_line(module_data, actual_def) || doc_line
     impl = Map.fetch(module_data.impls, actual_def)
-    defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
-    specs =
-      module_data.specs
-      |> Map.get(actual_def, [])
-      |> Enum.map(&Code.Typespec.spec_to_quoted(name, &1))
+    if not has_doc(doc_content) and is_tuple(impl) and elem(impl, 1) == :ok do
+      # Hide implementations without explicitily declared docs
+      :skip
+    else
+      {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
+      doc_line = anno_line(anno)
+      line = find_function_line(module_data, actual_def) || doc_line
 
-    specs =
-      if type == :macro do
-        Enum.map(specs, &remove_first_macro_arg/1)
-      else
-        specs
-      end
+      doc_ast =
+        doc_ast(content_type, doc_content, file: source.path, line: doc_line + 1) ||
+          delegate_doc_ast(metadata[:delegate_to])
 
-    annotations =
-      case {type, name, arity} do
-        {:macro, _, _} -> ["macro" | annotations]
-        {_, :__struct__, 0} -> ["struct" | annotations]
-        _ -> annotations
-      end
+      annotations = annotations_from_metadata(metadata)
+      defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
-    group =
-      Enum.find_value(groups_for_functions, fn {group, filter} ->
-        # TODO: should we call filter with the whole %FunctionNode{}, not just metadata?
-        #       also, should we save off metadata on the node?
-        filter.(metadata) && group
-      end)
+      specs =
+        module_data.specs
+        |> Map.get(actual_def, [])
+        |> Enum.map(&Code.Typespec.spec_to_quoted(name, &1))
 
-    doc_ast =
-      (doc_content && doc_ast(content_type, doc_content, file: source.path, line: doc_line + 1)) ||
-        callback_doc_ast(name, arity, impl) ||
-        delegate_doc_ast(metadata[:delegate_to])
+      specs =
+        if type == :macro do
+          Enum.map(specs, &remove_first_macro_arg/1)
+        else
+          specs
+        end
 
-    %ExDoc.FunctionNode{
-      id: "#{name}/#{arity}",
-      name: name,
-      arity: arity,
-      deprecated: metadata[:deprecated],
-      doc: doc_ast,
-      doc_line: doc_line,
-      defaults: Enum.sort_by(defaults, fn {name, arity} -> sort_key(name, arity) end),
-      signature: signature(signature),
-      specs: specs,
-      source_path: source.path,
-      source_url: source_link(source, line),
-      type: type,
-      group: group,
-      annotations: annotations
-    }
+      annotations =
+        case {type, name, arity} do
+          {:macro, _, _} -> ["macro" | annotations]
+          {_, :__struct__, 0} -> ["struct" | annotations]
+          _ -> annotations
+        end
+
+      group =
+        Enum.find_value(groups_for_functions, fn {group, filter} ->
+          # TODO: should we call filter with the whole %FunctionNode{}, not just metadata?
+          #       also, should we save off metadata on the node?
+          filter.(metadata) && group
+        end)
+
+      %ExDoc.FunctionNode{
+        id: "#{name}/#{arity}",
+        name: name,
+        arity: arity,
+        deprecated: metadata[:deprecated],
+        doc: doc_ast,
+        doc_line: doc_line,
+        defaults: Enum.sort_by(defaults, fn {name, arity} -> sort_key(name, arity) end),
+        signature: signature(signature),
+        specs: specs,
+        source_path: source.path,
+        source_url: source_link(source, line),
+        type: type,
+        group: group,
+        annotations: annotations
+      }
+    end
   end
 
   defp delegate_doc_ast({m, f, a}) do
@@ -328,21 +338,6 @@ defmodule ExDoc.Retriever do
   end
 
   defp delegate_doc_ast(nil) do
-    nil
-  end
-
-  defp callback_doc_ast(name, arity, {:ok, behaviour}) do
-    [
-      {:p, [],
-       [
-         "Callback implementation for ",
-         {:code, [class: "inline"], ["c:#{inspect(behaviour)}.#{name}/#{arity}"], %{}},
-         "."
-       ], %{}}
-    ]
-  end
-
-  defp callback_doc_ast(_, _, _) do
     nil
   end
 
@@ -362,6 +357,10 @@ defmodule ExDoc.Retriever do
         Enum.any?(docs, &match?(%{name: ^name, arity: ^arity}, &1))
       end)
     end)
+  end
+
+  defp filter_skipped(docs) do
+    Enum.reject(docs, &(&1 == :skip))
   end
 
   ## Callback helpers
