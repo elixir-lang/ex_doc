@@ -76,13 +76,11 @@ defmodule ExDoc.Autolink do
   end
 
   defp walk({:code, attrs, [code], meta} = ast, config) do
-    case url(code, :regular_link, config) do
-      nil ->
-        ast
-
-      url ->
-        code = remove_prefix(code)
-        {:a, [href: url], [{:code, attrs, [code], meta}], %{}}
+    if url = url(code, :regular_link, config) do
+      code = remove_prefix(code)
+      {:a, [href: url], [{:code, attrs, [code], meta}], %{}}
+    else
+      ast
     end
   end
 
