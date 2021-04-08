@@ -437,9 +437,22 @@ defmodule ExDoc.AutolinkTest do
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
 
-    assert warn(~m"[Bar A](`Bar.A`)", []) =~ "module \"Bar.A\" but it is undefined\n"
+    assert warn(fn ->
+             assert autolink(~m"[Bar A](`Bar.A`)") ==
+                      ["Bar A"]
+           end) =~ "module \"Bar.A\" but it is undefined\n"
 
     assert_unchanged(~m"`Bar.A`")
+
+    assert warn(fn ->
+             assert autolink(~m"[custom text](`Elixir.Unknown`)") ==
+                      ["custom text"]
+           end) =~ "documentation references module \"Elixir.Unknown\" but it is undefined\n"
+
+    assert warn(fn ->
+             assert autolink(~m"[It is Unknown](`Unknown`)") ==
+                      ["It is Unknown"]
+           end) =~ "documentation references module \"Unknown\" but it is undefined\n"
 
     assert warn(~m"[Foo task](`mix foo`)", []) =~
              "documentation references \"mix foo\" but it is undefined\n"
@@ -448,12 +461,6 @@ defmodule ExDoc.AutolinkTest do
 
     assert warn(~m"[bad](`String.upcase/9`)", extras: []) =~
              "documentation references \"String.upcase/9\" but it is undefined or private"
-
-    assert warn(~m"[custom text](`Elixir.Unknown`)", []) =~
-             "documentation references module \"Elixir.Unknown\" but it is undefined\n"
-
-    assert warn(~m"[Unknown](`Unknown`)") =~
-             "documentation references module \"Unknown\" but it is undefined"
 
     assert_unchanged(~m"`Unknown`")
 
