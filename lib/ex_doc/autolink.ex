@@ -91,9 +91,6 @@ defmodule ExDoc.Autolink do
   defp remove_link({:a, _attrs, inner, _meta}),
     do: inner
 
-  defp remove_link(ast),
-    do: ast
-
   @ref_regex ~r/^`(.+)`$/
 
   defp custom_link(attrs, config) do
