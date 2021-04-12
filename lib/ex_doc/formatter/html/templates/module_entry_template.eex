@@ -3,7 +3,7 @@
 
 <h1><%= module.title <> ".#{name}" %></h1>
 
-<div class="deprecated">
+<div class="deprecated" data-nosnippet>
   You're seeing just the <%= type %> <code><%= name %></code>, go back to <a href="<%= module.id %>.html"><%= module.title %></a> module for more information.
 </div>
 
