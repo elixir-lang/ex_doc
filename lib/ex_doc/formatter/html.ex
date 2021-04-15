@@ -496,7 +496,7 @@ defmodule ExDoc.Formatter.HTML do
       canonical_url =
         config.canonical
         |> String.trim_trailing("/")
-        |> Path.join(filename)
+        |> Kernel.<>("/" <> filename)
 
       Map.put(config, :canonical, canonical_url)
     else

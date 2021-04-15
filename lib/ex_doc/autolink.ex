@@ -560,8 +560,10 @@ defmodule ExDoc.Autolink do
         if app in config.apps do
           path <> ext <> suffix
         else
-          Keyword.get_lazy(config.deps, app, fn -> @hexdocs <> "#{app}/" end) <>
-            path <> ".html" <> suffix
+          config.deps
+          |> Keyword.get_lazy(app, fn -> @hexdocs <> "#{app}" end)
+          |> String.trim_trailing("/")
+          |> Kernel.<>("/" <> path <> ".html" <> suffix)
         end
 
       _ ->
