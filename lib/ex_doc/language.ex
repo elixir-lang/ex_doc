@@ -5,6 +5,8 @@ defmodule ExDoc.Language do
 
   @callback filter_prefix_pattern(String.t() | nil) :: String.t()
 
+  @callback module_data(module()) :: map()
+
   def get(:elixir), do: ExDoc.Language.Elixir
   def get(:erlang), do: ExDoc.Language.Erlang
 end

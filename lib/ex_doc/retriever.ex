@@ -58,18 +58,15 @@ defmodule ExDoc.Retriever do
   # with --docs flag), we raise an exception.
   defp get_module(module, config) do
     if docs_chunk = docs_chunk(module) do
-      generate_node(module, docs_chunk, config)
+      module_data = get_module_data(module, docs_chunk)
+
+      if not module_data.skip do
+        [generate_node(module, module_data, config)]
+      else
+        []
+      end
     else
       []
-    end
-  end
-
-  defp nesting_info(title, prefixes) do
-    prefixes
-    |> Enum.find(&String.starts_with?(title, &1 <> "."))
-    |> case do
-      nil -> {nil, nil}
-      prefix -> {String.trim_leading(title, prefix <> "."), prefix}
     end
   end
 
@@ -110,16 +107,7 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp generate_node(module, docs_chunk, config) do
-    module_data = get_module_data(module, docs_chunk)
-
-    case module_data do
-      %{type: :impl} -> []
-      _ -> [do_generate_node(module, module_data, config)]
-    end
-  end
-
-  defp do_generate_node(module, module_data, config) do
+  defp generate_node(module, module_data, config) do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
@@ -130,12 +118,13 @@ defmodule ExDoc.Retriever do
     {function_groups, function_docs} = get_docs(module_data, source, config)
     docs = function_docs ++ get_callbacks(module_data, source)
     types = get_types(module_data, source)
-    {title, id} = module_title_and_id(module_data)
-    {nested_title, nested_context} = nesting_info(title, config.nest_modules_by_prefix)
+
+    {nested_title, nested_context} =
+      nesting_info(module_data.title, config.nest_modules_by_prefix)
 
     node = %ExDoc.ModuleNode{
-      id: id,
-      title: title,
+      id: module_data.id,
+      title: module_data.title,
       nested_title: nested_title,
       nested_context: nested_context,
       module: module,
@@ -153,6 +142,15 @@ defmodule ExDoc.Retriever do
     put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
   end
 
+  defp nesting_info(title, prefixes) do
+    prefixes
+    |> Enum.find(&String.starts_with?(title, &1 <> "."))
+    |> case do
+      nil -> {nil, nil}
+      prefix -> {String.trim_leading(title, prefix <> "."), prefix}
+    end
+  end
+
   defp sort_key(name, arity) do
     first = name |> Atom.to_charlist() |> hd()
     {first in ?a..?z, name, arity}
@@ -167,38 +165,23 @@ defmodule ExDoc.Retriever do
   # Module Helpers
 
   defp get_module_data(module, docs_chunk) do
+    {:docs_v1, _, language, _, _, _, _} = docs_chunk
+    language = ExDoc.Language.get(language)
+    extra = language.module_data(module)
+
     %{
+      id: extra.id,
+      title: extra.title,
       name: module,
-      type: get_type(module),
+      language: language,
+      type: extra.type,
+      skip: extra.skip,
       specs: get_specs(module),
       impls: get_impls(module),
       callbacks: get_callbacks(module),
       abst_code: get_abstract_code(module),
       docs: docs_chunk
     }
-  end
-
-  defp get_type(module) do
-    cond do
-      function_exported?(module, :__struct__, 0) and
-          match?(%{__exception__: true}, module.__struct__) ->
-        :exception
-
-      function_exported?(module, :__protocol__, 1) ->
-        :protocol
-
-      function_exported?(module, :__impl__, 1) ->
-        :impl
-
-      function_exported?(module, :behaviour_info, 1) ->
-        :behaviour
-
-      match?("Elixir.Mix.Tasks." <> _, Atom.to_string(module)) ->
-        :task
-
-      true ->
-        :module
-    end
   end
 
   defp get_module_docs(module_data, source_path) do
@@ -613,29 +596,5 @@ defmodule ExDoc.Retriever do
     else
       source
     end
-  end
-
-  defp module_title_and_id(%{name: module, type: :task}) do
-    {"mix " <> task_name(module), module_id(module)}
-  end
-
-  defp module_title_and_id(%{name: module}) do
-    id = module_id(module)
-    {id, id}
-  end
-
-  defp module_id(module) do
-    case inspect(module) do
-      ":" <> inspected -> inspected
-      inspected -> inspected
-    end
-  end
-
-  defp task_name(module) do
-    "Elixir.Mix.Tasks." <> name = Atom.to_string(module)
-
-    name
-    |> String.split(".")
-    |> Enum.map_join(".", &Macro.underscore/1)
   end
 end
