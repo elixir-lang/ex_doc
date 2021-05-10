@@ -73,7 +73,9 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  # Special case required for Elixir
+  # TODO: see if we can do something about it after all?
+  # Special case required for Elixir - we don't know it's Elixir until we read
+  # the chunk so we can't have ExDoc.Language.Elixir specific behaviour.
   defp docs_chunk(:elixir_bootstrap), do: false
   defp docs_chunk(Elixir), do: false
 
