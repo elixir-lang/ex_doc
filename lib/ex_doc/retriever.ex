@@ -246,34 +246,14 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_function(doc_element, source, module_data, groups_for_functions) do
+    function_data = module_data.language.function_data(doc_element, module_data)
+
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
-    actual_def = actual_def(name, arity, type)
     doc_line = anno_line(anno)
-    annotations = annotations_from_metadata(metadata)
-
-    line = find_function_line(module_data, actual_def) || doc_line
-    impl = Map.fetch(module_data.impls, actual_def)
+    annotations = annotations_from_metadata(metadata) ++ function_data.extra_annotations
+    line = function_data.line_override || doc_line
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
-
-    specs =
-      module_data.specs
-      |> Map.get(actual_def, [])
-      |> Enum.map(&Code.Typespec.spec_to_quoted(name, &1))
-
-    specs =
-      if type == :macro do
-        Enum.map(specs, &remove_first_macro_arg/1)
-      else
-        specs
-      end
-
-    annotations =
-      case {type, name, arity} do
-        {:macro, _, _} -> ["macro" | annotations]
-        {_, :__struct__, 0} -> ["struct" | annotations]
-        _ -> annotations
-      end
 
     group =
       Enum.find_value(groups_for_functions, fn {group, filter} ->
@@ -284,8 +264,7 @@ defmodule ExDoc.Retriever do
 
     doc_ast =
       (doc_content && doc_ast(content_type, doc_content, file: source.path, line: doc_line + 1)) ||
-        callback_doc_ast(name, arity, impl) ||
-        delegate_doc_ast(metadata[:delegate_to])
+        (function_data.doc_fallback && function_data.doc_fallback.())
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -296,39 +275,13 @@ defmodule ExDoc.Retriever do
       doc_line: doc_line,
       defaults: Enum.sort_by(defaults, fn {name, arity} -> sort_key(name, arity) end),
       signature: signature(signature),
-      specs: specs,
+      specs: function_data.specs,
       source_path: source.path,
       source_url: source_link(source, line),
       type: type,
       group: group,
       annotations: annotations
     }
-  end
-
-  defp delegate_doc_ast({m, f, a}) do
-    [
-      {:p, [], ["See ", {:code, [class: "inline"], [Exception.format_mfa(m, f, a)], %{}}, "."],
-       %{}}
-    ]
-  end
-
-  defp delegate_doc_ast(nil) do
-    nil
-  end
-
-  defp callback_doc_ast(name, arity, {:ok, behaviour}) do
-    [
-      {:p, [],
-       [
-         "Callback implementation for ",
-         {:code, [class: "inline"], ["c:#{inspect(behaviour)}.#{name}/#{arity}"], %{}},
-         "."
-       ], %{}}
-    ]
-  end
-
-  defp callback_doc_ast(_, _, _) do
-    nil
   end
 
   defp get_defaults(_name, _arity, 0), do: []
@@ -556,24 +509,9 @@ defmodule ExDoc.Retriever do
     annotations
   end
 
-  defp remove_first_macro_arg({:"::", info, [{name, info2, [_term_arg | rest_args]}, return]}) do
-    {:"::", info, [{name, info2, rest_args}, return]}
-  end
-
-  defp remove_first_macro_arg({:when, meta, [lhs, rhs]}) do
-    {:when, meta, [remove_first_macro_arg(lhs), rhs]}
-  end
-
   defp find_module_line(%{abst_code: abst_code, name: name}) do
     Enum.find_value(abst_code, fn
       {:attribute, anno, :module, ^name} -> anno_line(anno)
-      _ -> nil
-    end)
-  end
-
-  defp find_function_line(%{abst_code: abst_code}, {name, arity}) do
-    Enum.find_value(abst_code, fn
-      {:function, anno, ^name, ^arity, _} -> anno_line(anno)
       _ -> nil
     end)
   end
