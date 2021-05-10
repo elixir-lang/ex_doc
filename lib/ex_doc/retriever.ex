@@ -15,7 +15,7 @@ defmodule ExDoc.Retriever do
   """
   @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
   def docs_from_dir(dir, config) when is_binary(dir) do
-    pattern = if config.filter_prefix, do: "Elixir.#{config.filter_prefix}*.beam", else: "*.beam"
+    pattern = config.proglang.filter_prefix_pattern(config.filter_prefix)
     files = Path.wildcard(Path.expand(pattern, dir))
     docs_from_files(files, config)
   end
