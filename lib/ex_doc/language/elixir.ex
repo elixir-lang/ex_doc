@@ -74,6 +74,17 @@ defmodule ExDoc.Language.Elixir do
     }
   end
 
+  @impl true
+  def type_data(entry, spec, _module_data) do
+    {{_kind, _name, arity}, _anno, _signature, _doc, _metadata} = entry
+
+    %{
+      signature_fallback: fn ->
+        get_typespec_signature(spec, arity)
+      end
+    }
+  end
+
   ## Helpers
 
   defp module_type_and_skip(module) do
@@ -199,6 +210,10 @@ defmodule ExDoc.Language.Elixir do
 
   defp to_var({:%, meta, [name, _]}, _), do: {:%, meta, [name, {:%{}, meta, []}]}
   defp to_var({name, meta, _}, _) when is_atom(name), do: {name, meta, nil}
+
+  defp to_var({{:., meta, [_module, name]}, _, _args}, _) when is_atom(name),
+    do: {name, meta, nil}
+
   defp to_var([{:->, _, _} | _], _), do: {:function, [], nil}
   defp to_var({:<<>>, _, _}, _), do: {:binary, [], nil}
   defp to_var({:%{}, _, _}, _), do: {:map, [], nil}

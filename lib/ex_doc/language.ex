@@ -11,6 +11,8 @@ defmodule ExDoc.Language do
 
   @callback callback_data(entry :: tuple(), module_data :: map()) :: map()
 
+  @callback type_data(entry :: tuple(), spec :: term(), module_data :: map()) :: map()
+
   def get(:elixir), do: ExDoc.Language.Elixir
   def get(:erlang), do: ExDoc.Language.Erlang
 end

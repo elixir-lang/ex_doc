@@ -407,9 +407,9 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp get_type(type, source, module_data) do
+  defp get_type(type_entry, source, module_data) do
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
-    {{_, name, arity}, anno, signature, doc, metadata} = type
+    {{_, name, arity}, anno, signature, doc, metadata} = type_entry
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
 
@@ -424,7 +424,10 @@ defmodule ExDoc.Retriever do
 
     spec = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(type)
     line = anno_line(anno)
-    signature = signature(signature) || get_typespec_signature(spec, arity)
+    type_data = module_data.language.type_data(type_entry, spec, module_data)
+
+    signature =
+      signature(signature) || (type_data.signature_fallback && type_data.signature_fallback.())
 
     annotations = if type == :opaque, do: ["opaque" | annotations], else: annotations
     doc_ast = doc_ast(content_type, doc, file: source.path)
@@ -448,46 +451,6 @@ defmodule ExDoc.Retriever do
   # Cut off the body of an opaque type while leaving it on a normal type.
   defp process_type_ast({:"::", _, [d | _]}, :opaque), do: d
   defp process_type_ast(ast, _), do: ast
-
-  defp get_typespec_signature({:when, _, [{:"::", _, [{name, meta, args}, _]}, _]}, arity) do
-    Macro.to_string({name, meta, strip_types(args, arity)})
-  end
-
-  defp get_typespec_signature({:"::", _, [{name, meta, args}, _]}, arity) do
-    Macro.to_string({name, meta, strip_types(args, arity)})
-  end
-
-  defp get_typespec_signature({name, meta, args}, arity) do
-    Macro.to_string({name, meta, strip_types(args, arity)})
-  end
-
-  defp strip_types(args, arity) do
-    args
-    |> Enum.take(-arity)
-    |> Enum.with_index(1)
-    |> Enum.map(fn
-      {{:"::", _, [left, _]}, position} -> to_var(left, position)
-      {{:|, _, _}, position} -> to_var({}, position)
-      {left, position} -> to_var(left, position)
-    end)
-  end
-
-  defp to_var({:%, meta, [name, _]}, _), do: {:%, meta, [name, {:%{}, meta, []}]}
-  defp to_var({name, meta, _}, _) when is_atom(name), do: {name, meta, nil}
-
-  defp to_var({{:., meta, [_module, name]}, _, _args}, _) when is_atom(name),
-    do: {name, meta, nil}
-
-  defp to_var([{:->, _, _} | _], _), do: {:function, [], nil}
-  defp to_var({:<<>>, _, _}, _), do: {:binary, [], nil}
-  defp to_var({:%{}, _, _}, _), do: {:map, [], nil}
-  defp to_var({:{}, _, _}, _), do: {:tuple, [], nil}
-  defp to_var({_, _}, _), do: {:tuple, [], nil}
-  defp to_var(integer, _) when is_integer(integer), do: {:integer, [], nil}
-  defp to_var(float, _) when is_integer(float), do: {:float, [], nil}
-  defp to_var(list, _) when is_list(list), do: {:list, [], nil}
-  defp to_var(atom, _) when is_atom(atom), do: {:atom, [], nil}
-  defp to_var(_, position), do: {:"arg#{position}", [], nil}
 
   ## General helpers
 

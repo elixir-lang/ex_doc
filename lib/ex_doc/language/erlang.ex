@@ -46,6 +46,13 @@ defmodule ExDoc.Language.Erlang do
     }
   end
 
+  @impl true
+  def type_data(_entry, _spec, _module_data) do
+    %{
+      signature_fallback: nil
+    }
+  end
+
   ## Helpers
 
   defp module_type(module) do
