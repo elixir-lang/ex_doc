@@ -11,7 +11,7 @@ defmodule ExDoc.Formatter.EPUB.Assets do
     end)
   end
 
-  def dist(proglang), do: dist_js() ++ dist_css(proglang)
+  def dist(proglang), do: dist_js() ++ dist_css(proglang.id())
 
   defp dist_js(), do: embed_pattern("dist/*.js")
   defp dist_css(:elixir), do: embed_pattern("dist/elixir-*.css")
