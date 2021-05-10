@@ -23,7 +23,8 @@ defmodule ExDoc.Language.Elixir do
       id: inspect(module),
       title: module_title(module, type),
       type: type,
-      skip: skip
+      skip: skip,
+      extra_callback_types: [:macrocallback]
     }
   end
 
@@ -50,6 +51,26 @@ defmodule ExDoc.Language.Elixir do
           delegate_doc_ast(metadata[:delegate_to])
       end,
       line_override: find_function_line(module_data, actual_def)
+    }
+  end
+
+  @impl true
+  def callback_data(entry, module_data) do
+    {{kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
+    actual_def = actual_def(name, arity, kind)
+
+    %{
+      actual_def: actual_def,
+      signature_fallback: fn ->
+        case Map.fetch(module_data.callbacks, actual_def) do
+          {:ok, specs} ->
+            specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
+            get_typespec_signature(hd(specs), arity)
+
+          :error ->
+            nil
+        end
+      end
     }
   end
 
@@ -152,4 +173,40 @@ defmodule ExDoc.Language.Elixir do
 
   defp anno_line(line) when is_integer(line), do: abs(line)
   defp anno_line(anno), do: anno |> :erl_anno.line() |> abs()
+
+  defp get_typespec_signature({:when, _, [{:"::", _, [{name, meta, args}, _]}, _]}, arity) do
+    Macro.to_string({name, meta, strip_types(args, arity)})
+  end
+
+  defp get_typespec_signature({:"::", _, [{name, meta, args}, _]}, arity) do
+    Macro.to_string({name, meta, strip_types(args, arity)})
+  end
+
+  defp get_typespec_signature({name, meta, args}, arity) do
+    Macro.to_string({name, meta, strip_types(args, arity)})
+  end
+
+  defp strip_types(args, arity) do
+    args
+    |> Enum.take(-arity)
+    |> Enum.with_index(1)
+    |> Enum.map(fn
+      {{:"::", _, [left, _]}, position} -> to_var(left, position)
+      {{:|, _, _}, position} -> to_var({}, position)
+      {left, position} -> to_var(left, position)
+    end)
+  end
+
+  defp to_var({:%, meta, [name, _]}, _), do: {:%, meta, [name, {:%{}, meta, []}]}
+  defp to_var({name, meta, _}, _) when is_atom(name), do: {name, meta, nil}
+  defp to_var([{:->, _, _} | _], _), do: {:function, [], nil}
+  defp to_var({:<<>>, _, _}, _), do: {:binary, [], nil}
+  defp to_var({:%{}, _, _}, _), do: {:map, [], nil}
+  defp to_var({:{}, _, _}, _), do: {:tuple, [], nil}
+  defp to_var({_, _}, _), do: {:tuple, [], nil}
+  defp to_var(integer, _) when is_integer(integer), do: {:integer, [], nil}
+  defp to_var(float, _) when is_integer(float), do: {:float, [], nil}
+  defp to_var(list, _) when is_list(list), do: {:list, [], nil}
+  defp to_var(atom, _) when is_atom(atom), do: {:atom, [], nil}
+  defp to_var(_, position), do: {:"arg#{position}", [], nil}
 end

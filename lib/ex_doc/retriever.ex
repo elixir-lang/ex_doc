@@ -180,7 +180,8 @@ defmodule ExDoc.Retriever do
       impls: get_impls(module),
       callbacks: get_callbacks(module),
       abst_code: get_abstract_code(module),
-      docs: docs_chunk
+      docs: docs_chunk,
+      callback_types: [:callback] ++ extra.extra_callback_types
     }
   end
 
@@ -218,11 +219,13 @@ defmodule ExDoc.Retriever do
     {Enum.map(groups_for_functions, &elem(&1, 0)), filter_defaults(function_doc_elements)}
   end
 
+  # TODO: Elixir specific
   # We are only interested in functions and macros for now
   defp doc?({{kind, _, _}, _, _, _, _}, _) when kind not in [:function, :macro] do
     false
   end
 
+  # TODO: Elixir specific
   # Skip impl_for and impl_for! for protocols
   defp doc?({{_, name, _}, _, _, _, _}, :protocol) when name in [:impl_for, :impl_for!] do
     false
@@ -308,7 +311,7 @@ defmodule ExDoc.Retriever do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
     optional_callbacks = module_data.name.behaviour_info(:optional_callbacks)
 
-    for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in [:callback, :macrocallback] do
+    for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in module_data.callback_types do
       get_callback(doc, source, optional_callbacks, module_data)
     end
   end
@@ -316,9 +319,11 @@ defmodule ExDoc.Retriever do
   defp get_callbacks(_, _), do: []
 
   defp get_callback(callback, source, optional_callbacks, module_data) do
+    callback_data = module_data.language.callback_data(callback, module_data)
+
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{kind, name, arity}, anno, signature, doc, metadata} = callback
-    actual_def = actual_def(name, arity, kind)
+    actual_def = callback_data.actual_def
     doc_line = anno_line(anno)
     signature = signature(signature)
 
@@ -329,7 +334,10 @@ defmodule ExDoc.Retriever do
           line = anno_line(anno)
 
           specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
-          signature = signature || get_typespec_signature(hd(specs), arity)
+
+          signature =
+            signature || (callback_data.signature_fallback && callback_data.signature_fallback.())
+
           {specs, line, signature}
 
         :error ->
@@ -485,16 +493,6 @@ defmodule ExDoc.Retriever do
 
   defp signature([]), do: nil
   defp signature(list) when is_list(list), do: Enum.join(list, " ")
-
-  defp actual_def(name, arity, :macrocallback) do
-    {String.to_atom("MACRO-" <> to_string(name)), arity + 1}
-  end
-
-  defp actual_def(name, arity, :macro) do
-    {String.to_atom("MACRO-" <> to_string(name)), arity + 1}
-  end
-
-  defp actual_def(name, arity, _), do: {name, arity}
 
   defp annotations_from_metadata(metadata) do
     annotations = []

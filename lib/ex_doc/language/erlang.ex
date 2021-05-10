@@ -19,7 +19,8 @@ defmodule ExDoc.Language.Erlang do
       id: id,
       title: id,
       type: module_type(module),
-      skip: false
+      skip: false,
+      extra_callback_types: []
     }
   end
 
@@ -32,6 +33,16 @@ defmodule ExDoc.Language.Erlang do
       specs: specs(name, arity, module_data),
       doc_fallback: nil,
       line_override: nil
+    }
+  end
+
+  @impl true
+  def callback_data(entry, _module_data) do
+    {{_kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
+
+    %{
+      actual_def: {name, arity},
+      signature_fallback: nil
     }
   end
 
