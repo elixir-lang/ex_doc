@@ -1,6 +1,6 @@
 defmodule ExDoc.RetrieverTest do
   use ExUnit.Case, async: true
-  alias ExDoc.{Retriever, DocAST}
+  alias ExDoc.{Retriever, DocAST, Language.Erlang}
   import TestHelper
 
   setup :create_tmp_dir
@@ -351,12 +351,16 @@ defmodule ExDoc.RetrieverTest do
       %% @doc
       %% mod docs.
       -module(mod).
-      -export([function/0]).
+      -export([function1/0, function2/0]).
 
       %% @doc
-      %% function/0 docs.
-      -spec function() -> atom().
-      function() -> ok.
+      %% function1/0 docs.
+      -spec function1() -> atom().
+      function1() -> ok.
+
+      %% @doc
+      %% function2/0 docs.
+      function2() -> ok.
       """)
 
       edoc_to_chunk(:mod)
@@ -366,7 +370,7 @@ defmodule ExDoc.RetrieverTest do
       %ExDoc.ModuleNode{
         deprecated: nil,
         doc_line: _,
-        docs: [function],
+        docs: [function1, function2],
         function_groups: ["Functions"],
         group: nil,
         id: "mod",
@@ -390,23 +394,29 @@ defmodule ExDoc.RetrieverTest do
         deprecated: nil,
         doc_line: _,
         group: "Functions",
-        id: "function/0",
-        name: :function,
+        id: "function1/0",
+        name: :function1,
         rendered_doc: nil,
-        # TODO: assert when edoc is fixed
-        signature: _,
+        signature: "function1()",
         source_path: _,
         source_url: nil,
         specs: _,
         type: :function
-      } = function
+      } = function1
 
-      assert DocAST.to_string(function.doc) =~ "function/0 docs."
-      assert Macro.to_string(function.specs) == "[function() :: atom()]"
+      assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
+      assert Erlang.typespec(hd(function1.specs), []) == "function1() -> atom()."
+
+      %ExDoc.FunctionNode{
+        id: "function2/0"
+      } = function2
+
+      assert DocAST.to_string(function2.doc) =~ "function2/0 docs."
+      assert function2.specs == []
     end
 
     @tag :otp24
-    test "Erlang callbacks", c do
+    test "callbacks", c do
       erlc(c, :mod, ~S"""
       -module(mod).
 
@@ -425,11 +435,11 @@ defmodule ExDoc.RetrieverTest do
       assert Path.basename(callback1.source_url) == "mod.erl:3"
       # this is an edoc bug, it should be 4
       assert callback1.doc_line == 3
-      assert Macro.to_string(callback1.specs) == "[callback1() :: atom()]"
+      assert Erlang.typespec(hd(callback1.specs), []) == "callback1() -> atom()."
     end
 
     @tag :otp24
-    test "Erlang types", c do
+    test "types", c do
       erlc(c, :mod, ~S"""
       -module(mod).
       -export_type([type1/0, opaque1/0]).
@@ -450,13 +460,13 @@ defmodule ExDoc.RetrieverTest do
       assert opaque1.type == :opaque
       assert opaque1.signature == "opaque1/0"
       assert DocAST.to_string(opaque1.doc) == "opaque1/0 docs."
-      assert Macro.to_string(opaque1.spec) == "opaque1()"
+      assert Erlang.typespec(opaque1.spec, []) == "opaque1() :: atom()."
 
       assert type1.id == "type1/0"
       assert type1.type == :type
       assert type1.signature == "type1/0"
       assert DocAST.to_string(type1.doc) == "type1/0 docs."
-      assert Macro.to_string(type1.spec) == "type1() :: atom()"
+      assert Erlang.typespec(type1.spec, []) == "type1() :: atom()."
     end
 
     test "module with no chunk", c do

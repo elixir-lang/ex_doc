@@ -28,29 +28,76 @@ defmodule ExDoc.Language.Erlang do
   def function_data(entry, module_data) do
     {{_kind, name, arity}, _anno, _signature, _doc_content, _metadata} = entry
 
+    specs =
+      case Map.fetch(module_data.specs, {name, arity}) do
+        {:ok, specs} ->
+          [{:attribute, 0, :spec, {{name, arity}, specs}}]
+
+        :error ->
+          []
+      end
+
     %{
       extra_annotations: [],
-      specs: specs(name, arity, module_data),
+      specs: specs,
       doc_fallback: nil,
       line_override: nil
     }
   end
 
   @impl true
-  def callback_data(entry, _module_data) do
+  def callback_data(entry, module_data) do
     {{_kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
+
+    specs =
+      case Map.fetch(module_data.callbacks, {name, arity}) do
+        {:ok, specs} ->
+          [{:attribute, 0, :callback, {{name, arity}, specs}}]
+
+        :error ->
+          []
+      end
 
     %{
       actual_def: {name, arity},
+      specs: specs,
+      signature_fallback: nil,
+      line: nil
+    }
+  end
+
+  @impl true
+  def type_data(_entry, spec, _module_data) do
+    %{
+      spec: {:attribute, 0, :type, spec},
       signature_fallback: nil
     }
   end
 
   @impl true
-  def type_data(_entry, _spec, _module_data) do
-    %{
-      signature_fallback: nil
-    }
+  def typespec(nil, _opts) do
+    nil
+  end
+
+  def typespec(attribute, _opts) do
+    {:attribute, _, type, _} = attribute
+
+    # `-type ` => 6
+    offset = byte_size(Atom.to_string(type)) + 2
+
+    options = [linewidth: 98 + offset]
+    :erl_pp.attribute(attribute, options) |> IO.iodata_to_binary() |> trim_offset(offset)
+  end
+
+  # `-type t() :: atom()` becomes `t() :: atom().`
+  defp trim_offset(binary, offset) do
+    binary
+    |> String.trim()
+    |> String.split("\n")
+    |> Enum.map(fn line ->
+      binary_part(line, offset, byte_size(line) - offset)
+    end)
+    |> Enum.join("\n")
   end
 
   ## Helpers
@@ -63,11 +110,5 @@ defmodule ExDoc.Language.Erlang do
       true ->
         :module
     end
-  end
-
-  defp specs(name, arity, module_data) do
-    module_data.specs
-    |> Map.get({name, arity}, [])
-    |> Enum.map(&Code.Typespec.spec_to_quoted(name, &1))
   end
 end

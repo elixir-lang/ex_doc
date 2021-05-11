@@ -3,6 +3,8 @@ defmodule ExDoc.Language.Elixir do
 
   @behaviour ExDoc.Language
 
+  alias ExDoc.Autolink
+
   @impl true
   def id(), do: :elixir
 
@@ -59,30 +61,53 @@ defmodule ExDoc.Language.Elixir do
     {{kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
     actual_def = actual_def(name, arity, kind)
 
+    specs =
+      case Map.fetch(module_data.callbacks, actual_def) do
+        {:ok, specs} ->
+          specs
+
+        :error ->
+          []
+      end
+
+    line =
+      if specs != [] do
+        {:type, anno, _, _} = hd(specs)
+        anno_line(anno)
+      end
+
+    specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
+
     %{
       actual_def: actual_def,
+      specs: specs,
       signature_fallback: fn ->
-        case Map.fetch(module_data.callbacks, actual_def) do
-          {:ok, specs} ->
-            specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
-            get_typespec_signature(hd(specs), arity)
-
-          :error ->
-            nil
+        if specs != [] do
+          get_typespec_signature(hd(specs), arity)
+        else
+          nil
         end
-      end
+      end,
+      line: line
     }
   end
 
   @impl true
   def type_data(entry, spec, _module_data) do
-    {{_kind, _name, arity}, _anno, _signature, _doc, _metadata} = entry
+    {{kind, _name, arity}, _anno, _signature, _doc, _metadata} = entry
+    spec = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(kind)
 
     %{
+      spec: spec,
       signature_fallback: fn ->
         get_typespec_signature(spec, arity)
       end
     }
+  end
+
+  @impl true
+  def typespec(spec, opts) do
+    Autolink.typespec(spec, opts)
   end
 
   ## Helpers
@@ -224,4 +249,8 @@ defmodule ExDoc.Language.Elixir do
   defp to_var(list, _) when is_list(list), do: {:list, [], nil}
   defp to_var(atom, _) when is_atom(atom), do: {:atom, [], nil}
   defp to_var(_, position), do: {:"arg#{position}", [], nil}
+
+  # Cut off the body of an opaque type while leaving it on a normal type.
+  defp process_type_ast({:"::", _, [d | _]}, :opaque), do: d
+  defp process_type_ast(ast, _), do: ast
 end

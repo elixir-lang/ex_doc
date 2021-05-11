@@ -326,26 +326,16 @@ defmodule ExDoc.Retriever do
     actual_def = callback_data.actual_def
     doc_line = anno_line(anno)
     signature = signature(signature)
+    specs = callback_data.specs
 
-    {specs, line, signature} =
-      case Map.fetch(module_data.callbacks, actual_def) do
-        {:ok, specs} ->
-          {:type, anno, _, _} = hd(specs)
-          line = anno_line(anno)
-
-          specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
-
-          signature =
-            signature || (callback_data.signature_fallback && callback_data.signature_fallback.())
-
-          {specs, line, signature}
-
-        :error ->
-          {[], doc_line, signature || "#{name}/#{arity}"}
-      end
+    signature =
+      signature ||
+        (callback_data.signature_fallback && callback_data.signature_fallback.()) ||
+        "#{name}/#{arity}"
 
     annotations = annotations_from_metadata(metadata)
 
+    # TODO: actual_def is Elixir specific, but remember optional_callbacks are generic.
     annotations =
       if actual_def in optional_callbacks, do: ["optional" | annotations], else: annotations
 
@@ -361,7 +351,7 @@ defmodule ExDoc.Retriever do
       signature: signature,
       specs: specs,
       source_path: source.path,
-      source_url: source_link(source, line),
+      source_url: source_link(source, callback_data.line || doc_line),
       type: kind,
       annotations: annotations
     }
@@ -422,9 +412,9 @@ defmodule ExDoc.Retriever do
           false
       end)
 
-    spec = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(type)
     line = anno_line(anno)
     type_data = module_data.language.type_data(type_entry, spec, module_data)
+    spec = type_data.spec
 
     signature =
       signature(signature) || (type_data.signature_fallback && type_data.signature_fallback.())
@@ -447,10 +437,6 @@ defmodule ExDoc.Retriever do
       annotations: annotations
     }
   end
-
-  # Cut off the body of an opaque type while leaving it on a normal type.
-  defp process_type_ast({:"::", _, [d | _]}, :opaque), do: d
-  defp process_type_ast(ast, _), do: ast
 
   ## General helpers
 
