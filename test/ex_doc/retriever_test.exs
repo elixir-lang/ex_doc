@@ -397,7 +397,7 @@ defmodule ExDoc.RetrieverTest do
         id: "function1/0",
         name: :function1,
         rendered_doc: nil,
-        signature: "function1()",
+        signature: _,
         source_path: _,
         source_url: nil,
         specs: _,
