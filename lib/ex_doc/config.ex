@@ -69,7 +69,7 @@ defmodule ExDoc.Config do
           groups_for_functions: keyword((keyword() -> boolean)),
           output: nil | Path.t(),
           project: nil | String.t(),
-          retriever: :atom,
+          retriever: atom(),
           source_beam: nil | String.t(),
           source_ref: nil | String.t(),
           source_root: nil | String.t(),

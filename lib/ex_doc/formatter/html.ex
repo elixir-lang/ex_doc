@@ -118,7 +118,7 @@ defmodule ExDoc.Formatter.HTML do
     doc
     |> Autolink.doc(autolink_opts)
     |> ExDoc.DocAST.to_string()
-    |> ExDoc.Highlighter.highlight_code_blocks(opts)
+    |> ExDoc.DocAST.highlight(opts)
   end
 
   defp output_setup(build, config) do

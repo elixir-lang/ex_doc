@@ -18,6 +18,11 @@ defmodule ExDoc.Markdown do
   """
   @callback to_ast(String.t(), Keyword.t()) :: term()
 
+  @doc """
+  Returns true if all dependencies necessary are available.
+  """
+  @callback available?() :: boolean()
+
   @markdown_processors [
     ExDoc.Markdown.Earmark
   ]
