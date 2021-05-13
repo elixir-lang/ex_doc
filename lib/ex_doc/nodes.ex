@@ -18,7 +18,8 @@ defmodule ExDoc.ModuleNode do
             typespecs: [],
             source_path: nil,
             source_url: nil,
-            type: nil
+            type: nil,
+            proglang: nil
 
   @type t :: %__MODULE__{
           id: nil | String.t(),
@@ -36,7 +37,8 @@ defmodule ExDoc.ModuleNode do
           typespecs: list(),
           source_path: nil | String.t(),
           source_url: nil | String.t(),
-          type: nil | :module | :exception | :protocol | :impl | :behaviour | :task
+          type: nil | :module | :exception | :protocol | :impl | :behaviour | :task,
+          proglang: module()
         }
 end
 

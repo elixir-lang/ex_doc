@@ -136,7 +136,8 @@ defmodule ExDoc.Retriever do
       doc_line: doc_line,
       typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
       source_path: source_path,
-      source_url: source_link(source, line)
+      source_url: source_link(source, line),
+      proglang: module_data.language
     }
 
     put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
@@ -156,11 +157,13 @@ defmodule ExDoc.Retriever do
     {first in ?a..?z, name, arity}
   end
 
-  defp doc_ast(format, %{"en" => doc_content}, options),
-    do: DocAST.parse!(doc_content, format, options)
+  defp doc_ast(format, %{"en" => doc_content}, options) do
+    DocAST.parse!(doc_content, format, options)
+  end
 
-  defp doc_ast(_, _, _options),
-    do: nil
+  defp doc_ast(_, _, _options) do
+    nil
+  end
 
   # Module Helpers
 
