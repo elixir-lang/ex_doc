@@ -15,8 +15,7 @@ defmodule ExDoc.Retriever do
   """
   @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
   def docs_from_dir(dir, config) when is_binary(dir) do
-    pattern = config.proglang.filter_prefix_pattern(config.filter_prefix)
-    files = Path.wildcard(Path.expand(pattern, dir))
+    files = Path.wildcard(Path.expand("*.beam", dir))
     docs_from_files(files, config)
   end
 
@@ -58,7 +57,10 @@ defmodule ExDoc.Retriever do
   # with --docs flag), we raise an exception.
   defp get_module(module, config) do
     if docs_chunk = docs_chunk(module) do
-      module_data = get_module_data(module, docs_chunk)
+      module_data =
+        module
+        |> get_module_data(docs_chunk)
+        |> maybe_skip(config.filter_prefix)
 
       if not module_data.skip do
         [generate_node(module, module_data, config)]
@@ -67,6 +69,14 @@ defmodule ExDoc.Retriever do
       end
     else
       []
+    end
+  end
+
+  defp maybe_skip(module_data, filter_prefix) do
+    if filter_prefix && not String.starts_with?(module_data.id, filter_prefix) do
+      %{module_data | skip: true}
+    else
+      module_data
     end
   end
 

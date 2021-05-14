@@ -3,8 +3,6 @@ defmodule ExDoc.Language do
 
   @callback id() :: atom()
 
-  @callback filter_prefix_pattern(String.t() | nil) :: String.t()
-
   @callback module_data(module()) :: map()
 
   @callback function_data(entry :: tuple(), module_data :: map()) :: map()

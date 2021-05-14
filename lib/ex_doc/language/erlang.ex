@@ -7,11 +7,6 @@ defmodule ExDoc.Language.Erlang do
   def id(), do: :erlang
 
   @impl true
-  def filter_prefix_pattern(filter_prefix) do
-    "#{filter_prefix}*.beam"
-  end
-
-  @impl true
   def module_data(module) do
     ":" <> id = inspect(module)
 
