@@ -32,15 +32,15 @@ defmodule ExDoc.Language.Elixir do
     actual_def = actual_def(name, arity, kind)
 
     %{
-      extra_annotations: extra_annotations,
-      specs: specs(kind, name, actual_def, module_data),
       doc_fallback: fn ->
         impl = Map.fetch(module_data.impls, actual_def)
 
         callback_doc_ast(name, arity, impl) ||
           delegate_doc_ast(metadata[:delegate_to])
       end,
-      line_override: find_function_line(module_data, actual_def)
+      extra_annotations: extra_annotations,
+      line_override: find_function_line(module_data, actual_def),
+      specs: specs(kind, name, actual_def, module_data)
     }
   end
 
@@ -68,7 +68,7 @@ defmodule ExDoc.Language.Elixir do
 
     %{
       actual_def: actual_def,
-      specs: specs,
+      line: line,
       signature_fallback: fn ->
         if specs != [] do
           get_typespec_signature(hd(specs), arity)
@@ -76,7 +76,7 @@ defmodule ExDoc.Language.Elixir do
           nil
         end
       end,
-      line: line
+      specs: specs
     }
   end
 

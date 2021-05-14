@@ -342,7 +342,7 @@ defmodule ExDoc.Retriever do
 
     annotations = annotations_from_metadata(metadata)
 
-    # TODO: actual_def is Elixir specific, but remember optional_callbacks are generic.
+    # actual_def is Elixir specific, but remember optional_callbacks are generic.
     annotations =
       if actual_def in optional_callbacks, do: ["optional" | annotations], else: annotations
 

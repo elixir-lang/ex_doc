@@ -30,10 +30,10 @@ defmodule ExDoc.Language.Erlang do
       end
 
     %{
-      extra_annotations: [],
-      specs: specs,
       doc_fallback: nil,
-      line_override: nil
+      extra_annotations: [],
+      line_override: nil,
+      specs: specs
     }
   end
 
@@ -52,9 +52,9 @@ defmodule ExDoc.Language.Erlang do
 
     %{
       actual_def: {name, arity},
-      specs: specs,
+      line: nil,
       signature_fallback: nil,
-      line: nil
+      specs: specs
     }
   end
 
