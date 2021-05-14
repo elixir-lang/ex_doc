@@ -19,7 +19,7 @@ defmodule ExDoc.ModuleNode do
             source_path: nil,
             source_url: nil,
             type: nil,
-            proglang: nil
+            language: nil
 
   @type t :: %__MODULE__{
           id: nil | String.t(),
@@ -38,7 +38,7 @@ defmodule ExDoc.ModuleNode do
           source_path: nil | String.t(),
           source_url: nil | String.t(),
           type: nil | :module | :exception | :protocol | :impl | :behaviour | :task,
-          proglang: module()
+          language: module()
         }
 end
 

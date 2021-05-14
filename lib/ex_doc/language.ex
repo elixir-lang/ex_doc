@@ -1,8 +1,6 @@
 defmodule ExDoc.Language do
   @moduledoc false
 
-  @callback id() :: atom()
-
   @callback module_data(module()) :: map()
 
   @callback function_data(entry :: tuple(), module_data :: map()) :: map()

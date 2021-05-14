@@ -8,7 +8,7 @@ defmodule ExDoc.Formatter.HTML.Assets do
     |> Enum.map(&{Path.basename(&1), File.read!(&1)})
   end
 
-  def dist(proglang), do: dist_js() ++ dist_css(proglang.id())
+  def dist(proglang), do: dist_js() ++ dist_css(proglang)
 
   defp dist_js(), do: embed_pattern("dist/*.js")
   defp dist_css(:elixir), do: embed_pattern("dist/elixir-*.css")

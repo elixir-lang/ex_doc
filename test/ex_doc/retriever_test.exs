@@ -279,10 +279,6 @@ defmodule ExDoc.RetrieverTest do
       refute mod.group
     end
 
-    test "Elixir special modules" do
-      assert Retriever.docs_from_modules([:elixir_bootstrap, Elixir], %ExDoc.Config{}) == []
-    end
-
     test "overlapping defaults", c do
       elixirc(c, ~S"""
       defmodule Mod do

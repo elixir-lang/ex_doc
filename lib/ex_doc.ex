@@ -46,7 +46,7 @@ defmodule ExDoc do
       main: options[:main],
       output: normalize_output(output),
       homepage_url: options[:homepage_url],
-      proglang: ExDoc.Language.get(proglang),
+      proglang: proglang,
       source_root: options[:source_root] || File.cwd!(),
       source_url_pattern: source_url_pattern,
       nest_modules_by_prefix: normalize_nest_modules_by_prefix(nest_modules_by_prefix),

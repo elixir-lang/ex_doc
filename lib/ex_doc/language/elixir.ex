@@ -6,9 +6,6 @@ defmodule ExDoc.Language.Elixir do
   alias ExDoc.Autolink
 
   @impl true
-  def id(), do: :elixir
-
-  @impl true
   def module_data(module) do
     {type, skip} = module_type_and_skip(module)
 

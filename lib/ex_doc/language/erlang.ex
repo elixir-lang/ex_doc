@@ -4,9 +4,6 @@ defmodule ExDoc.Language.Erlang do
   @behaviour ExDoc.Language
 
   @impl true
-  def id(), do: :erlang
-
-  @impl true
   def module_data(module) do
     ":" <> id = inspect(module)
 
