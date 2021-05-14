@@ -5,9 +5,7 @@ defmodule ExDoc.Markdown.Earmark do
 
   @behaviour ExDoc.Markdown
 
-  @doc """
-  Check if the EarmarkParser Markdown parser module is available.
-  """
+  @impl true
   def available? do
     match?({:ok, _}, Application.ensure_all_started(:earmark_parser)) and
       Code.ensure_loaded?(EarmarkParser)
