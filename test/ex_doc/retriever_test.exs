@@ -250,6 +250,19 @@ defmodule ExDoc.RetrieverTest do
       assert upcase.doc == ExDoc.Markdown.to_ast("See `String.upcase/1`.")
     end
 
+    test "signatures", c do
+      elixirc(c, ~S"""
+      defmodule Signatures do
+        @callback remote(GenServer.options()) :: :ok
+      end
+      """)
+
+      [mod] = Retriever.docs_from_modules([Signatures], %ExDoc.Config{})
+      [remote] = mod.docs
+
+      assert remote.signature == "remote(options)"
+    end
+
     test "Mix tasks", c do
       elixirc(c, ~S"""
       defmodule Mix.Tasks.MyTask do
