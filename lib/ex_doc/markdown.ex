@@ -58,6 +58,7 @@ defmodule ExDoc.Markdown do
   def put_markdown_processor(processor) when is_atom(processor) do
     put_markdown_processor({processor, []})
   end
+
   def put_markdown_processor({processor, options}) do
     Application.put_env(:ex_doc, @markdown_processor_key, {processor, options})
   end

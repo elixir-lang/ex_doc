@@ -34,7 +34,9 @@ defmodule ExDoc.Markdown.Earmark do
       breaks: false,
       smartypants: false,
       pure_links: true
-    ] |> Keyword.merge(opts)
+    ]
+
+    options = Keyword.merge(options, opts)
 
     case EarmarkParser.as_ast(text, options) do
       {:ok, ast, messages} ->
