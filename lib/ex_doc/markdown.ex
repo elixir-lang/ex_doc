@@ -42,6 +42,9 @@ defmodule ExDoc.Markdown do
   """
   def get_markdown_processor do
     {processor, options} = case Application.fetch_env(:ex_doc, @markdown_processor_key) do
+      {:ok, processor} when is_atom(processor) ->
+        {processor, []}
+
       {:ok, {processor, options}} ->
         {processor, options}
 
@@ -51,7 +54,7 @@ defmodule ExDoc.Markdown do
 
     if processor == nil do
       processor = find_markdown_processor() || raise_no_markdown_processor()
-      put_markdown_processor(processor, options)
+      put_markdown_processor({processor, options})
       {processor, options}
 
     else
@@ -62,8 +65,8 @@ defmodule ExDoc.Markdown do
   @doc """
   Changes the markdown processor globally.
   """
-  def put_markdown_processor(processor, options) do
-    Application.put_env(:ex_doc, @markdown_processor_key, {processor, options})
+  def put_markdown_processor(processor) do
+    Application.put_env(:ex_doc, @markdown_processor_key, processor)
   end
 
   defp find_markdown_processor do
