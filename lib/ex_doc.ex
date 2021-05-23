@@ -20,7 +20,11 @@ defmodule ExDoc do
     config = build_config(project, vsn, options)
 
     if processor = options[:markdown_processor] do
-      ExDoc.Markdown.put_markdown_processor(processor, Keyword.get(options, :markdown_processor_options, []))
+      ExDoc.Markdown.put_markdown_processor(processor)
+    end
+
+    if processor_options = options[:markdown_processor_options] do
+      ExDoc.Markdown.put_markdown_processor_options(processor_options)
     end
 
     docs = config.retriever.docs_from_dir(config.source_beam, config)

@@ -52,8 +52,14 @@ defmodule ExDoc.Markdown do
   @doc """
   Changes the markdown processor globally.
   """
-  def put_markdown_processor(processor, options \\ []) do
+  def put_markdown_processor(processor) do
     Application.put_env(:ex_doc, @markdown_processor_key, processor)
+  end
+
+  @doc """
+  Changes the markdown processor options globally.
+  """
+  def put_markdown_processor_options(options) do
     Application.put_env(:ex_doc, @markdown_processor_options_key, options)
   end
 
