@@ -19,13 +19,9 @@ defmodule ExDoc do
       when is_binary(project) and is_binary(vsn) and is_list(options) do
     config = build_config(project, vsn, options)
 
-    if processor = options[:markdown_processor] do
-      ExDoc.Markdown.put_markdown_processor(processor)
-    end
-
-    if processor_options = options[:markdown_processor_options] do
-      ExDoc.Markdown.put_markdown_processor_options(processor_options)
-    end
+    processor = Keyword.get(options, :markdown_processor, nil)
+    processor_options = Keyword.get(options, :markdown_processor_options, [])
+    ExDoc.Markdown.put_markdown_processor(processor, processor_options)
 
     docs = config.retriever.docs_from_dir(config.source_beam, config)
     find_formatter(config.formatter).run(docs, config)

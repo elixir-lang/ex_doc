@@ -28,44 +28,42 @@ defmodule ExDoc.Markdown do
   ]
 
   @markdown_processor_key :markdown_processor
-  @markdown_processor_options_key :markdown_processor_options
 
   @doc """
   Converts the given markdown document to HTML AST.
   """
   def to_ast(text, opts \\ []) when is_binary(text) do
-    options = Application.get_env(:ex_doc, @markdown_processor_options_key, [])
-      |> Keyword.merge(opts)
-    get_markdown_processor().to_ast(text, options)
+    {processor, options} = get_markdown_processor()
+    processor.to_ast(text, options |> Keyword.merge(opts))
   end
 
   @doc """
   Gets the current markdown processor set globally.
   """
   def get_markdown_processor do
-    case Application.fetch_env(:ex_doc, @markdown_processor_key) do
-      {:ok, processor} ->
-        processor
+    {processor, options} = case Application.fetch_env(:ex_doc, @markdown_processor_key) do
+      {:ok, {processor, options}} ->
+        {processor, options}
 
       :error ->
-        processor = find_markdown_processor() || raise_no_markdown_processor()
-        put_markdown_processor(processor)
-        processor
+        {nil, []}
+    end
+
+    if processor == nil do
+      processor = find_markdown_processor() || raise_no_markdown_processor()
+      put_markdown_processor(processor, options)
+      {processor, options}
+
+    else
+      {processor, options}
     end
   end
 
   @doc """
   Changes the markdown processor globally.
   """
-  def put_markdown_processor(processor) do
-    Application.put_env(:ex_doc, @markdown_processor_key, processor)
-  end
-
-  @doc """
-  Changes the markdown processor options globally.
-  """
-  def put_markdown_processor_options(options) do
-    Application.put_env(:ex_doc, @markdown_processor_options_key, options)
+  def put_markdown_processor(processor, options) do
+    Application.put_env(:ex_doc, @markdown_processor_key, {processor, options})
   end
 
   defp find_markdown_processor do
