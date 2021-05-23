@@ -41,21 +41,14 @@ defmodule ExDoc.Markdown do
   Gets the current markdown processor set globally.
   """
   def get_markdown_processor do
-    {processor, options} = case Application.fetch_env(:ex_doc, @markdown_processor_key) do
+    case Application.fetch_env(:ex_doc, @markdown_processor_key) do
       {:ok, {processor, options}} ->
         {processor, options}
 
       :error ->
-        {nil, []}
-    end
-
-    if processor == nil do
-      processor = find_markdown_processor() || raise_no_markdown_processor()
-      put_markdown_processor({processor, options})
-      {processor, options}
-
-    else
-      {processor, options}
+        processor = find_markdown_processor() || raise_no_markdown_processor()
+        put_markdown_processor({processor, []})
+        {processor, []}
     end
   end
 
