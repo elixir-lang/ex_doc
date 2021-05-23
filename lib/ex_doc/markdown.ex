@@ -18,22 +18,20 @@ defmodule ExDoc.Markdown do
   """
   @callback to_ast(String.t(), Keyword.t()) :: term()
 
-  @doc """
-  Returns true if all dependencies necessary are available.
-  """
-  @callback available?() :: boolean()
-
   @markdown_processors [
     ExDoc.Markdown.Earmark
   ]
 
   @markdown_processor_key :markdown_processor
+  @markdown_processor_options_key :markdown_processor_options
 
   @doc """
   Converts the given markdown document to HTML AST.
   """
   def to_ast(text, opts \\ []) when is_binary(text) do
-    get_markdown_processor().to_ast(text, opts)
+    options = Application.get_env(:ex_doc, @markdown_processor_options_key, [])
+      |> Keyword.merge(opts)
+    get_markdown_processor().to_ast(text, options)
   end
 
   @doc """
@@ -54,8 +52,9 @@ defmodule ExDoc.Markdown do
   @doc """
   Changes the markdown processor globally.
   """
-  def put_markdown_processor(processor) do
+  def put_markdown_processor(processor, options \\ []) do
     Application.put_env(:ex_doc, @markdown_processor_key, processor)
+    Application.put_env(:ex_doc, @markdown_processor_options_key, options)
   end
 
   defp find_markdown_processor do
