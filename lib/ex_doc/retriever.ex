@@ -528,6 +528,10 @@ defmodule ExDoc.Retriever do
 
   defp to_var({:%, meta, [name, _]}, _), do: {:%, meta, [name, {:%{}, meta, []}]}
   defp to_var({name, meta, _}, _) when is_atom(name), do: {name, meta, nil}
+
+  defp to_var({{:., meta, [_module, name]}, _, _args}, _) when is_atom(name),
+    do: {name, meta, nil}
+
   defp to_var([{:->, _, _} | _], _), do: {:function, [], nil}
   defp to_var({:<<>>, _, _}, _), do: {:binary, [], nil}
   defp to_var({:%{}, _, _}, _), do: {:map, [], nil}
