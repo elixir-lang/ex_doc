@@ -1,6 +1,8 @@
 defmodule ExDoc.Language do
   @moduledoc false
 
+  @typep spec_ast() :: term()
+
   @doc """
   Returns a map with module information.
 
@@ -17,7 +19,14 @@ defmodule ExDoc.Language do
     * `:extra_callback_types` - a list of types that are considered callbacks
 
   """
-  @callback module_data(module()) :: map()
+  @callback module_data(module()) :: data
+            when data: %{
+                   id: String.t(),
+                   title: String.t(),
+                   type: nil | atom(),
+                   skip: boolean(),
+                   extra_callback_types: [atom()]
+                 }
 
   @doc """
   Returns a map with function information.
@@ -34,7 +43,19 @@ defmodule ExDoc.Language do
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
   """
-  @callback function_data(entry :: tuple(), module_data :: map()) :: map()
+  @callback function_data(entry :: tuple(), module_data) :: data
+            when module_data: %{
+                   impls: term(),
+                   abst_code: term(),
+                   callbacks: term(),
+                   specs: [spec_ast()]
+                 },
+                 data: %{
+                   doc_fallback: (() -> ExDoc.DocAST.t()) | nil,
+                   extra_annotations: [String.t()],
+                   line_override: non_neg_integer() | nil,
+                   specs: [spec_ast()]
+                 }
 
   @doc """
   Returns a map with callback information.
@@ -65,7 +86,11 @@ defmodule ExDoc.Language do
       which will be used as a fallback to empty signature on the callback node
 
   """
-  @callback type_data(entry :: tuple(), spec :: term(), module_data :: map()) :: map()
+  @callback type_data(entry :: tuple(), spec :: term()) :: data
+            when data: %{
+                   spec: spec_ast(),
+                   signature_fallback: (() -> String.t()) | nil
+                 }
 
   @doc """
   Formats typespecs.

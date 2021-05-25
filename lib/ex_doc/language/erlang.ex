@@ -59,7 +59,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def type_data(_entry, spec, _module_data) do
+  def type_data(_entry, spec) do
     %{
       spec: {:attribute, 0, :type, spec},
       signature_fallback: nil

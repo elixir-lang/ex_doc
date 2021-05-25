@@ -420,7 +420,7 @@ defmodule ExDoc.Retriever do
       end)
 
     line = anno_line(anno)
-    type_data = module_data.language.type_data(type_entry, spec, module_data)
+    type_data = module_data.language.type_data(type_entry, spec)
     spec = type_data.spec
 
     signature =

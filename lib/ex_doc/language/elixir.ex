@@ -81,7 +81,7 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def type_data(entry, spec, _module_data) do
+  def type_data(entry, spec) do
     {{kind, _name, arity}, _anno, _signature, _doc, _metadata} = entry
     spec = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(kind)
 
