@@ -38,7 +38,7 @@ defmodule ExDoc.Language do
 
     * `:extra_annotations`
 
-    * `:line_override` - if set, overrides the line where the code is located
+    * `:line` - if set, overrides the line where the code is located
 
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
@@ -53,7 +53,7 @@ defmodule ExDoc.Language do
                  data: %{
                    doc_fallback: (() -> ExDoc.DocAST.t()) | nil,
                    extra_annotations: [String.t()],
-                   line_override: non_neg_integer() | nil,
+                   line: non_neg_integer() | nil,
                    specs: [spec_ast()]
                  }
 

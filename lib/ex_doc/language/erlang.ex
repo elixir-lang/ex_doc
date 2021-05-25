@@ -32,7 +32,7 @@ defmodule ExDoc.Language.Erlang do
     %{
       doc_fallback: nil,
       extra_annotations: [],
-      line_override: nil,
+      line: nil,
       specs: specs
     }
   end

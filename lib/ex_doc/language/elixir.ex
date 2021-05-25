@@ -39,7 +39,7 @@ defmodule ExDoc.Language.Elixir do
           delegate_doc_ast(metadata[:delegate_to])
       end,
       extra_annotations: extra_annotations,
-      line_override: find_function_line(module_data, actual_def),
+      line: find_function_line(module_data, actual_def),
       specs: specs(kind, name, actual_def, module_data)
     }
   end

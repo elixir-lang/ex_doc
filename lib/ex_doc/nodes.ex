@@ -37,7 +37,7 @@ defmodule ExDoc.ModuleNode do
           typespecs: list(),
           source_path: nil | String.t(),
           source_url: nil | String.t(),
-          type: nil | :module | :exception | :protocol | :impl | :behaviour | :task,
+          type: nil | atom(),
           language: module()
         }
 end

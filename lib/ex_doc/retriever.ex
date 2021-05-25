@@ -186,9 +186,10 @@ defmodule ExDoc.Retriever do
       specs: get_specs(module),
       impls: get_impls(module),
       callbacks: get_callbacks(module),
-      abst_code: get_abstract_code(module),
       docs: docs_chunk,
       callback_types: [:callback] ++ extra.extra_callback_types
+      # TODO: move to Language.Elixir/Erlang
+      abst_code: get_abstract_code(module),
     }
   end
 
@@ -262,7 +263,7 @@ defmodule ExDoc.Retriever do
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata) ++ function_data.extra_annotations
-    line = function_data.line_override || doc_line
+    line = function_data.line || doc_line
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
     group =
