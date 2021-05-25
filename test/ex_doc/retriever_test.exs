@@ -5,6 +5,7 @@ defmodule ExDoc.RetrieverTest do
 
   setup :create_tmp_dir
 
+  # TODO: extract into ExDoc.Retriever.ElixirTest. Same for Erlang.
   describe "docs_from_modules/2: Elixir" do
     test "module", c do
       elixirc(c, ~S"""
