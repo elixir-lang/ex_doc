@@ -1,6 +1,8 @@
 defmodule ExDoc.DocAST do
   @moduledoc false
 
+  @type t :: term()
+
   alias ExDoc.Markdown
   alias ExDoc.Formatter.HTML.Templates
 
