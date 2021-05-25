@@ -8,11 +8,11 @@ defmodule ExDoc.Language do
 
   The map has the following keys:
 
-    * `:id`
+    * `:id` - module page name
 
-    * `:title`
+    * `:title` - module display title
 
-    * `:type`
+    * `:type` - module type
 
     * `:skip` - whether module should be skipped from generating the docs
 
@@ -23,7 +23,7 @@ defmodule ExDoc.Language do
             when data: %{
                    id: String.t(),
                    title: String.t(),
-                   type: nil | atom(),
+                   type: atom() | nil,
                    skip: boolean(),
                    extra_callback_types: [atom()]
                  }
