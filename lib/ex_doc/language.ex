@@ -73,7 +73,16 @@ defmodule ExDoc.Language do
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
   """
-  @callback callback_data(entry :: tuple(), module_data :: map()) :: map()
+  @callback callback_data(entry :: tuple(), module_data) :: data
+            when module_data: %{
+                   callbacks: term
+                 },
+                 data: %{
+                   actual_def: {atom(), arity()},
+                   line: non_neg_integer() | nil,
+                   signature_fallback: (() -> String.t()) | nil,
+                   specs: [spec_ast()]
+                 }
 
   @doc """
   Returns a map with type information.
