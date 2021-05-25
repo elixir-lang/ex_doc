@@ -187,9 +187,9 @@ defmodule ExDoc.Retriever do
       impls: get_impls(module),
       callbacks: get_callbacks(module),
       docs: docs_chunk,
-      callback_types: [:callback] ++ extra.extra_callback_types
+      callback_types: [:callback] ++ extra.extra_callback_types,
       # TODO: move to Language.Elixir/Erlang
-      abst_code: get_abstract_code(module),
+      abst_code: get_abstract_code(module)
     }
   end
 
@@ -275,7 +275,7 @@ defmodule ExDoc.Retriever do
 
     doc_ast =
       (doc_content && doc_ast(content_type, doc_content, file: source.path, line: doc_line + 1)) ||
-        (function_data.doc_fallback && function_data.doc_fallback.())
+        function_data.doc_fallback.()
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -335,12 +335,7 @@ defmodule ExDoc.Retriever do
     doc_line = anno_line(anno)
     signature = signature(signature)
     specs = callback_data.specs
-
-    signature =
-      signature ||
-        (callback_data.signature_fallback && callback_data.signature_fallback.()) ||
-        "#{name}/#{arity}"
-
+    signature = signature || callback_data.signature_fallback.() || "#{name}/#{arity}"
     annotations = annotations_from_metadata(metadata)
 
     # actual_def is Elixir specific, but remember optional_callbacks are generic.
@@ -424,8 +419,7 @@ defmodule ExDoc.Retriever do
     type_data = module_data.language.type_data(type_entry, spec)
     spec = type_data.spec
 
-    signature =
-      signature(signature) || (type_data.signature_fallback && type_data.signature_fallback.())
+    signature = signature(signature) || type_data.signature_fallback.()
 
     annotations = if type == :opaque, do: ["opaque" | annotations], else: annotations
     doc_ast = doc_ast(content_type, doc, file: source.path)

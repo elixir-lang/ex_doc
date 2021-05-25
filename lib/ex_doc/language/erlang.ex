@@ -30,7 +30,7 @@ defmodule ExDoc.Language.Erlang do
       end
 
     %{
-      doc_fallback: nil,
+      doc_fallback: fn -> nil end,
       extra_annotations: [],
       line: nil,
       specs: specs
@@ -53,7 +53,7 @@ defmodule ExDoc.Language.Erlang do
     %{
       actual_def: {name, arity},
       line: nil,
-      signature_fallback: nil,
+      signature_fallback: fn -> nil end,
       specs: specs
     }
   end
@@ -62,7 +62,7 @@ defmodule ExDoc.Language.Erlang do
   def type_data(_entry, spec) do
     %{
       spec: {:attribute, 0, :type, spec},
-      signature_fallback: nil
+      signature_fallback: fn -> nil end
     }
   end
 

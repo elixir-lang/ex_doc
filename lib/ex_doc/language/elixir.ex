@@ -72,8 +72,6 @@ defmodule ExDoc.Language.Elixir do
       signature_fallback: fn ->
         if specs != [] do
           get_typespec_signature(hd(specs), arity)
-        else
-          nil
         end
       end,
       specs: specs
