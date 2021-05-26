@@ -28,13 +28,15 @@ defmodule ExDoc.Markdown.Earmark do
   @impl true
   def to_ast(text, opts) do
     options = [
-      gfm: Keyword.get(opts, :gfm, true),
-      line: Keyword.get(opts, :line, 1),
-      file: Keyword.get(opts, :file, "nofile"),
-      breaks: Keyword.get(opts, :breaks, false),
-      smartypants: Keyword.get(opts, :smartypants, false),
+      gfm: true,
+      line: 1,
+      file: "nofile",
+      breaks: false,
+      smartypants: false,
       pure_links: true
     ]
+
+    options = Keyword.merge(options, opts)
 
     case EarmarkParser.as_ast(text, options) do
       {:ok, ast, messages} ->

@@ -54,7 +54,27 @@ defmodule ExDocTest do
     ]
 
     ExDoc.generate_docs(project, version, options)
-    assert Application.fetch_env!(:ex_doc, :markdown_processor) == Sample
+    assert Application.fetch_env!(:ex_doc, :markdown_processor) == {Sample, []}
+  after
+    Application.delete_env(:ex_doc, :markdown_processor)
+  end
+
+  test "uses custom markdown processor with custom options" do
+    project = "Elixir"
+    version = "1"
+
+    options = [
+      apps: [:test_app],
+      formatter: IdentityFormatter,
+      markdown_processor: {Sample, [foo: :bar]},
+      output: "test/tmp/ex_doc",
+      retriever: IdentityRetriever,
+      source_root: "root_dir",
+      source_beam: "beam_dir"
+    ]
+
+    ExDoc.generate_docs(project, version, options)
+    assert Application.fetch_env!(:ex_doc, :markdown_processor) == {Sample, [foo: :bar]}
   after
     Application.delete_env(:ex_doc, :markdown_processor)
   end
