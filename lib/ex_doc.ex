@@ -46,7 +46,7 @@ defmodule ExDoc do
       main: options[:main],
       output: normalize_output(output),
       homepage_url: options[:homepage_url],
-      proglang: proglang,
+      proglang: normalize_proglang(proglang),
       source_root: options[:source_root] || File.cwd!(),
       source_url_pattern: source_url_pattern,
       nest_modules_by_prefix: normalize_nest_modules_by_prefix(nest_modules_by_prefix),
@@ -83,6 +83,18 @@ defmodule ExDoc do
 
   defp normalize_output(output) do
     String.trim_trailing(output, "/")
+  end
+
+  defp normalize_proglang(binary) when is_binary(binary) do
+    binary |> String.to_atom() |> normalize_proglang()
+  end
+
+  defp normalize_proglang(proglang) when proglang in [:elixir, :erlang] do
+    proglang
+  end
+
+  defp normalize_proglang(proglang) do
+    raise ArgumentError, "#{inspect(proglang)} is not supported"
   end
 
   defp normalize_groups_for_modules(groups_for_modules) do
