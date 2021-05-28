@@ -23,7 +23,7 @@ defmodule ExDoc.CLI do
         ],
         switches: [
           language: :string,
-          proglang: :atom,
+          proglang: :string,
           source_ref: :string,
           version: :boolean
         ]
