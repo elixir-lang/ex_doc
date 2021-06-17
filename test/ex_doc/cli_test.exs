@@ -115,4 +115,40 @@ defmodule ExDoc.CLITest do
       File.rm!("test.exs")
     end
   end
+
+  @tag :tmp_dir
+  test "run from CLI", c do
+    Mix.Task.run("escript.build")
+    assert_received {:mix_shell, :info, ["Generated escript ex_doc" <> _]}
+
+    File.mkdir_p!("#{c.tmp_dir}/lib")
+
+    File.write!("#{c.tmp_dir}/mix.exs", """
+    defmodule Foo.MixProject do
+      use Mix.Project
+
+      def project do
+        [app: :foo, version: "1.0.0"]
+      end
+    end
+    """)
+
+    File.write!("#{c.tmp_dir}/lib/foo.ex", """
+    defmodule Foo do
+      @moduledoc \"\"\"
+      `String.upcase/2`
+      \"\"\"
+    end
+    """)
+
+    Mix.shell().cmd("mix compile", cd: c.tmp_dir, env: %{"MIX_QUIET" => "1"})
+
+    Mix.shell().cmd("./ex_doc Foo 1.0.0 #{c.tmp_dir}/_build/dev/lib/foo/ebin -o #{c.tmp_dir}/doc")
+    refute_received _
+
+    html = File.read!("#{c.tmp_dir}/doc/Foo.html")
+    assert html =~ "hexdocs.pm/elixir/String.html#upcase/2"
+  after
+    File.rm_rf!("ex_doc")
+  end
 end
