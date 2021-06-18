@@ -138,6 +138,8 @@ defmodule ExDoc.CLITest do
       @moduledoc \"\"\"
       `String.upcase/2`
       \"\"\"
+
+      @type t() :: String.t()
     end
     """)
 
