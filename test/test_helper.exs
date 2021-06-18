@@ -4,6 +4,9 @@ exclude = [
   otp24: System.otp_release() < "24"
 ]
 
+Mix.shell(Mix.Shell.Process)
+ExUnit.after_suite(fn _ -> Mix.shell(Mix.Shell.IO) end)
+
 ExUnit.start(exclude: Enum.filter(exclude, &elem(&1, 1)))
 
 # Prepare module fixtures
