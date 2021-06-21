@@ -4,7 +4,7 @@ defmodule ExDoc.Language.ErlangTest do
 
   setup :create_tmp_dir
 
-  @moduletag :otp23
+  @moduletag :otp24
 
   describe "autolink_doc/2" do
     test "module", c do
