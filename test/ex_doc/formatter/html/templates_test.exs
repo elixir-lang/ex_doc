@@ -167,9 +167,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = Templates.sidebar_template(doc_config(), @empty_nodes_map)
 
       assert content =~
-               ~r{<div class="sidebar-header">\s*<div class="sidebar-projectDetails">\s*<a href="#{
-                 homepage_url()
-               }" class="sidebar-projectName">\s*Elixir\s*</a>\s*<strong class="sidebar-projectVersion">\s*v1.0.1\s*</strong>\s*</div>\s*</div>}
+               ~r{<div class="sidebar-header">\s*<div class="sidebar-projectDetails">\s*<a href="#{homepage_url()}" class="sidebar-projectName">\s*Elixir\s*</a>\s*<strong class="sidebar-projectVersion">\s*v1.0.1\s*</strong>\s*</div>\s*</div>}
     end
 
     test "text links to main when there is no homepage_url" do

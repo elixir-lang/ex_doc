@@ -3,6 +3,8 @@ defmodule ExDoc.Language.Erlang do
 
   @behaviour ExDoc.Language
 
+  alias ExDoc.Autolink
+
   @impl true
   def module_data(module) do
     ":" <> id = inspect(module)
@@ -67,11 +69,16 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def typespec(nil, _opts) do
+  def autolink_doc(doc, config) do
+    walk(doc, config)
+  end
+
+  @impl true
+  def autolink_spec(nil, _opts) do
     nil
   end
 
-  def typespec(attribute, _opts) do
+  def autolink_spec(attribute, _opts) do
     {:attribute, _, type, _} = attribute
 
     # `-type ` => 6
@@ -79,6 +86,18 @@ defmodule ExDoc.Language.Erlang do
 
     options = [linewidth: 98 + offset]
     :erl_pp.attribute(attribute, options) |> IO.iodata_to_binary() |> trim_offset(offset)
+  end
+
+  ## Helpers
+
+  defp module_type(module) do
+    cond do
+      function_exported?(module, :behaviour_info, 1) ->
+        :behaviour
+
+      true ->
+        :module
+    end
   end
 
   # `-type t() :: atom()` becomes `t() :: atom().`
@@ -92,15 +111,103 @@ defmodule ExDoc.Language.Erlang do
     |> Enum.join("\n")
   end
 
-  ## Helpers
+  defp walk(list, config) when is_list(list) do
+    Enum.map(list, &walk(&1, config))
+  end
 
-  defp module_type(module) do
-    cond do
-      function_exported?(module, :behaviour_info, 1) ->
-        :behaviour
+  defp walk(binary, _) when is_binary(binary) do
+    binary
+  end
 
-      true ->
-        :module
+  defp walk({:a, attrs, inner, _meta} = ast, config) do
+    case attrs[:rel] do
+      "https://erlang.org/doc/link/seeerl" ->
+        autolink({:module, attrs[:href]}, inner, config)
+
+      "https://erlang.org/doc/link/seemfa" ->
+        autolink({:function, attrs[:href]}, inner, config)
+
+      "https://erlang.org/doc/link/seetype" ->
+        autolink({:type, attrs[:href]}, inner, config)
+
+      "https://erlang.org/doc/link/seeapp" ->
+        [app, "index"] = String.split(attrs[:href], ":")
+        maybe_warn_app_ref("//#{app}", config)
+        [{:code, [], [app], %{}}]
+
+      _ ->
+        ast
     end
+  end
+
+  defp walk({tag, attrs, ast, meta}, config) do
+    {tag, attrs, walk(ast, config), meta}
+  end
+
+  defp autolink({:module, string}, inner, config) do
+    case String.split(string, ":") do
+      [module] ->
+        ref = {:module, String.to_atom(module)}
+        rewrite(ref, string, inner, config)
+
+      [app, module] ->
+        maybe_warn_app_ref("//#{app}/#{module}", config)
+        [{:code, [], [module], %{}}]
+    end
+  end
+
+  defp autolink({kind, string}, inner, config) do
+    case String.split(string, ":") do
+      [rest] ->
+        [module, function, arity] = String.split(rest, ["#", "/"])
+
+        module =
+          if module == "" do
+            config.module
+          else
+            String.to_atom(module)
+          end
+
+        ref = {kind, module, String.to_atom(function), String.to_integer(arity)}
+        rewrite(ref, string, inner, config)
+
+      [app, rest] ->
+        string = normalize_ref_string(rest, kind == :type)
+        maybe_warn_app_ref("//#{app}/#{string}", config)
+        [{:code, [], [string], %{}}]
+    end
+  end
+
+  defp rewrite(ref, string, inner, config) do
+    string = normalize_ref_string(string, match?({:type, _, _, _}, ref))
+
+    case Autolink.url(ref, string, :all, config) do
+      {:ok, url} ->
+        [{:a, [href: url], [inner], %{}}]
+
+      {:warn, warning} ->
+        Autolink.maybe_warn(warning, config)
+        inner
+
+      :error ->
+        inner
+    end
+  end
+
+  defp normalize_ref_string(string, type?) do
+    string =
+      string
+      |> String.trim_leading("#")
+      |> String.replace("#", ":")
+
+    if type? do
+      String.replace_trailing(string, "/0", "()")
+    else
+      string
+    end
+  end
+
+  defp maybe_warn_app_ref(ref, config) do
+    Autolink.maybe_warn("application references are not yet supported: #{ref}", config)
   end
 end

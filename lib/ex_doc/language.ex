@@ -102,9 +102,14 @@ defmodule ExDoc.Language do
                  }
 
   @doc """
-  Formats typespecs.
+  Autolinks docs.
   """
-  @callback typespec(spec :: term(), opts :: keyword()) :: iodata()
+  @callback autolink_doc(doc :: ExDoc.DocAST.t(), opts :: keyword()) :: ExDoc.DocAST.t()
+
+  @doc """
+  Autolinks typespecs.
+  """
+  @callback autolink_spec(spec :: term(), opts :: keyword()) :: iodata()
 
   def get(:elixir), do: ExDoc.Language.Elixir
   def get(:erlang), do: ExDoc.Language.Erlang

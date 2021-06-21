@@ -67,9 +67,9 @@ defmodule ExDoc.Formatter.HTML do
   def render_all(project_nodes, ext, config, opts) do
     project_nodes
     |> Enum.map(fn node ->
-      autolink_opts = [
+      autolink_config = %Autolink{
         apps: config.apps,
-        current_module: node.module,
+        module: node.module,
         ext: ext,
         extras: extra_paths(config),
         skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
@@ -77,37 +77,47 @@ defmodule ExDoc.Formatter.HTML do
         file: node.source_path,
         line: node.doc_line,
         deps: config.deps
-      ]
+      }
 
       language = node.language
 
       docs =
         for child_node <- node.docs do
           id = id(node, child_node)
-          autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
-          specs = Enum.map(child_node.specs, &language.typespec(&1, autolink_opts))
+          autolink_config = %{autolink_config | id: id, line: child_node.doc_line}
+          specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_config))
           child_node = %{child_node | specs: specs}
-          render_doc(child_node, autolink_opts, opts)
+          render_doc(child_node, language, autolink_config, opts)
         end
 
       typespecs =
         for child_node <- node.typespecs do
           id = id(node, child_node)
-          autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
-          child_node = %{child_node | spec: language.typespec(child_node.spec, autolink_opts)}
-          render_doc(child_node, autolink_opts, opts)
+          autolink_config = %{autolink_config | id: id, line: child_node.doc_line}
+
+          child_node = %{
+            child_node
+            | spec: language.autolink_spec(child_node.spec, autolink_config)
+          }
+
+          render_doc(child_node, language, autolink_config, opts)
         end
 
       id = id(node, nil)
-      %{render_doc(node, [{:id, id} | autolink_opts], opts) | docs: docs, typespecs: typespecs}
+
+      %{
+        render_doc(node, language, %{autolink_config | id: id}, opts)
+        | docs: docs,
+          typespecs: typespecs
+      }
     end)
   end
 
-  defp render_doc(%{doc: nil} = node, _autolink_opts, _opts),
+  defp render_doc(%{doc: nil} = node, _language, _autolink_config, _opts),
     do: node
 
-  defp render_doc(%{doc: doc} = node, autolink_opts, opts) do
-    rendered = autolink_and_render(doc, autolink_opts, opts)
+  defp render_doc(%{doc: doc} = node, language, autolink_config, opts) do
+    rendered = autolink_and_render(doc, language, autolink_config, opts)
     %{node | rendered_doc: rendered}
   end
 
@@ -116,9 +126,9 @@ defmodule ExDoc.Formatter.HTML do
   defp id(%{id: mod_id}, %ExDoc.FunctionNode{id: id}), do: "#{mod_id}.#{id}"
   defp id(%{id: mod_id}, %ExDoc.TypeNode{id: id}), do: "t:#{mod_id}.#{id}"
 
-  defp autolink_and_render(doc, autolink_opts, opts) do
+  defp autolink_and_render(doc, language, autolink_config, opts) do
     doc
-    |> Autolink.doc(autolink_opts)
+    |> language.autolink_doc(autolink_config)
     |> ExDoc.DocAST.to_string()
     |> ExDoc.DocAST.highlight(opts)
   end
@@ -290,14 +300,14 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp build_extra(input, id, title, groups, config, ext) do
-    autolink_opts = [
+    autolink_config = %Autolink{
       apps: config.apps,
       file: input,
       ext: ext,
       extras: extra_paths(config),
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
       deps: config.deps
-    ]
+    }
 
     opts = [file: input, line: 1]
 
@@ -316,7 +326,10 @@ defmodule ExDoc.Formatter.HTML do
                 "file extension not recognized, allowed extension is either .md, .txt or no extension"
       end
 
-    html_content = autolink_and_render(ast, autolink_opts, opts)
+    # TODO: don't hardcode Elixir for extras
+    language = ExDoc.Language.Elixir
+
+    html_content = autolink_and_render(ast, language, autolink_config, opts)
 
     group = GroupMatcher.match_extra(groups, input)
     title = title || extract_title(html_content) || filename_to_title(input)
