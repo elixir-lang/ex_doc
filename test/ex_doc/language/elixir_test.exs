@@ -60,14 +60,14 @@ defmodule ExDoc.Language.ElixirTest do
                ~s{<p><code class="inline">bad/0</code></p>}
 
       TestHelper.elixirc(c, """
-      defmodule Foo do
+      defmodule ExDoc.Language.ElixirTest.Foo do
         @type t() :: typep()
 
         @typep typep() :: term()
       end
       """)
 
-      assert doc("`t:typep/0`", module: Foo) ==
+      assert doc("`t:typep/0`", module: ExDoc.Language.ElixirTest.Foo) ==
                ~s{<p><code class="inline">typep/0</code></p>}
     end
 
