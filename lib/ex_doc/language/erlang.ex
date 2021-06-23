@@ -3,6 +3,8 @@ defmodule ExDoc.Language.Erlang do
 
   @behaviour ExDoc.Language
 
+  alias ExDoc.Autolink
+
   @impl true
   def module_data(module) do
     ":" <> id = inspect(module)
@@ -67,8 +69,9 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def autolink_doc(ast, _opts) do
-    ast
+  def autolink_doc(ast, opts) do
+    config = struct!(Autolink, opts)
+    walk_doc(ast, config)
   end
 
   @impl true
@@ -97,6 +100,85 @@ defmodule ExDoc.Language.Erlang do
     |> Enum.join("\n")
   end
 
+  ## Autolink
+
+  defp walk_doc(list, config) when is_list(list) do
+    Enum.map(list, &walk_doc(&1, config))
+  end
+
+  defp walk_doc(binary, _) when is_binary(binary) do
+    binary
+  end
+
+  defp walk_doc({:a, attrs, inner, _meta} = ast, config) do
+    case attrs[:rel] do
+      "https://erlang.org/doc/link/seeerl" ->
+        autolink({:module, attrs[:href]}, inner, config)
+
+      "https://erlang.org/doc/link/seemfa" ->
+        autolink({:function, attrs[:href]}, inner, config)
+
+      "https://erlang.org/doc/link/seetype" ->
+        autolink({:type, attrs[:href]}, inner, config)
+
+      _ ->
+        ast
+    end
+  end
+
+  defp walk_doc({tag, attrs, ast, meta}, config) do
+    {tag, attrs, walk_doc(ast, config), meta}
+  end
+
+  defp autolink(ref, inner, config) do
+    if url = url(ref, config) do
+      {:a, [href: url], inner, %{}}
+    else
+      inner
+    end
+  end
+
+  defp url({:module, string}, config) do
+    module = String.to_atom(string)
+
+    if otp_module?(module) do
+      Autolink.app_module_url(:otp, module, config)
+    else
+      "#{module}#{config.ext}"
+    end
+  end
+
+  defp url({kind, string}, config) do
+    [module, name, arity] = String.split(string, ["#", "/"])
+
+    if module == "" do
+      case kind do
+        :function ->
+          "##{name}/#{arity}"
+
+        :type ->
+          "#t:#{name}/#{arity}"
+      end
+    else
+      module = String.to_atom(module)
+
+      fragment =
+        case kind do
+          :function ->
+            "##{name}-#{arity}"
+
+          :type ->
+            "#type-#{name}"
+        end
+
+      if otp_module?(module) do
+        Autolink.app_module_url(:otp, module, config) <> fragment
+      else
+        "#{module}#{config.ext}" <> fragment
+      end
+    end
+  end
+
   ## Helpers
 
   defp module_type(module) do
@@ -106,6 +188,16 @@ defmodule ExDoc.Language.Erlang do
 
       true ->
         :module
+    end
+  end
+
+  defp otp_module?(module) do
+    case :code.which(module) do
+      :preloaded ->
+        true
+
+      path ->
+        :string.prefix(path, :code.lib_dir()) != :nomatch
     end
   end
 end
