@@ -262,9 +262,6 @@ defmodule ExDoc.Language.Elixir do
 
   ## Autolinking
 
-  @hexdocs "https://hexdocs.pm/"
-  @otpdocs "https://erlang.org/doc/man/"
-
   @autoimported_modules [Kernel, Kernel.SpecialForms]
 
   defp walk_doc(list, config) when is_list(list) do
@@ -650,7 +647,7 @@ defmodule ExDoc.Language.Elixir do
 
     case {mode, Refs.get_visibility(ref)} do
       {_link_type, :public} ->
-        app_module_url(tool(module), module, config)
+        Autolink.app_module_url(tool(module), module, config)
 
       {:regular_link, :undefined} ->
         nil
@@ -665,28 +662,16 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
-  defp app_module_url(:ex_doc, module, %{current_module: module} = config) do
-    ex_doc_app_url(module, config, inspect(module), config.ext, "#content")
-  end
-
-  defp app_module_url(:ex_doc, module, config) do
-    ex_doc_app_url(module, config, inspect(module), config.ext, "")
-  end
-
-  defp app_module_url(:otp, module, _config) do
-    @otpdocs <> "#{module}.html"
-  end
-
   defp local_url(kind, name, arity, config, original_text, options \\ [])
 
   defp local_url(:type, name, arity, config, _original_text, _options)
        when {name, arity} in @basic_types do
-    ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#basic-types")
+    Autolink.ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#basic-types")
   end
 
   defp local_url(:type, name, arity, config, _original_text, _options)
        when {name, arity} in @built_in_types do
-    ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#built-in-types")
+    Autolink.ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#built-in-types")
   end
 
   defp local_url(kind, name, arity, config, original_text, options) do
@@ -736,7 +721,7 @@ defmodule ExDoc.Language.Elixir do
             if same_module? do
               fragment(tool, kind, name, arity)
             else
-              app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
+              Autolink.app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
             end
         end
 
@@ -750,23 +735,6 @@ defmodule ExDoc.Language.Elixir do
       {_mode, _module_visibility, visibility} ->
         if warn?, do: maybe_warn(ref, config, visibility, %{original_text: original_text})
         nil
-    end
-  end
-
-  defp ex_doc_app_url(module, config, path, ext, suffix) do
-    case :application.get_application(module) do
-      {:ok, app} ->
-        if app in config.apps do
-          path <> ext <> suffix
-        else
-          config.deps
-          |> Keyword.get_lazy(app, fn -> @hexdocs <> "#{app}" end)
-          |> String.trim_trailing("/")
-          |> Kernel.<>("/" <> path <> ".html" <> suffix)
-        end
-
-      _ ->
-        path <> ext <> suffix
     end
   end
 
