@@ -206,7 +206,7 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc("EarmarkParser.as_ast/2", deps: [earmark_parser: "https://example.com"]) ==
                ~m"[`EarmarkParser.as_ast/2`](https://example.com/EarmarkParser.html#as_ast/2)"
 
-      # exrtensions are ignored as they are external links
+      # extensions are ignored for external links
       assert autolink_doc("EarmarkParser.as_ast/2", ext: ".xhtml") ==
                ~m"[`EarmarkParser.as_ast/2`](https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2)"
 
@@ -383,6 +383,12 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_spec(quote(do: term() < term() :: boolean())) ==
                ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>() &lt; <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">boolean</a>()]
     end
+
+    # TODO:
+    # test "extensions are ignored for external links" do
+    #   assert autolink_spec(quote(do: t() :: String.t()), ext: ".xhtml") ==
+    #            ~m"[`EarmarkParser.as_ast/2`](https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2)"
+    # end
   end
 
   test "warnings" do

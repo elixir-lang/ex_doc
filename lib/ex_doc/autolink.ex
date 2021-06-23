@@ -35,4 +35,38 @@ defmodule ExDoc.Autolink do
     siblings: [],
     skip_undefined_reference_warnings_on: []
   ]
+
+  @hexdocs "https://hexdocs.pm/"
+  @otpdocs "https://erlang.org/doc/man/"
+
+  def app_module_url(:ex_doc, module, %{current_module: module} = config) do
+    ex_doc_app_url(module, config, inspect(module), config.ext, "#content")
+  end
+
+  def app_module_url(:ex_doc, module, config) do
+    ex_doc_app_url(module, config, inspect(module), config.ext, "")
+  end
+
+  def app_module_url(:otp, module, _config) do
+    @otpdocs <> "#{module}.html"
+  end
+
+  # TODO: make more generic
+  @doc false
+  def ex_doc_app_url(module, config, path, ext, suffix) do
+    case :application.get_application(module) do
+      {:ok, app} ->
+        if app in config.apps do
+          path <> ext <> suffix
+        else
+          config.deps
+          |> Keyword.get_lazy(app, fn -> @hexdocs <> "#{app}" end)
+          |> String.trim_trailing("/")
+          |> Kernel.<>("/" <> path <> ".html" <> suffix)
+        end
+
+      _ ->
+        path <> ext <> suffix
+    end
+  end
 end
