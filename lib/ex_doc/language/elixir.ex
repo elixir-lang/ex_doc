@@ -97,7 +97,7 @@ defmodule ExDoc.Language.Elixir do
   @impl true
   def autolink_doc(ast, opts) do
     config = struct!(Autolink, opts)
-    walk(ast, config)
+    walk_doc(ast, config)
   end
 
   @impl true
@@ -267,19 +267,19 @@ defmodule ExDoc.Language.Elixir do
 
   @autoimported_modules [Kernel, Kernel.SpecialForms]
 
-  defp walk(list, config) when is_list(list) do
-    Enum.map(list, &walk(&1, config))
+  defp walk_doc(list, config) when is_list(list) do
+    Enum.map(list, &walk_doc(&1, config))
   end
 
-  defp walk(binary, _) when is_binary(binary) do
+  defp walk_doc(binary, _) when is_binary(binary) do
     binary
   end
 
-  defp walk({:pre, _, _, _} = ast, _config) do
+  defp walk_doc({:pre, _, _, _} = ast, _config) do
     ast
   end
 
-  defp walk({:a, attrs, inner, meta} = ast, config) do
+  defp walk_doc({:a, attrs, inner, meta} = ast, config) do
     case custom_link(attrs, config) do
       :remove_link ->
         remove_link(ast)
@@ -292,7 +292,7 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
-  defp walk({:code, attrs, [code], meta} = ast, config) do
+  defp walk_doc({:code, attrs, [code], meta} = ast, config) do
     if url = url(code, :regular_link, config) do
       code = remove_prefix(code)
       {:a, [href: url], [{:code, attrs, [code], meta}], %{}}
@@ -301,8 +301,8 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
-  defp walk({tag, attrs, ast, meta}, config) do
-    {tag, attrs, walk(ast, config), meta}
+  defp walk_doc({tag, attrs, ast, meta}, config) do
+    {tag, attrs, walk_doc(ast, config), meta}
   end
 
   defp remove_link({:a, _attrs, inner, _meta}),
