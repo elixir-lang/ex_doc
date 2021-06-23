@@ -67,11 +67,16 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def typespec(nil, _opts) do
+  def autolink_doc(ast, _opts) do
+    ast
+  end
+
+  @impl true
+  def autolink_spec(nil, _opts) do
     nil
   end
 
-  def typespec(attribute, _opts) do
+  def autolink_spec(attribute, _opts) do
     {:attribute, _, type, _} = attribute
 
     # `-type ` => 6

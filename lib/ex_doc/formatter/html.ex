@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.HTML do
   @moduledoc false
 
   alias __MODULE__.{Assets, Templates, SearchItems}
-  alias ExDoc.{Autolink, Markdown, GroupMatcher}
+  alias ExDoc.{Markdown, GroupMatcher}
 
   @main "api-reference"
   @assets_dir "assets"
@@ -85,29 +85,39 @@ defmodule ExDoc.Formatter.HTML do
         for child_node <- node.docs do
           id = id(node, child_node)
           autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
-          specs = Enum.map(child_node.specs, &language.typespec(&1, autolink_opts))
+          specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
           child_node = %{child_node | specs: specs}
-          render_doc(child_node, autolink_opts, opts)
+          render_doc(child_node, language, autolink_opts, opts)
         end
 
       typespecs =
         for child_node <- node.typespecs do
           id = id(node, child_node)
           autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
-          child_node = %{child_node | spec: language.typespec(child_node.spec, autolink_opts)}
-          render_doc(child_node, autolink_opts, opts)
+
+          child_node = %{
+            child_node
+            | spec: language.autolink_spec(child_node.spec, autolink_opts)
+          }
+
+          render_doc(child_node, language, autolink_opts, opts)
         end
 
       id = id(node, nil)
-      %{render_doc(node, [{:id, id} | autolink_opts], opts) | docs: docs, typespecs: typespecs}
+
+      %{
+        render_doc(node, language, [{:id, id} | autolink_opts], opts)
+        | docs: docs,
+          typespecs: typespecs
+      }
     end)
   end
 
-  defp render_doc(%{doc: nil} = node, _autolink_opts, _opts),
+  defp render_doc(%{doc: nil} = node, _language, _autolink_opts, _opts),
     do: node
 
-  defp render_doc(%{doc: doc} = node, autolink_opts, opts) do
-    rendered = autolink_and_render(doc, autolink_opts, opts)
+  defp render_doc(%{doc: doc} = node, language, autolink_opts, opts) do
+    rendered = autolink_and_render(doc, language, autolink_opts, opts)
     %{node | rendered_doc: rendered}
   end
 
@@ -116,9 +126,9 @@ defmodule ExDoc.Formatter.HTML do
   defp id(%{id: mod_id}, %ExDoc.FunctionNode{id: id}), do: "#{mod_id}.#{id}"
   defp id(%{id: mod_id}, %ExDoc.TypeNode{id: id}), do: "t:#{mod_id}.#{id}"
 
-  defp autolink_and_render(doc, autolink_opts, opts) do
+  defp autolink_and_render(doc, language, autolink_opts, opts) do
     doc
-    |> Autolink.doc(autolink_opts)
+    |> language.autolink_doc(autolink_opts)
     |> ExDoc.DocAST.to_string()
     |> ExDoc.DocAST.highlight(opts)
   end
@@ -316,7 +326,9 @@ defmodule ExDoc.Formatter.HTML do
                 "file extension not recognized, allowed extension is either .md, .txt or no extension"
       end
 
-    html_content = autolink_and_render(ast, autolink_opts, opts)
+    # TODO: don't hardcode Elixir for extras?
+    language = ExDoc.Language.Elixir
+    html_content = autolink_and_render(ast, language, autolink_opts, opts)
 
     group = GroupMatcher.match_extra(groups, input)
     title = title || extract_title(html_content) || filename_to_title(input)

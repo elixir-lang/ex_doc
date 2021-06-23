@@ -402,7 +402,7 @@ defmodule ExDoc.RetrieverTest do
       } = function1
 
       assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
-      assert Erlang.typespec(hd(function1.specs), []) == "function1() -> atom()."
+      assert Erlang.autolink_spec(hd(function1.specs), []) == "function1() -> atom()."
 
       %ExDoc.FunctionNode{
         id: "function2/0"
@@ -432,7 +432,7 @@ defmodule ExDoc.RetrieverTest do
       assert Path.basename(callback1.source_url) == "mod.erl:3"
       # this is an edoc bug, it should be 4
       assert callback1.doc_line == 3
-      assert Erlang.typespec(hd(callback1.specs), []) == "callback1() -> atom()."
+      assert Erlang.autolink_spec(hd(callback1.specs), []) == "callback1() -> atom()."
     end
 
     @tag :otp24
@@ -457,13 +457,13 @@ defmodule ExDoc.RetrieverTest do
       assert opaque1.type == :opaque
       assert opaque1.signature == "opaque1/0"
       assert DocAST.to_string(opaque1.doc) == "opaque1/0 docs."
-      assert Erlang.typespec(opaque1.spec, []) == "opaque1() :: atom()."
+      assert Erlang.autolink_spec(opaque1.spec, []) == "opaque1() :: atom()."
 
       assert type1.id == "type1/0"
       assert type1.type == :type
       assert type1.signature == "type1/0"
       assert DocAST.to_string(type1.doc) == "type1/0 docs."
-      assert Erlang.typespec(type1.spec, []) == "type1() :: atom()."
+      assert Erlang.autolink_spec(type1.spec, []) == "type1() :: atom()."
     end
 
     test "module with no chunk", c do

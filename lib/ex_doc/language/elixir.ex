@@ -92,7 +92,12 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def typespec(spec, opts) do
+  def autolink_doc(doc, opts) do
+    Autolink.doc(doc, opts)
+  end
+
+  @impl true
+  def autolink_spec(spec, opts) do
     Autolink.typespec(spec, opts)
   end
 
