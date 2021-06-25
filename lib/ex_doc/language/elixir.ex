@@ -647,7 +647,7 @@ defmodule ExDoc.Language.Elixir do
 
     case {mode, Refs.get_visibility(ref)} do
       {_link_type, :public} ->
-        Autolink.app_module_url(tool(module), module, config)
+        Autolink.app_module_url(Autolink.tool(module), module, config)
 
       {:regular_link, :undefined} ->
         nil
@@ -682,7 +682,7 @@ defmodule ExDoc.Language.Elixir do
 
     case {kind, visibility} do
       {_kind, :public} ->
-        fragment(tool(module), kind, name, arity)
+        fragment(Autolink.tool(module), kind, name, arity)
 
       {:function, _visibility} ->
         try_autoimported_function(name, arity, mode, config, original_text)
@@ -713,7 +713,7 @@ defmodule ExDoc.Language.Elixir do
 
     case {mode, Refs.get_visibility({:module, module}), Refs.get_visibility(ref)} do
       {_mode, _module_visibility, :public} ->
-        case tool(module) do
+        case Autolink.tool(module) do
           :no_tool ->
             nil
 
@@ -752,29 +752,6 @@ defmodule ExDoc.Language.Elixir do
       :function -> "##{name}-#{arity}"
       :callback -> "#Module:#{name}-#{arity}"
       :type -> "#type-#{name}"
-    end
-  end
-
-  defp tool(module) do
-    name = Atom.to_string(module)
-
-    if name == String.downcase(name) do
-      case :code.which(module) do
-        :preloaded ->
-          :otp
-
-        :non_existing ->
-          :no_tool
-
-        path ->
-          if String.starts_with?(List.to_string(path), List.to_string(:code.lib_dir())) do
-            :otp
-          else
-            :no_tool
-          end
-      end
-    else
-      :ex_doc
     end
   end
 

@@ -17,10 +17,14 @@ defmodule ExDoc.Language.ErlangTest do
                ~s{<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>}
     end
 
-    @tag :skip
     test "external module", c do
-      assert autolink_doc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) ==
-               ~s{<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>}
+      assert autolink_doc("{@link 'Elixir.EarmarkParser'}", c) ==
+               ~s{<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>}
+    end
+
+    test "external module - extension is ignored", c do
+      assert autolink_doc("{@link 'Elixir.EarmarkParser'}", [ext: ".xhtml"], c) ==
+               ~s{<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>}
     end
 
     test "custom text", c do
@@ -35,7 +39,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "remote function", c do
       assert autolink_doc("{@link bar:bar/0}", c) ==
-               ~s{<a href="bar.html#bar-0"><code>bar:bar/0</code></a>}
+               ~s{<a href="bar.html#bar/0"><code>bar:bar/0</code></a>}
     end
 
     test "OTP function", c do
@@ -48,6 +52,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s{<a href="https://erlang.org/doc/man/zlib.html#gunzip-1"><code>zlib:gunzip/1</code></a>}
     end
 
+    test "external function", c do
+      assert autolink_doc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) ==
+               ~s{<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>}
+    end
+
     test "local type", c do
       assert autolink_doc("{@link t()}", c) ==
                ~s{<a href="#t:t/0"><code>t()</code></a>}
@@ -55,7 +64,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "remote type", c do
       assert autolink_doc("{@link bar:bar()}", c) ==
-               ~s{<a href="bar.html#type-bar"><code>bar:bar()</code></a>}
+               ~s{<a href="bar.html#t:bar/0"><code>bar:bar()</code></a>}
     end
 
     test "OTP type", c do

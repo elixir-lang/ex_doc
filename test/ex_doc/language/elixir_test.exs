@@ -209,8 +209,6 @@ defmodule ExDoc.Language.ElixirTest do
       # extensions are ignored for external links
       assert autolink_doc("EarmarkParser.as_ast/2", ext: ".xhtml") ==
                ~m"[`EarmarkParser.as_ast/2`](https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2)"
-
-      assert_unchanged(":test_module.foo/0")
     end
 
     test "extras" do

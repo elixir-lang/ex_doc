@@ -40,33 +40,76 @@ defmodule ExDoc.Autolink do
   @otpdocs "https://erlang.org/doc/man/"
 
   def app_module_url(:ex_doc, module, %{current_module: module} = config) do
-    ex_doc_app_url(module, config, inspect(module), config.ext, "#content")
+    path = module |> inspect() |> String.trim_leading(":")
+    ex_doc_app_url(module, config, path, config.ext, "#content")
   end
 
   def app_module_url(:ex_doc, module, config) do
-    ex_doc_app_url(module, config, inspect(module), config.ext, "")
+    path = module |> inspect() |> String.trim_leading(":")
+    ex_doc_app_url(module, config, path, config.ext, "")
   end
 
   def app_module_url(:otp, module, _config) do
     @otpdocs <> "#{module}.html"
   end
 
+  def app_module_url(:no_tool, _, _) do
+    nil
+  end
+
   # TODO: make more generic
   @doc false
   def ex_doc_app_url(module, config, path, ext, suffix) do
+    if app = app(module) do
+      if app in config.apps do
+        path <> ext <> suffix
+      else
+        config.deps
+        |> Keyword.get_lazy(app, fn -> @hexdocs <> "#{app}" end)
+        |> String.trim_trailing("/")
+        |> Kernel.<>("/" <> path <> ".html" <> suffix)
+      end
+    else
+      path <> ext <> suffix
+    end
+  end
+
+  defp app(module) do
     case :application.get_application(module) do
       {:ok, app} ->
-        if app in config.apps do
-          path <> ext <> suffix
-        else
-          config.deps
-          |> Keyword.get_lazy(app, fn -> @hexdocs <> "#{app}" end)
-          |> String.trim_trailing("/")
-          |> Kernel.<>("/" <> path <> ".html" <> suffix)
-        end
+        app
 
       _ ->
-        path <> ext <> suffix
+        path = :code.which(module)
+
+        with true <- is_list(path),
+             [_, "ebin", app, "lib" | _] <- path |> Path.split() |> Enum.reverse() do
+          String.to_atom(app)
+        else
+          _ -> nil
+        end
+    end
+  end
+
+  @doc false
+  def tool(module) do
+    if match?("Elixir." <> _, Atom.to_string(module)) do
+      :ex_doc
+    else
+      case :code.which(module) do
+        :preloaded ->
+          :otp
+
+        :non_existing ->
+          :no_tool
+
+        path ->
+          if :string.prefix(path, :code.lib_dir()) != :nomatch do
+            :otp
+          else
+            :ex_doc
+          end
+      end
     end
   end
 end
