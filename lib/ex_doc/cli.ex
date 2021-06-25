@@ -81,6 +81,19 @@ defmodule ExDoc.CLI do
   end
 
   defp read_config(path) do
+    case Path.extname(path) do
+      ".exs" ->
+        read_config_exs(path)
+
+      ".config" ->
+        read_config_erl(path)
+
+      other ->
+        raise "expected config to have .exs or .config extension, got: #{inspect(other)}"
+    end
+  end
+
+  defp read_config_exs(path) do
     config = File.read!(path)
     {result, _} = Code.eval_string(config)
 
@@ -89,6 +102,16 @@ defmodule ExDoc.CLI do
     end
 
     result
+  end
+
+  defp read_config_erl(path) do
+    case :file.consult(path) do
+      {:ok, config} ->
+        config
+
+      {:error, reason} ->
+        raise "error parsing #{path}: #{inspect(reason)}"
+    end
   end
 
   defp parse_args([_project, _version, _source_beam] = args), do: args
@@ -119,7 +142,8 @@ defmodule ExDoc.CLI do
       VERSION             Version number
       BEAMS               Path to compiled beam files
       -n, --canonical     Indicate the preferred URL with rel="canonical" link element
-      -c, --config        Give configuration through a file instead of command line
+      -c, --config        Give configuration through a file instead of command line.
+                          See "Custom config" section below for more information.
       -f, --formatter     Docs formatter to use (html or epub), default: "html"
       -p, --homepage-url  URL to link to for the site name
           --prepend-path  Prepends the given path to Erlang code path
@@ -136,9 +160,12 @@ defmodule ExDoc.CLI do
 
     ## Custom config
 
-    A custom config can be given with the `--config` option. The file must
-    be an Elixir script that returns a keyword list with the same options
-    declare in `Mix.Tasks.Docs`.
+    A custom config can be given with the `--config` option.
+
+    The file must either have ".exs" or ".config" extension.
+
+    The file with the ".exs" extension must be an Elixir script that returns a keyword list with
+    the same options declare in `Mix.Tasks.Docs`. Here is an example:
 
         [
           extras: Path.wildcard("lib/elixir/pages/*.md"),
@@ -150,6 +177,13 @@ defmodule ExDoc.CLI do
             ...
           ]
         ]
+
+    The file with the ".config" extension must contain Erlang terms separated by ".".
+    See `:file.consult/1` for more information. Here is an example:
+
+        {extras, [<<"README.md">>, <<"CHANGELOG.md">>]}.
+        {main, <<"readme">>}.
+        {proglang, erlang}.
 
     ## Source linking
 
