@@ -78,7 +78,7 @@ defmodule ExDoc.CLITest do
     File.rm!("not_aliased.exs")
   end
 
-  describe ".exs config" do
+  describe "--config .exs" do
     test "loading" do
       File.write!("test.exs", ~s([extras: ["README.md"]]))
 
@@ -99,20 +99,48 @@ defmodule ExDoc.CLITest do
     end
 
     test "missing" do
-      assert_raise File.Error,
-                   fn -> run(["ExDoc", "1.2.3", @ebin, "-c", "test.exs"]) end
+      assert_raise File.Error, fn ->
+        run(["ExDoc", "1.2.3", @ebin, "-c", "test.exs"])
+      end
     end
 
     test "invalid" do
       File.write!("test.exs", ~s(%{"extras" => "README.md"}))
 
-      assert_raise RuntimeError,
-                   ~S(expected a keyword list from config file: "test.exs"),
-                   fn ->
-                     run(["ExDoc", "1.2.3", @ebin, "-c", "test.exs"])
-                   end
+      assert_raise RuntimeError, ~S(expected a keyword list from config file: "test.exs"), fn ->
+        run(["ExDoc", "1.2.3", @ebin, "-c", "test.exs"])
+      end
     after
       File.rm!("test.exs")
+    end
+  end
+
+  describe "--config .config" do
+    test "loading" do
+      File.write!("test.config", ~s({extras, [<<"README.md">>]}.))
+
+      {project, version, opts} = run(["ExDoc", "1.2.3", @ebin, "-c", "test.config"])
+
+      assert project == "ExDoc"
+      assert version == "1.2.3"
+
+      assert Enum.sort(opts) == [
+               apps: [:ex_doc],
+               extras: ["README.md"],
+               source_beam: @ebin
+             ]
+    after
+      File.rm!("test.config")
+    end
+
+    test "invalid" do
+      File.write!("test.config", "bad")
+
+      assert_raise RuntimeError, ~r/error parsing test.config/, fn ->
+        run(["ExDoc", "1.2.3", @ebin, "-c", "test.config"])
+      end
+    after
+      File.rm!("test.config")
     end
   end
 end
