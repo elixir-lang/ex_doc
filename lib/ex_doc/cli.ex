@@ -45,6 +45,10 @@ defmodule ExDoc.CLI do
 
     Code.prepend_path(source_beam)
 
+    if opts[:prepend_path] do
+      Code.prepend_path(opts[:prepend_path])
+    end
+
     opts =
       opts
       |> Keyword.put(:source_beam, source_beam)
@@ -118,6 +122,7 @@ defmodule ExDoc.CLI do
       -c, --config        Give configuration through a file instead of command line
       -f, --formatter     Docs formatter to use (html or epub), default: "html"
       -p, --homepage-url  URL to link to for the site name
+          --prepend-path  Prepends the given path to Erlang code path
           --language      Identify the primary language of the documents, its value must be
                           a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)
