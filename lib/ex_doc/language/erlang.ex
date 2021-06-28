@@ -3,7 +3,7 @@ defmodule ExDoc.Language.Erlang do
 
   @behaviour ExDoc.Language
 
-  alias ExDoc.Autolink
+  alias ExDoc.{Autolink, Refs}
 
   @impl true
   def module_data(module) do
@@ -140,8 +140,16 @@ defmodule ExDoc.Language.Erlang do
 
   defp url(:module, string, config) do
     module = String.to_atom(string)
-    tool = Autolink.tool(module)
-    Autolink.app_module_url(tool, module, config)
+    ref = {:module, module}
+    visibility = Refs.get_visibility(ref)
+
+    if visibility == :public do
+      tool = Autolink.tool(module)
+      Autolink.app_module_url(tool, module, config)
+    else
+      Autolink.maybe_warn(ref, config, visibility, %{original_text: string})
+      nil
+    end
   end
 
   defp url(kind, string, config) do

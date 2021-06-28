@@ -72,12 +72,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s{<a href="https://erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>}
     end
 
-    # TODO:
-    # test "bad module", c do
-    #   assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-    #            assert autolink_doc("{@link bad}", c) == ~s{<code>bad</code>}
-    #          end) =~ "bad"
-    # end
+    test "bad module", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_doc("{@link bad}", c) == ~s{<code>bad</code>}
+             end) =~ "references module \"bad\" but it is undefined"
+    end
 
     # test "bad local function", c do
     #   assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
