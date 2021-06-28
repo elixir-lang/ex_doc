@@ -100,6 +100,15 @@ defmodule ExDoc.Language.Erlang do
     |> Enum.join("\n")
   end
 
+  @impl true
+  def highlight_info() do
+    %{
+      language_name: "erlang",
+      lexer: Makeup.Lexers.ErlangLexer,
+      opts: []
+    }
+  end
+
   ## Autolink
 
   defp walk_doc(list, config) when is_list(list) do

@@ -130,7 +130,7 @@ defmodule ExDoc.Formatter.HTML do
     doc
     |> language.autolink_doc(autolink_opts)
     |> ExDoc.DocAST.to_string()
-    |> ExDoc.DocAST.highlight(opts)
+    |> ExDoc.DocAST.highlight(language, opts)
   end
 
   defp output_setup(build, config) do

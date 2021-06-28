@@ -116,6 +116,15 @@ defmodule ExDoc.Language.Elixir do
     name <> do_typespec(rest, config)
   end
 
+  @impl true
+  def highlight_info() do
+    %{
+      language_name: "elixir",
+      lexer: Makeup.Lexers.ElixirLexer,
+      opts: []
+    }
+  end
+
   ## Helpers
 
   defp module_type_and_skip(module) do

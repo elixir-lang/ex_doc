@@ -84,26 +84,28 @@ defmodule ExDoc.DocAST do
   @doc """
   Highlights a DocAST converted to string.
   """
-  def highlight(html, opts \\ []) do
+  def highlight(html, language, opts \\ []) do
+    highlight_info = language.highlight_info()
+
     Regex.replace(
       ~r/<pre><code(?:\s+class="(\w*)")?>([^<]*)<\/code><\/pre>/,
       html,
-      &highlight_code_block(&1, &2, &3, opts)
+      &highlight_code_block(&1, &2, &3, highlight_info, opts)
     )
   end
 
-  defp highlight_code_block(full_block, lang, code, outer_opts) do
-    case pick_language_and_lexer(lang) do
+  defp highlight_code_block(full_block, lang, code, highlight_info, outer_opts) do
+    case pick_language_and_lexer(lang, highlight_info) do
       {_language, nil, _opts} -> full_block
       {language, lexer, opts} -> render_code(language, lexer, opts, code, outer_opts)
     end
   end
 
-  # If new lexers are available, add them here:
-  # TODO: This probably needs to default to the actual language
-  defp pick_language_and_lexer(""), do: {"elixir", Makeup.Lexers.ElixirLexer, []}
+  defp pick_language_and_lexer("", highlight_info) do
+    {highlight_info.language_name, highlight_info.lexer, highlight_info.opts}
+  end
 
-  defp pick_language_and_lexer(lang) do
+  defp pick_language_and_lexer(lang, _highlight_info) do
     case Makeup.Registry.fetch_lexer_by_name(lang) do
       {:ok, {lexer, opts}} -> {lang, lexer, opts}
       :error -> {lang, nil, []}

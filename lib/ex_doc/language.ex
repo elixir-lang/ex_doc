@@ -111,6 +111,15 @@ defmodule ExDoc.Language do
   """
   @callback autolink_spec(spec :: term(), opts :: keyword()) :: iodata()
 
+  @doc """
+  Returns information for syntax highlighting.
+  """
+  @callback highlight_info() :: %{
+              language_name: String.t(),
+              lexer: module(),
+              opts: keyword()
+            }
+
   def get(:elixir), do: ExDoc.Language.Elixir
   def get(:erlang), do: ExDoc.Language.Erlang
 end

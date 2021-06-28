@@ -95,23 +95,23 @@ defmodule ExDoc.DocASTTest do
   end
 
   describe "highlight" do
-    test "if no language is given, highlight as iex/elixir" do
+    test "if no language is given in markup, use language module " do
       with_empty_class = ~S[<pre><code class="">mix run --no-halt path/to/file.exs</code></pre>]
       without_class = "<pre><code>mix run --no-halt path/to/file.exs</code></pre>"
       iex_detected_with_empty_class = ~S[<pre><code class="">iex&gt; max(4, 5)</code></pre>]
       iex_detected_without_class = ~S[<pre><code>iex&gt; max(4, 5)</code></pre>]
 
-      assert DocAST.highlight(with_empty_class) =~
+      assert DocAST.highlight(with_empty_class, ExDoc.Language.Elixir) =~
                ~r{<pre><code class=\"makeup elixir\">.*}
 
-      assert DocAST.highlight(without_class) =~
+      assert DocAST.highlight(without_class, ExDoc.Language.Elixir) =~
                ~r{<pre><code class=\"makeup elixir\">.*}
 
       # IEx is highlighted by the normal elixir lexer
-      assert DocAST.highlight(iex_detected_with_empty_class) =~
+      assert DocAST.highlight(iex_detected_with_empty_class, ExDoc.Language.Elixir) =~
                ~r{<pre><code class=\"makeup elixir\">.*}
 
-      assert DocAST.highlight(iex_detected_without_class) =~
+      assert DocAST.highlight(iex_detected_without_class, ExDoc.Language.Elixir) =~
                ~r{<pre><code class=\"makeup elixir\">.*}
     end
   end
