@@ -148,6 +148,13 @@ defmodule ExDoc.Language.Erlang do
     name = String.to_atom(name)
     arity = String.to_integer(arity)
 
+    original_text =
+      if kind == :type do
+        "#{name}()"
+      else
+        "#{name}/#{arity}"
+      end
+
     if module == "" do
       ref = {kind, config.current_module, name, arity}
       visibility = Refs.get_visibility(ref)
@@ -155,19 +162,13 @@ defmodule ExDoc.Language.Erlang do
       if visibility == :public do
         final_url({kind, name, arity}, config)
       else
-        original_text =
-          if kind == :type do
-            "#{name}()"
-          else
-            "#{name}/#{arity}"
-          end
-
         Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
         nil
       end
     else
-      module = String.to_atom(module)
-      final_url({kind, module, name, arity}, config)
+      ref = {kind, String.to_atom(module), name, arity}
+      original_text = "#{module}:#{original_text}"
+      do_url(ref, original_text, config)
     end
   end
 
