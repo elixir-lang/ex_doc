@@ -190,6 +190,10 @@ defmodule ExDoc.Autolink do
     warn(message, {file, line}, id)
   end
 
+  defp warn(message, {file, line}, id, _, _) when is_binary(message) do
+    warn(message, {file, line}, id)
+  end
+
   # there is not such a thing as private callback or private module
   defp format_visibility(visibility, kind) when kind in [:module, :callback], do: "#{visibility}"
 

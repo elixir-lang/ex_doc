@@ -102,29 +102,29 @@ defmodule ExDoc.Language.ErlangTest do
              end) =~ "references \"bad:bad()\" but it is undefined or private"
     end
 
-    # test "application", c do
-    #   assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-    #            assert autolink_doc("{@link //foo}", c) == ~s{<code>foo</code>}
-    #          end) =~ ~r{application references are not supported: //foo}
-    # end
+    test "application", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_doc("{@link //foo}", c) == ~s{<code>foo</code>}
+             end) =~ ~r{application references are not supported: //foo}
+    end
 
-    # test "application module", c do
-    #   assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-    #            assert autolink_doc("{@link //foo/bar}", c) == ~s{<code>bar</code>}
-    #          end) =~ ~r{application references are not supported: //foo/bar}
-    # end
+    test "application module", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_doc("{@link //foo/bar}", c) == ~s{<code>bar</code>}
+             end) =~ ~r{application references are not supported: //foo/bar}
+    end
 
-    # test "application function", c do
-    #   assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-    #            assert autolink_doc("{@link //foo/bar:baz/0}", c) == ~s{<code>bar:baz/0</code>}
-    #          end) =~ ~r{application references are not supported: //foo/bar:baz/0}
-    # end
+    test "application function", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_doc("{@link //foo/bar:baz/0}", c) == ~s{<code>bar:baz/0</code>}
+             end) =~ ~r{application references are not supported: //foo/bar:baz/0}
+    end
 
-    # test "application type", c do
-    #   assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-    #            assert autolink_doc("{@link //foo/bar:baz()}", c) == ~s{<code>bar:baz()</code>}
-    #          end) =~ ~r{application references are not supported: //foo/bar:baz\(\)}
-    # end
+    test "application type", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_doc("{@link //foo/bar:baz()}", c) == ~s{<code>bar:baz()</code>}
+             end) =~ ~r{application references are not supported: //foo/bar:baz\(\)}
+    end
   end
 
   defp autolink_doc(doc, opts \\ [], c) do

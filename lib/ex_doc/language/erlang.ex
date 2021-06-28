@@ -113,13 +113,35 @@ defmodule ExDoc.Language.Erlang do
   defp walk_doc({:a, attrs, inner, _meta} = ast, config) do
     case attrs[:rel] do
       "https://erlang.org/doc/link/seeerl" ->
-        autolink(:module, attrs[:href], inner, config)
+        case String.split(attrs[:href], ":") do
+          [_] ->
+            autolink(:module, attrs[:href], inner, config)
+
+          [app, module] ->
+            autolink_app({:module, app, module}, config)
+        end
 
       "https://erlang.org/doc/link/seemfa" ->
-        autolink(:function, attrs[:href], inner, config)
+        case String.split(attrs[:href], ":") do
+          [_] ->
+            autolink(:function, attrs[:href], inner, config)
+
+          [app, mfa] ->
+            autolink_app({:function, app, mfa}, config)
+        end
 
       "https://erlang.org/doc/link/seetype" ->
-        autolink(:type, attrs[:href], inner, config)
+        case String.split(attrs[:href], ":") do
+          [_] ->
+            autolink(:type, attrs[:href], inner, config)
+
+          [app, mfa] ->
+            autolink_app({:type, app, mfa}, config)
+        end
+
+      "https://erlang.org/doc/link/seeapp" ->
+        [app, "index"] = String.split(attrs[:href], ":")
+        autolink_app({:app, app}, config)
 
       _ ->
         ast
@@ -128,6 +150,33 @@ defmodule ExDoc.Language.Erlang do
 
   defp walk_doc({tag, attrs, ast, meta}, config) do
     {tag, attrs, walk_doc(ast, config), meta}
+  end
+
+  defp autolink_app({:app, app}, config) do
+    message = "application references are not supported: //#{app}"
+    Autolink.maybe_warn(message, config, nil, %{})
+    {:code, [], [app], %{}}
+  end
+
+  defp autolink_app({:module, app, module}, config) do
+    message = "application references are not supported: //#{app}/#{module}"
+    Autolink.maybe_warn(message, config, nil, %{})
+    {:code, [], [module], %{}}
+  end
+
+  defp autolink_app({:function, app, mfa}, config) do
+    mfa = String.replace(mfa, "#", ":")
+    message = "application references are not supported: //#{app}/#{mfa}"
+    Autolink.maybe_warn(message, config, nil, %{})
+    {:code, [], [mfa], %{}}
+  end
+
+  defp autolink_app({:type, app, mfa}, config) do
+    mfa = String.replace(mfa, "#", ":")
+    mfa = String.trim_trailing(mfa, "/0") <> "()"
+    message = "application references are not supported: //#{app}/#{mfa}"
+    Autolink.maybe_warn(message, config, nil, %{})
+    {:code, [], [mfa], %{}}
   end
 
   defp autolink(kind, string, inner, config) do
