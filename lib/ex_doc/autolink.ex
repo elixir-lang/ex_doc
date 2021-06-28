@@ -112,4 +112,92 @@ defmodule ExDoc.Autolink do
       end
     end
   end
+
+  def maybe_warn(ref, config, visibility, metadata) do
+    skipped = config.skip_undefined_reference_warnings_on
+    file = Path.relative_to(config.file, File.cwd!())
+    line = config.line
+
+    unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
+      warn(ref, {file, line}, config.id, visibility, metadata)
+    end
+  end
+
+  defp warn(message, {file, line}, id) do
+    warning = IO.ANSI.format([:yellow, "warning: ", :reset])
+
+    stacktrace =
+      "  #{file}" <>
+        if(line, do: ":#{line}", else: "") <>
+        if(id, do: ": #{id}", else: "")
+
+    IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
+  end
+
+  defp warn(ref, file_line, id, visibility, metadata)
+
+  defp warn(
+         {:module, _module},
+         {file, line},
+         id,
+         visibility,
+         %{mix_task: true, original_text: original_text}
+       ) do
+    message =
+      "documentation references \"#{original_text}\" but it is " <>
+        format_visibility(visibility, :module)
+
+    warn(message, {file, line}, id)
+  end
+
+  defp warn(
+         {:module, _module},
+         {file, line},
+         id,
+         visibility,
+         %{original_text: original_text}
+       ) do
+    message =
+      "documentation references module \"#{original_text}\" but it is " <>
+        format_visibility(visibility, :module)
+
+    warn(message, {file, line}, id)
+  end
+
+  defp warn(
+         nil,
+         {file, line},
+         id,
+         _visibility,
+         %{file_path: _file_path, original_text: original_text}
+       ) do
+    message = "documentation references file \"#{original_text}\" but it does not exist"
+
+    warn(message, {file, line}, id)
+  end
+
+  defp warn(
+         {kind, _module, _name, _arity},
+         {file, line},
+         id,
+         visibility,
+         %{original_text: original_text}
+       ) do
+    message =
+      "documentation references \"#{original_text}\" but it is " <>
+        format_visibility(visibility, kind)
+
+    warn(message, {file, line}, id)
+  end
+
+  # there is not such a thing as private callback or private module
+  defp format_visibility(visibility, kind) when kind in [:module, :callback], do: "#{visibility}"
+
+  # typep is defined as :hidden, since there is no :private visibility value
+  # but type defined with @doc false also is the stored the same way.
+  defp format_visibility(:hidden, :type), do: "hidden or private"
+
+  # for the rest, it can either be undefined or private
+  defp format_visibility(:undefined, _kind), do: "undefined or private"
+  defp format_visibility(visibility, _kind), do: "#{visibility}"
 end

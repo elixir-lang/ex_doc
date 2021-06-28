@@ -337,7 +337,7 @@ defmodule ExDoc.Language.Elixir do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
         HTML.text_to_id(without_ext) <> config.ext <> fragment
       else
-        maybe_warn(nil, config, nil, %{file_path: uri.path, original_text: link})
+        Autolink.maybe_warn(nil, config, nil, %{file_path: uri.path, original_text: link})
 
         nil
       end
@@ -547,7 +547,10 @@ defmodule ExDoc.Language.Elixir do
       end
 
     if url in [nil, :remove_link] and mode == :custom_link do
-      maybe_warn({:module, module}, config, visibility, %{mix_task: true, original_text: string})
+      Autolink.maybe_warn({:module, module}, config, visibility, %{
+        mix_task: true,
+        original_text: string
+      })
     end
 
     url
@@ -653,11 +656,11 @@ defmodule ExDoc.Language.Elixir do
         nil
 
       {:custom_link, visibility} when visibility in [:hidden, :undefined] ->
-        maybe_warn(ref, config, visibility, %{original_text: string})
+        Autolink.maybe_warn(ref, config, visibility, %{original_text: string})
         :remove_link
 
       {_link_type, visibility} ->
-        maybe_warn(ref, config, visibility, %{original_text: string})
+        Autolink.maybe_warn(ref, config, visibility, %{original_text: string})
         nil
     end
   end
@@ -695,7 +698,7 @@ defmodule ExDoc.Language.Elixir do
         nil
 
       _ ->
-        maybe_warn(ref, config, visibility, %{original_text: original_text})
+        Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
         nil
     end
   end
@@ -726,14 +729,18 @@ defmodule ExDoc.Language.Elixir do
         end
 
       {:regular_link, :public, :undefined} ->
-        if warn?, do: maybe_warn(ref, config, :undefined, %{original_text: original_text})
+        if warn?,
+          do: Autolink.maybe_warn(ref, config, :undefined, %{original_text: original_text})
+
         nil
 
       {:regular_link, _module_visibility, :undefined} when not same_module? ->
         nil
 
       {_mode, _module_visibility, visibility} ->
-        if warn?, do: maybe_warn(ref, config, visibility, %{original_text: original_text})
+        if warn?,
+          do: Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
+
         nil
     end
   end
@@ -754,92 +761,4 @@ defmodule ExDoc.Language.Elixir do
       :type -> "#type-#{name}"
     end
   end
-
-  defp maybe_warn(ref, config, visibility, metadata) do
-    skipped = config.skip_undefined_reference_warnings_on
-    file = Path.relative_to(config.file, File.cwd!())
-    line = config.line
-
-    unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
-      warn(ref, {file, line}, config.id, visibility, metadata)
-    end
-  end
-
-  defp warn(message, {file, line}, id) do
-    warning = IO.ANSI.format([:yellow, "warning: ", :reset])
-
-    stacktrace =
-      "  #{file}" <>
-        if(line, do: ":#{line}", else: "") <>
-        if(id, do: ": #{id}", else: "")
-
-    IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
-  end
-
-  defp warn(ref, file_line, id, visibility, metadata)
-
-  defp warn(
-         {:module, _module},
-         {file, line},
-         id,
-         visibility,
-         %{mix_task: true, original_text: original_text}
-       ) do
-    message =
-      "documentation references \"#{original_text}\" but it is " <>
-        format_visibility(visibility, :module)
-
-    warn(message, {file, line}, id)
-  end
-
-  defp warn(
-         {:module, _module},
-         {file, line},
-         id,
-         visibility,
-         %{original_text: original_text}
-       ) do
-    message =
-      "documentation references module \"#{original_text}\" but it is " <>
-        format_visibility(visibility, :module)
-
-    warn(message, {file, line}, id)
-  end
-
-  defp warn(
-         nil,
-         {file, line},
-         id,
-         _visibility,
-         %{file_path: _file_path, original_text: original_text}
-       ) do
-    message = "documentation references file \"#{original_text}\" but it does not exist"
-
-    warn(message, {file, line}, id)
-  end
-
-  defp warn(
-         {kind, _module, _name, _arity},
-         {file, line},
-         id,
-         visibility,
-         %{original_text: original_text}
-       ) do
-    message =
-      "documentation references \"#{original_text}\" but it is " <>
-        format_visibility(visibility, kind)
-
-    warn(message, {file, line}, id)
-  end
-
-  # there is not such a thing as private callback or private module
-  defp format_visibility(visibility, kind) when kind in [:module, :callback], do: "#{visibility}"
-
-  # typep is defined as :hidden, since there is no :private visibility value
-  # but type defined with @doc false also is the stored the same way.
-  defp format_visibility(:hidden, :type), do: "hidden or private"
-
-  # for the rest, it can either be undefined or private
-  defp format_visibility(:undefined, _kind), do: "undefined or private"
-  defp format_visibility(visibility, _kind), do: "#{visibility}"
 end
