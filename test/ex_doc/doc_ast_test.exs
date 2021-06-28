@@ -25,6 +25,13 @@ defmodule ExDoc.DocASTTest do
       assert DocAST.parse!(erl_ast, "application/erlang+html") ==
                [{:p, [], ["foo"], %{}}]
     end
+
+    test "erlang+html code blocks" do
+      erl_ast = [{:pre, [], ["foo"]}]
+
+      assert DocAST.parse!(erl_ast, "application/erlang+html") ==
+               [{:pre, [], [{:code, [], ["foo"], %{}}], %{}}]
+    end
   end
 
   describe "to_string/2" do
