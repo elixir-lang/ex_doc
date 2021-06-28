@@ -139,30 +139,62 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp url(:module, string, config) do
-    module = String.to_atom(string)
-    ref = {:module, module}
-    visibility = Refs.get_visibility(ref)
-
-    if visibility == :public do
-      tool = Autolink.tool(module)
-      Autolink.app_module_url(tool, module, config)
-    else
-      Autolink.maybe_warn(ref, config, visibility, %{original_text: string})
-      nil
-    end
+    ref = {:module, String.to_atom(string)}
+    do_url(ref, string, config)
   end
 
   defp url(kind, string, config) do
     [module, name, arity] = String.split(string, ["#", "/"])
+    name = String.to_atom(name)
+    arity = String.to_integer(arity)
 
     if module == "" do
-      fragment(:ex_doc, kind, name, arity)
+      ref = {kind, config.current_module, name, arity}
+      visibility = Refs.get_visibility(ref)
+
+      if visibility == :public do
+        final_url({kind, name, arity}, config)
+      else
+        original_text =
+          if kind == :type do
+            "#{name}()"
+          else
+            "#{name}/#{arity}"
+          end
+
+        Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
+        nil
+      end
     else
       module = String.to_atom(module)
-      tool = Autolink.tool(module)
-      module_url = Autolink.app_module_url(tool, module, config)
-      module_url && module_url <> fragment(tool, kind, name, arity)
+      final_url({kind, module, name, arity}, config)
     end
+  end
+
+  defp do_url(ref, original_text, config) do
+    visibility = Refs.get_visibility(ref)
+
+    if visibility == :public do
+      final_url(ref, config)
+    else
+      Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
+      nil
+    end
+  end
+
+  defp final_url({:module, module}, config) do
+    tool = Autolink.tool(module)
+    Autolink.app_module_url(tool, module, config)
+  end
+
+  defp final_url({kind, name, arity}, _config) do
+    fragment(:ex_doc, kind, name, arity)
+  end
+
+  defp final_url({kind, module, name, arity}, config) do
+    tool = Autolink.tool(module)
+    module_url = Autolink.app_module_url(tool, module, config)
+    module_url && module_url <> fragment(tool, kind, name, arity)
   end
 
   defp fragment(:otp, :function, name, arity) do

@@ -33,7 +33,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "local function", c do
-      assert autolink_doc("{@link foo/0}", c) ==
+      assert autolink_doc("{@link foo/0}", [current_module: :foo], c) ==
                ~s{<a href="#foo/0"><code>foo/0</code></a>}
     end
 
@@ -58,7 +58,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "local type", c do
-      assert autolink_doc("{@link t()}", c) ==
+      assert autolink_doc("{@link t()}", [current_module: :foo], c) ==
                ~s{<a href="#t:t/0"><code>t()</code></a>}
     end
 
@@ -78,11 +78,11 @@ defmodule ExDoc.Language.ErlangTest do
              end) =~ "references module \"bad\" but it is undefined"
     end
 
-    # test "bad local function", c do
-    #   assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-    #            assert autolink_doc("{@link bad/0}", c) == ~s{<code>bad/0</code>}
-    #          end) =~ "bad/0"
-    # end
+    test "bad local function", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_doc("{@link bad/0}", c) == ~s{<code>bad/0</code>}
+             end) =~ "references \"bad/0\" but it is undefined or private"
+    end
 
     # test "bad remote function", c do
     #   assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
@@ -90,11 +90,11 @@ defmodule ExDoc.Language.ErlangTest do
     #          end) =~ "bad:bad/0"
     # end
 
-    # test "bad local type", c do
-    #   assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-    #            assert autolink_doc("{@link bad()}", c) == ~s{<code>bad()</code>}
-    #          end) =~ "bad()"
-    # end
+    test "bad local type", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_doc("{@link bad()}", c) == ~s{<code>bad()</code>}
+             end) =~ "references \"bad\(\)\" but it is undefined or private"
+    end
 
     # test "bad remote type", c do
     #   assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
