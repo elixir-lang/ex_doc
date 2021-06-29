@@ -104,16 +104,54 @@ defmodule ExDoc.Language.Elixir do
   def autolink_spec(ast, opts) do
     config = struct!(Autolink, opts)
 
-    string =
+    # string =
+    #   ast
+    #   |> Macro.to_string()
+    #   |> safe_format_string!()
+    #   |> T.h()
+
+    # name = typespec_name(ast)
+    # {name, rest} = split_name(string, name)
+
+    # name <> do_typespec(rest, config)
+
+    format_fun = fn ast ->
       ast
       |> Macro.to_string()
       |> safe_format_string!()
       |> T.h()
+    end
 
-    name = typespec_name(ast)
-    {name, rest} = split_name(string, name)
+    autolink_fun = fn
+      {:type, name, arity} ->
+        text = "#{name}"
 
-    name <> do_typespec(rest, config)
+        if url = local_url(:type, name, arity, config, text) do
+          ~s[<a href="#{url}">#{text}</a>]
+        else
+          text
+        end
+
+      {:remote_type, module, name, arity} ->
+        module =
+          case module do
+            atom when is_atom(atom) ->
+              atom
+
+            {:__aliases__, _, parts} ->
+              Module.concat(parts)
+          end
+
+        text = "#{inspect(module)}.#{name}"
+
+        if url = remote_url({:type, module, name, arity}, config, text) do
+          ~s[<a href="#{url}">#{text}</a>]
+        else
+          text
+        end
+    end
+
+    ExDoc.Language.SpecAST.to_string(ast, format_fun, autolink_fun)
   end
 
   ## Helpers
@@ -698,6 +736,7 @@ defmodule ExDoc.Language.Elixir do
         nil
 
       _ ->
+        IO.inspect({kind, name, arity})
         Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
         nil
     end
