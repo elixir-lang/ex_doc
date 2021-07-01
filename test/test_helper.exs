@@ -39,7 +39,7 @@ defmodule TestHelper do
     end)
   end
 
-  def erlc(context, module, code) do
+  def erlc(context, module, code, opts \\ []) do
     dir = context.tmp_dir
 
     src_path = Path.join([dir, "#{module}.erl"])
@@ -63,6 +63,10 @@ defmodule TestHelper do
       :code.delete(module)
       File.rm_rf!(dir)
     end)
+
+    if Keyword.get(opts, :docs_chunk, true) do
+      edoc_to_chunk(module)
+    end
 
     :ok
   end

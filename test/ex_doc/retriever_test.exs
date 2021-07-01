@@ -360,8 +360,6 @@ defmodule ExDoc.RetrieverTest do
       function2() -> ok.
       """)
 
-      edoc_to_chunk(:mod)
-
       [mod] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
 
       %ExDoc.ModuleNode{
@@ -421,7 +419,6 @@ defmodule ExDoc.RetrieverTest do
       %% callback1/0 docs.
       """)
 
-      edoc_to_chunk(:mod)
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
       [mod] = Retriever.docs_from_modules([:mod], config)
       [callback1] = mod.docs
@@ -448,7 +445,6 @@ defmodule ExDoc.RetrieverTest do
       %% opaque1/0 docs.
       """)
 
-      edoc_to_chunk(:mod)
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
       [mod] = Retriever.docs_from_modules([:mod], config)
       [opaque1, type1] = mod.typespecs
@@ -467,9 +463,14 @@ defmodule ExDoc.RetrieverTest do
     end
 
     test "module with no chunk", c do
-      erlc(c, :no_chunk, ~S"""
-      -module(no_chunk).
-      """)
+      erlc(
+        c,
+        :no_chunk,
+        ~S"""
+        -module(no_chunk).
+        """,
+        docs_chunk: false
+      )
 
       assert Retriever.docs_from_modules([:no_chunk], %ExDoc.Config{}) == []
     end

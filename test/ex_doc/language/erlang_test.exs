@@ -138,8 +138,6 @@ defmodule ExDoc.Language.ErlangTest do
     foo() -> ok.
     """)
 
-    :ok = edoc_to_chunk(:foo)
-
     erlc(c, :bar, """
     -module(bar).
     -export([bar/0]).
@@ -147,8 +145,6 @@ defmodule ExDoc.Language.ErlangTest do
     -type t() :: atom().
     bar() -> ok.
     """)
-
-    :ok = edoc_to_chunk(:bar)
 
     {:docs_v1, _, _, "application/erlang+html", %{"en" => doc}, _, _} = Code.fetch_docs(:foo)
 
