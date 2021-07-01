@@ -127,7 +127,35 @@ defmodule ExDoc.Language.ErlangTest do
     end
   end
 
+  describe "autolink_spec/2" do
+    test "it works", c do
+      assert autolink_spec("-spec foo() -> atom().", c) ==
+               ~s{foo() -> atom().}
+    end
+  end
+
   defp autolink_doc(doc, opts \\ [], c) do
+    fixtures(c, doc)
+    {:docs_v1, _, _, "application/erlang+html", %{"en" => doc}, _, _} = Code.fetch_docs(:foo)
+
+    opts =
+      opts
+      |> Keyword.put_new(:file, "nofile")
+
+    doc
+    |> ExDoc.DocAST.parse!("application/erlang+html")
+    |> ExDoc.Language.Erlang.autolink_doc(opts)
+    |> ExDoc.DocAST.to_string()
+  end
+
+  defp autolink_spec(binary, opts \\ [], c) when is_binary(binary) do
+    fixtures(c, "")
+    {:ok, tokens, _} = :erl_scan.string(String.to_charlist(binary))
+    {:ok, ast} = :erl_parse.parse_form(tokens)
+    ExDoc.Language.Erlang.autolink_spec(ast, opts)
+  end
+
+  defp fixtures(c, doc) do
     erlc(c, :foo, """
     %% @doc
     %% #{doc}
@@ -145,16 +173,5 @@ defmodule ExDoc.Language.ErlangTest do
     -type t() :: atom().
     bar() -> ok.
     """)
-
-    {:docs_v1, _, _, "application/erlang+html", %{"en" => doc}, _, _} = Code.fetch_docs(:foo)
-
-    opts =
-      opts
-      |> Keyword.put_new(:file, "nofile")
-
-    doc
-    |> ExDoc.DocAST.parse!("application/erlang+html")
-    |> ExDoc.Language.Erlang.autolink_doc(opts)
-    |> ExDoc.DocAST.to_string()
   end
 end
