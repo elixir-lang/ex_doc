@@ -21,13 +21,12 @@ defmodule ExDoc.Autolink do
   #
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
 
-  @enforce_keys [:file]
   defstruct [
     :current_module,
     :module_id,
     :id,
-    :file,
     :line,
+    file: "nofile",
     apps: [],
     extras: [],
     deps: [],

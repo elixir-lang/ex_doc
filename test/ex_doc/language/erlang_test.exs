@@ -138,10 +138,6 @@ defmodule ExDoc.Language.ErlangTest do
     fixtures(c, doc)
     {:docs_v1, _, _, "application/erlang+html", %{"en" => doc}, _, _} = Code.fetch_docs(:foo)
 
-    opts =
-      opts
-      |> Keyword.put_new(:file, "nofile")
-
     doc
     |> ExDoc.DocAST.parse!("application/erlang+html")
     |> ExDoc.Language.Erlang.autolink_doc(opts)
