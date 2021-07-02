@@ -128,9 +128,86 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   describe "autolink_spec/2" do
-    test "it works", c do
+    test "spec", c do
       assert autolink_spec("-spec foo() -> atom().", c) ==
-               ~s{foo() -> atom().}
+               ~s|foo() -> atom().|
+    end
+
+    test "callback", c do
+      assert autolink_spec("-callback foo() -> atom().", c) ==
+               ~s|foo() -> atom().|
+    end
+
+    test "type", c do
+      assert autolink_spec("-type foo() :: atom().", c) ==
+               ~s|foo() :: atom().|
+    end
+
+    test "opaque", c do
+      assert autolink_spec("-opaque foo() :: opaque_t().", [current_module: :foo], c) ==
+               ~s|foo() :: <a href="#t:opaque_t/0">opaque_t</a>().|
+    end
+
+    test "tuple", c do
+      assert autolink_spec(~S"-spec foo() -> {ok, atom()}.", c) ==
+               ~S|foo() -> {ok, atom()}.|
+    end
+
+    test "list", c do
+      assert autolink_spec(~S"-spec foo() -> [atom()].", c) ==
+               ~S|foo() -> [atom()].|
+    end
+
+    test "map", c do
+      assert autolink_spec(~S"-spec foo() -> #{atom() := string(), float() => integer()}.", c) ==
+               ~S|foo() -> #{atom() := string(), float() => integer()}.|
+    end
+
+    test "vars", c do
+      assert autolink_spec(~s"-spec foo(X) -> {Y :: atom(), X}.", c) ==
+               ~s|foo(X) -> {Y :: atom(), X}.|
+    end
+
+    test "union", c do
+      assert autolink_spec(~s"-spec foo() -> ok | error.", c) ==
+               ~s[foo() -> ok | error.]
+    end
+
+    test "record", c do
+      assert autolink_spec(~s"-spec foo() -> #file_info{}.", c) ==
+               ~s[foo() -> #file_info{}.]
+    end
+
+    test "local type", c do
+      assert autolink_spec(~S"-spec foo() -> t().", [current_module: :foo], c) ==
+               ~s|foo() -> <a href="#t:t/0">t</a>().|
+    end
+
+    test "remote type", c do
+      assert autolink_spec(~S"-spec foo() -> bar:t().", c) ==
+               ~s|foo() -> <a href="bar.html#t:t/0">bar:t</a>().|
+    end
+
+    test "OTP type", c do
+      assert autolink_spec(~S"-spec foo() -> sets:set().", c) ==
+               ~s|foo() -> <a href="https://erlang.org/doc/man/sets.html#type-set">sets:set</a>().|
+    end
+
+    test "skip typespec name", c do
+      assert autolink_spec(~S"-spec t() -> t().", [current_module: :foo], c) ==
+               ~s|t() -> <a href="#t:t/0">t</a>().|
+    end
+
+    test "non-standard name", c do
+      assert autolink_spec(~S"-spec 'Foo'() -> ok.", c) ==
+               ~s|'Foo'() -> ok.|
+    end
+
+    test "bad remote type", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_spec(~S"-spec foo() -> bad:bad(atom()).", c) ==
+                        ~s|foo() -> bad:bad(atom()).|
+             end) =~ ~r{references "bad:bad/1" but it is undefined or private}
     end
   end
 
@@ -157,8 +234,9 @@ defmodule ExDoc.Language.ErlangTest do
     %% #{doc}
     -module(foo).
     -export([foo/0]).
-    -export_type([t/0]).
+    -export_type([t/0, opaque_t/0]).
     -type t() :: atom().
+    -type opaque_t() :: atom().
     foo() -> ok.
     """)
 

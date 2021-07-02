@@ -79,25 +79,21 @@ defmodule ExDoc.Language.Erlang do
     nil
   end
 
-  def autolink_spec(attribute, _opts) do
-    {:attribute, _, type, _} = attribute
+  def autolink_spec(ast, opts) do
+    config = struct!(Autolink, opts)
 
-    # `-type ` => 6
-    offset = byte_size(Atom.to_string(type)) + 2
+    {name, quoted} =
+      case ast do
+        {:attribute, _, kind, {{name, _arity}, ast}} when kind in [:spec, :callback] ->
+          {name, Enum.map(ast, &Code.Typespec.spec_to_quoted(name, &1))}
 
-    options = [linewidth: 98 + offset]
-    :erl_pp.attribute(attribute, options) |> IO.iodata_to_binary() |> trim_offset(offset)
-  end
+        {:attribute, _, kind, ast} when kind in [:type, :opaque] ->
+          {name, _, _} = ast
+          {name, Code.Typespec.type_to_quoted(ast)}
+      end
 
-  # `-type t() :: atom()` becomes `t() :: atom().`
-  defp trim_offset(binary, offset) do
-    binary
-    |> String.trim()
-    |> String.split("\n")
-    |> Enum.map(fn line ->
-      binary_part(line, offset, byte_size(line) - offset)
-    end)
-    |> Enum.join("\n")
+    formatted = format_spec(ast)
+    autolink_spec(quoted, name, formatted, config)
   end
 
   @impl true
@@ -272,6 +268,147 @@ defmodule ExDoc.Language.Erlang do
     "#t:#{name}/#{arity}"
   end
 
+  # Traverses quoted and formatted string of the typespec AST, replacing refs with links.
+  #
+  # Let's say we have this typespec:
+  #
+  #     -spec f(X) -> #{atom() => bar(), integer() => X}.
+  #
+  # We traverse the AST and find types and their string representations:
+  #
+  #     -spec f(X) -> #{atom() => bar(), integer() => X}.
+  #                     ^^^^      ^^^    ^^^^^^^
+  #
+  #     atom/0    => atom
+  #     bar/0     => bar
+  #     integer/0 => integer
+  #
+  # We then traverse the formatted string, *in order*, replacing the type strings with links:
+  #
+  #     "atom("    => "atom("
+  #     "bar("     => "<a>bar</a>("
+  #     "integer(" => "integer("
+  #
+  # Finally we end up with:
+  #
+  #     -spec f(X) -> #{atom() => <a>bar</a>(), integer() => X}.
+  #
+  # All of this hassle is to preserve the original *text layout* of the initial representation,
+  # all the spaces, newlines, etc.
+  defp autolink_spec(quoted, name, formatted, config) do
+    acc =
+      for quoted <- List.wrap(quoted) do
+        {_, acc} =
+          Macro.prewalk(quoted, [], fn
+            # module.name(args)
+            {{:., _, [module, name]}, _, args}, acc ->
+              {{:t, [], args}, [{pp({module, name}), {module, name, length(args)}} | acc]}
+
+            {name, _, args} = ast, acc when is_atom(name) and is_list(args) ->
+              arity = length(args)
+
+              cond do
+                name in [:"::", :when, :%{}, :{}, :|, :->, :record] ->
+                  {ast, acc}
+
+                # %{required(...) => ..., optional(...) => ...}
+                name in [:required, :optional] and arity == 1 ->
+                  {ast, acc}
+
+                # name(args)
+                true ->
+                  {ast, [{pp(name), {name, arity}} | acc]}
+              end
+
+            other, acc ->
+              {other, acc}
+          end)
+
+        acc |> Enum.reverse() |> Enum.drop(1)
+      end
+      |> Enum.concat()
+
+    put(acc)
+
+    # Drop and re-add type name (it, the first element in acc, is dropped there too)
+    #
+    #     1. foo() :: bar()
+    #     2.     ) :: bar()
+    #     3.     ) :: <a>bar</a>()
+    #     4. foo() :: <a>bar</a>()
+    name = pp(name)
+    formatted = String.trim_leading(formatted, name <> "(")
+    formatted = replace(formatted, acc, config)
+    name <> "(" <> formatted
+  end
+
+  defp replace(formatted, [], _config) do
+    formatted
+  end
+
+  defp replace(formatted, acc, config) do
+    String.replace(formatted, Enum.map(acc, &"#{elem(&1, 0)}("), fn string ->
+      string = String.trim_trailing(string, "(")
+      {^string, ref} = pop()
+
+      url =
+        case ref do
+          {name, arity} ->
+            visibility = Refs.get_visibility({:type, config.current_module, name, arity})
+
+            if visibility == :public do
+              final_url({:type, name, arity}, config)
+            end
+
+          {module, name, arity} ->
+            ref = {:type, module, name, arity}
+            visibility = Refs.get_visibility(ref)
+
+            if visibility == :public do
+              final_url(ref, config)
+            else
+              original_text = "#{string}/#{arity}"
+              Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
+              nil
+            end
+        end
+
+      if url do
+        ~s|<a href="#{url}">#{string}</a>(|
+      else
+        string <> "("
+      end
+    end)
+  end
+
+  defp put(items) do
+    Process.put({__MODULE__, :stack}, items)
+  end
+
+  defp pop() do
+    [head | tail] = Process.get({__MODULE__, :stack})
+    put(tail)
+    head
+  end
+
+  defp pp(name) when is_atom(name) do
+    :io_lib.format("~p", [name]) |> IO.iodata_to_binary()
+  end
+
+  defp pp({module, name}) when is_atom(module) and is_atom(name) do
+    :io_lib.format("~p:~p", [module, name]) |> IO.iodata_to_binary()
+  end
+
+  defp format_spec(ast) do
+    {:attribute, _, type, _} = ast
+
+    # `-type ` => 6
+    offset = byte_size(Atom.to_string(type)) + 2
+
+    options = [linewidth: 98 + offset]
+    :erl_pp.attribute(ast, options) |> IO.iodata_to_binary() |> trim_offset(offset)
+  end
+
   ## Helpers
 
   defp module_type(module) do
@@ -282,5 +419,16 @@ defmodule ExDoc.Language.Erlang do
       true ->
         :module
     end
+  end
+
+  # `-type t() :: atom()` becomes `t() :: atom().`
+  defp trim_offset(binary, offset) do
+    binary
+    |> String.trim()
+    |> String.split("\n")
+    |> Enum.map(fn line ->
+      binary_part(line, offset, byte_size(line) - offset)
+    end)
+    |> Enum.join("\n")
   end
 end

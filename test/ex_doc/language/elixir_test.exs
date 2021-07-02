@@ -331,7 +331,7 @@ defmodule ExDoc.Language.ElixirTest do
                ~s[t() :: <a href="AutolinkTest.Foo.html#t:t/0">AutolinkTest.Foo.t</a>()]
     end
 
-    test "autolinks same type and function name" do
+    test "skip typespec name" do
       ExDoc.Refs.insert([
         {{:module, MyModule}, :public},
         {{:type, MyModule, :foo, 0}, :public},
