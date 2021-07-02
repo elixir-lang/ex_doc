@@ -104,6 +104,8 @@ defmodule ExDoc.Language.Elixir do
   def autolink_spec(ast, opts) do
     config = struct!(Autolink, opts)
 
+    # TODO: re-use ExDoc.Language.Erlang.autolink_spec/2
+
     string =
       ast
       |> Macro.to_string()
