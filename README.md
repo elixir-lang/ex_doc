@@ -141,7 +141,10 @@ To use ExDoc with Erlang projects you need to do the following:
 
    ```bash
    $ mix escript.install github elixir-lang/ex_doc
+   $ ex_doc --version
    ```
+   
+   Make sure escript is in your system path, otherwise point to it directly.
 
 4. Generate docs:
 
