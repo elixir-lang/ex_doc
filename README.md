@@ -119,6 +119,54 @@ For example, here are some acceptable values:
     GITHUB_USER     => elixir-lang
     GITHUB_REPO     => ecto
 
+## Using ExDoc with Erlang projects
+
+To use ExDoc with Erlang projects you need to do the following:
+
+1. Use Erlang/OTP 24+
+
+2. Add the following to your `rebar.config`. This instructs `edoc` to generate doc chunks
+   instead of HTML docs:
+
+   ```erlang
+   {edoc_opts, [
+     {doclet, edoc_doclet_chunks},
+     {layout, edoc_layout_chunks},
+     {dir, "_build/default/lib/<app>/doc"}]}.
+   ```
+
+   Replace `<app>` with the name of your app.
+
+3. Install ExDoc escript:
+
+   ```bash
+   $ mix escript.install github elixir-lang/ex_doc
+   $ ex_doc --version
+   ```
+   
+   Make sure escript is in your system path, otherwise point to it directly.
+
+4. Generate docs:
+
+   ```bash
+   $ rebar3 edoc
+   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/default/lib/<app>/ebin
+   ```
+
+5. If you're publishing docs to Hex.pm with `rebar3 hex docs`, first add the following to your `src/<app>.app.src`:
+
+   ```erlang
+   {doc, "doc"}
+   ```
+
+   This instructs rebar3 to get HTML docs from the directory "doc" and that's where ExDoc would generate the docs by default.
+
+   Now you can publish your docs:
+
+   ```bash
+   $ rebar3 hex docs
+   ```
+
 ## Auto-linking
 
 ExDoc will automatically generate links across modules and functions if you enclose them in backticks:
