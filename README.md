@@ -123,7 +123,7 @@ For example, here are some acceptable values:
 
 To use ExDoc with Erlang projects you need to do the following:
 
-1. Use OTP 24+
+1. Use Erlang/OTP 24+
 
 2. Add the following to your `rebar.config`. This instructs `edoc` to generate doc chunks
    instead of HTML docs:
