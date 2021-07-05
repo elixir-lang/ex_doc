@@ -169,11 +169,11 @@ To use ExDoc with Erlang projects you need to do the following:
 
 6. If your project has dependencies and you want to generate links to them, you need to add the dependencies to the code path.
 
-   Suppose you're building `telemetry_poller` that depends on `telemetry`. Generate the docs with:
+   Suppose you're building `foo` that depends on `bar` and `baz`. Generate the docs with:
 
    ```bash
-   $ ex_doc "telemetry_poller" $version "_build/default/lib/telemetry_poller/ebin" \
-       --prepend-path "_build/default/lib/telemetry/ebin"
+   $ ex_doc "foo" "1.0.0" "_build/default/lib/foo/ebin" \
+       --paths "_build/default/lib/*/ebin"
    ```
 
 ## Auto-linking
