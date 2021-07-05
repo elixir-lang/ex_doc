@@ -143,7 +143,7 @@ To use ExDoc with Erlang projects you need to do the following:
    $ mix escript.install github elixir-lang/ex_doc
    $ ex_doc --version
    ```
-   
+
    Make sure escript is in your system path, otherwise point to it directly.
 
 4. Generate docs:
@@ -153,7 +153,7 @@ To use ExDoc with Erlang projects you need to do the following:
    $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/default/lib/<app>/ebin
    ```
 
-5. If you're publishing docs to Hex.pm with `rebar3 hex docs`, first add the following to your `src/<app>.app.src`:
+5. If you're publishing docs to Hex.pm, first add the following to your `src/<app>.app.src`:
 
    ```erlang
    {doc, "doc"}
@@ -165,6 +165,15 @@ To use ExDoc with Erlang projects you need to do the following:
 
    ```bash
    $ rebar3 hex docs
+   ```
+
+6. If your project has dependencies and you want to generate links to them, you need to add the dependencies to the code path.
+
+   Suppose you're building `foo` that depends on `bar` and `baz`. Generate the docs with:
+
+   ```bash
+   $ ex_doc "foo" "1.0.0" "_build/default/lib/foo/ebin" \
+       --paths "_build/default/lib/*/ebin"
    ```
 
 ## Auto-linking
