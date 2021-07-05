@@ -23,6 +23,7 @@ defmodule ExDoc.CLI do
         ],
         switches: [
           language: :string,
+          paths: :keep,
           proglang: :string,
           source_ref: :string,
           version: :boolean
@@ -45,8 +46,9 @@ defmodule ExDoc.CLI do
 
     Code.prepend_path(source_beam)
 
-    if opts[:prepend_path] do
-      Code.prepend_path(opts[:prepend_path])
+    for path <- Keyword.get_values(opts, :paths),
+        path <- Path.wildcard(path) do
+      Code.prepend_path(path)
     end
 
     opts =
@@ -146,7 +148,9 @@ defmodule ExDoc.CLI do
                           See "Custom config" section below for more information.
       -f, --formatter     Docs formatter to use (html or epub), default: "html"
       -p, --homepage-url  URL to link to for the site name
-          --prepend-path  Prepends the given path to Erlang code path
+          --paths         Prepends the given path to Erlang code path. The path might contain a glob
+                          pattern but in that case remember to quote it: --paths "_build/dev/lib/*/ebin".
+                          This option can be given multiple times
           --language      Identify the primary language of the documents, its value must be
                           a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)
