@@ -5,8 +5,8 @@ defmodule ExDoc.Application do
   def start(_type, _args) do
     Makeup.Registry.register_lexer(ExDoc.ShellLexer,
       options: [],
-      names: ["sh", "bash"],
-      extensions: ["sh", "bash"]
+      names: ["shell", "sh", "bash", "zsh"],
+      extensions: []
     )
 
     Enum.each([:eex, :ex_unit, :iex, :logger, :mix], &Application.load/1)
