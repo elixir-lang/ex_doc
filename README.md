@@ -94,22 +94,22 @@ You can ExDoc via the command line as follows:
 
 1. Install ExDoc as an escript:
 
-    ```bash
-    $ mix escript.install hex ex_doc
-    ```
+   ```bash
+   $ mix escript.install hex ex_doc
+   ```
 
 2. Then you are ready to use it in your projects. First, move into your project directory and make sure it is already compiled:
 
-    ```bash
-    $ cd PATH_TO_YOUR_PROJECT
-    $ mix compile
-    ```
+   ```bash
+   $ cd PATH_TO_YOUR_PROJECT
+   $ mix compile
+   ```
 
-3. Next invoke the ex_doc executable from your project:
+3. Next invoke the `ex_doc` executable from your project:
 
-    ```bash
-    $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
-    ```
+   ```bash
+   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
+   ```
 
 For example, here are some acceptable values:
 
