@@ -49,7 +49,7 @@ defmodule ExDoc.Language.Elixir do
 
   @impl true
   def callback_data(entry, module_state) do
-    {{kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
+    {{kind, name, arity}, anno, signature, _doc, _metadata} = entry
     actual_def = actual_def(name, arity, kind)
 
     specs =
@@ -65,41 +65,53 @@ defmodule ExDoc.Language.Elixir do
       if specs != [] do
         {:type, anno, _, _} = hd(specs)
         anno_line(anno)
+      else
+        anno_line(anno)
       end
 
-    specs = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
+    quoted = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
+
+    signature =
+      if signature != [] do
+        # TODO: this is in case Elixir ever emits non-empty signature for callbacks. Will it?
+        []
+      else
+        [get_typespec_signature(hd(quoted), arity)]
+      end
 
     %{
       actual_def: actual_def,
       line: line,
-      signature_fallback: fn ->
-        if specs != [] do
-          get_typespec_signature(hd(specs), arity)
-        end
-      end,
-      specs: specs
+      signature: signature,
+      specs: quoted
     }
   end
 
   @impl true
   def type_data(entry, module_state) do
-    {{kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
+    {{kind, name, arity}, _anno, signature, _doc, _metadata} = entry
 
-    %{type: type, spec: spec, line: line} = type_from_module_state(name, arity, module_state)
-    spec = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(kind)
+    %{type: type, spec: spec, line: line} = type_from_module_state(module_state, name, arity)
+    quoted = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(kind)
+
+    signature =
+      if signature != [] do
+        # TODO: this is in case Elixir ever emits non-empty signature for types. Will it?
+        signature
+      else
+        [get_typespec_signature(quoted, arity)]
+      end
 
     %{
       type: type,
       line: line,
-      spec: spec,
-      signature_fallback: fn ->
-        get_typespec_signature(spec, arity)
-      end
+      spec: quoted,
+      signature: signature
     }
   end
 
   @doc false
-  def type_from_module_state(name, arity, module_state) do
+  def type_from_module_state(module_state, name, arity) do
     Enum.find_value(module_state.abst_code, fn
       {:attribute, anno, type, {^name, _, args} = spec} ->
         if type in [:opaque, :type] and length(args) == arity do

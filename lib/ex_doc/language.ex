@@ -45,7 +45,7 @@ defmodule ExDoc.Language do
 
     * `:extra_annotations`
 
-    * `:line` - if set, overrides the line where the code is located
+    * `:line` - the line where the code is located
 
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
@@ -66,10 +66,9 @@ defmodule ExDoc.Language do
     * `:actual_def` - `{name, arity}` of how the callback is actually represented
       in abstract code
 
-    * `:line` - if set, returns the line where the code is located
+    * `:line` - the line where the code is located
 
-    * `:signature_fallback` - if set, a 0-arity function that returns signature which
-      which will be used as a fallback to empty signature on the callback node
+    * `:signature` - the signature
 
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
@@ -77,7 +76,7 @@ defmodule ExDoc.Language do
   @callback callback_data(entry :: tuple(), module_state()) :: %{
               actual_def: {atom(), arity()},
               line: non_neg_integer() | nil,
-              signature_fallback: (() -> String.t()) | nil,
+              signature: [binary()],
               specs: [spec_ast()]
             }
 
@@ -86,19 +85,20 @@ defmodule ExDoc.Language do
 
   The map has the following keys:
 
+    * `:type` - `:type` or `:opaque`
+
+    * `:line` - the line where the code is located
+
+    * `:signature` - the signature
+
     * `:spec` - a spec that will be later formatted by `c:typespec/2`
-
-    * `:signature_fallback` - if set, a 0-arity function that returns signature which
-      which will be used as a fallback to empty signature on the callback node
-
   """
-  @callback type_data(entry :: tuple(), spec :: term()) :: data
-            when data: %{
-                   type: :type | :opaque,
-                   line: non_neg_integer(),
-                   spec: spec_ast(),
-                   signature_fallback: (() -> String.t()) | nil
-                 }
+  @callback type_data(entry :: tuple(), spec :: term()) :: %{
+              type: :type | :opaque,
+              line: non_neg_integer(),
+              signature: [binary()],
+              spec: spec_ast()
+            }
 
   @doc """
   Autolinks docs.

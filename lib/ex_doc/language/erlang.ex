@@ -41,7 +41,7 @@ defmodule ExDoc.Language.Erlang do
 
   @impl true
   def callback_data(entry, module_state) do
-    {{_kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
+    {{_kind, name, arity}, anno, signature, _doc, _metadata} = entry
 
     specs =
       case Map.fetch(module_state.callbacks, {name, arity}) do
@@ -54,24 +54,24 @@ defmodule ExDoc.Language.Erlang do
 
     %{
       actual_def: {name, arity},
-      line: nil,
-      signature_fallback: fn -> nil end,
+      line: anno_line(anno),
+      signature: signature,
       specs: specs
     }
   end
 
   @impl true
   def type_data(entry, module_state) do
-    {{_kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
+    {{_kind, name, arity}, _anno, signature, _doc, _metadata} = entry
 
     %{type: type, spec: spec, line: line} =
-      ExDoc.Language.Elixir.type_from_module_state(name, arity, module_state)
+      ExDoc.Language.Elixir.type_from_module_state(module_state, name, arity)
 
     %{
       type: type,
       line: line,
       spec: {:attribute, 0, :type, spec},
-      signature_fallback: fn -> nil end
+      signature: signature
     }
   end
 
@@ -131,6 +131,10 @@ defmodule ExDoc.Language.Erlang do
 
           [app, module] ->
             autolink_app({:module, app, module}, config)
+
+          _ ->
+            # TODO investigate building OTP docs
+            ast
         end
 
       "https://erlang.org/doc/link/seemfa" ->
@@ -140,6 +144,10 @@ defmodule ExDoc.Language.Erlang do
 
           [app, mfa] ->
             autolink_app({:function, app, mfa}, config)
+
+          _ ->
+            # TODO investigate building OTP docs
+            ast
         end
 
       "https://erlang.org/doc/link/seetype" ->
@@ -152,8 +160,14 @@ defmodule ExDoc.Language.Erlang do
         end
 
       "https://erlang.org/doc/link/seeapp" ->
-        [app, "index"] = String.split(attrs[:href], ":")
-        autolink_app({:app, app}, config)
+        case String.split(attrs[:href], ":") do
+          [app, "index"] ->
+            autolink_app({:app, app}, config)
+
+          _ ->
+            # TODO investigate building OTP docs
+            ast
+        end
 
       _ ->
         ast
@@ -356,7 +370,16 @@ defmodule ExDoc.Language.Erlang do
   defp replace(formatted, acc, config) do
     String.replace(formatted, Enum.map(acc, &"#{elem(&1, 0)}("), fn string ->
       string = String.trim_trailing(string, "(")
-      {^string, ref} = pop()
+      {other, ref} = pop()
+
+      if string != other do
+        Autolink.maybe_warn(
+          "internal inconsistency, please submit bug: #{inspect(string)} != #{inspect(other)}",
+          config,
+          nil,
+          nil
+        )
+      end
 
       url =
         case ref do
@@ -438,4 +461,7 @@ defmodule ExDoc.Language.Erlang do
     end)
     |> Enum.join("\n")
   end
+
+  defp anno_line(line) when is_integer(line), do: abs(line)
+  defp anno_line(anno), do: anno |> :erl_anno.line() |> abs()
 end

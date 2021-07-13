@@ -330,12 +330,12 @@ defmodule ExDoc.Retriever do
     callback_data = module_state.language.callback_data(callback, module_state)
 
     {:docs_v1, _, _, content_type, _, _, _} = module_state.docs
-    {{kind, name, arity}, anno, signature, doc, metadata} = callback
+    {{kind, name, arity}, anno, _signature, doc, metadata} = callback
     actual_def = callback_data.actual_def
     doc_line = anno_line(anno)
-    signature = signature(signature)
+
+    signature = signature(callback_data.signature)
     specs = callback_data.specs
-    signature = signature || callback_data.signature_fallback.() || "#{name}/#{arity}"
     annotations = annotations_from_metadata(metadata)
 
     # actual_def is Elixir specific, but remember optional_callbacks are generic.
@@ -354,7 +354,7 @@ defmodule ExDoc.Retriever do
       signature: signature,
       specs: specs,
       source_path: source.path,
-      source_url: source_link(source, callback_data.line || doc_line),
+      source_url: source_link(source, callback_data.line),
       type: kind,
       annotations: annotations
     }
@@ -402,13 +402,12 @@ defmodule ExDoc.Retriever do
 
   defp get_type(type_entry, source, module_state) do
     {:docs_v1, _, _, content_type, _, _, _} = module_state.docs
-    {{_, name, arity}, anno, signature, doc, metadata} = type_entry
+    {{_, name, arity}, anno, _signature, doc, metadata} = type_entry
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
 
     type_data = module_state.language.type_data(type_entry, module_state)
-    signature = signature(signature) || type_data.signature_fallback.()
-
+    signature = signature(type_data.signature)
     annotations = if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
     doc_ast = doc_ast(content_type, doc, file: source.path)
 
