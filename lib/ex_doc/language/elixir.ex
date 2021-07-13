@@ -82,16 +82,37 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def type_data(entry, spec) do
-    {{kind, _name, arity}, _anno, _signature, _doc, _metadata} = entry
+  def type_data(entry, module_state) do
+    {{kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
+
+    %{type: type, spec: spec, line: line} = type_from_module_state(name, arity, module_state)
     spec = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(kind)
 
     %{
+      type: type,
+      line: line,
       spec: spec,
       signature_fallback: fn ->
         get_typespec_signature(spec, arity)
       end
     }
+  end
+
+  @doc false
+  def type_from_module_state(name, arity, module_state) do
+    Enum.find_value(module_state.abst_code, fn
+      {:attribute, anno, type, {^name, _, args} = spec} ->
+        if type in [:opaque, :type] and length(args) == arity do
+          %{
+            type: type,
+            spec: spec,
+            line: anno_line(anno)
+          }
+        end
+
+      _ ->
+        nil
+    end)
   end
 
   @impl true

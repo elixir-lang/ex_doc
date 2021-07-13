@@ -94,6 +94,8 @@ defmodule ExDoc.Language do
   """
   @callback type_data(entry :: tuple(), spec :: term()) :: data
             when data: %{
+                   type: :type | :opaque,
+                   line: non_neg_integer(),
                    spec: spec_ast(),
                    signature_fallback: (() -> String.t()) | nil
                  }

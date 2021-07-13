@@ -61,8 +61,15 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def type_data(_entry, spec) do
+  def type_data(entry, module_state) do
+    {{_kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
+
+    %{type: type, spec: spec, line: line} =
+      ExDoc.Language.Elixir.type_from_module_state(name, arity, module_state)
+
     %{
+      type: type,
+      line: line,
       spec: {:attribute, 0, :type, spec},
       signature_fallback: fn -> nil end
     }

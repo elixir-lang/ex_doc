@@ -406,36 +406,24 @@ defmodule ExDoc.Retriever do
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
 
-    {:attribute, anno, type, spec} =
-      Enum.find(module_state.abst_code, fn
-        {:attribute, _, type, {^name, _, args}} ->
-          type in [:opaque, :type] and length(args) == arity
-
-        _ ->
-          false
-      end)
-
-    line = anno_line(anno)
-    type_data = module_state.language.type_data(type_entry, spec)
-    spec = type_data.spec
-
+    type_data = module_state.language.type_data(type_entry, module_state)
     signature = signature(signature) || type_data.signature_fallback.()
 
-    annotations = if type == :opaque, do: ["opaque" | annotations], else: annotations
+    annotations = if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
     doc_ast = doc_ast(content_type, doc, file: source.path)
 
     %ExDoc.TypeNode{
       id: "#{name}/#{arity}",
       name: name,
       arity: arity,
-      type: type,
-      spec: spec,
+      type: type_data.type,
+      spec: type_data.spec,
       deprecated: metadata[:deprecated],
       doc: doc_ast,
       doc_line: doc_line,
       signature: signature,
       source_path: source.path,
-      source_url: source_link(source, line),
+      source_url: source_link(source, type_data.line),
       annotations: annotations
     }
   end
