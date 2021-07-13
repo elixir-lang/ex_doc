@@ -3,6 +3,13 @@ defmodule ExDoc.Language do
 
   @typep spec_ast() :: term()
 
+  @type module_state() :: %{
+          impls: term(),
+          abst_code: term(),
+          callbacks: term(),
+          specs: [spec_ast()]
+        }
+
   @doc """
   Returns a map with module information.
 
@@ -43,19 +50,13 @@ defmodule ExDoc.Language do
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
   """
-  @callback function_data(entry :: tuple(), module_data) :: data
-            when module_data: %{
-                   impls: term(),
-                   abst_code: term(),
-                   callbacks: term(),
-                   specs: [spec_ast()]
-                 },
-                 data: %{
-                   doc_fallback: (() -> ExDoc.DocAST.t()) | nil,
-                   extra_annotations: [String.t()],
-                   line: non_neg_integer() | nil,
-                   specs: [spec_ast()]
-                 }
+  @callback function_data(entry :: tuple(), module_state()) ::
+              %{
+                doc_fallback: (() -> ExDoc.DocAST.t()) | nil,
+                extra_annotations: [String.t()],
+                line: non_neg_integer() | nil,
+                specs: [spec_ast()]
+              }
 
   @doc """
   Returns a map with callback information.
@@ -73,16 +74,12 @@ defmodule ExDoc.Language do
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
   """
-  @callback callback_data(entry :: tuple(), module_data) :: data
-            when module_data: %{
-                   callbacks: term
-                 },
-                 data: %{
-                   actual_def: {atom(), arity()},
-                   line: non_neg_integer() | nil,
-                   signature_fallback: (() -> String.t()) | nil,
-                   specs: [spec_ast()]
-                 }
+  @callback callback_data(entry :: tuple(), module_state()) :: %{
+              actual_def: {atom(), arity()},
+              line: non_neg_integer() | nil,
+              signature_fallback: (() -> String.t()) | nil,
+              specs: [spec_ast()]
+            }
 
   @doc """
   Returns a map with type information.

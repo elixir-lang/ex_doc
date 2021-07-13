@@ -57,13 +57,13 @@ defmodule ExDoc.Retriever do
   # with --docs flag), we raise an exception.
   defp get_module(module, config) do
     if docs_chunk = docs_chunk(module) do
-      module_data =
+      module_state =
         module
-        |> get_module_data(docs_chunk)
+        |> get_module_state(docs_chunk)
         |> maybe_skip(config.filter_prefix)
 
-      if not module_data.skip do
-        [generate_node(module, module_data, config)]
+      if not module_state.skip do
+        [generate_node(module, module_state, config)]
       else
         []
       end
@@ -72,11 +72,11 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp maybe_skip(module_data, filter_prefix) do
-    if filter_prefix && not String.starts_with?(module_data.id, filter_prefix) do
-      %{module_data | skip: true}
+  defp maybe_skip(module_state, filter_prefix) do
+    if filter_prefix && not String.starts_with?(module_state.id, filter_prefix) do
+      %{module_state | skip: true}
     else
-      module_data
+      module_state
     end
   end
 
@@ -111,28 +111,28 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp generate_node(module, module_data, config) do
+  defp generate_node(module, module_state, config) do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
 
-    {doc_line, moduledoc, metadata} = get_module_docs(module_data, source_path)
-    line = find_module_line(module_data) || doc_line
+    {doc_line, moduledoc, metadata} = get_module_docs(module_state, source_path)
+    line = find_module_line(module_state) || doc_line
 
-    {function_groups, function_docs} = get_docs(module_data, source, config)
-    docs = function_docs ++ get_callbacks(module_data, source)
-    types = get_types(module_data, source)
+    {function_groups, function_docs} = get_docs(module_state, source, config)
+    docs = function_docs ++ get_callbacks(module_state, source)
+    types = get_types(module_state, source)
 
     {nested_title, nested_context} =
-      nesting_info(module_data.title, config.nest_modules_by_prefix)
+      nesting_info(module_state.title, config.nest_modules_by_prefix)
 
     node = %ExDoc.ModuleNode{
-      id: module_data.id,
-      title: module_data.title,
+      id: module_state.id,
+      title: module_state.title,
       nested_title: nested_title,
       nested_context: nested_context,
       module: module,
-      type: module_data.type,
+      type: module_state.type,
       deprecated: metadata[:deprecated],
       function_groups: function_groups,
       docs: Enum.sort_by(docs, &sort_key(&1.name, &1.arity)),
@@ -141,7 +141,7 @@ defmodule ExDoc.Retriever do
       typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
       source_path: source_path,
       source_url: source_link(source, line),
-      language: module_data.language
+      language: module_state.language
     }
 
     put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
@@ -171,7 +171,7 @@ defmodule ExDoc.Retriever do
 
   # Module Helpers
 
-  defp get_module_data(module, docs_chunk) do
+  defp get_module_state(module, docs_chunk) do
     {:docs_v1, _, language, _, _, _, _} = docs_chunk
     language = ExDoc.Language.get(language)
     extra = language.module_data(module)
@@ -193,8 +193,8 @@ defmodule ExDoc.Retriever do
     }
   end
 
-  defp get_module_docs(module_data, source_path) do
-    {:docs_v1, anno, _, content_type, moduledoc, metadata, _} = module_data.docs
+  defp get_module_docs(module_state, source_path) do
+    {:docs_v1, anno, _, content_type, moduledoc, metadata, _} = module_state.docs
     doc_line = anno_line(anno)
     options = [file: source_path, line: doc_line + 1]
     {doc_line, doc_ast(content_type, moduledoc, options), metadata}
@@ -211,7 +211,7 @@ defmodule ExDoc.Retriever do
 
   ## Function helpers
 
-  defp get_docs(%{type: type, docs: docs} = module_data, source, config) do
+  defp get_docs(%{type: type, docs: docs} = module_state, source, config) do
     {:docs_v1, _, _, _, _, _, doc_elements} = docs
 
     groups_for_functions =
@@ -221,7 +221,7 @@ defmodule ExDoc.Retriever do
 
     function_doc_elements =
       for doc_element <- doc_elements, doc?(doc_element, type) do
-        get_function(doc_element, source, module_data, groups_for_functions)
+        get_function(doc_element, source, module_state, groups_for_functions)
       end
 
     {Enum.map(groups_for_functions, &elem(&1, 0)), filter_defaults(function_doc_elements)}
@@ -256,10 +256,10 @@ defmodule ExDoc.Retriever do
     false
   end
 
-  defp get_function(doc_element, source, module_data, groups_for_functions) do
-    function_data = module_data.language.function_data(doc_element, module_data)
+  defp get_function(doc_element, source, module_state, groups_for_functions) do
+    function_data = module_state.language.function_data(doc_element, module_state)
 
-    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
+    {:docs_v1, _, _, content_type, _, _, _} = module_state.docs
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata) ++ function_data.extra_annotations
@@ -315,21 +315,21 @@ defmodule ExDoc.Retriever do
 
   ## Callback helpers
 
-  defp get_callbacks(%{type: :behaviour} = module_data, source) do
-    {:docs_v1, _, _, _, _, _, docs} = module_data.docs
-    optional_callbacks = module_data.name.behaviour_info(:optional_callbacks)
+  defp get_callbacks(%{type: :behaviour} = module_state, source) do
+    {:docs_v1, _, _, _, _, _, docs} = module_state.docs
+    optional_callbacks = module_state.name.behaviour_info(:optional_callbacks)
 
-    for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in module_data.callback_types do
-      get_callback(doc, source, optional_callbacks, module_data)
+    for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in module_state.callback_types do
+      get_callback(doc, source, optional_callbacks, module_state)
     end
   end
 
   defp get_callbacks(_, _), do: []
 
-  defp get_callback(callback, source, optional_callbacks, module_data) do
-    callback_data = module_data.language.callback_data(callback, module_data)
+  defp get_callback(callback, source, optional_callbacks, module_state) do
+    callback_data = module_state.language.callback_data(callback, module_state)
 
-    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
+    {:docs_v1, _, _, content_type, _, _, _} = module_state.docs
     {{kind, name, arity}, anno, signature, doc, metadata} = callback
     actual_def = callback_data.actual_def
     doc_line = anno_line(anno)
@@ -391,23 +391,23 @@ defmodule ExDoc.Retriever do
         do: behaviour
   end
 
-  defp get_types(module_data, source) do
-    {:docs_v1, _, _, _, _, _, docs} = module_data.docs
+  defp get_types(module_state, source) do
+    {:docs_v1, _, _, _, _, _, docs} = module_state.docs
 
     # TODO: When we require Elixir v1.12, we only keep contents that are maps
     for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
-      get_type(doc, source, module_data)
+      get_type(doc, source, module_state)
     end
   end
 
-  defp get_type(type_entry, source, module_data) do
-    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
+  defp get_type(type_entry, source, module_state) do
+    {:docs_v1, _, _, content_type, _, _, _} = module_state.docs
     {{_, name, arity}, anno, signature, doc, metadata} = type_entry
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
 
     {:attribute, anno, type, spec} =
-      Enum.find(module_data.abst_code, fn
+      Enum.find(module_state.abst_code, fn
         {:attribute, _, type, {^name, _, args}} ->
           type in [:opaque, :type] and length(args) == arity
 
@@ -416,7 +416,7 @@ defmodule ExDoc.Retriever do
       end)
 
     line = anno_line(anno)
-    type_data = module_data.language.type_data(type_entry, spec)
+    type_data = module_state.language.type_data(type_entry, spec)
     spec = type_data.spec
 
     signature = signature(signature) || type_data.signature_fallback.()

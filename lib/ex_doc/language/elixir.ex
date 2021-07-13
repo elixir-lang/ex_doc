@@ -22,7 +22,7 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def function_data(entry, module_data) do
+  def function_data(entry, module_state) do
     {{kind, name, arity}, _anno, _signature, _doc_content, metadata} = entry
 
     extra_annotations =
@@ -36,24 +36,24 @@ defmodule ExDoc.Language.Elixir do
 
     %{
       doc_fallback: fn ->
-        impl = Map.fetch(module_data.impls, actual_def)
+        impl = Map.fetch(module_state.impls, actual_def)
 
         callback_doc_ast(name, arity, impl) ||
           delegate_doc_ast(metadata[:delegate_to])
       end,
       extra_annotations: extra_annotations,
-      line: find_function_line(module_data, actual_def),
-      specs: specs(kind, name, actual_def, module_data)
+      line: find_function_line(module_state, actual_def),
+      specs: specs(kind, name, actual_def, module_state)
     }
   end
 
   @impl true
-  def callback_data(entry, module_data) do
+  def callback_data(entry, module_state) do
     {{kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
     actual_def = actual_def(name, arity, kind)
 
     specs =
-      case Map.fetch(module_data.callbacks, actual_def) do
+      case Map.fetch(module_state.callbacks, actual_def) do
         {:ok, specs} ->
           specs
 
@@ -160,9 +160,9 @@ defmodule ExDoc.Language.Elixir do
     name |> String.split(".") |> Enum.map_join(".", &Macro.underscore/1)
   end
 
-  defp specs(kind, name, actual_def, module_data) do
+  defp specs(kind, name, actual_def, module_state) do
     specs =
-      module_data.specs
+      module_state.specs
       |> Map.get(actual_def, [])
       |> Enum.map(&Code.Typespec.spec_to_quoted(name, &1))
 

@@ -19,11 +19,11 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def function_data(entry, module_data) do
+  def function_data(entry, module_state) do
     {{_kind, name, arity}, _anno, _signature, _doc_content, _metadata} = entry
 
     specs =
-      case Map.fetch(module_data.specs, {name, arity}) do
+      case Map.fetch(module_state.specs, {name, arity}) do
         {:ok, specs} ->
           [{:attribute, 0, :spec, {{name, arity}, specs}}]
 
@@ -40,11 +40,11 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def callback_data(entry, module_data) do
+  def callback_data(entry, module_state) do
     {{_kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
 
     specs =
-      case Map.fetch(module_data.callbacks, {name, arity}) do
+      case Map.fetch(module_state.callbacks, {name, arity}) do
         {:ok, specs} ->
           [{:attribute, 0, :callback, {{name, arity}, specs}}]
 
