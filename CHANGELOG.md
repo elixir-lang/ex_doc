@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.25.0 (2021-07-20)
+
+  * Enhancements
+    * Handle remote types when generating signatures, e.g. `@callback callback1(GenServer.options())` becomes `callback1(options)`
+    * Support Markdown processor options
+    * Add `--paths` command line argument to prepend directories to the code path when generating docs
+    * Make shell prompt, `$ `, not selectable for `shell`, `sh`, `bash` and `zsh` code blocks
+
+  * Bug fixes
+    * Fix custom links to undefined/hidden references
+    * Fix generating external links with `:deps` configuration
+    * Add ellipsis to more sections
+
+  * Backwards incompatible changes
+    * Remove function landing pages
+
 ## v0.24.2 (2021-04-06)
 
   * Enhancements
