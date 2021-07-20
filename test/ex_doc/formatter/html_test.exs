@@ -189,18 +189,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
   end
 
-  test "generates module entry pages" do
-    generate_docs(doc_config())
-
-    content = File.read!("#{output_dir()}/CompiledWithDocs-function-example.html")
-    assert content =~ "You're seeing just the function <code>example</code>"
-
-    content = File.read!("#{output_dir()}/CustomBehaviourOne-callback-greet.html")
-    assert content =~ "You're seeing just the callback <code>greet</code>"
-
-    assert Path.wildcard("#{output_dir()}/CompiledWithDocs-*slashes.html") == []
-  end
-
   test "generates all listing files" do
     generate_docs(doc_config())
 

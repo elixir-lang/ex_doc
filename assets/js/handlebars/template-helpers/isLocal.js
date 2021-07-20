@@ -1,5 +1,5 @@
 export default function (nodeId, options) {
-  const pathSuffix = window.location.pathname.split('/').pop().replace(/-.*/, '.html')
+  const pathSuffix = window.location.pathname.split('/').pop()
   const nodePage = nodeId + '.html'
 
   if (nodePage === pathSuffix) {
