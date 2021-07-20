@@ -5,7 +5,7 @@ defmodule ExDoc.Application do
   def start(_type, _args) do
     Makeup.Registry.register_lexer(ExDoc.ShellLexer,
       options: [],
-      names: ["shell", "sh", "bash", "zsh"],
+      names: ["shell", "console", "sh", "bash", "zsh"],
       extensions: []
     )
 
