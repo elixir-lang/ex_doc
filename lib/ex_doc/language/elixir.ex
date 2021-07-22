@@ -49,7 +49,7 @@ defmodule ExDoc.Language.Elixir do
 
   @impl true
   def callback_data(entry, module_state) do
-    {{kind, name, arity}, anno, signature, _doc, _metadata} = entry
+    {{kind, name, arity}, anno, _signature, _doc, _metadata} = entry
     actual_def = actual_def(name, arity, kind)
 
     specs =
@@ -70,14 +70,7 @@ defmodule ExDoc.Language.Elixir do
       end
 
     quoted = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
-
-    signature =
-      if signature != [] do
-        # TODO: this is in case Elixir ever emits non-empty signature for callbacks. Will it?
-        []
-      else
-        [get_typespec_signature(hd(quoted), arity)]
-      end
+    signature = [get_typespec_signature(hd(quoted), arity)]
 
     %{
       actual_def: actual_def,
@@ -89,18 +82,11 @@ defmodule ExDoc.Language.Elixir do
 
   @impl true
   def type_data(entry, module_state) do
-    {{kind, name, arity}, _anno, signature, _doc, _metadata} = entry
+    {{kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
 
     %{type: type, spec: spec, line: line} = type_from_module_state(module_state, name, arity)
     quoted = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(kind)
-
-    signature =
-      if signature != [] do
-        # TODO: this is in case Elixir ever emits non-empty signature for types. Will it?
-        signature
-      else
-        [get_typespec_signature(quoted, arity)]
-      end
+    signature = [get_typespec_signature(quoted, arity)]
 
     %{
       type: type,
