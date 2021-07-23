@@ -268,7 +268,7 @@ defmodule ExDoc.Language.ElixirTest do
                ~s[+<a href="#t:foo/0">foo</a>() :: <a href="#t:foo/0">foo</a>()]
 
       assert autolink_spec(quote(do: foo() + foo() :: foo())) ==
-               ~s[<a href=\"#t:foo/0\">foo</a>() + <a href=\"#t:foo/0\">foo</a>() :: <a href=\"#t:foo/0\">foo</a>()]
+               ~s[<a href="#t:foo/0">foo</a>() + <a href="#t:foo/0">foo</a>() :: <a href="#t:foo/0">foo</a>()]
 
       assert autolink_spec(quote(do: -0 :: 0)) == ~s[-0 :: 0]
     end
@@ -292,23 +292,23 @@ defmodule ExDoc.Language.ElixirTest do
                ~s[t() :: <a href="#t:foo/1">foo</a>(1)]
 
       assert autolink_spec(quote(do: t() :: bar(foo(1)))) ==
-               ~s[t() :: <a href=\"#t:bar/1\">bar</a>(<a href=\"#t:foo/1\">foo</a>(1))]
+               ~s[t() :: <a href="#t:bar/1">bar</a>(<a href="#t:foo/1">foo</a>(1))]
 
       assert autolink_spec(quote(do: (t() :: bar(foo(1)) when bat: foo(1)))) ==
-               ~s[t() :: <a href=\"#t:bar/1\">bar</a>(<a href="#t:foo/1">foo</a>(1)) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
+               ~s[t() :: <a href="#t:bar/1">bar</a>(<a href="#t:foo/1">foo</a>(1)) when bat: <a href="#t:foo/1">foo</a>(1)]
 
       assert autolink_spec(quote(do: t() :: bar(baz(1)))) ==
-               ~s[t() :: <a href=\"#t:bar/1\">bar</a>(<a href=\"#t:baz/1\">baz</a>(1))]
+               ~s[t() :: <a href="#t:bar/1">bar</a>(<a href="#t:baz/1">baz</a>(1))]
 
       assert autolink_spec(quote(do: t() :: foo(bar(), bar()))) ==
-               ~s[t() :: <a href="#t:foo/2">foo</a>(<a href=\"#t:bar/0\">bar</a>(), <a href=\"#t:bar/0\">bar</a>())]
+               ~s[t() :: <a href="#t:foo/2">foo</a>(<a href="#t:bar/0">bar</a>(), <a href="#t:bar/0">bar</a>())]
 
       assert autolink_spec(quote(do: t() :: foo!(bar()))) ==
-               ~s[t() :: <a href="#t:foo!/1">foo!</a>(<a href=\"#t:bar/0\">bar</a>())]
+               ~s[t() :: <a href="#t:foo!/1">foo!</a>(<a href="#t:bar/0">bar</a>())]
 
       # TODO: probably update this according to the previous test's changes
       assert autolink_spec(quote(do: t() :: foo?(bar()))) ==
-               ~s[t() :: <a href="#t:foo?/1">foo?</a>(<a href=\"#t:bar/0\">bar</a>())]
+               ~s[t() :: <a href="#t:foo?/1">foo?</a>(<a href="#t:bar/0">bar</a>())]
 
       assert autolink_spec(
                quote do
@@ -318,7 +318,7 @@ defmodule ExDoc.Language.ElixirTest do
                  }
                end
              ) ==
-               "t() :: %{required(<a href=\"#t:bar/0\">bar</a>()) =&gt; <a href=\"#t:bar/0\">bar</a>(), optional(<a href=\"#t:bar/0\">bar</a>()) =&gt; <a href=\"#t:bar/0\">bar</a>()}"
+               ~s[t() :: %{required(<a href="#t:bar/0">bar</a>()) =&gt; <a href="#t:bar/0">bar</a>(), optional(<a href="#t:bar/0">bar</a>()) =&gt; <a href="#t:bar/0">bar</a>()}]
     end
 
     test "remotes" do
@@ -345,16 +345,16 @@ defmodule ExDoc.Language.ElixirTest do
                ~s[foo(1) :: <a href="#t:foo/1">foo</a>(1)]
 
       assert autolink_spec(quote(do: (foo(1) :: foo(1) when bat: foo(1)))) ==
-               ~s[foo(1) :: <a href=\"#t:foo/1\">foo</a>(1) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
+               ~s[foo(1) :: <a href="#t:foo/1">foo</a>(1) when bat: <a href="#t:foo/1">foo</a>(1)]
 
       assert autolink_spec(quote(do: bar(foo(1)) :: foo(1))) ==
-               ~s[bar(<a href=\"#t:foo/1\">foo</a>(1)) :: <a href=\"#t:foo/1\">foo</a>(1)]
+               ~s[bar(<a href="#t:foo/1">foo</a>(1)) :: <a href="#t:foo/1">foo</a>(1)]
 
       assert autolink_spec(quote(do: (bar(foo(1)) :: foo(1) when bat: foo(1)))) ==
-               ~s[bar(<a href=\"#t:foo/1\">foo</a>(1)) :: <a href=\"#t:foo/1\">foo</a>(1) when bat: <a href=\"#t:foo/1\">foo</a>(1)]
+               ~s[bar(<a href="#t:foo/1">foo</a>(1)) :: <a href="#t:foo/1">foo</a>(1) when bat: <a href="#t:foo/1">foo</a>(1)]
 
       assert autolink_spec(quote(do: bar(foo :: foo(1)) :: foo(1))) ==
-               ~s[bar(foo :: <a href=\"#t:foo/1\">foo</a>(1)) :: <a href=\"#t:foo/1\">foo</a>(1)]
+               ~s[bar(foo :: <a href="#t:foo/1">foo</a>(1)) :: <a href="#t:foo/1">foo</a>(1)]
     end
 
     test "Elixir stdlib types" do
@@ -364,17 +364,17 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "Elixir basic types" do
       assert autolink_spec(quote(do: t() :: atom())) ==
-               ~s[t() :: <a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\">atom</a>()]
+               ~s[t() :: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>()]
     end
 
     test "Elixir built-in types" do
       assert autolink_spec(quote(do: t() :: keyword())) ==
-               ~s[t() :: <a href=\"https://hexdocs.pm/elixir/typespecs.html#built-in-types\">keyword</a>()]
+               ~s[t() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()]
     end
 
     test "Erlang stdlib types" do
       assert autolink_spec(quote(do: t() :: :sets.set())) ==
-               ~s[t() :: <a href=\"https://erlang.org/doc/man/sets.html#type-set\">:sets.set</a>()]
+               ~s[t() :: <a href="https://erlang.org/doc/man/sets.html#type-set">:sets.set</a>()]
     end
 
     test "escape special HTML characters" do
@@ -396,23 +396,23 @@ defmodule ExDoc.Language.ElixirTest do
     ])
 
     captured = warn("AutolinkTest.Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
-    assert captured =~ "documentation references \"AutolinkTest.Foo.bar/1\" but it is hidden\n"
+    assert captured =~ ~s[documentation references "AutolinkTest.Foo.bar/1" but it is hidden\n]
     assert captured =~ ~r{lib/foo.ex:1\n$}
 
     assert warn("t:AutolinkTest.Foo.bad/0", file: "lib/foo.ex", id: "AutolinkTest.Foo.foo/0") =~
-             "documentation references \"t:AutolinkTest.Foo.bad/0\" but it is hidden or private\n"
+             ~s[documentation references "t:AutolinkTest.Foo.bad/0" but it is hidden or private]
 
     assert warn("t:Elixir.AutolinkTest.Foo.bad/0",
              file: "lib/foo.ex",
              id: "AutolinkTest.Foo.foo/0"
            ) =~
-             "documentation references \"t:Elixir.AutolinkTest.Foo.bad/0\" but it is hidden or private\n"
+             ~s[documentation references "t:Elixir.AutolinkTest.Foo.bad/0" but it is hidden or private]
 
     assert warn("t:AutolinkTest.Foo.bad/0", file: "lib/foo.ex", id: "AutolinkTest.Foo.foo/0") =~
-             "documentation references \"t:AutolinkTest.Foo.bad/0\" but it is hidden or private\n"
+             ~s[documentation references "t:AutolinkTest.Foo.bad/0" but it is hidden or private]
 
     assert warn("Code.Typespec") =~
-             "documentation references module \"Code.Typespec\" but it is hidden"
+             ~s[documentation references module "Code.Typespec" but it is hidden]
 
     warn("String.upcase/9")
 
@@ -422,11 +422,11 @@ defmodule ExDoc.Language.ElixirTest do
 
     assert warn(fn ->
              autolink_spec(quote(do: t() :: bad()))
-           end) =~ "documentation references \"bad()\""
+           end) =~ ~s[documentation references "bad()"]
 
     assert warn(fn ->
              autolink_spec(quote(do: t() :: String.bad()))
-           end) =~ "documentation references \"String.bad()\""
+           end) =~ ~s[documentation references "String.bad()"]
 
     assert warn(fn ->
              autolink_spec(
@@ -436,10 +436,10 @@ defmodule ExDoc.Language.ElixirTest do
                  }
                end
              )
-           end) =~ "documentation references \"String.bad()\""
+           end) =~ ~s[documentation references "String.bad()"]
 
     assert warn(~m"[Foo](Foo Bar.md)", extras: []) =~
-             "documentation references file \"Foo Bar.md\" but it does not exist"
+             ~s[documentation references file "Foo Bar.md" but it does not exist]
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
@@ -447,27 +447,27 @@ defmodule ExDoc.Language.ElixirTest do
     assert warn(fn ->
              assert autolink_doc(~m"[Bar A](`Bar.A`)") ==
                       ["Bar A"]
-           end) =~ "module \"Bar.A\" but it is undefined\n"
+           end) =~ ~s[module "Bar.A" but it is undefined]
 
     assert_unchanged(~m"`Bar.A`")
 
     assert warn(fn ->
              assert autolink_doc(~m"[custom text](`Elixir.Unknown`)") ==
                       ["custom text"]
-           end) =~ "documentation references module \"Elixir.Unknown\" but it is undefined\n"
+           end) =~ ~s[documentation references module "Elixir.Unknown" but it is undefined]
 
     assert warn(fn ->
              assert autolink_doc(~m"[It is Unknown](`Unknown`)") ==
                       ["It is Unknown"]
-           end) =~ "documentation references module \"Unknown\" but it is undefined\n"
+           end) =~ ~s[documentation references module "Unknown" but it is undefined]
 
     assert warn(~m"[Foo task](`mix foo`)", []) =~
-             "documentation references \"mix foo\" but it is undefined\n"
+             ~s[documentation references "mix foo" but it is undefined]
 
     assert_unchanged(~m"`mix foo`")
 
     assert warn(~m"[bad](`String.upcase/9`)", extras: []) =~
-             "documentation references \"String.upcase/9\" but it is undefined or private"
+             ~s[documentation references "String.upcase/9" but it is undefined or private]
 
     assert_unchanged(~m"`Unknown`")
 

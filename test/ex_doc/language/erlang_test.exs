@@ -9,121 +9,121 @@ defmodule ExDoc.Language.ErlangTest do
   describe "autolink_doc/2" do
     test "module", c do
       assert autolink_doc("{@link bar}", c) ==
-               ~s{<a href="bar.html"><code>bar</code></a>}
+               ~s|<a href="bar.html"><code>bar</code></a>|
     end
 
     test "OTP module", c do
       assert autolink_doc("{@link array}", c) ==
-               ~s{<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>}
+               ~s|<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>|
     end
 
     test "external module", c do
       assert autolink_doc("{@link 'Elixir.EarmarkParser'}", c) ==
-               ~s{<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>}
+               ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
     end
 
     test "external module - extension is ignored", c do
       assert autolink_doc("{@link 'Elixir.EarmarkParser'}", [ext: ".xhtml"], c) ==
-               ~s{<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>}
+               ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
     end
 
     test "custom text", c do
       assert autolink_doc("{@link array. The <code>array</code> module}", c) ==
-               ~s{<a href="https://erlang.org/doc/man/array.html">The <code>array</code> module</a>}
+               ~s|<a href="https://erlang.org/doc/man/array.html">The <code>array</code> module</a>|
     end
 
     test "local function", c do
       assert autolink_doc("{@link foo/0}", [current_module: :foo], c) ==
-               ~s{<a href="#foo/0"><code>foo/0</code></a>}
+               ~s|<a href="#foo/0"><code>foo/0</code></a>|
     end
 
     test "remote function", c do
       assert autolink_doc("{@link bar:bar/0}", c) ==
-               ~s{<a href="bar.html#bar/0"><code>bar:bar/0</code></a>}
+               ~s|<a href="bar.html#bar/0"><code>bar:bar/0</code></a>|
     end
 
     test "OTP function", c do
       assert autolink_doc("{@link array:new/0}", c) ==
-               ~s{<a href="https://erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>}
+               ~s|<a href="https://erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
     end
 
     test "ERTS function", c do
       assert autolink_doc("{@link zlib:gunzip/1}", c) ==
-               ~s{<a href="https://erlang.org/doc/man/zlib.html#gunzip-1"><code>zlib:gunzip/1</code></a>}
+               ~s|<a href="https://erlang.org/doc/man/zlib.html#gunzip-1"><code>zlib:gunzip/1</code></a>|
     end
 
     test "external function", c do
       assert autolink_doc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) ==
-               ~s{<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>}
+               ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>|
     end
 
     test "local type", c do
       assert autolink_doc("{@link t()}", [current_module: :foo], c) ==
-               ~s{<a href="#t:t/0"><code>t()</code></a>}
+               ~s|<a href="#t:t/0"><code>t()</code></a>|
     end
 
     test "remote type", c do
       assert autolink_doc("{@link bar:t()}", c) ==
-               ~s{<a href="bar.html#t:t/0"><code>bar:t()</code></a>}
+               ~s|<a href="bar.html#t:t/0"><code>bar:t()</code></a>|
     end
 
     test "OTP type", c do
       assert autolink_doc("{@link array:array()}", c) ==
-               ~s{<a href="https://erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>}
+               ~s|<a href="https://erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
     end
 
     test "bad module", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link bad}", c) == ~s{<code>bad</code>}
-             end) =~ "references module \"bad\" but it is undefined"
+               assert autolink_doc("{@link bad}", c) == ~s|<code>bad</code>|
+             end) =~ ~s|references module "bad" but it is undefined|
     end
 
     test "bad local function", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link bad/0}", c) == ~s{<code>bad/0</code>}
-             end) =~ "references \"bad/0\" but it is undefined or private"
+               assert autolink_doc("{@link bad/0}", c) == ~s|<code>bad/0</code>|
+             end) =~ ~s|references "bad/0" but it is undefined or private|
     end
 
     test "bad remote function", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link bad:bad/0}", c) == ~s{<code>bad:bad/0</code>}
-             end) =~ "references \"bad:bad/0\" but it is undefined or private"
+               assert autolink_doc("{@link bad:bad/0}", c) == ~s|<code>bad:bad/0</code>|
+             end) =~ ~s|references "bad:bad/0" but it is undefined or private|
     end
 
     test "bad local type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link bad()}", c) == ~s{<code>bad()</code>}
-             end) =~ "references \"bad\(\)\" but it is undefined or private"
+               assert autolink_doc("{@link bad()}", c) == ~s|<code>bad()</code>|
+             end) =~ ~s|references "bad()" but it is undefined or private|
     end
 
     test "bad remote type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link bad:bad()}", c) == ~s{<code>bad:bad()</code>}
-             end) =~ "references \"bad:bad()\" but it is undefined or private"
+               assert autolink_doc("{@link bad:bad()}", c) == ~s|<code>bad:bad()</code>|
+             end) =~ ~s|references "bad:bad()" but it is undefined or private|
     end
 
     test "application", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo}", c) == ~s{<code>foo</code>}
+               assert autolink_doc("{@link //foo}", c) == ~s|<code>foo</code>|
              end) =~ ~r{application references are not supported: //foo}
     end
 
     test "application module", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo/bar}", c) == ~s{<code>bar</code>}
+               assert autolink_doc("{@link //foo/bar}", c) == ~s|<code>bar</code>|
              end) =~ ~r{application references are not supported: //foo/bar}
     end
 
     test "application function", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo/bar:baz/0}", c) == ~s{<code>bar:baz/0</code>}
+               assert autolink_doc("{@link //foo/bar:baz/0}", c) == ~s|<code>bar:baz/0</code>|
              end) =~ ~r{application references are not supported: //foo/bar:baz/0}
     end
 
     test "application type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo/bar:baz()}", c) == ~s{<code>bar:baz()</code>}
-             end) =~ ~r{application references are not supported: //foo/bar:baz\(\)}
+               assert autolink_doc("{@link //foo/bar:baz()}", c) == ~s|<code>bar:baz()</code>|
+             end) =~ ~r{application references are not supported: //foo/bar:baz()}
     end
   end
 
