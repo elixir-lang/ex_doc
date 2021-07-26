@@ -9,15 +9,17 @@ defmodule ExDoc.Language.Elixir do
   alias ExDoc.Refs
 
   @impl true
-  def module_data(module) do
+  def module_data(module, config) do
     {type, skip} = module_type_and_skip(module)
+    title = module_title(module, type)
 
     %{
       id: inspect(module),
-      title: module_title(module, type),
+      title: title,
       type: type,
       skip: skip,
-      extra_callback_types: [:macrocallback]
+      extra_callback_types: [:macrocallback],
+      nesting_info: nesting_info(title, config.nest_modules_by_prefix)
     }
   end
 
@@ -147,6 +149,15 @@ defmodule ExDoc.Language.Elixir do
   end
 
   ## Helpers
+
+  defp nesting_info(title, prefixes) do
+    prefixes
+    |> Enum.find(&String.starts_with?(title, &1 <> "."))
+    |> case do
+      nil -> {nil, nil}
+      prefix -> {String.trim_leading(title, prefix <> "."), prefix}
+    end
+  end
 
   defp module_type_and_skip(module) do
     cond do

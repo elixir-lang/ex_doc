@@ -6,7 +6,7 @@ defmodule ExDoc.Language.Erlang do
   alias ExDoc.{Autolink, Refs}
 
   @impl true
-  def module_data(module) do
+  def module_data(module, _config) do
     ":" <> id = inspect(module)
 
     %{
@@ -14,7 +14,8 @@ defmodule ExDoc.Language.Erlang do
       title: id,
       type: module_type(module),
       skip: false,
-      extra_callback_types: []
+      extra_callback_types: [],
+      nesting_info: nil
     }
   end
 

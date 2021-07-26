@@ -25,14 +25,18 @@ defmodule ExDoc.Language do
 
     * `:extra_callback_types` - a list of types that are considered callbacks
 
+    * `:nesting_info` - A `{nested_title, nested_context}` tuple or `nil`.
+      For example, `"A.B.C"` becomes `{"C", "A.B"}`.
+
   """
-  @callback module_data(module()) :: data
+  @callback module_data(module(), ExDoc.Config.t()) :: data
             when data: %{
                    id: String.t(),
                    title: String.t(),
                    type: atom() | nil,
                    skip: boolean(),
-                   extra_callback_types: [atom()]
+                   extra_callback_types: [atom()],
+                   nesting_info: {String.t(), String.t()} | nil
                  }
 
   @doc """

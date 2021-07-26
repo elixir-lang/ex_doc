@@ -59,7 +59,7 @@ defmodule ExDoc.Retriever do
     if docs_chunk = docs_chunk(module) do
       module_state =
         module
-        |> get_module_state(docs_chunk)
+        |> get_module_state(docs_chunk, config)
         |> maybe_skip(config.filter_prefix)
 
       if not module_state.skip do
@@ -123,8 +123,7 @@ defmodule ExDoc.Retriever do
     docs = function_docs ++ get_callbacks(module_state, source)
     types = get_types(module_state, source)
 
-    {nested_title, nested_context} =
-      nesting_info(module_state.title, config.nest_modules_by_prefix)
+    {nested_title, nested_context} = module_state.nesting_info || {nil, nil}
 
     node = %ExDoc.ModuleNode{
       id: module_state.id,
@@ -147,15 +146,6 @@ defmodule ExDoc.Retriever do
     put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
   end
 
-  defp nesting_info(title, prefixes) do
-    prefixes
-    |> Enum.find(&String.starts_with?(title, &1 <> "."))
-    |> case do
-      nil -> {nil, nil}
-      prefix -> {String.trim_leading(title, prefix <> "."), prefix}
-    end
-  end
-
   defp sort_key(name, arity) do
     first = name |> Atom.to_charlist() |> hd()
     {first in ?a..?z, name, arity}
@@ -171,10 +161,10 @@ defmodule ExDoc.Retriever do
 
   # Module Helpers
 
-  defp get_module_state(module, docs_chunk) do
+  defp get_module_state(module, docs_chunk, config) do
     {:docs_v1, _, language, _, _, _, _} = docs_chunk
     language = ExDoc.Language.get(language)
-    extra = language.module_data(module)
+    extra = language.module_data(module, config)
 
     %{
       id: extra.id,
@@ -188,6 +178,7 @@ defmodule ExDoc.Retriever do
       callbacks: get_callbacks(module),
       docs: docs_chunk,
       callback_types: [:callback] ++ extra.extra_callback_types,
+      nesting_info: extra.nesting_info,
       # TODO: move to Language.Elixir/Erlang
       abst_code: get_abstract_code(module)
     }
