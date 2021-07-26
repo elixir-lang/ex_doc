@@ -1,9 +1,9 @@
-<section class="detail" id="<%=enc HTML.link_id(node.id, node.type) %>">
+<section class="detail" id="<%=enc node.id %>">
   <%= for {default_name, default_arity} <- get_defaults(node) do %>
-    <span id="<%=enc HTML.link_id("#{default_name}/#{default_arity}", node.type) %>"></span>
+    <span id="<%=enc "#{default_name}/#{default_arity}" %>"></span>
   <% end %>
   <div class="detail-header">
-    <a href="#<%=enc HTML.link_id(node) %>" class="detail-link" title="Link to this <%= pretty_type(node) %>">
+    <a href="#<%=enc node.id %>" class="detail-link" title="Link to this <%= pretty_type(node) %>">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this <%= pretty_type(node) %></span>
     </a>
@@ -34,6 +34,6 @@
       </div>
     <% end %>
 
-    <%= node.rendered_doc |> link_detail_headings(enc(HTML.link_id(node))) %>
+    <%= node.rendered_doc |> link_detail_headings(enc(node.id)) %>
   </section>
 </section>
