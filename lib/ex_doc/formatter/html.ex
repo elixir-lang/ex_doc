@@ -103,10 +103,8 @@ defmodule ExDoc.Formatter.HTML do
           render_doc(child_node, language, autolink_opts, opts)
         end
 
-      id = id(node, nil)
-
       %{
-        render_doc(node, language, [{:id, id} | autolink_opts], opts)
+        render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
         | docs: docs,
           typespecs: typespecs
       }
@@ -121,10 +119,17 @@ defmodule ExDoc.Formatter.HTML do
     %{node | rendered_doc: rendered}
   end
 
-  defp id(%{id: id}, nil), do: id
-  defp id(%{id: mod_id}, %ExDoc.FunctionNode{id: id, type: :callback}), do: "c:#{mod_id}.#{id}"
-  defp id(%{id: mod_id}, %ExDoc.FunctionNode{id: id}), do: "#{mod_id}.#{id}"
-  defp id(%{id: mod_id}, %ExDoc.TypeNode{id: id}), do: "t:#{mod_id}.#{id}"
+  defp id(%{id: mod_id}, %{id: "c:" <> id}) do
+    "c:" <> mod_id <> "." <> id
+  end
+
+  defp id(%{id: mod_id}, %{id: "t:" <> id}) do
+    "t:" <> mod_id <> "." <> id
+  end
+
+  defp id(%{id: mod_id}, %{id: id}) do
+    mod_id <> "." <> id
+  end
 
   defp autolink_and_render(doc, language, autolink_opts, opts) do
     doc
@@ -387,24 +392,6 @@ defmodule ExDoc.Formatter.HTML do
     |> String.replace(~r/\W+/u, "-")
     |> String.trim("-")
     |> String.downcase()
-  end
-
-  @doc """
-  Generate a link id for the given node.
-  """
-  def link_id(node), do: link_id(node.id, node.type)
-
-  @doc """
-  Generate a link id for the given id and type.
-  """
-  def link_id(id, type) do
-    case type do
-      :macrocallback -> "c:#{id}"
-      :callback -> "c:#{id}"
-      :type -> "t:#{id}"
-      :opaque -> "t:#{id}"
-      _ -> "#{id}"
-    end
   end
 
   @doc """

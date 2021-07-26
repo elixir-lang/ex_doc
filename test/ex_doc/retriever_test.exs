@@ -116,7 +116,7 @@ defmodule ExDoc.RetrieverTest do
 
       [callback1, macrocallback1, optional_callback1] = mod.docs
 
-      assert callback1.id == "callback1/0"
+      assert callback1.id == "c:callback1/0"
       assert callback1.signature == "callback1()"
       assert callback1.type == :callback
       assert callback1.annotations == []
@@ -126,7 +126,7 @@ defmodule ExDoc.RetrieverTest do
       assert DocAST.to_string(callback1.doc) == "<p>callback1/0 docs.</p>"
       assert Macro.to_string(callback1.specs) == "[callback1() :: :ok]"
 
-      assert optional_callback1.id == "optional_callback1/0"
+      assert optional_callback1.id == "c:optional_callback1/0"
       assert optional_callback1.signature == "optional_callback1()"
       assert optional_callback1.type == :callback
       assert optional_callback1.annotations == ["optional"]
@@ -136,7 +136,7 @@ defmodule ExDoc.RetrieverTest do
       refute optional_callback1.doc
       assert Macro.to_string(optional_callback1.specs) == "[optional_callback1() :: :ok]"
 
-      assert macrocallback1.id == "macrocallback1/0"
+      assert macrocallback1.id == "c:macrocallback1/0"
       assert macrocallback1.signature == "macrocallback1()"
       assert macrocallback1.type == :macrocallback
       assert macrocallback1.annotations == []
@@ -426,7 +426,7 @@ defmodule ExDoc.RetrieverTest do
       [mod] = Retriever.docs_from_modules([:mod], config)
       [callback1] = mod.docs
 
-      assert callback1.id == "callback1/0"
+      assert callback1.id == "c:callback1/0"
       assert callback1.type == :callback
       assert DocAST.to_string(callback1.doc) == "callback1/0 docs."
       assert Path.basename(callback1.source_url) == "mod.erl:3"
@@ -452,13 +452,13 @@ defmodule ExDoc.RetrieverTest do
       [mod] = Retriever.docs_from_modules([:mod], config)
       [opaque1, type1] = mod.typespecs
 
-      assert opaque1.id == "opaque1/0"
+      assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
       assert opaque1.signature == "opaque1/0"
       assert DocAST.to_string(opaque1.doc) == "opaque1/0 docs."
       assert Erlang.autolink_spec(opaque1.spec, []) == "opaque1() :: atom()."
 
-      assert type1.id == "type1/0"
+      assert type1.id == "t:type1/0"
       assert type1.type == :type
       assert type1.signature == "type1/0"
       assert DocAST.to_string(type1.doc) == "type1/0 docs."
