@@ -43,12 +43,12 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     [module] ++ functions ++ types
   end
 
-  defp node_child(node, module) do
+  defp node_child(%{id: id, type: type, rendered_doc: doc}, module) do
     encode(
-      "#{module}.html##{node.id}",
-      "#{module}.#{node.name}/#{node.arity}",
-      node.type,
-      node.rendered_doc
+      "#{module}.html##{HTML.link_id(id, type)}",
+      "#{module}.#{id}",
+      type,
+      doc
     )
   end
 

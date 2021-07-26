@@ -345,7 +345,7 @@ defmodule ExDoc.Retriever do
       end)
 
     %ExDoc.FunctionNode{
-      id: "c:#{name}/#{arity}",
+      id: "#{name}/#{arity}",
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
@@ -413,7 +413,7 @@ defmodule ExDoc.Retriever do
     doc_ast = doc_ast(content_type, doc, file: source.path)
 
     %ExDoc.TypeNode{
-      id: "t:#{name}/#{arity}",
+      id: "#{name}/#{arity}",
       name: name,
       arity: arity,
       type: type_data.type,

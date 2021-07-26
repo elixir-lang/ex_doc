@@ -390,6 +390,24 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   @doc """
+  Generate a link id for the given node.
+  """
+  def link_id(node), do: link_id(node.id, node.type)
+
+  @doc """
+  Generate a link id for the given id and type.
+  """
+  def link_id(id, type) do
+    case type do
+      :macrocallback -> "c:#{id}"
+      :callback -> "c:#{id}"
+      :type -> "t:#{id}"
+      :opaque -> "t:#{id}"
+      _ -> "#{id}"
+    end
+  end
+
+  @doc """
   Generates the logo from config into the given directory.
   """
   def generate_logo(_dir, %{logo: nil}) do

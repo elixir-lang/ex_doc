@@ -1,6 +1,6 @@
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#<%=enc node.id %>"><%=h node.signature %></a>
+    <a href="#<%=enc HTML.link_id(node) %>"><%=h node.signature %></a>
     <%= if deprecated = node.deprecated do %>
       <span class="deprecated" title="<%= h(deprecated) %>">deprecated</span>
     <% end %>
