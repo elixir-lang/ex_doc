@@ -119,8 +119,18 @@ defmodule ExDoc.Retriever do
     {doc_line, moduledoc, metadata} = get_module_docs(module_state, source_path)
     line = find_module_line(module_state) || doc_line
 
-    {function_groups, function_docs} = get_docs(module_state, source, config)
-    docs = function_docs ++ get_callbacks(module_state, source)
+    groups_for_functions =
+      Enum.map(config.groups_for_functions, fn {group, filter} ->
+        {Atom.to_string(group), filter}
+      end) ++
+        [
+          {"Callbacks", & &1[:__callback__]},
+          {"Functions", fn _ -> true end}
+        ]
+
+    function_groups = Enum.map(groups_for_functions, &elem(&1, 0))
+    function_docs = get_docs(module_state, source, groups_for_functions)
+    docs = function_docs ++ get_callbacks(module_state, source, groups_for_functions)
     types = get_types(module_state, source)
 
     {nested_title, nested_context} = module_state.nesting_info || {nil, nil}
@@ -202,20 +212,15 @@ defmodule ExDoc.Retriever do
 
   ## Function helpers
 
-  defp get_docs(%{type: type, docs: docs} = module_state, source, config) do
+  defp get_docs(%{type: type, docs: docs} = module_state, source, groups_for_functions) do
     {:docs_v1, _, _, _, _, _, doc_elements} = docs
-
-    groups_for_functions =
-      Enum.map(config.groups_for_functions, fn {group, filter} ->
-        {Atom.to_string(group), filter}
-      end) ++ [{"Functions", fn _ -> true end}]
 
     function_doc_elements =
       for doc_element <- doc_elements, doc?(doc_element, type) do
         get_function(doc_element, source, module_state, groups_for_functions)
       end
 
-    {Enum.map(groups_for_functions, &elem(&1, 0)), filter_defaults(function_doc_elements)}
+    filter_defaults(function_doc_elements)
   end
 
   # TODO: Elixir specific
@@ -257,16 +262,14 @@ defmodule ExDoc.Retriever do
     line = function_data.line || doc_line
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
-    group =
-      Enum.find_value(groups_for_functions, fn {group, filter} ->
-        # TODO: should we call filter with the whole %FunctionNode{}, not just metadata?
-        #       also, should we save off metadata on the node?
-        filter.(metadata) && group
-      end)
-
     doc_ast =
       (doc_content && doc_ast(content_type, doc_content, file: source.path, line: doc_line + 1)) ||
         function_data.doc_fallback.()
+
+    group =
+      Enum.find_value(groups_for_functions, fn {group, filter} ->
+        filter.(metadata) && group
+      end)
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -306,18 +309,18 @@ defmodule ExDoc.Retriever do
 
   ## Callback helpers
 
-  defp get_callbacks(%{type: :behaviour} = module_state, source) do
+  defp get_callbacks(%{type: :behaviour} = module_state, source, groups_for_functions) do
     {:docs_v1, _, _, _, _, _, docs} = module_state.docs
     optional_callbacks = module_state.name.behaviour_info(:optional_callbacks)
 
     for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in module_state.callback_types do
-      get_callback(doc, source, optional_callbacks, module_state)
+      get_callback(doc, source, optional_callbacks, groups_for_functions, module_state)
     end
   end
 
-  defp get_callbacks(_, _), do: []
+  defp get_callbacks(_, _, _), do: []
 
-  defp get_callback(callback, source, optional_callbacks, module_state) do
+  defp get_callback(callback, source, optional_callbacks, groups_for_functions, module_state) do
     callback_data = module_state.language.callback_data(callback, module_state)
 
     {:docs_v1, _, _, content_type, _, _, _} = module_state.docs
@@ -335,6 +338,12 @@ defmodule ExDoc.Retriever do
 
     doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
 
+    group =
+      Enum.find_value(groups_for_functions, fn {group, filter} ->
+        metadata = Map.put(metadata, :__callback__, true)
+        filter.(metadata) && group
+      end)
+
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
       name: name,
@@ -347,7 +356,8 @@ defmodule ExDoc.Retriever do
       source_path: source.path,
       source_url: source_link(source, callback_data.line),
       type: kind,
-      annotations: annotations
+      annotations: annotations,
+      group: group
     }
   end
 

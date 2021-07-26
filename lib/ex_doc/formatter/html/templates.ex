@@ -185,8 +185,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def module_summary(module_node) do
     [Types: module_node.typespecs] ++
-      function_groups(module_node.function_groups, module_node.docs) ++
-      [Callbacks: Enum.filter(module_node.docs, &(&1.type in [:callback, :macrocallback]))]
+      function_groups(module_node.function_groups, module_node.docs)
   end
 
   defp function_groups(groups, docs) do
