@@ -166,49 +166,24 @@ defmodule ExDoc.Retriever do
 
   ## Function helpers
 
-  defp get_docs(%{type: type, docs: docs} = module_data, source, groups_for_functions) do
-    {:docs_v1, _, _, _, _, _, doc_elements} = docs
+  defp get_docs(module_data, source, groups_for_functions) do
+    {:docs_v1, _, _, _, _, _, doc_elements} = module_data.docs
 
-    function_doc_elements =
-      for doc_element <- doc_elements, doc?(doc_element, type) do
-        get_function(doc_element, source, module_data, groups_for_functions)
-      end
+    nodes =
+      Enum.flat_map(doc_elements, fn doc_element ->
+        case module_data.language.function_data(doc_element, module_data) do
+          :skip ->
+            []
 
-    filter_defaults(function_doc_elements)
+          function_data ->
+            [get_function(doc_element, function_data, source, module_data, groups_for_functions)]
+        end
+      end)
+
+    filter_defaults(nodes)
   end
 
-  # TODO: Elixir specific
-  # We are only interested in functions and macros for now
-  defp doc?({{kind, _, _}, _, _, _, _}, _) when kind not in [:function, :macro] do
-    false
-  end
-
-  # TODO: Elixir specific
-  # Skip impl_for and impl_for! for protocols
-  defp doc?({{_, name, _}, _, _, _, _}, :protocol) when name in [:impl_for, :impl_for!] do
-    false
-  end
-
-  # If content is a map, then it is ok.
-  defp doc?({_, _, _, %{}, _}, _) do
-    true
-  end
-
-  # We keep this clause with backwards compatibility with Elixir,
-  # from v1.12+, functions not starting with _ always default to %{}.
-  # TODO: Remove me once we require Elixir v1.12.
-  defp doc?({{_, name, _}, _, _, :none, _}, _type) do
-    hd(Atom.to_charlist(name)) != ?_
-  end
-
-  # Everything else is hidden.
-  defp doc?({_, _, _, _, _}, _) do
-    false
-  end
-
-  defp get_function(doc_element, source, module_data, groups_for_functions) do
-    function_data = module_data.language.function_data(doc_element, module_data)
-
+  defp get_function(doc_element, function_data, source, module_data, groups_for_functions) do
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
     doc_line = anno_line(anno)
@@ -249,14 +224,14 @@ defmodule ExDoc.Retriever do
     for default <- (arity - defaults)..(arity - 1), do: {name, default}
   end
 
-  defp filter_defaults(docs) do
-    Enum.map(docs, &filter_defaults(&1, docs))
+  defp filter_defaults(nodes) do
+    Enum.map(nodes, &filter_defaults(&1, nodes))
   end
 
-  defp filter_defaults(doc, docs) do
-    update_in(doc.defaults, fn defaults ->
+  defp filter_defaults(node, nodes) do
+    update_in(node.defaults, fn defaults ->
       Enum.reject(defaults, fn {name, arity} ->
-        Enum.any?(docs, &match?(%{name: ^name, arity: ^arity}, &1))
+        Enum.any?(nodes, &match?(%{name: ^name, arity: ^arity}, &1))
       end)
     end)
   end

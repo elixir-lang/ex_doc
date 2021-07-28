@@ -6,11 +6,17 @@ defmodule ExDoc.Language.Erlang do
   alias ExDoc.{Autolink, Refs}
 
   @impl true
-  def module_data(_module, {:docs_v1, _, _, _, doc, _, _}, _config) when not is_map(doc) do
-    :skip
+  def module_data(module, docs_chunk, _config) do
+    {:docs_v1, _, _, _, doc, _, _} = docs_chunk
+
+    if is_map(doc) do
+      module_data(module, docs_chunk)
+    else
+      :skip
+    end
   end
 
-  def module_data(module, docs_chunk, _config) do
+  def module_data(module, docs_chunk) do
     ":" <> id = inspect(module)
     abst_code = get_abstract_code(module)
     line = find_module_line(module, abst_code)
@@ -35,8 +41,16 @@ defmodule ExDoc.Language.Erlang do
 
   @impl true
   def function_data(entry, module_data) do
-    {{_kind, name, arity}, _anno, _signature, _doc_content, _metadata} = entry
+    {{kind, name, arity}, _anno, _signature, doc_content, _metadata} = entry
 
+    if kind == :function and is_map(doc_content) do
+      function_data(name, arity, doc_content, module_data)
+    else
+      :skip
+    end
+  end
+
+  defp function_data(name, arity, _doc_content, module_data) do
     specs =
       case Map.fetch(module_data.private.specs, {name, arity}) do
         {:ok, specs} ->
