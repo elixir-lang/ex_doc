@@ -42,8 +42,16 @@ defmodule ExDoc.Language.Elixir do
 
   @impl true
   def function_data(entry, module_data) do
-    {{kind, name, arity}, _anno, _signature, _doc_content, metadata} = entry
+    {{kind, name, arity}, _anno, _signature, doc_content, metadata} = entry
 
+    if doc?(entry, module_data.type) do
+      function_data(kind, name, arity, doc_content, metadata, module_data)
+    else
+      :skip
+    end
+  end
+
+  def function_data(kind, name, arity, _doc_content, metadata, module_data) do
     extra_annotations =
       case {kind, name, arity} do
         {:macro, _, _} -> ["macro"]
@@ -64,6 +72,33 @@ defmodule ExDoc.Language.Elixir do
       line: find_function_line(module_data, actual_def),
       specs: specs(kind, name, actual_def, module_data)
     }
+  end
+
+  # We are only interested in functions and macros for now
+  defp doc?({{kind, _, _}, _, _, _, _}, _) when kind not in [:function, :macro] do
+    false
+  end
+
+  # Skip impl_for and impl_for! for protocols
+  defp doc?({{_, name, _}, _, _, _, _}, :protocol) when name in [:impl_for, :impl_for!] do
+    false
+  end
+
+  # If content is a map, then it is ok.
+  defp doc?({_, _, _, %{}, _}, _) do
+    true
+  end
+
+  # We keep this clause with backwards compatibility with Elixir,
+  # from v1.12+, functions not starting with _ always default to %{}.
+  # TODO: Remove me once we require Elixir v1.12.
+  defp doc?({{_, name, _}, _, _, :none, _}, _type) do
+    hd(Atom.to_charlist(name)) != ?_
+  end
+
+  # Everything else is hidden.
+  defp doc?({_, _, _, _, _}, _) do
+    false
   end
 
   @impl true

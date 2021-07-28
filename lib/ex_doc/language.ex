@@ -46,7 +46,7 @@ defmodule ExDoc.Language do
   @callback module_data(module(), tuple(), ExDoc.Config.t()) :: module_data() | :skip
 
   @doc """
-  Returns a map with function information.
+  Returns a map with function information or an atom `:skip`.
 
   The map has the following keys:
 
@@ -67,6 +67,7 @@ defmodule ExDoc.Language do
                 line: non_neg_integer() | nil,
                 specs: [spec_ast()]
               }
+              | :skip
 
   @doc """
   Returns a map with callback information.
@@ -83,12 +84,13 @@ defmodule ExDoc.Language do
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
   """
-  @callback callback_data(entry :: tuple(), module_data()) :: %{
-              actual_def: {atom(), arity()},
-              line: non_neg_integer() | nil,
-              signature: [binary()],
-              specs: [spec_ast()]
-            }
+  @callback callback_data(entry :: tuple(), module_data()) ::
+              %{
+                actual_def: {atom(), arity()},
+                line: non_neg_integer() | nil,
+                signature: [binary()],
+                specs: [spec_ast()]
+              }
 
   @doc """
   Returns a map with type information.
@@ -103,12 +105,13 @@ defmodule ExDoc.Language do
 
     * `:spec` - a spec that will be later formatted by `c:typespec/2`
   """
-  @callback type_data(entry :: tuple(), spec :: term()) :: %{
-              type: :type | :opaque,
-              line: non_neg_integer(),
-              signature: [binary()],
-              spec: spec_ast()
-            }
+  @callback type_data(entry :: tuple(), spec :: term()) ::
+              %{
+                type: :type | :opaque,
+                line: non_neg_integer(),
+                signature: [binary()],
+                spec: spec_ast()
+              }
 
   @doc """
   Autolinks docs.

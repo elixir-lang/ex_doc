@@ -85,6 +85,21 @@ defmodule ExDoc.Retriever.ErlangTest do
       [] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
     end
 
+    @tag :otp23
+    @tag :otp24
+    test "function with no docs is skipped", c do
+      erlc(c, :mod, ~S"""
+      %% @doc Docs.
+      -module(mod).
+      -export([f/0]).
+
+      f() -> ok.
+      """)
+
+      [mod] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
+      assert mod.docs == []
+    end
+
     @tag :otp24
     test "callbacks", c do
       erlc(c, :mod, ~S"""
