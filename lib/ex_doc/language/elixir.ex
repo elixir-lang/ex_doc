@@ -7,11 +7,14 @@ defmodule ExDoc.Language.Elixir do
   alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates, as: T
   alias ExDoc.Refs
+  alias ExDoc.Language.Erlang
 
   @impl true
   def module_data(module, config) do
     {type, skip} = module_type_and_skip(module)
     title = module_title(module, type)
+    abst_code = Erlang.get_abstract_code(module)
+    line = Erlang.find_module_line(module, abst_code)
 
     %{
       id: inspect(module),
@@ -19,7 +22,9 @@ defmodule ExDoc.Language.Elixir do
       type: type,
       skip: skip,
       extra_callback_types: [:macrocallback],
-      nesting_info: nesting_info(title, config.nest_modules_by_prefix)
+      nesting_info: nesting_info(title, config.nest_modules_by_prefix),
+      line: line,
+      abst_code: abst_code
     }
   end
 

@@ -8,6 +8,8 @@ defmodule ExDoc.Language.Erlang do
   @impl true
   def module_data(module, _config) do
     ":" <> id = inspect(module)
+    abst_code = get_abstract_code(module)
+    line = find_module_line(module, abst_code)
 
     %{
       id: id,
@@ -15,7 +17,9 @@ defmodule ExDoc.Language.Erlang do
       type: module_type(module),
       skip: false,
       extra_callback_types: [],
-      nesting_info: nil
+      nesting_info: nil,
+      line: line,
+      abst_code: abst_code
     }
   end
 
@@ -111,6 +115,26 @@ defmodule ExDoc.Language.Erlang do
       lexer: Makeup.Lexers.ErlangLexer,
       opts: []
     }
+  end
+
+  ## Shared between Erlang & Elixir
+
+  @doc false
+  def get_abstract_code(module) do
+    {^module, binary, _file} = :code.get_object_code(module)
+
+    case :beam_lib.chunks(binary, [:abstract_code]) do
+      {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} -> abstract_code
+      _otherwise -> []
+    end
+  end
+
+  @doc false
+  def find_module_line(module, abst_code) do
+    Enum.find_value(abst_code, fn
+      {:attribute, anno, :module, ^module} -> anno_line(anno)
+      _ -> nil
+    end)
   end
 
   ## Autolink

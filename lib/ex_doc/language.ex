@@ -23,6 +23,8 @@ defmodule ExDoc.Language do
 
     * `:skip` - whether module should be skipped from generating the docs
 
+    * `:line` - the line where the code is located
+
     * `:extra_callback_types` - a list of types that are considered callbacks
 
     * `:nesting_info` - A `{nested_title, nested_context}` tuple or `nil`.
@@ -35,6 +37,7 @@ defmodule ExDoc.Language do
                    title: String.t(),
                    type: atom() | nil,
                    skip: boolean(),
+                   line: non_neg_integer(),
                    extra_callback_types: [atom()],
                    nesting_info: {String.t(), String.t()} | nil
                  }

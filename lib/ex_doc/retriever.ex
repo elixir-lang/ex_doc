@@ -117,7 +117,6 @@ defmodule ExDoc.Retriever do
     source = %{url: source_url, path: source_path}
 
     {doc_line, moduledoc, metadata} = get_module_docs(module_state, source_path)
-    line = find_module_line(module_state) || doc_line
 
     groups_for_functions =
       Enum.map(config.groups_for_functions, fn {group, filter} ->
@@ -149,7 +148,7 @@ defmodule ExDoc.Retriever do
       doc_line: doc_line,
       typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
       source_path: source_path,
-      source_url: source_link(source, line),
+      source_url: source_link(source, module_state.line),
       language: module_state.language
     }
 
@@ -189,8 +188,8 @@ defmodule ExDoc.Retriever do
       docs: docs_chunk,
       callback_types: [:callback] ++ extra.extra_callback_types,
       nesting_info: extra.nesting_info,
-      # TODO: move to Language.Elixir/Erlang
-      abst_code: get_abstract_code(module)
+      abst_code: extra.abst_code,
+      line: extra.line
     }
   end
 
@@ -199,15 +198,6 @@ defmodule ExDoc.Retriever do
     doc_line = anno_line(anno)
     options = [file: source_path, line: doc_line + 1]
     {doc_line, doc_ast(content_type, moduledoc, options), metadata}
-  end
-
-  defp get_abstract_code(module) do
-    {^module, binary, _file} = :code.get_object_code(module)
-
-    case :beam_lib.chunks(binary, [:abstract_code]) do
-      {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} -> abstract_code
-      _otherwise -> []
-    end
   end
 
   ## Function helpers
@@ -444,13 +434,6 @@ defmodule ExDoc.Retriever do
       end
 
     annotations
-  end
-
-  defp find_module_line(%{abst_code: abst_code, name: name}) do
-    Enum.find_value(abst_code, fn
-      {:attribute, anno, :module, ^name} -> anno_line(anno)
-      _ -> nil
-    end)
   end
 
   defp anno_line(line) when is_integer(line), do: abs(line)
