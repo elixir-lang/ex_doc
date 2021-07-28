@@ -18,7 +18,6 @@ defmodule ExDoc.Language.Erlang do
       id: id,
       title: id,
       type: module_type(module),
-      skip: false,
       line: line,
       callback_types: [:callback],
       nesting_info: nil,

@@ -18,8 +18,6 @@ defmodule ExDoc.Language do
 
     * `:type` - module type
 
-    * `:skip` - whether module should be skipped from generating the docs
-
     * `:line` - the line where the code is located
 
     * `:callback_types` - a list of types that are considered callbacks
@@ -36,7 +34,6 @@ defmodule ExDoc.Language do
           id: String.t(),
           title: String.t(),
           type: atom() | nil,
-          skip: boolean(),
           line: non_neg_integer(),
           callback_types: [atom()],
           nesting_info: {String.t(), String.t()} | nil,
@@ -46,7 +43,7 @@ defmodule ExDoc.Language do
   @doc """
   Returns a map with module information.
   """
-  @callback module_data(module(), tuple(), ExDoc.Config.t()) :: module_data()
+  @callback module_data(module(), tuple(), ExDoc.Config.t()) :: module_data() | :skip
 
   @doc """
   Returns a map with function information.

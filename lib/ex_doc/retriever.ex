@@ -51,33 +51,20 @@ defmodule ExDoc.Retriever do
     String.to_atom(name)
   end
 
-  # Get all the information from the module and compile
-  # it. If there is an error while retrieving the information (like
-  # the module is not available or it was not compiled
-  # with --docs flag), we raise an exception.
   defp get_module(module, config) do
-    if docs_chunk = docs_chunk(module) do
-      module_data =
-        module
-        |> get_module_data(docs_chunk, config)
-        |> maybe_skip(config.filter_prefix)
-
-      if not module_data.skip do
-        [generate_node(module, module_data, config)]
-      else
-        []
-      end
+    with {:docs_v1, _, language, _, _, _, _} = docs_chunk <- docs_chunk(module),
+         language = ExDoc.Language.get(language),
+         %{} = module_data <- language.module_data(module, docs_chunk, config),
+         false <- skip_module?(module_data, config) do
+      [generate_node(module, module_data, config)]
     else
-      []
+      _ ->
+        []
     end
   end
 
-  defp maybe_skip(module_data, filter_prefix) do
-    if filter_prefix && not String.starts_with?(module_data.id, filter_prefix) do
-      %{module_data | skip: true}
-    else
-      module_data
-    end
+  defp skip_module?(module_data, config) do
+    !!config.filter_prefix and not String.starts_with?(module_data.id, config.filter_prefix)
   end
 
   defp docs_chunk(module) do
@@ -169,12 +156,6 @@ defmodule ExDoc.Retriever do
   end
 
   # Module Helpers
-
-  defp get_module_data(module, docs_chunk, config) do
-    {:docs_v1, _, language, _, _, _, _} = docs_chunk
-    language = ExDoc.Language.get(language)
-    language.module_data(module, docs_chunk, config)
-  end
 
   defp get_module_docs(module_data, source_path) do
     {:docs_v1, anno, _, content_type, moduledoc, metadata, _} = module_data.docs

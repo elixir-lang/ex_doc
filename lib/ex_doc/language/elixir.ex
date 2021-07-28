@@ -12,28 +12,32 @@ defmodule ExDoc.Language.Elixir do
   @impl true
   def module_data(module, docs_chunk, config) do
     {type, skip} = module_type_and_skip(module)
-    title = module_title(module, type)
-    abst_code = Erlang.get_abstract_code(module)
-    line = Erlang.find_module_line(module, abst_code)
 
-    %{
-      module: module,
-      docs: docs_chunk,
-      language: __MODULE__,
-      id: inspect(module),
-      title: title,
-      type: type,
-      skip: skip,
-      line: line,
-      callback_types: [:callback, :macrocallback],
-      nesting_info: nesting_info(title, config.nest_modules_by_prefix),
-      private: %{
-        abst_code: abst_code,
-        specs: Erlang.get_specs(module),
-        callbacks: Erlang.get_callbacks(module),
-        impls: get_impls(module)
+    if skip do
+      :skip
+    else
+      title = module_title(module, type)
+      abst_code = Erlang.get_abstract_code(module)
+      line = Erlang.find_module_line(module, abst_code)
+
+      %{
+        module: module,
+        docs: docs_chunk,
+        language: __MODULE__,
+        id: inspect(module),
+        title: title,
+        type: type,
+        line: line,
+        callback_types: [:callback, :macrocallback],
+        nesting_info: nesting_info(title, config.nest_modules_by_prefix),
+        private: %{
+          abst_code: abst_code,
+          specs: Erlang.get_specs(module),
+          callbacks: Erlang.get_callbacks(module),
+          impls: get_impls(module)
+        }
       }
-    }
+    end
   end
 
   @impl true
