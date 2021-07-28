@@ -57,13 +57,13 @@ defmodule ExDoc.Retriever do
   # with --docs flag), we raise an exception.
   defp get_module(module, config) do
     if docs_chunk = docs_chunk(module) do
-      module_state =
+      module_data =
         module
-        |> get_module_state(docs_chunk, config)
+        |> get_module_data(docs_chunk, config)
         |> maybe_skip(config.filter_prefix)
 
-      if not module_state.skip do
-        [generate_node(module, module_state, config)]
+      if not module_data.skip do
+        [generate_node(module, module_data, config)]
       else
         []
       end
@@ -72,11 +72,11 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp maybe_skip(module_state, filter_prefix) do
-    if filter_prefix && not String.starts_with?(module_state.id, filter_prefix) do
-      %{module_state | skip: true}
+  defp maybe_skip(module_data, filter_prefix) do
+    if filter_prefix && not String.starts_with?(module_data.id, filter_prefix) do
+      %{module_data | skip: true}
     else
-      module_state
+      module_data
     end
   end
 
@@ -111,12 +111,12 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp generate_node(module, module_state, config) do
+  defp generate_node(module, module_data, config) do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
 
-    {doc_line, moduledoc, metadata} = get_module_docs(module_state, source_path)
+    {doc_line, moduledoc, metadata} = get_module_docs(module_data, source_path)
 
     groups_for_functions =
       Enum.map(config.groups_for_functions, fn {group, filter} ->
@@ -128,19 +128,19 @@ defmodule ExDoc.Retriever do
         ]
 
     function_groups = Enum.map(groups_for_functions, &elem(&1, 0))
-    function_docs = get_docs(module_state, source, groups_for_functions)
-    docs = function_docs ++ get_callbacks(module_state, source, groups_for_functions)
-    types = get_types(module_state, source)
+    function_docs = get_docs(module_data, source, groups_for_functions)
+    docs = function_docs ++ get_callbacks(module_data, source, groups_for_functions)
+    types = get_types(module_data, source)
 
-    {nested_title, nested_context} = module_state.nesting_info || {nil, nil}
+    {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
 
     node = %ExDoc.ModuleNode{
-      id: module_state.id,
-      title: module_state.title,
+      id: module_data.id,
+      title: module_data.title,
       nested_title: nested_title,
       nested_context: nested_context,
       module: module,
-      type: module_state.type,
+      type: module_data.type,
       deprecated: metadata[:deprecated],
       function_groups: function_groups,
       docs: Enum.sort_by(docs, &sort_key(&1.name, &1.arity)),
@@ -148,8 +148,8 @@ defmodule ExDoc.Retriever do
       doc_line: doc_line,
       typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
       source_path: source_path,
-      source_url: source_link(source, module_state.line),
-      language: module_state.language
+      source_url: source_link(source, module_data.line),
+      language: module_data.language
     }
 
     put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
@@ -170,31 +170,14 @@ defmodule ExDoc.Retriever do
 
   # Module Helpers
 
-  defp get_module_state(module, docs_chunk, config) do
+  defp get_module_data(module, docs_chunk, config) do
     {:docs_v1, _, language, _, _, _, _} = docs_chunk
     language = ExDoc.Language.get(language)
-    extra = language.module_data(module, config)
-
-    %{
-      id: extra.id,
-      title: extra.title,
-      name: module,
-      language: language,
-      type: extra.type,
-      skip: extra.skip,
-      specs: get_specs(module),
-      impls: get_impls(module),
-      callbacks: get_callbacks(module),
-      docs: docs_chunk,
-      callback_types: [:callback] ++ extra.extra_callback_types,
-      nesting_info: extra.nesting_info,
-      abst_code: extra.abst_code,
-      line: extra.line
-    }
+    language.module_data(module, docs_chunk, config)
   end
 
-  defp get_module_docs(module_state, source_path) do
-    {:docs_v1, anno, _, content_type, moduledoc, metadata, _} = module_state.docs
+  defp get_module_docs(module_data, source_path) do
+    {:docs_v1, anno, _, content_type, moduledoc, metadata, _} = module_data.docs
     doc_line = anno_line(anno)
     options = [file: source_path, line: doc_line + 1]
     {doc_line, doc_ast(content_type, moduledoc, options), metadata}
@@ -202,12 +185,12 @@ defmodule ExDoc.Retriever do
 
   ## Function helpers
 
-  defp get_docs(%{type: type, docs: docs} = module_state, source, groups_for_functions) do
+  defp get_docs(%{type: type, docs: docs} = module_data, source, groups_for_functions) do
     {:docs_v1, _, _, _, _, _, doc_elements} = docs
 
     function_doc_elements =
       for doc_element <- doc_elements, doc?(doc_element, type) do
-        get_function(doc_element, source, module_state, groups_for_functions)
+        get_function(doc_element, source, module_data, groups_for_functions)
       end
 
     filter_defaults(function_doc_elements)
@@ -242,10 +225,10 @@ defmodule ExDoc.Retriever do
     false
   end
 
-  defp get_function(doc_element, source, module_state, groups_for_functions) do
-    function_data = module_state.language.function_data(doc_element, module_state)
+  defp get_function(doc_element, source, module_data, groups_for_functions) do
+    function_data = module_data.language.function_data(doc_element, module_data)
 
-    {:docs_v1, _, _, content_type, _, _, _} = module_state.docs
+    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata) ++ function_data.extra_annotations
@@ -299,21 +282,21 @@ defmodule ExDoc.Retriever do
 
   ## Callback helpers
 
-  defp get_callbacks(%{type: :behaviour} = module_state, source, groups_for_functions) do
-    {:docs_v1, _, _, _, _, _, docs} = module_state.docs
-    optional_callbacks = module_state.name.behaviour_info(:optional_callbacks)
+  defp get_callbacks(%{type: :behaviour} = module_data, source, groups_for_functions) do
+    {:docs_v1, _, _, _, _, _, docs} = module_data.docs
+    optional_callbacks = module_data.module.behaviour_info(:optional_callbacks)
 
-    for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in module_state.callback_types do
-      get_callback(doc, source, optional_callbacks, groups_for_functions, module_state)
+    for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in module_data.callback_types do
+      get_callback(doc, source, optional_callbacks, groups_for_functions, module_data)
     end
   end
 
   defp get_callbacks(_, _, _), do: []
 
-  defp get_callback(callback, source, optional_callbacks, groups_for_functions, module_state) do
-    callback_data = module_state.language.callback_data(callback, module_state)
+  defp get_callback(callback, source, optional_callbacks, groups_for_functions, module_data) do
+    callback_data = module_data.language.callback_data(callback, module_data)
 
-    {:docs_v1, _, _, content_type, _, _, _} = module_state.docs
+    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{kind, name, arity}, anno, _signature, doc, metadata} = callback
     actual_def = callback_data.actual_def
     doc_line = anno_line(anno)
@@ -353,51 +336,22 @@ defmodule ExDoc.Retriever do
 
   ## Typespecs
 
-  # Returns a map of {name, arity} => spec.
-  defp get_specs(module) do
-    case Code.Typespec.fetch_specs(module) do
-      {:ok, specs} -> Map.new(specs)
-      :error -> %{}
-    end
-  end
-
-  # Returns a map of {name, arity} => behaviour.
-  defp get_impls(module) do
-    for behaviour <- behaviours_implemented_by(module),
-        {callback, _} <- get_callbacks(behaviour),
-        do: {callback, behaviour},
-        into: %{}
-  end
-
-  defp get_callbacks(module) do
-    case Code.Typespec.fetch_callbacks(module) do
-      {:ok, callbacks} -> Map.new(callbacks)
-      :error -> %{}
-    end
-  end
-
-  defp behaviours_implemented_by(module) do
-    for {:behaviour, list} <- module.module_info(:attributes),
-        behaviour <- list,
-        do: behaviour
-  end
-
-  defp get_types(module_state, source) do
-    {:docs_v1, _, _, _, _, _, docs} = module_state.docs
+  defp get_types(module_data, source) do
+    {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
     # TODO: When we require Elixir v1.12, we only keep contents that are maps
     for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
-      get_type(doc, source, module_state)
+      get_type(doc, source, module_data)
     end
   end
 
-  defp get_type(type_entry, source, module_state) do
-    {:docs_v1, _, _, content_type, _, _, _} = module_state.docs
+  defp get_type(type_entry, source, module_data) do
+    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{_, name, arity}, anno, _signature, doc, metadata} = type_entry
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
 
-    type_data = module_state.language.type_data(type_entry, module_state)
+    type_data = module_data.language.type_data(type_entry, module_data)
     signature = signature(type_data.signature)
     annotations = if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
     doc_ast = doc_ast(content_type, doc, file: source.path)

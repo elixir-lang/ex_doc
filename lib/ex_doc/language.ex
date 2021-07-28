@@ -3,17 +3,14 @@ defmodule ExDoc.Language do
 
   @typep spec_ast() :: term()
 
-  @type module_state() :: %{
-          impls: term(),
-          abst_code: term(),
-          callbacks: term(),
-          specs: [spec_ast()]
-        }
-
-  @doc """
-  Returns a map with module information.
-
+  @typedoc """
   The map has the following keys:
+
+    * `:module` - the module
+
+    * `:docs` - the docs chunk
+
+    * `:language` - the language callback
 
     * `:id` - module page name
 
@@ -25,22 +22,28 @@ defmodule ExDoc.Language do
 
     * `:line` - the line where the code is located
 
-    * `:extra_callback_types` - a list of types that are considered callbacks
+    * `:callback_types` - a list of types that are considered callbacks
 
     * `:nesting_info` - A `{nested_title, nested_context}` tuple or `nil`.
       For example, `"A.B.C"` becomes `{"C", "A.B"}`.
-
   """
-  @callback module_data(module(), ExDoc.Config.t()) :: data
-            when data: %{
-                   id: String.t(),
-                   title: String.t(),
-                   type: atom() | nil,
-                   skip: boolean(),
-                   line: non_neg_integer(),
-                   extra_callback_types: [atom()],
-                   nesting_info: {String.t(), String.t()} | nil
-                 }
+  @type module_data() :: %{
+          module: module(),
+          docs: tuple(),
+          language: module(),
+          id: String.t(),
+          title: String.t(),
+          type: atom() | nil,
+          skip: boolean(),
+          line: non_neg_integer(),
+          callback_types: [atom()],
+          nesting_info: {String.t(), String.t()} | nil
+        }
+
+  @doc """
+  Returns a map with module information.
+  """
+  @callback module_data(module(), tuple(), ExDoc.Config.t()) :: module_data()
 
   @doc """
   Returns a map with function information.
@@ -57,7 +60,7 @@ defmodule ExDoc.Language do
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
   """
-  @callback function_data(entry :: tuple(), module_state()) ::
+  @callback function_data(entry :: tuple(), module_data()) ::
               %{
                 doc_fallback: (() -> ExDoc.DocAST.t()) | nil,
                 extra_annotations: [String.t()],
@@ -80,7 +83,7 @@ defmodule ExDoc.Language do
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
   """
-  @callback callback_data(entry :: tuple(), module_state()) :: %{
+  @callback callback_data(entry :: tuple(), module_data()) :: %{
               actual_def: {atom(), arity()},
               line: non_neg_integer() | nil,
               signature: [binary()],

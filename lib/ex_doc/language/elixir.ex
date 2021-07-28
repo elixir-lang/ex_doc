@@ -10,26 +10,32 @@ defmodule ExDoc.Language.Elixir do
   alias ExDoc.Language.Erlang
 
   @impl true
-  def module_data(module, config) do
+  def module_data(module, docs_chunk, config) do
     {type, skip} = module_type_and_skip(module)
     title = module_title(module, type)
     abst_code = Erlang.get_abstract_code(module)
     line = Erlang.find_module_line(module, abst_code)
 
     %{
+      module: module,
+      docs: docs_chunk,
+      language: __MODULE__,
       id: inspect(module),
       title: title,
       type: type,
       skip: skip,
-      extra_callback_types: [:macrocallback],
+      callback_types: [:callback, :macrocallback],
       nesting_info: nesting_info(title, config.nest_modules_by_prefix),
       line: line,
-      abst_code: abst_code
+      abst_code: abst_code,
+      specs: Erlang.get_specs(module),
+      callbacks: Erlang.get_callbacks(module),
+      impls: get_impls(module)
     }
   end
 
   @impl true
-  def function_data(entry, module_state) do
+  def function_data(entry, module_data) do
     {{kind, name, arity}, _anno, _signature, _doc_content, metadata} = entry
 
     extra_annotations =
@@ -43,24 +49,24 @@ defmodule ExDoc.Language.Elixir do
 
     %{
       doc_fallback: fn ->
-        impl = Map.fetch(module_state.impls, actual_def)
+        impl = Map.fetch(module_data.impls, actual_def)
 
         callback_doc_ast(name, arity, impl) ||
           delegate_doc_ast(metadata[:delegate_to])
       end,
       extra_annotations: extra_annotations,
-      line: find_function_line(module_state, actual_def),
-      specs: specs(kind, name, actual_def, module_state)
+      line: find_function_line(module_data, actual_def),
+      specs: specs(kind, name, actual_def, module_data)
     }
   end
 
   @impl true
-  def callback_data(entry, module_state) do
+  def callback_data(entry, module_data) do
     {{kind, name, arity}, anno, _signature, _doc, _metadata} = entry
     actual_def = actual_def(name, arity, kind)
 
     specs =
-      case Map.fetch(module_state.callbacks, actual_def) do
+      case Map.fetch(module_data.callbacks, actual_def) do
         {:ok, specs} ->
           specs
 
@@ -88,10 +94,10 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def type_data(entry, module_state) do
+  def type_data(entry, module_data) do
     {{kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
 
-    %{type: type, spec: spec, line: line} = type_from_module_state(module_state, name, arity)
+    %{type: type, spec: spec, line: line} = type_from_module_data(module_data, name, arity)
     quoted = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(kind)
     signature = [get_typespec_signature(quoted, arity)]
 
@@ -104,8 +110,8 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @doc false
-  def type_from_module_state(module_state, name, arity) do
-    Enum.find_value(module_state.abst_code, fn
+  def type_from_module_data(module_data, name, arity) do
+    Enum.find_value(module_data.abst_code, fn
       {:attribute, anno, type, {^name, _, args} = spec} ->
         if type in [:opaque, :type] and length(args) == arity do
           %{
@@ -153,7 +159,7 @@ defmodule ExDoc.Language.Elixir do
     }
   end
 
-  ## Helpers
+  ## Module Helpers
 
   defp nesting_info(title, prefixes) do
     prefixes
@@ -195,9 +201,24 @@ defmodule ExDoc.Language.Elixir do
     name |> String.split(".") |> Enum.map_join(".", &Macro.underscore/1)
   end
 
-  defp specs(kind, name, actual_def, module_state) do
+  def get_impls(module) do
+    for behaviour <- behaviours_implemented_by(module),
+        {callback, _} <- Erlang.get_callbacks(behaviour),
+        do: {callback, behaviour},
+        into: %{}
+  end
+
+  defp behaviours_implemented_by(module) do
+    for {:behaviour, list} <- module.module_info(:attributes),
+        behaviour <- list,
+        do: behaviour
+  end
+
+  ## Helpers
+
+  defp specs(kind, name, actual_def, module_data) do
     specs =
-      module_state.specs
+      module_data.specs
       |> Map.get(actual_def, [])
       |> Enum.map(&Code.Typespec.spec_to_quoted(name, &1))
 

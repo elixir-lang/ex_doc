@@ -6,29 +6,34 @@ defmodule ExDoc.Language.Erlang do
   alias ExDoc.{Autolink, Refs}
 
   @impl true
-  def module_data(module, _config) do
+  def module_data(module, docs_chunk, _config) do
     ":" <> id = inspect(module)
     abst_code = get_abstract_code(module)
     line = find_module_line(module, abst_code)
 
     %{
+      module: module,
+      docs: docs_chunk,
+      language: __MODULE__,
       id: id,
       title: id,
       type: module_type(module),
       skip: false,
-      extra_callback_types: [],
+      callback_types: [:callback],
       nesting_info: nil,
       line: line,
-      abst_code: abst_code
+      abst_code: abst_code,
+      specs: get_specs(module),
+      callbacks: get_callbacks(module)
     }
   end
 
   @impl true
-  def function_data(entry, module_state) do
+  def function_data(entry, module_data) do
     {{_kind, name, arity}, _anno, _signature, _doc_content, _metadata} = entry
 
     specs =
-      case Map.fetch(module_state.specs, {name, arity}) do
+      case Map.fetch(module_data.specs, {name, arity}) do
         {:ok, specs} ->
           [{:attribute, 0, :spec, {{name, arity}, specs}}]
 
@@ -45,11 +50,11 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def callback_data(entry, module_state) do
+  def callback_data(entry, module_data) do
     {{_kind, name, arity}, anno, signature, _doc, _metadata} = entry
 
     specs =
-      case Map.fetch(module_state.callbacks, {name, arity}) do
+      case Map.fetch(module_data.callbacks, {name, arity}) do
         {:ok, specs} ->
           [{:attribute, 0, :callback, {{name, arity}, specs}}]
 
@@ -66,11 +71,11 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def type_data(entry, module_state) do
+  def type_data(entry, module_data) do
     {{_kind, name, arity}, _anno, signature, _doc, _metadata} = entry
 
     %{type: type, spec: spec, line: line} =
-      ExDoc.Language.Elixir.type_from_module_state(module_state, name, arity)
+      ExDoc.Language.Elixir.type_from_module_data(module_data, name, arity)
 
     %{
       type: type,
@@ -135,6 +140,21 @@ defmodule ExDoc.Language.Erlang do
       {:attribute, anno, :module, ^module} -> anno_line(anno)
       _ -> nil
     end)
+  end
+
+  # Returns a map of {name, arity} => spec.
+  def get_specs(module) do
+    case Code.Typespec.fetch_specs(module) do
+      {:ok, specs} -> Map.new(specs)
+      :error -> %{}
+    end
+  end
+
+  def get_callbacks(module) do
+    case Code.Typespec.fetch_callbacks(module) do
+      {:ok, callbacks} -> Map.new(callbacks)
+      :error -> %{}
+    end
   end
 
   ## Autolink
