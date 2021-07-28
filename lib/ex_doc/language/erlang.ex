@@ -6,6 +6,10 @@ defmodule ExDoc.Language.Erlang do
   alias ExDoc.{Autolink, Refs}
 
   @impl true
+  def module_data(_module, {:docs_v1, _, _, _, doc, _, _}, _config) when not is_map(doc) do
+    :skip
+  end
+
   def module_data(module, docs_chunk, _config) do
     ":" <> id = inspect(module)
     abst_code = get_abstract_code(module)

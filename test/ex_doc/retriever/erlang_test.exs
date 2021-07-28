@@ -75,9 +75,20 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert function2.specs == []
     end
 
+    @tag :otp23
+    @tag :otp24
+    test "module with no docs is skipped", c do
+      erlc(c, :mod, ~S"""
+      -module(mod).
+      """)
+
+      [] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
+    end
+
     @tag :otp24
     test "callbacks", c do
       erlc(c, :mod, ~S"""
+      %% @doc Docs.
       -module(mod).
 
       -callback callback1() -> atom().
@@ -91,15 +102,14 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert callback1.id == "c:callback1/0"
       assert callback1.type == :callback
       assert DocAST.to_string(callback1.doc) == "callback1/0 docs."
-      assert Path.basename(callback1.source_url) == "mod.erl:3"
-      # this is an edoc bug, it should be 4
-      assert callback1.doc_line == 3
+      assert Path.basename(callback1.source_url) == "mod.erl:4"
       assert Erlang.autolink_spec(hd(callback1.specs), []) == "callback1() -> atom()."
     end
 
     @tag :otp24
     test "types", c do
       erlc(c, :mod, ~S"""
+      %% @doc Docs.
       -module(mod).
       -export_type([type1/0, opaque1/0]).
 
