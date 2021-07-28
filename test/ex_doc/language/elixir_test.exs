@@ -306,7 +306,6 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_spec(quote(do: t() :: foo!(bar()))) ==
                ~s[t() :: <a href="#t:foo!/1">foo!</a>(<a href="#t:bar/0">bar</a>())]
 
-      # TODO: probably update this according to the previous test's changes
       assert autolink_spec(quote(do: t() :: foo?(bar()))) ==
                ~s[t() :: <a href="#t:foo?/1">foo?</a>(<a href="#t:bar/0">bar</a>())]
 
