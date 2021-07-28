@@ -24,8 +24,10 @@ defmodule ExDoc.Language do
 
     * `:callback_types` - a list of types that are considered callbacks
 
-    * `:nesting_info` - A `{nested_title, nested_context}` tuple or `nil`.
+    * `:nesting_info` - a `{nested_title, nested_context}` tuple or `nil`.
       For example, `"A.B.C"` becomes `{"C", "A.B"}`.
+
+    * `:private` - a map with language-specific data
   """
   @type module_data() :: %{
           module: module(),
@@ -37,7 +39,8 @@ defmodule ExDoc.Language do
           skip: boolean(),
           line: non_neg_integer(),
           callback_types: [atom()],
-          nesting_info: {String.t(), String.t()} | nil
+          nesting_info: {String.t(), String.t()} | nil,
+          private: map()
         }
 
   @doc """

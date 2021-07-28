@@ -24,13 +24,15 @@ defmodule ExDoc.Language.Elixir do
       title: title,
       type: type,
       skip: skip,
+      line: line,
       callback_types: [:callback, :macrocallback],
       nesting_info: nesting_info(title, config.nest_modules_by_prefix),
-      line: line,
-      abst_code: abst_code,
-      specs: Erlang.get_specs(module),
-      callbacks: Erlang.get_callbacks(module),
-      impls: get_impls(module)
+      private: %{
+        abst_code: abst_code,
+        specs: Erlang.get_specs(module),
+        callbacks: Erlang.get_callbacks(module),
+        impls: get_impls(module)
+      }
     }
   end
 
@@ -49,7 +51,7 @@ defmodule ExDoc.Language.Elixir do
 
     %{
       doc_fallback: fn ->
-        impl = Map.fetch(module_data.impls, actual_def)
+        impl = Map.fetch(module_data.private.impls, actual_def)
 
         callback_doc_ast(name, arity, impl) ||
           delegate_doc_ast(metadata[:delegate_to])
@@ -66,7 +68,7 @@ defmodule ExDoc.Language.Elixir do
     actual_def = actual_def(name, arity, kind)
 
     specs =
-      case Map.fetch(module_data.callbacks, actual_def) do
+      case Map.fetch(module_data.private.callbacks, actual_def) do
         {:ok, specs} ->
           specs
 
@@ -111,7 +113,7 @@ defmodule ExDoc.Language.Elixir do
 
   @doc false
   def type_from_module_data(module_data, name, arity) do
-    Enum.find_value(module_data.abst_code, fn
+    Enum.find_value(module_data.private.abst_code, fn
       {:attribute, anno, type, {^name, _, args} = spec} ->
         if type in [:opaque, :type] and length(args) == arity do
           %{
@@ -218,7 +220,7 @@ defmodule ExDoc.Language.Elixir do
 
   defp specs(kind, name, actual_def, module_data) do
     specs =
-      module_data.specs
+      module_data.private.specs
       |> Map.get(actual_def, [])
       |> Enum.map(&Code.Typespec.spec_to_quoted(name, &1))
 
@@ -273,8 +275,8 @@ defmodule ExDoc.Language.Elixir do
     nil
   end
 
-  defp find_function_line(%{abst_code: abst_code}, {name, arity}) do
-    Enum.find_value(abst_code, fn
+  defp find_function_line(module_data, {name, arity}) do
+    Enum.find_value(module_data.private.abst_code, fn
       {:function, anno, ^name, ^arity, _} -> anno_line(anno)
       _ -> nil
     end)

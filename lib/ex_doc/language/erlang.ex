@@ -19,12 +19,14 @@ defmodule ExDoc.Language.Erlang do
       title: id,
       type: module_type(module),
       skip: false,
+      line: line,
       callback_types: [:callback],
       nesting_info: nil,
-      line: line,
-      abst_code: abst_code,
-      specs: get_specs(module),
-      callbacks: get_callbacks(module)
+      private: %{
+        abst_code: abst_code,
+        specs: get_specs(module),
+        callbacks: get_callbacks(module)
+      }
     }
   end
 
@@ -33,7 +35,7 @@ defmodule ExDoc.Language.Erlang do
     {{_kind, name, arity}, _anno, _signature, _doc_content, _metadata} = entry
 
     specs =
-      case Map.fetch(module_data.specs, {name, arity}) do
+      case Map.fetch(module_data.private.specs, {name, arity}) do
         {:ok, specs} ->
           [{:attribute, 0, :spec, {{name, arity}, specs}}]
 
@@ -54,7 +56,7 @@ defmodule ExDoc.Language.Erlang do
     {{_kind, name, arity}, anno, signature, _doc, _metadata} = entry
 
     specs =
-      case Map.fetch(module_data.callbacks, {name, arity}) do
+      case Map.fetch(module_data.private.callbacks, {name, arity}) do
         {:ok, specs} ->
           [{:attribute, 0, :callback, {{name, arity}, specs}}]
 
