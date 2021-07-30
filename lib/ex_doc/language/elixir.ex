@@ -19,6 +19,7 @@ defmodule ExDoc.Language.Elixir do
       title = module_title(module, type)
       abst_code = Erlang.get_abstract_code(module)
       line = Erlang.find_module_line(module, abst_code)
+      optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
 
       %{
         module: module,
@@ -34,7 +35,8 @@ defmodule ExDoc.Language.Elixir do
           abst_code: abst_code,
           specs: Erlang.get_specs(module),
           callbacks: Erlang.get_callbacks(module),
-          impls: get_impls(module)
+          impls: get_impls(module),
+          optional_callbacks: optional_callbacks
         }
       }
     end
@@ -106,6 +108,9 @@ defmodule ExDoc.Language.Elixir do
     {{kind, name, arity}, anno, _signature, _doc, _metadata} = entry
     actual_def = actual_def(name, arity, kind)
 
+    extra_annotations =
+      if actual_def in module_data.private.optional_callbacks, do: ["optional"], else: []
+
     specs =
       case Map.fetch(module_data.private.callbacks, actual_def) do
         {:ok, specs} ->
@@ -127,10 +132,10 @@ defmodule ExDoc.Language.Elixir do
     signature = [get_typespec_signature(hd(quoted), arity)]
 
     %{
-      actual_def: actual_def,
       line: line,
       signature: signature,
-      specs: quoted
+      specs: quoted,
+      extra_annotations: extra_annotations
     }
   end
 

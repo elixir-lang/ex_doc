@@ -108,17 +108,27 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       -callback callback1() -> atom().
       %% callback1/0 docs.
+
+      -callback optional_callback1() -> atom().
+      %% optional_callback1/0 docs.
+
+      -optional_callbacks([optional_callback1/0]).
       """)
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
       [mod] = Retriever.docs_from_modules([:mod], config)
-      [callback1] = mod.docs
+      [callback1, optional_callback1] = mod.docs
 
       assert callback1.id == "c:callback1/0"
       assert callback1.type == :callback
+      assert callback1.annotations == []
       assert DocAST.to_string(callback1.doc) == "callback1/0 docs."
       assert Path.basename(callback1.source_url) == "mod.erl:4"
       assert Erlang.autolink_spec(hd(callback1.specs), []) == "callback1() -> atom()."
+
+      assert optional_callback1.id == "c:optional_callback1/0"
+      assert optional_callback1.type == :callback
+      assert optional_callback1.annotations == ["optional"]
     end
 
     @tag :otp24

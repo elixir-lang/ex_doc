@@ -50,22 +50,22 @@ defmodule ExDoc.Language do
 
   The map has the following keys:
 
-    * `:doc_fallback` - if set, a 0-arity function that returns DocAST which
-       will be used as fallback to empty docs on the function node
-
-    * `:extra_annotations`
-
     * `:line` - the line where the code is located
 
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
+    * `:doc_fallback` - if set, a 0-arity function that returns DocAST which
+       will be used as fallback to empty docs on the function node
+
+    * `:extra_annotations` - additional annotations
+
   """
   @callback function_data(entry :: tuple(), module_data()) ::
               %{
-                doc_fallback: (() -> ExDoc.DocAST.t()) | nil,
-                extra_annotations: [String.t()],
                 line: non_neg_integer() | nil,
-                specs: [spec_ast()]
+                specs: [spec_ast()],
+                doc_fallback: (() -> ExDoc.DocAST.t()) | nil,
+                extra_annotations: [String.t()]
               }
               | :skip
 
@@ -74,22 +74,21 @@ defmodule ExDoc.Language do
 
   The map has the following keys:
 
-    * `:actual_def` - `{name, arity}` of how the callback is actually represented
-      in abstract code
-
     * `:line` - the line where the code is located
 
     * `:signature` - the signature
 
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
+    * `:extra_annotations` - additional annotations
+
   """
   @callback callback_data(entry :: tuple(), module_data()) ::
               %{
-                actual_def: {atom(), arity()},
                 line: non_neg_integer() | nil,
                 signature: [binary()],
-                specs: [spec_ast()]
+                specs: [spec_ast()],
+                extra_annotations: [String.t()]
               }
 
   @doc """

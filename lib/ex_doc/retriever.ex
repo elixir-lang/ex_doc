@@ -240,31 +240,24 @@ defmodule ExDoc.Retriever do
 
   defp get_callbacks(%{type: :behaviour} = module_data, source, groups_for_functions) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
-    optional_callbacks = module_data.module.behaviour_info(:optional_callbacks)
 
     for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in module_data.callback_types do
-      get_callback(doc, source, optional_callbacks, groups_for_functions, module_data)
+      get_callback(doc, source, groups_for_functions, module_data)
     end
   end
 
   defp get_callbacks(_, _, _), do: []
 
-  defp get_callback(callback, source, optional_callbacks, groups_for_functions, module_data) do
+  defp get_callback(callback, source, groups_for_functions, module_data) do
     callback_data = module_data.language.callback_data(callback, module_data)
 
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{kind, name, arity}, anno, _signature, doc, metadata} = callback
-    actual_def = callback_data.actual_def
     doc_line = anno_line(anno)
 
     signature = signature(callback_data.signature)
     specs = callback_data.specs
-    annotations = annotations_from_metadata(metadata)
-
-    # actual_def is Elixir specific, but remember optional_callbacks are generic.
-    annotations =
-      if actual_def in optional_callbacks, do: ["optional" | annotations], else: annotations
-
+    annotations = callback_data.extra_annotations ++ annotations_from_metadata(metadata)
     doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
 
     group =

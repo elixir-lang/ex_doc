@@ -20,6 +20,8 @@ defmodule ExDoc.Language.Erlang do
     ":" <> id = inspect(module)
     abst_code = get_abstract_code(module)
     line = find_module_line(module, abst_code)
+    type = module_type(module)
+    optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
 
     %{
       module: module,
@@ -27,14 +29,15 @@ defmodule ExDoc.Language.Erlang do
       language: __MODULE__,
       id: id,
       title: id,
-      type: module_type(module),
+      type: type,
       line: line,
       callback_types: [:callback],
       nesting_info: nil,
       private: %{
         abst_code: abst_code,
         specs: get_specs(module),
-        callbacks: get_callbacks(module)
+        callbacks: get_callbacks(module),
+        optional_callbacks: optional_callbacks
       }
     }
   end
@@ -72,6 +75,9 @@ defmodule ExDoc.Language.Erlang do
   def callback_data(entry, module_data) do
     {{_kind, name, arity}, anno, signature, _doc, _metadata} = entry
 
+    extra_annotations =
+      if {name, arity} in module_data.private.optional_callbacks, do: ["optional"], else: []
+
     specs =
       case Map.fetch(module_data.private.callbacks, {name, arity}) do
         {:ok, specs} ->
@@ -82,10 +88,10 @@ defmodule ExDoc.Language.Erlang do
       end
 
     %{
-      actual_def: {name, arity},
       line: anno_line(anno),
       signature: signature,
-      specs: specs
+      specs: specs,
+      extra_annotations: extra_annotations
     }
   end
 
