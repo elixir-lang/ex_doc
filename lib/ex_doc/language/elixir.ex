@@ -141,10 +141,10 @@ defmodule ExDoc.Language.Elixir do
 
   @impl true
   def type_data(entry, module_data) do
-    {{kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
+    {{_kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
 
     %{type: type, spec: spec, line: line} = type_from_module_data(module_data, name, arity)
-    quoted = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(kind)
+    quoted = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(type)
     signature = [get_typespec_signature(quoted, arity)]
 
     %{

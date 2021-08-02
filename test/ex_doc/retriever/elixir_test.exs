@@ -166,12 +166,43 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert callback1.type == :function
       assert callback1.annotations == []
 
-      assert callback1.doc ==
-               ExDoc.Markdown.to_ast("Callback implementation for `c:Mod.callback1/0`.")
+      assert callback1.doc |> DocAST.to_string() ==
+               ~s|<p>Callback implementation for <code class="inline">c:Mod.callback1/0</code>.</p>|
 
       assert optional_callback1.id == "optional_callback1/0"
       assert optional_callback1.type == :function
-      assert DocAST.to_string(optional_callback1.doc) == "<p>optional_callback1/0 docs.</p>"
+      assert optional_callback1.doc |> DocAST.to_string() == ~s|<p>optional_callback1/0 docs.</p>|
+    end
+
+    test "types", c do
+      elixirc(c, ~S"""
+      defmodule Mod do
+        @typedoc "type1/0 docs."
+        @type type1() :: atom()
+
+        @typedoc "opaque1/0 docs."
+        @opaque opaque1() :: atom()
+      end
+      """)
+
+      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      [opaque1, type1] = mod.typespecs
+
+      assert type1.id == "t:type1/0"
+      assert type1.signature == "type1()"
+      assert type1.type == :type
+      assert type1.annotations == []
+      assert type1.doc_line == 2
+      assert DocAST.to_string(type1.doc) == "<p>type1/0 docs.</p>"
+      assert Macro.to_string(type1.spec) == "type1() :: atom()"
+
+      assert opaque1.id == "t:opaque1/0"
+      assert opaque1.signature == "opaque1()"
+      assert opaque1.type == :opaque
+      assert opaque1.annotations == ["opaque"]
+      assert opaque1.doc_line == 5
+      assert opaque1.doc |> DocAST.to_string() == ~s|<p>opaque1/0 docs.</p>|
+      assert opaque1.spec |> Macro.to_string() == "opaque1()"
     end
 
     test "protocols", c do

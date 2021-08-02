@@ -105,7 +105,7 @@ defmodule ExDoc.Language.Erlang do
     %{
       type: type,
       line: line,
-      spec: {:attribute, 0, :type, spec},
+      spec: {:attribute, 0, type, spec},
       signature: signature
     }
   end
@@ -121,6 +121,19 @@ defmodule ExDoc.Language.Erlang do
     nil
   end
 
+  def autolink_spec({:attribute, _, :opaque, ast}, _opts) do
+    {name, _, args} = ast
+
+    args =
+      for arg <- args do
+        {:var, _, name} = arg
+        Atom.to_string(name)
+      end
+      |> Enum.intersperse(", ")
+
+    IO.iodata_to_binary([Atom.to_string(name), "(", args, ")"])
+  end
+
   def autolink_spec(ast, opts) do
     config = struct!(Autolink, opts)
 
@@ -129,7 +142,7 @@ defmodule ExDoc.Language.Erlang do
         {:attribute, _, kind, {{name, _arity}, ast}} when kind in [:spec, :callback] ->
           {name, Enum.map(ast, &Code.Typespec.spec_to_quoted(name, &1))}
 
-        {:attribute, _, kind, ast} when kind in [:type, :opaque] ->
+        {:attribute, _, :type, ast} ->
           {name, _, _} = ast
           {name, Code.Typespec.type_to_quoted(ast)}
       end

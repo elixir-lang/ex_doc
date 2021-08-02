@@ -152,14 +152,14 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
       assert opaque1.signature == "opaque1/0"
-      assert DocAST.to_string(opaque1.doc) == "opaque1/0 docs."
-      assert Erlang.autolink_spec(opaque1.spec, []) == "opaque1() :: atom()."
+      assert opaque1.doc |> DocAST.to_string() == "opaque1/0 docs."
+      assert opaque1.spec |> Erlang.autolink_spec([]) == "opaque1()"
 
       assert type1.id == "t:type1/0"
       assert type1.type == :type
       assert type1.signature == "type1/0"
-      assert DocAST.to_string(type1.doc) == "type1/0 docs."
-      assert Erlang.autolink_spec(type1.spec, []) == "type1() :: atom()."
+      assert type1.doc |> DocAST.to_string() == "type1/0 docs."
+      assert type1.spec |> Erlang.autolink_spec([]) == "type1() :: atom()."
     end
 
     test "module with no chunk", c do

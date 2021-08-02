@@ -144,8 +144,12 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "opaque", c do
-      assert autolink_spec("-opaque foo() :: opaque_t().", [current_module: :foo], c) ==
-               ~s|foo() :: <a href="#t:opaque_t/0">opaque_t</a>().|
+      assert autolink_spec("-opaque foo() :: opaque_t().", [current_module: :foo], c) == ~s|foo()|
+    end
+
+    test "opaque with variables", c do
+      assert autolink_spec("-opaque foo(X, Y) :: {X, Y}.", [current_module: :foo], c) ==
+               ~s|foo(X, Y)|
     end
 
     test "tuple", c do
