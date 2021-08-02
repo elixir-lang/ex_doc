@@ -108,17 +108,21 @@ defmodule ExDoc.DocAST do
   end
 
   defp highlight_code_block(full_block, lang, code, highlight_info, outer_opts) do
-    case pick_language_and_lexer(lang, highlight_info) do
+    case pick_language_and_lexer(lang, highlight_info, code) do
       {_language, nil, _opts} -> full_block
       {language, lexer, opts} -> render_code(language, lexer, opts, code, outer_opts)
     end
   end
 
-  defp pick_language_and_lexer("", highlight_info) do
+  defp pick_language_and_lexer("", _highlight_info, "$ " <> _) do
+    {"shell", ExDoc.ShellLexer, []}
+  end
+
+  defp pick_language_and_lexer("", highlight_info, _code) do
     {highlight_info.language_name, highlight_info.lexer, highlight_info.opts}
   end
 
-  defp pick_language_and_lexer(lang, _highlight_info) do
+  defp pick_language_and_lexer(lang, _highlight_info, _code) do
     case Makeup.Registry.fetch_lexer_by_name(lang) do
       {:ok, {lexer, opts}} -> {lang, lexer, opts}
       :error -> {lang, nil, []}
