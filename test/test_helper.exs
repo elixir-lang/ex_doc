@@ -51,6 +51,7 @@ defmodule TestHelper do
 
     {:ok, module} =
       :compile.file(String.to_charlist(src_path), [
+        :return_errors,
         :debug_info,
         outdir: String.to_charlist(ebin_dir)
       ])
