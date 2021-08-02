@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.25.1 (2021-08-02)
+
+  * Enhancements
+    * Group callbacks
+    * Use shell lexer for code blocks with no language and starting with `$ `
+
+  * Bug fixes
+    * Fix generating type signatures with maps
+    * Skip Erlang modules that have empty docs
+    * Skip Erlang functions that have empty docs
+    * Fix accidentally showing shape of opaque types
+
 ## v0.25.0 (2021-07-20)
 
   * Enhancements
