@@ -402,11 +402,26 @@ defmodule ExDoc.Language.Erlang do
   defp autolink_spec(quoted, name, formatted, config) do
     acc =
       for quoted <- List.wrap(quoted) do
-        {_, acc} =
+        {_quoted, acc} =
           Macro.prewalk(quoted, [], fn
             # module.name(args)
             {{:., _, [module, name]}, _, args}, acc ->
               {{:t, [], args}, [{pp({module, name}), {module, name, length(args)}} | acc]}
+
+            {name, _, _}, acc when name in [:<<>>, :..] ->
+              {nil, acc}
+
+            # -1
+            {:-, _, [int]}, acc when is_integer(int) ->
+              {nil, acc}
+
+            # fun() (spec_to_quoted expands it to (... -> any())
+            {:->, _, [[{name, _, _}], {:any, _, _}]}, acc when name == :... ->
+              {nil, acc}
+
+            # #{x :: t()}
+            {:field_type, _, [name, type]}, acc when is_atom(name) ->
+              {type, acc}
 
             {name, _, args} = ast, acc when is_atom(name) and is_list(args) ->
               arity = length(args)

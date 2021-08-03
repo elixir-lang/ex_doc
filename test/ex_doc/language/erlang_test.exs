@@ -129,61 +129,98 @@ defmodule ExDoc.Language.ErlangTest do
 
   describe "autolink_spec/2" do
     test "spec", c do
-      assert autolink_spec("-spec foo() -> atom().", c) ==
-               ~s|foo() -> atom().|
+      assert autolink_spec("-spec foo() -> t().", c) ==
+               ~s|foo() -> <a href="#t:t/0">t</a>().|
     end
 
     test "callback", c do
-      assert autolink_spec("-callback foo() -> atom().", c) ==
-               ~s|foo() -> atom().|
+      assert autolink_spec("-callback foo() -> t().", c) ==
+               ~s|foo() -> <a href="#t:t/0">t</a>().|
     end
 
     test "type", c do
-      assert autolink_spec("-type foo() :: atom().", c) ==
-               ~s|foo() :: atom().|
+      assert autolink_spec("-type foo() :: t().", c) ==
+               ~s|foo() :: <a href="#t:t/0">t</a>().|
     end
 
     test "opaque", c do
-      assert autolink_spec("-opaque foo() :: opaque_t().", [current_module: :foo], c) == ~s|foo()|
+      assert autolink_spec("-opaque foo() :: t().", c) ==
+               ~s|foo()|
     end
 
     test "opaque with variables", c do
-      assert autolink_spec("-opaque foo(X, Y) :: {X, Y}.", [current_module: :foo], c) ==
+      assert autolink_spec("-opaque foo(X, Y) :: X | Y.", c) ==
                ~s|foo(X, Y)|
     end
 
     test "tuple", c do
-      assert autolink_spec(~S"-spec foo() -> {ok, atom()}.", c) ==
-               ~S|foo() -> {ok, atom()}.|
+      assert autolink_spec(~S"-spec foo() -> {ok, t()}.", c) ==
+               ~s|foo() -> {ok, <a href="#t:t/0">t</a>()}.|
     end
 
     test "list", c do
-      assert autolink_spec(~S"-spec foo() -> [atom()].", c) ==
-               ~S|foo() -> [atom()].|
+      assert autolink_spec(~S"-spec foo() -> [t()].", c) ==
+               ~s|foo() -> [<a href="#t:t/0">t</a>()].|
     end
 
     test "map", c do
-      assert autolink_spec(~S"-spec foo() -> #{atom() := string(), float() => integer()}.", c) ==
-               ~S|foo() -> #{atom() := string(), float() => integer()}.|
+      assert autolink_spec(~S"-spec foo() -> #{atom() := string(), float() => t()}.", c) ==
+               ~S|foo() -> #{atom() := string(), float() => <a href="#t:t/0">t</a>()}.|
     end
 
     test "vars", c do
-      assert autolink_spec(~s"-spec foo(X) -> {Y :: atom(), X}.", c) ==
-               ~s|foo(X) -> {Y :: atom(), X}.|
+      assert autolink_spec(~s"-spec foo(X) -> {Y :: t(), X}.", c) ==
+               ~s|foo(X) -> {Y :: <a href="#t:t/0">t</a>(), X}.|
     end
 
     test "union", c do
-      assert autolink_spec(~s"-spec foo() -> ok | error.", c) ==
-               ~s[foo() -> ok | error.]
+      assert autolink_spec(~s"-spec foo() -> ok | t().", c) ==
+               ~s[foo() -> ok | <a href="#t:t/0">t</a>().]
     end
 
-    test "record", c do
-      assert autolink_spec(~s"-spec foo() -> #file_info{}.", c) ==
-               ~s[foo() -> #file_info{}.]
+    test "record - empty", c do
+      assert autolink_spec(~s"-spec foo() -> #x{} | t().", c) ==
+               ~s[foo() -> #x{} | <a href="#t:t/0">t</a>().]
+    end
+
+    test "record - one field", c do
+      assert autolink_spec(~s"-spec foo() -> #x{x :: atom()} | t().", c) ==
+               ~s[foo() -> #x{x :: atom()} | <a href="#t:t/0">t</a>().]
+    end
+
+    test "record - two fields", c do
+      assert autolink_spec(~s"-spec foo() -> #x{x :: atom(), y :: integer()} | t().", c) ==
+               ~s[foo() -> #x{x :: atom(), y :: integer()} | <a href="#t:t/0">t</a>().]
+    end
+
+    test "bitstring", c do
+      assert autolink_spec(~s"-spec foo() -> <<_:_*16>> | t().", c) ==
+               ~s[foo() -> <<_:_*16>> | <a href="#t:t/0">t</a>().]
+    end
+
+    test "negative integer", c do
+      # TODO: OTP bug: - 1 vs -1
+      assert autolink_spec(~s"-spec foo() -> -1 | t().", c) ==
+               ~s[foo() -> - 1 | <a href="#t:t/0">t</a>().]
+    end
+
+    test "integer range", c do
+      assert autolink_spec(~s"-spec foo() -> 1..255 | t().", c) ==
+               ~s[foo() -> 1..255 | <a href="#t:t/0">t</a>().]
+    end
+
+    test "function - any", c do
+      assert autolink_spec(~s"-spec foo() -> fun() | t().", c) ==
+               ~s[foo() -> fun() | <a href="#t:t/0">t</a>().]
+    end
+
+    test "function - any arity", c do
+      assert autolink_spec(~s"-spec foo() -> fun((...) -> t()) | bar:t().", c) ==
+               ~s[foo() -> fun((...) -> <a href="#t:t/0">t</a>()) | <a href="bar.html#t:t/0">bar:t</a>().]
     end
 
     test "local type", c do
-      assert autolink_spec(~S"-spec foo() -> t().", [current_module: :foo], c) ==
+      assert autolink_spec(~S"-spec foo() -> t().", c) ==
                ~s|foo() -> <a href="#t:t/0">t</a>().|
     end
 
@@ -198,7 +235,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "skip typespec name", c do
-      assert autolink_spec(~S"-spec t() -> t().", [current_module: :foo], c) ==
+      assert autolink_spec(~S"-spec t() -> t().", c) ==
                ~s|t() -> <a href="#t:t/0">t</a>().|
     end
 
@@ -226,6 +263,10 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   defp autolink_spec(binary, opts \\ [], c) when is_binary(binary) do
+    opts =
+      opts
+      |> Keyword.put_new(:current_module, :foo)
+
     fixtures(c, "")
     {:ok, tokens, _} = :erl_scan.string(String.to_charlist(binary))
     {:ok, ast} = :erl_parse.parse_form(tokens)
