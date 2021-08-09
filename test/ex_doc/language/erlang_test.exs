@@ -198,12 +198,6 @@ defmodule ExDoc.Language.ErlangTest do
                ~s[foo() -> <<_:_*16>> | <a href="#t:t/0">t</a>().]
     end
 
-    test "negative integer", c do
-      # TODO: OTP bug: - 1 vs -1
-      assert autolink_spec(~s"-spec foo() -> -1 | t().", c) ==
-               ~s[foo() -> - 1 | <a href="#t:t/0">t</a>().]
-    end
-
     test "integer range", c do
       assert autolink_spec(~s"-spec foo() -> 1..255 | t().", c) ==
                ~s[foo() -> 1..255 | <a href="#t:t/0">t</a>().]
