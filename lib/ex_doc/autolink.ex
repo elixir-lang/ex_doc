@@ -74,20 +74,8 @@ defmodule ExDoc.Autolink do
   end
 
   defp app(module) do
-    case :application.get_application(module) do
-      {:ok, app} ->
-        app
-
-      _ ->
-        path = :code.which(module)
-
-        with true <- is_list(path),
-             [_, "ebin", app, "lib" | _] <- path |> Path.split() |> Enum.reverse() do
-          String.to_atom(app)
-        else
-          _ -> nil
-        end
-    end
+    {_, app} = app_info(module)
+    app
   end
 
   @doc false
@@ -95,20 +83,40 @@ defmodule ExDoc.Autolink do
     if match?("Elixir." <> _, Atom.to_string(module)) do
       :ex_doc
     else
-      case :code.which(module) do
-        :preloaded ->
-          :otp
-
-        :non_existing ->
-          :no_tool
-
-        path ->
-          if :string.prefix(path, :code.lib_dir()) != :nomatch do
-            :otp
-          else
-            :ex_doc
-          end
+      case app_info(module) do
+        {true, _} -> :otp
+        {false, _} -> :ex_doc
       end
+    end
+  end
+
+  defp app_info(module) do
+    case :code.which(module) do
+      :preloaded ->
+        {true, :erts}
+
+      path when is_list(path) ->
+        otp? = :string.prefix(path, :code.lib_dir()) != :nomatch
+
+        app =
+          case :application.get_application(module) do
+            {:ok, app} ->
+              app
+
+            _ ->
+              case path |> Path.split() |> Enum.reverse() do
+                [_, "ebin", app, "lib" | _] ->
+                  String.to_atom(app)
+
+                _ ->
+                  nil
+              end
+          end
+
+        {otp?, app}
+
+      :non_existing ->
+        {false, nil}
     end
   end
 
