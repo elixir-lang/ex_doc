@@ -10,4 +10,4 @@ may want to try searching this site using the sidebar
 <% end %>
 to find what you were looking for.</p>
 
-<%= footer_template(config) %>
+<%= footer_template(config, nil) %>

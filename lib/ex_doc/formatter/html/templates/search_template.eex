@@ -5,4 +5,4 @@
   <div class="loading"><div></div><div></div><div></div><div></div></div>
 </div>
 <script src="<%= asset_rev config.output, "dist/search_items*.js" %>"></script>
-<%= footer_template(config) %>
+<%= footer_template(config, nil) %>

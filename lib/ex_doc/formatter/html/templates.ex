@@ -267,13 +267,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   templates = [
     detail_template: [:node, :_module],
-    footer_template: [:config],
+    footer_template: [:config, :node],
     head_template: [:config, :page],
     module_template: [:config, :module, :summary, :nodes_map],
     not_found_template: [:config, :nodes_map],
     api_reference_entry_template: [:module_node],
     api_reference_template: [:config, :nodes_map],
-    extra_template: [:config, :title, :nodes_map, :content, :refs],
+    extra_template: [:config, :node, :nodes_map, :refs],
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
