@@ -3,8 +3,8 @@
 
         <p>
           Find it on Hex:
-          <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>" class="footer-hex-package">Package</a>
-          <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>">Preview</a>
+          <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>" class="line footer-hex-package">Package</a>
+          <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>" class="line">Preview</a>
 
           <%= source_path = node && Map.get(node, :source_path); if source_path do %>
             <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>/show/<%= source_path %>">(current file)</a>
