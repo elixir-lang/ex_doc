@@ -24,6 +24,7 @@ defmodule ExDoc.CLI do
         switches: [
           language: :string,
           paths: :keep,
+          package: :string,
           proglang: :string,
           source_ref: :string,
           version: :boolean
@@ -156,6 +157,7 @@ defmodule ExDoc.CLI do
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)
                           The image size will be 64x64 and copied to the assets directory
       -m, --main          The entry-point page in docs, default: "api-reference"
+          --package       Hex package name
           --source-ref    Branch/commit/tag used for source link inference, default: "master"
       -r, --source-root   Path to the source code root, used for generating links, default: "."
       -u, --source-url    URL to the source code

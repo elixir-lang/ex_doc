@@ -50,4 +50,4 @@
           </div>
         </section>
       <% end %>
-    <%= footer_template(config) %>
+    <%= footer_template(config, module) %>

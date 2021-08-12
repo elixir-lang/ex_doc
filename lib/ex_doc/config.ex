@@ -43,7 +43,8 @@ defmodule ExDoc.Config do
             title: nil,
             version: nil,
             authors: nil,
-            skip_undefined_reference_warnings_on: []
+            skip_undefined_reference_warnings_on: [],
+            package: nil
 
   @type t :: %__MODULE__{
           apps: [atom()],
@@ -78,6 +79,7 @@ defmodule ExDoc.Config do
           title: nil | String.t(),
           version: nil | String.t(),
           authors: nil | [String.t()],
-          skip_undefined_reference_warnings_on: [String.t()]
+          skip_undefined_reference_warnings_on: [String.t()],
+          package: :atom | nil
         }
 end

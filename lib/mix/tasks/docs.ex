@@ -341,6 +341,7 @@ defmodule Mix.Tasks.Docs do
       |> normalize_apps(config)
       |> normalize_main()
       |> normalize_deps()
+      |> put_package(config)
 
     Mix.shell().info("Generating docs...")
 
@@ -451,6 +452,14 @@ defmodule Mix.Tasks.Docs do
         _ = Application.load(key),
         vsn = Application.spec(key, :vsn) do
       {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
+    end
+  end
+
+  defp put_package(options, config) do
+    if package = config[:package] do
+      Keyword.put(options, :package, package[:name] || config[:app])
+    else
+      options
     end
   end
 end
