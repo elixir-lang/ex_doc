@@ -17,6 +17,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>|
     end
 
+    test "app module", c do
+      assert autolink_doc("{@link //stdlib/array}", c) ==
+               ~s|<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>|
+    end
+
     test "external module", c do
       assert autolink_doc("{@link 'Elixir.EarmarkParser'}", c) ==
                ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
@@ -52,6 +57,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://erlang.org/doc/man/zlib.html#gunzip-1"><code>zlib:gunzip/1</code></a>|
     end
 
+    test "app function", c do
+      assert autolink_doc("{@link //stdlib/array:new/0}", c) ==
+               ~s|<a href="https://erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
+    end
+
     test "external function", c do
       assert autolink_doc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) ==
                ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>|
@@ -69,6 +79,11 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP type", c do
       assert autolink_doc("{@link array:array()}", c) ==
+               ~s|<a href="https://erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
+    end
+
+    test "app type", c do
+      assert autolink_doc("{@link //stdlib/array:array()}", c) ==
                ~s|<a href="https://erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
     end
 
@@ -104,26 +119,8 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "application", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo}", c) == ~s|<code>foo</code>|
-             end) =~ ~r{application references are not supported: //foo}
-    end
-
-    test "application module", c do
-      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo/bar}", c) == ~s|<code>bar</code>|
-             end) =~ ~r{application references are not supported: //foo/bar}
-    end
-
-    test "application function", c do
-      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo/bar:baz/0}", c) == ~s|<code>bar:baz/0</code>|
-             end) =~ ~r{application references are not supported: //foo/bar:baz/0}
-    end
-
-    test "application type", c do
-      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo/bar:baz()}", c) == ~s|<code>bar:baz()</code>|
-             end) =~ ~r{application references are not supported: //foo/bar:baz()}
+               assert autolink_doc("{@link //foo}", c) == ~s|<code>//foo</code>|
+             end) =~ ~r{invalid reference: foo:index}
     end
   end
 
