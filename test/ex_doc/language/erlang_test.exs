@@ -225,6 +225,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|foo() -> <a href="https://erlang.org/doc/man/sets.html#type-set">sets:set</a>().|
     end
 
+    test "OTP private type", c do
+      assert autolink_spec(~S"-spec foo() -> array:array_indx().", c) ==
+               ~s|foo() -> <a href="https://erlang.org/doc/man/array.html#type-array_indx">array:array_indx</a>().|
+    end
+
     test "skip typespec name", c do
       assert autolink_spec(~S"-spec t() -> t().", c) ==
                ~s|t() -> <a href="#t:t/0">t</a>().|

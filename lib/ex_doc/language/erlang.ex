@@ -331,7 +331,9 @@ defmodule ExDoc.Language.Erlang do
   defp do_url(ref, original_text, config) do
     visibility = Refs.get_visibility(ref)
 
-    if visibility == :public do
+    # TODO: type with content = %{} in otp xml is marked as :hidden, it should be :public
+
+    if visibility == :public or (visibility in [:hidden, :private] and elem(ref, 0) == :type) do
       final_url(ref, config)
     else
       Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
@@ -486,7 +488,7 @@ defmodule ExDoc.Language.Erlang do
           {name, arity} ->
             visibility = Refs.get_visibility({:type, config.current_module, name, arity})
 
-            if visibility == :public do
+            if visibility in [:public, :hidden] do
               final_url({:type, name, arity}, config)
             end
 
@@ -494,7 +496,7 @@ defmodule ExDoc.Language.Erlang do
             ref = {:type, module, name, arity}
             visibility = Refs.get_visibility(ref)
 
-            if visibility == :public do
+            if visibility in [:public, :hidden] do
               final_url(ref, config)
             else
               original_text = "#{string}/#{arity}"
