@@ -321,7 +321,7 @@ defmodule ExDoc.Formatter.HTML do
         extension when extension in ["", ".txt"] ->
           [{:pre, [], "\n" <> File.read!(input), %{}}]
 
-        ".md" ->
+        extension when extension in [".md", ".livemd"] ->
           input
           |> File.read!()
           |> Markdown.to_ast(opts)
