@@ -296,7 +296,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   describe "generates extras" do
-    test "includes source markdown" do
+    test "includes source `.livemd` files" do
       generate_docs(doc_config())
 
       refute File.exists?("#{output_dir()}/LICENSE")
