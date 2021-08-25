@@ -44,7 +44,7 @@ defmodule ExDoc.Formatter.HTMLTest do
         "test/fixtures/PlainText.txt",
         "test/fixtures/PlainTextFiles.md",
         "test/fixtures/README.md",
-        "test/fixtures/LiveBookFile.livemd"
+        "test/fixtures/LivebookFile.livemd"
       ]
     ]
   end
@@ -296,6 +296,18 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   describe "generates extras" do
+    test "includes source markdown" do
+      generate_docs(doc_config())
+
+      refute File.exists?("#{output_dir()}/LICENSE")
+      refute File.exists?("#{output_dir()}/PlainText.txt")
+      refute File.exists?("#{output_dir()}/PlainTextFiles.md")
+      refute File.exists?("#{output_dir()}/README.md")
+
+      assert File.read!("test/fixtures/LivebookFile.livemd") ==
+               File.read!("#{output_dir()}/LivebookFile.livemd")
+    end
+
     test "alongside other content" do
       config = doc_config(main: "readme")
       generate_docs(config)
