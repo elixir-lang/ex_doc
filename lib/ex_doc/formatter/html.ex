@@ -203,27 +203,42 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_extras(nodes_map, extras, config) do
-    extras
-    |> with_prev_next()
-    |> Enum.map(fn {node, prev, next} ->
-      filename = "#{node.id}.html"
-      output = "#{config.output}/#{filename}"
-      config = set_canonical_url(config, filename)
+    generated_extras =
+      extras
+      |> with_prev_next()
+      |> Enum.map(fn {node, prev, next} ->
+        filename = "#{node.id}.html"
+        output = "#{config.output}/#{filename}"
+        config = set_canonical_url(config, filename)
 
-      refs = %{
-        prev: prev && %{path: "#{prev.id}.html", title: prev.title},
-        next: next && %{path: "#{next.id}.html", title: next.title}
-      }
+        refs = %{
+          prev: prev && %{path: "#{prev.id}.html", title: prev.title},
+          next: next && %{path: "#{next.id}.html", title: next.title}
+        }
 
-      html = Templates.extra_template(config, node, nodes_map, refs)
+        html = Templates.extra_template(config, node, nodes_map, refs)
 
-      if File.regular?(output) do
-        IO.puts(:stderr, "warning: file #{Path.relative_to_cwd(output)} already exists")
-      end
+        if File.regular?(output) do
+          IO.puts(:stderr, "warning: file #{Path.relative_to_cwd(output)} already exists")
+        end
 
-      File.write!(output, html)
-      filename
-    end)
+        File.write!(output, html)
+        filename
+      end)
+
+    generated_extras ++ copy_extras(config, extras)
+  end
+
+  defp copy_extras(config, extras) do
+    for %{source_path: source_path, id: id} <- extras,
+        ext = extension_name(source_path),
+        ext == ".livemd" do
+      output = "#{config.output}/#{id}#{ext}"
+
+      File.copy!(source_path, output)
+
+      output
+    end
   end
 
   defp with_prev_next([]), do: []
@@ -321,7 +336,7 @@ defmodule ExDoc.Formatter.HTML do
         extension when extension in ["", ".txt"] ->
           [{:pre, [], "\n" <> File.read!(input), %{}}]
 
-        ".md" ->
+        extension when extension in [".md", ".livemd"] ->
           input
           |> File.read!()
           |> Markdown.to_ast(opts)
