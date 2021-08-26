@@ -307,6 +307,8 @@ defmodule ExDoc.Language.Erlang do
 
         # this is what docgen_xml_to_chunk returns
         [module, name] when kind == :type ->
+          # TODO: don't assume 0-arity, instead find first {:type, module, name, arity} ref
+          # and use that arity.
           [module, name, "0"]
       end
 
