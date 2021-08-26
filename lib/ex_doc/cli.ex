@@ -137,7 +137,7 @@ defmodule ExDoc.CLI do
       ex_doc PROJECT VERSION BEAMS [OPTIONS]
 
     Examples:
-      ex_doc "Ecto" "0.8.0" "_build/dev/lib/ecto/ebin" -u "https://github.com/elixir-lang/ecto"
+      ex_doc "Ecto" "0.8.0" "_build/dev/lib/ecto/ebin" -u "https://github.com/elixir-ecto/ecto"
       ex_doc "Project" "1.0.0" "_build/dev/lib/project/ebin" -c "docs.exs"
 
     Options:
@@ -198,19 +198,19 @@ defmodule ExDoc.CLI do
     provide `--source-url`, ExDoc will inflect the url pattern automatically
     for GitHub, GitLab, and Bitbucket URLs. For example:
 
-        --source-url "https://github.com/elixir-lang/ecto"
+        --source-url "https://github.com/elixir-ecto/ecto"
 
     Will be inflected as:
 
-        https://github.com/elixir-lang/ecto/blob/master/%{path}#L%{line}
+        https://github.com/elixir-ecto/ecto/blob/master/%{path}#L%{line}
 
     To specify a particular branch or commit, use the `--source-ref` option:
 
-        --source-url "https://github.com/elixir-lang/ecto" --source-ref "v1.0"
+        --source-url "https://github.com/elixir-ecto/ecto" --source-ref "v1.0"
 
     will result in the following URL pattern:
 
-        https://github.com/elixir-lang/ecto/blob/v1.0/%{path}#L%{line}
+        https://github.com/elixir-ecto/ecto/blob/v1.0/%{path}#L%{line}
 
     """)
   end
