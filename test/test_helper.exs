@@ -65,7 +65,7 @@ defmodule TestHelper do
       File.rm_rf!(dir)
     end)
 
-    if Keyword.get(opts, :docs_chunk, true) do
+    if Keyword.get(opts, :docs, true) do
       edoc_to_chunk(module)
     end
 

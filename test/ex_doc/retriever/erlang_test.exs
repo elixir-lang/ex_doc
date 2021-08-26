@@ -169,7 +169,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         ~S"""
         -module(no_chunk).
         """,
-        docs_chunk: false
+        docs: false
       )
 
       assert Retriever.docs_from_modules([:no_chunk], %ExDoc.Config{}) == []
