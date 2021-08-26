@@ -145,12 +145,12 @@ defmodule ExDoc.CLI do
       VERSION             Version number
       BEAMS               Path to compiled beam files
       -n, --canonical     Indicate the preferred URL with rel="canonical" link element
-      -c, --config        Give configuration through a file instead of command line.
+      -c, --config        Give configuration through a file instead of a command line.
                           See "Custom config" section below for more information.
       -f, --formatter     Docs formatter to use (html or epub), default: "html"
       -p, --homepage-url  URL to link to for the site name
           --paths         Prepends the given path to Erlang code path. The path might contain a glob
-                          pattern but in that case remember to quote it: --paths "_build/dev/lib/*/ebin".
+                          pattern but in that case, remember to quote it: --paths "_build/dev/lib/*/ebin".
                           This option can be given multiple times
           --language      Identify the primary language of the documents, its value must be
                           a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
@@ -171,7 +171,7 @@ defmodule ExDoc.CLI do
     The file must either have ".exs" or ".config" extension.
 
     The file with the ".exs" extension must be an Elixir script that returns a keyword list with
-    the same options declare in `Mix.Tasks.Docs`. Here is an example:
+    the same options declares in `Mix.Tasks.Docs`. Here is an example:
 
         [
           extras: Path.wildcard("lib/elixir/pages/*.md"),
@@ -193,7 +193,7 @@ defmodule ExDoc.CLI do
 
     ## Source linking
 
-    ExDoc by default provide links to the source code implementation as
+    ExDoc by default provides links to the source code implementation as
     long as `--source-url` or `--source-url-pattern` is provided. If you
     provide `--source-url`, ExDoc will inflect the url pattern automatically
     for GitHub, GitLab, and Bitbucket URLs. For example:
