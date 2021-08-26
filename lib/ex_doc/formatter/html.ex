@@ -233,7 +233,7 @@ defmodule ExDoc.Formatter.HTML do
     for %{source_path: source_path, id: id} <- extras,
         ext = extension_name(source_path),
         ext == ".livemd" do
-      output = "#{config.output}/#{id}.#{ext}"
+      output = "#{config.output}/#{id}#{ext}"
 
       File.copy!(source_path, output)
 
