@@ -230,10 +230,10 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp copy_extras(config, extras) do
-    for %{source_path: source_path} <- extras,
-        filename = Path.basename(source_path),
-        extension_name(filename) == ".livemd" do
-      output = "#{config.output}/#{filename}"
+    for %{source_path: source_path, id: id} <- extras,
+        ext = extension_name(source_path),
+        ext == ".livemd" do
+      output = "#{config.output}/#{id}.#{ext}"
 
       File.copy!(source_path, output)
 
