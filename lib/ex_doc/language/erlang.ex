@@ -208,13 +208,15 @@ defmodule ExDoc.Language.Erlang do
   defp walk_doc({:a, attrs, inner, _meta} = ast, config) do
     case attrs[:rel] do
       "https://erlang.org/doc/link/seeerl" ->
-        case String.split(attrs[:href], ":") do
+        {fragment, url} = extract_fragment(attrs[:href] || "")
+
+        case String.split(url, ":") do
           [module] ->
-            autolink(:module, module, inner, config)
+            autolink(:module, module, fragment, inner, config)
 
           [app, module] ->
             inner = strip_app(inner, app)
-            autolink(:module, module, inner, config)
+            autolink(:module, module, fragment, inner, config)
 
           _ ->
             warn_ref(attrs[:href], config)
@@ -222,33 +224,33 @@ defmodule ExDoc.Language.Erlang do
         end
 
       "https://erlang.org/doc/link/seemfa" ->
-        {kind, href} =
+        {kind, url} =
           case String.split(attrs[:href], "Module:") do
-            [href] -> {:function, href}
+            [url] -> {:function, url}
             [left, right] -> {:callback, left <> right}
           end
 
-        case String.split(href, ":") do
+        case String.split(url, ":") do
           [mfa] ->
-            autolink(kind, mfa, inner, config)
+            autolink(kind, mfa, "", inner, config)
 
           [app, mfa] ->
             inner = strip_app(inner, app)
-            autolink(kind, mfa, inner, config)
+            autolink(kind, mfa, "", inner, config)
         end
 
       "https://erlang.org/doc/link/seetype" ->
         case String.split(attrs[:href], ":") do
           [type] ->
-            autolink(:type, type, inner, config)
+            autolink(:type, type, "", inner, config)
 
           [app, type] ->
             inner = strip_app(inner, app)
-            autolink(:type, type, inner, config)
+            autolink(:type, type, "", inner, config)
         end
 
-      "https://erlang.org/doc/link/seeapp" ->
-        warn_ref(attrs[:href], config)
+      "https://erlang.org/doc/link/" <> see ->
+        warn_ref(attrs[:href] <> " (#{see})", config)
         inner
 
       _ ->
@@ -258,6 +260,13 @@ defmodule ExDoc.Language.Erlang do
 
   defp walk_doc({tag, attrs, ast, meta}, config) do
     {tag, attrs, walk_doc(ast, config), meta}
+  end
+
+  defp extract_fragment(url) do
+    case String.split(url, "#", parts: 2) do
+      [url] -> {"", url}
+      [url, fragment] -> {"#" <> fragment, url}
+    end
   end
 
   defp strip_app([{:code, attrs, [code], meta}], app) do
@@ -277,9 +286,9 @@ defmodule ExDoc.Language.Erlang do
     Autolink.maybe_warn(message, config, nil, %{})
   end
 
-  defp autolink(kind, string, inner, config) do
+  defp autolink(kind, string, fragment, inner, config) do
     if url = url(kind, string, config) do
-      {:a, [href: url], inner, %{}}
+      {:a, [href: url <> fragment], inner, %{}}
     else
       inner
     end
