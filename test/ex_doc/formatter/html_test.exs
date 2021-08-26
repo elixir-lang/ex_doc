@@ -300,12 +300,16 @@ defmodule ExDoc.Formatter.HTMLTest do
       generate_docs(doc_config())
 
       refute File.exists?("#{output_dir()}/LICENSE")
+      refute File.exists?("#{output_dir()}/license")
       refute File.exists?("#{output_dir()}/PlainText.txt")
+      refute File.exists?("#{output_dir()}/plaintext.txt")
       refute File.exists?("#{output_dir()}/PlainTextFiles.md")
+      refute File.exists?("#{output_dir()}/plaintextfiles.md")
       refute File.exists?("#{output_dir()}/README.md")
+      refute File.exists?("#{output_dir()}/readme.md")
 
       assert File.read!("test/fixtures/LivebookFile.livemd") ==
-               File.read!("#{output_dir()}/LivebookFile.livemd")
+               File.read!("#{output_dir()}/livebookfile.livemd")
     end
 
     test "alongside other content" do
