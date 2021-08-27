@@ -79,13 +79,17 @@ defmodule ExDoc.Autolink do
   end
 
   @doc false
-  def tool(module) do
+  def tool(module, config) do
     if match?("Elixir." <> _, Atom.to_string(module)) do
       :ex_doc
     else
-      case app_info(module) do
-        {true, _} -> :otp
-        {false, _} -> :ex_doc
+      {otp, app} = app_info(module)
+      apps = Enum.uniq(config.apps ++ Keyword.keys(config.deps))
+
+      if otp == true and app not in apps do
+        :otp
+      else
+        :ex_doc
       end
     end
   end

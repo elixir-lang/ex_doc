@@ -353,7 +353,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp final_url({:module, module}, config) do
-    tool = Autolink.tool(module)
+    tool = Autolink.tool(module, config)
     Autolink.app_module_url(tool, module, config)
   end
 
@@ -362,9 +362,11 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp final_url({kind, module, name, arity}, config) do
-    tool = Autolink.tool(module)
+    tool = Autolink.tool(module, config)
     module_url = Autolink.app_module_url(tool, module, config)
-    module_url && module_url <> fragment(tool, kind, name, arity)
+    # TODO: fix me
+    module_url = String.trim_trailing(module_url, "#content")
+    module_url <> fragment(tool, kind, name, arity)
   end
 
   defp fragment(:otp, :function, name, arity) do
@@ -379,11 +381,15 @@ defmodule ExDoc.Language.Erlang do
     "#type-#{name}"
   end
 
-  defp fragment(_, :function, name, arity) do
+  defp fragment(:ex_doc, :function, name, arity) do
     "##{name}/#{arity}"
   end
 
-  defp fragment(_, :type, name, arity) do
+  defp fragment(:ex_doc, :callback, name, arity) do
+    "#c:#{name}/#{arity}"
+  end
+
+  defp fragment(:ex_doc, :type, name, arity) do
     "#t:#{name}/#{arity}"
   end
 

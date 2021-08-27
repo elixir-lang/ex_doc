@@ -763,7 +763,7 @@ defmodule ExDoc.Language.Elixir do
 
     case {mode, Refs.get_visibility(ref)} do
       {_link_type, :public} ->
-        Autolink.app_module_url(Autolink.tool(module), module, config)
+        Autolink.app_module_url(Autolink.tool(module, config), module, config)
 
       {:regular_link, :undefined} ->
         nil
@@ -798,7 +798,7 @@ defmodule ExDoc.Language.Elixir do
 
     case {kind, visibility} do
       {_kind, :public} ->
-        fragment(Autolink.tool(module), kind, name, arity)
+        fragment(Autolink.tool(module, config), kind, name, arity)
 
       {:function, _visibility} ->
         try_autoimported_function(name, arity, mode, config, original_text)
@@ -829,7 +829,7 @@ defmodule ExDoc.Language.Elixir do
 
     case {mode, Refs.get_visibility({:module, module}), Refs.get_visibility(ref)} do
       {_mode, _module_visibility, :public} ->
-        case Autolink.tool(module) do
+        case Autolink.tool(module, config) do
           :no_tool ->
             nil
 

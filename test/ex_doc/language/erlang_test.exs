@@ -22,6 +22,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>|
     end
 
+    test "OTP module when generating OTP docs", c do
+      assert autolink_doc("{@link array}", [deps: [stdlib: "https://example.com/stdlib"]], c) ==
+               ~s|<a href="https://example.com/stdlib/array.html"><code>array</code></a>|
+    end
+
     test "app module", c do
       assert autolink_doc("{@link //stdlib/array}", c) ==
                ~s|<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>|
@@ -73,6 +78,16 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
     end
 
+    test "OTP function when generating OTP docs", c do
+      assert autolink_doc("{@link array:new/0}", [apps: [:stdlib]], c) ==
+               ~s|<a href="array.html#new/0"><code>array:new/0</code></a>|
+    end
+
+    test "OTP function when generating OTP docs, same module", c do
+      assert autolink_doc("{@link array:new/0}", [current_module: :array, apps: [:stdlib]], c) ==
+               ~s|<a href="array.html#new/0"><code>array:new/0</code></a>|
+    end
+
     test "ERTS function", c do
       assert autolink_doc("{@link zlib:gunzip/1}", c) ==
                ~s|<a href="https://erlang.org/doc/man/zlib.html#gunzip-1"><code>zlib:gunzip/1</code></a>|
@@ -82,6 +97,8 @@ defmodule ExDoc.Language.ErlangTest do
       assert autolink_doc("{@link //stdlib/array:new/0}", c) ==
                ~s|<a href="https://erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
     end
+
+    # TODO: test callbacks. No support in EDoc, use :docgen_xml_to_chunks.
 
     test "external function", c do
       assert autolink_doc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) ==
