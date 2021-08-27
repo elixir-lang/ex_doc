@@ -12,6 +12,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="bar.html"><code>bar</code></a>|
     end
 
+    test "current module", c do
+      assert autolink_doc("{@link foo}", [current_module: :foo], c) ==
+               ~s|<a href="foo.html#content"><code>foo</code></a>|
+    end
+
     test "OTP module", c do
       assert autolink_doc("{@link array}", c) ==
                ~s|<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>|
