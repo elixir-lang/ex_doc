@@ -97,17 +97,25 @@ defmodule ExDoc.Language.Erlang do
 
   @impl true
   def type_data(entry, module_data) do
-    {{_kind, name, arity}, _anno, signature, _doc, _metadata} = entry
+    {{kind, name, arity}, anno, signature, _doc, _metadata} = entry
 
-    %{type: type, spec: spec, line: line} =
-      ExDoc.Language.Elixir.type_from_module_data(module_data, name, arity)
+    case ExDoc.Language.Elixir.type_from_module_data(module_data, name, arity) do
+      %{} = map ->
+        %{
+          type: map.type,
+          line: map.line,
+          spec: {:attribute, 0, map.type, map.spec},
+          signature: signature
+        }
 
-    %{
-      type: type,
-      line: line,
-      spec: {:attribute, 0, type, spec},
-      signature: signature
-    }
+      nil ->
+        %{
+          type: kind,
+          line: anno_line(anno),
+          spec: nil,
+          signature: signature
+        }
+    end
   end
 
   @impl true
@@ -164,11 +172,15 @@ defmodule ExDoc.Language.Erlang do
 
   @doc false
   def get_abstract_code(module) do
-    {^module, binary, _file} = :code.get_object_code(module)
+    case :code.get_object_code(module) do
+      {^module, binary, _file} ->
+        case :beam_lib.chunks(binary, [:abstract_code]) do
+          {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} -> abstract_code
+          _otherwise -> []
+        end
 
-    case :beam_lib.chunks(binary, [:abstract_code]) do
-      {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} -> abstract_code
-      _otherwise -> []
+      :error ->
+        []
     end
   end
 

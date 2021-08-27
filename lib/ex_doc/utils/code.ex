@@ -9,9 +9,15 @@ defmodule ExDoc.Utils.Code do
       {_module, bin, beam_path} ->
         case fetch_docs_from_beam(bin) do
           {:error, :chunk_not_found} ->
-            app_root = Path.expand(Path.join(["..", ".."]), beam_path)
-            path = Path.join([app_root, "doc", "chunks", "#{module}.chunk"])
-            fetch_docs_from_chunk(path)
+            if :code.which(module) == :preloaded do
+              # TODO remove duplication
+              path = Path.join([:code.lib_dir(:erts), "doc", "chunks", "#{module}.chunk"])
+              fetch_docs_from_chunk(path)
+            else
+              app_root = Path.expand(Path.join(["..", ".."]), beam_path)
+              path = Path.join([app_root, "doc", "chunks", "#{module}.chunk"])
+              fetch_docs_from_chunk(path)
+            end
 
           other ->
             other

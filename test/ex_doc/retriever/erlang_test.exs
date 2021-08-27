@@ -174,5 +174,10 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert Retriever.docs_from_modules([:no_chunk], %ExDoc.Config{}) == []
     end
+
+    # TODO
+    # test "erts" do
+    #   [mod] = Retriever.docs_from_modules([:erlang], %ExDoc.Config{})
+    # end
   end
 end
