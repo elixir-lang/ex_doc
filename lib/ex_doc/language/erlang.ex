@@ -262,7 +262,11 @@ defmodule ExDoc.Language.Erlang do
         end
 
       "https://erlang.org/doc/link/" <> see ->
-        warn_ref(attrs[:href] <> " (#{see})", config)
+        # TODO: remove me before release
+        unless System.get_env("SKIP_SEE_WARNING") do
+          warn_ref(attrs[:href] <> " (#{see})", config)
+        end
+
         inner
 
       _ ->
