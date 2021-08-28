@@ -395,20 +395,23 @@ defmodule ExDoc.Language.ElixirTest do
     ])
 
     captured = warn("AutolinkTest.Foo.bar/1", file: "lib/foo.ex", line: 1, id: nil)
-    assert captured =~ ~s[documentation references "AutolinkTest.Foo.bar/1" but it is hidden\n]
+
+    assert captured =~
+             ~s[documentation references function "AutolinkTest.Foo.bar/1" but it is hidden\n]
+
     assert captured =~ ~r{lib/foo.ex:1\n$}
 
     assert warn("t:AutolinkTest.Foo.bad/0", file: "lib/foo.ex", id: "AutolinkTest.Foo.foo/0") =~
-             ~s[documentation references "t:AutolinkTest.Foo.bad/0" but it is hidden or private]
+             ~s[documentation references type "t:AutolinkTest.Foo.bad/0" but it is hidden or private]
 
     assert warn("t:Elixir.AutolinkTest.Foo.bad/0",
              file: "lib/foo.ex",
              id: "AutolinkTest.Foo.foo/0"
            ) =~
-             ~s[documentation references "t:Elixir.AutolinkTest.Foo.bad/0" but it is hidden or private]
+             ~s[documentation references type "t:Elixir.AutolinkTest.Foo.bad/0" but it is hidden or private]
 
     assert warn("t:AutolinkTest.Foo.bad/0", file: "lib/foo.ex", id: "AutolinkTest.Foo.foo/0") =~
-             ~s[documentation references "t:AutolinkTest.Foo.bad/0" but it is hidden or private]
+             ~s[documentation references type "t:AutolinkTest.Foo.bad/0" but it is hidden or private]
 
     assert warn("Code.Typespec") =~
              ~s[documentation references module "Code.Typespec" but it is hidden]
@@ -421,11 +424,11 @@ defmodule ExDoc.Language.ElixirTest do
 
     assert warn(fn ->
              autolink_spec(quote(do: t() :: bad()))
-           end) =~ ~s[documentation references "bad()"]
+           end) =~ ~s[documentation references type "bad()"]
 
     assert warn(fn ->
              autolink_spec(quote(do: t() :: String.bad()))
-           end) =~ ~s[documentation references "String.bad()"]
+           end) =~ ~s[documentation references type "String.bad()"]
 
     assert warn(fn ->
              autolink_spec(
@@ -435,7 +438,7 @@ defmodule ExDoc.Language.ElixirTest do
                  }
                end
              )
-           end) =~ ~s[documentation references "String.bad()"]
+           end) =~ ~s[documentation references type "String.bad()"]
 
     assert warn(~m"[Foo](Foo Bar.md)", extras: []) =~
              ~s[documentation references file "Foo Bar.md" but it does not exist]
@@ -466,7 +469,7 @@ defmodule ExDoc.Language.ElixirTest do
     assert_unchanged(~m"`mix foo`")
 
     assert warn(~m"[bad](`String.upcase/9`)", extras: []) =~
-             ~s[documentation references "String.upcase/9" but it is undefined or private]
+             ~s[documentation references function "String.upcase/9" but it is undefined or private]
 
     assert_unchanged(~m"`Unknown`")
 

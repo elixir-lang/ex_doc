@@ -195,7 +195,7 @@ defmodule ExDoc.Autolink do
          %{original_text: original_text}
        ) do
     message =
-      "documentation references \"#{original_text}\" but it is " <>
+      "documentation references #{kind} \"#{original_text}\" but it is " <>
         format_visibility(visibility, kind)
 
     warn(message, {file, line}, id)

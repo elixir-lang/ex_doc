@@ -134,25 +134,25 @@ defmodule ExDoc.Language.ErlangTest do
     test "bad local function", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad/0}", c) == ~s|<code>bad/0</code>|
-             end) =~ ~s|references "bad/0" but it is undefined or private|
+             end) =~ ~s|references function "bad/0" but it is undefined or private|
     end
 
     test "bad remote function", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad:bad/0}", c) == ~s|<code>bad:bad/0</code>|
-             end) =~ ~s|references "bad:bad/0" but it is undefined or private|
+             end) =~ ~s|references function "bad:bad/0" but it is undefined or private|
     end
 
     test "bad local type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad()}", c) == ~s|<code>bad()</code>|
-             end) =~ ~s|references "bad()" but it is undefined or private|
+             end) =~ ~s|references type "bad()" but it is undefined or private|
     end
 
     test "bad remote type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad:bad()}", c) == ~s|<code>bad:bad()</code>|
-             end) =~ ~s|references "bad:bad()" but it is undefined or private|
+             end) =~ ~s|references type "bad:bad()" but it is undefined or private|
     end
 
     test "application", c do
@@ -282,7 +282,7 @@ defmodule ExDoc.Language.ErlangTest do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_spec(~S"-spec foo() -> bad:bad(atom()).", c) ==
                         ~s|foo() -> bad:bad(atom()).|
-             end) =~ ~r{references "bad:bad/1" but it is undefined or private}
+             end) =~ ~r{references type "bad:bad/1" but it is undefined or private}
     end
   end
 
