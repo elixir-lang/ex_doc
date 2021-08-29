@@ -273,6 +273,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|t() -> <a href="#t:t/0">t</a>().|
     end
 
+    test "same spec and type name", c do
+      assert autolink_spec(~S"-spec t(t()) -> t().", c) ==
+               ~s|t(<a href="#t:t/0">t</a>()) -> <a href="#t:t/0">t</a>().|
+    end
+
     test "non-standard name", c do
       assert autolink_spec(~S"-spec 'Foo'() -> ok.", c) ==
                ~s|'Foo'() -> ok.|

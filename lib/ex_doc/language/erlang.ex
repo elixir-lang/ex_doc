@@ -480,7 +480,10 @@ defmodule ExDoc.Language.Erlang do
               {other, acc}
           end)
 
-        acc |> Enum.reverse() |> Enum.drop(1)
+        acc
+        |> Enum.reverse()
+        # drop the name of the typespec
+        |> Enum.drop(1)
       end
       |> Enum.concat()
 
@@ -489,13 +492,18 @@ defmodule ExDoc.Language.Erlang do
     # Drop and re-add type name (it, the first element in acc, is dropped there too)
     #
     #     1. foo() :: bar()
-    #     2.     ) :: bar()
-    #     3.     ) :: <a>bar</a>()
+    #     2.    () :: bar()
+    #     3.    () :: <a>bar</a>()
     #     4. foo() :: <a>bar</a>()
     name = pp(name)
-    formatted = String.trim_leading(formatted, name <> "(")
+    formatted = trim_name(formatted, name)
     formatted = replace(formatted, acc, config)
-    name <> "(" <> formatted
+    name <> formatted
+  end
+
+  defp trim_name(string, name) do
+    name_size = byte_size(name)
+    binary_part(string, name_size, byte_size(string) - name_size)
   end
 
   defp replace(formatted, [], _config) do
