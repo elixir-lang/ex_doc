@@ -77,8 +77,14 @@ defmodule ExDoc.Retriever do
         false
 
       {:docs_v1, _, _, _, _, _, _} = docs ->
-        _ = Code.ensure_loaded(module)
-        docs
+        case Code.ensure_loaded(module) do
+          {:module, _} ->
+            docs
+
+          {:error, reason} ->
+            IO.warn("skipping module #{inspect(module)}, reason: #{reason}", [])
+            false
+        end
 
       {:error, :chunk_not_found} ->
         false
