@@ -19,9 +19,6 @@ jobs:
               elixir: "1.10"
               otp: 21
           - pair:
-              elixir: "1.11"
-              otp: 23
-          - pair:
               elixir: "1.12"
               otp: 24
             lint: lint
