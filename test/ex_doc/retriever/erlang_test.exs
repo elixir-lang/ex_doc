@@ -3,11 +3,11 @@ defmodule ExDoc.Retriever.ErlangTest do
   alias ExDoc.{Retriever, DocAST, Language.Erlang}
   import TestHelper
 
+  @moduletag :otp24
+
   setup :create_tmp_dir
 
   describe "docs_from_modules/2" do
-    @describetag :otp23
-
     test "module", c do
       erlc(c, :mod, ~S"""
       %% @doc
@@ -75,8 +75,6 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert function2.specs == []
     end
 
-    @tag :otp23
-    @tag :otp24
     test "module with no docs is skipped", c do
       erlc(c, :mod, ~S"""
       -module(mod).
@@ -85,8 +83,6 @@ defmodule ExDoc.Retriever.ErlangTest do
       [] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
     end
 
-    @tag :otp23
-    @tag :otp24
     test "function with no docs is skipped", c do
       erlc(c, :mod, ~S"""
       %% @doc Docs.
@@ -100,7 +96,6 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert mod.docs == []
     end
 
-    @tag :otp24
     test "callbacks", c do
       erlc(c, :mod, ~S"""
       %% @doc Docs.
@@ -131,7 +126,6 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert optional_callback1.annotations == ["optional"]
     end
 
-    @tag :otp24
     test "types", c do
       erlc(c, :mod, ~S"""
       %% @doc Docs.

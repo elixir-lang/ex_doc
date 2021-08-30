@@ -1,6 +1,5 @@
 exclude = [
   earmark: not ExDoc.Markdown.Earmark.available?(),
-  otp23: System.otp_release() < "23",
   otp24: System.otp_release() < "24"
 ]
 
@@ -86,25 +85,8 @@ defmodule TestHelper do
         )
     end
   else
-    def edoc_to_chunk(module) do
-      source_path = module.module_info(:compile)[:source]
-      beam_path = :code.which(module)
-      dir = :filename.dirname(source_path)
-      xml_path = '#{dir}/#{module}.xml'
-      chunk_path = '#{dir}/#{module}.chunk'
-
-      docgen_priv_dir = :code.priv_dir(:erl_docgen)
-      cmd!("escript #{docgen_priv_dir}/bin/xml_from_edoc.escript -dir #{dir} #{source_path}")
-
-      :docgen_xml_to_chunk.main(["app", xml_path, beam_path, "", chunk_path])
-      docs_chunk = File.read!(chunk_path)
-      {:ok, ^module, chunks} = :beam_lib.all_chunks(beam_path)
-      {:ok, beam} = :beam_lib.build_module([{'Docs', docs_chunk} | chunks])
-      File.write!(beam_path, beam)
-    end
-
-    defp cmd!(command) do
-      0 = Mix.shell().cmd(command)
+    def edoc_to_chunk(_) do
+      raise "not supported"
     end
   end
 
