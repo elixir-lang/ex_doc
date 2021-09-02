@@ -1,9 +1,16 @@
 # Changelog
 
+## v0.25.2
+
+  * Enhancements
+    * Add support for Livebook's `.livemd` Markdown files
+    * Preload all applications starting with `makeup_` before doc generation
+    * Add Hex package config and display "Find on Hex" footer links
+
 ## v0.25.1 (2021-08-02)
 
   * Enhancements
-    * Group callbacks
+    * Supporting grouping of callbacks
     * Use shell lexer for code blocks with no language and starting with `$ `
 
   * Bug fixes
