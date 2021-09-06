@@ -131,6 +131,7 @@ defmodule ExDoc.Language do
               opts: keyword()
             }
 
-  def get(:elixir), do: ExDoc.Language.Elixir
-  def get(:erlang), do: ExDoc.Language.Erlang
+  def get(:elixir), do: {:ok, ExDoc.Language.Elixir}
+  def get(:erlang), do: {:ok, ExDoc.Language.Erlang}
+  def get(language), do: {:unknown_language, language}
 end

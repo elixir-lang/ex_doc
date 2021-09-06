@@ -53,7 +53,7 @@ defmodule ExDoc.Retriever do
 
   defp get_module(module, config) do
     with {:docs_v1, _, language, _, _, _, _} = docs_chunk <- docs_chunk(module),
-         language = ExDoc.Language.get(language),
+         {:ok, language} <- ExDoc.Language.get(language),
          %{} = module_data <- language.module_data(module, docs_chunk, config),
          false <- skip_module?(module_data, config) do
       [generate_node(module, module_data, config)]
