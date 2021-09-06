@@ -135,9 +135,9 @@ defmodule ExDoc.Language do
   def get(:erlang, _module), do: {:ok, ExDoc.Language.Erlang}
 
   def get(language, module) do
-    IO.puts(
-      :stderr,
-      "warning: skipping module #{inspect(module)}, reason: unsupported language (#{inspect(language)})"
+    IO.warn(
+      "skipping module #{inspect(module)}, reason: unsupported language (#{inspect(language)})",
+      []
     )
 
     :error
