@@ -133,5 +133,5 @@ defmodule ExDoc.Language do
 
   def get(:elixir), do: {:ok, ExDoc.Language.Elixir}
   def get(:erlang), do: {:ok, ExDoc.Language.Erlang}
-  def get(language), do: {:unknown_language, language}
+  def get(_language), do: :error
 end
