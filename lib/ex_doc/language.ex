@@ -137,7 +137,7 @@ defmodule ExDoc.Language do
   def get(language, module) do
     IO.puts(
       :stderr,
-      "warning: skipping module in unsupported language #{inspect(language)} : #{module}"
+      "warning: skipping module #{inspect(module)}, reason: unsupported language (#{inspect(language)})"
     )
 
     :error
