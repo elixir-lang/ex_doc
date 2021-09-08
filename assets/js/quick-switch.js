@@ -125,7 +125,7 @@ function queryForAutocomplete (packageSlug) {
       if (Array.isArray(payload)) {
         state.autocompleteResults = resultsFromPayload(packageSlug, payload)
         state.selectedIdx = null
-        // Only render results if the serach string is still long enough
+        // Only render results if the search string is still long enough
         const currentTerm = qs(QUICK_SWITCH_INPUT_SELECTOR).value
         if (currentTerm.length >= 3) {
           renderResults({ results: state.autocompleteResults })

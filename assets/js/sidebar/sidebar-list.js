@@ -3,7 +3,7 @@ import { qs, getCurrentPageSidebarType, getLocationHash, findSidebarCategory } f
 import { getSidebarNodes } from '../globals'
 
 const SIDEBAR_TYPE = {
-  serach: 'search',
+  search: 'search',
   extras: 'extras',
   modules: 'modules',
   tasks: 'tasks'
