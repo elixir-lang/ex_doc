@@ -7,6 +7,12 @@ const ANIMATION_DURATION = 300
 const SIDEBAR_TOGGLE_SELECTOR = '.sidebar-toggle'
 const CONTENT_SELECTOR = '.content'
 
+const userPref = {
+  CLOSED: 'closed',
+  OPEN: 'open',
+  NO_PREF: 'no_pref'
+}
+
 const SIDEBAR_CLASS = {
   opened: 'sidebar-opened',
   opening: 'sidebar-opening',
@@ -20,7 +26,9 @@ const state = {
   // Keep track of the current timeout to clear it if needed
   togglingTimeout: null,
   // Record window width on resize to update sidebar state only when it actually changes
-  lastWindowWidth: window.innerWidth
+  lastWindowWidth: window.innerWidth,
+  // No_PREF is defaults to OPEN behavior
+  sidebarPreference: userPref.NO_PREF
 }
 
 /**
@@ -32,11 +40,7 @@ export function initialize () {
 }
 
 function setDefaultSidebarState () {
-  setClass(
-    isScreenSmall()
-      ? SIDEBAR_CLASS.closed
-      : SIDEBAR_CLASS.opened
-  )
+  setClass(isScreenSmall() ? SIDEBAR_CLASS.closed : SIDEBAR_CLASS.opened)
 }
 
 function isScreenSmall () {
@@ -49,17 +53,21 @@ function setClass (...classes) {
 }
 
 function addEventListeners () {
-  qs(SIDEBAR_TOGGLE_SELECTOR).addEventListener('click', event => {
+  qs(SIDEBAR_TOGGLE_SELECTOR).addEventListener('click', (event) => {
     toggleSidebar()
+    setPreference()
   })
 
-  qs(CONTENT_SELECTOR).addEventListener('click', event => {
+  qs(CONTENT_SELECTOR).addEventListener('click', (event) => {
     closeSidebarIfSmallScreen()
   })
 
-  window.addEventListener('resize', throttle(event => {
-    adoptSidebarToWindowSize()
-  }, 100))
+  window.addEventListener(
+    'resize',
+    throttle((event) => {
+      adoptSidebarToWindowSize()
+    }, 100)
+  )
 }
 
 /**
@@ -76,8 +84,10 @@ export function toggleSidebar () {
 }
 
 function isSidebarOpen () {
-  return document.body.classList.contains(SIDEBAR_CLASS.opened) ||
+  return (
+    document.body.classList.contains(SIDEBAR_CLASS.opened) ||
     document.body.classList.contains(SIDEBAR_CLASS.opening)
+  )
 }
 
 /**
@@ -121,11 +131,23 @@ function clearTimeoutIfAny () {
   }
 }
 
+/**
+ * Handles updating the sidebar state on window resize
+ *
+ * WHEN the window width has changed
+ * AND the user sidebar preference is OPEN or NO_PREF
+ * THEN adjust the sidebar state according to screen size
+ */
 function adoptSidebarToWindowSize () {
   // See https://github.com/elixir-lang/ex_doc/issues/736#issuecomment-307371291
   if (state.lastWindowWidth !== window.innerWidth) {
     state.lastWindowWidth = window.innerWidth
-    setDefaultSidebarState()
+    if (
+      state.sidebarPreference === userPref.OPEN ||
+      state.sidebarPreference === userPref.NO_PREF
+    ) {
+      setDefaultSidebarState()
+    }
   }
 }
 
@@ -133,5 +155,23 @@ function closeSidebarIfSmallScreen () {
   const sidebarCoversContent = isScreenSmall()
   if (sidebarCoversContent && isSidebarOpen()) {
     closeSidebar()
+  }
+}
+
+/**
+ * Track the sidebar preference for the user
+ */
+function setPreference () {
+  switch (state.sidebarPreference) {
+    case userPref.OPEN:
+      state.sidebarPreference = userPref.CLOSED
+      break
+    case userPref.CLOSED:
+      state.sidebarPreference = userPref.OPEN
+      break
+    case userPref.NO_PREF:
+      isSidebarOpen()
+        ? (state.sidebarPreference = userPref.OPEN)
+        : (state.sidebarPreference = userPref.CLOSED)
   }
 }
