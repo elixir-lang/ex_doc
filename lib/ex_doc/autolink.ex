@@ -119,7 +119,7 @@ defmodule ExDoc.Autolink do
 
         {otp?, app}
 
-      :non_existing ->
+      value when value in [:cover_compiled, :non_existing] ->
         {false, nil}
     end
   end
