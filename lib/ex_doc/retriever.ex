@@ -72,7 +72,6 @@ defmodule ExDoc.Retriever do
     Refs.insert_from_chunk(module, result)
 
     case result do
-      # TODO: Once we require Elixir v1.12, we only keep modules that have map contents
       {:docs_v1, _, _, _, :hidden, _, _} ->
         false
 
@@ -294,7 +293,6 @@ defmodule ExDoc.Retriever do
   defp get_types(module_data, source) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
-    # TODO: When we require Elixir v1.12, we only keep contents that are maps
     for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
       get_type(doc, source, module_data)
     end

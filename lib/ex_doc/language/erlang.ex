@@ -6,10 +6,11 @@ defmodule ExDoc.Language.Erlang do
   alias ExDoc.{Autolink, Refs}
 
   @impl true
+  # TODO: Move :hidden handling to retriever, as it is shared across all BEAM languages
   def module_data(module, docs_chunk, _config) do
     {:docs_v1, _, _, _, doc, _, _} = docs_chunk
 
-    if is_map(doc) do
+    if doc != :hidden do
       module_data(module, docs_chunk)
     else
       :skip
@@ -46,7 +47,7 @@ defmodule ExDoc.Language.Erlang do
   def function_data(entry, module_data) do
     {{kind, name, arity}, _anno, _signature, doc_content, _metadata} = entry
 
-    if kind == :function and is_map(doc_content) do
+    if kind == :function and doc_content != :hidden do
       function_data(name, arity, doc_content, module_data)
     else
       :skip

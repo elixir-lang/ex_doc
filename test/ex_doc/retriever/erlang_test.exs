@@ -75,15 +75,15 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert function2.specs == []
     end
 
-    test "module with no docs is skipped", c do
+    test "module with no docs is generated", c do
       erlc(c, :mod, ~S"""
       -module(mod).
       """)
 
-      [] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
+      assert [_] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
     end
 
-    test "function with no docs is skipped", c do
+    test "function with no docs is generated", c do
       erlc(c, :mod, ~S"""
       %% @doc Docs.
       -module(mod).
@@ -93,7 +93,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       """)
 
       [mod] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
-      assert mod.docs == []
+      assert [_] = mod.docs
     end
 
     test "callbacks", c do

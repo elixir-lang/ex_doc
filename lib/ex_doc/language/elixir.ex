@@ -91,9 +91,8 @@ defmodule ExDoc.Language.Elixir do
     true
   end
 
-  # We keep this clause with backwards compatibility with Elixir,
-  # from v1.12+, functions not starting with _ always default to %{}.
-  # TODO: Remove me once we require Elixir v1.12.
+  # If it is none, then we need to look at underscore.
+  # TODO: We can remove this on Elixir v1.13 as all underscored are hidden.
   defp doc?({{_, name, _}, _, _, :none, _}, _type) do
     hd(Atom.to_charlist(name)) != ?_
   end
