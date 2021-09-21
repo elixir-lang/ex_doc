@@ -99,8 +99,8 @@ defmodule ExDoc.Autolink do
       :preloaded ->
         {true, :erts}
 
-      path when is_list(path) ->
-        otp? = :string.prefix(path, :code.lib_dir()) != :nomatch
+      maybe_path ->
+        otp? = is_list(maybe_path) and List.starts_with?(maybe_path, :code.lib_dir())
 
         app =
           case :application.get_application(module) do
@@ -108,19 +108,15 @@ defmodule ExDoc.Autolink do
               app
 
             _ ->
-              case path |> Path.split() |> Enum.reverse() do
-                [_, "ebin", app, "lib" | _] ->
-                  String.to_atom(app)
-
-                _ ->
-                  nil
+              with true <- is_list(maybe_path),
+                   [_, "ebin", app, "lib" | _] <- maybe_path |> Path.split() |> Enum.reverse() do
+                String.to_atom(app)
+              else
+                _ -> nil
               end
           end
 
         {otp?, app}
-
-      :non_existing ->
-        {false, nil}
     end
   end
 
