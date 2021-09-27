@@ -361,7 +361,7 @@ defmodule ExDoc.Language.Erlang do
 
     # TODO: type with content = %{} in otp xml is marked as :hidden, it should be :public
 
-    if visibility == :public or (visibility in [:hidden, :private] and elem(ref, 0) == :type) do
+    if visibility == :public or (visibility == :hidden and elem(ref, 0) == :type) do
       final_url(ref, config)
     else
       Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
