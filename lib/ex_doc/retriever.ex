@@ -53,7 +53,7 @@ defmodule ExDoc.Retriever do
 
   defp get_module(module, config) do
     with {:docs_v1, _, language, _, _, _, _} = docs_chunk <- docs_chunk(module),
-         language = ExDoc.Language.get(language),
+         {:ok, language} <- ExDoc.Language.get(language, module),
          %{} = module_data <- language.module_data(module, docs_chunk, config),
          false <- skip_module?(module_data, config) do
       [generate_node(module, module_data, config)]
@@ -72,13 +72,18 @@ defmodule ExDoc.Retriever do
     Refs.insert_from_chunk(module, result)
 
     case result do
-      # TODO: Once we require Elixir v1.12, we only keep modules that have map contents
       {:docs_v1, _, _, _, :hidden, _, _} ->
         false
 
       {:docs_v1, _, _, _, _, _, _} = docs ->
-        _ = Code.ensure_loaded(module)
-        docs
+        case Code.ensure_loaded(module) do
+          {:module, _} ->
+            docs
+
+          {:error, reason} ->
+            IO.warn("skipping module #{inspect(module)}, reason: #{reason}", [])
+            false
+        end
 
       {:error, :chunk_not_found} ->
         false
@@ -288,7 +293,6 @@ defmodule ExDoc.Retriever do
   defp get_types(module_data, source) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
-    # TODO: When we require Elixir v1.12, we only keep contents that are maps
     for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
       get_type(doc, source, module_data)
     end

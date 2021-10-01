@@ -12,8 +12,23 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="bar.html"><code>bar</code></a>|
     end
 
+    test "current module", c do
+      assert autolink_doc("{@link foo}", [current_module: :foo], c) ==
+               ~s|<a href="foo.html#content"><code>foo</code></a>|
+    end
+
     test "OTP module", c do
       assert autolink_doc("{@link array}", c) ==
+               ~s|<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>|
+    end
+
+    test "OTP module when generating OTP docs", c do
+      assert autolink_doc("{@link array}", [deps: [stdlib: "https://example.com/stdlib"]], c) ==
+               ~s|<a href="https://example.com/stdlib/array.html"><code>array</code></a>|
+    end
+
+    test "app module", c do
+      assert autolink_doc("{@link //stdlib/array}", c) ==
                ~s|<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>|
     end
 
@@ -25,6 +40,22 @@ defmodule ExDoc.Language.ErlangTest do
     test "external module - extension is ignored", c do
       assert autolink_doc("{@link 'Elixir.EarmarkParser'}", [ext: ".xhtml"], c) ==
                ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
+    end
+
+    test "module with anchor" do
+      ast =
+        {:a, [href: "array#anchor", rel: "https://erlang.org/doc/link/seeerl"],
+         [{:code, [], ["array"], %{}}], %{}}
+
+      assert do_autolink_doc(ast) ==
+               ~s|<a href="https://erlang.org/doc/man/array.html#anchor"><code>array</code></a>|
+
+      ast =
+        {:a, [href: "stdlib:array#anchor", rel: "https://erlang.org/doc/link/seeerl"],
+         [{:code, [], ["array"], %{}}], %{}}
+
+      assert do_autolink_doc(ast) ==
+               ~s|<a href="https://erlang.org/doc/man/array.html#anchor"><code>array</code></a>|
     end
 
     test "custom text", c do
@@ -47,10 +78,27 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
     end
 
+    test "OTP function when generating OTP docs", c do
+      assert autolink_doc("{@link array:new/0}", [apps: [:stdlib]], c) ==
+               ~s|<a href="array.html#new/0"><code>array:new/0</code></a>|
+    end
+
+    test "OTP function when generating OTP docs, same module", c do
+      assert autolink_doc("{@link array:new/0}", [current_module: :array, apps: [:stdlib]], c) ==
+               ~s|<a href="array.html#new/0"><code>array:new/0</code></a>|
+    end
+
     test "ERTS function", c do
       assert autolink_doc("{@link zlib:gunzip/1}", c) ==
                ~s|<a href="https://erlang.org/doc/man/zlib.html#gunzip-1"><code>zlib:gunzip/1</code></a>|
     end
+
+    test "app function", c do
+      assert autolink_doc("{@link //stdlib/array:new/0}", c) ==
+               ~s|<a href="https://erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
+    end
+
+    # TODO: test callbacks. No support in EDoc, use :docgen_xml_to_chunks.
 
     test "external function", c do
       assert autolink_doc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) ==
@@ -72,6 +120,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
     end
 
+    test "app type", c do
+      assert autolink_doc("{@link //stdlib/array:array()}", c) ==
+               ~s|<a href="https://erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
+    end
+
     test "bad module", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad}", c) == ~s|<code>bad</code>|
@@ -81,49 +134,31 @@ defmodule ExDoc.Language.ErlangTest do
     test "bad local function", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad/0}", c) == ~s|<code>bad/0</code>|
-             end) =~ ~s|references "bad/0" but it is undefined or private|
+             end) =~ ~s|references function "bad/0" but it is undefined or private|
     end
 
     test "bad remote function", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad:bad/0}", c) == ~s|<code>bad:bad/0</code>|
-             end) =~ ~s|references "bad:bad/0" but it is undefined or private|
+             end) =~ ~s|references function "bad:bad/0" but it is undefined or private|
     end
 
     test "bad local type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad()}", c) == ~s|<code>bad()</code>|
-             end) =~ ~s|references "bad()" but it is undefined or private|
+             end) =~ ~s|references type "bad()" but it is undefined or private|
     end
 
     test "bad remote type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad:bad()}", c) == ~s|<code>bad:bad()</code>|
-             end) =~ ~s|references "bad:bad()" but it is undefined or private|
+             end) =~ ~s|references type "bad:bad()" but it is undefined or private|
     end
 
     test "application", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo}", c) == ~s|<code>foo</code>|
-             end) =~ ~r{application references are not supported: //foo}
-    end
-
-    test "application module", c do
-      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo/bar}", c) == ~s|<code>bar</code>|
-             end) =~ ~r{application references are not supported: //foo/bar}
-    end
-
-    test "application function", c do
-      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo/bar:baz/0}", c) == ~s|<code>bar:baz/0</code>|
-             end) =~ ~r{application references are not supported: //foo/bar:baz/0}
-    end
-
-    test "application type", c do
-      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_doc("{@link //foo/bar:baz()}", c) == ~s|<code>bar:baz()</code>|
-             end) =~ ~r{application references are not supported: //foo/bar:baz()}
+               assert autolink_doc("{@link //foo}", c) == ~s|<code>//foo</code>|
+             end) =~ ~r{invalid reference: foo:index}
     end
   end
 
@@ -198,12 +233,6 @@ defmodule ExDoc.Language.ErlangTest do
                ~s[foo() -> <<_:_*16>> | <a href="#t:t/0">t</a>().]
     end
 
-    test "negative integer", c do
-      # TODO: OTP bug: - 1 vs -1
-      assert autolink_spec(~s"-spec foo() -> -1 | t().", c) ==
-               ~s[foo() -> - 1 | <a href="#t:t/0">t</a>().]
-    end
-
     test "integer range", c do
       assert autolink_spec(~s"-spec foo() -> 1..255 | t().", c) ==
                ~s[foo() -> 1..255 | <a href="#t:t/0">t</a>().]
@@ -234,9 +263,19 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|foo() -> <a href="https://erlang.org/doc/man/sets.html#type-set">sets:set</a>().|
     end
 
+    test "OTP private type", c do
+      assert autolink_spec(~S"-spec foo() -> array:array_indx().", c) ==
+               ~s|foo() -> <a href="https://erlang.org/doc/man/array.html#type-array_indx">array:array_indx</a>().|
+    end
+
     test "skip typespec name", c do
       assert autolink_spec(~S"-spec t() -> t().", c) ==
                ~s|t() -> <a href="#t:t/0">t</a>().|
+    end
+
+    test "same spec and type name", c do
+      assert autolink_spec(~S"-spec t(t()) -> t().", c) ==
+               ~s|t(<a href="#t:t/0">t</a>()) -> <a href="#t:t/0">t</a>().|
     end
 
     test "non-standard name", c do
@@ -248,7 +287,7 @@ defmodule ExDoc.Language.ErlangTest do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_spec(~S"-spec foo() -> bad:bad(atom()).", c) ==
                         ~s|foo() -> bad:bad(atom()).|
-             end) =~ ~r{references "bad:bad/1" but it is undefined or private}
+             end) =~ ~r{references type "bad:bad/1" but it is undefined or private}
     end
   end
 
@@ -258,6 +297,11 @@ defmodule ExDoc.Language.ErlangTest do
 
     doc
     |> ExDoc.DocAST.parse!("application/erlang+html")
+    |> do_autolink_doc(opts)
+  end
+
+  defp do_autolink_doc(doc, opts \\ []) do
+    doc
     |> ExDoc.Language.Erlang.autolink_doc(opts)
     |> ExDoc.DocAST.to_string()
   end

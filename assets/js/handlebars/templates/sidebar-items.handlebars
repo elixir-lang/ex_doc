@@ -13,12 +13,12 @@
     to the top of the page itself. }}
     <a href="{{node.id}}.html" class="expand">
       {{#if node.nested_title}}
-        {{node.nested_title}}
+        {{{node.nested_title}}}
       {{else}}
-        {{node.title}}
+        {{{node.title}}}
       {{/if}}
 
-      <span class="icon-goto" title="Go to {{node.title}}"></span>
+      <span class="icon-goto" title="Go to {{{node.title}}}"></span>
     </a>
 
     <ul>

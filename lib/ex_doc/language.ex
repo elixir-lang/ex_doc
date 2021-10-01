@@ -131,6 +131,15 @@ defmodule ExDoc.Language do
               opts: keyword()
             }
 
-  def get(:elixir), do: ExDoc.Language.Elixir
-  def get(:erlang), do: ExDoc.Language.Erlang
+  def get(:elixir, _module), do: {:ok, ExDoc.Language.Elixir}
+  def get(:erlang, _module), do: {:ok, ExDoc.Language.Erlang}
+
+  def get(language, module) when is_atom(language) and is_atom(module) do
+    IO.warn(
+      "skipping module #{module}, reason: unsupported language (#{language})",
+      []
+    )
+
+    :error
+  end
 end

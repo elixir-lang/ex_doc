@@ -1,9 +1,26 @@
 # Changelog
 
+## v0.25.3 (2021-09-21)
+
+  * Enhancements
+    * Track user preference for sidebar state
+
+  * Bug fixes
+    * Do not double escape page titles on the sidebar
+    * Do not fail when documenting cover compiled modules
+    * Don't crash upon doc chunks for unknown beam languages
+
+## v0.25.2 (2021-09-02)
+
+  * Enhancements
+    * Add support for Livebook's `.livemd` Markdown files
+    * Preload all applications starting with `makeup_` before doc generation
+    * Add Hex package config and display "Find on Hex" footer links
+
 ## v0.25.1 (2021-08-02)
 
   * Enhancements
-    * Group callbacks
+    * Supporting grouping of callbacks
     * Use shell lexer for code blocks with no language and starting with `$ `
 
   * Bug fixes

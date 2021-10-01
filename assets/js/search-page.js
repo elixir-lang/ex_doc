@@ -90,7 +90,7 @@ function createIndex () {
     this.field('doc')
     this.metadataWhitelist = ['position']
     this.pipeline.remove(lunr.stopWordFilter)
-    this.use(snakeCaseSplitter)
+    this.use(elixirTokenSplitter)
 
     searchNodes.forEach(searchNode => {
       this.add(searchNode)
@@ -113,24 +113,24 @@ function titleExtractor (document) {
   return title
 }
 
-function snakeCaseSplitter (builder) {
-  function snakeCaseFunction (token) {
-    const snakeTokens = token
+function elixirTokenSplitter (builder) {
+  function elixirTokenFunction (token) {
+    const tokens = token
       .toString()
-      .split('_')
+      .split(/\.|\/|_/)
       .map(part => {
         return token.clone().update(() => part)
       })
 
-    if (snakeTokens.length > 1) {
-      return [...snakeTokens, token]
+    if (tokens.length > 1) {
+      return [...tokens, token]
     }
 
-    return snakeTokens
+    return tokens
   }
 
-  lunr.Pipeline.registerFunction(snakeCaseFunction, 'snakeCaseSplitter')
-  builder.pipeline.before(lunr.stemmer, snakeCaseFunction)
+  lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
+  builder.pipeline.before(lunr.stemmer, elixirTokenFunction)
 }
 
 function searchResultsToDecoratedSearchNodes (results) {

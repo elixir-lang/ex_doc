@@ -121,7 +121,7 @@ For example, here are some acceptable values:
 
 ## Using ExDoc with Erlang projects
 
-To use ExDoc with Erlang projects you need to do the following:
+ExDoc is capable of generating documentation from Erlang's `edoc` annotations through the following steps:
 
 1. Use Erlang/OTP 24+
 
@@ -140,7 +140,7 @@ To use ExDoc with Erlang projects you need to do the following:
 3. Install ExDoc escript:
 
    ```bash
-   $ mix escript.install github elixir-lang/ex_doc
+   $ mix escript.install hex ex_doc
    $ ex_doc --version
    ```
 
@@ -178,7 +178,7 @@ To use ExDoc with Erlang projects you need to do the following:
 
 ## Auto-linking
 
-ExDoc will automatically generate links across modules and functions if you enclose them in backticks:
+ExDoc for Elixir will automatically generate links across modules and functions if you enclose them in backticks:
 
   * By referring to a module, function, type or callback from your project, such as `` `MyModule` ``, ExDoc will automatically link to those
   * By referring to a module, function, type or callback from Elixir, such as `` `String` ``, ExDoc will automatically link to Elixir's stable documentation

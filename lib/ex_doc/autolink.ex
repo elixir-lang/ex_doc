@@ -74,41 +74,49 @@ defmodule ExDoc.Autolink do
   end
 
   defp app(module) do
-    case :application.get_application(module) do
-      {:ok, app} ->
-        app
-
-      _ ->
-        path = :code.which(module)
-
-        with true <- is_list(path),
-             [_, "ebin", app, "lib" | _] <- path |> Path.split() |> Enum.reverse() do
-          String.to_atom(app)
-        else
-          _ -> nil
-        end
-    end
+    {_, app} = app_info(module)
+    app
   end
 
   @doc false
-  def tool(module) do
+  def tool(module, config) do
     if match?("Elixir." <> _, Atom.to_string(module)) do
       :ex_doc
     else
-      case :code.which(module) do
-        :preloaded ->
-          :otp
+      {otp, app} = app_info(module)
+      apps = Enum.uniq(config.apps ++ Keyword.keys(config.deps))
 
-        :non_existing ->
-          :no_tool
-
-        path ->
-          if :string.prefix(path, :code.lib_dir()) != :nomatch do
-            :otp
-          else
-            :ex_doc
-          end
+      if otp == true and app not in apps do
+        :otp
+      else
+        :ex_doc
       end
+    end
+  end
+
+  defp app_info(module) do
+    case :code.which(module) do
+      :preloaded ->
+        {true, :erts}
+
+      maybe_path ->
+        otp? = is_list(maybe_path) and List.starts_with?(maybe_path, :code.lib_dir())
+
+        app =
+          case :application.get_application(module) do
+            {:ok, app} ->
+              app
+
+            _ ->
+              with true <- is_list(maybe_path),
+                   [_, "ebin", app, "lib" | _] <- maybe_path |> Path.split() |> Enum.reverse() do
+                String.to_atom(app)
+              else
+                _ -> nil
+              end
+          end
+
+        {otp?, app}
     end
   end
 
@@ -183,7 +191,7 @@ defmodule ExDoc.Autolink do
          %{original_text: original_text}
        ) do
     message =
-      "documentation references \"#{original_text}\" but it is " <>
+      "documentation references #{kind} \"#{original_text}\" but it is " <>
         format_visibility(visibility, kind)
 
     warn(message, {file, line}, id)

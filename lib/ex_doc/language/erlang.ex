@@ -6,10 +6,11 @@ defmodule ExDoc.Language.Erlang do
   alias ExDoc.{Autolink, Refs}
 
   @impl true
+  # TODO: Move :hidden handling to retriever, as it is shared across all BEAM languages
   def module_data(module, docs_chunk, _config) do
     {:docs_v1, _, _, _, doc, _, _} = docs_chunk
 
-    if is_map(doc) do
+    if doc != :hidden do
       module_data(module, docs_chunk)
     else
       :skip
@@ -46,7 +47,7 @@ defmodule ExDoc.Language.Erlang do
   def function_data(entry, module_data) do
     {{kind, name, arity}, _anno, _signature, doc_content, _metadata} = entry
 
-    if kind == :function and is_map(doc_content) do
+    if kind == :function and doc_content != :hidden do
       function_data(name, arity, doc_content, module_data)
     else
       :skip
@@ -97,17 +98,25 @@ defmodule ExDoc.Language.Erlang do
 
   @impl true
   def type_data(entry, module_data) do
-    {{_kind, name, arity}, _anno, signature, _doc, _metadata} = entry
+    {{kind, name, arity}, anno, signature, _doc, _metadata} = entry
 
-    %{type: type, spec: spec, line: line} =
-      ExDoc.Language.Elixir.type_from_module_data(module_data, name, arity)
+    case ExDoc.Language.Elixir.type_from_module_data(module_data, name, arity) do
+      %{} = map ->
+        %{
+          type: map.type,
+          line: map.line,
+          spec: {:attribute, 0, map.type, map.spec},
+          signature: signature
+        }
 
-    %{
-      type: type,
-      line: line,
-      spec: {:attribute, 0, type, spec},
-      signature: signature
-    }
+      nil ->
+        %{
+          type: kind,
+          line: anno_line(anno),
+          spec: nil,
+          signature: signature
+        }
+    end
   end
 
   @impl true
@@ -164,11 +173,15 @@ defmodule ExDoc.Language.Erlang do
 
   @doc false
   def get_abstract_code(module) do
-    {^module, binary, _file} = :code.get_object_code(module)
+    case :code.get_object_code(module) do
+      {^module, binary, _file} ->
+        case :beam_lib.chunks(binary, [:abstract_code]) do
+          {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} -> abstract_code
+          _otherwise -> []
+        end
 
-    case :beam_lib.chunks(binary, [:abstract_code]) do
-      {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} -> abstract_code
-      _otherwise -> []
+      :error ->
+        []
     end
   end
 
@@ -208,49 +221,54 @@ defmodule ExDoc.Language.Erlang do
   defp walk_doc({:a, attrs, inner, _meta} = ast, config) do
     case attrs[:rel] do
       "https://erlang.org/doc/link/seeerl" ->
-        case String.split(attrs[:href], ":") do
-          [_] ->
-            autolink(:module, attrs[:href], inner, config)
+        {fragment, url} = extract_fragment(attrs[:href] || "")
+
+        case String.split(url, ":") do
+          [module] ->
+            autolink(:module, module, fragment, inner, config)
 
           [app, module] ->
-            autolink_app({:module, app, module}, config)
+            inner = strip_app(inner, app)
+            autolink(:module, module, fragment, inner, config)
 
           _ ->
-            # TODO investigate building OTP docs
-            ast
+            warn_ref(attrs[:href], config)
+            inner
         end
 
       "https://erlang.org/doc/link/seemfa" ->
-        case String.split(attrs[:href], ":") do
-          [_] ->
-            autolink(:function, attrs[:href], inner, config)
+        {kind, url} =
+          case String.split(attrs[:href], "Module:") do
+            [url] -> {:function, url}
+            [left, right] -> {:callback, left <> right}
+          end
+
+        case String.split(url, ":") do
+          [mfa] ->
+            autolink(kind, mfa, "", inner, config)
 
           [app, mfa] ->
-            autolink_app({:function, app, mfa}, config)
-
-          _ ->
-            # TODO investigate building OTP docs
-            ast
+            inner = strip_app(inner, app)
+            autolink(kind, mfa, "", inner, config)
         end
 
       "https://erlang.org/doc/link/seetype" ->
         case String.split(attrs[:href], ":") do
-          [_] ->
-            autolink(:type, attrs[:href], inner, config)
+          [type] ->
+            autolink(:type, type, "", inner, config)
 
-          [app, mfa] ->
-            autolink_app({:type, app, mfa}, config)
+          [app, type] ->
+            inner = strip_app(inner, app)
+            autolink(:type, type, "", inner, config)
         end
 
-      "https://erlang.org/doc/link/seeapp" ->
-        case String.split(attrs[:href], ":") do
-          [app, "index"] ->
-            autolink_app({:app, app}, config)
-
-          _ ->
-            # TODO investigate building OTP docs
-            ast
+      "https://erlang.org/doc/link/" <> see ->
+        # TODO: remove me before release
+        unless System.get_env("SKIP_SEE_WARNING") do
+          warn_ref(attrs[:href] <> " (#{see})", config)
         end
+
+        inner
 
       _ ->
         ast
@@ -261,36 +279,33 @@ defmodule ExDoc.Language.Erlang do
     {tag, attrs, walk_doc(ast, config), meta}
   end
 
-  defp autolink_app({:app, app}, config) do
-    message = "application references are not supported: //#{app}"
-    Autolink.maybe_warn(message, config, nil, %{})
-    {:code, [], [app], %{}}
+  defp extract_fragment(url) do
+    case String.split(url, "#", parts: 2) do
+      [url] -> {"", url}
+      [url, fragment] -> {"#" <> fragment, url}
+    end
   end
 
-  defp autolink_app({:module, app, module}, config) do
-    message = "application references are not supported: //#{app}/#{module}"
-    Autolink.maybe_warn(message, config, nil, %{})
-    {:code, [], [module], %{}}
+  defp strip_app([{:code, attrs, [code], meta}], app) do
+    [{:code, attrs, strip_app(code, app), meta}]
   end
 
-  defp autolink_app({:function, app, mfa}, config) do
-    mfa = String.replace(mfa, "#", ":")
-    message = "application references are not supported: //#{app}/#{mfa}"
-    Autolink.maybe_warn(message, config, nil, %{})
-    {:code, [], [mfa], %{}}
+  defp strip_app(code, app) when is_binary(code) do
+    String.trim_leading(code, "//#{app}/")
   end
 
-  defp autolink_app({:type, app, mfa}, config) do
-    mfa = String.replace(mfa, "#", ":")
-    mfa = String.trim_trailing(mfa, "/0") <> "()"
-    message = "application references are not supported: //#{app}/#{mfa}"
-    Autolink.maybe_warn(message, config, nil, %{})
-    {:code, [], [mfa], %{}}
+  defp strip_app(other, _app) do
+    other
   end
 
-  defp autolink(kind, string, inner, config) do
+  defp warn_ref(href, config) do
+    message = "invalid reference: #{href}"
+    Autolink.maybe_warn(message, config, nil, %{})
+  end
+
+  defp autolink(kind, string, fragment, inner, config) do
     if url = url(kind, string, config) do
-      {:a, [href: url], inner, %{}}
+      {:a, [href: url <> fragment], inner, %{}}
     else
       inner
     end
@@ -302,12 +317,23 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp url(kind, string, config) do
-    [module, name, arity] = String.split(string, ["#", "/"])
+    [module, name, arity] =
+      case String.split(string, ["#", "/"]) do
+        [module, name, arity] ->
+          [module, name, arity]
+
+        # this is what docgen_xml_to_chunk returns
+        [module, name] when kind == :type ->
+          # TODO: don't assume 0-arity, instead find first {:type, module, name, arity} ref
+          # and use that arity.
+          [module, name, "0"]
+      end
+
     name = String.to_atom(name)
     arity = String.to_integer(arity)
 
     original_text =
-      if kind == :type do
+      if kind == :type and arity == 0 do
         "#{name}()"
       else
         "#{name}/#{arity}"
@@ -333,7 +359,9 @@ defmodule ExDoc.Language.Erlang do
   defp do_url(ref, original_text, config) do
     visibility = Refs.get_visibility(ref)
 
-    if visibility == :public do
+    # TODO: type with content = %{} in otp xml is marked as :hidden, it should be :public
+
+    if visibility == :public or (visibility == :hidden and elem(ref, 0) == :type) do
       final_url(ref, config)
     else
       Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
@@ -342,7 +370,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp final_url({:module, module}, config) do
-    tool = Autolink.tool(module)
+    tool = Autolink.tool(module, config)
     Autolink.app_module_url(tool, module, config)
   end
 
@@ -351,24 +379,34 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp final_url({kind, module, name, arity}, config) do
-    tool = Autolink.tool(module)
+    tool = Autolink.tool(module, config)
     module_url = Autolink.app_module_url(tool, module, config)
-    module_url && module_url <> fragment(tool, kind, name, arity)
+    # TODO: fix me
+    module_url = String.trim_trailing(module_url, "#content")
+    module_url <> fragment(tool, kind, name, arity)
   end
 
   defp fragment(:otp, :function, name, arity) do
     "##{name}-#{arity}"
   end
 
+  defp fragment(:otp, :callback, name, arity) do
+    "#Module:#{name}-#{arity}"
+  end
+
   defp fragment(:otp, :type, name, _arity) do
     "#type-#{name}"
   end
 
-  defp fragment(_, :function, name, arity) do
+  defp fragment(:ex_doc, :function, name, arity) do
     "##{name}/#{arity}"
   end
 
-  defp fragment(_, :type, name, arity) do
+  defp fragment(:ex_doc, :callback, name, arity) do
+    "#c:#{name}/#{arity}"
+  end
+
+  defp fragment(:ex_doc, :type, name, arity) do
     "#t:#{name}/#{arity}"
   end
 
@@ -443,7 +481,10 @@ defmodule ExDoc.Language.Erlang do
               {other, acc}
           end)
 
-        acc |> Enum.reverse() |> Enum.drop(1)
+        acc
+        |> Enum.reverse()
+        # drop the name of the typespec
+        |> Enum.drop(1)
       end
       |> Enum.concat()
 
@@ -452,13 +493,18 @@ defmodule ExDoc.Language.Erlang do
     # Drop and re-add type name (it, the first element in acc, is dropped there too)
     #
     #     1. foo() :: bar()
-    #     2.     ) :: bar()
-    #     3.     ) :: <a>bar</a>()
+    #     2.    () :: bar()
+    #     3.    () :: <a>bar</a>()
     #     4. foo() :: <a>bar</a>()
     name = pp(name)
-    formatted = String.trim_leading(formatted, name <> "(")
+    formatted = trim_name(formatted, name)
     formatted = replace(formatted, acc, config)
-    name <> "(" <> formatted
+    name <> formatted
+  end
+
+  defp trim_name(string, name) do
+    name_size = byte_size(name)
+    binary_part(string, name_size, byte_size(string) - name_size)
   end
 
   defp replace(formatted, [], _config) do
@@ -484,7 +530,7 @@ defmodule ExDoc.Language.Erlang do
           {name, arity} ->
             visibility = Refs.get_visibility({:type, config.current_module, name, arity})
 
-            if visibility == :public do
+            if visibility in [:public, :hidden] do
               final_url({:type, name, arity}, config)
             end
 
@@ -492,7 +538,7 @@ defmodule ExDoc.Language.Erlang do
             ref = {:type, module, name, arity}
             visibility = Refs.get_visibility(ref)
 
-            if visibility == :public do
+            if visibility in [:public, :hidden] do
               final_url(ref, config)
             else
               original_text = "#{string}/#{arity}"
