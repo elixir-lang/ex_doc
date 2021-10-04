@@ -73,18 +73,58 @@ a.view-source {
 
 blockquote {
   font-style: italic;
-  margin: .5em 0;
-  padding: .25em 1.5em;
   border-left: 3px solid @gray;
-  display: inline-block;
+  position: relative;
+  margin: 1.5625em 0;
+  padding: 0 1.2rem;
+  font-size: 1.28rem;
+  overflow: auto;
+  background-color: #f6f6f6;
+  border-radius: 3px;
 
   *:first-child {
-    padding-top: 0;
-    margin-top: 0;
+    margin: 0 -1.2rem;
+    padding: 0.8rem 1.2rem 0.8rem 4rem;
+    font-weight: 700;
+
+    &::before {
+      position: absolute;
+      left: 1.2rem;
+      font-size: 2rem;
+
+      .icon-elem
+    }
+
+    &.warning {
+      background-color: rgba(255, 145, 0, 0.1);
+
+      &::before {
+        color: #ff9100;
+        content: "\ea07";
+      }
+    }
+
+    &.info {
+      background-color: rgba(0, 184, 212, 0.1);
+
+      &::before {
+        color: #00b8d4;
+        content: "\ea0c";
+      }
+    }
+
+    &.error {
+      background-color: rgba(255, 23, 68, 0.1);
+
+      &::before {
+        color: #ff1744;
+        content: "\e999";
+      }
+    }
   }
 
   *:last-child {
-    padding-bottom: 0;
+    padding-bottom: 1em;
     margin-bottom: 0;
   }
 }

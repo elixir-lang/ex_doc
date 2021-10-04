@@ -246,11 +246,30 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> elem(0)
   end
 
+  @class_regex ~r/class="([^"]+)/
+  @class_separator " "
   defp link_heading(match, _tag, _title, "", _prefix), do: match
 
-  defp link_heading(_match, tag, title, id, prefix) do
+  defp link_heading(match, tag, title, id, prefix) do
+    section_header_class_name = "section-heading"
+
+    class_attribute =
+      case Regex.run(@class_regex, match, capture: :all_but_first) do
+        nil ->
+          section_header_class_name
+
+        [previous_classes] ->
+          # Let's make sure that the `section_header_class_name` is not already
+          # included in the previous classes for the header
+          previous_classes
+          |> String.split(@class_separator)
+          |> Enum.reject(&(&1 == section_header_class_name))
+          |> Enum.join(@class_separator)
+          |> Kernel.<>(" #{section_header_class_name}")
+      end
+
     """
-    <#{tag} id="#{prefix}#{id}" class="section-heading">
+    <#{tag} id="#{prefix}#{id}" class="#{class_attribute}">
       <a href="##{prefix}#{id}" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       #{title}
     </#{tag}>
