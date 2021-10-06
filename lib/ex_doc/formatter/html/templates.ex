@@ -246,7 +246,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> elem(0)
   end
 
-  @class_regex ~r/class="([^"]+)/
+  @class_regex ~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/
   @class_separator " "
   defp link_heading(match, _tag, _title, "", _prefix), do: match
 
@@ -254,11 +254,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
     section_header_class_name = "section-heading"
 
     class_attribute =
-      case Regex.run(@class_regex, match, capture: :all_but_first) do
-        nil ->
+      case Regex.named_captures(@class_regex, match) do
+        %{"class" => ""} ->
           section_header_class_name
 
-        [previous_classes] ->
+        %{"class" => previous_classes} ->
           # Let's make sure that the `section_header_class_name` is not already
           # included in the previous classes for the header
           previous_classes
