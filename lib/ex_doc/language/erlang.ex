@@ -52,7 +52,7 @@ defmodule ExDoc.Language.Erlang do
     # TODO: Edoc on Erlang/OTP24.1+ includes private functions in
     # the chunk, so we manually yank them out for now.
     if kind == :function and doc_content != :hidden and
-        function_exported?(module_data.module, name, arity) do
+         function_exported?(module_data.module, name, arity) do
       function_data(name, arity, doc_content, module_data)
     else
       :skip
