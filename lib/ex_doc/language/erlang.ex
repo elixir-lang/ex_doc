@@ -18,7 +18,9 @@ defmodule ExDoc.Language.Erlang do
   end
 
   def module_data(module, docs_chunk) do
-    ":" <> id = inspect(module)
+    # Make sure the module is loaded for future checks
+    _ = Code.ensure_loaded(module)
+    id = Atom.to_string(module)
     abst_code = get_abstract_code(module)
     line = find_module_line(module, abst_code)
     type = module_type(module)
@@ -47,7 +49,10 @@ defmodule ExDoc.Language.Erlang do
   def function_data(entry, module_data) do
     {{kind, name, arity}, _anno, _signature, doc_content, _metadata} = entry
 
-    if kind == :function and doc_content != :hidden do
+    # TODO: Edoc on Erlang/OTP24.1+ includes private functions in
+    # the chunk, so we manually yank them out for now.
+    if kind == :function and doc_content != :hidden and
+        function_exported?(module_data.module, name, arity) do
       function_data(name, arity, doc_content, module_data)
     else
       :skip
