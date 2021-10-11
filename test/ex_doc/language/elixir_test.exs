@@ -371,6 +371,16 @@ defmodule ExDoc.Language.ElixirTest do
                ~s[t() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()]
     end
 
+    # regression test for elixir-ecto/ecto#3756
+    test "Elixir type variable without restriction in anonymous function" do
+      assert autolink_spec(
+               quote do
+                 checkout(adapter_meta, config :: Keyword.t(), (() -> result)) :: result
+                 when result: var
+               end
+             ) == ~s[checkout(adapter_meta, config :: <a href="https://hexdocs.pm/elixir/Keyword.html#t:t/0">Keyword.t</a>(), (-&gt; result)) :: result when result: <a href="https://hexdocs.pm/elixir/typespecs.html#defining-a-specification">var</a>]
+    end
+
     test "Erlang stdlib types" do
       assert autolink_spec(quote(do: t() :: :sets.set())) ==
                ~s[t() :: <a href="https://erlang.org/doc/man/sets.html#type-set">:sets.set</a>()]
