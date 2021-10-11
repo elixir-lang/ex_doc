@@ -32,6 +32,12 @@ const predefinedHints = [{
     kind: HINT_KIND.plain,
     description: 'Built-in type'
   }
+}, {
+  href: 'typespecs.html#defining-a-specification',
+  hint: {
+    kind: HINT_KIND.plain,
+    description: 'No restriction'
+  }
 }]
 
 const state = {

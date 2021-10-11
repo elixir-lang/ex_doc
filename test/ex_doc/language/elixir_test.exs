@@ -273,6 +273,95 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_spec(quote(do: -0 :: 0)) == ~s[-0 :: 0]
     end
 
+    test "containers" do
+      ExDoc.Refs.insert([
+        {{:module, MyModule}, :public},
+        {{:type, MyModule, :t, 0}, :public},
+        {{:module, AutolinkTest.Foo}, :public},
+        {{:type, AutolinkTest.Foo, :t, 0}, :public}
+      ])
+
+      # tuples
+      assert autolink_spec(quote(do: foo() :: {t()})) == ~s[foo() :: {<a href="#t:t/0">t</a>()}]
+
+      assert autolink_spec(quote(do: foo() :: {AutolinkTest.Foo.t()})) ==
+               ~s[foo() :: {<a href="AutolinkTest.Foo.html#t:t/0">AutolinkTest.Foo.t</a>()}]
+
+      # 2-tuple are special in AST
+      assert autolink_spec(quote(do: foo() :: {AutolinkTest.Foo.t(), t()})) ==
+               ~s[foo() :: {<a href="AutolinkTest.Foo.html#t:t/0">AutolinkTest.Foo.t</a>(), <a href="#t:t/0">t</a>()}]
+
+      # lists
+      assert autolink_spec(quote(do: foo() :: [AutolinkTest.Foo.t(), t()])) ==
+               ~s|foo() :: [<a href="AutolinkTest.Foo.html#t:t/0">AutolinkTest.Foo.t</a>(), <a href="#t:t/0">t</a>()]|
+
+      assert autolink_spec(quote(do: foo() :: [AutolinkTest.Foo.t() | t()])) ==
+               ~s{foo() :: [<a href="AutolinkTest.Foo.html#t:t/0">AutolinkTest.Foo.t</a>() | <a href="#t:t/0">t</a>()]}
+
+      assert autolink_spec(quote(do: foo() :: [AutolinkTest.Foo.t() | t(), ...])) ==
+               ~s{foo() :: [<a href="AutolinkTest.Foo.html#t:t/0">AutolinkTest.Foo.t</a>() | <a href="#t:t/0">t</a>(), ...]}
+
+      # maps
+      # atom keys
+      assert autolink_spec(quote(do: foo() :: %{key: t(), "key needs quotes": t()})) ==
+               ~s[foo() :: %{key: <a href="#t:t/0">t</a>(), "key needs quotes": <a href="#t:t/0">t</a>()}]
+
+      # optionality with atom keys
+      assert autolink_spec(
+               quote(
+                 do: foo() :: %{optional(:optional_key) => t(), required(:required_key) => t()}
+               )
+             ) ==
+               ~s[foo() :: %{optional(:optional_key) =&gt; <a href="#t:t/0">t</a>(), required(:required_key) =&gt; <a href="#t:t/0">t</a>()}]
+
+      # type keys
+      assert autolink_spec(
+               quote(do: foo() :: %{AutolinkTest.Foo.t() => t(), t() => AutolinkTest.Foo.t()})
+             ) ==
+               ~s[foo() :: %{<a href="AutolinkTest.Foo.html#t:t/0">AutolinkTest.Foo.t</a>()) =&gt; <a href="#t:t/0">t</a>(), <a href="#t:t/0">t</a>()) =&gt; <a href="AutolinkTest.Foo.html#t:t/0">AutolinkTest.Foo.t</a>()}]
+    end
+
+    test "struct" do
+      ExDoc.Refs.insert([
+        {{:module, MyModule}, :public},
+        {{:type, MyModule, :t, 0}, :public},
+        {{:module, AutolinkTest.Foo}, :public},
+        {{:type, AutolinkTest.Foo, :t, 0}, :public}
+      ])
+
+      assert autolink_spec(quote(do: t() :: %__MODULE__{parent: t(), foo: AutolinkTest.Foo.t()})) ==
+               ~s[t() :: %__MODULE__{parent: <a href="#t:t/0">t</a>(), foo: <a href="AutolinkTest.Foo.html#t:t/0">AutolinkTest.Foo.t</a>()}]
+    end
+
+    test "bit syntax" do
+      assert autolink_spec(quote(do: t() :: <<>>)) == "t() :: &lt;&lt;&gt;&gt;"
+      assert autolink_spec(quote(do: t() :: <<_::0>>)) == "t() :: &lt;&lt;_::0&gt;&gt;"
+      assert autolink_spec(quote(do: t() :: <<_::_*1>>)) == "t() :: &lt;&lt;_::_*1&gt;&gt;"
+      assert autolink_spec(quote(do: t() :: <<_::1*2>>)) == "t() :: &lt;&lt;_::1*2&gt;&gt;"
+
+      assert autolink_spec(quote(do: t() :: <<_::1, _::_*2>>)) ==
+               "t() :: &lt;&lt;_::1, _::_*2&gt;&gt;"
+    end
+
+    test "anonymous function" do
+      ExDoc.Refs.insert([
+        {{:module, MyModule}, :public},
+        {{:type, MyModule, :input, 0}, :public},
+        {{:type, MyModule, :output, 0}, :public},
+        {{:type, MyModule, :first, 0}, :public},
+        {{:type, MyModule, :second, 0}, :public}
+      ])
+
+      assert autolink_spec(quote(do: t() :: (() -> output()))) ==
+               ~s[t() :: (-&gt; <a href="#t:output/0">output</a>())]
+
+      assert autolink_spec(quote(do: t() :: (input() -> output()))) ==
+               ~s[t() :: (<a href="#t:input/0">input</a>()-&gt; <a href="#t:output/0">output</a>())]
+
+      assert autolink_spec(quote(do: t() :: (first(), second() -> output()))) ==
+               ~s[t() :: (<a href="#t:first/0">first</a>(), <a href="#t:second/0">second</a>()-&gt; <a href="#t:output/0">output</a>())]
+    end
+
     test "locals" do
       ExDoc.Refs.insert([
         {{:module, MyModule}, :public},
@@ -369,6 +458,38 @@ defmodule ExDoc.Language.ElixirTest do
     test "Elixir built-in types" do
       assert autolink_spec(quote(do: t() :: keyword())) ==
                ~s[t() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">keyword</a>()]
+    end
+
+    test "Elixir type variable with no restriction" do
+      assert autolink_spec(
+               quote do
+                 function(arg) :: [arg] when arg: var
+               end
+             ) ==
+               ~s|function(arg) :: [arg] when arg: <a href="https://hexdocs.pm/elixir/typespecs.html#defining-a-specification">var</a>|
+    end
+
+    test "Elixir type variables with and without restrictions" do
+      ExDoc.Refs.insert([
+        {{:module, MyModule}, :public},
+        {{:type, MyModule, :t, 0}, :public}
+      ])
+
+      assert autolink_spec(
+               quote do
+                 function(arg1, arg2, arg3) :: arg1 | arg2 | arg3
+                 when arg1: t(), arg2: var, arg3: t()
+               end
+             ) ==
+               ~s'function(arg1, arg2, arg3) :: arg1 | arg2 | arg3 when arg1: <a href="#t:t/0">t</a>(), arg2: <a href="https://hexdocs.pm/elixir/typespecs.html#defining-a-specification">var</a>, arg3: <a href="#t:t/0">t</a>()'
+    end
+
+    test "Elixir type variable with nest var is not linked as no restriction" do
+      assert autolink_spec(
+               quote do
+                 function(arg) :: [arg] when arg: %{var: var}
+               end
+             ) == ~s|function(arg) :: [arg] when arg: %{var: var}|
     end
 
     # regression test for elixir-ecto/ecto#3756

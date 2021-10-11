@@ -182,17 +182,226 @@ defmodule ExDoc.Language.Elixir do
     config = struct!(Autolink, opts)
 
     # TODO: re-use ExDoc.Language.Erlang.autolink_spec/2
+    autolink_restrictable_spec(ast, config)
+  end
 
-    string =
-      ast
-      |> Macro.to_string()
-      |> safe_format_string!()
-      |> T.h()
+  defp autolink_restrictable_spec({:when, _, [restricted, restrictions]}, config) do
+    autolink_restricted_spec(restricted, config) <>
+      " when " <> autolink_spec_restrictions(restrictions, config)
+  end
 
-    name = typespec_name(ast)
-    {name, rest} = split_name(string, name)
+  defp autolink_restrictable_spec(ast, config) do
+    autolink_restricted_spec(ast, config)
+  end
 
-    name <> do_typespec(rest, config)
+  defp autolink_restricted_spec({:"::", _, [head, body]}, config) do
+    autolink_spec_head(head, config) <> " :: " <> autolink_spec_body(body, config)
+  end
+
+  defp autolink_restricted_spec(head, config) do
+    autolink_spec_head(head, config)
+  end
+
+  defp autolink_spec_head({unary_operator, _, [operand]}, config)
+       when unary_operator in [:+, :-] do
+    Atom.to_string(unary_operator) <> autolink_spec_body(operand, config)
+  end
+
+  defp autolink_spec_head({binary_operator, _, [left, right]}, config)
+       when binary_operator in [:+, :-, :<, :<=, :>=, :>] do
+    "#{autolink_spec_body(left, config)} #{T.h(Atom.to_string(binary_operator))} #{autolink_spec_body(right, config)}"
+  end
+
+  defp autolink_spec_head({name, _, parameters}, config)
+       when is_atom(name) and is_list(parameters) do
+    "#{autolink_spec_name(name, config)}(#{autolink_spec_arguments(parameters, config)})"
+  end
+
+  defp autolink_spec_name(atom, _config) when is_atom(atom) do
+    Atom.to_string(atom)
+  end
+
+  # variable :: type
+  defp autolink_spec_body({:"::", _, [{name, _, context}, body]}, config)
+       when is_atom(name) and is_atom(context) do
+    "#{name} :: #{autolink_spec_body(body, config)}"
+  end
+
+  # alternation
+  defp autolink_spec_body({:|, _, [left, right]}, config) do
+    "#{autolink_spec_body(left, config)} | #{autolink_spec_body(right, config)}"
+  end
+
+  # bitstring
+  defp autolink_spec_body({:<<>>, _, _} = ast, _config) do
+    ast
+    |> Macro.to_string()
+    |> T.h()
+  end
+
+  # two element tuples
+  defp autolink_spec_body({first, second}, config) do
+    "{#{autolink_spec_body(first, config)}, #{autolink_spec_body(second, config)}}"
+  end
+
+  # tuples
+  defp autolink_spec_body({:{}, _, elements}, config) do
+    "{#{autolink_spec_arguments(elements, config)}}"
+  end
+
+  # map
+  defp autolink_spec_body({:%{}, _, entries}, config) do
+    "%{#{autolink_spec_map_entries(entries, config)}}"
+  end
+
+  # struct
+  defp autolink_spec_body({:%, _, [struct_name, map]}, config) do
+    {:%{}, _, args} = map
+
+    "%" <>
+      autolink_spec_body(struct_name, config) <>
+      "{" <> autolink_spec_map_entries(args, config) <> "}"
+  end
+
+  defp autolink_spec_body([{:->, _, _} | _] = ast, config) do
+    "(#{autolink_spec_arrow(ast, config)})"
+  end
+
+  # list
+  defp autolink_spec_body(list, config) when is_list(list) do
+    "[#{autolink_spec_list_elements(list, config)}]"
+  end
+
+  defp autolink_spec_body({:__aliases__, _, refs}, _config) do
+    Enum.map_join(refs, ".", &Atom.to_string/1)
+  end
+
+  # local type
+  defp autolink_spec_body({name, _, arguments}, config)
+       when is_atom(name) and is_list(arguments) do
+    arity = length(arguments)
+    name_string = Atom.to_string(name)
+    original_text = name_string <> "()"
+    url = local_url(:type, name, arity, config, original_text)
+
+    html_escaped_name = T.h(name_string)
+    autolink_spec_call(html_escaped_name, url, arguments, config)
+  end
+
+  # remote type
+  defp autolink_spec_body({{:., _, [qualifier, relative]}, _, arguments}, config) do
+    arity = length(arguments)
+    name_string = "#{Macro.to_string(qualifier)}.#{Code.Identifier.inspect_as_function(relative)}"
+    original_text = name_string <> "()"
+    html_escaped_name = T.h(name_string)
+
+    module = qualifier_to_module(qualifier)
+    url = remote_url({:type, module, relative, arity}, config, original_text)
+
+    autolink_spec_call(html_escaped_name, url, arguments, config)
+  end
+
+  defp autolink_spec_body(ast, _config) do
+    ast
+    |> Macro.to_string()
+    |> T.h()
+  end
+
+  defp autolink_spec_arrow(pairs, config) do
+    Enum.map_join(pairs, "; ", fn {:->, _, [left, right]} ->
+      left_string = comma_join_or_empty(left, config)
+      left_string <> "-&gt; " <> autolink_spec_body(right, config)
+    end)
+  end
+
+  defp comma_join_or_empty([], _config), do: ""
+
+  defp comma_join_or_empty(left, config) do
+    Enum.map_join(left, ", ", &autolink_spec_body(&1, config))
+  end
+
+  defp autolink_spec_map_entries(entries, config) when is_list(entries) do
+    cond do
+      Inspect.List.keyword?(entries) -> autolink_spec_keyword_list(entries, config)
+      true -> autolink_spec_map_list(entries, config)
+    end
+  end
+
+  defp autolink_spec_list_elements(elements, config) do
+    cond do
+      Inspect.List.keyword?(elements) -> autolink_spec_keyword_list(elements, config)
+      true -> autolink_spec_arguments(elements, config)
+    end
+  end
+
+  defp autolink_spec_keyword_list(keywords, config) do
+    Enum.map_join(keywords, ", ", &autolink_spec_keyword_pair(&1, config))
+  end
+
+  defp autolink_spec_keyword_pair({key, value}, config) do
+    Code.Identifier.inspect_as_key(key) <> " " <> autolink_spec_body(value, config)
+  end
+
+  defp autolink_spec_map_list(entries, config) do
+    Enum.map_join(entries, ", ", &autolink_spec_map_entry(&1, config))
+  end
+
+  # with optionality
+  defp autolink_spec_map_entry({{optionality, _, [key]}, value}, config)
+       when optionality in [:required, :optional] do
+    "#{optionality}(#{autolink_spec_body(key, config)}) =&gt; #{autolink_spec_body(value, config)}"
+  end
+
+  # without optionality
+  defp autolink_spec_map_entry({key, value}, config) do
+    "#{autolink_spec_body(key, config)}) =&gt; #{autolink_spec_body(value, config)}"
+  end
+
+  defp autolink_spec_call(html_escaped_name, url, arguments, config) do
+    linked_name =
+      if url do
+        ~s[<a href="#{url}">#{html_escaped_name}</a>]
+      else
+        html_escaped_name
+      end
+
+    "#{linked_name}(#{autolink_spec_arguments(arguments, config)})"
+  end
+
+  defp qualifier_to_module(atom) when is_atom(atom), do: atom
+
+  defp qualifier_to_module({:__aliases__, _, parts}) do
+    Module.concat(parts)
+  end
+
+  def autolink_spec_arguments(arguments, config) when is_list(arguments) do
+    Enum.map_join(arguments, ", ", &autolink_spec_body(&1, config))
+  end
+
+  defp autolink_spec_restrictions(restrictions, config) when is_list(restrictions) do
+    Enum.map_join(restrictions, ", ", &autolink_spec_restriction(&1, config))
+  end
+
+  defp autolink_spec_restriction({type_variable, type_restriction}, config)
+       when is_atom(type_variable) do
+    "#{type_variable}: #{autolink_spec_type_restriction(type_restriction, config)}"
+  end
+
+  defp autolink_spec_type_restriction({:var, _, context}, config) when is_atom(context) do
+    url =
+      Autolink.ex_doc_app_url(
+        Kernel,
+        config,
+        "typespecs",
+        config.ext,
+        "#defining-a-specification"
+      )
+
+    ~s[<a href="#{url}">var</a>]
+  end
+
+  defp autolink_spec_type_restriction(type_restriction, config) do
+    autolink_spec_body(type_restriction, config)
   end
 
   @impl true
@@ -667,93 +876,6 @@ defmodule ExDoc.Language.Elixir do
 
     url
   end
-
-  defp safe_format_string!(string) do
-    try do
-      string
-      |> Code.format_string!(line_length: 80)
-      |> IO.iodata_to_binary()
-    rescue
-      _ -> string
-    end
-  end
-
-  defp typespec_name({:"::", _, [{name, _, _}, _]}), do: Atom.to_string(name)
-  defp typespec_name({:when, _, [left, _]}), do: typespec_name(left)
-  defp typespec_name({name, _, _}) when is_atom(name), do: Atom.to_string(name)
-
-  # extract out function name so we don't process it. This is to avoid linking it when there's
-  # a type with the same name
-  defp split_name(string, name) do
-    if String.starts_with?(string, name) do
-      {name, binary_part(string, byte_size(name), byte_size(string) - byte_size(name))}
-    else
-      {"", string}
-    end
-  end
-
-  defp do_typespec(string, config) do
-    regex = ~r{
-        (                                             # <call_string>
-          (?:
-            (                                         # <module_string>
-              (?:
-                \:[a-z][_a-zA-Z0-9]*                  # Erlang module
-              )|
-              (?:
-                [A-Z][_a-zA-Z0-9]*                    # Elixir module
-                (?:\.[A-Z][_a-zA-Z0-9]*)*             # Elixir submodule
-              )
-            )                                         # </module_string>
-            \.                                        # Dot operator
-          )?
-          ([a-z_][_a-zA-Z0-9]*[\?\!]?)                # Name <name_string />
-        )                                             # </call_string>
-        (\(.*\))                                      # Arguments <rest />
-      }x
-
-    Regex.replace(regex, string, fn _all, call_string, module_string, name_string, rest ->
-      module = string_to_module(module_string)
-      name = String.to_atom(name_string)
-      arity = count_args(rest, 0, 0)
-      original_text = call_string <> "()"
-
-      url =
-        if module do
-          remote_url({:type, module, name, arity}, config, original_text)
-        else
-          local_url(:type, name, arity, config, original_text)
-        end
-
-      if url do
-        ~s[<a href="#{url}">#{T.h(call_string)}</a>]
-      else
-        call_string
-      end <> do_typespec(rest, config)
-    end)
-  end
-
-  defp string_to_module(""), do: nil
-
-  defp string_to_module(string) do
-    if String.starts_with?(string, ":") do
-      string |> String.trim_leading(":") |> String.to_atom()
-    else
-      Module.concat([string])
-    end
-  end
-
-  defp count_args("()" <> _, 0, 0), do: 0
-  defp count_args("(" <> rest, counter, acc), do: count_args(rest, counter + 1, acc)
-  defp count_args("[" <> rest, counter, acc), do: count_args(rest, counter + 1, acc)
-  defp count_args("{" <> rest, counter, acc), do: count_args(rest, counter + 1, acc)
-  defp count_args(")" <> _, 1, acc), do: acc + 1
-  defp count_args(")" <> rest, counter, acc), do: count_args(rest, counter - 1, acc)
-  defp count_args("]" <> rest, counter, acc), do: count_args(rest, counter - 1, acc)
-  defp count_args("}" <> rest, counter, acc), do: count_args(rest, counter - 1, acc)
-  defp count_args("," <> rest, 1, acc), do: count_args(rest, 1, acc + 1)
-  defp count_args(<<_>> <> rest, counter, acc), do: count_args(rest, counter, acc)
-  defp count_args("", _counter, acc), do: acc
 
   ## Internals
 
