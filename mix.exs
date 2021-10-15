@@ -31,7 +31,7 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [
-      {:earmark_parser, "~> 1.4.0"},
+      {:earmark_parser, "~> 1.4"},
       {:makeup_elixir, "~> 0.14"},
       {:makeup_erlang, "~> 0.1"},
       {:excoveralls, "~> 0.3", only: :test},
