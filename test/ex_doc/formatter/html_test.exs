@@ -39,13 +39,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       source_beam: beam_dir(),
       source_url: "https://github.com/elixir-lang/elixir",
       logo: "test/fixtures/elixir.png",
-      extras: [
-        "test/fixtures/LICENSE",
-        "test/fixtures/PlainText.txt",
-        "test/fixtures/PlainTextFiles.md",
-        "test/fixtures/README.md",
-        "test/fixtures/LivebookFile.livemd"
-      ]
+      extras: []
     ]
   end
 
@@ -296,8 +290,16 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   describe "generates extras" do
+    @extras [
+      "test/fixtures/LICENSE",
+      "test/fixtures/PlainText.txt",
+      "test/fixtures/PlainTextFiles.md",
+      "test/fixtures/README.md",
+      "test/fixtures/LivebookFile.livemd"
+    ]
+
     test "includes source `.livemd` files" do
-      generate_docs(doc_config())
+      generate_docs(doc_config(extras: @extras))
 
       refute File.exists?("#{output_dir()}/LICENSE")
       refute File.exists?("#{output_dir()}/license")
@@ -313,7 +315,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "alongside other content" do
-      config = doc_config(main: "readme")
+      config = doc_config(main: "readme", extras: @extras)
       generate_docs(config)
 
       content = File.read!("#{output_dir()}/index.html")
@@ -384,7 +386,11 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "with absolute and dot-relative paths for extra" do
-      config = doc_config(extras: ["./test/fixtures/README.md", Path.expand("test/fixtures/LivebookFile.livemd")])
+      config =
+        doc_config(
+          extras: ["./test/fixtures/README.md", Path.expand("test/fixtures/LivebookFile.livemd")]
+        )
+
       generate_docs(config)
 
       content = File.read!("#{output_dir()}/readme.html")
@@ -399,7 +405,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "without any other content" do
-      generate_docs(doc_config(source_beam: "unknown"))
+      generate_docs(doc_config(source_beam: "unknown", extras: @extras))
 
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~s("modules":[])
@@ -514,6 +520,24 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       refute content_last =~ ~r{Next Page}
     end
+
+    test "before_closing_*_tags required by the user are placed in the right place" do
+      generate_docs(
+        doc_config(
+          before_closing_head_tag: &before_closing_head_tag/1,
+          before_closing_body_tag: &before_closing_body_tag/1,
+          extras: ["test/fixtures/README.md"]
+        )
+      )
+
+      content = File.read!("#{output_dir()}/api-reference.html")
+      assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
+      assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
+
+      content = File.read!("#{output_dir()}/readme.html")
+      assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
+      assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
+    end
   end
 
   describe ".build" do
@@ -541,23 +565,6 @@ defmodule ExDoc.Formatter.HTMLTest do
       content = File.read!("#{output_dir()}/.build")
       refute content =~ ~r{keep}
     end
-  end
-
-  test "before_closing_*_tags required by the user are placed in the right place" do
-    generate_docs(
-      doc_config(
-        before_closing_head_tag: &before_closing_head_tag/1,
-        before_closing_body_tag: &before_closing_body_tag/1
-      )
-    )
-
-    content = File.read!("#{output_dir()}/api-reference.html")
-    assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
-    assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
-
-    content = File.read!("#{output_dir()}/readme.html")
-    assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
-    assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
   end
 
   test "assets required by the user end up in the right place" do
