@@ -3,8 +3,8 @@
 ## v0.25.4 (2021-10-20)
 
   * Enhancements
-    * Add source link to extra pages
-    * Add "Run in Livebook" badge to LiveMarkdown extra pages
+    * Add source link to pages in `:extras`
+    * Add "Run in Livebook" badge to `.livemd` pages in `:extras`
 
   * Bug fixes
     * Do not generate entries for private Erlang functions
