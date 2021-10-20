@@ -353,13 +353,9 @@ defmodule ExDoc.Retriever do
     Regex.replace(~r/%{line}/, source_url, to_string(line))
   end
 
-  defp source_path(module, config) do
-    source = String.Chars.to_string(module.module_info(:compile)[:source])
-
-    if root = config.source_root do
-      Path.relative_to(source, root)
-    else
-      source
-    end
+  defp source_path(module, _config) do
+    module.module_info(:compile)[:source]
+    |> String.Chars.to_string()
+    |> Path.relative_to(File.cwd!())
   end
 end

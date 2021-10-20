@@ -36,7 +36,6 @@ defmodule ExDoc.Formatter.HTMLTest do
       formatter: "html",
       assets: "test/tmp/html_assets",
       output: output_dir(),
-      source_root: beam_dir(),
       source_beam: beam_dir(),
       logo: "test/fixtures/elixir.png",
       extras: [
@@ -372,7 +371,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "without any other content" do
-      generate_docs(doc_config(source_root: "unknown", source_beam: "unknown"))
+      generate_docs(doc_config(source_beam: "unknown"))
 
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~s("modules":[])
@@ -387,7 +386,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     test "containing settext headers while discarding links on header" do
       generate_docs(
         doc_config(
-          source_root: "unknown",
           source_beam: "unknown",
           extras: ["test/fixtures/ExtraPageWithSettextHeader.md"]
         )

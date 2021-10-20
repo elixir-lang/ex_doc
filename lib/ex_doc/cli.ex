@@ -17,7 +17,6 @@ defmodule ExDoc.CLI do
           l: :logo,
           m: :main,
           o: :output,
-          r: :source_root,
           u: :source_url,
           v: :version
         ],
@@ -159,7 +158,6 @@ defmodule ExDoc.CLI do
       -m, --main          The entry-point page in docs, default: "api-reference"
           --package       Hex package name
           --source-ref    Branch/commit/tag used for source link inference, default: "master"
-      -r, --source-root   Path to the source code root, used for generating links, default: "."
       -u, --source-url    URL to the source code
       -o, --output        Path to output docs, default: "doc"
       -v, --version       Print ExDoc version

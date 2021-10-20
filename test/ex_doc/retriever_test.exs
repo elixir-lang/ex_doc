@@ -134,23 +134,6 @@ defmodule ExDoc.RetrieverTest do
         Retriever.docs_from_modules([NotAvailable], %ExDoc.Config{})
       end
     end
-
-    test "source_url is relative to source_root", c do
-      tmp_dir = Path.expand(c.tmp_dir)
-
-      elixirc(c, "foo.ex", ~S"""
-      defmodule Foo do
-      end
-      """)
-
-      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: nil}
-      [mod] = Retriever.docs_from_modules([Foo], config)
-      assert mod.source_url == "#{tmp_dir}/foo.ex:1"
-
-      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: tmp_dir}
-      [mod] = Retriever.docs_from_modules([Foo], config)
-      assert mod.source_url == "foo.ex:1"
-    end
   end
 
   test "docs_from_dir/2: filter_prefix", c do

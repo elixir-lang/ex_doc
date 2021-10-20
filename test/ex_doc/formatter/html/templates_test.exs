@@ -18,7 +18,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     default = %ExDoc.Config{
       project: "Elixir",
       version: "1.0.1",
-      source_root: File.cwd!(),
       source_url_pattern: "#{source_url()}/blob/master/%{path}#L%{line}",
       homepage_url: homepage_url(),
       source_url: source_url(),
@@ -179,7 +178,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       config = %ExDoc.Config{
         project: "Elixir",
         version: "1.0.1",
-        source_root: File.cwd!(),
         main: "hello"
       }
 

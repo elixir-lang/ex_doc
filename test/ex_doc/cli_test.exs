@@ -47,7 +47,6 @@ defmodule ExDoc.CLITest do
       --config not_aliased.exs
       --output html
       --formatter html
-      --source-root ./
       --source-url http://example.com/username/project
       --source-ref abcdefg
       --main Main
@@ -71,7 +70,6 @@ defmodule ExDoc.CLITest do
              output: "html",
              source_beam: "#{@ebin}",
              source_ref: "abcdefg",
-             source_root: "./",
              source_url: "http://example.com/username/project"
            ]
   after

@@ -27,7 +27,6 @@ defmodule ExDoc.Formatter.EPUBTest do
       version: "1.0.1",
       formatter: "epub",
       output: output_dir(),
-      source_root: beam_dir(),
       source_beam: beam_dir(),
       extras: ["test/fixtures/README.md"],
       skip_undefined_reference_warnings_on: ["Warnings"]
