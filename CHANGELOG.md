@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.25.5 (2021-10-20)
+
+  * Bug fixes
+    * Do not duplicate API Reference title
+    * Update assets for Livebook badge functionality
+
 ## v0.25.4 (2021-10-20)
 
   * Enhancements
