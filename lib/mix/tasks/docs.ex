@@ -80,9 +80,10 @@ defmodule Mix.Tasks.Docs do
     * `:extra_section` - String that defines the section title of the additional
       Markdown and plain text pages; default: "PAGES". Example: "GUIDES"
 
-    * `:extras` - List of keywords, each key must indicate the path to additional
-      Markdown or plain text pages, the value for each keyword (optional) gives you more control
-      about the PATH and the title of the output files; default: `[]`. Example:
+    * `:extras` - List of paths to additional Markdown (`.md` extension), Live Markdown
+      (`.livemd` extension), and plain text pages to add to the documentation. You can
+      also specify keyword pairs to customize the generated filename and title of each
+      extra page; default: `[]`. Example:
       `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing"]]`
 
     * `:filter_prefix` - Include only modules that match the given prefix in

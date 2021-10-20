@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.25.4 (2021-10-20)
+
+  * Enhancements
+    * Add source link to extra pages
+    * Add "Run in Livebook" badge to LiveMarkdown extra pages
+
+  * Bug fixes
+    * Do not generate entries for private Erlang functions
+    * Do not trim `?` and `!` from Elixir tokens on search
+
+  * Incompatible changes
+    * Remove unused `:source_root` option
+
 ## v0.25.3 (2021-09-21)
 
   * Enhancements
