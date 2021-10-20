@@ -1,7 +1,8 @@
-import { qs } from './helpers'
+import { qs, qsAll } from './helpers'
 
 const CONTENT_SELECTOR = '.content'
 const CONTENT_INNER_SELECTOR = '.content-inner'
+const LIVEBOOK_BADGE_ANCHOR_SELECTOR = '.livebook-badge'
 
 /**
  * Runs some general modifiers on the documentation content.
@@ -9,6 +10,7 @@ const CONTENT_INNER_SELECTOR = '.content-inner'
 export function initialize () {
   fixLinks()
   fixSpacebar()
+  setLivebookBadgeUrl()
 }
 
 /**
@@ -33,4 +35,15 @@ function fixLinks () {
 function fixSpacebar () {
   qs(CONTENT_INNER_SELECTOR).setAttribute('tabindex', -1)
   qs(CONTENT_INNER_SELECTOR).focus()
+}
+
+function setLivebookBadgeUrl () {
+  const path = window.location.pathname
+  const notebookPath = path.replace(/\.html$/, '.livemd')
+  const notebookUrl = new URL(notebookPath, window.location.href).toString()
+  const targetUrl = `https://livebook.dev/run?url=${encodeURIComponent(notebookUrl)}`
+
+  for (const anchor of qsAll(LIVEBOOK_BADGE_ANCHOR_SELECTOR)) {
+    anchor.href = targetUrl
+  }
 }

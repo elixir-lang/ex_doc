@@ -76,7 +76,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :def,
     :extra_template,
     Path.expand("templates/extra_template.eex", __DIR__),
-    [:config, :title, :content],
+    [:config, :title, :title_content, :content],
     trim: true
   )
 

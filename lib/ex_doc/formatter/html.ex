@@ -230,7 +230,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp copy_extras(config, extras) do
-    for %{source_path: source_path, id: id} <- extras,
+    for %{source_path: source_path, id: id} when source_path != nil <- extras,
         ext = extension_name(source_path),
         ext == ".livemd" do
       output = "#{config.output}/#{id}#{ext}"
@@ -293,7 +293,16 @@ defmodule ExDoc.Formatter.HTML do
 
   defp build_api_reference(nodes_map, config) do
     api_reference = Templates.api_reference_template(config, nodes_map)
-    %{id: "api-reference", title: "API Reference", group: "", content: api_reference}
+
+    %{
+      id: "api-reference",
+      title: "API Reference",
+      group: "",
+      title_content: "API Reference",
+      content: api_reference,
+      source_path: nil,
+      source_url: nil
+    }
   end
 
   @doc """
@@ -346,34 +355,46 @@ defmodule ExDoc.Formatter.HTML do
                 "file extension not recognized, allowed extension is either .md, .txt or no extension"
       end
 
+    {title_ast, ast} =
+      case ExDoc.DocAST.extract_title(ast) do
+        {:ok, title_ast, ast} -> {title_ast, ast}
+        :error -> {nil, ast}
+      end
+
+    title_text = title_ast && ExDoc.DocAST.text_from_ast(title_ast)
+    title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
+
     # TODO: don't hardcode Elixir for extras?
     language = ExDoc.Language.Elixir
-    html_content = autolink_and_render(ast, language, autolink_opts, opts)
+    content_html = autolink_and_render(ast, language, autolink_opts, opts)
 
     group = GroupMatcher.match_extra(groups, input)
-    title = title || extract_title(html_content) || filename_to_title(input)
+    title = title || title_text || filename_to_title(input)
 
-    %{id: id, title: title, group: group, content: html_content, source_path: input}
+    source_path = Path.relative_to(input, ".")
+
+    source_url =
+      if url = config.source_url_pattern do
+        url
+        |> String.replace("%{path}", source_path)
+        |> String.replace("%{line}", "1")
+      end
+
+    %{
+      id: id,
+      title: title,
+      group: group,
+      title_content: title_html,
+      content: content_html,
+      source_path: source_path,
+      source_url: source_url
+    }
   end
 
   defp extension_name(input) do
     input
     |> Path.extname()
     |> String.downcase()
-  end
-
-  @tag_regex ~r/<[^>]*>/m
-  defp strip_html(header) do
-    Regex.replace(@tag_regex, header, "")
-  end
-
-  @h1_regex ~r/<h1.*?>(.+?)<\/h1>/m
-  defp extract_title(content) do
-    title = Regex.run(@h1_regex, content, capture: :all_but_first)
-
-    if title do
-      title |> List.first() |> strip_html() |> String.trim()
-    end
   end
 
   @doc """
