@@ -1,6 +1,16 @@
 <%= head_template(config, %{title: node.title, type: :extra}) %>
 <%= sidebar_template(config, nodes_map) %>
 
+<h1 id="content">
+  <%= node.title_content %>
+  <%= if node.source_url do %>
+    <a href="<%= node.source_url %>" title="View Source" class="view-source" rel="help">
+      <span class="icon-code" aria-hidden="true"></span>
+      <span class="sr-only">View Source</span>
+    </a>
+  <% end %>
+</h1>
+
 <%= link_headings(node.content) %>
 <%= bottom_actions_template(refs) %>
 <%= footer_template(config, node) %>

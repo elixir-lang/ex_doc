@@ -24,7 +24,7 @@ defmodule ExDoc.DocAST do
   end
 
   # https://www.w3.org/TR/2011/WD-html-markup-20110113/syntax.html#void-element
-  @void_elements ~W(area base br col command embed hr img input keygen link 
+  @void_elements ~W(area base br col command embed hr img input keygen link
     meta param source track wbr)a
 
   @doc """
@@ -93,6 +93,38 @@ defmodule ExDoc.DocAST do
   defp parse_erl_ast({tag, attrs, content}) when is_atom(tag) do
     {tag, attrs, parse_erl_ast(content), %{}}
   end
+
+  @doc """
+  Extracts leading title element from the given AST.
+
+  If found, the title element is stripped from the resulting AST.
+  """
+  def extract_title(ast)
+
+  def extract_title([{:h1, _attrs, inner, _meta} | ast]) do
+    {:ok, inner, ast}
+  end
+
+  def extract_title(_ast) do
+    :error
+  end
+
+  @doc """
+  Returns text content from the given AST.
+  """
+  def text_from_ast(ast) do
+    ast
+    |> do_text_from_ast()
+    |> IO.iodata_to_binary()
+    |> String.trim()
+  end
+
+  def do_text_from_ast(ast) when is_list(ast) do
+    Enum.map(ast, &do_text_from_ast/1)
+  end
+
+  def do_text_from_ast(ast) when is_binary(ast), do: ast
+  def do_text_from_ast({_tag, _attr, ast, _meta}), do: text_from_ast(ast)
 
   @doc """
   Highlights a DocAST converted to string.
