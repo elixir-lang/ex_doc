@@ -292,13 +292,16 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp build_api_reference(nodes_map, config) do
-    api_reference = Templates.api_reference_template(config, nodes_map)
+    api_reference = Templates.api_reference_template(nodes_map)
+
+    title_content =
+      ~s{API Reference <small class="app-vsn">#{config.project} v#{config.version}</small>}
 
     %{
       id: "api-reference",
       title: "API Reference",
       group: "",
-      title_content: "API Reference",
+      title_content: title_content,
       content: api_reference,
       source_path: nil,
       source_url: nil
