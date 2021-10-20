@@ -371,7 +371,7 @@ defmodule ExDoc.Formatter.HTML do
     group = GroupMatcher.match_extra(groups, input)
     title = title || title_text || filename_to_title(input)
 
-    source_path = Path.relative_to(input, ".")
+    source_path = input |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
 
     source_url =
       if url = config.source_url_pattern do
