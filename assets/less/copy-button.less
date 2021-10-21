@@ -1,0 +1,22 @@
+pre {
+  position: relative;
+
+  &:hover .copy-button {
+    display: block;
+  }
+}
+
+.copy-button {
+  display: none;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  svg {
+    width: 20px;
+  }
+}
