@@ -1,0 +1,45 @@
+pre {
+  position: relative;
+
+  &:hover .copy-button {
+    display: block;
+  }
+}
+
+.copy-button {
+  display: none;
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.5;
+
+  // Copied confirmation
+  font-family: @serifFontFamily;
+  font-size: 14px;
+  line-height: 24px;
+  color: #0d710d;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  svg {
+    width: 20px;
+  }
+}
+
+.copy-button.clicked {
+  opacity: 1;
+
+  &::after {
+    content: "Copied! \2713";
+  }
+
+  svg {
+    display: none;
+  }
+}
