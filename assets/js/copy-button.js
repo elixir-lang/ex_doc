@@ -5,7 +5,9 @@ import { qsAll } from './helpers'
  * Initializes copy buttons.
  */
 export function initialize () {
-  addCopyButtons()
+  if ('clipboard' in navigator) {
+    addCopyButtons()
+  }
 }
 
 /**
