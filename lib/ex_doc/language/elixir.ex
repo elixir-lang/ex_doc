@@ -440,6 +440,7 @@ defmodule ExDoc.Language.Elixir do
          nil <- uri.scheme,
          nil <- uri.host,
          true <- is_binary(uri.path),
+         true <- uri.path != "",
          false <- uri.path =~ @ref_regex,
          extension when extension in [".md", ".txt", ""] <- Path.extname(uri.path) do
       file = Path.basename(uri.path)

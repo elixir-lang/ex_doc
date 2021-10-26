@@ -490,6 +490,18 @@ defmodule ExDoc.Language.ElixirTest do
   end
 
   defp assert_unchanged(ast_or_text, options \\ []) do
+    captured =
+      capture_io(:stderr, fn ->
+        do_assert_unchanged(ast_or_text, options)
+      end)
+
+    unless captured == "" do
+      IO.puts(captured)
+      raise "failing due to warnings"
+    end
+  end
+
+  defp do_assert_unchanged(ast_or_text, options) do
     assert autolink_doc(ast_or_text, options) == ast(ast_or_text)
   end
 
@@ -509,7 +521,7 @@ defmodule ExDoc.Language.ElixirTest do
 
   defp warn(ast_or_text, options \\ []) do
     warn(fn ->
-      assert_unchanged(ast_or_text, options)
+      do_assert_unchanged(ast_or_text, options)
     end)
   end
 
