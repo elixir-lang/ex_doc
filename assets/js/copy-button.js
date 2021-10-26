@@ -6,7 +6,9 @@ const BUTTON = `<button class="copy-button"><svg xmlns="http://www.w3.org/2000/s
  * Initializes copy buttons.
  */
 export function initialize () {
-  addCopyButtons()
+  if ('clipboard' in navigator) {
+    addCopyButtons()
+  }
 }
 
 /**
