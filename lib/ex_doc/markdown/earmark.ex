@@ -21,9 +21,6 @@ defmodule ExDoc.Markdown.Earmark do
     * `:breaks` - (boolean) only applicable if `gfm` is enabled. Makes all line
       breaks significant (so every line in the input is a new line in the output).
 
-    * `:smartypants` - (boolean) turns on smartypants processing, so quotes become curly,
-      two or three hyphens become en and em dashes, and so on. Defaults to `false`.
-
   """
   @impl true
   def to_ast(text, opts) do
@@ -32,7 +29,6 @@ defmodule ExDoc.Markdown.Earmark do
       line: 1,
       file: "nofile",
       breaks: false,
-      smartypants: false,
       pure_links: true
     ]
 
