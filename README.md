@@ -192,9 +192,9 @@ You can also use a custom text, e.g.: `` [custom text](`MyModule.function/1`) ``
 Link to extra pages like this: `` [Up and running](Up and running.md) `` (skipping the directory
 the page is in), the final link will be automatically converted to `up-and-running.html`.
 
-## Rendering Math
+## Extensions
 
-If you write TeX-style math in your Markdown (like `$\sum_{i}^{N} x_i$`), they end up as raw text on the generated pages. To render them we recommend using [KaTeX](https://katex.org/), a JavaScript library that turns those expressions into actual graphics. To load and trigger KaTeX on every documentation page, you can configure ExDoc to insert relevant scripts into the HTML:
+ExDoc renders Markdown content for you, but you can extend it to render complex objects on the page using JavaScript. To inject custom JavaScript into every page, add this to your configuration:
 
 ```elixir
 docs: [
@@ -206,17 +206,53 @@ docs: [
 
 defp before_closing_body_tag(:html) do
   """
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.css" integrity="sha384-beuqjL2bw+6DBM2eOpr5+Xlw+jiH44vMdVQwKxV28xxpoInPHTVmSvvvoPq9RdSh" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.js" integrity="sha384-aaNb715UK1HuP4rjZxyzph+dVss/5Nx3mLImBe9b0EW4vMUkc1Guw4VRyQKBC0eG" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
-      onload="renderMathInElement(document.body);"></script>
+  <!-- HTML injected at the end of the <body> element -->
   """
 end
 
 defp before_closing_body_tag(_), do: ""
 ```
 
+### Rendering Math
+
+If you write TeX-style math in your Markdown (like `$\sum_{i}^{N} x_i$`), they end up as raw text on the generated pages. To render them we recommend using [KaTeX](https://katex.org/), a JavaScript library that turns those expressions into actual graphics. To load and trigger KaTeX on every documentation page we can insert the following HTML:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.css" integrity="sha384-beuqjL2bw+6DBM2eOpr5+Xlw+jiH44vMdVQwKxV28xxpoInPHTVmSvvvoPq9RdSh" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.js" integrity="sha384-aaNb715UK1HuP4rjZxyzph+dVss/5Nx3mLImBe9b0EW4vMUkc1Guw4VRyQKBC0eG" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+```
+
 For more details and configuration options see the [KaTeX Auto-render Extension](https://katex.org/docs/autorender.html).
+
+### Rendering Vega-Lite plots
+
+Other objects you may want to render in a special manner are code snippets. For example, assuming your Markdown includes Vega-Lite specification in `vega-lite` code snippets, you can do:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    for (const codeEl of document.querySelectorAll("pre code.vega-lite")) {
+      try {
+        const preEl = codeEl.parentElement;
+        const spec = JSON.parse(codeEl.textContent);
+        const plotEl = document.createElement("div");
+        preEl.insertAdjacentElement("afterend", plotEl);
+        vegaEmbed(plotEl, spec);
+        preEl.remove();
+      } catch (error) {
+        console.log("Failed to render Vega-Lite plot: " + error)
+      }
+    }
+  });
+</script>
+```
+
+For more details and configuration options see the [vega/vega-embed](https://github.com/vega/vega-embed).
 
 ## Contributing
 
