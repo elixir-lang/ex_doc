@@ -103,8 +103,8 @@ defmodule ExDoc do
       Enum.reject(default_groups, fn {k, _} -> Keyword.has_key?(groups_for_modules, k) end)
   end
 
-  defp deprecated?(%{deprecated: deprecated}), do: is_binary(deprecated)
-  defp exception?(%{type: type}), do: type == :exception
+  defp deprecated?(metadata), do: metadata[:deprecated] != nil
+  defp exception?(metadata), do: metadata[:__type__] == :exception
 
   defp normalize_nest_modules_by_prefix(nest_modules_by_prefix) do
     nest_modules_by_prefix

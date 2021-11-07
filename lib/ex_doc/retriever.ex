@@ -107,30 +107,27 @@ defmodule ExDoc.Retriever do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
-
     {doc_line, moduledoc, metadata} = get_module_docs(module_data, source_path)
 
+    # TODO: The default function groups must be returned by the language
     groups_for_functions =
-      Enum.map(config.groups_for_functions, fn {group, filter} ->
-        {Atom.to_string(group), filter}
-      end) ++
-        [
-          {"Callbacks", & &1[:__callback__]},
-          {"Functions", fn _ -> true end}
-        ]
+      config.groups_for_functions ++ [Callbacks: & &1[:__callback__], Functions: fn _ -> true end]
 
     function_groups = Enum.map(groups_for_functions, &elem(&1, 0))
     function_docs = get_docs(module_data, source, groups_for_functions)
     docs = function_docs ++ get_callbacks(module_data, source, groups_for_functions)
     types = get_types(module_data, source)
 
+    metadata = Map.put(metadata, :__type__, module_data.type)
+    group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
 
-    node = %ExDoc.ModuleNode{
+    %ExDoc.ModuleNode{
       id: module_data.id,
       title: module_data.title,
       nested_title: nested_title,
       nested_context: nested_context,
+      group: group,
       module: module,
       type: module_data.type,
       deprecated: metadata[:deprecated],
@@ -143,8 +140,6 @@ defmodule ExDoc.Retriever do
       source_url: source_link(source, module_data.line),
       language: module_data.language
     }
-
-    put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
   end
 
   defp sort_key(name, arity) do
@@ -200,10 +195,7 @@ defmodule ExDoc.Retriever do
       (doc_content && doc_ast(content_type, doc_content, file: source.path, line: doc_line + 1)) ||
         function_data.doc_fallback.()
 
-    group =
-      Enum.find_value(groups_for_functions, fn {group, filter} ->
-        filter.(metadata) && group
-      end)
+    group = GroupMatcher.match_function(groups_for_functions, metadata)
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -265,11 +257,8 @@ defmodule ExDoc.Retriever do
     annotations = callback_data.extra_annotations ++ annotations_from_metadata(metadata)
     doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
 
-    group =
-      Enum.find_value(groups_for_functions, fn {group, filter} ->
-        metadata = Map.put(metadata, :__callback__, true)
-        filter.(metadata) && group
-      end)
+    metadata = Map.put(metadata, :__callback__, true)
+    group = GroupMatcher.match_function(groups_for_functions, metadata)
 
     %ExDoc.FunctionNode{
       id: "c:#{name}/#{arity}",

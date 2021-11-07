@@ -3,44 +3,52 @@ defmodule ExDoc.GroupMatcherTest do
   import ExDoc.GroupMatcher
 
   describe "module matching" do
-    test "it can match modules by their atom names" do
+    test "match modules by their atom names" do
       patterns = [
         Group: [MyApp.SomeModule, :lists]
       ]
 
-      assert match_module(patterns, %{module: MyApp.SomeModule, id: "MyApp.SomeModule"}) == :Group
-      assert match_module(patterns, %{module: :lists, id: ":lists"}) == :Group
+      assert match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule", %{}) ==
+               :Group
 
-      assert match_module(patterns, %{module: MyApp.SomeOtherModule, id: "MyApp.SomeOtherModule"}) ==
+      assert match_module(patterns, :lists, ":lists", %{}) == :Group
+
+      assert match_module(
+               patterns,
+               MyApp.SomeOtherModule,
+               "MyApp.SomeOtherModule",
+               %{}
+             ) ==
                nil
     end
 
-    test "it can match modules by their string names" do
+    test "match modules by their string names" do
       patterns = [
         Group: ["MyApp.SomeModule", ":lists"]
       ]
 
-      assert match_module(patterns, %{module: MyApp.SomeModule, id: "MyApp.SomeModule"}) == :Group
-      assert match_module(patterns, %{module: :lists, id: ":lists"}) == :Group
+      assert match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule", %{}) ==
+               :Group
 
-      assert match_module(patterns, %{module: MyApp.SomeOtherModule, id: "MyApp.SomeOtherModule"}) ==
+      assert match_module(patterns, :lists, ":lists", %{}) == :Group
+
+      assert match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule", %{}) ==
                nil
     end
 
-    test "it can match modules by regular expressions" do
+    test "match modules by regular expressions" do
       patterns = [
         Group: ~r/MyApp\..?/
       ]
 
-      assert match_module(patterns, %{module: MyApp.SomeModule, id: "MyApp.SomeModule"}) == :Group
-
-      assert match_module(patterns, %{module: MyApp.SomeOtherModule, id: "MyApp.SomeOtherModule"}) ==
+      assert match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule", %{}) ==
                :Group
 
-      assert match_module(patterns, %{
-               module: MyAppWeb.SomeOtherModule,
-               id: "MyAppWeb.SomeOtherModule"
-             }) == nil
+      assert match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule", %{}) ==
+               :Group
+
+      assert match_module(patterns, MyAppWeb.SomeOtherModule, "MyAppWeb.SomeOtherModule", %{}) ==
+               nil
     end
   end
 

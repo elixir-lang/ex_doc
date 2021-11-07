@@ -86,9 +86,9 @@ defmodule ExDoc.RetrieverTest do
       [mod] = Retriever.docs_from_modules([A], config)
       [bar, baz, foo] = mod.docs
 
-      assert %{id: "foo/0", group: "Group 1"} = foo
-      assert %{id: "bar/0", group: "Group 1"} = bar
-      assert %{id: "baz/0", group: "Group 2"} = baz
+      assert %{id: "foo/0", group: :"Group 1"} = foo
+      assert %{id: "bar/0", group: :"Group 1"} = bar
+      assert %{id: "baz/0", group: :"Group 2"} = baz
     end
 
     test "nesting", c do

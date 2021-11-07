@@ -42,7 +42,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                defaults: [],
                deprecated: nil,
                doc_line: 4,
-               group: "Functions",
+               group: :Functions,
                id: "function/0",
                name: :function,
                rendered_doc: nil,
@@ -120,7 +120,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert callback1.type == :callback
       assert callback1.annotations == []
       assert callback1.doc_line == 2
-      assert callback1.group == "Callbacks"
+      assert callback1.group == :Callbacks
       assert Path.basename(callback1.source_url) == "nofile:3"
       assert DocAST.to_string(callback1.doc) == "<p>callback1/0 docs.</p>"
       assert Macro.to_string(callback1.specs) == "[callback1() :: :ok]"
@@ -130,7 +130,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert optional_callback1.type == :callback
       assert optional_callback1.annotations == ["optional"]
       assert optional_callback1.doc_line == 5
-      assert optional_callback1.group == "Callbacks"
+      assert optional_callback1.group == :Callbacks
       assert Path.basename(optional_callback1.source_url) == "nofile:5"
       refute optional_callback1.doc
       assert Macro.to_string(optional_callback1.specs) == "[optional_callback1() :: :ok]"
@@ -140,7 +140,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert macrocallback1.type == :macrocallback
       assert macrocallback1.annotations == []
       assert macrocallback1.doc_line == 9
-      assert macrocallback1.group == "Callbacks"
+      assert macrocallback1.group == :Callbacks
       assert Path.basename(macrocallback1.source_url) == "nofile:9"
       refute macrocallback1.doc
       assert Macro.to_string(macrocallback1.specs) == "[macrocallback1(term()) :: :ok]"
