@@ -43,7 +43,7 @@
     "eslint-plugin-standard": "^4.0.1",
     "file-loader": "^2.0.0",
     "flex.less": "^1.1.0",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "handlebars-loader": "^1.7.1",
     "karma": "^3.1.4",
     "karma-chai-plugins": "^0.6.0",
