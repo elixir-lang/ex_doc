@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.26.0-dev
+
+  * Backwards incompatible changes
+    * `:filter_prefix` has been renamed to `:filter_modules` and supports anonymous functions
+    * `:source_ref` now defaults to `"main"`
+    * Dropped support for smartypants in Markdown
+
+  * Bug fixes
+    * Do not warn on links to sections
+
+  * Enhancements
+    * Add copy button to code snippets
+
 ## v0.25.5 (2021-10-20)
 
   * Bug fixes
