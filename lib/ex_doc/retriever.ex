@@ -52,19 +52,15 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_module(module, config) do
-    with {:docs_v1, _, language, _, _, _, _} = docs_chunk <- docs_chunk(module),
+    with {:docs_v1, _, language, _, _, metadata, _} = docs_chunk <- docs_chunk(module),
+         true <- config.filter_modules.(module, metadata),
          {:ok, language} <- ExDoc.Language.get(language, module),
-         %{} = module_data <- language.module_data(module, docs_chunk, config),
-         false <- skip_module?(module_data, config) do
+         %{} = module_data <- language.module_data(module, docs_chunk, config) do
       [generate_node(module, module_data, config)]
     else
       _ ->
         []
     end
-  end
-
-  defp skip_module?(module_data, config) do
-    !!config.filter_prefix and not String.starts_with?(module_data.id, config.filter_prefix)
   end
 
   defp docs_chunk(module) do

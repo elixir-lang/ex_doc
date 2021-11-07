@@ -1,5 +1,5 @@
 defmodule ExDocTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   # Simple retriever that returns whatever is passed into it
   defmodule IdentityRetriever do
@@ -13,29 +13,6 @@ defmodule ExDocTest do
     def run(modules, config) do
       {modules, config}
     end
-  end
-
-  test "build_config & normalize_options" do
-    project = "Elixir"
-    version = "1"
-
-    opts_with_output =
-      &[
-        apps: [:test_app],
-        formatter: IdentityFormatter,
-        retriever: IdentityRetriever,
-        source_beam: "beam_dir",
-        output: &1
-      ]
-
-    {_, config} = ExDoc.generate_docs(project, version, opts_with_output.("test/tmp/ex_doc"))
-    assert config.output == "test/tmp/ex_doc"
-
-    {_, config} = ExDoc.generate_docs(project, version, opts_with_output.("test/tmp/ex_doc/"))
-    assert config.output == "test/tmp/ex_doc"
-
-    {_, config} = ExDoc.generate_docs(project, version, opts_with_output.("test/tmp/ex_doc//"))
-    assert config.output == "test/tmp/ex_doc"
   end
 
   test "uses custom markdown processor" do

@@ -136,7 +136,7 @@ defmodule ExDoc.RetrieverTest do
     end
   end
 
-  test "docs_from_dir/2: filter_prefix", c do
+  test "docs_from_dir/2: filter_module", c do
     elixirc(c, ~S"""
     defmodule A do
     end
@@ -149,7 +149,7 @@ defmodule ExDoc.RetrieverTest do
     """)
 
     ebin_dir = Path.join(c.tmp_dir, "ebin")
-    config = %ExDoc.Config{filter_prefix: "A"}
+    config = %ExDoc.Config{filter_modules: fn module, _ -> Atom.to_string(module) =~ "A" end}
     [a, a_a] = Retriever.docs_from_dir(ebin_dir, config)
 
     assert a.id == "A"

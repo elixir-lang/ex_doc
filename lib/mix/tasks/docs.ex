@@ -86,10 +86,12 @@ defmodule Mix.Tasks.Docs do
       extra page; default: `[]`. Example:
       `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing"]]`
 
-    * `:filter_prefix` - Include only modules that match the given prefix in
-      the generated documentation. Example: "MyApp.Core". If you set this option,
-      remember to also set the `:main` option to a module that will be included
-      , for example `main: "MyApp.Core.Inner"`.
+    * `:filter_modules` - Include only modules that match the given value. The
+      value can be a regex, a string (representing a regex), or a two-arity
+      function that receives the module and its metadata and returns true if the
+      module must be included. If a string or a regex is given, it will be matched
+      against the complete module name (which includes the "Elixir." prefix for
+      Elixir modules). If a module has `@moduledoc false`, then it is always excluded.
 
     * `:formatters` - Formatter to use; default: ["html", "epub"], options: "html", "epub".
 
