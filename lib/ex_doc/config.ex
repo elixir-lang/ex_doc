@@ -2,7 +2,7 @@ defmodule ExDoc.Config do
   @moduledoc false
 
   # Defaults
-  @default_source_ref "master"
+  @default_source_ref "main"
   def filter_modules(_module, _metadata), do: true
   def before_closing_head_tag(_), do: ""
   def before_closing_body_tag(_), do: ""

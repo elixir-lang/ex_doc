@@ -127,7 +127,7 @@ defmodule Mix.Tasks.Docs do
     * `:source_beam` - Path to the beam directory; default: mix's compile path.
 
     * `:source_ref` - The branch/commit/tag used for source link inference;
-      default: "master".
+      default: "main".
 
     * `:source_url_pattern` - Public URL of the project for source links. This is derived
       automatically from the project's `:source_url` and `:source_ref` when using one of
@@ -145,13 +145,13 @@ defmodule Mix.Tasks.Docs do
       For GitLab/GitHub:
 
       ```text
-      https://mydomain.org/user_or_team/repo_name/blob/master/%{path}#L%{line}
+      https://mydomain.org/user_or_team/repo_name/blob/main/%{path}#L%{line}
       ```
 
       For Bitbucket:
 
       ```text
-      https://mydomain.org/user_or_team/repo_name/src/master/%{path}#cl-%{line}
+      https://mydomain.org/user_or_team/repo_name/src/main/%{path}#cl-%{line}
       ```
 
     * `:output` - Output directory for the generated docs; default: "doc".
