@@ -5,8 +5,7 @@ defmodule ExDoc.ConfigTest do
   @version "1"
 
   test "normalizes output" do
-    opts_with_output =
-      &[source_beam: "beam_dir", output: &1]
+    opts_with_output = &[source_beam: "beam_dir", output: &1]
 
     config = ExDoc.Config.build(@project, @version, opts_with_output.("test/tmp/ex_doc"))
     assert config.output == "test/tmp/ex_doc"
