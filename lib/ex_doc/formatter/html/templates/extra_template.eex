@@ -12,9 +12,11 @@
 </h1>
 
 <%= if node.source_path && String.ends_with?(node.source_path, ".livemd") do %>
-  <a href="#" class="livebook-badge">
-    <img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />
-  </a>
+  <div class="livebook-badge-container">
+    <a href="#" class="livebook-badge">
+      <img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />
+    </a>
+  </div>
 <% end %>
 
 <%= link_headings(node.content) %>
