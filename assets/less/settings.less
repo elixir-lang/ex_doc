@@ -1,0 +1,68 @@
+#settings-modal-content {
+  & > :not(:first-child) {
+    margin-top: 8px;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .input {
+    width: 100%;
+    padding: 6px;
+    border: none;
+    border-bottom: 1px solid @mediumGray;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .switch-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .switch-button {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    user-select: none;
+    transition: all 150ms;
+  }
+
+  .switch-button__checkbox {
+    appearance: none;
+    position: absolute;
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 1000px;
+    background-color: #91a4b7;
+    border: 3px solid #e5edf5;
+    cursor: pointer;
+    transition: all 300ms;
+  }
+
+  .switch-button__bg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 1000px;
+    background-color: #e5edf5;
+    cursor: pointer;
+    transition: all 300ms;
+  }
+
+  .switch-button__checkbox:checked {
+    background-color: white;
+    border-color: @main;
+    transform: translateX(100%);
+  }
+
+  .switch-button__checkbox:checked + .switch-button__bg {
+    background-color: @main;
+  }
+}
