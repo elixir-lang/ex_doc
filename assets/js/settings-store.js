@@ -1,8 +1,11 @@
 const SETTINGS_KEY = 'ex_doc:settings'
 
 const DEFAULT_SETTINGS = {
+  // Whether to show tooltips on function/module links
   tooltips: true,
+  // Night mode preference, null if never explicitly overridden by the user
   nightMode: null,
+  // Livebook URL to point the badges directly to
   livebookUrl: null
 }
 
