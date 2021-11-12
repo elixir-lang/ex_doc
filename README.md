@@ -162,8 +162,16 @@ ExDoc is capable of generating documentation from Erlang's `edoc` annotations th
 
 ExDoc supports certain metadata keys in your documentation. For example, the `since` metadata is used to annotate from when a given module/function is available. In Elixir, you can add metadata to modules and functions, respectively, like this:
 
-    @moduledoc since: "v1.10"
-    @doc since: "v1.13"
+```elixir
+@moduledoc since: "1.10.0"
+@doc since: "1.13.1"
+```
+
+In Erlang's EDoc, you would do:
+
+```erlang
+%% @since 0.1.0
+```
 
 The following metadata is available for both modules and functions:
 
@@ -172,7 +180,7 @@ The following metadata is available for both modules and functions:
 
 The following metadata is available for modules:
 
-  * `tags` (list of atoms) - a list of strings to be added as tags to the module
+  * `tags` (list of atoms) - a list of strings to be added as tags to the module (not supported by EDoc)
 
 ## Auto-linking
 
