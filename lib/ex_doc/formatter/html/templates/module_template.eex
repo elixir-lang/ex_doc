@@ -9,6 +9,9 @@
             <span class="sr-only">View Source</span>
           </a>
         <% end %>
+        <%= for annotation <- module.annotations do %>
+          <span class="note">(<%= annotation %>)</span>
+        <% end %>
       </h1>
 
       <%= if deprecated = module.deprecated do %>

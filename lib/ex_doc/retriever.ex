@@ -134,7 +134,8 @@ defmodule ExDoc.Retriever do
       typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
       source_path: source_path,
       source_url: source_link(source, module_data.line),
-      language: module_data.language
+      language: module_data.language,
+      annotations: List.wrap(metadata[:tags])
     }
   end
 

@@ -10,6 +10,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       elixirc(c, ~S"""
       defmodule Mod do
         @moduledoc "Mod docs."
+        @moduledoc tags: :public
 
         @doc "function/0 docs."
         @spec function() :: atom()
@@ -31,7 +32,8 @@ defmodule ExDoc.Retriever.ElixirTest do
                title: "Mod",
                type: :module,
                typespecs: [],
-               docs: [empty_doc_and_specs, function]
+               docs: [empty_doc_and_specs, function],
+               annotations: [:public]
              } = mod
 
       assert DocAST.to_string(mod.doc) == "<p>Mod docs.</p>"
@@ -41,7 +43,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                annotations: [],
                defaults: [],
                deprecated: nil,
-               doc_line: 4,
+               doc_line: 5,
                group: :Functions,
                id: "function/0",
                name: :function,

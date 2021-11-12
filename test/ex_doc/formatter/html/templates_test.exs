@@ -334,7 +334,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       # Source
       assert content =~
-               ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L14"[^>]*>\s*<span class="icon-code" aria-hidden="true"></span>\s*<span class="sr-only">View Source</span>\s*</a>}ms
+               ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L1"[^>]*>\s*<span class="icon-code" aria-hidden="true"></span>\s*<span class="sr-only">View Source</span>\s*</a>\s*}ms
+
+      # Module annotations
+      assert content =~ ~s{<span class=\"note\">(example_module_tag)</span>}
 
       # Functions
       assert content =~ ~s{<section class="detail" id="example/2">}

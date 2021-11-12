@@ -19,7 +19,8 @@ defmodule ExDoc.ModuleNode do
             source_path: nil,
             source_url: nil,
             type: nil,
-            language: nil
+            language: nil,
+            annotations: []
 
   @type t :: %__MODULE__{
           id: nil | String.t(),
@@ -38,7 +39,8 @@ defmodule ExDoc.ModuleNode do
           source_path: nil | String.t(),
           source_url: nil | String.t(),
           type: nil | atom(),
-          language: module()
+          language: module(),
+          annotations: list()
         }
 end
 
