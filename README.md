@@ -14,10 +14,10 @@ To see all supported options, see the documentation for [mix docs](https://hexdo
 ExDoc ships with many features:
 
   * Automatically generates HTML and EPUB documents from your API documentation
-  * Support for custom pages and guides (in addition to the API reference)
+  * Responsive design with built-in layout for phones and tablets
+  * Support for custom pages, guides, and livebooks (in addition to the API reference)
   * Support for custom grouping of modules, functions, and pages in the sidebar
   * Generates HTML documentation accessible online and offline
-  * Responsive design with built-in layout for phones and tablets
   * Customizable logo on the generated documentation
   * Each documented entry contains a direct link back to the source code
   * Full-text search
@@ -42,25 +42,7 @@ def deps do
 end
 ```
 
-If you are using Elixir v1.7, v1.8, or v1.9:
-
-```elixir
-def deps do
-  [
-    {:ex_doc, "~> 0.22.0", only: :dev, runtime: false},
-  ]
-end
-```
-
-If you are using Elixir v1.6, or earlier:
-
-```elixir
-def deps do
-  [
-    {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
-  ]
-end
-```
+> NOte: if you are using Elixir v1.7, v1.8, or v1.9, use `~> 0.22.0`.
 
 After adding ExDoc as a dependency, run `mix deps.get` to install it.
 
@@ -175,6 +157,22 @@ ExDoc is capable of generating documentation from Erlang's `edoc` annotations th
    $ ex_doc "foo" "1.0.0" "_build/default/lib/foo/ebin" \
        --paths "_build/default/lib/*/ebin"
    ```
+
+## Metadata
+
+ExDoc supports certain metadata keys in your documentation. For example, the `since` metadata is used to annotate from when a given module/function is available. In Elixir, you can add metadata to modules and functions, respectively, like this:
+
+    @moduledoc since: "v1.10"
+    @doc since: "v1.13"
+
+The following metadata is available for both modules and functions:
+
+  * `deprecated` (string) - marks the given module/function as deprecated with the given string as reason
+  * `since` (string) - annotates the given module/function is available from a particular version
+
+The following metadata is available for modules:
+
+  * `tags` (list of atoms) - a list of strings to be added as tags to the module
 
 ## Auto-linking
 
