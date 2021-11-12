@@ -10,6 +10,8 @@ defmodule CompiledWithDocs do
   example
   """
 
+  @moduledoc annotations: :example_module_annotation
+
   @doc "Some struct"
   defstruct [:field]
 
