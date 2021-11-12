@@ -10,7 +10,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       elixirc(c, ~S"""
       defmodule Mod do
         @moduledoc "Mod docs."
-        @moduledoc annotations: :public
+        @moduledoc tags: :public
 
         @doc "function/0 docs."
         @spec function() :: atom()
