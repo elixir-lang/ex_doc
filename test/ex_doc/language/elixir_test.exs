@@ -80,7 +80,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "erlang stdlib function" do
       assert autolink_doc(":lists.all/2") ==
-               ~m"[`:lists.all/2`](https://erlang.org/doc/man/lists.html#all-2)"
+               ~m"[`:lists.all/2`](https://www.erlang.org/doc/man/lists.html#all-2)"
     end
 
     test "local function" do
@@ -121,7 +121,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "erlang callback" do
       assert autolink_doc("c::gen_server.handle_call/3") ==
-               ~m"[`:gen_server.handle_call/3`](https://erlang.org/doc/man/gen_server.html#Module:handle_call-3)"
+               ~m"[`:gen_server.handle_call/3`](https://www.erlang.org/doc/man/gen_server.html#Module:handle_call-3)"
     end
 
     test "elixir type" do
@@ -142,7 +142,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "erlang type" do
       assert autolink_doc("t::array.array/0") ==
-               ~m"[`:array.array/0`](https://erlang.org/doc/man/array.html#type-array)"
+               ~m"[`:array.array/0`](https://www.erlang.org/doc/man/array.html#type-array)"
     end
 
     test "special forms" do
@@ -172,10 +172,10 @@ defmodule ExDoc.Language.ElixirTest do
                ~m"[custom text](https://hexdocs.pm/elixir/String.html#at/2)"
 
       assert autolink_doc(~m"[custom text](`:lists`)") ==
-               ~m"[custom text](https://erlang.org/doc/man/lists.html)"
+               ~m"[custom text](https://www.erlang.org/doc/man/lists.html)"
 
       assert autolink_doc(~m"[custom text](`:lists.all/2`)") ==
-               ~m"[custom text](https://erlang.org/doc/man/lists.html#all-2)"
+               ~m"[custom text](https://www.erlang.org/doc/man/lists.html#all-2)"
     end
 
     test "mix task" do
@@ -373,7 +373,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "Erlang stdlib types" do
       assert autolink_spec(quote(do: t() :: :sets.set())) ==
-               ~s[t() :: <a href="https://erlang.org/doc/man/sets.html#type-set">:sets.set</a>()]
+               ~s[t() :: <a href="https://www.erlang.org/doc/man/sets.html#type-set">:sets.set</a>()]
     end
 
     test "escape special HTML characters" do

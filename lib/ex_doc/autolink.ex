@@ -36,7 +36,7 @@ defmodule ExDoc.Autolink do
   ]
 
   @hexdocs "https://hexdocs.pm/"
-  @otpdocs "https://erlang.org/doc/man/"
+  @otpdocs "https://www.erlang.org/doc/man/"
 
   def app_module_url(:ex_doc, module, %{current_module: module} = config) do
     path = module |> inspect() |> String.trim_leading(":")
