@@ -1,17 +1,19 @@
 {{#each nodes as |node nodeId|}}
   {{#groupChanged ../this node.group}}
-    <li class="group">{{node.group}}</li>
+    <li class="group" {{#isArray node.headers}}{{else}}translate="no"{{/isArray}}>
+      {{node.group}}
+    </li>
   {{/groupChanged}}
 
   {{#nestingChanged ../this node}}
-    <li class="nesting-context" aria-hidden="true">{{node.nested_context}}</li>
+    <li class="nesting-context" aria-hidden="true" translate="no">{{node.nested_context}}</li>
   {{/nestingChanged}}
 
   <li class="{{#isLocal node.id}}current-page open{{/isLocal}} {{#if node.nested_title}}nested{{/if}}">
     {{! When visiting a module page, the link to this module page
     in the menu should not link to a new page, instead should link
     to the top of the page itself. }}
-    <a href="{{node.id}}.html" class="expand">
+    <a href="{{node.id}}.html" class="expand" {{#isArray node.headers}}{{else}}translate="no"{{/isArray}}>
       {{#if node.nested_title}}
         {{{node.nested_title}}}
       {{else}}
@@ -62,7 +64,7 @@
             <ul class="{{group.key}}-list deflist">
               {{#each group.nodes}}
                 <li>
-                  <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
+                  <a href="{{node.id}}.html#{{anchor}}" translate="no">{{id}}</a>
                 </li>
               {{/each}}
             </ul>

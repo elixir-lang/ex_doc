@@ -1,6 +1,6 @@
 <%= head_template(config, %{title: module.title}) %>
     <h1 id="content">
-      <%= H.module_title(module) %>
+      <%= module.title %> <%= H.module_type(module) %>
     </h1>
 
     <%= if deprecated = module.deprecated do %>

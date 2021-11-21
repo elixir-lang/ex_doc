@@ -25,10 +25,10 @@
   <% url = config.homepage_url || "#{config.main}.html" %>
   <div class="sidebar-header">
     <div class="sidebar-projectDetails">
-      <a href="<%= url %>" class="sidebar-projectName">
+      <a href="<%= url %>" class="sidebar-projectName" translate="no">
         <%= config.project %>
       </a>
-      <strong class="sidebar-projectVersion">
+      <strong class="sidebar-projectVersion" translate="no">
         v<%= config.version %>
       </strong>
     </div>
@@ -47,7 +47,7 @@
     <% end %>
 
     <%= if nodes_map.tasks != [] do %>
-      <li><a id="tasks-list-link" href="#full-list">Mix Tasks</a></li>
+      <li><a id="tasks-list-link" href="#full-list"><span translate="no">Mix</span> Tasks</a></li>
     <% end %>
   </ul>
   <div class="gradient"></div>

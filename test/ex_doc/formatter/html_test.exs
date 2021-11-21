@@ -206,10 +206,10 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config())
 
     content = File.read!("#{output_dir()}/api-reference.html")
-    assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
+    assert content =~ ~r{<a href="CompiledWithDocs.html" translate="no">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
-    assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
-    assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html">mix task_with_docs</a>}
+    assert content =~ ~r{<a href="CompiledWithDocs.Nested.html" translate="no">CompiledWithDocs.Nested</a>}
+    assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html" translate="no">mix task_with_docs</a>}
   end
 
   test "groups modules by nesting" do

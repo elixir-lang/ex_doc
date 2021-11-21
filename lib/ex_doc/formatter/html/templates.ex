@@ -51,14 +51,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Returns the HTML formatted title for the module page.
   """
-  def module_title(%{type: :task, title: title}),
-    do: title
-
-  def module_title(%{type: :module, title: title}),
-    do: title
-
-  def module_title(%{type: type, title: title}),
-    do: title <> " <small>#{type}</small>"
+  def module_type(%{type: :task}), do: ""
+  def module_type(%{type: :module}), do: ""
+  def module_type(%{type: type}), do: "<small>#{type}</small>"
 
   @doc """
   Gets the first paragraph of the documentation of a node. It strips
@@ -277,7 +272,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
-    summary_entry_template: [:node],
     redirect_template: [:config, :redirect_to],
     bottom_actions_template: [:refs]
   ]
