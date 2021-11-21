@@ -490,6 +490,7 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
+  # TODO: Move this categorization to the language
   def filter_list(:module, nodes) do
     Enum.filter(nodes, &(&1.type != :task))
   end

@@ -18,7 +18,6 @@ defmodule ExDoc.Formatter.EPUB do
 
     nodes_map = %{
       modules: HTML.filter_list(:module, project_nodes),
-      exceptions: HTML.filter_list(:exception, project_nodes),
       tasks: HTML.filter_list(:task, project_nodes)
     }
 
@@ -38,7 +37,6 @@ defmodule ExDoc.Formatter.EPUB do
     generate_title(config)
     generate_extras(config)
     generate_list(config, nodes_map.modules)
-    generate_list(config, nodes_map.exceptions)
     generate_list(config, nodes_map.tasks)
 
     {:ok, epub} = generate_epub(config.output)
