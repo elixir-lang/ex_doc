@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.26.0-dev
+## v0.26.0 (2021-11-21)
 
   * Backwards incompatible changes
     * `:filter_prefix` has been renamed to `:filter_modules` and supports anonymous functions
@@ -12,6 +12,11 @@
 
   * Enhancements
     * Add copy button to code snippets
+    * Add `translate="no"` to the relevant attributes to improve interoperability with automatic translation tools
+    * Support optional module annotations
+    * Introduce a settings modal to group most of configuration
+    * Allow customizing the Livebook expansion URL
+    * Provide documentation on how to render plugins such as Katex, VegaLite, and Mermaid
 
 ## v0.25.5 (2021-10-20)
 
