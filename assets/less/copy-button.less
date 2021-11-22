@@ -16,12 +16,13 @@ pre {
   cursor: pointer;
   padding: 0;
   opacity: 0.5;
+  transition: all 150ms;
 
   // Copied confirmation
   font-family: @serifFontFamily;
   font-size: 14px;
   line-height: 24px;
-  color: #0d710d;
+  color: currentColor;
 
   &:hover {
     opacity: 1;
@@ -33,7 +34,9 @@ pre {
 }
 
 .copy-button.clicked {
+  display: block;
   opacity: 1;
+  color: #408200;
 
   &::after {
     content: "Copied! \2713";
@@ -41,5 +44,6 @@ pre {
 
   svg {
     display: none;
+    color: currentColor;
   }
 }
