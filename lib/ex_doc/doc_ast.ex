@@ -174,7 +174,7 @@ defmodule ExDoc.DocAST do
         formatter_options: [highlight_tag: highlight_tag]
       )
 
-    ~s(<pre><code class="makeup #{lang}">#{highlighted}</code></pre>)
+    ~s(<pre><code class="makeup #{lang}" translate="no">#{highlighted}</code></pre>)
   end
 
   entities = [{"&amp;", ?&}, {"&lt;", ?<}, {"&gt;", ?>}, {"&quot;", ?"}, {"&#39;", ?'}]

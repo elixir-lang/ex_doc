@@ -109,17 +109,17 @@ defmodule ExDoc.DocASTTest do
       iex_detected_without_class = ~S[<pre><code>iex&gt; max(4, 5)</code></pre>]
 
       assert DocAST.highlight(with_empty_class, ExDoc.Language.Elixir) =~
-               ~r{<pre><code class=\"makeup elixir\">.*}
+               ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
       assert DocAST.highlight(without_class, ExDoc.Language.Elixir) =~
-               ~r{<pre><code class=\"makeup elixir\">.*}
+               ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
       # IEx is highlighted by the normal elixir lexer
       assert DocAST.highlight(iex_detected_with_empty_class, ExDoc.Language.Elixir) =~
-               ~r{<pre><code class=\"makeup elixir\">.*}
+               ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
       assert DocAST.highlight(iex_detected_without_class, ExDoc.Language.Elixir) =~
-               ~r{<pre><code class=\"makeup elixir\">.*}
+               ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
     end
   end
 end
