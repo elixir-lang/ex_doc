@@ -66,49 +66,53 @@ defmodule ExDoc.Formatter.HTML do
   """
   def render_all(project_nodes, ext, config, opts) do
     project_nodes
-    |> Enum.map(fn node ->
-      autolink_opts = [
-        apps: config.apps,
-        current_module: node.module,
-        ext: ext,
-        extras: extra_paths(config),
-        skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-        module_id: node.id,
-        file: node.source_path,
-        line: node.doc_line,
-        deps: config.deps
-      ]
+    |> Task.async_stream(
+      fn node ->
+        autolink_opts = [
+          apps: config.apps,
+          current_module: node.module,
+          ext: ext,
+          extras: extra_paths(config),
+          skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
+          module_id: node.id,
+          file: node.source_path,
+          line: node.doc_line,
+          deps: config.deps
+        ]
 
-      language = node.language
+        language = node.language
 
-      docs =
-        for child_node <- node.docs do
-          id = id(node, child_node)
-          autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
-          specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
-          child_node = %{child_node | specs: specs}
-          render_doc(child_node, language, autolink_opts, opts)
-        end
+        docs =
+          for child_node <- node.docs do
+            id = id(node, child_node)
+            autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
+            specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
+            child_node = %{child_node | specs: specs}
+            render_doc(child_node, language, autolink_opts, opts)
+          end
 
-      typespecs =
-        for child_node <- node.typespecs do
-          id = id(node, child_node)
-          autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
+        typespecs =
+          for child_node <- node.typespecs do
+            id = id(node, child_node)
+            autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
 
-          child_node = %{
-            child_node
-            | spec: language.autolink_spec(child_node.spec, autolink_opts)
-          }
+            child_node = %{
+              child_node
+              | spec: language.autolink_spec(child_node.spec, autolink_opts)
+            }
 
-          render_doc(child_node, language, autolink_opts, opts)
-        end
+            render_doc(child_node, language, autolink_opts, opts)
+          end
 
-      %{
-        render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
-        | docs: docs,
-          typespecs: typespecs
-      }
-    end)
+        %{
+          render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
+          | docs: docs,
+            typespecs: typespecs
+        }
+      end,
+      timeout: :infinity
+    )
+    |> Enum.map(&elem(&1, 1))
   end
 
   defp render_doc(%{doc: nil} = node, _language, _autolink_opts, _opts),
@@ -315,7 +319,7 @@ defmodule ExDoc.Formatter.HTML do
     groups = config.groups_for_extras
 
     config.extras
-    |> Task.async_stream(&build_extra(&1, groups, config, ext), timeout: :infinity)
+    |> Task.async_stream(&build_extra(&1, groups, config, ext), timeout: :infinity, ordered: false)
     |> Enum.map(&elem(&1, 1))
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
