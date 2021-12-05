@@ -16,7 +16,7 @@ export function initialize () {
  */
 function addCopyButtons () {
   Array.from(qsAll('pre'))
-    .filter(pre => pre.firstElementChild && pre.firstElementChild.tagName == 'CODE')
+    .filter(pre => pre.firstElementChild && pre.firstElementChild.tagName === 'CODE')
     .forEach(pre => pre.insertAdjacentHTML('afterbegin', BUTTON))
 
   Array.from(qsAll('.copy-button')).forEach(button => {
