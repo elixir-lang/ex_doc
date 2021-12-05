@@ -15,7 +15,9 @@ export function initialize () {
  * Find pre tags, add copy buttons, copy <code> content on click.
  */
 function addCopyButtons () {
-  Array.from(qsAll('pre')).forEach(pre => pre.insertAdjacentHTML('afterbegin', BUTTON))
+  Array.from(qsAll('pre'))
+    .filter(pre => pre.firstElementChild && pre.firstElementChild.tagName == 'CODE')
+    .forEach(pre => pre.insertAdjacentHTML('afterbegin', BUTTON))
 
   Array.from(qsAll('.copy-button')).forEach(button => {
     let timeout
