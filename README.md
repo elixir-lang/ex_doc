@@ -42,7 +42,7 @@ def deps do
 end
 ```
 
-> NOte: if you are using Elixir v1.7, v1.8, or v1.9, use `~> 0.22.0`.
+> Note: if you are using Elixir v1.7, v1.8, or v1.9, use `~> 0.22.0`.
 
 After adding ExDoc as a dependency, run `mix deps.get` to install it.
 
