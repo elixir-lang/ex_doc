@@ -46,6 +46,8 @@ end
 
 After adding ExDoc as a dependency, run `mix deps.get` to install it.
 
+> Note: Some Operating System distributions split Erlang into multiple packages and at least one ExDoc dependency (`earmark_parser`) requires Erlang development environment. If you get a message like "/usr/lib/erlang/lib/parsetools-2.3.1/include/yeccpre.hrl: no such file or directory", it means you lack this environment. For instance, on the Debian operating system and its derivatives, you need to `apt install erlang-dev`.
+
 ExDoc will automatically pull in information from your projects, like the application and version. However, you may want to set `:name`, `:source_url` and `:homepage_url` to have a nicer output from ExDoc, such as:
 
 ```elixir
