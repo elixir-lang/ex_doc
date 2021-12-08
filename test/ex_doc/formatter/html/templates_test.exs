@@ -218,6 +218,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example/2")ms
       assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example_without_docs/0")ms
       assert content =~ ~r("id":"CompiledWithDocs.Nested")ms
+      assert content =~ ~r(\{"anchor":"__struct__/0","id":"%CompiledWithDocs\{\}"\})ms
     end
 
     test "outputs nodes grouped based on metadata" do
