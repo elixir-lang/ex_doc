@@ -146,7 +146,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_entries({group, nodes}) do
     nodes =
       for node <- nodes do
-        %{id: "#{node.name}/#{node.arity}", anchor: URI.encode(node.id)}
+        id =
+          if "struct" in node.annotations do
+            node.signature
+          else
+            "#{node.name}/#{node.arity}"
+          end
+
+        %{id: id, anchor: URI.encode(node.id)}
       end
 
     %{key: HTML.text_to_id(group), name: group, nodes: nodes}
