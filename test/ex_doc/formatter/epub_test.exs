@@ -91,6 +91,11 @@ defmodule ExDoc.Formatter.EPUBTest do
   test "generates an EPUB file in the default directory" do
     generate_docs(doc_config())
     assert File.regular?("#{output_dir()}/#{doc_config()[:project]}.epub")
+
+    File.rm!("#{output_dir()}/#{doc_config()[:project]}.epub")
+
+    generate_docs(Keyword.put(doc_config(), :proglang, :erlang))
+    assert File.regular?("#{output_dir()}/#{doc_config()[:project]}.epub")
   end
 
   test "generates an EPUB file in specified output directory" do
