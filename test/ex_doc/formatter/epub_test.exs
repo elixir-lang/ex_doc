@@ -93,6 +93,11 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{output_dir()}/#{doc_config()[:project]}.epub")
   end
 
+  test "generates an EPUB file with erlang as proglang" do
+    generate_docs(Keyword.put(doc_config(), :proglang, :erlang))
+    assert File.regular?("#{output_dir()}/#{doc_config()[:project]}.epub")
+  end
+
   test "generates an EPUB file in specified output directory" do
     config = doc_config(output: "#{output_dir()}/another_dir", main: "RandomError")
     generate_docs(config)
