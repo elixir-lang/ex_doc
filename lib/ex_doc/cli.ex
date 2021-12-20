@@ -26,7 +26,8 @@ defmodule ExDoc.CLI do
           package: :string,
           proglang: :string,
           source_ref: :string,
-          version: :boolean
+          version: :boolean,
+          formatter: :keep
         ]
       )
 
@@ -57,7 +58,18 @@ defmodule ExDoc.CLI do
       |> Keyword.put(:apps, [app(source_beam)])
       |> merge_config()
 
-    generator.(project, version, opts)
+    for formatter <- get_formatters(opts) do
+      index = generator.(project, version, Keyword.put(opts, :formatter, formatter))
+      IO.puts(IO.ANSI.format([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"]))
+      index
+    end
+  end
+
+  defp get_formatters(opts) do
+    case Keyword.get_values(opts, :formatter) do
+      [] -> opts[:formatters] || ["html", "epub"]
+      values -> values
+    end
   end
 
   defp app(source_beam) do
@@ -146,7 +158,7 @@ defmodule ExDoc.CLI do
       -n, --canonical     Indicate the preferred URL with rel="canonical" link element
       -c, --config        Give configuration through a file instead of a command line.
                           See "Custom config" section below for more information.
-      -f, --formatter     Docs formatter to use (html or epub), default: "html"
+      -f, --formatter     Docs formatter to use (html or epub), default: html and epub
       -p, --homepage-url  URL to link to for the site name
           --paths         Prepends the given path to Erlang code path. The path might contain a glob
                           pattern but in that case, remember to quote it: --paths "_build/dev/lib/*/ebin".
