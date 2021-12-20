@@ -18,7 +18,8 @@ defmodule ExDoc.CLI do
           m: :main,
           o: :output,
           u: :source_url,
-          v: :version
+          v: :version,
+          q: :quiet
         ],
         switches: [
           language: :string,
@@ -58,9 +59,15 @@ defmodule ExDoc.CLI do
       |> Keyword.put(:apps, [app(source_beam)])
       |> merge_config()
 
+    quiet? = Keyword.get(opts, :quiet, false)
+
     for formatter <- get_formatters(opts) do
       index = generator.(project, version, Keyword.put(opts, :formatter, formatter))
-      IO.puts(IO.ANSI.format([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"]))
+
+      unless quiet? do
+        IO.puts(IO.ANSI.format([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"]))
+      end
+
       index
     end
   end
@@ -173,6 +180,7 @@ defmodule ExDoc.CLI do
       -u, --source-url    URL to the source code
       -o, --output        Path to output docs, default: "doc"
       -v, --version       Print ExDoc version
+      -q, --quiet         Only output warnings and errors
 
     ## Custom config
 
