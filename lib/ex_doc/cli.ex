@@ -63,11 +63,7 @@ defmodule ExDoc.CLI do
 
     for formatter <- get_formatters(opts) do
       index = generator.(project, version, Keyword.put(opts, :formatter, formatter))
-
-      unless quiet? do
-        IO.puts(IO.ANSI.format([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"]))
-      end
-
+      quiet? || IO.puts(IO.ANSI.format([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"]))
       index
     end
   end
