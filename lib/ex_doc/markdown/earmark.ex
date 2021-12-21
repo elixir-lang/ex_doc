@@ -29,8 +29,7 @@ defmodule ExDoc.Markdown.Earmark do
       line: 1,
       file: "nofile",
       breaks: false,
-      pure_links: true,
-      timeout: :infinity
+      pure_links: true
     ]
 
     options = Keyword.merge(options, opts)
