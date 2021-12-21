@@ -80,6 +80,11 @@ defmodule ExDoc.CLITest do
     File.rm!("not_aliased.exs")
   end
 
+  test "with --quiet" do
+    {_, io} = run(["ExDoc", "1.2.3", @ebin, "-q"])
+    assert io == ""
+  end
+
   describe "--config .exs" do
     test "loading" do
       File.write!("test.exs", ~s([extras: ["README.md"], formatters: ["html"]]))
@@ -147,29 +152,6 @@ defmodule ExDoc.CLITest do
       end
     after
       File.rm!("test.config")
-    end
-  end
-
-  describe "verborsity" do
-    test "without --quiet" do
-      File.write!("test.exs", ~s([extras: ["README.md"], formatters: ["html"]]))
-
-      {_, io} = run(["ExDoc", "--extra-section", "Guides", "1.2.3", @ebin, "-c", "test.exs"])
-
-      refute io == ""
-    after
-      File.rm!("test.exs")
-    end
-
-    test "with --quiet" do
-      File.write!("test.exs", ~s([extras: ["README.md"], formatters: ["html"]]))
-
-      {_, io} =
-        run(["ExDoc", "--extra-section", "Guides", "1.2.3", @ebin, "-c", "test.exs", "-q"])
-
-      assert io == ""
-    after
-      File.rm!("test.exs")
     end
   end
 end
