@@ -28,7 +28,8 @@ defmodule ExDoc.CLI do
           proglang: :string,
           source_ref: :string,
           version: :boolean,
-          formatter: :keep
+          formatter: :keep,
+          quiet: :boolean
         ]
       )
 
