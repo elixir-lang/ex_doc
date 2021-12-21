@@ -640,9 +640,13 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
+  # There are two special forms that are forbidden by the tokenizer
+  defp parse_function("__aliases__"), do: {:function, :__aliases__}
+  defp parse_function("__block__"), do: {:function, :__block__}
+
   defp parse_function(string) do
-    case Code.string_to_quoted(":" <> string) do
-      {:ok, function} when is_atom(function) -> {:function, function}
+    case Code.string_to_quoted(string <> "/0") do
+      {:ok, {:/, _, [{function, _, _}, 0]}} when is_atom(function) -> {:function, function}
       _ -> :error
     end
   end
