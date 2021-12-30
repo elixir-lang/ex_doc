@@ -5,6 +5,7 @@ const MODAL_SELECTOR = '#modal'
 const MODAL_CLOSE_BUTTON_SELECTOR = '#modal .modal-close'
 const MODAL_TITLE_SELECTOR = '#modal .modal-title'
 const MODAL_BODY_SELECTOR = '#modal .modal-body'
+const FOCUSABLE_SELECTOR = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 const state = {
   prevFocus: null,
   lastFocus: null,
@@ -43,67 +44,27 @@ function renderModal () {
 function trapFocus (event) {
   if (state.ignoreFocusChanges) return
   var modal = qs(MODAL_SELECTOR)
+  console.log(event.target)
   if (modal.contains(event.target)) {
     state.lastFocus = event.target
   } else {
-    focusFirstDescendant(modal)
+    state.ignoreFocusChanges = true
+    firstFocusableDescendant(modal).focus()
     if (state.lastFocus == document.activeElement) {
-      focusLastDescendant(modal)
+      lastFocusableDescendant(modal).focus()
     }
+    state.ignoreFocusChanges = false
     state.lastFocus = document.activeElement
   }
 }
 
-function focusFirstDescendant(element) {
-  for (var i = 0; i < element.childNodes.length; i++) {
-    var child = element.childNodes[i]
-    if (attemptFocus(child) || focusFirstDescendant(child)) {
-      return true
-    }
-  }
-  return false
+function firstFocusableDescendant(element) {
+  return element.querySelector(FOCUSABLE_SELECTOR)
 }
 
-function focusLastDescendant(element) {
-  for (var i = element.childNodes.length - 1; i >= 0; i--) {
-    var child = element.childNodes[i]
-    if (attemptFocus(child) || focusLastDescendant(child)) {
-      return true
-    }
-  }
-  return false
-}
-
-function attemptFocus (element) {
-  if (!isFocusable(element)) return false
-
-  state.ignoreFocusChanges = true
-  try {
-    element.focus()
-  } catch (e) {
-    // continue regardless of error
-  }
-  state.ignoreFocusChanges = false
-  return document.activeElement === element
-}
-
-function isFocusable (element) {
-  if (element.tabIndex < 0) return false
-
-  if (element.disabled) return false
-
-  switch (element.nodeName) {
-    case 'A':
-      return !!element.href && element.rel != 'ignore'
-    case 'INPUT':
-      return element.type != 'hidden'
-    case 'BUTTON':
-    case 'SELECT':
-    case 'TEXTAREA':
-      return true
-    default:
-      return false
-  }
+function lastFocusableDescendant(element) {
+  const elements = element.querySelectorAll(FOCUSABLE_SELECTOR)
+  return elements[elements.length - 1]
 }
 
 /**
