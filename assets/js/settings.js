@@ -40,9 +40,11 @@ function openSettingsModal () {
     if (settings.livebookUrl === null) {
       directLivebookUrlInput.checked = false
       livebookUrlInput.classList.add('hidden')
+      livebookUrlInput.tabIndex = -1
     } else {
       directLivebookUrlInput.checked = true
       livebookUrlInput.classList.remove('hidden')
+      livebookUrlInput.tabIndex = 0
       livebookUrlInput.value = settings.livebookUrl
     }
   })
