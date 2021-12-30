@@ -10,7 +10,7 @@ const state = {
   prevFocus: null,
   lastFocus: null,
   ignoreFocusChanges: false
-} 
+}
 
 /**
  * Initializes modal layout.
@@ -59,11 +59,11 @@ function trapFocus (event) {
   }
 }
 
-function firstFocusableDescendant(element) {
+function firstFocusableDescendant (element) {
   return element.querySelector(FOCUSABLE_SELECTOR)
 }
 
-function lastFocusableDescendant(element) {
+function lastFocusableDescendant (element) {
   const elements = element.querySelectorAll(FOCUSABLE_SELECTOR)
   return elements[elements.length - 1]
 }
