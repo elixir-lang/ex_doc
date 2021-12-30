@@ -37,7 +37,7 @@ function renderModal () {
  * Only called on open modals
  */
 function trapFocus (e) {
-  if (e.key !== 'Tab') return;
+  if (e.key !== 'Tab') return
 
   // trap focus
   const nodes = qs(MODAL_SELECTOR).querySelectorAll('*')
@@ -64,7 +64,7 @@ function trapFocus (e) {
  */
 export function openModal ({ title, body }) {
   prevFocus = typeof document !== 'undefined' && document.activeElement
-  window.addEventListener("keydown", trapFocus)
+  window.addEventListener('keydown', trapFocus)
 
   qs(MODAL_TITLE_SELECTOR).innerHTML = title
   qs(MODAL_BODY_SELECTOR).innerHTML = body
@@ -79,7 +79,7 @@ export function openModal ({ title, body }) {
 export function closeModal () {
   qs(MODAL_SELECTOR).classList.remove('shown')
 
-  window.removeEventListener("keydown", trapFocus)
+  window.removeEventListener('keydown', trapFocus)
   console.log(prevFocus)
   prevFocus && prevFocus.focus()
 }
