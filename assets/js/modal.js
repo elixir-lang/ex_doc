@@ -46,12 +46,8 @@ function trapFocus (e) {
   let index = tabbable.indexOf(document.activeElement)
   if (index === -1 && e.shiftKey) index = 0
 
-  console.log(index)
-
   index += tabbable.length + (e.shiftKey ? -1 : 1)
   index %= tabbable.length
-
-  console.log(index, tabbable)
 
   tabbable[index].focus()
   e.preventDefault()
@@ -80,7 +76,6 @@ export function closeModal () {
   qs(MODAL_SELECTOR).classList.remove('shown')
 
   window.removeEventListener('keydown', trapFocus)
-  console.log(prevFocus)
   prevFocus && prevFocus.focus()
 }
 
