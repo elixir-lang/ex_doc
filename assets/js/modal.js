@@ -43,15 +43,16 @@ function renderModal () {
  */
 function trapFocus (event) {
   if (state.ignoreFocusChanges) return
-  var modal = qs(MODAL_SELECTOR)
-  console.log(event.target)
+  const modal = qs(MODAL_SELECTOR)
   if (modal.contains(event.target)) {
     state.lastFocus = event.target
   } else {
     state.ignoreFocusChanges = true
-    firstFocusableDescendant(modal).focus()
-    if (state.lastFocus == document.activeElement) {
+    const firstFocusable = firstFocusableDescendant(modal)
+    if (state.lastFocus === firstFocusable) {
       lastFocusableDescendant(modal).focus()
+    } else {
+      firstFocusable.focus()
     }
     state.ignoreFocusChanges = false
     state.lastFocus = document.activeElement
@@ -73,7 +74,7 @@ function lastFocusableDescendant(element) {
  * @param {{ title: String, body: String }} attrs
  */
 export function openModal ({ title, body }) {
-  state.prevFocus = typeof document !== 'undefined' && document.activeElement
+  state.prevFocus = document.activeElement
   document.addEventListener('focus', trapFocus, true)
 
   qs(MODAL_TITLE_SELECTOR).innerHTML = title
