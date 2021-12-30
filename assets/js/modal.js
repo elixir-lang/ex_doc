@@ -5,6 +5,7 @@ const MODAL_SELECTOR = '#modal'
 const MODAL_CLOSE_BUTTON_SELECTOR = '#modal .modal-close'
 const MODAL_TITLE_SELECTOR = '#modal .modal-title'
 const MODAL_BODY_SELECTOR = '#modal .modal-body'
+let prev_focus = null
 
 /**
  * Initializes modal layout.
@@ -32,11 +33,35 @@ function renderModal () {
 }
 
 /**
+ * Trap focus in modal
+ * Only called on open modals
+ */
+function trapFocus (e) {
+  if (e.key !== 'Tab') return;
+
+  // trap focus
+  const nodes = qs(MODAL_SELECTOR).querySelectorAll('*')
+  const tabbable = Array.from(nodes).filter(n => n.tabIndex >= 0)
+
+  let index = tabbable.indexOf(document.activeElement)
+  if (index === -1 && e.shiftKey) index = 0
+
+  index += tabbable.length + (e.shiftKey ? -1 : 1)
+  index %= tabbable.length
+
+  tabbable[index].focus()
+  e.preventDefault()
+}
+
+/**
  * Shows modal with the given content.
  *
  * @param {{ title: String, body: String }} attrs
  */
 export function openModal ({ title, body }) {
+  prev_focus = typeof document !== 'undefined' && document.activeElement
+  window.addEventListener("keydown", trapFocus)
+
   qs(MODAL_TITLE_SELECTOR).innerHTML = title
   qs(MODAL_BODY_SELECTOR).innerHTML = body
 
@@ -49,6 +74,10 @@ export function openModal ({ title, body }) {
  */
 export function closeModal () {
   qs(MODAL_SELECTOR).classList.remove('shown')
+
+  window.removeEventListener("keydown", trapFocus)
+  console.log(prev_focus)
+  prev_focus && prev_focus.focus()
 }
 
 /**
