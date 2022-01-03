@@ -277,6 +277,8 @@ The easiest way to test changes to ExDoc is to locally rebuild the app and its o
   4. Run `mix lint` to check if the Elixir and JavaScript files are properly formatted.
      You can run `mix fix` to let the JavaScript linter and Elixir formatter fix the code automatically before submitting your pull request
 
+Note that Node 17 or later is not supported due to [API breaking changes with Webpack](https://github.com/webpack/webpack/issues/14532).
+
 ## License
 
 ExDoc source code is released under [Apache 2 License](LICENSE). The generated contents, however, are under different licenses based on projects used to help render HTML, including CSS, JS, and other assets.
