@@ -28,7 +28,7 @@
     <%= if specs = get_specs(node) do %>
       <div class="specs">
         <%= for spec <- specs do %>
-          <pre translate="no"><span class="attribute">@spec</span> <%= spec %></pre>
+          <pre translate="no"><span class="attribute"><%= get_spec_attribute(node) %></span> <%= spec %></pre>
         <% end %>
       </div>
     <% end %>
