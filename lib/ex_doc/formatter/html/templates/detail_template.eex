@@ -26,10 +26,9 @@
 
   <section class="docstring">
     <%= if specs = get_specs(node) do %>
-      <h2>Specs</h2>
       <div class="specs">
         <%= for spec <- specs do %>
-          <pre translate="no"><%= spec %></pre>
+          <pre translate="no"><span class="attribute">@spec</span> <%= spec %></pre>
         <% end %>
       </div>
     <% end %>

@@ -418,7 +418,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       integer = ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>()]
 
       public_html =
-        ~S[public(t) :: {t, ] <>
+        ~S[<span class="attribute">@spec</span> public(t) :: {t, ] <>
           ~s[<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), ] <>
           ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>(), ] <>
           ~S[<a href="#t:opaque/0">opaque</a>(), :ok | :error}]
@@ -428,6 +428,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ public_html
       refute content =~ ~s[<strong>private\(t\)]
       assert content =~ ~s[A public type]
+      assert content =~ ~s[<span class="attribute">@spec</span> add(]
       assert content =~ ~s[add(#{integer}, <a href="#t:opaque/0">opaque</a>()) :: #{integer}]
       refute content =~ ~s[minus(#{integer}, #{integer}) :: #{integer}]
 
