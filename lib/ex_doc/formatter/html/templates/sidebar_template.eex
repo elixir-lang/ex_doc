@@ -24,6 +24,11 @@
 
   <% url = config.homepage_url || "#{config.main}.html" %>
   <div class="sidebar-header">
+    <%= if config.logo do %>
+      <a href="<%= url %>">
+        <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
+      </a>
+    <% end %>
     <div class="sidebar-projectDetails">
       <a href="<%= url %>" class="sidebar-projectName" translate="no">
         <%= config.project %>
@@ -32,24 +37,19 @@
         v<%= config.version %>
       </strong>
     </div>
-    <%= if config.logo do %>
-      <a href="<%= url %>">
-        <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
-      </a>
-    <% end %>
+    <ul class="sidebar-listNav">
+      <li><a id="extras-list-link" href="#full-list"><%= config.extra_section || "Pages" %></a></li>
+    
+      <%= if nodes_map.modules != [] do %>
+        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+      <% end %>
+    
+      <%= if nodes_map.tasks != [] do %>
+        <li><a id="tasks-list-link" href="#full-list"><span translate="no">Mix</span> Tasks</a></li>
+      <% end %>
+    </ul>
   </div>
 
-  <ul class="sidebar-listNav">
-    <li><a id="extras-list-link" href="#full-list"><%= config.extra_section || "Pages" %></a></li>
-
-    <%= if nodes_map.modules != [] do %>
-      <li><a id="modules-list-link" href="#full-list">Modules</a></li>
-    <% end %>
-
-    <%= if nodes_map.tasks != [] do %>
-      <li><a id="tasks-list-link" href="#full-list"><span translate="no">Mix</span> Tasks</a></li>
-    <% end %>
-  </ul>
   <div class="gradient"></div>
   <ul id="full-list" class="sidebar-fullList"></ul>
 </section>

@@ -36,21 +36,23 @@
   }
 
   .sidebar-header {
-    margin: 15px 0 15px 30px;
+    margin: 10px;
+    padding-top: 10px;
+    background-color: darken(@darkGray, 8%);
   }
 
   .sidebar-projectDetails {
     display: inline-block;
-    text-align: right;
+    text-align: left;
     vertical-align: top;
-    margin-top: 6px;
+    margin: 6px 0 0 10px;
   }
 
   .sidebar-projectImage {
     display: inline-block;
     max-width: 64px;
     max-height: 64px;
-    margin-left: 15px;
+    margin: 0 0 0 10px;
     vertical-align: bottom;
   }
 
@@ -61,7 +63,6 @@
     color: @white;
     margin: 0;
     padding: 0;
-    padding-left: 20px;
     max-width: 230px;
     word-wrap: break-word;
   }
@@ -111,7 +112,8 @@
   }
 
   .sidebar-listNav {
-    padding: 10px 30px 20px 30px;
+    padding: 0px;
+    padding-top: 20px;
     margin: 0;
 
     li,
@@ -122,8 +124,8 @@
     }
 
     li {
-      padding-left: 17px;
-      border-left: 3px solid transparent;
+      display: inline-block;
+      border-bottom: 3px solid transparent;
       transition: all 0.3s linear;
       line-height: 27px;
 
