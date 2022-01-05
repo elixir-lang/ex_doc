@@ -192,9 +192,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r("id":"CompiledWithDocs",.*"key":"functions".*"example/2")ms
     assert content =~ ~r{"id":"CompiledWithDocs\.Nested",.*"title":"CompiledWithDocs\.Nested"}ms
 
-    assert content =~ ~r{"id":"UndefParent\.Nested",.*"title":"UndefParent\.Nested"}ms
-    refute content =~ ~r{"id":"UndefParent\.Undocumented"}ms
-
     assert content =~ ~r{"id":"CustomBehaviourOne",.*"title":"CustomBehaviourOne"}ms
     assert content =~ ~r{"id":"CustomBehaviourTwo",.*"title":"CustomBehaviourTwo"}ms
     assert content =~ ~r{"id":"RandomError",.*"title":"RandomError"}ms
@@ -214,45 +211,6 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     assert content =~
              ~r{<a href="Mix.Tasks.TaskWithDocs.html" translate="no">mix task_with_docs</a>}
-  end
-
-  test "groups modules by nesting" do
-    doc_config()
-    |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix.B, Common.Nesting.Prefix.B.B])
-    |> generate_docs()
-
-    "sidebarNodes=" <> content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
-    assert {:ok, %{"modules" => modules}} = Jason.decode(content)
-
-    assert %{"nested_context" => "Common.Nesting.Prefix.B"} =
-             Enum.find(modules, fn %{"id" => id} -> id == "Common.Nesting.Prefix.B.C" end)
-
-    assert %{"nested_context" => "Common.Nesting.Prefix.B.B"} =
-             Enum.find(modules, fn %{"id" => id} -> id == "Common.Nesting.Prefix.B.B.A" end)
-  end
-
-  test "groups modules by nesting respecting groups" do
-    groups = [
-      Group1: [
-        Common.Nesting.Prefix.B.A,
-        Common.Nesting.Prefix.B.C
-      ],
-      Group2: [
-        Common.Nesting.Prefix.B.B.A,
-        Common.Nesting.Prefix.C
-      ]
-    ]
-
-    doc_config()
-    |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix.B, Common.Nesting.Prefix.B.B])
-    |> Keyword.put(:groups_for_modules, groups)
-    |> generate_docs()
-
-    "sidebarNodes=" <> content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
-    assert {:ok, %{"modules" => modules}} = Jason.decode(content)
-
-    assert %{"Group1" => [_, _], "Group2" => [_, _]} =
-             Enum.group_by(modules, &Map.get(&1, "group"))
   end
 
   describe "generates logo" do

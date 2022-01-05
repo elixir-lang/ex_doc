@@ -91,44 +91,6 @@ defmodule ExDoc.RetrieverTest do
       assert %{id: "baz/0", group: :"Group 2"} = baz
     end
 
-    test "nesting", c do
-      elixirc(c, ~S"""
-      defmodule Nesting.Prefix.B.A do
-      end
-
-      defmodule Nesting.Prefix.B.B.A do
-      end
-
-      defmodule Nesting.Prefix.B.C do
-      end
-
-      defmodule Nesting.Prefix.C do
-      end
-      """)
-
-      mods =
-        Retriever.docs_from_modules(
-          [Nesting.Prefix.B.A, Nesting.Prefix.B.C],
-          %ExDoc.Config{nest_modules_by_prefix: ["Nesting.Prefix.B"]}
-        )
-
-      assert length(mods) == 2
-
-      assert Enum.at(mods, 0).nested_context == "Nesting.Prefix.B"
-      assert Enum.at(mods, 0).nested_title == "A"
-
-      assert Enum.at(mods, 1).nested_context == "Nesting.Prefix.B"
-      assert Enum.at(mods, 1).nested_title == "C"
-
-      [mod] =
-        Retriever.docs_from_modules([Nesting.Prefix.B.B.A], %ExDoc.Config{
-          nest_modules_by_prefix: ["Nesting.Prefix.B.B.A"]
-        })
-
-      refute mod.nested_context
-      refute mod.nested_title
-    end
-
     test "fails when module is not available" do
       assert_raise Retriever.Error, "module NotAvailable is not defined/available", fn ->
         Retriever.docs_from_modules([NotAvailable], %ExDoc.Config{})

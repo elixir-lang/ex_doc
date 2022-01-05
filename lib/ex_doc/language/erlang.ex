@@ -35,7 +35,6 @@ defmodule ExDoc.Language.Erlang do
       type: type,
       line: line,
       callback_types: [:callback],
-      nesting_info: nil,
       private: %{
         abst_code: abst_code,
         specs: get_specs(module),

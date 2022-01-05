@@ -101,8 +101,6 @@ defmodule Mix.Tasks.Docs do
       to provide up-to-date data for features like the version dropdown - See the "Additional
       JavaScript config" section. Example: `"../versions.js"`
 
-    * `:nest_modules_by_prefix` - See the "Nesting" section
-
     * `:language` - Identify the primary language of the documents, its value must be
       a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
 
@@ -242,13 +240,13 @@ defmodule Mix.Tasks.Docs do
 
   ## Additional JavaScript config
 
-  Since version `0.20.0` ExDoc includes a way to enrich the documentation
-  with new information without having to re-generate it, through a JavaScript
-  file that can be shared across documentation for multiple versions of the
-  package. If `:javascript_config_path` is set when building the documentation,
-  this script will be referenced in each page's `<head>` using a `<script>` tag.
-  The script should define data in global JavaScript variables that will be
-  interpreted by `ex_doc` when viewing the documentation.
+  ExDoc includes a way to enrich the documentation with new information without
+  having to re-generate it, through a JavaScript file that can be shared across
+  documentation for multiple versions of the package. If `:javascript_config_path`
+  is set when building the documentation, this script will be referenced in each
+  page's `<head>` using a `<script>` tag. The script should define data in global
+  JavaScript variables that will be interpreted by `ex_doc` when viewing the
+  documentation.
 
   Currently supported variables:
 
@@ -269,20 +267,6 @@ defmodule Mix.Tasks.Docs do
     }
   ]
   ```
-
-  ## Nesting
-
-  ExDoc also allows module names in the sidebar to appear nested under a given
-  prefix. The `:nest_modules_by_prefix` expects a list of module names, such as
-  `[Foo.Bar, Bar.Baz]`. In this case, a module named `Foo.Bar.Baz` will appear
-  nested within `Foo.Bar` and only the name `Baz` will be shown in the sidebar.
-  Note the `Foo.Bar` module itself is not affected.
-
-  This option is mainly intended to improve the display of long module names in
-  the sidebar, particularly when they are too long for the sidebar or when many
-  modules share a long prefix. If you mean to group modules logically or call
-  attention to them in the docs, you should probably use `:groups_for_modules`
-  (which can be used in conjunction with `:nest_modules_by_prefix`).
 
   ## Umbrella project
 

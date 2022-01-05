@@ -132,10 +132,8 @@ defmodule ExDoc.Formatter.EPUBTest do
 
     assert content =~ ~r{.*"CompiledWithDocs\".*}ms
     assert content =~ ~r{.*"CompiledWithDocs.Nested\".*}ms
-    assert content =~ ~r{.*"UndefParent\.Nested\".*}ms
     assert content =~ ~r{.*"CustomBehaviourOne\".*}ms
     assert content =~ ~r{.*"CustomBehaviourTwo\".*}ms
-    refute content =~ ~r{UndefParent\.Undocumented}ms
     assert content =~ ~r{.*"RandomError\".*}ms
     assert content =~ ~r{.*"CustomProtocol\".*}ms
     assert content =~ ~r{.*"Mix\.Tasks\.TaskWithDocs\".*}ms
