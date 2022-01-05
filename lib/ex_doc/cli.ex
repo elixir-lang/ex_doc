@@ -176,6 +176,7 @@ defmodule ExDoc.CLI do
                           The image size will be 64x64 and copied to the assets directory
       -m, --main          The entry-point page in docs, default: "api-reference"
           --package       Hex package name
+          --proglang      The project's programming language, default: "elixir"
           --source-ref    Branch/commit/tag used for source link inference, default: "master"
       -u, --source-url    URL to the source code
       -o, --output        Path to output docs, default: "doc"
