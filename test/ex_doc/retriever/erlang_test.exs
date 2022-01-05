@@ -35,8 +35,6 @@ defmodule ExDoc.Retriever.ErlangTest do
         group: nil,
         id: "mod",
         module: :mod,
-        nested_context: nil,
-        nested_title: nil,
         rendered_doc: nil,
         source_path: _,
         source_url: nil,
