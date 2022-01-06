@@ -241,30 +241,34 @@
 
       a.expand {
         &:after {
-          content: @arrow-down;
+          .remix-icon;
+          content: @icon-arrow-down-s;
           float: right;
           margin-right: 20px;
-          font-size: 0.5em;
+          font-size: 1.2em;
         }
       }
 
       &.open > a {
         &:after {
-          content: @arrow-up;
+          .remix-icon;
+          content: @icon-arrow-up-s;
         }
       }
 
       &.docs > a {
         &:after {
-          margin-right: 10px;
-          content: @plus-sign;
+          .remix-icon;
+          margin-right: 12px;
+          content: @icon-add;
           font-size: 1em;
         }
       }
 
       &.docs.open > a {
         &:after {
-          content: @minus-sign;
+          .remix-icon;
+          content: @icon-subtract;
         }
       }
 
