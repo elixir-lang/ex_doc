@@ -8,6 +8,7 @@ h6 {
   font-weight: 700;
   line-height: 1.5em;
   word-wrap: break-word;
+  color: @darkGrayTextHeaders;
 }
 
 h1 {
@@ -27,6 +28,10 @@ h1 {
   }
 
   a.view-source {
+    font-size: 1.2rem;
+  }
+
+  .settings {
     font-size: 1.2rem;
   }
 }
@@ -61,6 +66,21 @@ a.view-source {
 
   &:hover {
     color: @darkGray;
+  }
+}
+
+.settings {
+  background-color: transparent;
+  float: right;
+  color: @lightGray;
+  text-decoration: none;
+  border: none;
+  transition: color 0.1s ease-in-out;
+  margin-top: 12px;
+  cursor: pointer;
+
+  &:hover {
+    color: @main;
   }
 }
 

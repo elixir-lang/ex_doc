@@ -9,6 +9,17 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'remixicon';
+  src: url('../fonts/remixicon.eot?t=1590207869815'); /* IE9*/
+  src: url('../fonts/remixicon.eot?t=1590207869815#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('../fonts/remixicon.woff2?t=1590207869815') format('woff2'),
+  url('../fonts/remixicon.woff?t=1590207869815') format('woff'),
+  url('../fonts/remixicon.ttf?t=1590207869815') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('../fonts/remixicon.svg?t=1590207869815#remixicon') format('svg'); /* iOS 4.1- */
+  font-display: swap;
+}
+
 .icon-elem {
   font-family: 'icomoon';
   speak: none;
@@ -27,6 +38,14 @@
 [class*=" icon-"] {
   .icon-elem;
 }
+
+[class^="ri-"], [class*=" ri-"], .remix-icon {
+  font-family: 'remixicon';
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 
 .icon-link:before {
 	content: "\e005";
@@ -54,6 +73,7 @@
 	content: "\f121";
 }
 
+// Icomoon
 @icon-link: "\e005";
 @icon-search: "\e036";
 @icon-cross: "\e117";
@@ -61,3 +81,18 @@
 @icon-goto: "\e968";
 @icon-angle-right: "\f105";
 @icon-code: "\f121";
+
+// Remix
+@icon-arrow-up-s: "\ea78";
+@icon-arrow-down-s: "\ea4e";
+@icon-arrow-right-s: "\ea6e";
+@icon-add: "\ea13";
+@icon-subtract: "\f1af";
+
+.ri-settings-3-line:before { content: "\f0e6"; }
+.ri-add-line:before { content: "\ea13"; }
+.ri-subtract-line:before { content: "\f1af"; }
+.ri-arrow-up-s-line:before { content: "\ea78"; }
+.ri-arrow-down-s-line:before { content: "\ea4e"; }
+.ri-arrow-right-s-line:before { content: "\ea6e"; }
+.ri-search-2-line:before { content: "\f0cd"; }

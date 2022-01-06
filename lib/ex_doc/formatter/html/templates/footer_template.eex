@@ -32,9 +32,6 @@
           <button class="line footer-button display-quick-switch">
             Go to a HexDocs package
           </button>
-          <button class="line footer-button display-settings">
-            Settings
-          </button>
         </p>
       </footer>
     </div>

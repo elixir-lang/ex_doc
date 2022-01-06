@@ -3,6 +3,10 @@
 
 <h1 id="content">
   <%= node.title_content %>
+  <button class="settings display-settings">
+    <i class="ri-settings-3-line"></i>
+    <span class="sr-only">Settings</span>
+  </button>
   <%= if node.source_url do %>
     <a href="<%= node.source_url %>" title="View Source" class="view-source" rel="help">
       <span class="icon-code" aria-hidden="true"></span>

@@ -36,21 +36,24 @@
   }
 
   .sidebar-header {
-    margin: 15px 0 15px 30px;
+    margin: 12px;
+    padding-top: 10px;
+    border-radius: 4px;
+    background-color: @bgMediumGray;
   }
 
   .sidebar-projectDetails {
     display: inline-block;
-    text-align: right;
+    text-align: left;
     vertical-align: top;
-    margin-top: 6px;
+    margin: 6px 0 0 10px;
   }
 
   .sidebar-projectImage {
     display: inline-block;
-    max-width: 64px;
-    max-height: 64px;
-    margin-left: 15px;
+    max-width: 54px;
+    max-height: 54px;
+    margin: 0 0 0 10px;
     vertical-align: bottom;
   }
 
@@ -58,10 +61,9 @@
     font-weight: 700;
     font-size: 24px;
     line-height: 30px;
-    color: @white;
+    color: @lightestGray;
     margin: 0;
     padding: 0;
-    padding-left: 20px;
     max-width: 230px;
     word-wrap: break-word;
   }
@@ -74,7 +76,7 @@
     font-weight: 300;
     font-size: 16px;
     line-height: 20px;
-    color: @white;
+    color: @lightGray;
   }
 
   .sidebar-projectVersionsDropdown {
@@ -111,7 +113,8 @@
   }
 
   .sidebar-listNav {
-    padding: 10px 30px 20px 30px;
+    padding: 0px;
+    padding-top: 15px;
     margin: 0;
 
     li,
@@ -119,11 +122,12 @@
       text-transform: uppercase;
       font-weight: 300;
       font-size: 14px;
+      color: @lightGray;
     }
 
     li {
-      padding-left: 17px;
-      border-left: 3px solid transparent;
+      display: inline-block;
+      border-bottom: 3px solid transparent;
       transition: all 0.3s linear;
       line-height: 27px;
 
@@ -132,7 +136,7 @@
       &:hover a,
       &.selected a {
         border-color: @main;
-        color: @white;
+        color: @lightestGray;
       }
     }
   }
@@ -198,7 +202,7 @@
     }
 
     .search-input {
-      background-color: darken(@darkGray, 8%);
+      background-color: @bgMediumGray;
       border: none;
       border-radius: 4px;
       color: @lightestGray;
@@ -219,8 +223,8 @@
   }
 
   #full-list {
-    margin: 0 0 0 30px;
-    padding: 10px 20px;
+    margin: 0;
+    padding: 20px 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     .flex(1);
@@ -233,6 +237,40 @@
 
       &.open > ul {
         display: block;
+        margin-left: 10px;
+      }
+
+      a.expand {
+        &:after {
+          .remix-icon;
+          content: @icon-arrow-down-s;
+          float: right;
+          margin-right: 18px;
+          font-size: 1.2em;
+        }
+      }
+
+      &.open > a {
+        &:after {
+          .remix-icon;
+          content: @icon-arrow-up-s;
+        }
+      }
+
+      &.docs > a {
+        &:after {
+          .remix-icon;
+          margin-right: 10px;
+          content: @icon-add;
+          font-size: 1em;
+        }
+      }
+
+      &.docs.open > a {
+        &:after {
+          .remix-icon;
+          content: @icon-subtract;
+        }
       }
 
       &.group {
@@ -241,7 +279,13 @@
         font-size: 0.8em;
         margin: 2.0em 0 0;
         line-height: 1.8em;
-        color: @groupGray;
+        color: @lightGray;
+        padding-left: 20px;
+      }
+
+      a {
+        padding: 3px 0 3px 20px;
+        color: @accentLightGray;
       }
 
       a.expand,
@@ -267,17 +311,27 @@
 
     &>li {
       &.current-page > a {
-        color: @white;
+        color: @main;
+        border-left: 3px solid @main;
+        padding-left: 17px;
+        &:after {
+          color: @main;
+        }
       }
 
       &:last-child {
         margin-bottom: 30px;
+      }
+
+      &.group:first-child {
+        margin-top: 0;
       }
     }
 
     ul {
       display: none;
       margin: 9px 15px;
+      margin-right: 0;
       padding: 0;
 
       li {
@@ -285,28 +339,44 @@
         line-height: 18px;
         padding: 2px 10px;
 
+        &.current-hash:before {
+          content: "\2022";
+          color: @main;
+        }
+
+        &.current-hash > a {
+          color: @main;
+          margin-left: -12px;
+        }
+
+        a {
+          padding-left: 13px;
+        }
+
         ul {
           display: none;
-          margin: 9px 4px;
+          margin: 9px 20px;
 
           li {
-            border-left: 1px solid @mediumGray;
+            border-left: 1px solid @accentMediumGray;
             padding: 0px 10px;
+            margin-left: 10px;
+
+            a {
+              padding-left: 0px;
+            }
 
             &.current-hash:before {
-              .icon-elem;
-              content: @icon-angle-right;
-              margin-left: -10px;
-              font-size: 16px;
-              margin-right: 5px;
+              content: none;
             }
 
             &.current-hash {
-              border-left: none;
+              border-color: @main;
             }
 
             &.current-hash > a {
-              color: @white;
+              color: @main;
+              margin-left: 0;
             }
           }
         }
