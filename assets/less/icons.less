@@ -9,6 +9,17 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'remixicon';
+  src: url('../fonts/remixicon.eot?t=1590207869815'); /* IE9*/
+  src: url('../fonts/remixicon.eot?t=1590207869815#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('../fonts/remixicon.woff2?t=1590207869815') format('woff2'),
+  url('../fonts/remixicon.woff?t=1590207869815') format('woff'),
+  url('../fonts/remixicon.ttf?t=1590207869815') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('../fonts/remixicon.svg?t=1590207869815#remixicon') format('svg'); /* iOS 4.1- */
+  font-display: swap;
+}
+
 .icon-elem {
   font-family: 'icomoon';
   speak: none;
@@ -27,6 +38,14 @@
 [class*=" icon-"] {
   .icon-elem;
 }
+
+[class^="ri-"], [class*=" ri-"] {
+  font-family: 'remixicon' !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 
 .icon-link:before {
 	content: "\e005";
@@ -66,3 +85,5 @@
 @arrow-down: "\142F";
 @plus-sign: "\002B";
 @minus-sign: "\002D";
+
+.ri-settings-3-line:before { content: "\f0e6"; }
