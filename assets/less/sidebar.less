@@ -338,6 +338,16 @@
         line-height: 18px;
         padding: 2px 10px;
 
+        &.current-hash:before {
+          list-style-type: circle;
+          color: @main;
+        }
+
+        &.current-hash > a {
+          color: @main;
+          margin-left: -6px;
+        }
+
         ul {
           display: none;
           margin: 9px 4px;
