@@ -237,6 +237,7 @@
 
       &.open > ul {
         display: block;
+        margin-left: 10px;
       }
 
       a.expand {
@@ -244,7 +245,7 @@
           .remix-icon;
           content: @icon-arrow-down-s;
           float: right;
-          margin-right: 20px;
+          margin-right: 18px;
           font-size: 1.2em;
         }
       }
@@ -259,7 +260,7 @@
       &.docs > a {
         &:after {
           .remix-icon;
-          margin-right: 12px;
+          margin-right: 10px;
           content: @icon-add;
           font-size: 1em;
         }
@@ -340,39 +341,42 @@
 
         &.current-hash:before {
           content: "\2022";
-          margin-left: -6px;
           color: @main;
         }
 
         &.current-hash > a {
           color: @main;
-          margin-left: -6px;
+          margin-left: -12px;
+        }
+
+        a {
+          padding-left: 13px;
         }
 
         ul {
           display: none;
-          margin: 9px 4px;
+          margin: 9px 20px;
 
           li {
             border-left: 1px solid @accentMediumGray;
             padding: 0px 10px;
+            margin-left: 10px;
+
+            a {
+              padding-left: 0px;
+            }
 
             &.current-hash:before {
-              .icon-elem;
-              content: @icon-angle-right;
-              margin-left: -10px;
-              font-size: 16px;
-              margin-right: 5px;
-              color: @main;
+              content: none;
             }
 
             &.current-hash {
-              border-left: none;
+              border-color: @main;
             }
 
             &.current-hash > a {
               color: @main;
-              margin-left: -3px;
+              margin-left: 0;
             }
           }
         }
