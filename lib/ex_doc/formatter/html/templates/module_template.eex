@@ -4,6 +4,10 @@
 <h1>
   <span translate="no"><%= module.title %></span> <%= module_type(module) %>
   <small class="app-vsn" translate="no">(<%= config.project %> v<%= config.version %>)</small>
+  <button class="settings display-settings">
+    <i class="ri-settings-3-line"></i>
+    <span class="sr-only">Settings</span>
+  </button>
   <%= if module.source_url do %>
     <a href="<%= module.source_url %>" title="View Source" class="view-source" rel="help">
       <span class="icon-code" aria-hidden="true"></span>

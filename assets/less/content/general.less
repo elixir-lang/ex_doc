@@ -30,6 +30,10 @@ h1 {
   a.view-source {
     font-size: 1.2rem;
   }
+
+  .settings {
+    font-size: 1.2rem;
+  }
 }
 
 h2 {
@@ -62,6 +66,21 @@ a.view-source {
 
   &:hover {
     color: @darkGray;
+  }
+}
+
+.settings {
+  background-color: transparent;
+  float: right;
+  color: @lightGray;
+  text-decoration: none;
+  border: none;
+  transition: color 0.1s ease-in-out;
+  margin-top: 12px;
+  cursor: pointer;
+
+  &:hover {
+    color: @main;
   }
 }
 
