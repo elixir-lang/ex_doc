@@ -48,9 +48,18 @@ function renderSidebarNodeList (nodesByType, type) {
   nodeList.querySelectorAll('li a').forEach(anchor => {
     anchor.addEventListener('click', event => {
       const target = event.target
+
+      // Allows only one sub-level to be open
+      if (anchor.matches('.summary') || (anchor.matches('.expand'))) {
+       const alreadyOpen = nodeList.querySelector('.docs.open')
+       if (alreadyOpen) {
+         alreadyOpen.classList.remove('open')
+       }
+      }
+
       if (anchor.matches('.expand')) {
         const listItem = target.closest('li')
-        listItem.classList.toggle('open')
+        listItem.classList.add('open')
       }
     })
   })
