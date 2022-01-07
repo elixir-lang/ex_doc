@@ -32,7 +32,7 @@ const keyboardShortcuts = [
   },
   {
     key: 'g',
-    description: 'Go to a HexDocs package',
+    description: 'Search HexDocs package',
     displayAs: '<kbd><kbd>g</kdb></kdb>',
     action: openQuickSwitchModal
   },

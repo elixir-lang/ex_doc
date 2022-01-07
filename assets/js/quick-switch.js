@@ -72,7 +72,7 @@ function handleInput (event) {
  */
 export function openQuickSwitchModal () {
   openModal({
-    title: 'Go to a HexDocs package',
+    title: 'Search HexDocs package',
     body: quickSwitchModalBodyTemplate()
   })
 

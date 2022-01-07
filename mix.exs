@@ -17,6 +17,7 @@ defmodule ExDoc.Mixfile do
       source_url: @source_url,
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
+      name: "ExDoc",
       description: "ExDoc is a documentation generation tool for Elixir",
       docs: docs()
     ]
@@ -31,7 +32,7 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [
-      {:earmark_parser, "~> 1.4.0"},
+      {:earmark_parser, "~> 1.4.18"},
       {:makeup_elixir, "~> 0.14"},
       {:makeup_erlang, "~> 0.1"},
       {:jason, "~> 1.2", only: :test}
@@ -51,14 +52,7 @@ defmodule ExDoc.Mixfile do
   defp package do
     [
       licenses: ["Apache-2.0"],
-      maintainers: [
-        "José Valim",
-        "Eksperimental",
-        "Milton Mazzarri",
-        "Friedel Ziegelmayer",
-        "Dmitry",
-        "Wojtek Mach"
-      ],
+      maintainers: ["José Valim", "Eksperimental", "Milton Mazzarri", "Wojtek Mach"],
       files: ["formatters", "lib", "mix.exs", "LICENSE", "CHANGELOG.md", "README.md"],
       links: %{
         "GitHub" => @source_url,
