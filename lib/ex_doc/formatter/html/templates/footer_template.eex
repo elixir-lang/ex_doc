@@ -1,22 +1,22 @@
       <footer class="footer">
-        <p>
-          On Hex.pm:
+        <%= if config.package do %>
+          <p>
+            On Hex.pm:
 
-          <%= if config.package do %>
-          <span class="line">
-            <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>" class="line footer-hex-package">Package</a>
-            <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>" class="line">Preview</a>
+            <span class="line">
+              <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>" class="line footer-hex-package">Package</a>
+              <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>" class="line">Preview</a>
 
-            <%= source_path = node && Map.get(node, :source_path); if source_path do %>
-              <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>/show/<%= source_path %>">(current file)</a>
-            <% end %>
-          </span>
-          <% end %>
+              <%= source_path = node && Map.get(node, :source_path); if source_path do %>
+                <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>/show/<%= source_path %>">(current file)</a>
+              <% end %>
+            </span>
 
-          <button class="line footer-button display-quick-switch">
-            Search
-          </button>
-        </p>
+            <button class="line footer-button display-quick-switch">
+              Search
+            </button>
+          </p>
+        <% end %>
 
         <p>
           Built using
