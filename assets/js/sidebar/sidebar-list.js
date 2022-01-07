@@ -56,7 +56,6 @@ function renderSidebarNodeList (nodesByType, type) {
       }
 
       if (anchor.matches('.expand')) {
-        event.preventDefault()
         const listItem = target.closest('li')
         listItem.classList.toggle('open')
       }
