@@ -44,6 +44,16 @@ function renderSidebarNodeList (nodesByType, type) {
   // Highlight the corresponding navigation link
   highlightNavigationLink(type)
 
+  // Removes the "expand" class from links belonging to single-level sections
+  nodeList.querySelectorAll('ul').forEach(list => {
+    if (list.innerHTML.trim() == "") {
+      const emptyExpand = list.previousElementSibling
+      if (emptyExpand.classList.contains('expand')) {
+        emptyExpand.classList.remove('expand')
+      }
+    }
+  })
+
   // Register event listeners
   nodeList.querySelectorAll('li a').forEach(anchor => {
     anchor.addEventListener('click', event => {
