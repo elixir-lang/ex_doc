@@ -15,11 +15,11 @@ defmodule Mix.Tasks.Docs do
       "epub". This option can be given more than once. By default,
       both html and epub are generated.
 
-    * `--output`, `-o` - Output directory for the generated
-      docs, default: `"doc"`
-
     * `--language` - Specifies the language to annotate the
       EPUB output in valid [BCP 47](https://tools.ietf.org/html/bcp47)
+
+    * `--output`, `-o` - Output directory for the generated
+      docs, default: `"doc"`
 
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
@@ -58,6 +58,8 @@ defmodule Mix.Tasks.Docs do
       directory in the output path. Its entries may be referenced in your docs
       under "assets/ASSET.EXTENSION"; defaults to no assets directory.
 
+    * `:authors` - List of authors for the generated docs or epub.
+
     * `:before_closing_body_tag` - a function that takes as argument an atom specifying
       the formatter being used (`:html` or `:epub`) and returns a literal HTML string
       to be included just before the closing body tag (`</body>`).
@@ -72,6 +74,11 @@ defmodule Mix.Tasks.Docs do
 
     * `:canonical` - String that defines the preferred URL with the rel="canonical"
       element; defaults to no canonical path.
+
+    * `:cover` - Path to the epub cover image (only PNG or JPEG accepted)
+      The image size should be around 1600x2400. When specified, the cover will be placed under
+      the "assets" directory in the output path under the name "cover" and the
+      appropriate extension. This option has no effect when using the "html" formatter.
 
     * `:deps` - A keyword list application names and their documentation URL.
       ExDoc will by default include all dependencies and assume they are hosted on
@@ -97,6 +104,9 @@ defmodule Mix.Tasks.Docs do
 
     * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See the "Groups" section
 
+    * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
+      Receives a list of atoms. Example: `[:first_app, :second_app]`.
+
     * `:javascript_config_path` - Path of an additional JavaScript file to be included on all pages
       to provide up-to-date data for features like the version dropdown - See the "Additional
       JavaScript config" section. Example: `"../versions.js"`
@@ -109,18 +119,19 @@ defmodule Mix.Tasks.Docs do
       the "assets" directory in the output path under the name "logo" and the
       appropriate extension.
 
-    * `:cover` - Path to the epub cover image (only PNG or JPEG accepted)
-      The image size should be around 1600x2400. When specified, the cover will be placed under
-      the "assets" directory in the output path under the name "cover" and the
-      appropriate extension. This option has no effect when using the "html" formatter.
-
-    * `:authors` - List of authors for the generated docs or epub.
-
     * `:main` - Main page of the documentation. It may be a module or a
       generated page, like "Plug" or "api-reference"; default: "api-reference".
 
     * `:markdown_processor` - The markdown processor to use,
       either `module()` or `{module(), keyword()}` to provide configuration options;
+
+    * `:output` - Output directory for the generated docs; default: "doc".
+      May be overridden by command line argument.
+
+    * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
+      reference in the current project docs e.g. because of a typo. This list controls where to
+      skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
+      or on a given file (e.g.: `["pages/deprecations.md"]`); default: `[]`.
 
     * `:source_beam` - Path to the beam directory; default: mix's compile path.
 
@@ -151,17 +162,6 @@ defmodule Mix.Tasks.Docs do
       ```text
       https://mydomain.org/user_or_team/repo_name/src/main/%{path}#cl-%{line}
       ```
-
-    * `:output` - Output directory for the generated docs; default: "doc".
-      May be overridden by command line argument.
-
-    * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
-      Receives a list of atoms. Example: `[:first_app, :second_app]`.
-
-    * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
-      reference in the current project docs e.g. because of a typo. This list controls where to
-      skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
-      or on a given file (e.g.: `["pages/deprecations.md"]`); default: `[]`.
 
   ## Groups
 
