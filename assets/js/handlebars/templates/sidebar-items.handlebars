@@ -25,7 +25,6 @@
           <li class="docs {{#isLocal node.id}}open{{/isLocal}}">
             <a href="{{node.id}}.html#content" class="expand">
               Sections
-              <span class="icon-goto" title="Go to Sections"></span>
             </a>
             <ul class="sections-list deflist">
               {{#each sections}}
@@ -45,7 +44,6 @@
           <li class="docs">
             <a href="{{node.id}}.html#{{group.key}}" class="expand">
               {{group.name}}
-              <span class="icon-goto" title="Go to {{group.name}}"></span>
             </a>
             <ul class="{{group.key}}-list deflist">
               {{#each group.nodes}}

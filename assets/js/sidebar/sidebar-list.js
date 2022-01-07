@@ -48,13 +48,6 @@ function renderSidebarNodeList (nodesByType, type) {
   nodeList.querySelectorAll('li a').forEach(anchor => {
     anchor.addEventListener('click', event => {
       const target = event.target
-      const newWindowKeyDown = event.shiftKey || event.ctrlKey
-
-      if (target.matches('.icon-goto') || newWindowKeyDown) {
-        // The click intended to open the link rather than expanding it.
-        return
-      }
-
       if (anchor.matches('.expand')) {
         const listItem = target.closest('li')
         listItem.classList.toggle('open')
