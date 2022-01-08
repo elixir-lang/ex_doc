@@ -3,7 +3,7 @@ import { openSidebar, toggleSidebar } from './sidebar/sidebar-drawer'
 import { focusSearchInput } from './sidebar/sidebar-search'
 import { toggleNightMode } from './night'
 import { openQuickSwitchModal } from './quick-switch'
-import { closeModal, isModalOpen, openModal } from './modal'
+import { closeModal, isModalOpen } from './modal'
 import { openSettingsModal } from './settings'
 
 const HELP_MODAL_BODY_SELECTOR = '#settings-modal-content'
