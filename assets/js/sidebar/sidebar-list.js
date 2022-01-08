@@ -44,21 +44,32 @@ function renderSidebarNodeList (nodesByType, type) {
   // Highlight the corresponding navigation link
   highlightNavigationLink(type)
 
+  // Removes the "expand" class from links belonging to single-level sections
+  nodeList.querySelectorAll('ul').forEach(list => {
+    if (list.innerHTML.trim() === '') {
+      const emptyExpand = list.previousElementSibling
+      if (emptyExpand.classList.contains('expand')) {
+        emptyExpand.classList.remove('expand')
+      }
+    }
+  })
+
   // Register event listeners
   nodeList.querySelectorAll('li a').forEach(anchor => {
     anchor.addEventListener('click', event => {
       const target = event.target
-      const newWindowKeyDown = event.shiftKey || event.ctrlKey
 
-      if (target.matches('.icon-goto') || newWindowKeyDown) {
-        // The click intended to open the link rather than expanding it.
-        return
+      // Allows only one sub-level to be open
+      if (anchor.matches('.summary') || (anchor.matches('.expand'))) {
+        const alreadyOpen = nodeList.querySelector('.docs.open')
+        if (alreadyOpen) {
+          alreadyOpen.classList.remove('open')
+        }
       }
 
       if (anchor.matches('.expand')) {
-        event.preventDefault()
         const listItem = target.closest('li')
-        listItem.classList.toggle('open')
+        listItem.classList.add('open')
       }
     })
   })

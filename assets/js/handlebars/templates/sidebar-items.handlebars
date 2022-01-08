@@ -11,14 +11,9 @@
     to the top of the page itself. }}
     <a href="{{node.id}}.html" class="expand" {{#isArray node.headers}}{{else}}translate="no"{{/isArray}}>
       {{{node.title}}}
-      <span class="icon-goto" title="Go to {{{node.title}}}"></span>
     </a>
 
     <ul>
-      <li>
-        <a href="{{node.id}}.html#content">Top</a>
-      </li>
-
       {{#isArray node.headers}}
         {{#each node.headers}}
           <li>
@@ -30,7 +25,6 @@
           <li class="docs {{#isLocal node.id}}open{{/isLocal}}">
             <a href="{{node.id}}.html#content" class="expand">
               Sections
-              <span class="icon-goto" title="Go to Sections"></span>
             </a>
             <ul class="sections-list deflist">
               {{#each sections}}
@@ -43,14 +37,13 @@
         {{/showSections}}
         {{#showSummary node}}
           <li>
-            <a href="{{node.id}}.html#summary">Summary</a>
+            <a href="{{node.id}}.html#summary" class="summary">Summary</a>
           </li>
         {{/showSummary}}
         {{#each node.nodeGroups as |group|}}
           <li class="docs">
             <a href="{{node.id}}.html#{{group.key}}" class="expand">
               {{group.name}}
-              <span class="icon-goto" title="Go to {{group.name}}"></span>
             </a>
             <ul class="{{group.key}}-list deflist">
               {{#each group.nodes}}

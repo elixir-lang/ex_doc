@@ -249,7 +249,7 @@
         }
       }
 
-      &.open > a {
+      &.open > a.expand {
         &:after {
           .remix-icon;
           content: @icon-arrow-up-s;
@@ -266,6 +266,7 @@
       }
 
       &.docs.open > a {
+        color: @main;
         &:after {
           .remix-icon;
           content: @icon-subtract;
