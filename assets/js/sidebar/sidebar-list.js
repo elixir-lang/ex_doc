@@ -46,7 +46,7 @@ function renderSidebarNodeList (nodesByType, type) {
 
   // Removes the "expand" class from links belonging to single-level sections
   nodeList.querySelectorAll('ul').forEach(list => {
-    if (list.innerHTML.trim() == "") {
+    if (list.innerHTML.trim() === '') {
       const emptyExpand = list.previousElementSibling
       if (emptyExpand.classList.contains('expand')) {
         emptyExpand.classList.remove('expand')
@@ -61,10 +61,10 @@ function renderSidebarNodeList (nodesByType, type) {
 
       // Allows only one sub-level to be open
       if (anchor.matches('.summary') || (anchor.matches('.expand'))) {
-       const alreadyOpen = nodeList.querySelector('.docs.open')
-       if (alreadyOpen) {
-         alreadyOpen.classList.remove('open')
-       }
+        const alreadyOpen = nodeList.querySelector('.docs.open')
+        if (alreadyOpen) {
+          alreadyOpen.classList.remove('open')
+        }
       }
 
       if (anchor.matches('.expand')) {
