@@ -3,6 +3,7 @@ import { qs } from './helpers'
 import { openModal } from './modal'
 import { shouldUseNightMode } from './night'
 import { settingsStore } from './settings-store'
+import { keyboardShortcuts } from './keyboard-shortcuts'
 
 const SETTINGS_LINK_SELECTOR = '.display-settings'
 const SETTINGS_MODAL_BODY_SELECTOR = '#settings-modal-content'
@@ -20,10 +21,10 @@ function addEventListeners () {
   })
 }
 
-function openSettingsModal () {
+export function openSettingsModal () {
   openModal({
     title: 'Settings',
-    body: settingsModalBodyTemplate({})
+    body: settingsModalBodyTemplate({ shortcuts: keyboardShortcuts })
   })
 
   const modal = qs(SETTINGS_MODAL_BODY_SELECTOR)
