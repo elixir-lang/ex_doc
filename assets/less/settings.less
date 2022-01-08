@@ -9,12 +9,29 @@
 
   .input {
     width: 100%;
-    padding: 6px;
+    padding: 2px 0;
     border: none;
-    border-bottom: 1px solid @mediumGray;
+    color: #445668;
+    font-size: 14px;
 
     &:focus {
       outline: none;
+    }
+
+    &::-webkit-input-placeholder {
+      color: @lightGray;
+    }
+
+    &::-moz-placeholder {
+      color: @lightGray;
+    }
+
+    &:-moz-placeholder {
+      color: @lightGray;
+    }
+
+    &:-ms-input-placeholder {
+      color: @lightGray;
     }
   }
 
@@ -22,6 +39,20 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-bottom: 1px solid #CAD5E0;
+    margin-bottom: 16px;
+  }
+
+  .switch-button-container > div > span {
+    color: @accentMediumGray;
+    font-size: 18px;
+  }
+
+  .switch-button-container > div > p {
+    color: #445668;
+    font-size: 14px;
+    margin: 0;
+    padding-bottom: 4px;
   }
 
   .switch-button {
@@ -64,5 +95,10 @@
 
   .switch-button__checkbox:checked + .switch-button__bg {
     background-color: @main;
+  }
+
+  .keyboard-shortcuts {
+    color: @accentMediumGray;
+    font-size: 18px;
   }
 }

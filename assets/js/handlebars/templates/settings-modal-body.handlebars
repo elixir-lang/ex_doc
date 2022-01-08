@@ -1,24 +1,52 @@
 <div id="settings-modal-content">
   <label class="switch-button-container">
-    <span>Night mode</span>
+    <div>
+      <span>Night mode</span>
+      <p>Switch to a dark mode version of the website.</p>
+    </div>
     <div class="switch-button">
       <input class="switch-button__checkbox" type="checkbox" name="night_mode" />
       <div class="switch-button__bg"></div>
     </div>
   </label>
   <label class="switch-button-container">
-    <span>Show tooltips on code references</span>
+    <div>
+      <span>Show tooltips</span>
+      <p>Shows tooltips when mousing over code references.</p>
+    </div>
     <div class="switch-button">
       <input class="switch-button__checkbox" type="checkbox" name="tooltips" />
       <div class="switch-button__bg"></div>
     </div>
   </label>
   <label class="switch-button-container">
-    <span>Use direct address for "Run in Livebook" badges</span>
+    <div>
+      <span>Run in Livebook</span>
+      <p>Use Direct Address for “Run in Livebook” badges.</p>
+      <input class="input" type="text" name="livebook_url" placeholder="Type here the Livebook URL" />
+    </div>
     <div class="switch-button">
       <input class="switch-button__checkbox" type="checkbox" name="direct_livebook_url" />
       <div class="switch-button__bg"></div>
     </div>
   </label>
-  <input class="input" type="text" name="livebook_url" placeholder="Livebook URL" />
+  <span class="keyboard-shortcuts">Keyboard Shortcuts</span>
+  <div id="keyboard-shortcuts">
+    {{#each shortcuts}}
+      {{#if this.description}}
+        <dl class="shortcut-row">
+          <dt class="shortcut-keys">
+            {{#if this.displayAs}}
+              {{{this.displayAs}}}
+            {{else}}
+              <kbd><kbd>{{this.key}}</kbd></kbd>
+            {{/if}}
+          </dt>
+          <dd class="shortcut-description">
+            {{this.description}}
+          </dd>
+        </dl>
+      {{/if}}
+    {{/each}}
+  </div>
 </div>
