@@ -9,12 +9,31 @@
 
   .input {
     width: 100%;
-    padding: 6px;
+    padding: 0px;
     border: none;
-    border-bottom: 1px solid @mediumGray;
+    border-bottom: 1px solid #CAD5E0;
+    color: @accentMediumGray;
+    font-size: 18px;
+    margin-bottom: 25px;
 
     &:focus {
       outline: none;
+    }
+
+    &::-webkit-input-placeholder {
+      color: @lightGray;
+    }
+
+    &::-moz-placeholder {
+      color: @lightGray;
+    }
+
+    &:-moz-placeholder {
+      color: @lightGray;
+    }
+
+    &:-ms-input-placeholder {
+      color: @lightGray;
     }
   }
 
