@@ -8,7 +8,7 @@ describe('hints extraction', () => {
           Some module <small class="app-vsn">(ExDoc v0.0.1)</small>
 
           <a href="https://github.com/" title="View Source" class="view-source" rel="help">
-            <span class="icon-code" aria-hidden="true"></span>
+            <i class="ri-code-s-slash-line" aria-hidden="true"></i>
             <span class="sr-only">View Source</span>
           </a>
         </h1>
@@ -33,14 +33,14 @@ describe('hints extraction', () => {
       <div>
         <div class="detail-header">
           <a href="#c:configure/1" class="detail-link" title="Link to this callback">
-            <span class="icon-link" aria-hidden="true"></span>
+            <i class="ri-link-m" aria-hidden="true"></i>
             <span class="sr-only">Link to this callback</span>
           </a>
 
           <h1 class="signature">configure(any)</h1>
 
           <a href="https://github.com/" class="view-source" rel="help" title="View Source">
-            <span class="icon-code" aria-hidden="true"></span>
+            <i class="ri-code-s-slash-line" aria-hidden="true"></i>
             <span class="sr-only">View Source</span>
           </a>
         </div>
