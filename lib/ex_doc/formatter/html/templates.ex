@@ -253,7 +253,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp link_heading(_match, tag, title, id, prefix) do
     """
     <#{tag} id="#{prefix}#{id}" class="section-heading">
-      <a href="##{prefix}#{id}" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+      <a href="##{prefix}#{id}" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
       #{title}
     </#{tag}>
     """

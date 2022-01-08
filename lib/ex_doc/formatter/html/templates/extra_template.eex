@@ -9,7 +9,7 @@
   </button>
   <%= if node.source_url do %>
     <a href="<%= node.source_url %>" title="View Source" class="view-source" rel="help">
-      <span class="icon-code" aria-hidden="true"></span>
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
       <span class="sr-only">View Source</span>
     </a>
   <% end %>
