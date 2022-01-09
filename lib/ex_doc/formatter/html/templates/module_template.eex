@@ -10,7 +10,7 @@
   </button>
   <%= if module.source_url do %>
     <a href="<%= module.source_url %>" title="View Source" class="view-source" rel="help">
-      <span class="icon-code" aria-hidden="true"></span>
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
       <span class="sr-only">View Source</span>
     </a>
   <% end %>
@@ -35,7 +35,7 @@
   <section id="summary" class="details-list">
     <h1 class="section-heading">
       <a class="hover-link" href="#summary">
-        <span class="icon-link" aria-hidden="true"></span>
+        <i class="ri-link-m" aria-hidden="true"></i>
         <span class="sr-only">Link to this section</span>
       </a>
       Summary
@@ -48,7 +48,7 @@
   <section id="<%= key %>" class="details-list">
     <h1 class="section-heading">
       <a class="hover-link" href="#<%= key %>">
-        <span class="icon-link" aria-hidden="true"></span>
+        <i class="ri-link-m" aria-hidden="true"></i>
         <span class="sr-only">Link to this section</span>
       </a>
       <%= name %>
