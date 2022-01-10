@@ -58,17 +58,16 @@ function renderSidebarNodeList (nodesByType, type) {
   nodeList.querySelectorAll('li a').forEach(anchor => {
     anchor.addEventListener('click', event => {
       const target = event.target
+      const listItem = target.closest('li')
 
-      // Allows only one sub-level to be open
-      if (anchor.matches('.summary') || (anchor.matches('.expand'))) {
-        const alreadyOpen = nodeList.querySelector('.docs.open')
-        if (alreadyOpen) {
-          alreadyOpen.classList.remove('open')
-        }
+      // Expand icon should not navigate
+      if (target.matches('.icon-expand')) {
+        event.preventDefault()
+        listItem.classList.toggle('open')
+        return
       }
 
       if (anchor.matches('.expand')) {
-        const listItem = target.closest('li')
         listItem.classList.add('open')
       }
     })

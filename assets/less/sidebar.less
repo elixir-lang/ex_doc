@@ -242,7 +242,7 @@
         margin-left: 10px;
       }
 
-      a.expand {
+      a.expand > span {
         &:after {
           .remix-icon;
           content: @icon-arrow-down-s;
@@ -254,14 +254,14 @@
         }
       }
 
-      &.open > a.expand {
+      &.open > a.expand > span {
         &:after {
           .remix-icon;
           content: @icon-arrow-up-s;
         }
       }
 
-      &.docs > a {
+      &.docs > a > span {
         &:after {
           .remix-icon;
           margin-right: 12px;
@@ -272,8 +272,7 @@
         }
       }
 
-      &.docs.open > a {
-        color: @main;
+      &.docs.open > a > span {
         &:after {
           .remix-icon;
           content: @icon-subtract;
@@ -300,20 +299,6 @@
         text-overflow: ellipsis;
       }
 
-      a.expand span {
-        color: @lightestGray;
-        opacity: 0;
-        padding: 0 8px 0 2px;
-        font-size: 0.8em;
-      }
-
-      a.expand:hover span {
-        opacity: 1;
-      }
-
-      a.expand span:hover {
-        color: @white;
-      }
     }
 
     &>li {
