@@ -73,7 +73,7 @@ function renderSidebarNodeList (nodesByType, type) {
         previousSection.classList.remove('current-section')
       }
 
-      if (anchor.matches('.expand')) {
+      if (anchor.matches('.expand') && anchor.pathname === window.location.pathname) {
         listItem.classList.add('open')
       }
     })
