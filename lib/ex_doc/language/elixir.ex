@@ -10,7 +10,7 @@ defmodule ExDoc.Language.Elixir do
   alias ExDoc.Language.Erlang
 
   @impl true
-  def module_data(module, docs_chunk, _config) do
+  def module_data(module, docs_chunk, config) do
     {type, skip} = module_type_and_skip(module)
 
     if skip do
@@ -30,6 +30,7 @@ defmodule ExDoc.Language.Elixir do
         type: type,
         line: line,
         callback_types: [:callback, :macrocallback],
+        nesting_info: nesting_info(title, config.nest_modules_by_prefix),
         private: %{
           abst_code: abst_code,
           specs: Erlang.get_specs(module),
@@ -204,6 +205,15 @@ defmodule ExDoc.Language.Elixir do
   end
 
   ## Module Helpers
+
+  defp nesting_info(title, prefixes) do
+    prefixes
+    |> Enum.find(&String.starts_with?(title, &1 <> "."))
+    |> case do
+      nil -> {nil, nil}
+      prefix -> {"." <> String.trim_leading(title, prefix <> "."), prefix}
+    end
+  end
 
   defp module_type_and_skip(module) do
     cond do

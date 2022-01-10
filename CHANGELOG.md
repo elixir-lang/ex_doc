@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.27.0-dev
+
+  * Enhancements
+    * Introduce new sidebar design
+    * Add `--quiet` option to CLI
+    * Support multiple formatters in the CLI
+    * Show structs as `%Struct{}` instead of `__struct__` in the sidebar
+    * Point Erlang links to `www.erlang.org` instead of `erlang.org`
+    * Improvements to the night mode and styling
+
 ## v0.26.0 (2021-11-21)
 
   * Backwards incompatible changes

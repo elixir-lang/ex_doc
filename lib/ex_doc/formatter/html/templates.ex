@@ -133,7 +133,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
         sections = module_sections(module)
 
         pairs =
-          for key <- [:id, :title],
+          for key <- [:id, :title, :nested_title, :nested_context],
               value = Map.get(module, key),
               do: {key, value}
 

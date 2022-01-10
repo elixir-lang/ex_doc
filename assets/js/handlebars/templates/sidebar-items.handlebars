@@ -5,12 +5,17 @@
     </li>
   {{/groupChanged}}
 
+  {{#nestingChanged ../this node}}
+    <li class="nesting-context" aria-hidden="true" translate="no">{{node.nested_context}}</li>
+  {{/nestingChanged}}
+
   <li class="{{#isLocal node.id}}current-page open{{/isLocal}}">
-    {{! When visiting a module page, the link to this module page
-    in the menu should not link to a new page, instead should link
-    to the top of the page itself. }}
     <a href="{{node.id}}.html" class="expand" {{#isArray node.headers}}{{else}}translate="no"{{/isArray}}>
-      {{{node.title}}}
+      {{#if node.nested_title}}
+        {{{node.nested_title}}}
+      {{else}}
+        {{{node.title}}}
+      {{/if}}
       <span class="icon-expand"></span>
     </a>
 
