@@ -81,7 +81,6 @@ defmodule ExDoc.Mixfile do
       ],
       source_ref: "v#{@version}",
       source_url: @source_url,
-      nest_modules_by_prefix: [ExDoc],
       groups_for_modules: [
         Markdown: [
           ExDoc.Markdown,
