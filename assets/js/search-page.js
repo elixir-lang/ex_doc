@@ -31,7 +31,7 @@ function search (value) {
     const index = getIndex()
 
     try {
-      const results = searchResultsToDecoratedSearchNodes(index.search(queryString))
+      const results = searchResultsToDecoratedSearchNodes(index.search(value))
       renderResults({ value, results })
     } catch (error) {
       renderResults({ value, errorMessage: error.message })
