@@ -242,7 +242,7 @@
         margin-left: 10px;
       }
 
-      a.expand > span {
+      a.expand > span.icon-expand {
         &:after {
           .remix-icon;
           content: @icon-arrow-down-s;
@@ -254,14 +254,14 @@
         }
       }
 
-      &.open > a.expand > span {
+      &.open > a.expand > span.icon-expand {
         &:after {
           .remix-icon;
           content: @icon-arrow-up-s;
         }
       }
 
-      &.docs > a > span {
+      &.docs > a > span.icon-expand {
         &:after {
           .remix-icon;
           margin-right: 12px;
@@ -272,7 +272,7 @@
         }
       }
 
-      &.docs.open > a > span {
+      &.docs.open > a > span.icon-expand {
         &:after {
           .remix-icon;
           content: @icon-subtract;
