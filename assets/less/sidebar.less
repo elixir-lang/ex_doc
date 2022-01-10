@@ -221,14 +221,21 @@
     margin: 0;
     padding: 20px 0;
     overflow-y: auto;
+    position: relative;
     -webkit-overflow-scrolling: touch;
     .flex(1);
 
     li {
       padding: 0;
+      margin-right: 30px;
       line-height: 27px;
       white-space: nowrap;
       overflow: hidden;
+      text-overflow: ellipsis;
+
+      &.docs {
+        margin-right: 0;
+      }
 
       &.open > ul {
         display: block;
@@ -240,8 +247,10 @@
           .remix-icon;
           content: @icon-arrow-down-s;
           float: right;
-          margin-right: 11px;
+          margin-right: 10px;
           font-size: 1.2em;
+          position: absolute;
+          right: 0;
         }
       }
 
@@ -255,9 +264,11 @@
       &.docs > a {
         &:after {
           .remix-icon;
-          margin-right: 4px;
+          margin-right: 12px;
           content: @icon-add;
           font-size: 1em;
+          position: absolute;
+          right: 0;
         }
       }
 
@@ -315,6 +326,10 @@
         }
       }
 
+      &.current-page {
+        color: @main;
+      }
+
       &:last-child {
         margin-bottom: 30px;
       }
@@ -334,10 +349,15 @@
         font-weight: 300;
         line-height: 20px;
         padding: 2px 8px;
+        margin-right: 0px;
+        color: @lightestGray;
 
-        &.current-hash:before {
-          content: "\2022";
+        &.current-hash {
           color: @main;
+          &:before {
+            content: "\2022";
+            color: @main;
+          }
         }
 
         &.current-hash > a {
@@ -352,11 +372,14 @@
         ul {
           display: none;
           margin: 9px 20px;
+          margin-right: 0;
 
           li {
             border-left: 1px solid @accentMediumGray;
             padding: 0px 10px;
             margin-left: 8px;
+            margin-right: 0;
+            color: @lightestGray;
 
             a {
               padding-left: 0px;
@@ -367,6 +390,7 @@
             }
 
             &.current-hash {
+              color: @main;
               border-color: @main;
             }
 
