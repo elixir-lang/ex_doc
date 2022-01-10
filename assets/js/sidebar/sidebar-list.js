@@ -58,17 +58,22 @@ function renderSidebarNodeList (nodesByType, type) {
   nodeList.querySelectorAll('li a').forEach(anchor => {
     anchor.addEventListener('click', event => {
       const target = event.target
+      const listItem = target.closest('li')
+      const previousSection = nodeList.querySelector('.current-section')
 
-      // Allows only one sub-level to be open
-      if (anchor.matches('.summary') || (anchor.matches('.expand'))) {
-        const alreadyOpen = nodeList.querySelector('.docs.open')
-        if (alreadyOpen) {
-          alreadyOpen.classList.remove('open')
-        }
+      // Expand icon should not navigate
+      if (target.matches('.icon-expand')) {
+        event.preventDefault()
+        listItem.classList.toggle('open')
+        return
       }
 
-      if (anchor.matches('.expand')) {
-        const listItem = target.closest('li')
+      // Clear the previous current section
+      if (previousSection) {
+        previousSection.classList.remove('current-section')
+      }
+
+      if (anchor.matches('.expand') && anchor.pathname === window.location.pathname) {
         listItem.classList.add('open')
       }
     })
@@ -108,6 +113,10 @@ function markCurrentHashInSidebar () {
 
   const hashEl = nodeList.querySelector(`li.current-page a[href$="#${hash}"]`)
   if (hashEl) {
+    const deflist = hashEl.closest('ul')
+    if (deflist.classList.contains('deflist')) {
+      deflist.closest('li').classList.add('current-section')
+    }
     hashEl.closest('li').classList.add('current-hash')
   }
 }

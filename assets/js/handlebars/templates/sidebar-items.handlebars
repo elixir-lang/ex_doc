@@ -16,6 +16,7 @@
       {{else}}
         {{{node.title}}}
       {{/if}}
+      <span class="icon-expand"></span>
     </a>
 
     <ul>
@@ -30,6 +31,7 @@
           <li class="docs {{#isLocal node.id}}open{{/isLocal}}">
             <a href="{{node.id}}.html#content" class="expand">
               Sections
+              <span class="icon-expand"></span>
             </a>
             <ul class="sections-list deflist">
               {{#each sections}}
@@ -49,6 +51,7 @@
           <li class="docs">
             <a href="{{node.id}}.html#{{group.key}}" class="expand">
               {{group.name}}
+              <span class="icon-expand"></span>
             </a>
             <ul class="{{group.key}}-list deflist">
               {{#each group.nodes}}
