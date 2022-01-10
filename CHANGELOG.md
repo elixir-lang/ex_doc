@@ -4,7 +4,6 @@
 
   * Enhancements
     * Introduce new sidebar design
-    * `:nest_modules_by_prefix` is no longer supported with the more spacious sidebar. If there are still issues, please reach out
     * Add `--quiet` option to CLI
     * Support multiple formatters in the CLI
     * Show structs as `%Struct{}` instead of `__struct__` in the sidebar
