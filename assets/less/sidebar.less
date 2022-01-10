@@ -326,6 +326,10 @@
         }
       }
 
+      &.current-page {
+        color: @main;
+      }
+
       &:last-child {
         margin-bottom: 30px;
       }
@@ -346,10 +350,14 @@
         line-height: 20px;
         padding: 2px 8px;
         margin-right: 0px;
+        color: @lightestGray;
 
-        &.current-hash:before {
-          content: "\2022";
+        &.current-hash {
           color: @main;
+          &:before {
+            content: "\2022";
+            color: @main;
+          }
         }
 
         &.current-hash > a {
@@ -371,6 +379,7 @@
             padding: 0px 10px;
             margin-left: 8px;
             margin-right: 0;
+            color: @lightestGray;
 
             a {
               padding-left: 0px;
@@ -381,6 +390,7 @@
             }
 
             &.current-hash {
+              color: @main;
               border-color: @main;
             }
 
