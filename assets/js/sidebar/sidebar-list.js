@@ -59,12 +59,18 @@ function renderSidebarNodeList (nodesByType, type) {
     anchor.addEventListener('click', event => {
       const target = event.target
       const listItem = target.closest('li')
+      const previousSection = nodeList.querySelector('.current-section')
 
       // Expand icon should not navigate
       if (target.matches('.icon-expand')) {
         event.preventDefault()
         listItem.classList.toggle('open')
         return
+      }
+
+      // Clear the previous current section
+      if (previousSection) {
+        previousSection.classList.remove('current-section')
       }
 
       if (anchor.matches('.expand')) {
@@ -107,6 +113,10 @@ function markCurrentHashInSidebar () {
 
   const hashEl = nodeList.querySelector(`li.current-page a[href$="#${hash}"]`)
   if (hashEl) {
+    const deflist = hashEl.closest('ul')
+    if (deflist.classList.contains('deflist')) {
+      deflist.closest('li').classList.add('current-section')
+    }
     hashEl.closest('li').classList.add('current-hash')
   }
 }
