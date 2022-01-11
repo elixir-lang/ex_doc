@@ -2,8 +2,8 @@
 <%= sidebar_template(config, nodes_map) %>
 
 <h1>
-  <span>Page not found</span>
   <%= settings_button_template() %>
+  <span>Page not found</span>
 </h1>
 
 <p>Sorry, but the page you were trying to get to, does not exist. You

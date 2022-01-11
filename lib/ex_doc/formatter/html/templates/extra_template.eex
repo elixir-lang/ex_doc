@@ -2,7 +2,6 @@
 <%= sidebar_template(config, nodes_map) %>
 
 <h1>
-  <span><%= node.title_content %></span>
   <%= settings_button_template() %>
   <%= if node.source_url do %>
     <a href="<%= node.source_url %>" title="View Source" class="view-source" rel="help">
@@ -10,6 +9,7 @@
       <span class="sr-only">View Source</span>
     </a>
   <% end %>
+  <span><%= node.title_content %></span>
 </h1>
 
 <%= if node.source_path && String.ends_with?(node.source_path, ".livemd") do %>

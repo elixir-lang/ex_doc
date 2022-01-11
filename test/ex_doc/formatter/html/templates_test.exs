@@ -314,7 +314,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
 
       assert content =~
-               ~r{<h1>\s*<span translate="no">CompiledWithDocs</span>\s*<small class=\"app-vsn\" translate="no">\(Elixir v1.0.1\)</small>}
+               ~r{<span translate="no">CompiledWithDocs</span>\s*<small class=\"app-vsn\" translate="no">\(Elixir v1.0.1\)</small>}
 
       refute content =~ ~r{<small>module</small>}
 
@@ -440,7 +440,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomBehaviourOne])
 
       assert content =~
-               ~r{<h1>\s*<span translate="no">CustomBehaviourOne</span>\s*<small>behaviour</small>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>}
+               ~r{<span translate="no">CustomBehaviourOne</span>\s*<small>behaviour</small>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
 
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:hello/1">}
@@ -450,7 +450,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomBehaviourTwo])
 
       assert content =~
-               ~r{<h1>\s*<span translate="no">CustomBehaviourTwo</span>\s*<small>behaviour</small>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>}
+               ~r{<span translate="no">CustomBehaviourTwo</span>\s*<small>behaviour</small>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
 
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:bye/1">}
@@ -462,7 +462,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomProtocol])
 
       assert content =~
-               ~r{<h1>\s*<span translate="no">CustomProtocol</span>\s*<small>protocol</small>\s*<small class=\"app-vsn\" translate="no">\(Elixir v1.0.1\)</small>}
+               ~r{<span translate="no">CustomProtocol</span>\s*<small>protocol</small>\s*<small class=\"app-vsn\" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
     end
 
     ## TASKS
@@ -471,7 +471,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([Mix.Tasks.TaskWithDocs])
 
       assert content =~
-               ~r{<h1>\s*<span translate="no">mix task_with_docs</span>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>}
+               ~r{<span translate="no">mix task_with_docs</span>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
     end
   end
 

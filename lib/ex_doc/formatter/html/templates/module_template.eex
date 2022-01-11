@@ -2,8 +2,6 @@
 <%= sidebar_template(config, nodes_map) %>
 
 <h1>
-  <span translate="no"><%= module.title %></span> <%= module_type(module) %>
-  <small class="app-vsn" translate="no">(<%= config.project %> v<%= config.version %>)</small>
   <%= settings_button_template() %>
   <%= if module.source_url do %>
     <a href="<%= module.source_url %>" title="View Source" class="view-source" rel="help">
@@ -11,6 +9,8 @@
       <span class="sr-only">View Source</span>
     </a>
   <% end %>
+  <span translate="no"><%= module.title %></span> <%= module_type(module) %>
+  <small class="app-vsn" translate="no">(<%= config.project %> v<%= config.version %>)</small>
   <%= for annotation <- module.annotations do %>
     <span class="note">(<%= annotation %>)</span>
   <% end %>

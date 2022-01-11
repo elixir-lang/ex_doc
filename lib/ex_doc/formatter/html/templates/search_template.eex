@@ -3,8 +3,8 @@
 
 <div id="search">
   <h1>
-    <span>Page not found</span>
     <%= settings_button_template() %>
+    <span>Page not found</span>
   </h1>
 
   <div class="loading"><div></div><div></div><div></div><div></div></div>
