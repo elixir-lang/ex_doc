@@ -33,10 +33,20 @@
     border-radius: 3px;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
     padding: 25px 35px 35px;
+
+    @media screen and (max-width: 768px) {
+      padding: 20px;
+    }
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: start;
   }
 
   .modal-title {
     display: inline-block;
+    flex-grow: 1;
     font-size: 1.3rem;
     font-weight: bold;
     margin-bottom: 20px;
@@ -47,6 +57,8 @@
       font-weight: bold;
       margin-right: 30px;
       padding-left: 0;
+      text-align: left;
+      transition: color 150ms;
 
       &:hover {
         color: @main;
@@ -61,13 +73,13 @@
   .modal-close {
     cursor: pointer;
     display: block;
-    float: right;
     font-size: 1.5rem;
     margin: -8px -8px 0 0;
     padding: 8px;
     opacity: 0.3;
     background: none;
     border: none;
+    transition: opacity 150ms;
 
     &:hover {
       opacity: 0.7;

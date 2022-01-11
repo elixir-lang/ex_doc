@@ -30,12 +30,15 @@
         <div class="switch-button__bg"></div>
       </div>
     </label>
-    <input class="input" type="text" name="livebook_url" placeholder="Type here the Livebook URL" />
+    <input class="input" type="url" name="livebook_url" placeholder="Type here the Livebook URL" />
   </div>
    <div id="keyboard-shortcuts" class="hidden">
      {{#each shortcuts}}
        {{#if this.description}}
          <dl class="shortcut-row">
+           <dd class="shortcut-description">
+             {{this.description}}
+           </dd>
            <dt class="shortcut-keys">
              {{#if this.displayAs}}
                {{{this.displayAs}}}
@@ -43,9 +46,6 @@
                <kbd><kbd>{{this.key}}</kbd></kbd>
              {{/if}}
            </dt>
-           <dd class="shortcut-description">
-             {{this.description}}
-           </dd>
          </dl>
        {{/if}}
      {{/each}}

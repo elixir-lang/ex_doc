@@ -14,9 +14,11 @@
     border: 1px solid #CAD5E0;
     box-sizing: border-box;
     border-radius: 8px;
+    transition: border-color 150ms;
 
     &:focus {
       outline: none;
+      border-color: @main;
     }
 
     &::-webkit-input-placeholder {
@@ -54,13 +56,16 @@
   .switch-button-container > div > p {
     color: #445668;
     font-size: 14px;
+    line-height: 1.4;
     margin: 0;
-    padding-bottom: 4px;
+    padding-bottom: 6px;
+    padding-right: 10px;
   }
 
   .switch-button {
     position: relative;
     display: inline-block;
+    flex-shrink: 0;
     width: 40px;
     height: 20px;
     user-select: none;
