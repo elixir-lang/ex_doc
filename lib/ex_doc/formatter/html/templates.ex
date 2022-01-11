@@ -33,19 +33,23 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Get the attribute string used to define the spec of the given `node`.
   """
-  def get_spec_attribute(node)
+  def get_spec_attribute(module, node) do
+    node
+    |> get_spec_attribute()
+    |> module.language.format_attribute()
+  end
 
   def get_spec_attribute(%ExDoc.TypeNode{} = node) do
     if "opaque" in node.annotations do
-      "@opaque"
+      "opaque"
     else
-      "@type"
+      "type"
     end
   end
 
-  def get_spec_attribute(%ExDoc.FunctionNode{type: :callback}), do: "@callback"
-  def get_spec_attribute(%ExDoc.FunctionNode{type: :macrocallback}), do: "@macrocallback"
-  def get_spec_attribute(%ExDoc.FunctionNode{}), do: "@spec"
+  def get_spec_attribute(%ExDoc.FunctionNode{type: :callback}), do: "callback"
+  def get_spec_attribute(%ExDoc.FunctionNode{type: :macrocallback}), do: "macrocallback"
+  def get_spec_attribute(%ExDoc.FunctionNode{}), do: "spec"
 
   @doc """
   Get defaults clauses.
@@ -328,7 +332,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    detail_template: [:node, :_module],
+    detail_template: [:node, :module],
     footer_template: [:config, :node],
     head_template: [:config, :page],
     module_template: [:config, :module, :summary, :nodes_map],

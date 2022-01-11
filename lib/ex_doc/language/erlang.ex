@@ -163,6 +163,9 @@ defmodule ExDoc.Language.Erlang do
     }
   end
 
+  @impl true
+  def format_attribute(attribute) when is_binary(attribute), do: "-" <> attribute
+
   ## Shared between Erlang & Elixir
 
   @doc false

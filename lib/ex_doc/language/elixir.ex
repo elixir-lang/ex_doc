@@ -203,6 +203,9 @@ defmodule ExDoc.Language.Elixir do
     }
   end
 
+  @impl true
+  def format_attribute(attribute) when is_binary(attribute), do: "@" <> attribute
+
   ## Module Helpers
 
   defp nesting_info(title, prefixes) do

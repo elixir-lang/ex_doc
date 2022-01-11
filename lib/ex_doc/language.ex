@@ -131,6 +131,11 @@ defmodule ExDoc.Language do
               opts: keyword()
             }
 
+  @doc """
+  Return an attribute in the canonical representation.
+  """
+  @callback format_attribute(String.t()) :: String.t()
+
   def get(:elixir, _module), do: {:ok, ExDoc.Language.Elixir}
   def get(:erlang, _module), do: {:ok, ExDoc.Language.Erlang}
 
