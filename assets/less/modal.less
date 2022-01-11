@@ -32,31 +32,29 @@
     background-color: @white;
     border-radius: 3px;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-    padding: 15px 35px 35px;
+    padding: 25px 35px 35px;
   }
 
-  .modal-tab-title {
+  .modal-title {
     display: inline-block;
     font-size: 1.3rem;
     font-weight: bold;
-    margin-bottom: 10px;
-    margin-right: 10px;
-    background: transparent;
-    padding-left: 0;
-    border: none;
-    &:hover {
-      color: @main;
-      cursor: pointer;
-    }
-    &.active {
-      color: @main;
-    }
-  }
+    margin-bottom: 20px;
 
-  .modal-body {
-    margin-top: 10px;
-    &.hidden {
-      display: hide;
+    button {
+      border: none;
+      background: transparent;
+      font-weight: bold;
+      margin-right: 30px;
+      padding-left: 0;
+
+      &:hover {
+        color: @main;
+        cursor: pointer;
+      }
+      &.active {
+        color: @main;
+      }
     }
   }
 
@@ -70,7 +68,7 @@
     opacity: 0.3;
     background: none;
     border: none;
-    padding-top: 18px;
+
     &:hover {
       opacity: 0.7;
     }

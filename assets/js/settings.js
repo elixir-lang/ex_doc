@@ -5,7 +5,6 @@ import { shouldUseNightMode } from './night'
 import { settingsStore } from './settings-store'
 import { keyboardShortcuts } from './keyboard-shortcuts'
 
-const MODAL_TITLE_SELECTOR = '#modal .modal-title'
 const SETTINGS_LINK_SELECTOR = '.display-settings'
 const SETTINGS_MODAL_BODY_SELECTOR = '#settings-modal-content'
 const SETTINGS_TAB = '#modal-settings-tab'
@@ -53,8 +52,8 @@ function showKeyboardShortcutsTab () {
 
 export function openSettingsModal () {
   openModal({
-    title: 'Settings',
-    body: settingsModalBodyTemplate({ tabs: modalTabs, shortcuts: keyboardShortcuts })
+    title: modalTabs.map(({id, title}) => `<button id="${id}">${title}</button>`).join(''),
+    body: settingsModalBodyTemplate({ shortcuts: keyboardShortcuts })
   })
 
   const modal = qs(SETTINGS_MODAL_BODY_SELECTOR)
@@ -96,9 +95,6 @@ export function openSettingsModal () {
   livebookUrlInput.addEventListener('input', event => {
     settingsStore.update({ livebookUrl: event.target.value })
   })
-
-  // Builds the navigation by tabs and hides the original modal title
-  qs(MODAL_TITLE_SELECTOR).classList.add('sr-only')
 
   qs(SETTINGS_TAB).addEventListener('click', event => {
     showSettinsTab()
