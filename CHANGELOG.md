@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.27.0-dev
+## v0.27.0 (2021-01-11)
 
   * Enhancements
     * Introduce new sidebar design
