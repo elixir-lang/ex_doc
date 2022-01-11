@@ -319,7 +319,7 @@ defmodule ExDoc.Formatter.HTML do
     groups = config.groups_for_extras
 
     config.extras
-    |> Task.async_stream(&build_extra(&1, groups, config, ext), timeout: :infinity, ordered: false)
+    |> Task.async_stream(&build_extra(&1, groups, config, ext), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
