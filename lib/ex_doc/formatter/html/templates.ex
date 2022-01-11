@@ -280,7 +280,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
     redirect_template: [:config, :redirect_to],
-    bottom_actions_template: [:refs]
+    bottom_actions_template: [:refs],
+    settings_button_template: []
   ]
 
   Enum.each(templates, fn {name, args} ->
