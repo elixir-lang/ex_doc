@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.27.1 (2021-01-11)
+
+  * Bug fixes
+    * Several usability fixes on the new layout
+    * Keep page ordering
+
 ## v0.27.0 (2021-01-11)
 
   * Enhancements
