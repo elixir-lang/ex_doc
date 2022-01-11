@@ -5,8 +5,24 @@ import { shouldUseNightMode } from './night'
 import { settingsStore } from './settings-store'
 import { keyboardShortcuts } from './keyboard-shortcuts'
 
+const MODAL_TITLE_SELECTOR = '#modal .modal-title'
 const SETTINGS_LINK_SELECTOR = '.display-settings'
 const SETTINGS_MODAL_BODY_SELECTOR = '#settings-modal-content'
+const SETTINGS_TAB = '#modal-settings-tab'
+const KEYBOARD_SHORTCUTS_TAB = '#modal-keyboard-shortcuts-tab'
+const SETTINGS_CONTENT = '#settings-content'
+const KEYBOARD_SHORTCUTS_CONTENT = '#keyboard-shortcuts'
+
+const modalTabs = [
+  {
+    title: 'Settings',
+    id: 'modal-settings-tab'
+  },
+  {
+    title: 'Keyboard Shortcuts',
+    id: 'modal-keyboard-shortcuts-tab'
+  }
+]
 
 /**
  * Sets up the settings modal.
@@ -21,10 +37,24 @@ function addEventListeners () {
   })
 }
 
+function showSettinsTab () {
+  qs(KEYBOARD_SHORTCUTS_TAB).classList.remove('active')
+  qs(SETTINGS_TAB).classList.add('active')
+  qs(SETTINGS_CONTENT).classList.remove('hidden')
+  qs(KEYBOARD_SHORTCUTS_CONTENT).classList.add('hidden')
+}
+
+function showKeyboardShortcutsTab () {
+  qs(KEYBOARD_SHORTCUTS_TAB).classList.add('active')
+  qs(SETTINGS_TAB).classList.remove('active')
+  qs(KEYBOARD_SHORTCUTS_CONTENT).classList.remove('hidden')
+  qs(SETTINGS_CONTENT).classList.add('hidden')
+}
+
 export function openSettingsModal () {
   openModal({
     title: 'Settings',
-    body: settingsModalBodyTemplate({ shortcuts: keyboardShortcuts })
+    body: settingsModalBodyTemplate({ tabs: modalTabs, shortcuts: keyboardShortcuts })
   })
 
   const modal = qs(SETTINGS_MODAL_BODY_SELECTOR)
@@ -66,4 +96,16 @@ export function openSettingsModal () {
   livebookUrlInput.addEventListener('input', event => {
     settingsStore.update({ livebookUrl: event.target.value })
   })
+
+  // Builds the navigation by tabs and hides the original modal title
+  qs(MODAL_TITLE_SELECTOR).classList.add('sr-only')
+
+  qs(SETTINGS_TAB).addEventListener('click', event => {
+    showSettinsTab()
+  })
+  qs(KEYBOARD_SHORTCUTS_TAB).addEventListener('click', event => {
+    showKeyboardShortcutsTab()
+  })
+
+  showSettinsTab()
 }
