@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.27.2 (2021-01-11)
+
+  * Bug fixes
+    * Fix version dropdown when hosted on HexDocs
+    * Fix tooltips
+    * Fix JavaScript error when Hex package information is not available
+
 ## v0.27.1 (2021-01-11)
 
   * Bug fixes
