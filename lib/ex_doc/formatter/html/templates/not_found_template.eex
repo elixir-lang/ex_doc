@@ -1,8 +1,8 @@
 <%= head_template(config, %{title: "404", type: :extra}) %>
 <%= sidebar_template(config, nodes_map) %>
 
-<h1 id="content">
-  Page not found
+<h1>
+  <span>Page not found</span>
   <%= settings_button_template() %>
 </h1>
 

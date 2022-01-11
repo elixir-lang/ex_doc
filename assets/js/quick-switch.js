@@ -36,8 +36,10 @@ export function initialize () {
 }
 
 function addEventListeners () {
-  qs(QUICK_SWITCH_LINK_SELECTOR).addEventListener('click', event => {
-    openQuickSwitchModal()
+  qsAll(QUICK_SWITCH_LINK_SELECTOR).forEach(element => {
+    element.addEventListener('click', event => {
+      openQuickSwitchModal()
+    })
   })
 }
 

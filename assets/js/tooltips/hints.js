@@ -170,11 +170,7 @@ export function extractFunctionHint (element) {
  * @returns {Hint}
  */
 export function extractModuleHint (content) {
-  const heading = content.querySelector('h1')
-  // Get just the text content ignoring other elements.
-  while (heading.firstElementChild) {
-    heading.removeChild(heading.firstElementChild)
-  }
+  let heading = content.querySelector('h1 span')
   const title = heading.textContent
 
   const firstParagraph = content.querySelector('#moduledoc p')

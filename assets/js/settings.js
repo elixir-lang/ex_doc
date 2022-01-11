@@ -1,5 +1,5 @@
 import settingsModalBodyTemplate from './handlebars/templates/settings-modal-body.handlebars'
-import { qs } from './helpers'
+import { qs, qsAll } from './helpers'
 import { openModal } from './modal'
 import { shouldUseNightMode } from './night'
 import { settingsStore } from './settings-store'
@@ -31,8 +31,10 @@ export function initialize () {
 }
 
 function addEventListeners () {
-  qs(SETTINGS_LINK_SELECTOR).addEventListener('click', event => {
-    openSettingsModal()
+  qsAll(SETTINGS_LINK_SELECTOR).forEach(element => {
+    element.addEventListener('click', event => {
+      openSettingsModal()
+    })
   })
 }
 

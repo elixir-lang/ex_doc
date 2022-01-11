@@ -80,14 +80,16 @@
 
   .sidebar-projectVersionsDropdown {
     cursor: pointer;
+    position: relative;
     margin: 0;
-    padding: 0 12px 0 0;
+    padding: 0 0 0 12px;
     border: none;
     -moz-appearance: none;
     -webkit-appearance: none;
     appearance: none;
     background-color: transparent;
     color: @white;
+    z-index: 2;
 
     option {
       color: initial;
@@ -100,11 +102,12 @@
 
   .sidebar-projectVersion form::after {
     position: absolute;
-    right: 0;
-    top: 1px;
+    left: 0;
+    top: 2px;
     content: '\25BC';
-    z-index: -1;
+    z-index: 1;
     font-size: 8px;
+    color: @white;
   }
 
   .sidebar-projectVersionsDropdown::-ms-expand {

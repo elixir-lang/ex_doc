@@ -1,8 +1,8 @@
 <%= head_template(config, %{title: node.title, type: :extra}) %>
 <%= sidebar_template(config, nodes_map) %>
 
-<h1 id="content">
-  <%= node.title_content %>
+<h1>
+  <span><%= node.title_content %></span>
   <%= settings_button_template() %>
   <%= if node.source_url do %>
     <a href="<%= node.source_url %>" title="View Source" class="view-source" rel="help">

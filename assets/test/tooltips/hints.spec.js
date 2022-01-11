@@ -5,7 +5,7 @@ describe('hints extraction', () => {
     const modulePageObject = parseHTML(`
       <div>
         <h1>
-          Some module <small class="app-vsn">(ExDoc v0.0.1)</small>
+          <span>Some module</span> <small class="app-vsn">(ExDoc v0.0.1)</small>
 
           <a href="https://github.com/" title="View Source" class="view-source" rel="help">
             <i class="ri-code-s-slash-line" aria-hidden="true"></i>

@@ -2,8 +2,8 @@
 <%= sidebar_template(config, nodes_map) %>
 
 <div id="search">
-  <h1 id="content">
-    Page not found
+  <h1>
+    <span>Page not found</span>
     <%= settings_button_template() %>
   </h1>
 
