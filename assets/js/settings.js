@@ -31,9 +31,11 @@ export function initialize () {
 }
 
 function addEventListeners () {
-  qs(SETTINGS_LINK_SELECTOR).addEventListener('click', event => {
-    openSettingsModal()
-  })
+  if (document.querySelector(SETTINGS_LINK_SELECTOR)) {
+    qs(SETTINGS_LINK_SELECTOR).addEventListener('click', event => {
+      openSettingsModal()
+    })
+  }
 }
 
 function showSettinsTab () {
