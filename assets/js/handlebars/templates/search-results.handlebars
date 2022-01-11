@@ -1,7 +1,19 @@
 {{#if value}}
-  <h1>Search results for <em>{{value}}</em></h1>
+  <h1>
+    Search results for <em>{{value}}</em>
+    <button class="settings display-settings">
+      <i class="ri-settings-3-line"></i>
+      <span class="sr-only">Settings</span>
+    </button>
+  </h1>
 {{else}}
-  <h1>Invalid Search</h1>
+  <h1 id="content">
+    Invalid Search
+    <button class="settings display-settings">
+      <i class="ri-settings-3-line"></i>
+      <span class="sr-only">Settings</span>
+    </button>
+  </h1>
 {{/if}}
 
 {{#isNonEmptyArray results}}
