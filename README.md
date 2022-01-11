@@ -37,7 +37,7 @@ If you are using Elixir v1.10, or later:
 ```elixir
 def deps do
   [
-    {:ex_doc, "~> 0.24", only: :dev, runtime: false},
+    {:ex_doc, "~> 0.27", only: :dev, runtime: false},
   ]
 end
 ```
@@ -92,7 +92,7 @@ You can ExDoc via the command line as follows:
 3. Next invoke the `ex_doc` executable from your project:
 
    ```bash
-   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
+   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/dev/lib/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
    ```
 
 For example, here are some acceptable values:
@@ -105,60 +105,7 @@ For example, here are some acceptable values:
 
 ## Using ExDoc with Erlang projects
 
-ExDoc is capable of generating documentation from Erlang's `edoc` annotations through the following steps:
-
-1. Use Erlang/OTP 24+
-
-2. Add the following to your `rebar.config`. This instructs `edoc` to generate doc chunks
-   instead of HTML docs:
-
-   ```erlang
-   {edoc_opts, [
-     {doclet, edoc_doclet_chunks},
-     {layout, edoc_layout_chunks},
-     {dir, "_build/default/lib/<app>/doc"}]}.
-   ```
-
-   Replace `<app>` with the name of your app.
-
-3. Install ExDoc escript:
-
-   ```bash
-   $ mix escript.install hex ex_doc
-   $ ex_doc --version
-   ```
-
-   Make sure escript is in your system path, otherwise point to it directly.
-
-4. Generate docs:
-
-   ```bash
-   $ rebar3 edoc
-   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/default/lib/<app>/ebin
-   ```
-
-5. If you're publishing docs to Hex.pm, first add the following to your `src/<app>.app.src`:
-
-   ```erlang
-   {doc, "doc"}
-   ```
-
-   This instructs rebar3 to get HTML docs from the directory "doc" and that's where ExDoc would generate the docs by default.
-
-   Now you can publish your docs:
-
-   ```bash
-   $ rebar3 hex docs
-   ```
-
-6. If your project has dependencies and you want to generate links to them, you need to add the dependencies to the code path.
-
-   Suppose you're building `foo` that depends on `bar` and `baz`. Generate the docs with:
-
-   ```bash
-   $ ex_doc "foo" "1.0.0" "_build/default/lib/foo/ebin" \
-       --paths "_build/default/lib/*/ebin"
-   ```
+From Erlang/OTP 24+, you can use ExDoc to render your Erlang documentation written with EDoc. See [`rebar3_ex_doc`](https://github.com/starbelly/rebar3_ex_doc/) for more information.
 
 ## Metadata
 
