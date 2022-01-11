@@ -32,18 +32,32 @@
     background-color: @white;
     border-radius: 3px;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-    padding: 25px 35px 35px;
+    padding: 15px 35px 35px;
   }
 
-  .modal-title {
+  .modal-tab-title {
     display: inline-block;
     font-size: 1.3rem;
     font-weight: bold;
-    padding-bottom: 20px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    background: transparent;
+    padding-left: 0;
+    border: none;
+    &:hover {
+      color: @main;
+      cursor: pointer;
+    }
+    &.active {
+      color: @main;
+    }
   }
 
   .modal-body {
     margin-top: 10px;
+    &.hidden {
+      display: hide;
+    }
   }
 
   .modal-close {
@@ -56,6 +70,7 @@
     opacity: 0.3;
     background: none;
     border: none;
+    padding-top: 18px;
     &:hover {
       opacity: 0.7;
     }
