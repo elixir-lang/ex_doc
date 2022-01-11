@@ -18,7 +18,7 @@ const modalTabs = [
     id: 'modal-settings-tab'
   },
   {
-    title: 'Keyboard Shortcuts',
+    title: 'Keyboard shortcuts',
     id: 'modal-keyboard-shortcuts-tab'
   }
 ]

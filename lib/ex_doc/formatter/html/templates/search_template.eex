@@ -1,5 +1,6 @@
 <%= head_template(config, %{title: "Search", type: :search}) %>
 <%= sidebar_template(config, nodes_map) %>
+
 <div id="search">
   <h1 id="content">
     Page not found

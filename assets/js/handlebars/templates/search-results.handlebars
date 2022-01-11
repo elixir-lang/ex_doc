@@ -1,20 +1,15 @@
-{{#if value}}
-  <h1>
+<h1>
+  {{#if value}}
     Search results for <em>{{value}}</em>
-    <button class="settings display-settings">
-      <i class="ri-settings-3-line"></i>
-      <span class="sr-only">Settings</span>
-    </button>
-  </h1>
-{{else}}
-  <h1 id="content">
+  {{else}}
     Invalid Search
-    <button class="settings display-settings">
-      <i class="ri-settings-3-line"></i>
-      <span class="sr-only">Settings</span>
-    </button>
-  </h1>
-{{/if}}
+  {{/if}}
+
+  <button class="settings display-settings">
+    <i class="ri-settings-3-line"></i>
+    <span class="sr-only">Settings</span>
+  </button>
+</h1>
 
 {{#isNonEmptyArray results}}
   {{#each results}}
