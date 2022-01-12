@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.27.3 (2022-01-12)
+
+  * Bug fixes
+    * Make HexDocs search case insensitive
+    * Improve sidebar open/close animation
+
 ## v0.27.2 (2022-01-11)
 
   * Bug fixes
