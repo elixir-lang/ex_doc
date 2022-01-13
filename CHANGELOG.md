@@ -1,19 +1,19 @@
 # Changelog
 
-## v0.27.2 (2021-01-11)
+## v0.27.2 (2022-01-11)
 
   * Bug fixes
     * Fix version dropdown when hosted on HexDocs
     * Fix tooltips
     * Fix JavaScript error when Hex package information is not available
 
-## v0.27.1 (2021-01-11)
+## v0.27.1 (2022-01-11)
 
   * Bug fixes
     * Several usability fixes on the new layout
     * Keep page ordering
 
-## v0.27.0 (2021-01-11)
+## v0.27.0 (2022-01-11)
 
   * Enhancements
     * Introduce new sidebar design
