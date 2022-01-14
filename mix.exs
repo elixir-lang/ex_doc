@@ -41,11 +41,11 @@ defmodule ExDoc.Mixfile do
 
   defp aliases do
     [
-      build: ["cmd npm run --prefix assets build", "compile --force", "docs"],
+      build: ["cmd --cd assets npm run build", "compile --force", "docs"],
       clean: [&clean_test_fixtures/1, "clean"],
-      fix: ["format", "cmd npm run --prefix assets lint:fix"],
-      lint: ["format --check-formatted", "cmd npm run --prefix assets lint"],
-      setup: ["deps.get", "cmd npm install --prefix assets"]
+      fix: ["format", "cmd --cd assets npm run lint:fix"],
+      lint: ["format --check-formatted", "cmd --cd assets npm run lint"],
+      setup: ["deps.get", "cmd --cd assets npm install"]
     ]
   end
 
