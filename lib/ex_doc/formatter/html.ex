@@ -389,12 +389,12 @@ defmodule ExDoc.Formatter.HTML do
 
     %{
       id: id,
-      title: title,
-      group: group,
-      title_content: title_html,
       content: content_html,
+      group: group,
       source_path: source_path,
-      source_url: source_url
+      source_url: source_url,
+      title: title,
+      title_content: title_html || title
     }
   end
 

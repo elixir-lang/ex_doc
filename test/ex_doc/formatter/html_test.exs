@@ -358,10 +358,14 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       content = File.read!("#{output_dir()}/plaintextfiles.html")
 
+      assert content =~ ~r{Plain Text Files</span>.*</h1>}s
+
       assert content =~
                ~R{<p>Read the <a href="license.html">license</a> and the <a href="plaintext.html">plain-text file</a>.}
 
       plain_text_file = File.read!("#{output_dir()}/plaintext.html")
+
+      assert plain_text_file =~ ~r{PlainText</span>.*</h1>}s
 
       assert plain_text_file =~
                ~R{<pre>\nThis is plain\n  text and nothing\n.+\s+good bye\n</pre>}s
@@ -370,6 +374,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert plain_text_file =~ ~s{\n      `t:term/0`\n}
 
       license = File.read!("#{output_dir()}/license.html")
+
+      assert license =~ ~r{LICENSE</span>.*</h1>}s
 
       assert license =~
                ~s{<pre>\nLicensed under the Apache License, Version 2.0 (the &quot;License&quot;)}
