@@ -212,7 +212,7 @@ defmodule ExDoc.Language.ElixirTest do
     end
 
     test "extras" do
-      opts = [extras: ["Foo Bar.md"]]
+      opts = [extras: %{"Foo Bar.md" => "foo-bar"}]
 
       assert autolink_doc(~m"[Foo](Foo Bar.md)", opts) == ~m"[Foo](foo-bar.html)"
 
@@ -440,7 +440,7 @@ defmodule ExDoc.Language.ElixirTest do
              )
            end) =~ ~s[documentation references type "String.bad()"]
 
-    assert warn(~m"[Foo](Foo Bar.md)", extras: []) =~
+    assert warn(~m"[Foo](Foo Bar.md)", extras: %{}) =~
              ~s[documentation references file "Foo Bar.md" but it does not exist]
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]

@@ -17,7 +17,7 @@ defmodule ExDoc.Autolink do
   #
   # * `:ext` - the extension (`".html"`, "`.xhtml"`, etc)
   #
-  # * `:extras` - list of extras
+  # * `:extras` - map of extras
   #
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
 

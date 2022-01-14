@@ -65,20 +65,24 @@ defmodule ExDoc.Formatter.HTML do
   Autolinks and renders all docs.
   """
   def render_all(project_nodes, ext, config, opts) do
+    base = [
+      apps: config.apps,
+      ext: ext,
+      extras: extra_paths(config),
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
+      deps: config.deps
+    ]
+
     project_nodes
     |> Task.async_stream(
       fn node ->
-        autolink_opts = [
-          apps: config.apps,
-          current_module: node.module,
-          ext: ext,
-          extras: extra_paths(config),
-          skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-          module_id: node.id,
-          file: node.source_path,
-          line: node.doc_line,
-          deps: config.deps
-        ]
+        autolink_opts =
+          [
+            current_module: node.module,
+            module_id: node.id,
+            file: node.source_path,
+            line: node.doc_line
+          ] ++ base
 
         language = node.language
 
@@ -317,34 +321,37 @@ defmodule ExDoc.Formatter.HTML do
   """
   def build_extras(config, ext) do
     groups = config.groups_for_extras
+    source_url_pattern = config.source_url_pattern
 
-    config.extras
-    |> Task.async_stream(&build_extra(&1, groups, config, ext), timeout: :infinity)
-    |> Enum.map(&elem(&1, 1))
-    |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
-  end
-
-  defp build_extra({input, options}, groups, config, ext) do
-    input = to_string(input)
-    id = options[:filename] || input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, options[:title], groups, config, ext)
-  end
-
-  defp build_extra(input, groups, config, ext) do
-    id = input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, nil, groups, config, ext)
-  end
-
-  defp build_extra(input, id, title, groups, config, ext) do
     autolink_opts = [
       apps: config.apps,
-      file: input,
       ext: ext,
       extras: extra_paths(config),
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
       deps: config.deps
     ]
 
+    config.extras
+    |> Task.async_stream(
+      &build_extra(&1, groups, autolink_opts, source_url_pattern),
+      timeout: :infinity
+    )
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
+  end
+
+  defp build_extra({input, options}, groups, autolink_opts, source_url_pattern) do
+    input = to_string(input)
+    id = options[:filename] || input |> filename_to_title() |> text_to_id()
+    build_extra(input, id, options[:title], groups, autolink_opts, source_url_pattern)
+  end
+
+  defp build_extra(input, groups, autolink_opts, source_url_pattern) do
+    id = input |> filename_to_title() |> text_to_id()
+    build_extra(input, id, nil, groups, autolink_opts, source_url_pattern)
+  end
+
+  defp build_extra(input, id, title, groups, autolink_opts, source_url_pattern) do
     opts = [file: input, line: 1]
 
     ast =
@@ -373,7 +380,7 @@ defmodule ExDoc.Formatter.HTML do
 
     # TODO: don't hardcode Elixir for extras?
     language = ExDoc.Language.Elixir
-    content_html = autolink_and_render(ast, language, autolink_opts, opts)
+    content_html = autolink_and_render(ast, language, [file: input] ++ autolink_opts, opts)
 
     group = GroupMatcher.match_extra(groups, input)
     title = title || title_text || filename_to_title(input)
@@ -381,7 +388,7 @@ defmodule ExDoc.Formatter.HTML do
     source_path = input |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
 
     source_url =
-      if url = config.source_url_pattern do
+      if url = source_url_pattern do
         url
         |> String.replace("%{path}", source_path)
         |> String.replace("%{line}", "1")
@@ -531,12 +538,14 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp extra_paths(config) do
-    Enum.map(config.extras, fn
+    Map.new(config.extras, fn
       path when is_binary(path) ->
-        Path.basename(path)
+        base = Path.basename(path)
+        {base, text_to_id(Path.rootname(base))}
 
-      {path, _} ->
-        path |> Atom.to_string() |> Path.basename()
+      {path, opts} ->
+        base = path |> Atom.to_string() |> Path.basename()
+        {base, opts[:filename] || text_to_id(Path.rootname(base))}
     end)
   end
 end

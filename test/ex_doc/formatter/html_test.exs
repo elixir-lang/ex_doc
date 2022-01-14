@@ -444,14 +444,30 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     test "with custom names" do
       generate_docs(
-        doc_config(extras: ["test/fixtures/README.md": [filename: "GETTING-STARTED"]])
+        doc_config(
+          extras: [
+            "test/fixtures/PlainTextFiles.md",
+            "test/fixtures/LICENSE": [filename: "linked-license"],
+            "test/fixtures/PlainText.txt": [filename: "plain_text"]
+          ]
+        )
       )
 
-      refute File.regular?("#{output_dir()}/readme.html")
-      content = File.read!("#{output_dir()}/GETTING-STARTED.html")
-      assert content =~ ~r{<title>README [^<]*</title>}
+      refute File.regular?("#{output_dir()}/license.html")
+      assert File.regular?("#{output_dir()}/linked-license.html")
+
+      refute File.regular?("#{output_dir()}/plaintext.html")
+      assert File.regular?("#{output_dir()}/plain_text.html")
+
+      content = File.read!("#{output_dir()}/plaintextfiles.html")
+
+      assert content =~ ~r{Plain Text Files</span>.*</h1>}s
+
+      assert content =~
+               ~R{<p>Read the <a href="linked-license.html">license</a> and the <a href="plain_text.html">plain-text file</a>.}
+
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
-      assert content =~ ~r{"id":"GETTING-STARTED","title":"README"}
+      assert content =~ ~r{"id":"linked-license","title":"LICENSE"}
     end
 
     test "with custom title" do

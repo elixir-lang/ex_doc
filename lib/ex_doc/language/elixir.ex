@@ -4,7 +4,6 @@ defmodule ExDoc.Language.Elixir do
   @behaviour ExDoc.Language
 
   alias ExDoc.Autolink
-  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates, as: T
   alias ExDoc.Refs
   alias ExDoc.Language.Erlang
@@ -423,11 +422,8 @@ defmodule ExDoc.Language.Elixir do
     case Keyword.fetch(attrs, :href) do
       {:ok, href} ->
         case Regex.scan(@ref_regex, href) do
-          [[_, custom_link]] ->
-            url(custom_link, :custom_link, config)
-
-          [] ->
-            build_extra_link(href, config)
+          [[_, custom_link]] -> url(custom_link, :custom_link, config)
+          [] -> build_extra_link(href, config)
         end
 
       _ ->
@@ -436,34 +432,20 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp build_extra_link(link, config) do
-    with uri <- URI.parse(link),
-         nil <- uri.scheme,
-         nil <- uri.host,
-         true <- is_binary(uri.path),
-         true <- uri.path != "",
-         false <- uri.path =~ @ref_regex,
-         extension when extension in [".md", ".txt", ""] <- Path.extname(uri.path) do
-      file = Path.basename(uri.path)
-
-      if file in config.extras do
-        without_ext = trim_extension(file, extension)
+    with %{scheme: nil, host: nil, path: path} = uri <- URI.parse(link),
+         true <- is_binary(path) and path != "" and not (path =~ @ref_regex),
+         extension when extension in [".md", ".txt", ""] <- Path.extname(path) do
+      if file = config.extras[Path.basename(path)] do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
-        HTML.text_to_id(without_ext) <> config.ext <> fragment
+        file <> config.ext <> fragment
       else
-        Autolink.maybe_warn(nil, config, nil, %{file_path: uri.path, original_text: link})
-
+        Autolink.maybe_warn(nil, config, nil, %{file_path: path, original_text: link})
         nil
       end
     else
       _ -> nil
     end
   end
-
-  defp trim_extension(file, ""),
-    do: file
-
-  defp trim_extension(file, extension),
-    do: String.trim_trailing(file, extension)
 
   @basic_types [
     any: 0,
