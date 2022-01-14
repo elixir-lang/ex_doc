@@ -5,6 +5,7 @@
   background: @darkGray;
   color: @lightestGray;
   overflow: hidden;
+  scrollbar-color: @mediumGray @darkGray;
 
   .gradient {
     background: linear-gradient(fade(@darkGray, 100%), fade(@darkGray, 0%));
@@ -399,6 +400,20 @@
         }
       }
     }
+  }
+
+  ::-webkit-scrollbar {
+    width: 14px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: @darkGray;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: @mediumGray;
+    border-radius: 10px;
+    border: 3px solid @darkGray;
   }
 }
 
