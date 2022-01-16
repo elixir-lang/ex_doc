@@ -1,0 +1,20 @@
+name: Close stale issues
+on:
+  schedule:
+  - cron: 0 0 * * *
+
+jobs:
+  default:
+    timeout-minutes: 1
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/stale@v2.0.0
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-issue-message: |
+          This issue is stale because it has been open 21 days with no activity.
+          Remove stale label or comment or this will be closed in 7 days.
+        stale-issue-label: 'Stale:Marked'
+        exempt-issue-labels: 'Stale:Ignored'
+        days-before-stale: 21
+        days-before-close: 7
