@@ -4,7 +4,7 @@
 <div id="search">
   <h1>
     <%= settings_button_template() %>
-    <span>Page not found</span>
+    <span></span>
   </h1>
 
   <div class="loading"><div></div><div></div><div></div><div></div></div>
