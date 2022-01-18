@@ -21,6 +21,8 @@ defmodule Mix.Tasks.Docs do
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
 
+    * `--open` - open browser window pointed to the documentation
+
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
 
@@ -32,17 +34,21 @@ defmodule Mix.Tasks.Docs do
   from ExDoc, for example:
 
       def project do
-        [app: :my_app,
-         version: "0.1.0-dev",
-         deps: deps(),
+        [
+          app: :my_app,
+          version: "0.1.0-dev",
+          deps: deps(),
 
-         # Docs
-         name: "My App",
-         source_url: "https://github.com/USER/PROJECT",
-         homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
-         docs: [main: "MyApp", # The main page in the docs
-                logo: "path/to/logo.png",
-                extras: ["README.md"]]]
+          # Docs
+          name: "My App",
+          source_url: "https://github.com/USER/PROJECT",
+          homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
+          docs: [
+            main: "MyApp", # The main page in the docs
+            logo: "path/to/logo.png",
+            extras: ["README.md"]
+          ]
+        ]
       end
 
   ExDoc also allows configuration specific to the documentation to
@@ -301,7 +307,8 @@ defmodule Mix.Tasks.Docs do
     canonical: :string,
     formatter: :keep,
     language: :string,
-    output: :string
+    output: :string,
+    open: :boolean
   ]
 
   @aliases [n: :canonical, f: :formatter, o: :output]
@@ -351,6 +358,11 @@ defmodule Mix.Tasks.Docs do
     for formatter <- get_formatters(options) do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
       Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"])
+
+      if cli_opts[:open] do
+        browser_open(index)
+      end
+
       index
     end
   end
@@ -464,5 +476,16 @@ defmodule Mix.Tasks.Docs do
     else
       options
     end
+  end
+
+  defp browser_open(url) do
+    {cmd, args} =
+      case :os.type() do
+        {:win32, _} -> {"cmd", ["/c", "start", url]}
+        {:unix, :darwin} -> {"open", [url]}
+        {:unix, _} -> {"xdg-open", [url]}
+      end
+
+    System.cmd(cmd, args)
   end
 end
