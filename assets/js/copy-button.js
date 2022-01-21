@@ -23,7 +23,14 @@ function addCopyButtons () {
     let timeout
     button.addEventListener('click', () => {
       timeout && clearTimeout(timeout)
-      navigator.clipboard.writeText(button.parentElement.querySelector('code').textContent)
+
+      let text =
+        Array.from(button.parentElement.querySelector('code').childNodes)
+          .filter(elem => !(elem.tagName === 'SPAN' && elem.classList.contains('unselectable')))
+          .map(elem => elem.textContent)
+          .join('')
+
+      navigator.clipboard.writeText(text)
       button.classList.add('clicked')
       timeout = setTimeout(() => button.classList.remove('clicked'), 3000)
     })
