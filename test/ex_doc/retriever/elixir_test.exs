@@ -304,6 +304,9 @@ defmodule ExDoc.Retriever.ElixirTest do
       defmodule Mix.Tasks.MyTask do
         use Mix.Task
 
+        @doc "The task should win over the callback"
+        @callback hello() :: :world
+
         @impl true
         def run(_), do: :ok
       end

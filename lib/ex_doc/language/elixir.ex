@@ -226,11 +226,11 @@ defmodule ExDoc.Language.Elixir do
       function_exported?(module, :__impl__, 1) ->
         {:impl, true}
 
-      function_exported?(module, :behaviour_info, 1) ->
-        {:behaviour, false}
-
       match?("Elixir.Mix.Tasks." <> _, Atom.to_string(module)) ->
         {:task, false}
+
+      function_exported?(module, :behaviour_info, 1) ->
+        {:behaviour, false}
 
       true ->
         {:module, false}
