@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.28.0 (2022-01-24)
+
+ExDoc v0.28.0 requires Elixir v1.11+.
+
+  * Enhancements
+    * Use custom scrollbar in the sidebar
+    * Keep hamburger absolute to the opened sidebar
+    * Support `--open` flag on `mix docs`
+    * The copy button now only copies selectable content
+
+  * Bug fixes
+    * Make sure filename configuration in `:extras` is used across links
+    * Ensure all `extras` pages have a title generated
+    * Fix marging on 3rd level headers and beyond
+    * Ensure a task that defines callbacks is still listed as a task
+
 ## v0.27.3 (2022-01-12)
 
   * Bug fixes
