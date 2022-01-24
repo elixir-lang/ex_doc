@@ -8,7 +8,7 @@ defmodule ExDoc.Mixfile do
     [
       app: :ex_doc,
       version: @version,
-      elixir: "~> 1.10",
+      elixir: "~> 1.11",
       deps: deps(),
       aliases: aliases(),
       package: package(),

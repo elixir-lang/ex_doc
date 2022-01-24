@@ -6,18 +6,7 @@ defmodule ExDoc.Language.Erlang do
   alias ExDoc.{Autolink, Refs}
 
   @impl true
-  # TODO: Move :hidden handling to retriever, as it is shared across all BEAM languages
   def module_data(module, docs_chunk, _config) do
-    {:docs_v1, _, _, _, doc, _, _} = docs_chunk
-
-    if doc != :hidden do
-      module_data(module, docs_chunk)
-    else
-      :skip
-    end
-  end
-
-  def module_data(module, docs_chunk) do
     # Make sure the module is loaded for future checks
     _ = Code.ensure_loaded(module)
     id = Atom.to_string(module)

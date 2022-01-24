@@ -2,6 +2,7 @@ defmodule Mix.Tasks.Docs do
   use Mix.Task
 
   @shortdoc "Generate documentation for the project"
+  @requirements ["compile"]
 
   @moduledoc ~S"""
   Uses ExDoc to generate a static web page from the project documentation.
@@ -315,7 +316,6 @@ defmodule Mix.Tasks.Docs do
 
   @doc false
   def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate_docs/3) do
-    Mix.Task.run("compile")
     {:ok, _} = Application.ensure_all_started(:ex_doc)
 
     unless Code.ensure_loaded?(ExDoc.Config) do

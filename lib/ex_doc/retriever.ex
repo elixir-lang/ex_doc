@@ -64,7 +64,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp docs_chunk(module) do
-    result = ExDoc.Utils.Code.fetch_docs(module)
+    result = Code.fetch_docs(module)
     Refs.insert_from_chunk(module, result)
 
     case result do

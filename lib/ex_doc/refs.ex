@@ -76,7 +76,7 @@ defmodule ExDoc.Refs do
   end
 
   defp fetch({:module, module} = ref) do
-    entries = fetch_entries(module, ExDoc.Utils.Code.fetch_docs(module))
+    entries = fetch_entries(module, Code.fetch_docs(module))
     insert(entries)
     Map.get(Map.new(entries), ref, :undefined)
   end
