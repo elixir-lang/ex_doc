@@ -56,7 +56,7 @@ defmodule ExDoc.Mixfile do
       files: ["formatters", "lib", "mix.exs", "LICENSE", "CHANGELOG.md", "README.md"],
       links: %{
         "GitHub" => @source_url,
-        "Changelog" => "https://hexdocs.pm/ex_doc/CHAN.GE.LOG.html",
+        "Changelog" => "https://hexdocs.pm/ex_doc/CHANGELOG.html",
         "Writing documentation" => "https://hexdocs.pm/elixir/writing-documentation.html"
       }
     ]
@@ -77,7 +77,7 @@ defmodule ExDoc.Mixfile do
       extras: [
         "README.md",
         "LICENSE",
-        "CHANGELOG.md": [filename: "CHAN.GE.LOG"]
+        "CHANGELOG.md"
       ],
       source_ref: "v#{@version}",
       source_url: @source_url,
