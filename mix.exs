@@ -77,7 +77,7 @@ defmodule ExDoc.Mixfile do
       extras: [
         "README.md",
         "LICENSE",
-        "CHANGELOG.md": [filename: "CHAN.GE.LOG"]
+        "CHANGELOG.md"
       ],
       source_ref: "v#{@version}",
       source_url: @source_url,
