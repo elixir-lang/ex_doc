@@ -478,14 +478,21 @@ defmodule Mix.Tasks.Docs do
     end
   end
 
-  defp browser_open(url) do
-    {cmd, args} =
+  defp browser_open(path) do
+    {cmd, args, options} =
       case :os.type() do
-        {:win32, _} -> {"cmd", ["/c", "start", "", url]}
-        {:unix, :darwin} -> {"open", [url]}
-        {:unix, _} -> {"xdg-open", [url]}
+        {:win32, _} ->
+          dirname = Path.dirname(path)
+          basename = Path.basename(path)
+          {"cmd", ["/c", "start", basename], [cd: dirname]}
+
+        {:unix, :darwin} ->
+          {"open", [path], []}
+
+        {:unix, _} ->
+          {"xdg-open", [path], []}
       end
 
-    System.cmd(cmd, args)
+    System.cmd(cmd, args, options)
   end
 end
