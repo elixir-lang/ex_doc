@@ -481,7 +481,7 @@ defmodule Mix.Tasks.Docs do
   defp browser_open(url) do
     {cmd, args} =
       case :os.type() do
-        {:win32, _} -> {"cmd", ["/c", "start", url]}
+        {:win32, _} -> {"cmd", ["/c", "start", "", url]}
         {:unix, :darwin} -> {"open", [url]}
         {:unix, _} -> {"xdg-open", [url]}
       end
