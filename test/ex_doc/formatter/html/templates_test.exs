@@ -46,30 +46,40 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "generates headers with hovers" do
       assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """
              <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo</p>
+               </a>
                Foo
              </h2>
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">bar</p>
+               </a>
                Bar
              </h2>
              """
 
       assert Templates.link_headings("<h2>Foo</h2>\n<h2>Bar</h2>") == """
              <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo</p>
+               </a>
                Foo
              </h2>
 
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">bar</p>
+               </a>
                Bar
              </h2>
              """
 
       assert Templates.link_headings("<h2></h2><h2>Bar</h2>") == """
              <h2></h2><h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">bar</p>
+               </a>
                Bar
              </h2>
              """
@@ -77,7 +87,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.link_headings("<h2></h2>\n<h2>Bar</h2>") == """
              <h2></h2>
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">bar</p>
+               </a>
                Bar
              </h2>
              """
@@ -85,7 +97,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.link_headings("<h2>Foo</h2><h2></h2>") ==
                String.trim_trailing("""
                <h2 id="foo" class="section-heading">
-                 <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+                 <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+                 <p class="sr-only">foo</p>
+                 </a>
                  Foo
                </h2>
                <h2></h2>
@@ -94,7 +108,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") ==
                String.trim_trailing("""
                <h2 id="foo" class="section-heading">
-                 <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+                 <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+                 <p class="sr-only">foo</p>
+                 </a>
                  Foo
                </h2>
 
@@ -103,7 +119,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert Templates.link_headings("<h3>Foo</h3>") == """
              <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo</p>
+               </a>
                Foo
              </h3>
              """
@@ -112,12 +130,16 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "generates headers with unique id's" do
       assert Templates.link_headings("<h3>Foo</h3>\n<h3>Foo</h3>") == """
              <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo</p>
+               </a>
                Foo
              </h3>
 
              <h3 id="foo-1" class="section-heading">
-               <a href="#foo-1" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a>
+               <a href="#foo-1" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo-1</p>
+               </a>
                Foo
              </h3>
              """
