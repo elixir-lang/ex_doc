@@ -10,7 +10,7 @@
   {{/nestingChanged}}
 
   <li class="{{#isLocal node.id}}current-page open{{/isLocal}}">
-    <a href="{{node.id}}.html" class="expand" {{#isArray node.headers}}{{else}}translate="no"{{/isArray}}>
+    <a href="{{node.id}}.html{{#isLocal node.id}}#content{{/isLocal}}" class="expand" {{#isArray node.headers}}{{else}}translate="no"{{/isArray}}>
       {{#if node.nested_title}}
         {{{node.nested_title}}}
       {{else}}
