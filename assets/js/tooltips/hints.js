@@ -170,7 +170,7 @@ export function extractFunctionHint (element) {
  * @returns {Hint}
  */
 export function extractModuleHint (content) {
-  let heading = content.querySelector('h1 span')
+  let heading = content.querySelector('h1 > span')
   const title = heading.textContent
 
   const firstParagraph = content.querySelector('#moduledoc p')
