@@ -5,12 +5,17 @@ describe('hints extraction', () => {
     const modulePageObject = parseHTML(`
       <div>
         <h1>
-          <span>Some module</span> <small class="app-vsn">(ExDoc v0.0.1)</small>
+          <button class="settings display-settings">
+            <i class="ri-settings-3-line"></i>
+            <span class="sr-only">Settings</span>
+          </button>
 
           <a href="https://github.com/" title="View Source" class="view-source" rel="help">
             <i class="ri-code-s-slash-line" aria-hidden="true"></i>
             <span class="sr-only">View Source</span>
           </a>
+
+          <span>Some module</span> <small class="app-vsn">(ExDoc v0.0.1)</small>
         </h1>
         <section id="moduledoc">
           <p>
