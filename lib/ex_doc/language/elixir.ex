@@ -748,7 +748,7 @@ defmodule ExDoc.Language.Elixir do
     ref = {:module, module}
 
     case {mode, Refs.get_visibility(ref)} do
-      {_link_type, :public} ->
+      {_link_type, visibility} when visibility in [:public, :limited] ->
         Autolink.app_module_url(Autolink.tool(module, config), module, config)
 
       {:regular_link, :undefined} ->

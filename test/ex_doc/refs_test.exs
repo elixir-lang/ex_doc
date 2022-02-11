@@ -38,8 +38,8 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:function, WithModuleDoc, :_no_doc, 0}) == :hidden
     assert Refs.get_visibility({:function, WithModuleDoc, :_doc_false, 0}) == :hidden
 
-    assert Refs.get_visibility({:function, InMemory, :no_doc, 0}) == :public
     # unable to read documentation, visibility is set to :public
+    assert Refs.get_visibility({:function, InMemory, :no_doc, 0}) == :public
     assert Refs.get_visibility({:function, InMemory, :doc_false, 0}) == :public
     assert Refs.get_visibility({:function, InMemory, :with_doc, 0}) == :public
     assert Refs.get_visibility({:function, InMemory, :non_existant, 0}) == :undefined
@@ -53,6 +53,9 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:type, :sets, :set, 0}) == :public
     assert Refs.get_visibility({:type, :sets, :set, 9}) == :undefined
     assert Refs.get_visibility({:type, WithoutModuleDoc, :a_type, 0}) == :public
+
+    # types cannot be read for inmemory modules
+    assert Refs.get_visibility({:type, InMemory, :a_type, 0}) == :undefined
 
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 3}) == :public
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :undefined
