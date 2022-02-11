@@ -387,6 +387,22 @@ defmodule ExDoc.Language.ElixirTest do
     end
   end
 
+  defmodule InMemory do
+    @callback hello() :: :world
+    def hello(), do: :world
+  end
+
+  test "in memory" do
+    assert {:a, _, _, _} = autolink_doc("ExDoc.Language.ElixirTest.InMemory.hello/0")
+    assert {:a, _, _, _} = autolink_doc("c:ExDoc.Language.ElixirTest.InMemory.hello/0")
+
+    # Types are not checked for in memory
+    assert_unchanged("t:ExDoc.Language.ElixirTest.InMemory.unknown/0")
+
+    warn("ExDoc.Language.ElixirTest.InMemory.unknown/0")
+    warn("c:ExDoc.Language.ElixirTest.InMemory.unknown/0")
+  end
+
   test "warnings" do
     ExDoc.Refs.insert([
       {{:module, AutolinkTest.Foo}, :public},
@@ -421,10 +437,6 @@ defmodule ExDoc.Language.ElixirTest do
     warn("c:GenServer.handle_call/9")
 
     warn("t:Calendar.date/9")
-
-    assert warn(fn ->
-             autolink_spec(quote(do: t() :: bad()))
-           end) =~ ~s[documentation references type "bad()"]
 
     assert warn(fn ->
              autolink_spec(quote(do: t() :: String.bad()))

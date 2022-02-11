@@ -21,7 +21,7 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:module, Code}) == :public
     assert Refs.get_visibility({:module, Code.Typespec}) == :hidden
     assert Refs.get_visibility({:module, Unknown}) == :undefined
-    assert Refs.get_visibility({:module, InMemory}) == :public
+    assert Refs.get_visibility({:module, InMemory}) == :limited
 
     assert Refs.get_visibility({:function, Enum, :join, 1}) == :public
     assert Refs.get_visibility({:function, Enum, :join, 2}) == :public
@@ -53,10 +53,6 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:type, :sets, :set, 0}) == :public
     assert Refs.get_visibility({:type, :sets, :set, 9}) == :undefined
     assert Refs.get_visibility({:type, WithoutModuleDoc, :a_type, 0}) == :public
-    # types are in abstract_code chunk so not available for in-memory modules
-    assert Refs.get_visibility({:type, InMemory, :a_type, 0}) == :undefined
-    # @typep
-    assert Refs.get_visibility({:type, :sets, :seg, 0}) == :hidden
 
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 3}) == :public
     assert Refs.get_visibility({:callback, GenServer, :handle_call, 9}) == :undefined

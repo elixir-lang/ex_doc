@@ -792,8 +792,7 @@ defmodule ExDoc.Language.Elixir do
       {:type, :hidden} ->
         nil
 
-      # skip `@type %{required(...), optional(...), ...}`
-      {:type, _visibility} when name in [:required, :optional] and arity == 1 ->
+      {:type, _} ->
         nil
 
       _ ->
@@ -827,7 +826,9 @@ defmodule ExDoc.Language.Elixir do
             end
         end
 
-      {:regular_link, :public, :undefined} ->
+      {:regular_link, module_visibility, :undefined}
+      when module_visibility == :public
+      when module_visibility == :limited and kind != :type ->
         if warn?,
           do: Autolink.maybe_warn(ref, config, :undefined, %{original_text: original_text})
 
