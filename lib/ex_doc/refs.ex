@@ -101,9 +101,11 @@ defmodule ExDoc.Refs do
 
       {:error, _} ->
         if Code.ensure_loaded?(module) do
+          # We say it is limited because the types may not actually be available in the beam file.
           [{{:module, module}, :limited}] ++
             to_refs(exports(module), module, :function) ++
-            to_refs(callbacks(module), module, :callback)
+            to_refs(callbacks(module), module, :callback) ++
+            to_refs(types(module, [:type, :opaque]), module, :type)
         else
           [{{:module, module}, :undefined}]
         end
@@ -164,6 +166,19 @@ defmodule ExDoc.Refs do
       module.behaviour_info(:callbacks)
     else
       []
+    end
+  end
+
+  defp types(module, kind_list) do
+    case Code.Typespec.fetch_types(module) do
+      {:ok, list} ->
+        for {kind, {name, _, args}} <- list,
+            kind in kind_list do
+          {name, length(args)}
+        end
+
+      :error ->
+        []
     end
   end
 
