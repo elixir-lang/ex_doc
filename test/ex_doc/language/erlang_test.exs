@@ -2,9 +2,8 @@ defmodule ExDoc.Language.ErlangTest do
   use ExUnit.Case
   import TestHelper
 
-  setup :create_tmp_dir
-
   @moduletag :otp24
+  @moduletag :tmp_dir
 
   describe "autolink_doc/2" do
     test "module", c do

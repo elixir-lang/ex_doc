@@ -1,9 +1,9 @@
 defmodule ExDoc.Formatter.HTML.ErlangTest do
   use ExUnit.Case
   import TestHelper
-  setup :create_tmp_dir
 
   @moduletag :otp24
+  @moduletag :tmp_dir
 
   test "it works", c do
     erlc(c, :foo, ~S"""

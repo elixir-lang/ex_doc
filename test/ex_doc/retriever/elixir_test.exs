@@ -3,7 +3,7 @@ defmodule ExDoc.Retriever.ElixirTest do
   alias ExDoc.{Retriever, DocAST}
   import TestHelper
 
-  setup :create_tmp_dir
+  @moduletag :tmp_dir
 
   describe "docs_from_modules/2" do
     test "module", c do

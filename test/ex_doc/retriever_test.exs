@@ -3,7 +3,7 @@ defmodule ExDoc.RetrieverTest do
   alias ExDoc.Retriever
   import TestHelper
 
-  setup :create_tmp_dir
+  @moduletag :tmp_dir
 
   describe "docs_from_modules/2: Generic" do
     test "module with no docs", c do

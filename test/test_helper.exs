@@ -89,20 +89,4 @@ defmodule TestHelper do
       raise "not supported"
     end
   end
-
-  # TODO: replace with ExUnit @tag :tmp_dir feature when we require Elixir v1.11.
-  def create_tmp_dir(context) do
-    module = escape_path(inspect(context.module))
-    name = escape_path(to_string(context.test))
-    dir = Path.join(["tmp", module, name])
-    File.rm_rf!(dir)
-    File.mkdir_p!(dir)
-    Map.put(context, :tmp_dir, dir)
-  end
-
-  @escape Enum.map(' [~#%&*{}\\:<>?/+|"]', &<<&1::utf8>>)
-
-  defp escape_path(path) do
-    String.replace(path, @escape, "-")
-  end
 end

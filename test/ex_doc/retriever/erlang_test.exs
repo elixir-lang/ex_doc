@@ -4,8 +4,7 @@ defmodule ExDoc.Retriever.ErlangTest do
   import TestHelper
 
   @moduletag :otp24
-
-  setup :create_tmp_dir
+  @moduletag :tmp_dir
 
   describe "docs_from_modules/2" do
     test "module", c do
