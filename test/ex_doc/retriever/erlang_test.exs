@@ -3,7 +3,7 @@ defmodule ExDoc.Retriever.ErlangTest do
   alias ExDoc.{Retriever, DocAST, Language.Erlang}
   import TestHelper
 
-  @moduletag :otp24
+  @moduletag :otp_eep48
   @moduletag :tmp_dir
 
   describe "docs_from_modules/2" do

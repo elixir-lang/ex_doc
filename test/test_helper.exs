@@ -1,6 +1,9 @@
+otp_eep48? = Code.ensure_loaded?(:edoc_doclet_chunks)
+
 exclude = [
   earmark: not ExDoc.Markdown.Earmark.available?(),
-  otp24: System.otp_release() < "24"
+  otp_eep48: not otp_eep48?,
+  otp_has_docs: not match?({:docs_v1, _, _, _, _, _, _}, Code.fetch_docs(:array))
 ]
 
 ExUnit.start(exclude: Enum.filter(exclude, &elem(&1, 1)))
@@ -71,7 +74,7 @@ defmodule TestHelper do
     :ok
   end
 
-  if Code.ensure_loaded?(:edoc_doclet_chunks) do
+  if otp_eep48? do
     def edoc_to_chunk(module) do
       source_path = module.module_info(:compile)[:source]
       dir = :filename.dirname(source_path)

@@ -97,7 +97,6 @@ defmodule ExDoc.Language.ElixirTest do
       assert_unchanged("bar/1", current_module: AutolinkTest.Foo)
     end
 
-    @tag :otp24
     test "auto-imported function" do
       assert autolink_doc("+/2") ==
                ~m"[`+/2`](https://hexdocs.pm/elixir/Kernel.html#+/2)"
