@@ -101,6 +101,9 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc("+/2") ==
                ~m"[`+/2`](https://hexdocs.pm/elixir/Kernel.html#+/2)"
 
+      assert autolink_doc("&/1") ==
+               ~m"[`&/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#&/1)"
+
       assert autolink_doc("for/1") ==
                ~m"[`for/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#for/1)"
 

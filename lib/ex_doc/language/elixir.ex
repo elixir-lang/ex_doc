@@ -627,9 +627,12 @@ defmodule ExDoc.Language.Elixir do
   defp parse_function("__block__"), do: {:function, :__block__}
 
   defp parse_function(string) do
-    case Code.string_to_quoted(string <> "/0") do
-      {:ok, {:/, _, [{function, _, _}, 0]}} when is_atom(function) -> {:function, function}
-      _ -> :error
+    case Code.string_to_quoted("& #{string}/0") do
+      {:ok, {:&, _, [{:/, _, [{function, _, _}, 0]}]}} when is_atom(function) ->
+        {:function, function}
+
+      _ ->
+        :error
     end
   end
 
