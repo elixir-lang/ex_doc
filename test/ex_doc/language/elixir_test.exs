@@ -109,7 +109,10 @@ defmodule ExDoc.Language.ElixirTest do
 
       assert autolink_doc("for/1", apps: [:elixir]) ==
                ~m"[`for/1`](Kernel.SpecialForms.html#for/1)"
+    end
 
+    @tag skip: not Version.match?(System.version(), "~> 1.13")
+    test "stepped range" do
       assert autolink_doc("..///3") ==
                ~m"[`..///3`](https://hexdocs.pm/elixir/Kernel.html#..///3)"
     end
