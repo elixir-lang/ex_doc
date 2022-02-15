@@ -2,7 +2,7 @@ defmodule ExDoc.Language.ErlangTest do
   use ExUnit.Case
   import TestHelper
 
-  @moduletag :otp24
+  @moduletag :otp_has_docs
   @moduletag :tmp_dir
 
   describe "autolink_doc/2" do

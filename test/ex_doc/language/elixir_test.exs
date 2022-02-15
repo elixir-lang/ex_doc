@@ -97,17 +97,22 @@ defmodule ExDoc.Language.ElixirTest do
       assert_unchanged("bar/1", current_module: AutolinkTest.Foo)
     end
 
-    @tag :otp24
     test "auto-imported function" do
       assert autolink_doc("+/2") ==
                ~m"[`+/2`](https://hexdocs.pm/elixir/Kernel.html#+/2)"
+
+      assert autolink_doc("&/1") ==
+               ~m"[`&/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#&/1)"
 
       assert autolink_doc("for/1") ==
                ~m"[`for/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#for/1)"
 
       assert autolink_doc("for/1", apps: [:elixir]) ==
                ~m"[`for/1`](Kernel.SpecialForms.html#for/1)"
+    end
 
+    @tag skip: not Version.match?(System.version(), "~> 1.13")
+    test "stepped range" do
       assert autolink_doc("..///3") ==
                ~m"[`..///3`](https://hexdocs.pm/elixir/Kernel.html#..///3)"
     end

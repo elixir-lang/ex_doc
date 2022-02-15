@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
   use ExUnit.Case
   import TestHelper
 
-  @moduletag :otp24
+  @moduletag :otp_eep48
   @moduletag :tmp_dir
 
   test "it works", c do
