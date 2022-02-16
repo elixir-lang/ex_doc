@@ -140,6 +140,8 @@ defmodule ExDoc.Language do
   def get(:erlang, _module), do: {:ok, ExDoc.Language.Erlang}
 
   def get(language, module) when is_atom(language) and is_atom(module) do
+    ExDoc.WarningCounter.increment()
+
     IO.warn(
       "skipping module #{module}, reason: unsupported language (#{language})",
       []

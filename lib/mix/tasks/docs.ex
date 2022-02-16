@@ -24,6 +24,8 @@ defmodule Mix.Tasks.Docs do
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
 
+    * `--warnings-as-errors` - Exits with non-zero exit code if any warnings are found
+
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
 
@@ -309,7 +311,8 @@ defmodule Mix.Tasks.Docs do
     formatter: :keep,
     language: :string,
     open: :boolean,
-    output: :string
+    output: :string,
+    warnings_as_errors: :boolean
   ]
 
   @aliases [
@@ -367,7 +370,16 @@ defmodule Mix.Tasks.Docs do
         browser_open(index)
       end
 
-      index
+      if options[:warnings_as_errors] == true and ExDoc.WarningCounter.count() > 0 do
+        Mix.shell().info([
+          :red,
+          "Doc generation failed due to warnings while using the --warnings-as-errors option"
+        ])
+
+        exit({:shutdown, ExDoc.WarningCounter.count()})
+      else
+        index
+      end
     end
   end
 

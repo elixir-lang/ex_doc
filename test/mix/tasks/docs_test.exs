@@ -181,4 +181,10 @@ defmodule Mix.Tasks.DocsTest do
       ] = run([], app: :umbrella, apps_path: "apps/", docs: [ignore_apps: [:foo]])
     end)
   end
+
+  test "accepts warnings_as_errors in :warnings_as_errors" do
+    assert catch_exit(run([], app: :ex_doc, docs: [warnings_as_errors: true])) == {:shutdown, 1}
+  after
+    ExDoc.WarningCounter.reset()
+  end
 end

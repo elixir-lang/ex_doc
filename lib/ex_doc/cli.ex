@@ -29,14 +29,25 @@ defmodule ExDoc.CLI do
           proglang: :string,
           quiet: :boolean,
           source_ref: :string,
-          version: :boolean
+          version: :boolean,
+          warnings_as_errors: :boolean
         ]
       )
 
-    if List.keymember?(opts, :version, 0) do
-      print_version()
-    else
-      generate(args, opts, generator)
+    cond do
+      List.keymember?(opts, :version, 0) ->
+        print_version()
+
+      opts[:warnings_as_errors] == true and ExDoc.WarningCounter.count() > 0 ->
+        IO.puts(
+          :stderr,
+          "Doc generation failed due to warnings while using the --warnings-as-errors option"
+        )
+
+        exit({:shutdown, ExDoc.WarningCounter.count()})
+
+      true ->
+        generate(args, opts, generator)
     end
   end
 
@@ -182,6 +193,7 @@ defmodule ExDoc.CLI do
           --source-ref    Branch/commit/tag used for source link inference, default: "master"
       -u, --source-url    URL to the source code
       -v, --version       Print ExDoc version
+      --warnings-as-errors Exit with non-zero status if doc generation has one or more warnings
 
     ## Custom config
 
