@@ -83,6 +83,7 @@ defmodule ExDoc.Retriever do
             docs
 
           {:error, reason} ->
+            ExDoc.WarningCounter.increment()
             IO.warn("skipping module #{inspect(module)}, reason: #{reason}", [])
             false
         end

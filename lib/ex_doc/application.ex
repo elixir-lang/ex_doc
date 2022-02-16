@@ -17,6 +17,11 @@ defmodule ExDoc.Application do
         match?("makeup_" <> _, Atom.to_string(app)),
         do: Application.ensure_all_started(app)
 
-    Supervisor.start_link([ExDoc.Refs], strategy: :one_for_one)
+    children = [
+      ExDoc.Refs,
+      ExDoc.WarningCounter
+    ]
+
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
 end

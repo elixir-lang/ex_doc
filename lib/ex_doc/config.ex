@@ -40,7 +40,8 @@ defmodule ExDoc.Config do
             version: nil,
             authors: nil,
             skip_undefined_reference_warnings_on: [],
-            package: nil
+            package: nil,
+            warnings_as_errors: false
 
   @type t :: %__MODULE__{
           apps: [atom()],
@@ -75,7 +76,8 @@ defmodule ExDoc.Config do
           version: nil | String.t(),
           authors: nil | [String.t()],
           skip_undefined_reference_warnings_on: [String.t()],
-          package: :atom | nil
+          package: :atom | nil,
+          warnings_as_errors: boolean()
         }
 
   @spec build(String.t(), String.t(), Keyword.t()) :: ExDoc.Config.t()

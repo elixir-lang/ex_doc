@@ -35,6 +35,38 @@ defmodule ExDoc.CLITest do
     assert io == "ExDoc v#{ExDoc.version()}\n"
   end
 
+  describe "--warnings-as-errors" do
+    test "exits with code 0 when no warnings" do
+      {[html, epub], _io} = run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
+
+      assert html ==
+               {"ExDoc", "1.2.3",
+                [formatter: "html", apps: [:ex_doc], source_beam: @ebin, warnings_as_errors: true]}
+
+      assert epub ==
+               {"ExDoc", "1.2.3",
+                [formatter: "epub", apps: [:ex_doc], source_beam: @ebin, warnings_as_errors: true]}
+    end
+
+    test "exits with 1 with warnings" do
+      ExDoc.WarningCounter.increment()
+
+      fun = fn ->
+        run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
+      end
+
+      io =
+        capture_io(:stderr, fn ->
+          assert catch_exit(fun.()) == {:shutdown, 1}
+        end)
+
+      assert io =~
+               "Doc generation failed due to warnings while using the --warnings-as-errors option\n"
+    after
+      ExDoc.WarningCounter.reset()
+    end
+  end
+
   test "too many arguments" do
     assert catch_exit(run(["ExDoc", "1.2.3", "/", "kaboom"])) == {:shutdown, 1}
   end
