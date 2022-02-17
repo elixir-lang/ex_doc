@@ -129,6 +129,7 @@ function elixirTokenSplitter (builder) {
 
   lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
   builder.pipeline.before(lunr.stemmer, elixirTokenFunction)
+  builder.searchPipeline.before(lunr.stemmer, elixirTokenFunction)
 }
 
 function searchResultsToDecoratedSearchNodes (results) {
