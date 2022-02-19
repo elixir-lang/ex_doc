@@ -3,7 +3,7 @@ defmodule ExDoc.RetrieverTest do
   alias ExDoc.Retriever
   import TestHelper
 
-  setup :create_tmp_dir
+  @moduletag :tmp_dir
 
   describe "docs_from_modules/2: Generic" do
     test "module with no docs", c do
@@ -86,9 +86,9 @@ defmodule ExDoc.RetrieverTest do
       [mod] = Retriever.docs_from_modules([A], config)
       [bar, baz, foo] = mod.docs
 
-      assert %{id: "foo/0", group: "Group 1"} = foo
-      assert %{id: "bar/0", group: "Group 1"} = bar
-      assert %{id: "baz/0", group: "Group 2"} = baz
+      assert %{id: "foo/0", group: :"Group 1"} = foo
+      assert %{id: "bar/0", group: :"Group 1"} = bar
+      assert %{id: "baz/0", group: :"Group 2"} = baz
     end
 
     test "nesting", c do
@@ -115,10 +115,10 @@ defmodule ExDoc.RetrieverTest do
       assert length(mods) == 2
 
       assert Enum.at(mods, 0).nested_context == "Nesting.Prefix.B"
-      assert Enum.at(mods, 0).nested_title == "A"
+      assert Enum.at(mods, 0).nested_title == ".A"
 
       assert Enum.at(mods, 1).nested_context == "Nesting.Prefix.B"
-      assert Enum.at(mods, 1).nested_title == "C"
+      assert Enum.at(mods, 1).nested_title == ".C"
 
       [mod] =
         Retriever.docs_from_modules([Nesting.Prefix.B.B.A], %ExDoc.Config{
@@ -134,26 +134,9 @@ defmodule ExDoc.RetrieverTest do
         Retriever.docs_from_modules([NotAvailable], %ExDoc.Config{})
       end
     end
-
-    test "source_url is relative to source_root", c do
-      tmp_dir = Path.expand(c.tmp_dir)
-
-      elixirc(c, "foo.ex", ~S"""
-      defmodule Foo do
-      end
-      """)
-
-      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: nil}
-      [mod] = Retriever.docs_from_modules([Foo], config)
-      assert mod.source_url == "#{tmp_dir}/foo.ex:1"
-
-      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}", source_root: tmp_dir}
-      [mod] = Retriever.docs_from_modules([Foo], config)
-      assert mod.source_url == "foo.ex:1"
-    end
   end
 
-  test "docs_from_dir/2: filter_prefix", c do
+  test "docs_from_dir/2: filter_module", c do
     elixirc(c, ~S"""
     defmodule A do
     end
@@ -166,7 +149,7 @@ defmodule ExDoc.RetrieverTest do
     """)
 
     ebin_dir = Path.join(c.tmp_dir, "ebin")
-    config = %ExDoc.Config{filter_prefix: "A"}
+    config = %ExDoc.Config{filter_modules: fn module, _ -> Atom.to_string(module) =~ "A" end}
     [a, a_a] = Retriever.docs_from_dir(ebin_dir, config)
 
     assert a.id == "A"

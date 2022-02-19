@@ -1,7 +1,3 @@
-<h1>
-  API Reference <small class="app-vsn"><%= config.project %> v<%= config.version %></small>
-</h1>
-
 <%= if nodes_map.modules != [] do %>
   <section class="details-list">
     <h2 id="modules" class="section-heading">Modules</h2>

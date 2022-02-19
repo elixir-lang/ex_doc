@@ -18,7 +18,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     default = %ExDoc.Config{
       project: "Elixir",
       version: "1.0.1",
-      source_root: File.cwd!(),
       source_url_pattern: "#{source_url()}/blob/master/%{path}#L%{line}",
       homepage_url: homepage_url(),
       source_url: source_url(),
@@ -47,30 +46,40 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "generates headers with hovers" do
       assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """
              <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo</p>
+               </a>
                Foo
              </h2>
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">bar</p>
+               </a>
                Bar
              </h2>
              """
 
       assert Templates.link_headings("<h2>Foo</h2>\n<h2>Bar</h2>") == """
              <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo</p>
+               </a>
                Foo
              </h2>
 
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">bar</p>
+               </a>
                Bar
              </h2>
              """
 
       assert Templates.link_headings("<h2></h2><h2>Bar</h2>") == """
              <h2></h2><h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">bar</p>
+               </a>
                Bar
              </h2>
              """
@@ -78,7 +87,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.link_headings("<h2></h2>\n<h2>Bar</h2>") == """
              <h2></h2>
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">bar</p>
+               </a>
                Bar
              </h2>
              """
@@ -86,7 +97,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.link_headings("<h2>Foo</h2><h2></h2>") ==
                String.trim_trailing("""
                <h2 id="foo" class="section-heading">
-                 <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+                 <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+                 <p class="sr-only">foo</p>
+                 </a>
                  Foo
                </h2>
                <h2></h2>
@@ -95,7 +108,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") ==
                String.trim_trailing("""
                <h2 id="foo" class="section-heading">
-                 <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+                 <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+                 <p class="sr-only">foo</p>
+                 </a>
                  Foo
                </h2>
 
@@ -104,7 +119,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert Templates.link_headings("<h3>Foo</h3>") == """
              <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo</p>
+               </a>
                Foo
              </h3>
              """
@@ -113,12 +130,16 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "generates headers with unique id's" do
       assert Templates.link_headings("<h3>Foo</h3>\n<h3>Foo</h3>") == """
              <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo</p>
+               </a>
                Foo
              </h3>
 
              <h3 id="foo-1" class="section-heading">
-               <a href="#foo-1" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+               <a href="#foo-1" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo-1</p>
+               </a>
                Foo
              </h3>
              """
@@ -170,8 +191,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r"""
                <div class="sidebar-header">\s*\
                <div class="sidebar-projectDetails">\s*\
-               <a href="#{homepage_url()}" class="sidebar-projectName">\s*Elixir\s*</a>\s*\
-               <strong class="sidebar-projectVersion">\s*v1.0.1\s*</strong>\s*</div>\s*</div>\
+               <a href="#{homepage_url()}" class="sidebar-projectName" translate="no">\s*Elixir\s*</a>\s*\
+               <strong class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</strong>\s*\</div>
                """
     end
 
@@ -179,7 +200,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       config = %ExDoc.Config{
         project: "Elixir",
         version: "1.0.1",
-        source_root: File.cwd!(),
         main: "hello"
       }
 
@@ -189,9 +209,8 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r"""
                <div class="sidebar-header">\s*\
                <div class="sidebar-projectDetails">\s*\
-               <a href="hello.html" class="sidebar-projectName">\s*Elixir\s*</a>\s*\
-               <strong class="sidebar-projectVersion">\s*v1.0.1\s*</strong>\s*\
-               </div>\s*</div>\
+               <a href="hello.html" class="sidebar-projectName" translate="no">\s*Elixir\s*</a>\s*\
+               <strong class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</strong>\s*\</div>
                """
     end
 
@@ -220,6 +239,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example/2")ms
       assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example_without_docs/0")ms
       assert content =~ ~r("id":"CompiledWithDocs.Nested")ms
+      assert content =~ ~r(\{"anchor":"__struct__/0","id":"%CompiledWithDocs\{\}"\})ms
     end
 
     test "outputs nodes grouped based on metadata" do
@@ -316,7 +336,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
 
       assert content =~
-               ~r{<h1>\s*CompiledWithDocs <small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
+               ~r{<span translate="no">CompiledWithDocs</span>\s*<small class=\"app-vsn\" translate="no">\(Elixir v1.0.1\)</small>}
 
       refute content =~ ~r{<small>module</small>}
 
@@ -324,10 +344,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{moduledoc.*Example.*<span class="nc">CompiledWithDocs</span><span class="o">\.</span><span class="n">example</span>.*}ms
 
       assert content =~
-               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example.*</h2>}ms
+               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*Example.*</h2>}ms
 
       assert content =~
-               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Example H3 heading.*</h3>}ms
+               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*Example H3 heading.*</h3>}ms
 
       # Summaries
       assert content =~ ~r{example/2.*Some example}ms
@@ -336,7 +356,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       # Source
       assert content =~
-               ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L14"[^>]*>\s*<span class="icon-code" aria-hidden="true"></span>\s*<span class="sr-only">View Source</span>\s*</a>}ms
+               ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L1"[^>]*>\s*<i class="ri-code-s-slash-line" aria-hidden="true"></i>\s*<span class="sr-only">View Source</span>\s*</a>\s*}ms
+
+      # Module annotations
+      assert content =~ ~s{<span class=\"note\">(example_module_tag)</span>}
 
       # Functions
       assert content =~ ~s{<section class="detail" id="example/2">}
@@ -344,7 +367,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~s{example(foo, bar \\\\ Baz)}
 
       assert content =~
-               ~r{<a href="#example/2" class="detail-link" title="Link to this function">\s*<span class="icon-link" aria-hidden="true"></span>\s*<span class="sr-only">Link to this function</span>\s*</a>}ms
+               ~r{<a href="#example/2" class="detail-link" title="Link to this function">\s*<i class="ri-link-m" aria-hidden="true"></i>\s*<span class="sr-only">Link to this function</span>\s*</a>}ms
     end
 
     test "outputs function groups" do
@@ -384,7 +407,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>(), ] <>
           ~S[<a href="#t:opaque/0">opaque</a>(), :ok | :error}]
 
-      assert content =~ ~s[<a href="#t:public/1">public(t)</a>]
+      assert content =~ ~s[<a href="#t:public/1" translate="no">public(t)</a>]
       refute content =~ ~s[<a href="#t:private/0">private</a>]
       assert content =~ public_html
       refute content =~ ~s[<strong>private\(t\)]
@@ -400,7 +423,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     test "outputs summaries" do
       content = get_module_page([CompiledWithDocs])
-      assert content =~ ~r{<div class="summary-signature">\s*<a href="#example_1/0">}
+
+      assert content =~
+               ~r{<div class="summary-signature">\s*<a href="#example_1/0" translate="no">}
     end
 
     test "contains links to summary sections when those exist" do
@@ -412,7 +437,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CompiledWithDocs])
 
       assert content =~
-               ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
+               ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*Examples.*</h3>}ms
     end
 
     test "do not output overlapping functions, causing duplicate IDs" do
@@ -437,7 +462,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomBehaviourOne])
 
       assert content =~
-               ~r{<h1>\s*CustomBehaviourOne\s*<small>behaviour</small>\s*<small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
+               ~r{<span translate="no">CustomBehaviourOne</span>\s*<small>behaviour</small>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
 
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:hello/1">}
@@ -447,7 +472,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomBehaviourTwo])
 
       assert content =~
-               ~r{<h1>\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*<small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
+               ~r{<span translate="no">CustomBehaviourTwo</span>\s*<small>behaviour</small>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
 
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:bye/1">}
@@ -459,7 +484,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CustomProtocol])
 
       assert content =~
-               ~r{<h1>\s*CustomProtocol\s*<small>protocol</small>\s*<small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
+               ~r{<span translate="no">CustomProtocol</span>\s*<small>protocol</small>\s*<small class=\"app-vsn\" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
     end
 
     ## TASKS
@@ -468,7 +493,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([Mix.Tasks.TaskWithDocs])
 
       assert content =~
-               ~r{<h1>\s*mix task_with_docs\s*<small class=\"app-vsn\">\(Elixir v1.0.1\)</small>}
+               ~r{<span translate="no">mix task_with_docs</span>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
     end
   end
 

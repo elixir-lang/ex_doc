@@ -36,16 +36,10 @@ defmodule ExDoc.Formatter.HTMLTest do
       formatter: "html",
       assets: "test/tmp/html_assets",
       output: output_dir(),
-      source_root: beam_dir(),
       source_beam: beam_dir(),
+      source_url: "https://github.com/elixir-lang/elixir",
       logo: "test/fixtures/elixir.png",
-      extras: [
-        "test/fixtures/LICENSE",
-        "test/fixtures/PlainText.txt",
-        "test/fixtures/PlainTextFiles.md",
-        "test/fixtures/README.md",
-        "test/fixtures/LivebookFile.livemd"
-      ]
+      extras: []
     ]
   end
 
@@ -198,9 +192,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r("id":"CompiledWithDocs",.*"key":"functions".*"example/2")ms
     assert content =~ ~r{"id":"CompiledWithDocs\.Nested",.*"title":"CompiledWithDocs\.Nested"}ms
 
-    assert content =~ ~r{"id":"UndefParent\.Nested",.*"title":"UndefParent\.Nested"}ms
-    refute content =~ ~r{"id":"UndefParent\.Undocumented"}ms
-
     assert content =~ ~r{"id":"CustomBehaviourOne",.*"title":"CustomBehaviourOne"}ms
     assert content =~ ~r{"id":"CustomBehaviourTwo",.*"title":"CustomBehaviourTwo"}ms
     assert content =~ ~r{"id":"RandomError",.*"title":"RandomError"}ms
@@ -212,10 +203,14 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config())
 
     content = File.read!("#{output_dir()}/api-reference.html")
-    assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
+    assert content =~ ~r{<a href="CompiledWithDocs.html" translate="no">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
-    assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
-    assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html">mix task_with_docs</a>}
+
+    assert content =~
+             ~r{<a href="CompiledWithDocs.Nested.html" translate="no">CompiledWithDocs.Nested</a>}
+
+    assert content =~
+             ~r{<a href="Mix.Tasks.TaskWithDocs.html" translate="no">mix task_with_docs</a>}
   end
 
   test "groups modules by nesting" do
@@ -296,8 +291,16 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   describe "generates extras" do
+    @extras [
+      "test/fixtures/LICENSE",
+      "test/fixtures/PlainText.txt",
+      "test/fixtures/PlainTextFiles.md",
+      "test/fixtures/README.md",
+      "test/fixtures/LivebookFile.livemd"
+    ]
+
     test "includes source `.livemd` files" do
-      generate_docs(doc_config())
+      generate_docs(doc_config(extras: @extras))
 
       refute File.exists?("#{output_dir()}/LICENSE")
       refute File.exists?("#{output_dir()}/license")
@@ -313,7 +316,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "alongside other content" do
-      config = doc_config(main: "readme")
+      config = doc_config(main: "readme", extras: @extras)
       generate_docs(config)
 
       content = File.read!("#{output_dir()}/index.html")
@@ -323,10 +326,10 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r{<title>README [^<]*</title>}
 
       assert content =~
-               ~r{<h2 id="header-sample" class="section-heading">.*<a href="#header-sample" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>.*<code(\sclass="inline")?>Header</code> sample.*</h2>}ms
+               ~r{<h2 id="header-sample" class="section-heading">.*<a href="#header-sample" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>.*<p class="sr-only">header-sample</p>.*</a>.*<code(\sclass="inline")?>Header</code> sample.*</h2>}ms
 
       assert content =~
-               ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>.*more &gt; than.*</h2>}ms
+               ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>.*<p class="sr-only">more-than</p>.*</a>.*more &gt; than.*</h2>}ms
 
       assert content =~ ~r{<a href="RandomError.html"><code(\sclass="inline")?>RandomError</code>}
 
@@ -345,34 +348,71 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~
                ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code(\sclass="inline")?>mix compile.elixir</code></a>}
 
+      refute content =~
+               ~R{<img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />}
+
       assert content =~ "<p><strong>raw content</strong></p>"
 
+      assert content =~
+               ~s{<a href="https://github.com/elixir-lang/elixir/blob/main/test/fixtures/README.md#L1" title="View Source"}
+
       content = File.read!("#{output_dir()}/plaintextfiles.html")
+
+      assert content =~ ~r{Plain Text Files</span>.*</h1>}s
 
       assert content =~
                ~R{<p>Read the <a href="license.html">license</a> and the <a href="plaintext.html">plain-text file</a>.}
 
       plain_text_file = File.read!("#{output_dir()}/plaintext.html")
 
+      assert plain_text_file =~ ~r{PlainText</span>.*</h1>}s
+
       assert plain_text_file =~
                ~R{<pre>\nThis is plain\n  text and nothing\n.+\s+good bye\n</pre>}s
 
-      assert plain_text_file =~ ~R{\n## Neither formatted\n}
-      assert plain_text_file =~ ~R{\n      `t:term/0`\n}
+      assert plain_text_file =~ ~s{\n## Neither formatted\n}
+      assert plain_text_file =~ ~s{\n      `t:term/0`\n}
 
-      plain_text_file = File.read!("#{output_dir()}/license.html")
+      license = File.read!("#{output_dir()}/license.html")
 
-      assert plain_text_file =~
+      assert license =~ ~r{LICENSE</span>.*</h1>}s
+
+      assert license =~
                ~s{<pre>\nLicensed under the Apache License, Version 2.0 (the &quot;License&quot;)}
 
       content = File.read!("#{output_dir()}/livebookfile.html")
 
       assert content =~
-               ~R{<p>Read <code class="inline">.livemd</code> files generated by <a href="https://github.com/livebook-dev/livebook">livebook</a>.}
+               ~s{<a href="https://github.com/elixir-lang/elixir/blob/main/test/fixtures/LivebookFile.livemd#L1" title="View Source"}
+
+      assert content =~
+               ~s{<p>Read <code class="inline">.livemd</code> files generated by <a href="https://github.com/livebook-dev/livebook">livebook</a>.}
+
+      assert content =~
+               ~s{<img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />}
+    end
+
+    test "with absolute and dot-relative paths for extra" do
+      config =
+        doc_config(
+          extras: ["./test/fixtures/README.md", Path.expand("test/fixtures/LivebookFile.livemd")]
+        )
+
+      generate_docs(config)
+
+      content = File.read!("#{output_dir()}/readme.html")
+
+      assert content =~
+               ~s{<a href="https://github.com/elixir-lang/elixir/blob/main/test/fixtures/README.md#L1" title="View Source"}
+
+      content = File.read!("#{output_dir()}/livebookfile.html")
+
+      assert content =~
+               ~s{<a href="https://github.com/elixir-lang/elixir/blob/main/test/fixtures/LivebookFile.livemd#L1" title="View Source"}
     end
 
     test "without any other content" do
-      generate_docs(doc_config(source_root: "unknown", source_beam: "unknown"))
+      generate_docs(doc_config(source_beam: "unknown", extras: @extras))
 
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
       assert content =~ ~s("modules":[])
@@ -387,7 +427,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     test "containing settext headers while discarding links on header" do
       generate_docs(
         doc_config(
-          source_root: "unknown",
           source_beam: "unknown",
           extras: ["test/fixtures/ExtraPageWithSettextHeader.md"]
         )
@@ -405,14 +444,30 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     test "with custom names" do
       generate_docs(
-        doc_config(extras: ["test/fixtures/README.md": [filename: "GETTING-STARTED"]])
+        doc_config(
+          extras: [
+            "test/fixtures/PlainTextFiles.md",
+            "test/fixtures/LICENSE": [filename: "linked-license"],
+            "test/fixtures/PlainText.txt": [filename: "plain_text"]
+          ]
+        )
       )
 
-      refute File.regular?("#{output_dir()}/readme.html")
-      content = File.read!("#{output_dir()}/GETTING-STARTED.html")
-      assert content =~ ~r{<title>README [^<]*</title>}
+      refute File.regular?("#{output_dir()}/license.html")
+      assert File.regular?("#{output_dir()}/linked-license.html")
+
+      refute File.regular?("#{output_dir()}/plaintext.html")
+      assert File.regular?("#{output_dir()}/plain_text.html")
+
+      content = File.read!("#{output_dir()}/plaintextfiles.html")
+
+      assert content =~ ~r{Plain Text Files</span>.*</h1>}s
+
+      assert content =~
+               ~R{<p>Read the <a href="linked-license.html">license</a> and the <a href="plain_text.html">plain-text file</a>.}
+
       content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
-      assert content =~ ~r{"id":"GETTING-STARTED","title":"README"}
+      assert content =~ ~r{"id":"linked-license","title":"LICENSE"}
     end
 
     test "with custom title" do
@@ -488,6 +543,24 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       refute content_last =~ ~r{Next Page}
     end
+
+    test "before_closing_*_tags required by the user are placed in the right place" do
+      generate_docs(
+        doc_config(
+          before_closing_head_tag: &before_closing_head_tag/1,
+          before_closing_body_tag: &before_closing_body_tag/1,
+          extras: ["test/fixtures/README.md"]
+        )
+      )
+
+      content = File.read!("#{output_dir()}/api-reference.html")
+      assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
+      assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
+
+      content = File.read!("#{output_dir()}/readme.html")
+      assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
+      assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
+    end
   end
 
   describe ".build" do
@@ -515,23 +588,6 @@ defmodule ExDoc.Formatter.HTMLTest do
       content = File.read!("#{output_dir()}/.build")
       refute content =~ ~r{keep}
     end
-  end
-
-  test "before_closing_*_tags required by the user are placed in the right place" do
-    generate_docs(
-      doc_config(
-        before_closing_head_tag: &before_closing_head_tag/1,
-        before_closing_body_tag: &before_closing_body_tag/1
-      )
-    )
-
-    content = File.read!("#{output_dir()}/api-reference.html")
-    assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
-    assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
-
-    content = File.read!("#{output_dir()}/readme.html")
-    assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
-    assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
   end
 
   test "assets required by the user end up in the right place" do

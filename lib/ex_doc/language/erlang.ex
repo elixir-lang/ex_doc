@@ -6,19 +6,10 @@ defmodule ExDoc.Language.Erlang do
   alias ExDoc.{Autolink, Refs}
 
   @impl true
-  # TODO: Move :hidden handling to retriever, as it is shared across all BEAM languages
   def module_data(module, docs_chunk, _config) do
-    {:docs_v1, _, _, _, doc, _, _} = docs_chunk
-
-    if doc != :hidden do
-      module_data(module, docs_chunk)
-    else
-      :skip
-    end
-  end
-
-  def module_data(module, docs_chunk) do
-    ":" <> id = inspect(module)
+    # Make sure the module is loaded for future checks
+    _ = Code.ensure_loaded(module)
+    id = Atom.to_string(module)
     abst_code = get_abstract_code(module)
     line = find_module_line(module, abst_code)
     type = module_type(module)
@@ -47,7 +38,10 @@ defmodule ExDoc.Language.Erlang do
   def function_data(entry, module_data) do
     {{kind, name, arity}, _anno, _signature, doc_content, _metadata} = entry
 
-    if kind == :function and doc_content != :hidden do
+    # TODO: Edoc on Erlang/OTP24.1+ includes private functions in
+    # the chunk, so we manually yank them out for now.
+    if kind == :function and doc_content != :hidden and
+         function_exported?(module_data.module, name, arity) do
       function_data(name, arity, doc_content, module_data)
     else
       :skip
@@ -263,11 +257,7 @@ defmodule ExDoc.Language.Erlang do
         end
 
       "https://erlang.org/doc/link/" <> see ->
-        # TODO: remove me before release
-        unless System.get_env("SKIP_SEE_WARNING") do
-          warn_ref(attrs[:href] <> " (#{see})", config)
-        end
-
+        warn_ref(attrs[:href] <> " (#{see})", config)
         inner
 
       _ ->

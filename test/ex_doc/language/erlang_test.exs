@@ -2,9 +2,8 @@ defmodule ExDoc.Language.ErlangTest do
   use ExUnit.Case
   import TestHelper
 
-  setup :create_tmp_dir
-
-  @moduletag :otp24
+  @moduletag :otp_has_docs
+  @moduletag :tmp_dir
 
   describe "autolink_doc/2" do
     test "module", c do
@@ -19,7 +18,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP module", c do
       assert autolink_doc("{@link array}", c) ==
-               ~s|<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/man/array.html"><code>array</code></a>|
     end
 
     test "OTP module when generating OTP docs", c do
@@ -29,7 +28,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "app module", c do
       assert autolink_doc("{@link //stdlib/array}", c) ==
-               ~s|<a href="https://erlang.org/doc/man/array.html"><code>array</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/man/array.html"><code>array</code></a>|
     end
 
     test "external module", c do
@@ -48,19 +47,19 @@ defmodule ExDoc.Language.ErlangTest do
          [{:code, [], ["array"], %{}}], %{}}
 
       assert do_autolink_doc(ast) ==
-               ~s|<a href="https://erlang.org/doc/man/array.html#anchor"><code>array</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/man/array.html#anchor"><code>array</code></a>|
 
       ast =
         {:a, [href: "stdlib:array#anchor", rel: "https://erlang.org/doc/link/seeerl"],
          [{:code, [], ["array"], %{}}], %{}}
 
       assert do_autolink_doc(ast) ==
-               ~s|<a href="https://erlang.org/doc/man/array.html#anchor"><code>array</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/man/array.html#anchor"><code>array</code></a>|
     end
 
     test "custom text", c do
       assert autolink_doc("{@link array. The <code>array</code> module}", c) ==
-               ~s|<a href="https://erlang.org/doc/man/array.html">The <code>array</code> module</a>|
+               ~s|<a href="https://www.erlang.org/doc/man/array.html">The <code>array</code> module</a>|
     end
 
     test "local function", c do
@@ -75,7 +74,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP function", c do
       assert autolink_doc("{@link array:new/0}", c) ==
-               ~s|<a href="https://erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
     end
 
     test "OTP function when generating OTP docs", c do
@@ -90,12 +89,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "ERTS function", c do
       assert autolink_doc("{@link zlib:gunzip/1}", c) ==
-               ~s|<a href="https://erlang.org/doc/man/zlib.html#gunzip-1"><code>zlib:gunzip/1</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/man/zlib.html#gunzip-1"><code>zlib:gunzip/1</code></a>|
     end
 
     test "app function", c do
       assert autolink_doc("{@link //stdlib/array:new/0}", c) ==
-               ~s|<a href="https://erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
     end
 
     # TODO: test callbacks. No support in EDoc, use :docgen_xml_to_chunks.
@@ -117,12 +116,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP type", c do
       assert autolink_doc("{@link array:array()}", c) ==
-               ~s|<a href="https://erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
     end
 
     test "app type", c do
       assert autolink_doc("{@link //stdlib/array:array()}", c) ==
-               ~s|<a href="https://erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
     end
 
     test "bad module", c do
@@ -260,12 +259,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP type", c do
       assert autolink_spec(~S"-spec foo() -> sets:set().", c) ==
-               ~s|foo() -> <a href="https://erlang.org/doc/man/sets.html#type-set">sets:set</a>().|
+               ~s|foo() -> <a href="https://www.erlang.org/doc/man/sets.html#type-set">sets:set</a>().|
     end
 
     test "OTP private type", c do
       assert autolink_spec(~S"-spec foo() -> array:array_indx().", c) ==
-               ~s|foo() -> <a href="https://erlang.org/doc/man/array.html#type-array_indx">array:array_indx</a>().|
+               ~s|foo() -> <a href="https://www.erlang.org/doc/man/array.html#type-array_indx">array:array_indx</a>().|
     end
 
     test "skip typespec name", c do

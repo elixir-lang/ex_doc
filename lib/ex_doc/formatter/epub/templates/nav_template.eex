@@ -17,7 +17,6 @@
         <% end %>
 
         <%= nav_item_template "Modules", nodes.modules %>
-        <%= nav_item_template "Exceptions", nodes.exceptions %>
         <%= nav_item_template "Mix Tasks", nodes.tasks %>
       </ol>
     </nav>

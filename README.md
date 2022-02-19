@@ -14,10 +14,10 @@ To see all supported options, see the documentation for [mix docs](https://hexdo
 ExDoc ships with many features:
 
   * Automatically generates HTML and EPUB documents from your API documentation
-  * Support for custom pages and guides (in addition to the API reference)
+  * Responsive design with built-in layout for phones and tablets
+  * Support for custom pages, guides, and livebooks (in addition to the API reference)
   * Support for custom grouping of modules, functions, and pages in the sidebar
   * Generates HTML documentation accessible online and offline
-  * Responsive design with built-in layout for phones and tablets
   * Customizable logo on the generated documentation
   * Each documented entry contains a direct link back to the source code
   * Full-text search
@@ -37,32 +37,16 @@ If you are using Elixir v1.10, or later:
 ```elixir
 def deps do
   [
-    {:ex_doc, "~> 0.24", only: :dev, runtime: false},
+    {:ex_doc, "~> 0.27", only: :dev, runtime: false},
   ]
 end
 ```
 
-If you are using Elixir v1.7, v1.8, or v1.9:
-
-```elixir
-def deps do
-  [
-    {:ex_doc, "~> 0.22.0", only: :dev, runtime: false},
-  ]
-end
-```
-
-If you are using Elixir v1.6, or earlier:
-
-```elixir
-def deps do
-  [
-    {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
-  ]
-end
-```
+> Note: if you are using Elixir v1.7, v1.8, or v1.9, use `~> 0.22.0`.
 
 After adding ExDoc as a dependency, run `mix deps.get` to install it.
+
+> Note: Some Operating System distributions split Erlang into multiple packages and at least one ExDoc dependency (`earmark_parser`) requires Erlang development environment. If you get a message like "/usr/lib/erlang/lib/parsetools-2.3.1/include/yeccpre.hrl: no such file or directory", it means you lack this environment. For instance, on the Debian operating system and its derivatives, you need to `apt install erlang-dev`.
 
 ExDoc will automatically pull in information from your projects, like the application and version. However, you may want to set `:name`, `:source_url` and `:homepage_url` to have a nicer output from ExDoc, such as:
 
@@ -108,7 +92,7 @@ You can ExDoc via the command line as follows:
 3. Next invoke the `ex_doc` executable from your project:
 
    ```bash
-   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
+   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/dev/lib/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
    ```
 
 For example, here are some acceptable values:
@@ -121,60 +105,31 @@ For example, here are some acceptable values:
 
 ## Using ExDoc with Erlang projects
 
-ExDoc is capable of generating documentation from Erlang's `edoc` annotations through the following steps:
+From Erlang/OTP 24+, you can use ExDoc to render your Erlang documentation written with EDoc. See [`rebar3_ex_doc`](https://github.com/starbelly/rebar3_ex_doc/) for more information.
 
-1. Use Erlang/OTP 24+
+## Metadata
 
-2. Add the following to your `rebar.config`. This instructs `edoc` to generate doc chunks
-   instead of HTML docs:
+ExDoc supports certain metadata keys in your documentation. For example, the `since` metadata is used to annotate from when a given module/function is available. In Elixir, you can add metadata to modules and functions, respectively, like this:
 
-   ```erlang
-   {edoc_opts, [
-     {doclet, edoc_doclet_chunks},
-     {layout, edoc_layout_chunks},
-     {dir, "_build/default/lib/<app>/doc"}]}.
-   ```
+```elixir
+@moduledoc since: "1.10.0"
+@doc since: "1.13.1"
+```
 
-   Replace `<app>` with the name of your app.
+In Erlang's EDoc, you would do:
 
-3. Install ExDoc escript:
+```erlang
+%% @since 0.1.0
+```
 
-   ```bash
-   $ mix escript.install hex ex_doc
-   $ ex_doc --version
-   ```
+The following metadata is available for both modules and functions:
 
-   Make sure escript is in your system path, otherwise point to it directly.
+  * `deprecated` (string) - marks the given module/function as deprecated with the given string as reason
+  * `since` (string) - annotates the given module/function is available from a particular version
 
-4. Generate docs:
+The following metadata is available for modules:
 
-   ```bash
-   $ rebar3 edoc
-   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/default/lib/<app>/ebin
-   ```
-
-5. If you're publishing docs to Hex.pm, first add the following to your `src/<app>.app.src`:
-
-   ```erlang
-   {doc, "doc"}
-   ```
-
-   This instructs rebar3 to get HTML docs from the directory "doc" and that's where ExDoc would generate the docs by default.
-
-   Now you can publish your docs:
-
-   ```bash
-   $ rebar3 hex docs
-   ```
-
-6. If your project has dependencies and you want to generate links to them, you need to add the dependencies to the code path.
-
-   Suppose you're building `foo` that depends on `bar` and `baz`. Generate the docs with:
-
-   ```bash
-   $ ex_doc "foo" "1.0.0" "_build/default/lib/foo/ebin" \
-       --paths "_build/default/lib/*/ebin"
-   ```
+  * `tags` (list of atoms) - a list of strings to be added as tags to the module (not supported by EDoc)
 
 ## Auto-linking
 
@@ -191,6 +146,96 @@ You can also use a custom text, e.g.: `` [custom text](`MyModule.function/1`) ``
 
 Link to extra pages like this: `` [Up and running](Up and running.md) `` (skipping the directory
 the page is in), the final link will be automatically converted to `up-and-running.html`.
+
+## Extensions
+
+ExDoc renders Markdown content for you, but you can extend it to render complex objects on the page using JavaScript. To inject custom JavaScript into every page, add this to your configuration:
+
+```elixir
+docs: [
+  # ...
+  before_closing_body_tag: &before_closing_body_tag/1
+]
+
+# ...
+
+defp before_closing_body_tag(:html) do
+  """
+  <!-- HTML injected at the end of the <body> element -->
+  """
+end
+
+defp before_closing_body_tag(_), do: ""
+```
+
+### Rendering Math
+
+If you write TeX-style math in your Markdown (like `$\sum_{i}^{N} x_i$`), they end up as raw text on the generated pages. To render them we recommend using [KaTeX](https://katex.org/), a JavaScript library that turns those expressions into actual graphics. To load and trigger KaTeX on every documentation page we can insert the following HTML:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.css" integrity="sha384-beuqjL2bw+6DBM2eOpr5+Xlw+jiH44vMdVQwKxV28xxpoInPHTVmSvvvoPq9RdSh" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.js" integrity="sha384-aaNb715UK1HuP4rjZxyzph+dVss/5Nx3mLImBe9b0EW4vMUkc1Guw4VRyQKBC0eG" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+```
+
+For more details and configuration options see the [KaTeX Auto-render Extension](https://katex.org/docs/autorender.html).
+
+### Rendering Vega-Lite plots
+
+Other objects you may want to render in a special manner are code snippets. For example, assuming your Markdown includes Vega-Lite specification in `vega-lite` code snippets, you can do:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    for (const codeEl of document.querySelectorAll("pre code.vega-lite")) {
+      try {
+        const preEl = codeEl.parentElement;
+        const spec = JSON.parse(codeEl.textContent);
+        const plotEl = document.createElement("div");
+        preEl.insertAdjacentElement("afterend", plotEl);
+        vegaEmbed(plotEl, spec);
+        preEl.remove();
+      } catch (error) {
+        console.log("Failed to render Vega-Lite plot: " + error)
+      }
+    }
+  });
+</script>
+```
+
+For more details and configuration options see [vega/vega-embed](https://github.com/vega/vega-embed).
+
+### Rendering Mermaid graphs
+
+Similarly to the example above, if your Markdown includes Mermaid graph specification in `mermaid` code snippets, you can do:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    mermaid.initialize({ startOnLoad: false });
+    let id = 0;
+    for (const codeEl of document.querySelectorAll("pre code.mermaid")) {
+      const preEl = codeEl.parentElement;
+      const graphDefinition = codeEl.textContent;
+      const graphEl = document.createElement("div");
+      const graphId = "mermaid-graph-" + id++;
+      mermaid.render(graphId, graphDefinition, function (svgSource, bindListeners) {
+        graphEl.innerHTML = svgSource;
+        bindListeners && bindListeners(graphEl);
+        preEl.insertAdjacentElement("afterend", graphEl);
+        preEl.remove();
+      });
+    }
+  });
+</script>
+```
+
+For more details and configuration options see the [Mermaid usage docs](https://mermaid-js.github.io/mermaid/#/usage).
 
 ## Contributing
 

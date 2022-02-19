@@ -13,8 +13,8 @@
 
 .autocomplete-suggestions {
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.25);
-  background-color: darken(@darkGray, 11%);
-  border-top: 1px solid @darkGray;
+  background-color: @bgMediumGray;
+  border-top: 1px solid @bgDarkGray;
   left: 0;
   position: absolute;
   top: -2px;
@@ -29,7 +29,7 @@
   text-decoration: none;
 
   &:hover, &.selected {
-    background-color: darken(@darkGray, 7%);
+    background-color: @accentMediumGray;
     border-left: 3px solid @main;
   }
 

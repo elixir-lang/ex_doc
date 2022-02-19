@@ -1,6 +1,9 @@
+otp_eep48? = Code.ensure_loaded?(:edoc_doclet_chunks)
+
 exclude = [
   earmark: not ExDoc.Markdown.Earmark.available?(),
-  otp24: System.otp_release() < "24"
+  otp_eep48: not otp_eep48?,
+  otp_has_docs: not match?({:docs_v1, _, _, _, _, _, _}, Code.fetch_docs(:array))
 ]
 
 ExUnit.start(exclude: Enum.filter(exclude, &elem(&1, 1)))
@@ -71,7 +74,7 @@ defmodule TestHelper do
     :ok
   end
 
-  if Code.ensure_loaded?(:edoc_doclet_chunks) do
+  if otp_eep48? do
     def edoc_to_chunk(module) do
       source_path = module.module_info(:compile)[:source]
       dir = :filename.dirname(source_path)
@@ -88,21 +91,5 @@ defmodule TestHelper do
     def edoc_to_chunk(_) do
       raise "not supported"
     end
-  end
-
-  # TODO: replace with ExUnit @tag :tmp_dir feature when we require Elixir v1.11.
-  def create_tmp_dir(context) do
-    module = escape_path(inspect(context.module))
-    name = escape_path(to_string(context.test))
-    dir = Path.join(["tmp", module, name])
-    File.rm_rf!(dir)
-    File.mkdir_p!(dir)
-    Map.put(context, :tmp_dir, dir)
-  end
-
-  @escape Enum.map(' [~#%&*{}\\:<>?/+|"]', &<<&1::utf8>>)
-
-  defp escape_path(path) do
-    String.replace(path, @escape, "-")
   end
 end

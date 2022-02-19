@@ -1,6 +1,25 @@
 <%= head_template(config, %{title: node.title, type: :extra}) %>
 <%= sidebar_template(config, nodes_map) %>
 
+<h1>
+  <%= settings_button_template() %>
+  <%= if node.source_url do %>
+    <a href="<%= node.source_url %>" title="View Source" class="view-source" rel="help">
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+      <span class="sr-only">View Source</span>
+    </a>
+  <% end %>
+  <span><%= node.title_content %></span>
+</h1>
+
+<%= if node.source_path && String.ends_with?(node.source_path, ".livemd") do %>
+  <div class="livebook-badge-container">
+    <a href="#" class="livebook-badge">
+      <img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />
+    </a>
+  </div>
+<% end %>
+
 <%= link_headings(node.content) %>
 <%= bottom_actions_template(refs) %>
 <%= footer_template(config, node) %>

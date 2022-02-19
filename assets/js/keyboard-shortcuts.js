@@ -1,15 +1,14 @@
-import keyboardShortcutsModalBodyTemplate from './handlebars/templates/keyboard-shortcuts-modal-body.handlebars'
 import { qs } from './helpers'
 import { openSidebar, toggleSidebar } from './sidebar/sidebar-drawer'
 import { focusSearchInput } from './sidebar/sidebar-search'
 import { toggleNightMode } from './night'
 import { openQuickSwitchModal } from './quick-switch'
-import { closeModal, isModalOpen, openModal } from './modal'
+import { closeModal, isModalOpen } from './modal'
+import { openSettingsModal } from './settings'
 
-const HELP_LINK_SELECTOR = '.display-shortcuts-help'
-const HELP_MODAL_BODY_SELECTOR = '#keyboard-shortcuts-modal-body'
+const HELP_MODAL_BODY_SELECTOR = '#settings-modal-content'
 
-const keyboardShortcuts = [
+export const keyboardShortcuts = [
   {
     key: 'c',
     description: 'Toggle sidebar',
@@ -32,7 +31,7 @@ const keyboardShortcuts = [
   },
   {
     key: 'g',
-    description: 'Go to a HexDocs package',
+    description: 'Search HexDocs package',
     displayAs: '<kbd><kbd>g</kdb></kdb>',
     action: openQuickSwitchModal
   },
@@ -58,10 +57,6 @@ export function initialize () {
 }
 
 function addEventListeners () {
-  qs(HELP_LINK_SELECTOR).addEventListener('click', event => {
-    openHelpModal()
-  })
-
   document.addEventListener('keydown', handleKeyDown)
   document.addEventListener('keyup', handleKeyUp)
 }
@@ -97,17 +92,10 @@ function toggleHelpModal () {
   if (isHelpModalOpen()) {
     closeModal()
   } else {
-    openHelpModal()
+    openSettingsModal()
   }
 }
 
 function isHelpModalOpen () {
   return isModalOpen() && qs(HELP_MODAL_BODY_SELECTOR)
-}
-
-function openHelpModal () {
-  openModal({
-    title: 'Keyboard Shortcuts',
-    body: keyboardShortcutsModalBodyTemplate({ shortcuts: keyboardShortcuts })
-  })
 }

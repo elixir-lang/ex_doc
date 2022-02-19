@@ -1,6 +1,6 @@
 <%= head_template(config, %{title: module.title}) %>
     <h1 id="content">
-      <%= H.module_title(module) %>
+      <%= module.title %> <%= H.module_type(module) %>
     </h1>
 
     <%= if deprecated = module.deprecated do %>
@@ -19,7 +19,7 @@
       <section id="summary" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#summary">
-            <span class="icon-link" aria-hidden="true"></span>
+            <i class="ri-link-m" aria-hidden="true"></i>
             <span class="sr-only">Anchor for this section</span>
           </a>
           Summary
@@ -32,7 +32,7 @@
       <section id="<%= key %>" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#<%= key %>">
-            <span class="icon-link" aria-hidden="true"></span>
+            <i class="ri-link-m" aria-hidden="true"></i>
             <span class="sr-only">Anchor for this section</span>
           </a>
           <%= name %>

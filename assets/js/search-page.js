@@ -31,9 +31,7 @@ function search (value) {
     const index = getIndex()
 
     try {
-      // Ignore colons representing field-specific query (https://lunrjs.com/guides/searching.html#fields)
-      const queryString = value.replace(':', '')
-      const results = searchResultsToDecoratedSearchNodes(index.search(queryString))
+      const results = searchResultsToDecoratedSearchNodes(index.search(value))
       renderResults({ value, results })
     } catch (error) {
       renderResults({ value, errorMessage: error.message })
@@ -131,6 +129,7 @@ function elixirTokenSplitter (builder) {
 
   lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
   builder.pipeline.before(lunr.stemmer, elixirTokenFunction)
+  builder.searchPipeline.before(lunr.stemmer, elixirTokenFunction)
 }
 
 function searchResultsToDecoratedSearchNodes (results) {

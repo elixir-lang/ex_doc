@@ -15,7 +15,7 @@ defmodule ExDoc.Refs do
            {:module, module()}
            | {kind(), module(), name :: atom(), arity()}
   @typep kind() :: :function | :callback | :type
-  @typep visibility() :: :hidden | :public | :undefined
+  @typep visibility() :: :hidden | :public | :undefined | :partial
 
   @name __MODULE__
 
@@ -45,21 +45,11 @@ defmodule ExDoc.Refs do
         visibility
 
       :error ->
-        fetch(ref)
+        case fetch(ref) do
+          {:ok, visibility} -> visibility
+          :error -> :undefined
+        end
     end
-  end
-
-  defp lookup(ref) do
-    case :ets.lookup(@name, ref) do
-      [{^ref, visibility}] ->
-        {:ok, visibility}
-
-      [] ->
-        :error
-    end
-  rescue
-    _ ->
-      :error
   end
 
   @spec insert([entry()]) :: :ok
@@ -70,26 +60,30 @@ defmodule ExDoc.Refs do
 
   @spec insert_from_chunk(module, tuple()) :: :ok
   def insert_from_chunk(module, result) do
-    entries = fetch_entries(module, result)
-    insert(entries)
+    module
+    |> fetch_entries(result)
+    |> insert()
+
     :ok
   end
 
+  defp lookup(ref) do
+    case :ets.lookup(@name, ref) do
+      [{^ref, visibility}] -> {:ok, visibility}
+      [] -> :error
+    end
+  rescue
+    _ -> :error
+  end
+
   defp fetch({:module, module} = ref) do
-    entries = fetch_entries(module, ExDoc.Utils.Code.fetch_docs(module))
-    insert(entries)
-    Map.get(Map.new(entries), ref, :undefined)
+    insert_from_chunk(module, Code.fetch_docs(module))
+    lookup(ref)
   end
 
   defp fetch({_kind, module, _name, _arity} = ref) do
-    with module_visibility <- fetch({:module, module}),
-         true <- module_visibility in [:public, :hidden],
-         {:ok, visibility} <- lookup(ref) do
-      visibility
-    else
-      _ ->
-        :undefined
-    end
+    get_visibility({:module, module})
+    lookup(ref)
   end
 
   defp fetch_entries(module, result) do
@@ -97,27 +91,21 @@ defmodule ExDoc.Refs do
       {:docs_v1, _, _, _, module_doc, _, docs} ->
         module_visibility = visibility(module_doc)
 
-        for {{kind, name, arity}, _, _, doc, metadata} <- docs do
-          ref_kind = to_ref_kind(kind)
-          visibility = visibility(module_doc, {ref_kind, name, doc})
-
-          for arity <- (arity - (metadata[:defaults] || 0))..arity do
+        [{{:module, module}, module_visibility}] ++
+          for {{kind, name, arity}, _, _, doc, metadata} <- docs,
+              ref_kind = to_ref_kind(kind),
+              visibility = visibility(module_doc, {ref_kind, name, doc}),
+              arity <- (arity - (metadata[:defaults] || 0))..arity do
             {{ref_kind, module, name, arity}, visibility}
           end
-        end
-        |> List.flatten()
-        |> Enum.concat([
-          {{:module, module}, module_visibility}
-          | to_refs(types(module, [:typep]), module, :type, :hidden)
-        ])
 
       {:error, _} ->
         if Code.ensure_loaded?(module) do
-          (to_refs(exports(module), module, :function) ++
-             to_refs(callbacks(module), module, :callback) ++
-             to_refs(types(module, [:type, :opaque]), module, :type) ++
-             to_refs(types(module, [:typep]), module, :type, :hidden))
-          |> Enum.concat([{{:module, module}, :public}])
+          # We say it is limited because the types may not actually be available in the beam file.
+          [{{:module, module}, :limited}] ++
+            to_refs(exports(module), module, :function) ++
+            to_refs(callbacks(module), module, :callback) ++
+            to_refs(types(module, [:type, :opaque]), module, :type)
         else
           [{{:module, module}, :undefined}]
         end

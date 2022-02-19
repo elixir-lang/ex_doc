@@ -4,7 +4,6 @@ defmodule ExDoc.Language.Elixir do
   @behaviour ExDoc.Language
 
   alias ExDoc.Autolink
-  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates, as: T
   alias ExDoc.Refs
   alias ExDoc.Language.Erlang
@@ -211,7 +210,7 @@ defmodule ExDoc.Language.Elixir do
     |> Enum.find(&String.starts_with?(title, &1 <> "."))
     |> case do
       nil -> {nil, nil}
-      prefix -> {String.trim_leading(title, prefix <> "."), prefix}
+      prefix -> {"." <> String.trim_leading(title, prefix <> "."), prefix}
     end
   end
 
@@ -227,11 +226,11 @@ defmodule ExDoc.Language.Elixir do
       function_exported?(module, :__impl__, 1) ->
         {:impl, true}
 
-      function_exported?(module, :behaviour_info, 1) ->
-        {:behaviour, false}
-
       match?("Elixir.Mix.Tasks." <> _, Atom.to_string(module)) ->
         {:task, false}
+
+      function_exported?(module, :behaviour_info, 1) ->
+        {:behaviour, false}
 
       true ->
         {:module, false}
@@ -423,11 +422,8 @@ defmodule ExDoc.Language.Elixir do
     case Keyword.fetch(attrs, :href) do
       {:ok, href} ->
         case Regex.scan(@ref_regex, href) do
-          [[_, custom_link]] ->
-            url(custom_link, :custom_link, config)
-
-          [] ->
-            build_extra_link(href, config)
+          [[_, custom_link]] -> url(custom_link, :custom_link, config)
+          [] -> build_extra_link(href, config)
         end
 
       _ ->
@@ -436,33 +432,20 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp build_extra_link(link, config) do
-    with uri <- URI.parse(link),
-         nil <- uri.scheme,
-         nil <- uri.host,
-         true <- is_binary(uri.path),
-         false <- uri.path =~ @ref_regex,
-         extension when extension in [".md", ".txt", ""] <- Path.extname(uri.path) do
-      file = Path.basename(uri.path)
-
-      if file in config.extras do
-        without_ext = trim_extension(file, extension)
+    with %{scheme: nil, host: nil, path: path} = uri <- URI.parse(link),
+         true <- is_binary(path) and path != "" and not (path =~ @ref_regex),
+         extension when extension in [".md", ".txt", ""] <- Path.extname(path) do
+      if file = config.extras[Path.basename(path)] do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
-        HTML.text_to_id(without_ext) <> config.ext <> fragment
+        file <> config.ext <> fragment
       else
-        Autolink.maybe_warn(nil, config, nil, %{file_path: uri.path, original_text: link})
-
+        Autolink.maybe_warn(nil, config, nil, %{file_path: path, original_text: link})
         nil
       end
     else
       _ -> nil
     end
   end
-
-  defp trim_extension(file, ""),
-    do: file
-
-  defp trim_extension(file, extension),
-    do: String.trim_trailing(file, extension)
 
   @basic_types [
     any: 0,
@@ -639,10 +622,17 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
+  # There are two special forms that are forbidden by the tokenizer
+  defp parse_function("__aliases__"), do: {:function, :__aliases__}
+  defp parse_function("__block__"), do: {:function, :__block__}
+
   defp parse_function(string) do
-    case Code.string_to_quoted(":" <> string) do
-      {:ok, function} when is_atom(function) -> {:function, function}
-      _ -> :error
+    case Code.string_to_quoted("& #{string}/0") do
+      {:ok, {:&, _, [{:/, _, [{function, _, _}, 0]}]}} when is_atom(function) ->
+        {:function, function}
+
+      _ ->
+        :error
     end
   end
 
@@ -761,7 +751,7 @@ defmodule ExDoc.Language.Elixir do
     ref = {:module, module}
 
     case {mode, Refs.get_visibility(ref)} do
-      {_link_type, :public} ->
+      {_link_type, visibility} when visibility in [:public, :limited] ->
         Autolink.app_module_url(Autolink.tool(module, config), module, config)
 
       {:regular_link, :undefined} ->
@@ -805,8 +795,7 @@ defmodule ExDoc.Language.Elixir do
       {:type, :hidden} ->
         nil
 
-      # skip `@type %{required(...), optional(...), ...}`
-      {:type, _visibility} when name in [:required, :optional] and arity == 1 ->
+      {:type, _} ->
         nil
 
       _ ->
@@ -840,7 +829,9 @@ defmodule ExDoc.Language.Elixir do
             end
         end
 
-      {:regular_link, :public, :undefined} ->
+      {:regular_link, module_visibility, :undefined}
+      when module_visibility == :public
+      when module_visibility == :limited and kind != :type ->
         if warn?,
           do: Autolink.maybe_warn(ref, config, :undefined, %{original_text: original_text})
 

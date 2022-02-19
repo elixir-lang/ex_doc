@@ -2,6 +2,7 @@ defmodule Mix.Tasks.Docs do
   use Mix.Task
 
   @shortdoc "Generate documentation for the project"
+  @requirements ["compile"]
 
   @moduledoc ~S"""
   Uses ExDoc to generate a static web page from the project documentation.
@@ -15,11 +16,13 @@ defmodule Mix.Tasks.Docs do
       "epub". This option can be given more than once. By default,
       both html and epub are generated.
 
+    * `--language` - Specifies the language to annotate the
+      EPUB output in valid [BCP 47](https://tools.ietf.org/html/bcp47)
+
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
 
-    * `--language` - Specifies the language to annotate the
-      EPUB output in valid [BCP 47](https://tools.ietf.org/html/bcp47)
+    * `--open` - open browser window pointed to the documentation
 
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
@@ -32,17 +35,21 @@ defmodule Mix.Tasks.Docs do
   from ExDoc, for example:
 
       def project do
-        [app: :my_app,
-         version: "0.1.0-dev",
-         deps: deps(),
+        [
+          app: :my_app,
+          version: "0.1.0-dev",
+          deps: deps(),
 
-         # Docs
-         name: "My App",
-         source_url: "https://github.com/USER/PROJECT",
-         homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
-         docs: [main: "MyApp", # The main page in the docs
-                logo: "path/to/logo.png",
-                extras: ["README.md"]]]
+          # Docs
+          name: "My App",
+          source_url: "https://github.com/USER/PROJECT",
+          homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
+          docs: [
+            main: "MyApp", # The main page in the docs
+            logo: "path/to/logo.png",
+            extras: ["README.md"]
+          ]
+        ]
       end
 
   ExDoc also allows configuration specific to the documentation to
@@ -57,6 +64,8 @@ defmodule Mix.Tasks.Docs do
     * `:assets` - Path to a directory that will be copied as is to the "assets"
       directory in the output path. Its entries may be referenced in your docs
       under "assets/ASSET.EXTENSION"; defaults to no assets directory.
+
+    * `:authors` - List of authors for the generated docs or epub.
 
     * `:before_closing_body_tag` - a function that takes as argument an atom specifying
       the formatter being used (`:html` or `:epub`) and returns a literal HTML string
@@ -73,6 +82,11 @@ defmodule Mix.Tasks.Docs do
     * `:canonical` - String that defines the preferred URL with the rel="canonical"
       element; defaults to no canonical path.
 
+    * `:cover` - Path to the epub cover image (only PNG or JPEG accepted)
+      The image size should be around 1600x2400. When specified, the cover will be placed under
+      the "assets" directory in the output path under the name "cover" and the
+      appropriate extension. This option has no effect when using the "html" formatter.
+
     * `:deps` - A keyword list application names and their documentation URL.
       ExDoc will by default include all dependencies and assume they are hosted on
       HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
@@ -80,19 +94,25 @@ defmodule Mix.Tasks.Docs do
     * `:extra_section` - String that defines the section title of the additional
       Markdown and plain text pages; default: "PAGES". Example: "GUIDES"
 
-    * `:extras` - List of keywords, each key must indicate the path to additional
-      Markdown or plain text pages, the value for each keyword (optional) gives you more control
-      about the PATH and the title of the output files; default: `[]`. Example:
+    * `:extras` - List of paths to additional Markdown (`.md` extension), Live Markdown
+      (`.livemd` extension), and plain text pages to add to the documentation. You can
+      also specify keyword pairs to customize the generated filename and title of each
+      extra page; default: `[]`. Example:
       `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing"]]`
 
-    * `:filter_prefix` - Include only modules that match the given prefix in
-      the generated documentation. Example: "MyApp.Core". If you set this option,
-      remember to also set the `:main` option to a module that will be included
-      , for example `main: "MyApp.Core.Inner"`.
+    * `:filter_modules` - Include only modules that match the given value. The
+      value can be a regex, a string (representing a regex), or a two-arity
+      function that receives the module and its metadata and returns true if the
+      module must be included. If a string or a regex is given, it will be matched
+      against the complete module name (which includes the "Elixir." prefix for
+      Elixir modules). If a module has `@moduledoc false`, then it is always excluded.
 
     * `:formatters` - Formatter to use; default: ["html", "epub"], options: "html", "epub".
 
     * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See the "Groups" section
+
+    * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
+      Receives a list of atoms. Example: `[:first_app, :second_app]`.
 
     * `:javascript_config_path` - Path of an additional JavaScript file to be included on all pages
       to provide up-to-date data for features like the version dropdown - See the "Additional
@@ -108,23 +128,24 @@ defmodule Mix.Tasks.Docs do
       the "assets" directory in the output path under the name "logo" and the
       appropriate extension.
 
-    * `:cover` - Path to the epub cover image (only PNG or JPEG accepted)
-      The image size should be around 1600x2400. When specified, the cover will be placed under
-      the "assets" directory in the output path under the name "cover" and the
-      appropriate extension. This option has no effect when using the "html" formatter.
-
-    * `:authors` - List of authors for the generated docs or epub.
-
     * `:main` - Main page of the documentation. It may be a module or a
       generated page, like "Plug" or "api-reference"; default: "api-reference".
 
     * `:markdown_processor` - The markdown processor to use,
       either `module()` or `{module(), keyword()}` to provide configuration options;
 
+    * `:output` - Output directory for the generated docs; default: "doc".
+      May be overridden by command line argument.
+
+    * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
+      reference in the current project docs e.g. because of a typo. This list controls where to
+      skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
+      or on a given file (e.g.: `["pages/deprecations.md"]`); default: `[]`.
+
     * `:source_beam` - Path to the beam directory; default: mix's compile path.
 
     * `:source_ref` - The branch/commit/tag used for source link inference;
-      default: "master".
+      default: "main".
 
     * `:source_url_pattern` - Public URL of the project for source links. This is derived
       automatically from the project's `:source_url` and `:source_ref` when using one of
@@ -142,25 +163,14 @@ defmodule Mix.Tasks.Docs do
       For GitLab/GitHub:
 
       ```text
-      https://mydomain.org/user_or_team/repo_name/blob/master/%{path}#L%{line}
+      https://mydomain.org/user_or_team/repo_name/blob/main/%{path}#L%{line}
       ```
 
       For Bitbucket:
 
       ```text
-      https://mydomain.org/user_or_team/repo_name/src/master/%{path}#cl-%{line}
+      https://mydomain.org/user_or_team/repo_name/src/main/%{path}#cl-%{line}
       ```
-
-    * `:output` - Output directory for the generated docs; default: "doc".
-      May be overridden by command line argument.
-
-    * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
-      Receives a list of atoms. Example: `[:first_app, :second_app]`.
-
-    * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
-      reference in the current project docs e.g. because of a typo. This list controls where to
-      skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
-      or on a given file (e.g.: `["pages/deprecations.md"]`); default: `[]`.
 
   ## Groups
 
@@ -298,14 +308,14 @@ defmodule Mix.Tasks.Docs do
     canonical: :string,
     formatter: :keep,
     language: :string,
-    output: :string
+    output: :string,
+    open: :boolean
   ]
 
   @aliases [n: :canonical, f: :formatter, o: :output]
 
   @doc false
   def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate_docs/3) do
-    Mix.Task.run("compile")
     {:ok, _} = Application.ensure_all_started(:ex_doc)
 
     unless Code.ensure_loaded?(ExDoc.Config) do
@@ -348,6 +358,11 @@ defmodule Mix.Tasks.Docs do
     for formatter <- get_formatters(options) do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
       Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"])
+
+      if cli_opts[:open] do
+        browser_open(index)
+      end
+
       index
     end
   end
@@ -461,5 +476,23 @@ defmodule Mix.Tasks.Docs do
     else
       options
     end
+  end
+
+  defp browser_open(path) do
+    {cmd, args, options} =
+      case :os.type() do
+        {:win32, _} ->
+          dirname = Path.dirname(path)
+          basename = Path.basename(path)
+          {"cmd", ["/c", "start", basename], [cd: dirname]}
+
+        {:unix, :darwin} ->
+          {"open", [path], []}
+
+        {:unix, _} ->
+          {"xdg-open", [path], []}
+      end
+
+    System.cmd(cmd, args, options)
   end
 end

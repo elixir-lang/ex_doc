@@ -23,7 +23,7 @@ defmodule ExDoc.Language do
     * `:callback_types` - a list of types that are considered callbacks
 
     * `:nesting_info` - a `{nested_title, nested_context}` tuple or `nil`.
-      For example, `"A.B.C"` becomes `{"C", "A.B"}`.
+      For example, `"A.B.C"` becomes `{"C", "A.B."}`.
 
     * `:private` - a map with language-specific data
   """

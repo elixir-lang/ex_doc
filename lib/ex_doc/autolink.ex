@@ -17,7 +17,7 @@ defmodule ExDoc.Autolink do
   #
   # * `:ext` - the extension (`".html"`, "`.xhtml"`, etc)
   #
-  # * `:extras` - list of extras
+  # * `:extras` - map of extras
   #
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
 
@@ -36,7 +36,7 @@ defmodule ExDoc.Autolink do
   ]
 
   @hexdocs "https://hexdocs.pm/"
-  @otpdocs "https://erlang.org/doc/man/"
+  @otpdocs "https://www.erlang.org/doc/man/"
 
   def app_module_url(:ex_doc, module, %{current_module: module} = config) do
     path = module |> inspect() |> String.trim_leading(":")

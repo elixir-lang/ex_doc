@@ -2,13 +2,13 @@ defmodule ExDoc.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-lang/ex_doc"
-  @version "0.25.3"
+  @version "0.28.0"
 
   def project do
     [
       app: :ex_doc,
       version: @version,
-      elixir: "~> 1.10",
+      elixir: "~> 1.11",
       deps: deps(),
       aliases: aliases(),
       package: package(),
@@ -17,6 +17,7 @@ defmodule ExDoc.Mixfile do
       source_url: @source_url,
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
+      name: "ExDoc",
       description: "ExDoc is a documentation generation tool for Elixir",
       docs: docs()
     ]
@@ -31,35 +32,28 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [
-      {:earmark_parser, "~> 1.4"},
+      {:earmark_parser, "~> 1.4.19"},
       {:makeup_elixir, "~> 0.14"},
       {:makeup_erlang, "~> 0.1"},
-      {:excoveralls, "~> 0.3", only: :test},
-      {:jason, "~> 1.2", only: :test}
+      {:jason, "~> 1.2", only: :test},
+      {:floki, "~> 0.0", only: :test}
     ]
   end
 
   defp aliases do
     [
-      build: ["cmd npm run --prefix assets build", "compile --force", "docs"],
+      build: ["cmd --cd assets npm run build", "compile --force", "docs"],
       clean: [&clean_test_fixtures/1, "clean"],
-      fix: ["format", "cmd npm run --prefix assets lint:fix"],
-      lint: ["format --check-formatted", "cmd npm run --prefix assets lint"],
-      setup: ["deps.get", "cmd npm install --prefix assets"]
+      fix: ["format", "cmd --cd assets npm run lint:fix"],
+      lint: ["format --check-formatted", "cmd --cd assets npm run lint"],
+      setup: ["deps.get", "cmd --cd assets npm install"]
     ]
   end
 
   defp package do
     [
       licenses: ["Apache-2.0"],
-      maintainers: [
-        "José Valim",
-        "Eksperimental",
-        "Milton Mazzarri",
-        "Friedel Ziegelmayer",
-        "Dmitry",
-        "Wojtek Mach"
-      ],
+      maintainers: ["José Valim", "Milton Mazzarri", "Wojtek Mach"],
       files: ["formatters", "lib", "mix.exs", "LICENSE", "CHANGELOG.md", "README.md"],
       links: %{
         "GitHub" => @source_url,
@@ -83,8 +77,8 @@ defmodule ExDoc.Mixfile do
       main: "readme",
       extras: [
         "README.md",
-        "CHANGELOG.md",
-        "LICENSE"
+        "LICENSE",
+        "CHANGELOG.md"
       ],
       source_ref: "v#{@version}",
       source_url: @source_url,

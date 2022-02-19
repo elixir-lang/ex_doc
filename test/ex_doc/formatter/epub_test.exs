@@ -27,7 +27,6 @@ defmodule ExDoc.Formatter.EPUBTest do
       version: "1.0.1",
       formatter: "epub",
       output: output_dir(),
-      source_root: beam_dir(),
       source_beam: beam_dir(),
       extras: ["test/fixtures/README.md"],
       skip_undefined_reference_warnings_on: ["Warnings"]
@@ -94,6 +93,11 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{output_dir()}/#{doc_config()[:project]}.epub")
   end
 
+  test "generates an EPUB file with erlang as proglang" do
+    generate_docs(Keyword.put(doc_config(), :proglang, :erlang))
+    assert File.regular?("#{output_dir()}/#{doc_config()[:project]}.epub")
+  end
+
   test "generates an EPUB file in specified output directory" do
     config = doc_config(output: "#{output_dir()}/another_dir", main: "RandomError")
     generate_docs(config)
@@ -128,10 +132,8 @@ defmodule ExDoc.Formatter.EPUBTest do
 
     assert content =~ ~r{.*"CompiledWithDocs\".*}ms
     assert content =~ ~r{.*"CompiledWithDocs.Nested\".*}ms
-    assert content =~ ~r{.*"UndefParent\.Nested\".*}ms
     assert content =~ ~r{.*"CustomBehaviourOne\".*}ms
     assert content =~ ~r{.*"CustomBehaviourTwo\".*}ms
-    refute content =~ ~r{UndefParent\.Undocumented}ms
     assert content =~ ~r{.*"RandomError\".*}ms
     assert content =~ ~r{.*"CustomProtocol\".*}ms
     assert content =~ ~r{.*"Mix\.Tasks\.TaskWithDocs\".*}ms

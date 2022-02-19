@@ -1,6 +1,7 @@
 import tooltipBodyTemplate from '../handlebars/templates/tooltip-body.handlebars'
 import tooltipLayoutTemplate from '../handlebars/templates/tooltip-layout.handlebars'
 import { qs, qsAll } from '../helpers'
+import { settingsStore } from '../settings-store'
 import { cancelHintFetchingIfAny, getHint, HINT_KIND, isValidHintHref } from './hints'
 
 // Elements that can activate the tooltip.
@@ -11,11 +12,7 @@ const TOOLTIP_SELECTOR = '#tooltip'
 const TOOLTIP_BODY_SELECTOR = '#tooltip .tooltip-body'
 // Element containing the documentation text.
 const CONTENT_INNER_SELECTOR = 'body .content-inner'
-// 'Enable/Disable tooltips' button.
-const TOOLTIPS_TOGGLE_SELECTOR = 'footer .tooltips-toggle'
 
-// Local Storage key Used to store tooltips settings.
-const TOOLTIPS_DISABLED_STORAGE_KEY = 'tooltipsDisabled'
 // Hash included in links pointing to module pages
 const MODULE_CONTENT_HASH = '#content'
 
@@ -43,7 +40,6 @@ const state = {
 export function initialize () {
   renderTooltipLayout()
   addEventListeners()
-  updateToggleLinkText()
 }
 
 function renderTooltipLayout () {
@@ -52,10 +48,6 @@ function renderTooltipLayout () {
 }
 
 function addEventListeners () {
-  qs(TOOLTIPS_TOGGLE_SELECTOR).addEventListener('click', event => {
-    toggleTooltipsDisabled()
-  })
-
   qsAll(TOOLTIP_ACTIVATORS_SELECTOR).forEach(element => {
     if (!linkElementEligibleForTooltip(element)) { return }
 
@@ -67,43 +59,6 @@ function addEventListeners () {
       handleHoverEnd(element)
     })
   })
-}
-
-/**
- * Toggles tooltips mode and saves the preference in local storage.
- */
-function toggleTooltipsDisabled () {
-  const disabled = getTooltipsDisabledPreference()
-  setTooltipsDisabledPreference(!disabled)
-  updateToggleLinkText()
-}
-
-function getTooltipsDisabledPreference () {
-  try {
-    return !!localStorage.getItem(TOOLTIPS_DISABLED_STORAGE_KEY)
-  } catch (error) { }
-
-  return false
-}
-
-function setTooltipsDisabledPreference (disabled) {
-  try {
-    if (disabled) {
-      localStorage.setItem(TOOLTIPS_DISABLED_STORAGE_KEY, 'true')
-    } else {
-      localStorage.removeItem(TOOLTIPS_DISABLED_STORAGE_KEY)
-    }
-  } catch (error) { }
-}
-
-/**
- * Updates text of the link used to disable/enable tooltips.
- *
- * If tooltips are disabled `Enable tooltips` text is displayed.
- * If tooltips are enabled `Disable tooltips` text is displayed.
- */
-function updateToggleLinkText () {
-  qs(TOOLTIPS_TOGGLE_SELECTOR).setAttribute('data-is-disabled', getTooltipsDisabledPreference().toString())
 }
 
 /**
@@ -149,10 +104,9 @@ function handleHoverStart (element) {
 }
 
 function shouldShowTooltips () {
-  const tooltipsEnabled = !getTooltipsDisabledPreference()
   const windowToSmall = (window.innerWidth < MIN_WINDOW_SIZE.width || window.innerHeight < MIN_WINDOW_SIZE.height)
 
-  return tooltipsEnabled && !windowToSmall
+  return tooltipsEnabled() && !windowToSmall
 }
 
 function renderTooltip (hint) {
@@ -172,7 +126,7 @@ function animateTooltipIn () {
 }
 
 function handleHoverEnd (element) {
-  if (getTooltipsDisabledPreference()) { return }
+  if (!tooltipsEnabled()) { return }
 
   clearTimeout(state.hoverDelayTimeout)
   cancelHintFetchingIfAny()
@@ -237,4 +191,8 @@ function getRelativeBoundingRect (elementRect, containerRect) {
     width: elementRect.width,
     height: elementRect.height
   }
+}
+
+function tooltipsEnabled () {
+  return settingsStore.get().tooltips
 }

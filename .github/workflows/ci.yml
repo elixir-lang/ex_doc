@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   mix_test:
@@ -16,10 +16,10 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: "1.10"
+              elixir: "1.11"
               otp: 21
           - pair:
-              elixir: "1.12"
+              elixir: "1.13"
               otp: 24
             lint: lint
     steps:
@@ -53,7 +53,7 @@ jobs:
         run: |
           mix docs
           test -f doc/index.html && echo "doc/index.html exists."
-          test -f doc/ex_doc.epub && echo "doc/ex_doc.epub exists."
+          test -f doc/ExDoc.epub && echo "doc/ExDoc.epub exists."
 
   check_js:
     name: Check JS

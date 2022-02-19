@@ -1,5 +1,87 @@
 # Changelog
 
+## v0.28.0 (2022-01-24)
+
+ExDoc v0.28.0 requires Elixir v1.11+.
+
+  * Enhancements
+    * Use custom scrollbar in the sidebar
+    * Keep hamburger absolute to the opened sidebar
+    * Support `--open` flag on `mix docs`
+    * The copy button now only copies selectable content
+
+  * Bug fixes
+    * Make sure filename configuration in `:extras` is used across links
+    * Ensure all `extras` pages have a title generated
+    * Fix margin on 3rd level headers and beyond
+    * Ensure a task that defines callbacks is still listed as a task
+
+## v0.27.3 (2022-01-12)
+
+  * Bug fixes
+    * Make HexDocs search case insensitive
+    * Improve sidebar open/close animation
+
+## v0.27.2 (2022-01-11)
+
+  * Bug fixes
+    * Fix version dropdown when hosted on HexDocs
+    * Fix tooltips
+    * Fix JavaScript error when Hex package information is not available
+
+## v0.27.1 (2022-01-11)
+
+  * Bug fixes
+    * Several usability fixes on the new layout
+    * Keep page ordering
+
+## v0.27.0 (2022-01-11)
+
+  * Enhancements
+    * Introduce new sidebar design
+    * Add `--quiet` option to CLI
+    * Support multiple formatters in the CLI
+    * Show structs as `%Struct{}` instead of `__struct__` in the sidebar
+    * Point Erlang links to `www.erlang.org` instead of `erlang.org`
+    * Improvements to the night mode and styling
+
+## v0.26.0 (2021-11-21)
+
+  * Backwards incompatible changes
+    * `:filter_prefix` has been renamed to `:filter_modules` and supports anonymous functions
+    * `:source_ref` now defaults to `"main"`
+    * Dropped support for smartypants in Markdown
+
+  * Bug fixes
+    * Do not warn on links to sections
+
+  * Enhancements
+    * Add copy button to code snippets
+    * Add `translate="no"` to the relevant attributes to improve interoperability with automatic translation tools
+    * Support optional module annotations
+    * Introduce a settings modal to group most of configuration
+    * Allow customizing the Livebook expansion URL
+    * Provide documentation on how to render plugins such as Katex, VegaLite, and Mermaid
+
+## v0.25.5 (2021-10-20)
+
+  * Bug fixes
+    * Do not duplicate API Reference title
+    * Update assets for Livebook badge functionality
+
+## v0.25.4 (2021-10-20)
+
+  * Enhancements
+    * Add source link to pages in `:extras`
+    * Add "Run in Livebook" badge to `.livemd` pages in `:extras`
+
+  * Bug fixes
+    * Do not generate entries for private Erlang functions
+    * Do not trim `?` and `!` from Elixir tokens on search
+
+  * Incompatible changes
+    * Remove unused `:source_root` option
+
 ## v0.25.3 (2021-09-21)
 
   * Enhancements

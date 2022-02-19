@@ -5,6 +5,7 @@
   background: @darkGray;
   color: @lightestGray;
   overflow: hidden;
+  scrollbar-color: @mediumGray @darkGray;
 
   .gradient {
     background: linear-gradient(fade(@darkGray, 100%), fade(@darkGray, 0%));
@@ -36,32 +37,34 @@
   }
 
   .sidebar-header {
-    margin: 15px 0 15px 30px;
+    margin: 12px;
+    border-radius: 4px;
+    background-color: @bgMediumGray;
+    width: 276px;
   }
 
   .sidebar-projectDetails {
     display: inline-block;
-    text-align: right;
+    text-align: left;
     vertical-align: top;
-    margin-top: 6px;
+    margin: 6px 0 0 10px;
   }
 
   .sidebar-projectImage {
     display: inline-block;
-    max-width: 64px;
-    max-height: 64px;
-    margin-left: 15px;
+    max-width: 48px;
+    max-height: 48px;
+    margin: 0 0 0 10px;
     vertical-align: bottom;
   }
 
   .sidebar-projectName {
     font-weight: 700;
-    font-size: 24px;
+    font-size: 20px;
     line-height: 30px;
-    color: @white;
+    color: @lightestGray;
     margin: 0;
     padding: 0;
-    padding-left: 20px;
     max-width: 230px;
     word-wrap: break-word;
   }
@@ -74,19 +77,21 @@
     font-weight: 300;
     font-size: 16px;
     line-height: 20px;
-    color: @white;
+    color: @lightGray;
   }
 
   .sidebar-projectVersionsDropdown {
     cursor: pointer;
+    position: relative;
     margin: 0;
-    padding: 0 12px 0 0;
+    padding: 0 0 0 12px;
     border: none;
     -moz-appearance: none;
     -webkit-appearance: none;
     appearance: none;
     background-color: transparent;
     color: @white;
+    z-index: 2;
 
     option {
       color: initial;
@@ -99,11 +104,12 @@
 
   .sidebar-projectVersion form::after {
     position: absolute;
-    right: 0;
-    top: 1px;
+    left: 0;
+    top: 2px;
     content: '\25BC';
-    z-index: -1;
+    z-index: 1;
     font-size: 8px;
+    color: @white;
   }
 
   .sidebar-projectVersionsDropdown::-ms-expand {
@@ -111,7 +117,8 @@
   }
 
   .sidebar-listNav {
-    padding: 10px 30px 20px 30px;
+    padding: 0px;
+    padding-top: 12px;
     margin: 0;
 
     li,
@@ -119,12 +126,12 @@
       text-transform: uppercase;
       font-weight: 300;
       font-size: 14px;
+      color: @lightGray;
     }
 
     li {
-      padding-left: 17px;
-      border-left: 3px solid transparent;
-      transition: all 0.3s linear;
+      display: inline-block;
+      border-bottom: 3px solid transparent;
       line-height: 27px;
 
       &:hover,
@@ -132,7 +139,7 @@
       &:hover a,
       &.selected a {
         border-color: @main;
-        color: @white;
+        color: @lightestGray;
       }
     }
   }
@@ -163,7 +170,6 @@
       padding: 3px 1px 3px 0;
       position: absolute;
       top: 18px;
-      transition: 0.12s all ease-out;
       z-index: 2;
     }
 
@@ -176,16 +182,12 @@
       right: 18px;
       margin: 0;
       opacity: 0.5;
-      padding: 3px 1px 3px 0;
+      padding: 5px 1px 5px 0;
       position: absolute;
       transform: scaleY(0);
       top: 17px;
       transition: 0.15s transform ease-out;
       z-index: 2;
-
-      .icon-cross {
-        font-weight: bold;
-      }
 
       &:hover {
         opacity: 0.7;
@@ -198,13 +200,12 @@
     }
 
     .search-input {
-      background-color: darken(@darkGray, 8%);
+      background-color: @bgMediumGray;
       border: none;
       border-radius: 4px;
       color: @lightestGray;
       margin-left: 12px;
       padding: 8px 6px 8px 38px;
-      transition: 0.12s all ease-out;
       width: 276px;
 
       &:focus,
@@ -213,34 +214,79 @@
       }
     }
 
-    .icon-search {
+    .ri-search-2-line {
       font-weight: bold;
     }
   }
 
   #full-list {
-    margin: 0 0 0 30px;
-    padding: 10px 20px;
+    margin: 0;
+    padding: 20px 0;
     overflow-y: auto;
+    position: relative;
     -webkit-overflow-scrolling: touch;
     .flex(1);
 
     li {
       padding: 0;
+      margin-right: 30px;
       line-height: 27px;
       white-space: nowrap;
       overflow: hidden;
+      text-overflow: ellipsis;
+
+      &.docs {
+        margin-right: 0;
+      }
 
       &.open > ul {
         display: block;
+        margin-left: 10px;
+      }
+
+      a.expand > span.icon-expand {
+        &:after {
+          .remix-icon;
+          content: @icon-arrow-down-s;
+          float: right;
+          margin-right: 10px;
+          font-size: 1.2em;
+          position: absolute;
+          right: 0;
+        }
+      }
+
+      &.open > a.expand > span.icon-expand {
+        &:after {
+          .remix-icon;
+          content: @icon-arrow-up-s;
+        }
+      }
+
+      &.docs > a > span.icon-expand {
+        &:after {
+          .remix-icon;
+          margin-right: 12px;
+          content: @icon-add;
+          font-size: 1em;
+          position: absolute;
+          right: 0;
+        }
+      }
+
+      &.docs.open > a > span.icon-expand {
+        &:after {
+          .remix-icon;
+          content: @icon-subtract;
+        }
       }
 
       &.nesting-context {
-        opacity: 0.6;
-      }
-
-      &.nested {
-        margin-left: 2ex;
+        font-weight: bold;
+        font-size: 0.9em;
+        line-height: 1.8em;
+        color: @lightGray;
+        padding-left: 15px;
       }
 
       &.group {
@@ -249,7 +295,13 @@
         font-size: 0.8em;
         margin: 2.0em 0 0;
         line-height: 1.8em;
-        color: @groupGray;
+        color: @lightGray;
+        padding-left: 15px;
+      }
+
+      a {
+        padding: 3px 0 3px 15px;
+        color: @accentLightGray;
       }
 
       a.expand,
@@ -257,69 +309,112 @@
         text-overflow: ellipsis;
       }
 
-      a.expand span {
-        color: @lightestGray;
-        opacity: 0;
-        padding: 0 8px 0 2px;
-        font-size: 0.8em;
+      .current-section > a {
+        color: @main;
       }
 
-      a.expand:hover span {
-        opacity: 1;
-      }
-
-      a.expand span:hover {
-        color: @white;
-      }
     }
 
     &>li {
       &.current-page > a {
-        color: @white;
+        color: @main;
+        border-left: 3px solid @main;
+        padding-left: 12px;
+        &:after {
+          color: @main;
+        }
+      }
+
+      &.current-page {
+        color: @main;
       }
 
       &:last-child {
         margin-bottom: 30px;
+      }
+
+      &.group:first-child {
+        margin-top: 0;
       }
     }
 
     ul {
       display: none;
       margin: 9px 15px;
+      margin-right: 0;
       padding: 0;
 
       li {
         font-weight: 300;
-        line-height: 18px;
-        padding: 2px 10px;
+        line-height: 20px;
+        padding: 2px 8px;
+        margin-right: 0px;
+        color: @lightestGray;
+
+        &.current-hash {
+          color: @main;
+          &:before {
+            content: "\2022";
+            color: @main;
+          }
+        }
+
+        &.current-hash > a {
+          color: @main;
+          margin-left: -12px;
+        }
+
+        a {
+          padding-left: 15px;
+        }
 
         ul {
           display: none;
-          margin: 9px 4px;
+          margin: 9px 20px;
+          margin-right: 0;
 
           li {
-            border-left: 1px solid @mediumGray;
+            border-left: 1px solid @accentMediumGray;
             padding: 0px 10px;
+            margin-left: 8px;
+            margin-right: 0;
+            color: @lightestGray;
+
+            a {
+              padding-left: 0px;
+            }
 
             &.current-hash:before {
-              .icon-elem;
-              content: @icon-angle-right;
-              margin-left: -10px;
-              font-size: 16px;
-              margin-right: 5px;
+              content: none;
             }
 
             &.current-hash {
-              border-left: none;
+              color: @main;
+              border-color: @main;
             }
 
             &.current-hash > a {
-              color: @white;
+              color: @main;
+              margin-left: 0;
             }
           }
         }
       }
     }
+  }
+
+  ::-webkit-scrollbar {
+    width: 14px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: @darkGray;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: @mediumGray;
+    border-radius: 10px;
+    border: 3px solid @darkGray;
   }
 }
 
@@ -328,7 +423,7 @@
   cursor: pointer;
   background-color: transparent;
   border: none;
-  padding: 10px 11px;
+  padding: 15px 11px;
   font-size: 16px;
 
   &:hover {

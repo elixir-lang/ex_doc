@@ -51,14 +51,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Returns the HTML formatted title for the module page.
   """
-  def module_title(%{type: :task, title: title}),
-    do: title
-
-  def module_title(%{type: :module, title: title}),
-    do: title
-
-  def module_title(%{type: type, title: title}),
-    do: title <> " <small>#{type}</small>"
+  def module_type(%{type: :task}), do: ""
+  def module_type(%{type: :module}), do: ""
+  def module_type(%{type: type}), do: "<small>#{type}</small>"
 
   @doc """
   Gets the first paragraph of the documentation of a node. It strips
@@ -151,7 +146,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_entries({group, nodes}) do
     nodes =
       for node <- nodes do
-        %{id: "#{node.name}/#{node.arity}", anchor: URI.encode(node.id)}
+        id =
+          if "struct" in node.annotations do
+            node.signature
+          else
+            "#{node.name}/#{node.arity}"
+          end
+
+        %{id: id, anchor: URI.encode(node.id)}
       end
 
     %{key: HTML.text_to_id(group), name: group, nodes: nodes}
@@ -270,7 +272,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
     """
     <#{tag} id="#{prefix}#{id}" class="#{class_attribute}">
-      <a href="##{prefix}#{id}" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+      <a href="##{prefix}#{id}" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+      <p class="sr-only">#{id}</p>
+      </a>
       #{title}
     </#{tag}>
     """
@@ -291,14 +295,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
     module_template: [:config, :module, :summary, :nodes_map],
     not_found_template: [:config, :nodes_map],
     api_reference_entry_template: [:module_node],
-    api_reference_template: [:config, :nodes_map],
+    api_reference_template: [:nodes_map],
     extra_template: [:config, :node, :nodes_map, :refs],
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
-    summary_entry_template: [:node],
     redirect_template: [:config, :redirect_to],
-    bottom_actions_template: [:refs]
+    bottom_actions_template: [:refs],
+    settings_button_template: []
   ]
 
   Enum.each(templates, fn {name, args} ->

@@ -16,7 +16,6 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     default = %ExDoc.Config{
       project: "Elixir",
       version: "1.0.1",
-      source_root: File.cwd!(),
       source_url_pattern: "#{source_url()}/blob/master/%{path}#L%{line}",
       homepage_url: homepage_url(),
       source_url: source_url(),
@@ -90,7 +89,9 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
     test "outputs summaries" do
       content = get_module_page([CompiledWithDocs])
-      assert content =~ ~r{<div class="summary-signature">\s*<a href="#example_1/0">}
+
+      assert content =~
+               ~r{<div class="summary-signature">\s*<a href="#example_1/0" translate="no">}
     end
 
     test "contains links to summary sections when those exist" do

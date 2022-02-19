@@ -36,15 +36,17 @@ export function initialize () {
 }
 
 function addEventListeners () {
-  qs(QUICK_SWITCH_LINK_SELECTOR).addEventListener('click', event => {
-    openQuickSwitchModal()
+  qsAll(QUICK_SWITCH_LINK_SELECTOR).forEach(element => {
+    element.addEventListener('click', event => {
+      openQuickSwitchModal()
+    })
   })
 }
 
 function handleKeyDown (event) {
-  const packageSlug = event.target.value
-
   if (event.key === 'Enter') {
+    const packageSlug = event.target.value
+
     quickSwitchToPackage(packageSlug)
     event.preventDefault()
   } else if (event.key === 'ArrowUp') {
@@ -72,7 +74,7 @@ function handleInput (event) {
  */
 export function openQuickSwitchModal () {
   openModal({
-    title: 'Go to a HexDocs package',
+    title: 'Search HexDocs package',
     body: quickSwitchModalBodyTemplate()
   })
 
@@ -107,7 +109,7 @@ function quickSwitchToPackage (packageSlug) {
  * @param {String} packageSlug The package name to navigate to
  */
 function navigateToHexDocPackage (packageSlug) {
-  window.location = HEX_DOCS_ENDPOINT.replace('%%', packageSlug)
+  window.location = HEX_DOCS_ENDPOINT.replace('%%', packageSlug.toLowerCase())
 }
 
 const debouncedQueryForAutocomplete = debounce(queryForAutocomplete, DEBOUNCE_KEYPRESS_TIMEOUT)
@@ -159,7 +161,7 @@ function renderResults ({ results }) {
 function resultsFromPayload (packageSlug, payload) {
   return STATIC_SEARCH_RESULTS
     .concat(payload)
-    .filter(result => result.name.includes(packageSlug))
+    .filter(result => result.name.toLowerCase().includes(packageSlug.toLowerCase()))
     .filter(result => result.releases === undefined || result.releases[0]['has_docs'] === true)
     .slice(0, NUMBER_OF_SUGGESTIONS)
 }

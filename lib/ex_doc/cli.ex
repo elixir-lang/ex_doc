@@ -17,9 +17,9 @@ defmodule ExDoc.CLI do
           l: :logo,
           m: :main,
           o: :output,
-          r: :source_root,
           u: :source_url,
-          v: :version
+          v: :version,
+          q: :quiet
         ],
         switches: [
           language: :string,
@@ -27,7 +27,9 @@ defmodule ExDoc.CLI do
           package: :string,
           proglang: :string,
           source_ref: :string,
-          version: :boolean
+          version: :boolean,
+          formatter: :keep,
+          quiet: :boolean
         ]
       )
 
@@ -58,7 +60,23 @@ defmodule ExDoc.CLI do
       |> Keyword.put(:apps, [app(source_beam)])
       |> merge_config()
 
-    generator.(project, version, opts)
+    quiet? = Keyword.get(opts, :quiet, false)
+
+    for formatter <- get_formatters(opts) do
+      index = generator.(project, version, Keyword.put(opts, :formatter, formatter))
+
+      quiet? ||
+        IO.puts(IO.ANSI.format([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"]))
+
+      index
+    end
+  end
+
+  defp get_formatters(opts) do
+    case Keyword.get_values(opts, :formatter) do
+      [] -> opts[:formatters] || ["html", "epub"]
+      values -> values
+    end
   end
 
   defp app(source_beam) do
@@ -147,7 +165,7 @@ defmodule ExDoc.CLI do
       -n, --canonical     Indicate the preferred URL with rel="canonical" link element
       -c, --config        Give configuration through a file instead of a command line.
                           See "Custom config" section below for more information.
-      -f, --formatter     Docs formatter to use (html or epub), default: "html"
+      -f, --formatter     Docs formatter to use (html or epub), default: html and epub
       -p, --homepage-url  URL to link to for the site name
           --paths         Prepends the given path to Erlang code path. The path might contain a glob
                           pattern but in that case, remember to quote it: --paths "_build/dev/lib/*/ebin".
@@ -158,11 +176,12 @@ defmodule ExDoc.CLI do
                           The image size will be 64x64 and copied to the assets directory
       -m, --main          The entry-point page in docs, default: "api-reference"
           --package       Hex package name
+          --proglang      The project's programming language, default: "elixir"
           --source-ref    Branch/commit/tag used for source link inference, default: "master"
-      -r, --source-root   Path to the source code root, used for generating links, default: "."
       -u, --source-url    URL to the source code
       -o, --output        Path to output docs, default: "doc"
       -v, --version       Print ExDoc version
+      -q, --quiet         Only output warnings and errors
 
     ## Custom config
 
