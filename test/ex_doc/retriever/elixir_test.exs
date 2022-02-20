@@ -16,6 +16,10 @@ defmodule ExDoc.Retriever.ElixirTest do
         @spec function() :: atom()
         def function(), do: :ok
 
+        @doc "macro/0 docs."
+        @spec macro() :: Macro.t()
+        defmacro macro(), do: :ok
+
         def empty_doc_and_specs(), do: :ok
 
         @doc false
@@ -32,7 +36,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                title: "Mod",
                type: :module,
                typespecs: [],
-               docs: [empty_doc_and_specs, function],
+               docs: [empty_doc_and_specs, function, macro],
                annotations: [:public]
              } = mod
 
@@ -56,14 +60,25 @@ defmodule ExDoc.Retriever.ElixirTest do
              } = function
 
       assert DocAST.to_string(function.doc) == "<p>function/0 docs.</p>"
+      assert Macro.to_string(spec) == "function() :: atom()"
+
+      assert %ExDoc.FunctionNode{
+               arity: 0,
+               annotations: ["macro"],
+               id: "macro/0",
+               signature: "macro()",
+               specs: [spec],
+               type: :macro
+             } = macro
+
+      assert DocAST.to_string(macro.doc) == "<p>macro/0 docs.</p>"
+      assert Macro.to_string(spec) == "macro() :: Macro.t()"
 
       assert %ExDoc.FunctionNode{
                id: "empty_doc_and_specs/0",
                doc: nil,
                specs: []
              } = empty_doc_and_specs
-
-      assert Macro.to_string(spec) == "function() :: atom()"
     end
 
     test "Elixir functions with defaults", c do
