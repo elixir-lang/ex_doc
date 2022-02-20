@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## v0.28.1 (2022-02-20)
 
   * Enhancements
     * Add support for admonition text blocks
@@ -8,6 +8,9 @@
 
   * Bug fixes
     * Ensure that `mix docs --open` works on Windows
+    * Ensure search tokenizer also splits on underscore
+    * Fix false warnings about missing types when running ExDoc in escript mode
+    * Don't navigate when clicking the current page
 
 ## v0.28.0 (2022-01-24)
 
