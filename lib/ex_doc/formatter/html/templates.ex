@@ -255,6 +255,28 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp link_heading(match, tag, title, id, prefix) do
     section_header_class_name = "section-heading"
 
+    # NOTE: This addition is mainly to preserve the previous `class` attributes
+    # from the headers, in case there is one. Now with the _admonition_ text
+    # block, we inject CSS classes. So far, the supported classes are:
+    # `warning`, `info`, `error`, and `neutral`.
+    #
+    # The Markdown syntax that we support for the admonition text
+    # blocks is something like this:
+    #
+    #     > ### Never open this door! {: .warning}
+    #     >
+    #     > ...
+    #
+    # That should produce the following HTML:
+    #
+    #      <blockquote>
+    #        <h3 class="warning">Never open this door!</h3>
+    #        <p>...</p>
+    #      </blockquote>
+    #
+    # The original implementation discarded the previous CSS classes. Instead,
+    # it was setting `#{section_header_class_name}` as the only CSS class
+    # associated with the given header.
     class_attribute =
       case Regex.named_captures(@class_regex, match) do
         %{"class" => ""} ->
