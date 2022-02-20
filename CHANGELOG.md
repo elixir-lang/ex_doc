@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+  * Enhancements
+    * Add support for admonition text blocks
+    * Improve accessibility for light and dark themes
+
+  * Bug fixes
+    * Ensure that `mix docs --open` works on Windows
+
 ## v0.28.0 (2022-01-24)
 
 ExDoc v0.28.0 requires Elixir v1.11+.
