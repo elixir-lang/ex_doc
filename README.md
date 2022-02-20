@@ -42,11 +42,15 @@ def deps do
 end
 ```
 
-> Note: if you are using Elixir v1.7, v1.8, or v1.9, use `~> 0.22.0`.
+> #### Note {: .info}
+>
+> If you are using Elixir v1.7, v1.8, or v1.9, use `~> 0.22.0`.
 
 After adding ExDoc as a dependency, run `mix deps.get` to install it.
 
-> Note: Some Operating System distributions split Erlang into multiple packages and at least one ExDoc dependency (`earmark_parser`) requires Erlang development environment. If you get a message like "/usr/lib/erlang/lib/parsetools-2.3.1/include/yeccpre.hrl: no such file or directory", it means you lack this environment. For instance, on the Debian operating system and its derivatives, you need to `apt install erlang-dev`.
+> #### Erlang development environment {: .warning}
+>
+> Some Operating System distributions split Erlang into multiple packages and at least one ExDoc dependency (`earmark_parser`) requires Erlang development environment. If you get a message like "/usr/lib/erlang/lib/parsetools-2.3.1/include/yeccpre.hrl: no such file or directory", it means you lack this environment. For instance, on the Debian operating system and its derivatives, you need to `apt install erlang-dev`.
 
 ExDoc will automatically pull in information from your projects, like the application and version. However, you may want to set `:name`, `:source_url` and `:homepage_url` to have a nicer output from ExDoc, such as:
 
@@ -146,6 +150,32 @@ You can also use a custom text, e.g.: `` [custom text](`MyModule.function/1`) ``
 
 Link to extra pages like this: `` [Up and running](Up and running.md) `` (skipping the directory
 the page is in), the final link will be automatically converted to `up-and-running.html`.
+
+## Admonition blocks
+
+You may want to draw attention to certain statements by taking them out of the
+content's flow and labeling them with a priority. These are called admonitions,
+sometimes are also known as asides or callouts. An admonition block is rendered
+based on the assigned label or class. `ex_doc` supports the following tags:
+`warning`, `error`, `info`, and `neutral` over header levels `h3` and `h4`.
+
+The syntax is as follows:
+
+    > #### Error {: .error}
+    >
+    > This syntax will render an error block
+
+The result for the previous syntax is as follows:
+
+> #### Error {: .error}
+>
+> This syntax will render an error block
+
+For example, if you change the class name to `neutral`, you get:
+
+> #### Error {: .neutral}
+>
+> This syntax will render an error block
 
 ## Extensions
 

@@ -144,6 +144,22 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              </h3>
              """
     end
+
+    test "generates headers for admonition support" do
+      admonition_block = """
+      <blockquote><h3 class="warning">Foo</h3></blockquote>
+      """
+
+      assert Templates.link_headings(admonition_block) == """
+             <blockquote><h3 id="foo" class="warning section-heading">
+               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+               <p class="sr-only">foo</p>
+               </a>
+               Foo
+             </h3>
+             </blockquote>
+             """
+    end
   end
 
   describe "synopsis" do

@@ -248,11 +248,52 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> elem(0)
   end
 
+  @class_regex ~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/
+  @class_separator " "
   defp link_heading(match, _tag, _title, "", _prefix), do: match
 
-  defp link_heading(_match, tag, title, id, prefix) do
+  defp link_heading(match, tag, title, id, prefix) do
+    section_header_class_name = "section-heading"
+
+    # NOTE: This addition is mainly to preserve the previous `class` attributes
+    # from the headers, in case there is one. Now with the _admonition_ text
+    # block, we inject CSS classes. So far, the supported classes are:
+    # `warning`, `info`, `error`, and `neutral`.
+    #
+    # The Markdown syntax that we support for the admonition text
+    # blocks is something like this:
+    #
+    #     > ### Never open this door! {: .warning}
+    #     >
+    #     > ...
+    #
+    # That should produce the following HTML:
+    #
+    #      <blockquote>
+    #        <h3 class="warning">Never open this door!</h3>
+    #        <p>...</p>
+    #      </blockquote>
+    #
+    # The original implementation discarded the previous CSS classes. Instead,
+    # it was setting `#{section_header_class_name}` as the only CSS class
+    # associated with the given header.
+    class_attribute =
+      case Regex.named_captures(@class_regex, match) do
+        %{"class" => ""} ->
+          section_header_class_name
+
+        %{"class" => previous_classes} ->
+          # Let's make sure that the `section_header_class_name` is not already
+          # included in the previous classes for the header
+          previous_classes
+          |> String.split(@class_separator)
+          |> Enum.reject(&(&1 == section_header_class_name))
+          |> Enum.join(@class_separator)
+          |> Kernel.<>(" #{section_header_class_name}")
+      end
+
     """
-    <#{tag} id="#{prefix}#{id}" class="section-heading">
+    <#{tag} id="#{prefix}#{id}" class="#{class_attribute}">
       <a href="##{prefix}#{id}" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
       <p class="sr-only">#{id}</p>
       </a>
