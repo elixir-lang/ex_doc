@@ -161,11 +161,9 @@ based on the assigned label or class. `ex_doc` supports the following tags:
 
 The syntax is as follows:
 
-```
-> #### Error {\: .error}
->
-> This syntax will render an error block
-```
+    > #### Error {: .error}
+    >
+    > This syntax will render an error block
 
 The result for the previous syntax is as follows:
 
