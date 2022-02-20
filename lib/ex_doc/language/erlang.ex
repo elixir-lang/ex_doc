@@ -164,7 +164,9 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def format_attribute(attribute) when is_binary(attribute), do: "-" <> attribute
+  def format_spec_attribute(%ExDoc.TypeNode{type: type}), do: "-#{type}"
+  def format_spec_attribute(%ExDoc.FunctionNode{type: :callback}), do: "-callback"
+  def format_spec_attribute(%ExDoc.FunctionNode{}), do: "-spec"
 
   ## Shared between Erlang & Elixir
 

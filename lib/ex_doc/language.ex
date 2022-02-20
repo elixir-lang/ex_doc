@@ -134,7 +134,7 @@ defmodule ExDoc.Language do
   @doc """
   Return an attribute in the canonical representation.
   """
-  @callback format_attribute(String.t()) :: String.t()
+  @callback format_spec_attribute(%ExDoc.FunctionNode{} | %ExDoc.TypeNode{}) :: String.t()
 
   def get(:elixir, _module), do: {:ok, ExDoc.Language.Elixir}
   def get(:erlang, _module), do: {:ok, ExDoc.Language.Erlang}
