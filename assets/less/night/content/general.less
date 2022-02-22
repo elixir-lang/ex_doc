@@ -13,10 +13,6 @@ a {
   .linkUnderlines(@nightTextHeaders);
 }
 
-a.no-underline {
-  text-decoration: none;
-}
-
 a.view-source {
   color: #939393;
   text-decoration: none;
@@ -46,7 +42,14 @@ img[src*="#gh-light-mode-only"] {
   display: none;
 }
 
-blockquote code {
-  background-color: @codeBackground;
-  border: 1px solid darken(@codeBackground, 10%);
+blockquote {
+  a {
+    color: @black;
+    .linkUnderlines(@black);
+  }
+
+  code {
+    background-color: @codeBackground;
+    border: 1px solid darken(@codeBackground, 10%);
+  }
 }
