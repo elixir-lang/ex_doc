@@ -111,7 +111,8 @@ blockquote {
   &.warning,
   &.error,
   &.info,
-  &.neutral {
+  &.neutral,
+  &.tip {
     color: @black;
     border-radius: 10px;
     border-left: 0;
@@ -133,14 +134,20 @@ blockquote {
     background-color: #e2e8ef;
   }
 
+  &.tip {
+    background-color: #9dc5aa;
+  }
+
   h3.warning,
   h3.error,
   h3.info,
   h3.neutral,
+  h3.tip,
   h4.warning,
   h4.error,
   h4.info,
-  h4.neutral {
+  h4.neutral,
+  h4.tip {
     margin: 0 -1.2rem;
     padding: 0.7rem 1.2rem 0.7rem 3.3rem;
     font-weight: 700;
@@ -187,6 +194,15 @@ blockquote {
       &::before {
         content: @icon-double-quotes-l;
       }
+    }
+
+    &.tip {
+      background-color: #1f4034;
+
+      &::before {
+        content: @icon-error-warning;
+      }
+
     }
   }
 
