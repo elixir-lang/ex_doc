@@ -157,7 +157,7 @@ You may want to draw attention to certain statements by taking them out of the
 content's flow and labeling them with a priority. These are called admonitions,
 sometimes are also known as asides or callouts. An admonition block is rendered
 based on the assigned label or class. `ex_doc` supports the following tags:
-`warning`, `error`, `info`, and `neutral` over header levels `h3` and `h4`.
+`warning`, `error`, `info`, `tip`, and `neutral` over header levels `h3` and `h4`.
 
 The syntax is as follows:
 
