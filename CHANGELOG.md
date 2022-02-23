@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.28.2 (2022-02-23)
+
+  * Bug fixes
+    * Fix links and code tags in admonition text blocks for dark mode
+
 ## v0.28.1 (2022-02-20)
 
   * Enhancements
