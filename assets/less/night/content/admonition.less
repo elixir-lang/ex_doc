@@ -1,0 +1,57 @@
+blockquote {
+  &.warning {
+    background-color: #edd5a5;
+  }
+
+  &.error {
+    background-color: #e4aaac;
+  }
+
+  &.info {
+    background-color: #a4b8e8;
+  }
+
+  &.neutral {
+    background-color: #c6cddb;
+  }
+
+  &.tip {
+    background-color: #9dc5aa;
+  }
+
+  h3.warning,
+  h3.error,
+  h3.info,
+  h3.neutral,
+  h3.tip,
+  h4.warning,
+  h4.error,
+  h4.info,
+  h4.neutral,
+  h4.tip {
+    &::before {
+      color: @white;
+    }
+
+    &.warning {
+      color: @white;
+      background-color: #7c4619;
+    }
+
+    &.error {
+      background-color: #882738;
+    }
+
+    &.info {
+      background-color: #1b176b;
+    }
+
+    &.neutral {
+      background-color: #1f2432;
+    }
+
+    &.tip {
+      background-color: #1f4034;
+    }
+  }
+}
