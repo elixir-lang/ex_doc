@@ -2,6 +2,8 @@ defmodule ExDoc.Retriever do
   # Functions to extract documentation information from modules.
   @moduledoc false
 
+  alias ExDoc.Utils.NaturalOrder
+
   defmodule Error do
     @moduledoc false
     defexception [:message]
@@ -128,10 +130,10 @@ defmodule ExDoc.Retriever do
       type: module_data.type,
       deprecated: metadata[:deprecated],
       function_groups: function_groups,
-      docs: Enum.sort_by(docs, &sort_key(&1.name, &1.arity)),
+      docs: natural_sort(docs, &"#{&1.name}/#{&1.arity}"),
       doc: moduledoc,
       doc_line: doc_line,
-      typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
+      typespecs: natural_sort(types, &"#{&1.name}/#{&1.arity}"),
       source_path: source_path,
       source_url: source_link(source, module_data.line),
       language: module_data.language,
@@ -139,9 +141,13 @@ defmodule ExDoc.Retriever do
     }
   end
 
-  defp sort_key(name, arity) do
-    first = name |> Atom.to_charlist() |> hd()
-    {first in ?a..?z, name, arity}
+  defp natural_sort(enumerable, mapper) when is_function(mapper, 1) do
+    enumerable
+    |> Enum.sort_by(fn elem ->
+      elem
+      |> mapper.()
+      |> NaturalOrder.to_sortable_charlist()
+    end)
   end
 
   defp doc_ast(format, %{"en" => doc_content}, options) do
@@ -201,7 +207,7 @@ defmodule ExDoc.Retriever do
       deprecated: metadata[:deprecated],
       doc: doc_ast,
       doc_line: doc_line,
-      defaults: Enum.sort_by(defaults, fn {name, arity} -> sort_key(name, arity) end),
+      defaults: natural_sort(defaults, fn {name, arity} -> "#{name}/#{arity}" end),
       signature: signature(signature),
       specs: function_data.specs,
       source_path: source.path,
