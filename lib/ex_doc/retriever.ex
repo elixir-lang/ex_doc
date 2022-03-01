@@ -130,24 +130,15 @@ defmodule ExDoc.Retriever do
       type: module_data.type,
       deprecated: metadata[:deprecated],
       function_groups: function_groups,
-      docs: natural_sort(docs, &"#{&1.name}/#{&1.arity}"),
+      docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
       doc: moduledoc,
       doc_line: doc_line,
-      typespecs: natural_sort(types, &"#{&1.name}/#{&1.arity}"),
+      typespecs: ExDoc.Utils.natural_sort_by(types, &"#{&1.name}/#{&1.arity}"),
       source_path: source_path,
       source_url: source_link(source, module_data.line),
       language: module_data.language,
       annotations: List.wrap(metadata[:tags])
     }
-  end
-
-  defp natural_sort(enumerable, mapper) when is_function(mapper, 1) do
-    enumerable
-    |> Enum.sort_by(fn elem ->
-      elem
-      |> mapper.()
-      |> NaturalOrder.to_sortable_charlist()
-    end)
   end
 
   defp doc_ast(format, %{"en" => doc_content}, options) do
@@ -207,7 +198,7 @@ defmodule ExDoc.Retriever do
       deprecated: metadata[:deprecated],
       doc: doc_ast,
       doc_line: doc_line,
-      defaults: natural_sort(defaults, fn {name, arity} -> "#{name}/#{arity}" end),
+      defaults: ExDoc.Utils.natural_sort_by(defaults, fn {name, arity} -> "#{name}/#{arity}" end),
       signature: signature(signature),
       specs: function_data.specs,
       source_path: source.path,

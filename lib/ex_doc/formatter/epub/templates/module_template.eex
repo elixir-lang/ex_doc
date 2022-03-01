@@ -5,7 +5,7 @@
 
     <%= if deprecated = module.deprecated do %>
       <div class="deprecated">
-        This <%= module.type %> is deprecated. <%= H.h(deprecated) %>.
+        This <%= module.type %> is deprecated. <%= ExDoc.Utils.h(deprecated) %>.
       </div>
     <% end %>
 

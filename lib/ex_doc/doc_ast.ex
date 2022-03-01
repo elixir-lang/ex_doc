@@ -4,7 +4,6 @@ defmodule ExDoc.DocAST do
   @type t :: term()
 
   alias ExDoc.Markdown
-  alias ExDoc.Formatter.HTML.Templates
 
   @doc """
   Parses given `doc_content` according to `doc_format`.
@@ -33,7 +32,7 @@ defmodule ExDoc.DocAST do
   def to_string(ast, fun \\ fn _ast, string -> string end)
 
   def to_string(binary, _fun) when is_binary(binary) do
-    Templates.h(binary)
+    ExDoc.Utils.h(binary)
   end
 
   def to_string(list, fun) when is_list(list) do

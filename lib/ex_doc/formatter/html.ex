@@ -430,7 +430,7 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generates an ID from some text
 
-  Used primarily with titles, headings and functions group names.
+  Used primarily with titles, headings, and functions group names.
   """
   def text_to_id(atom) when is_atom(atom), do: text_to_id(Atom.to_string(atom))
 

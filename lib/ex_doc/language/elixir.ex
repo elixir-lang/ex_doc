@@ -4,7 +4,6 @@ defmodule ExDoc.Language.Elixir do
   @behaviour ExDoc.Language
 
   alias ExDoc.Autolink
-  alias ExDoc.Formatter.HTML.Templates, as: T
   alias ExDoc.Refs
   alias ExDoc.Language.Erlang
 
@@ -186,7 +185,7 @@ defmodule ExDoc.Language.Elixir do
       ast
       |> Macro.to_string()
       |> safe_format_string!()
-      |> T.h()
+      |> ExDoc.Utils.h()
 
     name = typespec_name(ast)
     {name, rest} = split_name(string, name)
@@ -716,7 +715,7 @@ defmodule ExDoc.Language.Elixir do
         end
 
       if url do
-        ~s[<a href="#{url}">#{T.h(call_string)}</a>]
+        ~s[<a href="#{url}">#{ExDoc.Utils.h(call_string)}</a>]
       else
         call_string
       end <> do_typespec(rest, config)
@@ -854,7 +853,7 @@ defmodule ExDoc.Language.Elixir do
   defp prefix(:type), do: "t:"
 
   defp fragment(:ex_doc, kind, name, arity) do
-    "#" <> prefix(kind) <> "#{T.enc(Atom.to_string(name))}/#{arity}"
+    "#" <> prefix(kind) <> "#{URI.encode(Atom.to_string(name))}/#{arity}"
   end
 
   defp fragment(_, kind, name, arity) do

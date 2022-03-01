@@ -2,9 +2,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
 
-  # TODO: It should not depend on the parent module
+  import ExDoc.Utils, only: [h: 1]
+
+  # TODO: It should not depend on the parent module. Move required HTML functions to Utils.
   # TODO: Add tests that assert on the returned structured, not on JSON
-  alias ExDoc.Utils.SimpleJSON
   alias ExDoc.Formatter.HTML
 
   @doc """
@@ -75,22 +76,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp presence([]), do: nil
   defp presence(other), do: other
 
-  @doc false
-  def h(binary) do
-    escape_map = [
-      {"&", "&amp;"},
-      {"<", "&lt;"},
-      {">", "&gt;"},
-      {~S("), "&quot;"}
-    ]
-
-    Enum.reduce(escape_map, binary, fn {pattern, escape}, acc ->
-      String.replace(acc, pattern, escape)
-    end)
-  end
-
-  @doc false
-  def enc(binary), do: URI.encode(binary)
+  defp enc(binary), do: URI.encode(binary)
 
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
@@ -102,7 +88,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
       |> Map.new()
       |> Map.put(:extras, sidebar_extras(extras))
 
-    ["sidebarNodes=" | SimpleJSON.encode(nodes)]
+    ["sidebarNodes=" | ExDoc.Utils.to_json(nodes)]
   end
 
   defp sidebar_extras(extras) do
