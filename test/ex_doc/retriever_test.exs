@@ -155,4 +155,39 @@ defmodule ExDoc.RetrieverTest do
     assert a.id == "A"
     assert a_a.id == "A.A"
   end
+
+  test "natural sorting", c do
+    elixirc(c, ~S"""
+    defmodule NaturallySorted do
+      @type type_b :: any()
+      @type type_B :: any()
+      @type type_A :: any()
+      @type type_a :: any()
+
+      def function_b(), do: :ok
+
+      def function_B(), do: :ok
+
+      def function_A(), do: :ok
+
+      def function_a(), do: :ok
+
+      def function_A(arg), do: arg
+
+      def function_a(arg), do: arg
+    end
+    """)
+
+    [mod] = Retriever.docs_from_modules([NaturallySorted], %ExDoc.Config{})
+
+    [function_A_0, function_A_1, function_a_0, function_a_1, function_B_0, function_b_0] =
+      mod.docs
+
+    assert function_A_0.id == "function_A/0"
+    assert function_A_1.id == "function_A/1"
+    assert function_a_0.id == "function_a/0"
+    assert function_a_1.id == "function_a/1"
+    assert function_B_0.id == "function_B/0"
+    assert function_b_0.id == "function_b/0"
+  end
 end
