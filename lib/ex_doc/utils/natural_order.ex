@@ -1,4 +1,6 @@
 defmodule ExDoc.Utils.NaturalOrder do
+  @moduledoc false
+
   def to_sortable_charlist(string) do
     string
     |> :unicode.characters_to_nfkd_list()
