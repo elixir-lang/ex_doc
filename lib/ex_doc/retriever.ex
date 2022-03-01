@@ -2,8 +2,6 @@ defmodule ExDoc.Retriever do
   # Functions to extract documentation information from modules.
   @moduledoc false
 
-  alias ExDoc.Utils.NaturalOrder
-
   defmodule Error do
     @moduledoc false
     defexception [:message]
