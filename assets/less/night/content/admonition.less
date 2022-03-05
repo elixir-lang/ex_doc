@@ -1,4 +1,16 @@
 blockquote {
+  &.warning, &.error, &.info, &.neutral, &.tip {
+    a {
+      color: @black;
+      .linkUnderlines(@black);
+    }
+
+    code {
+      background-color: @codeBackground;
+      border: 1px solid darken(@codeBackground, 10%);
+    }
+  }
+
   &.warning {
     background-color: #edd5a5;
   }
