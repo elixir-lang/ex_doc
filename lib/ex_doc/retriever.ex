@@ -17,10 +17,12 @@ defmodule ExDoc.Retriever do
   def docs_from_dir(dir, config) when is_binary(dir) do
     files = Path.wildcard(Path.expand("*.beam", dir))
     docs_from_files(files, config)
+    |> docs_from_modules(config)
   end
 
   def docs_from_dir(dirs, config) when is_list(dirs) do
     Enum.flat_map(dirs, &docs_from_dir(&1, config))
+    |> docs_from_modules(config)
   end
 
   @doc """
@@ -30,7 +32,6 @@ defmodule ExDoc.Retriever do
   def docs_from_files(files, config) when is_list(files) do
     files
     |> Enum.map(&filename_to_module(&1))
-    |> docs_from_modules(config)
   end
 
   @doc """
@@ -41,8 +42,12 @@ defmodule ExDoc.Retriever do
     modules
     |> Enum.flat_map(&get_module(&1, config))
     |> Enum.sort_by(fn module ->
-      {GroupMatcher.group_index(config.groups_for_modules, module.group), module.nested_context,
-       module.nested_title, module.id}
+      {
+        GroupMatcher.group_index(config.groups_for_modules, module.group),
+        module.nested_context,
+        module.nested_title,
+        module.id
+      }
     end)
   end
 
