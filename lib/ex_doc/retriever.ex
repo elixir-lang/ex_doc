@@ -330,8 +330,19 @@ defmodule ExDoc.Retriever do
   defp source_link(%{path: _, url: nil}, _line), do: nil
 
   defp source_link(source, line) do
-    source_url = Regex.replace(~r/%{path}/, source.url, source.path)
-    Regex.replace(~r/%{line}/, source_url, to_string(line))
+    source_url_pattern(source.url, source.path, to_string(line))
+  end
+
+  def source_url_pattern(source_url_pattern, path, line) do
+    if is_function(source_url_pattern) do
+      source_url_pattern.(path, line)
+    else
+      if url = source_url_pattern do
+        url
+        |> String.replace("%{path}", path)
+        |> String.replace("%{line}", line)
+      end
+    end
   end
 
   defp source_path(module, _config) do
