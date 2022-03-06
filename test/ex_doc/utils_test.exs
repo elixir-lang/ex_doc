@@ -82,4 +82,9 @@ defmodule ExDoc.UtilsTest do
            }\
            """
   end
+
+  test "source_url_pattern" do
+    assert ExDoc.Utils.source_url_pattern("/%{path}-%{line}", "lib/foo", 13) == "/lib/foo-13"
+    assert ExDoc.Utils.source_url_pattern(&"/#{&1}:#{&2}", "lib/foo", 13) == "/lib/foo:13"
+  end
 end

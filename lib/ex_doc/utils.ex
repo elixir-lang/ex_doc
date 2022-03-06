@@ -91,15 +91,22 @@ defmodule ExDoc.Utils do
     Integer.to_string(integer)
   end
 
-  def source_url_pattern(source_url_pattern, path, line) do
-    if is_function(source_url_pattern) do
-      source_url_pattern.(path, line)
-    else
-      if url = source_url_pattern do
-        url
+  @doc """
+  Generates a url based on the given pattern.
+  """
+  def source_url_pattern(source_url_pattern, path, line)
+      when is_binary(path) and is_integer(line) do
+    cond do
+      is_function(source_url_pattern) ->
+        source_url_pattern.(path, line)
+
+      source_url_pattern ->
+        source_url_pattern
         |> String.replace("%{path}", path)
-        |> String.replace("%{line}", line)
-      end
+        |> String.replace("%{line}", Integer.to_string(line))
+
+      true ->
+        nil
     end
   end
 end

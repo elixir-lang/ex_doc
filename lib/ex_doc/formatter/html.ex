@@ -387,7 +387,7 @@ defmodule ExDoc.Formatter.HTML do
 
     source_path = input |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
 
-    source_url = Utils.source_url_pattern(source_url_pattern, source_path, "1")
+    source_url = Utils.source_url_pattern(source_url_pattern, source_path, 1)
 
     %{
       id: id,

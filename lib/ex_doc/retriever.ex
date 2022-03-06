@@ -336,7 +336,7 @@ defmodule ExDoc.Retriever do
   defp source_link(%{path: _, url: nil}, _line), do: nil
 
   defp source_link(source, line) do
-    Utils.source_url_pattern(source.url, source.path, to_string(line))
+    Utils.source_url_pattern(source.url, source.path, line)
   end
 
   defp source_path(module, _config) do
