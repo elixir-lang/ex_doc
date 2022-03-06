@@ -16,6 +16,7 @@ defmodule ExDoc.Retriever do
   @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
   def docs_from_dir(dir, config) when is_binary(dir) do
     files = Path.wildcard(Path.expand("*.beam", dir))
+
     docs_from_files(files, config)
     |> docs_from_modules(config)
   end
