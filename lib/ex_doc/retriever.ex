@@ -45,14 +45,9 @@ defmodule ExDoc.Retriever do
   end
 
   defp sort_modules(modules, config) when is_list(modules) do
-    modules
-    |> Enum.sort_by(fn module ->
-      {
-        GroupMatcher.group_index(config.groups_for_modules, module.group),
-        module.nested_context,
-        module.nested_title,
-        module.id
-      }
+    Enum.sort_by(modules, fn module ->
+      {GroupMatcher.group_index(config.groups_for_modules, module.group), module.nested_context,
+       module.nested_title, module.id}
     end)
   end
 
