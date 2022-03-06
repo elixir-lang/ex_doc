@@ -7,7 +7,7 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.{DocAST, GroupMatcher, Refs}
+  alias ExDoc.{DocAST, GroupMatcher, Refs, Utils}
   alias ExDoc.Retriever.Error
 
   @doc """
@@ -330,19 +330,7 @@ defmodule ExDoc.Retriever do
   defp source_link(%{path: _, url: nil}, _line), do: nil
 
   defp source_link(source, line) do
-    source_url_pattern(source.url, source.path, to_string(line))
-  end
-
-  def source_url_pattern(source_url_pattern, path, line) do
-    if is_function(source_url_pattern) do
-      source_url_pattern.(path, line)
-    else
-      if url = source_url_pattern do
-        url
-        |> String.replace("%{path}", path)
-        |> String.replace("%{line}", line)
-      end
-    end
+    Utils.source_url_pattern(source.url, source.path, to_string(line))
   end
 
   defp source_path(module, _config) do

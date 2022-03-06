@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.HTML do
   @moduledoc false
 
   alias __MODULE__.{Assets, Templates, SearchItems}
-  alias ExDoc.{Markdown, GroupMatcher, Retriever}
+  alias ExDoc.{Markdown, GroupMatcher, Utils}
 
   @main "api-reference"
   @assets_dir "assets"
@@ -387,7 +387,7 @@ defmodule ExDoc.Formatter.HTML do
 
     source_path = input |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
 
-    source_url = Retriever.source_url_pattern(source_url_pattern, source_path, "1")
+    source_url = Utils.source_url_pattern(source_url_pattern, source_path, "1")
 
     %{
       id: id,
