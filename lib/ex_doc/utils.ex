@@ -90,4 +90,16 @@ defmodule ExDoc.Utils do
   def to_json(integer) when is_integer(integer) do
     Integer.to_string(integer)
   end
+
+  def source_url_pattern(source_url_pattern, path, line) do
+    if is_function(source_url_pattern) do
+      source_url_pattern.(path, line)
+    else
+      if url = source_url_pattern do
+        url
+        |> String.replace("%{path}", path)
+        |> String.replace("%{line}", line)
+      end
+    end
+  end
 end
