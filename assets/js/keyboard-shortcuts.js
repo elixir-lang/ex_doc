@@ -1,7 +1,7 @@
 import { qs } from './helpers'
 import { openSidebar, toggleSidebar } from './sidebar/sidebar-drawer'
 import { focusSearchInput } from './sidebar/sidebar-search'
-import { toggleNightMode } from './night'
+import { toggleDarkMode } from './night'
 import { openQuickSwitchModal } from './quick-switch'
 import { closeModal, isModalOpen } from './modal'
 import { openSettingsModal } from './settings'
@@ -17,7 +17,7 @@ export const keyboardShortcuts = [
   {
     key: 'n',
     description: 'Toggle night mode',
-    action: toggleNightMode
+    action: toggleDarkMode
   },
   {
     key: 's',

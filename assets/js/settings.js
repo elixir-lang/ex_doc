@@ -1,7 +1,6 @@
 import settingsModalBodyTemplate from './handlebars/templates/settings-modal-body.handlebars'
 import { qs, qsAll } from './helpers'
 import { openModal } from './modal'
-import { shouldUseNightMode } from './night'
 import { settingsStore } from './settings-store'
 import { keyboardShortcuts } from './keyboard-shortcuts'
 
@@ -60,13 +59,13 @@ export function openSettingsModal () {
 
   const modal = qs(SETTINGS_MODAL_BODY_SELECTOR)
 
-  const nightModeInput = modal.querySelector(`[name="night_mode"]`)
+  const themeInput = modal.querySelector(`[name="theme"]`)
   const tooltipsInput = modal.querySelector(`[name="tooltips"]`)
   const directLivebookUrlInput = modal.querySelector(`[name="direct_livebook_url"]`)
   const livebookUrlInput = modal.querySelector(`[name="livebook_url"]`)
 
   settingsStore.getAndSubscribe(settings => {
-    nightModeInput.checked = shouldUseNightMode(settings)
+    themeInput.value = settings.theme || 'system'
     tooltipsInput.checked = settings.tooltips
 
     if (settings.livebookUrl === null) {
@@ -81,8 +80,8 @@ export function openSettingsModal () {
     }
   })
 
-  nightModeInput.addEventListener('change', event => {
-    settingsStore.update({ nightMode: event.target.checked })
+  themeInput.addEventListener('change', event => {
+    settingsStore.update({ theme: event.target.value })
   })
 
   tooltipsInput.addEventListener('change', event => {
