@@ -10,12 +10,13 @@ export function initialize () {
   settingsStore.getAndSubscribe(settings => {
     document.body.classList.toggle(DARK_MODE_CLASS, shouldUseDarkMode(settings))
   })
+  listenToDarkMode()
 }
 
 /**
- * Toggles night mode theme and saves the preference.
+ * Cycles through themes and saves the preference.
  */
-export function toggleDarkMode () {
+export function cycleTheme () {
   const settings = settingsStore.get()
   const currentTheme = settings.theme || 'system'
   const nextTheme = THEMES[THEMES.indexOf(currentTheme) + 1] || THEMES[0]
@@ -35,7 +36,7 @@ function prefersDarkColorScheme () {
   return window.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
-export function listenToDarkMode () {
+function listenToDarkMode () {
   window.matchMedia('(prefers-color-scheme: dark)').addListener(_e => {
     const settings = settingsStore.get()
     const isNight = shouldUseDarkMode(settings)

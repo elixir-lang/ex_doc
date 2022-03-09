@@ -1,7 +1,7 @@
 import { qs } from './helpers'
 import { openSidebar, toggleSidebar } from './sidebar/sidebar-drawer'
 import { focusSearchInput } from './sidebar/sidebar-search'
-import { toggleDarkMode } from './night'
+import { cycleTheme } from './theme'
 import { openQuickSwitchModal } from './quick-switch'
 import { closeModal, isModalOpen } from './modal'
 import { openSettingsModal } from './settings'
@@ -16,8 +16,8 @@ export const keyboardShortcuts = [
   },
   {
     key: 'n',
-    description: 'Toggle night mode',
-    action: toggleDarkMode
+    description: 'Cycle themes',
+    action: cycleTheme
   },
   {
     key: 's',

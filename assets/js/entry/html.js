@@ -5,7 +5,7 @@ import { initialize as initSidebarContent } from '../sidebar/sidebar-list'
 import { initialize as initSidebarSearch } from '../sidebar/sidebar-search'
 import { initialize as initVersions } from '../sidebar/sidebar-version-select'
 import { initialize as initSearchPage } from '../search-page'
-import { initialize as initDarkMode, listenToDarkMode } from '../night'
+import { initialize as initTheme } from '../theme'
 import { initialize as initMakeup } from '../makeup'
 import { initialize as initModal } from '../modal'
 import { initialize as initKeyboardShortcuts } from '../keyboard-shortcuts'
@@ -16,7 +16,7 @@ import { initialize as initCopyButton } from '../copy-button'
 import { initialize as initSettings } from '../settings'
 
 onDocumentReady(() => {
-  initDarkMode()
+  initTheme()
   initSidebarDrawer()
   initSidebarContent()
   initSidebarSearch()
@@ -31,5 +31,4 @@ onDocumentReady(() => {
   initSearchPage()
   initCopyButton()
   initSettings()
-  listenToDarkMode()
 })
