@@ -418,7 +418,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       integer = ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>()]
 
       public_html =
-        ~S[public(t) :: {t, ] <>
+        ~S[<span class="attribute">@type</span> public(t) :: {t, ] <>
           ~s[<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), ] <>
           ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>(), ] <>
           ~S[<a href="#t:opaque/0">opaque</a>(), :ok | :error}]
@@ -428,6 +428,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ public_html
       refute content =~ ~s[<strong>private\(t\)]
       assert content =~ ~s[A public type]
+      assert content =~ ~s[<span class="attribute">@spec</span> add(]
       assert content =~ ~s[add(#{integer}, <a href="#t:opaque/0">opaque</a>()) :: #{integer}]
       refute content =~ ~s[minus(#{integer}, #{integer}) :: #{integer}]
 
@@ -435,6 +436,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~s[Basic type: <a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\"><code class=\"inline\">atom/0</code></a>.]
 
       assert content =~ ~r{opaque/0.*<span class="note">\(opaque\)</span>}ms
+      assert content =~ ~r{<span class="attribute">@opaque</span> opaque}
     end
 
     test "outputs summaries" do
@@ -482,6 +484,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:hello/1">}
+      assert content =~ ~s[<span class="attribute">@callback</span> hello(]
       assert content =~ ~s[hello(%URI{})]
       assert content =~ ~s[greet(arg1)]
 
@@ -492,6 +495,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:bye/1">}
+      assert content =~ ~s[<span class="attribute">@macrocallback</span> bye(]
     end
 
     ## PROTOCOLS

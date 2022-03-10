@@ -32,6 +32,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
+  Format the attribute type used to define the spec of the given `node`.
+  """
+  def format_spec_attribute(module, node) do
+    module.language.format_spec_attribute(node)
+  end
+
+  @doc """
   Get defaults clauses.
   """
   def get_defaults(%{defaults: defaults}) do
@@ -297,7 +304,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    detail_template: [:node, :_module],
+    detail_template: [:node, :module],
     footer_template: [:config, :node],
     head_template: [:config, :page],
     module_template: [:config, :module, :summary, :nodes_map],

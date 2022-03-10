@@ -202,6 +202,12 @@ defmodule ExDoc.Language.Elixir do
     }
   end
 
+  @impl true
+  def format_spec_attribute(%ExDoc.TypeNode{type: type}), do: "@#{type}"
+  def format_spec_attribute(%ExDoc.FunctionNode{type: :callback}), do: "@callback"
+  def format_spec_attribute(%ExDoc.FunctionNode{type: :macrocallback}), do: "@macrocallback"
+  def format_spec_attribute(%ExDoc.FunctionNode{}), do: "@spec"
+
   ## Module Helpers
 
   defp nesting_info(title, prefixes) do

@@ -33,6 +33,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         function_groups: [:Callbacks, :Functions],
         group: nil,
         id: "mod",
+        language: ExDoc.Language.Erlang,
         module: :mod,
         nested_context: nil,
         nested_title: nil,
