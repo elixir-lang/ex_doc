@@ -26,10 +26,8 @@ export function cycleTheme () {
 function shouldUseDarkMode (settings) {
   // nightMode used to be true|false|null
   // Now it's 'dark'|'light'|'system'|null with null treated as 'system'
-  const prefersDark = prefersDarkColorScheme()
   return (settings.theme === 'dark') ||
-         (prefersDark && settings.theme === null) ||
-         (prefersDark && settings.theme === 'system')
+         (prefersDarkColorScheme() && (settings.theme == null || settings.theme === 'system'))
 }
 
 function prefersDarkColorScheme () {
@@ -40,7 +38,7 @@ function listenToDarkMode () {
   window.matchMedia('(prefers-color-scheme: dark)').addListener(_e => {
     const settings = settingsStore.get()
     const isNight = shouldUseDarkMode(settings)
-    if (settings.theme === null || settings.theme === 'system') {
+    if (settings.theme == null || settings.theme === 'system') {
       document.body.classList.toggle(DARK_MODE_CLASS, isNight)
     }
   })
