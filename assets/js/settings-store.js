@@ -3,8 +3,8 @@ const SETTINGS_KEY = 'ex_doc:settings'
 const DEFAULT_SETTINGS = {
   // Whether to show tooltips on function/module links
   tooltips: true,
-  // Night mode preference, null if never explicitly overridden by the user
-  nightMode: null,
+  // Theme preference, null if never explicitly overridden by the user
+  theme: null,
   // Livebook URL to point the badges directly to
   livebookUrl: null
 }
@@ -68,10 +68,8 @@ class SettingsStore {
 
   _storeSettings () {
     try {
-      const json = JSON.stringify(this._settings)
-      localStorage.setItem(SETTINGS_KEY, json)
-
       this._storeSettingsLegacy()
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(this._settings))
     } catch (error) {
       console.error(`Failed to persist settings: ${error}`)
     }
@@ -89,8 +87,12 @@ class SettingsStore {
     }
 
     const nightMode = localStorage.getItem('night-mode')
-    if (nightMode !== null) {
-      this._settings = { ...this._settings, nightMode: JSON.parse(nightMode) }
+    if (nightMode === 'true') {
+      this._settings = { ...this._settings, nightMode: true }
+    }
+
+    if (this._settings.nightMode === true) {
+      this._settings = { ...this._settings, theme: 'dark' }
     }
   }
 
@@ -102,8 +104,16 @@ class SettingsStore {
     }
 
     if (this._settings.nightMode !== null) {
-      localStorage.setItem('night-mode', JSON.stringify(this._settings.nightMode))
+      localStorage.setItem('night-mode', this._settings.nightMode === true ? 'true' : 'false')
     } else {
+      localStorage.removeItem('night-mode')
+    }
+
+    if (this._settings.theme !== null) {
+      localStorage.setItem('night-mode', this._settings.theme === 'dark' ? 'true' : 'false')
+      this._settings.nightMode = this._settings.theme === 'dark'
+    } else {
+      delete this._settings.nightMode
       localStorage.removeItem('night-mode')
     }
   }
