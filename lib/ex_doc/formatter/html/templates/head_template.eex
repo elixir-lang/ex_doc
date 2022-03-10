@@ -26,15 +26,13 @@
     <script>
       <%# Immediately apply night mode preference to avoid a flash effect %>
       try {
-        var settings = localStorage.getItem('ex_doc:settings');
-        settings = JSON.parse(settings || '{}');
-        var isDark = null;
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
 
-        if (localStorage.getItem('night-mode') === 'true') { isDark = true }
-        if (settings.nightMode === true) { isDark = true }
-        if (settings.theme === 'dark') { isDark = true }
-        if (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) { isDark = true }
-        if (isDark === null && settings.theme === null && window.matchMedia('(prefers-color-scheme: dark)').matches) { isDark = true }
-        if (isDark) { document.body.classList.add('dark') }
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
       } catch (error) { }
     </script>
