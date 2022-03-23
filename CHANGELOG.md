@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.28.3 (2022-03-23)
+
+  * Enhacements
+    * Include page titles in autocomplete suggestions
+    * Allow theme to be set to "System" version
+    * Remove "Specs" heading and render full typespecs
+    * Support for `source_url_pattern` in config being a function
+
+  * Bug fixes
+    * Adjustments for blockquotes and admonition blocks in dark mode
+    * Fix module sorting when a list of dirs is provided
+    * Consider casing of letters when sorting items in the menu, summary, function list, etc
+
 ## v0.28.2 (2022-02-23)
 
   * Bug fixes
