@@ -59,10 +59,11 @@ describe('getSuggestions', () => {
   })
 
   describe('find', () => {
-    it('returns matching modules, tasks and exceptions', () => {
+    it('returns matching modules, tasks, extras and exceptions', () => {
       expect(getSuggestions('Map').length).to.eql(1)
       expect(getSuggestions('Ecto.Repo').length).to.eql(1)
       expect(getSuggestions('phx.server').length).to.eql(1)
+      expect(getSuggestions('API Reference').length).to.eql(1)
       expect(getSuggestions('My exception').length).to.eql(1)
     })
 
@@ -70,10 +71,6 @@ describe('getSuggestions', () => {
       expect(getSuggestions('get_by').length).to.eql(1)
       expect(getSuggestions('fetch').length).to.eql(1)
       expect(getSuggestions('has_many').length).to.eql(1)
-    })
-
-    it('ignores matching extras', () => {
-      expect(getSuggestions('api-reference').length).to.eql(0)
     })
 
     it('handles special characters', () => {

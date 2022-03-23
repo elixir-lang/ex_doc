@@ -15,7 +15,8 @@ import { escapeRegexModifiers, escapeHtmlEntities, isBlank } from '../helpers'
 const SUGGESTION_CATEGORY = {
   module: 'module',
   moduleChild: 'module-child',
-  mixTask: 'mix-task'
+  mixTask: 'mix-task',
+  extra: 'extra'
 }
 
 /**
@@ -35,7 +36,8 @@ export function getSuggestions (query, limit = 5) {
   const suggestions = [
     ...findSuggestionsInTopLevelNodes(nodes.modules, query, SUGGESTION_CATEGORY.module),
     ...findSuggestionsInChildNodes(nodes.modules, query, SUGGESTION_CATEGORY.moduleChild),
-    ...findSuggestionsInTopLevelNodes(nodes.tasks, query, SUGGESTION_CATEGORY.mixTask)
+    ...findSuggestionsInTopLevelNodes(nodes.tasks, query, SUGGESTION_CATEGORY.mixTask),
+    ...findSuggestionsInTopLevelNodes(nodes.extras, query, SUGGESTION_CATEGORY.extra)
   ]
 
   return sort(suggestions).slice(0, limit)
