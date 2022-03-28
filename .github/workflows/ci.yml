@@ -49,11 +49,31 @@ jobs:
       - name: Prerelease
         run: test/prerelease.sh
 
-      - name: Generate docs
+      - name: Generate ExDoc docs
         run: |
           mix docs
           test -f doc/index.html && echo "doc/index.html exists."
           test -f doc/ExDoc.epub && echo "doc/ExDoc.epub exists."
+
+      - name: Generate Elixir docs
+        env:
+          MIX_ENV: dev
+        run: |
+          echo "Compiling ExDoc with MIX_ENV=dev"
+          mix deps.get
+          mix compile
+
+          echo "Cloning Elixir repository"
+          cd ..
+          git config --global advice.detachedHead false
+          git clone https://github.com/elixir-lang/elixir.git --depth 1 --branch v${{ matrix.pair.elixir }}.0
+
+          echo "Building Elixir docs"
+          cd elixir
+          make docs
+          for app in elixir eex ex_unit iex logger mix; do
+            test -f doc/${app}/index.html && echo "doc/${app}/index.html exists."
+          done
 
   check_js:
     name: Check JS
