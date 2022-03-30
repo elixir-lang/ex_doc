@@ -16,7 +16,8 @@ const SUGGESTION_CATEGORY = {
   module: 'module',
   moduleChild: 'module-child',
   mixTask: 'mix-task',
-  extra: 'extra'
+  extra: 'extra',
+  extraChild: 'extra-child'
 }
 
 /**
@@ -37,7 +38,8 @@ export function getSuggestions (query, limit = 5) {
     ...findSuggestionsInTopLevelNodes(nodes.modules, query, SUGGESTION_CATEGORY.module),
     ...findSuggestionsInChildNodes(nodes.modules, query, SUGGESTION_CATEGORY.moduleChild),
     ...findSuggestionsInTopLevelNodes(nodes.tasks, query, SUGGESTION_CATEGORY.mixTask),
-    ...findSuggestionsInTopLevelNodes(nodes.extras, query, SUGGESTION_CATEGORY.extra)
+    ...findSuggestionsInTopLevelNodes(nodes.extras, query, SUGGESTION_CATEGORY.extra),
+    ...findSuggestionsInChildHeaders(nodes.extras, query, SUGGESTION_CATEGORY.extraChild)
   ]
 
   return sort(suggestions).slice(0, limit)
@@ -61,12 +63,26 @@ function findSuggestionsInChildNodes (nodes, query, category) {
     .flatMap(node => {
       return node.nodeGroups.flatMap(({ key, nodes: childNodes }) => {
         const label = nodeGroupKeyToLabel(key)
-
         return childNodes.map(childNode =>
           childNodeSuggestion(childNode, node.id, query, category, label) ||
           moduleChildNodeSuggestion(childNode, node.id, query, category, label)
         )
       })
+    })
+    .filter(suggestion => suggestion !== null)
+}
+
+/**
+ * Finds suggestions in headers of the given parent nodes.
+ */
+function findSuggestionsInChildHeaders (nodes, query, category) {
+  return nodes
+    .filter(node => node.headers)
+    .flatMap(node => {
+      return node.headers.map(childNode =>
+        childNodeSuggestion(childNode, node.id, query, category, null) ||
+          moduleChildNodeSuggestion(childNode, node.id, query, category, null)
+      )
     })
     .filter(suggestion => suggestion !== null)
 }

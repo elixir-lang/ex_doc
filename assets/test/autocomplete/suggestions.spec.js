@@ -54,7 +54,16 @@ describe('getSuggestions', () => {
         }
       ],
       tasks: [{id: 'phx.server', title: 'phx.server'}],
-      extras: [{id: 'api-reference', title: 'API Reference'}]
+      extras: [
+        {
+          id: 'api-reference',
+          title: 'API Reference',
+          headers: [
+            {id: "Modules", anchor: "modules"},
+            {id: "Mix Tasks", anchor: "mix-tasks"}
+          ]
+        }
+      ]
     }
   })
 
@@ -65,6 +74,7 @@ describe('getSuggestions', () => {
       expect(getSuggestions('phx.server').length).to.eql(1)
       expect(getSuggestions('API Reference').length).to.eql(1)
       expect(getSuggestions('My exception').length).to.eql(1)
+      expect(getSuggestions('Mix Tasks').length).to.eql(1)
     })
 
     it('returns matching functions, callbacks and types', () => {
