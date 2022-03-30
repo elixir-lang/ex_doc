@@ -39,7 +39,7 @@ export function getSuggestions (query, limit = 5) {
     ...findSuggestionsInChildNodes(nodes.modules, query, SUGGESTION_CATEGORY.moduleChild),
     ...findSuggestionsInTopLevelNodes(nodes.tasks, query, SUGGESTION_CATEGORY.mixTask),
     ...findSuggestionsInTopLevelNodes(nodes.extras, query, SUGGESTION_CATEGORY.extra),
-    ...findSuggestionsInChildHeaders(nodes.extras, query, SUGGESTION_CATEGORY.extraChild)
+    ...findSuggestionsInExtraChild(nodes.extras, query, SUGGESTION_CATEGORY.extraChild)
   ]
 
   return sort(suggestions).slice(0, limit)
@@ -73,15 +73,14 @@ function findSuggestionsInChildNodes (nodes, query, category) {
 }
 
 /**
- * Finds suggestions in headers of the given parent nodes.
+ * Finds suggestions in headers of the given extra nodes.
  */
-function findSuggestionsInChildHeaders (nodes, query, category) {
+function findSuggestionsInExtraChild (nodes, query, category) {
   return nodes
     .filter(node => node.headers)
     .flatMap(node => {
       return node.headers.map(childNode =>
-        childNodeSuggestion(childNode, node.id, query, category, null) ||
-          moduleChildNodeSuggestion(childNode, node.id, query, category, null)
+        extraChildNodeSuggestion(childNode, node.id, node.title, query, category)
       )
     })
     .filter(suggestion => suggestion !== null)
@@ -143,6 +142,23 @@ function moduleChildNodeSuggestion (childNode, parentId, query, category, label)
     label: label,
     description: parentId,
     matchQuality: matchQuality(modFun, query),
+    category: category
+  }
+}
+
+/**
+ * Builds a suggestion for a extra child node.
+ * Returns null if the node doesn't match the query.
+ */
+function extraChildNodeSuggestion (childNode, parentId, parentTitle, query, category) {
+  if (!matchesAll(childNode.id, query)) { return null }
+
+  return {
+    link: `${parentId}.html#${childNode.anchor}`,
+    title: highlightMatches(childNode.id, query),
+    label: null,
+    description: parentTitle,
+    matchQuality: matchQuality(childNode.id, query),
     category: category
   }
 }
