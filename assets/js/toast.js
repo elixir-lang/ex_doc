@@ -1,20 +1,20 @@
-var toastTimer = null;
-const toast = document.getElementById("toast");
+var toastTimer = null
+const toast = document.getElementById('toast')
 toast.addEventListener('click', (event) => {
-  clearTimeout(toastTimer);
-  event.target.classList.remove("show");
+  clearTimeout(toastTimer)
+  event.target.classList.remove('show')
 })
 
-export function showToast(message) {
+export function showToast (message) {
   if (toast) {
-    clearTimeout(toastTimer);
-    toast.innerText = message;
-    toast.classList.add("show");
+    clearTimeout(toastTimer)
+    toast.innerText = message
+    toast.classList.add('show')
 
     toastTimer = setTimeout(() => {
-      toast.classList.remove("show");
+      toast.classList.remove('show')
       // wait for transition animation
-      toastTimer = setTimeout(() => toast.innerText = '', 1000)
-    }, 5000);
+      toastTimer = setTimeout(function () { toast.innerText = '' }, 1000)
+    }, 5000)
   }
 }

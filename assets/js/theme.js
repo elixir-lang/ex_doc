@@ -42,7 +42,7 @@ function listenToDarkMode () {
     const isNight = shouldUseDarkMode(settings)
     if (settings.theme == null || settings.theme === 'system') {
       document.body.classList.toggle(DARK_MODE_CLASS, isNight)
-      showToast(`Browser changed theme to "${isNight ? "dark" : "light"}"`)
+      showToast(`Browser changed theme to "${isNight ? 'dark' : 'light'}"`)
     }
   })
 }
