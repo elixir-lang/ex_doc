@@ -568,14 +568,27 @@ defmodule ExDoc.Formatter.HTMLTest do
       config = doc_config(extras: ["test/fixtures/README.md"], logo: "test/fixtures/elixir.png")
       generate_docs(config)
       content = File.read!("#{output_dir()}/.build")
+
+      # Verify necessary files in .build
       assert content =~ ~r(^readme\.html$)m
       assert content =~ ~r(^api-reference\.html$)m
       assert content =~ ~r(^dist/sidebar_items-[\w]{10}\.js$)m
       assert content =~ ~r(^dist/app-[\w]{20}\.js$)m
+      assert content =~ ~r(^dist/app-[\w]{20}\.js.LICENSE.txt$)m
       assert content =~ ~r(^dist/elixir-[\w]{20}\.css$)m
       assert content =~ ~r(^assets/logo\.png$)m
       assert content =~ ~r(^index\.html$)m
       assert content =~ ~r(^404\.html$)m
+
+      # Verify the files listed in .build actually exist
+      files =
+        content
+        |> String.split("\n", trim: true)
+        |> Enum.map(&Path.join(output_dir(), &1))
+
+      for file <- files do
+        assert File.exists?(file)
+      end
     end
 
     test "does not delete files not listed in .build" do
