@@ -28,11 +28,13 @@ ExDoc ships with many features:
   * Show tooltips when mousing over a link to a module/function (works for the current project and across projects)
   * A version dropdown to quickly switch to other versions (automatically configured when hosted on HexDocs)
 
-## Using ExDoc with Mix
+## Usage
 
-To use ExDoc in your Mix projects, first add ExDoc as a dependency.
+You can use ExDoc with Mix (recommended for Elixir projects), with Rebar (recommended for Erlang projects), or via the command line.
 
-If you are using Elixir v1.10, or later:
+### Using ExDoc with Mix
+
+First add ExDoc as a dependency. ExDoc requires Elixir v1.10 or later:
 
 ```elixir
 def deps do
@@ -42,11 +44,7 @@ def deps do
 end
 ```
 
-> #### Note {: .info}
->
-> If you are using Elixir v1.7, v1.8, or v1.9, use `~> 0.22.0`.
-
-After adding ExDoc as a dependency, run `mix deps.get` to install it.
+Then run `mix deps.get` to install it.
 
 > #### Erlang development environment {: .warning}
 >
@@ -76,7 +74,11 @@ end
 
 Now you are ready to generate your project documentation with `mix docs`. To see all options available when generating docs, run `mix help docs`.
 
-## Using ExDoc via command line
+### Using ExDoc with Rebar3
+
+From Erlang/OTP 24+, you can use ExDoc to render your Erlang documentation written with EDoc. See [`rebar3_ex_doc`](https://github.com/starbelly/rebar3_ex_doc/) for more information.
+
+### Using ExDoc via command line
 
 You can ExDoc via the command line as follows:
 
@@ -107,9 +109,15 @@ For example, here are some acceptable values:
     GITHUB_USER     => elixir-lang
     GITHUB_REPO     => ecto
 
-## Using ExDoc with Erlang projects
+## Syntax highlighting
 
-From Erlang/OTP 24+, you can use ExDoc to render your Erlang documentation written with EDoc. See [`rebar3_ex_doc`](https://github.com/starbelly/rebar3_ex_doc/) for more information.
+ExDoc uses [the makeup project](https://github.com/elixir-makeup/makeup) for syntax highlighting. By default, it includes highlighters for Erlang and Elixir. To highlight other languages, simply add the equivalent `makeup_LANGUAGE` package to your `mix.exs`/`rebar.config`. For example, for HTML support, you could add:
+
+```elixir
+    {:makeup_html, ">= 0.0.0", only: :dev, runtime: false}
+```
+
+You can find all support languages [under the Makeup organization on GitHub](https://github.com/elixir-makeup).
 
 ## Metadata
 
@@ -148,16 +156,11 @@ ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.fu
 
 You can also use a custom text, e.g.: `` [custom text](`MyModule.function/1`) ``. This also allows to refer to OTP modules, e.g.: `` [`:array`](`:array`) ``.
 
-Link to extra pages like this: `` [Up and running](Up and running.md) `` (skipping the directory
-the page is in), the final link will be automatically converted to `up-and-running.html`.
+Link to extra pages like this: `` [Up and running](Up and running.md) `` (skipping the directory the page is in), the final link will be automatically converted to `up-and-running.html`.
 
 ## Admonition blocks
 
-You may want to draw attention to certain statements by taking them out of the
-content's flow and labeling them with a priority. These are called admonitions,
-sometimes are also known as asides or callouts. An admonition block is rendered
-based on the assigned label or class. `ex_doc` supports the following tags:
-`warning`, `error`, `info`, `tip`, and `neutral` over header levels `h3` and `h4`.
+You may want to draw attention to certain statements by taking them out of the content's flow and labeling them with a priority. These are called admonitions, sometimes are also known as asides or callouts. An admonition block is rendered based on the assigned label or class. `ex_doc` supports the following tags: `warning`, `error`, `info`, `tip`, and `neutral` over header levels `h3` and `h4`.
 
 The syntax is as follows:
 
