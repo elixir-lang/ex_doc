@@ -17,7 +17,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   defp before_closing_head_tag(:html), do: @before_closing_head_tag_content_html
   defp before_closing_body_tag(:html), do: @before_closing_body_tag_content_html
 
-  defp doc_config(tmp_dir) when is_binary(tmp_dir) do
+  defp doc_config(%{tmp_dir: tmp_dir} = _context) do
     [
       apps: [:elixir],
       project: "Elixir",
@@ -32,8 +32,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     ]
   end
 
-  defp doc_config(tmp_dir, config) when is_binary(tmp_dir) and is_list(config) do
-    Keyword.merge(doc_config(tmp_dir), config)
+  defp doc_config(context, config) when is_map(context) and is_list(config) do
+    Keyword.merge(doc_config(context), config)
   end
 
   defp generate_docs(config) do
@@ -41,17 +41,17 @@ defmodule ExDoc.Formatter.HTMLTest do
     ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
-  test "normalizes options", %{tmp_dir: tmp_dir} do
+  test "normalizes options", %{tmp_dir: tmp_dir} = context do
     # 1. Check for output dir having trailing "/" stripped
     # 2. Check for default [main: "api-reference"]
-    generate_docs(doc_config(tmp_dir, output: tmp_dir <> "/html//", main: nil))
+    generate_docs(doc_config(context, output: tmp_dir <> "/html//", main: nil))
 
     content = File.read!(tmp_dir <> "/html/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
     assert File.regular?(tmp_dir <> "/html/api-reference.html")
 
     # 3. main as index is not allowed
-    config = doc_config(tmp_dir, main: "index")
+    config = doc_config(context, main: "index")
 
     assert_raise ArgumentError,
                  ~S("main" cannot be set to "index", otherwise it will recursively link to itself),
@@ -80,10 +80,11 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
   end
 
-  test "warns when generating an index.html file with an invalid redirect", %{tmp_dir: tmp_dir} do
+  test "warns when generating an index.html file with an invalid redirect",
+       %{tmp_dir: tmp_dir} = context do
     output =
       capture_io(:stderr, fn ->
-        generate_docs(doc_config(tmp_dir, main: "Randomerror"))
+        generate_docs(doc_config(context, main: "Randomerror"))
       end)
 
     assert output == "warning: index.html redirects to Randomerror.html, which does not exist\n"
@@ -91,10 +92,10 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?(tmp_dir <> "/html/RandomError.html")
   end
 
-  test "warns on undefined functions", %{tmp_dir: tmp_dir} do
+  test "warns on undefined functions", context do
     output =
       capture_io(:stderr, fn ->
-        generate_docs(doc_config(tmp_dir, skip_undefined_reference_warnings_on: []))
+        generate_docs(doc_config(context, skip_undefined_reference_warnings_on: []))
       end)
 
     assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:2: Warnings"
@@ -103,19 +104,19 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:8: t:Warnings.t/0"
   end
 
-  test "warns on undefined functions in file", %{tmp_dir: tmp_dir} do
+  test "warns on undefined functions in file", context do
     output =
       capture_io(:stderr, fn ->
         generate_docs(
-          doc_config(tmp_dir, skip_undefined_reference_warnings_on: ["test/fixtures/warnings.ex"])
+          doc_config(context, skip_undefined_reference_warnings_on: ["test/fixtures/warnings.ex"])
         )
       end)
 
     assert output == ""
   end
 
-  test "generates headers for index.html and module pages", %{tmp_dir: tmp_dir} do
-    generate_docs(doc_config(tmp_dir, main: "RandomError"))
+  test "generates headers for index.html and module pages", %{tmp_dir: tmp_dir} = context do
+    generate_docs(doc_config(context, main: "RandomError"))
     content_index = File.read!(tmp_dir <> "/html/index.html")
     content_module = File.read!(tmp_dir <> "/html/RandomError.html")
 
@@ -153,15 +154,16 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute content_module =~ re[:index][:refresh]
   end
 
-  test "allows to set the authors of the document", %{tmp_dir: tmp_dir} do
-    generate_docs(doc_config(tmp_dir, authors: ["John Doe", "Jane Doe"]))
+  test "allows to set the authors of the document", %{tmp_dir: tmp_dir} = context do
+    generate_docs(doc_config(context, authors: ["John Doe", "Jane Doe"]))
     content_index = File.read!(tmp_dir <> "/html/api-reference.html")
 
     assert content_index =~ ~r{<meta name="author" content="John Doe, Jane Doe">}
   end
 
-  test "generates in default directory with redirect index.html file", %{tmp_dir: tmp_dir} do
-    generate_docs(doc_config(tmp_dir))
+  test "generates in default directory with redirect index.html file",
+       %{tmp_dir: tmp_dir} = context do
+    generate_docs(doc_config(context))
 
     assert File.regular?(tmp_dir <> "/html/CompiledWithDocs.html")
     assert File.regular?(tmp_dir <> "/html/CompiledWithDocs.Nested.html")
@@ -173,8 +175,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
   end
 
-  test "generates all listing files", %{tmp_dir: tmp_dir} do
-    generate_docs(doc_config(tmp_dir))
+  test "generates all listing files", %{tmp_dir: tmp_dir} = context do
+    generate_docs(doc_config(context))
 
     content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
     assert content =~ ~r{"id":"CompiledWithDocs",.*"title":"CompiledWithDocs"}ms
@@ -188,8 +190,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{"id":"Mix\.Tasks\.TaskWithDocs",.*"title":"mix task_with_docs"}ms
   end
 
-  test "generates the api reference file", %{tmp_dir: tmp_dir} do
-    generate_docs(doc_config(tmp_dir))
+  test "generates the api reference file", %{tmp_dir: tmp_dir} = context do
+    generate_docs(doc_config(context))
 
     content = File.read!(tmp_dir <> "/html/api-reference.html")
     assert content =~ ~r{<a href="CompiledWithDocs.html" translate="no">CompiledWithDocs</a>}
@@ -202,8 +204,8 @@ defmodule ExDoc.Formatter.HTMLTest do
              ~r{<a href="Mix.Tasks.TaskWithDocs.html" translate="no">mix task_with_docs</a>}
   end
 
-  test "groups modules by nesting", %{tmp_dir: tmp_dir} do
-    doc_config(tmp_dir)
+  test "groups modules by nesting", %{tmp_dir: tmp_dir} = context do
+    doc_config(context)
     |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix.B, Common.Nesting.Prefix.B.B])
     |> generate_docs()
 
@@ -217,7 +219,7 @@ defmodule ExDoc.Formatter.HTMLTest do
              Enum.find(modules, fn %{"id" => id} -> id == "Common.Nesting.Prefix.B.B.A" end)
   end
 
-  test "groups modules by nesting respecting groups", %{tmp_dir: tmp_dir} do
+  test "groups modules by nesting respecting groups", %{tmp_dir: tmp_dir} = context do
     groups = [
       Group1: [
         Common.Nesting.Prefix.B.A,
@@ -229,7 +231,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       ]
     ]
 
-    doc_config(tmp_dir)
+    doc_config(context)
     |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix.B, Common.Nesting.Prefix.B.B])
     |> Keyword.put(:groups_for_modules, groups)
     |> generate_docs()
@@ -242,15 +244,15 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   describe "generates logo" do
-    test "overriding previous entries", %{tmp_dir: tmp_dir} do
+    test "overriding previous entries", %{tmp_dir: tmp_dir} = context do
       File.mkdir_p!(tmp_dir <> "/html/assets")
       File.touch!(tmp_dir <> "/html/assets/logo.png")
-      generate_docs(doc_config(tmp_dir, logo: "test/fixtures/elixir.png"))
+      generate_docs(doc_config(context, logo: "test/fixtures/elixir.png"))
       assert File.read!(tmp_dir <> "/html/assets/logo.png") != ""
     end
 
-    test "fails when logo is not an allowed format", %{tmp_dir: tmp_dir} do
-      config = doc_config(tmp_dir, logo: "README.md")
+    test "fails when logo is not an allowed format", context do
+      config = doc_config(context, logo: "README.md")
 
       assert_raise ArgumentError,
                    "image format not recognized, allowed formats are: .jpg, .png",
@@ -259,9 +261,9 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   describe "canonical URL" do
-    test "is included when canonical options is specified", %{tmp_dir: tmp_dir} do
+    test "is included when canonical options is specified", %{tmp_dir: tmp_dir} = context do
       config =
-        doc_config(tmp_dir,
+        doc_config(context,
           extras: ["test/fixtures/README.md"],
           canonical: "https://hexdocs.pm/elixir/"
         )
@@ -274,8 +276,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r{<link rel="canonical" href="https://hexdocs.pm/elixir/}
     end
 
-    test "is not included when canonical is nil", %{tmp_dir: tmp_dir} do
-      config = doc_config(tmp_dir, canonical: nil)
+    test "is not included when canonical is nil", %{tmp_dir: tmp_dir} = context do
+      config = doc_config(context, canonical: nil)
       generate_docs(config)
       content = File.read!(tmp_dir <> "/html/api-reference.html")
       refute content =~ ~r{<link rel="canonical" href="}
@@ -291,8 +293,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       "test/fixtures/LivebookFile.livemd"
     ]
 
-    test "includes source `.livemd` files", %{tmp_dir: tmp_dir} do
-      generate_docs(doc_config(tmp_dir, extras: @extras))
+    test "includes source `.livemd` files", %{tmp_dir: tmp_dir} = context do
+      generate_docs(doc_config(context, extras: @extras))
 
       refute File.exists?(tmp_dir <> "/html/LICENSE")
       refute File.exists?(tmp_dir <> "/html/license")
@@ -307,8 +309,8 @@ defmodule ExDoc.Formatter.HTMLTest do
                File.read!(tmp_dir <> "/html/livebookfile.livemd")
     end
 
-    test "alongside other content", %{tmp_dir: tmp_dir} do
-      config = doc_config(tmp_dir, main: "readme", extras: @extras)
+    test "alongside other content", %{tmp_dir: tmp_dir} = context do
+      config = doc_config(context, main: "readme", extras: @extras)
       generate_docs(config)
 
       content = File.read!(tmp_dir <> "/html/index.html")
@@ -384,9 +386,9 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~s{<img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />}
     end
 
-    test "with absolute and dot-relative paths for extra", %{tmp_dir: tmp_dir} do
+    test "with absolute and dot-relative paths for extra", %{tmp_dir: tmp_dir} = context do
       config =
-        doc_config(tmp_dir,
+        doc_config(context,
           extras: ["./test/fixtures/README.md", Path.expand("test/fixtures/LivebookFile.livemd")]
         )
 
@@ -403,8 +405,8 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~s{<a href="https://github.com/elixir-lang/elixir/blob/main/test/fixtures/LivebookFile.livemd#L1" title="View Source"}
     end
 
-    test "without any other content", %{tmp_dir: tmp_dir} do
-      generate_docs(doc_config(tmp_dir, source_beam: "unknown", extras: @extras))
+    test "without any other content", %{tmp_dir: tmp_dir} = context do
+      generate_docs(doc_config(context, source_beam: "unknown", extras: @extras))
 
       content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
       assert content =~ ~s("modules":[])
@@ -416,9 +418,10 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~s({"group":"","headers":[{"anchor":"heading-without-content","id":"Heading without content"},{"anchor":"header-sample","id":"Header sample"},{"anchor":"more-than","id":"more &gt; than"}],"id":"readme","title":"README"})
     end
 
-    test "containing settext headers while discarding links on header", %{tmp_dir: tmp_dir} do
+    test "containing settext headers while discarding links on header",
+         %{tmp_dir: tmp_dir} = context do
       generate_docs(
-        doc_config(tmp_dir,
+        doc_config(context,
           source_beam: "unknown",
           extras: ["test/fixtures/ExtraPageWithSettextHeader.md"]
         )
@@ -434,9 +437,9 @@ defmodule ExDoc.Formatter.HTMLTest do
                  ~s(id":"extrapagewithsettextheader","title":"Extra Page Title"}])
     end
 
-    test "with custom names", %{tmp_dir: tmp_dir} do
+    test "with custom names", %{tmp_dir: tmp_dir} = context do
       generate_docs(
-        doc_config(tmp_dir,
+        doc_config(context,
           extras: [
             "test/fixtures/PlainTextFiles.md",
             "test/fixtures/LICENSE": [filename: "linked-license"],
@@ -462,9 +465,9 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r{"id":"linked-license","title":"LICENSE"}
     end
 
-    test "with custom title", %{tmp_dir: tmp_dir} do
+    test "with custom title", %{tmp_dir: tmp_dir} = context do
       generate_docs(
-        doc_config(tmp_dir, extras: ["test/fixtures/README.md": [title: "Getting Started"]])
+        doc_config(context, extras: ["test/fixtures/README.md": [title: "Getting Started"]])
       )
 
       content = File.read!(tmp_dir <> "/html/readme.html")
@@ -475,28 +478,28 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~r{"group":"","headers":\[[^\]]+\],"id":"readme","title":"Getting Started"}
     end
 
-    test "with custom groups", %{tmp_dir: tmp_dir} do
+    test "with custom groups", %{tmp_dir: tmp_dir} = context do
       extra_config = [
         extras: ["test/fixtures/README.md"],
         groups_for_extras: [Intro: ~r/fixtures\/READ.?/]
       ]
 
-      generate_docs(doc_config(tmp_dir, extra_config))
+      generate_docs(doc_config(context, extra_config))
       content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
       assert content =~ ~r{"group":"Intro","headers":\[[^\]]+\],"id":"readme","title":"README"}
     end
 
-    test "with auto-extracted titles", %{tmp_dir: tmp_dir} do
-      generate_docs(doc_config(tmp_dir, extras: ["test/fixtures/ExtraPage.md"]))
+    test "with auto-extracted titles", %{tmp_dir: tmp_dir} = context do
+      generate_docs(doc_config(context, extras: ["test/fixtures/ExtraPage.md"]))
       content = File.read!(tmp_dir <> "/html/extrapage.html")
       assert content =~ ~r{<title>Extra Page Title — Elixir v1.0.1</title>}
       content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
       assert content =~ ~r{"id":"extrapage","title":"Extra Page Title"}
     end
 
-    test "without api-reference", %{tmp_dir: tmp_dir} do
+    test "without api-reference", %{tmp_dir: tmp_dir} = context do
       generate_docs(
-        doc_config(tmp_dir,
+        doc_config(context,
           api_reference: false,
           extras: ["test/fixtures/README.md"],
           main: "readme"
@@ -508,9 +511,10 @@ defmodule ExDoc.Formatter.HTMLTest do
       refute content =~ ~r{"id":"api-reference","title":"API Reference"}
     end
 
-    test "pages include links to the previous/next page if applicable", %{tmp_dir: tmp_dir} do
+    test "pages include links to the previous/next page if applicable",
+         %{tmp_dir: tmp_dir} = context do
       generate_docs(
-        doc_config(tmp_dir,
+        doc_config(context,
           extras: [
             "test/fixtures/LICENSE",
             "test/fixtures/README.md"
@@ -543,11 +547,12 @@ defmodule ExDoc.Formatter.HTMLTest do
       refute content_last =~ ~r{Next Page}
     end
 
-    test "before_closing_*_tags required by the user are placed in the right place", %{
-      tmp_dir: tmp_dir
-    } do
+    test "before_closing_*_tags required by the user are placed in the right place",
+         %{
+           tmp_dir: tmp_dir
+         } = context do
       generate_docs(
-        doc_config(tmp_dir,
+        doc_config(context,
           before_closing_head_tag: &before_closing_head_tag/1,
           before_closing_body_tag: &before_closing_body_tag/1,
           extras: ["test/fixtures/README.md"]
@@ -565,9 +570,9 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   describe ".build" do
-    test "stores generated content", %{tmp_dir: tmp_dir} do
+    test "stores generated content", %{tmp_dir: tmp_dir} = context do
       config =
-        doc_config(tmp_dir, extras: ["test/fixtures/README.md"], logo: "test/fixtures/elixir.png")
+        doc_config(context, extras: ["test/fixtures/README.md"], logo: "test/fixtures/elixir.png")
 
       generate_docs(config)
 
@@ -594,9 +599,9 @@ defmodule ExDoc.Formatter.HTMLTest do
       end
     end
 
-    test "does not delete files not listed in .build", %{tmp_dir: tmp_dir} do
+    test "does not delete files not listed in .build", %{tmp_dir: tmp_dir} = context do
       keep = tmp_dir <> "/html/keep"
-      config = doc_config(tmp_dir)
+      config = doc_config(context)
       generate_docs(config)
       File.touch!(keep)
       generate_docs(config)
@@ -606,12 +611,12 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
   end
 
-  test "assets required by the user end up in the right place", %{tmp_dir: tmp_dir} do
+  test "assets required by the user end up in the right place", %{tmp_dir: tmp_dir} = context do
     File.mkdir_p!("test/tmp/html_assets/hello")
     File.touch!("test/tmp/html_assets/hello/world")
 
     generate_docs(
-      doc_config(tmp_dir, assets: "test/tmp/html_assets", logo: "test/fixtures/elixir.png")
+      doc_config(context, assets: "test/tmp/html_assets", logo: "test/fixtures/elixir.png")
     )
 
     assert File.regular?(tmp_dir <> "/html/assets/logo.png")
