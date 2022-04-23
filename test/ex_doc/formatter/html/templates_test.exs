@@ -246,6 +246,21 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       refute content =~ ~r{<li><a id="tasks-list-link" href="#full-list">Mix Tasks</a></li>}
     end
 
+    test "display built with footer by proglang option" do
+      content = Templates.footer_template(doc_config(proglang: :erlang), nil)
+
+      assert content =~
+               ~r{<a href="https://erlang.org" title="Erlang" target="_blank" translate="no">Erlang programming language</a>}
+
+      content = Templates.footer_template(doc_config(proglang: :elixir), nil)
+
+      assert content =~
+               ~r{<a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>}
+
+      assert Templates.footer_template(doc_config(proglang: :elixir), nil) ==
+               Templates.footer_template(doc_config(), nil)
+    end
+
     test "outputs listing for the given nodes" do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       nodes = ExDoc.Retriever.docs_from_modules(names, doc_config())
