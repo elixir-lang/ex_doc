@@ -25,6 +25,7 @@ ex_doc-*.tar
 node_modules/
 /test/fixtures/umbrella/_build/
 /test/tmp/
+/tmp/
 /npm-debug.log
 
 # Ignore artifacts from non-production builds
