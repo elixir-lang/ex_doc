@@ -160,6 +160,9 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc("Kernel.SpecialForms.%{}/1") ==
                ~m"[`Kernel.SpecialForms.%{}/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%25%7B%7D/1)"
 
+      assert autolink_doc("Kernel.SpecialForms.%/2") ==
+               ~m"[`Kernel.SpecialForms.%/2`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%25/2)"
+
       assert autolink_doc("Kernel.SpecialForms.{}/1") ==
                ~m"[`Kernel.SpecialForms.{}/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%7B%7D/1)"
 
