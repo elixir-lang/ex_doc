@@ -84,7 +84,7 @@ function indexStorageKey () {
 function createIndex () {
   return lunr(function () {
     this.ref('ref')
-    this.field('title', { boost: 3, extractor: titleExtractor })
+    this.field('title', { boost: 3 })
     this.field('doc')
     this.metadataWhitelist = ['position']
     this.pipeline.remove(lunr.stopWordFilter)
@@ -94,21 +94,6 @@ function createIndex () {
       this.add(searchNode)
     })
   })
-}
-
-function titleExtractor (document) {
-  const { title, type } = document
-
-  if (type === 'function' || type === 'callback' || type === 'type') {
-    const modFun = title.replace(/\/\d+$/, '')
-    const modOrFun = modFun.replace(/\./g, ' ')
-    const parts = title.split('.')
-    const funArity = parts[parts.length - 1]
-
-    return `${title} ${modFun} ${modOrFun} ${funArity}`
-  }
-
-  return title
 }
 
 function elixirTokenSplitter (builder) {
