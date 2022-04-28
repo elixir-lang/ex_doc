@@ -2,7 +2,7 @@ defmodule ExDoc.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-lang/ex_doc"
-  @version "0.28.3"
+  @version "0.28.4"
 
   def project do
     [

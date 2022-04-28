@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.28.4 (2022-04-28)
+
+  * Enhancements
+    * Add a toast when changing theme via keyboard
+    * Automatically convert `.livemd` links to `.html` ones
+    * Show programming language in HTML footer
+
+  * Bug fixes
+    * Properly escape `%/2` special form
+    * Improve ranking of exact-matching modules in search
+
 ## v0.28.3 (2022-03-23)
 
   * Enhacements
