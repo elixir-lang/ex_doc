@@ -87,7 +87,7 @@ defmodule ExDoc.Formatter.HTMLTest do
         generate_docs(doc_config(context, main: "Randomerror"))
       end)
 
-    assert output == "warning: index.html redirects to Randomerror.html, which does not exist\n"
+    assert output =~ "warning: index.html redirects to Randomerror.html, which does not exist\n"
     assert File.regular?(tmp_dir <> "/html/index.html")
     assert File.regular?(tmp_dir <> "/html/RandomError.html")
   end
@@ -102,17 +102,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:18: Warnings.foo/0"
     assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:13: c:Warnings.handle_foo/0"
     assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:8: t:Warnings.t/0"
-  end
-
-  test "warns on undefined functions in file", context do
-    output =
-      capture_io(:stderr, fn ->
-        generate_docs(
-          doc_config(context, skip_undefined_reference_warnings_on: ["test/fixtures/warnings.ex"])
-        )
-      end)
-
-    assert output == ""
   end
 
   test "generates headers for index.html and module pages", %{tmp_dir: tmp_dir} = context do
