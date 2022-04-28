@@ -366,7 +366,7 @@ defmodule ExDoc.Formatter.HTML do
 
         _ ->
           raise ArgumentError,
-                "file extension not recognized, allowed extension is either .md, .txt or no extension"
+                "file extension not recognized, allowed extension is either .livemd, .md, .txt or no extension"
       end
 
     {title_ast, ast} =

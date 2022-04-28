@@ -218,9 +218,11 @@ defmodule ExDoc.Language.ElixirTest do
     end
 
     test "extras" do
-      opts = [extras: %{"Foo Bar.md" => "foo-bar"}]
+      opts = [extras: %{"Foo Bar.md" => "foo-bar", "Bar Baz.livemd" => "bar-baz"}]
 
       assert autolink_doc(~m"[Foo](Foo Bar.md)", opts) == ~m"[Foo](foo-bar.html)"
+
+      assert autolink_doc(~m"[Bar](Bar Baz.livemd)", opts) == ~m"[Bar](bar-baz.html)"
 
       assert autolink_doc(~m"[Foo](Foo Bar.md)", [ext: ".xhtml"] ++ opts) ==
                ~m"[Foo](foo-bar.xhtml)"

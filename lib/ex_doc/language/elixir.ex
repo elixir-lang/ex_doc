@@ -439,7 +439,7 @@ defmodule ExDoc.Language.Elixir do
   defp build_extra_link(link, config) do
     with %{scheme: nil, host: nil, path: path} = uri <- URI.parse(link),
          true <- is_binary(path) and path != "" and not (path =~ @ref_regex),
-         extension when extension in [".md", ".txt", ""] <- Path.extname(path) do
+         true <- Path.extname(path) in [".livemd", ".md", ".txt", ""] do
       if file = config.extras[Path.basename(path)] do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
         file <> config.ext <> fragment
