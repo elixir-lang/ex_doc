@@ -67,10 +67,10 @@ defmodule ExDoc.Formatter.HTML do
   def render_all(project_nodes, ext, config, opts) do
     base = [
       apps: config.apps,
+      deps: config.deps,
       ext: ext,
       extras: extra_paths(config),
-      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-      deps: config.deps
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
     ]
 
     project_nodes
@@ -79,9 +79,9 @@ defmodule ExDoc.Formatter.HTML do
         autolink_opts =
           [
             current_module: node.module,
-            module_id: node.id,
             file: node.source_path,
-            line: node.doc_line
+            line: node.doc_line,
+            module_id: node.id
           ] ++ base
 
         language = node.language
@@ -306,13 +306,13 @@ defmodule ExDoc.Formatter.HTML do
       ~s{API Reference <small class="app-vsn">#{config.project} v#{config.version}</small>}
 
     %{
-      id: "api-reference",
-      title: "API Reference",
-      group: nil,
-      title_content: title_content,
       content: api_reference,
+      group: nil,
+      id: "api-reference",
       source_path: nil,
-      source_url: nil
+      source_url: nil,
+      title: "API Reference",
+      title_content: title_content
     }
   end
 
@@ -325,10 +325,10 @@ defmodule ExDoc.Formatter.HTML do
 
     autolink_opts = [
       apps: config.apps,
+      deps: config.deps,
       ext: ext,
       extras: extra_paths(config),
-      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-      deps: config.deps
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
     ]
 
     config.extras
@@ -390,9 +390,9 @@ defmodule ExDoc.Formatter.HTML do
     source_url = Utils.source_url_pattern(source_url_pattern, source_path, 1)
 
     %{
-      id: id,
       content: content_html,
       group: group,
+      id: id,
       source_path: source_path,
       source_url: source_url,
       title: title,
