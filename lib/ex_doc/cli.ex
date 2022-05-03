@@ -10,26 +10,26 @@ defmodule ExDoc.CLI do
     {opts, args, _invalid} =
       OptionParser.parse(args,
         aliases: [
-          n: :canonical,
           c: :config,
           f: :formatter,
-          p: :homepage_url,
           l: :logo,
           m: :main,
+          n: :canonical,
           o: :output,
+          p: :homepage_url,
+          q: :quiet,
           u: :source_url,
-          v: :version,
-          q: :quiet
+          v: :version
         ],
         switches: [
-          language: :string,
-          paths: :keep,
-          package: :string,
-          proglang: :string,
-          source_ref: :string,
-          version: :boolean,
           formatter: :keep,
-          quiet: :boolean
+          language: :string,
+          package: :string,
+          paths: :keep,
+          proglang: :string,
+          quiet: :boolean,
+          source_ref: :string,
+          version: :boolean
         ]
       )
 
@@ -167,21 +167,21 @@ defmodule ExDoc.CLI do
                           See "Custom config" section below for more information.
       -f, --formatter     Docs formatter to use (html or epub), default: html and epub
       -p, --homepage-url  URL to link to for the site name
-          --paths         Prepends the given path to Erlang code path. The path might contain a glob
-                          pattern but in that case, remember to quote it: --paths "_build/dev/lib/*/ebin".
-                          This option can be given multiple times
           --language      Identify the primary language of the documents, its value must be
                           a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)
                           The image size will be 64x64 and copied to the assets directory
       -m, --main          The entry-point page in docs, default: "api-reference"
+      -o, --output        Path to output docs, default: "doc"
           --package       Hex package name
+          --paths         Prepends the given path to Erlang code path. The path might contain a glob
+                          pattern but in that case, remember to quote it: --paths "_build/dev/lib/*/ebin".
+                          This option can be given multiple times
           --proglang      The project's programming language, default: "elixir"
+      -q, --quiet         Only output warnings and errors
           --source-ref    Branch/commit/tag used for source link inference, default: "master"
       -u, --source-url    URL to the source code
-      -o, --output        Path to output docs, default: "doc"
       -v, --version       Print ExDoc version
-      -q, --quiet         Only output warnings and errors
 
     ## Custom config
 
