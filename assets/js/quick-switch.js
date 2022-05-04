@@ -23,6 +23,8 @@ const STATIC_SEARCH_RESULTS = [
   'mix'
 ].map(name => ({ name }))
 
+const MIN_SEARCH_LENGTH = 2
+
 const state = {
   autocompleteResults: [],
   selectedIdx: null
@@ -61,7 +63,7 @@ function handleKeyDown (event) {
 function handleInput (event) {
   const packageSlug = event.target.value
 
-  if (packageSlug.length < 3) {
+  if (packageSlug.length < MIN_SEARCH_LENGTH) {
     const resultsContainer = qs(QUICK_SWITCH_RESULTS_SELECTOR)
     resultsContainer.innerHTML = ''
   } else {
@@ -129,7 +131,7 @@ function queryForAutocomplete (packageSlug) {
         state.selectedIdx = null
         // Only render results if the search string is still long enough
         const currentTerm = qs(QUICK_SWITCH_INPUT_SELECTOR).value
-        if (currentTerm.length >= 3) {
+        if (currentTerm.length >= MIN_SEARCH_LENGTH) {
           renderResults({ results: state.autocompleteResults })
         }
       }
