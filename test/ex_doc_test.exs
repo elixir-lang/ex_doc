@@ -1,6 +1,8 @@
 defmodule ExDocTest do
   use ExUnit.Case, async: true
 
+  @moduletag :tmp_dir
+
   # Simple retriever that returns whatever is passed into it
   defmodule IdentityRetriever do
     def docs_from_dir(source, config) do
@@ -15,7 +17,7 @@ defmodule ExDocTest do
     end
   end
 
-  test "uses custom markdown processor" do
+  test "uses custom markdown processor", %{tmp_dir: tmp_dir} do
     project = "Elixir"
     version = "1"
 
@@ -23,7 +25,7 @@ defmodule ExDocTest do
       apps: [:test_app],
       formatter: IdentityFormatter,
       markdown_processor: Sample,
-      output: "test/tmp/ex_doc",
+      output: tmp_dir <> "/ex_doc",
       retriever: IdentityRetriever,
       source_beam: "beam_dir"
     ]
@@ -34,7 +36,7 @@ defmodule ExDocTest do
     Application.delete_env(:ex_doc, :markdown_processor)
   end
 
-  test "uses custom markdown processor with custom options" do
+  test "uses custom markdown processor with custom options", %{tmp_dir: tmp_dir} do
     project = "Elixir"
     version = "1"
 
@@ -42,7 +44,7 @@ defmodule ExDocTest do
       apps: [:test_app],
       formatter: IdentityFormatter,
       markdown_processor: {Sample, [foo: :bar]},
-      output: "test/tmp/ex_doc",
+      output: tmp_dir <> "/ex_doc",
       retriever: IdentityRetriever,
       source_beam: "beam_dir"
     ]
