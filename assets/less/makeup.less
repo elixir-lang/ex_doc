@@ -93,13 +93,14 @@ code.makeup {
 }
 
 @night-comment-color: #969386;
+@night-bright: #DCE1E6;
 
 /* Originally taken from: https://tmbb.github.io/makeup_demo/elixir.html#monokai */
 .dark .makeup {
-  color: #f8f8f2;
+  color: @night-bright;
 
   .hll {background-color: #49483e}
-  .bp {color: #f8f8f2; } /* :name_builtin_pseudo */
+  .bp {color: @night-bright; } /* :name_builtin_pseudo */
   .c {color: @night-comment-color; } /* :comment */
   .c1 {color: @night-comment-color; } /* :comment_single */
   .ch {color: @night-comment-color; } /* :comment_hashbang */
@@ -133,24 +134,24 @@ code.makeup {
   .mh {color: #ae81ff; } /* :number_hex */
   .mi {color: #ae81ff; } /* :number_integer */
   .mo {color: #ae81ff; } /* :number_oct */
-  .n {color: #f8f8f2; } /* :name */
+  .n {color: @night-bright; } /* :name */
   .na {color: #a6e22e; } /* :name_attribute */
-  .nb {color: #f8f8f2; } /* :name_builtin */
+  .nb {color: @night-bright; } /* :name_builtin */
   .nc {color: #a6e22e; } /* :name_class */
   .nd {color: #a6e22e; } /* :name_decorator */
   .ne {color: #a6e22e; } /* :name_exception */
   .nf {color: #a6e22e; } /* :name_function */
-  .ni {color: #f8f8f2; } /* :name_entity */
-  .nl {color: #f8f8f2; } /* :name_label */
-  .nn {color: #f8f8f2; } /* :name_namespace */
+  .ni {color: @night-bright; } /* :name_entity */
+  .nl {color: @night-bright; } /* :name_label */
+  .nn {color: @night-bright; } /* :name_namespace */
   .no {color: #66d9ef; } /* :name_constant */
   .nt {color: #ff5385; } /* :name_tag */
-  .nv {color: #f8f8f2; } /* :name_variable */
+  .nv {color: @night-bright; } /* :name_variable */
   .nx {color: #a6e22e; } /* :name_other */
   .o {color: #ff5385; } /* :operator */
   .ow {color: #ff5385; } /* :operator_word */
-  .p {color: #f8f8f2; } /* :punctuation */
-  .py {color: #f8f8f2; } /* :name_property */
+  .p {color: @night-bright; } /* :punctuation */
+  .py {color: @night-bright; } /* :name_property */
   .s {color: #e6db74; } /* :string */
   .s1 {color: #e6db74; } /* :string_single */
   .s2 {color: #e6db74; } /* :string_double */
@@ -165,8 +166,8 @@ code.makeup {
   .ss {color: #e6db74; } /* :string_symbol */
   .sx {color: #e6db74; } /* :string_other */
   .sx {color: #e6db74; } /* :string_sigil */
-  .vc {color: #f8f8f2; } /* :name_variable_class */
-  .vg {color: #f8f8f2; } /* :name_variable_global */
-  .vi {color: #f8f8f2; } /* :name_variable_instance */
-  .vm {color: #f8f8f2; } /* :name_variable_magic */
+  .vc {color: @night-bright; } /* :name_variable_class */
+  .vg {color: @night-bright; } /* :name_variable_global */
+  .vi {color: @night-bright; } /* :name_variable_instance */
+  .vm {color: @night-bright; } /* :name_variable_magic */
 }
