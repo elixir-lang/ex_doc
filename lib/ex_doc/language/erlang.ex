@@ -460,7 +460,7 @@ defmodule ExDoc.Language.Erlang do
               arity = length(args)
 
               cond do
-                name in [:"::", :when, :%{}, :{}, :|, :->, :record] ->
+                name in [:"::", :when, :%{}, :{}, :|, :->, :record] and acc != [] ->
                   {ast, acc}
 
                 # %{required(...) => ..., optional(...) => ...}

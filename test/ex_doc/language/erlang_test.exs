@@ -167,6 +167,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|foo() -> <a href="#t:t/0">t</a>().|
     end
 
+    test "spec when fun is called record", c do
+      assert autolink_spec("-spec record(module()) -> [[{module(), atom()}]].", c) ==
+               ~s|record(module()) -> [[{module(), atom()}]].|
+    end
+
     test "callback", c do
       assert autolink_spec("-callback foo() -> t().", c) ==
                ~s|foo() -> <a href="#t:t/0">t</a>().|
