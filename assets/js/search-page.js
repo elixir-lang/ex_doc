@@ -58,6 +58,7 @@ function loadIndex () {
   try {
     const serializedIndex = sessionStorage.getItem(indexStorageKey())
     if (serializedIndex) {
+      registerElixirTokenFunction()
       return lunr.Index.load(JSON.parse(serializedIndex))
     } else {
       return null
@@ -97,24 +98,28 @@ function createIndex () {
 }
 
 function elixirTokenSplitter (builder) {
-  function elixirTokenFunction (token) {
-    const tokens = token
-      .toString()
-      .split(/\.|\/|_/)
-      .map(part => {
-        return token.clone().update(() => part)
-      })
-
-    if (tokens.length > 1) {
-      return [...tokens, token]
-    }
-
-    return tokens
-  }
-
-  lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
+  registerElixirTokenFunction()
   builder.pipeline.before(lunr.stemmer, elixirTokenFunction)
   builder.searchPipeline.before(lunr.stemmer, elixirTokenFunction)
+}
+
+function elixirTokenFunction (token) {
+  const tokens = token
+    .toString()
+    .split(/\.|\/|_/)
+    .map(part => {
+      return token.clone().update(() => part)
+    })
+
+  if (tokens.length > 1) {
+    return [...tokens, token]
+  }
+
+  return tokens
+}
+
+function registerElixirTokenFunction () {
+  return lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
 }
 
 function searchResultsToDecoratedSearchNodes (results) {
