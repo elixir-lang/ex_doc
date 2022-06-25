@@ -176,9 +176,9 @@ The result for the previous syntax is as follows:
 
 For example, if you change the class name to `neutral`, you get:
 
-> #### Error {: .neutral}
+> #### Neutral {: .neutral}
 >
-> This syntax will render an error block
+> This syntax will render an neutral block
 
 ## Extensions
 
