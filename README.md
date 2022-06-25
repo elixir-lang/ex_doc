@@ -174,7 +174,7 @@ The result for the previous syntax is as follows:
 >
 > This syntax will render an error block
 
-For example, if you change the class name to `neutral`, you get:
+For example, if you change the class name to `neutral`, you get the same admonition block in neutral style:
 
 > #### Error {: .neutral}
 >
