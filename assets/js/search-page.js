@@ -59,6 +59,7 @@ function loadIndex () {
     const serializedIndex = sessionStorage.getItem(indexStorageKey())
     if (serializedIndex) {
       registerElixirTokenFunction()
+      registerElixirTrimmerFunction()
       return lunr.Index.load(JSON.parse(serializedIndex))
     } else {
       return null
@@ -90,6 +91,8 @@ function createIndex () {
     this.metadataWhitelist = ['position']
     this.pipeline.remove(lunr.stopWordFilter)
     this.use(elixirTokenSplitter)
+    this.pipeline.remove(lunr.trimmer)
+    this.use(elixirTrimmer)
 
     searchNodes.forEach(searchNode => {
       this.add(searchNode)
@@ -120,6 +123,22 @@ function elixirTokenFunction (token) {
 
 function registerElixirTokenFunction () {
   return lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
+}
+
+function elixirTrimmer (builder) {
+  registerElixirTrimmerFunction()
+  builder.pipeline.after(lunr.stemmer, elixirTrimmerFunction)
+  builder.searchPipeline.after(lunr.stemmer, elixirTrimmerFunction)
+}
+
+function elixirTrimmerFunction (token) {
+  return token.update(function (s) {
+    return s.replace(/^@?\W+/, '').replace(/\W+$/, '')
+  })
+}
+
+function registerElixirTrimmerFunction () {
+  return lunr.Pipeline.registerFunction(elixirTrimmerFunction, 'elixirTrimmer')
 }
 
 function searchResultsToDecoratedSearchNodes (results) {
