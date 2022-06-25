@@ -176,7 +176,7 @@ The result for the previous syntax is as follows:
 
 For example, if you change the class name to `neutral`, you get the same admonition block in neutral style:
 
-> #### Error {: .error}
+> #### Error {: .neutral}
 >
 > This syntax will render an error block
 
