@@ -6,7 +6,7 @@
     <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
   </button>
 
-  <form class="sidebar-search" action="search.html">
+  <div class="sidebar-search">
     <button type="submit" class="search-button" aria-label="Submit Search">
       <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
     </button>
@@ -17,10 +17,20 @@
       <p class="sr-only">Search</p>
       <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" />
     </label>
-  </form>
+  </div>
 
-  <div class="autocomplete">
-    <div class="autocomplete-results">
+  <div class="quick-search">
+    <div class="quick-search-container">
+      <form action="search.html">
+        <label class="quick-search-label">
+          <input name="q" type="text" class="quick-search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" />
+        </label>
+      </form>
+
+      <div class="autocomplete">
+        <div class="autocomplete-results">
+        </div>
+      </div>
     </div>
   </div>
 

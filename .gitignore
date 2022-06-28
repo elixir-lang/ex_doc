@@ -27,6 +27,8 @@ node_modules/
 /test/tmp/
 /tmp/
 /npm-debug.log
+.idea/
+*.iml
 
 # Ignore artifacts from non-production builds
 formatters/epub/dist/epub.js

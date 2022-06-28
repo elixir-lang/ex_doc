@@ -3,7 +3,7 @@
 import lunr from 'lunr'
 import resultsTemplate from './handlebars/templates/search-results.handlebars'
 import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
-import { setSearchInputValue } from './sidebar/sidebar-search'
+import { setSearchInputValue } from './sidebar/quick-search'
 
 const EXCERPT_RADIUS = 80
 

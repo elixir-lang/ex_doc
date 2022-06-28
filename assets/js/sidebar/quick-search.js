@@ -9,7 +9,7 @@ import {
 } from '../autocomplete/autocomplete-list'
 import { qs } from '../helpers'
 
-const SEARCH_INPUT_SELECTOR = 'form.sidebar-search input'
+const SEARCH_INPUT_SELECTOR = '.quick-search input'
 const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.sidebar-search .search-close-button'
 
 /**
