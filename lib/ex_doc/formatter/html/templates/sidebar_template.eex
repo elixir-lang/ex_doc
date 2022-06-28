@@ -14,17 +14,19 @@
   </div>
 
   <div class="quick-search">
-    <div class="quick-search-container">
-      <form action="search.html">
-        <label class="quick-search-label">
-          <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
-          <input name="q" type="text" class="quick-search-input" placeholder="Quick Search..." aria-label="Input your search terms" autocomplete="off" />
-        </label>
-      </form>
+    <div class="quick-search-main">
+      <div class="quick-search-container">
+        <form action="search.html">
+          <label class="quick-search-label">
+            <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
+            <input name="q" type="text" class="quick-search-input" placeholder="Quick Search..." aria-label="Input your search terms" autocomplete="off" />
+          </label>
+        </form>
 
-      <div class="quick-search-results">
-        <div class="autocomplete">
-          <div class="autocomplete-results">
+        <div class="quick-search-results">
+          <div class="autocomplete">
+            <div class="autocomplete-results">
+            </div>
           </div>
         </div>
       </div>
