@@ -9,9 +9,35 @@
   left: 0;
   justify-content: center;
   align-items: center;
+
+  .ri-search-2-line {
+    font-weight: bold;
+    vertical-align: middle;
+  }
 }
 
 .quick-search-container {
   display: inline-block;
   width: 600px;
+  background-color: @bgMediumGray;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.quick-search-results {
+  max-height: 400px;
+  display: flex;
+  overflow-y: auto;
+}
+
+.quick-search-input {
+  border: none;
+  color: @lightestGray;
+  background-color: @bgMediumGray;
+
+  &:focus,
+  &:hover {
+    outline: none;
+  }
 }
