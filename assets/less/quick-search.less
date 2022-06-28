@@ -1,5 +1,5 @@
 .quick-search {
-  display: flex;
+  display: none;
   overflow: visible;
   position: fixed;
   width: 100%;
@@ -9,6 +9,10 @@
   left: 0;
   justify-content: center;
   align-items: center;
+
+  &.shown {
+    display: flex;
+  }
 
   .ri-search-2-line {
     font-weight: bold;

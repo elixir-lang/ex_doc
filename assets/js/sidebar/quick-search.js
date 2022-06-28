@@ -10,7 +10,8 @@ import {
 import { qs } from '../helpers'
 
 const SEARCH_INPUT_SELECTOR = '.quick-search input'
-const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.sidebar-search .search-close-button'
+const SEARCH_BUTTON_SELECTOR = '.search-button'
+const QUICK_SEARCH_MODAL_SELECTOR = '.quick-search'
 
 /**
  * Initializes the sidebar search box.
@@ -30,9 +31,11 @@ export function setSearchInputValue (value) {
 }
 
 /**
- * Focuses the search input.
+ * Open Quick Search modal and focuses the search input.
  */
-export function focusSearchInput () {
+export function openQuickSearchModal () {
+  showQuickSearchModal()
+
   const searchInput = qs(SEARCH_INPUT_SELECTOR)
   searchInput.focus()
 }
@@ -80,10 +83,6 @@ function addEventListeners () {
         }, 1000)
         return null
       }
-
-      if (relatedTarget.matches(SEARCH_CLOSE_BUTTON_SELECTOR)) {
-        clearSearch()
-      }
     }
 
     hideAutocomplete()
@@ -97,6 +96,11 @@ function addEventListeners () {
       clearSearch()
       hideAutocomplete()
     }
+  })
+
+  qs(SEARCH_BUTTON_SELECTOR).addEventListener('click', event => {
+    showQuickSearchModal()
+    searchInput.focus()
   })
 }
 
@@ -134,4 +138,13 @@ function clearSearch () {
 function hideAutocomplete () {
   document.body.classList.remove('search-focused')
   hideAutocompleteList()
+  hideQuickSearchModal()
+}
+
+function showQuickSearchModal () {
+  qs(QUICK_SEARCH_MODAL_SELECTOR).classList.add('shown')
+}
+
+function hideQuickSearchModal () {
+  qs(QUICK_SEARCH_MODAL_SELECTOR).classList.remove('shown')
 }

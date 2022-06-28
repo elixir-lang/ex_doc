@@ -153,68 +153,22 @@
       opacity: 1;
     }
 
-    .search-label {
-      position: relative;
-      width: 100%;
-    }
-
     .search-button {
-      font-size: 14px;
       color: @lightestGray;
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      left: 22px;
-      margin: 0;
-      opacity: 0.5;
-      padding: 3px 1px 3px 0;
-      position: absolute;
-      top: 18px;
-      z-index: 2;
-    }
-
-    .search-close-button {
-      font-size: 16px;
-      color: @lightestGray;
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      right: 18px;
-      margin: 0;
-      opacity: 0.5;
-      padding: 5px 1px 5px 0;
-      position: absolute;
-      transform: scaleY(0);
-      top: 17px;
-      transition: 0.15s transform ease-out;
-      z-index: 2;
-
-      &:hover {
-        opacity: 0.7;
-      }
-
-      &:focus,
-      &:hover {
-        outline: none;
-      }
-    }
-
-    .search-input {
       background-color: @bgMediumGray;
-      border: none;
       border-radius: 4px;
-      color: @lightestGray;
+      border: none;
+      cursor: pointer;
       margin-left: 12px;
-      padding: 8px 6px 8px 38px;
+      text-align: left;
+      padding: 8px 6px 8px 8px;
       width: 276px;
-
-      &:focus,
-      &:hover {
-        outline: none;
-      }
+      z-index: 2;
     }
 
     .ri-search-2-line {
+      padding-right: 10px;
+      font-size: 14px;
       font-weight: bold;
     }
   }
