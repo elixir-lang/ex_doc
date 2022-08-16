@@ -84,7 +84,7 @@ function indexStorageKey () {
   return `index:${getProjectNameAndVersion()}`
 }
 
-export function createIndex () {
+function createIndex () {
   lunr.QueryLexer.termSeparator = /\s+/
   return lunr(function () {
     this.tokenizer.separator = /\s+/
@@ -160,7 +160,6 @@ function hyphenSearchFunction (token) {
   tokens.push(token)
   return tokens
 }
-
 
 function hyphenSearch (builder) {
   registerHyphenSearchFunction ()
