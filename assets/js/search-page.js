@@ -60,6 +60,7 @@ function loadIndex () {
     if (serializedIndex) {
       registerElixirTokenFunction()
       registerElixirTrimmerFunction()
+      registerHyphenSearchFunction()
       return lunr.Index.load(JSON.parse(serializedIndex))
     } else {
       return null
@@ -83,13 +84,16 @@ function indexStorageKey () {
   return `index:${getProjectNameAndVersion()}`
 }
 
-function createIndex () {
+export function createIndex () {
+  lunr.QueryLexer.termSeparator = /\s+/
   return lunr(function () {
+    this.tokenizer.separator = /\s+/
     this.ref('ref')
     this.field('title', { boost: 3 })
     this.field('doc')
     this.metadataWhitelist = ['position']
     this.pipeline.remove(lunr.stopWordFilter)
+    this.use(hyphenSearch)
     this.use(elixirTokenSplitter)
     this.pipeline.remove(lunr.trimmer)
     this.use(elixirTrimmer)
@@ -139,6 +143,33 @@ function elixirTrimmerFunction (token) {
 
 function registerElixirTrimmerFunction () {
   return lunr.Pipeline.registerFunction(elixirTrimmerFunction, 'elixirTrimmer')
+}
+
+function hyphenSearchFunction (token) {
+  const tokenStr = token.toString()
+  if (tokenStr.indexOf('-') < 0) return token
+
+  const tokens = []
+
+  tokens.push(
+    token.clone(function (s) {
+      return s.replace('-', '')
+    })
+  )
+
+  tokens.push(token)
+  return tokens
+}
+
+
+function hyphenSearch (builder) {
+  registerHyphenSearchFunction ()
+  builder.pipeline.before(lunr.stemmer, hyphenSearchFunction)
+  builder.searchPipeline.before(lunr.stemmer, hyphenSearchFunction)
+}
+
+function registerHyphenSearchFunction () {
+  return lunr.Pipeline.registerFunction(hyphenSearchFunction, 'hypenSearch')
 }
 
 function searchResultsToDecoratedSearchNodes (results) {
