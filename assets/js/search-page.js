@@ -46,6 +46,11 @@ function renderResults ({ value, results, errorMessage }) {
 }
 
 function getIndex () {
+  lunr.QueryLexer.termSeparator = /\s+/
+  lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
+  lunr.Pipeline.registerFunction(elixirTrimmerFunction, 'elixirTrimmer')
+  lunr.Pipeline.registerFunction(hyphenSearchFunction, 'hyphenSearch')
+
   const cachedIndex = loadIndex()
   if (cachedIndex) { return cachedIndex }
 
@@ -58,9 +63,6 @@ function loadIndex () {
   try {
     const serializedIndex = sessionStorage.getItem(indexStorageKey())
     if (serializedIndex) {
-      registerElixirTokenFunction()
-      registerElixirTrimmerFunction()
-      registerHyphenSearchFunction()
       return lunr.Index.load(JSON.parse(serializedIndex))
     } else {
       return null
@@ -85,7 +87,6 @@ function indexStorageKey () {
 }
 
 function createIndex () {
-  lunr.QueryLexer.termSeparator = /\s+/
   return lunr(function () {
     this.tokenizer.separator = /\s+/
     this.ref('ref')
@@ -105,7 +106,6 @@ function createIndex () {
 }
 
 function elixirTokenSplitter (builder) {
-  registerElixirTokenFunction()
   builder.pipeline.before(lunr.stemmer, elixirTokenFunction)
   builder.searchPipeline.before(lunr.stemmer, elixirTokenFunction)
 }
@@ -125,24 +125,16 @@ function elixirTokenFunction (token) {
   return tokens
 }
 
-function registerElixirTokenFunction () {
-  return lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
-}
-
 function elixirTrimmer (builder) {
-  registerElixirTrimmerFunction()
   builder.pipeline.after(lunr.stemmer, elixirTrimmerFunction)
   builder.searchPipeline.after(lunr.stemmer, elixirTrimmerFunction)
 }
 
 function elixirTrimmerFunction (token) {
+  // Preserve @ at the beginning of tokens
   return token.update(function (s) {
     return s.replace(/^@?\W+/, '').replace(/\W+$/, '')
   })
-}
-
-function registerElixirTrimmerFunction () {
-  return lunr.Pipeline.registerFunction(elixirTrimmerFunction, 'elixirTrimmer')
 }
 
 function hyphenSearchFunction (token) {
@@ -162,13 +154,8 @@ function hyphenSearchFunction (token) {
 }
 
 function hyphenSearch (builder) {
-  registerHyphenSearchFunction ()
   builder.pipeline.before(lunr.stemmer, hyphenSearchFunction)
   builder.searchPipeline.before(lunr.stemmer, hyphenSearchFunction)
-}
-
-function registerHyphenSearchFunction () {
-  return lunr.Pipeline.registerFunction(hyphenSearchFunction, 'hypenSearch')
 }
 
 function searchResultsToDecoratedSearchNodes (results) {
