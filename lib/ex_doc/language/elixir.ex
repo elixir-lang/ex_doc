@@ -109,14 +109,14 @@ defmodule ExDoc.Language.Elixir do
       if actual_def in module_data.private.optional_callbacks, do: ["optional"], else: []
 
     specs =
-      case {kind, Map.fetch(module_data.private.callbacks, actual_def)} do
-        {:macrocallback, {:ok, specs}} ->
+      case module_data.private.callbacks do
+        %{^actual_def => specs} when kind == :macro_callback ->
           Enum.map(specs, &remove_callback_term/1)
 
-        {:callback, {:ok, specs}} ->
+        %{^actual_def => specs} ->
           specs
 
-        {_kind, :error} ->
+        %{} ->
           []
       end
 
