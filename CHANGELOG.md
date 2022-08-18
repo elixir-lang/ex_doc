@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.28.5 (2022-08-18)
+
+  * Enhancements
+    * Do not preserve spaces from spec declaration in signature rendering
+    * Index hyphens in search
+    * Index `@` in search
+    * Change minimal package search length to 2
+
+  * Bug fixes
+    * Remove extra `term()` argument at start of `@macrocallback`
+
 ## v0.28.4 (2022-04-28)
 
   * Enhancements
