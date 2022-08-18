@@ -364,6 +364,7 @@ defmodule ExDoc.Language.Elixir do
       {{:|, _, _}, position} -> to_var({}, position)
       {left, position} -> to_var(left, position)
     end)
+    |> Macro.prewalk(fn node -> Macro.update_meta(node, &Keyword.delete(&1, :line)) end)
   end
 
   defp to_var({:%, meta, [name, _]}, _), do: {:%, meta, [name, {:%{}, meta, []}]}

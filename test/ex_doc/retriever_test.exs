@@ -190,4 +190,22 @@ defmodule ExDoc.RetrieverTest do
     assert function_B_0.id == "function_B/0"
     assert function_b_0.id == "function_b/0"
   end
+
+  test "no whitespace in signature", c do
+    elixirc(c, ~S"""
+    defmodule NoWhitespaceInSignature do
+      @callback callback_name(
+        arg1 :: integer(),
+        1,
+        %Date{},
+        term,
+        String.t()
+      ) :: :ok
+    end
+    """)
+
+    [module_node] = Retriever.docs_from_modules([NoWhitespaceInSignature], %ExDoc.Config{})
+    %{docs: [%{signature: signature}]} = module_node
+    assert signature == "callback_name(arg1, integer, %Date{}, term, t)"
+  end
 end
