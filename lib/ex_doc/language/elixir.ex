@@ -110,7 +110,7 @@ defmodule ExDoc.Language.Elixir do
 
     specs =
       case module_data.private.callbacks do
-        %{^actual_def => specs} when kind == :macro_callback ->
+        %{^actual_def => specs} when kind == :macrocallback ->
           Enum.map(specs, &remove_callback_term/1)
 
         %{^actual_def => specs} ->
