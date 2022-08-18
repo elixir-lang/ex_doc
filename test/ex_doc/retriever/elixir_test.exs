@@ -160,7 +160,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert macrocallback1.group == :Callbacks
       assert Path.basename(macrocallback1.source_url) == "nofile:9"
       refute macrocallback1.doc
-      assert Macro.to_string(macrocallback1.specs) == "[macrocallback1(term()) :: :ok]"
+      assert Macro.to_string(macrocallback1.specs) == "[macrocallback1() :: :ok]"
 
       elixirc(c, ~S"""
       defmodule Impl do

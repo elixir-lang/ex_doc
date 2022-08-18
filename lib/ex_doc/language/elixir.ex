@@ -109,11 +109,14 @@ defmodule ExDoc.Language.Elixir do
       if actual_def in module_data.private.optional_callbacks, do: ["optional"], else: []
 
     specs =
-      case Map.fetch(module_data.private.callbacks, actual_def) do
-        {:ok, specs} ->
+      case module_data.private.callbacks do
+        %{^actual_def => specs} when kind == :macrocallback ->
+          Enum.map(specs, &remove_callback_term/1)
+
+        %{^actual_def => specs} ->
           specs
 
-        :error ->
+        %{} ->
           []
       end
 
@@ -134,6 +137,14 @@ defmodule ExDoc.Language.Elixir do
       specs: quoted,
       extra_annotations: extra_annotations
     }
+  end
+
+  defp remove_callback_term({:type, num, :bounded_fun, [lhs, rhs]}) do
+    {:type, num, :bounded_fun, [remove_callback_term(lhs), rhs]}
+  end
+
+  defp remove_callback_term({:type, num, :fun, [{:type, num, :product, [_ | rest_args]} | rest]}) do
+    {:type, num, :fun, [{:type, num, :product, rest_args} | rest]}
   end
 
   @impl true
