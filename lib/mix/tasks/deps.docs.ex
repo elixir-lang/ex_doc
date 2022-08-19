@@ -49,7 +49,15 @@ defmodule Mix.Tasks.Deps.Docs do
 
     project = project <> " (dependencies)"
     version = config[:version] || "dev"
-    options = config |> get_deps_docs() |> normalize_apps(config) |> Keyword.merge(cli_opts)
+    root_docs_config = Keyword.take(config[:docs] || [], ~w[extra_section language logo]a)
+
+    options =
+      config
+      |> get_deps_docs()
+      |> normalize_apps(config)
+      |> Keyword.merge(cli_opts)
+      |> Keyword.merge(root_docs_config)
+
     Mix.shell().info("Generating docs...")
 
     for formatter <- get_formatters(options) do
@@ -69,7 +77,7 @@ defmodule Mix.Tasks.Deps.Docs do
 
   defp get_deps_docs(options) do
     key = :skip_undefined_reference_warnings_on
-    acc = [{key, []}, apps: [], extras: [], groups_for_modules: [], source_beam: []]
+    acc = [{key, []}, apps: [], extras: [], source_beam: []]
     build = Mix.Project.build_path()
 
     for {app, path} <- Mix.Project.deps_paths(),
@@ -78,16 +86,15 @@ defmodule Mix.Tasks.Deps.Docs do
         reduce: acc do
       acc ->
         extras = normalize_extras_paths(dep_docs[:extras], app)
-        groups_for_modules = dep_docs[:groups_for_modules] || []
         compile_path = Path.join([build, "lib", Atom.to_string(app), "ebin"])
         skip_undefined_reference_warnings_on = normalize_paths(dep_docs[key], app)
 
         acc
         |> Keyword.update!(:apps, &[app | &1])
         |> Keyword.update!(:extras, &(&1 ++ extras))
-        |> Keyword.update!(:groups_for_modules, &(&1 ++ groups_for_modules))
         |> Keyword.update!(:source_beam, &[compile_path | &1])
         |> Keyword.update!(key, &(&1 ++ skip_undefined_reference_warnings_on))
+        |> normalize_groups(dep_docs)
     end
   end
 
@@ -114,6 +121,20 @@ defmodule Mix.Tasks.Deps.Docs do
 
   defp normalize_path(name, app) do
     Path.join(["deps", Atom.to_string(app), to_string(name)])
+  end
+
+  defp normalize_groups(acc, dep_docs) do
+    group_names = ~w[groups_for_extras groups_for_functions groups_for_modules]a
+
+    Enum.reduce(group_names, acc, fn group_name, acc ->
+      group = dep_docs[group_name]
+
+      if is_nil(group) do
+        acc
+      else
+        Keyword.update(acc, group_name, group, &(&1 ++ group))
+      end
+    end)
   end
 
   defp normalize_apps(docs, options) do
