@@ -38,7 +38,7 @@ export const keyboardShortcuts = [
   {
     key: '?',
     displayAs: '<kbd><kbd>?</kbd></kbd>',
-    description: 'Bring up this help dialog',
+    description: 'Bring up this modal',
     action: toggleHelpModal
   }
 ]

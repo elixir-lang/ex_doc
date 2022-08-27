@@ -9,7 +9,7 @@ const SETTINGS_MODAL_BODY_SELECTOR = '#settings-modal-content'
 const SETTINGS_TAB = '#modal-settings-tab'
 const KEYBOARD_SHORTCUTS_TAB = '#modal-keyboard-shortcuts-tab'
 const SETTINGS_CONTENT = '#settings-content'
-const KEYBOARD_SHORTCUTS_CONTENT = '#keyboard-shortcuts'
+const KEYBOARD_SHORTCUTS_CONTENT = '#keyboard-shortcuts-content'
 
 const modalTabs = [
   {

@@ -8,10 +8,9 @@
   .input {
     width: 80%;
     padding: 8px;
-    margin-top: 2px;
     color: #445668;
     font-size: 14px;
-    border: 1px solid #CAD5E0;
+    border: 1px solid @accentLightGray;
     box-sizing: border-box;
     border-radius: 8px;
     transition: border-color 150ms;
@@ -42,19 +41,19 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    &:not(:first-child) {
-      border-top: 1px solid #CAD5E0;
-      padding-top: 16px;
+    border-top: 1px solid @accentLightGray;
+    padding: 10px 0;
+    &:first-of-type {
+      border-top-style: none;
+      padding-top: 0px;
     }
   }
 
   .switch-button-container > div > span {
-    color: @accentMediumGray;
     font-size: 18px;
   }
 
   .switch-button-container > div > p {
-    color: #445668;
     font-size: 14px;
     line-height: 1.4;
     margin: 0;
@@ -103,11 +102,6 @@
 
   .switch-button__checkbox:checked + .switch-button__bg {
     background-color: @main;
-  }
-
-  .keyboard-shortcuts {
-    color: @accentMediumGray;
-    font-size: 18px;
   }
 
   .settings-select {

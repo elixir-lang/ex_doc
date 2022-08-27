@@ -1,0 +1,63 @@
+body.dark {
+  .modal {
+    background-color: rgba(0, 0, 0, 0.75);
+
+    .modal-contents {
+      color: @nightTextBody;
+      background-color: @bgDarkGray;
+    }
+    
+    .modal-title {
+      button {
+        color: @nightTextHeaders;
+
+        &:hover {
+          color: @main;
+        }
+        &.active {
+          color: @main;
+        }
+      }
+    }
+
+    .modal-close {
+      color: @white;
+    }
+  }
+
+  #settings-modal-content {
+    .input {
+      background-color: @bgMediumGray;
+      color: @white;
+      border-color: @nightCodeBorder;
+      &:focus {
+        border-color: @main;
+      }
+    }
+
+    .switch-button-container {
+      border-top: 1px solid @nightCodeBorder;
+      &:first-of-type {
+        border-top-style: none;
+      }
+    }
+
+    .settings-select {
+      color: @nightTextBody;
+    }
+  }
+
+  #keyboard-shortcuts-content {
+    dl.shortcut-row {
+      border-bottom: 1px solid @nightCodeBorder;
+      &:last-of-type {
+        border-bottom-style: none;
+      }
+    }
+
+    kbd > kbd {
+      color: @nightTextBody;
+      background-color: @bgMediumGray;
+    }
+  }
+}

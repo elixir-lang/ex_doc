@@ -1,10 +1,15 @@
-#keyboard-shortcuts {
+#keyboard-shortcuts-content {
   dl.shortcut-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin: 0;
-    padding: 6px 0;
+    padding: 6px 0 8px;
+    border-bottom: 1px solid @accentLightGray;
+
+    &:last-of-type {
+      border-bottom-style: none;
+    }
   }
 
   dl.shortcut-row:first-child {
@@ -17,7 +22,6 @@
 
   .shortcut-description {
     display: inline-block;
-    color: #445668;
   }
 
   kbd > kbd {
@@ -31,8 +35,6 @@
     padding: 4px 7px 6px 7px;
     min-width: 26px;
     text-align: center;
-    margin-left: 3px;
-    border-bottom: 1px solid #91A4B7;
   }
 
   .shortcut-keys,
