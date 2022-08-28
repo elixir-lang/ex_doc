@@ -359,14 +359,15 @@ defmodule ExDoc.Formatter.HTML do
         extension when extension in ["", ".txt"] ->
           [{:pre, [], "\n" <> File.read!(input), %{}}]
 
-        extension when extension in [".md", ".livemd"] ->
+        extension when extension in [".md", ".livemd", ".cheatmd"] ->
           input
           |> File.read!()
           |> Markdown.to_ast(opts)
+          |> Markdown.normalize(extension)
 
         _ ->
           raise ArgumentError,
-                "file extension not recognized, allowed extension is either .livemd, .md, .txt or no extension"
+                "file extension not recognized, allowed extension is either .cheatmd, .livemd, .md, .txt or no extension"
       end
 
     {title_ast, ast} =

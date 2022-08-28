@@ -279,7 +279,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       "test/fixtures/PlainText.txt",
       "test/fixtures/PlainTextFiles.md",
       "test/fixtures/README.md",
-      "test/fixtures/LivebookFile.livemd"
+      "test/fixtures/LivebookFile.livemd",
+      "test/fixtures/cheatsheets.cheatmd"
     ]
 
     test "includes source `.livemd` files", %{tmp_dir: tmp_dir} = context do
@@ -373,6 +374,13 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       assert content =~
                ~s{<img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />}
+
+      content = File.read!(tmp_dir <> "/html/cheatsheets.html")
+
+      assert content =~ ~s{<section><h2 id="getting-started" class="section-heading">}
+      assert content =~ ~s{<section><h3 id="hello-world" class="section-heading">}
+      assert content =~ ~s{<section><h2 id="types" class="section-heading">}
+      assert content =~ ~s{<section><h3 id="operators" class="section-heading">}
     end
 
     test "with absolute and dot-relative paths for extra", %{tmp_dir: tmp_dir} = context do

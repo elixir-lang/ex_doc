@@ -78,4 +78,40 @@ defmodule ExDoc.Markdown do
       to use an Elixir-based markdown processor
     """
   end
+
+  @doc """
+  Normalizes the AST for better display.
+  """
+  def normalize(ast, ".cheatmd"), do: sectionize(ast)
+  def normalize(ast, _), do: ast
+
+  defp sectionize(list), do: sectionize(list, [])
+
+  defp sectionize(list, acc) do
+    case pivot(list, acc, &h2_or_h3?/1) do
+      {acc, {header_tag, _, _, _} = header, rest} ->
+        {inner, rest} = Enum.split_while(rest, &not_tag?(&1, header_tag))
+        section = {:section, [], [header | sectionize(inner)], %{}}
+        sectionize(rest, [section | acc])
+
+      acc ->
+        acc
+    end
+  end
+
+  defp not_tag?({tag, _, _, _}, tag), do: false
+  defp not_tag?(_, _tag), do: true
+
+  defp h2_or_h3?({:h2, _, _, _}), do: true
+  defp h2_or_h3?({:h3, _, _, _}), do: true
+  defp h2_or_h3?(_), do: false
+
+  defp pivot([head | tail], acc, fun) do
+    case fun.(head) do
+      true -> {acc, head, tail}
+      false -> pivot(tail, [head | acc], fun)
+    end
+  end
+
+  defp pivot([], acc, _fun), do: Enum.reverse(acc)
 end
