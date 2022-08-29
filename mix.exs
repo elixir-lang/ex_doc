@@ -79,7 +79,7 @@ defmodule ExDoc.Mixfile do
       main: "readme",
       extras: [
         "README.md",
-        "LICENSE",
+        "Cheatsheet.cheatmd",
         "CHANGELOG.md"
       ],
       source_ref: "v#{@version}",
