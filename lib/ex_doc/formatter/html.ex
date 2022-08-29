@@ -363,7 +363,7 @@ defmodule ExDoc.Formatter.HTML do
           input
           |> File.read!()
           |> Markdown.to_ast(opts)
-          |> Markdown.normalize(extension)
+          |> sectionize(extension)
 
         _ ->
           raise ArgumentError,
@@ -406,6 +406,16 @@ defmodule ExDoc.Formatter.HTML do
     |> Path.extname()
     |> String.downcase()
   end
+
+  defp sectionize(ast, ".cheatmd") do
+    Markdown.sectionize(ast, fn
+      {:h2, _, _, _} -> true
+      {:h3, _, _, _} -> true
+      _ -> false
+    end)
+  end
+
+  defp sectionize(ast, _), do: ast
 
   @doc """
   Convert the input file name into a title

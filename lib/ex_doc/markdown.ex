@@ -80,19 +80,16 @@ defmodule ExDoc.Markdown do
   end
 
   @doc """
-  Normalizes the AST for better display.
+  Wraps the desired tags in HTML in sections.
   """
-  def normalize(ast, ".cheatmd"), do: sectionize(ast)
-  def normalize(ast, _), do: ast
+  def sectionize(list, matcher), do: sectionize(list, matcher, [])
 
-  defp sectionize(list), do: sectionize(list, [])
-
-  defp sectionize(list, acc) do
-    case pivot(list, acc, &h2_or_h3?/1) do
+  defp sectionize(list, matcher, acc) do
+    case pivot(list, acc, matcher) do
       {acc, {header_tag, _, _, _} = header, rest} ->
         {inner, rest} = Enum.split_while(rest, &not_tag?(&1, header_tag))
-        section = {:section, [], [header | sectionize(inner)], %{}}
-        sectionize(rest, [section | acc])
+        section = {:section, [], [header | sectionize(inner, matcher, [])], %{}}
+        sectionize(rest, matcher, [section | acc])
 
       acc ->
         acc
@@ -101,10 +98,6 @@ defmodule ExDoc.Markdown do
 
   defp not_tag?({tag, _, _, _}, tag), do: false
   defp not_tag?(_, _tag), do: true
-
-  defp h2_or_h3?({:h2, _, _, _}), do: true
-  defp h2_or_h3?({:h3, _, _, _}), do: true
-  defp h2_or_h3?(_), do: false
 
   defp pivot([head | tail], acc, fun) do
     case fun.(head) do
