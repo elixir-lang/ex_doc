@@ -116,8 +116,18 @@ defmodule ExDoc.Formatter.EPUB do
   defp generate_epub(output) do
     :zip.create(
       String.to_charlist("#{output}.epub"),
-      [{'mimetype', @mimetype} | files_to_add(output)],
-      compress: ['.css', '.xhtml', '.html', '.ncx', '.js', '.opf', '.jpg', '.png', '.xml']
+      [{~c"mimetype", @mimetype} | files_to_add(output)],
+      compress: [
+        ~c".css",
+        ~c".xhtml",
+        ~c".html",
+        ~c".ncx",
+        ~c".js",
+        ~c".opf",
+        ~c".jpg",
+        ~c".png",
+        ~c".xml"
+      ]
     )
   end
 

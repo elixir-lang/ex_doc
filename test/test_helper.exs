@@ -84,7 +84,7 @@ defmodule TestHelper do
           preprocess: true,
           doclet: :edoc_doclet_chunks,
           layout: :edoc_layout_chunks,
-          dir: dir ++ '/doc'
+          dir: dir ++ ~c"/doc"
         )
     end
   else

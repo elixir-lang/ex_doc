@@ -56,7 +56,7 @@ defmodule ExDoc.Mixfile do
     [
       licenses: ["Apache-2.0"],
       maintainers: ["José Valim", "Milton Mazzarri", "Wojtek Mach"],
-      files: ["formatters", "lib", "mix.exs", "LICENSE", "CHANGELOG.md", "README.md"],
+      files: ~w(CHANGELOG.md Cheatsheet.cheatmd formatters lib LICENSE mix.exs README.md),
       links: %{
         "GitHub" => @source_url,
         "Changelog" => "https://hexdocs.pm/ex_doc/changelog.html",
