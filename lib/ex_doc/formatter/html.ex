@@ -224,7 +224,8 @@ defmodule ExDoc.Formatter.HTML do
           next: next && %{path: "#{next.id}.html", title: next.title}
         }
 
-        html = Templates.extra_template(config, node, nodes_map, refs)
+        extension = node.source_path && Path.extname(node.source_path)
+        html = Templates.extra_template(config, node, extra_type(extension), nodes_map, refs)
 
         if File.regular?(output) do
           IO.puts(:stderr, "warning: file #{Path.relative_to_cwd(output)} already exists")
@@ -236,6 +237,10 @@ defmodule ExDoc.Formatter.HTML do
 
     generated_extras ++ copy_extras(config, extras)
   end
+
+  defp extra_type(".cheatmd"), do: :cheatmd
+  defp extra_type(".livemd"), do: :livemd
+  defp extra_type(_), do: :extra
 
   defp copy_extras(config, extras) do
     for %{source_path: source_path, id: id} when source_path != nil <- extras,

@@ -195,12 +195,15 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
 
   defp sidebar_type(:exception), do: "modules"
-  defp sidebar_type(:extra), do: "extras"
   defp sidebar_type(:module), do: "modules"
   defp sidebar_type(:behaviour), do: "modules"
   defp sidebar_type(:protocol), do: "modules"
   defp sidebar_type(:task), do: "tasks"
+
   defp sidebar_type(:search), do: "search"
+  defp sidebar_type(:cheatmd), do: "extras"
+  defp sidebar_type(:livemd), do: "extras"
+  defp sidebar_type(:extra), do: "extras"
 
   def asset_rev(output, pattern) do
     output = Path.expand(output)
@@ -311,12 +314,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
     not_found_template: [:config, :nodes_map],
     api_reference_entry_template: [:module_node],
     api_reference_template: [:nodes_map],
-    extra_template: [:config, :node, :nodes_map, :refs],
+    extra_template: [:config, :node, :type, :nodes_map, :refs],
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
     redirect_template: [:config, :redirect_to],
-    bottom_actions_template: [:refs],
     settings_button_template: []
   ]
 

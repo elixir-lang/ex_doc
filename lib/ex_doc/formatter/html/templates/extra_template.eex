@@ -1,4 +1,4 @@
-<%= head_template(config, %{title: node.title, type: :extra}) %>
+<%= head_template(config, %{title: node.title, type: type}) %>
 <%= sidebar_template(config, nodes_map) %>
 
 <h1>
@@ -12,7 +12,7 @@
   <span><%= node.title_content %></span>
 </h1>
 
-<%= if node.source_path && String.ends_with?(node.source_path, ".livemd") do %>
+<%= if type == :livemd do %>
   <div class="livebook-badge-container">
     <a href="#" class="livebook-badge">
       <img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />
@@ -21,5 +21,32 @@
 <% end %>
 
 <%= link_headings(node.content) %>
-<%= bottom_actions_template(refs) %>
+
+<div class="bottom-actions">
+  <div class="bottom-actions-item">
+    <%= if refs.prev do %>
+      <a href="<%= refs.prev.path %>" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+          <%= refs.prev.title %>
+        </span>
+      </a>
+    <% end %>
+  </div>
+  <div class="bottom-actions-item">
+    <%= if refs.next do %>
+      <a href="<%= refs.next.path %>" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+          <%= refs.next.title %>
+        </span>
+      </a>
+    <% end %>
+  </div>
+</div>
+
 <%= footer_template(config, node) %>

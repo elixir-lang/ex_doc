@@ -22,7 +22,7 @@
     <%# Extra content specified by the user (e.g. custom CSS) %>
     <%= config.before_closing_head_tag.(:html) %>
   </head>
-  <body data-type="<%= sidebar_type(page.type) %>">
+  <body data-type="<%= sidebar_type(page.type) %>" class="page-<%= page.type %>">
     <script>
       <%# Immediately apply night mode preference to avoid a flash effect %>
       try {
