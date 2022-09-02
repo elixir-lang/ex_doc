@@ -1,0 +1,28 @@
+#toast {
+  opacity: 0;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: 1rem;
+  min-width: 3rem;
+  margin: 0 -1.2rem;
+  padding: .7rem 1.2rem;
+  text-align: center;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 1px solid var(--codeBorder);
+  background-color: var(--codeBackground);
+  color: var(--textBody);
+  transition: opacity .4s ease-in-out, transform .3s ease-out;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateY(-.75rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #toast {
+    transition: none;
+  }
+}

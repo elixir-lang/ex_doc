@@ -1,0 +1,46 @@
+pre {
+  position: relative;
+}
+
+pre:hover .copy-button {
+  display: block;
+}
+
+.copy-button {
+  display: none;
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  opacity: .5;
+  transition: all 150ms;
+  font-family: var(--serifFontFamily);
+  font-size: 14px;
+  line-height: 24px;
+  color: currentColor;
+}
+
+.copy-button:hover {
+  opacity: 1;
+}
+
+.copy-button svg {
+  width: 20px;
+}
+
+.copy-button.clicked {
+  display: block;
+  opacity: 1;
+  color: var(--success);
+}
+.copy-button.clicked::after {
+  content: "Copied! \2713";
+}
+
+.copy-button.clicked svg {
+  display: none;
+  color: currentColor;
+}

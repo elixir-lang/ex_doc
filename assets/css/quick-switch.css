@@ -1,0 +1,49 @@
+#quick-switch-modal-body {
+  width: 100%;
+  position: relative;
+}
+
+#quick-switch-modal-body .ri-search-2-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 8px 2px;
+  color: var(--quickSwitchText);
+}
+
+#quick-switch-modal-body #quick-switch-input {
+  width: 100%;
+  padding: 8px 6px 6px 26px;
+  border: none;
+  border-bottom: 1px solid var(--quickSwitchText);
+  box-sizing: border-box;
+  transition: all .12s ease-out;
+}
+
+#quick-switch-modal-body #quick-switch-input:focus {
+  border-bottom: 1px solid var(--gray800);
+  outline: none;
+}
+
+#quick-switch-modal-body #quick-switch-results {
+  margin: 0;
+}
+
+#quick-switch-modal-body .quick-switch-result {
+  padding: 2px 5px;
+  border-bottom: 1px dotted var(--quickSwitchText);
+  transition: all .12s ease-out;
+}
+
+#quick-switch-modal-body .quick-switch-result:last-child {
+  border-bottom: none;
+}
+
+#quick-switch-modal-body .quick-switch-result:hover {
+  cursor: pointer;
+}
+
+#quick-switch-modal-body .quick-switch-result:is(:hover, .selected) {
+  border-left: 4px solid var(--main);
+  background-color: var(--codeBackground);
+}

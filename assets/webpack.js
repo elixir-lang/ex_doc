@@ -25,18 +25,15 @@ module.exports = {
   mode: 'production',
   entry: {
     "epub-app": './js/entry/epub.js',
-    "epub-elixir": './less/entry/epub-elixir.less',
-    "epub-erlang": './less/entry/epub-erlang.less',
+    "epub-elixir": './css/entry/epub-elixir.css',
+    "epub-erlang": './css/entry/epub-erlang.css',
     "html-app": './js/entry/html.js',
-    "html-elixir": './less/entry/html-elixir.less',
-    "html-erlang": './less/entry/html-erlang.less',
+    "html-elixir": './css/entry/html-elixir.css',
+    "html-erlang": './css/entry/html-erlang.css',
   },
   output: {
     path: resolve(__dirname, '../formatters'),
     filename: (chunkData) => buildFilename(chunkData.chunk.name, '.js')
-  },
-  resolve: {
-    extensions: ['.js', '.less']
   },
   optimization: {
     minimize: true,
@@ -68,11 +65,11 @@ module.exports = {
         }
       },
       {
-        test: /\.less$/,
-        use: [MiniCSSExtractPlugin.loader, 'css-loader', 'postcss-loader', 'less-loader']
+        test: /\.css$/,
+        use: [MiniCSSExtractPlugin.loader, 'css-loader', 'postcss-loader']
       },
       {
-        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        test: /\.woff2$/,
         use: [
           {
             loader: 'file-loader',

@@ -1,0 +1,60 @@
+:root {
+  --background:                  var(--white);
+  --contrast:                    var(--black);
+  --textBody:                    var(--gray700);
+  --textHeaders:                 var(--gray800);
+  --textDetailBackground:        var(--coldGrayFaint);
+  --textFooter:                  var(--coldGray);
+
+  --links:                       var(--black);
+  --linksVisited:                var(--black);
+  --linksNoUnderline:            var(--main-darkened-10);
+  --linksNoUnderlineVisited:     var(--main-darkened-20);
+
+  --viewSource:                  var(--coldGray);
+  --viewSourceHover:             var(--gray800);
+
+  --blockquoteBackground:        var(--coldGrayFaint);
+  --blockquoteBorder:            var(--coldGrayLight);
+
+  --warningBackground:           hsl( 33, 100%,  97%);
+  --warningHeadingBackground:    hsl( 33,  87%,  64%);
+  --warningHeading:              var(--black);
+  --errorBackground:             hsl(  7,  81%,  96%);
+  --errorHeadingBackground:      hsl(  6,  80%,  60%);
+  --errorHeading:                var(--white);
+  --infoBackground:              hsl(206,  91%,  96%);
+  --infoHeadingBackground:       hsl(213,  92%,  62%);
+  --infoHeading:                 var(--white);
+  --neutralBackground:           hsl(212,  29%,  92%);
+  --neutralHeadingBackground:    hsl(220,  43%,  11%);
+  --neutralHeading:              var(--white);
+  --tipBackground:               hsl(142,  31%,  93%);
+  --tipHeadingBackground:        hsl(134,  39%,  36%);
+  --tipHeading:                  var(--white);
+
+  --fnSpecAttr:                  var(--coldGray);
+  --fnDeprecated:                var(--yellowLight);
+  --blink:                       var(--yellowLight);
+
+  --codeBackground:              var(--gray50-lightened-2);
+  --codeBorder:                  var(--gray100);
+  --inlineCodeBackground:        var(--codeBackground);
+  --inlineCodeBorder:            var(--codeBorder);
+
+  --bottomActionsBtnBorder:      var(--black-opacity-10);
+  --bottomActionsBtnSubheader:   var(--main-darkened-10);
+
+  --modalBackground:             var(--white);
+
+  --settingsInput:               var(--gray500);
+  --settingsInputBackground:     var(--white);
+  --settingsInputBorder:         var(--gray200);
+  --settingsSectionBorder:       var(--gray200);
+
+  --quickSwitchText:             var(--coldGray);
+
+  --success:                     var(--green);
+
+  --sidebarButton:               var(--gray100);
+}

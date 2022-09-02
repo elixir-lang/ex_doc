@@ -1,0 +1,86 @@
+@keyframes keyboard-shortcuts-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  animation-duration: .15s;
+  animation-name: keyboard-shortcuts-show;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+  display: none;
+  background-color: rgba(0, 0, 0, .75);
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+}
+
+.modal.shown {
+  display: block;
+}
+
+.modal .modal-contents {
+  margin: 75px auto 0 auto;
+  max-width: 500px;
+  background-color: var(--modalBackground);
+  border-radius: 3px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, .2);
+  padding: 25px 35px 35px;
+}
+
+@media screen and (max-width: 768px) {
+  .modal .modal-contents {
+    padding: 20px;
+  }
+}
+
+.modal .modal-header {
+  display: flex;
+  align-items: start;
+}
+
+.modal .modal-title {
+  display: inline-block;
+  flex-grow: 1;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.modal .modal-title button {
+  border: none;
+  background-color: transparent;
+  color: var(--textHeaders);
+  font-weight: bold;
+  margin-right: 30px;
+  padding-left: 0;
+  text-align: left;
+  transition: color 150ms;
+}
+.modal .modal-title button:hover {
+  color: var(--main);
+  cursor: pointer;
+}
+.modal .modal-title button.active {
+  color: var(--main);
+}
+
+.modal .modal-close {
+  cursor: pointer;
+  display: block;
+  font-size: 1.5rem;
+  margin: -8px -8px 0 0;
+  padding: 8px;
+  opacity: .7;
+  background-color: transparent;
+  color: var(--textHeaders);
+  border: none;
+  transition: opacity 150ms;
+}
+.modal .modal-close:hover {
+  opacity: 1;
+}
