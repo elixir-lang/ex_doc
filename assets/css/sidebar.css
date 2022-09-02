@@ -1,0 +1,438 @@
+.sidebar {
+  font-family: var(--sansFontFamily);
+  font-size: 16px;
+  line-height: 18px;
+  background-color: var(--gray800);
+  color: var(--gray50);
+  overflow: hidden;
+  scrollbar-color: var(--coldGray) var(--gray800);
+}
+
+.sidebar .gradient {
+  background: linear-gradient(var(--gray800), var(--gray800-opacity-0));
+  height: 20px;
+  margin-top: -20px;
+  pointer-events: none;
+  position: relative;
+  top: 20px;
+  z-index: 100;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar ul li {
+  margin: 0;
+  padding: 0 10px;
+}
+
+.sidebar a {
+  color: var(--gray50);
+  text-decoration: none;
+  transition: color .3s ease-in-out;
+}
+
+.sidebar a:hover {
+  color: var(--white);
+}
+
+.sidebar .sidebar-header {
+  margin: 12px;
+  border-radius: 4px;
+  background-color: var(--gray700);
+  width: 276px;
+}
+
+.sidebar .sidebar-projectDetails {
+  display: inline-block;
+  text-align: left;
+  vertical-align: top;
+  margin: 6px 0 0 10px;
+}
+
+.sidebar .sidebar-projectImage {
+  display: inline-block;
+  max-width: 48px;
+  max-height: 48px;
+  margin: 0 0 0 10px;
+  vertical-align: bottom;
+}
+
+.sidebar .sidebar-projectName {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 30px;
+  color: var(--gray50);
+  margin: 0;
+  padding: 0;
+  max-width: 230px;
+  word-wrap: break-word;
+}
+
+.sidebar .sidebar-projectVersion {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--gray300);
+}
+
+.sidebar .sidebar-projectVersionsDropdown {
+  cursor: pointer;
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 12px;
+  border: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  color: var(--white);
+  z-index: 2;
+}
+
+.sidebar .sidebar-projectVersionsDropdown option {
+  color: initial;
+}
+
+.sidebar .sidebar-projectVersionsDropdown:focus {
+  outline: none;
+}
+
+.sidebar .sidebar-projectVersion form::after {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  content: '\25BC';
+  z-index: 1;
+  font-size: 8px;
+  color: var(--white);
+}
+
+.sidebar .sidebar-projectVersionsDropdown::-ms-expand {
+  display: none;
+}
+
+.sidebar .sidebar-listNav {
+  padding: 0;
+  padding-top: 12px;
+  margin: 0;
+}
+
+.sidebar .sidebar-listNav :is(li, li a) {
+  text-transform: uppercase;
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--gray300);
+}
+
+.sidebar .sidebar-listNav li {
+  display: inline-block;
+  border-bottom: 3px solid transparent;
+  line-height: 27px;
+}
+
+.sidebar .sidebar-listNav li:is(:hover, .selected) {
+  border-color: var(--main);
+}
+
+.sidebar .sidebar-listNav li:is(:hover, .selected) a {
+  color: var(--gray50);
+}
+
+.sidebar .sidebar-search {
+  margin-top: 12px;
+}
+
+.sidebar .sidebar-search.selected .search-button,
+.sidebar .sidebar-search .search-button:hover {
+  color: var(--main);
+  opacity: 1;
+}
+
+.sidebar .sidebar-search .search-label {
+  position: relative;
+  width: 100%;
+}
+
+.sidebar .sidebar-search .search-button {
+  font-size: 14px;
+  color: var(--gray50);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  left: 22px;
+  margin: 0;
+  opacity: .5;
+  padding: 3px 1px 3px 0;
+  position: absolute;
+  top: 18px;
+  z-index: 2;
+}
+
+.sidebar .sidebar-search .search-close-button {
+  font-size: 16px;
+  color: var(--gray50);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  right: 18px;
+  margin: 0;
+  opacity: .5;
+  padding: 5px 1px 5px 0;
+  position: absolute;
+  transform: scaleY(0);
+  top: 17px;
+  transition: .15s transform ease-out;
+  z-index: 2;
+}
+
+.sidebar .sidebar-search .search-close-button:hover {
+  opacity: .7;
+}
+
+.sidebar .sidebar-search .search-close-button:is(:focus, :hover) {
+  outline: none;
+}
+
+.sidebar .sidebar-search .search-input {
+  background-color: var(--gray700);
+  border: none;
+  border-radius: 4px;
+  color: var(--gray50);
+  margin-left: 12px;
+  padding: 8px 6px 8px 38px;
+  width: 276px;
+}
+
+.sidebar .sidebar-search .search-input:is(:focus, :hover) {
+  outline: none;
+}
+
+.sidebar .sidebar-search .ri-search-2-line {
+  font-weight: bold;
+}
+
+.sidebar #full-list {
+  margin: 0;
+  padding: 20px 0;
+  overflow-y: auto;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 .01%;
+}
+
+.sidebar #full-list li {
+  padding: 0;
+  margin-right: 30px;
+  line-height: 27px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar #full-list li.docs {
+  margin-right: 0;
+}
+
+.sidebar #full-list li.open > ul {
+  display: block;
+  margin-left: 10px;
+}
+
+.sidebar #full-list li a span.icon-expand:after {
+  font-family: remixicon;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sidebar #full-list li a.expand > span.icon-expand:after {
+  content: var(--icon-arrow-down-s);
+  margin-right: 10px;
+  font-size: 1.2em;
+  position: absolute;
+  right: 0;
+}
+
+.sidebar #full-list li.open > a.expand > span.icon-expand:after {
+  content: var(--icon-arrow-up-s);
+}
+
+.sidebar #full-list li.docs > a > span.icon-expand:after {
+  margin-right: 12px;
+  content: var(--icon-add);
+  font-size: 1em;
+  position: absolute;
+  right: 0;
+}
+
+.sidebar #full-list li.docs.open > a > span.icon-expand:after {
+  content: var(--icon-subtract);
+}
+
+.sidebar #full-list li.nesting-context {
+  font-weight: bold;
+  font-size: .9em;
+  line-height: 1.8em;
+  color: var(--gray300);
+  padding-left: 15px;
+}
+
+.sidebar #full-list li.group {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: .8em;
+  margin: 2.0em 0 0;
+  line-height: 1.8em;
+  color: var(--gray300);
+  padding-left: 15px;
+}
+
+.sidebar #full-list li a {
+  padding: 3px 0 3px 15px;
+  color: var(--gray200);
+}
+
+.sidebar #full-list li a.expand,
+.sidebar #full-list li .sections-list > li {
+  text-overflow: ellipsis;
+}
+
+.sidebar #full-list li .current-section > a {
+  color: var(--main);
+}
+
+.sidebar #full-list > li.current-page > a {
+  color: var(--main);
+  border-left: 3px solid var(--main);
+  padding-left: 12px;
+}
+
+.sidebar #full-list > li.current-page > a:after,
+.sidebar #full-list > li.current-page {
+  color: var(--main);
+}
+
+.sidebar #full-list > li:last-child {
+  margin-bottom: 30px;
+}
+
+.sidebar #full-list > li.group:first-child {
+  margin-top: 0;
+}
+
+.sidebar #full-list ul {
+  display: none;
+  margin: 9px 15px;
+  margin-right: 0;
+  padding: 0;
+}
+
+.sidebar #full-list ul li {
+  font-weight: 300;
+  line-height: 20px;
+  padding: 2px 8px;
+  margin-right: 0;
+  color: var(--gray50);
+}
+
+.sidebar #full-list ul li.current-hash {
+  color: var(--main);
+}
+
+.sidebar #full-list ul li.current-hash:before {
+  content: "\2022";
+  color: var(--main);
+}
+
+.sidebar #full-list ul li.current-hash > a {
+  color: var(--main);
+  margin-left: -12px;
+}
+
+.sidebar #full-list ul li a {
+  padding-left: 15px;
+}
+
+.sidebar #full-list ul li ul {
+  display: none;
+  margin: 9px 20px;
+  margin-right: 0;
+}
+
+.sidebar #full-list ul li ul li {
+  border-left: 1px solid var(--gray600);
+  padding: 0 10px;
+  margin-left: 8px;
+  margin-right: 0;
+  color: var(--gray50);
+}
+
+.sidebar #full-list ul li ul li a {
+  padding-left: 0;
+}
+
+.sidebar #full-list ul li ul li.current-hash:before {
+  content: none;
+}
+
+.sidebar #full-list ul li ul li.current-hash {
+  color: var(--main);
+  border-color: var(--main);
+}
+
+.sidebar #full-list ul li ul li.current-hash > a {
+  color: var(--main);
+  margin-left: 0;
+}
+
+.sidebar ::-webkit-scrollbar {
+  width: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--gray800);
+}
+
+.sidebar ::-webkit-scrollbar-thumb {
+  background-color: var(--coldGray);
+  border-radius: 10px;
+  border: 3px solid var(--gray800);
+}
+
+.sidebar-button {
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  padding: 15px 11px;
+  font-size: 16px;
+}
+
+.sidebar-button:hover {
+  color: var(--white);
+}
+
+.sidebar-button:is(:active, :hover, :focus) {
+  outline: none;
+}
+
+.sidebar-button {
+  color: var(--sidebarButton);
+}
+.sidebar-closed .sidebar-button {
+  color: var(--contrast);
+}
+
+@media screen and (max-height: 500px) {
+  .sidebar {
+    overflow-y: auto;
+  }
+
+  .sidebar #full-list {
+    overflow: visible;
+  }
+}

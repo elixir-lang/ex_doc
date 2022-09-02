@@ -47,11 +47,10 @@ Run all the available JavaScript tests using [Karma].
 
 ## Webpack
 
-Internally we use [Webpack]. We also use [Less] for organizing stylesheets.
+Internally we use [Webpack].
 
 [Node.js]: https://nodejs.org/
 [NPM]: https://www.npmjs.com/
 [ESLint]: https://eslint.org/
 [Karma]: https://karma-runner.github.io/
 [Webpack]: https://webpack.js.org/
-[Less]: http://lesscss.org/

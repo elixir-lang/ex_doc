@@ -1,0 +1,31 @@
+.content-inner :is(a.no-underline, pre a) {
+  color: var(--linksNoUnderline);
+  text-shadow: none;
+  text-decoration: none;
+  background-image: none;
+}
+
+.content-inner :is(a.no-underline, pre a):is(:visited, :active, :focus, :hover) {
+  color: var(--linksNoUnderlineVisited);
+}
+
+.content-inner code {
+  background-color: var(--codeBackground);
+  vertical-align: baseline;
+  border-radius: 2px;
+  padding: .1em .2em;
+  border: 1px solid var(--codeBorder);
+  text-transform: none;
+}
+
+.content-inner pre {
+  margin: var(--baseLineHeight) 0;
+}
+
+.content-inner pre code {
+  display: block;
+  overflow-x: auto;
+  white-space: inherit;
+  padding: .5em 1em;
+  background-color: var(--codeBackground);
+}

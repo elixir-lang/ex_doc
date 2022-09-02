@@ -1,0 +1,21 @@
+.content-inner {
+  font-family: var(--serifFontFamily);
+  font-size: 1em;
+  line-height: 1.6875em;
+  position: relative;
+  background-color: var(--background);
+  color: var(--textBody);
+}
+
+body:not(.dark) .content-inner img[src*="#gh-dark-mode-only"],
+body.dark .content-inner img[src*="#gh-light-mode-only"] {
+  display: none;
+}
+
+@import 'content/general.css';
+@import 'content/admonition.css';
+@import 'content/summary.css';
+@import 'content/code.css';
+@import 'content/functions.css';
+@import 'content/footer.css';
+@import 'content/bottom-actions.css';

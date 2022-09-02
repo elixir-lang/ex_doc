@@ -1,0 +1,36 @@
+.content-inner .summary h2 {
+  font-weight: 700;
+}
+
+.content-inner .summary h2 a {
+  text-decoration: none;
+  border: none;
+}
+
+.content-inner .summary span.deprecated {
+  color: var(--darkDeprecated);
+  font-weight: normal;
+  font-style: italic;
+}
+
+.content-inner .summary .summary-row .summary-signature {
+  font-family: var(--monoFontFamily);
+  font-weight: 700;
+}
+
+.content-inner .summary .summary-row .summary-signature a {
+  text-decoration: none;
+  border: none;
+}
+
+.content-inner .summary .summary-row .summary-synopsis {
+  font-family: var(--serifFontFamily);
+  font-style: italic;
+  padding: 0 1.2em;
+  margin: 0 0 .5em;
+}
+
+.content-inner .summary .summary-row .summary-synopsis p {
+  margin: 0;
+  padding: 0;
+}

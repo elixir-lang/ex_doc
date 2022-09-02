@@ -1,0 +1,177 @@
+.content-inner :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--sansFontFamily);
+  font-weight: 700;
+  line-height: 1.5em;
+  word-wrap: break-word;
+  color: var(--textHeaders);
+}
+
+.content-inner h1 {
+  font-size: 2em;
+  margin: 1em 0 .5em;
+}
+
+.content-inner h1.signature {
+  margin: 0;
+}
+
+.content-inner h1.section-heading {
+  margin: 1.5em 0 .5em;
+}
+
+.content-inner h1 small {
+  font-weight: 300;
+}
+
+.content-inner h1 :is(a.view-source, .settings) {
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+
+.content-inner h2 {
+  font-size: 1.6em;
+  margin: 1em 0 .5em;
+  font-weight: 700;
+}
+
+.content-inner h3 {
+  font-size: 1.375em;
+  margin: 1em 0 .5em;
+  font-weight: 700;
+}
+
+.content-inner :is(a, .a-main) {
+  color: var(--links);
+  text-decoration: underline;
+  text-decoration-skip-ink: auto;
+}
+.content-inner :is(a:visited, .a-main:visited) {
+  color: var(--linksVisited);
+}
+
+.content-inner a.view-source {
+  float: right;
+  color: var(--viewSource);
+  text-decoration: none;
+  border: none;
+  transition: color .3s ease-in-out;
+}
+.content-inner a.view-source:hover {
+  color: var(--viewSourceHover);
+}
+
+.content-inner .settings {
+  background-color: transparent;
+  float: right;
+  color: var(--viewSource);
+  text-decoration: none;
+  border: none;
+  transition: color .1s ease-in-out;
+  margin-top: 12px;
+  cursor: pointer;
+}
+.content-inner .settings:hover {
+  color: var(--viewSourceHover);
+}
+
+.content-inner .livebook-badge-container {
+  display: flex;
+}
+
+.content-inner a.livebook-badge {
+  display: inline-flex;
+}
+
+.content-inner .note {
+  color: var(--viewSource);
+  margin-right: 5px;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.content-inner h1 .note {
+  float: right;
+}
+
+.content-inner blockquote {
+  border-left: 3px solid var(--blockquoteBorder);
+  position: relative;
+  margin: 1.5625em 0;
+  padding: 0 1.2rem;
+  overflow: auto;
+  background-color: var(--blockquoteBackground);
+  border-radius: 3px;
+}
+.content-inner blockquote p:last-child {
+  padding-bottom: 1em;
+  margin-bottom: 0;
+}
+
+.content-inner table {
+  margin: 2em 0;
+}
+
+.content-inner th {
+  text-align: left;
+  font-family: var(--sansFontFamily);
+  text-transform: uppercase;
+  font-weight: 700;
+  padding-bottom: .5em;
+}
+
+.content-inner tr {
+  border-bottom: 1px solid var(--gray50);
+  vertical-align: bottom;
+  height: 2.5em;
+}
+
+.content-inner :is(td, th) {
+  padding-left: 1em;
+  line-height: 2em;
+  vertical-align: top;
+}
+
+.content-inner .section-heading:hover a.hover-link {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.content-inner .section-heading a.hover-link {
+  transition: opacity .3s ease-in-out;
+  display: inline-block;
+  opacity: 0;
+  padding: .3em .6em .6em;
+  line-height: 1em;
+  margin-left: -2.7em;
+  text-decoration: none;
+  border: none;
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.content-inner .detail :is(h1, h2, h3, h4, h5, h6).section-heading {
+  margin-left: .3em;
+}
+
+.content-inner .app-vsn {
+  display: none !important;
+  font-size: .6em;
+  line-height: 1.5em;
+}
+
+@media screen and (max-width: 768px) {
+  .content-inner .app-vsn {
+    display: block !important;
+  }
+}
+
+.content-inner img {
+  max-width: 100%;
+}
+
+.content-inner code {
+  font-family: var(--monoFontFamily);
+  font-style: normal;
+  line-height: 24px;
+  font-weight: 400;
+}

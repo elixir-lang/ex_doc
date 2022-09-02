@@ -1,0 +1,109 @@
+#settings-modal-content {
+  margin-top: 10px;
+}
+
+#settings-modal-content .hidden {
+  display: none;
+}
+
+#settings-modal-content .input {
+  box-sizing: border-box;
+  width: 80%;
+  padding: 8px;
+  font-size: 14px;
+  background-color: var(--settingsInputBackground);
+  color: var(--settingsInput);
+  border: 1px solid var(--settingsInputBorder);
+  border-radius: 8px;
+  transition: border-color 150ms;
+}
+#settings-modal-content .input:focus {
+  outline: none;
+  border-color: var(--main);
+}
+#settings-modal-content .input::placeholder {
+  color: var(--gray300);
+}
+
+#settings-modal-content .switch-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--settingsSectionBorder);
+  padding: 10px 0;
+}
+#settings-modal-content .switch-button-container:first-of-type {
+  border-top-style: none;
+  padding-top: 0;
+}
+
+#settings-modal-content .switch-button-container > div > span {
+  font-size: 18px;
+}
+
+#settings-modal-content .switch-button-container > div > p {
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+  padding-bottom: 6px;
+  padding-right: 10px;
+}
+
+#settings-modal-content .switch-button {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 40px;
+  height: 20px;
+  user-select: none;
+  transition: all 150ms;
+}
+
+#settings-modal-content .switch-button__checkbox {
+  appearance: none;
+  position: absolute;
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 1000px;
+  background-color: #91a4b7;
+  border: 3px solid #e5edf5;
+  cursor: pointer;
+  transition: all 300ms;
+}
+
+#settings-modal-content .switch-button__bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 1000px;
+  background-color: #e5edf5;
+  cursor: pointer;
+  transition: all 300ms;
+}
+
+#settings-modal-content .switch-button__checkbox:checked {
+  background-color: white;
+  border-color: var(--main);
+  transform: translateX(100%);
+}
+
+#settings-modal-content .switch-button__checkbox:checked + .switch-button__bg {
+  background-color: var(--main);
+}
+
+#settings-modal-content .settings-select {
+  cursor: pointer;
+  position: relative;
+  border: none;
+  background-color: transparent;
+  color: var(--textBody);
+}
+
+#settings-modal-content .settings-select option {
+  color: initial;
+}
+
+#settings-modal-content .settings-select:focus {
+  outline: none;
+}

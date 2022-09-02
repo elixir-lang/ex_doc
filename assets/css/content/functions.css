@@ -1,0 +1,95 @@
+@keyframes blink-background {
+  from {
+    background-color: var(--textDetailBackground);
+  }
+  to {
+    background-color: var(--blink);
+  }
+}
+
+.content-inner .detail:target .detail-header {
+  animation-duration: .55s;
+  animation-name: blink-background;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+}
+
+.content-inner .detail-header {
+  margin: 2.0em 0 1.0em;
+  padding: .5em 1em;
+  background-color: var(--textDetailBackground);
+  border-left: 3px solid var(--main);
+  font-size: 1em;
+  font-family: var(--monoFontFamily);
+  position: relative;
+}
+
+.content-inner .detail-header .note {
+  float: right;
+}
+
+.content-inner .detail-header .signature {
+  display: inline-block;
+  font-family: var(--monoFontFamily);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.content-inner .detail-header:hover a.detail-link {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.content-inner .detail-header a.detail-link {
+  transition: opacity .3s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  opacity: 0;
+  padding: .6em;
+  line-height: 1.5em;
+  margin-left: -2.5em;
+  text-decoration: none;
+  border: none;
+}
+
+.content-inner .specs pre {
+  font-family: var(--monoFontFamily);
+  font-size: .9em;
+  font-style: normal;
+  line-height: 24px;
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 0;
+}
+
+.content-inner .specs .attribute {
+  color: var(--fnSpecAttr);
+}
+
+.content-inner .docstring {
+  margin: 1.2em 0 3em 1.2em;
+}
+
+.content-inner .docstring:is(h2, h3, h4, h5) {
+  font-weight: 700;
+}
+.content-inner .docstring h2 {
+  font-size: 1.1em;
+}
+.content-inner .docstring h3 {
+  font-size: 1.0em;
+}
+.content-inner .docstring h4 {
+  font-size: .95em;
+}
+.content-inner .docstring h5 {
+  font-size: .9em;
+}
+
+.content-inner div.deprecated {
+  display: block;
+  padding: 9px 15px;
+  background-color: var(--fnDeprecated);
+}

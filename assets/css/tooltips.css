@@ -1,0 +1,67 @@
+#tooltip {
+  box-shadow: 0 0 10px var(--black-opacity-10);
+  max-height: 300px;
+  max-width: 500px;
+  padding: 0;
+  position: absolute;
+  pointer-events: none;
+  margin: 0;
+  z-index: 99;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: .2s visibility ease-out, .2s transform ease-out, .2s opacity ease-out;
+}
+
+/*
+Show-up animation
+======
+Note: it's fine to hide the tooltip with `visibility: hidden` (rather than `display: none`)
+as it has absolute positioning, so doesn't impact the layout and click events pass through.
+*/
+#tooltip.tooltip-shown {
+  visibility: visible;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#tooltip .tooltip-body {
+  border: 1px solid var(--codeBorder);
+}
+
+#tooltip .tooltip-body .signature {
+  min-width: 320px;
+  width: 100%;
+}
+
+#tooltip .tooltip-body .detail-header {
+  border-left: 0;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+#tooltip .tooltip-body .docstring {
+  background-color: var(--background);
+  padding: 1.2em;
+  margin: 0;
+  width: 498px; /* Taking 2 * 1px of border into account */
+}
+
+/* Used for simple tooltips having only description. */
+#tooltip .tooltip-body .docstring-plain {
+  max-width: 498px;
+  width: auto;
+}
+
+#tooltip .tooltip-body .version-info {
+  float: right;
+  line-height: 1.6rem;
+  font-family: var(--monoFontFamily);
+  font-size: .9rem;
+  font-weight: normal;
+  margin-bottom: -6px;
+  opacity: .3;
+  padding-left: .3em;
+}

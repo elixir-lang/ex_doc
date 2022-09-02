@@ -1,0 +1,21 @@
+@import 'fonts.css';
+
+@import '~normalize.css/normalize.css';
+
+@import 'icons.css';
+@import 'layout.css';
+@import 'sidebar.css';
+@import 'content.css';
+@import 'search.css';
+@import 'modal.css';
+@import 'keyboard-shortcuts.css';
+@import 'quick-switch.css';
+@import 'autocomplete.css';
+@import 'tooltips.css';
+@import 'copy-button.css';
+@import 'settings.css';
+@import 'toast.css';
+
+@import 'screen-reader.css';
+@import 'print.css';
+@import 'makeup.css';
