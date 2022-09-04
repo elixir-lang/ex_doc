@@ -24,6 +24,9 @@ defmodule Mix.Tasks.Docs do
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
 
+    * `--proglang` - Chooses the main programming language: "elixir"
+      or "erlang"
+
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
 
@@ -309,7 +312,8 @@ defmodule Mix.Tasks.Docs do
     formatter: :keep,
     language: :string,
     open: :boolean,
-    output: :string
+    output: :string,
+    proglang: :string
   ]
 
   @aliases [
@@ -338,10 +342,18 @@ defmodule Mix.Tasks.Docs do
     project =
       to_string(
         config[:name] || config[:app] ||
-          raise("expected :name or :app to be found in the project definition in mix.exs")
+          Mix.raise("expected :name or :app to be found in the project definition in mix.exs")
       )
 
     version = config[:version] || "dev"
+
+    cli_opts = Keyword.update(cli_opts, :proglang, :elixir, fn proglang ->
+      if proglang not in ~w(erlang elixir) do
+        Mix.raise("--proglang must be elixir or erlang")
+      end
+
+      String.to_atom(proglang)
+    end)
 
     options =
       config
