@@ -7,21 +7,23 @@
   position: absolute;
   left: 0;
   top: 0;
-  padding: 8px 2px;
-  color: var(--quickSwitchText);
+  padding: 4px 10px;
+  color: var(--quickSwitchContour);
+  font-weight: bold;
 }
 
 #quick-switch-modal-body #quick-switch-input {
   width: 100%;
-  padding: 8px 6px 6px 26px;
+  padding: 8px 6px 8px 38px;
   border: none;
-  border-bottom: 1px solid var(--quickSwitchText);
+  color: var(--quickSwitchInput);
+  background-color: transparent;
+  border-bottom: 1px solid var(--quickSwitchContour);
   box-sizing: border-box;
   transition: all .12s ease-out;
 }
 
 #quick-switch-modal-body #quick-switch-input:focus {
-  border-bottom: 1px solid var(--gray800);
   outline: none;
 }
 
@@ -31,7 +33,7 @@
 
 #quick-switch-modal-body .quick-switch-result {
   padding: 2px 5px;
-  border-bottom: 1px dotted var(--quickSwitchText);
+  border-bottom: 1px dotted var(--quickSwitchContour);
   transition: all .12s ease-out;
 }
 

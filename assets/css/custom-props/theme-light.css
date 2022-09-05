@@ -52,7 +52,8 @@
   --settingsInputBorder:         var(--gray200);
   --settingsSectionBorder:       var(--gray200);
 
-  --quickSwitchText:             var(--coldGray);
+  --quickSwitchInput:            var(--gray500);
+  --quickSwitchContour:          var(--coldGray);
 
   --success:                     var(--green);
 
