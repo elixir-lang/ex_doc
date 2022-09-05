@@ -26,6 +26,9 @@ defmodule ExDoc.UtilsTest do
       умножить/1
       Вычесть/1
       вычесть/1
+      rm?/1
+      rm!/1
+      rm/1
     |
 
     assert ExDoc.Utils.natural_sort_by(input, & &1) == ~w|
@@ -40,6 +43,9 @@ defmodule ExDoc.UtilsTest do
       äpfeln/1
       reraise/2
       reraise/3
+      rm/1
+      rm!/1
+      rm?/1
       send/2
       sigil_C/2
       sigil_c/2

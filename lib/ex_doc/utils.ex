@@ -42,8 +42,14 @@ defmodule ExDoc.Utils do
     [@offset + List.to_integer([digit | digits]) | make_sortable(chars)]
   end
 
+  # Then Elixir special punctuation - trailing bang `!`
+  defp make_sortable([?! | chars]), do: [?0 | make_sortable(chars)]
+
+  # Then Elixir special punctuation - question mark `?`
+  defp make_sortable([?? | chars]), do: [?1 | make_sortable(chars)]
+
   # Then underscore
-  defp make_sortable([?_ | chars]), do: [?0 | make_sortable(chars)]
+  defp make_sortable([?_ | chars]), do: [?2 | make_sortable(chars)]
 
   # Then uppercased letters and lowercased letters
   defp make_sortable([char | chars]) when char in ?a..?z do
