@@ -347,13 +347,14 @@ defmodule Mix.Tasks.Docs do
 
     version = config[:version] || "dev"
 
-    cli_opts = Keyword.update(cli_opts, :proglang, :elixir, fn proglang ->
-      if proglang not in ~w(erlang elixir) do
-        Mix.raise("--proglang must be elixir or erlang")
-      end
+    cli_opts =
+      Keyword.update(cli_opts, :proglang, :elixir, fn proglang ->
+        if proglang not in ~w(erlang elixir) do
+          Mix.raise("--proglang must be elixir or erlang")
+        end
 
-      String.to_atom(proglang)
-    end)
+        String.to_atom(proglang)
+      end)
 
     options =
       config
