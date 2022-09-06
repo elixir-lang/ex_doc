@@ -1,11 +1,22 @@
-@import 'fonts.css';
+@import url('https://fonts.googleapis.com/css?family=Lato:300,700|Merriweather:300italic,300|Inconsolata:400,700');
 
+@import 'custom-props/common.css';
+@import 'custom-props/theme-light.css';
+@import 'custom-props/theme-dark.css';
+
+/* To build with esbuild, remove '~' */
 @import '~normalize.css/normalize.css';
 
 @import 'icons.css';
 @import 'layout.css';
 @import 'sidebar.css';
-@import 'content.css';
+@import 'content/general.css';
+@import 'content/admonition.css';
+@import 'content/summary.css';
+@import 'content/code.css';
+@import 'content/functions.css';
+@import 'content/footer.css';
+@import 'content/bottom-actions.css';
 @import 'search.css';
 @import 'modal.css';
 @import 'keyboard-shortcuts.css';
@@ -15,7 +26,11 @@
 @import 'copy-button.css';
 @import 'settings.css';
 @import 'toast.css';
-
 @import 'screen-reader.css';
 @import 'print.css';
 @import 'makeup.css';
+
+body:not(.dark) .content-inner img[src*="#gh-dark-mode-only"],
+body.dark .content-inner img[src*="#gh-light-mode-only"] {
+  display: none;
+}

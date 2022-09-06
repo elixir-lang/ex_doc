@@ -1,5 +1,3 @@
-@import 'common.css';
-
 :root {
   --main:               hsl(250, 68%, 69%); /* purple 600 */
   --main-darkened-10:   hsl(250, 68%, 59%);
