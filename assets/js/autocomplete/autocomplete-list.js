@@ -1,4 +1,3 @@
-import autocompleteSuggestionsTemplate from '../handlebars/templates/autocomplete-suggestions.handlebars'
 import { getSuggestions } from './suggestions'
 import { isBlank, qs } from '../helpers'
 
@@ -54,7 +53,7 @@ export function updateAutocompleteList (searchTerm) {
 
 // Updates list of suggestions inside the autocomplete.
 function renderSuggestions ({ term, suggestions }) {
-  const autocompleteContainerHtml = autocompleteSuggestionsTemplate({ suggestions, term })
+  const autocompleteContainerHtml = Handlebars.templates['autocomplete-suggestions']({ suggestions, term })
 
   const autocompleteContainer = qs(AUTOCOMPLETE_CONTAINER_SELECTOR)
   autocompleteContainer.innerHTML = autocompleteContainerHtml

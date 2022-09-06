@@ -1,4 +1,3 @@
-import sidebarItemsTemplate from '../handlebars/templates/sidebar-items.handlebars'
 import { qs, getCurrentPageSidebarType, getLocationHash, findSidebarCategory } from '../helpers'
 import { getSidebarNodes } from '../globals'
 
@@ -38,7 +37,7 @@ function renderSidebarNodeList (nodesByType, type) {
 
   // Render the list
   const nodeList = qs(SIDEBAR_NODE_LIST_SELECTOR)
-  const listContentHtml = sidebarItemsTemplate({ nodes: nodes, group: '' })
+  const listContentHtml = Handlebars.templates['sidebar-items']({ nodes, group: '' })
   nodeList.innerHTML = listContentHtml
 
   // Highlight the corresponding navigation link

@@ -11,9 +11,9 @@ defmodule ExDoc.Formatter.HTML.Assets do
   def dist(proglang), do: dist_js() ++ dist_css(proglang) ++ dist_license()
 
   defp dist_js(), do: embed_pattern("dist/*.js")
-  defp dist_css(:elixir), do: embed_pattern("dist/elixir-*.css")
-  defp dist_css(:erlang), do: embed_pattern("dist/erlang-*.css")
+  defp dist_css(:elixir), do: embed_pattern("dist/html-elixir-*.css")
+  defp dist_css(:erlang), do: embed_pattern("dist/html-erlang-*.css")
   defp dist_license(), do: embed_pattern("dist/*.LICENSE.txt")
 
-  def fonts, do: embed_pattern("fonts/*")
+  def fonts, do: embed_pattern("dist/*.woff2")
 end

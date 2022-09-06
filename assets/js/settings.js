@@ -1,4 +1,3 @@
-import settingsModalBodyTemplate from './handlebars/templates/settings-modal-body.handlebars'
 import { qs, qsAll } from './helpers'
 import { openModal } from './modal'
 import { settingsStore } from './settings-store'
@@ -54,15 +53,15 @@ function showKeyboardShortcutsTab () {
 export function openSettingsModal () {
   openModal({
     title: modalTabs.map(({id, title}) => `<button id="${id}">${title}</button>`).join(''),
-    body: settingsModalBodyTemplate({ shortcuts: keyboardShortcuts })
+    body: Handlebars.templates['settings-modal-body']({ shortcuts: keyboardShortcuts })
   })
 
   const modal = qs(SETTINGS_MODAL_BODY_SELECTOR)
 
-  const themeInput = modal.querySelector(`[name="theme"]`)
-  const tooltipsInput = modal.querySelector(`[name="tooltips"]`)
-  const directLivebookUrlInput = modal.querySelector(`[name="direct_livebook_url"]`)
-  const livebookUrlInput = modal.querySelector(`[name="livebook_url"]`)
+  const themeInput = modal.querySelector('[name="theme"]')
+  const tooltipsInput = modal.querySelector('[name="tooltips"]')
+  const directLivebookUrlInput = modal.querySelector('[name="direct_livebook_url"]')
+  const livebookUrlInput = modal.querySelector('[name="livebook_url"]')
 
   settingsStore.getAndSubscribe(settings => {
     themeInput.value = settings.theme || 'system'

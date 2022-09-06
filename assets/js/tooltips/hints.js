@@ -99,7 +99,7 @@ function findPredefinedHint (href) {
 function loadHintFromExternalPage (href) {
   // Add the hint parameter, so that the target documentation page
   // knows it should send us a window message event.
-  const hintHref = href.replace('.html', `.html?hint=true`)
+  const hintHref = href.replace('.html', '.html?hint=true')
 
   return new Promise((resolve, reject) => {
     // Load the page in a hidden iframe, so that it may send a message to the window.
@@ -170,7 +170,7 @@ export function extractFunctionHint (element) {
  * @returns {Hint}
  */
 export function extractModuleHint (content) {
-  let heading = content.querySelector('h1 > span')
+  const heading = content.querySelector('h1 > span')
   const title = heading.textContent
 
   const firstParagraph = content.querySelector('#moduledoc p')

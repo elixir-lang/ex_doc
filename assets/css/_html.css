@@ -4,8 +4,7 @@
 @import 'custom-props/theme-light.css';
 @import 'custom-props/theme-dark.css';
 
-/* To build with esbuild, remove '~' */
-@import '~normalize.css/normalize.css';
+@import 'normalize.css/normalize.css';
 
 @import 'icons.css';
 @import 'layout.css';

@@ -1,4 +1,3 @@
-import modalLayoutTemplate from './handlebars/templates/modal-layout.handlebars'
 import { qs } from './helpers'
 
 const MODAL_SELECTOR = '#modal'
@@ -23,7 +22,7 @@ export function initialize () {
  * Adds the modal to DOM, initially it's hidden.
  */
 function renderModal () {
-  const modalLayoutHtml = modalLayoutTemplate()
+  const modalLayoutHtml = Handlebars.templates['modal-layout']()
   document.body.insertAdjacentHTML('beforeend', modalLayoutHtml)
 
   qs(MODAL_SELECTOR).addEventListener('keydown', event => {
