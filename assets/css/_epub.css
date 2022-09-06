@@ -1,3 +1,9 @@
+@import 'custom-props/common.css';
+@import 'custom-props/theme-light.css';
+
+@import 'content/code.css';
+@import 'content/functions.css';
+@import 'screen-reader.css';
 @import 'makeup.css';
 
 body {
@@ -17,14 +23,10 @@ nav > ol ol {
   list-style-type: disc;
 }
 
-img[src*="#gh-dark-mode-only"] {
-  display: none;
-}
-
 .title-container {
   text-align: center;
 }
 
-@import 'content/code.css';
-@import 'content/functions.css';
-@import 'screen-reader.css';
+img[src*="#gh-dark-mode-only"] {
+  display: none;
+}

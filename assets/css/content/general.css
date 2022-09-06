@@ -1,3 +1,12 @@
+.content-inner {
+  font-family: var(--serifFontFamily);
+  font-size: 1em;
+  line-height: 1.6875em;
+  position: relative;
+  background-color: var(--background);
+  color: var(--textBody);
+}
+
 .content-inner :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--sansFontFamily);
   font-weight: 700;

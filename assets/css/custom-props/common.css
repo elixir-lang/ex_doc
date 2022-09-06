@@ -36,6 +36,3 @@
   --black-opacity-10:       hsla(  0,   0%,   0%,  10%);
   --black-opacity-50:       hsla(  0,   0%,   0%,  50%);
 }
-
-@import 'theme-light.css';
-@import 'theme-dark.css';
