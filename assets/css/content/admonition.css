@@ -94,4 +94,5 @@
 .content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) code {
   background-color: var(--inlineCodeBackground);
   border: 1px solid var(--inlineCodeBorder);
+  color: var(--black);
 }
