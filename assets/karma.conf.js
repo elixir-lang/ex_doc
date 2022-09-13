@@ -9,7 +9,7 @@ module.exports = function (config) {
     ],
 
     preprocessors: {
-      'test/**/*.spec.js': ['esbuild']
+      'test/**/*.spec.js': ['esbuild', 'sourcemap']
     },
 
     reporters: ['progress'],
