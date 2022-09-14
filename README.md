@@ -276,11 +276,13 @@ The easiest way to test changes to ExDoc is to locally rebuild the app and its o
 
   1. Run `mix setup` to install all dependencies
   2. Run `mix build` to generate docs. This is a custom alias that will build assets, recompile ExDoc, and output fresh docs into the `doc/` directory
-  3. If you want to contribute a pull request, please do not add to your commits the files generated in the `assets/` and `formatters/` folders
+  3. If you want to contribute a pull request, please do not add to your commits the files generated in the `formatters/` directory
   4. Run `mix lint` to check if the Elixir and JavaScript files are properly formatted.
      You can run `mix fix` to let the JavaScript linter and Elixir formatter fix the code automatically before submitting your pull request
 
-Note that Node 17 or later is not supported due to [API breaking changes with Webpack](https://github.com/webpack/webpack/issues/14532).
+If working on the assets, please see the README in the `assets/` directory.
+
+The build process is currently tested in Node 16 LTS.
 
 ## License
 
