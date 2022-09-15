@@ -84,7 +84,7 @@ function nodeSuggestion (node, query, category) {
     label: null,
     description: null,
     matchQuality: matchQuality(node.title, query),
-    category: category
+    category
   }
 }
 
@@ -98,10 +98,10 @@ function childNodeSuggestion (childNode, parentId, query, category, label) {
   return {
     link: `${parentId}.html#${childNode.anchor}`,
     title: highlightMatches(childNode.id, query),
-    label: label,
+    label,
     description: parentId,
     matchQuality: matchQuality(childNode.id, query),
-    category: category
+    category
   }
 }
 
@@ -124,10 +124,10 @@ function moduleChildNodeSuggestion (childNode, parentId, query, category, label)
   return {
     link: `${parentId}.html#${childNode.anchor}`,
     title: highlightMatches(childNode.id, tokenizedQuery),
-    label: label,
+    label,
     description: parentId,
     matchQuality: matchQuality(modFun, query),
-    category: category
+    category
   }
 }
 

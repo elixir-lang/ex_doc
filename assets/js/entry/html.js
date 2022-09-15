@@ -1,3 +1,5 @@
+import '../handlebars/helpers'
+
 import { onDocumentReady } from '../helpers'
 import { initialize as initContent } from '../content'
 import { initialize as initSidebarDrawer } from '../sidebar/sidebar-drawer'

@@ -206,8 +206,8 @@ defmodule ExDoc.Formatter.HTML do
   defp digest(content) do
     content
     |> :erlang.md5()
-    |> Base.encode16(case: :lower)
-    |> binary_part(0, 10)
+    |> Base.encode16(case: :upper)
+    |> binary_part(0, 8)
   end
 
   defp generate_extras(nodes_map, extras, config) do
@@ -300,7 +300,7 @@ defmodule ExDoc.Formatter.HTML do
   defp default_assets(config) do
     [
       {Assets.dist(config.proglang), "dist"},
-      {Assets.fonts(), "dist/html/fonts"}
+      {Assets.fonts(), "dist"}
     ]
   end
 

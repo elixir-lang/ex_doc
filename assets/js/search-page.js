@@ -1,7 +1,6 @@
 /* globals searchNodes */
 
 import lunr from 'lunr'
-import resultsTemplate from './handlebars/templates/search-results.handlebars'
 import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
 import { setSearchInputValue } from './sidebar/sidebar-search'
 
@@ -41,7 +40,7 @@ function search (value) {
 
 function renderResults ({ value, results, errorMessage }) {
   const searchContainer = qs(SEARCH_CONTAINER_SELECTOR)
-  const resultsHtml = resultsTemplate({ value, results, errorMessage })
+  const resultsHtml = Handlebars.templates['search-results']({ value, results, errorMessage })
   searchContainer.innerHTML = resultsHtml
 }
 

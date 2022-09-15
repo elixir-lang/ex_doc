@@ -1,5 +1,3 @@
-import tooltipBodyTemplate from '../handlebars/templates/tooltip-body.handlebars'
-import tooltipLayoutTemplate from '../handlebars/templates/tooltip-layout.handlebars'
 import { qs, qsAll } from '../helpers'
 import { settingsStore } from '../settings-store'
 import { cancelHintFetchingIfAny, getHint, HINT_KIND, isValidHintHref } from './hints'
@@ -43,7 +41,7 @@ export function initialize () {
 }
 
 function renderTooltipLayout () {
-  const tooltipLayoutHtml = tooltipLayoutTemplate()
+  const tooltipLayoutHtml = Handlebars.templates['tooltip-layout']()
   qs(CONTENT_INNER_SELECTOR).insertAdjacentHTML('beforeend', tooltipLayoutHtml)
 }
 
@@ -110,9 +108,9 @@ function shouldShowTooltips () {
 }
 
 function renderTooltip (hint) {
-  const tooltipBodyHtml = tooltipBodyTemplate({
+  const tooltipBodyHtml = Handlebars.templates['tooltip-body']({
     isPlain: hint.kind === HINT_KIND.plain,
-    hint: hint
+    hint
   })
 
   qs(TOOLTIP_BODY_SELECTOR).innerHTML = tooltipBodyHtml

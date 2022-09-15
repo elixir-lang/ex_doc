@@ -16,45 +16,5 @@ https://github.com/elixir-lang/ex_doc/
 
 ==========================================================================
 
-normalize.css
-Copyright (c) Nicolas Gallagher and Jonathan Neal
-https://necolas.github.io/normalize.css/
-
-  Released under the MIT License.
-  https://github.com/necolas/normalize.css/blob/master/LICENSE.md
-
-==========================================================================
-
-webpack
-Copyright (c) 2012, Tobias Koppers
-https://github.com/webpack/webpack
-
-  Released under the MIT License.
-  http://www.opensource.org/licenses/mit-license.php
-
-==========================================================================
-
-lodash
-https://lodash.com/
-Copyright 2012, The Dojo Foundation
-http://dojofoundation.org/
-
-  Available under MIT license
-  https://github.com/lodash/lodash/blob/master/LICENSE
-
-Based on Underscore.js
-Copyright 2009, Jeremy Ashkenas, DocumentCloud and
-Investigative Reporters & Editors
-
-  http://underscorejs.org/LICENSE
-
-==========================================================================
-
-IcoMoon
-https://icomoon.io/
-
-  Released under the GPL version 3 and the Creative Commons Attribution 4.0 licenses.
-  https://www.gnu.org/licenses/gpl.html
-  https://creativecommons.org/licenses/by/4.0/
-
-==========================================================================
+Dependencies are externally maintained and have their own licenses; we
+recommend you read them as their terms may differ from the terms above.

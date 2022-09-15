@@ -1,5 +1,3 @@
-import quickSwitchModalBodyTemplate from './handlebars/templates/quick-switch-modal-body.handlebars'
-import quickSwitchResultsTemplate from './handlebars/templates/quick-switch-results.handlebars'
 import { debounce, qs, qsAll } from './helpers'
 import { openModal } from './modal'
 
@@ -77,7 +75,7 @@ function handleInput (event) {
 export function openQuickSwitchModal () {
   openModal({
     title: 'Search HexDocs package',
-    body: quickSwitchModalBodyTemplate()
+    body: Handlebars.templates['quick-switch-modal-body']()
   })
 
   qs(QUICK_SWITCH_INPUT_SELECTOR).focus()
@@ -140,7 +138,7 @@ function queryForAutocomplete (packageSlug) {
 
 function renderResults ({ results }) {
   const resultsContainer = qs(QUICK_SWITCH_RESULTS_SELECTOR)
-  const resultsHtml = quickSwitchResultsTemplate({ results })
+  const resultsHtml = Handlebars.templates['quick-switch-results']({ results })
   resultsContainer.innerHTML = resultsHtml
 
   qsAll(QUICK_SWITCH_RESULT_SELECTOR).forEach(result => {
@@ -164,7 +162,7 @@ function resultsFromPayload (packageSlug, payload) {
   return STATIC_SEARCH_RESULTS
     .concat(payload)
     .filter(result => result.name.toLowerCase().includes(packageSlug.toLowerCase()))
-    .filter(result => result.releases === undefined || result.releases[0]['has_docs'] === true)
+    .filter(result => result.releases === undefined || result.releases[0].has_docs === true)
     .slice(0, NUMBER_OF_SUGGESTIONS)
 }
 

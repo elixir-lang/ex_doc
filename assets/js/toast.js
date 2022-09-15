@@ -1,4 +1,4 @@
-var toastTimer = null
+let toastTimer = null
 const toast = document.getElementById('toast')
 toast.addEventListener('click', (event) => {
   clearTimeout(toastTimer)

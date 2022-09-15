@@ -157,8 +157,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.regular?(tmp_dir <> "/html/CompiledWithDocs.html")
     assert File.regular?(tmp_dir <> "/html/CompiledWithDocs.Nested.html")
 
-    assert [_] = Path.wildcard(tmp_dir <> "/html/dist/app-*.js")
-    assert [_] = Path.wildcard(tmp_dir <> "/html/dist/elixir-*.css")
+    assert [_] = Path.wildcard(tmp_dir <> "/html/dist/html-*.js")
+    assert [_] = Path.wildcard(tmp_dir <> "/html/dist/html-elixir-*.css")
 
     content = File.read!(tmp_dir <> "/html/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
@@ -577,10 +577,9 @@ defmodule ExDoc.Formatter.HTMLTest do
       content = File.read!(tmp_dir <> "/html/.build")
       assert content =~ ~r(^readme\.html$)m
       assert content =~ ~r(^api-reference\.html$)m
-      assert content =~ ~r(^dist/sidebar_items-[\w]{10}\.js$)m
-      assert content =~ ~r(^dist/app-[\w]{20}\.js$)m
-      assert content =~ ~r(^dist/app-[\w]{20}\.js.LICENSE.txt$)m
-      assert content =~ ~r(^dist/elixir-[\w]{20}\.css$)m
+      assert content =~ ~r(^dist/sidebar_items-[\w]{8}\.js$)m
+      assert content =~ ~r(^dist/html-[\w]{8}\.js$)m
+      assert content =~ ~r(^dist/html-elixir-[\w]{8}\.css$)m
       assert content =~ ~r(^assets/logo\.png$)m
       assert content =~ ~r(^index\.html$)m
       assert content =~ ~r(^404\.html$)m

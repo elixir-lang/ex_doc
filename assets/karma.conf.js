@@ -1,5 +1,3 @@
-const webpackConfig = require('./webpack.js')
-
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -11,13 +9,7 @@ module.exports = function (config) {
     ],
 
     preprocessors: {
-      'test/**/*.spec.js': ['webpack', 'sourcemap']
-    },
-
-    webpack: webpackConfig,
-
-    webpackMiddleware: {
-      noInfo: true
+      'test/**/*.spec.js': ['esbuild', 'sourcemap']
     },
 
     reporters: ['progress'],
@@ -25,7 +17,7 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: false,
-    browsers: [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
+    browsers: ['Chrome'],
     singleRun: false
   })
 }
