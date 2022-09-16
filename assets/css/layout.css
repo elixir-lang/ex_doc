@@ -39,11 +39,11 @@ body {
 .sidebar-button {
   position: fixed;
   z-index: 99;
-  left: 7px;
+  left: 0;
   top: 7px;
   transition: color .3s ease-in-out, transform .15s ease-out .1s, opacity .15s ease-out .1s;
   will-change: transform;
-  transform: translateX(243px);
+  transform: translateX(250px);
 }
 
 .content {
@@ -85,8 +85,8 @@ body.sidebar-closing .content {
 }
 
 body.sidebar-closed .sidebar-button {
-  transition: none;
-  transform: translateX(0);
+  transition: transform .3s ease-in-out;
+  transform: translateY(-8px);
 }
 
 body.sidebar-closed .sidebar {
