@@ -41,9 +41,9 @@ export function initialize () {
 
 function setDefaultSidebarState () {
   // check & set persistent session state
-  const persistent_session_state = sessionStorage.getItem('sidebar_state')
-  if (persistent_session_state == 'opened') return setClass(SIDEBAR_CLASS.opened)
-  if (persistent_session_state == 'closed') return setClass(SIDEBAR_CLASS.closed)
+  const persistenSessionState = sessionStorage.getItem('sidebar_state')
+  if (persistenSessionState === 'opened') return setClass(SIDEBAR_CLASS.opened)
+  if (persistenSessionState === 'closed') return setClass(SIDEBAR_CLASS.closed)
 
   // else
   setClass(isScreenSmall() ? SIDEBAR_CLASS.closed : SIDEBAR_CLASS.opened)
