@@ -16,5 +16,4 @@ defmodule ExDoc.Formatter.HTML.Assets do
   defp dist_license(), do: embed_pattern("dist/*.LICENSE.txt")
 
   def fonts, do: embed_pattern("dist/*.woff2")
-  def fonts_legacy, do: embed_pattern("dist/*.woff")
 end
