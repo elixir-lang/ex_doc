@@ -83,6 +83,8 @@ const htmlBuild = esbuild.build({
   ],
   loader: {
     '.woff2': 'file',
+    // TODO: Remove when @fontsource/* removes legacy .woff
+    '.woff': 'file',
   },
 }).catch(() => process.exit(1))
 
