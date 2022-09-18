@@ -34,7 +34,7 @@ body.dark {
   --tipHeading:                  var(--white);
 
   --fnSpecAttr:                  var(--gray500);
-  --fnDeprecated:                var(--yellow);
+  --fnDeprecated:                var(--yellowDark);
   --blink:                       var(--gray600);
 
   --codeBackground:              var(--gray800);

@@ -27,6 +27,7 @@
   --coldGrayDark:            hsl(240,   5%,  28%      );
   --coldGrayDim:             hsl(240,   5%,  18%      );
   --yellowLight:             hsl( 60, 100%,  81%      );
+  --yellowDark:              hsl(60deg 100%  43% / 62%);
   --yellow:                  hsl( 60, 100%,  43%      );
   --green-lightened-10:      hsl( 90, 100%,  45%      );
   --green:                   hsl( 90, 100%,  35%      );
