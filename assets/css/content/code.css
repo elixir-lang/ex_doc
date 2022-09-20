@@ -29,3 +29,28 @@
   padding: .5em 1em;
   background-color: var(--codeBackground);
 }
+
+.content-inner pre code.output {
+  margin: 0 12px;
+}
+
+.content-inner pre code.output + .copy-button {
+  margin-right: 12px;
+}
+
+.content-inner pre code.output:before {
+  content: "Output";
+  display: block;
+  position: absolute;
+  top: -16px;
+  left: 12px;
+  padding: 2px 4px;
+  font-size: 12px;
+  font-family: var(--monoFontFamily);
+  line-height: 1;
+  color: var(--textHeaders);
+  background-color: var(--codeBackground);
+  border: 1px solid var(--codeBorder);
+  border-bottom: 0;
+  border-radius: 2px;
+}

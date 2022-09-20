@@ -149,6 +149,10 @@ defmodule ExDoc.DocAST do
     {"shell", ExDoc.ShellLexer, []}
   end
 
+  defp pick_language_and_lexer("output", highlight_info, _code) do
+    {"output", highlight_info.lexer, highlight_info.opts}
+  end
+
   defp pick_language_and_lexer("", highlight_info, _code) do
     {highlight_info.language_name, highlight_info.lexer, highlight_info.opts}
   end

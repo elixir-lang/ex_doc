@@ -41,5 +41,30 @@ defmodule ExDoc.Markdown.EarmarkTest do
                         Markdown.to_ast("{:ok, status, %MyApp.User{}} on success", [])
              end) =~ "ExDoc.Markdown.Earmark (warning)"
     end
+
+    test "rewrites livebook outputs to output code blocks" do
+      md = """
+      # Notebook
+
+      ## Example
+
+      ```elixir
+      1 + 1
+      ```
+
+      <!-- livebook:{"output":true} -->
+
+      ```
+      2
+      ```
+      """
+
+      assert Markdown.to_ast(md, []) == [
+               {:h1, [], ["Notebook"], %{}},
+               {:h2, [], ["Example"], %{}},
+               {:pre, [], [{:code, [class: "elixir"], ["1 + 1"], %{}}], %{}},
+               {:pre, [], [{:code, [class: "output"], ["2"], %{}}], %{}}
+             ]
+    end
   end
 end
