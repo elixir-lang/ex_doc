@@ -72,6 +72,19 @@ defmodule ExDoc.Markdown.Earmark do
     []
   end
 
+  defp fixup_list(
+         [
+           {:comment, _, [~s/ livebook:{"output":true} /], %{comment: true}},
+           {"pre", pre_attrs, [{"code", code_attrs, [source], code_meta}], pre_meta}
+           | ast
+         ],
+         acc
+       ) do
+    code_attrs = Enum.reject(code_attrs, &match?({"class", _}, &1))
+    new_code = {"code", [{"class", "output"} | code_attrs], [source], code_meta}
+    fixup_list([{"pre", pre_attrs, [new_code], pre_meta} | ast], acc)
+  end
+
   defp fixup_list([head | tail], acc) do
     fixed = fixup(head)
 
