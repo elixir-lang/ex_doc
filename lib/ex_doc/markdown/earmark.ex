@@ -72,6 +72,7 @@ defmodule ExDoc.Markdown.Earmark do
     []
   end
 
+  # We are matching on Livebook outputs here, because we prune comments at this point
   defp fixup_list(
          [
            {:comment, _, [~s/ livebook:{"output":true} /], %{comment: true}},

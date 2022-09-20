@@ -17,7 +17,7 @@ export function initialize () {
 function addCopyButtons () {
   Array.from(qsAll('pre'))
     .filter(pre => pre.firstElementChild && pre.firstElementChild.tagName === 'CODE')
-    .forEach(pre => pre.insertAdjacentHTML('afterbegin', BUTTON))
+    .forEach(pre => pre.insertAdjacentHTML('beforeend', BUTTON))
 
   Array.from(qsAll('.copy-button')).forEach(button => {
     let timeout

@@ -31,7 +31,11 @@
 }
 
 .content-inner pre code.output {
-  margin-left: 24px;
+  margin: 0 12px;
+}
+
+.content-inner pre code.output + .copy-button {
+  margin-right: 12px;
 }
 
 .content-inner pre code.output:before {
@@ -39,7 +43,7 @@
   display: block;
   position: absolute;
   top: -16px;
-  left: 24px;
+  left: 12px;
   padding: 2px 4px;
   font-size: 12px;
   font-family: var(--monoFontFamily);
