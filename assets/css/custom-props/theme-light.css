@@ -41,6 +41,8 @@
   --codeBorder:                  var(--gray100);
   --inlineCodeBackground:        var(--codeBackground);
   --inlineCodeBorder:            var(--codeBorder);
+  --codeScrollThumb:             var(--gray300);
+  --codeScrollBackground:        var(--codeBorder);
 
   --bottomActionsBtnBorder:      var(--black-opacity-10);
   --bottomActionsBtnSubheader:   var(--main-darkened-10);
