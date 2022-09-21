@@ -41,6 +41,8 @@ body.dark {
   --codeBorder:                  var(--gray700);
   --inlineCodeBackground:        var(--gray50);
   --inlineCodeBorder:            var(--gray100);
+  --codeScrollThumb:             var(--gray500);
+  --codeScrollBackground:        var(--codeBorder);
 
   --bottomActionsBtnBorder:      var(--white-opacity-10);
   --bottomActionsBtnSubheader:   var(--main);
