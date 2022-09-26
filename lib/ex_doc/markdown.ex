@@ -86,9 +86,10 @@ defmodule ExDoc.Markdown do
 
   defp sectionize(list, matcher, acc) do
     case pivot(list, acc, matcher) do
-      {acc, {header_tag, _, _, _} = header, rest} ->
+      {acc, {header_tag, header_attrs, _, _} = header, rest} ->
         {inner, rest} = Enum.split_while(rest, &not_tag?(&1, header_tag))
-        section = {:section, [], [header | sectionize(inner, matcher, [])], %{}}
+        class = String.trim_trailing("#{header_tag} #{header_attrs[:class]}")
+        section = {:section, [class: class], [header | sectionize(inner, matcher, [])], %{}}
         sectionize(rest, matcher, [section | acc])
 
       acc ->

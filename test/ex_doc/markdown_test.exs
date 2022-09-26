@@ -4,7 +4,7 @@ defmodule ExDoc.MarkdownTest do
   test "sectioninize" do
     list = [
       {:h1, [], ["H1"], %{}},
-      {:h2, [], ["H2-1"], %{}},
+      {:h2, [class: "example"], ["H2-1"], %{}},
       {:p, [], ["p1"], %{}},
       {:h3, [], ["H3-1"], %{}},
       {:p, [], ["p2"], %{}},
@@ -14,40 +14,40 @@ defmodule ExDoc.MarkdownTest do
       {:p, [], ["p4"], %{}},
       {:h2, [], ["H2-2"], %{}},
       {:p, [], ["p5"], %{}},
-      {:h3, [], ["H3-1"], %{}},
+      {:h3, [class: "last"], ["H3-1"], %{}},
       {:p, [], ["p6"], %{}}
     ]
 
     assert ExDoc.Markdown.sectionize(list, &h2_or_h3?/1) ==
              [
                {:h1, [], ["H1"], %{}},
-               {:section, [],
+               {:section, [class: "h2 example"],
                 [
-                  {:h2, [], ["H2-1"], %{}},
+                  {:h2, [class: "example"], ["H2-1"], %{}},
                   {:p, [], ["p1"], %{}},
-                  {:section, [],
+                  {:section, [class: "h3"],
                    [
                      {:h3, [], ["H3-1"], %{}},
                      {:p, [], ["p2"], %{}}
                    ], %{}},
-                  {:section, [],
+                  {:section, [class: "h3"],
                    [
                      {:h3, [], ["H3-2"], %{}},
                      {:p, [], ["p3"], %{}}
                    ], %{}},
-                  {:section, [],
+                  {:section, [class: "h3"],
                    [
                      {:h3, [], ["H3-3"], %{}},
                      {:p, [], ["p4"], %{}}
                    ], %{}}
                 ], %{}},
-               {:section, [],
+               {:section, [class: "h2"],
                 [
                   {:h2, [], ["H2-2"], %{}},
                   {:p, [], ["p5"], %{}},
-                  {:section, [],
+                  {:section, [class: "h3 last"],
                    [
-                     {:h3, [], ["H3-1"], %{}},
+                     {:h3, [class: "last"], ["H3-1"], %{}},
                      {:p, [], ["p6"], %{}}
                    ], %{}}
                 ], %{}}
