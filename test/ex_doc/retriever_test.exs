@@ -5,6 +5,31 @@ defmodule ExDoc.RetrieverTest do
 
   @moduletag :tmp_dir
 
+  describe "docs_from_files/2" do
+    test "returns sorted docs", c do
+      elixirc(c, "module.ex", ~S"""
+      defmodule B do
+      end
+
+      defmodule A do
+      end
+
+      defmodule C do
+      end
+      """)
+
+      ebin_dir = Path.join(c.tmp_dir, "ebin")
+
+      files = [
+        Path.join(ebin_dir, "Elixir.B.beam"),
+        Path.join(ebin_dir, "Elixir.A.beam")
+      ]
+
+      assert [%ExDoc.ModuleNode{id: "A"}, %ExDoc.ModuleNode{id: "B"}] =
+               Retriever.docs_from_files(files, %ExDoc.Config{})
+    end
+  end
+
   describe "docs_from_modules/2: Generic" do
     test "module with no docs", c do
       elixirc(c, ~S"""
@@ -136,24 +161,46 @@ defmodule ExDoc.RetrieverTest do
     end
   end
 
-  test "docs_from_dir/2: filter_module", c do
-    elixirc(c, ~S"""
-    defmodule A do
+  describe "docs_from_dir/2" do
+    test "filter_module", c do
+      elixirc(c, ~S"""
+      defmodule A do
+      end
+
+      defmodule A.A do
+      end
+
+      defmodule B do
+      end
+      """)
+
+      ebin_dir = Path.join(c.tmp_dir, "ebin")
+      config = %ExDoc.Config{filter_modules: fn module, _ -> Atom.to_string(module) =~ "A" end}
+      [a, a_a] = Retriever.docs_from_dir(ebin_dir, config)
+
+      assert a.id == "A"
+      assert a_a.id == "A.A"
     end
 
-    defmodule A.A do
+    test "orders by module", c do
+      dir_1 = Path.join(c.tmp_dir, "somedir")
+      dir_2 = Path.join(c.tmp_dir, "otherdir")
+
+      elixirc(%{c | tmp_dir: dir_1}, ~S"""
+      defmodule B do
+      end
+      """)
+
+      elixirc(%{c | tmp_dir: dir_2}, ~S"""
+      defmodule A do
+      end
+      """)
+
+      dirs = [Path.join(dir_1, "ebin"), Path.join(dir_2, "ebin")]
+
+      assert [%ExDoc.ModuleNode{id: "A"}, %ExDoc.ModuleNode{id: "B"}] =
+               Retriever.docs_from_dir(dirs, %ExDoc.Config{})
     end
-
-    defmodule B do
-    end
-    """)
-
-    ebin_dir = Path.join(c.tmp_dir, "ebin")
-    config = %ExDoc.Config{filter_modules: fn module, _ -> Atom.to_string(module) =~ "A" end}
-    [a, a_a] = Retriever.docs_from_dir(ebin_dir, config)
-
-    assert a.id == "A"
-    assert a_a.id == "A.A"
   end
 
   test "natural sorting", c do
