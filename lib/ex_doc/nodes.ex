@@ -22,25 +22,27 @@ defmodule ExDoc.ModuleNode do
             language: nil,
             annotations: []
 
+  @typep annotation :: atom()
+
   @type t :: %__MODULE__{
-          id: nil | String.t(),
-          title: nil | String.t(),
-          nested_context: nil | String.t(),
-          nested_title: nil | String.t(),
-          module: nil | String.t(),
-          group: nil | String.t(),
-          deprecated: nil | String.t(),
-          function_groups: list(String.t()),
-          docs: list(),
-          doc: term(),
-          rendered_doc: nil | String.t(),
+          id: String.t(),
+          title: String.t(),
+          nested_context: String.t() | nil,
+          nested_title: String.t() | nil,
+          module: module(),
+          group: atom() | nil,
+          deprecated: String.t() | nil,
+          doc: ExDoc.DocAST.t() | nil,
+          rendered_doc: String.t() | nil,
           doc_line: non_neg_integer(),
-          typespecs: list(),
-          source_path: nil | String.t(),
-          source_url: nil | String.t(),
-          type: nil | atom(),
+          function_groups: [atom()],
+          docs: [ExDoc.FunctionNode.t()],
+          typespecs: [ExDoc.TypeNode.t()],
+          source_path: String.t(),
+          source_url: String.t() | nil,
+          type: atom(),
           language: module(),
-          annotations: list()
+          annotations: [annotation()]
         }
 end
 
@@ -65,22 +67,25 @@ defmodule ExDoc.FunctionNode do
             source_path: nil,
             source_url: nil
 
+  @typep annotation :: String.t()
+  @typep function_default :: {name :: atom(), arity :: non_neg_integer()}
+
   @type t :: %__MODULE__{
-          id: nil | String.t(),
-          name: nil | String.t(),
-          arity: non_neg_integer,
-          defaults: non_neg_integer,
-          doc: term(),
-          rendered_doc: nil | String.t(),
-          doc_line: non_neg_integer,
-          source_path: nil | String.t(),
-          source_url: nil | String.t(),
-          group: nil | String.t(),
-          type: nil | String.t(),
-          signature: nil | String.t(),
-          specs: list(),
-          annotations: list(),
-          deprecated: nil | String.t()
+          id: String.t(),
+          name: atom(),
+          arity: non_neg_integer(),
+          defaults: [function_default()],
+          deprecated: String.t() | nil,
+          doc: ExDoc.DocAST.t() | nil,
+          rendered_doc: String.t() | nil,
+          type: atom(),
+          signature: String.t(),
+          specs: [ExDoc.Language.spec_ast()],
+          annotations: [annotation()],
+          group: atom() | nil,
+          doc_line: non_neg_integer(),
+          source_path: String.t(),
+          source_url: String.t() | nil
         }
 end
 
@@ -103,19 +108,21 @@ defmodule ExDoc.TypeNode do
             signature: nil,
             annotations: []
 
+  @typep annotation :: String.t()
+
   @type t :: %__MODULE__{
-          id: nil | String.t(),
-          name: nil | String.t(),
-          arity: non_neg_integer,
-          type: nil | String.t(),
-          spec: nil | String.t(),
-          deprecated: nil | String.t(),
-          doc: term(),
-          rendered_doc: nil | String.t(),
-          doc_line: non_neg_integer,
-          signature: nil | String.t(),
-          source_url: nil | String.t(),
-          source_path: nil | String.t(),
-          annotations: list()
+          id: String.t(),
+          name: atom(),
+          arity: non_neg_integer(),
+          type: atom(),
+          deprecated: nil,
+          doc: ExDoc.DocAST.t() | nil,
+          rendered_doc: String.t() | nil,
+          doc_line: non_neg_integer(),
+          source_path: String.t(),
+          source_url: String.t() | nil,
+          spec: ExDoc.Language.spec_ast(),
+          signature: String.t(),
+          annotations: [annotation()]
         }
 end
