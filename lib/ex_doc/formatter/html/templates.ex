@@ -224,7 +224,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   prefixed with `prefix`.
   """
   @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
-  @spec link_headings(String.t(), Regex.t(), String.t()) :: String.t()
+  @spec link_headings(String.t() | nil, Regex.t(), String.t()) :: String.t() | nil
   def link_headings(content, regex \\ @heading_regex, prefix \\ "")
   def link_headings(nil, _, _), do: nil
 

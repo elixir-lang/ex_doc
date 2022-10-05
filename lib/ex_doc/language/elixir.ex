@@ -835,16 +835,12 @@ defmodule ExDoc.Language.Elixir do
 
     case {mode, Refs.get_visibility({:module, module}), Refs.get_visibility(ref)} do
       {_mode, _module_visibility, :public} ->
-        case Autolink.tool(module, config) do
-          :no_tool ->
-            nil
+        tool = Autolink.tool(module, config)
 
-          tool ->
-            if same_module? do
-              fragment(tool, kind, name, arity)
-            else
-              Autolink.app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
-            end
+        if same_module? do
+          fragment(tool, kind, name, arity)
+        else
+          Autolink.app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
         end
 
       {:regular_link, module_visibility, :undefined}
