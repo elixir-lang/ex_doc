@@ -17,22 +17,14 @@ defmodule ExDoc.Retriever do
   def docs_from_dir(dir, config) when is_binary(dir) do
     files = Path.wildcard(Path.expand("*.beam", dir))
 
-    docs_from_files(files, config)
+    files
+    |> Enum.map(&filename_to_module/1)
     |> docs_from_modules(config)
   end
 
   def docs_from_dir(dirs, config) when is_list(dirs) do
     Enum.flat_map(dirs, &docs_from_dir(&1, config))
     |> sort_modules(config)
-  end
-
-  @doc """
-  Extract documentation from all modules in the specified list of files
-  """
-  @spec docs_from_files([Path.t()], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
-  def docs_from_files(files, _config) when is_list(files) do
-    files
-    |> Enum.map(&filename_to_module(&1))
   end
 
   @doc """
