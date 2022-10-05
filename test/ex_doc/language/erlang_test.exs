@@ -161,6 +161,57 @@ defmodule ExDoc.Language.ErlangTest do
     end
   end
 
+  describe "autolink_doc/2 for extras" do
+    test "function", c do
+      assert autolink_extra("`foo:foo/0`", c) ==
+               ~s|<a href="foo.html#foo/0"><code class="inline">foo:foo/0</code></a>|
+    end
+
+    test "OTP function", c do
+      assert autolink_extra("`lists:reverse/1`", c) ==
+               ~s|<a href="https://www.erlang.org/doc/man/lists.html#reverse-1"><code class="inline">lists:reverse/1</code></a>|
+    end
+
+    test "type", c do
+      assert autolink_extra("`t:bar:t()`", c) ==
+               ~s|<a href="bar.html#t:t/0"><code class="inline">bar:t()</code></a>|
+    end
+
+    test "OTP type", c do
+      assert autolink_extra("`t:array:array()`", c) ==
+               ~s|<a href="https://www.erlang.org/doc/man/array.html#type-array"><code class="inline">array:array()</code></a>|
+    end
+
+    test "module", c do
+      assert autolink_extra("`foo`", c) ==
+               ~s|<a href="foo.html"><code class="inline">foo</code></a>|
+    end
+
+    test "OTP module", c do
+      assert autolink_extra("`rpc`", c) ==
+               ~s|<a href="https://www.erlang.org/doc/man/rpc.html"><code class="inline">rpc</code></a>|
+    end
+
+    test "bad function", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_extra("`bad:bad/0`", c) ==
+                        ~s|<code class="inline">bad:bad/0</code>|
+             end) =~ ~s|references function "bad:bad/0" but it is undefined or private|
+    end
+
+    test "bad type", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_extra("`t:bad:bad/0`", c) ==
+                        ~s|<code class="inline">t:bad:bad/0</code>|
+             end) =~ ~s|references type "bad:bad()" but it is undefined or private|
+    end
+
+    test "bad module", c do
+      assert autolink_extra("`does_not_exist`", c) ==
+               ~s|<code class="inline">does_not_exist</code>|
+    end
+  end
+
   describe "autolink_spec/2" do
     test "spec", c do
       assert autolink_spec("-spec foo() -> t().", c) ==
@@ -314,6 +365,15 @@ defmodule ExDoc.Language.ErlangTest do
     {:ok, tokens, _} = :erl_scan.string(String.to_charlist(binary))
     {:ok, ast} = :erl_parse.parse_form(tokens)
     ExDoc.Language.Erlang.autolink_spec(ast, opts)
+  end
+
+  defp autolink_extra(text, c) do
+    # Markdown is usually not valid EDoc
+    fixtures(c, "")
+
+    [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, [])
+
+    do_autolink_doc(ast)
   end
 
   defp fixtures(c, doc) do
