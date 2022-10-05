@@ -225,7 +225,7 @@ defmodule ExDoc.Language.Elixir do
     prefixes
     |> Enum.find(&String.starts_with?(title, &1 <> "."))
     |> case do
-      nil -> {nil, nil}
+      nil -> nil
       prefix -> {"." <> String.trim_leading(title, prefix <> "."), prefix}
     end
   end
