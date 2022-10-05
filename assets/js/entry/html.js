@@ -16,6 +16,7 @@ import { initialize as initTooltips } from '../tooltips/tooltips'
 import { initialize as initHintsPage } from '../tooltips/hint-page'
 import { initialize as initCopyButton } from '../copy-button'
 import { initialize as initSettings } from '../settings'
+import { initialize as initLayoutCheatsheets } from '../cheatsheet'
 
 onDocumentReady(() => {
   initTheme()
@@ -33,4 +34,5 @@ onDocumentReady(() => {
   initSearchPage()
   initCopyButton()
   initSettings()
+  initLayoutCheatsheets()
 })
