@@ -1,7 +1,7 @@
 defmodule ExDoc.Language do
   @moduledoc false
 
-  @typep spec_ast() :: term()
+  @type spec_ast() :: term()
 
   @typedoc """
   The map has the following keys:

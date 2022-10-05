@@ -314,7 +314,6 @@ defmodule ExDoc.Retriever do
 
   ## General helpers
 
-  defp signature([]), do: nil
   defp signature(list) when is_list(list), do: Enum.join(list, " ")
 
   defp annotations_from_metadata(metadata) do
