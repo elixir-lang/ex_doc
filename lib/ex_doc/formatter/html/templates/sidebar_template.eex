@@ -57,5 +57,5 @@
 
 <section class="content">
   <output role="status" id="toast"></output>
-  <div id="cheat" class="content-outer">
-    <div id="content" class="content-inner">
+  <div class="content-outer test">
+    <div id="content" class="content-inner cheatsheet2">
