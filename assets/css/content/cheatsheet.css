@@ -70,7 +70,7 @@
 }
 
 .page-cheatmd thead {
-  background-color: var(--gray300);
+  background-color: var(--gray100);
 }
 
 .page-cheatmd.dark thead {
@@ -78,7 +78,7 @@
 }
 
 .page-cheatmd tbody {
-  background-color: var(--gray200);
+  background-color: var(--gray50);
 }
 
 .page-cheatmd.dark tbody {
