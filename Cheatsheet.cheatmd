@@ -165,15 +165,16 @@ end
 ```
 
 ## Types
+{: .col-2}
 
 ### Primitives
 
-| Sample                  | Type            |
-| ---                     | ---             |
-| `nil`                   | Nil/null        |
+| Sample | Type |
+|:-:|:-:|
+| `nil` | Nil/null        |
 | `true` _/_ `false`      | Boolean         |
 | ---                     | ---             |
-| `?a`                    | Integer (ASCII) |
+| `?a`   | Integer (ASCII) |
 | `23`                    | Integer         |
 | `3.14`                  | Float           |
 | ---                     | ---             |
