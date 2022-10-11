@@ -25,7 +25,7 @@
   font-weight: 400;
 }
 
-.page-cheatmd h3::after {
+.page-cheatmd.dark h3::after {
   margin-left: 24px;
   content: '';
   vertical-align: middle;
@@ -33,6 +33,16 @@
   width: 100%;
   height: 1px;
   background: linear-gradient(to right,var(--gray600, 0.2),transparent 80%);
+}
+
+.page-cheatmd h3::after {
+  margin-left: 24px;
+  content: '';
+  vertical-align: middle;
+  display: inline-block;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right,rgba(116,95,181,0.2),transparent 80%);
 }
 
 .col-3 {
