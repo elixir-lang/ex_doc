@@ -115,9 +115,19 @@
 
 /* Columns */
 
-.col-1 {
+.full-page {
   display: block;
   width: 100%;
+}
+
+.full-page > section > table {
+  width: 100%;
+}
+
+.page-cheatmd section.col-1 {
+  display: block;
+  width: 70%;
+  margin: 0 auto;
 }
 
 .col-1 > section > table {

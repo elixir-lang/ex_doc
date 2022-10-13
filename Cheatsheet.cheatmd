@@ -5,6 +5,7 @@
 
 ### For columns use H2 tittle
 
+| `.full-page` | "full page"|
 | `.col-1` | "one-column"|
 | `.col-2` | "two-column"|
 | `.col-3` | "three-column"|
@@ -20,6 +21,7 @@ Use H3 to start a new topic.
 
 ### Tables
 
+| `.full-page` | "full page"|
 | `.col-1` | "one-column"|
 | `.col-2` | "two-column"|
 | `.col-3` | "three-column"|
@@ -73,7 +75,7 @@ Ex_docs uses Kramdown, and supports adding classes via Kramdown's syntax.
 
 H3 tittle
 -----------
-{: .col-1}
+{: .full-page}
 
 ### Supported
 
@@ -226,7 +228,7 @@ Add `{: .col-6}` after the H3 tittle to make large lists.
 
 Add `{: .col-4}` after the H3 tittle to make large lists.
 
-## Tables
+## One column
 {: .col-1}
 
 ### Basic table
