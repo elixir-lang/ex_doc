@@ -1,8 +1,38 @@
-## Getting started
-{: .col-3}
+# Cheatsheet User Guide
 
-### Hello world
-{: .col-item}
+## I'm a H2 section
+{: .col-2}
+
+### For columns use H2 sections
+
+| `.col-1` | "one-column"|
+| `.col-2` | "two-column"|
+| `.col-3` | "three-column"|
+| `-col-2-left` | "two-columns" (1/3 - 2/3) |
+
+Set the number of columns under the H2 Sections. 
+
+### I'm a H3 section
+
+Use H3 to start a new topic.
+
+#### I'm a H4 section.
+
+### Tables
+
+| `.col-1` | "one-column"|
+| `.col-2` | "two-column"|
+| `.col-3` | "three-column"|
+| `-col-2-left` | "two-columns" (1/3 - 2/3) |
+| `.col-4` | "four-columns for lists"|
+| `.col-6` | "six-columns for lists"|
+| `.wrap` | "wrap a content"|
+| `.prime` | "highlight a content" |
+
+I'm a `.prime`. How cool is that? ;)
+{: .prime}
+
+### Code
 
 ```elixir
 # hello.exs
@@ -16,736 +46,348 @@ end
 Greeter.greet("world")
 ```
 
-```bash
-elixir hello.exs
-# Hello, world!
-```
-{: .-setup}
+### Paragraphs
 
-### Variables
-{: .col-item}
-
-```elixir
-age = 23
-```
-
-### Maps
-{: .col-item}
-
-```elixir
-user = %{
-  name: "John",
-  city: "Melbourne"
-}
-```
-
-```elixir
-IO.puts "Hello, " <> user.name
-```
-{: .-setup}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at ante consectetur, pharetra magna a, malesuada lectus. Mauris porttitor ligula dui, at egestas augue hendrerit eget. Morbi lorem urna, scelerisque ut sem et, sollicitudin porta nulla.
 
 ### Lists
-{: .col-item}
 
-```elixir
-users = [ "Tom", "Dick", "Harry" ]
+- Element 1
+- Element 2
+- `piece of code`
+
+### Adding variants
+
 ```
+## Section
+{: .col-2}
+
+"highlight the content in a paragraph"
+{: .prime}
+
+"wrap a very long text"
+{: .wrap}
+```
+
+Ex_docs uses Kramdown, and supports adding classes via Kramdown's syntax.
+
+H3 sections
+-----------
+{: .col-1}
+
+### Supported
+
+Each section can have the following children:
+
+#### H4 section
+
+- `h4`
+- `lists`
+- `tables`
+
+A paragraph with a cool text: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at ante consectetur, pharetra magna a, malesuada lectus. Mauris porttitor ligula dui, at egestas augue hendrerit eget.
+
+- `p`
 
 ```elixir
 Enum.map(users, fn user ->
   IO.puts "Hello " <> user
 end)
 ```
+- `code`
 
-### Piping
-{: .col-item}
+A highlight section!
+This is a section with `{: .prime}`. Notice the fancy highlight! Great for "getting started" kind of snippets.
+{: .prime}
 
-```elixir
-source
-|> transform(:hello)
-|> print()
-```
-{: data-line="2,3"}
+### H3 section
 
-```elixir
-# Same as:
-print(transform(source, :hello))
-```
+Every box is an H3 section. The box will encompass everything inside the body of the H3.
 
-These two are equivalent.
+This is a basic section with paragraphs in it.
 
-### Pattern matching
-{: .col-item}
+Code
+----
+{: .col-3}
+
+### Basic code
 
 ```elixir
 user = %{name: "Tom", age: 23}
 %{name: username} = user
 ```
-{: data-line="2"}
-
-This sets `username` to `"Tom"`.
-
-
-## Control flow
-{: .col-2}
-
-### If
-{: .col-item}
 
 ```elixir
-if false do
-  "This will never be seen"
-else
-  "This will"
+def greet(%{name: username}) do
+  IO.puts "Hello, " <> username
 end
-```
-### Case
-{: .col-item}
 
-```elixir
-case {1, 2, 3} do
-  {4, 5, 6} ->
-    "This clause won't match"
-  {1, x, 3} ->
-    "This will match and bind x to 2"
-  _ ->
-   "This will match any value"
-end
+user = %{name: "Tom", age: 23}
 ```
 
-### Cond
-{: .col-item}
+Code blocks can be placed one after the other.
 
-```elixir
-cond do
-  1 + 1 == 3 ->
-    "I will never be seen"
-  2 * 5 == 12 ->
-    "Me neither"
-  true ->
-    "But I will (this is essentially an else)"
-end
+### Code with headings
+
+#### index.ex
+
+```
+Path.join(["~", "foo"])
+"~/foo"
 ```
 
-### With
-{: .col-item}
+#### other.ex
 
-```elixir
-with {:ok, {int, _asdf}} <- Integer.parse("123asdf"),
-     {:ok, datetime, _utc_offset} <- DateTime.from_iso8601("2021-10-27T12:00:00Z") do
-  DateTime.add(datetime, int, :second)
-  # optional else clause. if not provided and an error occurs, the error is returned
-else
-  :error -> "couldn't parse integer string"
-  {:error, :invalid_format} -> "couldn't parse date string"
-  _ -> "this will never get hit because all errors are handled"
+```
+Path.join(["foo"])
+"foo"
+```
+
+Code blocks can have headings.
+
+### Long lines
+
+```
+defmodule MyTracer do
+  def trace({:remote_function, _meta, module, name, arity}, env) do
+    IO.puts "#{env.file}:#{env.line} #{inspect(module)}.#{name}/#{arity}"
+    :ok
+  end
+
+  def trace(_event, _env) do
+    :ok
+  end
 end
 ```
 
-### Errors
+Long lines will have scrollbars on hover.
 
+### Line wrapping
 
-```elixir
-try do
-  throw(:hello)
-catch
-  message -> "Got #{message}."
-after
-  IO.puts("I'm the after clause.")
+```
+defmodule MyTracer do
+  def trace({:remote_function, _meta, module, name, arity}, env) do
+    IO.puts "#{env.file}:#{env.line} #{inspect(module)}.#{name}/#{arity}"
+    :ok
+  end
+
+  def trace(_event, _env) do
+    :ok
+  end
 end
 ```
+{: .wrap}
 
-## Types
-{: .col-2}
+Add `wrap` to wrap long lines.
 
-### Primitives
+## Lists
+{: .-three-column}
 
-| Sample | Type |
-|:-:|:-:|
-| `nil` | Nil/null        |
-| `true` _/_ `false`      | Boolean         |
-| ---                     | ---             |
-| `?a`   | Integer (ASCII) |
-| `23`                    | Integer         |
-| `3.14`                  | Float           |
-| ---                     | ---             |
-| `'hello'`               | Charlist        |
-| `<<2, 3>>`              | Binary          |
-| `"hello"`               | Binary string   |
-| `:hello`                | Atom            |
-| ---                     | ---             |
-| `[a, b]`                | List            |
-| `{a, b}`                | Tuple           |
-| ---                     | ---             |
-| `%{a: "hello"}`         | Map             |
-| `%MyStruct{a: "hello"}` | Struct          |
-| `fn -> ... end`         | Function        |
+### Lists
 
-### Type checks
+- This is
+- a list
+- with a few items
 
-```elixir
-is_atom/1
-is_bitstring/1
-is_boolean/1
-is_function/1
-is_function/2
-is_integer/1
-is_float/1
-```
+Here's an extra paragraph after the list.
 
-```elixir
-is_binary/1
-is_list/1
-is_map/1
-is_tuple/1
-```
+### Lists with headings
 
-```elixir
-is_nil/1
-is_number/1
-is_pid/1
-is_port/1
-is_reference/1
-```
+#### Part 1
 
-### Operators
+- `createElement()`
+- `componentDidMount()`
+- `componentWillUnmount()`
 
-```elixir
-left != right   # equal
-left !== right  # match
-left ++ right   # concat lists
-left <> right   # concat string/binary
-left =~ right   # regexp
-```
+#### Part 2
 
-Modules
--------
+- `shouldComponentUpdate()`
+- `componentWillReceiveProps()`
 
-### Importing
 
-```elixir
-require Redux   # compiles a module
-import Redux    # compiles, and you can use without the `Redux.` prefix
+Here's an extra paragraph after the list.
 
-use Redux       # compiles, and runs Redux.__using__/1
-use Redux, async: true
-
-import Redux, only: [duplicate: 2]
-import Redux, only: :functions
-import Redux, only: :macros
-
-import Foo.{Bar, Baz}
-```
-
-### Aliases
-
-```elixir
-alias Foo.Bar, as: Bar
-alias Foo.Bar   # same as above
-
-alias Foo.{Bar, Baz}
-```
-
-## String
-
-### Functions
-
-```elixir
-import String
-```
-{: .-setup}
-
-```elixir
-str = "hello"
-str |> length()        # → 5
-str |> codepoints()    # → ["h", "e", "l", "l", "o"]
-str |> slice(2..-1)    # → "llo"
-str |> split(" ")      # → ["hello"]
-str |> capitalize()    # → "Hello"
-str |> match(regex)
-```
-
-### Inspecting objects
-
-```elixir
-inspect(object, opts \\ [])
-```
-```elixir
-value |> IO.inspect()
-```
-```elixir
-value |> IO.inspect(label: "value")
-```
-
-## Numbers
-
-### Operations
-
-```elixir
-abs(n)
-round(n)
-rem(a, b)   # remainder (modulo)
-div(a, b)   # integer division
-```
-
-### Float
-
-```elixir
-import Float
-```
-{: .-setup}
-
-```elixir
-n = 10.3
-```
-{: .-setup}
-
-```elixir
-n |> ceil()            # → 11.0
-n |> ceil(2)           # → 11.30
-n |> to_string()       # → "1.030000+e01"
-n |> to_string([decimals: 2, compact: true])
-```
-
-```elixir
-Float.parse("34")  # → { 34.0, "" }
-```
-
-### Integer
-
-```elixir
-import Integer
-```
-{: .-setup}
-
-```elixir
-n = 12
-```
-{: .-setup}
-
-```elixir
-n |> digits()         # → [1, 2]
-n |> to_charlist()    # → '12'
-n |> to_string()      # → "12"
-n |> is_even()
-n |> is_odd()
-```
-
-```elixir
-# Different base:
-n |> digits(2)        # → [1, 1, 0, 0]
-n |> to_charlist(2)   # → '1100'
-n |> to_string(2)     # → "1100"
-```
-
-```elixir
-parse("12")           # → {12, ""}
-undigits([1, 2])      # → 12
-```
-
-### Type casting
-
-```elixir
-Float.parse("34.1")    # → {34.1, ""}
-Integer.parse("34")    # → {34, ""}
-```
-
-```elixir
-Float.to_string(34.1)  # → "3.4100e+01"
-Float.to_string(34.1, [decimals: 2, compact: true])  # → "34.1"
-```
-
-## Map
-
-### Defining
-
-```elixir
-m = %{name: "hi"}       # atom keys (:name)
-m = %{"name" => "hi"}   # string keys ("name")
-```
-
-### Updating
-
-```elixir
-import Map
-```
-{: .-setup}
-
-```elixir
-m = %{m | name: "yo"}  # key must exist
-```
-
-```elixir
-m |> put(:id, 2)      # → %{id: 2, name: "hi"}
-m |> put_new(:id, 2)  # only if `id` doesn't exist (`||=`)
-```
-
-```elixir
-m |> put(:b, "Banana")
-m |> merge(%{b: "Banana"})
-m |> update(:a, &(&1 + 1))
-m |> update(:a, fun a -> a + 1 end)
-```
-
-```elixir
-m |> get_and_update(:a, &(&1 || "default"))
-# → {old, new}
-```
-
-### Deleting
-
-```elixir
-m |> delete(:name)  # → %{}
-m |> pop(:name)     # → {"John", %{}}
-```
-
-### Reading
-
-```elixir
-m |> get(:id)       # → 1
-m |> keys()         # → [:id, :name]
-m |> values()       # → [1, "hi"]
-```
-
-```elixir
-m |> to_list()      # → [id: 1, name: "hi"]
-                    # → [{:id, 1}, {:name, "hi"}]
-```
-
-### Deep
-
-```elixir
-put_in(map, [:b, :c], "Banana")
-put_in(map[:b][:c], "Banana")    # via macros
-```
-
-```elixir
-get_and_update_in(users, ["john", :age], &{&1, &1 + 1})
-```
-
-### Constructing from lists
-
-```elixir
-Map.new([{:b, 1}, {:a, 2}])
-Map.new([a: 1, b: 2])
-Map.new([:a, :b], fn x -> {x, x} end)  # → %{a: :a, b: :b}
-```
-
-### Working with structs
-
-#### Struct to map
-
-```elixir
-Map.from_struct(%AnyStruct{a: "b"})  # → %{a: "b"}
-```
-
-#### Map to struct
-
-```elixir
-struct(AnyStruct, %{a: "b"})  # → %AnyStruct{a: "b"}
-```
-
-## List
-
-```elixir
-import List
-```
-{: .-setup}
-
-```elixir
-l = [ 1, 2, 3, 4 ]
-```
-{: .-setup}
-
-```elixir
-l = l ++ [5]         # push (append)
-l = [ 0 | list ]     # unshift (prepend)
-```
-
-```elixir
-l |> first()
-l |> last()
-```
-
-```elixir
-l |> flatten()
-l |> flatten(tail)
-```
-
-Also see [Enum](#enum).
-
-
-## Enum
-
-### Usage
-
-```elixir
-import Enum
-```
-{: .-setup}
-
-```elixir
-list = [:a, :b, :c]
-```
-{: .-setup}
-
-```elixir
-list |> at(0)         # → :a
-list |> count()       # → 3
-list |> empty?()      # → false
-list |> any?()        # → true
-```
-
-```elixir
-list |> concat([:d])  # → [:a, :b, :c, :d]
-```
-
-Also, consider streams instead.
-
-### Map/reduce
-
-```elixir
-list |> reduce(fn)
-list |> reduce(acc, fn)
-list |> map(fn)
-list |> reject(fn)
-list |> any?(fn)
-list |> empty?(fn)
-```
-
-```elixir
-[1, 2, 3, 4]
-|> Enum.reduce(0, fn(x, acc) -> x + acc end)
-```
-
-## Tuple
-
-### Tuples
-
-```elixir
-import Tuple
-```
-{: .-setup}
-
-```elixir
-t = { :a, :b }
-```
-
-```elixir
-t |> elem(1)    # like tuple[1]
-t |> put_elem(index, value)
-t |> tuple_size()
-```
-
-### Keyword lists
-
-```elixir
-list = [{ :name, "John" }, { :age, 15 }]
-list[:name]
-```
-
-```elixir
-# For string-keyed keyword lists
-list = [{"size", 2}, {"type", "shoe"}]
-List.keyfind(list, "size", 0)  # → {"size", 2}
-```
-
-## Functions
-
-### Lambdas
-
-```elixir
-square = fn n -> n*n end
-square.(20)
-```
-
-### & syntax
-
-```elixir
-square = &(&1 * &1)
-square.(20)
-
-square = &Math.square/1
-```
-
-### Running
-
-```elixir
-fun.(args)
-apply(fun, args)
-apply(module, fun, args)
-```
-
-### Function heads
-
-```elixir
-def join(a, b \\ nil)
-def join(a, b) when is_nil(b) do: a
-def join(a, b) do: a <> b
-```
-
-## Structs
-
-### Structs
-
-```elixir
-defmodule User do
-  defstruct name: "", age: nil
-end
-
-%User{name: "John", age: 20}
-
-%User{}.struct  # → User
-```
-
-See: [Structs](http://elixir-lang.org/getting-started/structs.html)
-
-## Protocols
-
-### Defining protocols
-
-```elixir
-defprotocol Blank do
-  @doc "Returns true if data is considered blank/empty"
-  def blank?(data)
-end
-```
-
-```elixir
-defimpl Blank, for: List do
-  def blank?([]), do: true
-  def blank?(_), do: false
-end
-
-Blank.blank?([])  # → true
-```
-
-### Any
-
-```elixir
-defimpl Blank, for: Any do ... end
-
-defmodule User do
-  @derive Blank     # Falls back to Any
-  defstruct name: ""
-end
-```
-
-### Examples
-
-- `Enumerable` and `Enum.map()`
-- `Inspect` and `inspect()`
-
-## Comprehensions
-
-### For
-
-```elixir
-for n <- [1, 2, 3, 4], do: n * n
-for n <- 1..4, do: n * n
-```
-
-```elixir
-for {key, val} <- %{a: 10, b: 20}, do: val
-# → [10, 20]
-```
-
-```elixir
-for {key, val} <- %{a: 10, b: 20}, into: %{}, do: {key, val*val}
-```
-
-### Conditions
-
-```elixir
-for n <- 1..10, rem(n, 2) == 0, do: n
-# → [2, 4, 6, 8, 10]
-```
-
-### Complex
-
-```elixir
-for dir <- dirs,
-    file <- File.ls!(dir),          # nested comprehension
-    path = Path.join(dir, file),    # invoked
-    File.regular?(path) do          # condition
-  IO.puts(file)
-end
-```
-
-## Misc
-
-### Metaprogramming
-
-```elixir
-__MODULE__
-__MODULE__.__info__
-
-@after_compile __MODULE__
-def __before_compile__(env)
-def __after_compile__(env, _bytecode)
-def __using__(opts)    # invoked on `use`
-
-@on_definition {__MODULE__, :on_def}
-def on_def(_env, kind, name, args, guards, body)
-
-@on_load :load_check
-def load_check
-```
-
-### Regexp
-
-```elixir
-exp = ~r/hello/
-exp = ~r/hello/i
-"hello world" =~ exp
-```
-
-### Sigils
-
-```elixir
-~r/regexp/
-~w(list of strings)
-~s|strings with #{interpolation} and \x20 escape codes|
-~S|no interpolation and no escapes|
-~c(charlist)
-```
-
-Allowed chars: `/` `|` `"` `'` `(` `[` `{` `<` `"""`.
-See: [Sigils](http://elixir-lang.org/getting-started/sigils.html)
-
-### Type specs
-
-```elixir
-@spec round(number) :: integer
-
-@type number_with_remark :: {number, String.t}
-@spec add(number, number) :: number_with_remark
-```
-
-Useful for [dialyzer](http://www.erlang.org/doc/man/dialyzer.html).
-See: [Typespecs](http://elixir-lang.org/getting-started/typespecs-and-behaviours.html)
-
-### Behaviours
-
-```elixir
-defmodule Parser do
-  @callback parse(String.t) :: any
-  @callback extensions() :: [String.t]
-end
-```
-
-```elixir
-defmodule JSONParser do
-  @behaviour Parser
-
-  def parse(str), do: # ... parse JSON
-  def extensions, do: ["json"]
-end
-```
-
-See: [Module](http://elixir-lang.org/docs/stable/elixir/Module.html)
-
-## References
+## List columns
 {: .-one-column}
 
-- [Learn Elixir in Y minutes](https://learnxinyminutes.com/docs/elixir/)
+### Six columns
+
+- One
+- Two
+- Three
+- Four
+- Five
+- Six
+- Seven
+- Eight
+- Nine
+- Ten
+- Eleven
+{: .-six-column}
+
+Add `{: .-six-column}` to make large lists.
+
+### Four columns
+
+- One
+- Two
+- Three
+- Four
+- Five
+- Six
+- Seven
+- Eight
+- Nine
+- Ten
+- Eleven
+{: .-four-column}
+
+Add `{: .-four-column}` to make large lists.
+
+### Also see
+
+- One
+- Two
+- Three
+- Four
+- Five
+- Six
+- Seven
+- Eight
+- Nine
+- Ten
+{: .-also-see}
+
+Add `{: .-also-see}`.
+
+## Paragraphs
+{: .-three-column}
+
+### Basic paragraphs
+
+This is a basic section with paragraphs in it. When paragraphs are the first elements in an H3 section's body, they appear as white.
+
+### Basic paragraphs
+
+```
+···
+```
+
+When paragraphs appear after `pre`/`table`/`ul`, they appear with a gray background.
+
+### Preludes
+
+Here's a prelude paragraph. Add `{: .-setup}` to make paragraphs appear with a gray background.
+{: .-setup}
+
+```
+···
+```
+
+### Crosslink
+
+Add `{: .-crosslink}` to make big loud external links:
+
+```
+···
+```
+
+[Home](/)
+{: .-crosslink}
+
+## Tables
+{: .-three-column}
+
+### Basic table
+
+#### Date
+
+| Example         | Output                 |
+| ---             | ---                    |
+| `%m/%d/%Y`      | `06/05/2013`           |
+| `%A, %B %e, %Y` | `Sunday, June 5, 2013` |
+| `%b %e %a`      | `Jun 5 Sun`            |
+
+#### Time
+
+| Example         | Output                 |
+| ---             | ---                    |
+| `%H:%M`         | `23:05`                |
+| `%I:%M %p`      | `11:05 PM`             |
+
+This is a basic table with h4's.
+
+### Shortcuts
+
+| `V` | Vector |
+| `P` | Pencil |
+| `T` | Text |
+| `L` | Line |
+| `R` | Rectangle |
+| `O` | Oval |
+| `U` | Rounded |
+{: .-shortcuts}
+
+Add `{: .-shortcuts}` to tables.
+
+### With headers
+
+| Prefix | Example               | What     |
+| ---    | ---                   | ---      |
+| `//`   | `//hr[@class='edge']` | Anywhere |
+| `./`   | `./a`                 | Relative |
+| `/`    | `/html/body/div`      | Root     |
+{: .-headers}
+
+Add `{: .-headers}` to add headers.
+
+## Two columns
+
+### One
+
+```
+···
+```
+
+### Two
+
+```
+···
+```
+
+## Left reference
+{: .-left-reference}
+
+### One
+
+```
+···
+···
+···
+···
+···
+···
+···
+···
+```
+
+### Two
+
+```
+···
+```
+
+### Three
+
+```
+···
+```
+
+## One column
+{: .-one-column}
+
+### One
+
+```
+···
+```
