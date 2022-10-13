@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.28.6 (2022-10-13)
+
+  * Enhancements
+    * Add Elixir special punctuation ! and ? to natural sort
+    * Add night mode to settings pane
+    * Support --proglang in mix docs
+    * Save sidebar state per session
+    * Distinguish output code blocks in Livebooks
+
+  * Bug fixes
+    * Prevent sidebar button scrolling out of view
+    * Prevent unreadable text when using inline code with admonition headers
+
 ## v0.28.5 (2022-08-18)
 
   * Enhancements
