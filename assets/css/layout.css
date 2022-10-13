@@ -116,10 +116,10 @@ body.search-focused .sidebar-search .search-close-button {
   padding: 3px 60px;
 }
 
-.content-cheatsheet {
+.page-cheatmd .content-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 3px 60px;
+  padding: 3px 10px 3px 45px;
 }
 
 .content-inner:focus {
@@ -130,7 +130,7 @@ body.search-focused .sidebar-search .search-close-button {
   min-height: 100%;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1295px) {
   .content,
   body.sidebar-opening .content {
     left: 0;
