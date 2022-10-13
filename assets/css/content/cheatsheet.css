@@ -94,6 +94,7 @@
 .page-cheatmd h4 {
   display: block;
   margin: 0;
+  margin-bottom: -1px;
   padding: 4px 16px;
   font-weight: 400;
   background: var(--gray100);
@@ -102,10 +103,9 @@
 }
 
 .page-cheatmd.dark h4 {
- 
-  background: var(--gray600);
+  background: var(--gray500);
   color: #fff;
-  border: solid 1px 1px 0 1px var(--gray600);
+  border: solid 1px 1px 0 1px var(--gray500);
 }
 
 /* Columns */
@@ -117,7 +117,7 @@
 
 .col-1 > section > table {
   width: 100%;
-  border: solid 1px var(--gray300);
+  /* border: solid 1px var(--gray300); */
 }
 
 .col-2 {
@@ -177,20 +177,23 @@
   box-sizing: border-box;
   width: 100%;
   border-collapse: collapse;
-  border: solid 1px var(--codeBorder);
   margin: 0;
 }
 
 .page-cheatmd table th {
   padding: 0.75em 2em;
   line-height: 2em;
+  margin-bottom: -1px;
   vertical-align: middle;
+  border-top: 1px solid var(--codeBorder);
+  border-bottom: 1px solid var(--codeBorder);
 }
 
 .page-cheatmd table td {
   padding: 0.75em 2em;
-  border-top: solid 1px var(--codeBorder);
-  border-bottom: solid 1px var(--codeBorder);
+  border: 0;
+  border-top: 1px solid var(--codeBorder);
+  border-bottom: 1px solid var(--codeBorder);
 }
 
 .page-cheatmd table td code {
@@ -204,7 +207,7 @@
 }
 
 .page-cheatmd.dark thead {
-  background-color: var(--gray600);
+  background-color: var(--gray700);
 }
 
 .page-cheatmd tbody {
