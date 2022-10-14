@@ -1,38 +1,35 @@
 # Cheatsheet User Guide
 
-## I'm a H2 tittle
+## I'm a H2 title
 {: .col-2}
 
-### For columns use H2 tittle
+### To configure columns use the H2 title
 
-| `.full-page` | "full page"|
-| `.col-1` | "one-column centered"|
+| `full page` |_*default_|
+| `.width-50 | "half page" |
 | `.col-2` | "two-column"|
 | `.col-3` | "three-column"|
 | `-col-2-left` | "two-columns" (1/3 - 2/3) |
+| `.table-col` | "tables will take only 50% of the page"|
 
-Set the number of columns under the H2 tittles. 
+Set the number of columns under the H2 titles. 
 
-### I'm a H3 tittle
+### I'm a H3 title
 
 Use H3 to start a new topic.
 
-#### I'm a H4 tittle.
+#### I'm a H4 title.
 
 ### Tables
 
-| `.full-page` | "full page"|
-| `.col-1` | "one-column centered"|
+| `.full-page` | "full page" _*default_|
 | `.col-2` | "two-column"|
 | `.col-3` | "three-column"|
 | `-col-2-left` | "two-columns" (1/3 - 2/3) |
 | `.col-4` | "four-columns for lists"|
 | `.col-6` | "six-columns for lists"|
 | `.wrap` | "wrap a content"|
-| `.prime` | "highlight a content" |
-
-I'm a `.prime`. How cool is that? ;)
-{: .prime}
+| `.table-col` | "tables will take only 50% of the page"|
 
 ### Code
 
@@ -73,7 +70,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at ante consectetur
 
 Ex_docs uses Kramdown, and supports adding classes via Kramdown's syntax.
 
-H3 tittle
+H3 title
 -----------
 {: .full-page}
 
@@ -81,7 +78,7 @@ H3 tittle
 
 Each section can have the following children:
 
-#### H4 tittle
+#### H4 title
 
 - `h4`
 - `lists`
@@ -102,9 +99,9 @@ A highlight section!
 This is a section with `{: .prime}`. Notice the fancy highlight! Great for "getting started" kind of snippets.
 {: .prime}
 
-### H3 tittle
+### H3 title
 
-Every box is an H3 tittle. The box will encompass everything inside the body of the H3.
+Every box is an H3 title. The box will encompass everything inside the body of the H3.
 
 This is a basic section with paragraphs in it.
 
@@ -209,7 +206,7 @@ Here's an extra paragraph after the list.
 - Ten
 - Eleven
 
-Add `{: .col-6}` after the H3 tittle to make large lists.
+Add `{: .col-6}` after the H3 title to make large lists.
 
 ### Four columns
 {: .col-4}
@@ -226,10 +223,9 @@ Add `{: .col-6}` after the H3 tittle to make large lists.
 - Ten
 - Eleven
 
-Add `{: .col-4}` after the H3 tittle to make large lists.
+Add `{: .col-4}` after the H3 title to make large lists.
 
-## One column
-{: .col-1}
+## Full page table
 
 ### Basic table
 
@@ -249,6 +245,28 @@ Add `{: .col-4}` after the H3 tittle to make large lists.
 | `%I:%M %p`      | `11:05 PM`             |
 
 This is a basic table with h4's.
+
+## Page width 50%
+{: .width-50}
+
+### I make tables look nicer
+
+#### Date
+
+| Example         | Output                 |
+| ---             | ---                    |
+| `%m/%d/%Y`      | `06/05/2013`           |
+| `%A, %B %e, %Y` | `Sunday, June 5, 2013` |
+| `%b %e %a`      | `Jun 5 Sun`            |
+
+#### Time
+
+| Example         | Output                 |
+| ---             | ---                    |
+| `%H:%M`         | `23:05`                |
+| `%I:%M %p`      | `11:05 PM`             |
+
+Use `.width-50` for a half page content.
 
 ## Left reference
 {: .col-2-left}
@@ -279,3 +297,17 @@ user = %{
 ```elixir
 IO.puts "Hello, " <> user.name
 ```
+
+### Three
+
+```
+defmodule MyModule do 
+	def hello_world do 
+			IO.puts("Hello, World!") 
+	end 
+end
+```
+
+### Four
+
+I'm a grid, with 1/3 - 2/3 table width.

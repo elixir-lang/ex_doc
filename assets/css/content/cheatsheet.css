@@ -1,51 +1,31 @@
-/* *, :after, :before {
-  box-sizing: border-box;
-}
-
-*, :after, :before {
-  box-sizing: inherit;
-} */
-
 /* Code blocks */
 
 .page-cheatmd pre code {
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-  scrollbar-width: none; /* Firefox */
+  /* -ms-overflow-style: none;
+  scrollbar-width: none;  */
+  padding: 1.5em 2em;
 }
 
-.page-cheatmd pre code:hover {
-  -ms-overflow-style: auto; /* Internet Explorer 10+ */
-  scrollbar-width: auto; /* Firefox */
-}
+/* .page-cheatmd pre code:hover {
+  -ms-overflow-style: auto; 
+  scrollbar-width: auto; 
+} */
 
-.page-cheatmd pre code::-webkit-scrollbar {
-  display: none; /* safari and chrome */
+/* .page-cheatmd pre code::-webkit-scrollbar {
+  display: none; 
 }
 
 .page-cheatmd pre code:hover::-webkit-scrollbar {
   display: block;
-}
+} */
 
 .page-cheatmd pre {
   margin: 0;
 }
 
-/* prime */
-
-.page-cheatmd p.prime {
-  color: var(--main);
-  border-radius: 2px;
-  box-shadow: 0 6px 8px rgb(85 102 119 / 3%), 0 1px 1px rgb(85 102 119 / 40%),
-    0 8px 12px rgb(58 193 203 / 10%);
-  margin: 1em 0;
-}
-
-.page-cheatmd.dark p.prime {
-  color: var(--main);
-  border-radius: 2px;
-  box-shadow: 0 6px 8px rgb(85 102 119 / 3%), 0 1px 1px rgb(85 102 119 / 40%),
-    0 8px 12px rgb(58 193 203 / 10%);
-  margin: 1em 0;
+.content-inner pre code::-webkit-scrollbar {
+  width: 0.4rem;
+  height: 0.3rem;
 }
 
 /* h2 styling */
@@ -100,7 +80,7 @@
   display: block;
   margin: 0;
   margin-bottom: -1px;
-  padding: 4px 16px;
+  padding: 0.25em 2em;
   font-weight: 400;
   background: var(--gray100);
   color: #567;
@@ -108,9 +88,10 @@
 }
 
 .page-cheatmd.dark h4 {
-  background: var(--gray500);
+  background: #192f50;
   color: #fff;
-  border: solid 1px 1px 0 1px var(--gray500);
+  border: 1px solid #192f50;
+  border-bottom: 0;
 }
 
 /* Columns */
@@ -124,13 +105,13 @@
   width: 100%;
 }
 
-.page-cheatmd section.col-1 {
+.page-cheatmd section.width-50 {
   display: block;
-  width: 70%;
-  margin: 0 auto;
+  width: 50%;
+  margin: 0;
 }
 
-.col-1 > section > table {
+.width-50 > section > table {
   width: 100%;
 }
 
@@ -163,7 +144,7 @@
   display: block;
   background: var(--gray50);
   padding: 1.5em 1em;
-  padding-left: 24px;
+  padding-left: 2em;
 }
 
 .page-cheatmd.dark .h2 .h3 p {
@@ -240,8 +221,8 @@ ol {
 
 .page-cheatmd .h3 li {
   list-style-position: inside;
-  padding: 8px;
-  padding-left: 24px;
+  padding: 0.5em;
+  padding-left: 2em;
   line-height: 2em;
   vertical-align: middle;
   background-color: var(--codeBackground);
