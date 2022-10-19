@@ -38,18 +38,15 @@ Several paragraphs are visually distinct.
 - Element 2
 - `piece of code`
 
-
 ### Table
 
-#### Date
+#### Date (H4 header)
 
 | Example         | Output                 |
 | ---             | ---                    |
 | `%m/%d/%Y`      | `06/05/2013`           |
 | `%A, %B %e, %Y` | `Sunday, June 5, 2013` |
 | `%b %e %a`      | `Jun 5 Sun`            |
-
-This is a basic table with a h4 header.
 
 ## Variants
 {: .col-2}
@@ -118,7 +115,7 @@ defmodule MyTracer do
 end
 ```
 
-Long lines will have scrollbars on hover.
+Long lines show scrollbars.
 
 ### Line wrapping
 
