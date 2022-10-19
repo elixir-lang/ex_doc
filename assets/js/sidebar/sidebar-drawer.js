@@ -40,6 +40,12 @@ export function initialize () {
 }
 
 function setDefaultSidebarState () {
+  // check & set persistent session state
+  const persistentSessionState = sessionStorage.getItem('sidebar_state')
+  // set default for closed state only, so sidebar will still auto close on window resize
+  if (persistentSessionState === 'closed') return setClass(SIDEBAR_CLASS.closed)
+
+  // else
   setClass(isScreenSmall() ? SIDEBAR_CLASS.closed : SIDEBAR_CLASS.opened)
 }
 
@@ -98,6 +104,7 @@ function isSidebarOpen () {
 export function openSidebar () {
   clearTimeoutIfAny()
   setClass(SIDEBAR_CLASS.opening)
+  sessionStorage.setItem('sidebar_state', 'opened')
 
   return new Promise((resolve, reject) => {
     state.togglingTimeout = setTimeout(() => {
@@ -115,6 +122,7 @@ export function openSidebar () {
 export function closeSidebar () {
   clearTimeoutIfAny()
   setClass(SIDEBAR_CLASS.closing)
+  sessionStorage.setItem('sidebar_state', 'closed')
 
   return new Promise((resolve, reject) => {
     state.togglingTimeout = setTimeout(() => {
