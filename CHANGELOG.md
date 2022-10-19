@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.29.0 (2022-10-19)
+
+  * Enhancements
+    * Support cheatsheets as `.cheatmd` files
+
+  * Bug fix
+    * Collapse sidebar when resizing page even if stored in the session as opened
+
 ## v0.28.6 (2022-10-13)
 
   * Enhancements
