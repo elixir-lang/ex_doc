@@ -116,10 +116,6 @@ body.search-focused .sidebar-search .search-close-button {
   padding: 3px 60px;
 }
 
-.page-cheatmd .content-inner {
-  max-width: 1200px;
-}
-
 .content-inner:focus {
   outline: none;
 }

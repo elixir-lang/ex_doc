@@ -1,3 +1,7 @@
+.page-cheatmd .content-inner {
+  max-width: 1200px;
+}
+
 /* h1 styling */
 
 .page-cheatmd h1 {
@@ -55,7 +59,6 @@
 .page-cheatmd h4 {
   display: block;
   margin: 0;
-  margin-bottom: -1px;
   padding: 0.25em 1.5em;
   font-weight: 400;
   background: var(--gray100);
@@ -97,11 +100,6 @@
 
 .page-cheatmd .h2 pre {
   margin: 0;
-}
-
-.page-cheatmd .h2 pre code::-webkit-scrollbar {
-  width: 0.4rem;
-  height: 0.3rem;
 }
 
 .page-cheatmd pre.wrap {
@@ -168,6 +166,11 @@
   vertical-align: middle;
   background-color: var(--codeBackground);
   border-bottom: 1px solid var(--codeBorder);
+}
+
+.page-cheatmd .h2 ul + pre code,
+.page-cheatmd .h2 ol + pre code {
+  border-top: 0;
 }
 
 .page-cheatmd .h2 li > code {
