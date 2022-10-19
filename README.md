@@ -15,7 +15,7 @@ ExDoc ships with many features:
 
   * Automatically generates HTML and EPUB documents from your API documentation
   * Responsive design with built-in layout for phones and tablets
-  * Support for custom pages, guides, and livebooks (in addition to the API reference)
+  * Support for custom pages, guides, livebooks, and cheatsheets
   * Support for custom grouping of modules, functions, and pages in the sidebar
   * Generates HTML documentation accessible online and offline
   * Customizable logo on the generated documentation
@@ -118,6 +118,24 @@ ExDoc uses [the makeup project](https://github.com/elixir-makeup/makeup) for syn
 ```
 
 You can find all support languages [under the Makeup organization on GitHub](https://github.com/elixir-makeup) and [view them on Makeup's website](https://elixir-makeup.github.io/makeup_demo/).
+
+## Additional pages
+
+You can publish additional pages in your project documentation by configuring them as `:extras`. The following formats and extensions are supported:
+
+  * Markdown (`.md` extension) - useful for general long-term text. [Learn more](https://daringfireball.net/projects/markdown/syntax).
+
+  * Cheatsheets (`.cheatmd` extension) - useful for discovery and quick reference. [Learn more](https://hexdocs.pm/ex_doc/cheatsheet.html).
+
+  * Livebooks (`.livemd` extension) - useful for tutorials, interactive examples, and deep dives. [Learn more](https://livebook.dev/).
+
+For example, you can set your `:extras` to:
+
+```elixir
+extras: ["README.md", "LICENSE", "tutorial.livemd", "cheatsheet.cheatmd"]
+```
+
+Run `mix help docs` for more information on configuration.
 
 ## Metadata
 
