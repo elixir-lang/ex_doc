@@ -40,12 +40,6 @@ export function initialize () {
 }
 
 function setDefaultSidebarState () {
-  // check & set persistent session state
-  const persistenSessionState = sessionStorage.getItem('sidebar_state')
-  if (persistenSessionState === 'opened') return setClass(SIDEBAR_CLASS.opened)
-  if (persistenSessionState === 'closed') return setClass(SIDEBAR_CLASS.closed)
-
-  // else
   setClass(isScreenSmall() ? SIDEBAR_CLASS.closed : SIDEBAR_CLASS.opened)
 }
 
@@ -104,7 +98,6 @@ function isSidebarOpen () {
 export function openSidebar () {
   clearTimeoutIfAny()
   setClass(SIDEBAR_CLASS.opening)
-  sessionStorage.setItem('sidebar_state', 'opened')
 
   return new Promise((resolve, reject) => {
     state.togglingTimeout = setTimeout(() => {
@@ -122,7 +115,6 @@ export function openSidebar () {
 export function closeSidebar () {
   clearTimeoutIfAny()
   setClass(SIDEBAR_CLASS.closing)
-  sessionStorage.setItem('sidebar_state', 'closed')
 
   return new Promise((resolve, reject) => {
     state.togglingTimeout = setTimeout(() => {
