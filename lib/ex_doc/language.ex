@@ -64,7 +64,7 @@ defmodule ExDoc.Language do
               %{
                 line: non_neg_integer() | nil,
                 specs: [spec_ast()],
-                doc_fallback: (-> ExDoc.DocAST.t()) | nil,
+                doc_fallback: (() -> ExDoc.DocAST.t()) | nil,
                 extra_annotations: [String.t()]
               }
               | :skip
