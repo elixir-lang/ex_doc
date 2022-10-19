@@ -1,15 +1,313 @@
-# Cheatsheets
+# Cheatsheet User Guide
 
-This is an example of several cheatsheets features.
+## I'm a H2 title with 2 columns
+{: .col-2}
 
-## Blocks
+### To configure columns use the H2 title
 
-One.
+| `full page` |_*default_|
+| `.width-50` | "half page" |
+| `.col-2` | "two-column"|
+| `.col-3` | "three-column"|
+| `-col-2-left` | "two-columns" (1/3 - 2/3) |
+| `.table-col` | "tables will take only 50% of the page"|
 
-### Nested
+Set the number of columns under the H2 titles. 
 
-Two.
+### I'm a H3 title
 
-## More
+Use H3 to start a new topic.
 
-Three.
+#### I'm a H4 title.
+
+### Tables
+
+| `.full-page` | "full page" _*default_|
+| `.col-2` | "two-column"|
+| `.col-3` | "three-column"|
+| `-col-2-left` | "two-columns" (1/3 - 2/3) |
+| `.col-4` | "four-columns for lists"|
+| `.col-6` | "six-columns for lists"|
+| `.wrap` | "wrap a content"|
+| `.table-col` | "tables will take only 50% of the page"|
+
+### Code and 3 columns
+
+```elixir
+# hello.exs
+defmodule Greeter do
+  def greet(name) do
+    message = "Hello, " <> name <> "!"
+    IO.puts message
+  end
+end
+
+Greeter.greet("world")
+```
+
+### Paragraphs
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at ante consectetur, pharetra magna a, malesuada lectus. Mauris porttitor ligula dui, at egestas augue hendrerit eget. Morbi lorem urna, scelerisque ut sem et, sollicitudin porta nulla.
+
+### Lists
+
+- Element 1
+- Element 2
+- `piece of code`
+
+### Adding variants
+
+```
+## Section
+{: .col-2}
+
+"highlight the content in a paragraph"
+{: .prime}
+
+"wrap a very long text"
+{: .wrap}
+```
+
+Ex_docs uses Kramdown, and supports adding classes via Kramdown's syntax.
+
+Full page and H3 titles
+-----------
+{: .full-page}
+
+### H3 tittles sections
+
+Each section can have the following children:
+
+#### H4 title
+
+- `h4`
+- `lists`
+- `tables`
+
+A paragraph with a cool text: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at ante consectetur, pharetra magna a, malesuada lectus. Mauris porttitor ligula dui, at egestas augue hendrerit eget.
+
+- `p`
+
+```elixir
+Enum.map(users, fn user ->
+  IO.puts "Hello " <> user
+end)
+```
+- `code`
+
+A highlight section!
+This is a section with `{: .prime}`. Notice the fancy highlight! Great for "getting started" kind of snippets.
+{: .prime}
+
+### H3 title
+
+Every box is an H3 title. The box will encompass everything inside the body of the H3.
+
+This is a basic section with paragraphs in it.
+
+Code
+----
+{: .col-3}
+
+### Code with headings
+
+#### index.ex
+
+```
+Path.join(["~", "foo"])
+"~/foo"
+```
+
+#### other.ex
+
+```
+Path.join(["foo"])
+"foo"
+```
+
+Code blocks can have headings.
+
+### Long lines
+
+```
+defmodule MyTracer do
+  def trace({:remote_function, _meta, module, name, arity}, env) do
+    IO.puts "#{env.file}:#{env.line} #{inspect(module)}.#{name}/#{arity}"
+    :ok
+  end
+
+  def trace(_event, _env) do
+    :ok
+  end
+end
+```
+
+Long lines will have scrollbars on hover.
+
+### Line wrapping
+
+```
+defmodule MyTracer do
+  def trace({:remote_function, _meta, module, name, arity}, env) do
+    IO.puts "#{env.file}:#{env.line} #{inspect(module)}.#{name}/#{arity}"
+    :ok
+  end
+
+  def trace(_event, _env) do
+    :ok
+  end
+end
+```
+{: .wrap}
+
+Add `wrap` to wrap long lines.
+
+## Lists
+{: .col-2}
+
+### Lists
+
+- This is
+- a list
+- with a few items
+
+Here's an extra paragraph after the list.
+
+### Lists with headings
+
+#### Part 1
+
+- `createElement()`
+- `componentDidMount()`
+- `componentWillUnmount()`
+
+#### Part 2
+
+- `shouldComponentUpdate()`
+- `componentWillReceiveProps()`
+
+
+Here's an extra paragraph after the list.
+
+## List columns
+
+### Six columns
+{: .col-6}
+
+- One
+- Two
+- Three
+- Four
+- Five
+- Six
+- Seven
+- Eight
+- Nine
+- Ten
+- Eleven
+
+Add `{: .col-6}` after the H3 title to make large lists.
+
+### Four columns
+{: .col-4}
+
+- One
+- Two
+- Three
+- Four
+- Five
+- Six
+- Seven
+- Eight
+- Nine
+- Ten
+- Eleven
+
+Add `{: .col-4}` after the H3 title to make large lists.
+
+## Full page table
+
+### Basic table
+
+#### Date
+
+| Example         | Output                 |
+| ---             | ---                    |
+| `%m/%d/%Y`      | `06/05/2013`           |
+| `%A, %B %e, %Y` | `Sunday, June 5, 2013` |
+| `%b %e %a`      | `Jun 5 Sun`            |
+
+#### Time
+
+| Example         | Output                 |
+| ---             | ---                    |
+| `%H:%M`         | `23:05`                |
+| `%I:%M %p`      | `11:05 PM`             |
+
+This is a basic table with h4's.
+
+## Page width 50%
+{: .width-50}
+
+### I make tables look nicer
+
+#### Date
+
+| Example         | Output                 |
+| ---             | ---                    |
+| `%m/%d/%Y`      | `06/05/2013`           |
+| `%A, %B %e, %Y` | `Sunday, June 5, 2013` |
+| `%b %e %a`      | `Jun 5 Sun`            |
+
+#### Time
+
+| Example         | Output                 |
+| ---             | ---                    |
+| `%H:%M`         | `23:05`                |
+| `%I:%M %p`      | `11:05 PM`             |
+
+Use `.width-50` for a half page content.
+
+## Left reference
+{: .col-2-left}
+
+### One
+
+```elixir
+# hello.exs
+defmodule Greeter do
+  def greet(name) do
+    message = "Hello, " <> name <> "!"
+    IO.puts message
+  end
+end
+
+Greeter.greet("world")
+```
+
+### Two
+
+```elixir
+user = %{
+  name: "John",
+  city: "Melbourne"
+}
+```
+
+```elixir
+IO.puts "Hello, " <> user.name
+```
+
+### Three
+
+```
+defmodule MyModule do 
+	def hello_world do 
+			IO.puts("Hello, World!") 
+	end 
+end
+```
+
+### Four
+
+I'm a grid, with 1/3 - 2/3 table width.

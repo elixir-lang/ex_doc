@@ -21,6 +21,7 @@
 @import 'content/functions.css';
 @import 'content/footer.css';
 @import 'content/bottom-actions.css';
+@import 'content/cheatsheet.css';
 @import 'search.css';
 @import 'modal.css';
 @import 'keyboard-shortcuts.css';
@@ -33,6 +34,7 @@
 @import 'screen-reader.css';
 @import 'print.css';
 @import 'makeup.css';
+
 
 body:not(.dark) .content-inner img[src*="#gh-dark-mode-only"],
 body.dark .content-inner img[src*="#gh-light-mode-only"] {

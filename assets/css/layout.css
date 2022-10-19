@@ -41,7 +41,8 @@ body {
   z-index: 99;
   left: 0;
   top: 7px;
-  transition: color .3s ease-in-out, transform .15s ease-out .1s, opacity .15s ease-out .1s;
+  transition: color 0.3s ease-in-out, transform 0.15s ease-out 0.1s,
+    opacity 0.15s ease-out 0.1s;
   will-change: transform;
   transform: translateX(250px);
 }
@@ -55,18 +56,18 @@ body {
 }
 
 body.sidebar-opening .sidebar-button {
-  transition: transform .3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
 }
 
 body.sidebar-opening .sidebar {
   left: 0;
-  transition: left .3s ease-in-out;
+  transition: left 0.3s ease-in-out;
 }
 
 body.sidebar-opening .content {
   width: calc(100% - 300px);
   left: 300px;
-  transition: all .3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 
 body.sidebar-closing .sidebar-button {
@@ -75,17 +76,17 @@ body.sidebar-closing .sidebar-button {
 
 body.sidebar-closing .sidebar {
   left: -300px;
-  transition: left .3s ease-in-out;
+  transition: left 0.3s ease-in-out;
 }
 
 body.sidebar-closing .content {
   width: 100%;
   left: 0;
-  transition: all .3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 
 body.sidebar-closed .sidebar-button {
-  transition: transform .3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
   transform: translateY(-8px);
 }
 
@@ -100,19 +101,25 @@ body.sidebar-closed .content {
 
 body.search-focused .sidebar-button {
   transform: translateX(250px) scaleY(0);
-  transition: all .15s ease-out;
+  transition: all 0.15s ease-out;
   opacity: 0;
 }
 
 body.search-focused .sidebar-search .search-close-button {
   transform: scaleY(1);
-  transition: transform .15s ease-out .15s;
+  transition: transform 0.15s ease-out 0.15s;
 }
 
 .content-inner {
   max-width: 949px;
   margin: 0 auto;
   padding: 3px 60px;
+}
+
+.page-cheatmd .content-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3px 10px 3px 45px;
 }
 
 .content-inner:focus {
@@ -123,14 +130,15 @@ body.search-focused .sidebar-search .search-close-button {
   min-height: 100%;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1295px) {
   .content,
   body.sidebar-opening .content {
     left: 0;
     width: 100%;
   }
 
-  .content-inner {
+  .content-inner,
+  .content-cheatsheet {
     padding: 27px 20px 27px 40px;
     max-width: 100%;
     overflow-x: auto;
