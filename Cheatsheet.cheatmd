@@ -28,8 +28,8 @@ Use H3 to start a new topic.
 | `.col-2` | "two-column"|
 | `.col-3` | "three-column"|
 | `-col-2-left` | "two-columns" (1/3 - 2/3) |
-| `.col-4` | "four-columns for lists"|
-| `.col-6` | "six-columns for lists"|
+| `.list-4` | "four-columns for lists"|
+| `.list-6` | "six-columns for lists"|
 | `.wrap` | "wrap a content"|
 | `.table-col` | "tables will take only 50% of the page"|
 
@@ -93,10 +93,6 @@ Enum.map(users, fn user ->
 end)
 ```
 - `code`
-
-A highlight section!
-This is a section with `{: .prime}`. Notice the fancy highlight! Great for "getting started" kind of snippets.
-{: .prime}
 
 ### H3 title
 
@@ -199,7 +195,7 @@ Here's an extra paragraph after the list.
 ## List columns
 
 ### Six columns
-{: .col-6}
+{: .list-6}
 
 - One
 - Two
@@ -213,10 +209,10 @@ Here's an extra paragraph after the list.
 - Ten
 - Eleven
 
-Add `{: .col-6}` after the H3 title to make large lists.
+Add `{: .list-6}` after the H3 title to make large lists.
 
 ### Four columns
-{: .col-4}
+{: .list-4}
 
 - One
 - Two
@@ -230,7 +226,7 @@ Add `{: .col-6}` after the H3 title to make large lists.
 - Ten
 - Eleven
 
-Add `{: .col-4}` after the H3 title to make large lists.
+Add `{: .list-4}` after the H3 title to make large lists.
 
 ## Full page table
 
