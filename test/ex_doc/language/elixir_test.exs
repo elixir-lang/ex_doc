@@ -206,7 +206,9 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc("EarmarkParser.as_ast/2") ==
                ~m"[`EarmarkParser.as_ast/2`](https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2)"
 
-      assert autolink_doc("EarmarkParser.as_ast/2", deps: [earmark_parser: "https://example.com/"]) ==
+      assert autolink_doc("EarmarkParser.as_ast/2",
+               deps: [earmark_parser: "https://example.com/"]
+             ) ==
                ~m"[`EarmarkParser.as_ast/2`](https://example.com/EarmarkParser.html#as_ast/2)"
 
       assert autolink_doc("EarmarkParser.as_ast/2", deps: [earmark_parser: "https://example.com"]) ==

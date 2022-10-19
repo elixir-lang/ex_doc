@@ -51,7 +51,11 @@ defmodule Mix.Tasks.DocsTest do
                 proglang: :elixir
               ]}
            ] =
-             run(context, [], app: :ex_doc, version: "0.1.0", docs: [formatters: ["html", "epub"]])
+             run(context, [],
+               app: :ex_doc,
+               version: "0.1.0",
+               docs: [formatters: ["html", "epub"]]
+             )
   end
 
   test "uses the given name", context do

@@ -1,39 +1,18 @@
 # Cheatsheet User Guide
 
 This document is a cheatsheet on how to use cheatsheets.
-Cheatsheets are Markdown files with the `.cheatmd` extension.
+Cheatsheets are Markdown files with the `.cheatmd` extension. You may also check the source of this document as a reference.
 
 ## I'm a H2 title with 2 columns
 {: .col-2}
 
-### To configure columns use the H2 title
-
-| `full page` |_*default_|
-| `.width-50` | "half page" |
-| `.col-2` | "two-column"|
-| `.col-3` | "three-column"|
-| `-col-2-left` | "two-columns" (1/3 - 2/3) |
-
-Set the number of columns under the H2 titles. 
-
 ### I'm a H3 title
-
-Use H3 to start a new topic.
 
 #### I'm a H4 title.
 
-### Tables
+And this is a paragraph.
 
-| `.full-page` | "full page" _*default_|
-| `.col-2` | "two-column"|
-| `.col-3` | "three-column"|
-| `-col-2-left` | "two-columns" (1/3 - 2/3) |
-| `.col-4` | "four-columns for lists"|
-| `.col-6` | "six-columns for lists"|
-| `.wrap` | "wrap a content"|
-| `.table-col` | "tables will take only 50% of the page"|
-
-### Code and 3 columns
+### Code
 
 ```elixir
 # hello.exs
@@ -49,7 +28,9 @@ Greeter.greet("world")
 
 ### Paragraphs
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at ante consectetur, pharetra magna a, malesuada lectus. Mauris porttitor ligula dui, at egestas augue hendrerit eget. Morbi lorem urna, scelerisque ut sem et, sollicitudin porta nulla.
+Paragraphs are also supported and can quote `code`.
+
+Several paragraphs are visually distinct.
 
 ### Lists
 
@@ -57,55 +38,51 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at ante consectetur
 - Element 2
 - `piece of code`
 
+
+### Table
+
+#### Date
+
+| Example         | Output                 |
+| ---             | ---                    |
+| `%m/%d/%Y`      | `06/05/2013`           |
+| `%A, %B %e, %Y` | `Sunday, June 5, 2013` |
+| `%b %e %a`      | `Jun 5 Sun`            |
+
+This is a basic table with a h4 header.
+
+## Variants
+{: .col-2}
+
 ### Adding variants
 
 ```
-## Section
+## H2
 {: .col-2}
 
-"wrap a very long text"
-{: .wrap}
+### H3
+{: .list-6}
+
+* example 1
+* example 2
 ```
 
-Ex_docs uses Kramdown, and supports adding classes via Kramdown's syntax.
+Variants customize how your cheatsheet looks like via Markdown's inline attribute notation.
 
-Full page and H3 titles
------------
-{: .full-page}
+### Header variants
 
-### H3 tittles sections
+#### H2
 
-Each section can have the following children:
+| `.col-2` | two-columns |
+| `.col-3` | three-columns |
+| `.col-2-left` | two-columns (1/3 - 2/3) |
 
-#### H4 title
+#### H3
 
-- `h4`
-- `lists`
-- `tables`
+| `.list-4` | four-columns for lists |
+| `.list-6` | six-columns for lists |
 
-A paragraph with a cool text: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at ante consectetur, pharetra magna a, malesuada lectus. Mauris porttitor ligula dui, at egestas augue hendrerit eget.
-
-- `p`
-
-```elixir
-Enum.map(users, fn user ->
-  IO.puts "Hello " <> user
-end)
-```
-- `code`
-
-A highlight section!
-This is a section with `{: .prime}`. Notice the fancy highlight! Great for "getting started" kind of snippets.
-{: .prime}
-
-### H3 title
-
-Every box is an H3 title. The box will encompass everything inside the body of the H3.
-
-This is a basic section with paragraphs in it.
-
-Code
-----
+## Code
 {: .col-3}
 
 ### Code with headings
@@ -128,7 +105,7 @@ Code blocks can have headings.
 
 ### Long lines
 
-```
+```elixir
 defmodule MyTracer do
   def trace({:remote_function, _meta, module, name, arity}, env) do
     IO.puts "#{env.file}:#{env.line} #{inspect(module)}.#{name}/#{arity}"
@@ -164,42 +141,37 @@ Add `wrap` to wrap long lines.
 ## Lists
 {: .col-2}
 
-### Lists
+### Bullet lists
 
 - This is
 - a list
 - with a few items
 
-Here's an extra paragraph after the list.
-
-### Ordered List
+### Ordered lists
 
 1. I'm first;
 2. You are second;
 3. We are third;
 
-#### That was cool!
+Here's an extra paragraph after the list.
 
-### Lists with headings
+### With headings and code links
 
 #### Part 1
 
-- `createElement()`
-- `componentDidMount()`
-- `componentWillUnmount()`
+- `is_atom/1`
+- `is_binary/1`
+- `is_number/1`
 
 #### Part 2
 
-- `shouldComponentUpdate()`
-- `componentWillReceiveProps()`
-
-
-Here's an extra paragraph after the list.
+- `length/1`
+- `elem/2`
 
 ## List columns
 
 ### Six columns
-{: .col-6}
+{: .list-6}
 
 - One
 - Two
@@ -213,10 +185,10 @@ Here's an extra paragraph after the list.
 - Ten
 - Eleven
 
-Add `{: .col-6}` after the H3 title to make large lists.
+Add `{: .list-6}` after the H3 title to make large lists.
 
 ### Four columns
-{: .col-4}
+{: .list-4}
 
 - One
 - Two
@@ -230,42 +202,17 @@ Add `{: .col-6}` after the H3 title to make large lists.
 - Ten
 - Eleven
 
-Add `{: .col-4}` after the H3 title to make large lists.
+Add `{: .list-4}` after the H3 title to make large lists.
 
-## Full page table
+## Full page
 
-### Basic table
+This is the default.
 
-#### Date
-
-| Example         | Output                 |
-| ---             | ---                    |
-| `%m/%d/%Y`      | `06/05/2013`           |
-| `%A, %B %e, %Y` | `Sunday, June 5, 2013` |
-| `%b %e %a`      | `Jun 5 Sun`            |
-
-#### Time
-
-| Example         | Output                 |
-| ---             | ---                    |
-| `%H:%M`         | `23:05`                |
-| `%I:%M %p`      | `11:05 PM`             |
-
-This is a basic table with h4's.
-
-## Page width 50%
+## Half width
 {: .width-50}
 
 ### I make tables look nicer
 
-#### Date
-
-| Example         | Output                 |
-| ---             | ---                    |
-| `%m/%d/%Y`      | `06/05/2013`           |
-| `%A, %B %e, %Y` | `Sunday, June 5, 2013` |
-| `%b %e %a`      | `Jun 5 Sun`            |
-
 #### Time
 
 | Example         | Output                 |
@@ -273,9 +220,9 @@ This is a basic table with h4's.
 | `%H:%M`         | `23:05`                |
 | `%I:%M %p`      | `11:05 PM`             |
 
-Use `.width-50` for a half page content.
+Add `{: .width-50}` after the H2 title to use only half width.
 
-## Left reference
+## Column left reference
 {: .col-2-left}
 
 ### One
@@ -307,14 +254,10 @@ IO.puts "Hello, " <> user.name
 
 ### Three
 
-```
-defmodule MyModule do 
-	def hello_world do 
-			IO.puts("Hello, World!") 
-	end 
-end
-```
+* Yet
+* Another
+* List
 
 ### Four
 
-I'm a grid, with 1/3 - 2/3 table width.
+I'm a grid, with 1/3 - 2/3 width.

@@ -68,6 +68,9 @@
 .content-inner a.view-source:hover {
   color: var(--viewSourceHover);
 }
+.content-inner a.view-source:visited {
+  color: var(--viewSource);
+}
 
 .content-inner .settings {
   background-color: transparent;

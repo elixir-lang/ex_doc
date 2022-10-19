@@ -27,7 +27,7 @@
 .page-cheatmd h3 {
   white-space: nowrap;
   overflow: hidden;
-  margin: 0 0 1em 0;
+  margin: 0 0 1em;
   padding-left: 5px;
   color: var(--main);
   font-weight: 400;
@@ -68,7 +68,7 @@
 
 .page-cheatmd.dark h4 {
   background: #192f50;
-  color: #fff;
+  color: var(--textBody);
   border: 1px solid #192f50;
   border-bottom: 0;
 }
@@ -186,15 +186,6 @@
 
 /* Columns */
 
-.page-cheatmd section.full-page {
-  display: block;
-  width: 100%;
-}
-
-.page-cheatmd section.full-page > section > table {
-  width: 100%;
-}
-
 .page-cheatmd section.width-50 {
   display: block;
   width: 50%;
@@ -228,21 +219,21 @@
   height: auto;
 }
 
-.page-cheatmd section.col-4 > ul {
+.page-cheatmd section.list-4 > ul {
   display: flex;
   flex-wrap: wrap;
 }
 
-.page-cheatmd section.col-4 > ul > li {
+.page-cheatmd section.list-4 > ul > li {
   flex: 0 0 25%;
 }
 
-.page-cheatmd section.col-6 > ul {
+.page-cheatmd section.list-6 > ul {
   display: flex;
   flex-wrap: wrap;
 }
 
-.page-cheatmd section.col-6 > ul > li {
+.page-cheatmd section.list-6 > ul > li {
   flex: 0 0 16.6667%;
 }
 
@@ -266,27 +257,27 @@
     column-count: 1;
   }
 
-  .page-cheatmd section.col-6 > ul > li {
+  .page-cheatmd section.list-6 > ul > li {
     flex: 0 0 25%;
   }
 }
 
 @media (max-width: 1000px) {
-  .page-cheatmd section.col-4 > ul > li {
+  .page-cheatmd section.list-4 > ul > li {
     flex: 0 0 33%;
   }
 
-  .page-cheatmd section.col-6 > ul > li {
+  .page-cheatmd section.list-6 > ul > li {
     flex: 0 0 33%;
   }
 }
 
 @media (max-width: 600px) {
-  .page-cheatmd section.col-4 > ul > li {
+  .page-cheatmd section.list-4 > ul > li {
     flex: 0 0 50%;
   }
 
-  .page-cheatmd section.col-6 > ul > li {
+  .page-cheatmd section.list-6 > ul > li {
     flex: 0 0 50%;
   }
 }

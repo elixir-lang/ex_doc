@@ -824,7 +824,10 @@ defmodule ExDoc.Language.Elixir do
 
   defp try_autoimported_function(name, arity, mode, config, original_text) do
     Enum.find_value(@autoimported_modules, fn module ->
-      remote_url({:function, module, name, arity}, config, original_text, warn?: false, mode: mode)
+      remote_url({:function, module, name, arity}, config, original_text,
+        warn?: false,
+        mode: mode
+      )
     end)
   end
 
