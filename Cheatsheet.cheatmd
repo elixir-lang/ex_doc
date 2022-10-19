@@ -63,9 +63,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at ante consectetur
 ## Section
 {: .col-2}
 
-"highlight the content in a paragraph"
-{: .prime}
-
 "wrap a very long text"
 {: .wrap}
 ```
@@ -174,6 +171,14 @@ Add `wrap` to wrap long lines.
 - with a few items
 
 Here's an extra paragraph after the list.
+
+### Ordered List
+
+1. I'm first;
+2. You are second;
+3. We are third;
+
+#### That was cool!
 
 ### Lists with headings
 

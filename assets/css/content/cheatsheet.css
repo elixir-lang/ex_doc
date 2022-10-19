@@ -76,7 +76,7 @@
 /* Paragraphs */
 
 .page-cheatmd .h2 p {
-  margin:  0;
+  margin: 0;
   display: block;
   background: var(--gray50);
   padding: 1.5em;
@@ -94,8 +94,13 @@
 
 /* Code blocks */
 
-.page-cheatmd .h2 pre code {
+.page-cheatmd pre code {
   padding: 1em 1.5em;
+}
+
+.page-cheatmd pre code::-webkit-scrollbar {
+  width: 0.4rem;
+  height: 0.6rem;
 }
 
 .page-cheatmd .h2 pre {
@@ -243,10 +248,24 @@
 
 /* Media query */
 
-@media (max-width: 1080px) {
+@media (max-width: 1400px) {
   .page-cheatmd section.col-3 {
     column-count: 2;
     column-gap: 40px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .page-cheatmd section.col-3,
+  .page-cheatmd section.col-2 {
+    column-count: 1;
+  }
+}
+
+@media (max-width: 850px) {
+  .page-cheatmd section.col-2-left {
+    display: block;
+    column-count: 1;
   }
 }
 
