@@ -80,7 +80,7 @@ From Erlang/OTP 24+, you can use ExDoc to render your Erlang documentation writt
 
 ### Using ExDoc via command line
 
-You can ExDoc via the command line as follows:
+You can use ExDoc via the command line as follows:
 
 1. Install ExDoc as an escript:
 
