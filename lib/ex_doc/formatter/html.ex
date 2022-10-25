@@ -326,6 +326,13 @@ defmodule ExDoc.Formatter.HTML do
   """
   def build_extras(config, ext) do
     groups = config.groups_for_extras
+
+    language =
+      case config.proglang do
+        :erlang -> ExDoc.Language.Erlang
+        _ -> ExDoc.Language.Elixir
+      end
+
     source_url_pattern = config.source_url_pattern
 
     autolink_opts = [
@@ -338,25 +345,25 @@ defmodule ExDoc.Formatter.HTML do
 
     config.extras
     |> Task.async_stream(
-      &build_extra(&1, groups, autolink_opts, source_url_pattern),
+      &build_extra(&1, groups, language, autolink_opts, source_url_pattern),
       timeout: :infinity
     )
     |> Enum.map(&elem(&1, 1))
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
 
-  defp build_extra({input, options}, groups, autolink_opts, source_url_pattern) do
+  defp build_extra({input, options}, groups, language, autolink_opts, source_url_pattern) do
     input = to_string(input)
     id = options[:filename] || input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, options[:title], groups, autolink_opts, source_url_pattern)
+    build_extra(input, id, options[:title], groups, language, autolink_opts, source_url_pattern)
   end
 
-  defp build_extra(input, groups, autolink_opts, source_url_pattern) do
+  defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
     id = input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, nil, groups, autolink_opts, source_url_pattern)
+    build_extra(input, id, nil, groups, language, autolink_opts, source_url_pattern)
   end
 
-  defp build_extra(input, id, title, groups, autolink_opts, source_url_pattern) do
+  defp build_extra(input, id, title, groups, language, autolink_opts, source_url_pattern) do
     opts = [file: input, line: 1]
 
     ast =
@@ -384,8 +391,6 @@ defmodule ExDoc.Formatter.HTML do
     title_text = title_ast && ExDoc.DocAST.text_from_ast(title_ast)
     title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
 
-    # TODO: don't hardcode Elixir for extras?
-    language = ExDoc.Language.Elixir
     content_html = autolink_and_render(ast, language, [file: input] ++ autolink_opts, opts)
 
     group = GroupMatcher.match_extra(groups, input)

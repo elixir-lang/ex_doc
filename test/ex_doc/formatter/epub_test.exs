@@ -83,8 +83,14 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   test "generates an EPUB file with erlang as proglang", %{tmp_dir: tmp_dir} = context do
-    generate_docs(Keyword.put(doc_config(context), :proglang, :erlang))
-    assert File.regular?(tmp_dir <> "/epub/#{doc_config(context)[:project]}.epub")
+    config =
+      context
+      |> doc_config()
+      |> Keyword.put(:proglang, :erlang)
+      |> Keyword.update!(:skip_undefined_reference_warnings_on, &["test/fixtures/README.md" | &1])
+
+    generate_docs(config)
+    assert File.regular?(tmp_dir <> "/epub/#{config[:project]}.epub")
   end
 
   test "generates an EPUB file in specified output directory", %{tmp_dir: tmp_dir} = context do
