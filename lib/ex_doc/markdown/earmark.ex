@@ -21,6 +21,8 @@ defmodule ExDoc.Markdown.Earmark do
     * `:breaks` - (boolean) only applicable if `gfm` is enabled. Makes all line
       breaks significant (so every line in the input is a new line in the output).
 
+    * `:footnotes` - (boolean) enables footnotes. Defaults to `true`.
+
   """
   @impl true
   def to_ast(text, opts) do
@@ -29,7 +31,8 @@ defmodule ExDoc.Markdown.Earmark do
       line: 1,
       file: "nofile",
       breaks: false,
-      pure_links: true
+      pure_links: true,
+      footnotes: true
     ]
 
     options = Keyword.merge(options, opts)
