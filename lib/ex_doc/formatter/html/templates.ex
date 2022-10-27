@@ -146,7 +146,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
             "#{node.name}/#{node.arity}"
           end
 
-        %{id: id, anchor: URI.encode(node.id)}
+        %{id: id, title: node.signature, anchor: URI.encode(node.id)}
       end
 
     %{key: HTML.text_to_id(group), name: group, nodes: nodes}
