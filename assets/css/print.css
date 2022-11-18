@@ -55,6 +55,10 @@
     white-space: break-spaces;
   }
 
+  .content-inner blockquote code.inline {
+    border-color: var(--gray300);
+  }
+
   .content-inner code.inline {
     border-color: var(--gray300);
   }
