@@ -58,6 +58,7 @@
 
   .content-inner pre code.makeup {
     border-color: var(--gray300);
+    white-space: break-spaces;
   }
 
   .content-inner code.inline {
