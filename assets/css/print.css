@@ -59,4 +59,8 @@
   .content-inner pre code.makeup {
     border-color: var(--gray300);
   }
+
+  .content-inner code.inline {
+    border-color: var(--gray300);
+  }
 }
