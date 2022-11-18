@@ -55,4 +55,8 @@
     :is(h3, h4):is(.warning, .error, .info, .neutral, .tip)::before {
     color: var(--textHeaders);
   }
+
+  .content-inner pre code.makeup {
+    border-color: var(--gray300);
+  }
 }
