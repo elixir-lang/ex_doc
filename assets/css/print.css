@@ -37,7 +37,8 @@
     display: none;
   }
 
-  .footer {
+  /* Hide On Hex.pm text but keep Built Using ExDoc */
+  .footer p:first-of-type {
     display: none;
   }
 
