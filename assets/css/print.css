@@ -50,12 +50,6 @@
     border-bottom: 2px solid var(--gray300);
   }
 
-  .content-inner
-    blockquote
-    :is(h3, h4):is(.warning, .error, .info, .neutral, .tip)::before {
-    color: var(--textHeaders);
-  }
-
   .content-inner pre code.makeup {
     border-color: var(--gray300);
     white-space: break-spaces;
