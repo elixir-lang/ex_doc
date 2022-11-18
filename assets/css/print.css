@@ -1,3 +1,5 @@
+/* Standard print styles */
+
 @media print {
   .main {
     display: block;
@@ -61,5 +63,142 @@
 
   .content-inner code.inline {
     border-color: var(--gray300);
+  }
+}
+
+/* Cheatsheet Print Styles */
+
+@media print {
+  .page-cheatmd .content-inner {
+    max-width: 1000px;
+  }
+
+  /* Columns */
+
+  .page-cheatmd section.list-4 > ul > li {
+    flex: 0 0 50%;
+  }
+
+  .page-cheatmd section.list-6 > ul > li {
+    flex: 0 0 33%;
+  }
+
+  .page-cheatmd section.list-4 > ul {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .page-cheatmd section.list-6 > ul {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  /* Headers */
+
+  .page-cheatmd h3.section-heading {
+    overflow: hidden;
+  }
+
+  /* There is a -2.7em margin for the other style sheet, but its incorrect here */
+  .page-cheatmd .content-inner .section-heading a.hover-link {
+    margin-left: -2.45em;
+  }
+
+  /* Line to the side of the h3 */
+  .page-cheatmd h3.section-heading:after {
+    content: "";
+    display: inline-block;
+    height: 0.75em;
+    vertical-align: bottom;
+    width: 100%;
+    margin-right: -100%;
+    margin-left: 10px;
+    border-top: 2px solid var(--gray200);
+  }
+
+  .page-cheatmd h4 {
+    display: block;
+    margin: 0;
+    padding: 0.25em 1.5em;
+    font-weight: 400;
+    border: solid 1px var(--gray800);
+  }
+
+  /* Ensure solo p tags have borders around them, but merge the border
+     when multiple p tags are next to each other */
+  .page-cheatmd .content-inner section p {
+    display: block;
+    margin: 0;
+    padding: 0.25em 1.5em;
+    border: solid;
+    border-color: var(--gray800);
+    border-width: 1px 1px 0px 1px;
+  }
+
+  .page-cheatmd .content-inner section p + p {
+    border-width: 0px 1px 0px 1px;
+  }
+
+  .page-cheatmd .content-inner section p:last-of-type {
+    border-width: 0px 1px 1px 1px;
+  }
+
+  .page-cheatmd .content-inner section p:only-of-type {
+    border-width: 1px;
+  }
+
+  /* Tables */
+
+  .page-cheatmd table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .page-cheatmd th,
+  .page-cheatmd td {
+    vertical-align: top;
+    border: 1px solid var(--gray800);
+    line-height: 15px;
+    padding: 15px;
+  }
+
+  .page-cheatmd th {
+    font-weight: bold;
+    text-align: left;
+    color: var(--gray800);
+  }
+
+  /* Code blocks */
+
+  .page-cheatmd pre {
+    margin: 0;
+  }
+
+  .page-cheatmd content-inner pre code.makeup {
+    border-color: var(--gray300);
+    white-space: break-spaces;
+  }
+
+  /* Lists */
+
+  .page-cheatmd ul,
+  .page-cheatmd ol {
+    border: 1px solid var(--gray800);
+    margin: 0;
+    padding: 0;
+    list-style-position: inside;
+  }
+
+  .page-cheatmd .h2 li {
+    padding: 0.5em 1.5em;
+    line-height: 2em;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--gray800);
+  }
+
+  .page-cheatmd .h2 li:last-of-type {
+    border-bottom: 0px;
   }
 }
