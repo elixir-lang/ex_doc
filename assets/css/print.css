@@ -130,7 +130,7 @@
   .page-cheatmd .content-inner section p {
     display: block;
     margin: 0;
-    padding: 0.25em 1.5em;
+    padding: 1.5em;
     border: solid;
     border-color: var(--gray800);
     border-width: 1px 1px 0px 1px;
