@@ -18,4 +18,8 @@
   .summary-row {
     page-break-inside: avoid;
   }
+
+  #toast {
+    display: none;
+  }
 }
