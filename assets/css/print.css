@@ -11,6 +11,8 @@
   .content {
     padding-left: 0;
     overflow: visible;
+    left: 0px;
+    width: 100%;
   }
 
   .summary-row {
