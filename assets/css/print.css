@@ -30,4 +30,8 @@
   button.display-settings {
     display: none;
   }
+
+  .content-inner .bottom-actions {
+    display: none;
+  }
 }
