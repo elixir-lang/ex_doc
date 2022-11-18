@@ -22,4 +22,12 @@
   #toast {
     display: none;
   }
+
+  a.view-source {
+    display: none;
+  }
+
+  button.display-settings {
+    display: none;
+  }
 }
