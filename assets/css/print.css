@@ -11,9 +11,55 @@
   .content {
     padding-left: 0;
     overflow: visible;
+    left: 0px;
+    width: 100%;
   }
 
   .summary-row {
     page-break-inside: avoid;
+  }
+
+  #toast {
+    display: none;
+  }
+
+  a.view-source {
+    display: none;
+  }
+
+  button.display-settings {
+    display: none;
+  }
+
+  .content-inner .bottom-actions {
+    display: none;
+  }
+
+  .footer {
+    display: none;
+  }
+
+  .content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) {
+    border: 2px solid var(--gray300);
+  }
+
+  .content-inner
+    blockquote
+    :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
+    color: var(--textHeaders);
+    border-bottom: 2px solid var(--gray300);
+  }
+
+  .content-inner pre code.makeup {
+    border-color: var(--gray300);
+    white-space: break-spaces;
+  }
+
+  .content-inner blockquote code.inline {
+    border-color: var(--gray300);
+  }
+
+  .content-inner code.inline {
+    border-color: var(--gray300);
   }
 }
