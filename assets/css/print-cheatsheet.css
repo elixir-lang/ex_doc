@@ -117,7 +117,7 @@
     display: block;
     margin: -1px 0 -1px 0;
     padding: 0.5em;
-    border: solid 1px var(--gray800);
+    border: solid 1px var(--gray300);
   }
 
   /* p styling */
@@ -135,7 +135,7 @@
     font-size: 0.95em;
     padding: 0.5em;
     border: solid;
-    border-color: var(--gray800);
+    border-color: var(--gray300);
     border-width: 1px 1px 0px 1px;
   }
 
@@ -164,7 +164,7 @@
   .page-cheatmd th,
   .page-cheatmd td {
     vertical-align: top;
-    border: 1px solid var(--gray800);
+    border: 1px solid var(--gray300);
     padding: 0.5em;
     font-size: 0.95em;
   }
@@ -172,7 +172,7 @@
   .page-cheatmd th {
     font-weight: bold;
     text-align: left;
-    color: var(--gray800);
+    color: var(--gray300);
   }
 
   /* Code Blocks */
@@ -185,7 +185,7 @@
 
   .page-cheatmd ul,
   .page-cheatmd ol {
-    border: 1px solid var(--gray800);
+    border: 1px solid var(--gray300);
     margin: 0;
     padding: 0;
     list-style-position: inside;
@@ -196,7 +196,7 @@
     margin-bottom: -1px;
     line-height: 1.5em;
     vertical-align: middle;
-    border-bottom: 1px solid var(--gray800);
+    border-bottom: 1px solid var(--gray300);
   }
 
   /* Remove copy button from Code Blocks */
