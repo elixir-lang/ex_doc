@@ -23,6 +23,10 @@
     display: none;
   }
 
+  .content-inner .section-heading a.hover-link {
+    display: none;
+  }
+
   a.view-source {
     display: none;
   }
