@@ -120,8 +120,7 @@
   .page-cheatmd h4 {
     display: block;
     margin: 0;
-    padding: 0.25em;
-    /* font-weight: 600; */
+    padding: 0.5em;
     border: solid 1px var(--gray800);
   }
 
@@ -168,7 +167,7 @@
   .page-cheatmd td {
     vertical-align: top;
     border: 1px solid var(--gray800);
-    padding: 0.25em 0.5em;
+    padding: 0.5em;
   }
 
   .page-cheatmd th {
@@ -194,14 +193,10 @@
   }
 
   .page-cheatmd .h2 li {
-    padding: 0.25em 0.5em;
+    padding: 0.5em;
     line-height: 1.5em;
     vertical-align: middle;
     border-bottom: 1px solid var(--gray800);
-  }
-
-  .page-cheatmd .h2 li:last-of-type {
-    border-bottom: 0px;
   }
 
   /* Remove copy button from Code Blocks */
