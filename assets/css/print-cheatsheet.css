@@ -124,6 +124,7 @@
 
   .page-cheatmd .content-inner p {
     font-size: 0.95em;
+    line-height: 1.5em;
     padding: 0.5em;
   }
 
@@ -133,6 +134,7 @@
     display: block;
     margin: -1px 0 -1px 0;
     font-size: 0.95em;
+    line-height: 1.5em;
     padding: 0.5em;
     border: solid;
     border-color: var(--gray300);
