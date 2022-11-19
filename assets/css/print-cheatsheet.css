@@ -205,4 +205,9 @@
   pre:hover button.copy-button {
     display: none;
   }
+
+  /* Remove hover tooltip from inline code references */
+  .page-cheatmd div#tooltip {
+    display: none;
+  }
 }
