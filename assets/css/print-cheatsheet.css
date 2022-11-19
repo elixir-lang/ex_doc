@@ -9,6 +9,7 @@
     max-width: 100%;
     width: 100%;
     padding: 0;
+    font-size: 0.85em;
   }
 
   .page-cheatmd section.col-2 {
@@ -66,13 +67,13 @@
 
   .page-cheatmd h1 {
     margin-top: 0em;
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
   }
 
   /* h2 styling */
 
   .page-cheatmd h2 {
-    margin: 1.5em 0 0.25em;
+    margin: 1em 0 0.25em;
     column-span: all;
     padding-left: 8px;
     border-left: solid 6px var(--gray500);
@@ -126,7 +127,8 @@
 
   /* p styling */
 
-  .page-cheatmd .h2 p {
+  .page-cheatmd .content-inner p {
+    font-size: 0.95em;
     padding: 0.5em;
   }
 
@@ -135,6 +137,7 @@
   .page-cheatmd .content-inner section p {
     display: block;
     margin: 0;
+    font-size: 0.95em;
     padding: 0.5em;
     border: solid;
     border-color: var(--gray800);
@@ -168,6 +171,7 @@
     vertical-align: top;
     border: 1px solid var(--gray800);
     padding: 0.5em;
+    font-size: 0.95em;
   }
 
   .page-cheatmd th {
