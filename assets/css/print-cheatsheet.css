@@ -1,9 +1,4 @@
 @media print {
-  /* Set page size to landscape for printing */
-  @page {
-    size: landscape;
-  }
-
   /* Basic layout and columns */
   .page-cheatmd .content-inner {
     max-width: 100%;

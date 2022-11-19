@@ -11,6 +11,9 @@
     <% end %>
     <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
     <link rel="stylesheet" href="<%= asset_rev config.output, "dist/html-#{config.proglang}*.css" %>" />
+    <%= if page.type == :cheatmd do %>
+      <style>@media print { @page { size: landscape; } }</style>
+    <% end %>
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
