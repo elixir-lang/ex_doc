@@ -215,6 +215,10 @@
     border-bottom: 1px solid var(--gray200);
   }
 
+  .page-cheatmd .h2 li:last-of-type {
+    border-bottom: 0;
+  }
+
   /* Remove copy button from Code Blocks */
 
   pre:hover button.copy-button {
