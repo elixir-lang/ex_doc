@@ -115,7 +115,7 @@
 
   .page-cheatmd h4 {
     display: block;
-    margin: 0;
+    margin: -1px 0 -1px 0;
     padding: 0.5em;
     border: solid 1px var(--gray800);
   }
@@ -131,7 +131,7 @@
      when multiple p tags are next to each other */
   .page-cheatmd .content-inner section p {
     display: block;
-    margin: 0;
+    margin: -1px 0 -1px 0;
     font-size: 0.95em;
     padding: 0.5em;
     border: solid;
