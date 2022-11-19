@@ -93,7 +93,7 @@
 
   .page-cheatmd section.h3 {
     min-width: 300px;
-    margin: 0 0 0.5em 0;
+    margin: 0 0 0.75em 0;
     break-inside: avoid;
     page-break-inside: avoid;
     -webkit-column-break-inside: avoid;
@@ -108,7 +108,7 @@
     width: 100%;
     margin-right: -100%;
     margin-left: 10px;
-    border-top: 2px solid var(--gray200);
+    border-top: 2px solid var(--gray100);
   }
 
   /* h4 styling */
