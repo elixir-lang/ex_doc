@@ -194,6 +194,7 @@
 
   .page-cheatmd .h2 li {
     padding: 0.5em;
+    margin-bottom: -1px;
     line-height: 1.5em;
     vertical-align: middle;
     border-bottom: 1px solid var(--gray800);
