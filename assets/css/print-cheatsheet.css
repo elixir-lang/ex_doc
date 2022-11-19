@@ -108,7 +108,7 @@
     width: 100%;
     margin-right: -100%;
     margin-left: 10px;
-    border-top: 2px solid var(--gray100);
+    border-top: 2px solid var(--gray50);
   }
 
   /* h4 styling */
