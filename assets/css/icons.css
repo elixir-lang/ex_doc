@@ -27,9 +27,11 @@
   --icon-menu-line: "\ef3e";
   --icon-search-2-line: "\f0cd";
   --icon-settings-3-line: "\f0e6";
+  --icon-printer-line: "\f029";
 }
 
 .ri-lg { font-size: 1.3333em; line-height: .75em; vertical-align: -.0667em; }
+
 .ri-settings-3-line:before { content: var(--icon-settings-3-line); }
 .ri-add-line:before { content: var(--icon-add); }
 .ri-subtract-line:before { content: var(--icon-subtract); }
@@ -45,3 +47,4 @@
 .ri-information-line:before { content: var(--icon-information); }
 .ri-alert-line:before { content: var(--icon-alert); }
 .ri-double-quotes-l:before { content: var(--icon-double-quotes-l); }
+.ri-printer-line:before { content: var(--icon-printer-line); }

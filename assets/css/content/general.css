@@ -32,7 +32,7 @@
   font-weight: 300;
 }
 
-.content-inner h1 :is(a.view-source, .settings) {
+.content-inner h1 .icon-action {
   font-size: 1.2rem;
   font-weight: normal;
 }
@@ -58,32 +58,24 @@
   color: var(--linksVisited);
 }
 
-.content-inner a.view-source {
+.content-inner .icon-action {
   float: right;
-  color: var(--viewSource);
+  color: var(--iconAction);
   text-decoration: none;
   border: none;
   transition: color .3s ease-in-out;
-}
-.content-inner a.view-source:hover {
-  color: var(--viewSourceHover);
-}
-.content-inner a.view-source:visited {
-  color: var(--viewSource);
-}
-
-.content-inner .settings {
   background-color: transparent;
-  float: right;
-  color: var(--viewSource);
-  text-decoration: none;
-  border: none;
-  transition: color .1s ease-in-out;
-  margin-top: 12px;
   cursor: pointer;
+  padding: 0 0 0 6px;
 }
-.content-inner .settings:hover {
-  color: var(--viewSourceHover);
+.content-inner button.icon-action {
+  margin-top: 12px;
+}
+.content-inner .icon-action:hover {
+  color: var(--iconActionHover);
+}
+.content-inner .icon-action:visited {
+  color: var(--iconAction);
 }
 
 .content-inner .livebook-badge-container {
@@ -95,7 +87,7 @@
 }
 
 .content-inner .note {
-  color: var(--viewSource);
+  color: var(--iconAction);
   margin-right: 5px;
   font-size: 14px;
   font-weight: normal;

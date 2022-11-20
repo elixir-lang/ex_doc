@@ -9,7 +9,7 @@
     </a>
     <h1 class="signature" translate="no"><%=h node.signature %></h1>
     <%= if node.source_url do %>
-      <a href="<%= node.source_url %>" class="view-source" rel="help" title="View Source">
+      <a href="<%= node.source_url %>" class="icon-action" rel="help" title="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
        <span class="sr-only">View Source</span>
      </a>

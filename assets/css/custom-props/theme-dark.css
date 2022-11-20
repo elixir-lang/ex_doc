@@ -11,8 +11,8 @@ body.dark {
   --linksNoUnderline:            var(--main-lightened-10);
   --linksNoUnderlineVisited:     var(--main-lightened-05);
 
-  --viewSource:                  var(--coldGray-lightened-10);
-  --viewSourceHover:             var(--white);
+  --iconAction:                  var(--coldGray-lightened-10);
+  --iconActionHover:             var(--white);
 
   --blockquoteBackground:        var(--coldGrayDim);
   --blockquoteBorder:            var(--coldGrayDark);

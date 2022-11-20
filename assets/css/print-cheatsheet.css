@@ -99,18 +99,6 @@
     -webkit-column-break-inside: avoid;
   }
 
-  /* Line to the side of the h3 */
-  .page-cheatmd h3.section-heading:after {
-    content: "";
-    display: inline-block;
-    height: 0.75em;
-    vertical-align: bottom;
-    width: 100%;
-    margin-right: -100%;
-    margin-left: 10px;
-    border-top: 2px solid var(--gray50);
-  }
-
   /* h4 styling */
 
   .page-cheatmd h4 {
@@ -219,8 +207,7 @@
     border-bottom: 0;
   }
 
-  /* Remove copy button from Code Blocks */
-
+  /* Remove copy button from code blocks */
   pre:hover button.copy-button {
     display: none;
   }
@@ -228,5 +215,13 @@
   /* Remove hover tooltip from inline code references */
   .page-cheatmd div#tooltip {
     display: none;
+  }
+
+  .page-cheatmd footer p {
+    display: none;
+  }
+
+  .page-cheatmd footer p.built-using {
+    display: block;
   }
 }

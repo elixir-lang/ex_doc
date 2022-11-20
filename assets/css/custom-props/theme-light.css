@@ -11,8 +11,8 @@
   --linksNoUnderline:            var(--main-darkened-10);
   --linksNoUnderlineVisited:     var(--main-darkened-20);
 
-  --viewSource:                  var(--coldGray);
-  --viewSourceHover:             var(--gray800);
+  --iconAction:                  var(--coldGray);
+  --iconActionHover:             var(--gray800);
 
   --blockquoteBackground:        var(--coldGrayFaint);
   --blockquoteBorder:            var(--coldGrayLight);

@@ -34,14 +34,10 @@ defmodule ExDoc.CLI do
       )
 
     if List.keymember?(opts, :version, 0) do
-      print_version()
+      IO.puts("ExDoc v#{ExDoc.version()}")
     else
       generate(args, opts, generator)
     end
-  end
-
-  defp print_version do
-    IO.puts("ExDoc v#{ExDoc.version()}")
   end
 
   defp generate(args, opts, generator) do
@@ -59,10 +55,11 @@ defmodule ExDoc.CLI do
       |> Keyword.put(:source_beam, source_beam)
       |> Keyword.put(:apps, [app(source_beam)])
       |> merge_config()
+      |> normalize_formatters()
 
     quiet? = Keyword.get(opts, :quiet, false)
 
-    for formatter <- get_formatters(opts) do
+    for formatter <- opts[:formatters] do
       index = generator.(project, version, Keyword.put(opts, :formatter, formatter))
 
       quiet? ||
@@ -72,11 +69,14 @@ defmodule ExDoc.CLI do
     end
   end
 
-  defp get_formatters(opts) do
-    case Keyword.get_values(opts, :formatter) do
-      [] -> opts[:formatters] || ["html", "epub"]
-      values -> values
-    end
+  defp normalize_formatters(opts) do
+    formatters =
+      case Keyword.get_values(opts, :formatter) do
+        [] -> opts[:formatters] || ["html", "epub"]
+        values -> values
+      end
+
+    Keyword.put(opts, :formatters, formatters)
   end
 
   defp app(source_beam) do

@@ -368,11 +368,12 @@ defmodule Mix.Tasks.Docs do
       |> normalize_apps(config)
       |> normalize_main()
       |> normalize_deps()
+      |> normalize_formatters()
       |> put_package(config)
 
     Mix.shell().info("Generating docs...")
 
-    for formatter <- get_formatters(options) do
+    for formatter <- options[:formatters] do
       index = generator.(project, version, Keyword.put(options, :formatter, formatter))
       Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"])
 
@@ -384,11 +385,14 @@ defmodule Mix.Tasks.Docs do
     end
   end
 
-  defp get_formatters(options) do
-    case Keyword.get_values(options, :formatter) do
-      [] -> options[:formatters] || ["html", "epub"]
-      values -> values
-    end
+  defp normalize_formatters(options) do
+    formatters =
+      case Keyword.get_values(options, :formatter) do
+        [] -> options[:formatters] || ["html", "epub"]
+        values -> values
+      end
+
+    Keyword.put(options, :formatters, formatters)
   end
 
   defp get_docs_opts(config) do

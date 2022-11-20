@@ -5,9 +5,8 @@
   font-size: 14px;
 }
 
-/* .footer class in selector twice to reach required specificity to override general link colour. */
 .content-inner .footer,
-.content-inner .footer.footer :is(a, .footer-button) {
+.content-inner .footer :is(a, .footer-button) {
   color: var(--textFooter);
 }
 
