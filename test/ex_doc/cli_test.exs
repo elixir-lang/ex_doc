@@ -17,14 +17,46 @@ defmodule ExDoc.CLITest do
 
   test "minimum command-line options" do
     {[html, epub], _io} = run(["ExDoc", "1.2.3", @ebin])
-    assert html == {"ExDoc", "1.2.3", [formatter: "html", formatters: ["html", "epub"], apps: [:ex_doc], source_beam: @ebin]}
-    assert epub == {"ExDoc", "1.2.3", [formatter: "epub", formatters: ["html", "epub"], apps: [:ex_doc], source_beam: @ebin]}
+
+    assert html ==
+             {"ExDoc", "1.2.3",
+              [
+                formatter: "html",
+                formatters: ["html", "epub"],
+                apps: [:ex_doc],
+                source_beam: @ebin
+              ]}
+
+    assert epub ==
+             {"ExDoc", "1.2.3",
+              [
+                formatter: "epub",
+                formatters: ["html", "epub"],
+                apps: [:ex_doc],
+                source_beam: @ebin
+              ]}
   end
 
   test "formatter option" do
     {[epub, html], _io} = run(["ExDoc", "1.2.3", @ebin, "-f", "epub", "-f", "html"])
-    assert epub == {"ExDoc", "1.2.3", [formatter: "epub", formatters: ["epub", "html"], apps: [:ex_doc], source_beam: @ebin]}
-    assert html == {"ExDoc", "1.2.3", [formatter: "html", formatters: ["epub", "html"], apps: [:ex_doc], source_beam: @ebin]}
+
+    assert epub ==
+             {"ExDoc", "1.2.3",
+              [
+                formatter: "epub",
+                formatters: ["epub", "html"],
+                apps: [:ex_doc],
+                source_beam: @ebin
+              ]}
+
+    assert html ==
+             {"ExDoc", "1.2.3",
+              [
+                formatter: "html",
+                formatters: ["epub", "html"],
+                apps: [:ex_doc],
+                source_beam: @ebin
+              ]}
   end
 
   test "version" do
