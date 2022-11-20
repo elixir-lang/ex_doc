@@ -23,6 +23,10 @@
     display: none;
   }
 
+  .content-inner .section-heading a.hover-link {
+    display: none;
+  }
+
   a.view-source {
     display: none;
   }
@@ -35,7 +39,8 @@
     display: none;
   }
 
-  .footer {
+  /* Hide On Hex.pm text but keep Built Using ExDoc */
+  .footer p:first-of-type {
     display: none;
   }
 
@@ -53,6 +58,8 @@
   .content-inner pre code.makeup {
     border-color: var(--gray300);
     white-space: break-spaces;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .content-inner blockquote code.inline {
