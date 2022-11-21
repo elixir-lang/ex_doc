@@ -67,11 +67,18 @@
 
   /* h2 styling */
 
-  .page-cheatmd h2 {
+  .page-cheatmd h2.section-heading {
     margin: 1em 0 0.25em;
     column-span: all;
-    padding-left: 8px;
+  }
+
+  /* for some reason Firefox extends the h2 border-left to the following h3 when printing,
+     moving the border-left to the :before pseudo-element fixes this */
+
+  .page-cheatmd h2.section-heading:before {
     border-left: solid 6px var(--gray100);
+    margin-right: 8px;
+    content: " ";
   }
 
   .page-cheatmd section.h2 {
@@ -178,14 +185,13 @@
   }
 
   .page-cheatmd td {
-    font-weight: bold;
     text-align: left;
   }
 
   /* Code Blocks */
 
   .page-cheatmd pre {
-    margin: 0;
+    margin: -1px 0px -1px 0px;
   }
 
   /* Lists */
