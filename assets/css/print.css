@@ -27,11 +27,11 @@
     display: none;
   }
 
-  a.view-source {
+  .content-inner button.icon-action {
     display: none;
   }
 
-  button.display-settings {
+  .content-inner a.icon-action {
     display: none;
   }
 
