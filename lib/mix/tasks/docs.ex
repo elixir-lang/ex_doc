@@ -61,6 +61,9 @@ defmodule Mix.Tasks.Docs do
   be a keyword list or a function returning a keyword list that will
   be lazily executed.
 
+    * `:annotations_for_docs` - a function that receives metadata and returns a list
+      of annotations to be added to the signature.
+
     * `:api_reference` - Whether to generate `api-reference.html`; default: `true`.
       If this is set to false, `:main` must also be set.
 

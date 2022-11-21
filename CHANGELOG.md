@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.29.1 (2022-11-21)
+
+  * Enhancements
+    * Add optional function annotations
+    * Support media print on stylesheets
+    * Add download ePub link to footer
+    * Support extras for Erlang
+    * Add tooltip to functions on sidebar
+    * Disable spellcheck and autocorrect on search input
+
+  * Bug fix
+    * Special handle functions called `record/*` in Erlang
+
+  * Deprecations
+    * Rename `:groups_for_functions` to `:groups_for_docs`
+
 ## v0.29.0 (2022-10-19)
 
   * Enhancements
