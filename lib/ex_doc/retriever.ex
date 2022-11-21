@@ -105,7 +105,8 @@ defmodule ExDoc.Retriever do
 
     # TODO: The default function groups must be returned by the language
     groups_for_functions =
-      config.groups_for_functions ++ [Callbacks: & &1[:__doc__] == :callback, Functions: fn _ -> true end]
+      config.groups_for_functions ++
+        [Callbacks: &(&1[:__doc__] == :callback), Functions: fn _ -> true end]
 
     docs_groups = Enum.map(groups_for_functions, &elem(&1, 0))
     function_docs = get_docs(module_data, source, groups_for_functions)
