@@ -108,9 +108,15 @@ defmodule ExDoc.Retriever do
       config.groups_for_functions ++
         [Callbacks: &(&1[:__doc__] == :callback), Functions: fn _ -> true end]
 
+    annotations_for_docs = config.annotations_for_docs
+
     docs_groups = Enum.map(groups_for_functions, &elem(&1, 0))
-    function_docs = get_docs(module_data, source, groups_for_functions)
-    docs = function_docs ++ get_callbacks(module_data, source, groups_for_functions)
+    function_docs = get_docs(module_data, source, groups_for_functions, annotations_for_docs)
+
+    docs =
+      function_docs ++
+        get_callbacks(module_data, source, groups_for_functions, annotations_for_docs)
+
     types = get_types(module_data, source)
 
     metadata = Map.put(metadata, :__doc__, module_data.type)
@@ -157,7 +163,7 @@ defmodule ExDoc.Retriever do
 
   ## Function helpers
 
-  defp get_docs(module_data, source, groups_for_functions) do
+  defp get_docs(module_data, source, groups_for_functions, annotations_for_docs) do
     {:docs_v1, _, _, _, _, _, doc_elements} = module_data.docs
 
     nodes =
@@ -167,18 +173,38 @@ defmodule ExDoc.Retriever do
             []
 
           function_data ->
-            [get_function(doc_element, function_data, source, module_data, groups_for_functions)]
+            [
+              get_function(
+                doc_element,
+                function_data,
+                source,
+                module_data,
+                groups_for_functions,
+                annotations_for_docs
+              )
+            ]
         end
       end)
 
     filter_defaults(nodes)
   end
 
-  defp get_function(doc_element, function_data, source, module_data, groups_for_functions) do
+  defp get_function(
+         doc_element,
+         function_data,
+         source,
+         module_data,
+         groups_for_functions,
+         annotations_for_docs
+       ) do
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
     doc_line = anno_line(anno)
-    annotations = annotations_from_metadata(metadata) ++ function_data.extra_annotations
+
+    annotations =
+      annotations_for_docs.(metadata) ++
+        annotations_from_metadata(metadata) ++ function_data.extra_annotations
+
     line = function_data.line || doc_line
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
@@ -226,17 +252,22 @@ defmodule ExDoc.Retriever do
 
   ## Callback helpers
 
-  defp get_callbacks(%{type: :behaviour} = module_data, source, groups_for_functions) do
+  defp get_callbacks(
+         %{type: :behaviour} = module_data,
+         source,
+         groups_for_functions,
+         annotations_for_docs
+       ) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
     for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in module_data.callback_types do
-      get_callback(doc, source, groups_for_functions, module_data)
+      get_callback(doc, source, groups_for_functions, module_data, annotations_for_docs)
     end
   end
 
-  defp get_callbacks(_, _, _), do: []
+  defp get_callbacks(_, _, _, _), do: []
 
-  defp get_callback(callback, source, groups_for_functions, module_data) do
+  defp get_callback(callback, source, groups_for_functions, module_data, annotations_for_docs) do
     callback_data = module_data.language.callback_data(callback, module_data)
 
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
@@ -245,7 +276,11 @@ defmodule ExDoc.Retriever do
 
     signature = signature(callback_data.signature)
     specs = callback_data.specs
-    annotations = callback_data.extra_annotations ++ annotations_from_metadata(metadata)
+
+    annotations =
+      annotations_for_docs.(metadata) ++
+        callback_data.extra_annotations ++ annotations_from_metadata(metadata)
+
     doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
 
     metadata = Map.put(metadata, :__doc__, :callback)

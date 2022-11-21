@@ -6,8 +6,10 @@ defmodule ExDoc.Config do
   def filter_modules(_module, _metadata), do: true
   def before_closing_head_tag(_), do: ""
   def before_closing_body_tag(_), do: ""
+  def annotations_for_docs(_), do: []
 
-  defstruct api_reference: true,
+  defstruct annotations_for_docs: &__MODULE__.annotations_for_docs/1,
+            api_reference: true,
             apps: [],
             assets: nil,
             authors: nil,
@@ -44,6 +46,7 @@ defmodule ExDoc.Config do
             version: nil
 
   @type t :: %__MODULE__{
+          annotations_for_docs: (term() -> list()),
           api_reference: boolean(),
           apps: [atom()],
           assets: nil | String.t(),
