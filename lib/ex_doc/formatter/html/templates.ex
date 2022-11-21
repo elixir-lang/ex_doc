@@ -184,12 +184,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def module_summary(module_node) do
     entries =
       [Types: module_node.typespecs] ++
-        function_groups(module_node.function_groups, module_node.docs)
+        docs_groups(module_node.docs_groups, module_node.docs)
 
     Enum.reject(entries, fn {_type, nodes} -> nodes == [] end)
   end
 
-  defp function_groups(groups, docs) do
+  defp docs_groups(groups, docs) do
     for group <- groups, do: {group, Enum.filter(docs, &(&1.group == group))}
   end
 

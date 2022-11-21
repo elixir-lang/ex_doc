@@ -215,12 +215,12 @@ defmodule Mix.Tasks.Docs do
 
   A regex or the string name of the module is also supported.
 
-  ### Grouping functions
+  ### Grouping functions and callbacks
 
-  Functions inside a module can also be organized in groups. This is done via
-  the `:groups_for_functions` configuration which is a keyword list of group
-  titles and filtering functions that receive the documentation metadata of
-  functions as argument.
+  Functions and callbacks inside a module can also be organized in groups.
+  This is done via the `:groups_for_functions` configuration which is a
+  keyword list of group titles and filtering functions that receive the
+  documentation metadata of functions as argument.
 
   For example, imagine that you have an API client library with a large surface
   area for all the API endpoints you need to support. It would be helpful to
@@ -247,8 +247,9 @@ defmodule Mix.Tasks.Docs do
       ]
 
   A function can belong to a single group only. If multiple group filters match,
-  the first will take precedence. Functions that don't have a custom group will
-  be listed under the default "Functions" group.
+  the first will take precedence. Functions and callbacks that don't have a
+  custom group will be listed under the default "Functions" and "Callbacks"
+  group respectively.
 
   ## Additional JavaScript config
 

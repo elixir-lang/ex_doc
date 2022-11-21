@@ -107,7 +107,7 @@ defmodule ExDoc.Retriever do
     groups_for_functions =
       config.groups_for_functions ++ [Callbacks: & &1[:__callback__], Functions: fn _ -> true end]
 
-    function_groups = Enum.map(groups_for_functions, &elem(&1, 0))
+    docs_groups = Enum.map(groups_for_functions, &elem(&1, 0))
     function_docs = get_docs(module_data, source, groups_for_functions)
     docs = function_docs ++ get_callbacks(module_data, source, groups_for_functions)
     types = get_types(module_data, source)
@@ -125,7 +125,7 @@ defmodule ExDoc.Retriever do
       module: module,
       type: module_data.type,
       deprecated: metadata[:deprecated],
-      function_groups: function_groups,
+      docs_groups: docs_groups,
       docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
       doc: moduledoc,
       doc_line: doc_line,
