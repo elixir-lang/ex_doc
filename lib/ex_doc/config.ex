@@ -46,7 +46,7 @@ defmodule ExDoc.Config do
             version: nil
 
   @type t :: %__MODULE__{
-          annotations_for_docs: (term() -> list()),
+          annotations_for_docs: (map() -> list()),
           api_reference: boolean(),
           apps: [atom()],
           assets: nil | String.t(),
