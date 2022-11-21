@@ -91,6 +91,57 @@ defmodule ExDoc.RetrieverTest do
       assert %{id: "baz/0", group: :"Group 2"} = baz
     end
 
+    test "custom function annotations", c do
+      elixirc(c, ~S"""
+      defmodule A do
+        @doc since: "1.0.0"
+        @doc deprecated: "deprecation message"
+        @doc foo: true
+        def foo(), do: :ok
+      end
+      """)
+
+      [mod] =
+        Retriever.docs_from_modules([A], %ExDoc.Config{
+          annotations_for_docs: fn metadata ->
+            if metadata[:foo] do
+              [:baz]
+            else
+              []
+            end
+          end
+        })
+
+      [foo] = mod.docs
+      assert foo.id == "foo/0"
+      assert foo.annotations == [:baz, "since 1.0.0"]
+      assert foo.deprecated == "deprecation message"
+    end
+
+    test "custom callback annotations", c do
+      elixirc(c, ~S"""
+      defmodule A do
+        @doc foo: true
+        @callback callback_name() :: :ok
+      end
+      """)
+
+      [mod] =
+        Retriever.docs_from_modules([A], %ExDoc.Config{
+          annotations_for_docs: fn metadata ->
+            if metadata[:foo] do
+              [:baz]
+            else
+              []
+            end
+          end
+        })
+
+      [foo] = mod.docs
+
+      assert foo.annotations == [:baz]
+    end
+
     test "nesting", c do
       elixirc(c, ~S"""
       defmodule Nesting.Prefix.B.A do
