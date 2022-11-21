@@ -112,7 +112,7 @@ defmodule Mix.Tasks.Docs do
 
     * `:formatters` - Formatter to use; default: ["html", "epub"], options: "html", "epub".
 
-    * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_functions` - See the "Groups" section
+    * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_docs` - See the "Groups" section
 
     * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
@@ -218,7 +218,7 @@ defmodule Mix.Tasks.Docs do
   ### Grouping functions and callbacks
 
   Functions and callbacks inside a module can also be organized in groups.
-  This is done via the `:groups_for_functions` configuration which is a
+  This is done via the `:groups_for_docs` configuration which is a
   keyword list of group titles and filtering functions that receive the
   documentation metadata of functions as argument.
 
@@ -240,7 +240,7 @@ defmodule Mix.Tasks.Docs do
 
   And then in the configuration you can group these with:
 
-      groups_for_functions: [
+      groups_for_docs: [
         Authentication: & &1[:section] == :auth,
         Resource: & &1[:subject] == :object,
         Admin: & &1[:permission] in [:grant, :write]

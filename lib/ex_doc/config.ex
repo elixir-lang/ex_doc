@@ -24,7 +24,7 @@ defmodule ExDoc.Config do
             formatter: "html",
             formatters: [],
             groups_for_extras: [],
-            groups_for_functions: [],
+            groups_for_docs: [],
             groups_for_modules: [],
             homepage_url: nil,
             javascript_config_path: "docs_config.js",
@@ -62,7 +62,7 @@ defmodule ExDoc.Config do
           formatter: nil | String.t(),
           formatters: [String.t()],
           groups_for_extras: keyword(),
-          groups_for_functions: keyword((keyword() -> boolean)),
+          groups_for_docs: keyword((keyword() -> boolean)),
           groups_for_modules: keyword(),
           homepage_url: nil | String.t(),
           javascript_config_path: nil | String.t(),
@@ -90,6 +90,14 @@ defmodule ExDoc.Config do
     {nest_modules_by_prefix, options} = Keyword.pop(options, :nest_modules_by_prefix, [])
     {proglang, options} = Keyword.pop(options, :proglang, :elixir)
     {filter_modules, options} = Keyword.pop(options, :filter_modules, &filter_modules/2)
+
+    options =
+      if groups_for_functions = options[:groups_for_functions] do
+        # TODO: Deprecate me
+        Keyword.put_new(options, :groups_for_docs, groups_for_functions)
+      else
+        options
+      end
 
     {source_url_pattern, options} =
       Keyword.pop_lazy(options, :source_url_pattern, fn ->

@@ -194,7 +194,7 @@ defmodule ExDoc.CLI do
 
         [
           extras: Path.wildcard("lib/elixir/pages/*.md"),
-          groups_for_functions: [
+          groups_for_docs: [
             Guards: & &1[:guard] == true
           ],
           skip_undefined_reference_warnings_on: ["compatibility-and-deprecations"],

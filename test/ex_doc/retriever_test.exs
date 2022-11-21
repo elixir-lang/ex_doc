@@ -77,7 +77,7 @@ defmodule ExDoc.RetrieverTest do
       """)
 
       config = %ExDoc.Config{
-        groups_for_functions: [
+        groups_for_docs: [
           "Group 1": &(&1.group == 1),
           "Group 2": &(&1.group == 2)
         ]
