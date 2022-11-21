@@ -117,7 +117,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
         extra =
           module
           |> module_summary()
-          |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
           |> case do
             [] -> []
             entries -> [nodeGroups: Enum.map(entries, &sidebar_entries/1)]
@@ -183,8 +182,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   def module_summary(module_node) do
-    [Types: module_node.typespecs] ++
-      function_groups(module_node.function_groups, module_node.docs)
+    entries =
+      [Types: module_node.typespecs] ++
+        function_groups(module_node.function_groups, module_node.docs)
+
+    Enum.reject(entries, fn {_type, nodes} -> nodes == [] end)
   end
 
   defp function_groups(groups, docs) do
