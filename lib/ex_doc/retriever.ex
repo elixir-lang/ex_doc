@@ -105,14 +105,14 @@ defmodule ExDoc.Retriever do
 
     # TODO: The default function groups must be returned by the language
     groups_for_functions =
-      config.groups_for_functions ++ [Callbacks: & &1[:__callback__], Functions: fn _ -> true end]
+      config.groups_for_functions ++ [Callbacks: & &1[:__doc__] == :callback, Functions: fn _ -> true end]
 
     docs_groups = Enum.map(groups_for_functions, &elem(&1, 0))
     function_docs = get_docs(module_data, source, groups_for_functions)
     docs = function_docs ++ get_callbacks(module_data, source, groups_for_functions)
     types = get_types(module_data, source)
 
-    metadata = Map.put(metadata, :__type__, module_data.type)
+    metadata = Map.put(metadata, :__doc__, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
 
@@ -247,7 +247,7 @@ defmodule ExDoc.Retriever do
     annotations = callback_data.extra_annotations ++ annotations_from_metadata(metadata)
     doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
 
-    metadata = Map.put(metadata, :__callback__, true)
+    metadata = Map.put(metadata, :__doc__, :callback)
     group = GroupMatcher.match_function(groups_for_functions, metadata)
 
     %ExDoc.FunctionNode{

@@ -133,7 +133,7 @@ defmodule ExDoc.Config do
   end
 
   defp deprecated?(metadata), do: metadata[:deprecated] != nil
-  defp exception?(metadata), do: metadata[:__type__] == :exception
+  defp exception?(metadata), do: metadata[:__doc__] == :exception
 
   defp normalize_nest_modules_by_prefix(nest_modules_by_prefix) do
     nest_modules_by_prefix
