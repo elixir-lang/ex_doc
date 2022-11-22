@@ -1,9 +1,9 @@
 # Assets
 
-In this directory live all assets for `ExDoc`. The built, ready-to-use
+All asset sources for `ExDoc` live in this directory. The built, ready-to-use
 versions are found in `formatters/{html,epub}/dist`.
 
-To work on these assets you first need to install [Node.js] and [npm]. (npm
+To work on these assets you need to have [Node.js] and [npm] installed. (npm
 is usually installed along with Node.js.) The build process is currently tested
 in Node 16 LTS.
 
@@ -25,10 +25,25 @@ The following scripts are available from the root folder of the project.
 $ npm run --prefix assets build
 ```
 
-This will build a complete production bundle, including JavaScript and CSS.
-If you run `mix build` at the `ExDoc` root after changing your assets, it will
-automatically recompile the assets, invoke `mix compile --force`, and generate
-fresh docs with your changes.
+Build a complete production bundle, including JavaScript and CSS.
+
+(Note that this is not required to be manually run when generating docs: if you
+run `mix build` at the `ExDoc` root after changing your assets, the
+assets will be recompiled, `mix compile --force` will be invoked, and fresh
+docs with your changes will be generated.)
+
+### `build:watch`
+
+```bash
+$ npm run --prefix assets build:watch
+```
+
+Run the `build` command with watch mode set, providing for automatic assets
+rebuilds on every asset file change.
+
+Additionally, in watch mode, the docs are built after every asset rebuild,
+meaning the only action required to check results after changing asset sources
+is to refresh/reload the browser or ePub reader.
 
 ### `lint`
 
@@ -53,6 +68,7 @@ $ npm run --prefix assets test
 ```
 
 Run all the available JavaScript tests using [Karma].
+
 
 [esbuild]: https://esbuild.github.io
 [Node.js]: https://nodejs.org/
