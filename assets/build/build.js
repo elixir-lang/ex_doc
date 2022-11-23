@@ -105,7 +105,7 @@ const htmlBuildOptions = {
 
 // HTML: esbuild (conditionally configuring watch mode and rebuilding of docs)
 if (!watchMode) {
-  esbuild.build(htmlBuildOptions).catch(() => process.exit(1))
+  esbuild.build(htmlBuildOptions).then(() => buildTemplatesRuntime()).catch(() => process.exit(1))
 } else {
   esbuild.build({
     ...htmlBuildOptions,
@@ -143,11 +143,6 @@ function buildTemplatesRuntime() {
     entryPoints: ['node_modules/handlebars/dist/handlebars.runtime.js'],
     bundle: false,
   }).catch(() => process.exit(1))
-}
-// Build of the templates runtime is not required here when in watch mode, as
-// the ebuild watch mode config already provides for such.
-if (!watchMode) {
-  buildTemplatesRuntime()
 }
 
 // Docs generation (used in watch mode only)
