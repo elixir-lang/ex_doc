@@ -43,7 +43,7 @@ rebuilds on every asset file change.
 
 Additionally, in watch mode, the docs are built after every asset rebuild,
 meaning the only action required to check results after changing asset sources
-is to refresh/reload the browser or ePub reader.
+is to refresh/reload the browser or EPUB reader.
 
 ### `lint`
 
