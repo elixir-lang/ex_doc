@@ -46,7 +46,7 @@ defmodule ExDoc.Mixfile do
       clean: [&clean_test_fixtures/1, "clean"],
       fix: ["format", "cmd --cd assets npm run lint:fix"],
       lint: ["format --check-formatted", "cmd --cd assets npm run lint"],
-      setup: ["deps.get", "cmd --cd assets npm install"]
+      setup: ["deps.get", "cmd mkdir -p tmp/handlebars", "cmd --cd assets npm install"]
     ]
   end
 
