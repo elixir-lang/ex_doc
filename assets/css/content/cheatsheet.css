@@ -1,4 +1,16 @@
 @media screen {
+  .page-cheatmd {
+    --horizontal-space: 1.5em;
+    --vertical-space: 1em;
+  }
+
+  @media (max-width: 600px) {
+    .page-cheatmd {
+      --horizontal-space: 1em;
+      --vertical-space: .75em;
+    }
+  }
+
   .page-cheatmd .content-inner {
     max-width: 1200px;
   }
@@ -6,13 +18,13 @@
   /* h1 styling */
 
   .page-cheatmd h1 {
-    margin-bottom: 1em;
+    margin-bottom: var(--vertical-space);
   }
 
   /* h2 styling */
 
   .page-cheatmd h2 {
-    margin: 1em 0;
+    margin: var(--vertical-space) 0;
     column-span: all;
     padding-left: 3px;
     color: var(--gray700);
@@ -26,7 +38,6 @@
   /* h3 styling */
 
   .page-cheatmd h3 {
-    white-space: nowrap;
     overflow: hidden;
     margin: 0 0 1em;
     padding-left: 5px;
@@ -36,18 +47,20 @@
 
   .page-cheatmd section.h3 {
     min-width: 300px;
-    margin: 0 0 2em 0;
+    margin: 0 0 calc(var(--vertical-space) * 2) 0;
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
   }
 
   .page-cheatmd h3::after {
-    margin-left: 24px;
     content: "";
-    vertical-align: middle;
+    margin-left: var(--horizontal-space);
+    vertical-align: baseline;
     display: inline-block;
     width: 100%;
     height: 1px;
+    margin-right: -100%;
+    margin-bottom: 5px;
     background: linear-gradient(
       to right,
       rgba(116, 95, 181, 0.2),
@@ -60,7 +73,7 @@
   .page-cheatmd h4 {
     display: block;
     margin: 0;
-    padding: 0.25em 1.5em;
+    padding: 0.25em var(--horizontal-space);
     font-weight: 400;
     background: var(--gray100);
     color: #567;
@@ -80,7 +93,7 @@
     margin: 0;
     display: block;
     background: var(--gray50);
-    padding: 1.5em;
+    padding: var(--vertical-space) var(--horizontal-space);
   }
 
   .page-cheatmd.dark .h2 p {
@@ -96,7 +109,7 @@
   /* Code blocks */
 
   .page-cheatmd pre code {
-    padding: 1em 1.5em;
+    padding: var(--vertical-space) var(--horizontal-space);
   }
 
   .page-cheatmd pre code::-webkit-scrollbar {
@@ -123,15 +136,15 @@
   }
 
   .page-cheatmd .h2 table th {
-    padding: 0.75em 1.5em;
-    line-height: 2em;
+    padding: var(--vertical-space) var(--horizontal-space);
+    line-height: inherit;
     margin-bottom: -1px;
     vertical-align: middle;
     border-bottom: 1px solid var(--codeBorder);
   }
 
   .page-cheatmd .h2 table td {
-    padding: 0.75em 1.5em;
+    padding: var(--vertical-space) var(--horizontal-space);
     border: 0;
     border-bottom: 1px solid var(--codeBorder);
   }
@@ -167,7 +180,7 @@
 
   .page-cheatmd .h2 li {
     list-style-position: inside;
-    padding: 0.5em 1.5em;
+    padding: 0.5em var(--horizontal-space);
     line-height: 2em;
     vertical-align: middle;
     background-color: var(--codeBackground);
