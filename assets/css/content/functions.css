@@ -17,7 +17,7 @@
 .content-inner .detail-header {
   margin: 2.0em 0 1.0em;
   padding: .5em 1em;
-  background-color: var(--codeBackground);
+  background-color: var(--textDetailBackground);
   border-left: 3px solid var(--main);
   font-size: 1em;
   font-family: var(--monoFontFamily);
@@ -32,6 +32,7 @@
   display: inline-block;
   font-family: var(--monoFontFamily);
   font-size: 1rem;
+  font-weight: 700;
 }
 
 .content-inner .detail-header:hover a.detail-link {
