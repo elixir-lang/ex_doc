@@ -60,5 +60,5 @@ body.dark {
   --success:                     var(--green-lightened-10);
 
   --sidebarButton:               var(--gray50);
-  --sidebarButtonBackground:     linear-gradient(180deg, var(--gray900) 0%, var(--gray900-opacity-0) 100%);
+  --sidebarButtonBackground:     linear-gradient(180deg, var(--gray900) 20%, var(--gray900-opacity-50) 70%, var(--gray900-opacity-0) 100%);
 }
