@@ -107,10 +107,10 @@ body.sidebar-closed .content {
     z-index: -1;
     pointer-events: none;
     position: fixed;
-    left: 0;
+    left: -1px;
     top: 0;
     height: var(--sidebarButtonHeight);
-    width: 100vw;
+    width: calc(100vw + 2px);
     background: var(--sidebarButtonBackground);
     transition: top .3s ease-in-out;
   }
