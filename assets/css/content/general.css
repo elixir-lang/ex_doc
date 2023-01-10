@@ -135,6 +135,10 @@
   vertical-align: top;
 }
 
+.content-inner .section-heading {
+  position: relative;
+}
+
 .content-inner .section-heading:hover a.hover-link {
   opacity: 1;
   text-decoration: none;
@@ -155,18 +159,10 @@
 
 @media screen and (max-width: 768px) {
   .content-inner .section-heading a.hover-link {
-    float: right;
-    margin-right: -13px;
-    padding: .3em;
-  }
-  .content-inner h1.section-heading a.hover-link {
-    margin-top: 13px;
-  }
-  .content-inner h2.section-heading a.hover-link {
-    margin-top: 7px;
-  }
-  .content-inner h3.section-heading a.hover-link {
-    margin-top: 4px;
+    position: absolute;
+    bottom: 0;
+    right: -20px;
+    padding: .3em .6em .4em;
   }
 }
 
