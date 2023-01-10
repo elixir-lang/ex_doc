@@ -154,6 +154,14 @@
 }
 
 @media screen and (max-width: 768px) {
+  .content-inner .section-heading:before {
+    content: '';
+    display: block;
+    position: relative;
+    padding-top: 45px;
+    margin-top: -45px;
+  }
+
   .content-inner .section-heading a.hover-link {
     float: right;
     margin: .5em 0 .5em .5em;
