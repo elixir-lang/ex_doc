@@ -76,8 +76,17 @@
 }
 
 @media screen and (max-width: 768px) {
-  .content-inner > pre:has(code),
-  .content-inner section > pre:has(code) {
+  /*
+    TODO:
+
+    This selector can be more specific once Firefox ships default
+    support for the :has() pseudo-class: https://caniuse.com/css-has
+
+    .content-inner > pre:has(code),
+    .content-inner section > pre:has(code) {
+  */
+  .content-inner > pre,
+  .content-inner section > pre {
     margin-left: calc(-1 * var(--content-gutter));
     margin-right: calc(-1 * var(--content-gutter));
   }
