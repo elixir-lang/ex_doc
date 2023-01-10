@@ -48,9 +48,7 @@
     border: 2px solid var(--gray300);
   }
 
-  .content-inner
-    blockquote
-    :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
+  .content-inner blockquote :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
     color: var(--textHeaders);
     border-bottom: 2px solid var(--gray300);
   }

@@ -4,7 +4,7 @@
     max-width: 100%;
     width: 100%;
     padding: 0;
-    font-size: 0.85em;
+    font-size: .85em;
   }
 
   .page-cheatmd section.col-2 {
@@ -58,21 +58,21 @@
     width: 100%;
   }
 
-  /* h1 styling */
+  /* h1 */
 
   .page-cheatmd h1 {
     margin-top: 0em;
-    margin-bottom: 0.5em;
+    margin-bottom: .5em;
   }
 
-  /* h2 styling */
+  /* h2 */
 
   .page-cheatmd h2.section-heading {
-    margin: 1em 0 0.25em;
+    margin: 1em 0 .25em;
     column-span: all;
   }
 
-  /* for some reason Firefox extends the h2 border-left to the following h3 when printing,
+  /* For some reason Firefox extends the h2 border-left to the following h3 when printing;
      moving the border-left to the :before pseudo-element fixes this */
 
   .page-cheatmd h2.section-heading:before {
@@ -85,12 +85,12 @@
     page-break-inside: avoid;
   }
 
-  /* h3 styling */
+  /* h3 */
 
   .page-cheatmd h3 {
     white-space: nowrap;
     overflow: hidden;
-    margin: 0 0 0.25em;
+    margin: 0 0 .25em;
     padding-left: 5px;
   }
 
@@ -100,27 +100,27 @@
 
   .page-cheatmd section.h3 {
     min-width: 300px;
-    margin: 0 0 0.75em 0;
+    margin: 0 0 .75em 0;
     break-inside: avoid;
     page-break-inside: avoid;
     -webkit-column-break-inside: avoid;
   }
 
-  /* h4 styling */
+  /* h4 */
 
   .page-cheatmd h4 {
     display: block;
     margin: -1px 0 -1px 0;
-    padding: 0.5em;
+    padding: .5em;
     border: solid 1px var(--gray300);
   }
 
-  /* p styling */
+  /* p */
 
   .page-cheatmd .content-inner p {
-    font-size: 0.95em;
+    font-size: .95em;
     line-height: 1.5em;
-    padding: 0.5em;
+    padding: .5em;
   }
 
   /* Ensure solo p tags have borders around them, but merge the border
@@ -128,9 +128,9 @@
   .page-cheatmd .content-inner section p {
     display: block;
     margin: -1px 0 -1px 0;
-    font-size: 0.95em;
+    font-size: .95em;
     line-height: 1.5em;
-    padding: 0.5em;
+    padding: .5em;
     border: solid;
     border-color: var(--gray300);
     border-width: 1px 1px 0px 1px;
@@ -162,8 +162,8 @@
   .page-cheatmd td {
     text-align: left;
     vertical-align: top;
-    padding: 0.5em;
-    font-size: 0.95em;
+    padding: .5em;
+    font-size: .95em;
   }
 
   .page-cheatmd thead {
@@ -204,7 +204,7 @@
   }
 
   .page-cheatmd .h2 li {
-    padding: 0.5em 0.75em;
+    padding: .5em .75em;
     vertical-align: middle;
     border-bottom: 1px solid var(--gray200);
   }

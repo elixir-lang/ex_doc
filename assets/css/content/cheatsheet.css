@@ -15,13 +15,13 @@
     max-width: 1200px;
   }
 
-  /* h1 styling */
+  /* h1 */
 
   .page-cheatmd h1 {
     margin-bottom: var(--vertical-space);
   }
 
-  /* h2 styling */
+  /* h2 */
 
   .page-cheatmd h2 {
     margin: var(--vertical-space) 0;
@@ -35,7 +35,7 @@
     color: var(--gray200);
   }
 
-  /* h3 styling */
+  /* h3 */
 
   .page-cheatmd h3 {
     overflow: hidden;
@@ -63,17 +63,17 @@
     margin-bottom: 5px;
     background: linear-gradient(
       to right,
-      rgba(116, 95, 181, 0.2),
+      rgba(116, 95, 181, .2),
       transparent 80%
     );
   }
 
-  /* h4 styling */
+  /* h4 */
 
   .page-cheatmd h4 {
     display: block;
     margin: 0;
-    padding: 0.25em var(--horizontal-space);
+    padding: .25em var(--horizontal-space);
     font-weight: 400;
     background: var(--gray100);
     color: #567;
@@ -103,7 +103,7 @@
   .page-cheatmd .h2 p > code {
     color: #eb5757;
     border-radius: 3px;
-    padding: 0.2em 0.4em;
+    padding: .2em .4em;
   }
 
   /* Code blocks */
@@ -113,8 +113,8 @@
   }
 
   .page-cheatmd pre code::-webkit-scrollbar {
-    width: 0.4rem;
-    height: 0.6rem;
+    width: .4rem;
+    height: .6rem;
   }
 
   .page-cheatmd .h2 pre {
@@ -156,7 +156,7 @@
   .page-cheatmd .h2 table td code {
     color: #eb5757;
     border-radius: 3px;
-    padding: 0.2em 0.4em;
+    padding: .2em .4em;
   }
 
   .page-cheatmd .h2 thead {
@@ -172,6 +172,7 @@
   }
 
   /* Lists */
+
   .page-cheatmd .h2 ul,
   .page-cheatmd .h2 ol {
     margin: 0;
@@ -180,7 +181,7 @@
 
   .page-cheatmd .h2 li {
     list-style-position: inside;
-    padding: 0.5em var(--horizontal-space);
+    padding: .5em var(--horizontal-space);
     line-height: 2em;
     vertical-align: middle;
     background-color: var(--codeBackground);
@@ -195,7 +196,7 @@
   .page-cheatmd .h2 li > code {
     color: #eb5757;
     border-radius: 3px;
-    padding: 0.2em 0.4em;
+    padding: .2em .4em;
   }
 
   /* Columns */
