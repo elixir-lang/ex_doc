@@ -1,4 +1,8 @@
 :root {
+  /* Layout & Whitespace */
+  --content-width: 949px;
+  --content-gutter: 60px;
+
   /* Font Families */
   --serifFontFamily: 'Merriweather', 'Book Antiqua', Georgia, 'Century Schoolbook', serif;
   --sansFontFamily: 'Lato', sans-serif;
@@ -36,4 +40,11 @@
   --black:                   hsl(  0,   0%,   0%      );
   --black-opacity-10:       hsla(  0,   0%,   0%,  10%);
   --black-opacity-50:       hsla(  0,   0%,   0%,  50%);
+}
+
+@media screen and (max-width: 768px) {
+  :root {
+    --content-width: 100%;
+    --content-gutter: 20px;
+  }
 }

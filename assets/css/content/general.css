@@ -146,15 +146,19 @@
   opacity: 0;
   padding: .3em .6em .6em;
   line-height: 1em;
-  margin-left: -2.7em;
+  margin-left: -2.4em;
   text-decoration: none;
   border: none;
   font-size: 16px;
   vertical-align: middle;
 }
 
-.content-inner .detail :is(h1, h2, h3, h4, h5, h6).section-heading {
-  margin-left: .3em;
+@media screen and (max-width: 768px) {
+  .content-inner .section-heading a.hover-link {
+    float: right;
+    margin: .5em 0 .5em .5em;
+    padding: .3em;
+  }
 }
 
 .content-inner .app-vsn {
@@ -178,4 +182,10 @@
   font-style: normal;
   line-height: 24px;
   font-weight: 400;
+}
+
+@media screen and (max-width: 768px) {
+  .content-inner :is(ol, ul) {
+    padding-left: calc(1.5 * var(--content-gutter));
+  }
 }

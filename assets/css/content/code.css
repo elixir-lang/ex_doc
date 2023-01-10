@@ -74,3 +74,20 @@
   border-bottom: 0;
   border-radius: 2px;
 }
+
+@media screen and (max-width: 768px) {
+  .content-inner > pre:has(code),
+  .content-inner section > pre:has(code) {
+    margin-left: calc(-1 * var(--content-gutter));
+    margin-right: calc(-1 * var(--content-gutter));
+  }
+
+  .content-inner > pre code,
+  .content-inner section > pre code {
+    padding-left: var(--content-gutter);
+    padding-right: var(--content-gutter);
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+}
