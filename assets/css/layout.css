@@ -54,6 +54,13 @@ body {
   z-index: 3;
 }
 
+@media screen and (max-width: 768px) {
+  .content {
+    overflow: auto;
+    scroll-padding-top: 45px;
+  }
+}
+
 body:is(.sidebar-opening, .sidebar-opened) .sidebar-button {
   transform: translateX(250px);
   top: var(--sidebarButtonTopOpen);
@@ -72,11 +79,6 @@ body.sidebar-opening .content {
 
 body.sidebar-closing .sidebar-button {
   transform: translateX(0);
-}
-
-body:is(.sidebar-closing, .sidebar-closed) .sidebar-button {
-  padding-left: var(--content-gutter);
-  padding-right: var(--content-gutter);
 }
 
 body.sidebar-closing .sidebar {

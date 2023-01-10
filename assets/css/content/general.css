@@ -154,18 +154,19 @@
 }
 
 @media screen and (max-width: 768px) {
-  .content-inner .section-heading:before {
-    content: '';
-    display: block;
-    position: relative;
-    padding-top: 45px;
-    margin-top: -45px;
-  }
-
   .content-inner .section-heading a.hover-link {
     float: right;
-    margin: .5em 0 .5em .5em;
+    margin-right: -13px;
     padding: .3em;
+  }
+  .content-inner h1.section-heading a.hover-link {
+    margin-top: 13px;
+  }
+  .content-inner h2.section-heading a.hover-link {
+    margin-top: 7px;
+  }
+  .content-inner h3.section-heading a.hover-link {
+    margin-top: 4px;
   }
 }
 

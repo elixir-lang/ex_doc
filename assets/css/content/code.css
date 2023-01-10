@@ -87,16 +87,14 @@
   */
   .content-inner > pre,
   .content-inner section > pre {
-    margin-left: calc(-1 * var(--content-gutter));
-    margin-right: calc(-1 * var(--content-gutter));
+    margin-left: calc(-1 * var(--content-gutter) - 2px);
+    margin-right: calc(-1 * var(--content-gutter) - 2px);
   }
 
   .content-inner > pre code,
   .content-inner section > pre code {
     padding-left: var(--content-gutter);
     padding-right: var(--content-gutter);
-    border-left: 0;
-    border-right: 0;
     border-radius: 0;
   }
 }

@@ -25,14 +25,6 @@
 }
 
 @media screen and (max-width: 768px) {
-  .content-inner .detail:before {
-    content: '';
-    display: block;
-    position: relative;
-    padding-top: 20px;
-    margin-top: -20px;
-  }
-
   .content-inner .detail-header {
     margin-left: calc(-1 * var(--content-gutter));
     margin-right: calc(-1 * var(--content-gutter));
