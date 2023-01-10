@@ -30,7 +30,7 @@
 .sidebar a {
   color: var(--gray50);
   text-decoration: none;
-  transition: color 0.3s ease-in-out;
+  transition: color .3s ease-in-out;
 }
 
 .sidebar a:hover {
@@ -106,7 +106,7 @@
   position: absolute;
   left: 0;
   top: 2px;
-  content: "\25BC";
+  content: "\25bc";
   z-index: 1;
   font-size: 8px;
   color: var(--white);
@@ -166,7 +166,7 @@
   cursor: pointer;
   left: 22px;
   margin: 0;
-  opacity: 0.5;
+  opacity: .5;
   padding: 3px 1px 3px 0;
   position: absolute;
   top: 18px;
@@ -181,17 +181,17 @@
   cursor: pointer;
   right: 18px;
   margin: 0;
-  opacity: 0.5;
+  opacity: .5;
   padding: 5px 1px 5px 0;
   position: absolute;
   transform: scaleY(0);
   top: 17px;
-  transition: 0.15s transform ease-out;
+  transition: .15s transform ease-out;
   z-index: 2;
 }
 
 .sidebar .sidebar-search .search-close-button:hover {
-  opacity: 0.7;
+  opacity: .7;
 }
 
 .sidebar .sidebar-search .search-close-button:is(:focus, :hover) {
@@ -223,7 +223,7 @@
   overscroll-behavior: contain;
   position: relative;
   -webkit-overflow-scrolling: touch;
-  flex: 1 1 0.01%;
+  flex: 1 1 .01%;
 }
 
 .sidebar #full-list li {
@@ -277,7 +277,7 @@
 
 .sidebar #full-list li.nesting-context {
   font-weight: bold;
-  font-size: 0.9em;
+  font-size: .9em;
   line-height: 1.8em;
   color: var(--gray300);
   padding-left: 15px;
@@ -286,7 +286,7 @@
 .sidebar #full-list li.group {
   text-transform: uppercase;
   font-weight: bold;
-  font-size: 0.8em;
+  font-size: .8em;
   margin: 2em 0 0;
   line-height: 1.8em;
   color: var(--gray300);
