@@ -24,17 +24,6 @@
   position: relative;
 }
 
-@media screen and (max-width: 768px) {
-  .content-inner .detail-header {
-    margin-left: calc(-1 * var(--content-gutter));
-    margin-right: calc(-1 * var(--content-gutter));
-    padding-left: var(--content-gutter);
-    padding-right: var(--content-gutter);
-    border-left: 0;
-    border-top: 3px solid var(--main);
-  }
-}
-
 .content-inner .detail-header .note {
   float: right;
 }
@@ -67,7 +56,7 @@
 
 @media screen and (max-width: 768px) {
   .content-inner .detail-header a.detail-link {
-    margin-left: -.5em;
+    margin-left: -30px;
   }
 }
 
