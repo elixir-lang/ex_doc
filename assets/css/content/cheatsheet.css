@@ -26,7 +26,6 @@
   .page-cheatmd h2 {
     margin: var(--vertical-space) 0;
     column-span: all;
-    padding-left: 3px;
     color: var(--gray700);
     font-weight: 500;
   }
@@ -38,11 +37,13 @@
   /* h3 */
 
   .page-cheatmd h3 {
-    overflow: hidden;
     margin: 0 0 1em;
-    padding-left: 5px;
     color: var(--main);
     font-weight: 400;
+  }
+
+  .page-cheatmd h3.section-heading .hover-link {
+    display: none;
   }
 
   .page-cheatmd section.h3 {
@@ -224,7 +225,6 @@
   }
 
   .page-cheatmd section.col-2-left > h2 {
-    display: block;
     grid-column-end: span 2;
   }
 
@@ -294,6 +294,10 @@
 
     .page-cheatmd section.list-6 > ul > li {
       flex: 0 0 50%;
+    }
+
+    .page-cheatmd section.width-50 {
+      width: 100%;
     }
   }
 }

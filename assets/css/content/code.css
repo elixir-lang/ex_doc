@@ -74,3 +74,27 @@
   border-bottom: 0;
   border-radius: 2px;
 }
+
+@media screen and (max-width: 768px) {
+  /*
+    TODO:
+
+    This selector can be more specific once Firefox ships default
+    support for the :has() pseudo-class: https://caniuse.com/css-has
+
+    .content-inner > pre:has(code),
+    .content-inner section > pre:has(code) {
+  */
+  .content-inner > pre,
+  .content-inner section > pre {
+    margin-left: calc(-1 * var(--content-gutter) - 2px);
+    margin-right: calc(-1 * var(--content-gutter) - 2px);
+  }
+
+  .content-inner > pre code,
+  .content-inner section > pre code {
+    padding-left: var(--content-gutter);
+    padding-right: var(--content-gutter);
+    border-radius: 0;
+  }
+}

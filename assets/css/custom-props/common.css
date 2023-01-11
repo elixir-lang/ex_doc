@@ -1,4 +1,8 @@
 :root {
+  /* Layout & Whitespace */
+  --content-width: 949px;
+  --content-gutter: 60px;
+
   /* Font Families */
   --serifFontFamily: 'Merriweather', 'Book Antiqua', Georgia, 'Century Schoolbook', serif;
   --sansFontFamily: 'Lato', sans-serif;
@@ -20,6 +24,8 @@
   --gray800:                 hsl(216,  52%,  11%      );
   --gray800-opacity-0:      hsla(216,  52%,  11%,   0%);
   --gray900:                 hsl(218,  73%,   4%      );
+  --gray900-opacity-50:     hsla(218,  73%,   4%,  50%);
+  --gray900-opacity-0:      hsla(218,  73%,   4%,   0%);
   --coldGrayFaint:           hsl(240,   5%,  97%      );
   --coldGrayLight:           hsl(240,   5%,  88%      );
   --coldGray-lightened-10:   hsl(240,   5%,  56%      );
@@ -32,8 +38,17 @@
   --green-lightened-10:      hsl( 90, 100%,  45%      );
   --green:                   hsl( 90, 100%,  35%      );
   --white:                   hsl(  0,   0%, 100%      );
+  --white-opacity-50:       hsla(  0,   0%, 100%,  50%);
   --white-opacity-10:       hsla(  0,   0%, 100%,  10%);
+  --white-opacity-0:        hsla(  0,   0%, 100%,   0%);
   --black:                   hsl(  0,   0%,   0%      );
   --black-opacity-10:       hsla(  0,   0%,   0%,  10%);
   --black-opacity-50:       hsla(  0,   0%,   0%,  50%);
+}
+
+@media screen and (max-width: 768px) {
+  :root {
+    --content-width: 100%;
+    --content-gutter: 20px;
+  }
 }

@@ -54,6 +54,12 @@
   border: none;
 }
 
+@media screen and (max-width: 768px) {
+  .content-inner .detail-header a.detail-link {
+    margin-left: -30px;
+  }
+}
+
 .content-inner .specs pre {
   font-family: var(--monoFontFamily);
   font-size: .9em;
@@ -70,6 +76,12 @@
 
 .content-inner .docstring {
   margin: 1.2em 0 3em 1.2em;
+}
+
+@media screen and (max-width: 768px) {
+  .content-inner .docstring {
+    margin-left: 0;
+  }
 }
 
 .content-inner .docstring:is(h2, h3, h4, h5) {

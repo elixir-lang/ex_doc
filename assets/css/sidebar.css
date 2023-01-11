@@ -406,10 +406,11 @@
 }
 
 .sidebar-button {
+  --sidebar-button-x-padding: 11px;
   cursor: pointer;
   background-color: transparent;
   border: none;
-  padding: 15px 11px;
+  padding: 15px var(--sidebar-button-x-padding);
   font-size: 16px;
 }
 

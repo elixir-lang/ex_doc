@@ -96,3 +96,17 @@
   border: 1px solid var(--inlineCodeBorder);
   color: var(--black);
 }
+
+@media screen and (max-width: 768px) {
+  .content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) {
+    margin-left: calc(-1 * var(--content-gutter));
+    margin-right: calc(-1 * var(--content-gutter));
+    padding-left: var(--content-gutter);
+    padding-right: var(--content-gutter);
+    border-radius: 0;
+  }
+
+  .content-inner blockquote :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
+    margin: 0 calc(-1 * var(--content-gutter));
+  }
+}

@@ -37,13 +37,13 @@ body {
 }
 
 .sidebar-button {
+  --sidebarButtonTopOpen: 6px;
   position: fixed;
   z-index: 99;
   left: 0;
-  top: 7px;
-  transition: color .3s ease-in-out, transform .15s ease-out .1s, opacity .15s ease-out .1s;
+  top: 0;
+  transition: all .3s ease-in-out;
   will-change: transform;
-  transform: translateX(250px);
 }
 
 .content {
@@ -54,8 +54,16 @@ body {
   z-index: 3;
 }
 
-body.sidebar-opening .sidebar-button {
-  transition: transform .3s ease-in-out;
+@media screen and (max-width: 768px) {
+  .content {
+    overflow: auto;
+    scroll-padding-top: 45px;
+  }
+}
+
+body:is(.sidebar-opening, .sidebar-opened) .sidebar-button {
+  transform: translateX(250px);
+  top: var(--sidebarButtonTopOpen);
 }
 
 body.sidebar-opening .sidebar {
@@ -84,11 +92,6 @@ body.sidebar-closing .content {
   transition: all .3s ease-in-out;
 }
 
-body.sidebar-closed .sidebar-button {
-  transition: transform .3s ease-in-out;
-  transform: translateY(-8px);
-}
-
 body.sidebar-closed .sidebar {
   left: -300px;
 }
@@ -96,6 +99,35 @@ body.sidebar-closed .sidebar {
 body.sidebar-closed .content {
   width: 100%;
   left: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .sidebar-button:before {
+    --sidebarButtonHeight: 60px;
+    content: '';
+    display: block;
+    z-index: -1;
+    pointer-events: none;
+    position: fixed;
+    left: -1px;
+    top: 0;
+    height: var(--sidebarButtonHeight);
+    width: calc(100vw + 2px);
+    background: var(--sidebarButtonBackground);
+    transition: top .3s ease-in-out;
+  }
+
+  body:is(.sidebar-closed, .sidebar-closing) .sidebar-button:before {
+    top: 0;
+  }
+
+  body:is(.sidebar-opening, .sidebar-opened) .sidebar-button:before {
+    top: calc(-1 * var(--sidebarButtonHeight) - var(--sidebarButtonTopOpen));
+  }
+
+  body.sidebar-opened .sidebar-button:before {
+    opacity: 0;
+  }
 }
 
 body.search-focused .sidebar-button {
@@ -110,9 +142,9 @@ body.search-focused .sidebar-search .search-close-button {
 }
 
 .content-inner {
-  max-width: 949px;
+  max-width: var(--content-width);
   margin: 0 auto;
-  padding: 3px 60px;
+  padding: 3px var(--content-gutter);
 }
 
 .content-inner:focus {
@@ -131,8 +163,8 @@ body.search-focused .sidebar-search .search-close-button {
   }
 
   .content-inner {
-    padding: 27px 20px 27px 40px;
-    max-width: 100%;
+    padding-top: 10px;
+    padding-bottom: 27px;
     overflow-x: auto;
   }
 }

@@ -115,7 +115,7 @@ For example, here are some acceptable values:
 ExDoc uses [the makeup project](https://github.com/elixir-makeup/makeup) for syntax highlighting. By default, highlighters for Erlang and Elixir are included. To syntax-highlight other languages, simply add the equivalent `makeup_LANGUAGE` package to your `mix.exs`/`rebar.config` file. For example, for HTML support you would add:
 
 ```elixir
-    {:makeup_html, ">= 0.0.0", only: :dev, runtime: false}
+{:makeup_html, ">= 0.0.0", only: :dev, runtime: false}
 ```
 
 You can find all supported languages under [the Makeup organization on GitHub](https://github.com/elixir-makeup) and view them at [Makeup's website](https://elixir-makeup.github.io/makeup_demo/).
