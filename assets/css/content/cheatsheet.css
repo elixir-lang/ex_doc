@@ -126,6 +126,13 @@
     white-space: break-spaces;
   }
 
+  @media screen and (max-width: 768px) {
+    .page-cheatmd pre code {
+      border-left-width: 1px !important;
+      border-right-width: 1px !important;
+    }
+  }
+
   /* Tables */
 
   .page-cheatmd .h2 table {
