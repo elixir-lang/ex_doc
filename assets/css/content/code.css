@@ -87,8 +87,8 @@
   */
   .content-inner > pre,
   .content-inner section > pre {
-    margin-left: calc(-1 * var(--content-gutter) - 2px);
-    margin-right: calc(-1 * var(--content-gutter) - 2px);
+    margin-left: calc(-1 * var(--content-gutter));
+    margin-right: calc(-1 * var(--content-gutter));
   }
 
   .content-inner > pre code,
@@ -96,5 +96,7 @@
     padding-left: var(--content-gutter);
     padding-right: var(--content-gutter);
     border-radius: 0;
+    border-left-width: 0;
+    border-right-width: 0;
   }
 }
