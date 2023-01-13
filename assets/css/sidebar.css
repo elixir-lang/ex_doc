@@ -39,7 +39,7 @@
 
 .sidebar .sidebar-header {
   margin: 12px;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   background-color: var(--gray700);
   width: 276px;
 }
@@ -120,6 +120,7 @@
   padding: 0;
   padding-top: 12px;
   margin: 0;
+  display: flex;
 }
 
 .sidebar .sidebar-listNav :is(li, li a) {
@@ -130,9 +131,18 @@
 }
 
 .sidebar .sidebar-listNav li {
-  display: inline-block;
+  text-align: center;
+  width: 100%;
   border-bottom: 3px solid transparent;
   line-height: 27px;
+}
+
+.sidebar .sidebar-listNav li:first-child {
+  border-bottom-left-radius: var(--border-radius);
+}
+
+.sidebar .sidebar-listNav li:last-child {
+  border-bottom-right-radius: var(--border-radius);
 }
 
 .sidebar .sidebar-listNav li:is(:hover, .selected) {
@@ -201,7 +211,7 @@
 .sidebar .sidebar-search .search-input {
   background-color: var(--gray700);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   color: var(--gray50);
   margin-left: 12px;
   padding: 8px 6px 8px 38px;

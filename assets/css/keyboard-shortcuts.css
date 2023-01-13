@@ -22,7 +22,7 @@
 #keyboard-shortcuts-content kbd > kbd {
   background-color: var(--settingsInputBorder);
   color: var(--contrast);
-  border-radius: 3px;
+  border-radius: var(--border-radius);
   font-family: inherit;
   font-weight: bold;
   display: inline-block;

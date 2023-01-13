@@ -2,6 +2,7 @@
   /* Layout & Whitespace */
   --content-width: 949px;
   --content-gutter: 60px;
+  --border-radius: 4px;
 
   /* Font Families */
   --serifFontFamily: 'Merriweather', 'Book Antiqua', Georgia, 'Century Schoolbook', serif;
