@@ -9,7 +9,7 @@ module.exports.runShellCmdSync = (command) => {
     } else {
       if (stdout) { console.log('\n' + stdout) }
       if (stderr) { console.log('\n' + stderr) }
-      return
+      return true
     }
   })
 }
