@@ -145,6 +145,7 @@ body.search-focused .sidebar-search .search-close-button {
   max-width: var(--content-width);
   margin: 0 auto;
   padding: 3px var(--content-gutter);
+  overflow-x: hidden;
 }
 
 .content-inner:focus {
