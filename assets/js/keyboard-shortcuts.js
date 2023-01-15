@@ -83,9 +83,7 @@ function handleKeyUp (event) {
 function searchKeyAction (event) {
   closeModal()
   openSidebar()
-    .then(() => {
-      focusSearchInput()
-    })
+  focusSearchInput()
 }
 
 function toggleHelpModal () {
