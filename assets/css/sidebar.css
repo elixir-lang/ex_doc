@@ -296,6 +296,14 @@
 .sidebar #full-list li a {
   padding: 3px 0 3px 15px;
   color: var(--gray200);
+  overflow: hidden;
+}
+
+.sidebar #full-list > li > a {
+  display: block;
+  width: 100%;
+  height: 27px;
+  line-height: 20px;
 }
 
 .sidebar #full-list li a.expand,
@@ -305,6 +313,11 @@
 
 .sidebar #full-list li .current-section > a {
   color: var(--main);
+}
+
+.sidebar #full-list > li > a:hover {
+  border-left: 3px solid var(--main-lightened-10);
+  padding-left: 12px;
 }
 
 .sidebar #full-list > li.current-page > a {
@@ -328,15 +341,15 @@
 
 .sidebar #full-list ul {
   display: none;
-  margin: 9px 15px;
+  margin: 10px 15px;
   margin-right: 0;
   padding: 0;
 }
 
 .sidebar #full-list ul li {
   font-weight: 300;
-  line-height: 20px;
-  padding: 2px 8px;
+  line-height: 16px;
+  padding: 0 8px;
   margin-right: 0;
   color: var(--gray50);
 }
@@ -345,18 +358,23 @@
   color: var(--main);
 }
 
-.sidebar #full-list ul li.current-hash:before {
-  content: "\2022";
+.sidebar #full-list ul li.current-hash > a {
   color: var(--main);
 }
 
-.sidebar #full-list ul li.current-hash > a {
+.sidebar #full-list ul li.current-hash > a:before,
+.sidebar #full-list > li > ul > li > a:hover:before {
+  content: "\2022";
+  position: absolute;
+  margin-left: -15px;
   color: var(--main);
-  margin-left: -12px;
 }
 
 .sidebar #full-list ul li a {
   padding-left: 15px;
+  display: block;
+  width: 100%;
+  height: 24px;
 }
 
 .sidebar #full-list ul li ul {
@@ -366,22 +384,26 @@
 }
 
 .sidebar #full-list ul li ul li {
-  border-left: 1px solid var(--gray600);
-  padding: 0 10px;
-  margin-left: 8px;
   margin-right: 0;
+  height: 20px;
   color: var(--gray50);
 }
 
 .sidebar #full-list ul li ul li a {
-  padding-left: 0;
+  border-left: 1px solid var(--gray600);
+  padding: 0 10px;
+  height: 20px;
 }
 
-.sidebar #full-list ul li ul li.current-hash:before {
+.sidebar #full-list ul li ul li.current-hash > a:before {
   content: none;
 }
 
-.sidebar #full-list ul li ul li.current-hash {
+.sidebar #full-list ul li ul li > a:hover {
+  border-color: var(--main);
+}
+
+.sidebar #full-list ul li ul li.current-hash > a {
   color: var(--main);
   border-color: var(--main);
 }
