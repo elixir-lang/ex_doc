@@ -131,11 +131,17 @@
 
 .sidebar .sidebar-listNav li {
   display: inline-block;
-  border-bottom: 3px solid transparent;
-  line-height: 27px;
+  padding: 0;
 }
 
-.sidebar .sidebar-listNav li:is(:hover, .selected) {
+.sidebar .sidebar-listNav li a {
+  display: inline-block;
+  line-height: 27px;
+  border-bottom: 3px solid transparent;
+  padding: 0 10px;
+}
+
+.sidebar .sidebar-listNav li:is(:hover, .selected) a {
   border-color: var(--main);
 }
 
