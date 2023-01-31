@@ -51,7 +51,6 @@
     min-width: 300px;
     margin: 0 0 calc(var(--vertical-space) * 2) 0;
     break-inside: avoid;
-    -webkit-column-break-inside: avoid;
   }
 
   .page-cheatmd h3::after {
