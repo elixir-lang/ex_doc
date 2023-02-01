@@ -7,16 +7,18 @@
     font-size: .85em;
   }
 
+  .page-cheatmd section:is(.col-2, .col-2-left) {
+    column-gap: 20px;
+  }
+
   .page-cheatmd section.col-2 {
     column-count: 2;
-    column-gap: 20px;
     height: auto;
   }
 
   .page-cheatmd section.col-2-left {
     display: grid;
-    grid-template-columns: 33% 63.2%;
-    column-gap: 20px;
+    grid-template-columns: calc(100% / 3) auto;
   }
 
   .page-cheatmd section.col-2-left > h2 {
@@ -31,19 +33,14 @@
   }
 
   .page-cheatmd section.list-4 > ul > li {
-    flex: 0 0 25%;
+    flex: 0 0 calc(100% / 4);
   }
 
   .page-cheatmd section.list-6 > ul > li {
-    flex: 0 0 16.6667%;
+    flex: 0 0 calc(100% / 6);
   }
 
-  .page-cheatmd section.list-4 > ul {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .page-cheatmd section.list-6 > ul {
+  .page-cheatmd section:is(.list-4, .list-6) > ul {
     display: flex;
     flex-wrap: wrap;
   }
@@ -61,7 +58,7 @@
   /* h1 */
 
   .page-cheatmd h1 {
-    margin-top: 0em;
+    margin-top: 0;
     margin-bottom: .5em;
   }
 
@@ -131,15 +128,15 @@
     padding: .5em;
     border: solid;
     border-color: var(--gray300);
-    border-width: 1px 1px 0px 1px;
+    border-width: 1px 1px 0 1px;
   }
 
   .page-cheatmd .content-inner section p + p {
-    border-width: 0px 1px 0px 1px;
+    border-width: 0 1px 0 1px;
   }
 
   .page-cheatmd .content-inner section p:last-of-type {
-    border-width: 0px 1px 1px 1px;
+    border-width: 0 1px 1px 1px;
   }
 
   .page-cheatmd .content-inner section p:only-of-type {
@@ -169,7 +166,7 @@
   }
 
   .page-cheatmd .content-inner tbody tr {
-    border-width: 0px 1px 1px 1px;
+    border-width: 0 1px 1px 1px;
     border-style: solid;
     border-color: var(--gray200);
   }
@@ -189,7 +186,7 @@
   /* Code Blocks */
 
   .page-cheatmd pre {
-    margin: -1px 0px -1px 0px;
+    margin: -1px 0 -1px 0;
   }
 
   /* Lists */
