@@ -92,7 +92,7 @@ defmodule ExDoc.Language do
               }
 
   @doc """
-  Returns a map with type information.
+  Returns a map with type information or the atom `:skip`.
 
   The map has the following keys:
 
@@ -111,6 +111,7 @@ defmodule ExDoc.Language do
                 signature: [binary()],
                 spec: spec_ast()
               }
+              | :skip
 
   @doc """
   Autolinks docs.

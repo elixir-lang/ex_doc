@@ -137,6 +137,9 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       -opaque opaque1() :: atom().
       %% opaque1/0 docs.
+
+      -type private_type1() :: integer().
+      %% private_type1/0 docs.
       """)
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}

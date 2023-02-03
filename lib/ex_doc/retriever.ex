@@ -308,18 +308,20 @@ defmodule ExDoc.Retriever do
   defp get_types(module_data, source) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
-    for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
-      get_type(doc, source, module_data)
+    for {{:type, _, _}, _, _, content, _} = type_entry <- docs,
+        content != :hidden,
+        type_data = module_data.language.type_data(type_entry, module_data),
+        type_data != :skip do
+      get_type(type_entry, type_data, source, module_data)
     end
   end
 
-  defp get_type(type_entry, source, module_data) do
+  defp get_type(type_entry, type_data, source, module_data) do
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{_, name, arity}, anno, _signature, doc, metadata} = type_entry
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata)
 
-    type_data = module_data.language.type_data(type_entry, module_data)
     signature = signature(type_data.signature)
     annotations = if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
     doc_ast = doc_ast(content_type, doc, file: source.path)

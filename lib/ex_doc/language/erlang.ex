@@ -29,7 +29,8 @@ defmodule ExDoc.Language.Erlang do
         abst_code: abst_code,
         specs: get_specs(module),
         callbacks: get_callbacks(module),
-        optional_callbacks: optional_callbacks
+        optional_callbacks: optional_callbacks,
+        exported_types: get_exported_types(abst_code)
       }
     }
   end
@@ -94,22 +95,26 @@ defmodule ExDoc.Language.Erlang do
   def type_data(entry, module_data) do
     {{kind, name, arity}, anno, signature, _doc, _metadata} = entry
 
-    case ExDoc.Language.Elixir.type_from_module_data(module_data, name, arity) do
-      %{} = map ->
-        %{
-          type: map.type,
-          line: map.line,
-          spec: {:attribute, 0, map.type, map.spec},
-          signature: signature
-        }
+    if {name, arity} in module_data.private.exported_types do
+      case ExDoc.Language.Elixir.type_from_module_data(module_data, name, arity) do
+        %{} = map ->
+          %{
+            type: map.type,
+            line: map.line,
+            spec: {:attribute, 0, map.type, map.spec},
+            signature: signature
+          }
 
-      nil ->
-        %{
-          type: kind,
-          line: anno_line(anno),
-          spec: nil,
-          signature: signature
-        }
+        nil ->
+          %{
+            type: kind,
+            line: anno_line(anno),
+            spec: nil,
+            signature: signature
+          }
+      end
+    else
+      :skip
     end
   end
 
@@ -205,6 +210,11 @@ defmodule ExDoc.Language.Erlang do
       {:ok, callbacks} -> Map.new(callbacks)
       :error -> %{}
     end
+  end
+
+  def get_exported_types(abstract_code) do
+    exported_types = for {:attribute, _, :export_type, types} <- abstract_code, do: types
+    List.flatten(exported_types)
   end
 
   ## Autolink
