@@ -54,6 +54,14 @@ Handlebars.registerHelper('isNonEmptyArray', function (entry, options) {
   }
 })
 
+Handlebars.registerHelper('isEmptyArray', function (entry, options) {
+  if (Array.isArray(entry) && entry.length === 0) {
+    return options.fn(this)
+  } else {
+    return options.inverse(this)
+  }
+})
+
 Handlebars.registerHelper('isLocal', function (nodeId, options) {
   const pathSuffix = window.location.pathname.split('/').pop()
   const nodePage = nodeId + '.html'

@@ -16,17 +16,24 @@
       {{else}}
         {{{node.title}}}
       {{/if}}
-      <span class="icon-expand"></span>
+      {{#isEmptyArray node.headers}}
+      {{else}}
+        <span class="icon-expand"></span>
+      {{/isEmptyArray}}
     </a>
 
-    <ul>
-      {{#isArray node.headers}}
-        {{#each node.headers}}
-          <li>
-            <a href="{{node.id}}.html#{{{anchor}}}">{{{id}}}</a>
-          </li>
-        {{/each}}
-      {{else}}
+    {{#isArray node.headers}}
+      {{#isNonEmptyArray node.headers}}
+        <ul>
+          {{#each node.headers}}
+            <li>
+              <a href="{{node.id}}.html#{{{anchor}}}">{{{id}}}</a>
+            </li>
+          {{/each}}
+        </ul>
+      {{/isNonEmptyArray}}
+    {{else}}
+      <ul>
         {{#showSections node}}
           <li class="docs {{#isLocal node.id}}open{{/isLocal}}">
             <a href="{{node.id}}.html#content" class="expand">
@@ -62,7 +69,7 @@
             </ul>
           </li>
         {{/each}}
-      {{/isArray}}
       </ul>
+    {{/isArray}}
   </li>
 {{/each}}
