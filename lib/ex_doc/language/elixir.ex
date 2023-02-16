@@ -611,10 +611,14 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp parse_module(<<first>> <> _ = string, _mode) when first in ?A..?Z do
-    do_parse_module(string)
+    if string =~ ~r/^[A-Za-z0-9_.]+$/ do
+      do_parse_module(string)
+    else
+      :error
+    end
   end
 
-  defp parse_module(<<?:>> <> _ = string, :custom_link) do
+  defp parse_module(":" <> _ = string, :custom_link) do
     do_parse_module(string)
   end
 

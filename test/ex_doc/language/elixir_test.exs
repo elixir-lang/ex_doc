@@ -496,6 +496,8 @@ defmodule ExDoc.Language.ElixirTest do
     assert_unchanged(~m"`Unknown`")
 
     assert_unchanged(~m"[Blank](about:blank)")
+
+    assert_unchanged(~m"`FOR UPDATE OF ? SKIP LOCKED`")
   end
 
   ## Helpers
