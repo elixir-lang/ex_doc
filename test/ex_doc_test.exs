@@ -1,5 +1,5 @@
 defmodule ExDocTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   @moduletag :tmp_dir
 
