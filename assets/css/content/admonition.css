@@ -4,7 +4,7 @@
   border-left: 0;
 }
 
-.content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) a {
+.content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) :is(a, a:visited) {
   color: var(--black);
 }
 
