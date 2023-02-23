@@ -1,228 +1,141 @@
 @media print {
+
+  /* Remove background colors and set border colors */
+  .page-cheatmd .content-inner * {
+    background-color: transparent !important;
+    border-color: var(--gray300) !important;
+  }
+
   /* Basic layout and columns */
+
   .page-cheatmd .content-inner {
     max-width: 100%;
     width: 100%;
     padding: 0;
-    font-size: .85em;
+    font-size: .7em;
   }
 
-  .page-cheatmd section:is(.col-2, .col-2-left) {
-    column-gap: 20px;
+  .page-cheatmd .content-inner section:is(.col-2, .col-2-left, .col-3) {
+    column-gap: 30px;
   }
 
-  .page-cheatmd section.col-2 {
+  /* column-count and grid display required to be set again within @print media query to take effect when actually printing */
+  .page-cheatmd .content-inner section.col-2 {
     column-count: 2;
-    height: auto;
   }
-
-  .page-cheatmd section.col-2-left {
+  .page-cheatmd .content-inner section.col-2-left {
     display: grid;
-    grid-template-columns: calc(100% / 3) auto;
   }
-
-  .page-cheatmd section.col-2-left > h2 {
-    display: block;
-    grid-column-end: span 2;
-  }
-
-  .page-cheatmd section.col-3 {
+  .page-cheatmd .content-inner section.col-3 {
     column-count: 3;
-    column-gap: 10px;
-    height: auto;
-  }
-
-  .page-cheatmd section.list-4 > ul > li {
-    flex: 0 0 calc(100% / 4);
-  }
-
-  .page-cheatmd section.list-6 > ul > li {
-    flex: 0 0 calc(100% / 6);
-  }
-
-  .page-cheatmd section:is(.list-4, .list-6) > ul {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .page-cheatmd section.width-50 {
-    display: block;
-    width: 50%;
-    margin: 0;
-  }
-
-  .page-cheatmd section.width-50 > section > table {
-    width: 100%;
   }
 
   /* h1 */
 
-  .page-cheatmd h1 {
+  .page-cheatmd .content-inner h1 {
     margin-top: 0;
     margin-bottom: .5em;
   }
 
   /* h2 */
 
-  .page-cheatmd h2.section-heading {
-    margin: 1em 0 .25em;
+  .page-cheatmd .content-inner h2.section-heading {
+    font-weight: bold;
+    margin-top: 1em;
     column-span: all;
   }
 
-  /* For some reason Firefox extends the h2 border-left to the following h3 when printing;
-     moving the border-left to the :before pseudo-element fixes this */
-
-  .page-cheatmd h2.section-heading:before {
-    border-left: solid 6px var(--gray100);
-    margin-right: 8px;
-    content: " ";
-  }
-
-  .page-cheatmd section.h2 {
+  .page-cheatmd .content-inner section.h2 {
     break-inside: avoid;
   }
 
   /* h3 */
 
-  .page-cheatmd h3 {
-    white-space: nowrap;
-    overflow: hidden;
-    margin: 0 0 .25em;
-    padding-left: 5px;
+  .page-cheatmd .content-inner h3 {
+    font-weight: bold;
+    color: var(--main-darkened-10);
   }
 
-  .page-cheatmd h3.section-heading {
-    overflow: hidden;
+  .page-cheatmd .content-inner h3::after {
+    height: 2px;
+    background-color: var(--gray300);
   }
 
-  .page-cheatmd section.h3 {
+  .page-cheatmd .content-inner section.h3 {
     min-width: 300px;
-    margin: 0 0 .75em 0;
     break-inside: avoid;
   }
 
   /* h4 */
 
-  .page-cheatmd h4 {
-    display: block;
-    margin: -1px 0 -1px 0;
-    padding: .5em;
-    border: solid 1px var(--gray300);
+  .page-cheatmd .content-inner h4 {
+    padding: .5em 0;
+    border: none;
+    font-weight: bold;
+    color: black;
   }
 
-  /* p */
+  /* Paragraphs */
 
-  .page-cheatmd .content-inner p {
-    font-size: .95em;
+  .page-cheatmd .content-inner .h2 p {
+    padding-left: 0;
+    padding-right: 0;
+    border: none !important;
+  }
+
+  /* Code blocks */
+
+  .page-cheatmd .content-inner code {
     line-height: 1.5em;
-    padding: .5em;
-  }
-
-  /* Ensure solo p tags have borders around them, but merge the border
-     when multiple p tags are next to each other */
-  .page-cheatmd .content-inner section p {
-    display: block;
-    margin: -1px 0 -1px 0;
-    font-size: .95em;
-    line-height: 1.5em;
-    padding: .5em;
-    border: solid;
-    border-color: var(--gray300);
-    border-width: 1px 1px 0 1px;
-  }
-
-  .page-cheatmd .content-inner section p + p {
-    border-width: 0 1px 0 1px;
-  }
-
-  .page-cheatmd .content-inner section p:last-of-type {
-    border-width: 0 1px 1px 1px;
-  }
-
-  .page-cheatmd .content-inner section p:only-of-type {
-    border-width: 1px;
   }
 
   /* Tables */
 
-  .page-cheatmd table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0;
+  .page-cheatmd .content-inner .h2 table {
     font-variant-numeric: tabular-nums;
     break-inside: avoid;
   }
 
-  .page-cheatmd th,
-  .page-cheatmd td {
-    text-align: left;
+  .page-cheatmd .content-inner .h2 :is(th, td) {
     vertical-align: top;
-    padding: .5em;
-    font-size: .95em;
+    padding-left: 0;
+    padding-right: 0;
   }
 
-  .page-cheatmd thead {
-    border: 1px solid var(--gray300);
+  .page-cheatmd .content-inner .h2 thead {
+    border-style: solid none;
+    border-width: 1px;
   }
 
-  .page-cheatmd .content-inner tbody tr {
-    border-width: 0 1px 1px 1px;
-    border-style: solid;
-    border-color: var(--gray200);
-  }
-
-  .page-cheatmd .content-inner thead tr {
+  .page-cheatmd .content-inner .h2 tr {
     border-bottom: none;
   }
 
-  .page-cheatmd th {
+  .page-cheatmd .content-inner .h2 th {
     font-weight: bold;
-  }
-
-  .page-cheatmd td {
-    text-align: left;
-  }
-
-  /* Code Blocks */
-
-  .page-cheatmd pre {
-    margin: -1px 0 -1px 0;
   }
 
   /* Lists */
 
-  .page-cheatmd ul,
-  .page-cheatmd ol {
-    margin: 0;
-    padding: 0;
-    list-style-position: inside;
-  }
-
-  .page-cheatmd .h2 li {
-    padding: .5em .75em;
+  .page-cheatmd .content-inner .h2 li {
+    padding-left: 0;
+    padding-right: 0;
     vertical-align: middle;
-    border-bottom: 1px solid var(--gray200);
-  }
-
-  .page-cheatmd .h2 li:last-of-type {
-    border-bottom: 0;
+    border-bottom: none;
   }
 
   /* Remove copy button from code blocks */
-  pre:hover button.copy-button {
+  .page-cheatmd .content-inner pre:hover button.copy-button {
     display: none;
   }
 
   /* Remove hover tooltip from inline code references */
-  .page-cheatmd div#tooltip {
+  .page-cheatmd .content-inner div#tooltip {
     display: none;
   }
 
-  .page-cheatmd footer p {
+  .page-cheatmd .content-inner footer p:not(.built-using) {
     display: none;
   }
 
-  .page-cheatmd footer p.built-using {
-    display: block;
-  }
 }
