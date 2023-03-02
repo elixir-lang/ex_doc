@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.29.2 (2023-03-02)
+
+  * Enhancements
+    * Improvements to cheatsheets spacing
+    * Improvements to cheatsheets print
+    * Include sections of modules and extras in search suggestions
+    * Make sidebar links full-width and add hover states
+    * Improve clickable area of sidebar tabs
+    * Improve contrast on sidebar
+
+  * Bug fix
+    * Add media type for .license files for epub
+    * Fix overscroll on the sidebar
+    * Focus search input immediately after keyboard shortcut
+    * Don't attempt parsing code blocks that don't look like modules
+    * Fix visited link color in admonition blocks
+
 ## v0.29.1 (2022-11-21)
 
   * Enhancements
