@@ -41,7 +41,7 @@
   --codeBorder:                  var(--gray100);
   --inlineCodeBackground:        var(--codeBackground);
   --inlineCodeBorder:            var(--codeBorder);
-  --codeScrollThumb:             var(--gray400);
+  --codeScrollThumb:             var(--gray300);
   --codeScrollBackground:        var(--codeBorder);
 
   --bottomActionsBtnBorder:      var(--black-opacity-10);
@@ -51,8 +51,8 @@
 
   --settingsInput:               var(--gray500);
   --settingsInputBackground:     var(--white);
-  --settingsInputBorder:         var(--gray300);
-  --settingsSectionBorder:       var(--gray300);
+  --settingsInputBorder:         var(--gray200);
+  --settingsSectionBorder:       var(--gray200);
 
   --quickSwitchInput:            var(--gray500);
   --quickSwitchContour:          var(--coldGray);

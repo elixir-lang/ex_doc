@@ -4,7 +4,7 @@ body.dark {
   --textBody:                    var(--gray200);
   --textHeaders:                 var(--gray100);
   --textDetailBackground:        var(--gray700);
-  --textFooter:                  var(--gray300);
+  --textFooter:                  var(--gray200);
 
   --links:                       var(--gray100);
   --linksVisited:                var(--gray100);
@@ -54,7 +54,7 @@ body.dark {
   --settingsInputBorder:         var(--gray700);
   --settingsSectionBorder:       var(--gray700);
 
-  --quickSwitchInput:            var(--gray300);
+  --quickSwitchInput:            var(--gray200);
   --quickSwitchContour:          var(--gray500);
 
   --success:                     var(--green-lightened-10);
