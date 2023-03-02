@@ -285,7 +285,7 @@
   font-weight: bold;
   font-size: .9em;
   line-height: 1.8em;
-  color: var(--gray300);
+  color: var(--gray400);
   padding-left: 15px;
 }
 
@@ -295,7 +295,7 @@
   font-size: .8em;
   margin: 2em 0 0;
   line-height: 1.8em;
-  color: var(--gray300);
+  color: var(--gray400);
   padding-left: 15px;
 }
 
@@ -318,23 +318,23 @@
 }
 
 .sidebar #full-list li .current-section > a {
-  color: var(--main);
+  color: var(--main-lightened-10);
 }
 
 .sidebar #full-list > li > a:hover {
-  border-left: 3px solid var(--main-lightened-10);
+  border-left: 3px solid var(--main);
   padding-left: 12px;
 }
 
 .sidebar #full-list > li.current-page > a {
-  color: var(--main);
+  color: var(--main-lightened-10);
   border-left: 3px solid var(--main);
   padding-left: 12px;
 }
 
 .sidebar #full-list > li.current-page > a:after,
 .sidebar #full-list > li.current-page {
-  color: var(--main);
+  color: var(--main-lightened-10);
 }
 
 .sidebar #full-list > li:last-child {
@@ -361,11 +361,11 @@
 }
 
 .sidebar #full-list ul li.current-hash {
-  color: var(--main);
+  color: var(--main-lightened-10);
 }
 
 .sidebar #full-list ul li.current-hash > a {
-  color: var(--main);
+  color: var(--main-lightened-10);
 }
 
 .sidebar #full-list ul li.current-hash > a:before,
@@ -373,7 +373,7 @@
   content: "\2022";
   position: absolute;
   margin-left: -15px;
-  color: var(--main);
+  color: var(--main-lightened-10);
 }
 
 .sidebar #full-list ul li a {
@@ -410,12 +410,12 @@
 }
 
 .sidebar #full-list ul li ul li.current-hash > a {
-  color: var(--main);
+  color: var(--main-lightened-10);
   border-color: var(--main);
 }
 
 .sidebar #full-list ul li ul li.current-hash > a {
-  color: var(--main);
+  color: var(--main-lightened-10);
   margin-left: 0;
 }
 
@@ -434,11 +434,10 @@
 }
 
 .sidebar-button {
-  --sidebar-button-x-padding: 11px;
   cursor: pointer;
   background-color: transparent;
   border: none;
-  padding: 15px var(--sidebar-button-x-padding);
+  padding: 15px 11px;
   font-size: 16px;
 }
 

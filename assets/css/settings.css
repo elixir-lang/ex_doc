@@ -22,7 +22,7 @@
   border-color: var(--main);
 }
 #settings-modal-content .input::placeholder {
-  color: var(--gray300);
+  color: var(--gray400);
 }
 
 #settings-modal-content .switch-button-container {

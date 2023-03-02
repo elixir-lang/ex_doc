@@ -54,7 +54,7 @@ body.dark {
   --settingsInputBorder:         var(--gray700);
   --settingsSectionBorder:       var(--gray700);
 
-  --quickSwitchInput:            var(--gray200);
+  --quickSwitchInput:            var(--gray300);
   --quickSwitchContour:          var(--gray500);
 
   --success:                     var(--green-lightened-10);
