@@ -19,7 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/elixir-lang/ex_doc.git"
   },
-  "author": "Plataformatec",
+  "author": "The Elixir Team",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/elixir-lang/ex_doc/issues"
@@ -28,7 +28,7 @@
   "browserslist": "last 2 versions",
   "devDependencies": {
     "@fontsource/inconsolata": "^4.5.9",
-    "@fontsource/lato": "^4.5.10",
+    "@fontsource/open-sans": "^4.5.10",
     "@fontsource/merriweather": "^4.5.14",
     "esbuild": "^0.16.16",
     "eslint": "^8.31.0",

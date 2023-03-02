@@ -1,6 +1,6 @@
 .sidebar {
   font-family: var(--sansFontFamily);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 18px;
   background-color: var(--gray800);
   color: var(--gray50);
@@ -78,7 +78,7 @@
   font-weight: 300;
   font-size: 16px;
   line-height: 20px;
-  color: var(--gray300);
+  color: var(--gray200);
 }
 
 .sidebar .sidebar-projectVersionsDropdown {
@@ -126,7 +126,7 @@
   text-transform: uppercase;
   font-weight: 300;
   font-size: 14px;
-  color: var(--gray300);
+  color: var(--gray200);
 }
 
 .sidebar .sidebar-listNav li {
@@ -285,7 +285,7 @@
   font-weight: bold;
   font-size: .9em;
   line-height: 1.8em;
-  color: var(--gray400);
+  color: var(--gray300);
   padding-left: 15px;
 }
 
@@ -295,7 +295,7 @@
   font-size: .8em;
   margin: 2em 0 0;
   line-height: 1.8em;
-  color: var(--gray400);
+  color: var(--gray300);
   padding-left: 15px;
 }
 

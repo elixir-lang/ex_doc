@@ -3,7 +3,7 @@
   /* Remove background colors and set border colors */
   .page-cheatmd .content-inner * {
     background-color: transparent !important;
-    border-color: var(--gray400) !important;
+    border-color: var(--gray300) !important;
   }
 
   /* Basic layout and columns */
@@ -58,7 +58,7 @@
 
   .page-cheatmd .content-inner h3::after {
     height: 2px;
-    background-color: var(--gray400);
+    background-color: var(--gray300);
   }
 
   .page-cheatmd .content-inner section.h3 {
