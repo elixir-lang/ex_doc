@@ -67,7 +67,7 @@ defmodule ExDoc.DocASTTest do
       """
 
       ast = DocAST.parse!(markdown, "text/markdown")
-      assert DocAST.to_string(ast) == ~s{<span><i></i><i></i></span>}
+      assert DocAST.to_string(ast) == ~s{<span><i></i>\n<i></i></span>}
     end
 
     test "with fun" do
