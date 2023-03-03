@@ -9,6 +9,9 @@ defmodule ExDoc.Formatter.EPUBTest do
   defp before_closing_head_tag(:epub), do: @before_closing_head_tag_content_epub
   defp before_closing_body_tag(:epub), do: @before_closing_body_tag_content_epub
 
+  def before_closing_head_tag(:epub, name), do: "<meta name=#{name}>"
+  def before_closing_body_tag(:epub, name), do: "<p>#{name}</p>"
+
   defp doc_config(%{tmp_dir: tmp_dir} = _context) do
     [
       app: :elixir,
@@ -185,6 +188,25 @@ defmodule ExDoc.Formatter.EPUBTest do
       content = File.read!(Path.join(oebps_dir, basename))
       assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
       assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
+    end
+  end
+
+  test "before_closing_*_tags required by the user are in the right place using MFA",
+       %{tmp_dir: tmp_dir} = context do
+    generate_docs_and_unzip(
+      context,
+      doc_config(context,
+        before_closing_head_tag: {__MODULE__, :before_closing_head_tag, ["Demo"]},
+        before_closing_body_tag: {__MODULE__, :before_closing_body_tag, ["Demo"]}
+      )
+    )
+
+    oebps_dir = tmp_dir <> "/epub/OEBPS"
+
+    for basename <- @example_basenames do
+      content = File.read!(Path.join(oebps_dir, basename))
+      assert content =~ ~r[<meta name=Demo>\s*</head>]
+      assert content =~ ~r[<p>Demo</p>\s*</body>]
     end
   end
 
