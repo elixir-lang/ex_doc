@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   mix_test:
@@ -16,14 +16,14 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: "1.10"
+              elixir: "1.11"
               otp: 21
           - pair:
-              elixir: "1.12"
+              elixir: "1.13"
               otp: 24
             lint: lint
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: erlef/setup-beam@v1
         with:
@@ -53,23 +53,20 @@ jobs:
         run: |
           mix docs
           test -f doc/index.html && echo "doc/index.html exists."
-          test -f doc/ex_doc.epub && echo "doc/ex_doc.epub exists."
+          test -f doc/ExDoc.epub && echo "doc/ExDoc.epub exists."
 
   check_js:
     name: Check JS
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.3
-      - name: Set up Node.js 10.x
-        uses: actions/setup-node@v1.4.4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: 10.10.0
+          node-version: 16
       - run: npm install --prefix assets
       - run: npm run --prefix assets lint
-
       - run: sudo apt-get install xvfb
-      - name: npm install, build, and test
-        run: |
+      - run: |
           xvfb-run --auto-servernum npm run --prefix assets test
         env:
           CI: true

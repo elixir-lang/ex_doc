@@ -1,5 +1,174 @@
 # Changelog
 
+## v0.29.2 (2023-03-02)
+
+  * Enhancements
+    * Improvements to cheatsheets spacing
+    * Improvements to cheatsheets print
+    * Include sections of modules and extras in search suggestions
+    * Make sidebar links full-width and add hover states
+    * Improve clickable area of sidebar tabs
+    * Improve contrast on sidebar
+
+  * Bug fix
+    * Add media type for .license files for epub
+    * Fix overscroll on the sidebar
+    * Focus search input immediately after keyboard shortcut
+    * Don't attempt parsing code blocks that don't look like modules
+    * Fix visited link color in admonition blocks
+
+## v0.29.1 (2022-11-21)
+
+  * Enhancements
+    * Add optional function annotations
+    * Support media print on stylesheets
+    * Add download ePub link to footer
+    * Support extras for Erlang
+    * Add tooltip to functions on sidebar
+    * Disable spellcheck and autocorrect on search input
+
+  * Bug fix
+    * Special handle functions called `record/*` in Erlang
+
+  * Deprecations
+    * Rename `:groups_for_functions` to `:groups_for_docs`
+
+## v0.29.0 (2022-10-19)
+
+  * Enhancements
+    * Support cheatsheets as `.cheatmd` files
+
+  * Bug fix
+    * Collapse sidebar when resizing page even if stored in the session as opened
+
+## v0.28.6 (2022-10-13)
+
+  * Enhancements
+    * Add Elixir special punctuation ! and ? to natural sort
+    * Add night mode to settings pane
+    * Support --proglang in mix docs
+    * Save sidebar state per session
+    * Distinguish output code blocks in Livebooks
+
+  * Bug fixes
+    * Prevent sidebar button scrolling out of view
+    * Prevent unreadable text when using inline code with admonition headers
+
+## v0.28.5 (2022-08-18)
+
+  * Enhancements
+    * Do not preserve spaces from spec declaration in signature rendering
+    * Index hyphens in search
+    * Index `@` in search
+    * Change minimal package search length to 2
+
+  * Bug fixes
+    * Remove extra `term()` argument at start of `@macrocallback`
+
+## v0.28.4 (2022-04-28)
+
+  * Enhancements
+    * Add a toast when changing theme via keyboard
+    * Automatically convert `.livemd` links to `.html` ones
+    * Show programming language in HTML footer
+
+  * Bug fixes
+    * Properly escape `%/2` special form
+    * Improve ranking of exact-matching modules in search
+
+## v0.28.3 (2022-03-23)
+
+  * Enhacements
+    * Include page titles in autocomplete suggestions
+    * Allow theme to be set to "System" version
+    * Remove "Specs" heading and render full typespecs
+    * Support for `source_url_pattern` in config being a function
+
+  * Bug fixes
+    * Adjustments for blockquotes and admonition blocks in dark mode
+    * Fix module sorting when a list of dirs is provided
+    * Consider casing of letters when sorting items in the menu, summary, function list, etc
+
+## v0.28.2 (2022-02-23)
+
+  * Bug fixes
+    * Fix links and code tags in admonition text blocks for dark mode
+
+## v0.28.1 (2022-02-20)
+
+  * Enhancements
+    * Add support for admonition text blocks
+    * Improve accessibility for light and dark themes
+
+  * Bug fixes
+    * Ensure that `mix docs --open` works on Windows
+    * Ensure search tokenizer also splits on underscore
+    * Fix false warnings about missing types when running ExDoc in escript mode
+    * Don't navigate when clicking the current page
+
+## v0.28.0 (2022-01-24)
+
+ExDoc v0.28.0 requires Elixir v1.11+.
+
+  * Enhancements
+    * Use custom scrollbar in the sidebar
+    * Keep hamburger absolute to the opened sidebar
+    * Support `--open` flag on `mix docs`
+    * The copy button now only copies selectable content
+
+  * Bug fixes
+    * Make sure filename configuration in `:extras` is used across links
+    * Ensure all `extras` pages have a title generated
+    * Fix margin on 3rd level headers and beyond
+    * Ensure a task that defines callbacks is still listed as a task
+
+## v0.27.3 (2022-01-12)
+
+  * Bug fixes
+    * Make HexDocs search case insensitive
+    * Improve sidebar open/close animation
+
+## v0.27.2 (2022-01-11)
+
+  * Bug fixes
+    * Fix version dropdown when hosted on HexDocs
+    * Fix tooltips
+    * Fix JavaScript error when Hex package information is not available
+
+## v0.27.1 (2022-01-11)
+
+  * Bug fixes
+    * Several usability fixes on the new layout
+    * Keep page ordering
+
+## v0.27.0 (2022-01-11)
+
+  * Enhancements
+    * Introduce new sidebar design
+    * Add `--quiet` option to CLI
+    * Support multiple formatters in the CLI
+    * Show structs as `%Struct{}` instead of `__struct__` in the sidebar
+    * Point Erlang links to `www.erlang.org` instead of `erlang.org`
+    * Improvements to the night mode and styling
+
+## v0.26.0 (2021-11-21)
+
+  * Backwards incompatible changes
+    * `:filter_prefix` has been renamed to `:filter_modules` and supports anonymous functions
+    * `:source_ref` now defaults to `"main"`
+    * Dropped support for smartypants in Markdown
+
+  * Bug fixes
+    * Do not warn on links to sections
+
+  * Enhancements
+    * Add copy button to code snippets
+    * Add `translate="no"` to the relevant attributes to improve interoperability with automatic translation tools
+    * Support optional module annotations
+    * Introduce a settings modal to group most of configuration
+    * Allow customizing the Livebook expansion URL
+    * Provide documentation on how to render plugins such as Katex, VegaLite, and Mermaid
+
 ## v0.25.5 (2021-10-20)
 
   * Bug fixes

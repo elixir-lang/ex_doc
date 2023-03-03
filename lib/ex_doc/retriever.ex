@@ -7,7 +7,7 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.{DocAST, GroupMatcher, Refs}
+  alias ExDoc.{DocAST, GroupMatcher, Refs, Utils}
   alias ExDoc.Retriever.Error
 
   @doc """
@@ -16,21 +16,15 @@ defmodule ExDoc.Retriever do
   @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
   def docs_from_dir(dir, config) when is_binary(dir) do
     files = Path.wildcard(Path.expand("*.beam", dir))
-    docs_from_files(files, config)
+
+    files
+    |> Enum.map(&filename_to_module/1)
+    |> docs_from_modules(config)
   end
 
   def docs_from_dir(dirs, config) when is_list(dirs) do
     Enum.flat_map(dirs, &docs_from_dir(&1, config))
-  end
-
-  @doc """
-  Extract documentation from all modules in the specified list of files
-  """
-  @spec docs_from_files([Path.t()], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
-  def docs_from_files(files, config) when is_list(files) do
-    files
-    |> Enum.map(&filename_to_module(&1))
-    |> docs_from_modules(config)
+    |> sort_modules(config)
   end
 
   @doc """
@@ -40,7 +34,11 @@ defmodule ExDoc.Retriever do
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
     |> Enum.flat_map(&get_module(&1, config))
-    |> Enum.sort_by(fn module ->
+    |> sort_modules(config)
+  end
+
+  defp sort_modules(modules, config) when is_list(modules) do
+    Enum.sort_by(modules, fn module ->
       {GroupMatcher.group_index(config.groups_for_modules, module.group), module.nested_context,
        module.nested_title, module.id}
     end)
@@ -52,10 +50,10 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_module(module, config) do
-    with {:docs_v1, _, language, _, _, _, _} = docs_chunk <- docs_chunk(module),
+    with {:docs_v1, _, language, _, _, metadata, _} = docs_chunk <- docs_chunk(module),
+         true <- config.filter_modules.(module, metadata),
          {:ok, language} <- ExDoc.Language.get(language, module),
-         %{} = module_data <- language.module_data(module, docs_chunk, config),
-         false <- skip_module?(module_data, config) do
+         %{} = module_data <- language.module_data(module, docs_chunk, config) do
       [generate_node(module, module_data, config)]
     else
       _ ->
@@ -63,12 +61,8 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp skip_module?(module_data, config) do
-    !!config.filter_prefix and not String.starts_with?(module_data.id, config.filter_prefix)
-  end
-
   defp docs_chunk(module) do
-    result = ExDoc.Utils.Code.fetch_docs(module)
+    result = Code.fetch_docs(module)
     Refs.insert_from_chunk(module, result)
 
     case result do
@@ -107,49 +101,47 @@ defmodule ExDoc.Retriever do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
-
     {doc_line, moduledoc, metadata} = get_module_docs(module_data, source_path)
 
-    groups_for_functions =
-      Enum.map(config.groups_for_functions, fn {group, filter} ->
-        {Atom.to_string(group), filter}
-      end) ++
-        [
-          {"Callbacks", & &1[:__callback__]},
-          {"Functions", fn _ -> true end}
-        ]
+    # TODO: The default function groups must be returned by the language
+    groups_for_docs =
+      config.groups_for_docs ++
+        [Callbacks: &(&1[:__doc__] == :callback), Functions: fn _ -> true end]
 
-    function_groups = Enum.map(groups_for_functions, &elem(&1, 0))
-    function_docs = get_docs(module_data, source, groups_for_functions)
-    docs = function_docs ++ get_callbacks(module_data, source, groups_for_functions)
+    annotations_for_docs = config.annotations_for_docs
+
+    docs_groups = Enum.map(groups_for_docs, &elem(&1, 0))
+    function_docs = get_docs(module_data, source, groups_for_docs, annotations_for_docs)
+
+    docs =
+      function_docs ++
+        get_callbacks(module_data, source, groups_for_docs, annotations_for_docs)
+
     types = get_types(module_data, source)
 
+    metadata = Map.put(metadata, :__doc__, module_data.type)
+    group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
 
-    node = %ExDoc.ModuleNode{
+    %ExDoc.ModuleNode{
       id: module_data.id,
       title: module_data.title,
       nested_title: nested_title,
       nested_context: nested_context,
+      group: group,
       module: module,
       type: module_data.type,
       deprecated: metadata[:deprecated],
-      function_groups: function_groups,
-      docs: Enum.sort_by(docs, &sort_key(&1.name, &1.arity)),
+      docs_groups: docs_groups,
+      docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
       doc: moduledoc,
       doc_line: doc_line,
-      typespecs: Enum.sort_by(types, &{&1.name, &1.arity}),
+      typespecs: ExDoc.Utils.natural_sort_by(types, &"#{&1.name}/#{&1.arity}"),
       source_path: source_path,
       source_url: source_link(source, module_data.line),
-      language: module_data.language
+      language: module_data.language,
+      annotations: List.wrap(metadata[:tags])
     }
-
-    put_in(node.group, GroupMatcher.match_module(config.groups_for_modules, node))
-  end
-
-  defp sort_key(name, arity) do
-    first = name |> Atom.to_charlist() |> hd()
-    {first in ?a..?z, name, arity}
   end
 
   defp doc_ast(format, %{"en" => doc_content}, options) do
@@ -171,7 +163,7 @@ defmodule ExDoc.Retriever do
 
   ## Function helpers
 
-  defp get_docs(module_data, source, groups_for_functions) do
+  defp get_docs(module_data, source, groups_for_docs, annotations_for_docs) do
     {:docs_v1, _, _, _, _, _, doc_elements} = module_data.docs
 
     nodes =
@@ -181,18 +173,38 @@ defmodule ExDoc.Retriever do
             []
 
           function_data ->
-            [get_function(doc_element, function_data, source, module_data, groups_for_functions)]
+            [
+              get_function(
+                doc_element,
+                function_data,
+                source,
+                module_data,
+                groups_for_docs,
+                annotations_for_docs
+              )
+            ]
         end
       end)
 
     filter_defaults(nodes)
   end
 
-  defp get_function(doc_element, function_data, source, module_data, groups_for_functions) do
+  defp get_function(
+         doc_element,
+         function_data,
+         source,
+         module_data,
+         groups_for_docs,
+         annotations_for_docs
+       ) do
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
     doc_line = anno_line(anno)
-    annotations = annotations_from_metadata(metadata) ++ function_data.extra_annotations
+
+    annotations =
+      annotations_for_docs.(metadata) ++
+        annotations_from_metadata(metadata) ++ function_data.extra_annotations
+
     line = function_data.line || doc_line
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
@@ -200,10 +212,7 @@ defmodule ExDoc.Retriever do
       (doc_content && doc_ast(content_type, doc_content, file: source.path, line: doc_line + 1)) ||
         function_data.doc_fallback.()
 
-    group =
-      Enum.find_value(groups_for_functions, fn {group, filter} ->
-        filter.(metadata) && group
-      end)
+    group = GroupMatcher.match_function(groups_for_docs, metadata)
 
     %ExDoc.FunctionNode{
       id: "#{name}/#{arity}",
@@ -212,7 +221,7 @@ defmodule ExDoc.Retriever do
       deprecated: metadata[:deprecated],
       doc: doc_ast,
       doc_line: doc_line,
-      defaults: Enum.sort_by(defaults, fn {name, arity} -> sort_key(name, arity) end),
+      defaults: ExDoc.Utils.natural_sort_by(defaults, fn {name, arity} -> "#{name}/#{arity}" end),
       signature: signature(signature),
       specs: function_data.specs,
       source_path: source.path,
@@ -243,17 +252,22 @@ defmodule ExDoc.Retriever do
 
   ## Callback helpers
 
-  defp get_callbacks(%{type: :behaviour} = module_data, source, groups_for_functions) do
+  defp get_callbacks(
+         %{type: :behaviour} = module_data,
+         source,
+         groups_for_docs,
+         annotations_for_docs
+       ) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
     for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in module_data.callback_types do
-      get_callback(doc, source, groups_for_functions, module_data)
+      get_callback(doc, source, groups_for_docs, module_data, annotations_for_docs)
     end
   end
 
-  defp get_callbacks(_, _, _), do: []
+  defp get_callbacks(_, _, _, _), do: []
 
-  defp get_callback(callback, source, groups_for_functions, module_data) do
+  defp get_callback(callback, source, groups_for_docs, module_data, annotations_for_docs) do
     callback_data = module_data.language.callback_data(callback, module_data)
 
     {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
@@ -262,14 +276,15 @@ defmodule ExDoc.Retriever do
 
     signature = signature(callback_data.signature)
     specs = callback_data.specs
-    annotations = callback_data.extra_annotations ++ annotations_from_metadata(metadata)
+
+    annotations =
+      annotations_for_docs.(metadata) ++
+        callback_data.extra_annotations ++ annotations_from_metadata(metadata)
+
     doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
 
-    group =
-      Enum.find_value(groups_for_functions, fn {group, filter} ->
-        metadata = Map.put(metadata, :__callback__, true)
-        filter.(metadata) && group
-      end)
+    metadata = Map.put(metadata, :__doc__, :callback)
+    group = GroupMatcher.match_function(groups_for_docs, metadata)
 
     %ExDoc.FunctionNode{
       id: "c:#{name}/#{arity}",
@@ -327,7 +342,6 @@ defmodule ExDoc.Retriever do
 
   ## General helpers
 
-  defp signature([]), do: nil
   defp signature(list) when is_list(list), do: Enum.join(list, " ")
 
   defp annotations_from_metadata(metadata) do
@@ -349,8 +363,7 @@ defmodule ExDoc.Retriever do
   defp source_link(%{path: _, url: nil}, _line), do: nil
 
   defp source_link(source, line) do
-    source_url = Regex.replace(~r/%{path}/, source.url, source.path)
-    Regex.replace(~r/%{line}/, source_url, to_string(line))
+    Utils.source_url_pattern(source.url, source.path, line)
   end
 
   defp source_path(module, _config) do

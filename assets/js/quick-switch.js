@@ -1,5 +1,3 @@
-import quickSwitchModalBodyTemplate from './handlebars/templates/quick-switch-modal-body.handlebars'
-import quickSwitchResultsTemplate from './handlebars/templates/quick-switch-results.handlebars'
 import { debounce, qs, qsAll } from './helpers'
 import { openModal } from './modal'
 
@@ -23,6 +21,8 @@ const STATIC_SEARCH_RESULTS = [
   'mix'
 ].map(name => ({ name }))
 
+const MIN_SEARCH_LENGTH = 2
+
 const state = {
   autocompleteResults: [],
   selectedIdx: null
@@ -36,15 +36,17 @@ export function initialize () {
 }
 
 function addEventListeners () {
-  qs(QUICK_SWITCH_LINK_SELECTOR).addEventListener('click', event => {
-    openQuickSwitchModal()
+  qsAll(QUICK_SWITCH_LINK_SELECTOR).forEach(element => {
+    element.addEventListener('click', event => {
+      openQuickSwitchModal()
+    })
   })
 }
 
 function handleKeyDown (event) {
-  const packageSlug = event.target.value
-
   if (event.key === 'Enter') {
+    const packageSlug = event.target.value
+
     quickSwitchToPackage(packageSlug)
     event.preventDefault()
   } else if (event.key === 'ArrowUp') {
@@ -59,7 +61,7 @@ function handleKeyDown (event) {
 function handleInput (event) {
   const packageSlug = event.target.value
 
-  if (packageSlug.length < 3) {
+  if (packageSlug.length < MIN_SEARCH_LENGTH) {
     const resultsContainer = qs(QUICK_SWITCH_RESULTS_SELECTOR)
     resultsContainer.innerHTML = ''
   } else {
@@ -72,8 +74,8 @@ function handleInput (event) {
  */
 export function openQuickSwitchModal () {
   openModal({
-    title: 'Go to a HexDocs package',
-    body: quickSwitchModalBodyTemplate()
+    title: 'Search HexDocs package',
+    body: Handlebars.templates['quick-switch-modal-body']()
   })
 
   qs(QUICK_SWITCH_INPUT_SELECTOR).focus()
@@ -107,7 +109,7 @@ function quickSwitchToPackage (packageSlug) {
  * @param {String} packageSlug The package name to navigate to
  */
 function navigateToHexDocPackage (packageSlug) {
-  window.location = HEX_DOCS_ENDPOINT.replace('%%', packageSlug)
+  window.location = HEX_DOCS_ENDPOINT.replace('%%', packageSlug.toLowerCase())
 }
 
 const debouncedQueryForAutocomplete = debounce(queryForAutocomplete, DEBOUNCE_KEYPRESS_TIMEOUT)
@@ -127,7 +129,7 @@ function queryForAutocomplete (packageSlug) {
         state.selectedIdx = null
         // Only render results if the search string is still long enough
         const currentTerm = qs(QUICK_SWITCH_INPUT_SELECTOR).value
-        if (currentTerm.length >= 3) {
+        if (currentTerm.length >= MIN_SEARCH_LENGTH) {
           renderResults({ results: state.autocompleteResults })
         }
       }
@@ -136,7 +138,7 @@ function queryForAutocomplete (packageSlug) {
 
 function renderResults ({ results }) {
   const resultsContainer = qs(QUICK_SWITCH_RESULTS_SELECTOR)
-  const resultsHtml = quickSwitchResultsTemplate({ results })
+  const resultsHtml = Handlebars.templates['quick-switch-results']({ results })
   resultsContainer.innerHTML = resultsHtml
 
   qsAll(QUICK_SWITCH_RESULT_SELECTOR).forEach(result => {
@@ -159,8 +161,8 @@ function renderResults ({ results }) {
 function resultsFromPayload (packageSlug, payload) {
   return STATIC_SEARCH_RESULTS
     .concat(payload)
-    .filter(result => result.name.includes(packageSlug))
-    .filter(result => result.releases === undefined || result.releases[0]['has_docs'] === true)
+    .filter(result => result.name.toLowerCase().includes(packageSlug.toLowerCase()))
+    .filter(result => result.releases === undefined || result.releases[0].has_docs === true)
     .slice(0, NUMBER_OF_SUGGESTIONS)
 }
 

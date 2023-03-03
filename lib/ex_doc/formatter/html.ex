@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.HTML do
   @moduledoc false
 
   alias __MODULE__.{Assets, Templates, SearchItems}
-  alias ExDoc.{Markdown, GroupMatcher}
+  alias ExDoc.{Markdown, GroupMatcher, Utils}
 
   @main "api-reference"
   @assets_dir "assets"
@@ -65,50 +65,58 @@ defmodule ExDoc.Formatter.HTML do
   Autolinks and renders all docs.
   """
   def render_all(project_nodes, ext, config, opts) do
+    base = [
+      apps: config.apps,
+      deps: config.deps,
+      ext: ext,
+      extras: extra_paths(config),
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
+    ]
+
     project_nodes
-    |> Enum.map(fn node ->
-      autolink_opts = [
-        apps: config.apps,
-        current_module: node.module,
-        ext: ext,
-        extras: extra_paths(config),
-        skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-        module_id: node.id,
-        file: node.source_path,
-        line: node.doc_line,
-        deps: config.deps
-      ]
+    |> Task.async_stream(
+      fn node ->
+        autolink_opts =
+          [
+            current_module: node.module,
+            file: node.source_path,
+            line: node.doc_line,
+            module_id: node.id
+          ] ++ base
 
-      language = node.language
+        language = node.language
 
-      docs =
-        for child_node <- node.docs do
-          id = id(node, child_node)
-          autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
-          specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
-          child_node = %{child_node | specs: specs}
-          render_doc(child_node, language, autolink_opts, opts)
-        end
+        docs =
+          for child_node <- node.docs do
+            id = id(node, child_node)
+            autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
+            specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
+            child_node = %{child_node | specs: specs}
+            render_doc(child_node, language, autolink_opts, opts)
+          end
 
-      typespecs =
-        for child_node <- node.typespecs do
-          id = id(node, child_node)
-          autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
+        typespecs =
+          for child_node <- node.typespecs do
+            id = id(node, child_node)
+            autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
 
-          child_node = %{
-            child_node
-            | spec: language.autolink_spec(child_node.spec, autolink_opts)
-          }
+            child_node = %{
+              child_node
+              | spec: language.autolink_spec(child_node.spec, autolink_opts)
+            }
 
-          render_doc(child_node, language, autolink_opts, opts)
-        end
+            render_doc(child_node, language, autolink_opts, opts)
+          end
 
-      %{
-        render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
-        | docs: docs,
-          typespecs: typespecs
-      }
-    end)
+        %{
+          render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
+          | docs: docs,
+            typespecs: typespecs
+        }
+      end,
+      timeout: :infinity
+    )
+    |> Enum.map(&elem(&1, 1))
   end
 
   defp render_doc(%{doc: nil} = node, _language, _autolink_opts, _opts),
@@ -198,8 +206,8 @@ defmodule ExDoc.Formatter.HTML do
   defp digest(content) do
     content
     |> :erlang.md5()
-    |> Base.encode16(case: :lower)
-    |> binary_part(0, 10)
+    |> Base.encode16(case: :upper)
+    |> binary_part(0, 8)
   end
 
   defp generate_extras(nodes_map, extras, config) do
@@ -216,7 +224,8 @@ defmodule ExDoc.Formatter.HTML do
           next: next && %{path: "#{next.id}.html", title: next.title}
         }
 
-        html = Templates.extra_template(config, node, nodes_map, refs)
+        extension = node.source_path && Path.extname(node.source_path)
+        html = Templates.extra_template(config, node, extra_type(extension), nodes_map, refs)
 
         if File.regular?(output) do
           IO.puts(:stderr, "warning: file #{Path.relative_to_cwd(output)} already exists")
@@ -228,6 +237,10 @@ defmodule ExDoc.Formatter.HTML do
 
     generated_extras ++ copy_extras(config, extras)
   end
+
+  defp extra_type(".cheatmd"), do: :cheatmd
+  defp extra_type(".livemd"), do: :livemd
+  defp extra_type(_), do: :extra
 
   defp copy_extras(config, extras) do
     for %{source_path: source_path, id: id} when source_path != nil <- extras,
@@ -287,7 +300,7 @@ defmodule ExDoc.Formatter.HTML do
   defp default_assets(config) do
     [
       {Assets.dist(config.proglang), "dist"},
-      {Assets.fonts(), "dist/html/fonts"}
+      {Assets.fonts(), "dist"}
     ]
   end
 
@@ -298,13 +311,13 @@ defmodule ExDoc.Formatter.HTML do
       ~s{API Reference <small class="app-vsn">#{config.project} v#{config.version}</small>}
 
     %{
-      id: "api-reference",
-      title: "API Reference",
-      group: "",
-      title_content: title_content,
       content: api_reference,
+      group: nil,
+      id: "api-reference",
       source_path: nil,
-      source_url: nil
+      source_url: nil,
+      title: "API Reference",
+      title_content: title_content
     }
   end
 
@@ -314,33 +327,43 @@ defmodule ExDoc.Formatter.HTML do
   def build_extras(config, ext) do
     groups = config.groups_for_extras
 
+    language =
+      case config.proglang do
+        :erlang -> ExDoc.Language.Erlang
+        _ -> ExDoc.Language.Elixir
+      end
+
+    source_url_pattern = config.source_url_pattern
+
+    autolink_opts = [
+      apps: config.apps,
+      deps: config.deps,
+      ext: ext,
+      extras: extra_paths(config),
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
+    ]
+
     config.extras
-    |> Task.async_stream(&build_extra(&1, groups, config, ext), timeout: :infinity)
+    |> Task.async_stream(
+      &build_extra(&1, groups, language, autolink_opts, source_url_pattern),
+      timeout: :infinity
+    )
     |> Enum.map(&elem(&1, 1))
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
 
-  defp build_extra({input, options}, groups, config, ext) do
+  defp build_extra({input, options}, groups, language, autolink_opts, source_url_pattern) do
     input = to_string(input)
     id = options[:filename] || input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, options[:title], groups, config, ext)
+    build_extra(input, id, options[:title], groups, language, autolink_opts, source_url_pattern)
   end
 
-  defp build_extra(input, groups, config, ext) do
+  defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
     id = input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, nil, groups, config, ext)
+    build_extra(input, id, nil, groups, language, autolink_opts, source_url_pattern)
   end
 
-  defp build_extra(input, id, title, groups, config, ext) do
-    autolink_opts = [
-      apps: config.apps,
-      file: input,
-      ext: ext,
-      extras: extra_paths(config),
-      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-      deps: config.deps
-    ]
-
+  defp build_extra(input, id, title, groups, language, autolink_opts, source_url_pattern) do
     opts = [file: input, line: 1]
 
     ast =
@@ -348,14 +371,15 @@ defmodule ExDoc.Formatter.HTML do
         extension when extension in ["", ".txt"] ->
           [{:pre, [], "\n" <> File.read!(input), %{}}]
 
-        extension when extension in [".md", ".livemd"] ->
+        extension when extension in [".md", ".livemd", ".cheatmd"] ->
           input
           |> File.read!()
           |> Markdown.to_ast(opts)
+          |> sectionize(extension)
 
         _ ->
           raise ArgumentError,
-                "file extension not recognized, allowed extension is either .md, .txt or no extension"
+                "file extension not recognized, allowed extension is either .cheatmd, .livemd, .md, .txt or no extension"
       end
 
     {title_ast, ast} =
@@ -367,30 +391,23 @@ defmodule ExDoc.Formatter.HTML do
     title_text = title_ast && ExDoc.DocAST.text_from_ast(title_ast)
     title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
 
-    # TODO: don't hardcode Elixir for extras?
-    language = ExDoc.Language.Elixir
-    content_html = autolink_and_render(ast, language, autolink_opts, opts)
+    content_html = autolink_and_render(ast, language, [file: input] ++ autolink_opts, opts)
 
     group = GroupMatcher.match_extra(groups, input)
     title = title || title_text || filename_to_title(input)
 
     source_path = input |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
 
-    source_url =
-      if url = config.source_url_pattern do
-        url
-        |> String.replace("%{path}", source_path)
-        |> String.replace("%{line}", "1")
-      end
+    source_url = Utils.source_url_pattern(source_url_pattern, source_path, 1)
 
     %{
-      id: id,
-      title: title,
-      group: group,
-      title_content: title_html,
       content: content_html,
+      group: group,
+      id: id,
       source_path: source_path,
-      source_url: source_url
+      source_url: source_url,
+      title: title,
+      title_content: title_html || title
     }
   end
 
@@ -399,6 +416,16 @@ defmodule ExDoc.Formatter.HTML do
     |> Path.extname()
     |> String.downcase()
   end
+
+  defp sectionize(ast, ".cheatmd") do
+    Markdown.sectionize(ast, fn
+      {:h2, _, _, _} -> true
+      {:h3, _, _, _} -> true
+      _ -> false
+    end)
+  end
+
+  defp sectionize(ast, _), do: ast
 
   @doc """
   Convert the input file name into a title
@@ -419,7 +446,7 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generates an ID from some text
 
-  Used primarily with titles, headings and functions group names.
+  Used primarily with titles, headings, and functions group names.
   """
   def text_to_id(atom) when is_atom(atom), do: text_to_id(Atom.to_string(atom))
 
@@ -490,6 +517,7 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
+  # TODO: Move this categorization to the language
   def filter_list(:module, nodes) do
     Enum.filter(nodes, &(&1.type != :task))
   end
@@ -526,12 +554,14 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp extra_paths(config) do
-    Enum.map(config.extras, fn
+    Map.new(config.extras, fn
       path when is_binary(path) ->
-        Path.basename(path)
+        base = Path.basename(path)
+        {base, text_to_id(Path.rootname(base))}
 
-      {path, _} ->
-        path |> Atom.to_string() |> Path.basename()
+      {path, opts} ->
+        base = path |> Atom.to_string() |> Path.basename()
+        {base, opts[:filename] || text_to_id(Path.rootname(base))}
     end)
   end
 end

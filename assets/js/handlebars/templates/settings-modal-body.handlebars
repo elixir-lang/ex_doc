@@ -1,0 +1,56 @@
+<div id="settings-modal-content">
+  <div id="settings-content">
+    <label class="switch-button-container">
+      <div>
+        <span>Theme</span>
+        <p>Use the documentation UI in a theme.</p>
+      </div>
+      <div>
+        <select name="theme" class="settings-select">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+          <option value="system">System</option>
+        </select>
+      </div>
+    </label>
+    <label class="switch-button-container">
+      <div>
+        <span>Show tooltips</span>
+        <p>Show tooltips when mousing over code references.</p>
+      </div>
+      <div class="switch-button">
+        <input class="switch-button__checkbox" type="checkbox" name="tooltips" />
+        <div class="switch-button__bg"></div>
+      </div>
+    </label>
+    <label class="switch-button-container">
+      <div>
+        <span>Run in Livebook</span>
+        <p>Use Direct Address for “Run in Livebook” badges.</p>
+      </div>
+      <div class="switch-button">
+        <input class="switch-button__checkbox" type="checkbox" name="direct_livebook_url" />
+        <div class="switch-button__bg"></div>
+      </div>
+    </label>
+    <input class="input" type="url" name="livebook_url" placeholder="Enter Livebook instance URL" aria-label="Enter Livebook instance URL" />
+  </div>
+  <div id="keyboard-shortcuts-content" class="hidden">
+    {{#each shortcuts}}
+      {{#if this.description}}
+        <dl class="shortcut-row">
+          <dd class="shortcut-description">
+            {{this.description}}
+          </dd>
+          <dt class="shortcut-keys">
+            {{#if this.displayAs}}
+              {{{this.displayAs}}}
+            {{else}}
+              <kbd><kbd>{{this.key}}</kbd></kbd>
+            {{/if}}
+          </dt>
+        </dl>
+      {{/if}}
+    {{/each}}
+  </div>
+</div>

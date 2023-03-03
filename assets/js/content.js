@@ -1,4 +1,5 @@
 import { qs, qsAll } from './helpers'
+import { settingsStore } from './settings-store'
 
 const CONTENT_SELECTOR = '.content'
 const CONTENT_INNER_SELECTOR = '.content-inner'
@@ -11,6 +12,7 @@ export function initialize () {
   fixLinks()
   fixSpacebar()
   setLivebookBadgeUrl()
+  fixBlockquotes()
 }
 
 /**
@@ -21,6 +23,20 @@ function fixLinks () {
     if (anchor.querySelector('code, img')) {
       anchor.classList.add('no-underline')
     }
+  })
+}
+
+/**
+ * Add CSS classes to `blockquote` elements when those are used to
+ * support admonition text blocks
+ */
+function fixBlockquotes () {
+  const classes = ['warning', 'info', 'error', 'neutral', 'tip']
+
+  classes.forEach(element => {
+    qsAll(`blockquote h3.${element}, blockquote h4.${element}`).forEach(header => {
+      header.closest('blockquote').classList.add(element)
+    })
   })
 }
 
@@ -37,13 +53,31 @@ function fixSpacebar () {
   qs(CONTENT_INNER_SELECTOR).focus()
 }
 
+/**
+ * Updates "Run in Livebook" badges to link to a notebook
+ * corresponding to the current documentation page.
+ */
 function setLivebookBadgeUrl () {
   const path = window.location.pathname
   const notebookPath = path.replace(/\.html$/, '.livemd')
   const notebookUrl = new URL(notebookPath, window.location.href).toString()
-  const targetUrl = `https://livebook.dev/run?url=${encodeURIComponent(notebookUrl)}`
 
-  for (const anchor of qsAll(LIVEBOOK_BADGE_ANCHOR_SELECTOR)) {
-    anchor.href = targetUrl
-  }
+  settingsStore.getAndSubscribe(settings => {
+    const targetUrl =
+      settings.livebookUrl
+        ? getLivebookImportUrl(settings.livebookUrl, notebookUrl)
+        : getLivebookDevRunUrl(notebookUrl)
+
+    for (const anchor of qsAll(LIVEBOOK_BADGE_ANCHOR_SELECTOR)) {
+      anchor.href = targetUrl
+    }
+  })
+}
+
+function getLivebookDevRunUrl (notebookUrl) {
+  return `https://livebook.dev/run?url=${encodeURIComponent(notebookUrl)}`
+}
+
+function getLivebookImportUrl (livebookUrl, notebookUrl) {
+  return `${livebookUrl}/import?url=${encodeURIComponent(notebookUrl)}`
 }

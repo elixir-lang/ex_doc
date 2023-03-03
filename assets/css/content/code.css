@@ -1,0 +1,102 @@
+.content-inner :is(a.no-underline, pre a) {
+  color: var(--linksNoUnderline);
+  text-shadow: none;
+  text-decoration: none;
+  background-image: none;
+}
+
+.content-inner :is(a.no-underline, pre a):is(:visited, :active, :focus, :hover) {
+  color: var(--linksNoUnderlineVisited);
+}
+
+.content-inner code {
+  background-color: var(--codeBackground);
+  vertical-align: baseline;
+  border-radius: 2px;
+  padding: .1em .2em;
+  border: 1px solid var(--codeBorder);
+  text-transform: none;
+}
+
+.content-inner pre {
+  margin: var(--baseLineHeight) 0;
+}
+
+.content-inner pre code {
+  display: block;
+  overflow-x: auto;
+  white-space: inherit;
+  padding: .5em 1em;
+  background-color: var(--codeBackground);
+}
+
+.content-inner pre code::-webkit-scrollbar {
+  width: .4rem;
+  height: .4rem;
+}
+
+.content-inner pre code::-webkit-scrollbar-thumb {
+  border-radius: .25rem;
+  background-color: var(--codeScrollThumb);
+}
+
+.content-inner pre code::-webkit-scrollbar-track {
+  background-color: var(--codeScrollBackground);
+}
+
+.content-inner pre code::-webkit-scrollbar-corner {
+  background-color: var(--codeScrollBackground);
+}
+
+.content-inner pre code.output {
+  margin: 0 12px;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.content-inner pre code.output + .copy-button {
+  margin-right: 12px;
+}
+
+.content-inner pre code.output:before {
+  content: "Output";
+  display: block;
+  position: absolute;
+  top: -16px;
+  left: 12px;
+  padding: 2px 4px;
+  font-size: 12px;
+  font-family: var(--monoFontFamily);
+  line-height: 1;
+  color: var(--textHeaders);
+  background-color: var(--codeBackground);
+  border: 1px solid var(--codeBorder);
+  border-bottom: 0;
+  border-radius: 2px;
+}
+
+@media screen and (max-width: 768px) {
+  /*
+    TODO:
+
+    This selector can be more specific once Firefox ships default
+    support for the :has() pseudo-class: https://caniuse.com/css-has
+
+    .content-inner > pre:has(code),
+    .content-inner section > pre:has(code) {
+  */
+  .content-inner > pre,
+  .content-inner section > pre {
+    margin-left: calc(-1 * var(--content-gutter));
+    margin-right: calc(-1 * var(--content-gutter));
+  }
+
+  .content-inner > pre code,
+  .content-inner section > pre code {
+    padding-left: var(--content-gutter);
+    padding-right: var(--content-gutter);
+    border-radius: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+  }
+}

@@ -1,7 +1,10 @@
 <%= head_template(config, %{title: "404", type: :extra}) %>
 <%= sidebar_template(config, nodes_map) %>
 
-<h2>Page not found</h2>
+<h1>
+  <%= settings_button_template() %>
+  <span>Page not found</span>
+</h1>
 
 <p>Sorry, but the page you were trying to get to, does not exist. You
 may want to try searching this site using the sidebar

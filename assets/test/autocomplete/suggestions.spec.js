@@ -19,6 +19,10 @@ describe('getSuggestions', () => {
         {
           id: 'Kernel',
           title: 'Kernel',
+          sections: [
+            {id: 'The standard library', anchor: 'module-the-standard-library'},
+            {id: 'Guards', anchor: 'module-guards'}
+          ],
           nodeGroups: [
             {
               key: 'functions',
@@ -54,26 +58,41 @@ describe('getSuggestions', () => {
         }
       ],
       tasks: [{id: 'phx.server', title: 'phx.server'}],
-      extras: [{id: 'api-reference', title: 'API Reference'}]
+      extras: [
+        {
+          id: 'api-reference',
+          title: 'API Reference'
+        },
+        {
+          id: 'library-guidelines',
+          title: 'Library Guidelines',
+          headers: [
+            {id: 'Getting started', anchor: 'getting-started'},
+            {id: 'Publishing', anchor: 'publishing'}
+          ]
+        }
+      ]
     }
   })
 
   describe('find', () => {
-    it('returns matching modules, tasks and exceptions', () => {
+    it('returns matching modules, tasks, extras and exceptions', () => {
       expect(getSuggestions('Map').length).to.eql(1)
       expect(getSuggestions('Ecto.Repo').length).to.eql(1)
       expect(getSuggestions('phx.server').length).to.eql(1)
+      expect(getSuggestions('API Reference').length).to.eql(1)
       expect(getSuggestions('My exception').length).to.eql(1)
+    })
+
+    it('returns matching sections of modules and extras', () => {
+      expect(getSuggestions('Getting').length).to.eql(1)
+      expect(getSuggestions('Gua').length).to.eql(1)
     })
 
     it('returns matching functions, callbacks and types', () => {
       expect(getSuggestions('get_by').length).to.eql(1)
       expect(getSuggestions('fetch').length).to.eql(1)
       expect(getSuggestions('has_many').length).to.eql(1)
-    })
-
-    it('ignores matching extras', () => {
-      expect(getSuggestions('api-reference').length).to.eql(0)
     })
 
     it('handles special characters', () => {
@@ -113,7 +132,7 @@ describe('getSuggestions', () => {
     })
 
     it('sorts results, putting closer matches at the top', () => {
-      let results = getSuggestions('insert')
+      const results = getSuggestions('insert')
       expect(results[0].title).to.eql('<em>insert</em>/2')
       expect(results[1].title).to.eql('<em>insert</em>_all/3')
     })

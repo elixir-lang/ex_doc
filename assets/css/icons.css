@@ -1,0 +1,50 @@
+@font-face {
+  font-family: 'remixicon';
+  src: url('../fonts/remixicon.woff2') format('woff2');
+  font-display: swap;
+}
+
+[class^="ri-"], [class*=" ri-"], .remix-icon {
+  font-family: 'remixicon';
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --icon-arrow-up-s: "\ea78";
+  --icon-arrow-down-s: "\ea4e";
+  --icon-arrow-right-s: "\ea6e";
+  --icon-add: "\ea13";
+  --icon-subtract: "\f1af";
+  --icon-error-warning: "\eca1";
+  --icon-information: "\ee59";
+  --icon-alert: "\ea21";
+  --icon-double-quotes-l: "\ec51";
+  --icon-link-m: "\eeaf";
+  --icon-close-line: "\eb99";
+  --icon-code-s-slash-line: "\ebad";
+  --icon-menu-line: "\ef3e";
+  --icon-search-2-line: "\f0cd";
+  --icon-settings-3-line: "\f0e6";
+  --icon-printer-line: "\f029";
+}
+
+.ri-lg { font-size: 1.3333em; line-height: .75em; vertical-align: -.0667em; }
+
+.ri-settings-3-line:before { content: var(--icon-settings-3-line); }
+.ri-add-line:before { content: var(--icon-add); }
+.ri-subtract-line:before { content: var(--icon-subtract); }
+.ri-arrow-up-s-line:before { content: var(--icon-arrow-up-s); }
+.ri-arrow-down-s-line:before { content: var(--icon-arrow-down-s); }
+.ri-arrow-right-s-line:before { content: var(--icon-arrow-right-s); }
+.ri-search-2-line:before { content: var(--icon-search-2-line); }
+.ri-menu-line:before { content: var(--icon-menu-line); }
+.ri-close-line:before { content: var(--icon-close-line); }
+.ri-link-m:before { content: var(--icon-link-m); }
+.ri-code-s-slash-line:before { content: var(--icon-code-s-slash-line); }
+.ri-error-warning-line:before { content: var(--icon-error-warning); }
+.ri-information-line:before { content: var(--icon-information); }
+.ri-alert-line:before { content: var(--icon-alert); }
+.ri-double-quotes-l:before { content: var(--icon-double-quotes-l); }
+.ri-printer-line:before { content: var(--icon-printer-line); }

@@ -1,7 +1,6 @@
 # ExDoc
 
 [![Build Status](https://github.com/elixir-lang/ex_doc/workflows/CI/badge.svg)](https://github.com/elixir-lang/ex_doc/actions?query=workflow%3A%22CI%22)
-[![Coverage Status](https://coveralls.io/repos/github/elixir-lang/ex_doc/badge.svg?branch=master)](https://coveralls.io/github/elixir-lang/ex_doc?branch=master)
 
 ExDoc is a tool to generate documentation for your Elixir projects. To see an example, [you can access Elixir's official docs](https://hexdocs.pm/elixir/).
 
@@ -13,58 +12,46 @@ To see all supported options, see the documentation for [mix docs](https://hexdo
 
 ExDoc ships with many features:
 
-  * Automatically generates HTML and EPUB documents from your API documentation
-  * Support for custom pages and guides (in addition to the API reference)
-  * Support for custom grouping of modules, functions, and pages in the sidebar
-  * Generates HTML documentation accessible online and offline
-  * Responsive design with built-in layout for phones and tablets
-  * Customizable logo on the generated documentation
-  * Each documented entry contains a direct link back to the source code
-  * Full-text search
-  * Keyboard shortcuts (press `?` inside an existing documentation to bring the help dialog)
-  * Quick search with autocompletion support (`s` keyboard shortcut)
-  * Go-to shortcut to take to any HexDocs package documentation with autocomplete support (`g` keyboard shortcut)
-  * Support for night-mode (automatically detected according to the browser preferences)
-  * Show tooltips when mousing over a link to a module/function (works for the current project and across projects)
-  * A version dropdown to quickly switch to other versions (automatically configured when hosted on HexDocs)
+  * Automatically generates HTML and EPUB documents from your API documentation.
+  * Responsive design, covering phones and tablets.
+  * Support for custom pages, guides, livebooks and cheatsheets.
+  * Support for custom grouping of modules, functions, and pages in the sidebar.
+  * Generates HTML documentation, accessible online and offline.
+  * Customizable logo.
+  * A direct link back to the source code for every documented entity.
+  * Full-text search.
+  * Keyboard shortcuts. (Press `?` to show help.)
+  * Quick-search with autocompletion support. (`s` keyboard shortcut.)
+  * Go-to shortcut with auto-complete to take the reader to any HexDocs package documentation. (`g` keyboard shortcut.)
+  * Support for night mode, activated according to the browser preference.
+  * Tooltips for links to modules and functions, for the current project and other projects.
+  * Version dropdown, automatically configured when hosted on HexDocs.
 
-## Using ExDoc with Mix
+## Usage
 
-To use ExDoc in your Mix projects, first add ExDoc as a dependency.
+You can use ExDoc with Mix (recommended for Elixir projects), with Rebar (recommended for Erlang projects), or via the command line.
 
-If you are using Elixir v1.10, or later:
+### Using ExDoc with Mix
 
-```elixir
-def deps do
-  [
-    {:ex_doc, "~> 0.24", only: :dev, runtime: false},
-  ]
-end
-```
+ExDoc requires Elixir v1.10 or later.
 
-If you are using Elixir v1.7, v1.8, or v1.9:
+First, add ExDoc as a dependency:
 
 ```elixir
 def deps do
   [
-    {:ex_doc, "~> 0.22.0", only: :dev, runtime: false},
+    {:ex_doc, "~> 0.27", only: :dev, runtime: false},
   ]
 end
 ```
 
-If you are using Elixir v1.6, or earlier:
+Then run `mix deps.get`.
 
-```elixir
-def deps do
-  [
-    {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
-  ]
-end
-```
+> #### Erlang development environment {: .warning}
+>
+> Some Operating System distributions split Erlang into multiple packages, and at least one ExDoc dependency (`earmark_parser`) requires the Erlang development environment. If you see a message like "/usr/lib/erlang/lib/parsetools-2.3.1/include/yeccpre.hrl: no such file or directory", it means you lack this environment. For instance, on the Debian operating system and its derivatives, you need to `apt install erlang-dev`.
 
-After adding ExDoc as a dependency, run `mix deps.get` to install it.
-
-ExDoc will automatically pull in information from your projects, like the application and version. However, you may want to set `:name`, `:source_url` and `:homepage_url` to have a nicer output from ExDoc, such as:
+ExDoc will automatically pull in information from your projects, such as the application and version. However, you may want to set `:name`, `:source_url` and `:homepage_url` in order to have nicer output from ExDoc:
 
 ```elixir
 def project do
@@ -86,11 +73,15 @@ def project do
 end
 ```
 
-Now you are ready to generate your project documentation with `mix docs`. To see all options available when generating docs, run `mix help docs`.
+Now you are ready to generate your project documentation with `mix docs`. To see all options available, run `mix help docs`.
 
-## Using ExDoc via command line
+### Using ExDoc with Rebar3
 
-You can ExDoc via the command line as follows:
+From Erlang/OTP 24+, you can use ExDoc to render your Erlang documentation written with EDoc. See [`rebar3_ex_doc`](https://github.com/starbelly/rebar3_ex_doc/) for more information.
+
+### Using ExDoc via command line
+
+You can use ExDoc via the command line.
 
 1. Install ExDoc as an escript:
 
@@ -98,17 +89,17 @@ You can ExDoc via the command line as follows:
    $ mix escript.install hex ex_doc
    ```
 
-2. Then you are ready to use it in your projects. First, move into your project directory and make sure it is already compiled:
+2. Now you are ready to use it in your projects. Move into your project directory and make sure it's compiled:
 
    ```bash
    $ cd PATH_TO_YOUR_PROJECT
    $ mix compile
    ```
 
-3. Next invoke the `ex_doc` executable from your project:
+3. Invoke the `ex_doc` executable from your project:
 
    ```bash
-   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" path/to/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
+   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/dev/lib/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
    ```
 
 For example, here are some acceptable values:
@@ -119,82 +110,107 @@ For example, here are some acceptable values:
     GITHUB_USER     => elixir-lang
     GITHUB_REPO     => ecto
 
-## Using ExDoc with Erlang projects
+## Syntax highlighting
 
-ExDoc is capable of generating documentation from Erlang's `edoc` annotations through the following steps:
+ExDoc uses [the makeup project](https://github.com/elixir-makeup/makeup) for syntax highlighting. By default, highlighters for Erlang and Elixir are included. To syntax-highlight other languages, simply add the equivalent `makeup_LANGUAGE` package to your `mix.exs`/`rebar.config` file. For example, for HTML support you would add:
 
-1. Use Erlang/OTP 24+
+```elixir
+{:makeup_html, ">= 0.0.0", only: :dev, runtime: false}
+```
 
-2. Add the following to your `rebar.config`. This instructs `edoc` to generate doc chunks
-   instead of HTML docs:
+You can find all supported languages under [the Makeup organization on GitHub](https://github.com/elixir-makeup) and view them at [Makeup's website](https://elixir-makeup.github.io/makeup_demo/).
 
-   ```erlang
-   {edoc_opts, [
-     {doclet, edoc_doclet_chunks},
-     {layout, edoc_layout_chunks},
-     {dir, "_build/default/lib/<app>/doc"}]}.
-   ```
+## Additional pages
 
-   Replace `<app>` with the name of your app.
+You can publish additional pages in your project documentation by configuring them as `:extras`. The following formats and extensions are supported:
 
-3. Install ExDoc escript:
+  * Markdown (`.md` extension) - useful for general long-term text. [Learn more](https://daringfireball.net/projects/markdown/syntax).
 
-   ```bash
-   $ mix escript.install hex ex_doc
-   $ ex_doc --version
-   ```
+  * Cheatsheets (`.cheatmd` extension) - useful for discovery and quick reference. [Learn more](https://hexdocs.pm/ex_doc/cheatsheet.html).
 
-   Make sure escript is in your system path, otherwise point to it directly.
+  * Livebooks (`.livemd` extension) - useful for tutorials, interactive examples and deep dives. [Learn more](https://livebook.dev/).
 
-4. Generate docs:
+For example, you can set your `:extras` to:
 
-   ```bash
-   $ rebar3 edoc
-   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/default/lib/<app>/ebin
-   ```
+```elixir
+extras: ["README.md", "LICENSE", "tutorial.livemd", "cheatsheet.cheatmd"]
+```
 
-5. If you're publishing docs to Hex.pm, first add the following to your `src/<app>.app.src`:
+Run `mix help docs` for more information on configuration.
 
-   ```erlang
-   {doc, "doc"}
-   ```
+## Metadata
 
-   This instructs rebar3 to get HTML docs from the directory "doc" and that's where ExDoc would generate the docs by default.
+ExDoc supports metadata keys in your documentation.
 
-   Now you can publish your docs:
+In Elixir, you can add metadata to modules and functions.
 
-   ```bash
-   $ rebar3 hex docs
-   ```
+For a module, use `@moduledoc`:
 
-6. If your project has dependencies and you want to generate links to them, you need to add the dependencies to the code path.
+```elixir
+@moduledoc since: "1.10.0"
+```
 
-   Suppose you're building `foo` that depends on `bar` and `baz`. Generate the docs with:
+For a function, use `@doc`:
 
-   ```bash
-   $ ex_doc "foo" "1.0.0" "_build/default/lib/foo/ebin" \
-       --paths "_build/default/lib/*/ebin"
-   ```
+```elixir
+@doc since: "1.13.1"
+```
+
+In Erlang's EDoc:
+
+```erlang
+%% @since 0.1.0
+```
+
+The following metadata is available for both modules and functions:
+
+  * `deprecated` (string) - marks a module/function as deprecated, with the given string as the reason.
+  * `since` (string) - declares a module/function available from a particular version.
+
+The following metadata is available for modules:
+
+  * `tags` (list of atoms) - a list of strings to be added as tags to the module. (Not supported by EDoc.)
 
 ## Auto-linking
 
-ExDoc for Elixir will automatically generate links across modules and functions if you enclose them in backticks:
+ExDoc for Elixir will automatically generate links across modules and functions if you enclose them in backticks.
 
-  * By referring to a module, function, type or callback from your project, such as `` `MyModule` ``, ExDoc will automatically link to those
-  * By referring to a module, function, type or callback from Elixir, such as `` `String` ``, ExDoc will automatically link to Elixir's stable documentation
-  * By referring to a function, type, or callback from OTP, such as (`` `:queue.new/0` ``), ExDoc will automatically link to the OTP documentation
-  * By referring to a module, function, type or callback from any of your dependencies, such as `` `MyDep` ``, ExDoc will automatically link to that dependency documentation on [hexdocs.pm](https://hexdocs.pm/) (the link can be configured by setting `docs: [deps: [my_dep: "https://path/to/docs/"]]` in your `mix.exs`)
+  * When referring to a module, function, type or callback from your project, such as `` `MyModule` ``, ExDoc will automatically link to it.
+  * When referring to a module, function, type or callback from Elixir, such as `` `String` ``, ExDoc will automatically link to it at Elixir's stable documentation.
+  * When referring to a function, type, or callback from OTP, such as (`` `:queue.new/0` ``), ExDoc will automatically link to it at the OTP documentation.
+  * When referring to a module, function, type or callback from any of your dependencies, such as `` `MyDep` ``, ExDoc will automatically link to it at the dependency's documentation at [hexdocs.pm](https://hexdocs.pm/). (The link can be configured by setting `docs: [deps: [my_dep: "https://path/to/docs/"]]` in your `mix.exs`.)
 
-ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name, such as `` `function/1` ``.
+ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name; e.g.: `` `function/1` ``.
 
-You can also use a custom text, e.g.: `` [custom text](`MyModule.function/1`) ``. This also allows to refer to OTP modules, e.g.: `` [`:array`](`:array`) ``.
+You can also use custom text; e.g.: `` [custom text](`MyModule.function/1`) ``. This also allows you to refer to OTP modules; e.g.: `` [`:array`](`:array`) ``.
 
-Link to extra pages like this: `` [Up and running](Up and running.md) `` (skipping the directory
-the page is in), the final link will be automatically converted to `up-and-running.html`.
+Link to extra pages using the syntax `` [Up and running](Up and running.md) ``, skipping the directory in which the page is. The final link will be automatically converted to `up-and-running.html`.
 
-## Rendering Math
+## Admonition blocks
 
-If you write TeX-style math in your Markdown (like `$\sum_{i}^{N} x_i$`), they end up as raw text on the generated pages. To render them we recommend using [KaTeX](https://katex.org/), a JavaScript library that turns those expressions into actual graphics. To load and trigger KaTeX on every documentation page, you can configure ExDoc to insert relevant scripts into the HTML:
+You may want to draw attention to certain statements by taking them out of the content's flow and labeling them with a priority. Such statements are called admonitions. (They are also known as asides or callouts.) An admonition block is rendered based on the assigned label or class. ExDoc supports `warning`, `error`, `info`, `tip` and `neutral` tags, on header levels `h3` and `h4`.
+
+The syntax is as follows:
+
+    > #### Error {: .error}
+    >
+    > This syntax will render an error block
+
+The result for the previous syntax is:
+
+> #### Error {: .error}
+>
+> This syntax will render an error block
+
+For example, if you change the class name to `neutral`, you get the same admonition block in neutral style:
+
+> #### Error {: .neutral}
+>
+> This syntax will render an error block
+
+## Extensions
+
+ExDoc renders Markdown content for you, but you can extend it to render complex objects on the page using JavaScript. To inject custom JavaScript into every page, add this to your configuration:
 
 ```elixir
 docs: [
@@ -206,30 +222,97 @@ docs: [
 
 defp before_closing_body_tag(:html) do
   """
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.css" integrity="sha384-beuqjL2bw+6DBM2eOpr5+Xlw+jiH44vMdVQwKxV28xxpoInPHTVmSvvvoPq9RdSh" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.js" integrity="sha384-aaNb715UK1HuP4rjZxyzph+dVss/5Nx3mLImBe9b0EW4vMUkc1Guw4VRyQKBC0eG" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
-      onload="renderMathInElement(document.body);"></script>
+  <!-- HTML injected at the end of the <body> element -->
   """
 end
 
 defp before_closing_body_tag(_), do: ""
 ```
 
-For more details and configuration options see the [KaTeX Auto-render Extension](https://katex.org/docs/autorender.html).
+### Rendering Math
+
+If you write TeX-style math in your Markdown, such as `$\sum_{i}^{N} x_i$`, it ends up as raw text on the generated pages. To render expressions, we recommend using [KaTeX](https://katex.org/), a JavaScript library that turns expressions into graphics. To load and trigger KaTeX on every documentation page, we can insert the following HTML:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.css" integrity="sha384-beuqjL2bw+6DBM2eOpr5+Xlw+jiH44vMdVQwKxV28xxpoInPHTVmSvvvoPq9RdSh" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.js" integrity="sha384-aaNb715UK1HuP4rjZxyzph+dVss/5Nx3mLImBe9b0EW4vMUkc1Guw4VRyQKBC0eG" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+```
+
+For more details and configuration options, see the [KaTeX Auto-render Extension](https://katex.org/docs/autorender.html).
+
+### Rendering Vega-Lite plots
+
+Snippets are also objects you may want to render in a special manner. For example, assuming your Markdown includes Vega-Lite specification in `vega-lite` code snippets:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    for (const codeEl of document.querySelectorAll("pre code.vega-lite")) {
+      try {
+        const preEl = codeEl.parentElement;
+        const spec = JSON.parse(codeEl.textContent);
+        const plotEl = document.createElement("div");
+        preEl.insertAdjacentElement("afterend", plotEl);
+        vegaEmbed(plotEl, spec);
+        preEl.remove();
+      } catch (error) {
+        console.log("Failed to render Vega-Lite plot: " + error)
+      }
+    }
+  });
+</script>
+```
+
+For more details and configuration options, see [vega/vega-embed](https://github.com/vega/vega-embed).
+
+### Rendering Mermaid graphs
+
+Similarly to the example above, if your Markdown includes Mermaid graph specification in `mermaid` code snippets:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    mermaid.initialize({ startOnLoad: false });
+    let id = 0;
+    for (const codeEl of document.querySelectorAll("pre code.mermaid")) {
+      const preEl = codeEl.parentElement;
+      const graphDefinition = codeEl.textContent;
+      const graphEl = document.createElement("div");
+      const graphId = "mermaid-graph-" + id++;
+      mermaid.render(graphId, graphDefinition, function (svgSource, bindListeners) {
+        graphEl.innerHTML = svgSource;
+        bindListeners && bindListeners(graphEl);
+        preEl.insertAdjacentElement("afterend", graphEl);
+        preEl.remove();
+      });
+    }
+  });
+</script>
+```
+
+For more details and configuration options, see the [Mermaid usage docs](https://mermaid-js.github.io/mermaid/#/usage).
 
 ## Contributing
 
 The easiest way to test changes to ExDoc is to locally rebuild the app and its own documentation:
 
-  1. Run `mix setup` to install all dependencies
-  2. Run `mix build` to generate docs. This is a custom alias that will build assets, recompile ExDoc, and output fresh docs into the `doc/` directory
-  3. If you want to contribute a pull request, please do not add to your commits the files generated in the `assets/` and `formatters/` folders
-  4. Run `mix lint` to check if the Elixir and JavaScript files are properly formatted.
-     You can run `mix fix` to let the JavaScript linter and Elixir formatter fix the code automatically before submitting your pull request
+  1. Run `mix setup` to install all dependencies.
+  2. Run `mix build` to generate the docs. This is a custom alias that will build assets, recompile ExDoc, and output fresh docs into the `doc/` directory.
+  3. If working on the assets, you may wish to run the assets build script in watch mode: `npm run --prefix assets build:watch`.
+  4. Run `mix lint` to check if the Elixir and JavaScript files are properly formatted. You can run `mix fix` to let the JavaScript linter and Elixir formatter fix the code automatically before submitting your pull request.
+  5. Please do not add the files generated in the `formatters/` directory to your commits. These will be handled as necessary by the repository maintainers.
+
+The build process is currently tested in Node 16 LTS.
+
+See the README in the `assets/` directory for more information on working on the assets.
 
 ## License
 
-ExDoc source code is released under [Apache 2 License](LICENSE). The generated contents, however, are under different licenses based on projects used to help render HTML, including CSS, JS, and other assets.
+ExDoc source code is released under the Apache 2 License. The generated contents, however, are under different licenses based on projects used to help render HTML, including CSS, JS, and other assets.
 
-Any documentation generated by ExDoc, or any documentation generated by any "Derivative Works" (as specified in the Apache 2 License), must include a direct, readable, and visible link to the [ExDoc repository](https://github.com/elixir-lang/ex_doc) on each rendered material. For HTML pages, a rendered material represents every single page. For PDF, EPUB and other ebook formats, it means one entry for the whole material.
+Any documentation generated by ExDoc, or any documentation generated by any "Derivative Works" (as specified in the Apache 2 License), must include a direct, readable, and visible link to the [ExDoc repository](https://github.com/elixir-lang/ex_doc) on each rendered material. For HTML pages, every single page is a rendered material. For PDF, EPUB and other ebook formats, the whole body of documentation is a rendered material.

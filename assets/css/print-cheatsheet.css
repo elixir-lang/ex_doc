@@ -1,0 +1,141 @@
+@media print {
+
+  /* Remove background colors and set border colors */
+  .page-cheatmd .content-inner * {
+    background-color: transparent !important;
+    border-color: var(--gray400) !important;
+  }
+
+  /* Basic layout and columns */
+
+  .page-cheatmd .content-inner {
+    max-width: 100%;
+    width: 100%;
+    padding: 0;
+    font-size: .7em;
+  }
+
+  .page-cheatmd .content-inner section:is(.col-2, .col-2-left, .col-3) {
+    column-gap: 30px;
+  }
+
+  /* column-count and grid display required to be set again within @print media query to take effect when actually printing */
+  .page-cheatmd .content-inner section.col-2 {
+    column-count: 2;
+  }
+  .page-cheatmd .content-inner section.col-2-left {
+    display: grid;
+  }
+  .page-cheatmd .content-inner section.col-3 {
+    column-count: 3;
+  }
+
+  /* h1 */
+
+  .page-cheatmd .content-inner h1 {
+    margin-top: 0;
+    margin-bottom: .5em;
+  }
+
+  /* h2 */
+
+  .page-cheatmd .content-inner h2.section-heading {
+    font-weight: bold;
+    margin-top: 1em;
+    column-span: all;
+  }
+
+  .page-cheatmd .content-inner section.h2 {
+    break-inside: avoid;
+  }
+
+  /* h3 */
+
+  .page-cheatmd .content-inner h3 {
+    font-weight: bold;
+    color: var(--main-darkened-10);
+  }
+
+  .page-cheatmd .content-inner h3::after {
+    height: 2px;
+    background-color: var(--gray400);
+  }
+
+  .page-cheatmd .content-inner section.h3 {
+    min-width: 300px;
+    break-inside: avoid;
+  }
+
+  /* h4 */
+
+  .page-cheatmd .content-inner h4 {
+    padding: .5em 0;
+    border: none;
+    font-weight: bold;
+    color: black;
+  }
+
+  /* Paragraphs */
+
+  .page-cheatmd .content-inner .h2 p {
+    padding-left: 0;
+    padding-right: 0;
+    border: none !important;
+  }
+
+  /* Code blocks */
+
+  .page-cheatmd .content-inner code {
+    line-height: 1.5em;
+  }
+
+  /* Tables */
+
+  .page-cheatmd .content-inner .h2 table {
+    font-variant-numeric: tabular-nums;
+    break-inside: avoid;
+  }
+
+  .page-cheatmd .content-inner .h2 :is(th, td) {
+    vertical-align: top;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .page-cheatmd .content-inner .h2 thead {
+    border-style: solid none;
+    border-width: 1px;
+  }
+
+  .page-cheatmd .content-inner .h2 tr {
+    border-bottom: none;
+  }
+
+  .page-cheatmd .content-inner .h2 th {
+    font-weight: bold;
+  }
+
+  /* Lists */
+
+  .page-cheatmd .content-inner .h2 li {
+    padding-left: 0;
+    padding-right: 0;
+    vertical-align: middle;
+    border-bottom: none;
+  }
+
+  /* Remove copy button from code blocks */
+  .page-cheatmd .content-inner pre:hover button.copy-button {
+    display: none;
+  }
+
+  /* Remove hover tooltip from inline code references */
+  .page-cheatmd .content-inner div#tooltip {
+    display: none;
+  }
+
+  .page-cheatmd .content-inner footer p:not(.built-using) {
+    display: none;
+  }
+
+}

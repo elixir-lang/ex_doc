@@ -1,43 +1,44 @@
 {{#each nodes as |node nodeId|}}
   {{#groupChanged ../this node.group}}
-    <li class="group">{{node.group}}</li>
+    <li class="group" {{#isArray node.headers}}{{else}}translate="no"{{/isArray}}>
+      {{node.group}}
+    </li>
   {{/groupChanged}}
 
   {{#nestingChanged ../this node}}
-    <li class="nesting-context" aria-hidden="true">{{node.nested_context}}</li>
+    <li class="nesting-context" aria-hidden="true" translate="no">{{node.nested_context}}</li>
   {{/nestingChanged}}
 
-  <li class="{{#isLocal node.id}}current-page open{{/isLocal}} {{#if node.nested_title}}nested{{/if}}">
-    {{! When visiting a module page, the link to this module page
-    in the menu should not link to a new page, instead should link
-    to the top of the page itself. }}
-    <a href="{{node.id}}.html" class="expand">
+  <li class="{{#isLocal node.id}}current-page open{{/isLocal}}">
+    <a href="{{node.id}}.html{{#isLocal node.id}}#content{{/isLocal}}" class="expand" {{#isArray node.headers}}{{else}}translate="no"{{/isArray}}>
       {{#if node.nested_title}}
         {{{node.nested_title}}}
       {{else}}
         {{{node.title}}}
       {{/if}}
-
-      <span class="icon-goto" title="Go to {{{node.title}}}"></span>
+      {{#isEmptyArray node.headers}}
+      {{else}}
+        <span class="icon-expand"></span>
+      {{/isEmptyArray}}
     </a>
 
-    <ul>
-      <li>
-        <a href="{{node.id}}.html#content">Top</a>
-      </li>
-
-      {{#isArray node.headers}}
-        {{#each node.headers}}
-          <li>
-            <a href="{{node.id}}.html#{{{anchor}}}">{{{id}}}</a>
-          </li>
-        {{/each}}
-      {{else}}
+    {{#isArray node.headers}}
+      {{#isNonEmptyArray node.headers}}
+        <ul>
+          {{#each node.headers}}
+            <li>
+              <a href="{{node.id}}.html#{{{anchor}}}">{{{id}}}</a>
+            </li>
+          {{/each}}
+        </ul>
+      {{/isNonEmptyArray}}
+    {{else}}
+      <ul>
         {{#showSections node}}
           <li class="docs {{#isLocal node.id}}open{{/isLocal}}">
             <a href="{{node.id}}.html#content" class="expand">
               Sections
-              <span class="icon-goto" title="Go to Sections"></span>
+              <span class="icon-expand"></span>
             </a>
             <ul class="sections-list deflist">
               {{#each sections}}
@@ -50,25 +51,25 @@
         {{/showSections}}
         {{#showSummary node}}
           <li>
-            <a href="{{node.id}}.html#summary">Summary</a>
+            <a href="{{node.id}}.html#summary" class="summary">Summary</a>
           </li>
         {{/showSummary}}
         {{#each node.nodeGroups as |group|}}
           <li class="docs">
             <a href="{{node.id}}.html#{{group.key}}" class="expand">
               {{group.name}}
-              <span class="icon-goto" title="Go to {{group.name}}"></span>
+              <span class="icon-expand"></span>
             </a>
             <ul class="{{group.key}}-list deflist">
               {{#each group.nodes}}
                 <li>
-                  <a href="{{node.id}}.html#{{anchor}}">{{id}}</a>
+                  <a href="{{node.id}}.html#{{anchor}}" title="{{title}}" translate="no">{{id}}</a>
                 </li>
               {{/each}}
             </ul>
           </li>
         {{/each}}
-      {{/isArray}}
       </ul>
+    {{/isArray}}
   </li>
 {{/each}}

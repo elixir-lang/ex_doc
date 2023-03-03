@@ -4,11 +4,10 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
   # TODO: It should not depend on the parent module
   # TODO: Add tests that assert on the returned structured, not on JSON
   alias ExDoc.Formatter.HTML
-  alias ExDoc.Utils.SimpleJSON
 
   def create(nodes, extras) do
     items = Enum.flat_map(nodes, &module/1) ++ Enum.flat_map(extras, &extra/1)
-    ["searchNodes=" | SimpleJSON.encode(items)]
+    ["searchNodes=" | ExDoc.Utils.to_json(items)]
   end
 
   @h2_split_regex ~r/<h2\b.*?>/

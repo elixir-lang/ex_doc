@@ -16,3 +16,4 @@ mp3,audio/mpeg
 mp4,video/mp4
 css,text/css
 js,text/javascript
+license,text/plain

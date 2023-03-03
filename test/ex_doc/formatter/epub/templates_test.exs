@@ -73,7 +73,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     test "outputs function groups" do
       content =
         get_module_page([CompiledWithDocs],
-          groups_for_functions: [
+          groups_for_docs: [
             "Example functions": &(&1[:purpose] == :example),
             Legacy: &is_binary(&1[:deprecated])
           ]
@@ -89,7 +89,9 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
     test "outputs summaries" do
       content = get_module_page([CompiledWithDocs])
-      assert content =~ ~r{<div class="summary-signature">\s*<a href="#example_1/0">}
+
+      assert content =~
+               ~r{<div class="summary-signature">\s*<a href="#example_1/0" translate="no">}
     end
 
     test "contains links to summary sections when those exist" do

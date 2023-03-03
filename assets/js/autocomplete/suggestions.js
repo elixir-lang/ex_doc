@@ -15,7 +15,9 @@ import { escapeRegexModifiers, escapeHtmlEntities, isBlank } from '../helpers'
 const SUGGESTION_CATEGORY = {
   module: 'module',
   moduleChild: 'module-child',
-  mixTask: 'mix-task'
+  mixTask: 'mix-task',
+  extra: 'extra',
+  section: 'section'
 }
 
 /**
@@ -35,8 +37,12 @@ export function getSuggestions (query, limit = 5) {
   const suggestions = [
     ...findSuggestionsInTopLevelNodes(nodes.modules, query, SUGGESTION_CATEGORY.module),
     ...findSuggestionsInChildNodes(nodes.modules, query, SUGGESTION_CATEGORY.moduleChild),
-    ...findSuggestionsInTopLevelNodes(nodes.tasks, query, SUGGESTION_CATEGORY.mixTask)
-  ]
+    ...findSuggestionsInTopLevelNodes(nodes.tasks, query, SUGGESTION_CATEGORY.mixTask),
+    ...findSuggestionsInTopLevelNodes(nodes.extras, query, SUGGESTION_CATEGORY.extra),
+    ...findSuggestionsInSectionsOfNodes(nodes.modules, query, SUGGESTION_CATEGORY.section),
+    ...findSuggestionsInSectionsOfNodes(nodes.tasks, query, SUGGESTION_CATEGORY.section),
+    ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section)
+  ].filter(suggestion => suggestion !== null)
 
   return sort(suggestions).slice(0, limit)
 }
@@ -45,9 +51,7 @@ export function getSuggestions (query, limit = 5) {
  * Finds suggestions in top level sidebar nodes.
  */
 function findSuggestionsInTopLevelNodes (nodes, query, category) {
-  return nodes
-    .map(node => nodeSuggestion(node, query, category))
-    .filter(suggestion => suggestion !== null)
+  return nodes.map(node => nodeSuggestion(node, query, category))
 }
 
 /**
@@ -66,7 +70,24 @@ function findSuggestionsInChildNodes (nodes, query, category) {
         )
       })
     })
-    .filter(suggestion => suggestion !== null)
+}
+
+/**
+ * Finds suggestions in the sections of the given parent nodes.
+ */
+function findSuggestionsInSectionsOfNodes (nodes, query, category) {
+  return nodes.flatMap(node =>
+    nodeSections(node).map(section => {
+      return nodeSectionSuggestion(node, section, query, category)
+    })
+  )
+}
+
+/**
+ * Returns any sections of the given parent node.
+ */
+function nodeSections (node) {
+  return (node.sections || []).concat(node.headers || [])
 }
 
 /**
@@ -82,7 +103,7 @@ function nodeSuggestion (node, query, category) {
     label: null,
     description: null,
     matchQuality: matchQuality(node.title, query),
-    category: category
+    category
   }
 }
 
@@ -96,10 +117,26 @@ function childNodeSuggestion (childNode, parentId, query, category, label) {
   return {
     link: `${parentId}.html#${childNode.anchor}`,
     title: highlightMatches(childNode.id, query),
-    label: label,
+    label,
     description: parentId,
     matchQuality: matchQuality(childNode.id, query),
-    category: category
+    category
+  }
+}
+
+/**
+ * Builds a suggestion for a node section.
+ */
+function nodeSectionSuggestion (node, section, query, category) {
+  if (!matchesAny(section.id, query)) { return null }
+
+  return {
+    link: `${node.id}.html#${section.anchor}`,
+    title: highlightMatches(section.id, query),
+    label: null,
+    description: node.title,
+    matchQuality: matchQuality(section.id, query),
+    category
   }
 }
 
@@ -122,10 +159,10 @@ function moduleChildNodeSuggestion (childNode, parentId, query, category, label)
   return {
     link: `${parentId}.html#${childNode.anchor}`,
     title: highlightMatches(childNode.id, tokenizedQuery),
-    label: label,
+    label,
     description: parentId,
     matchQuality: matchQuality(modFun, query),
-    category: category
+    category
   }
 }
 

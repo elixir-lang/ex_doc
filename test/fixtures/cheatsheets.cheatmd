@@ -1,0 +1,38 @@
+## Getting started
+
+### Hello world
+
+```elixir
+# hello.exs
+defmodule Greeter do
+  def greet(name) do
+    message = "Hello, " <> name <> "!"
+    IO.puts message
+  end
+end
+
+Greeter.greet("world")
+```
+
+```bash
+elixir hello.exs
+# Hello, world!
+```
+
+### Variables
+
+```elixir
+age = 23
+```
+
+## Types
+
+### Operators
+
+```elixir
+left != right   # equal
+left !== right  # match
+left ++ right   # concat lists
+left <> right   # concat string/binary
+left =~ right   # regexp
+```

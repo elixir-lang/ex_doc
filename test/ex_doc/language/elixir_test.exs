@@ -80,7 +80,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "erlang stdlib function" do
       assert autolink_doc(":lists.all/2") ==
-               ~m"[`:lists.all/2`](https://erlang.org/doc/man/lists.html#all-2)"
+               ~m"[`:lists.all/2`](https://www.erlang.org/doc/man/lists.html#all-2)"
     end
 
     test "local function" do
@@ -101,17 +101,20 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc("+/2") ==
                ~m"[`+/2`](https://hexdocs.pm/elixir/Kernel.html#+/2)"
 
+      assert autolink_doc("&/1") ==
+               ~m"[`&/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#&/1)"
+
       assert autolink_doc("for/1") ==
                ~m"[`for/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#for/1)"
 
       assert autolink_doc("for/1", apps: [:elixir]) ==
                ~m"[`for/1`](Kernel.SpecialForms.html#for/1)"
+    end
 
-      # TODO: Remove check once Elixir v1.12+ is required
-      if Version.match?(System.version(), ">= 1.12.0-rc.0") do
-        assert autolink_doc("..///3") ==
-                 ~m"[`..///3`](https://hexdocs.pm/elixir/Kernel.html#..///3)"
-      end
+    @tag skip: not Version.match?(System.version(), "~> 1.13")
+    test "stepped range" do
+      assert autolink_doc("..///3") ==
+               ~m"[`..///3`](https://hexdocs.pm/elixir/Kernel.html#..///3)"
     end
 
     test "elixir callback" do
@@ -121,7 +124,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "erlang callback" do
       assert autolink_doc("c::gen_server.handle_call/3") ==
-               ~m"[`:gen_server.handle_call/3`](https://erlang.org/doc/man/gen_server.html#Module:handle_call-3)"
+               ~m"[`:gen_server.handle_call/3`](https://www.erlang.org/doc/man/gen_server.html#Module:handle_call-3)"
     end
 
     test "elixir type" do
@@ -142,7 +145,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "erlang type" do
       assert autolink_doc("t::array.array/0") ==
-               ~m"[`:array.array/0`](https://erlang.org/doc/man/array.html#type-array)"
+               ~m"[`:array.array/0`](https://www.erlang.org/doc/man/array.html#type-array)"
     end
 
     test "special forms" do
@@ -156,6 +159,9 @@ defmodule ExDoc.Language.ElixirTest do
     test "escaping" do
       assert autolink_doc("Kernel.SpecialForms.%{}/1") ==
                ~m"[`Kernel.SpecialForms.%{}/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%25%7B%7D/1)"
+
+      assert autolink_doc("Kernel.SpecialForms.%/2") ==
+               ~m"[`Kernel.SpecialForms.%/2`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%25/2)"
 
       assert autolink_doc("Kernel.SpecialForms.{}/1") ==
                ~m"[`Kernel.SpecialForms.{}/1`](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%7B%7D/1)"
@@ -172,10 +178,10 @@ defmodule ExDoc.Language.ElixirTest do
                ~m"[custom text](https://hexdocs.pm/elixir/String.html#at/2)"
 
       assert autolink_doc(~m"[custom text](`:lists`)") ==
-               ~m"[custom text](https://erlang.org/doc/man/lists.html)"
+               ~m"[custom text](https://www.erlang.org/doc/man/lists.html)"
 
       assert autolink_doc(~m"[custom text](`:lists.all/2`)") ==
-               ~m"[custom text](https://erlang.org/doc/man/lists.html#all-2)"
+               ~m"[custom text](https://www.erlang.org/doc/man/lists.html#all-2)"
     end
 
     test "mix task" do
@@ -200,7 +206,9 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc("EarmarkParser.as_ast/2") ==
                ~m"[`EarmarkParser.as_ast/2`](https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2)"
 
-      assert autolink_doc("EarmarkParser.as_ast/2", deps: [earmark_parser: "https://example.com/"]) ==
+      assert autolink_doc("EarmarkParser.as_ast/2",
+               deps: [earmark_parser: "https://example.com/"]
+             ) ==
                ~m"[`EarmarkParser.as_ast/2`](https://example.com/EarmarkParser.html#as_ast/2)"
 
       assert autolink_doc("EarmarkParser.as_ast/2", deps: [earmark_parser: "https://example.com"]) ==
@@ -212,9 +220,11 @@ defmodule ExDoc.Language.ElixirTest do
     end
 
     test "extras" do
-      opts = [extras: ["Foo Bar.md"]]
+      opts = [extras: %{"Foo Bar.md" => "foo-bar", "Bar Baz.livemd" => "bar-baz"}]
 
       assert autolink_doc(~m"[Foo](Foo Bar.md)", opts) == ~m"[Foo](foo-bar.html)"
+
+      assert autolink_doc(~m"[Bar](Bar Baz.livemd)", opts) == ~m"[Bar](bar-baz.html)"
 
       assert autolink_doc(~m"[Foo](Foo Bar.md)", [ext: ".xhtml"] ++ opts) ==
                ~m"[Foo](foo-bar.xhtml)"
@@ -373,7 +383,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "Erlang stdlib types" do
       assert autolink_spec(quote(do: t() :: :sets.set())) ==
-               ~s[t() :: <a href="https://erlang.org/doc/man/sets.html#type-set">:sets.set</a>()]
+               ~s[t() :: <a href="https://www.erlang.org/doc/man/sets.html#type-set">:sets.set</a>()]
     end
 
     test "escape special HTML characters" do
@@ -385,6 +395,22 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_spec(quote(do: t() :: String.t()), ext: ".xhtml") ==
                ~s[t() :: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()]
     end
+  end
+
+  defmodule InMemory do
+    @callback hello() :: :world
+    def hello(), do: :world
+  end
+
+  test "in memory" do
+    assert {:a, _, _, _} = autolink_doc("ExDoc.Language.ElixirTest.InMemory.hello/0")
+    assert {:a, _, _, _} = autolink_doc("c:ExDoc.Language.ElixirTest.InMemory.hello/0")
+
+    # Types are not checked for in memory
+    assert_unchanged("t:ExDoc.Language.ElixirTest.InMemory.unknown/0")
+
+    warn("ExDoc.Language.ElixirTest.InMemory.unknown/0")
+    warn("c:ExDoc.Language.ElixirTest.InMemory.unknown/0")
   end
 
   test "warnings" do
@@ -423,10 +449,6 @@ defmodule ExDoc.Language.ElixirTest do
     warn("t:Calendar.date/9")
 
     assert warn(fn ->
-             autolink_spec(quote(do: t() :: bad()))
-           end) =~ ~s[documentation references type "bad()"]
-
-    assert warn(fn ->
              autolink_spec(quote(do: t() :: String.bad()))
            end) =~ ~s[documentation references type "String.bad()"]
 
@@ -440,7 +462,7 @@ defmodule ExDoc.Language.ElixirTest do
              )
            end) =~ ~s[documentation references type "String.bad()"]
 
-    assert warn(~m"[Foo](Foo Bar.md)", extras: []) =~
+    assert warn(~m"[Foo](Foo Bar.md)", extras: %{}) =~
              ~s[documentation references file "Foo Bar.md" but it does not exist]
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
@@ -474,6 +496,8 @@ defmodule ExDoc.Language.ElixirTest do
     assert_unchanged(~m"`Unknown`")
 
     assert_unchanged(~m"[Blank](about:blank)")
+
+    assert_unchanged(~m"`FOR UPDATE OF ? SKIP LOCKED`")
   end
 
   ## Helpers

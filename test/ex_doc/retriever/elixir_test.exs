@@ -3,17 +3,22 @@ defmodule ExDoc.Retriever.ElixirTest do
   alias ExDoc.{Retriever, DocAST}
   import TestHelper
 
-  setup :create_tmp_dir
+  @moduletag :tmp_dir
 
   describe "docs_from_modules/2" do
     test "module", c do
       elixirc(c, ~S"""
       defmodule Mod do
         @moduledoc "Mod docs."
+        @moduledoc tags: :public
 
         @doc "function/0 docs."
         @spec function() :: atom()
         def function(), do: :ok
+
+        @doc "macro/0 docs."
+        @spec macro() :: Macro.t()
+        defmacro macro(), do: :ok
 
         def empty_doc_and_specs(), do: :ok
 
@@ -31,7 +36,8 @@ defmodule ExDoc.Retriever.ElixirTest do
                title: "Mod",
                type: :module,
                typespecs: [],
-               docs: [empty_doc_and_specs, function]
+               docs: [empty_doc_and_specs, function, macro],
+               annotations: [:public]
              } = mod
 
       assert DocAST.to_string(mod.doc) == "<p>Mod docs.</p>"
@@ -41,8 +47,8 @@ defmodule ExDoc.Retriever.ElixirTest do
                annotations: [],
                defaults: [],
                deprecated: nil,
-               doc_line: 4,
-               group: "Functions",
+               doc_line: 5,
+               group: :Functions,
                id: "function/0",
                name: :function,
                rendered_doc: nil,
@@ -54,14 +60,25 @@ defmodule ExDoc.Retriever.ElixirTest do
              } = function
 
       assert DocAST.to_string(function.doc) == "<p>function/0 docs.</p>"
+      assert Macro.to_string(spec) == "function() :: atom()"
+
+      assert %ExDoc.FunctionNode{
+               arity: 0,
+               annotations: ["macro"],
+               id: "macro/0",
+               signature: "macro()",
+               specs: [spec],
+               type: :macro
+             } = macro
+
+      assert DocAST.to_string(macro.doc) == "<p>macro/0 docs.</p>"
+      assert Macro.to_string(spec) == "macro() :: Macro.t()"
 
       assert %ExDoc.FunctionNode{
                id: "empty_doc_and_specs/0",
                doc: nil,
                specs: []
              } = empty_doc_and_specs
-
-      assert Macro.to_string(spec) == "function() :: atom()"
     end
 
     test "Elixir functions with defaults", c do
@@ -120,7 +137,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert callback1.type == :callback
       assert callback1.annotations == []
       assert callback1.doc_line == 2
-      assert callback1.group == "Callbacks"
+      assert callback1.group == :Callbacks
       assert Path.basename(callback1.source_url) == "nofile:3"
       assert DocAST.to_string(callback1.doc) == "<p>callback1/0 docs.</p>"
       assert Macro.to_string(callback1.specs) == "[callback1() :: :ok]"
@@ -130,7 +147,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert optional_callback1.type == :callback
       assert optional_callback1.annotations == ["optional"]
       assert optional_callback1.doc_line == 5
-      assert optional_callback1.group == "Callbacks"
+      assert optional_callback1.group == :Callbacks
       assert Path.basename(optional_callback1.source_url) == "nofile:5"
       refute optional_callback1.doc
       assert Macro.to_string(optional_callback1.specs) == "[optional_callback1() :: :ok]"
@@ -140,10 +157,10 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert macrocallback1.type == :macrocallback
       assert macrocallback1.annotations == []
       assert macrocallback1.doc_line == 9
-      assert macrocallback1.group == "Callbacks"
+      assert macrocallback1.group == :Callbacks
       assert Path.basename(macrocallback1.source_url) == "nofile:9"
       refute macrocallback1.doc
-      assert Macro.to_string(macrocallback1.specs) == "[macrocallback1(term()) :: :ok]"
+      assert Macro.to_string(macrocallback1.specs) == "[macrocallback1() :: :ok]"
 
       elixirc(c, ~S"""
       defmodule Impl do
@@ -301,6 +318,9 @@ defmodule ExDoc.Retriever.ElixirTest do
       elixirc(c, ~S"""
       defmodule Mix.Tasks.MyTask do
         use Mix.Task
+
+        @doc "The task should win over the callback"
+        @callback hello() :: :world
 
         @impl true
         def run(_), do: :ok

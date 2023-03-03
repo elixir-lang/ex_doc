@@ -1,14 +1,23 @@
-{{#if value}}
-  <h1>Search results for <em>{{value}}</em></h1>
-{{else}}
-  <h1>Invalid Search</h1>
-{{/if}}
+<h1>
+  {{#if value}}
+    Search results for <em>{{value}}</em>
+  {{else}}
+    Invalid search
+  {{/if}}
+
+  <button class="icon-action display-settings">
+    <i class="ri-settings-3-line"></i>
+    <span class="sr-only">Settings</span>
+  </button>
+</h1>
 
 {{#isNonEmptyArray results}}
   {{#each results}}
     <div class="result">
       <h2 class="result-id">
-        <a href="{{this.ref}}">{{this.title}} <small>({{this.type}})</small></a>
+        <a href="{{this.ref}}">
+          <span translate="no">{{this.title}}</span> <small>({{this.type}})</small>
+        </a>
       </h2>
         {{#each excerpts}}
           <p class="result-elem">{{{this}}}</p>
@@ -31,6 +40,7 @@
     <li>Use <code>*</code> anywhere (such as <code>fo*</code>) as wildcard</li>
     <li>Use <code>+</code> before a word (such as <code>+foo</code>) to make its presence required</li>
     <li>Use <code>-</code> before a word (such as <code>-foo</code>) to make its absence required</li>
+    <li>Use <code>:</code> to search on a particular field (such as <code>field:word</code>). The available fields are <code>title</code> and <code>doc</code></li>
     <li>Use <code>WORD^NUMBER</code> (such as <code>foo^2</code>) to boost the given word</li>
     <li>Use <code>WORD~NUMBER</code> (such as <code>foo~2</code>) to do a search with edit distance on word</li>
   </ul>

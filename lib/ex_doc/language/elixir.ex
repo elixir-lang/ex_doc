@@ -4,8 +4,6 @@ defmodule ExDoc.Language.Elixir do
   @behaviour ExDoc.Language
 
   alias ExDoc.Autolink
-  alias ExDoc.Formatter.HTML
-  alias ExDoc.Formatter.HTML.Templates, as: T
   alias ExDoc.Refs
   alias ExDoc.Language.Erlang
 
@@ -111,11 +109,14 @@ defmodule ExDoc.Language.Elixir do
       if actual_def in module_data.private.optional_callbacks, do: ["optional"], else: []
 
     specs =
-      case Map.fetch(module_data.private.callbacks, actual_def) do
-        {:ok, specs} ->
+      case module_data.private.callbacks do
+        %{^actual_def => specs} when kind == :macrocallback ->
+          Enum.map(specs, &remove_callback_term/1)
+
+        %{^actual_def => specs} ->
           specs
 
-        :error ->
+        %{} ->
           []
       end
 
@@ -136,6 +137,14 @@ defmodule ExDoc.Language.Elixir do
       specs: quoted,
       extra_annotations: extra_annotations
     }
+  end
+
+  defp remove_callback_term({:type, num, :bounded_fun, [lhs, rhs]}) do
+    {:type, num, :bounded_fun, [remove_callback_term(lhs), rhs]}
+  end
+
+  defp remove_callback_term({:type, num, :fun, [{:type, num, :product, [_ | rest_args]} | rest]}) do
+    {:type, num, :fun, [{:type, num, :product, rest_args} | rest]}
   end
 
   @impl true
@@ -187,7 +196,7 @@ defmodule ExDoc.Language.Elixir do
       ast
       |> Macro.to_string()
       |> safe_format_string!()
-      |> T.h()
+      |> ExDoc.Utils.h()
 
     name = typespec_name(ast)
     {name, rest} = split_name(string, name)
@@ -204,14 +213,20 @@ defmodule ExDoc.Language.Elixir do
     }
   end
 
+  @impl true
+  def format_spec_attribute(%ExDoc.TypeNode{type: type}), do: "@#{type}"
+  def format_spec_attribute(%ExDoc.FunctionNode{type: :callback}), do: "@callback"
+  def format_spec_attribute(%ExDoc.FunctionNode{type: :macrocallback}), do: "@macrocallback"
+  def format_spec_attribute(%ExDoc.FunctionNode{}), do: "@spec"
+
   ## Module Helpers
 
   defp nesting_info(title, prefixes) do
     prefixes
     |> Enum.find(&String.starts_with?(title, &1 <> "."))
     |> case do
-      nil -> {nil, nil}
-      prefix -> {String.trim_leading(title, prefix <> "."), prefix}
+      nil -> nil
+      prefix -> {"." <> String.trim_leading(title, prefix <> "."), prefix}
     end
   end
 
@@ -227,11 +242,11 @@ defmodule ExDoc.Language.Elixir do
       function_exported?(module, :__impl__, 1) ->
         {:impl, true}
 
-      function_exported?(module, :behaviour_info, 1) ->
-        {:behaviour, false}
-
       match?("Elixir.Mix.Tasks." <> _, Atom.to_string(module)) ->
         {:task, false}
+
+      function_exported?(module, :behaviour_info, 1) ->
+        {:behaviour, false}
 
       true ->
         {:module, false}
@@ -349,6 +364,7 @@ defmodule ExDoc.Language.Elixir do
       {{:|, _, _}, position} -> to_var({}, position)
       {left, position} -> to_var(left, position)
     end)
+    |> Macro.prewalk(fn node -> Macro.update_meta(node, &Keyword.delete(&1, :line)) end)
   end
 
   defp to_var({:%, meta, [name, _]}, _), do: {:%, meta, [name, {:%{}, meta, []}]}
@@ -423,11 +439,8 @@ defmodule ExDoc.Language.Elixir do
     case Keyword.fetch(attrs, :href) do
       {:ok, href} ->
         case Regex.scan(@ref_regex, href) do
-          [[_, custom_link]] ->
-            url(custom_link, :custom_link, config)
-
-          [] ->
-            build_extra_link(href, config)
+          [[_, custom_link]] -> url(custom_link, :custom_link, config)
+          [] -> build_extra_link(href, config)
         end
 
       _ ->
@@ -436,34 +449,20 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp build_extra_link(link, config) do
-    with uri <- URI.parse(link),
-         nil <- uri.scheme,
-         nil <- uri.host,
-         true <- is_binary(uri.path),
-         true <- uri.path != "",
-         false <- uri.path =~ @ref_regex,
-         extension when extension in [".md", ".txt", ""] <- Path.extname(uri.path) do
-      file = Path.basename(uri.path)
-
-      if file in config.extras do
-        without_ext = trim_extension(file, extension)
+    with %{scheme: nil, host: nil, path: path} = uri <- URI.parse(link),
+         true <- is_binary(path) and path != "" and not (path =~ @ref_regex),
+         true <- Path.extname(path) in [".livemd", ".md", ".txt", ""] do
+      if file = config.extras[Path.basename(path)] do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
-        HTML.text_to_id(without_ext) <> config.ext <> fragment
+        file <> config.ext <> fragment
       else
-        Autolink.maybe_warn(nil, config, nil, %{file_path: uri.path, original_text: link})
-
+        Autolink.maybe_warn(nil, config, nil, %{file_path: path, original_text: link})
         nil
       end
     else
       _ -> nil
     end
   end
-
-  defp trim_extension(file, ""),
-    do: file
-
-  defp trim_extension(file, extension),
-    do: String.trim_trailing(file, extension)
 
   @basic_types [
     any: 0,
@@ -612,10 +611,14 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp parse_module(<<first>> <> _ = string, _mode) when first in ?A..?Z do
-    do_parse_module(string)
+    if string =~ ~r/^[A-Za-z0-9_.]+$/ do
+      do_parse_module(string)
+    else
+      :error
+    end
   end
 
-  defp parse_module(<<?:>> <> _ = string, :custom_link) do
+  defp parse_module(":" <> _ = string, :custom_link) do
     do_parse_module(string)
   end
 
@@ -640,10 +643,18 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
+  # There are special forms that are forbidden by the tokenizer
+  defp parse_function("__aliases__"), do: {:function, :__aliases__}
+  defp parse_function("__block__"), do: {:function, :__block__}
+  defp parse_function("%"), do: {:function, :%}
+
   defp parse_function(string) do
-    case Code.string_to_quoted(":" <> string) do
-      {:ok, function} when is_atom(function) -> {:function, function}
-      _ -> :error
+    case Code.string_to_quoted("& #{string}/0") do
+      {:ok, {:&, _, [{:/, _, [{function, _, _}, 0]}]}} when is_atom(function) ->
+        {:function, function}
+
+      _ ->
+        :error
     end
   end
 
@@ -727,7 +738,7 @@ defmodule ExDoc.Language.Elixir do
         end
 
       if url do
-        ~s[<a href="#{url}">#{T.h(call_string)}</a>]
+        ~s[<a href="#{url}">#{ExDoc.Utils.h(call_string)}</a>]
       else
         call_string
       end <> do_typespec(rest, config)
@@ -762,7 +773,7 @@ defmodule ExDoc.Language.Elixir do
     ref = {:module, module}
 
     case {mode, Refs.get_visibility(ref)} do
-      {_link_type, :public} ->
+      {_link_type, visibility} when visibility in [:public, :limited] ->
         Autolink.app_module_url(Autolink.tool(module, config), module, config)
 
       {:regular_link, :undefined} ->
@@ -806,8 +817,7 @@ defmodule ExDoc.Language.Elixir do
       {:type, :hidden} ->
         nil
 
-      # skip `@type %{required(...), optional(...), ...}`
-      {:type, _visibility} when name in [:required, :optional] and arity == 1 ->
+      {:type, _} ->
         nil
 
       _ ->
@@ -818,7 +828,10 @@ defmodule ExDoc.Language.Elixir do
 
   defp try_autoimported_function(name, arity, mode, config, original_text) do
     Enum.find_value(@autoimported_modules, fn module ->
-      remote_url({:function, module, name, arity}, config, original_text, warn?: false, mode: mode)
+      remote_url({:function, module, name, arity}, config, original_text,
+        warn?: false,
+        mode: mode
+      )
     end)
   end
 
@@ -829,19 +842,17 @@ defmodule ExDoc.Language.Elixir do
 
     case {mode, Refs.get_visibility({:module, module}), Refs.get_visibility(ref)} do
       {_mode, _module_visibility, :public} ->
-        case Autolink.tool(module, config) do
-          :no_tool ->
-            nil
+        tool = Autolink.tool(module, config)
 
-          tool ->
-            if same_module? do
-              fragment(tool, kind, name, arity)
-            else
-              Autolink.app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
-            end
+        if same_module? do
+          fragment(tool, kind, name, arity)
+        else
+          Autolink.app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
         end
 
-      {:regular_link, :public, :undefined} ->
+      {:regular_link, module_visibility, :undefined}
+      when module_visibility == :public
+      when module_visibility == :limited and kind != :type ->
         if warn?,
           do: Autolink.maybe_warn(ref, config, :undefined, %{original_text: original_text})
 
@@ -864,7 +875,7 @@ defmodule ExDoc.Language.Elixir do
   defp prefix(:type), do: "t:"
 
   defp fragment(:ex_doc, kind, name, arity) do
-    "#" <> prefix(kind) <> "#{T.enc(Atom.to_string(name))}/#{arity}"
+    "#" <> prefix(kind) <> "#{URI.encode(Atom.to_string(name))}/#{arity}"
   end
 
   defp fragment(_, kind, name, arity) do

@@ -1,0 +1,79 @@
+#search {
+  min-height: 200px;
+  position: relative;
+}
+
+#search .loading {
+  height: 64px;
+  width: 64px;
+  vertical-align: middle;
+  position: absolute;
+  top: 50%;
+  left: calc(18%);
+}
+
+#search .loading div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 51px;
+  height: 51px;
+  margin: 6px;
+  border: 6px solid var(--coldGray);
+  border-radius: 50%;
+  animation: loading 1.2s cubic-bezier(.5, 0, .5, 1) infinite;
+  border-color: var(--coldGray) transparent transparent transparent;
+}
+
+#search .loading div:nth-child(1) {
+  animation-delay: -.45s;
+}
+#search .loading div:nth-child(2) {
+  animation-delay: -.3s;
+}
+#search .loading div:nth-child(3) {
+  animation-delay: -.15s;
+}
+
+@keyframes loading {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#search .result {
+  margin: 2em 0 2.5em;
+}
+
+#search .result p {
+  margin: 0;
+}
+
+#search .result-id {
+  font-size: 1.4em;
+  margin: 0;
+}
+
+#search .result-id a {
+  text-decoration: none;
+  transition: color .1s ease-in-out;
+  color: var(--links);
+}
+#search .result-id a:is(:visited, :active, :focus) {
+  color: var(--linksVisited);
+}
+#search .result-id a:hover {
+  color: var(--main);
+}
+
+#search :is(.result-id, .result-elem) em {
+  font-style: normal;
+  color: var(--main);
+}
+
+#search .result-id small {
+  font-weight: normal;
+}

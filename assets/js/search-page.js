@@ -1,7 +1,6 @@
 /* globals searchNodes */
 
 import lunr from 'lunr'
-import resultsTemplate from './handlebars/templates/search-results.handlebars'
 import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
 import { setSearchInputValue } from './sidebar/sidebar-search'
 
@@ -31,9 +30,7 @@ function search (value) {
     const index = getIndex()
 
     try {
-      // Ignore colons representing field-specific query (https://lunrjs.com/guides/searching.html#fields)
-      const queryString = value.replace(':', '')
-      const results = searchResultsToDecoratedSearchNodes(index.search(queryString))
+      const results = searchResultsToDecoratedSearchNodes(index.search(value))
       renderResults({ value, results })
     } catch (error) {
       renderResults({ value, errorMessage: error.message })
@@ -43,11 +40,16 @@ function search (value) {
 
 function renderResults ({ value, results, errorMessage }) {
   const searchContainer = qs(SEARCH_CONTAINER_SELECTOR)
-  const resultsHtml = resultsTemplate({ value, results, errorMessage })
+  const resultsHtml = Handlebars.templates['search-results']({ value, results, errorMessage })
   searchContainer.innerHTML = resultsHtml
 }
 
 function getIndex () {
+  lunr.QueryLexer.termSeparator = /\s+/
+  lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
+  lunr.Pipeline.registerFunction(elixirTrimmerFunction, 'elixirTrimmer')
+  lunr.Pipeline.registerFunction(hyphenSearchFunction, 'hyphenSearch')
+
   const cachedIndex = loadIndex()
   if (cachedIndex) { return cachedIndex }
 
@@ -85,12 +87,16 @@ function indexStorageKey () {
 
 function createIndex () {
   return lunr(function () {
+    this.tokenizer.separator = /\s+/
     this.ref('ref')
-    this.field('title', { boost: 3, extractor: titleExtractor })
+    this.field('title', { boost: 3 })
     this.field('doc')
     this.metadataWhitelist = ['position']
     this.pipeline.remove(lunr.stopWordFilter)
+    this.use(hyphenSearch)
     this.use(elixirTokenSplitter)
+    this.pipeline.remove(lunr.trimmer)
+    this.use(elixirTrimmer)
 
     searchNodes.forEach(searchNode => {
       this.add(searchNode)
@@ -98,39 +104,57 @@ function createIndex () {
   })
 }
 
-function titleExtractor (document) {
-  const { title, type } = document
-
-  if (type === 'function' || type === 'callback' || type === 'type') {
-    const modFun = title.replace(/\/\d+$/, '')
-    const modOrFun = modFun.replace(/\./g, ' ')
-    const parts = title.split('.')
-    const funArity = parts[parts.length - 1]
-
-    return `${title} ${modFun} ${modOrFun} ${funArity}`
-  }
-
-  return title
+function elixirTokenSplitter (builder) {
+  builder.pipeline.before(lunr.stemmer, elixirTokenFunction)
+  builder.searchPipeline.before(lunr.stemmer, elixirTokenFunction)
 }
 
-function elixirTokenSplitter (builder) {
-  function elixirTokenFunction (token) {
-    const tokens = token
-      .toString()
-      .split(/\.|\/|_/)
-      .map(part => {
-        return token.clone().update(() => part)
-      })
+function elixirTokenFunction (token) {
+  const tokens = token
+    .toString()
+    .split(/\.|\/|_/)
+    .map(part => {
+      return token.clone().update(() => part)
+    })
 
-    if (tokens.length > 1) {
-      return [...tokens, token]
-    }
-
-    return tokens
+  if (tokens.length > 1) {
+    return [...tokens, token]
   }
 
-  lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
-  builder.pipeline.before(lunr.stemmer, elixirTokenFunction)
+  return tokens
+}
+
+function elixirTrimmer (builder) {
+  builder.pipeline.after(lunr.stemmer, elixirTrimmerFunction)
+  builder.searchPipeline.after(lunr.stemmer, elixirTrimmerFunction)
+}
+
+function elixirTrimmerFunction (token) {
+  // Preserve @ at the beginning of tokens
+  return token.update(function (s) {
+    return s.replace(/^@?\W+/, '').replace(/\W+$/, '')
+  })
+}
+
+function hyphenSearchFunction (token) {
+  const tokenStr = token.toString()
+  if (tokenStr.indexOf('-') < 0) return token
+
+  const tokens = []
+
+  tokens.push(
+    token.clone(function (s) {
+      return s.replace('-', '')
+    })
+  )
+
+  tokens.push(token)
+  return tokens
+}
+
+function hyphenSearch (builder) {
+  builder.pipeline.before(lunr.stemmer, hyphenSearchFunction)
+  builder.searchPipeline.before(lunr.stemmer, hyphenSearchFunction)
 }
 
 function searchResultsToDecoratedSearchNodes (results) {

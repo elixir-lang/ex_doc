@@ -10,7 +10,7 @@
         <% end %>
       <% end %>
     </div>
-    <%# Extra content specified by the user (e.g. custom Javascipt) %>
+    <%# Extra content specified by the user (e.g. custom Javascript) %>
     <%= config.before_closing_body_tag.(:epub) %>
   </body>
 </html>

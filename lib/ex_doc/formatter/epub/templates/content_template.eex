@@ -22,7 +22,7 @@
         <item id="<%= extra.id %>" href="<%= extra.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
       <% end %>
     <% end %>
-    <%= for filter <- [:modules, :exceptions, :tasks] do %>
+    <%= for filter <- [:modules, :tasks] do %>
       <%= for node <- nodes[filter] do %>
         <item id="<%= node.id %>" href="<%= node.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
       <% end %>
@@ -47,7 +47,7 @@
         <itemref idref="<%= extra.id %>"/>
       <% end %>
     <% end %>
-    <%= for filter <- [:modules, :exceptions, :tasks] do %>
+    <%= for filter <- [:modules, :tasks] do %>
       <%= for node <- nodes[filter] do %>
         <itemref idref="<%= node.id %>"/>
       <% end %>

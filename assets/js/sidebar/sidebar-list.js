@@ -1,4 +1,3 @@
-import sidebarItemsTemplate from '../handlebars/templates/sidebar-items.handlebars'
 import { qs, getCurrentPageSidebarType, getLocationHash, findSidebarCategory } from '../helpers'
 import { getSidebarNodes } from '../globals'
 
@@ -38,27 +37,43 @@ function renderSidebarNodeList (nodesByType, type) {
 
   // Render the list
   const nodeList = qs(SIDEBAR_NODE_LIST_SELECTOR)
-  const listContentHtml = sidebarItemsTemplate({ nodes: nodes, group: '' })
+  const listContentHtml = Handlebars.templates['sidebar-items']({ nodes, group: '' })
   nodeList.innerHTML = listContentHtml
 
   // Highlight the corresponding navigation link
   highlightNavigationLink(type)
 
+  // Removes the "expand" class from links belonging to single-level sections
+  nodeList.querySelectorAll('ul').forEach(list => {
+    if (list.innerHTML.trim() === '') {
+      const emptyExpand = list.previousElementSibling
+      if (emptyExpand.classList.contains('expand')) {
+        emptyExpand.classList.remove('expand')
+      }
+    }
+  })
+
   // Register event listeners
   nodeList.querySelectorAll('li a').forEach(anchor => {
     anchor.addEventListener('click', event => {
       const target = event.target
-      const newWindowKeyDown = event.shiftKey || event.ctrlKey
+      const listItem = target.closest('li')
+      const previousSection = nodeList.querySelector('.current-section')
 
-      if (target.matches('.icon-goto') || newWindowKeyDown) {
-        // The click intended to open the link rather than expanding it.
+      // Expand icon should not navigate
+      if (target.matches('.icon-expand')) {
+        event.preventDefault()
+        listItem.classList.toggle('open')
         return
       }
 
-      if (anchor.matches('.expand')) {
-        event.preventDefault()
-        const listItem = target.closest('li')
-        listItem.classList.toggle('open')
+      // Clear the previous current section
+      if (previousSection) {
+        previousSection.classList.remove('current-section')
+      }
+
+      if (anchor.matches('.expand') && anchor.pathname === window.location.pathname) {
+        listItem.classList.add('open')
       }
     })
   })
@@ -97,6 +112,10 @@ function markCurrentHashInSidebar () {
 
   const hashEl = nodeList.querySelector(`li.current-page a[href$="#${hash}"]`)
   if (hashEl) {
+    const deflist = hashEl.closest('ul')
+    if (deflist.classList.contains('deflist')) {
+      deflist.closest('li').classList.add('current-section')
+    }
     hashEl.closest('li').classList.add('current-hash')
   }
 }

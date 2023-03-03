@@ -3,9 +3,8 @@ defmodule ExDoc.Retriever.ErlangTest do
   alias ExDoc.{Retriever, DocAST, Language.Erlang}
   import TestHelper
 
-  @moduletag :otp24
-
-  setup :create_tmp_dir
+  @moduletag :otp_eep48
+  @moduletag :tmp_dir
 
   describe "docs_from_modules/2" do
     test "module", c do
@@ -31,9 +30,10 @@ defmodule ExDoc.Retriever.ErlangTest do
         deprecated: nil,
         doc_line: _,
         docs: [function1, function2],
-        function_groups: ["Callbacks", "Functions"],
+        docs_groups: [:Callbacks, :Functions],
         group: nil,
         id: "mod",
+        language: ExDoc.Language.Erlang,
         module: :mod,
         nested_context: nil,
         nested_title: nil,
@@ -53,7 +53,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         defaults: [],
         deprecated: nil,
         doc_line: _,
-        group: "Functions",
+        group: :Functions,
         id: "function1/0",
         name: :function1,
         rendered_doc: nil,

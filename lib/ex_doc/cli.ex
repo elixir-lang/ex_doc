@@ -10,35 +10,34 @@ defmodule ExDoc.CLI do
     {opts, args, _invalid} =
       OptionParser.parse(args,
         aliases: [
-          n: :canonical,
           c: :config,
           f: :formatter,
-          p: :homepage_url,
           l: :logo,
           m: :main,
+          n: :canonical,
           o: :output,
+          p: :homepage_url,
+          q: :quiet,
           u: :source_url,
           v: :version
         ],
         switches: [
+          formatter: :keep,
           language: :string,
-          paths: :keep,
           package: :string,
+          paths: :keep,
           proglang: :string,
+          quiet: :boolean,
           source_ref: :string,
           version: :boolean
         ]
       )
 
     if List.keymember?(opts, :version, 0) do
-      print_version()
+      IO.puts("ExDoc v#{ExDoc.version()}")
     else
       generate(args, opts, generator)
     end
-  end
-
-  defp print_version do
-    IO.puts("ExDoc v#{ExDoc.version()}")
   end
 
   defp generate(args, opts, generator) do
@@ -56,8 +55,28 @@ defmodule ExDoc.CLI do
       |> Keyword.put(:source_beam, source_beam)
       |> Keyword.put(:apps, [app(source_beam)])
       |> merge_config()
+      |> normalize_formatters()
 
-    generator.(project, version, opts)
+    quiet? = Keyword.get(opts, :quiet, false)
+
+    for formatter <- opts[:formatters] do
+      index = generator.(project, version, Keyword.put(opts, :formatter, formatter))
+
+      quiet? ||
+        IO.puts(IO.ANSI.format([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"]))
+
+      index
+    end
+  end
+
+  defp normalize_formatters(opts) do
+    formatters =
+      case Keyword.get_values(opts, :formatter) do
+        [] -> opts[:formatters] || ["html", "epub"]
+        values -> values
+      end
+
+    Keyword.put(opts, :formatters, formatters)
   end
 
   defp app(source_beam) do
@@ -146,20 +165,22 @@ defmodule ExDoc.CLI do
       -n, --canonical     Indicate the preferred URL with rel="canonical" link element
       -c, --config        Give configuration through a file instead of a command line.
                           See "Custom config" section below for more information.
-      -f, --formatter     Docs formatter to use (html or epub), default: "html"
+      -f, --formatter     Docs formatter to use (html or epub), default: html and epub
       -p, --homepage-url  URL to link to for the site name
-          --paths         Prepends the given path to Erlang code path. The path might contain a glob
-                          pattern but in that case, remember to quote it: --paths "_build/dev/lib/*/ebin".
-                          This option can be given multiple times
           --language      Identify the primary language of the documents, its value must be
                           a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)
                           The image size will be 64x64 and copied to the assets directory
       -m, --main          The entry-point page in docs, default: "api-reference"
+      -o, --output        Path to output docs, default: "doc"
           --package       Hex package name
+          --paths         Prepends the given path to Erlang code path. The path might contain a glob
+                          pattern but in that case, remember to quote it: --paths "_build/dev/lib/*/ebin".
+                          This option can be given multiple times
+          --proglang      The project's programming language, default: "elixir"
+      -q, --quiet         Only output warnings and errors
           --source-ref    Branch/commit/tag used for source link inference, default: "master"
       -u, --source-url    URL to the source code
-      -o, --output        Path to output docs, default: "doc"
       -v, --version       Print ExDoc version
 
     ## Custom config
@@ -173,7 +194,7 @@ defmodule ExDoc.CLI do
 
         [
           extras: Path.wildcard("lib/elixir/pages/*.md"),
-          groups_for_functions: [
+          groups_for_docs: [
             Guards: & &1[:guard] == true
           ],
           skip_undefined_reference_warnings_on: ["compatibility-and-deprecations"],

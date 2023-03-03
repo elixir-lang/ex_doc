@@ -2,9 +2,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
 
-  # TODO: It should not depend on the parent module
+  import ExDoc.Utils, only: [h: 1]
+
+  # TODO: It should not depend on the parent module. Move required HTML functions to Utils.
   # TODO: Add tests that assert on the returned structured, not on JSON
-  alias ExDoc.Utils.SimpleJSON
   alias ExDoc.Formatter.HTML
 
   @doc """
@@ -31,6 +32,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
+  Format the attribute type used to define the spec of the given `node`.
+  """
+  def format_spec_attribute(module, node) do
+    module.language.format_spec_attribute(node)
+  end
+
+  @doc """
   Get defaults clauses.
   """
   def get_defaults(%{defaults: defaults}) do
@@ -51,14 +59,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Returns the HTML formatted title for the module page.
   """
-  def module_title(%{type: :task, title: title}),
-    do: title
-
-  def module_title(%{type: :module, title: title}),
-    do: title
-
-  def module_title(%{type: type, title: title}),
-    do: title <> " <small>#{type}</small>"
+  def module_type(%{type: :task}), do: ""
+  def module_type(%{type: :module}), do: ""
+  def module_type(%{type: type}), do: "<small>#{type}</small>"
 
   @doc """
   Gets the first paragraph of the documentation of a node. It strips
@@ -80,22 +83,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp presence([]), do: nil
   defp presence(other), do: other
 
-  @doc false
-  def h(binary) do
-    escape_map = [
-      {"&", "&amp;"},
-      {"<", "&lt;"},
-      {">", "&gt;"},
-      {~S("), "&quot;"}
-    ]
-
-    Enum.reduce(escape_map, binary, fn {pattern, escape}, acc ->
-      String.replace(acc, pattern, escape)
-    end)
-  end
-
-  @doc false
-  def enc(binary), do: URI.encode(binary)
+  defp enc(binary), do: URI.encode(binary)
 
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
@@ -107,7 +95,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
       |> Map.new()
       |> Map.put(:extras, sidebar_extras(extras))
 
-    ["sidebarNodes=" | SimpleJSON.encode(nodes)]
+    ["sidebarNodes=" | ExDoc.Utils.to_json(nodes)]
   end
 
   defp sidebar_extras(extras) do
@@ -129,7 +117,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
         extra =
           module
           |> module_summary()
-          |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
           |> case do
             [] -> []
             entries -> [nodeGroups: Enum.map(entries, &sidebar_entries/1)]
@@ -151,7 +138,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_entries({group, nodes}) do
     nodes =
       for node <- nodes do
-        %{id: "#{node.name}/#{node.arity}", anchor: URI.encode(node.id)}
+        id =
+          if "struct" in node.annotations do
+            node.signature
+          else
+            "#{node.name}/#{node.arity}"
+          end
+
+        %{id: id, title: node.signature, anchor: URI.encode(node.id)}
       end
 
     %{key: HTML.text_to_id(group), name: group, nodes: nodes}
@@ -188,11 +182,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   def module_summary(module_node) do
-    [Types: module_node.typespecs] ++
-      function_groups(module_node.function_groups, module_node.docs)
+    entries =
+      [Types: module_node.typespecs] ++
+        docs_groups(module_node.docs_groups, module_node.docs)
+
+    Enum.reject(entries, fn {_type, nodes} -> nodes == [] end)
   end
 
-  defp function_groups(groups, docs) do
+  defp docs_groups(groups, docs) do
     for group <- groups, do: {group, Enum.filter(docs, &(&1.group == group))}
   end
 
@@ -200,12 +197,15 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
 
   defp sidebar_type(:exception), do: "modules"
-  defp sidebar_type(:extra), do: "extras"
   defp sidebar_type(:module), do: "modules"
   defp sidebar_type(:behaviour), do: "modules"
   defp sidebar_type(:protocol), do: "modules"
   defp sidebar_type(:task), do: "tasks"
+
   defp sidebar_type(:search), do: "search"
+  defp sidebar_type(:cheatmd), do: "extras"
+  defp sidebar_type(:livemd), do: "extras"
+  defp sidebar_type(:extra), do: "extras"
 
   def asset_rev(output, pattern) do
     output = Path.expand(output)
@@ -226,7 +226,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   prefixed with `prefix`.
   """
   @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
-  @spec link_headings(String.t(), Regex.t(), String.t()) :: String.t()
+  @spec link_headings(String.t() | nil, Regex.t(), String.t()) :: String.t() | nil
   def link_headings(content, regex \\ @heading_regex, prefix \\ "")
   def link_headings(nil, _, _), do: nil
 
@@ -246,12 +246,55 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> elem(0)
   end
 
+  @class_regex ~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/
+  @class_separator " "
   defp link_heading(match, _tag, _title, "", _prefix), do: match
 
-  defp link_heading(_match, tag, title, id, prefix) do
+  defp link_heading(match, tag, title, id, prefix) do
+    section_header_class_name = "section-heading"
+
+    # NOTE: This addition is mainly to preserve the previous `class` attributes
+    # from the headers, in case there is one. Now with the _admonition_ text
+    # block, we inject CSS classes. So far, the supported classes are:
+    # `warning`, `info`, `error`, and `neutral`.
+    #
+    # The Markdown syntax that we support for the admonition text
+    # blocks is something like this:
+    #
+    #     > ### Never open this door! {: .warning}
+    #     >
+    #     > ...
+    #
+    # That should produce the following HTML:
+    #
+    #      <blockquote>
+    #        <h3 class="warning">Never open this door!</h3>
+    #        <p>...</p>
+    #      </blockquote>
+    #
+    # The original implementation discarded the previous CSS classes. Instead,
+    # it was setting `#{section_header_class_name}` as the only CSS class
+    # associated with the given header.
+    class_attribute =
+      case Regex.named_captures(@class_regex, match) do
+        %{"class" => ""} ->
+          section_header_class_name
+
+        %{"class" => previous_classes} ->
+          # Let's make sure that the `section_header_class_name` is not already
+          # included in the previous classes for the header
+          previous_classes
+          |> String.split(@class_separator)
+          |> Enum.reject(&(&1 == section_header_class_name))
+          |> Enum.join(@class_separator)
+          |> Kernel.<>(" #{section_header_class_name}")
+      end
+
     """
-    <#{tag} id="#{prefix}#{id}" class="section-heading">
-      <a href="##{prefix}#{id}" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+    <#{tag} id="#{prefix}#{id}" class="#{class_attribute}">
+      <a href="##{prefix}#{id}" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+      <p class="sr-only">#{id}</p>
+      </a>
       #{title}
     </#{tag}>
     """
@@ -266,20 +309,19 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   templates = [
-    detail_template: [:node, :_module],
+    detail_template: [:node, :module],
     footer_template: [:config, :node],
     head_template: [:config, :page],
     module_template: [:config, :module, :summary, :nodes_map],
     not_found_template: [:config, :nodes_map],
     api_reference_entry_template: [:module_node],
     api_reference_template: [:nodes_map],
-    extra_template: [:config, :node, :nodes_map, :refs],
+    extra_template: [:config, :node, :type, :nodes_map, :refs],
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
-    summary_entry_template: [:node],
     redirect_template: [:config, :redirect_to],
-    bottom_actions_template: [:refs]
+    settings_button_template: []
   ]
 
   Enum.each(templates, fn {name, args} ->

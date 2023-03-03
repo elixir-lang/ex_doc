@@ -1,11 +1,11 @@
 <%= head_template(config, %{title: module.title}) %>
     <h1 id="content">
-      <%= H.module_title(module) %>
+      <%= module.title %> <%= H.module_type(module) %>
     </h1>
 
     <%= if deprecated = module.deprecated do %>
       <div class="deprecated">
-        This <%= module.type %> is deprecated. <%= H.h(deprecated) %>.
+        This <%= module.type %> is deprecated. <%= ExDoc.Utils.h(deprecated) %>.
       </div>
     <% end %>
 
@@ -15,11 +15,11 @@
       </section>
     <% end %>
 
-    <%= if Enum.any?(summary, fn {_, v} -> v != [] end) do %>
+    <%= if summary != [] do %>
       <section id="summary" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#summary">
-            <span class="icon-link" aria-hidden="true"></span>
+            <i class="ri-link-m" aria-hidden="true"></i>
             <span class="sr-only">Anchor for this section</span>
           </a>
           Summary
@@ -28,11 +28,11 @@
       </section>
     <% end %>
 
-    <%= for {name, nodes} <- summary, nodes != [], key = HTML.text_to_id(name) do %>
+    <%= for {name, nodes} <- summary, key = HTML.text_to_id(name) do %>
       <section id="<%= key %>" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#<%= key %>">
-            <span class="icon-link" aria-hidden="true"></span>
+            <i class="ri-link-m" aria-hidden="true"></i>
             <span class="sr-only">Anchor for this section</span>
           </a>
           <%= name %>

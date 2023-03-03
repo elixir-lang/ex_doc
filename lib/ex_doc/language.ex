@@ -1,7 +1,7 @@
 defmodule ExDoc.Language do
   @moduledoc false
 
-  @typep spec_ast() :: term()
+  @type spec_ast() :: term()
 
   @typedoc """
   The map has the following keys:
@@ -23,7 +23,7 @@ defmodule ExDoc.Language do
     * `:callback_types` - a list of types that are considered callbacks
 
     * `:nesting_info` - a `{nested_title, nested_context}` tuple or `nil`.
-      For example, `"A.B.C"` becomes `{"C", "A.B"}`.
+      For example, `"A.B.C"` becomes `{"C", "A.B."}`.
 
     * `:private` - a map with language-specific data
   """
@@ -130,6 +130,11 @@ defmodule ExDoc.Language do
               lexer: module(),
               opts: keyword()
             }
+
+  @doc """
+  Return an attribute in the canonical representation.
+  """
+  @callback format_spec_attribute(%ExDoc.FunctionNode{} | %ExDoc.TypeNode{}) :: String.t()
 
   def get(:elixir, _module), do: {:ok, ExDoc.Language.Elixir}
   def get(:erlang, _module), do: {:ok, ExDoc.Language.Erlang}
