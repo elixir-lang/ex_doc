@@ -2,14 +2,14 @@
   font-family: var(--sansFontFamily);
   font-size: 16px;
   line-height: 18px;
-  background-color: var(--gray800);
-  color: var(--gray50);
+  background-color: var(--sidebarBackground);
+  color: var(--sidebarAccentMain);
   overflow: hidden;
-  scrollbar-color: var(--coldGray) var(--gray800);
+  scrollbar-color: var(--sidebarScrollbarThumb) var(--sidebarScrollbarTrack);
 }
 
 .sidebar .gradient {
-  background: linear-gradient(var(--gray800), var(--gray800-opacity-0));
+  background: var(--sidebarGradient);
   height: 20px;
   margin-top: -20px;
   pointer-events: none;
@@ -28,19 +28,19 @@
 }
 
 .sidebar a {
-  color: var(--gray50);
+  color: var(--sidebarAccentMain);
   text-decoration: none;
   transition: color .3s ease-in-out;
 }
 
 .sidebar a:hover {
-  color: var(--white);
+  color: var(--sidebarHover);
 }
 
 .sidebar .sidebar-header {
   margin: 12px;
   border-radius: 4px;
-  background-color: var(--gray700);
+  background-color: var(--sidebarHeader);
   width: 276px;
 }
 
@@ -63,7 +63,7 @@
   font-weight: 700;
   font-size: 20px;
   line-height: 30px;
-  color: var(--gray50);
+  color: var(--sidebarAccentMain);
   margin: 0;
   padding: 0;
   max-width: 230px;
@@ -78,7 +78,7 @@
   font-weight: 300;
   font-size: 16px;
   line-height: 20px;
-  color: var(--gray300);
+  color: var(--sidebarMuted);
 }
 
 .sidebar .sidebar-projectVersionsDropdown {
@@ -90,7 +90,7 @@
   -webkit-appearance: none;
   appearance: none;
   background-color: transparent;
-  color: var(--white);
+  color: var(--sidebarHover);
   z-index: 2;
 }
 
@@ -109,7 +109,7 @@
   content: "\25bc";
   z-index: 1;
   font-size: 8px;
-  color: var(--white);
+  color: var(--sidebarHover);
 }
 
 .sidebar .sidebar-projectVersionsDropdown::-ms-expand {
@@ -126,7 +126,7 @@
   text-transform: uppercase;
   font-weight: 300;
   font-size: 14px;
-  color: var(--gray300);
+  color: var(--sidebarMuted);
 }
 
 .sidebar .sidebar-listNav li {
@@ -142,11 +142,11 @@
 }
 
 .sidebar .sidebar-listNav li:is(:hover, .selected) a {
-  border-color: var(--main);
+  border-color: var(--sidebarLanguageAccentBar);
 }
 
 .sidebar .sidebar-listNav li:is(:hover, .selected) a {
-  color: var(--gray50);
+  color: var(--sidebarAccentMain);
 }
 
 .sidebar .sidebar-search {
@@ -155,7 +155,7 @@
 
 .sidebar .sidebar-search.selected .search-button,
 .sidebar .sidebar-search .search-button:hover {
-  color: var(--main);
+  color: var(--sidebarLanguageAccentBar);
   opacity: 1;
 }
 
@@ -166,7 +166,7 @@
 
 .sidebar .sidebar-search .search-button {
   font-size: 14px;
-  color: var(--gray50);
+  color: var(--sidebarAccentMain);
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -181,7 +181,7 @@
 
 .sidebar .sidebar-search .search-close-button {
   font-size: 16px;
-  color: var(--gray50);
+  color: var(--sidebarAccentMain);
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -205,10 +205,10 @@
 }
 
 .sidebar .sidebar-search .search-input {
-  background-color: var(--gray700);
+  background-color: var(--sidebarSearch);
   border: none;
   border-radius: 4px;
-  color: var(--gray50);
+  color: var(--sidebarAccentMain);
   margin-left: 12px;
   padding: 8px 6px 8px 38px;
   width: 276px;
@@ -285,7 +285,7 @@
   font-weight: bold;
   font-size: .9em;
   line-height: 1.8em;
-  color: var(--gray400);
+  color: var(--sidebarSubheadings);
   padding-left: 15px;
 }
 
@@ -295,13 +295,13 @@
   font-size: .8em;
   margin: 2em 0 0;
   line-height: 1.8em;
-  color: var(--gray400);
+  color: var(--sidebarSubheadings);
   padding-left: 15px;
 }
 
 .sidebar #full-list li a {
   padding: 3px 0 3px 15px;
-  color: var(--gray200);
+  color: var(--sidebarItem);
   overflow: hidden;
 }
 
@@ -318,23 +318,23 @@
 }
 
 .sidebar #full-list li .current-section > a {
-  color: var(--main-lightened-10);
+  color: var(--sidebarActiveItem);
 }
 
 .sidebar #full-list > li > a:hover {
-  border-left: 3px solid var(--main);
+  border-left: 3px solid var(--sidebarLanguageAccentBar);
   padding-left: 12px;
 }
 
 .sidebar #full-list > li.current-page > a {
-  color: var(--main-lightened-10);
-  border-left: 3px solid var(--main);
+  color: var(--sidebarActiveItem);
+  border-left: 3px solid var(--sidebarLanguageAccentBar);
   padding-left: 12px;
 }
 
 .sidebar #full-list > li.current-page > a:after,
 .sidebar #full-list > li.current-page {
-  color: var(--main-lightened-10);
+  color: var(--sidebarActiveItem);
 }
 
 .sidebar #full-list > li:last-child {
@@ -357,15 +357,15 @@
   line-height: 16px;
   padding: 0 8px;
   margin-right: 0;
-  color: var(--gray50);
+  color: var(--sidebarAccentMain);
 }
 
 .sidebar #full-list ul li.current-hash {
-  color: var(--main-lightened-10);
+  color: var(--sidebarActiveItem);
 }
 
 .sidebar #full-list ul li.current-hash > a {
-  color: var(--main-lightened-10);
+  color: var(--sidebarActiveItem);
 }
 
 .sidebar #full-list ul li.current-hash > a:before,
@@ -373,7 +373,7 @@
   content: "\2022";
   position: absolute;
   margin-left: -15px;
-  color: var(--main-lightened-10);
+  color: var(--sidebarActiveItem);
 }
 
 .sidebar #full-list ul li a {
@@ -392,11 +392,11 @@
 .sidebar #full-list ul li ul li {
   margin-right: 0;
   height: 20px;
-  color: var(--gray50);
+  color: var(--sidebarAccentMain);
 }
 
 .sidebar #full-list ul li ul li a {
-  border-left: 1px solid var(--gray600);
+  border-left: 1px solid var(--sidebarInactiveItemMarker);
   padding: 0 10px;
   height: 20px;
 }
@@ -406,16 +406,16 @@
 }
 
 .sidebar #full-list ul li ul li > a:hover {
-  border-color: var(--main);
+  border-color: var(--sidebarLanguageAccentBar);
 }
 
 .sidebar #full-list ul li ul li.current-hash > a {
-  color: var(--main-lightened-10);
-  border-color: var(--main);
+  color: var(--sidebarActiveItem);
+  border-color: var(--sidebarLanguageAccentBar);
 }
 
 .sidebar #full-list ul li ul li.current-hash > a {
-  color: var(--main-lightened-10);
+  color: var(--sidebarActiveItem);
   margin-left: 0;
 }
 
@@ -424,13 +424,13 @@
 }
 
 ::-webkit-scrollbar-track {
-  background-color: var(--gray800);
+  background-color: var(--sidebarBackground);
 }
 
 .sidebar ::-webkit-scrollbar-thumb {
-  background-color: var(--coldGray);
+  background-color: var(--sidebarScrollbarThumb);
   border-radius: 10px;
-  border: 3px solid var(--gray800);
+  border: 3px solid var(--sidebarBackground);
 }
 
 .sidebar-button {
@@ -442,7 +442,7 @@
 }
 
 .sidebar-button:hover {
-  color: var(--white);
+  color: var(--sidebarHover);
 }
 
 .sidebar-button:is(:active, :hover, :focus) {
@@ -450,7 +450,7 @@
 }
 
 .sidebar-button {
-  color: var(--sidebarButton);
+  color: var(--sidebarAccentMain);
 }
 .sidebar-closed .sidebar-button {
   color: var(--contrast);

@@ -59,6 +59,24 @@ body.dark {
 
   --success:                     var(--green-lightened-10);
 
-  --sidebarButton:               var(--gray50);
-  --sidebarButtonBackground:     linear-gradient(180deg, var(--gray900) 20%, var(--gray900-opacity-50) 70%, var(--gray900-opacity-0) 100%);
+  --sidebarButtonBackground:     linear-gradient(180deg,
+                                                 var(--gray900) 20%,
+                                                 var(--gray900-opacity-50) 70%,
+                                                 var(--gray900-opacity-0) 100%);
+  --sidebarAccentMain:           var(--gray50);
+  --sidebarBackground:           var(--gray800);
+  --sidebarGradient:             linear-gradient(var(--sidebarBackground),
+                                                 var(gray800-opacity-0));
+  --sidebarHeader:               var(--gray700);
+  --sidebarMuted:                var(--gray300);
+  --sidebarHover:                var(--white);
+  --sidebarScrollbarThumb:       var(--coldGray);
+  --sidebarScrollbarTrack:       var(--sidebarBackground);
+  --sidebarSearch:               var(--gray700);
+  --sidebarSubheadings:          var(--gray400);
+  --sidebarItem:                 var(--gray200);
+  --sidebarInactiveItemMarker:   var(--gray600);
+  --sidebarLanguageAccentBar:    var(--main);
+  --sidebarActiveItem:           var(--main-lightened-10);
+
 }
