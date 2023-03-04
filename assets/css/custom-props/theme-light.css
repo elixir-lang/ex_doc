@@ -78,6 +78,4 @@
   --sidebarInactiveItemMarker:   var(--gray600);
   --sidebarLanguageAccentBar:    var(--main);
   --sidebarActiveItem:           var(--main-lightened-10);
-
-  --mark: red; /* TODO removeme */
 }
