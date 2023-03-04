@@ -2,6 +2,7 @@
   --main:               hsl(0, 100%, 64%);
   --main-darkened-10:   hsl(0, 100%, 54%);
   --main-darkened-20:   hsl(0, 100%, 44%);
+  --main-darkened-50:   hsl(0, 100%, 14%);
   --main-lightened-05:  hsl(0, 100%, 69%);
   --main-lightened-10:  hsl(0, 100%, 74%);
 }

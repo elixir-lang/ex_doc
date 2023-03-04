@@ -59,25 +59,25 @@
 
   --success:                     var(--green);
 
+  --mark: red; /* TODO removeme */
+
   --sidebarButtonBackground:     linear-gradient(180deg,
                                                  var(--gray900) 20%,
                                                  var(--gray900-opacity-50) 70%,
                                                  var(--gray900-opacity-0) 100%);
-  --sidebarAccentMain:           var(--gray50);
-  --sidebarBackground:           var(--gray800);
+  --sidebarAccentMain:           var(--gray800);
+  --sidebarBackground:           var(--gray50);
   --sidebarGradient:             linear-gradient(var(--sidebarBackground),
                                                  var(gray800-opacity-0));
-  --sidebarHeader:               var(--gray700);
-  --sidebarMuted:                var(--gray300);
-  --sidebarHover:                var(--white);
+  --sidebarHeader:               var(--gray100);
+  --sidebarMuted:                var(--gray600);
+  --sidebarHover:                var(--main-lightened-10);
   --sidebarScrollbarThumb:       var(--coldGray);
   --sidebarScrollbarTrack:       var(--sidebarBackground);
-  --sidebarSearch:               var(--gray700);
-  --sidebarSubheadings:          var(--gray400);
-  --sidebarItem:                 var(--gray200);
-  --sidebarInactiveItemMarker:   var(--gray600);
-  --sidebarLanguageAccentBar:    var(--main);
-  --sidebarActiveItem:           var(--main-lightened-10);
-
-  --mark: red; /* TODO removeme */
+  --sidebarSearch:               var(--gray100);
+  --sidebarSubheadings:          var(--gray600);
+  --sidebarItem:                 var(--gray800);
+  --sidebarInactiveItemMarker:   var(--gray300);
+  --sidebarLanguageAccentBar:    var(--main-darkened-20);
+  --sidebarActiveItem:           var(--main-darkened-50);
 }
