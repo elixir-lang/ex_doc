@@ -79,5 +79,5 @@
   --sidebarItem:                 var(--gray800);
   --sidebarInactiveItemMarker:   var(--gray300);
   --sidebarLanguageAccentBar:    var(--main-darkened-20);
-  --sidebarActiveItem:           var(--main-darkened-50);
+  --sidebarActiveItem:           var(--main-darkened-20);
 }
