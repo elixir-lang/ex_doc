@@ -59,8 +59,6 @@
 
   --success:                     var(--green);
 
-  --mark: red; /* TODO removeme */
-
   --sidebarButtonBackground:     linear-gradient(180deg,
                                                  var(--gray900) 20%,
                                                  var(--gray900-opacity-50) 70%,
