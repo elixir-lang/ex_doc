@@ -238,34 +238,14 @@ end
 defp before_closing_body_tag(:epub), do: ""
 ```
 
-You could use `MFA` as well:
+Besides an anonymous function, you can also pass a `module-function-args` tuple. It will the given module and function, with the format prefixed to the arguments:
 
 ```elixir
 docs: [
   # ...
-  before_closing_head_tag: {MyModule, :before_closing_head_tag, ["Demo"]},
-  before_closing_body_tag: {MyModule, :before_closing_body_tag, ["Demo"]}
+  before_closing_head_tag: {MyModule, :before_closing_head_tag, []},
+  before_closing_body_tag: {MyModule, :before_closing_body_tag, []}
 ]
-
-# ...
-
-defmodule MyModule do
-  def before_closing_head_tag(:html, name) do
-    # ...
-  end
-
-  def before_closing_head_tag(:epub, name) do
-    # ...
-  end
-
-  def before_closing_body_tag(:html, name) do
-    # ...
-  end
-
-  def before_closing_body_tag(:html, name) do
-    # ...
-  end
-end
 ```
 
 ### Rendering Math
