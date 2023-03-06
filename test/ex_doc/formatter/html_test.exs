@@ -17,6 +17,9 @@ defmodule ExDoc.Formatter.HTMLTest do
   defp before_closing_head_tag(:html), do: @before_closing_head_tag_content_html
   defp before_closing_body_tag(:html), do: @before_closing_body_tag_content_html
 
+  def before_closing_head_tag(:html, name), do: "<meta name=#{name}>"
+  def before_closing_body_tag(:html, name), do: "<p>#{name}</p>"
+
   defp doc_config(%{tmp_dir: tmp_dir} = _context) do
     [
       apps: [:elixir],
@@ -545,6 +548,27 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "before_closing_*_tags required by the user are placed in the right place",
+         %{
+           tmp_dir: tmp_dir
+         } = context do
+      generate_docs(
+        doc_config(context,
+          before_closing_head_tag: {__MODULE__, :before_closing_head_tag, ["Demo"]},
+          before_closing_body_tag: {__MODULE__, :before_closing_body_tag, ["Demo"]},
+          extras: ["test/fixtures/README.md"]
+        )
+      )
+
+      content = File.read!(tmp_dir <> "/html/api-reference.html")
+      assert content =~ ~r[<meta name=Demo>\s*</head>]
+      assert content =~ ~r[<p>Demo</p>\s*</body>]
+
+      content = File.read!(tmp_dir <> "/html/readme.html")
+      assert content =~ ~r[<meta name=Demo>\s*</head>]
+      assert content =~ ~r[<p>Demo</p>\s*</body>]
+    end
+
+    test "before_closing_*_tags required by the user are placed in the right place using MFA",
          %{
            tmp_dir: tmp_dir
          } = context do

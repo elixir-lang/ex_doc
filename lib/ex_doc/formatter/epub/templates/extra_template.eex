@@ -4,6 +4,6 @@
     </h1>
     <%= content %>
     <%# Extra content specified by the user (e.g. custom Javascript) %>
-    <%= config.before_closing_body_tag.(:epub) %>
+    <%= before_closing_body_tag(config, :epub) %>
   </body>
 </html>

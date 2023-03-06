@@ -215,10 +215,19 @@ ExDoc renders Markdown content for you, but you can extend it to render complex 
 ```elixir
 docs: [
   # ...
+  before_closing_head_tag: &before_closing_head_tag/1,
   before_closing_body_tag: &before_closing_body_tag/1
 ]
 
 # ...
+
+defp before_closing_head_tag(:html) do
+  """
+  <!-- HTML injected at the end of the <head> element -->
+  """
+end
+
+defp before_closing_head_tag(:epub), do: ""
 
 defp before_closing_body_tag(:html) do
   """
@@ -226,7 +235,37 @@ defp before_closing_body_tag(:html) do
   """
 end
 
-defp before_closing_body_tag(_), do: ""
+defp before_closing_body_tag(:epub), do: ""
+```
+
+You could use `MFA` as well:
+
+```elixir
+docs: [
+  # ...
+  before_closing_head_tag: {MyModule, :before_closing_head_tag, ["Demo"]},
+  before_closing_body_tag: {MyModule, :before_closing_body_tag, ["Demo"]}
+]
+
+# ...
+
+defmodule MyModule do
+  def before_closing_head_tag(:html, name) do
+    # ...
+  end
+
+  def before_closing_head_tag(:epub, name) do
+    # ...
+  end
+
+  def before_closing_body_tag(:html, name) do
+    # ...
+  end
+
+  def before_closing_body_tag(:html, name) do
+    # ...
+  end
+end
 ```
 
 ### Rendering Math

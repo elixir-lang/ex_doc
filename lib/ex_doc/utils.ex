@@ -2,6 +2,28 @@ defmodule ExDoc.Utils do
   @moduledoc false
 
   @doc """
+  Runs the `before_closing_head_tag` callback.
+  """
+  def before_closing_head_tag(%{before_closing_head_tag: {m, f, a}}, module) do
+    apply(m, f, [module | a])
+  end
+
+  def before_closing_head_tag(%{before_closing_head_tag: before_closing_head_tag}, module) do
+    before_closing_head_tag.(module)
+  end
+
+  @doc """
+  Runs the `before_closing_body_tag` callback.
+  """
+  def before_closing_body_tag(%{before_closing_body_tag: {m, f, a}}, module) do
+    apply(m, f, [module | a])
+  end
+
+  def before_closing_body_tag(%{before_closing_body_tag: before_closing_body_tag}, module) do
+    before_closing_body_tag.(module)
+  end
+
+  @doc """
   HTML escapes the given string.
 
       iex> ExDoc.Utils.h("<foo>")
