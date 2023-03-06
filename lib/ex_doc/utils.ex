@@ -8,6 +8,11 @@ defmodule ExDoc.Utils do
     apply(m, f, [module | a])
   end
 
+  def before_closing_head_tag(%{before_closing_head_tag: before_closing_head_tag}, module)
+      when is_map(before_closing_head_tag) do
+    Map.get(before_closing_head_tag, module, "")
+  end
+
   def before_closing_head_tag(%{before_closing_head_tag: before_closing_head_tag}, module) do
     before_closing_head_tag.(module)
   end
@@ -17,6 +22,11 @@ defmodule ExDoc.Utils do
   """
   def before_closing_body_tag(%{before_closing_body_tag: {m, f, a}}, module) do
     apply(m, f, [module | a])
+  end
+
+  def before_closing_body_tag(%{before_closing_body_tag: before_closing_body_tag}, module)
+      when is_map(before_closing_body_tag) do
+    Map.get(before_closing_body_tag, module, "")
   end
 
   def before_closing_body_tag(%{before_closing_body_tag: before_closing_body_tag}, module) do
