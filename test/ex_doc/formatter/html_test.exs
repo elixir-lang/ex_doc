@@ -547,7 +547,28 @@ defmodule ExDoc.Formatter.HTMLTest do
       refute content_last =~ ~r{Next Page}
     end
 
-    test "before_closing_*_tags required by the user are placed in the right place",
+    test "before_closing_*_tags required by the user are placed in the right place using a map",
+         %{
+           tmp_dir: tmp_dir
+         } = context do
+      generate_docs(
+        doc_config(context,
+          before_closing_head_tag: %{html: "<meta name=StaticDemo>"},
+          before_closing_body_tag: %{html: "<p>StaticDemo</p>"},
+          extras: ["test/fixtures/README.md"]
+        )
+      )
+
+      content = File.read!(tmp_dir <> "/html/api-reference.html")
+      assert content =~ ~r[<meta name=StaticDemo>\s*</head>]
+      assert content =~ ~r[<p>StaticDemo</p>\s*</body>]
+
+      content = File.read!(tmp_dir <> "/html/readme.html")
+      assert content =~ ~r[<meta name=StaticDemo>\s*</head>]
+      assert content =~ ~r[<p>StaticDemo</p>\s*</body>]
+    end
+
+    test "before_closing_*_tags required by the user are placed in the right place using MFA",
          %{
            tmp_dir: tmp_dir
          } = context do
@@ -568,7 +589,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r[<p>Demo</p>\s*</body>]
     end
 
-    test "before_closing_*_tags required by the user are placed in the right place using MFA",
+    test "before_closing_*_tags required by the user are placed in the right place",
          %{
            tmp_dir: tmp_dir
          } = context do

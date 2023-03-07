@@ -248,6 +248,16 @@ docs: [
 ]
 ```
 
+Or you can pass a map where the key is the format:
+
+```elixir
+docs: [
+  # ...
+  before_closing_head_tag: %{html: "...", epub: "..."},
+  before_closing_body_tag: %{html: "...", epub: "..."}
+]
+```
+
 ### Rendering Math
 
 If you write TeX-style math in your Markdown, such as `$\sum_{i}^{N} x_i$`, it ends up as raw text on the generated pages. To render expressions, we recommend using [KaTeX](https://katex.org/), a JavaScript library that turns expressions into graphics. To load and trigger KaTeX on every documentation page, we can insert the following HTML:

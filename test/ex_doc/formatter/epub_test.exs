@@ -191,7 +191,26 @@ defmodule ExDoc.Formatter.EPUBTest do
     end
   end
 
-  test "before_closing_*_tags required by the user are in the right place using MFA",
+  test "before_closing_*_tags required by the user are in the right place using map",
+       %{tmp_dir: tmp_dir} = context do
+    generate_docs_and_unzip(
+      context,
+      doc_config(context,
+        before_closing_head_tag: %{epub: "<meta name=StaticDemo>"},
+        before_closing_body_tag: %{epub: "<p>StaticDemo</p>"}
+      )
+    )
+
+    oebps_dir = tmp_dir <> "/epub/OEBPS"
+
+    for basename <- @example_basenames do
+      content = File.read!(Path.join(oebps_dir, basename))
+      assert content =~ ~r[<meta name=StaticDemo>\s*</head>]
+      assert content =~ ~r[<p>StaticDemo</p>\s*</body>]
+    end
+  end
+
+  test "before_closing_*_tags required by the user are in the right place using a MFA",
        %{tmp_dir: tmp_dir} = context do
     generate_docs_and_unzip(
       context,
