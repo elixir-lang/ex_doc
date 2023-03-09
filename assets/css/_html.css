@@ -1,4 +1,5 @@
 @import '@fontsource/lato/300.css';
+@import '@fontsource/lato/400.css';
 @import '@fontsource/lato/700.css';
 @import '@fontsource/merriweather/300.css';
 @import '@fontsource/merriweather/300-italic.css';
@@ -39,4 +40,10 @@
 body:not(.dark) .content-inner img[src*="#gh-dark-mode-only"],
 body.dark .content-inner img[src*="#gh-light-mode-only"] {
   display: none;
+}
+
+/* Improves consistency of type rendering across OSes; results in thinner type in Mac OS */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

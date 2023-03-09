@@ -124,7 +124,6 @@
 
 .sidebar .sidebar-listNav :is(li, li a) {
   text-transform: uppercase;
-  font-weight: 300;
   font-size: 14px;
   color: var(--sidebarMuted);
 }
@@ -353,7 +352,6 @@
 }
 
 .sidebar #full-list ul li {
-  font-weight: 300;
   line-height: 16px;
   padding: 0 8px;
   margin-right: 0;
