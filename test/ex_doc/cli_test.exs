@@ -140,6 +140,34 @@ defmodule ExDoc.CLITest do
       File.rm!("test.exs")
     end
 
+    test "switches take precedence over config" do
+      File.write!("test.exs", ~s([logo: "config_logo.png", formatters: ["html"]]))
+
+      {[{project, version, opts}], _io} =
+        run([
+          "ExDoc",
+          "--logo",
+          "opts_logo.png",
+          "1.2.3",
+          @ebin,
+          "-c",
+          "test.exs"
+        ])
+
+      assert project == "ExDoc"
+      assert version == "1.2.3"
+
+      assert Enum.sort(opts) == [
+               apps: [:ex_doc],
+               formatter: "html",
+               formatters: ["html"],
+               logo: "opts_logo.png",
+               source_beam: @ebin
+             ]
+    after
+      File.rm!("test.exs")
+    end
+
     test "missing" do
       assert_raise File.Error, fn ->
         run(["ExDoc", "1.2.3", @ebin, "-c", "test.exs"])

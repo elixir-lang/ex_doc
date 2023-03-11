@@ -92,9 +92,8 @@ defmodule ExDoc.CLI do
   defp merge_config(opts) do
     case Keyword.fetch(opts, :config) do
       {:ok, config} ->
-        opts
-        |> Keyword.delete(:config)
-        |> Keyword.merge(read_config(config))
+        opts_without_config = Keyword.delete(opts, :config)
+        Keyword.merge(read_config(config), opts_without_config)
 
       _ ->
         opts
