@@ -41,9 +41,3 @@ body:not(.dark) .content-inner img[src*="#gh-dark-mode-only"],
 body.dark .content-inner img[src*="#gh-light-mode-only"] {
   display: none;
 }
-
-/* Improves consistency of type rendering across OSes; results in thinner type in Mac OS */
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
