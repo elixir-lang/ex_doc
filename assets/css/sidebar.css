@@ -80,6 +80,9 @@
   line-height: 20px;
   color: var(--sidebarMuted);
 }
+.non-apple-os .sidebar .sidebar-projectVersion {
+  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
+}
 
 .sidebar .sidebar-projectVersionsDropdown {
   cursor: pointer;
@@ -127,6 +130,9 @@
   font-weight: 300;
   font-size: 14px;
   color: var(--sidebarMuted);
+}
+.non-apple-os .sidebar .sidebar-listNav :is(li, li a) {
+  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
 }
 
 .sidebar .sidebar-listNav li {
@@ -358,6 +364,9 @@
   padding: 0 8px;
   margin-right: 0;
   color: var(--sidebarAccentMain);
+}
+.non-apple-os .sidebar #full-list ul li {
+  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
 }
 
 .sidebar #full-list ul li.current-hash {
