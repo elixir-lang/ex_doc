@@ -140,7 +140,7 @@ defmodule ExDoc.Retriever do
       source_path: source_path,
       source_url: source_link(source, module_data.line),
       language: module_data.language,
-      annotations: List.wrap(metadata[:tags])
+      annotations: List.wrap(metadata[:tags]) ++ annotations_from_metadata(metadata)
     }
   end
 
@@ -345,16 +345,11 @@ defmodule ExDoc.Retriever do
   defp signature(list) when is_list(list), do: Enum.join(list, " ")
 
   defp annotations_from_metadata(metadata) do
-    annotations = []
-
-    annotations =
-      if since = metadata[:since] do
-        ["since #{since}" | annotations]
-      else
-        annotations
-      end
-
-    annotations
+    if since = metadata[:since] do
+      ["since #{since}"]
+    else
+      []
+    end
   end
 
   defp anno_line(line) when is_integer(line), do: abs(line)

@@ -22,7 +22,7 @@ defmodule ExDoc.ModuleNode do
             language: nil,
             annotations: []
 
-  @typep annotation :: atom()
+  @typep annotation :: atom() | String.t()
 
   @type t :: %__MODULE__{
           id: String.t(),
