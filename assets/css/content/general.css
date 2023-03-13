@@ -37,6 +37,10 @@
   font-weight: normal;
 }
 
+.content-inner h1 .note {
+  font-family: var(--monoFontFamily);
+}
+
 .content-inner h2 {
   font-size: 1.6em;
   margin: 1em 0 .5em;
