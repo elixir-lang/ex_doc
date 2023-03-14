@@ -93,10 +93,6 @@
   font-weight: normal;
 }
 
-.content-inner h1 .note {
-  float: right;
-}
-
 .content-inner blockquote {
   border-left: 3px solid var(--blockquoteBorder);
   position: relative;

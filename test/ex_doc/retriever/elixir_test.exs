@@ -391,5 +391,34 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert in_the_middle_2.defaults == []
       assert in_the_middle_3.defaults == []
     end
+
+    test "if @moduledoc has the :since attribute, it's applied to everything in the module", c do
+      elixirc(c, ~S"""
+      defmodule Mod do
+        @moduledoc since: "1.0.0"
+
+        @type t() :: :ok
+
+        def function(), do: :ok
+
+        defmacro macro(), do: :ok
+
+        @callback cb() :: :ok
+      end
+      """)
+
+      assert [%ExDoc.ModuleNode{} = mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+
+      assert [%ExDoc.TypeNode{id: "t:t/0", annotations: ["since 1.0.0"]}] = mod.typespecs
+
+      assert %ExDoc.FunctionNode{annotations: ["since 1.0.0"]} =
+               Enum.find(mod.docs, &(&1.id == "c:cb/0"))
+
+      assert %ExDoc.FunctionNode{annotations: ["since 1.0.0"]} =
+               Enum.find(mod.docs, &(&1.id == "function/0"))
+
+      assert %ExDoc.FunctionNode{annotations: ["since 1.0.0", "macro"]} =
+               Enum.find(mod.docs, &(&1.id == "macro/0"))
+    end
   end
 end
