@@ -11,7 +11,6 @@ defmodule ExDoc.Retriever.ElixirTest do
       defmodule Mod do
         @moduledoc "Mod docs."
         @moduledoc tags: :public
-        @moduledoc since: "0.15.0"
 
         @doc "function/0 docs."
         @spec function() :: atom()
@@ -38,7 +37,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                type: :module,
                typespecs: [],
                docs: [empty_doc_and_specs, function, macro],
-               annotations: [:public, "since 0.15.0"]
+               annotations: [:public]
              } = mod
 
       assert DocAST.to_string(mod.doc) == "<p>Mod docs.</p>"
@@ -48,7 +47,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                annotations: [],
                defaults: [],
                deprecated: nil,
-               doc_line: 6,
+               doc_line: 5,
                group: :Functions,
                id: "function/0",
                name: :function,
@@ -391,6 +390,35 @@ defmodule ExDoc.Retriever.ElixirTest do
       in_the_middle_3 = Enum.find(mod.docs, &(&1.id == "in_the_middle/3"))
       assert in_the_middle_2.defaults == []
       assert in_the_middle_3.defaults == []
+    end
+
+    test "if @moduledoc has the :since attribute, it's applied to everything in the module", c do
+      elixirc(c, ~S"""
+      defmodule Mod do
+        @moduledoc since: "1.0.0"
+
+        @type t() :: :ok
+
+        def function(), do: :ok
+
+        defmacro macro(), do: :ok
+
+        @callback cb() :: :ok
+      end
+      """)
+
+      assert [%ExDoc.ModuleNode{} = mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+
+      assert [%ExDoc.TypeNode{id: "t:t/0", annotations: ["since 1.0.0"]}] = mod.typespecs
+
+      assert %ExDoc.FunctionNode{annotations: ["since 1.0.0"]} =
+               Enum.find(mod.docs, &(&1.id == "c:cb/0"))
+
+      assert %ExDoc.FunctionNode{annotations: ["since 1.0.0"]} =
+               Enum.find(mod.docs, &(&1.id == "function/0"))
+
+      assert %ExDoc.FunctionNode{annotations: ["since 1.0.0", "macro"]} =
+               Enum.find(mod.docs, &(&1.id == "macro/0"))
     end
   end
 end

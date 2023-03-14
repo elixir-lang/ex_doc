@@ -140,7 +140,7 @@ defmodule ExDoc.Retriever do
       source_path: source_path,
       source_url: source_link(source, module_data.line),
       language: module_data.language,
-      annotations: List.wrap(metadata[:tags]) ++ annotations_from_metadata(metadata)
+      annotations: List.wrap(metadata[:tags])
     }
   end
 
@@ -197,13 +197,13 @@ defmodule ExDoc.Retriever do
          groups_for_docs,
          annotations_for_docs
        ) do
-    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
+    {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
     doc_line = anno_line(anno)
 
     annotations =
       annotations_for_docs.(metadata) ++
-        annotations_from_metadata(metadata) ++ function_data.extra_annotations
+        annotations_from_metadata(metadata, module_metadata) ++ function_data.extra_annotations
 
     line = function_data.line || doc_line
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
@@ -270,7 +270,7 @@ defmodule ExDoc.Retriever do
   defp get_callback(callback, source, groups_for_docs, module_data, annotations_for_docs) do
     callback_data = module_data.language.callback_data(callback, module_data)
 
-    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
+    {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{kind, name, arity}, anno, _signature, doc, metadata} = callback
     doc_line = anno_line(anno)
 
@@ -279,7 +279,7 @@ defmodule ExDoc.Retriever do
 
     annotations =
       annotations_for_docs.(metadata) ++
-        callback_data.extra_annotations ++ annotations_from_metadata(metadata)
+        callback_data.extra_annotations ++ annotations_from_metadata(metadata, module_metadata)
 
     doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
 
@@ -314,10 +314,10 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_type(type_entry, source, module_data) do
-    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
+    {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{_, name, arity}, anno, _signature, doc, metadata} = type_entry
     doc_line = anno_line(anno)
-    annotations = annotations_from_metadata(metadata)
+    annotations = annotations_from_metadata(metadata, module_metadata)
 
     type_data = module_data.language.type_data(type_entry, module_data)
     signature = signature(type_data.signature)
@@ -344,11 +344,12 @@ defmodule ExDoc.Retriever do
 
   defp signature(list) when is_list(list), do: Enum.join(list, " ")
 
-  defp annotations_from_metadata(metadata) do
-    if since = metadata[:since] do
-      ["since #{since}"]
-    else
-      []
+  defp annotations_from_metadata(metadata, module_metadata) do
+    # Give precedence to the function/callback/type metadata over the module metadata.
+    cond do
+      since = metadata[:since] -> ["since #{since}"]
+      since = module_metadata[:since] -> ["since #{since}"]
+      true -> []
     end
   end
 

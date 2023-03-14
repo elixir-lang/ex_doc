@@ -144,7 +144,7 @@ ExDoc supports metadata keys in your documentation.
 
 In Elixir, you can add metadata to modules and functions.
 
-For a module, use `@moduledoc`:
+For a module, use `@moduledoc`, which is equivalent to adding the annotation to everything inside the module (functions, macros, callbacks, types):
 
 ```elixir
 @moduledoc since: "1.10.0"
