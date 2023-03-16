@@ -57,13 +57,20 @@ defmodule ExDoc.Markdown.EarmarkTest do
       ```
       2
       ```
+
+      <!-- livebook:{"output":true} -->
+
+      ```mermaid
+      graph TD; A-->B;
+      ```
       """
 
       assert Markdown.to_ast(md, []) == [
                {:h1, [], ["Notebook"], %{}},
                {:h2, [], ["Example"], %{}},
                {:pre, [], [{:code, [class: "elixir"], ["1 + 1"], %{}}], %{}},
-               {:pre, [], [{:code, [class: "output"], ["2"], %{}}], %{}}
+               {:pre, [], [{:code, [class: "output"], ["2"], %{}}], %{}},
+               {:pre, [], [{:code, [class: "mermaid output"], ["graph TD; A-->B;"], %{}}], %{}}
              ]
     end
   end
