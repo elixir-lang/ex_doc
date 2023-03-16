@@ -135,6 +135,7 @@ defmodule ExDoc.Retriever do
       docs_groups: docs_groups,
       docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
       doc: moduledoc,
+      markdown: module_data.docs |> elem(4),
       doc_line: doc_line,
       typespecs: ExDoc.Utils.natural_sort_by(types, &"#{&1.name}/#{&1.arity}"),
       source_path: source_path,

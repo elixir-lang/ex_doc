@@ -205,6 +205,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:search), do: "search"
   defp sidebar_type(:cheatmd), do: "extras"
   defp sidebar_type(:livemd), do: "extras"
+  defp sidebar_type(:llmmd), do: "extras"
   defp sidebar_type(:extra), do: "extras"
 
   def asset_rev(output, pattern) do

@@ -37,6 +37,10 @@ defmodule ExDoc.Formatter.HTML do
         extras
       end
 
+    config = %{config | llm_spec_sheet: llm_spec_sheet(project_nodes)}
+
+    extras = [build_llm_spec_sheet() | extras]
+
     all_files =
       search_items ++
         static_files ++
@@ -203,6 +207,16 @@ defmodule ExDoc.Formatter.HTML do
     [search_items]
   end
 
+  defp llm_spec_sheet(project_nodes) do
+    project_nodes
+    |> Enum.map(fn
+      %{markdown: %{"en" => markdown}} -> markdown
+      _ -> ""
+    end)
+    |> Enum.filter(&(&1 != ""))
+    |> Enum.join("\n---\n")
+  end
+
   defp digest(content) do
     content
     |> :erlang.md5()
@@ -240,6 +254,8 @@ defmodule ExDoc.Formatter.HTML do
 
   defp extra_type(".cheatmd"), do: :cheatmd
   defp extra_type(".livemd"), do: :livemd
+  defp extra_type(".llmmd"), do: :llmmd
+
   defp extra_type(_), do: :extra
 
   defp copy_extras(config, extras) do
@@ -318,6 +334,18 @@ defmodule ExDoc.Formatter.HTML do
       source_url: nil,
       title: "API Reference",
       title_content: title_content
+    }
+  end
+
+  defp build_llm_spec_sheet() do
+    %{
+      content: "LLM Spec Sheet",
+      group: nil,
+      id: "llm-spec-sheet",
+      source_path: "spec_sheet.llmmd",
+      source_url: nil,
+      title: "LLM Spec Sheet",
+      title_content: "LLM Spec Sheet"
     }
   end
 

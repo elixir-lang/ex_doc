@@ -27,7 +27,13 @@
   </div>
 <% end %>
 
-<%= link_headings(node.content) %>
+<%= if type == :llmmd do %>
+  <pre>
+    <code class="makeup" translate="no"><%= config.llm_spec_sheet %></code>
+  </pre>
+<%= else %>
+  <%= link_headings(node.content) %>
+<% end %>
 
 <div class="bottom-actions">
   <div class="bottom-actions-item">
