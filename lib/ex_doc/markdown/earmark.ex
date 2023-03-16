@@ -81,9 +81,14 @@ defmodule ExDoc.Markdown.Earmark do
          ],
          acc
        ) do
-    code_attrs = Enum.reject(code_attrs, &match?({"class", _}, &1))
-    new_code = {"code", [{"class", "output"} | code_attrs], [source], code_meta}
-    fixup_list([{"pre", pre_attrs, [new_code], pre_meta} | ast], acc)
+    code_attrs =
+      case Enum.split_with(code_attrs, &match?({"class", _}, &1)) do
+        {[], attrs} -> [{"class", "output"} | attrs]
+        {[{"class", class}], attrs} -> [{"class", "#{class} output"} | attrs]
+      end
+
+    code_node = {"code", code_attrs, [source], code_meta}
+    fixup_list([{"pre", pre_attrs, [code_node], pre_meta} | ast], acc)
   end
 
   defp fixup_list([head | tail], acc) do
