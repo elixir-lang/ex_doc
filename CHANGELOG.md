@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.29.3 (2023-03-17)
+
+  * Enhancements
+    * Propagate `:since` metadata from modules
+    * Add support for MFAs and maps in `before_closing_body_tag` and `before_closing_head_tag`
+
+  * Bug fixes
+    * Improve font consistency across different OSes
+    * Keep language class on livebook output code block
+    * Ensure switches have higher precedence than config
+
 ## v0.29.2 (2023-03-02)
 
   * Enhancements
