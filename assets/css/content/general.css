@@ -66,7 +66,6 @@
   transition: color .3s ease-in-out;
   background-color: transparent;
   cursor: pointer;
-  padding: 0 0 0 6px;
 }
 .content-inner button.icon-action {
   margin-top: 12px;
