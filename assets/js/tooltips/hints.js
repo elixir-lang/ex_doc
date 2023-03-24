@@ -154,7 +154,7 @@ export function extractFunctionHint (element) {
   const title = heading.textContent
 
   const firstParagraph = element.querySelector('.docstring > p')
-  const description = firstParagraph ? firstParagraph.textContent : ''
+  const description = firstParagraph ? firstParagraph.innerHTML : ''
 
   return {
     kind: HINT_KIND.function,
@@ -174,7 +174,7 @@ export function extractModuleHint (content) {
   const title = heading.textContent
 
   const firstParagraph = content.querySelector('#moduledoc p')
-  const description = firstParagraph ? firstParagraph.textContent : ''
+  const description = firstParagraph ? firstParagraph.innerHTML : ''
 
   return {
     kind: HINT_KIND.module,

@@ -28,7 +28,7 @@ describe('hints extraction', () => {
 
     it('extracts hint info', () => {
       expect(extractModuleHint(modulePageObject).title).to.eql('Some module')
-      expect(extractModuleHint(modulePageObject).description).to.eql('Module description here')
+      expect(extractModuleHint(modulePageObject).description).to.eql('Module <strong>description</strong> here')
       expect(extractModuleHint(modulePageObject).kind).to.eql('module')
     })
   })
