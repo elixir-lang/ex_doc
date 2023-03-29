@@ -34,9 +34,9 @@
       <a href="<%= url %>" class="sidebar-projectName" translate="no">
         <%= config.project %>
       </a>
-      <strong class="sidebar-projectVersion" translate="no">
+      <div class="sidebar-projectVersion" translate="no">
         v<%= config.version %>
-      </strong>
+      </div>
     </div>
     <ul class="sidebar-listNav">
       <li><a id="extras-list-link" href="#full-list"><%= config.extra_section || "Pages" %></a></li>

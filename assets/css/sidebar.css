@@ -94,7 +94,7 @@
   -webkit-appearance: none;
   appearance: none;
   background-color: transparent;
-  color: var(--sidebarHover);
+  color: var(--sidebarMuted);
   z-index: 2;
 }
 
@@ -113,7 +113,7 @@
   content: "\25bc";
   z-index: 1;
   font-size: 8px;
-  color: var(--sidebarHover);
+  color: var(--sidebarMuted);
 }
 
 .sidebar .sidebar-projectVersionsDropdown::-ms-expand {
