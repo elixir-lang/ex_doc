@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.29.4 (2023-03-29)
+
+  * Bug fixes
+    * Fix sidebar element with no children taking additional padding
+    * Fix elements being rendered too thick on macOS
+    * Fix rendering of HTML elements inside tooltips
+
 ## v0.29.3 (2023-03-17)
 
   * Enhancements
