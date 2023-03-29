@@ -1,11 +1,16 @@
 .sidebar {
   font-family: var(--sansFontFamily);
   font-size: 16px;
+  font-weight: 300;
   line-height: 18px;
   background-color: var(--sidebarBackground);
   color: var(--sidebarAccentMain);
   overflow: hidden;
   scrollbar-color: var(--sidebarScrollbarThumb) var(--sidebarScrollbarTrack);
+}
+
+.non-apple-os .sidebar {
+  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
 }
 
 .sidebar .gradient {
@@ -75,13 +80,9 @@
   position: relative;
   margin: 0;
   padding: 0;
-  font-weight: 300;
   font-size: 16px;
   line-height: 20px;
   color: var(--sidebarMuted);
-}
-.non-apple-os .sidebar .sidebar-projectVersion {
-  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
 }
 
 .sidebar .sidebar-projectVersionsDropdown {
@@ -127,12 +128,8 @@
 
 .sidebar .sidebar-listNav :is(li, li a) {
   text-transform: uppercase;
-  font-weight: 300;
   font-size: 14px;
   color: var(--sidebarMuted);
-}
-.non-apple-os .sidebar .sidebar-listNav :is(li, li a) {
-  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
 }
 
 .sidebar .sidebar-listNav li {
@@ -299,7 +296,7 @@
   text-transform: uppercase;
   font-weight: bold;
   font-size: .8em;
-  margin: 2em 0 0;
+  margin: 1.5em 0 0;
   line-height: 1.8em;
   color: var(--sidebarSubheadings);
   padding-left: 15px;
@@ -364,9 +361,6 @@
   padding: 0 8px;
   margin-right: 0;
   color: var(--sidebarAccentMain);
-}
-.non-apple-os .sidebar #full-list ul li {
-  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
 }
 
 .sidebar #full-list ul li.current-hash {

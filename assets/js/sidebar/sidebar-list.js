@@ -50,6 +50,7 @@ function renderSidebarNodeList (nodesByType, type) {
       if (emptyExpand.classList.contains('expand')) {
         emptyExpand.classList.remove('expand')
       }
+      list.remove()
     }
   })
 
