@@ -1,9 +1,12 @@
 let toastTimer = null
 const toast = document.getElementById('toast')
-toast.addEventListener('click', (event) => {
-  clearTimeout(toastTimer)
-  event.target.classList.remove('show')
-})
+
+if (toast) {
+  toast.addEventListener('click', (event) => {
+    clearTimeout(toastTimer)
+    event.target.classList.remove('show')
+  })
+}
 
 export function showToast (message) {
   if (toast) {
