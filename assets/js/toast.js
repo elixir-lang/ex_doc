@@ -1,7 +1,9 @@
 let toastTimer = null
-const toast = document.getElementById('toast')
+let toast = null
 
-if (toast) {
+export function initialize () {
+  toast = document.getElementById('toast')
+
   toast.addEventListener('click', (event) => {
     clearTimeout(toastTimer)
     event.target.classList.remove('show')
@@ -16,7 +18,6 @@ export function showToast (message) {
 
     toastTimer = setTimeout(() => {
       toast.classList.remove('show')
-      // wait for transition animation
       toastTimer = setTimeout(function () { toast.innerText = '' }, 1000)
     }, 5000)
   }
