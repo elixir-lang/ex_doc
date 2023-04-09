@@ -279,7 +279,7 @@ If you write TeX-style math in your Markdown, such as `$\sum_{i}^{N} x_i$`, it e
   });"></script>
 </script>
 ```
-`
+
 For more details and configuration options, see the [KaTeX Auto-render Extension](https://katex.org/docs/autorender.html).
 
 ### Rendering Vega-Lite plots
