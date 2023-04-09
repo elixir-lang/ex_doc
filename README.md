@@ -270,13 +270,7 @@ If you write TeX-style math in your Markdown, such as `$\sum_{i}^{N} x_i$`, it e
 <script src="https://cdn.jsdelivr.net/npm/katex-copytex@1.0.2/dist/katex-copytex.min.js" crossorigin="anonymous"></script>
 
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
-  onload="renderMathInElement(document.body, {
-    delimiters: [
-        {left: '$$', right: '$$', display: true},
-        {left: '$', right: '$', display: false},
-    ],
-    throwOnError : false
-  });"></script>
+  onload="renderMathInElement(document.body)"></script>
 </script>
 ```
 
