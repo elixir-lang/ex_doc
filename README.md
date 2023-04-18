@@ -274,8 +274,7 @@ If you write TeX-style math in your Markdown, such as `$\sum_{i}^{N} x_i$`, it e
     delimiters: [
       {left: '$$', right: '$$', display: true},
       {left: '$', right: '$', display: false},
-    ],
-    throwOnError : false
+    ]
   });"></script>
 </script>
 ```
