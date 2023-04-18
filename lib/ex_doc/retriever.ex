@@ -75,7 +75,7 @@ defmodule ExDoc.Retriever do
             docs
 
           {:error, reason} ->
-            IO.warn("skipping module #{inspect(module)}, reason: #{reason}", [])
+            IO.warn("skipping docs for module #{inspect(module)}, reason: #{reason}", [])
             false
         end
 
