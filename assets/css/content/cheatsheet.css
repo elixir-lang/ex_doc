@@ -98,7 +98,7 @@
 
 .page-cheatmd .content-inner .h2 p > code {
   color: #eb5757;
-  border-radius: 3px;
+  border-radius: var(--borderRadius);
   padding: .2em .4em;
 }
 
@@ -162,7 +162,7 @@
 
 .page-cheatmd .content-inner .h2 td code {
   color: #eb5757;
-  border-radius: 3px;
+  border-radius: var(--borderRadius);
   padding: .2em .4em;
 }
 
@@ -200,7 +200,7 @@
 
 .page-cheatmd .content-inner .h2 li > code {
   color: #eb5757;
-  border-radius: 3px;
+  border-radius: var(--borderRadius);
   padding: .2em .4em;
 }
 
