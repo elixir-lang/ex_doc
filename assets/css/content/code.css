@@ -12,7 +12,7 @@
 .content-inner code {
   background-color: var(--codeBackground);
   vertical-align: baseline;
-  border-radius: 2px;
+  border-radius: var(--borderRadius);
   padding: .1em .2em;
   border: 1px solid var(--codeBorder);
   text-transform: none;
@@ -72,7 +72,7 @@
   background-color: var(--codeBackground);
   border: 1px solid var(--codeBorder);
   border-bottom: 0;
-  border-radius: 2px;
+  border-radius: var(--borderRadius);
 }
 
 @media screen and (max-width: 768px) {

@@ -99,7 +99,7 @@
   padding: 0 1.2rem;
   overflow: auto;
   background-color: var(--blockquoteBackground);
-  border-radius: 3px;
+  border-radius: var(--borderRadius);
 }
 .content-inner blockquote p:last-child {
   padding-bottom: 1em;
