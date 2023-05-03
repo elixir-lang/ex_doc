@@ -360,6 +360,10 @@
   color: var(--sidebarAccentMain);
 }
 
+.non-apple-os .sidebar #full-list ul li {
+  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
+}
+
 .sidebar #full-list ul li.current-hash {
   color: var(--sidebarActiveItem);
 }
