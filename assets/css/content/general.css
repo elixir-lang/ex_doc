@@ -52,6 +52,7 @@
 .content-inner :is(a, .a-main) {
   color: var(--links);
   text-decoration: underline;
+  text-decoration-color: var(--linksDecoration);
   text-decoration-skip-ink: auto;
 }
 .content-inner :is(a:visited, .a-main:visited) {

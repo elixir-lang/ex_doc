@@ -10,6 +10,7 @@ body.dark {
   --linksVisited:                var(--gray100);
   --linksNoUnderline:            var(--main-lightened-10);
   --linksNoUnderlineVisited:     var(--main-lightened-05);
+  --linksDecoration:             var(--gray500);
 
   --iconAction:                  var(--coldGray-lightened-10);
   --iconActionHover:             var(--white);
