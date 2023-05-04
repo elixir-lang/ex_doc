@@ -235,7 +235,7 @@ io:fwrite("Hello, world!\n").
 ---
 {: .tabs-close}
 
-Below is the example's source, showing the tabset syntax. `h3` headings indicate a new tab panel and are used as the tab button labels.
+Below is the example's source, showing the tabset syntax. You must define all tabs between horizontal rules (`---`). The opening and closing rules must be followed by a newline and `{: .tags-open}` and `{: .tags-close}` respectively. `h3` headings indicate a new tab panel and are used as the tab button labels.
 
 ````markdown
 ---
