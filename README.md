@@ -211,6 +211,52 @@ For example, if you change the class name to `neutral`, you get the same admonit
 >
 > This syntax will render an error block
 
+## Tabsets
+
+Where only one section of content from a series is likely to apply to the reader, you may wish to define a set of tabs to be be displayed accordingly in the HTML format.
+
+This example contains code blocks, separating them into tabs by language:
+
+---
+{: .tabs-open}
+
+### Elixir
+
+```elixir
+IO.puts "Hello, world!"
+```
+
+### Erlang
+
+```erlang
+io:fwrite("Hello, world!\n").
+```
+
+---
+{: .tabs-close}
+
+Below is the example's source, showing the tabset syntax. `h3` headings indicate a new tab panel and are used as the tab button labels.
+
+````markdown
+---
+{: .tabs-open}
+
+### Elixir
+
+```elixir
+IO.puts "Hello, world!"
+```
+
+### Erlang
+
+```erlang
+io:fwrite("hello, world!\n").
+```
+
+---
+{: .tabs-close}
+````
+
 ## Extensions
 
 ExDoc renders Markdown content for you, but you can extend it to render complex objects on the page using JavaScript. To inject custom JavaScript into every page, add this to your configuration:
