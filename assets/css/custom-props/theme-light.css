@@ -60,9 +60,9 @@
   --success:                     var(--green);
 
   --sidebarButtonBackground:     linear-gradient(180deg,
-                                                 var(--gray900) 20%,
-                                                 var(--gray900-opacity-50) 70%,
-                                                 var(--gray900-opacity-0) 100%);
+                                                 var(--white) 20%,
+                                                 var(--white-opacity-50) 70%,
+                                                 var(--white-opacity-0) 100%);
   --sidebarAccentMain:           var(--gray50);
   --sidebarBackground:           var(--gray800);
   --sidebarGradient:             linear-gradient(var(--sidebarBackground),
