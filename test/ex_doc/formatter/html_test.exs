@@ -406,7 +406,10 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "with html comments", %{tmp_dir: tmp_dir} = context do
-      generate_docs(doc_config(context, source_beam: "unknown", extras: ["test/fixtures/README.md"]))
+      generate_docs(
+        doc_config(context, source_beam: "unknown", extras: ["test/fixtures/README.md"])
+      )
+
       content = File.read!(tmp_dir <> "/html/readme.html")
       assert content =~ ~s(<!-- HTML comment -->)
     end
