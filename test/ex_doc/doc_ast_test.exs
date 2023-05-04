@@ -12,6 +12,19 @@ defmodule ExDoc.DocASTTest do
                [{:p, [], [{:strong, [], ["foo"], %{}}], %{}}]
     end
 
+    test "markdown comments" do
+      markdown = """
+      **foo**
+      <!-- bar -->
+      """
+
+      assert DocAST.parse!(markdown, "text/markdown") ==
+               [
+                 {:p, [], [{:strong, [], ["foo"], %{}}], %{}},
+                 {:comment, [], [" bar "], %{comment: true}}
+               ]
+    end
+
     test "markdown errors" do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert DocAST.parse!("`String.upcase", "text/markdown") ==

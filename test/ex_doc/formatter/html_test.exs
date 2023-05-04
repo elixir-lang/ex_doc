@@ -405,6 +405,12 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~s{<a href="https://github.com/elixir-lang/elixir/blob/main/test/fixtures/LivebookFile.livemd#L1" title="View Source"}
     end
 
+    test "with html comments", %{tmp_dir: tmp_dir} = context do
+      generate_docs(doc_config(context, source_beam: "unknown", extras: ["test/fixtures/README.md"]))
+      content = File.read!(tmp_dir <> "/html/readme.html")
+      assert content =~ ~s(<!-- HTML comment -->)
+    end
+
     test "without any other content", %{tmp_dir: tmp_dir} = context do
       generate_docs(doc_config(context, source_beam: "unknown", extras: @extras))
 

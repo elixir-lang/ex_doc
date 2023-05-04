@@ -26,7 +26,8 @@ defmodule ExDoc.Markdown.EarmarkTest do
     end
 
     test "comments" do
-      assert Markdown.to_ast("<!-- INCLUDE -->", []) == []
+      assert Markdown.to_ast("<!-- INCLUDE -->", []) ==
+               [{:comment, [], [" INCLUDE "], %{comment: true}}]
     end
 
     test "warnings" do

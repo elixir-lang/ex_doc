@@ -68,8 +68,8 @@ defmodule ExDoc.Markdown.Earmark do
     {fixup_tag(tag), Enum.map(attrs, &fixup_attr/1), fixup(ast), meta}
   end
 
-  defp fixup({:comment, _, _, _}) do
-    []
+  defp fixup({:comment, _, _, _} = comment) do
+    comment
   end
 
   # We are matching on Livebook outputs here, because we prune comments at this point

@@ -40,6 +40,10 @@ defmodule ExDoc.DocAST do
     fun.(list, result)
   end
 
+  def to_string({:comment, _attrs, inner, _meta} = ast, fun) do
+    fun.(ast, "<!--#{inner}-->")
+  end
+
   def to_string({tag, attrs, _inner, _meta} = ast, fun) when tag in @void_elements do
     result = "<#{tag}#{ast_attributes_to_string(attrs)}/>"
     fun.(ast, result)
