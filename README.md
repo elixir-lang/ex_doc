@@ -213,12 +213,11 @@ For example, if you change the class name to `neutral`, you get the same admonit
 
 ## Tabsets
 
-Where only one section of content from a series is likely to apply to the reader, you may wish to define a set of tabs to be be displayed accordingly in the HTML format.
+Where only one section of content of a series is likely to apply to the reader, you may wish to define a set of tabs.
 
-This example contains code blocks, separating them into tabs by language:
+This example contains code blocks, separating them into tabs based on language:
 
----
-{: .tabs-open}
+<!--  tabs-open -->
 
 ### Elixir
 
@@ -232,14 +231,14 @@ IO.puts "Hello, world!"
 io:fwrite("Hello, world!\n").
 ```
 
----
-{: .tabs-close}
+<!-- tabs-close -->
 
-Below is the example's source, showing the tabset syntax. You must define all tabs between horizontal rules (`---`). The opening and closing rules must be followed by a newline and `{: .tags-open}` and `{: .tags-close}` respectively. `h3` headings indicate a new tab panel and are used as the tab button labels.
+Tabbed content must be defined between `<!-- tabs-open -->` and `<!-- tabs-close -->` HTML comments. Each `h3` heading results in a new tab panel, with its text setting the tab button label.
+
+Here is the above example's source:
 
 ````markdown
----
-{: .tabs-open}
+<!-- tabs-open -->
 
 ### Elixir
 
@@ -253,8 +252,7 @@ IO.puts "Hello, world!"
 io:fwrite("hello, world!\n").
 ```
 
----
-{: .tabs-close}
+<!-- tabs-close -->
 ````
 
 ## Extensions

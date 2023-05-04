@@ -1,66 +1,88 @@
-import { qsAll } from './helpers'
-
-const TABSET_OPEN_SELECTOR = 'hr.tabs-open'
-const TABSET_CLOSE_SELECTOR = 'hr.tabs-close'
-const TABPANEL_HEADING_SELECTOR = 'h3'
+const CONTENT_CONTAINER_ID = 'content'
+const TABSET_OPEN_COMMENT = 'tabs-open'
+const TABSET_CLOSE_COMMENT = 'tabs-close'
+const TABPANEL_HEADING_NODENAME = 'H3'
 const TABSET_CONTAINER_CLASS = 'tabset'
 
 export function initialize () {
-  const tabsetOpeners = Array.from(qsAll(TABSET_OPEN_SELECTOR))
-  const tabsetContainers = tabsetOpeners.map(processTabset)
-  tabsetContainers.forEach((set) => activateTabset(set))
-  removeRules()
+  const tabSetOpeners = getTabSetOpeners()
+  const tabsetContainers = tabSetOpeners.map(processTabset)
+  tabsetContainers.forEach(set => activateTabset(set))
+}
+
+function getTabSetOpeners () {
+  const tabSetOpenersIterator = document.createNodeIterator(
+    document.getElementById(CONTENT_CONTAINER_ID),
+    NodeFilter.SHOW_COMMENT,
+    {
+      acceptNode (node) {
+        return node.nodeValue.trim() === TABSET_OPEN_COMMENT
+          ? NodeFilter.FILTER_ACCEPT
+          : NodeFilter.FILTER_REJECT
+      }
+    }
+  )
+
+  const tabSetOpeners = []
+  let opener
+  while ((opener = tabSetOpenersIterator.nextNode())) {
+    tabSetOpeners.push(opener)
+  }
+
+  return tabSetOpeners
 }
 
 /**
  * Prepares data in HTML for the tabset template, wraps the tabset
  * elements to enable replacement with result of template,
- * and removes the open/close marker elements.
+ * and removes the open/close comment nodes.
  *
- * @param {Element} el A tabset open marker element.
+ * @param {Element} element A tabset opener comment node.
+ * @param {Integer} tabSetIndex
+ * @param {Array} array
  * @returns {Array} Structured tabset data.
  */
-function processTabset (el, index, _array) {
-  const setElements = []
-  const set = []
-  const panel = {
+function processTabset (element, tabSetIndex, _array) {
+  const setNodes = []
+  const tabSet = []
+  const tabPanel = {
     label: '',
     content: []
   }
 
-  while ((el = el.nextElementSibling)) {
-    if (el.matches(TABSET_CLOSE_SELECTOR)) {
-      pushPanel(panel, set, index)
+  while ((element = element.nextSibling)) {
+    if (isTabSetCloser(element)) {
+      pushPanel(tabPanel, tabSet, tabSetIndex)
       break
     }
 
-    setElements.push(el)
+    setNodes.push(element)
 
-    if (el.matches(TABPANEL_HEADING_SELECTOR)) {
-      pushPanel(panel, set, index)
-      panel.label = el.innerText
-      panel.content = []
+    if (element.nodeName === TABPANEL_HEADING_NODENAME) {
+      pushPanel(tabPanel, tabSet, tabSetIndex)
+      tabPanel.label = element.innerText
+      tabPanel.content = []
     } else {
-      panel.content.push(el.outerHTML)
+      tabPanel.content.push(element.outerHTML)
     }
   }
 
-  // Wrap tabset elements in new tabset div
   const wrapper = document.createElement('div')
   wrapper.className = TABSET_CONTAINER_CLASS
-  wrapElements(setElements, wrapper)
+  wrapElements(setNodes, wrapper)
 
-  wrapper.innerHTML = Handlebars.templates.tabset({tabs: set})
+  wrapper.innerHTML = Handlebars.templates.tabset({tabs: tabSet})
 
   return wrapper
 }
 
 /**
- * Removes opening and closing horizontal rule elements
+ * Determines whether or not a DOM node is treated as a tabset closer marker.
+ * @param {Node} node A DOM node.
+ * @returns {Boolean}
  */
-function removeRules () {
-  const tabsetRules = qsAll(`${TABSET_OPEN_SELECTOR}, ${TABSET_CLOSE_SELECTOR}`)
-  tabsetRules.forEach(rule => rule.remove())
+function isTabSetCloser (node) {
+  return node.nodeName === '#comment' && node.nodeValue.trim() === TABSET_CLOSE_COMMENT
 }
 
 /**
@@ -85,10 +107,10 @@ function pushPanel (panel, set, setIndex) {
  * @param {Element} wrapper The wrapping element.
  */
 function wrapElements (elements, wrapper) {
-  if (elements && elements.length) {
-    elements[0].parentNode.insertBefore(wrapper, elements[0])
-    elements.forEach((el) => wrapper.appendChild(el))
-  }
+  if (!elements || !elements.length) return false
+
+  elements[0].parentNode.insertBefore(wrapper, elements[0])
+  elements.forEach((el) => wrapper.appendChild(el))
 }
 
 /**
