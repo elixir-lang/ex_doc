@@ -10,6 +10,8 @@
 
 hello
 
+<!-- HTML comment -->
+
 ## more > than
 
 <p><strong>raw content</strong></p>
