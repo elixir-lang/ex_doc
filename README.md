@@ -12,11 +12,10 @@ To see all supported options, see the documentation for [mix docs](https://hexdo
 
 ExDoc ships with many features:
 
-  * Automatically generates HTML and EPUB documents from your API documentation.
+  * Automatically generates online- and offline-accessible HTML and EPUB documents from your API documentation.
   * Responsive design, covering phones and tablets.
   * Support for custom pages, guides, livebooks and cheatsheets.
   * Support for custom grouping of modules, functions, and pages in the sidebar.
-  * Generates HTML documentation, accessible online and offline.
   * Customizable logo.
   * A direct link back to the source code for every documented entity.
   * Full-text search.
@@ -24,7 +23,7 @@ ExDoc ships with many features:
   * Quick-search with autocompletion support. (`s` keyboard shortcut.)
   * Go-to shortcut with auto-complete to take the reader to any HexDocs package documentation. (`g` keyboard shortcut.)
   * Support for night mode, activated according to the browser preference.
-  * Tooltips for links to modules and functions, for the current project and other projects.
+  * Tooltips for links to modules and functions, both for the current project and other projects.
   * Version dropdown, automatically configured when hosted on HexDocs.
 
 ## Usage
@@ -102,13 +101,15 @@ You can use ExDoc via the command line.
    $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/dev/lib/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
    ```
 
-For example, here are some acceptable values:
+   Examples of appropriate values:
 
-    PROJECT_NAME    => Ecto
-    PROJECT_VERSION => 0.1.0
-    PROJECT_MODULE  => Ecto (the main module provided by the library)
-    GITHUB_USER     => elixir-lang
-    GITHUB_REPO     => ecto
+   ```plain
+   PROJECT_NAME    => Ecto
+   PROJECT_VERSION => 0.1.0
+   PROJECT_MODULE  => Ecto (the main module provided by the library)
+   GITHUB_USER     => elixir-lang
+   GITHUB_REPO     => ecto
+   ```
 
 ## Syntax highlighting
 
@@ -192,9 +193,11 @@ You may want to draw attention to certain statements by taking them out of the c
 
 The syntax is as follows:
 
-    > #### Error {: .error}
-    >
-    > This syntax will render an error block
+```markdown
+> #### Error {: .error}
+>
+> This syntax will render an error block
+```
 
 The result for the previous syntax is:
 
