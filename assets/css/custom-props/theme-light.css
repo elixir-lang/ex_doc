@@ -45,6 +45,12 @@
   --codeScrollThumb:             var(--gray400);
   --codeScrollBackground:        var(--codeBorder);
 
+  --tabBackground:               var(--white);
+  --tabBorder:                   var(--gray300);
+  --tabBorderTop:                var(--gray100);
+  --tab:                         var(--gray600);
+  --tabShadow:                   var(--gray25);
+
   --bottomActionsBtnBorder:      var(--black-opacity-10);
   --bottomActionsBtnSubheader:   var(--main-darkened-10);
 

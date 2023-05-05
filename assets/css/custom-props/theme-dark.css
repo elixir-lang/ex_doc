@@ -38,12 +38,18 @@ body.dark {
   --fnDeprecated:                var(--yellowDark);
   --blink:                       var(--gray600);
 
-  --codeBackground:              var(--gray800);
+  --codeBackground:              var(--gray850);
   --codeBorder:                  var(--gray700);
   --inlineCodeBackground:        var(--gray50);
   --inlineCodeBorder:            var(--gray100);
   --codeScrollThumb:             var(--gray500);
   --codeScrollBackground:        var(--codeBorder);
+
+  --tabBackground:               var(--gray900);
+  --tabBorder:                   var(--gray700);
+  --tabBorderTop:                var(--gray700);
+  --tab:                         var(--white);
+  --tabShadow:                   var(--black);
 
   --bottomActionsBtnBorder:      var(--white-opacity-10);
   --bottomActionsBtnSubheader:   var(--main);

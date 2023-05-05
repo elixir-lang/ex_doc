@@ -1,0 +1,20 @@
+<div role="tablist" class="tabset-tablist">
+  {{#each tabs}}
+    <button role="tab" id="tab-{{setIndex}}-{{@index}}" class="tabset-tab"
+    tabindex="{{#if @index}}-1{{else}}0{{/if}}"
+    aria-selected="{{#if @index}}false{{else}}true{{/if}}"
+    aria-controls="tabpanel-{{setIndex}}-{{@index}}">
+      {{this.label}}
+    </button>
+  {{/each}}
+</div>
+
+{{#each tabs}}
+  <div role="tabpanel" id="tabpanel-{{setIndex}}-{{@index}}" class="tabset-panel"
+    {{#if @index}}hidden{{/if}} tabindex="{{#if @index}}-1{{else}}0{{/if}}"
+    aria-labelledby="tab-{{setIndex}}-{{@index}}">
+    {{#each content}}
+      {{{this}}}
+    {{/each}}
+  </div>
+{{/each}}
