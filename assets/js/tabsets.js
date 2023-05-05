@@ -130,7 +130,7 @@ function wrapElements (elements, wrapper) {
  * @param {Element} set A processed tabset container element.
  */
 function activateTabset (set) {
-  // Register tab buttons and panels create initial state object.
+  // Register tab buttons and panels, and create initial state object.
   const state = {
     tabs: set.querySelectorAll(':scope [role="tab"]'),
     panels: set.querySelectorAll(':scope [role="tabpanel"]'),
