@@ -217,6 +217,11 @@
   width: 276px;
 }
 
+.sidebar .sidebar-search .search-input::placeholder {
+  color: var(--sidebarAccentMain);
+  opacity: 0.3;
+}
+
 .sidebar .sidebar-search .search-input:is(:focus, :hover) {
   outline: none;
 }
