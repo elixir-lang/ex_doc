@@ -217,7 +217,7 @@ Where only one section of content of a series is likely to apply to the reader, 
 
 This example contains code blocks, separating them into tabs based on language:
 
-<!--  tabs-open -->
+<!-- tabs-open -->
 
 ### Elixir
 

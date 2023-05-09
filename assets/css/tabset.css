@@ -23,6 +23,7 @@
   border-top-left-radius: var(--borderRadius);
   border-top-right-radius: var(--borderRadius);
   box-shadow: 0 -3px 4px var(--tabShadow) inset;
+  cursor: pointer;
 }
 
 .tabset-tab[aria-selected=true] {
