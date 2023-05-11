@@ -97,7 +97,12 @@ defmodule ExDoc.Mixfile do
           ExDoc.TypeNode
         ]
       ],
-      skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
+      skip_undefined_reference_warnings_on: [
+        "CHANGELOG.md",
+        "t:ExDoc.FunctionNode.t/0",
+        "t:ExDoc.ModuleNode.t/0",
+        "t:ExDoc.TypeNode.t/0"
+      ]
     ]
   end
 
