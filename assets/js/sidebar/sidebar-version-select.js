@@ -3,6 +3,7 @@ import { getVersionNodes } from '../globals'
 
 const VERSIONS_CONTAINER_SELECTOR = '.sidebar-projectVersion'
 const VERSIONS_DROPDOWN_SELECTOR = '.sidebar-projectVersionsDropdown'
+const VERSIONS_CURRENT_BUTTON = ".sidebar-projectLatestVersionButton"
 
 /**
  * Initializes selectable version list if `versionNodes` have been configured.
@@ -26,6 +27,7 @@ function renderVersionsDropdown ({ nodes }) {
   versionsContainer.innerHTML = versionsDropdownHtml
 
   qs(VERSIONS_DROPDOWN_SELECTOR).addEventListener('change', handleVersionSelected)
+  qs(VERSIONS_CURRENT_BUTTON).addEventListener('click', handleVersionSelected)
 }
 
 /**

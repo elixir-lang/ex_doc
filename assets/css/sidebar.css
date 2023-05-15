@@ -465,6 +465,20 @@
   color: var(--contrast);
 }
 
+.sidebar-projectLatestVersionButton {
+  border: none;
+  background-color: transparent;
+  color: var(--sidebarMuted);
+  padding-left: 10px;
+  text-align: left;
+  transition: color 150ms;
+}
+
+.sidebar-projectLatestVersionButton:hover {
+  color: var(--main);
+  cursor: pointer;
+}
+
 @media screen and (max-height: 500px) {
   .sidebar {
     overflow-y: auto;
