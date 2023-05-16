@@ -24,10 +24,13 @@ defmodule ExDoc.Mixfile do
 
   def application do
     [
-      extra_applications: [:eex, :crypto],
+      extra_applications: [:eex, :crypto] ++ extra_applications(Mix.env()),
       mod: {ExDoc.Application, []}
     ]
   end
+
+  defp extra_applications(:test), do: [:edoc, :xmerl]
+  defp extra_applications(_), do: []
 
   defp deps do
     [
