@@ -64,7 +64,9 @@ defmodule ExDoc.Language do
               %{
                 line: non_neg_integer() | nil,
                 specs: [spec_ast()],
-                doc_fallback: (() -> ExDoc.DocAST.t()) | nil,
+                # TODO: change to following on Elixir 1.15. It trips mix formatter between 1.14 and 1.15
+                # doc_fallback: (-> ExDoc.DocAST.t()) | nil,
+                doc_fallback: (... -> ExDoc.DocAST.t()) | nil,
                 extra_annotations: [String.t()]
               }
               | :skip
