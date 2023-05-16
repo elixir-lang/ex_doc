@@ -41,6 +41,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
     assert item["doc"] == ""
   end
 
+  @tag :otp_eep48
   test "Erlang module", c do
     [module] =
       erlc(c, :search_foo, """
