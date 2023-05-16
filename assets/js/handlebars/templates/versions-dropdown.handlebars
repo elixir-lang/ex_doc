@@ -6,7 +6,11 @@
       </option>
     {{/each}}
   </select>
-  {{#unless nodes.0.isCurrentVersion}}
-    <button type="button" class="sidebar-projectLatestVersionButton" value="{{nodes.0.version}}">Jump to Latest</button>
-  {{/unless}}
+  {{#each nodes}}
+    {{#if latest}}
+      {{#unless isCurrentVersion}}
+        <button type="button" class="sidebar-projectLatestVersionButton" value="{{url}}">Jump to Latest</button>
+      {{/unless}}
+    {{/if}}
+  {{/each}}
 </form>

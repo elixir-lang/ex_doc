@@ -27,7 +27,9 @@ function renderVersionsDropdown ({ nodes }) {
   versionsContainer.innerHTML = versionsDropdownHtml
 
   qs(VERSIONS_DROPDOWN_SELECTOR).addEventListener('change', handleVersionSelected)
-  qs(VERSIONS_CURRENT_BUTTON).addEventListener('click', handleVersionSelected)
+  if (qs(VERSIONS_CURRENT_BUTTON)) {
+    qs(VERSIONS_CURRENT_BUTTON).addEventListener('click', handleVersionSelected)
+  }
 }
 
 /**
@@ -35,11 +37,28 @@ function renderVersionsDropdown ({ nodes }) {
  */
 function decorateVersionNodes (nodes, currentVersion) {
   const withCurrentVersion = ensureCurrentVersionNode(nodes, currentVersion)
+  const withSingleLatest = ensureSingleLatestNode(withCurrentVersion)
 
-  return withCurrentVersion.map(node => ({
+  return withSingleLatest.map(node => ({
     ...node,
     isCurrentVersion: node.version === currentVersion
   }))
+}
+
+/**
+ * Ensures that the node list only has one entry with latest: true
+ */
+function ensureSingleLatestNode (nodes) {
+  var seenLatest = false
+
+  return nodes.map((node) => {
+    if (seenLatest){
+      return {...node, latest: false}
+    } else {
+      seenLatest = node.latest ? true : false
+      return {...node, latest: seenLatest}
+    }
+  })
 }
 
 /**

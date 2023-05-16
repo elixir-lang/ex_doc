@@ -280,6 +280,7 @@ defmodule Mix.Tasks.Docs do
     {
       version: "v0.0.0", // version number or name (required)
       url: "https://hexdocs.pm/ex_doc/0.19.3/" // documentation URL (required)
+      latest: true // Use for links to latest docs (optional)
     }
   ]
   ```
