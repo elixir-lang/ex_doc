@@ -2,7 +2,6 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
   @moduledoc false
 
   # TODO: It should not depend on the parent module
-  # TODO: Add tests that assert on the returned structured, not on JSON
   alias ExDoc.Formatter.HTML
 
   def create(nodes, extras) do
@@ -10,56 +9,79 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     ["searchNodes=" | ExDoc.Utils.to_json(items)]
   end
 
-  @h2_split_regex ~r/<h2\b.*?>/
-  @header_body_regex ~r/(?<header>.+)<\/h2>(?<body>.*)/s
-  defp extra(%{id: id, title: title, content: content}) do
-    [intro | sections] = Regex.split(@h2_split_regex, content)
-    intro_json_item = encode("#{id}.html", title, :extras, intro)
+  defp extra(map) do
+    [intro | sections] =
+      Regex.split(~r/## (?<header>\b.+)/, map.source, include_captures: true)
+
+    sections = Enum.chunk_every(sections, 2)
+
+    intro_json_item =
+      encode(
+        "#{map.id}.html",
+        map.title,
+        :extras,
+        String.trim(intro)
+      )
 
     section_json_items =
-      sections
-      |> Enum.map(&Regex.named_captures(@header_body_regex, &1))
-      |> Enum.map(&extra_section(title, &1["header"], &1["body"], id))
+      for [header, body] <- sections do
+        "## " <> header = header
+
+        encode(
+          "#{map.id}.html##{HTML.text_to_id(header)}",
+          "#{map.title} - " <> clean_doc(header),
+          :extras,
+          body
+        )
+      end
 
     [intro_json_item | section_json_items]
   end
 
-  defp extra_section(title, header, body, id) do
-    header = HTML.strip_tags(header)
+  defp module(%ExDoc.ModuleNode{} = node) do
+    source_doc =
+      node.doc_format == "text/markdown" && is_map(node.source_doc) && node.source_doc["en"]
 
-    encode(
-      "#{id}.html##{HTML.text_to_id(header)}",
-      "#{title} - #{header}",
-      :extras,
-      body
-    )
-  end
+    module =
+      encode(
+        "#{node.id}.html",
+        node.id,
+        node.type,
+        source_doc || node.rendered_doc
+      )
 
-  defp module(node = %ExDoc.ModuleNode{id: id, type: type, rendered_doc: doc}) do
-    module = encode("#{id}.html", id, type, doc)
-    functions = Enum.map(node.docs, &node_child(&1, id))
-    types = Enum.map(node.typespecs, &node_child(&1, id))
+    functions = Enum.map(node.docs, &node_child(&1, node))
+    types = Enum.map(node.typespecs, &node_child(&1, node))
     [module] ++ functions ++ types
   end
 
-  defp node_child(node, module) do
+  defp node_child(node, module_node) do
+    source_doc =
+      module_node.doc_format == "text/markdown" && is_map(node.source_doc) &&
+        node.source_doc["en"]
+
     encode(
-      "#{module}.html##{node.id}",
-      "#{module}.#{node.name}/#{node.arity}",
+      "#{module_node.id}.html##{node.id}",
+      "#{module_node.id}.#{node.name}/#{node.arity}",
       node.type,
-      node.rendered_doc
+      source_doc || node.rendered_doc
     )
   end
 
   defp encode(ref, title, type, doc) do
-    %{ref: URI.encode(ref), title: title, type: type, doc: clean_doc(doc)}
+    %{
+      ref: URI.encode(ref),
+      title: title,
+      type: type,
+      doc: clean_doc(doc)
+    }
   end
 
   defp clean_doc(doc) do
     doc
     |> Kernel.||("")
     |> HTML.strip_tags(" ")
-    |> String.replace(~r/\s+/, " ")
+    |> String.replace(~r/[ \t]+/, " ")
     |> String.trim()
   end
 end

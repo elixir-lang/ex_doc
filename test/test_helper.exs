@@ -39,6 +39,8 @@ defmodule TestHelper do
 
       File.rm_rf!(dir)
     end)
+
+    modules
   end
 
   def erlc(context, module, code, opts \\ []) do
@@ -71,7 +73,7 @@ defmodule TestHelper do
       edoc_to_chunk(module)
     end
 
-    :ok
+    [module]
   end
 
   if otp_eep48? do
@@ -86,6 +88,8 @@ defmodule TestHelper do
           layout: :edoc_layout_chunks,
           dir: dir ++ ~c"/doc"
         )
+
+      module
     end
   else
     def edoc_to_chunk(_) do

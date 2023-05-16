@@ -171,6 +171,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     [sections: sections]
   end
 
+  # TODO: split into sections in Formatter.HTML instead.
   @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
   defp extract_headers(content) do
     @h2_regex
