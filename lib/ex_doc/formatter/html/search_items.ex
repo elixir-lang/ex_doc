@@ -10,8 +10,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
   end
 
   defp extra(map) do
-    [intro | sections] =
-      Regex.split(~r/## (?<header>\b.+)/, map.source, include_captures: true)
+    [intro | sections] = Regex.split(~r/## (?<header>\b.+)/, map.source, include_captures: true)
 
     sections = Enum.chunk_every(sections, 2)
 
