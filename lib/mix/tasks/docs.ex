@@ -454,7 +454,7 @@ defmodule Mix.Tasks.Docs do
           app
         end
 
-      Keyword.put(options, :apps, apps)
+      Keyword.put(options, :apps, Enum.sort(apps))
     else
       Keyword.put(options, :apps, List.wrap(config[:app]))
     end
