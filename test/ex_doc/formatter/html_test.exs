@@ -169,17 +169,33 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   test "generates all listing files", %{tmp_dir: tmp_dir} = context do
     generate_docs(doc_config(context))
+    "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
 
-    content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
-    assert content =~ ~r{"id":"CompiledWithDocs",.*"title":"CompiledWithDocs"}ms
-    assert content =~ ~r("id":"CompiledWithDocs",.*"key":"functions".*"example/2")ms
-    assert content =~ ~r{"id":"CompiledWithDocs\.Nested",.*"title":"CompiledWithDocs\.Nested"}ms
-
-    assert content =~ ~r{"id":"CustomBehaviourOne",.*"title":"CustomBehaviourOne"}ms
-    assert content =~ ~r{"id":"CustomBehaviourTwo",.*"title":"CustomBehaviourTwo"}ms
-    assert content =~ ~r{"id":"RandomError",.*"title":"RandomError"}ms
-    assert content =~ ~r{"id":"CustomProtocol",.*"title":"CustomProtocol"}ms
-    assert content =~ ~r{"id":"Mix\.Tasks\.TaskWithDocs",.*"title":"mix task_with_docs"}ms
+    assert %{
+             "modules" => [
+               %{"id" => "CallbacksNoDocs"},
+               %{"id" => "Common.Nesting.Prefix.B.A"},
+               %{"id" => "Common.Nesting.Prefix.B.B.A"},
+               %{"id" => "Common.Nesting.Prefix.B.C"},
+               %{"id" => "Common.Nesting.Prefix.C"},
+               %{"id" => "CompiledWithDocs"},
+               %{"id" => "CompiledWithDocs.Nested"},
+               %{"id" => "CompiledWithoutDocs"},
+               %{"id" => "CustomBehaviourImpl"},
+               %{"id" => "CustomBehaviourOne"},
+               %{"id" => "CustomBehaviourTwo"},
+               %{"id" => "CustomProtocol"},
+               %{"id" => "DuplicateHeadings"},
+               %{"id" => "OverlappingDefaults"},
+               %{"id" => "TypesAndSpecs"},
+               %{"id" => "TypesAndSpecs.Sub"},
+               %{"id" => "Warnings"},
+               %{"id" => "RandomError"}
+             ],
+             "tasks" => [
+               %{"id" => "Mix.Tasks.TaskWithDocs", "title" => "mix task_with_docs"}
+             ]
+           } = Jason.decode!(content)
   end
 
   test "generates the api reference file", %{tmp_dir: tmp_dir} = context do
@@ -416,15 +432,24 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     test "without any other content", %{tmp_dir: tmp_dir} = context do
       generate_docs(doc_config(context, source_beam: "unknown", extras: @extras))
+      "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
 
-      content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
-      assert content =~ ~s("modules":[])
-
-      assert content =~
-               ~s("extras":[{"group":"","headers":[],"id":"api-reference","title":"API Reference"},)
-
-      assert content =~
-               ~s({"group":"","headers":[{"anchor":"heading-without-content","id":"Heading without content"},{"anchor":"header-sample","id":"Header sample"},{"anchor":"more-than","id":"more &gt; than"}],"id":"readme","title":"README"})
+      assert [
+               %{"id" => "api-reference"},
+               %{"id" => "license"},
+               %{"id" => "plaintext"},
+               %{"id" => "plaintextfiles"},
+               %{
+                 "id" => "readme",
+                 "headers" => [
+                   %{"anchor" => "heading-without-content", "id" => "Heading without content"},
+                   %{"anchor" => "header-sample", "id" => "Header sample"},
+                   %{"anchor" => "more-than", "id" => "more &gt; than"}
+                 ]
+               },
+               %{"id" => "livebookfile"},
+               %{"id" => "cheatsheets"}
+             ] = Jason.decode!(content)["extras"]
     end
 
     test "containing settext headers while discarding links on header",
@@ -436,14 +461,19 @@ defmodule ExDoc.Formatter.HTMLTest do
         )
       )
 
-      content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
+      "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
 
-      assert content =~
-               ~s("extras":[{"group":"","headers":[],"id":"api-reference","title":"API Reference"},)
-
-      assert content =~
-               ~s({"group":"","headers":[{"anchor":"section-one","id":"Section One"},{"anchor":"section-two","id":"Section Two"}],") <>
-                 ~s(id":"extrapagewithsettextheader","title":"Extra Page Title"}])
+      assert [
+               %{"id" => "api-reference"},
+               %{
+                 "id" => "extrapagewithsettextheader",
+                 "title" => "Extra Page Title",
+                 "headers" => [
+                   %{"anchor" => "section-one", "id" => "Section One"},
+                   %{"anchor" => "section-two", "id" => "Section Two"}
+                 ]
+               }
+             ] = Jason.decode!(content)["extras"]
     end
 
     test "with custom names", %{tmp_dir: tmp_dir} = context do
@@ -470,8 +500,14 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~
                ~R{<p>Read the <a href="linked-license.html">license</a> and the <a href="plain_text.html">plain-text file</a>.}
 
-      content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
-      assert content =~ ~r{"id":"linked-license","title":"LICENSE"}
+      "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
+
+      assert [
+               %{"id" => "api-reference"},
+               %{"id" => "plaintextfiles"},
+               %{"id" => "linked-license", "title" => "LICENSE"},
+               %{"id" => "plain_text"}
+             ] = Jason.decode!(content)["extras"]
     end
 
     test "with custom title", %{tmp_dir: tmp_dir} = context do
@@ -481,10 +517,18 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       content = File.read!(tmp_dir <> "/html/readme.html")
       assert content =~ ~r{<title>Getting Started — Elixir v1.0.1</title>}
-      content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
+      "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
 
-      assert content =~
-               ~r{"group":"","headers":\[[^\]]+\],"id":"readme","title":"Getting Started"}
+      assert [
+               %{"headers" => [%{"id" => "Modules"}, %{"id" => "Mix Tasks"}]},
+               %{
+                 "headers" => [
+                   %{"anchor" => "heading-without-content", "id" => "Heading without content"},
+                   %{"anchor" => "header-sample", "id" => "Header sample"},
+                   %{"anchor" => "more-than", "id" => "more &gt; than"}
+                 ]
+               }
+             ] = Jason.decode!(content)["extras"]
     end
 
     test "with custom groups", %{tmp_dir: tmp_dir} = context do
@@ -494,16 +538,24 @@ defmodule ExDoc.Formatter.HTMLTest do
       ]
 
       generate_docs(doc_config(context, extra_config))
-      content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
-      assert content =~ ~r{"group":"Intro","headers":\[[^\]]+\],"id":"readme","title":"README"}
+      "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
+
+      assert [
+               %{"group" => ""},
+               %{"group" => "Intro", "id" => "readme", "title" => "README"}
+             ] = Jason.decode!(content)["extras"]
     end
 
     test "with auto-extracted titles", %{tmp_dir: tmp_dir} = context do
       generate_docs(doc_config(context, extras: ["test/fixtures/ExtraPage.md"]))
       content = File.read!(tmp_dir <> "/html/extrapage.html")
       assert content =~ ~r{<title>Extra Page Title — Elixir v1.0.1</title>}
-      content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
-      assert content =~ ~r{"id":"extrapage","title":"Extra Page Title"}
+      "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
+
+      assert [
+               %{"id" => "api-reference"},
+               %{"id" => "extrapage"}
+             ] = Jason.decode!(content)["extras"]
     end
 
     test "without api-reference", %{tmp_dir: tmp_dir} = context do
