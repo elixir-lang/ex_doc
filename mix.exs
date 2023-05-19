@@ -39,7 +39,8 @@ defmodule ExDoc.Mixfile do
       {:makeup_erlang, "~> 0.1"},
       {:makeup_html, ">= 0.0.0", only: :dev},
       {:jason, "~> 1.2", only: :test},
-      {:floki, "~> 0.0", only: :test}
+      {:floki, "~> 0.0", only: :test},
+      {:easyhtml, "~> 0.0", only: :test}
     ]
   end
 

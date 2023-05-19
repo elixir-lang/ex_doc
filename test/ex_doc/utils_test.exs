@@ -61,32 +61,21 @@ defmodule ExDoc.UtilsTest do
   end
 
   test "to_json" do
-    assert %{
-             nil: nil,
-             true: true,
-             false: false,
-             atom: :hello,
-             string: "world",
-             string_with_quotes: "hello \" world",
-             list: [
-               %{foo: "bar"},
-               %{baz: "bat"}
-             ],
-             integer: 1
-           }
-           |> ExDoc.Utils.to_json()
-           |> IO.iodata_to_binary() == """
-           {\
-           "atom":"hello",\
-           "false":false,\
-           "integer":1,\
-           "list":[{"foo":"bar"},{"baz":"bat"}],\
-           "nil":null,\
-           "string":"world",\
-           "string_with_quotes":"hello \\" world",\
-           "true":true\
-           }\
-           """
+    map = %{
+      nil: nil,
+      true: true,
+      false: false,
+      atom: :hello,
+      string: "world",
+      string_with_quotes: "hello \" world",
+      list: [
+        %{foo: "bar"},
+        %{baz: "bat"}
+      ],
+      integer: 1
+    }
+
+    assert map |> ExDoc.Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(map)
   end
 
   test "source_url_pattern" do
