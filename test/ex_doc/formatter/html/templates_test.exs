@@ -265,14 +265,29 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "outputs listing for the given nodes", context do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
-      content = create_sidebar_items(%{modules: nodes}, [])
 
-      assert content =~ ~r("modules":\[\{.*"id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
-      assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example/2")ms
-      assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example_without_docs/0")ms
-      assert content =~ ~s("id":"CompiledWithDocs.Nested")
-      assert content =~ ~s("anchor":"__struct__/0","id":"%CompiledWithDocs{}")
-      assert content =~ ~s("anchor":"is_zero/1","id":"is_zero/1","title":"is_zero\(number\))
+      assert [
+               %{
+                 "id" => "CompiledWithDocs",
+                 "title" => "CompiledWithDocs",
+                 "nodeGroups" => [
+                   %{
+                     "key" => "functions",
+                     "nodes" => [
+                       %{"anchor" => "__struct__/0", "id" => "%CompiledWithDocs{}"},
+                       %{"anchor" => "example/2", "id" => "example/2"},
+                       %{"anchor" => "example_1/0", "id" => "example_1/0"},
+                       %{"anchor" => "example_with_h3/0", "id" => "example_with_h3/0"},
+                       %{"anchor" => "example_without_docs/0", "id" => "example_without_docs/0"},
+                       %{"anchor" => "flatten/1", "id" => "flatten/1"},
+                       %{"anchor" => "is_zero/1", "id" => "is_zero/1"},
+                       %{"anchor" => "name/with/slashes/0", "id" => "name/with/slashes/0"}
+                     ]
+                   }
+                 ]
+               },
+               %{"id" => "CompiledWithDocs.Nested"}
+             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
     end
 
     test "outputs nodes grouped based on metadata", context do
@@ -287,41 +302,95 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           )
         )
 
-      content = create_sidebar_items(%{modules: nodes}, [])
-
-      assert content =~
-               ~r("modules":\[\{"group":"","id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
-
-      assert content =~ ~r("key":"example-functions".*"example/2")ms
-      refute content =~ ~r("key":"legacy".*"example/2")ms
-      refute content =~ ~r("key":"functions".*"example/2")ms
-      assert content =~ ~r("key":"functions".*"example_1/0")ms
-      assert content =~ ~r("key":"legacy".*"example_without_docs/0")ms
+      assert [
+               %{
+                 "group" => "",
+                 "id" => "CompiledWithDocs",
+                 "nodeGroups" => [
+                   %{
+                     "key" => "example-functions",
+                     "nodes" => [
+                       %{"id" => "example/2"},
+                       %{"id" => "example_with_h3/0"}
+                     ]
+                   },
+                   %{
+                     "key" => "legacy",
+                     "nodes" => [%{"id" => "example_without_docs/0"}]
+                   },
+                   %{
+                     "key" => "functions",
+                     "nodes" => [
+                       %{"id" => "%CompiledWithDocs{}"},
+                       %{"id" => "example_1/0"},
+                       %{"id" => "flatten/1"},
+                       %{"id" => "is_zero/1"},
+                       %{"id" => "name/with/slashes/0"}
+                     ]
+                   }
+                 ]
+               },
+               %{"id" => "CompiledWithDocs.Nested"}
+             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
     end
 
     test "outputs module groups for the given nodes", context do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       group_mapping = [groups_for_modules: [Group: [CompiledWithDocs]]]
       nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(context, group_mapping))
-      content = create_sidebar_items(%{modules: nodes}, [])
 
-      assert content =~ ~r("group":"Group","id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
+      assert [
+               %{"group" => ""},
+               %{
+                 "group" => "Group",
+                 "id" => "CompiledWithDocs",
+                 "title" => "CompiledWithDocs"
+               }
+             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
     end
 
     test "outputs extras with headers" do
       item = %{content: nil, group: nil, id: nil, title: nil}
 
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"},{"anchor":"bar","id":"Bar"}],"id":"","title":""}]})
+      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}])["extras"] ==
+               [
+                 %{
+                   "group" => "",
+                   "headers" => [
+                     %{"anchor" => "foo", "id" => "Foo"},
+                     %{"anchor" => "bar", "id" => "Bar"}
+                   ],
+                   "id" => "",
+                   "title" => ""
+                 }
+               ]
 
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"},{"anchor":"bar","id":"Bar"}],"id":"","title":""}]})
+      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}])[
+               "extras"
+             ] ==
+               [
+                 %{
+                   "group" => "",
+                   "headers" => [
+                     %{"anchor" => "foo", "id" => "Foo"},
+                     %{"anchor" => "bar", "id" => "Bar"}
+                   ],
+                   "id" => "",
+                   "title" => ""
+                 }
+               ]
 
-      assert create_sidebar_items(%{}, [%{item | content: "<h2></h2><h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"bar","id":"Bar"}],"id":"","title":""}]})
-
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"}],"id":"","title":""}]})
+      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}])["extras"] ==
+               [
+                 %{
+                   "group" => "",
+                   "headers" => [
+                     %{"anchor" => "foo", "id" => "Foo"}
+                   ],
+                   "id" => "",
+                   "title" => ""
+                 }
+               ]
     end
 
     test "builds sections out of moduledocs", context do
@@ -330,34 +399,35 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       nodes = ExDoc.Retriever.docs_from_modules(names, config)
       nodes = HTML.render_all(nodes, ".html", config, [])
 
-      assert "sidebarNodes=" <> json = create_sidebar_items(%{modules: nodes}, [])
+      [compiled_with_docs, compiled_without_docs, duplicate_headings] =
+        create_sidebar_items(%{modules: nodes}, [])["modules"]
 
-      assert {:ok, %{modules: [compiled_with_docs, compiled_without_docs, duplicate_headings]}} =
-               Jason.decode(json, keys: :atoms)
-
-      assert compiled_with_docs.sections == [
+      assert compiled_with_docs["sections"] == [
                %{
-                 anchor: "module-example-unicode-escaping",
-                 id: "Example ☃ Unicode &gt; escaping"
+                 "anchor" => "module-example-unicode-escaping",
+                 "id" => "Example ☃ Unicode &gt; escaping"
                }
              ]
 
-      assert compiled_without_docs.sections == []
+      assert compiled_without_docs["sections"] == []
 
-      assert duplicate_headings.sections == [
-               %{anchor: "module-one", id: "One"},
-               %{anchor: "module-two", id: "Two"},
-               %{anchor: "module-one-1", id: "One"},
-               %{anchor: "module-two-1", id: "Two"},
-               %{anchor: "module-one-2", id: "One"},
-               %{anchor: "module-two-2", id: "Two"}
+      assert duplicate_headings["sections"] == [
+               %{"anchor" => "module-one", "id" => "One"},
+               %{"anchor" => "module-two", "id" => "Two"},
+               %{"anchor" => "module-one-1", "id" => "One"},
+               %{"anchor" => "module-two-1", "id" => "Two"},
+               %{"anchor" => "module-one-2", "id" => "One"},
+               %{"anchor" => "module-two-2", "id" => "Two"}
              ]
     end
 
     defp create_sidebar_items(nodes_map, extras) do
-      nodes_map
-      |> Templates.create_sidebar_items(extras)
-      |> IO.iodata_to_binary()
+      "sidebarNodes=" <> content =
+        nodes_map
+        |> Templates.create_sidebar_items(extras)
+        |> IO.iodata_to_binary()
+
+      Jason.decode!(content)
     end
   end
 
@@ -412,12 +482,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           ]
         )
 
-      assert content =~ ~r{id="example-functions".*href="#example-functions".*Example functions}ms
-      assert content =~ ~r{id="legacy".*href="#legacy".*Legacy}ms
-      assert content =~ ~r{id="example-functions".*id="example/2"}ms
-      refute content =~ ~r{id="legacy".*id="example/2"}ms
-      refute content =~ ~r{id="functions".*id="example/2"}ms
-      assert content =~ ~r{id="functions".*id="example_1/0"}ms
+      doc = EasyHTML.parse!(content)
+      assert doc["#example-functions a[href='#example-functions']"]
+      assert doc["#legacy a[href='#legacy']"]
+      assert doc["#example-functions [id='example/2']"]
+      refute doc["#legacy [id='example/2']"]
+      assert doc["#functions [id='example_1/0']"]
+      refute doc["#functions [id='example/2']"]
     end
 
     test "outputs deprecation information", context do
