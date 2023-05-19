@@ -61,20 +61,19 @@ defmodule ExDoc.UtilsTest do
   end
 
   test "to_json" do
-    map =
-      %{
-        nil: nil,
-        true: true,
-        false: false,
-        atom: :hello,
-        string: "world",
-        string_with_quotes: "hello \" world",
-        list: [
-          %{foo: "bar"},
-          %{baz: "bat"}
-        ],
-        integer: 1
-      }
+    map = %{
+      nil: nil,
+      true: true,
+      false: false,
+      atom: :hello,
+      string: "world",
+      string_with_quotes: "hello \" world",
+      list: [
+        %{foo: "bar"},
+        %{baz: "bat"}
+      ],
+      integer: 1
+    }
 
     assert map |> ExDoc.Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(map)
   end
