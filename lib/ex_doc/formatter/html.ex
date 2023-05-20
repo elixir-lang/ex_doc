@@ -366,16 +366,22 @@ defmodule ExDoc.Formatter.HTML do
   defp build_extra(input, id, title, groups, language, autolink_opts, source_url_pattern) do
     opts = [file: input, line: 1]
 
-    ast =
+    {source, ast} =
       case extension_name(input) do
         extension when extension in ["", ".txt"] ->
-          [{:pre, [], "\n" <> File.read!(input), %{}}]
+          source = File.read!(input)
+          ast = [{:pre, [], "\n" <> source, %{}}]
+          {source, ast}
 
         extension when extension in [".md", ".livemd", ".cheatmd"] ->
-          input
-          |> File.read!()
-          |> Markdown.to_ast(opts)
-          |> sectionize(extension)
+          source = File.read!(input)
+
+          ast =
+            source
+            |> Markdown.to_ast(opts)
+            |> sectionize(extension)
+
+          {source, ast}
 
         _ ->
           raise ArgumentError,
@@ -401,6 +407,7 @@ defmodule ExDoc.Formatter.HTML do
     source_url = Utils.source_url_pattern(source_url_pattern, source_path, 1)
 
     %{
+      source: source,
       content: content_html,
       group: group,
       id: id,

@@ -101,7 +101,7 @@ defmodule ExDoc.Retriever do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
-    {doc_line, moduledoc, metadata} = get_module_docs(module_data, source_path)
+    {doc_line, format, source_doc, doc, metadata} = get_module_docs(module_data, source_path)
 
     # TODO: The default function groups must be returned by the language
     groups_for_docs =
@@ -134,7 +134,9 @@ defmodule ExDoc.Retriever do
       deprecated: metadata[:deprecated],
       docs_groups: docs_groups,
       docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
-      doc: moduledoc,
+      doc_format: format,
+      doc: doc,
+      source_doc: source_doc,
       doc_line: doc_line,
       typespecs: ExDoc.Utils.natural_sort_by(types, &"#{&1.name}/#{&1.arity}"),
       source_path: source_path,
@@ -148,17 +150,17 @@ defmodule ExDoc.Retriever do
     DocAST.parse!(doc_content, format, options)
   end
 
-  defp doc_ast(_, _, _options) do
+  defp doc_ast(_format, _, _options) do
     nil
   end
 
   # Module Helpers
 
   defp get_module_docs(module_data, source_path) do
-    {:docs_v1, anno, _, content_type, moduledoc, metadata, _} = module_data.docs
+    {:docs_v1, anno, _, format, moduledoc, metadata, _} = module_data.docs
     doc_line = anno_line(anno)
     options = [file: source_path, line: doc_line + 1]
-    {doc_line, doc_ast(content_type, moduledoc, options), metadata}
+    {doc_line, format, moduledoc, doc_ast(format, moduledoc, options), metadata}
   end
 
   ## Function helpers
@@ -220,6 +222,7 @@ defmodule ExDoc.Retriever do
       arity: arity,
       deprecated: metadata[:deprecated],
       doc: doc_ast,
+      source_doc: doc_content,
       doc_line: doc_line,
       defaults: ExDoc.Utils.natural_sort_by(defaults, fn {name, arity} -> "#{name}/#{arity}" end),
       signature: signature(signature),
@@ -292,6 +295,7 @@ defmodule ExDoc.Retriever do
       arity: arity,
       deprecated: metadata[:deprecated],
       doc: doc_ast,
+      source_doc: doc,
       doc_line: doc_line,
       signature: signature,
       specs: specs,
@@ -332,6 +336,7 @@ defmodule ExDoc.Retriever do
       spec: type_data.spec,
       deprecated: metadata[:deprecated],
       doc: doc_ast,
+      source_doc: doc,
       doc_line: doc_line,
       signature: signature,
       source_path: source.path,
