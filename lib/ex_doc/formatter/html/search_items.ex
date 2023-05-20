@@ -19,7 +19,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
         "#{map.id}.html",
         map.title,
         :extras,
-        String.trim(intro)
+        clean_markdown(intro)
       )
 
     section_json_items =
@@ -28,9 +28,9 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
 
         encode(
           "#{map.id}.html##{HTML.text_to_id(header)}",
-          "#{map.title} - " <> clean_doc(header),
+          "#{map.title} - " <> clean_markdown(header),
           :extras,
-          body
+          clean_markdown(body)
         )
       end
 
@@ -38,15 +38,12 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
   end
 
   defp module(%ExDoc.ModuleNode{} = node) do
-    source_doc =
-      node.doc_format == "text/markdown" && is_map(node.source_doc) && node.source_doc["en"]
-
     module =
       encode(
         "#{node.id}.html",
         node.id,
         node.type,
-        source_doc || node.rendered_doc
+        search_doc(node.doc_format, node)
       )
 
     functions = Enum.map(node.docs, &node_child(&1, node))
@@ -55,15 +52,11 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
   end
 
   defp node_child(node, module_node) do
-    source_doc =
-      module_node.doc_format == "text/markdown" && is_map(node.source_doc) &&
-        node.source_doc["en"]
-
     encode(
       "#{module_node.id}.html##{node.id}",
       "#{module_node.id}.#{node.name}/#{node.arity}",
       node.type,
-      source_doc || node.rendered_doc
+      search_doc(module_node.doc_format, node)
     )
   end
 
@@ -72,15 +65,28 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
       ref: URI.encode(ref),
       title: title,
       type: type,
-      doc: clean_doc(doc)
+      doc: doc
     }
   end
 
-  defp clean_doc(doc) do
+  defp search_doc("text/markdown", %{source_doc: %{"en" => doc}}) do
+    clean_markdown(doc)
+  end
+
+  defp search_doc("application/erlang+html", %{rendered_doc: doc}) do
     doc
-    |> Kernel.||("")
     |> HTML.strip_tags(" ")
-    |> String.replace(~r/[ \t]+/, " ")
+    |> String.replace(~r/\s+/, " ")
+    |> String.trim()
+  end
+
+  defp search_doc(_format, _node) do
+    ""
+  end
+
+  defp clean_markdown(doc) do
+    doc
+    |> HTML.strip_tags(" ")
     |> String.trim()
   end
 end
