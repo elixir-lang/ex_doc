@@ -16,7 +16,7 @@ defmodule ExDoc.Formatter.HTML do
     config = %{config | output: Path.expand(config.output)}
 
     build = Path.join(config.output, ".build")
-    output_setup(build, config)
+    setup_output(config, &cleanup_output_dir/2, &create_output_dir/2)
 
     project_nodes = render_all(project_nodes, ".html", config, [])
     extras = build_extras(config, ".html")
@@ -146,29 +146,20 @@ defmodule ExDoc.Formatter.HTML do
     |> ExDoc.DocAST.highlight(language, opts)
   end
 
-  defp output_setup(build, config) do
-    safety_path = Path.join(config.output, ".ex_doc")
+  def setup_output(config, cleanup, create, root \\ nil) do
+    root = root || config.output
+    safety_path = Path.join(root, ".ex_doc")
 
     cond do
-      File.exists?(build) ->
-        build
-        |> File.read!()
-        |> String.split("\n", trim: true)
-        |> Enum.map(&Path.join(config.output, &1))
-        |> Enum.each(&File.rm/1)
+      File.exists?(safety_path) and File.exists?(root) ->
+        cleanup.(root, config)
 
-        File.rm(build)
-
-      File.exists?(safety_path) ->
-        File.rm_rf!(config.output)
-        mkdir_output!(config.output)
-
-      not File.exists?(config.output) ->
-        mkdir_output!(config.output)
+      not File.exists?(root) ->
+        create.(root, config)
 
       true ->
         raise """
-        ex_doc cannot output to #{config.output}:
+        ex_doc cannot output to #{root}:
         Directory already exists and is not managed by ex_doc.
 
         Try giving an unexisting directory as `--output`.
@@ -176,9 +167,26 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  defp mkdir_output!(path) do
-    File.mkdir_p!(path)
-    File.touch!(Path.join(path, ".ex_doc"))
+  defp create_output_dir(root, _config) do
+    File.mkdir_p!(root)
+    File.touch!(Path.join(root, ".ex_doc"))
+  end
+
+  defp cleanup_output_dir(docs_root, config) do
+    build = Path.join(docs_root, ".build")
+
+    if File.exists?(build) do
+      build
+      |> File.read!()
+      |> String.split("\n", trim: true)
+      |> Enum.map(&Path.join(docs_root, &1))
+      |> Enum.each(&File.rm/1)
+
+      File.rm(build)
+    else
+      File.rm_rf!(docs_root)
+      create_output_dir(docs_root, config)
+    end
   end
 
   defp generate_build(files, build) do
