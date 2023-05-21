@@ -6,6 +6,12 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   @moduletag :tmp_dir
 
+  setup %{tmp_dir: tmp_dir} do
+    output = tmp_dir <> "/html"
+    File.mkdir_p!(output)
+    File.touch!(output <> "/.ex_doc")
+  end
+
   defp read_wildcard!(path) do
     [file] = Path.wildcard(path)
     File.read!(file)
@@ -144,6 +150,18 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content_module =~ re[:module][:x_ua]
     refute content_module =~ re[:index][:title]
     refute content_module =~ re[:index][:refresh]
+  end
+
+  test "fails if trying to write to existing directory", context do
+    assert_raise RuntimeError, ~r/Directory already exists and is not managed by ex_doc/, fn ->
+      config = doc_config(context)
+
+      new_output = config[:output] <> "/new-dir"
+      File.mkdir_p!(new_output)
+
+      new_config = Keyword.put(config, :output, new_output)
+      generate_docs(new_config)
+    end
   end
 
   test "allows to set the authors of the document", %{tmp_dir: tmp_dir} = context do

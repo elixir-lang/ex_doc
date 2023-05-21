@@ -10,9 +10,9 @@ defmodule ExDoc.Formatter.EPUB do
   """
   @spec run(list, ExDoc.Config.t()) :: String.t()
   def run(project_nodes, config) when is_map(config) do
+    parent = config.output
     config = normalize_config(config)
-    File.rm_rf!(config.output)
-    File.mkdir_p!(Path.join(config.output, "OEBPS"))
+    setup_output(config, parent)
 
     project_nodes = HTML.render_all(project_nodes, ".xhtml", config, highlight_tag: "samp")
 
@@ -42,6 +42,32 @@ defmodule ExDoc.Formatter.EPUB do
     {:ok, epub} = generate_epub(config.output)
     File.rm_rf!(config.output)
     Path.relative_to_cwd(epub)
+  end
+
+  defp setup_output(config, parent) do
+    safety_path = Path.join(parent, ".ex_doc")
+
+    cond do
+      File.exists?(safety_path) ->
+        File.rm_rf!(config.output)
+        mkdir_output!(config.output, parent)
+
+      not File.exists?(parent) ->
+        mkdir_output!(config.output, parent)
+
+      true ->
+        raise """
+        ex_doc cannot output to #{config.output}:
+        Directory already exists and is not managed by ex_doc.
+
+        Try giving an unexisting directory as `--output`.
+        """
+    end
+  end
+
+  defp mkdir_output!(path, parent) do
+    File.mkdir_p!(Path.join(path, "OEBPS"))
+    File.touch!(Path.join(parent, ".ex_doc"))
   end
 
   defp normalize_config(config) do

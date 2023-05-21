@@ -147,18 +147,38 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp output_setup(build, config) do
-    if File.exists?(build) do
-      build
-      |> File.read!()
-      |> String.split("\n", trim: true)
-      |> Enum.map(&Path.join(config.output, &1))
-      |> Enum.each(&File.rm/1)
+    safety_path = Path.join(config.output, ".ex_doc")
 
-      File.rm(build)
-    else
-      File.rm_rf!(config.output)
-      File.mkdir_p!(config.output)
+    cond do
+      File.exists?(build) ->
+        build
+        |> File.read!()
+        |> String.split("\n", trim: true)
+        |> Enum.map(&Path.join(config.output, &1))
+        |> Enum.each(&File.rm/1)
+
+        File.rm(build)
+
+      File.exists?(safety_path) ->
+        File.rm_rf!(config.output)
+        mkdir_output!(config.output)
+
+      not File.exists?(config.output) ->
+        mkdir_output!(config.output)
+
+      true ->
+        raise """
+        ex_doc cannot output to #{config.output}:
+        Directory already exists and is not managed by ex_doc.
+
+        Try giving an unexisting directory as `--output`.
+        """
     end
+  end
+
+  defp mkdir_output!(path) do
+    File.mkdir_p!(path)
+    File.touch!(Path.join(path, ".ex_doc"))
   end
 
   defp generate_build(files, build) do
