@@ -343,13 +343,25 @@ defmodule ExDoc.Formatter.HTML do
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
     ]
 
-    config.extras
-    |> Task.async_stream(
-      &build_extra(&1, groups, language, autolink_opts, source_url_pattern),
-      timeout: :infinity
-    )
-    |> Enum.map(&elem(&1, 1))
+    extras =
+      config.extras
+      |> Task.async_stream(
+        &build_extra(&1, groups, language, autolink_opts, source_url_pattern),
+        timeout: :infinity
+      )
+      |> Enum.map(&elem(&1, 1))
+
+    ids_count = Enum.reduce(extras, %{}, &Map.update(&2, &1.id, 0, fn c -> c + 1 end))
+
+    extras
+    |> Enum.with_index(fn extra, idx ->
+      if ids_count[extra.id] > 1, do: disambiguate_id(extra, idx), else: extra
+    end)
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
+  end
+
+  defp disambiguate_id(extra, discriminator) do
+    Map.put(extra, :id, "#{extra.id}-#{discriminator}")
   end
 
   defp build_extra({input, options}, groups, language, autolink_opts, source_url_pattern) do
