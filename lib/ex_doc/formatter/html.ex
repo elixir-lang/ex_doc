@@ -351,7 +351,7 @@ defmodule ExDoc.Formatter.HTML do
       )
       |> Enum.map(&elem(&1, 1))
 
-    ids_count = Enum.reduce(extras, %{}, &Map.update(&2, &1.id, 0, fn c -> c + 1 end))
+    ids_count = Enum.reduce(extras, %{}, &Map.update(&2, &1.id, 1, fn c -> c + 1 end))
 
     extras
     |> Enum.with_index(fn extra, idx ->
