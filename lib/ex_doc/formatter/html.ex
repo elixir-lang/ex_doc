@@ -354,9 +354,14 @@ defmodule ExDoc.Formatter.HTML do
     ids_count = Enum.reduce(extras, %{}, &Map.update(&2, &1.id, 1, fn c -> c + 1 end))
 
     extras
-    |> Enum.with_index(fn extra, idx ->
-      if ids_count[extra.id] > 1, do: disambiguate_id(extra, idx + 1), else: extra
+    |> Enum.map_reduce(1, fn extra, idx ->
+      if ids_count[extra.id] > 1 do 
+        {disambiguate_id(extra, idx), idx + 1}
+      else
+        {extra, idx}
+      end
     end)
+    |> elem(0)
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end
 
