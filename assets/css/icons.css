@@ -23,6 +23,7 @@
   --icon-double-quotes-l: "\ec51";
   --icon-link-m: "\eeaf";
   --icon-close-line: "\eb99";
+  --icon-external: "\ecaf";
   --icon-code-s-slash-line: "\ebad";
   --icon-menu-line: "\ef3e";
   --icon-search-2-line: "\f0cd";
@@ -43,6 +44,7 @@
 .ri-close-line:before { content: var(--icon-close-line); }
 .ri-link-m:before { content: var(--icon-link-m); }
 .ri-code-s-slash-line:before { content: var(--icon-code-s-slash-line); }
+.ri-external-link-line:before { content: var(--icon-external); }
 .ri-error-warning-line:before { content: var(--icon-error-warning); }
 .ri-information-line:before { content: var(--icon-information); }
 .ri-alert-line:before { content: var(--icon-alert); }

@@ -29,6 +29,11 @@
   text-decoration: none;
 }
 
+.autocomplete-suggestion-external {
+  display: flex;
+  gap: 10px;
+}
+
 .autocomplete-suggestion:hover,
 .autocomplete-suggestion.selected {
   background-color: var(--gray600);

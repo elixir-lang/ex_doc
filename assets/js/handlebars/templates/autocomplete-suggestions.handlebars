@@ -5,8 +5,8 @@
   </a>
   {{#each suggestions as |node nodeId|}}
     {{#if (isExternal node) }}
-      {{!-- TODO: deduplicate --}}
-      <a href="{{link}}" class="autocomplete-suggestion" target="_blank" rel="noopener" data-index="{{@index}}" tabindex="-1">
+      <a href="{{link}}" class="autocomplete-suggestion autocomplete-suggestion-external" target="_blank" rel="noopener" data-index="{{@index}}" tabindex="-1">
+        <i class="ri-external-link-line"></i>
         <div class="title">
           <span translate="no">{{{title}}}</span>
           {{#if label}}
