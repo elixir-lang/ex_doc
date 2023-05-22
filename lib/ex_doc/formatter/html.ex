@@ -16,7 +16,7 @@ defmodule ExDoc.Formatter.HTML do
     config = %{config | output: Path.expand(config.output)}
 
     build = Path.join(config.output, ".build")
-    setup_output(config, &cleanup_output_dir/2, &create_output_dir/2)
+    setup_output(config.output, &cleanup_output_dir(&1, config), &create_output_dir(&1, config))
 
     project_nodes = render_all(project_nodes, ".html", config, [])
     extras = build_extras(config, ".html")
@@ -146,29 +146,34 @@ defmodule ExDoc.Formatter.HTML do
     |> ExDoc.DocAST.highlight(language, opts)
   end
 
-  def setup_output(config, cleanup, create, root \\ nil) do
-    root = root || config.output
+  def setup_output(root, cleanup, create) do
     safety_path = Path.join(root, ".ex_doc")
 
     cond do
       File.exists?(safety_path) and File.exists?(root) ->
-        cleanup.(root, config)
+        cleanup.(root)
 
       not File.exists?(root) ->
-        create.(root, config)
+        create.(root)
+
+      File.ls!(root) == [] ->
+        add_safety_file(root)
+        :ok
 
       true ->
-        raise """
-        ex_doc cannot output to #{root}:
-        Directory already exists and is not managed by ex_doc.
-
-        Try giving an unexisting directory as `--output`.
-        """
+        IO.warn(
+          "ExDoc is outputting to an existing directory. " <>
+            "Beware documentation output may be mixed with other entries"
+        )
     end
   end
 
   defp create_output_dir(root, _config) do
     File.mkdir_p!(root)
+    add_safety_file(root)
+  end
+
+  defp add_safety_file(root) do
     File.touch!(Path.join(root, ".ex_doc"))
   end
 

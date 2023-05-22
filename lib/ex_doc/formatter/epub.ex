@@ -12,7 +12,12 @@ defmodule ExDoc.Formatter.EPUB do
   def run(project_nodes, config) when is_map(config) do
     parent = config.output
     config = normalize_config(config)
-    HTML.setup_output(config, &cleanup_output_dir/2, &create_output_dir/2, parent)
+
+    HTML.setup_output(
+      parent,
+      &cleanup_output_dir(&1, config),
+      &create_output_dir(&1, config)
+    )
 
     project_nodes = HTML.render_all(project_nodes, ".xhtml", config, highlight_tag: "samp")
 
