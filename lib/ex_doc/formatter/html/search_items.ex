@@ -37,7 +37,10 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     [intro_json_item | section_json_items]
   end
 
-  defp module(%ExDoc.ModuleNode{} = node) do
+  @doc """
+  TODO
+  """
+  def module(%ExDoc.ModuleNode{} = node) do
     module =
       encode(
         "#{node.id}.html",

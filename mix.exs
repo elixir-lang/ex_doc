@@ -106,7 +106,8 @@ defmodule ExDoc.Mixfile do
         "t:ExDoc.FunctionNode.t/0",
         "t:ExDoc.ModuleNode.t/0",
         "t:ExDoc.TypeNode.t/0"
-      ]
+      ],
+      reference_apps: [:makeup_elixir, :earmark_parser]
     ]
   end
 

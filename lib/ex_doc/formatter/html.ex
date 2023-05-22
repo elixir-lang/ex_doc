@@ -55,25 +55,40 @@ defmodule ExDoc.Formatter.HTML do
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
   end
 
+  defp dep_completions(app, config) do
+    # TODO: proper way of building this path
+    ebin_dir =
+      Path.join([File.cwd!(), "_build", to_string(Mix.env()), "lib", to_string(app), "ebin"])
+
+    case config.deps[app] do
+      nil ->
+        IO.warn(
+          "Could not find app #{inspect(app)} referenced in the `:reference_apps` option, ignoring it..."
+        )
+
+        []
+
+      docs_path ->
+        ebin_dir
+        # TODO: Maybe build a more lightweight version of this (maybe "external_docs_from_dir")
+        |> config.retriever.docs_from_dir(config)
+        |> Enum.flat_map(&ExDoc.Formatter.HTML.SearchItems.module/1)
+        |> Enum.map(&to_external_node(&1, docs_path))
+    end
+  end
+
+  defp to_external_node(node, base_docs_url) do
+    %{
+      id: node.ref,
+      title: node.title,
+      link: base_docs_url <> node.ref,
+      category: 'external'
+    }
+  end
+
   defp normalize_config(%{main: "index"}) do
     raise ArgumentError,
       message: ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
-  end
-
-  defp dep_completions(app_name, config) do
-    # TODO: proper way of building this path
-    ebin_dir =
-      Path.join([
-        File.cwd!(),
-        "_build",
-        to_string(Mix.env()),
-        "lib",
-        to_string(app_name),
-        "ebin"
-      ])
-
-    # TODO: Maybe build a more lightweight version of this (maybe "external_docs_from_dir")
-    config.retriever.docs_from_dir(ebin_dir, config)
   end
 
   defp normalize_config(%{main: main} = config) do
@@ -216,7 +231,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_external_nodes(nodes_map, config) do
-    content = Templates.create_external_nodes(nodes_map, config)
+    content = Templates.create_external_nodes(nodes_map)
     external_nodes = "dist/external_nodes-#{digest(content)}.js"
     File.write!(Path.join(config.output, external_nodes), content)
     [external_nodes]

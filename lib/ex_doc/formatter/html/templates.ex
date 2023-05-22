@@ -101,19 +101,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Create a JS object which holds all the external autocomplete suggestions.
   """
-  def create_external_nodes(nodes, config) do
-    nodes = Enum.map(nodes, &to_external_node/1)
+  def create_external_nodes(nodes) do
     ["externalNodes=" | ExDoc.Utils.to_json(nodes)]
-  end
-
-  # TODO: generate proper link
-  defp to_external_node(node) do
-    %{
-      id: to_string(node.id),
-      title: node.title,
-      link: "http://elixir-lang.org",
-      category: 'external'
-    }
   end
 
   defp sidebar_extras(extras) do
