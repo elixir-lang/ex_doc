@@ -111,9 +111,9 @@ function handleAutocompleteFormSubmission (event) {
   const anchor = document.createElement('a')
 
   // TODO: use enum defined in autocomplete js file
-  if (autocompleteSuggestion.category == 'external') {
+  if (autocompleteSuggestion.category === 'external') {
     window.open(autocompleteSuggestion.link, '_blank', 'noopener')
-    return;
+    return
   }
 
   anchor.setAttribute('target', target)

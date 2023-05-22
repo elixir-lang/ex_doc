@@ -35,7 +35,7 @@ export function getSuggestions (query, limit = 5) {
 
   const nodes = getSidebarNodes()
   // TODO: compute matchQuality on the js side
-  const externalNodes = getExternalNodes();
+  const externalNodes = getExternalNodes()
 
   const suggestions = [
     ...findSuggestionsInExternalNodes(externalNodes, query),
@@ -54,7 +54,7 @@ export function getSuggestions (query, limit = 5) {
 /**
  * Finds suggestions in external nodes.
  */
-function findSuggestionsInExternalNodes(nodes, query) {
+function findSuggestionsInExternalNodes (nodes, query) {
   return nodes.map(node => externalNodeSuggestion(node, query))
 }
 

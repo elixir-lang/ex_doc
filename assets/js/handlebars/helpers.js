@@ -47,7 +47,7 @@ Handlebars.registerHelper('isArray', function (entry, options) {
 })
 
 Handlebars.registerHelper('isExternal', function (node) {
-  return node.category == 'external'
+  return node.category === 'external'
 })
 
 Handlebars.registerHelper('isNonEmptyArray', function (entry, options) {
