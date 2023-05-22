@@ -355,7 +355,7 @@ defmodule ExDoc.Formatter.HTML do
 
     extras
     |> Enum.with_index(fn extra, idx ->
-      if ids_count[extra.id] > 1, do: disambiguate_id(extra, idx), else: extra
+      if ids_count[extra.id] > 1, do: disambiguate_id(extra, idx + 1), else: extra
     end)
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
   end

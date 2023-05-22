@@ -104,8 +104,8 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     generate_docs(config)
 
-    foo_content = EasyHTML.parse!(File.read!("#{c.tmp_dir}/html/readme-0.html"))["#content"]
-    bar_content = EasyHTML.parse!(File.read!("#{c.tmp_dir}/html/readme-1.html"))["#content"]
+    foo_content = EasyHTML.parse!(File.read!("#{c.tmp_dir}/html/readme-1.html"))["#content"]
+    bar_content = EasyHTML.parse!(File.read!("#{c.tmp_dir}/html/readme-2.html"))["#content"]
 
     assert to_string(foo_content["h1 > span"]) == "README foo"
     assert to_string(bar_content["h1 > span"]) == "README bar"
