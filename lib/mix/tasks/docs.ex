@@ -143,6 +143,8 @@ defmodule Mix.Tasks.Docs do
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
 
+    * `:reference_apps` - Mix apps that will also be included in the completions.
+
     * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
       reference in the current project docs e.g. because of a typo. This list controls where to
       skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)

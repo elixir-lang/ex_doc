@@ -21,6 +21,9 @@ defmodule ExDoc.Formatter.HTML do
     project_nodes = render_all(project_nodes, ".html", config, [])
     extras = build_extras(config, ".html")
 
+    deps_completions = Enum.map(config.reference_apps, &dep_completions(&1, config))
+    IO.inspect(deps_completions)
+
     # Generate search early on without api reference in extras
     static_files = generate_assets(config, @assets_dir, default_assets(config))
     search_items = generate_search_items(project_nodes, extras, config)
@@ -55,6 +58,22 @@ defmodule ExDoc.Formatter.HTML do
   defp normalize_config(%{main: "index"}) do
     raise ArgumentError,
       message: ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
+  end
+
+  defp dep_completions(app_name, config) do 
+    # TODO: proper way of building this path
+    ebin_dir = 
+      Path.join([
+        File.cwd!(),
+        "_build",
+        to_string(Mix.env()),
+        "lib",
+        to_string(app_name),
+        "ebin"
+      ])
+
+    # TODO: Build a more lightweight version of this (maybe "completions_from_dir")
+    docs = config.retriever.docs_from_dir(ebin_dir, config)
   end
 
   defp normalize_config(%{main: main} = config) do
