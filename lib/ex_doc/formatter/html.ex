@@ -21,8 +21,7 @@ defmodule ExDoc.Formatter.HTML do
     project_nodes = render_all(project_nodes, ".html", config, [])
     extras = build_extras(config, ".html")
 
-    deps_completions = Enum.map(config.reference_apps, &dep_completions(&1, config))
-    IO.inspect(deps_completions)
+    deps_nodes = Enum.flat_map(config.reference_apps, &dep_completions(&1, config))
 
     # Generate search early on without api reference in extras
     static_files = generate_assets(config, @assets_dir, default_assets(config))
@@ -44,6 +43,7 @@ defmodule ExDoc.Formatter.HTML do
       search_items ++
         static_files ++
         generate_sidebar_items(nodes_map, extras, config) ++
+        generate_external_nodes(deps_nodes, config) ++
         generate_extras(nodes_map, extras, config) ++
         generate_logo(@assets_dir, config) ++
         generate_search(nodes_map, config) ++
@@ -60,9 +60,9 @@ defmodule ExDoc.Formatter.HTML do
       message: ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
   end
 
-  defp dep_completions(app_name, config) do 
+  defp dep_completions(app_name, config) do
     # TODO: proper way of building this path
-    ebin_dir = 
+    ebin_dir =
       Path.join([
         File.cwd!(),
         "_build",
@@ -72,8 +72,8 @@ defmodule ExDoc.Formatter.HTML do
         "ebin"
       ])
 
-    # TODO: Build a more lightweight version of this (maybe "completions_from_dir")
-    docs = config.retriever.docs_from_dir(ebin_dir, config)
+    # TODO: Maybe build a more lightweight version of this (maybe "external_docs_from_dir")
+    config.retriever.docs_from_dir(ebin_dir, config)
   end
 
   defp normalize_config(%{main: main} = config) do
@@ -213,6 +213,13 @@ defmodule ExDoc.Formatter.HTML do
     sidebar_items = "dist/sidebar_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, sidebar_items), content)
     [sidebar_items]
+  end
+
+  defp generate_external_nodes(nodes_map, config) do
+    content = Templates.create_external_nodes(nodes_map, config)
+    external_nodes = "dist/external_nodes-#{digest(content)}.js"
+    File.write!(Path.join(config.output, external_nodes), content)
+    [external_nodes]
   end
 
   defp generate_search_items(linked, extras, config) do

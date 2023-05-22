@@ -1,4 +1,4 @@
-import { getSidebarNodes } from '../globals'
+import { getSidebarNodes, getExternalNodes } from '../globals'
 import { escapeRegexModifiers, escapeHtmlEntities, isBlank } from '../helpers'
 
 /**
@@ -13,6 +13,7 @@ import { escapeRegexModifiers, escapeHtmlEntities, isBlank } from '../helpers'
  */
 
 const SUGGESTION_CATEGORY = {
+  external: 'external',
   module: 'module',
   moduleChild: 'module-child',
   mixTask: 'mix-task',
@@ -33,8 +34,11 @@ export function getSuggestions (query, limit = 5) {
   }
 
   const nodes = getSidebarNodes()
+  // TODO: compute matchQuality on the js side
+  const externalNodes = getExternalNodes();
 
   const suggestions = [
+    ...findSuggestionsInExternalNodes(externalNodes, query),
     ...findSuggestionsInTopLevelNodes(nodes.modules, query, SUGGESTION_CATEGORY.module),
     ...findSuggestionsInChildNodes(nodes.modules, query, SUGGESTION_CATEGORY.moduleChild),
     ...findSuggestionsInTopLevelNodes(nodes.tasks, query, SUGGESTION_CATEGORY.mixTask),
@@ -45,6 +49,30 @@ export function getSuggestions (query, limit = 5) {
   ].filter(suggestion => suggestion !== null)
 
   return sort(suggestions).slice(0, limit)
+}
+
+/**
+ * Finds suggestions in external nodes.
+ */
+function findSuggestionsInExternalNodes(nodes, query) {
+  return nodes.map(node => externalNodeSuggestion(node, query))
+}
+
+/**
+ * Builds a suggestion for an external node.
+ * Returns null if the node doesn't match the query.
+ */
+function externalNodeSuggestion (node, query) {
+  if (!matchesAll(node.title, query)) { return null }
+
+  return {
+    ...node,
+    title: highlightMatches(node.title, query),
+    label: null,
+    description: null,
+    matchQuality: matchQuality(node.title, query),
+    category: SUGGESTION_CATEGORY.external
+  }
 }
 
 /**

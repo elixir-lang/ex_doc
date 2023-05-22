@@ -3,20 +3,38 @@
     <div class="title">"<em>{{term}}</em>"</div>
     <div class="description">Search the documentation</div>
   </a>
-  {{#each suggestions}}
-    <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
-      <div class="title">
-        <span translate="no">{{{title}}}</span>
-        {{#if label}}
-          <span class="label">({{label}})</span>
-        {{/if}}
-      </div>
-
-      {{#if description}}
-        <div class="description" translate="no">
-          {{{description}}}
+  {{#each suggestions as |node nodeId|}}
+    {{#if (isExternal node) }}
+      {{!-- TODO: deduplicate --}}
+      <a href="{{link}}" class="autocomplete-suggestion" target="_blank" rel="noopener" data-index="{{@index}}" tabindex="-1">
+        <div class="title">
+          <span translate="no">{{{title}}}</span>
+          {{#if label}}
+            <span translate="no">({{label}})</span>
+          {{/if}}
         </div>
-      {{/if}}
-    </a>
+
+        {{#if description}}
+          <div class="description" translate="no">
+            {{{description}}}
+          </div>
+        {{/if}}
+      </a>
+    {{ else }}
+      <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
+        <div class="title">
+          <span translate="no">{{{title}}}</span>
+          {{#if label}}
+            <span translate="no">({{label}})</span>
+          {{/if}}
+        </div>
+
+        {{#if description}}
+          <div class="description" translate="no">
+            {{{description}}}
+          </div>
+        {{/if}}
+      </a>
+    {{/if}}
   {{/each}}
 </div>

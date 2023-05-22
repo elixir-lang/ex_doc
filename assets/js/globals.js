@@ -4,6 +4,10 @@ export function getSidebarNodes () {
   return window.sidebarNodes || {}
 }
 
+export function getExternalNodes () {
+  return window.externalNodes || []
+}
+
 export function getVersionNodes () {
   return window.versionNodes || []
 }
