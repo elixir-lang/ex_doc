@@ -38,7 +38,8 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
   end
 
   @doc """
-  TODO
+  Builds documentation nodes for a `ExDoc.ModuleNode` and all of its children 
+  and return it as a flat list.
   """
   def module(%ExDoc.ModuleNode{} = node) do
     module =
