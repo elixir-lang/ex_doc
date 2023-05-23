@@ -56,17 +56,11 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp dep_completions(app, config) do
-    # TODO: proper way of building this path
-    ebin_dir =
-      Path.join([File.cwd!(), "_build", to_string(Mix.env()), "lib", to_string(app), "ebin"])
+    ebin_dir = Path.join([Mix.Project.build_path(), "lib", to_string(app), "ebin"])
 
     case config.deps[app] do
       nil ->
-        IO.warn(
-          "Could not find app #{inspect(app)} referenced in the `:reference_apps` option, ignoring it..."
-        )
-
-        []
+        raise "Could not find app #{inspect(app)} referenced in the `:reference_apps` option."
 
       docs_path ->
         ebin_dir
