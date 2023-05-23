@@ -1,5 +1,7 @@
 defmodule ExDoc.Language.ElixirTest do
-  use ExUnit.Case, async: true
+  # can't be async: true since we use capture_io :stderr and do exact match on output
+  use ExUnit.Case
+
   doctest ExDoc.Autolink
   import ExUnit.CaptureIO
 
