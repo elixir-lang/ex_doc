@@ -9,7 +9,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       elixirc(c, ~S'''
       defmodule SearchFoo do
         @moduledoc """
-        Hello
+        Hello.
 
         ## Section 1
 
@@ -19,11 +19,17 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       ''')
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [item] = search_items(modules, config)
-    assert item["ref"] == "SearchFoo.html"
-    assert item["type"] == "module"
-    assert item["title"] == "SearchFoo"
-    assert item["doc"] == "Hello\n\n## Section 1\n\nSection Content 1."
+    [item1, item2] = search_items(modules, config)
+
+    assert item1["ref"] == "SearchFoo.html"
+    assert item1["type"] == "module"
+    assert item1["title"] == "SearchFoo"
+    assert item1["doc"] == "Hello."
+
+    assert item2["ref"] == "SearchFoo.html#module-section-1"
+    assert item2["type"] == "module"
+    assert item2["title"] == "Section 1 - SearchFoo"
+    assert item2["doc"] == "Section Content 1."
   end
 
   test "module with no docs", c do
@@ -83,17 +89,26 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       defmodule SearchFoo do
         @doc """
         Handles _foo_.
+
+        ## Section
+
+        Section content.
         """
         @callback handle_foo() :: :ok
       end
       ''')
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [%{"type" => "behaviour"}, item] = search_items(modules, config)
-    assert item["ref"] == "SearchFoo.html#c:handle_foo/0"
-    assert item["type"] == "callback"
-    assert item["title"] == "SearchFoo.handle_foo/0"
-    assert item["doc"] == "Handles _foo_."
+    [%{"type" => "behaviour"}, item1, item2] = search_items(modules, config)
+    assert item1["ref"] == "SearchFoo.html#c:handle_foo/0"
+    assert item1["type"] == "callback"
+    assert item1["title"] == "SearchFoo.handle_foo/0"
+    assert item1["doc"] == "Handles _foo_."
+
+    assert item2["ref"] == "SearchFoo.html#c:handle_foo/0-section"
+    assert item2["type"] == "callback"
+    assert item2["title"] == "Section - SearchFoo.handle_foo/0"
+    assert item2["doc"] == "Section content."
   end
 
   test "type", c do
@@ -138,7 +153,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
 
     assert item2["ref"] == "readme.html#section-1-header"
     assert item2["type"] == "extras"
-    assert item2["title"] == "Foo - Section 1 Header"
+    assert item2["title"] == "Section 1 Header - Foo"
     assert item2["doc"] == "Section _1_ content."
   end
 
