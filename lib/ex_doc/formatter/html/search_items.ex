@@ -24,7 +24,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
       for {header, body} <- sections do
         encode(
           "#{map.id}.html##{HTML.text_to_id(header)}",
-          "#{map.title} - " <> header,
+          header <> " - #{map.title}",
           :extras,
           body
         )
@@ -48,7 +48,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
       for {header, body} <- sections do
         encode(
           "#{node.id}.html#module-#{HTML.text_to_id(header)}",
-          "#{node.title} - #{header}",
+          header <> " - #{node.title}",
           node.type,
           body
         )
@@ -74,7 +74,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
       for {header, body} <- sections do
         encode(
           "#{module_node.id}.html##{node.id}-#{HTML.text_to_id(header)}",
-          "#{module_node.id}.#{node.name}/#{node.arity} - #{header}",
+          header <> " - #{module_node.id}.#{node.name}/#{node.arity}",
           node.type,
           body
         )
