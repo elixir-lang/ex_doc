@@ -9,7 +9,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       elixirc(c, ~S'''
       defmodule SearchFoo do
         @moduledoc """
-        Hello
+        Hello.
 
         ## Section 1
 
@@ -19,11 +19,17 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       ''')
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [item] = search_items(modules, config)
-    assert item["ref"] == "SearchFoo.html"
-    assert item["type"] == "module"
-    assert item["title"] == "SearchFoo"
-    assert item["doc"] == "Hello\n\n## Section 1\n\nSection Content 1."
+    [item1, item2] = search_items(modules, config)
+
+    assert item1["ref"] == "SearchFoo.html"
+    assert item1["type"] == "module"
+    assert item1["title"] == "SearchFoo"
+    assert item1["doc"] == "Hello."
+
+    assert item2["ref"] == "SearchFoo.html#module-section-1"
+    assert item2["type"] == "module"
+    assert item2["title"] == "SearchFoo - Section 1"
+    assert item2["doc"] == "Section Content 1."
   end
 
   test "module with no docs", c do
