@@ -99,15 +99,18 @@ defmodule ExDoc.Refs do
             {{ref_kind, module, name, arity}, visibility}
           end
 
-      {:error, _} ->
-        if Code.ensure_loaded?(module) do
+      {:error, _reason} ->
+        with path <- :code.which(module),
+             true <- path != :non_existing,
+             true <- Code.ensure_loaded?(module) do
           # We say it is limited because the types may not actually be available in the beam file.
           [{{:module, module}, :limited}] ++
             to_refs(exports(module), module, :function) ++
             to_refs(callbacks(module), module, :callback) ++
             to_refs(types(module, [:type, :opaque]), module, :type)
         else
-          [{{:module, module}, :undefined}]
+          _ ->
+            [{{:module, module}, :undefined}]
         end
     end
   end

@@ -28,6 +28,11 @@ defmodule ExDoc.Language.ElixirTest do
                ~m"[`IEx.Helpers`](https://hexdocs.pm/iex/IEx.Helpers.html)"
     end
 
+    test "case-sensitive module lookup" do
+      assert autolink_doc("Path") == ~m"[`Path`](https://hexdocs.pm/elixir/Path.html)"
+      assert autolink_doc("PATH") == ~m"`PATH`"
+    end
+
     test "erlang module" do
       assert_unchanged(":array")
     end
