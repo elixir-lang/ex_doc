@@ -100,8 +100,7 @@ defmodule ExDoc.Refs do
           end
 
       {:error, _reason} ->
-        with path <- :code.which(module),
-             true <- path != :non_existing,
+        with true <- :code.which(module) != :non_existing,
              true <- Code.ensure_loaded?(module) do
           # We say it is limited because the types may not actually be available in the beam file.
           [{{:module, module}, :limited}] ++
