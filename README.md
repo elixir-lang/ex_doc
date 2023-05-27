@@ -207,9 +207,9 @@ The result for the previous syntax is:
 
 For example, if you change the class name to `neutral`, you get the same admonition block in neutral style:
 
-> #### Error {: .neutral}
+> #### Neutral {: .neutral}
 >
-> This syntax will render an error block
+> This syntax will render a neutral block
 
 ## Tabsets
 
