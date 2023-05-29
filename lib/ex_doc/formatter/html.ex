@@ -16,7 +16,7 @@ defmodule ExDoc.Formatter.HTML do
     config = %{config | output: Path.expand(config.output)}
 
     build = Path.join(config.output, ".build")
-    output_setup(build, config)
+    setup_output(config.output, &cleanup_output_dir(&1, config), &create_output_dir(&1, config))
 
     project_nodes = render_all(project_nodes, ".html", config, [])
     extras = build_extras(config, ".html")
@@ -146,18 +146,51 @@ defmodule ExDoc.Formatter.HTML do
     |> ExDoc.DocAST.highlight(language, opts)
   end
 
-  defp output_setup(build, config) do
+  def setup_output(root, cleanup, create) do
+    safety_path = Path.join(root, ".ex_doc")
+
+    cond do
+      File.exists?(safety_path) and File.exists?(root) ->
+        cleanup.(root)
+
+      not File.exists?(root) ->
+        create.(root)
+
+      File.ls!(root) == [] ->
+        add_safety_file(root)
+        :ok
+
+      true ->
+        IO.warn(
+          "ExDoc is outputting to an existing directory. " <>
+            "Beware documentation output may be mixed with other entries"
+        )
+    end
+  end
+
+  defp create_output_dir(root, _config) do
+    File.mkdir_p!(root)
+    add_safety_file(root)
+  end
+
+  defp add_safety_file(root) do
+    File.touch!(Path.join(root, ".ex_doc"))
+  end
+
+  defp cleanup_output_dir(docs_root, config) do
+    build = Path.join(docs_root, ".build")
+
     if File.exists?(build) do
       build
       |> File.read!()
       |> String.split("\n", trim: true)
-      |> Enum.map(&Path.join(config.output, &1))
+      |> Enum.map(&Path.join(docs_root, &1))
       |> Enum.each(&File.rm/1)
 
       File.rm(build)
     else
-      File.rm_rf!(config.output)
-      File.mkdir_p!(config.output)
+      File.rm_rf!(docs_root)
+      create_output_dir(docs_root, config)
     end
   end
 

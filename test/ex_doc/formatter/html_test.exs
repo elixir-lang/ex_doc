@@ -6,6 +6,12 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   @moduletag :tmp_dir
 
+  setup %{tmp_dir: tmp_dir} do
+    output = tmp_dir <> "/html"
+    File.mkdir_p!(output)
+    File.touch!(output <> "/.ex_doc")
+  end
+
   defp read_wildcard!(path) do
     [file] = Path.wildcard(path)
     File.read!(file)
@@ -172,6 +178,33 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content_module =~ re[:module][:x_ua]
     refute content_module =~ re[:index][:title]
     refute content_module =~ re[:index][:refresh]
+  end
+
+  test "succeeds if trying to write into an empty existing directory", context do
+    config = doc_config(context)
+
+    new_output = config[:output] <> "/new-dir"
+    File.mkdir_p!(new_output)
+
+    new_config = Keyword.put(config, :output, new_output)
+
+    refute ExUnit.CaptureIO.capture_io(:stderr, fn ->
+             generate_docs(new_config)
+           end) =~ "ExDoc is outputting to an existing directory"
+  end
+
+  test "warns if trying to write into existing directory with files", context do
+    config = doc_config(context)
+    new_output = config[:output] <> "/new-dir"
+
+    File.mkdir_p!(new_output)
+    File.touch!(Path.join(new_output, "dummy-file"))
+
+    new_config = Keyword.put(config, :output, new_output)
+
+    assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+             generate_docs(new_config)
+           end) =~ "ExDoc is outputting to an existing directory"
   end
 
   test "allows to set the authors of the document", %{tmp_dir: tmp_dir} = context do
