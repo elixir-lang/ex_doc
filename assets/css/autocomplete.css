@@ -29,6 +29,11 @@
   text-decoration: none;
 }
 
+.autocomplete-suggestion-title-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .autocomplete-suggestion:hover,
 .autocomplete-suggestion.selected {
   background-color: var(--gray600);
@@ -55,5 +60,5 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 100%;
+  max-width: 100%;
 }

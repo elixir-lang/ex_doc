@@ -5,10 +5,16 @@
   </a>
   {{#each suggestions}}
     <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
-      <div class="title">
-        <span translate="no">{{{title}}}</span>
-        {{#if label}}
-          <span class="label">({{label}})</span>
+      <div class="autocomplete-suggestion-title-wrapper">
+        <div class="title">
+          <span translate="no">{{{title}}}</span>
+          {{#if label}}
+            <span class="label">({{label}})</span>
+          {{/if}}
+        </div>
+
+        {{#if deprecated}}
+          <span class="label">(deprecated)</span>
         {{/if}}
       </div>
 
