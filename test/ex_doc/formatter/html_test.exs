@@ -89,6 +89,34 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
   end
 
+  test "multiple extras with the same name", c do
+    File.mkdir_p!("#{c.tmp_dir}/foo")
+
+    File.write!("#{c.tmp_dir}/foo/README.md", """
+    # README foo
+    """)
+
+    File.mkdir_p!("#{c.tmp_dir}/bar")
+
+    File.write!("#{c.tmp_dir}/bar/README.md", """
+    # README bar
+    """)
+
+    config =
+      Keyword.replace!(doc_config(c), :extras, [
+        "#{c.tmp_dir}/foo/README.md",
+        "#{c.tmp_dir}/bar/README.md"
+      ])
+
+    generate_docs(config)
+
+    foo_content = EasyHTML.parse!(File.read!("#{c.tmp_dir}/html/readme-1.html"))["#content"]
+    bar_content = EasyHTML.parse!(File.read!("#{c.tmp_dir}/html/readme-2.html"))["#content"]
+
+    assert to_string(foo_content["h1 > span"]) == "README foo"
+    assert to_string(bar_content["h1 > span"]) == "README bar"
+  end
+
   test "warns when generating an index.html file with an invalid redirect",
        %{tmp_dir: tmp_dir} = context do
     output =

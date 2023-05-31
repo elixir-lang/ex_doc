@@ -431,11 +431,12 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp walk_doc({tag, attrs, ast, meta}, config) do
-    {tag, attrs, walk_doc(ast, config), meta}
+    {tag, attrs, List.flatten(walk_doc(ast, config)), meta}
   end
 
-  defp remove_link({:a, _attrs, inner, _meta}),
-    do: inner
+  defp remove_link({:a, _attrs, inner, _meta}) do
+    inner
+  end
 
   @ref_regex ~r/^`(.+)`$/
 

@@ -132,8 +132,10 @@
 }
 
 .content-inner .section-heading a {
+  /* We don't want this overridden by code tags */
+  color:  var(--links) !important;
   text-decoration: none;
-  display: flex;
+  display: inline-block;
 }
 
 .content-inner .section-heading i {
