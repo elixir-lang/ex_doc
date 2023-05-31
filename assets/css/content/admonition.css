@@ -4,10 +4,6 @@
   border-left: 0;
 }
 
-.content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) :is(a, a:visited) {
-  color: var(--black);
-}
-
 .content-inner blockquote.warning {
   background-color: var(--warningBackground);
 }
@@ -91,10 +87,22 @@
   color: var(--tipHeading);
 }
 
+.content-inner blockquote :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) code {
+  margin: 0 0.5ch;
+}
+
 .content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) code {
   background-color: var(--inlineCodeBackground);
   border: 1px solid var(--inlineCodeBorder);
   color: var(--black);
+}
+
+.content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) :is(a, a:visited) {
+  color: var(--black);
+}
+
+.content-inner blockquote :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) :is(a, a:visited) {
+  color: inherit;
 }
 
 @media screen and (max-width: 768px) {
