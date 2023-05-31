@@ -165,6 +165,8 @@ defmodule ExDoc.Formatter.HTML do
           "ExDoc is outputting to an existing directory. " <>
             "Beware documentation output may be mixed with other entries"
         )
+
+        create.(root)
     end
   end
 
