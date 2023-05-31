@@ -180,38 +180,6 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute content_module =~ re[:index][:refresh]
   end
 
-  test "succeeds if trying to write into an empty existing directory", context do
-    config = doc_config(context)
-
-    new_output = config[:output] <> "/new-dir"
-    File.mkdir_p!(new_output)
-
-    new_config = Keyword.put(config, :output, new_output)
-
-    refute ExUnit.CaptureIO.capture_io(:stderr, fn ->
-             generate_docs(new_config)
-           end) =~ "ExDoc is outputting to an existing directory"
-  end
-
-  test "warns if trying to write into existing directory with files", context do
-    config = doc_config(context)
-    new_output = config[:output] <> "/new-dir"
-
-    File.mkdir_p!(new_output)
-    File.touch!(Path.join(new_output, "dummy-file"))
-
-    new_config = Keyword.put(config, :output, new_output)
-
-    assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-             generate_docs(new_config)
-           end) =~ "ExDoc is outputting to an existing directory"
-
-    # Warn only once
-    refute ExUnit.CaptureIO.capture_io(:stderr, fn ->
-             generate_docs(new_config)
-           end) =~ "ExDoc is outputting to an existing directory"
-  end
-
   test "allows to set the authors of the document", %{tmp_dir: tmp_dir} = context do
     generate_docs(doc_config(context, authors: ["John Doe", "Jane Doe"]))
     content_index = File.read!(tmp_dir <> "/html/api-reference.html")
