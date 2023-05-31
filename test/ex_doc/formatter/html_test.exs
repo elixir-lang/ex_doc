@@ -205,6 +205,11 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
              generate_docs(new_config)
            end) =~ "ExDoc is outputting to an existing directory"
+
+    # Warn only once
+    refute ExUnit.CaptureIO.capture_io(:stderr, fn ->
+             generate_docs(new_config)
+           end) =~ "ExDoc is outputting to an existing directory"
   end
 
   test "allows to set the authors of the document", %{tmp_dir: tmp_dir} = context do

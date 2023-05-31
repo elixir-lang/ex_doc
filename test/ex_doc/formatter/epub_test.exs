@@ -128,6 +128,11 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
              generate_docs(new_config)
            end) =~ "ExDoc is outputting to an existing directory"
+
+    # Warn only once
+    refute ExUnit.CaptureIO.capture_io(:stderr, fn ->
+             generate_docs(new_config)
+           end) =~ "ExDoc is outputting to an existing directory"
   end
 
   test "generates an EPUB file with a standardized structure", %{tmp_dir: tmp_dir} = context do
