@@ -42,7 +42,7 @@
   overflow: hidden;
 }
 
-.page-cheatmd .content-inner h3.section-heading .hover-link {
+.page-cheatmd .content-inner h3.section-heading a.hover-link {
   display: none;
 }
 

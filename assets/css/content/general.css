@@ -150,6 +150,10 @@
   opacity: 1;
 }
 
+blockquote .section-heading i {
+  display: none;
+}
+
 @media screen and (max-width: 768px) {
   .content-inner .section-heading a {
     justify-content: space-between;
