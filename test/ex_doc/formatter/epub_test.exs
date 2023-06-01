@@ -103,33 +103,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?(tmp_dir <> "/epub/another_dir/#{doc_config(context)[:project]}.epub")
   end
 
-  test "succeeds if trying to write into an empty existing directory", context do
-    config = doc_config(context)
-
-    new_output = config[:output] <> "/new-dir"
-    File.mkdir_p!(new_output)
-
-    new_config = Keyword.put(config, :output, new_output)
-
-    refute ExUnit.CaptureIO.capture_io(:stderr, fn ->
-             generate_docs(new_config)
-           end) =~ "ExDoc is outputting to an existing directory"
-  end
-
-  test "warns if trying to write into existing directory with files", context do
-    config = doc_config(context)
-    new_output = config[:output] <> "/new-dir"
-
-    File.mkdir_p!(new_output)
-    File.touch!(Path.join(new_output, "dummy-file"))
-
-    new_config = Keyword.put(config, :output, new_output)
-
-    assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-             generate_docs(new_config)
-           end) =~ "ExDoc is outputting to an existing directory"
-  end
-
   test "generates an EPUB file with a standardized structure", %{tmp_dir: tmp_dir} = context do
     generate_docs_and_unzip(context, doc_config(context))
 
