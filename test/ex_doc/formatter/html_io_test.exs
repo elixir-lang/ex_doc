@@ -8,7 +8,7 @@ defmodule ExDoc.Formatter.HtmlIOTest do
 
     assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
              generate_docs(tmp_dir)
-           end) =~ ""
+           end) == ""
   end
 
   test "warns if trying to write into existing directory with files", %{tmp_dir: tmp_dir} do
@@ -22,7 +22,7 @@ defmodule ExDoc.Formatter.HtmlIOTest do
     # Warn only once
     assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
              generate_docs(tmp_dir)
-           end) =~ ""
+           end) == ""
   end
 
   defp generate_docs(tmp_dir) do
