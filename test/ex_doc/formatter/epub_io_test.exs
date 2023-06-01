@@ -30,7 +30,7 @@ defmodule ExDoc.Formatter.EPUBIOTest do
       app: :foo,
       formatter: "epub",
       output: "#{tmp_dir}/doc",
-      source_beam: "#{tmp_dir}/ebin",
+      source_beam: "#{tmp_dir}/ebin"
     ]
 
     ExDoc.generate_docs("Foo", "1.0.0", config)
