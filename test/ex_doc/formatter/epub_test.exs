@@ -1,6 +1,9 @@
 defmodule ExDoc.Formatter.EPUBTest do
   use ExUnit.Case, async: true
 
+  import ExUnit.CaptureIO
+  import TestHelper, only: [isolated_warning_counter: 1]
+
   @moduletag :tmp_dir
 
   @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
@@ -247,5 +250,48 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?(tmp_dir <> "/epub/OEBPS/assets/cover.png")
   after
     File.rm_rf!("test/tmp/epub_assets")
+  end
+
+  describe "warning counter" do
+    @describetag :warning_counter
+
+    test "4 warnings are counted when using warnings_as_errors: true", context do
+      isolated_warning_counter do
+        output =
+          capture_io(:stderr, fn ->
+            generate_docs(
+              doc_config(context,
+                skip_undefined_reference_warnings_on: [],
+                warnings_as_errors: true
+              )
+            )
+          end)
+
+        assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:2: Warnings"
+        assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:18: Warnings.foo/0"
+
+        assert output =~
+                 ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:13: c:Warnings.handle_foo/0"
+
+        assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:8: t:Warnings.t/0"
+
+        assert ExDoc.WarningCounter.count() == 4
+      end
+    end
+
+    test "warnings are still counted even with warnings_as_errors: false", context do
+      isolated_warning_counter do
+        capture_io(:stderr, fn ->
+          generate_docs(
+            doc_config(context,
+              skip_undefined_reference_warnings_on: [],
+              warnings_as_errors: false
+            )
+          )
+        end)
+
+        assert ExDoc.WarningCounter.count() == 4
+      end
+    end
   end
 end
