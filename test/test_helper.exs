@@ -100,4 +100,21 @@ defmodule TestHelper do
       raise "not supported"
     end
   end
+
+  defmacro isolated_warning_counter(do: code) do
+    quote location: :keep do
+      task =
+        Task.async(fn ->
+          ExDoc.WarningCounter.register_caller(self())
+
+          try do
+            unquote(code)
+          after
+            ExDoc.WarningCounter.unregister_caller(self())
+          end
+        end)
+
+      Task.await(task)
+    end
+  end
 end

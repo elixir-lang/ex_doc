@@ -5,6 +5,8 @@ defmodule Mix.Tasks.DocsTest do
   # Cannot run concurrently due to Mix compile/deps calls
   use ExUnit.Case, async: false
 
+  import TestHelper, only: [isolated_warning_counter: 1]
+
   @moduletag :tmp_dir
 
   def run(context, args, opts) do
@@ -391,9 +393,50 @@ defmodule Mix.Tasks.DocsTest do
     end)
   end
 
-  test "accepts warnings_as_errors in :warnings_as_errors" do
-    assert catch_exit(run([], app: :ex_doc, docs: [warnings_as_errors: true])) == {:shutdown, 1}
-  after
-    ExDoc.WarningCounter.reset()
+  test "accepts warnings_as_errors in :warnings_as_errors", context do
+    isolated_warning_counter do
+      assert [
+               {"ex_doc", "dev",
+                [
+                  formatter: "html",
+                  formatters: ["html", "epub"],
+                  deps: _,
+                  apps: [:ex_doc],
+                  source_beam: _,
+                  warnings_as_errors: true,
+                  proglang: :elixir
+                ]},
+               {"ex_doc", "dev",
+                [
+                  formatter: "epub",
+                  formatters: ["html", "epub"],
+                  deps: _,
+                  apps: [:ex_doc],
+                  source_beam: _,
+                  warnings_as_errors: true,
+                  proglang: :elixir
+                ]}
+             ] = run(context, [], app: :ex_doc, docs: [warnings_as_errors: true])
+    end
+  end
+
+  test "exits with 1 due to warning with --warnings_as_errors", context do
+    isolated_warning_counter do
+      ExDoc.WarningCounter.increment()
+
+      assert catch_exit(run(context, [], app: :ex_doc, docs: [warnings_as_errors: true])) ==
+               {:shutdown, 1}
+    end
+  end
+
+  test "exits with 3 due to warning with --warnings_as_errors", context do
+    isolated_warning_counter do
+      ExDoc.WarningCounter.increment()
+      ExDoc.WarningCounter.increment()
+      ExDoc.WarningCounter.increment()
+
+      assert catch_exit(run(context, [], app: :ex_doc, docs: [warnings_as_errors: true])) ==
+               {:shutdown, 3}
+    end
   end
 end

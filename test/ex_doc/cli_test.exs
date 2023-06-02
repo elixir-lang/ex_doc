@@ -1,6 +1,8 @@
 defmodule ExDoc.CLITest do
   use ExUnit.Case, async: true
+
   import ExUnit.CaptureIO
+  import TestHelper, only: [isolated_warning_counter: 1]
 
   @ebin "_build/test/lib/ex_doc/ebin"
 
@@ -68,34 +70,72 @@ defmodule ExDoc.CLITest do
   end
 
   describe "--warnings-as-errors" do
+    @describetag :warning_counter
+
     test "exits with code 0 when no warnings" do
-      {[html, epub], _io} = run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
+      isolated_warning_counter do
+        {[html, epub], _io} = run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
 
-      assert html ==
-               {"ExDoc", "1.2.3",
-                [formatter: "html", apps: [:ex_doc], source_beam: @ebin, warnings_as_errors: true]}
+        assert html ==
+                 {"ExDoc", "1.2.3",
+                  [
+                    formatter: "html",
+                    formatters: ["html", "epub"],
+                    apps: [:ex_doc],
+                    source_beam: @ebin,
+                    warnings_as_errors: true
+                  ]}
 
-      assert epub ==
-               {"ExDoc", "1.2.3",
-                [formatter: "epub", apps: [:ex_doc], source_beam: @ebin, warnings_as_errors: true]}
+        assert epub ==
+                 {"ExDoc", "1.2.3",
+                  [
+                    formatter: "epub",
+                    formatters: ["html", "epub"],
+                    apps: [:ex_doc],
+                    source_beam: @ebin,
+                    warnings_as_errors: true
+                  ]}
+      end
     end
 
     test "exits with 1 with warnings" do
-      ExDoc.WarningCounter.increment()
+      isolated_warning_counter do
+        ExDoc.WarningCounter.increment()
 
-      fun = fn ->
-        run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
+        fun = fn ->
+          run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
+        end
+
+        io =
+          capture_io(:stderr, fn ->
+            assert catch_exit(fun.()) == {:shutdown, 1}
+          end)
+
+        assert io =~
+                 "Doc generation failed due to warnings while using the --warnings-as-errors option\n"
       end
+    end
 
-      io =
-        capture_io(:stderr, fn ->
-          assert catch_exit(fun.()) == {:shutdown, 1}
-        end)
+    test "exits with 3 with warnings" do
+      isolated_warning_counter do
+        ExDoc.WarningCounter.increment()
+        ExDoc.WarningCounter.increment()
+        ExDoc.WarningCounter.increment()
+        ExDoc.WarningCounter.increment()
+        ExDoc.WarningCounter.increment()
 
-      assert io =~
-               "Doc generation failed due to warnings while using the --warnings-as-errors option\n"
-    after
-      ExDoc.WarningCounter.reset()
+        fun = fn ->
+          run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
+        end
+
+        io =
+          capture_io(:stderr, fn ->
+            assert catch_exit(fun.()) == {:shutdown, 5}
+          end)
+
+        assert io =~
+                 "Doc generation failed due to warnings while using the --warnings-as-errors option\n"
+      end
     end
   end
 

@@ -388,13 +388,15 @@ defmodule Mix.Tasks.Docs do
         browser_open(index)
       end
 
-      if options[:warnings_as_errors] == true and ExDoc.WarningCounter.count() > 0 do
+      warning_counter_count = ExDoc.WarningCounter.count()
+
+      if options[:warnings_as_errors] == true and warning_counter_count > 0 do
         Mix.shell().info([
           :red,
           "Doc generation failed due to warnings while using the --warnings-as-errors option"
         ])
 
-        exit({:shutdown, ExDoc.WarningCounter.count()})
+        exit({:shutdown, warning_counter_count})
       else
         index
       end
