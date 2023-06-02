@@ -75,7 +75,7 @@ defmodule ExDoc.Formatter.EPUB do
         html = Templates.extra_template(config, title, title_content, content)
 
         if File.regular?(output) do
-          IO.puts(:stderr, "warning: file #{Path.relative_to_cwd(output)} already exists")
+          ExDoc.Utils.warning("file #{Path.relative_to_cwd(output)} already exists")
         end
 
         File.write!(output, html)

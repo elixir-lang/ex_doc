@@ -31,7 +31,7 @@ defmodule ExDoc.Language.Erlang do
         }
       }
     else
-      IO.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
+      ExDoc.Utils.warning("skipping docs for module #{inspect(module)}, reason: :no_debug_info")
     end
   end
 

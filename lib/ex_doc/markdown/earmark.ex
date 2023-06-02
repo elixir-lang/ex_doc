@@ -48,8 +48,7 @@ defmodule ExDoc.Markdown.Earmark do
   defp print_messages(messages, options) do
     for {severity, line, message} <- messages do
       file = options[:file]
-      ExDoc.WarningCounter.increment()
-      IO.warn("#{inspect(__MODULE__)} (#{severity}) #{file}:#{line} #{message}", [])
+      ExDoc.Utils.warning("#{inspect(__MODULE__)} (#{severity}) #{file}:#{line} #{message}")
     end
   end
 

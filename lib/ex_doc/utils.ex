@@ -147,4 +147,17 @@ defmodule ExDoc.Utils do
         nil
     end
   end
+
+  @doc """
+  Prints `message` as a warning in :stderr.
+
+  It automatically increases the counter in `ExDoc.WarningCounter`.
+  """
+  def warning(message) do
+    ExDoc.WarningCounter.increment()
+
+    prefix = IO.ANSI.format([:yellow, "warning: ", :reset])
+
+    IO.puts(:stderr, [prefix, message])
+  end
 end

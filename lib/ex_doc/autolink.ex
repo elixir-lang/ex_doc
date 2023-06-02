@@ -131,14 +131,12 @@ defmodule ExDoc.Autolink do
   end
 
   defp warn(message, {file, line}, id) do
-    warning = IO.ANSI.format([:yellow, "warning: ", :reset])
-
     stacktrace =
       "  #{file}" <>
         if(line, do: ":#{line}", else: "") <>
         if(id, do: ": #{id}", else: "")
 
-    IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
+    ExDoc.Utils.warning([message, ?\n, stacktrace, ?\n])
   end
 
   defp warn(ref, file_line, id, visibility, metadata)

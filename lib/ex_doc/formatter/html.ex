@@ -161,7 +161,7 @@ defmodule ExDoc.Formatter.HTML do
         :ok
 
       true ->
-        IO.warn(
+        ExDoc.Utils.warning(
           "ExDoc is outputting to an existing directory. " <>
             "Beware documentation output may be mixed with other entries"
         )
@@ -263,7 +263,7 @@ defmodule ExDoc.Formatter.HTML do
         html = Templates.extra_template(config, node, extra_type(extension), nodes_map, refs)
 
         if File.regular?(output) do
-          IO.puts(:stderr, "warning: file #{Path.relative_to_cwd(output)} already exists")
+          ExDoc.Utils.warning("file #{Path.relative_to_cwd(output)} already exists")
         end
 
         File.write!(output, html)
@@ -556,7 +556,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_redirect(filename, config, redirect_to) do
     unless case_sensitive_file_regular?("#{config.output}/#{redirect_to}") do
-      IO.puts(:stderr, "warning: #{filename} redirects to #{redirect_to}, which does not exist")
+      ExDoc.Utils.warning("#{filename} redirects to #{redirect_to}, which does not exist")
     end
 
     content = Templates.redirect_template(config, redirect_to)
