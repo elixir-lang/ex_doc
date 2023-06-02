@@ -11,32 +11,36 @@ defmodule ExDoc.Language.Elixir do
   def module_data(module, docs_chunk, config) do
     {type, skip} = module_type_and_skip(module)
 
-    if skip do
-      :skip
-    else
-      title = module_title(module, type)
-      abst_code = Erlang.get_abstract_code(module)
-      line = Erlang.find_module_line(module, abst_code)
-      optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
+    cond do
+      skip ->
+        :skip
 
-      %{
-        module: module,
-        docs: docs_chunk,
-        language: __MODULE__,
-        id: inspect(module),
-        title: title,
-        type: type,
-        line: line,
-        callback_types: [:callback, :macrocallback],
-        nesting_info: nesting_info(title, config.nest_modules_by_prefix),
-        private: %{
-          abst_code: abst_code,
-          specs: Erlang.get_specs(module),
-          callbacks: Erlang.get_callbacks(module),
-          impls: get_impls(module),
-          optional_callbacks: optional_callbacks
+      abst_code = Erlang.get_abstract_code(module) ->
+        title = module_title(module, type)
+        line = Erlang.find_module_line(module, abst_code)
+        optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
+
+        %{
+          module: module,
+          docs: docs_chunk,
+          language: __MODULE__,
+          id: inspect(module),
+          title: title,
+          type: type,
+          line: line,
+          callback_types: [:callback, :macrocallback],
+          nesting_info: nesting_info(title, config.nest_modules_by_prefix),
+          private: %{
+            abst_code: abst_code,
+            specs: Erlang.get_specs(module),
+            callbacks: Erlang.get_callbacks(module),
+            impls: get_impls(module),
+            optional_callbacks: optional_callbacks
+          }
         }
-      }
+
+      true ->
+        IO.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
     end
   end
 
@@ -109,11 +113,14 @@ defmodule ExDoc.Language.Elixir do
       if actual_def in module_data.private.optional_callbacks, do: ["optional"], else: []
 
     specs =
-      case Map.fetch(module_data.private.callbacks, actual_def) do
-        {:ok, specs} ->
+      case module_data.private.callbacks do
+        %{^actual_def => specs} when kind == :macrocallback ->
+          Enum.map(specs, &remove_callback_term/1)
+
+        %{^actual_def => specs} ->
           specs
 
-        :error ->
+        %{} ->
           []
       end
 
@@ -134,6 +141,14 @@ defmodule ExDoc.Language.Elixir do
       specs: quoted,
       extra_annotations: extra_annotations
     }
+  end
+
+  defp remove_callback_term({:type, num, :bounded_fun, [lhs, rhs]}) do
+    {:type, num, :bounded_fun, [remove_callback_term(lhs), rhs]}
+  end
+
+  defp remove_callback_term({:type, num, :fun, [{:type, num, :product, [_ | rest_args]} | rest]}) do
+    {:type, num, :fun, [{:type, num, :product, rest_args} | rest]}
   end
 
   @impl true
@@ -214,7 +229,7 @@ defmodule ExDoc.Language.Elixir do
     prefixes
     |> Enum.find(&String.starts_with?(title, &1 <> "."))
     |> case do
-      nil -> {nil, nil}
+      nil -> nil
       prefix -> {"." <> String.trim_leading(title, prefix <> "."), prefix}
     end
   end
@@ -353,6 +368,7 @@ defmodule ExDoc.Language.Elixir do
       {{:|, _, _}, position} -> to_var({}, position)
       {left, position} -> to_var(left, position)
     end)
+    |> Macro.prewalk(fn node -> Macro.update_meta(node, &Keyword.delete(&1, :line)) end)
   end
 
   defp to_var({:%, meta, [name, _]}, _), do: {:%, meta, [name, {:%{}, meta, []}]}
@@ -415,11 +431,12 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp walk_doc({tag, attrs, ast, meta}, config) do
-    {tag, attrs, walk_doc(ast, config), meta}
+    {tag, attrs, List.flatten(walk_doc(ast, config)), meta}
   end
 
-  defp remove_link({:a, _attrs, inner, _meta}),
-    do: inner
+  defp remove_link({:a, _attrs, inner, _meta}) do
+    inner
+  end
 
   @ref_regex ~r/^`(.+)`$/
 
@@ -599,10 +616,14 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp parse_module(<<first>> <> _ = string, _mode) when first in ?A..?Z do
-    do_parse_module(string)
+    if string =~ ~r/^[A-Za-z0-9_.]+$/ do
+      do_parse_module(string)
+    else
+      :error
+    end
   end
 
-  defp parse_module(<<?:>> <> _ = string, :custom_link) do
+  defp parse_module(":" <> _ = string, :custom_link) do
     do_parse_module(string)
   end
 
@@ -812,7 +833,10 @@ defmodule ExDoc.Language.Elixir do
 
   defp try_autoimported_function(name, arity, mode, config, original_text) do
     Enum.find_value(@autoimported_modules, fn module ->
-      remote_url({:function, module, name, arity}, config, original_text, warn?: false, mode: mode)
+      remote_url({:function, module, name, arity}, config, original_text,
+        warn?: false,
+        mode: mode
+      )
     end)
   end
 
@@ -823,16 +847,12 @@ defmodule ExDoc.Language.Elixir do
 
     case {mode, Refs.get_visibility({:module, module}), Refs.get_visibility(ref)} do
       {_mode, _module_visibility, :public} ->
-        case Autolink.tool(module, config) do
-          :no_tool ->
-            nil
+        tool = Autolink.tool(module, config)
 
-          tool ->
-            if same_module? do
-              fragment(tool, kind, name, arity)
-            else
-              Autolink.app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
-            end
+        if same_module? do
+          fragment(tool, kind, name, arity)
+        else
+          Autolink.app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
         end
 
       {:regular_link, module_visibility, :undefined}

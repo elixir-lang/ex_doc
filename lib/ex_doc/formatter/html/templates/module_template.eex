@@ -4,7 +4,7 @@
 <h1>
   <%= settings_button_template() %>
   <%= if module.source_url do %>
-    <a href="<%= module.source_url %>" title="View Source" class="view-source" rel="help">
+    <a href="<%= module.source_url %>" title="View Source" class="icon-action" rel="help">
       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
       <span class="sr-only">View Source</span>
     </a>
@@ -28,7 +28,7 @@
   </section>
 <% end %>
 
-<%= if Enum.any?(summary, fn {_, v} -> v != [] end) do %>
+<%= if summary != [] do %>
   <section id="summary" class="details-list">
     <h1 class="section-heading">
       <a class="hover-link" href="#summary">
@@ -41,7 +41,7 @@
   </section>
 <% end %>
 
-<%= for {name, nodes} <- summary, nodes != [], key = HTML.text_to_id(name) do %>
+<%= for {name, nodes} <- summary, key = HTML.text_to_id(name) do %>
   <section id="<%= key %>" class="details-list">
     <h1 class="section-heading">
       <a class="hover-link" href="#<%= key %>">

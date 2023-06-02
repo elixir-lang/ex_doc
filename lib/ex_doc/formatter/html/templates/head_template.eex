@@ -10,19 +10,24 @@
       <meta name="author" content="<%= Enum.join(config.authors, ", ") %>">
     <% end %>
     <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
-    <link rel="stylesheet" href="<%= asset_rev config.output, "dist/#{config.proglang}*.css" %>" />
+    <link rel="stylesheet" href="<%= asset_rev config.output, "dist/html-#{config.proglang}*.css" %>" />
+    <%= if page.type == :cheatmd do %>
+      <style>@media print { @page { size: landscape; } }</style>
+    <% end %>
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
-    <script src="<%= asset_rev config.output, "dist/sidebar_items*.js" %>"></script>
+    <script src="<%= asset_rev config.output, "dist/handlebars.runtime-*.js" %>"></script>
+    <script src="<%= asset_rev config.output, "dist/handlebars.templates-*.js" %>"></script>
+    <script src="<%= asset_rev config.output, "dist/sidebar_items-*.js" %>"></script>
     <%= if config.javascript_config_path do %>
       <script src="<%= config.javascript_config_path %>"></script>
     <% end %>
-    <script async src="<%= asset_rev config.output, "dist/app*.js" %>"></script>
+    <script async src="<%= asset_rev config.output, "dist/html-*.js" %>"></script>
     <%# Extra content specified by the user (e.g. custom CSS) %>
-    <%= config.before_closing_head_tag.(:html) %>
+    <%= before_closing_head_tag(config, :html) %>
   </head>
-  <body data-type="<%= sidebar_type(page.type) %>">
+  <body data-type="<%= sidebar_type(page.type) %>" class="page-<%= page.type %>">
     <script>
       <%# Immediately apply night mode preference to avoid a flash effect %>
       try {

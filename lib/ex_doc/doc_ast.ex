@@ -40,6 +40,10 @@ defmodule ExDoc.DocAST do
     fun.(list, result)
   end
 
+  def to_string({:comment, _attrs, inner, _meta} = ast, fun) do
+    fun.(ast, "<!--#{inner}-->")
+  end
+
   def to_string({tag, attrs, _inner, _meta} = ast, fun) when tag in @void_elements do
     result = "<#{tag}#{ast_attributes_to_string(attrs)}/>"
     fun.(ast, result)
@@ -132,21 +136,25 @@ defmodule ExDoc.DocAST do
     highlight_info = language.highlight_info()
 
     Regex.replace(
-      ~r/<pre><code(?:\s+class="(\w*)")?>([^<]*)<\/code><\/pre>/,
+      ~r/<pre(\s+class="\w*")?><code(?:\s+class="(\w*)")?>([^<]*)<\/code><\/pre>/,
       html,
-      &highlight_code_block(&1, &2, &3, highlight_info, opts)
+      &highlight_code_block(&1, &2, &3, &4, highlight_info, opts)
     )
   end
 
-  defp highlight_code_block(full_block, lang, code, highlight_info, outer_opts) do
+  defp highlight_code_block(full_block, pre_attr, lang, code, highlight_info, outer_opts) do
     case pick_language_and_lexer(lang, highlight_info, code) do
       {_language, nil, _opts} -> full_block
-      {language, lexer, opts} -> render_code(language, lexer, opts, code, outer_opts)
+      {lang, lexer, opts} -> render_code(pre_attr, lang, lexer, opts, code, outer_opts)
     end
   end
 
   defp pick_language_and_lexer("", _highlight_info, "$ " <> _) do
     {"shell", ExDoc.ShellLexer, []}
+  end
+
+  defp pick_language_and_lexer("output", highlight_info, _code) do
+    {"output", highlight_info.lexer, highlight_info.opts}
   end
 
   defp pick_language_and_lexer("", highlight_info, _code) do
@@ -160,7 +168,7 @@ defmodule ExDoc.DocAST do
     end
   end
 
-  defp render_code(lang, lexer, lexer_opts, code, opts) do
+  defp render_code(pre_attr, lang, lexer, lexer_opts, code, opts) do
     highlight_tag = Keyword.get(opts, :highlight_tag, "span")
 
     highlighted =
@@ -173,7 +181,7 @@ defmodule ExDoc.DocAST do
         formatter_options: [highlight_tag: highlight_tag]
       )
 
-    ~s(<pre><code class="makeup #{lang}" translate="no">#{highlighted}</code></pre>)
+    ~s(<pre#{pre_attr}><code class="makeup #{lang}" translate="no">#{highlighted}</code></pre>)
   end
 
   entities = [{"&amp;", ?&}, {"&lt;", ?<}, {"&gt;", ?>}, {"&quot;", ?"}, {"&#39;", ?'}]

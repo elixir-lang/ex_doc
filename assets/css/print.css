@@ -1,0 +1,69 @@
+@media print {
+  .main {
+    display: block;
+  }
+
+  .sidebar,
+  .sidebar-button {
+    display: none;
+  }
+
+  .content {
+    padding-left: 0;
+    overflow: visible;
+    left: 0px;
+    width: 100%;
+  }
+
+  .summary-row {
+    break-inside: avoid;
+  }
+
+  #toast {
+    display: none;
+  }
+
+  .content-inner .section-heading a.hover-link {
+    display: none;
+  }
+
+  .content-inner button.icon-action {
+    display: none;
+  }
+
+  .content-inner a.icon-action {
+    display: none;
+  }
+
+  .content-inner .bottom-actions {
+    display: none;
+  }
+
+  /* Hide On Hex.pm text but keep Built Using ExDoc */
+  .footer p:first-of-type {
+    display: none;
+  }
+
+  .content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) {
+    border: 2px solid var(--gray400);
+  }
+
+  .content-inner blockquote :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
+    color: var(--textHeaders);
+    border-bottom: 2px solid var(--gray400);
+  }
+
+  .content-inner pre code.makeup {
+    border-color: var(--gray400);
+    white-space: break-spaces;
+    break-inside: avoid;
+  }
+
+  .content-inner blockquote code.inline {
+    border-color: var(--gray400);
+  }
+
+  .content-inner code.inline {
+    border-color: var(--gray400);
+  }
+}

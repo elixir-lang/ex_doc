@@ -2,6 +2,38 @@ defmodule ExDoc.Utils do
   @moduledoc false
 
   @doc """
+  Runs the `before_closing_head_tag` callback.
+  """
+  def before_closing_head_tag(%{before_closing_head_tag: {m, f, a}}, module) do
+    apply(m, f, [module | a])
+  end
+
+  def before_closing_head_tag(%{before_closing_head_tag: before_closing_head_tag}, module)
+      when is_map(before_closing_head_tag) do
+    Map.get(before_closing_head_tag, module, "")
+  end
+
+  def before_closing_head_tag(%{before_closing_head_tag: before_closing_head_tag}, module) do
+    before_closing_head_tag.(module)
+  end
+
+  @doc """
+  Runs the `before_closing_body_tag` callback.
+  """
+  def before_closing_body_tag(%{before_closing_body_tag: {m, f, a}}, module) do
+    apply(m, f, [module | a])
+  end
+
+  def before_closing_body_tag(%{before_closing_body_tag: before_closing_body_tag}, module)
+      when is_map(before_closing_body_tag) do
+    Map.get(before_closing_body_tag, module, "")
+  end
+
+  def before_closing_body_tag(%{before_closing_body_tag: before_closing_body_tag}, module) do
+    before_closing_body_tag.(module)
+  end
+
+  @doc """
   HTML escapes the given string.
 
       iex> ExDoc.Utils.h("<foo>")
@@ -42,8 +74,14 @@ defmodule ExDoc.Utils do
     [@offset + List.to_integer([digit | digits]) | make_sortable(chars)]
   end
 
+  # Then Elixir special punctuation - trailing bang `!`
+  defp make_sortable([?! | chars]), do: [?0 | make_sortable(chars)]
+
+  # Then Elixir special punctuation - question mark `?`
+  defp make_sortable([?? | chars]), do: [?1 | make_sortable(chars)]
+
   # Then underscore
-  defp make_sortable([?_ | chars]), do: [?0 | make_sortable(chars)]
+  defp make_sortable([?_ | chars]), do: [?2 | make_sortable(chars)]
 
   # Then uppercased letters and lowercased letters
   defp make_sortable([char | chars]) when char in ?a..?z do

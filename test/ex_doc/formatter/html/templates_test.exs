@@ -47,61 +47,61 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "generates headers with hovers" do
       assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """
              <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-               <p class="sr-only">foo</p>
+               <a href="#foo">
+                 <i class="ri-link-m" aria-hidden="true"></i>
+                 Foo
                </a>
-               Foo
              </h2>
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-               <p class="sr-only">bar</p>
+               <a href="#bar">
+                 <i class="ri-link-m" aria-hidden="true"></i>
+                 Bar
                </a>
-               Bar
              </h2>
              """
 
       assert Templates.link_headings("<h2>Foo</h2>\n<h2>Bar</h2>") == """
              <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-               <p class="sr-only">foo</p>
+               <a href="#foo">
+                 <i class="ri-link-m" aria-hidden="true"></i>
+                 Foo
                </a>
-               Foo
              </h2>
 
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-               <p class="sr-only">bar</p>
+               <a href="#bar">
+                 <i class="ri-link-m" aria-hidden="true"></i>
+                 Bar
                </a>
-               Bar
              </h2>
              """
 
       assert Templates.link_headings("<h2></h2><h2>Bar</h2>") == """
              <h2></h2><h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-               <p class="sr-only">bar</p>
+               <a href="#bar">
+                 <i class="ri-link-m" aria-hidden="true"></i>
+                 Bar
                </a>
-               Bar
              </h2>
              """
 
       assert Templates.link_headings("<h2></h2>\n<h2>Bar</h2>") == """
              <h2></h2>
              <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-               <p class="sr-only">bar</p>
+               <a href="#bar">
+                 <i class="ri-link-m" aria-hidden="true"></i>
+                 Bar
                </a>
-               Bar
              </h2>
              """
 
       assert Templates.link_headings("<h2>Foo</h2><h2></h2>") ==
                String.trim_trailing("""
                <h2 id="foo" class="section-heading">
-                 <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-                 <p class="sr-only">foo</p>
+                 <a href="#foo">
+                   <i class="ri-link-m" aria-hidden="true"></i>
+                   Foo
                  </a>
-                 Foo
                </h2>
                <h2></h2>
                """)
@@ -109,10 +109,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") ==
                String.trim_trailing("""
                <h2 id="foo" class="section-heading">
-                 <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-                 <p class="sr-only">foo</p>
+                 <a href="#foo">
+                   <i class="ri-link-m" aria-hidden="true"></i>
+                   Foo
                  </a>
-                 Foo
                </h2>
 
                <h2></h2>
@@ -120,10 +120,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert Templates.link_headings("<h3>Foo</h3>") == """
              <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-               <p class="sr-only">foo</p>
+               <a href="#foo">
+                 <i class="ri-link-m" aria-hidden="true"></i>
+                 Foo
                </a>
-               Foo
              </h3>
              """
     end
@@ -131,17 +131,17 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "generates headers with unique id's" do
       assert Templates.link_headings("<h3>Foo</h3>\n<h3>Foo</h3>") == """
              <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-               <p class="sr-only">foo</p>
+               <a href="#foo">
+                 <i class="ri-link-m" aria-hidden="true"></i>
+                 Foo
                </a>
-               Foo
              </h3>
 
              <h3 id="foo-1" class="section-heading">
-               <a href="#foo-1" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-               <p class="sr-only">foo-1</p>
+               <a href="#foo-1">
+                 <i class="ri-link-m" aria-hidden="true"></i>
+                 Foo
                </a>
-               Foo
              </h3>
              """
     end
@@ -153,10 +153,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert Templates.link_headings(admonition_block) == """
              <blockquote><h3 id="foo" class="warning section-heading">
-               <a href="#foo" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-               <p class="sr-only">foo</p>
+               <a href="#foo">
+                 <i class="ri-link-m" aria-hidden="true"></i>
+                 Foo
                </a>
-               Foo
              </h3>
              </blockquote>
              """
@@ -209,7 +209,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                <div class="sidebar-header">\s*\
                <div class="sidebar-projectDetails">\s*\
                <a href="#{homepage_url()}" class="sidebar-projectName" translate="no">\s*Elixir\s*</a>\s*\
-               <strong class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</strong>\s*\</div>
+               <div class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</div>\s*\</div>
                """
     end
 
@@ -227,7 +227,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                <div class="sidebar-header">\s*\
                <div class="sidebar-projectDetails">\s*\
                <a href="hello.html" class="sidebar-projectName" translate="no">\s*Elixir\s*</a>\s*\
-               <strong class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</strong>\s*\</div>
+               <div class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</div>\s*\</div>
                """
     end
 
@@ -265,13 +265,29 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "outputs listing for the given nodes", context do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
-      content = create_sidebar_items(%{modules: nodes}, [])
 
-      assert content =~ ~r("modules":\[\{.*"id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
-      assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example/2")ms
-      assert content =~ ~r("id":"CompiledWithDocs".*"key":"functions".*"example_without_docs/0")ms
-      assert content =~ ~r("id":"CompiledWithDocs.Nested")ms
-      assert content =~ ~r(\{"anchor":"__struct__/0","id":"%CompiledWithDocs\{\}"\})ms
+      assert [
+               %{
+                 "id" => "CompiledWithDocs",
+                 "title" => "CompiledWithDocs",
+                 "nodeGroups" => [
+                   %{
+                     "key" => "functions",
+                     "nodes" => [
+                       %{"anchor" => "__struct__/0", "id" => "%CompiledWithDocs{}"},
+                       %{"anchor" => "example/2", "id" => "example/2"},
+                       %{"anchor" => "example_1/0", "id" => "example_1/0"},
+                       %{"anchor" => "example_with_h3/0", "id" => "example_with_h3/0"},
+                       %{"anchor" => "example_without_docs/0", "id" => "example_without_docs/0"},
+                       %{"anchor" => "flatten/1", "id" => "flatten/1"},
+                       %{"anchor" => "is_zero/1", "id" => "is_zero/1"},
+                       %{"anchor" => "name/with/slashes/0", "id" => "name/with/slashes/0"}
+                     ]
+                   }
+                 ]
+               },
+               %{"id" => "CompiledWithDocs.Nested"}
+             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
     end
 
     test "outputs nodes grouped based on metadata", context do
@@ -279,48 +295,102 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
         ExDoc.Retriever.docs_from_modules(
           [CompiledWithDocs, CompiledWithDocs.Nested],
           doc_config(context,
-            groups_for_functions: [
+            groups_for_docs: [
               "Example functions": &(&1[:purpose] == :example),
               Legacy: &is_binary(&1[:deprecated])
             ]
           )
         )
 
-      content = create_sidebar_items(%{modules: nodes}, [])
-
-      assert content =~
-               ~r("modules":\[\{"group":"","id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
-
-      assert content =~ ~r("key":"example-functions".*"example/2")ms
-      refute content =~ ~r("key":"legacy".*"example/2")ms
-      refute content =~ ~r("key":"functions".*"example/2")ms
-      assert content =~ ~r("key":"functions".*"example_1/0")ms
-      assert content =~ ~r("key":"legacy".*"example_without_docs/0")ms
+      assert [
+               %{
+                 "group" => "",
+                 "id" => "CompiledWithDocs",
+                 "nodeGroups" => [
+                   %{
+                     "key" => "example-functions",
+                     "nodes" => [
+                       %{"id" => "example/2"},
+                       %{"id" => "example_with_h3/0"}
+                     ]
+                   },
+                   %{
+                     "key" => "legacy",
+                     "nodes" => [%{"id" => "example_without_docs/0"}]
+                   },
+                   %{
+                     "key" => "functions",
+                     "nodes" => [
+                       %{"id" => "%CompiledWithDocs{}"},
+                       %{"id" => "example_1/0"},
+                       %{"id" => "flatten/1"},
+                       %{"id" => "is_zero/1"},
+                       %{"id" => "name/with/slashes/0"}
+                     ]
+                   }
+                 ]
+               },
+               %{"id" => "CompiledWithDocs.Nested"}
+             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
     end
 
     test "outputs module groups for the given nodes", context do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       group_mapping = [groups_for_modules: [Group: [CompiledWithDocs]]]
       nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(context, group_mapping))
-      content = create_sidebar_items(%{modules: nodes}, [])
 
-      assert content =~ ~r("group":"Group","id":"CompiledWithDocs",.*"title":"CompiledWithDocs")ms
+      assert [
+               %{"group" => ""},
+               %{
+                 "group" => "Group",
+                 "id" => "CompiledWithDocs",
+                 "title" => "CompiledWithDocs"
+               }
+             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
     end
 
     test "outputs extras with headers" do
       item = %{content: nil, group: nil, id: nil, title: nil}
 
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"},{"anchor":"bar","id":"Bar"}],"id":"","title":""}]})
+      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}])["extras"] ==
+               [
+                 %{
+                   "group" => "",
+                   "headers" => [
+                     %{"anchor" => "foo", "id" => "Foo"},
+                     %{"anchor" => "bar", "id" => "Bar"}
+                   ],
+                   "id" => "",
+                   "title" => ""
+                 }
+               ]
 
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"},{"anchor":"bar","id":"Bar"}],"id":"","title":""}]})
+      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}])[
+               "extras"
+             ] ==
+               [
+                 %{
+                   "group" => "",
+                   "headers" => [
+                     %{"anchor" => "foo", "id" => "Foo"},
+                     %{"anchor" => "bar", "id" => "Bar"}
+                   ],
+                   "id" => "",
+                   "title" => ""
+                 }
+               ]
 
-      assert create_sidebar_items(%{}, [%{item | content: "<h2></h2><h2>Bar</h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"bar","id":"Bar"}],"id":"","title":""}]})
-
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}]) ==
-               ~s(sidebarNodes={"extras":[{"group":"","headers":[{"anchor":"foo","id":"Foo"}],"id":"","title":""}]})
+      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}])["extras"] ==
+               [
+                 %{
+                   "group" => "",
+                   "headers" => [
+                     %{"anchor" => "foo", "id" => "Foo"}
+                   ],
+                   "id" => "",
+                   "title" => ""
+                 }
+               ]
     end
 
     test "builds sections out of moduledocs", context do
@@ -329,34 +399,35 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       nodes = ExDoc.Retriever.docs_from_modules(names, config)
       nodes = HTML.render_all(nodes, ".html", config, [])
 
-      assert "sidebarNodes=" <> json = create_sidebar_items(%{modules: nodes}, [])
+      [compiled_with_docs, compiled_without_docs, duplicate_headings] =
+        create_sidebar_items(%{modules: nodes}, [])["modules"]
 
-      assert {:ok, %{modules: [compiled_with_docs, compiled_without_docs, duplicate_headings]}} =
-               Jason.decode(json, keys: :atoms)
-
-      assert compiled_with_docs.sections == [
+      assert compiled_with_docs["sections"] == [
                %{
-                 anchor: "module-example-unicode-escaping",
-                 id: "Example ☃ Unicode &gt; escaping"
+                 "anchor" => "module-example-unicode-escaping",
+                 "id" => "Example ☃ Unicode &gt; escaping"
                }
              ]
 
-      assert compiled_without_docs.sections == []
+      assert compiled_without_docs["sections"] == []
 
-      assert duplicate_headings.sections == [
-               %{anchor: "module-one", id: "One"},
-               %{anchor: "module-two", id: "Two"},
-               %{anchor: "module-one-1", id: "One"},
-               %{anchor: "module-two-1", id: "Two"},
-               %{anchor: "module-one-2", id: "One"},
-               %{anchor: "module-two-2", id: "Two"}
+      assert duplicate_headings["sections"] == [
+               %{"anchor" => "module-one", "id" => "One"},
+               %{"anchor" => "module-two", "id" => "Two"},
+               %{"anchor" => "module-one-1", "id" => "One"},
+               %{"anchor" => "module-two-1", "id" => "Two"},
+               %{"anchor" => "module-one-2", "id" => "One"},
+               %{"anchor" => "module-two-2", "id" => "Two"}
              ]
     end
 
     defp create_sidebar_items(nodes_map, extras) do
-      nodes_map
-      |> Templates.create_sidebar_items(extras)
-      |> IO.iodata_to_binary()
+      "sidebarNodes=" <> content =
+        nodes_map
+        |> Templates.create_sidebar_items(extras)
+        |> IO.iodata_to_binary()
+
+      Jason.decode!(content)
     end
   end
 
@@ -376,10 +447,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{moduledoc.*Example.*<span class="nc">CompiledWithDocs</span><span class="o">\.</span><span class="n">example</span>.*}ms
 
       assert content =~
-               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*Example.*</h2>}ms
+               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping">.*<i class="ri-link-m" aria-hidden="true"></i>.*Example.*</a>.*</h2>}ms
 
       assert content =~
-               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*Example H3 heading.*</h3>}ms
+               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading">.*<i class="ri-link-m" aria-hidden="true"></i>.*Example H3 heading.*</a>.*</h3>}ms
 
       # Summaries
       assert content =~ ~r{example/2.*Some example}ms
@@ -405,18 +476,19 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "outputs function groups", context do
       content =
         get_module_page([CompiledWithDocs], context,
-          groups_for_functions: [
+          groups_for_docs: [
             "Example functions": &(&1[:purpose] == :example),
             Legacy: &is_binary(&1[:deprecated])
           ]
         )
 
-      assert content =~ ~r{id="example-functions".*href="#example-functions".*Example functions}ms
-      assert content =~ ~r{id="legacy".*href="#legacy".*Legacy}ms
-      assert content =~ ~r{id="example-functions".*id="example/2"}ms
-      refute content =~ ~r{id="legacy".*id="example/2"}ms
-      refute content =~ ~r{id="functions".*id="example/2"}ms
-      assert content =~ ~r{id="functions".*id="example_1/0"}ms
+      doc = EasyHTML.parse!(content)
+      assert doc["#example-functions a[href='#example-functions']"]
+      assert doc["#legacy a[href='#legacy']"]
+      assert doc["#example-functions [id='example/2']"]
+      refute doc["#legacy [id='example/2']"]
+      assert doc["#functions [id='example_1/0']"]
+      refute doc["#functions [id='example/2']"]
     end
 
     test "outputs deprecation information", context do
@@ -471,7 +543,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CompiledWithDocs], context)
 
       assert content =~
-               ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*Examples.*</h3>}ms
+               ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples">.*<i class="ri-link-m" aria-hidden="true"></i>.*Examples.*</a>.*</h3>}ms
     end
 
     test "do not output overlapping functions, causing duplicate IDs", context do
@@ -531,34 +603,5 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~
                ~r{<span translate="no">mix task_with_docs</span>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
     end
-  end
-
-  describe "bottom actions" do
-    test "does not render next/prev links when the refs are nil" do
-      refs = %{
-        prev: nil,
-        next: nil
-      }
-
-      content = Templates.bottom_actions_template(refs)
-
-      refute content =~ ~r{Previous Page}
-      refute content =~ ~r{Next Page}
-    end
-  end
-
-  test "renders next/prev links when their refs are given" do
-    refs = %{
-      prev: %{path: "Prev.html", title: "Left"},
-      next: %{path: "Next.html", title: "Right"}
-    }
-
-    content = Templates.bottom_actions_template(refs)
-
-    assert content =~
-             ~r{<a href="Prev.html" class="bottom-actions-button" rel="prev">\s*<span class="subheader">\s*← Previous Page\s*</span>\s*<span class="title">\s*Left\s*</span>\s*</a>}
-
-    assert content =~
-             ~r{<a href="Next.html" class="bottom-actions-button" rel="next">\s*<span class="subheader">\s*Next Page →\s*</span>\s*<span class="title">\s*Right\s*</span>\s*</a>}
   end
 end

@@ -69,8 +69,27 @@ defmodule ExDoc.Markdown.Earmark do
     {fixup_tag(tag), Enum.map(attrs, &fixup_attr/1), fixup(ast), meta}
   end
 
-  defp fixup({:comment, _, _, _}) do
-    []
+  defp fixup({:comment, _, _, _} = comment) do
+    comment
+  end
+
+  # We are matching on Livebook outputs here, because we prune comments at this point
+  defp fixup_list(
+         [
+           {:comment, _, [~s/ livebook:{"output":true} /], %{comment: true}},
+           {"pre", pre_attrs, [{"code", code_attrs, [source], code_meta}], pre_meta}
+           | ast
+         ],
+         acc
+       ) do
+    code_attrs =
+      case Enum.split_with(code_attrs, &match?({"class", _}, &1)) do
+        {[], attrs} -> [{"class", "output"} | attrs]
+        {[{"class", class}], attrs} -> [{"class", "#{class} output"} | attrs]
+      end
+
+    code_node = {"code", code_attrs, [source], code_meta}
+    fixup_list([{"pre", pre_attrs, [code_node], pre_meta} | ast], acc)
   end
 
   defp fixup_list([head | tail], acc) do

@@ -1,0 +1,28 @@
+.content-inner .footer {
+  margin: 4em auto 1em;
+  text-align: center;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.content-inner .footer,
+.content-inner .footer :is(a, .footer-button) {
+  color: var(--textFooter);
+}
+
+.content-inner .footer .line {
+  display: inline-block;
+}
+
+.content-inner .footer .footer-button {
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  font-style: italic;
+  outline: none;
+  padding: 0 4px;
+}
+
+.content-inner .footer .footer-hex-package {
+  margin-right: 4px;
+}

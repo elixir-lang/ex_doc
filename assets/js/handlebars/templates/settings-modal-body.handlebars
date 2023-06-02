@@ -35,22 +35,22 @@
     </label>
     <input class="input" type="url" name="livebook_url" placeholder="Enter Livebook instance URL" aria-label="Enter Livebook instance URL" />
   </div>
-   <div id="keyboard-shortcuts" class="hidden">
-     {{#each shortcuts}}
-       {{#if this.description}}
-         <dl class="shortcut-row">
-           <dd class="shortcut-description">
-             {{this.description}}
-           </dd>
-           <dt class="shortcut-keys">
-             {{#if this.displayAs}}
-               {{{this.displayAs}}}
-             {{else}}
-               <kbd><kbd>{{this.key}}</kbd></kbd>
-             {{/if}}
-           </dt>
-         </dl>
-       {{/if}}
-     {{/each}}
-   </div>
+  <div id="keyboard-shortcuts-content" class="hidden">
+    {{#each shortcuts}}
+      {{#if this.description}}
+        <dl class="shortcut-row">
+          <dd class="shortcut-description">
+            {{this.description}}
+          </dd>
+          <dt class="shortcut-keys">
+            {{#if this.displayAs}}
+              {{{this.displayAs}}}
+            {{else}}
+              <kbd><kbd>{{this.key}}</kbd></kbd>
+            {{/if}}
+          </dt>
+        </dl>
+      {{/if}}
+    {{/each}}
+  </div>
 </div>

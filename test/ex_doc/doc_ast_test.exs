@@ -12,6 +12,19 @@ defmodule ExDoc.DocASTTest do
                [{:p, [], [{:strong, [], ["foo"], %{}}], %{}}]
     end
 
+    test "markdown comments" do
+      markdown = """
+      **foo**
+      <!-- bar -->
+      """
+
+      assert DocAST.parse!(markdown, "text/markdown") ==
+               [
+                 {:p, [], [{:strong, [], ["foo"], %{}}], %{}},
+                 {:comment, [], [" bar "], %{comment: true}}
+               ]
+    end
+
     test "markdown errors" do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert DocAST.parse!("`String.upcase", "text/markdown") ==
@@ -67,7 +80,7 @@ defmodule ExDoc.DocASTTest do
       """
 
       ast = DocAST.parse!(markdown, "text/markdown")
-      assert DocAST.to_string(ast) == ~s{<span><i></i><i></i></span>}
+      assert DocAST.to_string(ast) == ~s{<span><i></i>\n<i></i></span>}
     end
 
     test "with fun" do
@@ -102,23 +115,40 @@ defmodule ExDoc.DocASTTest do
   end
 
   describe "highlight" do
-    test "if no language is given in markup, use language module " do
-      with_empty_class = ~S[<pre><code class="">mix run --no-halt path/to/file.exs</code></pre>]
-      without_class = "<pre><code>mix run --no-halt path/to/file.exs</code></pre>"
-      iex_detected_with_empty_class = ~S[<pre><code class="">iex&gt; max(4, 5)</code></pre>]
-      iex_detected_without_class = ~S[<pre><code>iex&gt; max(4, 5)</code></pre>]
-
-      assert DocAST.highlight(with_empty_class, ExDoc.Language.Elixir) =~
+    test "with default class" do
+      # Empty class
+      assert DocAST.highlight(
+               ~S[<pre><code class="">mix run --no-halt path/to/file.exs</code></pre>],
+               ExDoc.Language.Elixir
+             ) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
-      assert DocAST.highlight(without_class, ExDoc.Language.Elixir) =~
+      # Without class
+      assert DocAST.highlight(
+               "<pre><code>mix run --no-halt path/to/file.exs</code></pre>",
+               ExDoc.Language.Elixir
+             ) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
-      # IEx is highlighted by the normal elixir lexer
-      assert DocAST.highlight(iex_detected_with_empty_class, ExDoc.Language.Elixir) =~
+      # Pre class
+      assert DocAST.highlight(
+               ~S[<pre class="wrap"><code class="">mix run --no-halt path/to/file.exs</code></pre>],
+               ExDoc.Language.Elixir
+             ) =~
+               ~r{<pre class="wrap"><code class=\"makeup elixir\" translate="no">.*}
+
+      # IEx highlight with empty class
+      assert DocAST.highlight(
+               ~S[<pre><code class="">iex&gt; max(4, 5)</code></pre>],
+               ExDoc.Language.Elixir
+             ) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
-      assert DocAST.highlight(iex_detected_without_class, ExDoc.Language.Elixir) =~
+      # IEx highlight without class
+      assert DocAST.highlight(
+               ~S[<pre><code>iex&gt; max(4, 5)</code></pre>],
+               ExDoc.Language.Elixir
+             ) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
     end
   end

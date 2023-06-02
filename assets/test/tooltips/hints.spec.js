@@ -5,12 +5,12 @@ describe('hints extraction', () => {
     const modulePageObject = parseHTML(`
       <div>
         <h1>
-          <button class="settings display-settings">
+          <button class="icon-action display-settings">
             <i class="ri-settings-3-line"></i>
             <span class="sr-only">Settings</span>
           </button>
 
-          <a href="https://github.com/" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/" title="View Source" class="icon-action" rel="help">
             <i class="ri-code-s-slash-line" aria-hidden="true"></i>
             <span class="sr-only">View Source</span>
           </a>
@@ -28,7 +28,7 @@ describe('hints extraction', () => {
 
     it('extracts hint info', () => {
       expect(extractModuleHint(modulePageObject).title).to.eql('Some module')
-      expect(extractModuleHint(modulePageObject).description).to.eql('Module description here')
+      expect(extractModuleHint(modulePageObject).description).to.eql('Module <strong>description</strong> here')
       expect(extractModuleHint(modulePageObject).kind).to.eql('module')
     })
   })
@@ -44,7 +44,7 @@ describe('hints extraction', () => {
 
           <h1 class="signature">configure(any)</h1>
 
-          <a href="https://github.com/" class="view-source" rel="help" title="View Source">
+          <a href="https://github.com/" class="icon-action" rel="help" title="View Source">
             <i class="ri-code-s-slash-line" aria-hidden="true"></i>
             <span class="sr-only">View Source</span>
           </a>

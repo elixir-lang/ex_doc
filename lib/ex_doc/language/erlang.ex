@@ -7,31 +7,32 @@ defmodule ExDoc.Language.Erlang do
 
   @impl true
   def module_data(module, docs_chunk, _config) do
-    # Make sure the module is loaded for future checks
-    _ = Code.ensure_loaded(module)
-    id = Atom.to_string(module)
-    abst_code = get_abstract_code(module)
-    line = find_module_line(module, abst_code)
-    type = module_type(module)
-    optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
+    if abst_code = get_abstract_code(module) do
+      id = Atom.to_string(module)
+      line = find_module_line(module, abst_code)
+      type = module_type(module)
+      optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
 
-    %{
-      module: module,
-      docs: docs_chunk,
-      language: __MODULE__,
-      id: id,
-      title: id,
-      type: type,
-      line: line,
-      callback_types: [:callback],
-      nesting_info: nil,
-      private: %{
-        abst_code: abst_code,
-        specs: get_specs(module),
-        callbacks: get_callbacks(module),
-        optional_callbacks: optional_callbacks
+      %{
+        module: module,
+        docs: docs_chunk,
+        language: __MODULE__,
+        id: id,
+        title: id,
+        type: type,
+        line: line,
+        callback_types: [:callback],
+        nesting_info: nil,
+        private: %{
+          abst_code: abst_code,
+          specs: get_specs(module),
+          callbacks: get_callbacks(module),
+          optional_callbacks: optional_callbacks
+        }
       }
-    }
+    else
+      IO.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
+    end
   end
 
   @impl true
@@ -172,15 +173,12 @@ defmodule ExDoc.Language.Erlang do
 
   @doc false
   def get_abstract_code(module) do
-    case :code.get_object_code(module) do
-      {^module, binary, _file} ->
-        case :beam_lib.chunks(binary, [:abstract_code]) do
-          {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} -> abstract_code
-          _otherwise -> []
-        end
-
-      :error ->
-        []
+    with {^module, binary, _file} <- :code.get_object_code(module),
+         {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} <-
+           :beam_lib.chunks(binary, [:abstract_code]) do
+      abstract_code
+    else
+      _ -> nil
     end
   end
 
@@ -215,6 +213,41 @@ defmodule ExDoc.Language.Erlang do
 
   defp walk_doc(binary, _) when is_binary(binary) do
     binary
+  end
+
+  defp walk_doc({:code, attrs, [code], meta} = ast, config) do
+    {text, url} =
+      case parse_autolink(code) do
+        {:module, module} = ref ->
+          text = Atom.to_string(module)
+          # Modules are parsed very permissively, so undefined/private
+          # modules do not emit warnings
+          url = do_url(ref, code, config, false)
+          {text, url}
+
+        {:local, kind, name, arity} ->
+          {"#{name}/#{arity}", local_url(kind, name, arity, config)}
+
+        {:remote, kind, module, name, arity} ->
+          text =
+            if kind == :type and arity == 0 do
+              "#{module}:#{name}()"
+            else
+              "#{module}:#{name}/#{arity}"
+            end
+
+          url = remote_url(kind, module, name, arity, config)
+          {text, url}
+
+        :error ->
+          {code, nil}
+      end
+
+    if url do
+      {:a, [href: url], {:code, attrs, [text], meta}, %{}}
+    else
+      ast
+    end
   end
 
   defp walk_doc({:a, attrs, inner, _meta} = ast, config) do
@@ -308,7 +341,7 @@ defmodule ExDoc.Language.Erlang do
 
   defp url(:module, string, config) do
     ref = {:module, String.to_atom(string)}
-    do_url(ref, string, config)
+    do_url(ref, string, config, true)
   end
 
   defp url(kind, string, config) do
@@ -327,31 +360,46 @@ defmodule ExDoc.Language.Erlang do
     name = String.to_atom(name)
     arity = String.to_integer(arity)
 
-    original_text =
-      if kind == :type and arity == 0 do
-        "#{name}()"
-      else
-        "#{name}/#{arity}"
-      end
-
     if module == "" do
-      ref = {kind, config.current_module, name, arity}
-      visibility = Refs.get_visibility(ref)
-
-      if visibility == :public do
-        final_url({kind, name, arity}, config)
-      else
-        Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
-        nil
-      end
+      local_url(kind, name, arity, config)
     else
-      ref = {kind, String.to_atom(module), name, arity}
-      original_text = "#{module}:#{original_text}"
-      do_url(ref, original_text, config)
+      remote_url(kind, String.to_atom(module), name, arity, config)
     end
   end
 
-  defp do_url(ref, original_text, config) do
+  defp remote_url(kind, module, name, arity, config) do
+    ref = {kind, module, name, arity}
+
+    text =
+      if kind == :type and arity == 0 do
+        "#{module}:#{name}()"
+      else
+        "#{module}:#{name}/#{arity}"
+      end
+
+    do_url(ref, text, config, true)
+  end
+
+  defp local_url(kind, name, arity, config) do
+    ref = {kind, config.current_module, name, arity}
+    visibility = Refs.get_visibility(ref)
+
+    if visibility == :public do
+      final_url({kind, name, arity}, config)
+    else
+      original_text =
+        if kind == :type and arity == 0 do
+          "#{name}()"
+        else
+          "#{name}/#{arity}"
+        end
+
+      Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
+      nil
+    end
+  end
+
+  defp do_url(ref, original_text, config, emit_warning) do
     visibility = Refs.get_visibility(ref)
 
     # TODO: type with content = %{} in otp xml is marked as :hidden, it should be :public
@@ -359,7 +407,10 @@ defmodule ExDoc.Language.Erlang do
     if visibility == :public or (visibility == :hidden and elem(ref, 0) == :type) do
       final_url(ref, config)
     else
-      Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
+      if emit_warning do
+        Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
+      end
+
       nil
     end
   end
@@ -403,6 +454,86 @@ defmodule ExDoc.Language.Erlang do
 
   defp fragment(:ex_doc, :type, name, arity) do
     "#t:#{name}/#{arity}"
+  end
+
+  defp kind("c:" <> rest), do: {:callback, rest}
+  defp kind("t:" <> rest), do: {:type, rest}
+  defp kind(rest), do: {:function, rest}
+
+  defp parse_autolink(string) do
+    case Regex.run(~r{^(.+)(/\d+|\(\))$}, string) do
+      [_, left, right] ->
+        with {:ok, arity} <- parse_arity(right) do
+          {kind, rest} = kind(left)
+
+          case parse_module_function(rest) do
+            {:local, name} ->
+              {:local, kind, name, arity}
+
+            {:remote, module, name} ->
+              {:remote, kind, module, name, arity}
+
+            :error ->
+              :error
+          end
+        end
+
+      nil ->
+        parse_module(string)
+
+      _ ->
+        :error
+    end
+  end
+
+  # 0-arity types may take the form `t:module:type()`.
+  defp parse_arity("()") do
+    {:ok, 0}
+  end
+
+  defp parse_arity("/" <> arity_string) do
+    case Integer.parse(arity_string) do
+      {arity, ""} -> {:ok, arity}
+      _ -> :error
+    end
+  end
+
+  defp parse_module_function(string) do
+    case String.split(string, ":") do
+      [module_string, function_string] ->
+        with {:module, module} <- parse_module(module_string),
+             {:function, function} <- parse_function(function_string) do
+          {:remote, module, function}
+        end
+
+      [function_string] ->
+        with {:function, function} <- parse_function(function_string) do
+          {:local, function}
+        end
+
+      _ ->
+        :error
+    end
+  end
+
+  defp parse_function(string) do
+    case Code.string_to_quoted("& #{string}/0") do
+      {:ok, {:&, _, [{:/, _, [{function, _, _}, 0]}]}} when is_atom(function) ->
+        {:function, function}
+
+      _ ->
+        :error
+    end
+  end
+
+  defp parse_module(string) do
+    case Code.string_to_quoted(":#{string}", warn_on_unnecessary_quotes: false) do
+      {:ok, module} when is_atom(module) ->
+        {:module, module}
+
+      _ ->
+        :error
+    end
   end
 
   # Traverses quoted and formatted string of the typespec AST, replacing refs with links.
@@ -460,7 +591,10 @@ defmodule ExDoc.Language.Erlang do
               arity = length(args)
 
               cond do
-                name in [:"::", :when, :%{}, :{}, :|, :->, :record] ->
+                name == :record and acc != [] ->
+                  {ast, acc}
+
+                name in [:"::", :when, :%{}, :{}, :|, :->] ->
                   {ast, acc}
 
                 # %{required(...) => ..., optional(...) => ...}

@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
 
-  import ExDoc.Utils, only: [h: 1]
+  import ExDoc.Utils, only: [h: 1, before_closing_body_tag: 2, before_closing_head_tag: 2]
 
   # TODO: It should not depend on the parent module. Move required HTML functions to Utils.
   # TODO: Add tests that assert on the returned structured, not on JSON
@@ -117,7 +117,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
         extra =
           module
           |> module_summary()
-          |> Enum.reject(fn {_type, nodes_map} -> nodes_map == [] end)
           |> case do
             [] -> []
             entries -> [nodeGroups: Enum.map(entries, &sidebar_entries/1)]
@@ -146,7 +145,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
             "#{node.name}/#{node.arity}"
           end
 
-        %{id: id, anchor: URI.encode(node.id)}
+        %{id: id, title: node.signature, anchor: URI.encode(node.id)}
       end
 
     %{key: HTML.text_to_id(group), name: group, nodes: nodes}
@@ -172,6 +171,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     [sections: sections]
   end
 
+  # TODO: split into sections in Formatter.HTML instead.
   @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
   defp extract_headers(content) do
     @h2_regex
@@ -183,11 +183,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   def module_summary(module_node) do
-    [Types: module_node.typespecs] ++
-      function_groups(module_node.function_groups, module_node.docs)
+    entries =
+      [Types: module_node.typespecs] ++
+        docs_groups(module_node.docs_groups, module_node.docs)
+
+    Enum.reject(entries, fn {_type, nodes} -> nodes == [] end)
   end
 
-  defp function_groups(groups, docs) do
+  defp docs_groups(groups, docs) do
     for group <- groups, do: {group, Enum.filter(docs, &(&1.group == group))}
   end
 
@@ -195,12 +198,15 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
 
   defp sidebar_type(:exception), do: "modules"
-  defp sidebar_type(:extra), do: "extras"
   defp sidebar_type(:module), do: "modules"
   defp sidebar_type(:behaviour), do: "modules"
   defp sidebar_type(:protocol), do: "modules"
   defp sidebar_type(:task), do: "tasks"
+
   defp sidebar_type(:search), do: "search"
+  defp sidebar_type(:cheatmd), do: "extras"
+  defp sidebar_type(:livemd), do: "extras"
+  defp sidebar_type(:extra), do: "extras"
 
   def asset_rev(output, pattern) do
     output = Path.expand(output)
@@ -221,7 +227,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   prefixed with `prefix`.
   """
   @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
-  @spec link_headings(String.t(), Regex.t(), String.t()) :: String.t()
+  @spec link_headings(String.t() | nil, Regex.t(), String.t()) :: String.t() | nil
   def link_headings(content, regex \\ @heading_regex, prefix \\ "")
   def link_headings(nil, _, _), do: nil
 
@@ -287,10 +293,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
     """
     <#{tag} id="#{prefix}#{id}" class="#{class_attribute}">
-      <a href="##{prefix}#{id}" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-      <p class="sr-only">#{id}</p>
+      <a href="##{prefix}#{id}">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        #{title}
       </a>
-      #{title}
     </#{tag}>
     """
   end
@@ -311,12 +317,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
     not_found_template: [:config, :nodes_map],
     api_reference_entry_template: [:module_node],
     api_reference_template: [:nodes_map],
-    extra_template: [:config, :node, :nodes_map, :refs],
+    extra_template: [:config, :node, :type, :nodes_map, :refs],
     search_template: [:config, :nodes_map],
     sidebar_template: [:config, :nodes_map],
     summary_template: [:name, :nodes],
     redirect_template: [:config, :redirect_to],
-    bottom_actions_template: [:refs],
     settings_button_template: []
   ]
 

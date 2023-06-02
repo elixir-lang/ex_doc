@@ -9,6 +9,9 @@ defmodule ExDoc.Formatter.EPUBTest do
   defp before_closing_head_tag(:epub), do: @before_closing_head_tag_content_epub
   defp before_closing_body_tag(:epub), do: @before_closing_body_tag_content_epub
 
+  def before_closing_head_tag(:epub, name), do: "<meta name=#{name}>"
+  def before_closing_body_tag(:epub, name), do: "<p>#{name}</p>"
+
   defp doc_config(%{tmp_dir: tmp_dir} = _context) do
     [
       app: :elixir,
@@ -83,8 +86,14 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   test "generates an EPUB file with erlang as proglang", %{tmp_dir: tmp_dir} = context do
-    generate_docs(Keyword.put(doc_config(context), :proglang, :erlang))
-    assert File.regular?(tmp_dir <> "/epub/#{doc_config(context)[:project]}.epub")
+    config =
+      context
+      |> doc_config()
+      |> Keyword.put(:proglang, :erlang)
+      |> Keyword.update!(:skip_undefined_reference_warnings_on, &["test/fixtures/README.md" | &1])
+
+    generate_docs(config)
+    assert File.regular?(tmp_dir <> "/epub/#{config[:project]}.epub")
   end
 
   test "generates an EPUB file in specified output directory", %{tmp_dir: tmp_dir} = context do
@@ -111,8 +120,8 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{oebps_dir}/readme.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.Nested.xhtml")
-    assert [_] = Path.wildcard("#{dist_dir}/app*.js")
-    assert [_] = Path.wildcard("#{dist_dir}/elixir*.css")
+    assert [_] = Path.wildcard("#{dist_dir}/epub-*.js")
+    assert [_] = Path.wildcard("#{dist_dir}/epub-elixir-*.css")
   end
 
   test "generates all listing files", %{tmp_dir: tmp_dir} = context do
@@ -179,6 +188,44 @@ defmodule ExDoc.Formatter.EPUBTest do
       content = File.read!(Path.join(oebps_dir, basename))
       assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
       assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
+    end
+  end
+
+  test "before_closing_*_tags required by the user are in the right place using map",
+       %{tmp_dir: tmp_dir} = context do
+    generate_docs_and_unzip(
+      context,
+      doc_config(context,
+        before_closing_head_tag: %{epub: "<meta name=StaticDemo>"},
+        before_closing_body_tag: %{epub: "<p>StaticDemo</p>"}
+      )
+    )
+
+    oebps_dir = tmp_dir <> "/epub/OEBPS"
+
+    for basename <- @example_basenames do
+      content = File.read!(Path.join(oebps_dir, basename))
+      assert content =~ ~r[<meta name=StaticDemo>\s*</head>]
+      assert content =~ ~r[<p>StaticDemo</p>\s*</body>]
+    end
+  end
+
+  test "before_closing_*_tags required by the user are in the right place using a MFA",
+       %{tmp_dir: tmp_dir} = context do
+    generate_docs_and_unzip(
+      context,
+      doc_config(context,
+        before_closing_head_tag: {__MODULE__, :before_closing_head_tag, ["Demo"]},
+        before_closing_body_tag: {__MODULE__, :before_closing_body_tag, ["Demo"]}
+      )
+    )
+
+    oebps_dir = tmp_dir <> "/epub/OEBPS"
+
+    for basename <- @example_basenames do
+      content = File.read!(Path.join(oebps_dir, basename))
+      assert content =~ ~r[<meta name=Demo>\s*</head>]
+      assert content =~ ~r[<p>Demo</p>\s*</body>]
     end
   end
 

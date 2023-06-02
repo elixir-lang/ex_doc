@@ -69,7 +69,7 @@ defmodule ExDoc.RefsTest do
   end
 
   test "insert_from_chunk/2 with module that doesn't exist" do
-    result = Code.fetch_docs(:elixir)
-    assert :ok = ExDoc.Refs.insert_from_chunk(Elixir, result)
+    result = Code.fetch_docs(DoesNotExists)
+    assert :ok = ExDoc.Refs.insert_from_chunk(DoesNotExists, result)
   end
 end

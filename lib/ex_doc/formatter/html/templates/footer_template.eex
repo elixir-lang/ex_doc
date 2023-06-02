@@ -1,24 +1,31 @@
       <footer class="footer">
-        <%= if config.package do %>
-          <p>
-            On Hex.pm:
-
+        <p>
+          <%= if config.package do %>
             <span class="line">
-              <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>" class="line footer-hex-package">Package</a>
-              <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>" class="line">Preview</a>
+              <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>" class="footer-hex-package">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>">Hex Preview</a>
 
               <%= source_path = node && Map.get(node, :source_path); if source_path do %>
-                <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>/show/<%= source_path %>">(current file)</a>
+                (<a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>/show/<%= source_path %>">current file</a>)
               <% end %>
             </span>
+          <% end %>
 
-            <button class="line footer-button display-quick-switch">
-              Search
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+              Search HexDocs
             </button>
-          </p>
-        <% end %>
 
-        <p>
+            <%= if "epub" in config.formatters do %>
+              <a href="<%= config.project %>.epub" title="ePub version">
+                Download ePub version
+              </a>
+            <% end %>
+          </span>
+        </p>
+
+        <p class="built-using">
           Built using
           <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v<%= ExDoc.version() %>) for the
           <%= if config.proglang == :erlang do %>
@@ -33,6 +40,6 @@
 </section>
 </div>
   <%# Extra content specified by the user (e.g. custom Javascript) %>
-  <%= config.before_closing_body_tag.(:html) %>
+  <%= before_closing_body_tag(config, :html) %>
   </body>
 </html>

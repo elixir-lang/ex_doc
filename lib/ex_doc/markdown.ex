@@ -78,4 +78,34 @@ defmodule ExDoc.Markdown do
       to use an Elixir-based markdown processor
     """
   end
+
+  @doc """
+  Wraps the desired tags in HTML in sections.
+  """
+  def sectionize(list, matcher), do: sectionize(list, matcher, [])
+
+  defp sectionize(list, matcher, acc) do
+    case pivot(list, acc, matcher) do
+      {acc, {header_tag, header_attrs, _, _} = header, rest} ->
+        {inner, rest} = Enum.split_while(rest, &not_tag?(&1, header_tag))
+        class = String.trim_trailing("#{header_tag} #{header_attrs[:class]}")
+        section = {:section, [class: class], [header | sectionize(inner, matcher, [])], %{}}
+        sectionize(rest, matcher, [section | acc])
+
+      acc ->
+        acc
+    end
+  end
+
+  defp not_tag?({tag, _, _, _}, tag), do: false
+  defp not_tag?(_, _tag), do: true
+
+  defp pivot([head | tail], acc, fun) do
+    case fun.(head) do
+      true -> {acc, head, tail}
+      false -> pivot(tail, [head | acc], fun)
+    end
+  end
+
+  defp pivot([], acc, _fun), do: Enum.reverse(acc)
 end

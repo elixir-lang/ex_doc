@@ -26,7 +26,8 @@ defmodule ExDoc.Markdown.EarmarkTest do
     end
 
     test "comments" do
-      assert Markdown.to_ast("<!-- INCLUDE -->", []) == []
+      assert Markdown.to_ast("<!-- INCLUDE -->", []) ==
+               [{:comment, [], [" INCLUDE "], %{comment: true}}]
     end
 
     test "warnings" do
@@ -40,6 +41,38 @@ defmodule ExDoc.Markdown.EarmarkTest do
                assert [{:p, [], _, %{}}] =
                         Markdown.to_ast("{:ok, status, %MyApp.User{}} on success", [])
              end) =~ "ExDoc.Markdown.Earmark (warning)"
+    end
+
+    test "rewrites livebook outputs to output code blocks" do
+      md = """
+      # Notebook
+
+      ## Example
+
+      ```elixir
+      1 + 1
+      ```
+
+      <!-- livebook:{"output":true} -->
+
+      ```
+      2
+      ```
+
+      <!-- livebook:{"output":true} -->
+
+      ```mermaid
+      graph TD; A-->B;
+      ```
+      """
+
+      assert Markdown.to_ast(md, []) == [
+               {:h1, [], ["Notebook"], %{}},
+               {:h2, [], ["Example"], %{}},
+               {:pre, [], [{:code, [class: "elixir"], ["1 + 1"], %{}}], %{}},
+               {:pre, [], [{:code, [class: "output"], ["2"], %{}}], %{}},
+               {:pre, [], [{:code, [class: "mermaid output"], ["graph TD; A-->B;"], %{}}], %{}}
+             ]
     end
   end
 end

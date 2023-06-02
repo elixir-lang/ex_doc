@@ -77,7 +77,7 @@ defmodule ExDoc.RetrieverTest do
       """)
 
       config = %ExDoc.Config{
-        groups_for_functions: [
+        groups_for_docs: [
           "Group 1": &(&1.group == 1),
           "Group 2": &(&1.group == 2)
         ]
@@ -89,6 +89,57 @@ defmodule ExDoc.RetrieverTest do
       assert %{id: "foo/0", group: :"Group 1"} = foo
       assert %{id: "bar/0", group: :"Group 1"} = bar
       assert %{id: "baz/0", group: :"Group 2"} = baz
+    end
+
+    test "custom function annotations", c do
+      elixirc(c, ~S"""
+      defmodule A do
+        @doc since: "1.0.0"
+        @doc deprecated: "deprecation message"
+        @doc foo: true
+        def foo(), do: :ok
+      end
+      """)
+
+      [mod] =
+        Retriever.docs_from_modules([A], %ExDoc.Config{
+          annotations_for_docs: fn metadata ->
+            if metadata[:foo] do
+              [:baz]
+            else
+              []
+            end
+          end
+        })
+
+      [foo] = mod.docs
+      assert foo.id == "foo/0"
+      assert foo.annotations == [:baz, "since 1.0.0"]
+      assert foo.deprecated == "deprecation message"
+    end
+
+    test "custom callback annotations", c do
+      elixirc(c, ~S"""
+      defmodule A do
+        @doc foo: true
+        @callback callback_name() :: :ok
+      end
+      """)
+
+      [mod] =
+        Retriever.docs_from_modules([A], %ExDoc.Config{
+          annotations_for_docs: fn metadata ->
+            if metadata[:foo] do
+              [:baz]
+            else
+              []
+            end
+          end
+        })
+
+      [foo] = mod.docs
+
+      assert foo.annotations == [:baz]
     end
 
     test "nesting", c do
@@ -189,5 +240,23 @@ defmodule ExDoc.RetrieverTest do
     assert function_a_1.id == "function_a/1"
     assert function_B_0.id == "function_B/0"
     assert function_b_0.id == "function_b/0"
+  end
+
+  test "no whitespace in signature", c do
+    elixirc(c, ~S"""
+    defmodule NoWhitespaceInSignature do
+      @callback callback_name(
+        arg1 :: integer(),
+        1,
+        %Date{},
+        term,
+        String.t()
+      ) :: :ok
+    end
+    """)
+
+    [module_node] = Retriever.docs_from_modules([NoWhitespaceInSignature], %ExDoc.Config{})
+    %{docs: [%{signature: signature}]} = module_node
+    assert signature == "callback_name(arg1, integer, %Date{}, term, t)"
   end
 end

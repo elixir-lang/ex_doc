@@ -7,25 +7,30 @@ defmodule ExDoc.CLI do
   def main(args, generator \\ &ExDoc.generate_docs/3) do
     {:ok, _} = Application.ensure_all_started(:ex_doc)
 
-    {opts, args, _invalid} =
-      OptionParser.parse(args,
+    {opts, args} =
+      OptionParser.parse!(args,
         aliases: [
           c: :config,
           f: :formatter,
           l: :logo,
           m: :main,
-          n: :canonical,
           o: :output,
-          p: :homepage_url,
           q: :quiet,
           u: :source_url,
           v: :version
         ],
         switches: [
-          formatter: :keep,
+          canonical: :string,
+          config: :string,
+          formatter: [:keep, :string],
+          homepage_url: :string,
           language: :string,
+          logo: :string,
+          main: :string,
+          output: :string,
           package: :string,
-          paths: :keep,
+          package: :string,
+          paths: [:keep, :string],
           proglang: :string,
           quiet: :boolean,
           source_ref: :string,
@@ -36,7 +41,7 @@ defmodule ExDoc.CLI do
 
     cond do
       List.keymember?(opts, :version, 0) ->
-        print_version()
+        IO.puts("ExDoc v#{ExDoc.version()}")
 
       opts[:warnings_as_errors] == true and ExDoc.WarningCounter.count() > 0 ->
         IO.puts(
@@ -49,10 +54,6 @@ defmodule ExDoc.CLI do
       true ->
         generate(args, opts, generator)
     end
-  end
-
-  defp print_version do
-    IO.puts("ExDoc v#{ExDoc.version()}")
   end
 
   defp generate(args, opts, generator) do
@@ -70,10 +71,11 @@ defmodule ExDoc.CLI do
       |> Keyword.put(:source_beam, source_beam)
       |> Keyword.put(:apps, [app(source_beam)])
       |> merge_config()
+      |> normalize_formatters()
 
     quiet? = Keyword.get(opts, :quiet, false)
 
-    for formatter <- get_formatters(opts) do
+    for formatter <- opts[:formatters] do
       index = generator.(project, version, Keyword.put(opts, :formatter, formatter))
 
       quiet? ||
@@ -83,11 +85,14 @@ defmodule ExDoc.CLI do
     end
   end
 
-  defp get_formatters(opts) do
-    case Keyword.get_values(opts, :formatter) do
-      [] -> opts[:formatters] || ["html", "epub"]
-      values -> values
-    end
+  defp normalize_formatters(opts) do
+    formatters =
+      case Keyword.get_values(opts, :formatter) do
+        [] -> opts[:formatters] || ["html", "epub"]
+        values -> values
+      end
+
+    Keyword.put(opts, :formatters, formatters)
   end
 
   defp app(source_beam) do
@@ -103,9 +108,8 @@ defmodule ExDoc.CLI do
   defp merge_config(opts) do
     case Keyword.fetch(opts, :config) do
       {:ok, config} ->
-        opts
-        |> Keyword.delete(:config)
-        |> Keyword.merge(read_config(config))
+        opts_without_config = Keyword.delete(opts, :config)
+        Keyword.merge(read_config(config), opts_without_config)
 
       _ ->
         opts
@@ -173,11 +177,11 @@ defmodule ExDoc.CLI do
       PROJECT             Project name
       VERSION             Version number
       BEAMS               Path to compiled beam files
-      -n, --canonical     Indicate the preferred URL with rel="canonical" link element
+          --canonical     Indicate the preferred URL with rel="canonical" link element
       -c, --config        Give configuration through a file instead of a command line.
                           See "Custom config" section below for more information.
       -f, --formatter     Docs formatter to use (html or epub), default: html and epub
-      -p, --homepage-url  URL to link to for the site name
+          --homepage-url  URL to link to for the site name
           --language      Identify the primary language of the documents, its value must be
                           a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)
@@ -206,7 +210,7 @@ defmodule ExDoc.CLI do
 
         [
           extras: Path.wildcard("lib/elixir/pages/*.md"),
-          groups_for_functions: [
+          groups_for_docs: [
             Guards: & &1[:guard] == true
           ],
           skip_undefined_reference_warnings_on: ["compatibility-and-deprecations"],

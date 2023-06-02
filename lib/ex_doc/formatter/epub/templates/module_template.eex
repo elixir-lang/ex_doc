@@ -15,7 +15,7 @@
       </section>
     <% end %>
 
-    <%= if Enum.any?(summary, fn {_, v} -> v != [] end) do %>
+    <%= if summary != [] do %>
       <section id="summary" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#summary">
@@ -28,7 +28,7 @@
       </section>
     <% end %>
 
-    <%= for {name, nodes} <- summary, nodes != [], key = HTML.text_to_id(name) do %>
+    <%= for {name, nodes} <- summary, key = HTML.text_to_id(name) do %>
       <section id="<%= key %>" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#<%= key %>">
@@ -43,6 +43,6 @@
       </section>
     <% end %>
     <%# Extra content specified by the user (e.g. custom Javascript) %>
-    <%= config.before_closing_body_tag.(:epub) %>
+    <%= before_closing_body_tag(config, :epub) %>
   </body>
 </html>

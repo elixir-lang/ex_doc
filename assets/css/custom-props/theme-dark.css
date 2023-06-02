@@ -1,0 +1,88 @@
+body.dark {
+  --background:                  var(--gray900);
+  --contrast:                    var(--white);
+  --textBody:                    var(--gray200);
+  --textHeaders:                 var(--gray100);
+  --textDetailBackground:        var(--gray700);
+  --textFooter:                  var(--gray300);
+
+  --links:                       var(--gray100);
+  --linksVisited:                var(--gray100);
+  --linksNoUnderline:            var(--main-lightened-10);
+  --linksNoUnderlineVisited:     var(--main-lightened-05);
+  --linksDecoration:             var(--gray500);
+
+  --iconAction:                  var(--coldGray-lightened-10);
+  --iconActionHover:             var(--white);
+
+  --blockquoteBackground:        var(--coldGrayDim);
+  --blockquoteBorder:            var(--coldGrayDark);
+
+  --warningBackground:           hsl( 40,  67%,  79%);
+  --warningHeadingBackground:    hsl( 27,  66%,  29%);
+  --warningHeading:              var(--white);
+  --errorBackground:             hsl(358,  52%,  78%);
+  --errorHeadingBackground:      hsl(349,  55%,  34%);
+  --errorHeading:                var(--white);
+  --infoBackground:              hsl(222,  57%,  77%);
+  --infoHeadingBackground:       hsl(243,  65%,  26%);
+  --infoHeading:                 var(--white);
+  --neutralBackground:           hsl(220,  23%,  82%);
+  --neutralHeadingBackground:    hsl(224,  24%,  16%);
+  --neutralHeading:              var(--white);
+  --tipBackground:               hsl(139,  26%,  69%);
+  --tipHeadingBackground:        hsl(158,  35%,  17%);
+  --tipHeading:                  var(--white);
+
+  --fnSpecAttr:                  var(--gray500);
+  --fnDeprecated:                var(--yellowDark);
+  --blink:                       var(--gray600);
+
+  --codeBackground:              var(--gray850);
+  --codeBorder:                  var(--gray700);
+  --inlineCodeBackground:        var(--gray50);
+  --inlineCodeBorder:            var(--gray100);
+  --codeScrollThumb:             var(--gray500);
+  --codeScrollBackground:        var(--codeBorder);
+
+  --tabBackground:               var(--gray900);
+  --tabBorder:                   var(--gray700);
+  --tabBorderTop:                var(--gray700);
+  --tab:                         var(--white);
+  --tabShadow:                   var(--black);
+
+  --bottomActionsBtnBorder:      var(--white-opacity-10);
+  --bottomActionsBtnSubheader:   var(--main);
+
+  --modalBackground:             var(--gray800);
+
+  --settingsInput:               var(--white);
+  --settingsInputBackground:     var(--gray700);
+  --settingsInputBorder:         var(--gray700);
+  --settingsSectionBorder:       var(--gray700);
+
+  --quickSwitchInput:            var(--gray300);
+  --quickSwitchContour:          var(--gray500);
+
+  --success:                     var(--green-lightened-10);
+
+  --sidebarButtonBackground:     linear-gradient(180deg,
+                                                 var(--gray900) 20%,
+                                                 var(--gray900-opacity-50) 70%,
+                                                 var(--gray900-opacity-0) 100%);
+  --sidebarAccentMain:           var(--gray50);
+  --sidebarBackground:           var(--gray800);
+  --sidebarGradient:             linear-gradient(var(--sidebarBackground),
+                                                 var(gray800-opacity-0));
+  --sidebarHeader:               var(--gray700);
+  --sidebarMuted:                var(--gray300);
+  --sidebarHover:                var(--white);
+  --sidebarScrollbarThumb:       var(--coldGray);
+  --sidebarScrollbarTrack:       var(--sidebarBackground);
+  --sidebarSearch:               var(--gray700);
+  --sidebarSubheadings:          var(--gray400);
+  --sidebarItem:                 var(--gray200);
+  --sidebarInactiveItemMarker:   var(--gray600);
+  --sidebarLanguageAccentBar:    var(--main);
+  --sidebarActiveItem:           var(--main-lightened-10);
+}

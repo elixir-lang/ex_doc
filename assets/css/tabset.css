@@ -1,0 +1,70 @@
+.tabset {
+  --borderWidth: 1px;
+  --tabsetPadding: var(--baseLineHeight);
+  margin: var(--baseLineHeight) 0;
+}
+
+.tabset-tablist {
+  display: flex;
+  overflow-x: auto;
+}
+
+.tabset-tab {
+  padding: .6rem var(--tabsetPadding);
+  min-height: 46px; /* matches admonition title, which has icon that adds height */
+  font-family: var(--sansFontFamily);
+  background-color: var(--tabBackground);
+  color: var(--tab);
+  border: var(--borderWidth) solid var(--tabBorder);
+  margin-right: calc(-1 * var(--borderWidth));
+  border-top-width: 4px;
+  border-top-color: var(--tabBorderTop);
+  border-radius: 0;
+  border-top-left-radius: var(--borderRadius);
+  border-top-right-radius: var(--borderRadius);
+  box-shadow: 0 -3px 4px var(--tabShadow) inset;
+  cursor: pointer;
+}
+
+.tabset-tab[aria-selected=true] {
+  border-bottom-color: var(--tabBackground);
+  border-top-color: var(--main-lightened-05);
+  box-shadow: none;
+}
+
+/* Keyboard navigation focus state (increased contrast) */
+.tabset-tab[aria-selected=true]:focus-visible {
+  background-color: var(--main-lightened-05);
+  border-color: var(--main-lightened-05);
+  border-top-color: var(--main);
+  color: var(--white); /* light works best for both light and dark themes given background colors */
+}
+
+.tabset-panel {
+  padding: 0 var(--tabsetPadding);
+  border: var(--borderWidth) solid var(--tabBorder);
+  margin-top: calc(-1 * var(--borderWidth));
+  border-bottom-left-radius: var(--borderRadius);
+  border-bottom-right-radius: var(--borderRadius);
+}
+
+@media screen and (max-width: 768px) {
+  .tabset {
+    --tabsetPadding: calc(var(--baseLineHeight) / 2);
+  }
+
+  .tabset-panel {
+    padding-top: calc(var(--tabsetPadding) / 2);
+    padding-bottom: calc(var(--tabsetPadding) / 2);
+  }
+
+  .tabset-panel pre {
+    margin-left: calc(-1 * var(--tabsetPadding));
+    margin-right: calc(-1 * var(--tabsetPadding));
+  }
+
+  .tabset-panel > pre code {
+    border-left-width: 0;
+    border-right-width: 0;
+  }
+}

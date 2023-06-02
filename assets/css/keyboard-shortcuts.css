@@ -1,0 +1,37 @@
+#keyboard-shortcuts-content dl.shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 6px 0 8px;
+  border-bottom: 1px solid var(--settingsSectionBorder);
+}
+
+#keyboard-shortcuts-content dl.shortcut-row:last-of-type {
+  border-bottom-style: none;
+}
+
+#keyboard-shortcuts-content dl.shortcut-row:first-child {
+  padding-top: 0;
+}
+
+#keyboard-shortcuts-content :is(.shortcut-keys, .shortcut-description) {
+  display: inline-block;
+}
+
+#keyboard-shortcuts-content kbd > kbd {
+  background-color: var(--settingsInputBorder);
+  color: var(--contrast);
+  border-radius: var(--borderRadius);
+  font-family: inherit;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1;
+  padding: 4px 7px 6px 7px;
+  min-width: 26px;
+  text-align: center;
+}
+
+#keyboard-shortcuts-content :is(.shortcut-keys, .shortcut-description) {
+  margin: 0;
+}

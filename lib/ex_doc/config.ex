@@ -6,8 +6,10 @@ defmodule ExDoc.Config do
   def filter_modules(_module, _metadata), do: true
   def before_closing_head_tag(_), do: ""
   def before_closing_body_tag(_), do: ""
+  def annotations_for_docs(_), do: []
 
-  defstruct api_reference: true,
+  defstruct annotations_for_docs: &__MODULE__.annotations_for_docs/1,
+            api_reference: true,
             apps: [],
             assets: nil,
             authors: nil,
@@ -20,8 +22,9 @@ defmodule ExDoc.Config do
             extras: [],
             filter_modules: &__MODULE__.filter_modules/2,
             formatter: "html",
+            formatters: [],
             groups_for_extras: [],
-            groups_for_functions: [],
+            groups_for_docs: [],
             groups_for_modules: [],
             homepage_url: nil,
             javascript_config_path: "docs_config.js",
@@ -44,12 +47,13 @@ defmodule ExDoc.Config do
             warnings_as_errors: false
 
   @type t :: %__MODULE__{
+          annotations_for_docs: (map() -> list()),
           api_reference: boolean(),
           apps: [atom()],
           assets: nil | String.t(),
           authors: nil | [String.t()],
-          before_closing_body_tag: (atom() -> String.t()),
-          before_closing_head_tag: (atom() -> String.t()),
+          before_closing_body_tag: (atom() -> String.t()) | mfa() | map(),
+          before_closing_head_tag: (atom() -> String.t()) | mfa() | map(),
           canonical: nil | String.t(),
           cover: nil | Path.t(),
           deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
@@ -57,8 +61,9 @@ defmodule ExDoc.Config do
           extras: list(),
           filter_modules: (module, map -> boolean),
           formatter: nil | String.t(),
+          formatters: [String.t()],
           groups_for_extras: keyword(),
-          groups_for_functions: keyword((keyword() -> boolean)),
+          groups_for_docs: keyword((keyword() -> boolean)),
           groups_for_modules: keyword(),
           homepage_url: nil | String.t(),
           javascript_config_path: nil | String.t(),
@@ -87,6 +92,14 @@ defmodule ExDoc.Config do
     {nest_modules_by_prefix, options} = Keyword.pop(options, :nest_modules_by_prefix, [])
     {proglang, options} = Keyword.pop(options, :proglang, :elixir)
     {filter_modules, options} = Keyword.pop(options, :filter_modules, &filter_modules/2)
+
+    options =
+      if groups_for_functions = options[:groups_for_functions] do
+        # TODO: Deprecate me
+        Keyword.put_new(options, :groups_for_docs, groups_for_functions)
+      else
+        options
+      end
 
     {source_url_pattern, options} =
       Keyword.pop_lazy(options, :source_url_pattern, fn ->
@@ -133,7 +146,7 @@ defmodule ExDoc.Config do
   end
 
   defp deprecated?(metadata), do: metadata[:deprecated] != nil
-  defp exception?(metadata), do: metadata[:__type__] == :exception
+  defp exception?(metadata), do: metadata[:__doc__] == :exception
 
   defp normalize_nest_modules_by_prefix(nest_modules_by_prefix) do
     nest_modules_by_prefix

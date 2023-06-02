@@ -1,5 +1,5 @@
 defmodule ExDoc.Language.ErlangTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import TestHelper
 
   @moduletag :otp_has_docs
@@ -7,13 +7,13 @@ defmodule ExDoc.Language.ErlangTest do
 
   describe "autolink_doc/2" do
     test "module", c do
-      assert autolink_doc("{@link bar}", c) ==
-               ~s|<a href="bar.html"><code>bar</code></a>|
+      assert autolink_doc("{@link erlang_bar}", c) ==
+               ~s|<a href="erlang_bar.html"><code>erlang_bar</code></a>|
     end
 
     test "current module", c do
-      assert autolink_doc("{@link foo}", [current_module: :foo], c) ==
-               ~s|<a href="foo.html#content"><code>foo</code></a>|
+      assert autolink_doc("{@link erlang_foo}", [current_module: :erlang_foo], c) ==
+               ~s|<a href="erlang_foo.html#content"><code>erlang_foo</code></a>|
     end
 
     test "OTP module", c do
@@ -63,13 +63,13 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "local function", c do
-      assert autolink_doc("{@link foo/0}", [current_module: :foo], c) ==
+      assert autolink_doc("{@link foo/0}", [current_module: :erlang_foo], c) ==
                ~s|<a href="#foo/0"><code>foo/0</code></a>|
     end
 
     test "remote function", c do
-      assert autolink_doc("{@link bar:bar/0}", c) ==
-               ~s|<a href="bar.html#bar/0"><code>bar:bar/0</code></a>|
+      assert autolink_doc("{@link erlang_bar:bar/0}", c) ==
+               ~s|<a href="erlang_bar.html#bar/0"><code>erlang_bar:bar/0</code></a>|
     end
 
     test "OTP function", c do
@@ -105,13 +105,13 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "local type", c do
-      assert autolink_doc("{@link t()}", [current_module: :foo], c) ==
+      assert autolink_doc("{@link t()}", [current_module: :erlang_foo], c) ==
                ~s|<a href="#t:t/0"><code>t()</code></a>|
     end
 
     test "remote type", c do
-      assert autolink_doc("{@link bar:t()}", c) ==
-               ~s|<a href="bar.html#t:t/0"><code>bar:t()</code></a>|
+      assert autolink_doc("{@link erlang_bar:t()}", c) ==
+               ~s|<a href="erlang_bar.html#t:t/0"><code>erlang_bar:t()</code></a>|
     end
 
     test "OTP type", c do
@@ -161,10 +161,66 @@ defmodule ExDoc.Language.ErlangTest do
     end
   end
 
+  describe "autolink_doc/2 for extras" do
+    test "function", c do
+      assert autolink_extra("`erlang_foo:foo/0`", c) ==
+               ~s|<a href="erlang_foo.html#foo/0"><code class="inline">erlang_foo:foo/0</code></a>|
+    end
+
+    test "OTP function", c do
+      assert autolink_extra("`lists:reverse/1`", c) ==
+               ~s|<a href="https://www.erlang.org/doc/man/lists.html#reverse-1"><code class="inline">lists:reverse/1</code></a>|
+    end
+
+    test "type", c do
+      assert autolink_extra("`t:erlang_bar:t()`", c) ==
+               ~s|<a href="erlang_bar.html#t:t/0"><code class="inline">erlang_bar:t()</code></a>|
+    end
+
+    test "OTP type", c do
+      assert autolink_extra("`t:array:array()`", c) ==
+               ~s|<a href="https://www.erlang.org/doc/man/array.html#type-array"><code class="inline">array:array()</code></a>|
+    end
+
+    test "module", c do
+      assert autolink_extra("`erlang_foo`", c) ==
+               ~s|<a href="erlang_foo.html"><code class="inline">erlang_foo</code></a>|
+    end
+
+    test "OTP module", c do
+      assert autolink_extra("`rpc`", c) ==
+               ~s|<a href="https://www.erlang.org/doc/man/rpc.html"><code class="inline">rpc</code></a>|
+    end
+
+    test "bad function", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_extra("`bad:bad/0`", c) ==
+                        ~s|<code class="inline">bad:bad/0</code>|
+             end) =~ ~s|references function "bad:bad/0" but it is undefined or private|
+    end
+
+    test "bad type", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_extra("`t:bad:bad/0`", c) ==
+                        ~s|<code class="inline">t:bad:bad/0</code>|
+             end) =~ ~s|references type "bad:bad()" but it is undefined or private|
+    end
+
+    test "bad module", c do
+      assert autolink_extra("`does_not_exist`", c) ==
+               ~s|<code class="inline">does_not_exist</code>|
+    end
+  end
+
   describe "autolink_spec/2" do
     test "spec", c do
       assert autolink_spec("-spec foo() -> t().", c) ==
                ~s|foo() -> <a href="#t:t/0">t</a>().|
+    end
+
+    test "spec when fun is called record", c do
+      assert autolink_spec("-spec record(module()) -> [[{module(), atom()}]].", c) ==
+               ~s|record(module()) -> [[{module(), atom()}]].|
     end
 
     test "callback", c do
@@ -243,8 +299,8 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "function - any arity", c do
-      assert autolink_spec(~s"-spec foo() -> fun((...) -> t()) | bar:t().", c) ==
-               ~s[foo() -> fun((...) -> <a href="#t:t/0">t</a>()) | <a href="bar.html#t:t/0">bar:t</a>().]
+      assert autolink_spec(~s"-spec foo() -> fun((...) -> t()) | erlang_bar:t().", c) ==
+               ~s[foo() -> fun((...) -> <a href="#t:t/0">t</a>()) | <a href="erlang_bar.html#t:t/0">erlang_bar:t</a>().]
     end
 
     test "local type", c do
@@ -253,8 +309,8 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "remote type", c do
-      assert autolink_spec(~S"-spec foo() -> bar:t().", c) ==
-               ~s|foo() -> <a href="bar.html#t:t/0">bar:t</a>().|
+      assert autolink_spec(~S"-spec foo() -> erlang_bar:t().", c) ==
+               ~s|foo() -> <a href="erlang_bar.html#t:t/0">erlang_bar:t</a>().|
     end
 
     test "OTP type", c do
@@ -292,7 +348,9 @@ defmodule ExDoc.Language.ErlangTest do
 
   defp autolink_doc(doc, opts \\ [], c) do
     fixtures(c, doc)
-    {:docs_v1, _, _, "application/erlang+html", %{"en" => doc}, _, _} = Code.fetch_docs(:foo)
+
+    {:docs_v1, _, _, "application/erlang+html", %{"en" => doc}, _, _} =
+      Code.fetch_docs(:erlang_foo)
 
     doc
     |> ExDoc.DocAST.parse!("application/erlang+html")
@@ -308,7 +366,7 @@ defmodule ExDoc.Language.ErlangTest do
   defp autolink_spec(binary, opts \\ [], c) when is_binary(binary) do
     opts =
       opts
-      |> Keyword.put_new(:current_module, :foo)
+      |> Keyword.put_new(:current_module, :erlang_foo)
 
     fixtures(c, "")
     {:ok, tokens, _} = :erl_scan.string(String.to_charlist(binary))
@@ -316,11 +374,20 @@ defmodule ExDoc.Language.ErlangTest do
     ExDoc.Language.Erlang.autolink_spec(ast, opts)
   end
 
+  defp autolink_extra(text, c) do
+    # Markdown is usually not valid EDoc
+    fixtures(c, "")
+
+    [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, [])
+
+    do_autolink_doc(ast)
+  end
+
   defp fixtures(c, doc) do
-    erlc(c, :foo, """
+    erlc(c, :erlang_foo, """
     %% @doc
     %% #{doc}
-    -module(foo).
+    -module(erlang_foo).
     -export([foo/0]).
     -export_type([t/0, opaque_t/0]).
     -type t() :: atom().
@@ -328,8 +395,8 @@ defmodule ExDoc.Language.ErlangTest do
     foo() -> ok.
     """)
 
-    erlc(c, :bar, """
-    -module(bar).
+    erlc(c, :erlang_bar, """
+    -module(erlang_bar).
     -export([bar/0]).
     -export_type([t/0]).
     -type t() :: atom().
