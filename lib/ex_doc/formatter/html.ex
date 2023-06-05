@@ -350,7 +350,7 @@ defmodule ExDoc.Formatter.HTML do
       group: nil,
       id: "api-reference",
       source_path: nil,
-      source_url: nil,
+      source_url: config.source_url,
       title: "API Reference",
       title_content: title_content
     }
