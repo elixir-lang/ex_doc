@@ -236,6 +236,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config(context))
 
     content = File.read!(tmp_dir <> "/html/api-reference.html")
+
+    assert content =~ ~r{<a href="https://github.com/elixir-lang/elixir" title="View Source"}
     assert content =~ ~r{<a href="CompiledWithDocs.html" translate="no">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
 
