@@ -34,7 +34,14 @@ defmodule ExDoc.Markdown do
   """
   def to_ast(text, opts \\ []) when is_binary(text) do
     {processor, options} = get_markdown_processor()
-    processor.to_ast(text, options |> Keyword.merge(opts))
+
+    to_ast(text, processor, Keyword.merge(options, opts), [])
+  end
+
+  defp to_ast(text, processor, opts, applied_processors) do
+    text
+    |> processor.to_ast(opts)
+    |> apply_fence_processors(processor, opts, applied_processors)
   end
 
   @doc """
@@ -108,4 +115,41 @@ defmodule ExDoc.Markdown do
   end
 
   defp pivot([], acc, _fun), do: Enum.reverse(acc)
+
+  defp apply_fence_processors(ast, processor, opts, applied_processors) do
+    Enum.reduce(ast, [], fn block, acc ->
+      acc ++ maybe_apply_fence_processors(block, processor, opts, applied_processors)
+    end)
+  end
+
+  defp maybe_apply_fence_processors(
+         {:pre, pre_attrs, [{:code, [class: fence], content, _code_meta}], _pre_meta} = block,
+         processor,
+         opts,
+         applied_processors
+       ) do
+    fence_processors = Keyword.get(opts, :fence_processors, %{})
+
+    cond do
+      # we want to avoid infinite recursion here, just return the block
+      fence in applied_processors ->
+        [block]
+
+      # if we have defined a custom fence processor apply it (recursively)
+      Map.has_key?(fence_processors, fence) ->
+        # for now it expects to be a mfa tuple - to be discussed
+        {module, function, args} = fence_processors[fence]
+
+        code = Enum.join(content, "\n")
+
+        apply(module, function, [code | args])
+        |> to_ast(processor, opts, [fence | applied_processors])
+
+      # in any other case return the original block
+      true ->
+        [block]
+    end
+  end
+
+  defp maybe_apply_fence_processors(block, _processor, _opts, _applied_processors), do: [block]
 end

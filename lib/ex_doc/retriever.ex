@@ -101,7 +101,10 @@ defmodule ExDoc.Retriever do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
-    {doc_line, format, source_doc, doc, metadata} = get_module_docs(module_data, source_path)
+    fence_processors = config.fence_processors
+
+    {doc_line, format, source_doc, doc, metadata} =
+      get_module_docs(module_data, source_path, fence_processors)
 
     # TODO: The default function groups must be returned by the language
     groups_for_docs =
@@ -111,7 +114,9 @@ defmodule ExDoc.Retriever do
     annotations_for_docs = config.annotations_for_docs
 
     docs_groups = Enum.map(groups_for_docs, &elem(&1, 0))
-    function_docs = get_docs(module_data, source, groups_for_docs, annotations_for_docs)
+
+    function_docs =
+      get_docs(module_data, source, groups_for_docs, annotations_for_docs, fence_processors)
 
     docs =
       function_docs ++
@@ -156,16 +161,16 @@ defmodule ExDoc.Retriever do
 
   # Module Helpers
 
-  defp get_module_docs(module_data, source_path) do
+  defp get_module_docs(module_data, source_path, fence_processors) do
     {:docs_v1, anno, _, format, moduledoc, metadata, _} = module_data.docs
     doc_line = anno_line(anno)
-    options = [file: source_path, line: doc_line + 1]
+    options = [file: source_path, line: doc_line + 1, fence_processors: fence_processors]
     {doc_line, format, moduledoc, doc_ast(format, moduledoc, options), metadata}
   end
 
   ## Function helpers
 
-  defp get_docs(module_data, source, groups_for_docs, annotations_for_docs) do
+  defp get_docs(module_data, source, groups_for_docs, annotations_for_docs, fence_processors) do
     {:docs_v1, _, _, _, _, _, doc_elements} = module_data.docs
 
     nodes =
@@ -182,7 +187,8 @@ defmodule ExDoc.Retriever do
                 source,
                 module_data,
                 groups_for_docs,
-                annotations_for_docs
+                annotations_for_docs,
+                fence_processors
               )
             ]
         end
@@ -197,7 +203,8 @@ defmodule ExDoc.Retriever do
          source,
          module_data,
          groups_for_docs,
-         annotations_for_docs
+         annotations_for_docs,
+         fence_processors
        ) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
@@ -211,7 +218,12 @@ defmodule ExDoc.Retriever do
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
     doc_ast =
-      (doc_content && doc_ast(content_type, doc_content, file: source.path, line: doc_line + 1)) ||
+      (doc_content &&
+         doc_ast(content_type, doc_content,
+           file: source.path,
+           line: doc_line + 1,
+           fence_processors: fence_processors
+         )) ||
         function_data.doc_fallback.()
 
     group = GroupMatcher.match_function(groups_for_docs, metadata)

@@ -369,6 +369,7 @@ defmodule ExDoc.Formatter.HTML do
       end
 
     source_url_pattern = config.source_url_pattern
+    fence_processors = config.fence_processors
 
     autolink_opts = [
       apps: config.apps,
@@ -381,7 +382,7 @@ defmodule ExDoc.Formatter.HTML do
     extras =
       config.extras
       |> Task.async_stream(
-        &build_extra(&1, groups, language, autolink_opts, source_url_pattern),
+        &build_extra(&1, groups, language, autolink_opts, source_url_pattern, fence_processors),
         timeout: :infinity
       )
       |> Enum.map(&elem(&1, 1))
@@ -400,19 +401,55 @@ defmodule ExDoc.Formatter.HTML do
     Map.put(extra, :id, "#{extra.id}-#{discriminator}")
   end
 
-  defp build_extra({input, options}, groups, language, autolink_opts, source_url_pattern) do
+  defp build_extra(
+         {input, options},
+         groups,
+         language,
+         autolink_opts,
+         source_url_pattern,
+         fence_processors
+       ) do
     input = to_string(input)
     id = options[:filename] || input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, options[:title], groups, language, autolink_opts, source_url_pattern)
+
+    build_extra(
+      input,
+      id,
+      options[:title],
+      groups,
+      language,
+      autolink_opts,
+      source_url_pattern,
+      fence_processors
+    )
   end
 
-  defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
+  defp build_extra(input, groups, language, autolink_opts, source_url_pattern, fence_processors) do
     id = input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, nil, groups, language, autolink_opts, source_url_pattern)
+
+    build_extra(
+      input,
+      id,
+      nil,
+      groups,
+      language,
+      autolink_opts,
+      source_url_pattern,
+      fence_processors
+    )
   end
 
-  defp build_extra(input, id, title, groups, language, autolink_opts, source_url_pattern) do
-    opts = [file: input, line: 1]
+  defp build_extra(
+         input,
+         id,
+         title,
+         groups,
+         language,
+         autolink_opts,
+         source_url_pattern,
+         fence_processors
+       ) do
+    opts = [file: input, line: 1, fence_processors: fence_processors]
 
     {source, ast} =
       case extension_name(input) do

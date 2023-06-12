@@ -43,7 +43,8 @@ defmodule ExDoc.Config do
             source_url: nil,
             source_url_pattern: nil,
             title: nil,
-            version: nil
+            version: nil,
+            fence_processors: %{}
 
   @type t :: %__MODULE__{
           annotations_for_docs: (map() -> list()),
@@ -80,7 +81,8 @@ defmodule ExDoc.Config do
           source_url: nil | String.t(),
           source_url_pattern: nil | String.t(),
           title: nil | String.t(),
-          version: nil | String.t()
+          version: nil | String.t(),
+          fence_processors: map()
         }
 
   @spec build(String.t(), String.t(), Keyword.t()) :: ExDoc.Config.t()
@@ -114,7 +116,8 @@ defmodule ExDoc.Config do
       proglang: normalize_proglang(proglang),
       project: project,
       source_url_pattern: source_url_pattern,
-      version: vsn
+      version: vsn,
+      fence_processors: Keyword.get(options, :fence_processors, %{})
     }
 
     struct(preconfig, options)
