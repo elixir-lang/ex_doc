@@ -270,6 +270,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                %{
                  "id" => "CompiledWithDocs",
                  "title" => "CompiledWithDocs",
+                 "deprecated" => false,
                  "nodeGroups" => [
                    %{
                      "key" => "functions",
@@ -288,6 +289,29 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                },
                %{"id" => "CompiledWithDocs.Nested"}
              ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
+    end
+
+    test "outputs deprecated: true if node is deprecated", context do
+      names = [CompiledWithDocs]
+      nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+
+      path = ["modules", Access.at!(0), "nodeGroups", Access.at!(0), "nodes"]
+      sidebar_functions = get_in(create_sidebar_items(%{modules: nodes}, []), path)
+
+      assert Enum.any?(
+               sidebar_functions,
+               &match?(%{"anchor" => "example/2", "deprecated" => true}, &1)
+             )
+    end
+
+    test "outputs deprecated: true if module is deprecated", context do
+      names = [Warnings]
+      nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+
+      assert Enum.any?(
+               create_sidebar_items(%{modules: nodes}, [])["modules"],
+               &match?(%{"title" => "Warnings", "deprecated" => true}, &1)
+             )
     end
 
     test "outputs nodes grouped based on metadata", context do

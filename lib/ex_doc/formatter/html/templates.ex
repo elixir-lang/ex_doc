@@ -124,10 +124,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
         sections = module_sections(module)
 
+        deprecated? = not is_nil(module.deprecated)
+
         pairs =
           for key <- [:id, :title, :nested_title, :nested_context],
               value = Map.get(module, key),
               do: {key, value}
+
+        pairs = [{:deprecated, deprecated?} | pairs]
 
         Map.new([group: to_string(module.group)] ++ extra ++ pairs ++ sections)
       end
@@ -145,7 +149,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
             "#{node.name}/#{node.arity}"
           end
 
-        %{id: id, title: node.signature, anchor: URI.encode(node.id)}
+        deprecated? = not is_nil(node.deprecated)
+
+        %{id: id, title: node.signature, anchor: URI.encode(node.id), deprecated: deprecated?}
       end
 
     %{key: HTML.text_to_id(group), name: group, nodes: nodes}
