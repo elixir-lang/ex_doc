@@ -80,7 +80,7 @@ defmodule ExDoc.Markdown do
   end
 
   @doc """
-  Wraps the desired tags in HTML in sections.
+  Wraps a list of HTML nodes into `<section>` tags whenever `matcher` returns true.
   """
   def sectionize(list, matcher), do: sectionize(list, matcher, [])
 
