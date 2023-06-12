@@ -130,6 +130,36 @@ defmodule ExDoc.DocAST do
   def do_text_from_ast({_tag, _attr, ast, _meta}), do: text_from_ast(ast)
 
   @doc """
+  Wraps a list of HTML nodes into `<section>` tags whenever `matcher` returns true.
+  """
+  def sectionize(list, matcher), do: sectionize(list, matcher, [])
+
+  defp sectionize(list, matcher, acc) do
+    case pivot(list, acc, matcher) do
+      {acc, {header_tag, header_attrs, _, _} = header, rest} ->
+        {inner, rest} = Enum.split_while(rest, &not_tag?(&1, header_tag))
+        class = String.trim_trailing("#{header_tag} #{header_attrs[:class]}")
+        section = {:section, [class: class], [header | sectionize(inner, matcher, [])], %{}}
+        sectionize(rest, matcher, [section | acc])
+
+      acc ->
+        acc
+    end
+  end
+
+  defp not_tag?({tag, _, _, _}, tag), do: false
+  defp not_tag?(_, _tag), do: true
+
+  defp pivot([head | tail], acc, fun) do
+    case fun.(head) do
+      true -> {acc, head, tail}
+      false -> pivot(tail, [head | acc], fun)
+    end
+  end
+
+  defp pivot([], acc, _fun), do: Enum.reverse(acc)
+
+  @doc """
   Highlights a DocAST converted to string.
   """
   def highlight(html, language, opts \\ []) do

@@ -473,7 +473,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp sectionize(ast, ".cheatmd") do
-    Markdown.sectionize(ast, fn
+    ExDoc.DocAST.sectionize(ast, fn
       {:h2, _, _, _} -> true
       {:h3, _, _, _} -> true
       _ -> false
