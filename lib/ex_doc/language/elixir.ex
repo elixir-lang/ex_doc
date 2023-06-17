@@ -444,12 +444,26 @@ defmodule ExDoc.Language.Elixir do
     case Keyword.fetch(attrs, :href) do
       {:ok, href} ->
         case Regex.scan(@ref_regex, href) do
-          [[_, custom_link]] -> url(custom_link, :custom_link, config)
-          [] -> build_extra_link(href, config)
+          [[_, custom_link]] ->
+            custom_link
+            |> url(:custom_link, config)
+            |> maybe_remove_invalid_ref(href)
+
+          [] ->
+            build_extra_link(href, config)
         end
 
       _ ->
         nil
+    end
+  end
+
+  defp maybe_remove_invalid_ref(result, href) do
+    if is_nil(result) and String.match?(href, ~r/`.*`/) do
+      IO.warn("found invalid reference: #{href}")
+      :remove_link
+    else
+      result
     end
   end
 
