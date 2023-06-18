@@ -550,8 +550,13 @@ defmodule ExDoc.Language.Elixir do
     timeout: 0
   ]
 
-  defp url(string = "mix help " <> name, mode, config), do: mix_task(name, string, mode, config)
-  defp url(string = "mix " <> name, mode, config), do: mix_task(name, string, mode, config)
+  defp url(string = "mix help " <> name, mode, config) do
+    name |> mix_task(string, mode, config) |> maybe_remove_link(mode)
+  end
+
+  defp url(string = "mix " <> name, mode, config) do
+    name |> mix_task(string, mode, config) |> maybe_remove_link(mode)
+  end
 
   defp url(string, mode, config) do
     case Regex.run(~r{^(.+)/(\d+)$}, string) do
@@ -721,11 +726,9 @@ defmodule ExDoc.Language.Elixir do
         mix_task: true,
         original_text: string
       })
-
-      :remove_link
-    else
-      url
     end
+
+    url
   end
 
   defp safe_format_string!(string) do
