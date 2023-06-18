@@ -447,7 +447,7 @@ defmodule ExDoc.Language.Elixir do
           [[_, custom_link]] ->
             custom_link
             |> url(:custom_link, config)
-            |> remove_and_warn_if_invalid(href, config)
+            |> remove_and_warn_if_invalid(custom_link, config)
 
           [] ->
             build_extra_link(href, config)
@@ -458,9 +458,9 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
-  defp remove_and_warn_if_invalid(nil, href, config) do
+  defp remove_and_warn_if_invalid(nil, reference, config) do
     warn(
-      ~s[documentation references "#{href}" but it is invalid],
+      ~s[documentation references "#{reference}" but it is invalid],
       {config.file, config.line},
       config.id
     )

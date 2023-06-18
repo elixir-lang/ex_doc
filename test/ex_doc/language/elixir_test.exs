@@ -462,19 +462,19 @@ defmodule ExDoc.Language.ElixirTest do
 
     assert warn(fn ->
              assert autolink_doc(~m"[text](`fakefunction`)") == ~m"text"
-           end) =~ ~s[but it is invalid]
+           end) =~ ~s[documentation references "fakefunction" but it is invalid]
 
     assert warn(fn ->
              assert autolink_doc(~m"[text](`some.function`)") == ~m"text"
-           end) =~ ~s[but it is invalid]
+           end) =~ ~s[documentation references "some.function" but it is invalid]
 
     assert warn(fn ->
              assert autolink_doc(~m"[text](`Enum.map()`)") == ~m"text"
-           end) =~ ~s[but it is invalid]
+           end) =~ ~s[documentation references "Enum.map()" but it is invalid]
 
     assert warn(fn ->
              assert autolink_doc(~m"[text](`t:supervisor.child_spec/0`)") == ~m"text"
-           end) =~ ~s[but it is invalid]
+           end) =~ ~s[documentation references "t:supervisor.child_spec/0" but it is invalid]
 
     assert warn(fn ->
              autolink_spec(quote(do: t() :: String.bad()))
