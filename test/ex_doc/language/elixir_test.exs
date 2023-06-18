@@ -32,24 +32,6 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc(~m"`PATH`") == ~m"`PATH`"
     end
 
-    test "removes link and warns on invalid references" do
-      assert warn(fn ->
-               assert autolink_doc(~m"[text](`fakefunction`)") == ~m"text"
-             end) =~ ~s[but it is invalid]
-
-      assert warn(fn ->
-               assert autolink_doc(~m"[text](`some.function`)") == ~m"text"
-             end) =~ ~s[but it is invalid]
-
-      assert warn(fn ->
-               assert autolink_doc(~m"[text](`Enum.map()`)") == ~m"text"
-             end) =~ ~s[but it is invalid]
-
-      assert warn(fn ->
-               assert autolink_doc(~m"[text](`t:supervisor.child_spec/0`)") == ~m"text"
-             end) =~ ~s[but it is invalid]
-    end
-
     test "erlang module" do
       assert_unchanged(~m"`:array`")
     end
@@ -477,6 +459,22 @@ defmodule ExDoc.Language.ElixirTest do
     warn(~m"`c:GenServer.handle_call/9`")
 
     warn(~m"`t:Calendar.date/9`")
+
+    assert warn(fn ->
+             assert autolink_doc(~m"[text](`fakefunction`)") == ~m"text"
+           end) =~ ~s[but it is invalid]
+
+    assert warn(fn ->
+             assert autolink_doc(~m"[text](`some.function`)") == ~m"text"
+           end) =~ ~s[but it is invalid]
+
+    assert warn(fn ->
+             assert autolink_doc(~m"[text](`Enum.map()`)") == ~m"text"
+           end) =~ ~s[but it is invalid]
+
+    assert warn(fn ->
+             assert autolink_doc(~m"[text](`t:supervisor.child_spec/0`)") == ~m"text"
+           end) =~ ~s[but it is invalid]
 
     assert warn(fn ->
              autolink_spec(quote(do: t() :: String.bad()))
