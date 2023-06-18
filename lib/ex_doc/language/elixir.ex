@@ -447,7 +447,7 @@ defmodule ExDoc.Language.Elixir do
           [[_, custom_link]] ->
             custom_link
             |> url(:custom_link, config)
-            |> maybe_remove_invalid_ref(href)
+            |> remove_and_warn_if_invalid(href, config)
 
           [] ->
             build_extra_link(href, config)
@@ -458,13 +458,27 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
-  defp maybe_remove_invalid_ref(result, href) do
-    if is_nil(result) and String.match?(href, ~r/`.*`/) do
-      IO.warn("found invalid reference: #{href}")
-      :remove_link
-    else
-      result
-    end
+  defp remove_and_warn_if_invalid(nil, href, config) do
+    warn(
+      ~s[documentation references "#{href}" but it is invalid],
+      {config.file, config.line},
+      config.id
+    )
+
+    :remove_link
+  end
+
+  defp remove_and_warn_if_invalid(result, _, _), do: result
+
+  defp warn(message, {file, line}, id) do
+    warning = IO.ANSI.format([:yellow, "warning: ", :reset])
+
+    stacktrace =
+      "  #{file}" <>
+        if(line, do: ":#{line}", else: "") <>
+        if(id, do: ": #{id}", else: "")
+
+    IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
   end
 
   defp build_extra_link(link, config) do
@@ -547,10 +561,14 @@ defmodule ExDoc.Language.Elixir do
 
           case parse_module_function(rest) do
             {:local, function} ->
-              local_url(kind, function, arity, config, string, mode: mode)
+              kind
+              |> local_url(function, arity, config, string, mode: mode)
+              |> maybe_remove_link(mode)
 
             {:remote, module, function} ->
-              remote_url({kind, module, function, arity}, config, string, mode: mode)
+              {kind, module, function, arity}
+              |> remote_url(config, string, mode: mode)
+              |> maybe_remove_link(mode)
 
             :error ->
               nil
@@ -572,6 +590,15 @@ defmodule ExDoc.Language.Elixir do
       _ ->
         nil
     end
+  end
+
+  # Remove link when we fail to parse reference so we don't warn twice
+  defp maybe_remove_link(nil, :custom_link) do
+    :remove_link
+  end
+
+  defp maybe_remove_link(result, _mode) do
+    result
   end
 
   defp kind("c:" <> rest), do: {:callback, rest}
@@ -694,9 +721,11 @@ defmodule ExDoc.Language.Elixir do
         mix_task: true,
         original_text: string
       })
-    end
 
-    url
+      :remove_link
+    else
+      url
+    end
   end
 
   defp safe_format_string!(string) do

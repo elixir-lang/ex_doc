@@ -32,18 +32,22 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc(~m"`PATH`") == ~m"`PATH`"
     end
 
-    test "invalid reference does not return backticks and emits warning" do
-      assert_invalid_ref_warning("`fakefunction`", fn ->
-        assert autolink_doc(~m"[text](`fakefunction`)") == ~m"text"
-      end)
+    test "removes link and warns on invalid references" do
+      assert warn(fn ->
+               assert autolink_doc(~m"[text](`fakefunction`)") == ~m"text"
+             end) =~ ~s[but it is invalid]
 
-      assert_invalid_ref_warning("`t:supervisor.child_spec/0`", fn ->
-        assert autolink_doc(~m"[text](`t:supervisor.child_spec/0`)") == ~m"text"
-      end)
+      assert warn(fn ->
+               assert autolink_doc(~m"[text](`some.function`)") == ~m"text"
+             end) =~ ~s[but it is invalid]
 
-      assert_invalid_ref_warning("`mix foobar`", fn ->
-        assert autolink_doc(~m"[text](`mix foobar`)") == ~m"text"
-      end)
+      assert warn(fn ->
+               assert autolink_doc(~m"[text](`Enum.map()`)") == ~m"text"
+             end) =~ ~s[but it is invalid]
+
+      assert warn(fn ->
+               assert autolink_doc(~m"[text](`t:supervisor.child_spec/0`)") == ~m"text"
+             end) =~ ~s[but it is invalid]
     end
 
     test "erlang module" do
@@ -514,13 +518,13 @@ defmodule ExDoc.Language.ElixirTest do
            end) =~ ~s[documentation references module "Unknown" but it is undefined]
 
     assert warn(fn ->
-             assert autolink_doc(~m"[Foo task](`mix foo`)", []) == ~m"Foo task"
+             autolink_doc(~m"[Foo task](`mix foo`)", [])
            end) =~ ~s[documentation references "mix foo" but it is undefined]
 
     assert_unchanged(~m"`mix foo`")
 
     assert warn(fn ->
-             assert autolink_doc(~m"[bad](`String.upcase/9`)", extras: []) == ~m"bad"
+             autolink_doc(~m"[bad](`String.upcase/9`)", extras: [])
            end) =~
              ~s[documentation references function "String.upcase/9" but it is undefined or private]
 
@@ -542,10 +546,6 @@ defmodule ExDoc.Language.ElixirTest do
 
   defp autolink_doc(ast, options \\ []) do
     ExDoc.Language.Elixir.autolink_doc(ast, Keyword.merge(@default_options, options))
-  end
-
-  defp assert_invalid_ref_warning(ref, fun) do
-    assert capture_io(:stderr, fun) =~ "found invalid reference: #{ref}"
   end
 
   defp assert_unchanged(ast, options \\ []) do
