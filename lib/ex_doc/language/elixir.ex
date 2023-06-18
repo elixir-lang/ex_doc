@@ -444,13 +444,41 @@ defmodule ExDoc.Language.Elixir do
     case Keyword.fetch(attrs, :href) do
       {:ok, href} ->
         case Regex.scan(@ref_regex, href) do
-          [[_, custom_link]] -> url(custom_link, :custom_link, config)
-          [] -> build_extra_link(href, config)
+          [[_, custom_link]] ->
+            custom_link
+            |> url(:custom_link, config)
+            |> remove_and_warn_if_invalid(custom_link, config)
+
+          [] ->
+            build_extra_link(href, config)
         end
 
       _ ->
         nil
     end
+  end
+
+  defp remove_and_warn_if_invalid(nil, reference, config) do
+    warn(
+      ~s[documentation references "#{reference}" but it is invalid],
+      {config.file, config.line},
+      config.id
+    )
+
+    :remove_link
+  end
+
+  defp remove_and_warn_if_invalid(result, _, _), do: result
+
+  defp warn(message, {file, line}, id) do
+    warning = IO.ANSI.format([:yellow, "warning: ", :reset])
+
+    stacktrace =
+      "  #{file}" <>
+        if(line, do: ":#{line}", else: "") <>
+        if(id, do: ": #{id}", else: "")
+
+    IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
   end
 
   defp build_extra_link(link, config) do
@@ -522,8 +550,13 @@ defmodule ExDoc.Language.Elixir do
     timeout: 0
   ]
 
-  defp url(string = "mix help " <> name, mode, config), do: mix_task(name, string, mode, config)
-  defp url(string = "mix " <> name, mode, config), do: mix_task(name, string, mode, config)
+  defp url(string = "mix help " <> name, mode, config) do
+    name |> mix_task(string, mode, config) |> maybe_remove_link(mode)
+  end
+
+  defp url(string = "mix " <> name, mode, config) do
+    name |> mix_task(string, mode, config) |> maybe_remove_link(mode)
+  end
 
   defp url(string, mode, config) do
     case Regex.run(~r{^(.+)/(\d+)$}, string) do
@@ -533,10 +566,14 @@ defmodule ExDoc.Language.Elixir do
 
           case parse_module_function(rest) do
             {:local, function} ->
-              local_url(kind, function, arity, config, string, mode: mode)
+              kind
+              |> local_url(function, arity, config, string, mode: mode)
+              |> maybe_remove_link(mode)
 
             {:remote, module, function} ->
-              remote_url({kind, module, function, arity}, config, string, mode: mode)
+              {kind, module, function, arity}
+              |> remote_url(config, string, mode: mode)
+              |> maybe_remove_link(mode)
 
             :error ->
               nil
@@ -558,6 +595,15 @@ defmodule ExDoc.Language.Elixir do
       _ ->
         nil
     end
+  end
+
+  # Remove link when we fail to parse reference so we don't warn twice
+  defp maybe_remove_link(nil, :custom_link) do
+    :remove_link
+  end
+
+  defp maybe_remove_link(result, _mode) do
+    result
   end
 
   defp kind("c:" <> rest), do: {:callback, rest}

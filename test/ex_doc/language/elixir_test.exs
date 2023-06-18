@@ -461,6 +461,22 @@ defmodule ExDoc.Language.ElixirTest do
     warn(~m"`t:Calendar.date/9`")
 
     assert warn(fn ->
+             assert autolink_doc(~m"[text](`fakefunction`)") == ~m"text"
+           end) =~ ~s[documentation references "fakefunction" but it is invalid]
+
+    assert warn(fn ->
+             assert autolink_doc(~m"[text](`some.function`)") == ~m"text"
+           end) =~ ~s[documentation references "some.function" but it is invalid]
+
+    assert warn(fn ->
+             assert autolink_doc(~m"[text](`Enum.map()`)") == ~m"text"
+           end) =~ ~s[documentation references "Enum.map()" but it is invalid]
+
+    assert warn(fn ->
+             assert autolink_doc(~m"[text](`t:supervisor.child_spec/0`)") == ~m"text"
+           end) =~ ~s[documentation references "t:supervisor.child_spec/0" but it is invalid]
+
+    assert warn(fn ->
              autolink_spec(quote(do: t() :: String.bad()))
            end) =~ ~s[documentation references type "String.bad()"]
 
@@ -499,12 +515,15 @@ defmodule ExDoc.Language.ElixirTest do
                       ~m"It is Unknown"
            end) =~ ~s[documentation references module "Unknown" but it is undefined]
 
-    assert warn(~m"[Foo task](`mix foo`)", []) =~
-             ~s[documentation references "mix foo" but it is undefined]
+    assert warn(fn ->
+             autolink_doc(~m"[Foo task](`mix foo`)", [])
+           end) =~ ~s[documentation references "mix foo" but it is undefined]
 
     assert_unchanged(~m"`mix foo`")
 
-    assert warn(~m"[bad](`String.upcase/9`)", extras: []) =~
+    assert warn(fn ->
+             autolink_doc(~m"[bad](`String.upcase/9`)", extras: [])
+           end) =~
              ~s[documentation references function "String.upcase/9" but it is undefined or private]
 
     assert_unchanged(~m"`Unknown`")
