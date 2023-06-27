@@ -363,7 +363,7 @@ Similarly to the example above, if your Markdown includes Mermaid graph specific
 ```html
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", async function () {
+  document.addEventListener("DOMContentLoaded", function () {
     mermaid.initialize({
       startOnLoad: false,
       theme: document.body.className.includes("dark") ? "dark" : "default"
@@ -374,11 +374,12 @@ Similarly to the example above, if your Markdown includes Mermaid graph specific
       const graphDefinition = codeEl.textContent;
       const graphEl = document.createElement("div");
       const graphId = "mermaid-graph-" + id++;
-      const {svg, bindFunctions} = await mermaid.render(graphId, graphDefinition);
-      graphEl.innerHTML = svg;
-      bindFunctions?.(graphEl);
-      preEl.insertAdjacentElement("afterend", graphEl);
-      preEl.remove();
+      mermaid.render(graphId, graphDefinition).then(({svg, bindFunctions}) => {
+        graphEl.innerHTML = svg;
+        bindFunctions?.(graphEl);
+        preEl.insertAdjacentElement("afterend", graphEl);
+        preEl.remove();
+      });
     }
   });
 </script>
