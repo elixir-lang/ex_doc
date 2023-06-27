@@ -361,22 +361,24 @@ For more details and configuration options, see [vega/vega-embed](https://github
 Similarly to the example above, if your Markdown includes Mermaid graph specification in `mermaid` code snippets:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    mermaid.initialize({ startOnLoad: false });
+  document.addEventListener("DOMContentLoaded", async function () {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: document.body.className.includes("dark") ? "dark" : "default"
+    });
     let id = 0;
     for (const codeEl of document.querySelectorAll("pre code.mermaid")) {
       const preEl = codeEl.parentElement;
       const graphDefinition = codeEl.textContent;
       const graphEl = document.createElement("div");
       const graphId = "mermaid-graph-" + id++;
-      mermaid.render(graphId, graphDefinition, function (svgSource, bindListeners) {
-        graphEl.innerHTML = svgSource;
-        bindListeners && bindListeners(graphEl);
-        preEl.insertAdjacentElement("afterend", graphEl);
-        preEl.remove();
-      });
+      const {svg, bindFunctions} = await mermaid.render(graphId, graphDefinition);
+      graphEl.innerHTML = svg;
+      bindFunctions?.(graphEl);
+      preEl.insertAdjacentElement("afterend", graphEl);
+      preEl.remove();
     }
   });
 </script>
