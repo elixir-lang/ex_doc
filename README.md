@@ -374,11 +374,13 @@ Similarly to the example above, if your Markdown includes Mermaid graph specific
       const graphDefinition = codeEl.textContent;
       const graphEl = document.createElement("div");
       const graphId = "mermaid-graph-" + id++;
-      const {svg, bindFunctions} = await mermaid.render(graphId, graphDefinition);
-      graphEl.innerHTML = svg;
-      bindFunctions?.(graphEl);
-      preEl.insertAdjacentElement("afterend", graphEl);
-      preEl.remove();
+      const renderPromise = mermaid.render(graphId, graphDefinition);
+      renderPromise.then(({svg, bindFunctions}) => {
+        graphEl.innerHTML = svg;
+        bindFunctions?.(graphEl);
+        preEl.insertAdjacentElement("afterend", graphEl);
+        preEl.remove();
+      });
     }
   });
 </script>
