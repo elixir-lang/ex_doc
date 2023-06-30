@@ -39,7 +39,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
     module =
       encode(
         "#{node.id}.html",
-        node.id,
+        node.title,
         node.type,
         intro
       )
