@@ -38,6 +38,34 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
     assert item2["doc"] == "Section Content 1."
   end
 
+  test "Mix task", c do
+    modules =
+      elixirc(c, ~S'''
+      defmodule Mix.Tasks.SearchItemTest do
+        @moduledoc """
+        Test task.
+
+        ## Section 1
+
+            $ mix search_item_test
+        """
+      end
+      ''')
+
+    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    [item1, item2] = search_items(modules, config)
+
+    assert item1["ref"] == "Mix.Tasks.SearchItemTest.html"
+    assert item1["type"] == "task"
+    # assert item1["title"] == "mix search_item_test"
+    assert item1["doc"] == "Test task."
+
+    assert item2["ref"] == "Mix.Tasks.SearchItemTest.html#module-section-1"
+    assert item2["type"] == "task"
+    assert item2["title"] == "Section 1 - mix search_item_test"
+    assert item2["doc"] == "$ mix search_item_test"
+  end
+
   test "module with no docs", c do
     modules =
       elixirc(c, ~S'''
