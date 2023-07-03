@@ -40,10 +40,13 @@ body.dark {
 
   --codeBackground:              var(--gray850);
   --codeBorder:                  var(--gray700);
-  --inlineCodeBackground:        var(--gray50);
-  --inlineCodeBorder:            var(--gray100);
   --codeScrollThumb:             var(--gray500);
   --codeScrollBackground:        var(--codeBorder);
+  --admCodeBackground:           var(--gray750);
+  --admCodeBorder:               var(--gray600);
+  --admInlineCode:               var(--black);
+  --admInlineCodeBackground:     var(--gray25);
+  --admInlineCodeBorder:         var(--gray100);
 
   --tabBackground:               var(--gray900);
   --tabBorder:                   var(--gray700);

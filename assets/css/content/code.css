@@ -27,7 +27,6 @@
   overflow-x: auto;
   white-space: inherit;
   padding: .5em 1em;
-  background-color: var(--codeBackground);
 }
 
 .content-inner pre code::-webkit-scrollbar {
