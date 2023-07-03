@@ -40,10 +40,13 @@
 
   --codeBackground:              var(--gray25);
   --codeBorder:                  var(--gray100);
-  --inlineCodeBackground:        var(--codeBackground);
-  --inlineCodeBorder:            var(--codeBorder);
   --codeScrollThumb:             var(--gray400);
   --codeScrollBackground:        var(--codeBorder);
+  --admCodeBackground:           var(--gray25);
+  --admCodeBorder:               var(--gray100);
+  --admInlineCode:               var(--black);
+  --admInlineCodeBackground:     var(--gray25);
+  --admInlineCodeBorder:         var(--gray100);
 
   --tabBackground:               var(--white);
   --tabBorder:                   var(--gray300);
