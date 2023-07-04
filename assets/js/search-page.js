@@ -1,4 +1,4 @@
-/* globals searchNodes */
+/* globals searchData */
 
 import lunr from 'lunr'
 import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
@@ -98,7 +98,7 @@ function createIndex () {
     this.pipeline.remove(lunr.trimmer)
     this.use(elixirTrimmer)
 
-    searchNodes.forEach(searchNode => {
+    searchData.items.forEach(searchNode => {
       this.add(searchNode)
     })
   })
@@ -175,7 +175,7 @@ function searchResultsToDecoratedSearchNodes (results) {
 }
 
 function getSearchNodeByRef (ref) {
-  return searchNodes.find(searchNode => searchNode.ref === ref) || null
+  return searchData.items.find(searchNode => searchNode.ref === ref) || null
 }
 
 function getExcerpts (searchNode, metadata) {

@@ -1,7 +1,7 @@
 defmodule ExDoc.Formatter.HTML do
   @moduledoc false
 
-  alias __MODULE__.{Assets, Templates, SearchItems}
+  alias __MODULE__.{Assets, Templates, SearchData}
   alias ExDoc.{Markdown, GroupMatcher, Utils}
 
   @main "api-reference"
@@ -23,7 +23,7 @@ defmodule ExDoc.Formatter.HTML do
 
     # Generate search early on without api reference in extras
     static_files = generate_assets(config, @assets_dir, default_assets(config))
-    search_items = generate_search_items(project_nodes, extras, config)
+    search_data = generate_search_data(project_nodes, extras, config)
 
     nodes_map = %{
       modules: filter_list(:module, project_nodes),
@@ -38,7 +38,7 @@ defmodule ExDoc.Formatter.HTML do
       end
 
     all_files =
-      search_items ++
+      search_data ++
         static_files ++
         generate_sidebar_items(nodes_map, extras, config) ++
         generate_extras(nodes_map, extras, config) ++
@@ -226,16 +226,16 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_sidebar_items(nodes_map, extras, config) do
     content = Templates.create_sidebar_items(nodes_map, extras)
-    sidebar_items = "dist/sidebar_items-#{digest(content)}.js"
-    File.write!(Path.join(config.output, sidebar_items), content)
-    [sidebar_items]
+    path = "dist/sidebar_items-#{digest(content)}.js"
+    File.write!(Path.join(config.output, path), content)
+    [path]
   end
 
-  defp generate_search_items(linked, extras, config) do
-    content = SearchItems.create(linked, extras)
-    search_items = "dist/search_items-#{digest(content)}.js"
-    File.write!(Path.join(config.output, search_items), content)
-    [search_items]
+  defp generate_search_data(linked, extras, config) do
+    content = SearchData.create(linked, extras, config.proglang)
+    path = "dist/search_data-#{digest(content)}.js"
+    File.write!(Path.join(config.output, path), content)
+    [path]
   end
 
   defp digest(content) do
