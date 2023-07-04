@@ -4,9 +4,21 @@ defmodule ExDoc.Formatter.HTML.SearchData do
   # TODO: It should not depend on the parent module
   alias ExDoc.Formatter.HTML
 
-  def create(nodes, extras) do
+  def create(nodes, extras, proglang) do
+    content_type =
+      case proglang do
+        :elixir -> "text/markdown"
+        :erlang -> "text/plain"
+      end
+
     items = Enum.flat_map(nodes, &module/1) ++ Enum.flat_map(extras, &extra/1)
-    ["searchData=" | ExDoc.Utils.to_json(%{items: items})]
+
+    data = %{
+      items: items,
+      content_type: content_type
+    }
+
+    ["searchData=" | ExDoc.Utils.to_json(data)]
   end
 
   defp extra(map) do

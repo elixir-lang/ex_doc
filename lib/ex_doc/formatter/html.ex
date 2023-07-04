@@ -232,7 +232,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_search_data(linked, extras, config) do
-    content = SearchData.create(linked, extras)
+    content = SearchData.create(linked, extras, config.proglang)
     path = "dist/search_data-#{digest(content)}.js"
     File.write!(Path.join(config.output, path), content)
     [path]
