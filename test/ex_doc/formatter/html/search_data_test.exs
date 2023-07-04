@@ -1,4 +1,4 @@
-defmodule ExDoc.Formatter.HTML.SearchItemsTest do
+defmodule ExDoc.Formatter.HTML.SearchDataTest do
   use ExUnit.Case, async: true
   import TestHelper
 
@@ -25,7 +25,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       ''')
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [item1, item2] = search_items(modules, config)
+    [item1, item2] = search_data(modules, config)
 
     assert item1["ref"] == "SearchFoo.html"
     assert item1["type"] == "module"
@@ -53,7 +53,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       ''')
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [item1, item2] = search_items(modules, config)
+    [item1, item2] = search_data(modules, config)
 
     assert item1["ref"] == "Mix.Tasks.SearchItemTest.html"
     assert item1["type"] == "task"
@@ -74,7 +74,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       ''')
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [item] = search_items(modules, config)
+    [item] = search_data(modules, config)
     assert item["ref"] == "SearchFoo.html"
     assert item["type"] == "module"
     assert item["title"] == "SearchFoo"
@@ -92,7 +92,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       ''')
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [item] = search_items(modules, config)
+    [item] = search_data(modules, config)
 
     assert item["doc"] == ~S"#{}"
   end
@@ -107,7 +107,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       """)
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [item] = search_items([module], config)
+    [item] = search_data([module], config)
     assert item["ref"] == "search_foo.html"
     assert item["type"] == "module"
     assert item["title"] == "search_foo"
@@ -126,7 +126,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       ''')
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [%{"type" => "module"}, item] = search_items(modules, config)
+    [%{"type" => "module"}, item] = search_data(modules, config)
     assert item["ref"] == "SearchFoo.html#foo/0"
     assert item["type"] == "function"
     assert item["title"] == "SearchFoo.foo/0"
@@ -149,7 +149,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       ''')
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [%{"type" => "behaviour"}, item1, item2] = search_items(modules, config)
+    [%{"type" => "behaviour"}, item1, item2] = search_data(modules, config)
     assert item1["ref"] == "SearchFoo.html#c:handle_foo/0"
     assert item1["type"] == "callback"
     assert item1["title"] == "SearchFoo.handle_foo/0"
@@ -173,7 +173,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
       ''')
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
-    [%{"type" => "module"}, item] = search_items(modules, config)
+    [%{"type" => "module"}, item] = search_data(modules, config)
     assert item["ref"] == "SearchFoo.html#t:foo/0"
     assert item["type"] == "type"
     assert item["title"] == "SearchFoo.foo/0"
@@ -194,7 +194,7 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
     """)
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: [readme_path]}
-    [item1, item2] = search_items([], config)
+    [item1, item2] = search_data([], config)
 
     assert item1["ref"] == "readme.html"
     assert item1["type"] == "extras"
@@ -207,12 +207,13 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
     assert item2["doc"] == "Section _1_ content."
   end
 
-  defp search_items(modules, config) do
+  defp search_data(modules, config) do
     modules = ExDoc.Retriever.docs_from_modules(modules, config)
 
     ExDoc.Formatter.HTML.run(modules, config)
-    [path] = Path.wildcard(Path.join([config.output, "dist", "search_items-*.js"]))
-    "searchNodes=" <> json = File.read!(path)
-    Jason.decode!(json)
+    [path] = Path.wildcard(Path.join([config.output, "dist", "search_data-*.js"]))
+    "searchData=" <> json = File.read!(path)
+    %{"items" => items} = Jason.decode!(json)
+    items
   end
 end

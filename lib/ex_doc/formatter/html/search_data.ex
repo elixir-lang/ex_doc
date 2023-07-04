@@ -1,4 +1,4 @@
-defmodule ExDoc.Formatter.HTML.SearchItems do
+defmodule ExDoc.Formatter.HTML.SearchData do
   @moduledoc false
 
   # TODO: It should not depend on the parent module
@@ -6,7 +6,7 @@ defmodule ExDoc.Formatter.HTML.SearchItems do
 
   def create(nodes, extras) do
     items = Enum.flat_map(nodes, &module/1) ++ Enum.flat_map(extras, &extra/1)
-    ["searchNodes=" | ExDoc.Utils.to_json(items)]
+    ["searchData=" | ExDoc.Utils.to_json(%{items: items})]
   end
 
   defp extra(map) do
