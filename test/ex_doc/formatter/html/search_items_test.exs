@@ -81,6 +81,22 @@ defmodule ExDoc.Formatter.HTML.SearchItemsTest do
     assert item["doc"] == ""
   end
 
+  test "escaping", c do
+    modules =
+      elixirc(c, ~S'''
+      defmodule SearchFoo do
+        @moduledoc ~S"""
+        #{}
+        """
+      end
+      ''')
+
+    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    [item] = search_items(modules, config)
+
+    assert item["doc"] == ~S"#{}"
+  end
+
   @tag :otp_eep48
   test "Erlang module", c do
     [module] =

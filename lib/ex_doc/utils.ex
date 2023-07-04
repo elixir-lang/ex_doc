@@ -122,7 +122,9 @@ defmodule ExDoc.Utils do
   end
 
   def to_json(binary) when is_binary(binary) do
-    inspect(binary, printable_limit: :infinity)
+    binary
+    |> inspect(printable_limit: :infinity)
+    |> String.replace("\\#\{", "#\{")
   end
 
   def to_json(integer) when is_integer(integer) do
