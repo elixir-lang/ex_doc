@@ -87,11 +87,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node-version }}
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
       - run: mkdir -p tmp/handlebars
       - run: npm ci --prefix assets
       - run: npm run build --prefix assets
       - name: Push updated assets
-        id: push_assets
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update assets
