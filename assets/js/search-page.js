@@ -8,10 +8,6 @@ const EXCERPT_RADIUS = 80
 
 const SEARCH_CONTAINER_SELECTOR = '#search'
 
-export function foo () {
-  return 'bar'
-}
-
 /**
  * Performs a full-text search within the documentation
  * for the query in URL params and renders the result.
