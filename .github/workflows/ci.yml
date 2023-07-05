@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+env:
+  node-version: 18.x
 
 jobs:
   mix_test:
@@ -57,16 +59,44 @@ jobs:
 
   check_js:
     name: Check JS
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: ${{ env.node-version }}
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
       - run: npm install --prefix assets
-      - run: npm run --prefix assets lint
+      - run: npm run lint --prefix assets
       - run: sudo apt-get install xvfb
       - run: |
-          xvfb-run --auto-servernum npm run --prefix assets test
+          xvfb-run --auto-servernum npm run test --prefix assets
         env:
           CI: true
+
+  assets:
+    needs: [check_js]
+    runs-on: ubuntu-20.04
+    if: github.ref_name == 'main'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.node-version }}
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
+      - run: mkdir -p tmp/handlebars
+      - run: npm ci --prefix assets
+      - run: npm run build --prefix assets
+      - name: Push updated assets
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update assets
+          file_pattern: formatters
