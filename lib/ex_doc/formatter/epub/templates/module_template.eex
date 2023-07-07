@@ -20,9 +20,8 @@
         <h1 class="section-heading">
           <a class="hover-link" href="#summary">
             <i class="ri-link-m" aria-hidden="true"></i>
-            <span class="sr-only">Anchor for this section</span>
+            Summary
           </a>
-          Summary
         </h1>
         <%= for {name, nodes} <- summary, do: H.summary_template(name, nodes) %>
       </section>
@@ -33,9 +32,8 @@
         <h1 class="section-heading">
           <a class="hover-link" href="#<%= key %>">
             <i class="ri-link-m" aria-hidden="true"></i>
-            <span class="sr-only">Anchor for this section</span>
+            <%= name %>
           </a>
-          <%= name %>
         </h1>
         <div class="<%= key %>-list">
           <%= for node <- nodes, do: H.detail_template(node, module) %>
