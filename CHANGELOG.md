@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.30.1 (2023-07-07)
+
+  * Bug fixes
+    * Fix styling for headers on cheatsheets and small screens
+
 ## v0.30.0 (2023-07-07)
 
   * Enhancements
