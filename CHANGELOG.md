@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.30.0 (2023-07-07)
+
+  * Enhancements
+    * Support tabsets (see the README for more information)
+    * Improve search results and indexing by storing more data and metadata
+    * Warn on invalid references in links
+    * Strike-through deprecated items on autocompletion
+    * Add source URL link to API reference page
+    * Allow multiple extra files with the same name by generating unique names in case of conflicts
+
+  * Bug fixes
+    * Fix rendering of large code blocks in admonition texts
+    * Do not log errors on module mismatch in case-insensitive file systems
+
 ## v0.29.4 (2023-03-29)
 
   * Bug fixes
