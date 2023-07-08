@@ -76,6 +76,9 @@ defmodule ExDoc.UtilsTest do
     }
 
     assert map |> ExDoc.Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(map)
+
+    string = for i <- 0..0x1F, do: <<i>>, into: ""
+    assert string |> ExDoc.Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(string)
   end
 
   test "source_url_pattern" do

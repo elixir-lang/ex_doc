@@ -122,14 +122,42 @@ defmodule ExDoc.Utils do
   end
 
   def to_json(binary) when is_binary(binary) do
-    binary
-    |> inspect(printable_limit: :infinity)
-    |> String.replace("\\#\{", "#\{")
+    to_json_string(binary, "\"")
   end
 
   def to_json(integer) when is_integer(integer) do
     Integer.to_string(integer)
   end
+
+  defp to_json_string(<<?\b, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\b">>)
+
+  defp to_json_string(<<?\t, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\t">>)
+
+  defp to_json_string(<<?\n, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\n">>)
+
+  defp to_json_string(<<?\f, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\f">>)
+
+  defp to_json_string(<<?\r, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\r">>)
+
+  defp to_json_string(<<?\\, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\\\">>)
+
+  defp to_json_string(<<?", rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\\"">>)
+
+  defp to_json_string(<<x, rest::binary>>, acc) when x <= 0x000F,
+    do: to_json_string(rest, <<acc::binary, "\\u000#{Integer.to_string(x, 16)}">>)
+
+  defp to_json_string(<<x, rest::binary>>, acc) when x <= 0x001F,
+    do: to_json_string(rest, <<acc::binary, "\\u00#{Integer.to_string(x, 16)}">>)
+
+  defp to_json_string(<<x, rest::binary>>, acc), do: to_json_string(rest, <<acc::binary, x>>)
+  defp to_json_string(<<>>, acc), do: <<acc::binary, "\"">>
 
   @doc """
   Generates a url based on the given pattern.
