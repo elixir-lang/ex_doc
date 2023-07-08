@@ -151,12 +151,14 @@ defmodule ExDoc.Utils do
     do: to_json_string(rest, <<acc::binary, "\\\"">>)
 
   defp to_json_string(<<x, rest::binary>>, acc) when x <= 0x000F,
-    do: to_json_string(rest, <<acc::binary, "\\u000#{Integer.to_string(x, 16)}">>)
+    do: to_json_string(rest, <<acc::binary, "\\u000", Integer.to_string(x, 16)::binary>>)
 
   defp to_json_string(<<x, rest::binary>>, acc) when x <= 0x001F,
-    do: to_json_string(rest, <<acc::binary, "\\u00#{Integer.to_string(x, 16)}">>)
+    do: to_json_string(rest, <<acc::binary, "\\u00", Integer.to_string(x, 16)::binary>>)
 
-  defp to_json_string(<<x, rest::binary>>, acc), do: to_json_string(rest, <<acc::binary, x>>)
+  defp to_json_string(<<x, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, x>>)
+
   defp to_json_string(<<>>, acc), do: <<acc::binary, "\"">>
 
   @doc """
