@@ -211,6 +211,37 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     assert item2["doc"] == "Section _1_ content."
   end
 
+  test "drops vega-lite blocks", c do
+    readme_path = "#{c.tmp_dir}/README.md"
+
+    File.write!(readme_path, """
+    # Foo
+
+    _Foo_ content.
+
+    ## Section 1 Header
+
+    ```vega-lite
+      graph
+    ```
+
+    Section _1_ content.
+    """)
+
+    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: [readme_path]}
+    [item1, item2] = search_data([], config)["items"]
+
+    assert item1["ref"] == "readme.html"
+    assert item1["type"] == "extras"
+    assert item1["title"] == "Foo"
+    assert item1["doc"] == "# Foo\n\n_Foo_ content."
+
+    assert item2["ref"] == "readme.html#section-1-header"
+    assert item2["type"] == "extras"
+    assert item2["title"] == "Section 1 Header - Foo"
+    assert item2["doc"] == "Section _1_ content."
+  end
+
   defp search_data(modules, config) do
     modules = ExDoc.Retriever.docs_from_modules(modules, config)
 
