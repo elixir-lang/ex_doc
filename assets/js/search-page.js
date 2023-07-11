@@ -50,7 +50,7 @@ async function getIndex () {
   lunr.Pipeline.registerFunction(elixirTrimmerFunction, 'elixirTrimmer')
   lunr.Pipeline.registerFunction(hyphenSearchFunction, 'hyphenSearch')
 
-  const cachedIndex = await loadIndex()  
+  const cachedIndex = await loadIndex()
   if (cachedIndex) { return cachedIndex }
 
   const index = createIndex()
@@ -75,52 +75,50 @@ async function loadIndex () {
 
 async function saveIndex (index) {
   try {
-    const serializedIndex = await compress(index)      
+    const serializedIndex = await compress(index)
     sessionStorage.setItem(indexStorageKey(), serializedIndex)
   } catch (error) {
     console.error('Failed to save index: ', error)
   }
 }
 
-async function compress(index) {
-  
+async function compress (index) {
   const stream = new Blob([JSON.stringify(index)], {
-    type: 'application/json',
-  }).stream().pipeThrough(new CompressionStream('gzip'));
+    type: 'application/json'
+  }).stream().pipeThrough(new window.CompressionStream('gzip'))
 
   const blob = await new Response(stream).blob()
   const buffer = await blob.arrayBuffer()
   return b64encode(buffer)
 }
 
-
-async function decompress(index) {
+async function decompress (index) {
   const stream = new Blob([b64decode(index)], {
-    type: "application/json",
-  }).stream().pipeThrough(new DecompressionStream('gzip'));
+    type: 'application/json'
+  }).stream().pipeThrough(new window.DecompressionStream('gzip'))
 
   const blob = await new Response(stream).text()
   return JSON.parse(blob)
 }
 
-function b64encode(buffer) {
-    var binary = '';
-    var bytes = new Uint8Array( buffer );
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
-        binary += String.fromCharCode( bytes[ i ] );
-    }
-    return window.btoa( binary );
+function b64encode (buffer) {
+  let binary = ''
+  const bytes = new Uint8Array(buffer)
+  const len = bytes.byteLength
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return window.btoa(binary)
 }
 
-function b64decode(str) {
-  const binary_string = window.atob(str);
-  const len = binary_string.length;
-  const bytes = new Uint8Array(new ArrayBuffer(len));
+function b64decode (str) {
+  const binaryString = window.atob(str)
+  const len = binaryString.length
+  const bytes = new Uint8Array(new ArrayBuffer(len))
   for (let i = 0; i < len; i++) {
-    bytes[i] = binary_string.charCodeAt(i);
+    bytes[i] = binaryString.charCodeAt(i)
   }
-  return bytes;
+  return bytes
 }
 
 function indexStorageKey () {
