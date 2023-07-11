@@ -126,6 +126,7 @@ defmodule ExDoc.Formatter.HTML.SearchData do
         section =
           section
           |> HTML.strip_tags(" ")
+          |> drop_ignorable_codeblocks()
           |> String.trim()
 
         {clean_markdown(header), section}
@@ -145,5 +146,12 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     |> HTML.strip_tags(" ")
     |> String.replace(~r/\s+/, " ")
     |> String.trim()
+  end
+
+  @ignored_codeblocks ~w[vega-lite]
+
+  defp drop_ignorable_codeblocks(section) do
+    block_names = Enum.join(@ignored_codeblocks, "|")
+    String.replace(section, ~r/^```(?:#{block_names})\n(?:[\s\S]*?)```$/m, "")
   end
 end
