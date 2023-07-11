@@ -124,7 +124,7 @@ function b64decode(str) {
 }
 
 function indexStorageKey () {
-  return `index:${getProjectNameAndVersion()}`
+  return `idv2:${getProjectNameAndVersion()}`
 }
 
 function createIndex () {
