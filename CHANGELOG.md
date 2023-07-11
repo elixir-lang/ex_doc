@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.30.2 (2023-07-11)
+
+  * Bug fixes
+    * Fix escaping in `search_data.json`
+    * Skip vega-lite code blocks in `search_data.json`
+
 ## v0.30.1 (2023-07-07)
 
   * Bug fixes
