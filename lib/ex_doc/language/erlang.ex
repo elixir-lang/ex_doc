@@ -11,7 +11,20 @@ defmodule ExDoc.Language.Erlang do
       id = Atom.to_string(module)
       line = find_module_line(module, abst_code)
       type = module_type(module)
-      optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
+
+      optional_callbacks =
+        type == :behaviour &&
+          try do
+            module.behaviour_info(:optional_callbacks)
+          rescue
+            FunctionClauseError -> :undefined
+          end
+
+      optional_callbacks =
+        case optional_callbacks do
+          :undefined -> []
+          _ -> optional_callbacks
+        end
 
       %{
         module: module,
