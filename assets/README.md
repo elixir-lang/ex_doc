@@ -2,7 +2,7 @@
 
 All asset sources for `ExDoc` live in this directory. The built, ready-to-use versions are found in `formatters/{html,epub}/dist`.
 
-To work on these assets you need to have [Node.js] and [npm] installed. (npm is usually installed along with Node.js.) The build process is currently tested in Node 16 LTS.
+To work on these assets you need to have [Node.js] and [npm] installed. (npm is usually installed along with Node.js.) The build process is currently tested in Node 18 LTS.
 
 Assets are built with [esbuild], which, along with the JavaScript linter and test-runner, is set as a dependency in the assets `package.json` and installed via [npm]:
 
