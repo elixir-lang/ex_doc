@@ -397,8 +397,6 @@ The easiest way to test changes to ExDoc is to locally rebuild the app and its o
   4. Run `mix lint` to check if the Elixir and JavaScript files are properly formatted. You can run `mix fix` to let the JavaScript linter and Elixir formatter fix the code automatically before submitting your pull request.
   5. Please do not add the files generated in the `formatters/` directory to your commits. These will be handled as necessary by the repository maintainers.
 
-The build process is currently tested in Node 16 LTS.
-
 See the README in the `assets/` directory for more information on working on the assets.
 
 ## License
