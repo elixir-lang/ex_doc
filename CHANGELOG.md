@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.30.3 (2023-07-15)
+
+  * Enhancements
+    * Compress search index before storing in local storage
+
+  * Bug fixes
+    * Fix styling for headers on cheatsheets and small screens
+
 ## v0.30.2 (2023-07-11)
 
   * Bug fixes

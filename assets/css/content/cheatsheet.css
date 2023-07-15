@@ -37,9 +37,12 @@
 
 .page-cheatmd .content-inner h3 {
   margin: 0 0 1em;
-  color: var(--main);
   font-weight: 400;
   overflow: hidden;
+}
+
+.page-cheatmd .content-inner h3 a {
+  color: var(--main);
 }
 
 .page-cheatmd .content-inner h3.section-heading a.hover-link {
