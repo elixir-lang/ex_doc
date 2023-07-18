@@ -59,7 +59,7 @@ function fixSpacebar () {
  */
 function setLivebookBadgeUrl () {
   const path = window.location.pathname
-  const notebookPath = path.replace(/\.html$/, '.livemd')
+  const notebookPath = path.replace(/(\.html)?$/, '.livemd')
   const notebookUrl = new URL(notebookPath, window.location.href).toString()
 
   settingsStore.getAndSubscribe(settings => {
