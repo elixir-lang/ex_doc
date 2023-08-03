@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.30.4 (2023-08-03)
+
+  * Bug fixes
+    * Fix style for anchors in headers
+
 ## v0.30.3 (2023-07-15)
 
   * Enhancements
