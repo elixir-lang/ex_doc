@@ -16,13 +16,16 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     %% @doc
     %% foo module.
     -module(foo).
-    -export([foo/1]).
+    -export([foo/1, bar/0]).
     -export_type([t/0]).
 
     %% @doc
     %% f/0 function.
     -spec foo(atom()) -> atom().
     foo(X) -> X.
+
+    -spec bar() -> baz.
+    bar() -> baz.
 
     -type t() :: atom().
     %% t/0 type.

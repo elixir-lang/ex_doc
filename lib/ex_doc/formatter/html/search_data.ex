@@ -108,6 +108,10 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     extract_sections_from_markdown(doc)
   end
 
+  defp extract_sections("application/erlang+html", %{rendered_doc: nil}) do
+    {nil, []}
+  end
+
   defp extract_sections("application/erlang+html", %{rendered_doc: doc}) do
     {clean_html(doc), []}
   end
