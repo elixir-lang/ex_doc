@@ -141,6 +141,8 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     |> String.trim()
   end
 
+  defp clean_html(nil), do: ""
+
   defp clean_html(doc) do
     doc
     |> HTML.strip_tags(" ")
