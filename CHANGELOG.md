@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.30.5 (2023-08-12)
+
+  * Bug fixes
+    * Fix style for code in headers
+    * Fix search data generation for Erlang/OTP
+
 ## v0.30.4 (2023-08-03)
 
   * Bug fixes
