@@ -137,6 +137,10 @@
   display: inline-block;
 }
 
+.content-inner .section-heading a.no-underline {
+  color: var(--links);
+}
+
 .content-inner .section-heading i {
   font-size: 16px;
   margin-top: .1em;
