@@ -18,7 +18,6 @@
   transition: border-color 150ms;
 }
 #settings-modal-content .input:focus {
-  outline: none;
   border-color: var(--main);
 }
 #settings-modal-content .input::placeholder {
@@ -103,8 +102,4 @@
 
 #settings-modal-content .settings-select option {
   color: initial;
-}
-
-#settings-modal-content .settings-select:focus {
-  outline: none;
 }

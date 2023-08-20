@@ -23,10 +23,6 @@
   transition: all .12s ease-out;
 }
 
-#quick-switch-modal-body #quick-switch-input:focus {
-  outline: none;
-}
-
 #quick-switch-modal-body #quick-switch-results {
   margin: 0;
 }

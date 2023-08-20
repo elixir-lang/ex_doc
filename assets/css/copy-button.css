@@ -22,7 +22,7 @@ pre:hover .copy-button {
   color: currentColor;
 }
 
-pre .copy-button:hover, .copy-button:focus-visible {
+pre .copy-button:hover, pre .copy-button:focus-visible {
   opacity: 1;
 }
 
