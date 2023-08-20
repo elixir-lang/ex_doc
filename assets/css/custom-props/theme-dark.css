@@ -75,8 +75,6 @@ body.dark {
                                                  var(--gray900-opacity-0) 100%);
   --sidebarAccentMain:           var(--gray50);
   --sidebarBackground:           var(--gray800);
-  --sidebarGradient:             linear-gradient(var(--sidebarBackground),
-                                                 var(gray800-opacity-0));
   --sidebarHeader:               var(--gray700);
   --sidebarMuted:                var(--gray300);
   --sidebarHover:                var(--white);
