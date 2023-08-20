@@ -143,7 +143,8 @@
 }
 
 .sidebar .sidebar-search.selected .search-button,
-.sidebar .sidebar-search .search-button:hover {
+.sidebar .sidebar-search .search-button:hover,
+.sidebar .sidebar-search .search-button:focus {
   color: var(--sidebarLanguageAccentBar);
   opacity: 1;
 }
