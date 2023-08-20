@@ -6,6 +6,8 @@ body {
 }
 
 body {
+  --sidebarWidth: 300px;
+  --sidebarTransitionDuration: .3s;
   background-color: var(--background);
   color: var(--textBody);
   font-size: 16px;
@@ -28,7 +30,7 @@ body {
 .sidebar {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: var(--sidebarWidth);
   height: 100%;
   position: fixed;
   top: 0;
@@ -38,17 +40,18 @@ body {
 
 .sidebar-button {
   --sidebarButtonTopOpen: 6px;
+  --sidebarButtonRightOpen: 7px;
   position: fixed;
   z-index: 99;
   left: 0;
   top: 0;
-  transition: all .3s ease-in-out;
+  transition: all var(--sidebarTransitionDuration) ease-in-out;
   will-change: transform;
 }
 
 .content {
-  width: calc(100% - 300px);
-  left: 300px;
+  width: calc(100% - var(--sidebarWidth));
+  left: var(--sidebarWidth);
   height: 100%;
   position: absolute;
   z-index: 3;
@@ -62,12 +65,12 @@ body {
 }
 
 body:is(.sidebar-opening, .sidebar-opened) .sidebar-button {
-  transform: translateX(250px);
+  transform: translateX(calc(var(--sidebarWidth) - 100% - var(--sidebarButtonRightOpen)));
   top: var(--sidebarButtonTopOpen);
 }
 
 body.sidebar-opening-start .sidebar {
-  left: -300px;
+  left: calc(-1 * var(--sidebarWidth));
 }
 
 body.sidebar-opening-start .content {
@@ -77,13 +80,13 @@ body.sidebar-opening-start .content {
 
 body.sidebar-opening .sidebar {
   left: 0;
-  transition: left .3s ease-in-out;
+  transition: left var(--sidebarTransitionDuration) ease-in-out;
 }
 
 body.sidebar-opening .content {
-  width: calc(100% - 300px);
-  left: 300px;
-  transition: all .3s ease-in-out;
+  width: calc(100% - var(--sidebarWidth));
+  left: var(--sidebarWidth);
+  transition: all var(--sidebarTransitionDuration) ease-in-out;
 }
 
 body.sidebar-closing .sidebar-button {
@@ -91,18 +94,18 @@ body.sidebar-closing .sidebar-button {
 }
 
 body.sidebar-closing .sidebar {
-  left: -300px;
-  transition: left .3s ease-in-out;
+  left: calc(-1 * var(--sidebarWidth));
+  transition: left var(--sidebarTransitionDuration) ease-in-out;
 }
 
 body.sidebar-closing .content {
   width: 100%;
   left: 0;
-  transition: all .3s ease-in-out;
+  transition: all var(--sidebarTransitionDuration) ease-in-out;
 }
 
 body.sidebar-closed .sidebar {
-  left: -300px;
+  left: calc(-1 * var(--sidebarWidth));
   display: none;
 }
 
@@ -124,7 +127,7 @@ body.sidebar-closed .content {
     height: var(--sidebarButtonHeight);
     width: calc(100vw + 2px);
     background: var(--sidebarButtonBackground);
-    transition: top .3s ease-in-out;
+    transition: top var(--sidebarTransitionDuration) ease-in-out;
   }
 
   body:is(.sidebar-closed, .sidebar-closing) .sidebar-button:before {
