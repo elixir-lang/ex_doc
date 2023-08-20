@@ -13,16 +13,6 @@
   font-weight: 400; /* Non-Apple OSes render small light type too thinly */
 }
 
-.sidebar .gradient {
-  background: var(--sidebarGradient);
-  height: 20px;
-  margin-top: -20px;
-  pointer-events: none;
-  position: relative;
-  top: 20px;
-  z-index: 100;
-}
-
 .sidebar ul {
   list-style: none;
 }
