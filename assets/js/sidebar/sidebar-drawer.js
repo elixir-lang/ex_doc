@@ -15,8 +15,10 @@ const userPref = {
 
 const SIDEBAR_CLASS = {
   opened: 'sidebar-opened',
+  openingStart: 'sidebar-opening-start',
   opening: 'sidebar-opening',
   closed: 'sidebar-closed',
+  closingStart: 'sidebar-closing-start',
   closing: 'sidebar-closing'
 }
 
@@ -103,14 +105,21 @@ function isSidebarOpen () {
  */
 export function openSidebar () {
   clearTimeoutIfAny()
-  setClass(SIDEBAR_CLASS.opening)
   sessionStorage.setItem('sidebar_state', 'opened')
 
-  return new Promise((resolve, reject) => {
-    state.togglingTimeout = setTimeout(() => {
-      setClass(SIDEBAR_CLASS.opened)
-      resolve()
-    }, ANIMATION_DURATION)
+  requestAnimationFrame(() => {
+    setClass(SIDEBAR_CLASS.openingStart)
+
+    requestAnimationFrame(() => {
+      setClass(SIDEBAR_CLASS.opening)
+
+      return new Promise((resolve, reject) => {
+        state.togglingTimeout = setTimeout(() => {
+          setClass(SIDEBAR_CLASS.opened)
+          resolve()
+        }, ANIMATION_DURATION)
+      })
+    })
   })
 }
 
@@ -121,14 +130,21 @@ export function openSidebar () {
  */
 export function closeSidebar () {
   clearTimeoutIfAny()
-  setClass(SIDEBAR_CLASS.closing)
   sessionStorage.setItem('sidebar_state', 'closed')
 
-  return new Promise((resolve, reject) => {
-    state.togglingTimeout = setTimeout(() => {
-      setClass(SIDEBAR_CLASS.closed)
-      resolve()
-    }, ANIMATION_DURATION)
+  requestAnimationFrame(() => {
+    setClass(SIDEBAR_CLASS.closingStart)
+
+    requestAnimationFrame(() => {
+      setClass(SIDEBAR_CLASS.closing)
+
+      return new Promise((resolve, reject) => {
+        state.togglingTimeout = setTimeout(() => {
+          setClass(SIDEBAR_CLASS.closed)
+          resolve()
+        }, ANIMATION_DURATION)
+      })
+    })
   })
 }
 
