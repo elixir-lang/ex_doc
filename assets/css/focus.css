@@ -1,3 +1,6 @@
+/* For backwards compatibility, style :focus state so that it works in all browsers,
+but unstyle not-focus-visible focus state in browsers that support focus-visible */
+
 /* extra button selectors necessary to overwrite normalize.css */
 *:focus,
 button:focus,
