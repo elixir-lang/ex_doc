@@ -1,8 +1,10 @@
 .sidebar {
+  --sidebarFontSize: 16px;
+  --sidebarLineHeight: 20px;
   font-family: var(--sansFontFamily);
-  font-size: 16px;
+  font-size: var(--sidebarFontSize);
   font-weight: 300;
-  line-height: 18px;
+  line-height: var(--sidebarLineHeight);
   background-color: var(--sidebarBackground);
   color: var(--sidebarAccentMain);
   overflow: hidden;
@@ -70,8 +72,8 @@
   position: relative;
   margin: 0;
   padding: 0;
-  font-size: 16px;
-  line-height: 20px;
+  font-size: var(--sidebarFontSize);
+  line-height: var(--sidebarLineHeight);
   color: var(--sidebarMuted);
 }
 
@@ -170,7 +172,7 @@
 }
 
 .sidebar .sidebar-search .search-close-button {
-  font-size: 16px;
+  font-size: var(--sidebarFontSize);
   color: var(--sidebarAccentMain);
   background-color: transparent;
   border: none;
@@ -248,8 +250,8 @@
   cursor: pointer;
   color: inherit;
   margin-right: 10px;
-  font-size: calc(1.2 * 16px);
-  line-height: 20px;
+  font-size: calc(1.2 * var(--sidebarFontSize));
+  line-height: var(--sidebarLineHeight);
   position: absolute;
   display: flex;
   right: 0;
@@ -273,8 +275,8 @@
 
 .sidebar #full-list li.docs > a + button.icon-expand {
   margin-right: 12px;
-  font-size: calc(1 * 16px);
-  line-height: 1;
+  font-size: var(--sidebarFontSize);
+  line-height: var(--sidebarFontSize);
   transform: translateY(calc(-100% - 5px));
 }
 
@@ -313,7 +315,7 @@
   display: block;
   width: 100%;
   height: 27px;
-  line-height: 20px;
+  line-height: var(--sidebarLineHeight);
 }
 
 .sidebar #full-list li .current-section > a {
@@ -357,7 +359,7 @@
 
 .sidebar #full-list ul li {
   font-weight: 300;
-  line-height: 16px;
+  line-height: var(--sidebarFontSize);
   padding: 0 8px;
   margin-right: 0;
   color: var(--sidebarAccentMain);
@@ -445,7 +447,7 @@
   background-color: transparent;
   border: none;
   padding: 15px 11px;
-  font-size: 16px;
+  font-size: var(--sidebarFontSize);
 }
 
 .sidebar-button:hover {
