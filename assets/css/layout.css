@@ -66,6 +66,15 @@ body:is(.sidebar-opening, .sidebar-opened) .sidebar-button {
   top: var(--sidebarButtonTopOpen);
 }
 
+body.sidebar-opening-start .sidebar {
+  left: -300px;
+}
+
+body.sidebar-opening-start .content {
+  width: 100%;
+  left: 0;
+}
+
 body.sidebar-opening .sidebar {
   left: 0;
   transition: left .3s ease-in-out;
@@ -94,6 +103,7 @@ body.sidebar-closing .content {
 
 body.sidebar-closed .sidebar {
   left: -300px;
+  display: none;
 }
 
 body.sidebar-closed .content {
