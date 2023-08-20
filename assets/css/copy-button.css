@@ -3,11 +3,11 @@ pre {
 }
 
 pre:hover .copy-button {
-  display: block;
+  opacity: .5;
 }
 
 .copy-button {
-  display: none;
+  opacity: 0;
   position: absolute;
   top: 9px;
   right: 9px;
@@ -15,7 +15,6 @@ pre:hover .copy-button {
   border: none;
   cursor: pointer;
   padding: 0;
-  opacity: .5;
   transition: all 150ms;
   font-family: var(--serifFontFamily);
   font-size: 14px;
@@ -23,7 +22,7 @@ pre:hover .copy-button {
   color: currentColor;
 }
 
-.copy-button:hover {
+pre .copy-button:hover, .copy-button:focus-visible {
   opacity: 1;
 }
 
