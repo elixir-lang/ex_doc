@@ -2,19 +2,20 @@ pre {
   position: relative;
 }
 
-pre:hover .copy-button {
-  opacity: .5;
+pre:hover .copy-button, pre .copy-button:focus {
+  opacity: 1;
 }
 
 .copy-button {
+  display: flex;
   opacity: 0;
   position: absolute;
-  top: 9px;
-  right: 9px;
-  background-color: transparent;
+  top: 5px;
+  right: 5px;
+  padding: 4px;
+  background-color: var(--codeBackground);
   border: none;
   cursor: pointer;
-  padding: 0;
   transition: all 150ms;
   font-family: var(--serifFontFamily);
   font-size: 14px;
@@ -22,7 +23,12 @@ pre:hover .copy-button {
   color: currentColor;
 }
 
-pre .copy-button:hover, pre .copy-button:focus-visible {
+.copy-button svg {
+  opacity: .5;
+  transition: all 150ms;
+}
+
+pre .copy-button:hover svg, pre .copy-button:focus-visible svg {
   opacity: 1;
 }
 
