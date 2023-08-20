@@ -16,11 +16,12 @@
       {{else}}
         {{{node.title}}}
       {{/if}}
-      {{#isEmptyArray node.headers}}
-      {{else}}
-        <span class="icon-expand"></span>
-      {{/isEmptyArray}}
     </a>
+
+    {{#isEmptyArray node.headers}}
+    {{else}}
+      <button class="icon-expand" aria-label="expand"></button>
+    {{/isEmptyArray}}
 
     {{#isArray node.headers}}
       {{#isNonEmptyArray node.headers}}
@@ -38,8 +39,8 @@
           <li class="docs {{#isLocal node.id}}open{{/isLocal}}">
             <a href="{{node.id}}.html#content" class="expand">
               Sections
-              <span class="icon-expand"></span>
             </a>
+            <button class="icon-expand" aria-label="expand"></button>
             <ul class="sections-list deflist">
               {{#each sections}}
                 <li>
@@ -58,8 +59,8 @@
           <li class="docs">
             <a href="{{node.id}}.html#{{group.key}}" class="expand">
               {{group.name}}
-              <span class="icon-expand"></span>
             </a>
+            <button class="icon-expand" aria-label="expand"></button>
             <ul class="{{group.key}}-list deflist">
               {{#each group.nodes}}
                 <li>
