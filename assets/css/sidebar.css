@@ -92,10 +92,6 @@
   color: initial;
 }
 
-.sidebar .sidebar-projectVersionsDropdown:focus {
-  outline: none;
-}
-
 .sidebar .sidebar-projectVersion form::after {
   position: absolute;
   left: 0;
@@ -193,10 +189,6 @@
   opacity: .7;
 }
 
-.sidebar .sidebar-search .search-close-button:is(:focus, :hover) {
-  outline: none;
-}
-
 .sidebar .sidebar-search .search-input {
   background-color: var(--sidebarSearch);
   border: none;
@@ -210,10 +202,6 @@
 .sidebar .sidebar-search .search-input::placeholder {
   color: var(--sidebarAccentMain);
   opacity: 0.3;
-}
-
-.sidebar .sidebar-search .search-input:is(:focus, :hover) {
-  outline: none;
 }
 
 .sidebar .sidebar-search .ri-search-2-line {
@@ -442,10 +430,6 @@
 
 .sidebar-button:hover {
   color: var(--sidebarHover);
-}
-
-.sidebar-button:is(:active, :hover, :focus) {
-  outline: none;
 }
 
 .sidebar-button {
