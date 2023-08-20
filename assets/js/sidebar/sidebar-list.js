@@ -55,18 +55,19 @@ function renderSidebarNodeList (nodesByType, type) {
   })
 
   // Register event listeners
+  nodeList.querySelectorAll('li a + button').forEach(button => {
+    button.addEventListener('click', event => {
+      const target = event.target
+      const listItem = target.closest('li')
+      listItem.classList.toggle('open')
+    })
+  })
+
   nodeList.querySelectorAll('li a').forEach(anchor => {
     anchor.addEventListener('click', event => {
       const target = event.target
       const listItem = target.closest('li')
       const previousSection = nodeList.querySelector('.current-section')
-
-      // Expand icon should not navigate
-      if (target.matches('.icon-expand')) {
-        event.preventDefault()
-        listItem.classList.toggle('open')
-        return
-      }
 
       // Clear the previous current section
       if (previousSection) {
