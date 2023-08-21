@@ -11,7 +11,7 @@
 
     <%= if doc = module.rendered_doc do %>
       <section id="moduledoc" class="docstring">
-        <%= doc %>
+        <%= H.link_moduledoc_headings(doc) %>
       </section>
     <% end %>
 

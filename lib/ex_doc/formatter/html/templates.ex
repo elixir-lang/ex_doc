@@ -228,6 +228,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp relative_asset([h | _], output, _pattern), do: Path.relative_to(h, output)
 
+  # TODO: Move link_headings and friends to html.ex or even to autolinking code,
+  # so content is built with it upfront instead of added at the template level.
+
   @doc """
   Link headings found with `regex` with in the given `content`. IDs are
   prefixed with `prefix`.
@@ -307,11 +310,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
     """
   end
 
-  defp link_moduledoc_headings(content) do
+  def link_moduledoc_headings(content) do
     link_headings(content, @heading_regex, "module-")
   end
 
-  defp link_detail_headings(content, prefix) do
+  def link_detail_headings(content, prefix) do
     link_headings(content, @heading_regex, prefix <> "-")
   end
 
