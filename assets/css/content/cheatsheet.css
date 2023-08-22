@@ -6,7 +6,7 @@
 @media (max-width: 600px) {
   .page-cheatmd .content-inner {
     --horizontal-space: 1em;
-    --vertical-space: .75em;
+    --vertical-space: 0.75em;
   }
 }
 
@@ -51,7 +51,8 @@
 
 .page-cheatmd .content-inner section.h3 {
   min-width: 300px;
-  margin: 0 0 calc(var(--vertical-space) * 2) 0;
+  margin: 0;
+  padding: 0 0 calc(var(--vertical-space) * 2) 0;
   break-inside: avoid;
 }
 
@@ -72,7 +73,7 @@
 .page-cheatmd .content-inner h4 {
   display: block;
   margin: 0;
-  padding: .25em var(--horizontal-space);
+  padding: 0.25em var(--horizontal-space);
   font-weight: 400;
   background: var(--gray100);
   color: #567;
@@ -102,7 +103,7 @@
 .page-cheatmd .content-inner .h2 p > code {
   color: #eb5757;
   border-radius: var(--borderRadius);
-  padding: .2em .4em;
+  padding: 0.2em 0.4em;
 }
 
 /* Code blocks */
@@ -112,8 +113,8 @@
 }
 
 .page-cheatmd .content-inner pre code::-webkit-scrollbar {
-  width: .4rem;
-  height: .6rem;
+  width: 0.4rem;
+  height: 0.6rem;
 }
 
 .page-cheatmd .content-inner .h2 pre {
@@ -166,7 +167,7 @@
 .page-cheatmd .content-inner .h2 td code {
   color: #eb5757;
   border-radius: var(--borderRadius);
-  padding: .2em .4em;
+  padding: 0.2em 0.4em;
 }
 
 .page-cheatmd .content-inner .h2 thead {
@@ -190,7 +191,7 @@
 
 .page-cheatmd .content-inner .h2 li {
   list-style-position: inside;
-  padding: .5em var(--horizontal-space);
+  padding: 0.5em var(--horizontal-space);
   line-height: 2em;
   vertical-align: middle;
   background-color: var(--codeBackground);
@@ -204,7 +205,7 @@
 .page-cheatmd .content-inner .h2 li > code {
   color: #eb5757;
   border-radius: var(--borderRadius);
-  padding: .2em .4em;
+  padding: 0.2em 0.4em;
 }
 
 /* Columns */
@@ -268,14 +269,15 @@
   }
 
   .page-cheatmd .content-inner section.col-2-left {
-    display: block;
-    column-count: 1;
+    display: flex;
+    flex-direction: column;
   }
 }
 
 @media screen and (max-width: 1200px) {
   .page-cheatmd .content-inner section:is(.col-2, .col-3) {
-    column-count: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   .page-cheatmd .content-inner section.list-6 > ul > li {
