@@ -36,13 +36,15 @@
 /* h3 */
 
 .page-cheatmd .content-inner h3 {
+  color: var(--main);
   margin: 0 0 1em;
   font-weight: 400;
   overflow: hidden;
 }
 
-.page-cheatmd .content-inner h3 a {
+.page-cheatmd .content-inner h3 :is(a, a:visited) {
   color: var(--main);
+  text-decoration: none;
 }
 
 .page-cheatmd .content-inner h3.section-heading a.hover-link {
