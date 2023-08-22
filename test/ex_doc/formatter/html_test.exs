@@ -365,10 +365,10 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r{<title>README [^<]*</title>}
 
       assert content =~
-               ~r{<h2 id="header-sample" class="section-heading">.*<a href="#header-sample">.*<i class="ri-link-m" aria-hidden="true"></i>.*<code(\sclass="inline")?>Header</code> sample.*</a>.*</h2>}ms
+               ~r{<h2 id="header-sample" class="section-heading">.*<a href="#header-sample" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*<code(\sclass="inline")?>Header</code> sample.*</h2>}ms
 
       assert content =~
-               ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than">.*<i class="ri-link-m" aria-hidden="true"></i>.*more &gt; than.*</a>.*</h2>}ms
+               ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*more &gt; than.*</h2>}ms
 
       assert content =~ ~r{<a href="RandomError.html"><code(\sclass="inline")?>RandomError</code>}
 

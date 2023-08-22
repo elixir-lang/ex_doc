@@ -132,8 +132,7 @@
 }
 
 .content-inner .section-heading a {
-  color:  var(--links);
-  text-decoration: none;
+  color: var(--links);
   display: inline-block;
 }
 
@@ -141,14 +140,21 @@
   color: var(--links);
 }
 
+.content-inner .section-heading a.hover-link {
+  text-decoration: none;
+}
+
 .content-inner .section-heading i {
-  font-size: 16px;
+  --icon-size: 16px;
+  --icon-spacing: 5px;
+  font-size: var(--icon-size);
   margin-top: .1em;
-  margin-left: -21px;
+  margin-left: calc(-1 * (var(--icon-size) + var(--icon-spacing)));
+  padding-right: var(--icon-spacing);
   opacity: 0;
 }
 
-.content-inner .section-heading a:is(:hover, :focus) i {
+.content-inner .section-heading:hover i {
   opacity: 1;
 }
 
