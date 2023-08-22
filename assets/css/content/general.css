@@ -132,13 +132,7 @@
 }
 
 .content-inner .section-heading a {
-  color:  var(--links);
   text-decoration: none;
-  display: inline-block;
-}
-
-.content-inner .section-heading a.no-underline {
-  color: var(--links);
 }
 
 .content-inner .section-heading i {
