@@ -35,7 +35,8 @@
   font-weight: 700;
 }
 
-.content-inner .detail-header:hover a.detail-link {
+.content-inner .detail-header:hover a.detail-link,
+.content-inner .detail-header a.detail-link:focus {
   opacity: 1;
   text-decoration: none;
 }
