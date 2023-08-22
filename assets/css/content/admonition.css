@@ -108,7 +108,6 @@
 
 .content-inner blockquote :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) :is(a, a:visited) {
   color: inherit;
-  text-decoration-color: currentColor;
 }
 
 @media screen and (max-width: 768px) {

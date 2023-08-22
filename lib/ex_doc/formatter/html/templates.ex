@@ -302,9 +302,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
     """
     <#{tag} id="#{prefix}#{id}" class="#{class_attribute}">
-      <a href="##{prefix}#{id}" class="hover-link">
+      <a href="##{prefix}#{id}">
         <i class="ri-link-m" aria-hidden="true"></i>
-      </a>#{title}
+        #{title}
+      </a>
     </#{tag}>
     """
   end

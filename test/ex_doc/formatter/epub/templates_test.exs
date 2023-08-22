@@ -60,10 +60,10 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~r{<h1 id="content">\s*CompiledWithDocs\s*}
 
       assert content =~
-               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*Example.*</h2>}ms
+               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping">.*<i class="ri-link-m" aria-hidden="true"></i>.*Example.*</a>.*</h2>}ms
 
       assert content =~
-               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*Example H3 heading.*</h3>}ms
+               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading">.*<i class="ri-link-m" aria-hidden="true"></i>.*Example H3 heading.*</a>.*</h3>}ms
 
       assert content =~
                ~r{moduledoc.*Example.*<samp class="nc">CompiledWithDocs</samp><samp class="o">\.</samp><samp class="n">example</samp>.*}ms
