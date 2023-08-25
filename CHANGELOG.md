@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.30.6 (2023-08-25)
+
+  * Enhancements
+    * Extract title from Markdown file when preceeded with comments
+    * Improve focus navigation in notebooks
+
 ## v0.30.5 (2023-08-12)
 
   * Bug fixes
