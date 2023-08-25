@@ -421,6 +421,8 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       content = File.read!(tmp_dir <> "/html/livebookfile.html")
 
+      assert content =~ ~r{<span>Title for Livebook Files</span>\s*</h1>}
+
       assert content =~
                ~s{<a href="https://github.com/elixir-lang/elixir/blob/main/test/fixtures/LivebookFile.livemd#L1" title="View Source"}
 

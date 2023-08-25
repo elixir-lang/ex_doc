@@ -104,13 +104,9 @@ defmodule ExDoc.DocAST do
   """
   def extract_title(ast)
 
-  def extract_title([{:h1, _attrs, inner, _meta} | ast]) do
-    {:ok, inner, ast}
-  end
-
-  def extract_title(_ast) do
-    :error
-  end
+  def extract_title([{:comment, _, _, _} | ast]), do: extract_title(ast)
+  def extract_title([{:h1, _attrs, inner, _meta} | ast]), do: {:ok, inner, ast}
+  def extract_title(_ast), do: :error
 
   @doc """
   Returns text content from the given AST.
