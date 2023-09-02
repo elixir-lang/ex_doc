@@ -559,6 +559,14 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp url(string, mode, config) do
+    if Enum.any?(config.skip_code_autolink_to, &(&1 == string)) do
+      nil
+    else
+      parse_url(string, mode, config)
+    end
+  end
+
+  defp parse_url(string, mode, config) do
     case Regex.run(~r{^(.+)/(\d+)$}, string) do
       [_, left, right] ->
         with {:ok, arity} <- parse_arity(right) do

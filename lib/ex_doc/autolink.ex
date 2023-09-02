@@ -20,6 +20,8 @@ defmodule ExDoc.Autolink do
   # * `:extras` - map of extras
   #
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
+  #
+  # * `:skip_code_autolink_to` - list of terms that will be skipped when autolinking (e.g: "PrivateModule")
 
   defstruct [
     :current_module,
@@ -32,7 +34,8 @@ defmodule ExDoc.Autolink do
     deps: [],
     ext: ".html",
     siblings: [],
-    skip_undefined_reference_warnings_on: []
+    skip_undefined_reference_warnings_on: [],
+    skip_code_autolink_to: []
   ]
 
   @hexdocs "https://hexdocs.pm/"
