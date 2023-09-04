@@ -148,6 +148,12 @@ defmodule Mix.Tasks.Docs do
       skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
       or on a given file (e.g.: `["pages/deprecations.md"]`); default: `[]`.
 
+    * `:skip_code_autolink_to` - Similar to `:skip_undefined_reference_warnings_on`, this option
+      controls which terms will be skipped by ExDoc when building documentation.
+      Useful for example if you want to highlight private modules or functions
+      without warnings (e.g.: `["PrivateModule", "PrivateModule.func/1"]`);
+      default: `[]`.
+
     * `:source_beam` - Path to the beam directory; default: mix's compile path.
 
     * `:source_ref` - The branch/commit/tag used for source link inference;

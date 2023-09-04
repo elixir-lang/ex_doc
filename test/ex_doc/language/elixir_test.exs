@@ -381,6 +381,20 @@ defmodule ExDoc.Language.ElixirTest do
                ~s[t() :: <a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>()]
     end
 
+    test "skips autolinking if requested" do
+      ExDoc.Refs.insert([
+        {{:module, AutolinkTest.Hidden}, :hidden},
+        {{:function, AutolinkTest.Hidden, :foo, 1}, :hidden}
+      ])
+
+      assert_skip_autolink_no_warn("AutolinkTest.Hidden")
+      assert_skip_autolink_no_warn("AutolinkTest.Hidden.foo/1")
+    end
+
+    defp assert_skip_autolink_no_warn(string) do
+      assert_unchanged(~m(`#{string}`), skip_code_autolink_to: [string])
+    end
+
     test "Elixir basic types" do
       assert autolink_spec(quote(do: t() :: atom())) ==
                ~s[t() :: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>()]

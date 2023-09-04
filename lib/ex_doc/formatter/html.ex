@@ -70,7 +70,8 @@ defmodule ExDoc.Formatter.HTML do
       deps: config.deps,
       ext: ext,
       extras: extra_paths(config),
-      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
+      skip_code_autolink_to: config.skip_code_autolink_to
     ]
 
     project_nodes
@@ -375,7 +376,8 @@ defmodule ExDoc.Formatter.HTML do
       deps: config.deps,
       ext: ext,
       extras: extra_paths(config),
-      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
+      skip_code_autolink_to: config.skip_code_autolink_to
     ]
 
     extras =
