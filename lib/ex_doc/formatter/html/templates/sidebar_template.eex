@@ -1,10 +1,10 @@
 <div class="main">
 
-<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar">
+<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
   <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
 </button>
 
-<nav class="sidebar">
+<nav id="sidebar" class="sidebar">
   <form class="sidebar-search" action="search.html">
     <button type="submit" class="search-button" aria-label="Submit Search">
       <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>

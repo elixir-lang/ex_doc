@@ -45,10 +45,13 @@ function setDefaultSidebarState () {
   // check & set persistent session state
   const persistentSessionState = sessionStorage.getItem('sidebar_state')
   // set default for closed state only, so sidebar will still auto close on window resize
-  if (persistentSessionState === 'closed') return setClass(SIDEBAR_CLASS.closed)
-
-  // else
-  setClass(isScreenSmall() ? SIDEBAR_CLASS.closed : SIDEBAR_CLASS.opened)
+  if (persistentSessionState === 'closed' || isScreenSmall()) {
+    setClass(SIDEBAR_CLASS.closed)
+    qs(SIDEBAR_TOGGLE_SELECTOR).setAttribute('aria-expanded', 'false')
+  } else {
+    setClass(SIDEBAR_CLASS.opened)
+    qs(SIDEBAR_TOGGLE_SELECTOR).setAttribute('aria-expanded', 'true')
+  }
 }
 
 function isScreenSmall () {
@@ -106,6 +109,7 @@ function isSidebarOpen () {
 export function openSidebar () {
   clearTimeoutIfAny()
   sessionStorage.setItem('sidebar_state', 'opened')
+  qs(SIDEBAR_TOGGLE_SELECTOR).setAttribute('aria-expanded', 'true')
 
   requestAnimationFrame(() => {
     setClass(SIDEBAR_CLASS.openingStart)
@@ -131,6 +135,7 @@ export function openSidebar () {
 export function closeSidebar () {
   clearTimeoutIfAny()
   sessionStorage.setItem('sidebar_state', 'closed')
+  qs(SIDEBAR_TOGGLE_SELECTOR).setAttribute('aria-expanded', 'false')
 
   requestAnimationFrame(() => {
     setClass(SIDEBAR_CLASS.closingStart)
