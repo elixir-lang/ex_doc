@@ -4,7 +4,7 @@
   <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
 </button>
 
-<section class="sidebar">
+<nav class="sidebar">
   <form class="sidebar-search" action="search.html">
     <button type="submit" class="search-button" aria-label="Submit Search">
       <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
@@ -52,9 +52,9 @@
   </div>
 
   <ul id="full-list"></ul>
-</section>
+</nav>
 
-<section class="content">
+<main class="content">
   <output role="status" id="toast"></output>
   <div class="content-outer">
     <div id="content" class="content-inner">
