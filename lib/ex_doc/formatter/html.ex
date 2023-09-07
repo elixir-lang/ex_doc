@@ -10,7 +10,6 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generate HTML documentation for the given modules.
   """
-  # TODO: improve this spec
   @spec run(
           [ExDoc.ModuleNode.t()]
           | {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]},
