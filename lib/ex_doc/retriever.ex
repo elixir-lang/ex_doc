@@ -12,8 +12,12 @@ defmodule ExDoc.Retriever do
 
   @doc """
   Extract documentation from all modules in the specified directory or directories.
+
+  Returns a tuple containing `{modules, filtered}`, using `config.filter_modules`
+  as a filter criteria.
   """
-  @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
+  @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) ::
+          {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]}
   def docs_from_dir(dir, config) when is_binary(dir) do
     files = Path.wildcard(Path.expand("*.beam", dir))
 
@@ -28,13 +32,30 @@ defmodule ExDoc.Retriever do
   end
 
   @doc """
-  Extract documentation from all modules in the list `modules`
+  Extract documentation from all modules and returns a tuple containing
+  `{modules, filtered}`, two lists of modules that were extracted and filtered
+  by `config.filter_modules`, respectively.
   """
-  @spec docs_from_modules([atom], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
+  @spec docs_from_modules([atom], ExDoc.Config.t()) ::
+          {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]}
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
-    |> Enum.flat_map(&get_module(&1, config))
+    |> Enum.reduce({[], []}, fn module_name, {modules, filtered} = acc ->
+      case get_module(module_name, config) do
+        {:error, _module} ->
+          acc
+
+        {:ok, module_node} ->
+          if config.filter_modules.(module_node.module, module_node.metadata),
+            do: {[module_node | modules], filtered},
+            else: {modules, [module_node | filtered]}
+      end
+    end)
     |> sort_modules(config)
+  end
+
+  defp sort_modules({modules, filtered}, config) do
+    {sort_modules(modules, config), sort_modules(filtered, config)}
   end
 
   defp sort_modules(modules, config) when is_list(modules) do
@@ -50,14 +71,13 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_module(module, config) do
-    with {:docs_v1, _, language, _, _, metadata, _} = docs_chunk <- docs_chunk(module),
-         true <- config.filter_modules.(module, metadata),
+    with {:docs_v1, _, language, _, _, _metadata, _} = docs_chunk <- docs_chunk(module),
          {:ok, language} <- ExDoc.Language.get(language, module),
          %{} = module_data <- language.module_data(module, docs_chunk, config) do
-      [generate_node(module, module_data, config)]
+      {:ok, generate_node(module, module_data, config)}
     else
       _ ->
-        []
+        {:error, module}
     end
   end
 
@@ -142,7 +162,8 @@ defmodule ExDoc.Retriever do
       source_path: source_path,
       source_url: source_link(source, module_data.line),
       language: module_data.language,
-      annotations: List.wrap(metadata[:tags])
+      annotations: List.wrap(metadata[:tags]),
+      metadata: metadata
     }
   end
 

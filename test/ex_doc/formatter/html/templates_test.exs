@@ -31,7 +31,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   defp get_module_page(names, context, config \\ []) do
     config = doc_config(context, config)
-    mods = ExDoc.Retriever.docs_from_modules(names, config)
+    {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
     [mod | _] = HTML.render_all(mods, ".html", config, [])
     Templates.module_page(mod, @empty_nodes_map, config)
   end
@@ -264,7 +264,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     test "outputs listing for the given nodes", context do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
-      nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
 
       assert [
                %{
@@ -293,7 +293,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     test "outputs deprecated: true if node is deprecated", context do
       names = [CompiledWithDocs]
-      nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
 
       path = ["modules", Access.at!(0), "nodeGroups", Access.at!(0), "nodes"]
       sidebar_functions = get_in(create_sidebar_items(%{modules: nodes}, []), path)
@@ -306,7 +306,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     test "outputs deprecated: true if module is deprecated", context do
       names = [Warnings]
-      nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
 
       assert Enum.any?(
                create_sidebar_items(%{modules: nodes}, [])["modules"],
@@ -315,7 +315,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
 
     test "outputs nodes grouped based on metadata", context do
-      nodes =
+      {nodes, []} =
         ExDoc.Retriever.docs_from_modules(
           [CompiledWithDocs, CompiledWithDocs.Nested],
           doc_config(context,
@@ -361,7 +361,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "outputs module groups for the given nodes", context do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       group_mapping = [groups_for_modules: [Group: [CompiledWithDocs]]]
-      nodes = ExDoc.Retriever.docs_from_modules(names, doc_config(context, group_mapping))
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context, group_mapping))
 
       assert [
                %{"group" => ""},
@@ -420,7 +420,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "builds sections out of moduledocs", context do
       names = [CompiledWithDocs, CompiledWithoutDocs, DuplicateHeadings]
       config = doc_config(context)
-      nodes = ExDoc.Retriever.docs_from_modules(names, config)
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, config)
       nodes = HTML.render_all(nodes, ".html", config, [])
 
       [compiled_with_docs, compiled_without_docs, duplicate_headings] =

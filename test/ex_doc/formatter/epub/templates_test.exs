@@ -27,7 +27,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
   defp get_module_page(names, config \\ []) do
     config = doc_config(config)
-    mods = ExDoc.Retriever.docs_from_modules(names, config)
+    {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
     [mod | _] = HTML.render_all(mods, ".xhtml", config, highlight_tag: "samp")
     Templates.module_page(config, mod)
   end
