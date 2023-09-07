@@ -33,8 +33,8 @@
     <h1 class="section-heading">
       <a class="hover-link" href="#summary">
         <i class="ri-link-m" aria-hidden="true"></i>
-        Summary
       </a>
+      <span class="text">Summary</span>
     </h1>
     <%= for {name, nodes} <- summary, do: summary_template(name, nodes) %>
   </section>
@@ -45,8 +45,8 @@
     <h1 class="section-heading">
       <a class="hover-link" href="#<%= key %>">
         <i class="ri-link-m" aria-hidden="true"></i>
-        <%= name %>
       </a>
+      <span class="text"><%= name %></span>
     </h1>
     <div class="<%= key %>-list">
       <%= for node <- nodes, do: detail_template(node, module) %>
