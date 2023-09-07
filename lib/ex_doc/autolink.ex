@@ -22,6 +22,8 @@ defmodule ExDoc.Autolink do
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
   #
   # * `:skip_code_autolink_to` - list of terms that will be skipped when autolinking (e.g: "PrivateModule")
+  #
+  # * `:filtered_modules` - A list of module nodes that were filtered by the retriever
 
   defstruct [
     :current_module,
@@ -35,7 +37,8 @@ defmodule ExDoc.Autolink do
     ext: ".html",
     siblings: [],
     skip_undefined_reference_warnings_on: [],
-    skip_code_autolink_to: []
+    skip_code_autolink_to: [],
+    filtered_modules: []
   ]
 
   @hexdocs "https://hexdocs.pm/"

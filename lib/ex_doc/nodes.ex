@@ -22,7 +22,8 @@ defmodule ExDoc.ModuleNode do
             source_url: nil,
             type: nil,
             language: nil,
-            annotations: []
+            annotations: [],
+            metadata: nil
 
   @typep annotation :: atom()
 
@@ -46,7 +47,8 @@ defmodule ExDoc.ModuleNode do
           source_url: String.t() | nil,
           type: atom(),
           language: module(),
-          annotations: [annotation()]
+          annotations: [annotation()],
+          metadata: map()
         }
 end
 

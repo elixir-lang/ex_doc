@@ -24,7 +24,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       function2() -> ok.
       """)
 
-      [mod] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
 
       %ExDoc.ModuleNode{
         deprecated: nil,
@@ -80,7 +80,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       -module(mod).
       """)
 
-      assert [_] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
+      assert {[_], []} = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
     end
 
     test "function with no docs is generated", c do
@@ -92,7 +92,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       f() -> ok.
       """)
 
-      [mod] = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
       assert [_] = mod.docs
     end
 
@@ -111,7 +111,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       """)
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
-      [mod] = Retriever.docs_from_modules([:mod], config)
+      {[mod], []} = Retriever.docs_from_modules([:mod], config)
       [callback1, optional_callback1] = mod.docs
 
       assert callback1.id == "c:callback1/0"
@@ -140,7 +140,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       """)
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
-      [mod] = Retriever.docs_from_modules([:mod], config)
+      {[mod], []} = Retriever.docs_from_modules([:mod], config)
       [opaque1, type1] = mod.typespecs
 
       assert opaque1.id == "t:opaque1/0"
@@ -166,7 +166,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         docs: false
       )
 
-      assert Retriever.docs_from_modules([:no_chunk], %ExDoc.Config{}) == []
+      assert {[], []} = Retriever.docs_from_modules([:no_chunk], %ExDoc.Config{})
     end
 
     # TODO

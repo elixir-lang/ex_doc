@@ -27,7 +27,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
 
       assert %ExDoc.ModuleNode{
                doc_line: 2,
@@ -88,7 +88,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
       [foo] = mod.docs
 
       assert foo.id == "foo/2"
@@ -104,7 +104,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
       [macro] = mod.docs
 
       assert macro.id == "macro/1"
@@ -127,7 +127,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       """)
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
-      [mod] = Retriever.docs_from_modules([Mod], config)
+      {[mod], []} = Retriever.docs_from_modules([Mod], config)
       assert mod.type == :behaviour
 
       [callback1, macrocallback1, optional_callback1] = mod.docs
@@ -176,7 +176,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [impl] = Retriever.docs_from_modules([Impl], %ExDoc.Config{})
+      {[impl], []} = Retriever.docs_from_modules([Impl], %ExDoc.Config{})
       [callback1, optional_callback1] = impl.docs
 
       assert callback1.id == "callback1/0"
@@ -202,7 +202,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
       [opaque1, type1] = mod.typespecs
 
       assert type1.id == "t:type1/0"
@@ -233,7 +233,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([Mod, Mod.Atom], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([Mod, Mod.Atom], %ExDoc.Config{})
       assert mod.type == :protocol
 
       [foo] = mod.docs
@@ -248,7 +248,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([MyStruct], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([MyStruct], %ExDoc.Config{})
       [my_struct] = mod.docs
 
       assert my_struct.id == "__struct__/0"
@@ -263,7 +263,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([MyException], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([MyException], %ExDoc.Config{})
       assert mod.title == "MyException"
       assert mod.type == :exception
 
@@ -287,7 +287,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
       [downcase, upcase] = mod.docs
 
       assert downcase.id == "downcase/1"
@@ -308,7 +308,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([Signatures], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([Signatures], %ExDoc.Config{})
       [remote] = mod.docs
 
       assert remote.signature == "remote(options)"
@@ -327,7 +327,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([Mix.Tasks.MyTask], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([Mix.Tasks.MyTask], %ExDoc.Config{})
       assert mod.title == "mix my_task"
       assert mod.type == :task
       refute mod.group
@@ -369,7 +369,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
 
       overlapping_defaults_2 = Enum.find(mod.docs, &(&1.id == "overlapping_defaults/2"))
       overlapping_defaults_3 = Enum.find(mod.docs, &(&1.id == "overlapping_defaults/3"))
@@ -407,7 +407,8 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      assert [%ExDoc.ModuleNode{} = mod] = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      assert {[%ExDoc.ModuleNode{} = mod], []} =
+               Retriever.docs_from_modules([Mod], %ExDoc.Config{})
 
       assert [%ExDoc.TypeNode{id: "t:t/0", annotations: ["since 1.0.0"]}] = mod.typespecs
 
