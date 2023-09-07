@@ -407,7 +407,8 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      assert {[%ExDoc.ModuleNode{} = mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
+      assert {[%ExDoc.ModuleNode{} = mod], []} =
+               Retriever.docs_from_modules([Mod], %ExDoc.Config{})
 
       assert [%ExDoc.TypeNode{id: "t:t/0", annotations: ["since 1.0.0"]}] = mod.typespecs
 
