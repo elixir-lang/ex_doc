@@ -21,8 +21,8 @@ defmodule ExDoc do
       ExDoc.Markdown.put_markdown_processor(processor)
     end
 
-    {module_nodes, _filtered_nodes} = config.retriever.docs_from_dir(config.source_beam, config)
-    find_formatter(config.formatter).run(module_nodes, config)
+    {module_nodes, filtered_nodes} = config.retriever.docs_from_dir(config.source_beam, config)
+    find_formatter(config.formatter).run({module_nodes, filtered_nodes}, config)
   end
 
   # Short path for programmatic interface

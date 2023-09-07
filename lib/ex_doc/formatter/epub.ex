@@ -9,7 +9,11 @@ defmodule ExDoc.Formatter.EPUB do
   Generate EPUB documentation for the given modules.
   """
   @spec run(list, ExDoc.Config.t()) :: String.t()
-  def run(project_nodes, config) when is_map(config) do
+  def run(project_nodes, config) when is_list(project_nodes) and is_map(config) do
+    run({project_nodes, []}, config)
+  end
+
+  def run({project_nodes, filtered_modules}, config) when is_map(config) do
     parent = config.output
     config = normalize_config(config)
 
@@ -19,7 +23,7 @@ defmodule ExDoc.Formatter.EPUB do
       &create_output_dir(&1, config)
     )
 
-    project_nodes = HTML.render_all(project_nodes, ".xhtml", config, highlight_tag: "samp")
+    project_nodes = HTML.render_all(project_nodes, filtered_modules, ".xhtml", config, highlight_tag: "samp")
 
     nodes_map = %{
       modules: HTML.filter_list(:module, project_nodes),

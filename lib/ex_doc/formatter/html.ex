@@ -10,15 +10,25 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generate HTML documentation for the given modules.
   """
-  @spec run(list, ExDoc.Config.t()) :: String.t()
-  def run(project_nodes, config) when is_map(config) do
+  # TODO: improve this spec
+  @spec run(
+          [ExDoc.ModuleNode.t()]
+          | {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]},
+          ExDoc.Config.t()
+        ) :: String.t()
+
+  def run(project_nodes, config) when is_list(project_nodes) and is_map(config) do
+    run({project_nodes, []}, config)
+  end
+
+  def run({project_nodes, filtered_modules}, config) when is_map(config) do
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
 
     build = Path.join(config.output, ".build")
     setup_output(config.output, &cleanup_output_dir(&1, config), &create_output_dir(&1, config))
 
-    project_nodes = render_all(project_nodes, ".html", config, [])
+    project_nodes = render_all(project_nodes, filtered_modules, ".html", config, [])
     extras = build_extras(config, ".html")
 
     # Generate search early on without api reference in extras
@@ -64,14 +74,15 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Autolinks and renders all docs.
   """
-  def render_all(project_nodes, ext, config, opts) do
+  def render_all(project_nodes, filtered_modules, ext, config, opts) do
     base = [
       apps: config.apps,
       deps: config.deps,
       ext: ext,
       extras: extra_paths(config),
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-      skip_code_autolink_to: config.skip_code_autolink_to
+      skip_code_autolink_to: config.skip_code_autolink_to,
+      filtered_modules: filtered_modules
     ]
 
     project_nodes
