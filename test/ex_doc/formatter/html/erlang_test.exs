@@ -17,7 +17,7 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     %% foo module.
     -module(foo).
     -export([foo/1, bar/0]).
-    -export_type([t/0]).
+    -export_type([t/0, my_tea/0]).
 
     %% @doc
     %% f/0 function.
@@ -29,15 +29,31 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
 
     -type t() :: atom().
     %% t/0 type.
+
+    -record(some_record, {bar :: undefined, foo :: undefined}).
+
+    -type my_tea() :: #some_record{bar :: uri_string:uri_string(), foo :: uri_string:uri_string() | undefine}.
+
+    -spec baz() -> my_tea().
+      baz() ->
+        Eh = <<"eh?">>,
+        #some_record{bar=Eh,foo=undefined}.
     """)
 
-    doc = generate_docs(c)
+    refute ExUnit.CaptureIO.capture_io(:stderr, fn ->
+             send(self(), {:doc_path, generate_docs(c)})
+           end) =~ "inconsistency, please submit bug"
+
+    assert_received {:doc_path, doc}
 
     assert "-spec foo(atom()) -> atom()." =
              doc |> Floki.find("pre:fl-contains('foo(atom())')") |> Floki.text()
 
     assert "-type t() :: atom()." =
              doc |> Floki.find("pre:fl-contains('t() :: atom().')") |> Floki.text()
+
+    # assert "-type my_tea() :: atom()." =
+    #  doc |> Floki.find("pre:fl-contains('my_tea() :: atom().')") |> Floki.text()
   end
 
   defp generate_docs(c) do

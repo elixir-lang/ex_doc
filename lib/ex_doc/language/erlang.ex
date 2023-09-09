@@ -572,6 +572,10 @@ defmodule ExDoc.Language.Erlang do
             {{:., _, [module, name]}, _, args}, acc ->
               {{:t, [], args}, [{pp({module, name}), {module, name, length(args)}} | acc]}
 
+            ## type module.type/0
+            {:., _, [module, name]} = ast, acc ->
+              {ast, [{pp({module, name}), {module, name, 0}} | acc]}
+
             {name, _, _}, acc when name in [:<<>>, :..] ->
               {nil, acc}
 
