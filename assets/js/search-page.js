@@ -131,6 +131,7 @@ function createIndex () {
     this.ref('ref')
     this.field('title', { boost: 3 })
     this.field('doc')
+    this.field('type')
     this.metadataWhitelist = ['position']
     this.pipeline.remove(lunr.stopWordFilter)
     this.use(hyphenSearch)
