@@ -439,16 +439,6 @@ defmodule ExDoc.Language.ElixirTest do
     warn(~m"`c:InMemory.unknown/0`")
   end
 
-  test "warning if typespec references filtered module" do
-    ExDoc.Refs.insert([
-      {{:module, AutolinkTest.Keep}, :public},
-      {{:function, AutolinkTest.Filtered}, :public},
-      {{:type, AutolinkTest.Filtered, :type, 0}, :public}
-    ])
-
-    # TODO: testing
-  end
-
   test "warnings" do
     ExDoc.Refs.insert([
       {{:module, AutolinkTest.Foo}, :public},

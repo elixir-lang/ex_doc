@@ -141,6 +141,15 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:8: t:Warnings.t/0"
   end
 
+  test "warns when referencing typespec on filtered module", context do
+    output =
+      capture_io(:stderr, fn ->
+        generate_docs(doc_config(context, filter_modules: ~r/ReferencesTypespec/))
+      end)
+
+    assert output =~ "typespec references filtered module: TypesAndSpecs.public(integer())"
+  end
+
   test "generates headers for index.html and module pages", %{tmp_dir: tmp_dir} = context do
     generate_docs(doc_config(context, main: "RandomError"))
     content_index = File.read!(tmp_dir <> "/html/index.html")
@@ -221,6 +230,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                %{"id" => "CustomProtocol"},
                %{"id" => "DuplicateHeadings"},
                %{"id" => "OverlappingDefaults"},
+               %{"id" => "ReferencesTypespec"},
                %{"id" => "TypesAndSpecs"},
                %{"id" => "TypesAndSpecs.Sub"},
                %{"id" => "Warnings"},

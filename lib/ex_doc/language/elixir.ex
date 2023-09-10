@@ -790,7 +790,7 @@ defmodule ExDoc.Language.Elixir do
       original_text = call_string <> "()"
 
       if Enum.any?(config.filtered_modules, &(&1.id == module_string)) do
-        warn("Typespec references filtered module: #{all}", {config.file, config.line}, config.id)
+        warn("typespec references filtered module: #{all}", {config.file, config.line}, config.id)
       end
 
       url =
