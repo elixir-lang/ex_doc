@@ -71,7 +71,7 @@ function renderSidebarNodeList (nodesByType, type) {
 
       // Clear the previous current section
       if (previousSection) {
-        previousSection.classList.remove('current-section')
+        clearCurrentSectionElement(previousSection)
       }
 
       if (anchor.matches('.expand') && anchor.pathname === window.location.pathname) {
@@ -97,6 +97,26 @@ function toggleListItem (listItem) {
   } else {
     openListItem(listItem)
   }
+}
+
+function markElementAsCurrentSection (section) {
+  section.classList.add('current-section')
+  section.querySelector('a').setAttribute('aria-current', 'true')
+}
+
+function clearCurrentSectionElement (section) {
+  section.classList.remove('current-section')
+  section.querySelector('a').setAttribute('aria-current', 'false')
+}
+
+function markElementAsCurrentHash (listItem) {
+  listItem.classList.add('current-hash')
+  listItem.querySelector('a').setAttribute('aria-current', 'true')
+}
+
+function clearCurrentHashElement (listItem) {
+  listItem.classList.remove('current-hash')
+  listItem.querySelector('a').setAttribute('aria-current', 'false')
 }
 
 function highlightNavigationLink (activeType) {
@@ -134,9 +154,9 @@ function markCurrentHashInSidebar () {
   if (hashEl) {
     const deflist = hashEl.closest('ul')
     if (deflist.classList.contains('deflist')) {
-      deflist.closest('li').classList.add('current-section')
+      markElementAsCurrentSection(deflist.closest('li'))
     }
-    hashEl.closest('li').classList.add('current-hash')
+    markElementAsCurrentHash(hashEl.closest('li'))
   }
 }
 
@@ -159,7 +179,7 @@ function addEventListeners () {
     const nodeList = qs(SIDEBAR_NODE_LIST_SELECTOR)
     const currentListItem = nodeList.querySelector('li.current-page li.current-hash')
     if (currentListItem) {
-      currentListItem.classList.remove('current-hash')
+      clearCurrentHashElement(currentListItem)
     }
 
     markCurrentHashInSidebar()
