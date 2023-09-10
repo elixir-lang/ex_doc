@@ -30,14 +30,14 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     -type t() :: atom().
     %% t/0 type.
 
-    -record(some_record, {bar :: undefined, foo :: undefined}).
+    -record(rec, {k :: undefined}).
 
-    -type my_tea() :: #some_record{bar :: uri_string:uri_string(), foo :: uri_string:uri_string() | undefine}.
+    -type my_tea() :: #rec{k :: uri_string:uri_string() | undefined}.
 
     -spec baz() -> my_tea().
       baz() ->
         Eh = <<"eh?">>,
-        #some_record{bar=Eh,foo=undefined}.
+        #rec{k=Eh}.
     """)
 
     refute ExUnit.CaptureIO.capture_io(:stderr, fn ->
@@ -52,8 +52,10 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     assert "-type t() :: atom()." =
              doc |> Floki.find("pre:fl-contains('t() :: atom().')") |> Floki.text()
 
-    # assert "-type my_tea() :: atom()." =
-    #  doc |> Floki.find("pre:fl-contains('my_tea() :: atom().')") |> Floki.text()
+    assert "-type my_tea() :: #rec{k :: uri_string:uri_string() | undefined}." =
+             doc
+             |> Floki.find("pre:fl-contains('my_tea() ::')")
+             |> Floki.text()
   end
 
   defp generate_docs(c) do
