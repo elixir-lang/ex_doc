@@ -94,11 +94,10 @@
   color: initial;
 }
 
-.sidebar .sidebar-projectVersion form::after {
+.sidebar .sidebar-projectVersionsDropdownCaret {
   position: absolute;
   left: 0;
   top: 2px;
-  content: "\25bc";
   z-index: 1;
   font-size: 8px;
   color: var(--sidebarMuted);
