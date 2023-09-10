@@ -59,7 +59,7 @@ function renderSidebarNodeList (nodesByType, type) {
     button.addEventListener('click', event => {
       const target = event.target
       const listItem = target.closest('li')
-      listItem.classList.toggle('open')
+      toggleListItem(listItem)
     })
   })
 
@@ -75,10 +75,28 @@ function renderSidebarNodeList (nodesByType, type) {
       }
 
       if (anchor.matches('.expand') && anchor.pathname === window.location.pathname) {
-        listItem.classList.add('open')
+        openListItem(listItem)
       }
     })
   })
+}
+
+function openListItem (listItem) {
+  listItem.classList.add('open')
+  listItem.querySelector('button[aria-controls]').setAttribute('aria-expanded', 'true')
+}
+
+function closeListItem (listItem) {
+  listItem.classList.remove('open')
+  listItem.querySelector('button[aria-controls]').setAttribute('aria-expanded', 'false')
+}
+
+function toggleListItem (listItem) {
+  if (listItem.classList.contains('open')) {
+    closeListItem(listItem)
+  } else {
+    openListItem(listItem)
+  }
 }
 
 function highlightNavigationLink (activeType) {
@@ -109,7 +127,7 @@ function markCurrentHashInSidebar () {
 
   const categoryEl = nodeList.querySelector(`li.current-page a.expand[href$="#${category}"]`)
   if (categoryEl) {
-    categoryEl.closest('li').classList.add('open')
+    openListItem(categoryEl.closest('li'))
   }
 
   const hashEl = nodeList.querySelector(`li.current-page a[href$="#${hash}"]`)
