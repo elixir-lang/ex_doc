@@ -30,7 +30,25 @@ async function search (value) {
     const index = await getIndex()
 
     try {
-      const results = searchResultsToDecoratedSearchNodes(index.search(value))
+      const queryResult = index.query(function (query) {
+        const parser = new lunr.QueryParser(value, query)
+        const newQuery = parser.parse()
+        newQuery.clauses.forEach((clause) => {
+          // clause.presence being 1 means that it is acting as an OR
+          // We want to change the default OR behavior to AND, which means
+          // Setting the presence to 2
+          if (clause.presence === 1) {
+            clause.presence = 2
+          } else if (clause.presence === 2) {
+            clause.presence = 1
+          }
+        })
+
+        return newQuery
+      })
+
+      const results = searchResultsToDecoratedSearchNodes(queryResult)
+
       renderResults({ value, results })
     } catch (error) {
       renderResults({ value, errorMessage: error.message })

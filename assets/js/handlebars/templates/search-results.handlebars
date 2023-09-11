@@ -36,11 +36,11 @@
   <p>The search functionality is full-text based. Here are some tips:</p>
 
   <ul>
-    <li>Multiple words (such as <code>foo bar</code>) are searched as <code>OR</code></li>
+    <li>Multiple words (such as <code>foo bar</code>) are searched as <code>AND</code></li>
     <li>Use <code>*</code> anywhere (such as <code>fo*</code>) as wildcard</li>
-    <li>Use <code>+</code> before a word (such as <code>+foo</code>) to make its presence required</li>
+    <li>Use <code>+</code> before a word to make its presence optional. For example <code>+this +or_that </code></li>
     <li>Use <code>-</code> before a word (such as <code>-foo</code>) to make its absence required</li>
-    <li>Use <code>:</code> to search on a particular field (such as <code>field:word</code>). The available fields are <code>title</code>, <code>doc</code> and <code>type</code></li>
+    <li>Use <code>:</code> to search on a field (such as <code>field:word</code>). The available fields are <code>title</code>, <code>doc</code> and <code>type</code></li>
     <li>Use <code>WORD^NUMBER</code> (such as <code>foo^2</code>) to boost the given word</li>
     <li>Use <code>WORD~NUMBER</code> (such as <code>foo~2</code>) to do a search with edit distance on word</li>
   </ul>
