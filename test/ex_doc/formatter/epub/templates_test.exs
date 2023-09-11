@@ -59,6 +59,8 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
       assert content =~ ~r{<h1 id="content">\s*CompiledWithDocs\s*}
 
+      assert content =~ ~s{<h1 class="section-heading">Summary</h1>}
+
       assert content =~
                ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping">.*<i class="ri-link-m" aria-hidden="true"></i>.*Example.*</a>.*</h2>}ms
 
@@ -85,8 +87,8 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
           ]
         )
 
-      assert content =~ ~r{id="example-functions".*href="#example-functions".*Example functions}ms
-      assert content =~ ~r{id="legacy".*href="#legacy".*Legacy}ms
+      assert content =~ ~r{id="example-functions".*Example functions}ms
+      assert content =~ ~r{id="legacy".*Legacy}ms
       assert content =~ ~r{id="example-functions".*id="example/2"}ms
       refute content =~ ~r{id="legacy".*id="example/2"}ms
       refute content =~ ~r{id="functions".*id="example/2"}ms
