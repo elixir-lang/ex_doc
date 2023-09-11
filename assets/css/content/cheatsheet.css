@@ -39,16 +39,10 @@
   color: var(--main);
   margin: 0 0 1em;
   font-weight: 400;
-  overflow: hidden;
 }
 
 .page-cheatmd .content-inner h3 :is(a, a:visited) {
   color: var(--main);
-  text-decoration: none;
-}
-
-.page-cheatmd .content-inner h3.section-heading i {
-  display: none;
 }
 
 .page-cheatmd .content-inner section.h3 {
@@ -58,7 +52,11 @@
   break-inside: avoid;
 }
 
-.page-cheatmd .content-inner h3::after {
+.page-cheatmd .content-inner h3 .text {
+  overflow: hidden; /* Clips generated content horizontal rule */
+}
+
+.page-cheatmd .content-inner h3 .text::after {
   content: "";
   margin-left: calc(var(--horizontal-space) / 2);
   vertical-align: baseline;

@@ -131,30 +131,50 @@
   vertical-align: top;
 }
 
-.content-inner .section-heading a {
+.content-inner .section-heading {
+  --icon-size: 16px;
+  --icon-spacing: 5px;
+  display: grid;
+  grid-template: 1fr / 1fr;
+}
+
+.content-inner .section-heading > :is(.hover-link, .text) {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.content-inner .section-heading .hover-link {
   text-decoration: none;
 }
 
 .content-inner .section-heading i {
-  font-size: 16px;
+  font-size: var(--icon-size);
   margin-top: .1em;
-  margin-left: -21px;
+  margin-left: calc(-1 * (var(--icon-size) + var(--icon-spacing)));
+  padding-right: var(--icon-spacing); /* Avoids gap in hover area */
   opacity: 0;
-}
-
-.content-inner .section-heading a:is(:hover, :focus) i {
-  opacity: 1;
-}
-
-blockquote .section-heading i {
-  display: none;
 }
 
 @media screen and (max-width: 768px) {
   .content-inner .section-heading i {
-    margin-left: -16px;
-    margin-right: -5px;
+    margin-left: calc(-1 * (var(--icon-size)));
   }
+}
+
+.content-inner blockquote .section-heading i {
+  display: none;
+}
+
+.content-inner .section-heading .hover-link:is(:hover, :focus) i {
+  opacity: 1;
+}
+
+/* Allow section link to be hovered and used “through” text */
+.content-inner .section-heading .text {
+  pointer-events: none;
+}
+.content-inner .section-heading .text a {
+  pointer-events: all;
 }
 
 .content-inner .app-vsn {

@@ -10,7 +10,7 @@
   --linksVisited:                var(--black);
   --linksNoUnderline:            var(--main-darkened-10);
   --linksNoUnderlineVisited:     var(--main-darkened-20);
-  --linksDecoration:             var(--gray400);
+  --linksDecoration:             var(--gray450);
 
   --iconAction:                  var(--coldGray);
   --iconActionHover:             var(--gray800);
