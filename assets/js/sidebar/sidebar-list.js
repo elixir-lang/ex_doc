@@ -8,15 +8,18 @@ const SIDEBAR_TYPE = {
   tasks: 'tasks'
 }
 
-const SIDEBAR_NAV_TYPES = [SIDEBAR_TYPE.extras, SIDEBAR_TYPE.modules, SIDEBAR_TYPE.tasks]
+const SIDEBAR_TAB_TYPES = [SIDEBAR_TYPE.extras, SIDEBAR_TYPE.modules, SIDEBAR_TYPE.tasks]
 
-const SIDEBAR_NODE_LIST_SELECTOR = '#full-list'
+const sidebarNodeListSelector = type => `#${type}-full-list`
 
 /**
  * Initializes the sidebar navigation list.
  */
 export function initialize () {
-  renderSidebarNodeList(getSidebarNodes(), getCurrentPageSidebarType())
+  SIDEBAR_TAB_TYPES.forEach(type => {
+    renderSidebarNodeList(getSidebarNodes(), type)
+  })
+  markActiveSidebarTab(getCurrentPageSidebarType())
   markCurrentHashInSidebar()
   scrollNodeListToCurrentCategory()
   addEventListeners()
@@ -36,12 +39,9 @@ function renderSidebarNodeList (nodesByType, type) {
   const nodes = nodesByType[type] || []
 
   // Render the list
-  const nodeList = qs(SIDEBAR_NODE_LIST_SELECTOR)
+  const nodeList = qs(sidebarNodeListSelector(type))
   const listContentHtml = Handlebars.templates['sidebar-items']({ nodes, group: '' })
   nodeList.innerHTML = listContentHtml
-
-  // Highlight the corresponding navigation link
-  highlightNavigationLink(type)
 
   // Removes the "expand" class from links belonging to single-level sections
   nodeList.querySelectorAll('ul').forEach(list => {
@@ -119,17 +119,28 @@ function clearCurrentHashElement (listItem) {
   listItem.querySelector('a').setAttribute('aria-current', 'false')
 }
 
-function highlightNavigationLink (activeType) {
-  SIDEBAR_NAV_TYPES.forEach(type => {
-    const anchor = qs(`#${type}-list-link`)
-    if (anchor) {
-      anchor.parentElement.classList.toggle('selected', type === activeType)
+function markActiveSidebarTab (activeType) {
+  SIDEBAR_TAB_TYPES.forEach(type => {
+    const button = qs(`#${type}-list-tab-button`)
+    if (button) {
+      const tabpanel = qs(`#${button.getAttribute('aria-controls')}`)
+      if (type === activeType) {
+        button.parentElement.classList.add('selected')
+        button.setAttribute('aria-selected', 'true')
+        button.setAttribute('tabindex', '0')
+        tabpanel.removeAttribute('hidden')
+      } else {
+        button.parentElement.classList.remove('selected')
+        button.setAttribute('aria-selected', 'false')
+        button.setAttribute('tabindex', '-1')
+        tabpanel.setAttribute('hidden', 'hidden')
+      }
     }
   })
 }
 
 function scrollNodeListToCurrentCategory () {
-  const nodeList = qs(SIDEBAR_NODE_LIST_SELECTOR)
+  const nodeList = qs(sidebarNodeListSelector(getCurrentPageSidebarType()))
   const currentPage = nodeList.querySelector('li.current-page')
   if (currentPage) {
     currentPage.scrollIntoView()
@@ -143,7 +154,7 @@ function markCurrentHashInSidebar () {
   const sidebarNodes = getSidebarNodes()
   const nodes = sidebarNodes[getCurrentPageSidebarType()] || []
   const category = findSidebarCategory(nodes, hash)
-  const nodeList = qs(SIDEBAR_NODE_LIST_SELECTOR)
+  const nodeList = qs(sidebarNodeListSelector(getCurrentPageSidebarType()))
 
   const categoryEl = nodeList.querySelector(`li.current-page a.expand[href$="#${category}"]`)
   if (categoryEl) {
@@ -163,20 +174,50 @@ function markCurrentHashInSidebar () {
 function addEventListeners () {
   // Bind the navigation links ("Pages", "Modules", "Tasks")
   // so that they render a list of all relevant nodes when clicked.
-  SIDEBAR_NAV_TYPES.forEach(type => {
-    const anchor = qs(`#${type}-list-link`)
-    if (anchor) {
-      anchor.addEventListener('click', event => {
-        event.preventDefault()
-        renderSidebarNodeList(getSidebarNodes(), type)
+  SIDEBAR_TAB_TYPES.forEach(type => {
+    const button = qs(`#${type}-list-tab-button`)
+    if (button) {
+      button.addEventListener('click', event => {
+        markActiveSidebarTab(type)
         scrollNodeListToCurrentCategory()
       })
     }
   })
 
+  // provide left/right arrow navigation for tablist, as required by ARIA authoring practices guide
+  const tabList = qs('#sidebar-listNav')
+  tabList.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') { return }
+
+    // SIDEBAR_TAB_TYPES cannot be used here as it always contains all possible types, not only types that the specific project has
+    const tabTypes = Array.from(tabList.querySelectorAll('[role="tab"]')).map(tab => tab.dataset.type)
+    // getCurrentPageSidebarType() cannot be used here as it's assigned once, on page render
+    const currentTabType = tabList.querySelector('[role="tab"][aria-selected="true"]').dataset.type
+
+    if (e.key === 'ArrowRight') {
+      let nextTabTypeIndex = tabTypes.indexOf(currentTabType) + 1
+      if (nextTabTypeIndex >= tabTypes.length) {
+        nextTabTypeIndex = 0
+      }
+
+      const nextType = tabTypes[nextTabTypeIndex]
+      markActiveSidebarTab(nextType)
+      qs(`#${nextType}-list-tab-button`).focus()
+    } else if (e.key === 'ArrowLeft') {
+      let previousTabTypeIndex = tabTypes.indexOf(currentTabType) - 1
+      if (previousTabTypeIndex < 0) {
+        previousTabTypeIndex = tabTypes.length - 1
+      }
+
+      const previousType = tabTypes[previousTabTypeIndex]
+      markActiveSidebarTab(previousType)
+      qs(`#${previousType}-list-tab-button`).focus()
+    }
+  })
+
   // Keep .current-hash item in sync with the hash, regardless how the change takes place
   window.addEventListener('hashchange', event => {
-    const nodeList = qs(SIDEBAR_NODE_LIST_SELECTOR)
+    const nodeList = qs(sidebarNodeListSelector(getCurrentPageSidebarType()))
     const currentListItem = nodeList.querySelector('li.current-page li.current-hash')
     if (currentListItem) {
       clearCurrentHashElement(currentListItem)

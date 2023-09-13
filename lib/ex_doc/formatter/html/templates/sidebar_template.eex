@@ -38,20 +38,41 @@
         v<%= config.version %>
       </div>
     </div>
-    <ul class="sidebar-listNav">
-      <li><a id="extras-list-link" href="#full-list"><%= config.extra_section || "Pages" %></a></li>
+    <ul id="sidebar-listNav" class="sidebar-listNav" role="tablist">
+      <li>
+        <button id="extras-list-tab-button" role="tab" data-type="extras" aria-controls="extras-full-list" aria-selected="true" tabindex="0">
+          <%= config.extra_section || "Pages" %>
+        </button>
+      </li>
 
       <%= if nodes_map.modules != [] do %>
-        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+        <li>
+          <button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-full-list" aria-selected="false" tabindex="-1">
+            Modules
+          </button>
+        </li>
       <% end %>
 
       <%= if nodes_map.tasks != [] do %>
-        <li><a id="tasks-list-link" href="#full-list"><span translate="no">Mix</span> Tasks</a></li>
+        <li>
+          <button id="tasks-list-tab-button" role="tab" data-type="tasks" aria-controls="tasks-full-list" aria-selected="false" tabindex="-1">
+            <span translate="no">Mix</span> Tasks
+          </button>
+        </li>
       <% end %>
     </ul>
   </div>
 
-  <ul id="full-list"></ul>
+  <ul id="extras-full-list" class="full-list" role="tabpanel" aria-labelledby="extras-list-tab-button"></ul>
+
+  <%= if nodes_map.modules != [] do %>
+    <ul id="modules-full-list" class="full-list" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden></ul>
+  <% end %>
+
+  <%= if nodes_map.tasks != [] do %>
+    <ul id="tasks-full-list" class="full-list" role="tabpanel" aria-labelledby="tasks-list-tab-button" hidden></ul>
+  <% end %>
+
 </nav>
 
 <main class="content">
