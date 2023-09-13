@@ -242,9 +242,16 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           tasks: []
         })
 
-      assert content =~ ~r{<li><a id="modules-list-link" href="#full-list">Modules</a></li>}
-      refute content =~ ~r{<li><a id="exceptions-list" href="#full-list">Exceptions</a></li>}
-      refute content =~ ~r{<li><a id="tasks-list-link" href="#full-list">Mix Tasks</a></li>}
+      assert content =~
+               ~r{<li>[\s\n]*<button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-full-list" aria-selected="false" tabindex="-1">[\s\n]*Modules[\s\n]*</button>[\s\n]*</li>}
+
+      assert content =~
+               ~r{<ul id="modules-full-list" class="full-list" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden></ul>}
+
+      refute content =~ ~r{id="exceptions-list-tab-button">}
+      refute content =~ ~r{id="exceptions-full-list">}
+      refute content =~ ~r{id="tasks-list-tab-button"}
+      refute content =~ ~r{id="tasks-full-list"}
     end
 
     test "display built with footer by proglang option", context do
