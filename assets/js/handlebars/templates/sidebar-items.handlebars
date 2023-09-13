@@ -10,7 +10,7 @@
   {{/nestingChanged}}
 
   <li class="{{#isLocal node.id}}current-page open{{/isLocal}}">
-    <a href="{{node.id}}.html{{#isLocal node.id}}#content{{/isLocal}}" class="expand" {{#isArray node.headers}}{{else}}translate="no"{{/isArray}}>
+    <a href="{{node.id}}.html{{#isLocal node.id}}#content{{/isLocal}}" class="expand" aria-current="{{#isLocal node.id}}page{{else}}false{{/isLocal}}" {{#isArray node.headers}}{{else}}translate="no"{{/isArray}}>
       {{#if node.nested_title}}
         {{{node.nested_title}}}
       {{else}}
@@ -20,12 +20,12 @@
 
     {{#isEmptyArray node.headers}}
     {{else}}
-      <button class="icon-expand" aria-label="expand"></button>
+      <button class="icon-expand" aria-label="expand" aria-expanded="{{#isLocal node.id}}true{{else}}false{{/isLocal}}" aria-controls="node-{{node.id}}-headers"></button>
     {{/isEmptyArray}}
 
     {{#isArray node.headers}}
       {{#isNonEmptyArray node.headers}}
-        <ul>
+        <ul id="node-{{node.id}}-headers">
           {{#each node.headers}}
             <li>
               <a href="{{node.id}}.html#{{{anchor}}}">{{{id}}}</a>
@@ -34,14 +34,14 @@
         </ul>
       {{/isNonEmptyArray}}
     {{else}}
-      <ul>
+      <ul id="node-{{node.id}}-headers">
         {{#showSections node}}
           <li class="docs {{#isLocal node.id}}open{{/isLocal}}">
             <a href="{{node.id}}.html#content" class="expand">
               Sections
             </a>
-            <button class="icon-expand" aria-label="expand"></button>
-            <ul class="sections-list deflist">
+            <button class="icon-expand" aria-label="expand" aria-expanded="{{#isLocal node.id}}true{{else}}false{{/isLocal}}" aria-controls="{{node.id}}-sections-list"></button>
+            <ul id="{{node.id}}-sections-list" class="sections-list deflist">
               {{#each sections}}
                 <li>
                   <a href="{{node.id}}.html#{{anchor}}">{{{id}}}</a>
@@ -60,8 +60,8 @@
             <a href="{{node.id}}.html#{{group.key}}" class="expand">
               {{group.name}}
             </a>
-            <button class="icon-expand" aria-label="expand"></button>
-            <ul class="{{group.key}}-list deflist">
+            <button class="icon-expand" aria-label="expand" aria-expanded="false" aria-controls="node-{{node.id}}-group-{{group.key}}-list"></button>
+            <ul id="node-{{node.id}}-group-{{group.key}}-list" class="{{group.key}}-list deflist">
               {{#each group.nodes}}
                 <li>
                   <a href="{{node.id}}.html#{{anchor}}" title="{{title}}" translate="no">{{id}}</a>

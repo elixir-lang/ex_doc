@@ -37,12 +37,8 @@ pre .copy-button:hover svg, pre .copy-button:focus-visible svg {
 }
 
 .copy-button.clicked {
-  display: block;
   opacity: 1;
   color: var(--success);
-}
-.copy-button.clicked::after {
-  content: "Copied! \2713";
 }
 
 .copy-button.clicked svg {
