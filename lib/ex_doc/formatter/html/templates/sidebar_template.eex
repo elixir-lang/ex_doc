@@ -40,14 +40,14 @@
     </div>
     <ul id="sidebar-listNav" class="sidebar-listNav" role="tablist">
       <li>
-        <button id="extras-list-tab-button" role="tab" data-type="extras" aria-controls="extras-full-list" aria-selected="true" tabindex="0">
+        <button id="extras-list-tab-button" role="tab" data-type="extras" aria-controls="extras-tab-panel" aria-selected="true" tabindex="0">
           <%= config.extra_section || "Pages" %>
         </button>
       </li>
 
       <%= if nodes_map.modules != [] do %>
         <li>
-          <button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-full-list" aria-selected="false" tabindex="-1">
+          <button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-tab-panel" aria-selected="false" tabindex="-1">
             Modules
           </button>
         </li>
@@ -55,7 +55,7 @@
 
       <%= if nodes_map.tasks != [] do %>
         <li>
-          <button id="tasks-list-tab-button" role="tab" data-type="tasks" aria-controls="tasks-full-list" aria-selected="false" tabindex="-1">
+          <button id="tasks-list-tab-button" role="tab" data-type="tasks" aria-controls="tasks-tab-panel" aria-selected="false" tabindex="-1">
             <span translate="no">Mix</span> Tasks
           </button>
         </li>
@@ -63,14 +63,20 @@
     </ul>
   </div>
 
-  <ul id="extras-full-list" class="full-list" role="tabpanel" aria-labelledby="extras-list-tab-button"></ul>
+  <div id="extras-tab-panel" role="tabpanel" aria-labelledby="extras-list-tab-button">
+    <ul id="extras-full-list" class="full-list"></ul>
+  </div>
 
   <%= if nodes_map.modules != [] do %>
-    <ul id="modules-full-list" class="full-list" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden></ul>
+    <div id="modules-tab-panel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>
+      <ul id="modules-full-list" class="full-list"></ul>
+    </div>
   <% end %>
 
   <%= if nodes_map.tasks != [] do %>
-    <ul id="tasks-full-list" class="full-list" role="tabpanel" aria-labelledby="tasks-list-tab-button" hidden></ul>
+    <div id="tasks-tab-panel" role="tabpanel" aria-labelledby="tasks-list-tab-button" hidden>
+      <ul id="tasks-full-list" class="full-list"></ul>
+    </div>
   <% end %>
 
 </nav>
