@@ -40,6 +40,7 @@ function renderSidebarNodeList (nodesByType, type) {
 
   // Render the list
   const nodeList = qs(sidebarNodeListSelector(type))
+  if (!nodeList) { return }
   const listContentHtml = Handlebars.templates['sidebar-items']({ nodes, group: '' })
   nodeList.innerHTML = listContentHtml
 
