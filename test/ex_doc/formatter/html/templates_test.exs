@@ -248,8 +248,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~
                ~r{<div id="modules-tab-panel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>[\n\s]*<ul id="modules-full-list" class="full-list"></ul>[\n\s]*</div>}
 
-      refute content =~ ~r{id="exceptions-list-tab-button">}
-      refute content =~ ~r{id="exceptions-full-list">}
       refute content =~ ~r{id="tasks-list-tab-button"}
       refute content =~ ~r{id="tasks-full-list"}
     end
