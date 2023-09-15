@@ -246,7 +246,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{<li>[\s\n]*<button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-tab-panel" aria-selected="false" tabindex="-1">[\s\n]*Modules[\s\n]*</button>[\s\n]*</li>}
 
       assert content =~
-               ~r{<div id="modules-tab-panel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>[\n\s]*<ul id="modules-full-list" class="full-list"></ul>[\n\s]*</div>}
+               ~r{<div id="modules-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>[\n\s]*<ul id="modules-full-list" class="full-list"></ul>[\n\s]*</div>}
 
       refute content =~ ~r{id="tasks-list-tab-button"}
       refute content =~ ~r{id="tasks-full-list"}
