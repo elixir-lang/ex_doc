@@ -63,18 +63,18 @@
     </ul>
   </div>
 
-  <div id="extras-tab-panel" role="tabpanel" aria-labelledby="extras-list-tab-button">
+  <div id="extras-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="extras-list-tab-button">
     <ul id="extras-full-list" class="full-list"></ul>
   </div>
 
   <%= if nodes_map.modules != [] do %>
-    <div id="modules-tab-panel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>
+    <div id="modules-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>
       <ul id="modules-full-list" class="full-list"></ul>
     </div>
   <% end %>
 
   <%= if nodes_map.tasks != [] do %>
-    <div id="tasks-tab-panel" role="tabpanel" aria-labelledby="tasks-list-tab-button" hidden>
+    <div id="tasks-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="tasks-list-tab-button" hidden>
       <ul id="tasks-full-list" class="full-list"></ul>
     </div>
   <% end %>

@@ -218,14 +218,18 @@
   font-weight: bold;
 }
 
-.sidebar .full-list {
-  margin: 0;
-  padding: 20px 0;
+.sidebar .sidebar-tabpanel {
+  flex: 1 1 .01%;
   overflow-y: auto;
   overscroll-behavior: contain;
   position: relative;
   -webkit-overflow-scrolling: touch;
-  flex: 1 1 .01%;
+}
+
+.sidebar .full-list {
+  margin: 0;
+  padding: 20px 0;
+  position: relative;
 }
 
 .sidebar .full-list :is(li, a) {
