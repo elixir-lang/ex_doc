@@ -57,13 +57,6 @@ body {
   z-index: 3;
 }
 
-/* @media screen and (max-width: 768px) {
-  .content {
-    overflow: auto;
-    scroll-padding-top: 45px;
-  }
-} */
-
 body:is(.sidebar-opening, .sidebar-opened) .sidebar-button {
   transform: translateX(
     calc(var(--sidebarWidth) - 100% - var(--sidebarButtonRightOpen))
