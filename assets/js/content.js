@@ -83,23 +83,21 @@ function getLivebookImportUrl (livebookUrl, notebookUrl) {
 }
 
 // Check if the device width is below a certain threshold (e.g., 768px for mobile)
-if (window.innerWidth <= 768) {
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
+document.addEventListener('click', function (e) {
+  if (window.innerWidth <= 768) {
+    const target = e.target.closest('a[href^="#"]')
+    if (target) {
       e.preventDefault()
-
-      const targetId = this.getAttribute('href').substring(1)
+      const targetId = target.getAttribute('href').substring(1)
       const targetElement = document.getElementById(targetId)
-
       if (targetElement) {
         const offset = 45 // Adjust this offset as needed
         const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - offset
-
         window.scrollTo({
           top: targetPosition,
           behavior: 'smooth'
         })
       }
-    })
-  })
-}
+    }
+  }
+})
