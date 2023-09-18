@@ -9,7 +9,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   setup %{tmp_dir: tmp_dir} do
     output = tmp_dir <> "/html"
     File.mkdir_p!(output)
-    File.touch!(output <> "/.ex_doc")
+    File.touch!(output <> "/.build")
   end
 
   defp read_wildcard!(path) do

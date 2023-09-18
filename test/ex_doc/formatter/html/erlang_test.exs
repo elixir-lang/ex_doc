@@ -8,7 +8,7 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
   setup %{tmp_dir: tmp_dir} do
     output = tmp_dir <> "/doc"
     File.mkdir!(output)
-    File.touch!("#{output}/.ex_doc")
+    File.touch!("#{output}/.build")
   end
 
   test "smoke test", c do

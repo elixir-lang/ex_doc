@@ -56,7 +56,7 @@ defmodule ExDoc.Formatter.EPUB do
 
   defp create_output_dir(root, config) do
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
-    File.touch!(Path.join(root, ".ex_doc"))
+    File.touch!(Path.join(root, ".build"))
   end
 
   defp cleanup_output_dir(docs_root, config) do

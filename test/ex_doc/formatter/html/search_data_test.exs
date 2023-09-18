@@ -7,7 +7,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
   setup %{tmp_dir: tmp_dir} do
     output = tmp_dir <> "/doc"
     File.mkdir!(output)
-    File.touch!("#{output}/.ex_doc")
+    File.touch!("#{output}/.build")
   end
 
   test "Elixir module", c do

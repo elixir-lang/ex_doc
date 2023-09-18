@@ -158,7 +158,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   def setup_output(root, cleanup, create) do
-    safety_path = Path.join(root, ".ex_doc")
+    safety_path = Path.join(root, ".build")
 
     cond do
       File.exists?(safety_path) and File.exists?(root) ->
@@ -187,7 +187,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp add_safety_file(root) do
-    File.touch!(Path.join(root, ".ex_doc"))
+    File.touch!(Path.join(root, ".build"))
   end
 
   defp cleanup_output_dir(docs_root, config) do
