@@ -93,9 +93,43 @@ defmodule Mix.Tasks.Docs do
       the "assets" directory in the output path under the name "cover" and the
       appropriate extension. This option has no effect when using the "html" formatter.
 
-    * `:deps` - A keyword list application names and their documentation URL.
-      ExDoc will by default include all dependencies and assume they are hosted on
-      HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
+    * `:deps` - A keyword list with application names and their documentation URL
+      or a function for generating such a list dynamically. ExDoc will by default include
+      all dependencies and assume they are hosted on HexDocs. This can be overridden by
+      your own values.
+
+      Using a keyword list:
+      
+      ```elixir 
+      docs: [
+        deps: [plug: "https://myserver/plug/"]
+      ]
+      ```
+
+      Alternatively you can use a function to generate this list dynamically. For example
+      you could read a custom project option from your dependencies and update the deps
+      list if this is set:
+
+      ```elixir
+      docs: [
+        deps: fn -> deps_base_urls() end
+      ]
+
+      defp deps_base_urls do
+        for {app, path} <- Mix.Project.deps_paths(),
+            _ = Application.load(app),
+            base_url = base_url(app, path),
+            not is_nil(base_url) do
+          {app, base_url}
+        end
+      end
+
+      defp base_url(app, path) do
+        Mix.Project.in_project(app, path, fn _ ->
+          get_in(Mix.Project.config(), [:docs, :base_url])
+        end)
+      end
+      ``` 
 
     * `:extra_section` - String that defines the section title of the additional
       Markdown and plain text pages; default: "PAGES". Example: "GUIDES"
@@ -482,7 +516,7 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp normalize_deps(options) do
-    user_deps = Keyword.get(options, :deps, [])
+    user_deps = user_deps(options[:deps])
 
     deps =
       for {app, doc} <- Keyword.merge(get_deps(), user_deps),
@@ -492,6 +526,10 @@ defmodule Mix.Tasks.Docs do
 
     Keyword.put(options, :deps, deps)
   end
+
+  defp user_deps(nil), do: []
+  defp user_deps(deps) when is_function(deps, 0), do: deps.()
+  defp user_deps(deps), do: deps
 
   defp get_deps do
     for {key, _} <- Mix.Project.deps_paths(),

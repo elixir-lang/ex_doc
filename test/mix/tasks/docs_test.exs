@@ -276,6 +276,32 @@ defmodule Mix.Tasks.DocsTest do
              {:earmark_parser, "foo"}
   end
 
+  test "allows setting deps through a function", context do
+    assert [
+             {"ex_doc", "dev",
+              [
+                formatter: "html",
+                formatters: _,
+                deps: deps,
+                apps: _,
+                source_beam: _,
+                proglang: :elixir
+              ]},
+             {"ex_doc", "dev",
+              [
+                formatter: "epub",
+                formatters: _,
+                deps: deps,
+                apps: _,
+                source_beam: _,
+                proglang: :elixir
+              ]}
+           ] = run(context, [], app: :ex_doc, docs: [deps: fn -> [earmark_parser: "foo"] end])
+
+    assert List.keyfind(deps, :earmark_parser, 0) ==
+             {:earmark_parser, "foo"}
+  end
+
   test "accepts lazy docs", context do
     assert [
              {"ex_doc", "dev",
