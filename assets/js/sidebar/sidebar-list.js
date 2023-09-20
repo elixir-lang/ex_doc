@@ -142,6 +142,8 @@ function markActiveSidebarTab (activeType) {
 
 function scrollNodeListToCurrentCategory () {
   const nodeList = qs(sidebarNodeListSelector(getCurrentPageSidebarType()))
+  if (!nodeList) { return }
+
   const currentPage = nodeList.querySelector('li.current-page')
   if (currentPage) {
     currentPage.scrollIntoView()
@@ -156,6 +158,7 @@ function markCurrentHashInSidebar () {
   const nodes = sidebarNodes[getCurrentPageSidebarType()] || []
   const category = findSidebarCategory(nodes, hash)
   const nodeList = qs(sidebarNodeListSelector(getCurrentPageSidebarType()))
+  if (!nodeList) { return }
 
   const categoryEl = nodeList.querySelector(`li.current-page a.expand[href$="#${category}"]`)
   if (categoryEl) {
@@ -219,11 +222,12 @@ function addEventListeners () {
   // Keep .current-hash item in sync with the hash, regardless how the change takes place
   window.addEventListener('hashchange', event => {
     const nodeList = qs(sidebarNodeListSelector(getCurrentPageSidebarType()))
+    if (!nodeList) { return }
+
     const currentListItem = nodeList.querySelector('li.current-page li.current-hash')
     if (currentListItem) {
       clearCurrentHashElement(currentListItem)
     }
-
     markCurrentHashInSidebar()
   })
 }
