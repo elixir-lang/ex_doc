@@ -519,7 +519,7 @@ defmodule ExDoc.Formatter.HTMLTest do
         doc_config(context,
           extras: [
             "test/fixtures/PlainTextFiles.md",
-            "test/fixtures/LICENSE": [filename: "linked-license"],
+            {"test/fixtures/LICENSE", filename: "linked-license"},
             "test/fixtures/PlainText.txt": [filename: "plain_text"]
           ]
         )

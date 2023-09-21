@@ -627,7 +627,7 @@ defmodule ExDoc.Formatter.HTML do
         {base, text_to_id(Path.rootname(base))}
 
       {path, opts} ->
-        base = path |> Atom.to_string() |> Path.basename()
+        base = path |> to_string() |> Path.basename()
         {base, opts[:filename] || text_to_id(Path.rootname(base))}
     end)
   end
