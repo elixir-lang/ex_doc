@@ -30,14 +30,9 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     -type t() :: atom().
     %% t/0 type.
 
-    -record(rec, {k :: undefined}).
+    -record(rec, {k :: term}).
 
-    -type my_tea() :: #rec{k :: uri_string:uri_string() | undefined}.
-
-    -spec baz() -> my_tea().
-      baz() ->
-        Eh = <<"eh?">>,
-        #rec{k=Eh}.
+    -type t2() :: #rec{k :: uri_string:uri_string() | undefined}.
     """)
 
     doc = generate_docs(c)
