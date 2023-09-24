@@ -584,9 +584,9 @@ defmodule ExDoc.Language.Erlang do
               {nil, acc}
 
             # record{type :: remote:type/arity}
-            {:field_type, _, [type, {{:., _, [remote_mod, remote_type]}, _, args}]}, acc ->
-              {type,
-               [{pp({remote_mod, remote_type}), {remote_mod, remote_type, length(args)}} | acc]}
+            {:field_type, _, [name, {{:., _, [r_mod, r_type]}, _, args}]}, acc ->
+              {name,
+               [{pp({r_mod, r_type}), {r_mod, r_type, length(args)}} | acc]}
 
             # #{x :: t()}
             {:field_type, _, [name, type]}, acc when is_atom(name) ->
