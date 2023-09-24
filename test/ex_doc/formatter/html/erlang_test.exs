@@ -43,10 +43,11 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     assert "-type t() :: atom()." =
              doc |> Floki.find("pre:fl-contains('t() :: atom().')") |> Floki.text()
 
-    # assert "-type my_tea() :: #rec{k :: uri_string:uri_string() | undefined}." =
-    #          doc
-    #          |> Floki.find("pre:fl-contains('my_tea() ::')")
-    #          |> Floki.text()
+    assert "-type t2() :: #rec{k1 :: uri_string:uri_string(), k2 :: uri_string:uri_string() | undefined}."
+
+    doc
+    |> Floki.find("pre:fl-contains('t2() ::')")
+    |> Floki.text()
   end
 
   defp generate_docs(c) do
