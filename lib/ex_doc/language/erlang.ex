@@ -572,14 +572,6 @@ defmodule ExDoc.Language.Erlang do
             {{:., _, [module, name]}, _, args}, acc ->
               {{:t, [], args}, [{pp({module, name}), {module, name, length(args)}} | acc]}
 
-            ## remote type module.type/0
-            {:., _, [module, name]} = ast, acc ->
-              {ast, [{pp({module, name}), {module, name, 0}} | acc]}
-
-            ## remote type module.type/0
-            {_local_name, {{:., _, [module, name]}, _, args}} = ast, acc ->
-              {ast, [{pp({module, name}), {module, name, length(args)}} | acc]}
-
             {name, _, _}, acc when name in [:<<>>, :..] ->
               {nil, acc}
 
@@ -590,6 +582,11 @@ defmodule ExDoc.Language.Erlang do
             # fun() (spec_to_quoted expands it to (... -> any())
             {:->, _, [[{name, _, _}], {:any, _, _}]}, acc when name == :... ->
               {nil, acc}
+
+            # record{type :: remote:type/arity}
+            {:field_type, _, [type, {{:., _, [remote_mod, remote_type]}, _, args}]}, acc ->
+              {type,
+               [{pp({remote_mod, remote_type}), {remote_mod, remote_type, length(args)}} | acc]}
 
             # #{x :: t()}
             {:field_type, _, [name, type]}, acc when is_atom(name) ->
