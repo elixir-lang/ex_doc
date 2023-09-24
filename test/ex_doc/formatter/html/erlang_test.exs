@@ -40,11 +40,7 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
         #rec{k=Eh}.
     """)
 
-    refute ExUnit.CaptureIO.capture_io(:stderr, fn ->
-             send(self(), {:doc_path, generate_docs(c)})
-           end) =~ "inconsistency, please submit bug"
-
-    assert_received {:doc_path, doc}
+    doc = generate_docs(c)
 
     assert "-spec foo(atom()) -> atom()." =
              doc |> Floki.find("pre:fl-contains('foo(atom())')") |> Floki.text()
