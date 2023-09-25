@@ -10,11 +10,11 @@ defmodule Mix.Tasks.Docs do
   ## Command line options
 
     * `--canonical`, `-n` - Indicate the preferred URL with
-      rel="canonical" link element, defaults to no canonical path
+      `rel="canonical"` link element, defaults to no canonical path
 
-    * `--formatter`, `-f` - Which formatters to use, "html" or
-      "epub". This option can be given more than once. By default,
-      both html and epub are generated.
+    * `--formatter`, `-f` - Which formatters to use, `"html"` or
+      `"epub"`. This option can be given more than once. By default,
+      both `html` and `epub` are generated.
 
     * `--language` - Specifies the language to annotate the
       EPUB output in valid [BCP 47](https://tools.ietf.org/html/bcp47)
@@ -24,8 +24,8 @@ defmodule Mix.Tasks.Docs do
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
 
-    * `--proglang` - Chooses the main programming language: "elixir"
-      or "erlang"
+    * `--proglang` - Chooses the main programming language: `"elixir"`
+      or `"erlang"`
 
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
