@@ -116,8 +116,6 @@ defmodule ExDoc.Refs do
 
   defguardp has_no_docs(doc) when doc == :none or doc == %{}
 
-  defp starts_with_underscore?(name), do: hd(Atom.to_charlist(name)) == ?_
-
   defp visibility(:hidden),
     do: :hidden
 
@@ -139,7 +137,7 @@ defmodule ExDoc.Refs do
       kind in [:callback, :type] ->
         :public
 
-      kind == :function and starts_with_underscore?(name) ->
+      kind == :function and ExDoc.Utils.starts_with_underscore?(name) ->
         :hidden
 
       kind == :function ->

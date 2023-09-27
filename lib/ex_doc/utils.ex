@@ -179,4 +179,9 @@ defmodule ExDoc.Utils do
         nil
     end
   end
+
+  def starts_with_underscore?(name) when is_atom(name), do: Atom.to_charlist(name) |> starts_with_underscore?()
+  def starts_with_underscore?([head | _]), do: head == ?_
+  def starts_with_underscore?(_), do: false
+
 end
