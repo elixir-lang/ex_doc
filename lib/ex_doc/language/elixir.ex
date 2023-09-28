@@ -96,7 +96,7 @@ defmodule ExDoc.Language.Elixir do
   # If it is none, then we need to look at underscore.
   # TODO: We can remove this on Elixir v1.13 as all underscored are hidden.
   defp doc?({{_, name, _}, _, _, :none, _}, _type) do
-    hd(Atom.to_charlist(name)) != ?_
+    not match?([?_ | _], Atom.to_charlist(name))
   end
 
   # Everything else is hidden.
