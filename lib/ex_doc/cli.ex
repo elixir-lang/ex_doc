@@ -7,28 +7,34 @@ defmodule ExDoc.CLI do
   def main(args, generator \\ &ExDoc.generate_docs/3) do
     {:ok, _} = Application.ensure_all_started(:ex_doc)
 
-    {opts, args, _invalid} =
-      OptionParser.parse(args,
+    {opts, args} =
+      OptionParser.parse!(args,
         aliases: [
           c: :config,
           f: :formatter,
           l: :logo,
           m: :main,
-          n: :canonical,
           o: :output,
-          p: :homepage_url,
           q: :quiet,
           u: :source_url,
           v: :version
         ],
         switches: [
-          formatter: :keep,
+          canonical: :string,
+          config: :string,
+          formatter: [:keep, :string],
+          homepage_url: :string,
           language: :string,
+          logo: :string,
+          main: :string,
+          output: :string,
           package: :string,
-          paths: :keep,
+          package: :string,
+          paths: [:keep, :string],
           proglang: :string,
           quiet: :boolean,
           source_ref: :string,
+          source_url: :string,
           version: :boolean
         ]
       )
@@ -92,9 +98,8 @@ defmodule ExDoc.CLI do
   defp merge_config(opts) do
     case Keyword.fetch(opts, :config) do
       {:ok, config} ->
-        opts
-        |> Keyword.delete(:config)
-        |> Keyword.merge(read_config(config))
+        opts_without_config = Keyword.delete(opts, :config)
+        Keyword.merge(read_config(config), opts_without_config)
 
       _ ->
         opts
@@ -162,11 +167,11 @@ defmodule ExDoc.CLI do
       PROJECT             Project name
       VERSION             Version number
       BEAMS               Path to compiled beam files
-      -n, --canonical     Indicate the preferred URL with rel="canonical" link element
+          --canonical     Indicate the preferred URL with rel="canonical" link element
       -c, --config        Give configuration through a file instead of a command line.
                           See "Custom config" section below for more information.
       -f, --formatter     Docs formatter to use (html or epub), default: html and epub
-      -p, --homepage-url  URL to link to for the site name
+          --homepage-url  URL to link to for the site name
           --language      Identify the primary language of the documents, its value must be
                           a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
       -l, --logo          Path to the image logo of the project (only PNG or JPEG accepted)

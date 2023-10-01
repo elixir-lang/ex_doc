@@ -59,7 +59,7 @@ function fixSpacebar () {
  */
 function setLivebookBadgeUrl () {
   const path = window.location.pathname
-  const notebookPath = path.replace(/\.html$/, '.livemd')
+  const notebookPath = path.replace(/(\.html)?$/, '.livemd')
   const notebookUrl = new URL(notebookPath, window.location.href).toString()
 
   settingsStore.getAndSubscribe(settings => {
@@ -81,3 +81,23 @@ function getLivebookDevRunUrl (notebookUrl) {
 function getLivebookImportUrl (livebookUrl, notebookUrl) {
   return `${livebookUrl}/import?url=${encodeURIComponent(notebookUrl)}`
 }
+
+// Check if the device width is below a certain threshold (e.g., 768px for mobile)
+document.addEventListener('click', function (e) {
+  if (window.innerWidth <= 768) {
+    const target = e.target.closest('a[href^="#"]')
+    if (target) {
+      e.preventDefault()
+      const targetId = target.getAttribute('href').substring(1)
+      const targetElement = document.getElementById(targetId)
+      if (targetElement) {
+        const offset = 45 // Adjust this offset as needed
+        const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - offset
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        })
+      }
+    }
+  }
+})

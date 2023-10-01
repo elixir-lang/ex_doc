@@ -10,11 +10,11 @@ defmodule Mix.Tasks.Docs do
   ## Command line options
 
     * `--canonical`, `-n` - Indicate the preferred URL with
-      rel="canonical" link element, defaults to no canonical path
+      `rel="canonical"` link element, defaults to no canonical path
 
-    * `--formatter`, `-f` - Which formatters to use, "html" or
-      "epub". This option can be given more than once. By default,
-      both html and epub are generated.
+    * `--formatter`, `-f` - Which formatters to use, `html` or
+      `epub`. This option can be given more than once. By default,
+      both `html` and `epub` are generated.
 
     * `--language` - Specifies the language to annotate the
       EPUB output in valid [BCP 47](https://tools.ietf.org/html/bcp47)
@@ -24,8 +24,8 @@ defmodule Mix.Tasks.Docs do
     * `--output`, `-o` - Output directory for the generated
       docs, default: `"doc"`
 
-    * `--proglang` - Chooses the main programming language: "elixir"
-      or "erlang"
+    * `--proglang` - Chooses the main programming language: `elixir`
+      or `erlang`
 
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
@@ -147,6 +147,12 @@ defmodule Mix.Tasks.Docs do
       reference in the current project docs e.g. because of a typo. This list controls where to
       skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
       or on a given file (e.g.: `["pages/deprecations.md"]`); default: `[]`.
+
+    * `:skip_code_autolink_to` - Similar to `:skip_undefined_reference_warnings_on`, this option
+      controls which terms will be skipped by ExDoc when building documentation.
+      Useful for example if you want to highlight private modules or functions
+      without warnings (e.g.: `["PrivateModule", "PrivateModule.func/1"]`);
+      default: `[]`.
 
     * `:source_beam` - Path to the beam directory; default: mix's compile path.
 
@@ -454,7 +460,7 @@ defmodule Mix.Tasks.Docs do
           app
         end
 
-      Keyword.put(options, :apps, apps)
+      Keyword.put(options, :apps, Enum.sort(apps))
     else
       Keyword.put(options, :apps, List.wrap(config[:app]))
     end

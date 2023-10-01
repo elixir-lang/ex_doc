@@ -2,7 +2,7 @@ defmodule ExDoc.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-lang/ex_doc"
-  @version "0.29.2"
+  @version "0.30.6"
 
   def project do
     [
@@ -24,10 +24,13 @@ defmodule ExDoc.Mixfile do
 
   def application do
     [
-      extra_applications: [:eex, :crypto],
+      extra_applications: [:eex, :crypto] ++ extra_applications(Mix.env()),
       mod: {ExDoc.Application, []}
     ]
   end
+
+  defp extra_applications(:test), do: [:edoc, :xmerl]
+  defp extra_applications(_), do: []
 
   defp deps do
     [
@@ -36,7 +39,8 @@ defmodule ExDoc.Mixfile do
       {:makeup_erlang, "~> 0.1"},
       {:makeup_html, ">= 0.0.0", only: :dev},
       {:jason, "~> 1.2", only: :test},
-      {:floki, "~> 0.0", only: :test}
+      {:floki, "~> 0.0", only: :test},
+      {:easyhtml, "~> 0.0", only: :test}
     ]
   end
 
@@ -97,7 +101,12 @@ defmodule ExDoc.Mixfile do
           ExDoc.TypeNode
         ]
       ],
-      skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
+      skip_undefined_reference_warnings_on: [
+        "CHANGELOG.md",
+        "t:ExDoc.FunctionNode.t/0",
+        "t:ExDoc.ModuleNode.t/0",
+        "t:ExDoc.TypeNode.t/0"
+      ]
     ]
   end
 

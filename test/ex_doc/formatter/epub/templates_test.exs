@@ -27,8 +27,8 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
   defp get_module_page(names, config \\ []) do
     config = doc_config(config)
-    mods = ExDoc.Retriever.docs_from_modules(names, config)
-    [mod | _] = HTML.render_all(mods, ".xhtml", config, highlight_tag: "samp")
+    {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
+    [mod | _] = HTML.render_all(mods, [], ".xhtml", config, highlight_tag: "samp")
     Templates.module_page(config, mod)
   end
 
@@ -59,6 +59,14 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
       assert content =~ ~r{<h1 id="content">\s*CompiledWithDocs\s*}
 
+      assert content =~ ~s{<h1 class="section-heading">Summary</h1>}
+
+      assert content =~
+               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*Example.*</h2>}ms
+
+      assert content =~
+               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*Example H3 heading.*</h3>}ms
+
       assert content =~
                ~r{moduledoc.*Example.*<samp class="nc">CompiledWithDocs</samp><samp class="o">\.</samp><samp class="n">example</samp>.*}ms
 
@@ -79,8 +87,8 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
           ]
         )
 
-      assert content =~ ~r{id="example-functions".*href="#example-functions".*Example functions}ms
-      assert content =~ ~r{id="legacy".*href="#legacy".*Legacy}ms
+      assert content =~ ~r{id="example-functions".*Example functions}ms
+      assert content =~ ~r{id="legacy".*Legacy}ms
       assert content =~ ~r{id="example-functions".*id="example/2"}ms
       refute content =~ ~r{id="legacy".*id="example/2"}ms
       refute content =~ ~r{id="functions".*id="example/2"}ms

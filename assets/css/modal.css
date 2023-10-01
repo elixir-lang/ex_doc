@@ -27,7 +27,7 @@
   margin: 75px auto 0 auto;
   max-width: 500px;
   background-color: var(--modalBackground);
-  border-radius: 3px;
+  border-radius: var(--borderRadius);
   box-shadow: 2px 2px 8px rgba(0, 0, 0, .2);
   padding: 25px 35px 35px;
 }

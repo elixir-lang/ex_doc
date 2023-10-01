@@ -1,5 +1,73 @@
 # Changelog
 
+## v0.30.6 (2023-08-25)
+
+  * Enhancements
+    * Extract title from Markdown file when preceeded with comments
+    * Improve focus navigation in notebooks
+
+## v0.30.5 (2023-08-12)
+
+  * Bug fixes
+    * Fix style for code in headers
+    * Fix search data generation for Erlang/OTP
+
+## v0.30.4 (2023-08-03)
+
+  * Bug fixes
+    * Fix style for anchors in headers
+
+## v0.30.3 (2023-07-15)
+
+  * Enhancements
+    * Compress search index before storing in local storage
+
+  * Bug fixes
+    * Fix styling for headers on cheatsheets and small screens
+
+## v0.30.2 (2023-07-11)
+
+  * Bug fixes
+    * Fix escaping in `search_data.json`
+    * Skip vega-lite code blocks in `search_data.json`
+
+## v0.30.1 (2023-07-07)
+
+  * Bug fixes
+    * Fix styling for headers on cheatsheets and small screens
+
+## v0.30.0 (2023-07-07)
+
+  * Enhancements
+    * Support tabsets (see the README for more information)
+    * Improve search results and indexing by storing more data and metadata
+    * Warn on invalid references in links
+    * Strike-through deprecated items on autocompletion
+    * Add source URL link to API reference page
+    * Allow multiple extra files with the same name by generating unique names in case of conflicts
+
+  * Bug fixes
+    * Fix rendering of large code blocks in admonition texts
+    * Do not log errors on module mismatch in case-insensitive file systems
+
+## v0.29.4 (2023-03-29)
+
+  * Bug fixes
+    * Fix sidebar element with no children taking additional padding
+    * Fix elements being rendered too thick on macOS
+    * Fix rendering of HTML elements inside tooltips
+
+## v0.29.3 (2023-03-17)
+
+  * Enhancements
+    * Propagate `:since` metadata from modules
+    * Add support for MFAs and maps in `before_closing_body_tag` and `before_closing_head_tag`
+
+  * Bug fixes
+    * Improve font consistency across different OSes
+    * Keep language class on livebook output code block
+    * Ensure switches have higher precedence than config
+
 ## v0.29.2 (2023-03-02)
 
   * Enhancements

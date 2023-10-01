@@ -2,6 +2,38 @@ defmodule ExDoc.Utils do
   @moduledoc false
 
   @doc """
+  Runs the `before_closing_head_tag` callback.
+  """
+  def before_closing_head_tag(%{before_closing_head_tag: {m, f, a}}, module) do
+    apply(m, f, [module | a])
+  end
+
+  def before_closing_head_tag(%{before_closing_head_tag: before_closing_head_tag}, module)
+      when is_map(before_closing_head_tag) do
+    Map.get(before_closing_head_tag, module, "")
+  end
+
+  def before_closing_head_tag(%{before_closing_head_tag: before_closing_head_tag}, module) do
+    before_closing_head_tag.(module)
+  end
+
+  @doc """
+  Runs the `before_closing_body_tag` callback.
+  """
+  def before_closing_body_tag(%{before_closing_body_tag: {m, f, a}}, module) do
+    apply(m, f, [module | a])
+  end
+
+  def before_closing_body_tag(%{before_closing_body_tag: before_closing_body_tag}, module)
+      when is_map(before_closing_body_tag) do
+    Map.get(before_closing_body_tag, module, "")
+  end
+
+  def before_closing_body_tag(%{before_closing_body_tag: before_closing_body_tag}, module) do
+    before_closing_body_tag.(module)
+  end
+
+  @doc """
   HTML escapes the given string.
 
       iex> ExDoc.Utils.h("<foo>")
@@ -90,12 +122,44 @@ defmodule ExDoc.Utils do
   end
 
   def to_json(binary) when is_binary(binary) do
-    inspect(binary, printable_limit: :infinity)
+    to_json_string(binary, "\"")
   end
 
   def to_json(integer) when is_integer(integer) do
     Integer.to_string(integer)
   end
+
+  defp to_json_string(<<?\b, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\b">>)
+
+  defp to_json_string(<<?\t, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\t">>)
+
+  defp to_json_string(<<?\n, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\n">>)
+
+  defp to_json_string(<<?\f, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\f">>)
+
+  defp to_json_string(<<?\r, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\r">>)
+
+  defp to_json_string(<<?\\, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\\\">>)
+
+  defp to_json_string(<<?", rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, "\\\"">>)
+
+  defp to_json_string(<<x, rest::binary>>, acc) when x <= 0x000F,
+    do: to_json_string(rest, <<acc::binary, "\\u000", Integer.to_string(x, 16)::binary>>)
+
+  defp to_json_string(<<x, rest::binary>>, acc) when x <= 0x001F,
+    do: to_json_string(rest, <<acc::binary, "\\u00", Integer.to_string(x, 16)::binary>>)
+
+  defp to_json_string(<<x, rest::binary>>, acc),
+    do: to_json_string(rest, <<acc::binary, x>>)
+
+  defp to_json_string(<<>>, acc), do: <<acc::binary, "\"">>
 
   @doc """
   Generates a url based on the given pattern.

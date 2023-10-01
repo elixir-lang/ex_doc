@@ -7,31 +7,32 @@ defmodule ExDoc.Language.Erlang do
 
   @impl true
   def module_data(module, docs_chunk, _config) do
-    # Make sure the module is loaded for future checks
-    _ = Code.ensure_loaded(module)
-    id = Atom.to_string(module)
-    abst_code = get_abstract_code(module)
-    line = find_module_line(module, abst_code)
-    type = module_type(module)
-    optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
+    if abst_code = get_abstract_code(module) do
+      id = Atom.to_string(module)
+      line = find_module_line(module, abst_code)
+      type = module_type(module)
+      optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
 
-    %{
-      module: module,
-      docs: docs_chunk,
-      language: __MODULE__,
-      id: id,
-      title: id,
-      type: type,
-      line: line,
-      callback_types: [:callback],
-      nesting_info: nil,
-      private: %{
-        abst_code: abst_code,
-        specs: get_specs(module),
-        callbacks: get_callbacks(module),
-        optional_callbacks: optional_callbacks
+      %{
+        module: module,
+        docs: docs_chunk,
+        language: __MODULE__,
+        id: id,
+        title: id,
+        type: type,
+        line: line,
+        callback_types: [:callback],
+        nesting_info: nil,
+        private: %{
+          abst_code: abst_code,
+          specs: get_specs(module),
+          callbacks: get_callbacks(module),
+          optional_callbacks: optional_callbacks
+        }
       }
-    }
+    else
+      IO.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
+    end
   end
 
   @impl true
@@ -172,15 +173,12 @@ defmodule ExDoc.Language.Erlang do
 
   @doc false
   def get_abstract_code(module) do
-    case :code.get_object_code(module) do
-      {^module, binary, _file} ->
-        case :beam_lib.chunks(binary, [:abstract_code]) do
-          {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} -> abstract_code
-          _otherwise -> []
-        end
-
-      :error ->
-        []
+    with {^module, binary, _file} <- :code.get_object_code(module),
+         {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} <-
+           :beam_lib.chunks(binary, [:abstract_code]) do
+      abstract_code
+    else
+      _ -> nil
     end
   end
 
@@ -584,6 +582,10 @@ defmodule ExDoc.Language.Erlang do
             # fun() (spec_to_quoted expands it to (... -> any())
             {:->, _, [[{name, _, _}], {:any, _, _}]}, acc when name == :... ->
               {nil, acc}
+
+            # record{type :: remote:type/arity}
+            {:field_type, _, [name, {{:., _, [r_mod, r_type]}, _, args}]}, acc ->
+              {name, [{pp({r_mod, r_type}), {r_mod, r_type, length(args)}} | acc]}
 
             # #{x :: t()}
             {:field_type, _, [name, type]}, acc when is_atom(name) ->

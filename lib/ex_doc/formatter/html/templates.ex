@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
 
-  import ExDoc.Utils, only: [h: 1]
+  import ExDoc.Utils, only: [h: 1, before_closing_body_tag: 2, before_closing_head_tag: 2]
 
   # TODO: It should not depend on the parent module. Move required HTML functions to Utils.
   # TODO: Add tests that assert on the returned structured, not on JSON
@@ -124,10 +124,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
         sections = module_sections(module)
 
+        deprecated? = not is_nil(module.deprecated)
+
         pairs =
           for key <- [:id, :title, :nested_title, :nested_context],
               value = Map.get(module, key),
               do: {key, value}
+
+        pairs = [{:deprecated, deprecated?} | pairs]
 
         Map.new([group: to_string(module.group)] ++ extra ++ pairs ++ sections)
       end
@@ -145,7 +149,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
             "#{node.name}/#{node.arity}"
           end
 
-        %{id: id, title: node.signature, anchor: URI.encode(node.id)}
+        deprecated? = not is_nil(node.deprecated)
+
+        %{id: id, title: node.signature, anchor: URI.encode(node.id), deprecated: deprecated?}
       end
 
     %{key: HTML.text_to_id(group), name: group, nodes: nodes}
@@ -171,6 +177,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     [sections: sections]
   end
 
+  # TODO: split into sections in Formatter.HTML instead.
   @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
   defp extract_headers(content) do
     @h2_regex
@@ -220,6 +227,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     do: raise("could not find matching #{output}/#{pattern}")
 
   defp relative_asset([h | _], output, _pattern), do: Path.relative_to(h, output)
+
+  # TODO: Move link_headings and friends to html.ex or even to autolinking code,
+  # so content is built with it upfront instead of added at the template level.
 
   @doc """
   Link headings found with `regex` with in the given `content`. IDs are
@@ -292,19 +302,19 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
     """
     <#{tag} id="#{prefix}#{id}" class="#{class_attribute}">
-      <a href="##{prefix}#{id}" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
-      <p class="sr-only">#{id}</p>
+      <a href="##{prefix}#{id}" class="hover-link">
+        <i class="ri-link-m" aria-hidden="true"></i>
       </a>
-      #{title}
+      <span class="text">#{title}</span>
     </#{tag}>
     """
   end
 
-  defp link_moduledoc_headings(content) do
+  def link_moduledoc_headings(content) do
     link_headings(content, @heading_regex, "module-")
   end
 
-  defp link_detail_headings(content, prefix) do
+  def link_detail_headings(content, prefix) do
     link_headings(content, @heading_regex, prefix <> "-")
   end
 

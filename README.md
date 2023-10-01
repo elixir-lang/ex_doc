@@ -12,11 +12,10 @@ To see all supported options, see the documentation for [mix docs](https://hexdo
 
 ExDoc ships with many features:
 
-  * Automatically generates HTML and EPUB documents from your API documentation.
+  * Automatically generates online- and offline-accessible HTML and EPUB documents from your API documentation.
   * Responsive design, covering phones and tablets.
   * Support for custom pages, guides, livebooks and cheatsheets.
   * Support for custom grouping of modules, functions, and pages in the sidebar.
-  * Generates HTML documentation, accessible online and offline.
   * Customizable logo.
   * A direct link back to the source code for every documented entity.
   * Full-text search.
@@ -24,7 +23,7 @@ ExDoc ships with many features:
   * Quick-search with autocompletion support. (`s` keyboard shortcut.)
   * Go-to shortcut with auto-complete to take the reader to any HexDocs package documentation. (`g` keyboard shortcut.)
   * Support for night mode, activated according to the browser preference.
-  * Tooltips for links to modules and functions, for the current project and other projects.
+  * Tooltips for links to modules and functions, both for the current project and other projects.
   * Version dropdown, automatically configured when hosted on HexDocs.
 
 ## Usage
@@ -102,13 +101,15 @@ You can use ExDoc via the command line.
    $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/dev/lib/project/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
    ```
 
-For example, here are some acceptable values:
+   Examples of appropriate values:
 
-    PROJECT_NAME    => Ecto
-    PROJECT_VERSION => 0.1.0
-    PROJECT_MODULE  => Ecto (the main module provided by the library)
-    GITHUB_USER     => elixir-lang
-    GITHUB_REPO     => ecto
+   ```plain
+   PROJECT_NAME    => Ecto
+   PROJECT_VERSION => 0.1.0
+   PROJECT_MODULE  => Ecto (the main module provided by the library)
+   GITHUB_USER     => elixir-lang
+   GITHUB_REPO     => ecto
+   ```
 
 ## Syntax highlighting
 
@@ -144,7 +145,7 @@ ExDoc supports metadata keys in your documentation.
 
 In Elixir, you can add metadata to modules and functions.
 
-For a module, use `@moduledoc`:
+For a module, use `@moduledoc`, which is equivalent to adding the annotation to everything inside the module (functions, macros, callbacks, types):
 
 ```elixir
 @moduledoc since: "1.10.0"
@@ -192,9 +193,11 @@ You may want to draw attention to certain statements by taking them out of the c
 
 The syntax is as follows:
 
-    > #### Error {: .error}
-    >
-    > This syntax will render an error block
+```markdown
+> #### Error {: .error}
+>
+> This syntax will render an error block
+```
 
 The result for the previous syntax is:
 
@@ -204,9 +207,53 @@ The result for the previous syntax is:
 
 For example, if you change the class name to `neutral`, you get the same admonition block in neutral style:
 
-> #### Error {: .neutral}
+> #### Neutral {: .neutral}
 >
-> This syntax will render an error block
+> This syntax will render a neutral block
+
+## Tabsets
+
+Where only one section of content of a series is likely to apply to the reader, you may wish to define a set of tabs.
+
+This example contains code blocks, separating them into tabs based on language:
+
+<!-- tabs-open -->
+
+### Elixir
+
+```elixir
+IO.puts "Hello, world!"
+```
+
+### Erlang
+
+```erlang
+io:fwrite("Hello, world!\n").
+```
+
+<!-- tabs-close -->
+
+Tabbed content must be defined between `<!-- tabs-open -->` and `<!-- tabs-close -->` HTML comments. Each `h3` heading results in a new tab panel, with its text setting the tab button label.
+
+Here is the above example's source:
+
+````markdown
+<!-- tabs-open -->
+
+### Elixir
+
+```elixir
+IO.puts "Hello, world!"
+```
+
+### Erlang
+
+```erlang
+io:fwrite("hello, world!\n").
+```
+
+<!-- tabs-close -->
+````
 
 ## Extensions
 
@@ -215,10 +262,19 @@ ExDoc renders Markdown content for you, but you can extend it to render complex 
 ```elixir
 docs: [
   # ...
+  before_closing_head_tag: &before_closing_head_tag/1,
   before_closing_body_tag: &before_closing_body_tag/1
 ]
 
 # ...
+
+defp before_closing_head_tag(:html) do
+  """
+  <!-- HTML injected at the end of the <head> element -->
+  """
+end
+
+defp before_closing_head_tag(:epub), do: ""
 
 defp before_closing_body_tag(:html) do
   """
@@ -226,7 +282,27 @@ defp before_closing_body_tag(:html) do
   """
 end
 
-defp before_closing_body_tag(_), do: ""
+defp before_closing_body_tag(:epub), do: ""
+```
+
+Besides an anonymous function, you can also pass a `module-function-args` tuple. It will the given module and function, with the format prefixed to the arguments:
+
+```elixir
+docs: [
+  # ...
+  before_closing_head_tag: {MyModule, :before_closing_head_tag, []},
+  before_closing_body_tag: {MyModule, :before_closing_body_tag, []}
+]
+```
+
+Or you can pass a map where the key is the format:
+
+```elixir
+docs: [
+  # ...
+  before_closing_head_tag: %{html: "...", epub: "..."},
+  before_closing_body_tag: %{html: "...", epub: "..."}
+]
 ```
 
 ### Rendering Math
@@ -234,9 +310,20 @@ defp before_closing_body_tag(_), do: ""
 If you write TeX-style math in your Markdown, such as `$\sum_{i}^{N} x_i$`, it ends up as raw text on the generated pages. To render expressions, we recommend using [KaTeX](https://katex.org/), a JavaScript library that turns expressions into graphics. To load and trigger KaTeX on every documentation page, we can insert the following HTML:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.css" integrity="sha384-beuqjL2bw+6DBM2eOpr5+Xlw+jiH44vMdVQwKxV28xxpoInPHTVmSvvvoPq9RdSh" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/katex.min.js" integrity="sha384-aaNb715UK1HuP4rjZxyzph+dVss/5Nx3mLImBe9b0EW4vMUkc1Guw4VRyQKBC0eG" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.19/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@1.0.2/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+<script src="https://cdn.jsdelivr.net/npm/katex-copytex@1.0.2/dist/katex-copytex.min.js" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false},
+    ]
+  });"></script>
+</script>
 ```
 
 For more details and configuration options, see the [KaTeX Auto-render Extension](https://katex.org/docs/autorender.html).
@@ -274,19 +361,22 @@ For more details and configuration options, see [vega/vega-embed](https://github
 Similarly to the example above, if your Markdown includes Mermaid graph specification in `mermaid` code snippets:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/mermaid@8.13.3/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    mermaid.initialize({ startOnLoad: false });
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: document.body.className.includes("dark") ? "dark" : "default"
+    });
     let id = 0;
     for (const codeEl of document.querySelectorAll("pre code.mermaid")) {
       const preEl = codeEl.parentElement;
       const graphDefinition = codeEl.textContent;
       const graphEl = document.createElement("div");
       const graphId = "mermaid-graph-" + id++;
-      mermaid.render(graphId, graphDefinition, function (svgSource, bindListeners) {
-        graphEl.innerHTML = svgSource;
-        bindListeners && bindListeners(graphEl);
+      mermaid.render(graphId, graphDefinition).then(({svg, bindFunctions}) => {
+        graphEl.innerHTML = svg;
+        bindFunctions?.(graphEl);
         preEl.insertAdjacentElement("afterend", graphEl);
         preEl.remove();
       });
@@ -306,8 +396,6 @@ The easiest way to test changes to ExDoc is to locally rebuild the app and its o
   3. If working on the assets, you may wish to run the assets build script in watch mode: `npm run --prefix assets build:watch`.
   4. Run `mix lint` to check if the Elixir and JavaScript files are properly formatted. You can run `mix fix` to let the JavaScript linter and Elixir formatter fix the code automatically before submitting your pull request.
   5. Please do not add the files generated in the `formatters/` directory to your commits. These will be handled as necessary by the repository maintainers.
-
-The build process is currently tested in Node 16 LTS.
 
 See the README in the `assets/` directory for more information on working on the assets.
 

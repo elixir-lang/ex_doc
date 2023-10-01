@@ -1,4 +1,4 @@
-/* globals searchNodes */
+/* globals searchData */
 
 import lunr from 'lunr'
 import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
@@ -21,13 +21,13 @@ export function initialize () {
   }
 }
 
-function search (value) {
+async function search (value) {
   if (isBlank(value)) {
     renderResults({ value })
   } else {
     setSearchInputValue(value)
 
-    const index = getIndex()
+    const index = await getIndex()
 
     try {
       const results = searchResultsToDecoratedSearchNodes(index.search(value))
@@ -44,13 +44,13 @@ function renderResults ({ value, results, errorMessage }) {
   searchContainer.innerHTML = resultsHtml
 }
 
-function getIndex () {
+async function getIndex () {
   lunr.QueryLexer.termSeparator = /\s+/
   lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
   lunr.Pipeline.registerFunction(elixirTrimmerFunction, 'elixirTrimmer')
   lunr.Pipeline.registerFunction(hyphenSearchFunction, 'hyphenSearch')
 
-  const cachedIndex = loadIndex()
+  const cachedIndex = await loadIndex()
   if (cachedIndex) { return cachedIndex }
 
   const index = createIndex()
@@ -58,11 +58,12 @@ function getIndex () {
   return index
 }
 
-function loadIndex () {
+async function loadIndex () {
   try {
     const serializedIndex = sessionStorage.getItem(indexStorageKey())
     if (serializedIndex) {
-      return lunr.Index.load(JSON.parse(serializedIndex))
+      const index = await decompress(serializedIndex)
+      return lunr.Index.load(index)
     } else {
       return null
     }
@@ -72,17 +73,56 @@ function loadIndex () {
   }
 }
 
-function saveIndex (index) {
+async function saveIndex (index) {
   try {
-    const serializedIndex = JSON.stringify(index)
+    const serializedIndex = await compress(index)
     sessionStorage.setItem(indexStorageKey(), serializedIndex)
   } catch (error) {
     console.error('Failed to save index: ', error)
   }
 }
 
+async function compress (index) {
+  const stream = new Blob([JSON.stringify(index)], {
+    type: 'application/json'
+  }).stream().pipeThrough(new window.CompressionStream('gzip'))
+
+  const blob = await new Response(stream).blob()
+  const buffer = await blob.arrayBuffer()
+  return b64encode(buffer)
+}
+
+async function decompress (index) {
+  const stream = new Blob([b64decode(index)], {
+    type: 'application/json'
+  }).stream().pipeThrough(new window.DecompressionStream('gzip'))
+
+  const blob = await new Response(stream).text()
+  return JSON.parse(blob)
+}
+
+function b64encode (buffer) {
+  let binary = ''
+  const bytes = new Uint8Array(buffer)
+  const len = bytes.byteLength
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return window.btoa(binary)
+}
+
+function b64decode (str) {
+  const binaryString = window.atob(str)
+  const len = binaryString.length
+  const bytes = new Uint8Array(new ArrayBuffer(len))
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i)
+  }
+  return bytes
+}
+
 function indexStorageKey () {
-  return `index:${getProjectNameAndVersion()}`
+  return `idv2:${getProjectNameAndVersion()}`
 }
 
 function createIndex () {
@@ -91,6 +131,7 @@ function createIndex () {
     this.ref('ref')
     this.field('title', { boost: 3 })
     this.field('doc')
+    this.field('type')
     this.metadataWhitelist = ['position']
     this.pipeline.remove(lunr.stopWordFilter)
     this.use(hyphenSearch)
@@ -98,7 +139,7 @@ function createIndex () {
     this.pipeline.remove(lunr.trimmer)
     this.use(elixirTrimmer)
 
-    searchNodes.forEach(searchNode => {
+    searchData.items.forEach(searchNode => {
       this.add(searchNode)
     })
   })
@@ -175,7 +216,7 @@ function searchResultsToDecoratedSearchNodes (results) {
 }
 
 function getSearchNodeByRef (ref) {
-  return searchNodes.find(searchNode => searchNode.ref === ref) || null
+  return searchData.items.find(searchNode => searchNode.ref === ref) || null
 }
 
 function getExcerpts (searchNode, metadata) {

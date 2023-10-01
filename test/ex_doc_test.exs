@@ -63,7 +63,7 @@ defmodule ExDocTest do
       source_beam: "beam_dir"
     ]
 
-    {{source_dir, _retr_config}, _config} = ExDoc.generate_docs("Elixir", "1", options)
+    assert {{source_dir, _retr_config}, _config} = ExDoc.generate_docs("Elixir", "1", options)
     assert source_dir == options[:source_beam]
   end
 

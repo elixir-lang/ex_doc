@@ -52,6 +52,7 @@
 .content-inner :is(a, .a-main) {
   color: var(--links);
   text-decoration: underline;
+  text-decoration-color: var(--linksDecoration);
   text-decoration-skip-ink: auto;
 }
 .content-inner :is(a:visited, .a-main:visited) {
@@ -66,7 +67,6 @@
   transition: color .3s ease-in-out;
   background-color: transparent;
   cursor: pointer;
-  padding: 0 0 0 6px;
 }
 .content-inner button.icon-action {
   margin-top: 12px;
@@ -93,10 +93,6 @@
   font-weight: normal;
 }
 
-.content-inner h1 .note {
-  float: right;
-}
-
 .content-inner blockquote {
   border-left: 3px solid var(--blockquoteBorder);
   position: relative;
@@ -104,7 +100,7 @@
   padding: 0 1.2rem;
   overflow: auto;
   background-color: var(--blockquoteBackground);
-  border-radius: 3px;
+  border-radius: var(--borderRadius);
 }
 .content-inner blockquote p:last-child {
   padding-bottom: 1em;
@@ -136,34 +132,49 @@
 }
 
 .content-inner .section-heading {
-  position: relative;
+  --icon-size: 16px;
+  --icon-spacing: 5px;
+  display: grid;
+  grid-template: 1fr / 1fr;
 }
 
-.content-inner .section-heading:hover a.hover-link {
-  opacity: 1;
+.content-inner .section-heading > :is(.hover-link, .text) {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.content-inner .section-heading .hover-link {
   text-decoration: none;
 }
 
-.content-inner .section-heading a.hover-link {
-  transition: opacity .3s ease-in-out;
-  display: inline-block;
+.content-inner .section-heading i {
+  font-size: var(--icon-size);
+  margin-top: .1em;
+  margin-left: calc(-1 * (var(--icon-size) + var(--icon-spacing)));
+  padding-right: var(--icon-spacing); /* Avoids gap in hover area */
   opacity: 0;
-  padding: .3em .4em .6em .6em;
-  line-height: 1em;
-  margin-left: -2.4em;
-  text-decoration: none;
-  border: none;
-  font-size: 16px;
-  vertical-align: middle;
 }
 
 @media screen and (max-width: 768px) {
-  .content-inner .section-heading a.hover-link {
-    position: absolute;
-    bottom: 0;
-    right: -20px;
-    padding: .3em .6em .4em;
+  .content-inner .section-heading i {
+    margin-left: calc(-1 * (var(--icon-size)));
   }
+}
+
+.content-inner blockquote .section-heading i {
+  display: none;
+}
+
+.content-inner .section-heading .hover-link:is(:hover, :focus) i {
+  opacity: 1;
+}
+
+/* Allow section link to be hovered and used “through” text */
+.content-inner .section-heading .text {
+  pointer-events: none;
+}
+.content-inner .section-heading .text a {
+  pointer-events: all;
 }
 
 .content-inner .app-vsn {

@@ -5,21 +5,34 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
   @moduletag :otp_eep48
   @moduletag :tmp_dir
 
-  test "it works", c do
+  setup %{tmp_dir: tmp_dir} do
+    output = tmp_dir <> "/doc"
+    File.mkdir!(output)
+    File.touch!("#{output}/.build")
+  end
+
+  test "smoke test", c do
     erlc(c, :foo, ~S"""
     %% @doc
     %% foo module.
     -module(foo).
-    -export([foo/1]).
-    -export_type([t/0]).
+    -export([foo/1, bar/0]).
+    -export_type([t/0, t2/0]).
 
     %% @doc
     %% f/0 function.
     -spec foo(atom()) -> atom().
     foo(X) -> X.
 
+    -spec bar() -> baz.
+    bar() -> baz.
+
     -type t() :: atom().
     %% t/0 type.
+
+    -record(rec, {k1 :: any(), k2 :: any()}).
+
+    -type t2() :: #rec{k1 :: uri_string:uri_string(), k2 :: uri_string:uri_string() | undefined}.
     """)
 
     doc = generate_docs(c)
@@ -29,6 +42,12 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
 
     assert "-type t() :: atom()." =
              doc |> Floki.find("pre:fl-contains('t() :: atom().')") |> Floki.text()
+
+    assert "-type t2() :: #rec{k1 :: uri_string:uri_string(), k2 :: uri_string:uri_string() | undefined}."
+
+    doc
+    |> Floki.find("pre:fl-contains('t2() ::')")
+    |> Floki.text()
   end
 
   defp generate_docs(c) do

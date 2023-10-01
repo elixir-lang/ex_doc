@@ -37,9 +37,9 @@
       </footer>
     </div>
   </div>
-</section>
+</main>
 </div>
   <%# Extra content specified by the user (e.g. custom Javascript) %>
-  <%= config.before_closing_body_tag.(:html) %>
+  <%= before_closing_body_tag(config, :html) %>
   </body>
 </html>

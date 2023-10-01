@@ -1,4 +1,5 @@
 @import '@fontsource/lato/300.css';
+@import '@fontsource/lato/400.css';
 @import '@fontsource/lato/700.css';
 @import '@fontsource/merriweather/300.css';
 @import '@fontsource/merriweather/300-italic.css';
@@ -14,6 +15,7 @@
 @import 'icons.css';
 @import 'layout.css';
 @import 'sidebar.css';
+@import 'focus.css';
 @import 'content/general.css';
 @import 'content/admonition.css';
 @import 'content/summary.css';
@@ -35,6 +37,7 @@
 @import 'print.css';
 @import 'print-cheatsheet.css';
 @import 'makeup.css';
+@import 'tabset.css';
 
 body:not(.dark) .content-inner img[src*="#gh-dark-mode-only"],
 body.dark .content-inner img[src*="#gh-light-mode-only"] {

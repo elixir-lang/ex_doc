@@ -25,7 +25,7 @@
     <% end %>
     <script async src="<%= asset_rev config.output, "dist/html-*.js" %>"></script>
     <%# Extra content specified by the user (e.g. custom CSS) %>
-    <%= config.before_closing_head_tag.(:html) %>
+    <%= before_closing_head_tag(config, :html) %>
   </head>
   <body data-type="<%= sidebar_type(page.type) %>" class="page-<%= page.type %>">
     <script>

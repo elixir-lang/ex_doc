@@ -1,0 +1,41 @@
+/* For backwards compatibility, style :focus state so that it works in all browsers,
+but unstyle not-focus-visible focus state in browsers that support focus-visible */
+
+/* extra button selectors necessary to overwrite normalize.css */
+*:focus,
+button:focus,
+[type="button"]:focus,
+[type="reset"]:focus,
+[type="submit"]:focus {
+  outline: 2px solid var(--main);
+  /* negative offset to make outline visible when overflow hidden */
+  outline-offset: -2px;
+}
+
+*:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+[type="button"]:focus:not(:focus-visible),
+[type="reset"]:focus:not(:focus-visible),
+[type="submit"]:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+/* inputs you can type into don't need an extra focus style
+because they have a visible cursor */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="month"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+textarea {
+  outline: 0;
+}

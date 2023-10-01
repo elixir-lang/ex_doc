@@ -18,7 +18,6 @@
   transition: border-color 150ms;
 }
 #settings-modal-content .input:focus {
-  outline: none;
   border-color: var(--main);
 }
 #settings-modal-content .input::placeholder {
@@ -43,6 +42,7 @@
 
 #settings-modal-content .switch-button-container > div > p {
   font-size: 14px;
+  font-weight: 300;
   line-height: 1.4;
   margin: 0;
   padding-bottom: 6px;
@@ -92,6 +92,19 @@
   background-color: var(--main);
 }
 
+#settings-modal-content .switch-button__checkbox:focus {
+  outline: 0;
+}
+
+#settings-modal-content .switch-button__checkbox:focus + .switch-button__bg {
+  outline: 2px solid var(--main);
+  outline-offset: 2px;
+}
+
+#settings-modal-content .switch-button__checkbox:focus:not(:focus-visible) + .switch-button__bg {
+  outline: 0;
+}
+
 #settings-modal-content .settings-select {
   cursor: pointer;
   position: relative;
@@ -102,8 +115,4 @@
 
 #settings-modal-content .settings-select option {
   color: initial;
-}
-
-#settings-modal-content .settings-select:focus {
-  outline: none;
 }

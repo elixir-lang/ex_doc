@@ -12,6 +12,19 @@ defmodule ExDoc.DocASTTest do
                [{:p, [], [{:strong, [], ["foo"], %{}}], %{}}]
     end
 
+    test "markdown comments" do
+      markdown = """
+      **foo**
+      <!-- bar -->
+      """
+
+      assert DocAST.parse!(markdown, "text/markdown") ==
+               [
+                 {:p, [], [{:strong, [], ["foo"], %{}}], %{}},
+                 {:comment, [], [" bar "], %{comment: true}}
+               ]
+    end
+
     test "markdown errors" do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert DocAST.parse!("`String.upcase", "text/markdown") ==
@@ -138,5 +151,64 @@ defmodule ExDoc.DocASTTest do
              ) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
     end
+  end
+
+  describe "sectionize" do
+    test "sectioninize" do
+      list = [
+        {:h1, [], ["H1"], %{}},
+        {:h2, [class: "example"], ["H2-1"], %{}},
+        {:p, [], ["p1"], %{}},
+        {:h3, [], ["H3-1"], %{}},
+        {:p, [], ["p2"], %{}},
+        {:h3, [], ["H3-2"], %{}},
+        {:p, [], ["p3"], %{}},
+        {:h3, [], ["H3-3"], %{}},
+        {:p, [], ["p4"], %{}},
+        {:h2, [], ["H2-2"], %{}},
+        {:p, [], ["p5"], %{}},
+        {:h3, [class: "last"], ["H3-1"], %{}},
+        {:p, [], ["p6"], %{}}
+      ]
+
+      assert DocAST.sectionize(list, &h2_or_h3?/1) ==
+               [
+                 {:h1, [], ["H1"], %{}},
+                 {:section, [class: "h2 example"],
+                  [
+                    {:h2, [class: "example"], ["H2-1"], %{}},
+                    {:p, [], ["p1"], %{}},
+                    {:section, [class: "h3"],
+                     [
+                       {:h3, [], ["H3-1"], %{}},
+                       {:p, [], ["p2"], %{}}
+                     ], %{}},
+                    {:section, [class: "h3"],
+                     [
+                       {:h3, [], ["H3-2"], %{}},
+                       {:p, [], ["p3"], %{}}
+                     ], %{}},
+                    {:section, [class: "h3"],
+                     [
+                       {:h3, [], ["H3-3"], %{}},
+                       {:p, [], ["p4"], %{}}
+                     ], %{}}
+                  ], %{}},
+                 {:section, [class: "h2"],
+                  [
+                    {:h2, [], ["H2-2"], %{}},
+                    {:p, [], ["p5"], %{}},
+                    {:section, [class: "h3 last"],
+                     [
+                       {:h3, [class: "last"], ["H3-1"], %{}},
+                       {:p, [], ["p6"], %{}}
+                     ], %{}}
+                  ], %{}}
+               ]
+    end
+
+    defp h2_or_h3?({:h2, _, _, _}), do: true
+    defp h2_or_h3?({:h3, _, _, _}), do: true
+    defp h2_or_h3?(_), do: false
   end
 end

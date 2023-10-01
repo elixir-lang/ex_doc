@@ -22,6 +22,10 @@ defmodule TestHelper do
   def elixirc(context, filename \\ "nofile", code) do
     dir = context.tmp_dir
 
+    output_dir = context.tmp_dir <> "/html"
+    File.mkdir_p!(output_dir)
+    File.write!(output_dir <> "/.build", "")
+
     src_path = Path.join([dir, filename])
     src_path |> Path.dirname() |> File.mkdir_p!()
     File.write!(src_path, code)
@@ -39,6 +43,8 @@ defmodule TestHelper do
 
       File.rm_rf!(dir)
     end)
+
+    modules
   end
 
   def erlc(context, module, code, opts \\ []) do
@@ -71,7 +77,7 @@ defmodule TestHelper do
       edoc_to_chunk(module)
     end
 
-    :ok
+    [module]
   end
 
   if otp_eep48? do
@@ -86,6 +92,8 @@ defmodule TestHelper do
           layout: :edoc_layout_chunks,
           dir: dir ++ ~c"/doc"
         )
+
+      module
     end
   else
     def edoc_to_chunk(_) do

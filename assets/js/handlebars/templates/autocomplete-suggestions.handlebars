@@ -6,7 +6,12 @@
   {{#each suggestions}}
     <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
       <div class="title">
-        <span translate="no">{{{title}}}</span>
+        {{# if deprecated }}
+          <s><span translate="no">{{{title}}}</span></s>
+        {{ else }}
+          <span translate="no">{{{title}}}</span>
+        {{/if}}
+
         {{#if label}}
           <span class="label">({{label}})</span>
         {{/if}}

@@ -6,10 +6,9 @@
 #search .loading {
   height: 64px;
   width: 64px;
-  vertical-align: middle;
   position: absolute;
   top: 50%;
-  left: calc(18%);
+  left: calc(50% - 32px);
 }
 
 #search .loading div {

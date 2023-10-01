@@ -12,7 +12,7 @@ defmodule ExDoc.RetrieverTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([A], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([A], %ExDoc.Config{})
       assert mod.doc == nil
     end
 
@@ -26,7 +26,7 @@ defmodule ExDoc.RetrieverTest do
       end
       """)
 
-      [mod] = Retriever.docs_from_modules([A], %ExDoc.Config{})
+      {[mod], []} = Retriever.docs_from_modules([A], %ExDoc.Config{})
       [foo] = mod.docs
       assert foo.id == "foo/0"
       assert foo.annotations == ["since 1.0.0"]
@@ -55,7 +55,7 @@ defmodule ExDoc.RetrieverTest do
         ]
       }
 
-      [qux, bar, foo, baz] = Retriever.docs_from_modules([Foo, Bar, Baz, Qux], config)
+      {[qux, bar, foo, baz], []} = Retriever.docs_from_modules([Foo, Bar, Baz, Qux], config)
       assert %{module: Foo, group: :"Group 1"} = foo
       assert %{module: Bar, group: :"Group 1"} = bar
       assert %{module: Baz, group: :"Group 2"} = baz
@@ -83,7 +83,7 @@ defmodule ExDoc.RetrieverTest do
         ]
       }
 
-      [mod] = Retriever.docs_from_modules([A], config)
+      {[mod], []} = Retriever.docs_from_modules([A], config)
       [bar, baz, foo] = mod.docs
 
       assert %{id: "foo/0", group: :"Group 1"} = foo
@@ -101,7 +101,7 @@ defmodule ExDoc.RetrieverTest do
       end
       """)
 
-      [mod] =
+      {[mod], []} =
         Retriever.docs_from_modules([A], %ExDoc.Config{
           annotations_for_docs: fn metadata ->
             if metadata[:foo] do
@@ -126,7 +126,7 @@ defmodule ExDoc.RetrieverTest do
       end
       """)
 
-      [mod] =
+      {[mod], []} =
         Retriever.docs_from_modules([A], %ExDoc.Config{
           annotations_for_docs: fn metadata ->
             if metadata[:foo] do
@@ -157,7 +157,7 @@ defmodule ExDoc.RetrieverTest do
       end
       """)
 
-      mods =
+      {mods, []} =
         Retriever.docs_from_modules(
           [Nesting.Prefix.B.A, Nesting.Prefix.B.C],
           %ExDoc.Config{nest_modules_by_prefix: ["Nesting.Prefix.B"]}
@@ -171,7 +171,7 @@ defmodule ExDoc.RetrieverTest do
       assert Enum.at(mods, 1).nested_context == "Nesting.Prefix.B"
       assert Enum.at(mods, 1).nested_title == ".C"
 
-      [mod] =
+      {[mod], []} =
         Retriever.docs_from_modules([Nesting.Prefix.B.B.A], %ExDoc.Config{
           nest_modules_by_prefix: ["Nesting.Prefix.B.B.A"]
         })
@@ -201,10 +201,11 @@ defmodule ExDoc.RetrieverTest do
 
     ebin_dir = Path.join(c.tmp_dir, "ebin")
     config = %ExDoc.Config{filter_modules: fn module, _ -> Atom.to_string(module) =~ "A" end}
-    [a, a_a] = Retriever.docs_from_dir(ebin_dir, config)
 
-    assert a.id == "A"
-    assert a_a.id == "A.A"
+    assert {
+             [%{id: "A"}, %{id: "A.A"}],
+             [%{id: "B"}]
+           } = Retriever.docs_from_dir(ebin_dir, config)
   end
 
   test "natural sorting", c do
@@ -229,7 +230,7 @@ defmodule ExDoc.RetrieverTest do
     end
     """)
 
-    [mod] = Retriever.docs_from_modules([NaturallySorted], %ExDoc.Config{})
+    {[mod], []} = Retriever.docs_from_modules([NaturallySorted], %ExDoc.Config{})
 
     [function_A_0, function_A_1, function_a_0, function_a_1, function_B_0, function_b_0] =
       mod.docs
@@ -255,7 +256,7 @@ defmodule ExDoc.RetrieverTest do
     end
     """)
 
-    [module_node] = Retriever.docs_from_modules([NoWhitespaceInSignature], %ExDoc.Config{})
+    {[module_node], []} = Retriever.docs_from_modules([NoWhitespaceInSignature], %ExDoc.Config{})
     %{docs: [%{signature: signature}]} = module_node
     assert signature == "callback_name(arg1, integer, %Date{}, term, t)"
   end

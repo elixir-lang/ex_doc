@@ -12,8 +12,12 @@ defmodule ExDoc.Retriever do
 
   @doc """
   Extract documentation from all modules in the specified directory or directories.
+
+  Returns a tuple containing `{modules, filtered}`, using `config.filter_modules`
+  as a filter criteria.
   """
-  @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
+  @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) ::
+          {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]}
   def docs_from_dir(dir, config) when is_binary(dir) do
     files = Path.wildcard(Path.expand("*.beam", dir))
 
@@ -28,13 +32,30 @@ defmodule ExDoc.Retriever do
   end
 
   @doc """
-  Extract documentation from all modules in the list `modules`
+  Extract documentation from all modules and returns a tuple containing
+  `{modules, filtered}`, two lists of modules that were extracted and filtered
+  by `config.filter_modules`, respectively.
   """
-  @spec docs_from_modules([atom], ExDoc.Config.t()) :: [ExDoc.ModuleNode.t()]
+  @spec docs_from_modules([atom], ExDoc.Config.t()) ::
+          {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]}
   def docs_from_modules(modules, config) when is_list(modules) do
     modules
-    |> Enum.flat_map(&get_module(&1, config))
+    |> Enum.reduce({[], []}, fn module_name, {modules, filtered} = acc ->
+      case get_module(module_name, config) do
+        {:error, _module} ->
+          acc
+
+        {:ok, module_node} ->
+          if config.filter_modules.(module_node.module, module_node.metadata),
+            do: {[module_node | modules], filtered},
+            else: {modules, [module_node | filtered]}
+      end
+    end)
     |> sort_modules(config)
+  end
+
+  defp sort_modules({modules, filtered}, config) do
+    {sort_modules(modules, config), sort_modules(filtered, config)}
   end
 
   defp sort_modules(modules, config) when is_list(modules) do
@@ -50,14 +71,13 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_module(module, config) do
-    with {:docs_v1, _, language, _, _, metadata, _} = docs_chunk <- docs_chunk(module),
-         true <- config.filter_modules.(module, metadata),
+    with {:docs_v1, _, language, _, _, _metadata, _} = docs_chunk <- docs_chunk(module),
          {:ok, language} <- ExDoc.Language.get(language, module),
          %{} = module_data <- language.module_data(module, docs_chunk, config) do
-      [generate_node(module, module_data, config)]
+      {:ok, generate_node(module, module_data, config)}
     else
       _ ->
-        []
+        {:error, module}
     end
   end
 
@@ -75,7 +95,7 @@ defmodule ExDoc.Retriever do
             docs
 
           {:error, reason} ->
-            IO.warn("skipping module #{inspect(module)}, reason: #{reason}", [])
+            IO.warn("skipping docs for module #{inspect(module)}, reason: #{reason}", [])
             false
         end
 
@@ -101,7 +121,7 @@ defmodule ExDoc.Retriever do
     source_url = config.source_url_pattern
     source_path = source_path(module, config)
     source = %{url: source_url, path: source_path}
-    {doc_line, moduledoc, metadata} = get_module_docs(module_data, source_path)
+    {doc_line, format, source_doc, doc, metadata} = get_module_docs(module_data, source_path)
 
     # TODO: The default function groups must be returned by the language
     groups_for_docs =
@@ -134,13 +154,16 @@ defmodule ExDoc.Retriever do
       deprecated: metadata[:deprecated],
       docs_groups: docs_groups,
       docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
-      doc: moduledoc,
+      doc_format: format,
+      doc: doc,
+      source_doc: source_doc,
       doc_line: doc_line,
       typespecs: ExDoc.Utils.natural_sort_by(types, &"#{&1.name}/#{&1.arity}"),
       source_path: source_path,
       source_url: source_link(source, module_data.line),
       language: module_data.language,
-      annotations: List.wrap(metadata[:tags])
+      annotations: List.wrap(metadata[:tags]),
+      metadata: metadata
     }
   end
 
@@ -148,17 +171,17 @@ defmodule ExDoc.Retriever do
     DocAST.parse!(doc_content, format, options)
   end
 
-  defp doc_ast(_, _, _options) do
+  defp doc_ast(_format, _, _options) do
     nil
   end
 
   # Module Helpers
 
   defp get_module_docs(module_data, source_path) do
-    {:docs_v1, anno, _, content_type, moduledoc, metadata, _} = module_data.docs
+    {:docs_v1, anno, _, format, moduledoc, metadata, _} = module_data.docs
     doc_line = anno_line(anno)
     options = [file: source_path, line: doc_line + 1]
-    {doc_line, doc_ast(content_type, moduledoc, options), metadata}
+    {doc_line, format, moduledoc, doc_ast(format, moduledoc, options), metadata}
   end
 
   ## Function helpers
@@ -197,13 +220,13 @@ defmodule ExDoc.Retriever do
          groups_for_docs,
          annotations_for_docs
        ) do
-    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
+    {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
     doc_line = anno_line(anno)
 
     annotations =
       annotations_for_docs.(metadata) ++
-        annotations_from_metadata(metadata) ++ function_data.extra_annotations
+        annotations_from_metadata(metadata, module_metadata) ++ function_data.extra_annotations
 
     line = function_data.line || doc_line
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
@@ -220,6 +243,7 @@ defmodule ExDoc.Retriever do
       arity: arity,
       deprecated: metadata[:deprecated],
       doc: doc_ast,
+      source_doc: doc_content,
       doc_line: doc_line,
       defaults: ExDoc.Utils.natural_sort_by(defaults, fn {name, arity} -> "#{name}/#{arity}" end),
       signature: signature(signature),
@@ -270,7 +294,7 @@ defmodule ExDoc.Retriever do
   defp get_callback(callback, source, groups_for_docs, module_data, annotations_for_docs) do
     callback_data = module_data.language.callback_data(callback, module_data)
 
-    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
+    {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{kind, name, arity}, anno, _signature, doc, metadata} = callback
     doc_line = anno_line(anno)
 
@@ -279,7 +303,7 @@ defmodule ExDoc.Retriever do
 
     annotations =
       annotations_for_docs.(metadata) ++
-        callback_data.extra_annotations ++ annotations_from_metadata(metadata)
+        callback_data.extra_annotations ++ annotations_from_metadata(metadata, module_metadata)
 
     doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
 
@@ -292,6 +316,7 @@ defmodule ExDoc.Retriever do
       arity: arity,
       deprecated: metadata[:deprecated],
       doc: doc_ast,
+      source_doc: doc,
       doc_line: doc_line,
       signature: signature,
       specs: specs,
@@ -314,10 +339,10 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_type(type_entry, source, module_data) do
-    {:docs_v1, _, _, content_type, _, _, _} = module_data.docs
+    {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{_, name, arity}, anno, _signature, doc, metadata} = type_entry
     doc_line = anno_line(anno)
-    annotations = annotations_from_metadata(metadata)
+    annotations = annotations_from_metadata(metadata, module_metadata)
 
     type_data = module_data.language.type_data(type_entry, module_data)
     signature = signature(type_data.signature)
@@ -332,6 +357,7 @@ defmodule ExDoc.Retriever do
       spec: type_data.spec,
       deprecated: metadata[:deprecated],
       doc: doc_ast,
+      source_doc: doc,
       doc_line: doc_line,
       signature: signature,
       source_path: source.path,
@@ -344,17 +370,13 @@ defmodule ExDoc.Retriever do
 
   defp signature(list) when is_list(list), do: Enum.join(list, " ")
 
-  defp annotations_from_metadata(metadata) do
-    annotations = []
-
-    annotations =
-      if since = metadata[:since] do
-        ["since #{since}" | annotations]
-      else
-        annotations
-      end
-
-    annotations
+  defp annotations_from_metadata(metadata, module_metadata) do
+    # Give precedence to the function/callback/type metadata over the module metadata.
+    cond do
+      since = metadata[:since] -> ["since #{since}"]
+      since = module_metadata[:since] -> ["since #{since}"]
+      true -> []
+    end
   end
 
   defp anno_line(line) when is_integer(line), do: abs(line)

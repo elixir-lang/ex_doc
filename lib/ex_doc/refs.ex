@@ -99,22 +99,24 @@ defmodule ExDoc.Refs do
             {{ref_kind, module, name, arity}, visibility}
           end
 
-      {:error, _} ->
-        if Code.ensure_loaded?(module) do
+      {:error, _reason} ->
+        with true <- :code.which(module) != :non_existing,
+             true <- Code.ensure_loaded?(module) do
           # We say it is limited because the types may not actually be available in the beam file.
           [{{:module, module}, :limited}] ++
             to_refs(exports(module), module, :function) ++
             to_refs(callbacks(module), module, :callback) ++
             to_refs(types(module, [:type, :opaque]), module, :type)
         else
-          [{{:module, module}, :undefined}]
+          _ ->
+            [{{:module, module}, :undefined}]
         end
     end
   end
 
   defguardp has_no_docs(doc) when doc == :none or doc == %{}
 
-  defp starts_with_underscore?(name), do: hd(Atom.to_charlist(name)) == ?_
+  defp starts_with_underscore?(name), do: match?([?_ | _], Atom.to_charlist(name))
 
   defp visibility(:hidden),
     do: :hidden

@@ -10,6 +10,7 @@
   --linksVisited:                var(--black);
   --linksNoUnderline:            var(--main-darkened-10);
   --linksNoUnderlineVisited:     var(--main-darkened-20);
+  --linksDecoration:             var(--gray450);
 
   --iconAction:                  var(--coldGray);
   --iconActionHover:             var(--gray800);
@@ -39,10 +40,19 @@
 
   --codeBackground:              var(--gray25);
   --codeBorder:                  var(--gray100);
-  --inlineCodeBackground:        var(--codeBackground);
-  --inlineCodeBorder:            var(--codeBorder);
   --codeScrollThumb:             var(--gray400);
   --codeScrollBackground:        var(--codeBorder);
+  --admCodeBackground:           var(--gray25);
+  --admCodeBorder:               var(--gray100);
+  --admInlineCode:               var(--black);
+  --admInlineCodeBackground:     var(--gray25);
+  --admInlineCodeBorder:         var(--gray100);
+
+  --tabBackground:               var(--white);
+  --tabBorder:                   var(--gray300);
+  --tabBorderTop:                var(--gray100);
+  --tab:                         var(--gray600);
+  --tabShadow:                   var(--gray25);
 
   --bottomActionsBtnBorder:      var(--black-opacity-10);
   --bottomActionsBtnSubheader:   var(--main-darkened-10);
@@ -59,6 +69,21 @@
 
   --success:                     var(--green);
 
-  --sidebarButton:               var(--gray50);
-  --sidebarButtonBackground:     linear-gradient(180deg, var(--white) 20%, var(--white-opacity-50) 70%, var(--white-opacity-0) 100%);
+  --sidebarButtonBackground:     linear-gradient(180deg,
+                                                 var(--white) 20%,
+                                                 var(--white-opacity-50) 70%,
+                                                 var(--white-opacity-0) 100%);
+  --sidebarAccentMain:           var(--gray50);
+  --sidebarBackground:           var(--gray800);
+  --sidebarHeader:               var(--gray700);
+  --sidebarMuted:                var(--gray300);
+  --sidebarHover:                var(--white);
+  --sidebarScrollbarThumb:       var(--coldGray);
+  --sidebarScrollbarTrack:       var(--sidebarBackground);
+  --sidebarSearch:               var(--gray700);
+  --sidebarSubheadings:          var(--gray400);
+  --sidebarItem:                 var(--gray200);
+  --sidebarInactiveItemMarker:   var(--gray600);
+  --sidebarLanguageAccentBar:    var(--main);
+  --sidebarActiveItem:           var(--main-lightened-10);
 }

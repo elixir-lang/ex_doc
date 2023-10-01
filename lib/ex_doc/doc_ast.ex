@@ -40,6 +40,10 @@ defmodule ExDoc.DocAST do
     fun.(list, result)
   end
 
+  def to_string({:comment, _attrs, inner, _meta} = ast, fun) do
+    fun.(ast, "<!--#{inner}-->")
+  end
+
   def to_string({tag, attrs, _inner, _meta} = ast, fun) when tag in @void_elements do
     result = "<#{tag}#{ast_attributes_to_string(attrs)}/>"
     fun.(ast, result)
@@ -100,13 +104,9 @@ defmodule ExDoc.DocAST do
   """
   def extract_title(ast)
 
-  def extract_title([{:h1, _attrs, inner, _meta} | ast]) do
-    {:ok, inner, ast}
-  end
-
-  def extract_title(_ast) do
-    :error
-  end
+  def extract_title([{:comment, _, _, _} | ast]), do: extract_title(ast)
+  def extract_title([{:h1, _attrs, inner, _meta} | ast]), do: {:ok, inner, ast}
+  def extract_title(_ast), do: :error
 
   @doc """
   Returns text content from the given AST.
@@ -124,6 +124,36 @@ defmodule ExDoc.DocAST do
 
   def do_text_from_ast(ast) when is_binary(ast), do: ast
   def do_text_from_ast({_tag, _attr, ast, _meta}), do: text_from_ast(ast)
+
+  @doc """
+  Wraps a list of HTML nodes into `<section>` tags whenever `matcher` returns true.
+  """
+  def sectionize(list, matcher), do: sectionize(list, matcher, [])
+
+  defp sectionize(list, matcher, acc) do
+    case pivot(list, acc, matcher) do
+      {acc, {header_tag, header_attrs, _, _} = header, rest} ->
+        {inner, rest} = Enum.split_while(rest, &not_tag?(&1, header_tag))
+        class = String.trim_trailing("#{header_tag} #{header_attrs[:class]}")
+        section = {:section, [class: class], [header | sectionize(inner, matcher, [])], %{}}
+        sectionize(rest, matcher, [section | acc])
+
+      acc ->
+        acc
+    end
+  end
+
+  defp not_tag?({tag, _, _, _}, tag), do: false
+  defp not_tag?(_, _tag), do: true
+
+  defp pivot([head | tail], acc, fun) do
+    case fun.(head) do
+      true -> {acc, head, tail}
+      false -> pivot(tail, [head | acc], fun)
+    end
+  end
+
+  defp pivot([], acc, _fun), do: Enum.reverse(acc)
 
   @doc """
   Highlights a DocAST converted to string.

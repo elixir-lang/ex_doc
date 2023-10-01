@@ -2,6 +2,7 @@
   /* Layout & Whitespace */
   --content-width: 949px;
   --content-gutter: 60px;
+  --borderRadius: 4px;
 
   /* Font Families */
   --serifFontFamily: 'Merriweather', 'Book Antiqua', Georgia, 'Century Schoolbook', serif;
@@ -19,11 +20,14 @@
   --gray200:                 hsl(210,  29%,  88%      );
   --gray300:                 hsl(210,  26%,  84%      );
   --gray400:                 hsl(210,  21%,  64%      );
+  --gray450:                 hsl(210,  21%,  49%      );
   --gray500:                 hsl(210,  21%,  34%      );
   --gray600:                 hsl(210,  27%,  26%      );
   --gray700:                 hsl(212,  35%,  17%      );
+  --gray750:                 hsl(214,  46%,  14%      );
   --gray800:                 hsl(216,  52%,  11%      );
   --gray800-opacity-0:      hsla(216,  52%,  11%,   0%);
+  --gray850:                 hsl(216,  63%,   8%      );
   --gray900:                 hsl(218,  73%,   4%      );
   --gray900-opacity-50:     hsla(218,  73%,   4%,  50%);
   --gray900-opacity-0:      hsla(218,  73%,   4%,   0%);

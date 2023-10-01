@@ -10,7 +10,9 @@ defmodule ExDoc.ModuleNode do
             module: nil,
             group: nil,
             deprecated: nil,
+            doc_format: nil,
             doc: nil,
+            source_doc: nil,
             rendered_doc: nil,
             doc_line: nil,
             docs_groups: [],
@@ -20,7 +22,8 @@ defmodule ExDoc.ModuleNode do
             source_url: nil,
             type: nil,
             language: nil,
-            annotations: []
+            annotations: [],
+            metadata: nil
 
   @typep annotation :: atom()
 
@@ -32,7 +35,9 @@ defmodule ExDoc.ModuleNode do
           module: module(),
           group: atom() | nil,
           deprecated: String.t() | nil,
+          doc_format: String.t() | nil,
           doc: ExDoc.DocAST.t() | nil,
+          source_doc: term(),
           rendered_doc: String.t() | nil,
           doc_line: non_neg_integer(),
           docs_groups: [atom()],
@@ -42,7 +47,8 @@ defmodule ExDoc.ModuleNode do
           source_url: String.t() | nil,
           type: atom(),
           language: module(),
-          annotations: [annotation()]
+          annotations: [annotation()],
+          metadata: map()
         }
 end
 
@@ -57,6 +63,7 @@ defmodule ExDoc.FunctionNode do
             defaults: [],
             deprecated: nil,
             doc: nil,
+            source_doc: nil,
             rendered_doc: nil,
             type: nil,
             signature: nil,
@@ -77,6 +84,7 @@ defmodule ExDoc.FunctionNode do
           defaults: [function_default()],
           deprecated: String.t() | nil,
           doc: ExDoc.DocAST.t() | nil,
+          source_doc: String.t() | nil,
           rendered_doc: String.t() | nil,
           type: atom(),
           signature: String.t(),
@@ -100,6 +108,7 @@ defmodule ExDoc.TypeNode do
             type: nil,
             deprecated: nil,
             doc: nil,
+            source_doc: nil,
             rendered_doc: nil,
             doc_line: nil,
             source_path: nil,
@@ -117,6 +126,7 @@ defmodule ExDoc.TypeNode do
           type: atom(),
           deprecated: nil,
           doc: ExDoc.DocAST.t() | nil,
+          source_doc: String.t() | nil,
           rendered_doc: String.t() | nil,
           doc_line: non_neg_integer(),
           source_path: String.t(),

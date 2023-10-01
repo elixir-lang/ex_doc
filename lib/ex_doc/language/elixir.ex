@@ -11,32 +11,36 @@ defmodule ExDoc.Language.Elixir do
   def module_data(module, docs_chunk, config) do
     {type, skip} = module_type_and_skip(module)
 
-    if skip do
-      :skip
-    else
-      title = module_title(module, type)
-      abst_code = Erlang.get_abstract_code(module)
-      line = Erlang.find_module_line(module, abst_code)
-      optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
+    cond do
+      skip ->
+        :skip
 
-      %{
-        module: module,
-        docs: docs_chunk,
-        language: __MODULE__,
-        id: inspect(module),
-        title: title,
-        type: type,
-        line: line,
-        callback_types: [:callback, :macrocallback],
-        nesting_info: nesting_info(title, config.nest_modules_by_prefix),
-        private: %{
-          abst_code: abst_code,
-          specs: Erlang.get_specs(module),
-          callbacks: Erlang.get_callbacks(module),
-          impls: get_impls(module),
-          optional_callbacks: optional_callbacks
+      abst_code = Erlang.get_abstract_code(module) ->
+        title = module_title(module, type)
+        line = Erlang.find_module_line(module, abst_code)
+        optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
+
+        %{
+          module: module,
+          docs: docs_chunk,
+          language: __MODULE__,
+          id: inspect(module),
+          title: title,
+          type: type,
+          line: line,
+          callback_types: [:callback, :macrocallback],
+          nesting_info: nesting_info(title, config.nest_modules_by_prefix),
+          private: %{
+            abst_code: abst_code,
+            specs: Erlang.get_specs(module),
+            callbacks: Erlang.get_callbacks(module),
+            impls: get_impls(module),
+            optional_callbacks: optional_callbacks
+          }
         }
-      }
+
+      true ->
+        IO.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
     end
   end
 
@@ -92,7 +96,7 @@ defmodule ExDoc.Language.Elixir do
   # If it is none, then we need to look at underscore.
   # TODO: We can remove this on Elixir v1.13 as all underscored are hidden.
   defp doc?({{_, name, _}, _, _, :none, _}, _type) do
-    hd(Atom.to_charlist(name)) != ?_
+    not match?([?_ | _], Atom.to_charlist(name))
   end
 
   # Everything else is hidden.
@@ -427,11 +431,12 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp walk_doc({tag, attrs, ast, meta}, config) do
-    {tag, attrs, walk_doc(ast, config), meta}
+    {tag, attrs, List.flatten(walk_doc(ast, config)), meta}
   end
 
-  defp remove_link({:a, _attrs, inner, _meta}),
-    do: inner
+  defp remove_link({:a, _attrs, inner, _meta}) do
+    inner
+  end
 
   @ref_regex ~r/^`(.+)`$/
 
@@ -439,13 +444,41 @@ defmodule ExDoc.Language.Elixir do
     case Keyword.fetch(attrs, :href) do
       {:ok, href} ->
         case Regex.scan(@ref_regex, href) do
-          [[_, custom_link]] -> url(custom_link, :custom_link, config)
-          [] -> build_extra_link(href, config)
+          [[_, custom_link]] ->
+            custom_link
+            |> url(:custom_link, config)
+            |> remove_and_warn_if_invalid(custom_link, config)
+
+          [] ->
+            build_extra_link(href, config)
         end
 
       _ ->
         nil
     end
+  end
+
+  defp remove_and_warn_if_invalid(nil, reference, config) do
+    warn(
+      ~s[documentation references "#{reference}" but it is invalid],
+      {config.file, config.line},
+      config.id
+    )
+
+    :remove_link
+  end
+
+  defp remove_and_warn_if_invalid(result, _, _), do: result
+
+  defp warn(message, {file, line}, id) do
+    warning = IO.ANSI.format([:yellow, "warning: ", :reset])
+
+    stacktrace =
+      "  #{file}" <>
+        if(line, do: ":#{line}", else: "") <>
+        if(id, do: ": #{id}", else: "")
+
+    IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
   end
 
   defp build_extra_link(link, config) do
@@ -517,10 +550,23 @@ defmodule ExDoc.Language.Elixir do
     timeout: 0
   ]
 
-  defp url(string = "mix help " <> name, mode, config), do: mix_task(name, string, mode, config)
-  defp url(string = "mix " <> name, mode, config), do: mix_task(name, string, mode, config)
+  defp url(string = "mix help " <> name, mode, config) do
+    name |> mix_task(string, mode, config) |> maybe_remove_link(mode)
+  end
+
+  defp url(string = "mix " <> name, mode, config) do
+    name |> mix_task(string, mode, config) |> maybe_remove_link(mode)
+  end
 
   defp url(string, mode, config) do
+    if Enum.any?(config.skip_code_autolink_to, &(&1 == string)) do
+      nil
+    else
+      parse_url(string, mode, config)
+    end
+  end
+
+  defp parse_url(string, mode, config) do
     case Regex.run(~r{^(.+)/(\d+)$}, string) do
       [_, left, right] ->
         with {:ok, arity} <- parse_arity(right) do
@@ -528,10 +574,14 @@ defmodule ExDoc.Language.Elixir do
 
           case parse_module_function(rest) do
             {:local, function} ->
-              local_url(kind, function, arity, config, string, mode: mode)
+              kind
+              |> local_url(function, arity, config, string, mode: mode)
+              |> maybe_remove_link(mode)
 
             {:remote, module, function} ->
-              remote_url({kind, module, function, arity}, config, string, mode: mode)
+              {kind, module, function, arity}
+              |> remote_url(config, string, mode: mode)
+              |> maybe_remove_link(mode)
 
             :error ->
               nil
@@ -553,6 +603,15 @@ defmodule ExDoc.Language.Elixir do
       _ ->
         nil
     end
+  end
+
+  # Remove link when we fail to parse reference so we don't warn twice
+  defp maybe_remove_link(nil, :custom_link) do
+    :remove_link
+  end
+
+  defp maybe_remove_link(result, _mode) do
+    result
   end
 
   defp kind("c:" <> rest), do: {:callback, rest}
@@ -724,11 +783,15 @@ defmodule ExDoc.Language.Elixir do
         (\(.*\))                                      # Arguments <rest />
       }x
 
-    Regex.replace(regex, string, fn _all, call_string, module_string, name_string, rest ->
+    Regex.replace(regex, string, fn all, call_string, module_string, name_string, rest ->
       module = string_to_module(module_string)
       name = String.to_atom(name_string)
       arity = count_args(rest, 0, 0)
       original_text = call_string <> "()"
+
+      if Enum.any?(config.filtered_modules, &(&1.id == module_string)) do
+        warn("Typespec references filtered module: #{all}", {config.file, config.line}, config.id)
+      end
 
       url =
         if module do

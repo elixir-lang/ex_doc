@@ -1,9 +1,13 @@
 <form autocomplete="off">
-  <select class="sidebar-projectVersionsDropdown">
-    {{#each nodes}}
-      <option translate="no" value="{{url}}"{{#if isCurrentVersion}} selected disabled{{/if}}>
-        {{version}}
-      </option>
-    {{/each}}
-  </select>
+  <label>
+    <span class="sidebar-projectVersionsDropdownCaret" aria-hidden="true">&#x25bc;</span>
+    <span class="sr-only">Project version</span>
+    <select class="sidebar-projectVersionsDropdown">
+      {{#each nodes}}
+        <option translate="no" value="{{url}}"{{#if isCurrentVersion}} selected disabled{{/if}}>
+          {{version}}
+        </option>
+      {{/each}}
+    </select>
+  </label>
 </form>
