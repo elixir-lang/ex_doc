@@ -124,6 +124,27 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://www.erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
     end
 
+    test "abstract types - description", c do
+      # if type exists:
+      # <code><a href="#type-myList">myList</a>(X)</code>
+      assert autolink_doc("{@type myList(X). A special kind of lists ...}", c) ==
+               ~s|<a href="#t:myList/1"><code>myList(X)</code></a>|
+    end
+
+    test "abstract types - description+dot", c do
+      # if type exists:
+      # <code><a href="#type-myList">myList</a>(X)</code>
+      assert autolink_doc("{@type myList(X, Y).}", c) ==
+               ~s|<a href="#t:myList/2"><code>myList(X, Y)</code></a>|
+    end
+
+    test "abstract types - no description", c do
+      # if type exists:
+      # <code><a href="#type-myList">myList</a>(X)</code>
+      assert autolink_doc("{@type myList()}", c) ==
+               ~s|<a href="#t:myList/0"><code>myList()</code></a>|
+    end
+
     test "bad module", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad}", c) == ~s|<code>bad</code>|
