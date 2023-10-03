@@ -215,22 +215,8 @@ defmodule ExDoc.Language.Erlang do
     binary
   end
 
-  defp walk_doc({:code, attrs, [{:a, a_attrs, [a_inner], _a_meta} | _] = a, meta}, _config) do
-    {arity, extra} =
-      case :lists.keydelete(:a, 1, a) do
-        [] ->
-          {0, ""}
-
-        [extra] ->
-          # a_meta is not broken down, so we have to parse stuff like (X, Y)
-          {extra |> String.split(",") |> Enum.count(), extra}
-      end
-
-    type = type_from_fragment(:otp, a_attrs[:href])
-    url = fragment(:ex_doc, :type, type, arity)
-    text = a_inner <> extra
-
-    {:a, [href: url], {:code, attrs, [text], meta}, %{}}
+  defp walk_doc({:code, _attrs, [{:a, _, _, _}], _meta} = ast, _config) do
+    ast
   end
 
   defp walk_doc({:code, attrs, [code], meta} = ast, config) do
@@ -473,8 +459,6 @@ defmodule ExDoc.Language.Erlang do
   defp fragment(:ex_doc, :type, name, arity) do
     "#t:#{name}/#{arity}"
   end
-
-  defp type_from_fragment(:otp, "#type-" <> name), do: name
 
   defp kind("c:" <> rest), do: {:callback, rest}
   defp kind("t:" <> rest), do: {:type, rest}
