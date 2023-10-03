@@ -125,22 +125,16 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "abstract types - description", c do
-      # if type exists:
-      # <code><a href="#type-myList">myList</a>(X)</code>
       assert autolink_doc("{@type myList(X). A special kind of lists ...}", c) ==
                ~s|<code><a href=\"#type-myList\">myList</a>(X)</code>|
     end
 
     test "abstract types - description+dot", c do
-      # if type exists:
-      # <code><a href="#type-myList">myList</a>(X)</code>
       assert autolink_doc("{@type myList(X, Y).}", c) ==
                ~s|<code><a href=\"#type-myList\">myList</a>(X, Y)</code>|
     end
 
     test "abstract types - no description", c do
-      # if type exists:
-      # <code><a href="#type-myList">myList</a>(X)</code>
       assert autolink_doc("{@type myList()}", c) ==
                ~s|<code><a href=\"#type-myList\">myList()</a></code>|
     end
