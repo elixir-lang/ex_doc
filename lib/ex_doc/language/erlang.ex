@@ -215,6 +215,10 @@ defmodule ExDoc.Language.Erlang do
     binary
   end
 
+  defp walk_doc({:code, _attrs, [{:a, _, _, _}], _meta} = ast, _config) do
+    ast
+  end
+
   defp walk_doc({:code, attrs, [code], meta} = ast, config) do
     {text, url} =
       case parse_autolink(code) do
