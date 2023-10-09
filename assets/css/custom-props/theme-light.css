@@ -80,10 +80,13 @@
   --sidebarHover:                var(--white);
   --sidebarScrollbarThumb:       var(--coldGray);
   --sidebarScrollbarTrack:       var(--sidebarBackground);
-  --sidebarSearch:               var(--gray700);
   --sidebarSubheadings:          var(--gray400);
   --sidebarItem:                 var(--gray200);
   --sidebarInactiveItemMarker:   var(--gray600);
   --sidebarLanguageAccentBar:    var(--main);
   --sidebarActiveItem:           var(--main-lightened-10);
+  --searchBarBorder:             var(--gray200);
+  --searchAccentMain:            var(--gray-400);
+  --searchLanguageAccentBar:     var(--main);
+  --searchSearch:                var(--white);
 }

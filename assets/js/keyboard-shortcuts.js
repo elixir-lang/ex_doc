@@ -1,6 +1,6 @@
 import { qs } from './helpers'
 import { openSidebar, toggleSidebar } from './sidebar/sidebar-drawer'
-import { focusSearchInput } from './sidebar/sidebar-search'
+import { focusSearchInput } from './search-bar'
 import { cycleTheme } from './theme'
 import { openQuickSwitchModal } from './quick-switch'
 import { closeModal, isModalOpen } from './modal'
@@ -82,7 +82,6 @@ function handleKeyUp (event) {
 
 function searchKeyAction (event) {
   closeModal()
-  openSidebar()
   focusSearchInput()
 }
 

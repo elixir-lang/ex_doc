@@ -2,7 +2,6 @@
 <%= sidebar_template(config, nodes_map) %>
 
 <h1>
-  <%= settings_button_template() %>
   <%= if module.source_url do %>
     <a href="<%= module.source_url %>" title="View Source" class="icon-action" rel="help">
       <i class="ri-code-s-slash-line" aria-hidden="true"></i>

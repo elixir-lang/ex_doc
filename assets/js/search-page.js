@@ -2,7 +2,7 @@
 
 import lunr from 'lunr'
 import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
-import { setSearchInputValue } from './sidebar/sidebar-search'
+import { setSearchInputValue } from './search-bar'
 
 const EXCERPT_RADIUS = 80
 

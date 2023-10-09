@@ -147,76 +147,6 @@
   color: var(--sidebarAccentMain);
 }
 
-.sidebar .sidebar-search {
-  margin-top: 12px;
-}
-
-.sidebar .sidebar-search.selected .search-button,
-.sidebar .sidebar-search .search-button:hover,
-.sidebar .sidebar-search .search-button:focus {
-  color: var(--sidebarLanguageAccentBar);
-  opacity: 1;
-}
-
-.sidebar .sidebar-search .search-label {
-  position: relative;
-  width: 100%;
-}
-
-.sidebar .sidebar-search .search-button {
-  font-size: 14px;
-  color: var(--sidebarAccentMain);
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  left: 22px;
-  margin: 0;
-  opacity: .5;
-  padding: 3px 1px 3px 0;
-  position: absolute;
-  top: 18px;
-  z-index: 2;
-}
-
-.sidebar .sidebar-search .search-close-button {
-  font-size: var(--sidebarFontSize);
-  color: var(--sidebarAccentMain);
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  right: 18px;
-  margin: 0;
-  opacity: .5;
-  padding: 5px 1px 5px 0;
-  position: absolute;
-  transform: scaleY(0);
-  top: 17px;
-  transition: .15s transform ease-out;
-  z-index: 2;
-}
-
-.sidebar .sidebar-search .search-close-button:hover {
-  opacity: .7;
-}
-
-.sidebar .sidebar-search .search-input {
-  background-color: var(--sidebarSearch);
-  border: none;
-  border-radius: var(--borderRadius);
-  color: var(--sidebarAccentMain);
-  margin-left: 12px;
-  padding: 8px 6px 8px 38px;
-  width: 276px;
-}
-
-.sidebar .sidebar-search .search-input::placeholder {
-  color: var(--sidebarAccentMain);
-  opacity: 0.3;
-}
-
-.sidebar .sidebar-search .ri-search-2-line {
-  font-weight: bold;
-}
 
 .sidebar .sidebar-tabpanel {
   flex: 1 1 .01%;
@@ -470,6 +400,7 @@
 }
 .sidebar-closed .sidebar-button {
   color: var(--contrast);
+  margin: 8px;
 }
 
 @media screen and (max-height: 500px) {

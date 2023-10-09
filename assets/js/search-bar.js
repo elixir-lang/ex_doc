@@ -6,11 +6,11 @@ import {
   updateAutocompleteList,
   AUTOCOMPLETE_CONTAINER_SELECTOR,
   AUTOCOMPLETE_SUGGESTION_SELECTOR
-} from '../autocomplete/autocomplete-list'
-import { qs } from '../helpers'
+} from './autocomplete/autocomplete-list'
+import { qs } from './helpers'
 
-const SEARCH_INPUT_SELECTOR = 'form.sidebar-search input'
-const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.sidebar-search .search-close-button'
+const SEARCH_INPUT_SELECTOR = 'form.search-bar input'
+const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-bar .search-close-button'
 
 /**
  * Initializes the sidebar search box.
