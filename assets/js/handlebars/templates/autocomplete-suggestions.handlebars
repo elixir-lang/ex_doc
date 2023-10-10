@@ -1,8 +1,14 @@
+<div class="triangle"></div>
 <div class="autocomplete-suggestions">
-  <a class="autocomplete-suggestion" href="search.html?q={{term}}" data-index="-1" tabindex="-1">
-    <div class="title">"<em>{{term}}</em>"</div>
-    <div class="description">Search the documentation</div>
-  </a>
+  <div class="autocomplete-results">
+    <span class="show">Showing search results for 
+      <span class="bold"> "{{term}}" </span>.
+    </span> 
+    <span class="mobile-hide">Press 
+      <span class="bold">RETURN</span> 
+      to see all results.
+    </span>
+  </div>
   {{#each suggestions}}
     <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
       <div class="title">

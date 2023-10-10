@@ -1,5 +1,5 @@
 import { qs } from './helpers'
-import { openSidebar, toggleSidebar } from './sidebar/sidebar-drawer'
+import { toggleSidebar } from './sidebar/sidebar-drawer'
 import { focusSearchInput } from './search-bar'
 import { cycleTheme } from './theme'
 import { openQuickSwitchModal } from './quick-switch'

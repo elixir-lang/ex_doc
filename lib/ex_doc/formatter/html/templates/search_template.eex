@@ -3,7 +3,6 @@
 
 <div id="search">
   <h1>
-    <%= settings_button_template() %>
     <span></span>
   </h1>
 
