@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.30.7 (2023-10-15)
+
+  * Bug fixes
+    * Do not crash on EDoc type annotations
+    * Do not crash on functions without name
+    * Handle remote types in records
+    * Fix scrolling to top on iOS
+    * Fix invalid output markup for “hover link” headings
+
+  * Enhancements
+    * Support any String.Chars as the extra page name
+    * Improve screen reader accessibility
+    * Add `:skip_code_autolink_to` option
+
 ## v0.30.6 (2023-08-25)
 
   * Enhancements
