@@ -37,12 +37,14 @@
 
 .page-cheatmd .content-inner h3 {
   color: var(--main);
+  text-decoration-color: var(--main);
   margin: 0 0 1em;
   font-weight: 400;
 }
 
 .page-cheatmd .content-inner h3 :is(a, a:visited) {
   color: var(--main);
+  text-decoration-color: var(--main);
 }
 
 .page-cheatmd .content-inner section.h3 {
