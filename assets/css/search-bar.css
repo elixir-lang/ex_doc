@@ -1,5 +1,5 @@
 .top-search {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .search-settings {
@@ -116,6 +116,7 @@
 @media (max-width: 480px) {
   .search-bar {
     width: 90%;
+    margin-left: 35px;
   }
 
   .top-search .search-settings .icon-settings {
@@ -123,12 +124,19 @@
   }
 }
 
-@media (min-width: 481px) and (max-width: 767px) {
+@media (min-width: 481px) and (max-width: 768px) {
   .search-bar {
-    width: 92%;
+    width: 95%;
+    margin-left: 35px;
   }
 
   .top-search .search-settings .icon-settings {
-    width: 8%;
+    width: 5%;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-search {
+    margin-top: 0;
   }
 }

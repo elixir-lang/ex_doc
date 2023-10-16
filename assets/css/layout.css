@@ -47,6 +47,7 @@ body {
   top: 0;
   transition: all var(--sidebarTransitionDuration) ease-in-out;
   will-change: transform;
+  margin-top: 6px;
 }
 
 .content {
@@ -109,7 +110,28 @@ body.sidebar-closed .content {
   left: 0;
 }
 
+.content-inner {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 3px var(--content-gutter);
+}
+
+.content-inner:focus {
+  outline: none;
+}
+
+.content-outer {
+  min-height: 100%;
+}
+
 @media screen and (max-width: 768px) {
+
+  .sidebar-button {
+    position: absolute;
+    top: 4px;
+    left: -1px;
+  }
+
   .sidebar-button:before {
     --sidebarButtonHeight: 60px;
     content: "";
@@ -121,7 +143,6 @@ body.sidebar-closed .content {
     top: 0;
     height: var(--sidebarButtonHeight);
     width: calc(100vw + 2px);
-    background: var(--sidebarButtonBackground);
     transition: top var(--sidebarTransitionDuration) ease-in-out;
   }
 
@@ -141,20 +162,6 @@ body.sidebar-closed .content {
 body.search-focused .search-bar .search-close-button {
   transform: scaleY(1);
   transition: transform 0.15s ease-out 0.15s;
-}
-
-.content-inner {
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 3px var(--content-gutter);
-}
-
-.content-inner:focus {
-  outline: none;
-}
-
-.content-outer {
-  min-height: 100%;
 }
 
 @media screen and (max-width: 768px) {

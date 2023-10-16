@@ -124,6 +124,18 @@
   background-color: var(--autocompleteSrollbarTrack);
 }
 
+@media (max-width: 480px) {
+  .autocomplete .triangle {
+    left: 27%; 
+  }
+}
+
+@media (max-width: 767px) {
+  .autocomplete .triangle {
+    left: 17%; 
+  }
+}
+
 @media (max-width: 1024px) {
   .autocomplete-results {
     gap: 0;
