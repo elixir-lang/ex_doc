@@ -206,6 +206,11 @@ defmodule ExDoc.RetrieverTest do
              [%{id: "A"}, %{id: "A.A"}],
              [%{id: "B"}]
            } = Retriever.docs_from_dir(ebin_dir, config)
+
+    assert {
+             [%{id: "A"}, %{id: "A.A"}],
+             [%{id: "B"}]
+           } = Retriever.docs_from_dir([ebin_dir], config)
   end
 
   test "natural sorting", c do

@@ -19,16 +19,23 @@ defmodule ExDoc.Retriever do
   @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) ::
           {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]}
   def docs_from_dir(dir, config) when is_binary(dir) do
+    dir
+    |> docs_from_dir({[], []}, config)
+    |> sort_modules(config)
+  end
+
+  def docs_from_dir(dirs, config) when is_list(dirs) do
+    dirs
+    |> Enum.reduce({[], []}, &docs_from_dir(&1, &2, config))
+    |> sort_modules(config)
+  end
+
+  defp docs_from_dir(dir, acc, config) do
     files = Path.wildcard(Path.expand("*.beam", dir))
 
     files
     |> Enum.map(&filename_to_module/1)
-    |> docs_from_modules(config)
-  end
-
-  def docs_from_dir(dirs, config) when is_list(dirs) do
-    Enum.flat_map(dirs, &docs_from_dir(&1, config))
-    |> sort_modules(config)
+    |> docs_from_modules(acc, config)
   end
 
   @doc """
@@ -39,8 +46,11 @@ defmodule ExDoc.Retriever do
   @spec docs_from_modules([atom], ExDoc.Config.t()) ::
           {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]}
   def docs_from_modules(modules, config) when is_list(modules) do
-    modules
-    |> Enum.reduce({[], []}, fn module_name, {modules, filtered} = acc ->
+    modules |> docs_from_modules({[], []}, config) |> sort_modules(config)
+  end
+
+  defp docs_from_modules(modules, acc, config) do
+    Enum.reduce(modules, acc, fn module_name, {modules, filtered} = acc ->
       case get_module(module_name, config) do
         {:error, _module} ->
           acc
@@ -51,7 +61,6 @@ defmodule ExDoc.Retriever do
             else: {modules, [module_node | filtered]}
       end
     end)
-    |> sort_modules(config)
   end
 
   defp sort_modules({modules, filtered}, config) do

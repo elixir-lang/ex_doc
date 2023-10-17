@@ -22,7 +22,7 @@ defmodule ExDoc do
     end
 
     {module_nodes, filtered_nodes} = config.retriever.docs_from_dir(config.source_beam, config)
-    find_formatter(config.formatter).run({module_nodes, filtered_nodes}, config)
+    find_formatter(config.formatter).run(module_nodes, filtered_nodes, config)
   end
 
   # Short path for programmatic interface

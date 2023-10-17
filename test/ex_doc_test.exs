@@ -12,7 +12,7 @@ defmodule ExDocTest do
 
   # Simple formatter that returns whatever is passed into it
   defmodule IdentityFormatter do
-    def run(modules, config) do
+    def run(modules, _filtered, config) do
       {modules, config}
     end
   end
@@ -63,7 +63,7 @@ defmodule ExDocTest do
       source_beam: "beam_dir"
     ]
 
-    assert {{source_dir, _retr_config}, _config} = ExDoc.generate_docs("Elixir", "1", options)
+    assert {source_dir, _config} = ExDoc.generate_docs("Elixir", "1", options)
     assert source_dir == options[:source_beam]
   end
 
