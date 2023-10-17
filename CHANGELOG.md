@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.30.8 (2023-10-17)
+
+  * Bug fixes
+    * Fix regression in umbrella applications
+
 ## v0.30.7 (2023-10-15)
 
   * Bug fixes
