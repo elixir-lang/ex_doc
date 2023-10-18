@@ -30,7 +30,7 @@ function fixLinks () {
  * Add CSS classes to `blockquote` elements when those are used to
  * support admonition text blocks
  */
-function fixBlockquotes () {
+export function fixBlockquotes () {
   const classes = ['warning', 'info', 'error', 'neutral', 'tip']
 
   classes.forEach(element => {
