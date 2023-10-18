@@ -1,6 +1,7 @@
 @import 'custom-props/common.css';
 @import 'custom-props/theme-light.css';
 
+@import 'content/epub-admonition.css';
 @import 'content/code.css';
 @import 'content/functions.css';
 @import 'screen-reader.css';
