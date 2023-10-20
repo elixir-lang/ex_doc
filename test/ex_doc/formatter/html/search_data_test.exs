@@ -4,12 +4,6 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
 
   @moduletag :tmp_dir
 
-  setup %{tmp_dir: tmp_dir} do
-    output = tmp_dir <> "/doc"
-    File.mkdir!(output)
-    File.touch!("#{output}/.build")
-  end
-
   test "Elixir module", c do
     modules =
       elixirc(c, ~S'''

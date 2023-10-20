@@ -5,12 +5,6 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
   @moduletag :otp_eep48
   @moduletag :tmp_dir
 
-  setup %{tmp_dir: tmp_dir} do
-    output = tmp_dir <> "/doc"
-    File.mkdir!(output)
-    File.touch!("#{output}/.build")
-  end
-
   test "smoke test", c do
     erlc(c, :foo, ~S"""
     %% @doc

@@ -22,10 +22,6 @@ defmodule TestHelper do
   def elixirc(context, filename \\ "nofile", code) do
     dir = context.tmp_dir
 
-    output_dir = context.tmp_dir <> "/html"
-    File.mkdir_p!(output_dir)
-    File.write!(output_dir <> "/.build", "")
-
     src_path = Path.join([dir, filename])
     src_path |> Path.dirname() |> File.mkdir_p!()
     File.write!(src_path, code)

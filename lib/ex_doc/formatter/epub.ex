@@ -10,14 +10,9 @@ defmodule ExDoc.Formatter.EPUB do
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
-    parent = config.output
     config = normalize_config(config)
-
-    HTML.setup_output(
-      parent,
-      &cleanup_output_dir(&1, config),
-      &create_output_dir(&1, config)
-    )
+    File.rm_rf!(config.output)
+    File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
     project_nodes =
       HTML.render_all(project_nodes, filtered_modules, ".xhtml", config, highlight_tag: "samp")
@@ -48,16 +43,6 @@ defmodule ExDoc.Formatter.EPUB do
     {:ok, epub} = generate_epub(config.output)
     File.rm_rf!(config.output)
     Path.relative_to_cwd(epub)
-  end
-
-  defp create_output_dir(root, config) do
-    File.mkdir_p!(Path.join(config.output, "OEBPS"))
-    File.touch!(Path.join(root, ".build"))
-  end
-
-  defp cleanup_output_dir(docs_root, config) do
-    File.rm_rf!(config.output)
-    create_output_dir(docs_root, config)
   end
 
   defp normalize_config(config) do

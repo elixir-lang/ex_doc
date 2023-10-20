@@ -6,12 +6,6 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   @moduletag :tmp_dir
 
-  setup %{tmp_dir: tmp_dir} do
-    output = tmp_dir <> "/html"
-    File.mkdir_p!(output)
-    File.touch!(output <> "/.build")
-  end
-
   defp read_wildcard!(path) do
     [file] = Path.wildcard(path)
     File.read!(file)
