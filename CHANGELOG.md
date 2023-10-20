@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.30.9 (2023-10-20)
+
+  * Bug fixes
+    * Fix a scenario where invalid assets would be generated
+
+  * Enhancements
+    * Add admonition EPUB styles
+
 ## v0.30.8 (2023-10-17)
 
   * Bug fixes
