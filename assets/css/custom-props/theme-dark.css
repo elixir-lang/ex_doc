@@ -80,10 +80,21 @@ body.dark {
   --sidebarHover:                var(--white);
   --sidebarScrollbarThumb:       var(--coldGray);
   --sidebarScrollbarTrack:       var(--sidebarBackground);
-  --sidebarSearch:               var(--gray700);
   --sidebarSubheadings:          var(--gray400);
   --sidebarItem:                 var(--gray200);
   --sidebarInactiveItemMarker:   var(--gray600);
   --sidebarLanguageAccentBar:    var(--main);
   --sidebarActiveItem:           var(--main-lightened-10);
+  --searchBarBorder:             var(--gray500);
+  --searchAccentMain:            var(--gray300);
+  --searchLanguageAccentBar:     var(--main);
+  --searchSearch:                var(--gray900);
+  --autocompleteBorder:          rgba(0,0,0,.25);
+  --autocompleteHover:           var(--gray700);
+  --autocompleBackground:        var(--gray800);
+  --suggestionBorder:            var(--gray600);
+  --autocompleteResults:         var(--gray200);
+  --autocompleteResultsBold:     var(--gray100);
+  --autocompleteSrollbarThumb:   var(--gray600);
+  --autocompleteSrollbarTrack:   var(--gray850);
 }

@@ -5,11 +5,6 @@ describe('hints extraction', () => {
     const modulePageObject = parseHTML(`
       <div>
         <h1>
-          <button class="icon-action display-settings">
-            <i class="ri-settings-3-line"></i>
-            <span class="sr-only">Settings</span>
-          </button>
-
           <a href="https://github.com/" title="View Source" class="icon-action" rel="help">
             <i class="ri-code-s-slash-line" aria-hidden="true"></i>
             <span class="sr-only">View Source</span>

@@ -1,21 +1,27 @@
-(()=>{(function(){var d=Handlebars.template,y=Handlebars.templates=Handlebars.templates||{};y["autocomplete-suggestions"]=d({1:function(o,l,a,f,r){var e,n,u=l??(o.nullContext||{}),s=o.hooks.helperMissing,i="function",c=o.escapeExpression,t=o.lookupProperty||function(p,m){if(Object.prototype.hasOwnProperty.call(p,m))return p[m]};return'    <a href="'+c((n=(n=t(a,"link")||(l!=null?t(l,"link"):l))!=null?n:s,typeof n===i?n.call(u,{name:"link",hash:{},data:r,loc:{start:{line:7,column:13},end:{line:7,column:21}}}):n))+'" class="autocomplete-suggestion" data-index="'+c((n=(n=t(a,"index")||r&&t(r,"index"))!=null?n:s,typeof n===i?n.call(u,{name:"index",hash:{},data:r,loc:{start:{line:7,column:67},end:{line:7,column:77}}}):n))+`" tabindex="-1">
+(()=>{(function(){var d=Handlebars.template,y=Handlebars.templates=Handlebars.templates||{};y["autocomplete-suggestions"]=d({1:function(o,l,a,f,r){var e,n,u=l??(o.nullContext||{}),s=o.hooks.helperMissing,i="function",c=o.escapeExpression,t=o.lookupProperty||function(p,m){if(Object.prototype.hasOwnProperty.call(p,m))return p[m]};return'    <a href="'+c((n=(n=t(a,"link")||(l!=null?t(l,"link"):l))!=null?n:s,typeof n===i?n.call(u,{name:"link",hash:{},data:r,loc:{start:{line:13,column:13},end:{line:13,column:21}}}):n))+'" class="autocomplete-suggestion" data-index="'+c((n=(n=t(a,"index")||r&&t(r,"index"))!=null?n:s,typeof n===i?n.call(u,{name:"index",hash:{},data:r,loc:{start:{line:13,column:67},end:{line:13,column:77}}}):n))+`" tabindex="-1">
       <div class="title">
-`+((e=t(a,"if").call(u,l!=null?t(l,"deprecated"):l,{name:"if",hash:{},fn:o.program(2,r,0),inverse:o.program(4,r,0),data:r,loc:{start:{line:9,column:8},end:{line:13,column:15}}}))!=null?e:"")+`
-`+((e=t(a,"if").call(u,l!=null?t(l,"label"):l,{name:"if",hash:{},fn:o.program(6,r,0),inverse:o.noop,data:r,loc:{start:{line:15,column:8},end:{line:17,column:15}}}))!=null?e:"")+`      </div>
+`+((e=t(a,"if").call(u,l!=null?t(l,"deprecated"):l,{name:"if",hash:{},fn:o.program(2,r,0),inverse:o.program(4,r,0),data:r,loc:{start:{line:15,column:8},end:{line:19,column:15}}}))!=null?e:"")+`
+`+((e=t(a,"if").call(u,l!=null?t(l,"label"):l,{name:"if",hash:{},fn:o.program(6,r,0),inverse:o.noop,data:r,loc:{start:{line:21,column:8},end:{line:23,column:15}}}))!=null?e:"")+`      </div>
 
-`+((e=t(a,"if").call(u,l!=null?t(l,"description"):l,{name:"if",hash:{},fn:o.program(8,r,0),inverse:o.noop,data:r,loc:{start:{line:20,column:6},end:{line:24,column:13}}}))!=null?e:"")+`    </a>
-`},2:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'          <s><span translate="no">'+((e=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:10,column:34},end:{line:10,column:45}}}):n))!=null?e:"")+`</span></s>
-`},4:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'          <span translate="no">'+((e=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:12,column:31},end:{line:12,column:42}}}):n))!=null?e:"")+`</span>
-`},6:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return'          <span class="label">('+o.escapeExpression((e=(e=n(a,"label")||(l!=null?n(l,"label"):l))!=null?e:o.hooks.helperMissing,typeof e=="function"?e.call(l??(o.nullContext||{}),{name:"label",hash:{},data:r,loc:{start:{line:16,column:31},end:{line:16,column:40}}}):e))+`)</span>
+`+((e=t(a,"if").call(u,l!=null?t(l,"description"):l,{name:"if",hash:{},fn:o.program(8,r,0),inverse:o.noop,data:r,loc:{start:{line:26,column:6},end:{line:30,column:13}}}))!=null?e:"")+`    </a>
+`},2:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'          <s><span translate="no">'+((e=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:16,column:34},end:{line:16,column:45}}}):n))!=null?e:"")+`</span></s>
+`},4:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'          <span translate="no">'+((e=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:18,column:31},end:{line:18,column:42}}}):n))!=null?e:"")+`</span>
+`},6:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return'          <span class="label">('+o.escapeExpression((e=(e=n(a,"label")||(l!=null?n(l,"label"):l))!=null?e:o.hooks.helperMissing,typeof e=="function"?e.call(l??(o.nullContext||{}),{name:"label",hash:{},data:r,loc:{start:{line:22,column:31},end:{line:22,column:40}}}):e))+`)</span>
 `},8:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return`        <div class="description" translate="no">
-          `+((e=(n=(n=u(a,"description")||(l!=null?u(l,"description"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"description",hash:{},data:r,loc:{start:{line:22,column:10},end:{line:22,column:27}}}):n))!=null?e:"")+`
+          `+((e=(n=(n=u(a,"description")||(l!=null?u(l,"description"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"description",hash:{},data:r,loc:{start:{line:28,column:10},end:{line:28,column:27}}}):n))!=null?e:"")+`
         </div>
-`},compiler:[8,">= 4.3.0"],main:function(o,l,a,f,r){var e,n,u=l??(o.nullContext||{}),s=o.hooks.helperMissing,i="function",c=o.escapeExpression,t=o.lookupProperty||function(p,m){if(Object.prototype.hasOwnProperty.call(p,m))return p[m]};return`<div class="autocomplete-suggestions">
-  <a class="autocomplete-suggestion" href="search.html?q=`+c((n=(n=t(a,"term")||(l!=null?t(l,"term"):l))!=null?n:s,typeof n===i?n.call(u,{name:"term",hash:{},data:r,loc:{start:{line:2,column:57},end:{line:2,column:65}}}):n))+`" data-index="-1" tabindex="-1">
-    <div class="title">"<em>`+c((n=(n=t(a,"term")||(l!=null?t(l,"term"):l))!=null?n:s,typeof n===i?n.call(u,{name:"term",hash:{},data:r,loc:{start:{line:3,column:28},end:{line:3,column:36}}}):n))+`</em>"</div>
-    <div class="description">Search the documentation</div>
-  </a>
-`+((e=t(a,"each").call(u,l!=null?t(l,"suggestions"):l,{name:"each",hash:{},fn:o.program(1,r,0),inverse:o.noop,data:r,loc:{start:{line:6,column:2},end:{line:26,column:11}}}))!=null?e:"")+`</div>
+`},compiler:[8,">= 4.3.0"],main:function(o,l,a,f,r){var e,n,u=l??(o.nullContext||{}),s=o.lookupProperty||function(i,c){if(Object.prototype.hasOwnProperty.call(i,c))return i[c]};return`<div class="triangle"></div>
+<div class="autocomplete-suggestions">
+  <div class="autocomplete-results">
+    <span class="show">Autocompletion results for 
+      <span class="bold"> "`+o.escapeExpression((n=(n=s(a,"term")||(l!=null?s(l,"term"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(u,{name:"term",hash:{},data:r,loc:{start:{line:5,column:27},end:{line:5,column:35}}}):n))+`" </span>.
+    </span> 
+    <span class="mobile-hide">Press 
+      <span class="bold">RETURN</span> 
+      for full-text search.
+    </span>
+  </div>
+`+((e=s(a,"each").call(u,l!=null?s(l,"suggestions"):l,{name:"each",hash:{},fn:o.program(1,r,0),inverse:o.noop,data:r,loc:{start:{line:12,column:2},end:{line:32,column:11}}}))!=null?e:"")+`</div>
 `},useData:!0}),y["modal-layout"]=d({compiler:[8,">= 4.3.0"],main:function(o,l,a,f,r){return`<div id="modal" class="modal" tabindex="-1">
   <div class="modal-contents">
     <div class="modal-header">
@@ -36,15 +42,15 @@
   </div>
 `},compiler:[8,">= 4.3.0"],main:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return(e=n(a,"each").call(l??(o.nullContext||{}),l!=null?n(l,"results"):l,{name:"each",hash:{},fn:o.program(1,r,0),inverse:o.noop,data:r,loc:{start:{line:1,column:0},end:{line:5,column:9}}}))!=null?e:""},useData:!0}),y["search-results"]=d({1:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return"    Search results for <em>"+o.escapeExpression((e=(e=n(a,"value")||(l!=null?n(l,"value"):l))!=null?e:o.hooks.helperMissing,typeof e=="function"?e.call(l??(o.nullContext||{}),{name:"value",hash:{},data:r,loc:{start:{line:3,column:27},end:{line:3,column:36}}}):e))+`</em>
 `},3:function(o,l,a,f,r){return`    Invalid search
-`},5:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return(e=n(a,"each").call(l??(o.nullContext||{}),l!=null?n(l,"results"):l,{name:"each",hash:{},fn:o.program(6,r,0),inverse:o.noop,data:r,loc:{start:{line:15,column:2},end:{line:26,column:11}}}))!=null?e:""},6:function(o,l,a,f,r){var e,n=o.lambda,u=o.escapeExpression,s=o.lookupProperty||function(i,c){if(Object.prototype.hasOwnProperty.call(i,c))return i[c]};return`    <div class="result">
+`},5:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return(e=n(a,"each").call(l??(o.nullContext||{}),l!=null?n(l,"results"):l,{name:"each",hash:{},fn:o.program(6,r,0),inverse:o.noop,data:r,loc:{start:{line:10,column:2},end:{line:21,column:11}}}))!=null?e:""},6:function(o,l,a,f,r){var e,n=o.lambda,u=o.escapeExpression,s=o.lookupProperty||function(i,c){if(Object.prototype.hasOwnProperty.call(i,c))return i[c]};return`    <div class="result">
       <h2 class="result-id">
         <a href="`+u(n(l!=null?s(l,"ref"):l,l))+`">
           <span translate="no">`+u(n(l!=null?s(l,"title"):l,l))+"</span> <small>("+u(n(l!=null?s(l,"type"):l,l))+`)</small>
         </a>
       </h2>
-`+((e=s(a,"each").call(l??(o.nullContext||{}),l!=null?s(l,"excerpts"):l,{name:"each",hash:{},fn:o.program(7,r,0),inverse:o.noop,data:r,loc:{start:{line:22,column:8},end:{line:24,column:17}}}))!=null?e:"")+`    </div>
+`+((e=s(a,"each").call(l??(o.nullContext||{}),l!=null?s(l,"excerpts"):l,{name:"each",hash:{},fn:o.program(7,r,0),inverse:o.noop,data:r,loc:{start:{line:17,column:8},end:{line:19,column:17}}}))!=null?e:"")+`    </div>
 `},7:function(o,l,a,f,r){var e;return'          <p class="result-elem">'+((e=o.lambda(l,l))!=null?e:"")+`</p>
-`},9:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return((e=(n(a,"isArray")||l&&n(l,"isArray")||o.hooks.helperMissing).call(l??(o.nullContext||{}),l!=null?n(l,"results"):l,{name:"isArray",hash:{},fn:o.program(10,r,0),inverse:o.program(12,r,0),data:r,loc:{start:{line:28,column:2},end:{line:34,column:14}}}))!=null?e:"")+`
+`},9:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return((e=(n(a,"isArray")||l&&n(l,"isArray")||o.hooks.helperMissing).call(l??(o.nullContext||{}),l!=null?n(l,"results"):l,{name:"isArray",hash:{},fn:o.program(10,r,0),inverse:o.program(12,r,0),data:r,loc:{start:{line:23,column:2},end:{line:29,column:14}}}))!=null?e:"")+`
   <p>The search functionality is full-text based. Here are some tips:</p>
 
   <ul>
@@ -58,18 +64,13 @@
   </ul>
 
   <p>To quickly go to a module, type, or function, use the autocompletion feature in the sidebar search.</p>
-`},10:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return"    <p>Sorry, we couldn't find anything for <em>"+o.escapeExpression((e=(e=n(a,"value")||(l!=null?n(l,"value"):l))!=null?e:o.hooks.helperMissing,typeof e=="function"?e.call(l??(o.nullContext||{}),{name:"value",hash:{},data:r,loc:{start:{line:29,column:48},end:{line:29,column:57}}}):e))+`</em>.</p>
-`},12:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return(e=n(a,"if").call(l??(o.nullContext||{}),l!=null?n(l,"value"):l,{name:"if",hash:{},fn:o.program(13,r,0),inverse:o.program(15,r,0),data:r,loc:{start:{line:30,column:2},end:{line:34,column:2}}}))!=null?e:""},13:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return"    <p>Invalid search: "+o.escapeExpression((e=(e=n(a,"errorMessage")||(l!=null?n(l,"errorMessage"):l))!=null?e:o.hooks.helperMissing,typeof e=="function"?e.call(l??(o.nullContext||{}),{name:"errorMessage",hash:{},data:r,loc:{start:{line:31,column:23},end:{line:31,column:39}}}):e))+`.</p>
+`},10:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return"    <p>Sorry, we couldn't find anything for <em>"+o.escapeExpression((e=(e=n(a,"value")||(l!=null?n(l,"value"):l))!=null?e:o.hooks.helperMissing,typeof e=="function"?e.call(l??(o.nullContext||{}),{name:"value",hash:{},data:r,loc:{start:{line:24,column:48},end:{line:24,column:57}}}):e))+`</em>.</p>
+`},12:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return(e=n(a,"if").call(l??(o.nullContext||{}),l!=null?n(l,"value"):l,{name:"if",hash:{},fn:o.program(13,r,0),inverse:o.program(15,r,0),data:r,loc:{start:{line:25,column:2},end:{line:29,column:2}}}))!=null?e:""},13:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return"    <p>Invalid search: "+o.escapeExpression((e=(e=n(a,"errorMessage")||(l!=null?n(l,"errorMessage"):l))!=null?e:o.hooks.helperMissing,typeof e=="function"?e.call(l??(o.nullContext||{}),{name:"errorMessage",hash:{},data:r,loc:{start:{line:26,column:23},end:{line:26,column:39}}}):e))+`.</p>
 `},15:function(o,l,a,f,r){return`    <p>Please type something into the search bar to perform a search.</p>
   `},compiler:[8,">= 4.3.0"],main:function(o,l,a,f,r){var e,n=l??(o.nullContext||{}),u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return`<h1>
-`+((e=u(a,"if").call(n,l!=null?u(l,"value"):l,{name:"if",hash:{},fn:o.program(1,r,0),inverse:o.program(3,r,0),data:r,loc:{start:{line:2,column:2},end:{line:6,column:9}}}))!=null?e:"")+`
-  <button class="icon-action display-settings">
-    <i class="ri-settings-3-line"></i>
-    <span class="sr-only">Settings</span>
-  </button>
-</h1>
+`+((e=u(a,"if").call(n,l!=null?u(l,"value"):l,{name:"if",hash:{},fn:o.program(1,r,0),inverse:o.program(3,r,0),data:r,loc:{start:{line:2,column:2},end:{line:6,column:9}}}))!=null?e:"")+`</h1>
 
-`+((e=(u(a,"isNonEmptyArray")||l&&u(l,"isNonEmptyArray")||o.hooks.helperMissing).call(n,l!=null?u(l,"results"):l,{name:"isNonEmptyArray",hash:{},fn:o.program(5,r,0),inverse:o.program(9,r,0),data:r,loc:{start:{line:14,column:0},end:{line:49,column:20}}}))!=null?e:"")},useData:!0}),y["settings-modal-body"]=d({1:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return(e=n(a,"if").call(l??(o.nullContext||{}),l!=null?n(l,"description"):l,{name:"if",hash:{},fn:o.program(2,r,0),inverse:o.noop,data:r,loc:{start:{line:40,column:6},end:{line:53,column:13}}}))!=null?e:""},2:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return`        <dl class="shortcut-row">
+`+((e=(u(a,"isNonEmptyArray")||l&&u(l,"isNonEmptyArray")||o.hooks.helperMissing).call(n,l!=null?u(l,"results"):l,{name:"isNonEmptyArray",hash:{},fn:o.program(5,r,0),inverse:o.program(9,r,0),data:r,loc:{start:{line:9,column:0},end:{line:44,column:20}}}))!=null?e:"")},useData:!0}),y["settings-modal-body"]=d({1:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return(e=n(a,"if").call(l??(o.nullContext||{}),l!=null?n(l,"description"):l,{name:"if",hash:{},fn:o.program(2,r,0),inverse:o.noop,data:r,loc:{start:{line:40,column:6},end:{line:53,column:13}}}))!=null?e:""},2:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return`        <dl class="shortcut-row">
           <dd class="shortcut-description">
             `+o.escapeExpression(o.lambda(l!=null?n(l,"description"):l,l))+`
           </dd>

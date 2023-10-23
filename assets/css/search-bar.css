@@ -1,0 +1,142 @@
+.top-search {
+  margin-top: 10px;
+}
+
+.search-settings {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar {
+  border: 1px solid var(--searchBarBorder);
+  border-radius: 8px;
+  height: 48px;
+  position: relative;
+  flex-grow: 1;
+  width: 96%;
+}
+
+.top-search .search-bar .search-input {
+  background-color: var(--searchSearch);
+  border: none;
+  border-radius: 8px;
+  color: var(--searchAccentMain);
+  position: relative;
+  height: 46px;
+  padding: 8px 35px 8px 43px;
+  width: 100%;
+}
+
+.top-search .search-bar .search-input::placeholder {
+  color: var(--searchAccentMain);
+  opacity: 0.5;
+}
+
+.top-search .search-bar .search-input:focus {
+  border: 1px solid #8E7CE6; 
+  border-radius: 8px;
+  height: 48px;
+  position: relative;
+  box-shadow: 0px 4px 20px 0px rgba(142, 124, 230, 0.25) inset;
+}
+
+.top-search .search-bar .search-label {
+  position: relative;
+}
+
+.top-search .search-bar .search-button {
+  font-size: 14px;
+  color: var(--searchAccentMain);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  left: 11px;
+  opacity: .5;
+  padding: 5px 1px 5px 5px;
+  position: absolute;
+  top: 60%;
+  transform: translateY(-60%);
+  z-index: 2;
+}
+
+.top-search .search-bar.selected .search-button,
+.top-search .search-bar .search-button:hover,
+.top-search .search-bar .search-button:focus {
+  color: var(--top-searchLanguageAccentBar);
+  opacity: 1;
+}
+
+.top-search .search-bar .search-close-button {
+  font-size: 16px;
+  color: var(--searchAccentMain);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  right: 11px;
+  margin: 0;
+  opacity: .5;
+  padding: 5px 1px 5px 0;
+  position: absolute;
+  transform: scaleY(0);
+  top: calc(50% - 11px);
+  transition: .15s transform ease-out;
+  z-index: 2;
+}
+
+.top-search .search-bar .search-close-button:hover {
+  opacity: .7;
+}
+
+.top-search .search-settings button.icon-settings {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.top-search .search-settings .icon-settings {
+  font-size: 20px;
+  width: 4%;
+  float: right;
+  color: var(--iconAction);
+  text-decoration: none;
+  border: none;
+  transition: color .3s ease-in-out;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 1px 0px 1px 5px;
+}
+
+.top-search .search-settings .icon-settings:hover {
+  color: var(--iconActionHover);
+}
+.top-search .search-settings .icon-settings:visited {
+  color: var(--iconAction);
+}
+
+@media (max-width: 480px) {
+  .search-bar {
+    width: 90%;
+    margin-left: 35px;
+  }
+
+  .top-search .search-settings .icon-settings {
+    width: 10%;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .search-bar {
+    width: 95%;
+    margin-left: 35px;
+  }
+
+  .top-search .search-settings .icon-settings {
+    width: 5%;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-search {
+    margin-top: 0;
+  }
+}

@@ -80,10 +80,21 @@
   --sidebarHover:                var(--white);
   --sidebarScrollbarThumb:       var(--coldGray);
   --sidebarScrollbarTrack:       var(--sidebarBackground);
-  --sidebarSearch:               var(--gray700);
   --sidebarSubheadings:          var(--gray400);
   --sidebarItem:                 var(--gray200);
   --sidebarInactiveItemMarker:   var(--gray600);
   --sidebarLanguageAccentBar:    var(--main);
   --sidebarActiveItem:           var(--main-lightened-10);
+  --searchBarBorder:             var(--gray200);
+  --searchAccentMain:            var(--gray-400);
+  --searchLanguageAccentBar:     var(--main);
+  --searchSearch:                var(--white);
+  --autocompleteBorder:          rgba(3, 9, 19, 0.10);
+  --autocompleteHover:           var(--grey50, #F0F5F9);
+  --autocompleBackground:        var(--white); 
+  --suggestionBorder:            var(--gray200);
+  --autocompleteResults:         var(--gray500);
+  --autocompleteResultsBold:     var(--gray700);
+  --autocompleteSrollbarThumb:   var(--gray200);
+  --autocompleteSrollbarTrack:   var(--gray50);
 }
