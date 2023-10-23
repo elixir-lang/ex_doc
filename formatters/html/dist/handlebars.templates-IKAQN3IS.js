@@ -13,12 +13,12 @@
 `},compiler:[8,">= 4.3.0"],main:function(o,l,a,f,r){var e,n,u=l??(o.nullContext||{}),s=o.lookupProperty||function(i,c){if(Object.prototype.hasOwnProperty.call(i,c))return i[c]};return`<div class="triangle"></div>
 <div class="autocomplete-suggestions">
   <div class="autocomplete-results">
-    <span class="show">Showing search results for 
+    <span class="show">Autocompletion results for 
       <span class="bold"> "`+o.escapeExpression((n=(n=s(a,"term")||(l!=null?s(l,"term"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(u,{name:"term",hash:{},data:r,loc:{start:{line:5,column:27},end:{line:5,column:35}}}):n))+`" </span>.
     </span> 
     <span class="mobile-hide">Press 
       <span class="bold">RETURN</span> 
-      to see all results.
+      for full-text search.
     </span>
   </div>
 `+((e=s(a,"each").call(u,l!=null?s(l,"suggestions"):l,{name:"each",hash:{},fn:o.program(1,r,0),inverse:o.noop,data:r,loc:{start:{line:12,column:2},end:{line:32,column:11}}}))!=null?e:"")+`</div>

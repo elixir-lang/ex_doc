@@ -37,7 +37,7 @@
 .autocomplete-results .show {
   white-space: normal;
   overflow-x: hidden;
-  width: 67%;
+  width: 62%;
 }
 
 .autocomplete-results .bold {
@@ -46,7 +46,7 @@
 }
 
 .autocomplete-results .mobile-hide {
-  width: 30%;
+  width: 35%;
 }
 
 .autocomplete.shown {
@@ -104,6 +104,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
+}
+
+.autocomplete-suggestions a {
+  text-decoration: none !important;
 }
 
 /* Style the scrollbar track (the area behind the thumb) */
