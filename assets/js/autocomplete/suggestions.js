@@ -174,7 +174,7 @@ function nodeGroupKeyToLabel (key) {
   switch (key) {
     case 'callbacks': return 'callback'
     case 'types': return 'type'
-    default: return null
+    default: return 'function'
   }
 }
 

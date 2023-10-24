@@ -97,4 +97,6 @@
   --autocompleteResultsBold:     var(--gray700);
   --autocompleteSrollbarThumb:   var(--gray200);
   --autocompleteSrollbarTrack:   var(--gray50);
+  --autocompleteLabelBack:       var(--purple100, #F4F2FD);
+  --autocompleteLabelFont:       var(--purple600, #8E7CE6);
 }

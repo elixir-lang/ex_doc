@@ -94,8 +94,14 @@
 }
 
 .autocomplete-suggestion .label {
-  padding-left: 2px;
-  opacity: .75;
+  background-color: var(--autocompleteLabelBack);
+  color: var(--autocompleteLabelFont);
+  padding: 4px 12px 4px 12px;
+  border-radius: 4px;
+  margin-left: 10px;
+  text-transform: uppercase;
+  font-family: var(--sansFontFamily);
+  font-size: 14px;
 }
 
 .autocomplete-suggestion .title,
