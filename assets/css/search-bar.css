@@ -33,11 +33,11 @@
 }
 
 .top-search .search-bar .search-input:focus {
-  border: 1px solid #8E7CE6; 
+  border: 1px solid var(--searchBarFocusColor); 
   border-radius: 8px;
   height: 48px;
   position: relative;
-  box-shadow: 0px 4px 20px 0px rgba(142, 124, 230, 0.25) inset;
+  box-shadow: 0px 4px 20px 0px var(--searchBarBorderColor) inset;
 }
 
 .top-search .search-bar .search-label {

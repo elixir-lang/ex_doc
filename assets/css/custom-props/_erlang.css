@@ -4,4 +4,6 @@
   --main-darkened-20:   hsl(0, 100%, 44%);
   --main-lightened-05:  hsl(0, 100%, 69%);
   --main-lightened-10:  hsl(0, 100%, 74%);
+  --searchBarFocusColor: hsl(0, 100%, 70%);
+  --searchBarBorderColor: rgb(255,71,71, 0.1);
 }
