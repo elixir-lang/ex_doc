@@ -28,7 +28,7 @@ const SUGGESTION_CATEGORY = {
  * @param {Number} limit The maximum number of results to return.
  * @returns {Suggestion[]} List of suggestions sorted and limited.
  */
-export function getSuggestions (query, limit = 5) {
+export function getSuggestions (query, limit = 8) {
   if (isBlank(query)) {
     return []
   }
