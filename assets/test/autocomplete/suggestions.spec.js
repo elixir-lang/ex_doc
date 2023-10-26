@@ -107,8 +107,8 @@ describe('getSuggestions', () => {
       expect(getSuggestions('My ExCePtIoN')).to.eql(getSuggestions('my exception'))
     })
 
-    it('returns max 5 results', () => {
-      expect(getSuggestions('e').length).to.eql(5)
+    it('returns max 8 results', () => {
+      expect(getSuggestions('e').length).to.eql(8)
     })
 
     it('returns no results if no match found', () => {
