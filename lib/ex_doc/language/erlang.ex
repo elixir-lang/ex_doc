@@ -312,7 +312,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp handle_custom_link({:a, attrs, inner, meta} = ast, config) do
-    case ExDoc.Language.Elixir.custom_link(attrs, config) do
+    case Autolink.custom_link(attrs, config) do
       nil ->
         ast
 
