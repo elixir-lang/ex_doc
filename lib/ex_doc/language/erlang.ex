@@ -254,7 +254,7 @@ defmodule ExDoc.Language.Erlang do
     end
   end
 
-  defp walk_doc({:a, attrs, inner, _meta} = ast, config) do
+  defp walk_doc({:a, attrs, inner, meta} = ast, config) do
     case attrs[:rel] do
       "https://erlang.org/doc/link/seeerl" ->
         {fragment, url} = extract_fragment(attrs[:href] || "")
@@ -303,7 +303,13 @@ defmodule ExDoc.Language.Erlang do
         inner
 
       _ ->
-        ast
+        case ExDoc.Language.Elixir.custom_link(attrs, config) do
+          nil ->
+            ast
+
+          url ->
+            {:a, Keyword.put(attrs, :href, url), inner, meta}
+        end
     end
   end
 

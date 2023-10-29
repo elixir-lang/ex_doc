@@ -440,7 +440,7 @@ defmodule ExDoc.Language.Elixir do
 
   @ref_regex ~r/^`(.+)`$/
 
-  defp custom_link(attrs, config) do
+  def custom_link(attrs, config) do
     case Keyword.fetch(attrs, :href) do
       {:ok, href} ->
         case Regex.scan(@ref_regex, href) do

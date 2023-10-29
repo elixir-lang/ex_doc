@@ -5,6 +5,10 @@ defmodule ExDoc.Language.ErlangTest do
   @moduletag :otp_has_docs
   @moduletag :tmp_dir
 
+  defp sigil_m(text, []) do
+    ExDoc.Markdown.to_ast(text, [])
+  end
+
   describe "autolink_doc/2" do
     test "module", c do
       assert autolink_doc("{@link erlang_bar}", c) ==
@@ -224,6 +228,30 @@ defmodule ExDoc.Language.ErlangTest do
     test "bad module", c do
       assert autolink_extra("`does_not_exist`", c) ==
                ~s|<code class="inline">does_not_exist</code>|
+    end
+
+    test "extras" do
+      opts = [extras: %{"Foo Bar.md" => "foo-bar", "Bar Baz.livemd" => "bar-baz"}]
+
+      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](Foo Bar.md)", opts) ==
+               ~m"[Foo](foo-bar.html)"
+
+      assert ExDoc.Language.Erlang.autolink_doc(~m"[Bar](Bar Baz.livemd)", opts) ==
+               ~m"[Bar](bar-baz.html)"
+
+      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](Foo Bar.md)", [ext: ".xhtml"] ++ opts) ==
+               ~m"[Foo](foo-bar.xhtml)"
+
+      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](Foo Bar.md#baz)", opts) ==
+               ~m"[Foo](foo-bar.html#baz)"
+
+      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](../guide/Foo Bar.md)", opts) ==
+               ~m"[Foo](foo-bar.html)"
+
+      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](http://example.com/foo.md)", opts) ==
+               ~m"[Foo](http://example.com/foo.md)"
+
+      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](#baz)", opts) == ~m"[Foo](#baz)"
     end
   end
 
