@@ -303,12 +303,22 @@ defmodule ExDoc.Language.Erlang do
         inner
 
       _ ->
-        ast
+        handle_custom_link(ast, config)
     end
   end
 
   defp walk_doc({tag, attrs, ast, meta}, config) do
     {tag, attrs, walk_doc(ast, config), meta}
+  end
+
+  defp handle_custom_link({:a, attrs, inner, meta} = ast, config) do
+    case Autolink.custom_link(attrs, config) do
+      nil ->
+        ast
+
+      url ->
+        {:a, Keyword.put(attrs, :href, url), inner, meta}
+    end
   end
 
   defp extract_fragment(url) do
