@@ -69,7 +69,13 @@ defmodule ExDoc.Language.Erlang do
           [{:attribute, 0, :spec, {{name, arity}, specs}}]
 
         :error ->
-          []
+          case Map.fetch(module_data.private.specs, {module_data.module, name, arity}) do
+            {:ok, specs} ->
+              [{:attribute, 0, :spec, {{module_data.module, name, arity}, specs}}]
+
+            :error ->
+              []
+          end
       end
 
     %{
@@ -156,8 +162,14 @@ defmodule ExDoc.Language.Erlang do
 
     {name, quoted} =
       case ast do
-        {:attribute, _, kind, {{name, _arity}, ast}} when kind in [:spec, :callback] ->
-          {name, Enum.map(ast, &Code.Typespec.spec_to_quoted(name, &1))}
+        {:attribute, _, kind, {mfa, ast}} when kind in [:spec, :callback] ->
+          {mn, name} =
+            case mfa do
+              {name, _} -> {name, name}
+              {module, name, _} -> {{module, name}, name}
+            end
+
+          {mn, Enum.map(ast, &Code.Typespec.spec_to_quoted(name, &1))}
 
         {:attribute, _, :type, ast} ->
           {name, _, _} = ast

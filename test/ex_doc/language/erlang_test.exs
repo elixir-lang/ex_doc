@@ -381,6 +381,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|'Foo'() -> ok.|
     end
 
+    test "prefixed name", c do
+      assert autolink_spec(~S"-spec erlang_foo:t() -> ok.", c) ==
+               ~s|erlang_foo:t() -> ok.|
+    end
+
     test "bad remote type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_spec(~S"-spec foo() -> bad:bad(atom()).", c) ==
