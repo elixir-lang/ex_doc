@@ -118,7 +118,7 @@ defmodule ExDoc.Autolink do
             _ ->
               with true <- is_list(maybe_path),
                    [_, "ebin", app, "lib" | _] <- maybe_path |> Path.split() |> Enum.reverse() do
-                String.to_atom(app)
+                String.split(app, "-") |> Enum.at(0) |> String.to_atom()
               else
                 _ -> nil
               end
