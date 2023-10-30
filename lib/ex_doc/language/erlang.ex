@@ -255,6 +255,10 @@ defmodule ExDoc.Language.Erlang do
     binary
   end
 
+  defp walk_doc({:pre, _, _, _} = ast, _config) do
+    ast
+  end
+
   defp walk_doc({:code, attrs, [code], meta} = ast, config) when is_binary(code) do
     case Autolink.url(code, :regular_link, config) do
       url when is_binary(url) ->
