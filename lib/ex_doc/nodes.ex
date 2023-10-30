@@ -115,7 +115,8 @@ defmodule ExDoc.TypeNode do
             source_url: nil,
             spec: nil,
             signature: nil,
-            annotations: []
+            annotations: [],
+            group: nil
 
   @typep annotation :: String.t()
 
@@ -133,6 +134,7 @@ defmodule ExDoc.TypeNode do
           source_url: String.t() | nil,
           spec: ExDoc.Language.spec_ast(),
           signature: String.t(),
-          annotations: [annotation()]
+          annotations: [annotation()],
+          group: atom() | nil
         }
 end

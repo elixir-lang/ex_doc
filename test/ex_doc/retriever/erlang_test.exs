@@ -30,7 +30,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         deprecated: nil,
         doc_line: _,
         docs: [function1, function2],
-        docs_groups: [:Callbacks, :Functions],
+        docs_groups: [:Types, :Callbacks, :Functions],
         group: nil,
         id: "mod",
         language: ExDoc.Language.Erlang,

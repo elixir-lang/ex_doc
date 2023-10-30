@@ -135,18 +135,22 @@ defmodule ExDoc.Retriever do
     # TODO: The default function groups must be returned by the language
     groups_for_docs =
       config.groups_for_docs ++
-        [Callbacks: &(&1[:__doc__] == :callback), Functions: fn _ -> true end]
+        [
+          Types: &(&1[:__doc__] == :type),
+          Callbacks: &(&1[:__doc__] == :callback),
+          Functions: fn _ -> true end
+        ]
 
     annotations_for_docs = config.annotations_for_docs
 
-    docs_groups = Enum.map(groups_for_docs, &elem(&1, 0))
+    docs_groups = Enum.map(groups_for_docs, &elem(&1, 0)) |> Enum.uniq()
     function_docs = get_docs(module_data, source, groups_for_docs, annotations_for_docs)
 
     docs =
       function_docs ++
         get_callbacks(module_data, source, groups_for_docs, annotations_for_docs)
 
-    types = get_types(module_data, source)
+    types = get_types(module_data, source, groups_for_docs)
 
     metadata = Map.put(metadata, :__doc__, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
@@ -339,15 +343,15 @@ defmodule ExDoc.Retriever do
 
   ## Typespecs
 
-  defp get_types(module_data, source) do
+  defp get_types(module_data, source, groups_for_docs) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
     for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
-      get_type(doc, source, module_data)
+      get_type(doc, source, groups_for_docs, module_data)
     end
   end
 
-  defp get_type(type_entry, source, module_data) do
+  defp get_type(type_entry, source, groups_for_docs, module_data) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{_, name, arity}, anno, _signature, doc, metadata} = type_entry
     doc_line = anno_line(anno)
@@ -357,6 +361,8 @@ defmodule ExDoc.Retriever do
     signature = signature(type_data.signature)
     annotations = if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
     doc_ast = doc_ast(content_type, doc, file: source.path)
+    metadata = Map.put(metadata, :__doc__, :type)
+    group = GroupMatcher.match_function(groups_for_docs, metadata)
 
     %ExDoc.TypeNode{
       id: "t:#{name}/#{arity}",
@@ -371,7 +377,8 @@ defmodule ExDoc.Retriever do
       signature: signature,
       source_path: source.path,
       source_url: source_link(source, type_data.line),
-      annotations: annotations
+      annotations: annotations,
+      group: group
     }
   end
 
