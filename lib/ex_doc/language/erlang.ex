@@ -426,15 +426,24 @@ defmodule ExDoc.Language.Erlang do
     if visibility == :public do
       final_url({kind, name, arity}, config)
     else
-      original_text =
-        if kind == :type and arity == 0 do
-          "#{name}()"
-        else
-          "#{name}/#{arity}"
-        end
+      cond do
+        kind == :function and :erl_internal.bif(name, arity) ->
+          remote_url(kind, :erlang, name, arity, config)
 
-      Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
-      nil
+        kind == :type and :erl_internal.is_type(name, arity) ->
+          remote_url(kind, :erlang, name, arity, config)
+
+        true ->
+          original_text =
+            if kind == :type and arity == 0 do
+              "#{name}()"
+            else
+              "#{name}/#{arity}"
+            end
+
+          Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
+          nil
+      end
     end
   end
 
@@ -628,7 +637,7 @@ defmodule ExDoc.Language.Erlang do
 
             # #{x :: t()}
             {:field_type, _, [name, type]}, acc when is_atom(name) ->
-              {type, acc}
+              {[type], acc}
 
             {name, _, args} = ast, acc when is_atom(name) and is_list(args) ->
               arity = length(args)
@@ -702,8 +711,15 @@ defmodule ExDoc.Language.Erlang do
           {name, arity} ->
             visibility = Refs.get_visibility({:type, config.current_module, name, arity})
 
-            if visibility in [:public, :hidden] do
-              final_url({:type, name, arity}, config)
+            cond do
+              visibility in [:public, :hidden] ->
+                final_url({:type, name, arity}, config)
+
+              :erl_internal.is_type(name, arity) ->
+                final_url({:type, :erlang, name, arity}, config)
+
+              true ->
+                nil
             end
 
           {module, name, arity} ->

@@ -9,7 +9,7 @@ defmodule ExDoc.Language.ErlangTest do
     ExDoc.Markdown.to_ast(text, [])
   end
 
-  describe "autolink_doc/2" do
+  describe "autolink_doc/2 for edoc" do
     test "module", c do
       assert autolink_doc("{@link erlang_bar}", c) ==
                ~s|<a href="erlang_bar.html"><code>erlang_bar</code></a>|
@@ -263,7 +263,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "spec when fun is called record", c do
       assert autolink_spec("-spec record(module()) -> [[{module(), atom()}]].", c) ==
-               ~s|record(module()) -> [[{module(), atom()}]].|
+               ~s|record(<a href="https://www.erlang.org/doc/man/erlang.html#type-module">module</a>()) -> [[{<a href="https://www.erlang.org/doc/man/erlang.html#type-module">module</a>(), <a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>()}]].|
     end
 
     test "callback", c do
@@ -298,7 +298,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "map", c do
       assert autolink_spec(~S"-spec foo() -> #{atom() := string(), float() => t()}.", c) ==
-               ~S|foo() -> #{atom() := string(), float() => <a href="#t:t/0">t</a>()}.|
+               ~S|foo() -> #{<a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>() := <a href="https://www.erlang.org/doc/man/erlang.html#type-string">string</a>(), <a href="https://www.erlang.org/doc/man/erlang.html#type-float">float</a>() => <a href="#t:t/0">t</a>()}.|
     end
 
     test "vars", c do
@@ -318,12 +318,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "record - one field", c do
       assert autolink_spec(~s"-spec foo() -> #x{x :: atom()} | t().", c) ==
-               ~s[foo() -> #x{x :: atom()} | <a href="#t:t/0">t</a>().]
+               ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>()} | <a href="#t:t/0">t</a>().]
     end
 
     test "record - two fields", c do
       assert autolink_spec(~s"-spec foo() -> #x{x :: atom(), y :: integer()} | t().", c) ==
-               ~s[foo() -> #x{x :: atom(), y :: integer()} | <a href="#t:t/0">t</a>().]
+               ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>(), y :: <a href="https://www.erlang.org/doc/man/erlang.html#type-integer">integer</a>()} | <a href="#t:t/0">t</a>().]
     end
 
     test "bitstring", c do
@@ -389,7 +389,7 @@ defmodule ExDoc.Language.ErlangTest do
     test "bad remote type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_spec(~S"-spec foo() -> bad:bad(atom()).", c) ==
-                        ~s|foo() -> bad:bad(atom()).|
+                        ~s|foo() -> bad:bad(<a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>()).|
              end) =~ ~r{references type "bad:bad/1" but it is undefined or private}
     end
   end

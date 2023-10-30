@@ -65,7 +65,9 @@ defmodule ExDoc.Retriever.ErlangTest do
       } = function1
 
       assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
-      assert Erlang.autolink_spec(hd(function1.specs), []) == "function1() -> atom()."
+
+      assert Erlang.autolink_spec(hd(function1.specs), []) ==
+               "function1() -> <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
 
       %ExDoc.FunctionNode{
         id: "function2/0"
@@ -119,7 +121,9 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert callback1.annotations == []
       assert DocAST.to_string(callback1.doc) == "callback1/0 docs."
       assert Path.basename(callback1.source_url) == "mod.erl:4"
-      assert Erlang.autolink_spec(hd(callback1.specs), []) == "callback1() -> atom()."
+
+      assert Erlang.autolink_spec(hd(callback1.specs), []) ==
+               "callback1() -> <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
 
       assert optional_callback1.id == "c:optional_callback1/0"
       assert optional_callback1.type == :callback
@@ -153,7 +157,9 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert type1.type == :type
       assert type1.signature == "type1/0"
       assert type1.doc |> DocAST.to_string() == "type1/0 docs."
-      assert type1.spec |> Erlang.autolink_spec([]) == "type1() :: atom()."
+
+      assert type1.spec |> Erlang.autolink_spec([]) ==
+               "type1() :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
     end
 
     test "module with no chunk", c do
