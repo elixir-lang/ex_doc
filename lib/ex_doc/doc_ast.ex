@@ -170,8 +170,24 @@ defmodule ExDoc.DocAST do
 
   defp highlight_code_block(full_block, pre_attr, lang, code, highlight_info, outer_opts) do
     case pick_language_and_lexer(lang, highlight_info, code) do
-      {_language, nil, _opts} -> full_block
-      {lang, lexer, opts} -> render_code(pre_attr, lang, lexer, opts, code, outer_opts)
+      {_language, nil, _opts} ->
+        full_block
+
+      {lang, lexer, opts} ->
+        try do
+          render_code(pre_attr, lang, lexer, opts, code, outer_opts)
+        rescue
+          e ->
+            IO.puts(:stderr, [
+              IO.ANSI.format([:yellow, "warning: ", :reset]),
+              "crashed while highlighting #{lang} snippet:\n\n",
+              full_block,
+              "\nFull error message shown next:\n\n",
+              Exception.format(:error, e, __STACKTRACE__)
+            ])
+
+            full_block
+        end
     end
   end
 
