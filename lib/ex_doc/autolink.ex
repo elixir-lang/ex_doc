@@ -13,6 +13,8 @@ defmodule ExDoc.Autolink do
   #
   # * `:line` - line number of the beginning of the documentation
   #
+  # * `:language` - the language call-back module to use
+  #
   # * `:id` - a module/function/etc being documented (e.g.: `"String.upcase/2"`)
   #
   # * `:ext` - the extension (`".html"`, "`.xhtml"`, etc)
@@ -50,31 +52,21 @@ defmodule ExDoc.Autolink do
   def app_module_url(tool, module, anchor \\ nil, config)
 
   def app_module_url(:ex_doc, module, nil, %{current_module: module} = config) do
-    path = module |> inspect() |> String.trim_leading(":")
-    ex_doc_app_url(module, config, path, config.ext, "#content")
+    app_module_url(:ex_doc, module, "#content", config)
   end
 
   def app_module_url(:ex_doc, module, anchor, %{current_module: module} = config) do
     path = module |> inspect() |> String.trim_leading(":")
-    ex_doc_app_url(module, config, path, config.ext, "##{anchor}")
-  end
-
-  def app_module_url(:ex_doc, module, nil, config) do
-    path = module |> inspect() |> String.trim_leading(":")
-    ex_doc_app_url(module, config, path, config.ext, "")
+    ex_doc_app_url(module, config, path, config.ext, "#{anchor}")
   end
 
   def app_module_url(:ex_doc, module, anchor, config) do
     path = module |> inspect() |> String.trim_leading(":")
-    ex_doc_app_url(module, config, path, config.ext, "##{anchor}")
-  end
-
-  def app_module_url(:otp, module, nil, _config) do
-    @otpdocs <> "#{module}.html"
+    ex_doc_app_url(module, config, path, config.ext, "#{anchor}")
   end
 
   def app_module_url(:otp, module, anchor, _config) do
-    @otpdocs <> "#{module}.html##{anchor}"
+    @otpdocs <> "#{module}.html#{anchor}"
   end
 
   def app_module_url(:no_tool, _, _, _) do
@@ -203,10 +195,12 @@ defmodule ExDoc.Autolink do
 
   defp remove_and_warn_if_invalid(result, _, _), do: result
 
+  @builtin_ext [".livemd", ".md", ".txt", ""]
+
   defp build_extra_link(link, config) do
     with %{scheme: nil, host: nil, path: path} = uri <- URI.parse(link),
          true <- is_binary(path) and path != "" and not (path =~ @ref_regex),
-         true <- Path.extname(path) in [".livemd", ".md", ".txt", ""] do
+         true <- Path.extname(path) in @builtin_ext do
       if file = config.extras[Path.basename(path)] do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
         file <> config.ext <> fragment
@@ -269,6 +263,36 @@ defmodule ExDoc.Autolink do
     end
   end
 
+  defp extra_url(string, config) do
+    case String.split(string, ":", parts: 2) do
+      [app, extra] ->
+        {extra, anchor} =
+          case String.split(extra, "#", parts: 2) do
+            [extra] ->
+              {extra, ""}
+
+            [extra, anchor] ->
+              {extra, "#" <> anchor}
+          end
+
+        config.deps
+        |> Keyword.get_lazy(String.to_atom(app), fn -> @hexdocs <> "#{app}" end)
+        |> String.trim_trailing("/")
+        |> Kernel.<>("/" <> convert_extra_extension(extra, config) <> anchor)
+
+      _ ->
+        nil
+    end
+  end
+
+  defp convert_extra_extension(extra, config) do
+    if Path.extname(extra) in @builtin_ext do
+      Path.rootname(extra) <> config.ext
+    else
+      extra
+    end
+  end
+
   defp parse_url(string, mode, config) do
     case Regex.run(~r{^(.+)/(\d+)$}, string) do
       [_, left, right] ->
@@ -295,26 +319,29 @@ defmodule ExDoc.Autolink do
         end
 
       nil ->
-        case kind(string) do
+        case mpkind(string) do
           {:module, rest} ->
             case config.language.parse_module(rest, mode) do
               {:module, module} ->
                 module_url(module, :custom_link, config, rest)
 
               {:module, module, anchor} ->
-                module_url(module, anchor, :custom_link, config, rest)
+                module_url(module, "#" <> anchor, :custom_link, config, rest)
 
               :error ->
                 nil
             end
 
-          _ ->
+          {:extra, rest} ->
+            extra_url(rest, config)
+
+          {nil, string} ->
             case config.language.parse_module(string, mode) do
               {:module, module} ->
                 module_url(module, mode, config, string)
 
               {:module, module, anchor} ->
-                module_url(module, anchor, mode, config, string)
+                module_url(module, "#" <> anchor, mode, config, string)
 
               :error ->
                 nil
@@ -358,8 +385,11 @@ defmodule ExDoc.Autolink do
 
   def kind("c:" <> rest), do: {:callback, rest}
   def kind("t:" <> rest), do: {:type, rest}
-  def kind("m:" <> rest), do: {:module, rest}
   def kind(rest), do: {:function, rest}
+
+  def mpkind("m:" <> rest), do: {:module, rest}
+  def mpkind("e:" <> rest), do: {:extra, rest}
+  def mpkind(rest), do: {nil, rest}
 
   def local_url(kind, name, arity, config, original_text, options \\ [])
 

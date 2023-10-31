@@ -396,7 +396,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp final_url({kind, name, arity}, _config) do
-    "#" <> Autolink.fragment(:ex_doc, kind, name, arity)
+    Autolink.fragment(:ex_doc, kind, name, arity)
   end
 
   defp final_url({kind, module, name, arity}, config) do

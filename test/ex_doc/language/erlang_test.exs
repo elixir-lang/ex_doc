@@ -288,6 +288,36 @@ defmodule ExDoc.Language.ErlangTest do
                         ~s|<a href="#is_integer/1"><code class="inline">is_integer</code></a>|
              end) == ""
     end
+
+    test "linking to extra works", c do
+      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+               assert autolink_markdown(
+                        "[extra](`e:foolib:extra.md`)",
+                        c
+                      ) ==
+                        ~s|<a href="https://foolib.com/extra.html">extra</a>|
+             end) == ""
+    end
+
+    test "linking to extra anchor works", c do
+      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+               assert autolink_markdown(
+                        "[extra](`e:foolib:extra.md#anchor`)",
+                        c
+                      ) ==
+                        ~s|<a href="https://foolib.com/extra.html#anchor">extra</a>|
+             end) == ""
+    end
+
+    test "linking to extra xhtml works", c do
+      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+               assert autolink_markdown(
+                        "[extra](`e:foolib:extra.xhtml`)",
+                        c
+                      ) ==
+                        ~s|<a href="https://foolib.com/extra.xhtml">extra</a>|
+             end) == ""
+    end
   end
 
   describe "autolink_doc/2 for extra" do
@@ -581,7 +611,8 @@ defmodule ExDoc.Language.ErlangTest do
     res =
       do_autolink_doc(ast,
         current_module: :erlang_foo,
-        module_id: "erlang_foo"
+        module_id: "erlang_foo",
+        deps: [foolib: "https://foolib.com"]
       )
 
     res

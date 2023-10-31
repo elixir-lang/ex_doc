@@ -174,7 +174,11 @@ The following metadata is available for modules:
 
 ## Auto-linking
 
-ExDoc for Elixir will automatically generate links across modules and functions if you enclose them in backticks.
+ExDoc for Elixir and Erlang will automatically generate links across modules and functions if you enclose them in backticks.
+
+<!-- tabs-open -->
+
+### Elixir
 
   * When referring to a module, function, type or callback from your project, such as `` `MyModule` ``, ExDoc will automatically link to it.
   * When referring to a module, function, type or callback from Elixir, such as `` `String` ``, ExDoc will automatically link to it at Elixir's stable documentation.
@@ -186,6 +190,35 @@ ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.fu
 You can also use custom text; e.g.: `` [custom text](`MyModule.function/1`) ``. This also allows you to refer to OTP modules; e.g.: `` [`:array`](`:array`) ``.
 
 Link to extra pages using the syntax `` [Up and running](Up and running.md) ``, skipping the directory in which the page is. The final link will be automatically converted to `up-and-running.html`.
+
+Link to extra pages in another application using the syntax `` [Writing Documentation](`e:elixir:writing-documentation.md`) ``, skipping the directory in which the page is. The final link will be automatically converted to `https://hexdocs.pm/elixir/writing-documentation.html`.
+
+It is also possible to place anchors after the module name and extra pages. For example:
+
+* `` `Keyword#module-duplicate-keys-and-ordering` `` will create a link to `https://hexdocs.pm/elixir/Keyword.html#module-duplicate-keys-and-ordering`
+* `` `e:elixir:syntax-reference.md#expressions` `` will create a link to `https://hexdocs.pm/elixir/syntax-reference.html#expressions`
+
+### Erlang
+
+  * When referring to a module, function, type or callback from your project, such as `` `my_module` ``, ExDoc will automatically link to it. 
+  * When referring to a module, function, type or callback from Erlang/OTP, such as `` `string` ``, ExDoc will automatically link to it at Erlang/OTP's stable documentation.
+  * When referring to a function, type, or callback from Elixir, such as (`` `Elixir.String` ``), ExDoc will automatically link to it at Elixir stable documentation.
+  * When referring to a module, function, type or callback from any of your hex dependencies, such as `` `my_dep` ``, ExDoc will automatically link to it at the dependency's documentation at [hexdocs.pm](https://hexdocs.pm/). (The link can be configured by setting `{docs, [{deps,  [{my_dep, "https://path/to/docs/"}]}]}` in your `rebar3.conf`.)
+
+ExDoc supports linking to modules (`` `my_module` ``), functions (`` `my_module:function/1` ``), types (`` `t:my_module:type/2` ``) and callbacks (`` `c:my_module:callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name; e.g.: `` `function/1` ``.
+
+You can also use custom text; e.g.: `` [custom text](`my_module:function/1`) ``. This also allows you to refer to Erlang/OTP modules; e.g.: `` [`array`](`array`) ``.
+
+Link to extra pages using the syntax `` [Up and running](Up and running.md) ``, skipping the directory in which the page is. The final link will be automatically converted to `up-and-running.html`.
+
+Link to extra pages in another application using the syntax `` [Using unicode](`e:stdlib:unicode_usage.md`) ``, skipping the directory in which the page is. The final link will be automatically converted to `https://hexdocs.pm/elixir/writing-documentation.html`.
+
+It is also possible to place anchors after the module name and extra pages. For example:
+
+* `` `argparse#quick-start` `` will create a link to `https://erlang.org/doc/man/argparse#quick-start`
+* `` `e:stdlib:unicode-usage.md#what-unicode-is` `` will create a link to `https://erlang.org/doc/apps/stdlib/unicode-usage.html#quick-start`
+
+<!-- tabs-close -->
 
 ## Admonition blocks
 
