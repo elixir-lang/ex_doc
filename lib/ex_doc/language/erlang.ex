@@ -6,6 +6,20 @@ defmodule ExDoc.Language.Erlang do
   alias ExDoc.{Autolink, Refs}
 
   @impl true
+  @spec module_data(atom, any, any) ::
+          :ok
+          | %{
+              callback_types: [:callback, ...],
+              docs: any,
+              id: binary,
+              language: ExDoc.Language.Erlang,
+              line: any,
+              module: atom,
+              nesting_info: nil,
+              private: %{abst_code: any, callbacks: map, optional_callbacks: any, specs: map},
+              title: binary,
+              type: :behaviour | :module
+            }
   def module_data(module, docs_chunk, _config) do
     if abst_code = get_abstract_code(module) do
       id = Atom.to_string(module)
@@ -136,6 +150,7 @@ defmodule ExDoc.Language.Erlang do
   @impl true
   def autolink_doc(ast, opts) do
     config = struct!(Autolink, opts)
+    true = config.language == __MODULE__
     walk_doc(ast, config)
   end
 
@@ -240,57 +255,29 @@ defmodule ExDoc.Language.Erlang do
     binary
   end
 
-  defp walk_doc({:code, _attrs, [{:a, _, _, _}], _meta} = ast, _config) do
-    ast
-  end
+  defp walk_doc({:code, attrs, [code], meta} = ast, config) when is_binary(code) do
+    case Autolink.url(code, :regular_link, config) do
+      url when is_binary(url) ->
+        code = remove_prefix(code)
+        {:a, [href: url], [{:code, attrs, [code], meta}], %{}}
 
-  defp walk_doc({:code, attrs, [code], meta} = ast, config) do
-    {text, url} =
-      case parse_autolink(code) do
-        {:module, module} = ref ->
-          text = Atom.to_string(module)
-          # Modules are parsed very permissively, so undefined/private
-          # modules do not emit warnings
-          url = do_url(ref, code, config, false)
-          {text, url}
-
-        {:local, kind, name, arity} ->
-          {"#{name}/#{arity}", local_url(kind, name, arity, config)}
-
-        {:remote, kind, module, name, arity} ->
-          text =
-            if kind == :type and arity == 0 do
-              "#{module}:#{name}()"
-            else
-              "#{module}:#{name}/#{arity}"
-            end
-
-          url = remote_url(kind, module, name, arity, config)
-          {text, url}
-
-        :error ->
-          {code, nil}
-      end
-
-    if url do
-      {:a, [href: url], {:code, attrs, [text], meta}, %{}}
-    else
-      ast
+      _ ->
+        ast
     end
   end
 
-  defp walk_doc({:a, attrs, inner, _meta} = ast, config) do
+  defp walk_doc({:a, attrs, inner, meta} = ast, config) do
     case attrs[:rel] do
       "https://erlang.org/doc/link/seeerl" ->
-        {fragment, url} = extract_fragment(attrs[:href] || "")
+        {fragment, url} = extract_fragment(attrs[:href] || "", "#")
 
         case String.split(url, ":") do
           [module] ->
-            autolink(:module, module, fragment, inner, config)
+            walk_doc({:a, [href: "`m:#{module}#{fragment}`"], inner, meta}, config)
 
           [app, module] ->
             inner = strip_app(inner, app)
-            autolink(:module, module, fragment, inner, config)
+            walk_doc({:a, [href: "`m:#{module}#{fragment}`"], inner, meta}, config)
 
           _ ->
             warn_ref(attrs[:href], config)
@@ -298,37 +285,62 @@ defmodule ExDoc.Language.Erlang do
         end
 
       "https://erlang.org/doc/link/seemfa" ->
-        {kind, url} =
+        {prefix, url} =
           case String.split(attrs[:href], "Module:") do
-            [url] -> {:function, url}
-            [left, right] -> {:callback, left <> right}
+            [url] ->
+              {"", url}
+
+            [left, right] ->
+              {"c:", left <> right}
           end
 
-        case String.split(url, ":") do
-          [mfa] ->
-            autolink(kind, mfa, "", inner, config)
+        {mfa, inner} =
+          case String.split(url, ":") do
+            [mfa] ->
+              {mfa, inner}
 
-          [app, mfa] ->
-            inner = strip_app(inner, app)
-            autolink(kind, mfa, "", inner, config)
-        end
+            [app, mfa] ->
+              {mfa, strip_app(inner, app)}
+          end
+
+        walk_doc({:a, [href: "`#{prefix}#{fixup(mfa)}`"], inner, meta}, config)
 
       "https://erlang.org/doc/link/seetype" ->
-        case String.split(attrs[:href], ":") do
-          [type] ->
-            autolink(:type, type, "", inner, config)
+        {type, inner} =
+          case String.split(attrs[:href], ":") do
+            [type] ->
+              {type, inner}
 
-          [app, type] ->
-            inner = strip_app(inner, app)
-            autolink(:type, type, "", inner, config)
-        end
+            [app, type] ->
+              {type, strip_app(inner, app)}
+          end
+
+        type =
+          case String.split(type, "(") do
+            [type] ->
+              type
+
+            [type, _] ->
+              type <> "/0"
+          end
+
+        walk_doc({:a, [href: "`t:#{fixup(type)}`"], inner, meta}, config)
 
       "https://erlang.org/doc/link/" <> see ->
         warn_ref(attrs[:href] <> " (#{see})", config)
         inner
 
       _ ->
-        handle_custom_link(ast, config)
+        case Autolink.custom_link(attrs, config) do
+          :remove_link ->
+            remove_link(ast)
+
+          nil ->
+            ast
+
+          url ->
+            {:a, Keyword.put(attrs, :href, url), inner, meta}
+        end
     end
   end
 
@@ -336,20 +348,29 @@ defmodule ExDoc.Language.Erlang do
     {tag, attrs, walk_doc(ast, config), meta}
   end
 
-  defp handle_custom_link({:a, attrs, inner, meta} = ast, config) do
-    case Autolink.custom_link(attrs, config) do
-      nil ->
-        ast
+  defp remove_link({:a, _attrs, inner, _meta}) do
+    inner
+  end
 
-      url ->
-        {:a, Keyword.put(attrs, :href, url), inner, meta}
+  defp remove_prefix("c:" <> rest), do: rest
+  defp remove_prefix("m:" <> rest), do: rest
+  defp remove_prefix("t:" <> rest), do: rest
+  defp remove_prefix(rest), do: rest
+
+  defp extract_fragment(url, prefix) do
+    case String.split(url, "#", parts: 2) do
+      [url] -> {"", url}
+      [url, fragment] -> {prefix <> fragment, url}
     end
   end
 
-  defp extract_fragment(url) do
-    case String.split(url, "#", parts: 2) do
-      [url] -> {"", url}
-      [url, fragment] -> {"#" <> fragment, url}
+  defp fixup(mfa) do
+    case String.split(mfa, "#") do
+      ["", mfa] ->
+        mfa
+
+      [m, fa] ->
+        m <> ":" <> fa
     end
   end
 
@@ -370,192 +391,26 @@ defmodule ExDoc.Language.Erlang do
     Autolink.maybe_warn(message, config, nil, %{})
   end
 
-  defp autolink(kind, string, fragment, inner, config) do
-    if url = url(kind, string, config) do
-      {:a, [href: url <> fragment], inner, %{}}
-    else
-      inner
-    end
-  end
-
-  defp url(:module, string, config) do
-    ref = {:module, String.to_atom(string)}
-    do_url(ref, string, config, true)
-  end
-
-  defp url(kind, string, config) do
-    [module, name, arity] =
-      case String.split(string, ["#", "/"]) do
-        [module, name, arity] ->
-          [module, name, arity]
-
-        # this is what docgen_xml_to_chunk returns
-        [module, name] when kind == :type ->
-          # TODO: don't assume 0-arity, instead find first {:type, module, name, arity} ref
-          # and use that arity.
-          [module, name, "0"]
-      end
-
-    name = String.to_atom(name)
-    arity = String.to_integer(arity)
-
-    if module == "" do
-      local_url(kind, name, arity, config)
-    else
-      remote_url(kind, String.to_atom(module), name, arity, config)
-    end
-  end
-
-  defp remote_url(kind, module, name, arity, config) do
-    ref = {kind, module, name, arity}
-
-    text =
-      if kind == :type and arity == 0 do
-        "#{module}:#{name}()"
-      else
-        "#{module}:#{name}/#{arity}"
-      end
-
-    do_url(ref, text, config, true)
-  end
-
-  defp local_url(kind, name, arity, config) do
-    ref = {kind, config.current_module, name, arity}
-    visibility = Refs.get_visibility(ref)
-
-    if visibility == :public do
-      final_url({kind, name, arity}, config)
-    else
-      cond do
-        kind == :function and :erl_internal.bif(name, arity) ->
-          remote_url(kind, :erlang, name, arity, config)
-
-        kind == :type and :erl_internal.is_type(name, arity) ->
-          remote_url(kind, :erlang, name, arity, config)
-
-        true ->
-          original_text =
-            if kind == :type and arity == 0 do
-              "#{name}()"
-            else
-              "#{name}/#{arity}"
-            end
-
-          Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
-          nil
-      end
-    end
-  end
-
-  defp do_url(ref, original_text, config, emit_warning) do
-    visibility = Refs.get_visibility(ref)
-
-    # TODO: type with content = %{} in otp xml is marked as :hidden, it should be :public
-
-    if visibility == :public or (visibility == :hidden and elem(ref, 0) == :type) do
-      final_url(ref, config)
-    else
-      if emit_warning do
-        Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
-      end
-
-      nil
-    end
-  end
-
-  defp final_url({:module, module}, config) do
-    tool = Autolink.tool(module, config)
-    Autolink.app_module_url(tool, module, config)
-  end
-
   defp final_url({kind, name, arity}, _config) do
-    fragment(:ex_doc, kind, name, arity)
+    "#" <> Autolink.fragment(:ex_doc, kind, name, arity)
   end
 
   defp final_url({kind, module, name, arity}, config) do
     tool = Autolink.tool(module, config)
-    module_url = Autolink.app_module_url(tool, module, config)
-    # TODO: fix me
-    module_url = String.trim_trailing(module_url, "#content")
-    module_url <> fragment(tool, kind, name, arity)
+    Autolink.app_module_url(tool, module, Autolink.fragment(tool, kind, name, arity), config)
   end
 
-  defp fragment(:otp, :function, name, arity) do
-    "##{name}-#{arity}"
-  end
-
-  defp fragment(:otp, :callback, name, arity) do
-    "#Module:#{name}-#{arity}"
-  end
-
-  defp fragment(:otp, :type, name, _arity) do
-    "#type-#{name}"
-  end
-
-  defp fragment(:ex_doc, :function, name, arity) do
-    "##{name}/#{arity}"
-  end
-
-  defp fragment(:ex_doc, :callback, name, arity) do
-    "#c:#{name}/#{arity}"
-  end
-
-  defp fragment(:ex_doc, :type, name, arity) do
-    "#t:#{name}/#{arity}"
-  end
-
-  defp kind("c:" <> rest), do: {:callback, rest}
-  defp kind("t:" <> rest), do: {:type, rest}
-  defp kind(rest), do: {:function, rest}
-
-  defp parse_autolink(string) do
-    case Regex.run(~r{^(.+)(/\d+|\(\))$}, string) do
-      [_, left, right] ->
-        with {:ok, arity} <- parse_arity(right) do
-          {kind, rest} = kind(left)
-
-          case parse_module_function(rest) do
-            {:local, name} ->
-              {:local, kind, name, arity}
-
-            {:remote, module, name} ->
-              {:remote, kind, module, name, arity}
-
-            :error ->
-              :error
-          end
-        end
-
-      nil ->
-        parse_module(string)
-
-      _ ->
-        :error
-    end
-  end
-
-  # 0-arity types may take the form `t:module:type()`.
-  defp parse_arity("()") do
-    {:ok, 0}
-  end
-
-  defp parse_arity("/" <> arity_string) do
-    case Integer.parse(arity_string) do
-      {arity, ""} -> {:ok, arity}
-      _ -> :error
-    end
-  end
-
-  defp parse_module_function(string) do
+  @impl true
+  def parse_module_function(string) do
     case String.split(string, ":") do
       [module_string, function_string] ->
-        with {:module, module} <- parse_module(module_string),
-             {:function, function} <- parse_function(function_string) do
+        with {:module, module} <- parse_module_string(module_string, :custom_link),
+             {:function, function} <- Autolink.parse_function(function_string) do
           {:remote, module, function}
         end
 
       [function_string] ->
-        with {:function, function} <- parse_function(function_string) do
+        with {:function, function} <- Autolink.parse_function(function_string) do
           {:local, function}
         end
 
@@ -564,18 +419,45 @@ defmodule ExDoc.Language.Erlang do
     end
   end
 
-  defp parse_function(string) do
-    case Code.string_to_quoted("& #{string}/0") do
-      {:ok, {:&, _, [{:/, _, [{function, _, _}, 0]}]}} when is_atom(function) ->
-        {:function, function}
-
-      _ ->
-        :error
+  @impl true
+  def try_autoimported_function(name, arity, mode, config, original_text) do
+    if :erl_internal.bif(name, arity) do
+      Autolink.remote_url({:function, :erlang, name, arity}, config, original_text,
+        warn?: false,
+        mode: mode
+      )
     end
   end
 
-  defp parse_module(string) do
-    case Code.string_to_quoted(":#{string}", warn_on_unnecessary_quotes: false) do
+  @impl true
+  def try_builtin_type(name, arity, mode, config, original_text) do
+    if :erl_internal.is_type(name, arity) do
+      Autolink.remote_url({:type, :erlang, name, arity}, config, original_text,
+        warn?: false,
+        mode: mode
+      )
+    end
+  end
+
+  @impl true
+  def parse_module(string, mode) do
+    case String.split(string, "#", parts: 2) do
+      [mod, anchor] ->
+        case parse_module_string(mod, mode) do
+          {:module, mod} ->
+            {:module, mod, anchor}
+
+          :error ->
+            :error
+        end
+
+      [mod] ->
+        parse_module_string(mod, mode)
+    end
+  end
+
+  def parse_module_string(string, _mode) do
+    case Code.string_to_quoted(":'#{string}'", warn_on_unnecessary_quotes: false) do
       {:ok, module} when is_atom(module) ->
         {:module, module}
 

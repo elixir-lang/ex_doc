@@ -563,7 +563,8 @@ defmodule ExDoc.Language.ElixirTest do
     apps: [:myapp],
     current_module: MyModule,
     module_id: "MyModule",
-    file: "nofile"
+    file: "nofile",
+    language: ExDoc.Language.Elixir
   ]
 
   defp autolink_doc(ast, options \\ []) do

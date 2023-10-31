@@ -138,6 +138,44 @@ defmodule ExDoc.Language do
   """
   @callback format_spec_attribute(%ExDoc.FunctionNode{} | %ExDoc.TypeNode{}) :: String.t()
 
+  @doc """
+  Parse a module.function string and return it.
+  """
+  @callback parse_module_function(String.t()) ::
+              {:local, function :: atom()}
+              | {:remote, module :: module(), function :: atom()}
+              | :error
+
+  @doc """
+  Parse a module string and return it.
+  """
+  @callback parse_module(String.t(), mode :: :regular_link | :custom_link) ::
+              {:module, atom()} | :error
+
+  @doc """
+  Return a URL to autoimported function if atom+arity are autoimported
+  """
+  @callback try_autoimported_function(
+              name :: atom(),
+              arity :: non_neg_integer(),
+              mode :: :regular_link | :custom_link,
+              opts :: keyword(),
+              original_text :: String.t()
+            ) ::
+              nil | String.t()
+
+  @doc """
+  Return a URL to built-in type if atom+arity are built-in
+  """
+  @callback try_builtin_type(
+              name :: atom(),
+              arity :: non_neg_integer(),
+              mode :: :regular_link | :custom_link,
+              opts :: keyword(),
+              original_text :: String.t()
+            ) ::
+              nil | String.t()
+
   def get(:elixir, _module), do: {:ok, ExDoc.Language.Elixir}
   def get(:erlang, _module), do: {:ok, ExDoc.Language.Erlang}
 

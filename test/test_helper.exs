@@ -67,6 +67,7 @@ defmodule TestHelper do
       :code.purge(module)
       :code.delete(module)
       File.rm_rf!(dir)
+      ExDoc.Refs.clear()
     end)
 
     if Keyword.get(opts, :docs, true) do

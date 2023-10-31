@@ -146,7 +146,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
           if "struct" in node.annotations do
             node.signature
           else
-            "#{node.name}/#{node.arity}"
+            if node.name == nil do
+              "nil/#{node.arity}"
+            else
+              "#{node.name}/#{node.arity}"
+            end
           end
 
         deprecated? = not is_nil(node.deprecated)

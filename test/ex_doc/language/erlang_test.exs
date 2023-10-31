@@ -1,5 +1,5 @@
 defmodule ExDoc.Language.ErlangTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   import TestHelper
 
   @moduletag :otp_has_docs
@@ -88,7 +88,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP function when generating OTP docs, same module", c do
       assert autolink_doc("{@link array:new/0}", [current_module: :array, apps: [:stdlib]], c) ==
-               ~s|<a href="array.html#new/0"><code>array:new/0</code></a>|
+               ~s|<a href="#new/0"><code>array:new/0</code></a>|
     end
 
     test "ERTS function", c do
@@ -164,13 +164,13 @@ defmodule ExDoc.Language.ErlangTest do
     test "bad local type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad()}", c) == ~s|<code>bad()</code>|
-             end) =~ ~s|references type "bad()" but it is undefined or private|
+             end) =~ ~s|references type "t:bad/0" but it is undefined or private|
     end
 
     test "bad remote type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_doc("{@link bad:bad()}", c) == ~s|<code>bad:bad()</code>|
-             end) =~ ~s|references type "bad:bad()" but it is undefined or private|
+             end) =~ ~s|references type "t:bad:bad/0" but it is undefined or private|
     end
 
     test "application", c do
@@ -180,7 +180,117 @@ defmodule ExDoc.Language.ErlangTest do
     end
   end
 
-  describe "autolink_doc/2 for extras" do
+  describe "autolink_doc/2 for markdown" do
+    test "function in module code", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("`foo/0`", c) ==
+                        ~s|<a href=\"#foo/0\"><code class="inline">foo/0</code></a>|
+             end) == ""
+    end
+
+    test "function in module ref", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("[`foo/0`](`foo/0`)", c) ==
+                        ~s|<a href="#foo/0"><code class="inline">foo/0</code></a>|
+             end) == ""
+    end
+
+    test "function in module autoimport", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("`node()`", c) ==
+                        ~s|<code class="inline">node()</code>|
+             end) == ""
+    end
+
+    test "function in module autoimport using slash", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("`node/0`", c) ==
+                        ~s|<a href="https://www.erlang.org/doc/man/erlang.html#node-0"><code class="inline">node/0</code></a>|
+             end) == ""
+    end
+
+    test "type in module autoimport", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("`t:integer()`", c) ==
+                        ~s|<code class="inline">t:integer()</code>|
+             end) == ""
+    end
+
+    test "type in module autoimport using slash", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("`t:integer/0`", c) ==
+                        ~s|<a href="https://www.erlang.org/doc/man/erlang.html#type-integer"><code class="inline">integer/0</code></a>|
+             end) == ""
+    end
+
+    test "bad function in module code", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("`bad/0`", c) ==
+                        ~s|<code class="inline">bad/0</code>|
+             end) == ""
+    end
+
+    test "bad function in module ref", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("[Bad](`bad/0`)", c) ==
+                        ~s|Bad|
+             end) =~ ~s|documentation references function "bad/0" but it is undefined or private|
+    end
+
+    test "linking to auto-imported nil works", c do
+      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+               assert autolink_markdown("[`[]`](`t:nil/0`)", c) ==
+                        ~s|<a href="https://www.erlang.org/doc/man/erlang.html#type-nil"><code class="inline">[]</code></a>|
+             end) == ""
+    end
+
+    test "linking to local nil works", c do
+      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+               assert autolink_markdown(
+                        "[`[]`](`t:nil/0`)",
+                        c,
+                        "-export_type([nil/0]).\n-type nil() :: [].\n"
+                      ) ==
+                        ~s|<a href="#t:nil/0"><code class="inline">[]</code></a>|
+             end) == ""
+    end
+
+    test "linking to local nil function works", c do
+      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+               assert autolink_markdown(
+                        "[`nil`](`nil/0`)",
+                        c,
+                        "-export([nil/0]).\nnil() -> [].\n"
+                      ) ==
+                        ~s|<a href="#nil/0"><code class="inline">nil</code></a>|
+             end) == ""
+    end
+
+    test "linking to exported nil function works", c do
+      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+               assert autolink_markdown(
+                        "[`nil`](`erlang_bar:nil/0`)",
+                        c,
+                        "",
+                        "-export([nil/0]).\nnil() -> [].\n"
+                      ) ==
+                        ~s|<a href="erlang_bar.html#nil/0"><code class="inline">nil</code></a>|
+             end) == ""
+    end
+
+    test "linking to local is_integer function works", c do
+      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+               assert autolink_markdown(
+                        "[`is_integer`](`is_integer/1`)",
+                        c,
+                        "-export([is_integer/1]).\nis_integer(I) -> erlang:is_integer(I).\n"
+                      ) ==
+                        ~s|<a href="#is_integer/1"><code class="inline">is_integer</code></a>|
+             end) == ""
+    end
+  end
+
+  describe "autolink_doc/2 for extra" do
     test "function", c do
       assert autolink_extra("`erlang_foo:foo/0`", c) ==
                ~s|<a href="erlang_foo.html#foo/0"><code class="inline">erlang_foo:foo/0</code></a>|
@@ -192,46 +302,65 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "type", c do
-      assert autolink_extra("`t:erlang_bar:t()`", c) ==
-               ~s|<a href="erlang_bar.html#t:t/0"><code class="inline">erlang_bar:t()</code></a>|
+      assert autolink_extra("`t:erlang_bar:t/0`", c) ==
+               ~s|<a href="erlang_bar.html#t:t/0"><code class="inline">erlang_bar:t/0</code></a>|
     end
 
     test "OTP type", c do
-      assert autolink_extra("`t:array:array()`", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html#type-array"><code class="inline">array:array()</code></a>|
+      assert autolink_extra("`t:array:array/0`", c) ==
+               ~s|<a href="https://www.erlang.org/doc/man/array.html#type-array"><code class="inline">array:array/0</code></a>|
     end
 
     test "module", c do
-      assert autolink_extra("`erlang_foo`", c) ==
+      assert autolink_extra("`m:erlang_foo`", c) ==
                ~s|<a href="erlang_foo.html"><code class="inline">erlang_foo</code></a>|
     end
 
     test "OTP module", c do
-      assert autolink_extra("`rpc`", c) ==
+      assert autolink_extra("`m:rpc`", c) ==
                ~s|<a href="https://www.erlang.org/doc/man/rpc.html"><code class="inline">rpc</code></a>|
+    end
+
+    test "bad module function", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_extra("`bad:bad/0`", c) ==
+                        ~s|<code class="inline">bad:bad/0</code>|
+             end) =~ ~s||
     end
 
     test "bad function", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert autolink_extra("`bad:bad/0`", c) ==
-                        ~s|<code class="inline">bad:bad/0</code>|
-             end) =~ ~s|references function "bad:bad/0" but it is undefined or private|
+               assert autolink_extra("`bad/0`", c) ==
+                        ~s|<code class="inline">bad/0</code>|
+             end) == ""
     end
 
     test "bad type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_extra("`t:bad:bad/0`", c) ==
                         ~s|<code class="inline">t:bad:bad/0</code>|
-             end) =~ ~s|references type "bad:bad()" but it is undefined or private|
+             end) =~ ~s||
     end
 
     test "bad module", c do
-      assert autolink_extra("`does_not_exist`", c) ==
-               ~s|<code class="inline">does_not_exist</code>|
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_extra("`does_not_exist`", c) ==
+                        ~s|<code class="inline">does_not_exist</code>|
+             end) == ""
+    end
+
+    test "bad module using m:", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_extra("`m:does_not_exist`", c) ==
+                        ~s|<code class="inline">m:does_not_exist</code>|
+             end) =~ ~r|documentation references module \"does_not_exist\" but it is undefined|
     end
 
     test "extras" do
-      opts = [extras: %{"Foo Bar.md" => "foo-bar", "Bar Baz.livemd" => "bar-baz"}]
+      opts = [
+        extras: %{"Foo Bar.md" => "foo-bar", "Bar Baz.livemd" => "bar-baz"},
+        language: ExDoc.Language.Erlang
+      ]
 
       assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](Foo Bar.md)", opts) ==
                ~m"[Foo](foo-bar.html)"
@@ -326,6 +455,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>(), y :: <a href="https://www.erlang.org/doc/man/erlang.html#type-integer">integer</a>()} | <a href="#t:t/0">t</a>().]
     end
 
+    test "record - two fields, known types", c do
+      assert autolink_spec(~s"-spec foo() -> #x{x :: [t()], y :: t()}.", c) ==
+               ~s|foo() -> #x{x :: [<a href="#t:t/0">t</a>()], y :: <a href="#t:t/0">t</a>()}.|
+    end
+
     test "bitstring", c do
       assert autolink_spec(~s"-spec foo() -> <<_:_*16>> | t().", c) ==
                ~s[foo() -> <<_:_*16>> | <a href="#t:t/0">t</a>().]
@@ -407,7 +541,7 @@ defmodule ExDoc.Language.ErlangTest do
 
   defp do_autolink_doc(doc, opts \\ []) do
     doc
-    |> ExDoc.Language.Erlang.autolink_doc(opts)
+    |> ExDoc.Language.Erlang.autolink_doc(opts ++ [language: ExDoc.Language.Erlang])
     |> ExDoc.DocAST.to_string()
   end
 
@@ -428,10 +562,32 @@ defmodule ExDoc.Language.ErlangTest do
 
     [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, [])
 
-    do_autolink_doc(ast)
+    res =
+      do_autolink_doc(ast)
+
+    res
   end
 
-  defp fixtures(c, doc) do
+  defp autolink_markdown(text, c, extra_foo_code \\ "", extra_bar_code \\ "") do
+    # Markdown is usually not valid EDoc
+    fixtures(c, "", extra_foo_code, extra_bar_code)
+
+    ast =
+      case ExDoc.Markdown.to_ast(text, []) do
+        [{:p, _, ast, _}] -> ast
+        ast -> ast
+      end
+
+    res =
+      do_autolink_doc(ast,
+        current_module: :erlang_foo,
+        module_id: "erlang_foo"
+      )
+
+    res
+  end
+
+  defp fixtures(c, doc, extra_foo_code \\ "", extra_bar_code \\ "") do
     erlc(c, :erlang_foo, """
     %% @doc
     %% #{doc}
@@ -440,6 +596,7 @@ defmodule ExDoc.Language.ErlangTest do
     -export_type([t/0, opaque_t/0]).
     -type t() :: atom().
     -type opaque_t() :: atom().
+    #{extra_foo_code}
     foo() -> ok.
     """)
 
@@ -448,6 +605,7 @@ defmodule ExDoc.Language.ErlangTest do
     -export([bar/0]).
     -export_type([t/0]).
     -type t() :: atom().
+    #{extra_bar_code}
     bar() -> ok.
     """)
   end

@@ -183,6 +183,161 @@ defmodule ExDoc.Language.Elixir do
     end)
   end
 
+  @autoimported_modules [Kernel, Kernel.SpecialForms]
+
+  @impl true
+  def try_autoimported_function(name, arity, mode, config, original_text) do
+    Enum.find_value(@autoimported_modules, fn module ->
+      Autolink.remote_url({:function, module, name, arity}, config, original_text,
+        warn?: false,
+        mode: mode
+      )
+    end)
+  end
+
+  @basic_types [
+    any: 0,
+    none: 0,
+    atom: 0,
+    map: 0,
+    pid: 0,
+    port: 0,
+    reference: 0,
+    struct: 0,
+    tuple: 0,
+    float: 0,
+    integer: 0,
+    neg_integer: 0,
+    non_neg_integer: 0,
+    pos_integer: 0,
+    list: 1,
+    nonempty_list: 1,
+    maybe_improper_list: 2,
+    nonempty_improper_list: 2,
+    nonempty_maybe_improper_list: 2
+  ]
+
+  @built_in_types [
+    term: 0,
+    arity: 0,
+    as_boolean: 1,
+    binary: 0,
+    bitstring: 0,
+    boolean: 0,
+    byte: 0,
+    char: 0,
+    charlist: 0,
+    nonempty_charlist: 0,
+    fun: 0,
+    function: 0,
+    identifier: 0,
+    iodata: 0,
+    iolist: 0,
+    keyword: 0,
+    keyword: 1,
+    list: 0,
+    nonempty_list: 0,
+    maybe_improper_list: 0,
+    nonempty_maybe_improper_list: 0,
+    mfa: 0,
+    module: 0,
+    no_return: 0,
+    node: 0,
+    number: 0,
+    struct: 0,
+    timeout: 0
+  ]
+
+  @impl true
+  def try_builtin_type(name, arity, _mode, config, _original_text)
+      when {name, arity} in @basic_types do
+    Autolink.ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#basic-types")
+  end
+
+  def try_builtin_type(name, arity, _mode, config, _original_text)
+      when {name, arity} in @built_in_types do
+    Autolink.ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#built-in-types")
+  end
+
+  def try_builtin_type(_name, _arity, _mode, _config, _original_text) do
+    nil
+  end
+
+  @impl true
+  def parse_module_function(string) do
+    case string |> String.split(".") |> Enum.reverse() do
+      [string] ->
+        with {:function, function} <- Autolink.parse_function(string) do
+          {:local, function}
+        end
+
+      ["", "", ""] ->
+        {:local, :..}
+
+      ["//", "", ""] ->
+        {:local, :"..//"}
+
+      ["", ""] ->
+        {:local, :.}
+
+      ["", "", "" | rest] ->
+        module_string = rest |> Enum.reverse() |> Enum.join(".")
+
+        with {:module, module} <- parse_module(module_string, :custom_link) do
+          {:remote, module, :..}
+        end
+
+      ["", "" | rest] ->
+        module_string = rest |> Enum.reverse() |> Enum.join(".")
+
+        with {:module, module} <- parse_module(module_string, :custom_link) do
+          {:remote, module, :.}
+        end
+
+      [function_string | rest] ->
+        module_string = rest |> Enum.reverse() |> Enum.join(".")
+
+        with {:module, module} <- parse_module(module_string, :custom_link),
+             {:function, function} <- Autolink.parse_function(function_string) do
+          {:remote, module, function}
+        end
+    end
+  end
+
+  @impl true
+  def parse_module(<<first>> <> _ = string, _mode) when first in ?A..?Z do
+    if string =~ ~r/^[A-Za-z0-9_.]+$/ do
+      do_parse_module(string)
+    else
+      :error
+    end
+  end
+
+  def parse_module(":" <> _ = string, :custom_link) do
+    do_parse_module(string)
+  end
+
+  def parse_module(_, _) do
+    :error
+  end
+
+  defp do_parse_module(string) do
+    case Code.string_to_quoted(string, warn_on_unnecessary_quotes: false) do
+      {:ok, module} when is_atom(module) ->
+        {:module, module}
+
+      {:ok, {:__aliases__, _, parts}} ->
+        if Enum.all?(parts, &is_atom/1) do
+          {:module, Module.concat(parts)}
+        else
+          :error
+        end
+
+      _ ->
+        :error
+    end
+  end
+
   @impl true
   def autolink_doc(ast, opts) do
     config = struct!(Autolink, opts)

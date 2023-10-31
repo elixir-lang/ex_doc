@@ -250,8 +250,15 @@ defmodule ExDoc.Retriever do
 
     group = GroupMatcher.match_function(groups_for_docs, metadata)
 
+    id =
+      if name == nil do
+        "nil/#{arity}"
+      else
+        "#{name}/#{arity}"
+      end
+
     %ExDoc.FunctionNode{
-      id: "#{name}/#{arity}",
+      id: id,
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
@@ -323,8 +330,15 @@ defmodule ExDoc.Retriever do
     metadata = Map.put(metadata, :__doc__, :callback)
     group = GroupMatcher.match_function(groups_for_docs, metadata)
 
+    id =
+      if name == nil do
+        "c:nil/#{arity}"
+      else
+        "c:#{name}/#{arity}"
+      end
+
     %ExDoc.FunctionNode{
-      id: "c:#{name}/#{arity}",
+      id: id,
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
@@ -364,8 +378,15 @@ defmodule ExDoc.Retriever do
     metadata = Map.put(metadata, :__doc__, :type)
     group = GroupMatcher.match_function(groups_for_docs, metadata)
 
+    id =
+      if name == nil do
+        "t:nil/#{arity}"
+      else
+        "t:#{name}/#{arity}"
+      end
+
     %ExDoc.TypeNode{
-      id: "t:#{name}/#{arity}",
+      id: id,
       name: name,
       arity: arity,
       type: type_data.type,

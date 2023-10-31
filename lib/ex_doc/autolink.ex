@@ -32,6 +32,7 @@ defmodule ExDoc.Autolink do
     :module_id,
     :id,
     :line,
+    :language,
     file: "nofile",
     apps: [],
     extras: [],
@@ -46,21 +47,37 @@ defmodule ExDoc.Autolink do
   @hexdocs "https://hexdocs.pm/"
   @otpdocs "https://www.erlang.org/doc/man/"
 
-  def app_module_url(:ex_doc, module, %{current_module: module} = config) do
+  def app_module_url(tool, module, anchor \\ nil, config)
+
+  def app_module_url(:ex_doc, module, nil, %{current_module: module} = config) do
     path = module |> inspect() |> String.trim_leading(":")
     ex_doc_app_url(module, config, path, config.ext, "#content")
   end
 
-  def app_module_url(:ex_doc, module, config) do
+  def app_module_url(:ex_doc, module, anchor, %{current_module: module} = config) do
+    path = module |> inspect() |> String.trim_leading(":")
+    ex_doc_app_url(module, config, path, config.ext, "##{anchor}")
+  end
+
+  def app_module_url(:ex_doc, module, nil, config) do
     path = module |> inspect() |> String.trim_leading(":")
     ex_doc_app_url(module, config, path, config.ext, "")
   end
 
-  def app_module_url(:otp, module, _config) do
+  def app_module_url(:ex_doc, module, anchor, config) do
+    path = module |> inspect() |> String.trim_leading(":")
+    ex_doc_app_url(module, config, path, config.ext, "##{anchor}")
+  end
+
+  def app_module_url(:otp, module, nil, _config) do
     @otpdocs <> "#{module}.html"
   end
 
-  def app_module_url(:no_tool, _, _) do
+  def app_module_url(:otp, module, anchor, _config) do
+    @otpdocs <> "#{module}.html##{anchor}"
+  end
+
+  def app_module_url(:no_tool, _, _, _) do
     nil
   end
 
@@ -232,12 +249,12 @@ defmodule ExDoc.Autolink do
     url
   end
 
-  defp module_url(module, mode, config, string) do
+  defp module_url(module, anchor \\ nil, mode, config, string) do
     ref = {:module, module}
 
     case {mode, Refs.get_visibility(ref)} do
       {_link_type, visibility} when visibility in [:public, :limited] ->
-        app_module_url(tool(module, config), module, config)
+        app_module_url(tool(module, config), module, anchor, config)
 
       {:regular_link, :undefined} ->
         nil
@@ -258,7 +275,7 @@ defmodule ExDoc.Autolink do
         with {:ok, arity} <- parse_arity(right) do
           {kind, rest} = kind(left)
 
-          case parse_module_function(rest) do
+          case config.language.parse_module_function(rest) do
             {:local, function} ->
               kind
               |> local_url(function, arity, config, string, mode: mode)
@@ -278,12 +295,30 @@ defmodule ExDoc.Autolink do
         end
 
       nil ->
-        case parse_module(string, mode) do
-          {:module, module} ->
-            module_url(module, mode, config, string)
+        case kind(string) do
+          {:module, rest} ->
+            case config.language.parse_module(rest, mode) do
+              {:module, module} ->
+                module_url(module, :custom_link, config, rest)
 
-          :error ->
-            nil
+              {:module, module, anchor} ->
+                module_url(module, anchor, :custom_link, config, rest)
+
+              :error ->
+                nil
+            end
+
+          _ ->
+            case config.language.parse_module(string, mode) do
+              {:module, module} ->
+                module_url(module, mode, config, string)
+
+              {:module, module, anchor} ->
+                module_url(module, anchor, mode, config, string)
+
+              :error ->
+                nil
+            end
         end
 
       _ ->
@@ -298,53 +333,21 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp parse_module_function(string) do
-    case string |> String.split(".") |> Enum.reverse() do
-      [string] ->
-        with {:function, function} <- parse_function(string) do
-          {:local, function}
-        end
-
-      ["", "", ""] ->
-        {:local, :..}
-
-      ["//", "", ""] ->
-        {:local, :"..//"}
-
-      ["", ""] ->
-        {:local, :.}
-
-      ["", "", "" | rest] ->
-        module_string = rest |> Enum.reverse() |> Enum.join(".")
-
-        with {:module, module} <- parse_module(module_string, :custom_link) do
-          {:remote, module, :..}
-        end
-
-      ["", "" | rest] ->
-        module_string = rest |> Enum.reverse() |> Enum.join(".")
-
-        with {:module, module} <- parse_module(module_string, :custom_link) do
-          {:remote, module, :.}
-        end
-
-      [function_string | rest] ->
-        module_string = rest |> Enum.reverse() |> Enum.join(".")
-
-        with {:module, module} <- parse_module(module_string, :custom_link),
-             {:function, function} <- parse_function(function_string) do
-          {:remote, module, function}
-        end
-    end
-  end
-
   # There are special forms that are forbidden by the tokenizer
-  defp parse_function("__aliases__"), do: {:function, :__aliases__}
-  defp parse_function("__block__"), do: {:function, :__block__}
-  defp parse_function("%"), do: {:function, :%}
+  def parse_function("__aliases__"), do: {:function, :__aliases__}
+  def parse_function("__block__"), do: {:function, :__block__}
+  def parse_function("%"), do: {:function, :%}
 
-  defp parse_function(string) do
+  def parse_function(string) do
     case Code.string_to_quoted("& #{string}/0") do
+      {:ok, {:&, _, [{:/, _, [{:__aliases__, _, [function]}, 0]}]}} when is_atom(function) ->
+        ## When function starts with capital letter
+        {:function, function}
+
+      ## When function is 'nil'
+      {:ok, {:&, _, [{:/, _, [nil, 0]}]}} ->
+        {:function, nil}
+
       {:ok, {:&, _, [{:/, _, [{function, _, _}, 0]}]}} when is_atom(function) ->
         {:function, function}
 
@@ -353,107 +356,12 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp parse_module(<<first>> <> _ = string, _mode) when first in ?A..?Z do
-    if string =~ ~r/^[A-Za-z0-9_.]+$/ do
-      do_parse_module(string)
-    else
-      :error
-    end
-  end
-
-  defp parse_module(":" <> _ = string, :custom_link) do
-    do_parse_module(string)
-  end
-
-  defp parse_module(_, _) do
-    :error
-  end
-
-  defp do_parse_module(string) do
-    case Code.string_to_quoted(string, warn_on_unnecessary_quotes: false) do
-      {:ok, module} when is_atom(module) ->
-        {:module, module}
-
-      {:ok, {:__aliases__, _, parts}} ->
-        if Enum.all?(parts, &is_atom/1) do
-          {:module, Module.concat(parts)}
-        else
-          :error
-        end
-
-      _ ->
-        :error
-    end
-  end
-
-  defp kind("c:" <> rest), do: {:callback, rest}
-  defp kind("t:" <> rest), do: {:type, rest}
-  defp kind(rest), do: {:function, rest}
-
-  @basic_types [
-    any: 0,
-    none: 0,
-    atom: 0,
-    map: 0,
-    pid: 0,
-    port: 0,
-    reference: 0,
-    struct: 0,
-    tuple: 0,
-    float: 0,
-    integer: 0,
-    neg_integer: 0,
-    non_neg_integer: 0,
-    pos_integer: 0,
-    list: 1,
-    nonempty_list: 1,
-    maybe_improper_list: 2,
-    nonempty_improper_list: 2,
-    nonempty_maybe_improper_list: 2
-  ]
-
-  @built_in_types [
-    term: 0,
-    arity: 0,
-    as_boolean: 1,
-    binary: 0,
-    bitstring: 0,
-    boolean: 0,
-    byte: 0,
-    char: 0,
-    charlist: 0,
-    nonempty_charlist: 0,
-    fun: 0,
-    function: 0,
-    identifier: 0,
-    iodata: 0,
-    iolist: 0,
-    keyword: 0,
-    keyword: 1,
-    list: 0,
-    nonempty_list: 0,
-    maybe_improper_list: 0,
-    nonempty_maybe_improper_list: 0,
-    mfa: 0,
-    module: 0,
-    no_return: 0,
-    node: 0,
-    number: 0,
-    struct: 0,
-    timeout: 0
-  ]
+  def kind("c:" <> rest), do: {:callback, rest}
+  def kind("t:" <> rest), do: {:type, rest}
+  def kind("m:" <> rest), do: {:module, rest}
+  def kind(rest), do: {:function, rest}
 
   def local_url(kind, name, arity, config, original_text, options \\ [])
-
-  def local_url(:type, name, arity, config, _original_text, _options)
-      when {name, arity} in @basic_types do
-    ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#basic-types")
-  end
-
-  def local_url(:type, name, arity, config, _original_text, _options)
-      when {name, arity} in @built_in_types do
-    ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#built-in-types")
-  end
 
   def local_url(kind, name, arity, config, original_text, options) do
     module = config.current_module
@@ -466,13 +374,28 @@ defmodule ExDoc.Autolink do
         fragment(tool(module, config), kind, name, arity)
 
       {:function, _visibility} ->
-        try_autoimported_function(name, arity, mode, config, original_text)
+        case config.language.try_autoimported_function(name, arity, mode, config, original_text) do
+          nil ->
+            if mode == :custom_link,
+              do: maybe_warn(ref, config, visibility, %{original_text: original_text})
 
-      {:type, :hidden} ->
-        nil
+            nil
 
-      {:type, _} ->
-        nil
+          url ->
+            url
+        end
+
+      {:type, _visibility} ->
+        case config.language.try_builtin_type(name, arity, mode, config, original_text) do
+          nil ->
+            if mode == :custom_link,
+              do: maybe_warn(ref, config, visibility, %{original_text: original_text})
+
+            nil
+
+          url ->
+            url
+        end
 
       _ ->
         maybe_warn(ref, config, visibility, %{original_text: original_text})
@@ -480,33 +403,34 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp fragment(:ex_doc, kind, name, arity) do
-    "#" <> prefix(kind) <> "#{URI.encode(Atom.to_string(name))}/#{arity}"
+  def fragment(tool, kind, nil, arity) do
+    fragment(tool, kind, "nil", arity)
   end
 
-  defp fragment(_, kind, name, arity) do
+  def fragment(:ex_doc, kind, name, arity) do
+    "#" <> prefix(kind) <> "#{encode_fragment_name(name)}/#{arity}"
+  end
+
+  def fragment(:otp, kind, name, arity) do
     case kind do
-      :function -> "##{name}-#{arity}"
-      :callback -> "#Module:#{name}-#{arity}"
-      :type -> "#type-#{name}"
+      :function -> "##{encode_fragment_name(name)}-#{arity}"
+      :callback -> "#Module:#{encode_fragment_name(name)}-#{arity}"
+      :type -> "#type-#{encode_fragment_name(name)}"
     end
+  end
+
+  defp encode_fragment_name(name) when is_atom(name) do
+    encode_fragment_name(Atom.to_string(name))
+  end
+
+  defp encode_fragment_name(name) when is_binary(name) do
+    URI.encode(name)
   end
 
   defp prefix(kind)
   defp prefix(:function), do: ""
   defp prefix(:callback), do: "c:"
   defp prefix(:type), do: "t:"
-
-  @autoimported_modules [Kernel, Kernel.SpecialForms]
-
-  defp try_autoimported_function(name, arity, mode, config, original_text) do
-    Enum.find_value(@autoimported_modules, fn module ->
-      remote_url({:function, module, name, arity}, config, original_text,
-        warn?: false,
-        mode: mode
-      )
-    end)
-  end
 
   def remote_url({kind, module, name, arity} = ref, config, original_text, opts \\ []) do
     warn? = Keyword.get(opts, :warn?, true)
