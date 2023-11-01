@@ -389,6 +389,8 @@ defmodule ExDoc.Autolink do
 
   def kind("c:" <> rest), do: {:callback, rest}
   def kind("t:" <> rest), do: {:type, rest}
+  ## \\ does not work for :custom_url as Earmark strips the \...
+  def kind("\\" <> rest), do: {:function, rest}
   def kind(rest), do: {:function, rest}
 
   def mpkind("m:" <> rest), do: {:module, rest}

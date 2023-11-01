@@ -216,6 +216,24 @@ defmodule ExDoc.Language.ErlangTest do
              end) == ""
     end
 
+    test "escaped function in module", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown(~S"`\c:ls/0`", c, deps: [stdlib: "stdlib/"]) ==
+                        ~s|<a href="stdlib/c.html#ls/0"><code class="inline">c:ls/0</code></a>|
+             end) == ""
+    end
+
+    ## There is a bug in EarmarkParser that leaves a trailing `)` in when parsing the
+    ## markdown below. We expect the bug to be present right now so that we can update th
+    ## testcase when it is fixed. See https://github.com/RobertDober/earmark_parser/issues/139
+    ## for details about the bug.
+    test "escaped function in module ref", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown(~S"[c](`\\c:ls/0`)", c, deps: [stdlib: "stdlib/"]) ==
+                        ~s|<a href="stdlib/c.html#ls/0">c</a>)|
+             end) == ""
+    end
+
     test "function in module autoimport", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown("`node()`", c) ==
