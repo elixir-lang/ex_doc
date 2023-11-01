@@ -237,7 +237,7 @@ defmodule ExDoc.Language.ErlangTest do
     test "function in module autoimport", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown("`node()`", c) ==
-                        ~s|<code class="inline">node()</code>|
+                        ~s|<a href="https://www.erlang.org/doc/man/erlang.html#node-0"><code class="inline">node()</code></a>|
              end) == ""
     end
 
@@ -251,7 +251,7 @@ defmodule ExDoc.Language.ErlangTest do
     test "type in module autoimport", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown("`t:integer()`", c) ==
-                        ~s|<code class="inline">t:integer()</code>|
+                        ~s|<a href="https://www.erlang.org/doc/man/erlang.html#type-integer"><code class="inline">integer()</code></a>|
              end) == ""
     end
 
