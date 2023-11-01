@@ -151,6 +151,8 @@ defmodule ExDoc.Language.Erlang do
   def autolink_doc(ast, opts) do
     config = struct!(Autolink, opts)
     true = config.language == __MODULE__
+
+    config = %{config | force_module_prefix: true}
     walk_doc(ast, config)
   end
 

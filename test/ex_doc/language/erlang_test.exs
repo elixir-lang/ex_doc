@@ -181,6 +181,27 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   describe "autolink_doc/2 for markdown" do
+    test "module in module code", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("`erlang_bar`", c) ==
+                        ~s|<code class="inline">erlang_bar</code>|
+             end) == ""
+    end
+
+    test "m:module in module code", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("`m:erlang_bar`", c) ==
+                        ~s|<a href=\"erlang_bar.html\"><code class="inline">erlang_bar</code></a>|
+             end) == ""
+    end
+
+    test "module in module code reference", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown("[`erlang_bar`](`erlang_bar`)", c) ==
+                        ~s|<a href=\"erlang_bar.html\"><code class="inline">erlang_bar</code></a>|
+             end) == ""
+    end
+
     test "function in module code", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown("`foo/0`", c) ==
@@ -249,7 +270,7 @@ defmodule ExDoc.Language.ErlangTest do
                assert autolink_markdown(
                         "[`[]`](`t:nil/0`)",
                         c,
-                        "-export_type([nil/0]).\n-type nil() :: [].\n"
+                        extra_foo_code: "-export_type([nil/0]).\n-type nil() :: [].\n"
                       ) ==
                         ~s|<a href="#t:nil/0"><code class="inline">[]</code></a>|
              end) == ""
@@ -260,7 +281,7 @@ defmodule ExDoc.Language.ErlangTest do
                assert autolink_markdown(
                         "[`nil`](`nil/0`)",
                         c,
-                        "-export([nil/0]).\nnil() -> [].\n"
+                        extra_foo_code: "-export([nil/0]).\nnil() -> [].\n"
                       ) ==
                         ~s|<a href="#nil/0"><code class="inline">nil</code></a>|
              end) == ""
@@ -271,8 +292,7 @@ defmodule ExDoc.Language.ErlangTest do
                assert autolink_markdown(
                         "[`nil`](`erlang_bar:nil/0`)",
                         c,
-                        "",
-                        "-export([nil/0]).\nnil() -> [].\n"
+                        extra_bar_code: "-export([nil/0]).\nnil() -> [].\n"
                       ) ==
                         ~s|<a href="erlang_bar.html#nil/0"><code class="inline">nil</code></a>|
              end) == ""
@@ -283,7 +303,8 @@ defmodule ExDoc.Language.ErlangTest do
                assert autolink_markdown(
                         "[`is_integer`](`is_integer/1`)",
                         c,
-                        "-export([is_integer/1]).\nis_integer(I) -> erlang:is_integer(I).\n"
+                        extra_foo_code:
+                          "-export([is_integer/1]).\nis_integer(I) -> erlang:is_integer(I).\n"
                       ) ==
                         ~s|<a href="#is_integer/1"><code class="inline">is_integer</code></a>|
              end) == ""
@@ -598,9 +619,9 @@ defmodule ExDoc.Language.ErlangTest do
     res
   end
 
-  defp autolink_markdown(text, c, extra_foo_code \\ "", extra_bar_code \\ "") do
+  defp autolink_markdown(text, c, opts \\ []) do
     # Markdown is usually not valid EDoc
-    fixtures(c, "", extra_foo_code, extra_bar_code)
+    fixtures(c, "", opts)
 
     ast =
       case ExDoc.Markdown.to_ast(text, []) do
@@ -609,16 +630,20 @@ defmodule ExDoc.Language.ErlangTest do
       end
 
     res =
-      do_autolink_doc(ast,
-        current_module: :erlang_foo,
-        module_id: "erlang_foo",
-        deps: [foolib: "https://foolib.com"]
+      do_autolink_doc(
+        ast,
+        [
+          current_module: :erlang_foo,
+          module_id: "erlang_foo",
+          deps: [foolib: "https://foolib.com"]
+        ] ++
+          Keyword.drop(opts, [:extra_foo_code, :extra_bar_code])
       )
 
     res
   end
 
-  defp fixtures(c, doc, extra_foo_code \\ "", extra_bar_code \\ "") do
+  defp fixtures(c, doc, opts \\ []) do
     erlc(c, :erlang_foo, """
     %% @doc
     %% #{doc}
@@ -627,7 +652,7 @@ defmodule ExDoc.Language.ErlangTest do
     -export_type([t/0, opaque_t/0]).
     -type t() :: atom().
     -type opaque_t() :: atom().
-    #{extra_foo_code}
+    #{opts[:extra_foo_code]}
     foo() -> ok.
     """)
 
@@ -636,7 +661,7 @@ defmodule ExDoc.Language.ErlangTest do
     -export([bar/0]).
     -export_type([t/0]).
     -type t() :: atom().
-    #{extra_bar_code}
+    #{opts[:extra_bar_code]}
     bar() -> ok.
     """)
   end

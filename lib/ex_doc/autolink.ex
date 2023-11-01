@@ -43,6 +43,7 @@ defmodule ExDoc.Autolink do
     siblings: [],
     skip_undefined_reference_warnings_on: [],
     skip_code_autolink_to: [],
+    force_module_prefix: nil,
     filtered_modules: []
   ]
 
@@ -335,7 +336,7 @@ defmodule ExDoc.Autolink do
           {:extra, rest} ->
             extra_url(rest, config)
 
-          {nil, string} ->
+          {nil, string} when not config.force_module_prefix or mode == :custom_link ->
             case config.language.parse_module(string, mode) do
               {:module, module} ->
                 module_url(module, mode, config, string)
@@ -346,6 +347,9 @@ defmodule ExDoc.Autolink do
               :error ->
                 nil
             end
+
+          _ ->
+            nil
         end
 
       _ ->
