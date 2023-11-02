@@ -370,7 +370,7 @@ defmodule ExDoc.Autolink do
   def parse_function("%"), do: {:function, :%}
 
   def parse_function(string) do
-    case Code.string_to_quoted("& #{string}/0") do
+    case Code.string_to_quoted("& #{string}/0", warnings: false) do
       {:ok, {:&, _, [{:/, _, [{:__aliases__, _, [function]}, 0]}]}} when is_atom(function) ->
         ## When function starts with capital letter
         {:function, function}

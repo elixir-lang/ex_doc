@@ -322,7 +322,7 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp do_parse_module(string) do
-    case Code.string_to_quoted(string, warn_on_unnecessary_quotes: false) do
+    case Code.string_to_quoted(string, warn_on_unnecessary_quotes: false, emit_warnings: false) do
       {:ok, module} when is_atom(module) ->
         {:module, module}
 

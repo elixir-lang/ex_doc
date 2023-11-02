@@ -404,6 +404,11 @@ defmodule ExDoc.Language.ErlangTest do
              end) == ""
     end
 
+    test "invalid function", c do
+      assert autolink_extra("`...a/0`", c) ==
+               ~s|<code class="inline">...a/0</code>|
+    end
+
     test "bad type", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_extra("`t:bad:bad/0`", c) ==
