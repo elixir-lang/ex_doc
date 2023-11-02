@@ -64,19 +64,19 @@ defmodule ExDoc.Language.Erlang do
 
   @impl true
   def function_data(entry, module_data) do
-    {{kind, name, arity}, _anno, _signature, doc_content, _metadata} = entry
+    {{kind, name, arity}, _anno, _signature, doc_content, metadata} = entry
 
     # TODO: Edoc on Erlang/OTP24.1+ includes private functions in
     # the chunk, so we manually yank them out for now.
     if kind == :function and doc_content != :hidden and
          function_exported?(module_data.module, name, arity) do
-      function_data(name, arity, doc_content, module_data)
+      function_data(name, arity, doc_content, module_data, metadata)
     else
       :skip
     end
   end
 
-  defp function_data(name, arity, _doc_content, module_data) do
+  defp function_data(name, arity, _doc_content, module_data, metadata) do
     specs =
       case Map.fetch(module_data.private.specs, {name, arity}) do
         {:ok, specs} ->
@@ -93,7 +93,26 @@ defmodule ExDoc.Language.Erlang do
       end
 
     %{
-      doc_fallback: fn -> nil end,
+      doc_fallback: fn ->
+        case metadata[:equiv] do
+          nil ->
+            nil
+
+          equiv when is_binary(equiv) ->
+            ## We try to parse the equiv in order to link to the target
+            with {:ok, toks, _} <- :erl_scan.string(:unicode.characters_to_list(equiv <> ".")),
+                 {:ok, [{:call, _, {:atom, _, func}, args}]} <- :erl_parse.parse_exprs(toks) do
+              "Equivalent to [`#{equiv}`](`#{func}/#{length(args)}`)"
+            else
+              _ -> "Equivalent to `#{equiv}`"
+            end
+            |> ExDoc.DocAST.parse!("text/markdown")
+
+          equiv ->
+            IO.warn("invalid equiv: #{inspect(equiv)}", [])
+            nil
+        end
+      end,
       extra_annotations: [],
       line: nil,
       specs: specs
