@@ -3,6 +3,7 @@
   --content-width: 949px;
   --content-gutter: 60px;
   --borderRadius: 4px;
+  --navTabBorderWidth: 4px;
 
   /* Font Families */
   --serifFontFamily: 'Merriweather', 'Book Antiqua', Georgia, 'Century Schoolbook', serif;

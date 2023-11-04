@@ -40,7 +40,7 @@ body {
 
 .sidebar-button {
   --sidebarButtonTopOpen: 6px;
-  --sidebarButtonRightOpen: 7px;
+  --sidebarButtonRightOpen: 4px;
   position: fixed;
   z-index: 99;
   left: 0;
