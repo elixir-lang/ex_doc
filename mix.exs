@@ -24,7 +24,7 @@ defmodule ExDoc.Mixfile do
 
   def application do
     [
-      extra_applications: [:eex, :crypto] ++ extra_applications(Mix.env()),
+      extra_applications: [:eex] ++ extra_applications(Mix.env()),
       mod: {ExDoc.Application, []}
     ]
   end
