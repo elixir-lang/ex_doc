@@ -277,14 +277,14 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "linking to auto-imported nil works", c do
-      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown("[`[]`](`t:nil/0`)", c) ==
                         ~s|<a href="https://www.erlang.org/doc/man/erlang.html#type-nil"><code class="inline">[]</code></a>|
              end) == ""
     end
 
     test "linking to local nil works", c do
-      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown(
                         "[`[]`](`t:nil/0`)",
                         c,
@@ -295,7 +295,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "linking to local nil function works", c do
-      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown(
                         "[`nil`](`nil/0`)",
                         c,
@@ -306,7 +306,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "linking to exported nil function works", c do
-      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown(
                         "[`nil`](`erlang_bar:nil/0`)",
                         c,
@@ -317,7 +317,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "linking to local is_integer function works", c do
-      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown(
                         "[`is_integer`](`is_integer/1`)",
                         c,
@@ -329,7 +329,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "linking to extra works", c do
-      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown(
                         "[extra](`e:foolib:extra.md`)",
                         c
@@ -339,7 +339,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "linking to extra anchor works", c do
-      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown(
                         "[extra](`e:foolib:extra.md#anchor`)",
                         c
@@ -349,7 +349,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "linking to extra xhtml works", c do
-      assert ExUnit.CaptureIO.capture_io(:standard_io, fn ->
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown(
                         "[extra](`e:foolib:extra.xhtml`)",
                         c
