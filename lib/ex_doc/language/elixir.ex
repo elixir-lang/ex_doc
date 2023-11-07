@@ -604,6 +604,7 @@ defmodule ExDoc.Language.Elixir do
 
   defp remove_prefix("c:" <> rest), do: rest
   defp remove_prefix("t:" <> rest), do: rest
+  defp remove_prefix("m:" <> rest), do: rest
   defp remove_prefix(rest), do: rest
 
   defp safe_format_string!(string) do

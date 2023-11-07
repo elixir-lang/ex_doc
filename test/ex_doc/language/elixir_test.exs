@@ -50,6 +50,9 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc(~m"`AutolinkTest.Foo`") ==
                ~m"[`AutolinkTest.Foo`](AutolinkTest.Foo.html)"
 
+      assert autolink_doc(~m"`m:AutolinkTest.Foo`") ==
+               ~m"[`AutolinkTest.Foo`](AutolinkTest.Foo.html)"
+
       assert autolink_doc(~m"`String`", apps: [:elixir]) == ~m"[`String`](String.html)"
 
       assert autolink_doc(~m"`AutolinkTest.Foo`", current_module: AutolinkTest.Foo) ==
