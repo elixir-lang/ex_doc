@@ -250,15 +250,8 @@ defmodule ExDoc.Retriever do
 
     group = GroupMatcher.match_function(groups_for_docs, metadata)
 
-    id =
-      if name == nil do
-        "nil/#{arity}"
-      else
-        "#{name}/#{arity}"
-      end
-
     %ExDoc.FunctionNode{
-      id: id,
+      id: nil_or_name(name, arity),
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
@@ -330,15 +323,8 @@ defmodule ExDoc.Retriever do
     metadata = Map.put(metadata, :__doc__, :callback)
     group = GroupMatcher.match_function(groups_for_docs, metadata)
 
-    id =
-      if name == nil do
-        "c:nil/#{arity}"
-      else
-        "c:#{name}/#{arity}"
-      end
-
     %ExDoc.FunctionNode{
-      id: id,
+      id: "c:" <> nil_or_name(name, arity),
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
@@ -378,15 +364,8 @@ defmodule ExDoc.Retriever do
     metadata = Map.put(metadata, :__doc__, :type)
     group = GroupMatcher.match_function(groups_for_docs, metadata)
 
-    id =
-      if name == nil do
-        "t:nil/#{arity}"
-      else
-        "t:#{name}/#{arity}"
-      end
-
     %ExDoc.TypeNode{
-      id: id,
+      id: "t:" <> nil_or_name(name, arity),
       name: name,
       arity: arity,
       type: type_data.type,
@@ -404,6 +383,14 @@ defmodule ExDoc.Retriever do
   end
 
   ## General helpers
+
+  defp nil_or_name(name, arity) do
+    if name == nil do
+      "nil/#{arity}"
+    else
+      "#{name}/#{arity}"
+    end
+  end
 
   defp signature(list) when is_list(list), do: Enum.join(list, " ")
 
