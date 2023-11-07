@@ -262,17 +262,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp walk_doc({:code, attrs, [code], meta} = ast, config) when is_binary(code) do
-    ## Translate foo() to foo/0
-    link_code =
-      case Regex.run(~r{^(.+)\(\)$}, code) do
-        nil ->
-          code
-
-        [_, name] ->
-          name <> "/0"
-      end
-
-    case Autolink.url(link_code, :regular_link, config) do
+    case Autolink.url(code, :regular_link, config) do
       url when is_binary(url) ->
         code = remove_prefix(code)
         {:a, [href: url], [{:code, attrs, [code], meta}], %{}}

@@ -237,7 +237,7 @@ defmodule ExDoc.Language.ErlangTest do
     test "function in module autoimport", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown("`node()`", c) ==
-                        ~s|<a href="https://www.erlang.org/doc/man/erlang.html#node-0"><code class="inline">node()</code></a>|
+                        ~s|<code class="inline">node()</code>|
              end) == ""
     end
 
@@ -251,7 +251,7 @@ defmodule ExDoc.Language.ErlangTest do
     test "type in module autoimport", c do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert autolink_markdown("`t:integer()`", c) ==
-                        ~s|<a href="https://www.erlang.org/doc/man/erlang.html#type-integer"><code class="inline">integer()</code></a>|
+                        ~s|<code class="inline">t:integer()</code>|
              end) == ""
     end
 
@@ -356,6 +356,16 @@ defmodule ExDoc.Language.ErlangTest do
                       ) ==
                         ~s|<a href="https://foolib.com/extra.xhtml">extra</a>|
              end) == ""
+    end
+
+    test "linking to local extra works does not work", c do
+      assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+               assert autolink_markdown(
+                        "[extra](`e:extra.md`)",
+                        c
+                      ) ==
+                        ~s|extra|
+             end) =~ ~r/documentation references "e:extra.md" but it is invalid/
     end
   end
 
