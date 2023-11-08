@@ -35,17 +35,15 @@
 }
 
 .sidebar .sidebar-header {
-  margin: 12px;
-  border-radius: var(--borderRadius);
   background-color: var(--sidebarHeader);
-  width: 276px;
+  width: 100%;
 }
 
 .sidebar .sidebar-projectDetails {
   display: inline-block;
   text-align: left;
   vertical-align: top;
-  margin: 6px 0 0 10px;
+  margin: 12px 16px 12px 16px;
 }
 
 .sidebar .sidebar-projectImage {
@@ -108,13 +106,14 @@
 }
 
 .sidebar .sidebar-listNav {
-  padding: 0;
-  padding-top: 12px;
+  display: flex;
   margin: 0;
+  padding: 12px 12px 0 12px;
 }
 
 .sidebar .sidebar-listNav :is(li, li button) {
   text-transform: uppercase;
+  letter-spacing: .02em;
   font-size: 14px;
   color: var(--sidebarMuted);
 }
@@ -135,16 +134,24 @@
   cursor: pointer;
   display: inline-block;
   line-height: 27px;
-  border-bottom: 3px solid transparent;
-  padding: 0 10px;
+  padding: 4px 10px 2px 10px;
+  transition: all 150ms;
 }
 
-.sidebar .sidebar-listNav li:is(:hover, .selected) button {
-  border-color: var(--sidebarLanguageAccentBar);
+.sidebar .sidebar-listNav li:is(.selected) button {
+  background-color: var(--sidebarBackground);
+  border-top: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
 }
 
-.sidebar .sidebar-listNav li:is(:hover, .selected) button {
+.sidebar .sidebar-listNav li:not(.selected) button {
+  border-top: var(--navTabBorderWidth) solid var(--sidebarHeader);
+}
+
+.sidebar .sidebar-listNav li:is(:hover):not(.selected) button {
+  background-color: var(--gray600);
+  border-top: var(--navTabBorderWidth) solid var(--gray400);
   color: var(--sidebarAccentMain);
+  transition: all 150ms;
 }
 
 
@@ -154,11 +161,12 @@
   overscroll-behavior: contain;
   position: relative;
   -webkit-overflow-scrolling: touch;
+  margin-top: 12px;
 }
 
 .sidebar .full-list {
   margin: 0;
-  padding: 20px 0;
+  padding: 0 0 20px 0;
   position: relative;
 }
 
