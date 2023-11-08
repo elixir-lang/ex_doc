@@ -395,6 +395,7 @@ defmodule ExDoc.Language.Erlang do
 
   defp warn_ref(href, config) do
     message = "invalid reference: #{href}"
+    nil = config.id
     Autolink.maybe_warn(config, message, nil, %{})
   end
 
