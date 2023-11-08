@@ -413,15 +413,25 @@ defmodule ExDoc.Language.Erlang do
     case String.split(string, ":") do
       [module_string, function_string] ->
         with {:module, module} <- parse_module_string(module_string, :custom_link),
-             {:function, function} <- Autolink.parse_function(function_string) do
+             {:function, function} <- parse_function(function_string) do
           {:remote, module, function}
         end
 
       [function_string] ->
-        with {:function, function} <- Autolink.parse_function(function_string) do
+        with {:function, function} <- parse_function(function_string) do
           {:local, function}
         end
 
+      _ ->
+        :error
+    end
+  end
+
+  defp parse_function(string) do
+    with {:ok, toks, _} <- :erl_scan.string(String.to_charlist("fun #{string}/0.")),
+         {:ok, [{:fun, _, {:function, name, _arity}}]} <- :erl_parse.parse_exprs(toks) do
+      {:function, name}
+    else
       _ ->
         :error
     end

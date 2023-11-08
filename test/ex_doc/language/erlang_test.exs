@@ -226,6 +226,25 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="stdlib/c.html#ls/0">c</a>)|
     end
 
+    test "function quoted", c do
+      assert autolink_doc("`erlang_foo:'foo'/0`", c) ==
+               ~s|<a href="#foo/0"><code class="inline">erlang_foo:'foo'/0</code></a>|
+    end
+
+    test "function quoted large", c do
+      assert autolink_doc("`erlang_foo:'Foo'/0`", c,
+               extra_foo_code: "-export(['Foo'/0]).\n'Foo'() -> ok.\n"
+             ) ==
+               ~s|<a href="#Foo/0"><code class="inline">erlang_foo:'Foo'/0</code></a>|
+    end
+
+    test "function unicode", c do
+      assert autolink_doc("`erlang_foo:'😀'/0`", c,
+               extra_foo_code: "-export(['😀'/0]).\n'😀'() -> ok.\n"
+             ) ==
+               ~s|<a href="#%F0%9F%98%80/0"><code class="inline">erlang_foo:'😀'/0</code></a>|
+    end
+
     test "function in module autoimport", c do
       assert autolink_doc("`node()`", c) ==
                ~s|<code class="inline">node()</code>|
@@ -249,6 +268,16 @@ defmodule ExDoc.Language.ErlangTest do
     test "bad function in module code", c do
       assert autolink_doc("`bad/0`", c) ==
                ~s|<code class="inline">bad/0</code>|
+    end
+
+    test "Elixir keyword function", c do
+      assert autolink_doc("`do/0`", c, extra_foo_code: "-export([do/0]).\ndo() -> ok.\n") ==
+               ~s|<a href="#do/0"><code class="inline">do/0</code></a>|
+    end
+
+    test "linking to auto-imported nil works", c do
+      assert autolink_doc("[`[]`](`t:nil/0`)", c) ==
+               ~s|<a href="https://www.erlang.org/doc/man/erlang.html#type-nil"><code class="inline">[]</code></a>|
     end
 
     test "linking to local nil works", c do

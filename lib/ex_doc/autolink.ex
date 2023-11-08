@@ -371,29 +371,6 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  # There are special forms that are forbidden by the tokenizer
-  def parse_function("__aliases__"), do: {:function, :__aliases__}
-  def parse_function("__block__"), do: {:function, :__block__}
-  def parse_function("%"), do: {:function, :%}
-
-  def parse_function(string) do
-    case Code.string_to_quoted("& #{string}/0", warnings: false) do
-      {:ok, {:&, _, [{:/, _, [{:__aliases__, _, [function]}, 0]}]}} when is_atom(function) ->
-        ## When function starts with capital letter
-        {:function, function}
-
-      ## When function is 'nil'
-      {:ok, {:&, _, [{:/, _, [nil, 0]}]}} ->
-        {:function, nil}
-
-      {:ok, {:&, _, [{:/, _, [{function, _, _}, 0]}]}} when is_atom(function) ->
-        {:function, function}
-
-      _ ->
-        :error
-    end
-  end
-
   def kind("c:" <> rest), do: {:callback, rest}
   def kind("t:" <> rest), do: {:type, rest}
   ## \\ does not work for :custom_url as Earmark strips the \...
