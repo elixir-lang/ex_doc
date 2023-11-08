@@ -394,7 +394,7 @@ defmodule ExDoc.Language.Elixir do
   defp module_type_and_skip(module) do
     cond do
       function_exported?(module, :__struct__, 0) and
-          match?(%{__exception__: true}, module.__struct__) ->
+          match?(%{__exception__: true}, module.__struct__()) ->
         {:exception, false}
 
       function_exported?(module, :__protocol__, 1) ->

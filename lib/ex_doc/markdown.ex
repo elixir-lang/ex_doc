@@ -65,7 +65,7 @@ defmodule ExDoc.Markdown do
 
   defp find_markdown_processor do
     Enum.find(@markdown_processors, fn module ->
-      Code.ensure_loaded?(module) && module.available?
+      Code.ensure_loaded?(module) && module.available?()
     end)
   end
 

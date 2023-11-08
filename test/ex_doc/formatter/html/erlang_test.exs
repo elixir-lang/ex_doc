@@ -15,13 +15,13 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
 
     %% @doc
     %% f/0 function.
-    -spec foo(t:atom()) -> t:atom().
+    -spec foo(t()) -> t().
     foo(X) -> X.
 
     -spec bar() -> baz.
     bar() -> baz.
 
-    -type t() :: t:atom().
+    -type t() :: atom().
     %% t/0 type.
 
     -record(rec, {k1 :: any(), k2 :: any()}).
@@ -30,17 +30,16 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     """)
 
     doc = generate_docs(c)
+    html = Floki.raw_html(doc)
 
-    assert "-spec foo(t:atom()) -> t:atom()." =
-             doc |> Floki.find("pre:fl-contains('foo(t:atom())')") |> Floki.text()
+    assert html =~
+             ~s|-spec</span> foo(<a href=\"#t:t/0\">t</a>()) -&gt; <a href=\"#t:t/0\">t</a>().|
 
-    assert "-type t() :: t:atom()." =
-             doc |> Floki.find("pre:fl-contains('t() :: t:atom().')") |> Floki.text()
+    assert html =~
+             ~s|-type</span> t() :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>().|
 
-    assert "-type t2() :: #rec{k1 :: uri_string:uri_string(), k2 :: uri_string:uri_string() | undefined}." =
-             doc
-             |> Floki.find("pre:fl-contains('t2() ::')")
-             |> Floki.text()
+    assert html =~
+             ~s|-type</span> t2() :: #rec{k1 :: <a href=\"https://www.erlang.org/doc/man/uri_string.html#type-uri_string\">uri_string:uri_string</a>(), k2 :: <a href=\"https://www.erlang.org/doc/man/uri_string.html#type-uri_string\">uri_string:uri_string</a>() \| undefined}.|
   end
 
   defp generate_docs(c) do

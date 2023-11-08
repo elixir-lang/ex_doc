@@ -383,7 +383,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                ~r{<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code(\sclass="inline")?>mix compile.elixir</code></a>}
 
       refute content =~
-               ~R{<img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />}
+               ~r{<img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />}
 
       assert content =~ "<p><strong>raw content</strong></p>"
 
@@ -395,14 +395,14 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r{Plain Text Files</span>.*</h1>}s
 
       assert content =~
-               ~R{<p>Read the <a href="license.html">license</a> and the <a href="plaintext.html">plain-text file</a>.}
+               ~r{<p>Read the <a href="license.html">license</a> and the <a href="plaintext.html">plain-text file</a>.}
 
       plain_text_file = File.read!(tmp_dir <> "/html/plaintext.html")
 
       assert plain_text_file =~ ~r{PlainText</span>.*</h1>}s
 
       assert plain_text_file =~
-               ~R{<pre>\nThis is plain\n  text and nothing\n.+\s+good bye\n</pre>}s
+               ~r{<pre>\nThis is plain\n  text and nothing\n.+\s+good bye\n</pre>}s
 
       assert plain_text_file =~ ~s{\n## Neither formatted\n}
       assert plain_text_file =~ ~s{\n      `t:term/0`\n}
@@ -531,7 +531,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert content =~ ~r{Plain Text Files</span>.*</h1>}s
 
       assert content =~
-               ~R{<p>Read the <a href="linked-license.html">license</a> and the <a href="plain_text.html">plain-text file</a>.}
+               ~r{<p>Read the <a href="linked-license.html">license</a> and the <a href="plain_text.html">plain-text file</a>.}
 
       "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
 
