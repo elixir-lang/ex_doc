@@ -504,7 +504,8 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp warn(config, message) do
+  @doc false
+  def warn(config, message) do
     warning = IO.ANSI.format([:yellow, "warning: ", :reset])
 
     stacktrace =

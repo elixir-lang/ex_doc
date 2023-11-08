@@ -591,17 +591,6 @@ defmodule ExDoc.Language.Elixir do
     inner
   end
 
-  defp warn(message, {file, line}, id) do
-    warning = IO.ANSI.format([:yellow, "warning: ", :reset])
-
-    stacktrace =
-      "  #{file}" <>
-        if(line, do: ":#{line}", else: "") <>
-        if(id, do: ": #{id}", else: "")
-
-    IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
-  end
-
   defp remove_prefix("c:" <> rest), do: rest
   defp remove_prefix("t:" <> rest), do: rest
   defp remove_prefix("m:" <> rest), do: rest
@@ -658,7 +647,7 @@ defmodule ExDoc.Language.Elixir do
       original_text = call_string <> "()"
 
       if Enum.any?(config.filtered_modules, &(&1.id == module_string)) do
-        warn("Typespec references filtered module: #{all}", {config.file, config.line}, config.id)
+        Autolink.warn(config, "Typespec references filtered module: #{all}")
       end
 
       url =
