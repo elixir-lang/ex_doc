@@ -395,7 +395,7 @@ defmodule ExDoc.Language.Erlang do
 
   defp warn_ref(href, config) do
     message = "invalid reference: #{href}"
-    Autolink.maybe_warn(message, config, nil, %{})
+    Autolink.maybe_warn(config, message, nil, %{})
   end
 
   defp final_url({kind, name, arity}, _config) do
@@ -588,8 +588,8 @@ defmodule ExDoc.Language.Erlang do
 
       if string != other do
         Autolink.maybe_warn(
-          "internal inconsistency, please submit bug: #{inspect(string)} != #{inspect(other)}",
           config,
+          "internal inconsistency, please submit bug: #{inspect(string)} != #{inspect(other)}",
           nil,
           nil
         )
@@ -619,7 +619,7 @@ defmodule ExDoc.Language.Erlang do
               final_url(ref, config)
             else
               original_text = "#{string}/#{arity}"
-              Autolink.maybe_warn(ref, config, visibility, %{original_text: original_text})
+              Autolink.maybe_warn(config, ref, visibility, %{original_text: original_text})
               nil
             end
         end

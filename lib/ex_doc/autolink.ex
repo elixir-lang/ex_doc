@@ -138,13 +138,13 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  def maybe_warn(ref, config, visibility, metadata) do
+  def maybe_warn(config, ref, visibility, metadata) do
     skipped = config.skip_undefined_reference_warnings_on
     file = Path.relative_to(config.file, File.cwd!())
     line = config.line
 
     unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
-      warn(ref, {file, line}, config.id, visibility, metadata)
+      warn(config, ref, {file, line}, config.id, visibility, metadata)
     end
   end
 
@@ -186,6 +186,7 @@ defmodule ExDoc.Autolink do
 
   defp remove_and_warn_if_invalid(nil, reference, config) do
     warn(
+      config,
       ~s[documentation references "#{reference}" but it is invalid],
       {config.file, config.line},
       config.id
@@ -206,7 +207,7 @@ defmodule ExDoc.Autolink do
         fragment = (uri.fragment && "#" <> uri.fragment) || ""
         file <> config.ext <> fragment
       else
-        maybe_warn(nil, config, nil, %{file_path: path, original_text: link})
+        maybe_warn(config, nil, nil, %{file_path: path, original_text: link})
         nil
       end
     else
@@ -235,7 +236,7 @@ defmodule ExDoc.Autolink do
       end
 
     if url in [nil, :remove_link] and mode == :custom_link do
-      maybe_warn({:module, module}, config, visibility, %{
+      maybe_warn(config, {:module, module}, visibility, %{
         mix_task: true,
         original_text: string
       })
@@ -255,11 +256,11 @@ defmodule ExDoc.Autolink do
         nil
 
       {:custom_link, visibility} when visibility in [:hidden, :undefined] ->
-        maybe_warn(ref, config, visibility, %{original_text: string})
+        maybe_warn(config, ref, visibility, %{original_text: string})
         :remove_link
 
       {_link_type, visibility} ->
-        maybe_warn(ref, config, visibility, %{original_text: string})
+        maybe_warn(config, ref, visibility, %{original_text: string})
         nil
     end
   end
@@ -412,8 +413,9 @@ defmodule ExDoc.Autolink do
       {:function, _visibility} ->
         case config.language.try_autoimported_function(name, arity, mode, config, original_text) do
           nil ->
-            if mode == :custom_link,
-              do: maybe_warn(ref, config, visibility, %{original_text: original_text})
+            if mode == :custom_link do
+              maybe_warn(config, ref, visibility, %{original_text: original_text})
+            end
 
             nil
 
@@ -424,8 +426,9 @@ defmodule ExDoc.Autolink do
       {:type, _visibility} ->
         case config.language.try_builtin_type(name, arity, mode, config, original_text) do
           nil ->
-            if mode == :custom_link,
-              do: maybe_warn(ref, config, visibility, %{original_text: original_text})
+            if mode == :custom_link do
+              maybe_warn(config, ref, visibility, %{original_text: original_text})
+            end
 
             nil
 
@@ -434,7 +437,7 @@ defmodule ExDoc.Autolink do
         end
 
       _ ->
-        maybe_warn(ref, config, visibility, %{original_text: original_text})
+        maybe_warn(config, ref, visibility, %{original_text: original_text})
         nil
     end
   end
@@ -486,8 +489,9 @@ defmodule ExDoc.Autolink do
       {:regular_link, module_visibility, :undefined}
       when module_visibility == :public
       when module_visibility == :limited and kind != :type ->
-        if warn?,
-          do: maybe_warn(ref, config, :undefined, %{original_text: original_text})
+        if warn? do
+          maybe_warn(config, ref, :undefined, %{original_text: original_text})
+        end
 
         nil
 
@@ -495,14 +499,15 @@ defmodule ExDoc.Autolink do
         nil
 
       {_mode, _module_visibility, visibility} ->
-        if warn?,
-          do: maybe_warn(ref, config, visibility, %{original_text: original_text})
+        if warn? do
+          maybe_warn(config, ref, visibility, %{original_text: original_text})
+        end
 
         nil
     end
   end
 
-  defp warn(message, {file, line}, id) do
+  defp warn(_config, message, {file, line}, id) do
     warning = IO.ANSI.format([:yellow, "warning: ", :reset])
 
     stacktrace =
@@ -513,9 +518,10 @@ defmodule ExDoc.Autolink do
     IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
   end
 
-  defp warn(ref, file_line, id, visibility, metadata)
+  defp warn(config, ref, file_line, id, visibility, metadata)
 
   defp warn(
+         config,
          {:module, _module},
          {file, line},
          id,
@@ -526,10 +532,11 @@ defmodule ExDoc.Autolink do
       "documentation references \"#{original_text}\" but it is " <>
         format_visibility(visibility, :module)
 
-    warn(message, {file, line}, id)
+    warn(config, message, {file, line}, id)
   end
 
   defp warn(
+         config,
          {:module, _module},
          {file, line},
          id,
@@ -540,10 +547,11 @@ defmodule ExDoc.Autolink do
       "documentation references module \"#{original_text}\" but it is " <>
         format_visibility(visibility, :module)
 
-    warn(message, {file, line}, id)
+    warn(config, message, {file, line}, id)
   end
 
   defp warn(
+         config,
          nil,
          {file, line},
          id,
@@ -552,10 +560,11 @@ defmodule ExDoc.Autolink do
        ) do
     message = "documentation references file \"#{original_text}\" but it does not exist"
 
-    warn(message, {file, line}, id)
+    warn(config, message, {file, line}, id)
   end
 
   defp warn(
+         config,
          {kind, _module, _name, _arity},
          {file, line},
          id,
@@ -566,11 +575,11 @@ defmodule ExDoc.Autolink do
       "documentation references #{kind} \"#{original_text}\" but it is " <>
         format_visibility(visibility, kind)
 
-    warn(message, {file, line}, id)
+    warn(config, message, {file, line}, id)
   end
 
-  defp warn(message, {file, line}, id, _, _) when is_binary(message) do
-    warn(message, {file, line}, id)
+  defp warn(config, message, {file, line}, id, _, _) when is_binary(message) do
+    warn(config, message, {file, line}, id)
   end
 
   # there is not such a thing as private callback or private module
