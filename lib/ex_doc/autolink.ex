@@ -143,7 +143,7 @@ defmodule ExDoc.Autolink do
     file = Path.relative_to_cwd(config.file)
 
     unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
-      warn(config, ref, config.id, visibility, metadata)
+      warn(config, ref, visibility, metadata)
     end
   end
 
@@ -186,8 +186,7 @@ defmodule ExDoc.Autolink do
   defp remove_and_warn_if_invalid(nil, reference, config) do
     warn(
       config,
-      ~s[documentation references "#{reference}" but it is invalid],
-      config.id
+      ~s[documentation references "#{reference}" but it is invalid]
     )
 
     :remove_link
@@ -505,23 +504,22 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp warn(config, message, id) do
+  defp warn(config, message) do
     warning = IO.ANSI.format([:yellow, "warning: ", :reset])
 
     stacktrace =
       "  #{config.file}" <>
         if(config.line, do: ":#{config.line}", else: "") <>
-        if(id, do: ": #{id}", else: "")
+        if(config.id, do: ": #{config.id}", else: "")
 
     IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
   end
 
-  defp warn(config, ref, id, visibility, metadata)
+  defp warn(config, ref, visibility, metadata)
 
   defp warn(
          config,
          {:module, _module},
-         id,
          visibility,
          %{mix_task: true, original_text: original_text}
        ) do
@@ -529,13 +527,12 @@ defmodule ExDoc.Autolink do
       "documentation references \"#{original_text}\" but it is " <>
         format_visibility(visibility, :module)
 
-    warn(config, message, id)
+    warn(config, message)
   end
 
   defp warn(
          config,
          {:module, _module},
-         id,
          visibility,
          %{original_text: original_text}
        ) do
@@ -543,25 +540,23 @@ defmodule ExDoc.Autolink do
       "documentation references module \"#{original_text}\" but it is " <>
         format_visibility(visibility, :module)
 
-    warn(config, message, id)
+    warn(config, message)
   end
 
   defp warn(
          config,
          nil,
-         id,
          _visibility,
          %{file_path: _file_path, original_text: original_text}
        ) do
     message = "documentation references file \"#{original_text}\" but it does not exist"
 
-    warn(config, message, id)
+    warn(config, message)
   end
 
   defp warn(
          config,
          {kind, _module, _name, _arity},
-         id,
          visibility,
          %{original_text: original_text}
        ) do
@@ -569,11 +564,11 @@ defmodule ExDoc.Autolink do
       "documentation references #{kind} \"#{original_text}\" but it is " <>
         format_visibility(visibility, kind)
 
-    warn(config, message, id)
+    warn(config, message)
   end
 
-  defp warn(config, message, id, _, _) when is_binary(message) do
-    warn(config, message, id)
+  defp warn(config, message, _, _) when is_binary(message) do
+    warn(config, message)
   end
 
   # there is not such a thing as private callback or private module
