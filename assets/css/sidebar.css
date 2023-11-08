@@ -27,7 +27,7 @@
 .sidebar a {
   color: var(--sidebarAccentMain);
   text-decoration: none;
-  transition: color .3s ease-in-out;
+  transition: color 0.3s ease-in-out;
 }
 
 .sidebar a:hover {
@@ -108,12 +108,12 @@
 .sidebar .sidebar-listNav {
   display: flex;
   margin: 0;
-  padding: 12px 12px 0 2px;
+  padding: 12px 12px 0 4px;
 }
 
 .sidebar .sidebar-listNav :is(li, li button) {
   text-transform: uppercase;
-  letter-spacing: .02em;
+  letter-spacing: 0.02em;
   font-size: 14px;
   color: var(--sidebarMuted);
 }
@@ -154,9 +154,8 @@
   transition: all 150ms;
 }
 
-
 .sidebar .sidebar-tabpanel {
-  flex: 1 1 .01%;
+  flex: 1 1 0.01%;
   overflow-y: auto;
   overscroll-behavior: contain;
   position: relative;
@@ -239,7 +238,7 @@
 
 .sidebar .full-list li.nesting-context {
   font-weight: bold;
-  font-size: .9em;
+  font-size: 0.9em;
   line-height: 1.8em;
   color: var(--sidebarSubheadings);
   padding-left: 15px;
@@ -248,7 +247,7 @@
 .sidebar .full-list li.group {
   text-transform: uppercase;
   font-weight: bold;
-  font-size: .8em;
+  font-size: 0.8em;
   margin: 1.5em 0 0;
   line-height: 1.8em;
   color: var(--sidebarSubheadings);
@@ -425,5 +424,5 @@
 @media screen and (max-width: 768px) {
   .sidebar-closed .sidebar-button {
     margin: 8px;
-  }  
+  }
 }
