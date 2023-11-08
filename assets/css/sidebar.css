@@ -108,7 +108,7 @@
 .sidebar .sidebar-listNav {
   display: flex;
   margin: 0;
-  padding: 12px 12px 0 12px;
+  padding: 12px 12px 0 2px;
 }
 
 .sidebar .sidebar-listNav :is(li, li button) {
