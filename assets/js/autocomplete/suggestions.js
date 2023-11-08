@@ -149,13 +149,24 @@ function nodeSectionSuggestion (node, section, query, category) {
  */
 function moduleChildNodeSuggestion (childNode, parentId, query, category, label) {
   // Match "Module.function" format.
-  const modFun = `${parentId}.${childNode.id}`
-  if (!matchesAll(modFun, query)) { return null }
+  const modFunElixir = `${parentId}.${childNode.id}`
+  const modFunErlang = `${parentId}:${childNode.id}`
+  let modFun
+  let modFunRe
+  if (matchesAll(modFunElixir, query)) {
+    modFun = modFunElixir
+    modFunRe = /\./g
+  } else if (matchesAll(modFunErlang, query)) {
+    modFun = modFunErlang
+    modFunRe = /:/g
+  } else {
+    return null
+  }
 
   // When match spans both module and function name (i.e. ">Map.fe<tch")
   // let's return just ">fe<tch" as the title.
   // Module will already be displayed as the description under the title.
-  const tokenizedQuery = query.replace(/\./g, ' ')
+  const tokenizedQuery = query.replace(modFunRe, ' ')
   // Make sure some token actually matches the child id (and not just the module prefix).
   if (!matchesAny(childNode.id, tokenizedQuery)) return null
 

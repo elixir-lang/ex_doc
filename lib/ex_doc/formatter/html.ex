@@ -78,15 +78,16 @@ defmodule ExDoc.Formatter.HTML do
     project_nodes
     |> Task.async_stream(
       fn node ->
+        language = node.language
+
         autolink_opts =
           [
             current_module: node.module,
             file: node.source_path,
             line: node.doc_line,
-            module_id: node.id
+            module_id: node.id,
+            language: language
           ] ++ base
-
-        language = node.language
 
         docs =
           for child_node <- node.docs do
@@ -342,6 +343,7 @@ defmodule ExDoc.Formatter.HTML do
       deps: config.deps,
       ext: ext,
       extras: extra_paths(config),
+      language: language,
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
       skip_code_autolink_to: config.skip_code_autolink_to
     ]

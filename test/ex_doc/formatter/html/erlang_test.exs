@@ -15,13 +15,13 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
 
     %% @doc
     %% f/0 function.
-    -spec foo(atom()) -> atom().
+    -spec foo(t:atom()) -> t:atom().
     foo(X) -> X.
 
     -spec bar() -> baz.
     bar() -> baz.
 
-    -type t() :: atom().
+    -type t() :: t:atom().
     %% t/0 type.
 
     -record(rec, {k1 :: any(), k2 :: any()}).
@@ -31,17 +31,16 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
 
     doc = generate_docs(c)
 
-    assert "-spec foo(atom()) -> atom()." =
-             doc |> Floki.find("pre:fl-contains('foo(atom())')") |> Floki.text()
+    assert "-spec foo(t:atom()) -> t:atom()." =
+             doc |> Floki.find("pre:fl-contains('foo(t:atom())')") |> Floki.text()
 
-    assert "-type t() :: atom()." =
-             doc |> Floki.find("pre:fl-contains('t() :: atom().')") |> Floki.text()
+    assert "-type t() :: t:atom()." =
+             doc |> Floki.find("pre:fl-contains('t() :: t:atom().')") |> Floki.text()
 
-    assert "-type t2() :: #rec{k1 :: uri_string:uri_string(), k2 :: uri_string:uri_string() | undefined}."
-
-    doc
-    |> Floki.find("pre:fl-contains('t2() ::')")
-    |> Floki.text()
+    assert "-type t2() :: #rec{k1 :: uri_string:uri_string(), k2 :: uri_string:uri_string() | undefined}." =
+             doc
+             |> Floki.find("pre:fl-contains('t2() ::')")
+             |> Floki.text()
   end
 
   defp generate_docs(c) do
@@ -55,6 +54,7 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     ]
 
     ExDoc.generate_docs(config[:project], config[:version], config)
+
     [c.tmp_dir, "doc", "foo.html"] |> Path.join() |> File.read!() |> Floki.parse_document!()
   end
 end

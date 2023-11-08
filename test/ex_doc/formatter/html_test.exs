@@ -31,6 +31,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       source_beam: "test/tmp/beam",
       source_url: "https://github.com/elixir-lang/elixir",
       logo: "test/fixtures/elixir.png",
+      proglang: :elixir,
       extras: []
     ]
   end

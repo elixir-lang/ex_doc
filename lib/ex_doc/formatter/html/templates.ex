@@ -146,7 +146,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
           if "struct" in node.annotations do
             node.signature
           else
-            "#{node.name}/#{node.arity}"
+            if node.name == nil do
+              "nil/#{node.arity}"
+            else
+              "#{node.name}/#{node.arity}"
+            end
           end
 
         deprecated? = not is_nil(node.deprecated)
@@ -190,8 +194,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def module_summary(module_node) do
     entries =
-      [Types: module_node.typespecs] ++
-        docs_groups(module_node.docs_groups, module_node.docs)
+      docs_groups(module_node.docs_groups, module_node.docs ++ module_node.typespecs)
 
     Enum.reject(entries, fn {_type, nodes} -> nodes == [] end)
   end
