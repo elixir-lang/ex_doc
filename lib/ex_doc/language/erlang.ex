@@ -279,11 +279,11 @@ defmodule ExDoc.Language.Erlang do
 
         case String.split(url, ":") do
           [module] ->
-            walk_doc({:a, [href: "`m:#{module}#{fragment}`"], inner, meta}, config)
+            walk_doc({:a, [href: "`m:#{maybe_quote(module)}#{fragment}`"], inner, meta}, config)
 
           [app, module] ->
             inner = strip_app(inner, app)
-            walk_doc({:a, [href: "`m:#{module}#{fragment}`"], inner, meta}, config)
+            walk_doc({:a, [href: "`m:#{maybe_quote(module)}#{fragment}`"], inner, meta}, config)
 
           _ ->
             warn_ref(attrs[:href], config)
@@ -372,13 +372,21 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp fixup(mfa) do
-    case String.split(mfa, "#") do
-      ["", mfa] ->
-        mfa
+    {m, fa} =
+      case String.split(mfa, "#") do
+        ["", mfa] ->
+          {"", mfa}
 
-      [m, fa] ->
-        m <> ":" <> fa
-    end
+        [m, fa] ->
+          {"#{maybe_quote(m)}:", fa}
+      end
+
+    [f, a] = String.split(fa, "/")
+    m <> maybe_quote(f) <> "/" <> a
+  end
+
+  defp maybe_quote(m) do
+    to_string(:io_lib.write_atom(String.to_atom(m)))
   end
 
   defp strip_app([{:code, attrs, [code], meta}], app) do
@@ -474,12 +482,9 @@ defmodule ExDoc.Language.Erlang do
     end
   end
 
-  def parse_module_string(string, _mode) do
-    case Code.string_to_quoted(":'#{string}'",
-           warn_on_unnecessary_quotes: false,
-           emit_warnings: false
-         ) do
-      {:ok, module} when is_atom(module) ->
+  defp parse_module_string(string, _mode) do
+    case :erl_scan.string(String.to_charlist(string)) do
+      {:ok, [{:atom, _, module}], _} when is_atom(module) ->
         {:module, module}
 
       _ ->

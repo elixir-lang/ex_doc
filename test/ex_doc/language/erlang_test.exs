@@ -197,6 +197,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href=\"erlang_bar.html\"><code class="inline">erlang_bar</code></a>|
     end
 
+    test "invalid m:module in module code", c do
+      assert autolink_doc("`m:erlang_bar()`", c) ==
+               ~s|<code class="inline">m:erlang_bar()</code>|
+    end
+
     test "module in module code reference", c do
       assert autolink_doc("[`erlang_bar`](`erlang_bar`)", c) ==
                ~s|<a href=\"erlang_bar.html\"><code class="inline">erlang_bar</code></a>|
