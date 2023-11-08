@@ -462,24 +462,24 @@ defmodule ExDoc.Language.ElixirTest do
     captured = warn(~m"`AutolinkTest.Foo.bar/1`", file: "lib/foo.ex", line: 1, id: nil)
 
     assert captured =~
-             ~s[documentation references function "AutolinkTest.Foo.bar/1" but it is hidden\n]
+             ~s|documentation references function "AutolinkTest.Foo.bar/1" but it is hidden|
 
     assert captured =~ ~r{lib/foo.ex:1\n$}
 
     assert warn(~m"`t:AutolinkTest.Foo.bad/0`", file: "lib/foo.ex", id: "AutolinkTest.Foo.foo/0") =~
-             ~s[documentation references type "t:AutolinkTest.Foo.bad/0" but it is hidden or private]
+             ~s|documentation references type "t:AutolinkTest.Foo.bad/0" but it is hidden or private|
 
     assert warn(~m"`t:Elixir.AutolinkTest.Foo.bad/0`",
              file: "lib/foo.ex",
              id: "AutolinkTest.Foo.foo/0"
            ) =~
-             ~s[documentation references type "t:Elixir.AutolinkTest.Foo.bad/0" but it is hidden or private]
+             ~s|documentation references type "t:Elixir.AutolinkTest.Foo.bad/0" but it is hidden or private|
 
     assert warn(~m"`t:AutolinkTest.Foo.bad/0`", file: "lib/foo.ex", id: "AutolinkTest.Foo.foo/0") =~
-             ~s[documentation references type "t:AutolinkTest.Foo.bad/0" but it is hidden or private]
+             ~s|documentation references type "t:AutolinkTest.Foo.bad/0" but it is hidden or private|
 
     assert warn(~m"`Code.Typespec`") =~
-             ~s[documentation references module "Code.Typespec" but it is hidden]
+             ~s|documentation references module "Code.Typespec" but it is hidden|
 
     warn(~m"`String.upcase/9`")
 
@@ -489,23 +489,23 @@ defmodule ExDoc.Language.ElixirTest do
 
     assert warn(fn ->
              assert autolink_doc(~m"[text](`fakefunction`)") == ~m"text"
-           end) =~ ~s[documentation references "fakefunction" but it is invalid]
+           end) =~ ~s|documentation references "fakefunction" but it is invalid|
 
     assert warn(fn ->
              assert autolink_doc(~m"[text](`some.function`)") == ~m"text"
-           end) =~ ~s[documentation references "some.function" but it is invalid]
+           end) =~ ~s|documentation references "some.function" but it is invalid|
 
     assert warn(fn ->
              assert autolink_doc(~m"[text](`Enum.map()`)") == ~m"text"
-           end) =~ ~s[documentation references "Enum.map()" but it is invalid]
+           end) =~ ~s|documentation references "Enum.map()" but it is invalid|
 
     assert warn(fn ->
              assert autolink_doc(~m"[text](`t:supervisor.child_spec/0`)") == ~m"text"
-           end) =~ ~s[documentation references "t:supervisor.child_spec/0" but it is invalid]
+           end) =~ ~s|documentation references "t:supervisor.child_spec/0" but it is invalid|
 
     assert warn(fn ->
              autolink_spec(quote(do: t() :: String.bad()))
-           end) =~ ~s[documentation references type "String.bad()"]
+           end) =~ ~s|documentation references type "String.bad()"|
 
     assert warn(fn ->
              autolink_spec(
@@ -515,23 +515,23 @@ defmodule ExDoc.Language.ElixirTest do
                  }
                end
              )
-           end) =~ ~s[documentation references type "String.bad()"]
+           end) =~ ~s|documentation references type "String.bad()"|
 
     assert warn(~m"[Foo](Foo Bar.md)", extras: %{}) =~
-             ~s[documentation references file "Foo Bar.md" but it does not exist]
+             ~s|documentation references file "Foo Bar.md" but it does not exist|
 
     options = [skip_undefined_reference_warnings_on: ["MyModule"], module_id: "MyModule"]
     assert_unchanged("String.upcase/9", options)
 
     assert warn(fn ->
              assert autolink_doc(~m"[Bar A](`Bar.A`)") == ~m"Bar A"
-           end) =~ ~s[module "Bar.A" but it is undefined]
+           end) =~ ~s|module "Bar.A" but it is undefined|
 
     assert_unchanged(~m"`Bar.A`")
 
     assert warn(fn ->
              assert autolink_doc(~m"[custom text](`Elixir.Unknown`)") == ~m"custom text"
-           end) =~ ~s[documentation references module "Elixir.Unknown" but it is undefined]
+           end) =~ ~s|documentation references module "Elixir.Unknown" but it is undefined|
 
     warn(fn ->
       assert autolink_doc(~m"[custom `text`](`Elixir.Unknown`)") == ~m"custom `text`"
@@ -540,18 +540,18 @@ defmodule ExDoc.Language.ElixirTest do
     assert warn(fn ->
              assert autolink_doc(~m"[It is Unknown](`Unknown`)") ==
                       ~m"It is Unknown"
-           end) =~ ~s[documentation references module "Unknown" but it is undefined]
+           end) =~ ~s|documentation references module "Unknown" but it is undefined|
 
     assert warn(fn ->
              autolink_doc(~m"[Foo task](`mix foo`)", [])
-           end) =~ ~s[documentation references "mix foo" but it is undefined]
+           end) =~ ~s|documentation references "mix foo" but it is undefined|
 
     assert_unchanged(~m"`mix foo`")
 
     assert warn(fn ->
              autolink_doc(~m"[bad](`String.upcase/9`)", extras: [])
            end) =~
-             ~s[documentation references function "String.upcase/9" but it is undefined or private]
+             ~s|documentation references function "String.upcase/9" but it is undefined or private|
 
     assert_unchanged(~m"`Unknown`")
 
