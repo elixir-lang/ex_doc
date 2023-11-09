@@ -125,15 +125,15 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "warns on undefined functions", context do
-    output =
+    out =
       capture_io(:stderr, fn ->
         generate_docs(doc_config(context, skip_undefined_reference_warnings_on: []))
       end)
 
-    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:2: Warnings"
-    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:18: Warnings.foo/0"
-    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:13: c:Warnings.handle_foo/0"
-    assert output =~ ~r"Warnings.bar/0.*\n  test/fixtures/warnings.ex:8: t:Warnings.t/0"
+    assert out =~ ~s| Warnings.foo/0 documentation references function "Warnings.bar/0" |
+    assert out =~ ~s| c:Warnings.handle_foo/0 documentation references function "Warnings.bar/0" |
+    assert out =~ ~s| t:Warnings.t/0 documentation references function "Warnings.bar/0" |
+    assert out =~ ~s| Warnings documentation references function "Warnings.bar/0" |
   end
 
   test "generates headers for index.html and module pages", %{tmp_dir: tmp_dir} = context do

@@ -506,14 +506,14 @@ defmodule ExDoc.Autolink do
 
   @doc false
   def warn(config, message) do
-    warning = IO.ANSI.format([:yellow, "warning: ", :reset])
+    message =
+      if config.id do
+        config.id <> " " <> message
+      else
+        message
+      end
 
-    stacktrace =
-      "  #{config.file}" <>
-        if(config.line, do: ":#{config.line}", else: "") <>
-        if(config.id, do: ": #{config.id}", else: "")
-
-    IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
+    IO.warn(message, file: config.file, line: config.line)
   end
 
   defp warn(config, ref, visibility, metadata)

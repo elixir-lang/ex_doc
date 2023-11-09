@@ -488,40 +488,23 @@ defmodule ExDoc.Language.ElixirTest do
       {{:type, AutolinkTest.Foo, :bad, 0}, :hidden}
     ])
 
-    captured =
-      warn(fn ->
-        assert autolink_doc("`AutolinkTest.Foo.bar/1`", file: "lib/foo.ex", line: 1, id: nil) ==
-                 ~s|<code class="inline">AutolinkTest.Foo.bar/1</code>|
-      end)
-
-    assert captured =~
-             ~s|documentation references function "AutolinkTest.Foo.bar/1" but it is hidden|
-
-    assert captured =~ ~r{lib/foo.ex:1\n$}
+    assert warn(fn ->
+             assert autolink_doc("`AutolinkTest.Foo.bar/1`") ==
+                      ~s|<code class="inline">AutolinkTest.Foo.bar/1</code>|
+           end) =~
+             ~s|documentation references function "AutolinkTest.Foo.bar/1" but it is hidden\n|
 
     assert warn(fn ->
-             assert autolink_doc("`t:AutolinkTest.Foo.bad/0`",
-                      file: "lib/foo.ex",
-                      id: "AutolinkTest.Foo.foo/0"
-                    ) == ~s|<code class="inline">t:AutolinkTest.Foo.bad/0</code>|
+             assert autolink_doc("`t:AutolinkTest.Foo.bad/0`") ==
+                      ~s|<code class="inline">t:AutolinkTest.Foo.bad/0</code>|
            end) =~
              ~s|documentation references type "t:AutolinkTest.Foo.bad/0" but it is hidden or private|
 
     assert warn(fn ->
-             assert autolink_doc("`t:Elixir.AutolinkTest.Foo.bad/0`",
-                      file: "lib/foo.ex",
-                      id: "AutolinkTest.Foo.foo/0"
-                    ) == ~s|<code class="inline">t:Elixir.AutolinkTest.Foo.bad/0</code>|
+             assert autolink_doc("`t:Elixir.AutolinkTest.Foo.bad/0`") ==
+                      ~s|<code class="inline">t:Elixir.AutolinkTest.Foo.bad/0</code>|
            end) =~
              ~s|documentation references type "t:Elixir.AutolinkTest.Foo.bad/0" but it is hidden or private|
-
-    assert warn(fn ->
-             assert autolink_doc("`t:AutolinkTest.Foo.bad/0`",
-                      file: "lib/foo.ex",
-                      id: "AutolinkTest.Foo.foo/0"
-                    ) == ~s|<code class="inline">t:AutolinkTest.Foo.bad/0</code>|
-           end) =~
-             ~s|documentation references type "t:AutolinkTest.Foo.bad/0" but it is hidden or private|
 
     assert warn(fn ->
              assert autolink_doc("`Code.Typespec`") ==
