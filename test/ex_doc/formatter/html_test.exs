@@ -130,10 +130,10 @@ defmodule ExDoc.Formatter.HTMLTest do
         generate_docs(doc_config(context, skip_undefined_reference_warnings_on: []))
       end)
 
-    assert out =~ ~s| Warnings.foo/0: documentation references function "Warnings.bar/0"|
-    assert out =~ ~s| c:Warnings.handle_foo/0: documentation references function "Warnings.bar/0"|
-    assert out =~ ~s| t:Warnings.t/0: documentation references function "Warnings.bar/0"|
-    assert out =~ ~s| Warnings: documentation references function "Warnings.bar/0"|
+    assert out =~ ~s|moduledoc `Warnings.bar/0`|
+    assert out =~ ~s|typedoc `Warnings.bar/0`|
+    assert out =~ ~s|doc callback `Warnings.bar/0`|
+    assert out =~ ~s|doc `Warnings.bar/0`|
   end
 
   test "generates headers for index.html and module pages", %{tmp_dir: tmp_dir} = context do

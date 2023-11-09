@@ -470,7 +470,8 @@ defmodule ExDoc.Language.Elixir do
 
   defp delegate_doc_ast({m, f, a}) do
     [
-      {:p, [], ["See ", {:code, [class: "inline"], [Exception.format_mfa(m, f, a)], %{}}, "."],
+      {:p, [],
+       ["See ", {:code, [class: "inline"], [Exception.format_mfa(m, f, a)], %{line: 1}}, "."],
        %{}}
     ]
   end
@@ -575,6 +576,8 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp walk_doc({:code, attrs, [code], meta} = ast, config) do
+    config = %{config | line: meta[:line]}
+
     if url = Autolink.url(code, :regular_link, config) do
       code = remove_prefix(code)
       {:a, [href: url], [{:code, attrs, [code], meta}], %{}}

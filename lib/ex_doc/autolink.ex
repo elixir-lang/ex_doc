@@ -515,13 +515,6 @@ defmodule ExDoc.Autolink do
 
   @doc false
   def warn(config, message) do
-    message =
-      if config.id do
-        config.id <> ": " <> message
-      else
-        message
-      end
-
     # TODO: Remove on Elixir v1.14
     stacktrace_info =
       if unquote(Version.match?(System.version(), ">= 1.14.0")) do

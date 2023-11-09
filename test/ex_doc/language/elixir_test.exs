@@ -491,11 +491,17 @@ defmodule ExDoc.Language.ElixirTest do
       warnings: :send
     ]
 
-    assert warn(fn ->
-             assert autolink_doc("`AutolinkTest.Foo.bar/1`", opts) ==
-                      ~s|<code class="inline">AutolinkTest.Foo.bar/1</code>|
-           end) =~
-             ~s|documentation references function "AutolinkTest.Foo.bar/1" but it is hidden|
+    doc = """
+    Hello,
+    `AutolinkTest.Foo.bar/1`
+    """
+
+    assert autolink_doc(doc, opts ++ [file: "foo.ex"]) ==
+             ~s|Hello,\n<code class="inline">AutolinkTest.Foo.bar/1</code>|
+
+    assert_received {:warn, message, metadata}
+    assert message =~ ~s|references function "AutolinkTest.Foo.bar/1" but it is hidden|
+    assert metadata == [file: "foo.ex", line: 2]
 
     assert warn(fn ->
              assert autolink_doc("`t:AutolinkTest.Foo.bad/0`", opts) ==

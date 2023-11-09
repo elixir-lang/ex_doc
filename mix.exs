@@ -34,7 +34,9 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [
-      {:earmark_parser, "~> 1.4.31"},
+      # TODO
+      {:earmark_parser, "~> 1.4.31",
+       github: "wojtekmach/earmark_parser", branch: "wm-codespan-line"},
       {:makeup_elixir, "~> 0.14"},
       {:makeup_erlang, "~> 0.1"},
       # Add other makeup lexers as optional for the executable
