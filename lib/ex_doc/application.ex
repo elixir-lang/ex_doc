@@ -14,9 +14,14 @@ defmodule ExDoc.Application do
 
     # Start all applications with the makeup prefix
     for {app, _, _} <- Application.loaded_applications(),
-        match?("makeup_" <> _, Atom.to_string(app)),
-        do: Application.ensure_all_started(app)
+        match?("makeup_" <> _, Atom.to_string(app)) do
+      Application.ensure_all_started(app)
+    end
 
-    Supervisor.start_link([ExDoc.Refs], strategy: :one_for_one)
+    children = [
+      ExDoc.Refs
+    ]
+
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
 end

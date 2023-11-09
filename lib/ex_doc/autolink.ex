@@ -26,6 +26,14 @@ defmodule ExDoc.Autolink do
   # * `:skip_code_autolink_to` - list of terms that will be skipped when autolinking (e.g: "PrivateModule")
   #
   # * `:filtered_modules` - A list of module nodes that were filtered by the retriever
+  #
+  # * `:warnings` - one of:
+  #
+  #     * `:emit` (default)
+  #
+  #     * `:raise` (useful for tests)
+  #
+  #     * `:send` - send back to caller (useful for tests)
 
   alias ExDoc.Refs
 
@@ -44,7 +52,8 @@ defmodule ExDoc.Autolink do
     skip_undefined_reference_warnings_on: [],
     skip_code_autolink_to: [],
     force_module_prefix: nil,
-    filtered_modules: []
+    filtered_modules: [],
+    warnings: :emit
   ]
 
   @hexdocs "https://hexdocs.pm/"
@@ -508,7 +517,7 @@ defmodule ExDoc.Autolink do
   def warn(config, message) do
     message =
       if config.id do
-        config.id <> " " <> message
+        config.id <> ": " <> message
       else
         message
       end
@@ -521,7 +530,17 @@ defmodule ExDoc.Autolink do
         []
       end
 
-    IO.warn(message, stacktrace_info)
+    case config.warnings do
+      :emit ->
+        IO.warn(message, stacktrace_info)
+
+      :raise ->
+        IO.warn(message, stacktrace_info)
+        raise "fail due to warnings"
+
+      :send ->
+        send(self(), {:warn, message, file: config.file, line: config.line})
+    end
   end
 
   defp warn(config, ref, visibility, metadata)
