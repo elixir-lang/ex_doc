@@ -506,14 +506,22 @@ defmodule ExDoc.Autolink do
 
   @doc false
   def warn(config, message) do
-    warning = IO.ANSI.format([:yellow, "warning: ", :reset])
+    message =
+      if config.id do
+        config.id <> " " <> message
+      else
+        message
+      end
 
-    stacktrace =
-      "  #{config.file}" <>
-        if(config.line, do: ":#{config.line}", else: "") <>
-        if(config.id, do: ": #{config.id}", else: "")
+    # TODO: Remove on Elixir v1.14
+    stacktrace_info =
+      if unquote(Version.match?(System.version(), ">= 1.14.0")) do
+        [file: config.file, line: config.line]
+      else
+        []
+      end
 
-    IO.puts(:stderr, [warning, message, ?\n, stacktrace, ?\n])
+    IO.warn(message, stacktrace_info)
   end
 
   defp warn(config, ref, visibility, metadata)
