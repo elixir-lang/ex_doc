@@ -537,6 +537,10 @@ defmodule ExDoc.Language.ElixirTest do
            end)
 
     assert warn(fn ->
+             assert autolink_doc("[text](`foo/0`)", opts) == "text"
+           end) =~ ~s|documentation references function "foo/0" but it is undefined or private|
+
+    assert warn(fn ->
              assert autolink_doc("[text](`fakefunction`)", opts) == "text"
            end) =~ ~s|documentation references "fakefunction" but it is invalid|
 
