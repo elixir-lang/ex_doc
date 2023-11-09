@@ -513,7 +513,15 @@ defmodule ExDoc.Autolink do
         message
       end
 
-    IO.warn(message, file: config.file, line: config.line)
+    # TODO: Remove on Elixir v1.14
+    stacktrace_info =
+      if unquote(Version.match?(System.version(), ">= 1.14.0")) do
+        [file: config.file, line: config.line]
+      else
+        []
+      end
+
+    IO.warn(message, stacktrace_info)
   end
 
   defp warn(config, ref, visibility, metadata)
