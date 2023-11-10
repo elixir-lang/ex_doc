@@ -92,22 +92,10 @@ defmodule ExDoc.Mixfile do
         Markdown: [
           ExDoc.Markdown,
           ExDoc.Markdown.Earmark
-        ],
-        "Formatter API": [
-          ExDoc.Config,
-          ExDoc.Formatter.EPUB,
-          ExDoc.Formatter.HTML,
-          ExDoc.Formatter.HTML.Autolink,
-          ExDoc.FunctionNode,
-          ExDoc.ModuleNode,
-          ExDoc.TypeNode
         ]
       ],
       skip_undefined_reference_warnings_on: [
-        "CHANGELOG.md",
-        "t:ExDoc.FunctionNode.t/0",
-        "t:ExDoc.ModuleNode.t/0",
-        "t:ExDoc.TypeNode.t/0"
+        "CHANGELOG.md"
       ]
     ]
   end

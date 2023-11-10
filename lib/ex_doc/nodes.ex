@@ -1,7 +1,5 @@
 defmodule ExDoc.ModuleNode do
-  @moduledoc """
-  Structure that represents a module.
-  """
+  @moduledoc false
 
   defstruct id: nil,
             title: nil,
@@ -53,9 +51,7 @@ defmodule ExDoc.ModuleNode do
 end
 
 defmodule ExDoc.FunctionNode do
-  @moduledoc """
-  Structure that represents an individual function.
-  """
+  @moduledoc false
 
   defstruct id: nil,
             name: nil,
@@ -98,9 +94,7 @@ defmodule ExDoc.FunctionNode do
 end
 
 defmodule ExDoc.TypeNode do
-  @moduledoc """
-  Structure that represents an individual type.
-  """
+  @moduledoc false
 
   defstruct id: nil,
             name: nil,
