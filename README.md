@@ -2,11 +2,7 @@
 
 [![Build Status](https://github.com/elixir-lang/ex_doc/workflows/CI/badge.svg)](https://github.com/elixir-lang/ex_doc/actions?query=workflow%3A%22CI%22)
 
-ExDoc is a tool to generate documentation for your Elixir projects. To see an example, [you can access Elixir's official docs](https://hexdocs.pm/elixir/).
-
-To learn about how to document your projects, see [Elixir's writing documentation page](https://hexdocs.pm/elixir/writing-documentation.html).
-
-To see all supported options, see the documentation for [mix docs](https://hexdocs.pm/ex_doc/Mix.Tasks.Docs.html).
+ExDoc is a tool to generate documentation for Erlang and Elixir projects. To see an example, [you can access Elixir's official docs](https://hexdocs.pm/elixir/).
 
 ## Features
 
@@ -30,11 +26,11 @@ ExDoc ships with many features:
 
 You can use ExDoc with Mix (recommended for Elixir projects), with Rebar (recommended for Erlang projects), or via the command line.
 
-### Using ExDoc with Mix
+<!-- tabs-open -->
 
-ExDoc requires Elixir v1.10 or later.
+### Mix
 
-First, add ExDoc as a dependency:
+ExDoc requires Elixir v1.12 or later. Then add ExDoc as a dependency:
 
 ```elixir
 def deps do
@@ -74,11 +70,13 @@ end
 
 Now you are ready to generate your project documentation with `mix docs`. To see all options available, run `mix help docs`.
 
-### Using ExDoc with Rebar3
+To learn about how to document your projects, see [Elixir's writing documentation page](https://hexdocs.pm/elixir/writing-documentation.html).
+
+### Rebar3
 
 From Erlang/OTP 24+, you can use ExDoc to render your Erlang documentation written with EDoc. See [`rebar3_ex_doc`](https://github.com/starbelly/rebar3_ex_doc/) for more information.
 
-### Using ExDoc via command line
+### CLI
 
 You can use ExDoc via the command line.
 
@@ -111,13 +109,29 @@ You can use ExDoc via the command line.
    GITHUB_REPO     => ecto
    ```
 
+You can specify a config file via the `--config` option, both Elixir and Erlang formats are supported. Invoke `ex_doc` without arguments to learn more.
+
+<!-- tabs-close -->
+
 ## Syntax highlighting
 
 ExDoc uses [the makeup project](https://github.com/elixir-makeup/makeup) for syntax highlighting. By default, highlighters for Erlang and Elixir are included. To syntax-highlight other languages, simply add the equivalent `makeup_LANGUAGE` package to your `mix.exs`/`rebar.config` file. For example, for HTML support you would add:
 
+<!-- tabs-open -->
+
+### Elixir (Mix)
+
 ```elixir
 {:makeup_html, ">= 0.0.0", only: :dev, runtime: false}
 ```
+
+### Erlang (Rebar3)
+
+```erlang
+{makeup_html, "0.1.1"}
+```
+
+<!-- tabs-close -->
 
 You can find all supported languages under [the Makeup organization on GitHub](https://github.com/elixir-makeup) and view them at [Makeup's website](https://elixir-makeup.github.io/makeup_demo/).
 
@@ -129,9 +143,13 @@ You can publish additional pages in your project documentation by configuring th
 
   * Cheatsheets (`.cheatmd` extension) - useful for discovery and quick reference. [Learn more](https://hexdocs.pm/ex_doc/cheatsheet.html).
 
-  * Livebooks (`.livemd` extension) - useful for tutorials, interactive examples and deep dives. [Learn more](https://livebook.dev/).
+  * Livebooks (`.livemd` extension) - useful for tutorials, interactive examples, and deep dives. [Learn more](https://livebook.dev/).
 
 For example, you can set your `:extras` to:
+
+<!-- tabs-open -->
+
+### Elixir
 
 ```elixir
 extras: ["README.md", "LICENSE", "tutorial.livemd", "cheatsheet.cheatmd"]
@@ -139,9 +157,21 @@ extras: ["README.md", "LICENSE", "tutorial.livemd", "cheatsheet.cheatmd"]
 
 Run `mix help docs` for more information on configuration.
 
+### Erlang
+
+```elixir
+{extras, [<<"README.md">>, <<"cheatsheet.cheatmd">>]}.
+```
+
+<!-- tabs-close -->
+
 ## Metadata
 
 ExDoc supports metadata keys in your documentation.
+
+<!-- tabs-open -->
+
+### Elixir
 
 In Elixir, you can add metadata to modules and functions.
 
@@ -157,16 +187,20 @@ For a function, use `@doc`:
 @doc since: "1.13.1"
 ```
 
+### Erlang
+
 In Erlang's EDoc:
 
 ```erlang
 %% @since 0.1.0
 ```
 
+<!-- tabs-close -->
+
 The following metadata is available for both modules and functions:
 
-  * `deprecated` (string) - marks a module/function as deprecated, with the given string as the reason.
-  * `since` (string) - declares a module/function available from a particular version.
+  * `deprecated` (binary) - marks a module/function as deprecated, with the given string as the reason.
+  * `since` (binary) - declares a module/function available from a particular version.
 
 The following metadata is available for modules:
 
@@ -180,18 +214,13 @@ ExDoc for Elixir and Erlang will automatically generate links across modules and
 
 ### Elixir
 
-  * When referring to a module, function, type or callback from your project, such as `` `MyModule` ``, ExDoc will automatically link to it.
-  * When referring to a module, function, type or callback from Elixir, such as `` `String` ``, ExDoc will automatically link to it at Elixir's stable documentation.
-  * When referring to a function, type, or callback from OTP, such as (`` `:queue.new/0` ``), ExDoc will automatically link to it at the OTP documentation.
-  * When referring to a module, function, type or callback from any of your dependencies, such as `` `MyDep` ``, ExDoc will automatically link to it at the dependency's documentation at [hexdocs.pm](https://hexdocs.pm/). (The link can be configured by setting `docs: [deps: [my_dep: "https://path/to/docs/"]]` in your `mix.exs`.)
+ExDoc will automatically link modules, functions, types or callbacks defined in your project and its dependencies (including Erlang and Elixir). ExDoc will automatically link to it at the dependency's documentation at [hexdocs.pm](https://hexdocs.pm/). The link can be configured by setting `docs: [deps: [my_dep: "https://path/to/docs/"]]` in your `mix.exs`.
 
-ExDoc supports linking to modules (`` `MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name; e.g.: `` `function/1` ``.
+ExDoc supports linking to modules (`` `MyModule` `` and `` `m:MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name, for example: `` `function/1` ``.
 
-You can also use custom text; e.g.: `` [custom text](`MyModule.function/1`) ``. This also allows you to refer to OTP modules; e.g.: `` [`:array`](`:array`) ``.
+You can also use custom text, such as `` [custom text](`MyModule.function/1`) ``. Link to extra pages using the syntax `` [Up and running](Up and running.md) ``. The final link will be automatically converted to `up-and-running.html`.
 
-Link to extra pages using the syntax `` [Up and running](Up and running.md) ``, skipping the directory in which the page is. The final link will be automatically converted to `up-and-running.html`.
-
-Link to extra pages in another application using the syntax `` [Writing Documentation](`e:elixir:writing-documentation.md`) ``, skipping the directory in which the page is. The final link will be automatically converted to `https://hexdocs.pm/elixir/writing-documentation.html`.
+Link to extra pages in another application using the syntax `` [Writing Documentation](`e:elixir:writing-documentation.html`) ``, skipping the directory in which the page is. The final link will be automatically converted to `https://hexdocs.pm/elixir/writing-documentation.html`.
 
 It is also possible to place anchors after the module name and extra pages. For example:
 
@@ -200,18 +229,15 @@ It is also possible to place anchors after the module name and extra pages. For 
 
 ### Erlang
 
-  * When referring to a module, function, type or callback from your project, such as `` `m:my_module` ``, ExDoc will automatically link to it.
-  * When referring to a module, function, type or callback from Erlang/OTP, such as `` `m:string` ``, ExDoc will automatically link to it at Erlang/OTP's stable documentation.
-  * When referring to a function, type, or callback from Elixir, such as (`` `Elixir.String` ``), ExDoc will automatically link to it at Elixir stable documentation.
-  * When referring to a module, function, type or callback from any of your hex dependencies, such as `` `my_dep` ``, ExDoc will automatically link to it at the dependency's documentation at [hexdocs.pm](https://hexdocs.pm/). (The link can be configured by setting `{docs, [{deps,  [{my_dep, "https://path/to/docs/"}]}]}` in your `rebar3.config`.)
+ExDoc will automatically link modules, functions, types or callbacks defined in your project and its dependencies (including Erlang and Elixir). ExDoc will automatically link to it at the dependency's documentation at [hexdocs.pm](https://hexdocs.pm/). The link can be configured by setting `docs: [deps: [my_dep: "https://path/to/docs/"]]` in your `mix.exs`. The link can be configured by setting `{docs, [{deps,  [{my_dep, "https://path/to/docs/"}]}]}` in your `rebar3.config`.
 
 ExDoc supports linking to modules (`` `m:my_module` ``), functions (`` `my_module:function/1` ``), types (`` `t:my_module:type/2` ``) and callbacks (`` `c:my_module:callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name; e.g.: `` `function/1` ``.
 
-You can also use custom text; e.g.: `` [custom text](`my_module:function/1`) ``. This also allows you to refer to Erlang/OTP modules; e.g.: `` [The array module](`array`) ``. (Note that when a module is given as the link target, it is not necessary nor possible to use the `m:` prefix.
+You can also use custom text, such as `` [custom text](`my_module:function/1`) ``. This also allows you to refer to Erlang/OTP modules: `` [The array module](`array`) `` (note that when a module is given as the link target, it is not necessary nor possible to use the `m:` prefix).
 
-Link to extra pages using the syntax `` [Up and running](Up and running.md) ``, skipping the directory in which the page is. The final link will be automatically converted to `up-and-running.html`.
+Link to extra pages using the syntax `` [Up and running](Up and running.md) ``. The final link will be automatically converted to `up-and-running.html`.
 
-Link to extra pages in another application using the syntax `` [Using unicode](`e:stdlib:unicode_usage.md`) ``, skipping the directory in which the page is. The final link will be automatically converted to `https://hexdocs.pm/elixir/writing-documentation.html`.
+Link to extra pages in another application using the syntax `` [Using unicode](`e:stdlib:unicode_usage.html`) ``, skipping the directory in which the page is. The final link will be automatically converted to `https://hexdocs.pm/elixir/writing-documentation.html`.
 
 It is also possible to place anchors after the module name and extra pages. For example:
 
