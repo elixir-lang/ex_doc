@@ -130,8 +130,6 @@ defmodule ExDoc.Formatter.HTMLTest do
         generate_docs(doc_config(context, skip_undefined_reference_warnings_on: []))
       end)
 
-    out = String.replace(out, ~r/\e\[[0-9;]*m/, "")
-
     assert out =~ ~s| Warnings.foo/0: documentation references function "Warnings.bar/0"|
     assert out =~ ~s| c:Warnings.handle_foo/0: documentation references function "Warnings.bar/0"|
     assert out =~ ~s| t:Warnings.t/0: documentation references function "Warnings.bar/0"|
