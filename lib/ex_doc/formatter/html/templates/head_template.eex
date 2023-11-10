@@ -9,7 +9,7 @@
     <%= if config.authors do %>
       <meta name="author" content="<%= Enum.join(config.authors, ", ") %>">
     <% end %>
-    <%= if page.title in ["404", "Search"] do %>
+    <%= if page.noindex do %>
       <meta name="robots" content="noindex">
     <% end %>
     <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
