@@ -1,5 +1,5 @@
 %{
-  "earmark_parser": {:git, "https://github.com/wojtekmach/earmark_parser.git", "3c032e1d1dc5cd2bddbc45c668b6d520350fd6ee", [branch: "wm-codespan-line"]},
+  "earmark_parser": {:git, "https://github.com/wojtekmach/earmark_parser.git", "0c2a6243cea6e7aa3056aaeec4899f5463c8dd0f", [branch: "wm-codespan-line"]},
   "easyhtml": {:hex, :easyhtml, "0.2.0", "0cd913f920392b5b5f74ff94c1795f8fc5c0812213ef4c466af7705348e1c05d", [:mix], [{:floki, "~> 0.30", [hex: :floki, repo: "hexpm", optional: false]}], "hexpm", "f827387bbafe03b70df5e392f5e536b579a1dfa315714fb827ffde4e620d44a9"},
   "floki": {:hex, :floki, "0.34.2", "5fad07ef153b3b8ec110b6b155ec3780c4b2c4906297d0b4be1a7162d04a7e02", [:mix], [], "hexpm", "26b9d50f0f01796bc6be611ca815c5e0de034d2128e39cc9702eee6b66a4d1c8"},
   "jason": {:hex, :jason, "1.2.0", "10043418c42d2493d0ee212d3fddd25d7ffe484380afad769a0a38795938e448", [:mix], [{:decimal, "~> 1.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm", "116747dbe057794c3a3e4e143b7c8390b29f634e16c78a7f59ba75bfa6852e7f"},
