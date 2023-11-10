@@ -393,7 +393,7 @@
   cursor: pointer;
   background-color: transparent;
   border: none;
-  padding: 18px 11px;
+  padding: 18px 8px 18px 11px;
   font-size: var(--sidebarFontSize);
 }
 
