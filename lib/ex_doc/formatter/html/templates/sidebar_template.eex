@@ -7,17 +7,19 @@
 <nav id="sidebar" class="sidebar">
   <% url = config.homepage_url || "#{config.main}.html" %>
   <div class="sidebar-header">
-    <%= if config.logo do %>
-      <a href="<%= url %>">
-        <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
-      </a>
-    <% end %>
-    <div class="sidebar-projectDetails">
-      <a href="<%= url %>" class="sidebar-projectName" translate="no">
-        <%= config.project %>
-      </a>
-      <div class="sidebar-projectVersion" translate="no">
-        v<%= config.version %>
+    <div class="sidebar-projectInfo">
+      <%= if config.logo do %>
+        <a href="<%= url %>">
+          <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
+        </a>
+      <% end %>
+      <div>
+        <a href="<%= url %>" class="sidebar-projectName" translate="no">
+          <%= config.project %>
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v<%= config.version %>
+        </div>
       </div>
     </div>
     <ul id="sidebar-listNav" class="sidebar-listNav" role="tablist">

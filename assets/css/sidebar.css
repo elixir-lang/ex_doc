@@ -39,19 +39,18 @@
   width: 100%;
 }
 
-.sidebar .sidebar-projectDetails {
-  display: inline-block;
-  text-align: left;
-  vertical-align: top;
-  margin: 12px 16px 12px 16px;
+.sidebar .sidebar-projectInfo {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 16px 12px 14px;
+  max-width: 235px;
 }
 
 .sidebar .sidebar-projectImage {
-  display: inline-block;
   max-width: 48px;
   max-height: 48px;
-  margin: 0 0 0 10px;
-  vertical-align: bottom;
 }
 
 .sidebar .sidebar-projectName {
@@ -108,7 +107,7 @@
 .sidebar .sidebar-listNav {
   display: flex;
   margin: 0;
-  padding: 12px 12px 0 4px;
+  padding: 4px 4px 0 4px;
 }
 
 .sidebar .sidebar-listNav :is(li, li button) {
@@ -394,7 +393,7 @@
   cursor: pointer;
   background-color: transparent;
   border: none;
-  padding: 15px 11px;
+  padding: 18px 8px 18px 11px;
   font-size: var(--sidebarFontSize);
 }
 

@@ -39,15 +39,13 @@ body {
 }
 
 .sidebar-button {
-  --sidebarButtonTopOpen: 6px;
   --sidebarButtonRightOpen: 4px;
   position: fixed;
   z-index: 99;
   left: 0;
-  top: 0;
   transition: all var(--sidebarTransitionDuration) ease-in-out;
   will-change: transform;
-  margin-top: 6px;
+  margin-top: 12px;
 }
 
 .content {
@@ -62,7 +60,6 @@ body:is(.sidebar-opening, .sidebar-opened) .sidebar-button {
   transform: translateX(
     calc(var(--sidebarWidth) - 100% - var(--sidebarButtonRightOpen))
   );
-  top: var(--sidebarButtonTopOpen);
 }
 
 body.sidebar-opening-start .sidebar {
