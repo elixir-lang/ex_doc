@@ -207,9 +207,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~
                ~r"""
                <div class="sidebar-header">\s*\
-               <div class="sidebar-projectDetails">\s*\
+               <div class="sidebar-projectInfo">\s*\
+               <div>\s*\
                <a href="#{homepage_url()}" class="sidebar-projectName" translate="no">\s*Elixir\s*</a>\s*\
-               <div class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</div>\s*\</div>
+               <div class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</div>\s*\</div>\s*\</div>
                """
     end
 
@@ -225,9 +226,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~
                ~r"""
                <div class="sidebar-header">\s*\
-               <div class="sidebar-projectDetails">\s*\
+               <div class="sidebar-projectInfo">\s*\
+               <div>\s*\
                <a href="hello.html" class="sidebar-projectName" translate="no">\s*Elixir\s*</a>\s*\
-               <div class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</div>\s*\</div>
+               <div class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</div>\s*\</div>\s*\</div>
                """
     end
 
