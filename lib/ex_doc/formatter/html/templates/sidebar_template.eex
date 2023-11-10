@@ -9,8 +9,8 @@
   <div class="sidebar-header">
     <div class="sidebar-projectInfo">
       <%= if config.logo do %>
-        <a href="<%= url %>">
-          <img src="<%= logo_path(config) %>" alt="<%= config.project %>" class="sidebar-projectImage">
+        <a href="<%= url %>" class="sidebar-projectImage">
+          <img src="<%= logo_path(config) %>" alt="<%= config.project %>" />
         </a>
       <% end %>
       <div>

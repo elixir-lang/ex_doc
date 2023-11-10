@@ -49,6 +49,10 @@
 }
 
 .sidebar .sidebar-projectImage {
+  align-self: flex-end;
+}
+
+.sidebar .sidebar-projectImage img {
   max-width: 48px;
   max-height: 48px;
 }
