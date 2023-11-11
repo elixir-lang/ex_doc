@@ -9,6 +9,9 @@
     <%= if config.authors do %>
       <meta name="author" content="<%= Enum.join(config.authors, ", ") %>">
     <% end %>
+    <%= if page.noindex do %>
+      <meta name="robots" content="noindex">
+    <% end %>
     <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
     <link rel="stylesheet" href="<%= asset_rev config.output, "dist/html-#{config.proglang}*.css" %>" />
     <%= if page.type == :cheatmd do %>

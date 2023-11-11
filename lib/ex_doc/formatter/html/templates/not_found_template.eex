@@ -1,4 +1,4 @@
-<%= head_template(config, %{title: "404", type: :extra}) %>
+<%= head_template(config, %{title: "404", type: :extra, noindex: true}) %>
 <%= sidebar_template(config, nodes_map) %>
 
 <h1>
