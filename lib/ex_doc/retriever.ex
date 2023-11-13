@@ -360,7 +360,7 @@ defmodule ExDoc.Retriever do
     type_data = module_data.language.type_data(type_entry, module_data)
     signature = signature(type_data.signature)
     annotations = if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
-    doc_ast = doc_ast(content_type, doc, file: source.path)
+    doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
     metadata = Map.put(metadata, :__doc__, :type)
     group = GroupMatcher.match_function(groups_for_docs, metadata)
 
