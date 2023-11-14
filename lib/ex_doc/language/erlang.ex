@@ -262,6 +262,8 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp walk_doc({:code, attrs, [code], meta} = ast, config) when is_binary(code) do
+    config = %{config | line: meta[:line]}
+
     case Autolink.url(code, :regular_link, config) do
       url when is_binary(url) ->
         code = remove_prefix(code)

@@ -92,7 +92,15 @@ defmodule ExDoc.Formatter.HTML do
         docs =
           for child_node <- node.docs do
             id = id(node, child_node)
-            autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
+
+            autolink_opts =
+              autolink_opts ++
+                [
+                  id: id,
+                  line: child_node.doc_line,
+                  current_kfa: {:function, child_node.name, child_node.arity}
+                ]
+
             specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
             child_node = %{child_node | specs: specs}
             render_doc(child_node, language, autolink_opts, opts)
@@ -101,7 +109,14 @@ defmodule ExDoc.Formatter.HTML do
         typespecs =
           for child_node <- node.typespecs do
             id = id(node, child_node)
-            autolink_opts = autolink_opts ++ [id: id, line: child_node.doc_line]
+
+            autolink_opts =
+              autolink_opts ++
+                [
+                  id: id,
+                  line: child_node.doc_line,
+                  current_kfa: {child_node.type, child_node.name, child_node.arity}
+                ]
 
             child_node = %{
               child_node

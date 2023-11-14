@@ -350,21 +350,59 @@ defmodule ExDoc.Language.ErlangTest do
   describe "autolink_doc/2 for markdown warnings" do
     @describetag warnings: :send
 
+    test "bad function in module", c do
+      assert warn(
+               fn ->
+                 assert autolink_doc("\n`erlang_bar:bad/0`", c) ==
+                          ~s|<code class="inline">erlang_bar:bad/0</code>|
+               end,
+               line: 2
+             ) =~
+               ~s|documentation references function "erlang_bar:bad/0" but it is undefined or private|
+    end
+
+    test "bad type in module", c do
+      assert warn(
+               fn ->
+                 assert autolink_doc("\n`t:erlang_bar:bad/0`", c) ==
+                          ~s|<code class="inline">t:erlang_bar:bad/0</code>|
+               end,
+               line: 2
+             ) =~
+               ~s|documentation references type "t:erlang_bar:bad/0" but it is undefined or private|
+    end
+
+    test "bad callback in module", c do
+      assert warn(
+               fn ->
+                 assert autolink_doc("\n`c:erlang_bar:bad/0`", c) ==
+                          ~s|<code class="inline">c:erlang_bar:bad/0</code>|
+               end,
+               line: 2
+             ) =~ ~s|documentation references callback "c:erlang_bar:bad/0" but it is undefined|
+    end
+
     test "bad function in module ref", c do
-      assert warn(fn ->
-               assert autolink_doc("[Bad](`bad/0`)", c) == ~s|Bad|
-             end) =~ ~s|documentation references function "bad/0" but it is undefined or private|
+      assert warn(
+               fn ->
+                 assert autolink_doc("[Bad](`bad/0`)", c) == ~s|Bad|
+               end,
+               line: nil
+             ) =~ ~s|documentation references function "bad/0" but it is undefined or private|
     end
 
     test "linking to local extra works does not work", c do
-      assert warn(fn ->
-               assert autolink_doc("[extra](`e:extra.md`)", c) ==
-                        ~s|extra|
-             end) =~ ~r/documentation references "e:extra.md" but it is invalid/
+      assert warn(
+               fn ->
+                 assert autolink_doc("[extra](`e:extra.md`)", c) ==
+                          ~s|extra|
+               end,
+               line: nil
+             ) =~ ~r/documentation references "e:extra.md" but it is invalid/
     end
   end
 
-  describe "autolink_edoc/2 for extra" do
+  describe "autolink_doc/2 for extra" do
     test "function", c do
       assert autolink_extra("`erlang_foo:foo/0`", c) ==
                ~s|<a href="erlang_foo.html#foo/0"><code class="inline">erlang_foo:foo/0</code></a>|
@@ -410,9 +448,16 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<code class="inline">...a/0</code>|
     end
 
-    test "bad type", c do
-      assert autolink_extra("`t:bad:bad/0`", c) ==
-               ~s|<code class="inline">t:bad:bad/0</code>|
+    @tag warnings: :send
+    test "bad type ref", c do
+      assert warn(
+               fn ->
+                 assert autolink_extra("[t](`t:bad:bad/0`)", c) ==
+                          ~s|t|
+               end,
+               file: "extra.md",
+               line: nil
+             ) =~ ~s|documentation references type "t:bad:bad/0" but it is undefined or private|
     end
 
     test "bad module", c do
@@ -422,10 +467,14 @@ defmodule ExDoc.Language.ErlangTest do
 
     @tag warnings: :send
     test "bad module using m:", c do
-      assert warn(fn ->
-               assert autolink_extra("`m:does_not_exist`", c) ==
-                        ~s|<code class="inline">m:does_not_exist</code>|
-             end) =~ ~r|documentation references module \"does_not_exist\" but it is undefined|
+      assert warn(
+               fn ->
+                 assert autolink_extra("`m:does_not_exist`", c) ==
+                          ~s|<code class="inline">m:does_not_exist</code>|
+               end,
+               file: "extra.md",
+               line: 1
+             ) =~ ~r|documentation references module \"does_not_exist\" but it is undefined|
     end
 
     test "extras" do
@@ -618,7 +667,7 @@ defmodule ExDoc.Language.ErlangTest do
     [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, [])
 
     opts = c |> Map.take([:warnings]) |> Enum.to_list()
-    do_autolink_doc(ast, opts)
+    do_autolink_doc(ast, [file: "extra.md"] ++ opts)
   end
 
   defp autolink_doc(text, c, opts \\ []) do
@@ -637,6 +686,7 @@ defmodule ExDoc.Language.ErlangTest do
       ast,
       [
         current_module: :erlang_foo,
+        file: "erlang_foo.erl",
         module_id: "erlang_foo",
         deps: [foolib: "https://foolib.com"]
       ] ++
@@ -668,9 +718,18 @@ defmodule ExDoc.Language.ErlangTest do
     |> ExDoc.DocAST.to_string()
   end
 
-  defp warn(fun) when is_function(fun, 0) do
+  defp warn(fun, md \\ []) when is_function(fun, 0) do
     fun.()
-    assert_received {:warn, message, _metadata}
+    assert_received {:warn, message, metadata}
+
+    if Keyword.has_key?(md, :line) do
+      assert md[:line] == metadata[:line]
+    end
+
+    if Keyword.has_key?(md, :file) do
+      assert md[:file] == metadata[:file]
+    end
+
     message
   end
 

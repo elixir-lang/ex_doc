@@ -7,6 +7,9 @@ defmodule ExDoc.Autolink do
   # * `:current_module` - the module that the docs are being generated for. Used to link local
   #   calls and see if remote calls are in the same app.
   #
+  # * `:current_kfa` - the kind, function, arity that the docs are being generated for. Is nil
+  #    if there is no such thing. Used to generate more accurate warnings.
+  #
   # * `:module_id` - id of the module being documented (e.g.: `"String"`)
   #
   # * `:file` - source file location
@@ -48,6 +51,7 @@ defmodule ExDoc.Autolink do
     extras: [],
     deps: [],
     ext: ".html",
+    current_kfa: nil,
     siblings: [],
     skip_undefined_reference_warnings_on: [],
     skip_code_autolink_to: [],
@@ -495,7 +499,16 @@ defmodule ExDoc.Autolink do
     # TODO: Remove on Elixir v1.14
     stacktrace_info =
       if unquote(Version.match?(System.version(), ">= 1.14.0")) do
-        [file: config.file, line: config.line]
+        f =
+          case config.current_kfa do
+            {:function, f, a} ->
+              [function: {f, a}]
+
+            _ ->
+              []
+          end
+
+        [file: config.file, line: config.line, module: config.current_module] ++ f
       else
         []
       end
