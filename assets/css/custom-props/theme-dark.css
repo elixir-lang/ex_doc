@@ -18,6 +18,9 @@ body.dark {
   --blockquoteBackground:        var(--coldGrayDim);
   --blockquoteBorder:            var(--coldGrayDark);
 
+  --tableHeadBorder:             var(--gray600);
+  --tableBodyBorder:             var(--gray700);
+
   --warningBackground:           hsl( 40,  67%,  79%);
   --warningHeadingBackground:    hsl( 27,  66%,  29%);
   --warningHeading:              var(--white);

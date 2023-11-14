@@ -18,6 +18,9 @@
   --blockquoteBackground:        var(--coldGrayFaint);
   --blockquoteBorder:            var(--coldGrayLight);
 
+  --tableHeadBorder:             var(--gray100);
+  --tableBodyBorder:             var(--gray50);
+
   --warningBackground:           hsl( 33, 100%,  97%);
   --warningHeadingBackground:    hsl( 33,  87%,  64%);
   --warningHeading:              var(--black);

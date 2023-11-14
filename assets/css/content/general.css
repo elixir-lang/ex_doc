@@ -109,6 +109,7 @@
 
 .content-inner table {
   margin: 2em 0;
+  border-collapse: collapse;
 }
 
 .content-inner th {
@@ -119,13 +120,25 @@
   padding-bottom: .5em;
 }
 
+.content-inner thead tr {
+  border-bottom: 1px solid var(--tableHeadBorder);
+}
+
+.content-inner tbody tr {
+  border-bottom: 1px solid var(--tableBodyBorder);
+}
+
+.content-inner tbody tr:last-child {
+  border-bottom: none
+}
+
 .content-inner tr {
-  border-bottom: 1px solid var(--gray50);
   vertical-align: bottom;
   height: 2.5em;
 }
 
 .content-inner :is(td, th) {
+  padding: 0.25em;
   padding-left: 1em;
   line-height: 2em;
   vertical-align: top;
