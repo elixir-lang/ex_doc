@@ -98,6 +98,7 @@ defmodule ExDoc.Formatter.HTML do
                 [
                   id: id,
                   line: child_node.doc_line,
+                  file: child_node.source_path,
                   current_kfa: {:function, child_node.name, child_node.arity}
                 ]
 
@@ -115,6 +116,7 @@ defmodule ExDoc.Formatter.HTML do
                 [
                   id: id,
                   line: child_node.doc_line,
+                  file: child_node.source_path,
                   current_kfa: {child_node.type, child_node.name, child_node.arity}
                 ]
 

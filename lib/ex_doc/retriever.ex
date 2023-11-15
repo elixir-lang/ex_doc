@@ -236,6 +236,7 @@ defmodule ExDoc.Retriever do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{type, name, arity}, anno, signature, source_doc, metadata} = doc_element
     doc_line = anno_line(anno)
+    source = anno_file(anno, source)
 
     annotations =
       annotations_for_docs.(metadata) ++
@@ -310,6 +311,7 @@ defmodule ExDoc.Retriever do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{kind, name, arity}, anno, _signature, source_doc, metadata} = callback
     doc_line = anno_line(anno)
+    source = anno_file(anno, source)
 
     signature = signature(callback_data.signature)
     specs = callback_data.specs
@@ -355,6 +357,7 @@ defmodule ExDoc.Retriever do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{_, name, arity}, anno, _signature, source_doc, metadata} = type_entry
     doc_line = anno_line(anno)
+    source = anno_file(anno, source)
     annotations = annotations_from_metadata(metadata, module_metadata)
 
     type_data = module_data.language.type_data(type_entry, module_data)
@@ -405,6 +408,15 @@ defmodule ExDoc.Retriever do
 
   defp anno_line(line) when is_integer(line), do: abs(line)
   defp anno_line(anno), do: anno |> :erl_anno.line() |> abs()
+
+  defp anno_file(anno, source) do
+    case :erl_anno.file(anno) do
+      :undefined ->
+        source
+      file ->
+        %{ url: source.url, path: Path.join(Path.dirname(source.path), file) }
+    end
+  end
 
   defp source_link(%{path: _, url: nil}, _line), do: nil
 
