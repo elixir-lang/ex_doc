@@ -37,6 +37,14 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://www.erlang.org/doc/man/array.html"><code>array</code></a>|
     end
 
+    @tag warnings: :send
+    test "app", c do
+      assert warn(fn ->
+               assert autolink_edoc("{@link //stdlib. `stdlib'}", c) ==
+                        ~s|<code>stdlib</code>|
+             end) =~ ~s|invalid reference: stdlib:index (seeapp)|
+    end
+
     test "external module", c do
       assert autolink_edoc("{@link 'Elixir.EarmarkParser'}", c) ==
                ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|

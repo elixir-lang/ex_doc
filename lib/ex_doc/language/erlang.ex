@@ -335,7 +335,7 @@ defmodule ExDoc.Language.Erlang do
         walk_doc({:a, [href: "`t:#{fixup(type)}`"], inner, meta}, config)
 
       "https://erlang.org/doc/link/" <> see ->
-        warn_ref(attrs[:href] <> " (#{see})", config)
+        warn_ref(attrs[:href] <> " (#{see})", %{config | id: nil})
         inner
 
       _ ->
