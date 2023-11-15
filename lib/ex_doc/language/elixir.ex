@@ -267,7 +267,7 @@ defmodule ExDoc.Language.Elixir do
   def parse_module_function(string) do
     case string |> String.split(".") |> Enum.reverse() do
       [string] ->
-        with {:function, function} <- Autolink.parse_function(string) do
+        with {:function, function} <- parse_function(string) do
           {:local, function}
         end
 
@@ -298,9 +298,24 @@ defmodule ExDoc.Language.Elixir do
         module_string = rest |> Enum.reverse() |> Enum.join(".")
 
         with {:module, module} <- parse_module(module_string, :custom_link),
-             {:function, function} <- Autolink.parse_function(function_string) do
+             {:function, function} <- parse_function(function_string) do
           {:remote, module, function}
         end
+    end
+  end
+
+  # There are special forms that are forbidden by the tokenizer
+  defp parse_function("__aliases__"), do: {:function, :__aliases__}
+  defp parse_function("__block__"), do: {:function, :__block__}
+  defp parse_function("%"), do: {:function, :%}
+
+  defp parse_function(string) do
+    case Code.string_to_quoted("& #{string}/0", warnings: false) do
+      {:ok, {:&, _, [{:/, _, [{function, _, _}, 0]}]}} when is_atom(function) ->
+        {:function, function}
+
+      _ ->
+        :error
     end
   end
 

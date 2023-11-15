@@ -262,6 +262,8 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp walk_doc({:code, attrs, [code], meta} = ast, config) when is_binary(code) do
+    config = %{config | line: meta[:line]}
+
     case Autolink.url(code, :regular_link, config) do
       url when is_binary(url) ->
         code = remove_prefix(code)
@@ -279,11 +281,11 @@ defmodule ExDoc.Language.Erlang do
 
         case String.split(url, ":") do
           [module] ->
-            walk_doc({:a, [href: "`m:#{module}#{fragment}`"], inner, meta}, config)
+            walk_doc({:a, [href: "`m:#{maybe_quote(module)}#{fragment}`"], inner, meta}, config)
 
           [app, module] ->
             inner = strip_app(inner, app)
-            walk_doc({:a, [href: "`m:#{module}#{fragment}`"], inner, meta}, config)
+            walk_doc({:a, [href: "`m:#{maybe_quote(module)}#{fragment}`"], inner, meta}, config)
 
           _ ->
             warn_ref(attrs[:href], config)
@@ -333,7 +335,7 @@ defmodule ExDoc.Language.Erlang do
         walk_doc({:a, [href: "`t:#{fixup(type)}`"], inner, meta}, config)
 
       "https://erlang.org/doc/link/" <> see ->
-        warn_ref(attrs[:href] <> " (#{see})", config)
+        warn_ref(attrs[:href] <> " (#{see})", %{config | id: nil})
         inner
 
       _ ->
@@ -372,13 +374,21 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp fixup(mfa) do
-    case String.split(mfa, "#") do
-      ["", mfa] ->
-        mfa
+    {m, fa} =
+      case String.split(mfa, "#") do
+        ["", mfa] ->
+          {"", mfa}
 
-      [m, fa] ->
-        m <> ":" <> fa
-    end
+        [m, fa] ->
+          {"#{maybe_quote(m)}:", fa}
+      end
+
+    [f, a] = String.split(fa, "/")
+    m <> maybe_quote(f) <> "/" <> a
+  end
+
+  defp maybe_quote(m) do
+    to_string(:io_lib.write_atom(String.to_atom(m)))
   end
 
   defp strip_app([{:code, attrs, [code], meta}], app) do
@@ -413,15 +423,25 @@ defmodule ExDoc.Language.Erlang do
     case String.split(string, ":") do
       [module_string, function_string] ->
         with {:module, module} <- parse_module_string(module_string, :custom_link),
-             {:function, function} <- Autolink.parse_function(function_string) do
+             {:function, function} <- parse_function(function_string) do
           {:remote, module, function}
         end
 
       [function_string] ->
-        with {:function, function} <- Autolink.parse_function(function_string) do
+        with {:function, function} <- parse_function(function_string) do
           {:local, function}
         end
 
+      _ ->
+        :error
+    end
+  end
+
+  defp parse_function(string) do
+    with {:ok, toks, _} <- :erl_scan.string(String.to_charlist("fun #{string}/0.")),
+         {:ok, [{:fun, _, {:function, name, _arity}}]} <- :erl_parse.parse_exprs(toks) do
+      {:function, name}
+    else
       _ ->
         :error
     end
@@ -464,12 +484,9 @@ defmodule ExDoc.Language.Erlang do
     end
   end
 
-  def parse_module_string(string, _mode) do
-    case Code.string_to_quoted(":'#{string}'",
-           warn_on_unnecessary_quotes: false,
-           emit_warnings: false
-         ) do
-      {:ok, module} when is_atom(module) ->
+  defp parse_module_string(string, _mode) do
+    case :erl_scan.string(String.to_charlist(string)) do
+      {:ok, [{:atom, _, module}], _} when is_atom(module) ->
         {:module, module}
 
       _ ->

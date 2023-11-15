@@ -7,6 +7,9 @@ defmodule ExDoc.Autolink do
   # * `:current_module` - the module that the docs are being generated for. Used to link local
   #   calls and see if remote calls are in the same app.
   #
+  # * `:current_kfa` - the kind, function, arity that the docs are being generated for. Is nil
+  #    if there is no such thing. Used to generate more accurate warnings.
+  #
   # * `:module_id` - id of the module being documented (e.g.: `"String"`)
   #
   # * `:file` - source file location
@@ -48,6 +51,7 @@ defmodule ExDoc.Autolink do
     extras: [],
     deps: [],
     ext: ".html",
+    current_kfa: nil,
     siblings: [],
     skip_undefined_reference_warnings_on: [],
     skip_code_autolink_to: [],
@@ -371,29 +375,6 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  # There are special forms that are forbidden by the tokenizer
-  def parse_function("__aliases__"), do: {:function, :__aliases__}
-  def parse_function("__block__"), do: {:function, :__block__}
-  def parse_function("%"), do: {:function, :%}
-
-  def parse_function(string) do
-    case Code.string_to_quoted("& #{string}/0", warnings: false) do
-      {:ok, {:&, _, [{:/, _, [{:__aliases__, _, [function]}, 0]}]}} when is_atom(function) ->
-        ## When function starts with capital letter
-        {:function, function}
-
-      ## When function is 'nil'
-      {:ok, {:&, _, [{:/, _, [nil, 0]}]}} ->
-        {:function, nil}
-
-      {:ok, {:&, _, [{:/, _, [{function, _, _}, 0]}]}} when is_atom(function) ->
-        {:function, function}
-
-      _ ->
-        :error
-    end
-  end
-
   def kind("c:" <> rest), do: {:callback, rest}
   def kind("t:" <> rest), do: {:type, rest}
   ## \\ does not work for :custom_url as Earmark strips the \...
@@ -432,7 +413,7 @@ defmodule ExDoc.Autolink do
       {:type, _visibility} ->
         case config.language.try_builtin_type(name, arity, mode, config, original_text) do
           nil ->
-            if mode == :custom_link do
+            if mode == :custom_link or config.language == ExDoc.Language.Erlang do
               maybe_warn(config, ref, visibility, %{original_text: original_text})
             end
 
@@ -501,7 +482,9 @@ defmodule ExDoc.Autolink do
 
         nil
 
-      {:regular_link, _module_visibility, :undefined} when not same_module? ->
+      {:regular_link, _module_visibility, :undefined}
+      when not same_module? and
+             (config.language != ExDoc.Language.Erlang or kind == :function) ->
         nil
 
       {_mode, _module_visibility, visibility} ->
@@ -518,7 +501,16 @@ defmodule ExDoc.Autolink do
     # TODO: Remove on Elixir v1.14
     stacktrace_info =
       if unquote(Version.match?(System.version(), ">= 1.14.0")) do
-        [file: config.file, line: config.line]
+        f =
+          case config.current_kfa do
+            {:function, f, a} ->
+              [function: {f, a}]
+
+            _ ->
+              []
+          end
+
+        [file: config.file, line: config.line, module: config.current_module] ++ f
       else
         []
       end
