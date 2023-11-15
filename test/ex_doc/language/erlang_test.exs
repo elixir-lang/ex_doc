@@ -382,6 +382,24 @@ defmodule ExDoc.Language.ErlangTest do
              ) =~ ~s|documentation references callback "c:erlang_bar:bad/0" but it is undefined|
     end
 
+    test "bad local type in module", c do
+      assert warn(
+               fn ->
+                 assert autolink_doc("\n`t:bad/0`", c) == ~s|<code class="inline">t:bad/0</code>|
+               end,
+               line: 2
+             ) =~ ~s|documentation references type "t:bad/0" but it is undefined or private|
+    end
+
+    test "bad local callback in module", c do
+      assert warn(
+               fn ->
+                 assert autolink_doc("\n`c:bad/0`", c) == ~s|<code class="inline">c:bad/0</code>|
+               end,
+               line: 2
+             ) =~ ~s|documentation references callback "c:bad/0" but it is undefined|
+    end
+
     test "bad function in module ref", c do
       assert warn(
                fn ->
@@ -449,6 +467,18 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     @tag warnings: :send
+    test "bad type", c do
+      assert warn(
+               fn ->
+                 assert autolink_extra("`t:bad:bad/0`", c) ==
+                          ~s|<code class="inline">t:bad:bad/0</code>|
+               end,
+               file: "extra.md",
+               line: 1
+             ) =~ ~s|documentation references type "t:bad:bad/0" but it is undefined or private|
+    end
+
+    @tag warnings: :send
     test "bad type ref", c do
       assert warn(
                fn ->
@@ -458,6 +488,18 @@ defmodule ExDoc.Language.ErlangTest do
                file: "extra.md",
                line: nil
              ) =~ ~s|documentation references type "t:bad:bad/0" but it is undefined or private|
+    end
+
+    @tag warnings: :send
+    test "bad callback", c do
+      assert warn(
+               fn ->
+                 assert autolink_extra("`c:bad:bad/0`", c) ==
+                          ~s|<code class="inline">c:bad:bad/0</code>|
+               end,
+               file: "extra.md",
+               line: 1
+             ) =~ ~s|documentation references callback "c:bad:bad/0" but it is undefined|
     end
 
     test "bad module", c do

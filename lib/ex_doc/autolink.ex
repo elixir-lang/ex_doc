@@ -413,7 +413,7 @@ defmodule ExDoc.Autolink do
       {:type, _visibility} ->
         case config.language.try_builtin_type(name, arity, mode, config, original_text) do
           nil ->
-            if mode == :custom_link do
+            if mode == :custom_link or config.language == ExDoc.Language.Erlang do
               maybe_warn(config, ref, visibility, %{original_text: original_text})
             end
 
@@ -482,7 +482,9 @@ defmodule ExDoc.Autolink do
 
         nil
 
-      {:regular_link, _module_visibility, :undefined} when not same_module? ->
+      {:regular_link, _module_visibility, :undefined}
+      when not same_module? and
+             (config.language != ExDoc.Language.Erlang or kind == :function) ->
         nil
 
       {_mode, _module_visibility, visibility} ->
