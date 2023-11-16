@@ -150,7 +150,7 @@ defmodule ExDoc.Retriever do
       function_docs ++
         get_callbacks(module_data, source, groups_for_docs, annotations_for_docs)
 
-    types = get_types(module_data, source, groups_for_docs)
+    types = get_types(module_data, source, groups_for_docs, annotations_for_docs)
 
     metadata = Map.put(metadata, :__doc__, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
@@ -345,15 +345,15 @@ defmodule ExDoc.Retriever do
 
   ## Typespecs
 
-  defp get_types(module_data, source, groups_for_docs) do
+  defp get_types(module_data, source, groups_for_docs, annotations_for_docs) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
     for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
-      get_type(doc, source, groups_for_docs, module_data)
+      get_type(doc, source, groups_for_docs, module_data, annotations_for_docs)
     end
   end
 
-  defp get_type(type_entry, source, groups_for_docs, module_data) do
+  defp get_type(type_entry, source, groups_for_docs, module_data, annotations_for_docs) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{_, name, arity}, anno, _signature, source_doc, metadata} = type_entry
     doc_line = anno_line(anno)
@@ -362,7 +362,11 @@ defmodule ExDoc.Retriever do
 
     type_data = module_data.language.type_data(type_entry, module_data)
     signature = signature(type_data.signature)
-    annotations = if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
+
+    annotations =
+      annotations_for_docs.(metadata) ++
+        if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
+
     doc_ast = doc_ast(content_type, source_doc, file: source.path, line: doc_line + 1)
     metadata = Map.put(metadata, :__doc__, :type)
     group = GroupMatcher.match_function(groups_for_docs, metadata)
@@ -413,8 +417,9 @@ defmodule ExDoc.Retriever do
     case :erl_anno.file(anno) do
       :undefined ->
         source
+
       file ->
-        %{ url: source.url, path: Path.join(Path.dirname(source.path), file) }
+        %{url: source.url, path: Path.join(Path.dirname(source.path), file)}
     end
   end
 
