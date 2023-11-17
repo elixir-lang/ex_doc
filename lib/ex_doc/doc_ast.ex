@@ -161,8 +161,9 @@ defmodule ExDoc.DocAST do
   def highlight(html, language, opts \\ []) do
     highlight_info = language.highlight_info()
 
+    ## Html cannot be parsed with regex, but we try our best...
     Regex.replace(
-      ~r/<pre(\s+class="\w*")?><code(?:\s+class="(\w*)")?>([^<]*)<\/code><\/pre>/,
+      ~r/<pre(\s[^>]*)?><code(?:\s+class="(\w*)")?>([^<]*)<\/code><\/pre>/,
       html,
       &highlight_code_block(&1, &2, &3, &4, highlight_info, opts)
     )
