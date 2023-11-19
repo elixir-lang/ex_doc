@@ -45,10 +45,11 @@ function renderResults ({ value, results, errorMessage }) {
 }
 
 async function getIndex () {
+  // lunr by default splits on - but we don't want that.
+  lunr.tokenizer.separator = /\s+/
   lunr.QueryLexer.termSeparator = /\s+/
-  lunr.Pipeline.registerFunction(elixirTokenFunction, 'elixirTokenSplitter')
-  lunr.Pipeline.registerFunction(elixirTrimmerFunction, 'elixirTrimmer')
-  lunr.Pipeline.registerFunction(hyphenSearchFunction, 'hyphenSearch')
+  lunr.Pipeline.registerFunction(docTokenFunction, 'docTokenSplitter')
+  lunr.Pipeline.registerFunction(docTrimmerFunction, 'docTrimmer')
 
   const cachedIndex = await loadIndex()
   if (cachedIndex) { return cachedIndex }
@@ -122,22 +123,20 @@ function b64decode (str) {
 }
 
 function indexStorageKey () {
-  return `idv2:${getProjectNameAndVersion()}`
+  return `idv3:${getProjectNameAndVersion()}`
 }
 
 function createIndex () {
   return lunr(function () {
-    this.tokenizer.separator = /\s+/
     this.ref('ref')
     this.field('title', { boost: 3 })
     this.field('doc')
     this.field('type')
     this.metadataWhitelist = ['position']
     this.pipeline.remove(lunr.stopWordFilter)
-    this.use(hyphenSearch)
-    this.use(elixirTokenSplitter)
     this.pipeline.remove(lunr.trimmer)
-    this.use(elixirTrimmer)
+    this.use(docTokenSplitter)
+    this.use(docTrimmer)
 
     searchData.items.forEach(searchNode => {
       this.add(searchNode)
@@ -145,15 +144,16 @@ function createIndex () {
   })
 }
 
-function elixirTokenSplitter (builder) {
-  builder.pipeline.before(lunr.stemmer, elixirTokenFunction)
-  builder.searchPipeline.before(lunr.stemmer, elixirTokenFunction)
+function docTokenSplitter (builder) {
+  builder.pipeline.before(lunr.stemmer, docTokenFunction)
 }
 
-function elixirTokenFunction (token) {
+function docTokenFunction (token) {
+  // Split on : . / _ - to make easier to partially match on function names.
+  // We split only when tokenizing, not when searching.
   const tokens = token
     .toString()
-    .split(/\.|\/|_/)
+    .split(/\:|\.|\/|_|-/)
     .map(part => {
       return token.clone().update(() => part)
     })
@@ -165,37 +165,16 @@ function elixirTokenFunction (token) {
   return tokens
 }
 
-function elixirTrimmer (builder) {
-  builder.pipeline.after(lunr.stemmer, elixirTrimmerFunction)
-  builder.searchPipeline.after(lunr.stemmer, elixirTrimmerFunction)
+function docTrimmer (builder) {
+  builder.pipeline.after(lunr.stemmer, docTrimmerFunction)
+  builder.searchPipeline.after(lunr.stemmer, docTrimmerFunction)
 }
 
-function elixirTrimmerFunction (token) {
+function docTrimmerFunction (token) {
   // Preserve @ at the beginning of tokens
   return token.update(function (s) {
     return s.replace(/^@?\W+/, '').replace(/\W+$/, '')
   })
-}
-
-function hyphenSearchFunction (token) {
-  const tokenStr = token.toString()
-  if (tokenStr.indexOf('-') < 0) return token
-
-  const tokens = []
-
-  tokens.push(
-    token.clone(function (s) {
-      return s.replace('-', '')
-    })
-  )
-
-  tokens.push(token)
-  return tokens
-}
-
-function hyphenSearch (builder) {
-  builder.pipeline.before(lunr.stemmer, hyphenSearchFunction)
-  builder.searchPipeline.before(lunr.stemmer, hyphenSearchFunction)
 }
 
 function searchResultsToDecoratedSearchNodes (results) {
