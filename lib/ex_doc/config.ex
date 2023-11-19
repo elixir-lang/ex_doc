@@ -138,6 +138,7 @@ defmodule ExDoc.Config do
     raise ArgumentError, "#{inspect(proglang)} is not supported"
   end
 
+  # TODO: The default module groups must be returned by the language
   defp normalize_groups_for_modules(groups_for_modules) do
     default_groups = [Deprecated: &deprecated?/1, Exceptions: &exception?/1]
 

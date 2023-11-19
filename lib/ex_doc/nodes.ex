@@ -1,3 +1,4 @@
+# TODO: source_doc should only be a string once we remove application/html+erlang.
 defmodule ExDoc.ModuleNode do
   @moduledoc false
 
@@ -35,7 +36,7 @@ defmodule ExDoc.ModuleNode do
           deprecated: String.t() | nil,
           doc_format: String.t() | nil,
           doc: ExDoc.DocAST.t() | nil,
-          source_doc: term(),
+          source_doc: term() | nil,
           rendered_doc: String.t() | nil,
           doc_line: non_neg_integer(),
           docs_groups: [atom()],
@@ -80,7 +81,7 @@ defmodule ExDoc.FunctionNode do
           defaults: [function_default()],
           deprecated: String.t() | nil,
           doc: ExDoc.DocAST.t() | nil,
-          source_doc: String.t() | nil,
+          source_doc: term() | nil,
           rendered_doc: String.t() | nil,
           type: atom(),
           signature: String.t(),
@@ -121,7 +122,7 @@ defmodule ExDoc.TypeNode do
           type: atom(),
           deprecated: nil,
           doc: ExDoc.DocAST.t() | nil,
-          source_doc: String.t() | nil,
+          source_doc: term() | nil,
           rendered_doc: String.t() | nil,
           doc_line: non_neg_integer(),
           source_path: String.t(),

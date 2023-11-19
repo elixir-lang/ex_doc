@@ -234,7 +234,7 @@ defmodule ExDoc.Retriever do
          annotations_for_docs
        ) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
-    {{type, name, arity}, anno, signature, doc_content, metadata} = doc_element
+    {{type, name, arity}, anno, signature, source_doc, metadata} = doc_element
     doc_line = anno_line(anno)
 
     annotations =
@@ -245,7 +245,7 @@ defmodule ExDoc.Retriever do
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
     doc_ast =
-      (doc_content && doc_ast(content_type, doc_content, file: source.path, line: doc_line + 1)) ||
+      (source_doc && doc_ast(content_type, source_doc, file: source.path, line: doc_line + 1)) ||
         function_data.doc_fallback.()
 
     group = GroupMatcher.match_function(groups_for_docs, metadata)
@@ -256,7 +256,7 @@ defmodule ExDoc.Retriever do
       arity: arity,
       deprecated: metadata[:deprecated],
       doc: doc_ast,
-      source_doc: doc_content,
+      source_doc: source_doc,
       doc_line: doc_line,
       defaults: ExDoc.Utils.natural_sort_by(defaults, fn {name, arity} -> "#{name}/#{arity}" end),
       signature: signature(signature),
@@ -308,7 +308,7 @@ defmodule ExDoc.Retriever do
     callback_data = module_data.language.callback_data(callback, module_data)
 
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
-    {{kind, name, arity}, anno, _signature, doc, metadata} = callback
+    {{kind, name, arity}, anno, _signature, source_doc, metadata} = callback
     doc_line = anno_line(anno)
 
     signature = signature(callback_data.signature)
@@ -318,7 +318,7 @@ defmodule ExDoc.Retriever do
       annotations_for_docs.(metadata) ++
         callback_data.extra_annotations ++ annotations_from_metadata(metadata, module_metadata)
 
-    doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
+    doc_ast = doc_ast(content_type, source_doc, file: source.path, line: doc_line + 1)
 
     metadata = Map.put(metadata, :__doc__, :callback)
     group = GroupMatcher.match_function(groups_for_docs, metadata)
@@ -329,7 +329,7 @@ defmodule ExDoc.Retriever do
       arity: arity,
       deprecated: metadata[:deprecated],
       doc: doc_ast,
-      source_doc: doc,
+      source_doc: source_doc,
       doc_line: doc_line,
       signature: signature,
       specs: specs,
@@ -353,14 +353,14 @@ defmodule ExDoc.Retriever do
 
   defp get_type(type_entry, source, groups_for_docs, module_data) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
-    {{_, name, arity}, anno, _signature, doc, metadata} = type_entry
+    {{_, name, arity}, anno, _signature, source_doc, metadata} = type_entry
     doc_line = anno_line(anno)
     annotations = annotations_from_metadata(metadata, module_metadata)
 
     type_data = module_data.language.type_data(type_entry, module_data)
     signature = signature(type_data.signature)
     annotations = if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
-    doc_ast = doc_ast(content_type, doc, file: source.path, line: doc_line + 1)
+    doc_ast = doc_ast(content_type, source_doc, file: source.path, line: doc_line + 1)
     metadata = Map.put(metadata, :__doc__, :type)
     group = GroupMatcher.match_function(groups_for_docs, metadata)
 
@@ -372,7 +372,7 @@ defmodule ExDoc.Retriever do
       spec: type_data.spec,
       deprecated: metadata[:deprecated],
       doc: doc_ast,
-      source_doc: doc,
+      source_doc: source_doc,
       doc_line: doc_line,
       signature: signature,
       source_path: source.path,
