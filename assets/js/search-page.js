@@ -31,8 +31,8 @@ async function search (value) {
 
     try {
       // We cannot match on atoms :foo because that would be considered
-      // a filter. So we escape all colons not preceded by a word.
-      const fixedValue = value.replaceAll(/\B:/g, '\\:')
+      // a filter. So we escape all colons not preceeded by a word.
+      const fixedValue = value.replaceAll(/(\B|\\):/g, '\\:')
       const results = searchResultsToDecoratedSearchNodes(index.search(fixedValue))
       renderResults({ value, results })
     } catch (error) {
