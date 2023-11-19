@@ -69,6 +69,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert HTML.strip_tags("Git opts (<code class=\"inline\">:git</code>)") == "Git opts (:git)"
       assert HTML.strip_tags("<p>P1.</p><p>P2</p>") == "P1.P2"
       assert HTML.strip_tags("<p>P1.</p><p>P2</p>", " ") == " P1.  P2 "
+      assert HTML.strip_tags("<%= @inner_content %>", " ") == "<%= @inner_content %>"
     end
   end
 

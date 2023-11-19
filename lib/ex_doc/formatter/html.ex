@@ -474,7 +474,7 @@ defmodule ExDoc.Formatter.HTML do
     input |> Path.basename() |> Path.rootname()
   end
 
-  @clean_html_regex ~r/<(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
+  @clean_html_regex ~r/<\/?\s*[a-zA-Z]+(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
 
   @doc """
   Strips html tags from text leaving their text content
