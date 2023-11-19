@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.31.0-dev
+
+  * Enhancements
+    * Allow searching atoms, module attributes, and words finishing with `?` and `!`
+    * Support upcoming Erlang/OTP 27 documentation format
+    * Include prebuilt binaries on every release
+    * Add borders dividing table rows in rendered content
+    * Add accurate warnings for missing docs from Elixir v1.16+
+    * Support `e:some-page.md` for explicitly linking to a page
+    * Support `e:dep:some-page.md` for explicitly linking to a page in a package
+    * Support `m:SomeModule` for explicitly linking to a module
+    * Add `noindex` meta tag to 404 and Search pages
+    * Move search to the main content so we can display more results
+
+  * Bug fixes
+    * Fix search for words with hyphens in them
+    * Fix search for contents inside EEx interpolation
+
 ## v0.30.9 (2023-10-20)
 
   * Bug fixes
