@@ -30,7 +30,10 @@ async function search (value) {
     const index = await getIndex()
 
     try {
-      const results = searchResultsToDecoratedSearchNodes(index.search(value))
+      // We cannot match on atoms :foo because that would be considered
+      // a filter. So we escape all colons not preceded by a word.
+      const fixedValue = value.replaceAll(/\B:/g, '\\:')
+      const results = searchResultsToDecoratedSearchNodes(index.search(fixedValue))
       renderResults({ value, results })
     } catch (error) {
       renderResults({ value, errorMessage: error.message })
@@ -123,7 +126,7 @@ function b64decode (str) {
 }
 
 function indexStorageKey () {
-  return `idv3:${getProjectNameAndVersion()}`
+  return `idv4:${getProjectNameAndVersion()}`
 }
 
 function createIndex () {
@@ -166,14 +169,16 @@ function docTokenFunction (token) {
 }
 
 function docTrimmer (builder) {
-  builder.pipeline.after(lunr.stemmer, docTrimmerFunction)
-  builder.searchPipeline.after(lunr.stemmer, docTrimmerFunction)
+  builder.pipeline.before(lunr.stemmer, docTrimmerFunction)
 }
 
 function docTrimmerFunction (token) {
-  // Preserve @ at the beginning of tokens
+  // Preserve @ and : at the beginning of tokens,
+  // and ? and ! at the end of tokens. It needs to
+  // be done before stemming, otherwise search and
+  // indexes are not equally stemmed.
   return token.update(function (s) {
-    return s.replace(/^@?\W+/, '').replace(/\W+$/, '')
+    return s.replace(/^[^@:\w]+/, '').replace(/[^\?\!\w]+$/, '')
   })
 }
 
