@@ -29,7 +29,7 @@ defmodule ExDoc.DocASTTest do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
                assert DocAST.parse!("`String.upcase", "text/markdown") ==
                         [{:p, [], ["`String.upcase"], %{}}]
-             end) =~ "(warning) nofile:1 Closing unclosed backquotes ` at end of input"
+             end) =~ "Closing unclosed backquotes ` at end of input"
     end
 
     test "erlang+html" do

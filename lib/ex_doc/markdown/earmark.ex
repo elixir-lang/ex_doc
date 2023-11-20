@@ -46,9 +46,16 @@ defmodule ExDoc.Markdown.Earmark do
   end
 
   defp print_messages(messages, options) do
-    for {severity, line, message} <- messages do
-      file = options[:file]
-      IO.warn("#{inspect(__MODULE__)} (#{severity}) #{file}:#{line} #{message}", [])
+    for {_severity, line, message} <- messages do
+      # TODO: Remove on Elixir v1.14
+      stacktrace_info =
+        if unquote(Version.match?(System.version(), ">= 1.14.0")) do
+          [file: options[:file], line: line]
+        else
+          []
+        end
+
+      IO.warn(message, stacktrace_info)
     end
   end
 
