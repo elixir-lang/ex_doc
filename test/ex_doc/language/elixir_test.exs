@@ -543,6 +543,18 @@ defmodule ExDoc.Language.ElixirTest do
            end)
 
     assert warn(fn ->
+             assert autolink_doc("`m:Unknown`", opts) ==
+                      ~s|<code class="inline">m:Unknown</code>|
+           end) ==
+             ~s|documentation references module \"Unknown\" but it is undefined|
+
+    assert warn(fn ->
+             assert autolink_doc("`m::unknown`", opts) ==
+                      ~s|<code class="inline">m::unknown</code>|
+           end) ==
+             ~s|documentation references module \":unknown\" but it is undefined|
+
+    assert warn(fn ->
              assert autolink_doc("[text](`foo/0`)", opts) == "text"
            end) =~ ~s|documentation references function "foo/0" but it is undefined or private|
 

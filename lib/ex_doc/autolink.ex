@@ -331,9 +331,11 @@ defmodule ExDoc.Autolink do
         end
 
       nil ->
-        case mpkind(string) do
-          {:module, rest} ->
-            case config.language.parse_module(rest, mode) do
+        case string do
+          "m:" <> rest ->
+            # TODO: rename :custom_link to :strict i.e. we expect ref to be valid
+            # force custom_link mode because of m: prefix.
+            case config.language.parse_module(rest, :custom_link) do
               {:module, module} ->
                 module_url(module, :custom_link, config, rest)
 
@@ -344,10 +346,10 @@ defmodule ExDoc.Autolink do
                 nil
             end
 
-          {:extra, rest} ->
+          "e:" <> rest ->
             extra_url(rest, config)
 
-          {nil, string} when not config.force_module_prefix or mode == :custom_link ->
+          string when not config.force_module_prefix or mode == :custom_link ->
             case config.language.parse_module(string, mode) do
               {:module, module} ->
                 module_url(module, mode, config, string)
@@ -380,10 +382,6 @@ defmodule ExDoc.Autolink do
   ## \\ does not work for :custom_url as Earmark strips the \...
   def kind("\\" <> rest), do: {:function, rest}
   def kind(rest), do: {:function, rest}
-
-  def mpkind("m:" <> rest), do: {:module, rest}
-  def mpkind("e:" <> rest), do: {:extra, rest}
-  def mpkind(rest), do: {nil, rest}
 
   def local_url(kind, name, arity, config, original_text, options \\ [])
 

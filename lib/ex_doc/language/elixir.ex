@@ -579,25 +579,30 @@ defmodule ExDoc.Language.Elixir do
 
   defp walk_doc({:a, attrs, inner, meta} = ast, config) do
     case Autolink.custom_link(attrs, config) do
+      url when is_binary(url) ->
+        {:a, Keyword.put(attrs, :href, url), inner, meta}
+
       :remove_link ->
         remove_link(ast)
 
       nil ->
         ast
-
-      url ->
-        {:a, Keyword.put(attrs, :href, url), inner, meta}
     end
   end
 
   defp walk_doc({:code, attrs, [code], meta} = ast, config) do
     config = %{config | line: meta[:line]}
 
-    if url = Autolink.url(code, :regular_link, config) do
-      code = remove_prefix(code)
-      {:a, [href: url], [{:code, attrs, [code], meta}], %{}}
-    else
-      ast
+    case Autolink.url(code, :regular_link, config) do
+      url when is_binary(url) ->
+        code = remove_prefix(code)
+        {:a, [href: url], [{:code, attrs, [code], meta}], %{}}
+
+      :remove_link ->
+        {:code, attrs, [code], meta}
+
+      nil ->
+        ast
     end
   end
 
