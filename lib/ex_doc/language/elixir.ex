@@ -663,15 +663,11 @@ defmodule ExDoc.Language.Elixir do
         (\(.*\))                                      # Arguments <rest />
       }x
 
-    Regex.replace(regex, string, fn all, call_string, module_string, name_string, rest ->
+    Regex.replace(regex, string, fn _all, call_string, module_string, name_string, rest ->
       module = string_to_module(module_string)
       name = String.to_atom(name_string)
       arity = count_args(rest, 0, 0)
       original_text = call_string <> "()"
-
-      if Enum.any?(config.filtered_modules, &(&1.id == module_string)) do
-        Autolink.warn(config, "typespec references filtered module: #{all}")
-      end
 
       url =
         if module do

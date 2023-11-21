@@ -1,7 +1,6 @@
 defmodule ExDoc.Language.ElixirTest do
   # ExDoc.Refs is global
   use ExUnit.Case, async: false
-
   doctest ExDoc.Autolink
 
   describe "autolink_doc/2" do
@@ -36,21 +35,14 @@ defmodule ExDoc.Language.ElixirTest do
     end
 
     test "project-local module" do
-      ExDoc.Refs.insert([
-        {{:module, AutolinkTest.Foo}, :public}
-      ])
+      assert autolink_doc("`ExDoc.Markdown`") ==
+               ~s|<a href="ExDoc.Markdown.html"><code class="inline">ExDoc.Markdown</code></a>|
 
-      assert autolink_doc("`AutolinkTest.Foo`") ==
-               ~s|<a href="AutolinkTest.Foo.html"><code class="inline">AutolinkTest.Foo</code></a>|
-
-      assert autolink_doc("`m:AutolinkTest.Foo`") ==
-               ~s|<a href="AutolinkTest.Foo.html"><code class="inline">AutolinkTest.Foo</code></a>|
+      assert autolink_doc("`m:ExDoc.Markdown`") ==
+               ~s|<a href="ExDoc.Markdown.html"><code class="inline">ExDoc.Markdown</code></a>|
 
       assert autolink_doc("`String`", apps: [:elixir]) ==
                ~s|<a href="String.html"><code class="inline">String</code></a>|
-
-      assert autolink_doc("`AutolinkTest.Foo`", current_module: AutolinkTest.Foo) ==
-               ~s|<a href="AutolinkTest.Foo.html#content"><code class="inline">AutolinkTest.Foo</code></a>|
     end
 
     test "remote function" do
@@ -564,14 +556,35 @@ defmodule ExDoc.Language.ElixirTest do
              assert autolink_doc("[text](`t:supervisor.child_spec/0`)", opts) == "text"
            end) =~ ~s|documentation references "t:supervisor.child_spec/0" but it is invalid|
 
-    assert warn(fn ->
-             autolink_spec(quote(do: t() :: String.bad()), opts)
-           end) =~ ~s|documentation references type "String.bad()"|
+    ## filtered_modules
 
     assert warn(fn ->
-             opts = opts ++ [filtered_modules: [%ExDoc.ModuleNode{id: "String"}]]
+             opts = opts ++ [filtered_modules: [%ExDoc.ModuleNode{module: String}]]
+
+             assert autolink_doc("`String`", opts) ==
+                      ~s|<code class="inline">String</code>|
+           end) =~ "reference to a filtered module"
+
+    assert warn(fn ->
+             opts = opts ++ [filtered_modules: [%ExDoc.ModuleNode{module: String}]]
+
+             assert autolink_doc("`String.upcase/1`", opts) ==
+                      ~s|<code class="inline">String.upcase/1</code>|
+           end) =~ "reference to a filtered module"
+
+    assert warn(fn ->
+             opts = opts ++ [filtered_modules: [%ExDoc.ModuleNode{module: String}]]
+
+             assert autolink_doc("`t:String.t/0`", opts) ==
+                      ~s|<code class="inline">t:String.t/0</code>|
+           end) =~ "reference to a filtered module"
+
+    assert warn(fn ->
+             opts = opts ++ [filtered_modules: [%ExDoc.ModuleNode{module: String}]]
              autolink_spec(quote(do: t() :: String.t()), opts)
-           end) == "typespec references filtered module: String.t()"
+           end) =~ "reference to a filtered module"
+
+    ## typespecs
 
     assert warn(fn ->
              autolink_spec(
@@ -640,7 +653,7 @@ defmodule ExDoc.Language.ElixirTest do
   ## Helpers
 
   @default_options [
-    apps: [:myapp],
+    apps: [:ex_doc],
     current_module: MyModule,
     module_id: "MyModule",
     file: "nofile",

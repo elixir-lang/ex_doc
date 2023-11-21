@@ -192,6 +192,24 @@ defmodule ExDoc.Language.ErlangTest do
                assert autolink_edoc("{@link //foo}", c) == ~s|<code>//foo</code>|
              end) =~ ~s|invalid reference: foo:index|
     end
+
+    test "filtered module", c do
+      opts = [filtered_modules: [%ExDoc.ModuleNode{module: :lists, id: "lists"}]]
+
+      assert warn(fn ->
+               assert autolink_edoc("{@link lists}", c, opts) ==
+                        ~s|<code>lists</code>|
+             end) == "reference to a filtered module"
+    end
+
+    test "filtered module function", c do
+      opts = [filtered_modules: [%ExDoc.ModuleNode{module: :lists, id: "lists"}]]
+
+      assert warn(fn ->
+               assert autolink_edoc("{@link lists:all/2}", c, opts) ==
+                        ~s|<code>lists:all/2</code>|
+             end) == "reference to a filtered module"
+    end
   end
 
   describe "autolink_doc/2 for markdown" do
@@ -425,6 +443,24 @@ defmodule ExDoc.Language.ErlangTest do
                end,
                line: nil
              ) =~ ~r/documentation references "e:extra.md" but it is invalid/
+    end
+
+    test "filtered module", c do
+      opts = [filtered_modules: [%ExDoc.ModuleNode{module: :lists, id: "lists"}]]
+
+      assert warn(fn ->
+               assert autolink_doc("`m:lists`", c, opts) ==
+                        ~s|<code class="inline">m:lists</code>|
+             end) =~ "reference to a filtered module"
+    end
+
+    test "filtered module callback", c do
+      opts = [filtered_modules: [%ExDoc.ModuleNode{module: :gen_server, id: "gen_server"}]]
+
+      assert warn(fn ->
+               assert autolink_doc("`c:gen_server:handle_call/3`", c, opts) ==
+                        ~s|<code class="inline">c:gen_server:handle_call/3</code>|
+             end) =~ "reference to a filtered module"
     end
   end
 
