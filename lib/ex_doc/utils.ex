@@ -4,14 +4,14 @@ defmodule ExDoc.Utils do
   @doc """
   Emits a warning.
   """
-  def warn(message, stacktrace_info) do
-    if unquote(Version.match?(System.version(), ">= 1.14.0")) do
-      stacktrace_info
-    else
-      []
+  if Version.match?(System.version(), ">= 1.14.0") do
+    def warn(message, stacktrace_info) do
+      IO.warn(message, stacktrace_info)
     end
-
-    IO.warn(message, stacktrace_info)
+  else
+    def warn(message, _stacktrace_info) do
+      IO.warn(message, [])
+    end
   end
 
   @doc """
