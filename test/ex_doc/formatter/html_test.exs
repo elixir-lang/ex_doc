@@ -120,7 +120,7 @@ defmodule ExDoc.Formatter.HTMLTest do
         generate_docs(doc_config(context, main: "Randomerror"))
       end)
 
-    assert output =~ "warning: index.html redirects to Randomerror.html, which does not exist\n"
+    assert output =~ "index.html redirects to Randomerror.html, which does not exist\n"
     assert File.regular?(tmp_dir <> "/html/index.html")
     assert File.regular?(tmp_dir <> "/html/RandomError.html")
   end

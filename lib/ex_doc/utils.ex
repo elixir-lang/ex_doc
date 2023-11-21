@@ -2,6 +2,19 @@ defmodule ExDoc.Utils do
   @moduledoc false
 
   @doc """
+  Emits a warning.
+  """
+  def warn(message, stacktrace_info) do
+    if unquote(Version.match?(System.version(), ">= 1.14.0")) do
+      stacktrace_info
+    else
+      []
+    end
+
+    IO.warn(message, stacktrace_info)
+  end
+
+  @doc """
   Runs the `before_closing_head_tag` callback.
   """
   def before_closing_head_tag(%{before_closing_head_tag: {m, f, a}}, module) do

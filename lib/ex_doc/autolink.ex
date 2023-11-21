@@ -514,29 +514,23 @@ defmodule ExDoc.Autolink do
 
   @doc false
   def warn(config, message) do
-    # TODO: Remove on Elixir v1.14
-    stacktrace_info =
-      if unquote(Version.match?(System.version(), ">= 1.14.0")) do
-        f =
-          case config.current_kfa do
-            {:function, f, a} ->
-              [function: {f, a}]
+    f =
+      case config.current_kfa do
+        {:function, f, a} ->
+          [function: {f, a}]
 
-            _ ->
-              []
-          end
-
-        [file: config.file, line: config.line, module: config.current_module] ++ f
-      else
-        []
+        _ ->
+          []
       end
+
+    stacktrace_info = [file: config.file, line: config.line, module: config.current_module] ++ f
 
     case config.warnings do
       :emit ->
-        IO.warn(message, stacktrace_info)
+        ExDoc.Utils.warn(message, stacktrace_info)
 
       :raise ->
-        IO.warn(message, stacktrace_info)
+        ExDoc.Utils.warn(message, stacktrace_info)
         raise "fail due to warnings"
 
       :send ->

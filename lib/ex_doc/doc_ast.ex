@@ -177,14 +177,14 @@ defmodule ExDoc.DocAST do
         try do
           render_code(pre_attr, lang, lexer, opts, code, outer_opts)
         rescue
-          e ->
-            IO.puts(:stderr, [
-              IO.ANSI.format([:yellow, "warning: ", :reset]),
-              "crashed while highlighting #{lang} snippet:\n\n",
-              full_block,
-              "\nFull error message shown next:\n\n",
-              Exception.format(:error, e, __STACKTRACE__)
-            ])
+          _ ->
+            ExDoc.Utils.warn(
+              [
+                "crashed while highlighting #{lang} snippet:\n\n",
+                full_block
+              ],
+              __STACKTRACE__
+            )
 
             full_block
         end
