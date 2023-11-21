@@ -12,6 +12,7 @@
     * Support `m:SomeModule` for explicitly linking to a module
     * Add `noindex` meta tag to 404 and Search pages
     * Move search to the main content so we can display more results
+    * Warn when referencing functions, types, and callbacks from filtered out modules
 
   * Bug fixes
     * Fix search for words with hyphens in them

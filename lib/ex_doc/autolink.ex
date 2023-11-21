@@ -87,6 +87,23 @@ defmodule ExDoc.Autolink do
     nil
   end
 
+  defp string_app_module_url(string, tool, module, anchor, config) do
+    if Enum.any?(config.filtered_modules, &(&1.module == module)) do
+      # TODO: Remove on Elixir v1.14
+      prefix =
+        if unquote(Version.match?(System.version(), ">= 1.14.0")) do
+          ""
+        else
+          ~s|"#{string}" |
+        end
+
+      warn(config, prefix <> "reference to a filtered module")
+      nil
+    else
+      app_module_url(tool, module, anchor, config)
+    end
+  end
+
   # TODO: make more generic
   @doc false
   def ex_doc_app_url(module, config, path, ext, suffix) do
@@ -260,7 +277,7 @@ defmodule ExDoc.Autolink do
 
     case {mode, Refs.get_visibility(ref)} do
       {_link_type, visibility} when visibility in [:public, :limited] ->
-        app_module_url(tool(module, config), module, anchor, config)
+        string_app_module_url(string, tool(module, config), module, anchor, config)
 
       {:regular_link, :undefined} ->
         nil
@@ -468,7 +485,8 @@ defmodule ExDoc.Autolink do
         if same_module? do
           fragment(tool, kind, name, arity)
         else
-          app_module_url(tool, module, config) <> fragment(tool, kind, name, arity)
+          url = string_app_module_url(original_text, tool, module, nil, config)
+          url && url <> fragment(tool, kind, name, arity)
         end
 
       {:regular_link, module_visibility, :undefined}
