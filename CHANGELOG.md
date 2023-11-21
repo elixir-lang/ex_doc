@@ -8,7 +8,6 @@
     * Include prebuilt binaries on every release
     * Add borders dividing table rows in rendered content
     * Add accurate warnings for missing docs from Elixir v1.16+
-    * Support `e:some-page.md` for explicitly linking to a page
     * Support `e:dep:some-page.md` for explicitly linking to a page in a package
     * Support `m:SomeModule` for explicitly linking to a module
     * Add `noindex` meta tag to 404 and Search pages
