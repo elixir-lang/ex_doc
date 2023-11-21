@@ -470,16 +470,6 @@ defmodule ExDoc.Language.ElixirTest do
              ~s|<code class="inline">t:InMemory.unknown/0</code>|
   end
 
-  test "warning if typespec references filtered module" do
-    ExDoc.Refs.insert([
-      {{:module, AutolinkTest.Keep}, :public},
-      {{:function, AutolinkTest.Filtered}, :public},
-      {{:type, AutolinkTest.Filtered, :type, 0}, :public}
-    ])
-
-    # TODO: testing
-  end
-
   test "warnings" do
     ExDoc.Refs.insert([
       {{:module, AutolinkTest.Foo}, :public},
@@ -577,6 +567,11 @@ defmodule ExDoc.Language.ElixirTest do
     assert warn(fn ->
              autolink_spec(quote(do: t() :: String.bad()), opts)
            end) =~ ~s|documentation references type "String.bad()"|
+
+    assert warn(fn ->
+             opts = opts ++ [filtered_modules: [%ExDoc.ModuleNode{id: "String"}]]
+             autolink_spec(quote(do: t() :: String.t()), opts)
+           end) == "typespec references filtered module: String.t()"
 
     assert warn(fn ->
              autolink_spec(

@@ -670,7 +670,7 @@ defmodule ExDoc.Language.Elixir do
       original_text = call_string <> "()"
 
       if Enum.any?(config.filtered_modules, &(&1.id == module_string)) do
-        Autolink.warn(config, "Typespec references filtered module: #{all}")
+        Autolink.warn(config, "typespec references filtered module: #{all}")
       end
 
       url =
