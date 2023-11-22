@@ -3,6 +3,7 @@ defmodule ExDoc.Language.Erlang do
 
   @behaviour ExDoc.Language
 
+  alias ExDoc.Language.Elixir, as: ExDocElixir
   alias ExDoc.{Autolink, Refs}
 
   @impl true
@@ -114,7 +115,7 @@ defmodule ExDoc.Language.Erlang do
         end
       end,
       extra_annotations: [],
-      line: nil,
+      line: ExDocElixir.find_function_line(module_data, {name, arity}),
       specs: specs
     }
   end
@@ -126,13 +127,14 @@ defmodule ExDoc.Language.Erlang do
     extra_annotations =
       if {name, arity} in module_data.private.optional_callbacks, do: ["optional"], else: []
 
-    specs =
+    {specs, anno} =
       case Map.fetch(module_data.private.callbacks, {name, arity}) do
         {:ok, specs} ->
-          [{:attribute, 0, :callback, {{name, arity}, specs}}]
+          {:type, anno, _, _} = hd(specs)
+          {[{:attribute, anno, :callback, {{name, arity}, specs}}], anno}
 
         :error ->
-          []
+          {[], anno}
       end
 
     %{
@@ -147,7 +149,7 @@ defmodule ExDoc.Language.Erlang do
   def type_data(entry, module_data) do
     {{kind, name, arity}, anno, signature, _doc, _metadata} = entry
 
-    case ExDoc.Language.Elixir.type_from_module_data(module_data, name, arity) do
+    case ExDocElixir.type_from_module_data(module_data, name, arity) do
       %{} = map ->
         %{
           type: map.type,

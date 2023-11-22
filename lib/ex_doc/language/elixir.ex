@@ -513,7 +513,8 @@ defmodule ExDoc.Language.Elixir do
     nil
   end
 
-  defp find_function_line(module_data, {name, arity}) do
+  @doc false
+  def find_function_line(module_data, {name, arity}) do
     Enum.find_value(module_data.private.abst_code, fn
       {:function, anno, ^name, ^arity, _} -> anno_line(anno)
       _ -> nil
