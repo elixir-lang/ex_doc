@@ -74,5 +74,15 @@ defmodule ExDoc.Markdown.EarmarkTest do
                {:pre, [], [{:code, [class: "mermaid output"], ["graph TD; A-->B;"], %{}}], %{}}
              ]
     end
+
+    test "keeps math syntax without interpreting math as markdown" do
+      assert Markdown.to_ast("Math $x *y* y$", []) == [
+               {:p, [], ["Math ", "$x *y* y$"], %{}}
+             ]
+
+      assert Markdown.to_ast("Math $$x$$", []) == [
+               {:p, [], ["Math ", "$$\nx\n$$"], %{}}
+             ]
+    end
   end
 end
