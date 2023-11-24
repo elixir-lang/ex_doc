@@ -2,6 +2,7 @@ import { getSuggestions } from './suggestions'
 import { isBlank, qs } from '../helpers'
 
 export const AUTOCOMPLETE_CONTAINER_SELECTOR = '.autocomplete'
+export const AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR = '.autocomplete-suggestions'
 export const AUTOCOMPLETE_SUGGESTION_SELECTOR = '.autocomplete-suggestion'
 
 const state = {
@@ -88,6 +89,9 @@ export function moveAutocompleteSelection (offset) {
 
   if (elementToSelect) {
     elementToSelect.classList.add('selected')
+    elementToSelect.scrollIntoView({ block: 'nearest' })
+  } else {
+    qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR).scrollTop = 0
   }
 }
 

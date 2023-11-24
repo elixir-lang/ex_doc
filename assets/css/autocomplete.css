@@ -16,7 +16,7 @@
   top: 9px;
   left: 10%;
   transform: translateX(-50%);
-  z-index: 250;
+  z-index: 100;
   background-color: transparent;
 }
 

@@ -41,15 +41,17 @@ function addEventListeners () {
   const searchInput = qs(SEARCH_INPUT_SELECTOR)
 
   searchInput.addEventListener('keydown', event => {
+    const macOS = isMacOS()
+
     if (event.key === 'Escape') {
       clearSearch()
       searchInput.blur()
     } else if (event.key === 'Enter') {
       handleAutocompleteFormSubmission(event)
-    } else if (event.key === 'ArrowUp') {
+    } else if (event.key === 'ArrowUp' || (macOS && event.ctrlKey && event.key === 'p')) {
       moveAutocompleteSelection(-1)
       event.preventDefault()
-    } else if (event.key === 'ArrowDown') {
+    } else if (event.key === 'ArrowDown' || (macOS && event.ctrlKey && event.key === 'n')) {
       moveAutocompleteSelection(1)
       event.preventDefault()
     }
@@ -134,4 +136,8 @@ function clearSearch () {
 function hideAutocomplete () {
   document.body.classList.remove('search-focused')
   hideAutocompleteList()
+}
+
+function isMacOS () {
+  return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
 }
