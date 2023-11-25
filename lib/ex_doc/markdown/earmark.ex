@@ -29,7 +29,8 @@ defmodule ExDoc.Markdown.Earmark do
       line: 1,
       file: "nofile",
       breaks: false,
-      pure_links: true
+      pure_links: true,
+      math: true
     ]
 
     options = Keyword.merge(options, opts)
@@ -61,6 +62,16 @@ defmodule ExDoc.Markdown.Earmark do
 
   defp fixup({tag, attrs, ast}) do
     fixup({tag, attrs, ast, %{}})
+  end
+
+  # Rewrite math back to the original syntax, it's up to the user to render it
+
+  defp fixup({"code", [{"class", "math-inline"}], [content], _}) do
+    "$#{content}$"
+  end
+
+  defp fixup({"code", [{"class", "math-display"}], [content], _}) do
+    "$$\n#{content}\n$$"
   end
 
   defp fixup({tag, attrs, ast, meta}) when is_binary(tag) and is_list(attrs) and is_map(meta) do
