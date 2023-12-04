@@ -417,16 +417,16 @@ defmodule Mix.Tasks.DocsTest do
   end
 
   test "exits with 1 due to warning, with flag --warnings_as_errors", context do
-    ExDoc.Utils.put_warned()
+    ExDoc.Utils.set_warned()
 
     assert catch_exit(run(context, [], app: :ex_doc, docs: [warnings_as_errors: true])) ==
              {:shutdown, 1}
   end
 
   test "exits with 1 due to multiple warnings, with flag --warnings_as_errors", context do
-    ExDoc.Utils.put_warned()
-    ExDoc.Utils.put_warned()
-    ExDoc.Utils.put_warned()
+    ExDoc.Utils.set_warned()
+    ExDoc.Utils.set_warned()
+    ExDoc.Utils.set_warned()
 
     assert catch_exit(run(context, [], app: :ex_doc, docs: [warnings_as_errors: true])) ==
              {:shutdown, 1}

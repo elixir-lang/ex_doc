@@ -72,7 +72,7 @@ defmodule ExDoc.CLITest do
     @describetag :warnings
 
     test "exits with code 0 when no warnings" do
-      ExDoc.Utils.delete_warned()
+      ExDoc.Utils.unset_warned()
 
       {[html, epub], _io} = run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
 
@@ -98,7 +98,7 @@ defmodule ExDoc.CLITest do
     end
 
     test "exits with 1 when there is a warning" do
-      ExDoc.Utils.put_warned()
+      ExDoc.Utils.set_warned()
 
       fun = fn ->
         run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
@@ -114,9 +114,9 @@ defmodule ExDoc.CLITest do
     end
 
     test "exits with 1 when there are multiple warnings" do
-      ExDoc.Utils.put_warned()
-      ExDoc.Utils.put_warned()
-      ExDoc.Utils.put_warned()
+      ExDoc.Utils.set_warned()
+      ExDoc.Utils.set_warned()
+      ExDoc.Utils.set_warned()
 
       fun = fn ->
         run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])

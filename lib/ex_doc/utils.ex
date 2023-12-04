@@ -7,7 +7,7 @@ defmodule ExDoc.Utils do
   Emits a warning.
   """
   def warn(message, stacktrace_info) do
-    put_warned()
+    set_warned()
 
     # TODO: remove check when we require Elixir v1.14
     if @elixir_gte_1_14? do
@@ -17,8 +17,10 @@ defmodule ExDoc.Utils do
     end
   end
 
-  @doc false
-  def put_warned() do
+  @doc """
+  Stores that a warning has been generated.
+  """
+  def set_warned() do
     unless warned?() do
       :persistent_term.put({__MODULE__, :warned?}, true)
     end
@@ -26,13 +28,18 @@ defmodule ExDoc.Utils do
     true
   end
 
-  @doc false
-  def delete_warned() do
+  @doc """
+  Removes that a warning has been generated.
+  """
+  def unset_warned() do
     if warned?() do
       :persistent_term.put({__MODULE__, :warned?}, false)
     end
   end
 
+  @doc """
+  Returns `true` if any warning has been generated during the document building. Otherwise returns `false`.
+  """
   def warned?() do
     :persistent_term.get({__MODULE__, :warned?}, false)
   end

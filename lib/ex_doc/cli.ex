@@ -192,13 +192,13 @@ defmodule ExDoc.CLI do
           --package             Hex package name
           --paths               Prepends the given path to Erlang code path. The path might contain a glob
                                 pattern but in that case, remember to quote it: --paths "_build/dev/lib/*/ebin".
-                                This option can be given multiple times
-          --proglang            The project's programming language, default: "elixir"
-      -q, --quiet               Only output warnings and errors
-          --source-ref          Branch/commit/tag used for source link inference, default: "master"
-      -u, --source-url          URL to the source code
-      -v, --version             Print ExDoc version
-          --warnings-as-errors  Exit with non-zero status if doc generation has one or more warnings.
+                                This option can be given multiple times.
+          --proglang            The project's programming language, default: "elixir".
+      -q, --quiet               Only output warnings and errors.
+          --source-ref          Branch/commit/tag used for source link inference, default: "master".
+      -u, --source-url          URL to the source code.
+      -v, --version             Print ExDoc version.
+          --warnings-as-errors  Exit with non-zero status if doc generation produces warnings.
 
     ## Custom config
 

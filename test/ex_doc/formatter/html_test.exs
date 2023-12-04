@@ -152,7 +152,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     @describetag :warnings
 
     test "single warning is registered when using warnings_as_errors: true", context do
-      ExDoc.Utils.delete_warned()
+      ExDoc.Utils.unset_warned()
 
       output =
         capture_io(:stderr, fn ->
@@ -166,7 +166,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "multiple warnings are registered when using warnings_as_errors: true", context do
-      ExDoc.Utils.delete_warned()
+      ExDoc.Utils.unset_warned()
 
       output =
         capture_io(:stderr, fn ->
@@ -190,7 +190,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "warnings are registered even with warnings_as_errors: false", context do
-      ExDoc.Utils.delete_warned()
+      ExDoc.Utils.unset_warned()
 
       capture_io(:stderr, fn ->
         generate_docs(
