@@ -35,14 +35,25 @@ defmodule ExDoc.CLI do
           quiet: :boolean,
           source_ref: :string,
           source_url: :string,
-          version: :boolean
+          version: :boolean,
+          warnings_as_errors: :boolean
         ]
       )
 
-    if List.keymember?(opts, :version, 0) do
-      IO.puts("ExDoc v#{ExDoc.version()}")
-    else
-      generate(args, opts, generator)
+    cond do
+      List.keymember?(opts, :version, 0) ->
+        IO.puts("ExDoc v#{ExDoc.version()}")
+
+      opts[:warnings_as_errors] == true and ExDoc.Utils.warned?() ->
+        IO.puts(
+          :stderr,
+          "Doc generation failed due to warnings while using the --warnings-as-errors option"
+        )
+
+        exit({:shutdown, 1})
+
+      true ->
+        generate(args, opts, generator)
     end
   end
 
@@ -164,29 +175,30 @@ defmodule ExDoc.CLI do
       ex_doc "Project" "1.0.0" "_build/dev/lib/project/ebin" -c "docs.exs"
 
     Options:
-      PROJECT             Project name
-      VERSION             Version number
-      BEAMS               Path to compiled beam files
-          --canonical     Indicate the preferred URL with rel="canonical" link element
-      -c, --config        Give configuration through a file instead of a command line.
-                          See "Custom config" section below for more information.
-      -f, --formatter     Docs formatter to use (html or epub), default: html and epub
-          --homepage-url  URL to link to for the site name
-          --language      Identify the primary language of the documents, its value must be
-                          a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
-      -l, --logo          Path to a logo image for the project. Must be PNG, JPEG or SVG. The image will
-                          be placed in the output "assets" directory.
-      -m, --main          The entry-point page in docs, default: "api-reference"
-      -o, --output        Path to output docs, default: "doc"
-          --package       Hex package name
-          --paths         Prepends the given path to Erlang code path. The path might contain a glob
-                          pattern but in that case, remember to quote it: --paths "_build/dev/lib/*/ebin".
-                          This option can be given multiple times
-          --proglang      The project's programming language, default: "elixir"
-      -q, --quiet         Only output warnings and errors
-          --source-ref    Branch/commit/tag used for source link inference, default: "master"
-      -u, --source-url    URL to the source code
-      -v, --version       Print ExDoc version
+      PROJECT                   Project name
+      VERSION                   Version number
+      BEAMS                     Path to compiled beam files
+          --canonical           Indicate the preferred URL with rel="canonical" link element
+      -c, --config              Give configuration through a file instead of a command line.
+                                See "Custom config" section below for more information.
+      -f, --formatter           Docs formatter to use (html or epub), default: html and epub
+          --homepage-url        URL to link to for the site name
+          --language            Identify the primary language of the documents, its value must be
+                                a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
+      -l, --logo                Path to a logo image for the project. Must be PNG, JPEG or SVG. The image will
+                                be placed in the output "assets" directory.
+      -m, --main                The entry-point page in docs, default: "api-reference"
+      -o, --output              Path to output docs, default: "doc"
+          --package             Hex package name
+          --paths               Prepends the given path to Erlang code path. The path might contain a glob
+                                pattern but in that case, remember to quote it: --paths "_build/dev/lib/*/ebin".
+                                This option can be given multiple times
+          --proglang            The project's programming language, default: "elixir"
+      -q, --quiet               Only output warnings and errors
+          --source-ref          Branch/commit/tag used for source link inference, default: "master"
+      -u, --source-url          URL to the source code
+      -v, --version             Print ExDoc version
+          --warnings-as-errors  Exit with non-zero status if doc generation has one or more warnings.
 
     ## Custom config
 

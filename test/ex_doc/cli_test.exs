@@ -1,5 +1,6 @@
 defmodule ExDoc.CLITest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
+
   import ExUnit.CaptureIO
 
   @ebin "_build/test/lib/ex_doc/ebin"
@@ -65,6 +66,70 @@ defmodule ExDoc.CLITest do
 
     {_, io} = run(["--version"])
     assert io == "ExDoc v#{ExDoc.version()}\n"
+  end
+
+  describe "--warnings-as-errors" do
+    @describetag :warnings
+
+    test "exits with code 0 when no warnings" do
+      ExDoc.Utils.delete_warned()
+
+      {[html, epub], _io} = run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
+
+      assert html ==
+               {"ExDoc", "1.2.3",
+                [
+                  formatter: "html",
+                  formatters: ["html", "epub"],
+                  apps: [:ex_doc],
+                  source_beam: @ebin,
+                  warnings_as_errors: true
+                ]}
+
+      assert epub ==
+               {"ExDoc", "1.2.3",
+                [
+                  formatter: "epub",
+                  formatters: ["html", "epub"],
+                  apps: [:ex_doc],
+                  source_beam: @ebin,
+                  warnings_as_errors: true
+                ]}
+    end
+
+    test "exits with 1 when there is a warning" do
+      ExDoc.Utils.put_warned()
+
+      fun = fn ->
+        run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
+      end
+
+      io =
+        capture_io(:stderr, fn ->
+          assert catch_exit(fun.()) == {:shutdown, 1}
+        end)
+
+      assert io =~
+               "Doc generation failed due to warnings while using the --warnings-as-errors option\n"
+    end
+
+    test "exits with 1 when there are multiple warnings" do
+      ExDoc.Utils.put_warned()
+      ExDoc.Utils.put_warned()
+      ExDoc.Utils.put_warned()
+
+      fun = fn ->
+        run(["ExDoc", "1.2.3", @ebin, "--warnings-as-errors"])
+      end
+
+      io =
+        capture_io(:stderr, fn ->
+          assert catch_exit(fun.()) == {:shutdown, 1}
+        end)
+
+      assert io =~
+               "Doc generation failed due to warnings while using the --warnings-as-errors option\n"
+    end
   end
 
   test "too many arguments" do

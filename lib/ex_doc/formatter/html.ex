@@ -249,7 +249,7 @@ defmodule ExDoc.Formatter.HTML do
         html = Templates.extra_template(config, node, extra_type(extension), nodes_map, refs)
 
         if File.regular?(output) do
-          ExDoc.Utils.warn("warning: file #{Path.relative_to_cwd(output)} already exists", [])
+          ExDoc.Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
         end
 
         File.write!(output, html)

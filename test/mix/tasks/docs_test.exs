@@ -390,4 +390,45 @@ defmodule Mix.Tasks.DocsTest do
              ] = run(context, [], app: :umbrella, apps_path: "apps/", docs: [ignore_apps: [:foo]])
     end)
   end
+
+  test "accepts warnings_as_errors in :warnings_as_errors", context do
+    assert [
+             {"ex_doc", "dev",
+              [
+                formatter: "html",
+                formatters: ["html", "epub"],
+                deps: _,
+                apps: [:ex_doc],
+                source_beam: _,
+                warnings_as_errors: false,
+                proglang: :elixir
+              ]},
+             {"ex_doc", "dev",
+              [
+                formatter: "epub",
+                formatters: ["html", "epub"],
+                deps: _,
+                apps: [:ex_doc],
+                source_beam: _,
+                warnings_as_errors: false,
+                proglang: :elixir
+              ]}
+           ] = run(context, [], app: :ex_doc, docs: [warnings_as_errors: false])
+  end
+
+  test "exits with 1 due to warning, with flag --warnings_as_errors", context do
+    ExDoc.Utils.put_warned()
+
+    assert catch_exit(run(context, [], app: :ex_doc, docs: [warnings_as_errors: true])) ==
+             {:shutdown, 1}
+  end
+
+  test "exits with 1 due to multiple warnings, with flag --warnings_as_errors", context do
+    ExDoc.Utils.put_warned()
+    ExDoc.Utils.put_warned()
+    ExDoc.Utils.put_warned()
+
+    assert catch_exit(run(context, [], app: :ex_doc, docs: [warnings_as_errors: true])) ==
+             {:shutdown, 1}
+  end
 end

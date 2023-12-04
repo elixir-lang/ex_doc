@@ -27,6 +27,8 @@ defmodule Mix.Tasks.Docs do
     * `--proglang` - Chooses the main programming language: `elixir`
       or `erlang`
 
+    * `--warnings-as-errors` - Exits with non-zero exit code if any warnings are found
+
   The command line options have higher precedence than the options
   specified in your `mix.exs` file below.
 
@@ -339,7 +341,8 @@ defmodule Mix.Tasks.Docs do
     language: :string,
     open: :boolean,
     output: :string,
-    proglang: :string
+    proglang: :string,
+    warnings_as_errors: :boolean
   ]
 
   @aliases [
@@ -407,7 +410,16 @@ defmodule Mix.Tasks.Docs do
         browser_open(index)
       end
 
-      index
+      if options[:warnings_as_errors] == true and ExDoc.Utils.warned?() do
+        Mix.shell().info([
+          :red,
+          "Doc generation failed due to warnings while using the --warnings-as-errors option"
+        ])
+
+        exit({:shutdown, 1})
+      else
+        index
+      end
     end
   end
 
