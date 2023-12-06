@@ -103,8 +103,8 @@ defmodule Mix.Tasks.Docs do
     * `:extras` - List of paths to additional Markdown (`.md` extension), Live Markdown
       (`.livemd` extension), Cheatsheets (`.cheatmd` extension) and plain text pages to
       add to the documentation. You can also specify keyword pairs to customize the
-      generated filename and title of each extra page; default: `[]`. Example:
-      `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing"]]`
+      generated filename, title and source file of each extra page; default: `[]`. Example:
+      `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing", source: "CONTRIBUTING.mdx"]]`
 
     * `:filter_modules` - Include only modules that match the given value. The
       value can be a regex, a string (representing a regex), or a two-arity

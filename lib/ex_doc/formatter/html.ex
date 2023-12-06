@@ -390,16 +390,46 @@ defmodule ExDoc.Formatter.HTML do
   defp build_extra({input, options}, groups, language, autolink_opts, source_url_pattern) do
     input = to_string(input)
     id = options[:filename] || input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, options[:title], groups, language, autolink_opts, source_url_pattern)
+    source = options[:source] || input
+
+    build_extra(
+      input,
+      id,
+      options[:title],
+      groups,
+      language,
+      autolink_opts,
+      source,
+      source_url_pattern
+    )
   end
 
   defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
     id = input |> filename_to_title() |> text_to_id()
-    build_extra(input, id, nil, groups, language, autolink_opts, source_url_pattern)
+
+    build_extra(
+      input,
+      id,
+      nil,
+      groups,
+      language,
+      autolink_opts,
+      input,
+      source_url_pattern
+    )
   end
 
-  defp build_extra(input, id, title, groups, language, autolink_opts, source_url_pattern) do
-    opts = [file: input, line: 1]
+  defp build_extra(
+         input,
+         id,
+         title,
+         groups,
+         language,
+         autolink_opts,
+         source_file,
+         source_url_pattern
+       ) do
+    opts = [file: source_file, line: 1]
 
     {source, ast} =
       case extension_name(input) do
@@ -437,7 +467,7 @@ defmodule ExDoc.Formatter.HTML do
     group = GroupMatcher.match_extra(groups, input)
     title = title || title_text || filename_to_title(input)
 
-    source_path = input |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
+    source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
 
     source_url = Utils.source_url_pattern(source_url_pattern, source_path, 1)
 
