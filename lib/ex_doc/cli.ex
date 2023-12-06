@@ -40,20 +40,32 @@ defmodule ExDoc.CLI do
         ]
       )
 
-    cond do
-      List.keymember?(opts, :version, 0) ->
-        IO.puts("ExDoc v#{ExDoc.version()}")
+    if List.keymember?(opts, :version, 0) do
+      IO.puts("ExDoc v#{ExDoc.version()}")
+    else
+      results = generate(args, opts, generator)
+      error_results = Enum.filter(results, &(elem(&1, 0) == :error))
 
-      opts[:warnings_as_errors] == true and ExDoc.Utils.warned?() ->
-        IO.puts(
-          :stderr,
-          "Doc generation failed due to warnings while using the --warnings-as-errors option"
-        )
+      if error_results == [] do
+        results
+      else
+        formatters = Enum.map(error_results, &elem(&1, 1).formatter)
+
+        format_message =
+          case formatters do
+            [formatter] -> "#{formatter} format"
+            _ -> "#{Enum.join(formatters, ", ")} formats"
+          end
+
+        message =
+          "Documents have been generated, but generation for #{format_message} failed due to warnings while using the --warnings-as-errors option."
+
+        message_formatted = IO.ANSI.format([:red, message, :reset])
+
+        IO.puts(:stderr, message_formatted)
 
         exit({:shutdown, 1})
-
-      true ->
-        generate(args, opts, generator)
+      end
     end
   end
 
@@ -82,7 +94,11 @@ defmodule ExDoc.CLI do
       quiet? ||
         IO.puts(IO.ANSI.format([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"]))
 
-      index
+      if opts[:warnings_as_errors] == true and ExDoc.Utils.warned?() do
+        {:error, %{reason: :warnings_as_errors, formatter: formatter}}
+      else
+        {:ok, index}
+      end
     end
   end
 

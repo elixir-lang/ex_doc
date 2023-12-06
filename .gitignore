@@ -24,6 +24,8 @@ ex_doc-*.tar
 
 node_modules/
 /test/fixtures/umbrella/_build/
+/test/fixtures/single/_build/
+/test/fixtures/single/doc/
 /test/tmp/
 /tmp/
 /npm-debug.log

@@ -400,26 +400,52 @@ defmodule Mix.Tasks.Docs do
       |> normalize_formatters()
       |> put_package(config)
 
+    Code.prepend_path(options[:source_beam])
+
+    for path <- Keyword.get_values(options, :paths),
+        path <- Path.wildcard(path) do
+      Code.prepend_path(path)
+    end
+
     Mix.shell().info("Generating docs...")
 
-    for formatter <- options[:formatters] do
-      index = generator.(project, version, Keyword.put(options, :formatter, formatter))
-      Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"])
+    results =
+      for formatter <- options[:formatters] do
+        index = generator.(project, version, Keyword.put(options, :formatter, formatter))
+        Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"])
 
-      if cli_opts[:open] do
-        browser_open(index)
+        if cli_opts[:open] do
+          browser_open(index)
+        end
+
+        if options[:warnings_as_errors] == true and ExDoc.Utils.warned?() do
+          {:error, %{reason: :warnings_as_errors, formatter: formatter}}
+        else
+          {:ok, index}
+        end
       end
 
-      if options[:warnings_as_errors] == true and ExDoc.Utils.warned?() do
-        Mix.shell().info([
-          :red,
-          "Doc generation failed due to warnings while using the --warnings-as-errors option"
-        ])
+    error_results = Enum.filter(results, &(elem(&1, 0) == :error))
 
-        exit({:shutdown, 1})
-      else
-        index
-      end
+    if error_results == [] do
+      results
+    else
+      formatters = Enum.map(error_results, &elem(&1, 1).formatter)
+
+      format_message =
+        case formatters do
+          [formatter] -> "#{formatter} format"
+          _ -> "#{Enum.join(formatters, ", ")} formats"
+        end
+
+      message =
+        "Documents have been generated, but generation for #{format_message} failed due to warnings while using the --warnings-as-errors option."
+
+      message_formatted = IO.ANSI.format([:red, message, :reset])
+
+      IO.puts(:stderr, message_formatted)
+
+      exit({:shutdown, 1})
     end
   end
 
