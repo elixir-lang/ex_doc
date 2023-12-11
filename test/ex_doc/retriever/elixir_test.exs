@@ -30,7 +30,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
 
       assert %ExDoc.ModuleNode{
-               doc_line: 2,
+               moduledoc_line: 2,
                id: "Mod",
                module: Mod,
                title: "Mod",
@@ -53,7 +53,6 @@ defmodule ExDoc.Retriever.ElixirTest do
                name: :function,
                rendered_doc: nil,
                signature: "function()",
-               source_path: _,
                source_url: nil,
                specs: [spec],
                type: :function

@@ -83,8 +83,8 @@ defmodule ExDoc.Formatter.HTML do
         autolink_opts =
           [
             current_module: node.module,
-            file: node.source_path,
-            line: node.doc_line,
+            file: node.moduledoc_file,
+            line: node.moduledoc_line,
             module_id: node.id,
             language: language
           ] ++ base
@@ -98,7 +98,7 @@ defmodule ExDoc.Formatter.HTML do
                 [
                   id: id,
                   line: child_node.doc_line,
-                  file: child_node.source_path,
+                  file: child_node.doc_file,
                   current_kfa: {:function, child_node.name, child_node.arity}
                 ]
 
@@ -116,7 +116,7 @@ defmodule ExDoc.Formatter.HTML do
                 [
                   id: id,
                   line: child_node.doc_line,
-                  file: child_node.source_path,
+                  file: child_node.doc_file,
                   current_kfa: {child_node.type, child_node.name, child_node.arity}
                 ]
 

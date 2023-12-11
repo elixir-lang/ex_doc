@@ -18,7 +18,12 @@ defmodule ExDoc.Language do
 
     * `:type` - module type
 
-    * `:line` - the line where the code is located
+    * `:source_line` - the line where the module code is located, defmodule in Elixir, or -module in Erlang
+
+    * `:source_file` - the source file the module code is located, defmodule in Elixir, or -module in Erlang
+
+    * `:source_basedir` - the absolute directory where the Elixir/Erlang compiler was run.
+      See `ExDoc.Language.Source.get_basedir/2` for more details.
 
     * `:callback_types` - a list of types that are considered callbacks
 
@@ -34,7 +39,9 @@ defmodule ExDoc.Language do
           id: String.t(),
           title: String.t(),
           type: atom() | nil,
-          line: non_neg_integer(),
+          source_basedir: String.t(),
+          source_file: String.t(),
+          source_line: non_neg_integer(),
           callback_types: [atom()],
           nesting_info: {String.t(), String.t()} | nil,
           private: map()
@@ -50,7 +57,9 @@ defmodule ExDoc.Language do
 
   The map has the following keys:
 
-    * `:line` - the line where the code is located
+    * `:line` - the line where the code is located, def/defp in Elixir, foo(...) in Erlang
+
+    * `:source` - the source file where the code in located
 
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
@@ -63,6 +72,7 @@ defmodule ExDoc.Language do
   @callback function_data(entry :: tuple(), module_data()) ::
               %{
                 line: non_neg_integer() | nil,
+                source: String.t(),
                 specs: [spec_ast()],
                 # TODO: change to following on Elixir 1.15. It trips mix formatter between 1.14 and 1.15
                 # doc_fallback: (-> ExDoc.DocAST.t()) | nil,
@@ -78,6 +88,8 @@ defmodule ExDoc.Language do
 
     * `:line` - the line where the code is located
 
+    * `:source` - the source file where the code is located
+
     * `:signature` - the signature
 
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
@@ -88,6 +100,7 @@ defmodule ExDoc.Language do
   @callback callback_data(entry :: tuple(), module_data()) ::
               %{
                 line: non_neg_integer() | nil,
+                source: String.t(),
                 signature: [binary()],
                 specs: [spec_ast()],
                 extra_annotations: [String.t()]
@@ -101,6 +114,8 @@ defmodule ExDoc.Language do
     * `:type` - `:type` or `:opaque`
 
     * `:line` - the line where the code is located
+
+    * `:source` - the source file where the code is located
 
     * `:signature` - the signature
 

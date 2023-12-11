@@ -4,9 +4,31 @@ defmodule ExDoc.Language.Elixir do
   @behaviour ExDoc.Language
 
   alias ExDoc.Autolink
-  alias ExDoc.Language.Erlang
+  alias ExDoc.Language.Source
 
   @impl true
+  @spec module_data(atom, any, any) ::
+          :skip
+          | %{
+              callback_types: [:callback, ...],
+              docs: any,
+              id: binary,
+              language: ExDoc.Language.Erlang,
+              source_line: pos_integer,
+              source_file: Path.t(),
+              source_basedir: Path.t(),
+              module: module,
+              nesting_info: nil,
+              private: %{
+                abst_code: any,
+                callbacks: map,
+                impls: map,
+                optional_callbacks: any,
+                specs: map
+              },
+              title: binary,
+              type: :behaviour | :module
+            }
   def module_data(module, docs_chunk, config) do
     {type, skip} = module_type_and_skip(module)
 
@@ -14,10 +36,13 @@ defmodule ExDoc.Language.Elixir do
       skip ->
         :skip
 
-      abst_code = Erlang.get_abstract_code(module) ->
+      abst_code = Source.get_abstract_code(module) ->
         title = module_title(module, type)
-        line = Erlang.find_module_line(module, abst_code)
-        optional_callbacks = type == :behaviour && module.behaviour_info(:optional_callbacks)
+
+        source_basedir = Source.get_basedir(abst_code, module)
+        {source_file, source_line} = Source.get_module_location(abst_code, source_basedir, module)
+
+        optional_callbacks = Source.get_optional_callbacks(module, type)
 
         %{
           module: module,
@@ -26,13 +51,15 @@ defmodule ExDoc.Language.Elixir do
           id: inspect(module),
           title: title,
           type: type,
-          line: line,
+          source_line: source_line,
+          source_file: source_file,
+          source_basedir: source_basedir,
           callback_types: [:callback, :macrocallback],
           nesting_info: nesting_info(title, config.nest_modules_by_prefix),
           private: %{
             abst_code: abst_code,
-            specs: Erlang.get_specs(module),
-            callbacks: Erlang.get_callbacks(module),
+            specs: Source.get_specs(abst_code, source_basedir),
+            callbacks: Source.get_callbacks(abst_code, source_basedir),
             impls: get_impls(module),
             optional_callbacks: optional_callbacks
           }
@@ -43,6 +70,8 @@ defmodule ExDoc.Language.Elixir do
           "skipping docs for module #{inspect(module)}, reason: :no_debug_info",
           []
         )
+
+        :skip
     end
   end
 
@@ -75,7 +104,7 @@ defmodule ExDoc.Language.Elixir do
           delegate_doc_ast(metadata[:delegate_to])
       end,
       extra_annotations: extra_annotations,
-      line: find_function_line(module_data, actual_def),
+      source_line: find_function_line(module_data, actual_def),
       specs: specs(kind, name, actual_def, module_data)
     }
   end
@@ -114,31 +143,28 @@ defmodule ExDoc.Language.Elixir do
     extra_annotations =
       if actual_def in module_data.private.optional_callbacks, do: ["optional"], else: []
 
-    specs =
+    {anno, specs} =
       case module_data.private.callbacks do
-        %{^actual_def => specs} when kind == :macrocallback ->
-          Enum.map(specs, &remove_callback_term/1)
-
-        %{^actual_def => specs} ->
-          specs
+        %{^actual_def => {:attribute, anno, :callback, {_name, specs}}} ->
+          {anno,
+           if kind == :macrocallback do
+             Enum.map(specs, &remove_callback_term/1)
+           else
+             specs
+           end}
 
         %{} ->
-          []
+          {anno, []}
       end
 
-    line =
-      if specs != [] do
-        {:type, anno, _, _} = hd(specs)
-        anno_line(anno)
-      else
-        anno_line(anno)
-      end
+    line = Source.anno_line(anno)
 
     quoted = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
     signature = [get_typespec_signature(hd(quoted), arity)]
 
     %{
-      line: line,
+      source_line: line,
+      source_file: nil,
       signature: signature,
       specs: quoted,
       extra_annotations: extra_annotations
@@ -157,33 +183,19 @@ defmodule ExDoc.Language.Elixir do
   def type_data(entry, module_data) do
     {{_kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
 
-    %{type: type, spec: spec, line: line} = type_from_module_data(module_data, name, arity)
+    %{type: type, spec: spec, source_file: source, source_line: line} =
+      Source.get_type_from_module_data(module_data, name, arity)
+
     quoted = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(type)
     signature = [get_typespec_signature(quoted, arity)]
 
     %{
       type: type,
-      line: line,
+      source_line: line,
+      source_file: source,
       spec: quoted,
       signature: signature
     }
-  end
-
-  @doc false
-  def type_from_module_data(module_data, name, arity) do
-    Enum.find_value(module_data.private.abst_code, fn
-      {:attribute, anno, type, {^name, _, args} = spec} ->
-        if type in [:opaque, :type] and length(args) == arity do
-          %{
-            type: type,
-            spec: spec,
-            line: anno_line(anno)
-          }
-        end
-
-      _ ->
-        nil
-    end)
   end
 
   @autoimported_modules [Kernel, Kernel.SpecialForms]
@@ -442,7 +454,7 @@ defmodule ExDoc.Language.Elixir do
 
   def get_impls(module) do
     for behaviour <- behaviours_implemented_by(module),
-        {callback, _} <- Erlang.get_callbacks(behaviour),
+        {callback, _} <- Source.get_callbacks(Source.get_abstract_code(behaviour), ""),
         do: {callback, behaviour},
         into: %{}
   end
@@ -458,7 +470,11 @@ defmodule ExDoc.Language.Elixir do
   defp specs(kind, name, actual_def, module_data) do
     specs =
       module_data.private.specs
-      |> Map.get(actual_def, [])
+      |> Map.get(actual_def)
+      |> then(fn
+        {:attribute, _anno, :spec, {_name, type}} -> type
+        nil -> []
+      end)
       |> Enum.map(&Code.Typespec.spec_to_quoted(name, &1))
 
     if kind == :macro do
@@ -513,16 +529,10 @@ defmodule ExDoc.Language.Elixir do
     nil
   end
 
-  @doc false
-  def find_function_line(module_data, {name, arity}) do
-    Enum.find_value(module_data.private.abst_code, fn
-      {:function, anno, ^name, ^arity, _} -> anno_line(anno)
-      _ -> nil
-    end)
+  defp find_function_line(module_data, na) do
+    {_source, line} = Source.get_function_location(module_data, na)
+    line
   end
-
-  defp anno_line(line) when is_integer(line), do: abs(line)
-  defp anno_line(anno), do: anno |> :erl_anno.line() |> abs()
 
   defp get_typespec_signature({:when, _, [{:"::", _, [{name, meta, args}, _]}, _]}, arity) do
     Macro.to_string({name, meta, strip_types(args, arity)})
