@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.31.0-dev
+## v0.31.0 (2023-12-11)
 
   * Enhancements
     * Allow searching atoms, module attributes, and words finishing with `?` and `!`
