@@ -671,8 +671,11 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "map", c do
-      assert autolink_spec(~S"-spec foo() -> #{atom() := string(), float() => t()}.", c) ==
-               ~S|foo() -> #{<a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>() := <a href="https://www.erlang.org/doc/man/erlang.html#type-string">string</a>(), <a href="https://www.erlang.org/doc/man/erlang.html#type-float">float</a>() => <a href="#t:t/0">t</a>()}.|
+      assert autolink_spec(
+               ~S"-spec foo() -> #{atom() := sets:set(integer()), float() => t()}.",
+               c
+             ) ==
+               ~S|foo() -> #{<a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>() := <a href="https://www.erlang.org/doc/man/sets.html#type-set">sets:set</a>(<a href="https://www.erlang.org/doc/man/erlang.html#type-integer">integer</a>()), <a href="https://www.erlang.org/doc/man/erlang.html#type-float">float</a>() => <a href="#t:t/0">t</a>()}.|
     end
 
     test "vars", c do
@@ -696,8 +699,8 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "record - two fields", c do
-      assert autolink_spec(~s"-spec foo() -> #x{x :: atom(), y :: integer()} | t().", c) ==
-               ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>(), y :: <a href="https://www.erlang.org/doc/man/erlang.html#type-integer">integer</a>()} | <a href="#t:t/0">t</a>().]
+      assert autolink_spec(~s"-spec foo() -> #x{x :: atom(), y :: sets:set(integer())} | t().", c) ==
+               ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>(), y :: <a href="https://www.erlang.org/doc/man/sets.html#type-set">sets:set</a>(<a href="https://www.erlang.org/doc/man/erlang.html#type-integer">integer</a>())} | <a href="#t:t/0">t</a>().]
     end
 
     test "record - two fields, known types", c do
