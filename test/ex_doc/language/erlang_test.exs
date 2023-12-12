@@ -774,13 +774,16 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   defp autolink_spec(binary, c, opts \\ []) when is_binary(binary) do
+    fixtures(c, "")
+
     opts =
       opts
       |> Keyword.put_new(:current_module, :erlang_foo)
+      |> Keyword.put_new(:current_kfa, {:function, :foo, 1})
 
-    fixtures(c, "")
     {:ok, tokens, _} = :erl_scan.string(String.to_charlist(binary))
     {:ok, ast} = :erl_parse.parse_form(tokens)
+    ast = put_elem(ast, 1, :erl_anno.set_file(~c"test.erl", elem(ast, 1)))
     ExDoc.Language.Erlang.autolink_spec(ast, opts)
   end
 

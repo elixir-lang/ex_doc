@@ -88,11 +88,12 @@ defmodule ExDoc.Language.Source do
 
   def get_type_from_module_data(module_data, name, arity) do
     find_ast(module_data.private.abst_code, module_data.source_basedir, fn
-      {:attribute, anno, type, {^name, _, args} = spec} ->
+      {:attribute, anno, type, {^name, _, args} = spec} = attr ->
         if type in [:opaque, :type] and length(args) == arity do
           %{
             type: type,
             spec: spec,
+            attr: attr,
             source_file: anno_file(anno),
             source_line: anno_line(anno)
           }
@@ -156,5 +157,13 @@ defmodule ExDoc.Language.Source do
   def anno_line(line) when is_integer(line), do: abs(line)
   def anno_line(anno), do: anno |> :erl_anno.line() |> abs()
 
-  def anno_file(anno), do: anno |> :erl_anno.file() |> String.Chars.to_string()
+  def anno_file(anno) do
+    case :erl_anno.file(anno) do
+      :undefined ->
+        nil
+
+      file ->
+        String.Chars.to_string(file)
+    end
+  end
 end

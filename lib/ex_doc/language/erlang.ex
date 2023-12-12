@@ -150,7 +150,7 @@ defmodule ExDoc.Language.Erlang do
           type: map.type,
           source_line: map.source_line,
           source_file: map.source_file,
-          spec: {:attribute, 0, map.type, map.spec},
+          spec: map.attr,
           signature: signature
         }
 
@@ -194,23 +194,24 @@ defmodule ExDoc.Language.Erlang do
   def autolink_spec(ast, opts) do
     config = struct!(Autolink, opts)
 
-    {name, quoted} =
+    {name, anno, quoted} =
       case ast do
-        {:attribute, _, kind, {mfa, ast}} when kind in [:spec, :callback] ->
+        {:attribute, anno, kind, {mfa, ast}} when kind in [:spec, :callback] ->
           {mn, name} =
             case mfa do
               {name, _} -> {name, name}
               {module, name, _} -> {{module, name}, name}
             end
 
-          {mn, Enum.map(ast, &Code.Typespec.spec_to_quoted(name, &1))}
+          {mn, anno, Enum.map(ast, &Code.Typespec.spec_to_quoted(name, &1))}
 
-        {:attribute, _, :type, ast} ->
+        {:attribute, anno, :type, ast} ->
           {name, _, _} = ast
-          {name, Code.Typespec.type_to_quoted(ast)}
+          {name, anno, Code.Typespec.type_to_quoted(ast)}
       end
 
     formatted = format_spec(ast)
+    config = %{config | file: Source.anno_file(anno), line: Source.anno_line(anno)}
     autolink_spec(quoted, name, formatted, config)
   end
 
@@ -589,12 +590,22 @@ defmodule ExDoc.Language.Erlang do
         )
       end
 
+      what =
+        case config.current_kfa do
+          {:function, _, _} -> :spec
+          {kind, _, _} -> kind
+        end
+
       url =
         case ref do
           {name, arity} ->
-            visibility = Refs.get_visibility({:type, config.current_module, name, arity})
+            ref = {:type, config.current_module, name, arity}
+            visibility = Refs.get_visibility(ref)
 
             cond do
+              Enum.any?(config.skip_code_autolink_to, &(&1 == "t:#{name}/#{arity}")) ->
+                nil
+
               visibility in [:public, :hidden] ->
                 final_url({:type, name, arity}, config)
 
@@ -602,6 +613,14 @@ defmodule ExDoc.Language.Erlang do
                 final_url({:type, :erlang, name, arity}, config)
 
               true ->
+                Autolink.maybe_warn(
+                  config,
+                  "#{what} references type \"#{name}/#{arity}\" but it is " <>
+                    Autolink.format_visibility(visibility, :type),
+                  nil,
+                  nil
+                )
+
                 nil
             end
 
@@ -609,12 +628,23 @@ defmodule ExDoc.Language.Erlang do
             ref = {:type, module, name, arity}
             visibility = Refs.get_visibility(ref)
 
-            if visibility in [:public, :hidden] do
-              final_url(ref, config)
-            else
-              original_text = "#{string}/#{arity}"
-              Autolink.maybe_warn(config, ref, visibility, %{original_text: original_text})
-              nil
+            cond do
+              Enum.any?(config.skip_code_autolink_to, &(&1 == "t:#{module}:#{name}/#{arity}")) ->
+                nil
+
+              visibility in [:public] ->
+                final_url(ref, config)
+
+              true ->
+                Autolink.maybe_warn(
+                  config,
+                  "#{what} references type \"#{module}:#{name}/#{arity}\" but it is " <>
+                    Autolink.format_visibility(visibility, :type),
+                  nil,
+                  nil
+                )
+
+                nil
             end
         end
 
