@@ -278,6 +278,43 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert type1.spec |> Erlang.autolink_spec(current_kfa: {:type, :type1, 0}) ==
                "type1() :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
     end
+
+    test "records", c do
+      erlc(c, :mod, ~s"""
+      -module(mod).
+      -export([function/0]).
+
+      -record(a, { a = 1 :: pos_integer(),
+                   b :: non_neg_integer(),
+                   c :: atom(),
+                   d = 1,
+                   e}).
+
+      -type type() :: #a{}.
+      -callback callback() -> #a{}.
+
+      -spec function() -> type() | #a{ a :: integer(), b :: integer() }.
+      function() -> ok.
+      """)
+
+      config = %ExDoc.Config{}
+      {[mod], []} = Retriever.docs_from_modules([:mod], config)
+
+      [callback, function] = mod.docs
+      [type] = mod.typespecs
+
+      assert hd(function.specs)
+             |> Erlang.autolink_spec(current_module: :mod, current_kfa: {:function, :function, 0}) ==
+               "function() -> <a href=\"#t:type/0\">type</a>() | #a{a :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-integer\">integer</a>(), b :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-integer\">integer</a>(), c :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>(), d :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>(), e :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>()}."
+
+      assert hd(callback.specs)
+             |> Erlang.autolink_spec(current_module: :mod, current_kfa: {:callback, :callback, 0}) ==
+               "callback() ->\n            #a{a :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-pos_integer\">pos_integer</a>(), b :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-non_neg_integer\">non_neg_integer</a>(), c :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>(), d :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>(), e :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>()}."
+
+      assert type.spec
+             |> Erlang.autolink_spec(current_module: :mod, current_kfa: {:type, :type, 0}) ==
+               "type() :: #a{a :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-pos_integer\">pos_integer</a>(), b :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-non_neg_integer\">non_neg_integer</a>(), c :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>(), d :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>(), e :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>()}."
+    end
   end
 
   describe "docs_from_modules/2 edoc" do

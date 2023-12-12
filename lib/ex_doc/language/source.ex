@@ -2,23 +2,100 @@ defmodule ExDoc.Language.Source do
   @moduledoc false
 
   @doc """
-  Get abstract code for a module
+  Get abstract code and basedir for a module
+
+  The abstract code has been traversed so that all records in types
+  have had their fields in-lined.
+
+  The basedir is the cwd of the Elixir/Erlang compiler when compiling the module.
   """
   def get_abstract_code(module) do
     with {^module, binary, _file} <- :code.get_object_code(module),
-         {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} <-
+         {:ok, {_, [{:abstract_code, {_vsn, abst_code}}]}} <-
            :beam_lib.chunks(binary, [:abstract_code]) do
-      abstract_code
+      expand_records_in_types(abst_code)
     else
       _ -> nil
     end
   end
 
+  defp expand_records_in_types(abst_code) do
+    ## Find all records in ast and collect any fields with type declarations
+    records =
+      filtermap_ast(abst_code, nil, fn
+        {:attribute, anno, :record, {name, fields}} ->
+          {name,
+           fields
+           |> Enum.flat_map(fn
+             {:typed_record_field, record_field, type} ->
+               [{:type, anno, :field_type, [elem(record_field, 2), type]}]
+
+             record_field when elem(record_field, 0) == :record_field ->
+               [{:type, anno, :field_type, [elem(record_field, 2), {:type, anno, :term, []}]}]
+
+             _ ->
+               []
+           end)}
+
+        _ ->
+          nil
+      end)
+      |> Map.new()
+
+    ## Expand records in all specs, callbacks, types and opaques
+    filtermap_ast(abst_code, nil, fn
+      {:attribute, anno, kind, {mfa, ast}} when kind in [:spec, :callback] ->
+        ast = Enum.map(ast, &expand_records(&1, records))
+        {:attribute, anno, kind, {mfa, ast}}
+
+      {:attribute, anno, type, {name, ast, args}} when type in [:opaque, :type] ->
+        {:attribute, anno, type, {name, expand_records(ast, records), args}}
+
+      otherwise ->
+        otherwise
+    end)
+  end
+
+  defp expand_records(types, records) when is_list(types) do
+    Enum.map(types, &expand_records(&1, records))
+  end
+
+  defp expand_records({:ann_type, anno, [name, type]}, records) do
+    {:ann_type, anno, [name, expand_records(type, records)]}
+  end
+
+  ## When we encounter a record, we fetch the type definitions in the record and
+  ## merge then with the type. If there are duplicates we take the one in the type
+  ## declaration
+  defp expand_records({:type, anno, :record, [{:atom, _, record} = name | args]}, records) do
+    args =
+      (args ++ Map.get(records, record, []))
+      |> Enum.uniq_by(fn {:type, _, :field_type, [{:atom, _, name} | _]} -> name end)
+
+    ## We delete the record from the map so that recursive
+    ## record definitions are not expanded.
+    records = Map.delete(records, record)
+
+    {:type, anno, :record, expand_records([name | args], records)}
+  end
+
+  defp expand_records({type, anno, what, args}, records) when type in [:type, :user_type] do
+    {:type, anno, what, expand_records(args, records)}
+  end
+
+  defp expand_records({:remote_type, anno, [m, t, args]}, records) do
+    {:remote_type, anno, [m, t, expand_records(args, records)]}
+  end
+
+  defp expand_records(otherwise, _records) do
+    otherwise
+  end
+
   @doc """
   Get the basedir of a module
 
-   The basedir is the cwd of the Elixir/Erlang compiler when compiling the module.
-   All `-file` attributes in the module is relative to this directory.
+  The basedir is the cwd of the Elixir/Erlang compiler when compiling the module.
+  All `-file` attributes in the module is relative to this directory.
   """
   def get_basedir(abst_code, module) do
     ## We look for the first -file attribute to see what the source file that
@@ -136,11 +213,25 @@ defmodule ExDoc.Language.Source do
 
   def filtermap_ast(ast, source_basedir, fun) do
     Enum.reduce(ast, {nil, []}, fn
-      {:attribute, _anno, :file, {filename, _line}}, {_file, acc} ->
-        {Path.join(source_basedir, filename), acc}
+      {:attribute, _anno, :file, {filename, _line}} = entry, {_file, acc} ->
+        {if Path.type(filename) == :relative && source_basedir do
+           Path.join(source_basedir, filename)
+         else
+           filename
+         end,
+         if entry = fun.(entry) do
+           [entry | acc]
+         else
+           acc
+         end}
 
       entry, {file, acc} ->
-        anno = :erl_anno.set_file(file, elem(entry, 1))
+        anno =
+          if file && source_basedir do
+            :erl_anno.set_file(file, elem(entry, 1))
+          else
+            elem(entry, 1)
+          end
 
         if entry = fun.(put_elem(entry, 1, anno)) do
           {file, [entry | acc]}
@@ -152,6 +243,7 @@ defmodule ExDoc.Language.Source do
         file_acc
     end)
     |> elem(1)
+    |> Enum.reverse()
   end
 
   def anno_line(line) when is_integer(line), do: abs(line)
