@@ -606,7 +606,7 @@ defmodule ExDoc.Language.Erlang do
               Enum.any?(config.skip_code_autolink_to, &(&1 == "t:#{name}/#{arity}")) ->
                 nil
 
-              visibility in [:public, :hidden] ->
+              visibility in [:public] ->
                 final_url({:type, name, arity}, config)
 
               :erl_internal.is_type(name, arity) ->
