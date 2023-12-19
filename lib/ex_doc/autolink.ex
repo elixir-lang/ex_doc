@@ -231,8 +231,7 @@ defmodule ExDoc.Autolink do
          true <- is_binary(path) and path != "" and not (path =~ @ref_regex),
          true <- Path.extname(path) in @builtin_ext do
       if file = config.extras[Path.basename(path)] do
-        fragment = (uri.fragment && "#" <> uri.fragment) || ""
-        file <> config.ext <> fragment
+        append_fragment(file <> config.ext, uri.fragment)
       else
         maybe_warn(config, nil, nil, %{file_path: path, original_text: link})
         nil
@@ -350,14 +349,14 @@ defmodule ExDoc.Autolink do
       nil ->
         case string do
           "m:" <> rest ->
+            destructure [rest, fragment], String.split(rest, "#", parts: 2)
+
             # TODO: rename :custom_link to :strict i.e. we expect ref to be valid
             # force custom_link mode because of m: prefix.
             case config.language.parse_module(rest, :custom_link) do
               {:module, module} ->
-                module_url(module, :custom_link, config, rest)
-
-              {:module, module, anchor} ->
-                module_url(module, "#" <> anchor, :custom_link, config, rest)
+                url = module_url(module, :custom_link, config, rest)
+                url && append_fragment(url, fragment)
 
               :error ->
                 nil
@@ -370,9 +369,6 @@ defmodule ExDoc.Autolink do
             case config.language.parse_module(string, mode) do
               {:module, module} ->
                 module_url(module, mode, config, string)
-
-              {:module, module, anchor} ->
-                module_url(module, "#" <> anchor, mode, config, string)
 
               :error ->
                 nil
@@ -604,4 +600,7 @@ defmodule ExDoc.Autolink do
   # for the rest, it can either be undefined or private
   defp format_visibility(:undefined, _kind), do: "undefined or private"
   defp format_visibility(visibility, _kind), do: "#{visibility}"
+
+  defp append_fragment(url, nil), do: url
+  defp append_fragment(url, fragment), do: url <> "#" <> fragment
 end

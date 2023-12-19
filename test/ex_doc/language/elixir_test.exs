@@ -24,8 +24,32 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc("`PATH`") == ~s|<code class="inline">PATH</code>|
     end
 
-    test "erlang module" do
+    test "erlang module does not link" do
       assert autolink_doc("`:array`") == ~s|<code class="inline">:array</code>|
+    end
+
+    test "m:module" do
+      assert autolink_doc("`m:String`") ==
+               ~s|<a href="https://hexdocs.pm/elixir/String.html"><code class="inline">String</code></a>|
+    end
+
+    test "m:module fragment" do
+      assert autolink_doc("`m:String#fragment`") ==
+               ~s|<a href="https://hexdocs.pm/elixir/String.html#fragment"><code class="inline">String</code></a>|
+    end
+
+    test "m:module with Erlang module" do
+      assert autolink_doc("`m::array`") ==
+               ~s|<a href="https://www.erlang.org/doc/man/array.html"><code class="inline">:array</code></a>|
+    end
+
+    test "m:module with Erlang module and fragment" do
+      assert autolink_doc("`m::array#fragment`") ==
+               ~s|<a href="https://www.erlang.org/doc/man/array.html#fragment"><code class="inline">:array</code></a>|
+    end
+
+    test "module with fragment without m: does not link" do
+      assert autolink_doc("`String#anchor`") == ~s|<code class="inline">String#anchor</code>|
     end
 
     test "unknown module" do
@@ -36,9 +60,6 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "project-local module" do
       assert autolink_doc("`ExDoc.Markdown`") ==
-               ~s|<a href="ExDoc.Markdown.html"><code class="inline">ExDoc.Markdown</code></a>|
-
-      assert autolink_doc("`m:ExDoc.Markdown`") ==
                ~s|<a href="ExDoc.Markdown.html"><code class="inline">ExDoc.Markdown</code></a>|
 
       assert autolink_doc("`String`", apps: [:elixir]) ==

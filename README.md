@@ -224,8 +224,9 @@ Link to extra pages in another application using the syntax `` [Writing Document
 
 It is also possible to place anchors after the module name and extra pages. For example:
 
-* `` `Keyword#module-duplicate-keys-and-ordering` `` will create a link to `https://hexdocs.pm/elixir/Keyword.html#module-duplicate-keys-and-ordering`
-* `` `e:elixir:syntax-reference.md#expressions` `` will create a link to `https://hexdocs.pm/elixir/syntax-reference.html#expressions`
+  * `` `m:Keyword#module-duplicate-keys-and-ordering` `` will create a link to `https://hexdocs.pm/elixir/Keyword.html#module-duplicate-keys-and-ordering`
+
+  * `` `e:elixir:syntax-reference.md#expressions` `` will create a link to `https://hexdocs.pm/elixir/syntax-reference.html#expressions`
 
 ### Erlang
 
@@ -241,8 +242,9 @@ Link to extra pages in another application using the syntax `` [Using unicode](`
 
 It is also possible to place anchors after the module name and extra pages. For example:
 
-* `` `m:argparse#quick-start` `` will create a link to `https://erlang.org/doc/man/argparse#quick-start`
-* `` `e:stdlib:unicode-usage.md#what-unicode-is` `` will create a link to `https://erlang.org/doc/apps/stdlib/unicode-usage.html#what-unicode-is`
+  * `` `m:argparse#quick-start` `` will create a link to `https://erlang.org/doc/man/argparse#quick-start`
+
+  * `` `e:stdlib:unicode-usage.md#what-unicode-is` `` will create a link to `https://erlang.org/doc/apps/stdlib/unicode-usage.html#what-unicode-is`
 
 <!-- tabs-close -->
 

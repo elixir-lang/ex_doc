@@ -443,7 +443,7 @@ defmodule ExDoc.Language.Erlang do
   def parse_module_function(string) do
     case String.split(string, ":") do
       [module_string, function_string] ->
-        with {:module, module} <- parse_module_string(module_string, :custom_link),
+        with {:module, module} <- parse_module(module_string, :custom_link),
              {:function, function} <- parse_function(function_string) do
           {:remote, module, function}
         end
@@ -489,23 +489,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def parse_module(string, mode) do
-    case String.split(string, "#", parts: 2) do
-      [mod, anchor] ->
-        case parse_module_string(mod, mode) do
-          {:module, mod} ->
-            {:module, mod, anchor}
-
-          :error ->
-            :error
-        end
-
-      [mod] ->
-        parse_module_string(mod, mode)
-    end
-  end
-
-  defp parse_module_string(string, _mode) do
+  def parse_module(string, _mode) do
     case :erl_scan.string(String.to_charlist(string)) do
       {:ok, [{:atom, _, module}], _} when is_atom(module) ->
         {:module, module}
