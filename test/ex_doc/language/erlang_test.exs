@@ -7,10 +7,6 @@ defmodule ExDoc.Language.ErlangTest do
   @moduletag :otp_has_docs
   @moduletag :tmp_dir
 
-  defp sigil_m(text, []) do
-    ExDoc.Markdown.to_ast(text, [])
-  end
-
   describe "autolink_doc/2 for edoc" do
     test "module", c do
       assert autolink_edoc("{@link erlang_bar}", c) ==
@@ -371,6 +367,11 @@ defmodule ExDoc.Language.ErlangTest do
              ) ==
                ~s|<a href="https://foolib.com/extra.xhtml">extra</a>|
     end
+
+    test "anchor", c do
+      assert autolink_doc("[Foo](#baz)", c) ==
+               ~s|<a href="#baz">Foo</a>|
+    end
   end
 
   describe "autolink_doc/2 for markdown warnings" do
@@ -563,31 +564,33 @@ defmodule ExDoc.Language.ErlangTest do
              ) =~ ~r|documentation references module \"does_not_exist\" but it is undefined|
     end
 
-    test "extras" do
-      opts = [
-        extras: %{"Foo Bar.md" => "foo-bar", "Bar Baz.livemd" => "bar-baz"},
-        language: ExDoc.Language.Erlang
-      ]
+    @opts [
+      extras: %{"Foo Bar.md" => "foo-bar", "Bar Baz.livemd" => "bar-baz"}
+    ]
 
-      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](Foo Bar.md)", opts) ==
-               ~m"[Foo](foo-bar.html)"
+    test "extras", c do
+      assert autolink_doc("[Foo](Foo Bar.md)", c, @opts) ==
+               ~s|<a href="foo-bar.html">Foo</a>|
+    end
 
-      assert ExDoc.Language.Erlang.autolink_doc(~m"[Bar](Bar Baz.livemd)", opts) ==
-               ~m"[Bar](bar-baz.html)"
+    test "extras livemd", c do
+      assert autolink_doc("[Bar](Bar Baz.livemd)", c, @opts) ==
+               ~s|<a href="bar-baz.html">Bar</a>|
+    end
 
-      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](Foo Bar.md)", [ext: ".xhtml"] ++ opts) ==
-               ~m"[Foo](foo-bar.xhtml)"
+    test "extras xhtml", c do
+      assert autolink_doc("[Foo](Foo Bar.md)", c, [ext: ".xhtml"] ++ @opts) ==
+               ~s|<a href="foo-bar.xhtml">Foo</a>|
+    end
 
-      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](Foo Bar.md#baz)", opts) ==
-               ~m"[Foo](foo-bar.html#baz)"
+    test "extras anchor", c do
+      assert autolink_doc("[Foo](Foo Bar.md#baz)", c, @opts) ==
+               ~s|<a href="foo-bar.html#baz">Foo</a>|
+    end
 
-      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](../guide/Foo Bar.md)", opts) ==
-               ~m"[Foo](foo-bar.html)"
-
-      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](http://example.com/foo.md)", opts) ==
-               ~m"[Foo](http://example.com/foo.md)"
-
-      assert ExDoc.Language.Erlang.autolink_doc(~m"[Foo](#baz)", opts) == ~m"[Foo](#baz)"
+    test "extras relative", c do
+      assert autolink_doc("[Foo](../guide/Foo Bar.md)", c, @opts) ==
+               ~s|<a href="foo-bar.html">Foo</a>|
     end
   end
 
@@ -599,7 +602,9 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "spec when fun is called record", c do
       assert autolink_spec("-spec record(module()) -> [[{module(), atom()}]].", c) ==
-               ~s|record(<a href="https://www.erlang.org/doc/man/erlang.html#type-module">module</a>()) -> [[{<a href="https://www.erlang.org/doc/man/erlang.html#type-module">module</a>(), <a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>()}]].|
+               ~s|record(<a href="https://www.erlang.org/doc/man/erlang.html#type-module">module</a>())| <>
+                 ~s| -> [[{<a href="https://www.erlang.org/doc/man/erlang.html#type-module">module</a>(),| <>
+                 ~s| <a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>()}]].|
     end
 
     test "callback", c do
