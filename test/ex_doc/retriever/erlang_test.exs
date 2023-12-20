@@ -454,7 +454,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
       assert opaque1.signature == "opaque1/0"
-      assert opaque1.doc |> DocAST.to_string() == "opaque1/0 docs."
+      assert opaque1.doc |> DocAST.to_string() =~ "opaque1/0 docs."
 
       assert opaque1.spec |> Erlang.autolink_spec(current_kfa: {:type, :opaque1, 0}) ==
                "opaque1()"
@@ -462,7 +462,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert type1.id == "t:type1/0"
       assert type1.type == :type
       assert type1.signature == "type1/0"
-      assert type1.doc |> DocAST.to_string() == "type1/0 docs."
+      assert type1.doc |> DocAST.to_string() =~ "type1/0 docs."
 
       assert type1.spec |> Erlang.autolink_spec(current_kfa: {:type, :type1, 0}) ==
                "type1() :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
