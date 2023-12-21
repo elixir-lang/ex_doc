@@ -40,7 +40,7 @@ defmodule ExDoc.Language do
           title: String.t(),
           type: atom() | nil,
           source_basedir: String.t(),
-          source_file: String.t(),
+          source_file: String.t() | nil,
           source_line: non_neg_integer(),
           callback_types: [atom()],
           nesting_info: {String.t(), String.t()} | nil,
@@ -57,9 +57,9 @@ defmodule ExDoc.Language do
 
   The map has the following keys:
 
-    * `:line` - the line where the code is located, def/defp in Elixir, foo(...) in Erlang
+    * `:source_line` - the line where the code is located, def/defp in Elixir, foo(...) in Erlang
 
-    * `:source` - the source file where the code in located
+    * `:source_file` - the source file where the code in located
 
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
@@ -71,8 +71,8 @@ defmodule ExDoc.Language do
   """
   @callback function_data(entry :: tuple(), module_data()) ::
               %{
-                line: non_neg_integer() | nil,
-                source: String.t(),
+                source_line: non_neg_integer() | nil,
+                source_file: String.t() | nil,
                 specs: [spec_ast()],
                 # TODO: change to following on Elixir 1.15. It trips mix formatter between 1.14 and 1.15
                 # doc_fallback: (-> ExDoc.DocAST.t()) | nil,
@@ -86,9 +86,9 @@ defmodule ExDoc.Language do
 
   The map has the following keys:
 
-    * `:line` - the line where the code is located
+    * `:source_line` - the line where the code is located
 
-    * `:source` - the source file where the code is located
+    * `:source_file` - the source file where the code in located
 
     * `:signature` - the signature
 
@@ -99,8 +99,8 @@ defmodule ExDoc.Language do
   """
   @callback callback_data(entry :: tuple(), module_data()) ::
               %{
-                line: non_neg_integer() | nil,
-                source: String.t(),
+                source_line: non_neg_integer() | nil,
+                source_file: String.t() | nil,
                 signature: [binary()],
                 specs: [spec_ast()],
                 extra_annotations: [String.t()]
@@ -113,9 +113,9 @@ defmodule ExDoc.Language do
 
     * `:type` - `:type` or `:opaque`
 
-    * `:line` - the line where the code is located
+    * `:source_line` - the line where the code is located
 
-    * `:source` - the source file where the code is located
+    * `:source_file` - the source file where the code in located
 
     * `:signature` - the signature
 
@@ -124,7 +124,8 @@ defmodule ExDoc.Language do
   @callback type_data(entry :: tuple(), spec :: term()) ::
               %{
                 type: :type | :opaque,
-                line: non_neg_integer(),
+                source_line: non_neg_integer(),
+                source_file: String.t() | nil,
                 signature: [binary()],
                 spec: spec_ast()
               }
