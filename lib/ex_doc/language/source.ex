@@ -97,7 +97,7 @@ defmodule ExDoc.Language.Source do
   """
   def get_basedir(abst_code, module) do
     ## We look for the first -file attribute to see what the source file that
-    ## was compiled is called.
+    ## was compiled is called. Both Erlang and Elixir places one at the top.
     filename =
       Enum.find_value(abst_code, fn
         {:attribute, _anno, :file, {filename, _line}} ->
@@ -206,6 +206,15 @@ defmodule ExDoc.Language.Source do
     filtermap_ast(ast, source_basedir, fun) |> hd()
   end
 
+  @doc """
+  Does a filtermap operation over the forms in an abstract syntax tree with
+  updated anno for each form pointing to the correct file.
+  """
+  # The file which a form belongs to is decided by the previous :file
+  # attribute in the AST. The :file can be either relative, or absolute
+  # depending on how the file was included. So when traversing the AST
+  # we need to keep track of the :file attributes and update the anno
+  # with the correct file.
   def filtermap_ast(ast, source_basedir, fun) do
     Enum.reduce(ast, {nil, []}, fn
       {:attribute, _anno, :file, {filename, _line}} = entry, {_file, acc} ->
