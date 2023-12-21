@@ -241,13 +241,8 @@ defmodule ExDoc.Retriever do
     doc_file = anno_file(anno, source)
     doc_line = anno_line(anno)
 
-    ## When do we not have a source_line?
     source_url =
-      if function_data.source_line do
-        source_link(function_data[:source_file], source, function_data.source_line)
-      else
-        source_link(doc_file, source, doc_line)
-      end
+      source_link(function_data[:source_file], source, function_data.source_line)
 
     annotations =
       annotations_for_docs.(metadata) ++
@@ -330,13 +325,8 @@ defmodule ExDoc.Retriever do
     doc_file = anno_file(anno, source)
     doc_line = anno_line(anno)
 
-    ## When do we not have a source_line?
     source_url =
-      if callback_data.source_line do
-        source_link(callback_data[:source_file], source, callback_data.source_line)
-      else
-        source_link(doc_file, source, doc_line)
-      end
+      source_link(callback_data[:source_file], source, callback_data.source_line)
 
     signature = signature(callback_data.signature)
     specs = callback_data.specs
@@ -394,13 +384,8 @@ defmodule ExDoc.Retriever do
 
     type_data = module_data.language.type_data(type_entry, module_data)
 
-    ## When do we not have a source_line?
     source_url =
-      if type_data.source_line do
-        source_link(type_data[:source_file], source, type_data.source_line)
-      else
-        source_link(doc_file, source, doc_line)
-      end
+      source_link(type_data[:source_file], source, type_data.source_line)
 
     annotations = annotations_from_metadata(metadata, module_metadata)
 

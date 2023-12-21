@@ -77,16 +77,16 @@ defmodule ExDoc.Language.Elixir do
 
   @impl true
   def function_data(entry, module_data) do
-    {{kind, name, arity}, _anno, _signature, doc_content, metadata} = entry
+    {{kind, name, arity}, anno, _signature, _doc_content, metadata} = entry
 
     if doc?(entry, module_data.type) do
-      function_data(kind, name, arity, doc_content, metadata, module_data)
+      function_data(kind, name, arity, anno, metadata, module_data)
     else
       :skip
     end
   end
 
-  def function_data(kind, name, arity, _doc_content, metadata, module_data) do
+  defp function_data(kind, name, arity, anno, metadata, module_data) do
     extra_annotations =
       case {kind, name, arity} do
         {:macro, _, _} -> ["macro"]
@@ -104,7 +104,7 @@ defmodule ExDoc.Language.Elixir do
           delegate_doc_ast(metadata[:delegate_to])
       end,
       extra_annotations: extra_annotations,
-      source_line: find_function_line(module_data, actual_def),
+      source_line: find_function_line(module_data, actual_def) || Source.anno_line(anno),
       specs: specs(kind, name, actual_def, module_data)
     }
   end
