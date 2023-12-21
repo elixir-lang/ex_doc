@@ -287,7 +287,11 @@ defmodule ExDoc.Language.Erlang do
 
     case Autolink.url(code, :regular_link, config) do
       url when is_binary(url) ->
-        code = remove_prefix(code)
+        code =
+          code
+          |> remove_prefix()
+          |> remove_fragment()
+
         {:a, [href: url], [{:code, attrs, [code], meta}], %{}}
 
       _ ->
@@ -386,6 +390,10 @@ defmodule ExDoc.Language.Erlang do
   defp remove_prefix("t:" <> rest), do: rest
   defp remove_prefix("\\" <> rest), do: rest
   defp remove_prefix(rest), do: rest
+
+  defp remove_fragment(string) do
+    string |> String.split("#") |> hd()
+  end
 
   defp extract_fragment(url, prefix) do
     case String.split(url, "#", parts: 2) do

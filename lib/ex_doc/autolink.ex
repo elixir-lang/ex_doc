@@ -349,23 +349,15 @@ defmodule ExDoc.Autolink do
       nil ->
         case string do
           "m:" <> rest ->
-            destructure [rest, fragment], String.split(rest, "#", parts: 2)
-
-            # TODO: rename :custom_link to :strict i.e. we expect ref to be valid
-            # force custom_link mode because of m: prefix.
-            case config.language.parse_module(rest, :custom_link) do
-              {:module, module} ->
-                url = module_url(module, :custom_link, config, rest)
-                url && append_fragment(url, fragment)
-
-              :error ->
-                nil
-            end
+            parse_module_with_anchor(rest, config)
 
           "e:" <> rest ->
             extra_url(rest, config)
 
-          string when not config.force_module_prefix or mode == :custom_link ->
+          string when mode == :custom_link ->
+            parse_module_with_anchor(string, config)
+
+          string when not config.force_module_prefix ->
             case config.language.parse_module(string, mode) do
               {:module, module} ->
                 module_url(module, mode, config, string)
@@ -379,6 +371,19 @@ defmodule ExDoc.Autolink do
         end
 
       _ ->
+        nil
+    end
+  end
+
+  defp parse_module_with_anchor(string, config) do
+    destructure [rest, fragment], String.split(string, "#", parts: 2)
+    # TODO: rename :custom_link to :strict i.e. we expect ref to be valid
+    # force custom_link mode because of m: prefix.
+    case config.language.parse_module(rest, :custom_link) do
+      {:module, module} ->
+        module_url(module, fragment && "#" <> fragment, :custom_link, config, rest)
+
+      :error ->
         nil
     end
   end
