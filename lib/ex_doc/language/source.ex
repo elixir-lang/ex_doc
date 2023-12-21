@@ -6,8 +6,6 @@ defmodule ExDoc.Language.Source do
 
   The abstract code has been traversed so that all records in types
   have had their fields in-lined.
-
-  The basedir is the cwd of the Elixir/Erlang compiler when compiling the module.
   """
   def get_abstract_code(module) do
     with {^module, binary, _file} <- :code.get_object_code(module),
@@ -122,10 +120,7 @@ defmodule ExDoc.Language.Source do
       |> String.Chars.to_string()
       |> Path.absname()
       |> Path.split()
-      |> Enum.reverse()
-      |> Enum.split(Path.split(filename) |> Enum.count())
-      |> elem(1)
-      |> Enum.reverse()
+      |> Enum.drop(Path.split(filename) |> Enum.count() |> Kernel.*(-1))
       |> Path.join()
     else
       ## If an absolute path was used, then any relative -file attribute
