@@ -219,6 +219,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href=\"erlang_bar.html\"><code class="inline">erlang_bar</code></a>|
     end
 
+    test "m:module with anchor in module code", c do
+      assert autolink_doc("`m:erlang_bar#anchor`", c) ==
+               ~s|<a href=\"erlang_bar.html#anchor\"><code class="inline">erlang_bar</code></a>|
+    end
+
     test "invalid m:module in module code", c do
       assert autolink_doc("`m:erlang_bar()`", c) ==
                ~s|<code class="inline">m:erlang_bar()</code>|
@@ -227,6 +232,22 @@ defmodule ExDoc.Language.ErlangTest do
     test "module in module code reference", c do
       assert autolink_doc("[`erlang_bar`](`erlang_bar`)", c) ==
                ~s|<a href=\"erlang_bar.html\"><code class="inline">erlang_bar</code></a>|
+    end
+
+    test "remote module with anchor in module code reference", c do
+      assert autolink_doc("[`erlang_bar`](`erlang_bar#anchor`)", c) ==
+               ~s|<a href=\"erlang_bar.html#anchor\"><code class="inline">erlang_bar</code></a>|
+
+      assert autolink_doc("[`erlang_bar`](`m:erlang_bar#anchor`)", c) ==
+               ~s|<a href=\"erlang_bar.html#anchor\"><code class="inline">erlang_bar</code></a>|
+    end
+
+    test "own module with anchor in module code reference", c do
+      assert autolink_doc("[`erlang_foo`](`erlang_foo#anchor`)", c) ==
+               ~s|<a href=\"erlang_foo.html#anchor\"><code class="inline">erlang_foo</code></a>|
+
+      assert autolink_doc("[`erlang_foo`](`m:erlang_foo#anchor`)", c) ==
+               ~s|<a href=\"erlang_foo.html#anchor\"><code class="inline">erlang_foo</code></a>|
     end
 
     test "function in module code", c do
@@ -564,6 +585,18 @@ defmodule ExDoc.Language.ErlangTest do
              ) =~ ~r|documentation references module \"does_not_exist\" but it is undefined|
     end
 
+    @tag warnings: :send
+    test "bad module using m: and anchor", c do
+      assert warn(
+               fn ->
+                 assert autolink_extra("`m:does_not_exist#anchor`", c) ==
+                          ~s|<code class="inline">m:does_not_exist#anchor</code>|
+               end,
+               file: "extra.md",
+               line: 1
+             ) =~ ~r|documentation references module \"does_not_exist\" but it is undefined|
+    end
+
     @opts [
       extras: %{"Foo Bar.md" => "foo-bar", "Bar Baz.livemd" => "bar-baz"}
     ]
@@ -825,6 +858,9 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   defp fixtures(c, doc, opts \\ []) do
+    :code.purge(:erlang_foo)
+    :code.purge(:erlang_bar)
+
     erlc(c, :erlang_foo, """
     %% @doc
     %% #{doc}
