@@ -411,7 +411,6 @@
 
 .sidebar-closed .sidebar-button {
   color: var(--contrast);
-  margin: 12px 8px 8px 8px;
 }
 
 @media screen and (max-height: 500px) {
@@ -421,11 +420,5 @@
 
   .sidebar .full-list {
     overflow: visible;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .sidebar-closed .sidebar-button {
-    margin: 8px;
   }
 }
