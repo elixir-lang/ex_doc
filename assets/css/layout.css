@@ -135,4 +135,8 @@ body.sidebar-closed .sidebar-button {
     padding-bottom: 26px;
     overflow-x: auto;
   }
+
+  body.sidebar-closed .sidebar-button {
+    position: absolute;
+  }
 }
