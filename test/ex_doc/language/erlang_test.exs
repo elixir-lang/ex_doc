@@ -9,45 +9,45 @@ defmodule ExDoc.Language.ErlangTest do
 
   describe "autolink_doc/2 for edoc" do
     test "module", c do
-      assert autolink_edoc("{@link erlang_bar}", c) =~
+      assert autolink_edoc("{@link erlang_bar}", c) ==
                ~s|<a href="erlang_bar.html"><code>erlang_bar</code></a>|
     end
 
     test "current module", c do
-      assert autolink_edoc("{@link erlang_foo}", c, current_module: :erlang_foo) =~
+      assert autolink_edoc("{@link erlang_foo}", c, current_module: :erlang_foo) ==
                ~s|<a href="erlang_foo.html#content"><code>erlang_foo</code></a>|
     end
 
     test "OTP module", c do
-      assert autolink_edoc("{@link array}", c) =~
+      assert autolink_edoc("{@link array}", c) ==
                ~s|<a href="https://www.erlang.org/doc/man/array.html"><code>array</code></a>|
     end
 
     test "OTP module when generating OTP docs", c do
-      assert autolink_edoc("{@link array}", c, deps: [stdlib: "https://example.com/stdlib"]) =~
+      assert autolink_edoc("{@link array}", c, deps: [stdlib: "https://example.com/stdlib"]) ==
                ~s|<a href="https://example.com/stdlib/array.html"><code>array</code></a>|
     end
 
     test "app module", c do
-      assert autolink_edoc("{@link //stdlib/array}", c) =~
+      assert autolink_edoc("{@link //stdlib/array}", c) ==
                ~s|<a href="https://www.erlang.org/doc/man/array.html"><code>array</code></a>|
     end
 
     @tag warnings: :send
     test "app", c do
       assert warn(fn ->
-               assert autolink_edoc("{@link //stdlib. `stdlib'}", c) =~
+               assert autolink_edoc("{@link //stdlib. `stdlib'}", c) ==
                         ~s|<code>stdlib</code>|
              end) =~ ~s|invalid reference: stdlib:index (seeapp)|
     end
 
     test "external module", c do
-      assert autolink_edoc("{@link 'Elixir.EarmarkParser'}", c) =~
+      assert autolink_edoc("{@link 'Elixir.EarmarkParser'}", c) ==
                ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
     end
 
     test "external module - extension is ignored", c do
-      assert autolink_edoc("{@link 'Elixir.EarmarkParser'}", c, ext: ".xhtml") =~
+      assert autolink_edoc("{@link 'Elixir.EarmarkParser'}", c, ext: ".xhtml") ==
                ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
     end
 
@@ -56,81 +56,81 @@ defmodule ExDoc.Language.ErlangTest do
         {:a, [href: "array#anchor", rel: "https://erlang.org/doc/link/seeerl"],
          [{:code, [], ["array"], %{}}], %{}}
 
-      assert do_autolink_doc(ast) =~
+      assert do_autolink_doc(ast) ==
                ~s|<a href="https://www.erlang.org/doc/man/array.html#anchor"><code>array</code></a>|
 
       ast =
         {:a, [href: "stdlib:array#anchor", rel: "https://erlang.org/doc/link/seeerl"],
          [{:code, [], ["array"], %{}}], %{}}
 
-      assert do_autolink_doc(ast) =~
+      assert do_autolink_doc(ast) ==
                ~s|<a href="https://www.erlang.org/doc/man/array.html#anchor"><code>array</code></a>|
     end
 
     test "custom text", c do
-      assert autolink_edoc("{@link array. The <code>array</code> module}", c) =~
+      assert autolink_edoc("{@link array. The <code>array</code> module}", c) ==
                ~s|<a href="https://www.erlang.org/doc/man/array.html">The <code>array</code> module</a>|
     end
 
     test "local function", c do
-      assert autolink_edoc("{@link foo/0}", c, current_module: :erlang_foo) =~
+      assert autolink_edoc("{@link foo/0}", c, current_module: :erlang_foo) ==
                ~s|<a href="#foo/0"><code>foo/0</code></a>|
     end
 
     test "remote function", c do
-      assert autolink_edoc("{@link erlang_bar:bar/0}", c) =~
+      assert autolink_edoc("{@link erlang_bar:bar/0}", c) ==
                ~s|<a href="erlang_bar.html#bar/0"><code>erlang_bar:bar/0</code></a>|
     end
 
     test "OTP function", c do
-      assert autolink_edoc("{@link array:new/0}", c) =~
+      assert autolink_edoc("{@link array:new/0}", c) ==
                ~s|<a href="https://www.erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
     end
 
     test "OTP function when generating OTP docs", c do
-      assert autolink_edoc("{@link array:new/0}", c, apps: [:stdlib]) =~
+      assert autolink_edoc("{@link array:new/0}", c, apps: [:stdlib]) ==
                ~s|<a href="array.html#new/0"><code>array:new/0</code></a>|
     end
 
     test "OTP function when generating OTP docs, same module", c do
-      assert autolink_edoc("{@link array:new/0}", c, current_module: :array, apps: [:stdlib]) =~
+      assert autolink_edoc("{@link array:new/0}", c, current_module: :array, apps: [:stdlib]) ==
                ~s|<a href="#new/0"><code>array:new/0</code></a>|
     end
 
     test "ERTS function", c do
-      assert autolink_edoc("{@link zlib:gunzip/1}", c) =~
+      assert autolink_edoc("{@link zlib:gunzip/1}", c) ==
                ~s|<a href="https://www.erlang.org/doc/man/zlib.html#gunzip-1"><code>zlib:gunzip/1</code></a>|
     end
 
     test "app function", c do
-      assert autolink_edoc("{@link //stdlib/array:new/0}", c) =~
+      assert autolink_edoc("{@link //stdlib/array:new/0}", c) ==
                ~s|<a href="https://www.erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
     end
 
     # TODO: test callbacks. No support in EDoc, use :docgen_xml_to_chunks.
 
     test "external function", c do
-      assert autolink_edoc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) =~
+      assert autolink_edoc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) ==
                ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>|
     end
 
     test "local type", c do
-      assert autolink_edoc("{@link t()}", c, current_module: :erlang_foo) =~
+      assert autolink_edoc("{@link t()}", c, current_module: :erlang_foo) ==
                ~s|<a href="#t:t/0"><code>t()</code></a>|
     end
 
     test "remote type", c do
-      assert autolink_edoc("{@link erlang_bar:t()}", c) =~
+      assert autolink_edoc("{@link erlang_bar:t()}", c) ==
                ~s|<a href="erlang_bar.html#t:t/0"><code>erlang_bar:t()</code></a>|
     end
 
     test "OTP type", c do
-      assert autolink_edoc("{@link array:array()}", c) =~
+      assert autolink_edoc("{@link array:array()}", c) ==
                ~s|<a href="https://www.erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
     end
 
     test "app type", c do
-      assert autolink_edoc("{@link //stdlib/array:array()}", c) =~
+      assert autolink_edoc("{@link //stdlib/array:array()}", c) ==
                ~s|<a href="https://www.erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
     end
 
@@ -143,21 +143,21 @@ defmodule ExDoc.Language.ErlangTest do
     test "abstract types - description", c do
       assert autolink_edoc("{@type myList(X). A special kind of lists ...}", c,
                extra_foo_code: "-export_type([myList/0]).\n-type myList() :: term().\n%% A type"
-             ) =~
+             ) ==
                ~s|<code><a href=\"##{@myList}\">myList</a>(X)</code>|
     end
 
     test "abstract types - description+dot", c do
       assert autolink_edoc("{@type myList(X, Y).}", c,
                extra_foo_code: "-export_type([myList/0]).\n-type myList() :: term().\n%% A type"
-             ) =~
+             ) ==
                ~s|<code><a href=\"##{@myList}\">myList</a>(X, Y)</code>|
     end
 
     test "abstract types - no description", c do
       assert autolink_edoc("{@type myList()}", c,
                extra_foo_code: "-export_type([myList/0]).\n-type myList() :: term().\n%% A type"
-             ) =~
+             ) ==
                ~s|<code><a href=\"##{@myList}\">myList()</a></code>|
     end
   end
@@ -167,37 +167,37 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "bad module", c do
       assert warn(fn ->
-               assert autolink_edoc("{@link bad}", c) =~ ~s|<code>bad</code>|
+               assert autolink_edoc("{@link bad}", c) == ~s|<code>bad</code>|
              end) =~ ~s|references module "bad" but it is undefined|
     end
 
     test "bad local function", c do
       assert warn(fn ->
-               assert autolink_edoc("{@link bad/0}", c) =~ ~s|<code>bad/0</code>|
+               assert autolink_edoc("{@link bad/0}", c) == ~s|<code>bad/0</code>|
              end) =~ ~s|references function "bad/0" but it is undefined or private|
     end
 
     test "bad remote function", c do
       assert warn(fn ->
-               assert autolink_edoc("{@link bad:bad/0}", c) =~ ~s|<code>bad:bad/0</code>|
+               assert autolink_edoc("{@link bad:bad/0}", c) == ~s|<code>bad:bad/0</code>|
              end) =~ ~s|references function "bad:bad/0" but it is undefined or private|
     end
 
     test "bad local type", c do
       assert warn(fn ->
-               assert autolink_edoc("{@link bad()}", c) =~ ~s|<code>bad()</code>|
+               assert autolink_edoc("{@link bad()}", c) == ~s|<code>bad()</code>|
              end) =~ ~s|references type "t:bad/0" but it is undefined or private|
     end
 
     test "bad remote type", c do
       assert warn(fn ->
-               assert autolink_edoc("{@link bad:bad()}", c) =~ ~s|<code>bad:bad()</code>|
+               assert autolink_edoc("{@link bad:bad()}", c) == ~s|<code>bad:bad()</code>|
              end) =~ ~s|references type "t:bad:bad/0" but it is undefined or private|
     end
 
     test "application", c do
       assert warn(fn ->
-               assert autolink_edoc("{@link //foo}", c) =~ ~s|<code>//foo</code>|
+               assert autolink_edoc("{@link //foo}", c) == ~s|<code>//foo</code>|
              end) =~ ~s|invalid reference: foo:index|
     end
 
@@ -205,7 +205,7 @@ defmodule ExDoc.Language.ErlangTest do
       opts = [filtered_modules: [%ExDoc.ModuleNode{module: :lists, id: "lists"}]]
 
       assert warn(fn ->
-               assert autolink_edoc("{@link lists}", c, opts) =~
+               assert autolink_edoc("{@link lists}", c, opts) ==
                         ~s|<code>lists</code>|
              end) == "reference to a filtered module"
     end
@@ -214,7 +214,7 @@ defmodule ExDoc.Language.ErlangTest do
       opts = [filtered_modules: [%ExDoc.ModuleNode{module: :lists, id: "lists"}]]
 
       assert warn(fn ->
-               assert autolink_edoc("{@link lists:all/2}", c, opts) =~
+               assert autolink_edoc("{@link lists:all/2}", c, opts) ==
                         ~s|<code>lists:all/2</code>|
              end) == "reference to a filtered module"
     end
