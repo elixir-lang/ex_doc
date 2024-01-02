@@ -465,13 +465,14 @@ defmodule ExDoc.Retriever do
     else
       source.path
     end
-    |> then(fn path ->
-      if function_exported?(Path, :relative_to, 3) do
-        Path.relative_to(path, File.cwd!(), force: true)
-      else
-        Path.relative_to(path, File.cwd!())
-      end
-    end)
+    |> path_relative_to_cwd(force: true)
+  end
+
+  # TODO: Remove when we require Elixir 1.16
+  if function_exported?(Path, :relative_to_cwd, 2) do
+    defp path_relative_to_cwd(path, options), do: Path.relative_to_cwd(path, options)
+  else
+    defp path_relative_to_cwd(path, _options), do: Path.relative_to_cwd(path)
   end
 
   defp source_link(nil, source, line), do: source_link(source, line)
