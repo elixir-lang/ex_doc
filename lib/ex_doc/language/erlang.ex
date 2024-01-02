@@ -3,43 +3,32 @@ defmodule ExDoc.Language.Erlang do
 
   @behaviour ExDoc.Language
 
-  alias ExDoc.Language.Elixir, as: ExDocElixir
+  alias ExDoc.Language.Source
   alias ExDoc.{Autolink, Refs}
 
   @impl true
   @spec module_data(atom, any, any) ::
-          :ok
+          :skip
           | %{
               callback_types: [:callback, ...],
               docs: any,
               id: binary,
               language: ExDoc.Language.Erlang,
-              line: any,
-              module: atom,
+              source_line: pos_integer,
+              source_file: Path.t(),
+              source_basedir: Path.t(),
+              module: module,
               nesting_info: nil,
               private: %{abst_code: any, callbacks: map, optional_callbacks: any, specs: map},
               title: binary,
               type: :behaviour | :module
             }
   def module_data(module, docs_chunk, _config) do
-    if abst_code = get_abstract_code(module) do
+    if abst_code = Source.get_abstract_code(module) do
       id = Atom.to_string(module)
-      line = find_module_line(module, abst_code)
+      source_basedir = Source.get_basedir(abst_code, module)
+      {source_file, source_line} = Source.get_module_location(abst_code, source_basedir, module)
       type = module_type(module)
-
-      optional_callbacks =
-        type == :behaviour &&
-          try do
-            module.behaviour_info(:optional_callbacks)
-          rescue
-            FunctionClauseError -> :undefined
-          end
-
-      optional_callbacks =
-        case optional_callbacks do
-          :undefined -> []
-          _ -> optional_callbacks
-        end
 
       %{
         module: module,
@@ -48,18 +37,21 @@ defmodule ExDoc.Language.Erlang do
         id: id,
         title: id,
         type: type,
-        line: line,
+        source_line: source_line,
+        source_file: source_file,
+        source_basedir: source_basedir,
         callback_types: [:callback],
         nesting_info: nil,
         private: %{
           abst_code: abst_code,
-          specs: get_specs(module),
-          callbacks: get_callbacks(module),
-          optional_callbacks: optional_callbacks
+          specs: Source.get_specs(abst_code, source_basedir),
+          callbacks: Source.get_callbacks(abst_code, source_basedir),
+          optional_callbacks: Source.get_optional_callbacks(module, type)
         }
       }
     else
       ExDoc.Utils.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
+      :skip
     end
   end
 
@@ -80,18 +72,20 @@ defmodule ExDoc.Language.Erlang do
   defp function_data(name, arity, _doc_content, module_data, metadata) do
     specs =
       case Map.fetch(module_data.private.specs, {name, arity}) do
-        {:ok, specs} ->
-          [{:attribute, 0, :spec, {{name, arity}, specs}}]
+        {:ok, spec} ->
+          [spec]
 
         :error ->
           case Map.fetch(module_data.private.specs, {module_data.module, name, arity}) do
-            {:ok, specs} ->
-              [{:attribute, 0, :spec, {{module_data.module, name, arity}, specs}}]
+            {:ok, spec} ->
+              [spec]
 
             :error ->
               []
           end
       end
+
+    {file, line} = Source.get_function_location(module_data, {name, arity})
 
     %{
       doc_fallback: fn ->
@@ -115,7 +109,8 @@ defmodule ExDoc.Language.Erlang do
         end
       end,
       extra_annotations: [],
-      line: ExDocElixir.find_function_line(module_data, {name, arity}),
+      source_line: line,
+      source_file: file,
       specs: specs
     }
   end
@@ -129,16 +124,16 @@ defmodule ExDoc.Language.Erlang do
 
     {specs, anno} =
       case Map.fetch(module_data.private.callbacks, {name, arity}) do
-        {:ok, specs} ->
-          {:type, anno, _, _} = hd(specs)
-          {[{:attribute, anno, :callback, {{name, arity}, specs}}], anno}
+        {:ok, spec} ->
+          {[spec], elem(spec, 1)}
 
         :error ->
           {[], anno}
       end
 
     %{
-      line: anno_line(anno),
+      source_line: Source.anno_line(anno),
+      source_file: Source.anno_file(anno),
       signature: signature,
       specs: specs,
       extra_annotations: extra_annotations
@@ -149,19 +144,20 @@ defmodule ExDoc.Language.Erlang do
   def type_data(entry, module_data) do
     {{kind, name, arity}, anno, signature, _doc, _metadata} = entry
 
-    case ExDocElixir.type_from_module_data(module_data, name, arity) do
+    case Source.get_type_from_module_data(module_data, name, arity) do
       %{} = map ->
         %{
           type: map.type,
-          line: map.line,
-          spec: {:attribute, 0, map.type, map.spec},
+          source_line: map.source_line,
+          source_file: map.source_file,
+          spec: map.attr,
           signature: signature
         }
 
       nil ->
         %{
           type: kind,
-          line: anno_line(anno),
+          source_line: Source.anno_line(anno),
           spec: nil,
           signature: signature
         }
@@ -198,23 +194,24 @@ defmodule ExDoc.Language.Erlang do
   def autolink_spec(ast, opts) do
     config = struct!(Autolink, opts)
 
-    {name, quoted} =
+    {name, anno, quoted} =
       case ast do
-        {:attribute, _, kind, {mfa, ast}} when kind in [:spec, :callback] ->
+        {:attribute, anno, kind, {mfa, ast}} when kind in [:spec, :callback] ->
           {mn, name} =
             case mfa do
               {name, _} -> {name, name}
               {module, name, _} -> {{module, name}, name}
             end
 
-          {mn, Enum.map(ast, &Code.Typespec.spec_to_quoted(name, &1))}
+          {mn, anno, Enum.map(ast, &Code.Typespec.spec_to_quoted(name, &1))}
 
-        {:attribute, _, :type, ast} ->
+        {:attribute, anno, :type, ast} ->
           {name, _, _} = ast
-          {name, Code.Typespec.type_to_quoted(ast)}
+          {name, anno, Code.Typespec.type_to_quoted(ast)}
       end
 
     formatted = format_spec(ast)
+    config = %{config | file: Source.anno_file(anno), line: Source.anno_line(anno)}
     autolink_spec(quoted, name, formatted, config)
   end
 
@@ -231,42 +228,6 @@ defmodule ExDoc.Language.Erlang do
   def format_spec_attribute(%ExDoc.TypeNode{type: type}), do: "-#{type}"
   def format_spec_attribute(%ExDoc.FunctionNode{type: :callback}), do: "-callback"
   def format_spec_attribute(%ExDoc.FunctionNode{}), do: "-spec"
-
-  ## Shared between Erlang & Elixir
-
-  @doc false
-  def get_abstract_code(module) do
-    with {^module, binary, _file} <- :code.get_object_code(module),
-         {:ok, {_, [{:abstract_code, {_vsn, abstract_code}}]}} <-
-           :beam_lib.chunks(binary, [:abstract_code]) do
-      abstract_code
-    else
-      _ -> nil
-    end
-  end
-
-  @doc false
-  def find_module_line(module, abst_code) do
-    Enum.find_value(abst_code, fn
-      {:attribute, anno, :module, ^module} -> anno_line(anno)
-      _ -> nil
-    end)
-  end
-
-  # Returns a map of {name, arity} => spec.
-  def get_specs(module) do
-    case Code.Typespec.fetch_specs(module) do
-      {:ok, specs} -> Map.new(specs)
-      :error -> %{}
-    end
-  end
-
-  def get_callbacks(module) do
-    case Code.Typespec.fetch_callbacks(module) do
-      {:ok, callbacks} -> Map.new(callbacks)
-      :error -> %{}
-    end
-  end
 
   ## Autolink
 
@@ -556,7 +517,7 @@ defmodule ExDoc.Language.Erlang do
 
             # record{type :: remote:type/arity}
             {:field_type, _, [name, {{:., _, [r_mod, r_type]}, _, args}]}, acc ->
-              {name, [{pp({r_mod, r_type}), {r_mod, r_type, length(args)}} | acc]}
+              {{name, [], args}, [{pp({r_mod, r_type}), {r_mod, r_type, length(args)}} | acc]}
 
             # #{x :: t()}
             {:field_type, _, [name, type]}, acc when is_atom(name) ->
@@ -629,19 +590,37 @@ defmodule ExDoc.Language.Erlang do
         )
       end
 
+      what =
+        case config.current_kfa do
+          {:function, _, _} -> :spec
+          {kind, _, _} -> kind
+        end
+
       url =
         case ref do
           {name, arity} ->
-            visibility = Refs.get_visibility({:type, config.current_module, name, arity})
+            ref = {:type, config.current_module, name, arity}
+            visibility = Refs.get_visibility(ref)
 
             cond do
-              visibility in [:public, :hidden] ->
+              Enum.any?(config.skip_code_autolink_to, &(&1 == "t:#{name}/#{arity}")) ->
+                nil
+
+              visibility in [:public] ->
                 final_url({:type, name, arity}, config)
 
               :erl_internal.is_type(name, arity) ->
                 final_url({:type, :erlang, name, arity}, config)
 
               true ->
+                Autolink.maybe_warn(
+                  config,
+                  "#{what} references type \"#{name}/#{arity}\" but it is " <>
+                    Autolink.format_visibility(visibility, :type),
+                  nil,
+                  nil
+                )
+
                 nil
             end
 
@@ -649,12 +628,23 @@ defmodule ExDoc.Language.Erlang do
             ref = {:type, module, name, arity}
             visibility = Refs.get_visibility(ref)
 
-            if visibility in [:public, :hidden] do
-              final_url(ref, config)
-            else
-              original_text = "#{string}/#{arity}"
-              Autolink.maybe_warn(config, ref, visibility, %{original_text: original_text})
-              nil
+            cond do
+              Enum.any?(config.skip_code_autolink_to, &(&1 == "t:#{module}:#{name}/#{arity}")) ->
+                nil
+
+              visibility in [:public] ->
+                final_url(ref, config)
+
+              true ->
+                Autolink.maybe_warn(
+                  config,
+                  "#{what} references type \"#{module}:#{name}/#{arity}\" but it is " <>
+                    Autolink.format_visibility(visibility, :type),
+                  nil,
+                  nil
+                )
+
+                nil
             end
         end
 
@@ -716,7 +706,4 @@ defmodule ExDoc.Language.Erlang do
     end)
     |> Enum.join("\n")
   end
-
-  defp anno_line(line) when is_integer(line), do: abs(line)
-  defp anno_line(anno), do: anno |> :erl_anno.line() |> abs()
 end

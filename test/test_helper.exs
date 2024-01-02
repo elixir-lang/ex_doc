@@ -1,8 +1,10 @@
 otp_eep48? = Code.ensure_loaded?(:edoc_doclet_chunks)
+otp_eep59? = Code.ensure_loaded?(:beam_doc)
 
 exclude = [
   earmark: not ExDoc.Markdown.Earmark.available?(),
   otp_eep48: not otp_eep48?,
+  otp_eep59: not otp_eep59?,
   otp_has_docs: not match?({:docs_v1, _, _, _, _, _, _}, Code.fetch_docs(:array))
 ]
 
@@ -46,6 +48,8 @@ defmodule TestHelper do
   def erlc(context, module, code, opts \\ []) do
     dir = context.tmp_dir
 
+    docs = Keyword.get(opts, :docs, true)
+
     src_path = Path.join([dir, "#{module}.erl"])
     src_path |> Path.dirname() |> File.mkdir_p!()
     File.write!(src_path, code)
@@ -53,12 +57,17 @@ defmodule TestHelper do
     ebin_dir = Path.join(dir, "ebin")
     File.mkdir_p!(ebin_dir)
 
+    beam_docs = docstrings(docs, context)
+
     {:ok, module} =
-      :compile.file(String.to_charlist(src_path), [
-        :return_errors,
-        :debug_info,
-        outdir: String.to_charlist(ebin_dir)
-      ])
+      :compile.file(
+        String.to_charlist(src_path),
+        [
+          :return_errors,
+          :debug_info,
+          outdir: String.to_charlist(ebin_dir)
+        ] ++ beam_docs
+      )
 
     true = Code.prepend_path(ebin_dir)
     {:module, ^module} = :code.load_file(module)
@@ -70,11 +79,29 @@ defmodule TestHelper do
       ExDoc.Refs.clear()
     end)
 
-    if Keyword.get(opts, :docs, true) do
+    if docs && !context[:otp_eep59] do
       edoc_to_chunk(module)
     end
 
     [module]
+  end
+
+  if otp_eep59? do
+    def docstrings(docs, context) do
+      if docs && context[:otp_eep59] do
+        []
+      else
+        [:no_docs]
+      end
+    end
+  else
+    def docstrings(docs, context) do
+      if docs && context[:otp_eep59] do
+        raise "not supported"
+      else
+        []
+      end
+    end
   end
 
   if otp_eep48? do

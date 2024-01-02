@@ -74,10 +74,17 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def synopsis(nil), do: nil
 
   def synopsis(doc) when is_binary(doc) do
-    case :binary.split(doc, "</p>") do
-      [left, _] -> String.trim_trailing(left, ":") <> "</p>"
-      [all] -> all
-    end
+    doc =
+      case :binary.split(doc, "</p>") do
+        [left, _] -> String.trim_trailing(left, ":") <> "</p>"
+        [all] -> all
+      end
+
+    # Remove any anchors found in synopsis.
+    # Old Erlang docs placed anchors at the top of the documentation
+    # for links. Ideally they would have been removed but meanwhile
+    # it is simpler to guarantee they won't be duplicated in docs.
+    Regex.replace(~r|(<[^>]*) id="[^"]*"([^>]*>)|, doc, ~S"\1\2", [])
   end
 
   defp presence([]), do: nil

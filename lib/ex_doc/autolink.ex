@@ -596,15 +596,15 @@ defmodule ExDoc.Autolink do
   end
 
   # there is not such a thing as private callback or private module
-  defp format_visibility(visibility, kind) when kind in [:module, :callback], do: "#{visibility}"
+  def format_visibility(visibility, kind) when kind in [:module, :callback], do: "#{visibility}"
 
   # typep is defined as :hidden, since there is no :private visibility value
   # but type defined with @doc false also is the stored the same way.
-  defp format_visibility(:hidden, :type), do: "hidden or private"
+  def format_visibility(:hidden, :type), do: "hidden or private"
 
   # for the rest, it can either be undefined or private
-  defp format_visibility(:undefined, _kind), do: "undefined or private"
-  defp format_visibility(visibility, _kind), do: "#{visibility}"
+  def format_visibility(:undefined, _kind), do: "undefined or private"
+  def format_visibility(visibility, _kind), do: "#{visibility}"
 
   defp append_fragment(url, nil), do: url
   defp append_fragment(url, fragment), do: url <> "#" <> fragment

@@ -103,8 +103,8 @@ defmodule Mix.Tasks.Docs do
     * `:extras` - List of paths to additional Markdown (`.md` extension), Live Markdown
       (`.livemd` extension), Cheatsheets (`.cheatmd` extension) and plain text pages to
       add to the documentation. You can also specify keyword pairs to customize the
-      generated filename and title of each extra page; default: `[]`. Example:
-      `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing"]]`
+      generated filename, title and source file of each extra page; default: `[]`. Example:
+      `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing", source: "CONTRIBUTING.mdx"]]`
 
     * `:filter_modules` - Include only modules that match the given value. The
       value can be a regex, a string (representing a regex), or a two-arity
@@ -166,8 +166,11 @@ defmodule Mix.Tasks.Docs do
       need to set this configuration.
 
       However, if using a different solution, or self-hosting, you will need to set this
-      configuration variable to a pattern for source code links. The value must be a string
-      of the full URI to use for links with the following variables available for interpolation:
+      configuration variable to a pattern for source code links. The value must be a string or
+      a function.
+
+      If a string, then it should be the full URI to use for links with the following
+      variables available for interpolation:
 
         * `%{path}`: the path of a file in the repo
         * `%{line}`: the line number in the file
@@ -183,6 +186,10 @@ defmodule Mix.Tasks.Docs do
       ```text
       https://mydomain.org/user_or_team/repo_name/src/main/%{path}#cl-%{line}
       ```
+
+      If a function, then it must be a function that takes two arguments, path and line,
+      where path is either an relative path from the cwd, or an absolute path. The function
+      must return the full URI as it should be placed in the documentation.
 
   ## Groups
 

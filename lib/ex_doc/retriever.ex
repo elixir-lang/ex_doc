@@ -127,10 +127,12 @@ defmodule ExDoc.Retriever do
   end
 
   defp generate_node(module, module_data, config) do
-    source_url = config.source_url_pattern
-    source_path = source_path(module, config)
-    source = %{url: source_url, path: source_path}
-    {doc_line, format, source_doc, doc, metadata} = get_module_docs(module_data, source_path)
+    source = %{
+      url: config.source_url_pattern,
+      path: module_data.source_file
+    }
+
+    {doc_line, doc_file, format, source_doc, doc, metadata} = get_module_docs(module_data, source)
 
     # TODO: The default function groups must be returned by the language
     groups_for_docs =
@@ -170,10 +172,10 @@ defmodule ExDoc.Retriever do
       doc_format: format,
       doc: doc,
       source_doc: source_doc,
-      doc_line: doc_line,
+      moduledoc_line: doc_line,
+      moduledoc_file: doc_file,
       typespecs: ExDoc.Utils.natural_sort_by(types, &"#{&1.name}/#{&1.arity}"),
-      source_path: source_path,
-      source_url: source_link(source, module_data.line),
+      source_url: source_link(source, module_data.source_line),
       language: module_data.language,
       annotations: List.wrap(metadata[:tags]),
       metadata: metadata
@@ -190,11 +192,12 @@ defmodule ExDoc.Retriever do
 
   # Module Helpers
 
-  defp get_module_docs(module_data, source_path) do
+  defp get_module_docs(module_data, source) do
     {:docs_v1, anno, _, format, moduledoc, metadata, _} = module_data.docs
+    doc_file = anno_file(anno, source)
     doc_line = anno_line(anno)
-    options = [file: source_path, line: doc_line + 1]
-    {doc_line, format, moduledoc, doc_ast(format, moduledoc, options), metadata}
+    options = [file: doc_file, line: doc_line + 1]
+    {doc_line, doc_file, format, moduledoc, doc_ast(format, moduledoc, options), metadata}
   end
 
   ## Function helpers
@@ -235,18 +238,20 @@ defmodule ExDoc.Retriever do
        ) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{type, name, arity}, anno, signature, source_doc, metadata} = doc_element
+    doc_file = anno_file(anno, source)
     doc_line = anno_line(anno)
-    source = anno_file(anno, source)
+
+    source_url =
+      source_link(function_data[:source_file], source, function_data.source_line)
 
     annotations =
       annotations_for_docs.(metadata) ++
         annotations_from_metadata(metadata, module_metadata) ++ function_data.extra_annotations
 
-    line = function_data.line || doc_line
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
     doc_ast =
-      (source_doc && doc_ast(content_type, source_doc, file: source.path, line: doc_line + 1)) ||
+      (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
         function_data.doc_fallback.()
 
     group =
@@ -266,11 +271,11 @@ defmodule ExDoc.Retriever do
       doc: doc_ast,
       source_doc: source_doc,
       doc_line: doc_line,
+      doc_file: doc_file,
       defaults: ExDoc.Utils.natural_sort_by(defaults, fn {name, arity} -> "#{name}/#{arity}" end),
       signature: signature(signature),
       specs: function_data.specs,
-      source_path: source.path,
-      source_url: source_link(source, line),
+      source_url: source_url,
       type: type,
       group: group,
       annotations: annotations
@@ -317,8 +322,11 @@ defmodule ExDoc.Retriever do
 
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{kind, name, arity}, anno, _signature, source_doc, metadata} = callback
+    doc_file = anno_file(anno, source)
     doc_line = anno_line(anno)
-    source = anno_file(anno, source)
+
+    source_url =
+      source_link(callback_data[:source_file], source, callback_data.source_line)
 
     signature = signature(callback_data.signature)
     specs = callback_data.specs
@@ -327,7 +335,7 @@ defmodule ExDoc.Retriever do
       annotations_for_docs.(metadata) ++
         callback_data.extra_annotations ++ annotations_from_metadata(metadata, module_metadata)
 
-    doc_ast = doc_ast(content_type, source_doc, file: source.path, line: doc_line + 1)
+    doc_ast = doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)
 
     metadata = Map.put(metadata, :__doc__, :callback)
 
@@ -348,10 +356,10 @@ defmodule ExDoc.Retriever do
       doc: doc_ast,
       source_doc: source_doc,
       doc_line: doc_line,
+      doc_file: doc_file,
       signature: signature,
       specs: specs,
-      source_path: source.path,
-      source_url: source_link(source, callback_data.line),
+      source_url: source_url,
       type: kind,
       annotations: annotations,
       group: group
@@ -371,18 +379,23 @@ defmodule ExDoc.Retriever do
   defp get_type(type_entry, source, groups_for_docs, module_data, annotations_for_docs) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{kind, name, arity}, anno, _signature, source_doc, metadata} = type_entry
+    doc_file = anno_file(anno, source)
     doc_line = anno_line(anno)
-    source = anno_file(anno, source)
-    annotations = annotations_from_metadata(metadata, module_metadata)
 
     type_data = module_data.language.type_data(type_entry, module_data)
+
+    source_url =
+      source_link(type_data[:source_file], source, type_data.source_line)
+
+    annotations = annotations_from_metadata(metadata, module_metadata)
+
     signature = signature(type_data.signature)
 
     annotations =
       annotations_for_docs.(metadata) ++
         if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
 
-    doc_ast = doc_ast(content_type, source_doc, file: source.path, line: doc_line + 1)
+    doc_ast = doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)
     metadata = Map.put(metadata, :__doc__, :type)
 
     group =
@@ -404,9 +417,9 @@ defmodule ExDoc.Retriever do
       doc: doc_ast,
       source_doc: source_doc,
       doc_line: doc_line,
+      doc_file: doc_file,
       signature: signature,
-      source_path: source.path,
-      source_url: source_link(source, type_data.line),
+      source_url: source_url,
       annotations: annotations,
       group: group
     }
@@ -436,25 +449,41 @@ defmodule ExDoc.Retriever do
   defp anno_line(line) when is_integer(line), do: abs(line)
   defp anno_line(anno), do: anno |> :erl_anno.line() |> abs()
 
-  defp anno_file(anno, source) do
+  defp anno_file(anno) do
     case :erl_anno.file(anno) do
       :undefined ->
-        source
+        nil
 
       file ->
-        %{url: source.url, path: Path.join(Path.dirname(source.path), file)}
+        file
     end
+  end
+
+  defp anno_file(anno, source) do
+    if file = anno_file(anno) do
+      Path.join(Path.dirname(source.path), file)
+    else
+      source.path
+    end
+    |> path_relative_to_cwd(force: true)
+  end
+
+  # TODO: Remove when we require Elixir 1.16
+  if function_exported?(Path, :relative_to_cwd, 2) do
+    defp path_relative_to_cwd(path, options), do: Path.relative_to_cwd(path, options)
+  else
+    defp path_relative_to_cwd(path, _options), do: Path.relative_to_cwd(path)
+  end
+
+  defp source_link(nil, source, line), do: source_link(source, line)
+
+  defp source_link(file, source, line) do
+    source_link(%{source | path: file}, line)
   end
 
   defp source_link(%{path: _, url: nil}, _line), do: nil
 
   defp source_link(source, line) do
-    Utils.source_url_pattern(source.url, source.path, line)
-  end
-
-  defp source_path(module, _config) do
-    module.module_info(:compile)[:source]
-    |> String.Chars.to_string()
-    |> Path.relative_to(File.cwd!())
+    Utils.source_url_pattern(source.url, source.path |> Path.relative_to(File.cwd!()), line)
   end
 end

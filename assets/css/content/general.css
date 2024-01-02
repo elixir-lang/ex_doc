@@ -206,6 +206,10 @@
   max-width: 100%;
 }
 
+.content-inner strong > code {
+  font-weight: bold;
+}
+
 .content-inner code {
   font-family: var(--monoFontFamily);
   font-style: normal;

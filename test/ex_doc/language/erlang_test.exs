@@ -134,19 +134,31 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://www.erlang.org/doc/man/array.html#type-array"><code>array:array()</code></a>|
     end
 
+    @myList (if :erlang.system_info(:otp_release) >= ~c"27" do
+               "t:myList/0"
+             else
+               "type-myList"
+             end)
+
     test "abstract types - description", c do
-      assert autolink_edoc("{@type myList(X). A special kind of lists ...}", c) ==
-               ~s|<code><a href=\"#type-myList\">myList</a>(X)</code>|
+      assert autolink_edoc("{@type myList(X). A special kind of lists ...}", c,
+               extra_foo_code: "-export_type([myList/0]).\n-type myList() :: term().\n%% A type"
+             ) ==
+               ~s|<code><a href=\"##{@myList}\">myList</a>(X)</code>|
     end
 
     test "abstract types - description+dot", c do
-      assert autolink_edoc("{@type myList(X, Y).}", c) ==
-               ~s|<code><a href=\"#type-myList\">myList</a>(X, Y)</code>|
+      assert autolink_edoc("{@type myList(X, Y).}", c,
+               extra_foo_code: "-export_type([myList/0]).\n-type myList() :: term().\n%% A type"
+             ) ==
+               ~s|<code><a href=\"##{@myList}\">myList</a>(X, Y)</code>|
     end
 
     test "abstract types - no description", c do
-      assert autolink_edoc("{@type myList()}", c) ==
-               ~s|<code><a href=\"#type-myList\">myList()</a></code>|
+      assert autolink_edoc("{@type myList()}", c,
+               extra_foo_code: "-export_type([myList/0]).\n-type myList() :: term().\n%% A type"
+             ) ==
+               ~s|<code><a href=\"##{@myList}\">myList()</a></code>|
     end
   end
 
@@ -671,8 +683,11 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "map", c do
-      assert autolink_spec(~S"-spec foo() -> #{atom() := string(), float() => t()}.", c) ==
-               ~S|foo() -> #{<a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>() := <a href="https://www.erlang.org/doc/man/erlang.html#type-string">string</a>(), <a href="https://www.erlang.org/doc/man/erlang.html#type-float">float</a>() => <a href="#t:t/0">t</a>()}.|
+      assert autolink_spec(
+               ~S"-spec foo() -> #{atom() := sets:set(integer()), float() => t()}.",
+               c
+             ) ==
+               ~S|foo() -> #{<a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>() := <a href="https://www.erlang.org/doc/man/sets.html#type-set">sets:set</a>(<a href="https://www.erlang.org/doc/man/erlang.html#type-integer">integer</a>()), <a href="https://www.erlang.org/doc/man/erlang.html#type-float">float</a>() => <a href="#t:t/0">t</a>()}.|
     end
 
     test "vars", c do
@@ -696,8 +711,8 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "record - two fields", c do
-      assert autolink_spec(~s"-spec foo() -> #x{x :: atom(), y :: integer()} | t().", c) ==
-               ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>(), y :: <a href="https://www.erlang.org/doc/man/erlang.html#type-integer">integer</a>()} | <a href="#t:t/0">t</a>().]
+      assert autolink_spec(~s"-spec foo() -> #x{x :: atom(), y :: sets:set(integer())} | t().", c) ==
+               ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/man/erlang.html#type-atom">atom</a>(), y :: <a href="https://www.erlang.org/doc/man/sets.html#type-set">sets:set</a>(<a href="https://www.erlang.org/doc/man/erlang.html#type-integer">integer</a>())} | <a href="#t:t/0">t</a>().]
     end
 
     test "record - two fields, known types", c do
@@ -774,13 +789,16 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   defp autolink_spec(binary, c, opts \\ []) when is_binary(binary) do
+    fixtures(c, "")
+
     opts =
       opts
       |> Keyword.put_new(:current_module, :erlang_foo)
+      |> Keyword.put_new(:current_kfa, {:function, :foo, 1})
 
-    fixtures(c, "")
     {:ok, tokens, _} = :erl_scan.string(String.to_charlist(binary))
     {:ok, ast} = :erl_parse.parse_form(tokens)
+    ast = put_elem(ast, 1, :erl_anno.set_file(~c"test.erl", elem(ast, 1)))
     ExDoc.Language.Erlang.autolink_spec(ast, opts)
   end
 
@@ -791,7 +809,11 @@ defmodule ExDoc.Language.ErlangTest do
     [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, [])
 
     opts = c |> Map.take([:warnings]) |> Enum.to_list()
-    do_autolink_doc(ast, [file: "extra.md"] ++ opts)
+
+    do_autolink_doc(
+      ast,
+      [current_module: nil, file: nil, module_id: nil, file: "extra.md"] ++ opts
+    )
   end
 
   defp autolink_doc(text, c, opts \\ []) do
@@ -808,18 +830,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     do_autolink_doc(
       ast,
-      [
-        current_module: :erlang_foo,
-        file: "erlang_foo.erl",
-        module_id: "erlang_foo",
-        deps: [foolib: "https://foolib.com"]
-      ] ++
-        Keyword.drop(opts, [:extra_foo_code, :extra_bar_code])
+      opts
     )
   end
 
   defp autolink_edoc(doc, c, opts \\ []) do
-    fixtures(c, doc)
+    fixtures(c, doc, opts)
 
     {:docs_v1, _, _, "application/erlang+html", %{"en" => doc}, _, _} =
       Code.fetch_docs(:erlang_foo)
@@ -836,6 +852,11 @@ defmodule ExDoc.Language.ErlangTest do
       opts
       |> Keyword.put(:language, ExDoc.Language.Erlang)
       |> Keyword.put_new(:warnings, :raise)
+      |> Keyword.put_new(:current_module, :erlang_foo)
+      |> Keyword.put_new(:file, "erlang_foo.erl")
+      |> Keyword.put_new(:module_id, "erlang_foo")
+      |> Keyword.put_new(:deps, foolib: "https://foolib.com")
+      |> Keyword.drop([:extra_foo_code, :extra_bar_code])
 
     doc
     |> ExDoc.Language.Erlang.autolink_doc(opts)
