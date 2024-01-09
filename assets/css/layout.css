@@ -123,20 +123,17 @@ body.sidebar-closed .sidebar-button {
 }
 
 @media screen and (max-width: 768px) {
-  .content {
-    margin-top: 30px;
-  }
-  
-  .content,
+    .content,
   body.sidebar-opening .content {
     left: 0;
     width: 100%;
   }
 
   .content-inner {
-    padding-top: 13px;
+    padding-top: 43px;
     padding-bottom: 26px;
     overflow-x: auto;
+    
   }
 
   body.sidebar-closed .sidebar-button {

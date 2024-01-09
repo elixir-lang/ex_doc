@@ -142,7 +142,7 @@ function isMacOS () {
   return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
 }
 
-let lastScrollTop = 0
+let lastScrollTop = window.scrollY
 const topSearch = document.querySelector('.top-search')
 const sidebarMenu = document.getElementById('sidebar-menu')
 const backgroundLayer = document.querySelector('.background-layer')
