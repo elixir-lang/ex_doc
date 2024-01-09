@@ -141,3 +141,29 @@ function hideAutocomplete () {
 function isMacOS () {
   return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
 }
+
+let lastScrollTop = 0
+const topSearch = document.querySelector('.top-search')
+const sidebarMenu = document.getElementById('sidebar-menu')
+const backgroundLayer = document.querySelector('.background-layer')
+
+window.addEventListener('scroll', function () {
+  const currentScroll = window.scrollY
+
+  if (currentScroll > lastScrollTop) {
+    // Scrolling down
+    topSearch.style.top = '-50px'
+    backgroundLayer.style.top = '-70px'
+    // Only hide sidebarMenu if aria-expanded is not true
+    if (sidebarMenu.getAttribute('aria-expanded') !== 'true') {
+      sidebarMenu.style.display = 'none'
+    }
+  } else {
+    // Scrolling up
+    topSearch.style.top = '11px'
+    backgroundLayer.style.top = '0px'
+    sidebarMenu.style.display = 'block'
+  }
+
+  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll
+}, false)
