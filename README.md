@@ -346,7 +346,7 @@ end
 defp before_closing_body_tag(:epub), do: ""
 ```
 
-Besides an anonymous function, you can also pass a `module-function-args` tuple. It will the given module and function, with the format prefixed to the arguments:
+Besides an anonymous function, you can also pass a `module-function-args` tuple. It will call the given module and function, with the format prefixed to the arguments:
 
 ```elixir
 docs: [
