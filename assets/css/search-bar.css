@@ -128,7 +128,7 @@
     height: 57px;
     left: 56px;
     right: 20px;
-    transition: top 0.3s;
+    transition: top var(--sidebarTransitionDuration) ease-in-out;
     z-index: 99;
   }
 
@@ -139,7 +139,7 @@
     right: 0;
     height: 70px;
     background-color: var(--background);
-    transition: top 0.3s;
+    transition: all var(--sidebarTransitionDuration) ease-in-out;
     z-index: 98;
   }
 

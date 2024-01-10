@@ -204,3 +204,11 @@ function setPreference () {
         : (state.sidebarPreference = userPref.CLOSED)
   }
 }
+
+const resizeObserver = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    document.body.style.setProperty('--sidebarWidth', `${entry.contentRect.width}px`);
+  }
+});
+
+resizeObserver.observe(document.getElementById('sidebar'));

@@ -7,6 +7,7 @@ body {
 
 body {
   --sidebarWidth: 300px;
+  --sidebarMinWidth: 300px;
   --sidebarTransitionDuration: 0.3s;
   background-color: var(--background);
   color: var(--textBody);
@@ -23,7 +24,6 @@ body {
 
 .main {
   display: flex;
-  justify-content: flex-end;
   height: 100%;
 }
 
@@ -31,11 +31,13 @@ body {
   display: flex;
   flex-direction: column;
   width: var(--sidebarWidth);
+  min-width: var(--sidebarMinWidth);
   height: 100%;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 100;
+  resize: horizontal;
 }
 
 .sidebar-button {
