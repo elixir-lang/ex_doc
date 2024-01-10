@@ -42,6 +42,7 @@ body {
   --sidebarButtonRightOpen: 4px;
   position: fixed;
   z-index: 200;
+  top: 0;
   left: 0;
   transition: all var(--sidebarTransitionDuration) ease-in-out;
   will-change: transform;
@@ -123,19 +124,7 @@ body.sidebar-closed .sidebar-button {
 }
 
 @media screen and (max-width: 768px) {
-  .sidebar-button {
-    top: 0;
-    transition: top .3s;
-    position: absolute;
-  }
-
-  .sidebar-button.fixed {
-    top: 0;
-    transition: top .3s;
-    position: fixed;
-  }
-
-    .content,
+  .content,
   body.sidebar-opening .content {
     left: 0;
     width: 100%;
@@ -145,21 +134,17 @@ body.sidebar-closed .sidebar-button {
     padding-top: 43px;
     padding-bottom: 26px;
     overflow-x: auto;
-    
   }
 
   body.sidebar-closed .sidebar-button {
-    position: fixed;
-    left: 0; 
-    top: 0;
-    transition: top .3s;
     position: absolute;
   }
 
-  body.sidebar-closed .sidebar-button.fixed {
-    position: fixed;
-    left: 0;
-    top: 0; 
-    transition: top .3s;
+  .sm-fixed {
+    position: fixed !important;
+  }
+
+  .sm-hidden {
+    top: -70px !important;
   }
 }

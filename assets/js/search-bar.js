@@ -142,46 +142,39 @@ function isMacOS () {
   return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
 }
 
-window.addEventListener('scroll', function () {
-  const topSearch = document.querySelector('.top-search')
-  const sidebarMenu = document.getElementById('sidebar-menu')
-  const backgroundLayer = document.querySelector('.background-layer')
-  const currentScroll = window.scrollY
-
-  // Add 'fixed' class when not at the top
-  if (currentScroll > 70) {
-    topSearch.classList.add('fixed')
-    sidebarMenu.classList.add('fixed')
-    backgroundLayer.classList.add('fixed')
-  } else {
-    // Remove 'fixed' class when at the top
-    topSearch.classList.remove('fixed')
-    sidebarMenu.classList.remove('fixed')
-    backgroundLayer.classList.remove('fixed')
-  }
-})
-
 let lastScrollTop = window.scrollY
 const topSearch = document.querySelector('.top-search')
 const sidebarMenu = document.getElementById('sidebar-menu')
 const backgroundLayer = document.querySelector('.background-layer')
-const scrollThreshold = 56 // Set a threshold for scroll, adjust as needed
+const scrollThreshold = 70 // Set a threshold for scroll, adjust as needed
 
 window.addEventListener('scroll', function () {
   const currentScroll = window.scrollY
 
+  // Add 'fixed' class when not at the top
+  if (currentScroll > scrollThreshold * 2) {
+    topSearch.classList.add('sm-fixed')
+    sidebarMenu.classList.add('sm-fixed')
+    backgroundLayer.classList.add('sm-fixed')
+  }
+
+  if (currentScroll == 0) {
+    // Remove 'fixed' class when at the top
+    topSearch.classList.remove('sm-fixed')
+    sidebarMenu.classList.remove('sm-fixed')
+    backgroundLayer.classList.remove('sm-fixed')
+  }
+
   if (currentScroll > lastScrollTop && currentScroll > scrollThreshold) {
     // Scrolling down and past the threshold
-    topSearch.style.top = '-50px'
-    backgroundLayer.style.top = '-70px'
-    if (sidebarMenu.getAttribute('aria-expanded') !== 'true') {
-      sidebarMenu.style.top = '-50px'
-    }
+    topSearch.classList.add('sm-hidden')
+    sidebarMenu.classList.add('sm-hidden')
+    backgroundLayer.classList.add('sm-hidden')
   } else {
     // Scrolling up or at the top of the page
-    topSearch.style.top = '11px'
-    backgroundLayer.style.top = '0px'
-    sidebarMenu.style.top = '0px'
+    topSearch.classList.remove('sm-hidden')
+    sidebarMenu.classList.remove('sm-hidden')
+    backgroundLayer.classList.remove('sm-hidden')
   }
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll

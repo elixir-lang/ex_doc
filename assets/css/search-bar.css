@@ -1,5 +1,7 @@
 .top-search {
   margin-top: 10px;
+  height: 70px;
+  background-color: var(--background);
 }
 
 .search-settings {
@@ -120,20 +122,11 @@
 }
 
 @media (max-width: 768px) {
-  
   .top-search {
     margin-top: 0;
     position: absolute;
     top: 13px;
-    left: 56px;
-    right: 20px;
-    z-index: 99;
-  }
-
-  .top-search.fixed {
-    margin-top: 0;
-    position: fixed;
-    top: 13px;
+    height: 57px;
     left: 56px;
     right: 20px;
     transition: top 0.3s;
@@ -141,20 +134,16 @@
   }
 
   .background-layer {
-    display: block;
-    z-index: 10;
-    transition: top 0.3s;
-  }
-
-  .background-layer.fixed {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 70px;
     background-color: var(--background);
+    transition: top 0.3s;
+    z-index: 98;
   }
-  
+
   .search-settings {
     width: 100%;
     box-sizing: border-box;
