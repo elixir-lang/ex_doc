@@ -123,6 +123,18 @@ body.sidebar-closed .sidebar-button {
 }
 
 @media screen and (max-width: 768px) {
+  .sidebar-button {
+    top: 0;
+    transition: top .3s;
+    position: absolute;
+  }
+
+  .sidebar-button.fixed {
+    top: 0;
+    transition: top .3s;
+    position: fixed;
+  }
+
     .content,
   body.sidebar-opening .content {
     left: 0;
@@ -138,7 +150,16 @@ body.sidebar-closed .sidebar-button {
 
   body.sidebar-closed .sidebar-button {
     position: fixed;
+    left: 0; 
+    top: 0;
+    transition: top .3s;
+    position: absolute;
+  }
+
+  body.sidebar-closed .sidebar-button.fixed {
+    position: fixed;
     left: 0;
-    transition: top 0.9s;  
+    top: 0; 
+    transition: top .3s;
   }
 }
