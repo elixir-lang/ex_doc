@@ -1,3 +1,13 @@
+.background-layer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background-color: var(--background);
+}
+
 .top-search {
   margin-top: 10px;
 }
@@ -6,6 +16,7 @@
   display: flex;
   column-gap: 12px;
   align-items: center;
+  width: 100%;
 }
 
 .search-bar {
@@ -13,7 +24,7 @@
   border-radius: 8px;
   height: 48px;
   position: relative;
-  flex-grow: 1;
+  width: 100%;
 }
 
 .top-search .search-bar .search-input {
@@ -56,7 +67,7 @@
   position: absolute;
   top: 60%;
   transform: translateY(-60%);
-  z-index: 2;
+  z-index: 99;
 }
 
 .top-search .search-bar.selected .search-button,
@@ -80,7 +91,7 @@
   transform: scaleY(0);
   top: calc(50% - 11px);
   transition: 0.15s transform ease-out;
-  z-index: 2;
+  z-index: 99;
 }
 
 .top-search .search-bar .search-close-button:hover {
@@ -114,13 +125,30 @@
 
 @media (max-width: 480px) or ((min-width: 481px) and (max-width: 768px)) {
   .search-bar {
-    margin-left: 35px;
+    margin-left: 0px;
   }
 }
 
 @media (max-width: 768px) {
+  .background-layer {
+    display: block;
+    z-index: 10;
+    transition: top 0.3s;
+  }
+
   .top-search {
     margin-top: 0;
+    position: fixed;
+    top: 13px;
+    left: 56px;
+    right: 20px;
+    transition: top 0.3s;
+    z-index: 99;
+  }
+
+  .search-settings {
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 

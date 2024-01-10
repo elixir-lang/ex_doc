@@ -35,13 +35,13 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 4;
+  z-index: 100;
 }
 
 .sidebar-button {
   --sidebarButtonRightOpen: 4px;
   position: fixed;
-  z-index: 99;
+  z-index: 200;
   left: 0;
   transition: all var(--sidebarTransitionDuration) ease-in-out;
   will-change: transform;
@@ -53,7 +53,6 @@ body {
   left: var(--sidebarWidth);
   height: 100%;
   position: absolute;
-  z-index: 3;
 }
 
 .content-inner {
@@ -124,19 +123,22 @@ body.sidebar-closed .sidebar-button {
 }
 
 @media screen and (max-width: 768px) {
-  .content,
+    .content,
   body.sidebar-opening .content {
     left: 0;
     width: 100%;
   }
 
   .content-inner {
-    padding-top: 13px;
+    padding-top: 43px;
     padding-bottom: 26px;
     overflow-x: auto;
+    
   }
 
   body.sidebar-closed .sidebar-button {
-    position: absolute;
+    position: fixed;
+    left: 0;
+    transition: top 0.9s;  
   }
 }

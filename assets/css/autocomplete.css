@@ -1,9 +1,8 @@
 .autocomplete {
   display: none;
-  height: 0;
-  margin-right: 32px;
-  overflow: visible;
-  position: relative;
+  position: absolute;
+  width: 84%;
+  top: 55px;
 }
 
 .autocomplete .triangle {
@@ -36,7 +35,7 @@
 .autocomplete-results .show {
   white-space: normal;
   overflow-x: hidden;
-  width: 62%;
+  width: 84%;
 }
 
 .autocomplete-results .bold {
@@ -135,18 +134,41 @@
 }
 
 @media (max-width: 480px) {
+
+  .autocomplete {
+    width: 90%;
+  }
+
   .autocomplete .triangle {
     left: 27%;
   }
 }
 
-@media (max-width: 767px) {
+@media (min-width: 481px) and (max-width: 767px) {
+
+  .autocomplete {
+    width: 95%;
+  }
+  
   .autocomplete .triangle {
     left: 17%;
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 767px) {
+  .autocomplete {
+    top: 50px;
+    left: 0;
+    right: 0;
+    z-index: 200;
+  }
+
+  .autocomplete .triangle {
+    left: 17%;
+  }
+}
+
+@media (max-width: 1023px) {
   .autocomplete-results {
     gap: 0;
   }
