@@ -158,7 +158,7 @@ window.addEventListener('scroll', function () {
     backgroundLayer.classList.add('sm-fixed')
   }
 
-  if (currentScroll == 0) {
+  if (currentScroll === 0) {
     // Remove 'fixed' class when at the top
     topSearch.classList.remove('sm-fixed')
     sidebarMenu.classList.remove('sm-fixed')

@@ -42,25 +42,25 @@ export function initialize () {
   addEventListeners()
 }
 
-function observeResizing() {
+function observeResizing () {
   const sidebarWidth = sessionStorage.getItem('sidebar_width')
 
-  if(sidebarWidth) {
+  if (sidebarWidth) {
     setSidebarWidth(sidebarWidth)
   }
 
   const resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
-      setSidebarWidth(entry.contentRect.width);
+      setSidebarWidth(entry.contentRect.width)
     }
-  });
+  })
 
-  resizeObserver.observe(document.getElementById('sidebar'));
+  resizeObserver.observe(document.getElementById('sidebar'))
 }
 
-function setSidebarWidth(width) {
+function setSidebarWidth (width) {
   sessionStorage.setItem('sidebar_width', width)
-  document.body.style.setProperty('--sidebarWidth', `${width}px`);
+  document.body.style.setProperty('--sidebarWidth', `${width}px`)
 }
 
 function setDefaultSidebarState () {
