@@ -38,7 +38,29 @@ const state = {
  */
 export function initialize () {
   setDefaultSidebarState()
+  observeResizing()
   addEventListeners()
+}
+
+function observeResizing() {
+  const sidebarWidth = sessionStorage.getItem('sidebar_width')
+
+  if(sidebarWidth) {
+    setSidebarWidth(sidebarWidth)
+  }
+
+  const resizeObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      setSidebarWidth(entry.contentRect.width);
+    }
+  });
+
+  resizeObserver.observe(document.getElementById('sidebar'));
+}
+
+function setSidebarWidth(width) {
+  sessionStorage.setItem('sidebar_width', width)
+  document.body.style.setProperty('--sidebarWidth', `${width}px`);
 }
 
 function setDefaultSidebarState () {
@@ -204,11 +226,3 @@ function setPreference () {
         : (state.sidebarPreference = userPref.CLOSED)
   }
 }
-
-const resizeObserver = new ResizeObserver((entries) => {
-  for (const entry of entries) {
-    document.body.style.setProperty('--sidebarWidth', `${entry.contentRect.width}px`);
-  }
-});
-
-resizeObserver.observe(document.getElementById('sidebar'));
