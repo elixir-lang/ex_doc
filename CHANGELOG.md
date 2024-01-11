@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.31.1 (2024-01-11)
+
+  * Enhancements
+    * Make the sidebar horizontally resizable
+    * Show the sidebar button and search bar on scroll up on mobile devices
+    * More improvements to Erlang/OTP 27 support
+    * Document that `source_url_pattern` can be a fun
+    * Support `m:Module#anchor`
+
 ## v0.31.0 (2023-12-11)
 
   * Enhancements
