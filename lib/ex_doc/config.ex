@@ -5,6 +5,7 @@ defmodule ExDoc.Config do
   @default_source_ref "main"
   def filter_modules(_module, _metadata), do: true
   def before_closing_head_tag(_), do: ""
+  def before_closing_footer_tag(_), do: ""
   def before_closing_body_tag(_), do: ""
   def annotations_for_docs(_), do: []
 
@@ -14,6 +15,7 @@ defmodule ExDoc.Config do
             assets: nil,
             authors: nil,
             before_closing_body_tag: &__MODULE__.before_closing_body_tag/1,
+            before_closing_footer_tag: &__MODULE__.before_closing_footer_tag/1,
             before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
             canonical: nil,
             cover: nil,
@@ -53,6 +55,7 @@ defmodule ExDoc.Config do
           assets: nil | String.t(),
           authors: nil | [String.t()],
           before_closing_body_tag: (atom() -> String.t()) | mfa() | map(),
+          before_closing_footer_tag: (atom() -> String.t()) | mfa() | map(),
           before_closing_head_tag: (atom() -> String.t()) | mfa() | map(),
           canonical: nil | String.t(),
           cover: nil | Path.t(),

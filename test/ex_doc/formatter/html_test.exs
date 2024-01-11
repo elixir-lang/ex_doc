@@ -13,12 +13,15 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   @before_closing_head_tag_content_html "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-EPUB</dont-escape>"
   @before_closing_body_tag_content_html "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-EPUB</dont-escape>"
+  @before_closing_footer_tag_content_html "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-FOOTER-TAG-EPUB</dont-escape>"
 
   defp before_closing_head_tag(:html), do: @before_closing_head_tag_content_html
   defp before_closing_body_tag(:html), do: @before_closing_body_tag_content_html
+  defp before_closing_footer_tag(:html), do: @before_closing_footer_tag_content_html
 
   def before_closing_head_tag(:html, name), do: "<meta name=#{name}>"
   def before_closing_body_tag(:html, name), do: "<p>#{name}</p>"
+  def before_closing_footer_tag(:html, name), do: "<p>#{name}</p>"
 
   defp doc_config(%{tmp_dir: tmp_dir} = _context) do
     [
@@ -654,18 +657,21 @@ defmodule ExDoc.Formatter.HTMLTest do
       generate_docs(
         doc_config(context,
           before_closing_head_tag: %{html: "<meta name=StaticDemo>"},
-          before_closing_body_tag: %{html: "<p>StaticDemo</p>"},
+          before_closing_body_tag: %{html: "<p>StaticBodyDemo</p>"},
+          before_closing_footer_tag: %{html: "<p>StaticFooterDemo</p>"},
           extras: ["test/fixtures/README.md"]
         )
       )
 
       content = File.read!(tmp_dir <> "/html/api-reference.html")
       assert content =~ ~r[<meta name=StaticDemo>\s*</head>]
-      assert content =~ ~r[<p>StaticDemo</p>\s*</body>]
+      assert content =~ ~r[<p>StaticBodyDemo</p>\s*</body>]
+      assert content =~ ~r[<p>StaticFooterDemo</p>\s*</footer>]
 
       content = File.read!(tmp_dir <> "/html/readme.html")
       assert content =~ ~r[<meta name=StaticDemo>\s*</head>]
-      assert content =~ ~r[<p>StaticDemo</p>\s*</body>]
+      assert content =~ ~r[<p>StaticBodyDemo</p>\s*</body>]
+      assert content =~ ~r[<p>StaticFooterDemo</p>\s*</footer>]
     end
 
     test "before_closing_*_tags required by the user are placed in the right place using MFA",
@@ -675,18 +681,21 @@ defmodule ExDoc.Formatter.HTMLTest do
       generate_docs(
         doc_config(context,
           before_closing_head_tag: {__MODULE__, :before_closing_head_tag, ["Demo"]},
-          before_closing_body_tag: {__MODULE__, :before_closing_body_tag, ["Demo"]},
+          before_closing_body_tag: {__MODULE__, :before_closing_body_tag, ["BodyDemo"]},
+          before_closing_footer_tag: {__MODULE__, :before_closing_footer_tag, ["FooterDemo"]},
           extras: ["test/fixtures/README.md"]
         )
       )
 
       content = File.read!(tmp_dir <> "/html/api-reference.html")
       assert content =~ ~r[<meta name=Demo>\s*</head>]
-      assert content =~ ~r[<p>Demo</p>\s*</body>]
+      assert content =~ ~r[<p>BodyDemo</p>\s*</body>]
+      assert content =~ ~r[<p>FooterDemo</p>\s*</footer>]
 
       content = File.read!(tmp_dir <> "/html/readme.html")
       assert content =~ ~r[<meta name=Demo>\s*</head>]
-      assert content =~ ~r[<p>Demo</p>\s*</body>]
+      assert content =~ ~r[<p>BodyDemo</p>\s*</body>]
+      assert content =~ ~r[<p>FooterDemo</p>\s*</footer>]
     end
 
     test "before_closing_*_tags required by the user are placed in the right place",
@@ -697,6 +706,7 @@ defmodule ExDoc.Formatter.HTMLTest do
         doc_config(context,
           before_closing_head_tag: &before_closing_head_tag/1,
           before_closing_body_tag: &before_closing_body_tag/1,
+          before_closing_footer_tag: &before_closing_footer_tag/1,
           extras: ["test/fixtures/README.md"]
         )
       )
@@ -704,10 +714,12 @@ defmodule ExDoc.Formatter.HTMLTest do
       content = File.read!(tmp_dir <> "/html/api-reference.html")
       assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
       assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
+      assert content =~ ~r[#{@before_closing_footer_tag_content_html}\s*</footer>]
 
       content = File.read!(tmp_dir <> "/html/readme.html")
       assert content =~ ~r[#{@before_closing_head_tag_content_html}\s*</head>]
       assert content =~ ~r[#{@before_closing_body_tag_content_html}\s*</body>]
+      assert content =~ ~r[#{@before_closing_footer_tag_content_html}\s*</footer>]
     end
   end
 

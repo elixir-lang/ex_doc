@@ -2,7 +2,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
 
-  import ExDoc.Utils, only: [h: 1, before_closing_body_tag: 2, before_closing_head_tag: 2]
+  import ExDoc.Utils,
+    only: [
+      h: 1,
+      before_closing_body_tag: 2,
+      before_closing_footer_tag: 2,
+      before_closing_head_tag: 2
+    ]
 
   # TODO: It should not depend on the parent module. Move required HTML functions to Utils.
   # TODO: Add tests that assert on the returned structured, not on JSON
