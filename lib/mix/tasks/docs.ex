@@ -85,6 +85,12 @@ defmodule Mix.Tasks.Docs do
       The atom given as argument can be used to include different content in both formats.
       Useful to inject custom assets, such as CSS stylesheets.
 
+    * `:before_closing_footer_tag` - a function that takes as argument an atom specifying
+      the formatter being used (`:html`) and returns a literal HTML string
+      to be included just before the closing footer tag (`</footer>`).
+      This option only has effect on the html formatter.
+      Useful if you want to inject an extra footer into the documentation.
+
     * `:canonical` - String that defines the preferred URL with the rel="canonical"
       element; defaults to no canonical path.
 

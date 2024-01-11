@@ -34,6 +34,7 @@
             <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
           <% end %>
         </p>
+        <%= before_closing_footer_tag(config, :html) %>
       </footer>
     </div>
   </div>
