@@ -1,33 +1,34 @@
 <div class="triangle"></div>
 <div class="autocomplete-suggestions">
   <div class="autocomplete-results">
-    <span class="show">Autocompletion results for 
-      <span class="bold"> "{{term}}" </span>.
-    </span> 
-    <span class="mobile-hide">Press 
-      <span class="bold">RETURN</span> 
-      for full-text search.
+    <span>
+      Autocompletion results for <span class="bold">"{{term}}"</span>
+    </span>
+    <span class="press-return">
+      Press <span class="bold">RETURN</span> for full-text search
     </span>
   </div>
-  {{#each suggestions}}
-    <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
-      <div class="title">
-        {{# if deprecated }}
-          <s><span translate="no">{{{title}}}</span></s>
-        {{ else }}
-          <span translate="no">{{{title}}}</span>
-        {{/if}}
+  <div>
+    {{#each suggestions}}
+      <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
+        <div class="title">
+          {{# if deprecated }}
+            <s><span translate="no">{{{title}}}</span></s>
+          {{ else }}
+            <span translate="no">{{{title}}}</span>
+          {{/if}}
 
-        {{#if label}}
-          <span class="label">{{label}}</span>
-        {{/if}}
-      </div>
-
-      {{#if description}}
-        <div class="description" translate="no">
-          {{{description}}}
+          {{#if label}}
+            <span class="label">{{label}}</span>
+          {{/if}}
         </div>
-      {{/if}}
-    </a>
-  {{/each}}
+
+        {{#if description}}
+          <div class="description" translate="no">
+            {{{description}}}
+          </div>
+        {{/if}}
+      </a>
+    {{/each}}
+  </div>
 </div>

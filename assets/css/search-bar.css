@@ -8,6 +8,7 @@
   column-gap: 12px;
   align-items: center;
   width: 100%;
+  position: relative;
 }
 
 .search-bar {

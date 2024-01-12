@@ -1,27 +1,28 @@
-(()=>{(function(){var d=Handlebars.template,y=Handlebars.templates=Handlebars.templates||{};y["autocomplete-suggestions"]=d({1:function(o,l,a,f,r){var e,n,u=l??(o.nullContext||{}),s=o.hooks.helperMissing,i="function",c=o.escapeExpression,t=o.lookupProperty||function(p,m){if(Object.prototype.hasOwnProperty.call(p,m))return p[m]};return'    <a href="'+c((n=(n=t(a,"link")||(l!=null?t(l,"link"):l))!=null?n:s,typeof n===i?n.call(u,{name:"link",hash:{},data:r,loc:{start:{line:13,column:13},end:{line:13,column:21}}}):n))+'" class="autocomplete-suggestion" data-index="'+c((n=(n=t(a,"index")||r&&t(r,"index"))!=null?n:s,typeof n===i?n.call(u,{name:"index",hash:{},data:r,loc:{start:{line:13,column:67},end:{line:13,column:77}}}):n))+`" tabindex="-1">
-      <div class="title">
-`+((e=t(a,"if").call(u,l!=null?t(l,"deprecated"):l,{name:"if",hash:{},fn:o.program(2,r,0),inverse:o.program(4,r,0),data:r,loc:{start:{line:15,column:8},end:{line:19,column:15}}}))!=null?e:"")+`
-`+((e=t(a,"if").call(u,l!=null?t(l,"label"):l,{name:"if",hash:{},fn:o.program(6,r,0),inverse:o.noop,data:r,loc:{start:{line:21,column:8},end:{line:23,column:15}}}))!=null?e:"")+`      </div>
+(()=>{(function(){var d=Handlebars.template,y=Handlebars.templates=Handlebars.templates||{};y["autocomplete-suggestions"]=d({1:function(o,l,a,f,r){var e,n,u=l??(o.nullContext||{}),s=o.hooks.helperMissing,i="function",c=o.escapeExpression,t=o.lookupProperty||function(p,m){if(Object.prototype.hasOwnProperty.call(p,m))return p[m]};return'      <a href="'+c((n=(n=t(a,"link")||(l!=null?t(l,"link"):l))!=null?n:s,typeof n===i?n.call(u,{name:"link",hash:{},data:r,loc:{start:{line:13,column:15},end:{line:13,column:23}}}):n))+'" class="autocomplete-suggestion" data-index="'+c((n=(n=t(a,"index")||r&&t(r,"index"))!=null?n:s,typeof n===i?n.call(u,{name:"index",hash:{},data:r,loc:{start:{line:13,column:69},end:{line:13,column:79}}}):n))+`" tabindex="-1">
+        <div class="title">
+`+((e=t(a,"if").call(u,l!=null?t(l,"deprecated"):l,{name:"if",hash:{},fn:o.program(2,r,0),inverse:o.program(4,r,0),data:r,loc:{start:{line:15,column:10},end:{line:19,column:17}}}))!=null?e:"")+`
+`+((e=t(a,"if").call(u,l!=null?t(l,"label"):l,{name:"if",hash:{},fn:o.program(6,r,0),inverse:o.noop,data:r,loc:{start:{line:21,column:10},end:{line:23,column:17}}}))!=null?e:"")+`        </div>
 
-`+((e=t(a,"if").call(u,l!=null?t(l,"description"):l,{name:"if",hash:{},fn:o.program(8,r,0),inverse:o.noop,data:r,loc:{start:{line:26,column:6},end:{line:30,column:13}}}))!=null?e:"")+`    </a>
-`},2:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'          <s><span translate="no">'+((e=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:16,column:34},end:{line:16,column:45}}}):n))!=null?e:"")+`</span></s>
-`},4:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'          <span translate="no">'+((e=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:18,column:31},end:{line:18,column:42}}}):n))!=null?e:"")+`</span>
-`},6:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return'          <span class="label">'+o.escapeExpression((e=(e=n(a,"label")||(l!=null?n(l,"label"):l))!=null?e:o.hooks.helperMissing,typeof e=="function"?e.call(l??(o.nullContext||{}),{name:"label",hash:{},data:r,loc:{start:{line:22,column:30},end:{line:22,column:39}}}):e))+`</span>
-`},8:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return`        <div class="description" translate="no">
-          `+((e=(n=(n=u(a,"description")||(l!=null?u(l,"description"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"description",hash:{},data:r,loc:{start:{line:28,column:10},end:{line:28,column:27}}}):n))!=null?e:"")+`
-        </div>
+`+((e=t(a,"if").call(u,l!=null?t(l,"description"):l,{name:"if",hash:{},fn:o.program(8,r,0),inverse:o.noop,data:r,loc:{start:{line:26,column:8},end:{line:30,column:15}}}))!=null?e:"")+`      </a>
+`},2:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'            <s><span translate="no">'+((e=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:16,column:36},end:{line:16,column:47}}}):n))!=null?e:"")+`</span></s>
+`},4:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'            <span translate="no">'+((e=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:18,column:33},end:{line:18,column:44}}}):n))!=null?e:"")+`</span>
+`},6:function(o,l,a,f,r){var e,n=o.lookupProperty||function(u,s){if(Object.prototype.hasOwnProperty.call(u,s))return u[s]};return'            <span class="label">'+o.escapeExpression((e=(e=n(a,"label")||(l!=null?n(l,"label"):l))!=null?e:o.hooks.helperMissing,typeof e=="function"?e.call(l??(o.nullContext||{}),{name:"label",hash:{},data:r,loc:{start:{line:22,column:32},end:{line:22,column:41}}}):e))+`</span>
+`},8:function(o,l,a,f,r){var e,n,u=o.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return`          <div class="description" translate="no">
+            `+((e=(n=(n=u(a,"description")||(l!=null?u(l,"description"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(l??(o.nullContext||{}),{name:"description",hash:{},data:r,loc:{start:{line:28,column:12},end:{line:28,column:29}}}):n))!=null?e:"")+`
+          </div>
 `},compiler:[8,">= 4.3.0"],main:function(o,l,a,f,r){var e,n,u=l??(o.nullContext||{}),s=o.lookupProperty||function(i,c){if(Object.prototype.hasOwnProperty.call(i,c))return i[c]};return`<div class="triangle"></div>
 <div class="autocomplete-suggestions">
   <div class="autocomplete-results">
-    <span class="show">Autocompletion results for 
-      <span class="bold"> "`+o.escapeExpression((n=(n=s(a,"term")||(l!=null?s(l,"term"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(u,{name:"term",hash:{},data:r,loc:{start:{line:5,column:27},end:{line:5,column:35}}}):n))+`" </span>.
-    </span> 
-    <span class="mobile-hide">Press 
-      <span class="bold">RETURN</span> 
-      for full-text search.
+    <span>
+      Autocompletion results for <span class="bold">"`+o.escapeExpression((n=(n=s(a,"term")||(l!=null?s(l,"term"):l))!=null?n:o.hooks.helperMissing,typeof n=="function"?n.call(u,{name:"term",hash:{},data:r,loc:{start:{line:5,column:53},end:{line:5,column:61}}}):n))+`"</span>
+    </span>
+    <span class="press-return">
+      Press <span class="bold">RETURN</span> for full-text search
     </span>
   </div>
-`+((e=s(a,"each").call(u,l!=null?s(l,"suggestions"):l,{name:"each",hash:{},fn:o.program(1,r,0),inverse:o.noop,data:r,loc:{start:{line:12,column:2},end:{line:32,column:11}}}))!=null?e:"")+`</div>
+  <div>
+`+((e=s(a,"each").call(u,l!=null?s(l,"suggestions"):l,{name:"each",hash:{},fn:o.program(1,r,0),inverse:o.noop,data:r,loc:{start:{line:12,column:4},end:{line:32,column:13}}}))!=null?e:"")+`  </div>
+</div>
 `},useData:!0}),y["modal-layout"]=d({compiler:[8,">= 4.3.0"],main:function(o,l,a,f,r){return`<div id="modal" class="modal" tabindex="-1">
   <div class="modal-contents">
     <div class="modal-header">
