@@ -373,6 +373,8 @@ defmodule Mix.Tasks.Docs do
         String.to_atom(proglang)
       end)
 
+    check_ex_doc_version()
+
     options =
       config
       |> get_docs_opts()
@@ -532,5 +534,27 @@ defmodule Mix.Tasks.Docs do
       end
 
     System.cmd(cmd, args, options)
+  end
+
+  defp check_ex_doc_version() do
+    case :hex_repo.get_package(:hex_core.default_config(), "ex_doc") do
+      {:ok, {200, _headers, body}} ->
+        current_version = Application.spec(:ex_doc, :vsn) |> List.to_string()
+        latest_version = body.releases |> List.last() |> Map.get(:version)
+
+        if Version.compare(current_version, latest_version) == :lt do
+          warn("""
+            A new ex_doc version is available (#{current_version} < #{latest_version}).
+            Add {:ex_doc, ">= 0.0.0", only: :dev, runtime: false} to your dependencies to always get the latest version.
+          """)
+        end
+
+      _other ->
+        warn("Could not check latest ex_doc version.")
+    end
+  end
+
+  defp warn(message) do
+    Mix.shell().info([IO.ANSI.yellow(), message, IO.ANSI.reset()])
   end
 end

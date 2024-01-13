@@ -24,7 +24,7 @@ defmodule ExDoc.Mixfile do
 
   def application do
     [
-      extra_applications: [:eex] ++ extra_applications(Mix.env()),
+      extra_applications: [:eex, :inets, :ssl] ++ extra_applications(Mix.env()),
       mod: {ExDoc.Application, []}
     ]
   end
@@ -37,6 +37,7 @@ defmodule ExDoc.Mixfile do
       {:earmark_parser, "~> 1.4.39"},
       {:makeup_elixir, "~> 0.14"},
       {:makeup_erlang, "~> 0.1"},
+      {:hex_core, "~> 0.10.0"},
       # Add other makeup lexers as optional for the executable
       {:makeup_c, ">= 0.1.1", optional: true},
       {:makeup_html, ">= 0.0.0", only: :dev},
