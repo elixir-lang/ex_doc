@@ -304,7 +304,16 @@ defmodule ExDoc.Autolink do
           end
 
         config.deps
-        |> Keyword.get_lazy(String.to_atom(app), fn -> @hexdocs <> "#{app}" end)
+        |> Keyword.get_lazy(String.to_atom(app), fn ->
+          maybe_warn(
+            config,
+            "documentation references \"e:#{string}\" but #{app} cannot be found in deps.",
+            nil,
+            %{}
+          )
+
+          @hexdocs <> "#{app}"
+        end)
         |> String.trim_trailing("/")
         |> Kernel.<>("/" <> convert_extra_extension(extra, config) <> anchor)
 
