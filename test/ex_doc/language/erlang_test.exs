@@ -479,6 +479,28 @@ defmodule ExDoc.Language.ErlangTest do
              ) =~ ~r/documentation references "e:extra.md" but it is invalid/
     end
 
+    test "linking to unknown application does not work", c do
+      assert warn(
+               fn ->
+                 assert autolink_doc("[extra](`e:barlib:extra.md`)", c) ==
+                          ~s|<a href=\"https://hexdocs.pm/barlib/extra.html\">extra</a>|
+               end,
+               line: nil
+             ) =~
+               ~r/documentation references "e:barlib:extra.md" but barlib cannot be found in deps/
+    end
+
+    test "linking to unknown application with anchor does not work", c do
+      assert warn(
+               fn ->
+                 assert autolink_doc("[extra](`e:barlib:extra.md#anchor`)", c) ==
+                          ~s|<a href=\"https://hexdocs.pm/barlib/extra.html#anchor\">extra</a>|
+               end,
+               line: nil
+             ) =~
+               ~r/documentation references "e:barlib:extra.md#anchor" but barlib cannot be found in deps/
+    end
+
     test "filtered module", c do
       opts = [filtered_modules: [%ExDoc.ModuleNode{module: :lists, id: "lists"}]]
 
