@@ -38,7 +38,6 @@
 .top-search .search-bar .search-input:focus {
   border: 1px solid var(--searchBarFocusColor);
   border-radius: 8px;
-  height: 48px;
   position: relative;
   box-shadow: 0px 4px 20px 0px var(--searchBarBorderColor) inset;
 }
@@ -81,7 +80,7 @@
   padding: 5px 1px 5px 0;
   position: absolute;
   transform: scaleY(0);
-  top: calc(50% - 11px);
+  top: calc(50% - 13px);
   transition: 0.15s transform ease-out;
   z-index: 99;
 }

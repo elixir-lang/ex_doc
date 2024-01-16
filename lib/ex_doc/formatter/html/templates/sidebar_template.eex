@@ -75,7 +75,7 @@
           <form class="search-bar" action="search.html">
             <label class="search-label">
               <span class="sr-only">Search documentation of <%= config.project %></span>
-              <input name="q" type="text" class="search-input" placeholder="Search Documentation (press /)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
             </label>
             <button type="submit" class="search-button" aria-label="Submit Search">
               <i class="ri-search-2-line ri-lg" aria-hidden="true" title="Submit search"></i>
