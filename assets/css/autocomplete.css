@@ -64,11 +64,11 @@
   font-size: 0.9rem;
 }
 
-.autocomplete-suggestion:first-child() {
+.autocomplete-suggestion:first-child {
   border-top: 1px solid var(--suggestionBorder);
 }
 
-.autocomplete-suggestion:last-child() {
+.autocomplete-suggestion:last-child {
   border-bottom: 0;
 }
 
