@@ -6,7 +6,7 @@ import { escapeRegexModifiers, escapeHtmlEntities, isBlank } from '../helpers'
  * @type {Object}
  * @property {String} link URL of the relevant documentation page.
  * @property {String} title A title of the documentation page.
- * @property {String|null} label A short text describing suggestion type (to be displayed alongside title).
+ * @property {String|null} labels A list with short texts describing suggestion type (to be displayed alongside title).
  * @property {String|null} description An additional information (to be displayed below the title).
  * @property {Number} matchQuality How well the suggestion matches the given query string.
  * @property {String} category The group of suggestions that the suggestion belongs to.
@@ -36,13 +36,13 @@ export function getSuggestions (query, limit = 8) {
   const nodes = getSidebarNodes()
 
   const suggestions = [
-    ...findSuggestionsInTopLevelNodes(nodes.modules, query, SUGGESTION_CATEGORY.module),
+    ...findSuggestionsInTopLevelNodes(nodes.modules, query, SUGGESTION_CATEGORY.module, 'module'),
     ...findSuggestionsInChildNodes(nodes.modules, query, SUGGESTION_CATEGORY.moduleChild),
-    ...findSuggestionsInTopLevelNodes(nodes.tasks, query, SUGGESTION_CATEGORY.mixTask),
-    ...findSuggestionsInTopLevelNodes(nodes.extras, query, SUGGESTION_CATEGORY.extra),
-    ...findSuggestionsInSectionsOfNodes(nodes.modules, query, SUGGESTION_CATEGORY.section),
-    ...findSuggestionsInSectionsOfNodes(nodes.tasks, query, SUGGESTION_CATEGORY.section),
-    ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section)
+    ...findSuggestionsInTopLevelNodes(nodes.tasks, query, SUGGESTION_CATEGORY.mixTask, 'mix task'),
+    ...findSuggestionsInTopLevelNodes(nodes.extras, query, SUGGESTION_CATEGORY.extra, 'page'),
+    ...findSuggestionsInSectionsOfNodes(nodes.modules, query, SUGGESTION_CATEGORY.section, 'module'),
+    ...findSuggestionsInSectionsOfNodes(nodes.tasks, query, SUGGESTION_CATEGORY.section, 'mix task'),
+    ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section, 'page')
   ].filter(suggestion => suggestion !== null)
 
   return sort(suggestions).slice(0, limit)
@@ -51,8 +51,8 @@ export function getSuggestions (query, limit = 8) {
 /**
  * Finds suggestions in top level sidebar nodes.
  */
-function findSuggestionsInTopLevelNodes (nodes, query, category) {
-  return nodes.map(node => nodeSuggestion(node, query, category))
+function findSuggestionsInTopLevelNodes (nodes, query, category, label) {
+  return nodes.map(node => nodeSuggestion(node, query, category, label))
 }
 
 /**
@@ -76,10 +76,10 @@ function findSuggestionsInChildNodes (nodes, query, category) {
 /**
  * Finds suggestions in the sections of the given parent nodes.
  */
-function findSuggestionsInSectionsOfNodes (nodes, query, category) {
+function findSuggestionsInSectionsOfNodes (nodes, query, category, label) {
   return nodes.flatMap(node =>
     nodeSections(node).map(section => {
-      return nodeSectionSuggestion(node, section, query, category)
+      return nodeSectionSuggestion(node, section, query, category, label)
     })
   )
 }
@@ -95,16 +95,16 @@ function nodeSections (node) {
  * Builds a suggestion for a top level node.
  * Returns null if the node doesn't match the query.
  */
-function nodeSuggestion (node, query, category) {
+function nodeSuggestion (node, query, category, label) {
   if (!matchesAll(node.title, query)) { return null }
 
   return {
     link: `${node.id}.html`,
     title: highlightMatches(node.title, query),
-    label: null,
     description: null,
     matchQuality: matchQuality(node.title, query),
     deprecated: node.deprecated,
+    labels: [label],
     category
   }
 }
@@ -119,7 +119,7 @@ function childNodeSuggestion (childNode, parentId, query, category, label) {
   return {
     link: `${parentId}.html#${childNode.anchor}`,
     title: highlightMatches(childNode.id, query),
-    label,
+    labels: [label],
     description: parentId,
     matchQuality: matchQuality(childNode.id, query),
     deprecated: childNode.deprecated,
@@ -130,15 +130,15 @@ function childNodeSuggestion (childNode, parentId, query, category, label) {
 /**
  * Builds a suggestion for a node section.
  */
-function nodeSectionSuggestion (node, section, query, category) {
+function nodeSectionSuggestion (node, section, query, category, label) {
   if (!matchesAny(section.id, query)) { return null }
 
   return {
     link: `${node.id}.html#${section.anchor}`,
     title: highlightMatches(section.id, query),
-    label: null,
     description: node.title,
     matchQuality: matchQuality(section.id, query),
+    labels: [label, "section"],
     category
   }
 }

@@ -13,14 +13,14 @@
       <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
         <div class="title">
           {{# if deprecated }}
-            <s><span translate="no">{{{title}}}</span></s>
+            <s><span class="header" translate="no">{{{title}}}</span></s>
           {{ else }}
-            <span translate="no">{{{title}}}</span>
+            <span class="header" translate="no">{{{title}}}</span>
           {{/if}}
 
-          {{#if label}}
-            <span class="label">{{label}}</span>
-          {{/if}}
+          {{#each labels}}
+            <span class="label">{{this}}</span>
+          {{/each}}
         </div>
 
         {{#if description}}

@@ -93,10 +93,14 @@
   color: var(--autocompleteLabelFont);
   padding: 4px 8px 4px 8px;
   border-radius: 4px;
-  margin-left: 10px;
+  margin-left: 5px;
   text-transform: uppercase;
   font-family: var(--sansFontFamily);
   font-size: 0.7rem;
+}
+
+.autocomplete-suggestion .header {
+  margin-right: 5px;
 }
 
 .autocomplete-suggestion .title,
