@@ -138,7 +138,7 @@ function nodeSectionSuggestion (node, section, query, category, label) {
     title: highlightMatches(section.id, query),
     description: node.title,
     matchQuality: matchQuality(section.id, query),
-    labels: [label, "section"],
+    labels: [label, 'section'],
     category
   }
 }
