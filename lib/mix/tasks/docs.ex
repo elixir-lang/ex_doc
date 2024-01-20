@@ -127,10 +127,10 @@ defmodule Mix.Tasks.Docs do
     * `:language` - Identify the primary language of the documents, its value must be
       a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
 
-    * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
-      The image size will be 64x64. When specified, the logo will be placed under
-      the "assets" directory in the output path under the name "logo" and the
-      appropriate extension.
+    * `:logo` - Path to a logo image file for the project. Must be PNG, JPEG or SVG.
+      The image should be square; it will be shown at 48x48px. When specified, the
+      logo will be placed in the "assets" directory in the output path with the
+      name "logo" and the appropriate extension.
 
     * `:main` - Main page of the documentation. It may be a module or a
       generated page, like "Plug" or "api-reference"; default: "api-reference".

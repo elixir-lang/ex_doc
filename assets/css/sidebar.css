@@ -53,7 +53,8 @@
 }
 
 .sidebar .sidebar-projectImage img {
-  max-width: 48px;
+  width: 48px;
+  height: auto;
   max-height: 48px;
 }
 
