@@ -140,13 +140,13 @@ describe('getSuggestions', () => {
     it('marks callbacks with a special label', () => {
       const firstResult = getSuggestions('get_by')[0]
 
-      expect(firstResult.label).to.eql('callback')
+      expect(firstResult.labels).to.eql(['callback'])
     })
 
     it('marks types with a special label', () => {
       const firstResult = getSuggestions('has_many')[0]
 
-      expect(firstResult.label).to.eql('type')
+      expect(firstResult.labels).to.eql(['type'])
     })
 
     it('includes module name in function description', () => {
