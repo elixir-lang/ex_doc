@@ -174,9 +174,8 @@ defmodule ExDoc.CLI do
           --homepage-url  URL to link to for the site name
           --language      Identify the primary language of the documents, its value must be
                           a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
-      -l, --logo          Path to a logo image for the project. Must be PNG, JPEG or SVG.
-                          The image should be square; it will be shown at 48x48px.
-                          The image file will be copied to the output assets directory.
+      -l, --logo          Path to a logo image for the project. Must be PNG, JPEG or SVG. The image will
+                          be placed in the output "assets" directory.
       -m, --main          The entry-point page in docs, default: "api-reference"
       -o, --output        Path to output docs, default: "doc"
           --package       Hex package name
