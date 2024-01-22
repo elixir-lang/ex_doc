@@ -300,7 +300,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       config = doc_config(context, logo: "README.md")
 
       assert_raise ArgumentError,
-                   "image format not recognized, allowed formats are: .jpg, .png",
+                   "image format not recognized, allowed formats are: .png, .jpg, .svg",
                    fn -> generate_docs(config) end
     end
   end

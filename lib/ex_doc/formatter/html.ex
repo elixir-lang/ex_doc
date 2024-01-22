@@ -560,14 +560,14 @@ defmodule ExDoc.Formatter.HTML do
       |> Path.extname()
       |> String.downcase()
 
-    if extname in ~w(.png .jpg .svg) do
+    if extname in ~w(.png .jpg .jpeg .svg) do
       filename = Path.join(dir, "#{name}#{extname}")
       target = Path.join(output, filename)
       File.mkdir_p!(Path.dirname(target))
       File.copy!(image, target)
       [filename]
     else
-      raise ArgumentError, "image format not recognized, allowed formats are: .jpg, .png"
+      raise ArgumentError, "image format not recognized, allowed formats are: .png, .jpg, .svg"
     end
   end
 
