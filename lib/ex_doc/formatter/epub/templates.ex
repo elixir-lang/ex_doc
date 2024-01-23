@@ -3,7 +3,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
 
   require EEx
 
-  import ExDoc.Utils, only: [before_closing_body_tag: 2, before_closing_head_tag: 2]
+  import ExDoc.Utils, only: [before_closing_body_tag: 2, before_closing_head_tag: 2, h: 1]
 
   alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates, as: H

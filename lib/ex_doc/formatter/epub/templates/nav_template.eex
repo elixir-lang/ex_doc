@@ -4,15 +4,15 @@
       <ol>
         <%= for {title, extras} <- config.extras do %>
           <%= if title do %>
-          <li><span><%= title %></span>
-            <ol>
+            <li><span><%=h to_string(title) %></span>
+              <ol>
           <% end %>
           <%= for extra <- extras do %>
-            <li><a href="<%= extra.id %>.xhtml"><%= extra.title %></a></li>
+              <li><a href="<%= URI.encode extra.id %>.xhtml"><%=h extra.title %></a></li>
           <% end %>
           <%= if title do %>
-            </ol>
-          </li>
+              </ol>
+            </li>
           <% end %>
         <% end %>
 

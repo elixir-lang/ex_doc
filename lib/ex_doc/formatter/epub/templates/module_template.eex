@@ -5,7 +5,7 @@
 
     <%= if deprecated = module.deprecated do %>
       <div class="deprecated">
-        This <%= module.type %> is deprecated. <%= ExDoc.Utils.h(deprecated) %>.
+        This <%= module.type %> is deprecated. <%=h deprecated %>.
       </div>
     <% end %>
 
@@ -24,7 +24,7 @@
 
     <%= for {name, nodes} <- summary, key = HTML.text_to_id(name) do %>
       <section id="<%= key %>" class="details-list">
-        <h1 class="section-heading"><%= name %></h1>
+        <h1 class="section-heading"><%=h to_string(name) %></h1>
         <div class="<%= key %>-list">
           <%= for node <- nodes, do: H.detail_template(node, module) %>
         </div>

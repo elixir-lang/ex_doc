@@ -1,6 +1,6 @@
 <%= head_template(config, %{title: title}) %>
     <h1 id="content">
-      <%= title_content %>
+      <%=h title_content %>
     </h1>
     <%= H.link_headings(content) %>
     <%# Extra content specified by the user (e.g. custom Javascript) %>

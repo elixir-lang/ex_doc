@@ -19,12 +19,12 @@
     <item id="cover" href="title.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
     <%= for {_title, extras} <- config.extras do %>
       <%= for extra <- extras do %>
-        <item id="<%= extra.id %>" href="<%= extra.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+        <item id="<%= URI.encode extra.id %>" href="<%= URI.encode extra.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
       <% end %>
     <% end %>
     <%= for filter <- [:modules, :tasks] do %>
       <%= for node <- nodes[filter] do %>
-        <item id="<%= node.id %>" href="<%= node.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+        <item id="<%= URI.encode node.id %>" href="<%= URI.encode node.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
       <% end %>
     <% end %>
     <%= for static_file <- static_files do %>
@@ -44,12 +44,12 @@
     <itemref idref="nav"/>
     <%= for {_title, extras} <- config.extras do %>
       <%= for extra <- extras do %>
-        <itemref idref="<%= extra.id %>"/>
+        <itemref idref="<%= URI.encode extra.id %>"/>
       <% end %>
     <% end %>
     <%= for filter <- [:modules, :tasks] do %>
       <%= for node <- nodes[filter] do %>
-        <itemref idref="<%= node.id %>"/>
+        <itemref idref="<%= URI.encode node.id %>"/>
       <% end %>
     <% end %>
   </spine>
