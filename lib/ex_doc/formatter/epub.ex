@@ -22,7 +22,12 @@ defmodule ExDoc.Formatter.EPUB do
       tasks: HTML.filter_list(:task, project_nodes)
     }
 
-    extras = config |> HTML.build_extras(".xhtml") |> group_extras()
+    extras =
+      config
+      |> HTML.build_extras(".xhtml")
+      |> Enum.chunk_by(& &1.group)
+      |> Enum.map(&{hd(&1).group, &1})
+
     config = %{config | extras: extras}
 
     assets_dir = "OEBPS/assets"
@@ -84,23 +89,6 @@ defmodule ExDoc.Formatter.EPUB do
   defp generate_nav(config, nodes) do
     content = Templates.nav_template(config, nodes)
     File.write("#{config.output}/OEBPS/nav.xhtml", content)
-  end
-
-  defp group_extras(extras) do
-    {extras_by_group, groups} =
-      extras
-      |> Enum.with_index()
-      |> Enum.reduce({%{}, %{}}, fn {x, index}, {extras_by_group, groups} ->
-        group = if x.group != "", do: x.group, else: "Extras"
-        extras_by_group = Map.update(extras_by_group, group, [x], &[x | &1])
-        groups = Map.put_new(groups, group, index)
-        {extras_by_group, groups}
-      end)
-
-    groups
-    |> Map.to_list()
-    |> List.keysort(1)
-    |> Enum.map(fn {k, _} -> {k, Enum.reverse(Map.get(extras_by_group, k))} end)
   end
 
   defp generate_title(config) do
