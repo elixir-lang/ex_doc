@@ -111,6 +111,20 @@ defmodule ExDoc.Formatter.EPUB.Templates do
 
   EEx.function_from_file(
     :defp,
+    :nav_grouped_modules_template,
+    Path.expand("templates/nav_grouped_modules_template.eex", __DIR__),
+    [:name, :nodes, :config],
+    trim: true
+  )
+
+  defp get_node_info(nodes, mod_name) do
+    module_name = mod_name |> to_string() |> String.replace("Elixir.", "")
+
+    Map.fetch!(nodes, module_name)
+  end
+
+  EEx.function_from_file(
+    :defp,
     :toc_item_template,
     Path.expand("templates/toc_item_template.eex", __DIR__),
     [:nodes],

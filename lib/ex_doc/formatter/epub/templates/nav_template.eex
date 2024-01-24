@@ -16,7 +16,11 @@
           <% end %>
         <% end %>
 
-        <%= nav_item_template "Modules", nodes.modules %>
+        <%= if Enum.empty?(config.groups_for_modules) do %>
+          <%= nav_item_template "Modules", nodes.modules %>
+        <% else %>
+          <%= nav_grouped_modules_template "Modules", nodes.modules, config %>
+        <% end %>
         <%= nav_item_template "Mix Tasks", nodes.tasks %>
       </ol>
     </nav>
