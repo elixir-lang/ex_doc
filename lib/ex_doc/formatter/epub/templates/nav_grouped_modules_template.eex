@@ -6,8 +6,10 @@
       <li><span><%= h to_string(title) %></span>
         <ol>
     <% end %>
-    <%= for module_name <- modules do %>
-      <% node = get_node_info(nodes, module_name) %>
+    <%= for node <- Enum.map(modules, fn module ->
+        module = module |> to_string() |> String.replace("Elixir.", "")
+        Map.fetch!(nodes, module)
+      end) do %>
       <li><a href="<%= URI.encode node.id %>.xhtml"><%=h node.title %></a></li>
     <% end %>
     <%= if title do %>

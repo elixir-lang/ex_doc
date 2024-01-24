@@ -117,12 +117,6 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     trim: true
   )
 
-  defp get_node_info(nodes, mod_name) do
-    module_name = mod_name |> to_string() |> String.replace("Elixir.", "")
-
-    Map.fetch!(nodes, module_name)
-  end
-
   EEx.function_from_file(
     :defp,
     :toc_item_template,
