@@ -9,8 +9,6 @@
 
   --links:                       var(--black);
   --linksVisited:                var(--black);
-  --linksNoUnderline:            var(--mainDark);
-  --linksNoUnderlineVisited:     var(--mainDarkest);
   --linksDecoration:             var(--gray450);
 
   --iconAction:                  var(--coldGray);

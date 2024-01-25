@@ -4,7 +4,15 @@
   --mainDarkest:   hsl(0, 100%, 24%);
   --mainLight:     hsl(0, 100%, 64%);
   --mainLightest:  hsl(0, 100%, 74%);
-  --searchBarFocusColor: hsl(0, 100%, 50%);
+
+  --searchBarFocusColor:  hsl(0, 100%, 50%);
   --searchBarBorderColor: rgb(255, 71, 71, 0.1);
 
+  --linksNoUnderline:            #0969da;
+  --linksNoUnderlineVisited:     #085fc4;
+}
+
+body.dark {
+  --linksNoUnderline:            #71b7ff;
+  --linksNoUnderlineVisited:     #65a4e5;
 }
