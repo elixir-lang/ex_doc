@@ -28,15 +28,14 @@
 
 .tabset-tab[aria-selected=true] {
   border-bottom-color: var(--tabBackground);
-  border-top-color: var(--main-lightened-05);
+  border-top-color: var(--mainLight);
   box-shadow: none;
 }
 
 /* Keyboard navigation focus state (increased contrast) */
 .tabset-tab[aria-selected=true]:focus-visible {
-  background-color: var(--main-lightened-05);
-  border-color: var(--main-lightened-05);
-  border-top-color: var(--main);
+  background-color: var(--mainLight);
+  border-color: var(--mainLight);
   color: var(--white); /* light works best for both light and dark themes given background colors */
 }
 

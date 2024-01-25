@@ -53,7 +53,7 @@
 
   .page-cheatmd .content-inner h3 {
     font-weight: bold;
-    color: var(--main-darkened-10);
+    color: var(--mainDark);
   }
 
   .page-cheatmd .content-inner h3::after {

@@ -1,9 +1,9 @@
 :root {
-  --main:               hsl(250, 68%, 69%); /* purple 600 */
-  --main-darkened-10:   hsl(250, 68%, 59%);
-  --main-darkened-20:   hsl(250, 68%, 49%);
-  --main-lightened-05:  hsl(250, 68%, 74%);
-  --main-lightened-10:  hsl(250, 68%, 79%);
+  --main:          hsl(250, 68%, 69%); /* purple 600 */
+  --mainDark:      hsl(250, 68%, 59%);
+  --mainDarkest:   hsl(250, 68%, 49%);
+  --mainLight:     hsl(250, 68%, 74%);
+  --mainLightest:  hsl(250, 68%, 79%);
   --searchBarFocusColor: #8E7CE6;
   --searchBarBorderColor: rgba(142, 124, 230, 0.25);
 }
