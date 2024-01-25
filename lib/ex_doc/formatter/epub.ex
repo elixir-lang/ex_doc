@@ -87,6 +87,11 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_nav(config, nodes) do
+    nodes =
+      Map.update!(nodes, :modules, fn modules ->
+        modules |> Enum.chunk_by(& &1.group) |> Enum.map(&{hd(&1).group, &1})
+      end)
+
     content = Templates.nav_template(config, nodes)
     File.write("#{config.output}/OEBPS/nav.xhtml", content)
   end

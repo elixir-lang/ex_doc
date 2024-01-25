@@ -111,6 +111,14 @@ defmodule ExDoc.Formatter.EPUB.Templates do
 
   EEx.function_from_file(
     :defp,
+    :nav_grouped_item_template,
+    Path.expand("templates/nav_grouped_item_template.eex", __DIR__),
+    [:nodes],
+    trim: true
+  )
+
+  EEx.function_from_file(
+    :defp,
     :toc_item_template,
     Path.expand("templates/toc_item_template.eex", __DIR__),
     [:nodes],

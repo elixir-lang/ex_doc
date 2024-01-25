@@ -131,7 +131,7 @@ defmodule ExDoc.Formatter.HTMLTest do
         generate_docs(doc_config(context, skip_undefined_reference_warnings_on: []))
       end)
 
-    assert out =~ ~s| documentation references function \"Warnings.bar/0\" but|
+    assert out =~ ~s|documentation references function "Warnings.bar/0" but|
 
     # TODO: remove check when we require Elixir v1.16
     if Version.match?(System.version(), ">= 1.16.0-rc") do
