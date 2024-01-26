@@ -1,15 +1,16 @@
 :root {
   --background:                  var(--white);
   --contrast:                    var(--black);
-  --textBody:                    var(--gray700);
-  --textHeaders:                 var(--gray800);
+  --textBody:                    var(--gray800);
+  --textHeaders:                 var(--gray900);
+  --textDetailAccent:            var(--mainLight);
   --textDetailBackground:        var(--coldGrayFaint);
-  --textFooter:                  var(--gray600);
+  --textFooter:                  var(--gray700);
 
   --links:                       var(--black);
   --linksVisited:                var(--black);
-  --linksNoUnderline:            var(--main-darkened-10);
-  --linksNoUnderlineVisited:     var(--main-darkened-20);
+  --linksNoUnderline:            var(--mainDark);
+  --linksNoUnderlineVisited:     var(--mainDarkest);
   --linksDecoration:             var(--gray450);
 
   --iconAction:                  var(--coldGray);
@@ -58,7 +59,7 @@
   --tabShadow:                   var(--gray25);
 
   --bottomActionsBtnBorder:      var(--black-opacity-10);
-  --bottomActionsBtnSubheader:   var(--main-darkened-10);
+  --bottomActionsBtnSubheader:   var(--mainDark);
 
   --modalBackground:             var(--white);
 
@@ -86,8 +87,8 @@
   --sidebarSubheadings:          var(--gray400);
   --sidebarItem:                 var(--gray200);
   --sidebarInactiveItemMarker:   var(--gray600);
-  --sidebarLanguageAccentBar:    var(--main);
-  --sidebarActiveItem:           var(--main-lightened-10);
+  --sidebarLanguageAccentBar:    var(--mainLight);
+  --sidebarActiveItem:           var(--mainLightest);
   --searchBarBorder:             var(--gray200);
   --searchAccentMain:            var(--gray-400);
   --searchLanguageAccentBar:     var(--main);
@@ -96,10 +97,10 @@
   --autocompleteHover:           var(--grey50, #F0F5F9);
   --autocompleBackground:        var(--white); 
   --suggestionBorder:            var(--gray200);
-  --autocompleteResults:         var(--gray500);
-  --autocompleteResultsBold:     var(--gray700);
+  --autocompleteResults:         var(--gray600);
+  --autocompleteResultsBold:     var(--gray800);
   --autocompleteSrollbarThumb:   var(--gray200);
   --autocompleteSrollbarTrack:   var(--gray50);
   --autocompleteLabelBack:       var(--gray100);
-  --autocompleteLabelFont:       var(--gray500);
+  --autocompleteLabelFont:       var(--gray600);
 }

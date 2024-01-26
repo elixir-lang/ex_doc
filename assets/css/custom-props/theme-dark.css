@@ -3,13 +3,14 @@ body.dark {
   --contrast:                    var(--white);
   --textBody:                    var(--gray200);
   --textHeaders:                 var(--gray100);
+  --textDetailAccent:            var(--mainLight);
   --textDetailBackground:        var(--gray700);
   --textFooter:                  var(--gray300);
 
   --links:                       var(--gray100);
   --linksVisited:                var(--gray100);
-  --linksNoUnderline:            var(--main-lightened-10);
-  --linksNoUnderlineVisited:     var(--main-lightened-05);
+  --linksNoUnderline:            var(--mainLightest);
+  --linksNoUnderlineVisited:     var(--mainLight);
   --linksDecoration:             var(--gray450);
 
   --iconAction:                  var(--coldGray-lightened-10);
@@ -37,7 +38,7 @@ body.dark {
   --tipHeadingBackground:        hsl(158,  35%,  17%);
   --tipHeading:                  var(--white);
 
-  --fnSpecAttr:                  var(--gray500);
+  --fnSpecAttr:                  var(--gray400);
   --fnDeprecated:                var(--yellowDark);
   --blink:                       var(--gray600);
 
@@ -58,7 +59,7 @@ body.dark {
   --tabShadow:                   var(--black);
 
   --bottomActionsBtnBorder:      var(--white-opacity-10);
-  --bottomActionsBtnSubheader:   var(--main);
+  --bottomActionsBtnSubheader:   var(--mainLight);
 
   --modalBackground:             var(--gray800);
 
@@ -86,11 +87,10 @@ body.dark {
   --sidebarSubheadings:          var(--gray400);
   --sidebarItem:                 var(--gray200);
   --sidebarInactiveItemMarker:   var(--gray600);
-  --sidebarLanguageAccentBar:    var(--main);
-  --sidebarActiveItem:           var(--main-lightened-10);
+  --sidebarLanguageAccentBar:    var(--mainLight);
+  --sidebarActiveItem:           var(--mainLightest);
   --searchBarBorder:             var(--gray500);
   --searchAccentMain:            var(--gray300);
-  --searchLanguageAccentBar:     var(--main);
   --searchSearch:                var(--gray900);
   --autocompleteBorder:          rgba(0,0,0,.25);
   --autocompleteHover:           var(--gray700);
