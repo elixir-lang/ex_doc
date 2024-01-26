@@ -5,15 +5,11 @@
         <%= nav_grouped_item_template config.extras  %>
 
         <%= unless Enum.empty?(nodes.modules) do %>
-        <li>
-          <ol>
-            <li><span>Modules</span>
-              <ol>
-              <%= nav_grouped_item_template nodes.modules  %>
-              </ol>
-            </li>
-          </ol>
-        </li>
+          <li><span>Modules</span>
+            <ol>
+            <%= nav_grouped_item_template nodes.modules  %>
+            </ol>
+          </li>
         <% end %>
         <%= nav_item_template "Mix Tasks", nodes.tasks %>
       </ol>
