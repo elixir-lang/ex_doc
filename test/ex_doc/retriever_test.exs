@@ -91,6 +91,48 @@ defmodule ExDoc.RetrieverTest do
       assert %{id: "baz/0", group: :"Group 2"} = baz
     end
 
+    test "function annotations", c do
+      elixirc(c, ~S"""
+      defmodule A do
+        def foo(), do: :ok
+      end
+      """)
+
+      {[mod], []} =
+        Retriever.docs_from_modules([A], %ExDoc.Config{
+          annotations_for_docs: fn metadata ->
+            [metadata[:module], metadata[:name], metadata[:arity], metadata[:kind]]
+          end
+        })
+
+      [foo] = mod.docs
+      assert foo.id == "foo/0"
+      assert foo.annotations == [A, :foo, 0, :function]
+    end
+
+    test "function annotations override", c do
+      elixirc(c, ~S"""
+      defmodule A do
+        @doc module: B
+        @doc name: :bar
+        @doc arity: 1
+        @doc kind: :type
+        def foo(), do: :ok
+      end
+      """)
+
+      {[mod], []} =
+        Retriever.docs_from_modules([A], %ExDoc.Config{
+          annotations_for_docs: fn metadata ->
+            [metadata[:module], metadata[:name], metadata[:arity], metadata[:kind]]
+          end
+        })
+
+      [foo] = mod.docs
+      assert foo.id == "foo/0"
+      assert foo.annotations == [B, :bar, 1, :type]
+    end
+
     test "custom function annotations", c do
       elixirc(c, ~S"""
       defmodule A do
