@@ -62,7 +62,9 @@ defmodule Mix.Tasks.Docs do
   be lazily executed.
 
     * `:annotations_for_docs` - a function that receives metadata and returns a list
-      of annotations to be added to the signature.
+      of annotations to be added to the signature. The metadata received will also
+      contain `:module`, `:name`, `:arity` and `:kind` to help identify which entity is
+      currently being processed.
 
     * `:api_reference` - Whether to generate `api-reference.html`; default: `true`.
       If this is set to false, `:main` must also be set.

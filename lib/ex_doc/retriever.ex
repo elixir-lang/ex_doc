@@ -241,6 +241,12 @@ defmodule ExDoc.Retriever do
     doc_file = anno_file(anno, source)
     doc_line = anno_line(anno)
 
+    metadata =
+      Map.merge(
+        %{kind: type, name: name, arity: arity, module: module_data.module},
+        metadata
+      )
+
     source_url =
       source_link(function_data[:source_file], source, function_data.source_line)
 
@@ -255,13 +261,7 @@ defmodule ExDoc.Retriever do
         function_data.doc_fallback.()
 
     group =
-      GroupMatcher.match_function(
-        groups_for_docs,
-        Map.merge(
-          %{kind: type, name: name, arity: arity, module: module_data.module},
-          metadata
-        )
-      )
+      GroupMatcher.match_function(groups_for_docs, metadata)
 
     %ExDoc.FunctionNode{
       id: nil_or_name(name, arity),
@@ -328,6 +328,12 @@ defmodule ExDoc.Retriever do
     source_url =
       source_link(callback_data[:source_file], source, callback_data.source_line)
 
+    metadata =
+      Map.merge(
+        %{kind: kind, name: name, arity: arity, module: module_data.module},
+        metadata
+      )
+
     signature = signature(callback_data.signature)
     specs = callback_data.specs
 
@@ -342,10 +348,7 @@ defmodule ExDoc.Retriever do
     group =
       GroupMatcher.match_function(
         groups_for_docs,
-        Map.merge(
-          %{kind: kind, name: name, arity: arity, module: module_data.module},
-          metadata
-        )
+        metadata
       )
 
     %ExDoc.FunctionNode{
@@ -384,6 +387,12 @@ defmodule ExDoc.Retriever do
 
     type_data = module_data.language.type_data(type_entry, module_data)
 
+    metadata =
+      Map.merge(
+        %{kind: kind, name: name, arity: arity, module: module_data.module},
+        metadata
+      )
+
     source_url =
       source_link(type_data[:source_file], source, type_data.source_line)
 
@@ -401,10 +410,7 @@ defmodule ExDoc.Retriever do
     group =
       GroupMatcher.match_function(
         groups_for_docs,
-        Map.merge(
-          %{kind: kind, name: name, arity: arity, module: module_data.module},
-          metadata
-        )
+        metadata
       )
 
     %ExDoc.TypeNode{
