@@ -116,7 +116,27 @@ defmodule ExDoc.Language.Source do
       ## We use `module_info(:compile)[:source]` to get an absolute path
       ## to the source file and calculate the basedir from that
 
-      module.module_info(:compile)[:source]
+      compile_source =
+        cond do
+          source = module.module_info(:compile)[:source] ->
+            source
+
+          module in :erlang.pre_loaded() ->
+            {:ok, {_, [compile_info: compile_info]}} =
+              :beam_lib.chunks(
+                Application.app_dir(:erts, "ebin/#{module}.beam")
+                |> String.to_charlist(),
+                [:compile_info]
+              )
+
+            compile_info[:source]
+
+          true ->
+            # This should never happen...
+            raise "could not find source or debug info for #{inspect(module)}"
+        end
+
+      compile_source
       |> String.Chars.to_string()
       |> Path.absname()
       |> Path.split()
