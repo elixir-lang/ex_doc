@@ -120,6 +120,7 @@ defmodule ExDoc.Language.Source do
         cond do
           source = module.module_info(:compile)[:source] ->
             source
+
           module in :erlang.pre_loaded() ->
             {:ok, {_, [compile_info: compile_info]}} =
               :beam_lib.chunks(
@@ -129,6 +130,7 @@ defmodule ExDoc.Language.Source do
               )
 
             compile_info[:source]
+
           true ->
             # This should never happen...
             raise "could not find source or debug info for #{inspect(module)}"
