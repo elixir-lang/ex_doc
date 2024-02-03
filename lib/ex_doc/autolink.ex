@@ -224,7 +224,7 @@ defmodule ExDoc.Autolink do
 
   defp remove_and_warn_if_invalid(result, _, _), do: result
 
-  @builtin_ext [".livemd", ".md", ".txt", ""]
+  @builtin_ext [".livemd", ".cheatmd", ".md", ".txt", ""]
 
   defp build_extra_link(link, config) do
     with %{scheme: nil, host: nil, path: path} = uri <- URI.parse(link),
