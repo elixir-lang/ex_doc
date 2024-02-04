@@ -40,9 +40,10 @@ defmodule ExDoc.Mixfile do
       # Add other makeup lexers as optional for the executable
       {:makeup_c, ">= 0.1.1", optional: true},
       {:makeup_html, ">= 0.0.0", only: :dev},
-      {:jason, "~> 1.2", only: :test},
+      {:jason, "~> 1.2"},
       {:floki, "~> 0.0", only: :test},
-      {:easyhtml, "~> 0.0", only: :test}
+      {:easyhtml, "~> 0.0", only: :test},
+      {:httpoison, "~> 2.2"}
     ]
   end
 

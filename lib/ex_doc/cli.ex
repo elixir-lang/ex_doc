@@ -42,7 +42,29 @@ defmodule ExDoc.CLI do
     if List.keymember?(opts, :version, 0) do
       IO.puts("ExDoc v#{ExDoc.version()}")
     else
+      warn_if_newer_ex_doc_is_available()
       generate(args, opts, generator)
+    end
+  end
+
+  defp warn_if_newer_ex_doc_is_available() do
+    case HTTPoison.get!("https://hex.pm/api/packages/ex_doc", [],
+           timeout: 1_000,
+           recv_timeout: 1_000
+         ) do
+      %HTTPoison.Response{status_code: 200, body: body} ->
+        latest_stable_version =
+          body |> Jason.decode!() |> Map.get("latest_stable_version") |> Version.parse!()
+
+        if latest_stable_version > Version.parse!(ExDoc.version()) do
+          IO.warn(
+            "there is a newer stable version of ExDoc available: #{latest_stable_version}",
+            []
+          )
+        end
+
+      _ ->
+        nil
     end
   end
 
