@@ -147,19 +147,14 @@ defmodule ExDoc.Autolink do
     if match?("Elixir." <> _, Atom.to_string(module)) do
       :ex_doc
     else
-      tool_app(app(module), config)
-    end
-  end
+      app = app(module)
+      apps = Enum.uniq(config.apps ++ Keyword.keys(config.deps))
 
-  defp tool_app(app, config) do
-    apps = Enum.uniq(config.apps ++ Keyword.keys(config.deps))
-
-    cond do
-      is_app_otp(app) and app not in apps ->
+      if is_app_otp(app) and app not in apps do
         :otp
-
-      true ->
+      else
         :ex_doc
+      end
     end
   end
 
@@ -303,32 +298,34 @@ defmodule ExDoc.Autolink do
               {extra, "#" <> anchor}
           end
 
-        tool = tool_app(String.to_atom(app), config)
-
-        default_prefix =
-          case tool do
-            :otp ->
-              @otpappdocs
-
-            :ex_doc ->
-              @hexdocs
-          end
-
-        # TODO: In ex_doc_app_url we check if `app in config.apps` and
-        # then don't # link to hexdocs. Should we do the same here?
+        app = String.to_atom(app)
 
         config.deps
-        |> Keyword.get_lazy(String.to_atom(app), fn ->
-          if tool != :otp do
-            maybe_warn(
-              config,
-              "documentation references \"e:#{string}\" but #{app} cannot be found in deps.",
-              nil,
-              %{}
-            )
+        |> Keyword.get_lazy(app, fn ->
+          case Application.load(app) do
+            :ok ->
+              nil
+
+            {:error, {:already_loaded, ^app}} ->
+              nil
+
+            _ ->
+              maybe_warn(
+                config,
+                "documentation references \"e:#{string}\" but #{app} cannot be found.",
+                nil,
+                %{}
+              )
           end
 
-          default_prefix <> "#{app}"
+          prefix =
+            cond do
+              app in config.apps -> ""
+              is_app_otp(app) -> @otpappdocs
+              true -> @hexdocs
+            end
+
+          prefix <> "#{app}"
         end)
         |> String.trim_trailing("/")
         |> Kernel.<>("/" <> convert_extra_extension(extra, config) <> anchor)
