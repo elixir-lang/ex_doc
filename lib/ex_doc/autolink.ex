@@ -104,7 +104,6 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  # TODO: make more generic
   @doc false
   def ex_doc_app_url(module, config, path, ext, suffix) do
     if app = app(module) do

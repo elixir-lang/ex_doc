@@ -98,7 +98,7 @@ defmodule ExDoc.Config do
 
     options =
       if groups_for_functions = options[:groups_for_functions] do
-        # TODO: Deprecate me
+        IO.warn(":groups_for_functions is deprecated, please use :groups_for_docs instead")
         Keyword.put_new(options, :groups_for_docs, groups_for_functions)
       else
         options
@@ -150,7 +150,7 @@ defmodule ExDoc.Config do
   end
 
   defp deprecated?(metadata), do: metadata[:deprecated] != nil
-  defp exception?(metadata), do: metadata[:__doc__] == :exception
+  defp exception?(metadata), do: metadata[:kind] == :exception
 
   defp normalize_nest_modules_by_prefix(nest_modules_by_prefix) do
     nest_modules_by_prefix

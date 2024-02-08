@@ -25,6 +25,7 @@ defmodule ExDoc.Formatter.HTML do
     static_files = generate_assets(config, @assets_dir, default_assets(config))
     search_data = generate_search_data(project_nodes, extras, config)
 
+    # TODO: Move this categorization to the language
     nodes_map = %{
       modules: filter_list(:module, project_nodes),
       tasks: filter_list(:task, project_nodes)
@@ -589,7 +590,6 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  # TODO: Move this categorization to the language
   def filter_list(:module, nodes) do
     Enum.filter(nodes, &(&1.type != :task))
   end

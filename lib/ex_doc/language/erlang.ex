@@ -151,7 +151,8 @@ defmodule ExDoc.Language.Erlang do
           source_line: map.source_line,
           source_file: map.source_file,
           spec: map.attr,
-          signature: signature
+          signature: signature,
+          extra_annotations: []
         }
 
       nil ->
@@ -159,7 +160,8 @@ defmodule ExDoc.Language.Erlang do
           type: kind,
           source_line: Source.anno_line(anno),
           spec: nil,
-          signature: signature
+          signature: signature,
+          extra_annotations: []
         }
     end
   end

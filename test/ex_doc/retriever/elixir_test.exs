@@ -207,6 +207,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert type1.id == "t:type1/0"
       assert type1.signature == "type1()"
       assert type1.type == :type
+      assert type1.group == :Types
       assert type1.annotations == []
       assert type1.doc_line == 2
       assert DocAST.to_string(type1.doc) == "<p>type1/0 docs.</p>"
@@ -215,7 +216,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.signature == "opaque1()"
       assert opaque1.type == :opaque
-      assert opaque1.annotations == ["opaque"]
+      assert opaque1.group == :Types
       assert opaque1.doc_line == 5
       assert opaque1.doc |> DocAST.to_string() == ~s|<p>opaque1/0 docs.</p>|
       assert opaque1.spec |> Macro.to_string() == "opaque1()"

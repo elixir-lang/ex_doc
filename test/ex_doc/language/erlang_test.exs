@@ -107,8 +107,6 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://www.erlang.org/doc/man/array.html#new-0"><code>array:new/0</code></a>|
     end
 
-    # TODO: test callbacks. No support in EDoc, use :docgen_xml_to_chunks.
-
     test "external function", c do
       assert autolink_edoc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) ==
                ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>|

@@ -194,7 +194,8 @@ defmodule ExDoc.Language.Elixir do
       source_line: line,
       source_file: source,
       spec: quoted,
-      signature: signature
+      signature: signature,
+      extra_annotations: []
     }
   end
 
@@ -380,8 +381,6 @@ defmodule ExDoc.Language.Elixir do
   @impl true
   def autolink_spec(ast, opts) do
     config = struct!(Autolink, opts)
-
-    # TODO: re-use ExDoc.Language.Erlang.autolink_spec/2
 
     string =
       ast

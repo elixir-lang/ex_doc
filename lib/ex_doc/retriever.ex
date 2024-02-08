@@ -138,8 +138,8 @@ defmodule ExDoc.Retriever do
     groups_for_docs =
       config.groups_for_docs ++
         [
-          Types: &(&1[:__doc__] == :type),
-          Callbacks: &(&1[:__doc__] == :callback),
+          Types: &(&1[:kind] in [:type, :opaque]),
+          Callbacks: &(&1[:kind] in [:callback, :macrocallback]),
           Functions: fn _ -> true end
         ]
 
@@ -154,7 +154,7 @@ defmodule ExDoc.Retriever do
 
     types = get_types(module_data, source, groups_for_docs, annotations_for_docs)
 
-    metadata = Map.put(metadata, :__doc__, module_data.type)
+    metadata = Map.put(metadata, :kind, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
 
@@ -343,8 +343,6 @@ defmodule ExDoc.Retriever do
 
     doc_ast = doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)
 
-    metadata = Map.put(metadata, :__doc__, :callback)
-
     group =
       GroupMatcher.match_function(
         groups_for_docs,
@@ -396,16 +394,14 @@ defmodule ExDoc.Retriever do
     source_url =
       source_link(type_data[:source_file], source, type_data.source_line)
 
-    annotations = annotations_from_metadata(metadata, module_metadata)
-
     signature = signature(type_data.signature)
 
     annotations =
       annotations_for_docs.(metadata) ++
-        if type_data.type == :opaque, do: ["opaque" | annotations], else: annotations
+        annotations_from_metadata(metadata, module_metadata) ++
+        type_data.extra_annotations
 
     doc_ast = doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)
-    metadata = Map.put(metadata, :__doc__, :type)
 
     group =
       GroupMatcher.match_function(

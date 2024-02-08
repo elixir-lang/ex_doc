@@ -235,6 +235,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert callback1.id == "c:callback1/0"
       assert callback1.type == :callback
       assert callback1.annotations == []
+      assert callback1.group == :Callbacks
       assert DocAST.to_string(callback1.doc) =~ "callback1/0 docs."
       assert Path.basename(callback1.source_url) == "mod.erl:4"
 
@@ -243,6 +244,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert optional_callback1.id == "c:optional_callback1/0"
       assert optional_callback1.type == :callback
+      assert optional_callback1.group == :Callbacks
       assert optional_callback1.annotations == ["optional"]
     end
 
@@ -264,6 +266,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
+      assert opaque1.group == :Types
       assert opaque1.signature == "opaque1()"
       assert opaque1.doc |> DocAST.to_string() =~ "opaque1/0 docs."
 
@@ -272,6 +275,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert type1.id == "t:type1/0"
       assert type1.type == :type
+      assert type1.group == :Types
       assert type1.signature == "type1()"
       assert type1.doc |> DocAST.to_string() =~ "type1/0 docs."
 

@@ -554,7 +554,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~
                ~s[Basic type: <a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\"><code class=\"inline\">atom/0</code></a>.]
 
-      assert content =~ ~r{opaque/0.*<span class="note">\(opaque\)</span>}ms
       assert content =~ ~r{<span class="attribute">@opaque</span> opaque}
     end
 

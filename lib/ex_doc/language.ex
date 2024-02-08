@@ -127,7 +127,8 @@ defmodule ExDoc.Language do
                 source_line: non_neg_integer(),
                 source_file: String.t() | nil,
                 signature: [binary()],
-                spec: spec_ast()
+                spec: spec_ast(),
+                extra_annotations: [String.t()]
               }
 
   @doc """
