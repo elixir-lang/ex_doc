@@ -2,7 +2,6 @@ otp_eep48? = Code.ensure_loaded?(:edoc_doclet_chunks)
 otp_eep59? = Code.ensure_loaded?(:beam_doc)
 
 exclude = [
-  earmark: not ExDoc.Markdown.Earmark.available?(),
   otp_eep48: not otp_eep48?,
   otp_eep59: not otp_eep59?,
   otp_has_docs: not match?({:docs_v1, _, _, _, _, _, _}, Code.fetch_docs(:array))
