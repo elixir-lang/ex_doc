@@ -399,6 +399,23 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://foolib.com/extra.xhtml">extra</a>|
     end
 
+    test "linking to extra otp docs works", c do
+      assert autolink_doc(
+               "[Unicode usage](`e:stdlib:unicode_usage.md`)",
+               c
+             ) ==
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/unicode_usage.html">Unicode usage</a>|
+    end
+
+    test "linking to extra umbrella docs works", c do
+      assert autolink_doc(
+               "[Unicode usage](`e:stdlib:unicode_usage.md`)",
+               c,
+               apps: [:stdlib]
+             ) ==
+               ~s|<a href="stdlib/unicode_usage.html">Unicode usage</a>|
+    end
+
     test "anchor", c do
       assert autolink_doc("[Foo](#baz)", c) ==
                ~s|<a href="#baz">Foo</a>|
@@ -485,7 +502,7 @@ defmodule ExDoc.Language.ErlangTest do
                end,
                line: nil
              ) =~
-               ~r/documentation references "e:barlib:extra.md" but barlib cannot be found in deps/
+               ~r/documentation references "e:barlib:extra.md" but barlib cannot be found/
     end
 
     test "linking to unknown application with anchor does not work", c do
@@ -496,7 +513,7 @@ defmodule ExDoc.Language.ErlangTest do
                end,
                line: nil
              ) =~
-               ~r/documentation references "e:barlib:extra.md#anchor" but barlib cannot be found in deps/
+               ~r/documentation references "e:barlib:extra.md#anchor" but barlib cannot be found/
     end
 
     test "filtered module", c do

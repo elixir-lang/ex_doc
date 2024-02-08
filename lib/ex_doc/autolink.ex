@@ -62,6 +62,7 @@ defmodule ExDoc.Autolink do
 
   @hexdocs "https://hexdocs.pm/"
   @otpdocs "https://www.erlang.org/doc/man/"
+  @otpappdocs "https://www.erlang.org/doc/apps/"
 
   def app_module_url(tool, module, anchor \\ nil, config)
 
@@ -121,8 +122,24 @@ defmodule ExDoc.Autolink do
   end
 
   defp app(module) do
-    {_, app} = app_info(module)
-    app
+    case :code.which(module) do
+      :preloaded ->
+        :erts
+
+      maybe_path ->
+        case :application.get_application(module) do
+          {:ok, app} ->
+            app
+
+          _ ->
+            with true <- is_list(maybe_path),
+                 [_, "ebin", app, "lib" | _] <- maybe_path |> Path.split() |> Enum.reverse() do
+              String.split(app, "-") |> hd() |> String.to_atom()
+            else
+              _ -> nil
+            end
+        end
+    end
   end
 
   @doc false
@@ -130,10 +147,10 @@ defmodule ExDoc.Autolink do
     if match?("Elixir." <> _, Atom.to_string(module)) do
       :ex_doc
     else
-      {otp, app} = app_info(module)
+      app = app(module)
       apps = Enum.uniq(config.apps ++ Keyword.keys(config.deps))
 
-      if otp == true and app not in apps do
+      if is_app_otp(app) and app not in apps do
         :otp
       else
         :ex_doc
@@ -141,30 +158,9 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  defp app_info(module) do
-    case :code.which(module) do
-      :preloaded ->
-        {true, :erts}
-
-      maybe_path ->
-        otp? = is_list(maybe_path) and List.starts_with?(maybe_path, :code.lib_dir())
-
-        app =
-          case :application.get_application(module) do
-            {:ok, app} ->
-              app
-
-            _ ->
-              with true <- is_list(maybe_path),
-                   [_, "ebin", app, "lib" | _] <- maybe_path |> Path.split() |> Enum.reverse() do
-                String.split(app, "-") |> Enum.at(0) |> String.to_atom()
-              else
-                _ -> nil
-              end
-          end
-
-        {otp?, app}
-    end
+  defp is_app_otp(app) do
+    maybe_lib_dir_path = :code.lib_dir(app)
+    is_list(maybe_lib_dir_path) and List.starts_with?(maybe_lib_dir_path, :code.root_dir())
   end
 
   def maybe_warn(config, ref, visibility, metadata) do
@@ -302,16 +298,27 @@ defmodule ExDoc.Autolink do
               {extra, "#" <> anchor}
           end
 
-        config.deps
-        |> Keyword.get_lazy(String.to_atom(app), fn ->
-          maybe_warn(
-            config,
-            "documentation references \"e:#{string}\" but #{app} cannot be found in deps.",
-            nil,
-            %{}
-          )
+        app = String.to_atom(app)
 
-          @hexdocs <> "#{app}"
+        config.deps
+        |> Keyword.get_lazy(app, fn ->
+          if Application.ensure_loaded(app) != :ok do
+            maybe_warn(
+              config,
+              "documentation references \"e:#{string}\" but #{app} cannot be found.",
+              nil,
+              %{}
+            )
+          end
+
+          prefix =
+            cond do
+              app in config.apps -> ""
+              is_app_otp(app) -> @otpappdocs
+              true -> @hexdocs
+            end
+
+          prefix <> "#{app}"
         end)
         |> String.trim_trailing("/")
         |> Kernel.<>("/" <> convert_extra_extension(extra, config) <> anchor)
