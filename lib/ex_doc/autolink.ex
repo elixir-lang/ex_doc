@@ -134,7 +134,7 @@ defmodule ExDoc.Autolink do
           _ ->
             with true <- is_list(maybe_path),
                  [_, "ebin", app, "lib" | _] <- maybe_path |> Path.split() |> Enum.reverse() do
-              String.split(app, "-") |> Enum.at(0) |> String.to_atom()
+              String.split(app, "-") |> hd() |> String.to_atom()
             else
               _ -> nil
             end
@@ -165,7 +165,7 @@ defmodule ExDoc.Autolink do
 
   defp is_app_otp(app) do
     maybe_lib_dir_path = :code.lib_dir(app)
-    is_list(maybe_lib_dir_path) && List.starts_with?(maybe_lib_dir_path, :code.root_dir())
+    is_list(maybe_lib_dir_path) and List.starts_with?(maybe_lib_dir_path, :code.root_dir())
   end
 
   def maybe_warn(config, ref, visibility, metadata) do
