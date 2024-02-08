@@ -302,20 +302,13 @@ defmodule ExDoc.Autolink do
 
         config.deps
         |> Keyword.get_lazy(app, fn ->
-          case Application.load(app) do
-            :ok ->
-              nil
-
-            {:error, {:already_loaded, ^app}} ->
-              nil
-
-            _ ->
-              maybe_warn(
-                config,
-                "documentation references \"e:#{string}\" but #{app} cannot be found.",
-                nil,
-                %{}
-              )
+          if Application.ensure_loaded(app) != :ok do
+            maybe_warn(
+              config,
+              "documentation references \"e:#{string}\" but #{app} cannot be found.",
+              nil,
+              %{}
+            )
           end
 
           prefix =
