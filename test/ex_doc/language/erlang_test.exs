@@ -399,6 +399,14 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://foolib.com/extra.xhtml">extra</a>|
     end
 
+    test "linking to extra otp docs works", c do
+      assert autolink_doc(
+               "[Unicode usage](`e:stdlib:unicode_usage.md`)",
+               c
+             ) ==
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/unicode_usage.html">Unicode usage</a>|
+    end
+
     test "anchor", c do
       assert autolink_doc("[Foo](#baz)", c) ==
                ~s|<a href="#baz">Foo</a>|
