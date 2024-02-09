@@ -21,6 +21,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
     data = search_data(modules, config)
     assert data["content_type"] == "text/markdown"
+    assert data["producer"]["name"] == "ex_doc"
     [item1, item2] = data["items"]
 
     assert item1["ref"] == "SearchFoo.html"

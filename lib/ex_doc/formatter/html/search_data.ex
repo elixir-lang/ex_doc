@@ -15,7 +15,11 @@ defmodule ExDoc.Formatter.HTML.SearchData do
 
     data = %{
       items: items,
-      content_type: content_type
+      content_type: content_type,
+      producer: %{
+        name: "ex_doc",
+        version: Application.spec(:ex_doc)[:vsn]
+      }
     }
 
     ["searchData=" | ExDoc.Utils.to_json(data)]
