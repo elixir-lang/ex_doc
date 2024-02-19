@@ -4,6 +4,10 @@
   border-left: 0;
 }
 
+.content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--black);
+}
+
 .content-inner blockquote.warning {
   background-color: var(--warningBackground);
 }

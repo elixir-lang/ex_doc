@@ -2,6 +2,18 @@
 
 ## Starting with header 3
 
+> ### Just a blockquote.
+>
+> Some `code`.
+>
+> ```elixir
+> foo + bar
+> ```
+>
+> ```text
+> no highlight
+> ```
+
 > ### Header 3 {: .info}
 >
 > #### Header 4
@@ -73,6 +85,14 @@
 > ```
 
 ## Starting with header 4
+
+> #### Just a blockquote.
+>
+> Some `code`.
+>
+> ```erlang
+> Foo + Bar.
+> ```
 
 > #### Header 4 {: .info}
 >
