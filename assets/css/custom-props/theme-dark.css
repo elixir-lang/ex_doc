@@ -46,7 +46,8 @@ body.dark {
   --codeScrollBackground:        var(--codeBorder);
   --admCodeBackground:           var(--gray750);
   --admCodeBorder:               var(--gray600);
-  --admInlineCode:               var(--black);
+  --admCodeColor:                var(--gray100);
+  --admInlineCodeColor:          var(--black);
   --admInlineCodeBackground:     var(--gray25);
   --admInlineCodeBorder:         var(--gray100);
 

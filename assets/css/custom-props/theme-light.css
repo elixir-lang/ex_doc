@@ -46,7 +46,8 @@
   --codeScrollBackground:        var(--codeBorder);
   --admCodeBackground:           var(--gray25);
   --admCodeBorder:               var(--gray100);
-  --admInlineCode:               var(--black);
+  --admCodeColor:                var(--black);
+  --admInlineCodeColor:          var(--black);
   --admInlineCodeBackground:     var(--gray25);
   --admInlineCodeBorder:         var(--gray100);
 

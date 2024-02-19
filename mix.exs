@@ -85,7 +85,7 @@ defmodule ExDoc.Mixfile do
         "README.md",
         "Cheatsheet.cheatmd",
         "CHANGELOG.md"
-      ],
+      ] ++ test_dev_examples(Mix.env()),
       source_ref: "v#{@version}",
       source_url: @source_url,
       groups_for_modules: [
@@ -94,11 +94,17 @@ defmodule ExDoc.Mixfile do
           ExDoc.Markdown.Earmark
         ]
       ],
+      groups_for_extras: [
+        "Examples": ~r"test/examples"
+      ],
       skip_undefined_reference_warnings_on: [
         "CHANGELOG.md"
       ]
     ]
   end
+
+  defp test_dev_examples(:dev), do: Path.wildcard("test/examples/*")
+  defp test_dev_examples(_), do: []
 
   defp clean_test_fixtures(_args) do
     File.rm_rf("test/tmp")

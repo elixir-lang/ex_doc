@@ -94,12 +94,13 @@
 .content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) code {
   background-color: var(--admInlineCodeBackground);
   border: 1px solid var(--admInlineCodeBorder);
-  color: var(--admInlineCode);
+  color: var(--admInlineCodeColor);
 }
 
 .content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) pre code {
   background-color: var(--admCodeBackground);
   border: 1px solid var(--admCodeBorder);
+  color: var(--admCodeColor);
 }
 
 .content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) :is(a, a:visited) {
