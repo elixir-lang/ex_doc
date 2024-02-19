@@ -81,11 +81,12 @@ defmodule ExDoc.Mixfile do
   defp docs do
     [
       main: "readme",
-      extras: [
-        "README.md",
-        "Cheatsheet.cheatmd",
-        "CHANGELOG.md"
-      ] ++ test_dev_examples(Mix.env()),
+      extras:
+        [
+          "README.md",
+          "Cheatsheet.cheatmd",
+          "CHANGELOG.md"
+        ] ++ test_dev_examples(Mix.env()),
       source_ref: "v#{@version}",
       source_url: @source_url,
       groups_for_modules: [
@@ -95,7 +96,7 @@ defmodule ExDoc.Mixfile do
         ]
       ],
       groups_for_extras: [
-        "Examples": ~r"test/examples"
+        Examples: ~r"test/examples"
       ],
       skip_undefined_reference_warnings_on: [
         "CHANGELOG.md"
