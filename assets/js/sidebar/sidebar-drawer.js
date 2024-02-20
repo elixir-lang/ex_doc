@@ -74,6 +74,9 @@ function setDefaultSidebarState () {
     setClass(SIDEBAR_CLASS.opened)
     qs(SIDEBAR_TOGGLE_SELECTOR).setAttribute('aria-expanded', 'true')
   }
+
+  // apply transition after the default state has been set so the animation does not show on initial page load
+  setTimeout(() => qs(SIDEBAR_TOGGLE_SELECTOR).classList.add('sidebar-toggle--animated'), ANIMATION_DURATION)
 }
 
 function isScreenSmall () {
