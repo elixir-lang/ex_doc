@@ -41,14 +41,15 @@ body {
 }
 
 .sidebar-button {
-  --sidebarButtonRightOpen: 4px;
   position: fixed;
   z-index: 200;
   top: 0;
   left: 0;
-  transition: all var(--sidebarTransitionDuration) ease-in-out;
   will-change: transform;
-  margin-top: 10px;
+}
+
+.sidebar-toggle--animated.sidebar-button {
+  transition: transform var(--sidebarTransitionDuration) ease-in-out;
 }
 
 .content {
@@ -73,7 +74,7 @@ body {
 }
 
 body:is(.sidebar-opening, .sidebar-opened) .sidebar-button {
-  transform: translateX(calc(var(--sidebarWidth) - 100% - var(--sidebarButtonRightOpen)));
+  transform: translateX(calc(var(--sidebarWidth) - 100%));
 }
 
 body.sidebar-opening-start .sidebar {
@@ -119,10 +120,6 @@ body.sidebar-closed .sidebar {
 body.sidebar-closed .content {
   width: 100%;
   left: 0;
-}
-
-body.sidebar-closed .sidebar-button {
-  margin: 10px 8px;
 }
 
 @media screen and (max-width: 768px) {
