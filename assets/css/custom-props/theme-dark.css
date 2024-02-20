@@ -14,42 +14,42 @@ body.dark {
   --iconAction:                  var(--coldGray-lightened-10);
   --iconActionHover:             var(--white);
 
-  --blockquoteBackground:        var(--coldGrayDim);
-  --blockquoteBorder:            var(--coldGrayDark);
+  --blockquoteBackground:        var(--coldGray-opacity-10);
+  --blockquoteBorder:            var(--coldGrayDim);
 
   --tableHeadBorder:             var(--gray600);
   --tableBodyBorder:             var(--gray700);
 
-  --warningBackground:           hsl( 40,  67%,  79%);
-  --warningHeadingBackground:    hsl( 27,  66%,  29%);
+  --warningBackground:          hsla( 33,  30%,  60%,  10%);
+  --warningHeadingBackground:   hsla( 33,  66%,  35%,  80%);
   --warningHeading:              var(--white);
-  --errorBackground:             hsl(358,  52%,  78%);
-  --errorHeadingBackground:      hsl(349,  55%,  34%);
+  --errorBackground:            hsla(  7,  30%,  60%,  10%);
+  --errorHeadingBackground:     hsla(  6,  70%,  40%,  80%);
   --errorHeading:                var(--white);
-  --infoBackground:              hsl(222,  57%,  77%);
-  --infoHeadingBackground:       hsl(243,  65%,  26%);
+  --infoBackground:             hsla(206,  30%,  60%,  10%);
+  --infoHeadingBackground:      hsla(213,  55%,  35%,  80%);
   --infoHeading:                 var(--white);
-  --neutralBackground:           hsl(220,  23%,  82%);
-  --neutralHeadingBackground:    hsl(224,  24%,  16%);
+  --neutralBackground:           hsl(210,  30%,  60%,  10%);
+  --neutralHeadingBackground:    var(--gray600);
   --neutralHeading:              var(--white);
-  --tipBackground:               hsl(139,  26%,  69%);
-  --tipHeadingBackground:        hsl(158,  35%,  17%);
+  --tipBackground:              hsla(142,  30%,  60%,  10%);
+  --tipHeadingBackground:       hsla(134,  45%,  30%,  80%);
   --tipHeading:                  var(--white);
 
   --fnSpecAttr:                  var(--gray400);
   --fnDeprecated:                var(--yellowDark);
   --blink:                       var(--gray600);
 
-  --codeBackground:              var(--gray850);
-  --codeBorder:                  var(--gray700);
+  --codeBackground:              var(--gray750);
+  --codeBorder:                  var(--gray600);
   --codeScrollThumb:             var(--gray500);
   --codeScrollBackground:        var(--codeBorder);
   --admCodeBackground:           var(--gray750);
   --admCodeBorder:               var(--gray600);
   --admCodeColor:                var(--gray100);
-  --admInlineCodeColor:          var(--black);
-  --admInlineCodeBackground:     var(--gray25);
-  --admInlineCodeBorder:         var(--gray100);
+  --admInlineCodeColor:          var(--gray100);
+  --admInlineCodeBackground:     var(--gray750);
+  --admInlineCodeBorder:         var(--gray600);
 
   --tabBackground:               var(--gray900);
   --tabBorder:                   var(--gray700);

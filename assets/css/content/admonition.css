@@ -1,11 +1,6 @@
 .content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) {
-  color: var(--black);
   border-radius: 10px;
   border-left: 0;
-}
-
-.content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) :is(h1, h2, h3, h4, h5, h6) {
-  color: var(--black);
 }
 
 .content-inner blockquote.warning {
@@ -105,10 +100,6 @@
   background-color: var(--admCodeBackground);
   border: 1px solid var(--admCodeBorder);
   color: var(--admCodeColor);
-}
-
-.content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) :is(a, a:visited) {
-  color: var(--black);
 }
 
 .content-inner blockquote :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) :is(a, a:visited) {
