@@ -1,4 +1,4 @@
-import { qs } from './helpers'
+import { isMacOS, qs } from './helpers'
 import { toggleSidebar } from './sidebar/sidebar-drawer'
 import { focusSearchInput } from './search-bar'
 import { cycleTheme } from './theme'
@@ -27,6 +27,11 @@ export const keyboardShortcuts = [
   },
   {
     key: '/',
+    action: searchKeyAction
+  },
+  {
+    key: 'k',
+    hasModifier: true,
     action: searchKeyAction
   },
   {
@@ -64,9 +69,20 @@ function addEventListeners () {
 function handleKeyDown (event) {
   if (state.shortcutBeingPressed) { return }
   if (event.target.matches('input, textarea')) { return }
-  if (event.ctrlKey || event.metaKey || event.altKey) { return }
 
-  const matchingShortcut = keyboardShortcuts.find(shortcut => shortcut.key === event.key)
+  const matchingShortcut = keyboardShortcuts.find(shortcut => {
+    if (shortcut.hasModifier) {
+      if (isMacOS() && event.metaKey) { return shortcut.key === event.key }
+      if (event.ctrlKey) { return shortcut.key === event.key }
+
+      return false
+    } else {
+      if (event.ctrlKey || event.metaKey || event.altKey) { return false }
+
+      return shortcut.key === event.key
+    }
+  })
+
   if (!matchingShortcut) { return }
   state.shortcutBeingPressed = matchingShortcut
 

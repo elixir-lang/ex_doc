@@ -159,3 +159,12 @@ export function debounce (fn, milliseconds) {
 export function getProjectNameAndVersion () {
   return document.head.querySelector('meta[name=project][content]').content
 }
+
+/**
+ * Return `true` if the client's OS is MacOS
+ *
+ * @return {Boolean}
+ */
+export function isMacOS () {
+  return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
+}
