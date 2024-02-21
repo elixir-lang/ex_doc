@@ -4,7 +4,7 @@
 
 > ### Just a blockquote.
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```elixir
 > foo + bar
@@ -18,7 +18,7 @@
 >
 > #### Header 4
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```elixir
 > foo + bar
@@ -32,7 +32,8 @@
 >
 > #### Header 4
 >
-> Some `code`.
+> Some `code` and a [link](#).
+>
 >
 > ```elixir
 > foo + bar
@@ -46,7 +47,7 @@
 >
 > #### Header 4
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```elixir
 > foo + bar
@@ -60,7 +61,7 @@
 >
 > #### Header 4
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```elixir
 > foo + bar
@@ -74,7 +75,7 @@
 >
 > #### Header 4
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```elixir
 > foo + bar
@@ -88,7 +89,7 @@
 
 > #### Just a blockquote.
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```erlang
 > Foo + Bar.
@@ -96,7 +97,7 @@
 
 > #### Header 4 {: .info}
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```erlang
 > Foo + Bar.
@@ -104,7 +105,7 @@
 
 > #### Header 4 {: .tip}
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```erlang
 > Foo + Bar.
@@ -112,7 +113,7 @@
 
 > #### Header 4 {: .neutral}
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```erlang
 > Foo + Bar.
@@ -120,7 +121,7 @@
 
 > #### Header 4 {: .warning}
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```erlang
 > Foo + Bar.
@@ -128,9 +129,8 @@
 
 > #### Header 4 {: .error}
 >
-> Some `code`.
+> Some `code` and a [link](#).
 >
 > ```erlang
 > Foo + Bar.
 > ```
-

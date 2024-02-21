@@ -36,6 +36,7 @@
   --coldGrayLight:           hsl(240,   5%,  88%      );
   --coldGray-lightened-10:   hsl(240,   5%,  56%      );
   --coldGray:                hsl(240,   5%,  46%      );
+  --coldGray-opacity-10:    hsla(240,   5%,  46%,  10%);
   --coldGrayDark:            hsl(240,   5%,  28%      );
   --coldGrayDim:             hsl(240,   5%,  18%      );
   --yellowLight:             hsl( 60, 100%,  81%      );
