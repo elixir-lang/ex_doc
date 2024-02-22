@@ -122,7 +122,28 @@ body.sidebar-closed .content {
   left: 0;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (hover: hover) and (max-width: 768px) {
+  body.sidebar-opening .content {
+    left: 0;
+    width: 100%;
+  }
+
+  body.sidebar-closed .sidebar-button {
+    position: absolute;
+    top: 14px;
+  }
+
+  body.sidebar-closed .sidebar-button.fixed {
+    position: fixed;
+    padding: 16px 12px 18px 19px;
+  }
+
+  body.sidebar-closed .sidebar-button.fixed-top {
+    position: fixed;
+  }
+}
+
+@media screen and (hover: none) {
   .content,
   body.sidebar-opening .content {
     left: 0;
@@ -137,6 +158,7 @@ body.sidebar-closed .content {
 
   body.sidebar-closed .sidebar-button {
     position: absolute;
+    top: 14px;
   }
 
   .sm-fixed {
