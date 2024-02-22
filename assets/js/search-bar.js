@@ -7,7 +7,7 @@ import {
   AUTOCOMPLETE_CONTAINER_SELECTOR,
   AUTOCOMPLETE_SUGGESTION_SELECTOR
 } from './autocomplete/autocomplete-list'
-import { qs } from './helpers'
+import { isMacOS, qs } from './helpers'
 
 const SEARCH_INPUT_SELECTOR = 'form.search-bar input'
 const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-bar .search-close-button'
@@ -136,10 +136,6 @@ function clearSearch () {
 function hideAutocomplete () {
   document.body.classList.remove('search-focused')
   hideAutocompleteList()
-}
-
-function isMacOS () {
-  return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
 }
 
 let lastScrollTop = window.scrollY
