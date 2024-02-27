@@ -207,20 +207,13 @@ defmodule ExDoc.Language.Source do
     |> Map.new()
   end
 
-  def get_optional_callbacks(module, type) do
-    optional_callbacks =
-      type == :behaviour &&
-        try do
-          module.behaviour_info(:optional_callbacks)
-        rescue
-          FunctionClauseError -> :undefined
-        end
-
-    case optional_callbacks do
-      :undefined -> []
-      _ -> optional_callbacks
-    end
+  def get_optional_callbacks(module, :behaviour) do
+    module.behaviour_info(:optional_callbacks)
+  rescue
+    FunctionClauseError -> []
   end
+
+  def get_optional_callbacks(_module, _type), do: []
 
   def find_ast(ast, source_basedir, fun) do
     filtermap_ast(ast, source_basedir, fun) |> hd()
