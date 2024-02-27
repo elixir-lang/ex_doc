@@ -453,7 +453,8 @@ defmodule ExDoc.Language.Elixir do
 
   def get_impls(module) do
     for behaviour <- behaviours_implemented_by(module),
-        {callback, _} <- Source.get_callbacks(Source.get_abstract_code(behaviour), ""),
+        abstract_code = Source.get_abstract_code(behaviour),
+        {callback, _} <- Source.get_callbacks(abstract_code, ""),
         do: {callback, behaviour},
         into: %{}
   end
