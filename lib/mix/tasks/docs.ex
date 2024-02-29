@@ -245,7 +245,9 @@ defmodule Mix.Tasks.Docs do
   Functions and callbacks inside a module can also be organized in groups.
   This is done via the `:groups_for_docs` configuration which is a
   keyword list of group titles and filtering functions that receive the
-  documentation metadata of functions as argument.
+  documentation metadata of functions as argument. The metadata received will also
+  contain `:module`, `:name`, `:arity` and `:kind` to help identify which entity is
+  currently being processed.
 
   For example, imagine that you have an API client library with a large surface
   area for all the API endpoints you need to support. It would be helpful to
