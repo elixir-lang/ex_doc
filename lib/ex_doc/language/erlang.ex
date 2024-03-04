@@ -69,6 +69,36 @@ defmodule ExDoc.Language.Erlang do
     end
   end
 
+  defp equiv_data(module, file, line, metadata, prefix \\ "") do
+    case metadata[:equiv] do
+      nil ->
+        nil
+
+      equiv when is_binary(equiv) ->
+        ## We try to parse the equiv in order to link to the target
+        with {:ok, toks, _} <- :erl_scan.string(:unicode.characters_to_list(equiv <> ".")),
+             {:ok, [{:call, _, {:atom, _, func}, args}]} <- :erl_parse.parse_exprs(toks) do
+          "Equivalent to [`#{equiv}`](`#{prefix}#{func}/#{length(args)}`)."
+        else
+          {:ok, [{:op, _, :/, {:atom, _, _}, {:integer, _, _}}]} ->
+            "Equivalent to `#{prefix}#{equiv}`."
+
+          _ ->
+            "Equivalent to `#{equiv}`."
+        end
+        |> ExDoc.DocAST.parse!("text/markdown")
+
+      equiv ->
+        ExDoc.Utils.warn("invalid equiv #{inspect(equiv)}",
+          file: file,
+          line: line,
+          module: module
+        )
+
+        nil
+    end
+  end
+
   defp function_data(name, arity, _doc_content, module_data, metadata) do
     specs =
       case Map.fetch(module_data.private.specs, {name, arity}) do
@@ -88,26 +118,7 @@ defmodule ExDoc.Language.Erlang do
     {file, line} = Source.get_function_location(module_data, {name, arity})
 
     %{
-      doc_fallback: fn ->
-        case metadata[:equiv] do
-          nil ->
-            nil
-
-          equiv when is_binary(equiv) ->
-            ## We try to parse the equiv in order to link to the target
-            with {:ok, toks, _} <- :erl_scan.string(:unicode.characters_to_list(equiv <> ".")),
-                 {:ok, [{:call, _, {:atom, _, func}, args}]} <- :erl_parse.parse_exprs(toks) do
-              "Equivalent to [`#{equiv}`](`#{func}/#{length(args)}`)"
-            else
-              _ -> "Equivalent to `#{equiv}`"
-            end
-            |> ExDoc.DocAST.parse!("text/markdown")
-
-          equiv ->
-            IO.warn("invalid equiv: #{inspect(equiv)}", [])
-            nil
-        end
-      end,
+      doc_fallback: fn -> equiv_data(module_data.module, file, line, metadata) end,
       extra_annotations: [],
       source_line: line,
       source_file: file,
@@ -117,7 +128,7 @@ defmodule ExDoc.Language.Erlang do
 
   @impl true
   def callback_data(entry, module_data) do
-    {{_kind, name, arity}, anno, signature, _doc, _metadata} = entry
+    {{_kind, name, arity}, anno, signature, _doc, metadata} = entry
 
     extra_annotations =
       if {name, arity} in module_data.private.optional_callbacks, do: ["optional"], else: []
@@ -132,6 +143,15 @@ defmodule ExDoc.Language.Erlang do
       end
 
     %{
+      doc_fallback: fn ->
+        equiv_data(
+          module_data.module,
+          Source.anno_file(anno),
+          Source.anno_line(anno),
+          metadata,
+          "c:"
+        )
+      end,
       source_line: Source.anno_line(anno),
       source_file: Source.anno_file(anno),
       signature: signature,
@@ -142,11 +162,14 @@ defmodule ExDoc.Language.Erlang do
 
   @impl true
   def type_data(entry, module_data) do
-    {{kind, name, arity}, anno, signature, _doc, _metadata} = entry
+    {{kind, name, arity}, anno, signature, _doc, metadata} = entry
 
     case Source.get_type_from_module_data(module_data, name, arity) do
       %{} = map ->
         %{
+          doc_fallback: fn ->
+            equiv_data(module_data.module, map.source_file, map.source_line, metadata, "t:")
+          end,
           type: map.type,
           source_line: map.source_line,
           source_file: map.source_file,
@@ -157,6 +180,9 @@ defmodule ExDoc.Language.Erlang do
 
       nil ->
         %{
+          doc_fallback: fn ->
+            equiv_data(module_data.module, nil, Source.anno_line(anno), metadata, "t:")
+          end,
           type: kind,
           source_line: Source.anno_line(anno),
           spec: nil,

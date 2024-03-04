@@ -33,14 +33,17 @@ defmodule ExDoc.Retriever.ErlangTest do
       erlc(c, :mod, ~S"""
       -module(mod).
       -moduledoc("mod docs.").
-      -export([function1/0, function2/0]).
+      -export([function1/0, function2/1, equiv_function2/0]).
 
       -doc("function1/0 docs.").
       -spec function1() -> atom().
       function1() -> ok.
 
-      -doc("function2/0 docs.").
-      function2() -> ok.
+      -doc("function2/1 docs.").
+      function2(Opts) -> Opts.
+
+      -doc #{ equiv => function2([{test, args}]) }.
+      equiv_function2() -> function2([{test, args}]).
       """)
 
       {[mod], []} = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
@@ -49,7 +52,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         deprecated: nil,
         moduledoc_line: 2,
         moduledoc_file: moduledoc_file,
-        docs: [function1, function2],
+        docs: [equiv_function2, function1, function2],
         docs_groups: [:Types, :Callbacks, :Functions],
         group: nil,
         id: "mod",
@@ -93,11 +96,18 @@ defmodule ExDoc.Retriever.ErlangTest do
                "function1() -> <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
 
       %ExDoc.FunctionNode{
-        id: "function2/0"
+        id: "function2/1"
       } = function2
 
-      assert DocAST.to_string(function2.doc) =~ "function2/0 docs."
+      assert DocAST.to_string(function2.doc) =~ "function2/1 docs."
       assert function2.specs == []
+
+      %ExDoc.FunctionNode{
+        id: "equiv_function2/0"
+      } = equiv_function2
+
+      assert DocAST.to_string(equiv_function2.doc) =~
+               ~r'Equivalent to <a href="`function2/1`"><code[^>]+>function2\(\[\{test, args\}\]\).*\.'
     end
 
     test "module included files", c do
@@ -222,6 +232,9 @@ defmodule ExDoc.Retriever.ErlangTest do
       -doc("callback1/0 docs.").
       -callback callback1() -> atom().
 
+      -doc #{ equiv => callback1() }.
+      -callback equiv_callback1() -> atom().
+
       -doc("optional_callback1/0 docs.").
       -callback optional_callback1() -> atom().
 
@@ -230,7 +243,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
       {[mod], []} = Retriever.docs_from_modules([:mod], config)
-      [callback1, optional_callback1] = mod.docs
+      [callback1, equiv_callback1, optional_callback1] = mod.docs
 
       assert callback1.id == "c:callback1/0"
       assert callback1.type == :callback
@@ -242,6 +255,16 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert Erlang.autolink_spec(hd(callback1.specs), current_kfa: {:callback, :callback1, 0}) ==
                "callback1() -> <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
 
+      assert equiv_callback1.id == "c:equiv_callback1/0"
+      assert equiv_callback1.type == :callback
+      assert equiv_callback1.annotations == []
+      assert equiv_callback1.group == :Callbacks
+
+      assert DocAST.to_string(equiv_callback1.doc) =~
+               ~r'Equivalent to <a href="`c:callback1/0`"><code[^>]+>callback1().*\.'
+
+      assert Path.basename(equiv_callback1.source_url) == "mod.erl:7"
+
       assert optional_callback1.id == "c:optional_callback1/0"
       assert optional_callback1.type == :callback
       assert optional_callback1.group == :Callbacks
@@ -251,10 +274,13 @@ defmodule ExDoc.Retriever.ErlangTest do
     test "types", c do
       erlc(c, :mod, ~S"""
       -module(mod).
-      -export_type([type1/0, opaque1/0]).
+      -export_type([type1/0, equiv_type1/0, opaque1/0]).
 
       -doc("type1/0 docs.").
       -type type1() :: atom().
+
+      -doc #{ equiv => type1/1 }.
+      -type equiv_type1() :: atom().
 
       -doc("opaque1/0 docs.").
       -opaque opaque1() :: atom().
@@ -262,7 +288,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
       {[mod], []} = Retriever.docs_from_modules([:mod], config)
-      [opaque1, type1] = mod.typespecs
+      [equiv_type1, opaque1, type1] = mod.typespecs
 
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
@@ -281,6 +307,12 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert type1.spec |> Erlang.autolink_spec(current_kfa: {:type, :type1, 0}) ==
                "type1() :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
+
+      assert equiv_type1.id == "t:equiv_type1/0"
+      assert equiv_type1.type == :type
+      assert equiv_type1.group == :Types
+      assert equiv_type1.signature == "equiv_type1()"
+      assert equiv_type1.doc |> DocAST.to_string() =~ ~r'Equivalent to .*t:type1/1.*\.'
     end
 
     test "records", c do
