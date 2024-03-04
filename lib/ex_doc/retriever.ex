@@ -342,8 +342,8 @@ defmodule ExDoc.Retriever do
         callback_data.extra_annotations ++ annotations_from_metadata(metadata, module_metadata)
 
     doc_ast =
-      (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
-        (callback_data[:doc_fallback] && callback_data.doc_fallback.())
+      doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
+        doc_fallback(callback_data)
 
     group =
       GroupMatcher.match_function(
@@ -404,8 +404,8 @@ defmodule ExDoc.Retriever do
         type_data.extra_annotations
 
     doc_ast =
-      (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
-        (type_data[:doc_fallback] && type_data.doc_fallback.())
+      doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
+        doc_fallback(type_data)
 
     group =
       GroupMatcher.match_function(
@@ -432,6 +432,10 @@ defmodule ExDoc.Retriever do
   end
 
   ## General helpers
+
+  defp doc_fallback(data) do
+    data[:doc_fallback] && data.doc_fallback.()
+  end
 
   defp nil_or_name(name, arity) do
     if name == nil do
