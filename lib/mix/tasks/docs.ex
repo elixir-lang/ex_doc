@@ -276,6 +276,17 @@ defmodule Mix.Tasks.Docs do
   custom group will be listed under the default "Functions" and "Callbacks"
   group respectively.
 
+  ## Meta-tags configuration
+
+  It is also possible to configure some of ExDoc behaviour using meta tags.
+  These meta tags can be inserted using `before_closing_head_tag`.
+
+    * `exdoc:autocomplete` - when set to "off", it disables autocompletion.
+
+    * `exdoc:full-text-search-url` - the URL to use when performing full text
+      search. The search string will be prepended to the URL as a parameter.
+      It defaults to ExDoc's auto-generated search page.
+
   ## Nesting
 
   ExDoc also allows module names in the sidebar to appear nested under a given

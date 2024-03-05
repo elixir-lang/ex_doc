@@ -40,6 +40,16 @@ export function focusSearchInput () {
 function addEventListeners () {
   const searchInput = qs(SEARCH_INPUT_SELECTOR)
 
+  if (document.querySelector('meta[name="exdoc:autocomplete"][content="off"]')) {
+    searchInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        handleAutocompleteFormSubmission(event)
+      }
+    })
+
+    return true
+  }
+
   searchInput.addEventListener('keydown', event => {
     const macOS = isMacOS()
 
@@ -117,7 +127,9 @@ function handleAutocompleteFormSubmission (event) {
   if (autocompleteSuggestion) {
     anchor.setAttribute('href', autocompleteSuggestion.link)
   } else {
-    anchor.setAttribute('href', `search.html?q=${encodeURIComponent(searchInput.value)}`)
+    const meta = document.querySelector('meta[name="exdoc:full-text-search-url"]')
+    const url = meta ? meta.getAttribute('content') : 'search.html?q='
+    anchor.setAttribute('href', `${url}${encodeURIComponent(searchInput.value)}`)
   }
 
   anchor.click()
