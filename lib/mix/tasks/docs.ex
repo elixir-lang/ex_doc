@@ -128,10 +128,6 @@ defmodule Mix.Tasks.Docs do
     * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
 
-    * `:javascript_config_path` - Path of an additional JavaScript file to be included on all pages
-      to provide up-to-date data for features like the version dropdown - See the "Additional
-      JavaScript config" section. Example: `"../versions.js"`
-
     * `:language` - Identify the primary language of the documents, its value must be
       a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
 
@@ -146,6 +142,8 @@ defmodule Mix.Tasks.Docs do
 
     * `:markdown_processor` - The markdown processor to use,
       either `module()` or `{module(), keyword()}` to provide configuration options;
+
+    * `:meta` - A keyword list or a map to specify meta tag attributes
 
     * `:nest_modules_by_prefix` - See the "Nesting" section
 
@@ -277,36 +275,6 @@ defmodule Mix.Tasks.Docs do
   the first will take precedence. Functions and callbacks that don't have a
   custom group will be listed under the default "Functions" and "Callbacks"
   group respectively.
-
-  ## Additional JavaScript config
-
-  Since version `0.20.0` ExDoc includes a way to enrich the documentation
-  with new information without having to re-generate it, through a JavaScript
-  file that can be shared across documentation for multiple versions of the
-  package. If `:javascript_config_path` is set when building the documentation,
-  this script will be referenced in each page's `<head>` using a `<script>` tag.
-  The script should define data in global JavaScript variables that will be
-  interpreted by `ex_doc` when viewing the documentation.
-
-  Currently supported variables:
-
-  ### `versionNodes`
-
-  This global JavaScript variable should be providing an array of objects that
-  define all versions of this Mix package which should appear in the package
-  versions dropdown in the documentation sidebar. The versions dropdown allows
-  for switching between package versions' documentation.
-
-  Example:
-
-  ```javascript
-  var versionNodes = [
-    {
-      version: "v0.0.0", // version number or name (required)
-      url: "https://hexdocs.pm/ex_doc/0.19.3/" // documentation URL (required)
-    }
-  ]
-  ```
 
   ## Nesting
 
