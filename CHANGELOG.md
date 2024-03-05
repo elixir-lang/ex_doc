@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.31.2 (2024-03-05)
+
+  * Enhancements
+    * Add `equiv` handling for types and callbacks for Erlang
+    * Add cmd-k/ctrl-k shortcut to focus searchbar
+    * Use dark backgrounds for admonition blocks in dark theme
+    * Autolink .cheatmd files
+    * Warn when extra link targets an application not in dependencies
+    * Add support for `before_closing_footer_tag`
+
+  * Bug fixes
+    * Fix sidebar toggle flickering on page load
+    * Fix background color inside code snippets with no language in dark mode
+    * Hide search bar and background layer on print
+    * Use blue links for Erlang
+    * Fix logo not declared in EPUB's OPF manifest
+    * Escape URIs and titles in EPUB
+    * Fix URL slug not updating on anchor clicks
+
 ## v0.31.1 (2024-01-11)
 
   * Enhancements
