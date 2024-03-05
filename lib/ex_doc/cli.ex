@@ -190,12 +190,13 @@ defmodule ExDoc.CLI do
 
     ## Custom config
 
-    A custom config can be given with the `--config` option.
+    A custom config can be given with the --config option.
 
     The file must either have ".exs" or ".config" extension.
 
-    The file with the ".exs" extension must be an Elixir script that returns a keyword list with
-    the same options declares in `Mix.Tasks.Docs`. Here is an example:
+    The file with the ".exs" extension must be an Elixir script that returns
+    a keyword list with the same options declares in `Mix.Tasks.Docs`.
+    Here is an example:
 
         [
           extras: Path.wildcard("lib/elixir/pages/*.md"),
@@ -218,8 +219,8 @@ defmodule ExDoc.CLI do
     ## Source linking
 
     ExDoc by default provides links to the source code implementation as
-    long as `--source-url` or `--source-url-pattern` is provided. If you
-    provide `--source-url`, ExDoc will inflect the url pattern automatically
+    long as --source-url or --source-url-pattern is provided. If you
+    provide --source-url, ExDoc will inflect the url pattern automatically
     for GitHub, GitLab, and Bitbucket URLs. For example:
 
         --source-url "https://github.com/elixir-ecto/ecto"
