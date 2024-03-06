@@ -1,8 +1,6 @@
 defmodule ExDoc.Formatter.HTML.SearchData do
   @moduledoc false
-
-  # TODO: It should not depend on the parent module
-  alias ExDoc.Formatter.HTML
+  alias ExDoc.Utils
 
   def create(nodes, extras, proglang) do
     content_type =
@@ -39,7 +37,7 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     section_json_items =
       for {header, body} <- sections do
         encode(
-          "#{map.id}.html##{HTML.text_to_id(header)}",
+          "#{map.id}.html##{Utils.text_to_id(header)}",
           header <> " - #{map.title}",
           :extras,
           body
@@ -63,7 +61,7 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     module_sections =
       for {header, body} <- sections do
         encode(
-          "#{node.id}.html#module-#{HTML.text_to_id(header)}",
+          "#{node.id}.html#module-#{Utils.text_to_id(header)}",
           header <> " - #{node.title}",
           node.type,
           body
@@ -89,7 +87,7 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     child_sections =
       for {header, body} <- sections do
         encode(
-          "#{module_node.id}.html##{node.id}-#{HTML.text_to_id(header)}",
+          "#{module_node.id}.html##{node.id}-#{Utils.text_to_id(header)}",
           header <> " - #{module_node.id}.#{node.name}/#{node.arity}",
           node.type,
           body
@@ -134,7 +132,7 @@ defmodule ExDoc.Formatter.HTML.SearchData do
 
         section =
           section
-          |> HTML.strip_tags(" ")
+          |> ExDoc.Utils.strip_tags(" ")
           |> drop_ignorable_codeblocks()
           |> String.trim()
 
@@ -146,13 +144,13 @@ defmodule ExDoc.Formatter.HTML.SearchData do
 
   defp clean_markdown(doc) do
     doc
-    |> HTML.strip_tags(" ")
+    |> ExDoc.Utils.strip_tags(" ")
     |> String.trim()
   end
 
   defp clean_html(doc) do
     doc
-    |> HTML.strip_tags(" ")
+    |> ExDoc.Utils.strip_tags(" ")
     |> String.replace(~r/\s+/, " ")
     |> String.trim()
   end

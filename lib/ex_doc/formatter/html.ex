@@ -249,7 +249,7 @@ defmodule ExDoc.Formatter.HTML do
         html = Templates.extra_template(config, node, extra_type(extension), nodes_map, refs)
 
         if File.regular?(output) do
-          ExDoc.Utils.warn("warning: file #{Path.relative_to_cwd(output)} already exists", [])
+          Utils.warn("warning: file #{Path.relative_to_cwd(output)} already exists", [])
         end
 
         File.write!(output, html)
@@ -390,7 +390,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp build_extra({input, options}, groups, language, autolink_opts, source_url_pattern) do
     input = to_string(input)
-    id = options[:filename] || input |> filename_to_title() |> text_to_id()
+    id = options[:filename] || input |> filename_to_title() |> Utils.text_to_id()
     source = options[:source] || input
 
     build_extra(
@@ -406,7 +406,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
-    id = input |> filename_to_title() |> text_to_id()
+    id = input |> filename_to_title() |> Utils.text_to_id()
 
     build_extra(
       input,
@@ -507,32 +507,6 @@ defmodule ExDoc.Formatter.HTML do
     input |> Path.basename() |> Path.rootname()
   end
 
-  @clean_html_regex ~r/<\/?\s*[a-zA-Z]+(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
-
-  @doc """
-  Strips html tags from text leaving their text content
-  """
-  def strip_tags(text, replace_with \\ "") when is_binary(text) do
-    String.replace(text, @clean_html_regex, replace_with)
-  end
-
-  @doc """
-  Generates an ID from some text
-
-  Used primarily with titles, headings, and functions group names.
-  """
-  def text_to_id(atom) when is_atom(atom), do: text_to_id(Atom.to_string(atom))
-
-  def text_to_id(text) when is_binary(text) do
-    text
-    |> strip_tags()
-    |> String.replace(~r/&#\d+;/, "")
-    |> String.replace(~r/&[A-Za-z0-9]+;/, "")
-    |> String.replace(~r/\W+/u, "-")
-    |> String.trim("-")
-    |> String.downcase()
-  end
-
   @doc """
   Generates the logo from config into the given directory.
   """
@@ -629,11 +603,11 @@ defmodule ExDoc.Formatter.HTML do
     Map.new(config.extras, fn
       path when is_binary(path) ->
         base = Path.basename(path)
-        {base, text_to_id(Path.rootname(base))}
+        {base, Utils.text_to_id(Path.rootname(base))}
 
       {path, opts} ->
         base = path |> to_string() |> Path.basename()
-        {base, opts[:filename] || text_to_id(Path.rootname(base))}
+        {base, opts[:filename] || Utils.text_to_id(Path.rootname(base))}
     end)
   end
 end

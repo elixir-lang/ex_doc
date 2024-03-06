@@ -78,6 +78,32 @@ defmodule ExDoc.Utils do
     end)
   end
 
+  @clean_html_regex ~r/<\/?\s*[a-zA-Z]+(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
+
+  @doc """
+  Strips HTML tags from text leaving their text content
+  """
+  def strip_tags(text, replace_with \\ "") when is_binary(text) do
+    String.replace(text, @clean_html_regex, replace_with)
+  end
+
+  @doc """
+  Generates an ID from some text.
+
+  Used primarily with titles, headings, and functions group names.
+  """
+  def text_to_id(atom) when is_atom(atom), do: text_to_id(Atom.to_string(atom))
+
+  def text_to_id(text) when is_binary(text) do
+    text
+    |> strip_tags()
+    |> String.replace(~r/&#\d+;/, "")
+    |> String.replace(~r/&[A-Za-z0-9]+;/, "")
+    |> String.replace(~r/\W+/u, "-")
+    |> String.trim("-")
+    |> String.downcase()
+  end
+
   @doc """
   Sorts mapped strings by natural order.
   """

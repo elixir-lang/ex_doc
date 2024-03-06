@@ -39,7 +39,7 @@
   </section>
 <% end %>
 
-<%= for {name, nodes} <- summary, key = HTML.text_to_id(name) do %>
+<%= for {name, nodes} <- summary, key = text_to_id(name) do %>
   <section id="<%= key %>" class="details-list">
     <h1 class="section-heading">
       <a class="hover-link" href="#<%= key %>">

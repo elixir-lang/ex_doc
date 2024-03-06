@@ -65,29 +65,6 @@ defmodule ExDoc.Formatter.HTMLTest do
                  fn -> generate_docs(config) end
   end
 
-  describe "strip_tags" do
-    test "removes html tags from text leaving the content" do
-      assert HTML.strip_tags("<em>Hello</em> World!<br/>") == "Hello World!"
-      assert HTML.strip_tags("Go <a href=\"#top\" class='small' disabled>back</a>") == "Go back"
-      assert HTML.strip_tags("Git opts (<code class=\"inline\">:git</code>)") == "Git opts (:git)"
-      assert HTML.strip_tags("<p>P1.</p><p>P2</p>") == "P1.P2"
-      assert HTML.strip_tags("<p>P1.</p><p>P2</p>", " ") == " P1.  P2 "
-      assert HTML.strip_tags("<%= @inner_content %>", " ") == "<%= @inner_content %>"
-    end
-  end
-
-  describe "text_to_id" do
-    test "id generation" do
-      assert HTML.text_to_id("“Stale”") == "stale"
-      assert HTML.text_to_id("José") == "josé"
-      assert HTML.text_to_id(" a - b ") == "a-b"
-      assert HTML.text_to_id(" ☃ ") == ""
-      assert HTML.text_to_id(" &sup2; ") == ""
-      assert HTML.text_to_id(" &#9180; ") == ""
-      assert HTML.text_to_id("Git opts (<code class=\"inline\">:git</code>)") == "git-opts-git"
-    end
-  end
-
   test "multiple extras with the same name", c do
     File.mkdir_p!("#{c.tmp_dir}/foo")
 

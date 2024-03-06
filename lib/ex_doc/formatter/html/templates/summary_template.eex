@@ -1,6 +1,6 @@
-<div class="summary-<%= HTML.text_to_id(name) %> summary">
+<div class="summary-<%= text_to_id(name) %> summary">
   <h2>
-    <a href="#<%= HTML.text_to_id(name) %>"><%= name %></a>
+    <a href="#<%= text_to_id(name) %>"><%= name %></a>
   </h2>
   <%= for node <- nodes do %>
     <div class="summary-row">

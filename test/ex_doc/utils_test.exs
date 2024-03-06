@@ -1,6 +1,8 @@
 defmodule ExDoc.UtilsTest do
   use ExUnit.Case, async: true
+
   doctest ExDoc.Utils
+  alias ExDoc.Utils
 
   test "natural_sort_by" do
     input = ~w|
@@ -31,7 +33,7 @@ defmodule ExDoc.UtilsTest do
       rm/1
     |
 
-    assert ExDoc.Utils.natural_sort_by(input, & &1) == ~w|
+    assert Utils.natural_sort_by(input, & &1) == ~w|
       Äpfeln/1
       a0/1
       a1/1
@@ -75,14 +77,33 @@ defmodule ExDoc.UtilsTest do
       integer: 1
     }
 
-    assert map |> ExDoc.Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(map)
+    assert map |> Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(map)
 
     string = for i <- 0..0x1F, do: <<i>>, into: ""
-    assert string |> ExDoc.Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(string)
+    assert string |> Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(string)
   end
 
   test "source_url_pattern" do
-    assert ExDoc.Utils.source_url_pattern("/%{path}-%{line}", "lib/foo", 13) == "/lib/foo-13"
-    assert ExDoc.Utils.source_url_pattern(&"/#{&1}:#{&2}", "lib/foo", 13) == "/lib/foo:13"
+    assert Utils.source_url_pattern("/%{path}-%{line}", "lib/foo", 13) == "/lib/foo-13"
+    assert Utils.source_url_pattern(&"/#{&1}:#{&2}", "lib/foo", 13) == "/lib/foo:13"
+  end
+
+  test "strip_tags" do
+    assert Utils.strip_tags("<em>Hello</em> World!<br/>") == "Hello World!"
+    assert Utils.strip_tags("Go <a href=\"#top\" class='small' disabled>back</a>") == "Go back"
+    assert Utils.strip_tags("Git opts (<code class=\"inline\">:git</code>)") == "Git opts (:git)"
+    assert Utils.strip_tags("<p>P1.</p><p>P2</p>") == "P1.P2"
+    assert Utils.strip_tags("<p>P1.</p><p>P2</p>", " ") == " P1.  P2 "
+    assert Utils.strip_tags("<%= @inner_content %>", " ") == "<%= @inner_content %>"
+  end
+
+  test "text_to_id" do
+    assert Utils.text_to_id("“Stale”") == "stale"
+    assert Utils.text_to_id("José") == "josé"
+    assert Utils.text_to_id(" a - b ") == "a-b"
+    assert Utils.text_to_id(" ☃ ") == ""
+    assert Utils.text_to_id(" &sup2; ") == ""
+    assert Utils.text_to_id(" &#9180; ") == ""
+    assert Utils.text_to_id("Git opts (<code class=\"inline\">:git</code>)") == "git-opts-git"
   end
 end

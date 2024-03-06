@@ -7,12 +7,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
       h: 1,
       before_closing_body_tag: 2,
       before_closing_footer_tag: 2,
-      before_closing_head_tag: 2
+      before_closing_head_tag: 2,
+      text_to_id: 1
     ]
-
-  # TODO: It should not depend on the parent module. Move required HTML functions to Utils.
-  # TODO: Add tests that assert on the returned structured, not on JSON
-  alias ExDoc.Formatter.HTML
 
   @doc """
   Generate content from the module template for a given `node`
@@ -171,7 +168,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
         %{id: id, title: node.signature, anchor: URI.encode(node.id), deprecated: deprecated?}
       end
 
-    %{key: HTML.text_to_id(group), name: group, nodes: nodes}
+    %{key: text_to_id(group), name: group, nodes: nodes}
   end
 
   defp module_sections(%ExDoc.ModuleNode{rendered_doc: nil}), do: [sections: []]
@@ -201,8 +198,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
     |> Enum.filter(&(&1 != ""))
-    |> Enum.map(&HTML.strip_tags/1)
-    |> Enum.map(&%{id: &1, anchor: URI.encode(HTML.text_to_id(&1))})
+    |> Enum.map(&ExDoc.Utils.strip_tags/1)
+    |> Enum.map(&%{id: &1, anchor: URI.encode(text_to_id(&1))})
   end
 
   def module_summary(module_node) do
@@ -263,7 +260,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     @heading_regex
     |> Regex.scan(content)
     |> Enum.reduce({content, %{}}, fn [match, tag, title], {content, occurrences} ->
-      possible_id = HTML.text_to_id(title)
+      possible_id = text_to_id(title)
       id_occurred = Map.get(occurrences, possible_id, 0)
 
       anchor_id = if id_occurred >= 1, do: "#{possible_id}-#{id_occurred}", else: possible_id
