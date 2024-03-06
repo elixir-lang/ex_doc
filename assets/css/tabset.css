@@ -57,9 +57,10 @@
     padding-bottom: calc(var(--tabsetPadding) / 2);
   }
 
-  .tabset-panel pre {
-    margin-left: calc(-1 * var(--tabsetPadding));
-    margin-right: calc(-1 * var(--tabsetPadding));
+  .tabset-panel pre,
+  .tabset-panel blockquote {
+    margin-left: calc(-1 * var(--tabsetPadding)) !important;
+    margin-right: calc(-1 * var(--tabsetPadding)) !important;
   }
 
   .tabset-panel > pre code {
