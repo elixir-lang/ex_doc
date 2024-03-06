@@ -6,7 +6,6 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   import ExDoc.Utils,
     only: [before_closing_body_tag: 2, before_closing_head_tag: 2, h: 1, text_to_id: 1]
 
-  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates, as: H
 
   @doc """
@@ -21,10 +20,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   Generated ID for static file
   """
   def static_file_to_id(static_file) do
-    prefix = static_file |> HTML.filename_to_title() |> text_to_id()
-    extension = static_file |> Path.extname() |> String.replace_prefix(".", "-")
-
-    "#{prefix}#{extension}"
+    static_file |> Path.basename() |> text_to_id()
   end
 
   @doc """

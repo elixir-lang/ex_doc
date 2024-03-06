@@ -2,7 +2,6 @@ defmodule ExDoc.Formatter.HTMLTest do
   use ExUnit.Case, async: true
 
   import ExUnit.CaptureIO
-  alias ExDoc.Formatter.HTML
 
   @moduletag :tmp_dir
 

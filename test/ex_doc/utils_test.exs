@@ -101,6 +101,7 @@ defmodule ExDoc.UtilsTest do
     assert Utils.text_to_id("“Stale”") == "stale"
     assert Utils.text_to_id("José") == "josé"
     assert Utils.text_to_id(" a - b ") == "a-b"
+    assert Utils.text_to_id("foo.img") == "foo-img"
     assert Utils.text_to_id(" ☃ ") == ""
     assert Utils.text_to_id(" &sup2; ") == ""
     assert Utils.text_to_id(" &#9180; ") == ""

@@ -388,48 +388,10 @@ defmodule ExDoc.Formatter.HTML do
     Map.put(extra, :id, "#{extra.id}-#{discriminator}")
   end
 
-  defp build_extra({input, options}, groups, language, autolink_opts, source_url_pattern) do
+  defp build_extra({input, input_options}, groups, language, autolink_opts, source_url_pattern) do
     input = to_string(input)
-    id = options[:filename] || input |> filename_to_title() |> Utils.text_to_id()
-    source = options[:source] || input
-
-    build_extra(
-      input,
-      id,
-      options[:title],
-      groups,
-      language,
-      autolink_opts,
-      source,
-      source_url_pattern
-    )
-  end
-
-  defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
-    id = input |> filename_to_title() |> Utils.text_to_id()
-
-    build_extra(
-      input,
-      id,
-      nil,
-      groups,
-      language,
-      autolink_opts,
-      input,
-      source_url_pattern
-    )
-  end
-
-  defp build_extra(
-         input,
-         id,
-         title,
-         groups,
-         language,
-         autolink_opts,
-         source_file,
-         source_url_pattern
-       ) do
+    id = input_options[:filename] || input |> filename_to_title() |> Utils.text_to_id()
+    source_file = input_options[:source] || input
     opts = [file: source_file, line: 1]
 
     {source, ast} =
@@ -462,14 +424,12 @@ defmodule ExDoc.Formatter.HTML do
 
     title_text = title_ast && ExDoc.DocAST.text_from_ast(title_ast)
     title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
-
     content_html = autolink_and_render(ast, language, [file: input] ++ autolink_opts, opts)
 
     group = GroupMatcher.match_extra(groups, input)
-    title = title || title_text || filename_to_title(input)
+    title = input_options[:title] || title_text || filename_to_title(input)
 
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
-
     source_url = Utils.source_url_pattern(source_url_pattern, source_path, 1)
 
     %{
@@ -482,6 +442,10 @@ defmodule ExDoc.Formatter.HTML do
       title: title,
       title_content: title_html || title
     }
+  end
+
+  defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
+    build_extra({input, []}, groups, language, autolink_opts, source_url_pattern)
   end
 
   defp extension_name(input) do
@@ -500,10 +464,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp sectionize(ast, _), do: ast
 
-  @doc """
-  Convert the input file name into a title
-  """
-  def filename_to_title(input) do
+  defp filename_to_title(input) do
     input |> Path.basename() |> Path.rootname()
   end
 
