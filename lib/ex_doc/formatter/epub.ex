@@ -6,10 +6,12 @@ defmodule ExDoc.Formatter.EPUB do
   alias ExDoc.Formatter.HTML
 
   @doc """
-  Generate EPUB documentation for the given modules.
+  Generates EPUB documentation for the given modules.
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
+    ExDoc.Utils.unset_warned()
+
     config = normalize_config(config)
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))

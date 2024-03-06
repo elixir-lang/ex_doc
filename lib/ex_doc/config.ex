@@ -45,7 +45,8 @@ defmodule ExDoc.Config do
             source_url: nil,
             source_url_pattern: nil,
             title: nil,
-            version: nil
+            version: nil,
+            warnings_as_errors: false
 
   @type t :: %__MODULE__{
           annotations_for_docs: (map() -> list()),
@@ -83,7 +84,8 @@ defmodule ExDoc.Config do
           source_url: nil | String.t(),
           source_url_pattern: nil | String.t(),
           title: nil | String.t(),
-          version: nil | String.t()
+          version: nil | String.t(),
+          warnings_as_errors: boolean()
         }
 
   @spec build(String.t(), String.t(), Keyword.t()) :: ExDoc.Config.t()

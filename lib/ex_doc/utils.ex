@@ -1,17 +1,47 @@
 defmodule ExDoc.Utils do
   @moduledoc false
 
+  @elixir_gte_1_14? Version.match?(System.version(), ">= 1.14.0")
+
   @doc """
   Emits a warning.
   """
-  if Version.match?(System.version(), ">= 1.14.0") do
-    def warn(message, stacktrace_info) do
+  def warn(message, stacktrace_info) do
+    set_warned()
+
+    # TODO: remove check when we require Elixir v1.14
+    if @elixir_gte_1_14? do
       IO.warn(message, stacktrace_info)
-    end
-  else
-    def warn(message, _stacktrace_info) do
+    else
       IO.warn(message, [])
     end
+  end
+
+  @doc """
+  Stores that a warning has been generated.
+  """
+  def set_warned() do
+    unless warned?() do
+      :persistent_term.put({__MODULE__, :warned?}, true)
+    end
+
+    true
+  end
+
+  @doc """
+  Removes that a warning has been generated.
+  """
+  def unset_warned() do
+    if warned?() do
+      :persistent_term.put({__MODULE__, :warned?}, false)
+    end
+  end
+
+  @doc """
+  Returns `true` if any warning has been generated during the document building. Otherwise returns `false`.
+  """
+  def warned?() do
+    :persistent_term.get({__MODULE__, :warned?}, false)
   end
 
   @doc """

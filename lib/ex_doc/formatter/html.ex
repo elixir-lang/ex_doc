@@ -8,10 +8,12 @@ defmodule ExDoc.Formatter.HTML do
   @assets_dir "assets"
 
   @doc """
-  Generate HTML documentation for the given modules.
+  Generates HTML documentation for the given modules.
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
+    ExDoc.Utils.unset_warned()
+
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
 
@@ -249,7 +251,7 @@ defmodule ExDoc.Formatter.HTML do
         html = Templates.extra_template(config, node, extra_type(extension), nodes_map, refs)
 
         if File.regular?(output) do
-          ExDoc.Utils.warn("warning: file #{Path.relative_to_cwd(output)} already exists", [])
+          ExDoc.Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
         end
 
         File.write!(output, html)

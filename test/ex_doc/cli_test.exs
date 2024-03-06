@@ -1,14 +1,15 @@
 defmodule ExDoc.CLITest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
+
   import ExUnit.CaptureIO
 
   @ebin "_build/test/lib/ex_doc/ebin"
 
-  defp run(args) do
+  defp run(args, generator \\ &{&1, &2, &3}, io_device \\ :stdio) do
     # TODO: Use with_io on Elixir v1.13
     io =
-      capture_io(fn ->
-        send(self(), ExDoc.CLI.main(args, &{&1, &2, &3}))
+      capture_io(io_device, fn ->
+        send(self(), ExDoc.CLI.main(args, generator))
       end)
 
     assert_receive response
@@ -19,52 +20,114 @@ defmodule ExDoc.CLITest do
     {[html, epub], _io} = run(["ExDoc", "1.2.3", @ebin])
 
     assert html ==
-             {"ExDoc", "1.2.3",
-              [
-                formatter: "html",
-                formatters: ["html", "epub"],
-                apps: [:ex_doc],
-                source_beam: @ebin
-              ]}
+             {:ok,
+              {"ExDoc", "1.2.3",
+               [
+                 formatter: "html",
+                 formatters: ["html", "epub"],
+                 apps: [:ex_doc],
+                 source_beam: @ebin
+               ]}}
 
     assert epub ==
-             {"ExDoc", "1.2.3",
-              [
-                formatter: "epub",
-                formatters: ["html", "epub"],
-                apps: [:ex_doc],
-                source_beam: @ebin
-              ]}
+             {:ok,
+              {"ExDoc", "1.2.3",
+               [
+                 formatter: "epub",
+                 formatters: ["html", "epub"],
+                 apps: [:ex_doc],
+                 source_beam: @ebin
+               ]}}
   end
 
   test "formatter option" do
     {[epub, html], _io} = run(["ExDoc", "1.2.3", @ebin, "-f", "epub", "-f", "html"])
 
     assert epub ==
-             {"ExDoc", "1.2.3",
-              [
-                formatter: "epub",
-                formatters: ["epub", "html"],
-                apps: [:ex_doc],
-                source_beam: @ebin
-              ]}
+             {:ok,
+              {"ExDoc", "1.2.3",
+               [
+                 formatter: "epub",
+                 formatters: ["epub", "html"],
+                 apps: [:ex_doc],
+                 source_beam: @ebin
+               ]}}
 
     assert html ==
-             {"ExDoc", "1.2.3",
-              [
-                formatter: "html",
-                formatters: ["epub", "html"],
-                apps: [:ex_doc],
-                source_beam: @ebin
-              ]}
+             {:ok,
+              {"ExDoc", "1.2.3",
+               [
+                 formatter: "html",
+                 formatters: ["epub", "html"],
+                 apps: [:ex_doc],
+                 source_beam: @ebin
+               ]}}
   end
 
   test "version" do
     {_, io} = run(["--version"])
-    assert io == "ExDoc v#{ExDoc.version()}\n"
+    assert io =~ "ExDoc v#{ExDoc.version()}\n"
 
     {_, io} = run(["--version"])
-    assert io == "ExDoc v#{ExDoc.version()}\n"
+    assert io =~ "ExDoc v#{ExDoc.version()}\n"
+  end
+
+  describe "--warnings-as-errors" do
+    @describetag :warnings
+
+    test "exits with 0 when there are warnings and --warnings-as-errors flag is not set" do
+      ExDoc.Utils.unset_warned()
+
+      Mix.Project.in_project(:single, "test/fixtures/single", fn _mod ->
+        source_beam = "_build/test/lib/single/ebin"
+
+        fun = fn ->
+          run(
+            ["Single", "1.2.3", source_beam, "--formatter=html"],
+            &ExDoc.generate_docs/3,
+            :stderr
+          )
+        end
+
+        {[_html], io} = fun.()
+
+        assert io =~
+                 ~s|documentation references function \"Single.bar/0\" but it is undefined or private|
+
+        # TODO: remove check when we require Elixir v1.16
+        if Version.match?(System.version(), ">= 1.16.0-rc") do
+          assert io =~ ~S|moduledoc `Single.bar/0`|
+          assert io =~ ~S|doc `Single.bar/0`|
+        end
+      end)
+    end
+
+    test "exits with 1 when there are warnings with --warnings-as-errors flag" do
+      ExDoc.Utils.unset_warned()
+
+      Mix.Project.in_project(:single, "test/fixtures/single", fn _mod ->
+        source_beam = "_build/test/lib/single/ebin"
+
+        fun = fn ->
+          run(
+            ["Single", "1.2.3", source_beam, "--formatter=html", "--warnings-as-errors"],
+            &ExDoc.generate_docs/3,
+            :stderr
+          )
+        end
+
+        # fun.()
+
+        io =
+          capture_io(:stderr, fn ->
+            assert catch_exit(fun.()) == {:shutdown, 1}
+          end)
+
+        assert io =~
+                 "Documents have been generated, but generation for html format failed due to warnings " <>
+                   "while using the --warnings-as-errors option."
+      end)
+    end
   end
 
   test "too many arguments" do
@@ -91,7 +154,7 @@ defmodule ExDoc.CLITest do
       --canonical http://example.com/project
     )
 
-    {[{project, version, opts}], _io} = run(args)
+    {[{:ok, {project, version, opts}}], _io} = run(args)
     assert project == "ExDoc"
     assert version == "1.2.3"
 
@@ -122,7 +185,7 @@ defmodule ExDoc.CLITest do
     test "loading" do
       File.write!("test.exs", ~s([extras: ["README.md"], formatters: ["html"]]))
 
-      {[{project, version, opts}], _io} =
+      {[{:ok, {project, version, opts}}], _io} =
         run(["ExDoc", "--extra-section", "Guides", "1.2.3", @ebin, "-c", "test.exs"])
 
       assert project == "ExDoc"
@@ -143,7 +206,7 @@ defmodule ExDoc.CLITest do
     test "switches take precedence over config" do
       File.write!("test.exs", ~s([logo: "config_logo.png", formatters: ["html"]]))
 
-      {[{project, version, opts}], _io} =
+      {[{:ok, {project, version, opts}}], _io} =
         run([
           "ExDoc",
           "--logo",
@@ -189,7 +252,8 @@ defmodule ExDoc.CLITest do
     test "loading" do
       File.write!("test.config", ~s({extras, [<<"README.md">>]}. {formatters, [<<"html">>]}.))
 
-      {[{project, version, opts}], _io} = run(["ExDoc", "1.2.3", @ebin, "-c", "test.config"])
+      {[{:ok, {project, version, opts}}], _io} =
+        run(["ExDoc", "1.2.3", @ebin, "-c", "test.config"])
 
       assert project == "ExDoc"
       assert version == "1.2.3"
