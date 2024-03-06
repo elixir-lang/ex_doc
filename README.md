@@ -310,7 +310,7 @@ IO.puts "Hello, world!"
 ### Erlang
 
 ```erlang
-io:fwrite("hello, world!\n").
+io:fwrite("Hello, world!\n").
 ```
 
 <!-- tabs-close -->
