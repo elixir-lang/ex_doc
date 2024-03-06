@@ -14,6 +14,10 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
         ## Section 1
 
         Section Content 1.
+
+        ### Section 1a
+
+        Section Content 1a.
         """
       end
       ''')
@@ -32,7 +36,14 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     assert item2["ref"] == "SearchFoo.html#module-section-1"
     assert item2["type"] == "module"
     assert item2["title"] == "Section 1 - SearchFoo"
-    assert item2["doc"] == "Section Content 1."
+
+    assert item2["doc"] == """
+           Section Content 1.
+
+           ### Section 1a
+
+           Section Content 1a.\
+           """
   end
 
   test "Mix task", c do
@@ -54,7 +65,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
 
     assert item1["ref"] == "Mix.Tasks.SearchItemTest.html"
     assert item1["type"] == "task"
-    # assert item1["title"] == "mix search_item_test"
+    assert item1["title"] == "mix search_item_test"
     assert item1["doc"] == "Test task."
 
     assert item2["ref"] == "Mix.Tasks.SearchItemTest.html#module-section-1"

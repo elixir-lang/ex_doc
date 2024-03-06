@@ -125,7 +125,7 @@ defmodule ExDoc.Formatter.HTML.SearchData do
   end
 
   defp extract_sections_from_markdown(string) do
-    [intro | sections] = Regex.split(~r/## (?<header>\b.+)/, string, include_captures: true)
+    [intro | sections] = Regex.split(~r/(?<!#)## (?<header>\b.+)/, string, include_captures: true)
 
     sections =
       for [header, section] <- Enum.chunk_every(sections, 2) do
