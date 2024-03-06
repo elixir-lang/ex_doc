@@ -15,7 +15,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
 
         Section Content 1.
 
-        ### Section 1a
+        #### Section 1a
 
         Section Content 1a.
         """
@@ -40,7 +40,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     assert item2["doc"] == """
            Section Content 1.
 
-           ### Section 1a
+           #### Section 1a
 
            Section Content 1a.\
            """

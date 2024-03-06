@@ -248,16 +248,19 @@ defmodule ExDoc.Formatter.HTML.Templates do
   # so content is built with it upfront instead of added at the template level.
 
   @doc """
-  Link headings found with `regex` with in the given `content`. IDs are
-  prefixed with `prefix`.
+  Add link headings for the given `content`.
+
+  IDs are prefixed with `prefix`.
+
+  We only link `h2` and `h3` headers. This is kept consistent in ExDoc.SearchData.
   """
   @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
-  @spec link_headings(String.t() | nil, Regex.t(), String.t()) :: String.t() | nil
-  def link_headings(content, regex \\ @heading_regex, prefix \\ "")
-  def link_headings(nil, _, _), do: nil
+  @spec link_headings(String.t() | nil, String.t()) :: String.t() | nil
+  def link_headings(content, prefix \\ "")
+  def link_headings(nil, _), do: nil
 
-  def link_headings(content, regex, prefix) do
-    regex
+  def link_headings(content, prefix) do
+    @heading_regex
     |> Regex.scan(content)
     |> Enum.reduce({content, %{}}, fn [match, tag, title], {content, occurrences} ->
       possible_id = HTML.text_to_id(title)
@@ -327,11 +330,11 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   def link_moduledoc_headings(content) do
-    link_headings(content, @heading_regex, "module-")
+    link_headings(content, "module-")
   end
 
   def link_detail_headings(content, prefix) do
-    link_headings(content, @heading_regex, prefix <> "-")
+    link_headings(content, prefix <> "-")
   end
 
   templates = [
