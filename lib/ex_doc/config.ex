@@ -8,6 +8,7 @@ defmodule ExDoc.Config do
   def before_closing_footer_tag(_), do: ""
   def before_closing_body_tag(_), do: ""
   def annotations_for_docs(_), do: []
+  def skip_undefined_reference_warnings_on(_string), do: false
   def skip_code_autolink_to(_string), do: false
 
   defstruct annotations_for_docs: &__MODULE__.annotations_for_docs/1,
@@ -39,7 +40,8 @@ defmodule ExDoc.Config do
             proglang: :elixir,
             project: nil,
             retriever: ExDoc.Retriever,
-            skip_undefined_reference_warnings_on: [],
+            skip_undefined_reference_warnings_on:
+              &__MODULE__.skip_undefined_reference_warnings_on/1,
             skip_code_autolink_to: &__MODULE__.skip_code_autolink_to/1,
             source_beam: nil,
             source_ref: @default_source_ref,
@@ -77,7 +79,7 @@ defmodule ExDoc.Config do
           package: :atom | nil,
           project: nil | String.t(),
           retriever: atom(),
-          skip_undefined_reference_warnings_on: [String.t()],
+          skip_undefined_reference_warnings_on: (String.t() -> boolean),
           skip_code_autolink_to: (String.t() -> boolean),
           source_beam: nil | String.t(),
           source_ref: nil | String.t(),
@@ -103,6 +105,13 @@ defmodule ExDoc.Config do
         options
       end
 
+    {skip_undefined_reference_warnings_on, options} =
+      Keyword.pop(
+        options,
+        :skip_undefined_reference_warnings_on,
+        &skip_undefined_reference_warnings_on/1
+      )
+
     {skip_code_autolink_to, options} =
       Keyword.pop(options, :skip_code_autolink_to, &skip_code_autolink_to/1)
 
@@ -120,7 +129,9 @@ defmodule ExDoc.Config do
       output: normalize_output(output),
       proglang: normalize_proglang(proglang),
       project: project,
-      skip_code_autolink_to: normalize_skip_code_autolink_to(skip_code_autolink_to),
+      skip_undefined_reference_warnings_on:
+        normalize_skip_list_function(skip_undefined_reference_warnings_on),
+      skip_code_autolink_to: normalize_skip_list_function(skip_code_autolink_to),
       source_url_pattern: source_url_pattern,
       version: vsn
     }
@@ -174,10 +185,10 @@ defmodule ExDoc.Config do
   defp normalize_filter_modules(fun) when is_function(fun, 2),
     do: fun
 
-  defp normalize_skip_code_autolink_to(strings) when is_list(strings),
+  defp normalize_skip_list_function(strings) when is_list(strings),
     do: &(&1 in strings)
 
-  defp normalize_skip_code_autolink_to(fun) when is_function(fun, 1),
+  defp normalize_skip_list_function(fun) when is_function(fun, 1),
     do: fun
 
   defp guess_url(url, ref) do
