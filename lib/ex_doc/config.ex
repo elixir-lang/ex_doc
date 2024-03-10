@@ -8,6 +8,7 @@ defmodule ExDoc.Config do
   def before_closing_footer_tag(_), do: ""
   def before_closing_body_tag(_), do: ""
   def annotations_for_docs(_), do: []
+  def skip_code_autolink_to(_string), do: false
 
   defstruct annotations_for_docs: &__MODULE__.annotations_for_docs/1,
             api_reference: true,
@@ -39,7 +40,7 @@ defmodule ExDoc.Config do
             project: nil,
             retriever: ExDoc.Retriever,
             skip_undefined_reference_warnings_on: [],
-            skip_code_autolink_to: [],
+            skip_code_autolink_to: &__MODULE__.skip_code_autolink_to/1,
             source_beam: nil,
             source_ref: @default_source_ref,
             source_url: nil,
@@ -77,7 +78,7 @@ defmodule ExDoc.Config do
           project: nil | String.t(),
           retriever: atom(),
           skip_undefined_reference_warnings_on: [String.t()],
-          skip_code_autolink_to: [String.t()],
+          skip_code_autolink_to: (String.t() -> boolean),
           source_beam: nil | String.t(),
           source_ref: nil | String.t(),
           source_url: nil | String.t(),
@@ -102,6 +103,9 @@ defmodule ExDoc.Config do
         options
       end
 
+    {skip_code_autolink_to, options} =
+      Keyword.pop(options, :skip_code_autolink_to, &skip_code_autolink_to/1)
+
     {source_url_pattern, options} =
       Keyword.pop_lazy(options, :source_url_pattern, fn ->
         guess_url(options[:source_url], options[:source_ref] || @default_source_ref)
@@ -116,6 +120,7 @@ defmodule ExDoc.Config do
       output: normalize_output(output),
       proglang: normalize_proglang(proglang),
       project: project,
+      skip_code_autolink_to: normalize_skip_code_autolink_to(skip_code_autolink_to),
       source_url_pattern: source_url_pattern,
       version: vsn
     }
@@ -167,6 +172,12 @@ defmodule ExDoc.Config do
     do: fn module, _ -> Atom.to_string(module) =~ regex end
 
   defp normalize_filter_modules(fun) when is_function(fun, 2),
+    do: fun
+
+  defp normalize_skip_code_autolink_to(strings) when is_list(strings),
+    do: &(&1 in strings)
+
+  defp normalize_skip_code_autolink_to(fun) when is_function(fun, 1),
     do: fun
 
   defp guess_url(url, ref) do

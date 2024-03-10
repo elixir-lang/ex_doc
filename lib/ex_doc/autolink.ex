@@ -26,7 +26,8 @@ defmodule ExDoc.Autolink do
   #
   # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
   #
-  # * `:skip_code_autolink_to` - list of terms that will be skipped when autolinking (e.g: "PrivateModule")
+  # * `:skip_code_autolink_to` - function that will be called with a term and return a boolean
+  #    whether to skip autolinking to it.
   #
   # * `:filtered_modules` - A list of module nodes that were filtered by the retriever
   #
@@ -54,7 +55,7 @@ defmodule ExDoc.Autolink do
     current_kfa: nil,
     siblings: [],
     skip_undefined_reference_warnings_on: [],
-    skip_code_autolink_to: [],
+    skip_code_autolink_to: &ExDoc.Config.skip_code_autolink_to/1,
     force_module_prefix: nil,
     filtered_modules: [],
     warnings: :emit
@@ -201,7 +202,7 @@ defmodule ExDoc.Autolink do
   end
 
   def url(string, mode, config) do
-    if Enum.any?(config.skip_code_autolink_to, &(&1 == string)) do
+    if config.skip_code_autolink_to.(string) do
       nil
     else
       parse_url(string, mode, config)
