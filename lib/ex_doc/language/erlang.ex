@@ -631,7 +631,7 @@ defmodule ExDoc.Language.Erlang do
             visibility = Refs.get_visibility(ref)
 
             cond do
-              Enum.any?(config.skip_code_autolink_to, &(&1 == "t:#{name}/#{arity}")) ->
+              config.skip_code_autolink_to.("t:#{name}/#{arity}") ->
                 nil
 
               visibility in [:public] ->
@@ -657,7 +657,7 @@ defmodule ExDoc.Language.Erlang do
             visibility = Refs.get_visibility(ref)
 
             cond do
-              Enum.any?(config.skip_code_autolink_to, &(&1 == "t:#{module}:#{name}/#{arity}")) ->
+              config.skip_code_autolink_to.("t:#{module}:#{name}/#{arity}") ->
                 nil
 
               visibility in [:public] ->

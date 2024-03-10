@@ -157,9 +157,10 @@ defmodule Mix.Tasks.Docs do
 
     * `:skip_code_autolink_to` - Similar to `:skip_undefined_reference_warnings_on`, this option
       controls which terms will be skipped by ExDoc when building documentation.
-      Useful for example if you want to highlight private modules or functions
-      without warnings (e.g.: `["PrivateModule", "PrivateModule.func/1"]`);
-      default: `[]`.
+      Useful for example if you want to highlight private modules or functions without warnings.
+      This option can be a function from a term to a boolean (e.g.: `&String.match?(&1, ~r/PrivateModule/)`
+      or a list of terms (e.g.:`["PrivateModule", "PrivateModule.func/1"]`);
+      default is nothing to be skipped.
 
     * `:source_beam` - Path to the beam directory; default: mix's compile path.
 

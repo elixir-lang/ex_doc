@@ -425,10 +425,7 @@ defmodule ExDoc.Language.ElixirTest do
       ])
 
       options = [
-        skip_code_autolink_to: [
-          "AutolinkTest.Hidden",
-          "AutolinkTest.Hidden.foo/1"
-        ]
+        skip_code_autolink_to: &String.match?(&1, ~r/\AAutolinkTest\.Hidden/)
       ]
 
       assert autolink_doc("`AutolinkTest.Hidden`", options) ==

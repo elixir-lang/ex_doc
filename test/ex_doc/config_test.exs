@@ -30,4 +30,28 @@ defmodule ExDoc.ConfigTest do
     assert config.filter_modules.(Foo, %{works: true})
     refute config.filter_modules.(Foo, %{works: false})
   end
+
+  test "normalizes skip_code_autolink_to" do
+    config =
+      ExDoc.Config.build(@project, @version,
+        skip_code_autolink_to: ["ConfigTest.Hidden", "ConfigTest.Hidden.foo/1"]
+      )
+
+    assert config.skip_code_autolink_to.("ConfigTest.Hidden")
+    assert config.skip_code_autolink_to.("ConfigTest.Hidden.foo/1")
+    refute config.skip_code_autolink_to.("ConfigTest.Hidden.foo/2")
+    refute config.skip_code_autolink_to.("ConfigTest.Hidden.bar/1")
+    refute config.skip_code_autolink_to.("ConfigTest.NotHidden")
+
+    config =
+      ExDoc.Config.build(@project, @version,
+        skip_code_autolink_to: &String.match?(&1, ~r/\AConfigTest\.Hidden/)
+      )
+
+    assert config.skip_code_autolink_to.("ConfigTest.Hidden")
+    assert config.skip_code_autolink_to.("ConfigTest.Hidden.foo/1")
+    assert config.skip_code_autolink_to.("ConfigTest.Hidden.foo/2")
+    assert config.skip_code_autolink_to.("ConfigTest.Hidden.bar/1")
+    refute config.skip_code_autolink_to.("ConfigTest.NotHidden")
+  end
 end
