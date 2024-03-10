@@ -668,7 +668,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     opts = [
       warnings: :send,
-      skip_undefined_reference_warnings_on: ["MyModule"],
+      skip_undefined_reference_warnings_on: &(&1 in ["MyModule"]),
       module_id: "MyModule"
     ]
 

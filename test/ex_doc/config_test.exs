@@ -31,6 +31,26 @@ defmodule ExDoc.ConfigTest do
     refute config.filter_modules.(Foo, %{works: false})
   end
 
+  test "normalizes skip_undefined_reference_warnings_on" do
+    config =
+      ExDoc.Config.build(@project, @version,
+        skip_undefined_reference_warnings_on: ["Foo", "Bar.baz/0"]
+      )
+
+    assert config.skip_undefined_reference_warnings_on.("Foo")
+    assert config.skip_undefined_reference_warnings_on.("Bar.baz/0")
+    refute config.skip_undefined_reference_warnings_on.("Foo.bar/1")
+
+    config =
+      ExDoc.Config.build(@project, @version,
+        skip_undefined_reference_warnings_on: &String.match?(&1, ~r/Foo/)
+      )
+
+    assert config.skip_undefined_reference_warnings_on.("Foo")
+    refute config.skip_undefined_reference_warnings_on.("Bar.baz/0")
+    assert config.skip_undefined_reference_warnings_on.("Foo.bar/1")
+  end
+
   test "normalizes skip_code_autolink_to" do
     config =
       ExDoc.Config.build(@project, @version,

@@ -24,7 +24,8 @@ defmodule ExDoc.Autolink do
   #
   # * `:extras` - map of extras
   #
-  # * `:skip_undefined_reference_warnings_on` - list of modules to skip the warning on
+  # * `:skip_undefined_reference_warnings_on` - function that will be called with
+  #    a module/function/file/etc and return a boolean whether to skip warning on it.
   #
   # * `:skip_code_autolink_to` - function that will be called with a term and return a boolean
   #    whether to skip autolinking to it.
@@ -54,7 +55,7 @@ defmodule ExDoc.Autolink do
     ext: ".html",
     current_kfa: nil,
     siblings: [],
-    skip_undefined_reference_warnings_on: [],
+    skip_undefined_reference_warnings_on: &ExDoc.Config.skip_undefined_reference_warnings_on/1,
     skip_code_autolink_to: &ExDoc.Config.skip_code_autolink_to/1,
     force_module_prefix: nil,
     filtered_modules: [],
@@ -165,10 +166,12 @@ defmodule ExDoc.Autolink do
   end
 
   def maybe_warn(config, ref, visibility, metadata) do
-    skipped = config.skip_undefined_reference_warnings_on
     file = Path.relative_to_cwd(config.file)
 
-    unless Enum.any?([config.id, config.module_id, file], &(&1 in skipped)) do
+    unless Enum.any?(
+             [config.id, config.module_id, file],
+             config.skip_undefined_reference_warnings_on
+           ) do
       warn(config, ref, visibility, metadata)
     end
   end
