@@ -7,11 +7,10 @@ import {
   AUTOCOMPLETE_CONTAINER_SELECTOR,
   AUTOCOMPLETE_SUGGESTION_SELECTOR
 } from './autocomplete/autocomplete-list'
-import { isMacOS, isTouchDevice, qs } from './helpers'
+import { isMacOS, qs } from './helpers'
 
 const SEARCH_INPUT_SELECTOR = 'form.search-bar input'
 const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-bar .search-close-button'
-const TOP_SEARCH_SELECTOR = '.top-search'
 
 /**
  * Initializes the sidebar search box.
@@ -35,16 +34,8 @@ export function setSearchInputValue (value) {
  */
 export function focusSearchInput () {
   const searchInput = qs(SEARCH_INPUT_SELECTOR)
-
-  if (!isTouchDevice()) {
-    qs(TOP_SEARCH_SELECTOR).classList.add('sticky')
-    if (window.scrollY === 0) {
-      qs('.sidebar-button').classList.add('fixed-top')
-    } else {
-      qs('.sidebar-button').classList.add('fixed')
-    }
-  }
-
+  // We also add the class before so we don't move the screen position
+  document.body.classList.add('search-focused')
   searchInput.focus()
 }
 
@@ -162,47 +153,27 @@ function hideAutocomplete () {
 }
 
 let lastScrollTop = window.scrollY
-const topSearch = document.querySelector(TOP_SEARCH_SELECTOR)
-const sidebarMenu = document.getElementById('sidebar-menu')
-const backgroundLayer = document.querySelector('.background-layer')
 const scrollThreshold = 70 // Set a threshold for scroll, adjust as needed
-const searchInput = qs(SEARCH_INPUT_SELECTOR)
-const sidebarButton = qs('.sidebar-button')
 
 window.addEventListener('scroll', function () {
   const currentScroll = window.scrollY
 
-  if (isTouchDevice()) {
-    // Add 'fixed' class when not at the top
-    if (currentScroll > scrollThreshold * 2) {
-      topSearch.classList.add('sm-fixed')
-      sidebarMenu.classList.add('sm-fixed')
-      backgroundLayer.classList.add('sm-fixed')
-    }
+  // Add 'scroll-sticky' class when not at the top
+  if (currentScroll > scrollThreshold * 2) {
+    document.body.classList.add('scroll-sticky')
+  }
 
-    if (currentScroll === 0) {
-      // Remove 'fixed' class when at the top
-      topSearch.classList.remove('sm-fixed')
-      sidebarMenu.classList.remove('sm-fixed')
-      backgroundLayer.classList.remove('sm-fixed')
-    }
+  // Remove when at the top
+  if (currentScroll === 0) {
+    document.body.classList.remove('scroll-sticky')
+  }
 
-    if (currentScroll > lastScrollTop && currentScroll > scrollThreshold) {
-      // Scrolling down and past the threshold
-      topSearch.classList.add('sm-hidden')
-      sidebarMenu.classList.add('sm-hidden')
-      backgroundLayer.classList.add('sm-hidden')
-    } else {
-      // Scrolling up or at the top of the page
-      topSearch.classList.remove('sm-hidden')
-      sidebarMenu.classList.remove('sm-hidden')
-      backgroundLayer.classList.remove('sm-hidden')
-    }
-  } else if (currentScroll !== lastScrollTop) {
-    topSearch.classList.remove('sticky')
-    sidebarButton.classList.remove('fixed')
-    sidebarButton.classList.remove('fixed-top')
-    searchInput.blur()
+  if (currentScroll > lastScrollTop && currentScroll > scrollThreshold) {
+    // Scrolling down and past the threshold
+    document.body.classList.remove('scroll-sticky')
+  } else {
+    // Scrolling up or at the top of the page
+    document.body.classList.add('scroll-sticky')
   }
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll

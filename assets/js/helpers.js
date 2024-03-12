@@ -168,14 +168,3 @@ export function getProjectNameAndVersion () {
 export function isMacOS () {
   return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
 }
-
-/**
- * Return `true` if the client's device is touch-enabled.
- *
- * @return {Boolean}
- */
-export function isTouchDevice () {
-  return (('ontouchstart' in window) ||
-    (navigator.maxTouchPoints > 0) ||
-    (navigator.msMaxTouchPoints > 0))
-}

@@ -1,22 +1,10 @@
 .top-search {
-  position: relative;
-  top: 0;
-  z-index: 101;
-  margin-top: 10px;
   background-color: var(--background);
-  padding: 0.8rem 0;
-}
-
-@media (max-width: 480px) or ((min-width: 481px) and (max-width: 768px)) {
-  .top-search {
-    padding: 0.8rem 1.8rem 0.8rem 3rem;
-    margin-left: -1rem;
-    margin-right: -1rem;
-  }
-}
-
-.top-search.sticky {
-  position: sticky;
+  top: 0;
+  z-index: 99;
+  position: relative;
+  width: 100%;
+  padding: 10px 0;
 }
 
 .search-settings {
@@ -130,27 +118,15 @@
   color: var(--iconAction);
 }
 
-@media (hover: none) {
+@media screen and (max-width: 768px) {
+  /* Code and blockquotes take the full gutter on small screens,
+     so we need the search to the same */
   .top-search {
-    margin-top: 0;
-    position: absolute;
-    top: 13px;
-    height: 57px;
-    left: 56px;
-    right: 20px;
-    transition: top var(--sidebarTransitionDuration) ease-in-out;
-    z-index: 99;
-  }
-
-  .background-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 70px;
-    background-color: var(--background);
-    transition: all var(--sidebarTransitionDuration) ease-in-out;
-    z-index: 98;
+    padding-left: calc(var(--content-gutter) + 36px);
+    padding-right: var(--content-gutter);
+    margin-left: calc(-1 * var(--content-gutter));
+    margin-right: calc(-1 * var(--content-gutter));
+    width: calc(2 * var(--content-gutter) + 100%);
   }
 
   .search-settings {
@@ -162,4 +138,24 @@
 body.search-focused .search-bar .search-close-button {
   transform: scaleY(1);
   transition: transform 0.15s ease-out 0.15s;
+}
+
+@media screen and (hover: hover) {
+  body.search-focused .top-search {
+    position: sticky !important;
+  }
+
+  body.search-focused.sidebar-closed .sidebar-button {
+    position: fixed !important;
+  }
+}
+
+@media screen and (hover: none) {
+  body.scroll-sticky .top-search {
+    position: sticky !important;
+  }
+
+  body.scroll-sticky.sidebar-closed .sidebar-button {
+    position: fixed !important;
+  }
 }

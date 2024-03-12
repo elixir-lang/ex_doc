@@ -8,7 +8,7 @@
     display: none;
   }
 
-  .top-search, .background-layer {
+  .top-search {
     display: none;
   }
 
@@ -25,6 +25,10 @@
 
   #toast {
     display: none;
+  }
+
+  .content-inner {
+    padding: 0;
   }
 
   .content-inner .section-heading a.hover-link {
