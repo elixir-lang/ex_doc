@@ -50,6 +50,23 @@ defmodule ExDoc.Formatter.EPUB do
     Path.relative_to_cwd(epub)
   end
 
+  @doc """
+  Helper that replaces anchor names and links that could potentially cause problems on EPUB documents
+
+  This helper replaces all the `&` with `&amp;` found in anchors like
+  `Kernel.xhtml#&&/2` or `<h2 id="&&&/2-examples" class="section-heading">...</h2>`
+
+  These anchor names cause a fatal error while EPUB readers parse the files,
+  resulting in truncated content.
+
+  For more details, see: https://github.com/elixir-lang/ex_doc/issues/1851
+  """
+  def fix_anchors(content) do
+    content
+    |> String.replace(~r{id="&+/\d+[^"]*}, &String.replace(&1, "&", "&amp;"))
+    |> String.replace(~r{href="[^#"]*#&+/\d+[^"]*}, &String.replace(&1, "&", "&amp;"))
+  end
+
   defp normalize_config(config) do
     output =
       config.output
@@ -63,7 +80,11 @@ defmodule ExDoc.Formatter.EPUB do
     for {_title, extras} <- config.extras do
       Enum.each(extras, fn %{id: id, title: title, title_content: title_content, content: content} ->
         output = "#{config.output}/OEBPS/#{id}.xhtml"
-        html = Templates.extra_template(config, title, title_content, content)
+
+        html =
+          config
+          |> Templates.extra_template(title, title_content, content)
+          |> fix_anchors()
 
         if File.regular?(output) do
           ExDoc.Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
@@ -157,7 +178,11 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_module_page(module_node, config) do
-    content = Templates.module_page(config, module_node)
+    content =
+      config
+      |> Templates.module_page(module_node)
+      |> fix_anchors()
+
     File.write("#{config.output}/OEBPS/#{module_node.id}.xhtml", content)
   end
 

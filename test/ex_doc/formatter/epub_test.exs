@@ -151,6 +151,9 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~
              ~r{<a href="TypesAndSpecs.Sub.xhtml"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
 
+    assert content =~
+             ~r{<a href="https://hexdocs.pm/elixir/Kernel.html#&amp;&amp;/2"><code(\sclass="inline")?>&amp;&amp;/2</code></a>}
+
     content = File.read!(tmp_dir <> "/epub/OEBPS/nav.xhtml")
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
   end
@@ -247,5 +250,20 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?(tmp_dir <> "/epub/OEBPS/assets/cover.png")
   after
     File.rm_rf!("test/tmp/epub_assets")
+  end
+
+  describe "fix_anchors/1" do
+    test "adapts anchor names to avoid parsing errors from EPUB readers" do
+      for {source, expected} <- [
+            {~S|<a href="Kernel.SpecialForms.xhtml#&/1">its documentation</a>|,
+             ~S|<a href="Kernel.SpecialForms.xhtml#&amp;/1">its documentation</a>|},
+            {~S|<a href="Kernel.xhtml#&&/2"><code class="inline">&amp;&amp;/2</code></a>|,
+             ~S|<a href="Kernel.xhtml#&amp;&amp;/2"><code class="inline">&amp;&amp;/2</code></a>|},
+            {~S|<h2 id="&&&/2-examples" class="section-heading">title</h2>|,
+             ~S|<h2 id="&amp;&amp;&amp;/2-examples" class="section-heading">title</h2>|}
+          ] do
+        assert ExDoc.Formatter.EPUB.fix_anchors(source) == expected
+      end
+    end
   end
 end
