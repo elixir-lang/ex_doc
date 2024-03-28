@@ -1,5 +1,5 @@
 .content-inner {
-  font-family: var(--serifFontFamily);
+  font-family: var(--defaultFontFamily);
   font-size: 1em;
   line-height: 1.6875em;
   position: relative;
@@ -17,7 +17,7 @@
 
 .content-inner h1 {
   font-size: 2em;
-  margin: .8em 0 .5em;
+  margin: 0.8em 0 0.5em;
 }
 
 .content-inner h1.signature {
@@ -25,7 +25,7 @@
 }
 
 .content-inner h1.section-heading {
-  margin: 1.5em 0 .5em;
+  margin: 1.5em 0 0.5em;
 }
 
 .content-inner h1 small {
@@ -39,14 +39,18 @@
 
 .content-inner h2 {
   font-size: 1.6em;
-  margin: 1em 0 .5em;
+  margin: 1em 0 0.5em;
   font-weight: 700;
 }
 
 .content-inner h3 {
   font-size: 1.375em;
-  margin: 1em 0 .5em;
+  margin: 1em 0 0.5em;
   font-weight: 700;
+}
+
+.content-inner li + li {
+  margin-top: 0.25em;
 }
 
 .content-inner :is(a, .a-main) {
@@ -64,7 +68,7 @@
   color: var(--iconAction);
   text-decoration: none;
   border: none;
-  transition: color .3s ease-in-out;
+  transition: color 0.3s ease-in-out;
   background-color: transparent;
   cursor: pointer;
 }
@@ -117,7 +121,7 @@
   font-family: var(--sansFontFamily);
   text-transform: uppercase;
   font-weight: 700;
-  padding-bottom: .5em;
+  padding-bottom: 0.5em;
 }
 
 .content-inner thead tr {
@@ -129,7 +133,7 @@
 }
 
 .content-inner tbody tr:last-child {
-  border-bottom: none
+  border-bottom: none;
 }
 
 .content-inner tr {
@@ -162,7 +166,7 @@
 
 .content-inner .section-heading i {
   font-size: var(--icon-size);
-  margin-top: .1em;
+  margin-top: 0.1em;
   margin-left: calc(-1 * (var(--icon-size) + var(--icon-spacing)));
   padding-right: var(--icon-spacing); /* Avoids gap in hover area */
   opacity: 0;
@@ -192,7 +196,7 @@
 
 .content-inner .app-vsn {
   display: none !important;
-  font-size: .6em;
+  font-size: 0.6em;
   line-height: 1.5em;
 }
 

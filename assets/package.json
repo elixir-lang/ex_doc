@@ -29,7 +29,6 @@
   "devDependencies": {
     "@fontsource/inconsolata": "^4.5.9",
     "@fontsource/lato": "^4.5.10",
-    "@fontsource/merriweather": "^4.5.14",
     "esbuild": "^0.16.16",
     "eslint": "^8.31.0",
     "eslint-config-standard": "^17.0.0",

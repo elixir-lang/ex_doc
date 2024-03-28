@@ -198,6 +198,7 @@
   vertical-align: middle;
   background-color: var(--codeBackground);
   border-bottom: 1px solid var(--codeBorder);
+  margin-top: 0;
 }
 
 .page-cheatmd .content-inner .h2 :is(ul, ol) + pre code {
