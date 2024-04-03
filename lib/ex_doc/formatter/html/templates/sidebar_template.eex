@@ -1,4 +1,4 @@
-<div class="main">
+<div class="body-wrapper">
 
 <button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
   <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
@@ -64,7 +64,7 @@
   <% end %>
 </nav>
 
-<main class="content" id="main">
+<main class="content">
   <output role="status" id="toast"></output>
 
   <div id="content" class="content-inner">

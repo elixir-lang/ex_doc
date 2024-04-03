@@ -103,7 +103,6 @@ function addEventListeners () {
         clearSearch()
       }
     }
-
   })
 
   qs(AUTOCOMPLETE_CONTAINER_SELECTOR).addEventListener('click', event => {
@@ -181,18 +180,3 @@ window.addEventListener('scroll', function () {
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll
 }, false)
-
-window.addEventListener('click', function (event) {
-  if(event.target.classList.contains('search-input')) return
-  const autocomplete = qs(".autocomplete")
-  if(autocomplete) {
-    let boundingRect = autocomplete.getBoundingClientRect();
-
-    if(event.clientX >= boundingRect.left && event.clientX <= boundingRect.right &&
-      event.clientY >= boundingRect.top && event.clientY <= boundingRect.bottom) {
-        return
-      } else {
-        hideAutocomplete()
-      }
-  }
-})

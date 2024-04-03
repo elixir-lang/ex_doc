@@ -1,5 +1,5 @@
 @media print {
-  .main {
+  .body-wrapper {
     display: block;
   }
 

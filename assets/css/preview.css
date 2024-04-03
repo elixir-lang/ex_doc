@@ -1,0 +1,23 @@
+body.preview {
+  --sidebarWidth: 0px;
+}
+
+body.preview .content {
+  height: auto;
+}
+
+body.preview .content-inner {
+  padding: 0;
+}
+
+body.preview .sidebar, body.preview #sidebar-menu {
+  display: none;
+}
+
+body.preview .hover-link, body.preview .detail-link {
+  display: none;
+}
+
+body.preview :is(h1, h2, h3):first-of-type {
+  margin-top: 0;
+}

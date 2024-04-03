@@ -11,8 +11,8 @@ const TOOLTIP_BODY_SELECTOR = '#tooltip .tooltip-body'
 // Element containing the documentation text.
 const CONTENT_INNER_SELECTOR = 'body .content-inner'
 
-// Hash included in links pointing to module pages
-const MODULE_CONTENT_HASH = '#content'
+// Hash included in links pointing to the top
+const CONTENT_HASH = '#content'
 
 const TOOLTIP_SHOWN_CLASS = 'tooltip-shown'
 // The minimum distance from window edges and links.
@@ -80,7 +80,7 @@ function linkElementEligibleForTooltip (linkElement) {
  * Checks if the given link points to the module page we are currently on.
  */
 function isHrefToSelf (href) {
-  const targetPage = href.replace(MODULE_CONTENT_HASH, '')
+  const targetPage = href.replace(CONTENT_HASH, '')
   const currentPage = window.location.href.split('#')[0]
 
   return currentPage === targetPage

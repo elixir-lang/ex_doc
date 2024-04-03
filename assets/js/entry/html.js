@@ -22,23 +22,29 @@ import { initialize as initTabsets } from '../tabsets'
 import { initialize as initPreview} from '../preview'
 
 onDocumentReady(() => {
+  const params = new URLSearchParams(window.location.search)
+
   initTheme()
-  initSidebarDrawer()
-  initSidebarContent()
-  initSidebarSearch()
-  initVersions()
   initContent()
   initMakeup()
-  initModal()
-  initKeyboardShortcuts()
-  initQuickSwitch()
-  initToast()
   initTooltips()
   initHintsPage()
-  initSearchPage()
   initCopyButton()
-  initSettings()
   initOs()
   initTabsets()
-  initPreview()
+
+  if (params.has('preview')) {
+    initPreview()
+  } else {
+    initVersions()
+    initSidebarDrawer()
+    initSidebarContent()
+    initSidebarSearch()
+    initModal()
+    initKeyboardShortcuts()
+    initQuickSwitch()
+    initToast()
+    initSearchPage()
+    initSettings()
+  }
 })

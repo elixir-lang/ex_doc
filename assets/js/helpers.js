@@ -76,18 +76,15 @@ export function findSidebarCategory (nodes, anchor) {
  * @returns {HTMLElement|null} The relevant element.
  */
 export function descriptionElementFromHash (hash, anything = false) {
-  if (!hash) { 
+  if (!hash) {
     if (!anything) {
-      return null 
+      return null
     } else {
-      const h1 = document.querySelector('h1');
-      if (!h1) { return null }
-      return toNextHeader(h1)
+      return document.getElementById('top-content')
     }
   }
 
   const element = document.getElementById(hash)
-
   if (!element) { return null }
 
   // See `detail_template.eex` for the reference.
@@ -95,24 +92,21 @@ export function descriptionElementFromHash (hash, anything = false) {
     return element
   }
 
-  if (element.matches('span')) {
-    return element.parentElement
-  }
-
+  // Matches a subheader in particular
   if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(element.tagName.toLowerCase())) {
     return toNextHeader(element)
-  } 
+  }
 
   return null
 }
 
-function toNextHeader(element) {
+function toNextHeader (element) {
   const elements = [element]
   let nextElement = element.nextElementSibling
   const tagName = element.tagName.toLowerCase()
 
   while (nextElement) {
-    const nextElementTagName = nextElement.tagName.toLowerCase();
+    const nextElementTagName = nextElement.tagName.toLowerCase()
     if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(nextElementTagName) && nextElementTagName <= tagName) {
       nextElement = null
     } else {

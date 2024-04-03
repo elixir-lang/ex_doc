@@ -91,10 +91,11 @@ export function moveAutocompleteSelection (offset) {
   if (elementToSelect) {
     elementToSelect.classList.add('selected')
     showPreview(elementToSelect)
-    
+
     elementToSelect.scrollIntoView({ block: 'nearest' })
   } else {
-    qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR).scrollTop = 0
+    const list = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
+    if (list) { list.scrollTop = 0 }
   }
 }
 
@@ -102,7 +103,7 @@ export function moveAutocompleteSelection (offset) {
  * Toggles the preview state of the autocomplete list
  */
 export function togglePreview () {
-  state.previewOpen = !state.previewOpen;
+  state.previewOpen = !state.previewOpen
   const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
   if (state.previewOpen) {
     suggestionList.classList.add('previewing')
@@ -118,7 +119,7 @@ export function togglePreview () {
   }
 }
 
-function showPreview(elementToSelect) {
+function showPreview (elementToSelect) {
   const container = previewContainer()
 
   if (container) {
@@ -127,7 +128,7 @@ function showPreview(elementToSelect) {
 
   const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
 
-  if(state.previewOpen && elementToSelect) {
+  if (state.previewOpen && elementToSelect) {
     suggestionList.classList.add('previewing')
     const newContainer = document.createElement('div')
     newContainer.classList.add('autocomplete-preview')
@@ -137,13 +138,13 @@ function showPreview(elementToSelect) {
     iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms')
     iframe.setAttribute('src', previewHref)
     newContainer.replaceChildren(iframe)
-    elementToSelect.parentNode.insertBefore(newContainer, elementToSelect.nextSibling);
+    elementToSelect.parentNode.insertBefore(newContainer, elementToSelect.nextSibling)
   } else {
     suggestionList.classList.remove('previewing')
   }
 }
 
-function previewContainer() {
+function previewContainer () {
   return qs('.autocomplete-preview')
 }
 
