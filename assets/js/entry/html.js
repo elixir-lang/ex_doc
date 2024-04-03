@@ -19,6 +19,7 @@ import { initialize as initCopyButton } from '../copy-button'
 import { initialize as initSettings } from '../settings'
 import { initialize as initOs } from '../os'
 import { initialize as initTabsets } from '../tabsets'
+import { initialize as initPreview} from '../preview'
 
 onDocumentReady(() => {
   initTheme()
@@ -39,4 +40,5 @@ onDocumentReady(() => {
   initSettings()
   initOs()
   initTabsets()
+  initPreview()
 })

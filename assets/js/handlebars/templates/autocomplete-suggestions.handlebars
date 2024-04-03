@@ -1,34 +1,46 @@
 <div class="triangle"></div>
-<div class="autocomplete-suggestions">
-  <div class="autocomplete-results">
-    <span>
-      Autocompletion results for <span class="bold">"{{term}}"</span>
-    </span>
-    <span class="press-return">
-      Press <span class="bold">RETURN</span> for full-text search
-    </span>
-  </div>
-  <div>
-    {{#each suggestions}}
+<div class="autocomplete-container">
+  <div class="autocomplete-suggestions">
+    <div class="autocomplete-results">
+      <span>
+        Autocompletion results for <span class="bold">"{{term}}"</span>
+      </span>
+      <span class="press-return">
+        Press <span class="bold">RETURN</span> for full-text search, <span class="bold">TAB</span> for previews
+      </span>
+    </div>
+    <div>
+      {{#each suggestions}}
       <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
         <div class="title">
           {{# if deprecated }}
-            <s><span class="header" translate="no">{{{title}}}</span></s>
+          <s><span class="header" translate="no">{{{title}}}</span></s>
           {{ else }}
-            <span class="header" translate="no">{{{title}}}</span>
+          <span class="header" translate="no">{{{title}}}</span>
           {{/if}}
 
           {{#each labels}}
-            <span class="label">{{this}}</span>
+          <span class="label">{{this}}</span>
           {{/each}}
+          <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-open" onclick="togglePreview()">
+            <button type="button">
+              Close Preview
+            </button>
+          </div>
+          <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-closed" onclick="togglePreview()">
+            <button type="button">
+              Open Preview <span class="ri-arrow-right-s-line"/>
+            </button>
+          </div>
         </div>
 
         {{#if description}}
-          <div class="description" translate="no">
-            {{{description}}}
-          </div>
+        <div class="description" translate="no">
+          {{{description}}}
+        </div>
         {{/if}}
       </a>
-    {{/each}}
+      {{/each}}
+    </div>
   </div>
 </div>

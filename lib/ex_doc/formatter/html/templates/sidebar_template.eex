@@ -64,7 +64,7 @@
   <% end %>
 </nav>
 
-<main class="content">
+<main class="content" id="main">
   <output role="status" id="toast"></output>
 
   <div id="content" class="content-inner">

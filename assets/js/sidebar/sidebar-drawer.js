@@ -37,6 +37,8 @@ const state = {
  * Initializes the toggleable sidebar drawer.
  */
 export function initialize () {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('preview') == "true") return;
   setDefaultSidebarState()
   observeResizing()
   addEventListeners()

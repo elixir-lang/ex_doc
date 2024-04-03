@@ -3,6 +3,7 @@ import {
   isAutocompleteListOpen,
   moveAutocompleteSelection,
   selectedAutocompleteSuggestion,
+  togglePreview,
   updateAutocompleteList,
   AUTOCOMPLETE_CONTAINER_SELECTOR,
   AUTOCOMPLETE_SUGGESTION_SELECTOR
@@ -66,6 +67,9 @@ function addEventListeners () {
     } else if (event.key === 'ArrowDown' || (macOS && event.ctrlKey && event.key === 'n')) {
       moveAutocompleteSelection(1)
       event.preventDefault()
+    } else if (event.key === 'Tab') {
+      togglePreview()
+      event.preventDefault()
     }
   })
 
@@ -100,7 +104,6 @@ function addEventListeners () {
       }
     }
 
-    hideAutocomplete()
   })
 
   qs(AUTOCOMPLETE_CONTAINER_SELECTOR).addEventListener('click', event => {
@@ -178,3 +181,18 @@ window.addEventListener('scroll', function () {
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll
 }, false)
+
+window.addEventListener('click', function (event) {
+  if(event.target.classList.contains('search-input')) return
+  const autocomplete = qs(".autocomplete")
+  if(autocomplete) {
+    let boundingRect = autocomplete.getBoundingClientRect();
+
+    if(event.clientX >= boundingRect.left && event.clientX <= boundingRect.right &&
+      event.clientY >= boundingRect.top && event.clientY <= boundingRect.bottom) {
+        return
+      } else {
+        hideAutocomplete()
+      }
+  }
+})

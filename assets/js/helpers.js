@@ -69,6 +69,64 @@ export function findSidebarCategory (nodes, anchor) {
 }
 
 /**
+ * Finds an element by a URL hash (e.g. a function section).
+ *
+ * @param {String} hash The hash part of a URL.
+ * @param {Boolean} anything Whether or not to support any link to any header.
+ * @returns {HTMLElement|null} The relevant element.
+ */
+export function descriptionElementFromHash (hash, anything = false) {
+  if (!hash) { 
+    if (!anything) {
+      return null 
+    } else {
+      const h1 = document.querySelector('h1');
+      if (!h1) { return null }
+      return toNextHeader(h1)
+    }
+  }
+
+  const element = document.getElementById(hash)
+
+  if (!element) { return null }
+
+  // See `detail_template.eex` for the reference.
+  if (element.matches('.detail')) {
+    return element
+  }
+
+  if (element.matches('span')) {
+    return element.parentElement
+  }
+
+  if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(element.tagName.toLowerCase())) {
+    return toNextHeader(element)
+  } 
+
+  return null
+}
+
+function toNextHeader(element) {
+  const elements = [element]
+  let nextElement = element.nextElementSibling
+  const tagName = element.tagName.toLowerCase()
+
+  while (nextElement) {
+    const nextElementTagName = nextElement.tagName.toLowerCase();
+    if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(nextElementTagName) && nextElementTagName <= tagName) {
+      nextElement = null
+    } else {
+      elements.push(nextElement)
+      nextElement = nextElement.nextElementSibling
+    }
+  }
+
+  const div = document.createElement('div')
+  div.append(...elements)
+  return div
+}
+
+/**
  * Returns current location hash without the leading hash character.
  *
  * @returns {String}

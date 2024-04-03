@@ -28,7 +28,7 @@
 
 <%= link_headings(node.content) %>
 
-<div class="bottom-actions">
+<div class="bottom-actions" id="bottom-actions">
   <div class="bottom-actions-item">
     <%= if refs.prev do %>
       <a href="<%= refs.prev.path %>" class="bottom-actions-button" rel="prev">

@@ -19,6 +19,23 @@
   background-color: transparent;
 }
 
+.autocomplete-preview {
+  width: 100%;
+  margin: 0;
+  height: 65vh;
+  font-family: var(--sansFontFamily);
+  border: 4px solid var(--autocompleteBorder);
+  font-weight: 300;
+  flex-grow: 12;
+  font-size: 0.9rem;
+}
+
+.autocomplete-preview iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .autocomplete-results {
   list-style: none;
   margin: 0;
@@ -40,18 +57,45 @@
   display: block;
 }
 
-.autocomplete-suggestions {
-  background-color: var(--autocompleBackground);
-  border-radius: 8px;
+.autocomplete-container {
   position: absolute;
   top: 15px;
   width: 100%;
   z-index: 200;
+}
+
+.autocomplete-suggestions {
+  background-color: var(--autocompleBackground);
+  border-radius: 8px;
   box-shadow: 0px 15px 99px 0px var(--autocompleteBorder);
   overflow-y: auto;
   max-height: 450px;
   white-space: normal;
   overflow-x: hidden;
+}
+
+.autocomplete-suggestions.previewing:has(.selected) {
+  max-height: 900px;
+}
+
+.autocomplete-suggestions.previewing:has(.selected) .autocomplete-suggestion:not(.selected) {
+  display: none;
+}
+
+.autocomplete-suggestions.previewing:has(.selected) .autocomplete-preview+.autocomplete-suggestion {
+  display: block;
+}
+
+.autocomplete-suggestions.previewing:not(:has(.selected)) .autocomplete-preview {
+  display: none;
+}
+
+.autocomplete-suggestions:not(.previewing) .autocomplete-preview {
+  display: none;
+}
+
+.autocomplete-preview {
+  width: 100%
 }
 
 .autocomplete-suggestion {
@@ -76,6 +120,24 @@
 .autocomplete-suggestion.selected {
   background-color: var(--autocompleteHover);
 }
+
+.autocomplete-suggestion:not(.selected) .autocomplete-suggestion-preview-indicator {
+  display: none;
+}
+
+.autocomplete-suggestion-preview-indicator {
+  float: right;
+  border-radius: 100%;
+}
+
+.autocomplete-suggestions.previewing .autocomplete-suggestion-preview-indicator-closed {
+  display: none;
+}
+
+.autocomplete-suggestions:not(.previewing) .autocomplete-suggestion-preview-indicator-open {
+  display: none;
+}
+
 
 .autocomplete-suggestion em {
   font-style: normal;
@@ -117,8 +179,10 @@
 
 /* Style the scrollbar track (the area behind the thumb) */
 .autocomplete-suggestions::-webkit-scrollbar {
-  width: 5px; /* Set the width of the scrollbar */
-  border-radius: 7px; /* Add rounded corners to the thumb */
+  width: 5px;
+  /* Set the width of the scrollbar */
+  border-radius: 7px;
+  /* Add rounded corners to the thumb */
   flex-shrink: 0;
 }
 

@@ -54,13 +54,23 @@ body {
 }
 
 .content {
+  height: 100%;
+  width: 100%;
+}
+
+.content:not(.content-preview) {
   width: calc(100% - var(--sidebarWidth));
   left: var(--sidebarWidth);
-  height: 100%;
   position: absolute;
 }
 
-.content-inner {
+.content.content-preview {
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 16px;
+}
+
+.content:not(.content-preview) .content-inner {
   max-width: var(--content-width);
   min-height: 100%;
   margin: 0 auto;
@@ -121,6 +131,7 @@ body.sidebar-closed .content {
 }
 
 @media screen and (max-width: 768px) {
+
   .content,
   body.sidebar-opening .content {
     left: 0;

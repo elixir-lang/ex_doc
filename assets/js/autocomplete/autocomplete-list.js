@@ -7,6 +7,7 @@ export const AUTOCOMPLETE_SUGGESTION_SELECTOR = '.autocomplete-suggestion'
 
 const state = {
   autocompleteSuggestions: [],
+  previewOpen: false,
   selectedIdx: -1
 }
 
@@ -89,10 +90,61 @@ export function moveAutocompleteSelection (offset) {
 
   if (elementToSelect) {
     elementToSelect.classList.add('selected')
+    showPreview(elementToSelect)
+    
     elementToSelect.scrollIntoView({ block: 'nearest' })
   } else {
     qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR).scrollTop = 0
   }
+}
+
+/**
+ * Toggles the preview state of the autocomplete list
+ */
+export function togglePreview () {
+  state.previewOpen = !state.previewOpen;
+  const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
+  if (state.previewOpen) {
+    suggestionList.classList.add('previewing')
+    const elementToSelect = qs(`${AUTOCOMPLETE_SUGGESTION_SELECTOR}[data-index="${state.selectedIdx}"]`)
+    showPreview(elementToSelect)
+  } else {
+    suggestionList.classList.remove('previewing')
+    const container = previewContainer()
+
+    if (container) {
+      container.remove()
+    };
+  }
+}
+
+function showPreview(elementToSelect) {
+  const container = previewContainer()
+
+  if (container) {
+    container.remove()
+  };
+
+  const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
+
+  if(state.previewOpen && elementToSelect) {
+    suggestionList.classList.add('previewing')
+    const newContainer = document.createElement('div')
+    newContainer.classList.add('autocomplete-preview')
+    const iframe = document.createElement('iframe')
+    const previewHref = elementToSelect.href.replace('.html', '.html?preview=true')
+    // The minimum permissions necessary for the iframe to run JavaScript and communicate with the parent window.
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms')
+    iframe.setAttribute('src', previewHref)
+    newContainer.replaceChildren(iframe)
+    elementToSelect.parentNode.insertBefore(newContainer, elementToSelect.nextSibling);
+  } else {
+    suggestionList.classList.remove('previewing')
+  }
+}
+
+function previewContainer() {
+  return qs('.autocomplete-preview')
 }
 
 function newAutocompleteIndex (offset) {
