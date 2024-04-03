@@ -135,7 +135,7 @@ function showPreview (elementToSelect) {
     const iframe = document.createElement('iframe')
     const previewHref = elementToSelect.href.replace('.html', '.html?preview=true')
     // The minimum permissions necessary for the iframe to run JavaScript and communicate with the parent window.
-    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms')
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups')
     iframe.setAttribute('src', previewHref)
     newContainer.replaceChildren(iframe)
     elementToSelect.parentNode.insertBefore(newContainer, elementToSelect.nextSibling)
