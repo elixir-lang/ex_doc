@@ -111,11 +111,37 @@ export function togglePreview () {
     showPreview(elementToSelect)
   } else {
     suggestionList.classList.remove('previewing')
-    const container = previewContainer()
+  }
+}
 
-    if (container) {
-      container.remove()
-    };
+function expandPreview () {
+  state.previewOpen = true
+  const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
+  if (suggestionList) {
+    suggestionList.classList.add('previewing')
+  }
+}
+
+function closePreview () {
+  state.previewOpen = false
+  const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
+  if (suggestionList) {
+    suggestionList.classList.remove('previewing')
+  }
+}
+
+export function removePreview () {
+  state.previewOpen = false
+  const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
+
+  if (suggestionList) {
+    suggestionList.classList.remove('previewing')
+  }
+
+  const container = previewContainer()
+
+  if (container) {
+    container.remove()
   }
 }
 
@@ -138,6 +164,19 @@ function showPreview (elementToSelect) {
     iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups')
     iframe.setAttribute('src', previewHref)
     newContainer.replaceChildren(iframe)
+    iframe.onload = () => {
+      if (iframe.contentDocument) {
+        iframe.contentDocument.addEventListener('keydown', event => {
+          if (event.key === 'ArrowLeft') {
+            closePreview()
+            event.preventDefault()
+          } else if (event.key === 'ArrowRight') {
+            expandPreview()
+            event.preventDefault()
+          }
+        })
+      }
+    }
     elementToSelect.parentNode.insertBefore(newContainer, elementToSelect.nextSibling)
   } else {
     suggestionList.classList.remove('previewing')

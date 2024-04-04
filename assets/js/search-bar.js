@@ -6,7 +6,8 @@ import {
   togglePreview,
   updateAutocompleteList,
   AUTOCOMPLETE_CONTAINER_SELECTOR,
-  AUTOCOMPLETE_SUGGESTION_SELECTOR
+  AUTOCOMPLETE_SUGGESTION_SELECTOR,
+  removePreview
 } from './autocomplete/autocomplete-list'
 import { isMacOS, qs } from './helpers'
 
@@ -67,7 +68,7 @@ function addEventListeners () {
     } else if (event.key === 'ArrowDown' || (macOS && event.ctrlKey && event.key === 'n')) {
       moveAutocompleteSelection(1)
       event.preventDefault()
-    } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+    } else if (event.key === 'ArrowRight') {
       togglePreview()
       event.preventDefault()
     }
@@ -79,6 +80,7 @@ function addEventListeners () {
 
   searchInput.addEventListener('focus', event => {
     document.body.classList.add('search-focused')
+    removePreview()
     updateAutocompleteList(event.target.value)
   })
 

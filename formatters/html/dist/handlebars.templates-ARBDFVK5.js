@@ -1,24 +1,26 @@
-(()=>{(function(){var d=Handlebars.template,y=Handlebars.templates=Handlebars.templates||{};y["autocomplete-suggestions"]=d({1:function(e,l,a,p,r){var o,n,u=l??(e.nullContext||{}),s=e.hooks.helperMissing,i="function",c=e.escapeExpression,t=e.lookupProperty||function(f,m){if(Object.prototype.hasOwnProperty.call(f,m))return f[m]};return'      <a href="'+c((n=(n=t(a,"link")||(l!=null?t(l,"link"):l))!=null?n:s,typeof n===i?n.call(u,{name:"link",hash:{},data:r,loc:{start:{line:14,column:15},end:{line:14,column:23}}}):n))+'" class="autocomplete-suggestion" data-index="'+c((n=(n=t(a,"index")||r&&t(r,"index"))!=null?n:s,typeof n===i?n.call(u,{name:"index",hash:{},data:r,loc:{start:{line:14,column:69},end:{line:14,column:79}}}):n))+`" tabindex="-1">
+(()=>{(function(){var d=Handlebars.template,y=Handlebars.templates=Handlebars.templates||{};y["autocomplete-suggestions"]=d({1:function(e,l,a,p,r){var o,n,u=l??(e.nullContext||{}),s=e.hooks.helperMissing,i="function",c=e.escapeExpression,t=e.lookupProperty||function(f,m){if(Object.prototype.hasOwnProperty.call(f,m))return f[m]};return'      <a href="'+c((n=(n=t(a,"link")||(l!=null?t(l,"link"):l))!=null?n:s,typeof n===i?n.call(u,{name:"link",hash:{},data:r,loc:{start:{line:15,column:15},end:{line:15,column:23}}}):n))+'" class="autocomplete-suggestion" data-index="'+c((n=(n=t(a,"index")||r&&t(r,"index"))!=null?n:s,typeof n===i?n.call(u,{name:"index",hash:{},data:r,loc:{start:{line:15,column:69},end:{line:15,column:79}}}):n))+`" tabindex="-1">
         <div class="title">
-`+((o=t(a,"if").call(u,l!=null?t(l,"deprecated"):l,{name:"if",hash:{},fn:e.program(2,r,0),inverse:e.program(4,r,0),data:r,loc:{start:{line:16,column:10},end:{line:20,column:17}}}))!=null?o:"")+`
-`+((o=t(a,"each").call(u,l!=null?t(l,"labels"):l,{name:"each",hash:{},fn:e.program(6,r,0),inverse:e.noop,data:r,loc:{start:{line:22,column:10},end:{line:24,column:19}}}))!=null?o:"")+`          <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-open" onclick="togglePreview()">
+`+((o=t(a,"if").call(u,l!=null?t(l,"deprecated"):l,{name:"if",hash:{},fn:e.program(2,r,0),inverse:e.program(4,r,0),data:r,loc:{start:{line:17,column:10},end:{line:21,column:17}}}))!=null?o:"")+`
+`+((o=t(a,"each").call(u,l!=null?t(l,"labels"):l,{name:"each",hash:{},fn:e.program(6,r,0),inverse:e.noop,data:r,loc:{start:{line:23,column:10},end:{line:25,column:19}}}))!=null?o:"")+`          <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-open"
+            onclick="togglePreview()">
             <button type="button">
               Close Preview
             </button>
           </div>
-          <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-closed" onclick="togglePreview()">
+          <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-closed"
+            onclick="togglePreview()">
             <button type="button">
-              Open Preview <span class="ri-arrow-right-s-line"/>
+              Open Preview <span class="ri-arrow-right-s-line" />
             </button>
           </div>
         </div>
 
-`+((o=t(a,"if").call(u,l!=null?t(l,"description"):l,{name:"if",hash:{},fn:e.program(8,r,0),inverse:e.noop,data:r,loc:{start:{line:37,column:8},end:{line:41,column:15}}}))!=null?o:"")+`      </a>
-`},2:function(e,l,a,p,r){var o,n,u=e.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'          <s><span class="header" translate="no">'+((o=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:e.hooks.helperMissing,typeof n=="function"?n.call(l??(e.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:17,column:49},end:{line:17,column:60}}}):n))!=null?o:"")+`</span></s>
-`},4:function(e,l,a,p,r){var o,n,u=e.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'          <span class="header" translate="no">'+((o=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:e.hooks.helperMissing,typeof n=="function"?n.call(l??(e.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:19,column:46},end:{line:19,column:57}}}):n))!=null?o:"")+`</span>
+`+((o=t(a,"if").call(u,l!=null?t(l,"description"):l,{name:"if",hash:{},fn:e.program(8,r,0),inverse:e.noop,data:r,loc:{start:{line:40,column:8},end:{line:44,column:15}}}))!=null?o:"")+`      </a>
+`},2:function(e,l,a,p,r){var o,n,u=e.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'          <s><span class="header" translate="no">'+((o=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:e.hooks.helperMissing,typeof n=="function"?n.call(l??(e.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:18,column:49},end:{line:18,column:60}}}):n))!=null?o:"")+`</span></s>
+`},4:function(e,l,a,p,r){var o,n,u=e.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return'          <span class="header" translate="no">'+((o=(n=(n=u(a,"title")||(l!=null?u(l,"title"):l))!=null?n:e.hooks.helperMissing,typeof n=="function"?n.call(l??(e.nullContext||{}),{name:"title",hash:{},data:r,loc:{start:{line:20,column:46},end:{line:20,column:57}}}):n))!=null?o:"")+`</span>
 `},6:function(e,l,a,p,r){return'          <span class="label">'+e.escapeExpression(e.lambda(l,l))+`</span>
 `},8:function(e,l,a,p,r){var o,n,u=e.lookupProperty||function(s,i){if(Object.prototype.hasOwnProperty.call(s,i))return s[i]};return`        <div class="description" translate="no">
-          `+((o=(n=(n=u(a,"description")||(l!=null?u(l,"description"):l))!=null?n:e.hooks.helperMissing,typeof n=="function"?n.call(l??(e.nullContext||{}),{name:"description",hash:{},data:r,loc:{start:{line:39,column:10},end:{line:39,column:27}}}):n))!=null?o:"")+`
+          `+((o=(n=(n=u(a,"description")||(l!=null?u(l,"description"):l))!=null?n:e.hooks.helperMissing,typeof n=="function"?n.call(l??(e.nullContext||{}),{name:"description",hash:{},data:r,loc:{start:{line:42,column:10},end:{line:42,column:27}}}):n))!=null?o:"")+`
         </div>
 `},compiler:[8,">= 4.3.0"],main:function(e,l,a,p,r){var o,n,u=l??(e.nullContext||{}),s=e.lookupProperty||function(i,c){if(Object.prototype.hasOwnProperty.call(i,c))return i[c]};return`<div class="triangle"></div>
 <div class="autocomplete-container">
@@ -28,14 +30,14 @@
         Autocompletion results for <span class="bold">"`+e.escapeExpression((n=(n=s(a,"term")||(l!=null?s(l,"term"):l))!=null?n:e.hooks.helperMissing,typeof n=="function"?n.call(u,{name:"term",hash:{},data:r,loc:{start:{line:6,column:55},end:{line:6,column:63}}}):n))+`"</span>
       </span>
       <span class="press-return">
-        Press <span class="bold">RETURN</span> for full-text search, <span class="bold">TAB</span> for previews
+        Press <span class="bold">RETURN</span> for full-text search, <span class="bold">\u2192</span> for expand previews,
+        <span class="bold">\u2190</span> for close previews
       </span>
     </div>
     <div>
-`+((o=s(a,"each").call(u,l!=null?s(l,"suggestions"):l,{name:"each",hash:{},fn:e.program(1,r,0),inverse:e.noop,data:r,loc:{start:{line:13,column:6},end:{line:43,column:15}}}))!=null?o:"")+`    </div>
+`+((o=s(a,"each").call(u,l!=null?s(l,"suggestions"):l,{name:"each",hash:{},fn:e.program(1,r,0),inverse:e.noop,data:r,loc:{start:{line:14,column:6},end:{line:46,column:15}}}))!=null?o:"")+`    </div>
   </div>
-</div>
-`},useData:!0}),y["modal-layout"]=d({compiler:[8,">= 4.3.0"],main:function(e,l,a,p,r){return`<div id="modal" class="modal" tabindex="-1">
+</div>`},useData:!0}),y["modal-layout"]=d({compiler:[8,">= 4.3.0"],main:function(e,l,a,p,r){return`<div id="modal" class="modal" tabindex="-1">
   <div class="modal-contents">
     <div class="modal-header">
       <div class="modal-title"></div>
