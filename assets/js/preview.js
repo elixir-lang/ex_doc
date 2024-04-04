@@ -17,7 +17,6 @@ function preview (previewing) {
 function makeLinksOpenInParent () {
   const links = document.getElementsByTagName('a')
   for (const element of links) {
-    console.log(element)
     if (element.getAttribute('target') !== '_blank') {
       element.setAttribute('target', '_parent')
     }

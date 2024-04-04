@@ -4,10 +4,10 @@ import {
   moveAutocompleteSelection,
   selectedAutocompleteSuggestion,
   togglePreview,
+  hidePreview,
   updateAutocompleteList,
   AUTOCOMPLETE_CONTAINER_SELECTOR,
-  AUTOCOMPLETE_SUGGESTION_SELECTOR,
-  removePreview
+  AUTOCOMPLETE_SUGGESTION_SELECTOR
 } from './autocomplete/autocomplete-list'
 import { isMacOS, qs } from './helpers'
 
@@ -19,6 +19,16 @@ const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-bar .search-close-button'
  */
 export function initialize () {
   addEventListeners()
+
+  window.onTogglePreviewClick = function onTogglePreviewClick (event) {
+    event.preventDefault()
+    event.stopImmediatePropagation()
+
+    // Keep the focus on the input instead of the button when the user clicked to open the preview
+    // Maintains consistent keyboard navigation and look
+    focusSearchInput()
+    togglePreview(event.target)
+  }
 }
 
 /**
@@ -68,7 +78,7 @@ function addEventListeners () {
     } else if (event.key === 'ArrowDown' || (macOS && event.ctrlKey && event.key === 'n')) {
       moveAutocompleteSelection(1)
       event.preventDefault()
-    } else if (event.key === 'ArrowRight') {
+    } else if (event.key === 'Tab') {
       togglePreview()
       event.preventDefault()
     }
@@ -79,9 +89,10 @@ function addEventListeners () {
   })
 
   searchInput.addEventListener('focus', event => {
-    document.body.classList.add('search-focused')
-    removePreview()
-    updateAutocompleteList(event.target.value)
+    if (!document.body.classList.contains('search-focused')) {
+      document.body.classList.add('search-focused')
+      updateAutocompleteList(event.target.value)
+    }
   })
 
   searchInput.addEventListener('blur', event => {
@@ -99,11 +110,11 @@ function addEventListeners () {
           }
         }, 1000)
         return null
+      } else {
+        hideAutocomplete()
       }
-
-      if (relatedTarget.matches(SEARCH_CLOSE_BUTTON_SELECTOR)) {
-        clearSearch()
-      }
+    } else {
+      hideAutocomplete()
     }
   })
 
@@ -115,6 +126,11 @@ function addEventListeners () {
       clearSearch()
       hideAutocomplete()
     }
+  })
+
+  qs(SEARCH_CLOSE_BUTTON_SELECTOR).addEventListener('click', _event => {
+    clearSearch()
+    hideAutocomplete()
   })
 }
 
@@ -152,6 +168,7 @@ function clearSearch () {
 }
 
 function hideAutocomplete () {
+  hidePreview()
   document.body.classList.remove('search-focused')
   hideAutocompleteList()
 }

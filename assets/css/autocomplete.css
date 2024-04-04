@@ -82,7 +82,7 @@
   display: none;
 }
 
-.autocomplete-suggestions.previewing:has(.selected) .autocomplete-preview+.autocomplete-suggestion {
+.autocomplete-suggestions.previewing:has(.selected) .autocomplete-preview + .autocomplete-suggestion {
   display: block;
 }
 
@@ -123,6 +123,10 @@
 
 .autocomplete-suggestion:not(.selected) .autocomplete-suggestion-preview-indicator {
   display: none;
+}
+
+.autocomplete-suggestion:hover .autocomplete-suggestion-preview-indicator {
+  display: block;
 }
 
 .autocomplete-suggestion-preview-indicator {

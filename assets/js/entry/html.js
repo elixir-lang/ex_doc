@@ -23,9 +23,10 @@ import { initialize as initPreview} from '../preview'
 
 onDocumentReady(() => {
   const params = new URLSearchParams(window.location.search)
+  const isPreview = params.has('preview')
 
   initTheme()
-  initContent()
+  initContent(isPreview)
   initMakeup()
   initTooltips()
   initHintsPage()
@@ -33,7 +34,7 @@ onDocumentReady(() => {
   initOs()
   initTabsets()
 
-  if (params.has('preview')) {
+  if (isPreview) {
     initPreview()
   } else {
     initVersions()

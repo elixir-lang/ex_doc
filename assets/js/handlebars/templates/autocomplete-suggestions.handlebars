@@ -6,8 +6,7 @@
         Autocompletion results for <span class="bold">"{{term}}"</span>
       </span>
       <span class="press-return">
-        Press <span class="bold">RETURN</span> for full-text search, <span class="bold">→</span> for expand previews,
-        <span class="bold">←</span> for close previews
+        Press <span class="bold">RETURN</span> for full-text search, <span class="bold">TAB</span> for previews
       </span>
     </div>
     <div>
@@ -24,13 +23,15 @@
           <span class="label">{{this}}</span>
           {{/each}}
           <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-open">
-            <button type="button">
-              <span class="ri-arrow-left-s-line" /> Close Preview
+            <button onclick="onTogglePreviewClick(event)" class="icon-settings display-settings" title="Close preveiw" tabindex="-1">
+              <i class="ri-close-line" aria-hidden="true"></i>
+              Close preview
             </button>
           </div>
           <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-closed">
-            <button type="button">
-              Open Preview <span class="ri-arrow-right-s-line" />
+            <button onclick="onTogglePreviewClick(event)" class="icon-settings display-settings" title="Open preview" tabindex="-1">
+              <i class="ri-search-2-line" aria-hidden="true"></i>
+              Open preview
             </button>
           </div>
         </div>
