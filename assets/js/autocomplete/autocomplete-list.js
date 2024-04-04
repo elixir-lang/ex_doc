@@ -88,9 +88,12 @@ export function moveAutocompleteSelection (offset) {
     selectedElement.classList.remove('selected')
   }
 
+  if (state.previewOpen) {
+    showPreview(elementToSelect)
+  }
+
   if (elementToSelect) {
     elementToSelect.classList.add('selected')
-    showPreview(elementToSelect)
 
     elementToSelect.scrollIntoView({ block: 'nearest' })
   } else {
@@ -103,32 +106,37 @@ export function moveAutocompleteSelection (offset) {
  * Toggles the preview state of the autocomplete list
  */
 export function togglePreview () {
-  state.previewOpen = !state.previewOpen
-  const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
   if (state.previewOpen) {
-    suggestionList.classList.add('previewing')
-    const elementToSelect = qs(`${AUTOCOMPLETE_SUGGESTION_SELECTOR}[data-index="${state.selectedIdx}"]`)
-    showPreview(elementToSelect)
+    hidePreview()
   } else {
-    suggestionList.classList.remove('previewing')
-    const container = previewContainer()
-
-    if (container) {
-      container.remove()
-    };
+    showPreview()
   }
 }
 
-function showPreview (elementToSelect) {
+/**
+ * Hides the preview state of the autocomplete list
+ */
+export function hidePreview () {
+  state.previewOpen = false
+  const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
+  suggestionList.classList.remove('previewing')
   const container = previewContainer()
 
   if (container) {
     container.remove()
   };
+}
 
+/**
+ * Shows the preview state of the autocomplete list
+ */
+export function showPreview (elementToSelect) {
+  hidePreview()
+  state.previewOpen = true
   const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
+  elementToSelect = elementToSelect || qs(`${AUTOCOMPLETE_SUGGESTION_SELECTOR}[data-index="${state.selectedIdx}"]`)
 
-  if (state.previewOpen && elementToSelect) {
+  if (elementToSelect) {
     suggestionList.classList.add('previewing')
     const newContainer = document.createElement('div')
     newContainer.classList.add('autocomplete-preview')
@@ -139,8 +147,6 @@ function showPreview (elementToSelect) {
     iframe.setAttribute('src', previewHref)
     newContainer.replaceChildren(iframe)
     elementToSelect.parentNode.insertBefore(newContainer, elementToSelect.nextSibling)
-  } else {
-    suggestionList.classList.remove('previewing')
   }
 }
 

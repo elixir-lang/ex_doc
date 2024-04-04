@@ -1,3 +1,9 @@
+/*
+* Only used icons are included in the font
+* Icons can be generated at https://remixicon.com/
+* In assets/fonts/RemixIconCollection.remixicon there's easy to import on website list of icons
+*/
+
 @font-face {
   font-family: 'remixicon';
   src: url('../fonts/remixicon.woff2') format('woff2');
@@ -28,6 +34,8 @@
   --icon-search-2-line: "\f0cd";
   --icon-settings-3-line: "\f0e6";
   --icon-printer-line: "\f029";
+  --icon-eye-line: "\ecb5";
+  --icon-eye-line-off: "\ecb7";
 }
 
 .ri-lg { font-size: 1.3333em; line-height: .75em; vertical-align: -.0667em; }
@@ -48,3 +56,5 @@
 .ri-alert-line:before { content: var(--icon-alert); }
 .ri-double-quotes-l:before { content: var(--icon-double-quotes-l); }
 .ri-printer-line:before { content: var(--icon-printer-line); }
+.ri-eye-line:before { content: var(--icon-eye-line); }
+.ri-eye-off-line:before { content: var(--icon-eye-line-off); }

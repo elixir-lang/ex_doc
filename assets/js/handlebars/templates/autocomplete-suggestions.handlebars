@@ -22,14 +22,16 @@
           {{#each labels}}
           <span class="label">{{this}}</span>
           {{/each}}
-          <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-open" onclick="togglePreview()">
-            <button type="button">
-              Close Preview
+          <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-open">
+            <button onclick="onTogglePreviewClick(event)" class="icon-settings display-settings" title="Close preveiw" tabindex="-1">
+              <i class="ri-eye-off-line" aria-hidden="true"></i>
+              <span class="sr-only">Close preview</span>
             </button>
           </div>
-          <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-closed" onclick="togglePreview()">
-            <button type="button">
-              Open Preview <span class="ri-arrow-right-s-line"/>
+          <div class="autocomplete-suggestion-preview-indicator autocomplete-suggestion-preview-indicator-closed">
+            <button onclick="onTogglePreviewClick(event)" class="icon-settings display-settings" title="Open preview" tabindex="-1">
+              <i class="ri-eye-line" aria-hidden="true"></i>
+              <span class="sr-only">Open preview</span>
             </button>
           </div>
         </div>
