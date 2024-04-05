@@ -15,6 +15,7 @@
   --icon-arrow-up-s: "\ea78";
   --icon-arrow-down-s: "\ea4e";
   --icon-arrow-right-s: "\ea6e";
+  --icon-arrow-left-s: "\ea64";
   --icon-add: "\ea13";
   --icon-subtract: "\f1af";
   --icon-error-warning: "\eca1";
@@ -38,6 +39,7 @@
 .ri-arrow-up-s-line:before { content: var(--icon-arrow-up-s); }
 .ri-arrow-down-s-line:before { content: var(--icon-arrow-down-s); }
 .ri-arrow-right-s-line:before { content: var(--icon-arrow-right-s); }
+.ri-arrow-left-s-line:before { content: var(--icon-arrow-left-s); }
 .ri-search-2-line:before { content: var(--icon-search-2-line); }
 .ri-menu-line:before { content: var(--icon-menu-line); }
 .ri-close-line:before { content: var(--icon-close-line); }

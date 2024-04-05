@@ -1,5 +1,5 @@
 import { getSuggestions } from './suggestions'
-import { isBlank, qs } from '../helpers'
+import { isBlank, qs, qsAll } from '../helpers'
 
 export const AUTOCOMPLETE_CONTAINER_SELECTOR = '.autocomplete'
 export const AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR = '.autocomplete-suggestions'
@@ -16,6 +16,15 @@ const state = {
  */
 export function showAutocompleteList () {
   qs(AUTOCOMPLETE_CONTAINER_SELECTOR).classList.add('shown')
+
+  const buttons = qsAll('.autocomplete-suggestion-preview-indicator')
+  buttons.forEach(button => {
+    button.addEventListener('click', event => {
+      event.preventDefault()
+      event.stopPropagation()
+      togglePreview()
+    })
+  })
 }
 
 /**
