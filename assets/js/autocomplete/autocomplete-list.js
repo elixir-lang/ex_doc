@@ -140,9 +140,8 @@ export function hidePreview () {
  */
 function showPreview (elementToSelect) {
   state.previewOpen = true
-  const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
 
-  if(elementToSelect) {
+  if (elementToSelect) {
     elementToSelect = elementToSelect.closest(AUTOCOMPLETE_SUGGESTION_SELECTOR)
   } else {
     elementToSelect = qs(`${AUTOCOMPLETE_SUGGESTION_SELECTOR}[data-index="${state.selectedIdx}"]`)
@@ -154,8 +153,8 @@ function showPreview (elementToSelect) {
 }
 
 function removePreview () {
-  let preview = qs('.autocomplete-preview')
-  if(preview) { preview.remove() }
+  const preview = qs('.autocomplete-preview')
+  if (preview) { preview.remove() }
 }
 
 function newAutocompleteIndex (offset) {
