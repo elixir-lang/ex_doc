@@ -91,9 +91,10 @@ body.dark {
   --searchBarBorder:             var(--gray500);
   --searchAccentMain:            var(--gray300);
   --searchSearch:                var(--gray900);
-  --autocompleteBorder:          rgba(0,0,0,.25);
+  --autocompleteBorder:          rgba(28,42,60,.75);
+  --autocompletePreview:         var(--gray750);
   --autocompleteHover:           var(--gray700);
-  --autocompleBackground:        var(--gray800);
+  --autocompleteBackground:      var(--gray800);
   --suggestionBorder:            var(--gray600);
   --autocompleteResults:         var(--gray200);
   --autocompleteResultsBold:     var(--gray100);

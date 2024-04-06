@@ -10,7 +10,7 @@
   height: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-bottom: 12px solid var(--autocompleBackground);
+  border-bottom: 12px solid var(--autocompleteBackground);
   position: absolute;
   top: 8px;
   left: 26px;
@@ -23,11 +23,10 @@
   width: 100%;
   margin: 0;
   height: 65vh;
+  background-color: var(--background);
   font-family: var(--sansFontFamily);
   border: 4px solid var(--autocompleteBorder);
-  font-weight: 300;
-  flex-grow: 12;
-  font-size: 0.9rem;
+  padding: 12px 16px;
 }
 
 .autocomplete-preview iframe {
@@ -65,7 +64,7 @@
 }
 
 .autocomplete-suggestions {
-  background-color: var(--autocompleBackground);
+  background-color: var(--autocompleteBackground);
   border-radius: 8px;
   box-shadow: 0px 15px 99px 0px var(--autocompleteBorder);
   overflow-y: auto;
@@ -94,10 +93,6 @@
   display: none;
 }
 
-.autocomplete-preview {
-  width: 100%
-}
-
 .autocomplete-suggestion {
   color: inherit;
   display: block;
@@ -121,27 +116,48 @@
   background-color: var(--autocompleteHover);
 }
 
-.autocomplete-suggestion:not(.selected) .autocomplete-suggestion-preview-indicator {
+.autocomplete-suggestion:not(.selected) .autocomplete-preview-indicator {
   display: none;
 }
 
-.autocomplete-suggestion:hover .autocomplete-suggestion-preview-indicator {
+.autocomplete-preview-indicator {
+  float: right;
+}
+
+.autocomplete-preview-indicator button {
+  color: var(--iconAction);
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  border: 1px solid var(--suggestionBorder);
+  border-radius: 8px;
+  transition: color .3s ease-in-out;
+  background-color: var(--autocompletePreview);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+.autocomplete-preview-indicator button:hover {
+  color: var(--iconActionHover);
+  background-color: var(--autocompleteHover);
+}
+
+.autocomplete-preview-indicator button i {
+  margin-right: 4px;
+}
+
+.autocomplete-suggestions.previewing .autocomplete-preview-indicator-closed {
+  display: none;
+}
+
+.autocomplete-suggestions:not(.previewing) .autocomplete-preview-indicator-open {
+  display: none;
+}
+
+.autocomplete-suggestion:hover:not(.selected) .autocomplete-preview-indicator-closed {
   display: block;
 }
-
-.autocomplete-suggestion-preview-indicator {
-  float: right;
-  border-radius: 100%;
-}
-
-.autocomplete-suggestions.previewing .autocomplete-suggestion-preview-indicator-closed {
-  display: none;
-}
-
-.autocomplete-suggestions:not(.previewing) .autocomplete-suggestion-preview-indicator-open {
-  display: none;
-}
-
 
 .autocomplete-suggestion em {
   font-style: normal;

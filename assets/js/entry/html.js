@@ -25,7 +25,7 @@ onDocumentReady(() => {
   const params = new URLSearchParams(window.location.search)
   const isPreview = params.has('preview')
 
-  initTheme()
+  initTheme(params.get('theme'))
   initContent(isPreview)
   initMakeup()
   initTooltips()

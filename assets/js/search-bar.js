@@ -4,6 +4,7 @@ import {
   moveAutocompleteSelection,
   selectedAutocompleteSuggestion,
   togglePreview,
+  showPreview,
   hidePreview,
   updateAutocompleteList,
   AUTOCOMPLETE_CONTAINER_SELECTOR,
@@ -20,14 +21,15 @@ const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-bar .search-close-button'
 export function initialize () {
   addEventListeners()
 
-  window.onTogglePreviewClick = function onTogglePreviewClick (event) {
+  window.onTogglePreviewClick = function (event, open) {
     event.preventDefault()
     event.stopImmediatePropagation()
 
-    // Keep the focus on the input instead of the button when the user clicked to open the preview
+    // Keep the focus on the input instead of the button
+    // when the user clicked to open the preview.
     // Maintains consistent keyboard navigation and look
     focusSearchInput()
-    togglePreview(event.target)
+    if (open) { showPreview(event.target) } else { hidePreview() }
   }
 }
 

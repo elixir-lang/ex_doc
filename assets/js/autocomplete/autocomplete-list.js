@@ -1,5 +1,6 @@
 import { getSuggestions } from './suggestions'
 import { isBlank, qs } from '../helpers'
+import { currentTheme } from '../theme'
 
 export const AUTOCOMPLETE_CONTAINER_SELECTOR = '.autocomplete'
 export const AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR = '.autocomplete-suggestions'
@@ -99,7 +100,7 @@ export function setAutocompleteSelection (index) {
       const newContainer = document.createElement('div')
       newContainer.classList.add('autocomplete-preview')
       const iframe = document.createElement('iframe')
-      const previewHref = elementToSelect.href.replace('.html', '.html?preview=true')
+      const previewHref = elementToSelect.href.replace('.html', `.html?preview=true&theme=${currentTheme()}`)
       // The minimum permissions necessary for the iframe to run JavaScript and communicate with the parent window.
       iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups')
       iframe.setAttribute('src', previewHref)
@@ -117,11 +118,11 @@ export function setAutocompleteSelection (index) {
 /**
  * Toggles the preview state of the autocomplete list
  */
-export function togglePreview (elementToSelect) {
+export function togglePreview () {
   if (state.previewOpen) {
     hidePreview()
   } else {
-    showPreview(elementToSelect)
+    showPreview()
   }
 }
 
@@ -138,7 +139,7 @@ export function hidePreview () {
 /**
  * Shows the preview state of the autocomplete list
  */
-function showPreview (elementToSelect) {
+export function showPreview (elementToSelect) {
   state.previewOpen = true
 
   if (elementToSelect) {
