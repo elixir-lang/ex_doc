@@ -85,7 +85,7 @@ export function moveAutocompleteSelection (offset) {
 
 function handlePreviewMessage (event) {
   if (event.data.type === 'preview') {
-    const { maxHeight, contentHeight } = event.data
+    const { contentHeight } = event.data
     const previewContainer = qs('.autocomplete-preview')
     if (previewContainer) {
       previewContainer.style.height = `${contentHeight + 32}px`
