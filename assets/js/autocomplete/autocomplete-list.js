@@ -84,13 +84,12 @@ export function moveAutocompleteSelection (offset) {
 }
 
 function handlePreviewMessage (event) {
-  if (event.origin !== 'null' && event.origin !== window.location.origin) return
-
   if (event.data.type === 'preview') {
     const { maxHeight, contentHeight } = event.data
     const previewContainer = qs('.autocomplete-preview')
     if (previewContainer) {
-      previewContainer.style.height = `${Math.min(maxHeight, contentHeight + 32)}px`
+      previewContainer.style.height = `${contentHeight + 32}px`
+      previewContainer.classList.remove('loading')
     }
   }
 }
@@ -108,15 +107,19 @@ export function setAutocompleteSelection (index) {
   if (elementToSelect) {
     if (state.previewOpen) {
       removePreview()
+      window.addEventListener('message', handlePreviewMessage)
       suggestionList.classList.add('previewing')
       const newContainer = document.createElement('div')
       newContainer.classList.add('autocomplete-preview')
-      const iframe = document.createElement('iframe')
+      newContainer.classList.add('loading')
+
       const previewHref = elementToSelect.href.replace('.html', `.html?preview=true&theme=${currentTheme()}`)
-      // The minimum permissions necessary for the iframe to run JavaScript and communicate with the parent window.
-      iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups')
+      const iframe = document.createElement('iframe')
       iframe.setAttribute('src', previewHref)
-      newContainer.replaceChildren(iframe)
+
+      newContainer.appendChild(document.createElement('div'))
+      newContainer.appendChild(document.createElement('span'))
+      newContainer.appendChild(iframe)
       elementToSelect.parentNode.insertBefore(newContainer, elementToSelect.nextSibling)
     }
 
@@ -162,7 +165,6 @@ export function showPreview (elementToSelect) {
 
   if (elementToSelect) {
     setAutocompleteSelection(parseInt(elementToSelect.dataset.index))
-    window.addEventListener('message', handlePreviewMessage)
   }
 }
 

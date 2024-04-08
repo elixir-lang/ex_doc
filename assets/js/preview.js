@@ -17,7 +17,7 @@ function preview (previewing) {
 
 function sendPreviewInfoToParent () {
   const maxHeight = document.body.scrollHeight
-  const contentHeight = document.getElementById('content').scrollHeight
+  const contentHeight = document.getElementById('content').parentElement.offsetHeight
   const message = {
     type: 'preview',
     maxHeight,
