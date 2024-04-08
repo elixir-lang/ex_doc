@@ -12,6 +12,18 @@ function preview (previewing) {
   replaceContents(previewing)
   makeLinksOpenInParent()
   scrollToTop()
+  sendPreviewInfoToParent()
+}
+
+function sendPreviewInfoToParent () {
+  const maxHeight = document.body.scrollHeight
+  const contentHeight = document.getElementById('content').scrollHeight
+  const message = {
+    type: 'preview',
+    maxHeight,
+    contentHeight
+  }
+  window.parent.postMessage(message, '*')
 }
 
 function makeLinksOpenInParent () {
