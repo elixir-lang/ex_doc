@@ -1,5 +1,6 @@
 body.preview {
   --sidebarWidth: 0px;
+  overflow: hidden;
 }
 
 body.preview .content {
