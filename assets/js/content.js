@@ -8,10 +8,14 @@ const LIVEBOOK_BADGE_ANCHOR_SELECTOR = '.livebook-badge'
 /**
  * Runs some general modifiers on the documentation content.
  */
-export function initialize () {
-  fixLinks()
-  fixSpacebar()
+export function initialize (isPreview) {
+  // Disabled on autocomplete preview because it moves the focus to inner iframe
+  if (!isPreview) {
+    fixSpacebar()
+  }
+
   setLivebookBadgeUrl()
+  fixLinks()
   fixBlockquotes()
 }
 

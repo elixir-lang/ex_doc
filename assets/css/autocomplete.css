@@ -10,13 +10,65 @@
   height: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-bottom: 12px solid var(--autocompleBackground);
+  border-bottom: 12px solid var(--autocompleteBackground);
   position: absolute;
   top: 8px;
   left: 26px;
   transform: translateX(-50%);
   z-index: 100;
   background-color: transparent;
+}
+
+.autocomplete-preview {
+  width: 100%;
+  margin: 0;
+  height: 100%;
+  line-height: 20px;
+  background-color: var(--background);
+  font-family: var(--sansFontFamily);
+  border: 4px solid var(--autocompleteBorder);
+  padding: 12px 16px;
+}
+
+.autocomplete-preview div, .autocomplete-preview span {
+  display: none;
+}
+
+.autocomplete-preview.loading div {
+  float: left;
+  display: block;
+  border: 5px solid var(--autocompleteBorder);
+  border-radius: 50%;
+  border-top: 5px solid var(--textDetailAccent);
+  width: 20px;
+  height: 20px;
+  animation: spinner 4s linear infinite;
+}
+
+.autocomplete-preview.loading span {
+  color: var(--autocompleteResults);
+  display: inline;
+  margin-left: 6px;
+}
+
+.autocomplete-preview.loading span:after {
+  color: var(--autocompleteResults);
+  content: "Loading";
+}
+
+@keyframes spinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.autocomplete-preview.loading iframe {
+  height: 0;
+}
+
+.autocomplete-preview iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 .autocomplete-results {
@@ -40,18 +92,37 @@
   display: block;
 }
 
-.autocomplete-suggestions {
-  background-color: var(--autocompleBackground);
-  border-radius: 8px;
+.autocomplete-container {
   position: absolute;
   top: 15px;
   width: 100%;
   z-index: 200;
+}
+
+.autocomplete-suggestions {
+  background-color: var(--autocompleteBackground);
+  border-radius: 8px;
   box-shadow: 0px 15px 99px 0px var(--autocompleteBorder);
   overflow-y: auto;
   max-height: 450px;
   white-space: normal;
   overflow-x: hidden;
+}
+
+.autocomplete-suggestions.previewing:has(.selected) {
+  max-height: 900px;
+}
+
+.autocomplete-suggestions.previewing:has(.selected) .autocomplete-suggestion:not(.selected) {
+  display: none;
+}
+
+.autocomplete-suggestions.previewing:not(:has(.selected)) .autocomplete-preview {
+  display: none;
+}
+
+.autocomplete-suggestions:not(.previewing) .autocomplete-preview {
+  display: none;
 }
 
 .autocomplete-suggestion {
@@ -60,21 +131,56 @@
   padding: 12px 20px;
   text-decoration: none;
   transition: background-color 0.3s ease-in-out;
-  border-bottom: 1px solid var(--suggestionBorder);
-  font-size: 0.9rem;
-}
-
-.autocomplete-suggestion:first-child {
   border-top: 1px solid var(--suggestionBorder);
-}
-
-.autocomplete-suggestion:last-child {
-  border-bottom: 0;
+  font-size: 0.9rem;
 }
 
 .autocomplete-suggestion:hover,
 .autocomplete-suggestion.selected {
   background-color: var(--autocompleteHover);
+}
+
+.autocomplete-suggestion:not(.selected) .autocomplete-preview-indicator {
+  display: none;
+}
+
+.autocomplete-preview-indicator {
+  float: right;
+}
+
+.autocomplete-preview-indicator button {
+  color: var(--iconAction);
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  border: 1px solid var(--suggestionBorder);
+  border-radius: 8px;
+  transition: color .3s ease-in-out;
+  background-color: var(--autocompletePreview);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+.autocomplete-preview-indicator button:hover {
+  color: var(--iconActionHover);
+  background-color: var(--autocompleteHover);
+}
+
+.autocomplete-preview-indicator button i {
+  margin-right: 4px;
+}
+
+.autocomplete-suggestions.previewing .autocomplete-preview-indicator-closed {
+  display: none;
+}
+
+.autocomplete-suggestions:not(.previewing) .autocomplete-preview-indicator-open {
+  display: none;
+}
+
+.autocomplete-suggestion:hover:not(.selected) .autocomplete-preview-indicator-closed {
+  display: block;
 }
 
 .autocomplete-suggestion em {
@@ -117,8 +223,10 @@
 
 /* Style the scrollbar track (the area behind the thumb) */
 .autocomplete-suggestions::-webkit-scrollbar {
-  width: 5px; /* Set the width of the scrollbar */
-  border-radius: 7px; /* Add rounded corners to the thumb */
+  width: 5px;
+  /* Set the width of the scrollbar */
+  border-radius: 7px;
+  /* Add rounded corners to the thumb */
   flex-shrink: 0;
 }
 

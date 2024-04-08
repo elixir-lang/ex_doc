@@ -1,5 +1,5 @@
 import { extractModuleHint, extractFunctionHint } from './hints'
-import { getCurrentPageSidebarType, getLocationHash, getProjectNameAndVersion, qs } from '../helpers'
+import { getCurrentPageSidebarType, descriptionElementFromHash, getLocationHash, getProjectNameAndVersion, qs } from '../helpers'
 
 const CONTENT_INNER_SELECTOR = '.content-inner'
 
@@ -56,30 +56,4 @@ function withVersion (hint) {
  */
 function isModulePage () {
   return ['modules', 'tasks'].includes(getCurrentPageSidebarType())
-}
-
-/**
- * Finds an element by a URL hash (e.g. a function section).
- *
- * @param {String} hash The hash part of a URL.
- * @returns {HTMLElement|null} The relevant element.
- */
-function descriptionElementFromHash (hash) {
-  if (!hash) { return null }
-
-  const element = document.getElementById(hash)
-
-  if (!element) { return null }
-
-  // See `detail_template.eex` for the reference.
-
-  if (element.matches('.detail')) {
-    return element
-  }
-
-  if (element.matches('span')) {
-    return element.parentElement
-  }
-
-  return null
 }

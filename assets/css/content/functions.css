@@ -2,21 +2,22 @@
   from {
     background-color: var(--textDetailBackground);
   }
+
   to {
     background-color: var(--blink);
   }
 }
 
 .content-inner .detail:target .detail-header {
-  animation-duration: .55s;
+  animation-duration: 0.55s;
   animation-name: blink-background;
   animation-iteration-count: 1;
   animation-timing-function: ease-in-out;
 }
 
 .content-inner .detail-header {
-  margin: 2.0em 0 1.0em;
-  padding: .5em 1em;
+  margin: 2 0 1em;
+  padding: 0.5em 1em;
   background-color: var(--textDetailBackground);
   border-left: 3px solid var(--textDetailAccent);
   font-size: 1em;
@@ -42,13 +43,13 @@
 }
 
 .content-inner .detail-header a.detail-link {
-  transition: opacity .3s ease-in-out;
+  transition: opacity 0.3s ease-in-out;
   position: absolute;
   top: 0;
   left: 0;
   display: block;
   opacity: 0;
-  padding: .6em;
+  padding: 0.6em;
   line-height: 1.5em;
   margin-left: -2.5em;
   text-decoration: none;
@@ -63,7 +64,7 @@
 
 .content-inner .specs pre {
   font-family: var(--monoFontFamily);
-  font-size: .9em;
+  font-size: 0.9em;
   font-style: normal;
   line-height: 24px;
   white-space: pre-wrap;
@@ -88,17 +89,21 @@
 .content-inner .docstring:is(h2, h3, h4, h5) {
   font-weight: 700;
 }
+
 .content-inner .docstring h2 {
   font-size: 1.1em;
 }
+
 .content-inner .docstring h3 {
-  font-size: 1.0em;
+  font-size: 1em;
 }
+
 .content-inner .docstring h4 {
-  font-size: .95em;
+  font-size: 0.95em;
 }
+
 .content-inner .docstring h5 {
-  font-size: .9em;
+  font-size: 0.9em;
 }
 
 .content-inner div.deprecated {

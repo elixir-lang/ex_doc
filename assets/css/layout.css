@@ -22,7 +22,7 @@ body {
   box-sizing: inherit;
 }
 
-.main {
+.body-wrapper {
   display: flex;
   height: 100%;
 }
@@ -60,7 +60,7 @@ body {
   position: absolute;
 }
 
-.content-inner {
+.content .content-inner {
   max-width: var(--content-width);
   min-height: 100%;
   margin: 0 auto;

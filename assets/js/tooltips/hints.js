@@ -104,8 +104,6 @@ function loadHintFromExternalPage (href) {
   return new Promise((resolve, reject) => {
     // Load the page in a hidden iframe, so that it may send a message to the window.
     const iframe = document.createElement('iframe')
-    // The minimum permissions necessary for the iframe to run JavaScript and communicate with the parent window.
-    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin')
     iframe.setAttribute('src', hintHref)
     iframe.style.display = 'none'
 

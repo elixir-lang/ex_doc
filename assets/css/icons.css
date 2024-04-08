@@ -1,3 +1,9 @@
+/*
+* Only used icons are included in the font
+* Icons can be generated at https://remixicon.com/
+* In assets/fonts/RemixIconCollection.remixicon there's easy to import on website list of icons
+*/
+
 @font-face {
   font-family: 'remixicon';
   src: url('../fonts/remixicon.woff2') format('woff2');

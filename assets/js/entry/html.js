@@ -19,24 +19,33 @@ import { initialize as initCopyButton } from '../copy-button'
 import { initialize as initSettings } from '../settings'
 import { initialize as initOs } from '../os'
 import { initialize as initTabsets } from '../tabsets'
+import { initialize as initPreview} from '../preview'
 
 onDocumentReady(() => {
-  initTheme()
-  initSidebarDrawer()
-  initSidebarContent()
-  initSidebarSearch()
-  initVersions()
-  initContent()
+  const params = new URLSearchParams(window.location.search)
+  const isPreview = params.has('preview')
+
+  initTheme(params.get('theme'))
+  initContent(isPreview)
   initMakeup()
-  initModal()
-  initKeyboardShortcuts()
-  initQuickSwitch()
-  initToast()
   initTooltips()
   initHintsPage()
-  initSearchPage()
   initCopyButton()
-  initSettings()
   initOs()
   initTabsets()
+
+  if (isPreview) {
+    initPreview()
+  } else {
+    initVersions()
+    initSidebarDrawer()
+    initSidebarContent()
+    initSidebarSearch()
+    initModal()
+    initKeyboardShortcuts()
+    initQuickSwitch()
+    initToast()
+    initSearchPage()
+    initSettings()
+  }
 })
