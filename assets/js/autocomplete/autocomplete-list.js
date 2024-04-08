@@ -83,6 +83,18 @@ export function moveAutocompleteSelection (offset) {
   setAutocompleteSelection(newAutocompleteIndex(offset))
 }
 
+function handlePreviewMessage (event) {
+  if (event.origin !== 'null' && event.origin !== window.location.origin) return
+
+  if (event.data.type === 'preview') {
+    const { maxHeight, contentHeight } = event.data
+    const previewContainer = qs('.autocomplete-preview')
+    if (previewContainer) {
+      previewContainer.style.height = `${Math.min(maxHeight, contentHeight + 32)}px`
+    }
+  }
+}
+
 export function setAutocompleteSelection (index) {
   state.selectedIdx = index
   const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
@@ -150,12 +162,16 @@ export function showPreview (elementToSelect) {
 
   if (elementToSelect) {
     setAutocompleteSelection(parseInt(elementToSelect.dataset.index))
+    window.addEventListener('message', handlePreviewMessage)
   }
 }
 
 function removePreview () {
   const preview = qs('.autocomplete-preview')
-  if (preview) { preview.remove() }
+  if (preview) {
+    preview.remove()
+    window.removeEventListener('message', handlePreviewMessage)
+  }
 }
 
 function newAutocompleteIndex (offset) {
