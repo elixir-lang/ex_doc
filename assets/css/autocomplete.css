@@ -110,7 +110,7 @@
 }
 
 .autocomplete-suggestions.previewing:has(.selected) {
-  max-height: 900px;
+  max-height: 80vh;
 }
 
 .autocomplete-suggestions.previewing:has(.selected) .autocomplete-suggestion:not(.selected) {
