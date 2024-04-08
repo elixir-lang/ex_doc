@@ -8,7 +8,7 @@ import {
   hidePreview,
   updateAutocompleteList,
   AUTOCOMPLETE_CONTAINER_SELECTOR,
-  AUTOCOMPLETE_SUGGESTION_SELECTOR
+  AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR
 } from './autocomplete/autocomplete-list'
 import { isMacOS, qs } from './helpers'
 
@@ -103,7 +103,7 @@ function addEventListeners () {
     if (relatedTarget) {
       // If blur is triggered caused by clicking on an autocomplete result,
       // then ignore it, because it's handled in the click handler below.
-      if (relatedTarget.matches(AUTOCOMPLETE_SUGGESTION_SELECTOR)) {
+      if (qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR).contains(relatedTarget)) {
         // Focus the input after a while, so that it's easier to close
         // or get back to after an accidental blur
         setTimeout(() => {
