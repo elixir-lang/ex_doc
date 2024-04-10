@@ -99,22 +99,19 @@ function addEventListeners () {
 
   searchInput.addEventListener('blur', event => {
     const relatedTarget = event.relatedTarget
+    const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
 
-    if (relatedTarget) {
+    if (relatedTarget && suggestionList && suggestionList.contains(relatedTarget)) {
       // If blur is triggered caused by clicking on an autocomplete result,
       // then ignore it, because it's handled in the click handler below.
-      if (qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR).contains(relatedTarget)) {
+      setTimeout(() => {
         // Focus the input after a while, so that it's easier to close
         // or get back to after an accidental blur
-        setTimeout(() => {
-          if (isAutocompleteListOpen()) {
-            searchInput.focus()
-          }
-        }, 1000)
-        return null
-      } else {
-        hideAutocomplete()
-      }
+        if (isAutocompleteListOpen()) {
+          searchInput.focus()
+        }
+      }, 1000)
+      return null
     } else {
       hideAutocomplete()
     }

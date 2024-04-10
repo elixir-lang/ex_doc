@@ -147,7 +147,7 @@ export function togglePreview () {
 export function hidePreview () {
   state.previewOpen = false
   const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
-  suggestionList.classList.remove('previewing')
+  if(suggestionList) { suggestionList.classList.remove('previewing') }
   removePreview()
 }
 
