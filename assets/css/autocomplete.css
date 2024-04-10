@@ -107,6 +107,7 @@
   max-height: 450px;
   white-space: normal;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
 }
 
 .autocomplete-suggestions.previewing:has(.selected) {
