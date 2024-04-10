@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.32.0 (2024-04-10)
+
+  * Enhancements
+    * Add the ability to see previews during autocompletion
+    * Remove serif font for content and prefer using the operating system font instead
+    * Allow the search bar to be focused at any moment
+    * Make functions acceptable for `:skip_undefined_reference_warnings_on`
+    * Make functions acceptable for `:skip_code_autolink_to`
+    * Allow using meta tags to disable autocompletion and configure the full text search
+
+  * Bug fixes
+    * Fix blockquote padding inside tabset on small screens
+    * Consistently index h2 and h3 headers
+
 ## v0.31.2 (2024-03-05)
 
   * Enhancements
