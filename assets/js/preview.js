@@ -13,6 +13,10 @@ function preview (previewing) {
   makeLinksOpenInParent()
   scrollToTop()
   sendPreviewInfoToParent()
+
+  window.addEventListener('resize', event => {
+    sendPreviewInfoToParent()
+  })
 }
 
 function sendPreviewInfoToParent () {
