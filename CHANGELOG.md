@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.32.1 (2024-04-12)
+
+  * Bug fixes
+    * Add version dropdown back on hexdocs.pm
+    * Improve search input styling and scrolling
+
 ## v0.32.0 (2024-04-10)
 
   * Enhancements
