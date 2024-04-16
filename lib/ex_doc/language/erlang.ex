@@ -709,7 +709,11 @@ defmodule ExDoc.Language.Erlang do
     offset = byte_size(Atom.to_string(type)) + 2
 
     options = [linewidth: 98 + offset]
-    :erl_pp.attribute(ast, options) |> IO.iodata_to_binary() |> trim_offset(offset)
+
+    :erl_pp.attribute(ast, options)
+    |> IO.chardata_to_string()
+    |> String.trim()
+    |> String.trim_leading("-#{Atom.to_string(type)} ")
   end
 
   ## Helpers
@@ -722,16 +726,5 @@ defmodule ExDoc.Language.Erlang do
       true ->
         :module
     end
-  end
-
-  # `-type t() :: atom()` becomes `t() :: atom().`
-  defp trim_offset(binary, offset) do
-    binary
-    |> String.trim()
-    |> String.split("\n")
-    |> Enum.map(fn line ->
-      binary_part(line, offset, byte_size(line) - offset)
-    end)
-    |> Enum.join("\n")
   end
 end
