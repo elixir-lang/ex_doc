@@ -23,7 +23,6 @@ defmodule ExDoc.Language do
     * `:source_file` - the source file the module code is located, defmodule in Elixir, or -module in Erlang
 
     * `:source_basedir` - the absolute directory where the Elixir/Erlang compiler was run.
-      See `ExDoc.Language.Source.get_basedir/2` for more details.
 
     * `:callback_types` - a list of types that are considered callbacks
 

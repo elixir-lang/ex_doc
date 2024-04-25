@@ -26,8 +26,11 @@ defmodule ExDoc.Language.Erlang do
   def module_data(module, docs_chunk, _config) do
     if abst_code = Source.get_abstract_code(module) do
       id = Atom.to_string(module)
-      source_basedir = Source.get_basedir(abst_code, module)
-      {source_file, source_line} = Source.get_module_location(abst_code, source_basedir, module)
+      source_basedir = Source.fetch_basedir!(abst_code, module)
+
+      {source_file, source_line} =
+        Source.fetch_module_location!(abst_code, source_basedir, module)
+
       type = module_type(module)
 
       %{
@@ -115,7 +118,7 @@ defmodule ExDoc.Language.Erlang do
           end
       end
 
-    {file, line} = Source.get_function_location(module_data, {name, arity})
+    {file, line} = Source.fetch_function_location!(module_data, {name, arity})
 
     %{
       doc_fallback: fn -> equiv_data(module_data.module, file, line, metadata) end,
@@ -164,7 +167,7 @@ defmodule ExDoc.Language.Erlang do
   def type_data(entry, module_data) do
     {{kind, name, arity}, anno, signature, _doc, metadata} = entry
 
-    case Source.get_type_from_module_data(module_data, name, arity) do
+    case Source.fetch_type!(module_data, name, arity) do
       %{} = map ->
         %{
           doc_fallback: fn ->

@@ -39,8 +39,10 @@ defmodule ExDoc.Language.Elixir do
       abst_code = Source.get_abstract_code(module) ->
         title = module_title(module, type)
 
-        source_basedir = Source.get_basedir(abst_code, module)
-        {source_file, source_line} = Source.get_module_location(abst_code, source_basedir, module)
+        source_basedir = Source.fetch_basedir!(abst_code, module)
+
+        {source_file, source_line} =
+          Source.fetch_module_location!(abst_code, source_basedir, module)
 
         optional_callbacks = Source.get_optional_callbacks(module, type)
 
@@ -184,7 +186,7 @@ defmodule ExDoc.Language.Elixir do
     {{_kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
 
     %{type: type, spec: spec, source_file: source, source_line: line} =
-      Source.get_type_from_module_data(module_data, name, arity)
+      Source.fetch_type!(module_data, name, arity)
 
     quoted = spec |> Code.Typespec.type_to_quoted() |> process_type_ast(type)
     signature = [get_typespec_signature(quoted, arity)]
@@ -530,7 +532,7 @@ defmodule ExDoc.Language.Elixir do
   end
 
   defp find_function_line(module_data, na) do
-    {_source, line} = Source.get_function_location(module_data, na)
+    {_source, line} = Source.fetch_function_location!(module_data, na)
     line
   end
 

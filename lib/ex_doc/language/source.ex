@@ -1,6 +1,19 @@
 defmodule ExDoc.Language.Source do
   @moduledoc false
 
+  def anno_line(line) when is_integer(line), do: abs(line)
+  def anno_line(anno), do: anno |> :erl_anno.line() |> abs()
+
+  def anno_file(anno) do
+    case :erl_anno.file(anno) do
+      :undefined ->
+        nil
+
+      file ->
+        String.Chars.to_string(file)
+    end
+  end
+
   @doc """
   Get abstract code and basedir for a module
 
@@ -18,7 +31,7 @@ defmodule ExDoc.Language.Source do
   end
 
   defp expand_records_in_types(abst_code) do
-    ## Find all records in ast and collect any fields with type declarations
+    # Find all records in ast and collect any fields with type declarations
     records =
       filtermap_ast(abst_code, nil, fn
         {:attribute, anno, :record, {name, fields}} ->
@@ -40,7 +53,7 @@ defmodule ExDoc.Language.Source do
       end)
       |> Map.new()
 
-    ## Expand records in all specs, callbacks, types and opaques
+    # Expand records in all specs, callbacks, types and opaques
     filtermap_ast(abst_code, nil, fn
       {:attribute, anno, kind, {mfa, ast}} when kind in [:spec, :callback] ->
         ast = Enum.map(ast, &expand_records(&1, records))
@@ -62,16 +75,16 @@ defmodule ExDoc.Language.Source do
     {:ann_type, anno, [name, expand_records(type, records)]}
   end
 
-  ## When we encounter a record, we fetch the type definitions in the record and
-  ## merge then with the type. If there are duplicates we take the one in the type
-  ## declaration
+  # When we encounter a record, we fetch the type definitions in the record and
+  # merge then with the type. If there are duplicates we take the one in the type
+  # declaration
   defp expand_records({:type, anno, :record, [{:atom, _, record} = name | args]}, records) do
     args =
       (args ++ Map.get(records, record, []))
       |> Enum.uniq_by(fn {:type, _, :field_type, [{:atom, _, name} | _]} -> name end)
 
-    ## We delete the record from the map so that recursive
-    ## record definitions are not expanded.
+    # We delete the record from the map so that recursive
+    # record definitions are not expanded.
     records = Map.delete(records, record)
 
     {:type, anno, :record, expand_records([name | args], records)}
@@ -90,14 +103,14 @@ defmodule ExDoc.Language.Source do
   end
 
   @doc """
-  Get the basedir of a module
+  Fetches the basedir of a module.
 
   The basedir is the cwd of the Elixir/Erlang compiler when compiling the module.
   All `-file` attributes in the module is relative to this directory.
   """
-  def get_basedir(abst_code, module) do
-    ## We look for the first -file attribute to see what the source file that
-    ## was compiled is called. Both Erlang and Elixir places one at the top.
+  def fetch_basedir!(abst_code, module) do
+    # We look for the first -file attribute to see what the source file that
+    # was compiled is called. Both Erlang and Elixir places one at the top.
     filename =
       Enum.find_value(abst_code, fn
         {:attribute, _anno, :file, {filename, _line}} ->
@@ -105,17 +118,16 @@ defmodule ExDoc.Language.Source do
 
         _ ->
           nil
-      end)
+      end) || raise "could not find base directory for #{inspect(module)}"
 
-    ## The first -file attribute will be either relative or absolute
-    ## depending on whether the compiler was called with an absolute
-    ## or relative path.
+    # The first -file attribute will be either relative or absolute
+    # depending on whether the compiler was called with an absolute
+    # or relative path.
     if Path.type(filename) == :relative do
-      ## If the compiler was called with a relative path, then any other
-      ## relative -file attribute will be relative to the same directory.
-      ## We use `module_info(:compile)[:source]` to get an absolute path
-      ## to the source file and calculate the basedir from that
-
+      # If the compiler was called with a relative path, then any other
+      # relative -file attribute will be relative to the same directory.
+      # We use `module_info(:compile)[:source]` to get an absolute path
+      # to the source file and calculate the basedir from that
       compile_source =
         cond do
           source = module.module_info(:compile)[:source] ->
@@ -143,27 +155,27 @@ defmodule ExDoc.Language.Source do
       |> Enum.drop(Path.split(filename) |> Enum.count() |> Kernel.*(-1))
       |> Path.join()
     else
-      ## If an absolute path was used, then any relative -file attribute
-      ## is relative to the directory of the source file
+      # If an absolute path was used, then any relative -file attribute
+      # is relative to the directory of the source file
       Path.dirname(filename)
     end
   end
 
-  def get_module_location(abst_code, source_basedir, module) do
+  def fetch_module_location!(abst_code, source_basedir, module) do
     find_ast(abst_code, source_basedir, fn
       {:attribute, anno, :module, ^module} ->
         {anno_file(anno), anno_line(anno)}
 
       _ ->
         nil
-    end)
+    end) || raise "could not find module definition for #{inspect(module)}"
   end
 
-  def get_function_location(module_data, {name, arity}) do
+  def fetch_function_location!(module_data, {name, arity}) do
     find_ast(module_data.private.abst_code, module_data.source_basedir, fn
       {:function, anno, ^name, ^arity, _} -> {anno_file(anno), anno_line(anno)}
       _ -> nil
-    end)
+    end) || raise "could not find function definition for #{name}/#{arity}"
   end
 
   # Returns a map of {name, arity} => spec.
@@ -178,7 +190,7 @@ defmodule ExDoc.Language.Source do
     |> Map.new()
   end
 
-  def get_type_from_module_data(module_data, name, arity) do
+  def fetch_type!(module_data, name, arity) do
     find_ast(module_data.private.abst_code, module_data.source_basedir, fn
       {:attribute, anno, type, {^name, _, args} = spec} = attr ->
         if type in [:opaque, :type] and length(args) == arity do
@@ -193,7 +205,7 @@ defmodule ExDoc.Language.Source do
 
       _ ->
         nil
-    end)
+    end) || raise "could not find type definition for #{name}/#{arity}"
   end
 
   def get_callbacks(abst_code, source_basedir) do
@@ -215,20 +227,16 @@ defmodule ExDoc.Language.Source do
 
   def get_optional_callbacks(_module, _type), do: []
 
-  def find_ast(ast, source_basedir, fun) do
-    filtermap_ast(ast, source_basedir, fun) |> hd()
+  defp find_ast(ast, source_basedir, fun) do
+    filtermap_ast(ast, source_basedir, fun) |> List.first()
   end
 
-  @doc """
-  Does a filtermap operation over the forms in an abstract syntax tree with
-  updated anno for each form pointing to the correct file.
-  """
   # The file which a form belongs to is decided by the previous :file
   # attribute in the AST. The :file can be either relative, or absolute
   # depending on how the file was included. So when traversing the AST
   # we need to keep track of the :file attributes and update the anno
   # with the correct file.
-  def filtermap_ast(ast, source_basedir, fun) do
+  defp filtermap_ast(ast, source_basedir, fun) do
     Enum.reduce(ast, {nil, []}, fn
       {:attribute, _anno, :file, {filename, _line}} = entry, {_file, acc} ->
         {if Path.type(filename) == :relative && source_basedir do
@@ -261,18 +269,5 @@ defmodule ExDoc.Language.Source do
     end)
     |> elem(1)
     |> Enum.reverse()
-  end
-
-  def anno_line(line) when is_integer(line), do: abs(line)
-  def anno_line(anno), do: anno |> :erl_anno.line() |> abs()
-
-  def anno_file(anno) do
-    case :erl_anno.file(anno) do
-      :undefined ->
-        nil
-
-      file ->
-        String.Chars.to_string(file)
-    end
   end
 end
