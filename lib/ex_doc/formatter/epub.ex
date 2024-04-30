@@ -2,14 +2,18 @@ defmodule ExDoc.Formatter.EPUB do
   @moduledoc false
 
   @mimetype "application/epub+zip"
+
   alias __MODULE__.{Assets, Templates}
   alias ExDoc.Formatter.HTML
+  alias ExDoc.Utils
 
   @doc """
-  Generate EPUB documentation for the given modules.
+  Generates EPUB documentation for the given modules.
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
+    Utils.unset_warned()
+
     config = normalize_config(config)
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
@@ -66,7 +70,7 @@ defmodule ExDoc.Formatter.EPUB do
         html = Templates.extra_template(config, title, title_content, content)
 
         if File.regular?(output) do
-          ExDoc.Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
+          Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
         end
 
         File.write!(output, html)
