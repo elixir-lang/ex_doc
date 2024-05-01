@@ -34,6 +34,15 @@ function renderModal () {
   qs(MODAL_CLOSE_BUTTON_SELECTOR).addEventListener('click', event => {
     closeModal()
   })
+
+  qs(MODAL_SELECTOR).addEventListener('click', event => {
+    const classList = event.target.classList
+    // if we clicked on the modal overlay/parent but not the modal content
+    if (classList.contains('modal') && classList.contains('shown') && classList.length === 2) {
+      closeModal()
+    }
+  })
+
 }
 
 /**
