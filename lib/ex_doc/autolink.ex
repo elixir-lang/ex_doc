@@ -250,7 +250,7 @@ defmodule ExDoc.Autolink do
 
   defp mix_task(name, string, mode, config) do
     {module, url, visibility} =
-      if name =~ ~r/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/ do
+      if name =~ ~r/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$/ do
         parts = name |> String.split(".") |> Enum.map(&Macro.camelize/1)
         module = Module.concat([Mix, Tasks | parts])
 
