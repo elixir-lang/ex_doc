@@ -214,6 +214,9 @@ defmodule ExDoc.Language.ElixirTest do
       assert autolink_doc("`mix compile.elixir`") ==
                ~s|<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code class="inline">mix compile.elixir</code></a>|
 
+      assert autolink_doc("`mix task_with_docs`") ==
+               ~s|<a href=\"Mix.Tasks.TaskWithDocs.html\"><code class=\"inline\">mix task_with_docs</code></a>|
+
       assert autolink_doc("`mix help compile.elixir`") ==
                ~s|<a href="https://hexdocs.pm/mix/Mix.Tasks.Compile.Elixir.html"><code class="inline">mix help compile.elixir</code></a>|
 
