@@ -42,7 +42,6 @@ function renderModal () {
       closeModal()
     }
   })
-
 }
 
 /**
