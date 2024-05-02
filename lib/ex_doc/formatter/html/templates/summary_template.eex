@@ -5,7 +5,7 @@
   <%= for node <- nodes do %>
     <div class="summary-row">
       <div class="summary-signature">
-        <a href="#<%=enc node.id %>" translate="no"><%=h node.signature %></a>
+        <a href="#<%=enc node.id %>" data-no-tooltip translate="no"><%=h node.signature %></a>
         <%= if deprecated = node.deprecated do %>
           <span class="deprecated" title="<%= h(deprecated) %>">deprecated</span>
         <% end %>

@@ -130,7 +130,7 @@
   }
 
   /* Remove hover tooltip from inline code references */
-  .page-cheatmd .content-inner div#tooltip {
+  .page-cheatmd .content-inner div.tooltip {
     display: none;
   }
 

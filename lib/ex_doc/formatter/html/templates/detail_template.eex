@@ -3,7 +3,7 @@
     <span id="<%=enc "#{default_name}/#{default_arity}" %>"></span>
   <% end %>
   <div class="detail-header">
-    <a href="#<%=enc node.id %>" class="detail-link" title="Link to this <%= pretty_type(node) %>">
+    <a href="#<%=enc node.id %>" class="detail-link" data-no-tooltip title="Link to this <%= pretty_type(node) %>">
       <i class="ri-link-m" aria-hidden="true"></i>
       <span class="sr-only">Link to this <%= pretty_type(node) %></span>
     </a>

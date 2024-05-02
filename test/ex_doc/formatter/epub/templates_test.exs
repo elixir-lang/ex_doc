@@ -145,7 +145,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       content = get_module_page([CompiledWithDocs])
 
       assert content =~
-               ~r{<div class="summary-signature">\s*<a href="#example_1/0" translate="no">}
+               ~r{<div class="summary-signature">\s*<a href="#example_1/0" data-no-tooltip translate="no">}
     end
 
     test "contains links to summary sections when those exist" do

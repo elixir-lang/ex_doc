@@ -5,9 +5,9 @@ import { cancelHintFetchingIfAny, getHint, HINT_KIND, isValidHintHref } from './
 // Elements that can activate the tooltip.
 const TOOLTIP_ACTIVATORS_SELECTOR = '.content a'
 // Tooltip root element.
-const TOOLTIP_SELECTOR = '#tooltip'
+const TOOLTIP_SELECTOR = '.tooltip'
 // Tooltip content element.
-const TOOLTIP_BODY_SELECTOR = '#tooltip .tooltip-body'
+const TOOLTIP_BODY_SELECTOR = '.tooltip .tooltip-body'
 // Element containing the documentation text.
 const CONTENT_INNER_SELECTOR = 'body .content-inner'
 
@@ -65,7 +65,7 @@ function addEventListeners () {
  */
 function linkElementEligibleForTooltip (linkElement) {
   // Skip tooltips on the permalink icon (the on-hover one next to the function name).
-  if (linkElement.classList.contains('detail-link')) { return false }
+  if (linkElement.getAttribute('data-no-tooltip') !== null) { return false }
 
   // Skip link to the module page we are already on.
   if (isHrefToSelf(linkElement.href)) { return false }
