@@ -37,7 +37,7 @@
 `+((o=s(a,"each").call(r,l!=null?s(l,"suggestions"):l,{name:"each",hash:{},fn:e.program(1,u,0),inverse:e.noop,data:u,loc:{start:{line:13,column:6},end:{line:45,column:15}}}))!=null?o:"")+`    </div>
   </div>
 </div>
-`},useData:!0}),y["modal-layout"]=d({compiler:[8,">= 4.3.0"],main:function(e,l,a,p,u){return`<div id="modal" class="modal" tabindex="-1">
+`},useData:!0}),y["modal-layout"]=d({compiler:[8,">= 4.3.0"],main:function(e,l,a,p,u){return`<div class="modal" tabindex="-1">
   <div class="modal-contents">
     <div class="modal-header">
       <div class="modal-title"></div>

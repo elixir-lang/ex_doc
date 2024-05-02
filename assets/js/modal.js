@@ -1,9 +1,9 @@
 import { qs } from './helpers'
 
-const MODAL_SELECTOR = '#modal'
-const MODAL_CLOSE_BUTTON_SELECTOR = '#modal .modal-close'
-const MODAL_TITLE_SELECTOR = '#modal .modal-title'
-const MODAL_BODY_SELECTOR = '#modal .modal-body'
+const MODAL_SELECTOR = '.modal'
+const MODAL_CLOSE_BUTTON_SELECTOR = '.modal .modal-close'
+const MODAL_TITLE_SELECTOR = '.modal .modal-title'
+const MODAL_BODY_SELECTOR = '.modal .modal-body'
 const FOCUSABLE_SELECTOR = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 const state = {
   prevFocus: null,
@@ -38,7 +38,7 @@ function renderModal () {
   qs(MODAL_SELECTOR).addEventListener('click', event => {
     const classList = event.target.classList
     // if we clicked on the modal overlay/parent but not the modal content
-    if (classList.contains('modal') && classList.contains('shown') && classList.length === 2) {
+    if (classList.contains('modal')) {
       closeModal()
     }
   })
