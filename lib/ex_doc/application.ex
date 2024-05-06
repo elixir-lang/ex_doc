@@ -22,6 +22,20 @@ defmodule ExDoc.Application do
       ExDoc.Refs
     ]
 
+    start_httpc()
+
     Supervisor.start_link(children, strategy: :one_for_one)
+  end
+
+  defp start_httpc() do
+    :inets.start(:httpc, profile: :ex_doc)
+
+    opts = [
+      max_sessions: 8,
+      max_keep_alive_length: 4,
+      keep_alive_timeout: 120_000
+    ]
+
+    :httpc.set_options(opts, :ex_doc)
   end
 end
