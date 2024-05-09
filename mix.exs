@@ -35,11 +35,11 @@ defmodule ExDoc.Mixfile do
   defp deps do
     [
       {:earmark_parser, "~> 1.4.39"},
-      {:makeup_elixir, "~> 0.14"},
-      {:makeup_erlang, "~> 0.1"},
+      {:makeup_elixir, "~> 0.14 or ~> 1.0"},
+      {:makeup_erlang, "~> 0.1 or ~> 1.0"},
       # Add other makeup lexers as optional for the executable
-      {:makeup_c, ">= 0.1.1", optional: true},
-      {:makeup_html, ">= 0.0.0", only: :dev},
+      {:makeup_c, ">= 0.1.0", optional: true},
+      {:makeup_html, ">= 0.1.0", optional: true},
       {:jason, "~> 1.2", only: :test},
       {:floki, "~> 0.0", only: :test},
       {:easyhtml, "~> 0.0", only: :test}
