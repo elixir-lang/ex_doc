@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.32.2 (2024-05-10)
+
+  * Enhancements
+    * Allow the modal to close when we click outside the modal content
+
+  * Bug fixes
+    * Fix indentation of -spec/-type in Erlang
+    * Fix Mix task autolink for tasks with underscores
+    * Avoid conflicts between custom headers with tooltips/modals
+
 ## v0.32.1 (2024-04-12)
 
   * Bug fixes
