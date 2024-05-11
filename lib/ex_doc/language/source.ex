@@ -144,8 +144,9 @@ defmodule ExDoc.Language.Source do
             compile_info[:source]
 
           true ->
-            # This should never happen...
-            raise "could not find source or debug info for #{inspect(module)}"
+            # This happens only when building docs for Makeup itself,
+            # as some of its modules may have been loaded from the escript.
+            filename
         end
 
       compile_source
