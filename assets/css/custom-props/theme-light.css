@@ -76,18 +76,18 @@
                                                  var(--white) 20%,
                                                  var(--white-opacity-50) 70%,
                                                  var(--white-opacity-0) 100%);
-  --sidebarAccentMain:           var(--gray50);
-  --sidebarBackground:           var(--gray800);
-  --sidebarHeader:               var(--gray700);
-  --sidebarMuted:                var(--gray300);
-  --sidebarHover:                var(--white);
-  --sidebarScrollbarThumb:       var(--coldGray);
+  --sidebarAccentMain:           var(--gray800);
+  --sidebarBackground:           var(--gray50);
+  --sidebarHeader:               var(--gray100);
+  --sidebarMuted:                var(--gray600);
+  --sidebarHover:                var(--black);
+  --sidebarScrollbarThumb:       var(--coldGrayLight);
   --sidebarScrollbarTrack:       var(--sidebarBackground);
-  --sidebarSubheadings:          var(--gray400);
-  --sidebarItem:                 var(--gray200);
-  --sidebarInactiveItemMarker:   var(--gray600);
-  --sidebarLanguageAccentBar:    var(--mainLight);
-  --sidebarActiveItem:           var(--mainLightest);
+  --sidebarSubheadings:          var(--gray800);
+  --sidebarItem:                 var(--gray600);
+  --sidebarInactiveItemMarker:   var(--gray300);
+  --sidebarLanguageAccentBar:    var(--mainDark);
+  --sidebarActiveItem:           var(--mainDarkest);
   --searchBarBorder:             var(--gray200);
   --searchAccentMain:            var(--gray-400);
   --searchLanguageAccentBar:     var(--main);

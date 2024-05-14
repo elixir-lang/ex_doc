@@ -152,8 +152,8 @@
 }
 
 .sidebar .sidebar-listNav li:is(:hover):not(.selected) button {
-  background-color: var(--gray600);
-  border-top: var(--navTabBorderWidth) solid var(--gray400);
+  background-color: var(--sidebarInactiveItemMarker);
+  border-top: var(--navTabBorderWidth) solid var(--sidebarSubheadings);
   color: var(--sidebarAccentMain);
   transition: all 150ms;
 }
