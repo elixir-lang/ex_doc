@@ -153,7 +153,7 @@
 
 .sidebar .sidebar-listNav li:is(:hover):not(.selected) button {
   background-color: var(--sidebarInactiveItemMarker);
-  border-top: var(--navTabBorderWidth) solid var(--sidebarSubheadings);
+  border-top: var(--navTabBorderWidth) solid var(--sidebarInactiveItemBorder);
   color: var(--sidebarAccentMain);
   transition: all 150ms;
 }

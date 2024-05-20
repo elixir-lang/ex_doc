@@ -72,10 +72,6 @@ body.dark {
 
   --success:                     var(--green-lightened-10);
 
-  --sidebarButtonBackground:     linear-gradient(180deg,
-                                                 var(--gray900) 20%,
-                                                 var(--gray900-opacity-50) 70%,
-                                                 var(--gray900-opacity-0) 100%);
   --sidebarAccentMain:           var(--gray50);
   --sidebarBackground:           var(--gray800);
   --sidebarHeader:               var(--gray700);
@@ -85,6 +81,7 @@ body.dark {
   --sidebarScrollbarTrack:       var(--sidebarBackground);
   --sidebarSubheadings:          var(--gray400);
   --sidebarItem:                 var(--gray200);
+  --sidebarInactiveItemBorder:   var(--gray400);
   --sidebarInactiveItemMarker:   var(--gray600);
   --sidebarLanguageAccentBar:    var(--mainLight);
   --sidebarActiveItem:           var(--mainLightest);

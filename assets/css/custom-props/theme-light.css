@@ -72,24 +72,21 @@
 
   --success:                     var(--green);
 
-  --sidebarButtonBackground:     linear-gradient(180deg,
-                                                 var(--white) 20%,
-                                                 var(--white-opacity-50) 70%,
-                                                 var(--white-opacity-0) 100%);
-  --sidebarAccentMain:           var(--gray800);
+  --sidebarAccentMain:           var(--black);
   --sidebarBackground:           var(--gray50);
   --sidebarHeader:               var(--gray100);
-  --sidebarMuted:                var(--gray600);
+  --sidebarMuted:                var(--gray800);
   --sidebarHover:                var(--black);
   --sidebarScrollbarThumb:       var(--coldGrayLight);
   --sidebarScrollbarTrack:       var(--sidebarBackground);
-  --sidebarSubheadings:          var(--gray800);
-  --sidebarItem:                 var(--gray600);
-  --sidebarInactiveItemMarker:   var(--gray300);
+  --sidebarSubheadings:          var(--black);
+  --sidebarItem:                 var(--black);
+  --sidebarInactiveItemBorder:   var(--gray500);
+  --sidebarInactiveItemMarker:   var(--gray200);
   --sidebarLanguageAccentBar:    var(--mainDark);
   --sidebarActiveItem:           var(--mainDarkest);
   --searchBarBorder:             var(--gray200);
-  --searchAccentMain:            var(--gray-400);
+  --searchAccentMain:            var(--gray600);
   --searchLanguageAccentBar:     var(--main);
   --searchSearch:                var(--white);
   --autocompleteBorder:          rgba(3, 9, 19, 0.10);
