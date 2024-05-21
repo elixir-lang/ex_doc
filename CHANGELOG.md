@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.33.0 (2024-05-21)
+
+  * Enhancements
+    * Keep the sidebar light in light mode
+
 ## v0.32.2 (2024-05-10)
 
   * Enhancements
