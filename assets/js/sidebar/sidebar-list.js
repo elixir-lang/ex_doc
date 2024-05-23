@@ -75,7 +75,9 @@ function renderSidebarNodeList (nodesByType, type) {
         clearCurrentSectionElement(previousSection)
       }
 
-      if (anchor.matches('.expand') && anchor.pathname === window.location.pathname) {
+      if (anchor.matches('.expand') &&
+          (anchor.pathname === window.location.pathname ||
+           anchor.pathname === window.location.pathname + '.html')) {
         openListItem(listItem)
       }
     })

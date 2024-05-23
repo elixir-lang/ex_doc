@@ -15,7 +15,8 @@ const SEARCH_CONTAINER_SELECTOR = '#search'
  * Activates only on the `/search.html` page.
  */
 export function initialize () {
-  if (window.location.pathname.endsWith('/search.html')) {
+  const pathname = window.location.pathname
+  if (pathname.endsWith('/search.html') || pathname.endsWith('/search')) {
     const query = getQueryParamByName('q')
     search(query)
   }

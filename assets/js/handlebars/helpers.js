@@ -64,9 +64,8 @@ Handlebars.registerHelper('isEmptyArray', function (entry, options) {
 
 Handlebars.registerHelper('isLocal', function (nodeId, options) {
   const pathSuffix = window.location.pathname.split('/').pop()
-  const nodePage = nodeId + '.html'
 
-  if (nodePage === pathSuffix) {
+  if (pathSuffix === nodeId + '.html' || pathSuffix === nodeId) {
     return options.fn(this)
   } else {
     return options.inverse(this)
