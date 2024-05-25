@@ -2,13 +2,13 @@ defmodule ExDoc.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-lang/ex_doc"
-  @version "0.33.0"
+  @version "0.34.0-dev"
 
   def project do
     [
       app: :ex_doc,
       version: @version,
-      elixir: "~> 1.12",
+      elixir: "~> 1.13",
       deps: deps(),
       aliases: aliases(),
       package: package(),
