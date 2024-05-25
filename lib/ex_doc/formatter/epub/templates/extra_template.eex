@@ -3,7 +3,6 @@
       <%=h title_content %>
     </h1>
     <%= H.link_headings(content) %>
-    <%# Extra content specified by the user (e.g. custom Javascript) %>
     <%= before_closing_body_tag(config, :epub) %>
   </body>
 </html>

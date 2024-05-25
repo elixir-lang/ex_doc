@@ -30,7 +30,6 @@
         </div>
       </section>
     <% end %>
-    <%# Extra content specified by the user (e.g. custom Javascript) %>
     <%= before_closing_body_tag(config, :epub) %>
   </body>
 </html>

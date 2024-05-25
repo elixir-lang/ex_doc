@@ -8,7 +8,6 @@
     <link type="text/css" rel="stylesheet"
       href="<%= H.asset_rev "#{config.output}/OEBPS", "dist/epub-#{config.proglang}-*.css" %>" />
     <script src="<%= H.asset_rev "#{config.output}/OEBPS", "dist/epub-*.js" %>"></script>
-    <%# Extra content specified by the user (e.g. custom CSS) %>
     <%= before_closing_head_tag(config, :epub) %>
   </head>
   <body class="content-inner">

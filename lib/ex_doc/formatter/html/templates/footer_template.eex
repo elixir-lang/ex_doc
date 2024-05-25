@@ -39,7 +39,6 @@
   </div>
 </main>
 </div>
-  <%# Extra content specified by the user (e.g. custom Javascript) %>
   <%= before_closing_body_tag(config, :html) %>
   </body>
 </html>
