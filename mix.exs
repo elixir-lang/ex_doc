@@ -41,7 +41,8 @@ defmodule ExDoc.Mixfile do
       {:makeup_c, ">= 0.1.0", optional: true},
       {:makeup_html, ">= 0.1.0", optional: true},
       {:jason, "~> 1.2", only: :test},
-      {:floki, "~> 0.0", only: :test},
+      # TODO: Relax Floki requirement once we no longer support Elixir v1.12
+      {:floki, "~> 0.35.0", only: :test},
       {:easyhtml, "~> 0.0", only: :test}
     ]
   end

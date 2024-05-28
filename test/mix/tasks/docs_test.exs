@@ -5,11 +5,30 @@ defmodule Mix.Tasks.DocsTest do
   # Cannot run concurrently due to Mix compile/deps calls
   use ExUnit.Case, async: false
 
+  import ExUnit.CaptureIO
+
+  alias ExDoc.Utils
+
   @moduletag :tmp_dir
 
-  def run(context, args, opts) do
+  def run(context, args, opts, generator \\ &{&1, &2, &3}) do
     opts = Keyword.put_new(opts, :output, context[:tmp_dir])
-    Mix.Tasks.Docs.run(args, opts, &{&1, &2, &3})
+    Mix.Tasks.Docs.run(args, opts, generator)
+  end
+
+  def run_with_io(context, args, opts, generator)
+      when is_list(args) and is_list(opts) and is_function(generator, 3) do
+    opts = Keyword.put_new(opts, :output, context[:tmp_dir])
+
+    # TODO: Use with_io on Elixir v1.13
+    output =
+      capture_io(fn ->
+        send(self(), run(context, args, opts, generator))
+      end)
+
+    receive do
+      response -> {response, output}
+    end
   end
 
   test "inflects values from app and version", context do
@@ -388,6 +407,67 @@ defmodule Mix.Tasks.DocsTest do
                   proglang: :elixir
                 ]}
              ] = run(context, [], app: :umbrella, apps_path: "apps/", docs: [ignore_apps: [:foo]])
+    end)
+  end
+
+  test "accepts warnings_as_errors in :warnings_as_errors", context do
+    assert [
+             {"ex_doc", "dev",
+              [
+                formatter: "html",
+                formatters: ["html", "epub"],
+                deps: _,
+                apps: [:ex_doc],
+                source_beam: _,
+                warnings_as_errors: false,
+                proglang: :elixir
+              ]},
+             {"ex_doc", "dev",
+              [
+                formatter: "epub",
+                formatters: ["html", "epub"],
+                deps: _,
+                apps: [:ex_doc],
+                source_beam: _,
+                warnings_as_errors: false,
+                proglang: :elixir
+              ]}
+           ] = run(context, [], app: :ex_doc, docs: [warnings_as_errors: false])
+  end
+
+  @tag :tmp_dir
+  test "exits with 1 due to warnings, with flag --warnings_as_errors", context do
+    Utils.unset_warned()
+
+    Mix.Project.in_project(:single, "test/fixtures/single", fn _mod ->
+      source_beam = "_build/test/lib/single/ebin"
+
+      fun = fn ->
+        run_with_io(
+          context,
+          [],
+          [
+            app: :single,
+            docs: [
+              source_beam: source_beam,
+              warnings_as_errors: true,
+              formatter: "html",
+              deps: []
+            ],
+            version: "0.1.0"
+          ],
+          &ExDoc.generate_docs/3
+        )
+      end
+
+      io =
+        capture_io(:stderr, fn ->
+          assert catch_exit(fun.()) == {:shutdown, 1}
+        end)
+
+      assert io =~
+               "Documents have been generated, but generation for html format failed due to warnings " <>
+                 "while using the --warnings-as-errors option."
     end)
   end
 end
