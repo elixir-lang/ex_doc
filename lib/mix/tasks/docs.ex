@@ -69,9 +69,8 @@ defmodule Mix.Tasks.Docs do
     * `:api_reference` - Whether to generate `api-reference.html`; default: `true`.
       If this is set to false, `:main` must also be set.
 
-    * `:assets` - Path to a directory that will be copied as is to the "assets"
-      directory in the output path. Its entries may be referenced in your docs
-      under "assets/ASSET.EXTENSION"; defaults to no assets directory.
+    * `:assets` - A map of source => target directories that will be copied as is to
+      the output path. It defaults to an empty map.
 
     * `:authors` - List of authors for the generated docs or epub.
 

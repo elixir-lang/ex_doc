@@ -22,7 +22,7 @@ defmodule ExDoc.Formatter.HTML do
     extras = build_extras(config, ".html")
 
     # Generate search early on without api reference in extras
-    static_files = generate_assets(config, @assets_dir, default_assets(config))
+    static_files = generate_assets(".", default_assets(config), config)
     search_data = generate_search_data(project_nodes, extras, config)
 
     # TODO: Move this categorization to the language
@@ -284,37 +284,41 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generate assets from configs with the given default assets.
   """
-  def generate_assets(config, assets_dir, defaults) do
-    write_default_assets(config, defaults) ++ copy_assets(config, assets_dir)
-  end
+  def generate_assets(namespace, defaults, %{output: output, assets: assets}) do
+    namespaced_assets =
+      if is_map(assets) do
+        Enum.map(assets, fn {source, target} -> {source, Path.join(namespace, target)} end)
+      else
+        IO.warn(
+          "giving a binary to :assets is deprecated, please give a map from source to target instead"
+        )
 
-  defp copy_assets(config, assets_dir) do
-    if path = config.assets do
-      path
-      |> Path.join("**/*")
-      |> Path.wildcard()
-      |> Enum.map(fn source ->
-        filename = Path.join(assets_dir, Path.relative_to(source, path))
-        target = Path.join(config.output, filename)
-        File.mkdir(Path.dirname(target))
-        File.copy(source, target)
-        filename
-      end)
-    else
-      []
-    end
-  end
+        [{assets, Path.join(namespace, "assets")}]
+      end
 
-  defp write_default_assets(config, sources) do
-    Enum.flat_map(sources, fn {files, dir} ->
-      target_dir = Path.join(config.output, dir)
+    Enum.flat_map(defaults ++ namespaced_assets, fn {dir_or_files, relative_target_dir} ->
+      target_dir = Path.join(output, relative_target_dir)
       File.mkdir_p!(target_dir)
 
-      Enum.map(files, fn {name, content} ->
-        target = Path.join(target_dir, name)
-        File.write(target, content)
-        Path.relative_to(target, config.output)
-      end)
+      cond do
+        is_list(dir_or_files) ->
+          Enum.map(dir_or_files, fn {name, content} ->
+            target = Path.join(target_dir, name)
+            File.write(target, content)
+            Path.relative_to(target, output)
+          end)
+
+        is_binary(dir_or_files) and File.dir?(dir_or_files) ->
+          dir_or_files
+          |> File.cp_r!(target_dir)
+          |> Enum.map(&Path.relative_to(&1, output))
+
+        is_binary(dir_or_files) ->
+          []
+
+        true ->
+          raise ":assets must be a map of source directories to target directories"
+      end
     end)
   end
 

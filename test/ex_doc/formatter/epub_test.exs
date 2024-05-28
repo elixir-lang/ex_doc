@@ -74,7 +74,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert_raise(
       RuntimeError,
       ~s{asset with extension ".pdf" is not supported by EPUB format},
-      fn -> generate_docs(doc_config(context, assets: "test/tmp/epub_assets")) end
+      fn -> generate_docs(doc_config(context, assets: %{"test/tmp/epub_assets" => "assets"})) end
     )
   after
     File.rm_rf!("test/tmp/epub_assets")
@@ -236,7 +236,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     generate_docs_and_unzip(
       context,
       doc_config(context,
-        assets: "test/tmp/epub_assets",
+        assets: %{"test/tmp/epub_assets" => "assets"},
         logo: "test/fixtures/elixir.png",
         cover: "test/fixtures/elixir.png"
       )

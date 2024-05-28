@@ -28,7 +28,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       project: "Elixir",
       version: "1.0.1",
       formatter: "html",
-      assets: "test/tmp/html_assets",
+      assets: %{"test/tmp/html_assets" => "assets"},
       output: tmp_dir <> "/html",
       source_beam: "test/tmp/beam",
       source_url: "https://github.com/elixir-lang/elixir",
@@ -745,7 +745,10 @@ defmodule ExDoc.Formatter.HTMLTest do
     File.touch!("test/tmp/html_assets/hello/world")
 
     generate_docs(
-      doc_config(context, assets: "test/tmp/html_assets", logo: "test/fixtures/elixir.png")
+      doc_config(context,
+        assets: %{"test/tmp/html_assets" => "assets"},
+        logo: "test/fixtures/elixir.png"
+      )
     )
 
     assert File.regular?(tmp_dir <> "/html/assets/logo.png")
