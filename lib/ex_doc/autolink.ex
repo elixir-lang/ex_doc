@@ -430,7 +430,7 @@ defmodule ExDoc.Autolink do
 
     case {kind, visibility} do
       {_kind, :public} ->
-        fragment(tool(module, config), kind, name, arity)
+        fragment(kind, name, arity)
 
       {:function, _visibility} ->
         case config.language.try_autoimported_function(name, arity, mode, config, original_text) do
@@ -464,20 +464,12 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  def fragment(tool, kind, nil, arity) do
-    fragment(tool, kind, "nil", arity)
+  def fragment(kind, nil, arity) do
+    fragment(kind, "nil", arity)
   end
 
-  def fragment(:ex_doc, kind, name, arity) do
+  def fragment(kind, name, arity) do
     "#" <> prefix(kind) <> "#{encode_fragment_name(name)}/#{arity}"
-  end
-
-  def fragment(:otp, kind, name, arity) do
-    case kind do
-      :function -> "##{encode_fragment_name(name)}-#{arity}"
-      :callback -> "#Module:#{encode_fragment_name(name)}-#{arity}"
-      :type -> "#type-#{encode_fragment_name(name)}"
-    end
   end
 
   defp encode_fragment_name(name) when is_atom(name) do
@@ -503,10 +495,10 @@ defmodule ExDoc.Autolink do
         tool = tool(module, config)
 
         if same_module? do
-          fragment(tool, kind, name, arity)
+          fragment(kind, name, arity)
         else
           url = string_app_module_url(original_text, tool, module, nil, config)
-          url && url <> fragment(tool, kind, name, arity)
+          url && url <> fragment(kind, name, arity)
         end
 
       {:regular_link, module_visibility, :undefined}
