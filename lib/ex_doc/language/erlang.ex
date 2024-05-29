@@ -431,12 +431,12 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp final_url({kind, name, arity}, _config) do
-    Autolink.fragment(:ex_doc, kind, name, arity)
+    Autolink.fragment(kind, name, arity)
   end
 
   defp final_url({kind, module, name, arity}, config) do
     tool = Autolink.tool(module, config)
-    Autolink.app_module_url(tool, module, Autolink.fragment(tool, kind, name, arity), config)
+    Autolink.app_module_url(tool, module, Autolink.fragment(kind, name, arity), config)
   end
 
   @impl true
