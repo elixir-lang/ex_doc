@@ -794,7 +794,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP private type", c do
       assert autolink_spec(~S"-spec foo() -> array:array_indx().", c) ==
-               ~s|foo() -> array:array_indx().|
+               ~s|foo() -> <a href="https://www.erlang.org/doc/man/array.html#t:array_indx/0">array:array_indx</a>().|
     end
 
     test "skip typespec name", c do
