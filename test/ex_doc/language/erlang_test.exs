@@ -20,7 +20,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP module", c do
       assert autolink_edoc("{@link array}", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html"><code>array</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html"><code>array</code></a>|
     end
 
     test "OTP module when generating OTP docs", c do
@@ -30,7 +30,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "app module", c do
       assert autolink_edoc("{@link //stdlib/array}", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html"><code>array</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html"><code>array</code></a>|
     end
 
     @tag warnings: :send
@@ -57,19 +57,19 @@ defmodule ExDoc.Language.ErlangTest do
          [{:code, [], ["array"], %{}}], %{}}
 
       assert do_autolink_doc(ast) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html#anchor"><code>array</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#anchor"><code>array</code></a>|
 
       ast =
         {:a, [href: "stdlib:array#anchor", rel: "https://erlang.org/doc/link/seeerl"],
          [{:code, [], ["array"], %{}}], %{}}
 
       assert do_autolink_doc(ast) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html#anchor"><code>array</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#anchor"><code>array</code></a>|
     end
 
     test "custom text", c do
       assert autolink_edoc("{@link array. The <code>array</code> module}", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html">The <code>array</code> module</a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html">The <code>array</code> module</a>|
     end
 
     test "local function", c do
@@ -84,7 +84,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP function", c do
       assert autolink_edoc("{@link array:new/0}", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html#new/0"><code>array:new/0</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#new/0"><code>array:new/0</code></a>|
     end
 
     test "OTP function when generating OTP docs", c do
@@ -99,12 +99,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "ERTS function", c do
       assert autolink_edoc("{@link zlib:gunzip/1}", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/zlib.html#gunzip/1"><code>zlib:gunzip/1</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/erts/zlib.html#gunzip/1"><code>zlib:gunzip/1</code></a>|
     end
 
     test "app function", c do
       assert autolink_edoc("{@link //stdlib/array:new/0}", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html#new/0"><code>array:new/0</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#new/0"><code>array:new/0</code></a>|
     end
 
     test "external function", c do
@@ -124,12 +124,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP type", c do
       assert autolink_edoc("{@link array:array()}", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html#t:array/0"><code>array:array()</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#t:array/0"><code>array:array()</code></a>|
     end
 
     test "app type", c do
       assert autolink_edoc("{@link //stdlib/array:array()}", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html#t:array/0"><code>array:array()</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#t:array/0"><code>array:array()</code></a>|
     end
 
     @myList (if :erlang.system_info(:otp_release) >= ~c"27" do
@@ -310,7 +310,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "function in module autoimport using slash", c do
       assert autolink_doc("`node/0`", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/erlang.html#node/0"><code class="inline">node/0</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/erts/erlang.html#node/0"><code class="inline">node/0</code></a>|
     end
 
     test "type in module autoimport", c do
@@ -320,7 +320,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "type in module autoimport using slash", c do
       assert autolink_doc("`t:integer/0`", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/erlang.html#t:integer/0"><code class="inline">integer/0</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:integer/0"><code class="inline">integer/0</code></a>|
     end
 
     test "bad function in module code", c do
@@ -335,7 +335,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "linking to auto-imported nil works", c do
       assert autolink_doc("[`[]`](`t:nil/0`)", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/erlang.html#t:nil/0"><code class="inline">[]</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:nil/0"><code class="inline">[]</code></a>|
     end
 
     test "linking to local nil works", c do
@@ -543,7 +543,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP function", c do
       assert autolink_extra("`lists:reverse/1`", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/lists.html#reverse/1"><code class="inline">lists:reverse/1</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/lists.html#reverse/1"><code class="inline">lists:reverse/1</code></a>|
     end
 
     test "type", c do
@@ -553,7 +553,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP type", c do
       assert autolink_extra("`t:array:array/0`", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html#t:array/0"><code class="inline">array:array/0</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#t:array/0"><code class="inline">array:array/0</code></a>|
     end
 
     test "module", c do
@@ -563,7 +563,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP module", c do
       assert autolink_extra("`m:rpc`", c) ==
-               ~s|<a href="https://www.erlang.org/doc/man/rpc.html"><code class="inline">rpc</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/kernel/rpc.html"><code class="inline">rpc</code></a>|
     end
 
     test "bad module function", c do
@@ -684,9 +684,9 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "spec when fun is called record", c do
       assert autolink_spec("-spec record(module()) -> [[{module(), atom()}]].", c) ==
-               ~s|record(<a href="https://www.erlang.org/doc/man/erlang.html#t:module/0">module</a>())| <>
-                 ~s| -> [[{<a href="https://www.erlang.org/doc/man/erlang.html#t:module/0">module</a>(),| <>
-                 ~s| <a href="https://www.erlang.org/doc/man/erlang.html#t:atom/0">atom</a>()}]].|
+               ~s|record(<a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:module/0">module</a>())| <>
+                 ~s| -> [[{<a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:module/0">module</a>(),| <>
+                 ~s| <a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0">atom</a>()}]].|
     end
 
     test "callback", c do
@@ -724,7 +724,7 @@ defmodule ExDoc.Language.ErlangTest do
                ~S"-spec foo() -> #{atom() := sets:set(integer()), float() => t()}.",
                c
              ) ==
-               ~S|foo() -> #{<a href="https://www.erlang.org/doc/man/erlang.html#t:atom/0">atom</a>() := <a href="https://www.erlang.org/doc/man/sets.html#t:set/1">sets:set</a>(<a href="https://www.erlang.org/doc/man/erlang.html#t:integer/0">integer</a>()), <a href="https://www.erlang.org/doc/man/erlang.html#t:float/0">float</a>() => <a href="#t:t/0">t</a>()}.|
+               ~S|foo() -> #{<a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0">atom</a>() := <a href="https://www.erlang.org/doc/apps/stdlib/sets.html#t:set/1">sets:set</a>(<a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:integer/0">integer</a>()), <a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:float/0">float</a>() => <a href="#t:t/0">t</a>()}.|
     end
 
     test "vars", c do
@@ -744,12 +744,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "record - one field", c do
       assert autolink_spec(~s"-spec foo() -> #x{x :: atom()} | t().", c) ==
-               ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/man/erlang.html#t:atom/0">atom</a>()} | <a href="#t:t/0">t</a>().]
+               ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0">atom</a>()} | <a href="#t:t/0">t</a>().]
     end
 
     test "record - two fields", c do
       assert autolink_spec(~s"-spec foo() -> #x{x :: atom(), y :: sets:set(integer())} | t().", c) ==
-               ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/man/erlang.html#t:atom/0">atom</a>(), y :: <a href="https://www.erlang.org/doc/man/sets.html#t:set/1">sets:set</a>(<a href="https://www.erlang.org/doc/man/erlang.html#t:integer/0">integer</a>())} | <a href="#t:t/0">t</a>().]
+               ~s[foo() -> #x{x :: <a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0">atom</a>(), y :: <a href="https://www.erlang.org/doc/apps/stdlib/sets.html#t:set/1">sets:set</a>(<a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:integer/0">integer</a>())} | <a href="#t:t/0">t</a>().]
     end
 
     test "record - two fields, known types", c do
@@ -789,12 +789,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "OTP type", c do
       assert autolink_spec(~S"-spec foo() -> sets:set().", c) ==
-               ~s|foo() -> <a href="https://www.erlang.org/doc/man/sets.html#t:set/0">sets:set</a>().|
+               ~s|foo() -> <a href="https://www.erlang.org/doc/apps/stdlib/sets.html#t:set/0">sets:set</a>().|
     end
 
     test "OTP private type", c do
       assert autolink_spec(~S"-spec foo() -> array:array_indx().", c) ==
-               ~s|foo() -> <a href="https://www.erlang.org/doc/man/array.html#t:array_indx/0">array:array_indx</a>().|
+               ~s|foo() -> <a href="https://www.erlang.org/doc/apps/stdlib/array.html#t:array_indx/0">array:array_indx</a>().|
     end
 
     test "skip typespec name", c do
@@ -820,7 +820,7 @@ defmodule ExDoc.Language.ErlangTest do
     test "bad remote type", c do
       assert warn(fn ->
                assert autolink_spec(~S"-spec foo() -> bad:bad(atom()).", c, warnings: :send) ==
-                        ~s|foo() -> bad:bad(<a href="https://www.erlang.org/doc/man/erlang.html#t:atom/0">atom</a>()).|
+                        ~s|foo() -> bad:bad(<a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0">atom</a>()).|
              end) =~ ~s|references type "bad:bad/1" but it is undefined or private|
     end
   end

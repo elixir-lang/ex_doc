@@ -63,7 +63,6 @@ defmodule ExDoc.Autolink do
   ]
 
   @hexdocs "https://hexdocs.pm/"
-  @otpdocs "https://www.erlang.org/doc/man/"
   @otpappdocs "https://www.erlang.org/doc/apps/"
 
   def app_module_url(tool, module, anchor \\ nil, config)
@@ -72,18 +71,30 @@ defmodule ExDoc.Autolink do
     app_module_url(:ex_doc, module, "#content", config)
   end
 
-  def app_module_url(:ex_doc, module, anchor, %{current_module: module} = config) do
-    path = module |> inspect() |> String.trim_leading(":")
-    ex_doc_app_url(module, config, path, config.ext, "#{anchor}")
-  end
-
   def app_module_url(:ex_doc, module, anchor, config) do
     path = module |> inspect() |> String.trim_leading(":")
     ex_doc_app_url(module, config, path, config.ext, "#{anchor}")
   end
 
-  def app_module_url(:otp, module, anchor, _config) do
-    @otpdocs <> "#{module}.html#{anchor}"
+  def app_module_url(:otp, module, nil, %{current_module: module} = config) do
+    app_module_url(:otp, module, "#content", config)
+  end
+
+  def app_module_url(:otp, module, anchor, config) do
+    path = module |> inspect() |> String.trim_leading(":")
+
+    # IO.inspect(
+    #   [
+    #     module: module,
+    #     anchor: anchor,
+    #     config: config,
+    #     prev: @otpdocs <> "#{module}.html#{anchor}",
+    #     new: app_url(@otpappdocs, module, config, path, config.ext, "#{anchor}")
+    #   ],
+    #   label: "app_module_url"
+    # )
+
+    app_url(@otpappdocs, module, config, path, config.ext, "#{anchor}")
   end
 
   def app_module_url(:no_tool, _, _, _) do
@@ -109,12 +120,16 @@ defmodule ExDoc.Autolink do
 
   @doc false
   def ex_doc_app_url(module, config, path, ext, suffix) do
+    app_url(@hexdocs, module, config, path, ext, suffix)
+  end
+
+  defp app_url(base_url, module, config, path, ext, suffix) do
     if app = app(module) do
       if app in config.apps do
         path <> ext <> suffix
       else
         config.deps
-        |> Keyword.get_lazy(app, fn -> @hexdocs <> "#{app}" end)
+        |> Keyword.get_lazy(app, fn -> base_url <> "#{app}" end)
         |> String.trim_trailing("/")
         |> Kernel.<>("/" <> path <> ".html" <> suffix)
       end

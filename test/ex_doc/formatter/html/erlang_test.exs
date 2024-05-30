@@ -36,10 +36,10 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
              ~s|-spec</span> foo(<a href=\"#t:t/0\">t</a>()) -&gt; <a href=\"#t:t/0\">t</a>().|
 
     assert html =~
-             ~s|-type</span> t() :: <a href=\"https://www.erlang.org/doc/man/erlang.html#t:atom/0\">atom</a>().|
+             ~s|-type</span> t() :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>().|
 
     assert html =~
-             ~s|-type</span> t2() :: #rec{k1 :: <a href=\"https://www.erlang.org/doc/man/uri_string.html#t:uri_string/0\">uri_string:uri_string</a>(), k2 :: <a href=\"https://www.erlang.org/doc/man/uri_string.html#t:uri_string/0\">uri_string:uri_string</a>() \| undefined}.|
+             ~s|-type</span> t2() :: #rec{k1 :: <a href=\"https://www.erlang.org/doc/apps/stdlib/uri_string.html#t:uri_string/0\">uri_string:uri_string</a>(), k2 :: <a href=\"https://www.erlang.org/doc/apps/stdlib/uri_string.html#t:uri_string/0\">uri_string:uri_string</a>() \| undefined}.|
   end
 
   defp generate_docs(c) do
