@@ -774,7 +774,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "function - any arity", c do
       assert autolink_spec(~s"-spec foo() -> fun((...) -> t()) | erlang_bar:t().", c) ==
-               ~s[foo() -> fun((...) -> <a href="#t:t/0">t</a>()) | <a href="erlang_bar.html#t:t/0">erlang_bar:t</a>().]
+               ~s[foo() -> fun((...) -> t()) | <a href="#t:t/0">erlang_bar:t</a>().]
     end
 
     test "local type", c do
