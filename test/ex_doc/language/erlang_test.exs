@@ -15,7 +15,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "current module", c do
       assert autolink_edoc("{@link erlang_foo}", c, current_module: :erlang_foo) ==
-               ~s|<a href="erlang_foo.html#content"><code>erlang_foo</code></a>|
+               ~s|<a href="erlang_foo.html"><code>erlang_foo</code></a>|
     end
 
     test "OTP module", c do

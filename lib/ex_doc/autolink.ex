@@ -65,40 +65,19 @@ defmodule ExDoc.Autolink do
   @hexdocs "https://hexdocs.pm/"
   @otpappdocs "https://www.erlang.org/doc/apps/"
 
-  def app_module_url(tool, module, anchor \\ nil, config)
+  def app_module_url(tool, module, anchor \\ "#content", config)
 
-  def app_module_url(:ex_doc, module, nil, %{current_module: module} = config) do
-    app_module_url(:ex_doc, module, "#content", config)
-  end
+  def app_module_url(:no_tool, _, _, _), do: nil
 
-  def app_module_url(:ex_doc, module, anchor, config) do
+  def app_module_url(tool, module, anchor, config) do
+    base_url =
+      case tool do
+        :ex_doc -> @hexdocs
+        :otp -> @otpappdocs
+      end
+
     path = module |> inspect() |> String.trim_leading(":")
-    ex_doc_app_url(module, config, path, config.ext, "#{anchor}")
-  end
-
-  def app_module_url(:otp, module, nil, %{current_module: module} = config) do
-    app_module_url(:otp, module, "#content", config)
-  end
-
-  def app_module_url(:otp, module, anchor, config) do
-    path = module |> inspect() |> String.trim_leading(":")
-
-    # IO.inspect(
-    #   [
-    #     module: module,
-    #     anchor: anchor,
-    #     config: config,
-    #     prev: @otpdocs <> "#{module}.html#{anchor}",
-    #     new: app_url(@otpappdocs, module, config, path, config.ext, "#{anchor}")
-    #   ],
-    #   label: "app_module_url"
-    # )
-
-    app_url(@otpappdocs, module, config, path, config.ext, "#{anchor}")
-  end
-
-  def app_module_url(:no_tool, _, _, _) do
-    nil
+    app_url(base_url, module, config, path, config.ext, "#{anchor}")
   end
 
   defp string_app_module_url(string, tool, module, anchor, config) do
