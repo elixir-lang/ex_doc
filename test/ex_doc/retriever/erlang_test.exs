@@ -306,7 +306,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert type1.doc |> DocAST.to_string() =~ "type1/0 docs."
 
       assert type1.spec |> Erlang.autolink_spec(current_kfa: {:type, :type1, 0}) ==
-               "type1() :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
+               "type1() :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       assert equiv_type1.id == "t:equiv_type1/0"
       assert equiv_type1.type == :type

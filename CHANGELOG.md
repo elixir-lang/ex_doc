@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.34.0 (2024-05-30)
+
+This release requires Elixir v1.13.
+
+  * Enhancements
+    * Allow several assets to be copied by passing a map to `:assets`
+    * Improve compatibility when hosting ExDoc on a platform that strips `.html`
+
+  * Bug fixes
+    * Link to the latest version of Erlang/OTP docs
+
+  * Deprecations
+    * Deprecate passing a binary to `:assets`
+
 ## v0.33.0 (2024-05-21)
 
   * Enhancements
