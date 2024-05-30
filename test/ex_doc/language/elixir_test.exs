@@ -40,12 +40,12 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "m:module with Erlang module" do
       assert autolink_doc("`m::array`") ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html"><code class="inline">:array</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html"><code class="inline">:array</code></a>|
     end
 
     test "m:module with Erlang module and fragment" do
       assert autolink_doc("`m::array#fragment`") ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html#fragment"><code class="inline">:array</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#fragment"><code class="inline">:array</code></a>|
     end
 
     test "module with fragment without m: does not link" do
@@ -99,7 +99,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "erlang stdlib function" do
       assert autolink_doc("`:lists.all/2`") ==
-               ~s|<a href="https://www.erlang.org/doc/man/lists.html#all/2"><code class="inline">:lists.all/2</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/lists.html#all/2"><code class="inline">:lists.all/2</code></a>|
     end
 
     test "local function" do
@@ -150,7 +150,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "erlang callback" do
       assert autolink_doc("`c::gen_server.handle_call/3`") ==
-               ~s|<a href="https://www.erlang.org/doc/man/gen_server.html#c:handle_call/3"><code class="inline">:gen_server.handle_call/3</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/gen_server.html#c:handle_call/3"><code class="inline">:gen_server.handle_call/3</code></a>|
     end
 
     test "elixir type" do
@@ -171,7 +171,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "erlang type" do
       assert autolink_doc("`t::array.array/0`") ==
-               ~s|<a href="https://www.erlang.org/doc/man/array.html#t:array/0"><code class="inline">:array.array/0</code></a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#t:array/0"><code class="inline">:array.array/0</code></a>|
     end
 
     test "special forms" do
@@ -204,10 +204,10 @@ defmodule ExDoc.Language.ElixirTest do
                ~s|<a href="https://hexdocs.pm/elixir/String.html#at/2">custom text</a>|
 
       assert autolink_doc("[custom text](`:lists`)") ==
-               ~s|<a href="https://www.erlang.org/doc/man/lists.html">custom text</a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/lists.html">custom text</a>|
 
       assert autolink_doc("[custom text](`:lists.all/2`)") ==
-               ~s|<a href="https://www.erlang.org/doc/man/lists.html#all/2">custom text</a>|
+               ~s|<a href="https://www.erlang.org/doc/apps/stdlib/lists.html#all/2">custom text</a>|
     end
 
     test "mix task" do
@@ -450,7 +450,7 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "Erlang stdlib types" do
       assert autolink_spec(quote(do: t() :: :sets.set())) ==
-               ~s[t() :: <a href="https://www.erlang.org/doc/man/sets.html#t:set/0">:sets.set</a>()]
+               ~s[t() :: <a href="https://www.erlang.org/doc/apps/stdlib/sets.html#t:set/0">:sets.set</a>()]
     end
 
     test "escape special HTML characters" do

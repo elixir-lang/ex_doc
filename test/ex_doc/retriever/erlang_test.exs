@@ -93,7 +93,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert function1.doc_file =~ "mod.erl"
 
       assert Erlang.autolink_spec(hd(function1.specs), current_kfa: {:function, :function1, 0}) ==
-               "function1() -> <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
+               "function1() -> <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       %ExDoc.FunctionNode{
         id: "function2/1"
@@ -253,7 +253,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert Path.basename(callback1.source_url) == "mod.erl:4"
 
       assert Erlang.autolink_spec(hd(callback1.specs), current_kfa: {:callback, :callback1, 0}) ==
-               "callback1() -> <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>()."
+               "callback1() -> <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       assert equiv_callback1.id == "c:equiv_callback1/0"
       assert equiv_callback1.type == :callback
@@ -341,15 +341,15 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert hd(function.specs)
              |> Erlang.autolink_spec(current_module: :mod, current_kfa: {:function, :function, 0}) ==
-               "function() -> <a href=\"#t:type/0\">type</a>() | #a{a :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-integer\">integer</a>(), b :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-integer\">integer</a>(), c :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>(), d :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>(), e :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>()}."
+               "function() -> <a href=\"#t:type/0\">type</a>() | #a{a :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:integer/0\">integer</a>(), b :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:integer/0\">integer</a>(), c :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>(), d :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:term/0\">term</a>(), e :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:term/0\">term</a>()}."
 
       assert hd(callback.specs)
              |> Erlang.autolink_spec(current_module: :mod, current_kfa: {:callback, :callback, 0}) ==
-               "callback() ->\n            #a{a :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-pos_integer\">pos_integer</a>(), b :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-non_neg_integer\">non_neg_integer</a>(), c :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>(), d :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>(), e :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>()}."
+               "callback() ->\n                      #a{a :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:pos_integer/0\">pos_integer</a>(), b :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:non_neg_integer/0\">non_neg_integer</a>(), c :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>(), d :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:term/0\">term</a>(), e :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:term/0\">term</a>()}."
 
       assert type.spec
              |> Erlang.autolink_spec(current_module: :mod, current_kfa: {:type, :type, 0}) ==
-               "type() :: #a{a :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-pos_integer\">pos_integer</a>(), b :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-non_neg_integer\">non_neg_integer</a>(), c :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-atom\">atom</a>(), d :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>(), e :: <a href=\"https://www.erlang.org/doc/man/erlang.html#type-term\">term</a>()}."
+               "type() :: #a{a :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:pos_integer/0\">pos_integer</a>(), b :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:non_neg_integer/0\">non_neg_integer</a>(), c :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>(), d :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:term/0\">term</a>(), e :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:term/0\">term</a>()}."
     end
   end
 
@@ -415,7 +415,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
 
       assert Erlang.autolink_spec(hd(function1.specs), current_kfa: {:function, :function1, 0}) ==
-               "function1() -> <a href=\"https://www.erlang.org/doc/man/erlang.html#t:atom/0\">atom</a>()."
+               "function1() -> <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       %ExDoc.FunctionNode{
         id: "function2/0"
@@ -463,7 +463,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert Path.basename(callback1.source_url) == "mod.erl:4"
 
       assert Erlang.autolink_spec(hd(callback1.specs), current_kfa: {:callback, :callback1, 0}) ==
-               "callback1() -> <a href=\"https://www.erlang.org/doc/man/erlang.html#t:atom/0\">atom</a>()."
+               "callback1() -> <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       assert optional_callback1.id == "c:optional_callback1/0"
       assert optional_callback1.type == :callback
@@ -501,7 +501,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert type1.doc |> DocAST.to_string() =~ "type1/0 docs."
 
       assert type1.spec |> Erlang.autolink_spec(current_kfa: {:type, :type1, 0}) ==
-               "type1() :: <a href=\"https://www.erlang.org/doc/man/erlang.html#t:atom/0\">atom</a>()."
+               "type1() :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
     end
   end
 end
