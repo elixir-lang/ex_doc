@@ -142,21 +142,21 @@ defmodule ExDoc.Language.ErlangTest do
       assert autolink_edoc("{@type myList(X). A special kind of lists ...}", c,
                extra_foo_code: "-export_type([myList/0]).\n-type myList() :: term().\n%% A type"
              ) ==
-               ~s|<code><a href=\"##{@myList}\">myList</a>(X)</code>|
+               ~s|<code><a href="##{@myList}">myList</a>(X)</code>|
     end
 
     test "abstract types - description+dot", c do
       assert autolink_edoc("{@type myList(X, Y).}", c,
                extra_foo_code: "-export_type([myList/0]).\n-type myList() :: term().\n%% A type"
              ) ==
-               ~s|<code><a href=\"##{@myList}\">myList</a>(X, Y)</code>|
+               ~s|<code><a href="##{@myList}">myList</a>(X, Y)</code>|
     end
 
     test "abstract types - no description", c do
       assert autolink_edoc("{@type myList()}", c,
                extra_foo_code: "-export_type([myList/0]).\n-type myList() :: term().\n%% A type"
              ) ==
-               ~s|<code><a href=\"##{@myList}\">myList()</a></code>|
+               ~s|<code><a href="##{@myList}">myList()</a></code>|
     end
   end
 
@@ -226,12 +226,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "m:module in module code", c do
       assert autolink_doc("`m:erlang_bar`", c) ==
-               ~s|<a href=\"erlang_bar.html\"><code class="inline">erlang_bar</code></a>|
+               ~s|<a href="erlang_bar.html"><code class="inline">erlang_bar</code></a>|
     end
 
     test "m:module with anchor in module code", c do
       assert autolink_doc("`m:erlang_bar#anchor`", c) ==
-               ~s|<a href=\"erlang_bar.html#anchor\"><code class="inline">erlang_bar</code></a>|
+               ~s|<a href="erlang_bar.html#anchor"><code class="inline">erlang_bar</code></a>|
     end
 
     test "invalid m:module in module code", c do
@@ -241,28 +241,28 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "module in module code reference", c do
       assert autolink_doc("[`erlang_bar`](`erlang_bar`)", c) ==
-               ~s|<a href=\"erlang_bar.html\"><code class="inline">erlang_bar</code></a>|
+               ~s|<a href="erlang_bar.html"><code class="inline">erlang_bar</code></a>|
     end
 
     test "remote module with anchor in module code reference", c do
       assert autolink_doc("[`erlang_bar`](`erlang_bar#anchor`)", c) ==
-               ~s|<a href=\"erlang_bar.html#anchor\"><code class="inline">erlang_bar</code></a>|
+               ~s|<a href="erlang_bar.html#anchor"><code class="inline">erlang_bar</code></a>|
 
       assert autolink_doc("[`erlang_bar`](`m:erlang_bar#anchor`)", c) ==
-               ~s|<a href=\"erlang_bar.html#anchor\"><code class="inline">erlang_bar</code></a>|
+               ~s|<a href="erlang_bar.html#anchor"><code class="inline">erlang_bar</code></a>|
     end
 
     test "own module with anchor in module code reference", c do
       assert autolink_doc("[`erlang_foo`](`erlang_foo#anchor`)", c) ==
-               ~s|<a href=\"erlang_foo.html#anchor\"><code class="inline">erlang_foo</code></a>|
+               ~s|<a href="erlang_foo.html#anchor"><code class="inline">erlang_foo</code></a>|
 
       assert autolink_doc("[`erlang_foo`](`m:erlang_foo#anchor`)", c) ==
-               ~s|<a href=\"erlang_foo.html#anchor\"><code class="inline">erlang_foo</code></a>|
+               ~s|<a href="erlang_foo.html#anchor"><code class="inline">erlang_foo</code></a>|
     end
 
     test "function in module code", c do
       assert autolink_doc("`foo/0`", c) ==
-               ~s|<a href=\"#foo/0\"><code class="inline">foo/0</code></a>|
+               ~s|<a href="#foo/0"><code class="inline">foo/0</code></a>|
     end
 
     test "function in module ref", c do
@@ -498,7 +498,7 @@ defmodule ExDoc.Language.ErlangTest do
       assert warn(
                fn ->
                  assert autolink_doc("[extra](`e:barlib:extra.md`)", c) ==
-                          ~s|<a href=\"https://hexdocs.pm/barlib/extra.html\">extra</a>|
+                          ~s|<a href="https://hexdocs.pm/barlib/extra.html">extra</a>|
                end,
                line: nil
              ) =~
@@ -509,7 +509,7 @@ defmodule ExDoc.Language.ErlangTest do
       assert warn(
                fn ->
                  assert autolink_doc("[extra](`e:barlib:extra.md#anchor`)", c) ==
-                          ~s|<a href=\"https://hexdocs.pm/barlib/extra.html#anchor\">extra</a>|
+                          ~s|<a href="https://hexdocs.pm/barlib/extra.html#anchor">extra</a>|
                end,
                line: nil
              ) =~
