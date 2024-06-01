@@ -50,11 +50,29 @@ defmodule ExDoc.Formatter.HTMLTest do
   test "normalizes options", %{tmp_dir: tmp_dir} = context do
     # 1. Check for output dir having trailing "/" stripped
     # 2. Check for default [main: "api-reference"]
-    generate_docs(doc_config(context, output: tmp_dir <> "/html//", main: nil))
+    # 3. Check for assets as a string [assets: "/assets"]
+
+    File.mkdir_p!("test/tmp/html_assets/hello")
+    File.touch!("test/tmp/html_assets/hello/world")
+
+    warning =
+      capture_io(:stderr, fn ->
+        generate_docs(
+          doc_config(context,
+            output: tmp_dir <> "/html//",
+            main: nil,
+            assets: "test/tmp/html_assets"
+          )
+        )
+      end)
+
+    assert warning =~ "binary to :assets is deprecated"
+    assert warning =~ ~S([assets: %{"test/tmp/html_assets" => "assets"}])
 
     content = File.read!(tmp_dir <> "/html/index.html")
     assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
     assert File.regular?(tmp_dir <> "/html/api-reference.html")
+    assert File.regular?(tmp_dir <> "/html/assets/hello/world")
 
     # 3. main as index is not allowed
     config = doc_config(context, main: "index")
