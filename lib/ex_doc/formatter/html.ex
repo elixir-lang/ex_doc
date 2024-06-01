@@ -289,9 +289,11 @@ defmodule ExDoc.Formatter.HTML do
       if is_map(assets) do
         Enum.map(assets, fn {source, target} -> {source, Path.join(namespace, target)} end)
       else
-        IO.warn(
-          "giving a binary to :assets is deprecated, please give a map from source to target instead"
-        )
+        IO.warn("""
+        giving a binary to :assets is deprecated, please give a map from source to target instead:
+
+            #{inspect(assets: %{assets => "assets"})}
+        """)
 
         [{assets, Path.join(namespace, "assets")}]
       end
