@@ -213,10 +213,10 @@ export function getProjectNameAndVersion () {
 }
 
 /**
- * Return `true` if the client's OS is MacOS.
+ * Return `true` if the client's OS is Apple.
  *
  * @return {Boolean}
  */
-export function isMacOS () {
-  return /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
+export function isAppleOS () {
+  return /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent)
 }

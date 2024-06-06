@@ -1,4 +1,4 @@
-import { isMacOS, qs } from './helpers'
+import { isAppleOS, qs } from './helpers'
 import { toggleSidebar } from './sidebar/sidebar-drawer'
 import { focusSearchInput } from './search-bar'
 import { cycleTheme } from './theme'
@@ -72,7 +72,7 @@ function handleKeyDown (event) {
 
   const matchingShortcut = keyboardShortcuts.find(shortcut => {
     if (shortcut.hasModifier) {
-      if (isMacOS() && event.metaKey) { return shortcut.key === event.key }
+      if (isAppleOS() && event.metaKey) { return shortcut.key === event.key }
       if (event.ctrlKey) { return shortcut.key === event.key }
 
       return false
