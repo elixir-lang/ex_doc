@@ -172,29 +172,23 @@ function hideAutocomplete () {
   hideAutocompleteList()
 }
 
-let lastScrollTop = window.scrollY
-const scrollThreshold = 70 // Set a threshold for scroll, adjust as needed
+let lastScroll = window.scrollY
+const scrollThreshold = 70 // Threshold beyond which search bar may be hidden
+const scrollConsideredIntentional = -2 // Pixels (negative sign) considered to indicate intent
 
 window.addEventListener('scroll', function () {
   const currentScroll = window.scrollY
 
-  // Add 'scroll-sticky' class when not at the top
-  if (currentScroll > scrollThreshold * 2) {
-    document.body.classList.add('scroll-sticky')
-  }
-
   // Remove when at the top
   if (currentScroll === 0) {
     document.body.classList.remove('scroll-sticky')
-  }
-
-  if (currentScroll > lastScrollTop && currentScroll > scrollThreshold) {
+  } else if (lastScroll - currentScroll < scrollConsideredIntentional && currentScroll > scrollThreshold) {
     // Scrolling down and past the threshold
     document.body.classList.remove('scroll-sticky')
-  } else {
-    // Scrolling up or at the top of the page
+  } else if (lastScroll - currentScroll > Math.abs(scrollConsideredIntentional)) {
+    // Scrolling up
     document.body.classList.add('scroll-sticky')
   }
 
-  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll
+  lastScroll = currentScroll <= 0 ? 0 : currentScroll
 }, false)
