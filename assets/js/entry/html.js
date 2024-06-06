@@ -17,7 +17,7 @@ import { initialize as initTooltips } from '../tooltips/tooltips'
 import { initialize as initHintsPage } from '../tooltips/hint-page'
 import { initialize as initCopyButton } from '../copy-button'
 import { initialize as initSettings } from '../settings'
-import { initialize as initOs } from '../os'
+import { initialize as initStyling } from '../styling'
 import { initialize as initTabsets } from '../tabsets'
 import { initialize as initPreview} from '../preview'
 
@@ -31,7 +31,7 @@ onDocumentReady(() => {
   initTooltips()
   initHintsPage()
   initCopyButton()
-  initOs()
+  initStyling()
   initTabsets()
 
   if (isPreview) {

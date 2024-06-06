@@ -10,7 +10,7 @@ import {
   AUTOCOMPLETE_CONTAINER_SELECTOR,
   AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR
 } from './autocomplete/autocomplete-list'
-import { isMacOS, qs } from './helpers'
+import { isAppleOS, qs } from './helpers'
 
 const SEARCH_INPUT_SELECTOR = 'form.search-bar input'
 const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-bar .search-close-button'
@@ -67,17 +67,17 @@ function addEventListeners () {
   }
 
   searchInput.addEventListener('keydown', event => {
-    const macOS = isMacOS()
+    const appleOS = isAppleOS()
 
     if (event.key === 'Escape') {
       clearSearch()
       searchInput.blur()
     } else if (event.key === 'Enter') {
       handleAutocompleteFormSubmission(event)
-    } else if (event.key === 'ArrowUp' || (macOS && event.ctrlKey && event.key === 'p')) {
+    } else if (event.key === 'ArrowUp' || (appleOS && event.ctrlKey && event.key === 'p')) {
       moveAutocompleteSelection(-1)
       event.preventDefault()
-    } else if (event.key === 'ArrowDown' || (macOS && event.ctrlKey && event.key === 'n')) {
+    } else if (event.key === 'ArrowDown' || (appleOS && event.ctrlKey && event.key === 'n')) {
       moveAutocompleteSelection(1)
       event.preventDefault()
     } else if (event.key === 'Tab') {
