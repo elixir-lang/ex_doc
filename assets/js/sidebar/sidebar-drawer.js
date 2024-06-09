@@ -138,7 +138,7 @@ export function isSidebarOpened () {
  *
  * @returns {Promise} A promise resolving once the animation is finished.
  */
-export function openSidebar() {
+export function openSidebar () {
   clearTimeoutIfAny()
   sessionStorage.setItem('sidebar_state', 'opened')
   qs(SIDEBAR_TOGGLE_SELECTOR).setAttribute('aria-expanded', 'true')
