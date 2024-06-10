@@ -74,7 +74,7 @@ function addEventListeners () {
 
 function handleKeyDown (event) {
   if (state.shortcutBeingPressed) { return }
-  if (event.target.matches('input, textarea')) { return }
+  if (event.target.matches('input, select, textarea')) { return }
 
   const matchingShortcut = keyboardShortcuts.find(shortcut => {
     if (shortcut.hasModifier) {
