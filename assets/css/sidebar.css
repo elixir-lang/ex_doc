@@ -109,6 +109,11 @@
   display: none;
 }
 
+.sidebar .sidebar-projectVersionsLatestLink {
+  background-color: red;
+  color: white;
+}
+
 .sidebar .sidebar-listNav {
   display: flex;
   margin: 0;
