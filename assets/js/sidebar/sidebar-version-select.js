@@ -70,3 +70,29 @@ function handleVersionSelected (event) {
       }
     })
 }
+
+/**
+ * Opens the version select if available.
+ * Only focuses the version select if
+ *   - the browser's HTMLSelectElement lacks the showPicker method
+ *   - there has been transient user interaction
+ */
+export function openVersionSelect () {
+  const select = qs(VERSIONS_DROPDOWN_SELECTOR)
+
+  if (select) {
+    select.focus()
+
+    // Prevent subsequent 'v' press from submitting form
+    select.addEventListener('keydown', event => {
+      if (event.key === 'Escape' || event.key === 'v') {
+        event.preventDefault()
+        select.blur()
+      }
+    })
+
+    if (navigator.userActivation.isActive && 'showPicker' in HTMLSelectElement.prototype) {
+      select.showPicker()
+    }
+  }
+}

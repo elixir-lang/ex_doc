@@ -127,6 +127,13 @@ function isSidebarOpen () {
 }
 
 /**
+ * Returns if sidebar is fully open.
+ */
+export function isSidebarOpened () {
+  return document.body.classList.contains(SIDEBAR_CLASS.opened)
+}
+
+/**
  * Opens the sidebar by applying an animation.
  *
  * @returns {Promise} A promise resolving once the animation is finished.
@@ -136,13 +143,13 @@ export function openSidebar () {
   sessionStorage.setItem('sidebar_state', 'opened')
   qs(SIDEBAR_TOGGLE_SELECTOR).setAttribute('aria-expanded', 'true')
 
-  requestAnimationFrame(() => {
-    setClass(SIDEBAR_CLASS.openingStart)
-
+  return new Promise((resolve, reject) => {
     requestAnimationFrame(() => {
-      setClass(SIDEBAR_CLASS.opening)
+      setClass(SIDEBAR_CLASS.openingStart)
 
-      return new Promise((resolve, reject) => {
+      requestAnimationFrame(() => {
+        setClass(SIDEBAR_CLASS.opening)
+
         state.togglingTimeout = setTimeout(() => {
           setClass(SIDEBAR_CLASS.opened)
           resolve()
@@ -162,13 +169,13 @@ export function closeSidebar () {
   sessionStorage.setItem('sidebar_state', 'closed')
   qs(SIDEBAR_TOGGLE_SELECTOR).setAttribute('aria-expanded', 'false')
 
-  requestAnimationFrame(() => {
-    setClass(SIDEBAR_CLASS.closingStart)
-
+  return new Promise((resolve, reject) => {
     requestAnimationFrame(() => {
-      setClass(SIDEBAR_CLASS.closing)
+      setClass(SIDEBAR_CLASS.closingStart)
 
-      return new Promise((resolve, reject) => {
+      requestAnimationFrame(() => {
+        setClass(SIDEBAR_CLASS.closing)
+
         state.togglingTimeout = setTimeout(() => {
           setClass(SIDEBAR_CLASS.closed)
           resolve()

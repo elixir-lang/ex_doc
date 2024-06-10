@@ -1,5 +1,6 @@
 import { isAppleOS, qs } from './helpers'
-import { toggleSidebar } from './sidebar/sidebar-drawer'
+import { isSidebarOpened, openSidebar, toggleSidebar } from './sidebar/sidebar-drawer'
+import { openVersionSelect } from './sidebar/sidebar-version-select'
 import { focusSearchInput } from './search-bar'
 import { cycleTheme } from './theme'
 import { openQuickSwitchModal } from './quick-switch'
@@ -35,6 +36,11 @@ export const keyboardShortcuts = [
     action: searchKeyAction
   },
   {
+    key: 'v',
+    description: 'Open/focus version select',
+    action: versionKeyAction
+  },
+  {
     key: 'g',
     description: 'Search HexDocs package',
     displayAs: '<kbd><kbd>g</kdb></kdb>',
@@ -68,7 +74,7 @@ function addEventListeners () {
 
 function handleKeyDown (event) {
   if (state.shortcutBeingPressed) { return }
-  if (event.target.matches('input, textarea')) { return }
+  if (event.target.matches('input, select, textarea')) { return }
 
   const matchingShortcut = keyboardShortcuts.find(shortcut => {
     if (shortcut.hasModifier) {
@@ -99,6 +105,16 @@ function handleKeyUp (event) {
 function searchKeyAction (event) {
   closeModal()
   focusSearchInput()
+}
+
+function versionKeyAction () {
+  closeModal()
+
+  if (isSidebarOpened()) {
+    openVersionSelect()
+  } else {
+    openSidebar().then(openVersionSelect)
+  }
 }
 
 function toggleHelpModal () {
