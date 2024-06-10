@@ -78,12 +78,12 @@ function handleVersionSelected (event) {
  *   - there has been transient user interaction
  */
 export function openVersionSelect () {
- const select = qs(VERSIONS_DROPDOWN_SELECTOR)
+  const select = qs(VERSIONS_DROPDOWN_SELECTOR)
 
   if (select) {
     select.focus()
 
-    if (navigator.userActivation.isActive && "showPicker" in HTMLSelectElement.prototype) {
+    if (navigator.userActivation.isActive && 'showPicker' in HTMLSelectElement.prototype) {
       select.showPicker()
     }
   }

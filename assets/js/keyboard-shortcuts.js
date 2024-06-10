@@ -1,5 +1,6 @@
 import { isAppleOS, qs } from './helpers'
-import { toggleSidebar } from './sidebar/sidebar-drawer'
+import { isSidebarOpened, openSidebar, toggleSidebar } from './sidebar/sidebar-drawer'
+import { openVersionSelect } from './sidebar/sidebar-version-select'
 import { focusSearchInput } from './search-bar'
 import { cycleTheme } from './theme'
 import { openQuickSwitchModal } from './quick-switch'
@@ -33,6 +34,11 @@ export const keyboardShortcuts = [
     key: 'k',
     hasModifier: true,
     action: searchKeyAction
+  },
+  {
+    key: 'v',
+    description: 'Open/focus version select',
+    action: versionKeyAction
   },
   {
     key: 'g',
@@ -99,6 +105,16 @@ function handleKeyUp (event) {
 function searchKeyAction (event) {
   closeModal()
   focusSearchInput()
+}
+
+function versionKeyAction () {
+  closeModal()
+
+  if (isSidebarOpened()) {
+    openVersionSelect()
+  } else {
+    openSidebar().then(openVersionSelect)
+  }
 }
 
 function toggleHelpModal () {
