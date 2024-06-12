@@ -110,8 +110,15 @@
 }
 
 .sidebar .sidebar-projectVersionsLatestLink {
-  background-color: red;
-  color: white;
+  border-left: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
+  padding: 0 10px;
+  background-color: var(--sidebarAccentMain);
+}
+
+.sidebar .sidebar-projectVersionsLatestLink a {
+  color: var(--sidebarBackground);
+  font-weight: bold;
+  ;
 }
 
 .sidebar .sidebar-listNav {
