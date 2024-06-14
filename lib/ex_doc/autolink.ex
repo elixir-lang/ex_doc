@@ -335,8 +335,8 @@ defmodule ExDoc.Autolink do
   end
 
   defp parse_url(string, mode, config) do
-    case Regex.run(~r{^(.+)/(\d+)$}, string) do
-      [_, left, right] ->
+    case Regex.run(~r{^(.+)/(\d+)(#.*)?$}, string) do
+      [_, left, right | maybe_fragment] ->
         with {:ok, arity} <- parse_arity(right) do
           {kind, rest} = kind(left)
 
@@ -344,11 +344,13 @@ defmodule ExDoc.Autolink do
             {:local, function} ->
               kind
               |> local_url(function, arity, config, string, mode: mode)
+              |> maybe_append_nested_fragment(maybe_fragment)
               |> maybe_remove_link(mode)
 
             {:remote, module, function} ->
               {kind, module, function, arity}
               |> remote_url(config, string, mode: mode)
+              |> maybe_append_nested_fragment(maybe_fragment)
               |> maybe_remove_link(mode)
 
             :error ->
@@ -610,6 +612,10 @@ defmodule ExDoc.Autolink do
   # for the rest, it can either be undefined or private
   def format_visibility(:undefined, _kind), do: "undefined or private"
   def format_visibility(visibility, _kind), do: "#{visibility}"
+
+  defp maybe_append_nested_fragment(nil, _), do: nil
+  defp maybe_append_nested_fragment(url, []), do: url
+  defp maybe_append_nested_fragment(url, ["#" <> fragment]), do: url <> "-" <> fragment
 
   defp append_fragment(url, nil), do: url
   defp append_fragment(url, fragment), do: url <> "#" <> fragment
