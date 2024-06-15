@@ -25,7 +25,7 @@
 
 .top-search .search-bar .search-input {
   background-color: var(--searchSearch);
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
   color: var(--searchAccentMain);
   position: relative;
