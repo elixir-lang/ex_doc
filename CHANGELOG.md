@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.34.1 (2024-06-30)
+
+  * Enhancements
+    * Add a `v` shortcut to open/focus the version select
+    * Compatibility fixes for Elixir v1.17 and Erlang/OTP 27+
+
+  * Bug fixes
+    * Do not crash on unknown media types in assets during EPUB generation
+    * Fix slight shift on search bar input during focus
+    * Avoid unwanted showing/hiding of search bar on mobile when scrolling
+
 ## v0.34.0 (2024-05-30)
 
 This release requires Elixir v1.13.
