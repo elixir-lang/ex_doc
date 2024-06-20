@@ -23,14 +23,14 @@
     <%= for filter <- [:modules, :tasks], node <- nodes[filter] do %>
       <item id="<%= URI.encode node.id %>" href="<%= URI.encode node.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
     <% end %>
-    <%= for static_file <- static_files do %>
-      <item id="<%= static_file_to_id(static_file) %>" href="<%= static_file %>" media-type="<%= media_type(Path.extname(static_file)) %>"/>
+    <%= for {static_file, media_type} <- static_files do %>
+      <item id="<%= static_file_to_id(static_file) %>" href="<%= static_file %>" media-type="<%= media_type %>"/>
     <% end %>
     <%= if config.cover do %>
-      <item id="cover-image" href="assets/cover<%= Path.extname(config.cover) %>" media-type="<%= media_type(Path.extname(config.cover))%>"/>
+      <item id="cover-image" href="assets/cover<%= Path.extname(config.cover) %>" media-type="<%= media_type(Path.extname(config.cover)) %>"/>
     <% end %>
     <%= if config.logo do %>
-      <item id="logo" href="assets/logo<%= Path.extname(config.logo) %>" media-type="<%= media_type(Path.extname(config.logo))%>"/>
+      <item id="logo" href="assets/logo<%= Path.extname(config.logo) %>" media-type="<%= media_type(Path.extname(config.logo)) %>"/>
     <% end %>
   </manifest>
   <spine>

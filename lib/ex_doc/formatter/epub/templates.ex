@@ -129,11 +129,10 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   |> Enum.each(fn line ->
     [extension, media] = String.split(line, ",")
 
-    defp media_type("." <> unquote(extension)) do
+    def media_type("." <> unquote(extension)) do
       unquote(media)
     end
   end)
 
-  defp media_type(arg),
-    do: raise("asset with extension #{inspect(arg)} is not supported by EPUB format")
+  def media_type(_arg), do: nil
 end

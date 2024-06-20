@@ -67,19 +67,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~ ~r{<dc:creator id="author2">Jane Doe</dc:creator>}
   end
 
-  test "raises when assets are invalid", context do
-    File.mkdir_p!("test/tmp/epub_assets/hello")
-    File.touch!("test/tmp/epub_assets/hello/world.pdf")
-
-    assert_raise(
-      RuntimeError,
-      ~s{asset with extension ".pdf" is not supported by EPUB format},
-      fn -> generate_docs(doc_config(context, assets: %{"test/tmp/epub_assets" => "assets"})) end
-    )
-  after
-    File.rm_rf!("test/tmp/epub_assets")
-  end
-
   test "generates an EPUB file in the default directory", %{tmp_dir: tmp_dir} = context do
     generate_docs(doc_config(context))
     assert File.regular?(tmp_dir <> "/epub/#{doc_config(context)[:project]}.epub")
@@ -232,6 +219,7 @@ defmodule ExDoc.Formatter.EPUBTest do
   test "assets required by the user end up in the right place", %{tmp_dir: tmp_dir} = context do
     File.mkdir_p!("test/tmp/epub_assets/hello")
     File.touch!("test/tmp/epub_assets/hello/world.png")
+    File.touch!("test/tmp/epub_assets/hello/world.pdf")
 
     generate_docs_and_unzip(
       context,
@@ -243,6 +231,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     )
 
     assert File.regular?(tmp_dir <> "/epub/OEBPS/assets/hello/world.png")
+    assert File.regular?(tmp_dir <> "/epub/OEBPS/assets/hello/world.pdf")
     assert File.regular?(tmp_dir <> "/epub/OEBPS/assets/logo.png")
     assert File.regular?(tmp_dir <> "/epub/OEBPS/assets/cover.png")
   after

@@ -76,11 +76,10 @@ defmodule ExDoc.Formatter.EPUB do
 
   defp generate_content(config, nodes, uuid, datetime, static_files) do
     static_files =
-      static_files
-      |> Enum.filter(fn name ->
-        String.contains?(name, "OEBPS") and config.output |> Path.join(name) |> File.regular?()
-      end)
-      |> Enum.map(&Path.relative_to(&1, "OEBPS"))
+      for name <- static_files,
+          String.contains?(name, "OEBPS"),
+          media_type = Templates.media_type(Path.extname(name)),
+          do: {Path.relative_to(name, "OEBPS"), media_type}
 
     content = Templates.content_template(config, nodes, uuid, datetime, static_files)
     File.write("#{config.output}/OEBPS/content.opf", content)
