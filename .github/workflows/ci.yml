@@ -16,12 +16,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - pair:
+          - pair: # Test very old elixir and Erlang
               elixir: "1.13"
               otp: "22"
-          - pair:
+          - pair: # Test Erlang without -doc attribute support
               elixir: "1.16"
               otp: "26"
+          - pair: # Test Erlang with -doc attribute support
+              elixir: "1.17"
+              otp: "27"
             lint: lint
     steps:
       - uses: actions/checkout@v3

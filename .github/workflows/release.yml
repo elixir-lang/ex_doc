@@ -29,12 +29,16 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - otp: 24
-            otp_version: "24.0"
           - otp: 25
-            otp_version: "25.0.4"
+            otp_version: "25.3.2.12"
+            elixir_version: "1.16.2"
           - otp: 26
-            otp_version: "26.0.2"
+            otp_version: "26.2.5"
+            elixir_version: "1.16.2"
+          - otp: 27
+            otp_version: "27.0"
+            elixir_version: "1.17.0"
+
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +48,7 @@ jobs:
         with:
           otp_version: ${{ matrix.otp_version }}
           otp: ${{ matrix.otp }}
+          elixir_version: ${{ matrix.elixir_version }}
 
       - name: Upload Pre-built
         env:
