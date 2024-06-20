@@ -5,13 +5,15 @@ inputs:
     description: "The major OTP version"
   otp_version:
     description: "The exact OTP version (major.minor[.patch])"
+  elixir_version:
+    description: "The exact Elixir version (major.minor[.patch])"
 runs:
   using: "composite"
   steps:
     - uses: erlef/setup-beam@v1.16.0
       with:
         otp-version: ${{ inputs.otp_version }}
-        elixir-version: "1.16.0"
+        elixir-version: ${{ inputs.elixir_version }}
     - name: Build ex_doc
       shell: bash
       run: |

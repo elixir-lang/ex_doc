@@ -561,7 +561,7 @@ defmodule ExDoc.Language.Erlang do
                 name == :record and acc != [] ->
                   {ast, acc}
 
-                name in [:"::", :when, :%{}, :{}, :|, :->] ->
+                name in [:"::", :when, :%{}, :{}, :|, :->, :...] ->
                   {ast, acc}
 
                 # %{required(...) => ..., optional(...) => ...}

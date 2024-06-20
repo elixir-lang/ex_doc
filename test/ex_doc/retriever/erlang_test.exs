@@ -11,6 +11,7 @@ defmodule ExDoc.Retriever.ErlangTest do
     test "module with no docs is generated", c do
       erlc(c, :mod, ~S"""
       -module(mod).
+      -moduledoc("").
       """)
 
       assert {[_], []} = Retriever.docs_from_modules([:mod], %ExDoc.Config{})
@@ -217,6 +218,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       erlc(c, :mod, ~S"""
       -module(mod).
       -export([f/0]).
+      -moduledoc("").
 
       f() -> ok.
       """)
@@ -319,6 +321,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       erlc(c, :mod, ~s"""
       -module(mod).
       -export([function/0]).
+      -moduledoc("").
 
       -record(a, { a = 1 :: pos_integer(),
                    b :: non_neg_integer(),
