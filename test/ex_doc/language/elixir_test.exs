@@ -148,6 +148,11 @@ defmodule ExDoc.Language.ElixirTest do
                ~s|<a href="https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3"><code class="inline">GenServer.handle_call/3</code></a>|
     end
 
+    test "elixir callback fragment" do
+      assert autolink_doc("`c:GenServer.handle_call/3#fragment`") ==
+               ~s|<a href="https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3-fragment"><code class="inline">GenServer.handle_call/3</code></a>|
+    end
+
     test "erlang callback" do
       assert autolink_doc("`c::gen_server.handle_call/3`") ==
                ~s|<a href="https://www.erlang.org/doc/apps/stdlib/gen_server.html#c:handle_call/3"><code class="inline">:gen_server.handle_call/3</code></a>|
