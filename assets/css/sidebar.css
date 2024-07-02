@@ -245,6 +245,7 @@
   font-size: 0.9em;
   line-height: 1.8em;
   color: var(--sidebarSubheadings);
+  margin-top: 10px;
   padding-left: 15px;
 }
 
