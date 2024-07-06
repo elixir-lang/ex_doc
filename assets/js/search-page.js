@@ -153,17 +153,46 @@ function docTokenSplitter (builder) {
 }
 
 function docTokenFunction (token) {
-  // Split on : . / _ - to make easier to partially match on function names.
-  // We split only when tokenizing, not when searching.
-  const tokens = token
-    .toString()
-    .split(/\:|\.|\/|_|-/)
-    .map(part => {
-      return token.clone().update(() => part)
-    })
+  // If we have something with an arity, we split on : . to make partial
+  // matches easier. We split only when tokenizing, not when searching.
+  // Below we use ExDoc.Markdown.to_ast/2 as an example.
+  const tokens = [token]
+  const arityRegex = /\/\d+$/
+  const namespaceRegex = /\:|\./
+  let toSplitWords = token.toString()
 
-  if (tokens.length > 1) {
-    return [...tokens, token]
+  if(arityRegex.test(toSplitWords)) {
+    const withoutArity = token
+      .toString()
+      .replace(arityRegex, "")
+
+    // This token represents ExDoc.Markdown.to_ast
+    tokens.push(token.clone().update(() => withoutArity))
+
+    // And now we get each part as token: ExDoc, Markdown, and to_ast
+    let parts = withoutArity.split(namespaceRegex)
+
+    if(parts.length > 1) {
+      for(let part of parts) {
+        tokens.push(token.clone().update(() => part))
+      }
+
+      // Let's also add to_ast/2
+      let lastWithArity = token.toString().split(namespaceRegex)
+      tokens.push(token.clone().update(() => lastWithArity[lastWithArity.length - 1]))
+    }
+
+    toSplitWords = parts[parts.length - 1]
+  }
+
+  // Now split the function name (or the token, if that's all we had),
+  // on _ or - (but we keep the original)
+  let words = toSplitWords.split(/\_|\-/)
+
+  if(words.length > 1) {
+    for(let word of words) {
+      tokens.push(token.clone().update(() => word))
+    }
   }
 
   return tokens
