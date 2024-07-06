@@ -161,24 +161,24 @@ function docTokenFunction (token) {
   const namespaceRegex = /\:|\./
   let toSplitWords = token.toString()
 
-  if(arityRegex.test(toSplitWords)) {
+  if (arityRegex.test(toSplitWords)) {
     const withoutArity = token
       .toString()
-      .replace(arityRegex, "")
+      .replace(arityRegex, '')
 
     // This token represents ExDoc.Markdown.to_ast
     tokens.push(token.clone().update(() => withoutArity))
 
     // And now we get each part as token: ExDoc, Markdown, and to_ast
-    let parts = withoutArity.split(namespaceRegex)
+    const parts = withoutArity.split(namespaceRegex)
 
-    if(parts.length > 1) {
-      for(let part of parts) {
+    if (parts.length > 1) {
+      for (const part of parts) {
         tokens.push(token.clone().update(() => part))
       }
 
       // Let's also add to_ast/2
-      let lastWithArity = token.toString().split(namespaceRegex)
+      const lastWithArity = token.toString().split(namespaceRegex)
       tokens.push(token.clone().update(() => lastWithArity[lastWithArity.length - 1]))
     }
 
@@ -187,10 +187,10 @@ function docTokenFunction (token) {
 
   // Now split the function name (or the token, if that's all we had),
   // on _ or - (but we keep the original)
-  let words = toSplitWords.split(/\_|\-/)
+  const words = toSplitWords.split(/\_|\-/)
 
-  if(words.length > 1) {
-    for(let word of words) {
+  if (words.length > 1) {
+    for (const word of words) {
       tokens.push(token.clone().update(() => word))
     }
   }
