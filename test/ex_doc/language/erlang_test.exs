@@ -767,6 +767,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s[foo() -> 1..255 | <a href="#t:t/0">t</a>().]
     end
 
+    test "integer unary", c do
+      assert autolink_spec(~s"-spec f(LimitedInteger :: +1 | -1) -> t().", c) ==
+               ~s[f(LimitedInteger :: +1 | -1) -> <a href="#t:t/0">t</a>().]
+    end
+
     test "function - any", c do
       assert autolink_spec(~s"-spec foo() -> fun() | t().", c) ==
                ~s[foo() -> fun() | <a href="#t:t/0">t</a>().]

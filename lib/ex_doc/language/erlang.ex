@@ -538,8 +538,8 @@ defmodule ExDoc.Language.Erlang do
             {name, _, _}, acc when name in [:<<>>, :..] ->
               {nil, acc}
 
-            # -1
-            {:-, _, [int]}, acc when is_integer(int) ->
+            # -1, +1
+            {op, _, [int]}, acc when is_integer(int) and op in [:+, :-] ->
               {nil, acc}
 
             # fun() (spec_to_quoted expands it to (... -> any())
