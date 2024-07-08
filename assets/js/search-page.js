@@ -183,10 +183,10 @@ function docTokenFunction (token) {
     }
 
     toSplitWords = parts[parts.length - 1]
-  } else if (toSplitWords.startsWith("@")) {
+  } else if (toSplitWords.startsWith('@')) {
     // If we have a module attribute, such as @foo_bar,
     // also make it searchable as foo_bar
-    toSplitWords = toSplitWords.substring(1);
+    toSplitWords = toSplitWords.substring(1)
     tokens.push(token.clone().update(() => toSplitWords))
   }
 
