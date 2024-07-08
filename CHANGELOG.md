@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.34.2 (2024-07-08)
+
+  * Enhancements
+    * Allow anchors on function and callback autolinks
+
+  * Bug fixes
+    * Make module attributes searchable without leading @
+    * Make Mod.fun pairs searchable without the arity
+    * Do not emit warnings on unary plus in typespecs
+    * Add top margin to nested module prefix in sidebar
+
 ## v0.34.1 (2024-06-30)
 
   * Enhancements
