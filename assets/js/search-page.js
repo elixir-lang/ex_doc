@@ -127,7 +127,7 @@ function b64decode (str) {
 }
 
 function indexStorageKey () {
-  return `idv4:${getProjectNameAndVersion()}`
+  return `idv5:${getProjectNameAndVersion()}`
 }
 
 function createIndex () {
@@ -183,6 +183,11 @@ function docTokenFunction (token) {
     }
 
     toSplitWords = parts[parts.length - 1]
+  } else if (toSplitWords.startsWith("@")) {
+    // If we have a module attribute, such as @foo_bar,
+    // also make it searchable as foo_bar
+    toSplitWords = toSplitWords.substring(1);
+    tokens.push(token.clone().update(() => toSplitWords))
   }
 
   // Now split the function name (or the token, if that's all we had),
