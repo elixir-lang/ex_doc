@@ -116,7 +116,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
 
     config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", proglang: :erlang}
     data = search_data([module], config)
-    assert data["content_type"] == "text/plain"
+    assert data["content_type"] == "text/markdown"
     [item] = data["items"]
     assert item["ref"] == "search_foo.html"
     assert item["type"] == "module"
