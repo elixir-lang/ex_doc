@@ -15,17 +15,18 @@ export function initialize () {
     // Initially the container contains only text with the current version
     const currentVersion = versionsContainer.textContent.trim()
     const latestVersionNode = versionNodes.find(node => node.latest)
-    const jumpToLatestUrl = latestVersionNode?.version !== currentVersion ? latestVersionNode?.url : null
+    const latestVersion = latestVersionNode?.version !== currentVersion ? latestVersionNode?.version : null
+    const latestUrl = latestVersionNode?.version !== currentVersion ? latestVersionNode?.url : null
 
     const nodes = decorateVersionNodes(versionNodes, currentVersion)
 
-    renderVersionPicker(nodes, jumpToLatestUrl)
+    renderVersionPicker(nodes, latestVersion, latestUrl)
   }
 }
 
-function renderVersionPicker (nodes, jumpToLatestUrl) {
+function renderVersionPicker (nodes, latestVersion, latestUrl) {
   const versionsContainer = qs(VERSIONS_CONTAINER_SELECTOR)
-  const versionPickerHtml = Handlebars.templates['versions-dropdown']({ nodes, jumpToLatestUrl })
+  const versionPickerHtml = Handlebars.templates['versions-dropdown']({ nodes, latestVersion, latestUrl })
   versionsContainer.innerHTML = versionPickerHtml
 
   qs(VERSIONS_DROPDOWN_SELECTOR).addEventListener('change', handleVersionSelected)
