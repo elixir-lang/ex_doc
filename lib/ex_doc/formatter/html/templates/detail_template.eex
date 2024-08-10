@@ -3,15 +3,13 @@
     <span id="<%=enc "#{default_name}/#{default_arity}" %>"></span>
   <% end %>
   <div class="detail-header">
-    <a href="#<%=enc node.id %>" class="detail-link" data-no-tooltip title="Link to this <%= pretty_type(node) %>">
+    <a href="#<%=enc node.id %>" class="detail-link" data-no-tooltip aria-label="Link to this <%= pretty_type(node) %>">
       <i class="ri-link-m" aria-hidden="true"></i>
-      <span class="sr-only">Link to this <%= pretty_type(node) %></span>
     </a>
     <h1 class="signature" translate="no"><%=h node.signature %></h1>
     <%= if node.source_url do %>
-      <a href="<%= node.source_url %>" class="icon-action" rel="help" title="View Source">
+      <a href="<%= node.source_url %>" class="icon-action" rel="help" aria-label="View Source">
        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
-       <span class="sr-only">View Source</span>
      </a>
     <% end %>
     <%= for annotation <- node.annotations do %>
