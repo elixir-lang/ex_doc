@@ -501,7 +501,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~s{example(foo, bar \\\\ Baz)}
 
       assert content =~
-               ~r{<a href="#example/2" class="detail-link" data-no-tooltip title="Link to this function">\s*<i class="ri-link-m" aria-hidden="true"></i>\s*<span class="sr-only">Link to this function</span>\s*</a>}ms
+               ~r{<a href="#example/2" class="detail-link" data-no-tooltip aria-label="Link to this function">\s*<i class="ri-link-m" aria-hidden="true"></i>\s*</a>}ms
     end
 
     test "outputs function groups", context do
