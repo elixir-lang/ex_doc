@@ -5,6 +5,8 @@ defmodule ExDoc.Markdown.Earmark do
 
   @behaviour ExDoc.Markdown
 
+  @admonition_classes ~w(warning error info tip neutral)
+
   @impl true
   def available? do
     match?({:ok, _}, Application.ensure_all_started(:earmark_parser)) and
@@ -72,6 +74,44 @@ defmodule ExDoc.Markdown.Earmark do
 
   defp fixup({"code", [{"class", "math-display"}], [content], _}) do
     "$$\n#{content}\n$$"
+  end
+
+  # Convert admonition blockquotes to divs for screen reader accessibility
+  defp fixup(
+         {"blockquote", blockquote_attrs, [{tag, h_attrs, _h_content, _h_meta} = h_elem | rest] = ast,
+          blockquote_meta}
+       )
+       when tag in ["h3", "h4"] do
+    h_admonition_classes =
+      h_attrs
+      |> Enum.find("", &match?({"class", _}, &1))
+      |> then(fn
+        "" ->
+          ""
+
+        {"class", classes} ->
+          classes
+          |> String.split(" ")
+          |> Enum.filter(&(&1 in @admonition_classes))
+          |> Enum.join(" ")
+      end)
+
+    if h_admonition_classes != "" do
+      blockquote_attrs =
+        case Enum.split_with(blockquote_attrs, &match?({"class", _}, &1)) do
+          {[], attrs} ->
+            [{"class", h_admonition_classes}, {"role", "note"} | attrs]
+
+          {[{"class", classes}], attrs} ->
+            classes = String.trim_trailing(classes) <> " #{h_admonition_classes}"
+            [{"class", classes}, {"role", "note"} | attrs]
+        end
+
+      fixup({"div", blockquote_attrs, [h_elem | rest], blockquote_meta})
+    else
+      # regular blockquote, copied fixup/1 here to avoid infinite loop
+      {:blockquote, Enum.map(blockquote_attrs, &fixup_attr/1), fixup(ast), blockquote_meta}
+    end
   end
 
   defp fixup({tag, attrs, ast, meta}) when is_binary(tag) and is_list(attrs) and is_map(meta) do

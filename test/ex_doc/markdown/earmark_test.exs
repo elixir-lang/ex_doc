@@ -75,6 +75,43 @@ defmodule ExDoc.Markdown.EarmarkTest do
              ]
     end
 
+    test "converts blockquote admonitions to regular divs" do
+      info = """
+      > #### Info {: .info .ignore}
+      > This is info.
+      """
+      assert Markdown.to_ast(info, []) == [
+        {:div, [class: "info", role: "note"], [
+          {:h4, [class: "ignore info"], ["Info"], %{}},
+          {:p, [], ["This is info."], %{}}
+        ], %{}}
+      ]
+
+      not_admonition = """
+      > ### H3 {: .xyz}
+      > This is NOT an admonition!
+      """
+
+      assert Markdown.to_ast(not_admonition, []) == [
+        {:blockquote, [], [
+          {:h3, [class: "xyz"], ["H3"], %{}},
+          {:p, [], ["This is NOT an admonition!"], %{}}
+        ], %{}}
+      ]
+
+      warning_error = """
+      > ### Warning! Error! {: .warning .error}
+      > A warning and an error.
+      """
+
+      assert Markdown.to_ast(warning_error, []) == [
+        {:div, [class: "error warning", role: "note"], [
+          {:h3, [class: "error warning"], ["Warning! Error!"], %{}},
+          {:p, [], ["A warning and an error."], %{}}
+        ], %{}}
+      ]
+    end
+
     test "keeps math syntax without interpreting math as markdown" do
       assert Markdown.to_ast("Math $x *y* y$", []) == [
                {:p, [], ["Math ", "$x *y* y$"], %{}}
