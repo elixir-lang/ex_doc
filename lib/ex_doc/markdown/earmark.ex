@@ -78,8 +78,8 @@ defmodule ExDoc.Markdown.Earmark do
 
   # Convert admonition blockquotes to divs for screen reader accessibility
   defp fixup(
-         {"blockquote", blockquote_attrs, [{tag, h_attrs, _h_content, _h_meta} = h_elem | rest] = ast,
-          blockquote_meta}
+         {"blockquote", blockquote_attrs,
+          [{tag, h_attrs, _h_content, _h_meta} = h_elem | rest] = ast, blockquote_meta}
        )
        when tag in ["h3", "h4"] do
     h_admonition_classes =
@@ -97,13 +97,15 @@ defmodule ExDoc.Markdown.Earmark do
       end)
 
     if h_admonition_classes != "" do
+      admonition_classes = "admonition #{h_admonition_classes}"
+
       blockquote_attrs =
         case Enum.split_with(blockquote_attrs, &match?({"class", _}, &1)) do
           {[], attrs} ->
-            [{"class", h_admonition_classes}, {"role", "note"} | attrs]
+            [{"class", admonition_classes}, {"role", "note"} | attrs]
 
           {[{"class", classes}], attrs} ->
-            classes = String.trim_trailing(classes) <> " #{h_admonition_classes}"
+            classes = String.trim_trailing(classes) <> " #{admonition_classes}"
             [{"class", classes}, {"role", "note"} | attrs]
         end
 

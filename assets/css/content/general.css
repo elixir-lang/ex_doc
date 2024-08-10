@@ -97,7 +97,7 @@
   font-weight: normal;
 }
 
-.content-inner blockquote {
+.content-inner blockquote, .content-inner div.admonition {
   border-left: 3px solid var(--blockquoteBorder);
   position: relative;
   margin: 1.5625em 0;
