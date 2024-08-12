@@ -97,7 +97,7 @@
   font-weight: normal;
 }
 
-.content-inner blockquote, .content-inner .admonition {
+.content-inner blockquote, .content-inner section.admonition {
   border-left: 3px solid var(--blockquoteBorder);
   position: relative;
   margin: 1.5625em 0;
@@ -106,7 +106,7 @@
   background-color: var(--blockquoteBackground);
   border-radius: var(--borderRadius);
 }
-.content-inner blockquote p:last-child, .content-inner .admonition p:last-child  {
+.content-inner blockquote p:last-child, .content-inner section.admonition p:last-child  {
   padding-bottom: 1em;
   margin-bottom: 0;
 }
