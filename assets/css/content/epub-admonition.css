@@ -34,33 +34,30 @@
   border-left-color: var(--tipHeadingBackground);
 }
 
-.content-inner section.admonition :is(h3, h4) {
+.content-inner section.admonition > :first-child {
   font-weight: bold;
   margin: 0px 10px 5px 0px;
-}
-
-.content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
   font-style: normal;
   font-weight: 700;
 }
 
-.content-inner section.admonition :is(h3, h4).warning {
+.content-inner section.admonition > :first-child.warning {
   color: var(--warningHeadingBackground);
 }
-.content-inner section.admonition :is(h3, h4).error {
+.content-inner section.admonition > :first-child.error {
   color: var(--errorHeadingBackground);
 }
-.content-inner section.admonition :is(h3, h4).info {
+.content-inner section.admonition > :first-child.info {
   color: var(--infoHeadingBackground);
 }
-.content-inner section.admonition :is(h3, h4).neutral {
+.content-inner section.admonition > :first-child.neutral {
   color: var(--neutralHeadingBackground);
 }
-.content-inner section.admonition :is(h3, h4).tip {
+.content-inner section.admonition > :first-child.tip {
   color: var(--tipHeadingBackground);
 }
 
-.content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) code {
+.content-inner section.admonition > :first-child code {
   margin: 0 0.5ch;
 }
 
