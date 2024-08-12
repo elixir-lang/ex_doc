@@ -1,4 +1,4 @@
-.content-inner .admonition:is(.warning, .error, .info, .neutral, .tip) {
+.content-inner .admonition {
   border-left: solid 4px;
   color: var(--black);
   font-size: 0.9em;
@@ -64,13 +64,13 @@
   margin: 0 0.5ch;
 }
 
-.content-inner .admonition:is(.warning, .error, .info, .neutral, .tip) code {
+.content-inner .admonition code {
   background-color: var(--admInlineCodeBackground);
   border: 1px solid var(--admInlineCodeBorder);
   color: var(--admInlineCodeColor);
 }
 
-.content-inner .admonition:is(.warning, .error, .info, .neutral, .tip) pre code {
+.content-inner .admonition pre code {
   background-color: var(--admCodeBackground);
   border: 1px solid var(--admCodeBorder);
   color: var(--admCodeColor);

@@ -52,7 +52,7 @@
     display: none;
   }
 
-  .content-inner .admonition:is(.warning, .error, .info, .neutral, .tip) {
+  .content-inner .admonition {
     border: 2px solid var(--gray400);
   }
 
