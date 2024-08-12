@@ -52,11 +52,11 @@
     display: none;
   }
 
-  .content-inner section.admonition:is(.warning, .error, .info, .neutral, .tip) {
+  .content-inner .admonition:is(.warning, .error, .info, .neutral, .tip) {
     border: 2px solid var(--gray400);
   }
 
-  .content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
+  .content-inner .admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
     color: var(--textHeaders);
     border-bottom: 2px solid var(--gray400);
   }
