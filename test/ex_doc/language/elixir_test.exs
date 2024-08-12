@@ -500,7 +500,9 @@ defmodule ExDoc.Language.ElixirTest do
     ExDoc.Refs.insert([
       {{:module, AutolinkTest.Foo}, :public},
       {{:function, AutolinkTest.Foo, :bar, 1}, :hidden},
-      {{:type, AutolinkTest.Foo, :bad, 0}, :hidden}
+      {{:type, AutolinkTest.Foo, :bad, 0}, :hidden},
+      {{:module, AutoLinkTest.Hidden}, :hidden},
+      {{:type, AutoLinkTest.Hidden, :my_type, 0}, :hidden}
     ])
 
     opts = [
@@ -518,6 +520,12 @@ defmodule ExDoc.Language.ElixirTest do
     assert_received {:warn, message, metadata}
     assert message =~ ~s|references function "AutolinkTest.Foo.bar/1" but it is hidden|
     assert metadata == [file: "foo.ex", line: 2]
+
+    assert warn(fn ->
+             assert autolink_doc("`t:AutoLinkTest.Hidden.my_type/0`", opts) ==
+                      ~s|<code class="inline">t:AutoLinkTest.Hidden.my_type/0</code>|
+           end) =~
+             ~s|documentation references type "t:AutoLinkTest.Hidden.my_type/0" but the module AutoLinkTest.Hidden is hidden|
 
     assert warn(fn ->
              assert autolink_doc("`t:AutolinkTest.Foo.bad/0`", opts) ==
