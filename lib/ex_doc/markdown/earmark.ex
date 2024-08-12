@@ -109,7 +109,7 @@ defmodule ExDoc.Markdown.Earmark do
             [{"class", classes}, {"role", "note"} | attrs]
         end
 
-      fixup({"div", blockquote_attrs, [h_elem | rest], blockquote_meta})
+      fixup({"section", blockquote_attrs, [h_elem | rest], blockquote_meta})
     else
       # regular blockquote, copied fixup/1 here to avoid infinite loop
       {:blockquote, Enum.map(blockquote_attrs, &fixup_attr/1), fixup(ast), blockquote_meta}

@@ -1,36 +1,36 @@
-.content-inner div.admonition:is(.warning, .error, .info, .neutral, .tip) {
+.content-inner section.admonition:is(.warning, .error, .info, .neutral, .tip) {
   border-radius: 10px;
   border-left: 0;
 }
 
-.content-inner div.admonition.warning {
+.content-inner section.admonition.warning {
   background-color: var(--warningBackground);
 }
 
-.content-inner div.admonition.error {
+.content-inner section.admonition.error {
   background-color: var(--errorBackground);
 }
 
-.content-inner div.admonition.info {
+.content-inner section.admonition.info {
   background-color: var(--infoBackground);
 }
 
-.content-inner div.admonition.neutral {
+.content-inner section.admonition.neutral {
   background-color: var(--neutralBackground);
 }
 
-.content-inner div.admonition.tip {
+.content-inner section.admonition.tip {
   background-color: var(--tipBackground);
 }
 
-.content-inner div.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
+.content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
   color: var(--contrast);
   margin: 0 -1.2rem;
   padding: .7rem 1.2rem .7rem 3.3rem;
   font-weight: 700;
   font-style: normal;
 }
-.content-inner div.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip)::before {
+.content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip)::before {
   color: var(--contrast);
   position: absolute;
   left: 1rem;
@@ -41,74 +41,74 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.content-inner div.admonition :is(h3, h4).warning {
+.content-inner section.admonition :is(h3, h4).warning {
   background-color: var(--warningHeadingBackground);
   color: var(--warningHeading);
 }
-.content-inner div.admonition :is(h3, h4).warning::before {
+.content-inner section.admonition :is(h3, h4).warning::before {
   content: var(--icon-error-warning);
   color: var(--warningHeading);
 }
 
-.content-inner div.admonition :is(h3, h4).error {
+.content-inner section.admonition :is(h3, h4).error {
   background-color: var(--errorHeadingBackground);
   color: var(--errorHeading);
 }
-.content-inner div.admonition :is(h3, h4).error::before {
+.content-inner section.admonition :is(h3, h4).error::before {
   content: var(--icon-error-warning);
   color: var(--errorHeading);
 }
 
-.content-inner div.admonition :is(h3, h4).info {
+.content-inner section.admonition :is(h3, h4).info {
   background-color: var(--infoHeadingBackground);
   color: var(--infoHeading);
 }
-.content-inner div.admonition :is(h3, h4).info::before {
+.content-inner section.admonition :is(h3, h4).info::before {
   content: var(--icon-information);
   color: var(--infoHeading);
 }
 
-.content-inner div.admonition :is(h3, h4).neutral {
+.content-inner section.admonition :is(h3, h4).neutral {
   background-color: var(--neutralHeadingBackground);
   color: var(--neutralHeading);
 }
-.content-inner div.admonition :is(h3, h4).neutral::before {
+.content-inner section.admonition :is(h3, h4).neutral::before {
   content: var(--icon-double-quotes-l);
   color: var(--neutralHeading);
 }
 
-.content-inner div.admonition :is(h3, h4).tip {
+.content-inner section.admonition :is(h3, h4).tip {
   background-color: var(--tipHeadingBackground);
   color: var(--tipHeading);
 }
-.content-inner div.admonition :is(h3, h4).tip::before {
+.content-inner section.admonition :is(h3, h4).tip::before {
   content: var(--icon-information);
   color: var(--tipHeading);
 }
 
-.content-inner div.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) code {
+.content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) code {
   margin: 0 0.5ch;
 }
 
-.content-inner div.admonition:is(.warning, .error, .info, .neutral, .tip) code {
+.content-inner section.admonition:is(.warning, .error, .info, .neutral, .tip) code {
   background-color: var(--admInlineCodeBackground);
   border: 1px solid var(--admInlineCodeBorder);
   color: var(--admInlineCodeColor);
 }
 
-.content-inner div.admonition:is(.warning, .error, .info, .neutral, .tip) pre code {
+.content-inner section.admonition:is(.warning, .error, .info, .neutral, .tip) pre code {
   background-color: var(--admCodeBackground);
   border: 1px solid var(--admCodeBorder);
   color: var(--admCodeColor);
 }
 
-.content-inner div.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) :is(a, a:visited) {
+.content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) :is(a, a:visited) {
   color: inherit;
   text-decoration-color: currentColor;
 }
 
 @media screen and (max-width: 768px) {
-  .content-inner div.admonition:is(.warning, .error, .info, .neutral, .tip) {
+  .content-inner section.admonition:is(.warning, .error, .info, .neutral, .tip) {
     margin-left: calc(-1 * var(--content-gutter));
     margin-right: calc(-1 * var(--content-gutter));
     padding-left: var(--content-gutter);
@@ -116,7 +116,7 @@
     border-radius: 0;
   }
 
-  .content-inner div.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
+  .content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
     margin: 0 calc(-1 * var(--content-gutter));
   }
 }

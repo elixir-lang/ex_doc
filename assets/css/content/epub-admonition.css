@@ -1,4 +1,4 @@
-.content-inner div.admonition:is(.warning, .error, .info, .neutral, .tip) {
+.content-inner section.admonition:is(.warning, .error, .info, .neutral, .tip) {
   border-left: solid 4px;
   color: var(--black);
   font-size: 0.9em;
@@ -9,68 +9,68 @@
   page-break-inside: avoid;
 }
 
-.content-inner div.admonition.warning {
+.content-inner section.admonition.warning {
   background-color: var(--warningBackground);
   border-left-color: var(--warningHeadingBackground);
 }
 
-.content-inner div.admonition.error {
+.content-inner section.admonition.error {
   background-color: var(--errorBackground);
   border-left-color: var(--errorHeadingBackground);
 }
 
-.content-inner div.admonition.info {
+.content-inner section.admonition.info {
   background-color: var(--infoBackground);
   border-left-color: var(--infoHeadingBackground);
 }
 
-.content-inner div.admonition.neutral {
+.content-inner section.admonition.neutral {
   background-color: var(--neutralBackground);
   border-left-color: var(--neutralHeadingBackground);
 }
 
-.content-inner div.admonition.tip {
+.content-inner section.admonition.tip {
   background-color: var(--tipBackground);
   border-left-color: var(--tipHeadingBackground);
 }
 
-.content-inner div.admonition :is(h3, h4) {
+.content-inner section.admonition :is(h3, h4) {
   font-weight: bold;
   margin: 0px 10px 5px 0px;
 }
 
-.content-inner div.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
+.content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
   font-style: normal;
   font-weight: 700;
 }
 
-.content-inner div.admonition :is(h3, h4).warning {
+.content-inner section.admonition :is(h3, h4).warning {
   color: var(--warningHeadingBackground);
 }
-.content-inner div.admonition :is(h3, h4).error {
+.content-inner section.admonition :is(h3, h4).error {
   color: var(--errorHeadingBackground);
 }
-.content-inner div.admonition :is(h3, h4).info {
+.content-inner section.admonition :is(h3, h4).info {
   color: var(--infoHeadingBackground);
 }
-.content-inner div.admonition :is(h3, h4).neutral {
+.content-inner section.admonition :is(h3, h4).neutral {
   color: var(--neutralHeadingBackground);
 }
-.content-inner div.admonition :is(h3, h4).tip {
+.content-inner section.admonition :is(h3, h4).tip {
   color: var(--tipHeadingBackground);
 }
 
-.content-inner div.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) code {
+.content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) code {
   margin: 0 0.5ch;
 }
 
-.content-inner div.admonition:is(.warning, .error, .info, .neutral, .tip) code {
+.content-inner section.admonition:is(.warning, .error, .info, .neutral, .tip) code {
   background-color: var(--admInlineCodeBackground);
   border: 1px solid var(--admInlineCodeBorder);
   color: var(--admInlineCodeColor);
 }
 
-.content-inner div.admonition:is(.warning, .error, .info, .neutral, .tip) pre code {
+.content-inner section.admonition:is(.warning, .error, .info, .neutral, .tip) pre code {
   background-color: var(--admCodeBackground);
   border: 1px solid var(--admCodeBorder);
   color: var(--admCodeColor);

@@ -82,7 +82,7 @@ defmodule ExDoc.Markdown.EarmarkTest do
       """
 
       assert Markdown.to_ast(info, []) == [
-               {:div, [class: "admonition info", role: "note"],
+               {:section, [class: "admonition info", role: "note"],
                 [
                   {:h4, [class: "ignore info"], ["Info"], %{}},
                   {:p, [], ["This is info."], %{}}
@@ -108,7 +108,7 @@ defmodule ExDoc.Markdown.EarmarkTest do
       """
 
       assert Markdown.to_ast(warning_error, []) == [
-               {:div, [class: "admonition error warning", role: "note"],
+               {:section, [class: "admonition error warning", role: "note"],
                 [
                   {:h3, [class: "error warning"], ["Warning! Error!"], %{}},
                   {:p, [], ["A warning and an error."], %{}}
