@@ -58,7 +58,8 @@
   }
 
   .tabset-panel pre,
-  .tabset-panel blockquote {
+  .tabset-panel blockquote,
+  .tabset-panel section.admonition {
     margin-left: calc(-1 * var(--tabsetPadding)) !important;
     margin-right: calc(-1 * var(--tabsetPadding)) !important;
   }
