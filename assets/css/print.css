@@ -56,7 +56,7 @@
     border: 2px solid var(--gray400);
   }
 
-  .content-inner section.admonition :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
+  .content-inner section.admonition > :first-child {
     color: var(--textHeaders);
     border-bottom: 2px solid var(--gray400);
   }
