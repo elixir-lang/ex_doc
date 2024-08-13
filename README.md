@@ -375,7 +375,7 @@ If you write TeX-style math in your Markdown, such as `$\sum_{i}^{N} x_i$`, it e
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
 
 <link href="https://cdn.jsdelivr.net/npm/katex-copytex@1.0.2/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
-<script src="https://cdn.jsdelivr.net/npm/katex-copytex@1.0.2/dist/katex-copytex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex-copytex@1.0.2/dist/katex-copytex.min.js" crossorigin="anonymous"></script>
 
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
   onload="renderMathInElement(document.body, {
@@ -394,9 +394,9 @@ For more details and configuration options, see the [KaTeX Auto-render Extension
 Snippets are also objects you may want to render in a special manner. For example, assuming your Markdown includes Vega-Lite specification in `vega-lite` code snippets:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.1"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.1"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     for (const codeEl of document.querySelectorAll("pre code.vega-lite")) {
@@ -422,9 +422,8 @@ For more details and configuration options, see [vega/vega-embed](https://github
 Similarly to the example above, if your Markdown includes Mermaid graph specification in `mermaid` code snippets:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+  function mermaidLoaded() {
     mermaid.initialize({
       startOnLoad: false,
       theme: document.body.className.includes("dark") ? "dark" : "default"
@@ -442,8 +441,9 @@ Similarly to the example above, if your Markdown includes Mermaid graph specific
         preEl.remove();
       });
     }
-  });
+  }
 </script>
+<script async src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js" onload="mermaidLoaded();"></script>
 ```
 
 For more details and configuration options, see the [Mermaid usage docs](https://mermaid-js.github.io/mermaid/#/usage).
