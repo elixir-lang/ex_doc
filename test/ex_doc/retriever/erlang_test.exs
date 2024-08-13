@@ -506,5 +506,45 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert type1.spec |> Erlang.autolink_spec(current_kfa: {:type, :type1, 0}) ==
                "type1() :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
     end
+
+    test "with encrypted debug_info", c do
+      erlc(
+        c,
+        :debug_info_mod,
+        ~S"""
+        %% @doc Docs.
+        -module(debug_info_mod).
+        -export([function1/0]).
+        -export_type([type1/0]).
+
+        -type type1() :: atom().
+        %% type1/0 docs.
+
+        %% @doc
+        %% function1/0 docs.
+        -spec function1() -> type1().
+        function1() -> ok.
+        """,
+        debug_info_key: ~c"SECRET"
+      )
+
+      assert {[], []} = Retriever.docs_from_modules([:debug_info_mod], %ExDoc.Config{})
+
+      config = %ExDoc.Config{
+        debug_info_fn: fn
+          :init -> :ok
+          :clear -> :ok
+          {:debug_info, _mode, _module, _filename} -> ~c"SECRET"
+        end
+      }
+
+      {[mod], []} = Retriever.docs_from_modules([:debug_info_mod], config)
+
+      [type1] = mod.typespecs
+      assert type1.id == "t:type1/0"
+      assert type1.type == :type
+      assert type1.signature == "type1/0"
+      assert type1.doc |> DocAST.to_string() =~ "type1/0 docs."
+    end
   end
 end

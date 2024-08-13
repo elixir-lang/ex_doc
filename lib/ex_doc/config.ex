@@ -22,6 +22,8 @@ defmodule ExDoc.Config do
             canonical: nil,
             cover: nil,
             deps: [],
+            debug_info_fn: nil,
+            debug_info_key: nil,
             extra_section: nil,
             extras: [],
             filter_modules: &__MODULE__.filter_modules/2,
@@ -62,6 +64,8 @@ defmodule ExDoc.Config do
           canonical: nil | String.t(),
           cover: nil | Path.t(),
           deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
+          debug_info_fn: nil | :beam_lib.crypto_fun(),
+          debug_info_key: nil | String.t() | charlist(),
           extra_section: nil | String.t(),
           extras: list(),
           filter_modules: (module, map -> boolean),
@@ -120,6 +124,16 @@ defmodule ExDoc.Config do
         guess_url(options[:source_url], options[:source_ref] || @default_source_ref)
       end)
 
+    {debug_info_key, options} = Keyword.pop(options, :debug_info_key)
+    {debug_info_fn, options} = Keyword.pop(options, :debug_info_fn)
+
+    debug_info_fn =
+      cond do
+        debug_info_fn != nil -> debug_info_fn
+        debug_info_key != nil -> default_debug_info_fn(debug_info_key)
+        true -> nil
+      end
+
     preconfig = %__MODULE__{
       filter_modules: normalize_filter_modules(filter_modules),
       groups_for_modules: normalize_groups_for_modules(groups_for_modules),
@@ -133,7 +147,8 @@ defmodule ExDoc.Config do
         normalize_skip_list_function(skip_undefined_reference_warnings_on),
       skip_code_autolink_to: normalize_skip_list_function(skip_code_autolink_to),
       source_url_pattern: source_url_pattern,
-      version: vsn
+      version: vsn,
+      debug_info_fn: debug_info_fn
     }
 
     struct(preconfig, options)
@@ -223,5 +238,15 @@ defmodule ExDoc.Config do
 
   defp append_slash(url) do
     if :binary.last(url) == ?/, do: url, else: url <> "/"
+  end
+
+  defp default_debug_info_fn(key) do
+    key = to_charlist(key)
+
+    fn
+      :init -> :ok
+      :clear -> :ok
+      {:debug_info, _mode, _module, _filename} -> key
+    end
   end
 end

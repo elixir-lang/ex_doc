@@ -80,7 +80,7 @@ defmodule ExDoc.Retriever do
   end
 
   defp get_module(module, config) do
-    with {:docs_v1, _, language, _, _, _metadata, _} = docs_chunk <- docs_chunk(module),
+    with {:docs_v1, _, language, _, _, _metadata, _} = docs_chunk <- docs_chunk(module, config),
          {:ok, language} <- ExDoc.Language.get(language, module),
          %{} = module_data <- language.module_data(module, docs_chunk, config) do
       {:ok, generate_node(module, module_data, config)}
@@ -90,7 +90,11 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp docs_chunk(module) do
+  defp docs_chunk(module, config) do
+    if debug_info_fn = config.debug_info_fn do
+      :beam_lib.crypto_key_fun(debug_info_fn)
+    end
+
     result = Code.fetch_docs(module)
     Refs.insert_from_chunk(module, result)
 
