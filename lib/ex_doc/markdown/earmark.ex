@@ -76,38 +76,38 @@ defmodule ExDoc.Markdown.Earmark do
     "$$\n#{content}\n$$"
   end
 
-  # Convert admonition blockquotes to divs for screen reader accessibility
+  # Convert admonition blockquotes to sections for screen reader accessibility
   defp fixup(
-         {"blockquote", blockquote_attrs,
-          [{tag, h_attrs, _h_content, _h_meta} = h_elem | rest] = ast, blockquote_meta}
+         {"blockquote", blockquote_attrs, [{tag, h_attrs, h_content, h_meta} | rest] = ast,
+          blockquote_meta}
        )
        when tag in ["h3", "h4"] do
-    h_admonition_classes =
-      h_attrs
-      |> Enum.find("", &match?({"class", _}, &1))
-      |> then(fn
-        "" ->
-          ""
+    {h_classes, h_attrs} = Enum.split_with(h_attrs, &match?({"class", _}, &1))
 
-        {"class", classes} ->
-          classes
-          |> String.split(" ")
-          |> Enum.filter(&(&1 in @admonition_classes))
-          |> Enum.join(" ")
-      end)
+    h_admonition =
+      with [{"class", classes}] <- h_classes,
+           class_list <- String.split(classes),
+           adm_classes = [_ | _] <- Enum.filter(class_list, &(&1 in @admonition_classes)) do
+        {Enum.join(adm_classes, " "), classes}
+      else
+        [] -> nil
+      end
 
-    if h_admonition_classes != "" do
-      admonition_classes = "admonition #{h_admonition_classes}"
+    blockquote_attrs_fn = fn admonition_classes ->
+      case Enum.split_with(blockquote_attrs, &match?({"class", _}, &1)) do
+        {[], attrs} ->
+          [{"class", admonition_classes}, {"role", "note"} | attrs]
 
-      blockquote_attrs =
-        case Enum.split_with(blockquote_attrs, &match?({"class", _}, &1)) do
-          {[], attrs} ->
-            [{"class", admonition_classes}, {"role", "note"} | attrs]
+        {[{"class", classes}], attrs} ->
+          classes = String.trim_trailing(classes) <> " #{admonition_classes}"
+          [{"class", classes}, {"role", "note"} | attrs]
+      end
+    end
 
-          {[{"class", classes}], attrs} ->
-            classes = String.trim_trailing(classes) <> " #{admonition_classes}"
-            [{"class", classes}, {"role", "note"} | attrs]
-        end
+    if h_admonition do
+      {h_admonition_classes, h_classes} = h_admonition
+      blockquote_attrs = blockquote_attrs_fn.("admonition #{h_admonition_classes}")
+      h_elem = {tag, [{"class", "admonition-title #{h_classes}"} | h_attrs], h_content, h_meta}
 
       fixup({"section", blockquote_attrs, [h_elem | rest], blockquote_meta})
     else

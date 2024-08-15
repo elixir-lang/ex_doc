@@ -34,30 +34,30 @@
   border-left-color: var(--tipHeadingBackground);
 }
 
-.content-inner section.admonition > :first-child {
+.content-inner section.admonition > .admonition-title {
   font-weight: bold;
   margin: 0px 10px 5px 0px;
   font-style: normal;
   font-weight: 700;
 }
 
-.content-inner section.admonition > :first-child.warning {
+.content-inner section.admonition > .admonition-title.warning {
   color: var(--warningHeadingBackground);
 }
-.content-inner section.admonition > :first-child.error {
+.content-inner section.admonition > .admonition-title.error {
   color: var(--errorHeadingBackground);
 }
-.content-inner section.admonition > :first-child.info {
+.content-inner section.admonition > .admonition-title.info {
   color: var(--infoHeadingBackground);
 }
-.content-inner section.admonition > :first-child.neutral {
+.content-inner section.admonition > .admonition-title.neutral {
   color: var(--neutralHeadingBackground);
 }
-.content-inner section.admonition > :first-child.tip {
+.content-inner section.admonition > .admonition-title.tip {
   color: var(--tipHeadingBackground);
 }
 
-.content-inner section.admonition > :first-child code {
+.content-inner section.admonition > .admonition-title code {
   margin: 0 0.5ch;
 }
 

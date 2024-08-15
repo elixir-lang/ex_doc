@@ -23,14 +23,14 @@
   background-color: var(--tipBackground);
 }
 
-.content-inner section.admonition > :first-child {
+.content-inner section.admonition > .admonition-title {
   color: var(--contrast);
   margin: 0 -1.2rem;
   padding: .7rem 1.2rem .7rem 3.3rem;
   font-weight: 700;
   font-style: normal;
 }
-.content-inner section.admonition > :first-child::before {
+.content-inner section.admonition > .admonition-title::before {
   color: var(--contrast);
   position: absolute;
   left: 1rem;
@@ -41,52 +41,52 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.content-inner section.admonition > :first-child.warning {
+.content-inner section.admonition > .admonition-title.warning {
   background-color: var(--warningHeadingBackground);
   color: var(--warningHeading);
 }
-.content-inner section.admonition > :first-child.warning::before {
+.content-inner section.admonition > .admonition-title.warning::before {
   content: var(--icon-error-warning);
   color: var(--warningHeading);
 }
 
-.content-inner section.admonition > :first-child.error {
+.content-inner section.admonition > .admonition-title.error {
   background-color: var(--errorHeadingBackground);
   color: var(--errorHeading);
 }
-.content-inner section.admonition > :first-child.error::before {
+.content-inner section.admonition > .admonition-title.error::before {
   content: var(--icon-error-warning);
   color: var(--errorHeading);
 }
 
-.content-inner section.admonition > :first-child.info {
+.content-inner section.admonition > .admonition-title.info {
   background-color: var(--infoHeadingBackground);
   color: var(--infoHeading);
 }
-.content-inner section.admonition > :first-child.info::before {
+.content-inner section.admonition > .admonition-title.info::before {
   content: var(--icon-information);
   color: var(--infoHeading);
 }
 
-.content-inner section.admonition > :first-child.neutral {
+.content-inner section.admonition > .admonition-title.neutral {
   background-color: var(--neutralHeadingBackground);
   color: var(--neutralHeading);
 }
-.content-inner section.admonition > :first-child.neutral::before {
+.content-inner section.admonition > .admonition-title.neutral::before {
   content: var(--icon-double-quotes-l);
   color: var(--neutralHeading);
 }
 
-.content-inner section.admonition > :first-child.tip {
+.content-inner section.admonition > .admonition-title.tip {
   background-color: var(--tipHeadingBackground);
   color: var(--tipHeading);
 }
-.content-inner section.admonition > :first-child.tip::before {
+.content-inner section.admonition > .admonition-title.tip::before {
   content: var(--icon-information);
   color: var(--tipHeading);
 }
 
-.content-inner section.admonition > :first-child code {
+.content-inner section.admonition > .admonition-title code {
   margin: 0 0.5ch;
 }
 
@@ -102,7 +102,7 @@
   color: var(--admCodeColor);
 }
 
-.content-inner section.admonition > :first-child :is(a, a:visited) {
+.content-inner section.admonition > .admonition-title :is(a, a:visited) {
   color: inherit;
   text-decoration-color: currentColor;
 }
@@ -116,7 +116,7 @@
     border-radius: 0;
   }
 
-  .content-inner section.admonition > :first-child {
+  .content-inner section.admonition > .admonition-title {
     margin: 0 calc(-1 * var(--content-gutter));
   }
 }
