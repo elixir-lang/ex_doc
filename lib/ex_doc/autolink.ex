@@ -511,6 +511,18 @@ defmodule ExDoc.Autolink do
              (config.language != ExDoc.Language.Erlang or kind == :function) ->
         nil
 
+      {:regular_link, :hidden, :hidden}
+      when not same_module? ->
+        if warn? do
+          maybe_warn(config, ref, :hidden, %{
+            original_text: original_text,
+            module_visibility: :hidden,
+            same_module?: false
+          })
+        end
+
+        nil
+
       {_mode, _module_visibility, visibility} ->
         if warn? do
           maybe_warn(config, ref, visibility, %{original_text: original_text})
@@ -581,6 +593,19 @@ defmodule ExDoc.Autolink do
          %{file_path: _file_path, original_text: original_text}
        ) do
     message = "documentation references file \"#{original_text}\" but it does not exist"
+
+    warn(config, message)
+  end
+
+  defp warn(
+         config,
+         {:type, module, _name, _arity},
+         :hidden,
+         %{original_text: original_text, module_visibility: :hidden, same_module?: false}
+       ) do
+    message =
+      "documentation references type \"#{original_text}\" but the module " <>
+        "#{inspect(module)} is #{format_visibility(:hidden, :module)}"
 
     warn(config, message)
   end
