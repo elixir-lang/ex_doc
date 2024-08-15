@@ -1,5 +1,10 @@
 # Changelog
 
+## HEAD
+
+  * Enhancements
+    * Improve warning when referencing type from a private module
+
 ## v0.34.2 (2024-07-08)
 
   * Enhancements
