@@ -5,6 +5,8 @@ defmodule ExDoc.Markdown.Earmark do
 
   @behaviour ExDoc.Markdown
 
+  @admonition_classes ~w(warning error info tip neutral)
+
   @impl true
   def available? do
     match?({:ok, _}, Application.ensure_all_started(:earmark_parser)) and
@@ -72,6 +74,47 @@ defmodule ExDoc.Markdown.Earmark do
 
   defp fixup({"code", [{"class", "math-display"}], [content], _}) do
     "$$\n#{content}\n$$"
+  end
+
+  # Convert admonition blockquotes to sections for screen reader accessibility
+  defp fixup(
+         {"blockquote", blockquote_attrs, [{tag, h_attrs, h_content, h_meta} | rest] = ast,
+          blockquote_meta}
+       )
+       when tag in ["h3", "h4"] do
+    h_admonition =
+      with {{"class", classes}, attrs} <- List.keytake(h_attrs, "class", 0),
+           class_list <- String.split(classes, " "),
+           adm_classes = [_ | _] <- Enum.filter(class_list, &(&1 in @admonition_classes)) do
+        {"admonition " <> Enum.join(adm_classes, " "),
+         [{"class", "admonition-title #{classes}"} | attrs]}
+      else
+        _ -> nil
+      end
+
+    section_attrs_fn = fn admonition_classes ->
+      {classes, attrs} =
+        case List.keytake(blockquote_attrs, "class", 0) do
+          nil ->
+            {admonition_classes, blockquote_attrs}
+
+          {{"class", classes}, attrs} ->
+            {"#{admonition_classes} #{classes}", attrs}
+        end
+
+      [{"role", "note"}, {"class", classes} | attrs]
+    end
+
+    if h_admonition do
+      {admonition_classes, h_attrs} = h_admonition
+      section_attrs = section_attrs_fn.(admonition_classes)
+      h_elem = {tag, h_attrs, h_content, h_meta}
+
+      fixup({"section", section_attrs, [h_elem | rest], blockquote_meta})
+    else
+      # regular blockquote, copied fixup/1 here to avoid infinite loop
+      {:blockquote, Enum.map(blockquote_attrs, &fixup_attr/1), fixup(ast), blockquote_meta}
+    end
   end
 
   defp fixup({tag, attrs, ast, meta}) when is_binary(tag) and is_list(attrs) and is_map(meta) do

@@ -16,7 +16,6 @@ export function initialize (isPreview) {
 
   setLivebookBadgeUrl()
   fixLinks()
-  fixBlockquotes()
 }
 
 /**
@@ -27,20 +26,6 @@ function fixLinks () {
     if (anchor.querySelector('code, img')) {
       anchor.classList.add('no-underline')
     }
-  })
-}
-
-/**
- * Add CSS classes to `blockquote` elements when those are used to
- * support admonition text blocks
- */
-export function fixBlockquotes () {
-  const classes = ['warning', 'info', 'error', 'neutral', 'tip']
-
-  classes.forEach(element => {
-    qsAll(`blockquote h3.${element}, blockquote h4.${element}`).forEach(header => {
-      header.closest('blockquote').classList.add(element)
-    })
   })
 }
 

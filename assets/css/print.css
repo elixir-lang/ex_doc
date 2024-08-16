@@ -52,11 +52,11 @@
     display: none;
   }
 
-  .content-inner blockquote:is(.warning, .error, .info, .neutral, .tip) {
+  .content-inner section.admonition {
     border: 2px solid var(--gray400);
   }
 
-  .content-inner blockquote :is(h3, h4):is(.warning, .error, .info, .neutral, .tip) {
+  .content-inner section.admonition > .admonition-title {
     color: var(--textHeaders);
     border-bottom: 2px solid var(--gray400);
   }
