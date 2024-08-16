@@ -84,7 +84,7 @@ defmodule ExDoc.Markdown.Earmark do
        when tag in ["h3", "h4"] do
     h_admonition =
       with {{"class", classes}, attrs} <- List.keytake(h_attrs, "class", 0),
-           class_list <- String.split(classes),
+           class_list <- String.split(classes, " "),
            adm_classes = [_ | _] <- Enum.filter(class_list, &(&1 in @admonition_classes)) do
         {"admonition " <> Enum.join(adm_classes, " "),
          [{"class", "admonition-title #{classes}"} | attrs]}
