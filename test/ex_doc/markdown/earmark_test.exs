@@ -75,20 +75,7 @@ defmodule ExDoc.Markdown.EarmarkTest do
              ]
     end
 
-    test "converts blockquote admonitions to regular divs" do
-      info = """
-      > #### Info {: .info .ignore}
-      > This is info.
-      """
-
-      assert Markdown.to_ast(info, []) == [
-               {:section, [class: "admonition info", role: "note"],
-                [
-                  {:h4, [class: "admonition-title ignore info"], ["Info"], %{}},
-                  {:p, [], ["This is info."], %{}}
-                ], %{}}
-             ]
-
+    test "leaves blockquotes with the wrong markup as is" do
       not_admonition = """
       > ### H3 {: .xyz}
       > This is NOT an admonition!
@@ -102,18 +89,80 @@ defmodule ExDoc.Markdown.EarmarkTest do
                 ], %{}}
              ]
 
+      no_h_tag_beginning = """
+      > {: .warning}
+      > #### Warning {: .warning}
+      > This blockquote didn't start with the h4 tag, so it wasn't converted.
+      """
+
+      assert Markdown.to_ast(no_h_tag_beginning, []) == [
+               {:blockquote, [],
+                [
+                  {:p, [], ["{: .warning}"], %{}},
+                  {:h4, [class: "warning"], ["Warning"], %{}},
+                  {:p, [],
+                   ["This blockquote didn't start with the h4 tag, so it wasn't converted."], %{}}
+                ], %{}}
+             ]
+    end
+
+    test "converts blockquotes with the appropriate markup to admonition sections" do
+      info = """
+      > #### Info {: .info .ignore}
+      > This is info.
+      """
+
+      assert [
+               {:section, section_attrs,
+                [
+                  {:h4, h_attrs, ["Info"], %{}},
+                  {:p, [], ["This is info."], %{}}
+                ], %{}}
+             ] = Markdown.to_ast(info, [])
+
+      assert section_attrs[:role] == "note"
+      assert section_attrs[:class] == "admonition info"
+
+      assert h_attrs[:class] == "admonition-title ignore info"
+
       warning_error = """
       > ### Warning! Error! {: .warning .error}
       > A warning and an error.
       """
 
-      assert Markdown.to_ast(warning_error, []) == [
-               {:section, [class: "admonition error warning", role: "note"],
+      assert [
+               {:section, section_attrs,
                 [
-                  {:h3, [class: "admonition-title error warning"], ["Warning! Error!"], %{}},
+                  {:h3, h_attrs, ["Warning! Error!"], %{}},
                   {:p, [], ["A warning and an error."], %{}}
                 ], %{}}
-             ]
+             ] = Markdown.to_ast(warning_error, [])
+
+      assert section_attrs[:role] == "note"
+      assert section_attrs[:class] == "admonition error warning"
+
+      assert h_attrs[:class] == "admonition-title error warning"
+
+      with_blockquote_level_attrs = """
+      > ### Eggs and baskets  {: .tip}
+      > Don't put all your eggs in one basket, especially if they're golden.
+      {: .egg-basket-bg #egg-basket-tip}
+      """
+
+      assert [
+               {:section, section_attrs,
+                [
+                  {:h3, h_attrs, ["Eggs and baskets"], %{}},
+                  {:p, [],
+                   ["Don't put all your eggs in one basket, especially if they're golden."], %{}}
+                ], %{}}
+             ] = Markdown.to_ast(with_blockquote_level_attrs, [])
+
+      assert section_attrs[:role] == "note"
+      assert section_attrs[:class] == "admonition tip egg-basket-bg"
+      assert section_attrs[:id] == "egg-basket-tip"
+
+      assert h_attrs[:class] == "admonition-title tip"
     end
 
     test "keeps math syntax without interpreting math as markdown" do

@@ -82,34 +82,35 @@ defmodule ExDoc.Markdown.Earmark do
           blockquote_meta}
        )
        when tag in ["h3", "h4"] do
-    {h_classes, h_attrs} = Enum.split_with(h_attrs, &match?({"class", _}, &1))
-
     h_admonition =
-      with [{"class", classes}] <- h_classes,
+      with {{"class", classes}, attrs} <- List.keytake(h_attrs, "class", 0),
            class_list <- String.split(classes),
            adm_classes = [_ | _] <- Enum.filter(class_list, &(&1 in @admonition_classes)) do
-        {Enum.join(adm_classes, " "), classes}
+        {"admonition " <> Enum.join(adm_classes, " "),
+         [{"class", "admonition-title #{classes}"} | attrs]}
       else
-        [] -> nil
+        _ -> nil
       end
 
-    blockquote_attrs_fn = fn admonition_classes ->
-      case Enum.split_with(blockquote_attrs, &match?({"class", _}, &1)) do
-        {[], attrs} ->
-          [{"class", admonition_classes}, {"role", "note"} | attrs]
+    section_attrs_fn = fn admonition_classes ->
+      {classes, attrs} =
+        case List.keytake(blockquote_attrs, "class", 0) do
+          nil ->
+            {admonition_classes, blockquote_attrs}
 
-        {[{"class", classes}], attrs} ->
-          classes = String.trim_trailing(classes) <> " #{admonition_classes}"
-          [{"class", classes}, {"role", "note"} | attrs]
-      end
+          {{"class", classes}, attrs} ->
+            {"#{admonition_classes} #{classes}", attrs}
+        end
+
+      [{"role", "note"}, {"class", classes} | attrs]
     end
 
     if h_admonition do
-      {h_admonition_classes, h_classes} = h_admonition
-      blockquote_attrs = blockquote_attrs_fn.("admonition #{h_admonition_classes}")
-      h_elem = {tag, [{"class", "admonition-title #{h_classes}"} | h_attrs], h_content, h_meta}
+      {admonition_classes, h_attrs} = h_admonition
+      section_attrs = section_attrs_fn.(admonition_classes)
+      h_elem = {tag, h_attrs, h_content, h_meta}
 
-      fixup({"section", blockquote_attrs, [h_elem | rest], blockquote_meta})
+      fixup({"section", section_attrs, [h_elem | rest], blockquote_meta})
     else
       # regular blockquote, copied fixup/1 here to avoid infinite loop
       {:blockquote, Enum.map(blockquote_attrs, &fixup_attr/1), fixup(ast), blockquote_meta}
