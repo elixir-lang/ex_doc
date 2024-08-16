@@ -178,7 +178,7 @@
   }
 }
 
-.content-inner blockquote .section-heading i {
+.content-inner :is(blockquote, section.admonition) .section-heading i {
   display: none;
 }
 
