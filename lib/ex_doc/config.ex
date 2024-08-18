@@ -125,7 +125,12 @@ defmodule ExDoc.Config do
       end)
 
     {debug_info_key, options} = Keyword.pop(options, :debug_info_key)
-    {debug_info_fn, options} = Keyword.pop(options, :debug_info_fn)
+
+    {debug_info_fn, options} =
+      case Keyword.pop(options, :debug_info_fn) do
+        {nil, options} -> Keyword.pop(options, :debug_info_fun)
+        {debug_info_fn, options} -> {debug_info_fn, options}
+      end
 
     debug_info_fn =
       cond do
