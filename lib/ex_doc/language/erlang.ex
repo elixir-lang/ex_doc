@@ -23,11 +23,7 @@ defmodule ExDoc.Language.Erlang do
               title: binary,
               type: :behaviour | :module
             }
-  def module_data(module, docs_chunk, config) do
-    if debug_info_fn = config.debug_info_fn do
-      :beam_lib.crypto_key_fun(debug_info_fn)
-    end
-
+  def module_data(module, docs_chunk, _config) do
     if abst_code = Source.get_abstract_code(module) do
       id = Atom.to_string(module)
       source_basedir = Source.fetch_basedir!(abst_code, module)
