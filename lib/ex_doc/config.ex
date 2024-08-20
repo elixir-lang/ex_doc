@@ -23,7 +23,6 @@ defmodule ExDoc.Config do
             cover: nil,
             deps: [],
             debug_info_fn: nil,
-            debug_info_key: nil,
             extra_section: nil,
             extras: [],
             filter_modules: &__MODULE__.filter_modules/2,
@@ -52,6 +51,10 @@ defmodule ExDoc.Config do
             title: nil,
             version: nil
 
+  @typep debug_info_fn_arg :: :init | :clear | {:debug_info, atom(), module(), :file.filename()}
+  @typep debug_info_fn :: (debug_info_fn_arg ->
+                             :ok | {:ok, (debug_info_fn_arg -> term())} | {:error, term()})
+
   @type t :: %__MODULE__{
           annotations_for_docs: (map() -> list()),
           api_reference: boolean(),
@@ -64,8 +67,7 @@ defmodule ExDoc.Config do
           canonical: nil | String.t(),
           cover: nil | Path.t(),
           deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
-          debug_info_fn: nil | :beam_lib.crypto_fun(),
-          debug_info_key: nil | String.t() | charlist(),
+          debug_info_fn: nil | debug_info_fn(),
           extra_section: nil | String.t(),
           extras: list(),
           filter_modules: (module, map -> boolean),
