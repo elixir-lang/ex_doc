@@ -70,11 +70,8 @@ defmodule TestHelper do
     {:ok, module} =
       :compile.file(
         String.to_charlist(src_path),
-        [
-          :return_errors,
-          :debug_info,
-          outdir: String.to_charlist(ebin_dir)
-        ] ++ beam_docs ++ debug_info_opts
+        [:return_errors, :debug_info, outdir: String.to_charlist(ebin_dir)] ++
+          beam_docs ++ debug_info_opts
       )
 
     true = Code.prepend_path(ebin_dir)

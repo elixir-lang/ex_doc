@@ -104,6 +104,17 @@ defmodule Mix.Tasks.Docs do
       ExDoc will by default include all dependencies and assume they are hosted on
       HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
 
+    * `:debug_info_key` - The key to be used to decrypt debug info that was encrypted during compilation. This option will be ignored if `:debug_info_fn` or `:debug_info_fun` is provided.
+    See [Encrypted debug info](`m:Mix.Tasks.Docs#module-encrypted-debug-info`).
+
+    * `:debug_info_fn` - A function that will be provided to `:beam_lib.crypto_key_fun/1` to decrypt debug info that was encrypted during compilation. If this option is provided,
+    `:debug_info_key` and `:debug_info_fun` will be ignored. See
+    [Encrypted debug info](`m:Mix.Tasks.Docs#module-encrypted-debug-info`).
+
+    * `:debug_info_fun` - Same as `:debug_info_fn`. This option will be ignored if `:debug_info_fn`
+    is already present. See
+    [Encrypted debug info](`m:Mix.Tasks.Docs#module-encrypted-debug-info`).
+
     * `:extra_section` - String that defines the section title of the additional
       Markdown and plain text pages; default: "PAGES". Example: "GUIDES"
 
@@ -199,6 +210,62 @@ defmodule Mix.Tasks.Docs do
       If a function, then it must be a function that takes two arguments, path and line,
       where path is either an relative path from the cwd, or an absolute path. The function
       must return the full URI as it should be placed in the documentation.
+
+  ## Encrypted debug info
+
+  If a module is compiled with [encrypted debug info](`:compile.file/2`), ExDoc will not be able to
+  extract its documentation without first setting a decryption function or utilizing a
+  `.erlang.crypt` file as prescribed by `m::beam_lib#module-encrypted-debug-information`. Two
+  convenience options are provided to avoid having to call `:beam_lib.crypto_key_fun/1` out-of-band
+  and/or to avoid using `.erlang.crypt`.
+
+  If you prefer to set set the key out-of-band, follow the instructions provided in the
+  `m::beam_lib#module-encrypted-debug-information` module documentation.
+
+  > ### Key exposure {: .warning}
+  >
+  > Avoid adding keys directly to your `mix.exs` file. Instead, use an environment variable, an
+  > external documentation config file, or a
+  > [closure](https://erlef.github.io/security-wg/secure_coding_and_deployment_hardening/sensitive_data#wrapping).
+
+  ### `:debug_info_key`
+
+  This option can be provided if you only have one key for all encrypted modules. A `t:charlist/0`, `t:String.t/0`, or tuple of `{:des3_cbc, charlist() | String.t()}` can be used.
+
+  ### `:debug_info_fn`/`:debug_info_fun`
+
+  This option can be provided if you have multiple keys, want more control over key retrieval, or
+  would like to wrap your key(s) in a closure. `:debug_info_key` will be ignored if this option is
+  also present. `:debug_info_fun` will be ignored if `:debug_info_fn` is already present.
+
+  A basic function that provides the decryption key `SECRET`:
+
+  <!-- tabs-open -->
+
+  ### Elixir
+
+  ⚠️ The key returned must be a `t:charlist/0`!
+
+  ```elixir
+  fn
+    :init -> :ok,
+    {:debug_info, _mode, _module, _filename} -> ~c"SECRET"
+    :clear -> :ok
+  end
+  ```
+
+  ### Erlang
+
+  ```erlang
+  fun
+    (init) -> ok;
+    ({debug_info, _Mode, _Module, _Filename}) -> "SECRET";
+    (clear) -> ok
+  end.
+  ```
+  <!-- tabs-close -->
+
+  See `:beam_lib.crypto_key_fun/1` for more information.
 
   ## Groups
 

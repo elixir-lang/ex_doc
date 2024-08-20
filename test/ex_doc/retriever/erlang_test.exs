@@ -111,6 +111,59 @@ defmodule ExDoc.Retriever.ErlangTest do
                ~r'Equivalent to <a href="`function2/1`"><code[^>]+>function2\(\[\{test, args\}\]\).*\.'
     end
 
+    test "with encrypted debug_info", c do
+      erlc(
+        c,
+        :debug_info_mod,
+        ~S"""
+        -module(debug_info_mod).
+        -moduledoc("mod docs.").
+        -export([function1/0]).
+        -export_type([foo/0]).
+
+        -doc("foo/0 docs.").
+        -type foo() :: atom().
+
+        -doc("function1/0 docs.").
+        -spec function1() -> atom().
+        function1() -> ok.
+        """,
+        debug_info_key: ~c"SECRET"
+      )
+
+      # the emitted warning is expected
+      assert {[], []} == Retriever.docs_from_modules([:debug_info_mod], %ExDoc.Config{})
+
+      config = ExDoc.Config.build("debug_info_mod", 1, debug_info_key: ~c"SECRET")
+
+      {[mod], []} = Retriever.docs_from_modules([:debug_info_mod], config)
+
+      assert %ExDoc.ModuleNode{
+               deprecated: nil,
+               moduledoc_line: 2,
+               moduledoc_file: moduledoc_file,
+               docs: [function1],
+               docs_groups: [:Types, :Callbacks, :Functions],
+               group: nil,
+               id: "debug_info_mod",
+               language: ExDoc.Language.Erlang,
+               module: :debug_info_mod,
+               nested_context: nil,
+               nested_title: nil,
+               rendered_doc: nil,
+               source_path: _,
+               source_url: nil,
+               title: "debug_info_mod",
+               type: :module,
+               typespecs: [foo]
+             } = mod
+
+      assert DocAST.to_string(mod.doc) =~ "mod docs."
+      assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
+      assert DocAST.to_string(foo.doc) =~ "foo/0 docs."
+      assert moduledoc_file =~ "debug_info_mod.erl"
+    end
+
     test "module included files", c do
       erlc(c, :mod, ~S"""
       -file("module.hrl", 1).
@@ -510,41 +563,55 @@ defmodule ExDoc.Retriever.ErlangTest do
     test "with encrypted debug_info", c do
       erlc(
         c,
-        :debug_info_mod,
+        :debug_info_mod2,
         ~S"""
-        %% @doc Docs.
-        -module(debug_info_mod).
+        %% @doc mod docs.
+        -module(debug_info_mod2).
         -export([function1/0]).
-        -export_type([type1/0]).
+        -export_type([foo/0]).
 
-        -type type1() :: atom().
-        %% type1/0 docs.
+        -type foo() :: atom().
+        %% foo/0 docs.
 
         %% @doc
         %% function1/0 docs.
-        -spec function1() -> type1().
+        -spec function1() -> foo().
         function1() -> ok.
         """,
         debug_info_key: ~c"SECRET"
       )
 
-      assert {[], []} = Retriever.docs_from_modules([:debug_info_mod], %ExDoc.Config{})
+      # this test only succeeds on the first run
+      refute {[], []} == Retriever.docs_from_modules([:debug_info_mod2], %ExDoc.Config{})
 
-      config = %ExDoc.Config{
-        debug_info_fn: fn
-          :init -> :ok
-          :clear -> :ok
-          {:debug_info, _mode, _module, _filename} -> ~c"SECRET"
-        end
-      }
+      config = ExDoc.Config.build("debug_info_mod2", 1, debug_info_key: ~c"SECRET")
 
-      {[mod], []} = Retriever.docs_from_modules([:debug_info_mod], config)
+      {[mod], []} = Retriever.docs_from_modules([:debug_info_mod2], config)
 
-      [type1] = mod.typespecs
-      assert type1.id == "t:type1/0"
-      assert type1.type == :type
-      assert type1.signature == "type1/0"
-      assert type1.doc |> DocAST.to_string() =~ "type1/0 docs."
+      assert %ExDoc.ModuleNode{
+               deprecated: nil,
+               moduledoc_line: 2,
+               moduledoc_file: moduledoc_file,
+               docs: [function1],
+               docs_groups: [:Types, :Callbacks, :Functions],
+               group: nil,
+               id: "debug_info_mod2",
+               language: ExDoc.Language.Erlang,
+               module: :debug_info_mod2,
+               nested_context: nil,
+               nested_title: nil,
+               rendered_doc: nil,
+               source_path: _,
+               source_url: nil,
+               title: "debug_info_mod2",
+               type: :module,
+               typespecs: [foo]
+             } = mod
+
+      assert DocAST.to_string(mod.doc) =~ "mod docs."
+      assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
+      assert DocAST.to_string(foo.doc) =~ "foo/0 docs."
+      assert moduledoc_file =~ "debug_info_mod2.erl"
     end
   end
 end

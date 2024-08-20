@@ -74,4 +74,52 @@ defmodule ExDoc.ConfigTest do
     assert config.skip_code_autolink_to.("ConfigTest.Hidden.bar/1")
     refute config.skip_code_autolink_to.("ConfigTest.NotHidden")
   end
+
+  test "produces a function when a debug_info_key is provided" do
+    config = ExDoc.Config.build(@project, @version, debug_info_key: "Hunter2")
+
+    assert config.debug_info_fn.(:init) == :ok
+    assert config.debug_info_fn.(:clear) == :ok
+    assert config.debug_info_fn.({:debug_info, nil, nil, nil}) == ~c"Hunter2"
+  end
+
+  test "ignores debug_info_key when debug_info_fn or debug_info_fun is provided" do
+    config =
+      ExDoc.Config.build(@project, @version,
+        debug_info_key: "Hunter2",
+        debug_info_fn: debug_info_fn(~c"foxtrot")
+      )
+
+    assert config.debug_info_fn.({:debug_info, nil, nil, nil}) == ~c"foxtrot"
+
+    config =
+      ExDoc.Config.build(@project, @version,
+        debug_info_key: "Hunter2",
+        debug_info_fun: debug_info_fn(~c"tango")
+      )
+
+    assert config.debug_info_fn.({:debug_info, nil, nil, nil}) == ~c"tango"
+  end
+
+  test "handles either debug_info_fn or debug_info_fun, but debug_info_fn takes precedence" do
+    config =
+      ExDoc.Config.build(@project, @version,
+        debug_info_fun: debug_info_fn(~c"fun"),
+        debug_info_fn: debug_info_fn(~c"fn")
+      )
+
+    assert config.debug_info_fn.({:debug_info, nil, nil, nil}) == ~c"fn"
+
+    config = ExDoc.Config.build(@project, @version, debug_info_fun: debug_info_fn(~c"fun"))
+
+    assert config.debug_info_fn.({:debug_info, nil, nil, nil}) == ~c"fun"
+  end
+
+  defp debug_info_fn(key) do
+    fn
+      :init -> :ok
+      :clear -> :ok
+      {:debug_info, _mode, _module, _filename} -> key
+    end
+  end
 end

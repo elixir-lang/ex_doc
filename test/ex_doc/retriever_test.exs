@@ -307,4 +307,14 @@ defmodule ExDoc.RetrieverTest do
     %{docs: [%{signature: signature}]} = module_node
     assert signature == "callback_name(arg1, integer, %Date{}, term, t)"
   end
+
+  test "set_crypto_key_fn/1 raises if it receives an error" do
+    assert_raise(
+      Retriever.Error,
+      "failed to set crypto_key_fun: :badfun",
+      fn ->
+        Retriever.set_crypto_key_fn(fn _ -> {:error, :badfun} end)
+      end
+    )
+  end
 end

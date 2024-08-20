@@ -92,7 +92,7 @@ defmodule ExDoc.Retriever do
 
   defp docs_chunk(module, config) do
     if debug_info_fn = config.debug_info_fn do
-      :beam_lib.crypto_key_fun(debug_info_fn)
+      set_crypto_key_fn(debug_info_fn)
     end
 
     result = Code.fetch_docs(module)
@@ -499,5 +499,18 @@ defmodule ExDoc.Retriever do
 
   defp source_link(source, line) do
     Utils.source_url_pattern(source.url, source.path |> Path.relative_to(File.cwd!()), line)
+  end
+
+  @doc false
+  def set_crypto_key_fn(crypto_key_fn) do
+    :beam_lib.clear_crypto_key_fun()
+
+    case :beam_lib.crypto_key_fun(crypto_key_fn) do
+      {:error, reason} ->
+        raise Error, "failed to set crypto_key_fun: #{inspect(reason)}"
+
+      other ->
+        other
+    end
   end
 end
