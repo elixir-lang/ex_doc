@@ -4,6 +4,12 @@
 
   * Enhancements
     * Improve warning when referencing type from a private module
+    * Rename "Search HexDocs package" modal to "Go to package docs". Support built-in Erlang/OTP
+      apps.
+
+  * Bug fixes
+    * Switch anchor `title` to `aria-label`
+    * Convert admonition blockquotes to sections for screen reader users
 
 ## v0.34.2 (2024-07-08)
 
