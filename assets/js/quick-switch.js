@@ -2,6 +2,7 @@ import { debounce, qs, qsAll } from './helpers'
 import { openModal } from './modal'
 
 const HEX_DOCS_ENDPOINT = 'https://hexdocs.pm/%%'
+const OTP_DOCS_ENDPOINT = 'https://www.erlang.org/doc/apps/%%'
 const HEX_SEARCH_ENDPOINT = 'https://hex.pm/api/packages?search=name:%%*'
 const QUICK_SWITCH_LINK_SELECTOR = '.display-quick-switch'
 const QUICK_SWITCH_INPUT_SELECTOR = '#quick-switch-input'
@@ -10,7 +11,46 @@ const QUICK_SWITCH_RESULT_SELECTOR = '.quick-switch-result'
 const DEBOUNCE_KEYPRESS_TIMEOUT = 300
 const NUMBER_OF_SUGGESTIONS = 9
 
-// Core elixir packages to include in the autocomplete results
+const OTP_APPS = [
+  'erts',
+  'asn1',
+  'common_test',
+  'compiler',
+  'crypto',
+  'debugger',
+  'dialyzer',
+  'diameter',
+  'edoc',
+  'eldap',
+  'erl_interface',
+  'et',
+  'eunit',
+  'ftp',
+  'inets',
+  'jinterface',
+  'kernel',
+  'megaco',
+  'mnesia',
+  'observer',
+  'odbc',
+  'os_mon',
+  'parsetools',
+  'public_key',
+  'reltool',
+  'runtime_tools',
+  'sasl',
+  'snmp',
+  'ssh',
+  'ssl',
+  'stdlib',
+  'syntax_tools',
+  'tftp',
+  'tools',
+  'wx',
+  'xmerl'
+]
+
+// Core Elixir/OTP packages to include in the autocomplete results
 const STATIC_SEARCH_RESULTS = [
   'elixir',
   'eex',
@@ -19,7 +59,7 @@ const STATIC_SEARCH_RESULTS = [
   'iex',
   'logger',
   'mix'
-].map(name => ({ name }))
+].concat(OTP_APPS).map(name => ({ name }))
 
 const MIN_SEARCH_LENGTH = 2
 
@@ -47,7 +87,7 @@ function handleKeyDown (event) {
   if (event.key === 'Enter') {
     const packageSlug = event.target.value
 
-    quickSwitchToPackage(packageSlug)
+    quickSwitchToAppDocs(packageSlug)
     event.preventDefault()
   } else if (event.key === 'ArrowUp') {
     moveAutocompleteSelection(-1)
@@ -74,7 +114,7 @@ function handleInput (event) {
  */
 export function openQuickSwitchModal () {
   openModal({
-    title: 'Search HexDocs package',
+    title: 'Go to package docs',
     body: Handlebars.templates['quick-switch-modal-body']()
   })
 
@@ -89,27 +129,34 @@ export function openQuickSwitchModal () {
 }
 
 /**
- * Navigate to a package on HexDocs.
+ * Navigate to application docs.
+ *
  * If an autocomplete entry is selected, it will be used instead of the input text.
  *
- * @param {String} packageSlug The searched package name
+ * @param {String} name The searched application name
  */
-function quickSwitchToPackage (packageSlug) {
+function quickSwitchToAppDocs (name) {
   if (state.selectedIdx === null) {
-    navigateToHexDocPackage(packageSlug)
+    navigateToAppDocs(name)
   } else {
     const selectedResult = state.autocompleteResults[state.selectedIdx]
-    navigateToHexDocPackage(selectedResult.name)
+    navigateToAppDocs(selectedResult.name)
   }
 }
 
 /**
- * Navigates to HexDocs of a specific package.
+ * Navigates to app docs.
  *
- * @param {String} packageSlug The package name to navigate to
+ * For Hex packages and Elixir apps go to hexdocs.pm. For OTP apps, erlang.org/doc.
+ *
+ * @param {String} app The application name to navigate to
  */
-function navigateToHexDocPackage (packageSlug) {
-  window.location = HEX_DOCS_ENDPOINT.replace('%%', packageSlug.toLowerCase())
+function navigateToAppDocs (app) {
+  if (OTP_APPS.includes(app.toLowerCase())) {
+    window.location = OTP_DOCS_ENDPOINT.replace('%%', app.toLowerCase())
+  } else {
+    window.location = HEX_DOCS_ENDPOINT.replace('%%', app.toLowerCase())
+  }
 }
 
 const debouncedQueryForAutocomplete = debounce(queryForAutocomplete, DEBOUNCE_KEYPRESS_TIMEOUT)
@@ -145,7 +192,7 @@ function renderResults ({ results }) {
     result.addEventListener('click', event => {
       const index = result.getAttribute('data-index')
       const selectedResult = state.autocompleteResults[index]
-      navigateToHexDocPackage(selectedResult.name)
+      navigateToAppDocs(selectedResult.name)
     })
   })
 }

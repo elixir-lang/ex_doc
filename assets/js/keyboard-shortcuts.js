@@ -42,7 +42,7 @@ export const keyboardShortcuts = [
   },
   {
     key: 'g',
-    description: 'Search HexDocs package',
+    description: 'Go to package docs',
     displayAs: '<kbd><kbd>g</kdb></kdb>',
     action: openQuickSwitchModal
   },
