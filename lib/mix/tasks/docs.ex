@@ -213,64 +213,10 @@ defmodule Mix.Tasks.Docs do
   ## Encrypted debug info
 
   If a module is compiled with [encrypted debug info](`:compile.file/2`), ExDoc will not be able to
-  extract its documentation without first setting a decryption function or utilizing
-  `.erlang.crypt` as prescribed by `m::beam_lib#module-encrypted-debug-information`. Two
-  convenience options (see below) are provided to avoid having to call `:beam_lib.crypto_key_fun/1`
-  out-of-band and/or to avoid using `.erlang.crypt`.
-
-  If you prefer to set the key out-of-band, follow the instructions provided in the
-  `m::beam_lib#module-encrypted-debug-information` module documentation.
-
-  > ### Key exposure {: .warning}
-  >
-  > Avoid adding keys directly to your `mix.exs` file. Instead, use an environment variable, an
-  > external documentation config file, or a
-  > [closure](https://erlef.github.io/security-wg/secure_coding_and_deployment_hardening/sensitive_data#wrapping).
-
-  ### `:debug_info_key`
-
-  This option can be provided if you only have one key for all encrypted modules. A `t:charlist/0`,
-  `t:String.t/0`, or tuple of `{:des3_cbc, charlist() | String.t()}` can be used.
-
-  ### `:debug_info_fn` / `:debug_info_fun`
-
-  This option can be provided if you have multiple keys, want more control over key retrieval, or
-  would like to wrap your key(s) in a closure. `:debug_info_key` will be ignored if this option is
-  also present. `:debug_info_fun` will be ignored if `:debug_info_fn` is already present.
-
-  While a module can be encrypted using a tuple key such as `{:des3_cbc, ~c"secret"}`, the function
-  that provides the key must return a regular charlist. In other words, the function should return
-  `~c"secret"`, not `{:des3_cbc, ~c"secret"}`.
-
-  A basic function that provides the decryption key `SECRET`:
-
-  <!-- tabs-open -->
-
-  ### Elixir
-
-  ⚠️ The key returned must be a `t:charlist/0`!
-
-  ```elixir
-  fn
-    :init -> :ok,
-    {:debug_info, _mode, _module, _filename} -> ~c"SECRET"
-    :clear -> :ok
-  end
-  ```
-
-  ### Erlang
-
-  ```erlang
-  fun
-    (init) -> ok;
-    ({debug_info, _Mode, _Module, _Filename}) -> "SECRET";
-    (clear) -> ok
-  end.
-  ```
-
-  <!-- tabs-close -->
-
-  See `:beam_lib.crypto_key_fun/1` for more information.
+  extract its documentation without preparation. ExDoc supports using `.erlang.crypt` to decrypt
+  debug information. Consult the
+  [`.erlang.crypt` section in the `:beam_lib` documentation](`m::beam_lib#module-erlang-crypt`)
+  for more information.
 
   ## Groups
 
