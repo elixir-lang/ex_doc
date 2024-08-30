@@ -111,6 +111,62 @@ defmodule ExDoc.Retriever.ErlangTest do
                ~r'Equivalent to <a href="`function2/1`"><code[^>]+>function2\(\[\{test, args\}\]\).*\.'
     end
 
+    test "with encrypted debug_info", c do
+      erlc(
+        c,
+        :debug_info_mod,
+        ~S"""
+        -module(debug_info_mod).
+        -moduledoc("mod docs.").
+        -export([function1/0]).
+        -export_type([foo/0]).
+
+        -doc("foo/0 docs.").
+        -type foo() :: atom().
+
+        -doc("function1/0 docs.").
+        -spec function1() -> atom().
+        function1() -> ok.
+        """,
+        debug_info_key: ~c"SECRET"
+      )
+
+      config = ExDoc.Config.build("debug_info_mod", 1, debug_info_key: ~c"SECRET")
+
+      {[mod], []} = Retriever.docs_from_modules([:debug_info_mod], config)
+
+      assert %ExDoc.ModuleNode{
+               moduledoc_file: moduledoc_file,
+               docs: [function1],
+               id: "debug_info_mod",
+               module: :debug_info_mod,
+               title: "debug_info_mod",
+               typespecs: [foo]
+             } = mod
+
+      assert DocAST.to_string(mod.doc) =~ "mod docs."
+      assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
+      assert DocAST.to_string(foo.doc) =~ "foo/0 docs."
+      assert moduledoc_file =~ "debug_info_mod.erl"
+    end
+
+    test "encrypted with tuple key", c do
+      erlc(
+        c,
+        :debug_info_mod2,
+        ~S"""
+        -module(debug_info_mod2).
+        -moduledoc("mod docs.").
+        """,
+        debug_info_key: {:des3_cbc, ~c"SECRET"}
+      )
+
+      config = ExDoc.Config.build("debug_info_mod2", 1, debug_info_key: {:des3_cbc, "SECRET"})
+
+      assert {[%ExDoc.ModuleNode{module: :debug_info_mod2}], []} =
+               Retriever.docs_from_modules([:debug_info_mod2], config)
+    end
+
     test "module included files", c do
       erlc(c, :mod, ~S"""
       -file("module.hrl", 1).

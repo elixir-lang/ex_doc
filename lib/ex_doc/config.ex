@@ -21,6 +21,7 @@ defmodule ExDoc.Config do
             before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
             canonical: nil,
             cover: nil,
+            debug_info_fn: nil,
             deps: [],
             extra_section: nil,
             extras: [],
@@ -50,6 +51,10 @@ defmodule ExDoc.Config do
             title: nil,
             version: nil
 
+  @typep debug_info_fn_arg :: :init | :clear | {:debug_info, atom(), module(), :file.filename()}
+  @typep debug_info_fn :: (debug_info_fn_arg ->
+                             :ok | {:ok, (debug_info_fn_arg -> term())} | {:error, term()})
+
   @type t :: %__MODULE__{
           annotations_for_docs: (map() -> list()),
           api_reference: boolean(),
@@ -61,6 +66,7 @@ defmodule ExDoc.Config do
           before_closing_head_tag: (atom() -> String.t()) | mfa() | map(),
           canonical: nil | String.t(),
           cover: nil | Path.t(),
+          debug_info_fn: nil | debug_info_fn(),
           deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
           extra_section: nil | String.t(),
           extras: list(),
@@ -120,7 +126,23 @@ defmodule ExDoc.Config do
         guess_url(options[:source_url], options[:source_ref] || @default_source_ref)
       end)
 
+    {debug_info_key, options} = Keyword.pop(options, :debug_info_key)
+
+    {debug_info_fn, options} =
+      case Keyword.pop(options, :debug_info_fn) do
+        {nil, options} -> Keyword.pop(options, :debug_info_fun)
+        {debug_info_fn, options} -> {debug_info_fn, options}
+      end
+
+    debug_info_fn =
+      cond do
+        debug_info_fn != nil -> debug_info_fn
+        debug_info_key != nil -> default_debug_info_fn(debug_info_key)
+        true -> nil
+      end
+
     preconfig = %__MODULE__{
+      debug_info_fn: debug_info_fn,
       filter_modules: normalize_filter_modules(filter_modules),
       groups_for_modules: normalize_groups_for_modules(groups_for_modules),
       homepage_url: options[:homepage_url],
@@ -223,5 +245,19 @@ defmodule ExDoc.Config do
 
   defp append_slash(url) do
     if :binary.last(url) == ?/, do: url, else: url <> "/"
+  end
+
+  defp default_debug_info_fn(key) do
+    key =
+      case key do
+        {_mode, key} -> to_charlist(key)
+        key -> to_charlist(key)
+      end
+
+    fn
+      :init -> :ok
+      :clear -> :ok
+      {:debug_info, _mode, _module, _filename} -> key
+    end
   end
 end
