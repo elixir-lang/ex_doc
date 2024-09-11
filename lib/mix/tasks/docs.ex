@@ -200,6 +200,14 @@ defmodule Mix.Tasks.Docs do
       where path is either an relative path from the cwd, or an absolute path. The function
       must return the full URI as it should be placed in the documentation.
 
+  ## Encrypted debug info
+
+  If a module is compiled with [encrypted debug info](`:compile.file/2`), ExDoc will not be able to
+  extract its documentation without preparation. ExDoc supports using `.erlang.crypt` to decrypt
+  debug information. Consult the
+  [`.erlang.crypt` section in the `:beam_lib` documentation](`m::beam_lib#module-erlang-crypt`)
+  for more information.
+
   ## Groups
 
   ExDoc content can be organized in groups. This is done via the `:groups_for_extras`
