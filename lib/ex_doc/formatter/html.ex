@@ -411,7 +411,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp stringify_redirect_item(item) do
     raise ArgumentError,
-          "Redirect source and destination must be a string or an atom, got: #{inspect(item)}"
+          "redirect source and destination must be a string or an atom, got: #{inspect(item)}"
   end
 
   defp disambiguate_id(extra, discriminator) do
