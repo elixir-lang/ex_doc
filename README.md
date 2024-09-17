@@ -460,10 +460,10 @@ As your project grows, your documentation may very likely change, even structura
 Because these docs are static files, the behavior of a missing page will depend on where they are hosted.
 In particular, [hexdocs.pm](https://hexdocs.pm) will show a 404 page.
 
-With this in mind, it is a good idea to preserve links to your old documentation. We do this with the `redirects` configuration.
-This can solve for everything but the function names changing.
-
-For this example, we've changed the module `MyApp.MyModule` to `MyApp.My.Module`, and the extra `get-started.md` to `quickstart.md`
+You can improve the developer experience on everything but function names changing
+by using the `redirects` configuration. For example, if you changed the module `MyApp.MyModule`
+to `MyApp.My.Module` and the extra `get-started.md` to `quickstart.md`, you can
+setup the following redirects:
 
 ```elixir
 defp docs do
