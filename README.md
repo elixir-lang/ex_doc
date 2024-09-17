@@ -448,6 +448,49 @@ Similarly to the example above, if your Markdown includes Mermaid graph specific
 
 For more details and configuration options, see the [Mermaid usage docs](https://mermaid-js.github.io/mermaid/#/usage).
 
+## Changing documentation over time
+
+As your project grows, your documentation may very likely change, even structurally. There are a few important things to consider in this regard:
+
+- Links to your *extras* will break if you change or move file names.
+- Links to your *modules, and mix tasks* will change if you change their name.
+- Links to *functions* are actually links to modules with anchor links. If you change the function name, the link does
+  not break but will leave users at the top of the module's documentation.
+
+Because these docs are static files, the behavior of a missing page will depend on where they are hosted.
+In particular, [hexdocs.pm](https://hexdocs.pm) will show a 404 page.
+
+You can improve the developer experience on everything but function names changing
+by using the `redirects` configuration. For example, if you changed the module `MyApp.MyModule`
+to `MyApp.My.Module` and the extra `get-started.md` to `quickstart.md`, you can
+setup the following redirects:
+
+<!-- tabs-open -->
+
+### Elixir
+
+For this example, we've changed the module `MyApp.MyModule` to `MyApp.My.Module`, and the extra `get-started.md` to `quickstart.md`
+
+```elixir
+redirects: %{
+  "MyApp.MyModule" => "MyApp.My.Module",
+  "get-started" => "quickstart"
+}
+```
+
+### Erlang
+
+For this example, we've changed the module `:my_module` to `:my_module2`, and the extra `get-started.md` to `quickstart.md`
+
+```erlang
+{redirects, [
+  {"my_module", "my_module2"},
+  {"get-started", "quickstart"}
+]}.
+```
+
+<!-- tabs-close -->
+
 ## Contributing
 
 The easiest way to test changes to ExDoc is to locally rebuild the app and its own documentation:
