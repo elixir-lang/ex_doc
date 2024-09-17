@@ -350,6 +350,30 @@ defmodule ExDoc.Formatter.HTMLTest do
              </html>
              """
     end
+
+    test "redirects accept a list", %{tmp_dir: tmp_dir} = context do
+          generate_docs(
+            doc_config(context,
+              extras: ["test/fixtures/LICENSE"],
+              redirects: [
+                {"/old-license", "license"}
+              ]
+            )
+          )
+
+          assert File.read!(tmp_dir <> "/html/old-license.html") == """
+                 <!DOCTYPE html>
+                 <html>
+                   <head>
+                     <meta charset="utf-8">
+                     <title>Elixir v1.0.1 — Documentation</title>
+                     <meta http-equiv="refresh" content="0; url=license.html">
+                     <meta name="generator" content="ExDoc v0.34.2">
+                   </head>
+                   <body></body>
+                 </html>
+                 """
+        end
   end
 
   describe "generates extras" do

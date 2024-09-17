@@ -386,6 +386,7 @@ defmodule ExDoc.Formatter.HTML do
 
   def generate_redirects(config, ext) do
     config.redirects
+    |> Map.new()
     |> Map.put_new("index", config.main)
     |> Enum.map(fn {from, to} ->
       unless is_binary(from),
