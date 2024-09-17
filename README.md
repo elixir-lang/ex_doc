@@ -464,6 +464,7 @@ You can improve the developer experience on everything but function names changi
 by using the `redirects` configuration. For example, if you changed the module `MyApp.MyModule`
 to `MyApp.My.Module` and the extra `get-started.md` to `quickstart.md`, you can
 setup the following redirects:
+
 <!-- tabs-open -->
 
 ### Elixir
