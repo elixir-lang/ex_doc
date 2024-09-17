@@ -47,7 +47,8 @@ defmodule ExDoc.Formatter.HTML do
         generate_search(nodes_map, config) ++
         generate_not_found(nodes_map, config) ++
         generate_list(nodes_map.modules, nodes_map, config) ++
-        generate_list(nodes_map.tasks, nodes_map, config) ++ generate_index(config)
+        generate_list(nodes_map.tasks, nodes_map, config) ++
+        generate_redirects(config, ".html")
 
     generate_build(Enum.sort(all_files), build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
@@ -185,13 +186,6 @@ defmodule ExDoc.Formatter.HTML do
   defp generate_build(files, build) do
     entries = Enum.map(files, &[&1, "\n"])
     File.write!(build, entries)
-  end
-
-  defp generate_index(config) do
-    index_file = "index.html"
-    main_file = "#{config.main}.html"
-    generate_redirect(index_file, config, main_file)
-    [index_file]
   end
 
   defp generate_not_found(nodes_map, config) do
@@ -388,6 +382,36 @@ defmodule ExDoc.Formatter.HTML do
     end)
     |> elem(0)
     |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
+  end
+
+  def generate_redirects(config, ext) do
+    config.redirects
+    |> Map.put_new("index", config.main)
+    |> Enum.map(fn {from, to} ->
+      source = stringify_redirect_item(from) <> ext
+      destination = stringify_redirect_item(to) <> ext
+      generate_redirect(source, config, destination)
+
+      source
+    end)
+  end
+
+  defp stringify_redirect_item(item) when is_binary(item) do
+    item
+  end
+
+  defp stringify_redirect_item(item) when is_atom(item) do
+    inspected = inspect(item)
+
+    case to_string(item) do
+      "Elixir." <> ^inspected -> inspected
+      other -> other
+    end
+  end
+
+  defp stringify_redirect_item(item) do
+    raise ArgumentError,
+          "Redirect source and destination must be a string or an atom, got: #{inspect(item)}"
   end
 
   defp disambiguate_id(extra, discriminator) do

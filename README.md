@@ -448,6 +448,35 @@ Similarly to the example above, if your Markdown includes Mermaid graph specific
 
 For more details and configuration options, see the [Mermaid usage docs](https://mermaid-js.github.io/mermaid/#/usage).
 
+## Changing documentation over time
+
+As your project grows, your documentation may very likely change, even structurally. There are a few important things to consider in this regard:
+
+- Links to your *extras* will break if you change or move file names.
+- Links to your *modules, and mix tasks* will change if you change your code.
+- Links to *functions* are actually links to modules with anchor links. If you change the function name, the link does
+  not break but will leave users at the top of the module's documentation.
+
+Because these docs are static files, when a user gets to a page that is not found, they will see a generic 404 page.
+They will not be redirected to your packages home page. This can potentially be jarring for users.
+
+With this in mind, it is a good idea to preserve links to your old documentation. We do this with the `redirects` configuration.
+This can solve for everything but the function names changing.
+
+For this example, we've changed the module `MyApp.MyModule` to `MyApp.My.Module`, and the extra `get-started.md` to `quickstart.md`
+
+```elixir
+defp docs do
+  [
+    ...,
+    redirects: %{
+      MyApp.MyModule => MyApp.My.Module,
+      "get-started" => "quickstart"
+    }
+  ]
+end
+```
+
 ## Contributing
 
 The easiest way to test changes to ExDoc is to locally rebuild the app and its own documentation:
