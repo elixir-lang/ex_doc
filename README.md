@@ -458,7 +458,7 @@ As your project grows, your documentation may very likely change, even structura
   not break but will leave users at the top of the module's documentation.
 
 Because these docs are static files, when a user gets to a page that is not found, they will see a generic 404 page.
-They will not be redirected to your packages home page. This can potentially be jarring for users.
+They will not be redirected to your package's home page. This can potentially be jarring for users.
 
 With this in mind, it is a good idea to preserve links to your old documentation. We do this with the `redirects` configuration.
 This can solve for everything but the function names changing.
