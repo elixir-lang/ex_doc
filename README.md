@@ -453,7 +453,7 @@ For more details and configuration options, see the [Mermaid usage docs](https:/
 As your project grows, your documentation may very likely change, even structurally. There are a few important things to consider in this regard:
 
 - Links to your *extras* will break if you change or move file names.
-- Links to your *modules, and mix tasks* will change if you change your code.
+- Links to your *modules, and mix tasks* will change if you change their name.
 - Links to *functions* are actually links to modules with anchor links. If you change the function name, the link does
   not break but will leave users at the top of the module's documentation.
 
