@@ -457,8 +457,8 @@ As your project grows, your documentation may very likely change, even structura
 - Links to *functions* are actually links to modules with anchor links. If you change the function name, the link does
   not break but will leave users at the top of the module's documentation.
 
-Because these docs are static files, when a user gets to a page that is not found, they will see a generic 404 page.
-They will not be redirected to your package's home page. This can potentially be jarring for users.
+Because these docs are static files, the behavior of a missing page will depend on where they are hosted.
+In particular, [hexdocs.pm](https://hexdocs.pm) will show a 404 page.
 
 With this in mind, it is a good idea to preserve links to your old documentation. We do this with the `redirects` configuration.
 This can solve for everything but the function names changing.
