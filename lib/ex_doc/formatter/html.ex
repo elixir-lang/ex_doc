@@ -388,8 +388,12 @@ defmodule ExDoc.Formatter.HTML do
     config.redirects
     |> Map.put_new("index", config.main)
     |> Enum.map(fn {from, to} ->
-      unless is_binary(from), do: raise "expected a string for the source of a redirect, got: #{inspect(from)}"
-      unless is_binary(to), do: raise "expected a string for the destination of a redirect, got: #{inspect(to)}"
+      unless is_binary(from),
+        do: raise("expected a string for the source of a redirect, got: #{inspect(from)}")
+
+      unless is_binary(to),
+        do: raise("expected a string for the destination of a redirect, got: #{inspect(to)}")
+
       source = from <> ext
       destination = to <> ext
       generate_redirect(source, config, destination)
