@@ -388,30 +388,14 @@ defmodule ExDoc.Formatter.HTML do
     config.redirects
     |> Map.put_new("index", config.main)
     |> Enum.map(fn {from, to} ->
-      source = stringify_redirect_item(from) <> ext
-      destination = stringify_redirect_item(to) <> ext
+      unless is_binary(from), do: raise "expected a string for the source of a redirect, got: #{inspect(from)}"
+      unless is_binary(to), do: raise "expected a string for the destination of a redirect, got: #{inspect(to)}"
+      source = from <> ext
+      destination = to <> ext
       generate_redirect(source, config, destination)
 
       source
     end)
-  end
-
-  defp stringify_redirect_item(item) when is_binary(item) do
-    item
-  end
-
-  defp stringify_redirect_item(item) when is_atom(item) do
-    inspected = inspect(item)
-
-    case to_string(item) do
-      "Elixir." <> ^inspected -> inspected
-      other -> other
-    end
-  end
-
-  defp stringify_redirect_item(item) do
-    raise ArgumentError,
-          "redirect source and destination must be a string or an atom, got: #{inspect(item)}"
   end
 
   defp disambiguate_id(extra, discriminator) do

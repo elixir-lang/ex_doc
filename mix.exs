@@ -87,7 +87,6 @@ defmodule ExDoc.Mixfile do
           "Cheatsheet.cheatmd",
           "CHANGELOG.md"
         ] ++ test_dev_examples(Mix.env()),
-      redirects: redirects(Mix.env()),
       source_ref: "v#{@version}",
       source_url: @source_url,
       groups_for_modules: [
@@ -107,15 +106,6 @@ defmodule ExDoc.Mixfile do
 
   defp test_dev_examples(:dev), do: Path.wildcard("test/examples/*")
   defp test_dev_examples(_), do: []
-
-  defp redirects(:dev) do
-    %{
-      "old-admonition" => "admonition",
-      Exdoc.OldMarkdown => ExDoc.Markdown
-    }
-  end
-
-  defp redirects(_), do: %{}
 
   defp clean_test_fixtures(_args) do
     File.rm_rf("test/tmp")

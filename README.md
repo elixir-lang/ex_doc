@@ -464,18 +464,31 @@ You can improve the developer experience on everything but function names changi
 by using the `redirects` configuration. For example, if you changed the module `MyApp.MyModule`
 to `MyApp.My.Module` and the extra `get-started.md` to `quickstart.md`, you can
 setup the following redirects:
+<!-- tabs-open -->
+
+### Elixir
+
+For this example, we've changed the module `MyApp.MyModule` to `MyApp.My.Module`, and the extra `get-started.md` to `quickstart.md`
 
 ```elixir
-defp docs do
-  [
-    ...,
-    redirects: %{
-      MyApp.MyModule => MyApp.My.Module,
-      "get-started" => "quickstart"
-    }
-  ]
-end
+redirects: %{
+  "MyApp.MyModule" => "MyApp.My.Module",
+  "get-started" => "quickstart"
+}
 ```
+
+### Erlang
+
+For this example, we've changed the module `:my_module` to `:my_module2`, and the extra `get-started.md` to `quickstart.md`
+
+```erlang
+{redirects, [
+  {"my_module", "my_module2"},
+  {"get-started", "quickstart"}
+]}.
+```
+
+<!-- tabs-close -->
 
 ## Contributing
 
