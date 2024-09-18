@@ -149,6 +149,9 @@ defmodule Mix.Tasks.Docs do
     * `:output` - Output directory for the generated docs; default: "doc".
       May be overridden by command line argument.
 
+    * `:redirects` - A map or list of tuples, where the key is the path to redirect from and the
+       value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`
+
     * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
       reference in the current project docs e.g. because of a typo. This list controls where to
       skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
