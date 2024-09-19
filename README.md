@@ -35,7 +35,7 @@ ExDoc requires Elixir v1.12 or later. Then add ExDoc as a dependency:
 ```elixir
 def deps do
   [
-    {:ex_doc, "~> 0.31", only: :dev, runtime: false},
+    {:ex_doc, "~> 0.34", only: :dev, runtime: false},
   ]
 end
 ```
