@@ -1,6 +1,7 @@
 import '../handlebars/helpers'
 
 import { onDocumentReady } from '../helpers'
+import { initialize as initTabsets } from '../tabsets'
 import { initialize as initContent } from '../content'
 import { initialize as initSidebarDrawer } from '../sidebar/sidebar-drawer'
 import { initialize as initSidebarContent } from '../sidebar/sidebar-list'
@@ -18,13 +19,13 @@ import { initialize as initHintsPage } from '../tooltips/hint-page'
 import { initialize as initCopyButton } from '../copy-button'
 import { initialize as initSettings } from '../settings'
 import { initialize as initStyling } from '../styling'
-import { initialize as initTabsets } from '../tabsets'
 import { initialize as initPreview} from '../preview'
 
 onDocumentReady(() => {
   const params = new URLSearchParams(window.location.search)
   const isPreview = params.has('preview')
 
+  initTabsets() // alters content HTML, so is run early
   initTheme(params.get('theme'))
   initContent(isPreview)
   initMakeup()
@@ -32,7 +33,6 @@ onDocumentReady(() => {
   initHintsPage()
   initCopyButton()
   initStyling()
-  initTabsets()
 
   if (isPreview) {
     initPreview()
