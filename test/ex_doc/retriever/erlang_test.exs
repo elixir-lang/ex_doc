@@ -354,6 +354,61 @@ defmodule ExDoc.Retriever.ErlangTest do
              |> Erlang.autolink_spec(current_module: :mod, current_kfa: {:type, :type, 0}) ==
                "type() :: #a{a :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:pos_integer/0\">pos_integer</a>(), b :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:non_neg_integer/0\">non_neg_integer</a>(), c :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>(), d :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:term/0\">term</a>(), e :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:term/0\">term</a>()}."
     end
+
+    @tag :ci
+    test "modules with encrypted debug info", c do
+      File.cp!("test/fixtures/.erlang.crypt", ".erlang.crypt")
+
+      erlc(
+        c,
+        :debug_info_mod,
+        ~S"""
+        -module(debug_info_mod).
+        -moduledoc("mod docs.").
+        -export([function1/0]).
+        -export_type([foo/0]).
+
+        -doc("foo/0 docs.").
+        -type foo() :: atom().
+
+        -doc("function1/0 docs.").
+        -spec function1() -> atom().
+        function1() -> ok.
+        """,
+        debug_info_key: ~c"SECRET"
+      )
+
+      {[mod], []} = Retriever.docs_from_modules([:debug_info_mod], %ExDoc.Config{})
+
+      assert %ExDoc.ModuleNode{
+               moduledoc_file: moduledoc_file,
+               docs: [function1],
+               id: "debug_info_mod",
+               module: :debug_info_mod,
+               title: "debug_info_mod",
+               typespecs: [foo]
+             } = mod
+
+      assert DocAST.to_string(mod.doc) =~ "mod docs."
+      assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
+      assert DocAST.to_string(foo.doc) =~ "foo/0 docs."
+      assert moduledoc_file =~ "debug_info_mod.erl"
+
+      erlc(
+        c,
+        :debug_info_mod2,
+        ~S"""
+        -module(debug_info_mod2).
+        -moduledoc("mod docs.").
+        """,
+        debug_info_key: {:des3_cbc, ~c"PASSWORD"}
+      )
+
+      assert {[%ExDoc.ModuleNode{module: :debug_info_mod2}], []} =
+               Retriever.docs_from_modules([:debug_info_mod2], %ExDoc.Config{})
+
+      File.rm!(".erlang.crypt")
+    end
   end
 
   describe "docs_from_modules/2 edoc" do

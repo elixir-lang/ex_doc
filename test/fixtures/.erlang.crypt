@@ -1,0 +1,2 @@
+[{debug_info, des3_cbc, debug_info_mod, "SECRET"},
+ {debug_info, des3_cbc, [], "PASSWORD"}].

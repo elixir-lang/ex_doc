@@ -1,10 +1,12 @@
 otp_eep48? = Code.ensure_loaded?(:edoc_doclet_chunks)
 otp_eep59? = Code.ensure_loaded?(:beam_doc)
+ci? = System.get_env("CI") == "true"
 
 exclude = [
   otp_eep48: not otp_eep48?,
   otp_eep59: not otp_eep59?,
-  otp_has_docs: not match?({:docs_v1, _, _, _, _, _, _}, Code.fetch_docs(:array))
+  otp_has_docs: not match?({:docs_v1, _, _, _, _, _, _}, Code.fetch_docs(:array)),
+  ci: not ci?
 ]
 
 ExUnit.start(exclude: Enum.filter(exclude, &elem(&1, 1)))
@@ -58,14 +60,20 @@ defmodule TestHelper do
 
     beam_docs = docstrings(docs, context)
 
+    # not to be confused with the regular :debug_info opt
+    debug_info_opts =
+      Enum.filter(opts, fn
+        {:debug_info, _debug_info} -> true
+        {:debug_info_key, _debug_info_key} -> true
+        :encrypt_debug_info -> true
+        _ -> false
+      end)
+
     {:ok, module} =
       :compile.file(
         String.to_charlist(src_path),
-        [
-          :return_errors,
-          :debug_info,
-          outdir: String.to_charlist(ebin_dir)
-        ] ++ beam_docs
+        [:return_errors, :debug_info, outdir: String.to_charlist(ebin_dir)] ++
+          beam_docs ++ debug_info_opts
       )
 
     true = Code.prepend_path(ebin_dir)
