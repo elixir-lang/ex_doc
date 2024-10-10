@@ -14,16 +14,20 @@ export function initialize () {
     const versionsContainer = qs(VERSIONS_CONTAINER_SELECTOR)
     // Initially the container contains only text with the current version
     const currentVersion = versionsContainer.textContent.trim()
+    const latestVersionNode = versionNodes.find(node => node.latest)
+    const latestVersion = latestVersionNode?.version !== currentVersion ? latestVersionNode?.version : null
+    const latestUrl = latestVersionNode?.version !== currentVersion ? latestVersionNode?.url : null
+
     const nodes = decorateVersionNodes(versionNodes, currentVersion)
 
-    renderVersionsDropdown({ nodes })
+    renderVersionPicker(nodes, latestVersion, latestUrl)
   }
 }
 
-function renderVersionsDropdown ({ nodes }) {
+function renderVersionPicker (nodes, latestVersion, latestUrl) {
   const versionsContainer = qs(VERSIONS_CONTAINER_SELECTOR)
-  const versionsDropdownHtml = Handlebars.templates['versions-dropdown']({ nodes })
-  versionsContainer.innerHTML = versionsDropdownHtml
+  const versionPickerHtml = Handlebars.templates['versions-dropdown']({ nodes, latestVersion, latestUrl })
+  versionsContainer.innerHTML = versionPickerHtml
 
   qs(VERSIONS_DROPDOWN_SELECTOR).addEventListener('change', handleVersionSelected)
 }
