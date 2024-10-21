@@ -21,7 +21,7 @@ defmodule ExDoc.Language.Erlang do
               nesting_info: nil,
               private: %{abst_code: any, callbacks: map, optional_callbacks: any, specs: map},
               title: binary,
-              type: :behaviour | :module
+              type: :module | :behaviour
             }
   def module_data(module, docs_chunk, _config) do
     if abst_code = Source.get_abstract_code(module) do

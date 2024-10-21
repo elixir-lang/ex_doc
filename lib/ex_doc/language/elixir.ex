@@ -27,7 +27,7 @@ defmodule ExDoc.Language.Elixir do
                 specs: map
               },
               title: binary,
-              type: :behaviour | :module
+              type: :module | :behaviour | :task | :protocol | :implementation | :exception
             }
   def module_data(module, docs_chunk, config) do
     {type, skip} = module_type_and_skip(module)
