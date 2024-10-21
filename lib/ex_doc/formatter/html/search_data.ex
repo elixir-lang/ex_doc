@@ -2,12 +2,13 @@ defmodule ExDoc.Formatter.HTML.SearchData do
   @moduledoc false
   alias ExDoc.Utils
 
-  def create(nodes, extras, _proglang) do
+  def create(nodes, extras, proglang) do
     items = Enum.flat_map(nodes, &module/1) ++ Enum.flat_map(extras, &extra/1)
 
     data = %{
       items: items,
       content_type: "text/markdown",
+      proglang: proglang,
       producer: %{
         name: "ex_doc",
         version: to_string(Application.spec(:ex_doc)[:vsn])
