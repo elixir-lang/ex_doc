@@ -18,7 +18,7 @@ jobs:
         include:
           - pair: # Test very old Elixir and Erlang
               elixir: "1.14"
-              otp: "23"
+              otp: "25"
           - pair: # Test Erlang without -doc attribute support
               elixir: "1.16"
               otp: "26"
