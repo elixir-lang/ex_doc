@@ -62,14 +62,38 @@ defmodule ExDoc.Language.Erlang do
   def function_data(entry, module_data) do
     {{kind, name, arity}, _anno, _signature, doc_content, metadata} = entry
 
-    # TODO: Edoc on Erlang/OTP24.1+ includes private functions in
-    # the chunk, so we manually yank them out for now.
-    if kind == :function and doc_content != :hidden and
-         function_exported?(module_data.module, name, arity) do
+    if kind == :function and doc_content != :hidden do
       function_data(name, arity, doc_content, module_data, metadata)
     else
       :skip
     end
+  end
+
+  defp function_data(name, arity, _doc_content, module_data, metadata) do
+    specs =
+      case Map.fetch(module_data.private.specs, {name, arity}) do
+        {:ok, spec} ->
+          [spec]
+
+        :error ->
+          case Map.fetch(module_data.private.specs, {module_data.module, name, arity}) do
+            {:ok, spec} ->
+              [spec]
+
+            :error ->
+              []
+          end
+      end
+
+    {file, line} = Source.fetch_function_location!(module_data, {name, arity})
+
+    %{
+      doc_fallback: fn -> equiv_data(module_data.module, file, line, metadata) end,
+      extra_annotations: [],
+      source_line: line,
+      source_file: file,
+      specs: specs
+    }
   end
 
   defp equiv_data(module, file, line, metadata, prefix \\ "") do
@@ -100,33 +124,6 @@ defmodule ExDoc.Language.Erlang do
 
         nil
     end
-  end
-
-  defp function_data(name, arity, _doc_content, module_data, metadata) do
-    specs =
-      case Map.fetch(module_data.private.specs, {name, arity}) do
-        {:ok, spec} ->
-          [spec]
-
-        :error ->
-          case Map.fetch(module_data.private.specs, {module_data.module, name, arity}) do
-            {:ok, spec} ->
-              [spec]
-
-            :error ->
-              []
-          end
-      end
-
-    {file, line} = Source.fetch_function_location!(module_data, {name, arity})
-
-    %{
-      doc_fallback: fn -> equiv_data(module_data.module, file, line, metadata) end,
-      extra_annotations: [],
-      source_line: line,
-      source_file: file,
-      specs: specs
-    }
   end
 
   @impl true

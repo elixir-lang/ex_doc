@@ -92,7 +92,7 @@ defmodule ExDoc.Language.Elixir do
     extra_annotations =
       case {kind, name, arity} do
         {:macro, _, _} -> ["macro"]
-        {_, :__struct__, 0} -> ["struct"]
+        {_, :__struct__, _} -> ["struct"]
         _ -> []
       end
 
@@ -122,19 +122,8 @@ defmodule ExDoc.Language.Elixir do
   end
 
   # If content is a map, then it is ok.
-  defp doc?({_, _, _, %{}, _}, _) do
-    true
-  end
-
-  # If it is none, then we need to look at underscore.
-  # TODO: We can remove this on Elixir v1.13 as all underscored are hidden.
-  defp doc?({{_, name, _}, _, _, :none, _}, _type) do
-    not match?([?_ | _], Atom.to_charlist(name))
-  end
-
-  # Everything else is hidden.
-  defp doc?({_, _, _, _, _}, _) do
-    false
+  defp doc?({_, _, _, doc, _}, _) do
+    doc != :hidden
   end
 
   @impl true
@@ -424,8 +413,8 @@ defmodule ExDoc.Language.Elixir do
 
   defp module_type_and_skip(module) do
     cond do
-      function_exported?(module, :__struct__, 0) and
-          match?(%{__exception__: true}, module.__struct__()) ->
+      function_exported?(module, :__info__, 1) and
+          Enum.any?(module.__info__(:struct) || [], &(&1.field == :__exception__)) ->
         {:exception, false}
 
       function_exported?(module, :__protocol__, 1) ->

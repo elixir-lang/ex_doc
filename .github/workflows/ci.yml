@@ -16,9 +16,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - pair: # Test very old elixir and Erlang
-              elixir: "1.13"
-              otp: "22"
+          - pair: # Test very old Elixir and Erlang
+              elixir: "1.14"
+              otp: "23"
           - pair: # Test Erlang without -doc attribute support
               elixir: "1.16"
               otp: "26"

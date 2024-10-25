@@ -5,14 +5,7 @@ defmodule ExDoc.CLITest do
   @ebin "_build/test/lib/ex_doc/ebin"
 
   defp run(args) do
-    # TODO: Use with_io on Elixir v1.13
-    io =
-      capture_io(fn ->
-        send(self(), ExDoc.CLI.main(args, &{&1, &2, &3}))
-      end)
-
-    assert_receive response
-    {response, io}
+    with_io(fn -> ExDoc.CLI.main(args, &{&1, &2, &3}) end)
   end
 
   test "minimum command-line options" do
