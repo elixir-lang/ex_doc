@@ -1,8 +1,26 @@
 defmodule ExDoc.Language.ErlangTest do
   # ExDoc.Refs is global
   use ExUnit.Case, async: false
-
   import TestHelper
+
+  setup_all c do
+    # erlang_bar is shared across all tests.
+    # Each test defines an erlang_foo for their specific purposes.
+    :code.purge(:erlang_bar)
+
+    c
+    |> Map.put(:tmp_dir, "test/tmp/#{inspect(__MODULE__)}")
+    |> erlc(:erlang_bar, """
+    -module(erlang_bar).
+    -export([bar/0, nil/0]).
+    -export_type([t/0]).
+    -type t() :: atom().
+    nil() -> [].
+    bar() -> ok.
+    """)
+
+    :ok
+  end
 
   @moduletag :otp_has_docs
   @moduletag :tmp_dir
@@ -56,14 +74,14 @@ defmodule ExDoc.Language.ErlangTest do
         {:a, [href: "array#anchor", rel: "https://erlang.org/doc/link/seeerl"],
          [{:code, [], ["array"], %{}}], %{}}
 
-      assert do_autolink_doc(ast) ==
+      assert autolink(ast) ==
                ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#anchor"><code>array</code></a>|
 
       ast =
         {:a, [href: "stdlib:array#anchor", rel: "https://erlang.org/doc/link/seeerl"],
          [{:code, [], ["array"], %{}}], %{}}
 
-      assert do_autolink_doc(ast) ==
+      assert autolink(ast) ==
                ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#anchor"><code>array</code></a>|
     end
 
@@ -339,12 +357,14 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "linking to local nil works", c do
-      assert autolink_doc(
-               "[`[]`](`t:nil/0`)",
-               c,
-               extra_foo_code: "-export_type([nil/0]).\n-type nil() :: [].\n"
-             ) ==
-               ~s|<a href="#t:nil/0"><code class="inline">[]</code></a>|
+      if :erlang.system_info(:otp_release) >= ~c"26" do
+        assert autolink_doc(
+                 "[`[]`](`t:nil/0`)",
+                 c,
+                 extra_foo_code: "-export_type([nil/0]).\n-type nil() :: [].\n"
+               ) ==
+                 ~s|<a href="#t:nil/0"><code class="inline">[]</code></a>|
+      end
     end
 
     test "linking to local nil function works", c do
@@ -359,8 +379,7 @@ defmodule ExDoc.Language.ErlangTest do
     test "linking to exported nil function works", c do
       assert autolink_doc(
                "[`nil`](`erlang_bar:nil/0`)",
-               c,
-               extra_bar_code: "-export([nil/0]).\nnil() -> [].\n"
+               c
              ) ==
                ~s|<a href="erlang_bar.html#nil/0"><code class="inline">nil</code></a>|
     end
@@ -537,8 +556,8 @@ defmodule ExDoc.Language.ErlangTest do
 
   describe "autolink_doc/2 for extra" do
     test "function", c do
-      assert autolink_extra("`erlang_foo:foo/0`", c) ==
-               ~s|<a href="erlang_foo.html#foo/0"><code class="inline">erlang_foo:foo/0</code></a>|
+      assert autolink_extra("`erlang_bar:bar/0`", c) ==
+               ~s|<a href="erlang_bar.html#bar/0"><code class="inline">erlang_bar:bar/0</code></a>|
     end
 
     test "OTP function", c do
@@ -557,8 +576,8 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "module", c do
-      assert autolink_extra("`m:erlang_foo`", c) ==
-               ~s|<a href="erlang_foo.html"><code class="inline">erlang_foo</code></a>|
+      assert autolink_extra("`m:erlang_bar`", c) ==
+               ~s|<a href="erlang_bar.html"><code class="inline">erlang_bar</code></a>|
     end
 
     test "OTP module", c do
@@ -830,13 +849,11 @@ defmodule ExDoc.Language.ErlangTest do
     end
   end
 
-  defp autolink_spec(binary, c, opts \\ []) when is_binary(binary) do
-    fixtures(c, "")
-
+  defp autolink_spec(binary, _c, opts \\ []) when is_binary(binary) do
     opts =
       opts
-      |> Keyword.put_new(:current_module, :erlang_foo)
-      |> Keyword.put_new(:current_kfa, {:function, :foo, 1})
+      |> Keyword.put_new(:current_module, :erlang_bar)
+      |> Keyword.put_new(:current_kfa, {:function, :bar, 1})
 
     {:ok, tokens, _} = :erl_scan.string(String.to_charlist(binary))
     {:ok, ast} = :erl_parse.parse_form(tokens)
@@ -845,14 +862,10 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   defp autolink_extra(text, c) do
-    # Markdown is usually not valid EDoc
-    fixtures(c, "")
-
     [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, [])
-
     opts = c |> Map.take([:warnings]) |> Enum.to_list()
 
-    do_autolink_doc(
+    autolink(
       ast,
       [current_module: nil, file: nil, module_id: nil, file: "extra.md"] ++ opts
     )
@@ -869,8 +882,7 @@ defmodule ExDoc.Language.ErlangTest do
       end
 
     opts = Keyword.merge(opts, c |> Map.take([:warnings]) |> Enum.to_list())
-
-    do_autolink_doc(ast, opts)
+    autolink(ast, opts)
   end
 
   defp autolink_edoc(doc, c, opts \\ []) do
@@ -884,7 +896,7 @@ defmodule ExDoc.Language.ErlangTest do
     html =
       doc
       |> ExDoc.DocAST.parse!("application/erlang+html")
-      |> do_autolink_doc(opts)
+      |> autolink(opts)
 
     # OTP 27 wraps edoc in <p></p>
     html
@@ -892,7 +904,7 @@ defmodule ExDoc.Language.ErlangTest do
     |> String.trim_trailing("</p>")
   end
 
-  defp do_autolink_doc(doc, opts \\ []) do
+  defp autolink(doc, opts \\ []) do
     opts =
       opts
       |> Keyword.put(:language, ExDoc.Language.Erlang)
@@ -901,7 +913,7 @@ defmodule ExDoc.Language.ErlangTest do
       |> Keyword.put_new(:file, "erlang_foo.erl")
       |> Keyword.put_new(:module_id, "erlang_foo")
       |> Keyword.put_new(:deps, foolib: "https://foolib.com")
-      |> Keyword.drop([:extra_foo_code, :extra_bar_code])
+      |> Keyword.drop([:extra_foo_code])
 
     doc
     |> ExDoc.Language.Erlang.autolink_doc(opts)
@@ -923,9 +935,8 @@ defmodule ExDoc.Language.ErlangTest do
     message
   end
 
-  defp fixtures(c, doc, opts \\ []) do
+  defp fixtures(c, doc, opts) do
     :code.purge(:erlang_foo)
-    :code.purge(:erlang_bar)
 
     erlc(c, :erlang_foo, """
     %% @doc
@@ -937,15 +948,6 @@ defmodule ExDoc.Language.ErlangTest do
     -type opaque_t() :: atom().
     #{opts[:extra_foo_code]}
     foo() -> ok.
-    """)
-
-    erlc(c, :erlang_bar, """
-    -module(erlang_bar).
-    -export([bar/0]).
-    -export_type([t/0]).
-    -type t() :: atom().
-    #{opts[:extra_bar_code]}
-    bar() -> ok.
     """)
   end
 end
