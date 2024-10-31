@@ -161,6 +161,18 @@ function docTokenFunction (token) {
   const namespaceRegex = /\:|\./
   let toSplitWords = token.toString()
 
+  // clean up leading and trailing backticks
+  if (toSplitWords.startsWith('`') && toSplitWords.endsWith('`')) {
+    toSplitWords = toSplitWords.slice(1, -1)
+    tokens.push(token.clone().update(() => toSplitWords))
+  }
+
+  // allow searching for atoms without `:`
+  if (toSplitWords.startsWith(':')) {
+    toSplitWords = toSplitWords.slice(1)
+    tokens.push(token.clone().update(() => toSplitWords))
+  }
+
   if (arityRegex.test(toSplitWords)) {
     const withoutArity = token
       .toString()
