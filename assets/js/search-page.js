@@ -196,7 +196,7 @@ function docTokenFunction (token) {
     tokens.push(token.clone().update(() => toSplitWords))
   } else if (toSplitWords.startsWith(':')) {
     // allow searching for atoms without `:`
-    toSplitWords = toSplitWords.slice(1)
+    toSplitWords = toSplitWords.substring(1)
     tokens.push(token.clone().update(() => toSplitWords))
   }
 
