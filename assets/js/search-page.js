@@ -167,12 +167,6 @@ function docTokenFunction (token) {
     tokens.push(token.clone().update(() => toSplitWords))
   }
 
-  // allow searching for atoms without `:`
-  if (toSplitWords.startsWith(':')) {
-    toSplitWords = toSplitWords.slice(1)
-    tokens.push(token.clone().update(() => toSplitWords))
-  }
-
   if (arityRegex.test(toSplitWords)) {
     const withoutArity = token
       .toString()
@@ -199,6 +193,10 @@ function docTokenFunction (token) {
     // If we have a module attribute, such as @foo_bar,
     // also make it searchable as foo_bar
     toSplitWords = toSplitWords.substring(1)
+    tokens.push(token.clone().update(() => toSplitWords))
+  } else if (toSplitWords.startsWith(':')) {
+    // allow searching for atoms without `:`
+    toSplitWords = toSplitWords.slice(1)
     tokens.push(token.clone().update(() => toSplitWords))
   }
 
