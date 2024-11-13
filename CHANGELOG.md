@@ -6,6 +6,7 @@
     * Improve warning when referencing type from a private module
     * Rename "Search HexDocs package" modal to "Go to package docs". Support built-in Erlang/OTP
       apps.
+    * Document how to use `.erlang.crypt` with ExDoc
 
   * Bug fixes
     * Switch anchor `title` to `aria-label`
