@@ -728,9 +728,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|foo(X, Y)|
     end
 
-    test "nominal", c do
-      assert autolink_spec("-nominal foo() :: t().", c) ==
-               ~s|foo() :: <a href="#t:t/0">t</a>().|
+    if System.otp_release() >= "28" do
+      test "nominal", c do
+        assert autolink_spec("-nominal foo() :: t().", c) ==
+                 ~s|foo() :: <a href="#t:t/0">t</a>().|
+      end
     end
 
     test "tuple", c do

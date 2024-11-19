@@ -4,6 +4,7 @@ defmodule ExDoc.Retriever.ErlangTest do
   import TestHelper
 
   @moduletag :tmp_dir
+  @nominal_type if System.otp_release() >= "28", do: :nominal, else: :type
 
   describe "docs_from_modules/2" do
     @describetag :otp_eep59
@@ -274,26 +275,26 @@ defmodule ExDoc.Retriever.ErlangTest do
     end
 
     test "types", c do
-      erlc(c, :mod, ~S"""
+      erlc(c, :mod, """
       -module(mod).
-      -export_type([type1/0, equiv_type1/0, opaque1/0]).
+      -export_type([type1/0, equiv_type1/0, opaque1/0, nominal1/0]).
 
       -doc("type1/0 docs.").
       -type type1() :: atom().
 
-      -doc #{ equiv => type1/1 }.
+      -doc \#{equiv => type1/1}.
       -type equiv_type1() :: atom().
 
       -doc("opaque1/0 docs.").
       -opaque opaque1() :: atom().
 
       -doc("nominal1/0 docs.").
-      -nominal nominal1() :: atom().
+      -#{@nominal_type} nominal1() :: atom().
       """)
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
       {[mod], []} = Retriever.docs_from_modules([:mod], config)
-      [equiv_type1, opaque1, nominal1, type1] = mod.typespecs
+      [equiv_type1, nominal1, opaque1, type1] = mod.typespecs
 
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
@@ -305,7 +306,7 @@ defmodule ExDoc.Retriever.ErlangTest do
                "opaque1()"
 
       assert nominal1.id == "t:nominal1/0"
-      assert nominal1.type == :nominal
+      assert nominal1.type == @nominal_type
       assert nominal1.group == :Types
       assert nominal1.signature == "nominal1()"
       assert nominal1.doc |> DocAST.to_string() =~ "nominal1/0 docs."
@@ -486,10 +487,10 @@ defmodule ExDoc.Retriever.ErlangTest do
     end
 
     test "types", c do
-      erlc(c, :mod, ~S"""
+      erlc(c, :mod, """
       %% @doc Docs.
       -module(mod).
-      -export_type([type1/0, opaque1/0]).
+      -export_type([type1/0, opaque1/0, nominal1/0]).
 
       -type type1() :: atom().
       %% type1/0 docs.
@@ -497,13 +498,13 @@ defmodule ExDoc.Retriever.ErlangTest do
       -opaque opaque1() :: atom().
       %% opaque1/0 docs.
 
-      -nominal nominal1() :: atom().
-      %% -doc("nominal1/0 docs.").
+      -#{@nominal_type} nominal1() :: atom().
+      %% nominal1/0 docs.
       """)
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
       {[mod], []} = Retriever.docs_from_modules([:mod], config)
-      [opaque1, type1] = mod.typespecs
+      [nominal1, opaque1, type1] = mod.typespecs
 
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
@@ -514,7 +515,7 @@ defmodule ExDoc.Retriever.ErlangTest do
                "opaque1()"
 
       assert nominal1.id == "t:nominal1/0"
-      assert nominal1.type == :nominal
+      assert nominal1.type == @nominal_type
       assert nominal1.group == :Types
       assert nominal1.signature == "nominal1/0"
       assert nominal1.doc |> DocAST.to_string() =~ "nominal1/0 docs."
