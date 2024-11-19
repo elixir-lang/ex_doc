@@ -728,6 +728,11 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|foo(X, Y)|
     end
 
+    test "nominal", c do
+      assert autolink_spec("-nominal foo() :: t().", c) ==
+               ~s|foo() :: <a href="#t:t/0">t</a>().|
+    end
+
     test "tuple", c do
       assert autolink_spec(~S"-spec foo() -> {ok, t()}.", c) ==
                ~s|foo() -> {ok, <a href="#t:t/0">t</a>()}.|

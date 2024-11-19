@@ -138,7 +138,7 @@ defmodule ExDoc.Retriever do
     groups_for_docs =
       config.groups_for_docs ++
         [
-          Types: &(&1[:kind] in [:type, :opaque]),
+          Types: &(&1[:kind] in [:type, :opaque, :nominal]),
           Callbacks: &(&1[:kind] in [:callback, :macrocallback]),
           Functions: fn _ -> true end
         ]
