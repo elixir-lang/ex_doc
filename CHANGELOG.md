@@ -1,15 +1,20 @@
 # Changelog
 
-## HEAD
+## v0.35.0 (2024-11-19)
 
   * Enhancements
+    * Store `proglang` in `searchdata.js`
+    * Allow searching for atoms inside backticks
+    * Add support for nominal types from Elang/OTP 28
+    * Support a new `:redirects` option which allows configuring redirects in the sidebar
     * Improve warning when referencing type from a private module
-    * Rename "Search HexDocs package" modal to "Go to package docs". Support built-in Erlang/OTP
-      apps.
+    * Rename "Search HexDocs package" modal to "Go to package docs"
+    * Support built-in Erlang/OTP apps in "Go to package docs"
 
   * Bug fixes
     * Switch anchor `title` to `aria-label`
     * Convert admonition blockquotes to sections for screen reader users
+    * Fix code copy buttons within tabsets
 
 ## v0.34.2 (2024-07-08)
 
