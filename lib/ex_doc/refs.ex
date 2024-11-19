@@ -106,7 +106,7 @@ defmodule ExDoc.Refs do
           [{{:module, module}, :limited}] ++
             to_refs(exports(module), module, :function) ++
             to_refs(callbacks(module), module, :callback) ++
-            to_refs(types(module, [:type, :opaque]), module, :type)
+            to_refs(types(module, [:type, :opaque, :nominal]), module, :type)
         else
           _ ->
             [{{:module, module}, :undefined}]

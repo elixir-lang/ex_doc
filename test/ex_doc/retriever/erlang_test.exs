@@ -286,11 +286,14 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       -doc("opaque1/0 docs.").
       -opaque opaque1() :: atom().
+
+      -doc("nominal1/0 docs.").
+      -nominal nominal1() :: atom().
       """)
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
       {[mod], []} = Retriever.docs_from_modules([:mod], config)
-      [equiv_type1, opaque1, type1] = mod.typespecs
+      [equiv_type1, opaque1, nominal1, type1] = mod.typespecs
 
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
@@ -300,6 +303,15 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert opaque1.spec |> Erlang.autolink_spec(current_kfa: {:type, :opaque1, 0}) ==
                "opaque1()"
+
+      assert nominal1.id == "t:nominal1/0"
+      assert nominal1.type == :nominal
+      assert nominal1.group == :Types
+      assert nominal1.signature == "nominal1()"
+      assert nominal1.doc |> DocAST.to_string() =~ "nominal1/0 docs."
+
+      assert nominal1.spec |> Erlang.autolink_spec(current_kfa: {:type, :nominal1, 0}) ==
+               "nominal1() :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       assert type1.id == "t:type1/0"
       assert type1.type == :type
@@ -484,6 +496,9 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       -opaque opaque1() :: atom().
       %% opaque1/0 docs.
+
+      -nominal nominal1() :: atom().
+      %% -doc("nominal1/0 docs.").
       """)
 
       config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
@@ -497,6 +512,15 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert opaque1.spec |> Erlang.autolink_spec(current_kfa: {:type, :opaque1, 0}) ==
                "opaque1()"
+
+      assert nominal1.id == "t:nominal1/0"
+      assert nominal1.type == :nominal
+      assert nominal1.group == :Types
+      assert nominal1.signature == "nominal1/0"
+      assert nominal1.doc |> DocAST.to_string() =~ "nominal1/0 docs."
+
+      assert nominal1.spec |> Erlang.autolink_spec(current_kfa: {:type, :nominal1, 0}) ==
+               "nominal1() :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       assert type1.id == "t:type1/0"
       assert type1.type == :type

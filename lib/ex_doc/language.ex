@@ -110,7 +110,7 @@ defmodule ExDoc.Language do
 
   The map has the following keys:
 
-    * `:type` - `:type` or `:opaque`
+    * `:type` - `:type` or `:opaque` or `:nominal`
 
     * `:source_line` - the line where the code is located
 
@@ -122,7 +122,7 @@ defmodule ExDoc.Language do
   """
   @callback type_data(entry :: tuple(), spec :: term()) ::
               %{
-                type: :type | :opaque,
+                type: :type | :opaque | :nominal,
                 source_line: non_neg_integer(),
                 source_file: String.t() | nil,
                 signature: [binary()],
