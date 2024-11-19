@@ -5,7 +5,7 @@
   * Enhancements
     * Store `proglang` in `searchdata.js`
     * Allow searching for atoms inside backticks
-    * Add support for nominal types from Elang/OTP 28
+    * Add support for nominal types from Erlang/OTP 28
     * Support a new `:redirects` option which allows configuring redirects in the sidebar
     * Improve warning when referencing type from a private module
     * Rename "Search HexDocs package" modal to "Go to package docs"
