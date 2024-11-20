@@ -236,6 +236,10 @@ defmodule ExDoc.Language.Erlang do
         {:attribute, anno, :type, ast} ->
           {name, _, _} = ast
           {name, anno, Code.Typespec.type_to_quoted(ast)}
+
+        {:attribute, anno, :nominal, ast} ->
+          {name, _, _} = ast
+          {name, anno, Code.Typespec.type_to_quoted(ast)}
       end
 
     formatted = format_spec(ast)
