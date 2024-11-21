@@ -306,7 +306,7 @@ defmodule ExDoc.Formatter.HTML do
 
         is_binary(dir_or_files) and File.dir?(dir_or_files) ->
           dir_or_files
-          |> File.cp_r!(target_dir)
+          |> File.cp_r!(target_dir, dereference_symlinks: true)
           |> Enum.map(&Path.relative_to(&1, output))
 
         is_binary(dir_or_files) ->

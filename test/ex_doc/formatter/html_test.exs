@@ -816,4 +816,24 @@ defmodule ExDoc.Formatter.HTMLTest do
   after
     File.rm_rf!("test/tmp/html_assets")
   end
+
+  test "symbolic links in the assets should be resolved and copied as actual files",
+       %{tmp_dir: tmp_dir} = context do
+    File.mkdir_p!("test/tmp/html_assets/hello")
+    File.touch!("test/tmp/html_assets/hello/world")
+
+    File.ln_s("world", "test/tmp/html_assets/hello/symlink_world")
+
+    generate_docs(
+      doc_config(context,
+        assets: %{"test/tmp/html_assets" => "assets"}
+      )
+    )
+
+    assert File.regular?(tmp_dir <> "/html/assets/hello/world")
+    assert File.exists?(tmp_dir <> "/html/assets/hello/symlink_world")
+    assert File.read_link(tmp_dir <> "/html/assets/hello/symlink_world") == {:error, :einval}
+  after
+    File.rm_rf!("test/tmp/html_assets")
+  end
 end
