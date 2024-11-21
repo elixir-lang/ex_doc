@@ -247,8 +247,7 @@ defmodule ExDoc.Retriever do
         metadata
       )
 
-    source_url =
-      source_link(function_data[:source_file], source, function_data.source_line)
+    source_url = source_link(function_data[:source_file], source, function_data.source_line)
 
     annotations =
       annotations_for_docs.(metadata) ++
@@ -260,8 +259,7 @@ defmodule ExDoc.Retriever do
       (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
         function_data.doc_fallback.()
 
-    group =
-      GroupMatcher.match_function(groups_for_docs, metadata)
+    group = GroupMatcher.match_function(groups_for_docs, metadata)
 
     %ExDoc.FunctionNode{
       id: nil_or_name(name, arity),
@@ -325,8 +323,7 @@ defmodule ExDoc.Retriever do
     doc_file = anno_file(anno, source)
     doc_line = anno_line(anno)
 
-    source_url =
-      source_link(callback_data[:source_file], source, callback_data.source_line)
+    source_url = source_link(callback_data[:source_file], source, callback_data.source_line)
 
     metadata =
       Map.merge(
@@ -393,8 +390,7 @@ defmodule ExDoc.Retriever do
         metadata
       )
 
-    source_url =
-      source_link(type_data[:source_file], source, type_data.source_line)
+    source_url = source_link(type_data[:source_file], source, type_data.source_line)
 
     signature = signature(type_data.signature)
 
