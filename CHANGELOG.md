@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.35.1 (2024-11-21)
+
+  * Bug fixes
+    * Make sure symlinks are copied from assets directory
+    * Discard private functions documented by EDoc
+
 ## v0.35.0 (2024-11-19)
 
   * Enhancements
