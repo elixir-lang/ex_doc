@@ -376,7 +376,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       %% @doc
       %% mod docs.
       -module(mod).
-      -export([function1/0, function2/0]).
+      -export([function1/0, function2/0, hidden_function/0]).
 
       %% @doc
       %% function1/0 docs.
@@ -386,6 +386,13 @@ defmodule ExDoc.Retriever.ErlangTest do
       %% @doc
       %% function2/0 docs.
       function2() -> ok.
+
+      %% @doc hidden function docs.
+      %% @private
+      hidden_function() -> local_function().
+
+      %% @doc hidden function docs.
+      local_function() -> local_function().
       """)
 
       {[mod], []} = Retriever.docs_from_modules([:mod], %ExDoc.Config{})

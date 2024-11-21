@@ -62,7 +62,10 @@ defmodule ExDoc.Language.Erlang do
   def function_data(entry, module_data) do
     {{kind, name, arity}, _anno, _signature, doc_content, metadata} = entry
 
-    if kind == :function and doc_content != :hidden do
+    # Edoc on Erlang/OTP24.1+ includes private functions in
+    # the chunk, so we manually yank them out.
+    if kind == :function and doc_content != :hidden and
+         function_exported?(module_data.module, name, arity) do
       function_data(name, arity, doc_content, module_data, metadata)
     else
       :skip
