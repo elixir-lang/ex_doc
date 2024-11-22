@@ -59,11 +59,15 @@ def project do
     name: "MyApp",
     source_url: "https://github.com/USER/PROJECT",
     homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
-    docs: [
-      main: "MyApp", # The main page in the docs
-      logo: "path/to/logo.png",
-      extras: ["README.md"]
-    ]
+    docs: &docs/0
+  ]
+end
+
+defp docs do
+  [
+    main: "MyApp", # The main page in the docs
+    logo: "path/to/logo.png",
+    extras: ["README.md"]
   ]
 end
 ```
