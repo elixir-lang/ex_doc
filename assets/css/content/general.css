@@ -186,14 +186,6 @@
   opacity: 1;
 }
 
-/* Allow section link to be hovered and used “through” text */
-.content-inner .section-heading .text {
-  pointer-events: none;
-}
-.content-inner .section-heading .text a {
-  pointer-events: all;
-}
-
 .content-inner .app-vsn {
   display: none !important;
   font-size: 0.6em;
