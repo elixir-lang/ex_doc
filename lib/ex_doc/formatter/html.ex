@@ -8,10 +8,12 @@ defmodule ExDoc.Formatter.HTML do
   @assets_dir "assets"
 
   @doc """
-  Generate HTML documentation for the given modules.
+  Generates HTML documentation for the given modules.
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
+    Utils.unset_warned()
+
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
 
@@ -528,7 +530,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_redirect(filename, config, redirect_to) do
     unless case_sensitive_file_regular?("#{config.output}/#{redirect_to}") do
-      ExDoc.Utils.warn("#{filename} redirects to #{redirect_to}, which does not exist", [])
+      Utils.warn("#{filename} redirects to #{redirect_to}, which does not exist", [])
     end
 
     content = Templates.redirect_template(config, redirect_to)

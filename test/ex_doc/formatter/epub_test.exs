@@ -1,5 +1,9 @@
 defmodule ExDoc.Formatter.EPUBTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
+
+  import ExUnit.CaptureIO
+
+  alias ExDoc.Utils
 
   @moduletag :tmp_dir
 
@@ -236,5 +240,48 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?(tmp_dir <> "/epub/OEBPS/assets/cover.png")
   after
     File.rm_rf!("test/tmp/epub_assets")
+  end
+
+  describe "warnings" do
+    @describetag :warnings
+
+    test "multiple warnings are registered when using warnings_as_errors: true", context do
+      Utils.unset_warned()
+
+      output =
+        capture_io(:stderr, fn ->
+          generate_docs(
+            doc_config(context,
+              skip_undefined_reference_warnings_on: [],
+              warnings_as_errors: true
+            )
+          )
+        end)
+
+      # TODO: remove check when we require Elixir v1.16
+      if Version.match?(System.version(), ">= 1.16.0-rc") do
+        assert output =~ ~S|moduledoc `Warnings.bar/0`|
+        assert output =~ ~S|typedoc `Warnings.bar/0`|
+        assert output =~ ~S|doc callback `Warnings.bar/0`|
+        assert output =~ ~S|doc `Warnings.bar/0`|
+      end
+
+      assert Utils.warned?() == true
+    end
+
+    test "warnings are registered even with warnings_as_errors: false", context do
+      Utils.unset_warned()
+
+      capture_io(:stderr, fn ->
+        generate_docs(
+          doc_config(context,
+            skip_undefined_reference_warnings_on: [],
+            warnings_as_errors: false
+          )
+        )
+      end)
+
+      assert Utils.warned?() == true
+    end
   end
 end
