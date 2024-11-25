@@ -1,20 +1,12 @@
 defmodule ExDoc.Utils do
   @moduledoc false
 
-  @elixir_gte_1_14? Version.match?(System.version(), ">= 1.14.0")
-
   @doc """
   Emits a warning.
   """
   def warn(message, stacktrace_info) do
     set_warned()
-
-    # TODO: remove check when we require Elixir v1.14
-    if @elixir_gte_1_14? do
-      IO.warn(message, stacktrace_info)
-    else
-      IO.warn(message, [])
-    end
+    IO.warn(message, stacktrace_info)
   end
 
   @doc """
