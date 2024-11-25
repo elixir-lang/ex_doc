@@ -428,9 +428,7 @@ defmodule Mix.Tasks.Docs do
         "Documents have been generated, but generation for #{format_message} failed due to warnings while using the --warnings-as-errors option."
 
       message_formatted = IO.ANSI.format([:red, message, :reset])
-
       IO.puts(:stderr, message_formatted)
-
       exit({:shutdown, 1})
     end
   end
