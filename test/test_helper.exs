@@ -11,30 +11,13 @@ ExUnit.start(exclude: Enum.filter(exclude, &elem(&1, 1)))
 
 # Prepare module fixtures
 File.rm_rf!("test/tmp")
-File.rm_rf!("test/fixtures/single/_build/")
 File.mkdir_p!("test/tmp/beam")
-File.mkdir_p!("test/fixtures/single/_build/test/lib/single/ebin")
 Code.prepend_path("test/tmp/beam")
 
 # Compile module fixtures
 "test/fixtures/*.ex"
 |> Path.wildcard()
 |> Kernel.ParallelCompiler.compile_to_path("test/tmp/beam")
-
-# Compile fixture :single app module
-"test/fixtures/single/lib/*.ex"
-|> Path.wildcard()
-|> Kernel.ParallelCompiler.compile_to_path("test/fixtures/single/_build/test/lib/single/ebin")
-
-File.write!("test/fixtures/single/_build/test/lib/single/ebin/single.app", ~S"""
-{application,single,
-             [{optional_applications,[]},
-              {applications,[kernel,stdlib,elixir,logger]},
-              {description,"single"},
-              {modules,['Elixir.Single']},
-              {registered,[]},
-              {vsn,"0.1.0"}]}.
-""")
 
 defmodule TestHelper do
   def elixirc(context, filename \\ "nofile", code) do
