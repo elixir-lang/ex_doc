@@ -1,7 +1,9 @@
 defmodule ExDoc.Formatter.HTMLTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
+
+  alias ExDoc.Utils
 
   @moduletag :tmp_dir
 
@@ -117,7 +119,9 @@ defmodule ExDoc.Formatter.HTMLTest do
         generate_docs(doc_config(context, main: "Randomerror"))
       end)
 
-    assert output =~ "index.html redirects to Randomerror.html, which does not exist\n"
+    assert output =~
+             ~r"warning:(\e\[0m)? .*index.html redirects to Randomerror.html, which does not exist\n"
+
     assert File.regular?(tmp_dir <> "/html/index.html")
     assert File.regular?(tmp_dir <> "/html/RandomError.html")
   end
@@ -128,7 +132,8 @@ defmodule ExDoc.Formatter.HTMLTest do
         generate_docs(doc_config(context, skip_undefined_reference_warnings_on: []))
       end)
 
-    assert out =~ ~s|documentation references function "Warnings.bar/0" but|
+    assert out =~
+             ~s|documentation references function "Warnings.bar/0" but it is undefined or private|
 
     # TODO: remove check when we require Elixir v1.16
     if Version.match?(System.version(), ">= 1.16.0-rc") do
@@ -136,6 +141,63 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert out =~ ~s|typedoc `Warnings.bar/0`|
       assert out =~ ~s|doc callback `Warnings.bar/0`|
       assert out =~ ~s|doc `Warnings.bar/0`|
+    end
+  end
+
+  describe "warnings" do
+    @describetag :warnings
+
+    test "single warning is registered when using warnings_as_errors: true", context do
+      Utils.unset_warned()
+
+      output =
+        capture_io(:stderr, fn ->
+          generate_docs(doc_config(context, main: "DoesNotExist", warnings_as_errors: true))
+        end)
+
+      assert output =~
+               ~r"warning:(\e\[0m)? .*index.html redirects to DoesNotExist.html, which does not exist\n"
+
+      assert Utils.warned?() == true
+    end
+
+    test "multiple warnings are registered when using warnings_as_errors: true", context do
+      Utils.unset_warned()
+
+      output =
+        capture_io(:stderr, fn ->
+          generate_docs(
+            doc_config(context,
+              skip_undefined_reference_warnings_on: [],
+              warnings_as_errors: true
+            )
+          )
+        end)
+
+      # TODO: remove check when we require Elixir v1.16
+      if Version.match?(System.version(), ">= 1.16.0-rc") do
+        assert output =~ ~S|moduledoc `Warnings.bar/0`|
+        assert output =~ ~S|typedoc `Warnings.bar/0`|
+        assert output =~ ~S|doc callback `Warnings.bar/0`|
+        assert output =~ ~S|doc `Warnings.bar/0`|
+      end
+
+      assert Utils.warned?() == true
+    end
+
+    test "warnings are registered even with warnings_as_errors: false", context do
+      Utils.unset_warned()
+
+      capture_io(:stderr, fn ->
+        generate_docs(
+          doc_config(context,
+            skip_undefined_reference_warnings_on: [],
+            warnings_as_errors: false
+          )
+        )
+      end)
+
+      assert Utils.warned?() == true
     end
   end
 
