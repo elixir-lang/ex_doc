@@ -18,13 +18,11 @@ defmodule ExDoc.Formatter.Markdown do
     Utils.unset_warned()
 
     config = %{config | output: Path.expand(config.output)}
-
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
     project_nodes = render_all(project_nodes, filtered_modules, ".md", config, [])
     extras = build_extras(config, ".md")
-
     # Generate search early on without api reference in extras
     static_files = generate_assets(".", default_assets(config), config)
 
@@ -43,13 +41,16 @@ defmodule ExDoc.Formatter.Markdown do
 
     all_files =
       static_files ++
-        generate_extras(nodes_map, extras, config) ++
+        generate_extras(extras, config) ++
         generate_logo(@assets_dir, config) ++
-        generate_list(nodes_map.modules, nodes_map, config) ++
-        generate_list(nodes_map.tasks, nodes_map, config)
+        generate_list(nodes_map.modules, config) ++
+        generate_list(nodes_map.tasks, config)
 
     generate_build(Enum.sort(all_files), build)
-    config.output |> Path.join("index.md") |> Path.relative_to_cwd()
+
+    config.output
+    |> Path.join("index.md")
+    |> Path.relative_to_cwd()
   end
 
   @doc """
@@ -93,9 +94,9 @@ defmodule ExDoc.Formatter.Markdown do
                   current_kfa: {:function, child_node.name, child_node.arity}
                 ]
 
-            specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
+            specs = Enum.map(child_node.specs, &language.format_spec(&1))
             child_node = %{child_node | specs: specs}
-            render_doc(child_node, language, autolink_opts, opts)
+            render_doc(child_node, language, autolink_opts, opts, 4)
           end
 
         typespecs =
@@ -113,14 +114,14 @@ defmodule ExDoc.Formatter.Markdown do
 
             child_node = %{
               child_node
-              | spec: language.autolink_spec(child_node.spec, autolink_opts)
+              | spec: language.format_spec(child_node.spec)
             }
 
-            render_doc(child_node, language, autolink_opts, opts)
+            render_doc(child_node, language, autolink_opts, opts, 3)
           end
 
         %{
-          render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
+          render_doc(node, language, [{:id, node.id} | autolink_opts], opts, 2)
           | docs: docs,
             typespecs: typespecs
         }
@@ -130,12 +131,73 @@ defmodule ExDoc.Formatter.Markdown do
     |> Enum.map(&elem(&1, 1))
   end
 
-  defp render_doc(%{doc: nil} = node, _language, _autolink_opts, _opts),
+  defp render_doc(%{doc: nil} = node, _language, _autolink_opts, _opts, _base_heading),
     do: node
 
-  defp render_doc(%{doc: doc} = node, language, autolink_opts, opts) do
-    rendered = autolink_and_render(doc, language, autolink_opts, opts)
+  defp render_doc(
+         %{doc: _doc, source_doc: source_doc} = node,
+         _language,
+         _autolink_opts,
+         _opts,
+         base_heading
+       ) do
+    # rendered = autolink_and_render(doc, language, autolink_opts, opts)
+    rendered = rewrite_headings(source_doc["en"], base_heading)
     %{node | rendered_doc: rendered}
+  end
+
+  defp rewrite_headings(markdown, base_heading)
+       when is_binary(markdown) and is_integer(base_heading) and base_heading >= 1 do
+    {:ok, [{"document", attributes, document}] = _ast} = MDEx.parse_document(markdown)
+
+    document =
+      case find_lowest_heading(document) do
+        lowest_heading when lowest_heading >= base_heading ->
+          document
+
+        lowest_heading ->
+          levels_to_bump = base_heading - lowest_heading
+
+          bump_levels(document, levels_to_bump)
+      end
+
+    ast = [{"document", attributes, document}]
+
+    MDEx.to_commonmark!(ast)
+  end
+
+  defp find_lowest_heading(document) when is_list(document) do
+    Enum.reduce_while(document, 6, fn
+      {"heading", [{"level", 1}, _rest_attributes], _children}, _lowest_level ->
+        {:halt, 1}
+
+      {"heading", [{"level", level}, _rest_attributes], _children}, lowest_level
+      when level < lowest_level ->
+        {:cont, level}
+
+      _, lowest_level ->
+        {:cont, lowest_level}
+    end)
+  end
+
+  defp bump_levels(document, levels_to_bump) when is_list(document) do
+    document
+    |> Enum.reduce([], fn
+      {"heading", [{"level", level}, rest_attributes], children}, acc ->
+        updated_element =
+          {"heading", [{"level", increase_level(level, levels_to_bump)}, rest_attributes],
+           children}
+
+        [updated_element | acc]
+
+      elem, acc ->
+        [elem | acc]
+    end)
+    |> Enum.reverse()
+  end
+
+  defp increase_level(level, levels_to_bump) do
+    min(level + levels_to_bump, 6)
   end
 
   defp id(%{id: mod_id}, %{id: "c:" <> id}) do
@@ -148,13 +210,6 @@ defmodule ExDoc.Formatter.Markdown do
 
   defp id(%{id: mod_id}, %{id: id}) do
     mod_id <> "." <> id
-  end
-
-  defp autolink_and_render(doc, language, autolink_opts, opts) do
-    doc
-    |> language.autolink_doc(autolink_opts)
-    |> ExDoc.DocAST.to_string()
-    |> ExDoc.DocAST.highlight(language, opts)
   end
 
   defp output_setup(build, config) do
@@ -177,7 +232,7 @@ defmodule ExDoc.Formatter.Markdown do
     File.write!(build, entries)
   end
 
-  defp generate_extras(nodes_map, extras, config) do
+  defp generate_extras(extras, config) do
     generated_extras =
       extras
       |> with_prev_next()
@@ -192,7 +247,7 @@ defmodule ExDoc.Formatter.Markdown do
         }
 
         extension = node.source_path && Path.extname(node.source_path)
-        markdown = Templates.extra_template(config, node, extra_type(extension), nodes_map, refs)
+        markdown = Templates.extra_template(config, node, extra_type(extension), refs)
 
         if File.regular?(output) do
           Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
@@ -277,10 +332,8 @@ defmodule ExDoc.Formatter.Markdown do
   end
 
   defp build_api_reference(nodes_map, config) do
-    api_reference = Templates.api_reference_template(nodes_map)
-
-    title_content =
-      ~s{API Reference <small class="app-vsn">#{config.project} v#{config.version}</small>}
+    title = "API Reference"
+    api_reference = Templates.api_reference_template(nodes_map, title)
 
     %{
       content: api_reference,
@@ -288,8 +341,7 @@ defmodule ExDoc.Formatter.Markdown do
       id: "api-reference",
       source_path: nil,
       source_url: config.source_url,
-      title: "API Reference",
-      title_content: title_content
+      title: title
     }
   end
 
@@ -339,7 +391,7 @@ defmodule ExDoc.Formatter.Markdown do
     Map.put(extra, :id, "#{extra.id}-#{discriminator}")
   end
 
-  defp build_extra({input, input_options}, groups, language, autolink_opts, source_url_pattern) do
+  defp build_extra({input, input_options}, groups, _language, _autolink_opts, source_url_pattern) do
     input = to_string(input)
     id = input_options[:filename] || input |> filename_to_title() |> Utils.text_to_id()
     source_file = input_options[:source] || input
@@ -358,7 +410,8 @@ defmodule ExDoc.Formatter.Markdown do
           ast =
             source
             |> Markdown.to_ast(opts)
-            |> sectionize(extension)
+
+          # |> sectionize(extension)
 
           {source, ast}
 
@@ -367,7 +420,7 @@ defmodule ExDoc.Formatter.Markdown do
                 "file extension not recognized, allowed extension is either .cheatmd, .livemd, .md, .txt or no extension"
       end
 
-    {title_ast, ast} =
+    {title_ast, _ast} =
       case ExDoc.DocAST.extract_title(ast) do
         {:ok, title_ast, ast} -> {title_ast, ast}
         :error -> {nil, ast}
@@ -375,7 +428,8 @@ defmodule ExDoc.Formatter.Markdown do
 
     title_text = title_ast && ExDoc.DocAST.text_from_ast(title_ast)
     title_markdown = title_ast && ExDoc.DocAST.to_string(title_ast)
-    content_markdown = autolink_and_render(ast, language, [file: input] ++ autolink_opts, opts)
+    # content_markdown = autolink_and_render(ast, language, [file: input] ++ autolink_opts, opts)
+    content_markdown = source
 
     group = GroupMatcher.match_extra(groups, input)
     title = input_options[:title] || title_text || filename_to_title(input)
@@ -405,15 +459,15 @@ defmodule ExDoc.Formatter.Markdown do
     |> String.downcase()
   end
 
-  defp sectionize(ast, ".cheatmd") do
-    ExDoc.DocAST.sectionize(ast, fn
-      {:h2, _, _, _} -> true
-      {:h3, _, _, _} -> true
-      _ -> false
-    end)
-  end
+  # defp sectionize(ast, ".cheatmd") do
+  #   ExDoc.DocAST.sectionize(ast, fn
+  #     {:h2, _, _, _} -> true
+  #     {:h3, _, _, _} -> true
+  #     _ -> false
+  #   end)
+  # end
 
-  defp sectionize(ast, _), do: ast
+  # defp sectionize(ast, _), do: ast
 
   defp filename_to_title(input) do
     input |> Path.basename() |> Path.rootname()
@@ -466,16 +520,16 @@ defmodule ExDoc.Formatter.Markdown do
     Enum.filter(nodes, &(&1.type == type))
   end
 
-  defp generate_list(nodes, nodes_map, config) do
+  defp generate_list(nodes, config) do
     nodes
-    |> Task.async_stream(&generate_module_page(&1, nodes_map, config), timeout: :infinity)
+    |> Task.async_stream(&generate_module_page(&1, config), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
   end
 
-  defp generate_module_page(module_node, nodes_map, config) do
+  defp generate_module_page(module_node, config) do
     filename = "#{module_node.id}.md"
     config = set_canonical_url(config, filename)
-    content = Templates.module_page(module_node, nodes_map, config)
+    content = Templates.module_page(module_node, config)
     File.write!("#{config.output}/#{filename}", content)
     filename
   end

@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.Markdown.Assets do
   @moduledoc false
 
   defmacrop embed_pattern(pattern) do
-    ["formatters/html", pattern]
+    ["formatters/markdown", pattern]
     |> Path.join()
     |> Path.wildcard()
     |> Enum.map(&{Path.basename(&1), File.read!(&1)})

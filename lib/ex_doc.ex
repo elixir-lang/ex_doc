@@ -43,6 +43,7 @@ defmodule ExDoc do
   defp modname("epub"), do: EPUB
   defp modname("html"), do: HTML
   defp modname("markdown"), do: Markdown
+  defp modname(_), do: nil
 
   defp check_formatter_module(modname, argname) do
     if Code.ensure_loaded?(modname) do
