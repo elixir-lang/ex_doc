@@ -195,7 +195,7 @@ defmodule ExDoc.CLI do
           --canonical           Indicate the preferred URL with rel="canonical" link element
       -c, --config              Give configuration through a file instead of a command line.
                                 See "Custom config" section below for more information.
-      -f, --formatter           Docs formatter to use (html or epub), default: html and epub
+      -f, --formatter           Docs formatter to use (html, epub or markdown), default: html and epub
           --homepage-url        URL to link to for the site name
           --language            Identify the primary language of the documents, its value must be
                                 a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
