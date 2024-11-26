@@ -1,0 +1,18 @@
+<div class="summary-<%= text_to_id(name) %> summary">
+  <h2>
+    <a href="#<%= text_to_id(name) %>"><%= name %></a>
+  </h2>
+  <%= for node <- nodes do %>
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#<%=enc node.id %>" data-no-tooltip translate="no"><%=h node.signature %></a>
+        <%= if deprecated = node.deprecated do %>
+          <span class="deprecated" title="<%= h(deprecated) %>">deprecated</span>
+        <% end %>
+      </div>
+      <%= if doc = node.rendered_doc do %>
+        <div class="summary-synopsis"><%= synopsis(doc) %></div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

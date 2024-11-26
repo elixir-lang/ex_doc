@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="<%= config.language %>">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v<%= ExDoc.version() %>">
+    <meta name="project" content="<%= config.project %> v<%= config.version%>">
+    <%= if config.authors do %>
+      <meta name="author" content="<%= Enum.join(config.authors, ", ") %>">
+    <% end %>
+    <%= if page.noindex do %>
+      <meta name="robots" content="noindex">
+    <% end %>
+    <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
+    <link rel="stylesheet" href="<%= asset_rev config.output, "dist/html-#{config.proglang}*.css" %>" />
+    <%= if page.type == :cheatmd do %>
+      <style>@media print { @page { size: landscape; } }</style>
+    <% end %>
+    <%= if config.canonical do %>
+      <link rel="canonical" href="<%= config.canonical %>" />
+    <% end %>
+    <script src="<%= asset_rev config.output, "dist/handlebars.runtime-*.js" %>"></script>
+    <script src="<%= asset_rev config.output, "dist/handlebars.templates-*.js" %>"></script>
+    <script src="<%= asset_rev config.output, "dist/sidebar_items-*.js" %>"></script>
+    <script src="docs_config.js"></script>
+    <script async src="<%= asset_rev config.output, "dist/html-*.js" %>"></script>
+    <%= before_closing_head_tag(config, :html) %>
+  </head>
+  <body data-type="<%= sidebar_type(page.type) %>" class="page-<%= page.type %>">
+    <script>
+      <% # Immediately apply night mode preference to avoid a flash effect %>
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>

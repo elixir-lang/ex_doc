@@ -1,0 +1,44 @@
+    <footer class="footer">
+      <p>
+        <%= if config.package do %>
+          <span class="line">
+            <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>">Hex Preview</a>
+
+            <%= source_path = node && Map.get(node, :source_path); if source_path do %>
+              (<a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>/show/<%= source_path %>">current file</a>)
+            <% end %>
+          </span>
+        <% end %>
+
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
+
+          <%= if "epub" in config.formatters do %>
+            <a href="<%= config.project %>.epub" title="ePub version">
+              Download ePub version
+            </a>
+          <% end %>
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v<%= ExDoc.version() %>) for the
+        <%= if config.proglang == :erlang do %>
+          <a href="https://erlang.org" title="Erlang" target="_blank" translate="no">Erlang programming language</a>
+        <% else %>
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+        <% end %>
+      </p>
+      <%= before_closing_footer_tag(config, :html) %>
+    </footer>
+  </div>
+</main>
+</div>
+  <%= before_closing_body_tag(config, :html) %>
+  </body>
+</html>

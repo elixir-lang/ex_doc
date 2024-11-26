@@ -1,0 +1,60 @@
+<%= head_template(config, %{title: node.title, type: type, noindex: false}) %>
+<%= sidebar_template(config, nodes_map) %>
+
+<div id="top-content">
+  <h1>
+    <%= if node.source_url do %>
+      <a href="<%= node.source_url %>" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+    <% end %>
+    <%= if type == :cheatmd do %>
+      <button onclick="window.print()" title="Print Cheatsheet" class="icon-action" rel="print">
+        <i class="ri-printer-line" aria-hidden="true"></i>
+        <span class="sr-only">Print cheatsheet</span>
+      </button>
+    <% end %>
+
+    <span><%= node.title_content %></span>
+  </h1>
+
+  <%= if type == :livemd do %>
+    <div class="livebook-badge-container">
+      <a href="#" class="livebook-badge">
+        <img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />
+      </a>
+    </div>
+  <% end %>
+
+  <%= link_headings(node.content) %>
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+    <%= if refs.prev do %>
+      <a href="<%= refs.prev.path %>" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+          <%= refs.prev.title %>
+        </span>
+      </a>
+    <% end %>
+  </div>
+  <div class="bottom-actions-item">
+    <%= if refs.next do %>
+      <a href="<%= refs.next.path %>" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+          <%= refs.next.title %>
+        </span>
+      </a>
+    <% end %>
+  </div>
+</div>
+
+<%= footer_template(config, node) %>
