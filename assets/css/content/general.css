@@ -176,7 +176,7 @@
   margin-top: 0.1em;
   margin-left: calc(-1 * (var(--icon-size) + var(--icon-spacing)));
   padding-right: var(--icon-spacing);
-  opacity: 0.3;
+  opacity: 0;
 }
 
 .content-inner :is(blockquote, section.admonition) .section-heading i {
