@@ -109,6 +109,18 @@
   display: none;
 }
 
+.sidebar .sidebar-projectVersionsLatestLink {
+  border-left: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
+  padding: 0 10px;
+  background-color: var(--sidebarAccentMain);
+}
+
+.sidebar .sidebar-projectVersionsLatestLink a {
+  color: var(--sidebarBackground);
+  font-weight: bold;
+  ;
+}
+
 .sidebar .sidebar-listNav {
   display: flex;
   margin: 0;
