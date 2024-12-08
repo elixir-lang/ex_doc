@@ -64,7 +64,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
     Regex.replace(~r|(<[^>]*) id="[^"]*"([^>]*>)|, doc, ~S"\1\2", [])
   end
 
-  defp enc(binary), do: URI.encode(binary)
+  defp presence([]), do: nil
+  defp presence(other), do: other
+
+  def enc(binary), do: URI.encode(binary)
 
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area

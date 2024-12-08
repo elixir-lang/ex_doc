@@ -1,0 +1,21 @@
+# <%=h node.signature %>
+
+<%= if node.source_url do %>
+[View Source](<%= node.source_url %>)
+<% end %>
+
+<%= for annotation <- node.annotations do %>
+> (<%= annotation %>)
+<% end %>
+
+<%= if deprecated = node.deprecated do %>
+> This <%= node.type %> is deprecated. <%= h(deprecated) %>.
+<% end %>
+
+<%= if specs = H.get_specs(node) do %>
+<%= for spec <- specs do %>
+> <%= H.format_spec_attribute(module, node) %> <%= spec %>
+<% end %>
+<% end %>
+
+<%= link_detail_headings(node_doc(node), H.enc(node.id)) %>
