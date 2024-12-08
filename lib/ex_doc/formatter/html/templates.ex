@@ -93,7 +93,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp presence([]), do: nil
   defp presence(other), do: other
 
-  defp enc(binary), do: URI.encode(binary)
+  def enc(binary), do: URI.encode(binary)
 
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
