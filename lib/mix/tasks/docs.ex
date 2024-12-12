@@ -404,7 +404,7 @@ defmodule Mix.Tasks.Docs do
           browser_open(index)
         end
 
-        if options[:warnings_as_errors] == true and ExDoc.Utils.warned?() do
+        if options[:warnings_as_errors] == true and ExDoc.Utils.unset_warned() do
           {:error, %{reason: :warnings_as_errors, formatter: formatter}}
         else
           {:ok, index}

@@ -12,8 +12,6 @@ defmodule ExDoc.Formatter.HTML do
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
-    Utils.unset_warned()
-
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
 

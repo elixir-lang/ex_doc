@@ -266,7 +266,7 @@ defmodule ExDoc.Formatter.EPUBTest do
         assert output =~ ~S|doc `Warnings.bar/0`|
       end
 
-      assert Utils.warned?() == true
+      assert Utils.unset_warned()
     end
 
     test "warnings are registered even with warnings_as_errors: false", context do
@@ -281,7 +281,7 @@ defmodule ExDoc.Formatter.EPUBTest do
         )
       end)
 
-      assert Utils.warned?() == true
+      assert Utils.unset_warned()
     end
   end
 end

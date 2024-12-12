@@ -158,7 +158,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       assert output =~
                ~r"warning:(\e\[0m)? .*index.html redirects to DoesNotExist.html, which does not exist\n"
 
-      assert Utils.warned?() == true
+      assert Utils.unset_warned()
     end
 
     test "multiple warnings are registered when using warnings_as_errors: true", context do
@@ -182,7 +182,7 @@ defmodule ExDoc.Formatter.HTMLTest do
         assert output =~ ~S|doc `Warnings.bar/0`|
       end
 
-      assert Utils.warned?() == true
+      assert Utils.unset_warned()
     end
 
     test "warnings are registered even with warnings_as_errors: false", context do
@@ -197,7 +197,7 @@ defmodule ExDoc.Formatter.HTMLTest do
         )
       end)
 
-      assert Utils.warned?() == true
+      assert Utils.unset_warned()
     end
   end
 

@@ -12,8 +12,6 @@ defmodule ExDoc.Formatter.EPUB do
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
-    Utils.unset_warned()
-
     config = normalize_config(config)
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))

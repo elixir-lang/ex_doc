@@ -5,35 +5,17 @@ defmodule ExDoc.Utils do
   Emits a warning.
   """
   def warn(message, stacktrace_info) do
-    set_warned()
+    :persistent_term.put({__MODULE__, :warned?}, true)
     IO.warn(message, stacktrace_info)
   end
 
   @doc """
-  Stores that a warning has been generated.
-  """
-  def set_warned() do
-    unless warned?() do
-      :persistent_term.put({__MODULE__, :warned?}, true)
-    end
-
-    true
-  end
-
-  @doc """
-  Removes that a warning has been generated.
+  Removes that a warning has been generated and returns its previous value.
   """
   def unset_warned() do
-    if warned?() do
-      :persistent_term.put({__MODULE__, :warned?}, false)
-    end
-  end
-
-  @doc """
-  Returns `true` if any warning has been generated during the document building. Otherwise returns `false`.
-  """
-  def warned?() do
-    :persistent_term.get({__MODULE__, :warned?}, false)
+    warned? = :persistent_term.get({__MODULE__, :warned?}, false)
+    :persistent_term.erase({__MODULE__, :warned?})
+    warned?
   end
 
   @doc """

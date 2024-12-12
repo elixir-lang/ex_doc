@@ -92,7 +92,7 @@ defmodule ExDoc.CLI do
       quiet? ||
         IO.puts(IO.ANSI.format([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"]))
 
-      if opts[:warnings_as_errors] == true and ExDoc.Utils.warned?() do
+      if opts[:warnings_as_errors] == true and ExDoc.Utils.unset_warned() do
         {:error, %{reason: :warnings_as_errors, formatter: formatter}}
       else
         {:ok, index}
