@@ -17,7 +17,7 @@ Code.prepend_path("test/tmp/beam")
 # Compile module fixtures
 "test/fixtures/*.ex"
 |> Path.wildcard()
-|> Kernel.ParallelCompiler.compile_to_path("test/tmp/beam")
+|> Kernel.ParallelCompiler.compile_to_path("test/tmp/beam", return_diagnostics: true)
 
 defmodule TestHelper do
   def elixirc(context, filename \\ "nofile", code) do
@@ -29,7 +29,10 @@ defmodule TestHelper do
 
     ebin_dir = Path.join(dir, "ebin")
     File.mkdir_p!(ebin_dir)
-    {:ok, modules, []} = Kernel.ParallelCompiler.compile_to_path([src_path], ebin_dir)
+
+    {:ok, modules, _} =
+      Kernel.ParallelCompiler.compile_to_path([src_path], ebin_dir, return_diagnostics: true)
+
     true = Code.prepend_path(ebin_dir)
 
     ExUnit.Callbacks.on_exit(fn ->
