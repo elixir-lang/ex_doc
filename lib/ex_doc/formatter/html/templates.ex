@@ -203,13 +203,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   def module_summary(module_node) do
-    entries = docs_groups(module_node.docs_groups, module_node.docs ++ module_node.typespecs)
-
-    Enum.reject(entries, fn {_type, nodes} -> nodes == [] end)
-  end
-
-  defp docs_groups(groups, docs) do
-    for group <- groups, do: {group, Enum.filter(docs, &(&1.group == group))}
+    # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
+    ExDoc.GroupMatcher.group_by(
+      module_node.docs_groups,
+      module_node.docs ++ module_node.typespecs,
+      & &1.group
+    )
   end
 
   defp logo_path(%{logo: nil}), do: nil

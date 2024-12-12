@@ -2,8 +2,18 @@ defmodule ExDoc.GroupMatcherTest do
   use ExUnit.Case, async: true
   import ExDoc.GroupMatcher
 
+  describe "group_by" do
+    test "group by given data with leftovers" do
+      assert group_by([1, 3, 5], [%{key: 1}, %{key: 3}, %{key: 2}], & &1.key) == [
+               {1, [%{key: 1}]},
+               {3, [%{key: 3}]},
+               {2, [%{key: 2}]}
+             ]
+    end
+  end
+
   describe "module matching" do
-    test "match modules by their atom names" do
+    test "by atom names" do
       patterns = [
         Group: [MyApp.SomeModule, :lists]
       ]
@@ -22,7 +32,7 @@ defmodule ExDoc.GroupMatcherTest do
                nil
     end
 
-    test "match modules by their string names" do
+    test "by string names" do
       patterns = [
         Group: ["MyApp.SomeModule", ":lists"]
       ]
@@ -36,7 +46,7 @@ defmodule ExDoc.GroupMatcherTest do
                nil
     end
 
-    test "match modules by regular expressions" do
+    test "by regular expressions" do
       patterns = [
         Group: ~r/MyApp\..?/
       ]
@@ -53,7 +63,7 @@ defmodule ExDoc.GroupMatcherTest do
   end
 
   describe "extras matching" do
-    test "it can match extra files by their string names" do
+    test "by string names" do
       patterns = [
         Group: ["docs/handling/testing.md"]
       ]
@@ -62,7 +72,7 @@ defmodule ExDoc.GroupMatcherTest do
       assert match_extra(patterns, "docs/handling/setup.md") == nil
     end
 
-    test "it can match extra files by regular expressions" do
+    test "by regular expressions" do
       patterns = [
         Group: ~r/docs\/handling?/
       ]

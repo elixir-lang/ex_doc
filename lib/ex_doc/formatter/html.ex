@@ -383,7 +383,7 @@ defmodule ExDoc.Formatter.HTML do
       if ids_count[extra.id] > 1, do: {disambiguate_id(extra, idx), idx + 1}, else: {extra, idx}
     end)
     |> elem(0)
-    |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
+    |> Enum.sort_by(fn extra -> GroupMatcher.index(groups, extra.group) end)
   end
 
   def generate_redirects(config, ext) do

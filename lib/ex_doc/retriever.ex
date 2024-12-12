@@ -69,7 +69,7 @@ defmodule ExDoc.Retriever do
 
   defp sort_modules(modules, config) when is_list(modules) do
     Enum.sort_by(modules, fn module ->
-      {GroupMatcher.group_index(config.groups_for_modules, module.group), module.nested_context,
+      {GroupMatcher.index(config.groups_for_modules, module.group), module.nested_context,
        module.nested_title, module.id}
     end)
   end
@@ -135,21 +135,14 @@ defmodule ExDoc.Retriever do
     {doc_line, doc_file, format, source_doc, doc, metadata} = get_module_docs(module_data, source)
 
     # TODO: The default function groups must be returned by the language
-    groups_for_docs =
-      config.groups_for_docs ++
-        [
-          Types: &(&1[:kind] in [:type, :opaque, :nominal]),
-          Callbacks: &(&1[:kind] in [:callback, :macrocallback]),
-          Functions: fn _ -> true end
-        ]
-
+    groups_for_docs = config.groups_for_docs
     annotations_for_docs = config.annotations_for_docs
 
-    docs_groups = Enum.map(groups_for_docs, &elem(&1, 0)) |> Enum.uniq()
-    function_docs = get_docs(module_data, source, groups_for_docs, annotations_for_docs)
+    docs_groups =
+      Enum.uniq(Enum.map(groups_for_docs, &elem(&1, 0)) ++ [:Types, :Callbacks, :Functions])
 
     docs =
-      function_docs ++
+      get_docs(module_data, source, groups_for_docs, annotations_for_docs) ++
         get_callbacks(module_data, source, groups_for_docs, annotations_for_docs)
 
     types = get_types(module_data, source, groups_for_docs, annotations_for_docs)
@@ -259,7 +252,7 @@ defmodule ExDoc.Retriever do
       (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
         function_data.doc_fallback.()
 
-    group = GroupMatcher.match_function(groups_for_docs, metadata)
+    group = GroupMatcher.match_doc(groups_for_docs, metadata) || :Functions
 
     %ExDoc.FunctionNode{
       id: nil_or_name(name, arity),
@@ -342,11 +335,7 @@ defmodule ExDoc.Retriever do
       doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
         doc_fallback(callback_data)
 
-    group =
-      GroupMatcher.match_function(
-        groups_for_docs,
-        metadata
-      )
+    group = GroupMatcher.match_doc(groups_for_docs, metadata) || :Callbacks
 
     %ExDoc.FunctionNode{
       id: "c:" <> nil_or_name(name, arity),
@@ -403,11 +392,7 @@ defmodule ExDoc.Retriever do
       doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
         doc_fallback(type_data)
 
-    group =
-      GroupMatcher.match_function(
-        groups_for_docs,
-        metadata
-      )
+    group = GroupMatcher.match_doc(groups_for_docs, metadata) || :Types
 
     %ExDoc.TypeNode{
       id: "t:" <> nil_or_name(name, arity),
