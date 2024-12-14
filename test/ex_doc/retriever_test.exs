@@ -50,15 +50,15 @@ defmodule ExDoc.RetrieverTest do
 
       config = %ExDoc.Config{
         groups_for_modules: [
-          "Group 1": [Foo, Bar],
-          "Group 2": [Baz]
+          {"Group 1", [Foo, Bar]},
+          {"Group 2", [Baz]}
         ]
       }
 
       {[qux, bar, foo, baz], []} = Retriever.docs_from_modules([Foo, Bar, Baz, Qux], config)
-      assert %{module: Foo, group: :"Group 1"} = foo
-      assert %{module: Bar, group: :"Group 1"} = bar
-      assert %{module: Baz, group: :"Group 2"} = baz
+      assert %{module: Foo, group: "Group 1"} = foo
+      assert %{module: Bar, group: "Group 1"} = bar
+      assert %{module: Baz, group: "Group 2"} = baz
       assert %{module: Qux, group: nil} = qux
     end
 
@@ -78,17 +78,63 @@ defmodule ExDoc.RetrieverTest do
 
       config = %ExDoc.Config{
         groups_for_docs: [
-          "Group 1": &(&1.group == 1),
-          "Group 2": &(&1.group == 2)
+          {"Group 1", &(&1.group == 1)},
+          {"Group 2", &(&1.group == 2)}
         ]
       }
 
       {[mod], []} = Retriever.docs_from_modules([A], config)
       [bar, baz, foo] = mod.docs
 
-      assert %{id: "foo/0", group: :"Group 1"} = foo
-      assert %{id: "bar/0", group: :"Group 1"} = bar
-      assert %{id: "baz/0", group: :"Group 2"} = baz
+      assert %{id: "foo/0", group: "Group 1"} = foo
+      assert %{id: "bar/0", group: "Group 1"} = bar
+      assert %{id: "baz/0", group: "Group 2"} = baz
+    end
+
+    test "function groups use :group metadata", c do
+      elixirc(c, ~S"""
+      defmodule A do
+        @doc group: "a"
+        @callback foo() :: :ok
+
+        @doc group: "b"
+        def bar(), do: :ok
+
+        @doc group: "c"
+        def baz(), do: :ok
+      end
+      """)
+
+      config = %ExDoc.Config{}
+      {[mod], []} = Retriever.docs_from_modules([A], config)
+      [bar, baz, foo] = mod.docs
+
+      assert %{id: "c:foo/0", group: "a"} = foo
+      assert %{id: "bar/0", group: "b"} = bar
+      assert %{id: "baz/0", group: "c"} = baz
+    end
+
+    test "function groups use default_group_for_doc", c do
+      elixirc(c, ~S"""
+      defmodule A do
+        @doc semi_group: "a"
+        @callback foo() :: :ok
+
+        @doc semi_group: "b"
+        def bar(), do: :ok
+
+        @doc semi_group: "c"
+        def baz(), do: :ok
+      end
+      """)
+
+      config = %ExDoc.Config{default_group_for_doc: & &1[:semi_group]}
+      {[mod], []} = Retriever.docs_from_modules([A], config)
+      [bar, baz, foo] = mod.docs
+
+      assert %{id: "c:foo/0", group: "a"} = foo
+      assert %{id: "bar/0", group: "b"} = bar
+      assert %{id: "baz/0", group: "c"} = baz
     end
 
     test "function annotations", c do

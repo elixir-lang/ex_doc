@@ -48,7 +48,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                defaults: [],
                deprecated: nil,
                doc_line: 5,
-               group: :Functions,
+               group: "Functions",
                id: "function/0",
                name: :function,
                rendered_doc: nil,
@@ -136,7 +136,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert callback1.type == :callback
       assert callback1.annotations == []
       assert callback1.doc_line == 2
-      assert callback1.group == :Callbacks
+      assert callback1.group == "Callbacks"
       assert Path.basename(callback1.source_url) == "nofile:3"
       assert DocAST.to_string(callback1.doc) == "<p>callback1/0 docs.</p>"
       assert Macro.to_string(callback1.specs) == "[callback1() :: :ok]"
@@ -146,7 +146,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert optional_callback1.type == :callback
       assert optional_callback1.annotations == ["optional"]
       assert optional_callback1.doc_line == 5
-      assert optional_callback1.group == :Callbacks
+      assert optional_callback1.group == "Callbacks"
       assert Path.basename(optional_callback1.source_url) == "nofile:5"
       refute optional_callback1.doc
       assert Macro.to_string(optional_callback1.specs) == "[optional_callback1() :: :ok]"
@@ -156,7 +156,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert macrocallback1.type == :macrocallback
       assert macrocallback1.annotations == []
       assert macrocallback1.doc_line == 9
-      assert macrocallback1.group == :Callbacks
+      assert macrocallback1.group == "Callbacks"
       assert Path.basename(macrocallback1.source_url) == "nofile:9"
       refute macrocallback1.doc
       assert Macro.to_string(macrocallback1.specs) == "[macrocallback1() :: :ok]"
@@ -207,7 +207,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert type1.id == "t:type1/0"
       assert type1.signature == "type1()"
       assert type1.type == :type
-      assert type1.group == :Types
+      assert type1.group == "Types"
       assert type1.annotations == []
       assert type1.doc_line == 2
       assert DocAST.to_string(type1.doc) == "<p>type1/0 docs.</p>"
@@ -216,7 +216,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.signature == "opaque1()"
       assert opaque1.type == :opaque
-      assert opaque1.group == :Types
+      assert opaque1.group == "Types"
       assert opaque1.doc_line == 5
       assert opaque1.doc |> DocAST.to_string() == ~s|<p>opaque1/0 docs.</p>|
       assert opaque1.spec |> Macro.to_string() == "opaque1()"

@@ -8,22 +8,38 @@ defmodule ExDoc.GroupMatcher do
   @doc """
   Finds the index of a given group.
   """
-  def group_index(groups, group) do
+  def index(groups, group) do
     Enum.find_index(groups, fn {k, _v} -> k == group end) || -1
+  end
+
+  @doc """
+  Group the following entries and while preserving the order in `groups`.
+  """
+  def group_by(groups, entries, by) do
+    entries = Enum.group_by(entries, by)
+
+    {groups, leftovers} =
+      Enum.flat_map_reduce(groups, entries, fn group, grouped_nodes ->
+        case Map.pop(grouped_nodes, group, []) do
+          {[], grouped_nodes} -> {[], grouped_nodes}
+          {entries, grouped_nodes} -> {[{group, entries}], grouped_nodes}
+        end
+      end)
+
+    groups ++ Enum.sort(leftovers)
   end
 
   @doc """
   Finds a matching group for the given function.
   """
-  @spec match_function(group_patterns, map) :: atom() | nil
-  def match_function(group_patterns, metadata) do
-    match_group_patterns(group_patterns, fn pattern -> pattern.(metadata) end)
+  def match_doc(group_patterns, callback, default, metadata) do
+    match_group_patterns(group_patterns, fn pattern -> pattern.(metadata) end) ||
+      callback.(metadata) || default
   end
 
   @doc """
   Finds a matching group for the given module name, id, and metadata.
   """
-  @spec match_module(group_patterns, module, binary, map) :: atom() | nil
   def match_module(group_patterns, module, id, metadata) do
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do
@@ -38,7 +54,6 @@ defmodule ExDoc.GroupMatcher do
   @doc """
   Finds a matching group for the given extra filename
   """
-  @spec match_extra(group_patterns, binary) :: atom() | nil
   def match_extra(group_patterns, filename) do
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do

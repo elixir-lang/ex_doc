@@ -124,7 +124,8 @@ defmodule Mix.Tasks.Docs do
 
     * `:formatters` - Formatter to use; default: ["html", "epub"], options: "html", "epub".
 
-    * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_docs` - See the "Groups" section
+    * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_docs`, and `:default_group_for_doc` -
+      See the "Groups" section
 
     * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
@@ -245,15 +246,41 @@ defmodule Mix.Tasks.Docs do
 
   A regex or the string name of the module is also supported.
 
-  ### Grouping functions and callbacks
+  ### Grouping functions, types, and callbacks
 
-  Functions and callbacks inside a module can also be organized in groups.
-  This is done via the `:groups_for_docs` configuration which is a
-  keyword list of group titles and filtering functions that receive the
-  documentation metadata of functions as argument. The metadata received will also
-  contain `:module`, `:name`, `:arity` and `:kind` to help identify which entity is
-  currently being processed.
+  Types, functions, and callbacks inside a module can also be organized in groups.
+  By default, ExDoc respects the `:group` metadata field:
 
+      @doc group: "Queries"
+      def get_by(schema, fields)
+
+  The function above will be automatically listed under the "Queries" section in
+  the sidebar. The benefit of using `:group` is that it can also be used by tools
+  such as IEx during autocompletion. These groups are then ordered alphabetically
+  in the sidebar.
+
+  It is also possible to tell ExDoc to either enrich the group metadata or lookup a
+  different field via the `:default_group_for_doc` configuration. The default is:
+
+      default_group_for_doc: fn metadata -> metadata[:group] end
+
+  The `metadata` received contains all of the documentation metadata, such as `:group`,
+  but also `:module`, `:name`, `:arity` and `:kind` to help identify which entity is
+  currently being processed. For example, projects like Nx have a custom function that
+  converts "Queries" into "Function: Queries":
+
+      default_group_for_doc: fn metadata ->
+        if group = metadata[:group] do
+          "Functions: #{group}"
+        end
+      end
+
+  Whenever using the `:group` key, the groups will be ordered alphabetically.
+  If you also want control over the group order, you can also use the `:groups_for_docs`
+  which works similarly as the one for modules/extra pages.
+
+  `:groups_for_docs` is a keyword list of group titles and filtering functions
+  that receive the documentation metadata and must return a boolean.
   For example, imagine that you have an API client library with a large surface
   area for all the API endpoints you need to support. It would be helpful to
   group the functions with similar responsibilities together. In this case in
@@ -278,10 +305,11 @@ defmodule Mix.Tasks.Docs do
         Admin: & &1[:permission] in [:grant, :write]
       ]
 
-  A function can belong to a single group only. If multiple group filters match,
-  the first will take precedence. Functions and callbacks that don't have a
-  custom group will be listed under the default "Functions" and "Callbacks"
-  group respectively.
+  A function can belong to a single group only. The first group that matches
+  will be the one used. In case no group is found in `:groups_for_docs`,
+  the `:default_group_for_doc` callback is invoked. If it returns nil, it
+  then falls back to the appropriate "Functions", "Types" or "Callbacks"
+  section respectively.
 
   ## Meta-tags configuration
 

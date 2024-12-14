@@ -8,7 +8,7 @@ defmodule ExDoc.Language.Erlang do
 
   @impl true
   @spec module_data(atom, any, any) ::
-          :skip
+          false
           | %{
               callback_types: [:callback, ...],
               docs: any,
@@ -54,7 +54,7 @@ defmodule ExDoc.Language.Erlang do
       }
     else
       ExDoc.Utils.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
-      :skip
+      false
     end
   end
 
@@ -68,7 +68,7 @@ defmodule ExDoc.Language.Erlang do
          function_exported?(module_data.module, name, arity) do
       function_data(name, arity, doc_content, module_data, metadata)
     else
-      :skip
+      false
     end
   end
 
