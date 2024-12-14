@@ -124,7 +124,8 @@ defmodule Mix.Tasks.Docs do
 
     * `:formatters` - Formatter to use; default: ["html", "epub"], options: "html", "epub".
 
-    * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_docs` - See the "Groups" section
+    * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_docs`, and `:default_group_for_doc` -
+      See the "Groups" section
 
     * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
