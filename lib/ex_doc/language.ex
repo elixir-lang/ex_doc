@@ -49,10 +49,10 @@ defmodule ExDoc.Language do
   @doc """
   Returns a map with module information.
   """
-  @callback module_data(module(), tuple(), ExDoc.Config.t()) :: module_data() | :skip
+  @callback module_data(module(), tuple(), ExDoc.Config.t()) :: module_data() | false
 
   @doc """
-  Returns a map with function information or an atom `:skip`.
+  Returns a map with function information or `false`.
 
   The map has the following keys:
 
@@ -78,7 +78,7 @@ defmodule ExDoc.Language do
                 doc_fallback: (... -> ExDoc.DocAST.t()) | nil,
                 extra_annotations: [String.t()]
               }
-              | :skip
+              | false
 
   @doc """
   Returns a map with callback information.

@@ -55,7 +55,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         moduledoc_line: 2,
         moduledoc_file: moduledoc_file,
         docs: [equiv_function2, function1, function2],
-        docs_groups: [:Types, :Callbacks, :Functions],
+        docs_groups: ["Types", "Callbacks", "Functions"],
         group: nil,
         id: "mod",
         language: ExDoc.Language.Erlang,
@@ -80,7 +80,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         deprecated: nil,
         doc_line: 5,
         doc_file: _,
-        group: :Functions,
+        group: "Functions",
         id: "function1/0",
         name: :function1,
         rendered_doc: nil,
@@ -157,7 +157,7 @@ defmodule ExDoc.Retriever.ErlangTest do
                moduledoc_line: 6,
                moduledoc_file: moduledoc_file,
                docs: [callback, function],
-               docs_groups: [:Types, :Callbacks, :Functions],
+               docs_groups: ["Types", "Callbacks", "Functions"],
                group: nil,
                id: "mod",
                language: ExDoc.Language.Erlang,
@@ -182,7 +182,7 @@ defmodule ExDoc.Retriever.ErlangTest do
                deprecated: nil,
                doc_line: 2,
                doc_file: _,
-               group: :Functions,
+               group: "Functions",
                id: "function/0",
                name: :function,
                rendered_doc: nil,
@@ -251,7 +251,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert callback1.id == "c:callback1/0"
       assert callback1.type == :callback
       assert callback1.annotations == []
-      assert callback1.group == :Callbacks
+      assert callback1.group == "Callbacks"
       assert DocAST.to_string(callback1.doc) =~ "callback1/0 docs."
       assert Path.basename(callback1.source_url) == "mod.erl:4"
 
@@ -261,7 +261,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert equiv_callback1.id == "c:equiv_callback1/0"
       assert equiv_callback1.type == :callback
       assert equiv_callback1.annotations == []
-      assert equiv_callback1.group == :Callbacks
+      assert equiv_callback1.group == "Callbacks"
 
       assert DocAST.to_string(equiv_callback1.doc) =~
                ~r'Equivalent to <a href="`c:callback1/0`"><code[^>]+>callback1().*\.'
@@ -270,7 +270,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert optional_callback1.id == "c:optional_callback1/0"
       assert optional_callback1.type == :callback
-      assert optional_callback1.group == :Callbacks
+      assert optional_callback1.group == "Callbacks"
       assert optional_callback1.annotations == ["optional"]
     end
 
@@ -298,7 +298,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
-      assert opaque1.group == :Types
+      assert opaque1.group == "Types"
       assert opaque1.signature == "opaque1()"
       assert opaque1.doc |> DocAST.to_string() =~ "opaque1/0 docs."
 
@@ -307,7 +307,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert nominal1.id == "t:nominal1/0"
       assert nominal1.type == @nominal_type
-      assert nominal1.group == :Types
+      assert nominal1.group == "Types"
       assert nominal1.signature == "nominal1()"
       assert nominal1.doc |> DocAST.to_string() =~ "nominal1/0 docs."
 
@@ -316,7 +316,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert type1.id == "t:type1/0"
       assert type1.type == :type
-      assert type1.group == :Types
+      assert type1.group == "Types"
       assert type1.signature == "type1()"
       assert type1.doc |> DocAST.to_string() =~ "type1/0 docs."
 
@@ -325,7 +325,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert equiv_type1.id == "t:equiv_type1/0"
       assert equiv_type1.type == :type
-      assert equiv_type1.group == :Types
+      assert equiv_type1.group == "Types"
       assert equiv_type1.signature == "equiv_type1()"
       assert equiv_type1.doc |> DocAST.to_string() =~ ~r'Equivalent to .*t:type1/1.*\.'
     end
@@ -401,7 +401,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         deprecated: nil,
         moduledoc_line: _,
         docs: [function1, function2],
-        docs_groups: [:Types, :Callbacks, :Functions],
+        docs_groups: ["Types", "Callbacks", "Functions"],
         group: nil,
         id: "mod",
         language: ExDoc.Language.Erlang,
@@ -425,7 +425,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         deprecated: nil,
         doc_line: _,
         doc_file: _,
-        group: :Functions,
+        group: "Functions",
         id: "function1/0",
         name: :function1,
         rendered_doc: nil,
@@ -523,7 +523,7 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert nominal1.id == "t:nominal1/0"
       assert nominal1.type == @nominal_type
-      assert nominal1.group == :Types
+      assert nominal1.group == "Types"
       assert nominal1.signature == "nominal1/0"
       assert nominal1.doc |> DocAST.to_string() =~ "nominal1/0 docs."
 

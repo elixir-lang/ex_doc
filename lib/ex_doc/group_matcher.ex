@@ -32,15 +32,14 @@ defmodule ExDoc.GroupMatcher do
   @doc """
   Finds a matching group for the given function.
   """
-  @spec match_doc(group_patterns, map) :: atom() | nil
-  def match_doc(group_patterns, metadata) do
-    match_group_patterns(group_patterns, fn pattern -> pattern.(metadata) end)
+  def match_doc(group_patterns, callback, default, metadata) do
+    match_group_patterns(group_patterns, fn pattern -> pattern.(metadata) end) ||
+      callback.(metadata) || default
   end
 
   @doc """
   Finds a matching group for the given module name, id, and metadata.
   """
-  @spec match_module(group_patterns, module, binary, map) :: atom() | nil
   def match_module(group_patterns, module, id, metadata) do
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do
@@ -55,7 +54,6 @@ defmodule ExDoc.GroupMatcher do
   @doc """
   Finds a matching group for the given extra filename
   """
-  @spec match_extra(group_patterns, binary) :: atom() | nil
   def match_extra(group_patterns, filename) do
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do

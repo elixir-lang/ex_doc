@@ -3,6 +3,7 @@ defmodule ExDoc.Config do
 
   # Defaults
   @default_source_ref "main"
+  def default_group_for_doc(metadata), do: metadata[:group]
   def filter_modules(_module, _metadata), do: true
   def before_closing_head_tag(_), do: ""
   def before_closing_footer_tag(_), do: ""
@@ -21,6 +22,7 @@ defmodule ExDoc.Config do
             before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
             canonical: nil,
             cover: nil,
+            default_group_for_doc: &__MODULE__.default_group_for_doc/1,
             deps: [],
             extra_section: nil,
             extras: [],
@@ -63,15 +65,16 @@ defmodule ExDoc.Config do
           before_closing_head_tag: (atom() -> String.t()) | mfa() | map(),
           canonical: nil | String.t(),
           cover: nil | Path.t(),
+          default_group_for_doc: (keyword() -> String.t() | nil),
           deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
           extra_section: nil | String.t(),
           extras: list(),
           filter_modules: (module, map -> boolean),
           formatter: nil | String.t(),
           formatters: [String.t()],
-          groups_for_extras: keyword(),
-          groups_for_docs: keyword((keyword() -> boolean)),
-          groups_for_modules: keyword(),
+          groups_for_extras: [{binary(), term()}],
+          groups_for_docs: [{binary(), (keyword() -> boolean)}],
+          groups_for_modules: [{binary(), term()}],
           homepage_url: nil | String.t(),
           language: String.t(),
           logo: nil | Path.t(),
@@ -96,7 +99,6 @@ defmodule ExDoc.Config do
   @spec build(String.t(), String.t(), Keyword.t()) :: ExDoc.Config.t()
   def build(project, vsn, options) do
     {output, options} = Keyword.pop(options, :output, "./doc")
-    {groups_for_modules, options} = Keyword.pop(options, :groups_for_modules, [])
     {nest_modules_by_prefix, options} = Keyword.pop(options, :nest_modules_by_prefix, [])
     {proglang, options} = Keyword.pop(options, :proglang, :elixir)
     {filter_modules, options} = Keyword.pop(options, :filter_modules, &filter_modules/2)
@@ -108,6 +110,10 @@ defmodule ExDoc.Config do
       else
         options
       end
+
+    {groups_for_docs, options} = Keyword.pop(options, :groups_for_docs, [])
+    {groups_for_extras, options} = Keyword.pop(options, :groups_for_extras, [])
+    {groups_for_modules, options} = Keyword.pop(options, :groups_for_modules, [])
 
     {skip_undefined_reference_warnings_on, options} =
       Keyword.pop(
@@ -126,7 +132,13 @@ defmodule ExDoc.Config do
 
     preconfig = %__MODULE__{
       filter_modules: normalize_filter_modules(filter_modules),
-      groups_for_modules: normalize_groups_for_modules(groups_for_modules),
+      groups_for_docs: normalize_groups(groups_for_docs),
+      groups_for_extras: normalize_groups(groups_for_extras),
+      groups_for_modules:
+        normalize_groups(
+          # TODO: The default module groups must be returned by the language
+          groups_for_modules ++ [Deprecated: &deprecated?/1, Exceptions: &exception?/1]
+        ),
       homepage_url: options[:homepage_url],
       main: options[:main],
       nest_modules_by_prefix: normalize_nest_modules_by_prefix(nest_modules_by_prefix),
@@ -159,12 +171,8 @@ defmodule ExDoc.Config do
     raise ArgumentError, "#{inspect(proglang)} is not supported"
   end
 
-  # TODO: The default module groups must be returned by the language
-  defp normalize_groups_for_modules(groups_for_modules) do
-    default_groups = [Deprecated: &deprecated?/1, Exceptions: &exception?/1]
-
-    groups_for_modules ++
-      Enum.reject(default_groups, fn {k, _} -> Keyword.has_key?(groups_for_modules, k) end)
+  defp normalize_groups(groups) do
+    for {k, v} <- groups, do: {to_string(k), v}
   end
 
   defp deprecated?(metadata), do: metadata[:deprecated] != nil

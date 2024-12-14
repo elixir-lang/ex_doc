@@ -8,7 +8,7 @@ defmodule ExDoc.Language.Elixir do
 
   @impl true
   @spec module_data(atom, any, any) ::
-          :skip
+          false
           | %{
               callback_types: [:callback, ...],
               docs: any,
@@ -34,7 +34,7 @@ defmodule ExDoc.Language.Elixir do
 
     cond do
       skip ->
-        :skip
+        false
 
       abst_code = Source.get_abstract_code(module) ->
         title = module_title(module, type)
@@ -73,7 +73,7 @@ defmodule ExDoc.Language.Elixir do
           []
         )
 
-        :skip
+        false
     end
   end
 
@@ -84,7 +84,7 @@ defmodule ExDoc.Language.Elixir do
     if doc?(entry, module_data.type) do
       function_data(kind, name, arity, anno, metadata, module_data)
     else
-      :skip
+      false
     end
   end
 
@@ -282,7 +282,7 @@ defmodule ExDoc.Language.Elixir do
         {:local, :..}
 
       ["//", "", ""] ->
-        {:local, :"..//"}
+        {:local, :..//}
 
       ["", ""] ->
         {:local, :.}
