@@ -546,9 +546,14 @@ defmodule ExDoc.Language.Erlang do
             {op, _, [int]}, acc when is_integer(int) and op in [:+, :-] ->
               {nil, acc}
 
-            # fun() (spec_to_quoted expands it to (... -> any())
-            {:->, _, [[{name, _, _}], {:any, _, _}]}, acc when name == :... ->
-              {nil, acc}
+            # fun() (spec_to_quoted expands it to (... -> any() in Elixir v1.17 and earlier)
+            # TODO: Remove me when we require Elixir v1.18+
+            {:->, _, [[{name, _, _}], {:any, _, _}]} = node, acc when name == :... ->
+              if Version.match?(System.version(), ">= 1.18.0-rc") do
+                {node, acc}
+              else
+                {nil, acc}
+              end
 
             # record{type :: remote:type/arity}
             {:field_type, _, [name, {{:., _, [r_mod, r_type]}, _, args}]}, acc ->
@@ -588,7 +593,7 @@ defmodule ExDoc.Language.Erlang do
       end
       |> Enum.concat()
 
-    put(acc)
+    put_stack(acc)
 
     # Drop and re-add type name (it, the first element in acc, is dropped there too)
     #
@@ -614,16 +619,21 @@ defmodule ExDoc.Language.Erlang do
   defp replace(formatted, acc, config) do
     String.replace(formatted, Enum.map(acc, &"#{elem(&1, 0)}("), fn string ->
       string = String.trim_trailing(string, "(")
-      {other, ref} = pop()
 
-      if string != other do
-        Autolink.maybe_warn(
-          config,
-          "internal inconsistency, please submit bug: #{inspect(string)} != #{inspect(other)}",
-          nil,
-          nil
-        )
-      end
+      ref =
+        case get_stack() do
+          [{^string, ref} | tail] ->
+            put_stack(tail)
+            ref
+
+          _ ->
+            Autolink.maybe_warn(
+              config,
+              "internal inconsistency when processing #{inspect(formatted)}",
+              nil,
+              nil
+            )
+        end
 
       what =
         case config.current_kfa do
@@ -691,15 +701,15 @@ defmodule ExDoc.Language.Erlang do
     end)
   end
 
-  defp put(items) do
+  defp put_stack(items) do
     Process.put({__MODULE__, :stack}, items)
   end
 
-  defp pop() do
-    [head | tail] = Process.get({__MODULE__, :stack})
-    put(tail)
-    head
+  defp get_stack() do
+    Process.get({__MODULE__, :stack})
   end
+
+  defp pp(:fun), do: "fun"
 
   defp pp(name) when is_atom(name) do
     :io_lib.format("~p", [name]) |> IO.iodata_to_binary()

@@ -806,6 +806,12 @@ defmodule ExDoc.Language.ErlangTest do
     test "function - any arity", c do
       assert autolink_spec(~s"-spec foo() -> fun((...) -> t()) | erlang_bar:t().", c) ==
                ~s[foo() -> fun((...) -> <a href="#t:t/0">t</a>()) | <a href="erlang_bar.html#t:t/0">erlang_bar:t</a>().]
+
+      if Version.match?(System.version(), ">= 1.18.0-rc") do
+        assert autolink_spec(~s"-type foo() :: fun((...) -> any()) | [any()].", c) ==
+                 "foo() :: fun((...) -> <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:any/0\">any</a>()) | " <>
+                   "[<a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:any/0\">any</a>()]."
+      end
     end
 
     test "local type", c do
