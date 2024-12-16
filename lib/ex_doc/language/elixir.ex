@@ -285,7 +285,7 @@ defmodule ExDoc.Language.Elixir do
         {:local, :..}
 
       ["//", "", ""] ->
-        {:local, :..//}
+        {:local, :"..//"}
 
       ["", ""] ->
         {:local, :.}
