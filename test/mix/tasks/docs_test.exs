@@ -20,15 +20,9 @@ defmodule Mix.Tasks.DocsTest do
       when is_list(args) and is_list(opts) and is_function(generator, 3) do
     opts = Keyword.put_new(opts, :output, context[:tmp_dir])
 
-    # TODO: Use with_io on Elixir v1.13
-    output =
-      capture_io(fn ->
-        send(self(), run(context, args, opts, generator))
-      end)
-
-    receive do
-      response -> {response, output}
-    end
+    with_io(fn ->
+      run(context, args, opts, generator)
+    end)
   end
 
   test "inflects values from app and version", context do
