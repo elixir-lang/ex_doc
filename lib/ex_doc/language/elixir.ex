@@ -10,7 +10,6 @@ defmodule ExDoc.Language.Elixir do
   @spec module_data(atom, any, any) ::
           false
           | %{
-              callback_types: [:callback, ...],
               docs: any,
               id: binary,
               language: ExDoc.Language.Erlang,
@@ -48,6 +47,7 @@ defmodule ExDoc.Language.Elixir do
 
         %{
           module: module,
+          default_groups: ~w(Types Callbacks Functions),
           docs: docs_chunk,
           language: __MODULE__,
           id: inspect(module),
@@ -56,7 +56,6 @@ defmodule ExDoc.Language.Elixir do
           source_line: source_line,
           source_file: source_file,
           source_basedir: source_basedir,
-          callback_types: [:callback, :macrocallback],
           nesting_info: nesting_info(title, config.nest_modules_by_prefix),
           private: %{
             abst_code: abst_code,
@@ -78,17 +77,30 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def function_data(entry, module_data) do
-    {{kind, name, arity}, anno, _signature, _doc_content, metadata} = entry
+  def doc_data(entry, %{type: type} = module_data) do
+    case entry do
+      {_key, _anno, _sig, :hidden, _metadata} ->
+        false
 
-    if doc?(entry, module_data.type) do
-      function_data(kind, name, arity, anno, metadata, module_data)
-    else
-      false
+      {{_kind, name, _arity}, _anno, _sig, _doc, _metadata}
+      when name in [:impl_for, :impl_for!] and type == :protocol ->
+        false
+
+      {{kind, _, _}, _anon, _sig, _doc, _metadata} when kind in [:function, :macro] ->
+        function_data(entry, module_data)
+
+      {{kind, _, _}, _anon, _sig, _doc, _metadata}
+      when kind in [:callback, :macrocallback] and type != :protocol ->
+        callback_data(entry, module_data)
+
+      _ ->
+        false
     end
   end
 
-  defp function_data(kind, name, arity, anno, metadata, module_data) do
+  defp function_data(entry, module_data) do
+    {{kind, name, arity}, anno, signature, _doc_content, metadata} = entry
+
     extra_annotations =
       case {kind, name, arity} do
         {:macro, _, _} -> ["macro"]
@@ -99,6 +111,8 @@ defmodule ExDoc.Language.Elixir do
     actual_def = actual_def(name, arity, kind)
 
     %{
+      id_key: "",
+      default_group: "Functions",
       doc_fallback: fn ->
         impl = Map.fetch(module_data.private.impls, actual_def)
 
@@ -106,28 +120,14 @@ defmodule ExDoc.Language.Elixir do
           delegate_doc_ast(metadata[:delegate_to])
       end,
       extra_annotations: extra_annotations,
+      signature: signature,
+      source_file: nil,
       source_line: find_function_line(module_data, actual_def) || Source.anno_line(anno),
       specs: specs(kind, name, actual_def, module_data)
     }
   end
 
-  # We are only interested in functions and macros for now
-  defp doc?({{kind, _, _}, _, _, _, _}, _) when kind not in [:function, :macro] do
-    false
-  end
-
-  # Skip impl_for and impl_for! for protocols
-  defp doc?({{_, name, _}, _, _, _, _}, :protocol) when name in [:impl_for, :impl_for!] do
-    false
-  end
-
-  # If content is a map, then it is ok.
-  defp doc?({_, _, _, doc, _}, _) do
-    doc != :hidden
-  end
-
-  @impl true
-  def callback_data(entry, module_data) do
+  defp callback_data(entry, module_data) do
     {{kind, name, arity}, anno, _signature, _doc, _metadata} = entry
     actual_def = actual_def(name, arity, kind)
 
@@ -149,16 +149,18 @@ defmodule ExDoc.Language.Elixir do
       end
 
     line = Source.anno_line(anno)
-
     quoted = Enum.map(specs, &Code.Typespec.spec_to_quoted(name, &1))
     signature = [get_typespec_signature(hd(quoted), arity)]
 
     %{
-      source_line: line,
-      source_file: nil,
+      id_key: "c:",
+      default_group: "Callbacks",
+      doc_fallback: fn -> nil end,
+      extra_annotations: extra_annotations,
       signature: signature,
-      specs: quoted,
-      extra_annotations: extra_annotations
+      source_file: nil,
+      source_line: line,
+      specs: quoted
     }
   end
 
@@ -182,6 +184,7 @@ defmodule ExDoc.Language.Elixir do
 
     %{
       type: type,
+      doc_fallback: fn -> nil end,
       source_line: line,
       source_file: source,
       spec: quoted,
@@ -282,7 +285,7 @@ defmodule ExDoc.Language.Elixir do
         {:local, :..}
 
       ["//", "", ""] ->
-        {:local, :"..//"}
+        {:local, :..//}
 
       ["", ""] ->
         {:local, :.}

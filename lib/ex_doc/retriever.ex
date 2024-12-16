@@ -140,12 +140,9 @@ defmodule ExDoc.Retriever do
     annotations_for_docs = config.annotations_for_docs
 
     docs_groups =
-      Enum.uniq(Enum.map(groups_for_docs, &elem(&1, 0)) ++ ~w(Types Callbacks Functions))
+      Enum.uniq(Enum.map(groups_for_docs, &elem(&1, 0)) ++ module_data.default_groups)
 
-    docs =
-      get_docs(module_data, source, default_group, groups_for_docs, annotations_for_docs) ++
-        get_callbacks(module_data, source, default_group, groups_for_docs, annotations_for_docs)
-
+    docs = get_docs(module_data, source, default_group, groups_for_docs, annotations_for_docs)
     types = get_types(module_data, source, default_group, groups_for_docs, annotations_for_docs)
 
     metadata = Map.put(metadata, :kind, module_data.type)
@@ -184,7 +181,7 @@ defmodule ExDoc.Retriever do
     nil
   end
 
-  # Module Helpers
+  # Helpers
 
   defp get_module_docs(module_data, source) do
     {:docs_v1, anno, _, format, moduledoc, metadata, _} = module_data.docs
@@ -194,17 +191,15 @@ defmodule ExDoc.Retriever do
     {doc_line, doc_file, format, moduledoc, doc_ast(format, moduledoc, options), metadata}
   end
 
-  ## Function helpers
-
   defp get_docs(module_data, source, default_group, groups_for_docs, annotations_for_docs) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
     nodes =
       for doc <- docs,
-          function_data = module_data.language.function_data(doc, module_data) do
-        get_function(
+          doc_data = module_data.language.doc_data(doc, module_data) do
+        get_doc(
           doc,
-          function_data,
+          doc_data,
           module_data,
           source,
           default_group,
@@ -216,9 +211,9 @@ defmodule ExDoc.Retriever do
     filter_defaults(nodes)
   end
 
-  defp get_function(
+  defp get_doc(
          doc,
-         function_data,
+         doc_data,
          module_data,
          source,
          default_group,
@@ -226,7 +221,7 @@ defmodule ExDoc.Retriever do
          annotations_for_docs
        ) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
-    {{type, name, arity}, anno, signature, source_doc, metadata} = doc
+    {{type, name, arity}, anno, _signature, source_doc, metadata} = doc
     doc_file = anno_file(anno, source)
     doc_line = anno_line(anno)
 
@@ -236,22 +231,23 @@ defmodule ExDoc.Retriever do
         metadata
       )
 
-    source_url = source_link(function_data[:source_file], source, function_data.source_line)
+    source_url = source_link(doc_data.source_file, source, doc_data.source_line)
 
     annotations =
       annotations_for_docs.(metadata) ++
-        annotations_from_metadata(metadata, module_metadata) ++ function_data.extra_annotations
+        annotations_from_metadata(metadata, module_metadata) ++ doc_data.extra_annotations
 
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
     doc_ast =
       (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
-        function_data.doc_fallback.()
+        doc_data.doc_fallback.()
 
-    group = GroupMatcher.match_doc(groups_for_docs, default_group, "Functions", metadata)
+    group =
+      GroupMatcher.match_doc(groups_for_docs, default_group, doc_data.default_group, metadata)
 
     %ExDoc.FunctionNode{
-      id: nil_or_name(name, arity),
+      id: doc_data.id_key <> nil_or_name(name, arity),
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
@@ -260,8 +256,8 @@ defmodule ExDoc.Retriever do
       doc_line: doc_line,
       doc_file: doc_file,
       defaults: ExDoc.Utils.natural_sort_by(defaults, fn {name, arity} -> "#{name}/#{arity}" end),
-      signature: signature(signature),
-      specs: function_data.specs,
+      signature: signature(doc_data.signature),
+      specs: doc_data.specs,
       source_url: source_url,
       type: type,
       group: group,
@@ -285,78 +281,6 @@ defmodule ExDoc.Retriever do
         Enum.any?(nodes, &match?(%{name: ^name, arity: ^arity}, &1))
       end)
     end)
-  end
-
-  ## Callback helpers
-
-  defp get_callbacks(
-         %{type: :behaviour} = module_data,
-         source,
-         default_group,
-         groups_for_docs,
-         annotations_for_docs
-       ) do
-    {:docs_v1, _, _, _, _, _, docs} = module_data.docs
-
-    for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in module_data.callback_types do
-      get_callback(doc, module_data, source, default_group, groups_for_docs, annotations_for_docs)
-    end
-  end
-
-  defp get_callbacks(_, _, _, _, _), do: []
-
-  defp get_callback(
-         doc,
-         module_data,
-         source,
-         default_group,
-         groups_for_docs,
-         annotations_for_docs
-       ) do
-    callback_data = module_data.language.callback_data(doc, module_data)
-
-    {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
-    {{kind, name, arity}, anno, _signature, source_doc, metadata} = doc
-    doc_file = anno_file(anno, source)
-    doc_line = anno_line(anno)
-
-    source_url = source_link(callback_data[:source_file], source, callback_data.source_line)
-
-    metadata =
-      Map.merge(
-        %{kind: kind, name: name, arity: arity, module: module_data.module},
-        metadata
-      )
-
-    signature = signature(callback_data.signature)
-    specs = callback_data.specs
-
-    annotations =
-      annotations_for_docs.(metadata) ++
-        callback_data.extra_annotations ++ annotations_from_metadata(metadata, module_metadata)
-
-    doc_ast =
-      doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
-        doc_fallback(callback_data)
-
-    group = GroupMatcher.match_doc(groups_for_docs, default_group, "Callbacks", metadata)
-
-    %ExDoc.FunctionNode{
-      id: "c:" <> nil_or_name(name, arity),
-      name: name,
-      arity: arity,
-      deprecated: metadata[:deprecated],
-      doc: doc_ast,
-      source_doc: source_doc,
-      doc_line: doc_line,
-      doc_file: doc_file,
-      signature: signature,
-      specs: specs,
-      source_url: source_url,
-      type: kind,
-      annotations: annotations,
-      group: group
-    }
   end
 
   ## Typespecs
@@ -394,7 +318,7 @@ defmodule ExDoc.Retriever do
 
     doc_ast =
       doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
-        doc_fallback(type_data)
+        type_data.doc_fallback.()
 
     group = GroupMatcher.match_doc(groups_for_docs, default_group, "Types", metadata)
 
@@ -417,10 +341,6 @@ defmodule ExDoc.Retriever do
   end
 
   ## General helpers
-
-  defp doc_fallback(data) do
-    data[:doc_fallback] && data.doc_fallback.()
-  end
 
   defp nil_or_name(name, arity) do
     if name == nil do

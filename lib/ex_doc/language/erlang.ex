@@ -10,7 +10,6 @@ defmodule ExDoc.Language.Erlang do
   @spec module_data(atom, any, any) ::
           false
           | %{
-              callback_types: [:callback, ...],
               docs: any,
               id: binary,
               language: ExDoc.Language.Erlang,
@@ -35,6 +34,7 @@ defmodule ExDoc.Language.Erlang do
 
       %{
         module: module,
+        default_groups: ~w(Types Callbacks Functions),
         docs: docs_chunk,
         language: __MODULE__,
         id: id,
@@ -43,7 +43,6 @@ defmodule ExDoc.Language.Erlang do
         source_line: source_line,
         source_file: source_file,
         source_basedir: source_basedir,
-        callback_types: [:callback],
         nesting_info: nil,
         private: %{
           abst_code: abst_code,
@@ -59,20 +58,27 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def function_data(entry, module_data) do
-    {{kind, name, arity}, _anno, _signature, doc_content, metadata} = entry
+  def doc_data(entry, module_data) do
+    {{kind, name, arity}, anno, signature, doc_content, metadata} = entry
 
-    # Edoc on Erlang/OTP24.1+ includes private functions in
-    # the chunk, so we manually yank them out.
-    if kind == :function and doc_content != :hidden and
-         function_exported?(module_data.module, name, arity) do
-      function_data(name, arity, doc_content, module_data, metadata)
-    else
-      false
+    cond do
+      doc_content == :hidden ->
+        false
+
+      # Edoc on Erlang/OTP24.1+ includes private functions in
+      # the chunk, so we manually yank them out.
+      kind == :function and function_exported?(module_data.module, name, arity) ->
+        function_data(name, arity, signature, metadata, module_data)
+
+      kind == :callback ->
+        callback_data(name, arity, anno, signature, metadata, module_data)
+
+      true ->
+        false
     end
   end
 
-  defp function_data(name, arity, _doc_content, module_data, metadata) do
+  defp function_data(name, arity, signature, metadata, module_data) do
     specs =
       case Map.fetch(module_data.private.specs, {name, arity}) do
         {:ok, spec} ->
@@ -91,48 +97,18 @@ defmodule ExDoc.Language.Erlang do
     {file, line} = Source.fetch_function_location!(module_data, {name, arity})
 
     %{
+      id_key: "",
+      default_group: "Functions",
       doc_fallback: fn -> equiv_data(module_data.module, file, line, metadata) end,
       extra_annotations: [],
-      source_line: line,
+      signature: signature,
       source_file: file,
+      source_line: line,
       specs: specs
     }
   end
 
-  defp equiv_data(module, file, line, metadata, prefix \\ "") do
-    case metadata[:equiv] do
-      nil ->
-        nil
-
-      equiv when is_binary(equiv) ->
-        ## We try to parse the equiv in order to link to the target
-        with {:ok, toks, _} <- :erl_scan.string(:unicode.characters_to_list(equiv <> ".")),
-             {:ok, [{:call, _, {:atom, _, func}, args}]} <- :erl_parse.parse_exprs(toks) do
-          "Equivalent to [`#{equiv}`](`#{prefix}#{func}/#{length(args)}`)."
-        else
-          {:ok, [{:op, _, :/, {:atom, _, _}, {:integer, _, _}}]} ->
-            "Equivalent to `#{prefix}#{equiv}`."
-
-          _ ->
-            "Equivalent to `#{equiv}`."
-        end
-        |> ExDoc.DocAST.parse!("text/markdown")
-
-      equiv ->
-        ExDoc.Utils.warn("invalid equiv #{inspect(equiv)}",
-          file: file,
-          line: line,
-          module: module
-        )
-
-        nil
-    end
-  end
-
-  @impl true
-  def callback_data(entry, module_data) do
-    {{_kind, name, arity}, anno, signature, _doc, metadata} = entry
-
+  defp callback_data(name, arity, anno, signature, metadata, module_data) do
     extra_annotations =
       if {name, arity} in module_data.private.optional_callbacks, do: ["optional"], else: []
 
@@ -145,21 +121,18 @@ defmodule ExDoc.Language.Erlang do
           {[], anno}
       end
 
+    file = Source.anno_file(anno)
+    line = Source.anno_line(anno)
+
     %{
-      doc_fallback: fn ->
-        equiv_data(
-          module_data.module,
-          Source.anno_file(anno),
-          Source.anno_line(anno),
-          metadata,
-          "c:"
-        )
-      end,
-      source_line: Source.anno_line(anno),
-      source_file: Source.anno_file(anno),
+      id_key: "c:",
+      default_group: "Callbacks",
+      doc_fallback: fn -> equiv_data(module_data.module, file, line, metadata, "c:") end,
+      extra_annotations: extra_annotations,
       signature: signature,
-      specs: specs,
-      extra_annotations: extra_annotations
+      source_file: file,
+      source_line: line,
+      specs: specs
     }
   end
 
@@ -192,6 +165,36 @@ defmodule ExDoc.Language.Erlang do
           signature: signature,
           extra_annotations: []
         }
+    end
+  end
+
+  defp equiv_data(module, file, line, metadata, prefix \\ "") do
+    case metadata[:equiv] do
+      nil ->
+        nil
+
+      equiv when is_binary(equiv) ->
+        ## We try to parse the equiv in order to link to the target
+        with {:ok, toks, _} <- :erl_scan.string(:unicode.characters_to_list(equiv <> ".")),
+             {:ok, [{:call, _, {:atom, _, func}, args}]} <- :erl_parse.parse_exprs(toks) do
+          "Equivalent to [`#{equiv}`](`#{prefix}#{func}/#{length(args)}`)."
+        else
+          {:ok, [{:op, _, :/, {:atom, _, _}, {:integer, _, _}}]} ->
+            "Equivalent to `#{prefix}#{equiv}`."
+
+          _ ->
+            "Equivalent to `#{equiv}`."
+        end
+        |> ExDoc.DocAST.parse!("text/markdown")
+
+      equiv ->
+        ExDoc.Utils.warn("invalid equiv #{inspect(equiv)}",
+          file: file,
+          line: line,
+          module: module
+        )
+
+        nil
     end
   end
 
