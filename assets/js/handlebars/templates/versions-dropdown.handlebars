@@ -9,5 +9,10 @@
         </option>
       {{/each}}
     </select>
+    {{#if latestUrl }}
+      <br />
+      <span class="sidebar-projectVersionsLatestLink"><a href="{{latestUrl}}">View latest
+          ({{latestVersion}})</a></span>
+    {{/if}}
   </label>
 </form>
