@@ -42,7 +42,7 @@ defmodule ExDoc.Retriever.ElixirTest do
 
       assert DocAST.to_string(mod.doc) == "<p>Mod docs.</p>"
 
-      assert %ExDoc.FunctionNode{
+      assert %ExDoc.DocNode{
                arity: 0,
                annotations: [],
                defaults: [],
@@ -61,7 +61,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert DocAST.to_string(function.doc) == "<p>function/0 docs.</p>"
       assert Macro.to_string(spec) == "function() :: atom()"
 
-      assert %ExDoc.FunctionNode{
+      assert %ExDoc.DocNode{
                arity: 0,
                annotations: ["macro"],
                id: "macro/0",
@@ -73,7 +73,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert DocAST.to_string(macro.doc) == "<p>macro/0 docs.</p>"
       assert Macro.to_string(spec) == "macro() :: Macro.t()"
 
-      assert %ExDoc.FunctionNode{
+      assert %ExDoc.DocNode{
                id: "empty_doc_and_specs/0",
                doc: nil,
                specs: []
@@ -202,7 +202,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
-      [opaque1, type1] = mod.typespecs
+      [opaque1, type1] = mod.docs
 
       assert type1.id == "t:type1/0"
       assert type1.signature == "type1()"
@@ -211,7 +211,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert type1.annotations == []
       assert type1.doc_line == 2
       assert DocAST.to_string(type1.doc) == "<p>type1/0 docs.</p>"
-      assert Macro.to_string(type1.spec) == "type1() :: atom()"
+      assert hd(type1.specs) |> Macro.to_string() == "type1() :: atom()"
 
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.signature == "opaque1()"
@@ -219,7 +219,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert opaque1.group == "Types"
       assert opaque1.doc_line == 5
       assert opaque1.doc |> DocAST.to_string() == ~s|<p>opaque1/0 docs.</p>|
-      assert opaque1.spec |> Macro.to_string() == "opaque1()"
+      assert hd(opaque1.specs) |> Macro.to_string() == "opaque1()"
     end
 
     test "protocols", c do
@@ -236,8 +236,9 @@ defmodule ExDoc.Retriever.ElixirTest do
       {[mod], []} = Retriever.docs_from_modules([Mod, Mod.Atom], %ExDoc.Config{})
       assert mod.type == :protocol
 
-      [foo] = mod.docs
+      [foo, t] = mod.docs
       assert foo.id == "foo/1"
+      assert t.id == "t:t/0"
     end
 
     test "structs", c do
@@ -410,15 +411,16 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert {[%ExDoc.ModuleNode{} = mod], []} =
                Retriever.docs_from_modules([Mod], %ExDoc.Config{})
 
-      assert [%ExDoc.TypeNode{id: "t:t/0", annotations: ["since 1.0.0"]}] = mod.typespecs
+      assert %ExDoc.DocNode{annotations: ["since 1.0.0"]} =
+               Enum.find(mod.docs, &(&1.id == "t:t/0"))
 
-      assert %ExDoc.FunctionNode{annotations: ["since 1.0.0"]} =
+      assert %ExDoc.DocNode{annotations: ["since 1.0.0"]} =
                Enum.find(mod.docs, &(&1.id == "c:cb/0"))
 
-      assert %ExDoc.FunctionNode{annotations: ["since 1.0.0"]} =
+      assert %ExDoc.DocNode{annotations: ["since 1.0.0"]} =
                Enum.find(mod.docs, &(&1.id == "function/0"))
 
-      assert %ExDoc.FunctionNode{annotations: ["since 1.0.0", "macro"]} =
+      assert %ExDoc.DocNode{annotations: ["since 1.0.0", "macro"]} =
                Enum.find(mod.docs, &(&1.id == "macro/0"))
     end
   end

@@ -44,8 +44,8 @@ defmodule ExDoc.ModuleNode do
           source_path: String.t() | nil,
           source_url: String.t() | nil,
           docs_groups: [atom()],
-          docs: [ExDoc.FunctionNode.t()],
-          typespecs: [ExDoc.TypeNode.t()],
+          docs: [ExDoc.DocNode.t()],
+          typespecs: [ExDoc.DocNode.t()],
           type: atom(),
           language: module(),
           annotations: [annotation()],
@@ -53,7 +53,7 @@ defmodule ExDoc.ModuleNode do
         }
 end
 
-defmodule ExDoc.FunctionNode do
+defmodule ExDoc.DocNode do
   @moduledoc false
 
   defstruct id: nil,
@@ -90,47 +90,8 @@ defmodule ExDoc.FunctionNode do
           specs: [ExDoc.Language.spec_ast()],
           annotations: [annotation()],
           group: atom() | nil,
+          doc_file: String.t(),
           doc_line: non_neg_integer(),
           source_url: String.t() | nil
-        }
-end
-
-defmodule ExDoc.TypeNode do
-  @moduledoc false
-
-  defstruct id: nil,
-            name: nil,
-            arity: 0,
-            type: nil,
-            deprecated: nil,
-            doc: nil,
-            source_doc: nil,
-            rendered_doc: nil,
-            doc_line: nil,
-            doc_file: nil,
-            source_url: nil,
-            spec: nil,
-            signature: nil,
-            annotations: [],
-            group: nil
-
-  @typep annotation :: String.t()
-
-  @type t :: %__MODULE__{
-          id: String.t(),
-          name: atom(),
-          arity: non_neg_integer(),
-          type: atom(),
-          deprecated: nil,
-          doc: ExDoc.DocAST.t() | nil,
-          source_doc: term() | nil,
-          rendered_doc: String.t() | nil,
-          doc_line: non_neg_integer(),
-          doc_file: String.t(),
-          source_url: String.t() | nil,
-          spec: ExDoc.Language.spec_ast(),
-          signature: String.t(),
-          annotations: [annotation()],
-          group: atom() | nil
         }
 end

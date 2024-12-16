@@ -134,7 +134,6 @@ defmodule ExDoc.Retriever do
 
     {doc_line, doc_file, format, source_doc, doc, metadata} = get_module_docs(module_data, source)
 
-    # TODO: The default function groups must be returned by the language
     default_group = config.default_group_for_doc
     groups_for_docs = config.groups_for_docs
     annotations_for_docs = config.annotations_for_docs
@@ -143,8 +142,6 @@ defmodule ExDoc.Retriever do
       Enum.uniq(Enum.map(groups_for_docs, &elem(&1, 0)) ++ module_data.default_groups)
 
     docs = get_docs(module_data, source, default_group, groups_for_docs, annotations_for_docs)
-    types = get_types(module_data, source, default_group, groups_for_docs, annotations_for_docs)
-
     metadata = Map.put(metadata, :kind, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
@@ -165,7 +162,6 @@ defmodule ExDoc.Retriever do
       source_doc: source_doc,
       moduledoc_line: doc_line,
       moduledoc_file: doc_file,
-      typespecs: ExDoc.Utils.natural_sort_by(types, &"#{&1.name}/#{&1.arity}"),
       source_url: source_link(source, module_data.source_line),
       language: module_data.language,
       annotations: List.wrap(metadata[:tags]),
@@ -246,7 +242,7 @@ defmodule ExDoc.Retriever do
     group =
       GroupMatcher.match_doc(groups_for_docs, default_group, doc_data.default_group, metadata)
 
-    %ExDoc.FunctionNode{
+    %ExDoc.DocNode{
       id: doc_data.id_key <> nil_or_name(name, arity),
       name: name,
       arity: arity,
@@ -259,7 +255,7 @@ defmodule ExDoc.Retriever do
       signature: signature(doc_data.signature),
       specs: doc_data.specs,
       source_url: source_url,
-      type: type,
+      type: doc_data.type,
       group: group,
       annotations: annotations
     }
@@ -281,63 +277,6 @@ defmodule ExDoc.Retriever do
         Enum.any?(nodes, &match?(%{name: ^name, arity: ^arity}, &1))
       end)
     end)
-  end
-
-  ## Typespecs
-
-  defp get_types(module_data, source, default_group, groups_for_docs, annotations_for_docs) do
-    {:docs_v1, _, _, _, _, _, docs} = module_data.docs
-
-    for {{:type, _, _}, _, _, content, _} = doc <- docs, content != :hidden do
-      get_type(doc, module_data, source, default_group, groups_for_docs, annotations_for_docs)
-    end
-  end
-
-  defp get_type(doc, module_data, source, default_group, groups_for_docs, annotations_for_docs) do
-    {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
-    {{kind, name, arity}, anno, _signature, source_doc, metadata} = doc
-    doc_file = anno_file(anno, source)
-    doc_line = anno_line(anno)
-
-    type_data = module_data.language.type_data(doc, module_data)
-
-    metadata =
-      Map.merge(
-        %{kind: kind, name: name, arity: arity, module: module_data.module},
-        metadata
-      )
-
-    source_url = source_link(type_data[:source_file], source, type_data.source_line)
-
-    signature = signature(type_data.signature)
-
-    annotations =
-      annotations_for_docs.(metadata) ++
-        annotations_from_metadata(metadata, module_metadata) ++
-        type_data.extra_annotations
-
-    doc_ast =
-      doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
-        type_data.doc_fallback.()
-
-    group = GroupMatcher.match_doc(groups_for_docs, default_group, "Types", metadata)
-
-    %ExDoc.TypeNode{
-      id: "t:" <> nil_or_name(name, arity),
-      name: name,
-      arity: arity,
-      type: type_data.type,
-      spec: type_data.spec,
-      deprecated: metadata[:deprecated],
-      doc: doc_ast,
-      source_doc: source_doc,
-      doc_line: doc_line,
-      doc_file: doc_file,
-      signature: signature,
-      source_url: source_url,
-      annotations: annotations,
-      group: group
-    }
   end
 
   ## General helpers

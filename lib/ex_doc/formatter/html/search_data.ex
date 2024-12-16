@@ -63,9 +63,8 @@ defmodule ExDoc.Formatter.HTML.SearchData do
         )
       end
 
-    functions = Enum.flat_map(node.docs, &node_child(&1, node))
-    types = Enum.flat_map(node.typespecs, &node_child(&1, node))
-    [module] ++ module_sections ++ functions ++ types
+    docs = Enum.flat_map(node.docs, &node_child(&1, node))
+    [module] ++ module_sections ++ docs
   end
 
   defp node_child(node, module_node) do

@@ -101,7 +101,7 @@ defmodule ExDoc.Formatter.HTML do
                   id: id,
                   line: child_node.doc_line,
                   file: child_node.doc_file,
-                  current_kfa: {:function, child_node.name, child_node.arity}
+                  current_kfa: {child_node.type, child_node.name, child_node.arity}
                 ]
 
             specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
@@ -109,31 +109,9 @@ defmodule ExDoc.Formatter.HTML do
             render_doc(child_node, language, autolink_opts, opts)
           end
 
-        typespecs =
-          for child_node <- node.typespecs do
-            id = id(node, child_node)
-
-            autolink_opts =
-              autolink_opts ++
-                [
-                  id: id,
-                  line: child_node.doc_line,
-                  file: child_node.doc_file,
-                  current_kfa: {child_node.type, child_node.name, child_node.arity}
-                ]
-
-            child_node = %{
-              child_node
-              | spec: language.autolink_spec(child_node.spec, autolink_opts)
-            }
-
-            render_doc(child_node, language, autolink_opts, opts)
-          end
-
         %{
           render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
-          | docs: docs,
-            typespecs: typespecs
+          | docs: docs
         }
       end,
       timeout: :infinity

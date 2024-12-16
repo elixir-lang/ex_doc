@@ -20,36 +20,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
-  Get the full specs from a function, already in HTML form.
-  """
-  def get_specs(%ExDoc.TypeNode{spec: spec}) do
-    [spec]
-  end
-
-  def get_specs(%ExDoc.FunctionNode{specs: specs}) when is_list(specs) do
-    presence(specs)
-  end
-
-  def get_specs(_node) do
-    nil
-  end
-
-  @doc """
   Format the attribute type used to define the spec of the given `node`.
   """
   def format_spec_attribute(module, node) do
     module.language.format_spec_attribute(node)
-  end
-
-  @doc """
-  Get defaults clauses.
-  """
-  def get_defaults(%{defaults: defaults}) do
-    defaults
-  end
-
-  def get_defaults(_) do
-    []
   end
 
   @doc """
@@ -89,9 +63,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     # it is simpler to guarantee they won't be duplicated in docs.
     Regex.replace(~r|(<[^>]*) id="[^"]*"([^>]*>)|, doc, ~S"\1\2", [])
   end
-
-  defp presence([]), do: nil
-  defp presence(other), do: other
 
   defp enc(binary), do: URI.encode(binary)
 
@@ -204,11 +175,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def module_summary(module_node) do
     # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
-    ExDoc.GroupMatcher.group_by(
-      module_node.docs_groups,
-      module_node.docs ++ module_node.typespecs,
-      & &1.group
-    )
+    ExDoc.GroupMatcher.group_by(module_node.docs_groups, module_node.docs, & &1.group)
   end
 
   defp logo_path(%{logo: nil}), do: nil

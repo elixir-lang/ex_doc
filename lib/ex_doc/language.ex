@@ -73,6 +73,8 @@ defmodule ExDoc.Language do
 
     * `:specs` - a list of specs that will be later formatted by `c:typespec/2`
 
+    * `:type` - the type of the doc (`:function`, `:macro`, `:type`, etc)
+
   """
   @callback doc_data(entry :: tuple(), module_data()) ::
               %{
@@ -85,39 +87,10 @@ defmodule ExDoc.Language do
                 signature: [binary()],
                 source_file: String.t() | nil,
                 source_line: non_neg_integer() | nil,
-                specs: [spec_ast()]
+                specs: [spec_ast()],
+                type: atom()
               }
               | false
-
-  @doc """
-  Returns a map with type information.
-
-  The map has the following keys:
-
-    * `:type` - `:type` or `:opaque` or `:nominal`
-
-    * `:source_line` - the line where the code is located
-
-    * `:source_file` - the source file where the code in located
-
-    * `:signature` - the signature
-
-    * `:spec` - a spec that will be later formatted by `c:typespec/2`
-  """
-  # TODO: Convert TypeNode into FunctionNode and rename FunctionNode to DocNode
-  # TODO: Merge this into doc_data
-  @callback type_data(entry :: tuple(), spec :: term()) ::
-              %{
-                type: :type | :opaque | :nominal,
-                # TODO: change to following on Elixir 1.15. It trips mix formatter between 1.14 and 1.15
-                # doc_fallback: (-> ExDoc.DocAST.t()),
-                doc_fallback: (... -> ExDoc.DocAST.t()),
-                source_line: non_neg_integer(),
-                source_file: String.t() | nil,
-                signature: [binary()],
-                spec: spec_ast(),
-                extra_annotations: [String.t()]
-              }
 
   @doc """
   Autolinks docs.
@@ -141,7 +114,7 @@ defmodule ExDoc.Language do
   @doc """
   Return an attribute in the canonical representation.
   """
-  @callback format_spec_attribute(%ExDoc.FunctionNode{} | %ExDoc.TypeNode{}) :: String.t()
+  @callback format_spec_attribute(%ExDoc.DocNode{}) :: String.t()
 
   @doc """
   Parse a module.function string and return it.

@@ -304,21 +304,11 @@ defmodule ExDoc.RetrieverTest do
   test "natural sorting", c do
     elixirc(c, ~S"""
     defmodule NaturallySorted do
-      @type type_b :: any()
-      @type type_B :: any()
-      @type type_A :: any()
-      @type type_a :: any()
-
       def function_b(), do: :ok
-
       def function_B(), do: :ok
-
       def function_A(), do: :ok
-
       def function_a(), do: :ok
-
       def function_A(arg), do: arg
-
       def function_a(arg), do: arg
     end
     """)

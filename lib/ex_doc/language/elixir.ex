@@ -93,6 +93,9 @@ defmodule ExDoc.Language.Elixir do
       when kind in [:callback, :macrocallback] and type != :protocol ->
         callback_data(entry, module_data)
 
+      {{:type, _, _}, _anon, _sig, _doc, _metadata} ->
+        type_data(entry, module_data)
+
       _ ->
         false
     end
@@ -115,15 +118,14 @@ defmodule ExDoc.Language.Elixir do
       default_group: "Functions",
       doc_fallback: fn ->
         impl = Map.fetch(module_data.private.impls, actual_def)
-
-        callback_doc_ast(name, arity, impl) ||
-          delegate_doc_ast(metadata[:delegate_to])
+        callback_doc_ast(name, arity, impl) || delegate_doc_ast(metadata[:delegate_to])
       end,
       extra_annotations: extra_annotations,
       signature: signature,
       source_file: nil,
       source_line: find_function_line(module_data, actual_def) || Source.anno_line(anno),
-      specs: specs(kind, name, actual_def, module_data)
+      specs: specs(kind, name, actual_def, module_data),
+      type: kind
     }
   end
 
@@ -160,7 +162,8 @@ defmodule ExDoc.Language.Elixir do
       signature: signature,
       source_file: nil,
       source_line: line,
-      specs: quoted
+      specs: quoted,
+      type: kind
     }
   end
 
@@ -172,8 +175,7 @@ defmodule ExDoc.Language.Elixir do
     {:type, num, :fun, [{:type, num, :product, rest_args} | rest]}
   end
 
-  @impl true
-  def type_data(entry, module_data) do
+  defp type_data(entry, module_data) do
     {{_kind, name, arity}, _anno, _signature, _doc, _metadata} = entry
 
     %{type: type, spec: spec, source_file: source, source_line: line} =
@@ -183,13 +185,15 @@ defmodule ExDoc.Language.Elixir do
     signature = [get_typespec_signature(quoted, arity)]
 
     %{
-      type: type,
+      id_key: "t:",
+      default_group: "Types",
       doc_fallback: fn -> nil end,
-      source_line: line,
+      extra_annotations: [],
       source_file: source,
-      spec: quoted,
+      source_line: line,
       signature: signature,
-      extra_annotations: []
+      specs: [quoted],
+      type: type
     }
   end
 
@@ -398,10 +402,12 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def format_spec_attribute(%ExDoc.TypeNode{type: type}), do: "@#{type}"
-  def format_spec_attribute(%ExDoc.FunctionNode{type: :callback}), do: "@callback"
-  def format_spec_attribute(%ExDoc.FunctionNode{type: :macrocallback}), do: "@macrocallback"
-  def format_spec_attribute(%ExDoc.FunctionNode{}), do: "@spec"
+  def format_spec_attribute(%{type: :type}), do: "@type"
+  def format_spec_attribute(%{type: :opaque}), do: "@opaque"
+  def format_spec_attribute(%{type: :nominal}), do: "@nominal"
+  def format_spec_attribute(%{type: :callback}), do: "@callback"
+  def format_spec_attribute(%{type: :macrocallback}), do: "@macrocallback"
+  def format_spec_attribute(%{}), do: "@spec"
 
   ## Module Helpers
 

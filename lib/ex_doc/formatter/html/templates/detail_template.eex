@@ -1,5 +1,5 @@
 <section class="detail" id="<%=enc node.id %>">
-  <%= for {default_name, default_arity} <- get_defaults(node) do %>
+  <%= for {default_name, default_arity} <- node.defaults do %>
     <span id="<%=enc "#{default_name}/#{default_arity}" %>"></span>
   <% end %>
   <div class="detail-header">
@@ -23,9 +23,9 @@
   <% end %>
 
   <section class="docstring">
-    <%= if specs = get_specs(node) do %>
+    <%= if node.specs != [] do %>
       <div class="specs">
-        <%= for spec <- specs do %>
+        <%= for spec <- node.specs do %>
           <pre translate="no"><span class="attribute"><%= format_spec_attribute(module, node) %></span> <%= spec %></pre>
         <% end %>
       </div>

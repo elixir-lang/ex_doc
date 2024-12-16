@@ -73,6 +73,9 @@ defmodule ExDoc.Language.Erlang do
       kind == :callback ->
         callback_data(name, arity, anno, signature, metadata, module_data)
 
+      kind == :type ->
+        type_data(name, arity, anno, signature, metadata, module_data)
+
       true ->
         false
     end
@@ -104,7 +107,8 @@ defmodule ExDoc.Language.Erlang do
       signature: signature,
       source_file: file,
       source_line: line,
-      specs: specs
+      specs: specs,
+      type: :function
     }
   end
 
@@ -132,40 +136,32 @@ defmodule ExDoc.Language.Erlang do
       signature: signature,
       source_file: file,
       source_line: line,
-      specs: specs
+      specs: specs,
+      type: :callback
     }
   end
 
-  @impl true
-  def type_data(entry, module_data) do
-    {{kind, name, arity}, anno, signature, _doc, metadata} = entry
+  defp type_data(name, arity, anno, signature, metadata, module_data) do
+    {specs, file, line, type} =
+      case Source.fetch_type!(module_data, name, arity) do
+        %{attr: attr, source_file: file, source_line: line, type: type} ->
+          {[attr], file, line, type}
 
-    case Source.fetch_type!(module_data, name, arity) do
-      %{} = map ->
-        %{
-          doc_fallback: fn ->
-            equiv_data(module_data.module, map.source_file, map.source_line, metadata, "t:")
-          end,
-          type: map.type,
-          source_line: map.source_line,
-          source_file: map.source_file,
-          spec: map.attr,
-          signature: signature,
-          extra_annotations: []
-        }
+        nil ->
+          {[], nil, Source.anno_line(anno), :type}
+      end
 
-      nil ->
-        %{
-          doc_fallback: fn ->
-            equiv_data(module_data.module, nil, Source.anno_line(anno), metadata, "t:")
-          end,
-          type: kind,
-          source_line: Source.anno_line(anno),
-          spec: nil,
-          signature: signature,
-          extra_annotations: []
-        }
-    end
+    %{
+      id_key: "t:",
+      default_group: "Types",
+      doc_fallback: fn -> equiv_data(module_data.module, file, line, metadata, "t:") end,
+      extra_annotations: [],
+      signature: signature,
+      source_file: file,
+      source_line: line,
+      specs: specs,
+      type: type
+    }
   end
 
   defp equiv_data(module, file, line, metadata, prefix \\ "") do
@@ -263,9 +259,11 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def format_spec_attribute(%ExDoc.TypeNode{type: type}), do: "-#{type}"
-  def format_spec_attribute(%ExDoc.FunctionNode{type: :callback}), do: "-callback"
-  def format_spec_attribute(%ExDoc.FunctionNode{}), do: "-spec"
+  def format_spec_attribute(%{type: :type}), do: "-type"
+  def format_spec_attribute(%{type: :opaque}), do: "-opaque"
+  def format_spec_attribute(%{type: :nominal}), do: "-nominal"
+  def format_spec_attribute(%{type: :callback}), do: "-callback"
+  def format_spec_attribute(%{}), do: "-spec"
 
   ## Autolink
 
