@@ -161,10 +161,13 @@ function docTokenFunction (token) {
   const namespaceRegex = /\:|\./
   let toSplitWords = token.toString()
 
+  // remove punctuation at start and end, except for !?
+  // at the end which can be part of the identifier itself
+  toSplitWords.replace(/^[.,;?!]+|[.,;]+$/g, '')
+
   // clean up leading and trailing backticks
   if (toSplitWords.startsWith('`') && toSplitWords.endsWith('`')) {
     toSplitWords = toSplitWords.slice(1, -1)
-    tokens.push(token.clone().update(() => toSplitWords))
   }
 
   if (arityRegex.test(toSplitWords)) {
