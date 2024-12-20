@@ -221,8 +221,3 @@
     padding-left: calc(1.5 * var(--content-gutter));
   }
 }
-
-/* Enable only for path relative links */
-a[href]:not([href^="/"]):not([href^="http"]) {
-  view-transition: auto;
-}

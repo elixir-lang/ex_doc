@@ -16,6 +16,30 @@ export function initialize (isPreview) {
 
   setLivebookBadgeUrl()
   fixLinks()
+  enableViewTransitions()
+}
+
+/**
+ * Enables view transitions on supported browsers
+ */
+function enableViewTransitions () {
+  if ('startViewTransition' in document) {
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a')
+      if (!link) return
+
+      const href = link.getAttribute('href')
+      if (!href) return
+
+      // Only relative links
+      if (href.startsWith('http') || href.startsWith('/')) return
+      e.preventDefault()
+
+      document.startViewTransition(() => {
+        window.location.href = href
+      })
+    })
+  }
 }
 
 /**
