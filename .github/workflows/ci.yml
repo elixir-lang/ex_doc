@@ -25,6 +25,9 @@ jobs:
           - pair: # Test Erlang with -doc attribute support
               elixir: "1.17"
               otp: "27"
+          - pair: # Test Erlang with -doc attribute support
+              elixir: "1.18"
+              otp: "27"    
             lint: lint
     steps:
       - uses: actions/checkout@v3
