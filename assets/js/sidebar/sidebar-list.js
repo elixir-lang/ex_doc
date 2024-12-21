@@ -8,8 +8,9 @@ const SIDEBAR_TYPE = {
   tasks: 'tasks'
 }
 
-const SIDEBAR_TAB_TYPES = [SIDEBAR_TYPE.extras, SIDEBAR_TYPE.modules, SIDEBAR_TYPE.tasks]
+let sidebarInitialized = false
 
+const SIDEBAR_TAB_TYPES = [SIDEBAR_TYPE.extras, SIDEBAR_TYPE.modules, SIDEBAR_TYPE.tasks]
 const sidebarNodeListSelector = type => `#${type}-full-list`
 
 /**
@@ -19,9 +20,13 @@ export function initialize () {
   SIDEBAR_TAB_TYPES.forEach(type => {
     renderSidebarNodeList(getSidebarNodes(), type)
   })
+
   markActiveSidebarTab(getCurrentPageSidebarType())
   markCurrentHashInSidebar()
   scrollNodeListToCurrentCategory()
+
+  if (sidebarInitialized) return
+  sidebarInitialized = true
   addEventListeners()
 }
 
@@ -191,7 +196,7 @@ function addEventListeners () {
   })
 
   // provide left/right arrow navigation for tablist, as required by ARIA authoring practices guide
-  const tabList = qs('#sidebar-listNav')
+  const tabList = qs('#sidebar-list-nav')
   tabList.addEventListener('keydown', (e) => {
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') { return }
 

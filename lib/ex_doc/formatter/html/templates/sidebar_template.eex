@@ -22,7 +22,7 @@
         </div>
       </div>
     </div>
-    <ul id="sidebar-listNav" class="sidebar-listNav" role="tablist">
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist">
       <li>
         <button id="extras-list-tab-button" role="tab" data-type="extras" aria-controls="extras-tab-panel" aria-selected="true" tabindex="0">
           <%= config.extra_section || "Pages" %>

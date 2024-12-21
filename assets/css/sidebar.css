@@ -109,25 +109,25 @@
   display: none;
 }
 
-.sidebar .sidebar-listNav {
+.sidebar .sidebar-list-nav {
   display: flex;
   margin: 0;
   padding: 4px 4px 0 4px;
 }
 
-.sidebar .sidebar-listNav :is(li, li button) {
+.sidebar .sidebar-list-nav :is(li, li button) {
   text-transform: uppercase;
   letter-spacing: 0.02em;
   font-size: 14px;
   color: var(--sidebarMuted);
 }
 
-.sidebar .sidebar-listNav li {
+.sidebar .sidebar-list-nav li {
   display: inline-block;
   padding: 0;
 }
 
-.sidebar .sidebar-listNav li button {
+.sidebar .sidebar-list-nav li button {
   background: none;
   border: 0;
   border-radius: 0;
@@ -142,16 +142,16 @@
   transition: all 150ms;
 }
 
-.sidebar .sidebar-listNav li:is(.selected) button {
+.sidebar .sidebar-list-nav li:is(.selected) button {
   background-color: var(--sidebarBackground);
   border-top: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
 }
 
-.sidebar .sidebar-listNav li:not(.selected) button {
+.sidebar .sidebar-list-nav li:not(.selected) button {
   border-top: var(--navTabBorderWidth) solid var(--sidebarHeader);
 }
 
-.sidebar .sidebar-listNav li:is(:hover):not(.selected) button {
+.sidebar .sidebar-list-nav li:is(:hover):not(.selected) button {
   background-color: var(--sidebarInactiveItemMarker);
   border-top: var(--navTabBorderWidth) solid var(--sidebarInactiveItemBorder);
   color: var(--sidebarAccentMain);
