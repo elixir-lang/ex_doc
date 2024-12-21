@@ -1,5 +1,5 @@
-<%= head_template(config, %{title: "Search", type: :search, noindex: true}) %>
-<%= sidebar_template(config, nodes_map) %>
+<%= head_template(config, "Search", true) %>
+<%= sidebar_template(config, :search, nodes_map) %>
 
 <div id="search">
   <h1>

@@ -19,7 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/elixir-lang/ex_doc.git"
   },
-  "author": "Plataformatec",
+  "author": "The Elixir Team",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/elixir-lang/ex_doc/issues"
@@ -47,5 +47,9 @@
     "lunr": "^2.3.8",
     "mocha": "^10.2.0",
     "normalize.css": "^8.0.1"
+  },
+  "dependencies": {
+    "@swup/a11y-plugin": "^5.0.0",
+    "swup": "^4.8.1"
   }
 }

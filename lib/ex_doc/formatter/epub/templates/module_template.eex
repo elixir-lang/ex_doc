@@ -1,4 +1,4 @@
-<%= head_template(config, %{title: module.title}) %>
+<%= head_template(config, module.title) %>
     <h1 id="content">
       <%= module.title %> <%= H.module_type(module) %>
     </h1>

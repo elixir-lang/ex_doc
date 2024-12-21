@@ -94,7 +94,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :defp,
     :head_template,
     Path.expand("templates/head_template.eex", __DIR__),
-    [:config, :page],
+    [:config, :title],
     trim: true
   )
 

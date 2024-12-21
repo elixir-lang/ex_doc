@@ -9,14 +9,11 @@
     <%= if config.authors do %>
       <meta name="author" content="<%= Enum.join(config.authors, ", ") %>">
     <% end %>
-    <%= if page.noindex do %>
+    <%= if noindex do %>
       <meta name="robots" content="noindex">
     <% end %>
-    <title><%= page.title %> — <%= config.project %> v<%= config.version %></title>
+    <title><%= title %> — <%= config.project %> v<%= config.version %></title>
     <link rel="stylesheet" href="<%= asset_rev config.output, "dist/html-#{config.proglang}*.css" %>" />
-    <%= if page.type == :cheatmd do %>
-      <style>@media print { @page { size: landscape; } }</style>
-    <% end %>
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />
     <% end %>
@@ -27,7 +24,7 @@
     <script async src="<%= asset_rev config.output, "dist/html-*.js" %>"></script>
     <%= before_closing_head_tag(config, :html) %>
   </head>
-  <body data-type="<%= sidebar_type(page.type) %>" class="page-<%= page.type %>">
+  <body>
     <script>
       <% # Immediately apply night mode preference to avoid a flash effect %>
       try {

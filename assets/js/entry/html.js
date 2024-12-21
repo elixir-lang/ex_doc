@@ -21,6 +21,9 @@ import { initialize as initSettings } from '../settings'
 import { initialize as initStyling } from '../styling'
 import { initialize as initPreview} from '../preview'
 
+import Swup from 'swup'
+import SwupA11yPlugin from '@swup/a11y-plugin'
+
 onDocumentReady(() => {
   const params = new URLSearchParams(window.location.search)
   const isPreview = params.has('preview')
@@ -37,6 +40,14 @@ onDocumentReady(() => {
   if (isPreview) {
     initPreview()
   } else {
+    new Swup({
+      animationSelector: false,
+      containers: ['#main'],
+      hooks: {'page:view': initSidebarContent},
+      linkSelector: 'a[href]:not([href^="/"]):not([href^="http"]):not(.no-swup)',
+      plugins: [new SwupA11yPlugin()]
+    })
+
     initVersions()
     initSidebarDrawer()
     initSidebarContent()
