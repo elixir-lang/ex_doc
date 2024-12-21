@@ -43,7 +43,7 @@ export function escapeHtmlEntities (text) {
  * @returns {String}
  */
 export function getCurrentPageSidebarType () {
-  return document.body.dataset.type
+  return document.getElementById('main').dataset.type
 }
 
 /**

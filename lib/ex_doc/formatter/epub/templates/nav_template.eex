@@ -1,4 +1,4 @@
-<%= head_template(config, %{title: "Table Of Contents"}) %>
+<%= head_template(config, "Table Of Contents") %>
     <h1>Table of contents</h1>
     <nav epub:type="toc">
       <ol>

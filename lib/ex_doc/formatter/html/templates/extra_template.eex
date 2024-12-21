@@ -1,5 +1,5 @@
-<%= head_template(config, %{title: node.title, type: type, noindex: false}) %>
-<%= sidebar_template(config, nodes_map) %>
+<%= head_template(config, node.title, false) %>
+<%= sidebar_template(config, type, nodes_map) %>
 
 <div id="top-content">
   <h1>

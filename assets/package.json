@@ -19,7 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/elixir-lang/ex_doc.git"
   },
-  "author": "Plataformatec",
+  "author": "The Elixir Team",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/elixir-lang/ex_doc/issues"
@@ -29,6 +29,7 @@
   "devDependencies": {
     "@fontsource/inconsolata": "^4.5.9",
     "@fontsource/lato": "^4.5.10",
+    "@swup/a11y-plugin": "^5.0.0",
     "esbuild": "^0.16.16",
     "eslint": "^8.31.0",
     "eslint-config-standard": "^17.0.0",
@@ -46,6 +47,7 @@
     "lodash.throttle": "^4.1.1",
     "lunr": "^2.3.8",
     "mocha": "^10.2.0",
-    "normalize.css": "^8.0.1"
+    "normalize.css": "^8.0.1",
+    "swup": "^4.8.1"
   }
 }

@@ -64,7 +64,7 @@
   <% end %>
 </nav>
 
-<main class="content">
+<main class="content page-<%= type %>" id="main" data-type="<%= sidebar_type(type) %>">
   <output role="status" id="toast"></output>
 
   <div id="content" class="content-inner">

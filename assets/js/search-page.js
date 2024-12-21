@@ -5,8 +5,12 @@ import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAnd
 import { setSearchInputValue } from './search-bar'
 
 const EXCERPT_RADIUS = 80
-
 const SEARCH_CONTAINER_SELECTOR = '#search'
+
+lunr.tokenizer.separator = /\s+/
+lunr.QueryLexer.termSeparator = /\s+/
+lunr.Pipeline.registerFunction(docTokenFunction, 'docTokenSplitter')
+lunr.Pipeline.registerFunction(docTrimmerFunction, 'docTrimmer')
 
 /**
  * Performs a full-text search within the documentation
@@ -49,12 +53,6 @@ function renderResults ({ value, results, errorMessage }) {
 }
 
 async function getIndex () {
-  // lunr by default splits on - but we don't want that.
-  lunr.tokenizer.separator = /\s+/
-  lunr.QueryLexer.termSeparator = /\s+/
-  lunr.Pipeline.registerFunction(docTokenFunction, 'docTokenSplitter')
-  lunr.Pipeline.registerFunction(docTrimmerFunction, 'docTrimmer')
-
   const cachedIndex = await loadIndex()
   if (cachedIndex) { return cachedIndex }
 
