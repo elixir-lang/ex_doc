@@ -80,7 +80,7 @@ function addEventListeners () {
     } else if (event.key === 'ArrowDown' || (appleOS && event.ctrlKey && event.key === 'n')) {
       moveAutocompleteSelection(1)
       event.preventDefault()
-    } else if (event.key === 'Tab') {
+    } else if (event.key === 'Tab' && selectedAutocompleteSuggestion() !== null) {
       togglePreview()
       event.preventDefault()
     }
