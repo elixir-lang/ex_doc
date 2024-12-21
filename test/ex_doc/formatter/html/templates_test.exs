@@ -202,7 +202,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   describe "sidebar" do
     test "text links to homepage_url when set", context do
-      content = Templates.sidebar_template(doc_config(context), @empty_nodes_map)
+      content = Templates.sidebar_template(doc_config(context), :extra, @empty_nodes_map)
 
       assert content =~
                ~r"""
@@ -221,7 +221,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
         main: "hello"
       }
 
-      content = Templates.sidebar_template(config, @empty_nodes_map)
+      content = Templates.sidebar_template(config, :extra, @empty_nodes_map)
 
       assert content =~
                ~r"""
@@ -238,7 +238,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       modules = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
 
       content =
-        Templates.sidebar_template(doc_config(context), %{
+        Templates.sidebar_template(doc_config(context), :extra, %{
           modules: modules,
           exceptions: [],
           tasks: []
