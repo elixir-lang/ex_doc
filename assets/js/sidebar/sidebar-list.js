@@ -65,7 +65,6 @@ function renderSidebarNodeList (nodesByType, type) {
   })
 
   nodeList.querySelectorAll('li a').forEach(anchor => {
-    anchor.classList.add('no-swup')
     anchor.addEventListener('click', event => {
       const target = event.target
       const listItem = target.closest('li')

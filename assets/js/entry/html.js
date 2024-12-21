@@ -40,13 +40,25 @@ onDocumentReady(() => {
   if (isPreview) {
     initPreview()
   } else {
-    new Swup({
-      animationSelector: false,
-      containers: ['#main'],
-      hooks: {'page:view': initSidebarContent},
-      linkSelector: 'a[href]:not([href^="/"]):not([href^="http"]):not(.no-swup)',
-      plugins: [new SwupA11yPlugin()]
-    })
+    if (window.location.protocol !== 'file:') {
+      new Swup({
+        animationSelector: false,
+        containers: ['#main'],
+        ignoreVisit: (url) => {
+          const path = url.split('#')[0]
+          return path === window.location.pathname ||
+            path === window.location.pathname + '.html'
+        },
+        hooks: {
+          'page:view': () => {
+            initSidebarContent()
+            initSearchPage()
+          }
+        },
+        linkSelector: 'a[href]:not([href^="/"]):not([href^="http"])',
+        plugins: [new SwupA11yPlugin()]
+      })
+    }
 
     initVersions()
     initSidebarDrawer()
