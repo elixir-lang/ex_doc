@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.36.0-dev
+
+  * Enhancements
+    * Use swup.js for navigation on hosted sites
+    * Support `:group` in documentation metadata for grouping in the sidebar
+    * Support `:default_group_for_doc` in configuration to set the default group for functions, callbacks, and types
+    * Add `--warnings-as-errors` flag to `mix docs`
+
+  * Bug fixes
+    * Fix typespec with `(...) -> any()`
+
 ## v0.35.1 (2024-11-21)
 
   * Bug fixes

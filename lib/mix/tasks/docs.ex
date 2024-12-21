@@ -319,8 +319,9 @@ defmodule Mix.Tasks.Docs do
     * `exdoc:autocomplete` - when set to "off", it disables autocompletion.
 
     * `exdoc:full-text-search-url` - the URL to use when performing full text
-      search. The search string will be prepended to the URL as a parameter.
-      It defaults to ExDoc's auto-generated search page.
+      search. The search string will be appended to the URL as an encoded
+      parameter. You could use this to bring a custom search engine to your
+      documentation. It defaults to ExDoc's default search page.
 
   ## Nesting
 
