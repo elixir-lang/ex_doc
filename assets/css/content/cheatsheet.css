@@ -29,7 +29,7 @@
   font-weight: 500;
 }
 
-.page-cheatmd.dark .content-inner h2 {
+.dark .page-cheatmd .content-inner h2 {
   color: var(--gray200);
 }
 
@@ -82,7 +82,7 @@
   border: solid 1px 1px 0 1px var(--gray100);
 }
 
-.page-cheatmd.dark .content-inner h4 {
+.dark .page-cheatmd .content-inner h4 {
   background: #192f50;
   color: var(--textBody);
   border: 1px solid #192f50;
@@ -98,7 +98,7 @@
   padding: var(--vertical-space) var(--horizontal-space);
 }
 
-.page-cheatmd.dark .content-inner .h2 p {
+.dark .page-cheatmd .content-inner .h2 p {
   background: var(--gray700);
 }
 
@@ -176,7 +176,7 @@
   background-color: var(--gray50);
 }
 
-.page-cheatmd.dark .content-inner .h2 thead {
+.dark .page-cheatmd .content-inner .h2 thead {
   background-color: var(--gray700);
 }
 

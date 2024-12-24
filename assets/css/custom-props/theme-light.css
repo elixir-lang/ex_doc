@@ -71,6 +71,7 @@
   --quickSwitchContour:          var(--coldGray);
 
   --success:                     var(--green);
+  --progressBarColor:            var(--gray400);
 
   --sidebarAccentMain:           var(--black);
   --sidebarBackground:           var(--gray50);

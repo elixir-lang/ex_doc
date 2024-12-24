@@ -30,6 +30,7 @@
     "@fontsource/inconsolata": "^4.5.9",
     "@fontsource/lato": "^4.5.10",
     "@swup/a11y-plugin": "^5.0.0",
+    "@swup/progress-plugin": "^3.2.0",
     "esbuild": "^0.16.16",
     "eslint": "^8.31.0",
     "eslint-config-standard": "^17.0.0",

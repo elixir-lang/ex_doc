@@ -131,3 +131,8 @@ body.sidebar-closed .content {
     position: absolute;
   }
 }
+
+.swup-progress-bar {
+  height: 2px;
+  background-color: var(--progressBarColor);
+}

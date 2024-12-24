@@ -20,20 +20,20 @@ body.dark {
   --tableHeadBorder:             var(--gray600);
   --tableBodyBorder:             var(--gray700);
 
-  --warningBackground:          hsla( 33,  30%,  60%,  10%);
-  --warningHeadingBackground:   hsla( 33,  66%,  35%,  80%);
+  --warningBackground:           hsla( 33,  30%,  60%,  10%);
+  --warningHeadingBackground:    hsla( 33,  66%,  35%,  80%);
   --warningHeading:              var(--white);
-  --errorBackground:            hsla(  7,  30%,  60%,  10%);
-  --errorHeadingBackground:     hsla(  6,  70%,  40%,  80%);
+  --errorBackground:             hsla(  7,  30%,  60%,  10%);
+  --errorHeadingBackground:      hsla(  6,  70%,  40%,  80%);
   --errorHeading:                var(--white);
-  --infoBackground:             hsla(206,  30%,  60%,  10%);
-  --infoHeadingBackground:      hsla(213,  55%,  35%,  80%);
+  --infoBackground:              hsla(206,  30%,  60%,  10%);
+  --infoHeadingBackground:       hsla(213,  55%,  35%,  80%);
   --infoHeading:                 var(--white);
   --neutralBackground:           hsl(210,  30%,  60%,  10%);
   --neutralHeadingBackground:    var(--gray600);
   --neutralHeading:              var(--white);
-  --tipBackground:              hsla(142,  30%,  60%,  10%);
-  --tipHeadingBackground:       hsla(134,  45%,  30%,  80%);
+  --tipBackground:               hsla(142,  30%,  60%,  10%);
+  --tipHeadingBackground:        hsla(134,  45%,  30%,  80%);
   --tipHeading:                  var(--white);
 
   --fnSpecAttr:                  var(--gray400);
@@ -71,6 +71,7 @@ body.dark {
   --quickSwitchContour:          var(--gray500);
 
   --success:                     var(--green-lightened-10);
+  --progressBarColor:            var(--gray400);
 
   --sidebarAccentMain:           var(--gray50);
   --sidebarBackground:           var(--gray800);
