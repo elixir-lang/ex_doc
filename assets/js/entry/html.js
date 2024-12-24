@@ -58,7 +58,7 @@ onDocumentReady(() => {
           }
         },
         linkSelector: 'a[href]:not([href^="/"]):not([href^="http"])',
-        plugins: [new SwupA11yPlugin(), new SwupProgressPlugin()]
+        plugins: [new SwupA11yPlugin(), new SwupProgressPlugin({delay: 500})]
       })
     }
 
