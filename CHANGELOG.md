@@ -10,6 +10,7 @@
 
   * Bug fixes
     * Fix typespec with `(...) -> any()`
+    * Do not trap `tab` commands in the search bar
 
 ## v0.35.1 (2024-11-21)
 
