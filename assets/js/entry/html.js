@@ -27,19 +27,23 @@ import SwupProgressPlugin from '@swup/progress-plugin'
 
 onDocumentReady(() => {
   const params = new URLSearchParams(window.location.search)
+  const isEmbedded = window.self !== window.parent
   const isPreview = params.has('preview')
+  const isHint = params.has('hint')
 
-  initTabsets() // alters content HTML, so is run early
   initTheme(params.get('theme'))
+  initStyling()
+
+  initTabsets()
   initContent(isPreview)
   initMakeup()
   initTooltips()
-  initHintsPage()
   initCopyButton()
-  initStyling()
 
-  if (isPreview) {
+  if (isPreview && isEmbedded) {
     initPreview()
+  } if (isHint && isEmbedded) {
+    initHintsPage()
   } else {
     if (window.location.protocol !== 'file:') {
       new Swup({
@@ -52,9 +56,17 @@ onDocumentReady(() => {
         },
         hooks: {
           'page:view': () => {
+            initTabsets()
+            initContent(false)
+            initMakeup()
+            initTooltips()
+            initCopyButton()
+
             updateSidebarDrawer()
             updateSidebarContent()
+            initSearch()
             initSearchPage()
+            initSettings()
           }
         },
         linkSelector: 'a[href]:not([href^="/"]):not([href^="http"])',
@@ -63,13 +75,14 @@ onDocumentReady(() => {
     }
 
     initVersions()
-    initSidebarDrawer()
-    initSidebarContent()
-    initSearch()
     initModal()
     initKeyboardShortcuts()
     initQuickSwitch()
     initToast()
+
+    initSidebarDrawer()
+    initSidebarContent()
+    initSearch()
     initSearchPage()
     initSettings()
   }

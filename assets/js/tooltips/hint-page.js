@@ -9,17 +9,10 @@ const CONTENT_INNER_SELECTOR = '.content-inner'
  * and sends to the parent window as an event.
  */
 export function initialize () {
-  if (shouldSendHint()) {
-    const hint = buildHint()
-    if (hint) {
-      sendHintToParentWindow(hint)
-    }
+  const hint = buildHint()
+  if (hint) {
+    sendHintToParentWindow(hint)
   }
-}
-
-function shouldSendHint () {
-  const params = new URLSearchParams(window.location.search)
-  return params.has('hint') && window.self !== window.parent
 }
 
 function sendHintToParentWindow (hint) {
