@@ -1,6 +1,15 @@
 # Changelog
 
-## v0.36.0-dev
+## v0.36.1 (2024-12-24)
+
+  * Enhancements
+    * Show a progress bar if navigation takes more than 300ms
+
+  * Bug fixes
+    * Fix dark mode styling on cheatsheets
+    * Ensure the sidebar closes on hosting navigation in mobile
+
+## v0.36.0 (2024-12-24)
 
   * Enhancements
     * Use swup.js for navigation on hosted sites
