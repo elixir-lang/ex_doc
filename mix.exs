@@ -22,6 +22,10 @@ defmodule ExDoc.Mixfile do
     ]
   end
 
+  def cli do
+    [preferred_envs: ["hex.publish": :prod]]
+  end
+
   def application do
     [
       extra_applications: [:eex] ++ extra_applications(Mix.env()),
