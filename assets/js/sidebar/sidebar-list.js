@@ -8,15 +8,15 @@ const SIDEBAR_TYPE = {
   tasks: 'tasks'
 }
 
-let sidebarInitialized = false
-
 const SIDEBAR_TAB_TYPES = [SIDEBAR_TYPE.extras, SIDEBAR_TYPE.modules, SIDEBAR_TYPE.tasks]
 const sidebarNodeListSelector = type => `#${type}-full-list`
 
-/**
- * Initializes the sidebar navigation list.
- */
 export function initialize () {
+  update()
+  addEventListeners()
+}
+
+export function update () {
   SIDEBAR_TAB_TYPES.forEach(type => {
     renderSidebarNodeList(getSidebarNodes(), type)
   })
@@ -24,10 +24,6 @@ export function initialize () {
   markActiveSidebarTab(getCurrentPageSidebarType())
   markCurrentHashInSidebar()
   scrollNodeListToCurrentCategory()
-
-  if (sidebarInitialized) return
-  sidebarInitialized = true
-  addEventListeners()
 }
 
 /**

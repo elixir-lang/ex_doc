@@ -24,7 +24,7 @@
     <script async src="<%= asset_rev config.output, "dist/html-*.js" %>"></script>
     <%= before_closing_head_tag(config, :html) %>
   </head>
-  <body>
+  <body class="sidebar-closed">
     <script>
       <% # Immediately apply night mode preference to avoid a flash effect %>
       try {

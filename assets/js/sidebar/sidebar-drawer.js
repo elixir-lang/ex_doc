@@ -33,13 +33,14 @@ const state = {
   sidebarPreference: userPref.NO_PREF
 }
 
-/**
- * Initializes the toggleable sidebar drawer.
- */
 export function initialize () {
   setDefaultSidebarState()
   observeResizing()
   addEventListeners()
+}
+
+export function update () {
+  setDefaultSidebarState()
 }
 
 function observeResizing () {
