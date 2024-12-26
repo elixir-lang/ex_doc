@@ -1,8 +1,7 @@
 defmodule ExDoc.Formatter.MARKDOWN do
   @moduledoc false
 
-  @assets_dir "MD/assets"
-  alias __MODULE__.{Assets, Templates}
+  alias __MODULE__.{Templates}
   alias ExDoc.Formatter.HTML
   alias ExDoc.Utils
 
@@ -15,7 +14,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
     config = normalize_config(config)
     File.rm_rf!(config.output)
-    File.mkdir_p!(Path.join(config.output, "MD"))
+    File.mkdir_p!(config.output)
 
     project_nodes =
       HTML.render_all(project_nodes, filtered_modules, ".md", config, highlight_tag: "samp")
@@ -51,7 +50,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
     output =
       config.output
       |> Path.expand()
-      |> Path.join("#{config.project}")
+      |> Path.join("markdown")
 
     %{config | output: output}
   end
@@ -59,7 +58,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
   defp normalize_output(output) do
     output
     |> String.replace(~r/\r\n|\r|\n/, "\n")
-    |> String.replace(~r/\n{2,}/, "\n") 
+    |> String.replace(~r/\n{3,}/, "\n\n") 
   end
 
   defp generate_nav(config, nodes) do
@@ -70,25 +69,19 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
     content = Templates.nav_template(config, nodes)
     |> normalize_output()
-    File.write("#{config.output}/MD/index.md", content)
+    File.write("#{config.output}/index.md", content)
   end
 
   defp generate_extras(config) do
     for {_title, extras} <- config.extras do
-      Enum.each(extras, fn %{id: id, title: title, title_content: _title_content, source: content} ->
-        output = "#{config.output}/MD/#{id}.md"
-        content = """
-        # #{title}
-
-        #{content}
-        """
-        |> normalize_output()
+      Enum.each(extras, fn %{id: id, source: content} ->
+        output = "#{config.output}/#{id}.md"
 
         if File.regular?(output) do
           Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
         end
 
-        File.write!(output, content)
+        File.write!(output, normalize_output(content))
       end)
     end
   end
@@ -129,7 +122,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
   defp generate_module_page(module_node, config) do
     content = Templates.module_page(config, module_node)
     |> normalize_output()
-    File.write("#{config.output}/MD/#{module_node.id}.md", content)
+    File.write("#{config.output}/#{module_node.id}.md", content)
   end
 
 end
