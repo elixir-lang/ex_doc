@@ -1,7 +1,6 @@
-defmodule ExDoc.Formatter.Markdown do
+defmodule ExDoc.Formatter.MARKDOWN do
   @moduledoc false
 
-  @mimetype "text/markdown"
   @assets_dir "MD/assets"
   alias __MODULE__.{Assets, Templates}
   alias ExDoc.Formatter.HTML
@@ -28,24 +27,24 @@ defmodule ExDoc.Formatter.Markdown do
 
     extras =
       config
-      |> HTML.build_extras(".xhtml")
+      |> HTML.build_extras(".md")
       |> Enum.chunk_by(& &1.group)
       |> Enum.map(&{hd(&1).group, &1})
 
     config = %{config | extras: extras}
 
-    static_files = HTML.generate_assets("MD", default_assets(config), config)
-    HTML.generate_logo(@assets_dir, config)
-    HTML.generate_cover(@assets_dir, config)
-
-    # generate_nav(config, nodes_map)
+    generate_nav(config, nodes_map) 
     generate_extras(config)
     generate_list(config, nodes_map.modules)
     generate_list(config, nodes_map.tasks)
 
-    {:ok, epub} = generate_zip(config.output)
-    File.rm_rf!(config.output)
-    Path.relative_to_cwd(epub)
+    # if config[:generate_zip] do # TODO: add a command line flag?
+    #   {:ok, zip} = generate_zip(config.output)
+    #   File.rm_rf!(config.output)
+    #   Path.relative_to_cwd(zip)
+    # else
+      config.output |> Path.join("index.md") |> Path.relative_to_cwd()
+    # end
   end
 
   defp normalize_config(config) do
@@ -57,6 +56,23 @@ defmodule ExDoc.Formatter.Markdown do
     %{config | output: output}
   end
 
+  defp normalize_output(output) do
+    output
+    |> String.replace(~r/\r\n|\r|\n/, "\n")
+    |> String.replace(~r/\n{2,}/, "\n") 
+  end
+
+  defp generate_nav(config, nodes) do
+    nodes =
+      Map.update!(nodes, :modules, fn modules ->
+        modules |> Enum.chunk_by(& &1.group) |> Enum.map(&{hd(&1).group, &1})
+      end)
+
+    content = Templates.nav_template(config, nodes)
+    |> normalize_output()
+    File.write("#{config.output}/MD/index.md", content)
+  end
+
   defp generate_extras(config) do
     for {_title, extras} <- config.extras do
       Enum.each(extras, fn %{id: id, title: title, title_content: _title_content, source: content} ->
@@ -66,6 +82,7 @@ defmodule ExDoc.Formatter.Markdown do
 
         #{content}
         """
+        |> normalize_output()
 
         if File.regular?(output) do
           Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
@@ -75,8 +92,6 @@ defmodule ExDoc.Formatter.Markdown do
       end)
     end
   end
-
-
 
 
   defp generate_list(config, nodes) do
@@ -99,13 +114,6 @@ defmodule ExDoc.Formatter.Markdown do
 
   ## Helpers
 
-  defp default_assets(config) do
-    [
-      {Assets.dist(config.proglang), "MD/dist"},
-      {Assets.metainfo(), "META-INF"}
-    ]
-  end
-
   defp files_to_add(path) do
     Enum.reduce(Path.wildcard(Path.join(path, "**/*")), [], fn file, acc ->
       case File.read(file) do
@@ -120,6 +128,7 @@ defmodule ExDoc.Formatter.Markdown do
 
   defp generate_module_page(module_node, config) do
     content = Templates.module_page(config, module_node)
+    |> normalize_output()
     File.write("#{config.output}/MD/#{module_node.id}.md", content)
   end
 

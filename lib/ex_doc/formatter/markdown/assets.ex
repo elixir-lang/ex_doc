@@ -1,4 +1,4 @@
-defmodule ExDoc.Formatter.Markdown.Assets do
+defmodule ExDoc.Formatter.MARKDOWN.Assets do
   @moduledoc false
 
   defmacrop embed_pattern(pattern) do

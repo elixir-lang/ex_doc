@@ -103,7 +103,7 @@ defmodule ExDoc.CLI do
   defp normalize_formatters(opts) do
     formatters =
       case Keyword.get_values(opts, :formatter) do
-        [] -> opts[:formatters] || ["html", "epub", "markdown"]
+        [] -> opts[:formatters] || ["html", "epub"]
         values -> values
       end
 

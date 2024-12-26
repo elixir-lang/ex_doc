@@ -1,10 +1,10 @@
-defmodule ExDoc.Formatter.Markdown.Templates do
+defmodule ExDoc.Formatter.MARKDOWN.Templates do
   @moduledoc false
 
   require EEx
 
   import ExDoc.Utils,
-    only: [before_closing_body_tag: 2, before_closing_head_tag: 2, h: 1, text_to_id: 1]
+    only: [before_closing_body_tag: 2, h: 1, text_to_id: 1]
 
   alias ExDoc.Formatter.HTML.Templates, as: H
 
@@ -119,48 +119,34 @@ defmodule ExDoc.Formatter.Markdown.Templates do
     trim: true
   )
 
-  # @doc """
-  # Creates the table of contents.
+  @doc """
+  Creates the table of contents.
 
-  # This template follows the EPUB Navigation Document Definition.
-
-  # See http://www.idpf.org/epub/30/spec/epub30-contentdocs.html#sec-xhtml-nav.
-  # """
-  # EEx.function_from_file(
-  #   :def,
-  #   :nav_template,
-  #   Path.expand("templates/nav_template.eex", __DIR__),
-  #   [:config, :nodes],
-  #   trim: true
-  # )
-
-  # @doc """
-  # Creates a new chapter when the user provides additional files.
-  # """
-  # EEx.function_from_file(
-  #   :def,
-  #   :extra_template,
-  #   Path.expand("templates/extra_template.eex", __DIR__),
-  #   [:config, :title, :title_content, :content],
-  #   trim: true
-  # )
+  """
+  EEx.function_from_file(
+    :def,
+    :nav_template,
+    Path.expand("templates/nav_template.eex", __DIR__),
+    [:config, :nodes],
+    trim: true
+  )
 
 
-  # EEx.function_from_file(
-  #   :defp,
-  #   :nav_item_template,
-  #   Path.expand("templates/nav_item_template.eex", __DIR__),
-  #   [:name, :nodes],
-  #   trim: true
-  # )
+  EEx.function_from_file(
+    :defp,
+    :nav_item_template,
+    Path.expand("templates/nav_item_template.eex", __DIR__),
+    [:name, :nodes],
+    trim: true
+  )
 
-  # EEx.function_from_file(
-  #   :defp,
-  #   :nav_grouped_item_template,
-  #   Path.expand("templates/nav_grouped_item_template.eex", __DIR__),
-  #   [:nodes],
-  #   trim: true
-  # )
+  EEx.function_from_file(
+    :defp,
+    :nav_grouped_item_template,
+    Path.expand("templates/nav_grouped_item_template.eex", __DIR__),
+    [:nodes],
+    trim: true
+  )
 
   # EEx.function_from_file(
   #   :defp,
@@ -170,17 +156,6 @@ defmodule ExDoc.Formatter.Markdown.Templates do
   #   trim: true
   # )
 
-  # "templates/media-types.txt"
-  # |> Path.expand(__DIR__)
-  # |> File.read!()
-  # |> String.split("\n", trim: true)
-  # |> Enum.each(fn line ->
-  #   [extension, media] = String.split(line, ",")
-
-  #   def media_type("." <> unquote(extension)) do
-  #     unquote(media)
-  #   end
-  # end)
 
   # def media_type(_arg), do: nil
 

@@ -9,6 +9,14 @@
         <span class="sr-only">View Source</span>
       </a>
     <% end %>
+    <%= if "markdown" in config.formatters do %>
+      <a href="<%= config.project %>-markdown.zip" title="Markdown version">
+        <%= IO.inspect(module).title %>
+        <i class="ri-markdown-line" aria-hidden="true"></i>
+        <span class="sr-only">Download Markdown version</span>
+      </a>
+    <% end %>
+
     <span translate="no"><%= module.title %></span> <%= module_type(module) %>
     <small class="app-vsn" translate="no">(<%= config.project %> v<%= config.version %>)</small>
     <%= for annotation <- module.annotations do %>

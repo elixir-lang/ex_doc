@@ -22,6 +22,12 @@
               Download ePub version
             </a>
           <% end %>
+
+          <%= if "markdown" in config.formatters do %>
+            <a href="<%= config.project %>-markdown.zip" title="Markdown version">
+              Download Markdown version
+            </a>
+          <% end %>
         </span>
       </p>
 
