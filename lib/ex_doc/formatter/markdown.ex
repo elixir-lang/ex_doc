@@ -92,18 +92,6 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
   ## Helpers
 
-  defp files_to_add(path) do
-    Enum.reduce(Path.wildcard(Path.join(path, "**/*")), [], fn file, acc ->
-      case File.read(file) do
-        {:ok, bin} ->
-          [{file |> Path.relative_to(path) |> String.to_charlist(), bin} | acc]
-
-        {:error, _} ->
-          acc
-      end
-    end)
-  end
-
   defp generate_module_page(module_node, config) do
     content =
       Templates.module_page(config, module_node)

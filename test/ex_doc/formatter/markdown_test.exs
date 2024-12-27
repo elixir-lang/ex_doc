@@ -1,10 +1,6 @@
 defmodule ExDoc.Formatter.MARKDOWNTest do
   use ExUnit.Case, async: false
 
-  import ExUnit.CaptureIO
-
-  alias ExDoc.Utils
-
   @moduletag :tmp_dir
 
   @before_closing_body_tag_content_md "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"

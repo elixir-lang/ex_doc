@@ -1,11 +1,7 @@
 defmodule ExDoc.Formatter do
   @moduledoc false
 
-  alias __MODULE__.{Assets, Templates, SearchData}
   alias ExDoc.{Markdown, GroupMatcher, Utils}
-
-  @main "api-reference"
-  @assets_dir "assets"
 
   @doc """
   Autolinks and renders all docs.
@@ -63,7 +59,7 @@ defmodule ExDoc.Formatter do
     |> Enum.map(&elem(&1, 1))
   end
 
-  defp render_doc(%{doc: nil} = node, ext, _language, _autolink_opts, _opts),
+  defp render_doc(%{doc: nil} = node, _ext, _language, _autolink_opts, _opts),
     do: node
 
   defp render_doc(%{doc: doc} = node, ext, language, autolink_opts, opts) do
@@ -83,7 +79,7 @@ defmodule ExDoc.Formatter do
     mod_id <> "." <> id
   end
 
-  defp autolink_and_render(doc, ".md", language, autolink_opts, opts) do
+  defp autolink_and_render(doc, ".md", language, autolink_opts, _opts) do
     doc
     |> language.autolink_doc(autolink_opts)
     |> ExDoc.DocAST.to_markdown_string()

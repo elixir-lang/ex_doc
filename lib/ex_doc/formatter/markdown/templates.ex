@@ -85,13 +85,9 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
     |> elem(0)
   end
 
-  @class_regex ~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/
-  @class_separator " "
   defp link_heading(match, _tag, _title, "", _prefix), do: match
 
-  defp link_heading(match, tag, title, id, prefix) do
-    section_header_class_name = "section-heading"
-
+  defp link_heading(_match, _tag, title, id, prefix) do
     # The Markdown syntax that we support for the admonition text
     # blocks is something like this:
     #

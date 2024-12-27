@@ -1,7 +1,6 @@
 defmodule ExDoc.Formatter.HTML.TemplatesTest do
   use ExUnit.Case, async: true
 
-  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates
 
   @moduletag :tmp_dir

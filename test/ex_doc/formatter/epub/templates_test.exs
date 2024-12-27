@@ -1,7 +1,6 @@
 defmodule ExDoc.Formatter.EPUB.TemplatesTest do
   use ExUnit.Case, async: true
 
-  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.EPUB.Templates
 
   defp source_url do

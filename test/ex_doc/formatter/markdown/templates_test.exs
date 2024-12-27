@@ -1,7 +1,6 @@
 defmodule ExDoc.Formatter.MARKDOWN.TemplatesTest do
   use ExUnit.Case, async: true
 
-  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.MARKDOWN.Templates
 
   defp source_url do

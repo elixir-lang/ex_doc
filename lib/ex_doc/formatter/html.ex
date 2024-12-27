@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.HTML do
   @moduledoc false
 
   alias __MODULE__.{Assets, Templates, SearchData}
-  alias ExDoc.{Formatter, Markdown, GroupMatcher, Utils}
+  alias ExDoc.{Formatter, Utils}
 
   @main "api-reference"
   @assets_dir "assets"

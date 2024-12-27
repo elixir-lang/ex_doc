@@ -118,12 +118,12 @@ defmodule ExDoc.DocAST do
     fun.(ast, result)
   end
 
-  def to_markdown_string({tag, _attrs, inner, %{verbatim: true}} = ast, fun) do
+  def to_markdown_string({_tag, _attrs, inner, %{verbatim: true}} = ast, fun) do
     result = Enum.join(inner, "")
     fun.(ast, result)
   end
 
-  def to_markdown_string({tag, _attrs, inner, _meta} = ast, fun) do
+  def to_markdown_string({_tag, _attrs, inner, _meta} = ast, fun) do
     result = to_string(inner, fun)
     fun.(ast, result)
   end
