@@ -27,7 +27,7 @@ defmodule ExDoc.DocAST do
     meta param source track wbr)a
 
   @doc """
-  Transform AST into string.
+  Transform AST into an HTML string.
   """
   def to_string(ast, fun \\ fn _ast, string -> string end)
 
@@ -62,6 +62,66 @@ defmodule ExDoc.DocAST do
 
   defp ast_attributes_to_string(attrs) do
     Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
+  end
+
+  @doc """
+  Transform AST into a markdown string.
+  """
+  def to_markdown_string(ast, fun \\ fn _ast, string -> string end)
+
+  def to_markdown_string(binary, _fun) when is_binary(binary) do
+    ExDoc.Utils.h(binary)
+  end
+
+  def to_markdown_string(list, fun) when is_list(list) do
+    result = Enum.map_join(list, "", &to_markdown_string(&1, fun))
+    fun.(list, result)
+  end
+
+  def to_markdown_string({:comment, _attrs, inner, _meta} = ast, fun) do
+    fun.(ast, "<!--#{inner}-->")
+  end
+
+  def to_markdown_string({:code, _attrs, inner, _meta} = ast, fun) do
+    result = """
+    ```
+    #{inner}
+    ```
+    """
+
+    fun.(ast, result)
+  end
+
+  def to_markdown_string({:a, attrs, inner, _meta} = ast, fun) do
+    result = "[#{inner}](#{attrs[:href]})"
+    fun.(ast, result)
+  end
+
+  def to_markdown_string({:hr, _attrs, _inner, _meta} = ast, fun) do
+    result = "\n\n---\n\n"
+    fun.(ast, result)
+  end
+
+  def to_markdown_string({tag, _attrs, _inner, _meta} = ast, fun) when tag in [:p, :br] do
+    result = "\n\n"
+    fun.(ast, result)
+  end
+
+  # @void_elements ~W(area base br col command embed hr img input keygen link
+  #   meta param source track wbr)a
+  def to_markdown_string({tag, _attrs, _inner, _meta} = ast, fun) when tag in @void_elements do
+    result = ""
+    fun.(ast, result)
+  end
+
+  def to_markdown_string({tag, _attrs, inner, %{verbatim: true}} = ast, fun) do
+    result = Enum.join(inner, "")
+    fun.(ast, result)
+  end
+
+  def to_markdown_string({tag, _attrs, inner, _meta} = ast, fun) do
+    result = to_string(inner, fun)
+    fun.(ast, result)
   end
 
   ## parse markdown

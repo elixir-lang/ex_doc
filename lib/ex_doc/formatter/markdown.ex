@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
   @moduledoc false
 
   alias __MODULE__.{Templates}
-  alias ExDoc.Formatter.HTML
+  alias ExDoc.Formatter
   alias ExDoc.Utils
 
   @doc """
@@ -17,16 +17,18 @@ defmodule ExDoc.Formatter.MARKDOWN do
     File.mkdir_p!(config.output)
 
     project_nodes =
-      HTML.render_all(project_nodes, filtered_modules, ".md", config, highlight_tag: "samp")
+      project_nodes
+      # |> Enum.map(&elem(&1, 1))
+      |> Formatter.render_all(filtered_modules, ".md", config, highlight_tag: "samp")
 
     nodes_map = %{
-      modules: HTML.filter_list(:module, project_nodes),
-      tasks: HTML.filter_list(:task, project_nodes)
+      modules: Formatter.filter_list(:module, project_nodes),
+      tasks: Formatter.filter_list(:task, project_nodes)
     }
 
     extras =
       config
-      |> HTML.build_extras(".md")
+      |> Formatter.build_extras(".md")
       |> Enum.chunk_by(& &1.group)
       |> Enum.map(&{hd(&1).group, &1})
 
