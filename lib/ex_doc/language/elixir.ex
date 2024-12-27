@@ -699,7 +699,11 @@ defmodule ExDoc.Language.Elixir do
         end
 
       if url do
-        ~s[<a href="#{url}">#{ExDoc.Utils.h(call_string)}</a>]
+        if config.ext == ".md" do
+          ~s[\[#{ExDoc.Utils.h(call_string)}\](#{url})]
+        else
+          ~s[<a href="#{url}">#{ExDoc.Utils.h(call_string)}</a>]
+        end
       else
         call_string
       end <> do_typespec(rest, config)

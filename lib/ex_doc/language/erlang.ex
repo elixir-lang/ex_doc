@@ -695,7 +695,11 @@ defmodule ExDoc.Language.Erlang do
         end
 
       if url do
-        ~s|<a href="#{url}">#{string}</a>(|
+        if config.ext == ".md" do
+          ~s|[#{string}\](#{url})(|
+        else
+          ~s|<a href="#{url}">#{string}</a>(|
+        end
       else
         string <> "("
       end
