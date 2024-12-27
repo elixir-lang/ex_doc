@@ -1,33 +1,43 @@
     <footer class="footer">
       <p>
-        <%= if config.package do %>
-          <span class="line">
-            <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>" class="footer-hex-package">Hex Package</a>
-
-            <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>">Hex Preview</a>
-
-            <%= source_path = node && Map.get(node, :source_path); if source_path do %>
-              (<a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>/show/<%= source_path %>">current file</a>)
-            <% end %>
-          </span>
-        <% end %>
-
         <span class="line">
+
+          <%= if config.package do %>
+            <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>" class="footer-hex-package">Hex Package</a>
+          <% end %>
+
+          <%
+            hex_url = get_hex_url(config, node && (Map.get(node, :source_path) || Map.get(node, :moduledoc_file)))
+            source_url = node && node.source_url
+          %>
+          <%= if hex_url || source_url do %>
+            View Code:
+            <%= if source_url do %>
+              <a href="<%= source_url %>" title="View Source Code" class="footer-button">Source Repo</a>
+            <% end %>
+
+            <%= if hex_url do %>
+              <a href="<%= hex_url %>" class="footer-button">Hex Preview</a>
+            <% end %>
+          <% end %>
+
+          <%= if "markdown" in config.formatters do %>
+            <a href="./markdown/<%= get_markdown_path(node) %>.md" title="Markdown version" class="footer-button">
+              View Markdown version
+            </a>
+          <% end %>
+
+          <%= if config.package do %>
+            <a href="https://repo.hex.pm/docs/<%= config.package %>-<%= config.version %>.tar.gz" title="Archive containing docs in all available formats" class="footer-button">
+              Download docs archive
+            </a>
+          <% end %>
+
+
           <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
             Search HexDocs
           </button>
 
-          <%= if "epub" in config.formatters do %>
-            <a href="<%= config.project %>.epub" title="ePub version">
-              Download ePub version
-            </a>
-          <% end %>
-
-          <%= if "markdown" in config.formatters do %>
-            <a href="<%= config.project %>-markdown.zip" title="Markdown version">
-              Download Markdown version
-            </a>
-          <% end %>
         </span>
       </p>
 

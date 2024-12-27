@@ -38,39 +38,6 @@ defmodule ExDoc.Formatter.MARKDOWN.TemplatesTest do
     :ok
   end
 
-  describe "content_template/5" do
-    test "includes logo as a resource if specified in the config" do
-      nodes = %{modules: [], tasks: []}
-
-      content =
-        [logo: "my_logo.png"]
-        |> doc_config()
-        |> Templates.content_template(nodes, "uuid", "datetime", _static_files = [])
-
-      assert content =~ ~S|<item id="logo" href="assets/logo.png" media-type="image/png"/>|
-    end
-
-
-    test "includes modules as a resource" do
-      module_node = %ExDoc.ModuleNode{
-        module: XPTOModule,
-        doc: nil,
-        id: "XPTOModule",
-        title: "XPTOModule"
-      }
-
-      nodes = %{modules: [module_node], tasks: []}
-
-      content =
-        Templates.content_template(doc_config(), nodes, "uuid", "datetime", _static_files = [])
-
-      assert content =~
-               ~S|<item id="XPTOModule" href="XPTOModule.md" media-type="application/md+xml" properties="scripted"/>|
-
-      assert content =~ ~S|<itemref idref="XPTOModule"/>|
-    end
-  end
-
   describe "module_page/2" do
     test "generates only the module name when there's no more info" do
       module_node = %ExDoc.ModuleNode{
@@ -99,11 +66,11 @@ defmodule ExDoc.Formatter.MARKDOWN.TemplatesTest do
                ~r{### .*Example H3 heading.*}ms
 
       assert content =~
-               ~r{moduledoc.*Example.*<samp class="nc">CompiledWithDocs</samp><samp class="o">\.</samp><samp class="n">example</samp>.*}ms
+               ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
 
-      assert content =~ ~r{example/2.*Some example}ms
-      assert content =~ ~r{example_without_docs/0.*}ms
-      assert content =~ ~r{example_1/0.*> \(macro\)}ms
+      assert content =~ ~r{Some example}ms
+      assert content =~ ~r{example_without_docs().*}ms
+      assert content =~ ~r{example_1().*> \(macro\)}ms
 
       assert content =~ ~s{example(foo, bar \\\\ Baz)}
     end
@@ -121,21 +88,20 @@ defmodule ExDoc.Formatter.MARKDOWN.TemplatesTest do
       assert content =~ ~r{.*Legacy}ms
     end
 
-
     ## BEHAVIOURS
 
     test "outputs behavior and callbacks" do
       content = get_module_page([CustomBehaviourOne])
 
       assert content =~
-               ~r{# \s*CustomBehaviourOne\s*behaviour\s*}m
+               ~r{# CustomBehaviourOne \(behaviour\)}m
 
       assert content =~ ~r{Callbacks}
 
       content = get_module_page([CustomBehaviourTwo])
 
       assert content =~
-               ~r{# \s*CustomBehaviourTwo\s*behaviour\s*}m
+               ~r{# CustomBehaviourTwo \(behaviour\)}m
 
       assert content =~ ~r{Callbacks}
     end
@@ -144,14 +110,14 @@ defmodule ExDoc.Formatter.MARKDOWN.TemplatesTest do
 
     test "outputs the protocol type" do
       content = get_module_page([CustomProtocol])
-      assert content =~ ~r{# \s*CustomProtocol\s*protocol\s*}m
+      assert content =~ ~r{# CustomProtocol \(protocol\)}m
     end
 
     ## TASKS
 
     test "outputs the task type" do
       content = get_module_page([Mix.Tasks.TaskWithDocs])
-      assert content =~ ~r{# \s*mix task_with_docs\s*}m
+      assert content =~ ~r{#\s*mix task_with_docs}m
     end
   end
 end

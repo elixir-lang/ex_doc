@@ -12,9 +12,9 @@
 > This <%= node.type %> is deprecated. <%= h(deprecated) %>.
 <% end %>
 
-<%= if specs = H.get_specs(node) do %>
-<%= for spec <- specs do %>
-> <%= H.format_spec_attribute(module, node) %> <%= spec %>
+<%= if node.specs != [] do %>
+<%= for spec <- node.specs do %>
+> <%= H.format_spec_attribute(module, node) %>: <%= spec %>
 <% end %>
 <% end %>
 

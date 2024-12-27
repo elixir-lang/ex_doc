@@ -17,13 +17,20 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
   end
 
   @doc """
+  Returns the formatted title for the module page.
+  """
+  def module_type(%{type: :task}), do: ""
+  def module_type(%{type: :module}), do: ""
+  def module_type(%{type: type}), do: "(#{type})"
+
+  @doc """
   Generated ID for static file
   """
   def static_file_to_id(static_file) do
     static_file |> Path.basename() |> text_to_id()
   end
 
-  def node_doc(%{source_doc: %{"en"=> source}}), do: source
+  def node_doc(%{source_doc: %{"en" => source}}), do: source
   def node_doc(%{rendered_doc: source}), do: source
 
   @doc """
@@ -49,8 +56,8 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
     # it is simpler to guarantee they won't be duplicated in docs.
     Regex.replace(~r|(<[^>]*) id="[^"]*"([^>]*>)|, doc, ~S"\1\2", [])
   end
-  
-    @doc """
+
+  @doc """
   Add link headings for the given `content`.
 
   IDs are prefixed with `prefix`.
@@ -131,7 +138,6 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
     trim: true
   )
 
-
   EEx.function_from_file(
     :defp,
     :nav_item_template,
@@ -155,7 +161,6 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
   #   [:nodes],
   #   trim: true
   # )
-
 
   # def media_type(_arg), do: nil
 

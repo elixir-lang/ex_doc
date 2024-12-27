@@ -32,18 +32,12 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
     config = %{config | extras: extras}
 
-    generate_nav(config, nodes_map) 
+    generate_nav(config, nodes_map)
     generate_extras(config)
     generate_list(config, nodes_map.modules)
     generate_list(config, nodes_map.tasks)
 
-    # if config[:generate_zip] do # TODO: add a command line flag?
-    #   {:ok, zip} = generate_zip(config.output)
-    #   File.rm_rf!(config.output)
-    #   Path.relative_to_cwd(zip)
-    # else
-      config.output |> Path.join("index.md") |> Path.relative_to_cwd()
-    # end
+    config.output |> Path.join("index.md") |> Path.relative_to_cwd()
   end
 
   defp normalize_config(config) do
@@ -58,7 +52,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
   defp normalize_output(output) do
     output
     |> String.replace(~r/\r\n|\r|\n/, "\n")
-    |> String.replace(~r/\n{3,}/, "\n\n") 
+    |> String.replace(~r/\n{3,}/, "\n\n")
   end
 
   defp generate_nav(config, nodes) do
@@ -67,8 +61,10 @@ defmodule ExDoc.Formatter.MARKDOWN do
         modules |> Enum.chunk_by(& &1.group) |> Enum.map(&{hd(&1).group, &1})
       end)
 
-    content = Templates.nav_template(config, nodes)
-    |> normalize_output()
+    content =
+      Templates.nav_template(config, nodes)
+      |> normalize_output()
+
     File.write("#{config.output}/index.md", content)
   end
 
@@ -86,23 +82,10 @@ defmodule ExDoc.Formatter.MARKDOWN do
     end
   end
 
-
   defp generate_list(config, nodes) do
     nodes
     |> Task.async_stream(&generate_module_page(&1, config), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
-  end
-
-  defp generate_zip(output) do
-    :zip.create(
-      String.to_charlist("#{output}-markdown.zip"),
-      files_to_add(output),
-      compress: [
-        ~c".md",
-        ~c".jpg",
-        ~c".png"
-      ]
-    )
   end
 
   ## Helpers
@@ -120,9 +103,10 @@ defmodule ExDoc.Formatter.MARKDOWN do
   end
 
   defp generate_module_page(module_node, config) do
-    content = Templates.module_page(config, module_node)
-    |> normalize_output()
+    content =
+      Templates.module_page(config, module_node)
+      |> normalize_output()
+
     File.write("#{config.output}/#{module_node.id}.md", content)
   end
-
 end
