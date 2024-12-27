@@ -107,8 +107,12 @@ defmodule ExDoc.DocAST do
     fun.(ast, result)
   end
 
-  # @void_elements ~W(area base br col command embed hr img input keygen link
-  #   meta param source track wbr)a
+  def to_markdown_string({:img, attrs, _inner, _meta} = ast, fun) do
+    result = "![#{attrs[:alt]}](#{attrs[:src]} \"#{attrs[:title]}\")"
+    fun.(ast, result)
+  end
+
+  # ignoring these: area base col command embed input keygen link meta param source track wbr
   def to_markdown_string({tag, _attrs, _inner, _meta} = ast, fun) when tag in @void_elements do
     result = ""
     fun.(ast, result)
