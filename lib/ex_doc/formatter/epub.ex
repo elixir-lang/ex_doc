@@ -4,6 +4,7 @@ defmodule ExDoc.Formatter.EPUB do
   @mimetype "application/epub+zip"
   @assets_dir "OEBPS/assets"
   alias __MODULE__.{Assets, Templates}
+  alias ExDoc.Formatter
   alias ExDoc.Formatter.HTML
   alias ExDoc.Utils
 
@@ -17,16 +18,18 @@ defmodule ExDoc.Formatter.EPUB do
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
     project_nodes =
-      HTML.render_all(project_nodes, filtered_modules, ".xhtml", config, highlight_tag: "samp")
+      Formatter.render_all(project_nodes, filtered_modules, ".xhtml", config,
+        highlight_tag: "samp"
+      )
 
     nodes_map = %{
-      modules: HTML.filter_list(:module, project_nodes),
-      tasks: HTML.filter_list(:task, project_nodes)
+      modules: Formatter.filter_list(:module, project_nodes),
+      tasks: Formatter.filter_list(:task, project_nodes)
     }
 
     extras =
       config
-      |> HTML.build_extras(".xhtml")
+      |> Formatter.build_extras(".xhtml")
       |> Enum.chunk_by(& &1.group)
       |> Enum.map(&{hd(&1).group, &1})
 

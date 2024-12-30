@@ -99,10 +99,13 @@ defmodule ExDoc.Autolink do
       if app in config.apps do
         path <> ext <> suffix
       else
+        #  TODO: remove this if/when hexdocs.pm starts including .md files
+        ext = ".html"
+
         config.deps
         |> Keyword.get_lazy(app, fn -> base_url <> "#{app}" end)
         |> String.trim_trailing("/")
-        |> Kernel.<>("/" <> path <> ".html" <> suffix)
+        |> Kernel.<>("/" <> path <> ext <> suffix)
       end
     else
       path <> ext <> suffix

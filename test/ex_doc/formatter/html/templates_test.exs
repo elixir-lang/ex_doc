@@ -1,7 +1,6 @@
 defmodule ExDoc.Formatter.HTML.TemplatesTest do
   use ExUnit.Case, async: true
 
-  alias ExDoc.Formatter.HTML
   alias ExDoc.Formatter.HTML.Templates
 
   @moduletag :tmp_dir
@@ -32,7 +31,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   defp get_module_page(names, context, config \\ []) do
     config = doc_config(context, config)
     {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
-    [mod | _] = HTML.render_all(mods, [], ".html", config, [])
+    [mod | _] = ExDoc.Formatter.render_all(mods, [], ".html", config, [])
     Templates.module_page(mod, @empty_nodes_map, config)
   end
 
@@ -428,7 +427,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       names = [CompiledWithDocs, CompiledWithoutDocs, DuplicateHeadings]
       config = doc_config(context)
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, config)
-      nodes = HTML.render_all(nodes, [], ".html", config, [])
+      nodes = ExDoc.Formatter.render_all(nodes, [], ".html", config, [])
 
       [compiled_with_docs, compiled_without_docs, duplicate_headings] =
         create_sidebar_items(%{modules: nodes}, [])["modules"]

@@ -64,7 +64,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
     Regex.replace(~r|(<[^>]*) id="[^"]*"([^>]*>)|, doc, ~S"\1\2", [])
   end
 
-  defp enc(binary), do: URI.encode(binary)
+  defp presence([]), do: nil
+  defp presence(other), do: other
+
+  def enc(binary), do: URI.encode(binary)
 
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
@@ -205,6 +208,21 @@ defmodule ExDoc.Formatter.HTML.Templates do
     do: raise("could not find matching #{output}/#{pattern}")
 
   defp relative_asset([h | _], output, _pattern), do: Path.relative_to(h, output)
+
+  defp get_hex_url(config, source_path) do
+    case config.package do
+      nil ->
+        nil
+
+      package ->
+        base_url = "https://preview.hex.pm/preview/#{package}/#{config.version}"
+        if source_path, do: "#{base_url}/show/#{source_path}", else: base_url
+    end
+  end
+
+  defp get_markdown_path(node) do
+    if node && node.id, do: URI.encode(node.id), else: "index"
+  end
 
   # TODO: Move link_headings and friends to html.ex or even to autolinking code,
   # so content is built with it upfront instead of added at the template level.

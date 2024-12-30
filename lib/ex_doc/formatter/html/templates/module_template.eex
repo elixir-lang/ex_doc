@@ -9,6 +9,7 @@
         <span class="sr-only">View Source</span>
       </a>
     <% end %>
+
     <span translate="no"><%= module.title %></span> <%= module_type(module) %>
     <small class="app-vsn" translate="no">(<%= config.project %> v<%= config.version %>)</small>
     <%= for annotation <- module.annotations do %>
