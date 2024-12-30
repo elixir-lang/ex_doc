@@ -136,8 +136,14 @@
   font-size: 0.9rem;
 }
 
-.autocomplete-suggestion:hover,
+
 .autocomplete-suggestion.selected {
+  background-color: var(--autocompleteSelected);
+  /* focus indicator on left, similar to default in focus.css  */
+  box-shadow: inset 2px 0 var(--main);
+}
+
+.autocomplete-suggestion:hover {
   background-color: var(--autocompleteHover);
 }
 
