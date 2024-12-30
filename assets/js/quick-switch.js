@@ -1,5 +1,7 @@
 import { debounce, qs, qsAll } from './helpers'
 import { openModal } from './modal'
+import quickSwitchModalBodyTemplate from './handlebars/templates/quick-switch-modal-body.handlebars'
+import quickSwitchResultsTemplate from './handlebars/templates/quick-switch-results.handlebars'
 
 const HEX_DOCS_ENDPOINT = 'https://hexdocs.pm/%%'
 const OTP_DOCS_ENDPOINT = 'https://www.erlang.org/doc/apps/%%'
@@ -115,7 +117,7 @@ function handleInput (event) {
 export function openQuickSwitchModal () {
   openModal({
     title: 'Go to package docs',
-    body: Handlebars.templates['quick-switch-modal-body']()
+    body: quickSwitchModalBodyTemplate()
   })
 
   qs(QUICK_SWITCH_INPUT_SELECTOR).focus()
@@ -185,7 +187,7 @@ function queryForAutocomplete (packageSlug) {
 
 function renderResults ({ results }) {
   const resultsContainer = qs(QUICK_SWITCH_RESULTS_SELECTOR)
-  const resultsHtml = Handlebars.templates['quick-switch-results']({ results })
+  const resultsHtml = quickSwitchResultsTemplate({ results })
   resultsContainer.innerHTML = resultsHtml
 
   qsAll(QUICK_SWITCH_RESULT_SELECTOR).forEach(result => {

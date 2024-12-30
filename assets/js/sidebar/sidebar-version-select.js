@@ -1,5 +1,6 @@
 import { qs, checkUrlExists } from '../helpers'
 import { getVersionNodes } from '../globals'
+import versionsDropdownTemplate from '../handlebars/templates/versions-dropdown.handlebars'
 
 const VERSIONS_CONTAINER_SELECTOR = '.sidebar-projectVersion'
 const VERSIONS_DROPDOWN_SELECTOR = '.sidebar-projectVersionsDropdown'
@@ -22,7 +23,7 @@ export function initialize () {
 
 function renderVersionsDropdown ({ nodes }) {
   const versionsContainer = qs(VERSIONS_CONTAINER_SELECTOR)
-  const versionsDropdownHtml = Handlebars.templates['versions-dropdown']({ nodes })
+  const versionsDropdownHtml = versionsDropdownTemplate({ nodes })
   versionsContainer.innerHTML = versionsDropdownHtml
 
   qs(VERSIONS_DROPDOWN_SELECTOR).addEventListener('change', handleVersionSelected)

@@ -2,6 +2,7 @@ import { qs, qsAll } from './helpers'
 import { openModal } from './modal'
 import { settingsStore } from './settings-store'
 import { keyboardShortcuts } from './keyboard-shortcuts'
+import settingsModalBodyTemplate from './handlebars/templates/settings-modal-body.handlebars'
 
 const SETTINGS_LINK_SELECTOR = '.display-settings'
 const SETTINGS_MODAL_BODY_SELECTOR = '#settings-modal-content'
@@ -53,7 +54,7 @@ function showKeyboardShortcutsTab () {
 export function openSettingsModal () {
   openModal({
     title: modalTabs.map(({id, title}) => `<button id="${id}">${title}</button>`).join(''),
-    body: Handlebars.templates['settings-modal-body']({ shortcuts: keyboardShortcuts })
+    body: settingsModalBodyTemplate({ shortcuts: keyboardShortcuts })
   })
 
   const modal = qs(SETTINGS_MODAL_BODY_SELECTOR)

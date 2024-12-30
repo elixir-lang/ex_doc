@@ -1,3 +1,5 @@
+import tabsetTemplate from './handlebars/templates/tabset.handlebars'
+
 const CONTENT_CONTAINER_ID = 'content'
 const TABSET_OPEN_COMMENT = 'tabs-open'
 const TABSET_CLOSE_COMMENT = 'tabs-close'
@@ -78,7 +80,7 @@ function processTabset (element, tabSetIndex, _array) {
   wrapElements(allSetNodes, container)
 
   // Apply template to tabset container element.
-  container.innerHTML = Handlebars.templates.tabset({tabs: tabSet})
+  container.innerHTML = tabsetTemplate({tabs: tabSet})
 
   // Return tabset container element.
   return container

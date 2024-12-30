@@ -16,8 +16,5 @@ module.exports = {
     'no-throw-literal': 0,
     'no-useless-escape': 0,
     'object-curly-spacing': 0
-  },
-  globals: {
-    'Handlebars': 'readonly'
   }
 }

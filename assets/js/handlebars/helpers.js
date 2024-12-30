@@ -1,3 +1,5 @@
+import * as Handlebars from 'handlebars/runtime'
+
 Handlebars.registerHelper('groupChanged', function (context, nodeGroup, options) {
   const group = nodeGroup || ''
   if (context.group !== group) {
