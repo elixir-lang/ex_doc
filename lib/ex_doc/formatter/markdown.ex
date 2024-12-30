@@ -91,7 +91,7 @@ defmodule ExDoc.Formatter.Markdown do
                   id: id,
                   line: child_node.doc_line,
                   file: child_node.doc_file,
-                  current_kfa: {:function, child_node.name, child_node.arity}
+                  current_kfa: {child_node.type, child_node.name, child_node.arity}
                 ]
 
             specs = Enum.map(child_node.specs, &language.format_spec(&1))
@@ -99,31 +99,9 @@ defmodule ExDoc.Formatter.Markdown do
             render_doc(child_node, language, autolink_opts, opts, 4)
           end
 
-        typespecs =
-          for child_node <- node.typespecs do
-            id = id(node, child_node)
-
-            autolink_opts =
-              autolink_opts ++
-                [
-                  id: id,
-                  line: child_node.doc_line,
-                  file: child_node.doc_file,
-                  current_kfa: {child_node.type, child_node.name, child_node.arity}
-                ]
-
-            child_node = %{
-              child_node
-              | spec: language.format_spec(child_node.spec)
-            }
-
-            render_doc(child_node, language, autolink_opts, opts, 3)
-          end
-
         %{
           render_doc(node, language, [{:id, node.id} | autolink_opts], opts, 2)
-          | docs: docs,
-            typespecs: typespecs
+          | docs: docs
         }
       end,
       timeout: :infinity
@@ -384,7 +362,7 @@ defmodule ExDoc.Formatter.Markdown do
       if ids_count[extra.id] > 1, do: {disambiguate_id(extra, idx), idx + 1}, else: {extra, idx}
     end)
     |> elem(0)
-    |> Enum.sort_by(fn extra -> GroupMatcher.group_index(groups, extra.group) end)
+    |> Enum.sort_by(fn extra -> GroupMatcher.index(groups, extra.group) end)
   end
 
   defp disambiguate_id(extra, discriminator) do

@@ -17,36 +17,10 @@ defmodule ExDoc.Formatter.Markdown.Templates do
   end
 
   @doc """
-  Get the full specs from a function, already in HTML form.
-  """
-  def get_specs(%ExDoc.TypeNode{spec: spec}) do
-    [spec]
-  end
-
-  def get_specs(%ExDoc.FunctionNode{specs: specs}) when is_list(specs) do
-    presence(specs)
-  end
-
-  def get_specs(_node) do
-    nil
-  end
-
-  @doc """
   Format the attribute type used to define the spec of the given `node`.
   """
   def format_spec_attribute(module, node) do
     module.language.format_spec_attribute(node)
-  end
-
-  @doc """
-  Get defaults clauses.
-  """
-  def get_defaults(%{defaults: defaults}) do
-    defaults
-  end
-
-  def get_defaults(_) do
-    []
   end
 
   @doc """
@@ -83,13 +57,8 @@ defmodule ExDoc.Formatter.Markdown.Templates do
   defp enc(binary), do: URI.encode(binary)
 
   def module_summary(module_node) do
-    entries = docs_groups(module_node.docs_groups, module_node.docs ++ module_node.typespecs)
-
-    Enum.reject(entries, fn {_type, nodes} -> nodes == [] end)
-  end
-
-  defp docs_groups(groups, docs) do
-    for group <- groups, do: {group, Enum.filter(docs, &(&1.group == group))}
+    # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
+    ExDoc.GroupMatcher.group_by(module_node.docs_groups, module_node.docs, & &1.group)
   end
 
   def asset_rev(output, pattern) do

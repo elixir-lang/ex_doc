@@ -1,8 +1,8 @@
 ### <%=h node.signature %>
 
 <%= for annotation <- node.annotations do %>*(<%= annotation %>)* <% end %>
-<%= if specs = get_specs(node) do %>```<%= config.proglang %>
-<%= for spec <- specs do %><%= format_spec_attribute(module, node) %> <%= spec %>
+<%= if node.specs != [] do %>```<%= config.proglang %>
+<%= for spec <- node.specs do %><%= format_spec_attribute(module, node) %> <%= spec %>
 <% end %>```<% end %>
 <%= if deprecated = node.deprecated do %>This <%= node.type %> is deprecated. <%= h(deprecated) %>.<% end %>
 
