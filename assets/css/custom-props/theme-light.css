@@ -92,7 +92,8 @@
   --searchSearch:                var(--white);
   --autocompleteBorder:          rgba(3, 9, 19, 0.10);
   --autocompletePreview:         var(--gray25);
-  --autocompleteHover:           var(--grey50, #F0F5F9);
+  --autocompleteSelected:        var(--gray25);
+  --autocompleteHover:           var(--gray50);
   --autocompleteBackground:      var(--white);
   --suggestionBorder:            var(--gray200);
   --autocompleteResults:         var(--gray600);
