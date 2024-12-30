@@ -141,6 +141,10 @@
   background-color: var(--autocompleteHover);
 }
 
+.autocomplete-suggestion.selected {
+  box-shadow: inset 0 0 0 1px var(--searchBarFocusColor);
+}
+
 .autocomplete-suggestion:not(.selected) .autocomplete-preview-indicator {
   display: none;
 }
