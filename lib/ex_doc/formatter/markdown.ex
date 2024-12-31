@@ -40,13 +40,16 @@ defmodule ExDoc.Formatter.Markdown do
       end
 
     all_files =
-      static_files ++
-        generate_extras(extras, config) ++
-        generate_logo(@assets_dir, config) ++
-        generate_list(nodes_map.modules, config) ++
-        generate_list(nodes_map.tasks, config)
+      (static_files ++
+         generate_extras(extras, config) ++
+         generate_logo(@assets_dir, config) ++
+         generate_list(nodes_map.modules, config) ++
+         generate_list(nodes_map.tasks, config))
+      |> Enum.uniq()
+      |> Kernel.--([@assets_dir])
+      |> Enum.sort()
 
-    generate_build(Enum.sort(all_files), build)
+    generate_build(all_files, build)
 
     config.output
     |> Path.join("index.md")
