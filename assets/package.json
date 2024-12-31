@@ -9,9 +9,9 @@
     "npm": ">= 9.0.0"
   },
   "scripts": {
-    "lint": "npx eslint './js/**/*.js'",
-    "lint:fix": "npx eslint --fix './js/**/*.js'",
-    "test": "npx karma start ./karma.conf.js --single-run",
+    "lint": "eslint './js/**/*.js'",
+    "lint:fix": "eslint --fix './js/**/*.js'",
+    "test": "karma start ./karma.conf.js --single-run",
     "build:watch": "npm run build --watch",
     "build": "node build/build.js"
   },
