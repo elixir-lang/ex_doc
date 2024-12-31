@@ -1,5 +1,6 @@
 import { qs, getCurrentPageSidebarType, getLocationHash, findSidebarCategory } from '../helpers'
 import { getSidebarNodes } from '../globals'
+import sidebarItemsTemplate from '../handlebars/templates/sidebar-items.handlebars'
 
 const SIDEBAR_TYPE = {
   search: 'search',
@@ -42,7 +43,7 @@ function renderSidebarNodeList (nodesByType, type) {
   // Render the list
   const nodeList = qs(sidebarNodeListSelector(type))
   if (!nodeList) { return }
-  const listContentHtml = Handlebars.templates['sidebar-items']({ nodes, group: '' })
+  const listContentHtml = sidebarItemsTemplate({ nodes, group: '' })
   nodeList.innerHTML = listContentHtml
 
   // Removes the "expand" class from links belonging to single-level sections

@@ -1,6 +1,8 @@
 import { qs, qsAll } from '../helpers'
 import { settingsStore } from '../settings-store'
 import { cancelHintFetchingIfAny, getHint, HINT_KIND, isValidHintHref } from './hints'
+import tooltipLayoutTemplate from '../handlebars/templates/tooltip-layout.handlebars'
+import tooltipBodyTemplate from '../handlebars/templates/tooltip-body.handlebars'
 
 // Elements that can activate the tooltip.
 const TOOLTIP_ACTIVATORS_SELECTOR = '.content a'
@@ -41,7 +43,7 @@ export function initialize () {
 }
 
 function renderTooltipLayout () {
-  const tooltipLayoutHtml = Handlebars.templates['tooltip-layout']()
+  const tooltipLayoutHtml = tooltipLayoutTemplate()
   qs(CONTENT_INNER_SELECTOR).insertAdjacentHTML('beforeend', tooltipLayoutHtml)
 }
 
@@ -108,7 +110,7 @@ function shouldShowTooltips () {
 }
 
 function renderTooltip (hint) {
-  const tooltipBodyHtml = Handlebars.templates['tooltip-body']({
+  const tooltipBodyHtml = tooltipBodyTemplate({
     isPlain: hint.kind === HINT_KIND.plain,
     hint
   })

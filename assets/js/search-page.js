@@ -3,6 +3,7 @@
 import lunr from 'lunr'
 import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
 import { setSearchInputValue } from './search-bar'
+import searchResultsTemplate from './handlebars/templates/search-results.handlebars'
 
 const EXCERPT_RADIUS = 80
 const SEARCH_CONTAINER_SELECTOR = '#search'
@@ -48,7 +49,7 @@ async function search (value) {
 
 function renderResults ({ value, results, errorMessage }) {
   const searchContainer = qs(SEARCH_CONTAINER_SELECTOR)
-  const resultsHtml = Handlebars.templates['search-results']({ value, results, errorMessage })
+  const resultsHtml = searchResultsTemplate({ value, results, errorMessage })
   searchContainer.innerHTML = resultsHtml
 }
 
