@@ -1,4 +1,6 @@
 defmodule ExDoc.DocAST do
+  # General helpers for dealing with the documentation AST
+  # (which is the Markdown -> HTML AST).
   @moduledoc false
 
   @type t :: term()

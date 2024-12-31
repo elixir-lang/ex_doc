@@ -1,4 +1,5 @@
 defmodule ExDoc.Language.Source do
+  # Shared helpers used by both Erlang and Elixir.
   @moduledoc false
 
   def anno_line(line) when is_integer(line), do: abs(line)

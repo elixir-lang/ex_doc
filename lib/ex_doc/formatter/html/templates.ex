@@ -163,7 +163,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     [sections: sections]
   end
 
-  # TODO: split into sections in Formatter.HTML instead.
+  # TODO: split into sections in Formatter.HTML instead (possibly via DocAST)
   @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
   defp extract_headers(content) do
     @h2_regex
@@ -193,8 +193,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:livemd), do: "extras"
   defp sidebar_type(:extra), do: "extras"
 
-  # TODO: Move link_headings and friends to html.ex or even to autolinking code,
-  # so content is built with it upfront instead of added at the template level.
+  # TODO: Move link_headings and friends to html.ex (possibly via DocAST)
+  # or even to autolinking code, so content is built with it upfront instead
+  # of added at the template level.
 
   @doc """
   Add link headings for the given `content`.
