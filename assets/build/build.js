@@ -74,10 +74,10 @@ Promise.all(formatters.map(async ({formatter, ...options}) => {
         if (watchMode) {
           build.onEnd(async result => {
             if (result.errors.length) return
-            console.log(`[watch] ${formatter} assets built`)
+            console.log(`${formatter} assets built`)
             await exec('mix compile --force', {cwd: '../'})
             await exec(`mix docs --formatter ${formatter}`, {cwd: '../'})
-            console.log(`[watch] ${formatter} docs built`)
+            console.log(`${formatter} docs built`)
           })
         }
       }
