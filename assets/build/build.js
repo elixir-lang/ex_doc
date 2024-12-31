@@ -26,7 +26,7 @@ const formatters = [
     formatter: 'html',
     outdir: path.resolve('../formatters/html/dist'),
     entryPoints: [
-      'js/entry/html_inline.js',
+      'js/entry/inline_html.js',
       'js/entry/html.js',
       'css/entry/html-elixir.css',
       'css/entry/html-erlang.css'

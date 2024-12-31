@@ -7,6 +7,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     only: [before_closing_body_tag: 2, before_closing_head_tag: 2, h: 1, text_to_id: 1]
 
   alias ExDoc.Formatter.HTML.Templates, as: H
+  alias ExDoc.Formatter.EPUB.Assets
 
   @doc """
   Generate content from the module template for a given `node`

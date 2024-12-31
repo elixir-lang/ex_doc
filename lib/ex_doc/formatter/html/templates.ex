@@ -1,6 +1,7 @@
 defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
+  alias ExDoc.Formatter.HTML.Assets
 
   import ExDoc.Utils,
     only: [
@@ -191,28 +192,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:cheatmd), do: "extras"
   defp sidebar_type(:livemd), do: "extras"
   defp sidebar_type(:extra), do: "extras"
-
-  defp resolve_asset(output, pattern) do
-    output = Path.expand(output)
-
-    matches =
-      output
-      |> Path.join(pattern)
-      |> Path.wildcard()
-
-    case matches do
-      [] -> raise("could not find matching #{output}/#{pattern}")
-      [asset | _] -> asset
-    end
-  end
-
-  def asset_rev(output, pattern) do
-    resolve_asset(output, pattern) |> Path.relative_to(output)
-  end
-
-  def asset_inline(output, pattern) do
-    resolve_asset(output, pattern) |> File.read!()
-  end
 
   # TODO: Move link_headings and friends to html.ex or even to autolinking code,
   # so content is built with it upfront instead of added at the template level.
