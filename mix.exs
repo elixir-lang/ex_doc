@@ -47,7 +47,7 @@ defmodule ExDoc.Mixfile do
       {:jason, "~> 1.4"},
       {:floki, "~> 0.0", only: :test},
       {:easyhtml, "~> 0.0", only: :test},
-      {:mdex, "~> 0.2"}
+      {:mdex, "~> 0.3"}
     ]
   end
 
