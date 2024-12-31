@@ -23,16 +23,4 @@
     <%= before_closing_head_tag(config, :html) %>
   </head>
   <body class="sidebar-closed">
-    <script>
-      <% # Immediately apply night mode preference to avoid a flash effect %>
-      try {
-        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
-
-        if (settings.theme === 'dark' ||
-           ((settings.theme === 'system' || settings.theme == null) &&
-             window.matchMedia('(prefers-color-scheme: dark)').matches)
-           ) {
-          document.body.classList.add('dark')
-        }
-      } catch (error) { }
-    </script>
+    <script><%= asset_inline config.output, "dist/html_inline-*.js" %></script>
