@@ -71,7 +71,7 @@ body.dark {
   --quickSwitchContour:          var(--gray500);
 
   --success:                     var(--green-lightened-10);
-  --progressBarColor:            var(--gray400);
+  --progressBarColor:            var(--gray300);
 
   --sidebarAccentMain:           var(--gray50);
   --sidebarBackground:           var(--gray800);
