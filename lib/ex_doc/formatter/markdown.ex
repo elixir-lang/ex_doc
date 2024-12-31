@@ -129,7 +129,7 @@ defmodule ExDoc.Formatter.Markdown do
 
   defp rewrite_headings(markdown, base_heading)
        when is_binary(markdown) and is_integer(base_heading) and base_heading >= 1 do
-    {:ok, [{"document", attributes, document}] = _ast} = MDEx.parse_document(markdown)
+    {:ok, document} = MDEx.parse_document(markdown)
 
     document =
       case find_lowest_heading(document) do
@@ -142,18 +142,15 @@ defmodule ExDoc.Formatter.Markdown do
           bump_levels(document, levels_to_bump)
       end
 
-    ast = [{"document", attributes, document}]
-
-    MDEx.to_commonmark!(ast)
+    MDEx.to_commonmark!(document)
   end
 
-  defp find_lowest_heading(document) when is_list(document) do
+  defp find_lowest_heading(document) when is_struct(document, MDEx.Document) do
     Enum.reduce_while(document, 6, fn
-      {"heading", [{"level", 1}, _rest_attributes], _children}, _lowest_level ->
+      %MDEx.Heading{level: 1}, _lowest_level ->
         {:halt, 1}
 
-      {"heading", [{"level", level}, _rest_attributes], _children}, lowest_level
-      when level < lowest_level ->
+      %MDEx.Heading{level: level}, lowest_level when level < lowest_level ->
         {:cont, level}
 
       _, lowest_level ->
@@ -161,20 +158,20 @@ defmodule ExDoc.Formatter.Markdown do
     end)
   end
 
-  defp bump_levels(document, levels_to_bump) when is_list(document) do
-    document
-    |> Enum.reduce([], fn
-      {"heading", [{"level", level}, rest_attributes], children}, acc ->
-        updated_element =
-          {"heading", [{"level", increase_level(level, levels_to_bump)}, rest_attributes],
-           children}
+  defp bump_levels(%MDEx.Document{nodes: nodes} = document, levels_to_bump) do
+    nodes_updated =
+      Enum.reduce(nodes, [], fn
+        %MDEx.Heading{level: level} = heading, acc ->
+          updated_element = %{heading | level: increase_level(level, levels_to_bump)}
 
-        [updated_element | acc]
+          [updated_element | acc]
 
-      elem, acc ->
-        [elem | acc]
-    end)
-    |> Enum.reverse()
+        elem, acc ->
+          [elem | acc]
+      end)
+      |> Enum.reverse()
+
+    Map.put(document, :nodes, nodes_updated)
   end
 
   defp increase_level(level, levels_to_bump) do

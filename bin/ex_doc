@@ -8,6 +8,7 @@ Code.prepend_path Path.expand("../_build/#{mix_env}/lib/makeup_html/ebin", __DIR
 Code.prepend_path Path.expand("../_build/#{mix_env}/lib/earmark_parser/ebin", __DIR__)
 Code.prepend_path Path.expand("../_build/#{mix_env}/lib/rustler_precompiled/ebin", __DIR__)
 Code.prepend_path Path.expand("../_build/#{mix_env}/lib/castore/ebin", __DIR__)
+Code.prepend_path Path.expand("../_build/#{mix_env}/lib/jason/ebin", __DIR__)
 Code.prepend_path Path.expand("../_build/#{mix_env}/lib/mdex/ebin", __DIR__)
 Code.prepend_path Path.expand("../_build/#{mix_env}/lib/ex_doc/ebin", __DIR__)
 
