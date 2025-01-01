@@ -10,7 +10,7 @@ import { escapeRegexModifiers, escapeHtmlEntities, isBlank } from '../helpers'
  * @property {String|null} description An additional information (to be displayed below the title).
  * @property {Number} matchQuality How well the suggestion matches the given query string.
  * @property {String} category The group of suggestions that the suggestion belongs to.
- * @property {bool} deprecated Wether this node is marked as deprecated in the codebase
+ * @property {bool} deprecated Whether this node is marked as deprecated in the codebase
  */
 
 const SUGGESTION_CATEGORY = {

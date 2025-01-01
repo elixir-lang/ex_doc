@@ -98,8 +98,8 @@
   --suggestionBorder:            var(--gray200);
   --autocompleteResults:         var(--gray600);
   --autocompleteResultsBold:     var(--gray800);
-  --autocompleteSrollbarThumb:   var(--gray200);
-  --autocompleteSrollbarTrack:   var(--gray50);
+  --autocompleteScrollbarThumb:   var(--gray200);
+  --autocompleteScrollbarTrack:   var(--gray50);
   --autocompleteLabelBack:       var(--gray100);
   --autocompleteLabelFont:       var(--gray600);
 }

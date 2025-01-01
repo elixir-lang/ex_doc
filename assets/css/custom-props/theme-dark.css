@@ -97,8 +97,8 @@ body.dark {
   --suggestionBorder:            var(--gray600);
   --autocompleteResults:         var(--gray200);
   --autocompleteResultsBold:     var(--gray100);
-  --autocompleteSrollbarThumb:   var(--gray600);
-  --autocompleteSrollbarTrack:   var(--gray850);
+  --autocompleteScrollbarThumb:   var(--gray600);
+  --autocompleteScrollbarTrack:   var(--gray850);
   --autocompleteLabelBack:       var(--gray600);
   --autocompleteLabelFont:       rgba(255, 255, 255, 0.8);
 }

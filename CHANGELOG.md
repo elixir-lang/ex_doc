@@ -190,7 +190,7 @@ This release requires Elixir v1.13.
 ## v0.30.6 (2023-08-25)
 
   * Enhancements
-    * Extract title from Markdown file when preceeded with comments
+    * Extract title from Markdown file when preceded with comments
     * Improve focus navigation in notebooks
 
 ## v0.30.5 (2023-08-12)
@@ -333,7 +333,7 @@ This release requires Elixir v1.13.
 
 ## v0.28.3 (2022-03-23)
 
-  * Enhacements
+  * Enhancements
     * Include page titles in autocomplete suggestions
     * Allow theme to be set to "System" version
     * Remove "Specs" heading and render full typespecs
