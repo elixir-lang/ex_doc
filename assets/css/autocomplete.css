@@ -239,13 +239,13 @@
 
 /* Style the scrollbar thumb (the draggable part) */
 .autocomplete-suggestions::-webkit-scrollbar-thumb {
-  background-color: var(--autocompleteSrollbarThumb);
+  background-color: var(--autocompleteScrollbarThumb);
   border-radius: 7px;
 }
 
 /* Style the scrollbar track on hover */
 .autocomplete-suggestions::-webkit-scrollbar-track {
-  background-color: var(--autocompleteSrollbarTrack);
+  background-color: var(--autocompleteScrollbarTrack);
 }
 
 @media screen and (max-width: 1023px) {

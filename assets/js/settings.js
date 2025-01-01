@@ -37,7 +37,7 @@ function addEventListeners () {
   })
 }
 
-function showSettinsTab () {
+function showSettingsTab () {
   qs(KEYBOARD_SHORTCUTS_TAB).classList.remove('active')
   qs(SETTINGS_TAB).classList.add('active')
   qs(SETTINGS_CONTENT).classList.remove('hidden')
@@ -98,11 +98,11 @@ export function openSettingsModal () {
   })
 
   qs(SETTINGS_TAB).addEventListener('click', event => {
-    showSettinsTab()
+    showSettingsTab()
   })
   qs(KEYBOARD_SHORTCUTS_TAB).addEventListener('click', event => {
     showKeyboardShortcutsTab()
   })
 
-  showSettinsTab()
+  showSettingsTab()
 }
