@@ -5,99 +5,137 @@ on:
   push:
 
 env:
-  node-version: 18.x
+  MIX_ENV: test
 
 jobs:
-  mix_test:
+  elixir_js_and_lint:
     runs-on: ubuntu-20.04
-    env:
-      MIX_ENV: test
+    strategy:
+      matrix:
+        include:
+          - elixir: "1.17"
+            otp: "27"
+            node: 18.x
+    steps:
+      - uses: actions/checkout@v3
+
+      # Setup Node
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{matrix.node}}
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
+
+      - run: npm ci --prefix assets
+
+      # Setup Elixir
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - run: mix deps.get
+
+      # Generate docs artifact
+      - name: Generate docs
+        run: |
+          mix build
+          test -f doc/index.html && echo "doc/index.html exists."
+          test -f doc/ExDoc.epub && echo "doc/ExDoc.epub exists."
+
+      - name: Upload docs
+        uses: actions/upload-artifact@v4
+        id: docs-upload
+        with:
+          name: docs
+          path: doc/
+          overwrite: true
+
+      - name: Build update
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        env:
+          ARTIFACT_ID: ${{ steps.docs-upload.outputs.artifact-id }}
+        with:
+          script: |
+            const artifactUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${process.env.ARTIFACT_ID}`;
+            const commentBody = `<!-- build-artifact-comment -->\n📦 Docs artifacts are ready: ${artifactUrl}`;
+
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.data.find(comment =>
+              comment.user.type === 'Bot' &&
+                comment.body.includes('<!-- build-artifact-comment -->')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+
+      # Test Elixir
+      - run: mix format --check-formatted
+      - run: mix deps.unlock --check-unused
+      - run: mix compile --force --warnings-as-errors
+      - run: mix test
+      - run: test/prerelease.sh
+
+      # Test JS
+      - run: npm run lint --prefix assets
+      - name: npm run test --prefix assets
+        run: |
+          sudo apt-get install xvfb
+          xvfb-run --auto-servernum npm run test --prefix assets
+        env:
+          CI: true
+
+      # Push updated assets if all good
+      - name: Push updated assets
+        if: github.ref_name == 'main'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update assets
+          file_pattern: formatters
+
+  elixir:
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
         include:
-          - pair: # Test very old Elixir and Erlang
-              elixir: "1.14"
-              otp: "25"
-          - pair: # Test Erlang without -doc attribute support
-              elixir: "1.16"
-              otp: "26"
-          - pair: # Test Erlang with -doc attribute support
-              elixir: "1.17"
-              otp: "27"
-            lint: lint
+          # Test very old Elixir and Erlang
+          - elixir: "1.14"
+            otp: "25"
+          # Test Erlang without -doc attribute support
+          - elixir: "1.16"
+            otp: "26"
     steps:
       - uses: actions/checkout@v3
 
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{matrix.pair.otp}}
-          elixir-version: ${{matrix.pair.elixir}}
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
 
-      - name: Install Dependencies
-        run: mix deps.get
-
-      - run: mix format --check-formatted
-        if: ${{ matrix.lint }}
-
-      - run: mix deps.unlock --check-unused
-        if: ${{ matrix.lint }}
-
-      - run: mix deps.compile
-
-      - run: mix compile --warnings-as-errors
-        if: ${{ matrix.lint }}
-
+      - run: mix deps.get
       - run: mix test
-
-      - name: Prerelease
-        run: test/prerelease.sh
-
-      - name: Generate docs
-        run: |
-          mix docs
-          test -f doc/index.html && echo "doc/index.html exists."
-          test -f doc/ExDoc.epub && echo "doc/ExDoc.epub exists."
-
-  check_js:
-    name: Check JS
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.node-version }}
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
-      - run: npm install --prefix assets
-      - run: npm run lint --prefix assets
-      - run: sudo apt-get install xvfb
-      - run: |
-          xvfb-run --auto-servernum npm run test --prefix assets
-        env:
-          CI: true
-
-  assets:
-    needs: [check_js]
-    runs-on: ubuntu-20.04
-    if: github.ref_name == 'main'
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.node-version }}
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
-      - run: npm ci --prefix assets
-      - run: npm run build --prefix assets
-      - name: Push updated assets
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Update assets
-          file_pattern: formatters
+      - run: test/prerelease.sh
