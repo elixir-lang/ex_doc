@@ -104,7 +104,7 @@ body {
     max-width: 90vw;
   }
 
-  .sidebar-button {
+  body:not(.sidebar-open) .sidebar-button {
     position: absolute;
   }
 }
