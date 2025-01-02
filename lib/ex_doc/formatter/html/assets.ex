@@ -5,7 +5,10 @@ defmodule ExDoc.Formatter.HTML.Assets do
     ["formatters/html", pattern]
     |> Path.join()
     |> Path.wildcard()
-    |> Enum.map(&{Path.basename(&1), File.read!(&1)})
+    |> Enum.map(fn path ->
+      Module.put_attribute(__CALLER__.module, :external_resource, path)
+      {Path.basename(path), File.read!(path)}
+    end)
   end
 
   defp dist_js(), do: embed_pattern("dist/html-*.js")
