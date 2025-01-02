@@ -1,1 +1,0 @@
-(()=>{var t="ex_doc:settings";try{let{theme:e}=JSON.parse(localStorage.getItem(t)||"{}");(e==="dark"||(e==="system"||e==null)&&window.matchMedia("(prefers-color-scheme: dark)").matches)&&document.body.classList.add("dark")}catch{}})();
