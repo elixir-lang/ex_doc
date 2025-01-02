@@ -62,7 +62,7 @@ jobs:
           ARTIFACT_ID: ${{ steps.docs-upload.outputs.artifact-id }}
         with:
           script: |
-            const artifactUrl = '$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts/$ARTIFACT_ID';
+            const artifactUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${process.env.ARTIFACT_ID}`;
             const commentBody = `<!-- build-artifact-comment -->📦 Build artifacts are ready: ${artifactUrl}`;
 
             const comments = await github.rest.issues.listComments({
