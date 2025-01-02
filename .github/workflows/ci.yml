@@ -72,7 +72,7 @@ jobs:
             });
 
             const botComment = comments.data.find(comment =>
-              comment.user.login === context.author &&
+              comment.user.type === 'Bot' &&
                 comment.body.includes('<!-- build-artifact-comment -->')
             );
 
