@@ -49,9 +49,47 @@ jobs:
 
       - name: Upload docs
         uses: actions/upload-artifact@v4
+        id: docs-upload
         with:
           name: docs
           path: doc/
+          overwrite: true
+
+      - name: Build update
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        env:
+          ARTIFACT_ID: ${{ steps.docs-upload.outputs.artifact-id }}
+        with:
+          script: |
+            const artifactUrl = '$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts/$ARTIFACT_ID';
+            const commentBody = `<!-- build-artifact-comment -->📦 Build artifacts are ready: ${artifactUrl}`;
+
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.data.find(comment =>
+              comment.body.includes('<!-- build-artifact-comment -->')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
 
       # Test Elixir
       - run: mix format --check-formatted
