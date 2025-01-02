@@ -72,7 +72,8 @@ jobs:
             });
 
             const botComment = comments.data.find(comment =>
-              comment.body.includes('<!-- build-artifact-comment -->')
+              comment.user.login === context.author &&
+                comment.body.includes('<!-- build-artifact-comment -->')
             );
 
             if (botComment) {
