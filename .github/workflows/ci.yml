@@ -5,62 +5,24 @@ on:
   push:
 
 env:
-  node-version: 18.x
+  MIX_ENV: test
 
 jobs:
-  elixir:
+  elixir_js_and_lint:
     runs-on: ubuntu-20.04
-    env:
-      MIX_ENV: test
     strategy:
-      fail-fast: false
       matrix:
         include:
-          - pair: # Test very old Elixir and Erlang
-              elixir: "1.14"
-              otp: "25"
-          - pair: # Test Erlang without -doc attribute support
-              elixir: "1.16"
-              otp: "26"
-          - pair: # Test Erlang with -doc attribute support
-              elixir: "1.17"
-              otp: "27"
-            lint: lint
+          - elixir: "1.17"
+            otp: "27"
+            node: 18.x
     steps:
       - uses: actions/checkout@v3
 
-      - uses: erlef/setup-beam@v1
-        with:
-          otp-version: ${{matrix.pair.otp}}
-          elixir-version: ${{matrix.pair.elixir}}
-
-      - name: Install Dependencies
-        run: mix deps.get
-
-      - run: mix format --check-formatted
-        if: ${{ matrix.lint }}
-
-      - run: mix deps.unlock --check-unused
-        if: ${{ matrix.lint }}
-
-      - run: mix deps.compile
-
-      - run: mix compile --warnings-as-errors
-        if: ${{ matrix.lint }}
-
-      - run: mix test
-
-      - name: Prerelease
-        run: test/prerelease.sh
-
-  js:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-
+      # Setup Node
       - uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.node-version }}
+          node-version: ${{matrix.node}}
 
       - name: Cache npm dependencies
         uses: actions/cache@v3
@@ -69,21 +31,16 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
 
       - run: npm ci --prefix assets
-      - run: npm run lint --prefix assets
-      - name: npm run test --prefix assets
-        run: |
-          sudo apt-get install xvfb
-          xvfb-run --auto-servernum npm run test --prefix assets
-        env:
-          CI: true
 
-      - name: Push updated assets
-        if: github.ref_name == 'main'
-        uses: stefanzweifel/git-auto-commit-action@v4
+      # Setup Elixir
+      - uses: erlef/setup-beam@v1
         with:
-          commit_message: Update assets
-          file_pattern: formatters
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
 
+      - run: mix deps.get
+
+      # Generate docs artifact
       - name: Generate docs
         run: |
           mix build
@@ -95,3 +52,51 @@ jobs:
         with:
           name: docs
           path: doc/
+
+      # Test Elixir
+      - run: mix format --check-formatted
+      - run: mix deps.unlock --check-unused
+      - run: mix compile --force --warnings-as-errors
+      - run: mix test
+      - run: test/prerelease.sh
+
+      # Test JS
+      - run: npm run lint --prefix assets
+      - name: npm run test --prefix assets
+        run: |
+          sudo apt-get install xvfb
+          xvfb-run --auto-servernum npm run test --prefix assets
+        env:
+          CI: true
+
+      # Push updated assets if all good
+      - name: Push updated assets
+        if: github.ref_name == 'main'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update assets
+          file_pattern: formatters
+
+  elixir:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Test very old Elixir and Erlang
+          - elixir: "1.14"
+            otp: "25"
+          # Test Erlang without -doc attribute support
+          - elixir: "1.16"
+            otp: "26"
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - run: mix deps.get
+      - run: mix test
+      - run: test/prerelease.sh
