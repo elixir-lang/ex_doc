@@ -8,7 +8,7 @@ env:
   node-version: 18.x
 
 jobs:
-  mix_test:
+  elixir:
     runs-on: ubuntu-20.04
     env:
       MIX_ENV: test
@@ -53,51 +53,45 @@ jobs:
       - name: Prerelease
         run: test/prerelease.sh
 
-      - name: Generate docs
-        run: |
-          mix docs
-          test -f doc/index.html && echo "doc/index.html exists."
-          test -f doc/ExDoc.epub && echo "doc/ExDoc.epub exists."
-
-  check_js:
-    name: Check JS
+  js:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node-version }}
+
       - name: Cache npm dependencies
         uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
-      - run: npm install --prefix assets
+
+      - run: npm ci --prefix assets
       - run: npm run lint --prefix assets
-      - run: sudo apt-get install xvfb
-      - run: |
+      - name: npm run test --prefix assets
+        run: |
+          sudo apt-get install xvfb
           xvfb-run --auto-servernum npm run test --prefix assets
         env:
           CI: true
 
-  assets:
-    needs: [check_js]
-    runs-on: ubuntu-20.04
-    if: github.ref_name == 'main'
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.node-version }}
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
-      - run: npm ci --prefix assets
-      - run: npm run build --prefix assets
       - name: Push updated assets
+        if: github.ref_name == 'main'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Update assets
           file_pattern: formatters
+
+      - name: Generate docs
+        run: |
+          mix build
+          test -f doc/index.html && echo "doc/index.html exists."
+          test -f doc/ExDoc.epub && echo "doc/ExDoc.epub exists."
+
+      - name: Upload docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: doc/
