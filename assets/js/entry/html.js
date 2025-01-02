@@ -1,5 +1,3 @@
-import '../handlebars/helpers'
-
 import { onDocumentReady } from '../helpers'
 import { initialize as initTabsets } from '../tabsets'
 import { initialize as initContent } from '../content'
@@ -31,7 +29,7 @@ onDocumentReady(() => {
   const isPreview = params.has('preview')
   const isHint = params.has('hint')
 
-  initTheme(params.get('theme'))
+  initTheme()
   initStyling()
 
   initTabsets()

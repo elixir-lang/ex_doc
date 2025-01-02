@@ -400,17 +400,14 @@
   background-color: transparent;
   border: none;
   font-size: var(--sidebarFontSize);
+  color: var(--sidebarAccentMain);
 }
 
 .sidebar-button:hover {
   color: var(--sidebarHover);
 }
 
-.sidebar-button {
-  color: var(--sidebarAccentMain);
-}
-
-.sidebar-closed .sidebar-button {
+body:not(.sidebar-open) .sidebar-button {
   color: var(--contrast);
 }
 

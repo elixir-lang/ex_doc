@@ -145,7 +145,7 @@ body.search-focused .search-bar .search-close-button {
     position: sticky !important;
   }
 
-  body.search-focused.sidebar-closed .sidebar-button {
+  body.search-focused .sidebar-button {
     position: fixed !important;
   }
 }
@@ -155,7 +155,7 @@ body.search-focused .search-bar .search-close-button {
     position: sticky !important;
   }
 
-  body.scroll-sticky.sidebar-closed .sidebar-button {
+  body.scroll-sticky .sidebar-button {
     position: fixed !important;
   }
 }
