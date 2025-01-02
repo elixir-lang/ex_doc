@@ -63,7 +63,7 @@ jobs:
         with:
           script: |
             const artifactUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${process.env.ARTIFACT_ID}`;
-            const commentBody = `<!-- build-artifact-comment -->📦 [Build artifacts are ready!](${artifactUrl})`;
+            const commentBody = `<!-- build-artifact-comment -->\n📦 [Docs artifacts are ready!](${artifactUrl})`;
 
             const comments = await github.rest.issues.listComments({
               owner: context.repo.owner,
