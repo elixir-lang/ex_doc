@@ -16,8 +16,8 @@
 }
 
 .content-inner .detail-header {
-  margin: 2 0 1em;
-  padding: 0.5em 1em;
+  margin: 1em 0;
+  padding: 0.5em 0.85em 0.5em 1em;
   background-color: var(--textDetailBackground);
   border-left: 3px solid var(--textDetailAccent);
   font-size: 1em;
@@ -25,12 +25,7 @@
   position: relative;
 }
 
-.content-inner .detail-header .note {
-  float: right;
-}
-
 .content-inner .detail-header .signature {
-  display: inline-block;
   font-family: var(--monoFontFamily);
   font-size: 1rem;
   font-weight: 700;
@@ -60,6 +55,10 @@
   .content-inner .detail-header a.detail-link {
     margin-left: -30px;
   }
+}
+
+.content-inner .detail-header .icon-action {
+  margin-top: 4px;
 }
 
 .content-inner .specs pre {

@@ -2,19 +2,21 @@
 <%= sidebar_template(config, module.type, nodes_map) %>
 
 <div id="top-content">
-  <h1>
+  <div class="heading-with-actions top-heading">
+    <h1>
+      <span translate="no"><%= module.title %></span> <%= module_type(module) %>
+      <small class="app-vsn" translate="no">(<%= config.project %> v<%= config.version %>)</small>
+      <%= for annotation <- module.annotations do %>
+        <span class="note">(<%= annotation %>)</span>
+      <% end %>
+    </h1>
     <%= if module.source_url do %>
       <a href="<%= module.source_url %>" title="View Source" class="icon-action" rel="help">
         <i class="ri-code-s-slash-line" aria-hidden="true"></i>
         <span class="sr-only">View Source</span>
       </a>
     <% end %>
-    <span translate="no"><%= module.title %></span> <%= module_type(module) %>
-    <small class="app-vsn" translate="no">(<%= config.project %> v<%= config.version %>)</small>
-    <%= for annotation <- module.annotations do %>
-      <span class="note">(<%= annotation %>)</span>
-    <% end %>
-  </h1>
+  </div>
 
   <%= if deprecated = module.deprecated do %>
     <div class="deprecated">
@@ -54,4 +56,5 @@
     </div>
   </section>
 <% end %>
+
 <%= footer_template(config, module) %>
