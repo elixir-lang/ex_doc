@@ -2,9 +2,6 @@ name: CI
 
 on: [pull_request, push]
 
-permissions:
-  checks: write
-
 env:
   MIX_ENV: test
 
@@ -41,7 +38,7 @@ jobs:
 
       - run: mix deps.get
 
-      # Generate docs artifact
+      # Generate and upload artifacts
       - name: Generate docs
         run: |
           mix build
@@ -54,30 +51,6 @@ jobs:
         with:
           name: docs
           path: doc/
-          overwrite: true
-
-      - name: Docs report
-        uses: actions/github-script@v7
-        continue-on-error: true
-        env:
-          ARTIFACT_ID: ${{ steps.docs-upload.outputs.artifact-id }}
-        with:
-          script: |
-            const artifactUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${process.env.ARTIFACT_ID}`;
-
-            await github.rest.checks.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'Docs artifacts',
-              head_sha: context.sha,
-              status: 'completed',
-              conclusion: 'success',
-              output: {
-                title: '',
-                summary: '',
-                text: artifactUrl
-              }
-            });
 
       # Test Elixir
       - run: mix format --check-formatted
