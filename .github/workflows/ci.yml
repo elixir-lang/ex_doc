@@ -41,6 +41,10 @@ jobs:
       - name: Generate docs
         run: test/prerelease.sh
 
+      - name: Attach docs metadata
+        run: |
+          echo "{\"pr_number\":${{ github.event.number }},\"artifact_id\":${{ steps.docs-upload.outputs.artifact-id }}}" > test/tmp/contents/doc/gh.json
+
       - name: Upload docs
         uses: actions/upload-artifact@v4
         id: docs-upload
