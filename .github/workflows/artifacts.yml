@@ -29,7 +29,8 @@ jobs:
             }
 
             const pullNumber = context.payload.workflow_run.pull_requests[0].number;
-            const artifactUrl = artifacts.data.artifacts[0].archive_download_url;
+            const artifactId = artifacts.data.artifacts[0].id;
+            const artifactUrl = `${context.payload.workflow_run.artifacts_url}/${artifactId}`;
             const commentBody = `<!-- build-artifact-comment -->\n📦 Docs artifacts are ready: ${artifactUrl}`;
 
             const comments = await github.rest.issues.listComments({
