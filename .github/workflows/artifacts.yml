@@ -4,6 +4,8 @@ on:
     workflows: ["CI"]
     types:
       - completed
+    branches-ignore:
+      - main
 
 permissions:
   pull-requests: write
@@ -26,13 +28,14 @@ jobs:
               throw new Error('Expected one artifact')
             }
 
+            const pullNumber = context.payload.workflow_run.pull_requests[0].number;
             const artifactUrl = artifacts.data.artifacts[0].archive_download_url;
             const commentBody = `<!-- build-artifact-comment -->\n📦 Docs artifacts are ready: ${artifactUrl}`;
 
             const comments = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              issue_number: pullNumber
             });
 
             const botComment = comments.data.find(comment =>
@@ -51,7 +54,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number,
+                issue_number: pullNumber,
                 body: commentBody
               });
             }
