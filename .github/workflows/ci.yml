@@ -73,9 +73,9 @@ jobs:
               status: 'completed',
               conclusion: 'success',
               output: {
-                title: artifactUrl,
+                title: '',
                 summary: '',
-                text: `Download: ${artifactUrl}`
+                text: artifactUrl
               }
             });
 
