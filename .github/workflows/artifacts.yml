@@ -22,7 +22,11 @@ jobs:
               run_id: context.payload.workflow_run.id
             });
 
-            const artifactUrl = artifacts[0].archive_download_url;
+            if (artifacts.data.total_count !== 1) {
+              throw new Error('Expected one artifact')
+            }
+
+            const artifactUrl = artifacts.data.artifacts[0].archive_download_url;
             const commentBody = `<!-- build-artifact-comment -->\n📦 Docs artifacts are ready: ${artifactUrl}`;
 
             const comments = await github.rest.issues.listComments({
