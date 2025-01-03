@@ -73,16 +73,10 @@ jobs:
               status: 'completed',
               conclusion: 'success',
               output: {
-                title: 'Docs Artifacts',
-                summary: `Download: ${artifactUrl}`,
-                text: ''
-              },
-              actions: [{
-                label: 'Download',
-                description: 'Download',
-                identifier: 'download',
-                url: artifactUrl
-              }]
+                title: artifactUrl,
+                summary: '',
+                text: `Download: ${artifactUrl}`
+              }
             });
 
       # Test Elixir
