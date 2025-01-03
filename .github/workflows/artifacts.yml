@@ -36,9 +36,10 @@ jobs:
               archive_format: 'zip'
             });
 
-            const zlib = require('zlib');
-            const zip = zlib.unzipSync(Buffer.from(download.data));
-            const ghInfo = JSON.parse(zip.toString());
+            const fs = require('fs');
+            fs.writeFileSync('artifact.zip', Buffer.from(download.data));
+            require('child_process').execSync('unzip artifact.zip');
+            const ghInfo = JSON.parse(fs.readFileSync('gh.json', 'utf8'));
             const pullNumber = ghInfo.number;
 
             const artifactUrl = `${context.payload.workflow_run.html_url}/artifacts/${artifact.id}`;
