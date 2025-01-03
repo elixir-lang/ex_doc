@@ -43,7 +43,7 @@ jobs:
 
       - name: Attach docs metadata
         run: |
-          echo "{\"pr_number\":${{ github.event.number }},\"artifact_id\":${{ steps.docs-upload.outputs.artifact-id }}}" > test/tmp/contents/doc/gh.json
+          echo "{\"number\":${{ github.event.number }}}" > test/tmp/contents/doc/gh.json
 
       - name: Upload docs
         uses: actions/upload-artifact@v4
