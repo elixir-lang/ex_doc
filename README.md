@@ -1,5 +1,7 @@
 # ExDoc
 
+TEST
+
 [![Build Status](https://github.com/elixir-lang/ex_doc/workflows/CI/badge.svg)](https://github.com/elixir-lang/ex_doc/actions?query=workflow%3A%22CI%22)
 
 ExDoc is a tool to generate documentation for Erlang and Elixir projects. To see an example, [you can access Elixir's official docs](https://hexdocs.pm/elixir/).
