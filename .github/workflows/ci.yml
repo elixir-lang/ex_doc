@@ -1,8 +1,9 @@
 name: CI
 
-on:
-  pull_request:
-  push:
+on: [pull_request, push]
+
+permissions:
+  checks: write
 
 env:
   MIX_ENV: test
@@ -55,42 +56,28 @@ jobs:
           path: doc/
           overwrite: true
 
-      - name: Build update
+      - name: Docs report
         uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
+        continue-on-error: true
         env:
           ARTIFACT_ID: ${{ steps.docs-upload.outputs.artifact-id }}
         with:
           script: |
             const artifactUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${process.env.ARTIFACT_ID}`;
-            const commentBody = `<!-- build-artifact-comment -->\n📦 Docs artifacts are ready: ${artifactUrl}`;
 
-            const comments = await github.rest.issues.listComments({
+            await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              name: 'Build Artifacts',
+              head_sha: context.sha,
+              status: 'completed',
+              conclusion: 'success',
+              output: {
+                title: 'Docs Artifacts',
+                summary: `📦 Docs artifacts are ready for download`,
+                text: `Download them from: ${artifactUrl}`
+              }
             });
-
-            const botComment = comments.data.find(comment =>
-              comment.user.type === 'Bot' &&
-                comment.body.includes('<!-- build-artifact-comment -->')
-            );
-
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: commentBody
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: commentBody
-              });
-            }
 
       # Test Elixir
       - run: mix format --check-formatted
