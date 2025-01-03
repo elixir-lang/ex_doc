@@ -52,12 +52,6 @@ jobs:
           name: docs
           path: test/tmp/contents/doc/
 
-      - name: Dispatch docs
-        uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
-        env:
-          ARTIFACT_ID: ${{ steps.docs-upload.outputs.artifact-id }}
-
       # Test JS
       - run: npm run lint --prefix assets
       - name: npm run test --prefix assets
