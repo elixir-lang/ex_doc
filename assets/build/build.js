@@ -76,7 +76,6 @@ Promise.all(formatters.map(async ({formatter, ...options}) => {
           build.onEnd(async result => {
             if (result.errors.length) return
             console.log(`${formatter} assets built`)
-            await exec('mix compile --force', {cwd: '../'})
             await exec(`mix docs --formatter ${formatter}`, {cwd: '../'})
             console.log(`${formatter} docs built`)
           })

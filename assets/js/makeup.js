@@ -6,30 +6,20 @@ const HIGHLIGHT_CLASS = 'hll'
  * Sets up dynamic behaviour for code blocks processed with *makeup*.
  */
 export function initialize () {
-  initializeDelimitersHighlighting()
-}
-
-// Hovering over a delimiter (bracket, parenthesis, do/end)
-// highlights the relevant pair of delimiters.
-function initializeDelimitersHighlighting () {
-  const delimiters = qsAll('[data-group-id]')
-
-  delimiters.forEach(delimiter => {
-    const groupId = delimiter.getAttribute('data-group-id')
-
-    delimiter.addEventListener('mouseenter', event => {
-      toggleDelimitersHighlight(groupId, true)
-    })
-
-    delimiter.addEventListener('mouseleave', event => {
-      toggleDelimitersHighlight(groupId, false)
-    })
+  // Hovering over a delimiter (bracket, parenthesis, do/end)
+  // highlights the relevant pair of delimiters.
+  qsAll('[data-group-id]').forEach(delimiter => {
+    delimiter.addEventListener('mouseenter', toggleDelimitersHighlight)
+    delimiter.addEventListener('mouseleave', toggleDelimitersHighlight)
   })
 }
 
-function toggleDelimitersHighlight (groupId, force) {
-  const delimiters = qsAll(`[data-group-id="${groupId}"]`)
-  delimiters.forEach(delimiter => {
+/** @param {MouseEvent} event */
+function toggleDelimitersHighlight (event) {
+  const element = event.currentTarget
+  const force = event.type === 'mouseenter'
+  const groupId = element.getAttribute('data-group-id')
+  element.parentElement.querySelectorAll(`[data-group-id="${groupId}"]`).forEach(delimiter => {
     delimiter.classList.toggle(HIGHLIGHT_CLASS, force)
   })
 }
