@@ -68,15 +68,21 @@ jobs:
             await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              name: 'Build Artifacts',
+              name: 'Docs artifacts',
               head_sha: context.sha,
               status: 'completed',
               conclusion: 'success',
               output: {
                 title: 'Docs Artifacts',
-                summary: `📦 Docs artifacts are ready for download`,
-                text: `Download them from: ${artifactUrl}`
-              }
+                summary: `Download: ${artifactUrl}`,
+                text: ''
+              },
+              actions: [{
+                label: 'Download',
+                description: 'Download',
+                identifier: 'download',
+                url: artifactUrl
+              }]
             });
 
       # Test Elixir
