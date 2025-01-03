@@ -28,8 +28,20 @@ jobs:
               throw new Error('Expected one artifact')
             }
 
-            const pullNumber = context.payload.workflow_run.pull_requests[0].number;
-            const artifactUrl = artifacts.data.artifacts[0].archive_download_url;
+            const artifact = artifacts.data.artifacts[0];
+            const download = await github.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: artifact.id,
+              archive_format: 'zip'
+            });
+
+            const zlib = require('zlib');
+            const zip = zlib.unzipSync(Buffer.from(download.data));
+            const ghInfo = JSON.parse(zip.toString());
+            const pullNumber = ghInfo.number;
+
+            const artifactUrl = artifact.archive_download_url;
             const commentBody = `<!-- build-artifact-comment -->\n📦 Docs artifacts are ready: ${artifactUrl}`;
 
             const comments = await github.rest.issues.listComments({

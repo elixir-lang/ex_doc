@@ -6,7 +6,7 @@ env:
   MIX_ENV: test
 
 jobs:
-  elixir_js_and_lint:
+  assets:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -29,6 +29,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
 
       - run: npm ci --prefix assets
+      - run: npm run build --prefix assets
 
       # Setup Elixir
       - uses: erlef/setup-beam@v1
@@ -36,28 +37,26 @@ jobs:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
 
-      - run: mix deps.get
-
       # Generate and upload artifacts
       - name: Generate docs
+        run: test/prerelease.sh
+
+      - name: Docs metadata
         run: |
-          mix build
-          test -f doc/index.html && echo "doc/index.html exists."
-          test -f doc/ExDoc.epub && echo "doc/ExDoc.epub exists."
+          echo "{\"pr_number\":${{ github.event.number }},\"artifact_id\":${{ steps.docs-upload.outputs.artifact-id }}}" > test/tmp/contents/doc/gh.json
 
       - name: Upload docs
         uses: actions/upload-artifact@v4
         id: docs-upload
         with:
           name: docs
-          path: doc/
+          path: test/tmp/contents/doc/
 
-      # Test Elixir
-      - run: mix format --check-formatted
-      - run: mix deps.unlock --check-unused
-      - run: mix compile --force --warnings-as-errors
-      - run: mix test
-      - run: test/prerelease.sh
+      - name: Dispatch docs
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        env:
+          ARTIFACT_ID: ${{ steps.docs-upload.outputs.artifact-id }}
 
       # Test JS
       - run: npm run lint --prefix assets
@@ -88,6 +87,10 @@ jobs:
           # Test Erlang without -doc attribute support
           - elixir: "1.16"
             otp: "26"
+          # Test Erlang with -doc attribute support
+          - elixir: "1.17"
+            otp: "27"
+            lint: true
     steps:
       - uses: actions/checkout@v3
 
@@ -97,5 +100,14 @@ jobs:
           elixir-version: ${{ matrix.elixir }}
 
       - run: mix deps.get
+
+      - run: mix compile --warnings-as-errors
+        if: ${{ matrix.lint }}
+
       - run: mix test
-      - run: test/prerelease.sh
+
+      - run: mix deps.unlock --check-unused
+        if: ${{ matrix.lint }}
+
+      - run: mix format --check-formatted
+        if: ${{ matrix.lint }}

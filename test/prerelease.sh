@@ -1,5 +1,5 @@
 #!/bin/bash
-PKG=test/tmp/package
+PKG=test/tmp
 
 # build package
 mix hex.build
@@ -10,4 +10,8 @@ TAR=$(ls ex_doc-*.tar | head -n 1)
 rm -rf $PKG && mkdir -p $PKG/contents && tar xf $TAR -C $PKG && tar xzf $PKG/contents.tar.gz -C $PKG/contents
 
 # compile and build docs
-cd $PKG/contents && MIX_ENV=prod mix do deps.get --only prod, compile, docs
+cd $PKG/contents && MIX_ENV=prod mix deps.get --only prod + compile + docs
+
+# run assertions
+test -f doc/index.html && echo "doc/index.html exists"
+test -f doc/ExDoc.epub && echo "doc/ExDoc.epub exists"
