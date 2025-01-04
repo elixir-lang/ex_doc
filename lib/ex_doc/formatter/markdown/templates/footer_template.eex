@@ -1,0 +1,3 @@
+
+---
+Built using [ExDoc](https://github.com/elixir-lang/ex_doc "ExDoc") (v<%= ExDoc.version() %>) for the <%= if config.proglang == :erlang do %>[Erlang programming language](href="https://erlang.org" "Erlang")<% else %>[Elixir programming language](href="https://elixir-lang.org" "Elixir")<% end %>.

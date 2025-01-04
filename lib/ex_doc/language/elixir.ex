@@ -380,16 +380,18 @@ defmodule ExDoc.Language.Elixir do
   def autolink_spec(ast, opts) do
     config = struct!(Autolink, opts)
 
-    string =
-      ast
-      |> Macro.to_string()
-      |> safe_format_string!()
-      |> ExDoc.Utils.h()
-
+    string = format_spec(ast)
     name = typespec_name(ast)
     {name, rest} = split_name(string, name)
 
     name <> do_typespec(rest, config)
+  end
+
+  def format_spec(ast) do
+    ast
+    |> Macro.to_string()
+    |> safe_format_string!()
+    |> ExDoc.Utils.h()
   end
 
   @impl true
