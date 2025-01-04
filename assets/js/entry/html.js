@@ -16,7 +16,6 @@ import { initialize as initTooltips } from '../tooltips/tooltips'
 import { initialize as initHintsPage } from '../tooltips/hint-page'
 import { initialize as initCopyButton } from '../copy-button'
 import { initialize as initSettings } from '../settings'
-import { initialize as initStyling } from '../styling'
 import { initialize as initPreview} from '../preview'
 
 import Swup from 'swup'
@@ -30,10 +29,9 @@ onDocumentReady(() => {
   const isHint = params.has('hint')
 
   initTheme()
-  initStyling()
 
   initTabsets()
-  initContent(isPreview)
+  initContent()
   initMakeup()
   initTooltips()
   initCopyButton()
@@ -55,7 +53,7 @@ onDocumentReady(() => {
         hooks: {
           'page:view': () => {
             initTabsets()
-            initContent(false)
+            initContent()
             initMakeup()
             initTooltips()
             initCopyButton()

@@ -1,12 +1,12 @@
 /**
  * A shorthand for `document.querySelector`.
- * @type {Function}
+ * @type {typeof document.querySelector}
  */
 export const qs = document.querySelector.bind(document)
 
 /**
  * A shorthand for `document.querySelectorAll`.
- * @type {Function}
+ * @type {typeof document.querySelectorAll}
  */
 export const qsAll = document.querySelectorAll.bind(document)
 
@@ -218,5 +218,6 @@ export function getProjectNameAndVersion () {
  * @return {Boolean}
  */
 export function isAppleOS () {
-  return /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent)
+  // Set in inline_html.js
+  return document.documentElement.classList.contains('apple-os')
 }

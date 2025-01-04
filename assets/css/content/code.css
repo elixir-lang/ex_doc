@@ -1,11 +1,11 @@
-.content-inner :is(a.no-underline, pre a) {
+.content-inner.content-inner :is(a:has(code, img), pre a) {
   color: var(--linksNoUnderline);
   text-shadow: none;
   text-decoration: none;
   background-image: none;
 }
 
-.content-inner :is(a.no-underline, pre a):is(:visited, :active, :focus, :hover) {
+.content-inner.content-inner :is(a:has(code, img), pre a):is(:visited, :active, :focus, :hover) {
   color: var(--linksNoUnderlineVisited);
 }
 

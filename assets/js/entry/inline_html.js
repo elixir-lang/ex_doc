@@ -28,3 +28,7 @@ const sidebarWidth = sessionStorage.getItem(SIDEBAR_WIDTH_KEY)
 if (sidebarWidth) {
   document.body.style.setProperty('--sidebarWidth', `${sidebarWidth}px`)
 }
+
+// Set OS class.
+const isAppleOS = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent)
+document.documentElement.classList.toggle('apple-os', isAppleOS)

@@ -11,7 +11,7 @@
   scrollbar-color: var(--sidebarScrollbarThumb) var(--sidebarScrollbarTrack);
 }
 
-.non-apple-os .sidebar {
+:root:not(.apple-os) .sidebar {
   font-weight: 400; /* Non-Apple OSes render small light type too thinly */
 }
 
@@ -318,7 +318,7 @@
   color: var(--sidebarAccentMain);
 }
 
-.non-apple-os .sidebar .full-list ul li {
+:root:not(.apple-os) .sidebar .full-list ul li {
   font-weight: 400; /* Non-Apple OSes render small light type too thinly */
 }
 
