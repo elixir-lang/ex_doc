@@ -8,7 +8,6 @@ import { initialize as initVersions } from '../sidebar/sidebar-version-select'
 import { initialize as initSearchPage } from '../search-page'
 import { initialize as initTheme } from '../theme'
 import { initialize as initMakeup } from '../makeup'
-import { initialize as initModal } from '../modal'
 import { initialize as initKeyboardShortcuts } from '../keyboard-shortcuts'
 import { initialize as initQuickSwitch } from '../quick-switch'
 import { initialize as initToast } from '../toast'
@@ -71,7 +70,6 @@ onDocumentReady(() => {
     }
 
     initVersions()
-    initModal()
     initKeyboardShortcuts()
     initQuickSwitch()
     initToast()

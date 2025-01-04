@@ -1,45 +1,38 @@
 import { qs } from './helpers'
-import modalLayoutTemplate from './handlebars/templates/modal-layout.handlebars'
+import modalLayoutHtml from './handlebars/templates/modal-layout.html'
 
-const MODAL_SELECTOR = '.modal'
-const MODAL_CLOSE_BUTTON_SELECTOR = '.modal .modal-close'
-const MODAL_TITLE_SELECTOR = '.modal .modal-title'
-const MODAL_BODY_SELECTOR = '.modal .modal-body'
 const FOCUSABLE_SELECTOR = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-const state = {
-  prevFocus: null,
-  lastFocus: null,
-  ignoreFocusChanges: false
-}
 
-/**
- * Initializes modal layout.
- */
-export function initialize () {
-  renderModal()
-}
+// State
+
+/** @type {HTMLDivElement | null} */
+let modal = null
+/** @type {HTMLElement | null} */
+let prevFocus = null
+/** @type {HTMLElement | null} */
+let lastFocus = null
+let ignoreFocusChanges = false
 
 /**
  * Adds the modal to DOM, initially it's hidden.
  */
 function renderModal () {
-  const modalLayoutHtml = modalLayoutTemplate()
-  document.body.insertAdjacentHTML('beforeend', modalLayoutHtml)
+  if (modal) return
 
-  qs(MODAL_SELECTOR).addEventListener('keydown', event => {
+  document.body.insertAdjacentHTML('beforeend', modalLayoutHtml)
+  modal = qs('.modal')
+
+  modal.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
       closeModal()
     }
   })
 
-  qs(MODAL_CLOSE_BUTTON_SELECTOR).addEventListener('click', event => {
-    closeModal()
-  })
+  modal.querySelector('.modal-close').addEventListener('click', closeModal)
 
-  qs(MODAL_SELECTOR).addEventListener('click', event => {
-    const classList = event.target.classList
+  modal.addEventListener('click', event => {
     // if we clicked on the modal overlay/parent but not the modal content
-    if (classList.contains('modal')) {
+    if (event.target === modal) {
       closeModal()
     }
   })
@@ -49,63 +42,57 @@ function renderModal () {
  * Trap focus in modal
  * Only called on open modals
  */
-function trapFocus (event) {
-  if (state.ignoreFocusChanges) return
-  const modal = qs(MODAL_SELECTOR)
+function handleFocus (event) {
+  if (ignoreFocusChanges) return
+
   if (modal.contains(event.target)) {
-    state.lastFocus = event.target
+    lastFocus = event.target
   } else {
-    state.ignoreFocusChanges = true
-    const firstFocusable = firstFocusableDescendant(modal)
-    if (state.lastFocus === firstFocusable) {
-      lastFocusableDescendant(modal).focus()
+    ignoreFocusChanges = true
+    const focusable = modal.querySelector(FOCUSABLE_SELECTOR)
+    if (lastFocus === focusable[0]) {
+      // Focus last
+      focusable[focusable.length - 1].focus()
     } else {
-      firstFocusable.focus()
+      // Focus first
+      focusable[0].focus()
     }
-    state.ignoreFocusChanges = false
-    state.lastFocus = document.activeElement
+    ignoreFocusChanges = false
+    lastFocus = document.activeElement
   }
-}
-
-function firstFocusableDescendant (element) {
-  return element.querySelector(FOCUSABLE_SELECTOR)
-}
-
-function lastFocusableDescendant (element) {
-  const elements = element.querySelectorAll(FOCUSABLE_SELECTOR)
-  return elements[elements.length - 1]
 }
 
 /**
  * Shows modal with the given content.
  *
- * @param {{ title: String, body: String }} attrs
+ * @param {{ title: string, body: string }} attrs
  */
 export function openModal ({ title, body }) {
-  state.prevFocus = document.activeElement
-  document.addEventListener('focus', trapFocus, true)
+  renderModal()
+  prevFocus = document.activeElement
+  document.addEventListener('focus', handleFocus, true)
 
-  qs(MODAL_TITLE_SELECTOR).innerHTML = title
-  qs(MODAL_BODY_SELECTOR).innerHTML = body
+  modal.querySelector('.modal-title').innerHTML = title
+  modal.querySelector('.modal-body').innerHTML = body
 
-  qs(MODAL_SELECTOR).classList.add('shown')
-  qs(MODAL_SELECTOR).focus()
+  modal.classList.add('shown')
+  modal.focus()
 }
 
 /**
  * Closes the modal.
  */
 export function closeModal () {
-  qs(MODAL_SELECTOR).classList.remove('shown')
+  modal?.classList.remove('shown')
 
-  document.addEventListener('focus', trapFocus, true)
-  state.prevFocus && state.prevFocus.focus()
-  state.prevFocus = null
+  document.removeEventListener('focus', handleFocus, true)
+  prevFocus?.focus()
+  prevFocus = null
 }
 
 /**
  * Checks whether a modal is open.
  */
 export function isModalOpen () {
-  return qs(MODAL_SELECTOR).classList.contains('shown')
+  return Boolean(modal?.classList.contains('shown'))
 }
