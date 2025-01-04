@@ -49,7 +49,7 @@ function handleFocus (event) {
     lastFocus = event.target
   } else {
     ignoreFocusChanges = true
-    const focusable = modal.querySelector(FOCUSABLE_SELECTOR)
+    const focusable = modal.querySelectorAll(FOCUSABLE_SELECTOR)
     if (lastFocus === focusable[0]) {
       // Focus last
       focusable[focusable.length - 1].focus()

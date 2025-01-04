@@ -1,7 +1,6 @@
 import { debounce, qs, qsAll } from './helpers'
 import { openModal } from './modal'
-import quickSwitchModalBodyTemplate from './handlebars/templates/quick-switch-modal-body.handlebars'
-import quickSwitchResultsTemplate from './handlebars/templates/quick-switch-results.handlebars'
+import quickSwitchModalBodyHtml from './handlebars/templates/quick-switch-modal-body.html'
 
 const HEX_DOCS_ENDPOINT = 'https://hexdocs.pm/%%'
 const OTP_DOCS_ENDPOINT = 'https://www.erlang.org/doc/apps/%%'
@@ -9,7 +8,6 @@ const HEX_SEARCH_ENDPOINT = 'https://hex.pm/api/packages?search=name:%%*'
 const QUICK_SWITCH_LINK_SELECTOR = '.display-quick-switch'
 const QUICK_SWITCH_INPUT_SELECTOR = '#quick-switch-input'
 const QUICK_SWITCH_RESULTS_SELECTOR = '#quick-switch-results'
-const QUICK_SWITCH_RESULT_SELECTOR = '.quick-switch-result'
 const DEBOUNCE_KEYPRESS_TIMEOUT = 300
 const NUMBER_OF_SUGGESTIONS = 9
 
@@ -74,14 +72,8 @@ const state = {
  * Initializes the quick switch modal.
  */
 export function initialize () {
-  addEventListeners()
-}
-
-function addEventListeners () {
   qsAll(QUICK_SWITCH_LINK_SELECTOR).forEach(element => {
-    element.addEventListener('click', event => {
-      openQuickSwitchModal()
-    })
+    element.addEventListener('click', openQuickSwitchModal)
   })
 }
 
@@ -117,12 +109,11 @@ function handleInput (event) {
 export function openQuickSwitchModal () {
   openModal({
     title: 'Go to package docs',
-    body: quickSwitchModalBodyTemplate()
+    body: quickSwitchModalBodyHtml
   })
 
-  qs(QUICK_SWITCH_INPUT_SELECTOR).focus()
-
   const quickSwitchInput = qs(QUICK_SWITCH_INPUT_SELECTOR)
+  quickSwitchInput.focus()
   quickSwitchInput.addEventListener('keydown', handleKeyDown)
   quickSwitchInput.addEventListener('input', handleInput)
 
@@ -179,24 +170,23 @@ function queryForAutocomplete (packageSlug) {
         // Only render results if the search string is still long enough
         const currentTerm = qs(QUICK_SWITCH_INPUT_SELECTOR).value
         if (currentTerm.length >= MIN_SEARCH_LENGTH) {
-          renderResults({ results: state.autocompleteResults })
+          renderResults(state.autocompleteResults)
         }
       }
     })
 }
 
-function renderResults ({ results }) {
-  const resultsContainer = qs(QUICK_SWITCH_RESULTS_SELECTOR)
-  const resultsHtml = quickSwitchResultsTemplate({ results })
-  resultsContainer.innerHTML = resultsHtml
-
-  qsAll(QUICK_SWITCH_RESULT_SELECTOR).forEach(result => {
-    result.addEventListener('click', event => {
-      const index = result.getAttribute('data-index')
-      const selectedResult = state.autocompleteResults[index]
-      navigateToAppDocs(selectedResult.name)
+function renderResults (results) {
+  qs(QUICK_SWITCH_RESULTS_SELECTOR).replaceChildren(...results.map((result, index) => {
+    const el = document.createElement('div')
+    el.className = 'quick-switch-result'
+    el.setAttribute('data-index', index)
+    el.innerText = result.name
+    el.addEventListener('click', () => {
+      navigateToAppDocs(result.name)
     })
-  })
+    return el
+  }))
 }
 
 /**
