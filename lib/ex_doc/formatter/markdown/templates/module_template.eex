@@ -9,7 +9,7 @@
 <% end %>
 
 <%= if summary != [] do %>
-### Summary</h1>
+## Summary
 <%= for {name, nodes} <- summary, do: summary_template(name, nodes) %>
 <% end %>
 

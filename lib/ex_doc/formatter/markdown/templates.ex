@@ -41,21 +41,13 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
   """
   @spec synopsis(String.t()) :: String.t()
   @spec synopsis(nil) :: nil
-  def synopsis(nil), do: nil
-
   def synopsis(doc) when is_binary(doc) do
-    doc =
-      case :binary.split(doc, "</p>") do
-        [left, _] -> String.trim_trailing(left, ": ")
-        [all] -> all
-      end
-
-    # Remove any anchors found in synopsis.
-    # Old Erlang docs placed anchors at the top of the documentation
-    # for links. Ideally they would have been removed but meanwhile
-    # it is simpler to guarantee they won't be duplicated in docs.
-    Regex.replace(~r|(<[^>]*) id="[^"]*"([^>]*>)|, doc, ~S"\1\2", [])
+    case :binary.split(doc, "\n\n") do
+      [left, _] -> String.trim_trailing(left, ": ")
+      [all] -> all
+    end
   end
+  def synopsis(_), do: nil
 
   @doc """
   Add link headings for the given `content`.
