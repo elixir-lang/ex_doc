@@ -10,7 +10,6 @@
 .content-inner .heading-with-actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
   justify-content: flex-end;
   align-items: start;
   gap: 6px;
