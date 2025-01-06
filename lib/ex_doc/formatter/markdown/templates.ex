@@ -43,63 +43,35 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
   @spec synopsis(nil) :: nil
   def synopsis(doc) when is_binary(doc) do
     case :binary.split(doc, "\n\n") do
-      [left, _] -> String.trim_trailing(left, ": ")
+      [left, _] -> String.trim_trailing(left, ": ") <> "\n\n"
       [all] -> all
     end
   end
+
   def synopsis(_), do: nil
 
-  @doc """
-  Add link headings for the given `content`.
-
-  IDs are prefixed with `prefix`.
-
-  We only link `h2` and `h3` headers. This is kept consistent in ExDoc.SearchData.
-  """
-  @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
-  @spec link_headings(String.t() | nil, String.t()) :: String.t() | nil
-  def link_headings(content, prefix \\ "")
-  def link_headings(nil, _), do: nil
-
-  def link_headings(content, prefix) do
+  @heading_regex ~r/^(\#{1,6})\s+(.*)/m
+  defp rewrite_headings(content) when is_binary(content) do
     @heading_regex
     |> Regex.scan(content)
-    |> Enum.reduce({content, %{}}, fn [match, tag, title], {content, occurrences} ->
-      possible_id = text_to_id(title)
-      id_occurred = Map.get(occurrences, possible_id, 0)
-
-      anchor_id = if id_occurred >= 1, do: "#{possible_id}-#{id_occurred}", else: possible_id
-      replacement = link_heading(match, tag, title, anchor_id, prefix)
-      linked_content = String.replace(content, match, replacement, global: false)
-      incremented_occs = Map.put(occurrences, possible_id, id_occurred + 1)
-      {linked_content, incremented_occs}
+    |> Enum.reduce(content, fn [match, level, title], content ->
+      replacement = rewrite_heading(level, title)
+      String.replace(content, match, replacement, global: false)
     end)
-    |> elem(0)
   end
 
-  defp link_heading(match, _tag, _title, "", _prefix), do: match
+  defp rewrite_headings(_), do: nil
 
-  defp link_heading(_match, _tag, title, id, prefix) do
-    # The Markdown syntax that we support for the admonition text
-    # blocks is something like this:
-    #
-    #     > ### Never open this door! {: .warning}
-    #     >
-    #     > ...
-    #
+  defp rewrite_heading("#", title), do: do_rewrite_heading("#####", title)
+  defp rewrite_heading(_, title), do: do_rewrite_heading("######", title)
 
+  defp do_rewrite_heading(level, title) do
     """
-    ## [#{title}](##{prefix}#{id})
+    #{level} #{title}
     """
   end
 
-  def link_moduledoc_headings(content) do
-    link_headings(content, "module-")
-  end
-
-  def link_detail_headings(content, prefix) do
-    link_headings(content, prefix <> "-")
-  end
+  defp enc(binary), do: URI.encode(binary) |> String.replace("/", "-")
 
   @doc """
   Creates a chapter which contains all the details about an individual module.

@@ -56,20 +56,20 @@ defmodule ExDoc.Formatter.MARKDOWN.TemplatesTest do
 
       assert content =~ ~r{#\s*CompiledWithDocs\s*}
 
-      assert content =~ ~s{# Summary</h1>}
+      assert content =~ ~s{## Table of Contents}
 
       assert content =~
-               ~r{## .*Example.*}ms
+               ~r{\n## .*Example.*}ms
 
       assert content =~
-               ~r{### .*Example H3 heading.*}ms
+               ~r{\n### .*Example H3 heading.*}ms
 
       assert content =~
                ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
 
       assert content =~ ~r{Some example}ms
       assert content =~ ~r{example_without_docs().*}ms
-      assert content =~ ~r{example_1().*> \(macro\)}ms
+      assert content =~ ~r{example_1().* \(macro\)}ms
 
       assert content =~ ~s{example(foo, bar \\\\ Baz)}
     end

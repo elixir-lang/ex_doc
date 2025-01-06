@@ -1,4 +1,4 @@
-# Table of contents
+# <%= config.project %> v<%= config.version %> - Documentation - Table of contents
 
 <%= nav_grouped_item_template config.extras  %>
 <%= unless Enum.empty?(nodes.modules) do %>

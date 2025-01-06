@@ -72,6 +72,6 @@ defmodule ExDoc.Formatter.MARKDOWNTest do
              ~r{\n`TypesAndSpecs.Sub`\n}
 
     content = File.read!(tmp_dir <> "/markdown/index.md")
-    assert content =~ "# Table of contents\n\n  - [README](readme.md)"
+    assert content =~ "Table of contents\n\n  - [README](readme.md)"
   end
 end

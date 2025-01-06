@@ -1,6 +1,6 @@
 <%= unless Enum.empty?(nodes) do %>
 - <%= name %>
 <%= for node <- nodes do %>
-1. [<%=h node.title %>](<%= URI.encode node.id %>.md)
+  - [<%=h node.title %>](<%= URI.encode node.id %>.md)
 <% end %>
 <% end %>
