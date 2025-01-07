@@ -1,237 +1,249 @@
-import { qs, getCurrentPageSidebarType, getLocationHash, findSidebarCategory } from '../helpers'
+import { el, getCurrentPageSidebarType, qs, qsAll } from '../helpers'
 import { getSidebarNodes } from '../globals'
-import sidebarItemsTemplate from '../handlebars/templates/sidebar-items.handlebars'
 
-const SIDEBAR_TYPE = {
-  search: 'search',
-  extras: 'extras',
-  modules: 'modules',
-  tasks: 'tasks'
-}
-
-const SIDEBAR_TAB_TYPES = [SIDEBAR_TYPE.extras, SIDEBAR_TYPE.modules, SIDEBAR_TYPE.tasks]
-const sidebarNodeListSelector = type => `#${type}-full-list`
-
+let init = false
 export function initialize () {
-  update()
-  addEventListeners()
-}
+  if (init) return
+  init = true
 
-export function update () {
-  SIDEBAR_TAB_TYPES.forEach(type => {
-    renderSidebarNodeList(getSidebarNodes(), type)
+  const sidebarList = document.getElementById('sidebar-list-nav')
+
+  if (!sidebarList) return
+
+  const defaultTab = getCurrentPageSidebarType()
+  const tabs = {
+    extras: sidebarList.dataset.extras || 'Pages',
+    modules: 'Modules',
+    tasks: '<span translate="no">Mix</span> Tasks'
+  }
+
+  Object.entries(tabs).forEach(([type, titleHtml]) => {
+    const nodes = getSidebarNodes()[type]
+
+    if (!nodes?.length) return
+
+    const tabId = `${type}-list-tab-button`
+    const tabpanelId = `${type}-tab-panel`
+    const selected = type === defaultTab
+
+    const tab = el('button', {
+      id: tabId,
+      role: 'tab',
+      tabindex: selected ? 0 : -1,
+      'aria-selected': selected || undefined,
+      'aria-controls': tabpanelId
+    })
+    tab.innerHTML = titleHtml
+    tab.addEventListener('keydown', handleTabKeydown)
+    tab.addEventListener('click', handleTabClick)
+    sidebarList.appendChild(el('li', {}, [tab]))
+
+    const nodeList = el('ul', {class: 'full-list'})
+    nodeList.addEventListener('click', handleNodeListClick)
+
+    const tabpanel = el('div', {
+      id: tabpanelId,
+      class: 'sidebar-tabpanel',
+      role: 'tabpanel',
+      'aria-labelledby': tabId,
+      hidden: selected ? undefined : ''
+    }, [nodeList])
+    document.getElementById('sidebar').appendChild(tabpanel)
+
+    let group = ''
+    let nestedContext
+    let lastModule
+    nodeList.replaceChildren(...nodes.flatMap(node => {
+      const items = []
+      const hasHeaders = Array.isArray(node.headers)
+      const translate = hasHeaders ? undefined : 'no'
+
+      // Group header.
+      if (node.group !== group) {
+        items.push(el('li', {class: 'group', translate}, [node.group]))
+        group = node.group
+        nestedContext = undefined
+      }
+
+      // Nesting context.
+      if (node.nested_context && node.nested_context !== nestedContext) {
+        nestedContext = node.nested_context
+        if (lastModule !== nestedContext) {
+          items.push(el('li', {class: 'nesting-context', translate: 'no', 'aria-hidden': true}, [nestedContext]))
+        }
+      } else {
+        lastModule = node.title
+      }
+
+      items.push(el('li', {}, [
+        el('a', {href: `${node.id}.html`, translate}, [node.nested_title || node.title]),
+        ...childList(`node-${node.id}-headers`,
+          hasHeaders
+            ? renderHeaders(node)
+            : renderSectionsAndGroups(node)
+        )
+      ]))
+
+      return items
+    }))
   })
 
-  markActiveSidebarTab(getCurrentPageSidebarType())
+  window.addEventListener('hashchange', markCurrentHashInSidebar)
+  window.addEventListener('swup:page:view', markCurrentHashInSidebar)
+
   markCurrentHashInSidebar()
-  scrollNodeListToCurrentCategory()
+  // Triggers layout, defer.
+  requestAnimationFrame(scrollNodeListToCurrentCategory)
 }
 
 /**
- * Fill the sidebar with links to different nodes
- *
- * This function replaces an empty unordered list with an
- * unordered list full of links to the different tasks, exceptions
- * and modules mentioned in the documentation.
- *
- * @param {Object} nodesByType - Container of tasks, exceptions and modules.
- * @param {String} type - Filter of nodes, by default the type of the current page.
+ * @param {string} id
+ * @param {HTMLElement[]} childItems
  */
-function renderSidebarNodeList (nodesByType, type) {
-  const nodes = nodesByType[type] || []
+function childList (id, childItems) {
+  if (!childItems.length) return []
 
-  // Render the list
-  const nodeList = qs(sidebarNodeListSelector(type))
-  if (!nodeList) { return }
-  const listContentHtml = sidebarItemsTemplate({ nodes, group: '' })
-  nodeList.innerHTML = listContentHtml
-
-  // Removes the "expand" class from links belonging to single-level sections
-  nodeList.querySelectorAll('ul').forEach(list => {
-    if (list.innerHTML.trim() === '') {
-      const emptyExpand = list.previousElementSibling
-      if (emptyExpand.classList.contains('expand')) {
-        emptyExpand.classList.remove('expand')
-      }
-      list.remove()
-    }
-  })
-
-  // Register event listeners
-  nodeList.querySelectorAll('li a + button').forEach(button => {
-    button.addEventListener('click', event => {
-      const target = event.target
-      const listItem = target.closest('li')
-      toggleListItem(listItem)
-    })
-  })
-
-  nodeList.querySelectorAll('li a').forEach(anchor => {
-    anchor.addEventListener('click', event => {
-      const target = event.target
-      const listItem = target.closest('li')
-      const previousSection = nodeList.querySelector('.current-section')
-
-      // Clear the previous current section
-      if (previousSection) {
-        clearCurrentSectionElement(previousSection)
-      }
-
-      if (anchor.matches('.expand') &&
-          (anchor.pathname === window.location.pathname ||
-           anchor.pathname === window.location.pathname + '.html')) {
-        openListItem(listItem)
-      }
-    })
-  })
+  return [
+    el('button', {'aria-label': 'expand', 'aria-expanded': false, 'aria-controls': id}),
+    el('ul', {id}, childItems)
+  ]
 }
 
-function openListItem (listItem) {
-  listItem.classList.add('open')
-  listItem.querySelector('button[aria-controls]').setAttribute('aria-expanded', 'true')
+function renderHeaders (node) {
+  return node.headers
+    .map(({id, anchor}) =>
+      el('li', {}, [
+        el('a', {href: `${node.id}.html#${anchor}`}, [id])
+      ])
+    )
 }
 
-function closeListItem (listItem) {
-  listItem.classList.remove('open')
-  listItem.querySelector('button[aria-controls]').setAttribute('aria-expanded', 'false')
-}
+function renderSectionsAndGroups (node) {
+  const items = []
 
-function toggleListItem (listItem) {
-  if (listItem.classList.contains('open')) {
-    closeListItem(listItem)
-  } else {
-    openListItem(listItem)
+  if (node.sections?.length) {
+    items.push(el('li', {}, [
+      el('a', {href: `${node.id}.html#content`}, ['Sections']),
+      ...childList(`${node.id}-sections-list`,
+        node.sections
+          .map(({id, anchor}) =>
+            el('li', {}, [
+              el('a', {href: `${node.id}.html#${anchor}`}, [id])
+            ])
+          )
+      )
+    ]))
   }
+
+  if (node.nodeGroups) {
+    items.push(el('li', {}, [
+      el('a', {href: `${node.id}.html#summary`}, ['Summary'])
+    ]))
+
+    items.push(...node.nodeGroups.map(({key, name, nodes}) =>
+      el('li', {}, [
+        el('a', {href: `${node.id}.html#${key}`}, [name]),
+        ...childList(`node-${node.id}-group-${key}-list`,
+          nodes
+            .map(({anchor, title, id}) =>
+              el('li', {}, [
+                el('a', {href: `${node.id}.html#${anchor}`, title, translate: 'no'}, [id])
+              ])
+            )
+        )
+      ])
+    ))
+  }
+
+  return items
 }
 
-function markElementAsCurrentSection (section) {
-  section.classList.add('current-section')
-  section.querySelector('a').setAttribute('aria-current', 'true')
-}
+/** @param {HTMLButtonElement} */
+function activateTab (next) {
+  const prev = document.getElementById('sidebar-list-nav').querySelector('[aria-selected]')
 
-function clearCurrentSectionElement (section) {
-  section.classList.remove('current-section')
-  section.querySelector('a').setAttribute('aria-current', 'false')
-}
+  if (prev === next) return
 
-function markElementAsCurrentHash (listItem) {
-  listItem.classList.add('current-hash')
-  listItem.querySelector('a').setAttribute('aria-current', 'true')
-}
+  if (prev) {
+    prev.removeAttribute('aria-selected')
+    prev.setAttribute('tabindex', '-1')
+    document.getElementById(prev.getAttribute('aria-controls')).setAttribute('hidden', 'hidden')
+  }
 
-function clearCurrentHashElement (listItem) {
-  listItem.classList.remove('current-hash')
-  listItem.querySelector('a').setAttribute('aria-current', 'false')
-}
-
-function markActiveSidebarTab (activeType) {
-  SIDEBAR_TAB_TYPES.forEach(type => {
-    const button = qs(`#${type}-list-tab-button`)
-    if (button) {
-      const tabpanel = qs(`#${button.getAttribute('aria-controls')}`)
-      if (type === activeType) {
-        button.parentElement.classList.add('selected')
-        button.setAttribute('aria-selected', 'true')
-        button.setAttribute('tabindex', '0')
-        tabpanel.removeAttribute('hidden')
-      } else {
-        button.parentElement.classList.remove('selected')
-        button.setAttribute('aria-selected', 'false')
-        button.setAttribute('tabindex', '-1')
-        tabpanel.setAttribute('hidden', 'hidden')
-      }
-    }
-  })
+  next.setAttribute('aria-selected', 'true')
+  next.setAttribute('tabindex', '0')
+  document.getElementById(next.getAttribute('aria-controls')).removeAttribute('hidden')
 }
 
 function scrollNodeListToCurrentCategory () {
-  const nodeList = qs(sidebarNodeListSelector(getCurrentPageSidebarType()))
-  if (!nodeList) { return }
-
-  const currentPage = nodeList.querySelector('li.current-page')
-  if (currentPage) {
-    currentPage.scrollIntoView()
-    nodeList.scrollTop -= 40
-  }
+  qs('#sidebar [role=tabpanel]:not([hidden]) a[aria-selected]')?.scrollIntoView()
 }
 
 function markCurrentHashInSidebar () {
-  const hash = getLocationHash() || 'content'
+  const sidebar = document.getElementById('sidebar')
+  const {pathname, hash} = window.location
 
-  const sidebarNodes = getSidebarNodes()
-  const nodes = sidebarNodes[getCurrentPageSidebarType()] || []
-  const category = findSidebarCategory(nodes, hash)
-  const nodeList = qs(sidebarNodeListSelector(getCurrentPageSidebarType()))
-  if (!nodeList) { return }
+  // All sidebar links are relative and end in .html.
+  const page = pathname.split('/').pop().replace(/\.html$/, '') + '.html'
 
-  const categoryEl = nodeList.querySelector(`li.current-page a.expand[href$="#${category}"]`)
-  if (categoryEl) {
-    openListItem(categoryEl.closest('li'))
-  }
+  // Try find exact link with hash, fall back to page.
+  const current = sidebar.querySelector(`li a[href="${page + hash}"]`) || sidebar.querySelector(`li a[href="${page}"]`)
 
-  const hashEl = nodeList.querySelector(`li.current-page a[href$="#${hash}"]`)
-  if (hashEl) {
-    const deflist = hashEl.closest('ul')
-    if (deflist.classList.contains('deflist')) {
-      markElementAsCurrentSection(deflist.closest('li'))
+  if (!current) return
+
+  // Unset previous.
+  sidebar.querySelectorAll('li a[aria-selected]').forEach(element => {
+    element.removeAttribute('aria-selected')
+  })
+
+  // Walk up parents, updating link, button and tab attributes.
+  let element = current.parentElement
+  while (element) {
+    if (element.tagName === 'LI') {
+      const link = element.firstChild
+      link.setAttribute('aria-selected', link.getAttribute('href') === page ? 'page' : 'true')
+      const button = link.nextSibling
+      if (button?.tagName === 'BUTTON') {
+        button.setAttribute('aria-expanded', true)
+      }
+    } else if (element.role === 'tabpanel') {
+      if (element.hasAttribute('hidden')) {
+        activateTab(document.getElementById(element.getAttribute('aria-labelledby')))
+      }
+      break
     }
-    markElementAsCurrentHash(hashEl.closest('li'))
+    element = element.parentElement
   }
 }
 
-function addEventListeners () {
-  // Bind the navigation links ("Pages", "Modules", "Tasks")
-  // so that they render a list of all relevant nodes when clicked.
-  SIDEBAR_TAB_TYPES.forEach(type => {
-    const button = qs(`#${type}-list-tab-button`)
-    if (button) {
-      button.addEventListener('click', event => {
-        markActiveSidebarTab(type)
-        scrollNodeListToCurrentCategory()
-      })
-    }
-  })
+/**
+ * Provide left/right arrow navigation for tablist, as required by ARIA authoring practices guide.
+ *
+ * @param {KeyboardEvent}
+ **/
+function handleTabKeydown (event) {
+  if (!['ArrowRight', 'ArrowLeft'].includes(event.key)) { return }
 
-  // provide left/right arrow navigation for tablist, as required by ARIA authoring practices guide
-  const tabList = qs('#sidebar-list-nav')
-  tabList.addEventListener('keydown', (e) => {
-    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') { return }
+  const tabs = Array.from(qsAll('#sidebar-list-nav [role="tab"]'))
+  const currentIndex = tabs.indexOf(event.currentTarget)
+  const nextIndex = currentIndex + (event.key === 'ArrowRight' ? 1 : -1)
+  const nextTab = tabs.at(nextIndex % tabs.length)
 
-    // SIDEBAR_TAB_TYPES cannot be used here as it always contains all possible types, not only types that the specific project has
-    const tabTypes = Array.from(tabList.querySelectorAll('[role="tab"]')).map(tab => tab.dataset.type)
-    // getCurrentPageSidebarType() cannot be used here as it's assigned once, on page render
-    const currentTabType = tabList.querySelector('[role="tab"][aria-selected="true"]').dataset.type
+  activateTab(nextTab)
+  nextTab.focus()
+}
 
-    if (e.key === 'ArrowRight') {
-      let nextTabTypeIndex = tabTypes.indexOf(currentTabType) + 1
-      if (nextTabTypeIndex >= tabTypes.length) {
-        nextTabTypeIndex = 0
-      }
+/** @param {MouseEvent} */
+function handleTabClick (event) {
+  activateTab(event.currentTarget)
+  scrollNodeListToCurrentCategory()
+}
 
-      const nextType = tabTypes[nextTabTypeIndex]
-      markActiveSidebarTab(nextType)
-      qs(`#${nextType}-list-tab-button`).focus()
-    } else if (e.key === 'ArrowLeft') {
-      let previousTabTypeIndex = tabTypes.indexOf(currentTabType) - 1
-      if (previousTabTypeIndex < 0) {
-        previousTabTypeIndex = tabTypes.length - 1
-      }
+/** @param {MouseEvent} */
+function handleNodeListClick (event) {
+  const target = event.target
 
-      const previousType = tabTypes[previousTabTypeIndex]
-      markActiveSidebarTab(previousType)
-      qs(`#${previousType}-list-tab-button`).focus()
-    }
-  })
-
-  // Keep .current-hash item in sync with the hash, regardless how the change takes place
-  window.addEventListener('hashchange', event => {
-    const nodeList = qs(sidebarNodeListSelector(getCurrentPageSidebarType()))
-    if (!nodeList) { return }
-
-    const currentListItem = nodeList.querySelector('li.current-page li.current-hash')
-    if (currentListItem) {
-      clearCurrentHashElement(currentListItem)
-    }
-    markCurrentHashInSidebar()
-  })
+  if (target.tagName === 'BUTTON') {
+    target.setAttribute('aria-expanded', target.getAttribute('aria-expanded') === 'false')
+  }
 }

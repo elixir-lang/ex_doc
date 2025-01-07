@@ -15,9 +15,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(module_node, nodes_map, config) do
+  def module_page(module_node, config) do
     summary = module_summary(module_node)
-    module_template(config, module_node, summary, nodes_map)
+    module_template(config, module_node, summary)
   end
 
   @doc """
@@ -291,13 +291,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
     detail_template: [:node, :module],
     footer_template: [:config, :node],
     head_template: [:config, :title, :noindex],
-    module_template: [:config, :module, :summary, :nodes_map],
-    not_found_template: [:config, :nodes_map],
+    module_template: [:config, :module, :summary],
+    not_found_template: [:config],
     api_reference_entry_template: [:module_node],
     api_reference_template: [:nodes_map],
-    extra_template: [:config, :node, :type, :nodes_map, :refs],
-    search_template: [:config, :nodes_map],
-    sidebar_template: [:config, :type, :nodes_map],
+    extra_template: [:config, :node, :type, :refs],
+    search_template: [:config],
+    sidebar_template: [:config, :type],
     summary_template: [:name, :nodes],
     redirect_template: [:config, :redirect_to]
   ]

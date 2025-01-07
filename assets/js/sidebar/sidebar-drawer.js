@@ -1,6 +1,7 @@
 import throttle from 'lodash.throttle'
 import { qs } from '../helpers'
 import { SIDEBAR_CLASS_OPEN, SIDEBAR_CLASS_TRANSITION, SIDEBAR_PREF_CLOSED, SIDEBAR_PREF_OPEN, SIDEBAR_STATE_KEY, SIDEBAR_WIDTH_KEY, SMALL_SCREEN_BREAKPOINT } from './constants'
+import { initialize as initializeList } from './sidebar-list'
 
 const ANIMATION_DURATION = 300
 
@@ -9,6 +10,8 @@ const SIDEBAR_TOGGLE_SELECTOR = '.sidebar-toggle'
 
 export function initialize () {
   update()
+
+  window.addEventListener('swup:page:view', update)
 
   qs(SIDEBAR_TOGGLE_SELECTOR).addEventListener('click', toggleSidebar)
 
@@ -45,6 +48,7 @@ export function initialize () {
 export function update () {
   const pref = sessionStorage.getItem(SIDEBAR_STATE_KEY)
   const open = pref !== SIDEBAR_PREF_CLOSED && !isScreenSmall()
+  if (open) initializeList()
   updateSidebar(open)
 }
 

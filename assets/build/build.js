@@ -71,6 +71,22 @@ Promise.all(formatters.map(async ({formatter, ...options}) => {
           }
         })
 
+        // Load html templates.
+        build.onLoad({
+          filter: /\.html$/
+        }, async ({ path: filename }) => {
+          try {
+            const source = await fs.readFile(filename, 'utf-8')
+            // Remove newlines and leading whitespace.
+            // Shouldn't have any effect on content.
+            const compressed = source.replace(/\n\s*/g, '')
+            const contents = `export default ${JSON.stringify(compressed)}`
+            return { contents }
+          } catch (error) {
+            return { errors: [{ text: error.message }] }
+          }
+        })
+
         // Generate docs with new assets (watch mode only).
         if (watchMode) {
           build.onEnd(async result => {

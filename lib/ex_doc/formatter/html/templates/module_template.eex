@@ -1,5 +1,5 @@
 <%= head_template(config, module.title, false) %>
-<%= sidebar_template(config, module.type, nodes_map) %>
+<%= sidebar_template(config, module.type) %>
 
 <div id="top-content">
   <div class="heading-with-actions top-heading">

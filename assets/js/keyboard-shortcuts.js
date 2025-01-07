@@ -64,10 +64,6 @@ const state = {
  * listing all available options.
  */
 export function initialize () {
-  addEventListeners()
-}
-
-function addEventListeners () {
   document.addEventListener('keydown', handleKeyDown)
   document.addEventListener('keyup', handleKeyUp)
 }

@@ -1,17 +1,14 @@
 import { onDocumentReady } from '../helpers'
 import { initialize as initTabsets } from '../tabsets'
 import { initialize as initContent } from '../content'
-import { initialize as initSidebarDrawer, update as updateSidebarDrawer } from '../sidebar/sidebar-drawer'
-import { initialize as initSidebarContent, update as updateSidebarContent } from '../sidebar/sidebar-list'
+import { initialize as initSidebarDrawer } from '../sidebar/sidebar-drawer'
 import { initialize as initSearch } from '../search-bar'
 import { initialize as initVersions } from '../sidebar/sidebar-version-select'
 import { initialize as initSearchPage } from '../search-page'
 import { initialize as initTheme } from '../theme'
 import { initialize as initMakeup } from '../makeup'
-import { initialize as initModal } from '../modal'
 import { initialize as initKeyboardShortcuts } from '../keyboard-shortcuts'
 import { initialize as initQuickSwitch } from '../quick-switch'
-import { initialize as initToast } from '../toast'
 import { initialize as initTooltips } from '../tooltips/tooltips'
 import { initialize as initHintsPage } from '../tooltips/hint-page'
 import { initialize as initCopyButton } from '../copy-button'
@@ -58,8 +55,6 @@ onDocumentReady(() => {
             initTooltips()
             initCopyButton()
 
-            updateSidebarDrawer()
-            updateSidebarContent()
             initSearch()
             initSearchPage()
             initSettings()
@@ -71,13 +66,10 @@ onDocumentReady(() => {
     }
 
     initVersions()
-    initModal()
     initKeyboardShortcuts()
     initQuickSwitch()
-    initToast()
 
     initSidebarDrawer()
-    initSidebarContent()
     initSearch()
     initSearchPage()
     initSettings()
