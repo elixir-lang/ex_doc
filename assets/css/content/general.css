@@ -7,6 +7,40 @@
   color: var(--textBody);
 }
 
+.content-inner .heading-with-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: start;
+  gap: 6px;
+}
+.content-inner .heading-with-actions > *:not(h1) {
+  flex-shrink: 0;
+}
+.content-inner .heading-with-actions h1 {
+  flex-grow: 1;
+  justify-self: flex-start;
+  max-width: 100%;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+.content-inner .heading-with-actions .icon-action {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: normal;
+}
+.content-inner .heading-with-actions.top-heading .icon-action {
+  padding-top: 1.5rem;
+  font-size: 1.2rem;
+}
+
+.content-inner .top-heading {
+  padding-top: 1rem;
+}
+
 .content-inner :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--sansFontFamily);
   font-weight: 700;
@@ -20,21 +54,12 @@
   margin: 0.5em 0;
 }
 
-.content-inner h1.signature {
-  margin: 0;
-}
-
 .content-inner h1.section-heading {
   margin: 1.5em 0 0.5em;
 }
 
 .content-inner h1 small {
   font-weight: 300;
-}
-
-.content-inner h1 .icon-action {
-  font-size: 1.2rem;
-  font-weight: normal;
 }
 
 .content-inner h2 {
@@ -65,16 +90,12 @@
 }
 
 .content-inner .icon-action {
-  float: right;
   color: var(--iconAction);
   text-decoration: none;
   border: none;
   transition: color 0.3s ease-in-out;
   background-color: transparent;
   cursor: pointer;
-}
-.content-inner button.icon-action {
-  margin-top: 12px;
 }
 .content-inner .icon-action:hover {
   color: var(--iconActionHover);

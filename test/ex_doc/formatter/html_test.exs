@@ -108,8 +108,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     foo_content = EasyHTML.parse!(File.read!("#{c.tmp_dir}/html/readme-1.html"))["#content"]
     bar_content = EasyHTML.parse!(File.read!("#{c.tmp_dir}/html/readme-2.html"))["#content"]
 
-    assert to_string(foo_content["h1 > span"]) == "README foo"
-    assert to_string(bar_content["h1 > span"]) == "README bar"
+    assert to_string(foo_content["h1"]) == "README foo"
+    assert to_string(bar_content["h1"]) == "README bar"
   end
 
   test "warns when generating an index.html file with an invalid redirect",
@@ -499,14 +499,14 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       content = File.read!(tmp_dir <> "/html/plaintextfiles.html")
 
-      assert content =~ ~r{Plain Text Files</span>.*</h1>}s
+      assert content =~ ~r{Plain Text Files</h1>}s
 
       assert content =~
                ~r{<p>Read the <a href="license.html">license</a> and the <a href="plaintext.html">plain-text file</a>.}
 
       plain_text_file = File.read!(tmp_dir <> "/html/plaintext.html")
 
-      assert plain_text_file =~ ~r{PlainText</span>.*</h1>}s
+      assert plain_text_file =~ ~r{PlainText</h1>}s
 
       assert plain_text_file =~
                ~r{<pre>\nThis is plain\n  text and nothing\n.+\s+good bye\n</pre>}s
@@ -516,14 +516,14 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       license = File.read!(tmp_dir <> "/html/license.html")
 
-      assert license =~ ~r{LICENSE</span>.*</h1>}s
+      assert license =~ ~r{LICENSE</h1>}s
 
       assert license =~
                ~s{<pre>\nLicensed under the Apache License, Version 2.0 (the &quot;License&quot;)}
 
       content = File.read!(tmp_dir <> "/html/livebookfile.html")
 
-      assert content =~ ~r{<span>Title for Livebook Files</span>\s*</h1>}
+      assert content =~ ~r{Title for Livebook Files</h1>}
 
       assert content =~
                ~s{<a href="https://github.com/elixir-lang/elixir/blob/main/test/fixtures/LivebookFile.livemd#L1" title="View Source"}
@@ -635,7 +635,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       content = File.read!(tmp_dir <> "/html/plaintextfiles.html")
 
-      assert content =~ ~r{Plain Text Files</span>.*</h1>}s
+      assert content =~ ~r{Plain Text Files</h1>}s
 
       assert content =~
                ~r{<p>Read the <a href="linked-license.html">license</a> and the <a href="plain_text.html">plain-text file</a>.}
