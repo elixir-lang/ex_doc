@@ -42,7 +42,8 @@ export function getSuggestions (query, limit = 8) {
     ...findSuggestionsInTopLevelNodes(nodes.extras, query, SUGGESTION_CATEGORY.extra, 'page'),
     ...findSuggestionsInSectionsOfNodes(nodes.modules, query, SUGGESTION_CATEGORY.section, 'module'),
     ...findSuggestionsInSectionsOfNodes(nodes.tasks, query, SUGGESTION_CATEGORY.section, 'mix task'),
-    ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section, 'page')
+    ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section, 'page'),
+    ...findSuggestionsInChildNodes(nodes.extras, query, SUGGESTION_CATEGORY.section),
   ].filter(suggestion => suggestion !== null)
 
   return sort(suggestions).slice(0, limit)
@@ -66,8 +67,8 @@ function findSuggestionsInChildNodes (nodes, query, category) {
         const label = nodeGroupKeyToLabel(key)
 
         return childNodes.map(childNode =>
-          childNodeSuggestion(childNode, node.id, query, category, label) ||
-          moduleChildNodeSuggestion(childNode, node.id, query, category, label)
+          childNodeSuggestion(childNode, node.id, node.title || node.id, query, category, label) ||
+          moduleChildNodeSuggestion(childNode, node.id, node.title || node.id, query, category, label)
         )
       })
     })
@@ -113,14 +114,14 @@ function nodeSuggestion (node, query, category, label) {
  * Builds a suggestion for a child node.
  * Returns null if the node doesn't match the query.
  */
-function childNodeSuggestion (childNode, parentId, query, category, label) {
+function childNodeSuggestion (childNode, parentId, parentTitle, query, category, label) {
   if (!matchesAll(childNode.id, query)) { return null }
 
   return {
     link: `${parentId}.html#${childNode.anchor}`,
     title: highlightMatches(childNode.id, query),
     labels: [label],
-    description: parentId,
+    description: parentTitle,
     matchQuality: matchQuality(childNode.id, query),
     deprecated: childNode.deprecated,
     category
@@ -147,7 +148,7 @@ function nodeSectionSuggestion (node, section, query, category, label) {
  * Builds a suggestion for a child node assuming the parent node is a module.
  * Returns null if the node doesn't match the query.
  */
-function moduleChildNodeSuggestion (childNode, parentId, query, category, label) {
+function moduleChildNodeSuggestion (childNode, parentId, parentTitle, query, category, label) {
   // Match "Module.function" format.
   const modFunElixir = `${parentId}.${childNode.id}`
   const modFunErlang = `${parentId}:${childNode.id}`
@@ -174,7 +175,7 @@ function moduleChildNodeSuggestion (childNode, parentId, query, category, label)
     link: `${parentId}.html#${childNode.anchor}`,
     title: highlightMatches(childNode.id, tokenizedQuery),
     label,
-    description: parentId,
+    description: parentTitle,
     matchQuality: matchQuality(modFun, query),
     deprecated: childNode.deprecated,
     category

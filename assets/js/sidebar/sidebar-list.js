@@ -135,25 +135,26 @@ function renderSectionsAndGroups (node) {
     ]))
   }
 
-  if (node.nodeGroups) {
-    items.push(el('li', {}, [
-      el('a', {href: `${node.id}.html#summary`}, ['Summary'])
-    ]))
+if (node.nodeGroups && node.nodeGroups.some(group => group.nodes.some(node => !node.hidden))) {
+  items.push(el('li', {}, [
+    el('a', {href: `${node.id}.html#summary`}, ['Summary'])
+  ]))
 
-    items.push(...node.nodeGroups.map(({key, name, nodes}) =>
-      el('li', {}, [
-        el('a', {href: `${node.id}.html#${key}`}, [name]),
-        ...childList(`node-${node.id}-group-${key}-list`,
-          nodes
-            .map(({anchor, title, id}) =>
-              el('li', {}, [
-                el('a', {href: `${node.id}.html#${anchor}`, title, translate: 'no'}, [id])
-              ])
-            )
-        )
-      ])
-    ))
-  }
+  items.push(...node.nodeGroups.map(({key, name, nodes}) =>
+    el('li', {}, [
+      el('a', {href: `${node.id}.html#${key}`}, [name]),
+      ...childList(`node-${node.id}-group-${key}-list`,
+        nodes
+          .filter(node => !node.hidden)
+          .map(({anchor, title, header, id}) =>
+            el('li', {}, [
+              el('a', {href: `${node.id}.html#${anchor}`, title: title, translate: 'no'}, [header || id])
+            ])
+          )
+      )
+    ])
+  ))
+}
 
   return items
 }
