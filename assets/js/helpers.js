@@ -47,28 +47,6 @@ export function getCurrentPageSidebarType () {
 }
 
 /**
- * Looks up a nested node having the specified anchor
- * and returns the corresponding category.
- *
- * @param {Array} nodes A list of sidebar nodes.
- * @param {String|null} anchor The anchor to look for.
- * @returns {String} The relevant node group key, like 'functions', 'types', etc.
- */
-export function findSidebarCategory (nodes, anchor) {
-  if (!nodes) return
-
-  for (const node of nodes) {
-    const nodeGroup = node.nodeGroups && node.nodeGroups.find(nodeGroup =>
-      nodeGroup.nodes.some(subnode => subnode.anchor === anchor)
-    )
-
-    if (nodeGroup) return nodeGroup.key
-  }
-
-  return null
-}
-
-/**
  * Finds an element by a URL hash (e.g. a function section).
  *
  * @param {String} hash The hash part of a URL.
@@ -220,4 +198,25 @@ export function getProjectNameAndVersion () {
 export function isAppleOS () {
   // Set in inline_html.js
   return document.documentElement.classList.contains('apple-os')
+}
+
+/**
+ * Create element from tag, attributes and children.
+ *
+ * @param {string} tagName
+ * @param {Record<string, any>} attributes
+ * @param {(HTMLElement | string)[]} [children]
+ * @returns {HTMLElement}
+ */
+export function el (tagName, attributes, children) {
+  const element = document.createElement(tagName)
+  for (const key in attributes) {
+    if (attributes[key] != null) {
+      element.setAttribute(key, attributes[key])
+    }
+  }
+  if (children) {
+    element.replaceChildren(...children)
+  }
+  return element
 }

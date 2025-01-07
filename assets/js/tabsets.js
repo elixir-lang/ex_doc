@@ -1,3 +1,5 @@
+import { el } from './helpers'
+
 const CONTENT_CONTAINER_ID = 'content'
 const TABSET_OPEN_COMMENT = 'tabs-open'
 const TABSET_CLOSE_COMMENT = 'tabs-close'
@@ -74,8 +76,7 @@ export function initialize () {
         tabindex: selected ? 0 : -1,
         'aria-selected': selected,
         'aria-controls': tabPanelId
-      })
-      tab.innerText = text
+      }, [text])
       tab.addEventListener('click', handleTabClick)
       tab.addEventListener('keydown', handleTabKeydown)
       tablist.appendChild(tab)
@@ -87,8 +88,7 @@ export function initialize () {
         hidden: !selected ? '' : undefined,
         tabindex: selected ? 0 : -1,
         'aria-labelledby': tabId
-      })
-      tabPanel.replaceChildren(...content)
+      }, content)
       tabset.appendChild(tabPanel)
     })
   })
@@ -96,21 +96,6 @@ export function initialize () {
   toRemove.forEach((node) => {
     node.parentNode.removeChild(node)
   })
-}
-
-/**
- * @param {string} tagName
- * @param {Record<string, any>} attributes
- * @returns {HTMLElement}
- */
-function el (tagName, attributes) {
-  const element = document.createElement(tagName)
-  for (const key in attributes) {
-    if (attributes[key] != null) {
-      element.setAttribute(key, attributes[key])
-    }
-  }
-  return element
 }
 
 /** @param {MouseEvent} event */

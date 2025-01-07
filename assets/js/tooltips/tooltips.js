@@ -40,8 +40,6 @@ const state = {
  * Initializes tooltips handling.
  */
 export function initialize () {
-  qs(CONTENT_INNER_SELECTOR).insertAdjacentHTML('beforeend', TOOLTIP_HTML)
-
   qsAll(TOOLTIP_ACTIVATORS_SELECTOR).forEach(element => {
     if (!linkElementEligibleForTooltip(element)) { return }
 
@@ -99,7 +97,12 @@ function renderTooltip (hint) {
     hint
   })
 
-  qs(TOOLTIP_BODY_SELECTOR).innerHTML = tooltipBodyHtml
+  let tooltipBody = qs(TOOLTIP_BODY_SELECTOR)
+  if (!tooltipBody) {
+    qs(CONTENT_INNER_SELECTOR).insertAdjacentHTML('beforeend', TOOLTIP_HTML)
+    tooltipBody = qs(TOOLTIP_BODY_SELECTOR)
+  }
+  tooltipBody.innerHTML = tooltipBodyHtml
 
   updateTooltipPosition()
 
@@ -113,7 +116,7 @@ function handleHoverEnd () {
   clearTimeout(state.hoverDelayTimeout)
   cancelHintFetchingIfAny()
   state.currentLinkElement = null
-  qs(TOOLTIP_SELECTOR).classList.remove(TOOLTIP_SHOWN_CLASS)
+  qs(TOOLTIP_SELECTOR)?.classList.remove(TOOLTIP_SHOWN_CLASS)
 }
 
 /**

@@ -1,8 +1,7 @@
 import { onDocumentReady } from '../helpers'
 import { initialize as initTabsets } from '../tabsets'
 import { initialize as initContent } from '../content'
-import { initialize as initSidebarDrawer, update as updateSidebarDrawer } from '../sidebar/sidebar-drawer'
-import { initialize as initSidebarContent, update as updateSidebarContent } from '../sidebar/sidebar-list'
+import { initialize as initSidebarDrawer } from '../sidebar/sidebar-drawer'
 import { initialize as initSearch } from '../search-bar'
 import { initialize as initVersions } from '../sidebar/sidebar-version-select'
 import { initialize as initSearchPage } from '../search-page'
@@ -56,8 +55,6 @@ onDocumentReady(() => {
             initTooltips()
             initCopyButton()
 
-            updateSidebarDrawer()
-            updateSidebarContent()
             initSearch()
             initSearchPage()
             initSettings()
@@ -73,7 +70,6 @@ onDocumentReady(() => {
     initQuickSwitch()
 
     initSidebarDrawer()
-    initSidebarContent()
     initSearch()
     initSearchPage()
     initSettings()

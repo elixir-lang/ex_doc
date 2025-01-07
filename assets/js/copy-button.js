@@ -1,8 +1,7 @@
-import { qsAll } from './helpers'
+import { el, qsAll } from './helpers'
 
-const template = document.createElement('div')
-template.innerHTML = '<button class="copy-button"><svg role="img" aria-label="copy" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg><span aria-live="polite"></span></button>'
-const buttonTemplate = template.firstChild
+const buttonTemplate = el('button', {class: 'copy-button'})
+buttonTemplate.innerHTML = '<svg role="img" aria-label="copy" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg><span aria-live="polite"></span>'
 
 /**
  * Initializes copy buttons.

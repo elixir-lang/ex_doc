@@ -42,12 +42,12 @@ defmodule ExDoc.Formatter.HTML do
       search_data ++
         static_files ++
         generate_sidebar_items(nodes_map, extras, config) ++
-        generate_extras(nodes_map, extras, config) ++
+        generate_extras(extras, config) ++
         generate_logo(@assets_dir, config) ++
-        generate_search(nodes_map, config) ++
-        generate_not_found(nodes_map, config) ++
-        generate_list(nodes_map.modules, nodes_map, config) ++
-        generate_list(nodes_map.tasks, nodes_map, config) ++
+        generate_search(config) ++
+        generate_not_found(config) ++
+        generate_list(nodes_map.modules, config) ++
+        generate_list(nodes_map.tasks, config) ++
         generate_redirects(config, ".html")
 
     generate_build(Enum.sort(all_files), build)
@@ -166,18 +166,18 @@ defmodule ExDoc.Formatter.HTML do
     File.write!(build, entries)
   end
 
-  defp generate_not_found(nodes_map, config) do
+  defp generate_not_found(config) do
     filename = "404.html"
     config = set_canonical_url(config, filename)
-    content = Templates.not_found_template(config, nodes_map)
+    content = Templates.not_found_template(config)
     File.write!("#{config.output}/#{filename}", content)
     [filename]
   end
 
-  defp generate_search(nodes_map, config) do
+  defp generate_search(config) do
     filename = "search.html"
     config = set_canonical_url(config, filename)
-    content = Templates.search_template(config, nodes_map)
+    content = Templates.search_template(config)
     File.write!("#{config.output}/#{filename}", content)
     [filename]
   end
@@ -203,7 +203,7 @@ defmodule ExDoc.Formatter.HTML do
     |> binary_part(0, 8)
   end
 
-  defp generate_extras(nodes_map, extras, config) do
+  defp generate_extras(extras, config) do
     generated_extras =
       extras
       |> with_prev_next()
@@ -218,7 +218,7 @@ defmodule ExDoc.Formatter.HTML do
         }
 
         extension = node.source_path && Path.extname(node.source_path)
-        html = Templates.extra_template(config, node, extra_type(extension), nodes_map, refs)
+        html = Templates.extra_template(config, node, extra_type(extension), refs)
 
         if File.regular?(output) do
           Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
@@ -530,16 +530,16 @@ defmodule ExDoc.Formatter.HTML do
     Enum.filter(nodes, &(&1.type == type))
   end
 
-  defp generate_list(nodes, nodes_map, config) do
+  defp generate_list(nodes, config) do
     nodes
-    |> Task.async_stream(&generate_module_page(&1, nodes_map, config), timeout: :infinity)
+    |> Task.async_stream(&generate_module_page(&1, config), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
   end
 
-  defp generate_module_page(module_node, nodes_map, config) do
+  defp generate_module_page(module_node, config) do
     filename = "#{module_node.id}.html"
     config = set_canonical_url(config, filename)
-    content = Templates.module_page(module_node, nodes_map, config)
+    content = Templates.module_page(module_node, config)
     File.write!("#{config.output}/#{filename}", content)
     filename
   end
