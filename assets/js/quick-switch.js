@@ -1,4 +1,4 @@
-import { debounce, qs, qsAll } from './helpers'
+import { debounce, el, qs, qsAll } from './helpers'
 import { openModal } from './modal'
 import quickSwitchModalBodyHtml from './handlebars/templates/quick-switch-modal-body.html'
 
@@ -177,15 +177,10 @@ function queryForAutocomplete (packageSlug) {
 }
 
 function renderResults (results) {
-  qs(QUICK_SWITCH_RESULTS_SELECTOR).replaceChildren(...results.map((result, index) => {
-    const el = document.createElement('div')
-    el.className = 'quick-switch-result'
-    el.setAttribute('data-index', index)
-    el.innerText = result.name
-    el.addEventListener('click', () => {
-      navigateToAppDocs(result.name)
-    })
-    return el
+  qs(QUICK_SWITCH_RESULTS_SELECTOR).replaceChildren(...results.map(({name}, index) => {
+    const resultEl = el('div', {class: 'quick-switch-result', 'data-index': index}, [name])
+    resultEl.addEventListener('click', () => navigateToAppDocs(name))
+    return resultEl
   }))
 }
 
