@@ -7,11 +7,7 @@ const TABPANEL_HEADING_NODENAME = 'H3'
 const TABSET_CONTAINER_CLASS = 'tabset'
 
 export function initialize () {
-  // Done in read and mutate parts to avoid layout thrashing.
-  // Reading inner text requires layout so we want to read
-  // all headings before we start mutating the DOM.
-
-  /** @type {[Node, [string, HTMLElement[]][]][]} */
+  /** @type {[Node, [NodeList, HTMLElement[]][]][]} */
   const sets = []
   /** @type {Node[]} */
   const toRemove = []
@@ -38,7 +34,9 @@ export function initialize () {
       if (node.nodeName === TABPANEL_HEADING_NODENAME) {
         // Tab heading.
         tabContent = []
-        set.push([node.innerText, tabContent])
+        // Extract heading text nodes (faster than using .textContent which requires layout).
+        const headingContent = node.querySelector('.text')?.childNodes || node.childNodes
+        set.push([headingContent, tabContent])
         toRemove.push(node)
       } else if (node.nodeName === '#comment' && node.nodeValue.trim() === TABSET_CLOSE_COMMENT) {
         // Closer comment.
@@ -51,7 +49,6 @@ export function initialize () {
     }
   }
 
-  // Now we can mutate DOM.
   sets.forEach(([opener, set], setIndex) => {
     const tabset = el('div', {
       class: TABSET_CONTAINER_CLASS
@@ -64,7 +61,7 @@ export function initialize () {
     })
     tabset.appendChild(tablist)
 
-    set.forEach(([text, content], index) => {
+    set.forEach(([headingContent, content], index) => {
       const selected = index === 0
       const tabId = `tab-${setIndex}-${index}`
       const tabPanelId = `tabpanel-${setIndex}-${index}`
@@ -76,7 +73,7 @@ export function initialize () {
         tabindex: selected ? 0 : -1,
         'aria-selected': selected,
         'aria-controls': tabPanelId
-      }, [text])
+      }, headingContent)
       tab.addEventListener('click', handleTabClick)
       tab.addEventListener('keydown', handleTabKeydown)
       tablist.appendChild(tab)
