@@ -26,10 +26,30 @@ if (!isEmbedded) {
       isCurrentVersion: node.version === currentVersion
     }))
 
-    versionsContainer.innerHTML = versionsDropdownTemplate({ nodes })
+    const latestVersionNode = versionNodes.find(node => node.latest)
+    const latestVersion = latestVersionNode?.version !== currentVersion ? latestVersionNode?.url : null
 
-    qs(VERSIONS_DROPDOWN_SELECTOR).addEventListener('change', handleVersionSelected)
+    versionsContainer.innerHTML = versionsDropdownTemplate({ nodes, latestVersion})
+
+    const select = qs(VERSIONS_DROPDOWN_SELECTOR)
+    select.addEventListener('change', handleVersionSelected)
+    adjustWidth(select)
   }
+}
+
+// Function to adjust the width of the select element
+function adjustWidth (select) {
+  // Create a temporary element to measure the width
+  const temp = document.createElement('span')
+  temp.style.visibility = 'hidden'
+  temp.style.position = 'absolute'
+  temp.style.whiteSpace = 'nowrap'
+  temp.style.font = window.getComputedStyle(select).font
+  temp.textContent = select.options[select.selectedIndex].text
+
+  document.body.appendChild(temp)
+  select.style.width = `${temp.offsetWidth + 20}px`
+  document.body.removeChild(temp)
 }
 
 function handleVersionSelected (event) {

@@ -52,6 +52,8 @@
   --black: hsl(0, 0%, 0%);
   --black-opacity-10: hsla(0, 0%, 0%, 10%);
   --black-opacity-50: hsla(0, 0%, 0%, 50%);
+  --orangeDark: hsl(30, 90%, 40%);
+  --orangeLight: hsl(30, 80%, 50%);
 }
 
 @media screen and (max-width: 768px) {

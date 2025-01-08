@@ -80,6 +80,7 @@ body.dark {
   --sidebarHover:                var(--white);
   --sidebarScrollbarThumb:       var(--coldGray);
   --sidebarScrollbarTrack:       var(--sidebarBackground);
+  --sidebarStaleVersion:         var(--orangeDark);
   --sidebarSubheadings:          var(--gray400);
   --sidebarItem:                 var(--gray200);
   --sidebarInactiveItemBorder:   var(--gray400);

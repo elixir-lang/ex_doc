@@ -10,4 +10,12 @@
       {{/each}}
     </select>
   </label>
+  {{#if latestVersion}}
+    <div class="sidebar-staleVersion">
+      <a href="{{latestVersion}}" title="This version of package is not the latest version">
+        <i class="ri-alert-line sidebar-staleIcon" aria-hidden="true"></i>
+        <span>Go to latest</span>
+      </a>
+    </div>
+  {{/if}}
 </form>
