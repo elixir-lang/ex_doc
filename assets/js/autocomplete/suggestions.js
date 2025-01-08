@@ -43,7 +43,7 @@ export function getSuggestions (query, limit = 8) {
     ...findSuggestionsInSectionsOfNodes(nodes.modules, query, SUGGESTION_CATEGORY.section, 'module'),
     ...findSuggestionsInSectionsOfNodes(nodes.tasks, query, SUGGESTION_CATEGORY.section, 'mix task'),
     ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section, 'page'),
-    ...findSuggestionsInChildNodes(nodes.extras, query, SUGGESTION_CATEGORY.section),
+    ...findSuggestionsInChildNodes(nodes.extras, query, SUGGESTION_CATEGORY.section, 'extras'),
   ].filter(suggestion => suggestion !== null)
 
   return sort(suggestions).slice(0, limit)
@@ -67,8 +67,8 @@ function findSuggestionsInChildNodes (nodes, query, category) {
         const label = nodeGroupKeyToLabel(key)
 
         return childNodes.map(childNode =>
-          childNodeSuggestion(childNode, node.id, node.title || node.id, query, category, label) ||
-          moduleChildNodeSuggestion(childNode, node.id, node.title || node.id, query, category, label)
+          childNodeSuggestion(childNode, node.id, node.title || node.id, query, category, childNode.label || label) ||
+          moduleChildNodeSuggestion(childNode, node.id, node.title || node.id, query, category, childNode.label || label)
         )
       })
     })
