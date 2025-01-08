@@ -492,8 +492,45 @@ For this example, we've changed the module `:my_module` to `:my_module2`, and th
   {"get-started", "quickstart"}
 ]}.
 ```
-
 <!-- tabs-close -->
+
+## Customizing Autocomplete
+
+In ExDoc, there are two kinds of searches. There is the "autocomplete", which is what shows up when you type in the top search bar,
+and "search" which is the separate page with results that you arrive at if you submit the search bar without selecting an autocompleted
+item. Currently, only the autocompletions are customizable.
+
+You can add to the available autocompletions by specifying the `custom_autocompletions` option. This must be a list of
+maps or keyword lists with the following shape:
+
+### Elixir
+
+```elixir
+custom_autocompletions: [
+  %{
+    link: "a-page.html#anchor",
+    title: "custom-text",
+    description: "Some Custom Text",
+    labels: ["Text"]
+  }
+]
+```
+
+### Erlang
+
+```erlang
+{custom_autocompletions, [
+  {link, "a-page.html#anchor"},
+  {title, "custom-text"},
+  {description, "Some Custom Text"},
+  {labels, ["Text"]}
+]}
+```
+
+The `link` is expected to be a relative link to a page in your documentation. You may user anchor links.
+The `title` is the term that will be searched, and what will be shown as the primary text in the search result.
+The `description` is text that will be shown below the search result, and `labels` will be shown as badges
+next to that content.
 
 ## Contributing
 

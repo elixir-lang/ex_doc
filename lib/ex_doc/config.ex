@@ -12,7 +12,7 @@ defmodule ExDoc.Config do
   def skip_undefined_reference_warnings_on(_string), do: false
   def skip_code_autolink_to(_string), do: false
 
-  @type custom_auto_completion :: %{
+  @type custom_autocompletion :: %{
           required(:link) => String.t(),
           required(:title) => String.t(),
           required(:description) => String.t(),
@@ -71,7 +71,7 @@ defmodule ExDoc.Config do
           before_closing_body_tag: (atom() -> String.t()) | mfa() | map(),
           before_closing_footer_tag: (atom() -> String.t()) | mfa() | map(),
           before_closing_head_tag: (atom() -> String.t()) | mfa() | map(),
-          custom_autocompletions: [custom_auto_completion],
+          custom_autocompletions: [custom_autocompletion],
           canonical: nil | String.t(),
           cover: nil | Path.t(),
           default_group_for_doc: (keyword() -> String.t() | nil),
@@ -123,6 +123,7 @@ defmodule ExDoc.Config do
     {groups_for_docs, options} = Keyword.pop(options, :groups_for_docs, [])
     {groups_for_extras, options} = Keyword.pop(options, :groups_for_extras, [])
     {groups_for_modules, options} = Keyword.pop(options, :groups_for_modules, [])
+    {custom_autocompletions, options} = Keyword.pop(options, :custom_autocompletions, [])
 
     {skip_undefined_reference_warnings_on, options} =
       Keyword.pop(
@@ -140,6 +141,7 @@ defmodule ExDoc.Config do
       end)
 
     preconfig = %__MODULE__{
+      custom_autocompletions: normalize_custom_autocompletions(custom_autocompletions),
       filter_modules: normalize_filter_modules(filter_modules),
       groups_for_docs: normalize_groups(groups_for_docs),
       groups_for_extras: normalize_groups(groups_for_extras),
@@ -162,6 +164,12 @@ defmodule ExDoc.Config do
     }
 
     struct(preconfig, options)
+  end
+
+  defp normalize_custom_autocompletions(custom_autocompletions) do
+    Enum.map(custom_autocompletions, fn autocompletion ->
+      Map.new(autocompletion)
+    end)
   end
 
   defp normalize_output(output) do

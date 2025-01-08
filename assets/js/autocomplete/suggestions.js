@@ -44,7 +44,7 @@ export function getSuggestions (query, limit = 8) {
     ...findSuggestionsInSectionsOfNodes(nodes.modules, query, SUGGESTION_CATEGORY.section, 'module'),
     ...findSuggestionsInSectionsOfNodes(nodes.tasks, query, SUGGESTION_CATEGORY.section, 'mix task'),
     ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section, 'page'),
-    ...findSuggestionsInCustomSidebarNodes(nodes.custom, query, SUGGESTION_CATEGORY.custom, 'custom')
+    ...findSuggestionsInCustomSidebarNodes(nodes.custom || [], query, SUGGESTION_CATEGORY.custom, 'custom')
   ].filter(suggestion => suggestion !== null)
 
   return sort(suggestions).slice(0, limit)
