@@ -192,8 +192,13 @@ function markCurrentHashInSidebar () {
   if (!current) return
 
   // Unset previous.
-  sidebar.querySelectorAll('li a[aria-selected]').forEach(element => {
+  sidebar.querySelectorAll('.full-list a[aria-selected]').forEach(element => {
     element.removeAttribute('aria-selected')
+  })
+
+  // Close open menus.
+  sidebar.querySelectorAll('.full-list button[aria-expanded=true]').forEach(element => {
+    element.setAttribute('aria-expanded', false)
   })
 
   // Walk up parents, updating link, button and tab attributes.
