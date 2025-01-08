@@ -12,6 +12,13 @@ defmodule ExDoc.Config do
   def skip_undefined_reference_warnings_on(_string), do: false
   def skip_code_autolink_to(_string), do: false
 
+  @type custom_auto_completion :: %{
+          required(:link) => String.t(),
+          required(:title) => String.t(),
+          required(:description) => String.t(),
+          optional(:labels) => [String.t()]
+        }
+
   defstruct annotations_for_docs: &__MODULE__.annotations_for_docs/1,
             api_reference: true,
             apps: [],
@@ -32,6 +39,7 @@ defmodule ExDoc.Config do
             groups_for_extras: [],
             groups_for_docs: [],
             groups_for_modules: [],
+            custom_autocompletions: [],
             homepage_url: nil,
             language: "en",
             logo: nil,
@@ -63,6 +71,7 @@ defmodule ExDoc.Config do
           before_closing_body_tag: (atom() -> String.t()) | mfa() | map(),
           before_closing_footer_tag: (atom() -> String.t()) | mfa() | map(),
           before_closing_head_tag: (atom() -> String.t()) | mfa() | map(),
+          custom_autocompletions: [custom_auto_completion],
           canonical: nil | String.t(),
           cover: nil | Path.t(),
           default_group_for_doc: (keyword() -> String.t() | nil),

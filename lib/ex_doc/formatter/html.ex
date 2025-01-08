@@ -183,7 +183,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_sidebar_items(nodes_map, extras, config) do
-    content = Templates.create_sidebar_items(nodes_map, extras)
+    content = Templates.create_sidebar_items(nodes_map, extras, config.custom_autocompletions)
     path = "dist/sidebar_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, path), content)
     [path]
