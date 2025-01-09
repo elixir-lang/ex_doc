@@ -76,11 +76,17 @@
   margin: 0;
   padding: 15px 20px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  gap: 8px;
   color: var(--autocompleteResults);
   font-family: var(--sansFontFamily);
   font-weight: 300;
   font-size: 0.9rem;
+}
+
+.autocomplete-results .query {
+  margin-right: auto;
 }
 
 .autocomplete-results .bold {
@@ -248,8 +254,12 @@
   background-color: var(--autocompleteScrollbarTrack);
 }
 
-@media screen and (max-width: 1023px) {
+@media screen and (hover: none) {
+  .autocomplete-preview-indicator {
+    display: none !important;
+  }
+
   .autocomplete-results .press-return {
-    display: none;
+    display: none !important;
   }
 }
