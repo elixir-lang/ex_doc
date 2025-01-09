@@ -1,5 +1,5 @@
 import { qs, checkUrlExists } from '../helpers'
-import { getVersionNodes } from '../globals'
+import { getVersionNodes, isEmbedded } from '../globals'
 import versionsDropdownTemplate from '../handlebars/templates/versions-dropdown.handlebars'
 
 const VERSIONS_CONTAINER_SELECTOR = '.sidebar-projectVersion'
@@ -8,52 +8,27 @@ const VERSIONS_DROPDOWN_SELECTOR = '.sidebar-projectVersionsDropdown'
 /**
  * Initializes selectable version list if `versionNodes` have been configured.
  */
-export function initialize () {
-  const versionNodes = getVersionNodes()
 
-  if (versionNodes.length > 0) {
-    const versionsContainer = qs(VERSIONS_CONTAINER_SELECTOR)
+if (!isEmbedded) {
+  const versionNodes = getVersionNodes()
+  const versionsContainer = qs(VERSIONS_CONTAINER_SELECTOR)
+
+  if (versionNodes.length > 0 || !versionsContainer) {
     // Initially the container contains only text with the current version
     const currentVersion = versionsContainer.textContent.trim()
-    const nodes = decorateVersionNodes(versionNodes, currentVersion)
+    // Add the current version node to the list if not there.
+    const withCurrentVersion = versionNodes.some((node) => node.version === currentVersion)
+      ? versionNodes
+      : [{ version: currentVersion, url: '#' }, ...versionNodes]
+    // Add additional attributes to version nodes for rendering.
+    const nodes = withCurrentVersion.map(node => ({
+      ...node,
+      isCurrentVersion: node.version === currentVersion
+    }))
 
-    renderVersionsDropdown({ nodes })
-  }
-}
+    versionsContainer.innerHTML = versionsDropdownTemplate({ nodes })
 
-function renderVersionsDropdown ({ nodes }) {
-  const versionsContainer = qs(VERSIONS_CONTAINER_SELECTOR)
-  const versionsDropdownHtml = versionsDropdownTemplate({ nodes })
-  versionsContainer.innerHTML = versionsDropdownHtml
-
-  qs(VERSIONS_DROPDOWN_SELECTOR).addEventListener('change', handleVersionSelected)
-}
-
-/**
- * Adds additional attributes to version nodes for rendering.
- */
-function decorateVersionNodes (nodes, currentVersion) {
-  const withCurrentVersion = ensureCurrentVersionNode(nodes, currentVersion)
-
-  return withCurrentVersion.map(node => ({
-    ...node,
-    isCurrentVersion: node.version === currentVersion
-  }))
-}
-
-/**
- * Adds the current version node to the list unless it's already there.
- */
-function ensureCurrentVersionNode (nodes, currentVersion) {
-  const currentVersionPresent = nodes.some(
-    (node) => node.version === currentVersion
-  )
-
-  if (currentVersionPresent) {
-    return nodes
-  } else {
-    const currentVersionNode = { version: currentVersion, url: '#' }
-    return [currentVersionNode, ...nodes]
+    qs(VERSIONS_DROPDOWN_SELECTOR).addEventListener('change', handleVersionSelected)
   }
 }
 

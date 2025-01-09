@@ -10,6 +10,7 @@ import {
   AUTOCOMPLETE_CONTAINER_SELECTOR,
   AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR
 } from './autocomplete/autocomplete-list'
+import { isEmbedded } from './globals'
 import { isAppleOS, qs } from './helpers'
 
 const SEARCH_INPUT_SELECTOR = 'form.search-bar input'
@@ -18,7 +19,13 @@ const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-bar .search-close-button'
 /**
  * Initializes the sidebar search box.
  */
-export function initialize () {
+
+if (!isEmbedded) {
+  window.addEventListener('swup:page:view', initialize)
+  initialize()
+}
+
+function initialize () {
   addEventListeners()
 
   window.onTogglePreviewClick = function (event, open) {

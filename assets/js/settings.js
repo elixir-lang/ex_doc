@@ -25,15 +25,13 @@ const modalTabs = [
 /**
  * Sets up the settings modal.
  */
-export function initialize () {
-  addEventListeners()
-}
 
-function addEventListeners () {
+window.addEventListener('swup:page:view', initialize)
+initialize()
+
+function initialize () {
   qsAll(SETTINGS_LINK_SELECTOR).forEach(element => {
-    element.addEventListener('click', event => {
-      openSettingsModal()
-    })
+    element.addEventListener('click', openSettingsModal)
   })
 }
 

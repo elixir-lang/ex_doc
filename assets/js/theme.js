@@ -9,10 +9,9 @@ const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 /**
  * Sets initial night mode state and registers to settings updates.
  */
-export function initialize () {
-  settingsStore.getAndSubscribe(update)
-  darkMediaQuery.addEventListener('change', update)
-}
+
+settingsStore.getAndSubscribe(update)
+darkMediaQuery.addEventListener('change', update)
 
 function update () {
   const theme = currentTheme()

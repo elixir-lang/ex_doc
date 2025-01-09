@@ -5,6 +5,10 @@ const HIGHLIGHT_CLASS = 'hll'
 /**
  * Sets up dynamic behaviour for code blocks processed with *makeup*.
  */
+
+window.addEventListener('swup:page:view', initialize)
+initialize()
+
 export function initialize () {
   // Hovering over a delimiter (bracket, parenthesis, do/end)
   // highlights the relevant pair of delimiters.

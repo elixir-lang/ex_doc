@@ -2,13 +2,16 @@ import throttle from 'lodash.throttle'
 import { qs } from '../helpers'
 import { SIDEBAR_CLASS_OPEN, SIDEBAR_CLASS_TRANSITION, SIDEBAR_PREF_CLOSED, SIDEBAR_PREF_OPEN, SIDEBAR_STATE_KEY, SIDEBAR_WIDTH_KEY, SMALL_SCREEN_BREAKPOINT } from './constants'
 import { initialize as initializeList } from './sidebar-list'
+import { isEmbedded } from '../globals'
 
 const ANIMATION_DURATION = 300
 
 const CONTENT_SELECTOR = '.content'
 const SIDEBAR_TOGGLE_SELECTOR = '.sidebar-toggle'
 
-export function initialize () {
+const smallScreenQuery = window.matchMedia(`screen and (max-width: ${SMALL_SCREEN_BREAKPOINT}px)`)
+
+if (!isEmbedded) {
   update()
 
   window.addEventListener('swup:page:view', update)
@@ -17,7 +20,7 @@ export function initialize () {
 
   // Clicks outside small screen open sidebar should close it.
   qs(CONTENT_SELECTOR).addEventListener('click', () => {
-    if (isScreenSmall() && isSidebarOpen()) {
+    if (smallScreenQuery.matches && isSidebarOpen()) {
       toggleSidebar()
     }
   })
@@ -47,15 +50,9 @@ export function initialize () {
 
 export function update () {
   const pref = sessionStorage.getItem(SIDEBAR_STATE_KEY)
-  const open = pref !== SIDEBAR_PREF_CLOSED && !isScreenSmall()
+  const open = pref !== SIDEBAR_PREF_CLOSED && !smallScreenQuery.matches
   if (open) initializeList()
   updateSidebar(open)
-}
-
-const smallScreenQuery = window.matchMedia(`screen and (max-width: ${SMALL_SCREEN_BREAKPOINT}px)`)
-
-function isScreenSmall () {
-  return smallScreenQuery.matches
 }
 
 /**

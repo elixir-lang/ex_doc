@@ -1,6 +1,7 @@
 import { debounce, el, qs, qsAll } from './helpers'
 import { openModal } from './modal'
 import quickSwitchModalBodyHtml from './handlebars/templates/quick-switch-modal-body.html'
+import { isEmbedded } from './globals'
 
 const HEX_DOCS_ENDPOINT = 'https://hexdocs.pm/%%'
 const OTP_DOCS_ENDPOINT = 'https://www.erlang.org/doc/apps/%%'
@@ -71,7 +72,13 @@ const state = {
 /**
  * Initializes the quick switch modal.
  */
-export function initialize () {
+
+if (!isEmbedded) {
+  window.addEventListener('swup:page:view', initialize)
+  initialize()
+}
+
+function initialize () {
   qsAll(QUICK_SWITCH_LINK_SELECTOR).forEach(element => {
     element.addEventListener('click', openQuickSwitchModal)
   })
