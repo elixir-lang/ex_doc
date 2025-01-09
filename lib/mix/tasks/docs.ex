@@ -358,30 +358,10 @@ defmodule Mix.Tasks.Docs do
   to `MyApp.My.Module` and the extra `get-started.md` to `quickstart.md`, you can
   setup the following redirects:
 
-  <!-- tabs-open -->
-
-  ### Elixir
-
-  For this example, we've changed the module `MyApp.MyModule` to `MyApp.My.Module`, and the extra `get-started.md` to `quickstart.md`
-
-  ```elixir
-  redirects: %{
-    "MyApp.MyModule" => "MyApp.My.Module",
-    "get-started" => "quickstart"
-  }
-  ```
-
-  ### Erlang
-
-  For this example, we've changed the module `:my_module` to `:my_module2`, and the extra `get-started.md` to `quickstart.md`
-
-  ```erlang
-  {redirects, [
-    {"my_module", "my_module2"},
-    {"get-started", "quickstart"}
-  ]}.
-  ```
-  <!-- tabs-close -->
+      redirects: %{
+        "MyApp.MyModule" => "MyApp.My.Module",
+        "get-started" => "quickstart"
+      }
 
   ## Customizing Search
 
@@ -392,33 +372,14 @@ defmodule Mix.Tasks.Docs do
   You can add to the available autocompletions by specifying the `custom_autocompletions` option. This must be a list of
   maps or keyword lists with the following shape:
 
-  <!-- tabs-open -->
-
-  ### Elixir
-
-  ```elixir
-  custom_autocompletions: [
-    %{
-      link: "a-page.html#anchor",
-      title: "custom-text",
-      description: "Some Custom Text",
-      labels: ["Text"]
-    }
-  ]
-  ```
-
-  ### Erlang
-
-  ```erlang
-  {custom_autocompletions, [
-    {link, "a-page.html#anchor"},
-    {title, "custom-text"},
-    {description, "Some Custom Text"},
-    {labels, ["Text"]}
-  ]}
-  ```
-
-  <!-- tabs-close -->
+      custom_autocompletions: [
+        %{
+          link: "a-page.html#anchor",
+          title: "custom-text",
+          description: "Some Custom Text",
+          labels: ["Text"]
+        }
+      ]
 
   - `link` is expected to be a relative link to a page in your documentation. You may user anchor links.
   - `title` is the term that will be searched, and what will be shown as the primary text in the search result.
