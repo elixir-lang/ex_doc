@@ -51,7 +51,7 @@ if (!isEmbedded) {
 export function update () {
   const pref = sessionStorage.getItem(SIDEBAR_STATE_KEY)
   const open = pref !== SIDEBAR_PREF_CLOSED && !smallScreenQuery.matches
-  if (open) initializeList()
+  initializeList()
   updateSidebar(open)
 }
 
