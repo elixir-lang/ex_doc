@@ -102,6 +102,9 @@ defmodule Mix.Tasks.Docs do
       the "assets" directory in the output path under the name "cover" and the
       appropriate extension. This option has no effect when using the "html" formatter.
 
+    * `:custom_autocompletions` - A list of maps or keywords representing custom autocomplete
+      results that will appear in the search. See the "Customizing Search" section below for more.
+
     * `:deps` - A keyword list application names and their documentation URL.
       ExDoc will by default include all dependencies and assume they are hosted on
       HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
@@ -153,7 +156,8 @@ defmodule Mix.Tasks.Docs do
       May be overridden by command line argument.
 
     * `:redirects` - A map or list of tuples, where the key is the path to redirect from and the
-       value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`
+       value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`.
+       See the "Changing documentation over time" section below for more.
 
     * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
       reference in the current project docs e.g. because of a typo. This list controls where to
@@ -336,6 +340,90 @@ defmodule Mix.Tasks.Docs do
   modules share a long prefix. If you mean to group modules logically or call
   attention to them in the docs, you should probably use `:groups_for_modules`
   (which can be used in conjunction with `:nest_modules_by_prefix`).
+
+  ## Changing documentation over time
+
+  As your project grows, your documentation may very likely change, even structurally. There are a few important things to consider in this regard:
+
+  - Links to your *extras* will break if you change or move file names.
+  - Links to your *modules, and mix tasks* will change if you change their name.
+  - Links to *functions* are actually links to modules with anchor links. If you change the function name, the link does
+  not break but will leave users at the top of the module's documentation.
+
+  Because these docs are static files, the behavior of a missing page will depend on where they are hosted.
+  In particular, [hexdocs.pm](https://hexdocs.pm) will show a 404 page.
+
+  You can improve the developer experience on everything but function names changing
+  by using the `redirects` configuration. For example, if you changed the module `MyApp.MyModule`
+  to `MyApp.My.Module` and the extra `get-started.md` to `quickstart.md`, you can
+  setup the following redirects:
+
+  <!-- tabs-open -->
+
+  ### Elixir
+
+  For this example, we've changed the module `MyApp.MyModule` to `MyApp.My.Module`, and the extra `get-started.md` to `quickstart.md`
+
+  ```elixir
+  redirects: %{
+    "MyApp.MyModule" => "MyApp.My.Module",
+    "get-started" => "quickstart"
+  }
+  ```
+
+  ### Erlang
+
+  For this example, we've changed the module `:my_module` to `:my_module2`, and the extra `get-started.md` to `quickstart.md`
+
+  ```erlang
+  {redirects, [
+    {"my_module", "my_module2"},
+    {"get-started", "quickstart"}
+  ]}.
+  ```
+  <!-- tabs-close -->
+
+  ## Customizing Search
+
+  In ExDoc, there are two kinds of searches. There is the "autocomplete", which is what shows up when you type in the top search bar,
+  and "search" which is the separate page with results that you arrive at if you submit the search bar without selecting an autocompleted
+  item. Currently, only the autocompletions are customizable.
+
+  You can add to the available autocompletions by specifying the `custom_autocompletions` option. This must be a list of
+  maps or keyword lists with the following shape:
+
+  <!-- tabs-open -->
+
+  ### Elixir
+
+  ```elixir
+  custom_autocompletions: [
+    %{
+      link: "a-page.html#anchor",
+      title: "custom-text",
+      description: "Some Custom Text",
+      labels: ["Text"]
+    }
+  ]
+  ```
+
+  ### Erlang
+
+  ```erlang
+  {custom_autocompletions, [
+    {link, "a-page.html#anchor"},
+    {title, "custom-text"},
+    {description, "Some Custom Text"},
+    {labels, ["Text"]}
+  ]}
+  ```
+
+  <!-- tabs-close -->
+
+  - `link` is expected to be a relative link to a page in your documentation. You may user anchor links.
+  - `title` is the term that will be searched, and what will be shown as the primary text in the search result.
+  - `description` is text that will be shown below the search result
+  - `labels` will be shown as badges next to that content.
 
   ## Umbrella project
 
