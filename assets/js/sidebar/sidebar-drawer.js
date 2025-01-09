@@ -6,21 +6,28 @@ import { isEmbedded } from '../globals'
 
 const ANIMATION_DURATION = 300
 
-const CONTENT_SELECTOR = '.content'
 const SIDEBAR_TOGGLE_SELECTOR = '.sidebar-toggle'
 
 const smallScreenQuery = window.matchMedia(`screen and (max-width: ${SMALL_SCREEN_BREAKPOINT}px)`)
 
 if (!isEmbedded) {
-  update()
+  setDefaultSidebarState()
 
-  window.addEventListener('swup:page:view', update)
+  window.addEventListener('swup:page:view', setDefaultSidebarState)
 
-  qs(SIDEBAR_TOGGLE_SELECTOR).addEventListener('click', toggleSidebar)
+  const sidebar = document.getElementById('sidebar')
+  const sidebarToggle = qs(SIDEBAR_TOGGLE_SELECTOR)
+
+  sidebarToggle.addEventListener('click', toggleSidebar)
 
   // Clicks outside small screen open sidebar should close it.
-  qs(CONTENT_SELECTOR).addEventListener('click', () => {
-    if (smallScreenQuery.matches && isSidebarOpen()) {
+  document.body.addEventListener('click', (event) => {
+    if (
+      smallScreenQuery.matches &&
+      isSidebarOpen() &&
+      !sidebar.contains(event.target) &&
+      !sidebarToggle.contains(event.target)
+    ) {
       toggleSidebar()
     }
   })
@@ -31,7 +38,7 @@ if (!isEmbedded) {
   window.addEventListener('resize', throttle(() => {
     if (lastWindowWidth === window.innerWidth) return
     lastWindowWidth = window.innerWidth
-    update()
+    setDefaultSidebarState()
   }, 100))
 
   // Save sidebar width changes on user resize only.
@@ -43,15 +50,13 @@ if (!isEmbedded) {
     document.body.style.setProperty('--sidebarWidth', `${width}px`)
   })
   // We observe on mousedown because we only care about user resize.
-  const sidebar = document.getElementById('sidebar')
   sidebar.addEventListener('mousedown', () => resizeObserver.observe(sidebar))
   sidebar.addEventListener('mouseup', () => resizeObserver.unobserve(sidebar))
 }
 
-export function update () {
+function setDefaultSidebarState () {
   const pref = sessionStorage.getItem(SIDEBAR_STATE_KEY)
   const open = pref !== SIDEBAR_PREF_CLOSED && !smallScreenQuery.matches
-  initializeList()
   updateSidebar(open)
 }
 
@@ -79,6 +84,8 @@ export function isSidebarOpened () {
 }
 
 function updateSidebar (open) {
+  // Lazy init list. Only needed when open.
+  if (open) initializeList()
   document.body.classList.toggle(SIDEBAR_CLASS_OPEN, open)
   qs(SIDEBAR_TOGGLE_SELECTOR).setAttribute('aria-expanded', open ? 'true' : 'false')
 }
