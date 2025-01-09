@@ -39,7 +39,11 @@ const state = {
 /**
  * Initializes tooltips handling.
  */
-export function initialize () {
+
+window.addEventListener('swup:page:view', initialize)
+initialize()
+
+function initialize () {
   qsAll(TOOLTIP_ACTIVATORS_SELECTOR).forEach(element => {
     if (!linkElementEligibleForTooltip(element)) { return }
 

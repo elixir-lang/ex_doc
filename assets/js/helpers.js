@@ -46,14 +46,17 @@ export function getCurrentPageSidebarType () {
   return document.getElementById('main').dataset.type
 }
 
+const headingTagNames = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']
+
 /**
  * Finds an element by a URL hash (e.g. a function section).
  *
- * @param {String} hash The hash part of a URL.
  * @param {Boolean} anything Whether or not to support any link to any header.
  * @returns {HTMLElement|null} The relevant element.
  */
-export function descriptionElementFromHash (hash, anything = false) {
+export function descriptionElementFromHash (anything = false) {
+  const hash = window.location.hash.replace(/^#/, '')
+
   if (!hash) {
     if (!anything) {
       return null
@@ -71,40 +74,25 @@ export function descriptionElementFromHash (hash, anything = false) {
   }
 
   // Matches a subheader in particular
-  if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(element.tagName.toLowerCase())) {
-    return toNextHeader(element)
+  if (headingTagNames.includes(element.tagName)) {
+    const div = document.createElement('div')
+    const nodes = [element]
+
+    // Capture all nodes under the current heading level.
+    let node = element
+    while ((node = node.nextSibling)) {
+      if (headingTagNames.includes(node.tagName) && node.tagName <= element.tagName) {
+        break
+      } else {
+        nodes.push(node)
+      }
+    }
+
+    div.append(...nodes)
+    return div
   }
 
   return null
-}
-
-function toNextHeader (element) {
-  const elements = [element]
-  let nextElement = element.nextElementSibling
-  const tagName = element.tagName.toLowerCase()
-
-  while (nextElement) {
-    const nextElementTagName = nextElement.tagName.toLowerCase()
-    if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(nextElementTagName) && nextElementTagName <= tagName) {
-      nextElement = null
-    } else {
-      elements.push(nextElement)
-      nextElement = nextElement.nextElementSibling
-    }
-  }
-
-  const div = document.createElement('div')
-  div.append(...elements)
-  return div
-}
-
-/**
- * Returns current location hash without the leading hash character.
- *
- * @returns {String}
- */
-export function getLocationHash () {
-  return window.location.hash.replace(/^#/, '')
 }
 
 /**

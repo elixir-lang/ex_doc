@@ -7,7 +7,11 @@ let buttonTemplate
 /**
  * Initializes copy buttons.
  */
-export function initialize () {
+
+window.addEventListener('swup:page:view', initialize)
+initialize()
+
+function initialize () {
   if (!('clipboard' in navigator)) return
 
   qsAll('pre:has(> code:first-child):not(:has(.copy-button))').forEach(pre => {

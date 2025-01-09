@@ -19,7 +19,11 @@ lunr.Pipeline.registerFunction(docTrimmerFunction, 'docTrimmer')
  *
  * Activates only on the `/search.html` page.
  */
-export function initialize () {
+
+window.addEventListener('swup:page:view', initialize)
+initialize()
+
+function initialize () {
   const pathname = window.location.pathname
   if (pathname.endsWith('/search.html') || pathname.endsWith('/search')) {
     const query = getQueryParamByName('q')
