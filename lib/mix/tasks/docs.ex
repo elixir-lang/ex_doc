@@ -337,6 +337,30 @@ defmodule Mix.Tasks.Docs do
   attention to them in the docs, you should probably use `:groups_for_modules`
   (which can be used in conjunction with `:nest_modules_by_prefix`).
 
+  ## Changing documentation over time
+
+  As your project grows, your documentation may very likely change, even structurally.
+  There are a few important things to consider in this regard:
+
+    * Links to your *extras* will break if you change or move file names.
+    * Links to your *modules, and mix tasks* will change if you change their name.
+    * Links to *functions* are actually links to modules with anchor links.
+      If you change the function name, the link does not break but will leave users
+      at the top of the module's documentation.
+
+  Because these docs are static files, the behavior of a missing page will depend on where they are hosted.
+  In particular, [hexdocs.pm](https://hexdocs.pm) will show a 404 page.
+
+  You can improve the developer experience on everything but function names changing
+  by using the `redirects` configuration. For example, if you changed the module `MyApp.MyModule`
+  to `MyApp.My.Module` and the extra `get-started.md` to `quickstart.md`, you can
+  setup the following redirects:
+
+      redirects: %{
+        "MyApp.MyModule" => "MyApp.My.Module",
+        "get-started" => "quickstart"
+      }
+
   ## Umbrella project
 
   ExDoc can be used in an umbrella project and generates a single documentation
