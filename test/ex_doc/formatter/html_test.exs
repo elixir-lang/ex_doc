@@ -592,6 +592,34 @@ defmodule ExDoc.Formatter.HTMLTest do
              ] = Jason.decode!(content)["extras"]
     end
 
+    test "custom autocompletions can be added", %{tmp_dir: tmp_dir} = context do
+      generate_docs(
+        doc_config(context,
+          source_beam: "unknown",
+          extras: [],
+          custom_autocompletions: [
+            %{
+              link: "a-page.html#anchor",
+              title: "custom-text",
+              description: "Some Custom Text",
+              labels: ["Text"]
+            }
+          ]
+        )
+      )
+
+      "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
+
+      assert [
+               %{
+                 "link" => "a-page.html#anchor",
+                 "title" => "custom-text",
+                 "description" => "Some Custom Text",
+                 "labels" => ["Text"]
+               }
+             ] = Jason.decode!(content)["custom"]
+    end
+
     test "containing settext headers while discarding links on header",
          %{tmp_dir: tmp_dir} = context do
       generate_docs(
