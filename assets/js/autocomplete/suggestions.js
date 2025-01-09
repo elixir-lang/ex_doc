@@ -18,8 +18,7 @@ const SUGGESTION_CATEGORY = {
   moduleChild: 'module-child',
   mixTask: 'mix-task',
   extra: 'extra',
-  section: 'section',
-  custom: 'custom'
+  section: 'section'
 }
 
 /**
@@ -43,8 +42,7 @@ export function getSuggestions (query, limit = 8) {
     ...findSuggestionsInTopLevelNodes(nodes.extras, query, SUGGESTION_CATEGORY.extra, 'page'),
     ...findSuggestionsInSectionsOfNodes(nodes.modules, query, SUGGESTION_CATEGORY.section, 'module'),
     ...findSuggestionsInSectionsOfNodes(nodes.tasks, query, SUGGESTION_CATEGORY.section, 'mix task'),
-    ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section, 'page'),
-    ...findSuggestionsInCustomSidebarNodes(nodes.custom || [], query, SUGGESTION_CATEGORY.custom, 'custom')
+    ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section, 'page')
   ].filter(suggestion => suggestion !== null)
 
   return sort(suggestions).slice(0, limit)
@@ -55,13 +53,6 @@ export function getSuggestions (query, limit = 8) {
  */
 function findSuggestionsInTopLevelNodes (nodes, query, category, label) {
   return nodes.map(node => nodeSuggestion(node, query, category, label))
-}
-
-/**
- * Finds suggestions in custom sidebar nodes.
- */
-function findSuggestionsInCustomSidebarNodes (nodes, query, category, label) {
-  return nodes.map(node => customNodeSuggestion(node, query, category, label))
 }
 
 /**
@@ -113,25 +104,7 @@ function nodeSuggestion (node, query, category, label) {
     description: null,
     matchQuality: matchQuality(node.title, query),
     deprecated: node.deprecated,
-    labels: node.labels || [label],
-    category
-  }
-}
-
-/**
- * Builds a suggestion for a custom top level node.
- * Returns null if the node doesn't match the query.
- */
-function customNodeSuggestion (node, query, category, label) {
-  if (!matchesAll(node.title, query)) { return null }
-
-  return {
-    link: node.link,
-    title: highlightMatches(node.title, query),
-    description: node.description,
-    matchQuality: matchQuality(node.title, query),
-    deprecated: node.deprecated,
-    labels: node.labels || [label],
+    labels: [label],
     category
   }
 }
@@ -238,8 +211,7 @@ function categoryPriority (category) {
     case SUGGESTION_CATEGORY.module: return 1
     case SUGGESTION_CATEGORY.moduleChild: return 2
     case SUGGESTION_CATEGORY.mixTask: return 3
-    case SUGGESTION_CATEGORY.custom: return 4
-    default: return 5
+    default: return 4
   }
 }
 
