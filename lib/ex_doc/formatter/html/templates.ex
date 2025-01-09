@@ -70,13 +70,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
   """
-  def create_sidebar_items(nodes_map, extras, custom_autocompletions \\ []) do
+  def create_sidebar_items(nodes_map, extras) do
     nodes =
       nodes_map
       |> Enum.map(&sidebar_module/1)
       |> Map.new()
       |> Map.put(:extras, sidebar_extras(extras))
-      |> Map.put(:custom, custom_autocompletions)
 
     ["sidebarNodes=" | ExDoc.Utils.to_json(nodes)]
   end
