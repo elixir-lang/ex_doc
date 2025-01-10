@@ -80,6 +80,7 @@
   --sidebarHover:                var(--black);
   --sidebarScrollbarThumb:       var(--coldGrayLight);
   --sidebarScrollbarTrack:       var(--sidebarBackground);
+  --sidebarStaleVersion:         var(--orangeDark);
   --sidebarSubheadings:          var(--black);
   --sidebarItem:                 var(--black);
   --sidebarInactiveItemBorder:   var(--gray500);

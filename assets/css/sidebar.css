@@ -109,6 +109,22 @@
   display: none;
 }
 
+.sidebar .sidebar-staleVersion {
+    display: inline;
+}
+
+.sidebar .sidebar-staleVersion > a {
+    color: var(--sidebarStaleVersion);
+    font-weight: 400;
+}
+
+.sidebar .sidebar-staleIcon {
+    font-size: 18px;
+    position: relative;
+    top: 3px;
+    line-height: 0;
+}
+
 .sidebar .sidebar-list-nav {
   display: flex;
   margin: 0;
