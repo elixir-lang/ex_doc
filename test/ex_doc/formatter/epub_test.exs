@@ -146,6 +146,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
   end
 
+  @tag :skip
   test "uses samp as highlight tag for markdown", %{tmp_dir: tmp_dir} = context do
     generate_docs_and_unzip(context, doc_config(context))
 

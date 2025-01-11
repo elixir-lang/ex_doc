@@ -229,7 +229,7 @@
 }
 
 .content-inner code {
-  font-family: var(--monoFontFamily);
+  font-family: var(--monoFontFamily) !important;
   font-style: normal;
   line-height: 24px;
   font-weight: 400;

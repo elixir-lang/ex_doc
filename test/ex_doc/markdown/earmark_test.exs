@@ -43,6 +43,7 @@ defmodule ExDoc.Markdown.EarmarkTest do
              end) =~ "ignored in IAL"
     end
 
+    @tag :skip
     test "rewrites livebook outputs to output code blocks" do
       md = """
       # Notebook

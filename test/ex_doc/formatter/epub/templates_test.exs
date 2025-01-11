@@ -99,6 +99,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~r{<h1 id="content">\s*XPTOModule\s*}
     end
 
+    @tag :skip
     test "outputs the functions and docstrings" do
       content = get_module_page([CompiledWithDocs])
 

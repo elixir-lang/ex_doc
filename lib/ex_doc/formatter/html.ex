@@ -139,11 +139,10 @@ defmodule ExDoc.Formatter.HTML do
     mod_id <> "." <> id
   end
 
-  defp autolink_and_render(doc, language, autolink_opts, opts) do
+  defp autolink_and_render(doc, language, autolink_opts, _opts) do
     doc
     |> language.autolink_doc(autolink_opts)
     |> ExDoc.DocAST.to_string()
-    |> ExDoc.DocAST.highlight(language, opts)
   end
 
   defp output_setup(build, config) do

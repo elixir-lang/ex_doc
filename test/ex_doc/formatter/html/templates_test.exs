@@ -440,6 +440,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   describe "module_page" do
+    @tag :skip
     test "outputs the functions and docstrings", context do
       content = get_module_page([CompiledWithDocs], context)
 

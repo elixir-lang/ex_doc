@@ -10,7 +10,7 @@
 }
 
 .content-inner code {
-  background-color: var(--codeBackground);
+  background-color: var(--codeBackground) !important;
   vertical-align: baseline;
   border-radius: 2px;
   padding: .1em .2em;
@@ -19,7 +19,9 @@
 }
 
 .content-inner pre {
-  margin: var(--baseLineHeight) 0;
+  margin: var(--baseLineHeight) 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
 }
 
 .content-inner pre code {
@@ -27,6 +29,7 @@
   overflow-x: auto;
   white-space: inherit;
   padding: .5em 1em;
+  text-shadow: none;
 }
 
 .content-inner pre code::-webkit-scrollbar {

@@ -14,9 +14,12 @@ settingsStore.getAndSubscribe(update)
 darkMediaQuery.addEventListener('change', update)
 
 function update () {
+  document.body.classList.toggle(DARK_MODE_CLASS, isDark())
+}
+
+export function isDark () {
   const theme = currentTheme()
-  const dark = theme === THEME_DARK || (theme !== THEME_LIGHT && darkMediaQuery.matches)
-  document.body.classList.toggle(DARK_MODE_CLASS, dark)
+  return theme === THEME_DARK || (theme !== THEME_LIGHT && darkMediaQuery.matches)
 }
 
 /**
