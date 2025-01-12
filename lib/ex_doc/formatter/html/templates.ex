@@ -84,12 +84,30 @@ defmodule ExDoc.Formatter.HTML.Templates do
     for extra <- extras do
       %{id: id, title: title, group: group, content: content} = extra
 
-      %{
-        id: to_string(id),
-        title: to_string(title),
-        group: to_string(group),
-        headers: extract_headers(content)
-      }
+      item =
+        %{
+          id: to_string(id),
+          title: to_string(title),
+          group: to_string(group),
+          headers: extract_headers(content)
+        }
+
+      case extra do
+        %{search_data: search_data} when is_list(search_data) ->
+          search_data =
+            Enum.map(search_data, fn search_item ->
+              %{
+                anchor: search_item.anchor,
+                id: search_item.title,
+                labels: [search_item.type]
+              }
+            end)
+
+          Map.put(item, :searchData, search_data)
+
+        _ ->
+          item
+      end
     end
   end
 

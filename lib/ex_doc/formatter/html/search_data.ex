@@ -19,27 +19,44 @@ defmodule ExDoc.Formatter.HTML.SearchData do
   end
 
   defp extra(map) do
-    {intro, sections} = extract_sections_from_markdown(map.source)
+    if custom_search_data = map[:search_data] do
+      extra_search_data(map, custom_search_data)
+    else
+      {intro, sections} = extract_sections_from_markdown(map.source)
 
-    intro_json_item =
-      encode(
-        "#{map.id}.html",
-        map.title,
-        :extras,
-        intro
-      )
-
-    section_json_items =
-      for {header, body} <- sections do
+      intro_json_item =
         encode(
-          "#{map.id}.html##{Utils.text_to_id(header)}",
-          header <> " - #{map.title}",
+          "#{map.id}.html",
+          map.title,
           :extras,
-          body
+          intro
         )
-      end
 
-    [intro_json_item | section_json_items]
+      section_json_items =
+        for {header, body} <- sections do
+          encode(
+            "#{map.id}.html##{Utils.text_to_id(header)}",
+            header <> " - #{map.title}",
+            :extras,
+            body
+          )
+        end
+
+      [intro_json_item | section_json_items]
+    end
+  end
+
+  defp extra_search_data(map, custom_search_data) do
+    Enum.map(custom_search_data, fn item ->
+      link =
+        if item.anchor === "" do
+          "#{map.id}.html"
+        else
+          "#{map.id}.html##{item.anchor}"
+        end
+
+      encode(link, item.title <> " - #{map.id}", item.type, clean_markdown(item.body))
+    end)
   end
 
   defp module(%ExDoc.ModuleNode{} = node) do
