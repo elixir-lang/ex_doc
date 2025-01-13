@@ -640,6 +640,26 @@ defmodule ExDoc.Formatter.HTMLTest do
                Jason.decode!(content)["extras"]
                |> Enum.find(&(&1["id"] == "readme"))
                |> Map.fetch!("searchData")
+
+      "searchData=" <> content = read_wildcard!(tmp_dir <> "/html/dist/search_data-*.js")
+
+      assert [
+               %{
+                 "doc" => "In this doc we...",
+                 "ref" => "readme.html",
+                 "title" => "top of the doc - readme",
+                 "type" => "custom"
+               },
+               %{
+                 "doc" => "Some longer text!\n\nHere it is :)",
+                 "ref" => "readme.html#heading-without-content",
+                 "title" => "custom-text - readme",
+                 "type" => "custom"
+               }
+             ] =
+               content
+               |> Jason.decode!()
+               |> Map.fetch!("items")
     end
 
     test "containing settext headers while discarding links on header",
