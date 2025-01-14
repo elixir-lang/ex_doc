@@ -52,7 +52,15 @@ export function getSuggestions (query, limit = 8) {
  * Finds suggestions in top level sidebar nodes.
  */
 function findSuggestionsInTopLevelNodes (nodes, query, category, label) {
-  return nodes.map(node => nodeSuggestion(node, query, category, label))
+  return nodes.map(node => {
+    if (node.searchData) {
+      // When searchData is present, all search results are found by findSuggestionsInSectionsOfNodes
+      return null
+    }
+
+    return nodeSuggestion(node, query, category, label)
+  }
+  )
 }
 
 /**
@@ -88,7 +96,11 @@ function findSuggestionsInSectionsOfNodes (nodes, query, category, label) {
  * Returns any sections of the given parent node.
  */
 function nodeSections (node) {
-  return (node.sections || []).concat(node.headers || [])
+  if (node.searchData) {
+    return node.searchData
+  } else {
+    return (node.sections || []).concat(node.headers || [])
+  }
 }
 
 /**
@@ -133,12 +145,20 @@ function childNodeSuggestion (childNode, parentId, query, category, label) {
 function nodeSectionSuggestion (node, section, query, category, label) {
   if (!matchesAny(section.id, query)) { return null }
 
+  let link
+
+  if (section.anchor === '') {
+    link = `${node.id}.html`
+  } else {
+    link = `${node.id}.html#${section.anchor}`
+  }
+
   return {
-    link: `${node.id}.html#${section.anchor}`,
+    link,
     title: highlightMatches(section.id, query),
     description: node.title,
     matchQuality: matchQuality(section.id, query),
-    labels: [label, 'section'],
+    labels: section.labels || [label, 'section'],
     category
   }
 }

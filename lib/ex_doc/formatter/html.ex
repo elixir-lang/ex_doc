@@ -6,6 +6,7 @@ defmodule ExDoc.Formatter.HTML do
 
   @main "api-reference"
   @assets_dir "assets"
+  @search_data_keys [:anchor, :body, :title, :type]
 
   @doc """
   Generates HTML documentation for the given modules.
@@ -184,6 +185,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp generate_sidebar_items(nodes_map, extras, config) do
     content = Templates.create_sidebar_items(nodes_map, extras)
+
     path = "dist/sidebar_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, path), content)
     [path]
@@ -429,6 +431,8 @@ defmodule ExDoc.Formatter.HTML do
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
     source_url = Utils.source_url_pattern(source_url_pattern, source_path, 1)
 
+    search_data = normalize_search_data!(input_options[:search_data])
+
     %{
       source: source,
       content: content_html,
@@ -436,6 +440,7 @@ defmodule ExDoc.Formatter.HTML do
       id: id,
       source_path: source_path,
       source_url: source_url,
+      search_data: search_data,
       title: title,
       title_content: title_html || title
     }
@@ -443,6 +448,26 @@ defmodule ExDoc.Formatter.HTML do
 
   defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
     build_extra({input, []}, groups, language, autolink_opts, source_url_pattern)
+  end
+
+  defp normalize_search_data!(nil), do: nil
+
+  defp normalize_search_data!(search_data) when is_list(search_data) do
+    Enum.each(search_data, fn search_data ->
+      has_keys = Map.keys(search_data)
+
+      if Enum.sort(has_keys) != @search_data_keys do
+        raise ArgumentError,
+              "Expected search data to be a list of maps with the keys: #{inspect(@search_data_keys)}, found keys: #{inspect(has_keys)}"
+      end
+    end)
+
+    search_data
+  end
+
+  defp normalize_search_data!(search_data) do
+    raise ArgumentError,
+          "Expected search data to be a list of maps with the keys: #{inspect(@search_data_keys)}, found: #{inspect(search_data)}"
   end
 
   defp extension_name(input) do
