@@ -592,6 +592,77 @@ defmodule ExDoc.Formatter.HTMLTest do
              ] = Jason.decode!(content)["extras"]
     end
 
+    test "extras can group sidebar nodes as h3s grouped by h2", %{tmp_dir: tmp_dir} = context do
+      generate_docs(
+        doc_config(context,
+          source_beam: "unknown",
+          extras: [
+            {"test/fixtures/ExtraPageWithH3s.md", sidebar_style: :grouped}
+          ]
+        )
+      )
+
+      "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
+
+      assert [
+               %{
+                 "group" => "",
+                 "headers" => [],
+                 "id" => "api-reference",
+                 "title" => "API Reference"
+               },
+               %{
+                 "group" => "",
+                 "id" => "extrapagewithh3s",
+                 "nodeGroups" => [
+                   %{
+                     "key" => "Section One",
+                     "name" => "Section One",
+                     "nodes" => [
+                       %{
+                         "anchor" => "nested-section-one",
+                         "deprecated" => false,
+                         "id" => "Nested Section One",
+                         "title" => "Nested Section One"
+                       },
+                       %{
+                         "anchor" => "nested-section-two",
+                         "deprecated" => false,
+                         "id" => "Nested Section Two",
+                         "title" => "Nested Section Two"
+                       }
+                     ],
+                     "anchor" => "section-one",
+                     "id" => "section-one",
+                     "title" => "Section One"
+                   },
+                   %{
+                     "key" => "Section Two",
+                     "name" => "Section Two",
+                     "nodes" => [
+                       %{
+                         "anchor" => "nested-section-three",
+                         "deprecated" => false,
+                         "id" => "Nested Section Three",
+                         "title" => "Nested Section Three"
+                       },
+                       %{
+                         "anchor" => "nested-section-four",
+                         "deprecated" => false,
+                         "id" => "Nested Section Four",
+                         "title" => "Nested Section Four"
+                       }
+                     ],
+                     "anchor" => "section-two",
+                     "id" => "section-two",
+                     "title" => "Section Two"
+                   }
+                 ],
+                 "title" => "Extra Page Title"
+               }
+             ] == Jason.decode!(content)["extras"]
+    end
+
     test "custom search data is added to the sidebar and search nodes",
          %{tmp_dir: tmp_dir} = context do
       generate_docs(

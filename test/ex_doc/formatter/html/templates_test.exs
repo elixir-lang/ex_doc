@@ -358,7 +358,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
 
     test "outputs extras with headers" do
-      item = %{content: nil, group: nil, id: nil, title: nil}
+      item = %{content: nil, group: nil, id: nil, title: nil, sidebar_style: :flat}
 
       assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}])["extras"] ==
                [

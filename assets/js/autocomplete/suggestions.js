@@ -42,7 +42,8 @@ export function getSuggestions (query, limit = 8) {
     ...findSuggestionsInTopLevelNodes(nodes.extras, query, SUGGESTION_CATEGORY.extra, 'page'),
     ...findSuggestionsInSectionsOfNodes(nodes.modules, query, SUGGESTION_CATEGORY.section, 'module'),
     ...findSuggestionsInSectionsOfNodes(nodes.tasks, query, SUGGESTION_CATEGORY.section, 'mix task'),
-    ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section, 'page')
+    ...findSuggestionsInSectionsOfNodes(nodes.extras, query, SUGGESTION_CATEGORY.section, 'page'),
+    //...findSuggestionsInChildNodesOfExtras(nodes.extras, query, SUGGESTION_CATEGORY.section, 'page')
   ].filter(suggestion => suggestion !== null)
 
   return sort(suggestions).slice(0, limit)
@@ -74,9 +75,25 @@ function findSuggestionsInChildNodes (nodes, query, category) {
         const label = nodeGroupKeyToLabel(key)
 
         return childNodes.map(childNode =>
-          childNodeSuggestion(childNode, node.id, query, category, label) ||
+          childNodeSuggestion(childNode, node.id, node.id, query, category, label) ||
           moduleChildNodeSuggestion(childNode, node.id, query, category, label)
         )
+      })
+    })
+}
+
+/**
+ * Finds suggestions in node groups of the given parent nodes for extras.
+ */
+function findSuggestionsInChildNodesOfExtras (nodes, query, category) {
+  return nodes
+    .filter(node => node.nodeGroups && !node.searchData)
+    .flatMap(node => {
+      return node.nodeGroups.flatMap(group => {
+        const { key, nodes: childNodes } = group;
+        return childNodes.map(childNode =>
+          childNodeSuggestion(childNode, node.title, node.id, query, category, 'section')
+        ).concat([childNodeSuggestion(group, node.title, node.id, query, category, 'section')])
       })
     })
 }
@@ -125,14 +142,14 @@ function nodeSuggestion (node, query, category, label) {
  * Builds a suggestion for a child node.
  * Returns null if the node doesn't match the query.
  */
-function childNodeSuggestion (childNode, parentId, query, category, label) {
+function childNodeSuggestion (childNode, parentTitle, parentId, query, category, label) {
   if (!matchesAll(childNode.id, query)) { return null }
 
   return {
     link: `${parentId}.html#${childNode.anchor}`,
     title: highlightMatches(childNode.id, query),
     labels: [label],
-    description: parentId,
+    description: parentTitle,
     matchQuality: matchQuality(childNode.id, query),
     deprecated: childNode.deprecated,
     category

@@ -12,6 +12,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
       text_to_id: 1
     ]
 
+  @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
+  @h2contents_regex ~r/<h2.*?>(.*?)<\/h2>(.*?)(?=<h2|<h1|\z)/ms
+  @h3_regex ~r/<h3.*?>(.*?)<\/h3>/m
+
   @doc """
   Generate content from the module template for a given `node`
   """
@@ -82,15 +86,16 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp sidebar_extras(extras) do
     for extra <- extras do
-      %{id: id, title: title, group: group, content: content} = extra
+      %{id: id, title: title, group: group, content: content, sidebar_style: sidebar_style} =
+        extra
 
       item =
         %{
           id: to_string(id),
           title: to_string(title),
-          group: to_string(group),
-          headers: extract_headers(content)
+          group: to_string(group)
         }
+        |> add_headers_or_node_groups(content, sidebar_style)
 
       case extra do
         %{search_data: search_data} when is_list(search_data) ->
@@ -109,6 +114,41 @@ defmodule ExDoc.Formatter.HTML.Templates do
           item
       end
     end
+  end
+
+  defp add_headers_or_node_groups(item, content, :flat) do
+    Map.put(item, :headers, extract_headers(content))
+  end
+
+  defp add_headers_or_node_groups(item, content, :grouped) do
+    Map.put(item, :nodeGroups, extract_node_groups(content))
+  end
+
+  defp extract_node_groups(content) do
+    @h2contents_regex
+    |> Regex.scan(content, capture: :all_but_first)
+    |> Enum.filter(fn
+      ["" | _] -> false
+      _ -> true
+    end)
+    |> Enum.map(fn [group, content] ->
+      nodes =
+        @h3_regex
+        |> Regex.scan(content, capture: :all_but_first)
+        |> List.flatten()
+        |> Enum.filter(&(&1 != ""))
+        |> Enum.map(&ExDoc.Utils.strip_tags/1)
+        |> Enum.map(&%{id: &1, title: &1, anchor: URI.encode(text_to_id(&1)), deprecated: false})
+
+      %{
+        key: group,
+        name: group,
+        nodes: nodes,
+        title: group,
+        id: text_to_id(group),
+        anchor: URI.encode(text_to_id(group))
+      }
+    end)
   end
 
   defp sidebar_module({id, modules}) do
@@ -182,7 +222,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   # TODO: split into sections in Formatter.HTML instead (possibly via DocAST)
-  @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
   defp extract_headers(content) do
     @h2_regex
     |> Regex.scan(content, capture: :all_but_first)

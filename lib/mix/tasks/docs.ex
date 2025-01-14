@@ -370,6 +370,8 @@ defmodule Mix.Tasks.Docs do
        the source file.
     * `:source` - The source file of the extra page. This is useful if you want to customize the filename or 
        title but keep the source file unchanged. *
+    * `:sidebar_style` - `:flat` or `:grouped`. Defaults to `:flat`. If set to `:grouped`, all h3s will be shown
+       in collapsible sections of their corresponding h2. The epub format ignores this option.
     `:search_data` - A list of terms to be indexed for autocomplete and search. If not provided, the content 
        of the extra page will be indexed for search. See the section below for more.
 
