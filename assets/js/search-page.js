@@ -43,7 +43,7 @@ async function search (value) {
       // We cannot match on atoms :foo because that would be considered
       // a filter. So we escape all colons not preceded by a word.
       const fixedValue = value.replaceAll(/(\B|\\):/g, '\\:')
-      const results = searchResultsToDecoratedSearchNodes(index.search(fixedValue))
+      const results = searchResultsToDecoratedSearchItems(index.search(fixedValue))
       renderResults({ value, results })
     } catch (error) {
       renderResults({ value, errorMessage: error.message })
@@ -145,8 +145,8 @@ function createIndex () {
     this.use(docTokenSplitter)
     this.use(docTrimmer)
 
-    searchData.items.forEach(searchNode => {
-      this.add(searchNode)
+    searchData.items.forEach(searchItem => {
+      this.add(searchItem)
     })
   })
 }
@@ -233,29 +233,29 @@ function docTrimmerFunction (token) {
   })
 }
 
-function searchResultsToDecoratedSearchNodes (results) {
+function searchResultsToDecoratedSearchItems (results) {
   return results
     // If the docs are regenerated without changing its version,
     // a reference may have been doc'ed false in the code but
     // still available in the cached index, so we skip it here.
-    .filter(result => getSearchNodeByRef(result.ref))
+    .filter(result => getSearchItemByRef(result.ref))
     .map(result => {
-      const searchNode = getSearchNodeByRef(result.ref)
+      const searchItem = getSearchItemByRef(result.ref)
       const metadata = result.matchData.metadata
       return {
-        ...searchNode,
+        ...searchItem,
         metadata,
-        excerpts: getExcerpts(searchNode, metadata)
+        excerpts: getExcerpts(searchItem, metadata)
       }
     })
 }
 
-function getSearchNodeByRef (ref) {
-  return searchData.items.find(searchNode => searchNode.ref === ref) || null
+function getSearchItemByRef (ref) {
+  return searchData.items.find(searchItem => searchItem.ref === ref) || null
 }
 
-function getExcerpts (searchNode, metadata) {
-  const { doc } = searchNode
+function getExcerpts (searchItem, metadata) {
+  const { doc } = searchItem
   const searchTerms = Object.keys(metadata)
 
   const excerpts =
