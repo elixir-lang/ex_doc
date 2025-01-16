@@ -9,7 +9,7 @@
   color: var(--sidebarAccentMain);
   overflow: hidden;
 
-  .sidebar-tabpanel {
+  & .sidebar-tabpanel {
     scrollbar-width: thin;
   }
 }
