@@ -103,3 +103,7 @@ body.dark {
   --autocompleteLabelBack:       var(--gray600);
   --autocompleteLabelFont:       rgba(255, 255, 255, 0.8);
 }
+
+:root:has(body.dark) {
+  color-scheme: dark;
+}
