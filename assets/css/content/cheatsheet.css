@@ -114,11 +114,6 @@
   padding: var(--vertical-space) var(--horizontal-space);
 }
 
-.page-cheatmd .content-inner pre code::-webkit-scrollbar {
-  width: 0.4rem;
-  height: 0.6rem;
-}
-
 .page-cheatmd .content-inner .h2 pre {
   margin: 0;
 }
