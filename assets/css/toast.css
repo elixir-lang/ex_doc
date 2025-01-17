@@ -9,7 +9,7 @@
   padding: .7rem 1.2rem;
   text-align: center;
   font-weight: 700;
-  border-radius: 10px;
+  border-radius: var(--borderRadius);
   border: 1px solid var(--codeBorder);
   background-color: var(--codeBackground);
   color: var(--textBody);

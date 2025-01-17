@@ -107,7 +107,7 @@
 
 .autocomplete-suggestions {
   background-color: var(--autocompleteBackground);
-  border-radius: 8px;
+  border-radius: var(--borderRadius);
   box-shadow: 0px 15px 99px 0px var(--autocompleteBorder);
   overflow-y: auto;
   max-height: 450px;
@@ -168,7 +168,7 @@
   align-items: center;
   text-decoration: none;
   border: 1px solid var(--suggestionBorder);
-  border-radius: 8px;
+  border-radius: var(--borderRadius);
   transition: color .3s ease-in-out;
   background-color: var(--autocompletePreview);
   cursor: pointer;
