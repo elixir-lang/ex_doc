@@ -8,6 +8,10 @@
   background-color: var(--sidebarBackground);
   color: var(--sidebarAccentMain);
   overflow: hidden;
+
+  & .sidebar-tabpanel {
+    scrollbar-width: thin;
+  }
 }
 
 :root:not(.apple-os) .sidebar {
