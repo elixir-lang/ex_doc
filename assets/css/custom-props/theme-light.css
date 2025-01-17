@@ -7,8 +7,8 @@
   --textDetailBackground:        var(--coldGrayFaint);
   --textFooter:                  var(--gray700);
 
-  --links:                       var(--black);
-  --linksVisited:                var(--black);
+  --links:                       var(--mainDark);
+  --linksVisited:                var(--mainDark);
   --linksDecoration:             var(--gray450);
 
   --iconAction:                  var(--coldGray);
