@@ -8,7 +8,10 @@
   background-color: var(--sidebarBackground);
   color: var(--sidebarAccentMain);
   overflow: hidden;
-  scrollbar-color: var(--sidebarScrollbarThumb) var(--sidebarScrollbarTrack);
+
+  & .sidebar-tabpanel {
+    scrollbar-width: thin;
+  }
 }
 
 :root:not(.apple-os) .sidebar {
@@ -356,20 +359,6 @@
 .sidebar .full-list ul ul a[aria-selected] {
   color: var(--sidebarActiveItem);
   border-color: var(--sidebarLanguageAccentBar);
-}
-
-.sidebar ::-webkit-scrollbar {
-  width: 14px;
-}
-
-::-webkit-scrollbar-track {
-  background-color: var(--sidebarBackground);
-}
-
-.sidebar ::-webkit-scrollbar-thumb {
-  background-color: var(--sidebarScrollbarThumb);
-  border-radius: 10px;
-  border: 3px solid var(--sidebarBackground);
 }
 
 .sidebar-button {

@@ -78,8 +78,6 @@ body.dark {
   --sidebarHeader:               var(--gray700);
   --sidebarMuted:                var(--gray300);
   --sidebarHover:                var(--white);
-  --sidebarScrollbarThumb:       var(--coldGray);
-  --sidebarScrollbarTrack:       var(--sidebarBackground);
   --sidebarStaleVersion:         var(--orangeLight);
   --sidebarSubheadings:          var(--gray400);
   --sidebarItem:                 var(--gray200);
@@ -98,8 +96,10 @@ body.dark {
   --suggestionBorder:            var(--gray600);
   --autocompleteResults:         var(--gray200);
   --autocompleteResultsBold:     var(--gray100);
-  --autocompleteScrollbarThumb:   var(--gray600);
-  --autocompleteScrollbarTrack:   var(--gray850);
   --autocompleteLabelBack:       var(--gray600);
   --autocompleteLabelFont:       rgba(255, 255, 255, 0.8);
+}
+
+:root:has(body.dark) {
+  color-scheme: dark;
 }
