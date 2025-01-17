@@ -30,7 +30,7 @@
 .sidebar a {
   color: var(--sidebarAccentMain);
   text-decoration: none;
-  transition: var(--transition-all);
+  transition: color 0.3s ease-in-out;
 }
 
 .sidebar a:hover {
