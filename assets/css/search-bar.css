@@ -32,6 +32,7 @@
   height: 46px;
   padding: 8px 35px 8px 43px;
   width: 100%;
+  transition: var(--transition-all);
 }
 
 .top-search .search-bar .search-input::placeholder {
