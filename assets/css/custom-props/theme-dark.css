@@ -7,8 +7,8 @@ body.dark {
   --textDetailBackground:        var(--gray700);
   --textFooter:                  var(--gray300);
 
-  --links:                       var(--mainLightest);
-  --linksVisited:                var(--mainLightest);
+  --links:                       #9e9eff;
+  --linksVisited:                #d0adef;
   --linksDecoration:             var(--gray450);
 
   --iconAction:                  var(--coldGray-lightened-10);
