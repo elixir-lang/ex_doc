@@ -18,6 +18,10 @@
   text-transform: none;
 }
 
+.content-inner code.inline {
+  border-radius: 4px;
+}
+
 .content-inner pre {
   margin: var(--baseLineHeight) 0;
 }
