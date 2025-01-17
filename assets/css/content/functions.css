@@ -38,7 +38,7 @@
 }
 
 .content-inner .detail-header a.detail-link {
-  transition: opacity 0.3s ease-in-out;
+  transition: var(--transition-all);
   position: absolute;
   top: 0;
   left: 0;

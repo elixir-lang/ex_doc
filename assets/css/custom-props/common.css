@@ -54,6 +54,7 @@
   --black-opacity-50: hsla(0, 0%, 0%, 50%);
   --orangeDark: hsl(30, 90%, 40%);
   --orangeLight: hsl(30, 80%, 50%);
+  --transition-all: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media screen and (max-width: 768px) {
@@ -61,4 +62,8 @@
     --content-width: 100%;
     --content-gutter: 20px;
   }
+}
+
+.transition-all {
+  transition: var(--transition-all);
 }
