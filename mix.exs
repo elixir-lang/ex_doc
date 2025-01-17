@@ -2,7 +2,7 @@ defmodule ExDoc.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-lang/ex_doc"
-  @version "0.36.1"
+  @version "0.36.1-dev"
 
   def project do
     [
@@ -52,7 +52,7 @@ defmodule ExDoc.Mixfile do
 
   defp aliases do
     [
-      build: ["cmd --cd assets npm run build", "compile --force", "docs"],
+      build: ["cmd --cd assets npm run build", "compile --force", "docs", &add_docs_config_js/1],
       clean: [&clean_test_fixtures/1, "clean"],
       fix: ["format", "cmd --cd assets npm run lint:fix"],
       lint: ["format --check-formatted", "cmd --cd assets npm run lint"],
@@ -106,6 +106,26 @@ defmodule ExDoc.Mixfile do
         "CHANGELOG.md"
       ]
     ]
+  end
+
+  defp add_docs_config_js(_args) do
+    {text_tags, 0} = System.cmd("git", ["tag"])
+
+    [latest | _] =
+      versions =
+      for("v" <> rest <- String.split(text_tags), do: Version.parse!(rest))
+      |> Enum.sort({:desc, Version})
+
+    list_contents =
+      Enum.map_intersperse(versions, ", ", fn version ->
+        string = Version.to_string(version)
+        ~s[{"version":"v#{string}", "url":"https://hexdocs.pm/ex_doc/#{string}"}]
+      end)
+
+    File.write!("doc/docs_config.js", """
+    var versionNodes = [#{list_contents}];
+    var searchNodes = [{"name":"ex_doc","version":"#{Version.to_string(latest)}"}];
+    """)
   end
 
   defp test_dev_examples(:dev), do: Path.wildcard("test/examples/*")
