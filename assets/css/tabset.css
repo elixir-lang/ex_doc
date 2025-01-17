@@ -2,34 +2,35 @@
   --borderWidth: 1px;
   --tabsetPadding: var(--baseLineHeight);
   margin: var(--baseLineHeight) 0;
+  border: var(--borderWidth) solid var(--tabBorder);
+  padding: 0 var(--tabsetPadding);
+  border-radius: var(--borderRadius);
 }
 
 .tabset-tablist {
   display: flex;
   overflow-x: auto;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: var(--tabBorderTop);
 }
 
 .tabset-tab {
-  padding: .6rem var(--tabsetPadding);
+  padding: 1.3rem var(--tabsetPadding);
   font-family: var(--sansFontFamily);
   background-color: var(--tabBackground);
   color: var(--tab);
-  border: var(--borderWidth) solid var(--tabBorder);
   margin-right: calc(-1 * var(--borderWidth));
-  border-top-width: 4px;
-  border-top-color: var(--tabBorderTop);
-  border-radius: 0;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  box-shadow: 0 -3px 4px var(--tabShadow) inset;
+  border:0;
+  box-shadow: none;
   cursor: pointer;
+  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-color: transparent;
 }
 
 .tabset-tab[aria-selected=true] {
-  border-bottom-color: var(--tabBackground);
-  border-top-color: var(--mainLight);
-  box-shadow: none;
-  z-index: 1;
+  border-bottom-color: var(--mainLight);
 }
 
 /* Keyboard navigation focus state (increased contrast) */
@@ -40,11 +41,6 @@
 }
 
 .tabset-panel {
-  padding: 0 var(--tabsetPadding);
-  border: var(--borderWidth) solid var(--tabBorder);
-  margin-top: calc(-1 * var(--borderWidth));
-  border-bottom-left-radius: var(--borderRadius);
-  border-bottom-right-radius: var(--borderRadius);
 }
 
 @media screen and (max-width: 768px) {
