@@ -23,6 +23,7 @@
   font-size: 1em;
   font-family: var(--monoFontFamily);
   position: relative;
+  border-radius: var(--borderRadius);
 }
 
 .content-inner .detail-header .signature {
