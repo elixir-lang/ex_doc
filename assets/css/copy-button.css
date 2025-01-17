@@ -14,7 +14,9 @@ pre .copy-button:focus {
   top: 5px;
   right: 5px;
   padding: 4px;
-  background-color: var(--codeBackground);
+  background-color: transparent;
+  backdrop-filter: blur(2px);
+  border-radius: var(--borderRadius);
   border: none;
   cursor: pointer;
   transition: all 150ms;

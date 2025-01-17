@@ -17,7 +17,7 @@
 
 .search-bar {
   border: 1px solid var(--searchBarBorder);
-  border-radius: 8px;
+  border-radius: var(--borderRadius);
   height: 48px;
   position: relative;
   width: 100%;
@@ -26,7 +26,7 @@
 .top-search .search-bar .search-input {
   background-color: var(--searchSearch);
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--borderRadius);
   color: var(--searchAccentMain);
   position: relative;
   height: 46px;
