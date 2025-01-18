@@ -98,3 +98,7 @@
 .transition-transform {
   transition: var(--transition-transform);
 }
+
+.transition-none {
+  transition-property: none;
+}
