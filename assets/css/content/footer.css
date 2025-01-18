@@ -5,11 +5,6 @@
   font-size: 14px;
 }
 
-.content-inner .footer,
-.content-inner .footer :is(a, .footer-button) {
-  color: var(--textFooter);
-}
-
 .content-inner .footer .line {
   display: inline-block;
 }
