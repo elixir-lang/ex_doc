@@ -17,9 +17,8 @@
 
 .content-inner .detail-header {
   margin: 1em 0;
-  padding: 0.5em 0.85em 0.5em 1em;
+  padding: 1em;
   background-color: var(--textDetailBackground);
-  border-left: 3px solid var(--textDetailAccent);
   font-size: 1em;
   font-family: var(--monoFontFamily);
   position: relative;
