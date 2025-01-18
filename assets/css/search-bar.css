@@ -32,6 +32,7 @@
   height: 46px;
   padding: 8px 35px 8px 43px;
   width: 100%;
+  transition: var(--transition-all);
 }
 
 .top-search .search-bar .search-input::placeholder {
@@ -63,6 +64,7 @@
   top: 60%;
   transform: translateY(-60%);
   z-index: 99;
+  transition: var(--transition-all);
 }
 
 .top-search .search-bar.selected .search-button,
@@ -85,7 +87,7 @@
   position: absolute;
   transform: scaleY(0);
   top: calc(50% - 13px);
-  transition: 0.15s transform ease-out;
+  transition: var(--transition-all);
   z-index: 99;
 }
 
@@ -137,7 +139,7 @@
 
 body.search-focused .search-bar .search-close-button {
   transform: scaleY(1);
-  transition: transform 0.15s ease-out 0.15s;
+  transition: var(--transition-all);
 }
 
 @media screen and (hover: hover) {

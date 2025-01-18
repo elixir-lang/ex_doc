@@ -93,7 +93,7 @@
   color: var(--iconAction);
   text-decoration: none;
   border: none;
-  transition: color 0.3s ease-in-out;
+  transition: var(--transition-colors);
   background-color: transparent;
   cursor: pointer;
 }

@@ -58,7 +58,7 @@
 
 #search .result-id a {
   text-decoration: none;
-  transition: color .1s ease-in-out;
+  transition: var(--transition-colors);
   color: var(--links);
 }
 #search .result-id a:is(:visited, :active, :focus) {

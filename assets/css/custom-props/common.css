@@ -54,6 +54,20 @@
   --black-opacity-50: hsla(0, 0%, 0%, 50%);
   --orangeDark: hsl(30, 90%, 40%);
   --orangeLight: hsl(30, 80%, 50%);
+
+  --transition-duration: 150ms;
+  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --transition-all: all var(--transition-duration) var(--transition-timing);
+
+  --transition-colors: color var(--transition-duration) var(--transition-timing),
+  background-color var(--transition-duration) var(--transition-timing),
+  border-color var(--transition-duration) var(--transition-timing),
+  text-decoration-color var(--transition-duration) var(--transition-timing),
+  fill var(--transition-duration) var(--transition-timing),
+  stroke var(--transition-duration) var(--transition-timing);
+
+  --transition-opacity: opacity var(--transition-duration) var(--transition-timing);
 }
 
 @media screen and (max-width: 768px) {

@@ -19,7 +19,7 @@ pre .copy-button:focus {
   border-radius: var(--borderRadius);
   border: none;
   cursor: pointer;
-  transition: all 150ms;
+  transition: var(--transition-all);
   font-family: var(--defaultFontFamily);
   font-size: 14px;
   line-height: 24px;
@@ -32,7 +32,7 @@ pre .copy-button:focus {
 
 .copy-button svg {
   opacity: 0.5;
-  transition: all 150ms;
+  transition: var(--transition-all);
 }
 
 pre .copy-button:hover svg,

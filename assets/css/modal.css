@@ -59,7 +59,7 @@
   margin-right: 30px;
   padding-left: 0;
   text-align: left;
-  transition: color 150ms;
+  transition: var(--transition-colors);
 }
 .modal .modal-title button:hover {
   color: var(--main);
@@ -79,7 +79,7 @@
   background-color: transparent;
   color: var(--textHeaders);
   border: none;
-  transition: opacity 150ms;
+  transition: var(--transition-opacity);
 }
 .modal .modal-close:hover {
   opacity: 1;
