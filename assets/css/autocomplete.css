@@ -138,7 +138,7 @@
   display: block;
   padding: 12px 20px;
   text-decoration: none;
-  transition: var(--transition-all);
+  transition: var(--transition-colors);
   border-top: 1px solid var(--suggestionBorder);
   font-size: 0.9rem;
 }
@@ -169,7 +169,7 @@
   text-decoration: none;
   border: 1px solid var(--suggestionBorder);
   border-radius: var(--borderRadius);
-  transition: var(--transition-all);
+  transition: var(--transition-colors);
   background-color: var(--autocompletePreview);
   cursor: pointer;
   padding: 4px 8px;
