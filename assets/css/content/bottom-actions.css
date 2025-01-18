@@ -29,6 +29,10 @@
   white-space: nowrap;
 }
 
+.content-inner .bottom-actions .bottom-actions-button .title {
+  color: var(--textHeaders);
+}
+
 .content-inner .bottom-actions .bottom-actions-button[rel="prev"] {
   text-align: start;
 }

@@ -1,12 +1,12 @@
 .content-inner.content-inner :is(a:has(code, img), pre a) {
-  color: var(--linksNoUnderline);
+  color: var(--link-color);
   text-shadow: none;
   text-decoration: none;
   background-image: none;
 }
 
 .content-inner.content-inner :is(a:has(code, img), pre a):is(:visited, :active, :focus, :hover) {
-  color: var(--linksNoUnderlineVisited);
+  color: var(--link-visited-color);
 }
 
 .content-inner code {

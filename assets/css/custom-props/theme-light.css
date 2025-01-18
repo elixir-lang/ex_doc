@@ -5,11 +5,6 @@
   --textHeaders:                 var(--gray900);
   --textDetailAccent:            var(--mainLight);
   --textDetailBackground:        var(--coldGrayFaint);
-  --textFooter:                  var(--gray700);
-
-  --links:                       var(--black);
-  --linksVisited:                var(--black);
-  --linksDecoration:             var(--gray450);
 
   --iconAction:                  var(--coldGray);
   --iconActionHover:             var(--gray800);
