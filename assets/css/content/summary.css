@@ -5,6 +5,7 @@
 .content-inner .summary h2 a {
   text-decoration: none;
   border: none;
+  color: var(--textHeaders) !important;
 }
 
 .content-inner .summary span.deprecated {
