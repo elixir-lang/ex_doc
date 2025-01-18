@@ -78,27 +78,3 @@
     --content-gutter: 20px;
   }
 }
-
-.transition-all {
-  transition: var(--transition-all);
-}
-
-.transition-colors {
-  transition: var(--transition-colors);
-}
-
-.transition-opacity {
-  transition: var(--transition-opacity);
-}
-
-.transition-shadow {
-  transition: var(--transition-shadow);
-}
-
-.transition-transform {
-  transition: var(--transition-transform);
-}
-
-.transition-none {
-  transition-property: none;
-}
