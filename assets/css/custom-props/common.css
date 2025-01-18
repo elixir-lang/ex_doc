@@ -68,8 +68,6 @@
   stroke var(--transition-duration) var(--transition-timing);
 
   --transition-opacity: opacity var(--transition-duration) var(--transition-timing);
-  --transition-shadow: box-shadow var(--transition-duration) var(--transition-timing);
-  --transition-transform: transform var(--transition-duration) var(--transition-timing);
 }
 
 @media screen and (max-width: 768px) {
