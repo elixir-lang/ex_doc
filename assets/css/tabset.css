@@ -9,7 +9,8 @@
 
 .tabset-tablist {
   display: flex;
-  overflow-x: auto;
+  overflow: auto;
+  scrollbar-width: thin;
   border-bottom-width: 1px;
   border-bottom-style: solid;
   border-bottom-color: var(--tabBorderTop);
