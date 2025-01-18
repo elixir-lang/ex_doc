@@ -11,13 +11,13 @@ pre .copy-button:focus {
   display: flex;
   opacity: 0;
   position: absolute;
-  top: 5px;
-  right: 5px;
-  padding: 4px;
+  top: 10px;
+  right: 10px;
+  padding: 8px;
   background-color: transparent;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
   border-radius: var(--borderRadius);
-  border: none;
+  border: 1px solid var(--codeBorder);
   cursor: pointer;
   transition: var(--transition-all);
   font-family: var(--defaultFontFamily);
