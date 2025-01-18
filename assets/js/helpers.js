@@ -75,24 +75,56 @@ export function descriptionElementFromHash (anything = false) {
 
   // Matches a subheader in particular
   if (headingTagNames.includes(element.tagName)) {
-    const div = document.createElement('div')
-    const nodes = [element]
-
-    // Capture all nodes under the current heading level.
-    let node = element
-    while ((node = node.nextSibling)) {
-      if (headingTagNames.includes(node.tagName) && node.tagName <= element.tagName) {
-        break
-      } else {
-        nodes.push(node)
-      }
-    }
-
-    div.append(...nodes)
-    return div
+    return headingPreview(element)
   }
 
+  const nearestHeading = findNearestAboveHeading(element)
+
+  if (nearestHeading) {
+    return nearestHeading
+  } else {
+    return document.getElementById('top-content')
+  }
+}
+
+function findNearestAboveHeading (element) {
+  let previous = element.previousElementSibling
+  while (previous) {
+    if (headingTagNames.includes(previous.tagName)) {
+      return headingPreview(previous)
+    }
+    previous = previous.previousElementSibling
+  }
+  let parent = element.parentNode
+  while (parent) {
+    previous = parent.previousElementSibling
+    while (previous) {
+      if (headingTagNames.includes(previous.tagName)) {
+        return headingPreview(previous)
+      }
+      previous = previous.previousElementSibling
+    }
+    parent = parent.parentNode
+  }
   return null
+}
+
+function headingPreview (element) {
+  const div = document.createElement('div')
+  const nodes = [element]
+
+  // Capture all nodes under the current heading level.
+  let node = element
+  while ((node = node.nextSibling)) {
+    if (headingTagNames.includes(node.tagName) && node.tagName <= element.tagName) {
+      break
+    } else {
+      nodes.push(node)
+    }
+  }
+
+  div.append(...nodes)
+  return div
 }
 
 /**
