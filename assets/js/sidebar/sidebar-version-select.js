@@ -34,6 +34,9 @@ if (!isEmbedded) {
     const select = qs(VERSIONS_DROPDOWN_SELECTOR)
     select.addEventListener('change', handleVersionSelected)
     adjustWidth(select)
+
+    const versionsGoToLatest = qs('.sidebar-staleVersion a')
+    versionsGoToLatest.addEventListener('click', handleGoToLatestClicked)
   }
 }
 
@@ -56,6 +59,22 @@ function handleVersionSelected (event) {
   const url = event.target.value
   const pathSuffix = window.location.pathname.split('/').pop() + window.location.hash
   const otherVersionWithPath = `${url}/${pathSuffix}`
+
+  checkUrlExists(otherVersionWithPath)
+    .then(exists => {
+      if (exists) {
+        window.location.href = otherVersionWithPath
+      } else {
+        window.location.href = url
+      }
+    })
+}
+
+function handleGoToLatestClicked (event) {
+  const url = this.href
+  const pathSuffix = window.location.pathname.split('/').pop() + window.location.hash
+  const otherVersionWithPath = `${url}/${pathSuffix}`
+  event.preventDefault()
 
   checkUrlExists(otherVersionWithPath)
     .then(exists => {
