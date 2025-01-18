@@ -26,7 +26,6 @@ function initialize () {
 
     let timeout
     button.addEventListener('click', () => {
-      const ariaLiveContent = button.querySelector('[aria-live]')
       clearTimeout(timeout)
 
       const text =
@@ -36,10 +35,10 @@ function initialize () {
 
       navigator.clipboard.writeText(text)
       button.classList.add('clicked')
-      ariaLiveContent.innerHTML = 'Copied! &#x2713;'
+      button.disabled = true
       timeout = setTimeout(() => {
         button.classList.remove('clicked')
-        ariaLiveContent.innerHTML = ''
+        button.disabled = false
       }, 3000)
     })
   })

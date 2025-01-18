@@ -17,6 +17,7 @@
   border: 1px solid var(--bottomActionsBtnBorder);
   padding: 12px 16px;
   min-width: 150px;
+  transition: var(--transition-all);
 }
 
 .content-inner .bottom-actions .bottom-actions-button:hover {
