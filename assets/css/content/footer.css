@@ -1,7 +1,6 @@
 .content-inner .footer {
   margin: 4em auto 1em;
   text-align: center;
-  font-style: italic;
   font-size: 14px;
 }
 
@@ -13,7 +12,6 @@
   background-color: transparent;
   border: 0;
   cursor: pointer;
-  font-style: italic;
   padding: 0 4px;
 }
 
