@@ -54,6 +54,7 @@
   --black-opacity-50: hsla(0, 0%, 0%, 50%);
   --orangeDark: hsl(30, 90%, 40%);
   --orangeLight: hsl(30, 80%, 50%);
+
   --transition-duration: 150ms;
   --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 
