@@ -39,7 +39,7 @@ if (!isEmbedded) {
 
     const versionsGoToLatest = qs('.sidebar-staleVersion a')
 
-    if(versionsGoToLatest) {
+    if (versionsGoToLatest) {
       versionsGoToLatest.addEventListener('click', handleGoToLatestClicked)
     }
   }
