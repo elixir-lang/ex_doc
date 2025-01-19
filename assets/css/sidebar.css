@@ -227,11 +227,11 @@
 .sidebar .full-list a {
   padding: 10px 12px 10px 12px;
   color: var(--sidebarItem);
-  border-radius: calc(var(--borderRadius));
 }
 
 .sidebar .full-list a[aria-selected] {
   color: var(--sidebarActiveItem);
+  box-shadow: inset 2px 0px 0 var(--sidebarActiveItem);
 }
 
 .sidebar .full-list a:hover {
@@ -336,7 +336,7 @@
 
 .sidebar .full-list ul ul a[aria-selected] {
   color: var(--sidebarActiveItem);
-  border-color: var(--sidebarLanguageAccentBar);
+  box-shadow: inset 2px 0px 0 var(--sidebarActiveItem);
 }
 
 .sidebar-button {
