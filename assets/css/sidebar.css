@@ -300,7 +300,6 @@
 
 .sidebar .full-list ul li {
   line-height: var(--sidebarFontSize);
-  padding: 0 0px 0 8px;
 }
 
 .sidebar .full-list ul button {
