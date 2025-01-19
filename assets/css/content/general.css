@@ -135,6 +135,8 @@
 .content-inner table {
   margin: 2em 0;
   border-collapse: collapse;
+  display: block;
+  overflow: auto;
 }
 
 .content-inner th {
