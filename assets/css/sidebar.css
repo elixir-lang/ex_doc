@@ -190,7 +190,7 @@
 
 .sidebar .full-list {
   margin: 0;
-  padding: 0px 10px 20px 10px;
+  padding: 0px 0px 20px 0px;
   position: relative;
 }
 
@@ -274,9 +274,9 @@
 
 .sidebar .full-list ul {
   display: none;
-  margin: 10px 0 10px 10px;
+  margin: 10px 0 10px 12px;
   padding: 0;
-  border-left: 1px solid var(--searchBarBorder);
+  box-shadow: inset 1px 0px 0 var(--searchBarBorder);
   padding-left: 0px;
 }
 
@@ -316,27 +316,8 @@
   content: var(--icon-subtract);
 }
 
-/* Level 3+ */
-
-.sidebar .full-list ul ul {
-  margin: 10px 0 10px 10px;
-}
-
 .sidebar .full-list ul ul li {
   color: var(--sidebarAccentMain);
-}
-
-.sidebar .full-list ul ul a {
-  padding: 10px 12px 10px 12px;
-}
-
-.sidebar .full-list ul ul a:hover {
-  border-color: var(--sidebarLanguageAccentBar);
-}
-
-.sidebar .full-list ul ul a[aria-selected] {
-  color: var(--sidebarActiveItem);
-  box-shadow: inset 2px 0px 0 var(--sidebarActiveItem);
 }
 
 .sidebar-button {
