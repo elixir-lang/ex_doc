@@ -225,7 +225,7 @@
 }
 
 .sidebar .full-list a {
-  padding: 10px 0 10px 12px;
+  padding: 10px 12px 10px 12px;
   color: var(--sidebarItem);
   border-radius: calc(var(--borderRadius));
 }
@@ -247,13 +247,14 @@
   cursor: pointer;
   color: inherit;
   width: 20px;
+  height: 20px;
   text-align: center;
   font-size: calc(1.2 * var(--sidebarFontSize));
   line-height: var(--sidebarLineHeight);
   position: absolute;
   display: block;
   right: 20px;
-  transform: translateY(-135%);
+  transform: translateY(-146%);
 }
 
 .sidebar .full-list a[aria-selected] + button {
@@ -321,14 +322,11 @@
 }
 
 .sidebar .full-list ul ul li {
-  height: 20px;
   color: var(--sidebarAccentMain);
 }
 
 .sidebar .full-list ul ul a {
-  border-left: 1px solid var(--sidebarInactiveItemMarker);
-  padding: 0 10px;
-  height: 20px;
+  padding: 10px 12px 10px 12px;
 }
 
 .sidebar .full-list ul ul a:hover {
