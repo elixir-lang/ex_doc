@@ -1,9 +1,9 @@
 @keyframes blink-background {
-  from {
+  0%, 100% {
     background-color: var(--textDetailBackground);
   }
 
-  to {
+  50% {
     background-color: var(--blink);
   }
 }

@@ -16,10 +16,12 @@ if (!isEmbedded) {
   if (versionNodes.length > 0 || !versionsContainer) {
     // Initially the container contains only text with the current version
     const currentVersion = versionsContainer.textContent.trim()
+
     // Add the current version node to the list if not there.
     const withCurrentVersion = versionNodes.some((node) => node.version === currentVersion)
       ? versionNodes
       : [{ version: currentVersion, url: '#' }, ...versionNodes]
+
     // Add additional attributes to version nodes for rendering.
     const nodes = withCurrentVersion.map(node => ({
       ...node,
@@ -36,7 +38,10 @@ if (!isEmbedded) {
     adjustWidth(select)
 
     const versionsGoToLatest = qs('.sidebar-staleVersion a')
-    versionsGoToLatest.addEventListener('click', handleGoToLatestClicked)
+
+    if (versionsGoToLatest) {
+      versionsGoToLatest.addEventListener('click', handleGoToLatestClicked)
+    }
   }
 }
 
