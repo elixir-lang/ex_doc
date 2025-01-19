@@ -208,13 +208,12 @@
 }
 
 .sidebar .full-list li.group {
-  text-transform: uppercase;
   font-weight: bold;
   font-size: 0.8em;
   margin: 1.5em 0 0;
   line-height: 1.8em;
   color: var(--sidebarSubheadings);
-  padding-left: 15px;
+  padding-left: 12px;
 }
 
 .sidebar .full-list li.nesting-context {
@@ -223,7 +222,7 @@
   line-height: 1.8em;
   color: var(--sidebarSubheadings);
   margin-top: 10px;
-  padding-left: 15px;
+  padding-left: 12px;
 }
 
 .sidebar .full-list a {
@@ -234,12 +233,12 @@
 
 .sidebar .full-list a[aria-selected] {
   color: var(--sidebarActiveItem);
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--sidebar-link-bg);
 }
 
 .sidebar .full-list a:hover {
   color: var(--sidebarActiveItem);
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: var(--sidebar-link-hover-bg);
 }
 
 .sidebar .full-list button {
