@@ -140,7 +140,6 @@
 .content-inner th {
   text-align: left;
   font-family: var(--sansFontFamily);
-  text-transform: uppercase;
   font-weight: 700;
   padding-bottom: 0.5em;
 }
@@ -167,6 +166,7 @@
   padding-left: 1em;
   line-height: 2em;
   vertical-align: top;
+  white-space: nowrap;
 }
 
 .content-inner .section-heading {
