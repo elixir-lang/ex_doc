@@ -37,7 +37,7 @@
 }
 
 .sidebar .sidebar-header {
-  background-color: var(--sidebarBackground);
+  background-color: var(--sidebarHeader);
   width: 100%;
 }
 
@@ -232,7 +232,6 @@
 
 .sidebar .full-list a[aria-selected] {
   color: var(--sidebarActiveItem);
-  background-color: var(--sidebar-link-bg);
 }
 
 .sidebar .full-list a:hover {
@@ -278,7 +277,7 @@
   margin: 10px 0 10px 10px;
   padding: 0;
   border-left: 1px solid var(--searchBarBorder);
-  padding-left: 8px;
+  padding-left: 0px;
 }
 
 .sidebar .full-list button[aria-expanded=true] + ul {
