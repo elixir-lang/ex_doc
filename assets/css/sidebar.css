@@ -277,6 +277,8 @@
   display: none;
   margin: 10px 0 10px 10px;
   padding: 0;
+  border-left: 1px solid var(--searchBarBorder);
+  padding-left: 8px;
 }
 
 .sidebar .full-list button[aria-expanded=true] + ul {

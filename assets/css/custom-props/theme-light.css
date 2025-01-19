@@ -81,7 +81,7 @@
   --sidebarInactiveItemMarker:   var(--gray200);
   --sidebarLanguageAccentBar:    var(--mainDark);
   --sidebarActiveItem:           var(--mainDarkest);
-  --searchBarBorder:             var(--gray200);
+  --searchBarBorder:             var(--gray300);
   --searchAccentMain:            var(--gray600);
   --searchLanguageAccentBar:     var(--main);
   --searchSearch:                var(--white);

@@ -81,7 +81,7 @@ body.dark {
   --sidebarInactiveItemMarker:   var(--gray600);
   --sidebarLanguageAccentBar:    var(--mainLight);
   --sidebarActiveItem:           var(--mainLightest);
-  --searchBarBorder:             var(--gray500);
+  --searchBarBorder:             var(--gray600);
   --searchAccentMain:            var(--gray300);
   --searchSearch:                var(--gray900);
   --autocompleteBorder:          rgba(28,42,60,.75);
