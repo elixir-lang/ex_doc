@@ -3,7 +3,6 @@
   --sidebarLineHeight: 20px;
   font-family: var(--sansFontFamily);
   font-size: var(--sidebarFontSize);
-  font-weight: 300;
   line-height: var(--sidebarLineHeight);
   background-color: var(--sidebarBackground);
   color: var(--sidebarAccentMain);
@@ -38,7 +37,7 @@
 }
 
 .sidebar .sidebar-header {
-  background-color: var(--sidebarHeader);
+  background-color: var(--sidebarBackground);
   width: 100%;
 }
 
@@ -132,13 +131,18 @@
   display: flex;
   margin: 0;
   padding: 4px 4px 0 4px;
+  padding: 0px;
+  overflow: auto;
+  scrollbar-width: thin;
 }
 
 .sidebar .sidebar-list-nav :is(li, li button) {
-  text-transform: uppercase;
   letter-spacing: 0.02em;
   font-size: 14px;
   color: var(--sidebarMuted);
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .sidebar .sidebar-list-nav li {
@@ -180,16 +184,14 @@
 .sidebar .sidebar-tabpanel {
   flex: 1 1 0.01%;
   overflow-y: auto;
-  overscroll-behavior: contain;
   position: relative;
-  -webkit-overflow-scrolling: touch;
   padding-top: 12px;
   scroll-padding-top: 40px;
 }
 
 .sidebar .full-list {
   margin: 0;
-  padding: 0 0 20px 0;
+  padding: 0px 10px 20px 10px;
   position: relative;
 }
 
@@ -225,13 +227,19 @@
 }
 
 .sidebar .full-list a {
-  margin-right: 30px;
-  padding: 3px 0 3px 15px;
+  padding: 10px 0 10px 12px;
   color: var(--sidebarItem);
+  border-radius: calc(var(--borderRadius));
 }
 
 .sidebar .full-list a[aria-selected] {
   color: var(--sidebarActiveItem);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .full-list a:hover {
+  color: var(--sidebarActiveItem);
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
 .sidebar .full-list button {
@@ -247,8 +255,8 @@
   line-height: var(--sidebarLineHeight);
   position: absolute;
   display: block;
-  right: 10px;
-  transform: translateY(-100%);
+  right: 20px;
+  transform: translateY(-135%);
 }
 
 .sidebar .full-list a[aria-selected] + button {
@@ -280,18 +288,7 @@
 /* Level 1 */
 
 .sidebar .full-list > li > a {
-  height: 27px;
   line-height: var(--sidebarLineHeight);
-}
-
-.sidebar .full-list > li > a:hover {
-  border-left: 3px solid var(--sidebarLanguageAccentBar);
-  padding-left: 12px;
-}
-
-.sidebar .full-list > li > a[aria-selected] {
-  border-left: 3px solid var(--sidebarLanguageAccentBar);
-  padding-left: 12px;
 }
 
 .sidebar .full-list > li:last-child {
@@ -302,25 +299,11 @@
   margin-top: 0;
 }
 
-/* Level 2 */
-
-.sidebar .full-list > li > ul > li > a:hover:before {
-  content: "\2022";
-  position: absolute;
-  margin-left: -15px;
-  color: var(--sidebarActiveItem);
-}
-
 /* Level 2+ */
 
 .sidebar .full-list ul li {
   line-height: var(--sidebarFontSize);
-  padding: 0 8px;
-}
-
-.sidebar .full-list ul a {
-  padding-left: 15px;
-  height: 24px;
+  padding: 0 0px 0 8px;
 }
 
 .sidebar .full-list ul button {
