@@ -1,8 +1,7 @@
 body.dark {
   --background:                  var(--gray900);
   --contrast:                    var(--white);
-  --sidebar-link-bg:            hsla(0, 0%, 100%, 0.1);
-  --sidebar-link-hover-bg:      hsla(0, 0%, 100%, 0.06);
+  --sidebar-link-bg:            hsla(0, 0%, 100%, 0.06);
   --textBody:                    var(--gray200);
   --textHeaders:                 var(--gray100);
   --textDetailAccent:            var(--mainLight);

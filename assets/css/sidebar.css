@@ -130,7 +130,6 @@
 .sidebar .sidebar-list-nav {
   display: flex;
   margin: 0;
-  padding: 4px 4px 0 4px;
   padding: 0px;
   overflow: auto;
   scrollbar-width: thin;
@@ -237,8 +236,7 @@
 }
 
 .sidebar .full-list a:hover {
-  color: var(--sidebarActiveItem);
-  background-color: var(--sidebar-link-hover-bg);
+  background-color: var(--sidebar-link-bg);
 }
 
 .sidebar .full-list button {

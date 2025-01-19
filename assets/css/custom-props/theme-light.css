@@ -1,8 +1,7 @@
 :root {
   --background:                  var(--white);
   --contrast:                    var(--black);
-  --sidebar-link-bg:            hsla(0, 0%, 0%, 0.1);
-  --sidebar-link-hover-bg:      hsla(0, 0%, 0%, 0.06);
+  --sidebar-link-bg:            hsla(0, 0%, 0%, 0.06);
   --textBody:                    var(--gray800);
   --textHeaders:                 var(--gray900);
   --textDetailAccent:            var(--mainLight);
