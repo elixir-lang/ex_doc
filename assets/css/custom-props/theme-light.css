@@ -78,7 +78,7 @@
   --sidebarSubheadings:          var(--black);
   --sidebarItem:                 var(--black);
   --sidebarInactiveItemBorder:   var(--gray500);
-  --sidebarInactiveItemMarker:   var(--gray200);
+  --sidebarInactiveItemMarker:   var(--gray300);
   --sidebarLanguageAccentBar:    var(--mainDark);
   --sidebarActiveItem:           var(--mainDarkest);
   --searchBarBorder:             var(--gray300);

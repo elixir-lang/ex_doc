@@ -276,7 +276,7 @@
   display: none;
   margin: 10px 0 10px 12px;
   padding: 0;
-  box-shadow: inset 1px 0px 0 var(--searchBarBorder);
+  box-shadow: inset 1px 0px 0 var(--sidebarInactiveItemMarker);
   padding-left: 0px;
 }
 
