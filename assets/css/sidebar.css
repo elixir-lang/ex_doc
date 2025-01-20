@@ -137,7 +137,6 @@
 }
 
 .sidebar .sidebar-list-nav :is(li, li button) {
-  text-transform: uppercase;
   letter-spacing: 0.02em;
   font-size: 14px;
   color: var(--sidebarMuted);
