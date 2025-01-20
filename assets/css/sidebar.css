@@ -285,12 +285,12 @@
 }
 
 .sidebar .full-list > li > a:hover {
-  border-left: 3px solid var(--sidebarLanguageAccentBar);
+  border-left: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
   padding-left: 12px;
 }
 
 .sidebar .full-list > li > a[aria-selected] {
-  border-left: 3px solid var(--sidebarLanguageAccentBar);
+  border-left: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
   padding-left: 12px;
 }
 
