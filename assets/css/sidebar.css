@@ -132,6 +132,8 @@
   display: flex;
   margin: 0;
   padding: 4px 4px 0 4px;
+  overflow: auto;
+  scrollbar-width: thin;
 }
 
 .sidebar .sidebar-list-nav :is(li, li button) {
@@ -139,6 +141,7 @@
   letter-spacing: 0.02em;
   font-size: 14px;
   color: var(--sidebarMuted);
+  white-space: nowrap;
 }
 
 .sidebar .sidebar-list-nav li {
