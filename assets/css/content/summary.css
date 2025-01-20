@@ -26,7 +26,6 @@
 
 .content-inner .summary .summary-row .summary-synopsis {
   font-family: var(--defaultFontFamily);
-  font-style: italic;
   padding: 0 1.2em;
   margin: 0 0 0.5em;
 }
