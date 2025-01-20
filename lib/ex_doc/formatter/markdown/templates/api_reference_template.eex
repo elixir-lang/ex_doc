@@ -1,0 +1,19 @@
+# <%= title %>
+
+<%= if nodes_map.modules != [] do %>
+## Modules
+
+<%= for module_node <- Enum.sort_by(nodes_map.modules, & &1.id) do
+api_reference_entry_template(module_node) <> "\n"
+end %>
+<% end %>
+
+<%= if nodes_map.tasks != [] do %>
+## Mix Tasks
+
+<%= for task_node <- nodes_map.tasks do
+api_reference_entry_template(task_node)
+
+end %>
+
+<% end %>

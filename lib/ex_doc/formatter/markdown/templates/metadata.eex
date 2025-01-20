@@ -1,0 +1,6 @@
+- Language: <%= config.language %>
+- Generator: ExDoc v<%= ExDoc.version() %>
+- Project: <%= config.project %> v<%= config.version%>
+<%= if config.authors do %>
+- Authors: <%= Enum.join(config.authors, ", ") %>
+<% end %>

@@ -1,0 +1,9 @@
+### <%=h node.signature %>
+
+<%= for annotation <- node.annotations do %>*(<%= annotation %>)* <% end %>
+<%= if node.specs != [] do %>```<%= config.proglang %>
+<%= for spec <- node.specs do %><%= format_spec_attribute(module, node) %> <%= spec %>
+<% end %>```<% end %>
+<%= if deprecated = node.deprecated do %>**This <%= node.type %> is deprecated. <%= h(deprecated) %>.**
+<% end %>
+<%= if doc = node.rendered_doc do %><%= doc %><% end %>

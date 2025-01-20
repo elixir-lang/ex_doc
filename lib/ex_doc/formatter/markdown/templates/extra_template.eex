@@ -1,0 +1,6 @@
+<%= if type == :livemd do %>![Livebook badge](https://livebook.dev/badge/v1/blue.svg "Run in Livebook")
+<% end %><%= node.content %>
+
+---
+<%= if refs.prev do %>[← Previous Page](<%= refs.prev.path %> "<%= refs.prev.title %>")<% end %><%= if refs.prev && refs.next do %> - <% end %><%= if refs.next do %>[Next Page →](<%= refs.next.path %> "<%= refs.next.title %>")<% end %>
+<%= footer_template(config) %>
