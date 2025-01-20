@@ -107,6 +107,8 @@
 
 .content-inner div.deprecated {
   display: block;
-  padding: 9px 15px;
+  padding: 1em;
   background-color: var(--fnDeprecated);
+  border-radius: var(--borderRadius);
+  margin: var(--baseLineHeight) 0;
 }
