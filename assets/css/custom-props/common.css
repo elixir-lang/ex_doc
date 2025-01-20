@@ -76,3 +76,7 @@
     --content-gutter: 20px;
   }
 }
+
+option {
+  background-color: var(--sidebarBackground);
+}
