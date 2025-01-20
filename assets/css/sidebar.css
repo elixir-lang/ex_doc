@@ -133,15 +133,17 @@
   padding: 0px;
   overflow: auto;
   scrollbar-width: thin;
+  background-color: var(--sidebarBackground);
+  border-bottom: 1px solid var(--tabBorderTop);
 }
 
 .sidebar .sidebar-list-nav :is(li, li button) {
   letter-spacing: 0.02em;
   font-size: 14px;
   color: var(--sidebarMuted);
-  width: 100%;
   text-align: center;
   white-space: nowrap;
+  background-color: var(--sidebarBackground);
 }
 
 .sidebar .sidebar-list-nav li {
@@ -160,24 +162,24 @@
   cursor: pointer;
   display: inline-block;
   line-height: 27px;
-  padding: 4px 10px 2px 10px;
+  padding: 4px 10px 4px 10px;
   transition: var(--transition-all);
 }
 
 .sidebar .sidebar-list-nav button {
-  border-top: var(--navTabBorderWidth) solid var(--sidebarHeader);
+  border-bottom: var(--navTabBorderWidth) solid transparent;
 }
 
 .sidebar .sidebar-list-nav button:not([aria-selected]):hover {
   background-color: var(--sidebarInactiveItemMarker);
-  border-top: var(--navTabBorderWidth) solid var(--sidebarInactiveItemBorder);
+  border-bottom: var(--navTabBorderWidth) solid var(--sidebarInactiveItemBorder);
   color: var(--sidebarAccentMain);
   transition: var(--transition-all);
 }
 
 .sidebar .sidebar-list-nav button[aria-selected] {
   background-color: var(--sidebarBackground);
-  border-top: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
+  border-bottom: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
 }
 
 .sidebar .sidebar-tabpanel {
