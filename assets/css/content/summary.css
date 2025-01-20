@@ -11,7 +11,6 @@
 .content-inner .summary span.deprecated {
   color: var(--darkDeprecated);
   font-weight: normal;
-  font-style: italic;
 }
 
 .content-inner .summary .summary-row .summary-signature {
