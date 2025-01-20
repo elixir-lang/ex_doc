@@ -226,7 +226,8 @@
 
 .sidebar .full-list a {
   margin-right: 30px;
-  padding: 3px 0 3px 15px;
+  padding: 3px 0 3px 12px;
+  border-left: 3px solid transparent;
   color: var(--sidebarItem);
 }
 
@@ -285,13 +286,11 @@
 }
 
 .sidebar .full-list > li > a:hover {
-  border-left: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
-  padding-left: 12px;
+  border-left-color: var(--sidebarLanguageAccentBar);
 }
 
 .sidebar .full-list > li > a[aria-selected] {
-  border-left: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
-  padding-left: 12px;
+  border-left-color: var(--sidebarLanguageAccentBar);
 }
 
 .sidebar .full-list > li:last-child {
