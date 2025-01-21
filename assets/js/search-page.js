@@ -4,6 +4,7 @@ import lunr from 'lunr'
 import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
 import { setSearchInputValue } from './search-bar'
 import searchResultsTemplate from './handlebars/templates/search-results.handlebars'
+import { getSearchNodes } from './globals'
 
 const EXCERPT_RADIUS = 80
 const SEARCH_CONTAINER_SELECTOR = '#search'
@@ -26,27 +27,82 @@ function initialize () {
   const pathname = window.location.pathname
   if (pathname.endsWith('/search.html') || pathname.endsWith('/search')) {
     const query = getQueryParamByName('q')
-    search(query)
+    const queryType = getQueryParamByName('type')
+    search(query, queryType)
   }
 }
 
-async function search (value) {
+async function search (value, queryType) {
   if (isBlank(value)) {
     renderResults({ value })
   } else {
     setSearchInputValue(value)
 
-    const index = await getIndex()
-
     try {
-      // We cannot match on atoms :foo because that would be considered
-      // a filter. So we escape all colons not preceded by a word.
-      const fixedValue = value.replaceAll(/(\B|\\):/g, '\\:')
-      const results = searchResultsToDecoratedSearchItems(index.search(fixedValue))
+      let results = []
+      const searchNodes = getSearchNodes()
+
+      if (['related', 'latest'].includes(queryType) && searchNodes.length > 0) {
+        results = await remoteSearch(value, queryType, searchNodes)
+      } else {
+        results = await localSearch(value)
+      }
+
       renderResults({ value, results })
     } catch (error) {
       renderResults({ value, errorMessage: error.message })
     }
+  }
+}
+
+async function localSearch (value) {
+  const index = await getIndex()
+
+  // We cannot match on atoms :foo because that would be considered
+  // a filter. So we escape all colons not preceded by a word.
+  const fixedValue = value.replaceAll(/(\B|\\):/g, '\\:')
+  return searchResultsToDecoratedSearchItems(index.search(fixedValue))
+}
+
+async function remoteSearch (value, queryType, searchNodes) {
+  let filterNodes = searchNodes
+
+  if (queryType === 'latest') {
+    filterNodes = searchNodes.slice(0, 1)
+  }
+
+  const filters = filterNodes.map(node => `package:=${node.name}-${node.version}`).join(' || ')
+
+  const params = new URLSearchParams()
+  params.set('q', value)
+  params.set('query_by', 'title,doc')
+  params.set('filter_by', filters)
+
+  const response = await fetch(`https://search.hexdocs.pm/?${params.toString()}`)
+  const payload = await response.json()
+
+  if (Array.isArray(payload.hits)) {
+    return payload.hits.map(result => {
+      const [packageName, packageVersion] = result.document.package.split('-')
+
+      const doc = result.document.doc
+      const excerpts = [doc]
+      const metadata = {}
+      const ref = `https://hexdocs.pm/${packageName}/${packageVersion}/${result.document.ref}`
+      const title = result.document.title
+      const type = result.document.type
+
+      return {
+        doc,
+        excerpts,
+        metadata,
+        ref,
+        title,
+        type
+      }
+    })
+  } else {
+    return []
   }
 }
 
