@@ -38,7 +38,8 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [
-      {:earmark_parser, "~> 1.4.42"},
+      {:earmark_parser, "~> 1.4.42",
+       github: "RobertDober/earmark_parser", branch: "jv-no-compile-time-regexes"},
       {:makeup_elixir, "~> 0.14 or ~> 1.0"},
       {:makeup_erlang, "~> 0.1 or ~> 1.0"},
       # Add other makeup lexers as optional for the executable
