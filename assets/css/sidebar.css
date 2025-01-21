@@ -46,9 +46,12 @@
   display: flex;
   justify-content: start;
   align-items: center;
-  gap: 16px;
-  margin: 12px 16px 12px 14px;
-  max-width: 235px;
+  gap: 8px;
+  margin: 12px 34px 12px 14px;
+}
+
+.sidebar .sidebar-projectInfo > div {
+  flex: 1;
 }
 
 .sidebar .sidebar-projectImage {
@@ -68,8 +71,9 @@
   color: var(--sidebarAccentMain);
   margin: 0;
   padding: 0;
-  max-width: 230px;
   word-wrap: break-word;
+  display: block;
+  width: calc(100% - 12px);
 }
 
 .sidebar .sidebar-projectVersion {
@@ -80,9 +84,15 @@
   font-size: var(--sidebarFontSize);
   line-height: var(--sidebarLineHeight);
   color: var(--sidebarMuted);
+  width: calc(100% - 12px);
 }
 
-.sidebar .sidebar-projectVersionsDropdown {
+.sidebar .sidebar-projectVersion form {
+  display: flex;
+  gap: 4px;
+}
+
+.sidebar .sidebar-projectVersion select {
   cursor: pointer;
   position: relative;
   margin: 0;
@@ -95,11 +105,11 @@
   z-index: 2;
 }
 
-.sidebar .sidebar-projectVersionsDropdown option {
+.sidebar .sidebar-projectVersion option {
   color: initial;
 }
 
-.sidebar .sidebar-projectVersionsDropdownCaret {
+.sidebar .sidebar-projectVersionsCaret {
   position: absolute;
   left: 0;
   top: 2px;
@@ -108,24 +118,28 @@
   color: var(--sidebarMuted);
 }
 
-.sidebar .sidebar-projectVersionsDropdown::-ms-expand {
+.sidebar .sidebar-projectVersion select::-ms-expand {
   display: none;
 }
 
 .sidebar .sidebar-staleVersion {
-    display: inline;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--sidebarStaleVersion);
 }
 
 .sidebar .sidebar-staleVersion > a {
-    color: var(--sidebarStaleVersion);
-    font-weight: 400;
+  color: var(--sidebarStaleVersion);
+  font-weight: 400;
 }
 
 .sidebar .sidebar-staleIcon {
-    font-size: 18px;
-    position: relative;
-    top: 3px;
-    line-height: 0;
+  font-size: 18px;
+  position: relative;
+  top: 3px;
+  line-height: 0;
 }
 
 .sidebar .sidebar-list-nav {
