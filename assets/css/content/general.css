@@ -233,7 +233,8 @@
   font-family: var(--monoFontFamily);
   font-style: normal;
   line-height: 24px;
-  font-weight: 400;
+  font-weight: normal;
+  font-size: 0.875rem
 }
 
 @media screen and (max-width: 768px) {
