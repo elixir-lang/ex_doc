@@ -55,7 +55,7 @@
 }
 
 .sidebar .sidebar-projectImage {
-  align-self: center;
+  align-self: flex-start;
 }
 
 .sidebar .sidebar-projectImage img {
