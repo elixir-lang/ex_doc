@@ -3,6 +3,7 @@
   --sidebarLineHeight: 20px;
   font-family: var(--sansFontFamily);
   font-size: var(--sidebarFontSize);
+  font-weight: 500;
   line-height: var(--sidebarLineHeight);
   background-color: var(--sidebarBackground);
   color: var(--sidebarAccentMain);
@@ -148,6 +149,7 @@
   -webkit-appearance: none;
   text-align: inherit;
   color: inherit;
+  font-weight: inherit;
   cursor: pointer;
   display: inline-block;
   line-height: 27px;
