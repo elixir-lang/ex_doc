@@ -85,7 +85,6 @@ defmodule ExDoc.Utils do
     end)
   end
 
-
   @doc """
   Strips HTML tags from text leaving their text content
   """
