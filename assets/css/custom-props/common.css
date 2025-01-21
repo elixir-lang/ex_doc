@@ -1,6 +1,6 @@
 :root {
   /* Layout & Whitespace */
-  --content-width: 949px;
+  --content-width: 70em;
   --content-gutter: 60px;
   --borderRadius: 8px;
   --navTabBorderWidth: 4px;
