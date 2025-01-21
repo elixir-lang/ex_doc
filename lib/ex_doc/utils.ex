@@ -85,13 +85,13 @@ defmodule ExDoc.Utils do
     end)
   end
 
-  @clean_html_regex ~r/<\/?\s*[a-zA-Z]+(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
 
   @doc """
   Strips HTML tags from text leaving their text content
   """
   def strip_tags(text, replace_with \\ "") when is_binary(text) do
-    String.replace(text, @clean_html_regex, replace_with)
+    clean_html_regex = ~r/<\/?\s*[a-zA-Z]+(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
+    String.replace(text, clean_html_regex, replace_with)
   end
 
   @doc """

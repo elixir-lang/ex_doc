@@ -182,9 +182,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   # TODO: split into sections in Formatter.HTML instead (possibly via DocAST)
-  @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
   defp extract_headers(content) do
-    @h2_regex
+    ~r/<h2.*?>(.*?)<\/h2>/m
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
     |> Enum.filter(&(&1 != ""))
@@ -222,13 +221,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   We only link `h2` and `h3` headers. This is kept consistent in ExDoc.SearchData.
   """
-  @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
   @spec link_headings(String.t() | nil, String.t()) :: String.t() | nil
   def link_headings(content, prefix \\ "")
   def link_headings(nil, _), do: nil
 
   def link_headings(content, prefix) do
-    @heading_regex
+    ~r/<(h[23]).*?>(.*?)<\/\1>/m
     |> Regex.scan(content)
     |> Enum.reduce({content, %{}}, fn [match, tag, title], {content, occurrences} ->
       possible_id = text_to_id(title)
@@ -243,7 +241,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> elem(0)
   end
 
-  @class_regex ~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/
   @class_separator " "
   defp link_heading(match, _tag, _title, "", _prefix), do: match
 
@@ -273,7 +270,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     # it was setting `#{section_header_class_name}` as the only CSS class
     # associated with the given header.
     class_attribute =
-      case Regex.named_captures(@class_regex, match) do
+      case Regex.named_captures(~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/, match) do
         %{"class" => ""} ->
           section_header_class_name
 
