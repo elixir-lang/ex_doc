@@ -9,7 +9,7 @@
   --defaultFontFamily: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji";
   --sansFontFamily: "Lato", sans-serif;
-  --monoFontFamily: "Inconsolata", Menlo, Courier, monospace;
+  --monoFontFamily: "Inconsolata Variable", Menlo, Courier, monospace;
 
   /* Typography */
   --baseFontSize: 18px;
