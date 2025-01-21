@@ -32,9 +32,7 @@ const formatters = [
       'css/entry/html-erlang.css'
     ],
     loader: {
-      '.woff2': 'file',
-      // TODO: Remove when @fontsource/* removes legacy .woff
-      '.woff': 'file'
+      '.woff2': 'file'
     }
   }
 ]

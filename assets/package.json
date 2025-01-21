@@ -28,7 +28,7 @@
   "browserslist": "last 2 versions",
   "devDependencies": {
     "@fontsource-variable/inconsolata": "^5.1.1",
-    "@fontsource/lato": "^4.5.10",
+    "@fontsource-variable/nunito-sans": "^5.1.1",
     "@swup/a11y-plugin": "^5.0.0",
     "@swup/progress-plugin": "^3.2.0",
     "esbuild": "^0.16.16",
