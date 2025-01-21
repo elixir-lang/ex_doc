@@ -144,6 +144,7 @@
   font-family: var(--sansFontFamily);
   font-weight: 700;
   padding-bottom: 0.5em;
+  white-space: nowrap;
 }
 
 .content-inner thead tr {
@@ -168,7 +169,6 @@
   padding-left: 1em;
   line-height: 2em;
   vertical-align: top;
-  white-space: nowrap;
 }
 
 .content-inner .section-heading {
