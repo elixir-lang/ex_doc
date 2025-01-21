@@ -3,7 +3,8 @@ import { getVersionNodes, isEmbedded } from '../globals'
 import versionsDropdownTemplate from '../handlebars/templates/versions-dropdown.handlebars'
 
 const VERSIONS_CONTAINER_SELECTOR = '.sidebar-projectVersion'
-const VERSIONS_DROPDOWN_SELECTOR = '.sidebar-projectVersionsDropdown'
+const VERSIONS_DROPDOWN_SELECTOR = '.sidebar-projectVersion select'
+const VERSIONS_LATEST_SELECTOR = '.sidebar-staleVersion a'
 
 /**
  * Initializes selectable version list if `versionNodes` have been configured.
@@ -37,7 +38,7 @@ if (!isEmbedded) {
     select.addEventListener('change', handleVersionSelected)
     adjustWidth(select)
 
-    const versionsGoToLatest = qs('.sidebar-staleVersion a')
+    const versionsGoToLatest = qs(VERSIONS_LATEST_SELECTOR)
 
     if (versionsGoToLatest) {
       versionsGoToLatest.addEventListener('click', handleGoToLatestClicked)

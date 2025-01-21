@@ -89,7 +89,6 @@
 
 .sidebar .sidebar-projectVersion form {
   display: flex;
-  gap: 4px;
 }
 
 .sidebar .sidebar-projectVersion select {
