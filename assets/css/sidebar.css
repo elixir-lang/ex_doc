@@ -74,7 +74,6 @@
   word-wrap: break-word;
   display: block;
   width: calc(100% - 12px);
-  margin-bottom: 2px;
 }
 
 .sidebar .sidebar-projectVersion {
@@ -91,7 +90,6 @@
 .sidebar .sidebar-projectVersion form {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
 }
 
 .sidebar .sidebar-projectVersion select {
