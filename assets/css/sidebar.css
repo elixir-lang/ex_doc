@@ -165,19 +165,17 @@
 }
 
 .sidebar .sidebar-list-nav button {
-  border-top: var(--navTabBorderWidth) solid var(--sidebarHeader);
+  border-bottom: var(--navTabBorderWidth) solid transparent;
 }
 
 .sidebar .sidebar-list-nav button:not([aria-selected]):hover {
-  background-color: var(--sidebarInactiveItemMarker);
-  border-top: var(--navTabBorderWidth) solid var(--sidebarInactiveItemBorder);
+  border-bottom: var(--navTabBorderWidth) solid var(--sidebarInactiveItemBorder);
   color: var(--sidebarAccentMain);
   transition: var(--transition-all);
 }
 
 .sidebar .sidebar-list-nav button[aria-selected] {
-  background-color: var(--sidebarBackground);
-  border-top: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
+  border-bottom: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
 }
 
 .sidebar .sidebar-tabpanel {
