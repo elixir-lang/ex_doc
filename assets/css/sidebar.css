@@ -3,7 +3,6 @@
   --sidebarLineHeight: 20px;
   font-family: var(--sansFontFamily);
   font-size: var(--sidebarFontSize);
-  font-weight: 300;
   line-height: var(--sidebarLineHeight);
   background-color: var(--sidebarBackground);
   color: var(--sidebarAccentMain);
@@ -12,10 +11,6 @@
   & .sidebar-tabpanel {
     scrollbar-width: thin;
   }
-}
-
-:root:not(.apple-os) .sidebar {
-  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
 }
 
 .sidebar ul {
