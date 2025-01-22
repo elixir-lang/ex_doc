@@ -30,7 +30,7 @@ if (!isEmbedded) {
     }))
 
     const latestVersionNode = versionNodes.find(node => node.latest)
-    const latestVersion = latestVersionNode?.version !== currentVersion ? latestVersionNode?.url : null
+    const latestVersion = latestVersionNode?.version !== currentVersion && !currentVersion.includes('-') ? latestVersionNode?.url : null
 
     versionsContainer.innerHTML = versionsDropdownTemplate({ nodes, latestVersion})
 
