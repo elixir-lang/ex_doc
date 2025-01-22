@@ -234,7 +234,7 @@
 
 .sidebar .full-list a {
   margin-right: 30px;
-  padding: 5px 0 5px 12px;
+  padding: 6px 0 6px 12px;
   border-left: var(--navTabBorderWidth) solid transparent;
   color: var(--sidebarItem);
 }
