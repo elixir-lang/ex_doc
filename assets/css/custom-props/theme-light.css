@@ -46,10 +46,8 @@
   --admInlineCodeBackground:     var(--gray25);
   --admInlineCodeBorder:         var(--gray100);
 
-  --tabBackground:               var(--white);
   --tabBorder:                   var(--gray300);
   --tabBorderTop:                var(--gray100);
-  --tab:                         var(--gray600);
   --tabShadow:                   var(--gray25);
 
   --bottomActionsBtnBorder:      var(--black-opacity-10);
@@ -74,7 +72,7 @@
   --sidebarMuted:                var(--gray800);
   --sidebarHover:                var(--black);
   --sidebarStaleVersion:         var(--orangeDark);
-  --sidebarSubheadings:          var(--black);
+  --sidebarSubheadings:          var(--gray500);
   --sidebarItem:                 var(--black);
   --sidebarInactiveItemBorder:   var(--gray500);
   --sidebarInactiveItemMarker:   var(--gray200);

@@ -17,11 +17,11 @@
 }
 
 .tabset-tab {
-  padding: 1.3rem var(--tabsetPadding);
+  padding: 1.1rem var(--tabsetPadding);
   font-family: var(--sansFontFamily);
-  background-color: var(--tabBackground);
-  color: var(--tab);
+  color: var(--textColor);
   margin-right: calc(-1 * var(--borderWidth));
+  background-color: transparent;
   border:0;
   box-shadow: none;
   cursor: pointer;
@@ -33,10 +33,12 @@
 
 :hover.tabset-tab {
   border-bottom-color: var(--tabBorderTop);
+  color: var(--textHeaders);
 }
 
 .tabset-tab[aria-selected=true] {
   border-bottom-color: var(--mainLight);
+  color: var(--textHeaders);
 }
 
 /* Keyboard navigation focus state (increased contrast) */
@@ -44,9 +46,6 @@
   background-color: var(--mainLight);
   border-color: var(--mainLight);
   color: var(--white); /* light works best for both light and dark themes given background colors */
-}
-
-.tabset-panel {
 }
 
 @media screen and (max-width: 768px) {

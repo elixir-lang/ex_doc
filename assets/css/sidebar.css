@@ -153,7 +153,7 @@
   text-transform: uppercase;
   letter-spacing: 0.02em;
   font-size: 14px;
-  color: var(--sidebarMuted);
+  color: var(--sidebarSubheadings);
   white-space: nowrap;
 }
 
@@ -189,6 +189,7 @@
 
 .sidebar .sidebar-list-nav button[aria-selected] {
   border-bottom: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
+  color: var(--sidebarAccentMain);
 }
 
 .sidebar .sidebar-tabpanel {
