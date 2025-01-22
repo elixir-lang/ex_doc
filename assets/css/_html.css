@@ -1,3 +1,6 @@
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/vazirmatn";
+
 @import "custom-props/common.css";
 @import "custom-props/theme-light.css";
 @import "custom-props/theme-dark.css";
