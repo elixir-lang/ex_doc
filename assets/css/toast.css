@@ -1,4 +1,5 @@
 #toast {
+  visibility: hidden;
   opacity: 0;
   position: fixed;
   z-index: 1;
@@ -18,6 +19,7 @@
 }
 
 #toast.show {
+  visibility: visible;
   opacity: 1;
   transform: translateY(-.75rem);
 }
