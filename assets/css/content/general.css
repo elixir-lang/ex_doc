@@ -11,7 +11,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  align-items: start;
+  align-items: center;
   gap: 6px;
 }
 .content-inner .heading-with-actions > *:not(h1) {
@@ -33,7 +33,6 @@
   font-weight: normal;
 }
 .content-inner .heading-with-actions.top-heading .icon-action {
-  padding-top: 1.5rem;
   font-size: 1.2rem;
 }
 
