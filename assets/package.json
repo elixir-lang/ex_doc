@@ -13,7 +13,8 @@
     "lint:fix": "eslint --fix './js/**/*.js'",
     "test": "karma start ./karma.conf.js --single-run",
     "build:watch": "npm run build --watch",
-    "build": "node build/build.js"
+    "build": "node build/build.js",
+    "serve": "http-server ../doc --port 3000"
   },
   "repository": {
     "type": "git",
@@ -49,6 +50,7 @@
     "lunr": "^2.3.8",
     "mocha": "^10.2.0",
     "normalize.css": "^8.0.1",
-    "swup": "^4.8.1"
+    "swup": "^4.8.1",
+    "http-server": "^14.1.1"
   }
 }
