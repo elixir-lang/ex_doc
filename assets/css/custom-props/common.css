@@ -11,8 +11,8 @@
   --monoFontFamily: monospace, monospace;
 
   /* Typography */
-  --baseFontSize: 18px;
-  --baseLineHeight: 1.5em;
+  --baseFontSize: 1rem;
+  --baseLineHeight: 1.5rem;
 
   /* Colours */
   --gray25: hsl(207, 43%, 98%);
