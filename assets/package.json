@@ -14,7 +14,7 @@
     "test": "karma start ./karma.conf.js --single-run",
     "build:watch": "npm run build --watch",
     "build": "node build/build.js",
-    "serve": "http-server ../doc --port 3000"
+    "serve": "http-server ../doc --port 3001"
   },
   "repository": {
     "type": "git",
