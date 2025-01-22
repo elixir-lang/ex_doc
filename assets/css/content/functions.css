@@ -57,10 +57,6 @@
   }
 }
 
-.content-inner .detail-header .icon-action {
-  margin-top: 0px;
-}
-
 .content-inner .specs pre {
   font-family: var(--monoFontFamily);
   font-size: 0.9em;
