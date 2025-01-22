@@ -458,9 +458,10 @@ The easiest way to test changes to ExDoc is to locally rebuild the app and its o
 
   1. Run `mix setup` to install all dependencies
   2. Run `mix build` to generate the docs and open up the generated `doc/index.html`
-  3. (optional) Run `npm run --prefix assets build:watch` if working on assets for automatic recompilation
-  4. Run `mix lint` to check linting and formatting (and `mix fix` to automatically fix it)
-  5. (important) Do not add the files in the `formatters/` directory to your commits, those will be handled by the maintainers
+  3. (optional) Run `erl -S httpd serve doc/` to serve the docs locally
+  4. (optional) Run `npm run --prefix assets build:watch` if working on assets for automatic recompilation
+  5. Run `mix lint` to check linting and formatting (and `mix fix` to automatically fix it)
+  6. (important) Do not add the files in the `formatters/` directory to your commits, those will be handled by the maintainers
 
 See the README in the `assets/` directory for more information on working on the assets.
 
