@@ -27,6 +27,8 @@
   "homepage": "https://github.com/elixir-lang/ex_doc#readme",
   "browserslist": "last 2 versions",
   "devDependencies": {
+    "@fontsource-variable/inter": "^5.1.1",
+    "@fontsource-variable/vazirmatn": "^5.1.1",
     "@swup/a11y-plugin": "^5.0.0",
     "@swup/progress-plugin": "^3.2.0",
     "esbuild": "^0.16.16",
@@ -47,8 +49,9 @@
     "lunr": "^2.3.8",
     "mocha": "^10.2.0",
     "normalize.css": "^8.0.1",
-    "swup": "^4.8.1",
-    "@fontsource-variable/inter": "^5.1.1",
-    "@fontsource-variable/vazirmatn": "^5.1.1"
+    "swup": "^4.8.1"
+  },
+  "dependencies": {
+    "@fontsource-variable/open-sans": "^5.1.1"
   }
 }
