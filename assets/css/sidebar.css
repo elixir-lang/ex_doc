@@ -317,6 +317,7 @@
 
 /* Level 2 */
 
+.sidebar .full-list > li > ul > li:not(:has(li a[aria-selected=true])) > a[aria-selected=true]:before,
 .sidebar .full-list > li > ul > li > a:hover:before {
   content: "\2022";
   position: absolute;

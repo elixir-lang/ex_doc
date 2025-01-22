@@ -134,15 +134,14 @@
 }
 
 .autocomplete-suggestion {
-  color: inherit;
+  color: var(--textHeaders) !important;
   display: block;
   padding: 12px 20px;
-  text-decoration: none;
+  text-decoration: none !important;
   transition: var(--transition-colors);
   border-top: 1px solid var(--suggestionBorder);
   font-size: 0.9rem;
 }
-
 
 .autocomplete-suggestion.selected {
   background-color: var(--autocompleteSelected);
@@ -229,10 +228,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
-}
-
-.autocomplete-suggestions a {
-  text-decoration: none !important;
 }
 
 @media screen and (hover: none) {
