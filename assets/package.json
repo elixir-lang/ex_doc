@@ -27,7 +27,6 @@
   "homepage": "https://github.com/elixir-lang/ex_doc#readme",
   "browserslist": "last 2 versions",
   "devDependencies": {
-    "@fontsource-variable/inconsolata": "^5.1.1",
     "@fontsource/lato": "^4.5.10",
     "@swup/a11y-plugin": "^5.0.0",
     "@swup/progress-plugin": "^3.2.0",
