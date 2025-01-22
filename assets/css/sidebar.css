@@ -234,7 +234,7 @@
 
 .sidebar .full-list a {
   margin-right: 30px;
-  padding: 3px 0 3px 12px;
+  padding: 5px 0 5px 12px;
   border-left: var(--navTabBorderWidth) solid transparent;
   color: var(--sidebarItem);
 }
@@ -327,7 +327,6 @@
 
 .sidebar .full-list ul a {
   padding-left: 15px;
-  height: 24px;
 }
 
 .sidebar .full-list ul button {
