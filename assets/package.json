@@ -14,7 +14,7 @@
     "test": "karma start ./karma.conf.js --single-run",
     "build:watch": "npm run build --watch",
     "build": "node build/build.js",
-    "serve": "http-server ../doc --port 3001 -c-1",
+    "serve": "ws --directory ../doc --port 3001 --open",
     "dev": "concurrently \"npm run build:watch\" \"npm run serve\""
   },
   "repository": {
@@ -33,6 +33,7 @@
     "@fontsource/lato": "^4.5.10",
     "@swup/a11y-plugin": "^5.0.0",
     "@swup/progress-plugin": "^3.2.0",
+    "concurrently": "^9.1.2",
     "esbuild": "^0.16.16",
     "eslint": "^8.31.0",
     "eslint-config-standard": "^17.0.0",
@@ -41,18 +42,17 @@
     "eslint-plugin-promise": "^6.1.1",
     "fs-extra": "^11.1.0",
     "handlebars": "^4.7.7",
-    "concurrently": "^9.1.2",
     "karma": "^6.4.1",
     "karma-chai-plugins": "^0.9.0",
     "karma-chrome-launcher": "^3.1.1",
     "karma-esbuild": "^2.2.5",
     "karma-mocha": "^2.0.1",
     "karma-sourcemap-loader": "^0.3.5",
+    "local-web-server": "^5.4.0",
     "lodash.throttle": "^4.1.1",
     "lunr": "^2.3.8",
     "mocha": "^10.2.0",
     "normalize.css": "^8.0.1",
-    "swup": "^4.8.1",
-    "http-server": "^14.1.1"
+    "swup": "^4.8.1"
   }
 }
