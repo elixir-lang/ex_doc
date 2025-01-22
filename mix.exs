@@ -57,7 +57,8 @@ defmodule ExDoc.Mixfile do
       fix: ["format", "cmd --cd assets npm run lint:fix"],
       lint: ["format --check-formatted", "cmd --cd assets npm run lint"],
       setup: ["deps.get", "cmd --cd assets npm install"],
-      serve: ["cmd --cd assets npm run serve"]
+      serve: ["cmd --cd assets npm run serve"],
+      dev: ["cmd --cd assets npm run dev"]
     ]
   end
 
