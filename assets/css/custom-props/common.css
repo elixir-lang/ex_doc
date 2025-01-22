@@ -6,7 +6,7 @@
   --navTabBorderWidth: 2px;
 
   /* Font Families */
-  --defaultFontFamily: system-ui, ui-sans-serif, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif,
+  --defaultFontFamily: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji";
   --sansFontFamily: "Lato", ui-sans-serif, system-ui, sans-serif;
   --monoFontFamily: "Inconsolata Variable", Menlo, Courier, monospace;
