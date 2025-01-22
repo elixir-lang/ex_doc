@@ -58,20 +58,18 @@
 }
 
 .content-inner h1 small {
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .content-inner h2 {
   font-size: 1.6em;
   padding-top: 1em;
   margin-bottom: 0.5em;
-  font-weight: 700;
 }
 
 .content-inner h3 {
   font-size: 1.375em;
   margin: 1em 0 0.5em;
-  font-weight: 700;
 }
 
 .content-inner li + li {

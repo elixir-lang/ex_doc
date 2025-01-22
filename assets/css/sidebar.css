@@ -3,7 +3,6 @@
   --sidebarLineHeight: 20px;
   font-family: var(--sansFontFamily);
   font-size: var(--sidebarFontSize);
-  font-weight: 300;
   line-height: var(--sidebarLineHeight);
   background-color: var(--sidebarBackground);
   color: var(--sidebarAccentMain);
@@ -14,8 +13,9 @@
   }
 }
 
-:root:not(.apple-os) .sidebar {
-  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
+.apple-os .sidebar {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .sidebar ul {
