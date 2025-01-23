@@ -172,7 +172,7 @@
   background-color: var(--autocompletePreview);
   cursor: pointer;
   padding: 4px 8px;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 
 .autocomplete-preview-indicator button:hover {

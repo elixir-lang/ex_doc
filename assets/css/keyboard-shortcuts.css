@@ -30,7 +30,7 @@
   padding: 4px 7px 6px 7px;
   min-width: 26px;
   text-align: center;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 
 #keyboard-shortcuts-content :is(.shortcut-keys, .shortcut-description) {

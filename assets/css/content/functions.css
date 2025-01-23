@@ -27,7 +27,7 @@
 
 .content-inner .detail-header .signature {
   font-family: var(--monoFontFamily);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 
@@ -59,7 +59,7 @@
 
 .content-inner .specs pre {
   font-family: var(--monoFontFamily);
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-style: normal;
   line-height: 24px;
   white-space: pre-wrap;

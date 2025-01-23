@@ -111,7 +111,7 @@
 .content-inner .note {
   color: var(--iconAction);
   margin-right: 5px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: normal;
 }
 
