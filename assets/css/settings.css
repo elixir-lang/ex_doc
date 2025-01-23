@@ -10,7 +10,7 @@
   box-sizing: border-box;
   width: 80%;
   padding: 8px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   background-color: var(--settingsInputBackground);
   color: var(--settingsInput);
   border: 1px solid var(--settingsInputBorder);
@@ -37,13 +37,13 @@
 }
 
 #settings-modal-content .switch-button-container > div > span {
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 
 #settings-modal-content .switch-button-container > div > p {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 14px;
+  font-size: var(--text-sm);
   line-height: 1.4;
   margin: 0;
   padding-bottom: 6px;

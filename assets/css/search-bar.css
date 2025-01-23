@@ -52,7 +52,7 @@
 }
 
 .top-search .search-bar .search-button {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--searchAccentMain);
   background-color: transparent;
   border: none;
@@ -75,7 +75,7 @@
 }
 
 .top-search .search-bar .search-close-button {
-  font-size: 16px;
+  font-size: var(--text-base);
   color: var(--searchAccentMain);
   background-color: transparent;
   border: none;
@@ -102,7 +102,7 @@
 }
 
 .top-search .search-settings .icon-settings {
-  font-size: 20px;
+  font-size: var(--text-xl);
   float: right;
   color: var(--iconAction);
   text-decoration: none;

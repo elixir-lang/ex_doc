@@ -1,7 +1,7 @@
 .content-inner .footer {
   margin: 4em auto 1em;
   text-align: center;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 
 .content-inner .footer .line {

@@ -52,7 +52,7 @@
   top: -16px;
   left: 12px;
   padding: 2px 4px;
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-family: var(--monoFontFamily);
   line-height: 1;
   color: var(--textHeaders);
