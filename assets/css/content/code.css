@@ -31,7 +31,7 @@
   display: block;
   overflow-x: auto;
   white-space: inherit;
-  padding: 1em;
+  padding: 1.25em;
   scrollbar-width: thin;
 }
 
