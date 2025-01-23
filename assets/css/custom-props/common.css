@@ -55,6 +55,8 @@
   --orangeDark: hsl(30, 90%, 40%);
   --orangeLight: hsl(30, 80%, 50%);
 
+  --text-sm: 0.875rem;
+
   --transition-duration: 150ms;
   --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 
