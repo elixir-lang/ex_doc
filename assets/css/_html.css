@@ -5,7 +5,7 @@
 @import "custom-props/theme-light.css";
 @import "custom-props/theme-dark.css";
 
-@import "normalize.css/normalize.css";
+@import 'modern-normalize/modern-normalize.css';
 
 @import "icons.css";
 @import "layout.css";
