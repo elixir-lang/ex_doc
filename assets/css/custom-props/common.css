@@ -6,6 +6,7 @@
   --navTabBorderWidth: 2px;
 
   /* Font Families */
+  /* modern-normalize.css handles the default font */
   --sansFontFamily: "Lato", ui-sans-serif, system-ui, sans-serif;
   --monoFontFamily: ui-monospace, monospace;
 
