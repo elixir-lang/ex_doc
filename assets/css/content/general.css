@@ -231,6 +231,7 @@
   font-style: normal;
   line-height: 24px;
   font-weight: 400;
+  font-size: 13px;
 }
 
 @media screen and (max-width: 768px) {
