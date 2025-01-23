@@ -13,6 +13,9 @@
       <meta name="robots" content="noindex">
     <% end %>
     <title><%= title %> — <%= config.project %> v<%= config.version %></title>
+    <%= if config.favicon do %>
+      <link rel="icon" href="<%= favicon_path(config) %>" />
+    <% end %>
     <link rel="stylesheet" href="dist/<%= Assets.css_filename(config.proglang) %>" />
     <%= if config.canonical do %>
       <link rel="canonical" href="<%= config.canonical %>" />

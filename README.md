@@ -12,7 +12,7 @@ ExDoc ships with many features:
   * Responsive design, covering phones and tablets.
   * Support for custom pages, guides, livebooks and cheatsheets.
   * Support for custom grouping of modules, functions, and pages in the sidebar.
-  * Customizable logo.
+  * Customizable logo and favicon.
   * A direct link back to the source code for every documented entity.
   * Full-text search.
   * Keyboard shortcuts. (Press `?` to show help.)

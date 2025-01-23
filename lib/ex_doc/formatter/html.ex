@@ -44,6 +44,7 @@ defmodule ExDoc.Formatter.HTML do
         static_files ++
         generate_sidebar_items(nodes_map, extras, config) ++
         generate_extras(extras, config) ++
+        generate_favicon(@assets_dir, config) ++
         generate_logo(@assets_dir, config) ++
         generate_search(config) ++
         generate_not_found(config) ++
@@ -488,6 +489,17 @@ defmodule ExDoc.Formatter.HTML do
 
   defp filename_to_title(input) do
     input |> Path.basename() |> Path.rootname()
+  end
+
+  @doc """
+  Generates the favicon from config into the given directory.
+  """
+  def generate_favicon(_dir, %{favicon: nil}) do
+    []
+  end
+
+  def generate_favicon(dir, %{output: output, favicon: favicon}) do
+    generate_image(output, dir, favicon, "favicon")
   end
 
   @doc """

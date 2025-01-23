@@ -22,6 +22,7 @@ defmodule ExDoc.CLI do
         switches: [
           canonical: :string,
           config: :string,
+          favicon: :string,
           formatter: [:keep, :string],
           homepage_url: :string,
           language: :string,
@@ -195,6 +196,8 @@ defmodule ExDoc.CLI do
           --canonical           Indicate the preferred URL with rel="canonical" link element
       -c, --config              Give configuration through a file instead of a command line.
                                 See "Custom config" section below for more information.
+          --favicon             Path to a favicon image for the project. Must be PNG, JPEG or SVG. The image
+                                will be placed in the output "assets" directory.
       -f, --formatter           Docs formatter to use (html or epub), default: html and epub
           --homepage-url        URL to link to for the site name
           --language            Identify the primary language of the documents, its value must be
