@@ -15,3 +15,7 @@ export function getSidebarNodes () {
 export function getVersionNodes () {
   return window.versionNodes || []
 }
+
+export function getSearchNodes () {
+  return window.searchNodes || []
+}
