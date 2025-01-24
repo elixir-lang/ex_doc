@@ -41,7 +41,6 @@ const state = {
  */
 
 window.addEventListener('exdoc:loaded', initialize)
-initialize()
 
 function initialize () {
   qsAll(TOOLTIP_ACTIVATORS_SELECTOR).forEach(element => {

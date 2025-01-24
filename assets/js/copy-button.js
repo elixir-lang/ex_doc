@@ -9,7 +9,6 @@ let buttonTemplate
  */
 
 window.addEventListener('exdoc:loaded', initialize)
-initialize()
 
 function initialize () {
   if (!('clipboard' in navigator)) return

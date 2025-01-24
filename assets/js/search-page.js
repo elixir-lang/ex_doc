@@ -21,7 +21,6 @@ lunr.Pipeline.registerFunction(docTrimmerFunction, 'docTrimmer')
  */
 
 window.addEventListener('exdoc:loaded', initialize)
-initialize()
 
 function initialize () {
   const pathname = window.location.pathname

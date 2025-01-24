@@ -27,7 +27,6 @@ const modalTabs = [
  */
 
 window.addEventListener('exdoc:loaded', initialize)
-initialize()
 
 function initialize () {
   qsAll(SETTINGS_LINK_SELECTOR).forEach(element => {

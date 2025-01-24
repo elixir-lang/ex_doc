@@ -7,7 +7,6 @@ const HIGHLIGHT_CLASS = 'hll'
  */
 
 window.addEventListener('exdoc:loaded', initialize)
-initialize()
 
 export function initialize () {
   // Hovering over a delimiter (bracket, parenthesis, do/end)

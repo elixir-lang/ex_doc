@@ -22,7 +22,6 @@ const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-bar .search-close-button'
 
 if (!isEmbedded) {
   window.addEventListener('exdoc:loaded', initialize)
-  initialize()
 }
 
 function initialize () {

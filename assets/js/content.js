@@ -7,7 +7,6 @@ import { settingsStore } from './settings-store'
  */
 
 window.addEventListener('exdoc:loaded', initialize)
-initialize()
 
 function initialize () {
   const notebookPath = window.location.pathname.replace(/(\.html)?$/, '.livemd')

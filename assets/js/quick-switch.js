@@ -75,7 +75,6 @@ const state = {
 
 if (!isEmbedded) {
   window.addEventListener('exdoc:loaded', initialize)
-  initialize()
 }
 
 function initialize () {
