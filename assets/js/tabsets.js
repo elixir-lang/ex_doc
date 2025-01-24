@@ -6,7 +6,7 @@ const TABSET_CLOSE_COMMENT = 'tabs-close'
 const TABPANEL_HEADING_NODENAME = 'H3'
 const TABSET_CONTAINER_CLASS = 'tabset'
 
-window.addEventListener('swup:page:view', initialize)
+window.addEventListener('exdoc:loaded', initialize)
 initialize()
 
 function initialize () {

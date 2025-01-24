@@ -40,7 +40,7 @@ const state = {
  * Initializes tooltips handling.
  */
 
-window.addEventListener('swup:page:view', initialize)
+window.addEventListener('exdoc:loaded', initialize)
 initialize()
 
 function initialize () {

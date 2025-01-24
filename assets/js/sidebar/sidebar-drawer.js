@@ -13,7 +13,7 @@ const smallScreenQuery = window.matchMedia(`screen and (max-width: ${SMALL_SCREE
 if (!isEmbedded) {
   setDefaultSidebarState()
 
-  window.addEventListener('swup:page:view', setDefaultSidebarState)
+  window.addEventListener('exdoc:loaded', setDefaultSidebarState)
 
   const sidebar = document.getElementById('sidebar')
   const sidebarToggle = qs(SIDEBAR_TOGGLE_SELECTOR)

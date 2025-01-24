@@ -3,6 +3,10 @@ import SwupA11yPlugin from '@swup/a11y-plugin'
 import SwupProgressPlugin from '@swup/progress-plugin'
 import { isEmbedded } from './globals'
 
+window.addEventListener('DOMContentLoaded', () => {
+  window.dispatchEvent(new Event('exdoc:loaded'))
+})
+
 if (!isEmbedded && window.location.protocol !== 'file:') {
   new Swup({
     animationSelector: false,
@@ -15,4 +19,9 @@ if (!isEmbedded && window.location.protocol !== 'file:') {
     linkSelector: 'a[href]:not([href^="/"]):not([href^="http"])',
     plugins: [new SwupA11yPlugin(), new SwupProgressPlugin({delay: 500})]
   })
+
+  window.addEventListener('swup:page:view', () => {
+    window.dispatchEvent(new Event('exdoc:loaded'));
+  })
 }
+

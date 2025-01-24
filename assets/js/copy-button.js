@@ -8,7 +8,7 @@ let buttonTemplate
  * Initializes copy buttons.
  */
 
-window.addEventListener('swup:page:view', initialize)
+window.addEventListener('exdoc:loaded', initialize)
 initialize()
 
 function initialize () {

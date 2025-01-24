@@ -6,7 +6,7 @@ const HIGHLIGHT_CLASS = 'hll'
  * Sets up dynamic behaviour for code blocks processed with *makeup*.
  */
 
-window.addEventListener('swup:page:view', initialize)
+window.addEventListener('exdoc:loaded', initialize)
 initialize()
 
 export function initialize () {

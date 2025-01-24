@@ -89,7 +89,7 @@ export function initialize () {
   })
 
   window.addEventListener('hashchange', markCurrentHashInSidebar)
-  window.addEventListener('swup:page:view', markCurrentHashInSidebar)
+  window.addEventListener('exdoc:loaded', markCurrentHashInSidebar)
 
   markCurrentHashInSidebar()
   // Triggers layout, defer.

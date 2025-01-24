@@ -6,7 +6,7 @@ import { settingsStore } from './settings-store'
  * corresponding to the current documentation page.
  */
 
-window.addEventListener('swup:page:view', initialize)
+window.addEventListener('exdoc:loaded', initialize)
 initialize()
 
 function initialize () {

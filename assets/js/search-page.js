@@ -20,7 +20,7 @@ lunr.Pipeline.registerFunction(docTrimmerFunction, 'docTrimmer')
  * Activates only on the `/search.html` page.
  */
 
-window.addEventListener('swup:page:view', initialize)
+window.addEventListener('exdoc:loaded', initialize)
 initialize()
 
 function initialize () {
