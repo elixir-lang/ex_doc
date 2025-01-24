@@ -16,6 +16,7 @@ defmodule ExDoc.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env()),
       source_url: @source_url,
       test_elixirc_options: [docs: true, debug_info: true],
+      test_ignore_filters: [&String.starts_with?(&1, "test/fixtures/")],
       name: "ExDoc",
       description: "ExDoc is a documentation generation tool for Elixir",
       docs: docs()
