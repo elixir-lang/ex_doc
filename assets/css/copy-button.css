@@ -20,7 +20,6 @@ pre .copy-button:focus {
   border: 1px solid var(--codeBorder);
   cursor: pointer;
   transition: var(--transition-all);
-  font-family: var(--defaultFontFamily);
   font-size: var(--text-sm);
   line-height: 24px;
   color: currentColor;
