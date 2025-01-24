@@ -51,6 +51,7 @@ defmodule Mix.Tasks.Docs do
           homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
           docs: [
             main: "MyApp", # The main page in the docs
+            favicon: "path/to/favicon.png",
             logo: "path/to/logo.png",
             extras: ["README.md"]
           ]
@@ -115,6 +116,11 @@ defmodule Mix.Tasks.Docs do
       generated filename, title and source file, and search content of each extra page; default: `[]`. Example:
       `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing", source: "CONTRIBUTING.mdx"]]`
       See the Customizing Extras section for more.
+
+    * `:favicon` - Path to a favicon image file for the project. Must be PNG, JPEG or SVG. When
+      specified, the image file will be placed in the output "assets" directory, named
+      "favicon.EXTENSION". If using SVG, ensure appropriate width, height and viewBox attributes
+      are present in order to ensure predictable sizing and cropping.
 
     * `:filter_modules` - Include only modules that match the given value. The
       value can be a regex, a string (representing a regex), or a two-arity

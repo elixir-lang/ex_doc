@@ -196,6 +196,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ExDoc.GroupMatcher.group_by(module_node.docs_groups, module_node.docs, & &1.group)
   end
 
+  defp favicon_path(%{favicon: nil}), do: nil
+  defp favicon_path(%{favicon: favicon}), do: "assets/favicon#{Path.extname(favicon)}"
+
   defp logo_path(%{logo: nil}), do: nil
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
 

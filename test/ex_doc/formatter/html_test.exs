@@ -347,6 +347,23 @@ defmodule ExDoc.Formatter.HTMLTest do
              Enum.group_by(modules, &Map.get(&1, "group"))
   end
 
+  describe "generates favicon" do
+    test "overriding previous entries", %{tmp_dir: tmp_dir} = context do
+      File.mkdir_p!(tmp_dir <> "/html/assets")
+      File.touch!(tmp_dir <> "/html/assets/favicon.png")
+      generate_docs(doc_config(context, favicon: "test/fixtures/elixir.png"))
+      assert File.read!(tmp_dir <> "/html/assets/favicon.png") != ""
+    end
+
+    test "fails when favicon is not an allowed format", context do
+      config = doc_config(context, favicon: "README.md")
+
+      assert_raise ArgumentError,
+                   "image format not recognized, allowed formats are: .png, .jpg, .svg",
+                   fn -> generate_docs(config) end
+    end
+  end
+
   describe "generates logo" do
     test "overriding previous entries", %{tmp_dir: tmp_dir} = context do
       File.mkdir_p!(tmp_dir <> "/html/assets")
