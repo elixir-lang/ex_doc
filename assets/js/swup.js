@@ -21,7 +21,6 @@ if (!isEmbedded && window.location.protocol !== 'file:') {
   })
 
   window.addEventListener('swup:page:view', () => {
-    window.dispatchEvent(new Event('exdoc:loaded'));
+    window.dispatchEvent(new Event('exdoc:loaded'))
   })
 }
-
