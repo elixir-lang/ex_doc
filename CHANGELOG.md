@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.37.0-rc.0
+
+  * Enhancements
+    * Considerably improve page loading times in the browser
+    * Allow customizing `search_data` for extra pages
+    * Use native style for scroll bars
+    * Enhance navigation between extra pages with padding and hover effects
+    * Go to latest goes to the same page if it exists, root otherwise
+    * Apply new style and layout for tabs
+    * Increase font-weight on sidebar on Apple machines/devices
+    * Improve accessibility across deprecation, links, and summaries
+    * Add compatibility to Erlang/OTP 28+
+    * Rely on the operating system monospace font for unified experience and better load times
+    * Introduce `"exdoc:loaded"` window event to track navigation
+
+  * Bug fixes
+    * Move action links out from heading tags
+
 ## v0.36.1 (2024-12-24)
 
   * Enhancements
