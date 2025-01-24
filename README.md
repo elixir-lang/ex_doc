@@ -370,6 +370,8 @@ docs: [
 ]
 ```
 
+On the JavaScript side, ExDoc emits the "exdoc:loaded" event. This event may be called multiple times, as you navigate across pages, so initialization that should happen only once must be conditional. We recommend external scripts to use `def`, not async, as shown in the examples below.
+
 ### Rendering Math
 
 If you write TeX-style math in your Markdown, such as `$\sum_{i}^{N} x_i$`, it ends up as raw text on the generated pages. To render expressions, we recommend using [KaTeX](https://katex.org/), a JavaScript library that turns expressions into graphics. To load and trigger KaTeX on every documentation page, we can insert the following HTML:
