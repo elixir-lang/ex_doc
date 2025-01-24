@@ -370,7 +370,7 @@ docs: [
 ]
 ```
 
-On the JavaScript side, ExDoc emits the "exdoc:loaded" event. This event may be called multiple times, as you navigate across pages, so initialization that should happen only once must be conditional. We recommend external scripts to use `def`, not async, as shown in the examples below.
+On the JavaScript side, ExDoc emits the `"exdoc:loaded"` event. This event may be called multiple times, as you navigate across pages, so initialization that should happen only once must be conditional. We recommend external scripts to use `defer`, not `async`, as shown in the examples below.
 
 ### Rendering Math
 
