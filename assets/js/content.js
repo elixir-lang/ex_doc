@@ -6,8 +6,7 @@ import { settingsStore } from './settings-store'
  * corresponding to the current documentation page.
  */
 
-window.addEventListener('swup:page:view', initialize)
-initialize()
+window.addEventListener('exdoc:loaded', initialize)
 
 function initialize () {
   const notebookPath = window.location.pathname.replace(/(\.html)?$/, '.livemd')

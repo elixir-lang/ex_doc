@@ -74,8 +74,7 @@ const state = {
  */
 
 if (!isEmbedded) {
-  window.addEventListener('swup:page:view', initialize)
-  initialize()
+  window.addEventListener('exdoc:loaded', initialize)
 }
 
 function initialize () {

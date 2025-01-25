@@ -6,8 +6,7 @@ const HIGHLIGHT_CLASS = 'hll'
  * Sets up dynamic behaviour for code blocks processed with *makeup*.
  */
 
-window.addEventListener('swup:page:view', initialize)
-initialize()
+window.addEventListener('exdoc:loaded', initialize)
 
 export function initialize () {
   // Hovering over a delimiter (bracket, parenthesis, do/end)

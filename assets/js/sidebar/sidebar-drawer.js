@@ -11,9 +11,7 @@ const SIDEBAR_TOGGLE_SELECTOR = '.sidebar-toggle'
 const smallScreenQuery = window.matchMedia(`screen and (max-width: ${SMALL_SCREEN_BREAKPOINT}px)`)
 
 if (!isEmbedded) {
-  setDefaultSidebarState()
-
-  window.addEventListener('swup:page:view', setDefaultSidebarState)
+  window.addEventListener('exdoc:loaded', setDefaultSidebarState)
 
   const sidebar = document.getElementById('sidebar')
   const sidebarToggle = qs(SIDEBAR_TOGGLE_SELECTOR)
@@ -49,6 +47,7 @@ if (!isEmbedded) {
     sessionStorage.setItem(SIDEBAR_WIDTH_KEY, width)
     document.body.style.setProperty('--sidebarWidth', `${width}px`)
   })
+
   // We observe on mousedown because we only care about user resize.
   sidebar.addEventListener('mousedown', () => resizeObserver.observe(sidebar))
   sidebar.addEventListener('mouseup', () => resizeObserver.unobserve(sidebar))

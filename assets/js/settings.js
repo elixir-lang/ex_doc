@@ -26,8 +26,7 @@ const modalTabs = [
  * Sets up the settings modal.
  */
 
-window.addEventListener('swup:page:view', initialize)
-initialize()
+window.addEventListener('exdoc:loaded', initialize)
 
 function initialize () {
   qsAll(SETTINGS_LINK_SELECTOR).forEach(element => {
