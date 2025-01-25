@@ -11,8 +11,6 @@ const SIDEBAR_TOGGLE_SELECTOR = '.sidebar-toggle'
 const smallScreenQuery = window.matchMedia(`screen and (max-width: ${SMALL_SCREEN_BREAKPOINT}px)`)
 
 if (!isEmbedded) {
-  setDefaultSidebarState()
-
   window.addEventListener('exdoc:loaded', setDefaultSidebarState)
 
   const sidebar = document.getElementById('sidebar')

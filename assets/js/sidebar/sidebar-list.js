@@ -91,7 +91,6 @@ export function initialize () {
   window.addEventListener('hashchange', markCurrentHashInSidebar)
   window.addEventListener('exdoc:loaded', markCurrentHashInSidebar)
 
-  markCurrentHashInSidebar()
   // Triggers layout, defer.
   requestAnimationFrame(scrollNodeListToCurrentCategory)
 }
