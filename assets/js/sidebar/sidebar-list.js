@@ -89,7 +89,11 @@ export function initialize () {
   })
 
   window.addEventListener('hashchange', markCurrentHashInSidebar)
-  window.addEventListener('exdoc:loaded', markCurrentHashInSidebar)
+
+  // We listen to swup:page:view event because we need to trigger
+  // markCurrentHashInSidebar() before scollNodeListToCurrentCategory.
+  window.addEventListener('swup:page:view', markCurrentHashInSidebar)
+  markCurrentHashInSidebar()
 
   // Triggers layout, defer.
   requestAnimationFrame(scrollNodeListToCurrentCategory)

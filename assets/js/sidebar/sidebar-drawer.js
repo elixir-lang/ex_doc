@@ -47,6 +47,7 @@ if (!isEmbedded) {
     sessionStorage.setItem(SIDEBAR_WIDTH_KEY, width)
     document.body.style.setProperty('--sidebarWidth', `${width}px`)
   })
+
   // We observe on mousedown because we only care about user resize.
   sidebar.addEventListener('mousedown', () => resizeObserver.observe(sidebar))
   sidebar.addEventListener('mouseup', () => resizeObserver.unobserve(sidebar))
