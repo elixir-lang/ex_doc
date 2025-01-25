@@ -1,6 +1,8 @@
 # Changelog
 
-## v0.37.0-rc.0
+## v0.37.0-rc.0 (2025-01-25)
+
+Thank you to @liamcmitchell and @hichemfantar for the extensive contributions in this new release.
 
   * Enhancements
     * Considerably improve page loading times in the browser
