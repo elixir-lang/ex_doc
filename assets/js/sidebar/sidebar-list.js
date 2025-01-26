@@ -1,6 +1,8 @@
 import { el, getCurrentPageSidebarType, qs, qsAll } from '../helpers'
 import { getSidebarNodes } from '../globals'
 
+// Sidebar list is only rendered when needed.
+// Mobile users may never see the sidebar.
 let init = false
 export function initialize () {
   if (init) return
@@ -88,15 +90,15 @@ export function initialize () {
     }))
   })
 
-  window.addEventListener('hashchange', markCurrentHashInSidebar)
-
-  // We listen to swup:page:view event because we need to trigger
-  // markCurrentHashInSidebar() before scollNodeListToCurrentCategory.
-  window.addEventListener('swup:page:view', markCurrentHashInSidebar)
+  // Update new sidebar list with current hash.
   markCurrentHashInSidebar()
 
   // Triggers layout, defer.
   requestAnimationFrame(scrollNodeListToCurrentCategory)
+
+  // Keep updated with future changes.
+  window.addEventListener('hashchange', markCurrentHashInSidebar)
+  window.addEventListener('exdoc:loaded', markCurrentHashInSidebar)
 }
 
 /**

@@ -3,9 +3,14 @@ import SwupA11yPlugin from '@swup/a11y-plugin'
 import SwupProgressPlugin from '@swup/progress-plugin'
 import { isEmbedded } from './globals'
 
-window.addEventListener('DOMContentLoaded', () => {
+// Emit exdoc:loaded each time content loads:
+// - on initial page load (DOMContentLoaded)
+// - on subsequent SWUP page loads (page:view)
+const emitExdocLoaded = () => {
   window.dispatchEvent(new Event('exdoc:loaded'))
-})
+}
+
+window.addEventListener('DOMContentLoaded', emitExdocLoaded)
 
 if (!isEmbedded && window.location.protocol !== 'file:') {
   new Swup({
@@ -17,10 +22,9 @@ if (!isEmbedded && window.location.protocol !== 'file:') {
             path === window.location.pathname + '.html'
     },
     linkSelector: 'a[href]:not([href^="/"]):not([href^="http"])',
+    hooks: {
+      'page:view': emitExdocLoaded
+    },
     plugins: [new SwupA11yPlugin(), new SwupProgressPlugin({delay: 500})]
-  })
-
-  window.addEventListener('swup:page:view', () => {
-    window.dispatchEvent(new Event('exdoc:loaded'))
   })
 }
