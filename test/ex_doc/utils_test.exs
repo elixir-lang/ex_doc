@@ -83,11 +83,6 @@ defmodule ExDoc.UtilsTest do
     assert string |> Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(string)
   end
 
-  test "source_url_pattern" do
-    assert Utils.source_url_pattern("/%{path}-%{line}", "lib/foo", 13) == "/lib/foo-13"
-    assert Utils.source_url_pattern(&"/#{&1}:#{&2}", "lib/foo", 13) == "/lib/foo:13"
-  end
-
   test "strip_tags" do
     assert Utils.strip_tags("<em>Hello</em> World!<br/>") == "Hello World!"
     assert Utils.strip_tags("Go <a href=\"#top\" class='small' disabled>back</a>") == "Go back"

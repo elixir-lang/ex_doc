@@ -430,7 +430,7 @@ defmodule ExDoc.Formatter.HTML do
     title = input_options[:title] || title_text || filename_to_title(input)
 
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
-    source_url = Utils.source_url_pattern(source_url_pattern, source_path, 1)
+    source_url = source_url_pattern.(source_path, 1)
 
     search_data = normalize_search_data!(input_options[:search_data])
 

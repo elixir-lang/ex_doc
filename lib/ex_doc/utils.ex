@@ -221,23 +221,4 @@ defmodule ExDoc.Utils do
     do: to_json_string(rest, <<acc::binary, x>>)
 
   defp to_json_string(<<>>, acc), do: <<acc::binary, "\"">>
-
-  @doc """
-  Generates a url based on the given pattern.
-  """
-  def source_url_pattern(source_url_pattern, path, line)
-      when is_binary(path) and is_integer(line) do
-    cond do
-      is_function(source_url_pattern) ->
-        source_url_pattern.(path, line)
-
-      source_url_pattern ->
-        source_url_pattern
-        |> String.replace("%{path}", path)
-        |> String.replace("%{line}", Integer.to_string(line))
-
-      true ->
-        nil
-    end
-  end
 end

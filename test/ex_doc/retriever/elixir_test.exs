@@ -125,7 +125,10 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
+      config = %ExDoc.Config{
+        source_url_pattern: fn path, line -> "#{path}:#{line}" end
+      }
+
       {[mod], []} = Retriever.docs_from_modules([Mod], config)
       assert mod.type == :behaviour
 

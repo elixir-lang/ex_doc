@@ -18,7 +18,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     default = %ExDoc.Config{
       project: "Elixir",
       version: "1.0.1",
-      source_url_pattern: "#{source_url()}/blob/master/%{path}#L%{line}",
+      source_url_pattern: fn path, line -> "#{source_url()}/blob/master/#{path}#L#{line}" end,
       homepage_url: homepage_url(),
       source_url: source_url(),
       output: context.tmp_dir <> "/html_templates"

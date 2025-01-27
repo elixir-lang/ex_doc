@@ -11,6 +11,7 @@ defmodule ExDoc.Config do
   def annotations_for_docs(_), do: []
   def skip_undefined_reference_warnings_on(_string), do: false
   def skip_code_autolink_to(_string), do: false
+  def source_url_pattern(_, _), do: nil
 
   defstruct annotations_for_docs: &__MODULE__.annotations_for_docs/1,
             api_reference: true,
@@ -50,7 +51,7 @@ defmodule ExDoc.Config do
             source_beam: nil,
             source_ref: @default_source_ref,
             source_url: nil,
-            source_url_pattern: nil,
+            source_url_pattern: &__MODULE__.source_url_pattern/2,
             title: nil,
             version: nil,
             warnings_as_errors: false
@@ -92,13 +93,12 @@ defmodule ExDoc.Config do
           source_beam: nil | String.t(),
           source_ref: nil | String.t(),
           source_url: nil | String.t(),
-          source_url_pattern: nil | String.t(),
+          source_url_pattern: (String.t(), integer() -> String.t() | nil),
           title: nil | String.t(),
           version: nil | String.t(),
           warnings_as_errors: boolean()
         }
 
-  @spec build(String.t(), String.t(), Keyword.t()) :: ExDoc.Config.t()
   def build(project, vsn, options) do
     {output, options} = Keyword.pop(options, :output, "./doc")
     {nest_modules_by_prefix, options} = Keyword.pop(options, :nest_modules_by_prefix, [])
@@ -150,7 +150,7 @@ defmodule ExDoc.Config do
       skip_undefined_reference_warnings_on:
         normalize_skip_list_function(skip_undefined_reference_warnings_on),
       skip_code_autolink_to: normalize_skip_list_function(skip_code_autolink_to),
-      source_url_pattern: source_url_pattern,
+      source_url_pattern: normalize_source_url_pattern(source_url_pattern),
       version: vsn
     }
 
@@ -204,6 +204,46 @@ defmodule ExDoc.Config do
 
   defp normalize_skip_list_function(fun) when is_function(fun, 1),
     do: fun
+
+  defp normalize_source_url_pattern(function) when is_function(function, 2), do: function
+  defp normalize_source_url_pattern(nil), do: &source_url_pattern/2
+
+  defp normalize_source_url_pattern(binary) when is_binary(binary) do
+    case :binary.split(binary, "%{path}") do
+      [left, right] ->
+        case :binary.split(left, "%{line}") do
+          [line_left, line_right] ->
+            fn path, line ->
+              line_left <> Integer.to_string(line) <> line_right <> path <> right
+            end
+
+          [_] ->
+            case :binary.split(right, "%{line}") do
+              [line_left, line_right] ->
+                fn path, line ->
+                  left <> path <> line_left <> Integer.to_string(line) <> line_right
+                end
+
+              [_] ->
+                fn path, _ -> left <> path <> right end
+            end
+        end
+
+      [_] ->
+        case :binary.split(binary, "%{line}") do
+          [left, right] ->
+            fn _, line -> left <> Integer.to_string(line) <> right end
+
+          [_] ->
+            fn _, _ -> binary end
+        end
+    end
+  end
+
+  defp normalize_source_url_pattern(other) do
+    raise ArgumentError,
+          ":source_url_pattern must be a string, a two-arity function or nil, got: #{inspect(other)}"
+  end
 
   defp guess_url(url, ref) do
     with {:ok, host_with_path} <- http_or_https(url),
