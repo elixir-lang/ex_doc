@@ -53,7 +53,7 @@ defmodule ExDoc.Mixfile do
 
   defp aliases do
     [
-      build: ["cmd --cd assets npm run build", "compile --force", "docs", &add_docs_config_js/1],
+      build: ["cmd --cd assets npm run build", "compile --force", &docs/1],
       clean: [&clean_test_fixtures/1, "clean"],
       fix: ["format", "cmd --cd assets npm run lint:fix"],
       lint: ["format --check-formatted", "cmd --cd assets npm run lint"],
@@ -109,7 +109,8 @@ defmodule ExDoc.Mixfile do
     ]
   end
 
-  defp add_docs_config_js(_args) do
+  defp docs(args) do
+    Mix.Task.run("docs", args)
     {text_tags, 0} = System.cmd("git", ["tag"])
 
     [latest | _] =
