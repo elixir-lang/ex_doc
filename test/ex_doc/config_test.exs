@@ -6,9 +6,6 @@ defmodule ExDoc.ConfigTest do
 
   defp build(opts) do
     ExDoc.Config.build(@project, @version, opts)
-    ExDoc.Config.build(@project, @version, opts)
-    ExDoc.Config.build(@project, @version, opts)
-    ExDoc.Config.build(@project, @version, opts)
   end
 
   test "normalizes output" do
