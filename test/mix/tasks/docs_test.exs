@@ -7,8 +7,6 @@ defmodule Mix.Tasks.DocsTest do
 
   import ExUnit.CaptureIO
 
-  alias ExDoc.Utils
-
   @moduletag :tmp_dir
 
   def run(context, args, opts, generator \\ &{&1, &2, &3}) do
@@ -404,8 +402,6 @@ defmodule Mix.Tasks.DocsTest do
     end)
   end
 
-  # TODO:
-  @tag :skip
   test "accepts warnings_as_errors in :warnings_as_errors", context do
     assert [
              {"ex_doc", "dev",
@@ -429,43 +425,5 @@ defmodule Mix.Tasks.DocsTest do
                 proglang: :elixir
               ]}
            ] = run(context, [], app: :ex_doc, docs: [warnings_as_errors: false])
-  end
-
-  # TODO:
-  @tag :skip
-  @tag :tmp_dir
-  test "exits with 1 due to warnings, with flag --warnings_as_errors", context do
-    Utils.unset_warned()
-
-    Mix.Project.in_project(:single, "test/fixtures/single", fn _mod ->
-      source_beam = "_build/test/lib/single/ebin"
-
-      fun = fn ->
-        run_with_io(
-          context,
-          [],
-          [
-            app: :single,
-            docs: [
-              source_beam: source_beam,
-              warnings_as_errors: true,
-              formatter: "html",
-              deps: []
-            ],
-            version: "0.1.0"
-          ],
-          &ExDoc.generate_docs/3
-        )
-      end
-
-      io =
-        capture_io(:stderr, fn ->
-          assert catch_exit(fun.()) == {:shutdown, 1}
-        end)
-
-      assert io =~
-               "Documents have been generated, but generation for html format failed due to warnings " <>
-                 "while using the --warnings-as-errors option."
-    end)
   end
 end

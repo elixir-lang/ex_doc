@@ -268,13 +268,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert mod.title == "MyException"
       assert mod.type == :exception
 
-      # TODO: this is because `%ExDoc.Config{}.groups_for_modules == []`.
-      #
-      # We build the default groups (Exceptions, Deprecated) in lib/ex_doc.ex,
-      # maybe we should do that in the retriever instead?
-      #
-      # Remember Exceptions is an Elixir specific thing so the default should
-      # probably be language specific.
+      # TODO: this is because `%ExDoc.Config{}.groups_for_modules == []`
       refute mod.group
     end
 

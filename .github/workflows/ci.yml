@@ -76,7 +76,7 @@ jobs:
       matrix:
         include:
           # Test very old Elixir and Erlang
-          - elixir: "1.14"
+          - elixir: "1.15"
             otp: "25"
           # Test Erlang without -doc attribute support
           - elixir: "1.16"
