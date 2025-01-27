@@ -34,6 +34,17 @@
 .content-inner .heading-with-actions.top-heading .icon-action {
   font-size: 1.2rem;
 }
+/* When content is wide enough, ensure action icon is to the right of, not below, heading */
+@container content (width > 600px) {
+  .content-inner .heading-with-actions.top-heading {
+    flex-wrap: nowrap;
+    gap: 32px;
+    align-items: flex-start;
+    .icon-action {
+      padding-top: 1.7rem; /* vertically align with x-height of first line of heading */
+    }
+  }
+}
 
 .content-inner .top-heading {
   padding-top: 1rem;

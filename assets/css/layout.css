@@ -59,6 +59,7 @@ body {
 }
 
 .content .content-inner {
+  container: content / inline-size;
   max-width: var(--content-width);
   min-height: 100%;
   margin: 0 auto;
