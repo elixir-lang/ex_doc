@@ -25,12 +25,12 @@
 }
 .content-inner .bottom-actions .bottom-actions-button .subheader {
   font-size: .8em;
-  color: var(--bottomActionsBtnSubheader);
+  color: var(--textHeaders);
   white-space: nowrap;
 }
 
 .content-inner .bottom-actions .bottom-actions-button .title {
-  color: var(--textHeaders);
+  color: var(--bottomActionsBtnTitle);
 }
 
 .content-inner .bottom-actions .bottom-actions-button[rel="prev"] {
