@@ -30,7 +30,7 @@
 }
 
 .content-inner .bottom-actions .bottom-actions-button .title {
-  color: var(--mainLightest);
+  color: var(--bottomActionsBtnTitle);
 }
 
 .content-inner .bottom-actions .bottom-actions-button[rel="prev"] {

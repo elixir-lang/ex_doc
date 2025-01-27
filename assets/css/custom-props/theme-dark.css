@@ -51,6 +51,7 @@ body.dark {
   --tabShadow:                   var(--black);
 
   --bottomActionsBtnBorder:      var(--white-opacity-10);
+  --bottomActionsBtnTitle:       var(--mainLightest);
 
   --modalBackground:             var(--gray800);
 
