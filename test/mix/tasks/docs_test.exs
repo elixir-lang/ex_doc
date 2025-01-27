@@ -7,8 +7,6 @@ defmodule Mix.Tasks.DocsTest do
 
   import ExUnit.CaptureIO
 
-  alias ExDoc.Utils
-
   @moduletag :tmp_dir
 
   def run(context, args, opts, generator \\ &{&1, &2, &3}) do
