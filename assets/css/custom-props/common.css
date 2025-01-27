@@ -2,7 +2,8 @@
   /* Layout & Whitespace */
   --content-width: 949px;
   --content-gutter: 60px;
-  --borderRadius: 8px;
+  --borderRadiusOuter: 12px;
+  --borderRadiusInner: 3px;
   --navTabBorderWidth: 2px;
 
   /* Font Families */
@@ -58,7 +59,7 @@
   --text-base: 1rem; /* 16px */
   --text-lg: 1.125rem; /* 18px */
   --text-xl: 1.25rem; /* 20px */
-  
+
   --transition-duration: 150ms;
   --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 
