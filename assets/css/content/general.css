@@ -41,7 +41,7 @@
     gap: 32px;
     align-items: flex-start;
     .icon-action {
-      padding-top: 1.7rem; /* vertically aligned with first line of heading x-height */
+      padding-top: 1.7rem; /* vertically align with x-height of first line of heading */
     }
   }
 }
