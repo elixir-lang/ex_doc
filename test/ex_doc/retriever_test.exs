@@ -268,10 +268,14 @@ defmodule ExDoc.RetrieverTest do
       refute mod.nested_title
     end
 
+    @tag :capture_log
     test "fails when module is not available" do
-      assert_raise Retriever.Error, "module NotAvailable is not defined/available", fn ->
-        Retriever.docs_from_modules([NotAvailable], %ExDoc.Config{})
-      end
+      spawn_monitor(fn -> Retriever.docs_from_modules([NotAvailable], %ExDoc.Config{}) end)
+
+      assert_receive {:DOWN, _, _, _,
+                      {%ExDoc.Retriever.Error{
+                         message: "module NotAvailable is not defined/available"
+                       }, _}}
     end
   end
 

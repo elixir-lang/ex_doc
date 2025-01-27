@@ -50,8 +50,10 @@ defmodule ExDoc.Retriever do
   end
 
   defp docs_from_modules(modules, acc, config) do
-    Enum.reduce(modules, acc, fn module_name, {modules, filtered} = acc ->
-      case get_module(module_name, config) do
+    modules
+    |> Task.async_stream(&get_module(&1, config), timeout: :infinity)
+    |> Enum.reduce(acc, fn {:ok, result}, {modules, filtered} = acc ->
+      case result do
         {:error, _module} ->
           acc
 
