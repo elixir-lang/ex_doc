@@ -275,7 +275,8 @@ defmodule ExDoc.RetrieverTest do
       assert_receive {:DOWN, _, _, _,
                       {%ExDoc.Retriever.Error{
                          message: "module NotAvailable is not defined/available"
-                       }, _}}
+                       }, _}},
+                     1000
     end
   end
 
