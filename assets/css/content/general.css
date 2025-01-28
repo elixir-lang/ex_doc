@@ -38,8 +38,11 @@
 @container content (width > 600px) {
   .content-inner .heading-with-actions.top-heading {
     flex-wrap: nowrap;
-    gap: 32px;
     align-items: flex-start;
+
+    & h1 {
+      padding-right: 32px; /* ensures space between heading text and icon(s) */
+    }
 
     & .icon-action {
       padding-top: 1.7rem; /* vertically align with x-height of first line of heading */
