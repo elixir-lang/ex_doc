@@ -75,7 +75,7 @@
 }
 
 .top-search .search-bar .search-close-button {
-  font-size: var(--text-base);
+  font-size: var(--text-md);
   color: var(--searchAccentMain);
   background-color: transparent;
   border: none;

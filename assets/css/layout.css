@@ -11,7 +11,7 @@ body {
   --sidebarTransitionDuration: 0.3s;
   background-color: var(--background);
   color: var(--textBody);
-  font-size: var(--text-base);
+  font-size: var(--text-md);
   line-height: 1.6875em;
 }
 

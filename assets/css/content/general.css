@@ -120,7 +120,6 @@
 
 .content-inner .note {
   color: var(--iconAction);
-  margin-right: 5px;
   font-size: var(--text-sm);
   font-weight: normal;
 }
@@ -241,7 +240,7 @@
   font-style: normal;
   line-height: 24px;
   font-weight: 400;
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 @media screen and (max-width: 768px) {
