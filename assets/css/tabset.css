@@ -70,3 +70,36 @@
     border-right-width: 0;
   }
 }
+
+/* tabpanel content: top margin of first and bottom margin of last */
+@media screen and (max-width: 768px) {
+  .tabset-panel > :is(:first-child) {
+    &:is(table) {
+      margin: .5em 0;
+    }
+  }
+}
+@media screen and (min-width: 769px) {
+  .tabset-panel > :is(:first-child) {
+    &:is(blockquote, .admonition) {
+      margin-top: 1.5em;
+    }
+    &:is(p:has(img)) {
+      margin-top: 1.25em;
+    }
+    &:is(table) {
+      margin-top: .75em;
+    }
+  }
+  .tabset-panel > :is(:last-child) {
+    &:is(blockquote, .admonition) {
+      margin-bottom: 1.5em;
+    }
+    &:is(p:not(:has(img)), ul, ol) {
+      margin-bottom: 1.25em;
+    }
+    &:is(table) {
+      margin-bottom: .75em;
+    }
+  }
+}
