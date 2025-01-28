@@ -14,7 +14,7 @@
   background-color: var(--settingsInputBackground);
   color: var(--settingsInput);
   border: 1px solid var(--settingsInputBorder);
-  border-radius: var(--borderRadiusMiddle);
+  border-radius: var(--borderRadius-base);
   transition: var(--transition-all);
 }
 #settings-modal-content .input:focus {

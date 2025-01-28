@@ -29,7 +29,7 @@ as it has absolute positioning, so doesn't impact the layout and click events pa
 
 .tooltip .tooltip-body {
   border: 1px solid var(--codeBorder);
-  border-radius: var(--borderRadiusInner);
+  border-radius: var(--borderRadius-sm);
   overflow: auto;
 }
 

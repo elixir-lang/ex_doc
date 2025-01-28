@@ -121,7 +121,7 @@
   padding: 0 1.2rem;
   overflow: auto;
   background-color: var(--blockquoteBackground);
-  border-radius: var(--borderRadiusMiddle);
+  border-radius: var(--borderRadius-base);
 }
 .content-inner blockquote p:last-child, .content-inner section.admonition p:last-child  {
   padding-bottom: 1em;
