@@ -70,3 +70,9 @@
     border-right-width: 0;
   }
 }
+
+@media screen and (min-width: 769px) {
+  .tabset-panel > *:last-child:not(pre) {
+    margin-bottom: 1.25em;
+  }
+}
