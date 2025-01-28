@@ -81,8 +81,10 @@ jobs:
           # Test Erlang without -doc attribute support
           - elixir: "1.16"
             otp: "26"
-          # Test Erlang with -doc attribute support
+          # Test with initial Erlang doc attribute support
           - elixir: "1.17"
+            otp: "27"
+          - elixir: "1.18"
             otp: "27"
             lint: true
     steps:
