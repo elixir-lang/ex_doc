@@ -17,7 +17,7 @@
 
 .search-bar {
   border: 1px solid var(--searchBarBorder);
-  border-radius: var(--borderRadiusOuter);
+  border-radius: var(--borderRadiusMiddle);
   height: 48px;
   position: relative;
   width: 100%;
@@ -26,7 +26,7 @@
 .top-search .search-bar .search-input {
   background-color: var(--searchSearch);
   border: 1px solid transparent;
-  border-radius: var(--borderRadiusOuter);
+  border-radius: var(--borderRadiusMiddle);
   color: var(--searchAccentMain);
   position: relative;
   height: 46px;
@@ -42,7 +42,7 @@
 
 .top-search .search-bar .search-input:focus {
   border: 1px solid var(--searchBarFocusColor);
-  border-radius: 7px;
+  border-radius: calc(var(--borderRadiusMiddle) - 1px);
   position: relative;
   box-shadow: 0px 4px 20px 0px var(--searchBarBorderColor) inset;
 }

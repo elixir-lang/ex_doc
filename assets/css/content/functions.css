@@ -105,6 +105,6 @@
   display: block;
   padding: 1em;
   background-color: var(--fnDeprecated);
-  border-radius: var(--borderRadiusOuter);
+  border-radius: var(--borderRadiusInner);
   margin: var(--baseLineHeight) 0;
 }
