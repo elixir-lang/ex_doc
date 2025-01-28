@@ -20,7 +20,6 @@
   padding: 0.5em 0.85em 0.5em 1em;
   background-color: var(--textDetailBackground);
   border-left: 3px solid var(--textDetailAccent);
-  border-radius: var(--borderRadiusInner);
   font-size: 1em;
   font-family: var(--monoFontFamily);
   position: relative;
