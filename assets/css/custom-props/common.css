@@ -2,7 +2,9 @@
   /* Layout & Whitespace */
   --content-width: 949px;
   --content-gutter: 60px;
-  --borderRadius: 8px;
+  --borderRadius-lg: 14px;
+  --borderRadius-base: 8px;
+  --borderRadius-sm: 3px;
   --navTabBorderWidth: 2px;
 
   /* Font Families */

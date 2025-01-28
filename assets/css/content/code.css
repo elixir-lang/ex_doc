@@ -19,14 +19,14 @@
 .content-inner code {
   background-color: var(--codeBackground);
   vertical-align: baseline;
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-sm);
   padding: .1em .2em;
   border: 1px solid var(--codeBorder);
   text-transform: none;
 }
 
 .content-inner code.inline {
-  border-radius: 4px;
+  border-radius: var(--borderRadius-sm);
   word-wrap: break-word;
 }
 

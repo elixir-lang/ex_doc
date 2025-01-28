@@ -4,7 +4,7 @@
   margin: var(--baseLineHeight) 0;
   border: var(--borderWidth) solid var(--tabBorder);
   padding: 0 var(--tabsetPadding);
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-lg);
 }
 
 .tabset-tablist {
