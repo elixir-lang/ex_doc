@@ -72,7 +72,26 @@
 }
 
 @media screen and (min-width: 769px) {
-  .tabset-panel > *:last-child:not(pre) {
-    margin-bottom: 1.25em;
+  .tabset-panel > :is(:first-child) {
+    &:is(blockquote, .admonition) {
+      margin-top: 1.5em;
+    }
+    &:is(p:has(img)) {
+      margin-top: 1.25em;
+    }
+    &:is(table) {
+      margin-top: .75em;
+    }
+  }
+  .tabset-panel > :is(:last-child) {
+    &:is(blockquote, .admonition) {
+      margin-bottom: 1.5em;
+    }
+    &:is(p:not(:has(img)), ul, ol) {
+      margin-bottom: 1.25em;
+    }
+    &:is(table) {
+      margin-bottom: .75em;
+    }
   }
 }
