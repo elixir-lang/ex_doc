@@ -371,12 +371,12 @@ defmodule Mix.Tasks.Docs do
 
   ## Customizing Extras
 
-    * `:title` - The title of the extra page. If not provided, the title will be inferred from the filename. 
-    * `:filename` - The name of the generated file. If not provided, the filename will be inferred from 
+    * `:title` - The title of the extra page. If not provided, the title will be inferred from the filename.
+    * `:filename` - The name of the generated file. If not provided, the filename will be inferred from
        the source file.
-    * `:source` - The source file of the extra page. This is useful if you want to customize the filename or 
-       title but keep the source file unchanged. *
-    `:search_data` - A list of terms to be indexed for autocomplete and search. If not provided, the content 
+    * `:source` - The source file of the extra page. This is useful if you want to customize the filename or
+       title but keep the source file unchanged.
+    * `:search_data` - A list of terms to be indexed for autocomplete and search. If not provided, the content
        of the extra page will be indexed for search. See the section below for more.
 
   ### Customizing Search Data
