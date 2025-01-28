@@ -40,9 +40,6 @@
     flex-wrap: nowrap;
     gap: 32px;
     align-items: flex-start;
-    .icon-action {
-      padding-top: 1.7rem; /* vertically align with x-height of first line of heading */
-    }
   }
 }
 
@@ -120,7 +117,7 @@
 
 .content-inner .note {
   color: var(--iconAction);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   font-weight: normal;
 }
 

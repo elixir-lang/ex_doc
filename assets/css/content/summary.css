@@ -11,7 +11,7 @@
 
 .content-inner .summary .summary-row .summary-signature {
   font-family: var(--monoFontFamily);
-  font-size: var(--text-sm);
+  font-size: 13px;
   font-weight: 700;
 }
 

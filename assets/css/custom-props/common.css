@@ -6,9 +6,9 @@
   --navTabBorderWidth: 2px;
 
   /* Font Families */
-  /* modern-normalize.css handles the default font */
-  --sansFontFamily: "Lato", ui-sans-serif, system-ui, sans-serif;
-  --monoFontFamily: ui-monospace, monospace;
+  /* These mirror modern-normalize.css with "Lato" on top */
+  --sansFontFamily: "Lato", system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --monoFontFamily: ui-monospace, SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
 
   /* Typography */
   --baseLineHeight: 1.5em;

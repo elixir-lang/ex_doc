@@ -1,3 +1,10 @@
+/* The Consolas font on Windows is too small compared to other ones */
+@font-face {
+  font-family: "Consolas";
+  src: local("Consolas");
+  size-adjust: 110%;
+}
+
 .content-inner.content-inner :is(a:has(code, img), pre a) {
   color: var(--link-color);
   text-shadow: none;
