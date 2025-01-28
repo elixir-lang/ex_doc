@@ -71,6 +71,14 @@
   }
 }
 
+/* tabpanel content: top margin of first and bottom margin of last */
+@media screen and (max-width: 768px) {
+  .tabset-panel > :is(:first-child) {
+    &:is(table) {
+      margin: .5em 0;
+    }
+  }
+}
 @media screen and (min-width: 769px) {
   .tabset-panel > :is(:first-child) {
     &:is(blockquote, .admonition) {
