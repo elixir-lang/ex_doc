@@ -8,11 +8,11 @@
   --searchBarFocusColor:  #8E7CE6;
   --searchBarBorderColor: rgba(142, 124, 230, 0.25);
 
-  --link-color:            var(--mainDark);
-  --link-visited-color:     var(--mainDarkest);
+  --link-color:           var(--mainDark);
+  --link-visited-color:   var(--mainDarkest);
 }
 
 body.dark {
-  --link-color:            var(--mainLightest);
-  --link-visited-color:     var(--mainLight);
+  --link-color:           var(--mainLightest);
+  --link-visited-color:   var(--mainLight);
 }
