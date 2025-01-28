@@ -1,10 +1,11 @@
 # Changelog
 
-## v0.37.0-rc.0 (2025-01-25)
+## v0.37.0-rc.1 (2025-01-28)
 
 Thank you to @liamcmitchell and @hichemfantar for the extensive contributions in this new release.
 
   * Enhancements
+    * Optimize and parallelize module retriever, often leading to 20x-30x faster docs generation
     * Considerably improve page loading times in the browser
     * Allow customizing `search_data` for extra pages
     * Use native style for scroll bars
