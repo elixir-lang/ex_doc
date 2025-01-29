@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.37.0-rc.1 (2025-01-28)
+## v0.37.0-rc.2 (2025-01-29)
 
 Thank you to @liamcmitchell and @hichemfantar for the extensive contributions in this new release.
 
