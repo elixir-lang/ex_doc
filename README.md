@@ -114,6 +114,12 @@ You can use ExDoc via the command line.
    GITHUB_REPO     => ecto
    ```
 
+It is also possible to specify multiple `ebin` directories in the case of _umbrella_ projects:
+
+   ```bash
+   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/dev/lib/app1/ebin _build/dev/lib/app2/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
+   ```
+
 You can specify a config file via the `--config` option, both Elixir and Erlang formats are supported. Invoke `ex_doc` without arguments to learn more.
 
 <!-- tabs-close -->

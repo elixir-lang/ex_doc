@@ -17,7 +17,7 @@ defmodule ExDoc.CLITest do
                 formatter: "html",
                 formatters: ["html", "epub"],
                 apps: [:ex_doc],
-                source_beam: @ebin
+                source_beam: [@ebin]
               ]}
 
     assert epub ==
@@ -26,7 +26,7 @@ defmodule ExDoc.CLITest do
                 formatter: "epub",
                 formatters: ["html", "epub"],
                 apps: [:ex_doc],
-                source_beam: @ebin
+                source_beam: [@ebin]
               ]}
   end
 
@@ -39,7 +39,7 @@ defmodule ExDoc.CLITest do
                 formatter: "epub",
                 formatters: ["epub", "html"],
                 apps: [:ex_doc],
-                source_beam: @ebin
+                source_beam: [@ebin]
               ]}
 
     assert html ==
@@ -48,7 +48,7 @@ defmodule ExDoc.CLITest do
                 formatter: "html",
                 formatters: ["epub", "html"],
                 apps: [:ex_doc],
-                source_beam: @ebin
+                source_beam: [@ebin]
               ]}
   end
 
@@ -58,10 +58,6 @@ defmodule ExDoc.CLITest do
 
     {_, io} = run(["--version"])
     assert io == "ExDoc v#{ExDoc.version()}\n"
-  end
-
-  test "too many arguments" do
-    assert catch_exit(run(["ExDoc", "1.2.3", "/", "kaboom"])) == {:shutdown, 1}
   end
 
   test "too few arguments" do
@@ -98,7 +94,7 @@ defmodule ExDoc.CLITest do
              logo: "logo.png",
              main: "Main",
              output: "html",
-             source_beam: "#{@ebin}",
+             source_beam: ["#{@ebin}"],
              source_ref: "abcdefg",
              source_url: "http://example.com/username/project"
            ]
@@ -127,7 +123,7 @@ defmodule ExDoc.CLITest do
                extras: ["README.md"],
                formatter: "html",
                formatters: ["html"],
-               source_beam: @ebin
+               source_beam: [@ebin]
              ]
     after
       File.rm!("test.exs")
@@ -155,7 +151,7 @@ defmodule ExDoc.CLITest do
                formatter: "html",
                formatters: ["html"],
                logo: "opts_logo.png",
-               source_beam: @ebin
+               source_beam: [@ebin]
              ]
     after
       File.rm!("test.exs")
@@ -192,7 +188,7 @@ defmodule ExDoc.CLITest do
                extras: ["README.md"],
                formatter: "html",
                formatters: ["html"],
-               source_beam: @ebin
+               source_beam: [@ebin]
              ]
     after
       File.rm!("test.config")
