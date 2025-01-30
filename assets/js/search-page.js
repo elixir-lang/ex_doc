@@ -71,12 +71,12 @@ async function remoteSearch (value, queryType, searchNodes) {
     filterNodes = searchNodes.slice(0, 1)
   }
 
-  const filters = filterNodes.map(node => `package:=${node.name}-${node.version}`).join(' || ')
+  const filters = filterNodes.map(node => `${node.name}-${node.version}`).join(',')
 
   const params = new URLSearchParams()
   params.set('q', value)
   params.set('query_by', 'title,doc')
-  params.set('filter_by', filters)
+  params.set('filter_by', `package:=[${filters}]`)
 
   const response = await fetch(`https://search.hexdocs.pm/?${params.toString()}`)
   const payload = await response.json()
