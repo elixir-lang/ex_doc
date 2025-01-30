@@ -3,6 +3,7 @@ defmodule ExDoc.CLITest do
   import ExUnit.CaptureIO
 
   @ebin "_build/test/lib/ex_doc/ebin"
+  @ebin2 "_build/test/lib/makeup/ebin"
 
   defp run(args) do
     with_io(fn -> ExDoc.CLI.main(args, &{&1, &2, &3}) end)
@@ -62,6 +63,14 @@ defmodule ExDoc.CLITest do
 
   test "too few arguments" do
     assert catch_exit(run(["ExDoc"])) == {:shutdown, 1}
+  end
+
+  test "multiple apps" do
+    {[{"ExDoc", "1.2.3", html}, {"ExDoc", "1.2.3", epub}], _io} =
+      run(["ExDoc", "1.2.3", @ebin, @ebin2])
+
+    assert [:ex_doc, :makeup] = Enum.sort(Keyword.get(html, :apps))
+    assert [:ex_doc, :makeup] = Enum.sort(Keyword.get(epub, :apps))
   end
 
   test "arguments that are not aliased" do

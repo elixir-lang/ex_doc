@@ -115,7 +115,10 @@ defmodule ExDoc.Config do
 
     {groups_for_docs, options} = Keyword.pop(options, :groups_for_docs, [])
     {groups_for_extras, options} = Keyword.pop(options, :groups_for_extras, [])
-    {groups_for_modules, options} = Keyword.pop(options, :groups_for_modules, [])
+    apps = Keyword.get(options, :apps, [])
+
+    {groups_for_modules, options} =
+      Keyword.pop(options, :groups_for_modules, default_groups_for_modules(apps))
 
     {skip_undefined_reference_warnings_on, options} =
       Keyword.pop(
@@ -277,5 +280,16 @@ defmodule ExDoc.Config do
 
   defp append_slash(url) do
     if :binary.last(url) == ?/, do: url, else: url <> "/"
+  end
+
+  defp default_groups_for_modules([_app]) do
+    []
+  end
+
+  defp default_groups_for_modules(apps) do
+    Enum.map(apps, fn app ->
+      Application.load(app)
+      {app, Application.spec(app, :modules)}
+    end)
   end
 end
