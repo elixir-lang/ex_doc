@@ -1,5 +1,6 @@
 import { getSidebarNodes } from '../globals'
-import { escapeRegexModifiers, escapeHtmlEntities, isBlank } from '../helpers'
+import { isBlank } from '../helpers'
+import { highlightMatches } from '../highlighter'
 
 /**
  * @typedef Suggestion
@@ -287,28 +288,4 @@ function startsWith (text, subtext) {
  */
 function tokenize (query) {
   return query.trim().split(/\s+/)
-}
-
-/**
- * Returns an HTML string highlighting the individual tokens from the query string.
- */
-function highlightMatches (text, query) {
-  // Sort terms length, so that the longest are highlighted first.
-  const terms = tokenize(query).sort((term1, term2) => term2.length - term1.length)
-  return highlightTerms(text, terms)
-}
-
-function highlightTerms (text, terms) {
-  if (terms.length === 0) return text
-
-  const [firstTerm, ...otherTerms] = terms
-  const match = text.match(new RegExp(`(.*)(${escapeRegexModifiers(firstTerm)})(.*)`, 'i'))
-
-  if (match) {
-    const [, before, matching, after] = match
-    // Note: this has exponential complexity, but we expect just a few terms, so that's fine.
-    return highlightTerms(before, terms) + '<em>' + escapeHtmlEntities(matching) + '</em>' + highlightTerms(after, terms)
-  } else {
-    return highlightTerms(text, otherTerms)
-  }
 }
