@@ -4,6 +4,8 @@ import lunr from 'lunr'
 import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
 import { setSearchInputValue } from './search-bar'
 import searchResultsTemplate from './handlebars/templates/search-results.handlebars'
+import { getSearchNodes } from './globals'
+import { highlightMatches } from './highlighter'
 
 const EXCERPT_RADIUS = 80
 const SEARCH_CONTAINER_SELECTOR = '#search'
@@ -22,27 +24,31 @@ lunr.Pipeline.registerFunction(docTrimmerFunction, 'docTrimmer')
 
 window.addEventListener('exdoc:loaded', initialize)
 
-function initialize () {
+function initialize() {
   const pathname = window.location.pathname
   if (pathname.endsWith('/search.html') || pathname.endsWith('/search')) {
     const query = getQueryParamByName('q')
-    search(query)
+    const queryType = getQueryParamByName('type')
+    search(query, queryType)
   }
 }
 
-async function search (value) {
+async function search(value, queryType) {
   if (isBlank(value)) {
     renderResults({ value })
   } else {
     setSearchInputValue(value)
 
-    const index = await getIndex()
-
     try {
-      // We cannot match on atoms :foo because that would be considered
-      // a filter. So we escape all colons not preceded by a word.
-      const fixedValue = value.replaceAll(/(\B|\\):/g, '\\:')
-      const results = searchResultsToDecoratedSearchItems(index.search(fixedValue))
+      let results = []
+      const searchNodes = getSearchNodes()
+
+      if (['related', 'latest'].includes(queryType) && searchNodes.length > 0) {
+        results = await remoteSearch(value, queryType, searchNodes)
+      } else {
+        results = await localSearch(value)
+      }
+
       renderResults({ value, results })
     } catch (error) {
       renderResults({ value, errorMessage: error.message })
@@ -50,13 +56,64 @@ async function search (value) {
   }
 }
 
-function renderResults ({ value, results, errorMessage }) {
+async function localSearch(value) {
+  const index = await getIndex()
+
+  // We cannot match on atoms :foo because that would be considered
+  // a filter. So we escape all colons not preceded by a word.
+  const fixedValue = value.replaceAll(/(\B|\\):/g, '\\:')
+  return searchResultsToDecoratedSearchItems(index.search(fixedValue))
+}
+
+async function remoteSearch(value, queryType, searchNodes) {
+  let filterNodes = searchNodes
+
+  if (queryType === 'latest') {
+    filterNodes = searchNodes.slice(0, 1)
+  }
+
+  const filters = filterNodes.map(node => `${node.name}-${node.version}`).join(',')
+
+  const params = new URLSearchParams()
+  params.set('q', value)
+  params.set('query_by', 'title,doc')
+  params.set('filter_by', `package:=[${filters}]`)
+
+  const response = await fetch(`https://search.hexdocs.pm/?${params.toString()}`)
+  const payload = await response.json()
+
+  if (Array.isArray(payload.hits)) {
+    return payload.hits.map(result => {
+      const [packageName, packageVersion] = result.document.package.split('-')
+
+      const doc = highlightMatches(result.document.doc, value, { multiline: true })
+      const excerpts = [doc]
+      const metadata = {}
+      const ref = `https://hexdocs.pm/${packageName}/${packageVersion}/${result.document.ref}`
+      const title = result.document.title
+      const type = result.document.type
+
+      return {
+        doc,
+        excerpts,
+        metadata,
+        ref,
+        title,
+        type
+      }
+    })
+  } else {
+    return []
+  }
+}
+
+function renderResults({ value, results, errorMessage }) {
   const searchContainer = qs(SEARCH_CONTAINER_SELECTOR)
   const resultsHtml = searchResultsTemplate({ value, results, errorMessage })
   searchContainer.innerHTML = resultsHtml
 }
 
-async function getIndex () {
+async function getIndex() {
   const cachedIndex = await loadIndex()
   if (cachedIndex) { return cachedIndex }
 
@@ -65,7 +122,7 @@ async function getIndex () {
   return index
 }
 
-async function loadIndex () {
+async function loadIndex() {
   try {
     const serializedIndex = sessionStorage.getItem(indexStorageKey())
     if (serializedIndex) {
@@ -80,7 +137,7 @@ async function loadIndex () {
   }
 }
 
-async function saveIndex (index) {
+async function saveIndex(index) {
   try {
     const serializedIndex = await compress(index)
     sessionStorage.setItem(indexStorageKey(), serializedIndex)
@@ -89,7 +146,7 @@ async function saveIndex (index) {
   }
 }
 
-async function compress (index) {
+async function compress(index) {
   const stream = new Blob([JSON.stringify(index)], {
     type: 'application/json'
   }).stream().pipeThrough(new window.CompressionStream('gzip'))
@@ -99,7 +156,7 @@ async function compress (index) {
   return b64encode(buffer)
 }
 
-async function decompress (index) {
+async function decompress(index) {
   const stream = new Blob([b64decode(index)], {
     type: 'application/json'
   }).stream().pipeThrough(new window.DecompressionStream('gzip'))
@@ -108,7 +165,7 @@ async function decompress (index) {
   return JSON.parse(blob)
 }
 
-function b64encode (buffer) {
+function b64encode(buffer) {
   let binary = ''
   const bytes = new Uint8Array(buffer)
   const len = bytes.byteLength
@@ -118,7 +175,7 @@ function b64encode (buffer) {
   return window.btoa(binary)
 }
 
-function b64decode (str) {
+function b64decode(str) {
   const binaryString = window.atob(str)
   const len = binaryString.length
   const bytes = new Uint8Array(new ArrayBuffer(len))
@@ -128,11 +185,11 @@ function b64decode (str) {
   return bytes
 }
 
-function indexStorageKey () {
+function indexStorageKey() {
   return `idv5:${getProjectNameAndVersion()}`
 }
 
-function createIndex () {
+function createIndex() {
   return lunr(function () {
     this.ref('ref')
     this.field('title', { boost: 3 })
@@ -150,11 +207,11 @@ function createIndex () {
   })
 }
 
-function docTokenSplitter (builder) {
+function docTokenSplitter(builder) {
   builder.pipeline.before(lunr.stemmer, docTokenFunction)
 }
 
-function docTokenFunction (token) {
+function docTokenFunction(token) {
   // If we have something with an arity, we split on : . to make partial
   // matches easier. We split only when tokenizing, not when searching.
   // Below we use ExDoc.Markdown.to_ast/2 as an example.
@@ -218,11 +275,11 @@ function docTokenFunction (token) {
   return tokens
 }
 
-function docTrimmer (builder) {
+function docTrimmer(builder) {
   builder.pipeline.before(lunr.stemmer, docTrimmerFunction)
 }
 
-function docTrimmerFunction (token) {
+function docTrimmerFunction(token) {
   // Preserve @ and : at the beginning of tokens,
   // and ? and ! at the end of tokens. It needs to
   // be done before stemming, otherwise search and
@@ -232,7 +289,7 @@ function docTrimmerFunction (token) {
   })
 }
 
-function searchResultsToDecoratedSearchItems (results) {
+function searchResultsToDecoratedSearchItems(results) {
   return results
     // If the docs are regenerated without changing its version,
     // a reference may have been doc'ed false in the code but
@@ -249,11 +306,11 @@ function searchResultsToDecoratedSearchItems (results) {
     })
 }
 
-function getSearchItemByRef (ref) {
+function getSearchItemByRef(ref) {
   return searchData.items.find(searchItem => searchItem.ref === ref) || null
 }
 
-function getExcerpts (searchItem, metadata) {
+function getExcerpts(searchItem, metadata) {
   const { doc } = searchItem
   const searchTerms = Object.keys(metadata)
 
@@ -274,7 +331,7 @@ function getExcerpts (searchItem, metadata) {
   return excerpts.slice(0, 1)
 }
 
-function excerpt (doc, sliceStart, sliceLength) {
+function excerpt(doc, sliceStart, sliceLength) {
   const startPos = Math.max(sliceStart - EXCERPT_RADIUS, 0)
   const endPos = Math.min(sliceStart + sliceLength + EXCERPT_RADIUS, doc.length)
   return [
