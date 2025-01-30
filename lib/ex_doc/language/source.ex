@@ -92,7 +92,7 @@ defmodule ExDoc.Language.Source do
   end
 
   defp expand_records({type, anno, what, args}, records) when type in [:type, :user_type] do
-    {:type, anno, what, expand_records(args, records)}
+    {type, anno, what, expand_records(args, records)}
   end
 
   defp expand_records({:remote_type, anno, [m, t, args]}, records) do
