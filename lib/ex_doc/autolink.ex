@@ -137,9 +137,8 @@ defmodule ExDoc.Autolink do
       :ex_doc
     else
       app = app(module)
-      apps = Enum.uniq(config.apps ++ Keyword.keys(config.deps))
 
-      if is_app_otp(app) and app not in apps do
+      if is_app_otp(app) and app not in config.apps and not Keyword.has_key?(config.deps, app) do
         :otp
       else
         :ex_doc
