@@ -6,7 +6,7 @@ import tooltipBodyTemplate from '../handlebars/templates/tooltip-body.handlebars
 const TOOLTIP_HTML = '<div class="tooltip"><div class="tooltip-body"></div></div>'
 
 // Elements that can activate the tooltip.
-const TOOLTIP_ACTIVATORS_SELECTOR = '.content a:not([data-no-tooltip])'
+const TOOLTIP_ACTIVATORS_SELECTOR = '.content a:not([data-no-tooltip=""])'
 // Tooltip root element.
 const TOOLTIP_SELECTOR = '.tooltip'
 // Tooltip content element.

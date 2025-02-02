@@ -1,9 +1,0 @@
-<%= unless Enum.empty?(nodes) do %>
-  <li><span><%= name %></span>
-    <ol>
-    <%= for node <- nodes do %>
-    <li><a href="<%= URI.encode node.id %>.xhtml"><%=h node.title %></a></li>
-    <% end %>
-    </ol>
-  </li>
-<% end %>

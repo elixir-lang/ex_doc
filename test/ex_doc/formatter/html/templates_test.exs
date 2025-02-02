@@ -478,7 +478,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~s{example(foo, bar \\\\ Baz)}
 
       assert content =~
-               ~r{<a href="#example/2" class="detail-link" data-no-tooltip aria-label="Link to this function">\s*<i class="ri-link-m" aria-hidden="true"></i>\s*</a>}ms
+               ~r{<a href="#example/2" class="detail-link" data-no-tooltip="" aria-label="Link to this function">\s*<i class="ri-link-m" aria-hidden="true"></i>\s*</a>}ms
     end
 
     test "outputs function groups", context do
@@ -519,7 +519,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>(), ] <>
           ~S[<a href="#t:opaque/0">opaque</a>(), :ok | :error}]
 
-      assert content =~ ~s[<a href="#t:public/1" data-no-tooltip translate="no">public(t)</a>]
+      assert content =~ ~s[<a href="#t:public/1" data-no-tooltip="" translate="no">public(t)</a>]
       refute content =~ ~s[<a href="#t:private/0">private</a>]
       assert content =~ public_html
       refute content =~ ~s[<strong>private\(t\)]
@@ -538,7 +538,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CompiledWithDocs], context)
 
       assert content =~
-               ~r{<div class="summary-signature">\s*<a href="#example_1/0" data-no-tooltip translate="no">}
+               ~r{<div class="summary-signature">\s*<a href="#example_1/0" data-no-tooltip="" translate="no">}
     end
 
     test "contains links to summary sections when those exist", context do

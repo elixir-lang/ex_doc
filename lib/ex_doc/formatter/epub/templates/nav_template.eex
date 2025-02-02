@@ -2,20 +2,25 @@
     <h1>Table of contents</h1>
     <nav epub:type="toc">
       <ol>
-        <%= nav_grouped_item_template config.extras  %>
+        <%= nav_grouped_item_template config.extras %>
 
-        <%= unless Enum.empty?(nodes.modules) do %>
+        <%= if nodes.modules != [] do %>
         <li>
-          <ol>
-            <li><span>Modules</span>
-              <ol>
-              <%= nav_grouped_item_template nodes.modules  %>
-              </ol>
-            </li>
-          </ol>
+          <span>Modules</span>
+          <ol><%= nav_grouped_item_template nodes.modules %></ol>
         </li>
         <% end %>
-        <%= nav_item_template "Mix Tasks", nodes.tasks %>
+
+        <%= if nodes.tasks != [] do %>
+          <li>
+            <span>Mix Tasks</span>
+            <ol>
+              <%= for node <- nodes.tasks do %>
+                <li><a href="<%= URI.encode node.id %>.xhtml"><%=h node.title %></a></li>
+              <% end %>
+            </ol>
+          </li>
+        <% end %>
       </ol>
     </nav>
     <%= before_closing_body_tag(config, :epub) %>
