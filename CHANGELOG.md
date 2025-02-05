@@ -1,15 +1,15 @@
 # Changelog
 
-## v0.37.0-rc.2 (2025-01-29)
+## v0.37.0 (2025-02-05)
 
-Thank you to @liamcmitchell and @hichemfantar for the extensive contributions in this new release.
+Thanks to @liamcmitchell and @hichemfantar for the extensive contributions in this new release.
 
   * Enhancements
     * Optimize and parallelize module retriever, often leading to 20x-30x faster docs generation
     * Considerably improve page loading times in the browser
     * Allow customizing `search_data` for extra pages
     * Use native style for scroll bars
-    * Enhance links between extra pages with padding and hover effects
+    * Enhance links between extras/pages/guides with padding and hover effects
     * Go to latest goes to the same page if it exists, root otherwise
     * Apply new style and layout for tabs
     * Increase font-weight on sidebar on Apple machines/devices
