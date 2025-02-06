@@ -3,6 +3,7 @@ defmodule ExDoc.CLITest do
   import ExUnit.CaptureIO
 
   @ebin "_build/test/lib/ex_doc/ebin"
+  @ebin2 "_build/test/lib/makeup/ebin"
 
   defp run(args) do
     with_io(fn -> ExDoc.CLI.main(args, &{&1, &2, &3}) end)
@@ -17,7 +18,7 @@ defmodule ExDoc.CLITest do
                 formatter: "html",
                 formatters: ["html", "epub"],
                 apps: [:ex_doc],
-                source_beam: @ebin
+                source_beam: [@ebin]
               ]}
 
     assert epub ==
@@ -26,7 +27,7 @@ defmodule ExDoc.CLITest do
                 formatter: "epub",
                 formatters: ["html", "epub"],
                 apps: [:ex_doc],
-                source_beam: @ebin
+                source_beam: [@ebin]
               ]}
   end
 
@@ -39,7 +40,7 @@ defmodule ExDoc.CLITest do
                 formatter: "epub",
                 formatters: ["epub", "html"],
                 apps: [:ex_doc],
-                source_beam: @ebin
+                source_beam: [@ebin]
               ]}
 
     assert html ==
@@ -48,7 +49,7 @@ defmodule ExDoc.CLITest do
                 formatter: "html",
                 formatters: ["epub", "html"],
                 apps: [:ex_doc],
-                source_beam: @ebin
+                source_beam: [@ebin]
               ]}
   end
 
@@ -60,12 +61,16 @@ defmodule ExDoc.CLITest do
     assert io == "ExDoc v#{ExDoc.version()}\n"
   end
 
-  test "too many arguments" do
-    assert catch_exit(run(["ExDoc", "1.2.3", "/", "kaboom"])) == {:shutdown, 1}
-  end
-
   test "too few arguments" do
     assert catch_exit(run(["ExDoc"])) == {:shutdown, 1}
+  end
+
+  test "multiple apps" do
+    {[{"ExDoc", "1.2.3", html}, {"ExDoc", "1.2.3", epub}], _io} =
+      run(["ExDoc", "1.2.3", @ebin, @ebin2])
+
+    assert [:ex_doc, :makeup] = Enum.sort(Keyword.get(html, :apps))
+    assert [:ex_doc, :makeup] = Enum.sort(Keyword.get(epub, :apps))
   end
 
   test "arguments that are not aliased" do
@@ -98,7 +103,7 @@ defmodule ExDoc.CLITest do
              logo: "logo.png",
              main: "Main",
              output: "html",
-             source_beam: "#{@ebin}",
+             source_beam: ["#{@ebin}"],
              source_ref: "abcdefg",
              source_url: "http://example.com/username/project"
            ]
@@ -127,7 +132,7 @@ defmodule ExDoc.CLITest do
                extras: ["README.md"],
                formatter: "html",
                formatters: ["html"],
-               source_beam: @ebin
+               source_beam: [@ebin]
              ]
     after
       File.rm!("test.exs")
@@ -155,7 +160,7 @@ defmodule ExDoc.CLITest do
                formatter: "html",
                formatters: ["html"],
                logo: "opts_logo.png",
-               source_beam: @ebin
+               source_beam: [@ebin]
              ]
     after
       File.rm!("test.exs")
@@ -192,7 +197,7 @@ defmodule ExDoc.CLITest do
                extras: ["README.md"],
                formatter: "html",
                formatters: ["html"],
-               source_beam: @ebin
+               source_beam: [@ebin]
              ]
     after
       File.rm!("test.config")
