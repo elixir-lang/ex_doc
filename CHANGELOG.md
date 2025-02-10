@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.37.1 (2025-02-10)
+
+  * Enhancements
+    * Support umbrella projects via the CLI
+
+  * Bug fixes
+    * Make sure docs are rendered inside iframes
+
 ## v0.37.0 (2025-02-05)
 
 Thanks to @liamcmitchell and @hichemfantar for the extensive contributions in this new release.
