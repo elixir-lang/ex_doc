@@ -10,7 +10,7 @@ import {
   AUTOCOMPLETE_CONTAINER_SELECTOR,
   AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR
 } from './autocomplete/autocomplete-list'
-import { isEmbedded } from './globals'
+import { isEmbedded, getSearchNodes, getVersionNodes } from './globals'
 import { isAppleOS, qs } from './helpers'
 
 const SEARCH_INPUT_SELECTOR = 'form.search-bar input'
@@ -37,6 +37,12 @@ function initialize () {
     // Maintains consistent keyboard navigation and look
     focusSearchInput()
     if (open) { showPreview(event.target) } else { hidePreview() }
+  }
+
+  if (window.navigator.onLine) {
+    enableRemoteSearch(null)
+  } else {
+    disableRemoteSearch(null)
   }
 }
 
@@ -147,6 +153,66 @@ function addEventListeners () {
     clearSearch()
     hideAutocomplete()
   })
+
+  window.addEventListener('online', enableRemoteSearch)
+  window.addEventListener('offline', disableRemoteSearch)
+}
+
+function enableRemoteSearch (_event) {
+  Array.from(document.getElementsByClassName('online-only')).forEach(element => {
+    element.removeAttribute('disabled')
+    element.removeAttribute('title')
+    updateSearchTypeOptions(element)
+  })
+}
+
+function disableRemoteSearch (_event) {
+  Array.from(document.getElementsByClassName('online-only')).forEach(element => {
+    element.setAttribute('disabled', '')
+    element.setAttribute('title', 'Local searching only - browser is offline')
+    updateSearchTypeOptions(element)
+  })
+}
+
+function updateSearchTypeOptions (element) {
+  Array.from(element.getElementsByTagName('option')).forEach(option => {
+    if (option.value === 'related') {
+      if (shouldEnableRelatedSearch()) {
+        option.removeAttribute('disabled')
+        option.removeAttribute('title')
+      } else {
+        option.setAttribute('disabled', '')
+        option.setAttribute('title', 'No known related packages to search')
+      }
+    }
+    if (option.value === 'latest') {
+      if (shouldEnableLatestSearch()) {
+        option.removeAttribute('disabled')
+        option.removeAttribute('title')
+      } else {
+        option.setAttribute('disabled', '')
+        option.setAttribute('title', 'Already browsing latest version')
+      }
+    }
+  })
+}
+
+function shouldEnableRelatedSearch () {
+  return getSearchNodes().length > 1
+}
+
+function shouldEnableLatestSearch () {
+  const versionNodes = getVersionNodes()
+
+  if (versionNodes.length > 0) {
+    const latest = versionNodes[0]
+    const searchNodes = getSearchNodes()
+    const match = searchNodes.some(node => `v${node.version}` === latest.version)
+
+    return !match
+  }
+
+  return false
 }
 
 function handleAutocompleteFormSubmission (event) {
@@ -165,8 +231,18 @@ function handleAutocompleteFormSubmission (event) {
     anchor.setAttribute('href', autocompleteSuggestion.link)
   } else {
     const meta = document.querySelector('meta[name="exdoc:full-text-search-url"]')
-    const url = meta ? meta.getAttribute('content') : 'search.html?q='
-    anchor.setAttribute('href', `${url}${encodeURIComponent(searchInput.value)}`)
+    const url = meta ? meta.getAttribute('content') : 'search.html'
+
+    const params = new URLSearchParams()
+    params.set('q', searchInput.value)
+
+    const searchType = getSearchType()
+
+    if (searchType !== 'local') {
+      params.set('type', searchType)
+    }
+
+    anchor.setAttribute('href', `${url}?${params.toString()}`)
   }
 
   anchor.click()
@@ -175,6 +251,16 @@ function handleAutocompleteFormSubmission (event) {
     clearSearch()
     hideAutocomplete()
   }
+}
+
+function getSearchType () {
+  const searchTypes = Array.from(document.getElementsByClassName('search-type'))
+
+  if (searchTypes.length > 0) {
+    return searchTypes[0].value
+  }
+
+  return 'local'
 }
 
 function clearSearch () {

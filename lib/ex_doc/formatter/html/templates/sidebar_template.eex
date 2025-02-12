@@ -43,6 +43,11 @@
           <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
             <i class="ri-close-line ri-lg" title="Cancel search"></i>
           </button>
+          <select name="type" class="search-type online-only" disabled>
+            <option value="local">Local</option>
+            <option value="related" disabled>Related</option>
+            <option value="latest" disabled>Latest</option>
+          </select>
         </form>
         <div class="autocomplete">
         </div>
