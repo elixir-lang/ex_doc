@@ -165,7 +165,7 @@ defmodule ExDoc.DocAST do
 
     ## Html cannot be parsed with regex, but we try our best...
     Regex.replace(
-      ~r/<pre(\s[^>]*)?><code(?:\s+class="(\w*)")?>([^<]*)<\/code><\/pre>/,
+      ~r/<pre(\s[^>]*)?><code(?:\s+class="([^"\s]*)")?>([^<]*)<\/code><\/pre>/,
       html,
       &highlight_code_block(&1, &2, &3, &4, highlight_info, opts)
     )
