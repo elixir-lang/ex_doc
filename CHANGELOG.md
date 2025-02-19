@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.37.2 (2025-02-19)
+
+  * Bug fixes
+    * Fix code highlighting for languages with non-alphanumeric characters
+
 ## v0.37.1 (2025-02-10)
 
   * Enhancements
