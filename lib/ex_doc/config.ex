@@ -44,6 +44,7 @@ defmodule ExDoc.Config do
             proglang: :elixir,
             project: nil,
             redirects: %{},
+            related_packages: [],
             retriever: ExDoc.Retriever,
             skip_undefined_reference_warnings_on:
               &__MODULE__.skip_undefined_reference_warnings_on/1,
@@ -87,6 +88,7 @@ defmodule ExDoc.Config do
           package: :atom | nil,
           project: nil | String.t(),
           redirects: %{optional(String.t()) => String.t()} | [{String.t(), String.t()}],
+          related_packages: [:atom | %{name: :atom, version: Version.t()}],
           retriever: atom(),
           skip_undefined_reference_warnings_on: (String.t() -> boolean),
           skip_code_autolink_to: (String.t() -> boolean),
