@@ -10,6 +10,15 @@ const emitExdocLoaded = () => {
   window.dispatchEvent(new Event('exdoc:loaded'))
 }
 
+const maybeMetaRedirect = (visit, {page}) => {
+  const match = page.html.match(/<meta\s+http-equiv\s*=\s*["']refresh["']\s+content\s*=\s*["']\d+\s*;\s*url\s*=\s*([^"']+)["']/i)
+
+  if (match && match[1]) {
+    visit.abort()
+    window.location.href = match[1]
+  }
+}
+
 window.addEventListener('DOMContentLoaded', emitExdocLoaded)
 
 if (!isEmbedded && window.location.protocol !== 'file:') {
@@ -23,6 +32,7 @@ if (!isEmbedded && window.location.protocol !== 'file:') {
     },
     linkSelector: 'a[href]:not([href^="/"]):not([href^="http"])',
     hooks: {
+      'page:load': maybeMetaRedirect,
       'page:view': emitExdocLoaded
     },
     plugins: [new SwupA11yPlugin(), new SwupProgressPlugin({delay: 500})]
