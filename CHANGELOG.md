@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.37.3 (2025-03-06)
+
+  * Bug fixes
+    * Handle `http-equiv=refresh` during Swup.js navigation
+    * Include full error description when syntax highlighting fails
+
 ## v0.37.2 (2025-02-19)
 
   * Bug fixes
