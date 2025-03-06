@@ -180,11 +180,13 @@ defmodule ExDoc.DocAST do
         try do
           render_code(pre_attr, lang, lexer, opts, code, outer_opts)
         rescue
-          _ ->
+          exception ->
             ExDoc.Utils.warn(
               [
                 "crashed while highlighting #{lang} snippet:\n\n",
-                full_block
+                full_block,
+                "\n\n",
+                Exception.format_banner(:error, exception, __STACKTRACE__)
               ],
               __STACKTRACE__
             )
