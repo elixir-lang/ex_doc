@@ -30,7 +30,7 @@
   color: var(--searchAccentMain);
   position: relative;
   height: 46px;
-  padding: 8px 35px 8px 43px;
+  padding: 8px 135px 8px 43px;
   width: 100%;
   transition: var(--transition-all);
 }
@@ -80,7 +80,8 @@
   background-color: transparent;
   border: none;
   cursor: pointer;
-  right: 11px;
+  /* FIXME: I know this is wrong. Not sure what to do though */
+  right: 100px;
   margin: 0;
   opacity: 0.5;
   padding: 5px 1px 5px 0;
@@ -93,6 +94,31 @@
 
 .top-search .search-bar .search-close-button:hover {
   opacity: 0.7;
+}
+
+.top-search .search-bar .search-type {
+  background-color: transparent;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-left: 1px solid var(--searchBarBorder);
+  border-top-right-radius: var(--borderRadius-base);
+  border-bottom-right-radius: var(--borderRadius-base);
+  color: var(--searchAccentMain);
+  position: absolute;
+  top: calc(50% - 23px);
+  right: 0;
+  height: 46px;
+  padding: 8px 8px 8px 16px;
+  transition: var(--transition-all);
+  z-index: 99;
+}
+
+.top-search .search-bar .search-type:focus {
+  border: 1px solid var(--searchBarFocusColor);
+  border-top-right-radius: calc(var(--borderRadius-base) - 1px);
+  border-bottom-right-radius: calc(var(--borderRadius-base) - 1px);
+  box-shadow: 0px 4px 20px 0px var(--searchBarBorderColor) inset;
 }
 
 .top-search .search-settings button.icon-settings {
