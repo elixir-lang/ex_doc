@@ -11,11 +11,11 @@ const emitExdocLoaded = () => {
 }
 
 const maybeMetaRedirect = (visit, {page}) => {
-  const match = page.html.match(/<meta\s+http-equiv\s*=\s*["']refresh["']\s+content\s*=\s*["']\d+\s*;\s*url\s*=\s*([^"']+)["']/i)
+  const hasMetaRefresh = /<meta\s+http-equiv\s*=\s*["']refresh["']\s+content\s*=\s*["'][^"']*["']\s*\/?>/i.test(page.html)
 
-  if (match && match[1]) {
+  if (hasMetaRefresh) {
     visit.abort()
-    window.location.href = match[1]
+    window.location.reload()
   }
 }
 
