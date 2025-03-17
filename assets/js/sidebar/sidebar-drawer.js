@@ -51,6 +51,8 @@ if (!isEmbedded) {
   // We observe on mousedown because we only care about user resize.
   sidebar.addEventListener('mousedown', () => resizeObserver.observe(sidebar))
   sidebar.addEventListener('mouseup', () => resizeObserver.unobserve(sidebar))
+
+  window.addEventListener('hashchange', maybeCloseSidebarOnNavigate)
 }
 
 function setDefaultSidebarState () {
@@ -113,4 +115,14 @@ function transitionSidebar (open) {
  */
 export function openSidebar () {
   return transitionSidebar(true)
+}
+
+/**
+ * Closes the sidebar on small screens when navigating between sections
+ * on the page, for consistency with full page transitions
+ */
+function maybeCloseSidebarOnNavigate () {
+  if (smallScreenQuery.matches && isSidebarOpen()) {
+    transitionSidebar(false)
+  }
 }
