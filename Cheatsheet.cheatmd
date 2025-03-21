@@ -47,6 +47,10 @@ Paragraphs are visually distinct from one another.
 | `%A, %B %e, %Y` | `Sunday, June 5, 2013` |
 | `%b %e %a`      | `Jun 5 Sun`            |
 
+### [Link](`mix docs`)
+
+Header with links in it.
+
 ## Variants
 {: .col-2}
 

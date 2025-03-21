@@ -1,14 +1,11 @@
-@import "@fontsource/lato/300.css";
 @import "@fontsource/lato/400.css";
 @import "@fontsource/lato/700.css";
-@import "@fontsource/inconsolata/400.css";
-@import "@fontsource/inconsolata/700.css";
 
 @import "custom-props/common.css";
 @import "custom-props/theme-light.css";
 @import "custom-props/theme-dark.css";
 
-@import "normalize.css/normalize.css";
+@import "modern-normalize/modern-normalize.css";
 
 @import "icons.css";
 @import "layout.css";

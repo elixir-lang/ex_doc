@@ -29,11 +29,14 @@ as it has absolute positioning, so doesn't impact the layout and click events pa
 
 .tooltip .tooltip-body {
   border: 1px solid var(--codeBorder);
+  border-radius: var(--borderRadius-sm);
+  overflow: auto;
 }
 
 .tooltip .tooltip-body .signature {
   min-width: 320px;
   width: 100%;
+  line-height: 1em;
 }
 
 .tooltip .tooltip-body .detail-header {
@@ -57,11 +60,8 @@ as it has absolute positioning, so doesn't impact the layout and click events pa
 
 .tooltip .tooltip-body .version-info {
   float: right;
-  line-height: 1.6rem;
   font-family: var(--monoFontFamily);
-  font-size: .9rem;
   font-weight: normal;
-  margin-bottom: -6px;
   opacity: .3;
   padding-left: .3em;
 }

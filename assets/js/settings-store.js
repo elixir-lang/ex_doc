@@ -1,4 +1,4 @@
-const SETTINGS_KEY = 'ex_doc:settings'
+import { SETTINGS_KEY } from './constants'
 
 const DEFAULT_SETTINGS = {
   // Whether to show tooltips on function/module links

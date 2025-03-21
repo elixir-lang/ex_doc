@@ -64,6 +64,17 @@ describe('getSuggestions', () => {
           title: 'API Reference'
         },
         {
+          id: "how-to-make-things",
+          title: "How to make things",
+          searchData: [
+            {
+              id: "custom-text",
+              anchor: "Some Custom Text",
+              labels: ["custom"]
+            }
+          ]
+        },
+        {
           id: 'library-guidelines',
           title: 'Library Guidelines',
           headers: [
@@ -87,6 +98,10 @@ describe('getSuggestions', () => {
     it('returns matching sections of modules and extras', () => {
       expect(getSuggestions('Getting').length).to.eql(1)
       expect(getSuggestions('Gua').length).to.eql(1)
+    })
+
+    it('returns custom searchData of extras', () => {
+      expect(getSuggestions('custom text').length).to.eql(1)
     })
 
     it('returns matching functions, callbacks and types', () => {

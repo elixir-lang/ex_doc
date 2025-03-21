@@ -1,21 +1,33 @@
-.content-inner :is(a.no-underline, pre a) {
-  color: var(--linksNoUnderline);
+/* The Consolas font on Windows is too small compared to other ones */
+@font-face {
+  font-family: "Consolas";
+  src: local("Consolas");
+  size-adjust: 110%;
+}
+
+.content-inner.content-inner :is(a:has(code, img), pre a) {
+  color: var(--link-color);
   text-shadow: none;
   text-decoration: none;
   background-image: none;
 }
 
-.content-inner :is(a.no-underline, pre a):is(:visited, :active, :focus, :hover) {
-  color: var(--linksNoUnderlineVisited);
+.content-inner.content-inner :is(a:has(code, img), pre a):is(:visited, :active, :focus, :hover) {
+  color: var(--link-visited-color);
 }
 
 .content-inner code {
   background-color: var(--codeBackground);
   vertical-align: baseline;
-  border-radius: 2px;
+  border-radius: var(--borderRadius-sm);
   padding: .1em .2em;
   border: 1px solid var(--codeBorder);
   text-transform: none;
+}
+
+.content-inner code.inline {
+  border-radius: var(--borderRadius-sm);
+  word-wrap: break-word;
 }
 
 .content-inner pre {
@@ -26,25 +38,8 @@
   display: block;
   overflow-x: auto;
   white-space: inherit;
-  padding: .5em 1em;
-}
-
-.content-inner pre code::-webkit-scrollbar {
-  width: .4rem;
-  height: .4rem;
-}
-
-.content-inner pre code::-webkit-scrollbar-thumb {
-  border-radius: .25rem;
-  background-color: var(--codeScrollThumb);
-}
-
-.content-inner pre code::-webkit-scrollbar-track {
-  background-color: var(--codeScrollBackground);
-}
-
-.content-inner pre code::-webkit-scrollbar-corner {
-  background-color: var(--codeScrollBackground);
+  padding: 1em;
+  scrollbar-width: thin;
 }
 
 .content-inner pre code.output {
@@ -64,7 +59,7 @@
   top: -16px;
   left: 12px;
   padding: 2px 4px;
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-family: var(--monoFontFamily);
   line-height: 1;
   color: var(--textHeaders);
@@ -75,17 +70,8 @@
 }
 
 @media screen and (max-width: 768px) {
-  /*
-    TODO:
-
-    This selector can be more specific once Firefox ships default
-    support for the :has() pseudo-class: https://caniuse.com/css-has
-
-    .content-inner > pre:has(code),
-    .content-inner section > pre:has(code) {
-  */
-  .content-inner > pre,
-  .content-inner section > pre {
+  .content-inner > pre:has(code),
+  .content-inner section > pre:has(code) {
     margin-left: calc(-1 * var(--content-gutter));
     margin-right: calc(-1 * var(--content-gutter));
   }

@@ -1,51 +1,19 @@
-import '../handlebars/helpers'
-
-import { onDocumentReady } from '../helpers'
-import { initialize as initTabsets } from '../tabsets'
-import { initialize as initContent } from '../content'
-import { initialize as initSidebarDrawer } from '../sidebar/sidebar-drawer'
-import { initialize as initSidebarContent } from '../sidebar/sidebar-list'
-import { initialize as initSidebarSearch } from '../search-bar'
-import { initialize as initVersions } from '../sidebar/sidebar-version-select'
-import { initialize as initSearchPage } from '../search-page'
-import { initialize as initTheme } from '../theme'
-import { initialize as initMakeup } from '../makeup'
-import { initialize as initModal } from '../modal'
-import { initialize as initKeyboardShortcuts } from '../keyboard-shortcuts'
-import { initialize as initQuickSwitch } from '../quick-switch'
-import { initialize as initToast } from '../toast'
-import { initialize as initTooltips } from '../tooltips/tooltips'
-import { initialize as initHintsPage } from '../tooltips/hint-page'
-import { initialize as initCopyButton } from '../copy-button'
-import { initialize as initSettings } from '../settings'
-import { initialize as initStyling } from '../styling'
-import { initialize as initPreview} from '../preview'
-
-onDocumentReady(() => {
-  const params = new URLSearchParams(window.location.search)
-  const isPreview = params.has('preview')
-
-  initTabsets() // alters content HTML, so is run early
-  initTheme(params.get('theme'))
-  initContent(isPreview)
-  initMakeup()
-  initTooltips()
-  initHintsPage()
-  initCopyButton()
-  initStyling()
-
-  if (isPreview) {
-    initPreview()
-  } else {
-    initVersions()
-    initSidebarDrawer()
-    initSidebarContent()
-    initSidebarSearch()
-    initModal()
-    initKeyboardShortcuts()
-    initQuickSwitch()
-    initToast()
-    initSearchPage()
-    initSettings()
-  }
-})
+// Load preview & hint-page first because they could remove DOM.
+// This prevents later modules doing unnecessary work.
+import '../preview'
+import '../tooltips/hint-page'
+// The remaining modules are loaded in order of visible impact.
+import '../theme'
+import '../sidebar/sidebar-drawer'
+import '../sidebar/sidebar-version-select'
+import '../tabsets'
+import '../content'
+import '../makeup'
+import '../search-bar'
+import '../tooltips/tooltips'
+import '../copy-button'
+import '../search-page'
+import '../settings'
+import '../keyboard-shortcuts'
+import '../quick-switch'
+import '../swup'

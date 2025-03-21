@@ -5,11 +5,6 @@ body.dark {
   --textHeaders:                 var(--gray100);
   --textDetailAccent:            var(--mainLight);
   --textDetailBackground:        var(--gray700);
-  --textFooter:                  var(--gray300);
-
-  --links:                       var(--gray100);
-  --linksVisited:                var(--gray100);
-  --linksDecoration:             var(--gray450);
 
   --iconAction:                  var(--coldGray-lightened-10);
   --iconActionHover:             var(--white);
@@ -20,20 +15,20 @@ body.dark {
   --tableHeadBorder:             var(--gray600);
   --tableBodyBorder:             var(--gray700);
 
-  --warningBackground:          hsla( 33,  30%,  60%,  10%);
-  --warningHeadingBackground:   hsla( 33,  66%,  35%,  80%);
+  --warningBackground:           hsla( 33,  30%,  60%,  10%);
+  --warningHeadingBackground:    hsla( 33,  66%,  35%,  80%);
   --warningHeading:              var(--white);
-  --errorBackground:            hsla(  7,  30%,  60%,  10%);
-  --errorHeadingBackground:     hsla(  6,  70%,  40%,  80%);
+  --errorBackground:             hsla(  7,  30%,  60%,  10%);
+  --errorHeadingBackground:      hsla(  6,  70%,  40%,  80%);
   --errorHeading:                var(--white);
-  --infoBackground:             hsla(206,  30%,  60%,  10%);
-  --infoHeadingBackground:      hsla(213,  55%,  35%,  80%);
+  --infoBackground:              hsla(206,  30%,  60%,  10%);
+  --infoHeadingBackground:       hsla(213,  55%,  35%,  80%);
   --infoHeading:                 var(--white);
   --neutralBackground:           hsl(210,  30%,  60%,  10%);
   --neutralHeadingBackground:    var(--gray600);
   --neutralHeading:              var(--white);
-  --tipBackground:              hsla(142,  30%,  60%,  10%);
-  --tipHeadingBackground:       hsla(134,  45%,  30%,  80%);
+  --tipBackground:               hsla(142,  30%,  60%,  10%);
+  --tipHeadingBackground:        hsla(134,  45%,  30%,  80%);
   --tipHeading:                  var(--white);
 
   --fnSpecAttr:                  var(--gray400);
@@ -51,14 +46,12 @@ body.dark {
   --admInlineCodeBackground:     var(--gray750);
   --admInlineCodeBorder:         var(--gray600);
 
-  --tabBackground:               var(--gray900);
   --tabBorder:                   var(--gray700);
   --tabBorderTop:                var(--gray700);
-  --tab:                         var(--white);
   --tabShadow:                   var(--black);
 
   --bottomActionsBtnBorder:      var(--white-opacity-10);
-  --bottomActionsBtnSubheader:   var(--mainLight);
+  --bottomActionsBtnTitle:       var(--mainLightest);
 
   --modalBackground:             var(--gray800);
 
@@ -71,14 +64,14 @@ body.dark {
   --quickSwitchContour:          var(--gray500);
 
   --success:                     var(--green-lightened-10);
+  --progressBarColor:            var(--gray300);
 
   --sidebarAccentMain:           var(--gray50);
   --sidebarBackground:           var(--gray800);
   --sidebarHeader:               var(--gray700);
   --sidebarMuted:                var(--gray300);
   --sidebarHover:                var(--white);
-  --sidebarScrollbarThumb:       var(--coldGray);
-  --sidebarScrollbarTrack:       var(--sidebarBackground);
+  --sidebarStaleVersion:         var(--orangeLight);
   --sidebarSubheadings:          var(--gray400);
   --sidebarItem:                 var(--gray200);
   --sidebarInactiveItemBorder:   var(--gray400);
@@ -90,13 +83,16 @@ body.dark {
   --searchSearch:                var(--gray900);
   --autocompleteBorder:          rgba(28,42,60,.75);
   --autocompletePreview:         var(--gray750);
+  --autocompleteSelected:        var(--gray750);
   --autocompleteHover:           var(--gray700);
   --autocompleteBackground:      var(--gray800);
   --suggestionBorder:            var(--gray600);
   --autocompleteResults:         var(--gray200);
   --autocompleteResultsBold:     var(--gray100);
-  --autocompleteSrollbarThumb:   var(--gray600);
-  --autocompleteSrollbarTrack:   var(--gray850);
   --autocompleteLabelBack:       var(--gray600);
   --autocompleteLabelFont:       rgba(255, 255, 255, 0.8);
+}
+
+:root:has(body.dark) {
+  color-scheme: dark;
 }

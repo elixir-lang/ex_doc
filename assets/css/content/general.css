@@ -1,10 +1,57 @@
 .content-inner {
-  font-family: var(--defaultFontFamily);
   font-size: 1em;
   line-height: 1.6875em;
   position: relative;
   background-color: var(--background);
   color: var(--textBody);
+}
+
+.content-inner .heading-with-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+}
+.content-inner .heading-with-actions > *:not(h1) {
+  flex-shrink: 0;
+}
+.content-inner .heading-with-actions h1 {
+  flex-grow: 1;
+  justify-self: flex-start;
+  max-width: 100%;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+.content-inner .heading-with-actions .icon-action {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: normal;
+}
+.content-inner .heading-with-actions.top-heading .icon-action {
+  font-size: 1.2rem;
+}
+/* When content is wide enough, ensure action icon is to the right of, not below, heading */
+@container content (width > 600px) {
+  .content-inner .heading-with-actions.top-heading {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+
+    & h1 {
+      padding-right: 32px; /* ensures space between heading text and icon(s) */
+    }
+
+    & .icon-action {
+      padding-top: 1.7rem; /* vertically align with x-height of first line of heading */
+    }
+  }
+}
+
+.content-inner .top-heading {
+  padding-top: 1rem;
 }
 
 .content-inner :is(h1, h2, h3, h4, h5, h6) {
@@ -20,34 +67,23 @@
   margin: 0.5em 0;
 }
 
-.content-inner h1.signature {
-  margin: 0;
-}
-
 .content-inner h1.section-heading {
   margin: 1.5em 0 0.5em;
 }
 
 .content-inner h1 small {
-  font-weight: 300;
-}
-
-.content-inner h1 .icon-action {
-  font-size: 1.2rem;
-  font-weight: normal;
+  font-weight: 400;
 }
 
 .content-inner h2 {
   font-size: 1.6em;
   padding-top: 1em;
   margin-bottom: 0.5em;
-  font-weight: 700;
 }
 
 .content-inner h3 {
   font-size: 1.375em;
   margin: 1em 0 0.5em;
-  font-weight: 700;
 }
 
 .content-inner li + li {
@@ -55,26 +91,21 @@
 }
 
 .content-inner :is(a, .a-main) {
-  color: var(--links);
+  color: var(--link-color);
   text-decoration: underline;
-  text-decoration-color: var(--linksDecoration);
   text-decoration-skip-ink: auto;
 }
 .content-inner :is(a:visited, .a-main:visited) {
-  color: var(--linksVisited);
+  color: var(--link-visited-color);
 }
 
 .content-inner .icon-action {
-  float: right;
   color: var(--iconAction);
   text-decoration: none;
   border: none;
-  transition: color 0.3s ease-in-out;
+  transition: var(--transition-colors);
   background-color: transparent;
   cursor: pointer;
-}
-.content-inner button.icon-action {
-  margin-top: 12px;
 }
 .content-inner .icon-action:hover {
   color: var(--iconActionHover);
@@ -93,8 +124,7 @@
 
 .content-inner .note {
   color: var(--iconAction);
-  margin-right: 5px;
-  font-size: 14px;
+  font-size: var(--text-xs);
   font-weight: normal;
 }
 
@@ -105,7 +135,7 @@
   padding: 0 1.2rem;
   overflow: auto;
   background-color: var(--blockquoteBackground);
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-base);
 }
 .content-inner blockquote p:last-child, .content-inner section.admonition p:last-child  {
   padding-bottom: 1em;
@@ -115,14 +145,16 @@
 .content-inner table {
   margin: 2em 0;
   border-collapse: collapse;
+  display: block;
+  overflow: auto;
 }
 
 .content-inner th {
   text-align: left;
   font-family: var(--sansFontFamily);
-  text-transform: uppercase;
   font-weight: 700;
   padding-bottom: 0.5em;
+  white-space: nowrap;
 }
 
 .content-inner thead tr {
@@ -212,6 +244,7 @@
   font-style: normal;
   line-height: 24px;
   font-weight: 400;
+  font-size: var(--text-sm);
 }
 
 @media screen and (max-width: 768px) {

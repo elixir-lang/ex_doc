@@ -36,8 +36,8 @@ jobs:
             otp_version: "26.2.5"
             elixir_version: "1.16.2"
           - otp: 27
-            otp_version: "27.0"
-            elixir_version: "1.17.0"
+            otp_version: "27.2"
+            elixir_version: "1.18.2"
 
     runs-on: ubuntu-22.04
     steps:

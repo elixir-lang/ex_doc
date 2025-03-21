@@ -1,6 +1,4 @@
 defmodule ExDoc.Refs do
-  @moduledoc false
-
   # A read-through cache of documentation references.
   #
   # A given ref is always associated with a module. If we don't have a ref
@@ -8,6 +6,7 @@ defmodule ExDoc.Refs do
   #
   # If the module does not have the docs chunk, we fetch it's functions,
   # callbacks and types from other sources.
+  @moduledoc false
 
   @typep entry() :: {ref(), visibility()}
 

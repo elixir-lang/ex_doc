@@ -9,9 +9,9 @@
     "npm": ">= 9.0.0"
   },
   "scripts": {
-    "lint": "npx eslint './js/**/*.js'",
-    "lint:fix": "npx eslint --fix './js/**/*.js'",
-    "test": "npx karma start ./karma.conf.js --single-run",
+    "lint": "eslint './js/**/*.js'",
+    "lint:fix": "eslint --fix './js/**/*.js'",
+    "test": "karma start ./karma.conf.js --single-run",
     "build:watch": "npm run build --watch",
     "build": "node build/build.js"
   },
@@ -19,7 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/elixir-lang/ex_doc.git"
   },
-  "author": "Plataformatec",
+  "author": "The Elixir Team",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/elixir-lang/ex_doc/issues"
@@ -27,8 +27,10 @@
   "homepage": "https://github.com/elixir-lang/ex_doc#readme",
   "browserslist": "last 2 versions",
   "devDependencies": {
-    "@fontsource/inconsolata": "^4.5.9",
+    "@fontsource-variable/inconsolata": "^5.1.1",
     "@fontsource/lato": "^4.5.10",
+    "@swup/a11y-plugin": "^5.0.0",
+    "@swup/progress-plugin": "^3.2.0",
     "esbuild": "^0.16.16",
     "eslint": "^8.31.0",
     "eslint-config-standard": "^17.0.0",
@@ -45,7 +47,8 @@
     "karma-sourcemap-loader": "^0.3.5",
     "lodash.throttle": "^4.1.1",
     "lunr": "^2.3.8",
-    "mocha": "^10.2.0",
-    "normalize.css": "^8.0.1"
+    "mocha": "^10.8.2",
+    "modern-normalize": "^3.0.1",
+    "swup": "^4.8.1"
   }
 }

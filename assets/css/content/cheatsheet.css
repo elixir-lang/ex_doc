@@ -29,22 +29,15 @@
   font-weight: 500;
 }
 
-.page-cheatmd.dark .content-inner h2 {
+.dark .page-cheatmd .content-inner h2 {
   color: var(--gray200);
 }
 
 /* h3 */
 
 .page-cheatmd .content-inner h3 {
-  color: var(--main);
-  text-decoration-color: var(--main);
   margin: 0 0 1em;
   font-weight: 400;
-}
-
-.page-cheatmd .content-inner h3 :is(a, a:visited) {
-  color: var(--main);
-  text-decoration-color: var(--main);
 }
 
 .page-cheatmd .content-inner section.h3 {
@@ -82,7 +75,7 @@
   border: solid 1px 1px 0 1px var(--gray100);
 }
 
-.page-cheatmd.dark .content-inner h4 {
+.dark .page-cheatmd .content-inner h4 {
   background: #192f50;
   color: var(--textBody);
   border: 1px solid #192f50;
@@ -98,13 +91,13 @@
   padding: var(--vertical-space) var(--horizontal-space);
 }
 
-.page-cheatmd.dark .content-inner .h2 p {
+.dark .page-cheatmd .content-inner .h2 p {
   background: var(--gray700);
 }
 
 .page-cheatmd .content-inner .h2 p > code {
   color: #eb5757;
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-sm);
   padding: 0.2em 0.4em;
 }
 
@@ -112,11 +105,6 @@
 
 .page-cheatmd .content-inner pre code {
   padding: var(--vertical-space) var(--horizontal-space);
-}
-
-.page-cheatmd .content-inner pre code::-webkit-scrollbar {
-  width: 0.4rem;
-  height: 0.6rem;
 }
 
 .page-cheatmd .content-inner .h2 pre {
@@ -168,7 +156,7 @@
 
 .page-cheatmd .content-inner .h2 td code {
   color: #eb5757;
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-sm);
   padding: 0.2em 0.4em;
 }
 
@@ -176,7 +164,7 @@
   background-color: var(--gray50);
 }
 
-.page-cheatmd.dark .content-inner .h2 thead {
+.dark .page-cheatmd .content-inner .h2 thead {
   background-color: var(--gray700);
 }
 
@@ -207,7 +195,7 @@
 
 .page-cheatmd .content-inner .h2 li > code {
   color: #eb5757;
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-sm);
   padding: 0.2em 0.4em;
 }
 

@@ -1,4 +1,4 @@
-<%= head_template(config, %{title: title}) %>
+<%= head_template(config, title) %>
     <h1 id="content">
       <%=h title_content %>
     </h1>

@@ -1,8 +1,8 @@
 <form autocomplete="off">
   <label>
-    <span class="sidebar-projectVersionsDropdownCaret" aria-hidden="true">&#x25bc;</span>
+    <span class="sidebar-projectVersionsCaret" aria-hidden="true">&#x25bc;</span>
     <span class="sr-only">Project version</span>
-    <select class="sidebar-projectVersionsDropdown">
+    <select>
       {{#each nodes}}
         <option translate="no" value="{{url}}"{{#if isCurrentVersion}} selected disabled{{/if}}>
           {{version}}
@@ -10,4 +10,11 @@
       {{/each}}
     </select>
   </label>
+  {{#if latestVersion}}
+    <div class="sidebar-staleVersion">
+      <a href="{{latestVersion}}" title="This version of package is not the latest version">
+        <i class="ri-alert-line sidebar-staleIcon" aria-hidden="true"></i><span>Go to latest</span>
+      </a>
+    </div>
+  {{/if}}
 </form>

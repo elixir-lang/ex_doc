@@ -1,12 +1,12 @@
 /**
  * A shorthand for `document.querySelector`.
- * @type {Function}
+ * @type {typeof document.querySelector}
  */
 export const qs = document.querySelector.bind(document)
 
 /**
  * A shorthand for `document.querySelectorAll`.
- * @type {Function}
+ * @type {typeof document.querySelectorAll}
  */
 export const qsAll = document.querySelectorAll.bind(document)
 
@@ -43,39 +43,20 @@ export function escapeHtmlEntities (text) {
  * @returns {String}
  */
 export function getCurrentPageSidebarType () {
-  return document.body.dataset.type
+  return document.getElementById('main').dataset.type
 }
 
-/**
- * Looks up a nested node having the specified anchor
- * and returns the corresponding category.
- *
- * @param {Array} nodes A list of sidebar nodes.
- * @param {String|null} anchor The anchor to look for.
- * @returns {String} The relevant node group key, like 'functions', 'types', etc.
- */
-export function findSidebarCategory (nodes, anchor) {
-  if (!nodes) return
-
-  for (const node of nodes) {
-    const nodeGroup = node.nodeGroups && node.nodeGroups.find(nodeGroup =>
-      nodeGroup.nodes.some(subnode => subnode.anchor === anchor)
-    )
-
-    if (nodeGroup) return nodeGroup.key
-  }
-
-  return null
-}
+const headingTagNames = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6']
 
 /**
  * Finds an element by a URL hash (e.g. a function section).
  *
- * @param {String} hash The hash part of a URL.
  * @param {Boolean} anything Whether or not to support any link to any header.
  * @returns {HTMLElement|null} The relevant element.
  */
-export function descriptionElementFromHash (hash, anything = false) {
+export function descriptionElementFromHash (anything = false) {
+  const hash = window.location.hash.replace(/^#/, '')
+
   if (!hash) {
     if (!anything) {
       return null
@@ -93,40 +74,57 @@ export function descriptionElementFromHash (hash, anything = false) {
   }
 
   // Matches a subheader in particular
-  if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(element.tagName.toLowerCase())) {
-    return toNextHeader(element)
+  if (headingTagNames.includes(element.tagName)) {
+    return headingPreview(element)
   }
 
+  const nearestHeading = findNearestAboveHeading(element)
+
+  if (nearestHeading) {
+    return nearestHeading
+  } else {
+    return document.getElementById('top-content')
+  }
+}
+
+function findNearestAboveHeading (element) {
+  let previous = element.previousElementSibling
+  while (previous) {
+    if (headingTagNames.includes(previous.tagName)) {
+      return headingPreview(previous)
+    }
+    previous = previous.previousElementSibling
+  }
+  let parent = element.parentNode
+  while (parent) {
+    previous = parent.previousElementSibling
+    while (previous) {
+      if (headingTagNames.includes(previous.tagName)) {
+        return headingPreview(previous)
+      }
+      previous = previous.previousElementSibling
+    }
+    parent = parent.parentNode
+  }
   return null
 }
 
-function toNextHeader (element) {
-  const elements = [element]
-  let nextElement = element.nextElementSibling
-  const tagName = element.tagName.toLowerCase()
+function headingPreview (element) {
+  const div = document.createElement('div')
+  const nodes = [element]
 
-  while (nextElement) {
-    const nextElementTagName = nextElement.tagName.toLowerCase()
-    if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(nextElementTagName) && nextElementTagName <= tagName) {
-      nextElement = null
+  // Capture all nodes under the current heading level.
+  let node = element
+  while ((node = node.nextSibling)) {
+    if (headingTagNames.includes(node.tagName) && node.tagName <= element.tagName) {
+      break
     } else {
-      elements.push(nextElement)
-      nextElement = nextElement.nextElementSibling
+      nodes.push(node)
     }
   }
 
-  const div = document.createElement('div')
-  div.append(...elements)
+  div.append(...nodes)
   return div
-}
-
-/**
- * Returns current location hash without the leading hash character.
- *
- * @returns {String}
- */
-export function getLocationHash () {
-  return window.location.hash.replace(/^#/, '')
 }
 
 /**
@@ -218,5 +216,27 @@ export function getProjectNameAndVersion () {
  * @return {Boolean}
  */
 export function isAppleOS () {
-  return /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent)
+  // Set in inline_html.js
+  return document.documentElement.classList.contains('apple-os')
+}
+
+/**
+ * Create element from tag, attributes and children.
+ *
+ * @param {string} tagName
+ * @param {Record<string, any>} attributes
+ * @param {(HTMLElement | string)[]} [children]
+ * @returns {HTMLElement}
+ */
+export function el (tagName, attributes, children) {
+  const element = document.createElement(tagName)
+  for (const key in attributes) {
+    if (attributes[key] != null) {
+      element.setAttribute(key, attributes[key])
+    }
+  }
+  if (children) {
+    element.replaceChildren(...children)
+  }
+  return element
 }

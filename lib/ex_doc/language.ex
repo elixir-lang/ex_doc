@@ -80,9 +80,7 @@ defmodule ExDoc.Language do
               %{
                 id_key: binary(),
                 default_group: binary(),
-                # TODO: change to following on Elixir 1.15. It trips mix formatter between 1.14 and 1.15
-                # doc_fallback: (-> ExDoc.DocAST.t()),
-                doc_fallback: (... -> ExDoc.DocAST.t()),
+                doc_fallback: (-> ExDoc.DocAST.t()),
                 extra_annotations: [String.t()],
                 signature: [binary()],
                 source_file: String.t() | nil,

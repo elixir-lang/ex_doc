@@ -3,16 +3,19 @@
   --sidebarLineHeight: 20px;
   font-family: var(--sansFontFamily);
   font-size: var(--sidebarFontSize);
-  font-weight: 300;
   line-height: var(--sidebarLineHeight);
   background-color: var(--sidebarBackground);
   color: var(--sidebarAccentMain);
   overflow: hidden;
-  scrollbar-color: var(--sidebarScrollbarThumb) var(--sidebarScrollbarTrack);
+
+  & .sidebar-tabpanel {
+    scrollbar-width: thin;
+  }
 }
 
-.non-apple-os .sidebar {
-  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
+.apple-os .sidebar {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .sidebar ul {
@@ -27,7 +30,7 @@
 .sidebar a {
   color: var(--sidebarAccentMain);
   text-decoration: none;
-  transition: color 0.3s ease-in-out;
+  transition: var(--transition-colors);
 }
 
 .sidebar a:hover {
@@ -43,9 +46,12 @@
   display: flex;
   justify-content: start;
   align-items: center;
-  gap: 16px;
-  margin: 12px 16px 12px 14px;
-  max-width: 235px;
+  gap: 8px;
+  margin: 12px 34px 12px 14px;
+}
+
+.sidebar .sidebar-projectInfo > div {
+  flex: 1;
 }
 
 .sidebar .sidebar-projectImage {
@@ -60,13 +66,14 @@
 
 .sidebar .sidebar-projectName {
   font-weight: 700;
-  font-size: 20px;
+  font-size: var(--text-xl);
   line-height: 24px;
   color: var(--sidebarAccentMain);
   margin: 0;
   padding: 0;
-  max-width: 230px;
   word-wrap: break-word;
+  display: block;
+  width: calc(100% - 12px);
 }
 
 .sidebar .sidebar-projectVersion {
@@ -77,13 +84,18 @@
   font-size: var(--sidebarFontSize);
   line-height: var(--sidebarLineHeight);
   color: var(--sidebarMuted);
+  width: calc(100% - 12px);
 }
 
-.sidebar .sidebar-projectVersionsDropdown {
+.sidebar .sidebar-projectVersion form {
+  display: flex;
+}
+
+.sidebar .sidebar-projectVersion select {
   cursor: pointer;
   position: relative;
   margin: 0;
-  padding: 0 0 0 12px;
+  padding: 0 0 0 10px;
   border: none;
   -webkit-appearance: none;
   appearance: none;
@@ -92,11 +104,11 @@
   z-index: 2;
 }
 
-.sidebar .sidebar-projectVersionsDropdown option {
+.sidebar .sidebar-projectVersion option {
   color: initial;
 }
 
-.sidebar .sidebar-projectVersionsDropdownCaret {
+.sidebar .sidebar-projectVersionsCaret {
   position: absolute;
   left: 0;
   top: 2px;
@@ -105,29 +117,52 @@
   color: var(--sidebarMuted);
 }
 
-.sidebar .sidebar-projectVersionsDropdown::-ms-expand {
+.sidebar .sidebar-projectVersion select::-ms-expand {
   display: none;
 }
 
-.sidebar .sidebar-listNav {
+.sidebar .sidebar-staleVersion {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--sidebarStaleVersion);
+}
+
+.sidebar .sidebar-staleVersion > a {
+  color: var(--sidebarStaleVersion);
+  font-weight: 400;
+}
+
+.sidebar .sidebar-staleIcon {
+  font-size: var(--text-lg);
+  position: relative;
+  top: 3px;
+  line-height: 0;
+}
+
+.sidebar .sidebar-list-nav {
   display: flex;
   margin: 0;
-  padding: 4px 4px 0 4px;
+  padding: 0px;
+  overflow: auto;
+  scrollbar-width: thin;
 }
 
-.sidebar .sidebar-listNav :is(li, li button) {
+.sidebar .sidebar-list-nav :is(li, li button) {
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  font-size: 14px;
-  color: var(--sidebarMuted);
+  font-size: var(--text-sm);
+  color: var(--sidebarSubheadings);
+  white-space: nowrap;
 }
 
-.sidebar .sidebar-listNav li {
+.sidebar .sidebar-list-nav li {
   display: inline-block;
   padding: 0;
 }
 
-.sidebar .sidebar-listNav li button {
+.sidebar .sidebar-list-nav button {
   background: none;
   border: 0;
   border-radius: 0;
@@ -138,24 +173,23 @@
   cursor: pointer;
   display: inline-block;
   line-height: 27px;
-  padding: 4px 10px 2px 10px;
-  transition: all 150ms;
+  padding: 4px 14px 4px 14px;
+  transition: var(--transition-all);
 }
 
-.sidebar .sidebar-listNav li:is(.selected) button {
-  background-color: var(--sidebarBackground);
-  border-top: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
+.sidebar .sidebar-list-nav button {
+  border-bottom: var(--navTabBorderWidth) solid transparent;
 }
 
-.sidebar .sidebar-listNav li:not(.selected) button {
-  border-top: var(--navTabBorderWidth) solid var(--sidebarHeader);
-}
-
-.sidebar .sidebar-listNav li:is(:hover):not(.selected) button {
-  background-color: var(--sidebarInactiveItemMarker);
-  border-top: var(--navTabBorderWidth) solid var(--sidebarInactiveItemBorder);
+.sidebar .sidebar-list-nav button:not([aria-selected]):hover {
+  border-bottom: var(--navTabBorderWidth) solid var(--sidebarInactiveItemBorder);
   color: var(--sidebarAccentMain);
-  transition: all 150ms;
+  transition: var(--transition-all);
+}
+
+.sidebar .sidebar-list-nav button[aria-selected] {
+  border-bottom: var(--navTabBorderWidth) solid var(--sidebarLanguageAccentBar);
+  color: var(--sidebarAccentMain);
 }
 
 .sidebar .sidebar-tabpanel {
@@ -164,7 +198,8 @@
   overscroll-behavior: contain;
   position: relative;
   -webkit-overflow-scrolling: touch;
-  margin-top: 12px;
+  padding-top: 12px;
+  scroll-padding-top: 40px;
 }
 
 .sidebar .full-list {
@@ -174,79 +209,15 @@
 }
 
 .sidebar .full-list :is(li, a) {
+  display: block;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .sidebar .full-list li {
   padding: 0;
-  margin-right: 30px;
   line-height: 27px;
-  white-space: nowrap;
-}
-
-.sidebar .full-list li.docs {
-  margin-right: 0;
-}
-
-.sidebar .full-list li.open > ul {
-  display: block;
-  margin-left: 10px;
-}
-
-.sidebar .full-list li a.expand + button.icon-expand {
-  appearance: none;
-  background-color: transparent;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  color: inherit;
-  margin-right: 10px;
-  font-size: calc(1.2 * var(--sidebarFontSize));
-  line-height: var(--sidebarLineHeight);
-  position: absolute;
-  display: flex;
-  right: 0;
-  transform: translateY(calc(-100% - 4px));
-}
-
-.sidebar .full-list li a + button.icon-expand:after {
-  font-family: remixicon;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.sidebar .full-list li a.expand + button.icon-expand:after {
-  content: var(--icon-arrow-down-s);
-}
-
-.sidebar .full-list li.open > a.expand + button.icon-expand:after {
-  content: var(--icon-arrow-up-s);
-}
-
-.sidebar .full-list li.docs > a + button.icon-expand {
-  margin-right: 12px;
-  font-size: var(--sidebarFontSize);
-  line-height: var(--sidebarFontSize);
-  transform: translateY(calc(-100% - 5px));
-}
-
-.sidebar .full-list li.docs > a + button.icon-expand:after {
-  content: var(--icon-add);
-}
-
-.sidebar .full-list li.docs.open > a + button.icon-expand:after {
-  content: var(--icon-subtract);
-}
-
-.sidebar .full-list li.nesting-context {
-  font-weight: bold;
-  font-size: 0.9em;
-  line-height: 1.8em;
-  color: var(--sidebarSubheadings);
-  margin-top: 10px;
-  padding-left: 15px;
 }
 
 .sidebar .full-list li.group {
@@ -259,40 +230,82 @@
   padding-left: 15px;
 }
 
-.sidebar .full-list li a {
-  padding: 3px 0 3px 15px;
+.sidebar .full-list li.nesting-context {
+  font-weight: bold;
+  font-size: 0.9em;
+  line-height: 1.8em;
+  color: var(--sidebarSubheadings);
+  margin-top: 10px;
+  padding-left: 15px;
+}
+
+.sidebar .full-list a {
+  margin-right: 30px;
+  padding: 3px 0 3px 12px;
+  border-left: var(--navTabBorderWidth) solid transparent;
   color: var(--sidebarItem);
 }
 
-.sidebar .full-list > li > a {
+.sidebar .full-list a[aria-selected] {
+  color: var(--sidebarActiveItem);
+}
+
+.sidebar .full-list button {
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  width: 20px;
+  text-align: center;
+  font-size: calc(1.2 * var(--sidebarFontSize));
+  line-height: var(--sidebarLineHeight);
+  position: absolute;
   display: block;
-  width: 100%;
+  right: 10px;
+  transform: translateY(-100%);
+}
+
+.sidebar .full-list a[aria-selected] + button {
+  color: var(--sidebarActiveItem);
+}
+
+.sidebar .full-list button:after {
+  font-family: remixicon;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: var(--icon-arrow-down-s);
+}
+
+.sidebar .full-list button[aria-expanded=true]:after {
+  content: var(--icon-arrow-up-s);
+}
+
+.sidebar .full-list ul {
+  display: none;
+  margin: 10px 0 10px 10px;
+  padding: 0;
+}
+
+.sidebar .full-list button[aria-expanded=true] + ul {
+  display: block;
+}
+
+/* Level 1 */
+
+.sidebar .full-list > li > a {
   height: 27px;
   line-height: var(--sidebarLineHeight);
 }
 
-.sidebar .full-list li .current-section > a {
-  color: var(--sidebarActiveItem);
-}
-
-.sidebar .full-list li .current-section > a + button.icon-expand {
-  color: var(--sidebarActiveItem);
-}
-
 .sidebar .full-list > li > a:hover {
-  border-left: 3px solid var(--sidebarLanguageAccentBar);
-  padding-left: 12px;
+  border-left-color: var(--sidebarLanguageAccentBar);
 }
 
-.sidebar .full-list > li.current-page > a {
-  color: var(--sidebarActiveItem);
-  border-left: 3px solid var(--sidebarLanguageAccentBar);
-  padding-left: 12px;
-}
-
-.sidebar .full-list > li.current-page > a:after,
-.sidebar .full-list > li.current-page {
-  color: var(--sidebarActiveItem);
+.sidebar .full-list > li > a[aria-selected] {
+  border-left-color: var(--sidebarLanguageAccentBar);
 }
 
 .sidebar .full-list > li:last-child {
@@ -303,34 +316,9 @@
   margin-top: 0;
 }
 
-.sidebar .full-list ul {
-  display: none;
-  margin: 10px 15px;
-  margin-right: 0;
-  padding: 0;
-}
+/* Level 2 */
 
-.sidebar .full-list ul li {
-  font-weight: 300;
-  line-height: var(--sidebarFontSize);
-  padding: 0 8px;
-  margin-right: 0;
-  color: var(--sidebarAccentMain);
-}
-
-.non-apple-os .sidebar .full-list ul li {
-  font-weight: 400; /* Non-Apple OSes render small light type too thinly */
-}
-
-.sidebar .full-list ul li.current-hash {
-  color: var(--sidebarActiveItem);
-}
-
-.sidebar .full-list ul li.current-hash > a {
-  color: var(--sidebarActiveItem);
-}
-
-.sidebar .full-list ul li.current-hash > a:before,
+.sidebar .full-list > li > ul > li:not(:has(li a[aria-selected=true])) > a[aria-selected=true]:before,
 .sidebar .full-list > li > ul > li > a:hover:before {
   content: "\2022";
   position: absolute;
@@ -338,61 +326,54 @@
   color: var(--sidebarActiveItem);
 }
 
-.sidebar .full-list ul li a {
+/* Level 2+ */
+
+.sidebar .full-list ul li {
+  line-height: var(--sidebarFontSize);
+  padding: 0 8px;
+}
+
+.sidebar .full-list ul a {
   padding-left: 15px;
-  display: block;
-  width: 100%;
   height: 24px;
 }
 
-.sidebar .full-list ul li ul {
-  display: none;
-  margin: 9px 20px;
-  margin-right: 0;
+.sidebar .full-list ul button {
+  font-size: var(--sidebarFontSize);
 }
 
-.sidebar .full-list ul li ul li {
-  margin-right: 0;
+.sidebar .full-list ul button:after {
+  content: var(--icon-add);
+}
+
+.sidebar .full-list ul button[aria-expanded=true]:after {
+  content: var(--icon-subtract);
+}
+
+/* Level 3+ */
+
+.sidebar .full-list ul ul {
+  margin: 9px 0 9px 10px;
+}
+
+.sidebar .full-list ul ul li {
   height: 20px;
   color: var(--sidebarAccentMain);
 }
 
-.sidebar .full-list ul li ul li a {
+.sidebar .full-list ul ul a {
   border-left: 1px solid var(--sidebarInactiveItemMarker);
   padding: 0 10px;
   height: 20px;
 }
 
-.sidebar .full-list ul li ul li.current-hash > a:before {
-  content: none;
-}
-
-.sidebar .full-list ul li ul li > a:hover {
+.sidebar .full-list ul ul a:hover {
   border-color: var(--sidebarLanguageAccentBar);
 }
 
-.sidebar .full-list ul li ul li.current-hash > a {
+.sidebar .full-list ul ul a[aria-selected] {
   color: var(--sidebarActiveItem);
   border-color: var(--sidebarLanguageAccentBar);
-}
-
-.sidebar .full-list ul li ul li.current-hash > a {
-  color: var(--sidebarActiveItem);
-  margin-left: 0;
-}
-
-.sidebar ::-webkit-scrollbar {
-  width: 14px;
-}
-
-::-webkit-scrollbar-track {
-  background-color: var(--sidebarBackground);
-}
-
-.sidebar ::-webkit-scrollbar-thumb {
-  background-color: var(--sidebarScrollbarThumb);
-  border-radius: 10px;
-  border: 3px solid var(--sidebarBackground);
 }
 
 .sidebar-button {
@@ -400,17 +381,14 @@
   background-color: transparent;
   border: none;
   font-size: var(--sidebarFontSize);
+  color: var(--sidebarAccentMain);
 }
 
 .sidebar-button:hover {
   color: var(--sidebarHover);
 }
 
-.sidebar-button {
-  color: var(--sidebarAccentMain);
-}
-
-.sidebar-closed .sidebar-button {
+body:not(.sidebar-open) .sidebar-button {
   color: var(--contrast);
 }
 

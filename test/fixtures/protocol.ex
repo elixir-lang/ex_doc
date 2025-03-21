@@ -7,10 +7,10 @@ defprotocol CustomProtocol do
   def plus_two(bar)
 end
 
-defimpl CustomProtocol, for: Number do
+defimpl CustomProtocol, for: Integer do
   @doc """
   Special plus one docs
   """
-  def plus_one(number), do: number + 1
-  def plus_two(number), do: number + 2
+  def plus_one(int), do: int + 1
+  def plus_two(int), do: int + 2
 end

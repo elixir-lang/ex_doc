@@ -1,17 +1,22 @@
 import { settingsStore } from './settings-store'
 import { showToast } from './toast'
+import { DARK_MODE_CLASS, THEME_SYSTEM, THEME_DARK, THEME_LIGHT } from './constants'
 
-const DARK_MODE_CLASS = 'dark'
-const THEMES = ['system', 'dark', 'light']
+const THEMES = [THEME_SYSTEM, THEME_DARK, THEME_LIGHT]
+
+const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
 /**
  * Sets initial night mode state and registers to settings updates.
  */
-export function initialize (theme) {
-  settingsStore.getAndSubscribe(settings => {
-    document.body.classList.toggle(DARK_MODE_CLASS, shouldUseDarkMode(theme || settings.theme))
-  })
-  listenToDarkMode()
+
+settingsStore.getAndSubscribe(update)
+darkMediaQuery.addEventListener('change', update)
+
+function update () {
+  const theme = currentTheme()
+  const dark = theme === THEME_DARK || (theme !== THEME_LIGHT && darkMediaQuery.matches)
+  document.body.classList.toggle(DARK_MODE_CLASS, dark)
 }
 
 /**
@@ -24,27 +29,6 @@ export function cycleTheme () {
 }
 
 export function currentTheme () {
-  return settingsStore.get().theme || 'system'
-}
-
-function shouldUseDarkMode (theme) {
-  // nightMode used to be true|false|null
-  // Now it's 'dark'|'light'|'system'|null with null treated as 'system'
-  return (theme === 'dark') ||
-         (prefersDarkColorScheme() && (theme == null || theme === 'system'))
-}
-
-function prefersDarkColorScheme () {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-}
-
-function listenToDarkMode () {
-  window.matchMedia('(prefers-color-scheme: dark)').addListener(_e => {
-    const theme = settingsStore.get().theme
-    const isNight = shouldUseDarkMode(theme)
-    if (theme == null || theme === 'system') {
-      document.body.classList.toggle(DARK_MODE_CLASS, isNight)
-      showToast(`Browser changed theme to "${isNight ? 'dark' : 'light'}"`)
-    }
-  })
+  const params = new URLSearchParams(window.location.search)
+  return params.get('theme') || settingsStore.get().theme || THEME_SYSTEM
 }

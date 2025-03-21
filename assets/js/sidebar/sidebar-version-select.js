@@ -1,65 +1,86 @@
 import { qs, checkUrlExists } from '../helpers'
-import { getVersionNodes } from '../globals'
+import { getVersionNodes, isEmbedded } from '../globals'
+import versionsDropdownTemplate from '../handlebars/templates/versions-dropdown.handlebars'
 
 const VERSIONS_CONTAINER_SELECTOR = '.sidebar-projectVersion'
-const VERSIONS_DROPDOWN_SELECTOR = '.sidebar-projectVersionsDropdown'
+const VERSIONS_DROPDOWN_SELECTOR = '.sidebar-projectVersion select'
+const VERSIONS_LATEST_SELECTOR = '.sidebar-staleVersion a'
 
 /**
  * Initializes selectable version list if `versionNodes` have been configured.
  */
-export function initialize () {
-  const versionNodes = getVersionNodes()
 
-  if (versionNodes.length > 0) {
-    const versionsContainer = qs(VERSIONS_CONTAINER_SELECTOR)
+if (!isEmbedded) {
+  const versionNodes = getVersionNodes()
+  const versionsContainer = qs(VERSIONS_CONTAINER_SELECTOR)
+
+  if (versionNodes.length > 0 || !versionsContainer) {
     // Initially the container contains only text with the current version
     const currentVersion = versionsContainer.textContent.trim()
-    const nodes = decorateVersionNodes(versionNodes, currentVersion)
 
-    renderVersionsDropdown({ nodes })
+    // Add the current version node to the list if not there.
+    const withCurrentVersion = versionNodes.some((node) => node.version === currentVersion)
+      ? versionNodes
+      : [{ version: currentVersion, url: '#' }, ...versionNodes]
+
+    // Add additional attributes to version nodes for rendering.
+    const nodes = withCurrentVersion.map(node => ({
+      ...node,
+      isCurrentVersion: node.version === currentVersion
+    }))
+
+    const latestVersionNode = versionNodes.find(node => node.latest)
+    const latestVersion = latestVersionNode?.version !== currentVersion && !currentVersion.includes('-') ? latestVersionNode?.url : null
+
+    versionsContainer.innerHTML = versionsDropdownTemplate({ nodes, latestVersion})
+
+    const select = qs(VERSIONS_DROPDOWN_SELECTOR)
+    select.addEventListener('change', handleVersionSelected)
+    adjustWidth(select)
+
+    const versionsGoToLatest = qs(VERSIONS_LATEST_SELECTOR)
+
+    if (versionsGoToLatest) {
+      versionsGoToLatest.addEventListener('click', handleGoToLatestClicked)
+    }
   }
 }
 
-function renderVersionsDropdown ({ nodes }) {
-  const versionsContainer = qs(VERSIONS_CONTAINER_SELECTOR)
-  const versionsDropdownHtml = Handlebars.templates['versions-dropdown']({ nodes })
-  versionsContainer.innerHTML = versionsDropdownHtml
+// Function to adjust the width of the select element
+function adjustWidth (select) {
+  // Create a temporary element to measure the width
+  const temp = document.createElement('span')
+  temp.style.visibility = 'hidden'
+  temp.style.position = 'absolute'
+  temp.style.whiteSpace = 'nowrap'
+  temp.style.font = window.getComputedStyle(select).font
+  temp.textContent = select.options[select.selectedIndex].text
 
-  qs(VERSIONS_DROPDOWN_SELECTOR).addEventListener('change', handleVersionSelected)
-}
-
-/**
- * Adds additional attributes to version nodes for rendering.
- */
-function decorateVersionNodes (nodes, currentVersion) {
-  const withCurrentVersion = ensureCurrentVersionNode(nodes, currentVersion)
-
-  return withCurrentVersion.map(node => ({
-    ...node,
-    isCurrentVersion: node.version === currentVersion
-  }))
-}
-
-/**
- * Adds the current version node to the list unless it's already there.
- */
-function ensureCurrentVersionNode (nodes, currentVersion) {
-  const currentVersionPresent = nodes.some(
-    (node) => node.version === currentVersion
-  )
-
-  if (currentVersionPresent) {
-    return nodes
-  } else {
-    const currentVersionNode = { version: currentVersion, url: '#' }
-    return [currentVersionNode, ...nodes]
-  }
+  document.body.appendChild(temp)
+  select.style.width = `${temp.offsetWidth + 20}px`
+  document.body.removeChild(temp)
 }
 
 function handleVersionSelected (event) {
   const url = event.target.value
   const pathSuffix = window.location.pathname.split('/').pop() + window.location.hash
   const otherVersionWithPath = `${url}/${pathSuffix}`
+
+  checkUrlExists(otherVersionWithPath)
+    .then(exists => {
+      if (exists) {
+        window.location.href = otherVersionWithPath
+      } else {
+        window.location.href = url
+      }
+    })
+}
+
+function handleGoToLatestClicked (event) {
+  const url = this.href
+  const pathSuffix = window.location.pathname.split('/').pop() + window.location.hash
+  const otherVersionWithPath = `${url}/${pathSuffix}`
+  event.preventDefault()
 
   checkUrlExists(otherVersionWithPath)
     .then(exists => {

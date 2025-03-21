@@ -3,10 +3,15 @@
 import lunr from 'lunr'
 import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
 import { setSearchInputValue } from './search-bar'
+import searchResultsTemplate from './handlebars/templates/search-results.handlebars'
 
 const EXCERPT_RADIUS = 80
-
 const SEARCH_CONTAINER_SELECTOR = '#search'
+
+lunr.tokenizer.separator = /\s+/
+lunr.QueryLexer.termSeparator = /\s+/
+lunr.Pipeline.registerFunction(docTokenFunction, 'docTokenSplitter')
+lunr.Pipeline.registerFunction(docTrimmerFunction, 'docTrimmer')
 
 /**
  * Performs a full-text search within the documentation
@@ -14,7 +19,10 @@ const SEARCH_CONTAINER_SELECTOR = '#search'
  *
  * Activates only on the `/search.html` page.
  */
-export function initialize () {
+
+window.addEventListener('exdoc:loaded', initialize)
+
+function initialize () {
   const pathname = window.location.pathname
   if (pathname.endsWith('/search.html') || pathname.endsWith('/search')) {
     const query = getQueryParamByName('q')
@@ -32,9 +40,9 @@ async function search (value) {
 
     try {
       // We cannot match on atoms :foo because that would be considered
-      // a filter. So we escape all colons not preceeded by a word.
+      // a filter. So we escape all colons not preceded by a word.
       const fixedValue = value.replaceAll(/(\B|\\):/g, '\\:')
-      const results = searchResultsToDecoratedSearchNodes(index.search(fixedValue))
+      const results = searchResultsToDecoratedSearchItems(index.search(fixedValue))
       renderResults({ value, results })
     } catch (error) {
       renderResults({ value, errorMessage: error.message })
@@ -44,17 +52,11 @@ async function search (value) {
 
 function renderResults ({ value, results, errorMessage }) {
   const searchContainer = qs(SEARCH_CONTAINER_SELECTOR)
-  const resultsHtml = Handlebars.templates['search-results']({ value, results, errorMessage })
+  const resultsHtml = searchResultsTemplate({ value, results, errorMessage })
   searchContainer.innerHTML = resultsHtml
 }
 
 async function getIndex () {
-  // lunr by default splits on - but we don't want that.
-  lunr.tokenizer.separator = /\s+/
-  lunr.QueryLexer.termSeparator = /\s+/
-  lunr.Pipeline.registerFunction(docTokenFunction, 'docTokenSplitter')
-  lunr.Pipeline.registerFunction(docTrimmerFunction, 'docTrimmer')
-
   const cachedIndex = await loadIndex()
   if (cachedIndex) { return cachedIndex }
 
@@ -142,8 +144,8 @@ function createIndex () {
     this.use(docTokenSplitter)
     this.use(docTrimmer)
 
-    searchData.items.forEach(searchNode => {
-      this.add(searchNode)
+    searchData.items.forEach(searchItem => {
+      this.add(searchItem)
     })
   })
 }
@@ -230,29 +232,29 @@ function docTrimmerFunction (token) {
   })
 }
 
-function searchResultsToDecoratedSearchNodes (results) {
+function searchResultsToDecoratedSearchItems (results) {
   return results
     // If the docs are regenerated without changing its version,
     // a reference may have been doc'ed false in the code but
     // still available in the cached index, so we skip it here.
-    .filter(result => getSearchNodeByRef(result.ref))
+    .filter(result => getSearchItemByRef(result.ref))
     .map(result => {
-      const searchNode = getSearchNodeByRef(result.ref)
+      const searchItem = getSearchItemByRef(result.ref)
       const metadata = result.matchData.metadata
       return {
-        ...searchNode,
+        ...searchItem,
         metadata,
-        excerpts: getExcerpts(searchNode, metadata)
+        excerpts: getExcerpts(searchItem, metadata)
       }
     })
 }
 
-function getSearchNodeByRef (ref) {
-  return searchData.items.find(searchNode => searchNode.ref === ref) || null
+function getSearchItemByRef (ref) {
+  return searchData.items.find(searchItem => searchItem.ref === ref) || null
 }
 
-function getExcerpts (searchNode, metadata) {
-  const { doc } = searchNode
+function getExcerpts (searchItem, metadata) {
+  const { doc } = searchItem
   const searchTerms = Object.keys(metadata)
 
   const excerpts =

@@ -11,8 +11,7 @@ body {
   --sidebarTransitionDuration: 0.3s;
   background-color: var(--background);
   color: var(--textBody);
-  font-size: 16px;
-  font-family: var(--sansFontFamily);
+  font-size: var(--text-md);
   line-height: 1.6875em;
 }
 
@@ -27,15 +26,17 @@ body {
   height: 100%;
 }
 
+/* Sidebar is closed by default and opened with body.sidebar-opened. */
 .sidebar {
-  display: flex;
+  display: none;
   flex-direction: column;
   width: var(--sidebarWidth);
   min-width: var(--sidebarMinWidth);
+  max-width: 50vw;
   height: 100%;
   position: fixed;
   top: 0;
-  left: 0;
+  left: calc(-1 * var(--sidebarWidth));
   z-index: 100;
   resize: horizontal;
 }
@@ -47,20 +48,18 @@ body {
   top: 0;
   left: 0;
   will-change: transform;
-}
-
-.sidebar-toggle--animated.sidebar-button {
-  transition: transform var(--sidebarTransitionDuration) ease-in-out;
+  transform: translateX(0);
 }
 
 .content {
-  width: calc(100% - var(--sidebarWidth));
-  left: var(--sidebarWidth);
+  left: 0;
+  width: 100%;
   height: 100%;
   position: absolute;
 }
 
 .content .content-inner {
+  container: content / inline-size;
   max-width: var(--content-width);
   min-height: 100%;
   margin: 0 auto;
@@ -71,63 +70,46 @@ body {
   outline: none;
 }
 
-body:is(.sidebar-opening, .sidebar-opened) .sidebar-button {
+.sidebar-transition .sidebar,
+.sidebar-transition .sidebar-button,
+.sidebar-transition .content {
+  transition: all var(--sidebarTransitionDuration) ease-in-out allow-discrete;
+}
+
+.sidebar-open .sidebar,
+.sidebar-transition .sidebar {
+  display: flex;
+}
+
+.sidebar-open .sidebar {
+  left: 0;
+}
+
+.sidebar-open .sidebar-button {
   transform: translateX(calc(var(--sidebarWidth) - 100%));
 }
 
-body.sidebar-opening-start .sidebar {
-  left: calc(-1 * var(--sidebarWidth));
-}
-
-body.sidebar-opening-start .content {
-  width: 100%;
-  left: 0;
-}
-
-body.sidebar-opening .sidebar {
-  left: 0;
-  transition: left var(--sidebarTransitionDuration) ease-in-out;
-}
-
-body.sidebar-opening .content {
+.sidebar-open .content {
   width: calc(100% - var(--sidebarWidth));
   left: var(--sidebarWidth);
-  transition: all var(--sidebarTransitionDuration) ease-in-out;
-}
-
-body.sidebar-closing .sidebar-button {
-  transform: translateX(0);
-}
-
-body.sidebar-closing .sidebar {
-  left: calc(-1 * var(--sidebarWidth));
-  transition: left var(--sidebarTransitionDuration) ease-in-out;
-}
-
-body.sidebar-closing .content {
-  width: 100%;
-  left: 0;
-  transition: all var(--sidebarTransitionDuration) ease-in-out;
-}
-
-body.sidebar-closed .sidebar {
-  left: calc(-1 * var(--sidebarWidth));
-  display: none;
-}
-
-body.sidebar-closed .content {
-  width: 100%;
-  left: 0;
 }
 
 @media screen and (max-width: 768px) {
-  .content,
-  body.sidebar-opening .content {
+  .sidebar-open .content {
     left: 0;
     width: 100%;
   }
 
-  body.sidebar-closed .sidebar-button {
+  .sidebar {
+    max-width: 90vw;
+  }
+
+  body:not(.sidebar-open) .sidebar-button {
     position: absolute;
   }
+}
+
+.swup-progress-bar {
+  height: 2px;
+  background-color: var(--progressBarColor);
 }
