@@ -1,202 +1,148 @@
+import { el } from './helpers'
+
 const CONTENT_CONTAINER_ID = 'content'
 const TABSET_OPEN_COMMENT = 'tabs-open'
 const TABSET_CLOSE_COMMENT = 'tabs-close'
 const TABPANEL_HEADING_NODENAME = 'H3'
 const TABSET_CONTAINER_CLASS = 'tabset'
 
-export function initialize () {
-  const tabSetOpeners = getTabSetOpeners()
-  const tabsetContainers = tabSetOpeners.map(processTabset)
-  tabsetContainers.forEach(set => activateTabset(set))
-}
+window.addEventListener('exdoc:loaded', initialize)
 
-function getTabSetOpeners () {
-  const tabSetOpenersIterator = document.createNodeIterator(
+function initialize () {
+  /** @type {[Node, [NodeList, HTMLElement[]][]][]} */
+  const sets = []
+  /** @type {Node[]} */
+  const toRemove = []
+
+  const iterator = document.createNodeIterator(
     document.getElementById(CONTENT_CONTAINER_ID),
     NodeFilter.SHOW_COMMENT,
-    {
-      acceptNode (node) {
-        return node.nodeValue.trim() === TABSET_OPEN_COMMENT
-          ? NodeFilter.FILTER_ACCEPT
-          : NodeFilter.FILTER_REJECT
-      }
-    }
+    (node) => node.nodeValue.trim() === TABSET_OPEN_COMMENT
+      ? NodeFilter.FILTER_ACCEPT
+      : NodeFilter.FILTER_REJECT
   )
 
-  const tabSetOpeners = []
+  /** @type {Node} */
   let opener
-  while ((opener = tabSetOpenersIterator.nextNode())) {
-    tabSetOpeners.push(opener)
-  }
+  while ((opener = iterator.nextNode())) {
+    const set = []
+    sets.push([opener, set])
 
-  return tabSetOpeners
-}
+    /** @type {HTMLElement[]} */
+    let tabContent
 
-/**
- * Mapped to an array of tabset opener comment markers, processes a tabset.
- * Prepares data held in HTML for the template, wraps the tabset elements,
- * and applies the template.
- *
- * @param {Element} element A tabset opener comment node.
- * @param {Integer} tabSetIndex
- * @param {Array} array
- * @returns {Array} Tabset container element.
- */
-function processTabset (element, tabSetIndex, _array) {
-  const allSetNodes = []
-  const tabSet = []
-  const tabPanel = {
-    label: '',
-    content: []
-  }
-
-  while ((element = element.nextSibling)) {
-    if (isTabSetCloser(element)) {
-      // Next node is closer comment; push current panel data and break.
-      pushPanel(tabPanel, tabSet, tabSetIndex)
-      break
-    }
-
-    // Push node to array of all tabset nodes, which are to be wrapped.
-    allSetNodes.push(element)
-
-    if (element.nodeName === TABPANEL_HEADING_NODENAME) {
-      // Next node is tab heading; push current panel data, set next tab panel
-      // heading text and reset next tab panel content array.
-      pushPanel(tabPanel, tabSet, tabSetIndex)
-      tabPanel.label = element.innerText
-      tabPanel.content = []
-    } else {
-      // Next node is some other node; push to current tab panel content array.
-      tabPanel.content.push(element.outerHTML)
-    }
-  }
-
-  // Wrap all tabset nodes in new container element.
-  const container = document.createElement('div')
-  container.className = TABSET_CONTAINER_CLASS
-  wrapElements(allSetNodes, container)
-
-  // Apply template to tabset container element.
-  container.innerHTML = Handlebars.templates.tabset({tabs: tabSet})
-
-  // Return tabset container element.
-  return container
-}
-
-/**
- * Determines whether or not a DOM node is treated as a tabset closer marker.
- * @param {Node} node A DOM node.
- * @returns {Boolean}
- */
-function isTabSetCloser (node) {
-  return node.nodeName === '#comment' && node.nodeValue.trim() === TABSET_CLOSE_COMMENT
-}
-
-/**
- * Pushes panel data object to tabset.
- * The setIndex is used to provide each tabset’s elements unique IDs.
- *
- * @param {Object} panel The panel object to push.
- * @param {Array} set The parent tabset.
- * @param {Integer} setIndex The parent tabset index.
- */
-function pushPanel (panel, set, setIndex) {
-  // If panel data is incomplete, do not push. (Usually the case when the first
-  // tab panel heading is encountered.)
-  if (panel.label === '' && !panel.content.length) return false
-
-  const label = panel.label
-  const content = panel.content
-  set.push({label, content, setIndex})
-}
-
-/**
- * Wraps elements with the wrapper element.
- *
- * @param {Array} elements The elements to wrap.
- * @param {Element} wrapper The wrapping element.
- */
-function wrapElements (elements, wrapper) {
-  if (!elements || !elements.length) return false
-
-  elements[0].parentNode.insertBefore(wrapper, elements[0])
-  elements.forEach((el) => wrapper.appendChild(el))
-}
-
-/**
- * Adds behaviour to a processed tabset.
- *
- * @param {Element} set A processed tabset container element.
- */
-function activateTabset (set) {
-  // Register tab buttons and panels, and create initial state object.
-  const state = {
-    tabs: set.querySelectorAll(':scope [role="tab"]'),
-    panels: set.querySelectorAll(':scope [role="tabpanel"]'),
-    activeIndex: 0
-  }
-
-  state.tabs.forEach((tab, index) => {
-    // Pointing/touch device.
-    tab.addEventListener('click', (_event) => {
-      setActiveTab(index, state)
-    })
-
-    // Keyboard (arrow keys should wrap from first to last and vice-versa).
-    tab.addEventListener('keydown', (event) => {
-      const lastIndex = state.tabs.length - 1
-
-      if (event.code === 'ArrowLeft') {
-        event.preventDefault()
-        if (state.activeIndex === 0) {
-          setActiveTab(lastIndex, state)
-        } else {
-          setActiveTab(state.activeIndex - 1, state)
-        }
-      } else if (event.code === 'ArrowRight') {
-        event.preventDefault()
-        if (state.activeIndex === lastIndex) {
-          setActiveTab(0, state)
-        } else {
-          setActiveTab(state.activeIndex + 1, state)
-        }
-      } else if (event.code === 'Home') {
-        event.preventDefault()
-        setActiveTab(0, state)
-      } else if (event.code === 'End') {
-        event.preventDefault()
-        setActiveTab(lastIndex, state)
+    let node = opener
+    while ((node = node.nextSibling)) {
+      if (node.nodeName === TABPANEL_HEADING_NODENAME) {
+        // Tab heading.
+        tabContent = []
+        // Extract heading text nodes (faster than using .textContent which requires layout).
+        const headingContent = node.querySelector('.text')?.childNodes || node.childNodes
+        set.push([headingContent, tabContent])
+        toRemove.push(node)
+      } else if (node.nodeName === '#comment' && node.nodeValue.trim() === TABSET_CLOSE_COMMENT) {
+        // Closer comment.
+        toRemove.push(node)
+        break
+      } else if (tabContent) {
+        // Tab content.
+        tabContent.push(node)
       }
+    }
+  }
+
+  sets.forEach(([opener, set], setIndex) => {
+    const tabset = el('div', {
+      class: TABSET_CONTAINER_CLASS
     })
+    opener.parentNode.replaceChild(tabset, opener)
+
+    const tablist = el('div', {
+      role: 'tablist',
+      class: 'tabset-tablist'
+    })
+    tabset.appendChild(tablist)
+
+    set.forEach(([headingContent, content], index) => {
+      const selected = index === 0
+      const tabId = `tab-${setIndex}-${index}`
+      const tabPanelId = `tabpanel-${setIndex}-${index}`
+
+      const tab = el('button', {
+        role: 'tab',
+        id: tabId,
+        class: 'tabset-tab',
+        tabindex: selected ? 0 : -1,
+        'aria-selected': selected,
+        'aria-controls': tabPanelId
+      }, headingContent)
+      tab.addEventListener('click', handleTabClick)
+      tab.addEventListener('keydown', handleTabKeydown)
+      tablist.appendChild(tab)
+
+      const tabPanel = el('div', {
+        role: 'tabpanel',
+        id: tabPanelId,
+        class: 'tabset-panel',
+        hidden: !selected ? '' : undefined,
+        tabindex: selected ? 0 : -1,
+        'aria-labelledby': tabId
+      }, content)
+      tabset.appendChild(tabPanel)
+    })
+  })
+
+  toRemove.forEach((node) => {
+    node.parentNode.removeChild(node)
   })
 }
 
-/**
- * Updates active tab button and panel. Covers ARIA attributes and
- * (de)activates tab navigation.
- *
- * @param {Integer} index
- * @param {Object} state
- */
-function setActiveTab (index, state) {
+/** @param {MouseEvent} event */
+function handleTabClick (event) {
+  activateTab(event.currentTarget)
+}
+
+/** @param {KeyboardEvent} event */
+function handleTabKeydown (event) {
+  if (keys[event.code]) {
+    event.preventDefault()
+    const tabs = [...event.currentTarget.parentNode.childNodes]
+    const currentIndex = tabs.indexOf(event.currentTarget)
+    const newIndex = keys[event.code](currentIndex, tabs.length)
+    activateTab(tabs.at(newIndex % tabs.length))
+  }
+}
+
+/** @type {Dictionary<string, (index: number, length: number) => number>} */
+const keys = {
+  ArrowLeft: (index) => index - 1,
+  ArrowRight: (index) => index + 1,
+  Home: () => 0,
+  End: (index, length) => length - 1
+}
+
+/** @param {HTMLButtonElement} tab */
+function activateTab (tab) {
+  const prev = tab.parentNode.querySelector('[aria-selected=true]')
+
+  if (prev === tab) return
+
   // Set previously active tab button as inactive.
-  state.tabs[state.activeIndex].setAttribute('aria-selected', 'false')
-  state.tabs[state.activeIndex].tabIndex = -1
+  prev.setAttribute('aria-selected', 'false')
+  prev.tabIndex = -1
 
   // Set newly active tab button as active.
-  state.tabs[index].setAttribute('aria-selected', 'true')
-  state.tabs[index].tabIndex = 0
-  state.tabs[index].focus()
+  tab.setAttribute('aria-selected', 'true')
+  tab.tabIndex = 0
+  tab.focus()
 
   // Set previously active tab panel as inactive.
-  state.panels[state.activeIndex].setAttribute('hidden', '')
-  state.panels[state.activeIndex].tabIndex = -1
+  const prevPanel = document.getElementById(prev.getAttribute('aria-controls'))
+  prevPanel.setAttribute('hidden', '')
+  prevPanel.tabIndex = -1
 
   // Set newly active tab panel as active.
-  state.panels[index].removeAttribute('hidden')
-  state.panels[index].tabIndex = 0
-
-  // Update state's active index.
-  state.activeIndex = index
+  const panel = document.getElementById(tab.getAttribute('aria-controls'))
+  panel.removeAttribute('hidden')
+  panel.tabIndex = 0
 }

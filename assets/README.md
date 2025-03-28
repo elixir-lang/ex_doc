@@ -22,7 +22,7 @@ $ npm run --prefix assets build
 
 Build a complete production bundle, including JavaScript and CSS.
 
-(Note that this is not required to be manually run when generating docs: if you run `mix build` at the `ExDoc` root after changing your assets, the assets will be recompiled, `mix compile --force` will be invoked, and fresh docs with your changes will be generated.)
+(Note that this is not required to be manually run when generating docs: if you run `mix build` at the `ExDoc` root after changing your assets, the assets will be recompiled and fresh docs with your changes will be generated.)
 
 ### `build:watch`
 

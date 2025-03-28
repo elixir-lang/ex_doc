@@ -1,4 +1,6 @@
 defmodule ExDoc.GroupMatcher do
+  # General helpers for dealing with grouping functionality.
+  # Extracted for organization and testability.
   @moduledoc false
 
   @type pattern :: Regex.t() | module() | String.t()

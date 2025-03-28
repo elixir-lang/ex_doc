@@ -6,6 +6,7 @@ defmodule ExDoc.Formatter.HTML do
 
   @main "api-reference"
   @assets_dir "assets"
+  @search_data_keys [:anchor, :body, :title, :type]
 
   @doc """
   Generates HTML documentation for the given modules.
@@ -42,12 +43,13 @@ defmodule ExDoc.Formatter.HTML do
       search_data ++
         static_files ++
         generate_sidebar_items(nodes_map, extras, config) ++
-        generate_extras(nodes_map, extras, config) ++
+        generate_extras(extras, config) ++
+        generate_favicon(@assets_dir, config) ++
         generate_logo(@assets_dir, config) ++
-        generate_search(nodes_map, config) ++
-        generate_not_found(nodes_map, config) ++
-        generate_list(nodes_map.modules, nodes_map, config) ++
-        generate_list(nodes_map.tasks, nodes_map, config) ++
+        generate_search(config) ++
+        generate_not_found(config) ++
+        generate_list(nodes_map.modules, config) ++
+        generate_list(nodes_map.tasks, config) ++
         generate_redirects(config, ".html")
 
     generate_build(Enum.sort(all_files), build)
@@ -166,24 +168,25 @@ defmodule ExDoc.Formatter.HTML do
     File.write!(build, entries)
   end
 
-  defp generate_not_found(nodes_map, config) do
+  defp generate_not_found(config) do
     filename = "404.html"
     config = set_canonical_url(config, filename)
-    content = Templates.not_found_template(config, nodes_map)
+    content = Templates.not_found_template(config)
     File.write!("#{config.output}/#{filename}", content)
     [filename]
   end
 
-  defp generate_search(nodes_map, config) do
+  defp generate_search(config) do
     filename = "search.html"
     config = set_canonical_url(config, filename)
-    content = Templates.search_template(config, nodes_map)
+    content = Templates.search_template(config)
     File.write!("#{config.output}/#{filename}", content)
     [filename]
   end
 
   defp generate_sidebar_items(nodes_map, extras, config) do
     content = Templates.create_sidebar_items(nodes_map, extras)
+
     path = "dist/sidebar_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, path), content)
     [path]
@@ -203,7 +206,7 @@ defmodule ExDoc.Formatter.HTML do
     |> binary_part(0, 8)
   end
 
-  defp generate_extras(nodes_map, extras, config) do
+  defp generate_extras(extras, config) do
     generated_extras =
       extras
       |> with_prev_next()
@@ -218,7 +221,7 @@ defmodule ExDoc.Formatter.HTML do
         }
 
         extension = node.source_path && Path.extname(node.source_path)
-        html = Templates.extra_template(config, node, extra_type(extension), nodes_map, refs)
+        html = Templates.extra_template(config, node, extra_type(extension), refs)
 
         if File.regular?(output) do
           Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
@@ -427,7 +430,9 @@ defmodule ExDoc.Formatter.HTML do
     title = input_options[:title] || title_text || filename_to_title(input)
 
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
-    source_url = Utils.source_url_pattern(source_url_pattern, source_path, 1)
+    source_url = source_url_pattern.(source_path, 1)
+
+    search_data = normalize_search_data!(input_options[:search_data])
 
     %{
       source: source,
@@ -436,6 +441,7 @@ defmodule ExDoc.Formatter.HTML do
       id: id,
       source_path: source_path,
       source_url: source_url,
+      search_data: search_data,
       title: title,
       title_content: title_html || title
     }
@@ -443,6 +449,26 @@ defmodule ExDoc.Formatter.HTML do
 
   defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
     build_extra({input, []}, groups, language, autolink_opts, source_url_pattern)
+  end
+
+  defp normalize_search_data!(nil), do: nil
+
+  defp normalize_search_data!(search_data) when is_list(search_data) do
+    Enum.each(search_data, fn search_data ->
+      has_keys = Map.keys(search_data)
+
+      if Enum.sort(has_keys) != @search_data_keys do
+        raise ArgumentError,
+              "Expected search data to be a list of maps with the keys: #{inspect(@search_data_keys)}, found keys: #{inspect(has_keys)}"
+      end
+    end)
+
+    search_data
+  end
+
+  defp normalize_search_data!(search_data) do
+    raise ArgumentError,
+          "Expected search data to be a list of maps with the keys: #{inspect(@search_data_keys)}, found: #{inspect(search_data)}"
   end
 
   defp extension_name(input) do
@@ -463,6 +489,17 @@ defmodule ExDoc.Formatter.HTML do
 
   defp filename_to_title(input) do
     input |> Path.basename() |> Path.rootname()
+  end
+
+  @doc """
+  Generates the favicon from config into the given directory.
+  """
+  def generate_favicon(_dir, %{favicon: nil}) do
+    []
+  end
+
+  def generate_favicon(dir, %{output: output, favicon: favicon}) do
+    generate_image(output, dir, favicon, "favicon")
   end
 
   @doc """
@@ -530,16 +567,16 @@ defmodule ExDoc.Formatter.HTML do
     Enum.filter(nodes, &(&1.type == type))
   end
 
-  defp generate_list(nodes, nodes_map, config) do
+  defp generate_list(nodes, config) do
     nodes
-    |> Task.async_stream(&generate_module_page(&1, nodes_map, config), timeout: :infinity)
+    |> Task.async_stream(&generate_module_page(&1, config), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
   end
 
-  defp generate_module_page(module_node, nodes_map, config) do
+  defp generate_module_page(module_node, config) do
     filename = "#{module_node.id}.html"
     config = set_canonical_url(config, filename)
-    content = Templates.module_page(module_node, nodes_map, config)
+    content = Templates.module_page(module_node, config)
     File.write!("#{config.output}/#{filename}", content)
     filename
   end

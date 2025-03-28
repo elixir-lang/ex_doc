@@ -1,104 +1,109 @@
 name: CI
 
-on:
-  pull_request:
-  push:
+on: [pull_request, push]
 
 env:
-  node-version: 18.x
+  MIX_ENV: test
 
 jobs:
-  mix_test:
+  assets:
     runs-on: ubuntu-20.04
-    env:
-      MIX_ENV: test
+    strategy:
+      matrix:
+        include:
+          - elixir: "1.17"
+            otp: "27"
+            node: 18.x
+    steps:
+      - uses: actions/checkout@v3
+
+      # Setup Node
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{matrix.node}}
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
+
+      - run: npm ci --prefix assets
+      - run: npm run build --prefix assets
+
+      # Setup Elixir
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      # Generate and upload artifacts
+      - name: Generate docs
+        run: test/prerelease.sh
+
+      - name: Attach docs metadata
+        run: |
+          echo "{\"number\":${{ github.event.number }}}" > test/tmp/contents/doc/gh.json
+
+      - name: Upload docs
+        uses: actions/upload-artifact@v4
+        id: docs-upload
+        with:
+          name: docs
+          path: test/tmp/contents/doc/
+
+      # Test JS
+      - run: npm run lint --prefix assets
+      - name: npm run test --prefix assets
+        run: |
+          sudo apt-get install xvfb
+          xvfb-run --auto-servernum npm run test --prefix assets
+        env:
+          CI: true
+
+      # Push updated assets if all good
+      - name: Push updated assets
+        if: github.ref_name == 'main'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update assets
+          file_pattern: formatters
+
+  elixir:
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
         include:
-          - pair: # Test very old Elixir and Erlang
-              elixir: "1.14"
-              otp: "25"
-          - pair: # Test Erlang without -doc attribute support
-              elixir: "1.16"
-              otp: "26"
-          - pair: # Test Erlang with -doc attribute support
-              elixir: "1.17"
-              otp: "27"
-            lint: lint
+          # Test very old Elixir and Erlang
+          - elixir: "1.15"
+            otp: "25"
+          # Test Erlang without -doc attribute support
+          - elixir: "1.16"
+            otp: "26"
+          # Test with initial Erlang doc attribute support
+          - elixir: "1.17"
+            otp: "27"
+          - elixir: "1.18"
+            otp: "27"
+            lint: true
     steps:
       - uses: actions/checkout@v3
 
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{matrix.pair.otp}}
-          elixir-version: ${{matrix.pair.elixir}}
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
 
-      - name: Install Dependencies
-        run: mix deps.get
-
-      - run: mix format --check-formatted
-        if: ${{ matrix.lint }}
-
-      - run: mix deps.unlock --check-unused
-        if: ${{ matrix.lint }}
-
-      - run: mix deps.compile
+      - run: mix deps.get
 
       - run: mix compile --warnings-as-errors
         if: ${{ matrix.lint }}
 
       - run: mix test
 
-      - name: Prerelease
-        run: test/prerelease.sh
+      - run: mix deps.unlock --check-unused
+        if: ${{ matrix.lint }}
 
-      - name: Generate docs
-        run: |
-          mix docs
-          test -f doc/index.html && echo "doc/index.html exists."
-          test -f doc/ExDoc.epub && echo "doc/ExDoc.epub exists."
-
-  check_js:
-    name: Check JS
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.node-version }}
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
-      - run: npm install --prefix assets
-      - run: npm run lint --prefix assets
-      - run: sudo apt-get install xvfb
-      - run: |
-          xvfb-run --auto-servernum npm run test --prefix assets
-        env:
-          CI: true
-
-  assets:
-    needs: [check_js]
-    runs-on: ubuntu-20.04
-    if: github.ref_name == 'main'
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.node-version }}
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('asssets/package-lock.json') }}
-      - run: mkdir -p tmp/handlebars
-      - run: npm ci --prefix assets
-      - run: npm run build --prefix assets
-      - name: Push updated assets
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Update assets
-          file_pattern: formatters
+      - run: mix format --check-formatted
+        if: ${{ matrix.lint }}

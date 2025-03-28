@@ -5,11 +5,6 @@
   --textHeaders:                 var(--gray900);
   --textDetailAccent:            var(--mainLight);
   --textDetailBackground:        var(--coldGrayFaint);
-  --textFooter:                  var(--gray700);
-
-  --links:                       var(--black);
-  --linksVisited:                var(--black);
-  --linksDecoration:             var(--gray450);
 
   --iconAction:                  var(--coldGray);
   --iconActionHover:             var(--gray800);
@@ -51,14 +46,12 @@
   --admInlineCodeBackground:     var(--gray25);
   --admInlineCodeBorder:         var(--gray100);
 
-  --tabBackground:               var(--white);
   --tabBorder:                   var(--gray300);
   --tabBorderTop:                var(--gray100);
-  --tab:                         var(--gray600);
   --tabShadow:                   var(--gray25);
 
   --bottomActionsBtnBorder:      var(--black-opacity-10);
-  --bottomActionsBtnSubheader:   var(--mainDark);
+  --bottomActionsBtnTitle:       var(--mainDark);
 
   --modalBackground:             var(--white);
 
@@ -78,9 +71,8 @@
   --sidebarHeader:               var(--gray100);
   --sidebarMuted:                var(--gray800);
   --sidebarHover:                var(--black);
-  --sidebarScrollbarThumb:       var(--coldGrayLight);
-  --sidebarScrollbarTrack:       var(--sidebarBackground);
-  --sidebarSubheadings:          var(--black);
+  --sidebarStaleVersion:         var(--orangeDark);
+  --sidebarSubheadings:          var(--gray500);
   --sidebarItem:                 var(--black);
   --sidebarInactiveItemBorder:   var(--gray500);
   --sidebarInactiveItemMarker:   var(--gray200);
@@ -98,8 +90,6 @@
   --suggestionBorder:            var(--gray200);
   --autocompleteResults:         var(--gray600);
   --autocompleteResultsBold:     var(--gray800);
-  --autocompleteSrollbarThumb:   var(--gray200);
-  --autocompleteSrollbarTrack:   var(--gray50);
   --autocompleteLabelBack:       var(--gray100);
   --autocompleteLabelFont:       var(--gray600);
 }

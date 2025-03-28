@@ -6,8 +6,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   @moduletag :tmp_dir
 
-  @empty_nodes_map %{modules: [], exceptions: [], protocols: [], tasks: []}
-
   defp source_url do
     "https://github.com/elixir-lang/elixir"
   end
@@ -20,7 +18,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     default = %ExDoc.Config{
       project: "Elixir",
       version: "1.0.1",
-      source_url_pattern: "#{source_url()}/blob/master/%{path}#L%{line}",
+      source_url_pattern: fn path, line -> "#{source_url()}/blob/master/#{path}#L#{line}" end,
       homepage_url: homepage_url(),
       source_url: source_url(),
       output: context.tmp_dir <> "/html_templates"
@@ -33,7 +31,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     config = doc_config(context, config)
     {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
     [mod | _] = HTML.render_all(mods, [], ".html", config, [])
-    Templates.module_page(mod, @empty_nodes_map, config)
+    Templates.module_page(mod, config)
   end
 
   setup %{tmp_dir: tmp_dir} do
@@ -202,7 +200,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   describe "sidebar" do
     test "text links to homepage_url when set", context do
-      content = Templates.sidebar_template(doc_config(context), :extra, @empty_nodes_map)
+      content = Templates.sidebar_template(doc_config(context), :extra)
 
       assert content =~
                ~r"""
@@ -221,7 +219,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
         main: "hello"
       }
 
-      content = Templates.sidebar_template(config, :extra, @empty_nodes_map)
+      content = Templates.sidebar_template(config, :extra)
 
       assert content =~
                ~r"""
@@ -231,27 +229,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                <a href="hello.html" class="sidebar-projectName" translate="no">\s*Elixir\s*</a>\s*\
                <div class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</div>\s*\</div>\s*\</div>
                """
-    end
-
-    test "enables nav link when module type have at least one element", context do
-      names = [CompiledWithDocs, CompiledWithDocs.Nested]
-      modules = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
-
-      content =
-        Templates.sidebar_template(doc_config(context), :extra, %{
-          modules: modules,
-          exceptions: [],
-          tasks: []
-        })
-
-      assert content =~
-               ~r{<li>[\s\n]*<button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-tab-panel" aria-selected="false" tabindex="-1">[\s\n]*Modules[\s\n]*</button>[\s\n]*</li>}
-
-      assert content =~
-               ~r{<div id="modules-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>[\n\s]*<ul id="modules-full-list" class="full-list"></ul>[\n\s]*</div>}
-
-      refute content =~ ~r{id="tasks-list-tab-button"}
-      refute content =~ ~r{id="tasks-full-list"}
     end
 
     test "display built with footer by proglang option", context do
@@ -501,7 +478,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~s{example(foo, bar \\\\ Baz)}
 
       assert content =~
-               ~r{<a href="#example/2" class="detail-link" data-no-tooltip aria-label="Link to this function">\s*<i class="ri-link-m" aria-hidden="true"></i>\s*</a>}ms
+               ~r{<a href="#example/2" class="detail-link" data-no-tooltip="" aria-label="Link to this function">\s*<i class="ri-link-m" aria-hidden="true"></i>\s*</a>}ms
     end
 
     test "outputs function groups", context do
@@ -542,7 +519,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>(), ] <>
           ~S[<a href="#t:opaque/0">opaque</a>(), :ok | :error}]
 
-      assert content =~ ~s[<a href="#t:public/1" data-no-tooltip translate="no">public(t)</a>]
+      assert content =~ ~s[<a href="#t:public/1" data-no-tooltip="" translate="no">public(t)</a>]
       refute content =~ ~s[<a href="#t:private/0">private</a>]
       assert content =~ public_html
       refute content =~ ~s[<strong>private\(t\)]
@@ -561,7 +538,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       content = get_module_page([CompiledWithDocs], context)
 
       assert content =~
-               ~r{<div class="summary-signature">\s*<a href="#example_1/0" data-no-tooltip translate="no">}
+               ~r{<div class="summary-signature">\s*<a href="#example_1/0" data-no-tooltip="" translate="no">}
     end
 
     test "contains links to summary sections when those exist", context do

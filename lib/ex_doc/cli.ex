@@ -22,6 +22,7 @@ defmodule ExDoc.CLI do
         switches: [
           canonical: :string,
           config: :string,
+          favicon: :string,
           formatter: [:keep, :string],
           homepage_url: :string,
           language: :string,
@@ -68,9 +69,9 @@ defmodule ExDoc.CLI do
   end
 
   defp generate(args, opts, generator) do
-    [project, version, source_beam] = parse_args(args)
+    [project, version | source_beams] = parse_args(args)
 
-    Code.prepend_path(source_beam)
+    Code.prepend_paths(source_beams)
 
     for path <- Keyword.get_values(opts, :paths),
         path <- Path.wildcard(path) do
@@ -79,8 +80,8 @@ defmodule ExDoc.CLI do
 
     opts =
       opts
-      |> Keyword.put(:source_beam, source_beam)
-      |> Keyword.put(:apps, [app(source_beam)])
+      |> Keyword.put(:source_beam, source_beams)
+      |> Keyword.put(:apps, Enum.map(source_beams, &app/1))
       |> merge_config()
       |> normalize_formatters()
 
@@ -165,13 +166,7 @@ defmodule ExDoc.CLI do
     end
   end
 
-  defp parse_args([_project, _version, _source_beam] = args), do: args
-
-  defp parse_args([_, _, _ | _]) do
-    IO.puts("Too many arguments.\n")
-    print_usage()
-    exit({:shutdown, 1})
-  end
+  defp parse_args([_project, _version | _source_beams] = args), do: args
 
   defp parse_args(_) do
     IO.puts("Too few arguments.\n")
@@ -195,6 +190,8 @@ defmodule ExDoc.CLI do
           --canonical           Indicate the preferred URL with rel="canonical" link element
       -c, --config              Give configuration through a file instead of a command line.
                                 See "Custom config" section below for more information.
+          --favicon             Path to a favicon image for the project. Must be PNG, JPEG or SVG. The image
+                                will be placed in the output "assets" directory.
       -f, --formatter           Docs formatter to use (html, epub or markdown), default: html and epub
           --homepage-url        URL to link to for the site name
           --language            Identify the primary language of the documents, its value must be

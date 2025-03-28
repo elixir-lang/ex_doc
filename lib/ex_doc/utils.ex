@@ -1,4 +1,7 @@
 defmodule ExDoc.Utils do
+  # General helpers used throughout ExDoc or extracted for testing.
+  # Avoid adding functions to this module whenever possible,
+  # instead prefer defining modules closer to the context they are used.
   @moduledoc false
 
   @doc """
@@ -82,13 +85,12 @@ defmodule ExDoc.Utils do
     end)
   end
 
-  @clean_html_regex ~r/<\/?\s*[a-zA-Z]+(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
-
   @doc """
   Strips HTML tags from text leaving their text content
   """
   def strip_tags(text, replace_with \\ "") when is_binary(text) do
-    String.replace(text, @clean_html_regex, replace_with)
+    clean_html_regex = ~r/<\/?\s*[a-zA-Z]+(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
+    String.replace(text, clean_html_regex, replace_with)
   end
 
   @doc """
@@ -219,23 +221,4 @@ defmodule ExDoc.Utils do
     do: to_json_string(rest, <<acc::binary, x>>)
 
   defp to_json_string(<<>>, acc), do: <<acc::binary, "\"">>
-
-  @doc """
-  Generates a url based on the given pattern.
-  """
-  def source_url_pattern(source_url_pattern, path, line)
-      when is_binary(path) and is_integer(line) do
-    cond do
-      is_function(source_url_pattern) ->
-        source_url_pattern.(path, line)
-
-      source_url_pattern ->
-        source_url_pattern
-        |> String.replace("%{path}", path)
-        |> String.replace("%{line}", Integer.to_string(line))
-
-      true ->
-        nil
-    end
-  end
 end

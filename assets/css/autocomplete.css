@@ -76,11 +76,17 @@
   margin: 0;
   padding: 15px 20px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  gap: 8px;
   color: var(--autocompleteResults);
   font-family: var(--sansFontFamily);
   font-weight: 300;
   font-size: 0.9rem;
+}
+
+.autocomplete-results .query {
+  margin-right: auto;
 }
 
 .autocomplete-results .bold {
@@ -101,13 +107,14 @@
 
 .autocomplete-suggestions {
   background-color: var(--autocompleteBackground);
-  border-radius: 8px;
+  border-radius: var(--borderRadius-base);
   box-shadow: 0px 15px 99px 0px var(--autocompleteBorder);
   overflow-y: auto;
   max-height: 450px;
   white-space: normal;
   overflow-x: hidden;
   overscroll-behavior-y: contain;
+  scrollbar-width: thin;
 }
 
 .autocomplete-suggestions.previewing:has(.selected) {
@@ -127,15 +134,14 @@
 }
 
 .autocomplete-suggestion {
-  color: inherit;
+  color: var(--textHeaders) !important;
   display: block;
   padding: 12px 20px;
-  text-decoration: none;
-  transition: background-color 0.3s ease-in-out;
+  text-decoration: none !important;
+  transition: var(--transition-colors);
   border-top: 1px solid var(--suggestionBorder);
   font-size: 0.9rem;
 }
-
 
 .autocomplete-suggestion.selected {
   background-color: var(--autocompleteSelected);
@@ -161,12 +167,12 @@
   align-items: center;
   text-decoration: none;
   border: 1px solid var(--suggestionBorder);
-  border-radius: 8px;
-  transition: color .3s ease-in-out;
+  border-radius: var(--borderRadius-base);
+  transition: var(--transition-colors);
   background-color: var(--autocompletePreview);
   cursor: pointer;
   padding: 4px 8px;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 
 .autocomplete-preview-indicator button:hover {
@@ -224,32 +230,12 @@
   width: 100%;
 }
 
-.autocomplete-suggestions a {
-  text-decoration: none !important;
-}
+@media screen and (hover: none) {
+  .autocomplete-preview-indicator {
+    display: none !important;
+  }
 
-/* Style the scrollbar track (the area behind the thumb) */
-.autocomplete-suggestions::-webkit-scrollbar {
-  width: 5px;
-  /* Set the width of the scrollbar */
-  border-radius: 7px;
-  /* Add rounded corners to the thumb */
-  flex-shrink: 0;
-}
-
-/* Style the scrollbar thumb (the draggable part) */
-.autocomplete-suggestions::-webkit-scrollbar-thumb {
-  background-color: var(--autocompleteSrollbarThumb);
-  border-radius: 7px;
-}
-
-/* Style the scrollbar track on hover */
-.autocomplete-suggestions::-webkit-scrollbar-track {
-  background-color: var(--autocompleteSrollbarTrack);
-}
-
-@media screen and (max-width: 1023px) {
   .autocomplete-results .press-return {
-    display: none;
+    display: none !important;
   }
 }

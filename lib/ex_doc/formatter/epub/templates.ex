@@ -7,6 +7,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     only: [before_closing_body_tag: 2, before_closing_head_tag: 2, h: 1, text_to_id: 1]
 
   alias ExDoc.Formatter.HTML.Templates, as: H
+  alias ExDoc.Formatter.EPUB.Assets
 
   @doc """
   Generate content from the module template for a given `node`
@@ -95,14 +96,6 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :head_template,
     Path.expand("templates/head_template.eex", __DIR__),
     [:config, :title],
-    trim: true
-  )
-
-  EEx.function_from_file(
-    :defp,
-    :nav_item_template,
-    Path.expand("templates/nav_item_template.eex", __DIR__),
-    [:name, :nodes],
     trim: true
   )
 

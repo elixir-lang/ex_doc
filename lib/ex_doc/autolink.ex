@@ -1,4 +1,5 @@
 defmodule ExDoc.Autolink do
+  # Encapsulates all functionality related to autolinking.
   @moduledoc false
 
   # * `:apps` - the apps that the docs are being generated for. When linking modules they are
@@ -136,9 +137,8 @@ defmodule ExDoc.Autolink do
       :ex_doc
     else
       app = app(module)
-      apps = Enum.uniq(config.apps ++ Keyword.keys(config.deps))
 
-      if is_app_otp(app) and app not in apps do
+      if is_app_otp(app) and app not in config.apps and not Keyword.has_key?(config.deps, app) do
         :otp
       else
         :ex_doc
@@ -162,12 +162,12 @@ defmodule ExDoc.Autolink do
     end
   end
 
-  @ref_regex ~r/^`(.+)`$/
+  defp ref_regex, do: ~r/^`(.+)`$/
 
   def custom_link(attrs, config) do
     case Keyword.fetch(attrs, :href) do
       {:ok, href} ->
-        case Regex.scan(@ref_regex, href) do
+        case Regex.scan(ref_regex(), href) do
           [[_, custom_link]] ->
             custom_link
             |> url(:custom_link, config)
@@ -213,7 +213,7 @@ defmodule ExDoc.Autolink do
 
   defp build_extra_link(link, config) do
     with %{scheme: nil, host: nil, path: path} = uri <- URI.parse(link),
-         true <- is_binary(path) and path != "" and not (path =~ @ref_regex),
+         true <- is_binary(path) and path != "" and not (path =~ ref_regex()),
          true <- Path.extname(path) in @builtin_ext do
       if file = config.extras[Path.basename(path)] do
         append_fragment(file <> config.ext, uri.fragment)

@@ -2,6 +2,7 @@ import { qs, qsAll } from './helpers'
 import { openModal } from './modal'
 import { settingsStore } from './settings-store'
 import { keyboardShortcuts } from './keyboard-shortcuts'
+import settingsModalBodyTemplate from './handlebars/templates/settings-modal-body.handlebars'
 
 const SETTINGS_LINK_SELECTOR = '.display-settings'
 const SETTINGS_MODAL_BODY_SELECTOR = '#settings-modal-content'
@@ -24,19 +25,16 @@ const modalTabs = [
 /**
  * Sets up the settings modal.
  */
-export function initialize () {
-  addEventListeners()
-}
 
-function addEventListeners () {
+window.addEventListener('exdoc:loaded', initialize)
+
+function initialize () {
   qsAll(SETTINGS_LINK_SELECTOR).forEach(element => {
-    element.addEventListener('click', event => {
-      openSettingsModal()
-    })
+    element.addEventListener('click', openSettingsModal)
   })
 }
 
-function showSettinsTab () {
+function showSettingsTab () {
   qs(KEYBOARD_SHORTCUTS_TAB).classList.remove('active')
   qs(SETTINGS_TAB).classList.add('active')
   qs(SETTINGS_CONTENT).classList.remove('hidden')
@@ -53,7 +51,7 @@ function showKeyboardShortcutsTab () {
 export function openSettingsModal () {
   openModal({
     title: modalTabs.map(({id, title}) => `<button id="${id}">${title}</button>`).join(''),
-    body: Handlebars.templates['settings-modal-body']({ shortcuts: keyboardShortcuts })
+    body: settingsModalBodyTemplate({ shortcuts: keyboardShortcuts })
   })
 
   const modal = qs(SETTINGS_MODAL_BODY_SELECTOR)
@@ -97,11 +95,11 @@ export function openSettingsModal () {
   })
 
   qs(SETTINGS_TAB).addEventListener('click', event => {
-    showSettinsTab()
+    showSettingsTab()
   })
   qs(KEYBOARD_SHORTCUTS_TAB).addEventListener('click', event => {
     showKeyboardShortcutsTab()
   })
 
-  showSettinsTab()
+  showSettingsTab()
 }

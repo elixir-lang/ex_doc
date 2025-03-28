@@ -1,6 +1,7 @@
 defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
+  alias ExDoc.Formatter.HTML.Assets
 
   import ExDoc.Utils,
     only: [
@@ -14,9 +15,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(module_node, nodes_map, config) do
+  def module_page(module_node, config) do
     summary = module_summary(module_node)
-    module_template(config, module_node, summary, nodes_map)
+    module_template(config, module_node, summary)
   end
 
   @doc """
@@ -83,12 +84,30 @@ defmodule ExDoc.Formatter.HTML.Templates do
     for extra <- extras do
       %{id: id, title: title, group: group, content: content} = extra
 
-      %{
-        id: to_string(id),
-        title: to_string(title),
-        group: to_string(group),
-        headers: extract_headers(content)
-      }
+      item =
+        %{
+          id: to_string(id),
+          title: to_string(title),
+          group: to_string(group),
+          headers: extract_headers(content)
+        }
+
+      case extra do
+        %{search_data: search_data} when is_list(search_data) ->
+          search_data =
+            Enum.map(search_data, fn search_item ->
+              %{
+                anchor: search_item.anchor,
+                id: search_item.title,
+                labels: [search_item.type]
+              }
+            end)
+
+          Map.put(item, :searchData, search_data)
+
+        _ ->
+          item
+      end
     end
   end
 
@@ -162,10 +181,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     [sections: sections]
   end
 
-  # TODO: split into sections in Formatter.HTML instead.
-  @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
+  # TODO: split into sections in Formatter.HTML instead (possibly via DocAST)
   defp extract_headers(content) do
-    @h2_regex
+    ~r/<h2.*?>(.*?)<\/h2>/m
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
     |> Enum.filter(&(&1 != ""))
@@ -177,6 +195,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
     ExDoc.GroupMatcher.group_by(module_node.docs_groups, module_node.docs, & &1.group)
   end
+
+  defp favicon_path(%{favicon: nil}), do: nil
+  defp favicon_path(%{favicon: favicon}), do: "assets/favicon#{Path.extname(favicon)}"
 
   defp logo_path(%{logo: nil}), do: nil
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
@@ -192,22 +213,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:livemd), do: "extras"
   defp sidebar_type(:extra), do: "extras"
 
-  def asset_rev(output, pattern) do
-    output = Path.expand(output)
-
-    output
-    |> Path.join(pattern)
-    |> Path.wildcard()
-    |> relative_asset(output, pattern)
-  end
-
-  defp relative_asset([], output, pattern),
-    do: raise("could not find matching #{output}/#{pattern}")
-
-  defp relative_asset([h | _], output, _pattern), do: Path.relative_to(h, output)
-
-  # TODO: Move link_headings and friends to html.ex or even to autolinking code,
-  # so content is built with it upfront instead of added at the template level.
+  # TODO: Move link_headings and friends to html.ex (possibly via DocAST)
+  # or even to autolinking code, so content is built with it upfront instead
+  # of added at the template level.
 
   @doc """
   Add link headings for the given `content`.
@@ -216,13 +224,12 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   We only link `h2` and `h3` headers. This is kept consistent in ExDoc.SearchData.
   """
-  @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
   @spec link_headings(String.t() | nil, String.t()) :: String.t() | nil
   def link_headings(content, prefix \\ "")
   def link_headings(nil, _), do: nil
 
   def link_headings(content, prefix) do
-    @heading_regex
+    ~r/<(h[23]).*?>(.*?)<\/\1>/m
     |> Regex.scan(content)
     |> Enum.reduce({content, %{}}, fn [match, tag, title], {content, occurrences} ->
       possible_id = text_to_id(title)
@@ -237,7 +244,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> elem(0)
   end
 
-  @class_regex ~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/
   @class_separator " "
   defp link_heading(match, _tag, _title, "", _prefix), do: match
 
@@ -267,7 +273,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     # it was setting `#{section_header_class_name}` as the only CSS class
     # associated with the given header.
     class_attribute =
-      case Regex.named_captures(@class_regex, match) do
+      case Regex.named_captures(~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/, match) do
         %{"class" => ""} ->
           section_header_class_name
 
@@ -303,13 +309,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
     detail_template: [:node, :module],
     footer_template: [:config, :node],
     head_template: [:config, :title, :noindex],
-    module_template: [:config, :module, :summary, :nodes_map],
-    not_found_template: [:config, :nodes_map],
+    module_template: [:config, :module, :summary],
+    not_found_template: [:config],
     api_reference_entry_template: [:module_node],
     api_reference_template: [:nodes_map],
-    extra_template: [:config, :node, :type, :nodes_map, :refs],
-    search_template: [:config, :nodes_map],
-    sidebar_template: [:config, :type, :nodes_map],
+    extra_template: [:config, :node, :type, :refs],
+    search_template: [:config],
+    sidebar_template: [:config, :type],
     summary_template: [:name, :nodes],
     redirect_template: [:config, :redirect_to]
   ]

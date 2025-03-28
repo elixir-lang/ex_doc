@@ -33,7 +33,7 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:function, :lists, :all, 9}) == :undefined
     assert Refs.get_visibility({:function, :lists, :_all, 9}) == :undefined
     assert Refs.get_visibility({:function, InMemory, :with_doc, 0}) == :public
-    assert Refs.get_visibility({:function, InMemory, :non_existant, 0}) == :undefined
+    assert Refs.get_visibility({:function, InMemory, :non_existent, 0}) == :undefined
     assert Refs.get_visibility({:function, WithModuleDoc, :no_doc, 0}) == :public
     assert Refs.get_visibility({:function, WithModuleDoc, :_no_doc, 0}) == :hidden
     assert Refs.get_visibility({:function, WithModuleDoc, :_doc_false, 0}) == :hidden
@@ -42,7 +42,7 @@ defmodule ExDoc.RefsTest do
     assert Refs.get_visibility({:function, InMemory, :no_doc, 0}) == :public
     assert Refs.get_visibility({:function, InMemory, :doc_false, 0}) == :public
     assert Refs.get_visibility({:function, InMemory, :with_doc, 0}) == :public
-    assert Refs.get_visibility({:function, InMemory, :non_existant, 0}) == :undefined
+    assert Refs.get_visibility({:function, InMemory, :non_existent, 0}) == :undefined
 
     # macros are classified as functions
     assert Refs.get_visibility({:function, Kernel, :def, 2}) == :public

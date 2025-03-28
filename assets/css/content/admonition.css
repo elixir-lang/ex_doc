@@ -1,5 +1,5 @@
 .content-inner section.admonition {
-  border-radius: 10px;
+  border-radius: var(--borderRadius-base);
   border-left: 0;
 }
 

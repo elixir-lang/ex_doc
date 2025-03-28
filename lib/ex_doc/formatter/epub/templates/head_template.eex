@@ -5,9 +5,8 @@
     <meta charset="utf-8" />
     <title><%= title %> - <%= config.project %> v<%= config.version %></title>
     <meta name="generator" content="ExDoc v<%= ExDoc.version() %>" />
-    <link type="text/css" rel="stylesheet"
-      href="<%= H.asset_rev "#{config.output}/OEBPS", "dist/epub-#{config.proglang}-*.css" %>" />
-    <script src="<%= H.asset_rev "#{config.output}/OEBPS", "dist/epub-*.js" %>"></script>
+    <link type="text/css" rel="stylesheet" href="dist/<%= Assets.css_filename(config.proglang) %>" />
+    <script src="dist/<%= Assets.js_filename() %>"></script>
     <%= before_closing_head_tag(config, :epub) %>
   </head>
   <body class="content-inner">

@@ -51,6 +51,7 @@ defmodule Mix.Tasks.Docs do
           homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
           docs: [
             main: "MyApp", # The main page in the docs
+            favicon: "path/to/favicon.png",
             logo: "path/to/logo.png",
             extras: ["README.md"]
           ]
@@ -112,8 +113,14 @@ defmodule Mix.Tasks.Docs do
     * `:extras` - List of paths to additional Markdown (`.md` extension), Live Markdown
       (`.livemd` extension), Cheatsheets (`.cheatmd` extension) and plain text pages to
       add to the documentation. You can also specify keyword pairs to customize the
-      generated filename, title and source file of each extra page; default: `[]`. Example:
+      generated filename, title and source file, and search content of each extra page; default: `[]`. Example:
       `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing", source: "CONTRIBUTING.mdx"]]`
+      See the Customizing Extras section for more.
+
+    * `:favicon` - Path to a favicon image file for the project. Must be PNG, JPEG or SVG. When
+      specified, the image file will be placed in the output "assets" directory, named
+      "favicon.EXTENSION". If using SVG, ensure appropriate width, height and viewBox attributes
+      are present in order to ensure predictable sizing and cropping.
 
     * `:filter_modules` - Include only modules that match the given value. The
       value can be a regex, a string (representing a regex), or a two-arity
@@ -153,7 +160,8 @@ defmodule Mix.Tasks.Docs do
       May be overridden by command line argument.
 
     * `:redirects` - A map or list of tuples, where the key is the path to redirect from and the
-       value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`
+       value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`.
+       See the "Changing documentation over time" section below for more.
 
     * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
       reference in the current project docs e.g. because of a typo. This list controls where to
@@ -336,6 +344,52 @@ defmodule Mix.Tasks.Docs do
   modules share a long prefix. If you mean to group modules logically or call
   attention to them in the docs, you should probably use `:groups_for_modules`
   (which can be used in conjunction with `:nest_modules_by_prefix`).
+
+  ## Changing documentation over time
+
+  As your project grows, your documentation may very likely change, even structurally.
+  There are a few important things to consider in this regard:
+
+    * Links to your *extras* will break if you change or move file names.
+    * Links to your *modules, and mix tasks* will change if you change their name.
+    * Links to *functions* are actually links to modules with anchor links.
+      If you change the function name, the link does not break but will leave users
+      at the top of the module's documentation.
+
+  Because these docs are static files, the behavior of a missing page will depend on where they are hosted.
+  In particular, [hexdocs.pm](https://hexdocs.pm) will show a 404 page.
+
+  You can improve the developer experience on everything but function names changing
+  by using the `redirects` configuration. For example, if you changed the module `MyApp.MyModule`
+  to `MyApp.My.Module` and the extra `get-started.md` to `quickstart.md`, you can
+  setup the following redirects:
+
+      redirects: %{
+        "MyApp.MyModule" => "MyApp.My.Module",
+        "get-started" => "quickstart"
+      }
+
+  ## Customizing Extras
+
+    * `:title` - The title of the extra page. If not provided, the title will be inferred from the filename.
+    * `:filename` - The name of the generated file. If not provided, the filename will be inferred from
+       the source file.
+    * `:source` - The source file of the extra page. This is useful if you want to customize the filename or
+       title but keep the source file unchanged.
+    * `:search_data` - A list of terms to be indexed for autocomplete and search. If not provided, the content
+       of the extra page will be indexed for search. See the section below for more.
+
+  ### Customizing Search Data
+
+  It is possible to fully customize the way a given extra is indexed, both in autocomplete and in search.
+  In most cases, this makes sense for _generated_ documentation. If `search_data` is provided, it completely
+  overrides the built in logic for indexing your document based on the headers and content of the document.
+  The following fields can be provided in a list of maps for `search_data`.
+
+    * `:anchor` - The anchor link for the search result. Use `""` to point to the top of the page.
+    * `:title` - The title of the result.
+    * `:type` - The type of the search result, such as "module", "function" or "section".
+    * `:body` - The main content or body of the search result, _as markdown_. Used in search, not autocomplete.
 
   ## Umbrella project
 

@@ -2,17 +2,17 @@
   /* Layout & Whitespace */
   --content-width: 949px;
   --content-gutter: 60px;
-  --borderRadius: 4px;
-  --navTabBorderWidth: 4px;
+  --borderRadius-lg: 14px;
+  --borderRadius-base: 8px;
+  --borderRadius-sm: 3px;
+  --navTabBorderWidth: 2px;
 
   /* Font Families */
-  --defaultFontFamily: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji";
-  --sansFontFamily: "Lato", sans-serif;
-  --monoFontFamily: "Inconsolata", Menlo, Courier, monospace;
+  /* These mirror modern-normalize.css with "Lato" on top */
+  --sansFontFamily: "Lato", system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --monoFontFamily: ui-monospace, SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
 
   /* Typography */
-  --baseFontSize: 18px;
   --baseLineHeight: 1.5em;
 
   /* Colours */
@@ -40,8 +40,8 @@
   --coldGray-opacity-10: hsla(240, 5%, 46%, 10%);
   --coldGrayDark: hsl(240, 5%, 28%);
   --coldGrayDim: hsl(240, 5%, 18%);
-  --yellowLight: hsl(60, 100%, 81%);
-  --yellowDark: hsl(60, 100%, 43%, 62%);
+  --yellowLight: hsl(43, 100%, 95%);
+  --yellowDark: hsl(44, 100%, 15%);
   --yellow: hsl(60, 100%, 43%);
   --green-lightened-10: hsl(90, 100%, 45%);
   --green: hsl(90, 100%, 35%);
@@ -52,6 +52,28 @@
   --black: hsl(0, 0%, 0%);
   --black-opacity-10: hsla(0, 0%, 0%, 10%);
   --black-opacity-50: hsla(0, 0%, 0%, 50%);
+  --orangeDark: hsl(30, 90%, 40%);
+  --orangeLight: hsl(30, 80%, 50%);
+
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-md: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+
+  --transition-duration: 150ms;
+  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --transition-all: all var(--transition-duration) var(--transition-timing);
+
+  --transition-colors: color var(--transition-duration) var(--transition-timing),
+  background-color var(--transition-duration) var(--transition-timing),
+  border-color var(--transition-duration) var(--transition-timing),
+  text-decoration-color var(--transition-duration) var(--transition-timing),
+  fill var(--transition-duration) var(--transition-timing),
+  stroke var(--transition-duration) var(--transition-timing);
+
+  --transition-opacity: opacity var(--transition-duration) var(--transition-timing);
 }
 
 @media screen and (max-width: 768px) {
@@ -59,4 +81,8 @@
     --content-width: 100%;
     --content-gutter: 20px;
   }
+}
+
+option {
+  background-color: var(--sidebarBackground);
 }

@@ -11,22 +11,27 @@ pre .copy-button:focus {
   display: flex;
   opacity: 0;
   position: absolute;
-  top: 5px;
-  right: 5px;
-  padding: 4px;
-  background-color: var(--codeBackground);
-  border: none;
+  top: 7px;
+  right: 8px;
+  padding: 8px;
+  background-color: transparent;
+  backdrop-filter: blur(8px);
+  border-radius: var(--borderRadius-sm);
+  border: 1px solid var(--codeBorder);
   cursor: pointer;
-  transition: all 150ms;
-  font-family: var(--defaultFontFamily);
-  font-size: 14px;
+  transition: var(--transition-all);
+  font-size: var(--text-sm);
   line-height: 24px;
   color: currentColor;
+
+  & svg[aria-live="polite"] {
+    display: none;
+  }
 }
 
 .copy-button svg {
   opacity: 0.5;
-  transition: all 150ms;
+  transition: var(--transition-all);
 }
 
 pre .copy-button:hover svg,
@@ -41,6 +46,10 @@ pre .copy-button:focus-visible svg {
 .copy-button.clicked {
   opacity: 1;
   color: var(--success);
+
+  & svg[aria-live="polite"] {
+    display: block;
+  }
 }
 
 .copy-button.clicked svg {

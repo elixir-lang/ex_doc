@@ -7,7 +7,7 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.{DocAST, GroupMatcher, Refs, Utils}
+  alias ExDoc.{DocAST, GroupMatcher, Refs}
   alias ExDoc.Retriever.Error
 
   @doc """
@@ -50,8 +50,10 @@ defmodule ExDoc.Retriever do
   end
 
   defp docs_from_modules(modules, acc, config) do
-    Enum.reduce(modules, acc, fn module_name, {modules, filtered} = acc ->
-      case get_module(module_name, config) do
+    modules
+    |> Task.async_stream(&get_module(&1, config), timeout: :infinity)
+    |> Enum.reduce(acc, fn {:ok, result}, {modules, filtered} = acc ->
+      case result do
         {:error, _module} ->
           acc
 
@@ -128,8 +130,9 @@ defmodule ExDoc.Retriever do
 
   defp generate_node(module, module_data, config) do
     source = %{
-      url: config.source_url_pattern,
-      path: module_data.source_file
+      url_pattern: config.source_url_pattern,
+      path: module_data.source_file,
+      relative_path: path_relative_to_cwd(module_data.source_file)
     }
 
     {doc_line, doc_file, format, source_doc, doc, metadata} = get_module_docs(module_data, source)
@@ -303,41 +306,33 @@ defmodule ExDoc.Retriever do
   defp anno_line(line) when is_integer(line), do: abs(line)
   defp anno_line(anno), do: anno |> :erl_anno.line() |> abs()
 
-  defp anno_file(anno) do
+  defp anno_file(anno, source) do
     case :erl_anno.file(anno) do
       :undefined ->
-        nil
+        source.relative_path
 
       file ->
-        file
+        source.path
+        |> Path.dirname()
+        |> Path.join(file)
+        |> path_relative_to_cwd()
     end
-  end
-
-  defp anno_file(anno, source) do
-    if file = anno_file(anno) do
-      Path.join(Path.dirname(source.path), file)
-    else
-      source.path
-    end
-    |> path_relative_to_cwd(force: true)
   end
 
   # TODO: Remove when we require Elixir 1.16
   if function_exported?(Path, :relative_to_cwd, 2) do
-    defp path_relative_to_cwd(path, options), do: Path.relative_to_cwd(path, options)
+    defp path_relative_to_cwd(path), do: Path.relative_to_cwd(path, force: true)
   else
-    defp path_relative_to_cwd(path, _options), do: Path.relative_to_cwd(path)
+    defp path_relative_to_cwd(path), do: Path.relative_to_cwd(path)
   end
 
   defp source_link(nil, source, line), do: source_link(source, line)
 
-  defp source_link(file, source, line) do
-    source_link(%{source | path: file}, line)
+  defp source_link(file, %{url_pattern: url_pattern}, line) do
+    url_pattern.(path_relative_to_cwd(file), line)
   end
 
-  defp source_link(%{path: _, url: nil}, _line), do: nil
-
-  defp source_link(source, line) do
-    Utils.source_url_pattern(source.url, source.path |> Path.relative_to(File.cwd!()), line)
+  defp source_link(%{url_pattern: url_pattern, relative_path: path}, line) do
+    url_pattern.(path, line)
   end
 end

@@ -10,6 +10,7 @@ import {
   AUTOCOMPLETE_CONTAINER_SELECTOR,
   AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR
 } from './autocomplete/autocomplete-list'
+import { isEmbedded } from './globals'
 import { isAppleOS, qs } from './helpers'
 
 const SEARCH_INPUT_SELECTOR = 'form.search-bar input'
@@ -18,7 +19,12 @@ const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-bar .search-close-button'
 /**
  * Initializes the sidebar search box.
  */
-export function initialize () {
+
+if (!isEmbedded) {
+  window.addEventListener('exdoc:loaded', initialize)
+}
+
+function initialize () {
   addEventListeners()
 
   window.onTogglePreviewClick = function (event, open) {
@@ -172,23 +178,22 @@ function hideAutocomplete () {
   hideAutocompleteList()
 }
 
-let lastScroll = window.scrollY
-const scrollThreshold = 70 // Threshold beyond which search bar may be hidden
-const scrollConsideredIntentional = -2 // Pixels (negative sign) considered to indicate intent
+let lastScroll
+const scrollIntentThreshold = 2
 
 window.addEventListener('scroll', function () {
   const currentScroll = window.scrollY
 
-  // Remove when at the top
-  if (currentScroll === 0) {
-    document.body.classList.remove('scroll-sticky')
-  } else if (lastScroll - currentScroll < scrollConsideredIntentional && currentScroll > scrollThreshold) {
-    // Scrolling down and past the threshold
-    document.body.classList.remove('scroll-sticky')
-  } else if (lastScroll - currentScroll > Math.abs(scrollConsideredIntentional)) {
-    // Scrolling up
-    document.body.classList.add('scroll-sticky')
+  if (lastScroll !== undefined) {
+    const diff = currentScroll - lastScroll
+    if (currentScroll === 0 || diff > scrollIntentThreshold) {
+      // Remove when at the top or scrolling down.
+      document.body.classList.remove('scroll-sticky')
+    } else if (currentScroll > 0 && -diff > scrollIntentThreshold) {
+      // Add when scrolling up.
+      document.body.classList.add('scroll-sticky')
+    }
   }
 
-  lastScroll = currentScroll <= 0 ? 0 : currentScroll
+  lastScroll = Math.max(0, currentScroll)
 }, false)

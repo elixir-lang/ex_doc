@@ -6,6 +6,7 @@ import { cycleTheme } from './theme'
 import { openQuickSwitchModal } from './quick-switch'
 import { closeModal, isModalOpen } from './modal'
 import { openSettingsModal } from './settings'
+import { isEmbedded } from './globals'
 
 const HELP_MODAL_BODY_SELECTOR = '#settings-modal-content'
 
@@ -60,14 +61,9 @@ const state = {
 }
 
 /**
- * Registers keyboard shortcuts and sets up a help modal
- * listing all available options.
+ * Registers keyboard shortcuts.
  */
-export function initialize () {
-  addEventListeners()
-}
-
-function addEventListeners () {
+if (!isEmbedded) {
   document.addEventListener('keydown', handleKeyDown)
   document.addEventListener('keyup', handleKeyUp)
 }

@@ -1,4 +1,6 @@
 defmodule ExDoc.DocAST do
+  # General helpers for dealing with the documentation AST
+  # (which is the Markdown -> HTML AST).
   @moduledoc false
 
   @type t :: term()
@@ -163,7 +165,7 @@ defmodule ExDoc.DocAST do
 
     ## Html cannot be parsed with regex, but we try our best...
     Regex.replace(
-      ~r/<pre(\s[^>]*)?><code(?:\s+class="(\w*)")?>([^<]*)<\/code><\/pre>/,
+      ~r/<pre(\s[^>]*)?><code(?:\s+class="([^"\s]*)")?>([^<]*)<\/code><\/pre>/,
       html,
       &highlight_code_block(&1, &2, &3, &4, highlight_info, opts)
     )
@@ -178,11 +180,13 @@ defmodule ExDoc.DocAST do
         try do
           render_code(pre_attr, lang, lexer, opts, code, outer_opts)
         rescue
-          _ ->
+          exception ->
             ExDoc.Utils.warn(
               [
                 "crashed while highlighting #{lang} snippet:\n\n",
-                full_block
+                full_block,
+                "\n\n",
+                Exception.format_banner(:error, exception, __STACKTRACE__)
               ],
               __STACKTRACE__
             )
