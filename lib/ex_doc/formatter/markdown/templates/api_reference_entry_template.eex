@@ -1,0 +1,3 @@
+**[<%=h module_node.title %>](<%=enc module_node.id %>.md)**<%= if module_node.deprecated do %> *deprecated*<% end %>
+<%= if doc = module_node.rendered_doc do %><%= String.trim(synopsis(doc)) %>
+<% end %>
