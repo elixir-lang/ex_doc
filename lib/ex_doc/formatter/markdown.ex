@@ -158,20 +158,14 @@ defmodule ExDoc.Formatter.Markdown do
     end)
   end
 
-  defp bump_levels(%MDEx.Document{nodes: nodes} = document, levels_to_bump) do
-    nodes_updated =
-      Enum.reduce(nodes, [], fn
-        %MDEx.Heading{level: level} = heading, acc ->
-          updated_element = %{heading | level: increase_level(level, levels_to_bump)}
-
-          [updated_element | acc]
-
-        elem, acc ->
-          [elem | acc]
-      end)
-      |> Enum.reverse()
-
-    Map.put(document, :nodes, nodes_updated)
+  defp bump_levels(document, levels_to_bump) when is_struct(document, MDEx.Document) do
+    update_in(
+      document,
+      [:document, Access.key!(:nodes), Access.filter(&is_struct(&1, MDEx.Heading))],
+      fn %MDEx.Heading{level: level} = heading ->
+        %{heading | level: increase_level(level, levels_to_bump)}
+      end
+    )
   end
 
   defp increase_level(level, levels_to_bump) do
