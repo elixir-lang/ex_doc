@@ -59,6 +59,7 @@ export function initialize () {
       const items = []
       const hasHeaders = Array.isArray(node.headers)
       const translate = hasHeaders ? undefined : 'no'
+      const href = node?.url || `${node.id}.html`
 
       // Group header.
       if (node.group !== group) {
@@ -78,7 +79,7 @@ export function initialize () {
       }
 
       items.push(el('li', {}, [
-        el('a', {href: `${node.id}.html`, translate}, [node.nested_title || node.title]),
+        el('a', {href: href, translate}, [node.nested_title || node.title]),
         ...childList(`node-${node.id}-headers`,
           hasHeaders
             ? renderHeaders(node)

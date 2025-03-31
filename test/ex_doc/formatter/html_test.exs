@@ -112,6 +112,24 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert to_string(bar_content["h1"]) == "README bar"
   end
 
+  test "extras defined as external urls", %{tmp_dir: tmp_dir} = context do
+    config =
+      doc_config(context,
+        extras: [
+          "README.md",
+          "Elixir": [url: "https://elixir-lang.org"]
+        ]
+      )
+
+    File.write!("#{tmp_dir}/README.md", "README")
+
+    generate_docs(config)
+
+    content = File.read!(tmp_dir <> "/html/README.html")
+
+    assert content =~ "https://elixir-lang.org"
+  end
+
   test "warns when generating an index.html file with an invalid redirect",
        %{tmp_dir: tmp_dir} = context do
     output =
