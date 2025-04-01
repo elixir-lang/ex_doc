@@ -303,10 +303,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
         ExDoc.Retriever.docs_from_modules(
           [CompiledWithDocs, CompiledWithDocs.Nested],
           doc_config(context,
-            groups_for_docs: [
-              "Example functions": &(&1[:purpose] == :example),
-              Legacy: &is_binary(&1[:deprecated])
-            ]
+            group_for_doc: fn metadata ->
+              cond do
+                metadata[:purpose] == :example -> "Example functions"
+                is_binary(metadata[:deprecated]) -> "Legacy"
+                true -> "Functions"
+              end
+            end,
+            docs_groups: ["Example functions", "Legacy"]
           )
         )
 
@@ -484,10 +488,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "outputs function groups", context do
       content =
         get_module_page([CompiledWithDocs], context,
-          groups_for_docs: [
-            "Example functions": &(&1[:purpose] == :example),
-            Legacy: &is_binary(&1[:deprecated])
-          ]
+          group_for_doc: fn metadata ->
+            cond do
+              metadata[:purpose] == :example -> "Example functions"
+              is_binary(metadata[:deprecated]) -> "Legacy"
+              true -> "Functions"
+            end
+          end
         )
 
       doc = EasyHTML.parse!(content)

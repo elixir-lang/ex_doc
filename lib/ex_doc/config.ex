@@ -23,16 +23,16 @@ defmodule ExDoc.Config do
             before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
             canonical: nil,
             cover: nil,
-            default_group_for_doc: &__MODULE__.default_group_for_doc/1,
             deps: [],
+            docs_groups: [],
             extra_section: nil,
             extras: [],
             favicon: nil,
             filter_modules: &__MODULE__.filter_modules/2,
             formatter: "html",
             formatters: [],
+            group_for_doc: &__MODULE__.default_group_for_doc/1,
             groups_for_extras: [],
-            groups_for_docs: [],
             groups_for_modules: [],
             homepage_url: nil,
             language: "en",
@@ -67,16 +67,16 @@ defmodule ExDoc.Config do
           before_closing_head_tag: (atom() -> String.t()) | mfa() | map(),
           canonical: nil | String.t(),
           cover: nil | Path.t(),
-          default_group_for_doc: (keyword() -> String.t() | nil),
           deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
+          docs_groups: [String.t()],
           extra_section: nil | String.t(),
           extras: list(),
           favicon: nil | Path.t(),
           filter_modules: (module, map -> boolean),
           formatter: nil | String.t(),
           formatters: [String.t()],
+          group_for_doc: (keyword() -> String.t() | nil),
           groups_for_extras: [{binary(), term()}],
-          groups_for_docs: [{binary(), (keyword() -> boolean)}],
           groups_for_modules: [{binary(), term()}],
           homepage_url: nil | String.t(),
           language: String.t(),
@@ -113,12 +113,16 @@ defmodule ExDoc.Config do
         options
       end
 
+    apps = Keyword.get(options, :apps, [])
+
     {groups_for_docs, options} = Keyword.pop(options, :groups_for_docs, [])
     {groups_for_extras, options} = Keyword.pop(options, :groups_for_extras, [])
-    apps = Keyword.get(options, :apps, [])
 
     {groups_for_modules, options} =
       Keyword.pop(options, :groups_for_modules, default_groups_for_modules(apps))
+
+    {default_group_for_doc, options} =
+      Keyword.pop(options, :default_group_for_doc, &default_group_for_doc/1)
 
     {skip_undefined_reference_warnings_on, options} =
       Keyword.pop(
@@ -137,7 +141,8 @@ defmodule ExDoc.Config do
 
     preconfig = %__MODULE__{
       filter_modules: normalize_filter_modules(filter_modules),
-      groups_for_docs: normalize_groups(groups_for_docs),
+      docs_groups: for({group, _} <- groups_for_docs, do: to_string(group)),
+      group_for_doc: normalize_groups_for_docs(groups_for_docs, default_group_for_doc),
       groups_for_extras: normalize_groups(groups_for_extras),
       groups_for_modules:
         normalize_groups(
@@ -174,6 +179,16 @@ defmodule ExDoc.Config do
 
   defp normalize_proglang(proglang) do
     raise ArgumentError, "#{inspect(proglang)} is not supported"
+  end
+
+  defp normalize_groups_for_docs(groups, default) do
+    groups = normalize_groups(groups)
+
+    fn metadata ->
+      Enum.find_value(groups, fn {group, function} ->
+        function.(metadata) && group
+      end) || default.(metadata)
+    end
   end
 
   defp normalize_groups(groups) do
