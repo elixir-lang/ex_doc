@@ -209,6 +209,7 @@ defmodule ExDoc.Formatter.HTML do
   defp generate_extras(extras, config) do
     generated_extras =
       extras
+      |> Enum.reject(&is_map_key(&1, :url))
       |> with_prev_next()
       |> Enum.map(fn {node, prev, next} ->
         filename = "#{node.id}.html"
@@ -349,6 +350,7 @@ defmodule ExDoc.Formatter.HTML do
 
     extras =
       config.extras
+      |> Enum.map(&normalize_extras/1)
       |> Task.async_stream(
         &build_extra(&1, groups, language, autolink_opts, source_url_pattern),
         timeout: :infinity
@@ -384,8 +386,29 @@ defmodule ExDoc.Formatter.HTML do
     end)
   end
 
+  defp normalize_extras(base) when is_binary(base), do: {base, %{}}
+  defp normalize_extras({base, opts}), do: {base, Map.new(opts)}
+
   defp disambiguate_id(extra, discriminator) do
     Map.put(extra, :id, "#{extra.id}-#{discriminator}")
+  end
+
+  defp build_extra({input, %{url: _} = input_options}, groups, _lang, _auto, _url_pattern) do
+    input = to_string(input)
+    title = input_options[:title] || filename_to_title(input)
+    group = GroupMatcher.match_extra(groups, input)
+
+    # TODO: Can we make the content/source a link?
+
+    %{
+      group: group,
+      id: Utils.text_to_id(title),
+      source_path: input_options[:url],
+      source_url: input_options[:url],
+      title: title,
+      title_content: title,
+      url: input_options[:url]
+    }
   end
 
   defp build_extra({input, input_options}, groups, language, autolink_opts, source_url_pattern) do
@@ -445,10 +468,6 @@ defmodule ExDoc.Formatter.HTML do
       title: title,
       title_content: title_html || title
     }
-  end
-
-  defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
-    build_extra({input, []}, groups, language, autolink_opts, source_url_pattern)
   end
 
   defp normalize_search_data!(nil), do: nil
@@ -602,7 +621,15 @@ defmodule ExDoc.Formatter.HTML do
 
       {path, opts} ->
         base = path |> to_string() |> Path.basename()
-        {base, opts[:filename] || Utils.text_to_id(Path.rootname(base))}
+
+        txid =
+          cond do
+            filename = opts[:filename] -> filename
+            url = opts[:url] -> url
+            true -> Utils.text_to_id(Path.rootname(base))
+          end
+
+        {base, txid}
     end)
   end
 end

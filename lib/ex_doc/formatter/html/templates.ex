@@ -82,15 +82,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp sidebar_extras(extras) do
     for extra <- extras do
-      %{id: id, title: title, group: group, content: content} = extra
+      %{id: id, title: title, group: group} = extra
 
-      item =
-        %{
-          id: to_string(id),
-          title: to_string(title),
-          group: to_string(group),
-          headers: extract_headers(content)
-        }
+      item = %{id: to_string(id), title: to_string(title), group: to_string(group)}
 
       case extra do
         %{search_data: search_data} when is_list(search_data) ->
@@ -103,10 +97,15 @@ defmodule ExDoc.Formatter.HTML.Templates do
               }
             end)
 
-          Map.put(item, :searchData, search_data)
+          item
+          |> Map.put(:headers, extract_headers(extra.content))
+          |> Map.put(:searchData, search_data)
+
+        %{url: url} when is_binary(url) ->
+          Map.put(item, :url, url)
 
         _ ->
-          item
+          Map.put(item, :headers, extract_headers(extra.content))
       end
     end
   end
