@@ -47,7 +47,7 @@ defmodule ExDoc.Mixfile do
       {:makeup_html, ">= 0.1.0", optional: true},
       {:jason, "~> 1.2", only: :test},
       {:floki, "~> 0.0", only: :test},
-      {:easyhtml, "~> 0.0", only: :test}
+      {:lazy_html, "~> 0.1.0", only: :test}
     ]
   end
 
