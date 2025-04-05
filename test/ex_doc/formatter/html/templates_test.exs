@@ -497,13 +497,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
           end
         )
 
-      doc = EasyHTML.parse!(content)
-      assert doc["#example-functions a[href='#example-functions']"]
-      assert doc["#legacy a[href='#legacy']"]
-      assert doc["#example-functions [id='example/2']"]
-      refute doc["#legacy [id='example/2']"]
-      assert doc["#functions [id='example_1/0']"]
-      refute doc["#functions [id='example/2']"]
+      doc = LazyHTML.from_document(content)
+      assert Enum.count(doc["#example-functions a[href='#example-functions']"]) == 1
+      assert Enum.count(doc["#legacy a[href='#legacy']"]) == 1
+      assert Enum.count(doc["#example-functions [id='example/2']"]) == 1
+      assert Enum.count(doc["#legacy [id='example/2']"]) == 0
+      assert Enum.count(doc["#functions [id='example_1/0']"]) == 1
+      assert Enum.count(doc["#functions [id='example/2']"]) == 0
     end
 
     test "outputs deprecation information", context do
