@@ -30,7 +30,7 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     """)
 
     doc = generate_docs(c)
-    html = Floki.raw_html(doc)
+    html = LazyHTML.to_html(doc)
 
     assert html =~
              ~s|-spec</span> foo(<a href="#t:t/0">t</a>()) -&gt; <a href="#t:t/0">t</a>().|
@@ -54,6 +54,9 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
 
     ExDoc.generate_docs(config[:project], config[:version], config)
 
-    [c.tmp_dir, "doc", "foo.html"] |> Path.join() |> File.read!() |> Floki.parse_document!()
+    [c.tmp_dir, "doc", "foo.html"]
+    |> Path.join()
+    |> File.read!()
+    |> LazyHTML.from_document()
   end
 end
