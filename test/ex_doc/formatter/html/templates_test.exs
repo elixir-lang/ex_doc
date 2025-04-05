@@ -34,15 +34,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     Templates.module_page(mod, config)
   end
 
-  defp num_nodes_matched(doc, selector) do
-    import LazyHTML
-
-    doc
-    |> query(selector)
-    |> to_tree()
-    |> length()
-  end
-
   setup %{tmp_dir: tmp_dir} do
     File.cp_r!("formatters/html", tmp_dir <> "/html_templates")
     File.touch!(tmp_dir <> "/html_templates/dist/sidebar_items-123456.js")
@@ -507,12 +498,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
         )
 
       doc = LazyHTML.from_document(content)
-      assert num_nodes_matched(doc, "#example-functions a[href='#example-functions']") == 1
-      assert num_nodes_matched(doc, "#legacy a[href='#legacy']") == 1
-      assert num_nodes_matched(doc, "#example-functions [id='example/2']") == 1
-      assert num_nodes_matched(doc, "#legacy [id='example/2']") == 0
-      assert num_nodes_matched(doc, "#functions [id='example_1/0']") == 1
-      assert num_nodes_matched(doc, "#functions [id='example/2']") == 0
+      assert Enum.count(doc["#example-functions a[href='#example-functions']"]) == 1
+      assert Enum.count(doc["#legacy a[href='#legacy']"]) == 1
+      assert Enum.count(doc["#example-functions [id='example/2']"]) == 1
+      assert Enum.count(doc["#legacy [id='example/2']"]) == 0
+      assert Enum.count(doc["#functions [id='example_1/0']"]) == 1
+      assert Enum.count(doc["#functions [id='example/2']"]) == 0
     end
 
     test "outputs deprecation information", context do

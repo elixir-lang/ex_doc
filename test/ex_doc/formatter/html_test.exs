@@ -85,8 +85,6 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "multiple extras with the same name", c do
-    import LazyHTML
-
     File.mkdir_p!("#{c.tmp_dir}/foo")
 
     File.write!("#{c.tmp_dir}/foo/README.md", """
@@ -107,11 +105,11 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     generate_docs(config)
 
-    foo_content = "#{c.tmp_dir}/html/readme-1.html" |> File.read!() |> from_document()
-    bar_content = "#{c.tmp_dir}/html/readme-2.html" |> File.read!() |> from_document()
+    foo_content = "#{c.tmp_dir}/html/readme-1.html" |> File.read!() |> LazyHTML.from_document()
+    bar_content = "#{c.tmp_dir}/html/readme-2.html" |> File.read!() |> LazyHTML.from_document()
 
-    assert foo_content |> query("h1") |> text() == "README foo"
-    assert bar_content |> query("h1") |> text() == "README bar"
+    assert LazyHTML.text(foo_content["h1"]) == "README foo"
+    assert LazyHTML.text(bar_content["h1"]) == "README bar"
   end
 
   test "warns when generating an index.html file with an invalid redirect",
