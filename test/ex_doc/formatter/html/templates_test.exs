@@ -169,6 +169,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert Templates.synopsis("<p>::</p>") == "<p></p>"
       assert Templates.synopsis("<p>Description:</p>") == "<p>Description</p>"
       assert Templates.synopsis("<p>abcd</p>") == "<p>abcd</p>"
+      assert Templates.synopsis("<p>abc</p><p>def</p>") == "<p>abc</p>"
+      assert Templates.synopsis("<h2>title</h2><p>abc</p><p>def</p>") == "<p>abc</p>"
+      assert Templates.synopsis("<li><p>abc</p></li>") == "<p>abc</p>"
     end
 
     test "should not end have trailing periods or semicolons" do

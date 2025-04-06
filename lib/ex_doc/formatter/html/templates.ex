@@ -53,9 +53,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def synopsis(doc) when is_binary(doc) do
     doc =
-      case :binary.split(doc, "</p>") do
-        [left, _] -> String.trim_trailing(left, ":") <> "</p>"
-        [all] -> all
+      Regex.run(~r|<p>((?:(?!</p>).)*?):*</p>|, doc)
+      |> case do
+        nil -> doc
+        [_, first_paragraph_text] -> "<p>" <> first_paragraph_text <> "</p>"
       end
 
     # Remove any anchors found in synopsis.
