@@ -58,6 +58,14 @@ defmodule Mix.Tasks.Docs do
         ]
       end
 
+  > #### Tip {: .info}
+  >
+  > If you set `:source_url` to a GitHub/GitLab/BitBucket repo then whenever you
+  > publish a release you should publish the release to the repo (which will
+  > push a tag). If the release exists in the repo then ex_doc will generate
+  > links to the specific version of the code that the user is currently
+  > browsing.
+
   ExDoc also allows configuration specific to the documentation to
   be set. The following options should be put under the `:docs` key
   in your project's main configuration. The `:docs` options should
