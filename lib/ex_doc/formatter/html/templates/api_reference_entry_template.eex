@@ -5,7 +5,7 @@
       <span class="deprecated" title="<%= h(deprecated) %>">deprecated</span>
     <% end %>
   </div>
-  <%= if doc = module_node.rendered_doc do %>
-    <div class="summary-synopsis"><%= synopsis(doc) %></div>
+  <%= if doc = module_node.doc do %>
+    <div class="summary-synopsis"><%= ExDoc.DocAST.synopsis(doc) %></div>
   <% end %>
 </div>

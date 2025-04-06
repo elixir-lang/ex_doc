@@ -161,43 +161,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
   end
 
-  describe "synopsis" do
-    test "functionality" do
-      assert Templates.synopsis(nil) == nil
-      assert Templates.synopsis("") == ""
-      assert Templates.synopsis("<p>.</p>") == "<p>.</p>"
-      assert Templates.synopsis("<p>::</p>") == "<p></p>"
-      assert Templates.synopsis("<p>Description:</p>") == "<p>Description</p>"
-      assert Templates.synopsis("<p>abcd</p>") == "<p>abcd</p>"
-    end
-
-    test "should not end have trailing periods or semicolons" do
-      doc1 = """
-      Summaries should not be displayed with trailing semicolons :
-
-      ## Example
-      """
-
-      doc2 = """
-      Example function: Summary should display trailing period :.
-
-      ## Example:
-      """
-
-      assert Templates.synopsis(to_html(doc1)) ==
-               "<p>Summaries should not be displayed with trailing semicolons </p>"
-
-      assert Templates.synopsis(to_html(doc2)) ==
-               "<p>Example function: Summary should display trailing period :.</p>"
-    end
-  end
-
-  defp to_html(markdown) do
-    markdown
-    |> ExDoc.DocAST.parse!("text/markdown")
-    |> ExDoc.DocAST.to_string()
-  end
-
   describe "sidebar" do
     test "text links to homepage_url when set", context do
       content = Templates.sidebar_template(doc_config(context), :extra)

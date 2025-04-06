@@ -104,13 +104,49 @@ defmodule ExDoc.DocASTTest do
 
     test "void elements" do
       markdown = """
-      foo  
+      foo\s\s
       bar
       """
 
       ast = DocAST.parse!(markdown, "text/markdown")
 
       assert DocAST.to_string(ast) == ~s{<p>foo<br/>bar</p>}
+    end
+  end
+
+  describe "synopsis" do
+    test "functionality" do
+      assert synopsis("") == ""
+      assert synopsis("<p>.</p>") == "<p>.</p>"
+      assert synopsis("<p>::</p>") == "<p></p>"
+      assert synopsis("<p>Description:</p>") == "<p>Description</p>"
+      assert synopsis("<p>abcd</p>") == "<p>abcd</p>"
+    end
+
+    test "should not end have trailing periods or semicolons" do
+      doc1 = """
+      Summaries should not be displayed with trailing semicolons :
+
+      ## Example
+      """
+
+      doc2 = """
+      Example function: Summary should display trailing period :.
+
+      ## Example:
+      """
+
+      assert synopsis(doc1) ==
+               "<p>Summaries should not be displayed with trailing semicolons </p>"
+
+      assert synopsis(doc2) ==
+               "<p>Example function: Summary should display trailing period :.</p>"
+    end
+
+    defp synopsis(markdown) do
+      markdown
+      |> ExDoc.DocAST.parse!("text/markdown")
+      |> ExDoc.DocAST.synopsis()
     end
   end
 

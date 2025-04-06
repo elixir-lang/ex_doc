@@ -111,6 +111,37 @@ defmodule ExDoc.DocAST do
   def extract_title(_ast), do: :error
 
   @doc """
+  Compute a synopsis from a document by looking at its first paragraph.
+  """
+  def synopsis({:p, _attrs, [_ | _] = inner, meta}) do
+    inner =
+      case Enum.split(inner, -1) do
+        {pre, [post]} when is_binary(post) ->
+          pre ++ [String.trim_trailing(post, ":")]
+
+        _ ->
+          inner
+      end
+
+    ExDoc.DocAST.to_string({:p, [], remove_ids(inner), meta})
+  end
+
+  def synopsis([head | _]), do: synopsis(head)
+  def synopsis(_other), do: ""
+
+  @doc """
+  Remove ids from elements.
+  """
+  def remove_ids({tag, attrs, inner, meta}),
+    do: {tag, Keyword.delete(attrs, :href), remove_ids(inner), meta}
+
+  def remove_ids(list) when is_list(list),
+    do: Enum.map(list, &remove_ids/1)
+
+  def remove_ids(other),
+    do: other
+
+  @doc """
   Returns text content from the given AST.
   """
   def text(ast) do
