@@ -398,8 +398,6 @@ defmodule ExDoc.Formatter.HTML do
     title = input_options[:title] || filename_to_title(input)
     group = GroupMatcher.match_extra(groups, input)
 
-    # TODO: Can we make the content/source a link?
-
     %{
       group: group,
       id: Utils.text_to_id(title),
@@ -614,22 +612,21 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp extra_paths(config) do
-    Map.new(config.extras, fn
-      path when is_binary(path) ->
+    Enum.reduce(config.extras, %{}, fn
+      path, acc when is_binary(path) ->
         base = Path.basename(path)
-        {base, Utils.text_to_id(Path.rootname(base))}
 
-      {path, opts} ->
-        base = path |> to_string() |> Path.basename()
+        Map.put(acc, base, Utils.text_to_id(Path.rootname(base)))
 
-        txid =
-          cond do
-            filename = opts[:filename] -> filename
-            url = opts[:url] -> url
-            true -> Utils.text_to_id(Path.rootname(base))
-          end
+      {path, opts}, acc ->
+        if Keyword.has_key?(opts, :url) do
+          acc
+        else
+          base = path |> to_string() |> Path.basename()
+          name = Keyword.get_lazy(opts, :filename, fn -> Utils.text_to_id(Path.rootname(base)) end)
 
-        {base, txid}
+          Map.put(acc, base, name)
+        end
     end)
   end
 end
