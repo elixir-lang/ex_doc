@@ -111,11 +111,12 @@ defmodule Mix.Tasks.Docs do
       Markdown and plain text pages; default: "PAGES". Example: "GUIDES"
 
     * `:extras` - List of paths to additional Markdown (`.md` extension), Live Markdown
-      (`.livemd` extension), Cheatsheets (`.cheatmd` extension) and plain text pages to
-      add to the documentation. You can also specify keyword pairs to customize the
-      generated filename, title and source file, and search content of each extra page; default: `[]`. Example:
-      `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing", source: "CONTRIBUTING.mdx"]]`
-      See the Customizing Extras section for more.
+      (`.livemd` extension), Cheatsheets (`.cheatmd` extension), external urls (`:url` option),
+      and plain text pages to add to the documentation. You can also specify keyword pairs to
+      customize the generated filename, title and source file, and search content of each extra page;
+      default: `[]`. Example: `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing",
+      title: "Contributing", source: "CONTRIBUTING.mdx"]]` See the Customizing Extras section for
+      more.
 
     * `:favicon` - Path to a favicon image file for the project. Must be PNG, JPEG or SVG. When
       specified, the image file will be placed in the output "assets" directory, named
@@ -378,6 +379,7 @@ defmodule Mix.Tasks.Docs do
        title but keep the source file unchanged.
     * `:search_data` - A list of terms to be indexed for autocomplete and search. If not provided, the content
        of the extra page will be indexed for search. See the section below for more.
+    * `:url` - An external url to link to from the sidebar.
 
   ### Customizing Search Data
 

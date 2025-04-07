@@ -61,17 +61,17 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_extras(config) do
-    for {_title, extras} <- config.extras do
-      Enum.each(extras, fn %{id: id, title: title, title_content: title_content, content: content} ->
-        output = "#{config.output}/OEBPS/#{id}.xhtml"
-        html = Templates.extra_template(config, title, title_content, content)
+    for {_title, extras} <- config.extras,
+        %{id: id, title: title, title_content: title_content, content: content} <- extras,
+        not is_map_key(extras, :url) do
+      output = "#{config.output}/OEBPS/#{id}.xhtml"
+      html = Templates.extra_template(config, title, title_content, content)
 
-        if File.regular?(output) do
-          Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
-        end
+      if File.regular?(output) do
+        Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
+      end
 
-        File.write!(output, html)
-      end)
+      File.write!(output, html)
     end
   end
 
