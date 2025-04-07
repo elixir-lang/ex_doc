@@ -398,15 +398,7 @@ defmodule ExDoc.Formatter.HTML do
     title = input_options[:title] || filename_to_title(input)
     group = GroupMatcher.match_extra(groups, input)
 
-    %{
-      group: group,
-      id: Utils.text_to_id(title),
-      source_path: input_options[:url],
-      source_url: input_options[:url],
-      title: title,
-      title_content: title,
-      url: input_options[:url]
-    }
+    %{group: group, id: Utils.text_to_id(title), title: title, url: input_options[:url]}
   end
 
   defp build_extra({input, input_options}, groups, language, autolink_opts, source_url_pattern) do
