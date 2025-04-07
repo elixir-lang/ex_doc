@@ -161,43 +161,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
   end
 
-  describe "synopsis" do
-    test "functionality" do
-      assert Templates.synopsis(nil) == nil
-      assert Templates.synopsis("") == ""
-      assert Templates.synopsis("<p>.</p>") == "<p>.</p>"
-      assert Templates.synopsis("<p>::</p>") == "<p></p>"
-      assert Templates.synopsis("<p>Description:</p>") == "<p>Description</p>"
-      assert Templates.synopsis("<p>abcd</p>") == "<p>abcd</p>"
-    end
-
-    test "should not end have trailing periods or semicolons" do
-      doc1 = """
-      Summaries should not be displayed with trailing semicolons :
-
-      ## Example
-      """
-
-      doc2 = """
-      Example function: Summary should display trailing period :.
-
-      ## Example:
-      """
-
-      assert Templates.synopsis(to_html(doc1)) ==
-               "<p>Summaries should not be displayed with trailing semicolons </p>"
-
-      assert Templates.synopsis(to_html(doc2)) ==
-               "<p>Example function: Summary should display trailing period :.</p>"
-    end
-  end
-
-  defp to_html(markdown) do
-    markdown
-    |> ExDoc.DocAST.parse!("text/markdown")
-    |> ExDoc.DocAST.to_string()
-  end
-
   describe "sidebar" do
     test "text links to homepage_url when set", context do
       content = Templates.sidebar_template(doc_config(context), :extra)
@@ -303,10 +266,14 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
         ExDoc.Retriever.docs_from_modules(
           [CompiledWithDocs, CompiledWithDocs.Nested],
           doc_config(context,
-            groups_for_docs: [
-              "Example functions": &(&1[:purpose] == :example),
-              Legacy: &is_binary(&1[:deprecated])
-            ]
+            group_for_doc: fn metadata ->
+              cond do
+                metadata[:purpose] == :example -> "Example functions"
+                is_binary(metadata[:deprecated]) -> "Legacy"
+                true -> "Functions"
+              end
+            end,
+            docs_groups: ["Example functions", "Legacy"]
           )
         )
 
@@ -484,19 +451,22 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "outputs function groups", context do
       content =
         get_module_page([CompiledWithDocs], context,
-          groups_for_docs: [
-            "Example functions": &(&1[:purpose] == :example),
-            Legacy: &is_binary(&1[:deprecated])
-          ]
+          group_for_doc: fn metadata ->
+            cond do
+              metadata[:purpose] == :example -> "Example functions"
+              is_binary(metadata[:deprecated]) -> "Legacy"
+              true -> "Functions"
+            end
+          end
         )
 
-      doc = EasyHTML.parse!(content)
-      assert doc["#example-functions a[href='#example-functions']"]
-      assert doc["#legacy a[href='#legacy']"]
-      assert doc["#example-functions [id='example/2']"]
-      refute doc["#legacy [id='example/2']"]
-      assert doc["#functions [id='example_1/0']"]
-      refute doc["#functions [id='example/2']"]
+      doc = LazyHTML.from_document(content)
+      assert Enum.count(doc["#example-functions a[href='#example-functions']"]) == 1
+      assert Enum.count(doc["#legacy a[href='#legacy']"]) == 1
+      assert Enum.count(doc["#example-functions [id='example/2']"]) == 1
+      assert Enum.count(doc["#legacy [id='example/2']"]) == 0
+      assert Enum.count(doc["#functions [id='example_1/0']"]) == 1
+      assert Enum.count(doc["#functions [id='example/2']"]) == 0
     end
 
     test "outputs deprecation information", context do

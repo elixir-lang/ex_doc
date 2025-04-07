@@ -62,35 +62,6 @@ defmodule ExDoc.RetrieverTest do
       assert %{module: Qux, group: nil} = qux
     end
 
-    test "function groups", c do
-      elixirc(c, ~S"""
-      defmodule A do
-        @doc group: 1
-        def foo(), do: :ok
-
-        @doc group: 1
-        def bar(), do: :ok
-
-        @doc group: 2
-        def baz(), do: :ok
-      end
-      """)
-
-      config = %ExDoc.Config{
-        groups_for_docs: [
-          {"Group 1", &(&1.group == 1)},
-          {"Group 2", &(&1.group == 2)}
-        ]
-      }
-
-      {[mod], []} = Retriever.docs_from_modules([A], config)
-      [bar, baz, foo] = mod.docs
-
-      assert %{id: "foo/0", group: "Group 1"} = foo
-      assert %{id: "bar/0", group: "Group 1"} = bar
-      assert %{id: "baz/0", group: "Group 2"} = baz
-    end
-
     test "function groups use :group metadata", c do
       elixirc(c, ~S"""
       defmodule A do
@@ -128,7 +99,7 @@ defmodule ExDoc.RetrieverTest do
       end
       """)
 
-      config = %ExDoc.Config{default_group_for_doc: & &1[:semi_group]}
+      config = %ExDoc.Config{group_for_doc: & &1[:semi_group]}
       {[mod], []} = Retriever.docs_from_modules([A], config)
       [bar, baz, foo] = mod.docs
 

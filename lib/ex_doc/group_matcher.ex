@@ -32,14 +32,6 @@ defmodule ExDoc.GroupMatcher do
   end
 
   @doc """
-  Finds a matching group for the given function.
-  """
-  def match_doc(group_patterns, callback, default, metadata) do
-    match_group_patterns(group_patterns, fn pattern -> pattern.(metadata) end) ||
-      callback.(metadata) || default
-  end
-
-  @doc """
   Finds a matching group for the given module name, id, and metadata.
   """
   def match_module(group_patterns, module, id, metadata) do

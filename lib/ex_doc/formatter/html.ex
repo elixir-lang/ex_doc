@@ -435,7 +435,7 @@ defmodule ExDoc.Formatter.HTML do
         :error -> {nil, ast}
       end
 
-    title_text = title_ast && ExDoc.DocAST.text_from_ast(title_ast)
+    title_text = title_ast && ExDoc.DocAST.text(title_ast)
     title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
     content_html = autolink_and_render(ast, language, [file: input] ++ autolink_opts, opts)
 

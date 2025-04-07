@@ -41,30 +41,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def module_type(%{type: :module}), do: ""
   def module_type(%{type: type}), do: "<small>#{type}</small>"
 
-  @doc """
-  Gets the first paragraph of the documentation of a node. It strips
-  surrounding white-spaces and trailing `:`.
-
-  If `doc` is `nil`, it returns `nil`.
-  """
-  @spec synopsis(String.t()) :: String.t()
-  @spec synopsis(nil) :: nil
-  def synopsis(nil), do: nil
-
-  def synopsis(doc) when is_binary(doc) do
-    doc =
-      case :binary.split(doc, "</p>") do
-        [left, _] -> String.trim_trailing(left, ":") <> "</p>"
-        [all] -> all
-      end
-
-    # Remove any anchors found in synopsis.
-    # Old Erlang docs placed anchors at the top of the documentation
-    # for links. Ideally they would have been removed but meanwhile
-    # it is simpler to guarantee they won't be duplicated in docs.
-    Regex.replace(~r|(<[^>]*) id="[^"]*"([^>]*>)|, doc, ~S"\1\2", [])
-  end
-
   defp enc(binary), do: URI.encode(binary)
 
   @doc """

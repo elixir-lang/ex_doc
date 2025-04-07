@@ -137,14 +137,10 @@ defmodule ExDoc.Retriever do
 
     {doc_line, doc_file, format, source_doc, doc, metadata} = get_module_docs(module_data, source)
 
-    default_group = config.default_group_for_doc
-    groups_for_docs = config.groups_for_docs
+    group_for_doc = config.group_for_doc
     annotations_for_docs = config.annotations_for_docs
 
-    docs_groups =
-      Enum.uniq(Enum.map(groups_for_docs, &elem(&1, 0)) ++ module_data.default_groups)
-
-    docs = get_docs(module_data, source, default_group, groups_for_docs, annotations_for_docs)
+    docs = get_docs(module_data, source, group_for_doc, annotations_for_docs)
     metadata = Map.put(metadata, :kind, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
@@ -158,7 +154,7 @@ defmodule ExDoc.Retriever do
       module: module,
       type: module_data.type,
       deprecated: metadata[:deprecated],
-      docs_groups: docs_groups,
+      docs_groups: config.docs_groups ++ module_data.default_groups,
       docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
       doc_format: format,
       doc: doc,
@@ -190,35 +186,19 @@ defmodule ExDoc.Retriever do
     {doc_line, doc_file, format, moduledoc, doc_ast(format, moduledoc, options), metadata}
   end
 
-  defp get_docs(module_data, source, default_group, groups_for_docs, annotations_for_docs) do
+  defp get_docs(module_data, source, group_for_doc, annotations_for_docs) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
     nodes =
       for doc <- docs,
           doc_data = module_data.language.doc_data(doc, module_data) do
-        get_doc(
-          doc,
-          doc_data,
-          module_data,
-          source,
-          default_group,
-          groups_for_docs,
-          annotations_for_docs
-        )
+        get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs)
       end
 
     filter_defaults(nodes)
   end
 
-  defp get_doc(
-         doc,
-         doc_data,
-         module_data,
-         source,
-         default_group,
-         groups_for_docs,
-         annotations_for_docs
-       ) do
+  defp get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{type, name, arity}, anno, _signature, source_doc, metadata} = doc
     doc_file = anno_file(anno, source)
@@ -242,8 +222,7 @@ defmodule ExDoc.Retriever do
       (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
         doc_data.doc_fallback.()
 
-    group =
-      GroupMatcher.match_doc(groups_for_docs, default_group, doc_data.default_group, metadata)
+    group = group_for_doc.(metadata) || doc_data.default_group
 
     %ExDoc.DocNode{
       id: doc_data.id_key <> nil_or_name(name, arity),

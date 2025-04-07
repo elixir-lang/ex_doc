@@ -117,6 +117,7 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     }
   end
 
+  # TODO: Perform this via DocAST and remove doc_format (and perhaps source_doc)
   defp extract_sections("text/markdown", %{source_doc: %{"en" => doc}}) do
     extract_sections_from_markdown(doc)
   end

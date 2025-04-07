@@ -111,21 +111,49 @@ defmodule ExDoc.DocAST do
   def extract_title(_ast), do: :error
 
   @doc """
+  Compute a synopsis from a document by looking at its first paragraph.
+  """
+  def synopsis({:p, _attrs, [_ | _] = inner, meta}) do
+    inner =
+      case Enum.split(inner, -1) do
+        {pre, [post]} when is_binary(post) ->
+          pre ++ [String.trim_trailing(post, ":")]
+
+        _ ->
+          inner
+      end
+
+    ExDoc.DocAST.to_string({:p, [], remove_ids(inner), meta})
+  end
+
+  def synopsis([head | _]), do: synopsis(head)
+  def synopsis(_other), do: ""
+
+  @doc """
+  Remove ids from elements.
+  """
+  def remove_ids({tag, attrs, inner, meta}),
+    do: {tag, Keyword.delete(attrs, :href), remove_ids(inner), meta}
+
+  def remove_ids(list) when is_list(list),
+    do: Enum.map(list, &remove_ids/1)
+
+  def remove_ids(other),
+    do: other
+
+  @doc """
   Returns text content from the given AST.
   """
-  def text_from_ast(ast) do
+  def text(ast) do
     ast
-    |> do_text_from_ast()
+    |> do_text()
     |> IO.iodata_to_binary()
     |> String.trim()
   end
 
-  def do_text_from_ast(ast) when is_list(ast) do
-    Enum.map(ast, &do_text_from_ast/1)
-  end
-
-  def do_text_from_ast(ast) when is_binary(ast), do: ast
-  def do_text_from_ast({_tag, _attr, ast, _meta}), do: text_from_ast(ast)
+  defp do_text(ast) when is_list(ast), do: Enum.map(ast, &do_text/1)
+  defp do_text(ast) when is_binary(ast), do: ast
+  defp do_text({_tag, _attr, ast, _meta}), do: text(ast)
 
   @doc """
   Wraps a list of HTML nodes into `<section>` tags whenever `matcher` returns true.
@@ -160,6 +188,7 @@ defmodule ExDoc.DocAST do
   @doc """
   Highlights a DocAST converted to string.
   """
+  # TODO: Could this be done over the AST instead?
   def highlight(html, language, opts \\ []) do
     highlight_info = language.highlight_info()
 

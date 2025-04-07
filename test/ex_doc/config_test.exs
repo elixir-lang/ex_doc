@@ -114,6 +114,16 @@ defmodule ExDoc.ConfigTest do
       assert config.source_url_pattern.("foo.ex", 123) == "a123bfoo.exc"
     end
 
+    test "groups_for_docs" do
+      config =
+        build(groups_for_docs: [Foo: &(&1[:section] == "foo"), Bar: &(&1[:section] == "bar")])
+
+      assert config.group_for_doc.(section: "foo") == "Foo"
+      assert config.group_for_doc.(section: "bar") == "Bar"
+      assert config.group_for_doc.(section: "baz") == nil
+      assert config.docs_groups == ~w(Foo Bar)
+    end
+
     test "groups_for_modules" do
       # Using real applications, since we load them to extract the corresponding list of modules
       stdlib = :stdlib
