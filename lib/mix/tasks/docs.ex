@@ -58,6 +58,13 @@ defmodule Mix.Tasks.Docs do
         ]
       end
 
+  > #### Tip {: .info}
+  >
+  > If you set `:source_url` to a GitHub/GitLab/BitBucket repo then whenever you
+  > publish a new version of your package, you should run `git tag vVERSION`
+  > and push the tag. This way, ExDoc will generate links to the specific version
+  > the docs were generated for.
+
   ExDoc also allows configuration specific to the documentation to
   be set. The following options should be put under the `:docs` key
   in your project's main configuration. The `:docs` options should
