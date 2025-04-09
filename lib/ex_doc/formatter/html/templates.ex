@@ -142,7 +142,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
         %{id: id, title: node.signature, anchor: URI.encode(node.id), deprecated: deprecated?}
       end
 
-    %{key: text_to_id(group), name: group, nodes: nodes}
+    %{key: text_to_id(group.title), name: group.title, nodes: nodes}
   end
 
   defp headers(doc) do
@@ -155,7 +155,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def module_summary(module_node) do
     # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
-    ExDoc.GroupMatcher.group_by(module_node.docs_groups, module_node.docs, & &1.group)
+
+    group_titles = Enum.map(module_node.docs_groups, & &1.title)
+    groups_index = Map.new(module_node.docs_groups, &{&1.title, &1})
+    docs_groups = ExDoc.GroupMatcher.group_by(group_titles, module_node.docs, & &1.group)
+
+    Enum.map(docs_groups, fn {group_title, nodes} ->
+      {Map.fetch!(groups_index, group_title), nodes}
+    end)
   end
 
   defp favicon_path(%{favicon: nil}), do: nil

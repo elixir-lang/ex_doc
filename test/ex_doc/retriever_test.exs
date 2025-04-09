@@ -108,6 +108,38 @@ defmodule ExDoc.RetrieverTest do
       assert %{id: "baz/0", group: "c"} = baz
     end
 
+    test "function groups description use moduledoc :groups metadata", c do
+      elixirc(c, ~S"""
+      defmodule A do
+        @moduledoc groups: [
+          "c",
+          %{title: "b", description: "text for b"}
+        ]
+
+        @doc group: "a"
+        @callback foo() :: :ok
+
+        @doc group: "b"
+        def bar(), do: :ok
+
+        @doc group: "c"
+        def baz(), do: :ok
+      end
+      """)
+
+      config = %ExDoc.Config{}
+      {[mod], []} = Retriever.docs_from_modules([A], config)
+
+      assert [
+               %{description: nil, title: "c"},
+               %{description: "text for b", title: "b"},
+               %{description: nil, title: "Types"},
+               %{description: nil, title: "Callbacks"},
+               %{description: nil, title: "Functions"},
+               %{description: nil, title: "a"}
+             ] = mod.docs_groups
+    end
+
     test "function annotations", c do
       elixirc(c, ~S"""
       defmodule A do

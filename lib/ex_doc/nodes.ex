@@ -25,6 +25,10 @@ defmodule ExDoc.ModuleNode do
             metadata: nil
 
   @typep annotation :: atom()
+  @typep doc_group :: %{
+           title: String.t() | atom(),
+           description: String.t() | nil
+         }
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -41,7 +45,7 @@ defmodule ExDoc.ModuleNode do
           moduledoc_file: String.t(),
           source_path: String.t() | nil,
           source_url: String.t() | nil,
-          docs_groups: [atom()],
+          docs_groups: [doc_group],
           docs: [ExDoc.DocNode.t()],
           typespecs: [ExDoc.DocNode.t()],
           type: atom(),
