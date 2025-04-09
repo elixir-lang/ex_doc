@@ -15,7 +15,7 @@ defmodule ExDoc.GroupMatcher do
   end
 
   @doc """
-  Group the following entries and while preserving the order in `groups`.
+  Group the following entries while preserving the order in `groups`.
   """
   def group_by(groups, entries, by) do
     entries = Enum.group_by(entries, by)
