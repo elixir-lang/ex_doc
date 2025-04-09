@@ -108,6 +108,62 @@ defmodule ExDoc.RetrieverTest do
       assert %{id: "baz/0", group: "c"} = baz
     end
 
+    test "default_group_for_doc can return group description from @moduledoc", c do
+      elixirc(c, ~S"""
+      defmodule A do
+
+        @moduledoc groups: [
+          "c",
+          %{title: "b", description: "predefined b"}
+        ]
+
+        @doc test_group: "a"
+        @callback foo() :: :ok
+
+        @doc test_group: "b"
+        def bar(), do: :ok
+
+        @doc test_group: "c"
+        def baz(), do: :ok
+      end
+      """)
+
+      config = %ExDoc.Config{
+        group_for_doc: fn meta ->
+          case meta[:test_group] do
+            "a" -> [title: "a", description: "for a"]
+            "b" -> [title: "b", description: "ignored description"]
+            "c" -> [title: "c", description: "for c"]
+          end
+        end
+      }
+
+      {[mod], []} = Retriever.docs_from_modules([A], config)
+
+      assert [c, b, types, callbacks, functions, a] = mod.docs_groups
+
+      # Description returned by the function should override nil
+      assert %{title: "c", description: "for c"} = c
+
+      # Description returned by the function should not override a
+      # description from @moduledoc
+      assert %{title: "b", description: "predefined b"} = b
+
+      assert %{title: "Types", description: nil} = types
+      assert %{title: "Callbacks", description: nil} = callbacks
+      assert %{title: "Functions", description: nil} = functions
+
+      # Description returned by th function should define a description
+      # for leftover groups
+      assert %{title: "a", description: "for a"} = a
+
+      [bar, baz, foo] = mod.docs
+
+      assert %{id: "c:foo/0", group: "a"} = foo
+      assert %{id: "bar/0", group: "b"} = bar
+      assert %{id: "baz/0", group: "c"} = baz
+    end
+
     test "function groups description use moduledoc :groups metadata", c do
       elixirc(c, ~S"""
       defmodule A do

@@ -215,16 +215,29 @@ defmodule ExDoc.Retriever do
 
     # Doc nodes already have normalized groups
     nodes_groups = Enum.map(doc_nodes, & &1.group)
+    nodes_groups_descriptions = Map.new(nodes_groups, &{&1.title, &1.description})
 
     normal_groups = module_groups ++ nodes_groups
 
     {docs_groups, _} =
-      Enum.flat_map_reduce(normal_groups, %{}, fn group, seen ->
-        if is_map_key(seen, group.title) do
+      Enum.flat_map_reduce(normal_groups, %{}, fn
+        group, seen when is_map_key(seen, group.title) ->
           {[], seen}
-        else
-          {[group], Map.put(seen, group.title, true)}
-        end
+
+        group, seen ->
+          seen = Map.put(seen, group.title, group.description)
+
+          group =
+            case group do
+              %{description: nil} ->
+                description = Map.get(nodes_groups_descriptions, group.title, nil)
+                Map.put(group, :description, description)
+
+              _ ->
+                group
+            end
+
+          {[group], seen}
       end)
 
     # We do not need the full group data in each doc node anymore, only the
@@ -357,6 +370,10 @@ group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
       %{title: title, description: description}
       when is_binary(title) and (is_binary(description) or is_nil(description)) ->
         group
+
+      kw when is_list(kw) ->
+        true = Keyword.keyword?(kw)
+        %{title: Keyword.fetch!(kw, :title), description: kw[:description]}
 
       title when is_binary(title) when is_atom(title) ->
         %{title: title, description: nil}
