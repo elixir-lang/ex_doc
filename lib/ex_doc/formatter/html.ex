@@ -105,9 +105,15 @@ defmodule ExDoc.Formatter.HTML do
             render_doc(child_node, language, autolink_opts, opts)
           end
 
+        docs_groups =
+          for group <- node.docs_groups do
+            render_doc(group, language, autolink_opts, opts)
+          end
+
         %{
           render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
-          | docs: docs
+          | docs: docs,
+            docs_groups: docs_groups
         }
       end,
       timeout: :infinity
