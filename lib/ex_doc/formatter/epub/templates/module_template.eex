@@ -25,6 +25,11 @@
     <%= for {group, nodes} <- summary, key = text_to_id(group.title) do %>
       <section id="<%= key %>" class="details-list">
         <h1 class="section-heading"><%=h to_string(group.title) %></h1>
+        <%= if doc = group.rendered_doc do %>
+          <div class="group-description" id="group-description-<%= key %>">
+            <%= H.link_group_headings(doc, key) %>
+          </div>
+        <% end %>
         <div class="<%= key %>-list">
           <%= for node <- nodes, do: H.detail_template(node, module) %>
         </div>
