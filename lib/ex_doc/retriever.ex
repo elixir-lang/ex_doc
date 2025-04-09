@@ -141,6 +141,14 @@ defmodule ExDoc.Retriever do
     annotations_for_docs = config.annotations_for_docs
 
     docs = get_docs(module_data, source, group_for_doc, annotations_for_docs)
+
+    moduledoc_groups = Map.get(metadata, :groups, [])
+
+    docs_groups =
+      get_docs_groups(moduledoc_groups ++ config.docs_groups ++ module_data.default_groups, docs)
+
+    docs = Enum.map(docs, &Map.put(&1, :group, &1.group.title))
+
     metadata = Map.put(metadata, :kind, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
@@ -154,7 +162,7 @@ defmodule ExDoc.Retriever do
       module: module,
       type: module_data.type,
       deprecated: metadata[:deprecated],
-      docs_groups: config.docs_groups ++ module_data.default_groups,
+      docs_groups: docs_groups,
       docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
       doc_format: format,
       doc: doc,
@@ -222,7 +230,7 @@ defmodule ExDoc.Retriever do
       (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
         doc_data.doc_fallback.()
 
-    group = group_for_doc.(metadata) || doc_data.default_group
+    group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
 
     %ExDoc.DocNode{
       id: doc_data.id_key <> nil_or_name(name, arity),
@@ -259,6 +267,49 @@ defmodule ExDoc.Retriever do
         Enum.any?(nodes, &match?(%{name: ^name, arity: ^arity}, &1))
       end)
     end)
+  end
+
+  defp get_docs_groups(module_groups, doc_nodes) do
+    module_groups = Enum.map(module_groups, &normalize_group/1)
+
+    # Doc nodes already have normalized groups
+    nodes_groups = Enum.map(doc_nodes, & &1.group)
+    nodes_groups_descriptions = Map.new(nodes_groups, &{&1.title, &1.description})
+
+    normal_groups = module_groups ++ nodes_groups
+
+    {docs_groups, _} =
+      Enum.flat_map_reduce(normal_groups, %{}, fn
+        group, seen when is_map_key(seen, group.title) ->
+          {[], seen}
+
+        group, seen ->
+          seen = Map.put(seen, group.title, true)
+          group = finalize_group(group, nodes_groups_descriptions)
+          {[group], seen}
+      end)
+
+    docs_groups
+  end
+
+  defp finalize_group(group, description_fallbacks) do
+    description =
+      case group.description do
+        nil -> Map.get(description_fallbacks, group.title)
+        text -> text
+      end
+
+    doc_ast =
+      case description do
+        nil -> nil
+        text -> doc_ast("text/markdown", %{"en" => text}, [])
+      end
+
+    Map.merge(group, %{
+      description: description,
+      doc: doc_ast,
+      rendered_doc: nil
+    })
   end
 
   ## General helpers
@@ -313,5 +364,20 @@ defmodule ExDoc.Retriever do
 
   defp source_link(%{url_pattern: url_pattern, relative_path: path}, line) do
     url_pattern.(path, line)
+  end
+
+  defp normalize_group(group) do
+    case group do
+      %{title: title, description: description}
+      when is_binary(title) and (is_binary(description) or is_nil(description)) ->
+        group
+
+      kw when is_list(kw) ->
+        true = Keyword.keyword?(kw)
+        %{title: Keyword.fetch!(kw, :title), description: kw[:description]}
+
+      title when is_binary(title) when is_atom(title) ->
+        %{title: title, description: nil}
+    end
   end
 end
