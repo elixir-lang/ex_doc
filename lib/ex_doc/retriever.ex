@@ -145,8 +145,10 @@ defmodule ExDoc.Retriever do
 
     moduledoc_groups = Map.get(metadata, :groups, [])
 
-    {docs_groups, docs} =
+    docs_groups =
       get_docs_groups(moduledoc_groups ++ config.docs_groups ++ module_data.default_groups, docs)
+
+    docs = Enum.map(docs, &Map.put(&1, :group, &1.group.title))
 
     metadata = Map.put(metadata, :kind, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
@@ -208,54 +210,6 @@ defmodule ExDoc.Retriever do
       end
 
     filter_defaults(nodes)
-  end
-
-  defp get_docs_groups(module_groups, doc_nodes) do
-    module_groups = Enum.map(module_groups, &normalize_group/1)
-
-    # Doc nodes already have normalized groups
-    nodes_groups = Enum.map(doc_nodes, & &1.group)
-    nodes_groups_descriptions = Map.new(nodes_groups, &{&1.title, &1.description})
-
-    normal_groups = module_groups ++ nodes_groups
-
-    {docs_groups, _} =
-      Enum.flat_map_reduce(normal_groups, %{}, fn
-        group, seen when is_map_key(seen, group.title) ->
-          {[], seen}
-
-        group, seen ->
-          seen = Map.put(seen, group.title, group.description)
-
-          group =
-            case group do
-              %{description: nil} ->
-                description = Map.get(nodes_groups_descriptions, group.title, nil)
-                Map.put(group, :description, description)
-
-              _ ->
-                group
-            end
-
-          {[group], seen}
-      end)
-
-    docs_groups =
-      Enum.map(docs_groups, fn group ->
-        doc_ast =
-          case group.description do
-            nil -> nil
-            text -> doc_ast("text/markdown", %{"en" => text}, [])
-          end
-
-        Map.merge(group, %{doc: doc_ast, rendered_doc: nil})
-      end)
-
-    # We do not need the full group data in each doc node anymore, only the
-    # title.
-    doc_nodes = Enum.map(doc_nodes, &Map.put(&1, :group, &1.group.title))
-
-    {docs_groups, doc_nodes}
   end
 
   defp get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs) do
@@ -320,6 +274,49 @@ group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
         Enum.any?(nodes, &match?(%{name: ^name, arity: ^arity}, &1))
       end)
     end)
+  end
+
+  defp get_docs_groups(module_groups, doc_nodes) do
+    module_groups = Enum.map(module_groups, &normalize_group/1)
+
+    # Doc nodes already have normalized groups
+    nodes_groups = Enum.map(doc_nodes, & &1.group)
+    nodes_groups_descriptions = Map.new(nodes_groups, &{&1.title, &1.description})
+
+    normal_groups = module_groups ++ nodes_groups
+
+    {docs_groups, _} =
+      Enum.flat_map_reduce(normal_groups, %{}, fn
+        group, seen when is_map_key(seen, group.title) ->
+          {[], seen}
+
+        group, seen ->
+          seen = Map.put(seen, group.title, true)
+          group = finalize_group(group, nodes_groups_descriptions)
+          {[group], seen}
+      end)
+
+    docs_groups
+  end
+
+  defp finalize_group(group, description_fallbacks) do
+    description =
+      case group.description do
+        nil -> Map.get(description_fallbacks, group.title)
+        text -> text
+      end
+
+    doc_ast =
+      case description do
+        nil -> nil
+        text -> doc_ast("text/markdown", %{"en" => text}, [])
+      end
+
+    Map.merge(group, %{
+      description: description,
+      doc: doc_ast,
+      rendered_doc: nil
+    })
   end
 
   ## General helpers
