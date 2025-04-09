@@ -142,6 +142,12 @@ defmodule ExDoc.Retriever do
     annotations_for_docs = config.annotations_for_docs
 
     docs = get_docs(module_data, source, group_for_doc, annotations_for_docs)
+
+    moduledoc_groups = Map.get(metadata, :groups, [])
+
+    {docs_groups, docs} =
+      get_docs_groups(moduledoc_groups ++ config.docs_groups ++ module_data.default_groups, docs)
+
     metadata = Map.put(metadata, :kind, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
@@ -155,7 +161,7 @@ defmodule ExDoc.Retriever do
       module: module,
       type: module_data.type,
       deprecated: metadata[:deprecated],
-      docs_groups: config.docs_groups ++ module_data.default_groups,
+      docs_groups: docs_groups,
       docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
       doc: normalize_doc_ast(doc_ast, "module-"),
       source_doc: source_doc,
@@ -204,6 +210,30 @@ defmodule ExDoc.Retriever do
     filter_defaults(nodes)
   end
 
+  defp get_docs_groups(module_groups, doc_nodes) do
+    module_groups = Enum.map(module_groups, &normalize_group/1)
+
+    # Doc nodes already have normalized groups
+    nodes_groups = Enum.map(doc_nodes, & &1.group)
+
+    normal_groups = module_groups ++ nodes_groups
+
+    {docs_groups, _} =
+      Enum.flat_map_reduce(normal_groups, %{}, fn group, seen ->
+        if is_map_key(seen, group.title) do
+          {[], seen}
+        else
+          {[group], Map.put(seen, group.title, true)}
+        end
+      end)
+
+    # We do not need the full group data in each doc node anymore, only the
+    # title.
+    doc_nodes = Enum.map(doc_nodes, &Map.put(&1, :group, &1.group.title))
+
+    {docs_groups, doc_nodes}
+  end
+
   defp get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{type, name, arity}, anno, _signature, source_doc, metadata} = doc
@@ -228,7 +258,7 @@ defmodule ExDoc.Retriever do
       doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
         doc_data.doc_fallback.()
 
-    group = group_for_doc.(metadata) || doc_data.default_group
+group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
     id = doc_data.id_key <> nil_or_name(name, arity)
 
     %ExDoc.DocNode{
@@ -320,5 +350,16 @@ defmodule ExDoc.Retriever do
 
   defp source_link(%{url_pattern: url_pattern, relative_path: path}, line) do
     url_pattern.(path, line)
+  end
+
+  defp normalize_group(group) do
+    case group do
+      %{title: title, description: description}
+      when is_binary(title) and (is_binary(description) or is_nil(description)) ->
+        group
+
+      title when is_binary(title) when is_atom(title) ->
+        %{title: title, description: nil}
+    end
   end
 end
