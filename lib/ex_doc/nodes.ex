@@ -25,10 +25,14 @@ defmodule ExDoc.ModuleNode do
             metadata: nil
 
   @typep annotation :: atom()
-  @typep doc_group :: %{
-           title: String.t() | atom(),
-           description: String.t() | nil
-         }
+
+  # TODO: Maybe this is worth its own module
+  @type doc_group :: %{
+          title: String.t() | atom(),
+          description: String.t() | nil,
+          doc: ExDoc.DocAST.t() | nil,
+          rendered_doc: String.t() | nil
+        }
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -89,7 +93,7 @@ defmodule ExDoc.DocNode do
           signature: String.t(),
           specs: [ExDoc.Language.spec_ast()],
           annotations: [annotation()],
-          group: atom() | nil,
+          group: String.t() | ExDoc.ModuleNode.doc_group() | nil,
           doc_file: String.t(),
           doc_line: non_neg_integer(),
           source_url: String.t() | nil

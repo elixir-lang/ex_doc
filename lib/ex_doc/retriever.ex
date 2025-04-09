@@ -240,6 +240,17 @@ defmodule ExDoc.Retriever do
           {[group], seen}
       end)
 
+    docs_groups =
+      Enum.map(docs_groups, fn group ->
+        doc_ast =
+          case group.description do
+            nil -> nil
+            text -> doc_ast("text/markdown", %{"en" => text}, [])
+          end
+
+        Map.merge(group, %{doc: doc_ast, rendered_doc: nil})
+      end)
+
     # We do not need the full group data in each doc node anymore, only the
     # title.
     doc_nodes = Enum.map(doc_nodes, &Map.put(&1, :group, &1.group.title))

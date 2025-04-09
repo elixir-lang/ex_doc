@@ -228,6 +228,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
     end)
   end
 
+  def link_group_headings(content, key) do
+    link_headings(content, "group-#{key}-")
+  end
+
   templates = [
     detail_template: [:node, :module],
     footer_template: [:config, :source_path],
