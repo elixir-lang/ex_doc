@@ -58,13 +58,6 @@ defmodule Mix.Tasks.Docs do
         ]
       end
 
-  > #### Tip {: .info}
-  >
-  > If you set `:source_url` to a GitHub/GitLab/BitBucket repo then whenever you
-  > publish a new version of your package, you should run `git tag vVERSION`
-  > and push the tag. This way, ExDoc will generate links to the specific version
-  > the docs were generated for.
-
   ExDoc also allows configuration specific to the documentation to
   be set. The following options should be put under the `:docs` key
   in your project's main configuration. The `:docs` options should
@@ -205,13 +198,13 @@ defmodule Mix.Tasks.Docs do
         * `%{path}`: the path of a file in the repo
         * `%{line}`: the line number in the file
 
-      For GitLab/GitHub:
+      For self-hosted GitLab/GitHub:
 
       ```text
       https://mydomain.org/user_or_team/repo_name/blob/main/%{path}#L%{line}
       ```
 
-      For Bitbucket:
+      For self-hosted Bitbucket:
 
       ```text
       https://mydomain.org/user_or_team/repo_name/src/main/%{path}#cl-%{line}
@@ -220,6 +213,37 @@ defmodule Mix.Tasks.Docs do
       If a function, then it must be a function that takes two arguments, path and line,
       where path is either an relative path from the cwd, or an absolute path. The function
       must return the full URI as it should be placed in the documentation.
+
+  ### Using `:source_url` and `:source_ref` together
+
+  A common setup for a project or library is to set both `:source_url` and `:source_ref`. Setting
+  both of them will allow ExDoc to link to specific version of the code for a function or module
+  that matches the version of the docs. So if the docs have been generated for version 1.0.5 then
+  clicking on the source link in the docs will take the browser to the source code for the 1.0.5
+  version of the code instead of only the primary ref (e.g. `main`).
+
+  A example setup looks like:
+
+      @version "0.30.10"
+      def project do
+        [
+          ...
+          version: @version,
+          docs: docs(),
+          ...
+        ]
+      end
+
+      def docs do
+        ...
+        source_ref: "v#{@version}",
+        source_url: @source_url,
+        ...
+      end
+
+  If you use `source_ref: "v#{@version}"` then when publishing a new version of your package you
+  should run `git tag vVERSION` and push the tag. This way, ExDoc will generate links to the
+  specific version the docs were generated for.
 
   ## Groups
 
