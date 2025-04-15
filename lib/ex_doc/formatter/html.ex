@@ -615,7 +615,9 @@ defmodule ExDoc.Formatter.HTML do
           acc
         else
           base = path |> to_string() |> Path.basename()
-          name = Keyword.get_lazy(opts, :filename, fn -> Utils.text_to_id(Path.rootname(base)) end)
+
+          name =
+            Keyword.get_lazy(opts, :filename, fn -> Utils.text_to_id(Path.rootname(base)) end)
 
           Map.put(acc, base, name)
         end

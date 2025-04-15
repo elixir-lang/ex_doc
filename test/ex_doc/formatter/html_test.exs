@@ -797,7 +797,7 @@ defmodule ExDoc.Formatter.HTMLTest do
           Website: [url: "https://elixir-lang.org"],
           Forum: [url: "https://elixirforum.com"]
         ],
-        groups_for_extras: [Elixir: ~r/elixir/i]
+        groups_for_extras: ["Elixir": ~r/elixir/i]
       ]
 
       context

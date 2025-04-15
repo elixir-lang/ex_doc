@@ -79,7 +79,10 @@ export function initialize () {
       }
 
       items.push(el('li', {}, [
-        el('a', {href: href, translate}, [node.nested_title || node.title]),
+        el('a', {href, translate}, [
+          node.url ? el('i', {class: 'external-link ri-external-link-line'}) : null,
+          node.nested_title || node.title
+        ].filter(Boolean)),
         ...childList(`node-${node.id}-headers`,
           hasHeaders
             ? renderHeaders(node)

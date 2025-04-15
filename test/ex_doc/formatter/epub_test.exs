@@ -150,7 +150,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     config =
       context
       |> doc_config()
-      |> Keyword.put(:extras, [elixir: [url: "https://elixir-lang.org"]])
+      |> Keyword.put(:extras, elixir: [url: "https://elixir-lang.org"])
 
     generate_docs_and_unzip(context, config)
 
