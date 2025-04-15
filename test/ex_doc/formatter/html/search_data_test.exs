@@ -204,7 +204,12 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     Section _1_ content.
     """)
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: [readme_path]}
+    extras = [
+      readme_path,
+      "Elixir": [url: "https://elixir-lang.org"]
+    ]
+
+    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: extras}
     [item1, item2] = search_data([], config)["items"]
 
     assert item1["ref"] == "readme.html"

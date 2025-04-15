@@ -68,8 +68,8 @@ defmodule ExDoc.GroupMatcherTest do
         Group: ["docs/handling/testing.md"]
       ]
 
-      assert match_extra(patterns, "docs/handling/testing.md") == :Group
-      assert match_extra(patterns, "docs/handling/setup.md") == nil
+      assert match_extra(patterns, {:path, "docs/handling/testing.md"}) == :Group
+      refute match_extra(patterns, {:path, "docs/handling/setup.md"})
     end
 
     test "by regular expressions" do
@@ -77,9 +77,17 @@ defmodule ExDoc.GroupMatcherTest do
         Group: ~r/docs\/handling?/
       ]
 
-      assert match_extra(patterns, "docs/handling/testing.md") == :Group
-      assert match_extra(patterns, "docs/handling/setup.md") == :Group
-      assert match_extra(patterns, "docs/introduction.md") == nil
+      assert match_extra(patterns, {:path, "docs/handling/testing.md"}) == :Group
+      assert match_extra(patterns, {:path, "docs/handling/setup.md"}) == :Group
+      refute match_extra(patterns, {:path, "docs/introduction.md"})
+    end
+
+    test "for extras with a title and a url" do
+      patterns = [Group: ~r/elixir/i]
+
+      assert match_extra(patterns, {:url, "Elixir Packages", "https://hex.pm"}) == :Group
+      assert match_extra(patterns, {:url, "Website", "https://elixir-lang.org"}) == :Group
+      refute match_extra(patterns, {:url, "Example", "https://example.com"})
     end
   end
 end
