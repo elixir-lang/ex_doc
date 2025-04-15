@@ -372,6 +372,10 @@ defmodule Mix.Tasks.Docs do
 
   ## Customizing Extras
 
+  There are two sources for extras, filenames and urls.
+
+  For filenames, the allowed configuration is:
+
     * `:title` - The title of the extra page. If not provided, the title will be inferred from the filename.
     * `:filename` - The name of the generated file. If not provided, the filename will be inferred from
        the source file.
@@ -379,7 +383,11 @@ defmodule Mix.Tasks.Docs do
        title but keep the source file unchanged.
     * `:search_data` - A list of terms to be indexed for autocomplete and search. If not provided, the content
        of the extra page will be indexed for search. See the section below for more.
-    * `:url` - An external url to link to from the sidebar.
+
+  For urls:
+
+    * `:title` - The title of the extra page. If not provided, the title will be inferred from the extra name.
+    * `:url` - The external url to link to from the sidebar.
 
   ### Customizing Search Data
 
