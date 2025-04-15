@@ -791,6 +791,40 @@ defmodule ExDoc.Formatter.HTMLTest do
              ] = Jason.decode!(content)["extras"]
     end
 
+    test "with custom groups for external urls", %{tmp_dir: tmp_dir} = context do
+      extra_config = [
+        extras: [
+          Website: [url: "https://elixir-lang.org"],
+          Forum: [url: "https://elixirforum.com"]
+        ],
+        groups_for_extras: [Elixir: ~r/elixir/i]
+      ]
+
+      context
+      |> doc_config(extra_config)
+      |> generate_docs()
+
+      %{"extras" => extras} =
+        (tmp_dir <> "/html/dist/sidebar_items-*.js")
+        |> read_wildcard!()
+        |> String.trim_leading("sidebarNodes=")
+        |> Jason.decode!()
+
+      assert %{
+               "group" => "Elixir",
+               "id" => "website",
+               "title" => "Website",
+               "url" => "https://elixir-lang.org"
+             } in extras
+
+      assert %{
+               "group" => "Elixir",
+               "id" => "forum",
+               "title" => "Forum",
+               "url" => "https://elixirforum.com"
+             } in extras
+    end
+
     test "with auto-extracted titles", %{tmp_dir: tmp_dir} = context do
       generate_docs(doc_config(context, extras: ["test/fixtures/ExtraPage.md"]))
       content = File.read!(tmp_dir <> "/html/extrapage.html")
