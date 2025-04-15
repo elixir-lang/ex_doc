@@ -18,6 +18,8 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     ["searchData=" | ExDoc.Utils.to_json(data)]
   end
 
+  defp extra(%{url: _}), do: []
+
   defp extra(%{search_data: search_data} = map) when is_list(search_data) do
     Enum.map(search_data, fn item ->
       link =
@@ -29,10 +31,6 @@ defmodule ExDoc.Formatter.HTML.SearchData do
 
       encode(link, item.title <> " - #{map.id}", item.type, clean_markdown(item.body))
     end)
-  end
-
-  defp extra(%{url: url} = map) do
-    [encode("#{map.id}", map.title, :extras, url)]
   end
 
   defp extra(map) do
