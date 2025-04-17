@@ -141,14 +141,15 @@ defmodule ExDoc.Retriever do
     group_for_doc = config.group_for_doc
     annotations_for_docs = config.annotations_for_docs
 
-    docs = get_docs(module_data, source, group_for_doc, annotations_for_docs)
+    {docs, docs_groups} = get_docs(module_data, source, group_for_doc, annotations_for_docs)
 
     moduledoc_groups = Map.get(metadata, :groups, [])
 
     docs_groups =
-      get_docs_groups(moduledoc_groups ++ config.docs_groups ++ module_data.default_groups, docs)
-
-    docs = Enum.map(docs, &Map.put(&1, :group, &1.group.title))
+      get_docs_groups(
+        moduledoc_groups ++ config.docs_groups ++ module_data.default_groups,
+        docs_groups
+      )
 
     metadata = Map.put(metadata, :kind, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
@@ -203,13 +204,15 @@ defmodule ExDoc.Retriever do
   defp get_docs(module_data, source, group_for_doc, annotations_for_docs) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
-    nodes =
+    {nodes, groups} =
       for doc <- docs,
           doc_data = module_data.language.doc_data(doc, module_data) do
-        get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs)
+        {_node, _group} =
+          get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs)
       end
+      |> Enum.unzip()
 
-    filter_defaults(nodes)
+    {filter_defaults(nodes), groups}
   end
 
   defp get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs) do
@@ -236,10 +239,10 @@ defmodule ExDoc.Retriever do
       doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
         doc_data.doc_fallback.()
 
-group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
+    group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
     id = doc_data.id_key <> nil_or_name(name, arity)
 
-    %ExDoc.DocNode{
+    doc_node = %ExDoc.DocNode{
       id: id,
       name: name,
       arity: arity,
@@ -253,9 +256,11 @@ group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
       specs: doc_data.specs,
       source_url: source_url,
       type: doc_data.type,
-      group: group,
+      group: group.title,
       annotations: annotations
     }
+
+    {doc_node, group}
   end
 
   defp get_defaults(_name, _arity, 0), do: []
@@ -276,11 +281,10 @@ group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
     end)
   end
 
-  defp get_docs_groups(module_groups, doc_nodes) do
+  defp get_docs_groups(module_groups, nodes_groups) do
     module_groups = Enum.map(module_groups, &normalize_group/1)
 
     # Doc nodes already have normalized groups
-    nodes_groups = Enum.map(doc_nodes, & &1.group)
     nodes_groups_descriptions = Map.new(nodes_groups, &{&1.title, &1.description})
 
     normal_groups = module_groups ++ nodes_groups

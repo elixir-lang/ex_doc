@@ -85,7 +85,7 @@ defmodule ExDoc.DocNode do
           signature: String.t(),
           specs: [ExDoc.Language.spec_ast()],
           annotations: [annotation()],
-          group: String.t() | ExDoc.DocGroupNode.t() | nil,
+          group: String.t() | nil,
           doc_file: String.t(),
           doc_line: non_neg_integer(),
           source_url: String.t() | nil
