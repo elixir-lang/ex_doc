@@ -140,14 +140,16 @@ defmodule ExDoc.Retriever do
     group_for_doc = config.group_for_doc
     annotations_for_docs = config.annotations_for_docs
 
-    {docs, docs_groups} = get_docs(module_data, source, group_for_doc, annotations_for_docs)
+    {docs, nodes_groups} = get_docs(module_data, source, group_for_doc, annotations_for_docs)
+    docs = ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}")
 
     moduledoc_groups = Map.get(metadata, :groups, [])
 
     docs_groups =
       get_docs_groups(
         moduledoc_groups ++ config.docs_groups ++ module_data.default_groups,
-        docs_groups
+        nodes_groups,
+        docs
       )
 
     metadata = Map.put(metadata, :kind, module_data.type)
@@ -164,7 +166,7 @@ defmodule ExDoc.Retriever do
       type: module_data.type,
       deprecated: metadata[:deprecated],
       docs_groups: docs_groups,
-      docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
+      docs: docs,
       doc_format: format,
       doc: doc,
       source_doc: source_doc,
@@ -274,13 +276,14 @@ defmodule ExDoc.Retriever do
     end)
   end
 
-  defp get_docs_groups(module_groups, nodes_groups) do
+  defp get_docs_groups(module_groups, nodes_groups, doc_nodes) do
     module_groups = Enum.map(module_groups, &normalize_group/1)
 
     # Doc nodes already have normalized groups
     nodes_groups_descriptions = Map.new(nodes_groups, &{&1.title, &1.description})
 
     normal_groups = module_groups ++ nodes_groups
+    nodes_by_group_title = Enum.group_by(doc_nodes, & &1.group)
 
     {docs_groups, _} =
       Enum.flat_map_reduce(normal_groups, %{}, fn
@@ -289,14 +292,21 @@ defmodule ExDoc.Retriever do
 
         group, seen ->
           seen = Map.put(seen, group.title, true)
-          group = finalize_group(group, nodes_groups_descriptions)
-          {[group], seen}
+
+          case Map.get(nodes_by_group_title, group.title, []) do
+            [] ->
+              {[], seen}
+
+            child_nodes ->
+              group = finalize_group(group, child_nodes, nodes_groups_descriptions)
+              {[group], seen}
+          end
       end)
 
     docs_groups
   end
 
-  defp finalize_group(group, description_fallbacks) do
+  defp finalize_group(group, doc_nodes, description_fallbacks) do
     description =
       case group.description do
         nil -> Map.get(description_fallbacks, group.title)
@@ -313,7 +323,7 @@ defmodule ExDoc.Retriever do
       title: group.title,
       description: description,
       doc: doc_ast,
-      rendered_doc: nil
+      docs: doc_nodes
     }
   end
 
