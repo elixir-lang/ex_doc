@@ -115,9 +115,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     {id, modules}
   end
 
-  defp sidebar_entries({group, nodes}) do
+  defp sidebar_entries(group) do
     nodes =
-      for node <- nodes do
+      for node <- group.docs do
         id =
           if "struct" in node.annotations do
             node.signature
@@ -134,7 +134,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
         %{id: id, title: node.signature, anchor: URI.encode(node.id), deprecated: deprecated?}
       end
 
-    %{key: text_to_id(group), name: group, nodes: nodes}
+    %{key: text_to_id(group.title), name: group.title, nodes: nodes}
   end
 
   defp module_sections(%ExDoc.ModuleNode{rendered_doc: nil}), do: [sections: []]
@@ -167,10 +167,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> Enum.map(&%{id: &1, anchor: URI.encode(text_to_id(&1))})
   end
 
-  def module_summary(module_node) do
-    # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
-    ExDoc.GroupMatcher.group_by(module_node.docs_groups, module_node.docs, & &1.group)
-  end
+  def module_summary(module_node), do: module_node.docs_groups
 
   defp favicon_path(%{favicon: nil}), do: nil
   defp favicon_path(%{favicon: favicon}), do: "assets/favicon#{Path.extname(favicon)}"
@@ -279,6 +276,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def link_detail_headings(content, prefix) do
     link_headings(content, prefix <> "-")
+  end
+
+  def link_group_headings(content, key) do
+    link_headings(content, "group-#{key}-")
   end
 
   templates = [

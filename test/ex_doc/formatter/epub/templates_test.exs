@@ -145,6 +145,42 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~r{id="functions".*id="example_1/0"}ms
     end
 
+    test "outputs groups descriptions" do
+      content =
+        get_module_page([CompiledWithDocs],
+          group_for_doc: fn metadata ->
+            if metadata[:purpose] == :example do
+              [
+                title: "Example functions",
+                description: """
+                ### A section heading example
+
+                A content example.
+
+                See `example/1` or `example/2`.
+                A link to `flatten/1`.
+                """
+              ]
+            else
+              "Functions"
+            end
+          end
+        )
+
+      doc = LazyHTML.from_document(content)
+
+      assert Enum.count(doc["div.group-description"]) == 1
+      assert Enum.count(doc["#group-description-example-functions"]) == 1
+      assert Enum.count(doc["#group-description-example-functions h3"]) == 1
+      assert Enum.count(doc["#group-example-functions-a-section-heading-example"]) == 1
+      assert Enum.count(doc["#example-functions .group-description a[href='#example/1']"]) == 1
+      assert Enum.count(doc["#example-functions .group-description a[href='#example/2']"]) == 1
+      assert Enum.count(doc["#example-functions .group-description a[href='#flatten/1']"]) == 1
+
+      assert content =~ ~s[<span class="text">A section heading example</span>]
+      assert content =~ "<p>A content example.</p>"
+    end
+
     test "outputs summaries" do
       content = get_module_page([CompiledWithDocs])
 
