@@ -123,9 +123,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     {id, modules}
   end
 
-  defp sidebar_entries({group, nodes}) do
+  defp sidebar_entries(group) do
     nodes =
-      for node <- nodes do
+      for node <- group.docs do
         id =
           if "struct" in node.annotations do
             node.signature
@@ -153,17 +153,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     end)
   end
 
-  def module_summary(module_node) do
-    # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
-
-    group_titles = Enum.map(module_node.docs_groups, & &1.title)
-    groups_index = Map.new(module_node.docs_groups, &{&1.title, &1})
-    docs_groups = ExDoc.GroupMatcher.group_by(group_titles, module_node.docs, & &1.group)
-
-    Enum.map(docs_groups, fn {group_title, nodes} ->
-      {Map.fetch!(groups_index, group_title), nodes}
-    end)
-  end
+  def module_summary(module_node), do: module_node.docs_groups
 
   defp favicon_path(%{favicon: nil}), do: nil
   defp favicon_path(%{favicon: favicon}), do: "assets/favicon#{Path.extname(favicon)}"
