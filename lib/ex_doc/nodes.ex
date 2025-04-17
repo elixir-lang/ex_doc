@@ -26,14 +26,6 @@ defmodule ExDoc.ModuleNode do
 
   @typep annotation :: atom()
 
-  # TODO: Maybe this is worth its own module
-  @type doc_group :: %{
-          title: String.t() | atom(),
-          description: String.t() | nil,
-          doc: ExDoc.DocAST.t() | nil,
-          rendered_doc: String.t() | nil
-        }
-
   @type t :: %__MODULE__{
           id: String.t(),
           title: String.t(),
@@ -49,7 +41,7 @@ defmodule ExDoc.ModuleNode do
           moduledoc_file: String.t(),
           source_path: String.t() | nil,
           source_url: String.t() | nil,
-          docs_groups: [doc_group],
+          docs_groups: [ExDoc.DocGroupNode.t()],
           docs: [ExDoc.DocNode.t()],
           typespecs: [ExDoc.DocNode.t()],
           type: atom(),
@@ -93,9 +85,20 @@ defmodule ExDoc.DocNode do
           signature: String.t(),
           specs: [ExDoc.Language.spec_ast()],
           annotations: [annotation()],
-          group: String.t() | ExDoc.ModuleNode.doc_group() | nil,
+          group: String.t() | ExDoc.DocGroupNode.t() | nil,
           doc_file: String.t(),
           doc_line: non_neg_integer(),
           source_url: String.t() | nil
+        }
+end
+
+defmodule ExDoc.DocGroupNode do
+  defstruct title: nil, description: nil, doc: nil, rendered_doc: nil
+
+  @type t :: %__MODULE__{
+          title: String.t() | atom(),
+          description: String.t() | nil,
+          doc: ExDoc.DocAST.t() | nil,
+          rendered_doc: String.t() | nil
         }
 end

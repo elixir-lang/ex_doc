@@ -312,11 +312,12 @@ group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
         text -> doc_ast("text/markdown", %{"en" => text}, [])
       end
 
-    Map.merge(group, %{
+    %ExDoc.DocGroupNode{
+      title: group.title,
       description: description,
       doc: doc_ast,
       rendered_doc: nil
-    })
+    }
   end
 
   ## General helpers
