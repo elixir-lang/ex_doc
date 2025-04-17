@@ -371,14 +371,14 @@ defmodule ExDoc.Retriever do
     case group do
       %{title: title, description: description}
       when is_binary(title) and (is_binary(description) or is_nil(description)) ->
-        group
+        %{group | title: title, description: description}
 
       kw when is_list(kw) ->
         true = Keyword.keyword?(kw)
-        %{title: Keyword.fetch!(kw, :title), description: kw[:description]}
+        %{title: to_string(Keyword.fetch!(kw, :title)), description: kw[:description]}
 
       title when is_binary(title) when is_atom(title) ->
-        %{title: title, description: nil}
+        %{title: to_string(title), description: nil}
     end
   end
 end
