@@ -140,7 +140,7 @@ defmodule ExDoc.RetrieverTest do
 
       {[mod], []} = Retriever.docs_from_modules([A], config)
 
-      assert [c, b, types, callbacks, functions, a] = mod.docs_groups
+      assert [c, b, a] = mod.docs_groups
 
       # Description returned by the function should override nil
       assert %{title: "c", description: "for c"} = c
@@ -148,10 +148,6 @@ defmodule ExDoc.RetrieverTest do
       # Description returned by the function should not override a
       # description from @moduledoc
       assert %{title: "b", description: "predefined b"} = b
-
-      assert %{title: "Types", description: nil} = types
-      assert %{title: "Callbacks", description: nil} = callbacks
-      assert %{title: "Functions", description: nil} = functions
 
       # Description returned by th function should define a description
       # for leftover groups
@@ -189,9 +185,6 @@ defmodule ExDoc.RetrieverTest do
       assert [
                %{description: nil, title: "c"},
                %{description: "text for b", title: "b"},
-               %{description: nil, title: "Types"},
-               %{description: nil, title: "Callbacks"},
-               %{description: nil, title: "Functions"},
                %{description: nil, title: "a"}
              ] = mod.docs_groups
     end

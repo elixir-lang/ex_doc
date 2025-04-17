@@ -2,16 +2,6 @@ defmodule ExDoc.GroupMatcherTest do
   use ExUnit.Case, async: true
   import ExDoc.GroupMatcher
 
-  describe "group_by" do
-    test "group by given data with leftovers" do
-      assert group_by([1, 3, 5], [%{key: 1}, %{key: 3}, %{key: 2}], & &1.key) == [
-               {1, [%{key: 1}]},
-               {3, [%{key: 3}]},
-               {2, [%{key: 2}]}
-             ]
-    end
-  end
-
   describe "module matching" do
     test "by atom names" do
       patterns = [

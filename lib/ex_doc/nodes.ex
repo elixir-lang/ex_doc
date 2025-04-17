@@ -83,7 +83,7 @@ defmodule ExDoc.DocNode do
           source_doc: term() | nil,
           type: atom(),
           signature: String.t(),
-          specs: [ExDoc.Language.spec_ast()],
+          specs: [ExDoc.Language.spec_ast() | String.t()],
           annotations: [annotation()],
           group: String.t() | nil,
           doc_file: String.t(),
@@ -93,12 +93,13 @@ defmodule ExDoc.DocNode do
 end
 
 defmodule ExDoc.DocGroupNode do
-  defstruct title: nil, description: nil, doc: nil, rendered_doc: nil
+  defstruct title: nil, description: nil, doc: nil, rendered_doc: nil, docs: []
 
   @type t :: %__MODULE__{
           title: String.t() | atom(),
           description: String.t() | nil,
           doc: ExDoc.DocAST.t() | nil,
-          rendered_doc: String.t() | nil
+          rendered_doc: String.t() | nil,
+          docs: [ExDoc.DocNode.t()]
         }
 end

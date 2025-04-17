@@ -87,33 +87,32 @@ defmodule ExDoc.Formatter.HTML do
             language: language
           ] ++ base
 
-        docs =
-          for child_node <- node.docs do
-            id = id(node, child_node)
-
-            autolink_opts =
-              autolink_opts ++
-                [
-                  id: id,
-                  line: child_node.doc_line,
-                  file: child_node.doc_file,
-                  current_kfa: {child_node.type, child_node.name, child_node.arity}
-                ]
-
-            specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
-            child_node = %{child_node | specs: specs}
-            render_doc(child_node, language, autolink_opts, opts)
-          end
-
         docs_groups =
           for group <- node.docs_groups do
-            render_doc(group, language, autolink_opts, opts)
+            docs =
+              for child_node <- group.docs do
+                id = id(node, child_node)
+
+                autolink_opts =
+                  autolink_opts ++
+                    [
+                      id: id,
+                      line: child_node.doc_line,
+                      file: child_node.doc_file,
+                      current_kfa: {child_node.type, child_node.name, child_node.arity}
+                    ]
+
+                specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
+                child_node = %{child_node | specs: specs}
+                render_doc(child_node, language, autolink_opts, opts)
+              end
+
+            %{render_doc(group, language, autolink_opts, opts) | docs: docs}
           end
 
         %{
           render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
-          | docs: docs,
-            docs_groups: docs_groups
+          | docs_groups: docs_groups
         }
       end,
       timeout: :infinity
