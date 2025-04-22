@@ -282,11 +282,14 @@ defmodule ExDoc.Retriever.ElixirTest do
         defdelegate downcase(str), to: String
 
         defdelegate upcase(str), to: String
+
+        @doc copy: true
+        defdelegate first(str), to: String
       end
       """)
 
       {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
-      [downcase, upcase] = mod.docs
+      [downcase, first, upcase] = mod.docs
 
       assert downcase.id == "downcase/1"
       assert downcase.signature == "downcase(str)"
@@ -297,6 +300,28 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert upcase.signature == "upcase(str)"
       assert upcase.specs == []
       assert upcase.doc == ExDoc.Markdown.to_ast("See `String.upcase/1`.")
+
+      assert first.id == "first/1"
+      assert first.signature == "first(str)"
+      assert first.specs == []
+
+      assert first.doc ==
+               ExDoc.Markdown.to_ast("""
+               Returns the first grapheme from a UTF-8 string,
+               `nil` if the string is empty.
+
+               ## Examples
+
+                   iex> String.first("elixir")
+                   "e"
+
+                   iex> String.first("եոգլի")
+                   "ե"
+
+                   iex> String.first("")
+                   nil
+
+               """)
     end
 
     test "signatures", c do

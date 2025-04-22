@@ -178,6 +178,50 @@ defmodule ExDoc.Retriever do
 
   # Helpers
 
+  def extract_doc(module, function, arity) do
+    case get_docs(module, [:function]) do
+      {nil, nil, nil} ->
+        IO.puts("extract_doc failed" <> inspect({module, function, arity}))
+        nil
+
+      {_language, format, docs} ->
+        doc = extract_function_doc(docs, function, arity)
+        doc_ast(format, doc, [])
+    end
+  end
+
+  def extract_function_doc(docs, function, arity) do
+    case Enum.find(docs, nil, fn {{_type, func_name, func_arity}, _info, _types, _doc, _opts} ->
+           func_name === function && func_arity === arity
+         end) do
+      nil ->
+        nil
+
+      {_def, _info, _types, doc, _opts} ->
+        # %{"en" => doc} = doc
+        doc
+    end
+  end
+
+  @doc """
+  Extract docs from a module, filtered by the kinds (list of :function, :type, ...)
+  """
+  def get_docs(module, kinds) do
+    case Code.fetch_docs(module) do
+      {:docs_v1, _number, language, format, _module_doc, _donno, docs} ->
+        docs =
+          for {{kind, _name, _arity}, _info, _type, _txt, _donno} = doc <- docs,
+              kind in kinds,
+              do: doc
+
+        {language, format, docs}
+
+      {:error, _msg} ->
+        # IO.puts("error: " <> inspect {msg, module})
+        {nil, nil, nil}
+    end
+  end
+
   defp get_module_docs(module_data, source) do
     {:docs_v1, anno, _, format, moduledoc, metadata, _} = module_data.docs
     doc_file = anno_file(anno, source)
@@ -218,9 +262,16 @@ defmodule ExDoc.Retriever do
 
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
+    copy_doc = copy_doc(metadata)
+
     doc_ast =
-      (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
-        doc_data.doc_fallback.()
+      if copy_doc != nil do
+        {m, f, a} = copy_doc
+        extract_doc(m, f, a)
+      else
+        (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
+          doc_data.doc_fallback.()
+      end
 
     group = group_for_doc.(metadata) || doc_data.default_group
 
@@ -241,6 +292,16 @@ defmodule ExDoc.Retriever do
       group: group,
       annotations: annotations
     }
+  end
+
+  defp copy_doc(metadata) do
+    delegate_to = metadata[:delegate_to]
+
+    case metadata[:copy] do
+      copy when is_boolean(copy) and copy == true -> delegate_to
+      copy when is_tuple(copy) -> copy
+      _ -> nil
+    end
   end
 
   defp get_defaults(_name, _arity, 0), do: []
