@@ -181,13 +181,19 @@ defmodule ExDoc.Retriever do
   def extract_doc(module, function, arity) do
     case get_docs(module, [:function]) do
       {nil, nil, nil} ->
-        IO.puts("extract_doc failed" <> inspect({module, function, arity}))
+        # IO.puts("extract_doc failed" <> inspect({module, function, arity}))
         nil
 
       {_language, format, docs} ->
-        doc = extract_function_doc(docs, function, arity)
-        doc_ast(format, doc, [])
-    end
+        case extract_function_doc(docs, function, arity) do
+          nil ->
+            # IO.puts("doc: No doc found")
+            nil
+          doc ->
+            # IO.puts("doc: " <> inspect doc)
+            doc_ast(format, doc, [])
+        end
+      end
   end
 
   def extract_function_doc(docs, function, arity) do
@@ -216,7 +222,7 @@ defmodule ExDoc.Retriever do
 
         {language, format, docs}
 
-      {:error, _msg} ->
+      {:error, msg} ->
         # IO.puts("error: " <> inspect {msg, module})
         {nil, nil, nil}
     end
