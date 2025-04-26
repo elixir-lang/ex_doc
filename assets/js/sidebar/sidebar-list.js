@@ -80,8 +80,8 @@ export function initialize () {
 
       items.push(el('li', {}, [
         el('a', {href, translate}, [
-          node.url ? el('i', {class: 'external-link ri-external-link-line'}) : null,
-          node.nested_title || node.title
+          node.nested_title || node.title,
+          node.url ? el('i', {class: 'external-link ri-external-link-line'}) : null
         ].filter(Boolean)),
         ...childList(`node-${node.id}-headers`,
           hasHeaders
