@@ -146,6 +146,17 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
   end
 
+  test "ignores any external url extras", %{tmp_dir: tmp_dir} = context do
+    config =
+      context
+      |> doc_config()
+      |> Keyword.put(:extras, elixir: [url: "https://elixir-lang.org"])
+
+    generate_docs_and_unzip(context, config)
+
+    refute File.exists?(tmp_dir <> "/epub/OEBPS/elixir.xhtml")
+  end
+
   test "uses samp as highlight tag for markdown", %{tmp_dir: tmp_dir} = context do
     generate_docs_and_unzip(context, doc_config(context))
 

@@ -209,6 +209,7 @@ defmodule ExDoc.Formatter.HTML do
   defp generate_extras(extras, config) do
     generated_extras =
       extras
+      |> Enum.reject(&is_map_key(&1, :url))
       |> with_prev_next()
       |> Enum.map(fn {node, prev, next} ->
         filename = "#{node.id}.html"
@@ -349,6 +350,7 @@ defmodule ExDoc.Formatter.HTML do
 
     extras =
       config.extras
+      |> Enum.map(&normalize_extras/1)
       |> Task.async_stream(
         &build_extra(&1, groups, language, autolink_opts, source_url_pattern),
         timeout: :infinity
@@ -384,8 +386,19 @@ defmodule ExDoc.Formatter.HTML do
     end)
   end
 
+  defp normalize_extras(base) when is_binary(base), do: {base, %{}}
+  defp normalize_extras({base, opts}), do: {base, Map.new(opts)}
+
   defp disambiguate_id(extra, discriminator) do
     Map.put(extra, :id, "#{extra.id}-#{discriminator}")
+  end
+
+  defp build_extra({input, %{url: _} = input_options}, groups, _lang, _auto, _url_pattern) do
+    input = to_string(input)
+    title = input_options[:title] || input
+    group = GroupMatcher.match_extra(groups, input_options[:url])
+
+    %{group: group, id: Utils.text_to_id(title), title: title, url: input_options[:url]}
   end
 
   defp build_extra({input, input_options}, groups, language, autolink_opts, source_url_pattern) do
@@ -445,10 +458,6 @@ defmodule ExDoc.Formatter.HTML do
       title: title,
       title_content: title_html || title
     }
-  end
-
-  defp build_extra(input, groups, language, autolink_opts, source_url_pattern) do
-    build_extra({input, []}, groups, language, autolink_opts, source_url_pattern)
   end
 
   defp normalize_search_data!(nil), do: nil
@@ -595,14 +604,23 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp extra_paths(config) do
-    Map.new(config.extras, fn
-      path when is_binary(path) ->
+    Enum.reduce(config.extras, %{}, fn
+      path, acc when is_binary(path) ->
         base = Path.basename(path)
-        {base, Utils.text_to_id(Path.rootname(base))}
 
-      {path, opts} ->
-        base = path |> to_string() |> Path.basename()
-        {base, opts[:filename] || Utils.text_to_id(Path.rootname(base))}
+        Map.put(acc, base, Utils.text_to_id(Path.rootname(base)))
+
+      {path, opts}, acc ->
+        if Keyword.has_key?(opts, :url) do
+          acc
+        else
+          base = path |> to_string() |> Path.basename()
+
+          name =
+            Keyword.get_lazy(opts, :filename, fn -> Utils.text_to_id(Path.rootname(base)) end)
+
+          Map.put(acc, base, name)
+        end
     end)
   end
 end

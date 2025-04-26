@@ -112,6 +112,22 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert LazyHTML.text(bar_content["h1"]) == "README bar"
   end
 
+  test "extras defined as external urls", %{tmp_dir: tmp_dir} = context do
+    config =
+      doc_config(context,
+        extras: [
+          "#{tmp_dir}/readme.md",
+          "Elixir": [url: "https://elixir-lang.org"]
+        ]
+      )
+
+    File.write!("#{tmp_dir}/readme.md", "readme")
+    generate_docs(config)
+
+    content = File.read!(tmp_dir <> "/html/readme.html")
+    assert content =~ "https://elixir-lang.org"
+  end
+
   test "warns when generating an index.html file with an invalid redirect",
        %{tmp_dir: tmp_dir} = context do
     output =
@@ -771,6 +787,40 @@ defmodule ExDoc.Formatter.HTMLTest do
                %{"group" => ""},
                %{"group" => "Intro", "id" => "readme", "title" => "README"}
              ] = Jason.decode!(content)["extras"]
+    end
+
+    test "with custom groups for external urls", %{tmp_dir: tmp_dir} = context do
+      extra_config = [
+        extras: [
+          Website: [url: "https://elixir-lang.org"],
+          Forum: [url: "https://elixirforum.com"]
+        ],
+        groups_for_extras: ["Elixir": ~r/elixir/i]
+      ]
+
+      context
+      |> doc_config(extra_config)
+      |> generate_docs()
+
+      %{"extras" => extras} =
+        (tmp_dir <> "/html/dist/sidebar_items-*.js")
+        |> read_wildcard!()
+        |> String.trim_leading("sidebarNodes=")
+        |> Jason.decode!()
+
+      assert %{
+               "group" => "Elixir",
+               "id" => "website",
+               "title" => "Website",
+               "url" => "https://elixir-lang.org"
+             } in extras
+
+      assert %{
+               "group" => "Elixir",
+               "id" => "forum",
+               "title" => "Forum",
+               "url" => "https://elixirforum.com"
+             } in extras
     end
 
     test "with auto-extracted titles", %{tmp_dir: tmp_dir} = context do

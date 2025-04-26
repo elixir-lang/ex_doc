@@ -37,6 +37,10 @@
   color: var(--sidebarHover);
 }
 
+.sidebar .external-link {
+  margin: 0 2.5px 0 0;
+}
+
 .sidebar .sidebar-header {
   background-color: var(--sidebarHeader);
   width: 100%;
