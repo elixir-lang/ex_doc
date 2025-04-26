@@ -46,7 +46,7 @@ defmodule ExDoc.GroupMatcher do
   end
 
   @doc """
-  Finds a matching group for the given extra filename
+  Finds a matching group for the given filename or url.
   """
   def match_extra(group_patterns, path) do
     match_group_patterns(group_patterns, fn pattern ->
