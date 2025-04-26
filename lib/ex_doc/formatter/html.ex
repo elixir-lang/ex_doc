@@ -396,7 +396,7 @@ defmodule ExDoc.Formatter.HTML do
   defp build_extra({input, %{url: _} = input_options}, groups, _lang, _auto, _url_pattern) do
     input = to_string(input)
     title = input_options[:title] || input
-    group = GroupMatcher.match_extra(groups, {:url, input, input_options[:url]})
+    group = GroupMatcher.match_extra(groups, input_options[:url])
 
     %{group: group, id: Utils.text_to_id(title), title: title, url: input_options[:url]}
   end
@@ -439,7 +439,7 @@ defmodule ExDoc.Formatter.HTML do
     title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
     content_html = autolink_and_render(ast, language, [file: input] ++ autolink_opts, opts)
 
-    group = GroupMatcher.match_extra(groups, {:path, input})
+    group = GroupMatcher.match_extra(groups, input)
     title = input_options[:title] || title_text || filename_to_title(input)
 
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")

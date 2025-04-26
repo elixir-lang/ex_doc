@@ -246,6 +246,13 @@ defmodule Mix.Tasks.Docs do
         "Advanced": ~r"/advanced/"
       ]
 
+  External extras from a URL can also be grouped:
+
+      groups_for_extras: [
+        "Elixir": ~r"https://elixir-lang.org/",
+        "Erlang": ~r"https://www.erlang.org/"
+      ]
+
   Similar can be done for modules:
 
       groups_for_modules: [

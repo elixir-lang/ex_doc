@@ -48,20 +48,11 @@ defmodule ExDoc.GroupMatcher do
   @doc """
   Finds a matching group for the given extra filename
   """
-  def match_extra(group_patterns, {:path, path}) do
+  def match_extra(group_patterns, path) do
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do
         %Regex{} = regex -> Regex.match?(regex, path)
         string when is_binary(string) -> path == string
-      end
-    end)
-  end
-
-  def match_extra(group_patterns, {:url, title, url}) do
-    match_group_patterns(group_patterns, fn pattern ->
-      case pattern do
-        %Regex{} = regex -> Regex.match?(regex, title) or Regex.match?(regex, url)
-        string when is_binary(string) -> title == string or title == url
       end
     end)
   end
