@@ -116,16 +116,16 @@ defmodule ExDoc.Formatter.HTMLTest do
     config =
       doc_config(context,
         extras: [
-          "README.md",
+          "readme.md",
           "Elixir": [url: "https://elixir-lang.org"]
         ]
       )
 
-    File.write!("#{tmp_dir}/README.md", "README")
+    File.write!("#{tmp_dir}/readme.md", "readme")
 
     generate_docs(config)
 
-    content = File.read!(tmp_dir <> "/html/README.html")
+    content = File.read!(tmp_dir <> "/html/readme.html")
 
     assert content =~ "https://elixir-lang.org"
   end
