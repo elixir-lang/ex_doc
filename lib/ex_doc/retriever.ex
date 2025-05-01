@@ -7,7 +7,7 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.{DocAST, GroupMatcher, Refs}
+  alias ExDoc.{CopyDocUtils, DocAST, GroupMatcher, Refs}
   alias ExDoc.Retriever.Error
 
   @doc """
@@ -140,7 +140,7 @@ defmodule ExDoc.Retriever do
     group_for_doc = config.group_for_doc
     annotations_for_docs = config.annotations_for_docs
 
-    docs = get_docs(module_data, source, group_for_doc, annotations_for_docs)
+    docs = get_docs(module_data, source, group_for_doc, annotations_for_docs, config)
     metadata = Map.put(metadata, :kind, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
@@ -178,56 +178,6 @@ defmodule ExDoc.Retriever do
 
   # Helpers
 
-  def extract_doc(module, function, arity) do
-    case get_docs(module, [:function]) do
-      {nil, nil, nil} ->
-        # IO.puts("extract_doc failed" <> inspect({module, function, arity}))
-        nil
-
-      {_language, format, docs} ->
-        case extract_function_doc(docs, function, arity) do
-          nil ->
-            # IO.puts("doc: No doc found")
-            nil
-          doc ->
-            # IO.puts("doc: " <> inspect doc)
-            doc_ast(format, doc, [])
-        end
-      end
-  end
-
-  def extract_function_doc(docs, function, arity) do
-    case Enum.find(docs, nil, fn {{_type, func_name, func_arity}, _info, _types, _doc, _opts} ->
-           func_name === function && func_arity === arity
-         end) do
-      nil ->
-        nil
-
-      {_def, _info, _types, doc, _opts} ->
-        # %{"en" => doc} = doc
-        doc
-    end
-  end
-
-  @doc """
-  Extract docs from a module, filtered by the kinds (list of :function, :type, ...)
-  """
-  def get_docs(module, kinds) do
-    case Code.fetch_docs(module) do
-      {:docs_v1, _number, language, format, _module_doc, _donno, docs} ->
-        docs =
-          for {{kind, _name, _arity}, _info, _type, _txt, _donno} = doc <- docs,
-              kind in kinds,
-              do: doc
-
-        {language, format, docs}
-
-      {:error, msg} ->
-        # IO.puts("error: " <> inspect {msg, module})
-        {nil, nil, nil}
-    end
-  end
-
   defp get_module_docs(module_data, source) do
     {:docs_v1, anno, _, format, moduledoc, metadata, _} = module_data.docs
     doc_file = anno_file(anno, source)
@@ -236,19 +186,19 @@ defmodule ExDoc.Retriever do
     {doc_line, doc_file, format, moduledoc, doc_ast(format, moduledoc, options), metadata}
   end
 
-  defp get_docs(module_data, source, group_for_doc, annotations_for_docs) do
+  defp get_docs(module_data, source, group_for_doc, annotations_for_docs, config) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
     nodes =
       for doc <- docs,
           doc_data = module_data.language.doc_data(doc, module_data) do
-        get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs)
+        get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs, config)
       end
 
     filter_defaults(nodes)
   end
 
-  defp get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs) do
+  defp get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs, config) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{type, name, arity}, anno, _signature, source_doc, metadata} = doc
     doc_file = anno_file(anno, source)
@@ -268,12 +218,19 @@ defmodule ExDoc.Retriever do
 
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
-    copy_doc = copy_doc(metadata)
+    copy_doc = CopyDocUtils.copy_doc_info(metadata, {doc_file, doc_line})
 
     doc_ast =
       if copy_doc != nil do
-        {m, f, a} = copy_doc
-        extract_doc(m, f, a)
+        if source_doc != :none do
+          ExDoc.Utils.warn(
+            "Both a `@doc copy:` instruction AND some documentation were found. Ignoring the docs and using the copy instruction",
+            file: doc_file,
+            line: doc_line
+          )
+        end
+
+        CopyDocUtils.extract_doc(copy_doc, config)
       else
         (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
           doc_data.doc_fallback.()
@@ -298,16 +255,6 @@ defmodule ExDoc.Retriever do
       group: group,
       annotations: annotations
     }
-  end
-
-  defp copy_doc(metadata) do
-    delegate_to = metadata[:delegate_to]
-
-    case metadata[:copy] do
-      copy when is_boolean(copy) and copy == true -> delegate_to
-      copy when is_tuple(copy) -> copy
-      _ -> nil
-    end
   end
 
   defp get_defaults(_name, _arity, 0), do: []

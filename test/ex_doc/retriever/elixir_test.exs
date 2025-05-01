@@ -321,6 +321,9 @@ defmodule ExDoc.Retriever.ElixirTest do
                    iex> String.first("")
                    nil
 
+
+
+               Note: documentation was copied from: `String.first/1`
                """)
     end
 

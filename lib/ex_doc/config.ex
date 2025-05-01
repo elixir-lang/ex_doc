@@ -8,6 +8,9 @@ defmodule ExDoc.Config do
   def before_closing_head_tag(_), do: ""
   def before_closing_footer_tag(_), do: ""
   def before_closing_body_tag(_), do: ""
+  def copy_doc_decorator(doc, {m, f, a}) do
+    doc <> "\n\nNote: documentation was copied from: `#{m}#{f}/#{a}`"
+  end
   def annotations_for_docs(_), do: []
   def skip_undefined_reference_warnings_on(_string), do: false
   def skip_code_autolink_to(_string), do: false
@@ -22,6 +25,7 @@ defmodule ExDoc.Config do
             before_closing_footer_tag: &__MODULE__.before_closing_footer_tag/1,
             before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
             canonical: nil,
+            copy_doc_decorator: &__MODULE__.copy_doc_decorator/2,
             cover: nil,
             deps: [],
             docs_groups: [],
@@ -66,6 +70,7 @@ defmodule ExDoc.Config do
           before_closing_footer_tag: (atom() -> String.t()) | mfa() | map(),
           before_closing_head_tag: (atom() -> String.t()) | mfa() | map(),
           canonical: nil | String.t(),
+          copy_doc_decorator: (String.t, {String.t, String.t, non_neg_integer} -> String.t),
           cover: nil | Path.t(),
           deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
           docs_groups: [String.t()],
