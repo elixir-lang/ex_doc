@@ -12,7 +12,7 @@ defmodule ExDoc.Language.Elixir do
           | %{
               docs: any,
               id: binary,
-              language: ExDoc.Language.Erlang,
+              language: ExDoc.Language.Elixir,
               source_line: pos_integer,
               source_file: Path.t(),
               source_basedir: Path.t(),
