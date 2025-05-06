@@ -13,6 +13,9 @@ body {
   color: var(--textBody);
   font-size: var(--text-md);
   line-height: 1.6875em;
+  /* swup.js adds tabindex=-1 on Chrome,
+     which then adds an outline when clicked */
+  outline: none !important;
 }
 
 *,
