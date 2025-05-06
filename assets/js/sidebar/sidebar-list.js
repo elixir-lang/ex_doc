@@ -1,5 +1,6 @@
 import { el, getCurrentPageSidebarType, qs, qsAll } from '../helpers'
 import { getSidebarNodes } from '../globals'
+import he from 'he'
 
 // Sidebar list is only rendered when needed.
 // Mobile users may never see the sidebar.
@@ -122,7 +123,7 @@ function renderHeaders (node) {
   return node.headers
     .map(({id, anchor}) =>
       el('li', {}, [
-        el('a', {href: `${node.id}.html#${anchor}`}, [id])
+        el('a', {href: `${node.id}.html#${anchor}`}, [he.decode(id)])
       ])
     )
 }
@@ -137,7 +138,7 @@ function renderSectionsAndGroups (node) {
         node.sections
           .map(({id, anchor}) =>
             el('li', {}, [
-              el('a', {href: `${node.id}.html#${anchor}`}, [id])
+              el('a', {href: `${node.id}.html#${anchor}`}, [he.decode(id)])
             ])
           )
       )
@@ -156,7 +157,7 @@ function renderSectionsAndGroups (node) {
           nodes
             .map(({anchor, title, id}) =>
               el('li', {}, [
-                el('a', {href: `${node.id}.html#${anchor}`, title, translate: 'no'}, [id])
+                el('a', {href: `${node.id}.html#${anchor}`, title, translate: 'no'}, [he.decode(id)])
               ])
             )
         )
