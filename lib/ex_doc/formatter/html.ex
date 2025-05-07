@@ -320,7 +320,10 @@ defmodule ExDoc.Formatter.HTML do
       source_path: nil,
       source_url: config.source_url,
       title: "API Reference",
-      title_content: title_content
+      title_content: title_content,
+      headers:
+        if(nodes_map.modules != [], do: ["Modules"], else: []) ++
+          if(nodes_map.tasks != [], do: ["Mix Tasks"], else: [])
     }
   end
 
@@ -456,7 +459,8 @@ defmodule ExDoc.Formatter.HTML do
       source_url: source_url,
       search_data: search_data,
       title: title,
-      title_content: title_html || title
+      title_content: title_html || title,
+      headers: ExDoc.DocAST.extract_headers(ast)
     }
   end
 

@@ -59,7 +59,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_extras(extras) do
     for extra <- extras do
       %{id: id, title: title, group: group} = extra
-
       item = %{id: to_string(id), title: to_string(title), group: to_string(group)}
 
       case extra do
@@ -74,14 +73,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
             end)
 
           item
-          |> Map.put(:headers, extract_headers(extra.content))
+          |> Map.put(:headers, headers_to_id_and_anchors(extra.headers))
           |> Map.put(:searchData, search_data)
 
         %{url: url} when is_binary(url) ->
           Map.put(item, :url, url)
 
         _ ->
-          Map.put(item, :headers, extract_headers(extra.content))
+          Map.put(item, :headers, headers_to_id_and_anchors(extra.headers))
       end
     end
   end
@@ -140,8 +139,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp module_sections(module) do
     {sections, _} =
-      module.rendered_doc
-      |> extract_headers()
+      module.doc
+      |> ExDoc.DocAST.extract_headers()
+      |> headers_to_id_and_anchors()
       |> Enum.map_reduce(%{}, fn header, acc ->
         # TODO Duplicates some of the logic of link_headings/3
         case Map.fetch(acc, header.id) do
@@ -156,14 +156,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
     [sections: sections]
   end
 
-  # TODO: split into sections in Formatter.HTML instead (possibly via DocAST)
-  defp extract_headers(content) do
-    ~r/<h2.*?>(.*?)<\/h2>/m
-    |> Regex.scan(content, capture: :all_but_first)
-    |> List.flatten()
-    |> Enum.filter(&(&1 != ""))
-    |> Enum.map(&ExDoc.Utils.strip_tags/1)
-    |> Enum.map(&%{id: &1, anchor: URI.encode(text_to_id(&1))})
+  defp headers_to_id_and_anchors(headers) do
+    Enum.map(headers, fn text ->
+      %{id: text, anchor: URI.encode(text_to_id(text))}
+    end)
   end
 
   def module_summary(module_node) do

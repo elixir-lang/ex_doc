@@ -617,7 +617,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                  "headers" => [
                    %{"anchor" => "heading-without-content", "id" => "Heading without content"},
                    %{"anchor" => "header-sample", "id" => "Header sample"},
-                   %{"anchor" => "more-than", "id" => "more &gt; than"}
+                   %{"anchor" => "more-than", "id" => "more > than"}
                  ]
                },
                %{"id" => "livebookfile"},
@@ -768,7 +768,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                  "headers" => [
                    %{"anchor" => "heading-without-content", "id" => "Heading without content"},
                    %{"anchor" => "header-sample", "id" => "Header sample"},
-                   %{"anchor" => "more-than", "id" => "more &gt; than"}
+                   %{"anchor" => "more-than", "id" => "more > than"}
                  ]
                }
              ] = Jason.decode!(content)["extras"]

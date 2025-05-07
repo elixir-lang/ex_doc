@@ -324,50 +324,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
     end
 
-    test "outputs extras with headers" do
-      item = %{content: nil, group: nil, id: nil, title: nil}
-
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}])["extras"] ==
-               [
-                 %{
-                   "group" => "",
-                   "headers" => [
-                     %{"anchor" => "foo", "id" => "Foo"},
-                     %{"anchor" => "bar", "id" => "Bar"}
-                   ],
-                   "id" => "",
-                   "title" => ""
-                 }
-               ]
-
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}])[
-               "extras"
-             ] ==
-               [
-                 %{
-                   "group" => "",
-                   "headers" => [
-                     %{"anchor" => "foo", "id" => "Foo"},
-                     %{"anchor" => "bar", "id" => "Bar"}
-                   ],
-                   "id" => "",
-                   "title" => ""
-                 }
-               ]
-
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}])["extras"] ==
-               [
-                 %{
-                   "group" => "",
-                   "headers" => [
-                     %{"anchor" => "foo", "id" => "Foo"}
-                   ],
-                   "id" => "",
-                   "title" => ""
-                 }
-               ]
-    end
-
     test "builds sections out of moduledocs", context do
       names = [CompiledWithDocs, CompiledWithoutDocs, DuplicateHeadings]
       config = doc_config(context)

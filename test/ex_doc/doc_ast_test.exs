@@ -150,6 +150,31 @@ defmodule ExDoc.DocASTTest do
     end
   end
 
+  describe "extract_headers" do
+    test "extracts h2 headers" do
+      assert extract_headers("""
+             # h1
+             ## h2-a
+             ### h3
+             ## h2-b
+             ##
+             """) == ["h2-a", "h2-b"]
+    end
+
+    test "trims whitespace and preserve HTML entities" do
+      assert extract_headers("""
+             # h1
+             ##\s\s\sh2\s<&>\sh2\s\s\s
+             """) == ["h2 <&> h2"]
+    end
+
+    defp extract_headers(markdown) do
+      markdown
+      |> ExDoc.DocAST.parse!("text/markdown")
+      |> ExDoc.DocAST.extract_headers()
+    end
+  end
+
   describe "highlight" do
     test "with default class" do
       # Empty class

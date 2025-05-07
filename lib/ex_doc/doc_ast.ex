@@ -111,6 +111,18 @@ defmodule ExDoc.DocAST do
   def extract_title(_ast), do: :error
 
   @doc """
+  Extracts headers (h2) from the given AST.
+
+  Returns the header text.
+  """
+  def extract_headers(doc_ast) do
+    for {:h2, _, _, _} = node <- doc_ast,
+        text = ExDoc.DocAST.text(node),
+        text != "",
+        do: text
+  end
+
+  @doc """
   Compute a synopsis from a document by looking at its first paragraph.
   """
   def synopsis({:p, _attrs, [_ | _] = inner, meta}) do
