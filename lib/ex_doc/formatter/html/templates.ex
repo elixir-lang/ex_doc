@@ -184,9 +184,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:livemd), do: "extras"
   defp sidebar_type(:extra), do: "extras"
 
-  # TODO: Move link_headings and friends to html.ex (possibly via DocAST)
-  # or even to autolinking code, so content is built with it upfront instead
-  # of added at the template level.
+  # TODO: Adding the link headings must be done via DocAST instead of using regexes.
 
   @doc """
   Add link headings for the given `content`.
@@ -203,7 +201,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~r/<(h[23]).*?>(.*?)<\/\1>/m
     |> Regex.scan(content)
     |> Enum.reduce({content, %{}}, fn [match, tag, title], {content, occurrences} ->
-      possible_id = text_to_id(title)
+      possible_id = title |> ExDoc.Utils.strip_tags() |> text_to_id()
       id_occurred = Map.get(occurrences, possible_id, 0)
 
       anchor_id = if id_occurred >= 1, do: "#{possible_id}-#{id_occurred}", else: possible_id

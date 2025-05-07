@@ -58,6 +58,7 @@ defmodule ExDoc.Formatter.HTML.SearchData do
   end
 
   defp module(%ExDoc.ModuleNode{} = node) do
+    # TODO: This should work on DocAST
     {intro, sections} = extract_sections(node.doc_format, node)
 
     module =
@@ -132,6 +133,7 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     {"", []}
   end
 
+  # TODO: This should work on DocAST when we prebuild extra.
   defp extract_sections_from_markdown(string) do
     [intro | sections] =
       Regex.split(~r/(?<!#)###? (?<header>\b.+)/, string, include_captures: true)
