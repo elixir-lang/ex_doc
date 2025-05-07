@@ -336,7 +336,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert compiled_with_docs["sections"] == [
                %{
                  "anchor" => "module-example-unicode-escaping",
-                 "id" => "Example ☃ Unicode &gt; escaping"
+                 "id" => "Example ☃ Unicode > escaping"
                }
              ]
 

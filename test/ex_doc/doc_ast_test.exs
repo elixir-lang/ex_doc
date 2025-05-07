@@ -164,7 +164,7 @@ defmodule ExDoc.DocASTTest do
     test "trims whitespace and preserve HTML entities" do
       assert extract_headers("""
              # h1
-             ##\s\s\sh2\s<&>\sh2\s\s\s
+             ##\s\s\s**h2**\s<&>\s`h2`\s\s\s
              """) == ["h2 <&> h2"]
     end
 
