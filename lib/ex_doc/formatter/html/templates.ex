@@ -61,7 +61,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp api_reference(_config, nodes_map) do
     headers =
       if(nodes_map.modules != [], do: [%{id: "Modules", anchor: "modules"}], else: []) ++
-        if(nodes_map.tasks != [], do: [%{id: "Mix Tasks", anchor: "mix-tasks"}], else: [])
+        if(nodes_map.tasks != [], do: [%{id: "Mix Tasks", anchor: "tasks"}], else: [])
 
     [%{id: "api-reference", title: "API Reference", group: "", headers: headers}]
   end
