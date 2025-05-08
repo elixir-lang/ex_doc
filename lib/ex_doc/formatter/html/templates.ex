@@ -140,7 +140,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp module_sections(module) do
     {sections, _} =
       module.doc
-      |> ExDoc.DocAST.extract_headers()
+      |> ExDoc.DocAST.extract_headers([:h2])
       |> headers_to_id_and_anchors()
       |> Enum.map_reduce(%{}, fn header, acc ->
         # TODO Duplicates some of the logic of link_headings/3

@@ -460,7 +460,7 @@ defmodule ExDoc.Formatter.HTML do
       search_data: search_data,
       title: title,
       title_content: title_html || title,
-      headers: ExDoc.DocAST.extract_headers(ast)
+      headers: ExDoc.DocAST.extract_headers(ast, [:h2])
     }
   end
 
@@ -491,11 +491,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp sectionize(ast, ".cheatmd") do
-    ExDoc.DocAST.sectionize(ast, fn
-      {:h2, _, _, _} -> true
-      {:h3, _, _, _} -> true
-      _ -> false
-    end)
+    ExDoc.DocAST.sectionize(ast, [:h2, :h3])
   end
 
   defp sectionize(ast, _), do: ast

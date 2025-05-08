@@ -115,8 +115,9 @@ defmodule ExDoc.DocAST do
 
   Returns the header text.
   """
-  def extract_headers(doc_ast) do
-    for {:h2, _, _, _} = node <- doc_ast,
+  def extract_headers(doc_ast, headers) do
+    for {tag, _, _, _} = node <- doc_ast,
+        tag in headers,
         text = ExDoc.DocAST.text(node),
         text != "",
         do: text
@@ -168,17 +169,17 @@ defmodule ExDoc.DocAST do
   defp do_text({_tag, _attr, ast, _meta}), do: text(ast)
 
   @doc """
-  Wraps a list of HTML nodes into `<section>` tags whenever `matcher` returns true.
+  Wraps a list of HTML nodes into `<section>` tags whenever `headers` returns true.
   """
-  def sectionize(list, matcher), do: sectionize(list, matcher, [])
+  def sectionize(list, headers), do: sectionize(list, headers, [])
 
-  defp sectionize(list, matcher, acc) do
-    case pivot(list, acc, matcher) do
+  defp sectionize(list, headers, acc) do
+    case pivot(list, acc, headers) do
       {acc, {header_tag, header_attrs, _, _} = header, rest} ->
         {inner, rest} = Enum.split_while(rest, &not_tag?(&1, header_tag))
         class = String.trim_trailing("#{header_tag} #{header_attrs[:class]}")
-        section = {:section, [class: class], [header | sectionize(inner, matcher, [])], %{}}
-        sectionize(rest, matcher, [section | acc])
+        section = {:section, [class: class], [header | sectionize(inner, headers, [])], %{}}
+        sectionize(rest, headers, [section | acc])
 
       acc ->
         acc
@@ -188,14 +189,16 @@ defmodule ExDoc.DocAST do
   defp not_tag?({tag, _, _, _}, tag), do: false
   defp not_tag?(_, _tag), do: true
 
-  defp pivot([head | tail], acc, fun) do
-    case fun.(head) do
-      true -> {acc, head, tail}
-      false -> pivot(tail, [head | acc], fun)
+  defp pivot([{tag, _, _, _} = head | tail], acc, headers) do
+    if tag in headers do
+      {acc, head, tail}
+    else
+      pivot(tail, [head | acc], headers)
     end
   end
 
-  defp pivot([], acc, _fun), do: Enum.reverse(acc)
+  defp pivot([head | tail], acc, headers), do: pivot(tail, [head | acc], headers)
+  defp pivot([], acc, _headers), do: Enum.reverse(acc)
 
   @doc """
   Highlights a DocAST converted to string.

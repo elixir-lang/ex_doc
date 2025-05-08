@@ -171,7 +171,7 @@ defmodule ExDoc.DocASTTest do
     defp extract_headers(markdown) do
       markdown
       |> ExDoc.DocAST.parse!("text/markdown")
-      |> ExDoc.DocAST.extract_headers()
+      |> ExDoc.DocAST.extract_headers([:h2])
     end
   end
 
@@ -246,7 +246,7 @@ defmodule ExDoc.DocASTTest do
         {:p, [], ["p6"], %{}}
       ]
 
-      assert DocAST.sectionize(list, &h2_or_h3?/1) ==
+      assert DocAST.sectionize(list, [:h2, :h3]) ==
                [
                  {:h1, [], ["H1"], %{}},
                  {:section, [class: "h2 example"],
@@ -281,9 +281,5 @@ defmodule ExDoc.DocASTTest do
                   ], %{}}
                ]
     end
-
-    defp h2_or_h3?({:h2, _, _, _}), do: true
-    defp h2_or_h3?({:h3, _, _, _}), do: true
-    defp h2_or_h3?(_), do: false
   end
 end
