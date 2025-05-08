@@ -110,19 +110,6 @@ defmodule ExDoc.DocAST do
   def extract_title(_ast), do: :error
 
   @doc """
-  Extracts headers (h2) from the given AST.
-
-  Returns the header text.
-  """
-  def extract_headers(doc_ast, headers) do
-    for {tag, _, _, _} = node <- doc_ast,
-        tag in headers,
-        text = ExDoc.DocAST.text(node),
-        text != "",
-        do: text
-  end
-
-  @doc """
   Extracts the headers which have anchors (aka ids) in them.
   """
   def extract_headers_with_ids(ast, headers) do

@@ -131,31 +131,6 @@ defmodule ExDoc.DocASTTest do
     end
   end
 
-  describe "extract_headers" do
-    test "extracts h2 headers" do
-      assert extract_headers("""
-             # h1
-             ## h2-a
-             ### h3
-             ## h2-b
-             ##
-             """) == ["h2-a", "h2-b"]
-    end
-
-    test "trims whitespace and preserve HTML entities" do
-      assert extract_headers("""
-             # h1
-             ##\s\s\s**h2**\s<&>\s`h2`\s\s\s
-             """) == ["h2 <&> h2"]
-    end
-
-    defp extract_headers(markdown) do
-      markdown
-      |> DocAST.parse!("text/markdown")
-      |> DocAST.extract_headers([:h2])
-    end
-  end
-
   describe "headers" do
     test "adds and extracts anchored headers" do
       assert """
