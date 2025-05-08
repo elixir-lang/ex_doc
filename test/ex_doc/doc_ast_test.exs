@@ -158,54 +158,51 @@ defmodule ExDoc.DocASTTest do
 
   describe "highlight" do
     test "with default class" do
-      # Empty class
-      assert DocAST.highlight(
-               ~S[<pre><code class="">mix run --no-halt path/to/file.exs</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
+      # Four spaces
+      assert highlight("""
+                 mix run --no-halt path/to/file.exs
+             """) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
-      # Without class
-      assert DocAST.highlight(
-               "<pre><code>mix run --no-halt path/to/file.exs</code></pre>",
-               ExDoc.Language.Elixir
-             ) =~
+      # Code block without language
+      assert highlight("""
+             ```
+             mix run --no-halt path/to/file.exs</code></pre>
+             ```
+             """) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
-      # Pre class
-      assert DocAST.highlight(
-               ~S[<pre class="wrap"><code class="">mix run --no-halt path/to/file.exs</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
+      # Pre IAL
+      assert highlight("""
+             ```
+             mix run --no-halt path/to/file.exs</code></pre>
+             ```
+             {:class="wrap"}
+             """) =~
                ~r{<pre class="wrap"><code class=\"makeup elixir\" translate="no">.*}
 
-      # Pre id
-      assert DocAST.highlight(
-               ~S[<pre id="anchor"><code class="">mix run --no-halt path/to/file.exs</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
-               ~r{<pre id="anchor"><code class=\"makeup elixir\" translate="no">.*}
+      # Code with language
+      assert highlight("""
+             ```html
+             <foo />
+             ```
+             """) =~
+               ~r{<pre><code class=\"makeup html\" translate="no">.*}
 
-      # Pre id and class
-      assert DocAST.highlight(
-               ~S[<pre id="anchor" class="wrap"><code class="">mix run --no-halt path/to/file.exs</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
-               ~r{<pre id="anchor" class="wrap"><code class=\"makeup elixir\" translate="no">.*}
+      # Code with shell detection
+      assert highlight("""
+             ```
+             $ hello
+             ```
+             """) =~
+               ~r{<pre><code class=\"makeup shell\" translate="no"><span class="gp unselectable">\$.*}
+    end
 
-      # IEx highlight with empty class
-      assert DocAST.highlight(
-               ~S[<pre><code class="">iex&gt; max(4, 5)</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
-               ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
-
-      # IEx highlight without class
-      assert DocAST.highlight(
-               ~S[<pre><code>iex&gt; max(4, 5)</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
-               ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
+    defp highlight(markdown) do
+      markdown
+      |> ExDoc.DocAST.parse!("text/markdown")
+      |> ExDoc.DocAST.highlight(ExDoc.Language.Elixir)
+      |> ExDoc.DocAST.to_string()
     end
   end
 

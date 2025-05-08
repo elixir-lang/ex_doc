@@ -144,8 +144,8 @@ defmodule ExDoc.Formatter.HTML do
   defp autolink_and_render(doc, language, autolink_opts, opts) do
     doc
     |> language.autolink_doc(autolink_opts)
-    |> ExDoc.DocAST.to_string()
     |> ExDoc.DocAST.highlight(language, opts)
+    |> ExDoc.DocAST.to_string()
   end
 
   defp output_setup(build, config) do

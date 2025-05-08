@@ -1,3 +1,5 @@
+import Kernel, except: [to_string: 1]
+
 defmodule ExDoc.DocAST do
   # General helpers for dealing with the documentation AST
   # (which is the Markdown -> HTML AST).
@@ -198,39 +200,56 @@ defmodule ExDoc.DocAST do
   defp pivot([], acc, _headers), do: Enum.reverse(acc)
 
   def highlight(html, language, opts \\ []) do
-    highlight_info = language.highlight_info()
-
-    ## Html cannot be parsed with regex, but we try our best...
-    Regex.replace(
-      ~r/<pre(\s[^>]*)?><code(?:\s+class="([^"\s]*)")?>([^<]*)<\/code><\/pre>/,
-      html,
-      &highlight_code_block(&1, &2, &3, &4, highlight_info, opts)
-    )
+    do_highlight(html, language.highlight_info(), opts)
   end
 
-  defp highlight_code_block(full_block, pre_attr, lang, code, highlight_info, outer_opts) do
-    case pick_language_and_lexer(lang, highlight_info, code) do
-      {_language, nil, _opts} ->
-        full_block
+  defp do_highlight(
+         {:pre, pre_attrs, [{:code, code_attrs, [code], code_meta}], pre_meta} = ast,
+         highlight_info,
+         opts
+       )
+       when is_binary(code) do
+    {lang, code_attrs} = Keyword.pop(code_attrs, :class, "")
 
-      {lang, lexer, opts} ->
+    case pick_language_and_lexer(lang, highlight_info, code) do
+      {_lang, nil, _lexer_opts} ->
+        ast
+
+      {lang, lexer, lexer_opts} ->
         try do
-          render_code(pre_attr, lang, lexer, opts, code, outer_opts)
+          Makeup.highlight_inner_html(code,
+            lexer: lexer,
+            lexer_options: lexer_opts,
+            formatter_options: opts
+          )
         rescue
           exception ->
             ExDoc.Utils.warn(
               [
                 "crashed while highlighting #{lang} snippet:\n\n",
-                full_block,
+                ExDoc.DocAST.to_string(ast),
                 "\n\n",
                 Exception.format_banner(:error, exception, __STACKTRACE__)
               ],
               __STACKTRACE__
             )
 
-            full_block
+            ast
+        else
+          highlighted ->
+            code_attrs = [class: "makeup #{lang}", translate: "no"] ++ code_attrs
+            code_meta = Map.put(code_meta, :verbatim, true)
+            {:pre, pre_attrs, [{:code, code_attrs, [highlighted], code_meta}], pre_meta}
         end
     end
+  end
+
+  defp do_highlight(list, highlight_info, opts) when is_list(list) do
+    Enum.map(list, &do_highlight(&1, highlight_info, opts))
+  end
+
+  defp do_highlight(other, _highlight_info, _opts) do
+    other
   end
 
   defp pick_language_and_lexer("", _highlight_info, "$ " <> _) do
@@ -250,37 +269,5 @@ defmodule ExDoc.DocAST do
       {:ok, {lexer, opts}} -> {lang, lexer, opts}
       :error -> {lang, nil, []}
     end
-  end
-
-  defp render_code(pre_attr, lang, lexer, lexer_opts, code, opts) do
-    highlight_tag = Keyword.get(opts, :highlight_tag, "span")
-
-    highlighted =
-      code
-      |> unescape_html()
-      |> IO.iodata_to_binary()
-      |> Makeup.highlight_inner_html(
-        lexer: lexer,
-        lexer_options: lexer_opts,
-        formatter_options: [highlight_tag: highlight_tag]
-      )
-
-    ~s(<pre#{pre_attr}><code class="makeup #{lang}" translate="no">#{highlighted}</code></pre>)
-  end
-
-  entities = [{"&amp;", ?&}, {"&lt;", ?<}, {"&gt;", ?>}, {"&quot;", ?"}, {"&#39;", ?'}]
-
-  for {encoded, decoded} <- entities do
-    defp unescape_html(unquote(encoded) <> rest) do
-      [unquote(decoded) | unescape_html(rest)]
-    end
-  end
-
-  defp unescape_html(<<c, rest::binary>>) do
-    [c | unescape_html(rest)]
-  end
-
-  defp unescape_html(<<>>) do
-    []
   end
 end
