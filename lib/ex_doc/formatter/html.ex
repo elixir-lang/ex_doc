@@ -61,7 +61,7 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Autolinks and renders all docs.
   """
-  # TODO: Move this outside of the formatter
+  # TODO: Move this to normalize_doc_ast in the retriever
   def render_all(project_nodes, filtered_modules, ext, config, opts) do
     base = [
       apps: config.apps,
