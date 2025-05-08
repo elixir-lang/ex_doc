@@ -424,16 +424,13 @@ defmodule ExDoc.Formatter.HTML do
                 "file extension not recognized, allowed extension is either .cheatmd, .livemd, .md, .txt or no extension"
       end
 
-    {title_ast, ast} =
+    {title_doc, title_text, ast} =
       case ExDoc.DocAST.extract_title(ast) do
-        {:ok, title_ast, ast} -> {title_ast, ast}
-        :error -> {nil, ast}
+        {:ok, title_doc, ast} -> {title_doc, ExDoc.DocAST.text(title_doc), ast}
+        :error -> {nil, nil, ast}
       end
 
-    title_text = title_ast && ExDoc.DocAST.text(title_ast)
-    title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
     title = input_options[:title] || title_text || filename_to_title(input)
-
     group = GroupMatcher.match_extra(groups, input)
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
     source_url = source_url_pattern.(source_path, 1)
@@ -449,7 +446,7 @@ defmodule ExDoc.Formatter.HTML do
       source_url: source_url,
       search_data: search_data,
       title: title,
-      title_content: title_html || title
+      title_doc: title_doc || title
     }
   end
 
