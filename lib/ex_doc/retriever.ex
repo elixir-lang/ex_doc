@@ -135,7 +135,8 @@ defmodule ExDoc.Retriever do
       relative_path: path_relative_to_cwd(module_data.source_file)
     }
 
-    {doc_line, doc_file, format, source_doc, doc, metadata} = get_module_docs(module_data, source)
+    {doc_line, doc_file, format, source_doc, doc_ast, metadata} =
+      get_module_docs(module_data, source)
 
     group_for_doc = config.group_for_doc
     annotations_for_docs = config.annotations_for_docs
@@ -157,7 +158,7 @@ defmodule ExDoc.Retriever do
       docs_groups: config.docs_groups ++ module_data.default_groups,
       docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
       doc_format: format,
-      doc: doc,
+      doc: normalize_doc_ast(doc_ast, "module-"),
       source_doc: source_doc,
       moduledoc_line: doc_line,
       moduledoc_file: doc_file,
@@ -174,6 +175,12 @@ defmodule ExDoc.Retriever do
 
   defp doc_ast(_format, _, _options) do
     nil
+  end
+
+  # TODO: Consider perhaps moving auto-linking here.
+  defp normalize_doc_ast(doc_ast, prefix) do
+    doc_ast
+    |> DocAST.add_ids_to_headers([:h2, :h3], prefix)
   end
 
   # Helpers
@@ -219,17 +226,18 @@ defmodule ExDoc.Retriever do
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
     doc_ast =
-      (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
+      doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
         doc_data.doc_fallback.()
 
     group = group_for_doc.(metadata) || doc_data.default_group
+    id = doc_data.id_key <> nil_or_name(name, arity)
 
     %ExDoc.DocNode{
-      id: doc_data.id_key <> nil_or_name(name, arity),
+      id: id,
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
-      doc: doc_ast,
+      doc: normalize_doc_ast(doc_ast, id <> "-"),
       source_doc: source_doc,
       doc_line: doc_line,
       doc_file: doc_file,

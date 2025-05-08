@@ -135,30 +135,18 @@ defmodule ExDoc.Formatter.HTML.Templates do
     %{key: text_to_id(group), name: group, nodes: nodes}
   end
 
-  defp module_sections(%ExDoc.ModuleNode{rendered_doc: nil}), do: [sections: []]
-
   defp module_sections(module) do
-    {sections, _} =
-      module.doc
-      |> ExDoc.DocAST.extract_headers([:h2])
+    sections =
+      (module.doc || [])
+      |> ExDoc.DocAST.extract_headers_with_ids([:h2])
       |> headers_to_id_and_anchors()
-      |> Enum.map_reduce(%{}, fn header, acc ->
-        # TODO Duplicates some of the logic of link_headings/3
-        case Map.fetch(acc, header.id) do
-          {:ok, id} ->
-            {%{header | anchor: "module-#{header.anchor}-#{id}"}, Map.put(acc, header.id, id + 1)}
-
-          :error ->
-            {%{header | anchor: "module-#{header.anchor}"}, Map.put(acc, header.id, 1)}
-        end
-      end)
 
     [sections: sections]
   end
 
   defp headers_to_id_and_anchors(headers) do
-    Enum.map(headers, fn text ->
-      %{id: text, anchor: URI.encode(text_to_id(text))}
+    Enum.map(headers, fn {:h2, text, anchor} ->
+      %{id: text, anchor: anchor}
     end)
   end
 

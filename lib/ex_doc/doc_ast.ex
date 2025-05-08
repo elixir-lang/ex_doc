@@ -142,16 +142,22 @@ defmodule ExDoc.DocAST do
 
   @doc """
   Adds an id attribute to the given headers.
+
+  A prefix for the id attribute can be given,
+  which is automatically URL encoded to avoid
+  issues.
   """
-  def add_ids_to_headers(doc_ast, headers) do
+  def add_ids_to_headers(doc_ast, headers, prefix \\ "") do
+    prefix = URI.encode(prefix)
+
     doc_ast
     |> map_reduce_tags(%{}, fn {tag, attrs, inner, meta} = ast, seen ->
       if tag in headers and not Keyword.has_key?(attrs, :id) do
         possible_id = inner |> text() |> ExDoc.Utils.text_to_id()
         id_count = Map.get(seen, possible_id, 0)
-        actual_id = if id_count >= 1, do: "#{possible_id}-#{id_count}", else: possible_id
+        partial_id = if id_count >= 1, do: "#{possible_id}-#{id_count}", else: possible_id
         seen = Map.put(seen, possible_id, id_count + 1)
-        {{tag, [id: actual_id] ++ attrs, inner, meta}, seen}
+        {{tag, [id: prefix <> partial_id] ++ attrs, inner, meta}, seen}
       else
         {ast, seen}
       end

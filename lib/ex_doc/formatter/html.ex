@@ -322,8 +322,8 @@ defmodule ExDoc.Formatter.HTML do
       title: "API Reference",
       title_content: title_content,
       headers:
-        if(nodes_map.modules != [], do: ["Modules"], else: []) ++
-          if(nodes_map.tasks != [], do: ["Mix Tasks"], else: [])
+        if(nodes_map.modules != [], do: [{:h2, "Modules", "modules"}], else: []) ++
+          if(nodes_map.tasks != [], do: [{:h2, "Mix Tasks", "mix-tasks"}], else: [])
     }
   end
 
@@ -423,6 +423,7 @@ defmodule ExDoc.Formatter.HTML do
           ast =
             source
             |> Markdown.to_ast(opts)
+            |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3])
             |> sectionize(extension)
 
           {source, ast}
@@ -447,12 +448,10 @@ defmodule ExDoc.Formatter.HTML do
 
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
     source_url = source_url_pattern.(source_path, 1)
-
     search_data = normalize_search_data!(input_options[:search_data])
 
     %{
       source: source,
-      content: content_html,
       group: group,
       id: id,
       source_path: source_path,
@@ -460,7 +459,9 @@ defmodule ExDoc.Formatter.HTML do
       search_data: search_data,
       title: title,
       title_content: title_html || title,
-      headers: ExDoc.DocAST.extract_headers(ast, [:h2])
+      # TODO: Remove these fields but first we would need to make API reference return DocAST
+      content: content_html,
+      headers: ExDoc.DocAST.extract_headers_with_ids(ast, [:h2])
     }
   end
 
