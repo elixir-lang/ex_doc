@@ -83,25 +83,6 @@ defmodule ExDoc.DocASTTest do
       assert DocAST.to_string(ast) == ~s{<span><i></i>\n<i></i></span>}
     end
 
-    test "with fun" do
-      markdown = """
-      foo **bar** baz
-      """
-
-      ast = DocAST.parse!(markdown, "text/markdown")
-
-      f = fn
-        {:strong, _, _, _}, string ->
-          String.upcase(string)
-
-        _ast, string ->
-          string
-      end
-
-      assert DocAST.to_string(ast, f) ==
-               "<p>foo <STRONG>BAR</STRONG> baz</p>"
-    end
-
     test "void elements" do
       markdown = """
       foo\s\s

@@ -31,35 +31,32 @@ defmodule ExDoc.DocAST do
   @doc """
   Transform AST into string.
   """
-  def to_string(ast, fun \\ fn _ast, string -> string end)
+  def to_string(binary) do
+    IO.iodata_to_binary(to_iodata(binary))
+  end
 
-  def to_string(binary, _fun) when is_binary(binary) do
+  defp to_iodata(binary) when is_binary(binary) do
     ExDoc.Utils.h(binary)
   end
 
-  def to_string(list, fun) when is_list(list) do
-    result = Enum.map_join(list, "", &to_string(&1, fun))
-    fun.(list, result)
+  defp to_iodata(list) when is_list(list) do
+    Enum.map(list, &to_iodata/1)
   end
 
-  def to_string({:comment, _attrs, inner, _meta} = ast, fun) do
-    fun.(ast, "<!--#{inner}-->")
+  defp to_iodata({:comment, _attrs, inner, _meta}) do
+    ["<!--", inner, "-->"]
   end
 
-  def to_string({tag, attrs, _inner, _meta} = ast, fun) when tag in @void_elements do
-    result = "<#{tag}#{ast_attributes_to_string(attrs)}/>"
-    fun.(ast, result)
+  defp to_iodata({tag, attrs, _inner, _meta}) when tag in @void_elements do
+    "<#{tag}#{ast_attributes_to_string(attrs)}/>"
   end
 
-  def to_string({tag, attrs, inner, %{verbatim: true}} = ast, fun) do
-    inner = Enum.join(inner, "")
-    result = "<#{tag}#{ast_attributes_to_string(attrs)}>" <> inner <> "</#{tag}>"
-    fun.(ast, result)
+  defp to_iodata({tag, attrs, inner, %{verbatim: true}}) do
+    ["<#{tag}#{ast_attributes_to_string(attrs)}>", inner, "</#{tag}>"]
   end
 
-  def to_string({tag, attrs, inner, _meta} = ast, fun) do
-    result = "<#{tag}#{ast_attributes_to_string(attrs)}>" <> to_string(inner, fun) <> "</#{tag}>"
-    fun.(ast, result)
+  defp to_iodata({tag, attrs, inner, _meta}) do
+    ["<#{tag}#{ast_attributes_to_string(attrs)}>", to_iodata(inner), "</#{tag}>"]
   end
 
   defp ast_attributes_to_string(attrs) do
@@ -200,10 +197,6 @@ defmodule ExDoc.DocAST do
   defp pivot([head | tail], acc, headers), do: pivot(tail, [head | acc], headers)
   defp pivot([], acc, _headers), do: Enum.reverse(acc)
 
-  @doc """
-  Highlights a DocAST converted to string.
-  """
-  # TODO: Could this be done over the AST instead?
   def highlight(html, language, opts \\ []) do
     highlight_info = language.highlight_info()
 
