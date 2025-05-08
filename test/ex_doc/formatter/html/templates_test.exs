@@ -117,6 +117,23 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                Templates.footer_template(doc_config(context), nil)
     end
 
+    test "includes api reference", context do
+      names = [CompiledWithDocs]
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+      all = %{modules: nodes, tasks: []}
+
+      assert [
+               %{
+                 "group" => "",
+                 "headers" => [%{"anchor" => "modules", "id" => "Modules"}],
+                 "id" => "api-reference",
+                 "title" => "API Reference"
+               }
+             ] = create_sidebar_items(%{api_reference: true}, all, [])["extras"]
+
+      assert [] = create_sidebar_items(%{api_reference: false}, all, [])["extras"]
+    end
+
     test "outputs listing for the given nodes", context do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
@@ -143,7 +160,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  ]
                },
                %{"id" => "CompiledWithDocs.Nested"}
-             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
+             ] = create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
     end
 
     test "outputs deprecated: true if node is deprecated", context do
@@ -151,7 +168,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
 
       path = ["modules", Access.at!(0), "nodeGroups", Access.at!(0), "nodes"]
-      sidebar_functions = get_in(create_sidebar_items(%{modules: nodes}, []), path)
+
+      sidebar_functions =
+        get_in(create_sidebar_items(%{}, %{modules: nodes, tasks: []}, []), path)
 
       assert Enum.any?(
                sidebar_functions,
@@ -164,7 +183,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
 
       assert Enum.any?(
-               create_sidebar_items(%{modules: nodes}, [])["modules"],
+               create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"],
                &match?(%{"title" => "Warnings", "deprecated" => true}, &1)
              )
     end
@@ -214,7 +233,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  ]
                },
                %{"id" => "CompiledWithDocs.Nested"}
-             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
+             ] = create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
     end
 
     test "outputs module groups for the given nodes", context do
@@ -229,17 +248,16 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  "id" => "CompiledWithDocs",
                  "title" => "CompiledWithDocs"
                }
-             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
+             ] = create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
     end
 
     test "builds sections out of moduledocs", context do
       names = [CompiledWithDocs, CompiledWithoutDocs, DuplicateHeadings]
       config = doc_config(context)
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, config)
-      nodes = HTML.render_all(nodes, [], ".html", config, [])
 
       [compiled_with_docs, compiled_without_docs, duplicate_headings] =
-        create_sidebar_items(%{modules: nodes}, [])["modules"]
+        create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
 
       assert compiled_with_docs["sections"] == [
                %{
@@ -260,10 +278,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              ]
     end
 
-    defp create_sidebar_items(nodes_map, extras) do
+    defp create_sidebar_items(config, nodes_map, extras) do
       "sidebarNodes=" <> content =
-        nodes_map
-        |> Templates.create_sidebar_items(extras)
+        config
+        |> Templates.create_sidebar_items(nodes_map, extras)
         |> IO.iodata_to_binary()
 
       Jason.decode!(content)

@@ -57,4 +57,4 @@
   </section>
 <% end %>
 
-<%= footer_template(config, module) %>
+<%= footer_template(config, module.source_path) %>

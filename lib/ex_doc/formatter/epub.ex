@@ -63,7 +63,7 @@ defmodule ExDoc.Formatter.EPUB do
   defp generate_extras(config) do
     for {_title, extras} <- config.extras,
         node <- extras,
-        not is_map_key(node, :url) and node.extension != ".cheatmd" do
+        not is_map_key(node, :url) and node.type != :cheatmd do
       output = "#{config.output}/OEBPS/#{node.id}.xhtml"
       html = Templates.extra_template(config, node)
 

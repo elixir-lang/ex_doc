@@ -32,18 +32,11 @@ defmodule ExDoc.Formatter.HTML do
       tasks: filter_list(:task, project_nodes)
     }
 
-    # TODO: api reference should not be treated as an extra
-    extras =
-      if config.api_reference do
-        [build_api_reference(nodes_map, config) | extras]
-      else
-        extras
-      end
-
     all_files =
       search_data ++
         static_files ++
         generate_sidebar_items(nodes_map, extras, config) ++
+        generate_api_reference(nodes_map, config) ++
         generate_extras(extras, config) ++
         generate_favicon(@assets_dir, config) ++
         generate_logo(@assets_dir, config) ++
@@ -185,7 +178,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_sidebar_items(nodes_map, extras, config) do
-    content = Templates.create_sidebar_items(nodes_map, extras)
+    content = Templates.create_sidebar_items(config, nodes_map, extras)
 
     path = "dist/sidebar_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, path), content)
@@ -221,8 +214,7 @@ defmodule ExDoc.Formatter.HTML do
           next: next && %{path: "#{next.id}.html", title: next.title}
         }
 
-        extension = node.source_path && Path.extname(node.source_path)
-        html = Templates.extra_template(config, node, extra_type(extension), refs)
+        html = Templates.extra_template(config, node, refs)
 
         if File.regular?(output) do
           Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
@@ -307,24 +299,23 @@ defmodule ExDoc.Formatter.HTML do
     ]
   end
 
-  defp build_api_reference(nodes_map, config) do
-    api_reference = Templates.api_reference_template(nodes_map)
+  defp generate_api_reference(_nodes_map, %{api_reference: false}) do
+    []
+  end
 
-    title_content =
-      ~s{API Reference <small class="app-vsn">#{config.project} v#{config.version}</small>}
+  defp generate_api_reference(nodes_map, config) do
+    filename = "api-reference.html"
+    output = "#{config.output}/#{filename}"
+    config = set_canonical_url(config, filename)
 
-    %{
-      group: nil,
-      id: "api-reference",
-      source_path: nil,
-      source_url: config.source_url,
-      title: "API Reference",
-      title_content: title_content,
-      content: api_reference,
-      headers:
-        if(nodes_map.modules != [], do: [{:h2, "Modules", "modules"}], else: []) ++
-          if(nodes_map.tasks != [], do: [{:h2, "Mix Tasks", "mix-tasks"}], else: [])
-    }
+    html = Templates.api_reference_template(config, nodes_map)
+
+    if File.regular?(output) do
+      Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
+    end
+
+    File.write!(output, html)
+    [filename]
   end
 
   @doc """
@@ -441,16 +432,15 @@ defmodule ExDoc.Formatter.HTML do
 
     title_text = title_ast && ExDoc.DocAST.text(title_ast)
     title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
-
-    group = GroupMatcher.match_extra(groups, input)
     title = input_options[:title] || title_text || filename_to_title(input)
 
+    group = GroupMatcher.match_extra(groups, input)
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
     source_url = source_url_pattern.(source_path, 1)
     search_data = normalize_search_data!(input_options[:search_data])
 
     %{
-      extension: extension,
+      type: extra_type(extension),
       source: source,
       group: group,
       id: id,
@@ -459,9 +449,7 @@ defmodule ExDoc.Formatter.HTML do
       source_url: source_url,
       search_data: search_data,
       title: title,
-      title_content: title_html || title,
-      # Remove this field when API reference is no longer treated as an extra
-      headers: ExDoc.DocAST.extract_headers_with_ids(ast, [:h2])
+      title_content: title_html || title
     }
   end
 

@@ -46,14 +46,24 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
   """
-  def create_sidebar_items(nodes_map, extras) do
+  def create_sidebar_items(config, nodes_map, extras) do
     nodes =
       nodes_map
       |> Enum.map(&sidebar_module/1)
       |> Map.new()
-      |> Map.put(:extras, sidebar_extras(extras))
+      |> Map.put(:extras, api_reference(config, nodes_map) ++ sidebar_extras(extras))
 
     ["sidebarNodes=" | ExDoc.Utils.to_json(nodes)]
+  end
+
+  defp api_reference(%{api_reference: false}, _nodes_map), do: []
+
+  defp api_reference(_config, nodes_map) do
+    headers =
+      if(nodes_map.modules != [], do: [%{id: "Modules", anchor: "modules"}], else: []) ++
+        if(nodes_map.tasks != [], do: [%{id: "Mix Tasks", anchor: "mix-tasks"}], else: [])
+
+    [%{id: "api-reference", title: "API Reference", group: "", headers: headers}]
   end
 
   defp sidebar_extras(extras) do
@@ -73,14 +83,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
             end)
 
           item
-          |> Map.put(:headers, headers_to_id_and_anchors(extra.headers))
+          |> Map.put(:headers, headers(extra.doc))
           |> Map.put(:searchData, search_data)
 
         %{url: url} when is_binary(url) ->
           Map.put(item, :url, url)
 
         _ ->
-          Map.put(item, :headers, headers_to_id_and_anchors(extra.headers))
+          Map.put(item, :headers, headers(extra.doc))
       end
     end
   end
@@ -88,7 +98,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_module({id, modules}) do
     modules =
       for module <- modules do
-        extra =
+        groups =
           module
           |> module_summary()
           |> case do
@@ -96,18 +106,18 @@ defmodule ExDoc.Formatter.HTML.Templates do
             entries -> [nodeGroups: Enum.map(entries, &sidebar_entries/1)]
           end
 
-        sections = module_sections(module)
-
-        deprecated? = not is_nil(module.deprecated)
-
         pairs =
           for key <- [:id, :title, :nested_title, :nested_context],
               value = Map.get(module, key),
               do: {key, value}
 
-        pairs = [{:deprecated, deprecated?} | pairs]
+        others = [
+          deprecated: not is_nil(module.deprecated),
+          sections: headers(module.doc || []),
+          group: to_string(module.group)
+        ]
 
-        Map.new([group: to_string(module.group)] ++ extra ++ pairs ++ sections)
+        Map.new(groups ++ pairs ++ others)
       end
 
     {id, modules}
@@ -135,17 +145,10 @@ defmodule ExDoc.Formatter.HTML.Templates do
     %{key: text_to_id(group), name: group, nodes: nodes}
   end
 
-  defp module_sections(module) do
-    sections =
-      (module.doc || [])
-      |> ExDoc.DocAST.extract_headers_with_ids([:h2])
-      |> headers_to_id_and_anchors()
-
-    [sections: sections]
-  end
-
-  defp headers_to_id_and_anchors(headers) do
-    Enum.map(headers, fn {:h2, text, anchor} ->
+  defp headers(doc) do
+    doc
+    |> ExDoc.DocAST.extract_headers_with_ids([:h2])
+    |> Enum.map(fn {:h2, text, anchor} ->
       %{id: text, anchor: anchor}
     end)
   end
@@ -219,13 +222,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   templates = [
     detail_template: [:node, :module],
-    footer_template: [:config, :node],
+    footer_template: [:config, :source_path],
     head_template: [:config, :title, :noindex],
     module_template: [:config, :module, :summary],
     not_found_template: [:config],
     api_reference_entry_template: [:module_node],
-    api_reference_template: [:nodes_map],
-    extra_template: [:config, :node, :type, :refs],
+    api_reference_template: [:config, :nodes_map],
+    extra_template: [:config, :node, :refs],
     search_template: [:config],
     sidebar_template: [:config, :type],
     summary_template: [:name, :nodes],

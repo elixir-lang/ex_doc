@@ -6,7 +6,7 @@
 
             <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>">Hex Preview</a>
 
-            <%= source_path = node && Map.get(node, :source_path); if source_path do %>
+            <%= if source_path do %>
               (<a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>/show/<%= source_path %>">current file</a>)
             <% end %>
           </span>

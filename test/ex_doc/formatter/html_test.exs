@@ -854,15 +854,16 @@ defmodule ExDoc.Formatter.HTMLTest do
       generate_docs(
         doc_config(context,
           extras: [
+            "test/fixtures/ExtraPage.md",
             "test/fixtures/LICENSE",
             "test/fixtures/README.md"
           ]
         )
       )
 
-      # We have three extras: API Reference, LICENSE and README
+      # We have three extras: Extra Page, LICENSE and README
 
-      content_first = File.read!(tmp_dir <> "/html/api-reference.html")
+      content_first = File.read!(tmp_dir <> "/html/extrapage.html")
 
       refute content_first =~ ~r{Previous Page}
 
@@ -872,7 +873,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       content_middle = File.read!(tmp_dir <> "/html/license.html")
 
       assert content_middle =~
-               ~r{<a href="api-reference.html" class="bottom-actions-button" rel="prev">\s*<span class="subheader">\s*← Previous Page\s*</span>\s*<span class="title">\s*API Reference\s*</span>\s*</a>}
+               ~r{<a href="extrapage.html" class="bottom-actions-button" rel="prev">\s*<span class="subheader">\s*← Previous Page\s*</span>\s*<span class="title">\s*Extra Page Title\s*</span>\s*</a>}
 
       assert content_middle =~
                ~r{<a href="readme.html" class="bottom-actions-button" rel="next">\s*<span class="subheader">\s*Next Page →\s*</span>\s*<span class="title">\s*README\s*</span>\s*</a>}
