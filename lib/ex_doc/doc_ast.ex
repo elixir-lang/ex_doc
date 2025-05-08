@@ -183,16 +183,21 @@ defmodule ExDoc.DocAST do
   @doc """
   Returns text content from the given AST.
   """
-  def text(ast) do
+  def text(ast, joiner \\ "") do
     ast
-    |> do_text()
+    |> do_text(joiner)
     |> IO.iodata_to_binary()
     |> String.trim()
   end
 
-  defp do_text(ast) when is_list(ast), do: Enum.map(ast, &do_text/1)
-  defp do_text(ast) when is_binary(ast), do: ast
-  defp do_text({_tag, _attr, ast, _meta}), do: text(ast)
+  defp do_text(ast, joiner) when is_list(ast),
+    do: Enum.map_intersperse(ast, joiner, &do_text(&1, joiner))
+
+  defp do_text(ast, _joiner) when is_binary(ast),
+    do: ast
+
+  defp do_text({_tag, _attr, ast, _meta}, joiner),
+    do: do_text(ast, joiner)
 
   @doc """
   Wraps a list of HTML nodes into `<section>` tags whenever `headers` returns true.

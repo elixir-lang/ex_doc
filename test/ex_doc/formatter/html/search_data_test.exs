@@ -112,6 +112,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       erlc(c, :search_foo, """
       %% @doc
       %% Hello <em>world</em>.
+      %% Newline.
       -module(search_foo).
       """)
 
@@ -122,7 +123,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     assert item["ref"] == "search_foo.html"
     assert item["type"] == "module"
     assert item["title"] == "search_foo"
-    assert item["doc"] == "Hello world ."
+    assert item["doc"] == "Hello  world . Newline."
   end
 
   test "function", c do

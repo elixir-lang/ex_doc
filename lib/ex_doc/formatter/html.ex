@@ -22,7 +22,6 @@ defmodule ExDoc.Formatter.HTML do
     project_nodes = render_all(project_nodes, filtered_modules, ".html", config, [])
     extras = build_extras(config, ".html")
 
-    # Generate search early on without api reference in extras
     static_files = generate_assets(".", default_assets(config), config)
     search_data = generate_search_data(project_nodes, extras, config)
 
@@ -62,6 +61,7 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Autolinks and renders all docs.
   """
+  # TODO: Move this outside of the formatter
   def render_all(project_nodes, filtered_modules, ext, config, opts) do
     base = [
       apps: config.apps,
@@ -120,7 +120,7 @@ defmodule ExDoc.Formatter.HTML do
 
   defp render_doc(%{doc: doc} = node, language, autolink_opts, opts) do
     doc = autolink_and_highlight(doc, language, autolink_opts, opts)
-    %{node | doc: doc, rendered_doc: ExDoc.DocAST.to_string(doc)}
+    %{node | doc: doc}
   end
 
   defp id(%{id: mod_id}, %{id: "c:" <> id}) do

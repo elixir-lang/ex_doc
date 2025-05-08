@@ -51,7 +51,6 @@ defmodule ExDoc.Retriever.ElixirTest do
                group: "Functions",
                id: "function/0",
                name: :function,
-               rendered_doc: nil,
                signature: "function()",
                source_url: nil,
                specs: [spec],
