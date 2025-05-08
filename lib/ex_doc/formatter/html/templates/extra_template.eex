@@ -26,7 +26,11 @@
     </div>
   <% end %>
 
-  <%= node[:content] || render_doc(node.doc) %>
+  <%= if type == :cheatmd do %>
+    <%= node.doc |> ExDoc.DocAST.sectionize([:h2, :h3]) |> render_doc() %>
+  <% else %>
+    <%= node[:content] || render_doc(node.doc) %>
+  <% end %>
 </div>
 
 <div class="bottom-actions" id="bottom-actions">

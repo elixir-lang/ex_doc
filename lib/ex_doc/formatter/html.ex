@@ -410,12 +410,12 @@ defmodule ExDoc.Formatter.HTML do
     source_file = input_options[:source] || input
     opts = [file: source_file, line: 1]
 
-    {source, ast} =
+    {extension, source, ast} =
       case extension_name(input) do
         extension when extension in ["", ".txt"] ->
           source = File.read!(input)
           ast = [{:pre, [], ["\n" <> source], %{}}]
-          {source, ast}
+          {extension, source, ast}
 
         extension when extension in [".md", ".livemd", ".cheatmd"] ->
           source = File.read!(input)
@@ -424,10 +424,9 @@ defmodule ExDoc.Formatter.HTML do
             source
             |> Markdown.to_ast(opts)
             |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3])
-            |> sectionize(extension)
             |> autolink_and_highlight(language, [file: input] ++ autolink_opts, opts)
 
-          {source, ast}
+          {extension, source, ast}
 
         _ ->
           raise ArgumentError,
@@ -451,6 +450,7 @@ defmodule ExDoc.Formatter.HTML do
     search_data = normalize_search_data!(input_options[:search_data])
 
     %{
+      extension: extension,
       source: source,
       group: group,
       id: id,
@@ -490,12 +490,6 @@ defmodule ExDoc.Formatter.HTML do
     |> Path.extname()
     |> String.downcase()
   end
-
-  defp sectionize(ast, ".cheatmd") do
-    ExDoc.DocAST.sectionize(ast, [:h2, :h3])
-  end
-
-  defp sectionize(ast, _), do: ast
 
   defp filename_to_title(input) do
     input |> Path.basename() |> Path.rootname()
