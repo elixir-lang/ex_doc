@@ -9,6 +9,9 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   alias ExDoc.Formatter.HTML.Templates, as: H
   alias ExDoc.Formatter.EPUB.Assets
 
+  # The actual rendering happens here
+  defp render_doc(ast), do: ast && ExDoc.DocAST.to_string(ast)
+
   @doc """
   Generate content from the module template for a given `node`
   """
@@ -76,7 +79,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :def,
     :extra_template,
     Path.expand("templates/extra_template.eex", __DIR__),
-    [:config, :title, :title_content, :content],
+    [:config, :node],
     trim: true
   )
 

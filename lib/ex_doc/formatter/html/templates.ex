@@ -172,94 +172,49 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:livemd), do: "extras"
   defp sidebar_type(:extra), do: "extras"
 
-  # TODO: Adding the link headings must be done via DocAST instead of using regexes.
+  @section_header_class_name "section-heading"
 
   @doc """
-  Add link headings for the given `content`.
+  Renders the document in the page.
 
-  IDs are prefixed with `prefix`.
-
-  We only link `h2` and `h3` headers. This is kept consistent in ExDoc.SearchData.
+  For now it enriches the document by adding fancy anchors
+  around h2 and h3 tags with IDs.
   """
-  @spec link_headings(String.t() | nil, String.t()) :: String.t() | nil
-  def link_headings(content, prefix \\ "")
-  def link_headings(nil, _), do: nil
+  def render_doc(nil), do: ""
 
-  def link_headings(content, prefix) do
-    ~r/<(h[23]).*?>(.*?)<\/\1>/m
-    |> Regex.scan(content)
-    |> Enum.reduce({content, %{}}, fn [match, tag, title], {content, occurrences} ->
-      possible_id = title |> ExDoc.Utils.strip_tags() |> text_to_id()
-      id_occurred = Map.get(occurrences, possible_id, 0)
+  def render_doc(ast) do
+    ast
+    |> add_fancy_anchors()
+    |> ExDoc.DocAST.to_string()
+  end
 
-      anchor_id = if id_occurred >= 1, do: "#{possible_id}-#{id_occurred}", else: possible_id
-      replacement = link_heading(match, tag, title, anchor_id, prefix)
-      linked_content = String.replace(content, match, replacement, global: false)
-      incremented_occs = Map.put(occurrences, possible_id, id_occurred + 1)
-      {linked_content, incremented_occs}
+  defp add_fancy_anchors(ast) do
+    ExDoc.DocAST.map_tags(ast, fn
+      {tag, attrs, inner, meta} = ast when tag in [:h2, :h3] ->
+        if id = Keyword.get(attrs, :id) do
+          attrs =
+            Keyword.update(
+              attrs,
+              :class,
+              @section_header_class_name,
+              &(&1 <> " " <> @section_header_class_name)
+            )
+
+          {tag, attrs,
+           [
+             {:a, [href: "##{id}", class: "hover-link"],
+              [
+                {:i, [class: "ri-link-m", "aria-hidden": "true"], [], %{}}
+              ], %{}},
+             {:span, [class: "text"], inner, %{}}
+           ], meta}
+        else
+          ast
+        end
+
+      ast ->
+        ast
     end)
-    |> elem(0)
-  end
-
-  @class_separator " "
-  defp link_heading(match, _tag, _title, "", _prefix), do: match
-
-  defp link_heading(match, tag, title, id, prefix) do
-    section_header_class_name = "section-heading"
-
-    # NOTE: This addition is mainly to preserve the previous `class` attributes
-    # from the headers, in case there is one. Now with the _admonition_ text
-    # block, we inject CSS classes. So far, the supported classes are:
-    # `warning`, `info`, `error`, and `neutral`.
-    #
-    # The Markdown syntax that we support for the admonition text
-    # blocks is something like this:
-    #
-    #     > ### Never open this door! {: .warning}
-    #     >
-    #     > ...
-    #
-    # That should produce the following HTML:
-    #
-    #      <blockquote>
-    #        <h3 class="warning">Never open this door!</h3>
-    #        <p>...</p>
-    #      </blockquote>
-    #
-    # The original implementation discarded the previous CSS classes. Instead,
-    # it was setting `#{section_header_class_name}` as the only CSS class
-    # associated with the given header.
-    class_attribute =
-      case Regex.named_captures(~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/, match) do
-        %{"class" => ""} ->
-          section_header_class_name
-
-        %{"class" => previous_classes} ->
-          # Let's make sure that the `section_header_class_name` is not already
-          # included in the previous classes for the header
-          previous_classes
-          |> String.split(@class_separator)
-          |> Enum.reject(&(&1 == section_header_class_name))
-          |> Enum.join(@class_separator)
-          |> Kernel.<>(" #{section_header_class_name}")
-      end
-
-    """
-    <#{tag} id="#{prefix}#{id}" class="#{class_attribute}">
-      <a href="##{prefix}#{id}" class="hover-link">
-        <i class="ri-link-m" aria-hidden="true"></i>
-      </a>
-      <span class="text">#{title}</span>
-    </#{tag}>
-    """
-  end
-
-  def link_moduledoc_headings(content) do
-    link_headings(content, "module-")
-  end
-
-  def link_detail_headings(content, prefix) do
-    link_headings(content, prefix <> "-")
   end
 
   templates = [

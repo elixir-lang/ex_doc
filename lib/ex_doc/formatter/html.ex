@@ -32,6 +32,7 @@ defmodule ExDoc.Formatter.HTML do
       tasks: filter_list(:task, project_nodes)
     }
 
+    # TODO: api reference should not be treated as an extra
     extras =
       if config.api_reference do
         [build_api_reference(nodes_map, config) | extras]
@@ -125,8 +126,8 @@ defmodule ExDoc.Formatter.HTML do
     do: node
 
   defp render_doc(%{doc: doc} = node, language, autolink_opts, opts) do
-    rendered = autolink_and_render(doc, language, autolink_opts, opts)
-    %{node | rendered_doc: rendered}
+    doc = autolink_and_highlight(doc, language, autolink_opts, opts)
+    %{node | doc: doc, rendered_doc: ExDoc.DocAST.to_string(doc)}
   end
 
   defp id(%{id: mod_id}, %{id: "c:" <> id}) do
@@ -141,11 +142,10 @@ defmodule ExDoc.Formatter.HTML do
     mod_id <> "." <> id
   end
 
-  defp autolink_and_render(doc, language, autolink_opts, opts) do
+  defp autolink_and_highlight(doc, language, autolink_opts, opts) do
     doc
     |> language.autolink_doc(autolink_opts)
     |> ExDoc.DocAST.highlight(language, opts)
-    |> ExDoc.DocAST.to_string()
   end
 
   defp output_setup(build, config) do
@@ -314,13 +314,13 @@ defmodule ExDoc.Formatter.HTML do
       ~s{API Reference <small class="app-vsn">#{config.project} v#{config.version}</small>}
 
     %{
-      content: api_reference,
       group: nil,
       id: "api-reference",
       source_path: nil,
       source_url: config.source_url,
       title: "API Reference",
       title_content: title_content,
+      content: api_reference,
       headers:
         if(nodes_map.modules != [], do: [{:h2, "Modules", "modules"}], else: []) ++
           if(nodes_map.tasks != [], do: [{:h2, "Mix Tasks", "mix-tasks"}], else: [])
@@ -425,6 +425,7 @@ defmodule ExDoc.Formatter.HTML do
             |> Markdown.to_ast(opts)
             |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3])
             |> sectionize(extension)
+            |> autolink_and_highlight(language, [file: input] ++ autolink_opts, opts)
 
           {source, ast}
 
@@ -441,7 +442,6 @@ defmodule ExDoc.Formatter.HTML do
 
     title_text = title_ast && ExDoc.DocAST.text(title_ast)
     title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
-    content_html = autolink_and_render(ast, language, [file: input] ++ autolink_opts, opts)
 
     group = GroupMatcher.match_extra(groups, input)
     title = input_options[:title] || title_text || filename_to_title(input)
@@ -454,13 +454,13 @@ defmodule ExDoc.Formatter.HTML do
       source: source,
       group: group,
       id: id,
+      doc: ast,
       source_path: source_path,
       source_url: source_url,
       search_data: search_data,
       title: title,
       title_content: title_html || title,
-      # TODO: Remove these fields but first we would need to make API reference return DocAST
-      content: content_html,
+      # Remove this field when API reference is no longer treated as an extra
       headers: ExDoc.DocAST.extract_headers_with_ids(ast, [:h2])
     }
   end

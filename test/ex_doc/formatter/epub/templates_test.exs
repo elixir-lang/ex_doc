@@ -108,10 +108,10 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~s{<h1 class="section-heading">Summary</h1>}
 
       assert content =~
-               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*Example.*</h2>}ms
+               ~r{<h2 id="module-example-unicode-escaping">.*Example.*</h2>}ms
 
       assert content =~
-               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*Example H3 heading.*</h3>}ms
+               ~r{<h3 id="module-example-h3-heading">.*Example H3 heading.*</h3>}ms
 
       assert content =~
                ~r{moduledoc.*Example.*<samp class="nc">CompiledWithDocs</samp><samp class="o">\.</samp><samp class="n">example</samp>.*}ms

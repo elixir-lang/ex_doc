@@ -177,7 +177,7 @@ defmodule ExDoc.Retriever do
     nil
   end
 
-  # TODO: Consider perhaps moving auto-linking here.
+  # TODO: Consider moving auto-linking here.
   defp normalize_doc_ast(doc_ast, prefix) do
     doc_ast
     |> DocAST.add_ids_to_headers([:h2, :h3], prefix)

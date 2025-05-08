@@ -41,123 +41,31 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     :ok
   end
 
-  describe "link_headings" do
-    test "generates headers with hovers" do
-      assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """
-             <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h2>
-             <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Bar</span>
-             </h2>
+  describe "render_doc" do
+    test "adds fancy anchors around ids" do
+      assert """
+             ## Foo
+
+             ### Bar {:class=wrap}
              """
-
-      assert Templates.link_headings("<h2>Foo</h2>\n<h2>Bar</h2>") == """
-             <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h2>
-
-             <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Bar</span>
-             </h2>
-             """
-
-      assert Templates.link_headings("<h2></h2><h2>Bar</h2>") == """
-             <h2></h2><h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Bar</span>
-             </h2>
-             """
-
-      assert Templates.link_headings("<h2></h2>\n<h2>Bar</h2>") == """
-             <h2></h2>
-             <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Bar</span>
-             </h2>
-             """
-
-      assert Templates.link_headings("<h2>Foo</h2><h2></h2>") ==
-               String.trim_trailing("""
+             |> ExDoc.DocAST.parse!("text/markdown")
+             |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3])
+             |> Templates.render_doc() ==
+               """
                <h2 id="foo" class="section-heading">
                  <a href="#foo" class="hover-link">
                    <i class="ri-link-m" aria-hidden="true"></i>
                  </a>
                  <span class="text">Foo</span>
                </h2>
-               <h2></h2>
-               """)
-
-      assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") ==
-               String.trim_trailing("""
-               <h2 id="foo" class="section-heading">
-                 <a href="#foo" class="hover-link">
+               <h3 id="bar" class="wrap section-heading">
+                 <a href="#bar" class="hover-link">
                    <i class="ri-link-m" aria-hidden="true"></i>
                  </a>
-                 <span class="text">Foo</span>
-               </h2>
-
-               <h2></h2>
-               """)
-
-      assert Templates.link_headings("<h3>Foo</h3>") == """
-             <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h3>
-             """
-    end
-
-    test "generates headers with unique id's" do
-      assert Templates.link_headings("<h3>Foo</h3>\n<h3>Foo</h3>") == """
-             <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h3>
-
-             <h3 id="foo-1" class="section-heading">
-               <a href="#foo-1" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h3>
-             """
-    end
-
-    test "generates headers for admonition support" do
-      admonition_block = """
-      <blockquote><h3 class="warning">Foo</h3></blockquote>
-      """
-
-      assert Templates.link_headings(admonition_block) == """
-             <blockquote><h3 id="foo" class="warning section-heading">
-               <a href="#foo" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h3>
-             </blockquote>
-             """
+                 <span class="text">Bar</span>
+               </h3>
+               """
+               |> String.replace(~r/\n\s*/, "")
     end
   end
 
