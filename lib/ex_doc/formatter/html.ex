@@ -414,7 +414,7 @@ defmodule ExDoc.Formatter.HTML do
       case extension_name(input) do
         extension when extension in ["", ".txt"] ->
           source = File.read!(input)
-          ast = [{:pre, [], "\n" <> source, %{}}]
+          ast = [{:pre, [], ["\n" <> source], %{}}]
           {source, ast}
 
         extension when extension in [".md", ".livemd", ".cheatmd"] ->

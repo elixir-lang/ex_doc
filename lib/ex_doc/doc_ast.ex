@@ -123,6 +123,43 @@ defmodule ExDoc.DocAST do
   end
 
   @doc """
+  Extracts the headers which have anchors (aka ids) in them.
+  """
+  def extract_headers_with_ids(ast, headers) do
+    ast
+    |> reduce_tags([], fn {tag, attrs, inner, _}, acc ->
+      with true <- tag in headers,
+           id = Keyword.get(attrs, :id, ""),
+           text = ExDoc.DocAST.text(inner),
+           true <- id != "" and text != "" do
+        [{tag, text, id} | acc]
+      else
+        _ -> acc
+      end
+    end)
+    |> Enum.reverse()
+  end
+
+  @doc """
+  Adds an id attribute to the given headers.
+  """
+  def add_ids_to_headers(doc_ast, headers) do
+    doc_ast
+    |> map_reduce_tags(%{}, fn {tag, attrs, inner, meta} = ast, seen ->
+      if tag in headers and not Keyword.has_key?(attrs, :id) do
+        possible_id = inner |> text() |> ExDoc.Utils.text_to_id()
+        id_count = Map.get(seen, possible_id, 0)
+        actual_id = if id_count >= 1, do: "#{possible_id}-#{id_count}", else: possible_id
+        seen = Map.put(seen, possible_id, id_count + 1)
+        {{tag, [id: actual_id] ++ attrs, inner, meta}, seen}
+      else
+        {ast, seen}
+      end
+    end)
+    |> elem(0)
+  end
+
+  @doc """
   Compute a synopsis from a document by looking at its first paragraph.
   """
   def synopsis({:p, _attrs, [_ | _] = inner, meta}) do
@@ -144,14 +181,11 @@ defmodule ExDoc.DocAST do
   @doc """
   Remove ids from elements.
   """
-  def remove_ids({tag, attrs, inner, meta}),
-    do: {tag, Keyword.delete(attrs, :href), remove_ids(inner), meta}
-
-  def remove_ids(list) when is_list(list),
-    do: Enum.map(list, &remove_ids/1)
-
-  def remove_ids(other),
-    do: other
+  def remove_ids(ast) do
+    map_tags(ast, fn {tag, attrs, inner, meta} ->
+      {tag, Keyword.delete(attrs, :href), inner, meta}
+    end)
+  end
 
   @doc """
   Returns text content from the given AST.
@@ -199,57 +233,52 @@ defmodule ExDoc.DocAST do
   defp pivot([head | tail], acc, headers), do: pivot(tail, [head | acc], headers)
   defp pivot([], acc, _headers), do: Enum.reverse(acc)
 
-  def highlight(html, language, opts \\ []) do
-    do_highlight(html, language.highlight_info(), opts)
-  end
+  @doc """
+  Highlights the code blocks in the AST.
+  """
+  def highlight(ast, language, opts \\ []) do
+    highlight_info = language.highlight_info()
 
-  defp do_highlight(
-         {:pre, pre_attrs, [{:code, code_attrs, [code], code_meta}], pre_meta} = ast,
-         highlight_info,
-         opts
-       )
-       when is_binary(code) do
-    {lang, code_attrs} = Keyword.pop(code_attrs, :class, "")
+    map_tags(ast, fn
+      {:pre, pre_attrs, [{:code, code_attrs, [code], code_meta}], pre_meta} = ast
+      when is_binary(code) ->
+        {lang, code_attrs} = Keyword.pop(code_attrs, :class, "")
 
-    case pick_language_and_lexer(lang, highlight_info, code) do
-      {_lang, nil, _lexer_opts} ->
-        ast
-
-      {lang, lexer, lexer_opts} ->
-        try do
-          Makeup.highlight_inner_html(code,
-            lexer: lexer,
-            lexer_options: lexer_opts,
-            formatter_options: opts
-          )
-        rescue
-          exception ->
-            ExDoc.Utils.warn(
-              [
-                "crashed while highlighting #{lang} snippet:\n\n",
-                ExDoc.DocAST.to_string(ast),
-                "\n\n",
-                Exception.format_banner(:error, exception, __STACKTRACE__)
-              ],
-              __STACKTRACE__
-            )
-
+        case pick_language_and_lexer(lang, highlight_info, code) do
+          {_lang, nil, _lexer_opts} ->
             ast
-        else
-          highlighted ->
-            code_attrs = [class: "makeup #{lang}", translate: "no"] ++ code_attrs
-            code_meta = Map.put(code_meta, :verbatim, true)
-            {:pre, pre_attrs, [{:code, code_attrs, [highlighted], code_meta}], pre_meta}
+
+          {lang, lexer, lexer_opts} ->
+            try do
+              Makeup.highlight_inner_html(code,
+                lexer: lexer,
+                lexer_options: lexer_opts,
+                formatter_options: opts
+              )
+            rescue
+              exception ->
+                ExDoc.Utils.warn(
+                  [
+                    "crashed while highlighting #{lang} snippet:\n\n",
+                    ExDoc.DocAST.to_string(ast),
+                    "\n\n",
+                    Exception.format_banner(:error, exception, __STACKTRACE__)
+                  ],
+                  __STACKTRACE__
+                )
+
+                ast
+            else
+              highlighted ->
+                code_attrs = [class: "makeup #{lang}", translate: "no"] ++ code_attrs
+                code_meta = Map.put(code_meta, :verbatim, true)
+                {:pre, pre_attrs, [{:code, code_attrs, [highlighted], code_meta}], pre_meta}
+            end
         end
-    end
-  end
 
-  defp do_highlight(list, highlight_info, opts) when is_list(list) do
-    Enum.map(list, &do_highlight(&1, highlight_info, opts))
-  end
-
-  defp do_highlight(other, _highlight_info, _opts) do
-    other
+      ast ->
+        ast
+    end)
   end
 
   defp pick_language_and_lexer("", _highlight_info, "$ " <> _) do
@@ -270,4 +299,44 @@ defmodule ExDoc.DocAST do
       :error -> {lang, nil, []}
     end
   end
+
+  ## Traversal helpers
+
+  @doc """
+  Maps the tags in the AST, first mapping children tags, then the tag itself.
+  """
+  def map_tags({tag, attrs, inner, meta}, fun),
+    do: fun.({tag, attrs, Enum.map(inner, &map_tags(&1, fun)), meta})
+
+  def map_tags(list, fun) when is_list(list),
+    do: Enum.map(list, &map_tags(&1, fun))
+
+  def map_tags(other, _fun),
+    do: other
+
+  @doc """
+  Reduces the tags in the AST, first reducing children tags, then the tag itself.
+  """
+  def reduce_tags({tag, attrs, inner, meta}, acc, fun),
+    do: fun.({tag, attrs, inner, meta}, Enum.reduce(inner, acc, &reduce_tags(&1, &2, fun)))
+
+  def reduce_tags(list, acc, fun) when is_list(list),
+    do: Enum.reduce(list, acc, &reduce_tags(&1, &2, fun))
+
+  def reduce_tags(_other, acc, _fun),
+    do: acc
+
+  @doc """
+  Map-reduces the tags in the AST, first mapping children tags, then the tag itself.
+  """
+  def map_reduce_tags({tag, attrs, inner, meta}, acc, fun) do
+    {inner, acc} = Enum.map_reduce(inner, acc, &map_reduce_tags(&1, &2, fun))
+    fun.({tag, attrs, inner, meta}, acc)
+  end
+
+  def map_reduce_tags(list, acc, fun) when is_list(list),
+    do: Enum.map_reduce(list, acc, &map_reduce_tags(&1, &2, fun))
+
+  def map_reduce_tags(other, acc, _fun),
+    do: {other, acc}
 end

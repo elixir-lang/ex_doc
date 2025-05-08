@@ -126,8 +126,8 @@ defmodule ExDoc.DocASTTest do
 
     defp synopsis(markdown) do
       markdown
-      |> ExDoc.DocAST.parse!("text/markdown")
-      |> ExDoc.DocAST.synopsis()
+      |> DocAST.parse!("text/markdown")
+      |> DocAST.synopsis()
     end
   end
 
@@ -151,8 +151,36 @@ defmodule ExDoc.DocASTTest do
 
     defp extract_headers(markdown) do
       markdown
-      |> ExDoc.DocAST.parse!("text/markdown")
-      |> ExDoc.DocAST.extract_headers([:h2])
+      |> DocAST.parse!("text/markdown")
+      |> DocAST.extract_headers([:h2])
+    end
+  end
+
+  describe "headers" do
+    test "adds and extracts anchored headers" do
+      assert """
+             # h1
+
+             ## h2
+
+             ### h3 repeat
+
+             ## h2 > h3
+
+             ### h3 repeat
+
+             > ## inside `blockquote`
+             """
+             |> DocAST.parse!("text/markdown")
+             |> DocAST.add_ids_to_headers([:h2, :h3])
+             |> DocAST.extract_headers_with_ids([:h2, :h3]) ==
+               [
+                 {:h2, "h2", "h2"},
+                 {:h3, "h3 repeat", "h3-repeat"},
+                 {:h2, "h2 > h3", "h2-h3"},
+                 {:h3, "h3 repeat", "h3-repeat-1"},
+                 {:h2, "inside blockquote", "inside-blockquote"}
+               ]
     end
   end
 
@@ -196,35 +224,55 @@ defmodule ExDoc.DocASTTest do
              ```
              """) =~
                ~r{<pre><code class=\"makeup shell\" translate="no"><span class="gp unselectable">\$.*}
+
+      # Nested in another element
+      assert highlight("""
+             > ```elixir
+             > hello
+             > ```
+             """) =~
+               ~r{<blockquote><pre><code class=\"makeup elixir\" translate="no">.*}
     end
 
     defp highlight(markdown) do
       markdown
-      |> ExDoc.DocAST.parse!("text/markdown")
-      |> ExDoc.DocAST.highlight(ExDoc.Language.Elixir)
-      |> ExDoc.DocAST.to_string()
+      |> DocAST.parse!("text/markdown")
+      |> DocAST.highlight(ExDoc.Language.Elixir)
+      |> DocAST.to_string()
     end
   end
 
   describe "sectionize" do
     test "sectioninize" do
-      list = [
-        {:h1, [], ["H1"], %{}},
-        {:h2, [class: "example"], ["H2-1"], %{}},
-        {:p, [], ["p1"], %{}},
-        {:h3, [], ["H3-1"], %{}},
-        {:p, [], ["p2"], %{}},
-        {:h3, [], ["H3-2"], %{}},
-        {:p, [], ["p3"], %{}},
-        {:h3, [], ["H3-3"], %{}},
-        {:p, [], ["p4"], %{}},
-        {:h2, [], ["H2-2"], %{}},
-        {:p, [], ["p5"], %{}},
-        {:h3, [class: "last"], ["H3-1"], %{}},
-        {:p, [], ["p6"], %{}}
-      ]
+      assert """
+             # H1
 
-      assert DocAST.sectionize(list, [:h2, :h3]) ==
+             ## H2-1 {:class="example"}
+
+             p1
+
+             ### H3-1
+
+             p2
+
+             ### H3-2
+
+             p3
+
+             ### H3-3
+
+             p4
+
+             ## H2-2
+
+             p5
+
+             ### H3-1 {:class="last"}
+
+             p6
+             """
+             |> DocAST.parse!("text/markdown")
+             |> DocAST.sectionize([:h2, :h3]) ==
                [
                  {:h1, [], ["H1"], %{}},
                  {:section, [class: "h2 example"],
