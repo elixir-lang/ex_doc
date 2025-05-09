@@ -32,20 +32,23 @@ defmodule ExDoc.Formatter.HTML do
     }
 
     all_files =
-      search_data ++
-        static_files ++
-        generate_sidebar_items(nodes_map, extras, config) ++
-        generate_api_reference(nodes_map, config) ++
-        generate_extras(extras, config) ++
-        generate_favicon(@assets_dir, config) ++
-        generate_logo(@assets_dir, config) ++
-        generate_search(config) ++
-        generate_not_found(config) ++
-        generate_list(nodes_map.modules, config) ++
-        generate_list(nodes_map.tasks, config) ++
-        generate_redirects(config, ".html")
+      (search_data ++
+         static_files ++
+         generate_sidebar_items(nodes_map, extras, config) ++
+         generate_api_reference(nodes_map, config) ++
+         generate_extras(extras, config) ++
+         generate_favicon(@assets_dir, config) ++
+         generate_logo(@assets_dir, config) ++
+         generate_search(config) ++
+         generate_not_found(config) ++
+         generate_list(nodes_map.modules, config) ++
+         generate_list(nodes_map.tasks, config) ++
+         generate_redirects(config, ".html"))
+      |> Enum.uniq()
+      |> Kernel.--([@assets_dir])
+      |> Enum.sort()
 
-    generate_build(Enum.sort(all_files), build)
+    generate_build(all_files, build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
   end
 
