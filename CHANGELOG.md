@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.38.0 (2025-05-09)
+
+  * Enhancements
+    * Allow listing outside URLs in extras
+
+  * Bug fixes
+    * Ensure some cases where `<`, `>`, `&` and in headers would appear as entities in the sidebar
+    * Fix outline caused by swup.js on Webkit based browsers
+    * Fix bugs when computing synopsis
+    * Automatically close the sidebar when navigating sections on mobile
+
 ## v0.37.3 (2025-03-06)
 
   * Bug fixes
