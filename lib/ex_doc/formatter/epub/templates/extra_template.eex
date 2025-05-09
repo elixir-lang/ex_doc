@@ -1,8 +1,6 @@
-<%= head_template(config, title) %>
-    <h1 id="content">
-      <%=h title_content %>
-    </h1>
-    <%= H.link_headings(content) %>
+<%= head_template(config, node.title) %>
+    <h1 id="content"><%= ExDoc.DocAST.to_string(node.title_doc) %></h1>
+    <%= render_doc(node.doc) %>
     <%= before_closing_body_tag(config, :epub) %>
   </body>
 </html>

@@ -102,7 +102,6 @@ defmodule ExDoc.Utils do
 
   def text_to_id(text) when is_binary(text) do
     text
-    |> strip_tags()
     |> String.replace(~r/&#\d+;/, "")
     |> String.replace(~r/&[A-Za-z0-9]+;/, "")
     |> String.replace(~r/\W+/u, "-")

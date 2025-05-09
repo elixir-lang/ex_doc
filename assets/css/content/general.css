@@ -205,9 +205,10 @@
 .content-inner .section-heading i {
   font-size: var(--icon-size);
   color: var(--mainLight);
-  margin-top: 0.1em;
+  top: -2px;
   margin-left: calc(-1 * (var(--icon-size) + var(--icon-spacing)));
   padding-right: var(--icon-spacing);
+  position: relative;
   opacity: 0;
 }
 

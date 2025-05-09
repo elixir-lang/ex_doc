@@ -41,123 +41,31 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     :ok
   end
 
-  describe "link_headings" do
-    test "generates headers with hovers" do
-      assert Templates.link_headings("<h2>Foo</h2><h2>Bar</h2>") == """
-             <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h2>
-             <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Bar</span>
-             </h2>
+  describe "render_doc" do
+    test "adds fancy anchors around ids" do
+      assert """
+             ## Foo
+
+             ### Bar {:class=wrap}
              """
-
-      assert Templates.link_headings("<h2>Foo</h2>\n<h2>Bar</h2>") == """
-             <h2 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h2>
-
-             <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Bar</span>
-             </h2>
-             """
-
-      assert Templates.link_headings("<h2></h2><h2>Bar</h2>") == """
-             <h2></h2><h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Bar</span>
-             </h2>
-             """
-
-      assert Templates.link_headings("<h2></h2>\n<h2>Bar</h2>") == """
-             <h2></h2>
-             <h2 id="bar" class="section-heading">
-               <a href="#bar" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Bar</span>
-             </h2>
-             """
-
-      assert Templates.link_headings("<h2>Foo</h2><h2></h2>") ==
-               String.trim_trailing("""
+             |> ExDoc.DocAST.parse!("text/markdown")
+             |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3])
+             |> Templates.render_doc() ==
+               """
                <h2 id="foo" class="section-heading">
                  <a href="#foo" class="hover-link">
                    <i class="ri-link-m" aria-hidden="true"></i>
                  </a>
                  <span class="text">Foo</span>
                </h2>
-               <h2></h2>
-               """)
-
-      assert Templates.link_headings("<h2>Foo</h2>\n<h2></h2>") ==
-               String.trim_trailing("""
-               <h2 id="foo" class="section-heading">
-                 <a href="#foo" class="hover-link">
+               <h3 id="bar" class="wrap section-heading">
+                 <a href="#bar" class="hover-link">
                    <i class="ri-link-m" aria-hidden="true"></i>
                  </a>
-                 <span class="text">Foo</span>
-               </h2>
-
-               <h2></h2>
-               """)
-
-      assert Templates.link_headings("<h3>Foo</h3>") == """
-             <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h3>
-             """
-    end
-
-    test "generates headers with unique id's" do
-      assert Templates.link_headings("<h3>Foo</h3>\n<h3>Foo</h3>") == """
-             <h3 id="foo" class="section-heading">
-               <a href="#foo" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h3>
-
-             <h3 id="foo-1" class="section-heading">
-               <a href="#foo-1" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h3>
-             """
-    end
-
-    test "generates headers for admonition support" do
-      admonition_block = """
-      <blockquote><h3 class="warning">Foo</h3></blockquote>
-      """
-
-      assert Templates.link_headings(admonition_block) == """
-             <blockquote><h3 id="foo" class="warning section-heading">
-               <a href="#foo" class="hover-link">
-                 <i class="ri-link-m" aria-hidden="true"></i>
-               </a>
-               <span class="text">Foo</span>
-             </h3>
-             </blockquote>
-             """
+                 <span class="text">Bar</span>
+               </h3>
+               """
+               |> String.replace(~r/\n\s*/, "")
     end
   end
 
@@ -209,6 +117,23 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                Templates.footer_template(doc_config(context), nil)
     end
 
+    test "includes api reference", context do
+      names = [CompiledWithDocs]
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+      all = %{modules: nodes, tasks: []}
+
+      assert [
+               %{
+                 "group" => "",
+                 "headers" => [%{"anchor" => "modules", "id" => "Modules"}],
+                 "id" => "api-reference",
+                 "title" => "API Reference"
+               }
+             ] = create_sidebar_items(%{api_reference: true}, all, [])["extras"]
+
+      assert [] = create_sidebar_items(%{api_reference: false}, all, [])["extras"]
+    end
+
     test "outputs listing for the given nodes", context do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
@@ -235,7 +160,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  ]
                },
                %{"id" => "CompiledWithDocs.Nested"}
-             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
+             ] = create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
     end
 
     test "outputs deprecated: true if node is deprecated", context do
@@ -243,7 +168,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
 
       path = ["modules", Access.at!(0), "nodeGroups", Access.at!(0), "nodes"]
-      sidebar_functions = get_in(create_sidebar_items(%{modules: nodes}, []), path)
+
+      sidebar_functions =
+        get_in(create_sidebar_items(%{}, %{modules: nodes, tasks: []}, []), path)
 
       assert Enum.any?(
                sidebar_functions,
@@ -256,7 +183,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
 
       assert Enum.any?(
-               create_sidebar_items(%{modules: nodes}, [])["modules"],
+               create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"],
                &match?(%{"title" => "Warnings", "deprecated" => true}, &1)
              )
     end
@@ -306,7 +233,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  ]
                },
                %{"id" => "CompiledWithDocs.Nested"}
-             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
+             ] = create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
     end
 
     test "outputs module groups for the given nodes", context do
@@ -321,66 +248,21 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  "id" => "CompiledWithDocs",
                  "title" => "CompiledWithDocs"
                }
-             ] = create_sidebar_items(%{modules: nodes}, [])["modules"]
-    end
-
-    test "outputs extras with headers" do
-      item = %{content: nil, group: nil, id: nil, title: nil}
-
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2>Bar</h2>"}])["extras"] ==
-               [
-                 %{
-                   "group" => "",
-                   "headers" => [
-                     %{"anchor" => "foo", "id" => "Foo"},
-                     %{"anchor" => "bar", "id" => "Bar"}
-                   ],
-                   "id" => "",
-                   "title" => ""
-                 }
-               ]
-
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2>\n<h2>Bar</h2>"}])[
-               "extras"
-             ] ==
-               [
-                 %{
-                   "group" => "",
-                   "headers" => [
-                     %{"anchor" => "foo", "id" => "Foo"},
-                     %{"anchor" => "bar", "id" => "Bar"}
-                   ],
-                   "id" => "",
-                   "title" => ""
-                 }
-               ]
-
-      assert create_sidebar_items(%{}, [%{item | content: "<h2>Foo</h2><h2></h2>"}])["extras"] ==
-               [
-                 %{
-                   "group" => "",
-                   "headers" => [
-                     %{"anchor" => "foo", "id" => "Foo"}
-                   ],
-                   "id" => "",
-                   "title" => ""
-                 }
-               ]
+             ] = create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
     end
 
     test "builds sections out of moduledocs", context do
       names = [CompiledWithDocs, CompiledWithoutDocs, DuplicateHeadings]
       config = doc_config(context)
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, config)
-      nodes = HTML.render_all(nodes, [], ".html", config, [])
 
       [compiled_with_docs, compiled_without_docs, duplicate_headings] =
-        create_sidebar_items(%{modules: nodes}, [])["modules"]
+        create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
 
       assert compiled_with_docs["sections"] == [
                %{
                  "anchor" => "module-example-unicode-escaping",
-                 "id" => "Example ☃ Unicode &gt; escaping"
+                 "id" => "Example ☃ Unicode > escaping"
                }
              ]
 
@@ -396,10 +278,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              ]
     end
 
-    defp create_sidebar_items(nodes_map, extras) do
+    defp create_sidebar_items(config, nodes_map, extras) do
       "sidebarNodes=" <> content =
-        nodes_map
-        |> Templates.create_sidebar_items(extras)
+        config
+        |> Templates.create_sidebar_items(nodes_map, extras)
         |> IO.iodata_to_binary()
 
       Jason.decode!(content)

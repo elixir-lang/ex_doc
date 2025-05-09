@@ -100,6 +100,5 @@ defmodule ExDoc.UtilsTest do
     assert Utils.text_to_id(" ☃ ") == ""
     assert Utils.text_to_id(" &sup2; ") == ""
     assert Utils.text_to_id(" &#9180; ") == ""
-    assert Utils.text_to_id("Git opts (<code class=\"inline\">:git</code>)") == "git-opts-git"
   end
 end

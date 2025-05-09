@@ -33,6 +33,6 @@
       </div>
     <% end %>
 
-    <%= link_detail_headings(node.rendered_doc, enc(node.id)) %>
+    <%= render_doc(node.doc) %>
   </section>
 </section>

@@ -22,7 +22,6 @@ defmodule ExDoc.Formatter.HTML do
     project_nodes = render_all(project_nodes, filtered_modules, ".html", config, [])
     extras = build_extras(config, ".html")
 
-    # Generate search early on without api reference in extras
     static_files = generate_assets(".", default_assets(config), config)
     search_data = generate_search_data(project_nodes, extras, config)
 
@@ -32,17 +31,11 @@ defmodule ExDoc.Formatter.HTML do
       tasks: filter_list(:task, project_nodes)
     }
 
-    extras =
-      if config.api_reference do
-        [build_api_reference(nodes_map, config) | extras]
-      else
-        extras
-      end
-
     all_files =
       search_data ++
         static_files ++
         generate_sidebar_items(nodes_map, extras, config) ++
+        generate_api_reference(nodes_map, config) ++
         generate_extras(extras, config) ++
         generate_favicon(@assets_dir, config) ++
         generate_logo(@assets_dir, config) ++
@@ -68,6 +61,7 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Autolinks and renders all docs.
   """
+  # TODO: Move this to normalize_doc_ast in the retriever
   def render_all(project_nodes, filtered_modules, ext, config, opts) do
     base = [
       apps: config.apps,
@@ -125,8 +119,8 @@ defmodule ExDoc.Formatter.HTML do
     do: node
 
   defp render_doc(%{doc: doc} = node, language, autolink_opts, opts) do
-    rendered = autolink_and_render(doc, language, autolink_opts, opts)
-    %{node | rendered_doc: rendered}
+    doc = autolink_and_highlight(doc, language, autolink_opts, opts)
+    %{node | doc: doc}
   end
 
   defp id(%{id: mod_id}, %{id: "c:" <> id}) do
@@ -141,10 +135,9 @@ defmodule ExDoc.Formatter.HTML do
     mod_id <> "." <> id
   end
 
-  defp autolink_and_render(doc, language, autolink_opts, opts) do
+  defp autolink_and_highlight(doc, language, autolink_opts, opts) do
     doc
     |> language.autolink_doc(autolink_opts)
-    |> ExDoc.DocAST.to_string()
     |> ExDoc.DocAST.highlight(language, opts)
   end
 
@@ -185,7 +178,7 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_sidebar_items(nodes_map, extras, config) do
-    content = Templates.create_sidebar_items(nodes_map, extras)
+    content = Templates.create_sidebar_items(config, nodes_map, extras)
 
     path = "dist/sidebar_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, path), content)
@@ -221,8 +214,7 @@ defmodule ExDoc.Formatter.HTML do
           next: next && %{path: "#{next.id}.html", title: next.title}
         }
 
-        extension = node.source_path && Path.extname(node.source_path)
-        html = Templates.extra_template(config, node, extra_type(extension), refs)
+        html = Templates.extra_template(config, node, refs)
 
         if File.regular?(output) do
           Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
@@ -307,21 +299,23 @@ defmodule ExDoc.Formatter.HTML do
     ]
   end
 
-  defp build_api_reference(nodes_map, config) do
-    api_reference = Templates.api_reference_template(nodes_map)
+  defp generate_api_reference(_nodes_map, %{api_reference: false}) do
+    []
+  end
 
-    title_content =
-      ~s{API Reference <small class="app-vsn">#{config.project} v#{config.version}</small>}
+  defp generate_api_reference(nodes_map, config) do
+    filename = "api-reference.html"
+    output = "#{config.output}/#{filename}"
+    config = set_canonical_url(config, filename)
 
-    %{
-      content: api_reference,
-      group: nil,
-      id: "api-reference",
-      source_path: nil,
-      source_url: config.source_url,
-      title: "API Reference",
-      title_content: title_content
-    }
+    html = Templates.api_reference_template(config, nodes_map)
+
+    if File.regular?(output) do
+      Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
+    end
+
+    File.write!(output, html)
+    [filename]
   end
 
   @doc """
@@ -407,12 +401,12 @@ defmodule ExDoc.Formatter.HTML do
     source_file = input_options[:source] || input
     opts = [file: source_file, line: 1]
 
-    {source, ast} =
+    {extension, source, ast} =
       case extension_name(input) do
         extension when extension in ["", ".txt"] ->
           source = File.read!(input)
-          ast = [{:pre, [], "\n" <> source, %{}}]
-          {source, ast}
+          ast = [{:pre, [], ["\n" <> source], %{}}]
+          {extension, source, ast}
 
         extension when extension in [".md", ".livemd", ".cheatmd"] ->
           source = File.read!(input)
@@ -420,43 +414,39 @@ defmodule ExDoc.Formatter.HTML do
           ast =
             source
             |> Markdown.to_ast(opts)
-            |> sectionize(extension)
+            |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3])
+            |> autolink_and_highlight(language, [file: input] ++ autolink_opts, opts)
 
-          {source, ast}
+          {extension, source, ast}
 
         _ ->
           raise ArgumentError,
                 "file extension not recognized, allowed extension is either .cheatmd, .livemd, .md, .txt or no extension"
       end
 
-    {title_ast, ast} =
+    {title_doc, title_text, ast} =
       case ExDoc.DocAST.extract_title(ast) do
-        {:ok, title_ast, ast} -> {title_ast, ast}
-        :error -> {nil, ast}
+        {:ok, title_doc, ast} -> {title_doc, ExDoc.DocAST.text(title_doc), ast}
+        :error -> {nil, nil, ast}
       end
 
-    title_text = title_ast && ExDoc.DocAST.text(title_ast)
-    title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
-    content_html = autolink_and_render(ast, language, [file: input] ++ autolink_opts, opts)
-
-    group = GroupMatcher.match_extra(groups, input)
     title = input_options[:title] || title_text || filename_to_title(input)
-
+    group = GroupMatcher.match_extra(groups, input)
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
     source_url = source_url_pattern.(source_path, 1)
-
     search_data = normalize_search_data!(input_options[:search_data])
 
     %{
+      type: extra_type(extension),
       source: source,
-      content: content_html,
       group: group,
       id: id,
+      doc: ast,
       source_path: source_path,
       source_url: source_url,
       search_data: search_data,
       title: title,
-      title_content: title_html || title
+      title_doc: title_doc || title
     }
   end
 
@@ -485,16 +475,6 @@ defmodule ExDoc.Formatter.HTML do
     |> Path.extname()
     |> String.downcase()
   end
-
-  defp sectionize(ast, ".cheatmd") do
-    ExDoc.DocAST.sectionize(ast, fn
-      {:h2, _, _, _} -> true
-      {:h3, _, _, _} -> true
-      _ -> false
-    end)
-  end
-
-  defp sectionize(ast, _), do: ast
 
   defp filename_to_title(input) do
     input |> Path.basename() |> Path.rootname()
