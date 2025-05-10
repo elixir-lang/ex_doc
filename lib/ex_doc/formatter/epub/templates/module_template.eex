@@ -22,7 +22,7 @@
       </section>
     <% end %>
 
-    <%= for group <- dbg(summary), key = text_to_id(group.title) do %>
+    <%= for group <- summary, key = text_to_id(group.title) do %>
       <section id="<%= key %>" class="details-list">
         <h1 class="section-heading"><%=h to_string(group.title) %></h1>
         <%= if doc = group.doc  do %>
