@@ -93,13 +93,12 @@ defmodule ExDoc.DocNode do
 end
 
 defmodule ExDoc.DocGroupNode do
-  defstruct title: nil, description: nil, doc: nil, rendered_doc: nil, docs: []
+  defstruct title: nil, description: nil, doc: nil, docs: []
 
   @type t :: %__MODULE__{
           title: String.t() | atom(),
           description: String.t() | nil,
           doc: ExDoc.DocAST.t() | nil,
-          rendered_doc: String.t() | nil,
           docs: [ExDoc.DocNode.t()]
         }
 end

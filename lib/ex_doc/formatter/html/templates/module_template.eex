@@ -53,7 +53,7 @@
     </h1>
     <%= if doc = group.rendered_doc do %>
       <div class="group-description" id="group-description-<%= key %>">
-        <%= link_group_headings(doc, key) %>
+       <%= render_doc(doc) %>
       </div>
     <% end %>
     <div class="<%= key %>-list">
