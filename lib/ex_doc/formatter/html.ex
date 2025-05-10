@@ -45,7 +45,7 @@ defmodule ExDoc.Formatter.HTML do
         generate_list(nodes_map.tasks, config) ++
         generate_redirects(config, ".html")
 
-    generate_build(Enum.sort(all_files), build)
+    generate_build(all_files, build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
   end
 
@@ -157,7 +157,12 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_build(files, build) do
-    entries = Enum.map(files, &[&1, "\n"])
+    entries =
+      files
+      |> Enum.uniq()
+      |> Enum.sort()
+      |> Enum.map(&[&1, "\n"])
+
     File.write!(build, entries)
   end
 
@@ -281,7 +286,15 @@ defmodule ExDoc.Formatter.HTML do
         is_binary(dir_or_files) and File.dir?(dir_or_files) ->
           dir_or_files
           |> File.cp_r!(target_dir, dereference_symlinks: true)
-          |> Enum.map(&Path.relative_to(&1, output))
+          |> Enum.reduce([], fn path, acc ->
+            # Omit directories in .build file
+            if File.dir?(path) do
+              acc
+            else
+              [Path.relative_to(path, output) | acc]
+            end
+          end)
+          |> Enum.reverse()
 
         is_binary(dir_or_files) ->
           []
