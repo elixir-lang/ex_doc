@@ -32,21 +32,18 @@ defmodule ExDoc.Formatter.HTML do
     }
 
     all_files =
-      (search_data ++
-         static_files ++
-         generate_sidebar_items(nodes_map, extras, config) ++
-         generate_api_reference(nodes_map, config) ++
-         generate_extras(extras, config) ++
-         generate_favicon(@assets_dir, config) ++
-         generate_logo(@assets_dir, config) ++
-         generate_search(config) ++
-         generate_not_found(config) ++
-         generate_list(nodes_map.modules, config) ++
-         generate_list(nodes_map.tasks, config) ++
-         generate_redirects(config, ".html"))
-      |> Enum.uniq()
-      |> Kernel.--([@assets_dir])
-      |> Enum.sort()
+      search_data ++
+        static_files ++
+        generate_sidebar_items(nodes_map, extras, config) ++
+        generate_api_reference(nodes_map, config) ++
+        generate_extras(extras, config) ++
+        generate_favicon(@assets_dir, config) ++
+        generate_logo(@assets_dir, config) ++
+        generate_search(config) ++
+        generate_not_found(config) ++
+        generate_list(nodes_map.modules, config) ++
+        generate_list(nodes_map.tasks, config) ++
+        generate_redirects(config, ".html")
 
     generate_build(all_files, build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
@@ -160,7 +157,12 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_build(files, build) do
-    entries = Enum.map(files, &[&1, "\n"])
+    entries =
+      files
+      |> Enum.uniq()
+      |> Enum.sort()
+      |> Enum.map(&[&1, "\n"])
+
     File.write!(build, entries)
   end
 
@@ -278,13 +280,22 @@ defmodule ExDoc.Formatter.HTML do
           Enum.map(dir_or_files, fn {name, content} ->
             target = Path.join(target_dir, name)
             File.write(target, content)
+
             Path.relative_to(target, output)
           end)
 
         is_binary(dir_or_files) and File.dir?(dir_or_files) ->
           dir_or_files
           |> File.cp_r!(target_dir, dereference_symlinks: true)
-          |> Enum.map(&Path.relative_to(&1, output))
+          |> Enum.reduce([], fn path, acc ->
+            # Omit directories in .build file
+            if File.dir?(path) do
+              acc
+            else
+              [Path.relative_to(path, output) | acc]
+            end
+          end)
+          |> Enum.reverse()
 
         is_binary(dir_or_files) ->
           []
