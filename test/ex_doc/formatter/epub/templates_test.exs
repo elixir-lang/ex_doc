@@ -169,9 +169,6 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
       doc = LazyHTML.from_document(content)
 
-      IO.warn("remove file.write")
-      File.write("/tmp/doc.html", LazyHTML.to_html(doc))
-
       assert Enum.count(doc["div.group-description"]) == 1
       assert Enum.count(doc["#group-description-example-functions"]) == 1
       assert Enum.count(doc["#group-description-example-functions h3"]) == 1
@@ -180,7 +177,9 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert Enum.count(doc["#example-functions .group-description a[href='#example/2']"]) == 1
       assert Enum.count(doc["#example-functions .group-description a[href='#flatten/1']"]) == 1
 
-      assert content =~ ~s[<span class="text">A section heading example</span>]
+      assert content =~
+               ~s[<h3 id="group-example-functions-a-section-heading-example">A section heading example</h3>]
+
       assert content =~ "<p>A content example.</p>"
     end
 
