@@ -280,7 +280,6 @@ defmodule ExDoc.Formatter.HTML do
           Enum.map(dir_or_files, fn {name, content} ->
             target = Path.join(target_dir, name)
             File.write(target, content)
-
             Path.relative_to(target, output)
           end)
 
