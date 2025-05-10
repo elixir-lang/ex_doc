@@ -384,7 +384,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
         )
 
       doc = LazyHTML.from_document(content)
-
       assert Enum.count(doc["div.group-description"]) == 1
       assert Enum.count(doc["#group-description-example-functions"]) == 1
       assert Enum.count(doc["#group-description-example-functions h3"]) == 1
