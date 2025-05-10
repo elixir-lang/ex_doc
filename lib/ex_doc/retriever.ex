@@ -322,8 +322,13 @@ defmodule ExDoc.Retriever do
 
     doc_ast =
       case description do
-        nil -> nil
-        text -> doc_ast("text/markdown", %{"en" => text}, [])
+        nil ->
+          nil
+
+        text ->
+          doc_ast = doc_ast("text/markdown", %{"en" => text}, [])
+          sub_id = ExDoc.Utils.text_to_id(group.title)
+          normalize_doc_ast(doc_ast, "group-#{sub_id}-")
       end
 
     %ExDoc.DocGroupNode{
