@@ -51,7 +51,7 @@
       </a>
       <span class="text"><%= group.title %></span>
     </h1>
-    <%= if doc = group.rendered_doc do %>
+    <%= if doc = group.doc do %>
       <div class="group-description" id="group-description-<%= key %>">
        <%= render_doc(doc) %>
       </div>
