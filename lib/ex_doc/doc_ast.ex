@@ -85,17 +85,17 @@ defmodule ExDoc.DocAST do
     case content do
       # if we already have <pre><code>...</code></pre>, carry on
       [{:code, _, _}] ->
-        {:pre, attrs, parse_erl_ast(List.wrap(content)), %{}}
+        {:pre, attrs, parse_erl_ast(content), %{}}
 
       # otherwise, turn <pre>...</pre> into <pre><code>...</code></pre>
       _ ->
-        content = [{:code, [], parse_erl_ast(List.wrap(content)), %{}}]
+        content = [{:code, [], parse_erl_ast(content), %{}}]
         {:pre, attrs, content, %{}}
     end
   end
 
   defp parse_erl_ast({tag, attrs, content}) when is_atom(tag) do
-    {tag, attrs, parse_erl_ast(List.wrap(content)), %{}}
+    {tag, attrs, parse_erl_ast(content), %{}}
   end
 
   @doc """
