@@ -3,7 +3,7 @@
 ## v0.38.1 (2025-05-12)
 
   * Bug fixes
-    * Ensure stripping apps for Erlang soursces emit valid AST
+    * Ensure stripping apps for Erlang sources emit valid AST
 
 ## v0.38.0 (2025-05-09)
 
