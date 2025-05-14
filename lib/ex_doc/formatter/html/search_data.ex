@@ -44,7 +44,12 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     page = URI.encode(node.id) <> ".html"
     {intro, sections} = extract_sections(node.source_format, node, "module-")
     module = encode(page, node.title, node.type, intro)
-    docs = Enum.flat_map(node.docs, &node_child(&1, node, page))
+
+    docs =
+      node.docs_groups
+      |> Enum.flat_map(& &1.docs)
+      |> Enum.flat_map(&node_child(&1, node, page))
+
     [module] ++ render_sections(sections, page, node.title, node.type) ++ docs
   end
 

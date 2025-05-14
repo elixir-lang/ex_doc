@@ -167,7 +167,6 @@ defmodule ExDoc.Retriever do
       type: module_data.type,
       deprecated: metadata[:deprecated],
       docs_groups: docs_groups,
-      docs: docs,
       doc: normalize_doc_ast(doc_ast, "module-"),
       source_doc: source_doc,
       source_format: format,

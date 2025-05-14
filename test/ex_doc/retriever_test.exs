@@ -27,7 +27,7 @@ defmodule ExDoc.RetrieverTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([A], %ExDoc.Config{})
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
       assert foo.id == "foo/0"
       assert foo.annotations == ["since 1.0.0"]
       assert foo.deprecated == "deprecation message"
@@ -78,7 +78,7 @@ defmodule ExDoc.RetrieverTest do
 
       config = %ExDoc.Config{}
       {[mod], []} = Retriever.docs_from_modules([A], config)
-      [bar, baz, foo] = mod.docs
+      [%{docs: [bar]}, %{docs: [baz]}, %{docs: [foo]}] = mod.docs_groups
 
       assert %{id: "c:foo/0", group: "a"} = foo
       assert %{id: "bar/0", group: "b"} = bar
@@ -101,7 +101,7 @@ defmodule ExDoc.RetrieverTest do
 
       config = %ExDoc.Config{group_for_doc: & &1[:semi_group]}
       {[mod], []} = Retriever.docs_from_modules([A], config)
-      [bar, baz, foo] = mod.docs
+      [%{docs: [bar]}, %{docs: [baz]}, %{docs: [foo]}] = mod.docs_groups
 
       assert %{id: "c:foo/0", group: "a"} = foo
       assert %{id: "bar/0", group: "b"} = bar
@@ -143,17 +143,15 @@ defmodule ExDoc.RetrieverTest do
       assert [c, b, a] = mod.docs_groups
 
       # Description returned by the function should override nil
-      assert %{title: "c", description: "for c"} = c
+      assert %{title: "c", description: "for c", docs: [baz]} = c
 
       # Description returned by the function should not override a
       # description from @moduledoc
-      assert %{title: "b", description: "predefined b"} = b
+      assert %{title: "b", description: "predefined b", docs: [bar]} = b
 
       # Description returned by th function should define a description
       # for leftover groups
-      assert %{title: "a", description: "for a"} = a
-
-      [bar, baz, foo] = mod.docs
+      assert %{title: "a", description: "for a", docs: [foo]} = a
 
       assert %{id: "c:foo/0", group: "a"} = foo
       assert %{id: "bar/0", group: "b"} = bar
@@ -203,7 +201,7 @@ defmodule ExDoc.RetrieverTest do
           end
         })
 
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
       assert foo.id == "foo/0"
       assert foo.annotations == [A, :foo, 0, :function]
     end
@@ -226,7 +224,7 @@ defmodule ExDoc.RetrieverTest do
           end
         })
 
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
       assert foo.id == "foo/0"
       assert foo.annotations == [B, :bar, 1, :type]
     end
@@ -252,7 +250,7 @@ defmodule ExDoc.RetrieverTest do
           end
         })
 
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
       assert foo.id == "foo/0"
       assert foo.annotations == [:baz, "since 1.0.0"]
       assert foo.deprecated == "deprecation message"
@@ -277,7 +275,7 @@ defmodule ExDoc.RetrieverTest do
           end
         })
 
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
 
       assert foo.annotations == [:baz]
     end
@@ -372,8 +370,11 @@ defmodule ExDoc.RetrieverTest do
 
     {[mod], []} = Retriever.docs_from_modules([NaturallySorted], %ExDoc.Config{})
 
-    [function_A_0, function_A_1, function_a_0, function_a_1, function_B_0, function_b_0] =
-      mod.docs
+    [
+      %{
+        docs: [function_A_0, function_A_1, function_a_0, function_a_1, function_B_0, function_b_0]
+      }
+    ] = mod.docs_groups
 
     assert function_A_0.id == "function_A/0"
     assert function_A_1.id == "function_A/1"
@@ -397,7 +398,7 @@ defmodule ExDoc.RetrieverTest do
     """)
 
     {[module_node], []} = Retriever.docs_from_modules([NoWhitespaceInSignature], %ExDoc.Config{})
-    %{docs: [%{signature: signature}]} = module_node
+    [%{docs: [%{signature: signature}]}] = module_node.docs_groups
     assert signature == "callback_name(arg1, integer, %Date{}, term, t)"
   end
 end
