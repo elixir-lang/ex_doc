@@ -123,9 +123,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     {id, modules}
   end
 
-  defp sidebar_entries({group, nodes}) do
+  defp sidebar_entries(group) do
     nodes =
-      for node <- nodes do
+      for node <- group.docs do
         id =
           if "struct" in node.annotations do
             node.signature
@@ -142,7 +142,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
         %{id: id, title: node.signature, anchor: URI.encode(node.id), deprecated: deprecated?}
       end
 
-    %{key: text_to_id(group), name: group, nodes: nodes}
+    %{key: text_to_id(group.title), name: group.title, nodes: nodes}
   end
 
   defp headers(doc) do
@@ -153,10 +153,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     end)
   end
 
-  def module_summary(module_node) do
-    # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
-    ExDoc.GroupMatcher.group_by(module_node.docs_groups, module_node.docs, & &1.group)
-  end
+  def module_summary(module_node), do: module_node.docs_groups
 
   defp favicon_path(%{favicon: nil}), do: nil
   defp favicon_path(%{favicon: favicon}), do: "assets/favicon#{Path.extname(favicon)}"

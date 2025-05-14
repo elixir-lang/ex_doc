@@ -1,6 +1,6 @@
 defmodule ExDoc.Retriever.ErlangTest do
   use ExUnit.Case, async: true
-  alias ExDoc.{Retriever, DocAST, Language.Erlang}
+  alias ExDoc.{Retriever, DocAST, Language.Erlang, DocGroupNode}
   import TestHelper
 
   @moduletag :tmp_dir
@@ -58,8 +58,9 @@ defmodule ExDoc.Retriever.ErlangTest do
                deprecated: nil,
                moduledoc_line: 2,
                moduledoc_file: moduledoc_file,
-               docs: [equiv_function2, function1, function2],
-               docs_groups: ["Types", "Callbacks", "Functions"],
+               docs_groups: [
+                 %DocGroupNode{title: "Functions", docs: [equiv_function2, function1, function2]}
+               ],
                group: nil,
                id: "mod",
                language: ExDoc.Language.Erlang,
@@ -153,8 +154,11 @@ defmodule ExDoc.Retriever.ErlangTest do
                deprecated: nil,
                moduledoc_line: 6,
                moduledoc_file: moduledoc_file,
-               docs: [type, callback, function],
-               docs_groups: ["Types", "Callbacks", "Functions"],
+               docs_groups: [
+                 %DocGroupNode{title: "Types", docs: [type]},
+                 %DocGroupNode{title: "Callbacks", docs: [callback]},
+                 %DocGroupNode{title: "Functions", docs: [function]}
+               ],
                group: nil,
                id: "mod",
                language: ExDoc.Language.Erlang,
@@ -219,7 +223,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([:mod], default_config())
-      assert [_] = mod.docs
+      [%{docs: [_]}] = mod.docs_groups
     end
 
     test "callbacks", c do
@@ -239,7 +243,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([:mod], default_config())
-      [callback1, equiv_callback1, optional_callback1] = mod.docs
+      [%{docs: [callback1, equiv_callback1, optional_callback1]}] = mod.docs_groups
 
       assert callback1.id == "c:callback1/0"
       assert callback1.type == :callback
@@ -286,7 +290,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([:mod], default_config())
-      [equiv_type1, nominal1, opaque1, type1] = mod.docs
+      [%{docs: [equiv_type1, nominal1, opaque1, type1]}] = mod.docs_groups
 
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
@@ -345,7 +349,11 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       {[mod], []} = Retriever.docs_from_modules([:mod], default_config())
 
-      [callback, function, type] = mod.docs
+      assert [
+               %{title: "Types", docs: [type]},
+               %{title: "Callbacks", docs: [callback]},
+               %{title: "Functions", docs: [function]}
+             ] = mod.docs_groups
 
       assert hd(function.specs)
              |> Erlang.autolink_spec(current_module: :mod, current_kfa: {:function, :function, 0}) ==
@@ -392,8 +400,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       %ExDoc.ModuleNode{
         deprecated: nil,
         moduledoc_line: _,
-        docs: [function1, function2],
-        docs_groups: ["Types", "Callbacks", "Functions"],
+        docs_groups: [%DocGroupNode{title: "Functions", docs: [function1, function2]}],
         group: nil,
         id: "mod",
         language: ExDoc.Language.Erlang,
@@ -448,7 +455,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([:mod], default_config())
-      assert [_] = mod.docs
+      [%{docs: [_]}] = mod.docs_groups
     end
 
     test "callbacks", c do
@@ -466,7 +473,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([:mod], default_config())
-      [callback1, optional_callback1] = mod.docs
+      [%{docs: [callback1, optional_callback1]}] = mod.docs_groups
 
       assert callback1.id == "c:callback1/0"
       assert callback1.type == :callback
@@ -499,7 +506,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([:mod], default_config())
-      [nominal1, opaque1, type1] = mod.docs
+      [%{docs: [nominal1, opaque1, type1]}] = mod.docs_groups
 
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
