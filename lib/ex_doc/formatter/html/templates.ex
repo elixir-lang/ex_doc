@@ -193,7 +193,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp add_fancy_anchors(ast) do
     ExDoc.DocAST.map_tags(ast, fn
-      {tag, attrs, inner, meta} = ast when tag in [:h2, :h3] ->
+      {tag, attrs, inner, meta} = ast
+      when tag in [:h2, :h3] and not is_map_key(meta, :verbatim) ->
         if id = Keyword.get(attrs, :id) do
           attrs =
             Keyword.update(

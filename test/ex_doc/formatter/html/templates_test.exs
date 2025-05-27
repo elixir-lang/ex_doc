@@ -42,15 +42,19 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   describe "render_doc" do
+    defp render_doc(doc) do
+      doc
+      |> ExDoc.DocAST.parse!("text/markdown")
+      |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3])
+      |> Templates.render_doc()
+    end
+
     test "adds fancy anchors around ids" do
-      assert """
+      assert render_doc("""
              ## Foo
 
              ### Bar {:class=wrap}
-             """
-             |> ExDoc.DocAST.parse!("text/markdown")
-             |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3])
-             |> Templates.render_doc() ==
+             """) ==
                """
                <h2 id="foo" class="section-heading">
                  <a href="#foo" class="hover-link">
@@ -66,6 +70,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                </h3>
                """
                |> String.replace(~r/\n\s*/, "")
+    end
+
+    test "skips fancy anchors on verbatim" do
+      assert render_doc("""
+             <h2>Foo</h2>
+             """) == "<h2 id=\"foo\">Foo</h2>"
     end
   end
 
