@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.38.2 (2025-05-27)
+
+  * Bug fixes
+    * Render documents with hardcoded `<h2>`/`<h3>` entries correctly
+    * Fix padding on external links
+
 ## v0.38.1 (2025-05-12)
 
   * Bug fixes
