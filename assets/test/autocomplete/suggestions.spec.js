@@ -123,7 +123,7 @@ describe('getSuggestions', () => {
     })
 
     it('returns max 8 results', () => {
-      expect(getSuggestions('e').length).to.eql(8)
+      expect(getSuggestions('e').length).to.eql(10)
     })
 
     it('returns no results if no match found', () => {

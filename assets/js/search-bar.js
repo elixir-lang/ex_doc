@@ -26,6 +26,7 @@ if (!isEmbedded) {
 
 function initialize () {
   addEventListeners()
+  setAutocompleteLimit()
 
   window.onTogglePreviewClick = function (event, open) {
     event.preventDefault()
@@ -57,6 +58,15 @@ export function focusSearchInput () {
   // We also add the class before so we don't move the screen position
   document.body.classList.add('search-focused')
   searchInput.focus()
+}
+
+function setAutocompleteLimit () {
+  const searchInput = qs(SEARCH_INPUT_SELECTOR)
+  const autocompleteLimit = parseInt(document.querySelector('meta[name="exdoc:autocomplete-limit"]').content)
+  if (autocompleteLimit) {
+    window.autocompleteLimit = autocompleteLimit
+  }
+  searchInput.setAttribute('autocomplete-limit', autocompleteLimit)
 }
 
 function addEventListeners () {
