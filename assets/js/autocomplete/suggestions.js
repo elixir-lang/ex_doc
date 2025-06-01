@@ -31,7 +31,7 @@ const DEFAULT_AUTOCOMPLETE_LIMIT = 10
  * @returns {Suggestion[]} List of suggestions sorted and limited.
  */
 export function getSuggestions (query, explicitLimit = null) {
-  const limit = explicitLimit || window.autocompleteLimit || DEFAULT_AUTOCOMPLETE_LIMIT || 10
+  const limit = explicitLimit || window.autocompleteLimit || DEFAULT_AUTOCOMPLETE_LIMIT
   if (isBlank(query)) {
     return []
   }
