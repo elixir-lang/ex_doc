@@ -21,6 +21,8 @@ const SUGGESTION_CATEGORY = {
   section: 'section'
 }
 
+const DEFAULT_AUTOCOMPLETE_LIMIT = 10
+
 /**
  * Returns a list of autocomplete suggestion objects matching the given term.
  *
@@ -28,7 +30,8 @@ const SUGGESTION_CATEGORY = {
  * @param {Number} limit The maximum number of results to return.
  * @returns {Suggestion[]} List of suggestions sorted and limited.
  */
-export function getSuggestions (query, limit = 8) {
+export function getSuggestions (query, explicitLimit = null) {
+  const limit = explicitLimit || window.autocompleteLimit || DEFAULT_AUTOCOMPLETE_LIMIT || 10
   if (isBlank(query)) {
     return []
   }

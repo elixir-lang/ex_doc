@@ -365,6 +365,9 @@ defmodule Mix.Tasks.Docs do
 
     * `exdoc:autocomplete` - when set to "off", it disables autocompletion.
 
+    * `exdoc:autocomplete-limit` - Set to an integer to configure how many results
+      appear in the autocomplete dropdown. Defaults to 10.
+
     * `exdoc:full-text-search-url` - the URL to use when performing full text
       search. The search string will be appended to the URL as an encoded
       parameter. You could use this to bring a custom search engine to your
