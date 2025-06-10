@@ -31,7 +31,7 @@ You can use ExDoc with Mix (recommended for Elixir projects), with Rebar (recomm
 
 ### Mix
 
-ExDoc requires Elixir v1.12 or later. Then add ExDoc as a dependency:
+ExDoc requires Elixir v1.15 or later. Then add ExDoc as a dependency:
 
 ```elixir
 def deps do
