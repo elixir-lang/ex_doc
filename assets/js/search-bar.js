@@ -203,16 +203,7 @@ function shouldEnableRelatedSearch () {
 
 function shouldEnableLatestSearch () {
   const versionNodes = getVersionNodes()
-
-  if (versionNodes.length > 0) {
-    const latest = versionNodes[0]
-    const searchNodes = getSearchNodes()
-    const match = searchNodes.some(node => `v${node.version}` === latest.version)
-
-    return !match
-  }
-
-  return false
+  return versionNodes.length() > 0
 }
 
 function handleAutocompleteFormSubmission (event) {
