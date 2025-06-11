@@ -15,18 +15,23 @@
       </section>
     <% end %>
 
-    <%= if summary != [] do %>
+    <%= if module.docs_groups != [] do %>
       <section id="summary" class="details-list">
         <h1 class="section-heading">Summary</h1>
-        <%= for {name, nodes} <- summary, do: H.summary_template(name, nodes) %>
+        <%= for group <- module.docs_groups, do: H.summary_template(group.title, group.docs) %>
       </section>
     <% end %>
 
-    <%= for {name, nodes} <- summary, key = text_to_id(name) do %>
+    <%= for group <- module.docs_groups, key = text_to_id(group.title) do %>
       <section id="<%= key %>" class="details-list">
-        <h1 class="section-heading"><%=h to_string(name) %></h1>
+        <h1 class="section-heading"><%=h to_string(group.title) %></h1>
+        <%= if doc = group.doc  do %>
+          <div class="group-description" id="group-description-<%= key %>">
+            <%= render_doc(doc) %>
+          </div>
+        <% end %>
         <div class="<%= key %>-list">
-          <%= for node <- nodes, do: H.detail_template(node, module) %>
+          <%= for node <- group.docs, do: H.detail_template(node, module) %>
         </div>
       </section>
     <% end %>

@@ -16,8 +16,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   Generate content from the module template for a given `node`
   """
   def module_page(config, module_node) do
-    summary = H.module_summary(module_node)
-    module_template(config, module_node, summary)
+    module_template(config, module_node)
   end
 
   @doc """
@@ -53,7 +52,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :def,
     :module_template,
     Path.expand("templates/module_template.eex", __DIR__),
-    [:config, :module, :summary],
+    [:config, :module],
     trim: true
   )
 

@@ -15,23 +15,6 @@ defmodule ExDoc.GroupMatcher do
   end
 
   @doc """
-  Group the following entries and while preserving the order in `groups`.
-  """
-  def group_by(groups, entries, by) do
-    entries = Enum.group_by(entries, by)
-
-    {groups, leftovers} =
-      Enum.flat_map_reduce(groups, entries, fn group, grouped_nodes ->
-        case Map.pop(grouped_nodes, group, []) do
-          {[], grouped_nodes} -> {[], grouped_nodes}
-          {entries, grouped_nodes} -> {[{group, entries}], grouped_nodes}
-        end
-      end)
-
-    groups ++ Enum.sort(leftovers)
-  end
-
-  @doc """
   Finds a matching group for the given module name, id, and metadata.
   """
   def match_module(group_patterns, module, id, metadata) do

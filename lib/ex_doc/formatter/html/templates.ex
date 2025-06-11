@@ -16,8 +16,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   Generate content from the module template for a given `node`
   """
   def module_page(module_node, config) do
-    summary = module_summary(module_node)
-    module_template(config, module_node, summary)
+    module_template(config, module_node)
   end
 
   @doc """
@@ -99,9 +98,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     modules =
       for module <- modules do
         groups =
-          module
-          |> module_summary()
-          |> case do
+          case module.docs_groups do
             [] -> []
             entries -> [nodeGroups: Enum.map(entries, &sidebar_entries/1)]
           end
@@ -123,9 +120,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
     {id, modules}
   end
 
-  defp sidebar_entries({group, nodes}) do
+  defp sidebar_entries(group) do
     nodes =
-      for node <- nodes do
+      for node <- group.docs do
         id =
           if "struct" in node.annotations do
             node.signature
@@ -142,7 +139,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
         %{id: id, title: node.signature, anchor: URI.encode(node.id), deprecated: deprecated?}
       end
 
-    %{key: text_to_id(group), name: group, nodes: nodes}
+    %{key: text_to_id(group.title), name: group.title, nodes: nodes}
   end
 
   defp headers(doc) do
@@ -151,11 +148,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     |> Enum.map(fn {:h2, text, anchor} ->
       %{id: text, anchor: anchor}
     end)
-  end
-
-  def module_summary(module_node) do
-    # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
-    ExDoc.GroupMatcher.group_by(module_node.docs_groups, module_node.docs, & &1.group)
   end
 
   defp favicon_path(%{favicon: nil}), do: nil
@@ -225,7 +217,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     detail_template: [:node, :module],
     footer_template: [:config, :source_path],
     head_template: [:config, :title, :noindex],
-    module_template: [:config, :module, :summary],
+    module_template: [:config, :module],
     not_found_template: [:config],
     api_reference_entry_template: [:module_node],
     api_reference_template: [:config, :nodes_map],
