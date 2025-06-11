@@ -15,14 +15,14 @@
       </section>
     <% end %>
 
-    <%= if summary != [] do %>
+    <%= if module.docs_groups != [] do %>
       <section id="summary" class="details-list">
         <h1 class="section-heading">Summary</h1>
-        <%= for group <- summary, do: H.summary_template(group.title, group.docs) %>
+        <%= for group <- module.docs_groups, do: H.summary_template(group.title, group.docs) %>
       </section>
     <% end %>
 
-    <%= for group <- summary, key = text_to_id(group.title) do %>
+    <%= for group <- module.docs_groups, key = text_to_id(group.title) do %>
       <section id="<%= key %>" class="details-list">
         <h1 class="section-heading"><%=h to_string(group.title) %></h1>
         <%= if doc = group.doc  do %>

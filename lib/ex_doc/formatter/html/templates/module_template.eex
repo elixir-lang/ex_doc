@@ -31,7 +31,7 @@
   <% end %>
 </div>
 
-<%= if summary != [] do %>
+<%= if module.docs_groups != [] do %>
   <section id="summary" class="details-list">
     <h1 class="section-heading">
       <a class="hover-link" href="#summary">
@@ -39,11 +39,11 @@
       </a>
       <span class="text">Summary</span>
     </h1>
-    <%= for group <- summary, do: summary_template(group.title, group.docs) %>
+    <%= for group <- module.docs_groups, do: summary_template(group.title, group.docs) %>
   </section>
 <% end %>
 
-<%= for group <- summary, key = text_to_id(group.title) do %>
+<%= for group <- module.docs_groups, key = text_to_id(group.title) do %>
   <section id="<%= key %>" class="details-list">
     <h1 class="section-heading">
       <a class="hover-link" href="#<%= key %>">

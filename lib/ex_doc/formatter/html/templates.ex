@@ -16,8 +16,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   Generate content from the module template for a given `node`
   """
   def module_page(module_node, config) do
-    summary = module_summary(module_node)
-    module_template(config, module_node, summary)
+    module_template(config, module_node)
   end
 
   @doc """
@@ -99,9 +98,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     modules =
       for module <- modules do
         groups =
-          module
-          |> module_summary()
-          |> case do
+          case module.docs_groups do
             [] -> []
             entries -> [nodeGroups: Enum.map(entries, &sidebar_entries/1)]
           end
@@ -152,8 +149,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
       %{id: text, anchor: anchor}
     end)
   end
-
-  def module_summary(module_node), do: module_node.docs_groups
 
   defp favicon_path(%{favicon: nil}), do: nil
   defp favicon_path(%{favicon: favicon}), do: "assets/favicon#{Path.extname(favicon)}"
@@ -222,7 +217,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     detail_template: [:node, :module],
     footer_template: [:config, :source_path],
     head_template: [:config, :title, :noindex],
-    module_template: [:config, :module, :summary],
+    module_template: [:config, :module],
     not_found_template: [:config],
     api_reference_entry_template: [:module_node],
     api_reference_template: [:config, :nodes_map],
