@@ -402,8 +402,8 @@ defmodule Mix.Tasks.Docs do
   * First, groups defined as `@moduledoc groups: [...]` in the given order.
   * Then groups defined as keys in the `:groups_for_docs` configuration.
   * Then default groups: Types, Callbacks and Functions.
-  * Finally, other groups returned by `:default_group_for_doc` by order of
-    appearance of their belonging elements.
+  * Finally, other groups returned by `:default_group_for_doc` by alphabetical
+    order.
 
   ## Meta-tags configuration
 

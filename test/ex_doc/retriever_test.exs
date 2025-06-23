@@ -78,7 +78,7 @@ defmodule ExDoc.RetrieverTest do
 
       config = %ExDoc.Config{}
       {[mod], []} = Retriever.docs_from_modules([A], config)
-      [%{docs: [bar]}, %{docs: [baz]}, %{docs: [foo]}] = mod.docs_groups
+      [%{docs: [foo]}, %{docs: [bar]}, %{docs: [baz]}] = mod.docs_groups
 
       assert %{id: "c:foo/0", group: "a"} = foo
       assert %{id: "bar/0", group: "b"} = bar
@@ -101,7 +101,7 @@ defmodule ExDoc.RetrieverTest do
 
       config = %ExDoc.Config{group_for_doc: & &1[:semi_group]}
       {[mod], []} = Retriever.docs_from_modules([A], config)
-      [%{docs: [bar]}, %{docs: [baz]}, %{docs: [foo]}] = mod.docs_groups
+      [%{docs: [foo]}, %{docs: [bar]}, %{docs: [baz]}] = mod.docs_groups
 
       assert %{id: "c:foo/0", group: "a"} = foo
       assert %{id: "bar/0", group: "b"} = bar

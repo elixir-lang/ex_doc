@@ -285,9 +285,10 @@ defmodule ExDoc.Retriever do
   defp get_docs_groups(module_groups, nodes_groups, doc_nodes) do
     module_groups = Enum.map(module_groups, &normalize_group/1)
 
-    # Doc nodes already have normalized groups
     nodes_groups_descriptions = Map.new(nodes_groups, &{&1.title, &1.description})
 
+    # Doc nodes already have normalized groups
+    nodes_groups = ExDoc.Utils.natural_sort_by(nodes_groups, & &1.title)
     normal_groups = module_groups ++ nodes_groups
     nodes_by_group_title = Enum.group_by(doc_nodes, & &1.group)
 
