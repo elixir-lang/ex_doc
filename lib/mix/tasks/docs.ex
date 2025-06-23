@@ -374,7 +374,7 @@ defmodule Mix.Tasks.Docs do
         %{title: "Helpers", description: "Functions shared with other modules."}
       ]
 
-  Descriptions can be given in the `:default_group_for_doc` configuration:
+  Descriptions also can be given in the `:default_group_for_doc` configuration:
 
       default_group_for_doc: fn metadata ->
         csae metadata[:group] do
