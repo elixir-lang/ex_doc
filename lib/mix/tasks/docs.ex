@@ -296,15 +296,18 @@ defmodule Mix.Tasks.Docs do
   ### Grouping functions, types, and callbacks
 
   Types, functions, and callbacks inside a module can also be organized in groups.
-  By default, ExDoc respects the `:group` metadata field:
+
+  #### Group metadata
+
+  By default, ExDoc respects the `:group` metadata field to dertermine in which
+  group an element belongs:
 
       @doc group: "Queries"
       def get_by(schema, fields)
 
   The function above will be automatically listed under the "Queries" section in
   the sidebar. The benefit of using `:group` is that it can also be used by tools
-  such as IEx during autocompletion. These groups are then ordered alphabetically
-  in the sidebar.
+  such as IEx during autocompletion. These groups are then displayed in the sidebar.
 
   It is also possible to tell ExDoc to either enrich the group metadata or lookup a
   different field via the `:default_group_for_doc` configuration. The default is:
@@ -322,9 +325,8 @@ defmodule Mix.Tasks.Docs do
         end
       end
 
-  Whenever using the `:group` key, the groups will be ordered alphabetically.
-  If you also want control over the group order, you can also use the `:groups_for_docs`
-  which works similarly as the one for modules/extra pages.
+  Finally, you can also use the `:groups_for_docs` which works similarly as the
+  one for modules/extra pages.
 
   `:groups_for_docs` is a keyword list of group titles and filtering functions
   that receive the documentation metadata and must return a boolean.
@@ -357,6 +359,51 @@ defmodule Mix.Tasks.Docs do
   the `:default_group_for_doc` callback is invoked. If it returns nil, it
   then falls back to the appropriate "Functions", "Types" or "Callbacks"
   section respectively.
+
+  #### Group descriptions
+
+  It is possible to display a description for each group under its respective section
+  in a module's page. This helps to better explain what is the intended usage of each
+  group elements instead of describing everything in the displayed `@moduledoc`.
+
+  Descriptions can be provided as `@moduledoc` metadata. Groups without descriptions are
+  also supported to define group ordering.
+
+      @moduledoc groups: [
+        "Main API",
+        %{title: "Helpers", description: "Functions shared with other modules."}
+      ]
+
+  Descriptions can also be given in the `:default_group_for_doc` configuration:
+
+      default_group_for_doc: fn metadata ->
+        csae metadata[:group] do
+          :main_api -> "Main API"
+          :helpers -> [title: "Helpers", description: "Functions shared with other modules."]
+          _ -> nil
+        end
+      end
+
+  Keyword lists or maps are supported in either case.
+
+  When using `:groups_for_docs`, if all the elements for a given group are matched then the
+  `:default_group_for_doc` is never invoked and ExDoc will not know about the description.
+  In that case, the description should be provided in the `@moduledoc` `:groups` metadata.
+
+  Whenever using the `:group` key, the groups will be ordered alphabetically.
+  If you also want control over the group order, you can also use the `:groups_for_docs`
+  which works similarly as the one for modules/extra pages.
+
+  #### Group ordering
+
+  Groups in the sidebar and main page body are ordered according to the following
+  rules:
+
+  * First, groups defined as `@moduledoc groups: [...]` in the given order.
+  * Then groups defined as keys in the `:groups_for_docs` configuration.
+  * Then default groups: Types, Callbacks and Functions.
+  * Finally, other groups returned by `:default_group_for_doc` by alphabetical
+    order.
 
   ## Meta-tags configuration
 

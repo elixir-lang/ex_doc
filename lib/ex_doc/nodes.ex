@@ -91,6 +91,7 @@ defmodule ExDoc.DocNode do
 end
 
 defmodule ExDoc.DocGroupNode do
+  @moduledoc false
   defstruct title: nil, description: nil, doc: nil, docs: []
 
   @type t :: %__MODULE__{
