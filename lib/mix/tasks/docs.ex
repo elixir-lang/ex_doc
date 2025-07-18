@@ -165,11 +165,16 @@ defmodule Mix.Tasks.Docs do
        See the "Changing documentation over time" section below for more.
 
     * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
-      reference in the current project docs e.g. because of a typo. This list controls where to
-      skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
-      or on a given file (e.g.: `["pages/deprecations.md"]`). This option can also be a function
-      from a reference string to a boolean (e.g.: `&String.match?(&1, ~r/Foo/)`);
-      default is nothing to be skipped.
+      reference in the current project docs (for example, because of a typo). This option controls when to
+      skip such warnings. This option can be a list of strings that will be checked for exact matches,
+      or a function that takes a *reference* and must return a boolean (`true` means "skip this").
+      *References* that are checked against this option (either whether they're in the given
+      list or whether they match the given function) are the relative filename, the "ID" of
+      the node (like `User.exists?/1`), or the module name. Examples for this option:
+        * `["Foo", "Bar.baz/0"]` - skip warnings for `Foo` and `Bar.baz/0`
+        * `&String.match?(&1, ~r/Foo/)` - skip warnings for any reference that matches the regex
+        * `["pages/deprecations.md"]` - skip warnings for any reference in the
+          `pages/deprecations.md` file
 
     * `:skip_code_autolink_to` - Similar to `:skip_undefined_reference_warnings_on`, this option
       controls which terms will be skipped by ExDoc when building documentation.
