@@ -304,7 +304,7 @@ defmodule Mix.Tasks.Docs do
 
   #### Group metadata
 
-  By default, ExDoc respects the `:group` metadata field to dertermine in which
+  By default, ExDoc respects the `:group` metadata field to determine in which
   group an element belongs:
 
       @doc group: "Queries"
@@ -382,7 +382,7 @@ defmodule Mix.Tasks.Docs do
   Descriptions can also be given in the `:default_group_for_doc` configuration:
 
       default_group_for_doc: fn metadata ->
-        csae metadata[:group] do
+        case metadata[:group] do
           :main_api -> "Main API"
           :helpers -> [title: "Helpers", description: "Functions shared with other modules."]
           _ -> nil
