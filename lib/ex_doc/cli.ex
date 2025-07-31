@@ -76,6 +76,13 @@ defmodule ExDoc.CLI do
     for path <- Keyword.get_values(opts, :paths),
         path <- Path.wildcard(path) do
       Code.prepend_path(path)
+      app(path) |> Application.load()
+    end
+
+    # Start all applications with the makeup prefix
+    for {app, _, _} <- Application.loaded_applications(),
+        match?("makeup_" <> _, Atom.to_string(app)) do
+      Application.ensure_all_started(app)
     end
 
     opts =
