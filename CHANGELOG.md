@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.38.3 (2025-08-17)
+
+  * Enhancements
+    * Allow configuring autocomplete limit, and default it to 10 instead of 8
+    * Display description text in docs groups
+    * Load discovered makeup apps for CLI
+
 ## v0.38.2 (2025-05-27)
 
   * Bug fixes
