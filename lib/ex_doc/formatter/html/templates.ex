@@ -40,7 +40,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def module_type(%{type: :module}), do: ""
   def module_type(%{type: type}), do: "<small>#{type}</small>"
 
-  defp enc(binary), do: URI.encode(binary)
+  defp enc(binary), do: ExDoc.Utils.h(URI.encode(binary))
 
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area

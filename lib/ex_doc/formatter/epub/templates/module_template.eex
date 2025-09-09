@@ -25,7 +25,7 @@
     <%= for group <- module.docs_groups, key = text_to_id(group.title) do %>
       <section id="<%= key %>" class="details-list">
         <h1 class="section-heading"><%=h to_string(group.title) %></h1>
-        <%= if doc = group.doc  do %>
+        <%= if doc = group.doc do %>
           <div class="group-description" id="group-description-<%= key %>">
             <%= render_doc(doc) %>
           </div>

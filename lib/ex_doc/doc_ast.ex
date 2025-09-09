@@ -62,7 +62,7 @@ defmodule ExDoc.DocAST do
   end
 
   defp ast_attributes_to_string(attrs) do
-    Enum.map(attrs, fn {key, val} -> " #{key}=\"#{val}\"" end)
+    Enum.map(attrs, fn {key, val} -> " #{key}=\"#{ExDoc.Utils.h(val)}\"" end)
   end
 
   ## parse markdown
