@@ -140,8 +140,6 @@
 
 .sidebar .sidebar-staleIcon {
   font-size: var(--text-lg);
-  position: relative;
-  top: 3px;
   line-height: 0;
 }
 
