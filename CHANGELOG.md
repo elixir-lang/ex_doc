@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.38.4 (2025-09-09)
+
+  * Bug fixes
+    * Fix escaping of links when they have ampersand in them
+    * Increase spacing of footers in pages
+    * Align stale icon positioning
+
 ## v0.38.3 (2025-08-17)
 
   * Enhancements
