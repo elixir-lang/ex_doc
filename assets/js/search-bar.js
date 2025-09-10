@@ -62,7 +62,7 @@ export function focusSearchInput () {
 
 function setAutocompleteLimit () {
   const searchInput = qs(SEARCH_INPUT_SELECTOR)
-  const autocompleteLimit = parseInt(document.querySelector('meta[name="exdoc:autocomplete-limit"]').content)
+  const autocompleteLimit = parseInt(document.querySelector('meta[name="exdoc:autocomplete-limit"]')?.content)
   if (autocompleteLimit) {
     window.autocompleteLimit = autocompleteLimit
   }
