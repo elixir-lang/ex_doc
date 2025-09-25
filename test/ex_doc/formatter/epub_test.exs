@@ -24,7 +24,6 @@ defmodule ExDoc.Formatter.EPUBTest do
       formatter: "epub",
       output: tmp_dir <> "/epub",
       source_beam: "test/tmp/beam",
-      extras: ["test/fixtures/README.md"],
       skip_undefined_reference_warnings_on: ["Warnings"]
     ]
   end
@@ -63,7 +62,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~ ~r{<html.*lang="fr".*xmlns:epub="http://www.idpf.org/2007/ops">}ms
   end
 
-  test "allows to set the authors of the book", %{tmp_dir: tmp_dir} = context do
+  test "allows to set the authors of the document", %{tmp_dir: tmp_dir} = context do
     generate_docs_and_unzip(context, doc_config(context, authors: ["John Doe", "Jane Doe"]))
 
     content = File.read!(tmp_dir <> "/epub/OEBPS/content.opf")
@@ -108,7 +107,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{oebps_dir}/content.opf")
     assert File.regular?("#{oebps_dir}/nav.xhtml")
     assert File.regular?("#{oebps_dir}/title.xhtml")
-    assert File.regular?("#{oebps_dir}/readme.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.Nested.xhtml")
     assert [_] = Path.wildcard("#{dist_dir}/epub-*.js")
@@ -129,7 +127,7 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   test "generates the readme file", %{tmp_dir: tmp_dir} = context do
-    config = doc_config(context, main: "README")
+    config = doc_config(context, main: "README", extras: ["test/fixtures/README.md"])
     generate_docs_and_unzip(context, config)
 
     content = File.read!(tmp_dir <> "/epub/OEBPS/readme.xhtml")
@@ -174,13 +172,13 @@ defmodule ExDoc.Formatter.EPUBTest do
     "CompiledWithDocs.Nested.xhtml"
   ]
 
-  test "before_closing_*_tags required by the user are in the right place",
-       %{tmp_dir: tmp_dir} = context do
+  test "generates before_closing_*_tags using functions", %{tmp_dir: tmp_dir} = context do
     generate_docs_and_unzip(
       context,
       doc_config(context,
         before_closing_head_tag: &before_closing_head_tag/1,
-        before_closing_body_tag: &before_closing_body_tag/1
+        before_closing_body_tag: &before_closing_body_tag/1,
+        extras: ["test/fixtures/README.md"]
       )
     )
 
@@ -193,13 +191,13 @@ defmodule ExDoc.Formatter.EPUBTest do
     end
   end
 
-  test "before_closing_*_tags required by the user are in the right place using map",
-       %{tmp_dir: tmp_dir} = context do
+  test "generates before_closing_*_tags using maps", %{tmp_dir: tmp_dir} = context do
     generate_docs_and_unzip(
       context,
       doc_config(context,
         before_closing_head_tag: %{epub: "<meta name=StaticDemo>"},
-        before_closing_body_tag: %{epub: "<p>StaticDemo</p>"}
+        before_closing_body_tag: %{epub: "<p>StaticDemo</p>"},
+        extras: ["test/fixtures/README.md"]
       )
     )
 
@@ -212,13 +210,13 @@ defmodule ExDoc.Formatter.EPUBTest do
     end
   end
 
-  test "before_closing_*_tags required by the user are in the right place using a MFA",
-       %{tmp_dir: tmp_dir} = context do
+  test "generates before_closing_*_tags using MFA", %{tmp_dir: tmp_dir} = context do
     generate_docs_and_unzip(
       context,
       doc_config(context,
         before_closing_head_tag: {__MODULE__, :before_closing_head_tag, ["Demo"]},
-        before_closing_body_tag: {__MODULE__, :before_closing_body_tag, ["Demo"]}
+        before_closing_body_tag: {__MODULE__, :before_closing_body_tag, ["Demo"]},
+        extras: ["test/fixtures/README.md"]
       )
     )
 
@@ -231,7 +229,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     end
   end
 
-  test "assets required by the user end up in the right place", %{tmp_dir: tmp_dir} = context do
+  test "generates assets required by the user", %{tmp_dir: tmp_dir} = context do
     File.mkdir_p!("test/tmp/epub_assets/hello")
     File.touch!("test/tmp/epub_assets/hello/world.png")
     File.touch!("test/tmp/epub_assets/hello/world.pdf")
@@ -256,43 +254,30 @@ defmodule ExDoc.Formatter.EPUBTest do
   describe "warnings" do
     @describetag :warnings
 
-    test "multiple warnings are registered when using warnings_as_errors: true", context do
-      Utils.unset_warned()
+    for warnings_as_errors <- [true, false] do
+      test "when warnings_as_errors: #{warnings_as_errors}", context do
+        Utils.unset_warned()
 
-      output =
-        capture_io(:stderr, fn ->
-          generate_docs(
-            doc_config(context,
-              skip_undefined_reference_warnings_on: [],
-              warnings_as_errors: true
+        output =
+          capture_io(:stderr, fn ->
+            generate_docs(
+              doc_config(context,
+                skip_undefined_reference_warnings_on: [],
+                warnings_as_errors: unquote(warnings_as_errors)
+              )
             )
-          )
-        end)
+          end)
 
-      # TODO: remove check when we require Elixir v1.16
-      if Version.match?(System.version(), ">= 1.16.0-rc") do
-        assert output =~ ~S|moduledoc `Warnings.bar/0`|
-        assert output =~ ~S|typedoc `Warnings.bar/0`|
-        assert output =~ ~S|doc callback `Warnings.bar/0`|
-        assert output =~ ~S|doc `Warnings.bar/0`|
+        # TODO: remove check when we require Elixir v1.16
+        if Version.match?(System.version(), ">= 1.16.0-rc") do
+          assert output =~ ~S|moduledoc `Warnings.bar/0`|
+          assert output =~ ~S|typedoc `Warnings.bar/0`|
+          assert output =~ ~S|doc callback `Warnings.bar/0`|
+          assert output =~ ~S|doc `Warnings.bar/0`|
+        end
+
+        assert Utils.unset_warned()
       end
-
-      assert Utils.unset_warned()
-    end
-
-    test "warnings are registered even with warnings_as_errors: false", context do
-      Utils.unset_warned()
-
-      capture_io(:stderr, fn ->
-        generate_docs(
-          doc_config(context,
-            skip_undefined_reference_warnings_on: [],
-            warnings_as_errors: false
-          )
-        )
-      end)
-
-      assert Utils.unset_warned()
     end
   end
 end
