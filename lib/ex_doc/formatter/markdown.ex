@@ -10,6 +10,47 @@ defmodule ExDoc.Formatter.MARKDOWN do
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
+    # Legacy implementation - build extras inline
+    extras = Formatter.build_extras(config, ".md")
+    run_with_extras(project_nodes, filtered_modules, extras, config)
+  end
+
+  @doc """
+  Generates Markdown documentation using pre-built ExtraNode structures.
+
+  This is the new architecture that accepts pre-processed extras to eliminate
+  duplicate work when multiple formatters are used.
+  """
+  @spec run_with_extra_nodes([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], [ExDoc.ExtraNode.t()], ExDoc.Config.t()) :: String.t()
+  def run_with_extra_nodes(project_nodes, filtered_modules, extra_nodes, config) when is_map(config) do
+    # Convert ExtraNode structures to the format expected by Markdown formatter
+    extras = extra_nodes_to_markdown_extras(extra_nodes)
+    run_with_extras(project_nodes, filtered_modules, extras, config)
+  end
+
+  # Convert ExtraNode structures to the format expected by Markdown formatter
+  defp extra_nodes_to_markdown_extras(extra_nodes) do
+    extra_nodes
+    |> Enum.map(fn %ExDoc.ExtraNode{} = node ->
+      # Note: Markdown formatter's generate_extras expects 'source' to contain processed markdown content
+      processed_content = ExDoc.ExtraNode.content_for_format(node, :markdown)
+      %{
+        source: processed_content,  # This is what gets written to .md files
+        content: processed_content,
+        group: node.group,
+        id: node.id,
+        source_path: node.source_path,
+        source_url: node.source_url,
+        title: node.title,
+        title_content: node.title_content
+      }
+    end)
+    |> Enum.chunk_by(& &1.group)
+    |> Enum.map(&{hd(&1).group, &1})
+  end
+
+  # Common implementation used by both legacy and new architecture
+  defp run_with_extras(project_nodes, filtered_modules, extras, config) do
     Utils.unset_warned()
 
     config = normalize_config(config)
@@ -18,19 +59,12 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
     project_nodes =
       project_nodes
-      # |> Enum.map(&elem(&1, 1))
       |> Formatter.render_all(filtered_modules, ".md", config, highlight_tag: "samp")
 
     nodes_map = %{
       modules: Formatter.filter_list(:module, project_nodes),
       tasks: Formatter.filter_list(:task, project_nodes)
     }
-
-    extras =
-      config
-      |> Formatter.build_extras(".md")
-      |> Enum.chunk_by(& &1.group)
-      |> Enum.map(&{hd(&1).group, &1})
 
     config = %{config | extras: extras}
 
@@ -136,7 +170,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
       ""
     end
 
-    extras_info = if length(config.extras) > 0 do
+    extras_info = if is_list(config.extras) and length(config.extras) > 0 do
       extras_list =
         config.extras
         |> Enum.flat_map(fn {_group, extras} -> extras end)

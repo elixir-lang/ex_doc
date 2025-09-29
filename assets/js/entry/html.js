@@ -17,6 +17,7 @@ import { initialize as initToast } from '../toast'
 import { initialize as initTooltips } from '../tooltips/tooltips'
 import { initialize as initHintsPage } from '../tooltips/hint-page'
 import { initialize as initCopyButton } from '../copy-button'
+import { initialize as initCopyMarkdown } from '../copy-markdown'
 import { initialize as initSettings } from '../settings'
 import { initialize as initStyling } from '../styling'
 import { initialize as initPreview} from '../preview'
@@ -39,6 +40,7 @@ onDocumentReady(() => {
   initMakeup()
   initTooltips()
   initCopyButton()
+  initCopyMarkdown()
 
   if (isPreview && isEmbedded) {
     initPreview()
@@ -61,6 +63,7 @@ onDocumentReady(() => {
             initMakeup()
             initTooltips()
             initCopyButton()
+            initCopyMarkdown()
 
             updateSidebarDrawer()
             updateSidebarContent()

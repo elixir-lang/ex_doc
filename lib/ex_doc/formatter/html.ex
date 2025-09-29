@@ -12,6 +12,42 @@ defmodule ExDoc.Formatter.HTML do
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
+    # Legacy implementation - build extras inline
+    extras = Formatter.build_extras(config, ".html")
+    run_with_extras(project_nodes, filtered_modules, extras, config)
+  end
+
+  @doc """
+  Generates HTML documentation using pre-built ExtraNode structures.
+
+  This is the new architecture that accepts pre-processed extras to eliminate
+  duplicate work when multiple formatters are used.
+  """
+  @spec run_with_extra_nodes([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], [ExDoc.ExtraNode.t()], ExDoc.Config.t()) :: String.t()
+  def run_with_extra_nodes(project_nodes, filtered_modules, extra_nodes, config) when is_map(config) do
+    # Convert ExtraNode structures to the format expected by HTML formatter
+    extras = extra_nodes_to_html_extras(extra_nodes)
+    run_with_extras(project_nodes, filtered_modules, extras, config)
+  end
+
+  # Convert ExtraNode structures to the format expected by HTML formatter
+  defp extra_nodes_to_html_extras(extra_nodes) do
+    Enum.map(extra_nodes, fn %ExDoc.ExtraNode{} = node ->
+      %{
+        source: node.source,
+        content: ExDoc.ExtraNode.content_for_format(node, :html),
+        group: node.group,
+        id: node.id,
+        source_path: node.source_path,
+        source_url: node.source_url,
+        title: node.title,
+        title_content: node.title_content
+      }
+    end)
+  end
+
+  # Common implementation used by both legacy and new architecture
+  defp run_with_extras(project_nodes, filtered_modules, extras, config) do
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
 
@@ -19,7 +55,6 @@ defmodule ExDoc.Formatter.HTML do
     output_setup(build, config)
 
     project_nodes = Formatter.render_all(project_nodes, filtered_modules, ".html", config, [])
-    extras = Formatter.build_extras(config, ".html")
 
     # Generate search early on without api reference in extras
     static_files = generate_assets(".", default_assets(config), config)
@@ -38,6 +73,9 @@ defmodule ExDoc.Formatter.HTML do
         extras
       end
 
+    # Generate markdown files alongside HTML
+    markdown_files = generate_markdown_files(project_nodes, filtered_modules, config)
+
     all_files =
       search_data ++
         static_files ++
@@ -48,7 +86,9 @@ defmodule ExDoc.Formatter.HTML do
         generate_not_found(nodes_map, config) ++
         generate_list(nodes_map.modules, nodes_map, config) ++
         generate_list(nodes_map.tasks, nodes_map, config) ++
-        generate_redirects(config, ".html")
+        generate_redirects(config, ".html") ++
+        generate_llm_index(nodes_map, extras, config) ++
+        markdown_files
 
     generate_build(Enum.sort(all_files), build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
@@ -337,6 +377,132 @@ defmodule ExDoc.Formatter.HTML do
       Map.put(config, :canonical, canonical_url)
     else
       config
+    end
+  end
+
+  defp generate_llm_index(nodes_map, extras, config) do
+    content = generate_llm_index_content(nodes_map, extras, config)
+    File.write!("#{config.output}/llms.txt", content)
+    ["llms.txt"]
+  end
+
+  defp generate_llm_index_content(nodes_map, extras, config) do
+    project_info = """
+    # #{config.project} #{config.version}
+
+    #{config.project} documentation index for Large Language Models.
+
+    ## Modules
+
+    """
+
+    modules_info =
+      nodes_map.modules
+      |> Enum.map(fn module_node ->
+        "- **#{module_node.title}** (#{module_node.id}.html): #{module_node.doc |> extract_summary()}"
+      end)
+      |> Enum.join("\n")
+
+    tasks_info = if length(nodes_map.tasks) > 0 do
+      tasks_list =
+        nodes_map.tasks
+        |> Enum.map(fn task_node ->
+          "- **#{task_node.title}** (#{task_node.id}.html): #{task_node.doc |> extract_summary()}"
+        end)
+        |> Enum.join("\n")
+
+      "\n\n## Mix Tasks\n\n" <> tasks_list
+    else
+      ""
+    end
+
+    extras_info = if length(extras) > 0 do
+      extras_list =
+        extras
+        |> Enum.map(fn extra ->
+          "- **#{extra.title}** (#{extra.id}.html): #{extra.title}"
+        end)
+        |> Enum.join("\n")
+
+      "\n\n## Guides\n\n" <> extras_list
+    else
+      ""
+    end
+
+    project_info <> modules_info <> tasks_info <> extras_info
+  end
+
+  defp extract_summary(nil), do: "No documentation available"
+  defp extract_summary(""), do: "No documentation available"
+  defp extract_summary(doc) when is_binary(doc) do
+    doc
+    |> String.split("\n")
+    |> Enum.find("", fn line -> String.trim(line) != "" end)
+    |> String.trim()
+    |> case do
+      "" -> "No documentation available"
+      summary -> summary |> String.slice(0, 150) |> then(fn s -> if String.length(s) == 150, do: s <> "...", else: s end)
+    end
+  end
+  defp extract_summary(doc_ast) when is_list(doc_ast) do
+    # For DocAST (which is a list), extract the first text node
+    extract_first_text_from_ast(doc_ast)
+  end
+  defp extract_summary(_), do: "No documentation available"
+
+  defp extract_first_text_from_ast([]), do: "No documentation available"
+  defp extract_first_text_from_ast([{:p, _, content} | _rest]) do
+    extract_text_from_content(content) |> String.slice(0, 150) |> then(fn s -> if String.length(s) == 150, do: s <> "...", else: s end)
+  end
+  defp extract_first_text_from_ast([_node | rest]) do
+    extract_first_text_from_ast(rest)
+  end
+
+  defp extract_text_from_content([]), do: ""
+  defp extract_text_from_content([text | _rest]) when is_binary(text), do: text
+  defp extract_text_from_content([{_tag, _attrs, content} | rest]) do
+    case extract_text_from_content(content) do
+      "" -> extract_text_from_content(rest)
+      text -> text
+    end
+  end
+  defp extract_text_from_content([_ | rest]) do
+    extract_text_from_content(rest)
+  end
+
+  # Markdown generation functions
+
+  defp generate_markdown_files(project_nodes, filtered_modules, config) do
+    # Create markdown subdirectory
+    markdown_dir = Path.join(config.output, "markdown")
+    File.mkdir_p!(markdown_dir)
+
+    # Configure for markdown generation
+    markdown_config = %{config |
+      output: markdown_dir,
+      formatter: "markdown"
+    }
+
+    # Generate markdown docs using the new ExtraNode architecture for consistency
+    try do
+      # Use the same architecture path as the main generation
+      extra_nodes = ExDoc.ExtraNode.build_extras(markdown_config)
+      ExDoc.Formatter.MARKDOWN.run_with_extra_nodes(project_nodes, filtered_modules, extra_nodes, markdown_config)
+
+      # List all generated markdown files for build tracking
+      markdown_files =
+        markdown_dir
+        |> File.ls!()
+        |> Enum.filter(&String.ends_with?(&1, ".md"))
+
+      # Prefix all paths with "markdown/" for the build file tracking
+      Enum.map(markdown_files, &("markdown/" <> &1))
+    rescue
+      e ->
+        # If markdown generation fails, log and continue without markdown files
+        require Logger
+        Logger.warning("Failed to generate markdown files: #{inspect(e)}")
+        []
     end
   end
 end

@@ -17,12 +17,22 @@ defmodule ExDoc.Formatter.HTMLTest do
   @before_closing_footer_tag_content_html "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-FOOTER-TAG-EPUB</dont-escape>"
 
   defp before_closing_head_tag(:html), do: @before_closing_head_tag_content_html
+  defp before_closing_head_tag(:markdown), do: "<!-- MARKDOWN HEAD TAG -->"
+
   defp before_closing_body_tag(:html), do: @before_closing_body_tag_content_html
+  defp before_closing_body_tag(:markdown), do: "<!-- MARKDOWN BODY TAG -->"
+
   defp before_closing_footer_tag(:html), do: @before_closing_footer_tag_content_html
+  defp before_closing_footer_tag(:markdown), do: "<!-- MARKDOWN FOOTER TAG -->"
 
   def before_closing_head_tag(:html, name), do: "<meta name=#{name}>"
+  def before_closing_head_tag(:markdown, name), do: "<!-- #{name} -->"
+
   def before_closing_body_tag(:html, name), do: "<p>#{name}</p>"
+  def before_closing_body_tag(:markdown, name), do: "<!-- #{name} -->"
+
   def before_closing_footer_tag(:html, name), do: "<p>#{name}</p>"
+  def before_closing_footer_tag(:markdown, name), do: "<!-- #{name} -->"
 
   defp doc_config(%{tmp_dir: tmp_dir} = _context) do
     [
@@ -897,5 +907,17 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert File.read_link(tmp_dir <> "/html/assets/hello/symlink_world") == {:error, :einval}
   after
     File.rm_rf!("test/tmp/html_assets")
+  end
+
+  test "generates llms.txt index file", %{tmp_dir: tmp_dir} = context do
+    generate_docs(doc_config(context))
+
+    assert File.regular?(tmp_dir <> "/html/llms.txt")
+    content = File.read!(tmp_dir <> "/html/llms.txt")
+
+    assert content =~ "# Elixir 1.0.1"
+    assert content =~ "documentation index for Large Language Models"
+    assert content =~ "## Modules"
+    assert content =~ "**CompiledWithDocs** (CompiledWithDocs.html):"
   end
 end

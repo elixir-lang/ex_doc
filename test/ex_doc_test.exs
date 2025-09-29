@@ -15,6 +15,10 @@ defmodule ExDocTest do
     def run(modules, _filtered, config) do
       {modules, config}
     end
+
+    def run_with_extra_nodes(modules, _filtered, _extra_nodes, config) do
+      {modules, config}
+    end
   end
 
   test "uses custom markdown processor", %{tmp_dir: tmp_dir} do

@@ -134,6 +134,129 @@ defmodule ExDoc.Formatter do
     |> Enum.sort_by(fn extra -> GroupMatcher.index(groups, extra.group) end)
   end
 
+  @doc """
+  Builds extra nodes in a format-agnostic way, preparing content for all formats.
+
+  This function builds ExtraNode structures that contain the processed content
+  for multiple formats, eliminating the need for each formatter to rebuild the same content.
+  """
+  def build_extras_for_extra_node(config) do
+    groups = config.groups_for_extras
+
+    language =
+      case config.proglang do
+        :erlang -> ExDoc.Language.Erlang
+        _ -> ExDoc.Language.Elixir
+      end
+
+    source_url_pattern = config.source_url_pattern
+
+    # Build base autolink options (without ext since we'll render for multiple formats)
+    base_autolink_opts = [
+      apps: config.apps,
+      deps: config.deps,
+      extras: extra_paths(config),
+      language: language,
+      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
+      skip_code_autolink_to: config.skip_code_autolink_to
+    ]
+
+    extras =
+      config.extras
+      |> Task.async_stream(
+        &build_extra_node(&1, groups, language, base_autolink_opts, source_url_pattern),
+        timeout: :infinity
+      )
+      |> Enum.map(&elem(&1, 1))
+
+    ids_count = Enum.reduce(extras, %{}, &Map.update(&2, &1.id, 1, fn c -> c + 1 end))
+
+    extras
+    |> Enum.map_reduce(1, fn extra, idx ->
+      if ids_count[extra.id] > 1, do: {disambiguate_extra_node_id(extra, idx), idx + 1}, else: {extra, idx}
+    end)
+    |> elem(0)
+    |> Enum.sort_by(fn extra -> GroupMatcher.index(groups, extra.group) end)
+  end
+
+  defp build_extra_node(
+         {input, input_options},
+         groups,
+         language,
+         base_autolink_opts,
+         source_url_pattern
+       ) do
+    input = to_string(input)
+    id = input_options[:filename] || input |> filename_to_title() |> Utils.text_to_id()
+    source_file = input_options[:source] || input
+    opts = [file: source_file, line: 1]
+
+    {source, ast} =
+      case extension_name(input) do
+        extension when extension in ["", ".txt"] ->
+          source = File.read!(input)
+          ast = [{:pre, [], "\n" <> source, %{}}]
+          {source, ast}
+
+        extension when extension in [".md", ".livemd", ".cheatmd"] ->
+          source = File.read!(input)
+
+          ast =
+            source
+            |> Markdown.to_ast(opts)
+            |> sectionize(extension)
+
+          {source, ast}
+
+        _ ->
+          raise ArgumentError,
+                "file extension not recognized, allowed extension is either .cheatmd, .livemd, .md, .txt or no extension"
+      end
+
+    {title_ast, ast} =
+      case ExDoc.DocAST.extract_title(ast) do
+        {:ok, title_ast, ast} -> {title_ast, ast}
+        :error -> {nil, ast}
+      end
+
+    title_text = title_ast && ExDoc.DocAST.text_from_ast(title_ast)
+    title_html = title_ast && ExDoc.DocAST.to_string(title_ast)
+
+    # Build content for all formats
+    content = %{
+      ast: ast,
+      html: autolink_and_render(ast, ".html", language, [file: input, ext: ".html"] ++ base_autolink_opts, opts),
+      epub: autolink_and_render(ast, ".xhtml", language, [file: input, ext: ".xhtml"] ++ base_autolink_opts, opts),
+      # For markdown, use the original source to preserve markdown syntax without HTML attributes
+      markdown: source
+    }
+
+    group = GroupMatcher.match_extra(groups, input)
+    title = input_options[:title] || title_text || filename_to_title(input)
+
+    source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
+    source_url = Utils.source_url_pattern(source_url_pattern, source_path, 1)
+
+    %ExDoc.ExtraNode{
+      id: id,
+      title: title,
+      title_content: title_html || title,
+      source: source,
+      source_path: source_path,
+      source_url: source_url,
+      group: group,
+      content: content
+    }
+  end
+
+  defp build_extra_node(input, groups, language, base_autolink_opts, source_url_pattern) do
+    build_extra_node({input, []}, groups, language, base_autolink_opts, source_url_pattern)
+  end
+
+  defp disambiguate_extra_node_id(%ExDoc.ExtraNode{} = extra, idx) do
+    %{extra | id: "#{extra.id}-#{idx}"}
+  end
+
   defp build_extra(
          {input, input_options},
          groups,

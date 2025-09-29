@@ -30,8 +30,26 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
     static_file |> Path.basename() |> text_to_id()
   end
 
-  def node_doc(%{source_doc: %{"en" => source}}), do: source
-  def node_doc(%{rendered_doc: source}), do: source
+  def node_doc(%{source_doc: %{"en" => source}}) when is_binary(source), do: source
+  def node_doc(%{rendered_doc: source}) when is_binary(source), do: source
+  def node_doc(%{source_doc: %{"en" => source}}) when is_list(source) do
+    # Handle DocAST by converting to markdown
+    # For Erlang docs, we can extract text content
+    extract_text_from_doc_ast(source)
+  end
+  def node_doc(_), do: nil
+
+  defp extract_text_from_doc_ast(ast) when is_list(ast) do
+    Enum.map_join(ast, "\n\n", &extract_text_from_doc_ast/1)
+  end
+  defp extract_text_from_doc_ast({_tag, _attrs, content}) when is_list(content) do
+    Enum.map_join(content, "", &extract_text_from_doc_ast/1)
+  end
+  defp extract_text_from_doc_ast({_tag, _attrs, content, _meta}) when is_list(content) do
+    Enum.map_join(content, "", &extract_text_from_doc_ast/1)
+  end
+  defp extract_text_from_doc_ast(text) when is_binary(text), do: text
+  defp extract_text_from_doc_ast(_), do: ""
 
   @doc """
   Gets the first paragraph of the documentation of a node. It strips

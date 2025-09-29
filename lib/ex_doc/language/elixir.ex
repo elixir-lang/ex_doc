@@ -654,6 +654,14 @@ defmodule ExDoc.Language.Elixir do
   defp typespec_name({:"::", _, [{name, _, _}, _]}), do: Atom.to_string(name)
   defp typespec_name({:when, _, [left, _]}), do: typespec_name(left)
   defp typespec_name({name, _, _}) when is_atom(name), do: Atom.to_string(name)
+  # Handle case where spec is already a string (possibly pre-processed)
+  defp typespec_name(spec) when is_binary(spec) do
+    # Extract the function name from the beginning of the spec string
+    case Regex.run(~r/^([a-zA-Z_][a-zA-Z0-9_]*[?!]?)/, spec) do
+      [_, name] -> name
+      _ -> "unknown"
+    end
+  end
 
   # extract out function name so we don't process it. This is to avoid linking it when there's
   # a type with the same name

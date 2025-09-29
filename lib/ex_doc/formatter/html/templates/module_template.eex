@@ -3,12 +3,22 @@
 
 <div id="top-content">
   <h1>
-    <%= if module.source_url do %>
-      <a href="<%= module.source_url %>" title="View Source" class="icon-action" rel="help">
+    <div class="actions-group">
+      <%= if module.source_url do %>
+        <a href="<%= module.source_url %>" title="View Source" class="icon-action" rel="help">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+          <span class="sr-only">View Source</span>
+        </a>
+      <% end %>
+      <button onclick="copyMarkdown('<%= module.id %>.md')" title="Copy Markdown" class="copy-markdown-btn" rel="help">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        <span>Copy for LLM</span>
+      </button>
+      <a href="./markdown/<%= module.id %>.md" title="View as Markdown" class="copy-markdown-btn" rel="help">
         <i class="ri-code-s-slash-line" aria-hidden="true"></i>
-        <span class="sr-only">View Source</span>
+        <span>View as Markdown</span>
       </a>
-    <% end %>
+    </div>
 
     <span translate="no"><%= module.title %></span> <%= module_type(module) %>
     <small class="app-vsn" translate="no">(<%= config.project %> v<%= config.version %>)</small>
