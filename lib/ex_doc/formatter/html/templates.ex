@@ -64,8 +64,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     Regex.replace(~r|(<[^>]*) id="[^"]*"([^>]*>)|, doc, ~S"\1\2", [])
   end
 
-  defp presence([]), do: nil
-  defp presence(other), do: other
 
   def enc(binary), do: URI.encode(binary)
 

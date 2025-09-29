@@ -38,6 +38,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
     generate_extras(config)
     generate_list(config, nodes_map.modules)
     generate_list(config, nodes_map.tasks)
+    generate_llm_index(config, nodes_map)
 
     config.output |> Path.join("index.md") |> Path.relative_to_cwd()
   end
@@ -98,5 +99,95 @@ defmodule ExDoc.Formatter.MARKDOWN do
       |> normalize_output()
 
     File.write("#{config.output}/#{module_node.id}.md", content)
+  end
+
+  defp generate_llm_index(config, nodes_map) do
+    content = generate_llm_index_content(config, nodes_map)
+    File.write("#{config.output}/llms.txt", content)
+  end
+
+  defp generate_llm_index_content(config, nodes_map) do
+    project_info = """
+    # #{config.project} #{config.version}
+
+    #{config.project} documentation index for Large Language Models.
+
+    ## Modules
+
+    """
+
+    modules_info =
+      nodes_map.modules
+      |> Enum.map(fn module_node ->
+        "- **#{module_node.title}** (#{module_node.id}.md): #{module_node.doc |> extract_summary()}"
+      end)
+      |> Enum.join("\n")
+
+    tasks_info = if length(nodes_map.tasks) > 0 do
+      tasks_list =
+        nodes_map.tasks
+        |> Enum.map(fn task_node ->
+          "- **#{task_node.title}** (#{task_node.id}.md): #{task_node.doc |> extract_summary()}"
+        end)
+        |> Enum.join("\n")
+
+      "\n\n## Mix Tasks\n\n" <> tasks_list
+    else
+      ""
+    end
+
+    extras_info = if length(config.extras) > 0 do
+      extras_list =
+        config.extras
+        |> Enum.flat_map(fn {_group, extras} -> extras end)
+        |> Enum.map(fn extra ->
+          "- **#{extra.title}** (#{extra.id}.md): #{extra.title}"
+        end)
+        |> Enum.join("\n")
+
+      "\n\n## Guides\n\n" <> extras_list
+    else
+      ""
+    end
+
+    project_info <> modules_info <> tasks_info <> extras_info
+  end
+
+  defp extract_summary(nil), do: "No documentation available"
+  defp extract_summary(""), do: "No documentation available"
+  defp extract_summary(doc) when is_binary(doc) do
+    doc
+    |> String.split("\n")
+    |> Enum.find("", fn line -> String.trim(line) != "" end)
+    |> String.trim()
+    |> case do
+      "" -> "No documentation available"
+      summary -> summary |> String.slice(0, 150) |> then(fn s -> if String.length(s) == 150, do: s <> "...", else: s end)
+    end
+  end
+  defp extract_summary(doc_ast) when is_list(doc_ast) do
+    # For DocAST (which is a list), extract the first text node
+    extract_first_text_from_ast(doc_ast)
+  end
+  defp extract_summary(_), do: "No documentation available"
+
+  defp extract_first_text_from_ast([]), do: "No documentation available"
+  defp extract_first_text_from_ast([{:p, _, content} | _rest]) do
+    extract_text_from_content(content) |> String.slice(0, 150) |> then(fn s -> if String.length(s) == 150, do: s <> "...", else: s end)
+  end
+  defp extract_first_text_from_ast([_node | rest]) do
+    extract_first_text_from_ast(rest)
+  end
+
+  defp extract_text_from_content([]), do: ""
+  defp extract_text_from_content([text | _rest]) when is_binary(text), do: text
+  defp extract_text_from_content([{_tag, _attrs, content} | rest]) do
+    case extract_text_from_content(content) do
+      "" -> extract_text_from_content(rest)
+      text -> text
+    end
+  end
+  defp extract_text_from_content([_node | rest]) do
+    extract_text_from_content(rest)
   end
 end

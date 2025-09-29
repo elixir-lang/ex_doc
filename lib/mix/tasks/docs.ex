@@ -12,9 +12,9 @@ defmodule Mix.Tasks.Docs do
     * `--canonical`, `-n` - Indicate the preferred URL with
       `rel="canonical"` link element, defaults to no canonical path
 
-    * `--formatter`, `-f` - Which formatters to use, `html` or
-      `epub`. This option can be given more than once. By default,
-      both `html` and `epub` are generated.
+    * `--formatter`, `-f` - Which formatters to use, `html`,
+      `epub`, or `markdown`. This option can be given more than once. By default,
+      `html`, `epub`, and `markdown` are generated.
 
     * `--language` - Specifies the language to annotate the
       EPUB output in valid [BCP 47](https://tools.ietf.org/html/bcp47)
@@ -122,7 +122,7 @@ defmodule Mix.Tasks.Docs do
       against the complete module name (which includes the "Elixir." prefix for
       Elixir modules). If a module has `@moduledoc false`, then it is always excluded.
 
-    * `:formatters` - Formatter to use; default: ["html", "epub"], options: "html", "epub".
+    * `:formatters` - Formatter to use; default: ["html", "epub", "markdown"], options: "html", "epub", "markdown".
 
     * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_docs`, and `:default_group_for_doc` -
       See the "Groups" section
@@ -465,7 +465,7 @@ defmodule Mix.Tasks.Docs do
   defp normalize_formatters(options) do
     formatters =
       case Keyword.get_values(options, :formatter) do
-        [] -> options[:formatters] || ["html", "epub"]
+        [] -> options[:formatters] || ["html", "epub", "markdown"]
         values -> values
       end
 

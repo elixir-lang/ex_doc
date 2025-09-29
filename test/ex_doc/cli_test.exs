@@ -9,13 +9,13 @@ defmodule ExDoc.CLITest do
   end
 
   test "minimum command-line options" do
-    {[html, epub], _io} = run(["ExDoc", "1.2.3", @ebin])
+    {[html, epub, markdown], _io} = run(["ExDoc", "1.2.3", @ebin])
 
     assert html ==
              {"ExDoc", "1.2.3",
               [
                 formatter: "html",
-                formatters: ["html", "epub"],
+                formatters: ["html", "epub", "markdown"],
                 apps: [:ex_doc],
                 source_beam: @ebin
               ]}
@@ -24,7 +24,16 @@ defmodule ExDoc.CLITest do
              {"ExDoc", "1.2.3",
               [
                 formatter: "epub",
-                formatters: ["html", "epub"],
+                formatters: ["html", "epub", "markdown"],
+                apps: [:ex_doc],
+                source_beam: @ebin
+              ]}
+
+    assert markdown ==
+             {"ExDoc", "1.2.3",
+              [
+                formatter: "markdown",
+                formatters: ["html", "epub", "markdown"],
                 apps: [:ex_doc],
                 source_beam: @ebin
               ]}

@@ -3,10 +3,9 @@ defmodule ExDoc.Formatter.MARKDOWNTest do
 
   @moduletag :tmp_dir
 
-  @before_closing_body_tag_content_md "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
+  @before_closing_body_tag_content_md "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-MARKDOWN</dont-escape>"
 
-  defp before_closing_body_tag(:markdown), do: @before_closing_body_tag_content_md
-
+  def before_closing_body_tag(:markdown), do: @before_closing_body_tag_content_md
   def before_closing_body_tag(:markdown, name), do: "#{name}"
 
   defp doc_config(%{tmp_dir: tmp_dir} = _context) do
@@ -73,5 +72,15 @@ defmodule ExDoc.Formatter.MARKDOWNTest do
 
     content = File.read!(tmp_dir <> "/markdown/index.md")
     assert content =~ "Table of contents\n\n  - [README](readme.md)"
+  end
+
+  test "includes before_closing_body_tag content", %{tmp_dir: tmp_dir} = context do
+    generate_docs(doc_config(context,
+      before_closing_body_tag: &before_closing_body_tag/1,
+      extras: ["test/fixtures/README.md"]
+    ))
+
+    content = File.read!(tmp_dir <> "/markdown/index.md")
+    assert content =~ @before_closing_body_tag_content_md
   end
 end

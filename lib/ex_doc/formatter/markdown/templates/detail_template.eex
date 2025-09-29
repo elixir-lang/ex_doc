@@ -6,8 +6,10 @@
 <% end %>
 
 <%= if node.specs != [] do %>
-<%= for spec <- node.specs do %> 
-> <%= H.format_spec_attribute(module, node) %> <%= spec %>
+<%= for spec <- node.specs do %>
+```elixir
+<%= H.format_spec_attribute(module, node) %> <%= spec %>
+```
 <% end %>
 <% end %>
 
