@@ -12,9 +12,9 @@ defmodule Mix.Tasks.Docs do
     * `--canonical`, `-n` - Indicate the preferred URL with
       `rel="canonical"` link element, defaults to no canonical path
 
-    * `--formatter`, `-f` - Which formatters to use, `html` or
-      `epub`. This option can be given more than once. By default,
-      both `html` and `epub` are generated.
+    * `--formatter`, `-f` - Which formatters to use, `html`,
+      `epub`, or `markdown`. This option can be given more than once. By default,
+      `html`, `epub`, and `markdown` are generated.
 
     * `--language` - Specifies the language to annotate the
       EPUB output in valid [BCP 47](https://tools.ietf.org/html/bcp47)
@@ -130,7 +130,7 @@ defmodule Mix.Tasks.Docs do
       against the complete module name (which includes the "Elixir." prefix for
       Elixir modules). If a module has `@moduledoc false`, then it is always excluded.
 
-    * `:formatters` - Formatter to use; default: ["html", "epub"], options: "html", "epub".
+    * `:formatters` - Formatter to use; default: ["html", "epub", "markdown"], options: "html", "epub", "markdown".
 
     * `:footer` - When false, does not render the footer on all pages, except for
       the required "Built with ExDoc" note.
@@ -611,7 +611,12 @@ defmodule Mix.Tasks.Docs do
 
     results =
       for formatter <- options[:formatters] do
-        index = generator.(project, version, Keyword.put(options, :formatter, formatter))
+        formatter_options =
+          options
+          |> Keyword.put(:formatter, formatter)
+          |> update_output_for_formatter(formatter)
+
+        index = generator.(project, version, formatter_options)
         Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"])
 
         if cli_opts[:open] do
@@ -650,11 +655,21 @@ defmodule Mix.Tasks.Docs do
   defp normalize_formatters(options) do
     formatters =
       case Keyword.get_values(options, :formatter) do
-        [] -> options[:formatters] || ["html", "epub"]
+        [] -> options[:formatters] || ["html", "epub", "markdown"]
         values -> values
       end
 
     Keyword.put(options, :formatters, formatters)
+  end
+
+  defp update_output_for_formatter(options, "markdown") do
+    output = options[:output] || "doc"
+    Keyword.put(options, :output, Path.join(output, "markdown"))
+  end
+
+  defp update_output_for_formatter(options, _formatter) do
+    output = options[:output] || "doc"
+    Keyword.put(options, :output, output)
   end
 
   defp get_docs_opts(config) do

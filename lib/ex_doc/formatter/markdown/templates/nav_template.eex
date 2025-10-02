@@ -1,0 +1,9 @@
+# <%= config.project %> v<%= config.version %> - Documentation - Table of Contents
+
+<%= nav_grouped_item_template config.extras  %>
+<%= unless Enum.empty?(nodes.modules) do %>
+## Modules
+<%= nav_grouped_item_template nodes.modules  %>    
+<% end %>
+<%= nav_item_template "Mix Tasks", nodes.tasks %>
+<%= before_closing_body_tag(config, :markdown) %>
