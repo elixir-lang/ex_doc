@@ -1,0 +1,15 @@
+### <%= name %>
+
+<%= for node <- nodes do %>
+
+#### [`<%=h node.signature %>`](#<%= enc node.id %>)
+
+<%= if deprecated = node.deprecated do %>
+> <%= h(deprecated) %>
+
+<% end %>
+<%= if synopsis_content = node_synopsis(node) do %>
+<%= synopsis_content %>
+<% end %>
+
+<% end %>
