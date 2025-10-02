@@ -1,7 +1,7 @@
 defmodule ExDoc.Formatter.HTML.TemplatesTest do
   use ExUnit.Case, async: true
 
-  alias ExDoc.Formatter.HTML
+  alias ExDoc.Formatter
   alias ExDoc.Formatter.HTML.Templates
 
   @moduletag :tmp_dir
@@ -30,7 +30,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   defp get_module_page(names, context, config \\ []) do
     config = doc_config(context, config)
     {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
-    [mod | _] = HTML.render_all(mods, [], ".html", config, [])
+    [mod | _] = Formatter.render_all(mods, [], ".html", config, [])
     Templates.module_page(mod, config)
   end
 
