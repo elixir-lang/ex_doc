@@ -8,11 +8,12 @@ ExDoc is a tool to generate documentation for Erlang and Elixir projects. To see
 
 ExDoc ships with many features:
 
-  * Automatically generates online- and offline-accessible HTML and EPUB documents from your API documentation.
+  * Automatically generates offline-accessible HTML and EPUB documents from your API documentation.
+  * When hosted, ExDoc relies on browser's page transitions for better UX, caching, and enhanced accessibility.
   * Responsive design, covering phones and tablets.
   * Support for custom pages, guides, livebooks and cheatsheets.
   * Support for custom grouping of modules, functions, and pages in the sidebar.
-  * Customizable logo.
+  * Customizable logo and favicon.
   * A direct link back to the source code for every documented entity.
   * Full-text search.
   * Keyboard shortcuts. (Press `?` to show help.)
@@ -20,7 +21,7 @@ ExDoc ships with many features:
   * Go-to shortcut with auto-complete to take the reader to any HexDocs package documentation. (`g` keyboard shortcut.)
   * Support for night mode, activated according to the browser preference.
   * Tooltips for links to modules and functions, both for the current project and other projects.
-  * Version dropdown, automatically configured when hosted on HexDocs.
+  * Version dropdown and "Go to latest" notifications, automatically configured when hosted on HexDocs.
 
 ## Usage
 
@@ -30,12 +31,12 @@ You can use ExDoc with Mix (recommended for Elixir projects), with Rebar (recomm
 
 ### Mix
 
-ExDoc requires Elixir v1.12 or later. Then add ExDoc as a dependency:
+ExDoc requires Elixir v1.15 or later. Then add ExDoc as a dependency:
 
 ```elixir
 def deps do
   [
-    {:ex_doc, "~> 0.34", only: :dev, runtime: false},
+    {:ex_doc, "~> 0.34", only: :dev, runtime: false, warn_if_outdated: true},
   ]
 end
 ```
@@ -112,6 +113,14 @@ You can use ExDoc via the command line.
    GITHUB_USER     => elixir-lang
    GITHUB_REPO     => ecto
    ```
+
+It is also possible to specify multiple `ebin` directories in the case of _umbrella_ projects:
+
+   ```bash
+   $ ex_doc "PROJECT_NAME" "PROJECT_VERSION" _build/dev/lib/app1/ebin _build/dev/lib/app2/ebin -m "PROJECT_MODULE" -u "https://github.com/GITHUB_USER/GITHUB_REPO" -l path/to/logo.png
+   ```
+
+If multiple `ebin` directories are specified, modules are grouped by application by default. It is possible to override this behaviour by providing a custom `groups_per_modules` option.
 
 You can specify a config file via the `--config` option, both Elixir and Erlang formats are supported. Invoke `ex_doc` without arguments to learn more.
 
@@ -370,6 +379,8 @@ docs: [
 ]
 ```
 
+On the JavaScript side, ExDoc emits the `"exdoc:loaded"` event. This event may be called multiple times, as you navigate across pages, so initialization that should happen only once must be conditional. We recommend external scripts to use `defer`, not `async`, as shown in the examples below.
+
 ### Rendering Math
 
 If you write TeX-style math in your Markdown, such as `$\sum_{i}^{N} x_i$`, it ends up as raw text on the generated pages. To render expressions, we recommend using [KaTeX](https://katex.org/), a JavaScript library that turns expressions into graphics. To load and trigger KaTeX on every documentation page, we can insert the following HTML:
@@ -381,13 +392,17 @@ If you write TeX-style math in your Markdown, such as `$\sum_{i}^{N} x_i$`, it e
 <link href="https://cdn.jsdelivr.net/npm/katex-copytex@1.0.2/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex-copytex@1.0.2/dist/katex-copytex.min.js" crossorigin="anonymous"></script>
 
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
-  onload="renderMathInElement(document.body, {
-    delimiters: [
-      {left: '$$', right: '$$', display: true},
-      {left: '$', right: '$', display: false},
-    ]
-  });"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+
+<script>
+  window.addEventListener("exdoc:loaded", () => {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+      ]
+    })
+  })
 </script>
 ```
 
@@ -402,7 +417,7 @@ Snippets are also objects you may want to render in a special manner. For exampl
 <script defer src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.1"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+  window.addEventListener("exdoc:loaded", () => {
     for (const codeEl of document.querySelectorAll("pre code.vega-lite")) {
       try {
         const preEl = codeEl.parentElement;
@@ -426,12 +441,19 @@ For more details and configuration options, see [vega/vega-embed](https://github
 Similarly to the example above, if your Markdown includes Mermaid graph specification in `mermaid` code snippets:
 
 ```html
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
 <script>
-  function mermaidLoaded() {
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: document.body.className.includes("dark") ? "dark" : "default"
-    });
+  let initialized = false;
+
+  window.addEventListener("exdoc:loaded", () => {
+    if (!initialized) {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: document.body.className.includes("dark") ? "dark" : "default"
+      });
+      initialized = true;
+    }
+
     let id = 0;
     for (const codeEl of document.querySelectorAll("pre code.mermaid")) {
       const preEl = codeEl.parentElement;
@@ -445,55 +467,11 @@ Similarly to the example above, if your Markdown includes Mermaid graph specific
         preEl.remove();
       });
     }
-  }
+  });
 </script>
-<script async src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js" onload="mermaidLoaded();"></script>
 ```
 
 For more details and configuration options, see the [Mermaid usage docs](https://mermaid-js.github.io/mermaid/#/usage).
-
-## Changing documentation over time
-
-As your project grows, your documentation may very likely change, even structurally. There are a few important things to consider in this regard:
-
-- Links to your *extras* will break if you change or move file names.
-- Links to your *modules, and mix tasks* will change if you change their name.
-- Links to *functions* are actually links to modules with anchor links. If you change the function name, the link does
-  not break but will leave users at the top of the module's documentation.
-
-Because these docs are static files, the behavior of a missing page will depend on where they are hosted.
-In particular, [hexdocs.pm](https://hexdocs.pm) will show a 404 page.
-
-You can improve the developer experience on everything but function names changing
-by using the `redirects` configuration. For example, if you changed the module `MyApp.MyModule`
-to `MyApp.My.Module` and the extra `get-started.md` to `quickstart.md`, you can
-setup the following redirects:
-
-<!-- tabs-open -->
-
-### Elixir
-
-For this example, we've changed the module `MyApp.MyModule` to `MyApp.My.Module`, and the extra `get-started.md` to `quickstart.md`
-
-```elixir
-redirects: %{
-  "MyApp.MyModule" => "MyApp.My.Module",
-  "get-started" => "quickstart"
-}
-```
-
-### Erlang
-
-For this example, we've changed the module `:my_module` to `:my_module2`, and the extra `get-started.md` to `quickstart.md`
-
-```erlang
-{redirects, [
-  {"my_module", "my_module2"},
-  {"get-started", "quickstart"}
-]}.
-```
-
-<!-- tabs-close -->
 
 ## Contributing
 
@@ -501,9 +479,10 @@ The easiest way to test changes to ExDoc is to locally rebuild the app and its o
 
   1. Run `mix setup` to install all dependencies
   2. Run `mix build` to generate the docs and open up the generated `doc/index.html`
-  3. (optional) Run `npm run --prefix assets build:watch` if working on assets for automatic recompilation
-  4. Run `mix lint` to check linting and formatting (and `mix fix` to automatically fix it)
-  5. (important) Do not add the files in the `formatters/` directory to your commits, those will be handled by the maintainers
+  3. (optional) Run `erl -S httpd serve doc/` to serve the docs locally
+  4. (optional) Run `npm run --prefix assets build:watch` if working on assets for automatic recompilation
+  5. Run `mix lint` to check linting and formatting (and `mix fix` to automatically fix it)
+  6. (important) Do not add the files in the `formatters/` directory to your commits, those will be handled by the maintainers
 
 See the README in the `assets/` directory for more information on working on the assets.
 

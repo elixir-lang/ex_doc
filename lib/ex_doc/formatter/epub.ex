@@ -4,9 +4,7 @@ defmodule ExDoc.Formatter.EPUB do
   @mimetype "application/epub+zip"
   @assets_dir "OEBPS/assets"
   alias __MODULE__.{Assets, Templates}
-  alias ExDoc.Formatter
-  alias ExDoc.Formatter.HTML
-  alias ExDoc.Utils
+  alias ExDoc.{Formatter, Utils}
 
   @doc """
   Generates EPUB documentation for the given modules.
@@ -73,9 +71,9 @@ defmodule ExDoc.Formatter.EPUB do
 
     config = %{config | extras: extras}
 
-    static_files = HTML.generate_assets("OEBPS", default_assets(config), config)
-    HTML.generate_logo(@assets_dir, config)
-    HTML.generate_cover(@assets_dir, config)
+    static_files = Formatter.generate_assets("OEBPS", default_assets(config), config)
+    Formatter.generate_logo(@assets_dir, config)
+    Formatter.generate_cover(@assets_dir, config)
 
     uuid = "urn:uuid:#{uuid4()}"
     datetime = format_datetime()
@@ -102,17 +100,17 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_extras(config) do
-    for {_title, extras} <- config.extras do
-      Enum.each(extras, fn %{id: id, title: title, title_content: title_content, content: content} ->
-        output = "#{config.output}/OEBPS/#{id}.xhtml"
-        html = Templates.extra_template(config, title, title_content, content)
+    for {_title, extras} <- config.extras,
+        node <- extras,
+        not is_map_key(node, :url) do
+      output = "#{config.output}/OEBPS/#{node.id}.xhtml"
+      html = Templates.extra_template(config, node)
 
-        if File.regular?(output) do
-          Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
-        end
+      if File.regular?(output) do
+        Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
+      end
 
-        File.write!(output, html)
-      end)
+      File.write!(output, html)
     end
   end
 

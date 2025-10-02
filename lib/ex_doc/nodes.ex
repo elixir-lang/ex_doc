@@ -9,16 +9,14 @@ defmodule ExDoc.ModuleNode do
             module: nil,
             group: nil,
             deprecated: nil,
-            doc_format: nil,
             doc: nil,
             source_doc: nil,
-            rendered_doc: nil,
+            source_format: nil,
             moduledoc_line: nil,
             moduledoc_file: nil,
             source_path: nil,
             source_url: nil,
             docs_groups: [],
-            docs: [],
             typespecs: [],
             type: nil,
             language: nil,
@@ -35,16 +33,14 @@ defmodule ExDoc.ModuleNode do
           module: module(),
           group: atom() | nil,
           deprecated: String.t() | nil,
-          doc_format: String.t() | nil,
           doc: ExDoc.DocAST.t() | nil,
           source_doc: term() | nil,
-          rendered_doc: String.t() | nil,
+          source_format: String.t() | nil,
           moduledoc_line: non_neg_integer(),
           moduledoc_file: String.t(),
           source_path: String.t() | nil,
           source_url: String.t() | nil,
-          docs_groups: [atom()],
-          docs: [ExDoc.DocNode.t()],
+          docs_groups: [ExDoc.DocGroupNode.t()],
           typespecs: [ExDoc.DocNode.t()],
           type: atom(),
           language: module(),
@@ -63,7 +59,6 @@ defmodule ExDoc.DocNode do
             deprecated: nil,
             doc: nil,
             source_doc: nil,
-            rendered_doc: nil,
             type: nil,
             signature: nil,
             specs: [],
@@ -84,14 +79,25 @@ defmodule ExDoc.DocNode do
           deprecated: String.t() | nil,
           doc: ExDoc.DocAST.t() | nil,
           source_doc: term() | nil,
-          rendered_doc: String.t() | nil,
           type: atom(),
           signature: String.t(),
-          specs: [ExDoc.Language.spec_ast()],
+          specs: [ExDoc.Language.spec_ast() | String.t()],
           annotations: [annotation()],
-          group: atom() | nil,
+          group: String.t() | nil,
           doc_file: String.t(),
           doc_line: non_neg_integer(),
           source_url: String.t() | nil
+        }
+end
+
+defmodule ExDoc.DocGroupNode do
+  @moduledoc false
+  defstruct title: nil, description: nil, doc: nil, docs: []
+
+  @type t :: %__MODULE__{
+          title: String.t() | atom(),
+          description: String.t() | nil,
+          doc: ExDoc.DocAST.t() | nil,
+          docs: [ExDoc.DocNode.t()]
         }
 end

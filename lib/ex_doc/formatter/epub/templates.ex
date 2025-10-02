@@ -7,13 +7,16 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     only: [before_closing_body_tag: 2, before_closing_head_tag: 2, h: 1, text_to_id: 1]
 
   alias ExDoc.Formatter.HTML.Templates, as: H
+  alias ExDoc.Formatter.EPUB.Assets
+
+  # The actual rendering happens here
+  defp render_doc(ast), do: ast && ExDoc.DocAST.to_string(ast)
 
   @doc """
   Generate content from the module template for a given `node`
   """
   def module_page(config, module_node) do
-    summary = H.module_summary(module_node)
-    module_template(config, module_node, summary)
+    module_template(config, module_node)
   end
 
   @doc """
@@ -49,7 +52,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :def,
     :module_template,
     Path.expand("templates/module_template.eex", __DIR__),
-    [:config, :module, :summary],
+    [:config, :module],
     trim: true
   )
 
@@ -75,7 +78,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :def,
     :extra_template,
     Path.expand("templates/extra_template.eex", __DIR__),
-    [:config, :title, :title_content, :content],
+    [:config, :node],
     trim: true
   )
 
@@ -95,14 +98,6 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :head_template,
     Path.expand("templates/head_template.eex", __DIR__),
     [:config, :title],
-    trim: true
-  )
-
-  EEx.function_from_file(
-    :defp,
-    :nav_item_template,
-    Path.expand("templates/nav_item_template.eex", __DIR__),
-    [:name, :nodes],
     trim: true
   )
 

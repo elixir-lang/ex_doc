@@ -1,4 +1,6 @@
 defmodule ExDoc.GroupMatcher do
+  # General helpers for dealing with grouping functionality.
+  # Extracted for organization and testability.
   @moduledoc false
 
   @type pattern :: Regex.t() | module() | String.t()
@@ -10,31 +12,6 @@ defmodule ExDoc.GroupMatcher do
   """
   def index(groups, group) do
     Enum.find_index(groups, fn {k, _v} -> k == group end) || -1
-  end
-
-  @doc """
-  Group the following entries and while preserving the order in `groups`.
-  """
-  def group_by(groups, entries, by) do
-    entries = Enum.group_by(entries, by)
-
-    {groups, leftovers} =
-      Enum.flat_map_reduce(groups, entries, fn group, grouped_nodes ->
-        case Map.pop(grouped_nodes, group, []) do
-          {[], grouped_nodes} -> {[], grouped_nodes}
-          {entries, grouped_nodes} -> {[{group, entries}], grouped_nodes}
-        end
-      end)
-
-    groups ++ Enum.sort(leftovers)
-  end
-
-  @doc """
-  Finds a matching group for the given function.
-  """
-  def match_doc(group_patterns, callback, default, metadata) do
-    match_group_patterns(group_patterns, fn pattern -> pattern.(metadata) end) ||
-      callback.(metadata) || default
   end
 
   @doc """
@@ -52,13 +29,13 @@ defmodule ExDoc.GroupMatcher do
   end
 
   @doc """
-  Finds a matching group for the given extra filename
+  Finds a matching group for the given filename or url.
   """
-  def match_extra(group_patterns, filename) do
+  def match_extra(group_patterns, path) do
     match_group_patterns(group_patterns, fn pattern ->
       case pattern do
-        %Regex{} = regex -> Regex.match?(regex, filename)
-        string when is_binary(string) -> filename == string
+        %Regex{} = regex -> Regex.match?(regex, path)
+        string when is_binary(string) -> path == string
       end
     end)
   end

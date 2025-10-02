@@ -128,7 +128,7 @@ defmodule ExDoc.Language.ElixirTest do
                ~s|<a href="https://hexdocs.pm/elixir/Kernel.html#+/2"><code class="inline">+/2</code></a>|
 
       assert autolink_doc("`&/1`") ==
-               ~s|<a href="https://hexdocs.pm/elixir/Kernel.SpecialForms.html#&/1"><code class="inline">&amp;/1</code></a>|
+               ~s|<a href="https://hexdocs.pm/elixir/Kernel.SpecialForms.html#&amp;/1"><code class="inline">&amp;/1</code></a>|
 
       assert autolink_doc("`for/1`") ==
                ~s|<a href="https://hexdocs.pm/elixir/Kernel.SpecialForms.html#for/1"><code class="inline">for/1</code></a>|

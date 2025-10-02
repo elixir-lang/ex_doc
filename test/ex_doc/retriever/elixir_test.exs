@@ -1,6 +1,7 @@
 defmodule ExDoc.Retriever.ElixirTest do
   use ExUnit.Case, async: true
-  alias ExDoc.{Retriever, DocAST}
+  alias ExDoc.ModuleNode
+  alias ExDoc.{Retriever, DocAST, DocGroupNode}
   import TestHelper
 
   @moduletag :tmp_dir
@@ -36,11 +37,12 @@ defmodule ExDoc.Retriever.ElixirTest do
                title: "Mod",
                type: :module,
                typespecs: [],
-               docs: [empty_doc_and_specs, function, macro],
+               docs_groups: [functions_group],
                annotations: [:public]
              } = mod
 
       assert DocAST.to_string(mod.doc) == "<p>Mod docs.</p>"
+      assert %DocGroupNode{docs: [empty_doc_and_specs, function, macro]} = functions_group
 
       assert %ExDoc.DocNode{
                arity: 0,
@@ -51,7 +53,6 @@ defmodule ExDoc.Retriever.ElixirTest do
                group: "Functions",
                id: "function/0",
                name: :function,
-               rendered_doc: nil,
                signature: "function()",
                source_url: nil,
                specs: [spec],
@@ -88,7 +89,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
 
       assert foo.id == "foo/2"
       assert foo.defaults == [foo: 1]
@@ -104,7 +105,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
-      [macro] = mod.docs
+      [%{docs: [macro]}] = mod.docs_groups
 
       assert macro.id == "macro/1"
       assert macro.annotations == ["macro"]
@@ -125,11 +126,15 @@ defmodule ExDoc.Retriever.ElixirTest do
       end
       """)
 
-      config = %ExDoc.Config{source_url_pattern: "%{path}:%{line}"}
+      config = %ExDoc.Config{
+        source_url_pattern: fn path, line -> "#{path}:#{line}" end
+      }
+
       {[mod], []} = Retriever.docs_from_modules([Mod], config)
       assert mod.type == :behaviour
 
-      [callback1, macrocallback1, optional_callback1] = mod.docs
+      assert [%DocGroupNode{docs: [callback1, macrocallback1, optional_callback1]}] =
+               mod.docs_groups
 
       assert callback1.id == "c:callback1/0"
       assert callback1.signature == "callback1()"
@@ -176,7 +181,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       """)
 
       {[impl], []} = Retriever.docs_from_modules([Impl], %ExDoc.Config{})
-      [callback1, optional_callback1] = impl.docs
+      assert [%DocGroupNode{docs: [callback1, optional_callback1]}] = impl.docs_groups
 
       assert callback1.id == "callback1/0"
       assert callback1.type == :function
@@ -202,7 +207,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
-      [opaque1, type1] = mod.docs
+      [%{docs: [opaque1, type1]}] = mod.docs_groups
 
       assert type1.id == "t:type1/0"
       assert type1.signature == "type1()"
@@ -236,7 +241,8 @@ defmodule ExDoc.Retriever.ElixirTest do
       {[mod], []} = Retriever.docs_from_modules([Mod, Mod.Atom], %ExDoc.Config{})
       assert mod.type == :protocol
 
-      [foo, t] = mod.docs
+      assert [%{title: "Types", docs: [t]}, %{title: "Functions", docs: [foo]}] = mod.docs_groups
+
       assert foo.id == "foo/1"
       assert t.id == "t:t/0"
     end
@@ -250,7 +256,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([MyStruct], %ExDoc.Config{})
-      [my_struct] = mod.docs
+      [%{docs: [my_struct]}] = mod.docs_groups
 
       assert my_struct.id == "__struct__/0"
       assert my_struct.annotations == ["struct"]
@@ -268,13 +274,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert mod.title == "MyException"
       assert mod.type == :exception
 
-      # TODO: this is because `%ExDoc.Config{}.groups_for_modules == []`.
-      #
-      # We build the default groups (Exceptions, Deprecated) in lib/ex_doc.ex,
-      # maybe we should do that in the retriever instead?
-      #
-      # Remember Exceptions is an Elixir specific thing so the default should
-      # probably be language specific.
+      # TODO: this is because `%ExDoc.Config{}.groups_for_modules == []`
       refute mod.group
     end
 
@@ -289,7 +289,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
-      [downcase, upcase] = mod.docs
+      [%{docs: [downcase, upcase]}] = mod.docs_groups
 
       assert downcase.id == "downcase/1"
       assert downcase.signature == "downcase(str)"
@@ -310,7 +310,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([Signatures], %ExDoc.Config{})
-      [remote] = mod.docs
+      [%{docs: [remote]}] = mod.docs_groups
 
       assert remote.signature == "remote(options)"
     end
@@ -372,23 +372,23 @@ defmodule ExDoc.Retriever.ElixirTest do
 
       {[mod], []} = Retriever.docs_from_modules([Mod], %ExDoc.Config{})
 
-      overlapping_defaults_2 = Enum.find(mod.docs, &(&1.id == "overlapping_defaults/2"))
-      overlapping_defaults_3 = Enum.find(mod.docs, &(&1.id == "overlapping_defaults/3"))
+      overlapping_defaults_2 = find_doc(mod, &(&1.id == "overlapping_defaults/2"))
+      overlapping_defaults_3 = find_doc(mod, &(&1.id == "overlapping_defaults/3"))
       assert overlapping_defaults_2.defaults == []
       assert overlapping_defaults_3.defaults == []
 
-      two_defaults_2 = Enum.find(mod.docs, &(&1.id == "two_defaults/2"))
-      two_defaults_4 = Enum.find(mod.docs, &(&1.id == "two_defaults/4"))
+      two_defaults_2 = find_doc(mod, &(&1.id == "two_defaults/2"))
+      two_defaults_4 = find_doc(mod, &(&1.id == "two_defaults/4"))
       assert two_defaults_2.defaults == []
       assert two_defaults_4.defaults == [{:two_defaults, 3}]
 
-      special_case_2 = Enum.find(mod.docs, &(&1.id == "special_case/2"))
-      special_case_4 = Enum.find(mod.docs, &(&1.id == "special_case/4"))
+      special_case_2 = find_doc(mod, &(&1.id == "special_case/2"))
+      special_case_4 = find_doc(mod, &(&1.id == "special_case/4"))
       assert special_case_2.defaults == []
       assert special_case_4.defaults == [special_case: 1, special_case: 3]
 
-      in_the_middle_2 = Enum.find(mod.docs, &(&1.id == "in_the_middle/2"))
-      in_the_middle_3 = Enum.find(mod.docs, &(&1.id == "in_the_middle/3"))
+      in_the_middle_2 = find_doc(mod, &(&1.id == "in_the_middle/2"))
+      in_the_middle_3 = find_doc(mod, &(&1.id == "in_the_middle/3"))
       assert in_the_middle_2.defaults == []
       assert in_the_middle_3.defaults == []
     end
@@ -412,16 +412,22 @@ defmodule ExDoc.Retriever.ElixirTest do
                Retriever.docs_from_modules([Mod], %ExDoc.Config{})
 
       assert %ExDoc.DocNode{annotations: ["since 1.0.0"]} =
-               Enum.find(mod.docs, &(&1.id == "t:t/0"))
+               find_doc(mod, &(&1.id == "t:t/0"))
 
       assert %ExDoc.DocNode{annotations: ["since 1.0.0"]} =
-               Enum.find(mod.docs, &(&1.id == "c:cb/0"))
+               find_doc(mod, &(&1.id == "c:cb/0"))
 
       assert %ExDoc.DocNode{annotations: ["since 1.0.0"]} =
-               Enum.find(mod.docs, &(&1.id == "function/0"))
+               find_doc(mod, &(&1.id == "function/0"))
 
       assert %ExDoc.DocNode{annotations: ["since 1.0.0", "macro"]} =
-               Enum.find(mod.docs, &(&1.id == "macro/0"))
+               find_doc(mod, &(&1.id == "macro/0"))
     end
+  end
+
+  defp find_doc(%ModuleNode{} = mod, predicate) do
+    mod.docs_groups
+    |> Stream.flat_map(& &1.docs)
+    |> Enum.find(predicate)
   end
 end

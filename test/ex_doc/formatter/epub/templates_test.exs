@@ -1,6 +1,7 @@
 defmodule ExDoc.Formatter.EPUB.TemplatesTest do
   use ExUnit.Case, async: true
 
+  alias ExDoc.{Formatter}
   alias ExDoc.Formatter.EPUB.Templates
 
   defp source_url do
@@ -15,7 +16,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     default = %ExDoc.Config{
       project: "Elixir",
       version: "1.0.1",
-      source_url_pattern: "#{source_url()}/blob/master/%{path}#L%{line}",
+      source_url_pattern: fn path, line -> "#{source_url()}/blob/master/#{path}#L#{line}" end,
       homepage_url: homepage_url(),
       source_url: source_url(),
       output: "test/tmp/epub_templates"
@@ -27,7 +28,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
   defp get_module_page(names, config \\ []) do
     config = doc_config(config)
     {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
-    [mod | _] = ExDoc.Formatter.render_all(mods, [], ".xhtml", config, highlight_tag: "samp")
+    [mod | _] = Formatter.render_all(mods, [], ".xhtml", config, highlight_tag: "samp")
     Templates.module_page(config, mod)
   end
 
@@ -107,10 +108,10 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~s{<h1 class="section-heading">Summary</h1>}
 
       assert content =~
-               ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*Example.*</h2>}ms
+               ~r{<h2 id="module-example-unicode-escaping">.*Example.*</h2>}ms
 
       assert content =~
-               ~r{<h3 id="module-example-h3-heading" class="section-heading">.*Example H3 heading.*</h3>}ms
+               ~r{<h3 id="module-example-h3-heading">.*Example H3 heading.*</h3>}ms
 
       assert content =~
                ~r{moduledoc.*Example.*<samp class="nc">CompiledWithDocs</samp><samp class="o">\.</samp><samp class="n">example</samp>.*}ms
@@ -126,10 +127,14 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     test "outputs function groups" do
       content =
         get_module_page([CompiledWithDocs],
-          groups_for_docs: [
-            "Example functions": &(&1[:purpose] == :example),
-            Legacy: &is_binary(&1[:deprecated])
-          ]
+          group_for_doc: fn metadata ->
+            cond do
+              metadata[:purpose] == :example -> "Example functions"
+              is_binary(metadata[:deprecated]) -> "Legacy"
+              true -> "Functions"
+            end
+          end,
+          docs_groups: ["Example functions", "Legacy"]
         )
 
       assert content =~ ~r{id="example-functions".*Example functions}ms
@@ -140,11 +145,49 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~r{id="functions".*id="example_1/0"}ms
     end
 
+    test "outputs groups descriptions" do
+      content =
+        get_module_page([CompiledWithDocs],
+          group_for_doc: fn metadata ->
+            if metadata[:purpose] == :example do
+              [
+                title: "Example functions",
+                description: """
+                ### A section heading example
+
+                A content example.
+
+                See `example/1` or `example/2`.
+                A link to `flatten/1`.
+                """
+              ]
+            else
+              "Functions"
+            end
+          end
+        )
+
+      doc = LazyHTML.from_document(content)
+
+      assert Enum.count(doc["div.group-description"]) == 1
+      assert Enum.count(doc["#group-description-example-functions"]) == 1
+      assert Enum.count(doc["#group-description-example-functions h3"]) == 1
+      assert Enum.count(doc["#group-example-functions-a-section-heading-example"]) == 1
+      assert Enum.count(doc["#example-functions .group-description a[href='#example/1']"]) == 1
+      assert Enum.count(doc["#example-functions .group-description a[href='#example/2']"]) == 1
+      assert Enum.count(doc["#example-functions .group-description a[href='#flatten/1']"]) == 1
+
+      assert content =~
+               ~s[<h3 id="group-example-functions-a-section-heading-example">A section heading example</h3>]
+
+      assert content =~ "<p>A content example.</p>"
+    end
+
     test "outputs summaries" do
       content = get_module_page([CompiledWithDocs])
 
       assert content =~
-               ~r{<div class="summary-signature">\s*<a href="#example_1/0" data-no-tooltip translate="no">}
+               ~r{<div class="summary-signature">\s*<a href="#example_1/0" data-no-tooltip="" translate="no">}
     end
 
     test "contains links to summary sections when those exist" do

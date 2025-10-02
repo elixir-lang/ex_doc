@@ -51,6 +51,7 @@ defmodule Mix.Tasks.Docs do
           homepage_url: "http://YOUR_PROJECT_HOMEPAGE",
           docs: [
             main: "MyApp", # The main page in the docs
+            favicon: "path/to/favicon.png",
             logo: "path/to/logo.png",
             extras: ["README.md"]
           ]
@@ -110,10 +111,17 @@ defmodule Mix.Tasks.Docs do
       Markdown and plain text pages; default: "PAGES". Example: "GUIDES"
 
     * `:extras` - List of paths to additional Markdown (`.md` extension), Live Markdown
-      (`.livemd` extension), Cheatsheets (`.cheatmd` extension) and plain text pages to
-      add to the documentation. You can also specify keyword pairs to customize the
-      generated filename, title and source file of each extra page; default: `[]`. Example:
-      `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing", title: "Contributing", source: "CONTRIBUTING.mdx"]]`
+      (`.livemd` extension), Cheatsheets (`.cheatmd` extension), external urls (`:url` option),
+      and plain text pages to add to the documentation. You can also specify keyword pairs to
+      customize the generated filename, title and source file, and search content of each extra page;
+      default: `[]`. Example: `["README.md", "LICENSE", "CONTRIBUTING.md": [filename: "contributing",
+      title: "Contributing", source: "CONTRIBUTING.mdx"]]` See the Customizing Extras section for
+      more.
+
+    * `:favicon` - Path to a favicon image file for the project. Must be PNG, JPEG or SVG. When
+      specified, the image file will be placed in the output "assets" directory, named
+      "favicon.EXTENSION". If using SVG, ensure appropriate width, height and viewBox attributes
+      are present in order to ensure predictable sizing and cropping.
 
     * `:filter_modules` - Include only modules that match the given value. The
       value can be a regex, a string (representing a regex), or a two-arity
@@ -153,14 +161,20 @@ defmodule Mix.Tasks.Docs do
       May be overridden by command line argument.
 
     * `:redirects` - A map or list of tuples, where the key is the path to redirect from and the
-       value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`
+       value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`.
+       See the "Changing documentation over time" section below for more.
 
     * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
-      reference in the current project docs e.g. because of a typo. This list controls where to
-      skip the warnings, for a given module/function/callback/type (e.g.: `["Foo", "Bar.baz/0"]`)
-      or on a given file (e.g.: `["pages/deprecations.md"]`). This option can also be a function
-      from a reference string to a boolean (e.g.: `&String.match?(&1, ~r/Foo/)`);
-      default is nothing to be skipped.
+      reference in the current project docs (for example, because of a typo). This option controls when to
+      skip such warnings. This option can be a list of strings that will be checked for exact matches,
+      or a function that takes a *reference* and must return a boolean (`true` means "skip this").
+      *References* that are checked against this option (either whether they're in the given
+      list or whether they match the given function) are the relative filename, the "ID" of
+      the node (like `User.exists?/1`), or the module name. Examples for this option:
+        * `["Foo", "Bar.baz/0"]` - skip warnings for `Foo` and `Bar.baz/0`
+        * `&String.match?(&1, ~r/Foo/)` - skip warnings for any reference that matches the regex
+        * `["pages/deprecations.md"]` - skip warnings for any reference in the
+          `pages/deprecations.md` file
 
     * `:skip_code_autolink_to` - Similar to `:skip_undefined_reference_warnings_on`, this option
       controls which terms will be skipped by ExDoc when building documentation.
@@ -190,13 +204,13 @@ defmodule Mix.Tasks.Docs do
         * `%{path}`: the path of a file in the repo
         * `%{line}`: the line number in the file
 
-      For GitLab/GitHub:
+      For self-hosted GitLab/GitHub:
 
       ```text
       https://mydomain.org/user_or_team/repo_name/blob/main/%{path}#L%{line}
       ```
 
-      For Bitbucket:
+      For self-hosted Bitbucket:
 
       ```text
       https://mydomain.org/user_or_team/repo_name/src/main/%{path}#cl-%{line}
@@ -205,6 +219,37 @@ defmodule Mix.Tasks.Docs do
       If a function, then it must be a function that takes two arguments, path and line,
       where path is either an relative path from the cwd, or an absolute path. The function
       must return the full URI as it should be placed in the documentation.
+
+  ### Using `:source_url` and `:source_ref` together
+
+  A common setup for a project or library is to set both `:source_url` and `:source_ref`. Setting
+  both of them will allow ExDoc to link to specific version of the code for a function or module
+  that matches the version of the docs. So if the docs have been generated for version 1.0.5 then
+  clicking on the source link in the docs will take the browser to the source code for the 1.0.5
+  version of the code instead of only the primary ref (e.g. `main`).
+
+  A example setup looks like:
+
+      @version "0.30.10"
+      def project do
+        [
+          ...
+          version: @version,
+          docs: docs(),
+          ...
+        ]
+      end
+
+      def docs do
+        ...
+        source_ref: "v#{@version}",
+        source_url: @source_url,
+        ...
+      end
+
+  If you use `source_ref: "v#{@version}"` then when publishing a new version of your package you
+  should run `git tag vVERSION` and push the tag. This way, ExDoc will generate links to the
+  specific version the docs were generated for.
 
   ## Groups
 
@@ -237,6 +282,13 @@ defmodule Mix.Tasks.Docs do
         "Advanced": ~r"/advanced/"
       ]
 
+  External extras from a URL can also be grouped:
+
+      groups_for_extras: [
+        "Elixir": ~r"https://elixir-lang.org/",
+        "Erlang": ~r"https://www.erlang.org/"
+      ]
+
   Similar can be done for modules:
 
       groups_for_modules: [
@@ -249,15 +301,18 @@ defmodule Mix.Tasks.Docs do
   ### Grouping functions, types, and callbacks
 
   Types, functions, and callbacks inside a module can also be organized in groups.
-  By default, ExDoc respects the `:group` metadata field:
+
+  #### Group metadata
+
+  By default, ExDoc respects the `:group` metadata field to determine in which
+  group an element belongs:
 
       @doc group: "Queries"
       def get_by(schema, fields)
 
   The function above will be automatically listed under the "Queries" section in
   the sidebar. The benefit of using `:group` is that it can also be used by tools
-  such as IEx during autocompletion. These groups are then ordered alphabetically
-  in the sidebar.
+  such as IEx during autocompletion. These groups are then displayed in the sidebar.
 
   It is also possible to tell ExDoc to either enrich the group metadata or lookup a
   different field via the `:default_group_for_doc` configuration. The default is:
@@ -275,9 +330,8 @@ defmodule Mix.Tasks.Docs do
         end
       end
 
-  Whenever using the `:group` key, the groups will be ordered alphabetically.
-  If you also want control over the group order, you can also use the `:groups_for_docs`
-  which works similarly as the one for modules/extra pages.
+  Finally, you can also use the `:groups_for_docs` which works similarly as the
+  one for modules/extra pages.
 
   `:groups_for_docs` is a keyword list of group titles and filtering functions
   that receive the documentation metadata and must return a boolean.
@@ -311,12 +365,60 @@ defmodule Mix.Tasks.Docs do
   then falls back to the appropriate "Functions", "Types" or "Callbacks"
   section respectively.
 
+  #### Group descriptions
+
+  It is possible to display a description for each group under its respective section
+  in a module's page. This helps to better explain what is the intended usage of each
+  group elements instead of describing everything in the displayed `@moduledoc`.
+
+  Descriptions can be provided as `@moduledoc` metadata. Groups without descriptions are
+  also supported to define group ordering.
+
+      @moduledoc groups: [
+        "Main API",
+        %{title: "Helpers", description: "Functions shared with other modules."}
+      ]
+
+  Descriptions can also be given in the `:default_group_for_doc` configuration:
+
+      default_group_for_doc: fn metadata ->
+        case metadata[:group] do
+          :main_api -> "Main API"
+          :helpers -> [title: "Helpers", description: "Functions shared with other modules."]
+          _ -> nil
+        end
+      end
+
+  Keyword lists or maps are supported in either case.
+
+  When using `:groups_for_docs`, if all the elements for a given group are matched then the
+  `:default_group_for_doc` is never invoked and ExDoc will not know about the description.
+  In that case, the description should be provided in the `@moduledoc` `:groups` metadata.
+
+  Whenever using the `:group` key, the groups will be ordered alphabetically.
+  If you also want control over the group order, you can also use the `:groups_for_docs`
+  which works similarly as the one for modules/extra pages.
+
+  #### Group ordering
+
+  Groups in the sidebar and main page body are ordered according to the following
+  rules:
+
+  * First, groups defined as `@moduledoc groups: [...]` in the given order.
+  * Then groups defined as keys in the `:groups_for_docs` configuration.
+  * Then default groups: Types, Callbacks and Functions.
+  * Finally, other groups returned by `:default_group_for_doc` by alphabetical
+    order.
+
   ## Meta-tags configuration
 
   It is also possible to configure some of ExDoc behaviour using meta tags.
   These meta tags can be inserted using `before_closing_head_tag`.
 
     * `exdoc:autocomplete` - when set to "off", it disables autocompletion.
+
+    * `exdoc:autocomplete-limit` - Set to an integer to configure how many results
+      appear in the autocomplete dropdown. Defaults to 10.
 
     * `exdoc:full-text-search-url` - the URL to use when performing full text
       search. The search string will be appended to the URL as an encoded
@@ -336,6 +438,61 @@ defmodule Mix.Tasks.Docs do
   modules share a long prefix. If you mean to group modules logically or call
   attention to them in the docs, you should probably use `:groups_for_modules`
   (which can be used in conjunction with `:nest_modules_by_prefix`).
+
+  ## Changing documentation over time
+
+  As your project grows, your documentation may very likely change, even structurally.
+  There are a few important things to consider in this regard:
+
+    * Links to your *extras* will break if you change or move file names.
+    * Links to your *modules, and mix tasks* will change if you change their name.
+    * Links to *functions* are actually links to modules with anchor links.
+      If you change the function name, the link does not break but will leave users
+      at the top of the module's documentation.
+
+  Because these docs are static files, the behavior of a missing page will depend on where they are hosted.
+  In particular, [hexdocs.pm](https://hexdocs.pm) will show a 404 page.
+
+  You can improve the developer experience on everything but function names changing
+  by using the `redirects` configuration. For example, if you changed the module `MyApp.MyModule`
+  to `MyApp.My.Module` and the extra `get-started.md` to `quickstart.md`, you can
+  setup the following redirects:
+
+      redirects: %{
+        "MyApp.MyModule" => "MyApp.My.Module",
+        "get-started" => "quickstart"
+      }
+
+  ## Customizing Extras
+
+  There are two sources for extras, filenames and urls.
+
+  For filenames, the allowed configuration is:
+
+    * `:title` - The title of the extra page. If not provided, the title will be inferred from the filename.
+    * `:filename` - The name of the generated file. If not provided, the filename will be inferred from
+       the source file.
+    * `:source` - The source file of the extra page. This is useful if you want to customize the filename or
+       title but keep the source file unchanged.
+    * `:search_data` - A list of terms to be indexed for autocomplete and search. If not provided, the content
+       of the extra page will be indexed for search. See the section below for more.
+
+  For urls:
+
+    * `:title` - The title of the extra page. If not provided, the title will be inferred from the extra name.
+    * `:url` - The external url to link to from the sidebar.
+
+  ### Customizing Search Data
+
+  It is possible to fully customize the way a given extra is indexed, both in autocomplete and in search.
+  In most cases, this makes sense for _generated_ documentation. If `search_data` is provided, it completely
+  overrides the built in logic for indexing your document based on the headers and content of the document.
+  The following fields can be provided in a list of maps for `search_data`.
+
+    * `:anchor` - The anchor link for the search result. Use `""` to point to the top of the page.
+    * `:title` - The title of the result.
+    * `:type` - The type of the search result, such as "module", "function" or "section".
+    * `:body` - The main content or body of the search result, _as markdown_. Used in search, not autocomplete.
 
   ## Umbrella project
 

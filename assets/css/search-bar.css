@@ -17,7 +17,7 @@
 
 .search-bar {
   border: 1px solid var(--searchBarBorder);
-  border-radius: 8px;
+  border-radius: var(--borderRadius-base);
   height: 48px;
   position: relative;
   width: 100%;
@@ -26,12 +26,13 @@
 .top-search .search-bar .search-input {
   background-color: var(--searchSearch);
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--borderRadius-base);
   color: var(--searchAccentMain);
   position: relative;
   height: 46px;
   padding: 8px 35px 8px 43px;
   width: 100%;
+  transition: var(--transition-all);
 }
 
 .top-search .search-bar .search-input::placeholder {
@@ -41,7 +42,7 @@
 
 .top-search .search-bar .search-input:focus {
   border: 1px solid var(--searchBarFocusColor);
-  border-radius: 7px;
+  border-radius: calc(var(--borderRadius-base) - 1px);
   position: relative;
   box-shadow: 0px 4px 20px 0px var(--searchBarBorderColor) inset;
 }
@@ -51,7 +52,7 @@
 }
 
 .top-search .search-bar .search-button {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--searchAccentMain);
   background-color: transparent;
   border: none;
@@ -63,6 +64,7 @@
   top: 60%;
   transform: translateY(-60%);
   z-index: 99;
+  transition: var(--transition-all);
 }
 
 .top-search .search-bar.selected .search-button,
@@ -73,7 +75,7 @@
 }
 
 .top-search .search-bar .search-close-button {
-  font-size: 16px;
+  font-size: var(--text-md);
   color: var(--searchAccentMain);
   background-color: transparent;
   border: none;
@@ -85,7 +87,7 @@
   position: absolute;
   transform: scaleY(0);
   top: calc(50% - 13px);
-  transition: 0.15s transform ease-out;
+  transition: var(--transition-all);
   z-index: 99;
 }
 
@@ -100,7 +102,7 @@
 }
 
 .top-search .search-settings .icon-settings {
-  font-size: 20px;
+  font-size: var(--text-xl);
   float: right;
   color: var(--iconAction);
   text-decoration: none;
@@ -137,7 +139,7 @@
 
 body.search-focused .search-bar .search-close-button {
   transform: scaleY(1);
-  transition: transform 0.15s ease-out 0.15s;
+  transition: var(--transition-all);
 }
 
 @media screen and (hover: hover) {
@@ -145,7 +147,7 @@ body.search-focused .search-bar .search-close-button {
     position: sticky !important;
   }
 
-  body.search-focused.sidebar-closed .sidebar-button {
+  body.search-focused .sidebar-button {
     position: fixed !important;
   }
 }
@@ -155,7 +157,7 @@ body.search-focused .search-bar .search-close-button {
     position: sticky !important;
   }
 
-  body.scroll-sticky.sidebar-closed .sidebar-button {
+  body.scroll-sticky .sidebar-button {
     position: fixed !important;
   }
 }

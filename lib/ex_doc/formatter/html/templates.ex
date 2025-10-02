@@ -1,6 +1,7 @@
 defmodule ExDoc.Formatter.HTML.Templates do
   @moduledoc false
   require EEx
+  alias ExDoc.Formatter.HTML.Assets
 
   import ExDoc.Utils,
     only: [
@@ -14,9 +15,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Generate content from the module template for a given `node`
   """
-  def module_page(module_node, nodes_map, config) do
-    summary = module_summary(module_node)
-    module_template(config, module_node, summary, nodes_map)
+  def module_page(module_node, config) do
+    module_template(config, module_node)
   end
 
   @doc """
@@ -40,90 +40,89 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def module_type(%{type: :module}), do: ""
   def module_type(%{type: type}), do: "<small>#{type}</small>"
 
-  @doc """
-  Gets the first paragraph of the documentation of a node. It strips
-  surrounding white-spaces and trailing `:`.
-
-  If `doc` is `nil`, it returns `nil`.
-  """
-  @spec synopsis(String.t()) :: String.t()
-  @spec synopsis(nil) :: nil
-  def synopsis(nil), do: nil
-
-  def synopsis(doc) when is_binary(doc) do
-    doc =
-      case :binary.split(doc, "</p>") do
-        [left, _] -> String.trim_trailing(left, ":") <> "</p>"
-        [all] -> all
-      end
-
-    # Remove any anchors found in synopsis.
-    # Old Erlang docs placed anchors at the top of the documentation
-    # for links. Ideally they would have been removed but meanwhile
-    # it is simpler to guarantee they won't be duplicated in docs.
-    Regex.replace(~r|(<[^>]*) id="[^"]*"([^>]*>)|, doc, ~S"\1\2", [])
-  end
-
-
-  def enc(binary), do: URI.encode(binary)
+  defp enc(binary), do: ExDoc.Utils.h(URI.encode(binary))
 
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
   """
-  def create_sidebar_items(nodes_map, extras) do
+  def create_sidebar_items(config, nodes_map, extras) do
     nodes =
       nodes_map
       |> Enum.map(&sidebar_module/1)
       |> Map.new()
-      |> Map.put(:extras, sidebar_extras(extras))
+      |> Map.put(:extras, api_reference(config, nodes_map) ++ sidebar_extras(extras))
 
     ["sidebarNodes=" | ExDoc.Utils.to_json(nodes)]
   end
 
+  defp api_reference(%{api_reference: false}, _nodes_map), do: []
+
+  defp api_reference(_config, nodes_map) do
+    headers =
+      if(nodes_map.modules != [], do: [%{id: "Modules", anchor: "modules"}], else: []) ++
+        if(nodes_map.tasks != [], do: [%{id: "Mix Tasks", anchor: "tasks"}], else: [])
+
+    [%{id: "api-reference", title: "API Reference", group: "", headers: headers}]
+  end
+
   defp sidebar_extras(extras) do
     for extra <- extras do
-      %{id: id, title: title, group: group, content: content} = extra
+      %{id: id, title: title, group: group} = extra
+      item = %{id: to_string(id), title: to_string(title), group: to_string(group)}
 
-      %{
-        id: to_string(id),
-        title: to_string(title),
-        group: to_string(group),
-        headers: extract_headers(content)
-      }
+      case extra do
+        %{search_data: search_data} when is_list(search_data) ->
+          search_data =
+            Enum.map(search_data, fn search_item ->
+              %{
+                anchor: search_item.anchor,
+                id: search_item.title,
+                labels: [search_item.type]
+              }
+            end)
+
+          item
+          |> Map.put(:headers, headers(extra.doc))
+          |> Map.put(:searchData, search_data)
+
+        %{url: url} when is_binary(url) ->
+          Map.put(item, :url, url)
+
+        _ ->
+          Map.put(item, :headers, headers(extra.doc))
+      end
     end
   end
 
   defp sidebar_module({id, modules}) do
     modules =
       for module <- modules do
-        extra =
-          module
-          |> module_summary()
-          |> case do
+        groups =
+          case module.docs_groups do
             [] -> []
             entries -> [nodeGroups: Enum.map(entries, &sidebar_entries/1)]
           end
-
-        sections = module_sections(module)
-
-        deprecated? = not is_nil(module.deprecated)
 
         pairs =
           for key <- [:id, :title, :nested_title, :nested_context],
               value = Map.get(module, key),
               do: {key, value}
 
-        pairs = [{:deprecated, deprecated?} | pairs]
+        others = [
+          deprecated: not is_nil(module.deprecated),
+          sections: headers(module.doc || []),
+          group: to_string(module.group)
+        ]
 
-        Map.new([group: to_string(module.group)] ++ extra ++ pairs ++ sections)
+        Map.new(groups ++ pairs ++ others)
       end
 
     {id, modules}
   end
 
-  defp sidebar_entries({group, nodes}) do
+  defp sidebar_entries(group) do
     nodes =
-      for node <- nodes do
+      for node <- group.docs do
         id =
           if "struct" in node.annotations do
             node.signature
@@ -140,44 +139,19 @@ defmodule ExDoc.Formatter.HTML.Templates do
         %{id: id, title: node.signature, anchor: URI.encode(node.id), deprecated: deprecated?}
       end
 
-    %{key: text_to_id(group), name: group, nodes: nodes}
+    %{key: text_to_id(group.title), name: group.title, nodes: nodes}
   end
 
-  defp module_sections(%ExDoc.ModuleNode{rendered_doc: nil}), do: [sections: []]
-
-  defp module_sections(module) do
-    {sections, _} =
-      module.rendered_doc
-      |> extract_headers()
-      |> Enum.map_reduce(%{}, fn header, acc ->
-        # TODO Duplicates some of the logic of link_headings/3
-        case Map.fetch(acc, header.id) do
-          {:ok, id} ->
-            {%{header | anchor: "module-#{header.anchor}-#{id}"}, Map.put(acc, header.id, id + 1)}
-
-          :error ->
-            {%{header | anchor: "module-#{header.anchor}"}, Map.put(acc, header.id, 1)}
-        end
-      end)
-
-    [sections: sections]
+  defp headers(doc) do
+    doc
+    |> ExDoc.DocAST.extract_headers_with_ids([:h2])
+    |> Enum.map(fn {:h2, text, anchor} ->
+      %{id: text, anchor: anchor}
+    end)
   end
 
-  # TODO: split into sections in Formatter.HTML instead.
-  @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
-  defp extract_headers(content) do
-    @h2_regex
-    |> Regex.scan(content, capture: :all_but_first)
-    |> List.flatten()
-    |> Enum.filter(&(&1 != ""))
-    |> Enum.map(&ExDoc.Utils.strip_tags/1)
-    |> Enum.map(&%{id: &1, anchor: URI.encode(text_to_id(&1))})
-  end
-
-  def module_summary(module_node) do
-    # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
-    ExDoc.GroupMatcher.group_by(module_node.docs_groups, module_node.docs, & &1.group)
-  end
+  defp favicon_path(%{favicon: nil}), do: nil
+  defp favicon_path(%{favicon: favicon}), do: "assets/favicon#{Path.extname(favicon)}"
 
   defp logo_path(%{logo: nil}), do: nil
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
@@ -222,110 +196,63 @@ defmodule ExDoc.Formatter.HTML.Templates do
     if node && node.id, do: URI.encode(node.id), else: "index"
   end
 
-  # TODO: Move link_headings and friends to html.ex or even to autolinking code,
-  # so content is built with it upfront instead of added at the template level.
+  @section_header_class_name "section-heading"
 
   @doc """
-  Add link headings for the given `content`.
+  Renders the document in the page.
 
-  IDs are prefixed with `prefix`.
-
-  We only link `h2` and `h3` headers. This is kept consistent in ExDoc.SearchData.
+  For now it enriches the document by adding fancy anchors
+  around h2 and h3 tags with IDs.
   """
-  @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
-  @spec link_headings(String.t() | nil, String.t()) :: String.t() | nil
-  def link_headings(content, prefix \\ "")
-  def link_headings(nil, _), do: nil
+  def render_doc(nil), do: ""
 
-  def link_headings(content, prefix) do
-    @heading_regex
-    |> Regex.scan(content)
-    |> Enum.reduce({content, %{}}, fn [match, tag, title], {content, occurrences} ->
-      possible_id = text_to_id(title)
-      id_occurred = Map.get(occurrences, possible_id, 0)
+  def render_doc(ast) do
+    ast
+    |> add_fancy_anchors()
+    |> ExDoc.DocAST.to_string()
+  end
 
-      anchor_id = if id_occurred >= 1, do: "#{possible_id}-#{id_occurred}", else: possible_id
-      replacement = link_heading(match, tag, title, anchor_id, prefix)
-      linked_content = String.replace(content, match, replacement, global: false)
-      incremented_occs = Map.put(occurrences, possible_id, id_occurred + 1)
-      {linked_content, incremented_occs}
+  defp add_fancy_anchors(ast) do
+    ExDoc.DocAST.map_tags(ast, fn
+      {tag, attrs, inner, meta} = ast
+      when tag in [:h2, :h3] and not is_map_key(meta, :verbatim) ->
+        if id = Keyword.get(attrs, :id) do
+          attrs =
+            Keyword.update(
+              attrs,
+              :class,
+              @section_header_class_name,
+              &(&1 <> " " <> @section_header_class_name)
+            )
+
+          {tag, attrs,
+           [
+             {:a, [href: "##{id}", class: "hover-link"],
+              [
+                {:i, [class: "ri-link-m", "aria-hidden": "true"], [], %{}}
+              ], %{}},
+             {:span, [class: "text"], inner, %{}}
+           ], meta}
+        else
+          ast
+        end
+
+      ast ->
+        ast
     end)
-    |> elem(0)
-  end
-
-  @class_regex ~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/
-  @class_separator " "
-  defp link_heading(match, _tag, _title, "", _prefix), do: match
-
-  defp link_heading(match, tag, title, id, prefix) do
-    section_header_class_name = "section-heading"
-
-    # NOTE: This addition is mainly to preserve the previous `class` attributes
-    # from the headers, in case there is one. Now with the _admonition_ text
-    # block, we inject CSS classes. So far, the supported classes are:
-    # `warning`, `info`, `error`, and `neutral`.
-    #
-    # The Markdown syntax that we support for the admonition text
-    # blocks is something like this:
-    #
-    #     > ### Never open this door! {: .warning}
-    #     >
-    #     > ...
-    #
-    # That should produce the following HTML:
-    #
-    #      <blockquote>
-    #        <h3 class="warning">Never open this door!</h3>
-    #        <p>...</p>
-    #      </blockquote>
-    #
-    # The original implementation discarded the previous CSS classes. Instead,
-    # it was setting `#{section_header_class_name}` as the only CSS class
-    # associated with the given header.
-    class_attribute =
-      case Regex.named_captures(@class_regex, match) do
-        %{"class" => ""} ->
-          section_header_class_name
-
-        %{"class" => previous_classes} ->
-          # Let's make sure that the `section_header_class_name` is not already
-          # included in the previous classes for the header
-          previous_classes
-          |> String.split(@class_separator)
-          |> Enum.reject(&(&1 == section_header_class_name))
-          |> Enum.join(@class_separator)
-          |> Kernel.<>(" #{section_header_class_name}")
-      end
-
-    """
-    <#{tag} id="#{prefix}#{id}" class="#{class_attribute}">
-      <a href="##{prefix}#{id}" class="hover-link">
-        <i class="ri-link-m" aria-hidden="true"></i>
-      </a>
-      <span class="text">#{title}</span>
-    </#{tag}>
-    """
-  end
-
-  def link_moduledoc_headings(content) do
-    link_headings(content, "module-")
-  end
-
-  def link_detail_headings(content, prefix) do
-    link_headings(content, prefix <> "-")
   end
 
   templates = [
     detail_template: [:node, :module],
-    footer_template: [:config, :node],
+    footer_template: [:config, :source_path],
     head_template: [:config, :title, :noindex],
-    module_template: [:config, :module, :summary, :nodes_map],
-    not_found_template: [:config, :nodes_map],
+    module_template: [:config, :module],
+    not_found_template: [:config],
     api_reference_entry_template: [:module_node],
-    api_reference_template: [:nodes_map],
-    extra_template: [:config, :node, :type, :nodes_map, :refs],
-    search_template: [:config, :nodes_map],
-    sidebar_template: [:config, :type, :nodes_map],
+    api_reference_template: [:config, :nodes_map],
+    extra_template: [:config, :node, :refs],
+    search_template: [:config],
+    sidebar_template: [:config, :type],
     summary_template: [:name, :nodes],
     redirect_template: [:config, :redirect_to]
   ]

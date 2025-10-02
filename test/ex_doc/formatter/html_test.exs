@@ -115,11 +115,27 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     generate_docs(config)
 
-    foo_content = EasyHTML.parse!(File.read!("#{c.tmp_dir}/html/readme-1.html"))["#content"]
-    bar_content = EasyHTML.parse!(File.read!("#{c.tmp_dir}/html/readme-2.html"))["#content"]
+    foo_content = "#{c.tmp_dir}/html/readme-1.html" |> File.read!() |> LazyHTML.from_document()
+    bar_content = "#{c.tmp_dir}/html/readme-2.html" |> File.read!() |> LazyHTML.from_document()
 
-    assert to_string(foo_content["h1 > span"]) == "README foo"
-    assert to_string(bar_content["h1 > span"]) == "README bar"
+    assert LazyHTML.text(foo_content["h1"]) == "README foo"
+    assert LazyHTML.text(bar_content["h1"]) == "README bar"
+  end
+
+  test "extras defined as external urls", %{tmp_dir: tmp_dir} = context do
+    config =
+      doc_config(context,
+        extras: [
+          "#{tmp_dir}/readme.md",
+          "Elixir": [url: "https://elixir-lang.org"]
+        ]
+      )
+
+    File.write!("#{tmp_dir}/readme.md", "readme")
+    generate_docs(config)
+
+    content = File.read!(tmp_dir <> "/html/readme.html")
+    assert content =~ "https://elixir-lang.org"
   end
 
   test "warns when generating an index.html file with an invalid redirect",
@@ -357,6 +373,23 @@ defmodule ExDoc.Formatter.HTMLTest do
              Enum.group_by(modules, &Map.get(&1, "group"))
   end
 
+  describe "generates favicon" do
+    test "overriding previous entries", %{tmp_dir: tmp_dir} = context do
+      File.mkdir_p!(tmp_dir <> "/html/assets")
+      File.touch!(tmp_dir <> "/html/assets/favicon.png")
+      generate_docs(doc_config(context, favicon: "test/fixtures/elixir.png"))
+      assert File.read!(tmp_dir <> "/html/assets/favicon.png") != ""
+    end
+
+    test "fails when favicon is not an allowed format", context do
+      config = doc_config(context, favicon: "README.md")
+
+      assert_raise ArgumentError,
+                   "image format not recognized, allowed formats are: .png, .jpg, .svg",
+                   fn -> generate_docs(config) end
+    end
+  end
+
   describe "generates logo" do
     test "overriding previous entries", %{tmp_dir: tmp_dir} = context do
       File.mkdir_p!(tmp_dir <> "/html/assets")
@@ -509,14 +542,14 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       content = File.read!(tmp_dir <> "/html/plaintextfiles.html")
 
-      assert content =~ ~r{Plain Text Files</span>.*</h1>}s
+      assert content =~ ~r{Plain Text Files</h1>}s
 
       assert content =~
                ~r{<p>Read the <a href="license.html">license</a> and the <a href="plaintext.html">plain-text file</a>.}
 
       plain_text_file = File.read!(tmp_dir <> "/html/plaintext.html")
 
-      assert plain_text_file =~ ~r{PlainText</span>.*</h1>}s
+      assert plain_text_file =~ ~r{PlainText</h1>}s
 
       assert plain_text_file =~
                ~r{<pre>\nThis is plain\n  text and nothing\n.+\s+good bye\n</pre>}s
@@ -526,14 +559,14 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       license = File.read!(tmp_dir <> "/html/license.html")
 
-      assert license =~ ~r{LICENSE</span>.*</h1>}s
+      assert license =~ ~r{LICENSE</h1>}s
 
       assert license =~
                ~s{<pre>\nLicensed under the Apache License, Version 2.0 (the &quot;License&quot;)}
 
       content = File.read!(tmp_dir <> "/html/livebookfile.html")
 
-      assert content =~ ~r{<span>Title for Livebook Files</span>\s*</h1>}
+      assert content =~ ~r{Title for Livebook Files</h1>}
 
       assert content =~
                ~s{<a href="https://github.com/elixir-lang/elixir/blob/main/test/fixtures/LivebookFile.livemd#L1" title="View Source"}
@@ -594,12 +627,82 @@ defmodule ExDoc.Formatter.HTMLTest do
                  "headers" => [
                    %{"anchor" => "heading-without-content", "id" => "Heading without content"},
                    %{"anchor" => "header-sample", "id" => "Header sample"},
-                   %{"anchor" => "more-than", "id" => "more &gt; than"}
+                   %{"anchor" => "more-than", "id" => "more > than"}
                  ]
                },
                %{"id" => "livebookfile"},
                %{"id" => "cheatsheets"}
              ] = Jason.decode!(content)["extras"]
+    end
+
+    test "custom search data is added to the sidebar and search nodes",
+         %{tmp_dir: tmp_dir} = context do
+      generate_docs(
+        doc_config(context,
+          source_beam: "unknown",
+          extras: [
+            {"test/fixtures/README.md",
+             search_data: [
+               %{
+                 anchor: "",
+                 title: "top of the doc",
+                 type: "custom",
+                 body: """
+                 In this doc we...
+                 """
+               },
+               %{
+                 anchor: "heading-without-content",
+                 title: "custom-text",
+                 type: "custom",
+                 body: """
+                 Some longer text!
+
+                 Here it is :)
+                 """
+               }
+             ]}
+          ]
+        )
+      )
+
+      "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
+
+      assert [
+               %{
+                 "anchor" => "",
+                 "id" => "top of the doc",
+                 "labels" => ["custom"]
+               },
+               %{
+                 "anchor" => "heading-without-content",
+                 "id" => "custom-text",
+                 "labels" => ["custom"]
+               }
+             ] =
+               Jason.decode!(content)["extras"]
+               |> Enum.find(&(&1["id"] == "readme"))
+               |> Map.fetch!("searchData")
+
+      "searchData=" <> content = read_wildcard!(tmp_dir <> "/html/dist/search_data-*.js")
+
+      assert [
+               %{
+                 "doc" => "In this doc we...",
+                 "ref" => "readme.html",
+                 "title" => "top of the doc - readme",
+                 "type" => "custom"
+               },
+               %{
+                 "doc" => "Some longer text!\n\nHere it is :)",
+                 "ref" => "readme.html#heading-without-content",
+                 "title" => "custom-text - readme",
+                 "type" => "custom"
+               }
+             ] =
+               content
+               |> Jason.decode!()
+               |> Map.fetch!("items")
     end
 
     test "containing settext headers while discarding links on header",
@@ -645,7 +748,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
       content = File.read!(tmp_dir <> "/html/plaintextfiles.html")
 
-      assert content =~ ~r{Plain Text Files</span>.*</h1>}s
+      assert content =~ ~r{Plain Text Files</h1>}s
 
       assert content =~
                ~r{<p>Read the <a href="linked-license.html">license</a> and the <a href="plain_text.html">plain-text file</a>.}
@@ -675,7 +778,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                  "headers" => [
                    %{"anchor" => "heading-without-content", "id" => "Heading without content"},
                    %{"anchor" => "header-sample", "id" => "Header sample"},
-                   %{"anchor" => "more-than", "id" => "more &gt; than"}
+                   %{"anchor" => "more-than", "id" => "more > than"}
                  ]
                }
              ] = Jason.decode!(content)["extras"]
@@ -694,6 +797,40 @@ defmodule ExDoc.Formatter.HTMLTest do
                %{"group" => ""},
                %{"group" => "Intro", "id" => "readme", "title" => "README"}
              ] = Jason.decode!(content)["extras"]
+    end
+
+    test "with custom groups for external urls", %{tmp_dir: tmp_dir} = context do
+      extra_config = [
+        extras: [
+          Website: [url: "https://elixir-lang.org"],
+          Forum: [url: "https://elixirforum.com"]
+        ],
+        groups_for_extras: ["Elixir": ~r/elixir/i]
+      ]
+
+      context
+      |> doc_config(extra_config)
+      |> generate_docs()
+
+      %{"extras" => extras} =
+        (tmp_dir <> "/html/dist/sidebar_items-*.js")
+        |> read_wildcard!()
+        |> String.trim_leading("sidebarNodes=")
+        |> Jason.decode!()
+
+      assert %{
+               "group" => "Elixir",
+               "id" => "website",
+               "title" => "Website",
+               "url" => "https://elixir-lang.org"
+             } in extras
+
+      assert %{
+               "group" => "Elixir",
+               "id" => "forum",
+               "title" => "Forum",
+               "url" => "https://elixirforum.com"
+             } in extras
     end
 
     test "with auto-extracted titles", %{tmp_dir: tmp_dir} = context do
@@ -727,15 +864,16 @@ defmodule ExDoc.Formatter.HTMLTest do
       generate_docs(
         doc_config(context,
           extras: [
+            "test/fixtures/ExtraPage.md",
             "test/fixtures/LICENSE",
             "test/fixtures/README.md"
           ]
         )
       )
 
-      # We have three extras: API Reference, LICENSE and README
+      # We have three extras: Extra Page, LICENSE and README
 
-      content_first = File.read!(tmp_dir <> "/html/api-reference.html")
+      content_first = File.read!(tmp_dir <> "/html/extrapage.html")
 
       refute content_first =~ ~r{Previous Page}
 
@@ -745,7 +883,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       content_middle = File.read!(tmp_dir <> "/html/license.html")
 
       assert content_middle =~
-               ~r{<a href="api-reference.html" class="bottom-actions-button" rel="prev">\s*<span class="subheader">\s*← Previous Page\s*</span>\s*<span class="title">\s*API Reference\s*</span>\s*</a>}
+               ~r{<a href="extrapage.html" class="bottom-actions-button" rel="prev">\s*<span class="subheader">\s*← Previous Page\s*</span>\s*<span class="title">\s*Extra Page Title\s*</span>\s*</a>}
 
       assert content_middle =~
                ~r{<a href="readme.html" class="bottom-actions-button" rel="next">\s*<span class="subheader">\s*Next Page →\s*</span>\s*<span class="title">\s*README\s*</span>\s*</a>}

@@ -112,6 +112,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       erlc(c, :search_foo, """
       %% @doc
       %% Hello <em>world</em>.
+      %% Newline.
       -module(search_foo).
       """)
 
@@ -122,7 +123,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     assert item["ref"] == "search_foo.html"
     assert item["type"] == "module"
     assert item["title"] == "search_foo"
-    assert item["doc"] == "Hello world ."
+    assert item["doc"] == "Hello  world . Newline."
   end
 
   test "function", c do
@@ -204,7 +205,12 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     Section _1_ content.
     """)
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: [readme_path]}
+    extras = [
+      readme_path,
+      "Elixir": [url: "https://elixir-lang.org"]
+    ]
+
+    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: extras}
     [item1, item2] = search_data([], config)["items"]
 
     assert item1["ref"] == "readme.html"

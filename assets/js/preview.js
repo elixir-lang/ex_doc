@@ -1,50 +1,32 @@
-import { getLocationHash, descriptionElementFromHash } from './helpers'
+import { isEmbedded, isPreview } from './globals'
+import { descriptionElementFromHash } from './helpers'
 
-export function initialize () {
-  const previewing = descriptionElementFromHash(getLocationHash(), true)
+if (isPreview && isEmbedded) {
+  const previewing = descriptionElementFromHash(true)
 
   if (previewing) {
-    preview(previewing)
+    document.body.classList.add('preview')
+    document.getElementById('content').replaceChildren(...previewing.childNodes)
+
+    // Make links open in parent.
+    const links = document.getElementsByTagName('a:not([target=_blank]')
+    for (const element of links) {
+      element.setAttribute('target', '_parent')
+    }
+
+    window.scrollTo(0, 0)
+    // Stop iframe scrolling affecting parent by setting body position to fixed.
+    document.body.style.position = 'fixed'
+    // Defer preview message until all other scripts have run.
+    setTimeout(sendPreviewInfoToParent)
+    window.addEventListener('resize', sendPreviewInfoToParent)
   }
-}
-
-function preview (previewing) {
-  replaceContents(previewing)
-  makeLinksOpenInParent()
-  scrollToTop()
-  sendPreviewInfoToParent()
-
-  window.addEventListener('resize', event => {
-    sendPreviewInfoToParent()
-  })
 }
 
 function sendPreviewInfoToParent () {
-  const maxHeight = document.body.scrollHeight
-  const contentHeight = document.getElementById('content').parentElement.offsetHeight
   const message = {
     type: 'preview',
-    maxHeight,
-    contentHeight
+    contentHeight: document.getElementById('content').parentElement.offsetHeight
   }
   window.parent.postMessage(message, '*')
-}
-
-function makeLinksOpenInParent () {
-  const links = document.getElementsByTagName('a')
-  for (const element of links) {
-    if (element.getAttribute('target') !== '_blank') {
-      element.setAttribute('target', '_parent')
-    }
-  }
-}
-
-function scrollToTop () {
-  window.scrollTo(0, 0)
-}
-
-function replaceContents (previewing) {
-  document.body.classList.add('preview')
-  const content = document.getElementById('content')
-  content.innerHTML = previewing.innerHTML
 }

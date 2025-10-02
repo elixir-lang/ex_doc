@@ -8,11 +8,11 @@
   --searchBarFocusColor:  hsl(0, 100%, 50%);
   --searchBarBorderColor: rgb(255, 71, 71, 0.1);
 
-  --linksNoUnderline:            #0969da;
-  --linksNoUnderlineVisited:     #085fc4;
+  --link-color:           hsl(212, 96%, 45%);
+  --link-visited-color:   hsl(212, 96%, 40%);
 }
 
 body.dark {
-  --linksNoUnderline:            #71b7ff;
-  --linksNoUnderlineVisited:     #65a4e5;
+  --link-color:           hsl(212, 56%, 72%);
+  --link-visited-color:   hsl(212, 56%, 67%);
 }

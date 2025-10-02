@@ -1,35 +1,48 @@
 .content-inner .bottom-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 4em;
+  margin-top: 7em;
+  gap: 12px;
+}
+
+.bottom-actions-item {
+  flex: 1 1 0%;
 }
 
 .content-inner .bottom-actions .bottom-actions-button {
   display: flex;
   text-decoration: none;
   flex-direction: column;
-  border-radius: var(--borderRadius);
+  border-radius: var(--borderRadius-sm);
   border: 1px solid var(--bottomActionsBtnBorder);
-  padding: 8px 16px;
+  padding: 12px 16px;
   min-width: 150px;
+  transition: var(--transition-all);
 }
 
+.content-inner .bottom-actions .bottom-actions-button:hover {
+  border-color: var(--mainLight);
+}
 .content-inner .bottom-actions .bottom-actions-button .subheader {
   font-size: .8em;
-  color: var(--bottomActionsBtnSubheader);
+  color: var(--textHeaders);
   white-space: nowrap;
 }
 
-.content-inner .bottom-actions .bottom-actions-button[rel="prev"] .subheader {
-  text-align: right;
+.content-inner .bottom-actions .bottom-actions-button .title {
+  color: var(--bottomActionsBtnTitle);
+}
+
+.content-inner .bottom-actions .bottom-actions-button[rel="prev"] {
+  text-align: start;
+}
+
+.content-inner .bottom-actions .bottom-actions-button[rel="next"] {
+  text-align: end;
 }
 
 @media screen and (max-width: 768px) {
   .content-inner .bottom-actions {
     flex-direction: column-reverse;
-  }
-
-  .content-inner .bottom-actions .bottom-actions-item:not(:first-child) {
-    margin-bottom: 16px;
   }
 }

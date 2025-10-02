@@ -428,15 +428,15 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp strip_app([{:code, attrs, [code], meta}], app) do
-    [{:code, attrs, strip_app(code, app), meta}]
+    [{:code, attrs, List.wrap(strip_app(code, app)), meta}]
   end
 
   defp strip_app(code, app) when is_binary(code) do
-    String.trim_leading(code, "//#{app}/")
+    List.wrap(String.trim_leading(code, "//#{app}/"))
   end
 
   defp strip_app(other, _app) do
-    other
+    List.wrap(other)
   end
 
   defp warn_ref(href, config) do
@@ -581,7 +581,7 @@ defmodule ExDoc.Language.Erlang do
                 name == :record and acc != [] ->
                   {ast, acc}
 
-                name in [:"::", :when, :%{}, :{}, :|, :->, :...] ->
+                name in [:"::", :when, :%{}, :{}, :|, :->, :..., :fun] ->
                   {ast, acc}
 
                 # %{required(...) => ..., optional(...) => ...}

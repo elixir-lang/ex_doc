@@ -1,5 +1,82 @@
 # Changelog
 
+## v0.38.4 (2025-09-09)
+
+  * Bug fixes
+    * Fix escaping of links when they have ampersand in them
+    * Increase spacing of footers in pages
+    * Align stale icon positioning
+
+## v0.38.3 (2025-08-17)
+
+  * Enhancements
+    * Allow configuring autocomplete limit, and default it to 10 instead of 8
+    * Display description text in docs groups
+    * Load discovered makeup apps for CLI
+
+## v0.38.2 (2025-05-27)
+
+  * Bug fixes
+    * Render documents with hardcoded `<h2>`/`<h3>` entries correctly
+    * Fix padding on external links
+
+## v0.38.1 (2025-05-12)
+
+  * Bug fixes
+    * Ensure stripping apps for Erlang sources emit valid AST
+
+## v0.38.0 (2025-05-09)
+
+  * Enhancements
+    * Allow listing outside URLs in extras
+
+  * Bug fixes
+    * Ensure some cases where `<`, `>`, `&` and in headers would appear as entities in the sidebar
+    * Fix outline caused by swup.js on Webkit based browsers
+    * Fix bugs when computing synopsis
+    * Automatically close the sidebar when navigating sections on mobile
+
+## v0.37.3 (2025-03-06)
+
+  * Bug fixes
+    * Handle `http-equiv=refresh` during Swup.js navigation
+    * Include full error description when syntax highlighting fails
+
+## v0.37.2 (2025-02-19)
+
+  * Bug fixes
+    * Fix code highlighting for languages with non-alphanumeric characters
+
+## v0.37.1 (2025-02-10)
+
+  * Enhancements
+    * Support umbrella projects via the CLI
+
+  * Bug fixes
+    * Make sure docs are rendered inside iframes
+
+## v0.37.0 (2025-02-05)
+
+Thanks to @liamcmitchell and @hichemfantar for the extensive contributions in this new release.
+
+  * Enhancements
+    * Optimize and parallelize module retriever, often leading to 20x-30x faster docs generation
+    * Considerably improve page loading times in the browser
+    * Allow customizing `search_data` for extra pages
+    * Use native style for scroll bars
+    * Enhance links between extras/pages/guides with padding and hover effects
+    * Go to latest goes to the same page if it exists, root otherwise
+    * Apply new style and layout for tabs
+    * Increase font-weight on sidebar on Apple machines/devices
+    * Improve accessibility across deprecation, links, and summaries
+    * Add compatibility to Erlang/OTP 28+
+    * Rely on the operating system monospace font for unified experience and better load times
+    * Introduce `"exdoc:loaded"` window event to track navigation
+    * Support for favicons
+
+  * Bug fixes
+    * Move action links out from heading tags
+
 ## v0.36.1 (2024-12-24)
 
   * Enhancements
@@ -190,7 +267,7 @@ This release requires Elixir v1.13.
 ## v0.30.6 (2023-08-25)
 
   * Enhancements
-    * Extract title from Markdown file when preceeded with comments
+    * Extract title from Markdown file when preceded with comments
     * Improve focus navigation in notebooks
 
 ## v0.30.5 (2023-08-12)
@@ -333,7 +410,7 @@ This release requires Elixir v1.13.
 
 ## v0.28.3 (2022-03-23)
 
-  * Enhacements
+  * Enhancements
     * Include page titles in autocomplete suggestions
     * Allow theme to be set to "System" version
     * Remove "Specs" heading and render full typespecs

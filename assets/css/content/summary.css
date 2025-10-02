@@ -1,20 +1,17 @@
-.content-inner .summary h2 {
-  font-weight: 700;
-}
-
 .content-inner .summary h2 a {
   text-decoration: none;
   border: none;
+  color: var(--textHeaders) !important;
 }
 
 .content-inner .summary span.deprecated {
   color: var(--darkDeprecated);
   font-weight: normal;
-  font-style: italic;
 }
 
 .content-inner .summary .summary-row .summary-signature {
   font-family: var(--monoFontFamily);
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -24,8 +21,6 @@
 }
 
 .content-inner .summary .summary-row .summary-synopsis {
-  font-family: var(--defaultFontFamily);
-  font-style: italic;
   padding: 0 1.2em;
   margin: 0 0 0.5em;
 }

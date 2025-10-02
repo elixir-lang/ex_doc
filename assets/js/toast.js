@@ -1,16 +1,17 @@
+let init = false
 let toastTimer = null
 let toast = null
 
-export function initialize () {
-  toast = document.getElementById('toast')
-
-  toast.addEventListener('click', (event) => {
-    clearTimeout(toastTimer)
-    event.target.classList.remove('show')
-  })
-}
-
 export function showToast (message) {
+  if (!init) {
+    init = true
+    toast = document.getElementById('toast')
+    toast?.addEventListener('click', () => {
+      clearTimeout(toastTimer)
+      toast.classList.remove('show')
+    })
+  }
+
   if (toast) {
     clearTimeout(toastTimer)
     toast.innerText = message

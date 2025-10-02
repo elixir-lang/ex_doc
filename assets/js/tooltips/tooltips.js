@@ -1,9 +1,12 @@
 import { qs, qsAll } from '../helpers'
 import { settingsStore } from '../settings-store'
 import { cancelHintFetchingIfAny, getHint, HINT_KIND, isValidHintHref } from './hints'
+import tooltipBodyTemplate from '../handlebars/templates/tooltip-body.handlebars'
+
+const TOOLTIP_HTML = '<div class="tooltip"><div class="tooltip-body"></div></div>'
 
 // Elements that can activate the tooltip.
-const TOOLTIP_ACTIVATORS_SELECTOR = '.content a'
+const TOOLTIP_ACTIVATORS_SELECTOR = '.content a:not([data-no-tooltip=""])'
 // Tooltip root element.
 const TOOLTIP_SELECTOR = '.tooltip'
 // Tooltip content element.
@@ -20,7 +23,8 @@ const SPACING_BASE = 10
 // The minimum space needed between the bottom of the page and the bottom edge of the tooltip.
 const MIN_BOTTOM_SPACING = SPACING_BASE * 4
 // The minimum required viewport size to show tooltips.
-const MIN_WINDOW_SIZE = { height: 450, width: 768 }
+const MIN_WIDTH = 768
+const MIN_HEIGHT = 450
 // The minimum time mouse cursor must stay on link for the tooltip to be loaded.
 // This prevents from triggering tooltips by accident while scrolling and moving the cursor around.
 const HOVER_DELAY_MS = 100
@@ -35,27 +39,15 @@ const state = {
 /**
  * Initializes tooltips handling.
  */
-export function initialize () {
-  renderTooltipLayout()
-  addEventListeners()
-}
 
-function renderTooltipLayout () {
-  const tooltipLayoutHtml = Handlebars.templates['tooltip-layout']()
-  qs(CONTENT_INNER_SELECTOR).insertAdjacentHTML('beforeend', tooltipLayoutHtml)
-}
+window.addEventListener('exdoc:loaded', initialize)
 
-function addEventListeners () {
+function initialize () {
   qsAll(TOOLTIP_ACTIVATORS_SELECTOR).forEach(element => {
     if (!linkElementEligibleForTooltip(element)) { return }
 
-    element.addEventListener('mouseenter', event => {
-      handleHoverStart(element)
-    })
-
-    element.addEventListener('mouseleave', event => {
-      handleHoverEnd(element)
-    })
+    element.addEventListener('mouseenter', handleHoverStart)
+    element.addEventListener('mouseleave', handleHoverEnd)
   })
 }
 
@@ -64,9 +56,6 @@ function addEventListeners () {
  * link element, or if it should just be ignored up-front.
  */
 function linkElementEligibleForTooltip (linkElement) {
-  // Skip tooltips on the permalink icon (the on-hover one next to the function name).
-  if (linkElement.getAttribute('data-no-tooltip') !== null) { return false }
-
   // Skip link to the module page we are already on.
   if (isHrefToSelf(linkElement.href)) { return false }
 
@@ -86,55 +75,51 @@ function isHrefToSelf (href) {
   return currentPage === targetPage
 }
 
-function handleHoverStart (element) {
-  if (!shouldShowTooltips()) { return }
+/** @param {MouseEvent} event */
+function handleHoverStart (event) {
+  if (
+    window.innerWidth < MIN_WIDTH ||
+    window.innerHeight < MIN_HEIGHT ||
+    !settingsStore.get().tooltips
+  ) { return }
+
+  const element = event.currentTarget
 
   state.currentLinkElement = element
 
   state.hoverDelayTimeout = setTimeout(() => {
     getHint(element.href)
-      .then(hint => {
-        renderTooltip(hint)
-        animateTooltipIn()
-      })
+      .then(renderTooltip)
       .catch(() => {})
   }, HOVER_DELAY_MS)
 }
 
-function shouldShowTooltips () {
-  const windowToSmall = (window.innerWidth < MIN_WINDOW_SIZE.width || window.innerHeight < MIN_WINDOW_SIZE.height)
-
-  return tooltipsEnabled() && !windowToSmall
-}
-
 function renderTooltip (hint) {
-  const tooltipBodyHtml = Handlebars.templates['tooltip-body']({
+  const tooltipBodyHtml = tooltipBodyTemplate({
     isPlain: hint.kind === HINT_KIND.plain,
     hint
   })
 
-  qs(TOOLTIP_BODY_SELECTOR).innerHTML = tooltipBodyHtml
+  let tooltipBody = qs(TOOLTIP_BODY_SELECTOR)
+  if (!tooltipBody) {
+    qs(CONTENT_INNER_SELECTOR).insertAdjacentHTML('beforeend', TOOLTIP_HTML)
+    tooltipBody = qs(TOOLTIP_BODY_SELECTOR)
+  }
+  tooltipBody.innerHTML = tooltipBodyHtml
 
   updateTooltipPosition()
+
+  // Animate tooltip in.
+  qs(TOOLTIP_SELECTOR).classList.add(TOOLTIP_SHOWN_CLASS)
 }
 
-function animateTooltipIn () {
-  const tooltipElement = qs(TOOLTIP_SELECTOR)
-  tooltipElement.classList.add(TOOLTIP_SHOWN_CLASS)
-}
-
-function handleHoverEnd (element) {
-  if (!tooltipsEnabled()) { return }
+function handleHoverEnd () {
+  if (!state.currentLinkElement) { return }
 
   clearTimeout(state.hoverDelayTimeout)
   cancelHintFetchingIfAny()
   state.currentLinkElement = null
-  animateTooltipOut()
-}
-
-function animateTooltipOut () {
-  const tooltipElement = qs(TOOLTIP_SELECTOR)
-  tooltipElement.classList.remove(TOOLTIP_SHOWN_CLASS)
+  qs(TOOLTIP_SELECTOR)?.classList.remove(TOOLTIP_SHOWN_CLASS)
 }
 
 /**
@@ -189,8 +174,4 @@ function getRelativeBoundingRect (elementRect, containerRect) {
     width: elementRect.width,
     height: elementRect.height
   }
-}
-
-function tooltipsEnabled () {
-  return settingsStore.get().tooltips
 }

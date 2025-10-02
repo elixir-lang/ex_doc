@@ -10,7 +10,7 @@ import { escapeRegexModifiers, escapeHtmlEntities, isBlank } from '../helpers'
  * @property {String|null} description An additional information (to be displayed below the title).
  * @property {Number} matchQuality How well the suggestion matches the given query string.
  * @property {String} category The group of suggestions that the suggestion belongs to.
- * @property {bool} deprecated Wether this node is marked as deprecated in the codebase
+ * @property {bool} deprecated Whether this node is marked as deprecated in the codebase
  */
 
 const SUGGESTION_CATEGORY = {
@@ -21,6 +21,8 @@ const SUGGESTION_CATEGORY = {
   section: 'section'
 }
 
+const DEFAULT_AUTOCOMPLETE_LIMIT = 10
+
 /**
  * Returns a list of autocomplete suggestion objects matching the given term.
  *
@@ -28,7 +30,8 @@ const SUGGESTION_CATEGORY = {
  * @param {Number} limit The maximum number of results to return.
  * @returns {Suggestion[]} List of suggestions sorted and limited.
  */
-export function getSuggestions (query, limit = 8) {
+export function getSuggestions (query, explicitLimit = null) {
+  const limit = explicitLimit || window.autocompleteLimit || DEFAULT_AUTOCOMPLETE_LIMIT
   if (isBlank(query)) {
     return []
   }
@@ -52,7 +55,15 @@ export function getSuggestions (query, limit = 8) {
  * Finds suggestions in top level sidebar nodes.
  */
 function findSuggestionsInTopLevelNodes (nodes, query, category, label) {
-  return nodes.map(node => nodeSuggestion(node, query, category, label))
+  return nodes.map(node => {
+    if (node.searchData) {
+      // When searchData is present, all search results are found by findSuggestionsInSectionsOfNodes
+      return null
+    }
+
+    return nodeSuggestion(node, query, category, label)
+  }
+  )
 }
 
 /**
@@ -88,7 +99,11 @@ function findSuggestionsInSectionsOfNodes (nodes, query, category, label) {
  * Returns any sections of the given parent node.
  */
 function nodeSections (node) {
-  return (node.sections || []).concat(node.headers || [])
+  if (node.searchData) {
+    return node.searchData
+  } else {
+    return (node.sections || []).concat(node.headers || [])
+  }
 }
 
 /**
@@ -133,12 +148,20 @@ function childNodeSuggestion (childNode, parentId, query, category, label) {
 function nodeSectionSuggestion (node, section, query, category, label) {
   if (!matchesAny(section.id, query)) { return null }
 
+  let link
+
+  if (section.anchor === '') {
+    link = `${node.id}.html`
+  } else {
+    link = `${node.id}.html#${section.anchor}`
+  }
+
   return {
-    link: `${node.id}.html#${section.anchor}`,
+    link,
     title: highlightMatches(section.id, query),
     description: node.title,
     matchQuality: matchQuality(section.id, query),
-    labels: [label, 'section'],
+    labels: section.labels || [label, 'section'],
     category
   }
 }

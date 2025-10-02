@@ -1,9 +1,9 @@
 @keyframes blink-background {
-  from {
+  0%, 100% {
     background-color: var(--textDetailBackground);
   }
 
-  to {
+  50% {
     background-color: var(--blink);
   }
 }
@@ -16,8 +16,8 @@
 }
 
 .content-inner .detail-header {
-  margin: 2 0 1em;
-  padding: 0.5em 1em;
+  margin: 1em 0;
+  padding: 0.5em 0.85em 0.5em 1em;
   background-color: var(--textDetailBackground);
   border-left: 3px solid var(--textDetailAccent);
   font-size: 1em;
@@ -25,15 +25,11 @@
   position: relative;
 }
 
-.content-inner .detail-header .note {
-  float: right;
-}
-
 .content-inner .detail-header .signature {
-  display: inline-block;
   font-family: var(--monoFontFamily);
-  font-size: 1rem;
+  font-size: 13px;
   font-weight: 700;
+  line-height: 2em;
 }
 
 .content-inner .detail-header:hover a.detail-link,
@@ -43,7 +39,7 @@
 }
 
 .content-inner .detail-header a.detail-link {
-  transition: opacity 0.3s ease-in-out;
+  transition: var(--transition-opacity);
   position: absolute;
   top: 0;
   left: 0;
@@ -64,7 +60,7 @@
 
 .content-inner .specs pre {
   font-family: var(--monoFontFamily);
-  font-size: 0.9em;
+  font-size: var(--text-xs);
   font-style: normal;
   line-height: 24px;
   white-space: pre-wrap;
@@ -108,6 +104,8 @@
 
 .content-inner div.deprecated {
   display: block;
-  padding: 9px 15px;
+  padding: 1em;
   background-color: var(--fnDeprecated);
+  border-radius: var(--borderRadius-sm);
+  margin: var(--baseLineHeight) 0;
 }

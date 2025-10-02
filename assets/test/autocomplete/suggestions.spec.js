@@ -64,6 +64,17 @@ describe('getSuggestions', () => {
           title: 'API Reference'
         },
         {
+          id: "how-to-make-things",
+          title: "How to make things",
+          searchData: [
+            {
+              id: "custom-text",
+              anchor: "Some Custom Text",
+              labels: ["custom"]
+            }
+          ]
+        },
+        {
           id: 'library-guidelines',
           title: 'Library Guidelines',
           headers: [
@@ -89,6 +100,10 @@ describe('getSuggestions', () => {
       expect(getSuggestions('Gua').length).to.eql(1)
     })
 
+    it('returns custom searchData of extras', () => {
+      expect(getSuggestions('custom text').length).to.eql(1)
+    })
+
     it('returns matching functions, callbacks and types', () => {
       expect(getSuggestions('get_by').length).to.eql(1)
       expect(getSuggestions('fetch').length).to.eql(1)
@@ -108,7 +123,7 @@ describe('getSuggestions', () => {
     })
 
     it('returns max 8 results', () => {
-      expect(getSuggestions('e').length).to.eql(8)
+      expect(getSuggestions('e').length).to.eql(10)
     })
 
     it('returns no results if no match found', () => {

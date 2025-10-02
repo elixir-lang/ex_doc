@@ -1,35 +1,33 @@
 <%= head_template(config, node.title, false) %>
-<%= sidebar_template(config, type, nodes_map) %>
+<%= sidebar_template(config, node.type) %>
 
 <div id="top-content">
-  <h1>
-    <div class="actions-group">
-      <%= if node.source_url do %>
-        <a href="<%= node.source_url %>" title="View Source" class="icon-action" rel="help">
-          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
-          <span class="sr-only">View Source</span>
-        </a>
-      <% end %>
-      <%= if type == :cheatmd do %>
-        <button onclick="window.print()" title="Print Cheatsheet" class="icon-action" rel="print">
-          <i class="ri-printer-line" aria-hidden="true"></i>
-          <span class="sr-only">Print cheatsheet</span>
-        </button>
-      <% end %>
-      <button onclick="copyMarkdown('<%= node.id %>.md')" title="Copy Markdown" class="copy-markdown-btn" rel="help">
-        <i class="ri-link-m" aria-hidden="true"></i>
-        <span>Copy for LLM</span>
+  <div class="heading-with-actions top-heading">
+    <h1><%= ExDoc.DocAST.to_string(node.title_doc) %></h1>
+    <%= if node.type == :cheatmd do %>
+      <button onclick="window.print()" title="Print Cheatsheet" class="icon-action" rel="print">
+        <i class="ri-printer-line" aria-hidden="true"></i>
+        <span class="sr-only">Print Cheatsheet</span>
       </button>
-      <a href="./markdown/<%= node.id %>.md" title="View as Markdown" class="copy-markdown-btn" rel="help">
+    <% end %>
+    <%= if node.source_url do %>
+      <a href="<%= node.source_url %>" title="View Source" class="icon-action" rel="help">
         <i class="ri-code-s-slash-line" aria-hidden="true"></i>
-        <span>View as Markdown</span>
+        <span class="sr-only">View Source</span>
       </a>
-    </div>
+    <% end %>
+    <button onclick="copyMarkdown('<%= node.id %>.md')" title="Copy Markdown" class="copy-markdown-btn" rel="help">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span>Copy for LLM</span>
+    </button>
+    <a href="./markdown/<%= node.id %>.md" title="View as Markdown" class="copy-markdown-btn" rel="help">
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+      <span>View as Markdown</span>
+    </a>
+  </div>
 
-    <span><%= node.title_content %></span>
-  </h1>
 
-  <%= if type == :livemd do %>
+  <%= if node.type == :livemd do %>
     <div class="livebook-badge-container">
       <a href="#" class="livebook-badge">
         <img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />
@@ -37,7 +35,11 @@
     </div>
   <% end %>
 
-  <%= link_headings(node.content) %>
+  <%= if node.type == :cheatmd do %>
+    <%= node.doc |> ExDoc.DocAST.sectionize([:h2, :h3]) |> render_doc() %>
+  <% else %>
+    <%= node[:content] || render_doc(node.doc) %>
+  <% end %>
 </div>
 
 <div class="bottom-actions" id="bottom-actions">
@@ -67,4 +69,4 @@
   </div>
 </div>
 
-<%= footer_template(config, node) %>
+<%= footer_template(config, node.source_path) %>

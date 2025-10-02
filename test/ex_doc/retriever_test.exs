@@ -27,7 +27,7 @@ defmodule ExDoc.RetrieverTest do
       """)
 
       {[mod], []} = Retriever.docs_from_modules([A], %ExDoc.Config{})
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
       assert foo.id == "foo/0"
       assert foo.annotations == ["since 1.0.0"]
       assert foo.deprecated == "deprecation message"
@@ -62,35 +62,6 @@ defmodule ExDoc.RetrieverTest do
       assert %{module: Qux, group: nil} = qux
     end
 
-    test "function groups", c do
-      elixirc(c, ~S"""
-      defmodule A do
-        @doc group: 1
-        def foo(), do: :ok
-
-        @doc group: 1
-        def bar(), do: :ok
-
-        @doc group: 2
-        def baz(), do: :ok
-      end
-      """)
-
-      config = %ExDoc.Config{
-        groups_for_docs: [
-          {"Group 1", &(&1.group == 1)},
-          {"Group 2", &(&1.group == 2)}
-        ]
-      }
-
-      {[mod], []} = Retriever.docs_from_modules([A], config)
-      [bar, baz, foo] = mod.docs
-
-      assert %{id: "foo/0", group: "Group 1"} = foo
-      assert %{id: "bar/0", group: "Group 1"} = bar
-      assert %{id: "baz/0", group: "Group 2"} = baz
-    end
-
     test "function groups use :group metadata", c do
       elixirc(c, ~S"""
       defmodule A do
@@ -107,7 +78,7 @@ defmodule ExDoc.RetrieverTest do
 
       config = %ExDoc.Config{}
       {[mod], []} = Retriever.docs_from_modules([A], config)
-      [bar, baz, foo] = mod.docs
+      [%{docs: [foo]}, %{docs: [bar]}, %{docs: [baz]}] = mod.docs_groups
 
       assert %{id: "c:foo/0", group: "a"} = foo
       assert %{id: "bar/0", group: "b"} = bar
@@ -128,13 +99,92 @@ defmodule ExDoc.RetrieverTest do
       end
       """)
 
-      config = %ExDoc.Config{default_group_for_doc: & &1[:semi_group]}
+      config = %ExDoc.Config{group_for_doc: & &1[:semi_group]}
       {[mod], []} = Retriever.docs_from_modules([A], config)
-      [bar, baz, foo] = mod.docs
+      [%{docs: [foo]}, %{docs: [bar]}, %{docs: [baz]}] = mod.docs_groups
 
       assert %{id: "c:foo/0", group: "a"} = foo
       assert %{id: "bar/0", group: "b"} = bar
       assert %{id: "baz/0", group: "c"} = baz
+    end
+
+    test "default_group_for_doc can return group description from @moduledoc", c do
+      elixirc(c, ~S"""
+      defmodule A do
+
+        @moduledoc groups: [
+          "c",
+          %{title: "b", description: "predefined b"}
+        ]
+
+        @doc test_group: "a"
+        @callback foo() :: :ok
+
+        @doc test_group: "b"
+        def bar(), do: :ok
+
+        @doc test_group: "c"
+        def baz(), do: :ok
+      end
+      """)
+
+      config = %ExDoc.Config{
+        group_for_doc: fn meta ->
+          case meta[:test_group] do
+            "a" -> [title: "a", description: "for a"]
+            "b" -> [title: "b", description: "ignored description"]
+            "c" -> [title: "c", description: "for c"]
+          end
+        end
+      }
+
+      {[mod], []} = Retriever.docs_from_modules([A], config)
+
+      assert [c, b, a] = mod.docs_groups
+
+      # Description returned by the function should override nil
+      assert %{title: "c", description: "for c", docs: [baz]} = c
+
+      # Description returned by the function should not override a
+      # description from @moduledoc
+      assert %{title: "b", description: "predefined b", docs: [bar]} = b
+
+      # Description returned by th function should define a description
+      # for leftover groups
+      assert %{title: "a", description: "for a", docs: [foo]} = a
+
+      assert %{id: "c:foo/0", group: "a"} = foo
+      assert %{id: "bar/0", group: "b"} = bar
+      assert %{id: "baz/0", group: "c"} = baz
+    end
+
+    test "function groups description use moduledoc :groups metadata", c do
+      elixirc(c, ~S"""
+      defmodule A do
+        @moduledoc groups: [
+          "c",
+          %{title: "b", description: "text for b"}
+        ]
+
+        @doc group: "a"
+        @callback foo() :: :ok
+
+        @doc group: "b"
+        def bar(), do: :ok
+
+        @doc group: "c"
+        def baz(), do: :ok
+      end
+      """)
+
+      config = %ExDoc.Config{}
+      {[mod], []} = Retriever.docs_from_modules([A], config)
+
+      assert [
+               %{description: nil, title: "c"},
+               %{description: "text for b", title: "b"},
+               %{description: nil, title: "a"}
+             ] = mod.docs_groups
     end
 
     test "function annotations", c do
@@ -151,7 +201,7 @@ defmodule ExDoc.RetrieverTest do
           end
         })
 
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
       assert foo.id == "foo/0"
       assert foo.annotations == [A, :foo, 0, :function]
     end
@@ -174,7 +224,7 @@ defmodule ExDoc.RetrieverTest do
           end
         })
 
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
       assert foo.id == "foo/0"
       assert foo.annotations == [B, :bar, 1, :type]
     end
@@ -200,7 +250,7 @@ defmodule ExDoc.RetrieverTest do
           end
         })
 
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
       assert foo.id == "foo/0"
       assert foo.annotations == [:baz, "since 1.0.0"]
       assert foo.deprecated == "deprecation message"
@@ -225,7 +275,7 @@ defmodule ExDoc.RetrieverTest do
           end
         })
 
-      [foo] = mod.docs
+      [%{docs: [foo]}] = mod.docs_groups
 
       assert foo.annotations == [:baz]
     end
@@ -268,10 +318,15 @@ defmodule ExDoc.RetrieverTest do
       refute mod.nested_title
     end
 
+    @tag :capture_log
     test "fails when module is not available" do
-      assert_raise Retriever.Error, "module NotAvailable is not defined/available", fn ->
-        Retriever.docs_from_modules([NotAvailable], %ExDoc.Config{})
-      end
+      spawn_monitor(fn -> Retriever.docs_from_modules([NotAvailable], %ExDoc.Config{}) end)
+
+      assert_receive {:DOWN, _, _, _,
+                      {%ExDoc.Retriever.Error{
+                         message: "module NotAvailable is not defined/available"
+                       }, _}},
+                     1000
     end
   end
 
@@ -315,8 +370,11 @@ defmodule ExDoc.RetrieverTest do
 
     {[mod], []} = Retriever.docs_from_modules([NaturallySorted], %ExDoc.Config{})
 
-    [function_A_0, function_A_1, function_a_0, function_a_1, function_B_0, function_b_0] =
-      mod.docs
+    [
+      %{
+        docs: [function_A_0, function_A_1, function_a_0, function_a_1, function_B_0, function_b_0]
+      }
+    ] = mod.docs_groups
 
     assert function_A_0.id == "function_A/0"
     assert function_A_1.id == "function_A/1"
@@ -340,7 +398,7 @@ defmodule ExDoc.RetrieverTest do
     """)
 
     {[module_node], []} = Retriever.docs_from_modules([NoWhitespaceInSignature], %ExDoc.Config{})
-    %{docs: [%{signature: signature}]} = module_node
+    [%{docs: [%{signature: signature}]}] = module_node.docs_groups
     assert signature == "callback_name(arg1, integer, %Date{}, term, t)"
   end
 end

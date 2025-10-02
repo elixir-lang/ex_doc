@@ -2,13 +2,13 @@ defmodule ExDoc.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-lang/ex_doc"
-  @version "0.36.1"
+  @version "0.38.4"
 
   def project do
     [
       app: :ex_doc,
       version: @version,
-      elixir: "~> 1.14",
+      elixir: "~> 1.15",
       deps: deps(),
       aliases: aliases(),
       package: package(),
@@ -16,6 +16,7 @@ defmodule ExDoc.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env()),
       source_url: @source_url,
       test_elixirc_options: [docs: true, debug_info: true],
+      test_ignore_filters: [&String.starts_with?(&1, "test/fixtures/")],
       name: "ExDoc",
       description: "ExDoc is a documentation generation tool for Elixir",
       docs: docs()
@@ -38,25 +39,24 @@ defmodule ExDoc.Mixfile do
 
   defp deps do
     [
-      {:earmark_parser, "~> 1.4.42"},
+      {:earmark_parser, "~> 1.4.44"},
       {:makeup_elixir, "~> 0.14 or ~> 1.0"},
       {:makeup_erlang, "~> 0.1 or ~> 1.0"},
       # Add other makeup lexers as optional for the executable
       {:makeup_c, ">= 0.1.0", optional: true},
       {:makeup_html, ">= 0.1.0", optional: true},
       {:jason, "~> 1.2", only: :test},
-      {:floki, "~> 0.0", only: :test},
-      {:easyhtml, "~> 0.0", only: :test}
+      {:lazy_html, "~> 0.1.0", only: :test}
     ]
   end
 
   defp aliases do
     [
-      build: ["cmd --cd assets npm run build", "compile --force", "docs"],
+      build: ["cmd --cd assets npm run build", "compile --force", &docs/1],
       clean: [&clean_test_fixtures/1, "clean"],
       fix: ["format", "cmd --cd assets npm run lint:fix"],
       lint: ["format --check-formatted", "cmd --cd assets npm run lint"],
-      setup: ["deps.get", "cmd mkdir -p tmp/handlebars", "cmd --cd assets npm install"]
+      setup: ["deps.get", "cmd --cd assets npm install"]
     ]
   end
 
@@ -106,6 +106,27 @@ defmodule ExDoc.Mixfile do
         "CHANGELOG.md"
       ]
     ]
+  end
+
+  defp docs(args) do
+    Mix.Task.run("docs", args)
+    {text_tags, 0} = System.cmd("git", ["tag"])
+
+    [latest | _] =
+      versions =
+      for("v" <> rest <- String.split(text_tags), do: Version.parse!(rest))
+      |> Enum.sort({:desc, Version})
+
+    list_contents =
+      Enum.map_intersperse(versions, ", ", fn version ->
+        string = Version.to_string(version)
+        ~s[{"version":"v#{string}", "url":"https://hexdocs.pm/ex_doc/#{string}"}]
+      end)
+
+    File.write!("doc/docs_config.js", """
+    var versionNodes = [#{list_contents}];
+    var searchNodes = [{"name":"ex_doc","version":"#{Version.to_string(latest)}"}];
+    """)
   end
 
   defp test_dev_examples(:dev), do: Path.wildcard("test/examples/*")

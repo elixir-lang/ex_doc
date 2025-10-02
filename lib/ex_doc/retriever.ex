@@ -7,7 +7,7 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.{DocAST, GroupMatcher, Refs, Utils}
+  alias ExDoc.{DocAST, GroupMatcher, Refs}
   alias ExDoc.Retriever.Error
 
   @doc """
@@ -50,8 +50,10 @@ defmodule ExDoc.Retriever do
   end
 
   defp docs_from_modules(modules, acc, config) do
-    Enum.reduce(modules, acc, fn module_name, {modules, filtered} = acc ->
-      case get_module(module_name, config) do
+    modules
+    |> Task.async_stream(&get_module(&1, config), timeout: :infinity)
+    |> Enum.reduce(acc, fn {:ok, result}, {modules, filtered} = acc ->
+      case result do
         {:error, _module} ->
           acc
 
@@ -128,20 +130,29 @@ defmodule ExDoc.Retriever do
 
   defp generate_node(module, module_data, config) do
     source = %{
-      url: config.source_url_pattern,
-      path: module_data.source_file
+      url_pattern: config.source_url_pattern,
+      path: module_data.source_file,
+      relative_path: path_relative_to_cwd(module_data.source_file)
     }
 
-    {doc_line, doc_file, format, source_doc, doc, metadata} = get_module_docs(module_data, source)
+    {doc_line, doc_file, format, source_doc, doc_ast, metadata} =
+      get_module_docs(module_data, source)
 
-    default_group = config.default_group_for_doc
-    groups_for_docs = config.groups_for_docs
+    group_for_doc = config.group_for_doc
     annotations_for_docs = config.annotations_for_docs
 
-    docs_groups =
-      Enum.uniq(Enum.map(groups_for_docs, &elem(&1, 0)) ++ module_data.default_groups)
+    {docs, nodes_groups} = get_docs(module_data, source, group_for_doc, annotations_for_docs)
+    docs = ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}")
 
-    docs = get_docs(module_data, source, default_group, groups_for_docs, annotations_for_docs)
+    moduledoc_groups = Map.get(metadata, :groups, [])
+
+    docs_groups =
+      get_docs_groups(
+        moduledoc_groups ++ config.docs_groups ++ module_data.default_groups,
+        nodes_groups,
+        docs
+      )
+
     metadata = Map.put(metadata, :kind, module_data.type)
     group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
@@ -156,10 +167,9 @@ defmodule ExDoc.Retriever do
       type: module_data.type,
       deprecated: metadata[:deprecated],
       docs_groups: docs_groups,
-      docs: ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}"),
-      doc_format: format,
-      doc: doc,
+      doc: normalize_doc_ast(doc_ast, "module-"),
       source_doc: source_doc,
+      source_format: format,
       moduledoc_line: doc_line,
       moduledoc_file: doc_file,
       source_url: source_link(source, module_data.source_line),
@@ -177,6 +187,11 @@ defmodule ExDoc.Retriever do
     nil
   end
 
+  defp normalize_doc_ast(doc_ast, prefix) do
+    doc_ast
+    |> DocAST.add_ids_to_headers([:h2, :h3], prefix)
+  end
+
   # Helpers
 
   defp get_module_docs(module_data, source) do
@@ -187,35 +202,21 @@ defmodule ExDoc.Retriever do
     {doc_line, doc_file, format, moduledoc, doc_ast(format, moduledoc, options), metadata}
   end
 
-  defp get_docs(module_data, source, default_group, groups_for_docs, annotations_for_docs) do
+  defp get_docs(module_data, source, group_for_doc, annotations_for_docs) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
-    nodes =
+    {nodes, groups} =
       for doc <- docs,
           doc_data = module_data.language.doc_data(doc, module_data) do
-        get_doc(
-          doc,
-          doc_data,
-          module_data,
-          source,
-          default_group,
-          groups_for_docs,
-          annotations_for_docs
-        )
+        {_node, _group} =
+          get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs)
       end
+      |> Enum.unzip()
 
-    filter_defaults(nodes)
+    {filter_defaults(nodes), groups}
   end
 
-  defp get_doc(
-         doc,
-         doc_data,
-         module_data,
-         source,
-         default_group,
-         groups_for_docs,
-         annotations_for_docs
-       ) do
+  defp get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{type, name, arity}, anno, _signature, source_doc, metadata} = doc
     doc_file = anno_file(anno, source)
@@ -236,18 +237,18 @@ defmodule ExDoc.Retriever do
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
     doc_ast =
-      (source_doc && doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1)) ||
+      doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
         doc_data.doc_fallback.()
 
-    group =
-      GroupMatcher.match_doc(groups_for_docs, default_group, doc_data.default_group, metadata)
+    group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
+    id = doc_data.id_key <> nil_or_name(name, arity)
 
-    %ExDoc.DocNode{
-      id: doc_data.id_key <> nil_or_name(name, arity),
+    doc_node = %ExDoc.DocNode{
+      id: id,
       name: name,
       arity: arity,
       deprecated: metadata[:deprecated],
-      doc: doc_ast,
+      doc: normalize_doc_ast(doc_ast, id <> "-"),
       source_doc: source_doc,
       doc_line: doc_line,
       doc_file: doc_file,
@@ -256,9 +257,11 @@ defmodule ExDoc.Retriever do
       specs: doc_data.specs,
       source_url: source_url,
       type: doc_data.type,
-      group: group,
+      group: group.title,
       annotations: annotations
     }
+
+    {doc_node, group}
   end
 
   defp get_defaults(_name, _arity, 0), do: []
@@ -277,6 +280,63 @@ defmodule ExDoc.Retriever do
         Enum.any?(nodes, &match?(%{name: ^name, arity: ^arity}, &1))
       end)
     end)
+  end
+
+  defp get_docs_groups(module_groups, nodes_groups, doc_nodes) do
+    module_groups = Enum.map(module_groups, &normalize_group/1)
+
+    nodes_groups_descriptions = Map.new(nodes_groups, &{&1.title, &1.description})
+
+    # Doc nodes already have normalized groups
+    nodes_groups = ExDoc.Utils.natural_sort_by(nodes_groups, & &1.title)
+    normal_groups = module_groups ++ nodes_groups
+    nodes_by_group_title = Enum.group_by(doc_nodes, & &1.group)
+
+    {docs_groups, _} =
+      Enum.flat_map_reduce(normal_groups, %{}, fn
+        group, seen when is_map_key(seen, group.title) ->
+          {[], seen}
+
+        group, seen ->
+          seen = Map.put(seen, group.title, true)
+
+          case Map.get(nodes_by_group_title, group.title, []) do
+            [] ->
+              {[], seen}
+
+            child_nodes ->
+              group = finalize_group(group, child_nodes, nodes_groups_descriptions)
+              {[group], seen}
+          end
+      end)
+
+    docs_groups
+  end
+
+  defp finalize_group(group, doc_nodes, description_fallbacks) do
+    description =
+      case group.description do
+        nil -> Map.get(description_fallbacks, group.title)
+        text -> text
+      end
+
+    doc_ast =
+      case description do
+        nil ->
+          nil
+
+        text ->
+          doc_ast = doc_ast("text/markdown", %{"en" => text}, [])
+          sub_id = ExDoc.Utils.text_to_id(group.title)
+          normalize_doc_ast(doc_ast, "group-#{sub_id}-")
+      end
+
+    %ExDoc.DocGroupNode{
+      title: group.title,
+      description: description,
+      doc: doc_ast,
+      docs: doc_nodes
+    }
   end
 
   ## General helpers
@@ -303,41 +363,48 @@ defmodule ExDoc.Retriever do
   defp anno_line(line) when is_integer(line), do: abs(line)
   defp anno_line(anno), do: anno |> :erl_anno.line() |> abs()
 
-  defp anno_file(anno) do
+  defp anno_file(anno, source) do
     case :erl_anno.file(anno) do
       :undefined ->
-        nil
+        source.relative_path
 
       file ->
-        file
+        source.path
+        |> Path.dirname()
+        |> Path.join(file)
+        |> path_relative_to_cwd()
     end
-  end
-
-  defp anno_file(anno, source) do
-    if file = anno_file(anno) do
-      Path.join(Path.dirname(source.path), file)
-    else
-      source.path
-    end
-    |> path_relative_to_cwd(force: true)
   end
 
   # TODO: Remove when we require Elixir 1.16
   if function_exported?(Path, :relative_to_cwd, 2) do
-    defp path_relative_to_cwd(path, options), do: Path.relative_to_cwd(path, options)
+    defp path_relative_to_cwd(path), do: Path.relative_to_cwd(path, force: true)
   else
-    defp path_relative_to_cwd(path, _options), do: Path.relative_to_cwd(path)
+    defp path_relative_to_cwd(path), do: Path.relative_to_cwd(path)
   end
 
   defp source_link(nil, source, line), do: source_link(source, line)
 
-  defp source_link(file, source, line) do
-    source_link(%{source | path: file}, line)
+  defp source_link(file, %{url_pattern: url_pattern}, line) do
+    url_pattern.(path_relative_to_cwd(file), line)
   end
 
-  defp source_link(%{path: _, url: nil}, _line), do: nil
+  defp source_link(%{url_pattern: url_pattern, relative_path: path}, line) do
+    url_pattern.(path, line)
+  end
 
-  defp source_link(source, line) do
-    Utils.source_url_pattern(source.url, source.path |> Path.relative_to(File.cwd!()), line)
+  defp normalize_group(group) do
+    case group do
+      %{title: title, description: description}
+      when is_binary(title) and (is_binary(description) or is_nil(description)) ->
+        %{group | title: title, description: description}
+
+      kw when is_list(kw) ->
+        true = Keyword.keyword?(kw)
+        %{title: to_string(Keyword.fetch!(kw, :title)), description: kw[:description]}
+
+      title when is_binary(title) when is_atom(title) ->
+        %{title: to_string(title), description: nil}
+    end
   end
 end
