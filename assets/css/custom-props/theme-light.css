@@ -15,36 +15,37 @@
   --tableHeadBorder:             var(--gray100);
   --tableBodyBorder:             var(--gray50);
 
-  --warningBackground:           hsl( 33, 100%,  97%);
-  --warningHeadingBackground:    hsl( 33,  87%,  64%);
-  --warningHeading:              var(--black);
-  --errorBackground:             hsl(  7,  81%,  96%);
-  --errorHeadingBackground:      hsl(  6,  80%,  60%);
-  --errorHeading:                var(--white);
-  --infoBackground:              hsl(206,  91%,  96%);
-  --infoHeadingBackground:       hsl(213,  92%,  62%);
-  --infoHeading:                 var(--white);
-  --neutralBackground:           hsl(212,  29%,  92%);
-  --neutralHeadingBackground:    hsl(220,  43%,  11%);
-  --neutralHeading:              var(--white);
-  --tipBackground:               hsl(142,  31%,  93%);
-  --tipHeadingBackground:        hsl(134,  39%,  36%);
-  --tipHeading:                  var(--white);
+  /* Admonition colors: optionally mixed with a particular color in order to create cohesive feel */
+  --warningHue:                  34;
+  --errorHue:                    7;
+  --infoHue:                     206;
+  --neutralHue:                  212;
+  --tipHue:                      142;
+  --admMixCol:                   var(--gray100);
+  --admMixAmt:                   25%;
+  --warningBackground:           color-mix(in xyz, var(--admMixCol) var(--admMixAmt), hsl(var(--warningHue), 100%, 96%) 100%);
+  --warningHeading:              hsl(var(--warningHue), 95%, 38%);
+  --errorBackground:             color-mix(in xyz, var(--admMixCol) var(--admMixAmt), hsl(var(--errorHue), 85%, 96%) 100%);
+  --errorHeading:                hsl(var(--errorHue), 80%, 40%);
+  --infoBackground:              color-mix(in xyz, var(--admMixCol) var(--admMixAmt), hsl(var(--infoHue), 90%, 96%) 100%);
+  --infoHeading:                 hsl(var(--infoHue), 60%, 30%);
+  --neutralBackground:           color-mix(in xyz, var(--admMixCol) var(--admMixAmt), hsl(var(--neutralHue), 40%, 93%) 100%);
+  --neutralHeading:              hsl(var(--neutralHue), 35%, 30%);
+  --tipBackground:               color-mix(in xyz, var(--admMixCol) var(--admMixAmt), hsl(var(--tipHue), 40%, 93%) 100%);
+  --tipHeading:                  hsl(var(--tipHue), 55%, 25%);
 
   --fnSpecAttr:                  var(--coldGray);
   --fnDeprecated:                var(--yellowLight);
   --blink:                       var(--yellowLight);
 
-  --codeBackground:              var(--gray25);
+  --codeBackground:              var(--gray10);
   --codeBorder:                  var(--gray100);
   --codeScrollThumb:             var(--gray400);
   --codeScrollBackground:        var(--codeBorder);
-  --admCodeBackground:           var(--gray25);
-  --admCodeBorder:               var(--gray100);
+
+  --admCodeBackground:           var(--white-opacity-80);
+  --admCodeBorder:               var(--black-opacity-10);
   --admCodeColor:                var(--black);
-  --admInlineCodeColor:          var(--black);
-  --admInlineCodeBackground:     var(--gray25);
-  --admInlineCodeBorder:         var(--gray100);
 
   --tabBorder:                   var(--gray300);
   --tabBorderTop:                var(--gray100);

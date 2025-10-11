@@ -16,15 +16,17 @@
   --baseLineHeight: 1.5em;
 
   /* Colours */
+  --gray10: hsl(207, 43%, 98.5%);
   --gray25: hsl(207, 43%, 98%);
   --gray50: hsl(207, 43%, 96%);
   --gray100: hsl(212, 33%, 91%);
   --gray200: hsl(210, 29%, 88%);
-  --gray300: hsl(210, 26%, 84%);
+  --gray300: hsl(210, 26%, 76%);
   --gray400: hsl(210, 21%, 64%);
   --gray450: hsl(210, 21%, 49%);
   --gray500: hsl(210, 21%, 34%);
   --gray600: hsl(210, 27%, 26%);
+  --gray650: hsl(211, 32%, 22%);
   --gray700: hsl(212, 35%, 17%);
   --gray750: hsl(214, 46%, 14%);
   --gray800: hsl(216, 52%, 11%);
@@ -46,12 +48,16 @@
   --green-lightened-10: hsl(90, 100%, 45%);
   --green: hsl(90, 100%, 35%);
   --white: hsl(0, 0%, 100%);
+  --white-opacity-80: hsla(0, 0%, 100%, 80%);
   --white-opacity-50: hsla(0, 0%, 100%, 50%);
   --white-opacity-10: hsla(0, 0%, 100%, 10%);
   --white-opacity-0: hsla(0, 0%, 100%, 0%);
   --black: hsl(0, 0%, 0%);
-  --black-opacity-10: hsla(0, 0%, 0%, 10%);
+  --black-opacity-80: hsla(0, 0%, 0%, 80%);
   --black-opacity-50: hsla(0, 0%, 0%, 50%);
+  --black-opacity-30: hsla(0, 0%, 0%, 30%);
+  --black-opacity-10: hsla(0, 0%, 0%, 10%);
+  --black-opacity-0: hsla(0, 0%, 0%, 10%);
   --orangeDark: hsl(30, 90%, 40%);
   --orangeLight: hsl(30, 80%, 50%);
 

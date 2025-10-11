@@ -52,26 +52,8 @@
     display: none;
   }
 
-  .content-inner section.admonition {
-    border: 2px solid var(--gray400);
-  }
-
-  .content-inner section.admonition > .admonition-title {
-    color: var(--textHeaders);
-    border-bottom: 2px solid var(--gray400);
-  }
-
   .content-inner pre code.makeup {
-    border-color: var(--gray400);
     white-space: break-spaces;
     break-inside: avoid;
-  }
-
-  .content-inner blockquote code.inline {
-    border-color: var(--gray400);
-  }
-
-  .content-inner code.inline {
-    border-color: var(--gray400);
   }
 }

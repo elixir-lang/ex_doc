@@ -11,27 +11,27 @@
 
 .content-inner section.admonition.warning {
   background-color: var(--warningBackground);
-  border-left-color: var(--warningHeadingBackground);
+  border-left-color: var(--warningHeading);
 }
 
 .content-inner section.admonition.error {
   background-color: var(--errorBackground);
-  border-left-color: var(--errorHeadingBackground);
+  border-left-color: var(--errorHeading);
 }
 
 .content-inner section.admonition.info {
   background-color: var(--infoBackground);
-  border-left-color: var(--infoHeadingBackground);
+  border-left-color: var(--infoHeading);
 }
 
 .content-inner section.admonition.neutral {
   background-color: var(--neutralBackground);
-  border-left-color: var(--neutralHeadingBackground);
+  border-left-color: var(--neutralHeading);
 }
 
 .content-inner section.admonition.tip {
   background-color: var(--tipBackground);
-  border-left-color: var(--tipHeadingBackground);
+  border-left-color: var(--tipHeading);
 }
 
 .content-inner section.admonition > .admonition-title {
@@ -42,33 +42,21 @@
 }
 
 .content-inner section.admonition > .admonition-title.warning {
-  color: var(--warningHeadingBackground);
+  color: var(--warningHeading);
 }
 .content-inner section.admonition > .admonition-title.error {
-  color: var(--errorHeadingBackground);
+  color: var(--errorHeading);
 }
 .content-inner section.admonition > .admonition-title.info {
-  color: var(--infoHeadingBackground);
+  color: var(--infoHeading);
 }
 .content-inner section.admonition > .admonition-title.neutral {
-  color: var(--neutralHeadingBackground);
+  color: var(--neutralHeading);
 }
 .content-inner section.admonition > .admonition-title.tip {
-  color: var(--tipHeadingBackground);
+  color: var(--tipHeading);
 }
 
 .content-inner section.admonition > .admonition-title code {
   margin: 0 0.5ch;
-}
-
-.content-inner section.admonition code {
-  background-color: var(--admInlineCodeBackground);
-  border: 1px solid var(--admInlineCodeBorder);
-  color: var(--admInlineCodeColor);
-}
-
-.content-inner section.admonition pre code {
-  background-color: var(--admCodeBackground);
-  border: 1px solid var(--admCodeBorder);
-  color: var(--admCodeColor);
 }

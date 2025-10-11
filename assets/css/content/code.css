@@ -16,7 +16,16 @@
   color: var(--link-visited-color);
 }
 
+.content-inner strong > code {
+  font-weight: bold;
+}
+
 .content-inner code {
+  font-family: var(--monoFontFamily);
+  font-style: normal;
+  line-height: 24px;
+  font-weight: 400;
+  font-size: var(--text-sm);
   background-color: var(--codeBackground);
   vertical-align: baseline;
   border-radius: var(--borderRadius-sm);
