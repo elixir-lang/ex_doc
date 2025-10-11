@@ -2,7 +2,7 @@
 
 ## Starting with header 3
 
-> ### Just a blockquote.
+> ### Blockquote Header 3 [with link](#)
 >
 > Some `code` and a [link](#).
 >
@@ -14,7 +14,7 @@
 > no highlight
 > ```
 
-> ### Header 3 {: .info}
+> ### Info Header 3 [with link](#) {: .info}
 >
 > #### Header 4
 >
@@ -28,7 +28,7 @@
 > no highlight
 > ```
 
-> ### Header 3 {: .tip}
+> ### Tip Header 3 [with link](#) {: .tip}
 >
 > #### Header 4
 >
@@ -43,7 +43,7 @@
 > no highlight
 > ```
 
-> ### Header 3 {: .neutral}
+> ### Neutral Header 3 [with link](#) {: .neutral}
 >
 > #### Header 4
 >
@@ -57,7 +57,7 @@
 > no highlight
 > ```
 
-> ### Header 3 {: .warning}
+> ### Warning Header 3 [with link](#) {: .warning}
 >
 > #### Header 4
 >
@@ -71,7 +71,7 @@
 > no highlight
 > ```
 
-> ### Header 3 {: .error}
+> ### Error Header 3 [with link](#) {: .error}
 >
 > #### Header 4
 >
@@ -87,7 +87,7 @@
 
 ## Starting with header 4
 
-> #### Just a blockquote.
+> #### Blockquote Header 4 [with link](#)
 >
 > Some `code` and a [link](#).
 >
@@ -95,7 +95,7 @@
 > Foo + Bar.
 > ```
 
-> #### Header 4 {: .info}
+> #### Info Header 4 [with link](#) {: .info}
 >
 > Some `code` and a [link](#).
 >
@@ -103,7 +103,7 @@
 > Foo + Bar.
 > ```
 
-> #### Header 4 {: .tip}
+> #### Tip Header 4 [with link](#) {: .tip}
 >
 > Some `code` and a [link](#).
 >
@@ -111,7 +111,7 @@
 > Foo + Bar.
 > ```
 
-> #### Header 4 {: .neutral}
+> #### Neutral Header 4 [with link](#) {: .neutral}
 >
 > Some `code` and a [link](#).
 >
@@ -119,7 +119,7 @@
 > Foo + Bar.
 > ```
 
-> #### Header 4 {: .warning}
+> #### Warning Header 4 [with link](#) {: .warning}
 >
 > Some `code` and a [link](#).
 >
@@ -127,7 +127,7 @@
 > Foo + Bar.
 > ```
 
-> #### Header 4 {: .error}
+> #### Error Header 4 [with link](#) {: .error}
 >
 > Some `code` and a [link](#).
 >
