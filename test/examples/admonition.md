@@ -2,7 +2,7 @@
 
 ## Starting with header 3
 
-> ### Blockquote Header 3 [with link](#)
+> ### Blockquote Header 3 with [link](#) and `code`
 >
 > Some `code` and a [link](#).
 >
@@ -14,7 +14,7 @@
 > no highlight
 > ```
 
-> ### Info Header 3 [with link](#) {: .info}
+> ### Info Header 3 with [link](#) and `code` {: .info}
 >
 > #### Header 4
 >
@@ -28,7 +28,7 @@
 > no highlight
 > ```
 
-> ### Tip Header 3 [with link](#) {: .tip}
+> ### Tip Header 3 with [link](#) and `code` {: .tip}
 >
 > #### Header 4
 >
@@ -43,7 +43,7 @@
 > no highlight
 > ```
 
-> ### Neutral Header 3 [with link](#) {: .neutral}
+> ### Neutral Header 3 with [link](#) and `code` {: .neutral}
 >
 > #### Header 4
 >
@@ -57,7 +57,7 @@
 > no highlight
 > ```
 
-> ### Warning Header 3 [with link](#) {: .warning}
+> ### Warning Header 3 with [link](#) and `code` {: .warning}
 >
 > #### Header 4
 >
@@ -71,7 +71,7 @@
 > no highlight
 > ```
 
-> ### Error Header 3 [with link](#) {: .error}
+> ### Error Header 3 with [link](#) and `code` {: .error}
 >
 > #### Header 4
 >
@@ -87,7 +87,7 @@
 
 ## Starting with header 4
 
-> #### Blockquote Header 4 [with link](#)
+> #### Blockquote Header 4 with [link](#) and `code`
 >
 > Some `code` and a [link](#).
 >
@@ -95,7 +95,7 @@
 > Foo + Bar.
 > ```
 
-> #### Info Header 4 [with link](#) {: .info}
+> #### Info Header 4 with [link](#) and `code` {: .info}
 >
 > Some `code` and a [link](#).
 >
@@ -103,7 +103,7 @@
 > Foo + Bar.
 > ```
 
-> #### Tip Header 4 [with link](#) {: .tip}
+> #### Tip Header 4 with [link](#) and `code` {: .tip}
 >
 > Some `code` and a [link](#).
 >
@@ -111,7 +111,7 @@
 > Foo + Bar.
 > ```
 
-> #### Neutral Header 4 [with link](#) {: .neutral}
+> #### Neutral Header 4 with [link](#) and `code` {: .neutral}
 >
 > Some `code` and a [link](#).
 >
@@ -119,7 +119,7 @@
 > Foo + Bar.
 > ```
 
-> #### Warning Header 4 [with link](#) {: .warning}
+> #### Warning Header 4 with [link](#) and `code` {: .warning}
 >
 > Some `code` and a [link](#).
 >
@@ -127,7 +127,7 @@
 > Foo + Bar.
 > ```
 
-> #### Error Header 4 [with link](#) {: .error}
+> #### Error Header 4 with [link](#) and `code` {: .error}
 >
 > Some `code` and a [link](#).
 >
