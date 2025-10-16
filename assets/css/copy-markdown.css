@@ -1,0 +1,49 @@
+/* Actions Group Container */
+.actions-group {
+  float: right;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.actions-group .icon-action {
+  float: none;
+  margin-top: 0;
+}
+
+/* Copy Markdown Button Styling */
+.copy-markdown-btn {
+  color: var(--iconAction);
+  text-decoration: none;
+  border: none;
+  transition: color 0.3s ease-in-out;
+  background-color: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 300;
+  padding: 2px 4px;
+  height: fit-content;
+  border-radius: 3px;
+  opacity: 0.7;
+}
+
+.copy-markdown-btn:hover {
+  color: var(--iconActionHover);
+  opacity: 1;
+  background-color: rgba(128, 128, 128, 0.1);
+}
+
+.copy-markdown-btn i {
+  font-size: 0.7rem;
+}
+
+.copy-markdown-btn span {
+  white-space: nowrap;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}

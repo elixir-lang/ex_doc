@@ -16,7 +16,16 @@
         <span class="sr-only">View Source</span>
       </a>
     <% end %>
+    <button onclick="copyMarkdown('<%= node.id %>.md')" title="Copy Markdown" class="copy-markdown-btn" rel="help">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span>Copy for LLM</span>
+    </button>
+    <a href="./markdown/<%= node.id %>.md" title="View as Markdown" class="copy-markdown-btn" rel="help">
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+      <span>View as Markdown</span>
+    </a>
   </div>
+
 
   <%= if node.type == :livemd do %>
     <div class="livebook-badge-container">

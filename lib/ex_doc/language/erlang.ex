@@ -224,6 +224,16 @@ defmodule ExDoc.Language.Erlang do
   def autolink_spec(ast, opts) do
     config = struct!(Autolink, opts)
 
+    # Handle case where spec is already a string (possibly pre-processed)
+    case ast do
+      spec when is_binary(spec) ->
+        spec  # Return the spec as-is if it's already processed
+      _ ->
+        autolink_spec_ast(ast, config)
+    end
+  end
+
+  defp autolink_spec_ast(ast, config) do
     {name, anno, quoted} =
       case ast do
         {:attribute, anno, kind, {mfa, ast}} when kind in [:spec, :callback] ->
@@ -695,7 +705,11 @@ defmodule ExDoc.Language.Erlang do
         end
 
       if url do
-        ~s|<a href="#{url}">#{string}</a>(|
+        if config.ext == ".md" do
+          ~s|[#{string}\](#{url})(|
+        else
+          ~s|<a href="#{url}">#{string}</a>(|
+        end
       else
         string <> "("
       end
