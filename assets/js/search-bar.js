@@ -3,9 +3,6 @@ import {
   isAutocompleteListOpen,
   moveAutocompleteSelection,
   selectedAutocompleteSuggestion,
-  togglePreview,
-  showPreview,
-  hidePreview,
   updateAutocompleteList,
   AUTOCOMPLETE_CONTAINER_SELECTOR,
   AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR
@@ -27,17 +24,6 @@ if (!isEmbedded) {
 function initialize () {
   addEventListeners()
   setAutocompleteLimit()
-
-  window.onTogglePreviewClick = function (event, open) {
-    event.preventDefault()
-    event.stopImmediatePropagation()
-
-    // Keep the focus on the input instead of the button
-    // when the user clicked to open the preview.
-    // Maintains consistent keyboard navigation and look
-    focusSearchInput()
-    if (open) { showPreview(event.target) } else { hidePreview() }
-  }
 }
 
 /**
@@ -95,9 +81,6 @@ function addEventListeners () {
       event.preventDefault()
     } else if (event.key === 'ArrowDown' || (appleOS && event.ctrlKey && event.key === 'n')) {
       moveAutocompleteSelection(1)
-      event.preventDefault()
-    } else if (event.key === 'Tab' && selectedAutocompleteSuggestion() !== null) {
-      togglePreview()
       event.preventDefault()
     }
   })
@@ -183,7 +166,6 @@ function clearSearch () {
 }
 
 function hideAutocomplete () {
-  hidePreview()
   document.body.classList.remove('search-focused')
   hideAutocompleteList()
 }
