@@ -162,4 +162,45 @@ defmodule ExDoc.ConfigTest do
       assert groups_for_modules.(config, custom_group) == {"custom_group", ["module_1"]}
     end
   end
+
+  describe "normalizes search" do
+    test "defaults to local search" do
+      config = build([])
+      assert config.search == [%{name: "Default", help: "Search in browser", url: "search.html?q="}]
+    end
+
+    test "accepts list of maps with name, help, and url" do
+      config = build(search: [
+        %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
+        %{name: "Local", help: "Search locally", url: "search.html?q="}
+      ])
+
+      assert config.search == [
+        %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
+        %{name: "Local", help: "Search locally", url: "search.html?q="}
+      ]
+    end
+
+    test "defaults url to search.html?q= when not provided" do
+      config = build(search: [
+        %{name: "Default", help: "Search in browser"}
+      ])
+
+      assert config.search == [%{name: "Default", help: "Search in browser", url: "search.html?q="}]
+    end
+
+    test "raises on invalid search config" do
+      assert_raise ArgumentError, ~r/search must be a list of maps/, fn ->
+        build(search: "invalid")
+      end
+
+      assert_raise ArgumentError, ~r/search entries must be a map/, fn ->
+        build(search: [%{name: "Test"}])
+      end
+
+      assert_raise ArgumentError, ~r/search entries must be a map/, fn ->
+        build(search: [%{name: "Test", help: "Help", url: 123}])
+      end
+    end
+  end
 end
