@@ -799,8 +799,8 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "function - any", c do
-      assert autolink_spec(~s"-spec foo() -> fun() | t().", c) ==
-               ~s[foo() -> fun() | <a href="#t:t/0">t</a>().]
+      assert autolink_spec(~s"-spec foo() -> fun((...) -> any()) | t().", c) ==
+               ~s[foo() -> fun((...) -> <a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:any/0">any</a>()) | <a href="#t:t/0">t</a>().]
     end
 
     test "function - any arity", c do

@@ -22,8 +22,33 @@ defmodule ExDoc do
     end
 
     {module_nodes, filtered_nodes} = config.retriever.docs_from_dir(config.source_beam, config)
-    find_formatter(config.formatter).run(module_nodes, filtered_nodes, config)
+
+    # Check if we should use the new ExtraNode architecture
+    if use_extra_node_architecture?(config.formatter) do
+      generate_docs_with_extra_nodes(module_nodes, filtered_nodes, config)
+    else
+      # Legacy path for backwards compatibility
+      find_formatter(config.formatter).run(module_nodes, filtered_nodes, config)
+    end
   end
+
+  @doc """
+  Generates documentation using the new ExtraNode architecture.
+
+  This builds extras once and passes pre-built ExtraNode structures to formatters,
+  eliminating duplicate work when multiple formatters are used.
+  """
+  def generate_docs_with_extra_nodes(module_nodes, filtered_nodes, config) do
+    # Build extras once for all formats
+    extra_nodes = ExDoc.ExtraNode.build_extras(config)
+
+    # Pass pre-built extras to the formatter
+    find_formatter(config.formatter).run_with_extra_nodes(module_nodes, filtered_nodes, extra_nodes, config)
+  end
+
+  # For now, we'll enable the new architecture for all formatters
+  # In the future, this could be more selective based on config or formatter capabilities
+  defp use_extra_node_architecture?(_formatter), do: true
 
   # Short path for programmatic interface
   defp find_formatter(modname) when is_atom(modname), do: modname

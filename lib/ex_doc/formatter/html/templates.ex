@@ -167,6 +167,35 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:livemd), do: "extras"
   defp sidebar_type(:extra), do: "extras"
 
+  def asset_rev(output, pattern) do
+    output = Path.expand(output)
+
+    output
+    |> Path.join(pattern)
+    |> Path.wildcard()
+    |> relative_asset(output, pattern)
+  end
+
+  defp relative_asset([], output, pattern),
+    do: raise("could not find matching #{output}/#{pattern}")
+
+  defp relative_asset([h | _], output, _pattern), do: Path.relative_to(h, output)
+
+  defp get_hex_url(config, source_path) do
+    case config.package do
+      nil ->
+        nil
+
+      package ->
+        base_url = "https://preview.hex.pm/preview/#{package}/#{config.version}"
+        if source_path, do: "#{base_url}/show/#{source_path}", else: base_url
+    end
+  end
+
+  defp get_markdown_path(node) do
+    if node && node.id, do: URI.encode(node.id), else: "index"
+  end
+
   @section_header_class_name "section-heading"
 
   @doc """
