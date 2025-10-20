@@ -213,6 +213,7 @@ function addEventListeners () {
   qs(SEARCH_CLOSE_BUTTON_SELECTOR).addEventListener('click', _event => {
     clearSearch()
     hideAutocomplete()
+    searchInput.blur()
   })
 
   // Search engine dropdown events

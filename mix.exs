@@ -86,7 +86,11 @@ defmodule ExDoc.Mixfile do
     if Mix.env() == :dev do
       [
         search: [
-          %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
+          %{
+            name: "ExDoc ecosystem",
+            help: "Search everything about ExDoc on Google",
+            url: "https://google.com/?q="
+          },
           %{name: "Lunr", help: "Search using Lunr in browser"}
         ]
       ]

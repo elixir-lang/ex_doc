@@ -30,17 +30,28 @@
   color: var(--searchAccentMain);
   position: relative;
   height: 46px;
-  padding: 8px 35px 8px 12px;
+  padding: 8px 12px;
   width: 100%;
   transition: var(--transition-all);
 }
 
-.top-search .search-bar .engine-selector[data-multiple="true"] ~ .search-close-button {
-  right: 120px;
+.top-search .search-bar .search-input {
+  padding-right: 140px;
 }
 
-body.search-focused .top-search .search-bar .engine-selector[data-multiple="true"] ~ .search-input {
-  padding-right: 150px;
+.top-search .search-bar .search-controls {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  z-index: 100;
+}
+
+body.search-focused .top-search .search-bar .search-input {
+  padding-right: 170px;
 }
 
 .top-search .search-bar .search-input::placeholder {
@@ -66,45 +77,41 @@ body.search-focused .top-search .search-bar .engine-selector[data-multiple="true
 }
 
 .top-search .search-bar .engine-selector {
-  position: absolute;
-  right: 40px;
-  z-index: 100;
+  position: relative;
 }
 
 .top-search .search-bar .engine-selector[data-multiple="false"] .engine-button {
+  cursor: default;
+}
+
+.top-search .search-bar .engine-selector[data-multiple="false"] .engine-button .ri-arrow-down-s-line {
   display: none;
 }
 
 .top-search .search-bar .engine-button {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background-color: transparent;
+  gap: 6px;
+  background-color: var(--autocompleteHover);
   border: none;
   color: var(--searchAccentMain);
   cursor: pointer;
   font-size: var(--text-sm);
-  opacity: 0.7;
-  padding: 4px 8px;
+  padding: 8px 12px;
   border-radius: var(--borderRadius-base);
   transition: var(--transition-all);
 }
 
 .top-search .search-bar .engine-button:hover {
-  opacity: 1;
-  background-color: var(--autocompleteHover);
+  background-color: var(--autocompleteSelected);
 }
 
 .top-search .search-bar .engine-button[aria-expanded="true"] {
-  opacity: 1;
   background-color: var(--autocompleteSelected);
 }
 
 .top-search .search-bar .engine-name {
   font-size: var(--text-sm);
-  max-width: 80px;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -189,15 +196,13 @@ body.search-focused .top-search .search-bar .engine-selector[data-multiple="true
   background-color: transparent;
   border: none;
   cursor: pointer;
-  right: 11px;
   margin: 0;
   opacity: 0.5;
-  padding: 5px 1px 5px 0;
-  position: absolute;
+  padding: 5px 0;
   transform: scaleY(0);
-  top: calc(50% - 13px);
   transition: var(--transition-all);
-  z-index: 99;
+  display: flex;
+  align-items: center;
 }
 
 .top-search .search-bar .search-close-button:hover {

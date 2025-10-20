@@ -36,28 +36,31 @@
           <label class="search-label">
             <span class="sr-only">Search documentation of <%= config.project %></span>
             <div class="search-input-wrapper">
-              <input name="q" type="text" class="search-input" placeholder="Press / for autocomplete" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-              <div class="engine-selector" data-multiple="<%= length(config.search) > 1 %>">
-                <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
-                  <span class="engine-name"><%= hd(config.search).name %></span>
-                  <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+              <input name="q" type="text" class="search-input" placeholder="Press / to autocomplete within <%= config.project %>" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <div class="search-controls">
+                <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                  <i class="ri-close-line ri-lg" title="Cancel search"></i>
                 </button>
-                <div class="engine-dropdown" hidden role="menu">
-                  <%= for {engine, index} <- Enum.with_index(config.search) do %>
-                    <button type="button"
-                            class="engine-option"
-                            data-engine-url="<%= engine.url %>"
-                            role="menuitemradio"
-                            aria-checked="<%= if index == 0, do: "true", else: "false" %>">
-                      <span class="name"><%= engine.name %></span>
-                      <span class="help"><%= engine.help %></span>
-                    </button>
-                  <% end %>
+                <div class="engine-selector" data-multiple="<%= length(config.search) > 1 %>">
+                  <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+                    <i class="ri-search-2-line" aria-hidden="true"></i>
+                    <span class="engine-name"><%= hd(config.search).name %></span>
+                    <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+                  </button>
+                  <div class="engine-dropdown" hidden role="menu">
+                    <%= for {engine, index} <- Enum.with_index(config.search) do %>
+                      <button type="button"
+                              class="engine-option"
+                              data-engine-url="<%= engine.url %>"
+                              role="menuitemradio"
+                              aria-checked="<%= if index == 0, do: "true", else: "false" %>">
+                        <span class="name"><%= engine.name %></span>
+                        <span class="help"><%= engine.help %></span>
+                      </button>
+                    <% end %>
+                  </div>
                 </div>
               </div>
-              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
-                <i class="ri-close-line ri-lg" title="Cancel search"></i>
-              </button>
             </div>
           </label>
         </form>
