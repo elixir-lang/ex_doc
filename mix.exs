@@ -83,29 +83,39 @@ defmodule ExDoc.Mixfile do
   defp elixirc_paths(_), do: ["lib"]
 
   defp docs do
-    [
-      main: "readme",
-      extras:
-        [
-          "README.md",
-          "Cheatsheet.cheatmd",
-          "CHANGELOG.md"
-        ] ++ test_dev_examples(Mix.env()),
-      source_ref: "v#{@version}",
-      source_url: @source_url,
-      groups_for_modules: [
-        Markdown: [
-          ExDoc.Markdown,
-          ExDoc.Markdown.Earmark
+    if Mix.env() == :dev do
+      [
+        search: [
+          %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
+          %{name: "Lunr", help: "Search using Lunr in browser"}
         ]
-      ],
-      groups_for_extras: [
-        Examples: ~r"test/examples"
-      ],
-      skip_undefined_reference_warnings_on: [
-        "CHANGELOG.md"
       ]
-    ]
+    else
+      []
+    end ++
+      [
+        main: "readme",
+        extras:
+          [
+            "README.md",
+            "Cheatsheet.cheatmd",
+            "CHANGELOG.md"
+          ] ++ test_dev_examples(Mix.env()),
+        source_ref: "v#{@version}",
+        source_url: @source_url,
+        groups_for_modules: [
+          Markdown: [
+            ExDoc.Markdown,
+            ExDoc.Markdown.Earmark
+          ]
+        ],
+        groups_for_extras: [
+          Examples: ~r"test/examples"
+        ],
+        skip_undefined_reference_warnings_on: [
+          "CHANGELOG.md"
+        ]
+      ]
   end
 
   defp docs(args) do

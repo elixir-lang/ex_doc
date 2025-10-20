@@ -30,9 +30,17 @@
   color: var(--searchAccentMain);
   position: relative;
   height: 46px;
-  padding: 8px 35px 8px 43px;
+  padding: 8px 35px 8px 12px;
   width: 100%;
   transition: var(--transition-all);
+}
+
+.top-search .search-bar .engine-selector[data-multiple="true"] ~ .search-close-button {
+  right: 120px;
+}
+
+body.search-focused .top-search .search-bar .engine-selector[data-multiple="true"] ~ .search-input {
+  padding-right: 150px;
 }
 
 .top-search .search-bar .search-input::placeholder {
@@ -49,6 +57,107 @@
 
 .top-search .search-bar .search-label {
   position: relative;
+}
+
+.top-search .search-bar .search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.top-search .search-bar .engine-selector {
+  position: absolute;
+  right: 40px;
+  z-index: 100;
+}
+
+.top-search .search-bar .engine-selector[data-multiple="false"] .engine-button {
+  display: none;
+}
+
+.top-search .search-bar .engine-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: transparent;
+  border: none;
+  color: var(--searchAccentMain);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  opacity: 0.7;
+  padding: 4px 8px;
+  border-radius: var(--borderRadius-base);
+  transition: var(--transition-all);
+}
+
+.top-search .search-bar .engine-button:hover {
+  opacity: 1;
+  background-color: var(--autocompleteHover);
+}
+
+.top-search .search-bar .engine-button[aria-expanded="true"] {
+  opacity: 1;
+  background-color: var(--autocompleteSelected);
+}
+
+.top-search .search-bar .engine-name {
+  font-size: var(--text-sm);
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-search .search-bar .engine-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 200px;
+  background-color: var(--autocompleteBackground);
+  border-radius: var(--borderRadius-base);
+  box-shadow: 0px 8px 24px 0px var(--autocompleteBorder);
+  padding: 4px;
+  z-index: 200;
+}
+
+.top-search .search-bar .engine-dropdown[hidden] {
+  display: none;
+}
+
+.top-search .search-bar .engine-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--borderRadius-base);
+  color: var(--textHeaders);
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: var(--transition-colors);
+}
+
+.top-search .search-bar .engine-option:hover,
+.top-search .search-bar .engine-option:focus {
+  background-color: var(--autocompleteHover);
+  outline: none;
+}
+
+.top-search .search-bar .engine-option[aria-checked="true"] {
+  background-color: var(--autocompleteSelected);
+}
+
+.top-search .search-bar .engine-option .name {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.top-search .search-bar .engine-option .help {
+  display: block;
+  font-size: var(--text-xs);
+  opacity: 0.7;
 }
 
 .top-search .search-bar .search-button {

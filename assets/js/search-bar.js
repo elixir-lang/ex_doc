@@ -12,6 +12,12 @@ import { isAppleOS, qs } from './helpers'
 
 const SEARCH_INPUT_SELECTOR = 'form.search-bar input'
 const SEARCH_CLOSE_BUTTON_SELECTOR = 'form.search-bar .search-close-button'
+const ENGINE_SELECTOR = '.engine-selector'
+const ENGINE_BUTTON_SELECTOR = '.engine-button'
+const ENGINE_DROPDOWN_SELECTOR = '.engine-dropdown'
+
+// Search engine state - gets the currently selected engine URL from DOM
+let selectedEngineUrl = null
 
 /**
  * Initializes the sidebar search box.
@@ -22,8 +28,86 @@ if (!isEmbedded) {
 }
 
 function initialize () {
+  initializeSearchEngineState()
   addEventListeners()
   setAutocompleteLimit()
+}
+
+function initializeSearchEngineState () {
+  const allOptions = document.querySelectorAll('.engine-option')
+
+  if (allOptions.length === 0) {
+    selectedEngineUrl = 'search.html?q='
+    return
+  }
+
+  // If we're on the search page, prefer the first engine that starts with search.html
+  const pathname = window.location.pathname
+  if (pathname.endsWith('/search.html') || pathname.endsWith('/search')) {
+    const searchOption = Array.from(allOptions).find(option =>
+      option.dataset.engineUrl.startsWith('search.html')
+    )
+
+    if (searchOption) {
+      selectSearchEngine(searchOption)
+      return
+    }
+  }
+
+  // Otherwise, use the first option
+  selectedEngineUrl = allOptions[0].dataset.engineUrl
+}
+
+function selectSearchEngine (option) {
+  selectedEngineUrl = option.dataset.engineUrl
+
+  // Update button text
+  const button = qs(ENGINE_BUTTON_SELECTOR)
+  const nameSpan = button?.querySelector('.engine-name')
+  if (nameSpan) {
+    nameSpan.textContent = option.querySelector('.name').textContent
+  }
+
+  // Update aria-checked attributes
+  const dropdown = qs(ENGINE_DROPDOWN_SELECTOR)
+  dropdown?.querySelectorAll('.engine-option').forEach(opt => {
+    opt.setAttribute('aria-checked', opt === option ? 'true' : 'false')
+  })
+}
+
+function toggleSearchEngineDropdown () {
+  const button = qs(ENGINE_BUTTON_SELECTOR)
+  const dropdown = qs(ENGINE_DROPDOWN_SELECTOR)
+  if (!button || !dropdown) return
+
+  const isExpanded = button.getAttribute('aria-expanded') === 'true'
+  if (isExpanded) {
+    hideSearchEngineDropdown()
+  } else {
+    showSearchEngineDropdown()
+  }
+}
+
+function showSearchEngineDropdown () {
+  const button = qs(ENGINE_BUTTON_SELECTOR)
+  const dropdown = qs(ENGINE_DROPDOWN_SELECTOR)
+  if (!button || !dropdown) return
+
+  button.setAttribute('aria-expanded', 'true')
+  dropdown.removeAttribute('hidden')
+
+  // Focus first option
+  const firstOption = dropdown.querySelector('.engine-option')
+  firstOption?.focus()
+}
+
+function hideSearchEngineDropdown () {
+  const button = qs(ENGINE_BUTTON_SELECTOR)
+  const dropdown = qs(ENGINE_DROPDOWN_SELECTOR)
+  if (!button || !dropdown) return
+
+  button.setAttribute('aria-expanded', 'false')
+  dropdown.setAttribute('hidden', '')
 }
 
 /**
@@ -130,6 +214,66 @@ function addEventListeners () {
     clearSearch()
     hideAutocomplete()
   })
+
+  // Search engine dropdown events
+  const engineButton = qs(ENGINE_BUTTON_SELECTOR)
+  if (engineButton) {
+    engineButton.addEventListener('click', event => {
+      event.stopPropagation()
+      toggleSearchEngineDropdown()
+    })
+
+    engineButton.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        toggleSearchEngineDropdown()
+      } else if (event.key === 'Escape') {
+        hideSearchEngineDropdown()
+      }
+    })
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', event => {
+    const selector = qs(ENGINE_SELECTOR)
+    if (selector && !selector.contains(event.target)) {
+      hideSearchEngineDropdown()
+    }
+  })
+
+  // Add click handlers to engine options (rendered by Elixir)
+  const dropdown = qs(ENGINE_DROPDOWN_SELECTOR)
+  if (dropdown) {
+    dropdown.querySelectorAll('.engine-option').forEach(option => {
+      option.addEventListener('click', () => {
+        selectSearchEngine(option)
+        hideSearchEngineDropdown()
+      })
+    })
+
+    // Keyboard navigation in dropdown
+    dropdown.addEventListener('keydown', event => {
+      const options = Array.from(dropdown.querySelectorAll('.engine-option'))
+      const currentIndex = options.indexOf(document.activeElement)
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        const nextIndex = (currentIndex + 1) % options.length
+        options[nextIndex]?.focus()
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        const prevIndex = (currentIndex - 1 + options.length) % options.length
+        options[prevIndex]?.focus()
+      } else if (event.key === 'Escape') {
+        event.preventDefault()
+        hideSearchEngineDropdown()
+        engineButton?.focus()
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        document.activeElement?.click()
+      }
+    })
+  }
 }
 
 function handleAutocompleteFormSubmission (event) {
@@ -147,9 +291,8 @@ function handleAutocompleteFormSubmission (event) {
   if (autocompleteSuggestion) {
     anchor.setAttribute('href', autocompleteSuggestion.link)
   } else {
-    const meta = document.querySelector('meta[name="exdoc:full-text-search-url"]')
-    const url = meta ? meta.getAttribute('content') : 'search.html?q='
-    anchor.setAttribute('href', `${url}${encodeURIComponent(searchInput.value)}`)
+    // Use selected search engine URL
+    anchor.setAttribute('href', `${selectedEngineUrl}${encodeURIComponent(searchInput.value)}`)
   }
 
   anchor.click()
