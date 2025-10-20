@@ -166,27 +166,38 @@ defmodule ExDoc.ConfigTest do
   describe "normalizes search" do
     test "defaults to local search" do
       config = build([])
-      assert config.search == [%{name: "Default", help: "Search in browser", url: "search.html?q="}]
+
+      assert config.search == [
+               %{name: "Default", help: "In-browser search", url: "search.html?q="}
+             ]
     end
 
     test "accepts list of maps with name, help, and url" do
-      config = build(search: [
-        %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
-        %{name: "Local", help: "Search locally", url: "search.html?q="}
-      ])
+      config =
+        build(
+          search: [
+            %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
+            %{name: "Local", help: "Search locally", url: "search.html?q="}
+          ]
+        )
 
       assert config.search == [
-        %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
-        %{name: "Local", help: "Search locally", url: "search.html?q="}
-      ]
+               %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
+               %{name: "Local", help: "Search locally", url: "search.html?q="}
+             ]
     end
 
     test "defaults url to search.html?q= when not provided" do
-      config = build(search: [
-        %{name: "Default", help: "Search in browser"}
-      ])
+      config =
+        build(
+          search: [
+            %{name: "Default", help: "In-browser search"}
+          ]
+        )
 
-      assert config.search == [%{name: "Default", help: "Search in browser", url: "search.html?q="}]
+      assert config.search == [
+               %{name: "Default", help: "In-browser search", url: "search.html?q="}
+             ]
     end
 
     test "raises on invalid search config" do

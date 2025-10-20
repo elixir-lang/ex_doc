@@ -81,10 +81,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   describe "sidebar" do
     test "renders search engines when multiple are configured", context do
-      config = doc_config(context, search: [
-        %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
-        %{name: "Local", help: "Search locally", url: "search.html?q="}
-      ])
+      config =
+        doc_config(context,
+          search: [
+            %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
+            %{name: "Local", help: "Search locally", url: "search.html?q="}
+          ]
+        )
 
       content = Templates.sidebar_template(config, :extra)
 
@@ -96,9 +99,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
 
     test "renders search engine when only one is configured", context do
-      config = doc_config(context, search: [
-        %{name: "Default", help: "Search in browser", url: "search.html?q="}
-      ])
+      config =
+        doc_config(context,
+          search: [
+            %{name: "Default", help: "In-browser search", url: "search.html?q="}
+          ]
+        )
 
       content = Templates.sidebar_template(config, :extra)
 

@@ -45,7 +45,7 @@ defmodule ExDoc.Config do
             project: nil,
             redirects: %{},
             retriever: ExDoc.Retriever,
-            search: [%{name: "Default", help: "Search in browser", url: "search.html?q="}],
+            search: [%{name: "Default", help: "In-browser search", url: "search.html?q="}],
             skip_undefined_reference_warnings_on:
               &__MODULE__.skip_undefined_reference_warnings_on/1,
             skip_code_autolink_to: &__MODULE__.skip_code_autolink_to/1,
@@ -314,7 +314,7 @@ defmodule ExDoc.Config do
   end
 
   defp normalize_search([]) do
-    [%{name: "Default", help: "Search in browser", url: "search.html?q="}]
+    [%{name: "Default", help: "In-browser search", url: "search.html?q="}]
   end
 
   defp normalize_search(search) when is_list(search) do

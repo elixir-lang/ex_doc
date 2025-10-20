@@ -164,6 +164,24 @@ defmodule Mix.Tasks.Docs do
        value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`.
        See the "Changing documentation over time" section below for more.
 
+    * `:search` - A list of search engine configurations. Each search engine is a map with the following keys:
+
+        * `:name` - The display name of the search engine (required)
+        * `:help` - A help text describing what the search engine does (required)
+        * `:url` - The optional search URL template, usually ending with `q=`
+          The default uses ExDoc built-in Lunr's search engine
+
+      When multiple search engines are configured, a dropdown selector will appear next to the search bar
+      allowing users to choose which engine to use. For example:
+
+          search: [
+            %{name: "FooBar", help: "Search on FooBar", url: "https://example.com/?q="},
+            %{name: "Local", help: "In-browser search"}
+          ]
+
+      By default, the built-in Lunr's search engine is configured. If only one search engine
+      is configured, the dropdown selector will be hidden.
+
     * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
       reference in the current project docs (for example, because of a typo). This option controls when to
       skip such warnings. This option can be a list of strings that will be checked for exact matches,
