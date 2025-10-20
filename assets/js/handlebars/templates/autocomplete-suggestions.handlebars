@@ -12,23 +12,17 @@
     <div>
       {{#each suggestions}}
       <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
-        <div class="title">
-          {{# if deprecated }}
-          <s><span class="header" translate="no">{{{title}}}</span></s>
-          {{ else }}
-          <span class="header" translate="no">{{{title}}}</span>
-          {{/if}}
-
-          {{#each labels}}
-          <span class="label">{{this}}</span>
-          {{/each}}
-        </div>
-
+        <span class="header" translate="no">{{{title}}}</span>
         {{#if description}}
-        <div class="description" translate="no">
-          {{{description}}}
-        </div>
+        <span class="separator" aria-hidden="true"> · </span>
+        <span class="description" translate="no">{{{description}}}</span>
         {{/if}}
+        {{# if deprecated }}
+        <span class="label deprecated">deprecated</span>
+        {{/if}}
+        {{#each labels}}
+        <span class="label">{{this}}</span>
+        {{/each}}
       </a>
       {{/each}}
     </div>

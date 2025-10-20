@@ -73,6 +73,9 @@
   transition: var(--transition-colors);
   border-top: 1px solid var(--suggestionBorder);
   font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .autocomplete-suggestion.selected {
@@ -90,9 +93,13 @@
   font-weight: bold;
 }
 
+.autocomplete-suggestion .separator {
+  opacity: 0.4;
+  margin: 0 2px;
+}
+
 .autocomplete-suggestion .description {
   opacity: 0.6;
-  padding-top: 3px;
 }
 
 .autocomplete-suggestion .label {
@@ -107,17 +114,6 @@
   font-size: 0.7rem;
 }
 
-.autocomplete-suggestion .header {
-  margin-right: 5px;
-}
-
-.autocomplete-suggestion .title,
-.autocomplete-suggestion .description {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 100%;
-}
 
 @media screen and (hover: none) {
   .autocomplete-results .press-return {
