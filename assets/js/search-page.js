@@ -5,7 +5,6 @@ import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAnd
 import { setSearchInputValue } from './search-bar'
 import searchResultsTemplate from './handlebars/templates/search-results.handlebars'
 
-const EXCERPT_RADIUS = 80
 const SEARCH_CONTAINER_SELECTOR = '#search'
 
 lunr.tokenizer.separator = /\s+/
@@ -257,31 +256,47 @@ function getExcerpts (searchItem, metadata) {
   const { doc } = searchItem
   const searchTerms = Object.keys(metadata)
 
-  const excerpts =
-    searchTerms
-      .filter(term => 'doc' in metadata[term])
-      .map(term => {
-        return metadata[term].doc.position
-          .map(([sliceStart, sliceLength]) => excerpt(doc, sliceStart, sliceLength))
-      })
-      .reduce((xs, ys) => xs.concat(ys), []) // flatten
-
-  if (excerpts.length === 0) {
-    const beginning = doc.slice(0, EXCERPT_RADIUS * 2) + (EXCERPT_RADIUS * 2 < doc.length ? '...' : '')
-    return [beginning]
-  }
-
-  return excerpts.slice(0, 1)
+  return [generateSnippet(doc, searchTerms)]
 }
 
-function excerpt (doc, sliceStart, sliceLength) {
-  const startPos = Math.max(sliceStart - EXCERPT_RADIUS, 0)
-  const endPos = Math.min(sliceStart + sliceLength + EXCERPT_RADIUS, doc.length)
-  return [
-    startPos > 0 ? '...' : '',
-    doc.slice(startPos, sliceStart),
-    '<em>' + escapeHtmlEntities(doc.slice(sliceStart, sliceStart + sliceLength)) + '</em>',
-    doc.slice(sliceStart + sliceLength, endPos),
-    endPos < doc.length ? '...' : ''
-  ].join('')
+function generateSnippet (doc, searchTerms) {
+  // Extract all paragraphs by splitting on both possible line endings
+  const paragraphsFromCRLF = doc.split('\r\n\r\n')
+  const paragraphs = paragraphsFromCRLF.flatMap(p => p.split('\n\n'))
+
+  // Get first usable paragraph (skip if starts with "#")
+  let firstParagraph
+  if (paragraphs.length >= 2) {
+    const first = paragraphs[0].trim()
+    if (first.startsWith('#')) {
+      firstParagraph = paragraphs[1]
+    } else {
+      firstParagraph = paragraphs[0]
+    }
+  } else if (paragraphs.length === 1) {
+    firstParagraph = paragraphs[0]
+  } else {
+    firstParagraph = doc
+  }
+
+  // Truncate to reasonable length (around 200 characters)
+  let truncated
+  if (firstParagraph.length > 200) {
+    truncated = firstParagraph.slice(0, 200) + '...'
+  } else {
+    truncated = firstParagraph
+  }
+
+  // Highlight search terms (case-insensitive)
+  let result = escapeHtmlEntities(truncated)
+  for (const term of searchTerms) {
+    if (term.trim() === '') continue
+
+    // Create a case-insensitive regex for the term
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const regex = new RegExp(escapedTerm, 'gi')
+    result = result.replace(regex, match => `<em>${match}</em>`)
+  }
+
+  return result
 }

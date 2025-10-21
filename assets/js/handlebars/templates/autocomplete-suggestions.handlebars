@@ -3,7 +3,11 @@
   <div class="autocomplete-suggestions">
     <div class="autocomplete-results">
       <span class="query">
-        Autocompletion results for <span class="bold">"{{term}}"</span>
+        {{#if suggestions.length}}
+          Autocompletion results within this project
+        {{else}}
+          No autocompletion results within this project
+        {{/if}}
       </span>
       <span class="press-return">
         Press <span class="bold">RETURN</span> for full-text search

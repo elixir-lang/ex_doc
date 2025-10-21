@@ -18,7 +18,7 @@
 .search-bar {
   border: 1px solid var(--searchBarBorder);
   border-radius: var(--borderRadius-base);
-  height: 48px;
+  height: 40px;
   position: relative;
   width: 100%;
 }
@@ -29,8 +29,8 @@
   border-radius: var(--borderRadius-base);
   color: var(--searchAccentMain);
   position: relative;
-  height: 46px;
-  padding: 8px 35px 8px 43px;
+  height: 38px;
+  padding: 8px 40px 8px 12px;
   width: 100%;
   transition: var(--transition-all);
 }
@@ -44,34 +44,112 @@
   border: 1px solid var(--searchBarFocusColor);
   border-radius: calc(var(--borderRadius-base) - 1px);
   position: relative;
-  box-shadow: 0px 4px 20px 0px var(--searchBarBorderColor) inset;
 }
 
 .top-search .search-bar .search-label {
   position: relative;
 }
 
-.top-search .search-bar .search-button {
-  font-size: var(--text-sm);
-  color: var(--searchAccentMain);
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  left: 11px;
-  opacity: 0.5;
-  padding: 5px 1px 5px 5px;
-  position: absolute;
-  top: 60%;
-  transform: translateY(-60%);
-  z-index: 99;
-  transition: var(--transition-all);
+.top-search .search-bar .search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.top-search .search-bar.selected .search-button,
-.top-search .search-bar .search-button:hover,
-.top-search .search-bar .search-button:focus {
-  color: var(--top-searchLanguageAccentBar);
-  opacity: 1;
+.top-search .search-settings .engine-selector {
+  position: relative;
+}
+
+.top-search .search-settings .engine-selector[data-multiple="false"] {
+  display: none;
+}
+
+.top-search .search-settings .engine-selector[data-multiple="false"] .engine-button {
+  cursor: default;
+}
+
+.top-search .search-settings .engine-selector[data-multiple="false"] .engine-button .ri-arrow-down-s-line {
+  display: none;
+}
+
+.top-search .search-settings .engine-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--autocompleteHover);
+  border: none;
+  color: var(--searchAccentMain);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  padding: 8px 12px;
+  border-radius: var(--borderRadius-base);
+  transition: var(--transition-all);
+  height: 40px;
+}
+
+.top-search .search-settings .engine-button:hover {
+  background-color: var(--autocompleteSelected);
+}
+
+.top-search .search-settings .engine-button[aria-expanded="true"] {
+  background-color: var(--autocompleteSelected);
+}
+
+.top-search .search-settings .engine-name {
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.top-search .search-settings .engine-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 200px;
+  background-color: var(--autocompleteBackground);
+  border-radius: var(--borderRadius-base);
+  box-shadow: 0px 8px 24px 0px var(--autocompleteBorder);
+  padding: 4px;
+  z-index: 200;
+}
+
+.top-search .search-settings .engine-dropdown[hidden] {
+  display: none;
+}
+
+.top-search .search-settings .engine-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--borderRadius-base);
+  color: var(--textHeaders);
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: var(--transition-colors);
+}
+
+.top-search .search-settings .engine-option:hover,
+.top-search .search-settings .engine-option:focus {
+  background-color: var(--autocompleteHover);
+  outline: none;
+}
+
+.top-search .search-settings .engine-option[aria-checked="true"] {
+  background-color: var(--autocompleteSelected);
+}
+
+.top-search .search-settings .engine-option .name {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.top-search .search-settings .engine-option .help {
+  display: block;
+  font-size: var(--text-xs);
+  opacity: 0.7;
 }
 
 .top-search .search-bar .search-close-button {
@@ -80,15 +158,17 @@
   background-color: transparent;
   border: none;
   cursor: pointer;
-  right: 11px;
   margin: 0;
   opacity: 0.5;
-  padding: 5px 1px 5px 0;
-  position: absolute;
+  padding: 5px;
   transform: scaleY(0);
-  top: calc(50% - 13px);
   transition: var(--transition-all);
-  z-index: 99;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
 }
 
 .top-search .search-bar .search-close-button:hover {
@@ -138,7 +218,7 @@
 }
 
 body.search-focused .search-bar .search-close-button {
-  transform: scaleY(1);
+  transform: translateY(-50%) scaleY(1);
   transition: var(--transition-all);
 }
 

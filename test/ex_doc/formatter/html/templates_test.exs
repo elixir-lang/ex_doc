@@ -80,6 +80,38 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   describe "sidebar" do
+    test "renders search engines when multiple are configured", context do
+      config =
+        doc_config(context,
+          search: [
+            %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
+            %{name: "Local", help: "Search locally", url: "search.html?q="}
+          ]
+        )
+
+      content = Templates.sidebar_template(config, :extra)
+
+      assert content =~ ~r{<div class="engine-selector" data-multiple="true">}
+      assert content =~ ~r{<span class="engine-name">Google</span>}
+      assert content =~ ~r{data-engine-url="https://google.com/\?q="}
+      assert content =~ ~r{<span class="name">Local</span>}
+      assert content =~ ~r{<span class="help">Search locally</span>}
+    end
+
+    test "renders search engine when only one is configured", context do
+      config =
+        doc_config(context,
+          search: [
+            %{name: "Default", help: "In-browser search", url: "search.html?q="}
+          ]
+        )
+
+      content = Templates.sidebar_template(config, :extra)
+
+      assert content =~ ~r{<div class="engine-selector" data-multiple="false">}
+      assert content =~ ~r{<span class="engine-name">Default</span>}
+    end
+
     test "text links to homepage_url when set", context do
       content = Templates.sidebar_template(doc_config(context), :extra)
 

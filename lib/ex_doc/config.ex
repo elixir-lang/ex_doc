@@ -45,6 +45,7 @@ defmodule ExDoc.Config do
             project: nil,
             redirects: %{},
             retriever: ExDoc.Retriever,
+            search: [%{name: "Default", help: "In-browser search", url: "search.html?q="}],
             skip_undefined_reference_warnings_on:
               &__MODULE__.skip_undefined_reference_warnings_on/1,
             skip_code_autolink_to: &__MODULE__.skip_code_autolink_to/1,
@@ -88,6 +89,7 @@ defmodule ExDoc.Config do
           project: nil | String.t(),
           redirects: %{optional(String.t()) => String.t()} | [{String.t(), String.t()}],
           retriever: atom(),
+          search: [%{name: String.t(), help: String.t(), url: String.t()}],
           skip_undefined_reference_warnings_on: (String.t() -> boolean),
           skip_code_autolink_to: (String.t() -> boolean),
           source_beam: nil | String.t(),
@@ -139,6 +141,8 @@ defmodule ExDoc.Config do
         guess_url(options[:source_url], options[:source_ref] || @default_source_ref)
       end)
 
+    {search, options} = Keyword.pop(options, :search, [])
+
     preconfig = %__MODULE__{
       filter_modules: normalize_filter_modules(filter_modules),
       docs_groups: for({group, _} <- groups_for_docs, do: to_string(group)),
@@ -155,6 +159,7 @@ defmodule ExDoc.Config do
       output: normalize_output(output),
       proglang: normalize_proglang(proglang),
       project: project,
+      search: normalize_search(search),
       skip_undefined_reference_warnings_on:
         normalize_skip_list_function(skip_undefined_reference_warnings_on),
       skip_code_autolink_to: normalize_skip_list_function(skip_code_autolink_to),
@@ -306,5 +311,32 @@ defmodule ExDoc.Config do
       Application.load(app)
       {app, Application.spec(app, :modules)}
     end)
+  end
+
+  defp normalize_search([]) do
+    [%{name: "Default", help: "In-browser search", url: "search.html?q="}]
+  end
+
+  defp normalize_search(search) when is_list(search) do
+    Enum.map(search, fn
+      %{url: url} = engine when not is_binary(url) ->
+        bad_search!(engine)
+
+      %{name: name, help: help} = engine
+      when is_binary(name) and is_binary(help) ->
+        Map.put_new_lazy(engine, :url, fn -> "search.html?q=" end)
+
+      other ->
+        bad_search!(other)
+    end)
+  end
+
+  defp normalize_search(other) do
+    raise ArgumentError, "search must be a list of maps, got: #{inspect(other)}"
+  end
+
+  defp bad_search!(other) do
+    raise ArgumentError,
+          "search entries must be a map with :name, :help, and optional :url keys with string values, got: #{inspect(other)}"
   end
 end
