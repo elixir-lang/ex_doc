@@ -48,14 +48,14 @@ defmodule ExDoc.Formatter do
 
                 specs = Enum.map(child_node.specs, &language.autolink_spec(&1, autolink_opts))
                 child_node = %{child_node | specs: specs}
-                render_doc(child_node, language, autolink_opts, opts)
+                render_doc(child_node, ext, language, autolink_opts, opts)
               end
 
-            %{render_doc(group, language, autolink_opts, opts) | docs: docs}
+            %{render_doc(group, ext, language, autolink_opts, opts) | docs: docs}
           end
 
         %{
-          render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
+          render_doc(node, ext, language, [{:id, node.id} | autolink_opts], opts)
           | docs_groups: docs_groups
         }
       end,
@@ -117,11 +117,11 @@ defmodule ExDoc.Formatter do
 
   # Helper functions
 
-  defp render_doc(%{doc: nil} = node, _language, _autolink_opts, _opts),
+  defp render_doc(%{doc: nil} = node, _ext, _language, _autolink_opts, _opts),
     do: node
 
-  defp render_doc(%{doc: doc} = node, language, autolink_opts, opts) do
-    doc = autolink_and_highlight(doc, language, autolink_opts, opts)
+  defp render_doc(%{doc: doc} = node, ext, language, autolink_opts, opts) do
+    doc = autolink_and_render(doc, ext, language, autolink_opts, opts)
     %{node | doc: doc}
   end
 
@@ -137,7 +137,13 @@ defmodule ExDoc.Formatter do
     mod_id <> "." <> id
   end
 
-  defp autolink_and_highlight(doc, language, autolink_opts, opts) do
+  defp autolink_and_render(doc, ".md", language, autolink_opts, _opts) do
+    doc
+    |> language.autolink_doc(autolink_opts)
+    |> ExDoc.DocAST.to_markdown_string()
+  end
+
+  defp autolink_and_render(doc, _html_ext, language, autolink_opts, opts) do
     doc
     |> language.autolink_doc(autolink_opts)
     |> ExDoc.DocAST.highlight(language, opts)
@@ -183,6 +189,7 @@ defmodule ExDoc.Formatter do
     id = input_options[:filename] || input |> filename_to_title() |> Utils.text_to_id()
     source_file = input_options[:source] || input
     opts = [file: source_file, line: 1]
+    ext = Keyword.fetch!(autolink_opts, :ext)
 
     {extension, source, ast} =
       case extension_name(input) do
@@ -198,7 +205,7 @@ defmodule ExDoc.Formatter do
             source
             |> Markdown.to_ast(opts)
             |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3])
-            |> autolink_and_highlight(language, [file: input] ++ autolink_opts, opts)
+            |> autolink_and_render(ext, language, [file: input] ++ autolink_opts, opts)
 
           {extension, source, ast}
 
