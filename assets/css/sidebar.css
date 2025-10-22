@@ -157,6 +157,7 @@
   font-size: var(--text-sm);
   color: var(--sidebarSubheadings);
   white-space: nowrap;
+  font-weight: bold;
 }
 
 .sidebar .sidebar-list-nav li {
