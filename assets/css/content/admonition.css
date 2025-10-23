@@ -127,8 +127,4 @@
     padding-right: var(--content-gutter);
     border-radius: 0;
   }
-
-  .content-inner section.admonition > .admonition-title {
-    margin: 0 calc(-1 * var(--content-gutter));
-  }
 }
