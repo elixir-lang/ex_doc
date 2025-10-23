@@ -87,7 +87,12 @@ defmodule ExDoc.Mixfile do
       [
         search: [
           %{
-            name: "ExDoc ecosystem",
+            name: "ExDoc + Elixir",
+            help: "Search latest ExDoc + Elixir",
+            packages: [:ex_doc, elixir: "main"]
+          },
+          %{
+            name: "ExDoc on Google",
             help: "Search everything about ExDoc on Google",
             url: "https://google.com/?q="
           },

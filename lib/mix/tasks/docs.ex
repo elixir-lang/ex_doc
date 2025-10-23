@@ -164,23 +164,7 @@ defmodule Mix.Tasks.Docs do
        value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`.
        See the "Changing documentation over time" section below for more.
 
-    * `:search` - A list of search engine configurations. Each search engine is a map with the following keys:
-
-        * `:name` - The display name of the search engine (required)
-        * `:help` - A help text describing what the search engine does (required)
-        * `:url` - The optional search URL template, usually ending with `q=`
-          The default uses ExDoc built-in Lunr's search engine
-
-      When multiple search engines are configured, a dropdown selector will appear next to the search bar
-      allowing users to choose which engine to use. For example:
-
-          search: [
-            %{name: "FooBar", help: "Search on FooBar", url: "https://example.com/?q="},
-            %{name: "Local", help: "In-browser search"}
-          ]
-
-      By default, the built-in Lunr's search engine is configured. If only one search engine
-      is configured, the dropdown selector will be hidden.
+    * `:search` - A list of search engine configurations. See the "Search engines" section
 
     * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
       reference in the current project docs (for example, because of a typo). This option controls when to
@@ -422,21 +406,36 @@ defmodule Mix.Tasks.Docs do
   Groups in the sidebar and main page body are ordered according to the following
   rules:
 
-  * First, groups defined as `@moduledoc groups: [...]` in the given order.
-  * Then groups defined as keys in the `:groups_for_docs` configuration.
-  * Then default groups: Types, Callbacks and Functions.
-  * Finally, other groups returned by `:default_group_for_doc` by alphabetical
-    order.
+    * First, groups defined as `@moduledoc groups: [...]` in the given order.
+    * Then groups defined as keys in the `:groups_for_docs` configuration.
+    * Then default groups: Types, Callbacks and Functions.
+    * Finally, other groups returned by `:default_group_for_doc` by alphabetical order.
 
-  ## Meta-tags configuration
+  ## Search engines
 
-  It is also possible to configure some of ExDoc behaviour using meta tags.
-  These meta tags can be inserted using `before_closing_head_tag`.
+  ExDoc allows custom search engines via the `:search` key. Each search engine
+  is a map with the following keys:
 
-    * `exdoc:autocomplete` - when set to "off", it disables autocompletion.
+    * `:name` - The display name of the search engine (required)
+    * `:help` - A help text describing what the search engine does (required)
+    * `:url` - The optional search URL template, usually ending with `q=`
+    * `:packages` - An optional list of packages (or package-versions) to search on
+      https://hexdocs.pm. For example: `[:plug, :phoenix, ecto: "3.0.0", ecto_sql: "3.0.0"]`.
+      If no version is specified, it uses the package latest
 
-    * `exdoc:autocomplete-limit` - Set to an integer to configure how many results
-      appear in the autocomplete dropdown. Defaults to 10.
+  If none of `:url` or `:packages` are given, ExDoc will use its default search engine
+  powered by Lunr.
+
+  When multiple search engines are configured, a dropdown selector will appear next to
+  the search bar allowing users to choose which engine to use. For example:
+
+      search: [
+        %{name: "FooBar", help: "Search on FooBar", url: "https://example.com/?q="},
+        %{name: "Local", help: "In-browser search"}
+      ]
+
+  If only one search engine is configured, the dropdown selector will be hidden.
+  If no search engine is configured, only the built-in Lunr's is shown.
 
   ## Nesting
 
@@ -495,7 +494,7 @@ defmodule Mix.Tasks.Docs do
     * `:title` - The title of the extra page. If not provided, the title will be inferred from the extra name.
     * `:url` - The external url to link to from the sidebar.
 
-  ### Customizing Search Data
+  ### Customizing search data
 
   It is possible to fully customize the way a given extra is indexed, both in autocomplete and in search.
   In most cases, this makes sense for _generated_ documentation. If `search_data` is provided, it completely
@@ -518,6 +517,16 @@ defmodule Mix.Tasks.Docs do
       mix cmd mix docs
 
   See `mix help cmd` for more information.
+
+  ## Meta-tags configuration
+
+  It is also possible to configure some of ExDoc behaviour using meta tags.
+  These meta tags can be inserted using `before_closing_head_tag`.
+
+    * `exdoc:autocomplete` - when set to "off", it disables autocompletion.
+
+    * `exdoc:autocomplete-limit` - Set to an integer to configure how many results
+      appear in the autocomplete dropdown. Defaults to 10.
   """
 
   @switches [

@@ -187,6 +187,23 @@ defmodule ExDoc.ConfigTest do
              ]
     end
 
+    test "accepts list of maps with name, help, and packages" do
+      config =
+        build(
+          search: [
+            %{name: "Local", help: "Search locally", packages: [:ex_doc, elixir: "main"]}
+          ]
+        )
+
+      assert config.search == [
+               %{
+                 name: "Local",
+                 help: "Search locally",
+                 url: "https://hexdocs.pm/?packages=ex_doc%3Alatest%2Celixir%3Amain&q="
+               }
+             ]
+    end
+
     test "defaults url to search.html?q= when not provided" do
       config =
         build(

@@ -319,12 +319,23 @@ defmodule ExDoc.Config do
 
   defp normalize_search(search) when is_list(search) do
     Enum.map(search, fn
+      %{packages: _, url: _} ->
+        raise ArgumentError, "search must provide either :url or :packages, but not both"
+
       %{url: url} = engine when not is_binary(url) ->
         bad_search!(engine)
 
       %{name: name, help: help} = engine
       when is_binary(name) and is_binary(help) ->
-        Map.put_new_lazy(engine, :url, fn -> "search.html?q=" end)
+        engine
+        |> Map.delete(:packages)
+        |> Map.put_new_lazy(:url, fn ->
+          if packages = engine[:packages] do
+            "https://hexdocs.pm/?packages=#{normalize_package_search(packages)}&q="
+          else
+            "search.html?q="
+          end
+        end)
 
       other ->
         bad_search!(other)
@@ -335,8 +346,37 @@ defmodule ExDoc.Config do
     raise ArgumentError, "search must be a list of maps, got: #{inspect(other)}"
   end
 
+  defp normalize_package_search([]) do
+    raise ArgumentError, ":packages requires a non-empty list"
+  end
+
+  defp normalize_package_search(packages) do
+    packages
+    |> Enum.map_join(",", fn
+      package when is_atom(package) ->
+        "#{package}:latest"
+
+      {package, version} when is_atom(package) and is_binary(version) ->
+        "#{package}:#{version}"
+
+      other ->
+        raise ArgumentError,
+              "entries in :packages must be either a package name or a package-version tuple, got: #{inspect(other)}"
+    end)
+    |> URI.encode_www_form()
+  end
+
   defp bad_search!(other) do
     raise ArgumentError,
-          "search entries must be a map with :name, :help, and optional :url keys with string values, got: #{inspect(other)}"
+          """
+          search entries must be a map with:
+
+            * required :name as string
+            * required :help as string
+            * optional :url as a string
+            * optional :packages as a non-empty list of packages and versions
+
+          got: #{inspect(other)}
+          """
   end
 end
