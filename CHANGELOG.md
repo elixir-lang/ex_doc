@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.39.0 (2025-10-23)
+
+  * Enhancements
+    * Allow custom search engines to be configured with support for `https://hexdocs.pm`
+    * Improve admonition blocks so they better integrate with the page flow
+  * Bug fixes
+    * Add .cheatmd to EPUB to avoid broken links
+  * Backwards incompatible changes
+    * Validate :extras fields: if you were previously setting them to unexpected values, you may now get an exception
+    * Setting `exdoc:full-text-search-url` metadata is no longer supported, using the new search engines configuration
+
 ## v0.38.4 (2025-09-09)
 
   * Bug fixes
