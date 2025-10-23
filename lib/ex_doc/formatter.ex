@@ -172,16 +172,20 @@ defmodule ExDoc.Formatter do
 
   defp build_extra({input, %{url: _} = input_options}, groups, _lang, _auto, _url_pattern) do
     input = to_string(input)
-    title = input_options[:title] || input
-    group = GroupMatcher.match_extra(groups, input_options[:url])
-
-    %{group: group, id: Utils.text_to_id(title), title: title, url: input_options[:url]}
+    title = validate_extra_string!(input_options, :title) || input
+    url = validate_extra_string!(input_options, :url)
+    group = GroupMatcher.match_extra(groups, url)
+    %{group: group, id: Utils.text_to_id(title), title: title, url: url}
   end
 
   defp build_extra({input, input_options}, groups, language, autolink_opts, source_url_pattern) do
     input = to_string(input)
-    id = input_options[:filename] || input |> filename_to_title() |> Utils.text_to_id()
-    source_file = input_options[:source] || input
+
+    id =
+      validate_extra_string!(input_options, :filename) ||
+        input |> filename_to_title() |> Utils.text_to_id()
+
+    source_file = validate_extra_string!(input_options, :source) || input
     opts = [file: source_file, line: 1]
 
     {extension, source, ast} =
@@ -213,11 +217,13 @@ defmodule ExDoc.Formatter do
         :error -> {nil, nil, ast}
       end
 
-    title = input_options[:title] || title_text || filename_to_title(input)
+    title =
+      validate_extra_string!(input_options, :title) || title_text || filename_to_title(input)
+
     group = GroupMatcher.match_extra(groups, input)
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
     source_url = source_url_pattern.(source_path, 1)
-    search_data = normalize_search_data!(input_options[:search_data])
+    search_data = validate_search_data!(input_options[:search_data])
 
     %{
       type: extra_type(extension),
@@ -233,28 +239,42 @@ defmodule ExDoc.Formatter do
     }
   end
 
-  defp normalize_search_data!(nil), do: nil
+  defp validate_extra_string!(input_options, key) do
+    case input_options[key] do
+      nil ->
+        nil
 
-  defp normalize_search_data!(search_data) when is_list(search_data) do
-    search_data_keys = [:anchor, :body, :title, :type]
+      binary when is_binary(binary) ->
+        binary
 
+      other ->
+        raise ArgumentError,
+              "extra field #{inspect(key)} must be a string, got: #{inspect(other)}"
+    end
+  end
+
+  @search_data_keys [:anchor, :body, :title, :type]
+
+  defp validate_search_data!(nil), do: nil
+
+  defp validate_search_data!(search_data) when is_list(search_data) do
     Enum.each(search_data, fn search_data ->
       has_keys = Map.keys(search_data)
 
-      if Enum.sort(has_keys) != search_data_keys do
+      if Enum.sort(has_keys) != @search_data_keys do
         raise ArgumentError,
-              "Expected search data to be a list of maps with the keys: #{inspect(search_data_keys)}, found keys: #{inspect(has_keys)}"
+              "expected search data to be a list of maps with the keys: #{inspect(@search_data_keys)}, " <>
+                "found keys: #{inspect(has_keys)}"
       end
     end)
 
     search_data
   end
 
-  defp normalize_search_data!(search_data) do
-    search_data_keys = [:anchor, :body, :title, :type]
-
+  defp validate_search_data!(search_data) do
     raise ArgumentError,
-          "Expected search data to be a list of maps with the keys: #{inspect(search_data_keys)}, found: #{inspect(search_data)}"
+          "expected search data to be a list of maps with the keys: #{inspect(@search_data_keys)}, " <>
+            "found: #{inspect(search_data)}"
   end
 
   defp extension_name(input) do
