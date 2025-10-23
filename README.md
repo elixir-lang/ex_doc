@@ -110,7 +110,7 @@ You can use ExDoc via the command line.
    PROJECT_NAME    => Ecto
    PROJECT_VERSION => 0.1.0
    PROJECT_MODULE  => Ecto (the main module provided by the library)
-   GITHUB_USER     => elixir-lang
+   GITHUB_USER     => elixir-ecto
    GITHUB_REPO     => ecto
    ```
 
