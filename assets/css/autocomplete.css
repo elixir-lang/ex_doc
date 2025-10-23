@@ -20,7 +20,6 @@
 }
 
 .autocomplete-results {
-  list-style: none;
   margin: 0;
   padding: 15px 20px;
   display: flex;
@@ -31,6 +30,7 @@
   font-family: var(--sansFontFamily);
   font-weight: 300;
   font-size: 0.9rem;
+  font-style: italic;
 }
 
 .autocomplete-results .query {
