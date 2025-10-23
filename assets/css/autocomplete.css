@@ -56,7 +56,7 @@
 .autocomplete-suggestions {
   background-color: var(--autocompleteBackground);
   border-radius: var(--borderRadius-base);
-  box-shadow: 0px 15px 99px 0px var(--autocompleteBorder);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
   overflow-y: auto;
   max-height: 450px;
   white-space: normal;
@@ -80,8 +80,6 @@
 
 .autocomplete-suggestion.selected {
   background-color: var(--autocompleteSelected);
-  /* focus indicator on left, similar to default in focus.css  */
-  box-shadow: inset 2px 0 var(--main);
 }
 
 .autocomplete-suggestion:hover {

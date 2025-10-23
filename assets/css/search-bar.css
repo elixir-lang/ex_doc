@@ -109,7 +109,7 @@
   width: max-content;
   background-color: var(--autocompleteBackground);
   border-radius: var(--borderRadius-base);
-  box-shadow: 0px 8px 24px 0px var(--autocompleteBorder);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
   z-index: 200;
 }
 
@@ -219,6 +219,10 @@
   .search-settings {
     width: 100%;
     box-sizing: border-box;
+  }
+
+  .top-search .search-settings .engine-name {
+    display: none;
   }
 }
 
