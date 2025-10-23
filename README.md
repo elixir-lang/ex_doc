@@ -217,7 +217,7 @@ The following metadata is available for both modules and functions:
 
 The following metadata is available for modules:
 
-  * `tags` (list of atoms) - a list of strings to be added as tags to the module. (Not supported by EDoc.)
+  * `tags` (list of atoms) - tags to be added as module annotations. (Not supported by EDoc.)
 
 ## Auto-linking
 
