@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.39.1 (2025-10-23)
+
+  * Bug fixes
+    * Improve box-shadow around autocompletion
+    * Trim search engine selector on small screens
+    * Fix admonition titles on small screens
+
 ## v0.39.0 (2025-10-23)
 
   * Enhancements
