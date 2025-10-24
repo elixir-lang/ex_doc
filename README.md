@@ -227,9 +227,9 @@ ExDoc for Elixir and Erlang will automatically generate links across modules and
 
 ### Elixir
 
-ExDoc will automatically link modules, functions, types or callbacks defined in your project and its dependencies (including Erlang and Elixir). ExDoc will automatically link to it at the dependency's documentation at [hexdocs.pm](https://hexdocs.pm/). The link can be configured by setting `docs: [deps: [my_dep: "https://path/to/docs/"]]` in your `mix.exs`.
+ExDoc will automatically link modules, functions, types or callbacks defined in your project and its dependencies (including Erlang and Elixir). ExDoc will automatically link to the dependency's documentation at [hexdocs.pm](https://hexdocs.pm/). The link can be configured by setting `docs: [deps: [my_dep: "https://path/to/docs/"]]` in your `mix.exs`.
 
-ExDoc supports linking to modules (`` `MyModule` `` and `` `m:MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name, for example: `` `function/1` ``.
+ExDoc supports linking to modules (`` `MyModule` `` and `` `m:MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name, for example: `` `function/1` ``. Similarly, to link regular atom modules such as Erlang project modules, you can automatically link to modules (`` `:my_module` `` and `` `m::my_module` ``), functions (`` `:my_module.function/1` ``), types (`` `t::my_module.type/2` ``) and callbacks (`` `c::my_module.callback/3` ``); _note the double colon in some cases_.
 
 You can also use custom text, such as `` [custom text](`MyModule.function/1`) ``. Link to extra pages using the syntax `` [Up and running](Up and running.md) ``. The final link will be automatically converted to `up-and-running.html`.
 
