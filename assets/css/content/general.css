@@ -81,7 +81,7 @@
 
 .content-inner h2 {
   font-size: 1.6em;
-  padding-top: 1em;
+  margin-top: 1em;
   margin-bottom: 0.5em;
 }
 
@@ -90,31 +90,40 @@
   margin: 1em 0 0.5em;
 }
 
-:is(.page-module, .page-extra) .content-inner #top-content {
-  & > h2.section-heading {
-    font-size: 1.75rem;
-    padding-top: 0;
-    margin-top: 1.75em;
-  }
+/* Apply more generous sizes and spacing to main/"top content" headings in order
+to differentiate between levels.
+Note: headings in various contexts, such as the module "Summary" section and
+cheatsheets, currently depend on previously-declared sizes and spacing. Here,
+we intend to target only headings of author content. At some point, we should
+probably make all heading styles more concrete/less dependent on the cascade
+so that more straightforward control is possible. */
 
-  & > h3.section-heading {
-    font-size: 1.45rem;
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
-  }
+:is(.page-module, .page-task, .page-extra) {
+  :is(#top-content, #moduledoc) {
+    & > h2.section-heading {
+      font-size: 1.75rem;
+      margin-top: 1.75em;
+    }
 
-  & > :is(h4, h5, h6) {
-    font-size: 1.15rem;
-    margin-top: 1.25em;
-    margin-bottom: 0.5em;
-  }
+    & > h3.section-heading {
+      font-size: 1.45rem;
+      margin-top: 1.5em;
+      margin-bottom: 0.5em;
+    }
 
-  & > :is(h5, h6) {
-    font-weight: normal;
-  }
+    & > :is(h4, h5, h6) {
+      font-size: 1.15rem;
+      margin-top: 1.25em;
+      margin-bottom: 0.5em;
+    }
 
-  & > h6 {
-    font-size: 1rem;
+    & > :is(h5, h6) {
+      font-weight: normal;
+    }
+
+    & > h6 {
+      font-size: 1rem;
+    }
   }
 }
 
