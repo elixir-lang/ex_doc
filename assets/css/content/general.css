@@ -99,7 +99,7 @@ probably make all heading styles more concrete/less dependent on the cascade
 so that more straightforward control is possible. */
 
 :is(.page-module, .page-task, .page-extra) {
-  :is(#top-content, #moduledoc) {
+  & :is(#top-content, #moduledoc) {
     & > h2.section-heading {
       font-size: 1.75rem;
       margin-top: 1.75em;
