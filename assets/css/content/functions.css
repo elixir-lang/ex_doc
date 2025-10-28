@@ -30,6 +30,7 @@
   font-size: 13px;
   font-weight: 700;
   line-height: 2em;
+  margin: 0;
 }
 
 .content-inner .detail-header:hover a.detail-link,
