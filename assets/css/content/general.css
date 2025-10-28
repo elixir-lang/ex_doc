@@ -62,15 +62,6 @@
   color: var(--textHeaders);
 }
 
-.content-inner h1 {
-  font-size: 2em;
-  margin: 0.5em 0;
-}
-
-.content-inner h1.section-heading {
-  margin: 1.5em 0 0.5em;
-}
-
 .content-inner div.group-description {
   margin: 0 0 3em;
 }
@@ -79,51 +70,37 @@
   font-weight: 400;
 }
 
-.content-inner h2 {
-  font-size: 1.6em;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-}
+.content-inner {
+  & h1 {
+    font-size: 2rem;
+    margin-top: 1.75em;
+  }
 
-.content-inner h3 {
-  font-size: 1.375em;
-  margin: 1em 0 0.5em;
-}
+  & h2,
+  & .summary h1 {
+    font-size: 1.75rem;
+    margin-top: 1.5em;
+  }
 
-/* Apply more generous sizes and spacing to main/"top content" headings in order
-to differentiate between levels.
-Note: headings in various contexts, such as the module "Summary" section and
-cheatsheets, currently depend on previously-declared sizes and spacing. Here,
-we intend to target only headings of author content. At some point, we should
-probably make all heading styles more concrete/less dependent on the cascade
-so that more straightforward control is possible. */
+  & h3,
+  & .summary h2 {
+    font-size: 1.45rem;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
 
-:is(.page-module, .page-task, .page-extra) {
-  & :is(#top-content, #moduledoc) {
-    & > h2.section-heading {
-      font-size: 1.75rem;
-      margin-top: 1.75em;
-    }
+  & :is(h4, h5, h6) {
+    font-size: 1.15rem;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+  }
 
-    & > h3.section-heading {
-      font-size: 1.45rem;
-      margin-top: 1.5em;
-      margin-bottom: 0.5em;
-    }
+  & :is(h5, h6) {
+    font-weight: normal;
+  }
 
-    & > :is(h4, h5, h6) {
-      font-size: 1.15rem;
-      margin-top: 1.25em;
-      margin-bottom: 0.5em;
-    }
-
-    & > :is(h5, h6) {
-      font-weight: normal;
-    }
-
-    & > h6 {
-      font-size: 1rem;
-    }
+  & h6 {
+    font-size: 1rem;
   }
 }
 
@@ -177,6 +154,18 @@ so that more straightforward control is possible. */
     overflow: auto;
     border-radius: var(--borderRadius-base);
 
+    & :is(h1, h2, h3, h4, h5, h6) {
+      margin: 1.25rem 0;
+    }
+
+    & :is(h1, h2, h3) {
+      font-size: 1.375rem;
+    }
+
+    & :is(h4, h5, h6) {
+      font-size: 1rem;
+    }
+
     & :is(code, pre code) {
       background-color: var(--admCodeBackground);
       border: 1px solid var(--admCodeBorder);
@@ -188,7 +177,7 @@ so that more straightforward control is possible. */
     }
 
     & :is(h1, h2, h3, h4, h5, h6):first-child {
-      padding-bottom: 1em;
+      padding-bottom: 1rem;
       border-bottom: 2px solid hsl(from currentColor h s l / 15%);
     }
 

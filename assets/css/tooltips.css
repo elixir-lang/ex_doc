@@ -37,6 +37,7 @@ as it has absolute positioning, so doesn't impact the layout and click events pa
   min-width: 320px;
   width: 100%;
   line-height: 1em;
+  margin: .75em 0;
 }
 
 .tooltip .tooltip-body .detail-header {
