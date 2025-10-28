@@ -77,7 +77,8 @@
   }
 
   & h2,
-  & .summary h1 {
+  & #summary h1,
+  .details-list h1 {
     font-size: 1.75rem;
     margin-top: 1.5em;
   }
