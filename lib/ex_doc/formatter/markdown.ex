@@ -114,7 +114,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
     modules_info =
       nodes_map.modules
       |> Enum.map(fn module_node ->
-        "- **#{module_node.title}** (#{module_node.id}.md): #{module_node.doc |> extract_summary()}"
+        "- **#{module_node.title}** (#{module_node.id}.md): #{module_node.doc |> ExDoc.DocAST.synopsis() |> extract_plain_text()}"
       end)
       |> Enum.join("\n")
 
@@ -123,7 +123,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
         tasks_list =
           nodes_map.tasks
           |> Enum.map(fn task_node ->
-            "- **#{task_node.title}** (#{task_node.id}.md): #{task_node.doc |> extract_summary()}"
+            "- **#{task_node.title}** (#{task_node.id}.md): #{task_node.doc |> ExDoc.DocAST.synopsis() |> extract_plain_text()}"
           end)
           |> Enum.join("\n")
 
@@ -157,55 +157,21 @@ defmodule ExDoc.Formatter.MARKDOWN do
     project_info <> modules_info <> tasks_info <> extras_info
   end
 
-  defp extract_summary(nil), do: "No documentation available"
-  defp extract_summary(""), do: "No documentation available"
-
-  defp extract_summary(doc) when is_binary(doc) do
-    doc
-    |> String.split("\n")
-    |> Enum.find("", fn line -> String.trim(line) != "" end)
+  defp extract_plain_text(html) when is_binary(html) do
+    html
+    |> String.replace(~r/<[^>]*>/, "")
+    |> String.replace(~r/\s+/, " ")
     |> String.trim()
     |> case do
       "" ->
         "No documentation available"
 
-      summary ->
-        summary
+      text ->
+        text
         |> String.slice(0, 150)
         |> then(fn s -> if String.length(s) == 150, do: s <> "...", else: s end)
     end
   end
 
-  defp extract_summary(doc_ast) when is_list(doc_ast) do
-    # For DocAST (which is a list), extract the first text node
-    extract_first_text_from_ast(doc_ast)
-  end
-
-  defp extract_summary(_), do: "No documentation available"
-
-  defp extract_first_text_from_ast([]), do: "No documentation available"
-
-  defp extract_first_text_from_ast([{:p, _, content} | _rest]) do
-    extract_text_from_content(content)
-    |> String.slice(0, 150)
-    |> then(fn s -> if String.length(s) == 150, do: s <> "...", else: s end)
-  end
-
-  defp extract_first_text_from_ast([_node | rest]) do
-    extract_first_text_from_ast(rest)
-  end
-
-  defp extract_text_from_content([]), do: ""
-  defp extract_text_from_content([text | _rest]) when is_binary(text), do: text
-
-  defp extract_text_from_content([{_tag, _attrs, content} | rest]) do
-    case extract_text_from_content(content) do
-      "" -> extract_text_from_content(rest)
-      text -> text
-    end
-  end
-
-  defp extract_text_from_content([_node | rest]) do
-    extract_text_from_content(rest)
-  end
+  defp extract_plain_text(_), do: "No documentation available"
 end
