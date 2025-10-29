@@ -21,9 +21,9 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
   @doc """
   Returns the formatted title for the module page.
   """
-  def module_type(%{type: :task}), do: ""
-  def module_type(%{type: :module}), do: ""
-  def module_type(%{type: type}), do: "(#{type})"
+  def module_type(%{type: :task} = _node), do: ""
+  def module_type(%{type: :module} = _node), do: ""
+  def module_type(%{type: type} = _node), do: "(#{type})"
 
   @doc """
   Format the attribute type used to define the spec of the given `node`.
@@ -196,7 +196,6 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
 
   @doc """
   Creates the table of contents.
-
   """
   EEx.function_from_file(
     :def,
