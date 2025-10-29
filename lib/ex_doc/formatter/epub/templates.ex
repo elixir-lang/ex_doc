@@ -20,7 +20,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   end
 
   @doc """
-  Generated ID for static file
+  Generated ID for static file.
   """
   def static_file_to_id(static_file) do
     static_file |> Path.basename() |> text_to_id()
