@@ -62,15 +62,6 @@
   color: var(--textHeaders);
 }
 
-.content-inner h1 {
-  font-size: 2em;
-  margin: 0.5em 0;
-}
-
-.content-inner h1.section-heading {
-  margin: 1.5em 0 0.5em;
-}
-
 .content-inner div.group-description {
   margin: 0 0 3em;
 }
@@ -79,15 +70,43 @@
   font-weight: 400;
 }
 
-.content-inner h2 {
-  font-size: 1.6em;
-  padding-top: 1em;
-  margin-bottom: 0.5em;
-}
+/* Headings
+Summary, Callbacks and Functions sections output h1 and h2,
+which we style as h2 and h3. */
 
-.content-inner h3 {
-  font-size: 1.375em;
-  margin: 1em 0 0.5em;
+.content-inner {
+  & h1 {
+    font-size: 2rem;
+    margin-top: 1.75em;
+  }
+
+  & h2,
+  & :is(#summary, #callbacks, #functions) h1 {
+    font-size: 1.75rem;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  & h3,
+  & :is(#summary, #callbacks, #functions) h2 {
+    font-size: 1.45rem;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  & :is(h4, h5, h6) {
+    font-size: 1.15rem;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+  }
+
+  & :is(h5, h6) {
+    font-weight: normal;
+  }
+
+  & h6 {
+    font-size: 1rem;
+  }
 }
 
 .content-inner li + li {
@@ -140,6 +159,18 @@
     overflow: auto;
     border-radius: var(--borderRadius-base);
 
+    & :is(h1, h2, h3, h4, h5, h6) {
+      margin: 1.25rem 0;
+    }
+
+    & :is(h1, h2, h3) {
+      font-size: 1.375rem;
+    }
+
+    & :is(h4, h5, h6) {
+      font-size: 1rem;
+    }
+
     & :is(code, pre code) {
       background-color: var(--admCodeBackground);
       border: 1px solid var(--admCodeBorder);
@@ -151,7 +182,7 @@
     }
 
     & :is(h1, h2, h3, h4, h5, h6):first-child {
-      padding-bottom: 1em;
+      padding-bottom: 1rem;
       border-bottom: 2px solid hsl(from currentColor h s l / 15%);
     }
 

@@ -33,10 +33,12 @@ as it has absolute positioning, so doesn't impact the layout and click events pa
   overflow: auto;
 }
 
+/* !important used in order to beat main heading and functions signature styles. */
 .tooltip .tooltip-body .signature {
   min-width: 320px;
   width: 100%;
-  line-height: 1em;
+  line-height: 1em !important;
+  margin: .75em 0 !important;
 }
 
 .tooltip .tooltip-body .detail-header {

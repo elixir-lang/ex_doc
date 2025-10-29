@@ -25,11 +25,14 @@
   position: relative;
 }
 
+/* !important used in order to beat main heading styles (which use #id selectors),
+in both HTML and ePub. */
 .content-inner .detail-header .signature {
   font-family: var(--monoFontFamily);
-  font-size: 13px;
   font-weight: 700;
-  line-height: 2em;
+  font-size: 13px !important;
+  line-height: 2em !important;
+  margin: 0 !important;
 }
 
 .content-inner .detail-header:hover a.detail-link,
