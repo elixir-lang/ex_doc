@@ -56,6 +56,57 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
 
   def node_doc(_), do: nil
 
+  @doc """
+  Get synopsis for a node, handling both DocAST and string documentation.
+  Uses DocAST synopsis extraction logic for consistency with HTML formatter.
+  """
+  def node_synopsis(%{doc: doc}) when is_list(doc) do
+    # For DocAST, extract synopsis DocAST and convert to markdown
+    case extract_synopsis_ast(doc) do
+      nil -> nil
+      synopsis_ast -> ExDoc.DocAST.to_markdown(synopsis_ast)
+    end
+  end
+
+  def node_synopsis(%{doc: doc}) when is_binary(doc) do
+    synopsis(doc)
+  end
+
+  def node_synopsis(%{source_doc: %{"en" => source}}) when is_binary(source) do
+    synopsis(source)
+  end
+
+  def node_synopsis(%{rendered_doc: source}) when is_binary(source) do
+    synopsis(source)
+  end
+
+  def node_synopsis(%{source_doc: %{"en" => source}}) when is_list(source) do
+    # For Erlang DocAST, extract synopsis and convert to plain text
+    case extract_synopsis_ast(source) do
+      nil -> nil
+      synopsis_ast -> synopsis_ast |> ExDoc.DocAST.to_markdown() |> extract_plain_text()
+    end
+  end
+
+  def node_synopsis(_), do: nil
+
+  # Extract synopsis as DocAST (similar to ExDoc.DocAST.synopsis but returns AST instead of HTML string)
+  defp extract_synopsis_ast({:p, _attrs, [_ | _] = inner, _meta}) do
+    inner =
+      case Enum.split(inner, -1) do
+        {pre, [post]} when is_binary(post) ->
+          pre ++ [String.trim_trailing(post, ":")]
+
+        _ ->
+          inner
+      end
+
+    {:p, [], ExDoc.DocAST.remove_ids(inner), %{}}
+  end
+
+  defp extract_synopsis_ast([head | _]), do: extract_synopsis_ast(head)
+  defp extract_synopsis_ast(_other), do: nil
+
   defp extract_text_from_doc_ast(ast) when is_list(ast) do
     Enum.map_join(ast, "\n\n", &extract_text_from_doc_ast/1)
   end
@@ -70,6 +121,25 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
 
   defp extract_text_from_doc_ast(text) when is_binary(text), do: text
   defp extract_text_from_doc_ast(_), do: ""
+
+  # Extract plain text from markdown (similar to the one in markdown.ex but here for templates)
+  defp extract_plain_text(markdown) when is_binary(markdown) do
+    markdown
+    |> String.replace(~r/<[^>]*>/, "")
+    |> String.replace(~r/\s+/, " ")
+    |> String.trim()
+    |> case do
+      "" ->
+        nil
+
+      text ->
+        text
+        |> String.slice(0, 150)
+        |> then(fn s -> if String.length(s) == 150, do: s <> "...", else: s end)
+    end
+  end
+
+  defp extract_plain_text(_), do: nil
 
   @doc """
   Gets the first paragraph of the documentation of a node. It strips

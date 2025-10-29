@@ -8,8 +8,8 @@
 > <%= h(deprecated) %>
 <% end %>
 
-<%= if doc = node_doc(node) do %>
-<%= synopsis(doc) %>
+<%= if synopsis_content = node_synopsis(node) do %>
+<%= synopsis_content %>
 <% end %>
 
 <% end %>
