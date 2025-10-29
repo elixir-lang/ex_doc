@@ -7,7 +7,7 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
     only: [before_closing_body_tag: 2, h: 1, text_to_id: 1]
 
   @doc """
-  Generate content from the module template for a given `node`
+  Generate content from the module template for a given `node`.
   """
   def module_page(config, module_node) do
     summary =
