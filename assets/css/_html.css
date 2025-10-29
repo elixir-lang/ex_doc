@@ -25,7 +25,7 @@
 @import "keyboard-shortcuts.css";
 @import "quick-switch.css";
 @import "autocomplete.css";
-@import "tooltips.css";
+@import "tooltips.css"; /* must remain below functions */
 @import "copy-button.css";
 @import "settings.css";
 @import "toast.css";

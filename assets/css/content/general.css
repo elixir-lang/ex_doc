@@ -70,6 +70,10 @@
   font-weight: 400;
 }
 
+/* Headings
+Summary, Callbacks and Functions sections output h1 and h2,
+which we style as h2 and h3. */
+
 .content-inner {
   & h1 {
     font-size: 2rem;
@@ -77,14 +81,14 @@
   }
 
   & h2,
-  & #summary h1,
-  & .details-list h1 {
+  & :is(#summary, #callbacks, #functions) h1 {
     font-size: 1.75rem;
     margin-top: 1.5em;
+    margin-bottom: 0.5em;
   }
 
   & h3,
-  & .summary h2 {
+  & :is(#summary, #callbacks, #functions) h2 {
     font-size: 1.45rem;
     margin-top: 1.5em;
     margin-bottom: 0.5em;
