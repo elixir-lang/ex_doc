@@ -39,6 +39,12 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
     static_file |> Path.basename() |> text_to_id()
   end
 
+  def node_doc(%{doc: doc}) when is_list(doc) do
+    # Handle DocAST by converting to markdown
+    ExDoc.DocAST.to_markdown(doc)
+  end
+
+  def node_doc(%{doc: doc}) when is_binary(doc), do: doc
   def node_doc(%{source_doc: %{"en" => source}}) when is_binary(source), do: source
   def node_doc(%{rendered_doc: source}) when is_binary(source), do: source
 

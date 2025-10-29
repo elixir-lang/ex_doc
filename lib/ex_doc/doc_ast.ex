@@ -71,22 +71,22 @@ defmodule ExDoc.DocAST do
   The optional `fun` argument allows post-processing each AST node
   after it's been converted to markdown.
   """
-  def to_markdown_string(ast, fun \\ fn _ast, string -> string end)
+  def to_markdown(ast, fun \\ fn _ast, string -> string end)
 
-  def to_markdown_string(binary, _fun) when is_binary(binary) do
+  def to_markdown(binary, _fun) when is_binary(binary) do
     ExDoc.Utils.h(binary)
   end
 
-  def to_markdown_string(list, fun) when is_list(list) do
-    result = Enum.map_join(list, "", &to_markdown_string(&1, fun))
+  def to_markdown(list, fun) when is_list(list) do
+    result = Enum.map_join(list, "", &to_markdown(&1, fun))
     fun.(list, result)
   end
 
-  def to_markdown_string({:comment, _attrs, inner, _meta} = ast, fun) do
+  def to_markdown({:comment, _attrs, inner, _meta} = ast, fun) do
     fun.(ast, "<!--#{inner}-->")
   end
 
-  def to_markdown_string({:code, attrs, inner, _meta} = ast, fun) do
+  def to_markdown({:code, attrs, inner, _meta} = ast, fun) do
     lang = attrs[:class] || ""
 
     result = """
@@ -98,22 +98,27 @@ defmodule ExDoc.DocAST do
     fun.(ast, result)
   end
 
-  def to_markdown_string({:a, attrs, inner, _meta} = ast, fun) do
-    result = "[#{to_markdown_string(inner, fun)}](#{attrs[:href]})"
+  def to_markdown({:a, attrs, inner, _meta} = ast, fun) do
+    result = "[#{to_markdown(inner, fun)}](#{attrs[:href]})"
     fun.(ast, result)
   end
 
-  def to_markdown_string({:hr, _attrs, _inner, _meta} = ast, fun) do
+  def to_markdown({:hr, _attrs, _inner, _meta} = ast, fun) do
     result = "\n\n---\n\n"
     fun.(ast, result)
   end
 
-  def to_markdown_string({tag, _attrs, _inner, _meta} = ast, fun) when tag in [:p, :br] do
+  def to_markdown({:p, _attrs, inner, _meta} = ast, fun) do
+    result = to_markdown(inner, fun) <> "\n\n"
+    fun.(ast, result)
+  end
+
+  def to_markdown({:br, _attrs, _inner, _meta} = ast, fun) do
     result = "\n\n"
     fun.(ast, result)
   end
 
-  def to_markdown_string({:img, attrs, _inner, _meta} = ast, fun) do
+  def to_markdown({:img, attrs, _inner, _meta} = ast, fun) do
     alt = attrs[:alt] || ""
     title = attrs[:title] || ""
     result = "![#{alt}](#{attrs[:src]} \"#{title}\")"
@@ -121,20 +126,21 @@ defmodule ExDoc.DocAST do
   end
 
   # ignoring these: area base col command embed input keygen link meta param source track wbr
-  def to_markdown_string({tag, _attrs, _inner, _meta} = ast, fun) when tag in @void_elements do
+  def to_markdown({tag, _attrs, _inner, _meta} = ast, fun) when tag in @void_elements do
     result = ""
     fun.(ast, result)
   end
 
-  def to_markdown_string({_tag, _attrs, inner, %{verbatim: true}} = ast, fun) do
+  def to_markdown({_tag, _attrs, inner, %{verbatim: true}} = ast, fun) do
     result = Enum.join(inner, "")
     fun.(ast, result)
   end
 
-  def to_markdown_string({_tag, _attrs, inner, _meta} = ast, fun) do
-    result = to_markdown_string(inner, fun)
+  def to_markdown({_tag, _attrs, inner, _meta} = ast, fun) do
+    result = to_markdown(inner, fun)
     fun.(ast, result)
   end
+
 
   ## parse markdown
 

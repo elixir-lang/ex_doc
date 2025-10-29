@@ -137,10 +137,10 @@ defmodule ExDoc.Formatter do
     mod_id <> "." <> id
   end
 
-  defp autolink_and_render(doc, ".md", language, autolink_opts, _opts) do
+  defp autolink_and_render(doc, ".md", language, autolink_opts, opts) do
     doc
     |> language.autolink_doc(autolink_opts)
-    |> ExDoc.DocAST.to_markdown_string()
+    |> ExDoc.DocAST.highlight(language, opts)
   end
 
   defp autolink_and_render(doc, _html_ext, language, autolink_opts, opts) do
