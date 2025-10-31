@@ -80,7 +80,6 @@ defmodule ExDoc.Formatter.Markdown.Templates do
   end
 
   def node_synopsis(%{source_doc: %{"en" => source}}) when is_list(source) do
-    # For Erlang DocAST, extract synopsis and convert to plain text
     case extract_synopsis_ast(source) do
       nil -> nil
       synopsis_ast -> synopsis_ast |> ExDoc.DocAST.to_markdown() |> extract_plain_text()
