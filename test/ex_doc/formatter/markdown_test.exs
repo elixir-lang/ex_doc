@@ -22,7 +22,7 @@ defmodule ExDoc.Formatter.MarkdownTest do
     ExDoc.generate_docs(config[:project], config[:version], config)
   end
 
-  test "generates markdown files in the default directory", %{tmp_dir: tmp_dir} = context do
+  test "generates Markdown files in the default directory", %{tmp_dir: tmp_dir} = context do
     generate_docs(doc_config(context))
     assert File.regular?(tmp_dir <> "/markdown/index.md")
     assert File.regular?(tmp_dir <> "/markdown/CompiledWithDocs.md")
