@@ -40,7 +40,7 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
   end
 
   def node_doc(%{doc: doc}) when is_list(doc) do
-    # Handle DocAST by converting to markdown
+    # Handle DocAST by converting to Markdown.
     ExDoc.DocAST.to_markdown(doc)
   end
 
