@@ -52,7 +52,7 @@ defmodule ExDoc.Formatter.MARKDOWNTest do
     generate_docs(doc_config(context))
 
     content = File.read!(tmp_dir <> "/markdown/index.md")
-    assert content =~ ~r{^# Elixir v1\.0\.1 - Documentation - Table of contents$}m
+    assert content =~ ~r{^# Elixir v1\.0\.1 - Documentation - Table of Contents$}m
     assert content =~ ~r{## Modules}
     assert content =~ ~r{- \[CompiledWithDocs\]\(CompiledWithDocs\.md\)}
     assert content =~ ~r{- \[CompiledWithDocs\.Nested\]\(CompiledWithDocs\.Nested\.md\)}
