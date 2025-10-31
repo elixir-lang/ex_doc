@@ -114,7 +114,6 @@ defmodule ExDoc.DocAST do
     "![#{alt}](#{attrs[:src]} \"#{title}\")"
   end
 
-  # Ignoring these: area base col command embed input keygen link meta param source track wbr
   def to_markdown({tag, _attrs, _inner, _meta}) when tag in @void_elements do
     ""
   end
