@@ -49,8 +49,8 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
   def node_doc(%{rendered_doc: source}) when is_binary(source), do: source
 
   def node_doc(%{source_doc: %{"en" => source}}) when is_list(source) do
-    # Handle DocAST by converting to markdown
-    # For Erlang docs, we can extract text content
+    # Handle DocAST by converting to Markdown.
+    # For Erlang docs, we can extract the text content.
     extract_text_from_doc_ast(source)
   end
 
