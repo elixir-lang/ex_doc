@@ -58,7 +58,6 @@ defmodule ExDoc.Formatter.Markdown.Templates do
 
   @doc """
   Get synopsis for a node, handling both DocAST and string documentation.
-  Uses DocAST synopsis extraction logic for consistency with HTML formatter.
   """
   def node_synopsis(%{doc: doc}) when is_list(doc) do
     # For DocAST, extract synopsis DocAST and convert to markdown
