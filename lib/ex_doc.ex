@@ -35,10 +35,15 @@ defmodule ExDoc do
   end
 
   defp find_formatter(name) do
-    [ExDoc.Formatter, String.upcase(name)]
+    [ExDoc.Formatter, format_module_name(name)]
     |> Module.concat()
     |> check_formatter_module(name)
   end
+
+  defp format_module_name("html"), do: "HTML"
+  defp format_module_name("epub"), do: "EPUB"
+  defp format_module_name("markdown"), do: "Markdown"
+  defp format_module_name(name), do: String.upcase(name)
 
   defp check_formatter_module(modname, argname) do
     if Code.ensure_loaded?(modname) do

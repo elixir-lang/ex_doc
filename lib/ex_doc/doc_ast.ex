@@ -65,6 +65,67 @@ defmodule ExDoc.DocAST do
     Enum.map(attrs, fn {key, val} -> " #{key}=\"#{ExDoc.Utils.h(val)}\"" end)
   end
 
+  @doc """
+  Transform AST into markdown string.
+  """
+  def to_markdown(ast)
+
+  def to_markdown(binary) when is_binary(binary) do
+    ExDoc.Utils.h(binary)
+  end
+
+  def to_markdown(list) when is_list(list) do
+    Enum.map_join(list, "", &to_markdown/1)
+  end
+
+  def to_markdown({:comment, _attrs, inner, _meta}) do
+    "<!--#{inner}-->"
+  end
+
+  def to_markdown({:code, attrs, inner, _meta}) do
+    lang = attrs[:class] || ""
+
+    """
+    ```#{lang}
+    #{inner}
+    ```
+    """
+  end
+
+  def to_markdown({:a, attrs, inner, _meta}) do
+    "[#{to_markdown(inner)}](#{attrs[:href]})"
+  end
+
+  def to_markdown({:hr, _attrs, _inner, _meta}) do
+    "\n\n---\n\n"
+  end
+
+  def to_markdown({:p, _attrs, inner, _meta}) do
+    to_markdown(inner) <> "\n\n"
+  end
+
+  def to_markdown({:br, _attrs, _inner, _meta}) do
+    "\n\n"
+  end
+
+  def to_markdown({:img, attrs, _inner, _meta}) do
+    alt = attrs[:alt] || ""
+    title = attrs[:title] || ""
+    "![#{alt}](#{attrs[:src]} \"#{title}\")"
+  end
+
+  def to_markdown({tag, _attrs, _inner, _meta}) when tag in @void_elements do
+    ""
+  end
+
+  def to_markdown({_tag, _attrs, inner, %{verbatim: true}}) do
+    Enum.join(inner, "")
+  end
+
+  def to_markdown({_tag, _attrs, inner, _meta}) do
+    to_markdown(inner)
+  end
+
   ## parse markdown
 
   defp parse_markdown(markdown, opts) do
