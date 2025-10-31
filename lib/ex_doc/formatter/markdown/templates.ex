@@ -60,7 +60,7 @@ defmodule ExDoc.Formatter.Markdown.Templates do
   Get synopsis for a node, handling both DocAST and string documentation.
   """
   def node_synopsis(%{doc: doc}) when is_list(doc) do
-    # For DocAST, extract synopsis DocAST and convert to markdown
+    # For DocAST, extract synopsis DocAST and convert to Markdown.
     case extract_synopsis_ast(doc) do
       nil -> nil
       synopsis_ast -> ExDoc.DocAST.to_markdown(synopsis_ast)
