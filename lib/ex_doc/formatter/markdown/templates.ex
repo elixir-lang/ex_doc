@@ -158,9 +158,8 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
 
   def synopsis(_), do: nil
 
-  @heading_regex ~r/^(\#{1,6})\s+(.*)/m
   defp rewrite_headings(content) when is_binary(content) do
-    @heading_regex
+    ~r/^(\#{1,6})\s+(.*)/m
     |> Regex.scan(content)
     |> Enum.reduce(content, fn [match, level, title], content ->
       replacement = rewrite_heading(level, title)
