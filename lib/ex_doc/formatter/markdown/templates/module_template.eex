@@ -18,7 +18,6 @@
 ## Contents
 
 <%= for {name, nodes} <- summary, _key = text_to_id(name) do %>
-
 ### <%=h to_string(name) %>
 
 <%= for node <- nodes do %>
