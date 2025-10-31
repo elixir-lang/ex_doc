@@ -167,9 +167,11 @@ defmodule ExDoc.Formatter.Markdown do
         "No documentation available"
 
       text ->
-        text
-        |> String.slice(0, 150)
-        |> then(fn s -> if String.length(s) == 150, do: s <> "...", else: s end)
+        if String.length(text) > 150 do
+          String.slice(text, 0, 150) <> "..."
+        else
+          text
+        end
     end
   end
 
