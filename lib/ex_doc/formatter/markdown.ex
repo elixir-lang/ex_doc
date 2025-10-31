@@ -49,7 +49,7 @@ defmodule ExDoc.Formatter.Markdown do
 
   defp normalize_output(output) do
     output
-    |> String.replace(["\r\n", "\n"], "\n")
+    |> String.replace(~r/\r\n?/, "\n")
     |> String.replace(~r/\n{3,}/, "\n\n")
   end
 
