@@ -1,4 +1,4 @@
-defmodule ExDoc.Formatter.MARKDOWN do
+defmodule ExDoc.Formatter.Markdown do
   @moduledoc false
 
   alias __MODULE__.{Templates}
