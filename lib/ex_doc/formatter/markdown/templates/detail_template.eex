@@ -3,8 +3,8 @@
 
 <%= if deprecated = node.deprecated do %>
 > This <%= node.type %> is deprecated. <%= h(deprecated) %>.
-<% end %>
 
+<% end %>
 <%= if node.specs != [] do %>
 <%= for spec <- node.specs do %>
 ```elixir
