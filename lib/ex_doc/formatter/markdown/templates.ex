@@ -1,4 +1,4 @@
-defmodule ExDoc.Formatter.MARKDOWN.Templates do
+defmodule ExDoc.Formatter.Markdown.Templates do
   @moduledoc false
 
   require EEx
