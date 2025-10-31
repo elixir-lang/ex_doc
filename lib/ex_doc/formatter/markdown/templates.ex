@@ -151,7 +151,7 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
   @spec synopsis(nil) :: nil
   def synopsis(doc) when is_binary(doc) do
     case :binary.split(doc, "\n\n") do
-      [left, _] -> String.trim_trailing(left, ": ") <> "\n\n"
+      [left, _] -> String.trim_trailing(left) |> String.trim_trailing(left, ":") <> "\n\n"
       [all] -> all
     end
   end
