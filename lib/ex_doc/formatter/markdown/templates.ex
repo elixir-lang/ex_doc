@@ -26,7 +26,7 @@ defmodule ExDoc.Formatter.Markdown.Templates do
   def module_type(%{type: type} = _node), do: "(#{type})"
 
   @doc """
-  Formats the attribute type used to define the spec of the given `node`. 
+  Formats the attribute type used to define the spec of the given `node`.
   """
   def format_spec_attribute(module, node) do
     module.language.format_spec_attribute(node)
@@ -149,7 +149,7 @@ defmodule ExDoc.Formatter.Markdown.Templates do
   @spec synopsis(nil) :: nil
   def synopsis(doc) when is_binary(doc) do
     case :binary.split(doc, "\n\n") do
-      [left, _] -> String.trim_trailing(left) |> String.trim_trailing(left, ":") <> "\n\n"
+      [left, _] -> (String.trim_trailing(left) |> String.trim_trailing(":")) <> "\n\n"
       [all] -> all
     end
   end
