@@ -6,8 +6,8 @@
 
 <%= if deprecated = node.deprecated do %>
 > <%= h(deprecated) %>
-<% end %>
 
+<% end %>
 <%= if synopsis_content = node_synopsis(node) do %>
 <%= synopsis_content %>
 <% end %>
