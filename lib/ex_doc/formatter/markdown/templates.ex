@@ -90,7 +90,7 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
 
   def node_synopsis(_), do: nil
 
-  # Extract synopsis as DocAST (similar to ExDoc.DocAST.synopsis but returns AST instead of HTML string)
+  # Extract synopsis as DocAST (similar to ExDoc.DocAST.synopsis but returns an AST instead of an HTML string).
   defp extract_synopsis_ast({:p, _attrs, [_ | _] = inner, _meta}) do
     inner =
       case Enum.split(inner, -1) do
