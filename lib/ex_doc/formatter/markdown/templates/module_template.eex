@@ -4,8 +4,8 @@
 
 <%= if deprecated = module.deprecated do %>
 > This <%= module.type %> is deprecated. <%=h deprecated %>.
-<% end %>
 
+<% end %>
 <%= if doc = node_doc(module) do %>
 <%= doc %>
 <% end %>
