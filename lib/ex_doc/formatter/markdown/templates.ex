@@ -26,7 +26,7 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
   def module_type(%{type: type} = _node), do: "(#{type})"
 
   @doc """
-  Format the attribute type used to define the spec of the given `node`.
+  Formats the attribute type used to define the spec of the given `node`. 
   """
   def format_spec_attribute(module, node) do
     module.language.format_spec_attribute(node)
