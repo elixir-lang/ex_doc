@@ -86,6 +86,9 @@ jobs:
             otp: "27"
           - elixir: "1.18"
             otp: "27"
+          # Test with latest Elixir and Erlang versions
+          - elixir: "1.19"
+            otp: "28"
             lint: true
     steps:
       - uses: actions/checkout@v3
