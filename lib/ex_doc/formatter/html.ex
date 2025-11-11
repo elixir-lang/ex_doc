@@ -15,7 +15,8 @@ defmodule ExDoc.Formatter.HTML do
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
 
-    build = Path.join(config.output, ".build")
+    build_dir = Path.join(config.output, ".build/html")
+    build = Path.join(build_dir, ".build")
     output_setup(build, config)
 
     project_nodes = Formatter.render_all(project_nodes, filtered_modules, ".html", config, [])
@@ -79,6 +80,7 @@ defmodule ExDoc.Formatter.HTML do
       |> Enum.sort()
       |> Enum.map(&[&1, "\n"])
 
+    File.mkdir_p!(Path.dirname(build))
     File.write!(build, entries)
   end
 

@@ -13,7 +13,8 @@ defmodule ExDoc.Formatter.Markdown do
     Utils.unset_warned()
 
     config = normalize_config(config)
-    build = Path.join(config.output, ".build-markdown")
+    build_dir = Path.join(config.output, ".build/markdown")
+    build = Path.join(build_dir, ".build")
     output_setup(build, config)
 
     extras = Formatter.build_extras(config, ".md")
@@ -77,6 +78,7 @@ defmodule ExDoc.Formatter.Markdown do
       |> Enum.sort()
       |> Enum.map(&[&1, "\n"])
 
+    File.mkdir_p!(Path.dirname(build))
     File.write!(build, entries)
   end
 
