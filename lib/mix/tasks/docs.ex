@@ -605,7 +605,12 @@ defmodule Mix.Tasks.Docs do
 
     results =
       for formatter <- options[:formatters] do
-        index = generator.(project, version, Keyword.put(options, :formatter, formatter))
+        formatter_options =
+          options
+          |> Keyword.put(:formatter, formatter)
+          |> update_output_for_formatter(formatter)
+
+        index = generator.(project, version, formatter_options)
         Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"])
 
         if cli_opts[:open] do
@@ -649,6 +654,12 @@ defmodule Mix.Tasks.Docs do
       end
 
     Keyword.put(options, :formatters, formatters)
+  end
+
+  defp update_output_for_formatter(options, formatter) do
+    output = options[:output] || "doc"
+    formatter_output = Path.join(output, formatter)
+    Keyword.put(options, :output, formatter_output)
   end
 
   defp get_docs_opts(config) do

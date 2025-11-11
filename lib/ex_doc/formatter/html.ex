@@ -15,8 +15,7 @@ defmodule ExDoc.Formatter.HTML do
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
 
-    build_dir = Path.join(config.output, ".build/html")
-    build = Path.join(build_dir, ".build")
+    build = Path.join(config.output, ".build")
     output_setup(build, config)
 
     project_nodes = Formatter.render_all(project_nodes, filtered_modules, ".html", config, [])

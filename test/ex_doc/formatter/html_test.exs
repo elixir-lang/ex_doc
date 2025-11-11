@@ -967,7 +967,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       generate_docs(config)
 
       # Verify necessary files in .build
-      content = File.read!(tmp_dir <> "/html/.build/html/.build")
+      content = File.read!(tmp_dir <> "/html/.build")
       assert content =~ ~r(^readme\.html$)m
       assert content =~ ~r(^api-reference\.html$)m
       assert content =~ ~r(^dist/sidebar_items-[\w]{8}\.js$)m
@@ -995,7 +995,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       File.touch!(keep)
       generate_docs(config)
       assert File.exists?(keep)
-      content = File.read!(tmp_dir <> "/html/.build/html/.build")
+      content = File.read!(tmp_dir <> "/html/.build")
       refute content =~ ~r{keep}
     end
   end

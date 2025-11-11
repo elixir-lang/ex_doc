@@ -13,8 +13,8 @@ defmodule ExDoc.Formatter.Markdown do
     Utils.unset_warned()
 
     config = normalize_config(config)
-    build_dir = Path.join(config.output, ".build/markdown")
-    build = Path.join(build_dir, ".build")
+
+    build = Path.join(config.output, ".build")
     output_setup(build, config)
 
     extras = Formatter.build_extras(config, ".md")

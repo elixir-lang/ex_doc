@@ -11,10 +11,11 @@ defmodule ExDoc.Formatter.EPUB do
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
-    original_output = Path.expand(config.output)
+    # Store original output for build file before normalize_config creates temp path
+    original_output = config.output
     config = normalize_config(config)
-    build_dir = Path.join(original_output, ".build/epub")
-    build = Path.join(build_dir, ".build")
+
+    build = Path.join(original_output, ".build")
     output_setup(build, config)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
