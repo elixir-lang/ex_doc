@@ -237,6 +237,7 @@ defmodule Mix.Tasks.Docs do
         [
           ...
           version: @version,
+          source_url: @source_url,
           docs: docs(),
           ...
         ]
@@ -245,7 +246,6 @@ defmodule Mix.Tasks.Docs do
       def docs do
         ...
         source_ref: "v#{@version}",
-        source_url: @source_url,
         ...
       end
 
