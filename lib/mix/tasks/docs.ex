@@ -187,6 +187,9 @@ defmodule Mix.Tasks.Docs do
 
     * `:source_beam` - Path to the beam directory; default: mix's compile path.
 
+    * `:source_url` - The source URL fallback if `:source_url` is not given at the project
+      configuration. See the following sections.
+
     * `:source_ref` - The branch/commit/tag used for source link inference;
       default: "main".
 
@@ -228,7 +231,7 @@ defmodule Mix.Tasks.Docs do
   both of them will allow ExDoc to link to specific version of the code for a function or module
   that matches the version of the docs. So if the docs have been generated for version 1.0.5 then
   clicking on the source link in the docs will take the browser to the source code for the 1.0.5
-  version of the code instead of only the primary ref (e.g. `main`).
+  version of the code instead of only the primary ref (for example, `main`).
 
   A example setup looks like:
 
@@ -237,16 +240,16 @@ defmodule Mix.Tasks.Docs do
         [
           ...
           version: @version,
-          source_url: @source_url,
-          docs: docs(),
-          ...
+          source_url: "https://github.com/USER/PROJECT",
+          docs: &docs/0
         ]
       end
 
       def docs do
-        ...
-        source_ref: "v#{@version}",
-        ...
+        [
+          ...
+          source_ref: "v#{@version}"
+        ]
       end
 
   If you use `source_ref: "v#{@version}"` then when publishing a new version of your package you
