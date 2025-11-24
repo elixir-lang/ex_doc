@@ -30,7 +30,14 @@ if (!isEmbedded) {
     }))
 
     const latestVersionNode = versionNodes.find(node => node.latest)
-    const latestVersion = latestVersionNode?.version !== currentVersion && !currentVersion.includes('-') ? latestVersionNode?.url : null
+    let latestVersion = latestVersionNode?.version !== currentVersion ? latestVersionNode?.url : null
+
+    // Prereleases are not marked as latest. So if we have a prerelease
+    // and it appears before the latest version, we reset latestVersion
+    if (currentVersion.includes('-') &&
+          versionNodes.findIndex(n => n.version === currentVersion) < versionNodes.findIndex(node => node.latest)) {
+      latestVersion = null
+    }
 
     versionsContainer.innerHTML = versionsDropdownTemplate({ nodes, latestVersion})
 
