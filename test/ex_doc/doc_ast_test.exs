@@ -98,10 +98,16 @@ defmodule ExDoc.DocASTTest do
   describe "synopsis" do
     test "functionality" do
       assert synopsis("") == ""
-      assert synopsis("<p>.</p>") == "<p>.</p>"
-      assert synopsis("<p>::</p>") == "<p></p>"
-      assert synopsis("<p>Description:</p>") == "<p>Description</p>"
-      assert synopsis("<p>abcd</p>") == "<p>abcd</p>"
+      assert synopsis(".") == "<p>.</p>"
+      assert synopsis("::") == "<p></p>"
+      assert synopsis("abcd") == "<p>abcd</p>"
+      assert synopsis("Description:") == "<p>Description</p>"
+
+      assert synopsis("[Access](Access.html)") ==
+               "<p><a href=\"Access.html\">Access</a></p>"
+
+      assert synopsis("[Access](Access.html) {: #foo}") ==
+               "<p><a href=\"Access.html\">Access</a></p>"
     end
 
     test "should not end have trailing periods or semicolons" do

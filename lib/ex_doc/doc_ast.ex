@@ -171,12 +171,9 @@ defmodule ExDoc.DocAST do
   def synopsis([head | _]), do: synopsis(head)
   def synopsis(_other), do: ""
 
-  @doc """
-  Remove ids from elements.
-  """
-  def remove_ids(ast) do
+  defp remove_ids(ast) do
     map_tags(ast, fn {tag, attrs, inner, meta} ->
-      {tag, Keyword.delete(attrs, :href), inner, meta}
+      {tag, Keyword.delete(attrs, :id), inner, meta}
     end)
   end
 
