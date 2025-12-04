@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.39.2 (2025-12-04)
+
+  * Bug fixes
+    * Do not strip hrefs on summaries
+    * Show go to latest for prereleases
+    * Prevent fake italic in autocomplete text
+    * Rename "Search Hexdocs" link to "Go to package docs"
+
 ## v0.39.1 (2025-10-23)
 
   * Bug fixes
