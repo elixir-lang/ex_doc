@@ -47,6 +47,179 @@ defmodule ExDoc.DocASTTest do
     end
   end
 
+  describe "to_markdown/1" do
+    test "converts simple text" do
+      assert DocAST.to_markdown("hello world") == "hello world"
+    end
+
+    test "escapes HTML entities in text" do
+      assert DocAST.to_markdown("<script>alert('xss')</script>") ==
+               "&lt;script&gt;alert('xss')&lt;/script&gt;"
+
+      assert DocAST.to_markdown("Tom & Jerry") == "Tom &amp; Jerry"
+    end
+
+    test "converts lists of elements" do
+      ast = ["Hello ", "world", "!"]
+      assert DocAST.to_markdown(ast) == "Hello world!"
+    end
+
+    test "converts paragraphs" do
+      ast = {:p, [], ["Hello world"], %{}}
+      assert DocAST.to_markdown(ast) == "Hello world\n\n"
+    end
+
+    test "converts multiple paragraphs" do
+      ast = [
+        {:p, [], ["First paragraph"], %{}},
+        {:p, [], ["Second paragraph"], %{}}
+      ]
+
+      assert DocAST.to_markdown(ast) == "First paragraph\n\nSecond paragraph\n\n"
+    end
+
+    test "converts code blocks with language" do
+      ast = {:code, [class: "elixir"], "defmodule Test do\n  def hello, do: :world\nend", %{}}
+      expected = "```elixir\ndefmodule Test do\n  def hello, do: :world\nend\n```\n"
+      assert DocAST.to_markdown(ast) == expected
+    end
+
+    test "converts code blocks without language" do
+      ast = {:code, [], "some code", %{}}
+      assert DocAST.to_markdown(ast) == "```\nsome code\n```\n"
+    end
+
+    test "converts inline code with class attribute" do
+      ast = {:code, [class: "language-elixir"], "IO.puts", %{}}
+      expected = "```language-elixir\nIO.puts\n```\n"
+      assert DocAST.to_markdown(ast) == expected
+    end
+
+    test "converts links" do
+      ast = {:a, [href: "https://example.com"], ["Example"], %{}}
+      assert DocAST.to_markdown(ast) == "[Example](https://example.com)"
+    end
+
+    test "converts links with nested content" do
+      ast = {:a, [href: "/docs"], [{:code, [], ["API"], %{}}], %{}}
+      assert DocAST.to_markdown(ast) == "[```\nAPI\n```\n](/docs)"
+    end
+
+    test "converts images with alt and title" do
+      ast = {:img, [src: "image.png", alt: "Alt text", title: "Title"], [], %{}}
+      assert DocAST.to_markdown(ast) == "![Alt text](image.png \"Title\")"
+    end
+
+    test "converts images with missing attributes" do
+      ast = {:img, [src: "image.png"], [], %{}}
+      assert DocAST.to_markdown(ast) == "![](image.png \"\")"
+    end
+
+    test "converts horizontal rules" do
+      ast = {:hr, [], [], %{}}
+      assert DocAST.to_markdown(ast) == "\n\n---\n\n"
+    end
+
+    test "converts line breaks" do
+      ast = {:br, [], [], %{}}
+      assert DocAST.to_markdown(ast) == "\n\n"
+    end
+
+    test "converts comments" do
+      ast = {:comment, [], [" This is a comment "], %{}}
+      assert DocAST.to_markdown(ast) == "<!-- This is a comment -->"
+    end
+
+    test "handles void elements" do
+      void_elements = [
+        :area,
+        :base,
+        :col,
+        :embed,
+        :input,
+        :link,
+        :meta,
+        :param,
+        :source,
+        :track,
+        :wbr
+      ]
+
+      for element <- void_elements do
+        ast = {element, [], [], %{}}
+        assert DocAST.to_markdown(ast) == ""
+      end
+    end
+
+    test "handles verbatim content" do
+      ast = {:pre, [], ["  verbatim  \n  content  "], %{verbatim: true}}
+      assert DocAST.to_markdown(ast) == "  verbatim  \n  content  "
+    end
+
+    test "converts nested structures" do
+      ast = {:p, [], ["Hello ", {:strong, [], ["world"], %{}}, "!"], %{}}
+
+      result = DocAST.to_markdown(ast)
+      assert result =~ "Hello"
+      assert result =~ "world"
+      assert result =~ "!"
+      assert String.ends_with?(result, "\n\n")
+    end
+
+    test "handles unknown elements by extracting content" do
+      ast = {:custom_element, [class: "special"], ["Content"], %{}}
+      assert DocAST.to_markdown(ast) == "Content"
+    end
+
+    test "handles complex nested document" do
+      ast = [
+        {:h1, [], ["Main Title"], %{}},
+        {:p, [], ["Introduction paragraph with ", {:a, [href: "/link"], ["a link"], %{}}], %{}},
+        {:code, [class: "elixir"], "IO.puts \"Hello\"", %{}},
+        {:hr, [], [], %{}},
+        {:p, [], ["Final paragraph"], %{}}
+      ]
+
+      result = DocAST.to_markdown(ast)
+
+      assert result =~ "Main Title"
+      assert result =~ "Introduction paragraph with [a link](/link)"
+      assert result =~ "```elixir\nIO.puts \"Hello\"\n```\n"
+      assert result =~ "\n\n---\n\n"
+      assert result =~ "Final paragraph\n\n"
+    end
+
+    test "handles empty content gracefully" do
+      assert DocAST.to_markdown([]) == ""
+      assert DocAST.to_markdown({:p, [], [], %{}}) == "\n\n"
+    end
+
+    test "preserves whitespace in code blocks" do
+      code_content = "  def hello do\n    :world\n  end"
+      ast = {:code, [class: "elixir"], code_content, %{}}
+      result = DocAST.to_markdown(ast)
+
+      assert result =~ "```elixir"
+      assert String.contains?(result, code_content)
+      assert result =~ "```"
+    end
+
+    test "handles mixed content types" do
+      ast = [
+        "Plain text",
+        {:p, [], ["Paragraph text"], %{}},
+        {:code, [], "code", %{}},
+        "More plain text"
+      ]
+
+      result = DocAST.to_markdown(ast)
+      assert result =~ "Plain text"
+      assert result =~ "Paragraph text\n\n"
+      assert result =~ "```\ncode\n```\n"
+      assert result =~ "More plain text"
+    end
+  end
+
   describe "to_string/2" do
     test "simple" do
       markdown = """
@@ -167,13 +340,11 @@ defmodule ExDoc.DocASTTest do
 
   describe "highlight" do
     test "with default class" do
-      # Four spaces
       assert highlight("""
                  mix run --no-halt path/to/file.exs
              """) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
-      # Code block without language
       assert highlight("""
              ```
              mix run --no-halt path/to/file.exs</code></pre>
@@ -181,7 +352,6 @@ defmodule ExDoc.DocASTTest do
              """) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
-      # Pre IAL
       assert highlight("""
              ```
              mix run --no-halt path/to/file.exs</code></pre>
@@ -190,7 +360,6 @@ defmodule ExDoc.DocASTTest do
              """) =~
                ~r{<pre class="wrap"><code class=\"makeup elixir\" translate="no">.*}
 
-      # Code with language
       assert highlight("""
              ```html
              <foo />
@@ -198,7 +367,6 @@ defmodule ExDoc.DocASTTest do
              """) =~
                ~r{<pre><code class=\"makeup html\" translate="no">.*}
 
-      # Code with shell detection
       assert highlight("""
              ```
              $ hello
@@ -206,7 +374,6 @@ defmodule ExDoc.DocASTTest do
              """) =~
                ~r{<pre><code class=\"makeup shell\" translate="no"><span class="gp unselectable">\$.*}
 
-      # Nested in another element
       assert highlight("""
              > ```elixir
              > hello

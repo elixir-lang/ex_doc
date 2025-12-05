@@ -79,6 +79,7 @@ defmodule ExDoc.Formatter.HTML do
       |> Enum.sort()
       |> Enum.map(&[&1, "\n"])
 
+    File.mkdir_p!(Path.dirname(build))
     File.write!(build, entries)
   end
 

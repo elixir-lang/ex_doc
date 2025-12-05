@@ -11,8 +11,12 @@ defmodule ExDoc.Formatter.EPUB do
   """
   @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
   def run(project_nodes, filtered_modules, config) when is_map(config) do
+    # Store original output for build file before normalize_config creates temp path
+    original_output = config.output
     config = normalize_config(config)
-    File.rm_rf!(config.output)
+
+    build = Path.join(original_output, ".build")
+    output_setup(build, config)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
     project_nodes =
@@ -40,12 +44,15 @@ defmodule ExDoc.Formatter.EPUB do
     uuid = "urn:uuid:#{uuid4()}"
     datetime = format_datetime()
 
-    generate_content(config, nodes_map, uuid, datetime, static_files)
-    generate_nav(config, nodes_map)
-    generate_title(config)
-    generate_extras(config)
-    generate_list(config, nodes_map.modules)
-    generate_list(config, nodes_map.tasks)
+    content_files = generate_content(config, nodes_map, uuid, datetime, static_files)
+    nav_files = generate_nav(config, nodes_map)
+    title_files = generate_title(config)
+    extra_files = generate_extras(config)
+    module_files = generate_list(config, nodes_map.modules)
+    task_files = generate_list(config, nodes_map.tasks)
+
+    all_files = List.flatten([content_files, nav_files, title_files, extra_files, module_files, task_files])
+    generate_build(all_files, build)
 
     {:ok, epub} = generate_epub(config.output)
     File.rm_rf!(config.output)
@@ -65,7 +72,8 @@ defmodule ExDoc.Formatter.EPUB do
     for {_title, extras} <- config.extras,
         node <- extras,
         not is_map_key(node, :url) do
-      output = "#{config.output}/OEBPS/#{node.id}.xhtml"
+      filename = "OEBPS/#{node.id}.xhtml"
+      output = "#{config.output}/#{filename}"
       html = Templates.extra_template(config, node)
 
       if File.regular?(output) do
@@ -73,6 +81,7 @@ defmodule ExDoc.Formatter.EPUB do
       end
 
       File.write!(output, html)
+      filename
     end
   end
 
@@ -84,7 +93,9 @@ defmodule ExDoc.Formatter.EPUB do
           do: {Path.relative_to(name, "OEBPS"), media_type}
 
     content = Templates.content_template(config, nodes, uuid, datetime, static_files)
-    File.write("#{config.output}/OEBPS/content.opf", content)
+    filename = "OEBPS/content.opf"
+    File.write("#{config.output}/#{filename}", content)
+    [filename]
   end
 
   defp generate_nav(config, nodes) do
@@ -94,12 +105,16 @@ defmodule ExDoc.Formatter.EPUB do
       end)
 
     content = Templates.nav_template(config, nodes)
-    File.write("#{config.output}/OEBPS/nav.xhtml", content)
+    filename = "OEBPS/nav.xhtml"
+    File.write("#{config.output}/#{filename}", content)
+    [filename]
   end
 
   defp generate_title(config) do
     content = Templates.title_template(config)
-    File.write("#{config.output}/OEBPS/title.xhtml", content)
+    filename = "OEBPS/title.xhtml"
+    File.write("#{config.output}/#{filename}", content)
+    [filename]
   end
 
   defp generate_list(config, nodes) do
@@ -124,6 +139,31 @@ defmodule ExDoc.Formatter.EPUB do
         ~c".xml"
       ]
     )
+  end
+
+  defp output_setup(build, config) do
+    if File.exists?(build) do
+      build
+      |> File.read!()
+      |> String.split("\n", trim: true)
+      |> Enum.map(&Path.join(config.output, &1))
+      |> Enum.each(&File.rm/1)
+
+      File.rm(build)
+    else
+      File.rm_rf!(config.output)
+    end
+  end
+
+  defp generate_build(files, build) do
+    entries =
+      files
+      |> Enum.uniq()
+      |> Enum.sort()
+      |> Enum.map(&[&1, "\n"])
+
+    File.mkdir_p!(Path.dirname(build))
+    File.write!(build, entries)
   end
 
   ## Helpers
@@ -159,7 +199,9 @@ defmodule ExDoc.Formatter.EPUB do
 
   defp generate_module_page(module_node, config) do
     content = Templates.module_page(config, module_node)
-    File.write("#{config.output}/OEBPS/#{module_node.id}.xhtml", content)
+    filename = "OEBPS/#{module_node.id}.xhtml"
+    File.write("#{config.output}/#{filename}", content)
+    filename
   end
 
   @two_power_16 65536
