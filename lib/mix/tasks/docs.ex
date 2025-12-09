@@ -132,14 +132,17 @@ defmodule Mix.Tasks.Docs do
 
     * `:formatters` - Formatter to use; default: ["html", "epub"], options: "html", "epub".
 
+    * `:footer` - When false, does not render the footer on all pages, except for
+      the required "Built with ExDoc" note.
+
     * `:groups_for_extras`, `:groups_for_modules`, `:groups_for_docs`, and `:default_group_for_doc` -
-      See the "Groups" section
+      See the "Groups" section.
 
     * `:ignore_apps` - Apps to be ignored when generating documentation in an umbrella project.
       Receives a list of atoms. Example: `[:first_app, :second_app]`.
 
     * `:language` - Identify the primary language of the documents, its value must be
-      a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
+      a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag. Default: "en".
 
     * `:logo` - Path to a logo image file for the project. Must be PNG, JPEG or SVG. When
       specified, the image file will be placed in the output "assets" directory, named
@@ -148,23 +151,23 @@ defmodule Mix.Tasks.Docs do
       predictable sizing and cropping.
 
     * `:main` - Main page of the documentation. It may be a module or a
-      generated page, like "Plug" or "api-reference"; default: "api-reference".
+      generated page, like "Plug" or "api-reference". Default: "api-reference".
 
     * `:markdown_processor` - The markdown processor to use,
-      either `module()` or `{module(), keyword()}` to provide configuration options;
+      either `module()` or `{module(), keyword()}` to provide configuration options.
 
-    * `:meta` - A keyword list or a map to specify meta tag attributes
+    * `:meta` - A keyword list or a map to specify meta tag attributes.
 
-    * `:nest_modules_by_prefix` - See the "Nesting" section
+    * `:nest_modules_by_prefix` - See the "Nesting" section.
 
-    * `:output` - Output directory for the generated docs; default: "doc".
+    * `:output` - Output directory for the generated docs. Default: "doc".
       May be overridden by command line argument.
 
     * `:redirects` - A map or list of tuples, where the key is the path to redirect from and the
        value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`.
        See the "Changing documentation over time" section below for more.
 
-    * `:search` - A list of search engine configurations. See the "Search engines" section
+    * `:search` - A list of search engine configurations. See the "Search engines" section.
 
     * `:skip_undefined_reference_warnings_on` - ExDoc warns when it can't create a `Mod.fun/arity`
       reference in the current project docs (for example, because of a typo). This option controls when to
@@ -190,8 +193,8 @@ defmodule Mix.Tasks.Docs do
     * `:source_url` - The source URL fallback if `:source_url` is not given at the project
       configuration. See the following sections.
 
-    * `:source_ref` - The branch/commit/tag used for source link inference;
-      default: "main".
+    * `:source_ref` - The branch/commit/tag used for source link inference.
+      Default: "main".
 
     * `:source_url_pattern` - Public URL of the project for source links. This is derived
       automatically from the project's `:source_url` and `:source_ref` when using one of

@@ -157,6 +157,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
       assert Templates.footer_template(doc_config(context, proglang: :elixir), nil) ==
                Templates.footer_template(doc_config(context), nil)
+
+      refute Templates.footer_template(doc_config(context, footer: false), nil) =~
+               "Elixir programming language"
     end
 
     test "includes api reference", context do

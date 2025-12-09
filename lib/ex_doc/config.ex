@@ -29,6 +29,7 @@ defmodule ExDoc.Config do
             extras: [],
             favicon: nil,
             filter_modules: &__MODULE__.filter_modules/2,
+            footer: true,
             formatter: "html",
             formatters: [],
             group_for_doc: &__MODULE__.default_group_for_doc/1,
