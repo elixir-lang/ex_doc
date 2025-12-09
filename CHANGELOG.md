@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.39.3 (2025-12-09)
+
+  * Enhancements
+    * Add the option to trim down the footer
+
 ## v0.39.2 (2025-12-04)
 
   * Bug fixes
