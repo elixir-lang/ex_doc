@@ -1,0 +1,12 @@
+# `<%=h module.title %>`
+<%= if module.source_url do %>[🔗](<%= module.source_url %>)<% end %>
+
+<%= for annotation <- module.annotations do %>*<%= annotation %>* <% end %>
+<%= if deprecated = module.deprecated do %>
+> This <%= module.type %> is deprecated. <%=h deprecated %>.
+<% end %>
+<%= node_doc(module) %>
+<%= for {_name, nodes} <- docs, node <- nodes do %>
+<%= detail_template(node, module) %>
+<% end %>
+<%= before_closing_body_tag(config, :markdown) %>
