@@ -13,7 +13,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ]
 
   @doc """
-  Generate content from the module template for a given `node`
+  Generate content from the module template for a given `node`.
   """
   def module_page(module_node, config) do
     module_template(config, module_node)

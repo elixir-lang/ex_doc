@@ -13,14 +13,14 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   defp render_doc(ast), do: ast && ExDoc.DocAST.to_string(ast)
 
   @doc """
-  Generate content from the module template for a given `node`
+  Generate content from the module template for a given `node`.
   """
   def module_page(config, module_node) do
     module_template(config, module_node)
   end
 
   @doc """
-  Generated ID for static file
+  Generated ID for static file.
   """
   def static_file_to_id(static_file) do
     static_file |> Path.basename() |> text_to_id()
