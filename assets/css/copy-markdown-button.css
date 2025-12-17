@@ -1,0 +1,17 @@
+.copy-markdown-button {
+  & svg[aria-live="polite"] {
+    display: none;
+  }
+}
+
+.copy-markdown-button.clicked {
+  color: var(--success);
+
+  & svg[aria-live="polite"] {
+    display: block;
+  }
+
+  & svg:first-child {
+    display: none;
+  }
+}
