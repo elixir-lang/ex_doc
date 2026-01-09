@@ -66,7 +66,7 @@ end
 
 defp docs do
   [
-    main: "MyApp", # The main page in the docs
+    main: "readme", # can be changed to a module name, if you prefer
     logo: "path/to/logo.png",
     extras: ["README.md"]
   ]
