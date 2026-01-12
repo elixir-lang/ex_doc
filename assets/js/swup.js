@@ -30,7 +30,7 @@ if (!isEmbedded && window.location.protocol !== 'file:') {
       return path === window.location.pathname ||
             path === window.location.pathname + '.html'
     },
-    linkSelector: 'a[href]:not([href^="/"]):not([href^="http"])',
+    linkSelector: 'a[href]:not([href^="/"]):not([href^="http"])[href$=".html"]',
     hooks: {
       'page:load': maybeMetaRedirect,
       'page:view': emitExdocLoaded
