@@ -81,14 +81,15 @@ which we style as h2 and h3. */
   }
 
   & h2,
-  & :is(#summary, #callbacks, #functions) h1 {
+  & :is(#summary, #callbacks, #functions) > h1.section-heading {
     font-size: 1.75rem;
     margin-top: 1.5em;
     margin-bottom: 0.5em;
   }
 
   & h3,
-  & :is(#summary, #callbacks, #functions) h2 {
+  & :is(#summary, #callbacks, #functions) > h2.section-heading,
+  & #summary :is(.summary-callbacks, .summary-functions) h2 {
     font-size: 1.45rem;
     margin-top: 1.5em;
     margin-bottom: 0.5em;
