@@ -1,0 +1,20 @@
+(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
