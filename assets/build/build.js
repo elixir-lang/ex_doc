@@ -41,14 +41,16 @@ const formatters = [
 
 Promise.all(formatters.map(async ({formatter, ...options}) => {
   // Clean outdir.
-  await fsExtra.emptyDir(options.outdir)
+  fsExtra.emptyDir(options.outdir)
 
-  await esbuild.build({
+  const buildOptions = {
     entryNames: watchMode ? '[name]-dev' : '[name]-[hash]',
     bundle: true,
-    minify: !watchMode,
+    minifySyntax: !watchMode,
+    minifyIdentifiers: !watchMode,
+    // esbuild sometimes inserts erroneous space in ':is()' CSS function when whitespace minification is on: ': is()'
+    minifyWhitespace: false,
     logLevel: watchMode ? 'warning' : 'info',
-    watch: watchMode,
     ...options,
     plugins: [{
       name: 'ex_doc',
@@ -98,7 +100,14 @@ Promise.all(formatters.map(async ({formatter, ...options}) => {
         }
       }
     }]
-  })
+  }
+
+  if (watchMode) {
+    const context = await esbuild.context(buildOptions)
+    await context.watch()
+  } else {
+    await esbuild.build(buildOptions)
+  }
 })).catch((error) => {
   console.error(error)
   process.exit(1)
