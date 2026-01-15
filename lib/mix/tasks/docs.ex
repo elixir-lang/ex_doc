@@ -165,6 +165,7 @@ defmodule Mix.Tasks.Docs do
 
     * `:redirects` - A map or list of tuples, where the key is the path to redirect from and the
        value is the path to redirect to. The extension is omitted in both cases, i.e `%{"old-readme" => "readme"}`.
+       The destination may include an anchor, i.e `%{"old-readme" => "readme#section"}`.
        See the "Changing documentation over time" section below for more.
 
     * `:search` - A list of search engine configurations. See the "Search engines" section.
@@ -479,6 +480,12 @@ defmodule Mix.Tasks.Docs do
       redirects: %{
         "MyApp.MyModule" => "MyApp.My.Module",
         "get-started" => "quickstart"
+      }
+
+  The destination may also include an anchor to redirect to a specific section:
+
+      redirects: %{
+        "old-page" => "new-page#relevant-section"
       }
 
   ## Customizing Extras
