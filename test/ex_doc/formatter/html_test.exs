@@ -461,6 +461,31 @@ defmodule ExDoc.Formatter.HTMLTest do
                  <meta http-equiv="refresh" content="0; url=license.html">
              """
     end
+
+    test "redirects with anchors do not warn", %{tmp_dir: tmp_dir} = context do
+      output =
+        capture_io(:stderr, fn ->
+          generate_docs(
+            doc_config(context,
+              extras: ["test/fixtures/LICENSE"],
+              redirects: %{
+                "/old-license" => "license#some-section"
+              }
+            )
+          )
+        end)
+
+      assert output == ""
+
+      assert File.read!(tmp_dir <> "/html/old-license.html") =~ """
+             <!DOCTYPE html>
+             <html>
+               <head>
+                 <meta charset="utf-8">
+                 <title>Elixir v1.0.1 — Documentation</title>
+                 <meta http-equiv="refresh" content="0; url=license.html#some-section">
+             """
+    end
   end
 
   describe "generates extras" do

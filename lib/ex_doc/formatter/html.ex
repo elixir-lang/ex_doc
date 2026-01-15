@@ -204,7 +204,13 @@ defmodule ExDoc.Formatter.HTML do
         do: raise("expected a string for the destination of a redirect, got: #{inspect(to)}")
 
       source = from <> ext
-      destination = to <> ext
+
+      destination =
+        case String.split(to, "#") do
+          [to, anchor | _] -> to <> ext <> "#" <> anchor
+          _ -> to <> ext
+        end
+
       generate_redirect(source, config, destination)
 
       source
@@ -229,7 +235,9 @@ defmodule ExDoc.Formatter.HTML do
   end
 
   defp generate_redirect(filename, config, redirect_to) do
-    unless case_sensitive_file_regular?("#{config.output}/#{redirect_to}") do
+    without_anchor = String.split(redirect_to, "#") |> Enum.at(0)
+
+    unless case_sensitive_file_regular?("#{config.output}/#{without_anchor}") do
       Utils.warn("#{filename} redirects to #{redirect_to}, which does not exist", [])
     end
 
