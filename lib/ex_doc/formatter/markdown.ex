@@ -1,7 +1,7 @@
 defmodule ExDoc.Formatter.MARKDOWN do
   @moduledoc false
 
-  alias __MODULE__.{Templates}
+  alias __MODULE__.Templates
   alias ExDoc.Formatter
   alias ExDoc.Utils
 
@@ -20,8 +20,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
     extras = Formatter.build_extras(config, ".md")
 
     project_nodes =
-      project_nodes
-      |> Formatter.render_all(filtered_modules, ".md", config, highlight_tag: "samp")
+      Formatter.render_all(project_nodes, filtered_modules, ".md", config, highlight_tag: "samp")
 
     nodes_map = %{
       modules: Formatter.filter_list(:module, project_nodes),
@@ -30,14 +29,16 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
     config = %{config | extras: extras}
 
-    all_files =
-      [generate_nav(config, nodes_map)] ++
-        generate_extras(config) ++
-        generate_list(config, nodes_map.modules) ++
-        generate_list(config, nodes_map.tasks) ++
-        [generate_llm_index(config, nodes_map)]
+    [
+      generate_nav(config, nodes_map),
+      generate_extras(config),
+      generate_list(config, nodes_map.modules),
+      generate_list(config, nodes_map.tasks),
+      generate_llm_index(config, nodes_map)
+    ]
+    |> List.flatten()
+    |> generate_build(build)
 
-    generate_build(List.flatten(all_files), build)
     config.output |> Path.join("index.md") |> Path.relative_to_cwd()
   end
 
@@ -74,11 +75,10 @@ defmodule ExDoc.Formatter.MARKDOWN do
   defp generate_build(files, build) do
     entries =
       files
-      |> Enum.uniq()
       |> Enum.sort()
-      |> Enum.map(&[&1, "\n"])
+      |> Enum.dedup()
+      |> Enum.intersperse("\n")
 
-    File.mkdir_p!(Path.dirname(build))
     File.write!(build, entries)
   end
 
@@ -95,11 +95,16 @@ defmodule ExDoc.Formatter.MARKDOWN do
       end)
 
     content =
-      Templates.nav_template(config, nodes)
+      config
+      |> Templates.nav_template(nodes)
       |> normalize_output()
 
     filename = "index.md"
-    File.write("#{config.output}/#{filename}", content)
+
+    config.output
+    |> Path.join(filename)
+    |> File.write(content)
+
     filename
   end
 
@@ -108,13 +113,13 @@ defmodule ExDoc.Formatter.MARKDOWN do
         %{id: id, source: content} <- extras,
         not is_map_key(%{id: id, source: content}, :url) do
       filename = "#{id}.md"
-      output = "#{config.output}/#{filename}"
+      output = Path.join(config.output, filename)
 
-      if File.regular?(output) do
-        Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
-      end
+      if File.regular?(output),
+        do: Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
 
       File.write!(output, normalize_output(content))
+
       filename
     end
   end
@@ -129,18 +134,27 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
   defp generate_module_page(module_node, config) do
     content =
-      Templates.module_page(config, module_node)
+      config
+      |> Templates.module_page(module_node)
       |> normalize_output()
 
     filename = "#{module_node.id}.md"
-    File.write("#{config.output}/#{filename}", content)
+
+    config.output
+    |> Path.join(filename)
+    |> File.write(content)
+
     filename
   end
 
   defp generate_llm_index(config, nodes_map) do
     content = generate_llm_index_content(config, nodes_map)
     filename = "llms.txt"
-    File.write("#{config.output}/#{filename}", content)
+
+    config.output
+    |> Path.join(filename)
+    |> File.write(content)
+
     filename
   end
 
@@ -155,57 +169,64 @@ defmodule ExDoc.Formatter.MARKDOWN do
     """
 
     modules_info =
-      nodes_map.modules
-      |> Enum.map(fn module_node ->
-        "- [#{module_node.title}](#{module_node.id}.md): #{module_node.doc |> ExDoc.DocAST.synopsis() |> extract_plain_text()}"
+      Enum.map(nodes_map.modules, fn module_node ->
+        synopsis = synopsis(module_node.doc)
+
+        ["- [#{module_node.title}](#{module_node.id}.md): ", synopsis, "\n"]
       end)
-      |> Enum.join("\n")
 
     tasks_info =
-      if length(nodes_map.tasks) > 0 do
+      if Enum.any?(nodes_map.tasks) do
         tasks_list =
-          nodes_map.tasks
-          |> Enum.map(fn task_node ->
-            "- [#{task_node.title}](#{task_node.id}.md): #{task_node.doc |> ExDoc.DocAST.synopsis() |> extract_plain_text()}"
-          end)
-          |> Enum.join("\n")
+          Enum.map(nodes_map.tasks, fn task_node ->
+            synopsis = synopsis(task_node.doc)
 
-        "\n\n## Mix Tasks\n\n" <> tasks_list
+            ["- [#{task_node.title}](#{task_node.id}.md): ", synopsis, "\n"]
+          end)
+
+        ["\n## Mix Tasks\n\n" | tasks_list]
       else
-        ""
+        []
       end
 
     extras_info =
-      if is_list(config.extras) and length(config.extras) > 0 do
+      if is_list(config.extras) and Enum.any?(config.extras) do
         extras_list =
           config.extras
           |> Enum.flat_map(fn
             {_group, extras} when is_list(extras) -> extras
             _ -> []
           end)
-          |> Enum.map(fn extra ->
-            "- [#{extra.title}](#{extra.id}.md)"
-          end)
-          |> Enum.join("\n")
+          |> Enum.map(&["- [#{&1.title}](#{&1.id}.md)", "\n"])
 
-        if extras_list == "" do
-          ""
+        if Enum.any?(extras_list) do
+          ["\n## Guides\n\n" | extras_list]
         else
-          "\n\n## Guides\n\n" <> extras_list
+          []
         end
       else
-        ""
+        []
       end
 
-    project_info <> modules_info <> tasks_info <> extras_info
+    [project_info, modules_info, tasks_info, extras_info]
   end
 
+  defp synopsis(doc) do
+    doc
+    |> ExDoc.DocAST.synopsis()
+    |> extract_plain_text()
+  end
+
+  defp extract_plain_text(""), do: "No documentation available"
+
   defp extract_plain_text(html) when is_binary(html) do
-    html
-    |> String.replace(~r/<[^>]*>/, "")
-    |> String.replace(~r/\s+/, " ")
-    |> String.trim()
-    |> case do
+    html =
+      html
+      |> String.replace(~r/<[^>]*>/, "")
+      |> String.replace(~r/\s+/, " ")
+      |> String.trim()
+
+    case html do
       "" ->
         "No documentation available"
 
@@ -217,6 +238,4 @@ defmodule ExDoc.Formatter.MARKDOWN do
         end
     end
   end
-
-  defp extract_plain_text(_), do: "No documentation available"
 end
