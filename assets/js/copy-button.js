@@ -28,7 +28,8 @@ function initialize () {
       clearTimeout(timeout)
 
       const text =
-        Array.from(pre.querySelectorAll('code > *:not(.unselectable)'))
+        Array.from(pre.querySelectorAll('code > *'))
+          .filter(elem => !elem.classList.contains('unselectable') || elem.textContent !== '$ ')
           .map(elem => elem.textContent)
           .join('')
 
