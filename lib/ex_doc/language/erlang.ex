@@ -504,6 +504,21 @@ defmodule ExDoc.Language.Erlang do
     end
   end
 
+  @impl true
+  def format_spec(ast) do
+    {:attribute, _, type, _} = ast
+
+    # `-type ` => 6
+    offset = byte_size(Atom.to_string(type)) + 2
+
+    options = [linewidth: 98 + offset]
+
+    :erl_pp.attribute(ast, options)
+    |> IO.chardata_to_string()
+    |> String.trim()
+    |> String.trim_leading("-#{Atom.to_string(type)} ")
+  end
+
   # Traverses quoted and formatted string of the typespec AST, replacing refs with links.
   #
   # Let's say we have this typespec:
@@ -718,20 +733,6 @@ defmodule ExDoc.Language.Erlang do
 
   defp pp({module, name}) when is_atom(module) and is_atom(name) do
     :io_lib.format("~p:~p", [module, name]) |> IO.iodata_to_binary()
-  end
-
-  defp format_spec(ast) do
-    {:attribute, _, type, _} = ast
-
-    # `-type ` => 6
-    offset = byte_size(Atom.to_string(type)) + 2
-
-    options = [linewidth: 98 + offset]
-
-    :erl_pp.attribute(ast, options)
-    |> IO.chardata_to_string()
-    |> String.trim()
-    |> String.trim_leading("-#{Atom.to_string(type)} ")
   end
 
   ## Helpers

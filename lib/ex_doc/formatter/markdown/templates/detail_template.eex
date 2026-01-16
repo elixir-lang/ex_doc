@@ -8,7 +8,7 @@
 <%= if node.specs != [] do %>
 <%= for spec <- node.specs do %>
 ```elixir
-<%= format_spec_attribute(module, node) %> <%= spec %>
+<%= module.language.format_spec_attribute(node) %> <%= module.language.format_spec(spec) %>
 ```
 <% end %>
 <% end %>

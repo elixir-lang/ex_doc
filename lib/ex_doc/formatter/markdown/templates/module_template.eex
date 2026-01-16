@@ -6,7 +6,6 @@
 > This <%= module.type %> is deprecated. <%=h deprecated %>.
 <% end %>
 <%= node_doc(module) %>
-<%= for {_name, nodes} <- docs, node <- nodes do %>
+<%= for group <- module.docs_groups, node <- group.docs do %>
 <%= detail_template(node, module) %>
 <% end %>
-<%= before_closing_body_tag(config, :markdown) %>

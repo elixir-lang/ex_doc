@@ -14,7 +14,7 @@ export function initialize () {
 
   const defaultTab = getCurrentPageSidebarType()
   const tabs = {
-    extras: sidebarList.dataset.extras || 'Pages',
+    extras: sidebarList.dataset.extras,
     modules: 'Modules',
     tasks: '<span translate="no">Mix</span> Tasks'
   }

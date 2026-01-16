@@ -108,7 +108,7 @@ defmodule Mix.Tasks.Docs do
       HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
 
     * `:extra_section` - String that defines the section title of the additional
-      Markdown and plain text pages; default: "PAGES". Example: "GUIDES"
+      Markdown and plain text pages; default: "Pages". Example: "Guides"
 
     * `:extras` - List of paths to additional Markdown (`.md` extension), Live Markdown
       (`.livemd` extension), Cheatsheets (`.cheatmd` extension), external urls (`:url` option),

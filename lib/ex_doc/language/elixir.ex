@@ -377,19 +377,20 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
+  def format_spec(ast) do
+    ast
+    |> Macro.to_string()
+    |> safe_format_string!()
+    |> ExDoc.Utils.h()
+  end
+
+  @impl true
   def autolink_spec(ast, opts) do
     config = struct!(Autolink, opts)
-
-    string =
-      ast
-      |> Macro.to_string()
-      |> safe_format_string!()
-      |> ExDoc.Utils.h()
-
+    string = format_spec(ast)
     name = typespec_name(ast)
     {name, rest} = split_name(string, name)
-
-    name <> do_typespec(rest, config)
+    name <> autolink_typespec(rest, config)
   end
 
   @impl true
@@ -665,7 +666,7 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
-  defp do_typespec(string, config) do
+  defp autolink_typespec(string, config) do
     regex = ~r{
         (                                             # <call_string>
           (?:
@@ -702,7 +703,7 @@ defmodule ExDoc.Language.Elixir do
         ~s[<a href="#{url}">#{ExDoc.Utils.h(call_string)}</a>]
       else
         call_string
-      end <> do_typespec(rest, config)
+      end <> autolink_typespec(rest, config)
     end)
   end
 

@@ -101,6 +101,11 @@ defmodule ExDoc.Language do
   @callback autolink_spec(spec :: term(), opts :: keyword()) :: iodata()
 
   @doc """
+  Formats typespecs (without autolinking).
+  """
+  @callback format_spec(spec :: term()) :: iodata()
+
+  @doc """
   Returns information for syntax highlighting.
   """
   @callback highlight_info() :: %{

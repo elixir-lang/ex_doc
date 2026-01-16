@@ -1,8 +1,0 @@
-<%= for {title, nodes} <- nodes do %>
-<%= if title do %>
-- <%=h to_string(title) %>
-<% end %>
-<%= for node <- nodes do %>
-  - [<%=h node.title %>](<%= URI.encode node.id %>.md)
-<% end %>
-<% end %>

@@ -165,7 +165,7 @@ defmodule ExDoc.DocAST do
           inner
       end
 
-    ExDoc.DocAST.to_string({:p, [], remove_ids(inner), meta})
+    to_string({:p, [], remove_ids(inner), meta})
   end
 
   def synopsis([head | _]), do: synopsis(head)
