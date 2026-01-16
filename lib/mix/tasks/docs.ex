@@ -592,7 +592,7 @@ defmodule Mix.Tasks.Docs do
         String.to_atom(proglang)
       end)
 
-    options =
+    {formatters, options} =
       config
       |> get_docs_opts()
       |> Keyword.merge(cli_opts)
@@ -604,8 +604,8 @@ defmodule Mix.Tasks.Docs do
       |> normalize_apps(config)
       |> normalize_main()
       |> normalize_deps()
-      |> normalize_formatters()
       |> put_package(config)
+      |> normalize_formatters()
 
     Code.prepend_path(options[:source_beam])
 
@@ -617,16 +617,12 @@ defmodule Mix.Tasks.Docs do
     Mix.shell().info("Generating docs...")
 
     results =
-      for formatter <- options[:formatters] do
-        formatter_options =
-          options
-          |> Keyword.put(:formatter, formatter)
-          |> update_output_for_formatter(formatter)
-
-        index = generator.(project, version, formatter_options)
+      for formatter <- formatters do
+        index = generator.(project, version, Keyword.put(options, :formatter, formatter))
         Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"])
 
-        if cli_opts[:open] do
+        # Open only the first one
+        if cli_opts[:open] && formatter == hd(options[:formatters]) do
           browser_open(index)
         end
 
@@ -666,17 +662,7 @@ defmodule Mix.Tasks.Docs do
         values -> values
       end
 
-    Keyword.put(options, :formatters, formatters)
-  end
-
-  defp update_output_for_formatter(options, "markdown") do
-    output = options[:output] || "doc"
-    Keyword.put(options, :output, Path.join(output, "markdown"))
-  end
-
-  defp update_output_for_formatter(options, _formatter) do
-    output = options[:output] || "doc"
-    Keyword.put(options, :output, output)
+    {formatters, Keyword.put(options, :formatters, formatters)}
   end
 
   defp get_docs_opts(config) do

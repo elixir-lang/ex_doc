@@ -85,7 +85,7 @@ defmodule ExDoc.Config do
           logo: nil | Path.t(),
           main: nil | String.t(),
           nest_modules_by_prefix: [String.t()],
-          output: nil | Path.t(),
+          output: Path.t(),
           package: :atom | nil,
           project: nil | String.t(),
           redirects: %{optional(String.t()) => String.t()} | [{String.t(), String.t()}],

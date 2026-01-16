@@ -86,7 +86,7 @@ defmodule ExDoc.CLI do
       Application.ensure_all_started(app)
     end
 
-    opts =
+    {formatters, opts} =
       opts
       |> Keyword.put(:source_beam, source_beams)
       |> Keyword.put(:apps, Enum.map(source_beams, &app/1))
@@ -95,7 +95,7 @@ defmodule ExDoc.CLI do
 
     quiet? = Keyword.get(opts, :quiet, false)
 
-    for formatter <- opts[:formatters] do
+    for formatter <- formatters do
       index = generator.(project, version, Keyword.put(opts, :formatter, formatter))
 
       quiet? ||
@@ -116,7 +116,7 @@ defmodule ExDoc.CLI do
         values -> values
       end
 
-    Keyword.put(opts, :formatters, formatters)
+    {formatters, Keyword.put(opts, :formatters, formatters)}
   end
 
   defp app(source_beam) do
