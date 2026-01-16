@@ -97,7 +97,9 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert function1.doc_file =~ "mod.erl"
 
-      assert Erlang.autolink_spec(hd(function1.source_specs), current_kfa: {:function, :function1, 0}) ==
+      assert Erlang.autolink_spec(hd(function1.source_specs),
+               current_kfa: {:function, :function1, 0}
+             ) ==
                "function1() -> <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       %ExDoc.DocNode{id: "function2/1"} = function2
@@ -252,7 +254,9 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert DocAST.to_string(callback1.doc) =~ "callback1/0 docs."
       assert Path.basename(callback1.source_url) == "mod.erl:4"
 
-      assert Erlang.autolink_spec(hd(callback1.source_specs), current_kfa: {:callback, :callback1, 0}) ==
+      assert Erlang.autolink_spec(hd(callback1.source_specs),
+               current_kfa: {:callback, :callback1, 0}
+             ) ==
                "callback1() -> <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       assert equiv_callback1.id == "c:equiv_callback1/0"
@@ -434,7 +438,9 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
 
-      assert Erlang.autolink_spec(hd(function1.source_specs), current_kfa: {:function, :function1, 0}) ==
+      assert Erlang.autolink_spec(hd(function1.source_specs),
+               current_kfa: {:function, :function1, 0}
+             ) ==
                "function1() -> <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       %ExDoc.DocNode{
@@ -481,7 +487,9 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert DocAST.to_string(callback1.doc) =~ "callback1/0 docs."
       assert Path.basename(callback1.source_url) == "mod.erl:4"
 
-      assert Erlang.autolink_spec(hd(callback1.source_specs), current_kfa: {:callback, :callback1, 0}) ==
+      assert Erlang.autolink_spec(hd(callback1.source_specs),
+               current_kfa: {:callback, :callback1, 0}
+             ) ==
                "callback1() -> <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
 
       assert optional_callback1.id == "c:optional_callback1/0"

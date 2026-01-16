@@ -46,7 +46,9 @@ defmodule ExDoc.Formatter do
                       current_kfa: {child_node.type, child_node.name, child_node.arity}
                     ]
 
-                specs = Enum.map(child_node.source_specs, &language.autolink_spec(&1, autolink_opts))
+                specs =
+                  Enum.map(child_node.source_specs, &language.autolink_spec(&1, autolink_opts))
+
                 child_node = %{child_node | specs: specs}
                 render_doc(child_node, language, autolink_opts, opts)
               end

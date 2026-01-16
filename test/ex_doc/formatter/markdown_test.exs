@@ -79,7 +79,9 @@ defmodule ExDoc.Formatter.MarkdownTest do
     # Types section - check for public type
     assert content =~ "# `public`"
     assert content =~ "A public type"
-    assert content =~ "```elixir\n@type public(t) :: {t, String.t(), TypesAndSpecs.Sub.t(), opaque(), :ok | :error}\n```"
+
+    assert content =~
+             "```elixir\n@type public(t) :: {t, String.t(), TypesAndSpecs.Sub.t(), opaque(), :ok | :error}\n```"
 
     # Types section - check for opaque type
     assert content =~ "# `opaque`"
