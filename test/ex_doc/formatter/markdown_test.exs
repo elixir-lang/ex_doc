@@ -68,6 +68,36 @@ defmodule ExDoc.Formatter.MarkdownTest do
     assert content =~ ~r{\*macro\*}
   end
 
+  test "renders types and specs properly", %{tmp_dir: tmp_dir} = context do
+    generate_docs(doc_config(context))
+
+    content = File.read!(tmp_dir <> "/TypesAndSpecs.md")
+
+    # Module header
+    assert content =~ "# `TypesAndSpecs`"
+
+    # Types section - check for public type
+    assert content =~ "# `public`"
+    assert content =~ "A public type"
+    assert content =~ "```elixir\n@type public(t) :: {t, String.t(), TypesAndSpecs.Sub.t(), opaque(), :ok | :error}\n```"
+
+    # Types section - check for opaque type
+    assert content =~ "# `opaque`"
+    assert content =~ "```elixir\n@opaque opaque()\n```"
+
+    # Function with spec
+    assert content =~ "# `add`"
+    assert content =~ "```elixir\n@spec add(integer(), opaque()) :: integer()\n```"
+
+    # Macro with spec
+    assert content =~ "# `macro_spec`"
+    assert content =~ "```elixir\n@spec macro_spec(any()) :: {:ok, any()}\n```"
+
+    # Macro with spec using when clause
+    assert content =~ "# `macro_with_spec`"
+    assert content =~ "```elixir\n@spec macro_with_spec(v) :: {:ok, v} when v: any()\n```"
+  end
+
   test "generates extras", %{tmp_dir: tmp_dir} = context do
     config =
       doc_config(context,
