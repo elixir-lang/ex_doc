@@ -55,7 +55,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                name: :function,
                signature: "function()",
                source_url: nil,
-               specs: [spec],
+               source_specs: [spec],
                type: :function
              } = function
 
@@ -67,7 +67,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                annotations: ["macro"],
                id: "macro/0",
                signature: "macro()",
-               specs: [spec],
+               source_specs: [spec],
                type: :macro
              } = macro
 
@@ -77,7 +77,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert %ExDoc.DocNode{
                id: "empty_doc_and_specs/0",
                doc: nil,
-               specs: []
+               source_specs: []
              } = empty_doc_and_specs
     end
 
@@ -109,7 +109,7 @@ defmodule ExDoc.Retriever.ElixirTest do
 
       assert macro.id == "macro/1"
       assert macro.annotations == ["macro"]
-      assert Macro.to_string(macro.specs) == "[macro(Macro.t()) :: Macro.t()]"
+      assert Macro.to_string(macro.source_specs) == "[macro(Macro.t()) :: Macro.t()]"
     end
 
     test "callbacks", c do
@@ -144,7 +144,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert callback1.group == "Callbacks"
       assert Path.basename(callback1.source_url) == "nofile:3"
       assert DocAST.to_string(callback1.doc) == "<p>callback1/0 docs.</p>"
-      assert Macro.to_string(callback1.specs) == "[callback1() :: :ok]"
+      assert Macro.to_string(callback1.source_specs) == "[callback1() :: :ok]"
 
       assert optional_callback1.id == "c:optional_callback1/0"
       assert optional_callback1.signature == "optional_callback1()"
@@ -154,7 +154,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert optional_callback1.group == "Callbacks"
       assert Path.basename(optional_callback1.source_url) == "nofile:5"
       refute optional_callback1.doc
-      assert Macro.to_string(optional_callback1.specs) == "[optional_callback1() :: :ok]"
+      assert Macro.to_string(optional_callback1.source_specs) == "[optional_callback1() :: :ok]"
 
       assert macrocallback1.id == "c:macrocallback1/0"
       assert macrocallback1.signature == "macrocallback1()"
@@ -164,7 +164,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert macrocallback1.group == "Callbacks"
       assert Path.basename(macrocallback1.source_url) == "nofile:9"
       refute macrocallback1.doc
-      assert Macro.to_string(macrocallback1.specs) == "[macrocallback1() :: :ok]"
+      assert Macro.to_string(macrocallback1.source_specs) == "[macrocallback1() :: :ok]"
 
       elixirc(c, ~S"""
       defmodule Impl do
@@ -216,7 +216,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert type1.annotations == []
       assert type1.doc_line == 2
       assert DocAST.to_string(type1.doc) == "<p>type1/0 docs.</p>"
-      assert hd(type1.specs) |> Macro.to_string() == "type1() :: atom()"
+      assert hd(type1.source_specs) |> Macro.to_string() == "type1() :: atom()"
 
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.signature == "opaque1()"
@@ -224,7 +224,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert opaque1.group == "Types"
       assert opaque1.doc_line == 5
       assert opaque1.doc |> DocAST.to_string() == ~s|<p>opaque1/0 docs.</p>|
-      assert hd(opaque1.specs) |> Macro.to_string() == "opaque1()"
+      assert hd(opaque1.source_specs) |> Macro.to_string() == "opaque1()"
     end
 
     test "protocols", c do
@@ -293,12 +293,12 @@ defmodule ExDoc.Retriever.ElixirTest do
 
       assert downcase.id == "downcase/1"
       assert downcase.signature == "downcase(str)"
-      assert downcase.specs == []
+      assert downcase.source_specs == []
       assert downcase.doc == ExDoc.Markdown.to_ast("Doc override.")
 
       assert upcase.id == "upcase/1"
       assert upcase.signature == "upcase(str)"
-      assert upcase.specs == []
+      assert upcase.source_specs == []
       assert upcase.doc == ExDoc.Markdown.to_ast("See `String.upcase/1`.")
     end
 

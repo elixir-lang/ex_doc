@@ -254,7 +254,7 @@ defmodule ExDoc.Retriever do
       doc_file: doc_file,
       defaults: ExDoc.Utils.natural_sort_by(defaults, fn {name, arity} -> "#{name}/#{arity}" end),
       signature: signature(doc_data.signature),
-      specs: doc_data.specs,
+      source_specs: doc_data.specs,
       source_url: source_url,
       type: doc_data.type,
       group: group.title,
