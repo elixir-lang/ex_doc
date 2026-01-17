@@ -60,7 +60,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :def,
     :nav_template,
     Path.expand("templates/nav_template.eex", __DIR__),
-    [:config, :nodes, :extras],
+    [:config, :modules, :tasks, :extras],
     trim: true
   )
 

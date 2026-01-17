@@ -4,22 +4,18 @@
       <ol>
         <%= nav_grouped_item_template extras %>
 
-        <%= if nodes.modules != [] do %>
+        <%= if modules != [] do %>
         <li>
           <span>Modules</span>
-          <ol><%= nav_grouped_item_template nodes.modules %></ol>
+          <ol><%= nav_grouped_item_template modules %></ol>
         </li>
         <% end %>
 
-        <%= if nodes.tasks != [] do %>
-          <li>
-            <span>Mix Tasks</span>
-            <ol>
-              <%= for node <- nodes.tasks do %>
-                <li><a href="<%= URI.encode node.id %>.xhtml"><%=h node.title %></a></li>
-              <% end %>
-            </ol>
-          </li>
+        <%= if tasks != [] do %>
+        <li>
+          <span>Mix Tasks</span>
+          <ol><%= nav_grouped_item_template tasks %></ol>
+        </li>
         <% end %>
       </ol>
     </nav>

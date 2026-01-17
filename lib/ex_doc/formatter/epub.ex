@@ -26,21 +26,14 @@ defmodule ExDoc.Formatter.EPUB do
       tasks: Formatter.filter_list(:task, project_nodes)
     }
 
-    extras =
-      extras
-      |> Formatter.autolink_extras(".xhtml", config)
-      |> Enum.chunk_by(& &1.group)
-      |> Enum.map(&{hd(&1).group, &1})
+    extras = Formatter.autolink_extras(extras, ".xhtml", config)
 
     static_files = Formatter.generate_assets("OEBPS", default_assets(config), config)
     Formatter.generate_logo(@assets_dir, config)
     Formatter.generate_cover(@assets_dir, config)
 
-    uuid = "urn:uuid:#{uuid4()}"
-    datetime = format_datetime()
-
-    generate_content(config, nodes_map, extras, uuid, datetime, static_files)
-    generate_nav(config, nodes_map, extras)
+    generate_content(config, nodes_map, extras, static_files)
+    generate_nav(config, nodes_map.modules, nodes_map.tasks, extras)
     generate_title(config)
     generate_extras(extras, config)
     generate_list(config, nodes_map.modules)
@@ -61,8 +54,7 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_extras(extras, config) do
-    for {_title, extras} <- extras,
-        %ExDoc.Extras.Page{} = node <- extras do
+    for %ExDoc.Extras.Page{} = node <- extras do
       output = "#{config.output}/OEBPS/#{node.id}.xhtml"
       html = Templates.extra_template(config, node)
 
@@ -74,7 +66,10 @@ defmodule ExDoc.Formatter.EPUB do
     end
   end
 
-  defp generate_content(config, nodes, extras, uuid, datetime, static_files) do
+  defp generate_content(config, nodes, extras, static_files) do
+    uuid = "urn:uuid:#{uuid4()}"
+    datetime = format_datetime()
+
     static_files =
       for name <- static_files,
           String.contains?(name, "OEBPS"),
@@ -85,14 +80,19 @@ defmodule ExDoc.Formatter.EPUB do
     File.write("#{config.output}/OEBPS/content.opf", content)
   end
 
-  defp generate_nav(config, nodes, extras) do
-    nodes =
-      Map.update!(nodes, :modules, fn modules ->
-        modules |> Enum.chunk_by(& &1.group) |> Enum.map(&{hd(&1).group, &1})
-      end)
+  defp generate_nav(config, modules, tasks, extras) do
+    modules = group_by_group(modules)
+    tasks = group_by_group(tasks)
+    extras = group_by_group(extras)
 
-    content = Templates.nav_template(config, nodes, extras)
+    content = Templates.nav_template(config, modules, tasks, extras)
     File.write("#{config.output}/OEBPS/nav.xhtml", content)
+  end
+
+  defp group_by_group(nodes) do
+    nodes
+    |> Enum.chunk_by(& &1.group)
+    |> Enum.map(&{hd(&1).group, &1})
   end
 
   defp generate_title(config) do
