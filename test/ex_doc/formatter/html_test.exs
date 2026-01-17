@@ -84,50 +84,6 @@ defmodule ExDoc.Formatter.HTMLTest do
                  fn -> generate_docs(config) end
   end
 
-  test "multiple extras with the same name", c do
-    File.mkdir_p!("#{c.tmp_dir}/foo")
-
-    File.write!("#{c.tmp_dir}/foo/README.md", """
-    # README foo
-    """)
-
-    File.mkdir_p!("#{c.tmp_dir}/bar")
-
-    File.write!("#{c.tmp_dir}/bar/README.md", """
-    # README bar
-    """)
-
-    config =
-      Keyword.replace!(doc_config(c), :extras, [
-        "#{c.tmp_dir}/foo/README.md",
-        "#{c.tmp_dir}/bar/README.md"
-      ])
-
-    generate_docs(config)
-
-    foo_content = "#{c.tmp_dir}/html/readme-1.html" |> File.read!() |> LazyHTML.from_document()
-    bar_content = "#{c.tmp_dir}/html/readme-2.html" |> File.read!() |> LazyHTML.from_document()
-
-    assert LazyHTML.text(foo_content["h1"]) == "README foo"
-    assert LazyHTML.text(bar_content["h1"]) == "README bar"
-  end
-
-  test "extras defined as external urls", %{tmp_dir: tmp_dir} = context do
-    config =
-      doc_config(context,
-        extras: [
-          "#{tmp_dir}/readme.md",
-          "Elixir": [url: "https://elixir-lang.org"]
-        ]
-      )
-
-    File.write!("#{tmp_dir}/readme.md", "readme")
-    generate_docs(config)
-
-    content = File.read!(tmp_dir <> "/html/readme.html")
-    assert content =~ "https://elixir-lang.org"
-  end
-
   test "warns when generating an index.html file with an invalid redirect",
        %{tmp_dir: tmp_dir} = context do
     output =
@@ -846,18 +802,6 @@ defmodule ExDoc.Formatter.HTMLTest do
                "title" => "Forum",
                "url" => "https://elixirforum.com"
              } in extras
-    end
-
-    test "with auto-extracted titles", %{tmp_dir: tmp_dir} = context do
-      generate_docs(doc_config(context, extras: ["test/fixtures/ExtraPage.md"]))
-      content = File.read!(tmp_dir <> "/html/extrapage.html")
-      assert content =~ ~r{<title>Extra Page Title — Elixir v1.0.1</title>}
-      "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
-
-      assert [
-               %{"id" => "api-reference"},
-               %{"id" => "extrapage"}
-             ] = Jason.decode!(content)["extras"]
     end
 
     test "without api-reference", %{tmp_dir: tmp_dir} = context do

@@ -12,7 +12,7 @@ defmodule ExDocTest do
 
   # Simple formatter that returns whatever is passed into it
   defmodule IdentityFormatter do
-    def run(modules, _filtered, config) do
+    def run(modules, _filtered, _extras, config) do
       {modules, config}
     end
   end

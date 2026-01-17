@@ -10,8 +10,8 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generates HTML documentation for the given modules.
   """
-  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
-  def run(project_nodes, filtered_modules, config) when is_map(config) do
+  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) :: String.t()
+  def run(project_nodes, filtered_modules, extras, config) when is_map(config) do
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
 
@@ -19,7 +19,7 @@ defmodule ExDoc.Formatter.HTML do
     output_setup(build, config)
 
     project_nodes = Formatter.render_all(project_nodes, filtered_modules, ".html", config, [])
-    extras = Formatter.build_extras(config, ".html")
+    extras = Formatter.autolink_extras(extras, ".html", config)
 
     static_files = Formatter.generate_assets(".", default_assets(config), config)
     search_data = generate_search_data(project_nodes, extras, config)

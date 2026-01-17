@@ -2,7 +2,7 @@
     <h1>Table of contents</h1>
     <nav epub:type="toc">
       <ol>
-        <%= nav_grouped_item_template config.extras %>
+        <%= nav_grouped_item_template extras %>
 
         <%= if nodes.modules != [] do %>
         <li>

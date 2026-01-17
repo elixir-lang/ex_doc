@@ -17,9 +17,9 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     ["searchData=" | ExDoc.Utils.to_json(data)]
   end
 
-  defp extra(%{url: _}), do: []
+  defp extra(%ExDoc.Extras.URL{}), do: []
 
-  defp extra(%{search_data: search_data} = map) when is_list(search_data) do
+  defp extra(%ExDoc.Extras.Page{search_data: search_data} = map) when is_list(search_data) do
     Enum.map(search_data, fn item ->
       link =
         if item.anchor === "" do
@@ -32,9 +32,9 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     end)
   end
 
-  defp extra(map) do
+  defp extra(%ExDoc.Extras.Page{} = map) do
     page = URI.encode(map.id) <> ".html"
-    {intro, sections} = extract_sections_from_markdown(map.source, "")
+    {intro, sections} = extract_sections_from_markdown(map.source_doc, "")
 
     intro = encode(page, map.title, :extras, intro)
     [intro | render_sections(sections, page, map.title, :extras)]

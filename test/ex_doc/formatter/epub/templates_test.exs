@@ -45,7 +45,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       content =
         [logo: "my_logo.png"]
         |> doc_config()
-        |> Templates.content_template(nodes, "uuid", "datetime", _static_files = [])
+        |> Templates.content_template(nodes, _extras = [], "uuid", "datetime", _static_files = [])
 
       assert content =~ ~S|<item id="logo" href="assets/logo.png" media-type="image/png"/>|
     end
@@ -56,7 +56,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       content =
         [cover: "my_cover.svg"]
         |> doc_config()
-        |> Templates.content_template(nodes, "uuid", "datetime", _static_files = [])
+        |> Templates.content_template(nodes, _extras = [], "uuid", "datetime", _static_files = [])
 
       assert content =~ ~S|<meta name="cover" content="cover-image"/>|
 
@@ -75,7 +75,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       nodes = %{modules: [module_node], tasks: []}
 
       content =
-        Templates.content_template(doc_config(), nodes, "uuid", "datetime", _static_files = [])
+        Templates.content_template(doc_config(), nodes, _extras = [], "uuid", "datetime", _static_files = [])
 
       assert content =~
                ~S|<item id="XPTOModule" href="XPTOModule.xhtml" media-type="application/xhtml+xml" properties="scripted"/>|

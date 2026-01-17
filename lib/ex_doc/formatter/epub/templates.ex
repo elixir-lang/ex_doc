@@ -39,7 +39,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :def,
     :content_template,
     Path.expand("templates/content_template.eex", __DIR__),
-    [:config, :nodes, :uuid, :datetime, :static_files],
+    [:config, :nodes, :extras, :uuid, :datetime, :static_files],
     trim: true
   )
 
@@ -67,7 +67,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :def,
     :nav_template,
     Path.expand("templates/nav_template.eex", __DIR__),
-    [:config, :nodes],
+    [:config, :nodes, :extras],
     trim: true
   )
 

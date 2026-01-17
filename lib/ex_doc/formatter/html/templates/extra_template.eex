@@ -29,7 +29,7 @@
   <%= if node.type == :cheatmd do %>
     <%= node.doc |> ExDoc.DocAST.sectionize([:h2, :h3]) |> render_doc() %>
   <% else %>
-    <%= node[:content] || render_doc(node.doc) %>
+    <%= render_doc(node.doc) %>
   <% end %>
 </div>
 

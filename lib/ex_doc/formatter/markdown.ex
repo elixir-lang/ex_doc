@@ -8,15 +8,14 @@ defmodule ExDoc.Formatter.MARKDOWN do
   @doc """
   Generates Markdown documentation for the given modules.
   """
-  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
-  def run(project_nodes, _filtered_modules, config) when is_map(config) do
+  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) :: String.t()
+  def run(project_nodes, _filtered_modules, extras, config) when is_map(config) do
     Utils.unset_warned()
 
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
-    extras = Formatter.build_extras(config, ".md")
-    config = %{config | extras: extras}
+    extras = Formatter.autolink_extras(extras, ".md", config)
 
     {modules, tasks} =
       project_nodes
@@ -24,8 +23,8 @@ defmodule ExDoc.Formatter.MARKDOWN do
       |> Enum.split_with(&(&1.type != :task))
 
     all_files =
-      [generate_nav(config, modules, tasks)] ++
-        generate_extras(config) ++
+      [generate_nav(config, modules, tasks, extras)] ++
+        generate_extras(extras, config) ++
         generate_list(config, modules) ++
         generate_list(config, tasks)
 
@@ -75,10 +74,10 @@ defmodule ExDoc.Formatter.MARKDOWN do
     |> String.replace(~r/\n{3,}/, "\n\n")
   end
 
-  defp generate_nav(config, modules, tasks) do
+  defp generate_nav(config, modules, tasks, extras) do
     modules = group_by_group(modules)
     mix_tasks = group_by_group(tasks)
-    extras = group_by_group(config.extras)
+    extras = group_by_group(extras)
 
     content =
       Templates.nav_template(config, modules, mix_tasks, extras)
@@ -95,12 +94,11 @@ defmodule ExDoc.Formatter.MARKDOWN do
     |> Enum.map(&{hd(&1).group, &1})
   end
 
-  defp generate_extras(config) do
-    for %{id: id, source: source} = extra <- config.extras,
-        not is_map_key(extra, :url) do
+  defp generate_extras(extras, config) do
+    for %ExDoc.Extras.Page{id: id, source_doc: source_doc} <- extras do
       filename = "#{id}.md"
       output = "#{config.output}/#{filename}"
-      File.write!(output, source)
+      File.write!(output, source_doc)
       filename
     end
   end

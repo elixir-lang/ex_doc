@@ -9,8 +9,8 @@ defmodule ExDoc.Formatter.EPUB do
   @doc """
   Generates EPUB documentation for the given modules.
   """
-  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], ExDoc.Config.t()) :: String.t()
-  def run(project_nodes, filtered_modules, config) when is_map(config) do
+  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) :: String.t()
+  def run(project_nodes, filtered_modules, extras, config) when is_map(config) do
     config = normalize_config(config)
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
@@ -26,12 +26,10 @@ defmodule ExDoc.Formatter.EPUB do
     }
 
     extras =
-      config
-      |> Formatter.build_extras(".xhtml")
+      extras
+      |> Formatter.autolink_extras(".xhtml", config)
       |> Enum.chunk_by(& &1.group)
       |> Enum.map(&{hd(&1).group, &1})
-
-    config = %{config | extras: extras}
 
     static_files = Formatter.generate_assets("OEBPS", default_assets(config), config)
     Formatter.generate_logo(@assets_dir, config)
@@ -40,10 +38,10 @@ defmodule ExDoc.Formatter.EPUB do
     uuid = "urn:uuid:#{uuid4()}"
     datetime = format_datetime()
 
-    generate_content(config, nodes_map, uuid, datetime, static_files)
-    generate_nav(config, nodes_map)
+    generate_content(config, nodes_map, extras, uuid, datetime, static_files)
+    generate_nav(config, nodes_map, extras)
     generate_title(config)
-    generate_extras(config)
+    generate_extras(extras, config)
     generate_list(config, nodes_map.modules)
     generate_list(config, nodes_map.tasks)
 
@@ -61,10 +59,9 @@ defmodule ExDoc.Formatter.EPUB do
     %{config | output: output}
   end
 
-  defp generate_extras(config) do
-    for {_title, extras} <- config.extras,
-        node <- extras,
-        not is_map_key(node, :url) do
+  defp generate_extras(extras, config) do
+    for {_title, extras} <- extras,
+        %ExDoc.Extras.Page{} = node <- extras do
       output = "#{config.output}/OEBPS/#{node.id}.xhtml"
       html = Templates.extra_template(config, node)
 
@@ -76,24 +73,24 @@ defmodule ExDoc.Formatter.EPUB do
     end
   end
 
-  defp generate_content(config, nodes, uuid, datetime, static_files) do
+  defp generate_content(config, nodes, extras, uuid, datetime, static_files) do
     static_files =
       for name <- static_files,
           String.contains?(name, "OEBPS"),
           media_type = Templates.media_type(Path.extname(name)),
           do: {Path.relative_to(name, "OEBPS"), media_type}
 
-    content = Templates.content_template(config, nodes, uuid, datetime, static_files)
+    content = Templates.content_template(config, nodes, extras, uuid, datetime, static_files)
     File.write("#{config.output}/OEBPS/content.opf", content)
   end
 
-  defp generate_nav(config, nodes) do
+  defp generate_nav(config, nodes, extras) do
     nodes =
       Map.update!(nodes, :modules, fn modules ->
         modules |> Enum.chunk_by(& &1.group) |> Enum.map(&{hd(&1).group, &1})
       end)
 
-    content = Templates.nav_template(config, nodes)
+    content = Templates.nav_template(config, nodes, extras)
     File.write("#{config.output}/OEBPS/nav.xhtml", content)
   end
 
