@@ -9,7 +9,8 @@ defmodule ExDoc.Formatter.EPUB do
   @doc """
   Generates EPUB documentation for the given modules.
   """
-  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) :: String.t()
+  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) ::
+          String.t()
   def run(project_nodes, filtered_modules, extras, config) when is_map(config) do
     config = normalize_config(config)
     File.rm_rf!(config.output)
@@ -155,7 +156,7 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_module_page(module_node, config) do
-    content = Templates.module_page(config, module_node)
+    content = Templates.module_template(config, module_node)
     File.write("#{config.output}/OEBPS/#{module_node.id}.xhtml", content)
   end
 

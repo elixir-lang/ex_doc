@@ -1,5 +1,5 @@
 defmodule ExDoc.Formatter.MarkdownTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   @moduletag :tmp_dir
 

@@ -255,6 +255,55 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     assert item2["doc"] == "Section _1_ content."
   end
 
+  test "custom search data", c do
+    readme_path = "#{c.tmp_dir}/README.md"
+
+    File.write!(readme_path, """
+    # README
+
+    Content here.
+
+    ## Heading without content
+    """)
+
+    extras = [
+      {readme_path,
+       search_data: [
+         %{
+           anchor: "",
+           title: "top of the doc",
+           type: "custom",
+           body: """
+           In this doc we...
+           """
+         },
+         %{
+           anchor: "heading-without-content",
+           title: "custom-text",
+           type: "custom",
+           body: """
+           Some longer text!
+
+           Here it is :)
+           """
+         }
+       ]}
+    ]
+
+    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: extras}
+    [item1, item2] = search_data([], config)["items"]
+
+    assert item1["ref"] == "readme.html"
+    assert item1["type"] == "custom"
+    assert item1["title"] == "top of the doc - readme"
+    assert item1["doc"] == "In this doc we..."
+
+    assert item2["ref"] == "readme.html#heading-without-content"
+    assert item2["type"] == "custom"
+    assert item2["title"] == "custom-text - readme"
+    assert item2["doc"] == "Some longer text!\n\nHere it is :)"
+  end
+
   defp search_data(modules, config) do
     {modules, []} = ExDoc.Retriever.docs_from_modules(modules, config)
     extras = ExDoc.Extras.build(config)

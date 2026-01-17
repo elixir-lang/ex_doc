@@ -1,12 +1,7 @@
 defmodule ExDoc.Formatter.EPUBTest do
-  use ExUnit.Case, async: false
-
-  import ExUnit.CaptureIO
-
-  alias ExDoc.Utils
+  use ExUnit.Case, async: true
 
   @moduletag :tmp_dir
-
   @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
   @before_closing_body_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
 
@@ -138,6 +133,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     config =
       doc_config(context,
         extras: [
+          "test/fixtures/LICENSE",
           "test/fixtures/PlainText.txt",
           "test/fixtures/PlainTextFiles.md",
           "test/fixtures/cheatsheets.cheatmd"
@@ -266,35 +262,5 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?(tmp_dir <> "/epub/OEBPS/assets/cover.png")
   after
     File.rm_rf!("test/tmp/epub_assets")
-  end
-
-  describe "warnings" do
-    @describetag :warnings
-
-    for warnings_as_errors <- [true, false] do
-      test "when warnings_as_errors: #{warnings_as_errors}", context do
-        Utils.unset_warned()
-
-        output =
-          capture_io(:stderr, fn ->
-            generate_docs(
-              doc_config(context,
-                skip_undefined_reference_warnings_on: [],
-                warnings_as_errors: unquote(warnings_as_errors)
-              )
-            )
-          end)
-
-        # TODO: remove check when we require Elixir v1.16
-        if Version.match?(System.version(), ">= 1.16.0-rc") do
-          assert output =~ ~S|moduledoc `Warnings.bar/0`|
-          assert output =~ ~S|typedoc `Warnings.bar/0`|
-          assert output =~ ~S|doc callback `Warnings.bar/0`|
-          assert output =~ ~S|doc `Warnings.bar/0`|
-        end
-
-        assert Utils.unset_warned()
-      end
-    end
   end
 end

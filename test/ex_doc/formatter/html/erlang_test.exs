@@ -1,5 +1,5 @@
 defmodule ExDoc.Formatter.HTML.ErlangTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import TestHelper
 
   @moduletag :otp_eep48

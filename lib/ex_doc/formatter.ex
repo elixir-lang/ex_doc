@@ -118,7 +118,12 @@ defmodule ExDoc.Formatter do
   defp autolink_extra(%ExDoc.Extras.Page{doc: nil} = extra, _language, _autolink_opts, _opts),
     do: extra
 
-  defp autolink_extra(%ExDoc.Extras.Page{doc: doc, source_path: source_path, id: id} = extra, language, autolink_opts, opts) do
+  defp autolink_extra(
+         %ExDoc.Extras.Page{doc: doc, source_path: source_path, id: id} = extra,
+         language,
+         autolink_opts,
+         opts
+       ) do
     autolink_opts = [file: source_path, id: id] ++ autolink_opts
     doc = autolink_and_highlight(doc, language, autolink_opts, opts)
     %{extra | doc: doc}
@@ -170,11 +175,14 @@ defmodule ExDoc.Formatter do
       if is_map(assets) do
         Enum.map(assets, fn {source, target} -> {source, Path.join(namespace, target)} end)
       else
-        IO.warn("""
-        giving a binary to :assets is deprecated, please give a map from source to target instead:
+        ExDoc.Utils.warn(
+          """
+          giving a binary to :assets is deprecated, please give a map from source to target instead:
 
-            #{inspect(assets: %{assets => "assets"})}
-        """)
+              #{inspect(assets: %{assets => "assets"})}
+          """,
+          []
+        )
 
         [{assets, Path.join(namespace, "assets")}]
       end

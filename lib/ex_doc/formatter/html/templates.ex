@@ -12,19 +12,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
       text_to_id: 1
     ]
 
-  @doc """
-  Generate content from the module template for a given `node`.
-  """
-  def module_page(module_node, config) do
-    module_template(config, module_node)
-  end
-
-  @doc """
-  Format the attribute type used to define the spec of the given `node`.
-  """
-  def format_spec_attribute(module, node) do
-    module.language.format_spec_attribute(node)
-  end
+  defp enc(binary), do: ExDoc.Utils.h(URI.encode(binary))
 
   @doc """
   Get the pretty name of a function node
@@ -39,8 +27,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def module_type(%{type: :task}), do: ""
   def module_type(%{type: :module}), do: ""
   def module_type(%{type: type}), do: "<small>#{type}</small>"
-
-  defp enc(binary), do: ExDoc.Utils.h(URI.encode(binary))
 
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area

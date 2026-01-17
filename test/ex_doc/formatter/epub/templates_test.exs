@@ -25,11 +25,11 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     struct(default, config)
   end
 
-  defp get_module_page(names, config \\ []) do
+  defp get_module_template(names, config \\ []) do
     config = doc_config(config)
     {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
     [mod | _] = Formatter.render_all(mods, [], ".xhtml", config, highlight_tag: "samp")
-    Templates.module_page(config, mod)
+    Templates.module_template(config, mod)
   end
 
   setup_all do
@@ -75,7 +75,8 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       nodes = %{modules: [module_node], tasks: []}
 
       content =
-        Templates.content_template(doc_config(), nodes, _extras = [], "uuid", "datetime", _static_files = [])
+        doc_config()
+        |> Templates.content_template(nodes, _extras = [], "uuid", "datetime", _static_files = [])
 
       assert content =~
                ~S|<item id="XPTOModule" href="XPTOModule.xhtml" media-type="application/xhtml+xml" properties="scripted"/>|
@@ -84,7 +85,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     end
   end
 
-  describe "module_page/2" do
+  describe "module_template/2" do
     test "generates only the module name when there's no more info" do
       module_node = %ExDoc.ModuleNode{
         module: XPTOModule,
@@ -93,14 +94,14 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
         title: "XPTOModule"
       }
 
-      content = Templates.module_page(doc_config(), module_node)
+      content = Templates.module_template(doc_config(), module_node)
 
       assert content =~ ~r{<title>XPTOModule [^<]*</title>}
       assert content =~ ~r{<h1 id="content">\s*XPTOModule\s*}
     end
 
     test "outputs the functions and docstrings" do
-      content = get_module_page([CompiledWithDocs])
+      content = get_module_template([CompiledWithDocs])
 
       assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
       assert content =~ ~r{<h1 id="content">\s*CompiledWithDocs\s*}
@@ -126,7 +127,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
     test "outputs function groups" do
       content =
-        get_module_page([CompiledWithDocs],
+        get_module_template([CompiledWithDocs],
           group_for_doc: fn metadata ->
             cond do
               metadata[:purpose] == :example -> "Example functions"
@@ -147,7 +148,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
     test "outputs groups descriptions" do
       content =
-        get_module_page([CompiledWithDocs],
+        get_module_template([CompiledWithDocs],
           group_for_doc: fn metadata ->
             if metadata[:purpose] == :example do
               [
@@ -184,21 +185,21 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     end
 
     test "outputs summaries" do
-      content = get_module_page([CompiledWithDocs])
+      content = get_module_template([CompiledWithDocs])
 
       assert content =~
                ~r{<div class="summary-signature">\s*<a href="#example_1/0" data-no-tooltip="" translate="no">}
     end
 
     test "contains links to summary sections when those exist" do
-      content = get_module_page([CompiledWithDocs, CompiledWithDocs.Nested])
+      content = get_module_template([CompiledWithDocs, CompiledWithDocs.Nested])
       refute content =~ ~r{types_details}
     end
 
     ## BEHAVIOURS
 
     test "outputs behavior and callbacks" do
-      content = get_module_page([CustomBehaviourOne])
+      content = get_module_template([CustomBehaviourOne])
 
       assert content =~
                ~r{<h1 id="content">\s*CustomBehaviourOne\s*<small>behaviour</small>\s*</h1>}m
@@ -206,7 +207,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~r{Callbacks}
       assert content =~ ~r{<section class="detail" id="c:hello/1">}
 
-      content = get_module_page([CustomBehaviourTwo])
+      content = get_module_template([CustomBehaviourTwo])
 
       assert content =~
                ~r{<h1 id="content">\s*CustomBehaviourTwo\s*<small>behaviour</small>\s*</h1>}m
@@ -218,14 +219,14 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     ## PROTOCOLS
 
     test "outputs the protocol type" do
-      content = get_module_page([CustomProtocol])
+      content = get_module_template([CustomProtocol])
       assert content =~ ~r{<h1 id="content">\s*CustomProtocol\s*<small>protocol</small>\s*}m
     end
 
     ## TASKS
 
     test "outputs the task type" do
-      content = get_module_page([Mix.Tasks.TaskWithDocs])
+      content = get_module_template([Mix.Tasks.TaskWithDocs])
       assert content =~ ~r{<h1 id="content">\s*mix task_with_docs\s*}m
     end
   end

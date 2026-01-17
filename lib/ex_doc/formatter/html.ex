@@ -10,7 +10,8 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generates HTML documentation for the given modules.
   """
-  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) :: String.t()
+  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) ::
+          String.t()
   def run(project_nodes, filtered_modules, extras, config) when is_map(config) do
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
@@ -263,7 +264,7 @@ defmodule ExDoc.Formatter.HTML do
   defp generate_module_page(module_node, config) do
     filename = "#{module_node.id}.html"
     config = set_canonical_url(config, filename)
-    content = Templates.module_page(module_node, config)
+    content = Templates.module_template(config, module_node)
     File.write!("#{config.output}/#{filename}", content)
     filename
   end

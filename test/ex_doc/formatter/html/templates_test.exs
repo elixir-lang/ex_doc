@@ -27,11 +27,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     struct(default, config)
   end
 
-  defp get_module_page(names, context, config \\ []) do
+  defp get_module_template(names, context, config \\ []) do
     config = doc_config(context, config)
     {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
     [mod | _] = Formatter.render_all(mods, [], ".html", config, [])
-    Templates.module_page(mod, config)
+    Templates.module_template(config, mod)
   end
 
   setup %{tmp_dir: tmp_dir} do
@@ -79,7 +79,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
   end
 
-  describe "sidebar" do
+  describe "sidebar_template" do
     test "renders search engines when multiple are configured", context do
       config =
         doc_config(context,
@@ -143,7 +143,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                <div class="sidebar-projectVersion" translate="no">\s*v1.0.1\s*</div>\s*\</div>\s*\</div>
                """
     end
+  end
 
+  describe "footer_template" do
     test "display built with footer by proglang option", context do
       content = Templates.footer_template(doc_config(context, proglang: :erlang), nil)
 
@@ -161,7 +163,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       refute Templates.footer_template(doc_config(context, footer: false), nil) =~
                "Elixir programming language"
     end
+  end
 
+  describe "sidebar_items" do
     test "includes api reference", context do
       names = [CompiledWithDocs]
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
@@ -333,9 +337,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
   end
 
-  describe "module_page" do
+  describe "module_template" do
     test "outputs the functions and docstrings", context do
-      content = get_module_page([CompiledWithDocs], context)
+      content = get_module_template([CompiledWithDocs], context)
 
       # Title and headers
       assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
@@ -377,7 +381,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     test "outputs function groups", context do
       content =
-        get_module_page([CompiledWithDocs], context,
+        get_module_template([CompiledWithDocs], context,
           group_for_doc: fn metadata ->
             cond do
               metadata[:purpose] == :example -> "Example functions"
@@ -398,7 +402,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     test "outputs groups descriptions", context do
       content =
-        get_module_page([CompiledWithDocs], context,
+        get_module_template([CompiledWithDocs], context,
           group_for_doc: fn metadata ->
             if metadata[:purpose] == :example do
               [
@@ -432,7 +436,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
 
     test "outputs deprecation information", context do
-      content = get_module_page([CompiledWithDocs], context)
+      content = get_module_template([CompiledWithDocs], context)
 
       assert content =~
                ~s{<span class="deprecated" title="Use something else instead">deprecated</span>}
@@ -442,7 +446,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
 
     test "outputs the types and function specs", context do
-      content = get_module_page([TypesAndSpecs, TypesAndSpecs.Sub], context)
+      content = get_module_template([TypesAndSpecs, TypesAndSpecs.Sub], context)
       integer = ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>()]
 
       public_html =
@@ -467,26 +471,26 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
 
     test "outputs summaries", context do
-      content = get_module_page([CompiledWithDocs], context)
+      content = get_module_template([CompiledWithDocs], context)
 
       assert content =~
                ~r{<div class="summary-signature">\s*<a href="#example_1/0" data-no-tooltip="" translate="no">}
     end
 
     test "contains links to summary sections when those exist", context do
-      content = get_module_page([CompiledWithDocs, CompiledWithDocs.Nested], context)
+      content = get_module_template([CompiledWithDocs, CompiledWithDocs.Nested], context)
       refute content =~ ~r{types}
     end
 
     test "add hovers to <h3> tags", context do
-      content = get_module_page([CompiledWithDocs], context)
+      content = get_module_template([CompiledWithDocs], context)
 
       assert content =~
                ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*<span class="text">Examples</span>.*</h3>}ms
     end
 
     test "do not output overlapping functions, causing duplicate IDs", context do
-      content = get_module_page([OverlappingDefaults], context)
+      content = get_module_template([OverlappingDefaults], context)
 
       assert content =~ ~s{<section class="detail" id="overlapping_defaults/2">}
       assert content =~ ~s{<section class="detail" id="overlapping_defaults/3">}
@@ -504,7 +508,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     ## BEHAVIOURS
 
     test "outputs behavior and callbacks", context do
-      content = get_module_page([CustomBehaviourOne], context)
+      content = get_module_template([CustomBehaviourOne], context)
 
       assert content =~
                ~r{<span translate="no">CustomBehaviourOne</span>\s*<small>behaviour</small>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
@@ -515,7 +519,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~s[hello(%URI{})]
       assert content =~ ~s[greet(arg1)]
 
-      content = get_module_page([CustomBehaviourTwo], context)
+      content = get_module_template([CustomBehaviourTwo], context)
 
       assert content =~
                ~r{<span translate="no">CustomBehaviourTwo</span>\s*<small>behaviour</small>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
@@ -528,7 +532,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     ## PROTOCOLS
 
     test "outputs the protocol type", context do
-      content = get_module_page([CustomProtocol], context)
+      content = get_module_template([CustomProtocol], context)
 
       assert content =~
                ~r{<span translate="no">CustomProtocol</span>\s*<small>protocol</small>\s*<small class=\"app-vsn\" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}
@@ -537,7 +541,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     ## TASKS
 
     test "outputs the task type", context do
-      content = get_module_page([Mix.Tasks.TaskWithDocs], context)
+      content = get_module_template([Mix.Tasks.TaskWithDocs], context)
 
       assert content =~
                ~r{<span translate="no">mix task_with_docs</span>\s*<small class="app-vsn" translate="no">\(Elixir v1.0.1\)</small>\s*</h1>}

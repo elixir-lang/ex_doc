@@ -59,6 +59,18 @@ defmodule ExDoc.DocASTTest do
                ~s{<p>foo <strong>bar</strong> baz</p>}
     end
 
+    test "comments" do
+      markdown = """
+      hello
+      <!-- HTML -->
+      """
+
+      ast = DocAST.parse!(markdown, "text/markdown")
+
+      assert DocAST.to_string(ast) ==
+               ~s{<p>hello</p><!-- HTML -->}
+    end
+
     test "escape" do
       markdown = "foo > bar"
       ast = DocAST.parse!(markdown, "text/markdown")

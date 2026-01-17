@@ -28,7 +28,7 @@
     <%= if node.specs != [] do %>
       <div class="specs">
         <%= for spec <- node.specs do %>
-          <pre translate="no"><span class="attribute"><%= format_spec_attribute(module, node) %></span> <%= spec %></pre>
+          <pre translate="no"><span class="attribute"><%= module.language.format_spec_attribute(node) %></span> <%= spec %></pre>
         <% end %>
       </div>
     <% end %>
