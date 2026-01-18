@@ -562,7 +562,7 @@ defmodule Mix.Tasks.Docs do
   def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate_docs/3) do
     {:ok, _} = Application.ensure_all_started(:ex_doc)
 
-    unless Code.ensure_loaded?(ExDoc.Config) do
+    unless Code.ensure_loaded?(ExDoc.Formatter.Config) do
       Mix.raise(
         "Could not load ExDoc configuration. Please make sure you are running the " <>
           "docs task in the same Mix environment it is listed in your deps"

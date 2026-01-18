@@ -12,11 +12,10 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     "https://elixir-lang.org"
   end
 
-  defp doc_config(config \\ []) do
-    default = %ExDoc.Config{
+  defp formatter_config(config \\ []) do
+    default = %ExDoc.Formatter.Config{
       project: "Elixir",
       version: "1.0.1",
-      source_url_pattern: fn path, line -> "#{source_url()}/blob/master/#{path}#L#{line}" end,
       homepage_url: homepage_url(),
       source_url: source_url(),
       output: "test/tmp/epub_templates"
@@ -25,14 +24,23 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     struct(default, config)
   end
 
+  defp retriever_config(config) do
+    default = %ExDoc.Config{
+      source_url_pattern: fn path, line -> "#{source_url()}/blob/master/#{path}#L#{line}" end
+    }
+
+    struct(default, config)
+  end
+
   defp get_module_template(names, config \\ []) do
-    config = doc_config(config)
-    {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
+    fconfig = formatter_config(config)
+    rconfig = retriever_config(config)
+    {mods, []} = ExDoc.Retriever.docs_from_modules(names, rconfig)
 
     {[mod | _], _extras} =
-      Formatter.autolink(config, mods, [], extension: ".xhtml", highlight_tag: "samp")
+      Formatter.autolink(fconfig, mods, [], extension: ".xhtml", highlight_tag: "samp")
 
-    Templates.module_template(config, mod)
+    Templates.module_template(fconfig, mod)
   end
 
   setup_all do
@@ -45,7 +53,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     test "includes logo as a resource if specified in the config" do
       content =
         [logo: "my_logo.png"]
-        |> doc_config()
+        |> formatter_config()
         |> Templates.content_template([], [], [], "uuid", "datetime", _static_files = [])
 
       assert content =~ ~S|<item id="logo" href="assets/logo.png" media-type="image/png"/>|
@@ -54,7 +62,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     test "includes cover as a resource if specified in the config" do
       content =
         [cover: "my_cover.svg"]
-        |> doc_config()
+        |> formatter_config()
         |> Templates.content_template([], [], [], "uuid", "datetime", _static_files = [])
 
       assert content =~ ~S|<meta name="cover" content="cover-image"/>|
@@ -72,7 +80,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       }
 
       content =
-        doc_config()
+        formatter_config()
         |> Templates.content_template([node], [], [], "uuid", "datetime", _static_files = [])
 
       assert content =~
@@ -91,7 +99,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
         title: "XPTOModule"
       }
 
-      content = Templates.module_template(doc_config(), module_node)
+      content = Templates.module_template(formatter_config(), module_node)
 
       assert content =~ ~r{<title>XPTOModule [^<]*</title>}
       assert content =~ ~r{<h1 id="content">\s*XPTOModule\s*}

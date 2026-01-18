@@ -14,11 +14,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     "https://elixir-lang.org"
   end
 
-  defp doc_config(context, config \\ []) do
-    default = %ExDoc.Config{
+  defp formatter_config(context, config \\ []) do
+    default = %ExDoc.Formatter.Config{
       project: "Elixir",
       version: "1.0.1",
-      source_url_pattern: fn path, line -> "#{source_url()}/blob/master/#{path}#L#{line}" end,
       homepage_url: homepage_url(),
       source_url: source_url(),
       output: context.tmp_dir <> "/html_templates"
@@ -27,11 +26,20 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     struct(default, config)
   end
 
+  defp retriever_config(config \\ []) do
+    default = %ExDoc.Config{
+      source_url_pattern: fn path, line -> "#{source_url()}/blob/master/#{path}#L#{line}" end
+    }
+
+    struct(default, config)
+  end
+
   defp get_module_template(names, context, config \\ []) do
-    config = doc_config(context, config)
-    {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
-    {[mod | _], _extras} = Formatter.autolink(config, mods, [], extension: ".html")
-    Templates.module_template(config, mod)
+    fconfig = formatter_config(context, config)
+    rconfig = retriever_config(config)
+    {mods, []} = ExDoc.Retriever.docs_from_modules(names, rconfig)
+    {[mod | _], _extras} = Formatter.autolink(fconfig, mods, [], extension: ".html")
+    Templates.module_template(fconfig, mod)
   end
 
   setup %{tmp_dir: tmp_dir} do
@@ -82,7 +90,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   describe "sidebar_template" do
     test "renders search engines when multiple are configured", context do
       config =
-        doc_config(context,
+        formatter_config(context,
           search: [
             %{name: "Google", help: "Search using Google", url: "https://google.com/?q="},
             %{name: "Local", help: "Search locally", url: "search.html?q="}
@@ -100,7 +108,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     test "renders search engine when only one is configured", context do
       config =
-        doc_config(context,
+        formatter_config(context,
           search: [
             %{name: "Default", help: "In-browser search", url: "search.html?q="}
           ]
@@ -113,7 +121,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
 
     test "text links to homepage_url when set", context do
-      content = Templates.sidebar_template(doc_config(context), :extra)
+      content = Templates.sidebar_template(formatter_config(context), :extra)
 
       assert content =~
                ~r"""
@@ -126,7 +134,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     end
 
     test "text links to main when there is no homepage_url" do
-      config = %ExDoc.Config{
+      config = %ExDoc.Formatter.Config{
         project: "Elixir",
         version: "1.0.1",
         main: "hello"
@@ -147,28 +155,28 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   describe "footer_template" do
     test "display built with footer by proglang option", context do
-      content = Templates.footer_template(doc_config(context, proglang: :erlang), nil)
+      content = Templates.footer_template(formatter_config(context, proglang: :erlang), nil)
 
       assert content =~
                ~r{<a href="https://erlang.org" title="Erlang" target="_blank" translate="no">Erlang programming language</a>}
 
-      content = Templates.footer_template(doc_config(context, proglang: :elixir), nil)
+      content = Templates.footer_template(formatter_config(context, proglang: :elixir), nil)
 
       assert content =~
                ~r{<a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>}
 
-      assert Templates.footer_template(doc_config(context, proglang: :elixir), nil) ==
-               Templates.footer_template(doc_config(context), nil)
+      assert Templates.footer_template(formatter_config(context, proglang: :elixir), nil) ==
+               Templates.footer_template(formatter_config(context), nil)
 
-      refute Templates.footer_template(doc_config(context, footer: false), nil) =~
+      refute Templates.footer_template(formatter_config(context, footer: false), nil) =~
                "Elixir programming language"
     end
   end
 
   describe "sidebar_items" do
-    test "includes api reference", context do
+    test "includes api reference" do
       names = [CompiledWithDocs]
-      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, retriever_config())
 
       assert [
                %{
@@ -182,9 +190,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert [] = create_sidebar_items(%{api_reference: false}, nodes, [], [])["extras"]
     end
 
-    test "outputs listing for the given nodes", context do
+    test "outputs listing for the given nodes" do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
-      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, retriever_config())
 
       assert [
                %{
@@ -211,9 +219,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              ] = create_sidebar_items(%{}, nodes, [], [])["modules"]
     end
 
-    test "outputs deprecated: true if node is deprecated", context do
+    test "outputs deprecated: true if node is deprecated" do
       names = [CompiledWithDocs]
-      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, retriever_config())
 
       path = ["modules", Access.at!(0), "nodeGroups", Access.at!(0), "nodes"]
 
@@ -226,9 +234,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              )
     end
 
-    test "outputs deprecated: true if module is deprecated", context do
+    test "outputs deprecated: true if module is deprecated" do
       names = [Warnings]
-      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, retriever_config())
 
       assert Enum.any?(
                create_sidebar_items(%{}, nodes, [], [])["modules"],
@@ -236,11 +244,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              )
     end
 
-    test "outputs nodes grouped based on metadata", context do
+    test "outputs nodes grouped based on metadata" do
       {nodes, []} =
         ExDoc.Retriever.docs_from_modules(
           [CompiledWithDocs, CompiledWithDocs.Nested],
-          doc_config(context,
+          retriever_config(
             group_for_doc: fn metadata ->
               cond do
                 metadata[:purpose] == :example -> "Example functions"
@@ -284,10 +292,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              ] = create_sidebar_items(%{}, nodes, [], [])["modules"]
     end
 
-    test "outputs module groups for the given nodes", context do
+    test "outputs module groups for the given nodes" do
       names = [CompiledWithDocs, CompiledWithDocs.Nested]
       group_mapping = [groups_for_modules: [Group: [CompiledWithDocs]]]
-      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context, group_mapping))
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, retriever_config(group_mapping))
 
       assert [
                %{"group" => ""},
@@ -299,10 +307,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              ] = create_sidebar_items(%{}, nodes, [], [])["modules"]
     end
 
-    test "builds sections out of moduledocs", context do
+    test "builds sections out of moduledocs" do
       names = [CompiledWithDocs, CompiledWithoutDocs, DuplicateHeadings]
-      config = doc_config(context)
-      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, config)
+      {nodes, []} = ExDoc.Retriever.docs_from_modules(names, retriever_config())
 
       [compiled_with_docs, compiled_without_docs, duplicate_headings] =
         create_sidebar_items(%{}, nodes, [], [])["modules"]

@@ -7,8 +7,6 @@ defmodule ExDoc.ExtrasTest do
 
   defp config(opts \\ []) do
     %ExDoc.Config{
-      project: "Elixir",
-      version: "1.0.0",
       groups_for_extras: Keyword.get(opts, :groups_for_extras, []),
       source_url_pattern: Keyword.get(opts, :source_url_pattern, fn _path, _line -> nil end)
     }

@@ -5,101 +5,37 @@ defmodule ExDoc.Config do
   @default_source_ref "main"
   def default_group_for_doc(metadata), do: metadata[:group]
   def filter_modules(_module, _metadata), do: true
-  def before_closing_head_tag(_), do: ""
-  def before_closing_footer_tag(_), do: ""
-  def before_closing_body_tag(_), do: ""
   def annotations_for_docs(_), do: []
-  def skip_undefined_reference_warnings_on(_string), do: false
-  def skip_code_autolink_to(_string), do: false
   def source_url_pattern(_, _), do: nil
 
-  defstruct annotations_for_docs: &__MODULE__.annotations_for_docs/1,
-            api_reference: true,
-            apps: [],
-            assets: %{},
-            authors: nil,
-            before_closing_body_tag: &__MODULE__.before_closing_body_tag/1,
-            before_closing_footer_tag: &__MODULE__.before_closing_footer_tag/1,
-            before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
-            canonical: nil,
-            cover: nil,
-            deps: [],
-            docs_groups: [],
-            extra_section: "Pages",
-            favicon: nil,
-            filtered_modules: [],
-            filter_modules: &__MODULE__.filter_modules/2,
-            footer: true,
-            formatters: [],
-            group_for_doc: &__MODULE__.default_group_for_doc/1,
-            groups_for_extras: [],
+  defstruct filter_modules: &__MODULE__.filter_modules/2,
             groups_for_modules: [],
-            homepage_url: nil,
-            language: "en",
-            logo: nil,
-            main: nil,
-            nest_modules_by_prefix: [],
-            output: "./doc",
-            package: nil,
-            proglang: :elixir,
-            project: nil,
-            redirects: %{},
-            search: [%{name: "Default", help: "In-browser search", url: "search.html?q="}],
-            skip_undefined_reference_warnings_on:
-              &__MODULE__.skip_undefined_reference_warnings_on/1,
-            skip_code_autolink_to: &__MODULE__.skip_code_autolink_to/1,
+            group_for_doc: &__MODULE__.default_group_for_doc/1,
+            annotations_for_docs: &__MODULE__.annotations_for_docs/1,
+            docs_groups: [],
             source_ref: @default_source_ref,
-            source_url: nil,
+            groups_for_extras: [],
             source_url_pattern: &__MODULE__.source_url_pattern/2,
-            title: nil,
-            version: nil
+            nest_modules_by_prefix: [],
+            proglang: :elixir
 
   @type t :: %__MODULE__{
-          annotations_for_docs: (map() -> list()),
-          api_reference: boolean(),
-          apps: [atom()],
-          assets: %{binary() => binary()},
-          authors: nil | [String.t()],
-          before_closing_body_tag: (atom() -> String.t()) | mfa() | map(),
-          before_closing_footer_tag: (atom() -> String.t()) | mfa() | map(),
-          before_closing_head_tag: (atom() -> String.t()) | mfa() | map(),
-          canonical: nil | String.t(),
-          cover: nil | Path.t(),
-          deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
-          docs_groups: [String.t()],
-          extra_section: String.t(),
-          favicon: nil | Path.t(),
-          filtered_modules: [atom()],
           filter_modules: (module, map -> boolean),
-          formatters: [String.t()],
-          group_for_doc: (keyword() -> String.t() | nil),
-          groups_for_extras: [{binary(), term()}],
           groups_for_modules: [{binary(), term()}],
-          homepage_url: nil | String.t(),
-          language: String.t(),
-          logo: nil | Path.t(),
-          main: nil | String.t(),
-          nest_modules_by_prefix: [String.t()],
-          output: Path.t(),
-          package: :atom | nil,
-          proglang: :elixir | :erlang,
-          project: nil | String.t(),
-          redirects: %{optional(String.t()) => String.t()} | [{String.t(), String.t()}],
-          search: [%{name: String.t(), help: String.t(), url: String.t()}],
-          skip_undefined_reference_warnings_on: (String.t() -> boolean),
-          skip_code_autolink_to: (String.t() -> boolean),
+          group_for_doc: (keyword() -> String.t() | nil),
+          annotations_for_docs: (map() -> list()),
+          docs_groups: [String.t()],
           source_ref: nil | String.t(),
-          source_url: nil | String.t(),
+          groups_for_extras: [{binary(), term()}],
           source_url_pattern: (String.t(), integer() -> String.t() | nil),
-          title: nil | String.t(),
-          version: nil | String.t()
+          nest_modules_by_prefix: [String.t()],
+          proglang: :elixir | :erlang
         }
 
-  def build(project, vsn, options) do
-    {output, options} = Keyword.pop(options, :output, "./doc")
-    {nest_modules_by_prefix, options} = Keyword.pop(options, :nest_modules_by_prefix, [])
+  def build(options) do
     {proglang, options} = Keyword.pop(options, :proglang, :elixir)
     {filter_modules, options} = Keyword.pop(options, :filter_modules, &filter_modules/2)
+    {nest_modules_by_prefix, options} = Keyword.pop(options, :nest_modules_by_prefix, [])
 
     options =
       if groups_for_functions = options[:groups_for_functions] do
@@ -120,22 +56,10 @@ defmodule ExDoc.Config do
     {default_group_for_doc, options} =
       Keyword.pop(options, :default_group_for_doc, &default_group_for_doc/1)
 
-    {skip_undefined_reference_warnings_on, options} =
-      Keyword.pop(
-        options,
-        :skip_undefined_reference_warnings_on,
-        &skip_undefined_reference_warnings_on/1
-      )
-
-    {skip_code_autolink_to, options} =
-      Keyword.pop(options, :skip_code_autolink_to, &skip_code_autolink_to/1)
-
     {source_url_pattern, options} =
       Keyword.pop_lazy(options, :source_url_pattern, fn ->
         guess_url(options[:source_url], options[:source_ref] || @default_source_ref)
       end)
-
-    {search, options} = Keyword.pop(options, :search, [])
 
     preconfig = %__MODULE__{
       filter_modules: normalize_filter_modules(filter_modules),
@@ -145,28 +69,24 @@ defmodule ExDoc.Config do
       groups_for_modules:
         normalize_groups(
           # TODO: The default module groups must be returned by the language
-          groups_for_modules ++ [Deprecated: &deprecated?/1, Exceptions: &exception?/1]
+          groups_for_modules ++
+            [Deprecated: &deprecated?/1, Exceptions: &exception?/1]
         ),
-      homepage_url: options[:homepage_url],
-      main: options[:main],
       nest_modules_by_prefix: normalize_nest_modules_by_prefix(nest_modules_by_prefix),
-      output: normalize_output(output),
       proglang: normalize_proglang(proglang),
-      project: project,
-      search: normalize_search(search),
-      skip_undefined_reference_warnings_on:
-        normalize_skip_list_function(skip_undefined_reference_warnings_on),
-      skip_code_autolink_to: normalize_skip_list_function(skip_code_autolink_to),
-      source_url_pattern: normalize_source_url_pattern(source_url_pattern),
-      version: vsn
+      source_url_pattern: normalize_source_url_pattern(source_url_pattern)
     }
 
-    struct(preconfig, options)
+    retriever_options =
+      Keyword.take(options, [
+        :source_ref,
+        :annotations_for_docs
+      ])
+
+    struct!(preconfig, retriever_options)
   end
 
-  defp normalize_output(output) do
-    String.trim_trailing(output, "/")
-  end
+  # Helper functions
 
   defp normalize_proglang(binary) when is_binary(binary) do
     binary |> String.to_atom() |> normalize_proglang()
@@ -179,6 +99,15 @@ defmodule ExDoc.Config do
   defp normalize_proglang(proglang) do
     raise ArgumentError, "#{inspect(proglang)} is not supported"
   end
+
+  defp normalize_filter_modules(string) when is_binary(string),
+    do: normalize_filter_modules(Regex.compile!(string))
+
+  defp normalize_filter_modules(%Regex{} = regex),
+    do: fn module, _ -> Atom.to_string(module) =~ regex end
+
+  defp normalize_filter_modules(fun) when is_function(fun, 2),
+    do: fun
 
   defp normalize_groups_for_docs(groups, default) do
     groups = normalize_groups(groups)
@@ -194,9 +123,6 @@ defmodule ExDoc.Config do
     for {k, v} <- groups, do: {to_string(k), v}
   end
 
-  defp deprecated?(metadata), do: metadata[:deprecated] != nil
-  defp exception?(metadata), do: metadata[:kind] == :exception
-
   defp normalize_nest_modules_by_prefix(nest_modules_by_prefix) do
     nest_modules_by_prefix
     |> Enum.map(&inspect_atoms/1)
@@ -207,20 +133,8 @@ defmodule ExDoc.Config do
   defp inspect_atoms(atom) when is_atom(atom), do: inspect(atom)
   defp inspect_atoms(binary) when is_binary(binary), do: binary
 
-  defp normalize_filter_modules(string) when is_binary(string),
-    do: normalize_filter_modules(Regex.compile!(string))
-
-  defp normalize_filter_modules(%Regex{} = regex),
-    do: fn module, _ -> Atom.to_string(module) =~ regex end
-
-  defp normalize_filter_modules(fun) when is_function(fun, 2),
-    do: fun
-
-  defp normalize_skip_list_function(strings) when is_list(strings),
-    do: &(&1 in strings)
-
-  defp normalize_skip_list_function(fun) when is_function(fun, 1),
-    do: fun
+  defp deprecated?(metadata), do: metadata[:deprecated] != nil
+  defp exception?(metadata), do: metadata[:kind] == :exception
 
   defp normalize_source_url_pattern(function) when is_function(function, 2), do: function
   defp normalize_source_url_pattern(nil), do: &source_url_pattern/2
@@ -305,72 +219,5 @@ defmodule ExDoc.Config do
       Application.load(app)
       {app, Application.spec(app, :modules)}
     end)
-  end
-
-  defp normalize_search([]) do
-    [%{name: "Default", help: "In-browser search", url: "search.html?q="}]
-  end
-
-  defp normalize_search(search) when is_list(search) do
-    Enum.map(search, fn
-      %{packages: _, url: _} ->
-        raise ArgumentError, "search must provide either :url or :packages, but not both"
-
-      %{url: url} = engine when not is_binary(url) ->
-        bad_search!(engine)
-
-      %{name: name, help: help} = engine
-      when is_binary(name) and is_binary(help) ->
-        engine
-        |> Map.delete(:packages)
-        |> Map.put_new_lazy(:url, fn ->
-          if packages = engine[:packages] do
-            "https://hexdocs.pm/?packages=#{normalize_package_search(packages)}&q="
-          else
-            "search.html?q="
-          end
-        end)
-
-      other ->
-        bad_search!(other)
-    end)
-  end
-
-  defp normalize_search(other) do
-    raise ArgumentError, "search must be a list of maps, got: #{inspect(other)}"
-  end
-
-  defp normalize_package_search([]) do
-    raise ArgumentError, ":packages requires a non-empty list"
-  end
-
-  defp normalize_package_search(packages) do
-    packages
-    |> Enum.map_join(",", fn
-      package when is_atom(package) ->
-        "#{package}:latest"
-
-      {package, version} when is_atom(package) and is_binary(version) ->
-        "#{package}:#{version}"
-
-      other ->
-        raise ArgumentError,
-              "entries in :packages must be either a package name or a package-version tuple, got: #{inspect(other)}"
-    end)
-    |> URI.encode_www_form()
-  end
-
-  defp bad_search!(other) do
-    raise ArgumentError,
-          """
-          search entries must be a map with:
-
-            * required :name as string
-            * required :help as string
-            * optional :url as a string
-            * optional :packages as a non-empty list of packages and versions
-
-          got: #{inspect(other)}
-          """
   end
 end

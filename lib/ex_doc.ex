@@ -20,16 +20,23 @@ defmodule ExDoc do
     retriever = Keyword.get(options, :retriever, ExDoc.Retriever)
     extras_input = Keyword.get(options, :extras, [])
 
-    config = ExDoc.Config.build(project, vsn, options)
+    # Build configs independently
+    retriever_config = ExDoc.Config.build(options)
+    formatter_config = ExDoc.Formatter.Config.build(project, vsn, options)
 
     if processor = options[:markdown_processor] do
       ExDoc.Markdown.put_markdown_processor(processor)
     end
 
-    {module_nodes, filtered_nodes} = retriever.docs_from_dir(source_beam, config)
-    extras = ExDoc.Extras.build(extras_input, config)
-    config = %{config | filtered_modules: filtered_nodes}
-    find_formatter(formatter).run(module_nodes, extras, config)
+    # Retriever phase
+    {module_nodes, filtered_nodes} = retriever.docs_from_dir(source_beam, retriever_config)
+    extras = ExDoc.Extras.build(extras_input, retriever_config)
+
+    # Update formatter config with runtime data
+    formatter_config = %{formatter_config | filtered_modules: filtered_nodes}
+
+    # Formatter phase
+    find_formatter(formatter).run(module_nodes, extras, formatter_config)
   end
 
   # Short path for programmatic interface

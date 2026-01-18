@@ -8,7 +8,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
   @doc """
   Generates Markdown documentation for the given modules.
   """
-  @spec run([ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) ::
+  @spec run([ExDoc.ModuleNode.t()], list(), ExDoc.Formatter.Config.t()) ::
           String.t()
   def run(project_nodes, extras, config) when is_map(config) do
     Utils.unset_warned()

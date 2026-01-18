@@ -56,8 +56,9 @@ defmodule ExDoc.Autolink do
     ext: ".html",
     current_kfa: nil,
     siblings: [],
-    skip_undefined_reference_warnings_on: &ExDoc.Config.skip_undefined_reference_warnings_on/1,
-    skip_code_autolink_to: &ExDoc.Config.skip_code_autolink_to/1,
+    skip_undefined_reference_warnings_on:
+      &ExDoc.Formatter.Config.skip_undefined_reference_warnings_on/1,
+    skip_code_autolink_to: &ExDoc.Formatter.Config.skip_code_autolink_to/1,
     force_module_prefix: nil,
     filtered_modules: [],
     warnings: :emit
