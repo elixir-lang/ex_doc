@@ -19,8 +19,7 @@ defmodule ExDoc.Formatter.HTML do
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
-    extras = Formatter.autolink_extras(extras, ".html", config)
-    project_nodes = Formatter.render_all(project_nodes, extras, ".html", config, [])
+    {project_nodes, extras} = Formatter.autolink(config, project_nodes, extras, extension: ".html")
 
     static_files = Formatter.generate_assets(".", default_assets(config), config)
     search_data = generate_search_data(project_nodes, extras, config)

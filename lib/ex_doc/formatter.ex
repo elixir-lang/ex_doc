@@ -2,10 +2,19 @@ defmodule ExDoc.Formatter do
   @moduledoc false
 
   @doc """
-  Autolinks and renders all docs.
+  Autolinks and renders all docs and extras.
+
+  Returns a tuple of `{project_nodes, extras}` where both have been autolinked and rendered.
   """
-  def render_all(project_nodes, extras, ext, config, opts \\ []) do
-    base = [
+  def autolink(config, nodes, extras, opts) do
+    {ext, highlight_opts} = Keyword.pop!(opts, :extension)
+    language =
+      case config.proglang do
+        :erlang -> ExDoc.Language.Erlang
+        _ -> ExDoc.Language.Elixir
+      end
+
+    base_opts = [
       apps: config.apps,
       deps: config.deps,
       ext: ext,
@@ -15,89 +24,77 @@ defmodule ExDoc.Formatter do
       filtered_modules: config.filtered_modules
     ]
 
-    project_nodes
-    |> Task.async_stream(
-      fn node ->
-        language = node.language
+    extras =
+      extras
+      |> Task.async_stream(
+        &autolink_extra(&1, language, base_opts, highlight_opts),
+        timeout: :infinity
+      )
+      |> Enum.map(fn {:ok, res} -> res end)
 
-        autolink_opts =
-          [
-            current_module: node.module,
-            file: node.moduledoc_file,
-            line: node.moduledoc_line,
-            module_id: node.id,
-            language: language
-          ] ++ base
+    # Render project nodes with autolinked extras
+    nodes =
+      nodes
+      |> Task.async_stream(
+        &autolink_node(&1, base_opts, highlight_opts),
+        timeout: :infinity
+      )
+      |> Enum.map(&elem(&1, 1))
 
-        docs_groups =
-          for group <- node.docs_groups do
-            docs =
-              for child_node <- group.docs do
-                id = id(node, child_node)
-
-                autolink_opts =
-                  autolink_opts ++
-                    [
-                      id: id,
-                      line: child_node.doc_line,
-                      file: child_node.doc_file,
-                      current_kfa: {child_node.type, child_node.name, child_node.arity}
-                    ]
-
-                specs =
-                  Enum.map(child_node.source_specs, &language.autolink_spec(&1, autolink_opts))
-
-                child_node = %{child_node | specs: specs}
-                render_doc(child_node, language, autolink_opts, opts)
-              end
-
-            %{render_doc(group, language, autolink_opts, opts) | docs: docs}
-          end
-
-        %{
-          render_doc(node, language, [{:id, node.id} | autolink_opts], opts)
-          | docs_groups: docs_groups
-        }
-      end,
-      timeout: :infinity
-    )
-    |> Enum.map(&elem(&1, 1))
-  end
-
-  @doc """
-  Autolinks extras.
-  """
-  def autolink_extras(extras, ext, config) do
-    language =
-      case config.proglang do
-        :erlang -> ExDoc.Language.Erlang
-        _ -> ExDoc.Language.Elixir
-      end
-
-    autolink_opts = [
-      apps: config.apps,
-      deps: config.deps,
-      ext: ext,
-      extras: extra_paths(extras),
-      language: language,
-      skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
-      skip_code_autolink_to: config.skip_code_autolink_to
-    ]
-
-    extras
-    |> Task.async_stream(
-      &autolink_extra(&1, language, autolink_opts, []),
-      timeout: :infinity
-    )
-    |> Enum.map(&elem(&1, 1))
+    {nodes, extras}
   end
 
   # Helper functions
 
-  defp render_doc(%{doc: nil} = node, _language, _autolink_opts, _opts),
+  defp autolink_node(node, base_opts, highlight_opts) do
+    language = node.language
+
+    autolink_opts =
+      [
+        current_module: node.module,
+        module_id: node.id,
+        language: language
+      ] ++ base_opts
+
+    docs_groups =
+      for group <- node.docs_groups do
+        docs =
+          for child_node <- group.docs do
+            child_opts =
+              [
+                id: id(node, child_node),
+                line: child_node.doc_line,
+                file: child_node.doc_file,
+                current_kfa: {child_node.type, child_node.name, child_node.arity}
+              ] ++ autolink_opts
+
+            specs =
+              Enum.map(child_node.source_specs, &language.autolink_spec(&1, child_opts))
+
+            child_node = %{child_node | specs: specs}
+            autolink_doc(child_node, language, child_opts, highlight_opts)
+          end
+
+        %{autolink_doc(group, language, autolink_opts, highlight_opts) | docs: docs}
+      end
+
+    module_opts =
+      [
+        id: node.id,
+        file: node.moduledoc_file,
+        line: node.moduledoc_line
+      ] ++ autolink_opts
+
+    %{
+      autolink_doc(node, language, module_opts, highlight_opts)
+      | docs_groups: docs_groups
+    }
+  end
+
+  defp autolink_doc(%{doc: nil} = node, _language, _autolink_opts, _opts),
     do: node
 
-  defp render_doc(%{doc: doc} = node, language, autolink_opts, opts) do
+  defp autolink_doc(%{doc: doc} = node, language, autolink_opts, opts) do
     doc = autolink_and_highlight(doc, language, autolink_opts, opts)
     %{node | doc: doc}
   end
@@ -114,7 +111,7 @@ defmodule ExDoc.Formatter do
          autolink_opts,
          opts
        ) do
-    autolink_opts = [file: source_path, id: id] ++ autolink_opts
+    autolink_opts = [file: source_path, id: id, language: language] ++ autolink_opts
     doc = autolink_and_highlight(doc, language, autolink_opts, opts)
     %{extra | doc: doc}
   end

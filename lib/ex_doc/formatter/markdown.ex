@@ -16,7 +16,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
-    extras = Formatter.autolink_extras(extras, ".md", config)
+    {_project_nodes, extras} = Formatter.autolink(config, project_nodes, extras, extension: ".md")
 
     {modules, tasks} =
       project_nodes

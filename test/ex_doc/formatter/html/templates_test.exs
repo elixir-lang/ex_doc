@@ -30,7 +30,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   defp get_module_template(names, context, config \\ []) do
     config = doc_config(context, config)
     {mods, []} = ExDoc.Retriever.docs_from_modules(names, config)
-    [mod | _] = Formatter.render_all(mods, [], ".html", config, [])
+    {[mod | _], _extras} = Formatter.autolink(config, mods, [], extension: ".html")
     Templates.module_template(config, mod)
   end
 
