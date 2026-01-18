@@ -1,12 +1,25 @@
 defmodule ExDoc.Formatter do
   @moduledoc false
 
-  @doc """
-  Autolinks and renders all docs and extras.
+  @doc false
+  def run(formatter, formatter_config, module_nodes, filtered_nodes, extras) do
+    if not Code.ensure_loaded?(formatter) do
+      raise "formatter module #{inspect(formatter)} not found"
+    end
 
-  Returns a tuple of `{project_nodes, extras}` where both have been autolinked and rendered.
-  """
-  def autolink(config, nodes, extras, opts) do
+    {module_nodes, extras} =
+      if function_exported?(formatter, :autolink_options, 0) do
+        autolink_opts = formatter.autolink_options()
+        autolink(formatter_config, module_nodes, filtered_nodes, extras, autolink_opts)
+      else
+        {module_nodes, extras}
+      end
+
+    formatter.run(module_nodes, extras, formatter_config)
+  end
+
+  @doc false
+  def autolink(config, nodes, filtered_nodes, extras, opts) do
     {ext, highlight_opts} = Keyword.pop!(opts, :extension)
 
     language =
@@ -22,7 +35,7 @@ defmodule ExDoc.Formatter do
       extras: extra_paths(extras),
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
       skip_code_autolink_to: config.skip_code_autolink_to,
-      filtered_modules: config.filtered_modules
+      filtered_modules: filtered_nodes
     ]
 
     extras =

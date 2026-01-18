@@ -11,7 +11,7 @@ defmodule ExDoc.Formatter.Config do
   defstruct output: "./doc",
             project: nil,
             version: nil,
-            main: nil,
+            main: "api-reference",
             api_reference: true,
             canonical: nil,
             redirects: %{},
@@ -37,7 +37,6 @@ defmodule ExDoc.Formatter.Config do
             # Autolink fields
             apps: [],
             deps: [],
-            filtered_modules: [],
             skip_undefined_reference_warnings_on:
               &__MODULE__.skip_undefined_reference_warnings_on/1,
             skip_code_autolink_to: &__MODULE__.skip_code_autolink_to/1
@@ -70,7 +69,6 @@ defmodule ExDoc.Formatter.Config do
           before_closing_footer_tag: (atom() -> String.t()) | mfa() | map(),
           apps: [atom()],
           deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
-          filtered_modules: [atom()],
           skip_undefined_reference_warnings_on: (String.t() -> boolean),
           skip_code_autolink_to: (String.t() -> boolean),
           proglang: :elixir | :erlang
@@ -137,7 +135,7 @@ defmodule ExDoc.Formatter.Config do
   # Helper functions
 
   defp normalize_output(output) do
-    String.trim_trailing(output, "/")
+    Path.expand(String.trim_trailing(output, "/"))
   end
 
   defp normalize_proglang(binary) when is_binary(binary) do

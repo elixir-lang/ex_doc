@@ -2,21 +2,10 @@ defmodule ExDoc.Formatter.MARKDOWN do
   @moduledoc false
 
   alias __MODULE__.{Templates}
-  alias ExDoc.Formatter
-  alias ExDoc.Utils
 
-  @doc """
-  Generates Markdown documentation for the given modules.
-  """
-  @spec run([ExDoc.ModuleNode.t()], list(), ExDoc.Formatter.Config.t()) ::
-          String.t()
   def run(project_nodes, extras, config) when is_map(config) do
-    Utils.unset_warned()
-
     build = Path.join(config.output, ".build")
     output_setup(build, config)
-
-    {_project_nodes, extras} = Formatter.autolink(config, project_nodes, extras, extension: ".md")
 
     {modules, tasks} =
       project_nodes

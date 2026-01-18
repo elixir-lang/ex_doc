@@ -46,21 +46,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     Keyword.merge(doc_config(context), config)
   end
 
-  test "normalizes options", %{tmp_dir: tmp_dir} = context do
-    # 1. Check for output dir having trailing "/" stripped
-    # 2. Check for default [main: "api-reference"]
-    generate_docs(
-      doc_config(context,
-        output: tmp_dir <> "/html//",
-        main: nil
-      )
-    )
-
-    content = File.read!(tmp_dir <> "/html/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=api-reference.html">}
-    assert File.regular?(tmp_dir <> "/html/api-reference.html")
-
-    # 3. main as index is not allowed
+  test "validates options", context do
     config = doc_config(context, main: "index")
 
     assert_raise ArgumentError,

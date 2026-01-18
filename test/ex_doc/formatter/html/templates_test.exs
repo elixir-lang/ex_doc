@@ -35,11 +35,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   end
 
   defp get_module_template(names, context, config \\ []) do
-    fconfig = formatter_config(context, config)
-    rconfig = retriever_config(config)
-    {mods, []} = ExDoc.Retriever.docs_from_modules(names, rconfig)
-    {[mod | _], _extras} = Formatter.autolink(fconfig, mods, [], extension: ".html")
-    Templates.module_template(fconfig, mod)
+    formatter_config = formatter_config(context, config)
+    retriever_config = retriever_config(config)
+    {mods, []} = ExDoc.Retriever.docs_from_modules(names, retriever_config)
+    {[mod | _], _extras} = Formatter.autolink(formatter_config, mods, [], [], extension: ".html")
+    Templates.module_template(formatter_config, mod)
   end
 
   setup %{tmp_dir: tmp_dir} do

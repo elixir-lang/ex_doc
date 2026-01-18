@@ -38,7 +38,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     {mods, []} = ExDoc.Retriever.docs_from_modules(names, rconfig)
 
     {[mod | _], _extras} =
-      Formatter.autolink(fconfig, mods, [], extension: ".xhtml", highlight_tag: "samp")
+      Formatter.autolink(fconfig, mods, [], [], extension: ".xhtml", highlight_tag: "samp")
 
     Templates.module_template(fconfig, mod)
   end

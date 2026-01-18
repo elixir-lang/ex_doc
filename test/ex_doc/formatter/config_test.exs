@@ -12,13 +12,13 @@ defmodule ExDoc.Formatter.ConfigTest do
     opts_with_output = &[source_beam: "beam_dir", output: &1]
 
     config = build(opts_with_output.("test/tmp/ex_doc"))
-    assert config.output == "test/tmp/ex_doc"
+    assert config.output == Path.expand("test/tmp/ex_doc")
 
     config = build(opts_with_output.("test/tmp/ex_doc/"))
-    assert config.output == "test/tmp/ex_doc"
+    assert config.output == Path.expand("test/tmp/ex_doc")
 
     config = build(opts_with_output.("test/tmp/ex_doc//"))
-    assert config.output == "test/tmp/ex_doc"
+    assert config.output == Path.expand("test/tmp/ex_doc")
   end
 
   test "normalizes skip_undefined_reference_warnings_on" do

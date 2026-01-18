@@ -70,16 +70,10 @@ defmodule ExDocTest do
   test "formatter module not found" do
     project = "Elixir"
     version = "1"
-
-    options = [
-      apps: [:test_app],
-      formatter: "pdf",
-      retriever: IdentityRetriever,
-      source_beam: "beam_dir"
-    ]
+    options = [formatter: "pdf", retriever: IdentityRetriever]
 
     assert_raise RuntimeError,
-                 "formatter module \"pdf\" not found",
+                 "formatter module ExDoc.Formatter.PDF not found",
                  fn -> ExDoc.generate_docs(project, version, options) end
   end
 

@@ -6,24 +6,20 @@ defmodule ExDoc.Formatter.EPUB do
   alias __MODULE__.{Assets, Templates}
   alias ExDoc.{Formatter, Utils}
 
+  @doc false
+  def autolink_options do
+    [extension: ".xhtml", highlight_tag: "samp"]
+  end
+
   @doc """
   Generates EPUB documentation for the given modules.
   """
-  @spec run([ExDoc.ModuleNode.t()], list(), ExDoc.Formatter.Config.t()) ::
-          String.t()
   def run(project_nodes, extras, config) when is_map(config) do
     config = normalize_config(config)
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
-    {project_nodes, extras} =
-      Formatter.autolink(config, project_nodes, extras,
-        extension: ".xhtml",
-        highlight_tag: "samp"
-      )
-
     {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
-
     static_files = Formatter.generate_assets("OEBPS", default_assets(config), config)
     Formatter.generate_logo(@assets_dir, config)
     Formatter.generate_cover(@assets_dir, config)
@@ -41,11 +37,7 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp normalize_config(config) do
-    output =
-      config.output
-      |> Path.expand()
-      |> Path.join("#{config.project}")
-
+    output = Path.join(config.output, "#{config.project}")
     %{config | output: output}
   end
 

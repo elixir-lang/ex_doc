@@ -4,23 +4,22 @@ defmodule ExDoc.Formatter.HTML do
   alias __MODULE__.{Assets, Templates, SearchData}
   alias ExDoc.{Formatter, Utils}
 
-  @main "api-reference"
   @assets_dir "assets"
 
-  @doc """
-  Generates HTML documentation for the given modules.
-  """
-  @spec run([ExDoc.ModuleNode.t()], list(), ExDoc.Formatter.Config.t()) ::
-          String.t()
+  def autolink_options do
+    [extension: ".html"]
+  end
+
   def run(project_nodes, extras, config) when is_map(config) do
-    config = normalize_config(config)
+    if config.main == "index" do
+      raise ArgumentError,
+            ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
+    end
+
     config = %{config | output: Path.expand(config.output)}
 
     build = Path.join(config.output, ".build")
     output_setup(build, config)
-
-    {project_nodes, extras} =
-      Formatter.autolink(config, project_nodes, extras, extension: ".html")
 
     static_files = Formatter.generate_assets(".", default_assets(config), config)
     search_data = generate_search_data(project_nodes, extras, config)
@@ -43,15 +42,6 @@ defmodule ExDoc.Formatter.HTML do
 
     generate_build(all_files, build)
     config.output |> Path.join("index.html") |> Path.relative_to_cwd()
-  end
-
-  defp normalize_config(%{main: "index"}) do
-    raise ArgumentError,
-      message: ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
-  end
-
-  defp normalize_config(%{main: main} = config) do
-    %{config | main: main || @main}
   end
 
   defp output_setup(build, config) do

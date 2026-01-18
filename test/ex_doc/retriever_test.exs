@@ -5,7 +5,7 @@ defmodule ExDoc.RetrieverTest do
 
   @moduletag :tmp_dir
 
-  describe "docs_from_modules/2: Generic" do
+  describe "docs_from_modules/2: generic" do
     test "module with no docs", c do
       elixirc(c, ~S"""
       defmodule A do
