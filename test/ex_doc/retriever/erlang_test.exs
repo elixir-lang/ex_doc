@@ -74,7 +74,7 @@ defmodule ExDoc.Retriever.ErlangTest do
                typespecs: []
              } = mod
 
-      assert DocAST.to_string(mod.doc) =~ "mod docs."
+      assert DocAST.to_html(mod.doc) =~ "mod docs."
       assert moduledoc_file =~ "mod.erl"
 
       assert %ExDoc.DocNode{
@@ -93,7 +93,7 @@ defmodule ExDoc.Retriever.ErlangTest do
                type: :function
              } = function1
 
-      assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
+      assert DocAST.to_html(function1.doc) =~ "function1/0 docs."
 
       assert function1.doc_file =~ "mod.erl"
 
@@ -104,12 +104,12 @@ defmodule ExDoc.Retriever.ErlangTest do
 
       %ExDoc.DocNode{id: "function2/1"} = function2
 
-      assert DocAST.to_string(function2.doc) =~ "function2/1 docs."
+      assert DocAST.to_html(function2.doc) =~ "function2/1 docs."
       assert function2.source_specs == []
 
       %ExDoc.DocNode{id: "equiv_function2/0"} = equiv_function2
 
-      assert DocAST.to_string(equiv_function2.doc) =~
+      assert DocAST.to_html(equiv_function2.doc) =~
                ~r'Equivalent to <a href="`function2/1`"><code[^>]+>function2\(\[\{test, args\}\]\).*\.'
     end
 
@@ -173,7 +173,7 @@ defmodule ExDoc.Retriever.ErlangTest do
                type: :behaviour
              } = mod
 
-      assert DocAST.to_string(mod.doc) =~ "mod docs."
+      assert DocAST.to_html(mod.doc) =~ "mod docs."
       assert moduledoc_file =~ "moduledoc.hrl"
 
       assert %ExDoc.DocNode{
@@ -192,7 +192,7 @@ defmodule ExDoc.Retriever.ErlangTest do
                type: :function
              } = function
 
-      assert DocAST.to_string(function.doc) =~ "function/0 docs."
+      assert DocAST.to_html(function.doc) =~ "function/0 docs."
 
       assert function.doc_file =~ "doc.hrl"
 
@@ -202,7 +202,7 @@ defmodule ExDoc.Retriever.ErlangTest do
                source_url: "callback.hrl:322"
              } = callback
 
-      assert DocAST.to_string(callback.doc) =~ "callback foo/0 docs."
+      assert DocAST.to_html(callback.doc) =~ "callback foo/0 docs."
       assert callback.doc_file =~ "callbackdoc.hrl"
 
       assert %ExDoc.DocNode{
@@ -211,7 +211,7 @@ defmodule ExDoc.Retriever.ErlangTest do
                source_url: "type.hrl:433"
              } = type
 
-      assert DocAST.to_string(type.doc) =~ "type foo/0 docs."
+      assert DocAST.to_html(type.doc) =~ "type foo/0 docs."
       assert type.doc_file =~ "typedoc.hrl"
     end
 
@@ -251,7 +251,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert callback1.type == :callback
       assert callback1.annotations == []
       assert callback1.group == "Callbacks"
-      assert DocAST.to_string(callback1.doc) =~ "callback1/0 docs."
+      assert DocAST.to_html(callback1.doc) =~ "callback1/0 docs."
       assert Path.basename(callback1.source_url) == "mod.erl:4"
 
       assert Erlang.autolink_spec(hd(callback1.source_specs),
@@ -264,7 +264,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert equiv_callback1.annotations == []
       assert equiv_callback1.group == "Callbacks"
 
-      assert DocAST.to_string(equiv_callback1.doc) =~
+      assert DocAST.to_html(equiv_callback1.doc) =~
                ~r'Equivalent to <a href="`c:callback1/0`"><code[^>]+>callback1().*\.'
 
       assert Path.basename(equiv_callback1.source_url) == "mod.erl:7"
@@ -300,7 +300,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert opaque1.type == :opaque
       assert opaque1.group == "Types"
       assert opaque1.signature == "opaque1()"
-      assert opaque1.doc |> DocAST.to_string() =~ "opaque1/0 docs."
+      assert opaque1.doc |> DocAST.to_html() =~ "opaque1/0 docs."
 
       assert hd(opaque1.source_specs) |> Erlang.autolink_spec(current_kfa: {:type, :opaque1, 0}) ==
                "opaque1()"
@@ -309,7 +309,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert nominal1.type == @nominal_type
       assert nominal1.group == "Types"
       assert nominal1.signature == "nominal1()"
-      assert nominal1.doc |> DocAST.to_string() =~ "nominal1/0 docs."
+      assert nominal1.doc |> DocAST.to_html() =~ "nominal1/0 docs."
 
       assert hd(nominal1.source_specs) |> Erlang.autolink_spec(current_kfa: {:type, :nominal1, 0}) ==
                "nominal1() :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
@@ -318,7 +318,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert type1.type == :type
       assert type1.group == "Types"
       assert type1.signature == "type1()"
-      assert type1.doc |> DocAST.to_string() =~ "type1/0 docs."
+      assert type1.doc |> DocAST.to_html() =~ "type1/0 docs."
 
       assert hd(type1.source_specs) |> Erlang.autolink_spec(current_kfa: {:type, :type1, 0}) ==
                "type1() :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
@@ -327,7 +327,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert equiv_type1.type == :type
       assert equiv_type1.group == "Types"
       assert equiv_type1.signature == "equiv_type1()"
-      assert equiv_type1.doc |> DocAST.to_string() =~ ~r'Equivalent to .*t:type1/1.*\.'
+      assert equiv_type1.doc |> DocAST.to_html() =~ ~r'Equivalent to .*t:type1/1.*\.'
     end
 
     test "records", c do
@@ -418,7 +418,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         typespecs: []
       } = mod
 
-      assert DocAST.to_string(mod.doc) =~ "mod docs."
+      assert DocAST.to_html(mod.doc) =~ "mod docs."
 
       %ExDoc.DocNode{
         annotations: [],
@@ -436,7 +436,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         type: :function
       } = function1
 
-      assert DocAST.to_string(function1.doc) =~ "function1/0 docs."
+      assert DocAST.to_html(function1.doc) =~ "function1/0 docs."
 
       assert Erlang.autolink_spec(hd(function1.source_specs),
                current_kfa: {:function, :function1, 0}
@@ -447,7 +447,7 @@ defmodule ExDoc.Retriever.ErlangTest do
         id: "function2/0"
       } = function2
 
-      assert DocAST.to_string(function2.doc) =~ "function2/0 docs."
+      assert DocAST.to_html(function2.doc) =~ "function2/0 docs."
       assert function2.source_specs == []
     end
 
@@ -484,7 +484,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert callback1.id == "c:callback1/0"
       assert callback1.type == :callback
       assert callback1.annotations == []
-      assert DocAST.to_string(callback1.doc) =~ "callback1/0 docs."
+      assert DocAST.to_html(callback1.doc) =~ "callback1/0 docs."
       assert Path.basename(callback1.source_url) == "mod.erl:4"
 
       assert Erlang.autolink_spec(hd(callback1.source_specs),
@@ -519,7 +519,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert opaque1.id == "t:opaque1/0"
       assert opaque1.type == :opaque
       assert opaque1.signature == "opaque1/0"
-      assert opaque1.doc |> DocAST.to_string() =~ "opaque1/0 docs."
+      assert opaque1.doc |> DocAST.to_html() =~ "opaque1/0 docs."
 
       assert hd(opaque1.source_specs) |> Erlang.autolink_spec(current_kfa: {:type, :opaque1, 0}) ==
                "opaque1()"
@@ -528,7 +528,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert nominal1.type == @nominal_type
       assert nominal1.group == "Types"
       assert nominal1.signature == "nominal1/0"
-      assert nominal1.doc |> DocAST.to_string() =~ "nominal1/0 docs."
+      assert nominal1.doc |> DocAST.to_html() =~ "nominal1/0 docs."
 
       assert hd(nominal1.source_specs) |> Erlang.autolink_spec(current_kfa: {:type, :nominal1, 0}) ==
                "nominal1() :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."
@@ -536,7 +536,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert type1.id == "t:type1/0"
       assert type1.type == :type
       assert type1.signature == "type1/0"
-      assert type1.doc |> DocAST.to_string() =~ "type1/0 docs."
+      assert type1.doc |> DocAST.to_html() =~ "type1/0 docs."
 
       assert hd(type1.source_specs) |> Erlang.autolink_spec(current_kfa: {:type, :type1, 0}) ==
                "type1() :: <a href=\"https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0\">atom</a>()."

@@ -3,7 +3,7 @@
 
 <div id="top-content">
   <div class="heading-with-actions top-heading">
-    <h1><%= ExDoc.DocAST.to_string(node.title_doc) %></h1>
+    <h1><%= ExDoc.DocAST.to_html(node.title_doc) %></h1>
     <%= if node.type == :cheatmd do %>
       <button onclick="window.print()" title="Print Cheatsheet" class="icon-action" rel="print">
         <i class="ri-printer-line" aria-hidden="true"></i>

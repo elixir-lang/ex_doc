@@ -10,7 +10,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   alias ExDoc.Formatter.EPUB.Assets
 
   # The actual rendering happens here
-  defp render_doc(ast), do: ast && ExDoc.DocAST.to_string(ast)
+  defp render_doc(ast), do: ast && ExDoc.DocAST.to_html(ast)
 
   @doc """
   Generated ID for static file.

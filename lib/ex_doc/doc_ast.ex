@@ -1,5 +1,3 @@
-import Kernel, except: [to_string: 1]
-
 defmodule ExDoc.DocAST do
   # General helpers for dealing with the documentation AST
   # (which is the Markdown -> HTML AST).
@@ -31,9 +29,9 @@ defmodule ExDoc.DocAST do
     meta param source track wbr)a
 
   @doc """
-  Transform AST into string.
+  Transform AST into HTML string.
   """
-  def to_string(binary) do
+  def to_html(binary) do
     IO.iodata_to_binary(to_iodata(binary))
   end
 
@@ -165,7 +163,7 @@ defmodule ExDoc.DocAST do
           inner
       end
 
-    to_string({:p, [], remove_ids(inner), meta})
+    to_html({:p, [], remove_ids(inner), meta})
   end
 
   def synopsis([head | _]), do: synopsis(head)
@@ -255,7 +253,7 @@ defmodule ExDoc.DocAST do
                 ExDoc.Utils.warn(
                   [
                     "crashed while highlighting #{lang} snippet:\n\n",
-                    ExDoc.DocAST.to_string(ast),
+                    ExDoc.DocAST.to_html(ast),
                     "\n\n",
                     Exception.format_banner(:error, exception, __STACKTRACE__)
                   ],

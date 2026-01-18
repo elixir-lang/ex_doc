@@ -55,7 +55,7 @@ defmodule ExDoc.DocASTTest do
 
       ast = DocAST.parse!(markdown, "text/markdown")
 
-      assert DocAST.to_string(ast) ==
+      assert DocAST.to_html(ast) ==
                ~s{<p>foo <strong>bar</strong> baz</p>}
     end
 
@@ -67,20 +67,20 @@ defmodule ExDoc.DocASTTest do
 
       ast = DocAST.parse!(markdown, "text/markdown")
 
-      assert DocAST.to_string(ast) ==
+      assert DocAST.to_html(ast) ==
                ~s{<p>hello</p><!-- HTML -->}
     end
 
     test "escape" do
       markdown = "foo > bar"
       ast = DocAST.parse!(markdown, "text/markdown")
-      assert DocAST.to_string(ast) == ~s{<p>foo &gt; bar</p>}
+      assert DocAST.to_html(ast) == ~s{<p>foo &gt; bar</p>}
     end
 
     test "raw html" do
       markdown = "<strong><em>bar</em></strong>"
       ast = DocAST.parse!(markdown, "text/markdown")
-      assert DocAST.to_string(ast) == ~s{<strong><em>bar</em></strong>}
+      assert DocAST.to_html(ast) == ~s{<strong><em>bar</em></strong>}
     end
 
     test "empty" do
@@ -92,7 +92,7 @@ defmodule ExDoc.DocASTTest do
       """
 
       ast = DocAST.parse!(markdown, "text/markdown")
-      assert DocAST.to_string(ast) == ~s{<span><i></i>\n<i></i></span>}
+      assert DocAST.to_html(ast) == ~s{<span><i></i>\n<i></i></span>}
     end
 
     test "void elements" do
@@ -103,7 +103,7 @@ defmodule ExDoc.DocASTTest do
 
       ast = DocAST.parse!(markdown, "text/markdown")
 
-      assert DocAST.to_string(ast) == ~s{<p>foo<br/>bar</p>}
+      assert DocAST.to_html(ast) == ~s{<p>foo<br/>bar</p>}
     end
   end
 
@@ -231,7 +231,7 @@ defmodule ExDoc.DocASTTest do
       markdown
       |> DocAST.parse!("text/markdown")
       |> DocAST.highlight(ExDoc.Language.Elixir)
-      |> DocAST.to_string()
+      |> DocAST.to_html()
     end
   end
 

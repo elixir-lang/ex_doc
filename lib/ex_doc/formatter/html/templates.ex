@@ -166,7 +166,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def render_doc(ast) do
     ast
     |> add_fancy_anchors()
-    |> ExDoc.DocAST.to_string()
+    |> ExDoc.DocAST.to_html()
   end
 
   defp add_fancy_anchors(ast) do

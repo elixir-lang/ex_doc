@@ -707,7 +707,7 @@ defmodule ExDoc.Language.ElixirTest do
     |> ExDoc.Markdown.to_ast([])
     |> ExDoc.Language.Elixir.autolink_doc(Keyword.merge(@default_options, options))
     |> then(fn [{:p, _, content, _}] -> content end)
-    |> ExDoc.DocAST.to_string()
+    |> ExDoc.DocAST.to_html()
   end
 
   defp warn(fun) when is_function(fun, 0) do

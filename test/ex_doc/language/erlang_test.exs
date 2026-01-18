@@ -938,7 +938,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     doc
     |> ExDoc.Language.Erlang.autolink_doc(opts)
-    |> ExDoc.DocAST.to_string()
+    |> ExDoc.DocAST.to_html()
   end
 
   defp warn(fun, md \\ []) when is_function(fun, 0) do

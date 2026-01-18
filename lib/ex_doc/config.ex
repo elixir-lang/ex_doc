@@ -1,4 +1,5 @@
 defmodule ExDoc.Config do
+  # Config used by retriever and extras
   @moduledoc false
 
   # Defaults

@@ -41,7 +41,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                annotations: [:public]
              } = mod
 
-      assert DocAST.to_string(mod.doc) == "<p>Mod docs.</p>"
+      assert DocAST.to_html(mod.doc) == "<p>Mod docs.</p>"
       assert %DocGroupNode{docs: [empty_doc_and_specs, function, macro]} = functions_group
 
       assert %ExDoc.DocNode{
@@ -59,7 +59,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                type: :function
              } = function
 
-      assert DocAST.to_string(function.doc) == "<p>function/0 docs.</p>"
+      assert DocAST.to_html(function.doc) == "<p>function/0 docs.</p>"
       assert Macro.to_string(spec) == "function() :: atom()"
 
       assert %ExDoc.DocNode{
@@ -71,7 +71,7 @@ defmodule ExDoc.Retriever.ElixirTest do
                type: :macro
              } = macro
 
-      assert DocAST.to_string(macro.doc) == "<p>macro/0 docs.</p>"
+      assert DocAST.to_html(macro.doc) == "<p>macro/0 docs.</p>"
       assert Macro.to_string(spec) == "macro() :: Macro.t()"
 
       assert %ExDoc.DocNode{
@@ -143,7 +143,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert callback1.doc_line == 2
       assert callback1.group == "Callbacks"
       assert Path.basename(callback1.source_url) == "nofile:3"
-      assert DocAST.to_string(callback1.doc) == "<p>callback1/0 docs.</p>"
+      assert DocAST.to_html(callback1.doc) == "<p>callback1/0 docs.</p>"
       assert Macro.to_string(callback1.source_specs) == "[callback1() :: :ok]"
 
       assert optional_callback1.id == "c:optional_callback1/0"
@@ -187,12 +187,12 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert callback1.type == :function
       assert callback1.annotations == []
 
-      assert callback1.doc |> DocAST.to_string() ==
+      assert callback1.doc |> DocAST.to_html() ==
                ~s|<p>Callback implementation for <code class="inline">c:Mod.callback1/0</code>.</p>|
 
       assert optional_callback1.id == "optional_callback1/0"
       assert optional_callback1.type == :function
-      assert optional_callback1.doc |> DocAST.to_string() == ~s|<p>optional_callback1/0 docs.</p>|
+      assert optional_callback1.doc |> DocAST.to_html() == ~s|<p>optional_callback1/0 docs.</p>|
     end
 
     test "types", c do
@@ -215,7 +215,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert type1.group == "Types"
       assert type1.annotations == []
       assert type1.doc_line == 2
-      assert DocAST.to_string(type1.doc) == "<p>type1/0 docs.</p>"
+      assert DocAST.to_html(type1.doc) == "<p>type1/0 docs.</p>"
       assert hd(type1.source_specs) |> Macro.to_string() == "type1() :: atom()"
 
       assert opaque1.id == "t:opaque1/0"
@@ -223,7 +223,7 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert opaque1.type == :opaque
       assert opaque1.group == "Types"
       assert opaque1.doc_line == 5
-      assert opaque1.doc |> DocAST.to_string() == ~s|<p>opaque1/0 docs.</p>|
+      assert opaque1.doc |> DocAST.to_html() == ~s|<p>opaque1/0 docs.</p>|
       assert hd(opaque1.source_specs) |> Macro.to_string() == "opaque1()"
     end
 
