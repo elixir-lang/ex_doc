@@ -17,7 +17,10 @@ defmodule ExDoc.Formatter.EPUB do
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
     {project_nodes, extras} =
-      Formatter.autolink(config, project_nodes, extras, extension: ".xhtml", highlight_tag: "samp")
+      Formatter.autolink(config, project_nodes, extras,
+        extension: ".xhtml",
+        highlight_tag: "samp"
+      )
 
     {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
 

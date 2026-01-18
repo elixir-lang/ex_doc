@@ -48,16 +48,16 @@ defmodule ExDoc.Extras do
   end
 
   @doc """
-  Builds extras from config.
+  Builds extras from the given extras input and config.
 
   Does not perform autolinking.
   """
-  def build(config) do
+  def build(extras_input, config) do
     groups = config.groups_for_extras
     source_url_pattern = config.source_url_pattern
 
     extras =
-      config.extras
+      extras_input
       |> Enum.map(&build_extra(&1, groups, source_url_pattern))
 
     ids_count = Enum.reduce(extras, %{}, &Map.update(&2, &1.id, 1, fn c -> c + 1 end))

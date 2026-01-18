@@ -26,12 +26,10 @@ defmodule ExDoc.Config do
             deps: [],
             docs_groups: [],
             extra_section: "Pages",
-            extras: [],
             favicon: nil,
             filtered_modules: [],
             filter_modules: &__MODULE__.filter_modules/2,
             footer: true,
-            formatter: "html",
             formatters: [],
             group_for_doc: &__MODULE__.default_group_for_doc/1,
             groups_for_extras: [],
@@ -46,18 +44,15 @@ defmodule ExDoc.Config do
             proglang: :elixir,
             project: nil,
             redirects: %{},
-            retriever: ExDoc.Retriever,
             search: [%{name: "Default", help: "In-browser search", url: "search.html?q="}],
             skip_undefined_reference_warnings_on:
               &__MODULE__.skip_undefined_reference_warnings_on/1,
             skip_code_autolink_to: &__MODULE__.skip_code_autolink_to/1,
-            source_beam: nil,
             source_ref: @default_source_ref,
             source_url: nil,
             source_url_pattern: &__MODULE__.source_url_pattern/2,
             title: nil,
-            version: nil,
-            warnings_as_errors: false
+            version: nil
 
   @type t :: %__MODULE__{
           annotations_for_docs: (map() -> list()),
@@ -73,11 +68,9 @@ defmodule ExDoc.Config do
           deps: [{ebin_path :: String.t(), doc_url :: String.t()}],
           docs_groups: [String.t()],
           extra_section: String.t(),
-          extras: list(),
           favicon: nil | Path.t(),
           filtered_modules: [atom()],
           filter_modules: (module, map -> boolean),
-          formatter: nil | String.t(),
           formatters: [String.t()],
           group_for_doc: (keyword() -> String.t() | nil),
           groups_for_extras: [{binary(), term()}],
@@ -89,19 +82,17 @@ defmodule ExDoc.Config do
           nest_modules_by_prefix: [String.t()],
           output: Path.t(),
           package: :atom | nil,
+          proglang: :elixir | :erlang,
           project: nil | String.t(),
           redirects: %{optional(String.t()) => String.t()} | [{String.t(), String.t()}],
-          retriever: atom(),
           search: [%{name: String.t(), help: String.t(), url: String.t()}],
           skip_undefined_reference_warnings_on: (String.t() -> boolean),
           skip_code_autolink_to: (String.t() -> boolean),
-          source_beam: nil | String.t(),
           source_ref: nil | String.t(),
           source_url: nil | String.t(),
           source_url_pattern: (String.t(), integer() -> String.t() | nil),
           title: nil | String.t(),
-          version: nil | String.t(),
-          warnings_as_errors: boolean()
+          version: nil | String.t()
         }
 
   def build(project, vsn, options) do

@@ -8,6 +8,7 @@ defmodule ExDoc.Formatter do
   """
   def autolink(config, nodes, extras, opts) do
     {ext, highlight_opts} = Keyword.pop!(opts, :extension)
+
     language =
       case config.proglang do
         :erlang -> ExDoc.Language.Erlang

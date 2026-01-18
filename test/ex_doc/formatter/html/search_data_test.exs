@@ -210,8 +210,8 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       "Elixir": [url: "https://elixir-lang.org"]
     ]
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: extras}
-    [item1, item2] = search_data([], config)["items"]
+    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    [item1, item2] = search_data([], config, extras)["items"]
 
     assert item1["ref"] == "readme.html"
     assert item1["type"] == "extras"
@@ -241,8 +241,8 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     Section _1_ content.
     """)
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: [readme_path]}
-    [item1, item2] = search_data([], config)["items"]
+    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    [item1, item2] = search_data([], config, [readme_path])["items"]
 
     assert item1["ref"] == "readme.html"
     assert item1["type"] == "extras"
@@ -290,8 +290,8 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
        ]}
     ]
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: extras}
-    [item1, item2] = search_data([], config)["items"]
+    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    [item1, item2] = search_data([], config, extras)["items"]
 
     assert item1["ref"] == "readme.html"
     assert item1["type"] == "custom"
@@ -304,10 +304,9 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     assert item2["doc"] == "Some longer text!\n\nHere it is :)"
   end
 
-  defp search_data(modules, config) do
+  defp search_data(modules, config, extras_input \\ []) do
     {modules, []} = ExDoc.Retriever.docs_from_modules(modules, config)
-    extras = ExDoc.Extras.build(config)
-
+    extras = ExDoc.Extras.build(extras_input, config)
     ExDoc.Formatter.HTML.run(modules, extras, config)
     [path] = Path.wildcard(Path.join([config.output, "dist", "search_data-*.js"]))
     "searchData=" <> json = File.read!(path)

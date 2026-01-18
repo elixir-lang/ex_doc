@@ -15,16 +15,21 @@ defmodule ExDoc do
   @spec generate_docs(String.t(), String.t(), Keyword.t()) :: atom
   def generate_docs(project, vsn, options)
       when is_binary(project) and is_binary(vsn) and is_list(options) do
+    formatter = Keyword.get(options, :formatter, "html")
+    source_beam = Keyword.get(options, :source_beam)
+    retriever = Keyword.get(options, :retriever, ExDoc.Retriever)
+    extras_input = Keyword.get(options, :extras, [])
+
     config = ExDoc.Config.build(project, vsn, options)
 
     if processor = options[:markdown_processor] do
       ExDoc.Markdown.put_markdown_processor(processor)
     end
 
-    {module_nodes, filtered_nodes} = config.retriever.docs_from_dir(config.source_beam, config)
-    extras = ExDoc.Extras.build(config)
+    {module_nodes, filtered_nodes} = retriever.docs_from_dir(source_beam, config)
+    extras = ExDoc.Extras.build(extras_input, config)
     config = %{config | filtered_modules: filtered_nodes}
-    find_formatter(config.formatter).run(module_nodes, extras, config)
+    find_formatter(formatter).run(module_nodes, extras, config)
   end
 
   # Short path for programmatic interface

@@ -5,19 +5,17 @@ defmodule ExDoc.ExtrasTest do
 
   alias ExDoc.Extras
 
-  defp config(opts) do
-    config = %ExDoc.Config{
+  defp config(opts \\ []) do
+    %ExDoc.Config{
       project: "Elixir",
       version: "1.0.0",
-      extras: Keyword.get(opts, :extras, []),
       groups_for_extras: Keyword.get(opts, :groups_for_extras, []),
       source_url_pattern: Keyword.get(opts, :source_url_pattern, fn _path, _line -> nil end)
     }
-
-    struct!(config, opts)
+    |> struct!(opts)
   end
 
-  describe "build/1" do
+  describe "build/2" do
     test "builds extras from markdown files", %{tmp_dir: tmp_dir} do
       File.write!("#{tmp_dir}/readme.md", """
       # README
@@ -25,8 +23,9 @@ defmodule ExDoc.ExtrasTest do
       This is a readme file.
       """)
 
-      config = config(extras: ["#{tmp_dir}/readme.md"])
-      [extra] = Extras.build(config)
+      extras = ["#{tmp_dir}/readme.md"]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert %Extras.Page{} = extra
       assert extra.id == "readme"
@@ -42,8 +41,9 @@ defmodule ExDoc.ExtrasTest do
       A livebook file.
       """)
 
-      config = config(extras: ["#{tmp_dir}/notebook.livemd"])
-      [extra] = Extras.build(config)
+      extras = ["#{tmp_dir}/notebook.livemd"]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert %Extras.Page{} = extra
       assert extra.type == :livemd
@@ -57,8 +57,9 @@ defmodule ExDoc.ExtrasTest do
       Quick reference.
       """)
 
-      config = config(extras: ["#{tmp_dir}/cheat.cheatmd"])
-      [extra] = Extras.build(config)
+      extras = ["#{tmp_dir}/cheat.cheatmd"]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert %Extras.Page{} = extra
       assert extra.type == :cheatmd
@@ -71,8 +72,9 @@ defmodule ExDoc.ExtrasTest do
       No markdown here.
       """)
 
-      config = config(extras: ["#{tmp_dir}/plain.txt"])
-      [extra] = Extras.build(config)
+      extras = ["#{tmp_dir}/plain.txt"]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert %Extras.Page{} = extra
       assert extra.type == :extra
@@ -85,8 +87,9 @@ defmodule ExDoc.ExtrasTest do
       License text here.
       """)
 
-      config = config(extras: ["#{tmp_dir}/LICENSE"])
-      [extra] = Extras.build(config)
+      extras = ["#{tmp_dir}/LICENSE"]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert %Extras.Page{} = extra
       assert extra.type == :extra
@@ -94,8 +97,9 @@ defmodule ExDoc.ExtrasTest do
     end
 
     test "builds URL extras" do
-      config = config(extras: ["Elixir": [url: "https://elixir-lang.org"]])
-      [extra] = Extras.build(config)
+      extras = ["Elixir": [url: "https://elixir-lang.org"]]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert %Extras.URL{} = extra
       assert extra.id == "elixir"
@@ -106,10 +110,9 @@ defmodule ExDoc.ExtrasTest do
     test "builds mixed page and URL extras", %{tmp_dir: tmp_dir} do
       File.write!("#{tmp_dir}/readme.md", "# README")
 
-      config =
-        config(extras: ["#{tmp_dir}/readme.md", "Elixir": [url: "https://elixir-lang.org"]])
-
-      [page, url] = Extras.build(config)
+      extras = ["#{tmp_dir}/readme.md", "Elixir": [url: "https://elixir-lang.org"]]
+      config = config()
+      [page, url] = Extras.build(extras, config)
 
       assert %Extras.Page{} = page
       assert page.id == "readme"
@@ -125,8 +128,9 @@ defmodule ExDoc.ExtrasTest do
       File.mkdir_p!("#{tmp_dir}/bar")
       File.write!("#{tmp_dir}/bar/README.md", "# README bar")
 
-      config = config(extras: ["#{tmp_dir}/foo/README.md", "#{tmp_dir}/bar/README.md"])
-      [extra1, extra2] = Extras.build(config)
+      extras = ["#{tmp_dir}/foo/README.md", "#{tmp_dir}/bar/README.md"]
+      config = config()
+      [extra1, extra2] = Extras.build(extras, config)
 
       assert %Extras.Page{} = extra1
       assert %Extras.Page{} = extra2
@@ -142,8 +146,9 @@ defmodule ExDoc.ExtrasTest do
       Content here.
       """)
 
-      config = config(extras: ["#{tmp_dir}/page.md"])
-      [extra] = Extras.build(config)
+      extras = ["#{tmp_dir}/page.md"]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert extra.title == "My Great Page"
       assert extra.title_doc == ["My Great Page"]
@@ -154,8 +159,9 @@ defmodule ExDoc.ExtrasTest do
       Just some content without a header.
       """)
 
-      config = config(extras: ["#{tmp_dir}/NoHeader.md"])
-      [extra] = Extras.build(config)
+      extras = ["#{tmp_dir}/NoHeader.md"]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert extra.title == "NoHeader"
     end
@@ -163,8 +169,9 @@ defmodule ExDoc.ExtrasTest do
     test "supports custom title via options", %{tmp_dir: tmp_dir} do
       File.write!("#{tmp_dir}/readme.md", "# Default Title")
 
-      config = config(extras: [{"#{tmp_dir}/readme.md", [title: "Custom Title"]}])
-      [extra] = Extras.build(config)
+      extras = [{"#{tmp_dir}/readme.md", [title: "Custom Title"]}]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert extra.title == "Custom Title"
     end
@@ -172,8 +179,9 @@ defmodule ExDoc.ExtrasTest do
     test "supports custom filename via options", %{tmp_dir: tmp_dir} do
       File.write!("#{tmp_dir}/readme.md", "# README")
 
-      config = config(extras: [{"#{tmp_dir}/readme.md", [filename: "custom-name"]}])
-      [extra] = Extras.build(config)
+      extras = [{"#{tmp_dir}/readme.md", [filename: "custom-name"]}]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert extra.id == "custom-name"
     end
@@ -185,13 +193,12 @@ defmodule ExDoc.ExtrasTest do
         "https://example.com/#{path}"
       end
 
-      config =
-        config(
-          extras: [{"#{tmp_dir}/readme.md", [source: "custom/path.md"]}],
-          source_url_pattern: source_url_pattern
-        )
+      extras = [{"#{tmp_dir}/readme.md", [source: "custom/path.md"]}]
 
-      [extra] = Extras.build(config)
+      config =
+        config(source_url_pattern: source_url_pattern)
+
+      [extra] = Extras.build(extras, config)
 
       assert extra.source_path == "custom/path.md"
       assert extra.source_url == "https://example.com/custom/path.md"
@@ -208,8 +215,9 @@ defmodule ExDoc.ExtrasTest do
       ## Section Two
       """)
 
-      config = config(extras: ["#{tmp_dir}/page.md"])
-      [extra] = Extras.build(config)
+      extras = ["#{tmp_dir}/page.md"]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert [{:h2, attrs1, _, _}, {:h3, attrs2, _, _}, {:h2, attrs3, _, _}] = extra.doc
 
@@ -222,29 +230,29 @@ defmodule ExDoc.ExtrasTest do
       File.write!("#{tmp_dir}/guide.md", "# Guide")
       File.write!("#{tmp_dir}/reference.md", "# Reference")
 
+      extras = ["#{tmp_dir}/guide.md", "#{tmp_dir}/reference.md"]
+
       config =
         config(
-          extras: ["#{tmp_dir}/guide.md", "#{tmp_dir}/reference.md"],
           groups_for_extras: [
             Guides: ~r/guide/,
             Reference: ~r/reference/
           ]
         )
 
-      [guide, reference] = Extras.build(config)
+      [guide, reference] = Extras.build(extras, config)
 
       assert guide.group == :Guides
       assert reference.group == :Reference
     end
 
     test "groups URL extras" do
-      config =
-        config(
-          extras: ["Elixir": [url: "https://elixir-lang.org"]],
-          groups_for_extras: [External: ~r/elixir/i]
-        )
+      extras = ["Elixir": [url: "https://elixir-lang.org"]]
 
-      [extra] = Extras.build(config)
+      config =
+        config(groups_for_extras: [External: ~r/elixir/i])
+
+      [extra] = Extras.build(extras, config)
 
       assert %Extras.URL{} = extra
       assert extra.group == :External
@@ -255,9 +263,10 @@ defmodule ExDoc.ExtrasTest do
       File.write!("#{tmp_dir}/bbb.md", "# BBB")
       File.write!("#{tmp_dir}/ccc.md", "# CCC")
 
+      extras_input = ["#{tmp_dir}/ccc.md", "#{tmp_dir}/aaa.md", "#{tmp_dir}/bbb.md"]
+
       config =
         config(
-          extras: ["#{tmp_dir}/ccc.md", "#{tmp_dir}/aaa.md", "#{tmp_dir}/bbb.md"],
           groups_for_extras: [
             Second: ~r/bbb/,
             First: ~r/aaa/,
@@ -265,7 +274,7 @@ defmodule ExDoc.ExtrasTest do
           ]
         )
 
-      extras = Extras.build(config)
+      extras = Extras.build(extras_input, config)
 
       # Sorted by the order groups appear in groups_for_extras
       assert length(extras) == 3
@@ -289,8 +298,9 @@ defmodule ExDoc.ExtrasTest do
         %{anchor: "test", body: "body", title: "title", type: "extra"}
       ]
 
-      config = config(extras: [{"#{tmp_dir}/page.md", [search_data: search_data]}])
-      [extra] = Extras.build(config)
+      extras = [{"#{tmp_dir}/page.md", [search_data: search_data]}]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert extra.search_data == search_data
     end
@@ -299,8 +309,9 @@ defmodule ExDoc.ExtrasTest do
       File.write!("#{tmp_dir}/page.md", "# Page")
 
       assert_raise ArgumentError, ~r/expected search data to be a list/, fn ->
-        config = config(extras: [{"#{tmp_dir}/page.md", [search_data: "invalid"]}])
-        Extras.build(config)
+        extras = [{"#{tmp_dir}/page.md", [search_data: "invalid"]}]
+        config = config()
+        Extras.build(extras, config)
       end
     end
 
@@ -308,8 +319,9 @@ defmodule ExDoc.ExtrasTest do
       File.write!("#{tmp_dir}/file.pdf", "PDF content")
 
       assert_raise ArgumentError, ~r/file extension not recognized/, fn ->
-        config = config(extras: ["#{tmp_dir}/file.pdf"])
-        Extras.build(config)
+        extras = ["#{tmp_dir}/file.pdf"]
+        config = config()
+        Extras.build(extras, config)
       end
     end
 
@@ -317,8 +329,9 @@ defmodule ExDoc.ExtrasTest do
       File.write!("#{tmp_dir}/page.md", "# Page")
 
       assert_raise ArgumentError, ~r/extra field :title must be a string/, fn ->
-        config = config(extras: [{"#{tmp_dir}/page.md", [title: 123]}])
-        Extras.build(config)
+        extras = [{"#{tmp_dir}/page.md", [title: 123]}]
+        config = config()
+        Extras.build(extras, config)
       end
     end
 
@@ -326,16 +339,18 @@ defmodule ExDoc.ExtrasTest do
       File.write!("#{tmp_dir}/page.md", "# Page")
 
       assert_raise ArgumentError, ~r/extra field :filename must be a string/, fn ->
-        config = config(extras: [{"#{tmp_dir}/page.md", [filename: :atom]}])
-        Extras.build(config)
+        extras = [{"#{tmp_dir}/page.md", [filename: :atom]}]
+        config = config()
+        Extras.build(extras, config)
       end
     end
 
     test "handles extras with keyword list options", %{tmp_dir: tmp_dir} do
       File.write!("#{tmp_dir}/page.md", "# Page")
 
-      config = config(extras: [{"#{tmp_dir}/page.md", title: "Custom"}])
-      [extra] = Extras.build(config)
+      extras = [{"#{tmp_dir}/page.md", title: "Custom"}]
+      config = config()
+      [extra] = Extras.build(extras, config)
 
       assert extra.title == "Custom"
     end
