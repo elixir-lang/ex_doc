@@ -9,21 +9,21 @@ defmodule ExDoc.Formatter.EPUB do
   @doc """
   Generates EPUB documentation for the given modules.
   """
-  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) ::
+  @spec run([ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) ::
           String.t()
-  def run(project_nodes, filtered_modules, extras, config) when is_map(config) do
+  def run(project_nodes, extras, config) when is_map(config) do
     config = normalize_config(config)
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
+    extras = Formatter.autolink_extras(extras, ".xhtml", config)
+
     project_nodes =
-      Formatter.render_all(project_nodes, filtered_modules, ".xhtml", config,
+      Formatter.render_all(project_nodes, extras, ".xhtml", config,
         highlight_tag: "samp"
       )
 
     {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
-
-    extras = Formatter.autolink_extras(extras, ".xhtml", config)
 
     static_files = Formatter.generate_assets("OEBPS", default_assets(config), config)
     Formatter.generate_logo(@assets_dir, config)

@@ -1,20 +1,18 @@
 defmodule ExDoc.Formatter do
   @moduledoc false
 
-  alias ExDoc.Utils
-
   @doc """
   Autolinks and renders all docs.
   """
-  def render_all(project_nodes, filtered_modules, ext, config, opts) do
+  def render_all(project_nodes, extras, ext, config, opts \\ []) do
     base = [
       apps: config.apps,
       deps: config.deps,
       ext: ext,
-      extras: extra_paths(config),
+      extras: extra_paths(extras),
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
       skip_code_autolink_to: config.skip_code_autolink_to,
-      filtered_modules: filtered_modules
+      filtered_modules: config.filtered_modules
     ]
 
     project_nodes
@@ -80,7 +78,7 @@ defmodule ExDoc.Formatter do
       apps: config.apps,
       deps: config.deps,
       ext: ext,
-      extras: extra_paths(config),
+      extras: extra_paths(extras),
       language: language,
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
       skip_code_autolink_to: config.skip_code_autolink_to
@@ -139,23 +137,17 @@ defmodule ExDoc.Formatter do
     |> ExDoc.DocAST.highlight(language, opts)
   end
 
-  defp extra_paths(config) do
-    Enum.reduce(config.extras, %{}, fn
-      path, acc when is_binary(path) ->
-        base = Path.basename(path)
-        Map.put(acc, base, Utils.text_to_id(Path.rootname(base)))
+  defp extra_paths(extras) do
+    Enum.reduce(extras, %{}, fn
+      %ExDoc.Extras.URL{}, acc ->
+        acc
 
-      {path, opts}, acc ->
-        if Keyword.has_key?(opts, :url) do
-          acc
-        else
-          base = path |> to_string() |> Path.basename()
+      %ExDoc.Extras.Page{source_path: source_path, id: id}, acc when is_binary(source_path) ->
+        base = Path.basename(source_path)
+        Map.put(acc, base, id)
 
-          name =
-            Keyword.get_lazy(opts, :filename, fn -> Utils.text_to_id(Path.rootname(base)) end)
-
-          Map.put(acc, base, name)
-        end
+      _extra, acc ->
+        acc
     end)
   end
 

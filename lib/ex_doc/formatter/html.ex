@@ -10,22 +10,21 @@ defmodule ExDoc.Formatter.HTML do
   @doc """
   Generates HTML documentation for the given modules.
   """
-  @spec run([ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) ::
+  @spec run([ExDoc.ModuleNode.t()], list(), ExDoc.Config.t()) ::
           String.t()
-  def run(project_nodes, filtered_modules, extras, config) when is_map(config) do
+  def run(project_nodes, extras, config) when is_map(config) do
     config = normalize_config(config)
     config = %{config | output: Path.expand(config.output)}
 
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
-    project_nodes = Formatter.render_all(project_nodes, filtered_modules, ".html", config, [])
     extras = Formatter.autolink_extras(extras, ".html", config)
+    project_nodes = Formatter.render_all(project_nodes, extras, ".html", config, [])
 
     static_files = Formatter.generate_assets(".", default_assets(config), config)
     search_data = generate_search_data(project_nodes, extras, config)
 
-    # TODO: Move this categorization to the language
     {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
 
     all_files =

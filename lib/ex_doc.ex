@@ -23,7 +23,8 @@ defmodule ExDoc do
 
     {module_nodes, filtered_nodes} = config.retriever.docs_from_dir(config.source_beam, config)
     extras = ExDoc.Extras.build(config)
-    find_formatter(config.formatter).run(module_nodes, filtered_nodes, extras, config)
+    config = %{config | filtered_modules: filtered_nodes}
+    find_formatter(config.formatter).run(module_nodes, extras, config)
   end
 
   # Short path for programmatic interface
