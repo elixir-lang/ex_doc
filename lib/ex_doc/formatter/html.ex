@@ -26,23 +26,20 @@ defmodule ExDoc.Formatter.HTML do
     search_data = generate_search_data(project_nodes, extras, config)
 
     # TODO: Move this categorization to the language
-    nodes_map = %{
-      modules: Formatter.filter_list(:module, project_nodes),
-      tasks: Formatter.filter_list(:task, project_nodes)
-    }
+    {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
 
     all_files =
       search_data ++
         static_files ++
-        generate_sidebar_items(nodes_map, extras, config) ++
-        generate_api_reference(nodes_map, config) ++
+        generate_sidebar_items(modules, tasks, extras, config) ++
+        generate_api_reference(modules, tasks, config) ++
         generate_extras(extras, config) ++
         generate_favicon(@assets_dir, config) ++
         Formatter.generate_logo(@assets_dir, config) ++
         generate_search(config) ++
         generate_not_found(config) ++
-        generate_list(nodes_map.modules, config) ++
-        generate_list(nodes_map.tasks, config) ++
+        generate_list(modules, config) ++
+        generate_list(tasks, config) ++
         generate_redirects(config, ".html")
 
     generate_build(all_files, build)
@@ -99,8 +96,8 @@ defmodule ExDoc.Formatter.HTML do
     [filename]
   end
 
-  defp generate_sidebar_items(nodes_map, extras, config) do
-    content = Templates.create_sidebar_items(config, nodes_map, extras)
+  defp generate_sidebar_items(modules, tasks, extras, config) do
+    content = Templates.create_sidebar_items(config, modules, tasks, extras)
 
     path = "dist/sidebar_items-#{digest(content)}.js"
     File.write!(Path.join(config.output, path), content)
@@ -174,16 +171,16 @@ defmodule ExDoc.Formatter.HTML do
     ]
   end
 
-  defp generate_api_reference(_nodes_map, %{api_reference: false}) do
+  defp generate_api_reference(_modules, _tasks, %{api_reference: false}) do
     []
   end
 
-  defp generate_api_reference(nodes_map, config) do
+  defp generate_api_reference(modules, tasks, config) do
     filename = "api-reference.html"
     output = "#{config.output}/#{filename}"
     config = set_canonical_url(config, filename)
 
-    html = Templates.api_reference_template(config, nodes_map)
+    html = Templates.api_reference_template(config, modules, tasks)
 
     if File.regular?(output) do
       Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])

@@ -31,22 +31,22 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
   """
-  def create_sidebar_items(config, nodes_map, extras) do
+  def create_sidebar_items(config, modules, tasks, extras) do
     nodes =
-      nodes_map
+      [modules: modules, tasks: tasks]
       |> Enum.map(&sidebar_module/1)
       |> Map.new()
-      |> Map.put(:extras, api_reference(config, nodes_map) ++ sidebar_extras(extras))
+      |> Map.put(:extras, api_reference(config, modules, tasks) ++ sidebar_extras(extras))
 
     ["sidebarNodes=" | ExDoc.Utils.to_json(nodes)]
   end
 
-  defp api_reference(%{api_reference: false}, _nodes_map), do: []
+  defp api_reference(%{api_reference: false}, _modules, _tasks), do: []
 
-  defp api_reference(_config, nodes_map) do
+  defp api_reference(_config, modules, tasks) do
     headers =
-      if(nodes_map.modules != [], do: [%{id: "Modules", anchor: "modules"}], else: []) ++
-        if(nodes_map.tasks != [], do: [%{id: "Mix Tasks", anchor: "tasks"}], else: [])
+      if(modules != [], do: [%{id: "Modules", anchor: "modules"}], else: []) ++
+        if(tasks != [], do: [%{id: "Mix Tasks", anchor: "tasks"}], else: [])
 
     [%{id: "api-reference", title: "API Reference", group: "", headers: headers}]
   end
@@ -206,7 +206,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     module_template: [:config, :module],
     not_found_template: [:config],
     api_reference_entry_template: [:module_node],
-    api_reference_template: [:config, :nodes_map],
+    api_reference_template: [:config, :modules, :tasks],
     extra_template: [:config, :node, :refs],
     search_template: [:config],
     sidebar_template: [:config, :type],

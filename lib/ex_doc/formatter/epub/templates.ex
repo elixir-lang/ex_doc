@@ -32,7 +32,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
     :def,
     :content_template,
     Path.expand("templates/content_template.eex", __DIR__),
-    [:config, :nodes, :extras, :uuid, :datetime, :static_files],
+    [:config, :modules, :tasks, :extras, :uuid, :datetime, :static_files],
     trim: true
   )
 

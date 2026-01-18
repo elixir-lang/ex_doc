@@ -94,14 +94,6 @@ defmodule ExDoc.Formatter do
     |> Enum.map(&elem(&1, 1))
   end
 
-  def filter_list(:module, nodes) do
-    Enum.filter(nodes, &(&1.type != :task))
-  end
-
-  def filter_list(type, nodes) do
-    Enum.filter(nodes, &(&1.type == type))
-  end
-
   # Helper functions
 
   defp render_doc(%{doc: nil} = node, _language, _autolink_opts, _opts),

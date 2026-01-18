@@ -20,7 +20,7 @@
     <%= for {_title, extras} <- extras, extra <- extras do %>
       <item id="<%= URI.encode extra.id %>" href="<%= URI.encode extra.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
     <% end %>
-    <%= for filter <- [:modules, :tasks], node <- nodes[filter] do %>
+    <%= for node <- modules ++ tasks do %>
       <item id="<%= URI.encode node.id %>" href="<%= URI.encode node.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
     <% end %>
     <%= for {static_file, media_type} <- static_files do %>
@@ -39,7 +39,7 @@
     <%= for {_title, extras} <- extras, extra <- extras do %>
       <itemref idref="<%= URI.encode extra.id %>"/>
     <% end %>
-    <%= for filter <- [:modules, :tasks], node <- nodes[filter] do %>
+    <%= for node <- modules ++ tasks do %>
       <itemref idref="<%= URI.encode node.id %>"/>
     <% end %>
   </spine>

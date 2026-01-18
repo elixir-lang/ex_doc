@@ -169,7 +169,6 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "includes api reference", context do
       names = [CompiledWithDocs]
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
-      all = %{modules: nodes, tasks: []}
 
       assert [
                %{
@@ -178,9 +177,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  "id" => "api-reference",
                  "title" => "API Reference"
                }
-             ] = create_sidebar_items(%{api_reference: true}, all, [])["extras"]
+             ] = create_sidebar_items(%{api_reference: true}, nodes, [], [])["extras"]
 
-      assert [] = create_sidebar_items(%{api_reference: false}, all, [])["extras"]
+      assert [] = create_sidebar_items(%{api_reference: false}, nodes, [], [])["extras"]
     end
 
     test "outputs listing for the given nodes", context do
@@ -209,7 +208,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  ]
                },
                %{"id" => "CompiledWithDocs.Nested"}
-             ] = create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
+             ] = create_sidebar_items(%{}, nodes, [], [])["modules"]
     end
 
     test "outputs deprecated: true if node is deprecated", context do
@@ -219,7 +218,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       path = ["modules", Access.at!(0), "nodeGroups", Access.at!(0), "nodes"]
 
       sidebar_functions =
-        get_in(create_sidebar_items(%{}, %{modules: nodes, tasks: []}, []), path)
+        get_in(create_sidebar_items(%{}, nodes, [], []), path)
 
       assert Enum.any?(
                sidebar_functions,
@@ -232,7 +231,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, doc_config(context))
 
       assert Enum.any?(
-               create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"],
+               create_sidebar_items(%{}, nodes, [], [])["modules"],
                &match?(%{"title" => "Warnings", "deprecated" => true}, &1)
              )
     end
@@ -282,7 +281,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  ]
                },
                %{"id" => "CompiledWithDocs.Nested"}
-             ] = create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
+             ] = create_sidebar_items(%{}, nodes, [], [])["modules"]
     end
 
     test "outputs module groups for the given nodes", context do
@@ -297,7 +296,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                  "id" => "CompiledWithDocs",
                  "title" => "CompiledWithDocs"
                }
-             ] = create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
+             ] = create_sidebar_items(%{}, nodes, [], [])["modules"]
     end
 
     test "builds sections out of moduledocs", context do
@@ -306,7 +305,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       {nodes, []} = ExDoc.Retriever.docs_from_modules(names, config)
 
       [compiled_with_docs, compiled_without_docs, duplicate_headings] =
-        create_sidebar_items(%{}, %{modules: nodes, tasks: []}, [])["modules"]
+        create_sidebar_items(%{}, nodes, [], [])["modules"]
 
       assert compiled_with_docs["sections"] == [
                %{
@@ -327,10 +326,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              ]
     end
 
-    defp create_sidebar_items(config, nodes_map, extras) do
+    defp create_sidebar_items(config, modules, tasks, extras) do
       "sidebarNodes=" <> content =
         config
-        |> Templates.create_sidebar_items(nodes_map, extras)
+        |> Templates.create_sidebar_items(modules, tasks, extras)
         |> IO.iodata_to_binary()
 
       Jason.decode!(content)

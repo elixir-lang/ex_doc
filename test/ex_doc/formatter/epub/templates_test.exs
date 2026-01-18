@@ -40,23 +40,19 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
   describe "content_template/5" do
     test "includes logo as a resource if specified in the config" do
-      nodes = %{modules: [], tasks: []}
-
       content =
         [logo: "my_logo.png"]
         |> doc_config()
-        |> Templates.content_template(nodes, _extras = [], "uuid", "datetime", _static_files = [])
+        |> Templates.content_template([], [], [], "uuid", "datetime", _static_files = [])
 
       assert content =~ ~S|<item id="logo" href="assets/logo.png" media-type="image/png"/>|
     end
 
     test "includes cover as a resource if specified in the config" do
-      nodes = %{modules: [], tasks: []}
-
       content =
         [cover: "my_cover.svg"]
         |> doc_config()
-        |> Templates.content_template(nodes, _extras = [], "uuid", "datetime", _static_files = [])
+        |> Templates.content_template([], [], [], "uuid", "datetime", _static_files = [])
 
       assert content =~ ~S|<meta name="cover" content="cover-image"/>|
 
@@ -65,18 +61,16 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
     end
 
     test "includes modules as a resource" do
-      module_node = %ExDoc.ModuleNode{
+      node = %ExDoc.ModuleNode{
         module: XPTOModule,
         doc: nil,
         id: "XPTOModule",
         title: "XPTOModule"
       }
 
-      nodes = %{modules: [module_node], tasks: []}
-
       content =
         doc_config()
-        |> Templates.content_template(nodes, _extras = [], "uuid", "datetime", _static_files = [])
+        |> Templates.content_template([node], [], [], "uuid", "datetime", _static_files = [])
 
       assert content =~
                ~S|<item id="XPTOModule" href="XPTOModule.xhtml" media-type="application/xhtml+xml" properties="scripted"/>|

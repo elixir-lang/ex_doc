@@ -21,10 +21,7 @@ defmodule ExDoc.Formatter.EPUB do
         highlight_tag: "samp"
       )
 
-    nodes_map = %{
-      modules: Formatter.filter_list(:module, project_nodes),
-      tasks: Formatter.filter_list(:task, project_nodes)
-    }
+    {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
 
     extras = Formatter.autolink_extras(extras, ".xhtml", config)
 
@@ -32,12 +29,12 @@ defmodule ExDoc.Formatter.EPUB do
     Formatter.generate_logo(@assets_dir, config)
     Formatter.generate_cover(@assets_dir, config)
 
-    generate_content(config, nodes_map, extras, static_files)
-    generate_nav(config, nodes_map.modules, nodes_map.tasks, extras)
+    generate_content(config, modules, tasks, extras, static_files)
+    generate_nav(config, modules, tasks, extras)
     generate_title(config)
     generate_extras(extras, config)
-    generate_list(config, nodes_map.modules)
-    generate_list(config, nodes_map.tasks)
+    generate_list(config, modules)
+    generate_list(config, tasks)
 
     {:ok, epub} = generate_epub(config.output)
     File.rm_rf!(config.output)
@@ -66,7 +63,7 @@ defmodule ExDoc.Formatter.EPUB do
     end
   end
 
-  defp generate_content(config, nodes, extras, static_files) do
+  defp generate_content(config, modules, tasks, extras, static_files) do
     uuid = "urn:uuid:#{uuid4()}"
     datetime = format_datetime()
 
@@ -76,7 +73,9 @@ defmodule ExDoc.Formatter.EPUB do
           media_type = Templates.media_type(Path.extname(name)),
           do: {Path.relative_to(name, "OEBPS"), media_type}
 
-    content = Templates.content_template(config, nodes, extras, uuid, datetime, static_files)
+    content =
+      Templates.content_template(config, modules, tasks, extras, uuid, datetime, static_files)
+
     File.write("#{config.output}/OEBPS/content.opf", content)
   end
 
