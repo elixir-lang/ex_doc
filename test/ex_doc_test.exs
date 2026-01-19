@@ -1,5 +1,6 @@
 defmodule ExDocTest do
-  use ExUnit.Case, async: true
+  # We set markdown processor which is global
+  use ExUnit.Case, async: false
 
   @moduletag :tmp_dir
 
