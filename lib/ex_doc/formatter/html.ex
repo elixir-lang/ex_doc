@@ -10,7 +10,7 @@ defmodule ExDoc.Formatter.HTML do
     [extension: ".html"]
   end
 
-  def run(project_nodes, extras, config) when is_map(config) do
+  def run(config, project_nodes, extras) when is_map(config) do
     if config.main == "index" do
       raise ArgumentError,
             ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
@@ -32,8 +32,8 @@ defmodule ExDoc.Formatter.HTML do
         generate_sidebar_items(modules, tasks, extras, config) ++
         generate_api_reference(modules, tasks, config) ++
         generate_extras(extras, config) ++
-        generate_favicon(@assets_dir, config) ++
-        Formatter.generate_logo(@assets_dir, config) ++
+        Formatter.copy_favicon(config, Path.join(@assets_dir, "favicon")) ++
+        Formatter.copy_logo(config, Path.join(@assets_dir, "logo")) ++
         generate_search(config) ++
         generate_not_found(config) ++
         generate_list(modules, config) ++
@@ -208,17 +208,6 @@ defmodule ExDoc.Formatter.HTML do
     input
     |> Path.extname()
     |> String.downcase()
-  end
-
-  @doc """
-  Generates the favicon from config into the given directory.
-  """
-  def generate_favicon(_dir, %{favicon: nil}) do
-    []
-  end
-
-  def generate_favicon(dir, %{output: output, favicon: favicon}) do
-    Formatter.generate_image(output, dir, favicon, "favicon")
   end
 
   defp generate_redirect(filename, config, redirect_to) do

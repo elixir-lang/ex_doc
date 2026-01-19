@@ -14,20 +14,20 @@ defmodule ExDoc.Formatter.EPUB do
   @doc """
   Generates EPUB documentation for the given modules.
   """
-  def run(project_nodes, extras, config) when is_map(config) do
+  def run(config, project_nodes, extras) when is_map(config) do
     config = normalize_config(config)
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
     {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
     static_files = Formatter.generate_assets("OEBPS", default_assets(config), config)
-    Formatter.generate_logo(@assets_dir, config)
-    Formatter.generate_cover(@assets_dir, config)
+    Formatter.copy_logo(config, Path.join(@assets_dir, "logo"))
+    Formatter.copy_cover(config, Path.join(@assets_dir, "cover"))
 
     generate_content(config, modules, tasks, extras, static_files)
     generate_nav(config, modules, tasks, extras)
     generate_title(config)
-    generate_extras(extras, config)
+    generate_extras(config, extras)
     generate_list(config, modules)
     generate_list(config, tasks)
 
@@ -41,7 +41,7 @@ defmodule ExDoc.Formatter.EPUB do
     %{config | output: output}
   end
 
-  defp generate_extras(extras, config) do
+  defp generate_extras(config, extras) do
     for %ExDoc.Extras.Page{} = node <- extras do
       output = "#{config.output}/OEBPS/#{node.id}.xhtml"
       html = Templates.extra_template(config, node)

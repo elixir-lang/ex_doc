@@ -308,7 +308,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     retriever_config = %ExDoc.Config{proglang: formatter_config.proglang}
     {modules, []} = ExDoc.Retriever.docs_from_modules(modules, retriever_config)
     extras = ExDoc.Extras.build(extras_input, retriever_config)
-    ExDoc.Formatter.HTML.run(modules, extras, formatter_config)
+    ExDoc.Formatter.HTML.run(formatter_config, modules, extras)
     [path] = Path.wildcard(Path.join([formatter_config.output, "dist", "search_data-*.js"]))
     "searchData=" <> json = File.read!(path)
     Jason.decode!(json)

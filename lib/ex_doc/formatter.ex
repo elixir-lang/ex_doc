@@ -17,7 +17,7 @@ defmodule ExDoc.Formatter do
         {module_nodes, extras}
       end
 
-    formatter.run(module_nodes, extras, formatter_config)
+    formatter.run(formatter_config, module_nodes, extras)
   end
 
   @doc false
@@ -219,38 +219,46 @@ defmodule ExDoc.Formatter do
   end
 
   @doc """
-  Generates the logo from config into the given directory.
+  Copies the logo to the given location in the output directory.
   """
-  def generate_logo(_dir, %{logo: nil}) do
+  def copy_logo(%{logo: nil}, _target) do
     []
   end
 
-  def generate_logo(dir, %{output: output, logo: logo}) do
-    generate_image(output, dir, logo, "logo")
+  def copy_logo(%{output: output, logo: logo}, target) do
+    copy_image(output, logo, target)
   end
 
   @doc """
-  Generates the cover from config into the given directory.
+  Copies the favicon to the given location in the output directory.
   """
-  def generate_cover(_dir, %{cover: nil}) do
+  def copy_favicon(%{favicon: nil}, _target) do
     []
   end
 
-  def generate_cover(dir, %{output: output, cover: cover}) do
-    generate_image(output, dir, cover, "cover")
+  def copy_favicon(%{output: output, favicon: favicon}, target) do
+    copy_image(output, favicon, target)
   end
 
-  def generate_image(output, dir, image, name) do
-    extname =
-      image
-      |> Path.extname()
-      |> String.downcase()
+  @doc """
+  Copies the cover to the given location in the output directory.
+  """
+  def copy_cover(%{cover: nil}, _target) do
+    []
+  end
+
+  def copy_cover(%{output: output, cover: cover}, target) do
+    copy_image(output, cover, target)
+  end
+
+  defp copy_image(output, source, target) do
+    extname = source |> Path.extname() |> String.downcase()
 
     if extname in ~w(.png .jpg .jpeg .svg) do
-      filename = Path.join(dir, "#{name}#{extname}")
+      filename = "#{target}#{extname}"
       target = Path.join(output, filename)
       File.mkdir_p!(Path.dirname(target))
-      File.copy!(image, target)
+      File.copy!(source, target)
       [filename]
     else
       raise ArgumentError, "image format not recognized, allowed formats are: .png, .jpg, .svg"
