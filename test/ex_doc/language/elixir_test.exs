@@ -703,9 +703,11 @@ defmodule ExDoc.Language.ElixirTest do
   ]
 
   defp autolink_doc(text, options \\ []) when is_binary(text) do
+    config = struct!(ExDoc.Autolink, Keyword.merge(@default_options, options))
+
     text
     |> ExDoc.Markdown.to_ast([])
-    |> ExDoc.Language.Elixir.autolink_doc(Keyword.merge(@default_options, options))
+    |> ExDoc.Language.Elixir.autolink_doc(config)
     |> then(fn [{:p, _, content, _}] -> content end)
     |> ExDoc.DocAST.to_html()
   end
@@ -716,7 +718,8 @@ defmodule ExDoc.Language.ElixirTest do
     message
   end
 
-  defp autolink_spec(ast, options \\ []) do
-    ExDoc.Language.Elixir.autolink_spec(ast, Keyword.merge(@default_options, options))
+  defp autolink_spec(spec, options \\ []) do
+    config = struct!(ExDoc.Autolink, Keyword.merge(@default_options, options))
+    ExDoc.Language.Elixir.autolink_spec(spec, config)
   end
 end

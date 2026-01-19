@@ -871,15 +871,16 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   defp autolink_spec(binary, _c, opts \\ []) when is_binary(binary) do
-    opts =
+    config =
       opts
       |> Keyword.put_new(:current_module, :erlang_bar)
       |> Keyword.put_new(:current_kfa, {:function, :bar, 1})
+      |> then(&struct!(ExDoc.Autolink, &1))
 
     {:ok, tokens, _} = :erl_scan.string(String.to_charlist(binary))
     {:ok, ast} = :erl_parse.parse_form(tokens)
     ast = put_elem(ast, 1, :erl_anno.set_file(~c"test.erl", elem(ast, 1)))
-    ExDoc.Language.Erlang.autolink_spec(ast, opts)
+    ExDoc.Language.Erlang.autolink_spec(ast, config)
   end
 
   defp autolink_extra(text, c) do
@@ -926,7 +927,7 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   defp autolink(doc, opts \\ []) do
-    opts =
+    config =
       opts
       |> Keyword.put(:language, ExDoc.Language.Erlang)
       |> Keyword.put_new(:warnings, :raise)
@@ -935,9 +936,10 @@ defmodule ExDoc.Language.ErlangTest do
       |> Keyword.put_new(:module_id, "erlang_foo")
       |> Keyword.put_new(:deps, foolib: "https://foolib.com")
       |> Keyword.drop([:extra_foo_code])
+      |> then(&struct!(ExDoc.Autolink, &1))
 
     doc
-    |> ExDoc.Language.Erlang.autolink_doc(opts)
+    |> ExDoc.Language.Erlang.autolink_doc(config)
     |> ExDoc.DocAST.to_html()
   end
 

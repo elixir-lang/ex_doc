@@ -200,7 +200,7 @@ defmodule ExDoc.Language.Elixir do
   @autoimported_modules [Kernel, Kernel.SpecialForms]
 
   @impl true
-  def try_autoimported_function(name, arity, mode, config, original_text) do
+  def try_autoimported_function(name, arity, mode, %Autolink{} = config, original_text) do
     Enum.find_value(@autoimported_modules, fn module ->
       Autolink.remote_url({:function, module, name, arity}, config, original_text,
         warn?: false,
@@ -263,17 +263,17 @@ defmodule ExDoc.Language.Elixir do
   ]
 
   @impl true
-  def try_builtin_type(name, arity, _mode, config, _original_text)
+  def try_builtin_type(name, arity, _mode, %Autolink{} = config, _original_text)
       when {name, arity} in @basic_types do
     Autolink.ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#basic-types")
   end
 
-  def try_builtin_type(name, arity, _mode, config, _original_text)
+  def try_builtin_type(name, arity, _mode, %Autolink{} = config, _original_text)
       when {name, arity} in @built_in_types do
     Autolink.ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#built-in-types")
   end
 
-  def try_builtin_type(_name, _arity, _mode, _config, _original_text) do
+  def try_builtin_type(_name, _arity, _mode, %Autolink{}, _original_text) do
     nil
   end
 
@@ -368,8 +368,7 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def autolink_doc(ast, opts) do
-    config = struct!(Autolink, opts)
+  def autolink_doc(ast, %Autolink{} = config) do
     true = config.language == __MODULE__
 
     config = %{config | force_module_prefix: false}
@@ -385,8 +384,7 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def autolink_spec(ast, opts) do
-    config = struct!(Autolink, opts)
+  def autolink_spec(ast, %Autolink{} = config) do
     string = format_spec(ast)
     name = typespec_name(ast)
     {name, rest} = split_name(string, name)

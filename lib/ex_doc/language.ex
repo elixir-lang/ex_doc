@@ -93,12 +93,13 @@ defmodule ExDoc.Language do
   @doc """
   Autolinks docs.
   """
-  @callback autolink_doc(doc :: ExDoc.DocAST.t(), opts :: keyword()) :: ExDoc.DocAST.t()
+  @callback autolink_doc(doc :: ExDoc.DocAST.t(), config :: ExDoc.Autolink.t()) ::
+              ExDoc.DocAST.t()
 
   @doc """
   Autolinks typespecs.
   """
-  @callback autolink_spec(spec :: term(), opts :: keyword()) :: iodata()
+  @callback autolink_spec(spec :: term(), config :: ExDoc.Autolink.t()) :: iodata()
 
   @doc """
   Formats typespecs (without autolinking).
@@ -140,7 +141,7 @@ defmodule ExDoc.Language do
               name :: atom(),
               arity :: non_neg_integer(),
               mode :: :regular_link | :custom_link,
-              opts :: keyword(),
+              config :: ExDoc.Autolink.t(),
               original_text :: String.t()
             ) ::
               nil | String.t()
@@ -152,7 +153,7 @@ defmodule ExDoc.Language do
               name :: atom(),
               arity :: non_neg_integer(),
               mode :: :regular_link | :custom_link,
-              opts :: keyword(),
+              config :: ExDoc.Autolink.t(),
               original_text :: String.t()
             ) ::
               nil | String.t()

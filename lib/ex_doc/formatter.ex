@@ -1,6 +1,8 @@
 defmodule ExDoc.Formatter do
   @moduledoc false
 
+  alias ExDoc.Autolink
+
   @doc false
   def run(formatter, formatter_config, module_nodes, filtered_nodes, extras) do
     if not Code.ensure_loaded?(formatter) do
@@ -28,7 +30,7 @@ defmodule ExDoc.Formatter do
         _ -> ExDoc.Language.Elixir
       end
 
-    base_opts = [
+    base_config = %Autolink{
       apps: config.apps,
       deps: config.deps,
       ext: ext,
@@ -36,12 +38,12 @@ defmodule ExDoc.Formatter do
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
       skip_code_autolink_to: config.skip_code_autolink_to,
       filtered_modules: filtered_nodes
-    ]
+    }
 
     extras =
       extras
       |> Task.async_stream(
-        &autolink_extra(&1, language, base_opts, highlight_opts),
+        &autolink_extra(&1, language, base_config, highlight_opts),
         timeout: :infinity
       )
       |> Enum.map(fn {:ok, res} -> res end)
@@ -50,7 +52,7 @@ defmodule ExDoc.Formatter do
     nodes =
       nodes
       |> Task.async_stream(
-        &autolink_node(&1, base_opts, highlight_opts),
+        &autolink_node(&1, base_config, highlight_opts),
         timeout: :infinity
       )
       |> Enum.map(&elem(&1, 1))
@@ -60,47 +62,47 @@ defmodule ExDoc.Formatter do
 
   # Helper functions
 
-  defp autolink_node(node, base_opts, highlight_opts) do
+  defp autolink_node(node, base_config, highlight_opts) do
     language = node.language
 
-    autolink_opts =
-      [
-        current_module: node.module,
+    autolink_config = %{
+      base_config
+      | current_module: node.module,
         module_id: node.id,
         language: language
-      ] ++ base_opts
+    }
 
     docs_groups =
       for group <- node.docs_groups do
         docs =
           for child_node <- group.docs do
-            child_opts =
-              [
-                id: id(node, child_node),
+            child_config = %{
+              autolink_config
+              | id: id(node, child_node),
                 line: child_node.doc_line,
                 file: child_node.doc_file,
                 current_kfa: {child_node.type, child_node.name, child_node.arity}
-              ] ++ autolink_opts
+            }
 
             specs =
-              Enum.map(child_node.source_specs, &language.autolink_spec(&1, child_opts))
+              Enum.map(child_node.source_specs, &language.autolink_spec(&1, child_config))
 
             child_node = %{child_node | specs: specs}
-            autolink_doc(child_node, language, child_opts, highlight_opts)
+            autolink_doc(child_node, language, child_config, highlight_opts)
           end
 
-        %{autolink_doc(group, language, autolink_opts, highlight_opts) | docs: docs}
+        %{autolink_doc(group, language, autolink_config, highlight_opts) | docs: docs}
       end
 
-    module_opts =
-      [
-        id: node.id,
+    module_config = %{
+      autolink_config
+      | id: node.id,
         file: node.moduledoc_file,
         line: node.moduledoc_line
-      ] ++ autolink_opts
+    }
 
     %{
-      autolink_doc(node, language, module_opts, highlight_opts)
+      autolink_doc(node, language, module_config, highlight_opts)
       | docs_groups: docs_groups
     }
   end
@@ -122,11 +124,11 @@ defmodule ExDoc.Formatter do
   defp autolink_extra(
          %ExDoc.Extras.Page{doc: doc, source_path: source_path, id: id} = extra,
          language,
-         autolink_opts,
+         base_config,
          opts
        ) do
-    autolink_opts = [file: source_path, id: id, language: language] ++ autolink_opts
-    doc = autolink_and_highlight(doc, language, autolink_opts, opts)
+    extra_config = %{base_config | file: source_path, id: id, language: language}
+    doc = autolink_and_highlight(doc, language, extra_config, opts)
     %{extra | doc: doc}
   end
 

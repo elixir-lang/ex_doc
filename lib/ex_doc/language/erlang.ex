@@ -195,8 +195,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def autolink_doc(ast, opts) do
-    config = struct!(Autolink, opts)
+  def autolink_doc(ast, %Autolink{} = config) do
     true = config.language == __MODULE__
 
     config = %{config | force_module_prefix: true}
@@ -221,9 +220,7 @@ defmodule ExDoc.Language.Erlang do
     IO.iodata_to_binary([Atom.to_string(name), "(", args, ")"])
   end
 
-  def autolink_spec(ast, opts) do
-    config = struct!(Autolink, opts)
-
+  def autolink_spec(ast, %Autolink{} = config) do
     {name, anno, quoted} =
       case ast do
         {:attribute, anno, kind, {mfa, ast}} when kind in [:spec, :callback] ->
@@ -474,7 +471,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def try_autoimported_function(name, arity, mode, config, original_text) do
+  def try_autoimported_function(name, arity, mode, %Autolink{} = config, original_text) do
     if :erl_internal.bif(name, arity) do
       Autolink.remote_url({:function, :erlang, name, arity}, config, original_text,
         warn?: false,
@@ -484,7 +481,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def try_builtin_type(name, arity, mode, config, original_text) do
+  def try_builtin_type(name, arity, mode, %Autolink{} = config, original_text) do
     if :erl_internal.is_type(name, arity) do
       Autolink.remote_url({:type, :erlang, name, arity}, config, original_text,
         warn?: false,
