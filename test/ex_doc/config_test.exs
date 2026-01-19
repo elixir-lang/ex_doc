@@ -142,7 +142,12 @@ defmodule ExDoc.ConfigTest do
 
       assert ExDoc.Config.match_module(patterns, :lists, ":lists", %{}) == :Group
 
-      assert ExDoc.Config.match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule", %{}) ==
+      assert ExDoc.Config.match_module(
+               patterns,
+               MyApp.SomeOtherModule,
+               "MyApp.SomeOtherModule",
+               %{}
+             ) ==
                nil
     end
 
@@ -154,10 +159,20 @@ defmodule ExDoc.ConfigTest do
       assert ExDoc.Config.match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule", %{}) ==
                :Group
 
-      assert ExDoc.Config.match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule", %{}) ==
+      assert ExDoc.Config.match_module(
+               patterns,
+               MyApp.SomeOtherModule,
+               "MyApp.SomeOtherModule",
+               %{}
+             ) ==
                :Group
 
-      assert ExDoc.Config.match_module(patterns, MyAppWeb.SomeOtherModule, "MyAppWeb.SomeOtherModule", %{}) ==
+      assert ExDoc.Config.match_module(
+               patterns,
+               MyAppWeb.SomeOtherModule,
+               "MyAppWeb.SomeOtherModule",
+               %{}
+             ) ==
                nil
     end
   end

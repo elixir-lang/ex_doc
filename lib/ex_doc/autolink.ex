@@ -1,5 +1,6 @@
 defmodule ExDoc.Autolink do
-  # Encapsulates all functionality related to autolinking.
+  # Encapsulates all functionality related to autolinking,
+  # decoupled from language and ExDoc structs.
   @moduledoc false
 
   # * `:apps` - the apps that the docs are being generated for. When linking modules they are
