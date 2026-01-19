@@ -19,17 +19,20 @@ defmodule ExDoc.Formatter.EPUB do
     File.rm_rf!(config.output)
     File.mkdir_p!(Path.join(config.output, "OEBPS"))
 
-    {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
-    static_files = Formatter.generate_assets("OEBPS", default_assets(config), config)
+    static_files =
+      Formatter.copy_assets(config.assets, Path.join(config.output, "OEBPS")) ++
+        Formatter.copy_assets(additional_assets(config), config.output)
+
     Formatter.copy_logo(config, Path.join(@assets_dir, "logo"))
     Formatter.copy_cover(config, Path.join(@assets_dir, "cover"))
 
+    {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
     generate_content(config, modules, tasks, extras, static_files)
     generate_nav(config, modules, tasks, extras)
     generate_title(config)
     generate_extras(config, extras)
-    generate_list(config, modules)
-    generate_list(config, tasks)
+    generate_modules(config, modules)
+    generate_modules(config, tasks)
 
     {:ok, epub} = generate_epub(config.output)
     File.rm_rf!(config.output)
@@ -67,7 +70,7 @@ defmodule ExDoc.Formatter.EPUB do
     content =
       Templates.content_template(config, modules, tasks, extras, uuid, datetime, static_files)
 
-    File.write("#{config.output}/OEBPS/content.opf", content)
+    File.write!("#{config.output}/OEBPS/content.opf", content)
   end
 
   defp generate_nav(config, modules, tasks, extras) do
@@ -76,7 +79,7 @@ defmodule ExDoc.Formatter.EPUB do
     extras = group_by_group(extras)
 
     content = Templates.nav_template(config, modules, tasks, extras)
-    File.write("#{config.output}/OEBPS/nav.xhtml", content)
+    File.write!("#{config.output}/OEBPS/nav.xhtml", content)
   end
 
   defp group_by_group(nodes) do
@@ -87,13 +90,19 @@ defmodule ExDoc.Formatter.EPUB do
 
   defp generate_title(config) do
     content = Templates.title_template(config)
-    File.write("#{config.output}/OEBPS/title.xhtml", content)
+    File.write!("#{config.output}/OEBPS/title.xhtml", content)
   end
 
-  defp generate_list(config, nodes) do
+  defp generate_modules(config, nodes) do
     nodes
-    |> Task.async_stream(&generate_module_page(&1, config), timeout: :infinity)
-    |> Enum.map(&elem(&1, 1))
+    |> Task.async_stream(
+      fn module_node ->
+        content = Templates.module_template(config, module_node)
+        File.write!("#{config.output}/OEBPS/#{module_node.id}.xhtml", content)
+      end,
+      timeout: :infinity
+    )
+    |> Enum.map(fn {:ok, result} -> result end)
   end
 
   defp generate_epub(output) do
@@ -116,7 +125,7 @@ defmodule ExDoc.Formatter.EPUB do
 
   ## Helpers
 
-  defp default_assets(config) do
+  defp additional_assets(config) do
     [
       {Assets.dist(config.proglang), "OEBPS/dist"},
       {Assets.metainfo(), "META-INF"}
@@ -143,11 +152,6 @@ defmodule ExDoc.Formatter.EPUB do
     "~4..0B-~2..0B-~2..0BT~2..0B:~2..0B:~2..0BZ"
     |> :io_lib.format(list)
     |> IO.iodata_to_binary()
-  end
-
-  defp generate_module_page(module_node, config) do
-    content = Templates.module_template(config, module_node)
-    File.write("#{config.output}/OEBPS/#{module_node.id}.xhtml", content)
   end
 
   @two_power_16 65536

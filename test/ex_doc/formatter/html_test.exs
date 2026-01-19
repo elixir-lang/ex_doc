@@ -634,25 +634,4 @@ defmodule ExDoc.Formatter.HTML.WarningsTest do
       assert out =~ ~s|doc `Warnings.bar/0`|
     end
   end
-
-  test "deprecated assets", %{tmp_dir: tmp_dir} = context do
-    File.mkdir_p!("test/tmp/html_assets/hello")
-    File.touch!("test/tmp/html_assets/hello/world")
-
-    out =
-      capture_io(:stderr, fn ->
-        result =
-          ExDoc.Formatter.HTMLTest.generate_docs(
-            ExDoc.Formatter.HTMLTest.doc_config(context,
-              assets: "test/tmp/html_assets"
-            )
-          )
-
-        assert [%{warned?: true}] = result
-      end)
-
-    assert out =~ "binary to :assets is deprecated"
-    assert out =~ ~S([assets: %{"test/tmp/html_assets" => "assets"}])
-    assert File.regular?(tmp_dir <> "/html/assets/hello/world")
-  end
 end

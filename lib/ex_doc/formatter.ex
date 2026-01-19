@@ -165,26 +165,10 @@ defmodule ExDoc.Formatter do
   end
 
   @doc """
-  Generate assets from configs with the given default assets.
+  Copy `assets` to the given `output` folder.
   """
-  def generate_assets(namespace, defaults, %{output: output, assets: assets}) do
-    namespaced_assets =
-      if is_map(assets) do
-        Enum.map(assets, fn {source, target} -> {source, Path.join(namespace, target)} end)
-      else
-        ExDoc.warn(
-          """
-          giving a binary to :assets is deprecated, please give a map from source to target instead:
-
-              #{inspect(assets: %{assets => "assets"})}
-          """,
-          []
-        )
-
-        [{assets, Path.join(namespace, "assets")}]
-      end
-
-    Enum.flat_map(defaults ++ namespaced_assets, fn {dir_or_files, relative_target_dir} ->
+  def copy_assets(assets, output) do
+    Enum.flat_map(assets, fn {dir_or_files, relative_target_dir} ->
       target_dir = Path.join(output, relative_target_dir)
       File.mkdir_p!(target_dir)
 

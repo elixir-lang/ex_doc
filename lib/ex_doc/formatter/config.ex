@@ -138,7 +138,14 @@ defmodule ExDoc.Formatter.Config do
         :deps
       ])
 
-    struct!(preconfig, formatter_options)
+    config = struct!(preconfig, formatter_options)
+
+    if not is_map(config.assets) do
+      raise ArgumentError,
+            ":assets configuration in ExDoc expects a map from %{source => target}, got: #{config.assets}"
+    end
+
+    config
   end
 
   # Helper functions

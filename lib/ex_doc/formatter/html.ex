@@ -16,12 +16,13 @@ defmodule ExDoc.Formatter.HTML do
             ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
     end
 
-    config = %{config | output: Path.expand(config.output)}
-
     build = Path.join(config.output, ".build")
     output_setup(build, config)
 
-    static_files = Formatter.generate_assets(".", default_assets(config), config)
+    static_files =
+      Formatter.copy_assets(config.assets, config.output) ++
+        Formatter.copy_assets(additional_assets(config), config.output)
+
     search_data = generate_search_data(project_nodes, extras, config)
 
     {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
@@ -153,7 +154,7 @@ defmodule ExDoc.Formatter.HTML do
     Enum.zip([[head | tail], [nil, head | tail], tail ++ [nil]])
   end
 
-  defp default_assets(config) do
+  defp additional_assets(config) do
     [
       {Assets.dist(config.proglang), "dist"},
       {Assets.fonts(), "dist"}
