@@ -7,7 +7,7 @@ defmodule ExDoc.Retriever do
     defexception [:message]
   end
 
-  alias ExDoc.{DocAST, GroupMatcher, Refs}
+  alias ExDoc.{Config, DocAST, Refs}
   alias ExDoc.Retriever.Error
 
   @doc """
@@ -71,7 +71,7 @@ defmodule ExDoc.Retriever do
 
   defp sort_modules(modules, config) when is_list(modules) do
     Enum.sort_by(modules, fn module ->
-      {GroupMatcher.index(config.groups_for_modules, module.group), module.nested_context,
+      {Config.index(config.groups_for_modules, module.group), module.nested_context,
        module.nested_title, module.id}
     end)
   end
@@ -154,7 +154,7 @@ defmodule ExDoc.Retriever do
       )
 
     metadata = Map.put(metadata, :kind, module_data.type)
-    group = GroupMatcher.match_module(config.groups_for_modules, module, module_data.id, metadata)
+    group = Config.match_module(config.groups_for_modules, module, module_data.id, metadata)
     {nested_title, nested_context} = module_data.nesting_info || {nil, nil}
 
     %ExDoc.ModuleNode{

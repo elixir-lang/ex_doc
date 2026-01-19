@@ -1,7 +1,7 @@
 defmodule ExDoc.Extras do
   @moduledoc false
 
-  alias ExDoc.{GroupMatcher, Markdown, Utils}
+  alias ExDoc.{Config, Markdown, Utils}
 
   defmodule Page do
     @moduledoc false
@@ -67,7 +67,7 @@ defmodule ExDoc.Extras do
       if ids_count[extra.id] > 1, do: {disambiguate_id(extra, idx), idx + 1}, else: {extra, idx}
     end)
     |> elem(0)
-    |> Enum.sort_by(fn extra -> GroupMatcher.index(groups, extra.group) end)
+    |> Enum.sort_by(fn extra -> Config.index(groups, extra.group) end)
   end
 
   defp disambiguate_id(extra, discriminator) do
@@ -86,7 +86,7 @@ defmodule ExDoc.Extras do
     input = to_string(input)
     title = validate_extra_string!(input_options, :title) || input
     url = validate_extra_string!(input_options, :url)
-    group = GroupMatcher.match_extra(groups, url)
+    group = Config.match_extra(groups, url)
 
     %ExDoc.Extras.URL{
       group: group,
@@ -137,7 +137,7 @@ defmodule ExDoc.Extras do
     title =
       validate_extra_string!(input_options, :title) || title_text || filename_to_title(input)
 
-    group = GroupMatcher.match_extra(groups, input)
+    group = Config.match_extra(groups, input)
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
     source_url = source_url_pattern.(source_path, 1)
     search_data = validate_search_data!(input_options[:search_data])

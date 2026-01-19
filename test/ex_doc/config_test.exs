@@ -111,4 +111,78 @@ defmodule ExDoc.ConfigTest do
     assert groups_for_modules.(config, kernel) == nil
     assert groups_for_modules.(config, custom_group) == {"custom_group", ["module_1"]}
   end
+
+  describe "module matching" do
+    test "by atom names" do
+      patterns = [
+        Group: [MyApp.SomeModule, :lists]
+      ]
+
+      assert ExDoc.Config.match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule", %{}) ==
+               :Group
+
+      assert ExDoc.Config.match_module(patterns, :lists, ":lists", %{}) == :Group
+
+      assert ExDoc.Config.match_module(
+               patterns,
+               MyApp.SomeOtherModule,
+               "MyApp.SomeOtherModule",
+               %{}
+             ) ==
+               nil
+    end
+
+    test "by string names" do
+      patterns = [
+        Group: ["MyApp.SomeModule", ":lists"]
+      ]
+
+      assert ExDoc.Config.match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule", %{}) ==
+               :Group
+
+      assert ExDoc.Config.match_module(patterns, :lists, ":lists", %{}) == :Group
+
+      assert ExDoc.Config.match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule", %{}) ==
+               nil
+    end
+
+    test "by regular expressions" do
+      patterns = [
+        Group: ~r/MyApp\..?/
+      ]
+
+      assert ExDoc.Config.match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule", %{}) ==
+               :Group
+
+      assert ExDoc.Config.match_module(patterns, MyApp.SomeOtherModule, "MyApp.SomeOtherModule", %{}) ==
+               :Group
+
+      assert ExDoc.Config.match_module(patterns, MyAppWeb.SomeOtherModule, "MyAppWeb.SomeOtherModule", %{}) ==
+               nil
+    end
+  end
+
+  describe "extras matching" do
+    test "by string names" do
+      patterns = [Group: ["docs/handling/testing.md"]]
+
+      assert ExDoc.Config.match_extra(patterns, "docs/handling/testing.md") == :Group
+      refute ExDoc.Config.match_extra(patterns, "docs/handling/setup.md")
+    end
+
+    test "by regular expressions" do
+      patterns = [Group: ~r/docs\/handling?/]
+
+      assert ExDoc.Config.match_extra(patterns, "docs/handling/testing.md") == :Group
+      assert ExDoc.Config.match_extra(patterns, "docs/handling/setup.md") == :Group
+      refute ExDoc.Config.match_extra(patterns, "docs/introduction.md")
+    end
+
+    test "for extras with a url" do
+      patterns = [Group: ~r/elixir/i]
+
+      assert ExDoc.Config.match_extra(patterns, "https://elixir-lang.org") == :Group
+      refute ExDoc.Config.match_extra(patterns, "https://example.com")
+    end
+  end
 end
