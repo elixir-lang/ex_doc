@@ -4,7 +4,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
   alias __MODULE__.{Templates}
 
   def run(project_nodes, extras, config) when is_map(config) do
-    build = Path.join(config.output, ".build")
+    build = Path.join(config.output, ".build.markdown")
     output_setup(build, config)
 
     {modules, tasks} =
