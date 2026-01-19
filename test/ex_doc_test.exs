@@ -26,11 +26,10 @@ defmodule ExDocTest do
       formatters: [IdentityFormatter],
       markdown_processor: Sample,
       output: tmp_dir <> "/ex_doc",
-      retriever: IdentityRetriever,
-      source_beam: "beam_dir"
+      retriever: IdentityRetriever
     ]
 
-    ExDoc.generate(project, version, options)
+    ExDoc.generate(project, version, ["beam_dir"], options)
     assert Application.fetch_env!(:ex_doc, :markdown_processor) == {Sample, []}
   after
     Application.delete_env(:ex_doc, :markdown_processor)
@@ -45,11 +44,10 @@ defmodule ExDocTest do
       formatters: [IdentityFormatter],
       markdown_processor: {Sample, [foo: :bar]},
       output: tmp_dir <> "/ex_doc",
-      retriever: IdentityRetriever,
-      source_beam: "beam_dir"
+      retriever: IdentityRetriever
     ]
 
-    ExDoc.generate(project, version, options)
+    ExDoc.generate(project, version, ["beam_dir"], options)
     assert Application.fetch_env!(:ex_doc, :markdown_processor) == {Sample, [foo: :bar]}
   after
     Application.delete_env(:ex_doc, :markdown_processor)
@@ -59,12 +57,13 @@ defmodule ExDocTest do
     options = [
       apps: [:test_app],
       formatters: [IdentityFormatter],
-      retriever: IdentityRetriever,
-      source_beam: "beam_dir"
+      retriever: IdentityRetriever
     ]
 
-    assert [%{entrypoint: {source_dir, _config}}] = ExDoc.generate("Elixir", "1", options)
-    assert source_dir == options[:source_beam]
+    assert [%{entrypoint: {source_dirs, _config}}] =
+             ExDoc.generate("Elixir", "1", ["beam_dir"], options)
+
+    assert source_dirs == ["beam_dir"]
   end
 
   test "formatter module not found" do
@@ -74,7 +73,7 @@ defmodule ExDocTest do
 
     assert_raise RuntimeError,
                  "formatter module ExDoc.Formatter.PDF not found",
-                 fn -> ExDoc.generate(project, version, options) end
+                 fn -> ExDoc.generate(project, version, ["beam_dir"], options) end
   end
 
   test "version" do

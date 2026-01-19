@@ -4,7 +4,7 @@ defmodule ExDoc.CLI do
   @doc """
   Handles the command line parsing for the escript.
   """
-  def main(args, generator \\ &ExDoc.generate/3) do
+  def main(args, generator \\ &ExDoc.generate/4) do
     {:ok, _} = Application.ensure_all_started(:ex_doc)
 
     {opts, args} =
@@ -51,7 +51,6 @@ defmodule ExDoc.CLI do
 
   defp generate(args, opts, generator) do
     [project, version | source_beams] = parse_args(args)
-
     Code.prepend_paths(source_beams)
 
     for path <- Keyword.get_values(opts, :paths),
@@ -68,14 +67,12 @@ defmodule ExDoc.CLI do
 
     opts =
       opts
-      |> Keyword.put(:source_beam, source_beams)
       |> Keyword.put(:apps, Enum.map(source_beams, &app/1))
       |> merge_config()
       |> normalize_formatters()
 
     quiet? = Keyword.get(opts, :quiet, false)
-
-    generated_docs = generator.(project, version, opts)
+    generated_docs = generator.(project, version, source_beams, opts)
 
     unless quiet? do
       Enum.each(generated_docs, fn %{entrypoint: entrypoint, formatter: formatter} ->

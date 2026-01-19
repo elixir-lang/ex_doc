@@ -19,7 +19,8 @@ defmodule ExDoc.Formatter.MarkdownTest do
   end
 
   defp generate_docs(config) do
-    ExDoc.generate(config[:project], config[:version], config)
+    source_beam = config[:source_beam] |> List.wrap()
+    ExDoc.generate(config[:project], config[:version], source_beam, config)
   end
 
   test "generates Markdown files in the default directory", %{tmp_dir: tmp_dir} = context do

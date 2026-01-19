@@ -11,19 +11,13 @@ defmodule ExDoc.Retriever do
   alias ExDoc.Retriever.Error
 
   @doc """
-  Extract documentation from all modules in the specified directory or directories.
+  Extract documentation from all modules in the specified directories.
 
   Returns a tuple containing `{modules, filtered}`, using `config.filter_modules`
   as a filter criteria.
   """
-  @spec docs_from_dir(Path.t() | [Path.t()], ExDoc.Config.t()) ::
+  @spec docs_from_dir([Path.t()], ExDoc.Config.t()) ::
           {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]}
-  def docs_from_dir(dir, config) when is_binary(dir) do
-    dir
-    |> docs_from_dir({[], []}, config)
-    |> sort_modules(config)
-  end
-
   def docs_from_dir(dirs, config) when is_list(dirs) do
     dirs
     |> Enum.reduce({[], []}, &docs_from_dir(&1, &2, config))

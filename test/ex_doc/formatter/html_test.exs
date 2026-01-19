@@ -23,7 +23,8 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   def generate_docs(config) do
     config = Keyword.put_new(config, :skip_undefined_reference_warnings_on, ["Warnings"])
-    ExDoc.generate(config[:project], config[:version], config)
+    source_beam = config[:source_beam] |> List.wrap()
+    ExDoc.generate(config[:project], config[:version], source_beam, config)
   end
 
   def doc_config(%{tmp_dir: tmp_dir} = _context) do

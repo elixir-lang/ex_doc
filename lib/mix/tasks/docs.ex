@@ -559,7 +559,7 @@ defmodule Mix.Tasks.Docs do
   ]
 
   @doc false
-  def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate/3) do
+  def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate/4) do
     {:ok, _} = Application.ensure_all_started(:ex_doc)
 
     unless Code.ensure_loaded?(ExDoc.Formatter.Config) do
@@ -600,14 +600,14 @@ defmodule Mix.Tasks.Docs do
       |> normalize_source_url(config)
       # accepted at root level config
       |> normalize_homepage_url(config)
-      |> normalize_source_beam(config)
       |> normalize_apps(config)
       |> normalize_main()
       |> normalize_deps()
       |> normalize_formatters()
       |> put_package(config)
 
-    Code.prepend_path(options[:source_beam])
+    source_beams = source_beams(options, config)
+    Code.prepend_path(source_beams)
 
     for path <- Keyword.get_values(options, :paths),
         path <- Path.wildcard(path) do
@@ -615,7 +615,7 @@ defmodule Mix.Tasks.Docs do
     end
 
     Mix.shell().info("Generating docs...")
-    generated_docs = generator.(project, version, options)
+    generated_docs = generator.(project, version, source_beams, options)
 
     Enum.each(generated_docs, fn %{entrypoint: entrypoint, formatter: formatter} ->
       extension = formatter_module_to_extension(formatter)
@@ -693,15 +693,12 @@ defmodule Mix.Tasks.Docs do
     end
   end
 
-  defp normalize_source_beam(options, config) do
-    compile_path =
-      if Mix.Project.umbrella?(config) do
-        umbrella_compile_paths(Keyword.get(options, :ignore_apps, []))
-      else
-        Mix.Project.compile_path()
-      end
-
-    Keyword.put_new(options, :source_beam, compile_path)
+  defp source_beams(options, config) do
+    if Mix.Project.umbrella?(config) do
+      umbrella_compile_paths(Keyword.get(options, :ignore_apps, []))
+    else
+      [Mix.Project.compile_path()]
+    end
   end
 
   defp umbrella_compile_paths(ignored_apps) do

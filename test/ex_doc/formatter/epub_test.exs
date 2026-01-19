@@ -28,7 +28,8 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   defp generate_docs(config) do
-    ExDoc.generate(config[:project], config[:version], config)
+    source_beam = config[:source_beam] |> List.wrap()
+    ExDoc.generate(config[:project], config[:version], source_beam, config)
   end
 
   defp generate_docs_and_unzip(context, config) do

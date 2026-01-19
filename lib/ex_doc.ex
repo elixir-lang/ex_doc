@@ -23,17 +23,17 @@ defmodule ExDoc do
   end
 
   @doc """
-  Generates documentation for the given `project`, `vsn` (version)
-  and `options`.
+  Generates documentation for the given `project`, `vsn` (version),
+  `source_beams` directories, and `options`.
   """
-  @spec generate(String.t(), String.t(), Keyword.t()) ::
+  @spec generate(String.t(), String.t(), [Path.t()], Keyword.t()) ::
           [%{entrypoint: String.t(), warned?: boolean(), formatter: module()}]
-  def generate(project, version, options)
-      when is_binary(project) and is_binary(version) and is_list(options) do
+  def generate(project, version, source_beams, options)
+      when is_binary(project) and is_binary(version) and is_list(source_beams) and
+             is_list(options) do
     # Clear it up for tests
     _ = unset_warned()
 
-    source_beam = Keyword.get(options, :source_beam)
     retriever = Keyword.get(options, :retriever, ExDoc.Retriever)
     extras_input = Keyword.get(options, :extras, [])
 
@@ -46,7 +46,7 @@ defmodule ExDoc do
     formatter_config = ExDoc.Formatter.Config.build(project, version, options)
 
     # Retriever phase (run once for all formatters)
-    {modules, filtered} = retriever.docs_from_dir(source_beam, retriever_config)
+    {modules, filtered} = retriever.docs_from_dir(source_beams, retriever_config)
     extras = ExDoc.Extras.build(extras_input, retriever_config)
 
     for formatter <- formatter_config.formatters do

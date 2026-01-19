@@ -9,17 +9,17 @@ defmodule Mix.Tasks.DocsTest do
 
   @moduletag :tmp_dir
 
-  def run(context, args, opts, generator \\ &mock_generator/3) do
+  def run(context, args, opts, generator \\ &mock_generator/4) do
     opts = Keyword.put_new(opts, :output, context[:tmp_dir])
     Mix.Tasks.Docs.run(args, opts, generator)
   end
 
-  defp mock_generator(project, version, options) do
+  defp mock_generator(project, version, source_beam, options) do
     formatters = options[:formatters] || ["html"]
 
     for formatter <- formatters do
       %{
-        entrypoint: {project, version, options},
+        entrypoint: {project, version, source_beam, options},
         warned?: false,
         formatter: Module.concat(ExDoc.Formatter, String.upcase(formatter))
       }
@@ -27,7 +27,7 @@ defmodule Mix.Tasks.DocsTest do
   end
 
   def run_with_io(context, args, opts, generator)
-      when is_list(args) and is_list(opts) and is_function(generator, 3) do
+      when is_list(args) and is_list(opts) and is_function(generator, 4) do
     opts = Keyword.put_new(opts, :output, context[:tmp_dir])
 
     with_io(fn ->
@@ -37,28 +37,25 @@ defmodule Mix.Tasks.DocsTest do
 
   test "inflects values from app and version", context do
     assert [
-             {"ex_doc", "0.1.0",
+             {"ex_doc", "0.1.0", _,
               [
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "0.1.0",
+             {"ex_doc", "0.1.0", _,
               [
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "0.1.0",
+             {"ex_doc", "0.1.0", _,
               [
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]}
            ] = run(context, [], app: :ex_doc, version: "0.1.0")
@@ -66,20 +63,18 @@ defmodule Mix.Tasks.DocsTest do
 
   test "accepts multiple formatters from CLI", context do
     assert [
-             {"ex_doc", "0.1.0",
+             {"ex_doc", "0.1.0", _,
               [
                 formatters: ["html", "epub"],
                 deps: _,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "0.1.0",
+             {"ex_doc", "0.1.0", _,
               [
                 formatters: ["html", "epub"],
                 deps: _,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]}
            ] = run(context, ["-f", "html", "-f", "epub"], app: :ex_doc, version: "0.1.0")
@@ -87,20 +82,18 @@ defmodule Mix.Tasks.DocsTest do
 
   test "accepts multiple formatters from config", context do
     assert [
-             {"ex_doc", "0.1.0",
+             {"ex_doc", "0.1.0", _,
               [
                 formatters: ["html", "epub"],
                 deps: _,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "0.1.0",
+             {"ex_doc", "0.1.0", _,
               [
                 formatters: ["html", "epub"],
                 deps: _,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]}
            ] =
@@ -113,28 +106,25 @@ defmodule Mix.Tasks.DocsTest do
 
   test "uses the given name", context do
     assert [
-             {"ExDoc", "0.1.0",
+             {"ExDoc", "0.1.0", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ExDoc", "0.1.0",
+             {"ExDoc", "0.1.0", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ExDoc", "0.1.0",
+             {"ExDoc", "0.1.0", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]}
            ] = run(context, [], app: :ex_doc, version: "0.1.0", name: "ExDoc")
@@ -142,31 +132,28 @@ defmodule Mix.Tasks.DocsTest do
 
   test "accepts modules in :main", context do
     assert [
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 main: "Sample",
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 main: "Sample",
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 main: "Sample",
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]}
            ] = run(context, [], app: :ex_doc, docs: [main: Sample])
@@ -174,30 +161,27 @@ defmodule Mix.Tasks.DocsTest do
 
   test "accepts files in :main", context do
     assert [
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 main: "another",
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 main: "another",
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 main: "another",
                 proglang: :elixir
               ]}
@@ -205,34 +189,31 @@ defmodule Mix.Tasks.DocsTest do
   end
 
   test "accepts output in :output", %{tmp_dir: tmp_dir} = context do
-    [{_, _, html_options}, {_, _, epub_options}, {_, _, markdown_options}] =
+    [{_, _, _, html_options}, {_, _, _, epub_options}, {_, _, _, markdown_options}] =
       run_results = run(context, [], app: :ex_doc, docs: [output: tmp_dir <> "/hello"])
 
     assert [
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 output: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 output: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 output: _,
                 proglang: :elixir
               ]}
@@ -246,34 +227,31 @@ defmodule Mix.Tasks.DocsTest do
   test "parses output with lower preference than options", %{tmp_dir: tmp_dir} = context do
     output = tmp_dir <> "/world"
 
-    [{_, _, html_options}, {_, _, epub_options}, {_, _, markdown_options}] =
+    [{_, _, _, html_options}, {_, _, _, epub_options}, {_, _, _, markdown_options}] =
       run_results = run(context, ["-o", "#{output}"], app: :ex_doc, docs: [output: output])
 
     assert [
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 output: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 output: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 output: _,
                 proglang: :elixir
               ]}
@@ -286,28 +264,25 @@ defmodule Mix.Tasks.DocsTest do
 
   test "includes dependencies", context do
     assert [
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: deps,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: deps,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: deps,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]}
            ] = run(context, [], app: :ex_doc, docs: [])
@@ -319,28 +294,25 @@ defmodule Mix.Tasks.DocsTest do
 
   test "allows custom dependency paths", context do
     assert [
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: deps,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: deps,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: deps,
                 apps: _,
-                source_beam: _,
                 proglang: :elixir
               ]}
            ] = run(context, [], app: :ex_doc, docs: [deps: [earmark_parser: "foo"]])
@@ -351,30 +323,27 @@ defmodule Mix.Tasks.DocsTest do
 
   test "accepts lazy docs", context do
     assert [
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 main: "another",
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 main: "another",
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 main: "another",
                 proglang: :elixir
               ]}
@@ -384,32 +353,29 @@ defmodule Mix.Tasks.DocsTest do
   test "accepts options from root", context do
     # accepted options are: `app`, `name`, `source_url`, `homepage_url`, `version`
     assert [
-             {"ExDoc", "1.2.3-dev",
+             {"ExDoc", "1.2.3-dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 homepage_url: "https://elixir-lang.org",
                 source_url: "https://github.com/elixir-lang/ex_doc",
                 proglang: :elixir
               ]},
-             {"ExDoc", "1.2.3-dev",
+             {"ExDoc", "1.2.3-dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 homepage_url: "https://elixir-lang.org",
                 source_url: "https://github.com/elixir-lang/ex_doc",
                 proglang: :elixir
               ]},
-             {"ExDoc", "1.2.3-dev",
+             {"ExDoc", "1.2.3-dev", _,
               [
                 formatters: _,
                 deps: _,
                 apps: _,
-                source_beam: _,
                 homepage_url: "https://elixir-lang.org",
                 source_url: "https://github.com/elixir-lang/ex_doc",
                 proglang: :elixir
@@ -424,35 +390,32 @@ defmodule Mix.Tasks.DocsTest do
                proglang: :elixir
              )
 
-    assert [{"ex_doc", "dev", _}, {"ex_doc", "dev", _}, {"ex_doc", "dev", _}] =
+    assert [{"ex_doc", "dev", _, _}, {"ex_doc", "dev", _, _}, {"ex_doc", "dev", _, _}] =
              run(context, [], app: :ex_doc)
   end
 
   test "supports umbrella project", context do
     Mix.Project.in_project(:umbrella, "test/fixtures/umbrella", fn _mod ->
       assert [
-               {"umbrella", "dev",
+               {"umbrella", "dev", _,
                 [
                   formatters: _,
                   deps: _,
                   apps: [:bar, :foo],
-                  source_beam: _,
                   proglang: :elixir
                 ]},
-               {"umbrella", "dev",
+               {"umbrella", "dev", _,
                 [
                   formatters: _,
                   deps: _,
                   apps: [:bar, :foo],
-                  source_beam: _,
                   proglang: :elixir
                 ]},
-               {"umbrella", "dev",
+               {"umbrella", "dev", _,
                 [
                   formatters: _,
                   deps: _,
                   apps: [:bar, :foo],
-                  source_beam: _,
                   proglang: :elixir
                 ]}
              ] = run(context, [], app: :umbrella, apps_path: "apps/", docs: [])
@@ -462,30 +425,27 @@ defmodule Mix.Tasks.DocsTest do
   test "supports umbrella project with ignore_apps", context do
     Mix.Project.in_project(:umbrella, "test/fixtures/umbrella", fn _mod ->
       assert [
-               {"umbrella", "dev",
+               {"umbrella", "dev", _,
                 [
                   formatters: _,
                   deps: _,
                   apps: [:bar],
-                  source_beam: _,
                   ignore_apps: [:foo],
                   proglang: :elixir
                 ]},
-               {"umbrella", "dev",
+               {"umbrella", "dev", _,
                 [
                   formatters: _,
                   deps: _,
                   apps: [:bar],
-                  source_beam: _,
                   ignore_apps: [:foo],
                   proglang: :elixir
                 ]},
-               {"umbrella", "dev",
+               {"umbrella", "dev", _,
                 [
                   formatters: _,
                   deps: _,
                   apps: [:bar],
-                  source_beam: _,
                   ignore_apps: [:foo],
                   proglang: :elixir
                 ]}
@@ -495,30 +455,27 @@ defmodule Mix.Tasks.DocsTest do
 
   test "accepts warnings_as_errors in :warnings_as_errors", context do
     assert [
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: [:ex_doc],
-                source_beam: _,
                 warnings_as_errors: false,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: [:ex_doc],
-                source_beam: _,
                 warnings_as_errors: false,
                 proglang: :elixir
               ]},
-             {"ex_doc", "dev",
+             {"ex_doc", "dev", _,
               [
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: [:ex_doc],
-                source_beam: _,
                 warnings_as_errors: false,
                 proglang: :elixir
               ]}

@@ -52,7 +52,8 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
       extras: []
     ]
 
-    ExDoc.generate(config[:project], config[:version], config)
+    source_beam = config[:source_beam] |> List.wrap()
+    ExDoc.generate(config[:project], config[:version], source_beam, config)
 
     [c.tmp_dir, "doc", "foo.html"]
     |> Path.join()
