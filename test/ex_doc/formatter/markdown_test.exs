@@ -3,7 +3,7 @@ defmodule ExDoc.Formatter.MarkdownTest do
 
   @moduletag :tmp_dir
 
-  defp doc_config(%{tmp_dir: tmp_dir} = _context) do
+  defp config(%{tmp_dir: tmp_dir} = _context) do
     [
       project: "Elixir",
       version: "1.0.1",
@@ -14,17 +14,17 @@ defmodule ExDoc.Formatter.MarkdownTest do
     ]
   end
 
-  defp doc_config(context, config) when is_map(context) and is_list(config) do
-    Keyword.merge(doc_config(context), config)
+  defp config(context, config) when is_map(context) and is_list(config) do
+    Keyword.merge(config(context), config)
   end
 
-  defp generate_docs(config) do
+  defp generate(config) do
     source_beam = config[:source_beam] |> List.wrap()
     ExDoc.generate(config[:project], config[:version], source_beam, config)
   end
 
   test "generates Markdown files in the default directory", %{tmp_dir: tmp_dir} = context do
-    generate_docs(doc_config(context))
+    generate(config(context))
     assert File.regular?(tmp_dir <> "/index.md")
 
     assert File.regular?(tmp_dir <> "/CompiledWithDocs.md")
@@ -37,7 +37,7 @@ defmodule ExDoc.Formatter.MarkdownTest do
   end
 
   test "generates module pages", %{tmp_dir: tmp_dir} = context do
-    generate_docs(doc_config(context))
+    generate(config(context))
 
     content = File.read!(tmp_dir <> "/CompiledWithDocs.md")
 
@@ -70,7 +70,7 @@ defmodule ExDoc.Formatter.MarkdownTest do
   end
 
   test "renders types and specs properly", %{tmp_dir: tmp_dir} = context do
-    generate_docs(doc_config(context))
+    generate(config(context))
 
     content = File.read!(tmp_dir <> "/TypesAndSpecs.md")
 
@@ -103,7 +103,7 @@ defmodule ExDoc.Formatter.MarkdownTest do
 
   test "generates extras", %{tmp_dir: tmp_dir} = context do
     config =
-      doc_config(context,
+      config(context,
         extras: [
           "test/fixtures/LICENSE",
           "test/fixtures/PlainText.txt",
@@ -115,7 +115,7 @@ defmodule ExDoc.Formatter.MarkdownTest do
         ]
       )
 
-    generate_docs(config)
+    generate(config)
     refute File.exists?(tmp_dir <> "/elixir.md")
     assert File.exists?(tmp_dir <> "/license.md")
     assert File.exists?(tmp_dir <> "/plaintext.md")
@@ -128,8 +128,8 @@ defmodule ExDoc.Formatter.MarkdownTest do
   describe "configuration options" do
     test "handles custom output directory", %{tmp_dir: tmp_dir} = context do
       custom_output = Path.join(tmp_dir, "custom_docs")
-      config = doc_config(context, output: custom_output)
-      generate_docs(config)
+      config = config(context, output: custom_output)
+      generate(config)
 
       assert File.regular?(custom_output <> "/index.md")
       assert File.regular?(custom_output <> "/CompiledWithDocs.md")
@@ -137,16 +137,16 @@ defmodule ExDoc.Formatter.MarkdownTest do
     end
 
     test "handles custom project name and version", %{tmp_dir: tmp_dir} = context do
-      config = doc_config(context, project: "MyProject", version: "2.0.0")
-      generate_docs(config)
+      config = config(context, project: "MyProject", version: "2.0.0")
+      generate(config)
 
       content = File.read!(tmp_dir <> "/index.md")
       assert content =~ "# MyProject v2.0.0 - Table of Contents"
     end
 
     test "processes source_url configuration", %{tmp_dir: tmp_dir} = context do
-      config = doc_config(context, source_url: "https://github.com/example/project")
-      generate_docs(config)
+      config = config(context, source_url: "https://github.com/example/project")
+      generate(config)
 
       assert File.regular?(tmp_dir <> "/CompiledWithDocs.md")
       assert File.regular?(tmp_dir <> "/index.md")
@@ -155,8 +155,8 @@ defmodule ExDoc.Formatter.MarkdownTest do
 
   describe "index file" do
     test "generates index", %{tmp_dir: tmp_dir} = context do
-      config = doc_config(context, extras: ["test/fixtures/README.md"], extra_section: "Guides")
-      generate_docs(config)
+      config = config(context, extras: ["test/fixtures/README.md"], extra_section: "Guides")
+      generate(config)
 
       content = File.read!(tmp_dir <> "/index.md")
 
@@ -191,16 +191,16 @@ defmodule ExDoc.Formatter.MarkdownTest do
     end
 
     test "when no extras exist", %{tmp_dir: tmp_dir} = context do
-      config = doc_config(context)
-      generate_docs(config)
+      config = config(context)
+      generate(config)
       content = File.read!(tmp_dir <> "/index.md")
       refute content =~ ~r/## (Pages|Guides)/
     end
   end
 
   test "stores generated content in .build.markdown", %{tmp_dir: tmp_dir} = context do
-    config = doc_config(context, extras: ["test/fixtures/README.md"])
-    generate_docs(config)
+    config = config(context, extras: ["test/fixtures/README.md"])
+    generate(config)
 
     # Verify necessary files in .build.markdown
     content = File.read!(tmp_dir <> "/.build.markdown")

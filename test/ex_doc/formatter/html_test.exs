@@ -21,13 +21,13 @@ defmodule ExDoc.Formatter.HTMLTest do
   def before_closing_body_tag(:html, name), do: "<p>#{name}</p>"
   def before_closing_footer_tag(:html, name), do: "<p>#{name}</p>"
 
-  def generate_docs(config) do
+  def generate(config) do
     config = Keyword.put_new(config, :skip_undefined_reference_warnings_on, ["Warnings"])
     source_beam = config[:source_beam] |> List.wrap()
     ExDoc.generate(config[:project], config[:version], source_beam, config)
   end
 
-  def doc_config(%{tmp_dir: tmp_dir} = _context) do
+  def config(%{tmp_dir: tmp_dir} = _context) do
     [
       apps: [:elixir],
       project: "Elixir",
@@ -43,20 +43,20 @@ defmodule ExDoc.Formatter.HTMLTest do
     ]
   end
 
-  def doc_config(context, config) when is_map(context) and is_list(config) do
-    Keyword.merge(doc_config(context), config)
+  def config(context, config) when is_map(context) and is_list(config) do
+    Keyword.merge(config(context), config)
   end
 
   test "validates options", context do
-    config = doc_config(context, main: "index")
+    config = config(context, main: "index")
 
     assert_raise ArgumentError,
                  ~S("main" cannot be set to "index", otherwise it will recursively link to itself),
-                 fn -> generate_docs(config) end
+                 fn -> generate(config) end
   end
 
   test "allows to set the authors of the document", %{tmp_dir: tmp_dir} = context do
-    generate_docs(doc_config(context, authors: ["John Doe", "Jane Doe"], source_beam: "unknown"))
+    generate(config(context, authors: ["John Doe", "Jane Doe"], source_beam: "unknown"))
     content_index = File.read!(tmp_dir <> "/html/api-reference.html")
 
     assert content_index =~ ~r{<meta name="author" content="John Doe, Jane Doe">}
@@ -64,7 +64,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   test "generates in default directory with redirect index.html file",
        %{tmp_dir: tmp_dir} = context do
-    generate_docs(doc_config(context))
+    generate(config(context))
 
     assert File.regular?(tmp_dir <> "/html/CompiledWithDocs.html")
     assert File.regular?(tmp_dir <> "/html/CompiledWithDocs.Nested.html")
@@ -77,7 +77,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "generates all listing files", %{tmp_dir: tmp_dir} = context do
-    generate_docs(doc_config(context))
+    generate(config(context))
     "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
 
     assert %{
@@ -108,7 +108,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "generates the api reference file", %{tmp_dir: tmp_dir} = context do
-    generate_docs(doc_config(context))
+    generate(config(context))
 
     content = File.read!(tmp_dir <> "/html/api-reference.html")
 
@@ -124,8 +124,8 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "skips api-reference file", %{tmp_dir: tmp_dir} = context do
-    generate_docs(
-      doc_config(context,
+    generate(
+      config(context,
         api_reference: false,
         source_beam: "unknown",
         extras: ["test/fixtures/README.md"],
@@ -139,9 +139,9 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "groups modules by nesting", %{tmp_dir: tmp_dir} = context do
-    doc_config(context)
+    config(context)
     |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix.B, Common.Nesting.Prefix.B.B])
-    |> generate_docs()
+    |> generate()
 
     "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
     assert {:ok, %{"modules" => modules}} = Jason.decode(content)
@@ -165,10 +165,10 @@ defmodule ExDoc.Formatter.HTMLTest do
       ]
     ]
 
-    doc_config(context)
+    config(context)
     |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix.B, Common.Nesting.Prefix.B.B])
     |> Keyword.put(:groups_for_modules, groups)
-    |> generate_docs()
+    |> generate()
 
     "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
     assert {:ok, %{"modules" => modules}} = Jason.decode(content)
@@ -178,7 +178,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "generates headers for index.html and module pages", %{tmp_dir: tmp_dir} = context do
-    generate_docs(doc_config(context, main: "RandomError"))
+    generate(config(context, main: "RandomError"))
     content_index = File.read!(tmp_dir <> "/html/index.html")
     content_module = File.read!(tmp_dir <> "/html/RandomError.html")
 
@@ -221,19 +221,17 @@ defmodule ExDoc.Formatter.HTMLTest do
       File.mkdir_p!(tmp_dir <> "/html/assets")
       File.touch!(tmp_dir <> "/html/assets/favicon.png")
 
-      generate_docs(
-        doc_config(context, favicon: "test/fixtures/elixir.png", source_beam: "unknown")
-      )
+      generate(config(context, favicon: "test/fixtures/elixir.png", source_beam: "unknown"))
 
       assert File.read!(tmp_dir <> "/html/assets/favicon.png") != ""
     end
 
     test "fails when favicon is not an allowed format", context do
-      config = doc_config(context, favicon: "README.md", source_beam: "unknown")
+      config = config(context, favicon: "README.md", source_beam: "unknown")
 
       assert_raise ArgumentError,
                    "image format not recognized, allowed formats are: .png, .jpg, .svg",
-                   fn -> generate_docs(config) end
+                   fn -> generate(config) end
     end
   end
 
@@ -241,16 +239,16 @@ defmodule ExDoc.Formatter.HTMLTest do
     test "overriding previous entries", %{tmp_dir: tmp_dir} = context do
       File.mkdir_p!(tmp_dir <> "/html/assets")
       File.touch!(tmp_dir <> "/html/assets/logo.png")
-      generate_docs(doc_config(context, logo: "test/fixtures/elixir.png", source_beam: "unknown"))
+      generate(config(context, logo: "test/fixtures/elixir.png", source_beam: "unknown"))
       assert File.read!(tmp_dir <> "/html/assets/logo.png") != ""
     end
 
     test "fails when logo is not an allowed format", context do
-      config = doc_config(context, logo: "README.md", source_beam: "unknown")
+      config = config(context, logo: "README.md", source_beam: "unknown")
 
       assert_raise ArgumentError,
                    "image format not recognized, allowed formats are: .png, .jpg, .svg",
-                   fn -> generate_docs(config) end
+                   fn -> generate(config) end
     end
   end
 
@@ -259,8 +257,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       File.mkdir_p!("test/tmp/html_assets/hello")
       File.touch!("test/tmp/html_assets/hello/world")
 
-      generate_docs(
-        doc_config(context,
+      generate(
+        config(context,
           source_beam: "unknown",
           assets: %{"test/tmp/html_assets" => "assets"},
           logo: "test/fixtures/elixir.png"
@@ -279,8 +277,8 @@ defmodule ExDoc.Formatter.HTMLTest do
       File.touch!("test/tmp/html_assets/hello/world")
       File.ln_s("world", "test/tmp/html_assets/hello/symlink_world")
 
-      generate_docs(
-        doc_config(context,
+      generate(
+        config(context,
           source_beam: "unknown",
           assets: %{"test/tmp/html_assets" => "assets"}
         )
@@ -297,13 +295,13 @@ defmodule ExDoc.Formatter.HTMLTest do
   describe "canonical URL" do
     test "is included when canonical options is specified", %{tmp_dir: tmp_dir} = context do
       config =
-        doc_config(context,
+        config(context,
           source_beam: "unknown",
           extras: ["test/fixtures/README.md"],
           canonical: "https://hexdocs.pm/elixir/"
         )
 
-      generate_docs(config)
+      generate(config)
       content = File.read!(tmp_dir <> "/html/api-reference.html")
       assert content =~ ~r{<link rel="canonical" href="https://hexdocs.pm/elixir/}
 
@@ -312,8 +310,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "is not included when canonical is nil", %{tmp_dir: tmp_dir} = context do
-      config = doc_config(context, canonical: nil, source_beam: "unknown")
-      generate_docs(config)
+      config = config(context, canonical: nil, source_beam: "unknown")
+      generate(config)
       content = File.read!(tmp_dir <> "/html/api-reference.html")
       refute content =~ ~r{<link rel="canonical" href="}
     end
@@ -321,8 +319,8 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   describe "generates redirects" do
     test "redirects are generated based on the configuration", %{tmp_dir: tmp_dir} = context do
-      generate_docs(
-        doc_config(context,
+      generate(
+        config(context,
           source_beam: "unknown",
           extras: ["test/fixtures/LICENSE"],
           redirects: %{
@@ -342,8 +340,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "redirects accept a list", %{tmp_dir: tmp_dir} = context do
-      generate_docs(
-        doc_config(context,
+      generate(
+        config(context,
           source_beam: "unknown",
           extras: ["test/fixtures/LICENSE"],
           redirects: [
@@ -363,8 +361,8 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "redirects with anchors", %{tmp_dir: tmp_dir} = context do
-      generate_docs(
-        doc_config(context,
+      generate(
+        config(context,
           source_beam: "unknown",
           extras: ["test/fixtures/LICENSE"],
           redirects: %{
@@ -395,7 +393,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     ]
 
     test "includes source `.livemd` files", %{tmp_dir: tmp_dir} = context do
-      generate_docs(doc_config(context, extras: @extras, source_beam: "unknown"))
+      generate(config(context, extras: @extras, source_beam: "unknown"))
 
       refute File.exists?(tmp_dir <> "/html/LICENSE")
       refute File.exists?(tmp_dir <> "/html/license")
@@ -411,7 +409,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
 
     test "generates sidebarNodes (even without modules)", %{tmp_dir: tmp_dir} = context do
-      generate_docs(doc_config(context, source_beam: "unknown", extras: @extras))
+      generate(config(context, source_beam: "unknown", extras: @extras))
       "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
 
       assert [
@@ -434,7 +432,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     test "with autolinks", %{tmp_dir: tmp_dir} = context do
       config =
-        doc_config(context,
+        config(context,
           extras: [
             "test/fixtures/README.md",
             "test/fixtures/LivebookFile.livemd",
@@ -442,7 +440,7 @@ defmodule ExDoc.Formatter.HTMLTest do
           ]
         )
 
-      generate_docs(config)
+      generate(config)
 
       # Markdown extras render with autolinks
       content = File.read!(tmp_dir <> "/html/readme.html")
@@ -462,8 +460,8 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     test "supports settext headers while discarding links on header",
          %{tmp_dir: tmp_dir} = context do
-      generate_docs(
-        doc_config(context,
+      generate(
+        config(context,
           source_beam: "unknown",
           extras: ["test/fixtures/ExtraPageWithSettextHeader.md"]
         )
@@ -486,8 +484,8 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     test "includes links to the previous/next page if applicable",
          %{tmp_dir: tmp_dir} = context do
-      generate_docs(
-        doc_config(context,
+      generate(
+        config(context,
           source_beam: "unknown",
           extras: [
             "test/fixtures/ExtraPage.md",
@@ -524,8 +522,8 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   describe "before_closing_*_tags" do
     test "generates tags correctly", %{tmp_dir: tmp_dir} = context do
-      generate_docs(
-        doc_config(context,
+      generate(
+        config(context,
           before_closing_head_tag: &before_closing_head_tag/1,
           before_closing_body_tag: &before_closing_body_tag/1,
           before_closing_footer_tag: &before_closing_footer_tag/1,
@@ -547,9 +545,9 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   test "stores generated content in .build", %{tmp_dir: tmp_dir} = context do
     config =
-      doc_config(context, extras: ["test/fixtures/README.md"], logo: "test/fixtures/elixir.png")
+      config(context, extras: ["test/fixtures/README.md"], logo: "test/fixtures/elixir.png")
 
-    generate_docs(config)
+    generate(config)
 
     # Verify necessary files in .build
     content = File.read!(tmp_dir <> "/html/.build")
@@ -585,8 +583,8 @@ defmodule ExDoc.Formatter.HTML.WarningsTest do
     output =
       capture_io(:stderr, fn ->
         result =
-          ExDoc.Formatter.HTMLTest.generate_docs(
-            ExDoc.Formatter.HTMLTest.doc_config(context, main: "Randomerror")
+          ExDoc.Formatter.HTMLTest.generate(
+            ExDoc.Formatter.HTMLTest.config(context, main: "Randomerror")
           )
 
         assert [%{warned?: true}] = result
@@ -603,8 +601,8 @@ defmodule ExDoc.Formatter.HTML.WarningsTest do
     out =
       capture_io(:stderr, fn ->
         result =
-          ExDoc.Formatter.HTMLTest.generate_docs(
-            ExDoc.Formatter.HTMLTest.doc_config(context, skip_undefined_reference_warnings_on: [])
+          ExDoc.Formatter.HTMLTest.generate(
+            ExDoc.Formatter.HTMLTest.config(context, skip_undefined_reference_warnings_on: [])
           )
 
         assert [%{warned?: true}] = result

@@ -29,7 +29,7 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     -type t2() :: #rec{k1 :: uri_string:uri_string(), k2 :: uri_string:uri_string() | undefined}.
     """)
 
-    doc = generate_docs(c)
+    doc = generate(c)
     html = LazyHTML.to_html(doc)
 
     assert html =~
@@ -42,7 +42,7 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
              ~s|-type</span> t2() :: #rec{k1 :: <a href="https://www.erlang.org/doc/apps/stdlib/uri_string.html#t:uri_string/0">uri_string:uri_string</a>(), k2 :: <a href="https://www.erlang.org/doc/apps/stdlib/uri_string.html#t:uri_string/0">uri_string:uri_string</a>() \| undefined}.|
   end
 
-  defp generate_docs(c) do
+  defp generate(c) do
     config = [
       version: "1.0.0",
       project: "Foo",

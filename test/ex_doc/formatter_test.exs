@@ -38,7 +38,7 @@ defmodule ExDoc.FormatterTest do
     end
   end
 
-  defp config(%{tmp_dir: tmp_dir}, opts \\ []) do
+  defp formatter_config(%{tmp_dir: tmp_dir}, opts \\ []) do
     %ExDoc.Formatter.Config{
       output: Path.join(tmp_dir, "output"),
       main: Keyword.get(opts, :main, "index"),
@@ -52,7 +52,7 @@ defmodule ExDoc.FormatterTest do
     build_file = Path.join(tmp_dir, "output/.build.testformatter")
 
     # First run - scenario_a creates file1.txt and file2.txt
-    config = config(context, main: "scenario_a")
+    config = formatter_config(context, main: "scenario_a")
     result = ExDoc.Formatter.run(TestFormatter, config, [], [], [])
 
     assert result == "index_a.html"
@@ -67,7 +67,7 @@ defmodule ExDoc.FormatterTest do
     assert content =~ "file2.txt"
 
     # Second run - scenario_b removes file1.txt, updates file2.txt, adds file3.txt
-    config = config(context, main: "scenario_b")
+    config = formatter_config(context, main: "scenario_b")
     result = ExDoc.Formatter.run(TestFormatter, config, [], [], [])
 
     assert result == "index_b.html"
@@ -83,7 +83,7 @@ defmodule ExDoc.FormatterTest do
   end
 
   test "does not delete files not listed in build file", %{tmp_dir: tmp_dir} = context do
-    config = config(context, main: "scenario_a")
+    config = formatter_config(context, main: "scenario_a")
 
     # First run
     ExDoc.Formatter.run(TestFormatter, config, [], [], [])
@@ -118,7 +118,7 @@ defmodule ExDoc.FormatterTest do
       end
     end
 
-    config = config(context)
+    config = formatter_config(context)
     ExDoc.Formatter.run(DuplicateFormatter, config, [], [], [])
 
     build_file = Path.join(tmp_dir, "output/.build.duplicateformatter")
