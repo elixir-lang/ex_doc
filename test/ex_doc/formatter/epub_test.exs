@@ -185,7 +185,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     "CompiledWithDocs.Nested.xhtml"
   ]
 
-  test "generates before_closing_*_tags using functions", %{tmp_dir: tmp_dir} = context do
+  test "generates before_closing_*_tags", %{tmp_dir: tmp_dir} = context do
     generate_docs_and_unzip(
       context,
       doc_config(context,
@@ -201,44 +201,6 @@ defmodule ExDoc.Formatter.EPUBTest do
       content = File.read!(Path.join(oebps_dir, basename))
       assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
       assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
-    end
-  end
-
-  test "generates before_closing_*_tags using maps", %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(
-      context,
-      doc_config(context,
-        before_closing_head_tag: %{epub: "<meta name=StaticDemo>"},
-        before_closing_body_tag: %{epub: "<p>StaticDemo</p>"},
-        extras: ["test/fixtures/README.md"]
-      )
-    )
-
-    oebps_dir = tmp_dir <> "/epub/OEBPS"
-
-    for basename <- @example_basenames do
-      content = File.read!(Path.join(oebps_dir, basename))
-      assert content =~ ~r[<meta name=StaticDemo>\s*</head>]
-      assert content =~ ~r[<p>StaticDemo</p>\s*</body>]
-    end
-  end
-
-  test "generates before_closing_*_tags using MFA", %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(
-      context,
-      doc_config(context,
-        before_closing_head_tag: {__MODULE__, :before_closing_head_tag, ["Demo"]},
-        before_closing_body_tag: {__MODULE__, :before_closing_body_tag, ["Demo"]},
-        extras: ["test/fixtures/README.md"]
-      )
-    )
-
-    oebps_dir = tmp_dir <> "/epub/OEBPS"
-
-    for basename <- @example_basenames do
-      content = File.read!(Path.join(oebps_dir, basename))
-      assert content =~ ~r[<meta name=Demo>\s*</head>]
-      assert content =~ ~r[<p>Demo</p>\s*</body>]
     end
   end
 

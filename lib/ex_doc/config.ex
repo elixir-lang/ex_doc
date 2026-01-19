@@ -34,9 +34,9 @@ defmodule ExDoc.Config do
         }
 
   def build(options) do
-    {proglang, options} = Keyword.pop(options, :proglang, :elixir)
-    {filter_modules, options} = Keyword.pop(options, :filter_modules, &filter_modules/2)
-    {nest_modules_by_prefix, options} = Keyword.pop(options, :nest_modules_by_prefix, [])
+    proglang = Keyword.get(options, :proglang, :elixir)
+    filter_modules = Keyword.get(options, :filter_modules, &filter_modules/2)
+    nest_modules_by_prefix = Keyword.get(options, :nest_modules_by_prefix, [])
 
     options =
       if groups_for_functions = options[:groups_for_functions] do
@@ -48,17 +48,17 @@ defmodule ExDoc.Config do
 
     apps = Keyword.get(options, :apps, [])
 
-    {groups_for_docs, options} = Keyword.pop(options, :groups_for_docs, [])
-    {groups_for_extras, options} = Keyword.pop(options, :groups_for_extras, [])
+    groups_for_docs = Keyword.get(options, :groups_for_docs, [])
+    groups_for_extras = Keyword.get(options, :groups_for_extras, [])
 
-    {groups_for_modules, options} =
-      Keyword.pop(options, :groups_for_modules, default_groups_for_modules(apps))
+    groups_for_modules =
+      Keyword.get(options, :groups_for_modules, default_groups_for_modules(apps))
 
-    {default_group_for_doc, options} =
-      Keyword.pop(options, :default_group_for_doc, &default_group_for_doc/1)
+    default_group_for_doc =
+      Keyword.get(options, :default_group_for_doc, &default_group_for_doc/1)
 
-    {source_url_pattern, options} =
-      Keyword.pop_lazy(options, :source_url_pattern, fn ->
+    source_url_pattern =
+      Keyword.get_lazy(options, :source_url_pattern, fn ->
         guess_url(options[:source_url], options[:source_ref] || @default_source_ref)
       end)
 

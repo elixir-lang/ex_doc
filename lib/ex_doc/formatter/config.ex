@@ -75,21 +75,30 @@ defmodule ExDoc.Formatter.Config do
         }
 
   def build(project, version, options) do
-    {output, options} = Keyword.pop(options, :output, "./doc")
-    {nest_modules_by_prefix, options} = Keyword.pop(options, :nest_modules_by_prefix, [])
-    {proglang, options} = Keyword.pop(options, :proglang, :elixir)
+    output = Keyword.get(options, :output, "./doc")
+    nest_modules_by_prefix = Keyword.get(options, :nest_modules_by_prefix, [])
+    proglang = Keyword.get(options, :proglang, :elixir)
 
-    {skip_undefined_reference_warnings_on, options} =
-      Keyword.pop(
+    skip_undefined_reference_warnings_on =
+      Keyword.get(
         options,
         :skip_undefined_reference_warnings_on,
         &skip_undefined_reference_warnings_on/1
       )
 
-    {skip_code_autolink_to, options} =
-      Keyword.pop(options, :skip_code_autolink_to, &skip_code_autolink_to/1)
+    skip_code_autolink_to =
+      Keyword.get(options, :skip_code_autolink_to, &skip_code_autolink_to/1)
 
-    {search, options} = Keyword.pop(options, :search, [])
+    search = Keyword.get(options, :search, [])
+
+    before_closing_head_tag =
+      Keyword.get(options, :before_closing_head_tag, &before_closing_head_tag/1)
+
+    before_closing_body_tag =
+      Keyword.get(options, :before_closing_body_tag, &before_closing_body_tag/1)
+
+    before_closing_footer_tag =
+      Keyword.get(options, :before_closing_footer_tag, &before_closing_footer_tag/1)
 
     preconfig = %__MODULE__{
       nest_modules_by_prefix: normalize_nest_modules_by_prefix(nest_modules_by_prefix),
@@ -100,6 +109,9 @@ defmodule ExDoc.Formatter.Config do
       skip_undefined_reference_warnings_on:
         normalize_skip_list_function(skip_undefined_reference_warnings_on),
       skip_code_autolink_to: normalize_skip_list_function(skip_code_autolink_to),
+      before_closing_head_tag: normalize_callback(before_closing_head_tag),
+      before_closing_body_tag: normalize_callback(before_closing_body_tag),
+      before_closing_footer_tag: normalize_callback(before_closing_footer_tag),
       version: version
     }
 
@@ -122,9 +134,6 @@ defmodule ExDoc.Formatter.Config do
         :authors,
         :package,
         :title,
-        :before_closing_head_tag,
-        :before_closing_body_tag,
-        :before_closing_footer_tag,
         :apps,
         :deps
       ])
@@ -165,6 +174,18 @@ defmodule ExDoc.Formatter.Config do
 
   defp normalize_skip_list_function(fun) when is_function(fun, 1),
     do: fun
+
+  defp normalize_callback({m, f, a}) do
+    fn module -> apply(m, f, [module | a]) end
+  end
+
+  defp normalize_callback(callback) when is_map(callback) do
+    fn module -> Map.get(callback, module, "") end
+  end
+
+  defp normalize_callback(callback) when is_function(callback, 1) do
+    callback
+  end
 
   defp normalize_search([]) do
     [%{name: "Default", help: "In-browser search", url: "search.html?q="}]

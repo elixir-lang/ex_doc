@@ -3,14 +3,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   require EEx
   alias ExDoc.Formatter.HTML.Assets
 
-  import ExDoc.Utils,
-    only: [
-      h: 1,
-      before_closing_body_tag: 2,
-      before_closing_footer_tag: 2,
-      before_closing_head_tag: 2,
-      text_to_id: 1
-    ]
+  import ExDoc.Utils, only: [h: 1, text_to_id: 1]
 
   defp enc(binary), do: ExDoc.Utils.h(URI.encode(binary))
 

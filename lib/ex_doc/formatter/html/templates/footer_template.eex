@@ -42,11 +42,11 @@
         </p>
       <% end %>
 
-      <%= before_closing_footer_tag(config, :html) %>
+      <%= config.before_closing_footer_tag.(:html) %>
     </footer>
   </div>
 </main>
 </div>
-  <%= before_closing_body_tag(config, :html) %>
+  <%= config.before_closing_body_tag.(:html) %>
   </body>
 </html>

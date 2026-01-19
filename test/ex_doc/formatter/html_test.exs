@@ -522,49 +522,7 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   describe "before_closing_*_tags" do
-    test "using a map", %{tmp_dir: tmp_dir} = context do
-      generate_docs(
-        doc_config(context,
-          before_closing_head_tag: %{html: "<meta name=StaticDemo>"},
-          before_closing_body_tag: %{html: "<p>StaticBodyDemo</p>"},
-          before_closing_footer_tag: %{html: "<p>StaticFooterDemo</p>"},
-          extras: ["test/fixtures/README.md"]
-        )
-      )
-
-      content = File.read!(tmp_dir <> "/html/api-reference.html")
-      assert content =~ ~r[<meta name=StaticDemo>\s*</head>]
-      assert content =~ ~r[<p>StaticBodyDemo</p>\s*</body>]
-      assert content =~ ~r[<p>StaticFooterDemo</p>\s*</footer>]
-
-      content = File.read!(tmp_dir <> "/html/readme.html")
-      assert content =~ ~r[<meta name=StaticDemo>\s*</head>]
-      assert content =~ ~r[<p>StaticBodyDemo</p>\s*</body>]
-      assert content =~ ~r[<p>StaticFooterDemo</p>\s*</footer>]
-    end
-
-    test "using MFA", %{tmp_dir: tmp_dir} = context do
-      generate_docs(
-        doc_config(context,
-          before_closing_head_tag: {__MODULE__, :before_closing_head_tag, ["Demo"]},
-          before_closing_body_tag: {__MODULE__, :before_closing_body_tag, ["BodyDemo"]},
-          before_closing_footer_tag: {__MODULE__, :before_closing_footer_tag, ["FooterDemo"]},
-          extras: ["test/fixtures/README.md"]
-        )
-      )
-
-      content = File.read!(tmp_dir <> "/html/api-reference.html")
-      assert content =~ ~r[<meta name=Demo>\s*</head>]
-      assert content =~ ~r[<p>BodyDemo</p>\s*</body>]
-      assert content =~ ~r[<p>FooterDemo</p>\s*</footer>]
-
-      content = File.read!(tmp_dir <> "/html/readme.html")
-      assert content =~ ~r[<meta name=Demo>\s*</head>]
-      assert content =~ ~r[<p>BodyDemo</p>\s*</body>]
-      assert content =~ ~r[<p>FooterDemo</p>\s*</footer>]
-    end
-
-    test "using a function", %{tmp_dir: tmp_dir} = context do
+    test "generates tags correctly", %{tmp_dir: tmp_dir} = context do
       generate_docs(
         doc_config(context,
           before_closing_head_tag: &before_closing_head_tag/1,

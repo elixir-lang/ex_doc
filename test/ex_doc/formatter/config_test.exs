@@ -120,4 +120,46 @@ defmodule ExDoc.Formatter.ConfigTest do
       build(search: [%{name: "Test", help: "Help", url: 123}])
     end
   end
+
+  describe "normalizes before_closing_*_tag callbacks" do
+    defmodule TestModule do
+      def test_callback(module, arg1, arg2) do
+        "#{module}-#{arg1}-#{arg2}"
+      end
+    end
+
+    test "normalizes function with arity 1" do
+      callback = fn module -> "test-#{module}" end
+      config = build(before_closing_head_tag: callback)
+
+      assert config.before_closing_head_tag.(:MyModule) == "test-MyModule"
+    end
+
+    test "normalizes MFA tuple" do
+      config = build(before_closing_footer_tag: {TestModule, :test_callback, ["arg1", "arg2"]})
+
+      assert config.before_closing_footer_tag.(:MyModule) == "MyModule-arg1-arg2"
+    end
+
+    test "normalizes map" do
+      callback_map = %{
+        MyModule: "<script>module script</script>",
+        OtherModule: "<script>other script</script>"
+      }
+
+      config = build(before_closing_body_tag: callback_map)
+
+      assert config.before_closing_body_tag.(:MyModule) == "<script>module script</script>"
+      assert config.before_closing_body_tag.(:OtherModule) == "<script>other script</script>"
+      assert config.before_closing_body_tag.(:UnknownModule) == ""
+    end
+
+    test "defaults to empty string function" do
+      config = build([])
+
+      assert config.before_closing_head_tag.(:MyModule) == ""
+      assert config.before_closing_body_tag.(:MyModule) == ""
+      assert config.before_closing_footer_tag.(:MyModule) == ""
+    end
+  end
 end
