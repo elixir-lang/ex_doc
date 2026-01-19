@@ -29,21 +29,21 @@ defmodule ExDoc.CLITest do
     assert html ==
              {"ExDoc", "1.2.3", [@ebin],
               [
-                formatters: ["html", "epub", "markdown"],
+                formatters: ["html", "markdown", "epub"],
                 apps: [:ex_doc]
               ]}
 
     assert epub ==
              {"ExDoc", "1.2.3", [@ebin],
               [
-                formatters: ["html", "epub", "markdown"],
+                formatters: ["html", "markdown", "epub"],
                 apps: [:ex_doc]
               ]}
 
     assert markdown ==
              {"ExDoc", "1.2.3", [@ebin],
               [
-                formatters: ["html", "epub", "markdown"],
+                formatters: ["html", "markdown", "epub"],
                 apps: [:ex_doc]
               ]}
   end

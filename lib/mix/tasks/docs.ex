@@ -130,7 +130,7 @@ defmodule Mix.Tasks.Docs do
       against the complete module name (which includes the "Elixir." prefix for
       Elixir modules). If a module has `@moduledoc false`, then it is always excluded.
 
-    * `:formatters` - Formatter to use; default: ["html", "epub", "markdown"], options: "html", "epub", "markdown".
+    * `:formatters` - Formatter to use; default: ["html", "markdown", "epub"], options: "html", "markdown", "epub".
 
     * `:footer` - When false, does not render the footer on all pages, except for
       the required "Built with ExDoc" note.
@@ -658,7 +658,7 @@ defmodule Mix.Tasks.Docs do
   defp normalize_formatters(options) do
     formatters =
       case Keyword.get_values(options, :formatter) do
-        [] -> options[:formatters] || ["html", "epub", "markdown"]
+        [] -> options[:formatters] || ["html", "markdown", "epub"]
         values -> values
       end
 
