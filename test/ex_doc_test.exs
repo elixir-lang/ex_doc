@@ -14,7 +14,7 @@ defmodule ExDocTest do
   # Simple formatter that returns whatever is passed into it
   defmodule IdentityFormatter do
     def run(config, modules, _extras) do
-      {modules, config}
+      %{entrypoint: {modules, config}, build: []}
     end
   end
 

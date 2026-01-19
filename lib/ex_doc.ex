@@ -52,7 +52,6 @@ defmodule ExDoc do
     for formatter <- formatter_config.formatters do
       formatter = find_formatter(formatter)
       entrypoint = ExDoc.Formatter.run(formatter, formatter_config, modules, filtered, extras)
-
       %{entrypoint: entrypoint, warned?: unset_warned(), formatter: formatter}
     end
   end

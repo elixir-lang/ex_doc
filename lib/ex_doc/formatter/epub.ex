@@ -36,7 +36,8 @@ defmodule ExDoc.Formatter.EPUB do
 
     {:ok, epub} = generate_epub(config.output)
     File.rm_rf!(config.output)
-    Path.relative_to_cwd(epub)
+    entrypoint = Path.relative_to_cwd(epub)
+    %{entrypoint: entrypoint, build: [entrypoint]}
   end
 
   defp normalize_config(config) do
@@ -109,17 +110,7 @@ defmodule ExDoc.Formatter.EPUB do
     :zip.create(
       String.to_charlist("#{output}.epub"),
       [{~c"mimetype", @mimetype} | files_to_add(output)],
-      compress: [
-        ~c".css",
-        ~c".xhtml",
-        ~c".html",
-        ~c".ncx",
-        ~c".js",
-        ~c".opf",
-        ~c".jpg",
-        ~c".png",
-        ~c".xml"
-      ]
+      compress: ~w[.css .xhtml .html .ncx .js .opf .jpg .png .xml]c
     )
   end
 

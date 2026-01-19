@@ -9,6 +9,9 @@ defmodule ExDoc.Formatter do
       raise "formatter module #{inspect(formatter)} not found"
     end
 
+    build_file = build_file_path(formatter, formatter_config)
+    cleanup_build_file(build_file, formatter_config)
+
     {module_nodes, extras} =
       if function_exported?(formatter, :autolink_options, 0) do
         autolink_opts = formatter.autolink_options()
@@ -17,8 +20,140 @@ defmodule ExDoc.Formatter do
         {module_nodes, extras}
       end
 
-    formatter.run(formatter_config, module_nodes, extras)
+    %{entrypoint: entrypoint, build: build} =
+      formatter.run(formatter_config, module_nodes, extras)
+
+    write_build_file(build_file, build)
+    entrypoint
   end
+
+  defp build_file_path(formatter, config) do
+    extension =
+      case formatter do
+        # For backwards compatibility
+        ExDoc.Formatter.HTML ->
+          ""
+
+        _ ->
+          formatter
+          |> Module.split()
+          |> List.last()
+          |> String.downcase()
+          |> then(&".#{&1}")
+      end
+
+    Path.join(config.output, ".build#{extension}")
+  end
+
+  defp cleanup_build_file(build_file, config) do
+    if File.exists?(build_file) do
+      build_file
+      |> File.read!()
+      |> String.split("\n", trim: true)
+      |> Enum.map(&Path.join(config.output, &1))
+      |> Enum.each(&File.rm/1)
+    end
+  end
+
+  defp write_build_file(build_file, files) do
+    entries =
+      files
+      |> Enum.uniq()
+      |> Enum.sort()
+      |> Enum.map(&[&1, "\n"])
+
+    File.mkdir_p!(Path.dirname(build_file))
+    File.write!(build_file, entries)
+  end
+
+  ## Assets/image helpers
+
+  @doc """
+  Copy `assets` to the given `output` folder.
+  """
+  def copy_assets(assets, output) do
+    Enum.flat_map(assets, fn {dir_or_files, relative_target_dir} ->
+      target_dir = Path.join(output, relative_target_dir)
+      File.mkdir_p!(target_dir)
+
+      cond do
+        is_list(dir_or_files) ->
+          Enum.map(dir_or_files, fn {name, content} ->
+            target = Path.join(target_dir, name)
+            File.write(target, content)
+            Path.relative_to(target, output)
+          end)
+
+        is_binary(dir_or_files) and File.dir?(dir_or_files) ->
+          dir_or_files
+          |> File.cp_r!(target_dir, dereference_symlinks: true)
+          |> Enum.reduce([], fn path, acc ->
+            # Omit directories in .build file
+            if File.dir?(path) do
+              acc
+            else
+              [Path.relative_to(path, output) | acc]
+            end
+          end)
+          |> Enum.reverse()
+
+        is_binary(dir_or_files) ->
+          []
+
+        true ->
+          raise ":assets must be a map of source directories to target directories"
+      end
+    end)
+  end
+
+  @doc """
+  Copies the logo to the given location in the output directory.
+  """
+  def copy_logo(%{logo: nil}, _target) do
+    []
+  end
+
+  def copy_logo(%{output: output, logo: logo}, target) do
+    copy_image(output, logo, target)
+  end
+
+  @doc """
+  Copies the favicon to the given location in the output directory.
+  """
+  def copy_favicon(%{favicon: nil}, _target) do
+    []
+  end
+
+  def copy_favicon(%{output: output, favicon: favicon}, target) do
+    copy_image(output, favicon, target)
+  end
+
+  @doc """
+  Copies the cover to the given location in the output directory.
+  """
+  def copy_cover(%{cover: nil}, _target) do
+    []
+  end
+
+  def copy_cover(%{output: output, cover: cover}, target) do
+    copy_image(output, cover, target)
+  end
+
+  defp copy_image(output, source, target) do
+    extname = source |> Path.extname() |> String.downcase()
+
+    if extname in ~w(.png .jpg .jpeg .svg) do
+      filename = "#{target}#{extname}"
+      target = Path.join(output, filename)
+      File.mkdir_p!(Path.dirname(target))
+      File.copy!(source, target)
+      [filename]
+    else
+      raise ArgumentError, "image format not recognized, allowed formats are: .png, .jpg, .svg"
+    end
+  end
+
+  ## Autolinking
 
   @doc false
   def autolink(config, nodes, filtered_nodes, extras, opts) do
@@ -59,8 +194,6 @@ defmodule ExDoc.Formatter do
 
     {nodes, extras}
   end
-
-  # Helper functions
 
   defp autolink_node(node, base_config, highlight_opts) do
     language = node.language
@@ -162,90 +295,5 @@ defmodule ExDoc.Formatter do
       _extra, acc ->
         acc
     end)
-  end
-
-  @doc """
-  Copy `assets` to the given `output` folder.
-  """
-  def copy_assets(assets, output) do
-    Enum.flat_map(assets, fn {dir_or_files, relative_target_dir} ->
-      target_dir = Path.join(output, relative_target_dir)
-      File.mkdir_p!(target_dir)
-
-      cond do
-        is_list(dir_or_files) ->
-          Enum.map(dir_or_files, fn {name, content} ->
-            target = Path.join(target_dir, name)
-            File.write(target, content)
-            Path.relative_to(target, output)
-          end)
-
-        is_binary(dir_or_files) and File.dir?(dir_or_files) ->
-          dir_or_files
-          |> File.cp_r!(target_dir, dereference_symlinks: true)
-          |> Enum.reduce([], fn path, acc ->
-            # Omit directories in .build file
-            if File.dir?(path) do
-              acc
-            else
-              [Path.relative_to(path, output) | acc]
-            end
-          end)
-          |> Enum.reverse()
-
-        is_binary(dir_or_files) ->
-          []
-
-        true ->
-          raise ":assets must be a map of source directories to target directories"
-      end
-    end)
-  end
-
-  @doc """
-  Copies the logo to the given location in the output directory.
-  """
-  def copy_logo(%{logo: nil}, _target) do
-    []
-  end
-
-  def copy_logo(%{output: output, logo: logo}, target) do
-    copy_image(output, logo, target)
-  end
-
-  @doc """
-  Copies the favicon to the given location in the output directory.
-  """
-  def copy_favicon(%{favicon: nil}, _target) do
-    []
-  end
-
-  def copy_favicon(%{output: output, favicon: favicon}, target) do
-    copy_image(output, favicon, target)
-  end
-
-  @doc """
-  Copies the cover to the given location in the output directory.
-  """
-  def copy_cover(%{cover: nil}, _target) do
-    []
-  end
-
-  def copy_cover(%{output: output, cover: cover}, target) do
-    copy_image(output, cover, target)
-  end
-
-  defp copy_image(output, source, target) do
-    extname = source |> Path.extname() |> String.downcase()
-
-    if extname in ~w(.png .jpg .jpeg .svg) do
-      filename = "#{target}#{extname}"
-      target = Path.join(output, filename)
-      File.mkdir_p!(Path.dirname(target))
-      File.copy!(source, target)
-      [filename]
-    else
-      raise ArgumentError, "image format not recognized, allowed formats are: .png, .jpg, .svg"
-    end
   end
 end

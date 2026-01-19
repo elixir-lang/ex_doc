@@ -197,4 +197,26 @@ defmodule ExDoc.Formatter.MarkdownTest do
       refute content =~ ~r/## (Pages|Guides)/
     end
   end
+
+  test "stores generated content in .build.markdown", %{tmp_dir: tmp_dir} = context do
+    config = doc_config(context, extras: ["test/fixtures/README.md"])
+    generate_docs(config)
+
+    # Verify necessary files in .build.markdown
+    content = File.read!(tmp_dir <> "/.build.markdown")
+    assert content =~ ~r(^readme\.md$)m
+    assert content =~ ~r(^index\.md$)m
+    assert content =~ ~r(^CompiledWithDocs\.md$)m
+    assert content =~ ~r(^Mix\.Tasks\.TaskWithDocs\.md$)m
+
+    # Verify the files listed in .build.markdown actually exist
+    files =
+      content
+      |> String.split("\n", trim: true)
+      |> Enum.map(&Path.join(tmp_dir, &1))
+
+    for file <- files do
+      assert File.exists?(file)
+    end
+  end
 end

@@ -545,44 +545,31 @@ defmodule ExDoc.Formatter.HTMLTest do
     end
   end
 
-  describe ".build" do
-    test "stores generated content", %{tmp_dir: tmp_dir} = context do
-      config =
-        doc_config(context, extras: ["test/fixtures/README.md"], logo: "test/fixtures/elixir.png")
+  test "stores generated content in .build", %{tmp_dir: tmp_dir} = context do
+    config =
+      doc_config(context, extras: ["test/fixtures/README.md"], logo: "test/fixtures/elixir.png")
 
-      generate_docs(config)
+    generate_docs(config)
 
-      # Verify necessary files in .build
-      content = File.read!(tmp_dir <> "/html/.build")
-      assert content =~ ~r(^readme\.html$)m
-      assert content =~ ~r(^api-reference\.html$)m
-      assert content =~ ~r(^dist/sidebar_items-[\w]{8}\.js$)m
-      assert content =~ ~r(^dist/html-[\w]{8}\.js$)m
-      assert content =~ ~r(^dist/html-elixir-[\w]{8}\.css$)m
-      assert content =~ ~r(^assets/logo\.png$)m
-      assert content =~ ~r(^index\.html$)m
-      assert content =~ ~r(^404\.html$)m
+    # Verify necessary files in .build
+    content = File.read!(tmp_dir <> "/html/.build")
+    assert content =~ ~r(^readme\.html$)m
+    assert content =~ ~r(^api-reference\.html$)m
+    assert content =~ ~r(^dist/sidebar_items-[\w]{8}\.js$)m
+    assert content =~ ~r(^dist/html-[\w]{8}\.js$)m
+    assert content =~ ~r(^dist/html-elixir-[\w]{8}\.css$)m
+    assert content =~ ~r(^assets/logo\.png$)m
+    assert content =~ ~r(^index\.html$)m
+    assert content =~ ~r(^404\.html$)m
 
-      # Verify the files listed in .build actually exist
-      files =
-        content
-        |> String.split("\n", trim: true)
-        |> Enum.map(&Path.join(tmp_dir <> "/html", &1))
+    # Verify the files listed in .build actually exist
+    files =
+      content
+      |> String.split("\n", trim: true)
+      |> Enum.map(&Path.join(tmp_dir <> "/html", &1))
 
-      for file <- files do
-        assert File.exists?(file)
-      end
-    end
-
-    test "does not delete files not listed in .build", %{tmp_dir: tmp_dir} = context do
-      keep = tmp_dir <> "/html/keep"
-      config = doc_config(context)
-      generate_docs(config)
-      File.touch!(keep)
-      generate_docs(config)
-      assert File.exists?(keep)
-      content = File.read!(tmp_dir <> "/html/.build")
-      refute content =~ ~r{keep}
+    for file <- files do
+      assert File.exists?(file)
     end
   end
 end

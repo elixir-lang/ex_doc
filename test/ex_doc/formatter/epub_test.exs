@@ -226,4 +226,12 @@ defmodule ExDoc.Formatter.EPUBTest do
   after
     File.rm_rf!("test/tmp/epub_assets")
   end
+
+  test "stores generated EPUB file in .build.epub", %{tmp_dir: tmp_dir} = context do
+    config = doc_config(context, extras: ["test/fixtures/README.md"])
+    generate_docs(config)
+
+    content = File.read!(tmp_dir <> "/epub/.build.epub")
+    assert content =~ ~r(Elixir\.epub$)m
+  end
 end

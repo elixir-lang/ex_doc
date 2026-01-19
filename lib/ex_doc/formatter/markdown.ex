@@ -1,11 +1,10 @@
 defmodule ExDoc.Formatter.MARKDOWN do
   @moduledoc false
 
-  alias __MODULE__.{Templates}
+  alias __MODULE__.Templates
 
   def run(config, project_nodes, extras) when is_map(config) do
-    build = Path.join(config.output, ".build.markdown")
-    output_setup(build, config)
+    File.mkdir_p!(config.output)
 
     {modules, tasks} =
       project_nodes
@@ -18,44 +17,8 @@ defmodule ExDoc.Formatter.MARKDOWN do
         generate_list(config, modules) ++
         generate_list(config, tasks)
 
-    generate_build(List.flatten(all_files), build)
-    config.output |> Path.join("index.md") |> Path.relative_to_cwd()
-  end
-
-  defp output_setup(build, config) do
-    if File.exists?(build) do
-      build
-      |> File.read!()
-      |> String.split("\n", trim: true)
-      |> Enum.map(&Path.join(config.output, &1))
-      |> Enum.each(&File.rm/1)
-
-      File.rm(build)
-    else
-      # Only remove markdown files, not HTML/EPUB files
-      File.mkdir_p!(config.output)
-
-      if File.exists?(config.output) do
-        config.output
-        |> Path.join("*.md")
-        |> Path.wildcard()
-        |> Enum.each(&File.rm/1)
-
-        llms_file = Path.join(config.output, "llms.txt")
-        if File.exists?(llms_file), do: File.rm(llms_file)
-      end
-    end
-  end
-
-  defp generate_build(files, build) do
-    entries =
-      files
-      |> Enum.uniq()
-      |> Enum.sort()
-      |> Enum.map(&[&1, "\n"])
-
-    File.mkdir_p!(Path.dirname(build))
-    File.write!(build, entries)
+    entrypoint = config.output |> Path.join("index.md") |> Path.relative_to_cwd()
+    %{entrypoint: entrypoint, build: List.flatten(all_files)}
   end
 
   defp normalize_output(output) do

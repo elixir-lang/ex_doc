@@ -16,8 +16,7 @@ defmodule ExDoc.Formatter.HTML do
             ~S("main" cannot be set to "index", otherwise it will recursively link to itself)
     end
 
-    build = Path.join(config.output, ".build")
-    output_setup(build, config)
+    File.mkdir_p!(config.output)
 
     static_files =
       Formatter.copy_assets(config.assets, config.output) ++
@@ -41,33 +40,8 @@ defmodule ExDoc.Formatter.HTML do
         generate_list(tasks, config) ++
         generate_redirects(config, ".html")
 
-    generate_build(all_files, build)
-    config.output |> Path.join("index.html") |> Path.relative_to_cwd()
-  end
-
-  defp output_setup(build, config) do
-    if File.exists?(build) do
-      build
-      |> File.read!()
-      |> String.split("\n", trim: true)
-      |> Enum.map(&Path.join(config.output, &1))
-      |> Enum.each(&File.rm/1)
-
-      File.rm(build)
-    else
-      File.rm_rf!(config.output)
-      File.mkdir_p!(config.output)
-    end
-  end
-
-  defp generate_build(files, build) do
-    entries =
-      files
-      |> Enum.uniq()
-      |> Enum.sort()
-      |> Enum.map(&[&1, "\n"])
-
-    File.write!(build, entries)
+    entrypoint = config.output |> Path.join("index.html") |> Path.relative_to_cwd()
+    %{entrypoint: entrypoint, build: all_files}
   end
 
   defp generate_not_found(config) do
