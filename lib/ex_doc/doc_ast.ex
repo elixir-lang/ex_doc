@@ -250,7 +250,7 @@ defmodule ExDoc.DocAST do
               )
             rescue
               exception ->
-                ExDoc.Utils.warn(
+                ExDoc.warn(
                   [
                     "crashed while highlighting #{lang} snippet:\n\n",
                     ExDoc.DocAST.to_html(ast),

@@ -9,13 +9,30 @@ defmodule ExDoc do
   def version, do: @ex_doc_version
 
   @doc """
+  Emits a warning.
+  """
+  def warn(message, stacktrace_info) do
+    :persistent_term.put({__MODULE__, :warned?}, true)
+    IO.warn(message, stacktrace_info)
+  end
+
+  defp unset_warned() do
+    warned? = :persistent_term.get({__MODULE__, :warned?}, false)
+    :persistent_term.erase({__MODULE__, :warned?})
+    warned?
+  end
+
+  @doc """
   Generates documentation for the given `project`, `vsn` (version)
   and `options`.
   """
-  @spec generate_docs(String.t(), String.t(), Keyword.t()) :: atom
-  def generate_docs(project, vsn, options)
-      when is_binary(project) and is_binary(vsn) and is_list(options) do
-    formatter = Keyword.get(options, :formatter, "html")
+  @spec generate(String.t(), String.t(), Keyword.t()) ::
+          [%{entrypoint: String.t(), warned?: boolean(), formatter: module()}]
+  def generate(project, version, options)
+      when is_binary(project) and is_binary(version) and is_list(options) do
+    # Clear it up for tests
+    _ = unset_warned()
+
     source_beam = Keyword.get(options, :source_beam)
     retriever = Keyword.get(options, :retriever, ExDoc.Retriever)
     extras_input = Keyword.get(options, :extras, [])
@@ -26,15 +43,18 @@ defmodule ExDoc do
 
     # Build configs independently (build both upfront for validation)
     retriever_config = ExDoc.Config.build(options)
-    formatter_config = ExDoc.Formatter.Config.build(project, vsn, options)
+    formatter_config = ExDoc.Formatter.Config.build(project, version, options)
 
-    # Retriever phase
-    {module_nodes, filtered_nodes} = retriever.docs_from_dir(source_beam, retriever_config)
+    # Retriever phase (run once for all formatters)
+    {modules, filtered} = retriever.docs_from_dir(source_beam, retriever_config)
     extras = ExDoc.Extras.build(extras_input, retriever_config)
 
-    # Formatter phase
-    formatter = find_formatter(formatter)
-    ExDoc.Formatter.run(formatter, formatter_config, module_nodes, filtered_nodes, extras)
+    for formatter <- formatter_config.formatters do
+      formatter = find_formatter(formatter)
+      entrypoint = ExDoc.Formatter.run(formatter, formatter_config, modules, filtered, extras)
+
+      %{entrypoint: entrypoint, warned?: unset_warned(), formatter: formatter}
+    end
   end
 
   defp find_formatter(modname) when is_atom(modname),

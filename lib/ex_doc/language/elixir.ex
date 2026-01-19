@@ -67,7 +67,7 @@ defmodule ExDoc.Language.Elixir do
         }
 
       true ->
-        ExDoc.Utils.warn(
+        ExDoc.warn(
           "skipping docs for module #{inspect(module)}, reason: :no_debug_info",
           []
         )

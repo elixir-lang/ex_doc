@@ -170,7 +170,7 @@ defmodule ExDoc.Formatter do
       if is_map(assets) do
         Enum.map(assets, fn {source, target} -> {source, Path.join(namespace, target)} end)
       else
-        ExDoc.Utils.warn(
+        ExDoc.warn(
           """
           giving a binary to :assets is deprecated, please give a map from source to target instead:
 

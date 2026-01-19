@@ -16,7 +16,7 @@ defmodule ExDoc.Formatter.EPUBTest do
       app: :elixir,
       project: "Elixir",
       version: "1.0.1",
-      formatter: "epub",
+      formatters: ["epub"],
       output: tmp_dir <> "/epub",
       source_beam: "test/tmp/beam",
       skip_undefined_reference_warnings_on: ["Warnings"]
@@ -28,7 +28,7 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   defp generate_docs(config) do
-    ExDoc.generate_docs(config[:project], config[:version], config)
+    ExDoc.generate(config[:project], config[:version], config)
   end
 
   defp generate_docs_and_unzip(context, config) do

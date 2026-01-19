@@ -5,23 +5,6 @@ defmodule ExDoc.Utils do
   @moduledoc false
 
   @doc """
-  Emits a warning.
-  """
-  def warn(message, stacktrace_info) do
-    :persistent_term.put({__MODULE__, :warned?}, true)
-    IO.warn(message, stacktrace_info)
-  end
-
-  @doc """
-  Removes that a warning has been generated and returns its previous value.
-  """
-  def unset_warned() do
-    warned? = :persistent_term.get({__MODULE__, :warned?}, false)
-    :persistent_term.erase({__MODULE__, :warned?})
-    warned?
-  end
-
-  @doc """
   Runs the `before_closing_head_tag` callback.
   """
   def before_closing_head_tag(%{before_closing_head_tag: {m, f, a}}, module) do
@@ -159,6 +142,7 @@ defmodule ExDoc.Utils do
   their app due to an ExDoc restriction, so we ship with a
   simple JSON implementation.
   """
+  # TODO: Remove this once we require Elixir v1.20+
   def to_json(nil), do: "null"
   def to_json(true), do: "true"
   def to_json(false), do: "false"

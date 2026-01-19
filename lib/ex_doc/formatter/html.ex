@@ -2,7 +2,7 @@ defmodule ExDoc.Formatter.HTML do
   @moduledoc false
 
   alias __MODULE__.{Assets, Templates, SearchData}
-  alias ExDoc.{Formatter, Utils}
+  alias ExDoc.Formatter
 
   @assets_dir "assets"
 
@@ -125,7 +125,7 @@ defmodule ExDoc.Formatter.HTML do
         html = Templates.extra_template(config, node, refs)
 
         if File.regular?(output) do
-          Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
+          ExDoc.warn("file #{Path.relative_to_cwd(output)} already exists", [])
         end
 
         File.write!(output, html)
@@ -172,7 +172,7 @@ defmodule ExDoc.Formatter.HTML do
     html = Templates.api_reference_template(config, modules, tasks)
 
     if File.regular?(output) do
-      Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
+      ExDoc.warn("file #{Path.relative_to_cwd(output)} already exists", [])
     end
 
     File.write!(output, html)
@@ -225,7 +225,7 @@ defmodule ExDoc.Formatter.HTML do
     without_anchor = String.split(redirect_to, "#") |> hd()
 
     unless case_sensitive_file_regular?("#{config.output}/#{without_anchor}") do
-      Utils.warn("#{filename} redirects to #{redirect_to}, which does not exist", [])
+      ExDoc.warn("#{filename} redirects to #{redirect_to}, which does not exist", [])
     end
 
     content = Templates.redirect_template(config, redirect_to)

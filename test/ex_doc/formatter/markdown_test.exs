@@ -7,7 +7,7 @@ defmodule ExDoc.Formatter.MarkdownTest do
     [
       project: "Elixir",
       version: "1.0.1",
-      formatter: "markdown",
+      formatters: ["markdown"],
       output: tmp_dir,
       source_beam: "test/tmp/beam",
       skip_undefined_reference_warnings_on: ["Warnings"]
@@ -19,7 +19,7 @@ defmodule ExDoc.Formatter.MarkdownTest do
   end
 
   defp generate_docs(config) do
-    ExDoc.generate_docs(config[:project], config[:version], config)
+    ExDoc.generate(config[:project], config[:version], config)
   end
 
   test "generates Markdown files in the default directory", %{tmp_dir: tmp_dir} = context do

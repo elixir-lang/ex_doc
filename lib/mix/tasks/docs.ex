@@ -559,7 +559,7 @@ defmodule Mix.Tasks.Docs do
   ]
 
   @doc false
-  def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate_docs/3) do
+  def run(args, config \\ Mix.Project.config(), generator \\ &ExDoc.generate/3) do
     {:ok, _} = Application.ensure_all_started(:ex_doc)
 
     unless Code.ensure_loaded?(ExDoc.Formatter.Config) do
@@ -592,7 +592,7 @@ defmodule Mix.Tasks.Docs do
         String.to_atom(proglang)
       end)
 
-    {formatters, options} =
+    options =
       config
       |> get_docs_opts()
       |> Keyword.merge(cli_opts)
@@ -604,8 +604,8 @@ defmodule Mix.Tasks.Docs do
       |> normalize_apps(config)
       |> normalize_main()
       |> normalize_deps()
-      |> put_package(config)
       |> normalize_formatters()
+      |> put_package(config)
 
     Code.prepend_path(options[:source_beam])
 
@@ -615,30 +615,23 @@ defmodule Mix.Tasks.Docs do
     end
 
     Mix.shell().info("Generating docs...")
+    generated_docs = generator.(project, version, options)
 
-    results =
-      for formatter <- formatters do
-        index = generator.(project, version, Keyword.put(options, :formatter, formatter))
-        Mix.shell().info([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"])
+    Enum.each(generated_docs, fn %{entrypoint: entrypoint, formatter: formatter} ->
+      extension = formatter_module_to_extension(formatter)
+      Mix.shell().info([:green, "View #{extension} docs at #{inspect(entrypoint)}"])
+    end)
 
-        # Open only the first one
-        if cli_opts[:open] && formatter == hd(options[:formatters]) do
-          browser_open(index)
-        end
+    open? = Keyword.get(cli_opts, :open, false)
 
-        if options[:warnings_as_errors] == true and ExDoc.Utils.unset_warned() do
-          {:error, %{reason: :warnings_as_errors, formatter: formatter}}
-        else
-          {:ok, index}
-        end
-      end
+    with [%{entrypoint: entrypoint} | _] when open? <- generated_docs do
+      browser_open(entrypoint)
+    end
 
-    error_results = Enum.filter(results, &(elem(&1, 0) == :error))
+    warned = Enum.filter(generated_docs, & &1.warned?)
 
-    if error_results == [] do
-      Enum.map(results, fn {:ok, value} -> value end)
-    else
-      formatters = Enum.map(error_results, &elem(&1, 1).formatter)
+    if options[:warnings_as_errors] == true and warned != [] do
+      formatters = Enum.map(warned, &formatter_module_to_extension(&1.formatter))
 
       format_message =
         case formatters do
@@ -647,12 +640,19 @@ defmodule Mix.Tasks.Docs do
         end
 
       message =
-        "Documents have been generated, but generation for #{format_message} failed due to warnings while using the --warnings-as-errors option."
+        "Documents have been generated, but generation for #{format_message} failed " <>
+          "due to warnings while using the --warnings-as-errors option"
 
       message_formatted = IO.ANSI.format([:red, message, :reset])
       IO.puts(:stderr, message_formatted)
       exit({:shutdown, 1})
+    else
+      Enum.map(generated_docs, & &1.entrypoint)
     end
+  end
+
+  defp formatter_module_to_extension(module) do
+    module |> Module.split() |> List.last() |> String.downcase()
   end
 
   defp normalize_formatters(options) do
@@ -662,7 +662,9 @@ defmodule Mix.Tasks.Docs do
         values -> values
       end
 
-    {formatters, Keyword.put(options, :formatters, formatters)}
+    options
+    |> Keyword.delete(:formatter)
+    |> Keyword.put(:formatters, formatters)
   end
 
   defp get_docs_opts(config) do

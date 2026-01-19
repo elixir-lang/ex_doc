@@ -23,7 +23,7 @@ defmodule ExDoc.Formatter.HTMLTest do
 
   def generate_docs(config) do
     config = Keyword.put_new(config, :skip_undefined_reference_warnings_on, ["Warnings"])
-    ExDoc.generate_docs(config[:project], config[:version], config)
+    ExDoc.generate(config[:project], config[:version], config)
   end
 
   def doc_config(%{tmp_dir: tmp_dir} = _context) do
@@ -31,7 +31,7 @@ defmodule ExDoc.Formatter.HTMLTest do
       apps: [:elixir],
       project: "Elixir",
       version: "1.0.1",
-      formatter: "html",
+      formatters: ["html"],
       assets: %{"test/tmp/html_assets" => "assets"},
       output: tmp_dir <> "/html",
       source_beam: "test/tmp/beam",
@@ -633,17 +633,17 @@ defmodule ExDoc.Formatter.HTML.WarningsTest do
 
   @moduletag :tmp_dir
   import ExUnit.CaptureIO
-  alias ExDoc.Utils
 
   test "when generating an index.html file with an invalid redirect",
        %{tmp_dir: tmp_dir} = context do
-    Utils.unset_warned()
-
     output =
       capture_io(:stderr, fn ->
-        ExDoc.Formatter.HTMLTest.generate_docs(
-          ExDoc.Formatter.HTMLTest.doc_config(context, main: "Randomerror")
-        )
+        result =
+          ExDoc.Formatter.HTMLTest.generate_docs(
+            ExDoc.Formatter.HTMLTest.doc_config(context, main: "Randomerror")
+          )
+
+        assert [%{warned?: true}] = result
       end)
 
     assert output =~
@@ -651,17 +651,17 @@ defmodule ExDoc.Formatter.HTML.WarningsTest do
 
     assert File.regular?(tmp_dir <> "/html/index.html")
     assert File.regular?(tmp_dir <> "/html/RandomError.html")
-    assert Utils.unset_warned()
   end
 
   test "when there are undefined references", context do
-    Utils.unset_warned()
-
     out =
       capture_io(:stderr, fn ->
-        ExDoc.Formatter.HTMLTest.generate_docs(
-          ExDoc.Formatter.HTMLTest.doc_config(context, skip_undefined_reference_warnings_on: [])
-        )
+        result =
+          ExDoc.Formatter.HTMLTest.generate_docs(
+            ExDoc.Formatter.HTMLTest.doc_config(context, skip_undefined_reference_warnings_on: [])
+          )
+
+        assert [%{warned?: true}] = result
       end)
 
     assert out =~
@@ -674,27 +674,26 @@ defmodule ExDoc.Formatter.HTML.WarningsTest do
       assert out =~ ~s|doc callback `Warnings.bar/0`|
       assert out =~ ~s|doc `Warnings.bar/0`|
     end
-
-    assert Utils.unset_warned()
   end
 
   test "deprecated assets", %{tmp_dir: tmp_dir} = context do
-    Utils.unset_warned()
     File.mkdir_p!("test/tmp/html_assets/hello")
     File.touch!("test/tmp/html_assets/hello/world")
 
     out =
       capture_io(:stderr, fn ->
-        ExDoc.Formatter.HTMLTest.generate_docs(
-          ExDoc.Formatter.HTMLTest.doc_config(context,
-            assets: "test/tmp/html_assets"
+        result =
+          ExDoc.Formatter.HTMLTest.generate_docs(
+            ExDoc.Formatter.HTMLTest.doc_config(context,
+              assets: "test/tmp/html_assets"
+            )
           )
-        )
+
+        assert [%{warned?: true}] = result
       end)
 
     assert out =~ "binary to :assets is deprecated"
     assert out =~ ~S([assets: %{"test/tmp/html_assets" => "assets"}])
     assert File.regular?(tmp_dir <> "/html/assets/hello/world")
-    assert Utils.unset_warned()
   end
 end

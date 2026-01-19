@@ -540,10 +540,10 @@ defmodule ExDoc.Autolink do
 
     case config.warnings do
       :emit ->
-        ExDoc.Utils.warn(message, stacktrace_info)
+        ExDoc.warn(message, stacktrace_info)
 
       :raise ->
-        ExDoc.Utils.warn(message, stacktrace_info)
+        ExDoc.warn(message, stacktrace_info)
         raise "fail due to warnings"
 
       :send ->

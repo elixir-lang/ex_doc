@@ -23,14 +23,14 @@ defmodule ExDocTest do
 
     options = [
       apps: [:test_app],
-      formatter: IdentityFormatter,
+      formatters: [IdentityFormatter],
       markdown_processor: Sample,
       output: tmp_dir <> "/ex_doc",
       retriever: IdentityRetriever,
       source_beam: "beam_dir"
     ]
 
-    ExDoc.generate_docs(project, version, options)
+    ExDoc.generate(project, version, options)
     assert Application.fetch_env!(:ex_doc, :markdown_processor) == {Sample, []}
   after
     Application.delete_env(:ex_doc, :markdown_processor)
@@ -42,14 +42,14 @@ defmodule ExDocTest do
 
     options = [
       apps: [:test_app],
-      formatter: IdentityFormatter,
+      formatters: [IdentityFormatter],
       markdown_processor: {Sample, [foo: :bar]},
       output: tmp_dir <> "/ex_doc",
       retriever: IdentityRetriever,
       source_beam: "beam_dir"
     ]
 
-    ExDoc.generate_docs(project, version, options)
+    ExDoc.generate(project, version, options)
     assert Application.fetch_env!(:ex_doc, :markdown_processor) == {Sample, [foo: :bar]}
   after
     Application.delete_env(:ex_doc, :markdown_processor)
@@ -58,23 +58,23 @@ defmodule ExDocTest do
   test "source_beam sets source dir" do
     options = [
       apps: [:test_app],
-      formatter: IdentityFormatter,
+      formatters: [IdentityFormatter],
       retriever: IdentityRetriever,
       source_beam: "beam_dir"
     ]
 
-    assert {source_dir, _config} = ExDoc.generate_docs("Elixir", "1", options)
+    assert [%{entrypoint: {source_dir, _config}}] = ExDoc.generate("Elixir", "1", options)
     assert source_dir == options[:source_beam]
   end
 
   test "formatter module not found" do
     project = "Elixir"
     version = "1"
-    options = [formatter: "pdf", retriever: IdentityRetriever]
+    options = [formatters: ["pdf"], retriever: IdentityRetriever]
 
     assert_raise RuntimeError,
                  "formatter module ExDoc.Formatter.PDF not found",
-                 fn -> ExDoc.generate_docs(project, version, options) end
+                 fn -> ExDoc.generate(project, version, options) end
   end
 
   test "version" do

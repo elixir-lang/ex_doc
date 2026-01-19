@@ -52,7 +52,7 @@ defmodule ExDoc.Language.Erlang do
         }
       }
     else
-      ExDoc.Utils.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
+      ExDoc.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
       false
     end
   end
@@ -184,7 +184,7 @@ defmodule ExDoc.Language.Erlang do
         |> ExDoc.DocAST.parse!("text/markdown")
 
       equiv ->
-        ExDoc.Utils.warn("invalid equiv #{inspect(equiv)}",
+        ExDoc.warn("invalid equiv #{inspect(equiv)}",
           file: file,
           line: line,
           module: module

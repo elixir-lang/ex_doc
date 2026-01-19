@@ -9,9 +9,21 @@ defmodule Mix.Tasks.DocsTest do
 
   @moduletag :tmp_dir
 
-  def run(context, args, opts, generator \\ &{&1, &2, &3}) do
+  def run(context, args, opts, generator \\ &mock_generator/3) do
     opts = Keyword.put_new(opts, :output, context[:tmp_dir])
     Mix.Tasks.Docs.run(args, opts, generator)
+  end
+
+  defp mock_generator(project, version, options) do
+    formatters = options[:formatters] || ["html"]
+
+    for formatter <- formatters do
+      %{
+        entrypoint: {project, version, options},
+        warned?: false,
+        formatter: Module.concat(ExDoc.Formatter, String.upcase(formatter))
+      }
+    end
   end
 
   def run_with_io(context, args, opts, generator)
@@ -27,7 +39,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "0.1.0",
               [
-                formatter: "html",
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: _,
@@ -36,7 +47,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "0.1.0",
               [
-                formatter: "epub",
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: _,
@@ -45,7 +55,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "0.1.0",
               [
-                formatter: "markdown",
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: _,
@@ -59,7 +68,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "0.1.0",
               [
-                formatter: "html",
                 formatters: ["html", "epub"],
                 deps: _,
                 apps: _,
@@ -68,7 +76,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "0.1.0",
               [
-                formatter: "epub",
                 formatters: ["html", "epub"],
                 deps: _,
                 apps: _,
@@ -82,7 +89,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "0.1.0",
               [
-                formatter: "html",
                 formatters: ["html", "epub"],
                 deps: _,
                 apps: _,
@@ -91,7 +97,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "0.1.0",
               [
-                formatter: "epub",
                 formatters: ["html", "epub"],
                 deps: _,
                 apps: _,
@@ -110,7 +115,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ExDoc", "0.1.0",
               [
-                formatter: "html",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -119,7 +123,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ExDoc", "0.1.0",
               [
-                formatter: "epub",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -128,7 +131,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ExDoc", "0.1.0",
               [
-                formatter: "markdown",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -142,7 +144,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "dev",
               [
-                formatter: "html",
                 formatters: _,
                 deps: _,
                 main: "Sample",
@@ -152,7 +153,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "epub",
                 formatters: _,
                 deps: _,
                 main: "Sample",
@@ -162,7 +162,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "markdown",
                 formatters: _,
                 deps: _,
                 main: "Sample",
@@ -177,7 +176,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "dev",
               [
-                formatter: "html",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -187,7 +185,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "epub",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -197,7 +194,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "markdown",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -215,7 +211,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "dev",
               [
-                formatter: "html",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -225,7 +220,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "epub",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -235,7 +229,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "markdown",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -259,7 +252,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "dev",
               [
-                formatter: "html",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -269,7 +261,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "epub",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -279,7 +270,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "markdown",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -298,7 +288,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "dev",
               [
-                formatter: "html",
                 formatters: _,
                 deps: deps,
                 apps: _,
@@ -307,7 +296,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "epub",
                 formatters: _,
                 deps: deps,
                 apps: _,
@@ -316,7 +304,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "markdown",
                 formatters: _,
                 deps: deps,
                 apps: _,
@@ -334,7 +321,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "dev",
               [
-                formatter: "html",
                 formatters: _,
                 deps: deps,
                 apps: _,
@@ -343,7 +329,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "epub",
                 formatters: _,
                 deps: deps,
                 apps: _,
@@ -352,7 +337,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "markdown",
                 formatters: _,
                 deps: deps,
                 apps: _,
@@ -369,7 +353,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "dev",
               [
-                formatter: "html",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -379,7 +362,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "epub",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -389,7 +371,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "markdown",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -405,7 +386,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ExDoc", "1.2.3-dev",
               [
-                formatter: "html",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -416,7 +396,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ExDoc", "1.2.3-dev",
               [
-                formatter: "epub",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -427,7 +406,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ExDoc", "1.2.3-dev",
               [
-                formatter: "markdown",
                 formatters: _,
                 deps: _,
                 apps: _,
@@ -455,7 +433,6 @@ defmodule Mix.Tasks.DocsTest do
       assert [
                {"umbrella", "dev",
                 [
-                  formatter: "html",
                   formatters: _,
                   deps: _,
                   apps: [:bar, :foo],
@@ -464,7 +441,6 @@ defmodule Mix.Tasks.DocsTest do
                 ]},
                {"umbrella", "dev",
                 [
-                  formatter: "epub",
                   formatters: _,
                   deps: _,
                   apps: [:bar, :foo],
@@ -473,7 +449,6 @@ defmodule Mix.Tasks.DocsTest do
                 ]},
                {"umbrella", "dev",
                 [
-                  formatter: "markdown",
                   formatters: _,
                   deps: _,
                   apps: [:bar, :foo],
@@ -489,7 +464,6 @@ defmodule Mix.Tasks.DocsTest do
       assert [
                {"umbrella", "dev",
                 [
-                  formatter: "html",
                   formatters: _,
                   deps: _,
                   apps: [:bar],
@@ -499,7 +473,6 @@ defmodule Mix.Tasks.DocsTest do
                 ]},
                {"umbrella", "dev",
                 [
-                  formatter: "epub",
                   formatters: _,
                   deps: _,
                   apps: [:bar],
@@ -509,7 +482,6 @@ defmodule Mix.Tasks.DocsTest do
                 ]},
                {"umbrella", "dev",
                 [
-                  formatter: "markdown",
                   formatters: _,
                   deps: _,
                   apps: [:bar],
@@ -525,7 +497,6 @@ defmodule Mix.Tasks.DocsTest do
     assert [
              {"ex_doc", "dev",
               [
-                formatter: "html",
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: [:ex_doc],
@@ -535,7 +506,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "epub",
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: [:ex_doc],
@@ -545,7 +515,6 @@ defmodule Mix.Tasks.DocsTest do
               ]},
              {"ex_doc", "dev",
               [
-                formatter: "markdown",
                 formatters: ["html", "epub", "markdown"],
                 deps: _,
                 apps: [:ex_doc],

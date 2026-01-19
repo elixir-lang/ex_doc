@@ -4,7 +4,7 @@ defmodule ExDoc.Formatter.EPUB do
   @mimetype "application/epub+zip"
   @assets_dir "OEBPS/assets"
   alias __MODULE__.{Assets, Templates}
-  alias ExDoc.{Formatter, Utils}
+  alias ExDoc.Formatter
 
   @doc false
   def autolink_options do
@@ -47,7 +47,7 @@ defmodule ExDoc.Formatter.EPUB do
       html = Templates.extra_template(config, node)
 
       if File.regular?(output) do
-        Utils.warn("file #{Path.relative_to_cwd(output)} already exists", [])
+        ExDoc.warn("file #{Path.relative_to_cwd(output)} already exists", [])
       end
 
       File.write!(output, html)

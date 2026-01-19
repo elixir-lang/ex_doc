@@ -6,7 +6,16 @@ defmodule ExDoc.CLITest do
   @ebin2 "_build/test/lib/makeup/ebin"
 
   defp run(args) do
-    with_io(fn -> ExDoc.CLI.main(args, &{&1, &2, &3}) end)
+    with_io(fn -> ExDoc.CLI.main(args, &mock_generator/3) end)
+  end
+
+  defp mock_generator(project, version, options) do
+    formatters = options[:formatters] || ["html"]
+
+    for formatter <- formatters do
+      formatter_module = Module.concat([ExDoc.Formatter, String.upcase(formatter)])
+      %{entrypoint: {project, version, options}, warned?: false, formatter: formatter_module}
+    end
   end
 
   test "minimum command-line options" do
@@ -15,7 +24,6 @@ defmodule ExDoc.CLITest do
     assert html ==
              {"ExDoc", "1.2.3",
               [
-                formatter: "html",
                 formatters: ["html", "epub", "markdown"],
                 apps: [:ex_doc],
                 source_beam: [@ebin]
@@ -24,7 +32,6 @@ defmodule ExDoc.CLITest do
     assert epub ==
              {"ExDoc", "1.2.3",
               [
-                formatter: "epub",
                 formatters: ["html", "epub", "markdown"],
                 apps: [:ex_doc],
                 source_beam: [@ebin]
@@ -33,7 +40,6 @@ defmodule ExDoc.CLITest do
     assert markdown ==
              {"ExDoc", "1.2.3",
               [
-                formatter: "markdown",
                 formatters: ["html", "epub", "markdown"],
                 apps: [:ex_doc],
                 source_beam: [@ebin]
@@ -46,7 +52,6 @@ defmodule ExDoc.CLITest do
     assert epub ==
              {"ExDoc", "1.2.3",
               [
-                formatter: "epub",
                 formatters: ["epub", "html"],
                 apps: [:ex_doc],
                 source_beam: [@ebin]
@@ -55,7 +60,6 @@ defmodule ExDoc.CLITest do
     assert html ==
              {"ExDoc", "1.2.3",
               [
-                formatter: "html",
                 formatters: ["epub", "html"],
                 apps: [:ex_doc],
                 source_beam: [@ebin]
@@ -106,7 +110,6 @@ defmodule ExDoc.CLITest do
     assert Enum.sort(opts) == [
              apps: [:ex_doc],
              canonical: "http://example.com/project",
-             formatter: "html",
              formatters: ["html"],
              homepage_url: "http://example.com",
              key: "val",
@@ -140,7 +143,6 @@ defmodule ExDoc.CLITest do
                apps: [:ex_doc],
                extra_section: "Guides",
                extras: ["README.md"],
-               formatter: "html",
                formatters: ["html"],
                source_beam: [@ebin]
              ]
@@ -167,7 +169,6 @@ defmodule ExDoc.CLITest do
 
       assert Enum.sort(opts) == [
                apps: [:ex_doc],
-               formatter: "html",
                formatters: ["html"],
                logo: "opts_logo.png",
                source_beam: [@ebin]
@@ -205,7 +206,6 @@ defmodule ExDoc.CLITest do
       assert Enum.sort(opts) == [
                apps: [:ex_doc],
                extras: ["README.md"],
-               formatter: "html",
                formatters: ["html"],
                source_beam: [@ebin]
              ]

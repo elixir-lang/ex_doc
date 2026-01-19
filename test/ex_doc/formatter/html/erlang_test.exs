@@ -46,13 +46,13 @@ defmodule ExDoc.Formatter.HTML.ErlangTest do
     config = [
       version: "1.0.0",
       project: "Foo",
-      formatter: "html",
+      formatters: ["html"],
       output: Path.join(c.tmp_dir, "doc"),
       source_beam: Path.join(c.tmp_dir, "ebin"),
       extras: []
     ]
 
-    ExDoc.generate_docs(config[:project], config[:version], config)
+    ExDoc.generate(config[:project], config[:version], config)
 
     [c.tmp_dir, "doc", "foo.html"]
     |> Path.join()
