@@ -1,15 +1,14 @@
 # `<%= node.name %>`
-<%= if node.source_url do %>[🔗](<%= node.source_url %>)<% end %>
-
 <%= for annotation <- node.annotations do %>*<%= annotation %>* <% end %>
+
 <%= if deprecated = node.deprecated do %>
 > This <%= node.type %> is deprecated. <%= h(deprecated) %>.
 <% end %>
+
 <%= if node.source_specs != [] do %>
-<%= for spec <- node.source_specs do %>
 ```elixir
-<%= module.language.format_spec_attribute(node) %> <%= module.language.format_spec(spec) %>
-```
+<%= for spec <- node.source_specs do %><%= module.language.format_spec_attribute(node) %> <%= module.language.format_spec(spec) %>
+<% end %>```
 <% end %>
-<% end %>
+
 <%= node_doc(node) %>
