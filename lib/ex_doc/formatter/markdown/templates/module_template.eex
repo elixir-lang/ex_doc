@@ -8,4 +8,9 @@
 <%= node_doc(module) %>
 <%= for group <- module.docs_groups, node <- group.docs do %>
 <%= detail_template(node, module) %>
+<% end %><%= if config.api_reference do %>
+
+---
+
+*Consult [api-reference.md](api-reference.md) for complete listing*
 <% end %>

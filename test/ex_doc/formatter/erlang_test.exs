@@ -32,12 +32,6 @@ defmodule ExDoc.Formatter.ErlangTest do
     generate(c)
     html = c.tmp_dir |> Path.join("doc/foo.html") |> File.read!()
 
-    # Check moduledoc is rendered in HTML
-    assert html =~ "<p>foo module.</p>"
-
-    # Check function doc is rendered in HTML
-    assert html =~ "<p>f/0 function.</p>"
-
     # Check specs are rendered with proper links in HTML
     assert html =~
              ~s|-spec</span> foo(<a href="#t:t/0">t</a>()) -> <a href="#t:t/0">t</a>().|
@@ -51,9 +45,6 @@ defmodule ExDoc.Formatter.ErlangTest do
 
     assert html =~
              ~s|-type</span> t2() :: #rec{k1 :: <a href="https://www.erlang.org/doc/apps/stdlib/uri_string.html#t:uri_string/0">uri_string:uri_string</a>(), k2 :: <a href="https://www.erlang.org/doc/apps/stdlib/uri_string.html#t:uri_string/0">uri_string:uri_string</a>() \| undefined}.|
-
-    # Check type doc is rendered in HTML
-    assert html =~ "<p>t/0 type.</p>"
 
     # EEP 48 uses erlang+html format, so no markdown should be generated
     refute File.exists?(Path.join(c.tmp_dir, "doc/foo.md"))

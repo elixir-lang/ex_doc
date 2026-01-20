@@ -27,7 +27,7 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
     :def,
     :module_template,
     Path.expand("templates/module_template.eex", __DIR__),
-    [:_config, :module],
+    [:config, :module],
     trim: true
   )
 
@@ -35,7 +35,7 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
     :def,
     :nav_template,
     Path.expand("templates/nav_template.eex", __DIR__),
-    [:config, :modules, :mix_tasks, :extras],
+    [:config, :modules, :mix_tasks, :extras, :title],
     trim: true
   )
 

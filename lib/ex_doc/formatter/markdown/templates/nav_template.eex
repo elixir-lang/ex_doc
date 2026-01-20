@@ -1,4 +1,4 @@
-# <%= config.project %> v<%= config.version %> - Table of Contents
+# <%= config.project %> v<%= config.version %> - <%= title %>
 <%= nav_group_template config.extra_section, extras %>
 <%= nav_group_template "Modules", modules %>
 <%= nav_group_template "Mix Tasks", mix_tasks %>

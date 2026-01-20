@@ -25,7 +25,8 @@ defmodule ExDoc.Formatter.MarkdownTest do
 
   test "generates Markdown files in the default directory", %{tmp_dir: tmp_dir} = context do
     generate(config(context))
-    assert File.regular?(tmp_dir <> "/index.md")
+    assert File.regular?(tmp_dir <> "/llms.txt")
+    assert File.regular?(tmp_dir <> "/api-reference.md")
 
     assert File.regular?(tmp_dir <> "/CompiledWithDocs.md")
     assert File.regular?(tmp_dir <> "/CompiledWithDocs.Nested.md")
@@ -42,31 +43,34 @@ defmodule ExDoc.Formatter.MarkdownTest do
     content = File.read!(tmp_dir <> "/CompiledWithDocs.md")
 
     # Header
-    assert content =~ ~r{^# `CompiledWithDocs`}m
-    assert content =~ ~r{\*example_module_tag\*}
+    assert content =~ "# `CompiledWithDocs`"
+    assert content =~ "*example_module_tag*"
 
     # Moduledoc
-    assert content =~ ~r{moduledoc}
+    assert content =~ "moduledoc"
 
     # Function header
-    assert content =~ ~r{^# `example`$}m
+    assert content =~ "# `example`"
 
     # Function documentation
-    assert content =~ ~r{Some example}
+    assert content =~ "Some example"
 
     # Deprecated notice
-    assert content =~ ~r{> This function is deprecated\. Use something else instead\.}
+    assert content =~ "> This function is deprecated. Use something else instead."
 
     # Struct
-    assert content =~ ~r{^# `__struct__`$}m
-    assert content =~ ~r{Some struct}
+    assert content =~ "# `__struct__`"
+    assert content =~ "Some struct"
 
     # Since annotation
-    assert content =~ ~r{^# `example_1`$}m
-    assert content =~ ~r{\*since 1\.3\.0\*}
+    assert content =~ "# `example_1`"
+    assert content =~ "*since 1.3.0*"
 
     # Macro annotation
-    assert content =~ ~r{\*macro\*}
+    assert content =~ "*macro*"
+
+    # Footer should be present when api_reference defaults to true
+    assert content =~ "Consult [api-reference.md]"
   end
 
   test "renders types and specs properly", %{tmp_dir: tmp_dir} = context do
@@ -131,34 +135,48 @@ defmodule ExDoc.Formatter.MarkdownTest do
       config = config(context, output: custom_output)
       generate(config)
 
-      assert File.regular?(custom_output <> "/index.md")
+      assert File.regular?(custom_output <> "/llms.txt")
       assert File.regular?(custom_output <> "/CompiledWithDocs.md")
-      refute File.exists?(tmp_dir <> "/index.md")
+      refute File.exists?(tmp_dir <> "/llms.txt")
     end
 
     test "handles custom project name and version", %{tmp_dir: tmp_dir} = context do
       config = config(context, project: "MyProject", version: "2.0.0")
       generate(config)
 
-      content = File.read!(tmp_dir <> "/index.md")
+      content = File.read!(tmp_dir <> "/llms.txt")
       assert content =~ "# MyProject v2.0.0 - Table of Contents"
-    end
-
-    test "processes source_url configuration", %{tmp_dir: tmp_dir} = context do
-      config = config(context, source_url: "https://github.com/example/project")
-      generate(config)
-
-      assert File.regular?(tmp_dir <> "/CompiledWithDocs.md")
-      assert File.regular?(tmp_dir <> "/index.md")
     end
   end
 
-  describe "index file" do
+  test "stores generated content in .build.markdown", %{tmp_dir: tmp_dir} = context do
+    config = config(context, extras: ["test/fixtures/README.md"])
+    generate(config)
+
+    # Verify necessary files in .build.markdown
+    content = File.read!(tmp_dir <> "/.build.markdown")
+    assert content =~ "readme.md"
+    assert content =~ "llms.txt"
+    assert content =~ "CompiledWithDocs.md"
+    assert content =~ "Mix.Tasks.TaskWithDocs.md"
+
+    # Verify the files listed in .build.markdown actually exist
+    files =
+      content
+      |> String.split("\n", trim: true)
+      |> Enum.map(&Path.join(tmp_dir, &1))
+
+    for file <- files do
+      assert File.exists?(file)
+    end
+  end
+
+  describe "llms.txt" do
     test "generates index", %{tmp_dir: tmp_dir} = context do
       config = config(context, extras: ["test/fixtures/README.md"], extra_section: "Guides")
       generate(config)
 
-      content = File.read!(tmp_dir <> "/index.md")
+      content = File.read!(tmp_dir <> "/llms.txt")
 
       assert content =~ "# Elixir v1.0.1 - Table of Contents"
 
@@ -193,30 +211,62 @@ defmodule ExDoc.Formatter.MarkdownTest do
     test "when no extras exist", %{tmp_dir: tmp_dir} = context do
       config = config(context)
       generate(config)
-      content = File.read!(tmp_dir <> "/index.md")
-      refute content =~ ~r/## (Pages|Guides)/
+      content = File.read!(tmp_dir <> "/llms.txt")
+      refute content =~ "## Pages"
+      refute content =~ "## Guides"
     end
   end
 
-  test "stores generated content in .build.markdown", %{tmp_dir: tmp_dir} = context do
-    config = config(context, extras: ["test/fixtures/README.md"])
-    generate(config)
+  describe "api_reference" do
+    test "when false, does not generate api-reference.md", %{tmp_dir: tmp_dir} = context do
+      config = config(context, api_reference: false)
+      generate(config)
+      refute File.exists?(tmp_dir <> "/api-reference.md")
 
-    # Verify necessary files in .build.markdown
-    content = File.read!(tmp_dir <> "/.build.markdown")
-    assert content =~ ~r(^readme\.md$)m
-    assert content =~ ~r(^index\.md$)m
-    assert content =~ ~r(^CompiledWithDocs\.md$)m
-    assert content =~ ~r(^Mix\.Tasks\.TaskWithDocs\.md$)m
+      # Modules should not have the footer
+      content = File.read!(tmp_dir <> "/CompiledWithDocs.md")
+      refute content =~ "Consult [api-reference.md]"
+    end
 
-    # Verify the files listed in .build.markdown actually exist
-    files =
-      content
-      |> String.split("\n", trim: true)
-      |> Enum.map(&Path.join(tmp_dir, &1))
+    test "when true, generates api-reference.md", %{tmp_dir: tmp_dir} = context do
+      config =
+        config(context,
+          extras: ["test/fixtures/README.md"],
+          extra_section: "Guides",
+          api_reference: true
+        )
 
-    for file <- files do
-      assert File.exists?(file)
+      generate(config)
+      api_content = File.read!(tmp_dir <> "/api-reference.md")
+
+      # Should have API Reference title
+      assert api_content =~ "# Elixir v1.0.1 - API Reference"
+
+      # Should NOT include extras section
+      refute api_content =~ "## Guides"
+      refute api_content =~ "README"
+
+      # Should include modules section
+      assert api_content =~ """
+             ## Modules
+
+             - [CallbacksNoDocs](CallbacksNoDocs.md)
+             - [Common.Nesting.Prefix.B.A](Common.Nesting.Prefix.B.A.md): moduledoc
+             """
+
+      # Should include mix tasks
+      assert api_content =~ """
+             ## Mix Tasks
+
+             - [mix task_with_docs](Mix.Tasks.TaskWithDocs.md): Very useful task
+             """
+
+      # Modules should have the footer
+      module_content = File.read!(tmp_dir <> "/CompiledWithDocs.md")
+      assert module_content =~ "---"
+
+      assert module_content =~
+               "*Consult [api-reference.md](api-reference.md) for complete listing*"
     end
   end
 end

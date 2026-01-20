@@ -12,12 +12,13 @@ defmodule ExDoc.Formatter.MARKDOWN do
       |> Enum.split_with(&(&1.type != :task))
 
     all_files =
-      [generate_nav(config, modules, tasks, extras)] ++
+      generate_nav(config, modules, tasks, extras) ++
+        generate_api_reference(config, modules, tasks) ++
         generate_extras(extras, config) ++
         generate_list(config, modules) ++
         generate_list(config, tasks)
 
-    entrypoint = config.output |> Path.join("index.md") |> Path.relative_to_cwd()
+    entrypoint = config.output |> Path.join("llms.txt") |> Path.relative_to_cwd()
     %{entrypoint: entrypoint, build: List.flatten(all_files)}
   end
 
@@ -33,12 +34,29 @@ defmodule ExDoc.Formatter.MARKDOWN do
     extras = group_by_group(extras)
 
     content =
-      Templates.nav_template(config, modules, mix_tasks, extras)
+      Templates.nav_template(config, modules, mix_tasks, extras, "Table of Contents")
       |> normalize_output()
 
-    filename = "index.md"
-    File.write("#{config.output}/#{filename}", content)
-    filename
+    filename = "llms.txt"
+    File.write(Path.join(config.output, filename), content)
+    [filename]
+  end
+
+  defp generate_api_reference(%{api_reference: false}, _modules, _tasks) do
+    []
+  end
+
+  defp generate_api_reference(config, modules, tasks) do
+    modules = group_by_group(modules)
+    mix_tasks = group_by_group(tasks)
+
+    content =
+      Templates.nav_template(config, modules, mix_tasks, [], "API Reference")
+      |> normalize_output()
+
+    filename = "api-reference.md"
+    File.write(Path.join(config.output, filename), content)
+    [filename]
   end
 
   defp group_by_group(nodes) do
@@ -50,7 +68,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
   defp generate_extras(extras, config) do
     for %ExDoc.ExtraNode{id: id, source_doc: source_doc} <- extras do
       filename = "#{id}.md"
-      output = "#{config.output}/#{filename}"
+      output = Path.join(config.output, filename)
       File.write!(output, source_doc)
       filename
     end
@@ -70,7 +88,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
       |> normalize_output()
 
     filename = "#{module_node.id}.md"
-    File.write("#{config.output}/#{filename}", content)
+    File.write(Path.join(config.output, filename), content)
     filename
   end
 end
