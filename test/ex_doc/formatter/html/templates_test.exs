@@ -52,7 +52,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
   describe "render_doc" do
     defp render_doc(doc) do
       doc
-      |> ExDoc.DocAST.parse!("text/markdown")
+      |> ExDoc.DocAST.parse!("text/markdown", markdown_processor: ExDoc.Markdown.Earmark)
       |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3])
       |> Templates.render_doc()
     end

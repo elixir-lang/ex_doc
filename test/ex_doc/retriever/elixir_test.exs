@@ -294,12 +294,14 @@ defmodule ExDoc.Retriever.ElixirTest do
       assert downcase.id == "downcase/1"
       assert downcase.signature == "downcase(str)"
       assert downcase.source_specs == []
-      assert downcase.doc == ExDoc.Markdown.to_ast("Doc override.")
+      assert DocAST.to_html(downcase.doc) == "<p>Doc override.</p>"
 
       assert upcase.id == "upcase/1"
       assert upcase.signature == "upcase(str)"
       assert upcase.source_specs == []
-      assert upcase.doc == ExDoc.Markdown.to_ast("See `String.upcase/1`.")
+
+      assert DocAST.to_html(upcase.doc) ==
+               "<p>See <code class=\"inline\">String.upcase/1</code>.</p>"
     end
 
     test "signatures", c do

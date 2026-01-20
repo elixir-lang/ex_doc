@@ -173,15 +173,17 @@ defmodule ExDoc.Language.Erlang do
         ## We try to parse the equiv in order to link to the target
         with {:ok, toks, _} <- :erl_scan.string(:unicode.characters_to_list(equiv <> ".")),
              {:ok, [{:call, _, {:atom, _, func}, args}]} <- :erl_parse.parse_exprs(toks) do
-          "Equivalent to [`#{equiv}`](`#{prefix}#{func}/#{length(args)}`)."
+          equivalent_to(
+            {:a, [href: "`#{prefix}#{func}/#{length(args)}`"],
+             [{:code, [class: "inline"], [equiv], %{}}], %{}}
+          )
         else
           {:ok, [{:op, _, :/, {:atom, _, _}, {:integer, _, _}}]} ->
-            "Equivalent to `#{prefix}#{equiv}`."
+            equivalent_to({:code, [class: "inline"], ["#{prefix}#{equiv}"], %{}})
 
           _ ->
-            "Equivalent to `#{equiv}`."
+            equivalent_to({:code, [class: "inline"], [equiv], %{}})
         end
-        |> ExDoc.DocAST.parse!("text/markdown")
 
       equiv ->
         ExDoc.warn("invalid equiv #{inspect(equiv)}",
@@ -192,6 +194,10 @@ defmodule ExDoc.Language.Erlang do
 
         nil
     end
+  end
+
+  defp equivalent_to(node) do
+    [{:p, [], ["Equivalent to ", node, "."], %{}}]
   end
 
   @impl true

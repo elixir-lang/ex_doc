@@ -884,7 +884,7 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   defp autolink_extra(text, c) do
-    [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, [])
+    [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, markdown_processor: ExDoc.Markdown.Earmark)
     opts = c |> Map.take([:warnings]) |> Enum.to_list()
 
     autolink(
@@ -898,7 +898,7 @@ defmodule ExDoc.Language.ErlangTest do
     fixtures(c, "", opts)
 
     ast =
-      case ExDoc.Markdown.to_ast(text, []) do
+      case ExDoc.Markdown.to_ast(text, markdown_processor: ExDoc.Markdown.Earmark) do
         [{:p, _, ast, _}] -> ast
         ast -> ast
       end

@@ -523,10 +523,6 @@ defmodule ExDoc do
     retriever = Keyword.get(options, :retriever, ExDoc.Retriever)
     extras_input = Keyword.get(options, :extras, [])
 
-    if processor = options[:markdown_processor] do
-      ExDoc.Markdown.put_markdown_processor(processor)
-    end
-
     # Build configs independently (build both upfront for validation)
     retriever_config = ExDoc.Config.build(options)
     formatter_config = ExDoc.Formatter.Config.build(project, version, options)

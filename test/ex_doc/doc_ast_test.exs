@@ -2,13 +2,18 @@ defmodule ExDoc.DocASTTest do
   use ExUnit.Case, async: true
   alias ExDoc.DocAST
 
+  defp parse!(text, format, opts \\ []) do
+    opts = [markdown_processor: ExDoc.Markdown.Earmark] ++ opts
+    DocAST.parse!(text, format, opts)
+  end
+
   describe "parse!/3" do
     test "markdown" do
       markdown = """
       **foo**
       """
 
-      assert DocAST.parse!(markdown, "text/markdown") ==
+      assert parse!(markdown, "text/markdown") ==
                [{:p, [], [{:strong, [], ["foo"], %{}}], %{}}]
     end
 
@@ -18,7 +23,7 @@ defmodule ExDoc.DocASTTest do
       <!-- bar -->
       """
 
-      assert DocAST.parse!(markdown, "text/markdown") ==
+      assert parse!(markdown, "text/markdown") ==
                [
                  {:p, [], [{:strong, [], ["foo"], %{}}], %{}},
                  {:comment, [], [" bar "], %{comment: true}}
@@ -27,7 +32,7 @@ defmodule ExDoc.DocASTTest do
 
     test "markdown errors" do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert DocAST.parse!("`String.upcase", "text/markdown") ==
+               assert parse!("`String.upcase", "text/markdown") ==
                         [{:p, [], ["`String.upcase"], %{}}]
              end) =~ "Closing unclosed backquotes ` at end of input"
     end
@@ -35,14 +40,14 @@ defmodule ExDoc.DocASTTest do
     test "erlang+html" do
       erl_ast = [{:p, [], ["foo"]}]
 
-      assert DocAST.parse!(erl_ast, "application/erlang+html") ==
+      assert parse!(erl_ast, "application/erlang+html") ==
                [{:p, [], ["foo"], %{}}]
     end
 
     test "erlang+html code blocks" do
       erl_ast = [{:pre, [], ["foo"]}]
 
-      assert DocAST.parse!(erl_ast, "application/erlang+html") ==
+      assert parse!(erl_ast, "application/erlang+html") ==
                [{:pre, [], [{:code, [], ["foo"], %{}}], %{}}]
     end
   end
@@ -53,7 +58,7 @@ defmodule ExDoc.DocASTTest do
       foo **bar** baz
       """
 
-      ast = DocAST.parse!(markdown, "text/markdown")
+      ast = parse!(markdown, "text/markdown")
 
       assert DocAST.to_html(ast) ==
                ~s{<p>foo <strong>bar</strong> baz</p>}
@@ -65,7 +70,7 @@ defmodule ExDoc.DocASTTest do
       <!-- HTML -->
       """
 
-      ast = DocAST.parse!(markdown, "text/markdown")
+      ast = parse!(markdown, "text/markdown")
 
       assert DocAST.to_html(ast) ==
                ~s{<p>hello</p><!-- HTML -->}
@@ -73,13 +78,13 @@ defmodule ExDoc.DocASTTest do
 
     test "escape" do
       markdown = "foo > bar"
-      ast = DocAST.parse!(markdown, "text/markdown")
+      ast = parse!(markdown, "text/markdown")
       assert DocAST.to_html(ast) == ~s{<p>foo &gt; bar</p>}
     end
 
     test "raw html" do
       markdown = "<strong><em>bar</em></strong>"
-      ast = DocAST.parse!(markdown, "text/markdown")
+      ast = parse!(markdown, "text/markdown")
       assert DocAST.to_html(ast) == ~s{<strong><em>bar</em></strong>}
     end
 
@@ -91,7 +96,7 @@ defmodule ExDoc.DocASTTest do
       </span>
       """
 
-      ast = DocAST.parse!(markdown, "text/markdown")
+      ast = parse!(markdown, "text/markdown")
       assert DocAST.to_html(ast) == ~s{<span><i></i>\n<i></i></span>}
     end
 
@@ -101,7 +106,7 @@ defmodule ExDoc.DocASTTest do
       bar
       """
 
-      ast = DocAST.parse!(markdown, "text/markdown")
+      ast = parse!(markdown, "text/markdown")
 
       assert DocAST.to_html(ast) == ~s{<p>foo<br/>bar</p>}
     end
@@ -144,7 +149,7 @@ defmodule ExDoc.DocASTTest do
 
     defp synopsis(markdown) do
       markdown
-      |> DocAST.parse!("text/markdown")
+      |> parse!("text/markdown")
       |> DocAST.synopsis()
     end
   end
@@ -164,7 +169,7 @@ defmodule ExDoc.DocASTTest do
 
              > ## inside `blockquote`
              """
-             |> DocAST.parse!("text/markdown")
+             |> parse!("text/markdown")
              |> DocAST.add_ids_to_headers([:h2, :h3])
              |> DocAST.extract_headers_with_ids([:h2, :h3]) ==
                [
@@ -229,7 +234,7 @@ defmodule ExDoc.DocASTTest do
 
     defp highlight(markdown) do
       markdown
-      |> DocAST.parse!("text/markdown")
+      |> parse!("text/markdown")
       |> DocAST.highlight(ExDoc.Language.Elixir)
       |> DocAST.to_html()
     end
@@ -264,7 +269,7 @@ defmodule ExDoc.DocASTTest do
 
              p6
              """
-             |> DocAST.parse!("text/markdown")
+             |> parse!("text/markdown")
              |> DocAST.sectionize([:h2, :h3]) ==
                [
                  {:h1, [], ["H1"], %{}},

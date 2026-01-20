@@ -81,22 +81,20 @@ defmodule ExDoc.Formatter.HTML.SearchData do
     [intro | headers_sections] =
       Regex.split(~r/(?<!#)###? (?<header>\b.+)/, string, include_captures: true)
 
-    {headers, sections} =
+    sections =
       headers_sections
       |> Enum.chunk_every(2)
-      |> Enum.map(fn [header, section] -> {header, section} end)
-      |> Enum.unzip()
-
-    # Now convert the headers into a single markdown document
-    header_tags =
-      headers
-      |> Enum.join("\n\n")
-      |> ExDoc.Markdown.to_ast()
+      |> Enum.map(fn [header, section] ->
+        # Hardcoded markdown processor because we use it only for header matching
+        opts = [markdown_processor: ExDoc.Markdown.Earmark]
+        [{tag, attrs, content, meta}] = ExDoc.Markdown.to_ast(header, opts)
+        {tag, [section: section] ++ attrs, content, meta}
+      end)
       |> ExDoc.DocAST.add_ids_to_headers([:h2, :h3], prefix)
-
-    sections =
-      Enum.zip_with(header_tags, sections, fn {_, attrs, inner, _}, section ->
-        {ExDoc.DocAST.text(inner), Keyword.fetch!(attrs, :id), clean_markdown(section)}
+      |> Enum.map(fn {_, attrs, inner, _} ->
+        id = Keyword.fetch!(attrs, :id)
+        section = Keyword.fetch!(attrs, :section)
+        {ExDoc.DocAST.text(inner), id, clean_markdown(section)}
       end)
 
     {clean_markdown(intro), sections}

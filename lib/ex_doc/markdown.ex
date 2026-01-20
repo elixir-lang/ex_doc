@@ -23,59 +23,32 @@ defmodule ExDoc.Markdown do
   """
   @callback available?() :: boolean()
 
-  @markdown_processors [
-    ExDoc.Markdown.Earmark
-  ]
-
-  @markdown_processor_key :markdown_processor
-
   @doc """
   Converts the given markdown document to HTML AST.
+
+  ## Options
+
+    * `:markdown_processor` - The markdown processor to use,
+      either as a module or a `{module, keyword}` tuple
+
+  All other options are passed through to the markdown processor.
   """
   def to_ast(text, opts \\ []) when is_binary(text) do
-    {processor, options} = get_markdown_processor()
-    processor.to_ast(text, options |> Keyword.merge(opts))
-  end
+    {processor_pair, options} = Keyword.pop!(opts, :markdown_processor)
 
-  @doc """
-  Gets the current markdown processor set globally.
-  """
-  def get_markdown_processor do
-    case Application.fetch_env(:ex_doc, @markdown_processor_key) do
-      {:ok, {processor, options}} ->
-        {processor, options}
+    {processor, options} =
+      case processor_pair do
+        {processor, processor_options} when is_atom(processor) and is_list(processor_options) ->
+          {processor, Keyword.merge(processor_options, options)}
 
-      :error ->
-        processor = find_markdown_processor() || raise_no_markdown_processor()
-        put_markdown_processor({processor, []})
-        {processor, []}
-    end
-  end
+        processor when is_atom(processor) and processor != nil ->
+          {processor, options}
 
-  @doc """
-  Changes the markdown processor globally.
-  """
-  def put_markdown_processor(processor) when is_atom(processor) do
-    put_markdown_processor({processor, []})
-  end
+        _ ->
+          raise ArgumentError,
+                ":markdown_processor must be either `Mod` or `{Mod, options}`, got: #{inspect(processor_pair)}"
+      end
 
-  def put_markdown_processor({processor, options}) do
-    Application.put_env(:ex_doc, @markdown_processor_key, {processor, options})
-  end
-
-  defp find_markdown_processor do
-    Enum.find(@markdown_processors, fn module ->
-      Code.ensure_loaded?(module) && module.available?()
-    end)
-  end
-
-  defp raise_no_markdown_processor do
-    raise """
-    Could not find a markdown processor to be used by ex_doc.
-    You can either:
-
-    * Add {:earmark, ">= 0.0.0"} to your mix.exs deps
-      to use an Elixir-based markdown processor
-    """
+    processor.to_ast(text, options)
   end
 end

@@ -54,11 +54,10 @@ defmodule ExDoc.Extras do
   """
   def build(extras_input, config) do
     groups = config.groups_for_extras
-    source_url_pattern = config.source_url_pattern
 
     extras =
       extras_input
-      |> Enum.map(&build_extra(&1, groups, source_url_pattern))
+      |> Enum.map(&build_extra(&1, groups, config))
 
     ids_count = Enum.reduce(extras, %{}, &Map.update(&2, &1.id, 1, fn c -> c + 1 end))
 
@@ -74,15 +73,15 @@ defmodule ExDoc.Extras do
     Map.put(extra, :id, "#{extra.id}-#{discriminator}")
   end
 
-  defp build_extra(input, groups, source_url_pattern) when is_binary(input) do
-    build_extra({input, %{}}, groups, source_url_pattern)
+  defp build_extra(input, groups, config) when is_binary(input) do
+    build_extra({input, %{}}, groups, config)
   end
 
-  defp build_extra({input, opts}, groups, source_url_pattern) when is_list(opts) do
-    build_extra({input, Map.new(opts)}, groups, source_url_pattern)
+  defp build_extra({input, opts}, groups, config) when is_list(opts) do
+    build_extra({input, Map.new(opts)}, groups, config)
   end
 
-  defp build_extra({input, %{url: _} = input_options}, groups, _source_url_pattern) do
+  defp build_extra({input, %{url: _} = input_options}, groups, _config) do
     input = to_string(input)
     title = validate_extra_string!(input_options, :title) || input
     url = validate_extra_string!(input_options, :url)
@@ -96,7 +95,7 @@ defmodule ExDoc.Extras do
     }
   end
 
-  defp build_extra({input, input_options}, groups, source_url_pattern) do
+  defp build_extra({input, input_options}, groups, config) do
     input = to_string(input)
 
     id =
@@ -104,7 +103,7 @@ defmodule ExDoc.Extras do
         input |> filename_to_title() |> Utils.text_to_id()
 
     source_file = validate_extra_string!(input_options, :source) || input
-    opts = [file: source_file, line: 1]
+    opts = [file: source_file, line: 1, markdown_processor: config.markdown_processor]
 
     {extension, source, ast} =
       case extension_name(input) do
@@ -139,7 +138,7 @@ defmodule ExDoc.Extras do
 
     group = Config.match_extra(groups, input)
     source_path = source_file |> Path.relative_to(File.cwd!()) |> String.replace_leading("./", "")
-    source_url = source_url_pattern.(source_path, 1)
+    source_url = config.source_url_pattern.(source_path, 1)
     search_data = validate_search_data!(input_options[:search_data])
 
     %ExDoc.Extras.Page{

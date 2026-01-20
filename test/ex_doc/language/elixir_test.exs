@@ -706,7 +706,7 @@ defmodule ExDoc.Language.ElixirTest do
     config = struct!(ExDoc.Autolink, Keyword.merge(@default_options, options))
 
     text
-    |> ExDoc.Markdown.to_ast([])
+    |> ExDoc.Markdown.to_ast(markdown_processor: ExDoc.Markdown.Earmark)
     |> ExDoc.Language.Elixir.autolink_doc(config)
     |> then(fn [{:p, _, content, _}] -> content end)
     |> ExDoc.DocAST.to_html()

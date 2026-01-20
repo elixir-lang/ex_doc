@@ -18,7 +18,8 @@ defmodule ExDoc.Config do
             groups_for_extras: [],
             source_url_pattern: &__MODULE__.source_url_pattern/2,
             nest_modules_by_prefix: [],
-            proglang: :elixir
+            proglang: :elixir,
+            markdown_processor: {ExDoc.Markdown.Earmark, []}
 
   @type t :: %__MODULE__{
           filter_modules: (module, map -> boolean),
@@ -30,7 +31,8 @@ defmodule ExDoc.Config do
           groups_for_extras: [{binary(), term()}],
           source_url_pattern: (String.t(), integer() -> String.t() | nil),
           nest_modules_by_prefix: [String.t()],
-          proglang: :elixir | :erlang
+          proglang: :elixir | :erlang,
+          markdown_processor: {module(), keyword()} | module()
         }
 
   def build(options) do
@@ -80,8 +82,9 @@ defmodule ExDoc.Config do
 
     retriever_options =
       Keyword.take(options, [
-        :source_ref,
-        :annotations_for_docs
+        :annotations_for_docs,
+        :markdown_processor,
+        :source_ref
       ])
 
     struct!(preconfig, retriever_options)

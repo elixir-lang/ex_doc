@@ -130,12 +130,14 @@ defmodule ExDoc.Retriever do
     }
 
     {doc_line, doc_file, format, source_doc, doc_ast, metadata} =
-      get_module_docs(module_data, source)
+      get_module_docs(module_data, source, config)
 
     group_for_doc = config.group_for_doc
     annotations_for_docs = config.annotations_for_docs
 
-    {docs, nodes_groups} = get_docs(module_data, source, group_for_doc, annotations_for_docs)
+    {docs, nodes_groups} =
+      get_docs(module_data, source, group_for_doc, annotations_for_docs, config)
+
     docs = ExDoc.Utils.natural_sort_by(docs, &"#{&1.name}/#{&1.arity}")
 
     moduledoc_groups = Map.get(metadata, :groups, [])
@@ -144,7 +146,8 @@ defmodule ExDoc.Retriever do
       get_docs_groups(
         moduledoc_groups ++ config.docs_groups ++ module_data.default_groups,
         nodes_groups,
-        docs
+        docs,
+        config
       )
 
     metadata = Map.put(metadata, :kind, module_data.type)
@@ -188,29 +191,29 @@ defmodule ExDoc.Retriever do
 
   # Helpers
 
-  defp get_module_docs(module_data, source) do
+  defp get_module_docs(module_data, source, config) do
     {:docs_v1, anno, _, format, moduledoc, metadata, _} = module_data.docs
     doc_file = anno_file(anno, source)
     doc_line = anno_line(anno)
-    options = [file: doc_file, line: doc_line + 1]
+    options = [file: doc_file, line: doc_line + 1, markdown_processor: config.markdown_processor]
     {doc_line, doc_file, format, moduledoc, doc_ast(format, moduledoc, options), metadata}
   end
 
-  defp get_docs(module_data, source, group_for_doc, annotations_for_docs) do
+  defp get_docs(module_data, source, group_for_doc, annotations_for_docs, config) do
     {:docs_v1, _, _, _, _, _, docs} = module_data.docs
 
     {nodes, groups} =
       for doc <- docs,
           doc_data = module_data.language.doc_data(doc, module_data) do
         {_node, _group} =
-          get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs)
+          get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs, config)
       end
       |> Enum.unzip()
 
     {filter_defaults(nodes), groups}
   end
 
-  defp get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs) do
+  defp get_doc(doc, doc_data, module_data, source, group_for_doc, annotations_for_docs, config) do
     {:docs_v1, _, _, content_type, _, module_metadata, _} = module_data.docs
     {{type, name, arity}, anno, _signature, source_doc, metadata} = doc
     doc_file = anno_file(anno, source)
@@ -231,7 +234,11 @@ defmodule ExDoc.Retriever do
     defaults = get_defaults(name, arity, Map.get(metadata, :defaults, 0))
 
     doc_ast =
-      doc_ast(content_type, source_doc, file: doc_file, line: doc_line + 1) ||
+      doc_ast(content_type, source_doc,
+        file: doc_file,
+        line: doc_line + 1,
+        markdown_processor: config.markdown_processor
+      ) ||
         doc_data.doc_fallback.()
 
     group = normalize_group(group_for_doc.(metadata) || doc_data.default_group)
@@ -276,7 +283,7 @@ defmodule ExDoc.Retriever do
     end)
   end
 
-  defp get_docs_groups(module_groups, nodes_groups, doc_nodes) do
+  defp get_docs_groups(module_groups, nodes_groups, doc_nodes, config) do
     module_groups = Enum.map(module_groups, &normalize_group/1)
 
     nodes_groups_descriptions = Map.new(nodes_groups, &{&1.title, &1.description})
@@ -299,7 +306,7 @@ defmodule ExDoc.Retriever do
               {[], seen}
 
             child_nodes ->
-              group = finalize_group(group, child_nodes, nodes_groups_descriptions)
+              group = finalize_group(group, child_nodes, nodes_groups_descriptions, config)
               {[group], seen}
           end
       end)
@@ -307,7 +314,7 @@ defmodule ExDoc.Retriever do
     docs_groups
   end
 
-  defp finalize_group(group, doc_nodes, description_fallbacks) do
+  defp finalize_group(group, doc_nodes, description_fallbacks, config) do
     description =
       case group.description do
         nil -> Map.get(description_fallbacks, group.title)
@@ -320,7 +327,11 @@ defmodule ExDoc.Retriever do
           nil
 
         text ->
-          doc_ast = doc_ast("text/markdown", %{"en" => text}, [])
+          doc_ast =
+            doc_ast("text/markdown", %{"en" => text},
+              markdown_processor: config.markdown_processor
+            )
+
           sub_id = ExDoc.Utils.text_to_id(group.title)
           normalize_doc_ast(doc_ast, "group-#{sub_id}-")
       end
