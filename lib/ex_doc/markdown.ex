@@ -4,7 +4,7 @@ defmodule ExDoc.Markdown do
 
   ExDoc is compatible with any markdown processor that implements the
   functions defined in this module. The markdown processor can be changed
-  via the `:markdown_processor` option in your `mix.exs`.
+  via the `:markdown_processor` option. Note that doing such change is global.
 
   ExDoc supports the following Markdown parsers out of the box:
 

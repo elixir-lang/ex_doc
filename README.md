@@ -8,7 +8,7 @@ ExDoc is a tool to generate documentation for Erlang and Elixir projects. To see
 
 ExDoc ships with many features:
 
-  * Automatically generates offline-accessible HTML and EPUB documents from your API documentation.
+  * Automatically generates offline-accessible HTML, Markdown, and EPUB documents from your API documentation.
   * When hosted, ExDoc relies on browser's page transitions for better UX, caching, and enhanced accessibility.
   * Responsive design, covering phones and tablets.
   * Support for custom pages, guides, livebooks and cheatsheets.

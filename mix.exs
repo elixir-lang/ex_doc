@@ -131,8 +131,7 @@ defmodule ExDoc.Mixfile do
     Mix.Task.run("docs", args)
     {text_tags, 0} = System.cmd("git", ["tag"])
 
-    [latest | _] =
-      versions =
+    versions =
       for("v" <> rest <- String.split(text_tags), do: Version.parse!(rest))
       |> Enum.sort({:desc, Version})
 
@@ -144,7 +143,6 @@ defmodule ExDoc.Mixfile do
 
     File.write!("doc/docs_config.js", """
     var versionNodes = [#{list_contents}];
-    var searchNodes = [{"name":"ex_doc","version":"#{Version.to_string(latest)}"}];
     """)
   end
 
