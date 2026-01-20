@@ -1,9 +1,10 @@
 # Changelog
 
-## v0.40.0-dev
+## v0.40.0 (2026-01-20)
 
   * Enhancements
     * Introduce Markdown formatter (thanks to Yordis Prietro)
+    * Generate a `llms.txt` document by default and add a "Copy Markdown" button to the top of every page
     * Run retriever only once per formatter
     * Support anchors on redirects
 
@@ -13,8 +14,8 @@
     * Only include `.html` links on Swup
 
   * Breaking changes
-    * Revamp the ExDoc entrypoint and formatter API. While those have never been made public, others may have relied on it. We have now changed it on the path to standardization
-    * The previously deprecated :assets option no longer accepts strings, only maps
+    * Revamp the ExDoc entrypoint and formatter API. While those have never been made public, others may have relied on it. We have now changed and documented them on the path to standardization
+    * The previously deprecated :assets option will raise if given a string, pass a map instead
 
 ## v0.39.3 (2025-12-09)
 
