@@ -10,7 +10,7 @@
         <span class="sr-only">Print Cheatsheet</span>
       </a>
     <% end %>
-    <%= view_markdown_link(config, "#{node.id}.md") %>
+    <%= copy_markdown_link(config, "#{node.id}.md") %>
     <%= if node.source_url do %>
       <a href="<%= node.source_url %>" title="View Source" class="icon-action" rel="help">
         <i class="ri-code-s-slash-line" aria-hidden="true"></i>

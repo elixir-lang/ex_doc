@@ -11,7 +11,7 @@
       <% end %>
     </h1>
     <%= if module.source_format == "text/markdown" do %>
-      <%= view_markdown_link(config, "#{module.id}.md") %>
+      <%= copy_markdown_link(config, "#{module.id}.md") %>
     <% end %>
     <%= if module.source_url do %>
       <a href="<%= module.source_url %>" title="View Source" class="icon-action" rel="help">

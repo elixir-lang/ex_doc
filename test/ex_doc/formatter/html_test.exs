@@ -149,18 +149,18 @@ defmodule ExDoc.Formatter.HTMLTest do
 
     api_content = File.read!(tmp_dir <> "/html/api-reference.html")
     assert api_content =~ "View llms.txt"
-    assert api_content =~ "View Markdown"
-    assert api_content =~ ~s{<a href="api-reference.md" title="View Markdown"}
+    assert api_content =~ "Copy Markdown"
+    assert api_content =~ ~s{<a href="api-reference.md" title="Copy Markdown}
 
     extra_content = File.read!(tmp_dir <> "/html/readme.html")
     assert extra_content =~ "View llms.txt"
-    assert extra_content =~ "View Markdown"
-    assert extra_content =~ ~s{<a href="readme.md" title="View Markdown"}
+    assert extra_content =~ "Copy Markdown"
+    assert extra_content =~ ~s{<a href="readme.md" title="Copy Markdown}
 
     module_content = File.read!(tmp_dir <> "/html/CompiledWithDocs.html")
     assert module_content =~ "View llms.txt"
-    assert module_content =~ "View Markdown"
-    assert module_content =~ ~s{<a href="CompiledWithDocs.md" title="View Markdown"}
+    assert module_content =~ "Copy Markdown"
+    assert module_content =~ ~s{<a href="CompiledWithDocs.md" title="Copy Markdown}
   end
 
   test "groups modules by nesting", %{tmp_dir: tmp_dir} = context do

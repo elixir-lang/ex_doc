@@ -22,14 +22,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def module_type(%{type: type}), do: "<small>#{type}</small>"
 
   @doc """
-  Renders a "View Markdown" link if markdown formatter is enabled.
+  Renders a "Copy Markdown" link if markdown formatter is enabled.
   """
-  def view_markdown_link(config, path) do
+  def copy_markdown_link(config, path) do
     if "markdown" in config.formatters do
       """
-      <a href="#{enc(path)}" title="View Markdown" class="icon-action" rel="help">
+      <a href="#{enc(path)}" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
         <i class="ri-markdown-line" aria-hidden="true"></i>
-        <span class="sr-only">View Markdown</span>
+        <span class="sr-only">Copy Markdown</span>
       </a>
       """
     else
