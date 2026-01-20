@@ -33,9 +33,17 @@ defmodule ExDoc.Formatter.MARKDOWN.Templates do
 
   EEx.function_from_file(
     :def,
-    :nav_template,
-    Path.expand("templates/nav_template.eex", __DIR__),
-    [:config, :modules, :mix_tasks, :extras, :title],
+    :api_reference_template,
+    Path.expand("templates/api_reference_template.eex", __DIR__),
+    [:config, :modules, :mix_tasks],
+    trim: true
+  )
+
+  EEx.function_from_file(
+    :def,
+    :llms_txt_template,
+    Path.expand("templates/llms_txt_template.eex", __DIR__),
+    [:config, :modules, :mix_tasks, :extras],
     trim: true
   )
 

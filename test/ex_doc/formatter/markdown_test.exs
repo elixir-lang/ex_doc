@@ -215,6 +215,25 @@ defmodule ExDoc.Formatter.MarkdownTest do
       refute content =~ "## Pages"
       refute content =~ "## Guides"
     end
+
+    test "includes description when provided", %{tmp_dir: tmp_dir} = context do
+      config =
+        config(context,
+          extras: ["test/fixtures/README.md"],
+          description: "A documentation generation tool for Elixir"
+        )
+
+      generate(config)
+      content = File.read!(tmp_dir <> "/llms.txt")
+
+      assert content =~ "# Elixir v1.0.1 - Table of Contents"
+      assert content =~ "A documentation generation tool for Elixir"
+
+      # Description should not appear in api-reference.md
+      api_content = File.read!(tmp_dir <> "/api-reference.md")
+      assert api_content =~ "# Elixir v1.0.1 - API Reference"
+      refute api_content =~ "A documentation generation tool for Elixir"
+    end
   end
 
   describe "api_reference" do

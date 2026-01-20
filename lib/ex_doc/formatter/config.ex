@@ -39,6 +39,7 @@ defmodule ExDoc.Formatter.Config do
             authors: nil,
             package: nil,
             title: nil,
+            description: nil,
             nest_modules_by_prefix: [],
             before_closing_head_tag: &__MODULE__.before_closing_head_tag/1,
             before_closing_body_tag: &__MODULE__.before_closing_body_tag/1,
@@ -72,6 +73,7 @@ defmodule ExDoc.Formatter.Config do
           authors: nil | [String.t()],
           package: :atom | nil,
           title: nil | String.t(),
+          description: nil | String.t(),
           nest_modules_by_prefix: [String.t()],
           before_closing_head_tag: (atom() -> String.t()) | mfa() | map(),
           before_closing_body_tag: (atom() -> String.t()) | mfa() | map(),
@@ -144,6 +146,7 @@ defmodule ExDoc.Formatter.Config do
         :authors,
         :package,
         :title,
+        :description,
         :apps,
         :deps
       ])

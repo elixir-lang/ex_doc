@@ -34,7 +34,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
     extras = group_by_group(extras)
 
     content =
-      Templates.nav_template(config, modules, mix_tasks, extras, "Table of Contents")
+      Templates.llms_txt_template(config, modules, mix_tasks, extras)
       |> normalize_output()
 
     filename = "llms.txt"
@@ -51,7 +51,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
     mix_tasks = group_by_group(tasks)
 
     content =
-      Templates.nav_template(config, modules, mix_tasks, [], "API Reference")
+      Templates.api_reference_template(config, modules, mix_tasks)
       |> normalize_output()
 
     filename = "api-reference.md"

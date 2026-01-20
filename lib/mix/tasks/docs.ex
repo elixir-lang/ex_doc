@@ -135,6 +135,8 @@ defmodule Mix.Tasks.Docs do
       |> normalize_source_url(config)
       # accepted at root level config
       |> normalize_homepage_url(config)
+      # accepted at root level config
+      |> normalize_description(config)
       |> normalize_apps(config)
       |> normalize_main()
       |> normalize_deps()
@@ -223,6 +225,14 @@ defmodule Mix.Tasks.Docs do
   defp normalize_homepage_url(options, config) do
     if homepage_url = config[:homepage_url] do
       Keyword.put(options, :homepage_url, homepage_url)
+    else
+      options
+    end
+  end
+
+  defp normalize_description(options, config) do
+    if description = config[:description] do
+      Keyword.put(options, :description, description)
     else
       options
     end

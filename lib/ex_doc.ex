@@ -75,6 +75,9 @@ defmodule ExDoc do
       ExDoc will by default include all dependencies and assume they are hosted on
       HexDocs. This can be overridden by your own values. Example: `[plug: "https://myserver/plug/"]`
 
+    * `:description` - A brief description of the project, currently included in Hex.pm and the generated
+      `llms.txt` file
+
     * `:extra_section` - String that defines the section title of the additional
       Markdown and plain text pages; default: "Pages". Example: "Guides"
 
