@@ -4,6 +4,7 @@
 <div id="top-content">
   <div class="heading-with-actions top-heading">
     <h1>API Reference <small class="app-vsn"><%= config.project %> v#<%= config.version %></small></h1>
+    <%= view_markdown_link(config, "api-reference.md") %>
     <%= if config.source_url do %>
       <a href="<%= config.source_url %>" title="View Source" class="icon-action" rel="help">
         <i class="ri-code-s-slash-line" aria-hidden="true"></i>

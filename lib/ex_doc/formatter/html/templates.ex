@@ -22,6 +22,22 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def module_type(%{type: type}), do: "<small>#{type}</small>"
 
   @doc """
+  Renders a "View Markdown" link if markdown formatter is enabled.
+  """
+  def view_markdown_link(config, path) do
+    if "markdown" in config.formatters do
+      """
+      <a href="#{enc(path)}" title="View Markdown" class="icon-action" rel="help">
+        <i class="ri-markdown-line" aria-hidden="true"></i>
+        <span class="sr-only">View Markdown</span>
+      </a>
+      """
+    else
+      ""
+    end
+  end
+
+  @doc """
   Create a JS object which holds all the items displayed in the sidebar area
   """
   def create_sidebar_items(config, modules, tasks, extras) do

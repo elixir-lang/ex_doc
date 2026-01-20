@@ -35,6 +35,7 @@
   --icon-search-2-line: "\f0cd";
   --icon-settings-3-line: "\f0e6";
   --icon-printer-line: "\f029";
+  --icon-markdown-line: "\ef1e";
 }
 
 .ri-lg { font-size: 1.3333em; line-height: .75em; vertical-align: -.0667em; }
@@ -56,3 +57,4 @@
 .ri-alert-line:before { content: var(--icon-alert); }
 .ri-double-quotes-l:before { content: var(--icon-double-quotes-l); }
 .ri-printer-line:before { content: var(--icon-printer-line); }
+.ri-markdown-line:before { content: var(--icon-markdown-line); }

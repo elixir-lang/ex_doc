@@ -30,6 +30,7 @@
   justify-content: center;
   align-items: center;
   font-weight: normal;
+  margin-left: 3px;
 }
 .content-inner .heading-with-actions.top-heading .icon-action {
   font-size: 1.2rem;

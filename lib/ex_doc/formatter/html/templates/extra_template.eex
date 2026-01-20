@@ -5,11 +5,12 @@
   <div class="heading-with-actions top-heading">
     <h1><%= ExDoc.DocAST.to_html(node.title_doc) %></h1>
     <%= if node.type == :cheatmd do %>
-      <button onclick="window.print()" title="Print Cheatsheet" class="icon-action" rel="print">
+      <a onclick="window.print()" title="Print Cheatsheet" class="icon-action" rel="print">
         <i class="ri-printer-line" aria-hidden="true"></i>
         <span class="sr-only">Print Cheatsheet</span>
-      </button>
+      </a>
     <% end %>
+    <%= view_markdown_link(config, "#{node.id}.md") %>
     <%= if node.source_url do %>
       <a href="<%= node.source_url %>" title="View Source" class="icon-action" rel="help">
         <i class="ri-code-s-slash-line" aria-hidden="true"></i>

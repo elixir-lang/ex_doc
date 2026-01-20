@@ -138,6 +138,31 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute content =~ ~r{"id":"api-reference","title":"API Reference"}
   end
 
+  test "generates markdown links when markdown formatter is included",
+       %{tmp_dir: tmp_dir} = context do
+    generate(
+      config(context,
+        formatters: ["html", "markdown"],
+        extras: ["test/fixtures/README.md"]
+      )
+    )
+
+    api_content = File.read!(tmp_dir <> "/html/api-reference.html")
+    assert api_content =~ "View llms.txt"
+    assert api_content =~ "View Markdown"
+    assert api_content =~ ~s{<a href="api-reference.md" title="View Markdown"}
+
+    extra_content = File.read!(tmp_dir <> "/html/readme.html")
+    assert extra_content =~ "View llms.txt"
+    assert extra_content =~ "View Markdown"
+    assert extra_content =~ ~s{<a href="readme.md" title="View Markdown"}
+
+    module_content = File.read!(tmp_dir <> "/html/CompiledWithDocs.html")
+    assert module_content =~ "View llms.txt"
+    assert module_content =~ "View Markdown"
+    assert module_content =~ ~s{<a href="CompiledWithDocs.md" title="View Markdown"}
+  end
+
   test "groups modules by nesting", %{tmp_dir: tmp_dir} = context do
     config(context)
     |> Keyword.put(:nest_modules_by_prefix, [Common.Nesting.Prefix.B, Common.Nesting.Prefix.B.B])

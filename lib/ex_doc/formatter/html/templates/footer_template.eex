@@ -3,7 +3,7 @@
         <p>
           <%= if config.package do %>
             <span class="line">
-              <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>" class="footer-hex-package">Hex Package</a>
+              <a href="https://hex.pm/packages/<%= config.package %>/<%= config.version %>">Hex Package</a>
 
               <a href="https://preview.hex.pm/preview/<%= config.package %>/<%= config.version %>">Hex Preview</a>
 
@@ -18,8 +18,14 @@
               Go to package docs
             </button>
 
+            <%= if "markdown" in config.formatters do %>
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+            <% end %>
+
             <%= if "epub" in config.formatters do %>
-              <a href="<%= config.project %>.epub" title="ePub version">
+              <a href="<%= config.project %>.epub">
                 Download ePub version
               </a>
             <% end %>

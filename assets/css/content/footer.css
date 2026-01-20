@@ -8,13 +8,16 @@
   display: inline-block;
 }
 
-.content-inner .footer .footer-button {
-  background-color: transparent;
-  border: 0;
-  cursor: pointer;
+.content-inner .footer .line {
+  display: inline-block;
+}
+
+.content-inner .footer .line a, .content-inner .footer .line button {
   padding: 0 4px;
 }
 
-.content-inner .footer .footer-hex-package {
-  margin-right: 4px;
+.content-inner .footer button {
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
 }
