@@ -116,6 +116,17 @@ defmodule ExDoc.Mixfile do
           Markdown: [
             ExDoc.Markdown,
             ExDoc.Markdown.Earmark
+          ],
+          Formatter: [
+            ExDoc.Formatter,
+            ExDoc.Formatter.Config
+          ],
+          Nodes: [
+            ExDoc.ModuleNode,
+            ExDoc.DocNode,
+            ExDoc.DocGroupNode,
+            ExDoc.ExtraNode,
+            ExDoc.URLNode
           ]
         ],
         groups_for_extras: [

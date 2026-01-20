@@ -1,11 +1,20 @@
 defmodule ExDoc.Formatter.Config do
-  @moduledoc false
+  @moduledoc """
+  Configuration used by formatters.
 
-  # Defaults
+  Contains project metadata, output settings, and various
+  customization options for generating documentation.
+  """
+
+  @doc false
   def before_closing_head_tag(_), do: ""
+  @doc false
   def before_closing_footer_tag(_), do: ""
+  @doc false
   def before_closing_body_tag(_), do: ""
+  @doc false
   def skip_undefined_reference_warnings_on(_string), do: false
+  @doc false
   def skip_code_autolink_to(_string), do: false
 
   defstruct output: "./doc",
@@ -74,6 +83,7 @@ defmodule ExDoc.Formatter.Config do
           proglang: :elixir | :erlang
         }
 
+  @doc false
   def build(project, version, options) do
     output = Keyword.get(options, :output, "./doc")
     nest_modules_by_prefix = Keyword.get(options, :nest_modules_by_prefix, [])

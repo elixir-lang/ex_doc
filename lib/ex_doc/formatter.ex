@@ -1,7 +1,27 @@
 defmodule ExDoc.Formatter do
-  @moduledoc false
+  @moduledoc """
+  Specifies the custom formatter API.
+  """
 
-  alias ExDoc.Autolink
+  @doc """
+  The callback that must be implemented by formatters.
+
+  It receives the configuration, a list of nodes,
+  and it must return the documentation entrypoint
+  plus a list of files built inside the output folder.
+  """
+  @callback run(
+              ExDoc.Formatter.Config.t(),
+              [ExDoc.ModuleNode.t()],
+              [ExDoc.ExtraNode.t() | ExDoc.URLNode.t()]
+            ) :: %{entrypoint: String.t(), build: [String.t()]}
+
+  @doc """
+  A list of options to configure autolinking behaviour.
+  """
+  @callback autolink_options() :: [highlight_tag: String.t(), extension: String.t()]
+
+  @optional_callbacks autolink_options: 0
 
   @doc false
   def run(formatter, formatter_config, module_nodes, filtered_nodes, extras) do
@@ -53,6 +73,10 @@ defmodule ExDoc.Formatter do
       |> Enum.map(&Path.join(config.output, &1))
       |> Enum.each(&File.rm/1)
     end
+  end
+
+  defp write_build_file(_build_file, []) do
+    :ok
   end
 
   defp write_build_file(build_file, files) do
@@ -165,7 +189,7 @@ defmodule ExDoc.Formatter do
         _ -> ExDoc.Language.Elixir
       end
 
-    base_config = %Autolink{
+    base_config = %ExDoc.Autolink{
       apps: config.apps,
       deps: config.deps,
       ext: ext,
@@ -248,14 +272,14 @@ defmodule ExDoc.Formatter do
     %{node | doc: doc}
   end
 
-  defp autolink_extra(%ExDoc.Extras.URL{} = extra, _language, _autolink_opts, _opts),
+  defp autolink_extra(%ExDoc.URLNode{} = extra, _language, _autolink_opts, _opts),
     do: extra
 
-  defp autolink_extra(%ExDoc.Extras.Page{doc: nil} = extra, _language, _autolink_opts, _opts),
+  defp autolink_extra(%ExDoc.ExtraNode{doc: nil} = extra, _language, _autolink_opts, _opts),
     do: extra
 
   defp autolink_extra(
-         %ExDoc.Extras.Page{doc: doc, source_path: source_path, id: id} = extra,
+         %ExDoc.ExtraNode{doc: doc, source_path: source_path, id: id} = extra,
          language,
          base_config,
          opts
@@ -285,10 +309,10 @@ defmodule ExDoc.Formatter do
 
   defp extra_paths(extras) do
     Enum.reduce(extras, %{}, fn
-      %ExDoc.Extras.URL{}, acc ->
+      %ExDoc.URLNode{}, acc ->
         acc
 
-      %ExDoc.Extras.Page{source_path: source_path, id: id}, acc when is_binary(source_path) ->
+      %ExDoc.ExtraNode{source_path: source_path, id: id}, acc when is_binary(source_path) ->
         base = Path.basename(source_path)
         Map.put(acc, base, id)
 

@@ -48,7 +48,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
   end
 
   defp generate_extras(extras, config) do
-    for %ExDoc.Extras.Page{id: id, source_doc: source_doc} <- extras do
+    for %ExDoc.ExtraNode{id: id, source_doc: source_doc} <- extras do
       filename = "#{id}.md"
       output = "#{config.output}/#{filename}"
       File.write!(output, source_doc)

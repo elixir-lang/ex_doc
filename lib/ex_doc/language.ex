@@ -1,8 +1,6 @@
 defmodule ExDoc.Language do
   @moduledoc false
 
-  @type spec_ast() :: term()
-
   @typedoc """
   The map has the following keys:
 
@@ -85,7 +83,7 @@ defmodule ExDoc.Language do
                 signature: [binary()],
                 source_file: String.t() | nil,
                 source_line: non_neg_integer() | nil,
-                specs: [spec_ast()],
+                specs: [ExDoc.DocNode.spec_ast()],
                 type: atom()
               }
               | false

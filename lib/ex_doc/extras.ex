@@ -3,54 +3,8 @@ defmodule ExDoc.Extras do
 
   alias ExDoc.{Config, Markdown, Utils}
 
-  defmodule Page do
-    @moduledoc false
-
-    defstruct id: nil,
-              title: nil,
-              title_doc: nil,
-              group: nil,
-              type: nil,
-              doc: nil,
-              source_doc: nil,
-              source_path: nil,
-              source_url: nil,
-              search_data: nil
-
-    @type t :: %__MODULE__{
-            id: String.t(),
-            title: String.t(),
-            title_doc: ExDoc.DocAST.t() | String.t(),
-            group: atom() | nil,
-            type: atom(),
-            doc: ExDoc.DocAST.t() | nil,
-            source_doc: String.t(),
-            source_path: String.t(),
-            source_url: String.t(),
-            search_data: [map()] | nil
-          }
-  end
-
-  defmodule URL do
-    @moduledoc false
-
-    defstruct id: nil,
-              title: nil,
-              group: nil,
-              url: nil
-
-    @type t :: %__MODULE__{
-            id: String.t(),
-            title: String.t(),
-            group: atom() | nil,
-            url: String.t()
-          }
-  end
-
   @doc """
-  Builds extras from the given extras input and config.
-
-  Does not perform autolinking.
+  Build a list of `ExDoc.ExtraNode` and `ExDoc.URLNode`.
   """
   def build(extras_input, config) do
     groups = config.groups_for_extras
@@ -87,7 +41,7 @@ defmodule ExDoc.Extras do
     url = validate_extra_string!(input_options, :url)
     group = Config.match_extra(groups, url)
 
-    %ExDoc.Extras.URL{
+    %ExDoc.URLNode{
       group: group,
       id: Utils.text_to_id(title),
       title: title,
@@ -141,7 +95,7 @@ defmodule ExDoc.Extras do
     source_url = config.source_url_pattern.(source_path, 1)
     search_data = validate_search_data!(input_options[:search_data])
 
-    %ExDoc.Extras.Page{
+    %ExDoc.ExtraNode{
       type: extra_type(extension),
       source_doc: source,
       group: group,

@@ -46,7 +46,7 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_extras(config, extras) do
-    for %ExDoc.Extras.Page{} = node <- extras do
+    for %ExDoc.ExtraNode{} = node <- extras do
       output = "#{config.output}/OEBPS/#{node.id}.xhtml"
       html = Templates.extra_template(config, node)
 

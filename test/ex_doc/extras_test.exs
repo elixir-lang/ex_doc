@@ -25,7 +25,7 @@ defmodule ExDoc.ExtrasTest do
       config = config()
       [extra] = Extras.build(extras, config)
 
-      assert %Extras.Page{} = extra
+      assert %ExDoc.ExtraNode{} = extra
       assert extra.id == "readme"
       assert extra.title == "README"
       assert extra.source_doc =~ "This is a readme file"
@@ -43,7 +43,7 @@ defmodule ExDoc.ExtrasTest do
       config = config()
       [extra] = Extras.build(extras, config)
 
-      assert %Extras.Page{} = extra
+      assert %ExDoc.ExtraNode{} = extra
       assert extra.type == :livemd
       assert extra.title == "Livebook"
     end
@@ -59,7 +59,7 @@ defmodule ExDoc.ExtrasTest do
       config = config()
       [extra] = Extras.build(extras, config)
 
-      assert %Extras.Page{} = extra
+      assert %ExDoc.ExtraNode{} = extra
       assert extra.type == :cheatmd
       assert extra.title == "Cheatsheet"
     end
@@ -74,7 +74,7 @@ defmodule ExDoc.ExtrasTest do
       config = config()
       [extra] = Extras.build(extras, config)
 
-      assert %Extras.Page{} = extra
+      assert %ExDoc.ExtraNode{} = extra
       assert extra.type == :extra
       assert extra.title == "plain"
       assert extra.source_doc =~ "This is plain text"
@@ -89,7 +89,7 @@ defmodule ExDoc.ExtrasTest do
       config = config()
       [extra] = Extras.build(extras, config)
 
-      assert %Extras.Page{} = extra
+      assert %ExDoc.ExtraNode{} = extra
       assert extra.type == :extra
       assert extra.title == "LICENSE"
     end
@@ -99,7 +99,7 @@ defmodule ExDoc.ExtrasTest do
       config = config()
       [extra] = Extras.build(extras, config)
 
-      assert %Extras.URL{} = extra
+      assert %ExDoc.URLNode{} = extra
       assert extra.id == "elixir"
       assert extra.title == "Elixir"
       assert extra.url == "https://elixir-lang.org"
@@ -112,10 +112,10 @@ defmodule ExDoc.ExtrasTest do
       config = config()
       [page, url] = Extras.build(extras, config)
 
-      assert %Extras.Page{} = page
+      assert %ExDoc.ExtraNode{} = page
       assert page.id == "readme"
 
-      assert %Extras.URL{} = url
+      assert %ExDoc.URLNode{} = url
       assert url.id == "elixir"
     end
 
@@ -130,8 +130,8 @@ defmodule ExDoc.ExtrasTest do
       config = config()
       [extra1, extra2] = Extras.build(extras, config)
 
-      assert %Extras.Page{} = extra1
-      assert %Extras.Page{} = extra2
+      assert %ExDoc.ExtraNode{} = extra1
+      assert %ExDoc.ExtraNode{} = extra2
 
       assert extra1.id == "readme-1"
       assert extra2.id == "readme-2"
@@ -252,7 +252,7 @@ defmodule ExDoc.ExtrasTest do
 
       [extra] = Extras.build(extras, config)
 
-      assert %Extras.URL{} = extra
+      assert %ExDoc.URLNode{} = extra
       assert extra.group == :External
     end
 
