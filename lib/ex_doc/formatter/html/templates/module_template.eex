@@ -4,7 +4,7 @@
 <div id="top-content">
   <div class="heading-with-actions top-heading">
     <h1>
-      <span translate="no"><%= module.title %></span> <%= module_type(module) %>
+      <span translate="no"><%= breakable_module_title(module.title) %></span> <%= module_type(module) %>
       <small class="app-vsn" translate="no">(<%= config.project %> v<%= config.version %>)</small>
       <%= for annotation <- module.annotations do %>
         <span class="note">(<%= annotation %>)</span>

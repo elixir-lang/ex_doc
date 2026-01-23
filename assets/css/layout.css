@@ -1,3 +1,11 @@
+/* Layout container contexts */
+
+#main {
+  container: content / inline-size;
+}
+
+/* Layout styles */
+
 html,
 body {
   box-sizing: border-box;
@@ -62,7 +70,6 @@ body {
 }
 
 .content .content-inner {
-  container: content / inline-size;
   max-width: var(--content-width);
   min-height: 100%;
   margin: 0 auto;
