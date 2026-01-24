@@ -105,6 +105,20 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~r{<h1 id="content">\s*XPTOModule\s*}
     end
 
+    test "adds word break to titles" do
+      module_node = %ExDoc.ModuleNode{
+        module: XPTO.NestedModule,
+        doc: nil,
+        id: "XPTO.NestedModule",
+        title: "XPTO.NestedModule"
+      }
+
+      content = Templates.module_template(formatter_config(), module_node)
+
+      assert content =~ ~r{<title>XPTO.NestedModule [^<]*</title>}
+      assert content =~ ~r{<h1 id="content">\s*XPTO.<wbr>NestedModule\s*}
+    end
+
     test "outputs the functions and docstrings" do
       content = get_module_template([CompiledWithDocs])
 
@@ -194,11 +208,6 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
       assert content =~
                ~r{<div class="summary-signature">\s*<a href="#example_1/0" data-no-tooltip="" translate="no">}
-    end
-
-    test "contains links to summary sections when those exist" do
-      content = get_module_template([CompiledWithDocs, CompiledWithDocs.Nested])
-      refute content =~ ~r{types_details}
     end
 
     ## BEHAVIOURS

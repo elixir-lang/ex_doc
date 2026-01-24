@@ -495,6 +495,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<i class="ri-link-m" aria-hidden="true"></i>.*</a>.*<span class="text">Examples</span>.*</h3>}ms
     end
 
+    test "add word breaks to title", context do
+      content = get_module_template([CompiledWithDocs.Nested], context)
+
+      assert content =~ "CompiledWithDocs.<wbr>Nested"
+    end
+
     test "do not output overlapping functions, causing duplicate IDs", context do
       content = get_module_template([OverlappingDefaults], context)
 
