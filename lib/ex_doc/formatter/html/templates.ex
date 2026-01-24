@@ -15,6 +15,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
+  Returns the title with `<wbr>` after each fullstop, allowing word breaks in long module names.
+  """
+  def breakable_module_title(title) when is_binary(title) do
+    String.replace(title, ".", ".<wbr>")
+  end
+
+  @doc """
   Returns the HTML formatted title for the module page.
   """
   def module_type(%{type: :task}), do: ""

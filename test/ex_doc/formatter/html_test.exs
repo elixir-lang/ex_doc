@@ -117,7 +117,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<p>moduledoc</p>}
 
     assert content =~
-             ~r{<a href="CompiledWithDocs.Nested.html" translate="no">CompiledWithDocs.Nested</a>}
+             ~r{<a href="CompiledWithDocs.Nested.html" translate="no">CompiledWithDocs.<wbr>Nested</a>}
 
     assert content =~
              ~r{<a href="Mix.Tasks.TaskWithDocs.html" translate="no">mix task_with_docs</a>}
