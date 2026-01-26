@@ -86,16 +86,13 @@ which we style as h2 and h3. */
     margin-top: 1.75em;
   }
 
-  & h2,
-  & :is(#summary, #types, #callbacks, #functions) > h1.section-heading {
+  & h2 {
     font-size: var(--h2-size);
     margin-top: 1.5em;
     margin-bottom: 0.5em;
   }
 
-  & h3,
-  & :is(#summary, #types, #callbacks, #functions) > h2.section-heading,
-  & #summary :is(.summary-types, .summary-callbacks, .summary-functions) h2 {
+  & h3 {
     font-size: var(--h3-size);
     margin-top: 1.5em;
     margin-bottom: 0.5em;

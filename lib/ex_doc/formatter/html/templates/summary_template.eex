@@ -1,7 +1,7 @@
 <div class="summary-<%= text_to_id(name) %> summary">
-  <h2>
+  <h3>
     <a href="#<%=h text_to_id(name) %>"><%= name %></a>
-  </h2>
+  </h3>
   <%= for node <- nodes do %>
     <div class="summary-row">
       <div class="summary-signature">

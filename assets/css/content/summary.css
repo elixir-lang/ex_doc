@@ -1,4 +1,5 @@
-.content-inner .summary h2 a {
+/* Summary section subheading (e.g., Types) */
+.content-inner .summary h3 a {
   text-decoration: none;
   border: none;
   color: var(--textHeaders) !important;
