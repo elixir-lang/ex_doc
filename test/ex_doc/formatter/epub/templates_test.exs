@@ -125,7 +125,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ ~r{<title>CompiledWithDocs [^<]*</title>}
       assert content =~ ~r{<h1 id="content">\s*CompiledWithDocs\s*}
 
-      assert content =~ ~s{<h1 class="section-heading">Summary</h1>}
+      assert content =~ ~s{<h2 class="section-heading">Summary</h2>}
 
       assert content =~
                ~r{<h2 id="module-example-unicode-escaping">.*Example.*</h2>}ms

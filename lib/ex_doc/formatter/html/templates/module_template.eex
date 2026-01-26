@@ -36,24 +36,24 @@
 
 <%= if module.docs_groups != [] do %>
   <section id="summary" class="details-list">
-    <h1 class="section-heading">
+    <h2 class="section-heading">
       <a class="hover-link" href="#summary">
         <i class="ri-link-m" aria-hidden="true"></i>
       </a>
       <span class="text">Summary</span>
-    </h1>
+    </h2>
     <%= for group <- module.docs_groups, do: summary_template(group.title, group.docs) %>
   </section>
 <% end %>
 
 <%= for group <- module.docs_groups, key = text_to_id(group.title) do %>
   <section id="<%= key %>" class="details-list">
-    <h1 class="section-heading">
+    <h2 class="section-heading">
       <a class="hover-link" href="#<%= key %>">
         <i class="ri-link-m" aria-hidden="true"></i>
       </a>
       <span class="text"><%= group.title %></span>
-    </h1>
+    </h2>
     <%= if doc = group.doc do %>
       <div class="group-description" id="group-description-<%= key %>">
        <%= render_doc(doc) %>
