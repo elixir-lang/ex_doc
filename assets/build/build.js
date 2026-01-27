@@ -46,10 +46,9 @@ Promise.all(formatters.map(async ({formatter, ...options}) => {
   const buildOptions = {
     entryNames: watchMode ? '[name]-dev' : '[name]-[hash]',
     bundle: true,
-    minifySyntax: !watchMode,
-    minifyIdentifiers: !watchMode,
-    // esbuild sometimes inserts erroneous space in ':is()' CSS function when whitespace minification is on: ': is()'
-    minifyWhitespace: false,
+    minifySyntax: true,
+    minifyIdentifiers: true,
+    minifyWhitespace: true,
     logLevel: watchMode ? 'warning' : 'info',
     ...options,
     plugins: [{
