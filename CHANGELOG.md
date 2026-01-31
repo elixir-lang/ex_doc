@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.40.1 (2026-01-31)
+
+  * Enhancements
+    * Remove link to source from generated .md files
+    * Improve word-breaking of module names and sizing of main page titles
+    * Include description in llms.txt
+
+  * Bug fixes
+    * Fix headers in custom groups
+
 ## v0.40.0 (2026-01-20)
 
   * Enhancements
