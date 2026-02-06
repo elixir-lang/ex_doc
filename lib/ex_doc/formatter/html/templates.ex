@@ -182,7 +182,39 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def render_doc(ast) do
     ast
     |> add_fancy_anchors()
+    |> add_nofollow()
     |> ExDoc.DocAST.to_html()
+  end
+
+  @official_domains ~w(hex.pm hexdocs.pm elixir-lang.org erlang.org)
+
+  defp add_nofollow(ast) do
+    ExDoc.DocAST.map_tags(ast, fn
+      {:a, attrs, inner, meta} ->
+        href = Keyword.get(attrs, :href, "")
+
+        if nofollow?(href) do
+          {:a, Keyword.put(attrs, :rel, "nofollow"), inner, meta}
+        else
+          {:a, attrs, inner, meta}
+        end
+
+      other ->
+        other
+    end)
+  end
+
+  defp nofollow?(href) do
+    uri = URI.parse(href)
+    uri.scheme in ["http", "https"] and not official_host?(uri.host)
+  end
+
+  defp official_host?(nil), do: false
+
+  defp official_host?(host) do
+    Enum.any?(@official_domains, fn domain ->
+      host == domain or String.ends_with?(host, "." <> domain)
+    end)
   end
 
   defp add_fancy_anchors(ast) do

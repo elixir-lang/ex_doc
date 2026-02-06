@@ -79,7 +79,7 @@ export function initialize () {
       }
 
       items.push(el('li', {}, [
-        el('a', {href, translate}, [
+        el('a', {href, translate, ...(node.url ? {rel: 'nofollow'} : {})}, [
           node.nested_title || node.title,
           node.url ? el('i', {class: 'external-link ri-external-link-line'}) : null
         ].filter(Boolean)),

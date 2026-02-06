@@ -85,6 +85,33 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
              <h2>Foo</h2>
              """) == "<h2 id=\"foo\">Foo</h2>"
     end
+
+    test "adds rel=nofollow to external links" do
+      assert render_doc("[example](https://example.com)") ==
+               ~s|<p><a rel="nofollow" href="https://example.com">example</a></p>|
+    end
+
+    test "does not add rel=nofollow to official ecosystem links" do
+      assert render_doc("[hex](https://hex.pm/packages/ex_doc)") ==
+               ~s|<p><a href="https://hex.pm/packages/ex_doc">hex</a></p>|
+
+      assert render_doc("[docs](https://hexdocs.pm/ex_doc)") ==
+               ~s|<p><a href="https://hexdocs.pm/ex_doc">docs</a></p>|
+
+      assert render_doc("[elixir](https://elixir-lang.org)") ==
+               ~s|<p><a href="https://elixir-lang.org">elixir</a></p>|
+
+      assert render_doc("[erlang](https://www.erlang.org)") ==
+               ~s|<p><a href="https://www.erlang.org">erlang</a></p>|
+    end
+
+    test "does not add rel=nofollow to relative and anchor links" do
+      assert render_doc("[page](other.html)") ==
+               ~s|<p><a href="other.html">page</a></p>|
+
+      assert render_doc("[section](#foo)") ==
+               ~s|<p><a href="#foo">section</a></p>|
+    end
   end
 
   describe "sidebar_template" do

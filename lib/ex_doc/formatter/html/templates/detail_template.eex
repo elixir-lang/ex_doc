@@ -12,7 +12,7 @@
         <span class="note">(<%= annotation %>)</span>
       <% end %>
       <%= if node.source_url do %>
-        <a href="<%= node.source_url %>" class="icon-action" rel="help" aria-label="View Source">
+        <a href="<%= node.source_url %>" class="icon-action" rel="help nofollow" aria-label="View Source">
           <i class="ri-code-s-slash-line" aria-hidden="true"></i>
         </a>
       <% end %>
