@@ -11,9 +11,14 @@ defmodule ExDoc.Formatter.MARKDOWN do
       |> Enum.filter(&(&1.source_format == "text/markdown"))
       |> Enum.split_with(&(&1.type != :task))
 
+    groups =
+      Map.new([modules: modules, mix_tasks: tasks, extras: extras], fn {k, v} ->
+        {k, group_by_group(v)}
+      end)
+
     all_files =
-      generate_nav(config, modules, tasks, extras) ++
-        generate_api_reference(config, modules, tasks) ++
+      generate_nav(config, groups) ++
+        generate_api_reference(config, groups) ++
         generate_extras(extras, config) ++
         generate_list(config, modules) ++
         generate_list(config, tasks)
@@ -28,34 +33,37 @@ defmodule ExDoc.Formatter.MARKDOWN do
     |> String.replace(~r/\n{3,}/, "\n\n")
   end
 
-  defp generate_nav(config, modules, tasks, extras) do
-    modules = group_by_group(modules)
-    mix_tasks = group_by_group(tasks)
-    extras = group_by_group(extras)
-
+  defp generate_nav(config, %{modules: modules, mix_tasks: mix_tasks, extras: extras}) do
     content =
-      Templates.llms_txt_template(config, modules, mix_tasks, extras)
+      config
+      |> Templates.llms_txt_template(modules, mix_tasks, extras)
       |> normalize_output()
 
     filename = "llms.txt"
-    File.write(Path.join(config.output, filename), content)
+
+    config.output
+    |> Path.join(filename)
+    |> File.write(content)
+
     [filename]
   end
 
-  defp generate_api_reference(%{api_reference: false}, _modules, _tasks) do
+  defp generate_api_reference(%{api_reference: false}, _groups) do
     []
   end
 
-  defp generate_api_reference(config, modules, tasks) do
-    modules = group_by_group(modules)
-    mix_tasks = group_by_group(tasks)
-
+  defp generate_api_reference(config, %{modules: modules, mix_tasks: mix_tasks}) do
     content =
-      Templates.api_reference_template(config, modules, mix_tasks)
+      config
+      |> Templates.api_reference_template(modules, mix_tasks)
       |> normalize_output()
 
     filename = "api-reference.md"
-    File.write(Path.join(config.output, filename), content)
+
+    config.output
+    |> Path.join(filename)
+    |> File.write(content)
+
     [filename]
   end
 
