@@ -11,15 +11,10 @@ defmodule ExDoc.Formatter.MARKDOWN do
       |> Enum.filter(&(&1.source_format == "text/markdown"))
       |> Enum.split_with(&(&1.type != :task))
 
-    groups =
-      Map.new([modules: modules, mix_tasks: tasks, extras: extras], fn {k, v} ->
-        {k, group_by_group(v)}
-      end)
-
     all_files =
-      generate_nav(config, groups) ++
-        generate_api_reference(config, groups) ++
-        generate_extras(extras, config) ++
+      generate_nav(config, modules, tasks, extras) ++
+        generate_api_reference(config, modules, tasks) ++
+        generate_extras(config, extras) ++
         generate_list(config, modules) ++
         generate_list(config, tasks)
 
@@ -33,7 +28,11 @@ defmodule ExDoc.Formatter.MARKDOWN do
     |> String.replace(~r/\n{3,}/, "\n\n")
   end
 
-  defp generate_nav(config, %{modules: modules, mix_tasks: mix_tasks, extras: extras}) do
+  defp generate_nav(config, modules, tasks, extras) do
+    modules = group_by_group(modules)
+    mix_tasks = group_by_group(tasks)
+    extras = group_by_group(extras)
+
     content =
       config
       |> Templates.llms_txt_template(modules, mix_tasks, extras)
@@ -46,11 +45,14 @@ defmodule ExDoc.Formatter.MARKDOWN do
     [filename]
   end
 
-  defp generate_api_reference(%{api_reference: false}, _groups) do
+  defp generate_api_reference(%{api_reference: false}, _modules, _tasks) do
     []
   end
 
-  defp generate_api_reference(config, %{modules: modules, mix_tasks: mix_tasks}) do
+  defp generate_api_reference(config, modules, tasks) do
+    modules = group_by_group(modules)
+    mix_tasks = group_by_group(tasks)
+
     content =
       config
       |> Templates.api_reference_template(modules, mix_tasks)
@@ -69,7 +71,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
     |> Enum.map(&{hd(&1).group, &1})
   end
 
-  defp generate_extras(extras, config) do
+  defp generate_extras(config, extras) do
     for %ExDoc.ExtraNode{id: id, source_doc: content} <- extras do
       filename = "#{id}.md"
 
@@ -81,13 +83,13 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
   defp generate_list(config, nodes) do
     nodes
-    |> Task.async_stream(&generate_module(&1, config), timeout: :infinity)
+    |> Task.async_stream(&generate_module(config, &1), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
   end
 
   ## Helpers
 
-  defp generate_module(module_node, config) do
+  defp generate_module(config, module_node) do
     content =
       config
       |> Templates.module_template(module_node)
