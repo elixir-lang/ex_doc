@@ -74,10 +74,13 @@ defmodule ExDoc.Formatter.MARKDOWN do
   end
 
   defp generate_extras(extras, config) do
-    for %ExDoc.ExtraNode{id: id, source_doc: source_doc} <- extras do
+    for %ExDoc.ExtraNode{id: id, source_doc: content} <- extras do
       filename = "#{id}.md"
-      output = Path.join(config.output, filename)
-      File.write!(output, source_doc)
+
+      config.output
+      |> Path.join(filename)
+      |> File.write!(content)
+
       filename
     end
   end
@@ -92,11 +95,16 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
   defp generate_module(module_node, config) do
     content =
-      Templates.module_template(config, module_node)
+      config
+      |> Templates.module_template(module_node)
       |> normalize_output()
 
     filename = "#{module_node.id}.md"
-    File.write(Path.join(config.output, filename), content)
+
+    config.output
+    |> Path.join(filename)
+    |> File.write(content)
+
     filename
   end
 end
