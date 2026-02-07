@@ -41,9 +41,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
     filename = "llms.txt"
 
-    config.output
-    |> Path.join(filename)
-    |> File.write(content)
+    write!(config, filename, content)
 
     [filename]
   end
@@ -60,9 +58,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
     filename = "api-reference.md"
 
-    config.output
-    |> Path.join(filename)
-    |> File.write(content)
+    write!(config, filename, content)
 
     [filename]
   end
@@ -77,9 +73,7 @@ defmodule ExDoc.Formatter.MARKDOWN do
     for %ExDoc.ExtraNode{id: id, source_doc: content} <- extras do
       filename = "#{id}.md"
 
-      config.output
-      |> Path.join(filename)
-      |> File.write!(content)
+      write!(config, filename, content)
 
       filename
     end
@@ -101,10 +95,14 @@ defmodule ExDoc.Formatter.MARKDOWN do
 
     filename = "#{module_node.id}.md"
 
-    config.output
-    |> Path.join(filename)
-    |> File.write(content)
+    write!(config, filename, content)
 
     filename
+  end
+
+  defp write!(config, filename, content) do
+    config.output
+    |> Path.join(filename)
+    |> File.write!(content)
   end
 end
