@@ -1,6 +1,6 @@
 # <%= config.project %> v<%= config.version %> - Table of Contents
 <%= if config.description do %>
-<%= config.description %>
+> <%= config.description %>
 
 <% end %>
 <%= nav_group_template config.extra_section, extras %>
