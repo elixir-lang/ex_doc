@@ -6,6 +6,15 @@ defmodule ExDoc.Formatter.MARKDOWN do
   def run(config, project_nodes, extras) when is_map(config) do
     File.mkdir_p!(config.output)
 
+    static_files =
+      if Enum.all?(config.assets, fn {_k, target_dir} ->
+           config.output |> Path.join(target_dir) |> File.exists?()
+         end) do
+        []
+      else
+        ExDoc.Formatter.copy_assets(config.assets, config.output)
+      end
+
     {modules, tasks} =
       project_nodes
       |> Enum.filter(&(&1.source_format == "text/markdown"))
@@ -16,7 +25,8 @@ defmodule ExDoc.Formatter.MARKDOWN do
         generate_api_reference(config, modules, tasks) ++
         generate_extras(config, extras) ++
         generate_list(config, modules) ++
-        generate_list(config, tasks)
+        generate_list(config, tasks) ++
+        static_files
 
     entrypoint = config.output |> Path.join("llms.txt") |> Path.relative_to_cwd()
     %{entrypoint: entrypoint, build: List.flatten(all_files)}
