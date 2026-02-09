@@ -45,7 +45,6 @@ defmodule ExDoc.Mixfile do
       # Add other makeup lexers as optional for the executable
       {:makeup_c, ">= 0.1.0", optional: true},
       {:makeup_html, ">= 0.1.0", optional: true},
-      {:jason, "~> 1.2", only: :test},
       {:lazy_html, "~> 0.1.0", only: :test}
     ]
   end

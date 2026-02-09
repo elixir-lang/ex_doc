@@ -77,10 +77,10 @@ defmodule ExDoc.UtilsTest do
       integer: 1
     }
 
-    assert map |> Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(map)
+    assert map |> Utils.to_json() |> IO.iodata_to_binary() == JSON.encode!(map)
 
     string = for i <- 0..0x1F, do: <<i>>, into: ""
-    assert string |> Utils.to_json() |> IO.iodata_to_binary() == Jason.encode!(string)
+    assert string |> Utils.to_json() |> IO.iodata_to_binary() == JSON.encode!(string)
   end
 
   test "strip_tags" do

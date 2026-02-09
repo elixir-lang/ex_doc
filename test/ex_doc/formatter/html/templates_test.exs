@@ -366,7 +366,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
         |> Templates.create_sidebar_items(modules, tasks, extras)
         |> IO.iodata_to_binary()
 
-      Jason.decode!(content)
+      JSON.decode!(content)
     end
   end
 

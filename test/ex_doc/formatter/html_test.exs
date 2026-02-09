@@ -104,7 +104,7 @@ defmodule ExDoc.Formatter.HTMLTest do
              "tasks" => [
                %{"id" => "Mix.Tasks.TaskWithDocs", "title" => "mix task_with_docs"}
              ]
-           } = Jason.decode!(content)
+           } = JSON.decode!(content)
   end
 
   test "generates the api reference file", %{tmp_dir: tmp_dir} = context do
@@ -169,7 +169,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     |> generate()
 
     "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
-    assert {:ok, %{"modules" => modules}} = Jason.decode(content)
+    assert {:ok, %{"modules" => modules}} = JSON.decode(content)
 
     assert %{"nested_context" => "Common.Nesting.Prefix.B"} =
              Enum.find(modules, fn %{"id" => id} -> id == "Common.Nesting.Prefix.B.C" end)
@@ -196,7 +196,7 @@ defmodule ExDoc.Formatter.HTMLTest do
     |> generate()
 
     "sidebarNodes=" <> content = read_wildcard!(tmp_dir <> "/html/dist/sidebar_items-*.js")
-    assert {:ok, %{"modules" => modules}} = Jason.decode(content)
+    assert {:ok, %{"modules" => modules}} = JSON.decode(content)
 
     assert %{"Group1" => [_, _], "Group2" => [_, _]} =
              Enum.group_by(modules, &Map.get(&1, "group"))
@@ -452,7 +452,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                },
                %{"id" => "livebookfile"},
                %{"id" => "cheatsheets"}
-             ] = Jason.decode!(content)["extras"]
+             ] = JSON.decode!(content)["extras"]
     end
 
     test "with autolinks", %{tmp_dir: tmp_dir} = context do
@@ -504,7 +504,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                    %{"anchor" => "section-two", "id" => "Section Two"}
                  ]
                }
-             ] = Jason.decode!(content)["extras"]
+             ] = JSON.decode!(content)["extras"]
     end
 
     test "includes links to the previous/next page if applicable",

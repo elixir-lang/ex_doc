@@ -311,6 +311,6 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     ExDoc.Formatter.HTML.run(formatter_config, modules, extras)
     [path] = Path.wildcard(Path.join([formatter_config.output, "dist", "search_data-*.js"]))
     "searchData=" <> json = File.read!(path)
-    Jason.decode!(json)
+    JSON.decode!(json)
   end
 end
