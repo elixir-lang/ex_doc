@@ -116,7 +116,7 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       content = Templates.module_template(formatter_config(), module_node)
 
       assert content =~ ~r{<title>XPTO.NestedModule [^<]*</title>}
-      assert content =~ ~r{<h1 id="content">\s*XPTO.<wbr>NestedModule\s*}
+      assert content =~ ~r{<h1 id="content">\s*XPTO.<wbr />NestedModule\s*}
     end
 
     test "outputs the functions and docstrings" do

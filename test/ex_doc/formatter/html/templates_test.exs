@@ -525,7 +525,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "add word breaks to title", context do
       content = get_module_template([CompiledWithDocs.Nested], context)
 
-      assert content =~ "CompiledWithDocs.<wbr>Nested"
+      assert content =~ "CompiledWithDocs.<wbr />Nested"
     end
 
     test "do not output overlapping functions, causing duplicate IDs", context do
