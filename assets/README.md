@@ -56,11 +56,11 @@ Lint and automatically fix all JavaScript files using [ESLint].
 $ npm run --prefix assets test
 ```
 
-Run all the available JavaScript tests using [Karma].
+Run all the available JavaScript tests using [Vitest].
 
 
 [esbuild]: https://esbuild.github.io
 [Node.js]: https://nodejs.org/
 [npm]: https://www.npmjs.com/
 [ESLint]: https://eslint.org/
-[Karma]: https://karma-runner.github.io/
+[Vitest]: https://vitest.dev/
