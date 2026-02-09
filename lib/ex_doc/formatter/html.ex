@@ -22,22 +22,22 @@ defmodule ExDoc.Formatter.HTML do
       Formatter.copy_assets(config.assets, config.output) ++
         Formatter.copy_assets(additional_assets(config), config.output)
 
-    search_data = generate_search_data(project_nodes, extras, config)
+    search_data = generate_search_data(config, project_nodes, extras)
 
     {modules, tasks} = Enum.split_with(project_nodes, &(&1.type != :task))
 
     all_files =
       search_data ++
         static_files ++
-        generate_sidebar_items(modules, tasks, extras, config) ++
-        generate_api_reference(modules, tasks, config) ++
-        generate_extras(extras, config) ++
+        generate_sidebar_items(config, modules, tasks, extras) ++
+        generate_api_reference(config, modules, tasks) ++
+        generate_extras(config, extras) ++
         Formatter.copy_favicon(config, Path.join(@assets_dir, "favicon")) ++
         Formatter.copy_logo(config, Path.join(@assets_dir, "logo")) ++
         generate_search(config) ++
         generate_not_found(config) ++
-        generate_list(modules, config) ++
-        generate_list(tasks, config) ++
+        generate_list(config, modules) ++
+        generate_list(config, tasks) ++
         generate_redirects(config, ".html")
 
     entrypoint = config.output |> Path.join("index.html") |> Path.relative_to_cwd()
@@ -48,7 +48,7 @@ defmodule ExDoc.Formatter.HTML do
     filename = "404.html"
     config = set_canonical_url(config, filename)
     content = Templates.not_found_template(config)
-    File.write!("#{config.output}/#{filename}", content)
+    write!(config, filename, content)
     [filename]
   end
 
@@ -56,22 +56,21 @@ defmodule ExDoc.Formatter.HTML do
     filename = "search.html"
     config = set_canonical_url(config, filename)
     content = Templates.search_template(config)
-    File.write!("#{config.output}/#{filename}", content)
+    write!(config, filename, content)
     [filename]
   end
 
-  defp generate_sidebar_items(modules, tasks, extras, config) do
+  defp generate_sidebar_items(config, modules, tasks, extras) do
     content = Templates.create_sidebar_items(config, modules, tasks, extras)
-
     path = "dist/sidebar_items-#{digest(content)}.js"
-    File.write!(Path.join(config.output, path), content)
+    write!(config, path, content)
     [path]
   end
 
-  defp generate_search_data(linked, extras, config) do
+  defp generate_search_data(config, linked, extras) do
     content = SearchData.create(linked, extras, config.proglang)
     path = "dist/search_data-#{digest(content)}.js"
-    File.write!(Path.join(config.output, path), content)
+    write!(config, path, content)
     [path]
   end
 
@@ -82,14 +81,14 @@ defmodule ExDoc.Formatter.HTML do
     |> binary_part(0, 8)
   end
 
-  defp generate_extras(extras, config) do
+  defp generate_extras(config, extras) do
     generated_extras =
       extras
       |> Enum.reject(&is_map_key(&1, :url))
       |> with_prev_next()
       |> Enum.map(fn {node, prev, next} ->
         filename = "#{node.id}.html"
-        output = "#{config.output}/#{filename}"
+        output = Path.join(config.output, filename)
         config = set_canonical_url(config, filename)
 
         refs = %{
@@ -114,7 +113,7 @@ defmodule ExDoc.Formatter.HTML do
     for %{source_path: source_path, id: id} when source_path != nil <- extras,
         ext = extension_name(source_path),
         ext == ".livemd" do
-      output = "#{config.output}/#{id}#{ext}"
+      output = Path.join(config.output, "#{id}#{ext}")
 
       File.copy!(source_path, output)
 
@@ -135,13 +134,13 @@ defmodule ExDoc.Formatter.HTML do
     ]
   end
 
-  defp generate_api_reference(_modules, _tasks, %{api_reference: false}) do
+  defp generate_api_reference(%{api_reference: false}, _modules, _tasks) do
     []
   end
 
-  defp generate_api_reference(modules, tasks, config) do
+  defp generate_api_reference(config, modules, tasks) do
     filename = "api-reference.html"
-    output = "#{config.output}/#{filename}"
+    output = Path.join(config.output, filename)
     config = set_canonical_url(config, filename)
 
     html = Templates.api_reference_template(config, modules, tasks)
@@ -154,7 +153,7 @@ defmodule ExDoc.Formatter.HTML do
     [filename]
   end
 
-  def generate_redirects(config, ext) do
+  defp generate_redirects(config, ext) do
     config.redirects
     |> Map.new()
     |> Map.put_new("index", config.main)
@@ -173,7 +172,7 @@ defmodule ExDoc.Formatter.HTML do
           _ -> to <> ext
         end
 
-      generate_redirect(source, config, destination)
+      generate_redirect(config, source, destination)
 
       source
     end)
@@ -185,15 +184,15 @@ defmodule ExDoc.Formatter.HTML do
     |> String.downcase()
   end
 
-  defp generate_redirect(filename, config, redirect_to) do
-    without_anchor = String.split(redirect_to, "#") |> hd()
+  defp generate_redirect(config, filename, redirect_to) do
+    without_anchor = redirect_to |> String.split("#") |> hd()
 
-    unless case_sensitive_file_regular?("#{config.output}/#{without_anchor}") do
+    unless config.output |> Path.join(without_anchor) |> case_sensitive_file_regular?() do
       ExDoc.warn("#{filename} redirects to #{redirect_to}, which does not exist", [])
     end
 
     content = Templates.redirect_template(config, redirect_to)
-    File.write!("#{config.output}/#{filename}", content)
+    write!(config, filename, content)
   end
 
   defp case_sensitive_file_regular?(path) do
@@ -205,17 +204,17 @@ defmodule ExDoc.Formatter.HTML do
     end
   end
 
-  defp generate_list(nodes, config) do
+  defp generate_list(config, nodes) do
     nodes
-    |> Task.async_stream(&generate_module_page(&1, config), timeout: :infinity)
+    |> Task.async_stream(&generate_module_page(config, &1), timeout: :infinity)
     |> Enum.map(&elem(&1, 1))
   end
 
-  defp generate_module_page(module_node, config) do
+  defp generate_module_page(config, module_node) do
     filename = "#{module_node.id}.html"
     config = set_canonical_url(config, filename)
     content = Templates.module_template(config, module_node)
-    File.write!("#{config.output}/#{filename}", content)
+    write!(config, filename, content)
     filename
   end
 
@@ -230,5 +229,11 @@ defmodule ExDoc.Formatter.HTML do
     else
       config
     end
+  end
+
+  defp write!(config, filename, content) do
+    config.output
+    |> Path.join(filename)
+    |> File.write!(content)
   end
 end
