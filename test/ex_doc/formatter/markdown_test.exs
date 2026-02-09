@@ -288,4 +288,30 @@ defmodule ExDoc.Formatter.MarkdownTest do
                "*Consult [api-reference.md](api-reference.md) for complete listing*"
     end
   end
+
+  describe "assets" do
+    test "copies assets from source", %{tmp_dir: tmp_dir} = context do
+      dir_name = "test/tmp/markdown_assets/hello"
+      File.mkdir_p!(dir_name)
+      dir_name |> Path.join("world") |> File.touch!()
+
+      config = config(context, assets: %{dir_name => "assets"})
+
+      generate(config)
+
+      assert File.regular?(tmp_dir <> "/assets/world")
+    after
+      File.rm_rf!("test/tmp/markdown_assets")
+    end
+
+    test "does not override previous work from other formatters", %{tmp_dir: tmp_dir} = context do
+      dir_name = Path.join(tmp_dir, "assets")
+      File.mkdir!(dir_name)
+      info = File.stat!(dir_name)
+      config = config(context, assets: %{"test/tmp/markdown_assets/hello" => "assets"})
+      generate(config)
+
+      assert File.stat!(dir_name) == info
+    end
+  end
 end
