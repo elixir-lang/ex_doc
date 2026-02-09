@@ -17,7 +17,7 @@
   <manifest>
     <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav scripted"/>
     <item id="cover" href="title.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
-    <%= for {_title, extras} <- extras, extra <- extras do %>
+    <%= for extra <- extras do %>
       <item id="<%= URI.encode extra.id %>" href="<%= URI.encode extra.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
     <% end %>
     <%= for node <- modules ++ tasks do %>
@@ -36,7 +36,7 @@
   <spine>
     <itemref idref="cover"/>
     <itemref idref="nav"/>
-    <%= for {_title, extras} <- extras, extra <- extras do %>
+    <%= for extra <- extras do %>
       <itemref idref="<%= URI.encode extra.id %>"/>
     <% end %>
     <%= for node <- modules ++ tasks do %>
