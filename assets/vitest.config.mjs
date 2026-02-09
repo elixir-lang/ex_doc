@@ -4,6 +4,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['test/**/*.spec.js'],
-    globals: true
+    globals: true,
+    coverage: {
+      provider: 'v8',
+      include: ['js/**/*.js']
+    }
   }
 })
