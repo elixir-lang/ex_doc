@@ -88,6 +88,24 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
 
       assert content =~ ~S|<itemref idref="XPTOModule"/>|
     end
+
+    test "includes extras as resource" do
+      node =
+        %ExDoc.ExtraNode{
+          id: "changelog",
+          title: "Changelog",
+          doc: nil,
+          type: :extra
+        }
+
+      content =
+        Templates.content_template(formatter_config(), [], [], [node], "uuid", "datetime", [])
+
+      assert content =~
+               ~S|<item id="changelog" href="changelog.xhtml" media-type="application/xhtml+xml" properties="scripted"/>|
+
+      assert content =~ ~S|<itemref idref="changelog"/>|
+    end
   end
 
   describe "module_template/2" do
