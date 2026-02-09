@@ -54,12 +54,7 @@ jobs:
 
       # Test JS
       - run: npm run lint --prefix assets
-      - name: npm run test --prefix assets
-        run: |
-          sudo apt-get install xvfb
-          xvfb-run --auto-servernum npm run test --prefix assets
-        env:
-          CI: true
+      - run: npm run test --prefix assets
 
       # Push updated assets if all good
       - name: Push updated assets
