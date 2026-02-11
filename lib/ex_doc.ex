@@ -127,8 +127,6 @@ defmodule ExDoc do
     * `:markdown_processor` - The markdown processor to use,
       either `module()` or `{module(), keyword()}` to provide configuration options.
 
-    * `:meta` - A keyword list or a map to specify `<meta>` tag attributes.
-
     * `:nest_modules_by_prefix` - See the "Nesting" section.
 
     * `:output` - Output directory for the generated docs. Default: "doc".
@@ -495,15 +493,14 @@ defmodule ExDoc do
 
   ### `<meta>`-tags configuration
 
-  It is also possible to configure some of ExDoc behaviour using meta tags
-  by passing the `:meta` option
+  It is also possible to configure some of ExDoc behaviour using meta tags.
 
     * `exdoc:autocomplete` - when set to "off", it disables autocompletion.
 
     * `exdoc:autocomplete-limit` - Set to an integer to configure how many results
       appear in the autocomplete dropdown. Defaults to 10.
 
-  You can also insert meta tags using `before_closing_head_tag` option.
+  You can insert meta tags using `before_closing_head_tag` option.
 
   ### `docs_config.js`
 
