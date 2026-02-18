@@ -74,7 +74,7 @@ defmodule ExDoc.Language.Erlang do
         callback_data(name, arity, anno, signature, metadata, module_data)
 
       kind == :type ->
-        type_data(name, arity, anno, signature, metadata, module_data)
+        type_data(name, arity, signature, metadata, module_data)
 
       true ->
         false
@@ -141,15 +141,9 @@ defmodule ExDoc.Language.Erlang do
     }
   end
 
-  defp type_data(name, arity, anno, signature, metadata, module_data) do
-    {specs, file, line, type} =
-      case Source.fetch_type!(module_data, name, arity) do
-        %{attr: attr, source_file: file, source_line: line, type: type} ->
-          {[attr], file, line, type}
-
-        nil ->
-          {[], nil, Source.anno_line(anno), :type}
-      end
+  defp type_data(name, arity, signature, metadata, module_data) do
+    %{attr: attr, source_file: file, source_line: line, type: type} =
+      Source.fetch_type!(module_data, name, arity)
 
     %{
       id_key: "t:",
@@ -159,7 +153,7 @@ defmodule ExDoc.Language.Erlang do
       signature: signature,
       source_file: file,
       source_line: line,
-      specs: specs,
+      specs: [attr],
       type: type
     }
   end
