@@ -463,7 +463,7 @@ defmodule ExDoc do
 
   ### Redirects and changing documentation over time
 
-  As your project grows, your documentation may very likely change, even structurally.
+  As your project grows, your documentation may change, perhaps even structurally.
   There are a few important things to consider in this regard:
 
     * Links to your *extras* will break if you change or move file names.
@@ -472,8 +472,8 @@ defmodule ExDoc do
       If you change the function name, the link does not break but will leave users
       at the top of the module's documentation.
 
-  Because these docs are static files, the behavior of a missing page will depend on where they are hosted.
-  In particular, [hexdocs.pm](https://hexdocs.pm) will show a 404 page.
+  Because these docs are static files, the behaviour of a missing page will depend on where
+  they are hosted. In particular, [hexdocs.pm](https://hexdocs.pm) will show a 404 page.
 
   You can improve the developer experience on everything but function names changing
   by using the `redirects` configuration. For example, if you changed the module `MyApp.MyModule`
@@ -491,18 +491,18 @@ defmodule ExDoc do
         "old-page" => "new-page#relevant-section"
       }
 
-  ### `<meta>`-tags configuration
+  ### Meta tags configuration
 
-  It is also possible to configure some of ExDoc behaviour using meta tags.
+  It is also possible to configure some of ExDoc's behaviour using meta tags.
 
-    * `exdoc:autocomplete` - when set to "off", it disables autocompletion.
+    * `exdoc:autocomplete` - when set to "off", disables autocompletion.
 
     * `exdoc:autocomplete-limit` - Set to an integer to configure how many results
       appear in the autocomplete dropdown. Defaults to 10.
 
-  You can insert meta tags using `before_closing_head_tag` option.
+  You can insert meta tags using the `before_closing_head_tag` option.
 
-  ### `docs_config.js`
+  ### Version dropdown menu
 
   ExDoc will automatically render a version dropdown on HTML pages if a
   `docs_config.js` file is placed within the documentation.
