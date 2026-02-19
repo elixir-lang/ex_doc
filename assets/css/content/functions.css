@@ -85,23 +85,25 @@ in both HTML and ePub. */
   }
 }
 
-/* Docstring headings */
 .content-inner .docstring {
-  & :is(h1, h2, h3, h4, h5, h6) {
-    font-weight: 700;
-    font-size: 1em;
-    margin-top: 2em;
-  }
-  /* h1 not expected */
-  & :is(h1, h2) {
-    font-size: 1.1em;
-  }
-  /* h4 the last level expected: smallcaps */
-  & :is(h4) {
-    font-size: .8em;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--textBody);
+  /* Docstring headings - should not apply to admonition block headings */
+  & :not([class~='admonition-title']) {
+    &:is(h1, h2, h3, h4, h5, h6) {
+      font-weight: 700;
+      font-size: 1em;
+      margin-top: 2em;
+    }
+    /* h1 not expected */
+    &:is(h1, h2) {
+      font-size: 1.1em;
+    }
+    /* h4 the last level expected: smallcaps */
+    &:is(h4) {
+      font-size: .8em;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--textBody);
+    }
   }
 }
 
