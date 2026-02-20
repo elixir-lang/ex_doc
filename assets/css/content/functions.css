@@ -86,7 +86,7 @@ in both HTML and ePub. */
 }
 
 .content-inner .docstring {
-  /* Docstring headings - should not apply to admonition block headings */
+  /* Docstring headings: h2-h4 expected; should not apply to admonition blocks within docstring. */
   & :not(.admonition-title) {
     &:is(h1, h2, h3, h4, h5, h6) {
       font-weight: 700;
@@ -95,14 +95,10 @@ in both HTML and ePub. */
     }
     /* h1 not expected */
     &:is(h1, h2) {
-      font-size: 1.1em;
+      font-size: 1.25em;
     }
-    /* h4 the last level expected: smallcaps */
-    &:is(h4) {
-      font-size: .8em;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--textBody);
+    &:is(h3) {
+      font-size: 1.1em;
     }
   }
 }
