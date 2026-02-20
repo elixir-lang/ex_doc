@@ -87,7 +87,7 @@ in both HTML and ePub. */
 
 .content-inner .docstring {
   /* Docstring headings - should not apply to admonition block headings */
-  & :not([class~='admonition-title']) {
+  & :not(.admonition-title) {
     &:is(h1, h2, h3, h4, h5, h6) {
       font-weight: 700;
       font-size: 1em;
