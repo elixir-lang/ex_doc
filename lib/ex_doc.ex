@@ -201,12 +201,12 @@ defmodule ExDoc do
   ### Using `:source_url` and `:source_ref` together
 
   A common setup for a project or library is to set both `:source_url` and `:source_ref`. Setting
-  both of them will allow ExDoc to link to specific version of the code for a function or module
-  that matches the version of the docs. So if the docs have been generated for version 1.0.5 then
+  both of them will allow ExDoc to link to a specific version of the code for a function or module
+  that matches the version of the docs. If the docs have been generated for version 1.0.5,
   clicking on the source link in the docs will take the browser to the source code for the 1.0.5
-  version of the code instead of only the primary ref (for example, `main`).
+  version of the code instead of the primary ref (for example, `main`).
 
-  A example setup looks like:
+  An example setup:
 
       @version "0.30.10"
       def project do
@@ -225,9 +225,9 @@ defmodule ExDoc do
         ]
       end
 
-  If you use `source_ref: "v#{@version}"` then when publishing a new version of your package you
-  should run `git tag vVERSION` and push the tag. This way, ExDoc will generate links to the
-  specific version the docs were generated for.
+  If you use `source_ref: "v#{@version}"`, you should run `git tag vVERSION` and push the tag when
+  publishing a new version of your package; ExDoc will generate links to the specific version for
+  which the docs were generated.
 
   ## Additional pages (extras)
 
