@@ -1,11 +1,5 @@
 @media print {
 
-  /* Remove background colors and set border colors */
-  .page-cheatmd .content-inner * {
-    background-color: transparent !important;
-    border-color: var(--gray400) !important;
-  }
-
   /* Basic layout and columns */
 
   .page-cheatmd .content-inner {
@@ -13,129 +7,136 @@
     width: 100%;
     padding: 0;
     font-size: .7em;
+
+    & section:is(.col-2, .col-2-left, .col-3) {
+      column-gap: 30px;
+    }
+
+    /* column-count and grid display required to be set again within @print media query to take effect when actually printing */
+    & section.col-2 {
+      column-count: 2;
+    }
+    & section.col-2-left {
+      display: grid;
+    }
+    & section.col-3 {
+      column-count: 3;
+    }
   }
 
-  .page-cheatmd .content-inner section:is(.col-2, .col-2-left, .col-3) {
-    column-gap: 30px;
-  }
+  /* @scope is used to prevent cheatsheet styles from affecting admonition block styling */
 
-  /* column-count and grid display required to be set again within @print media query to take effect when actually printing */
-  .page-cheatmd .content-inner section.col-2 {
-    column-count: 2;
-  }
-  .page-cheatmd .content-inner section.col-2-left {
-    display: grid;
-  }
-  .page-cheatmd .content-inner section.col-3 {
-    column-count: 3;
-  }
+  @scope (.page-cheatmd) to (.admonition) {
+    :scope .content-inner {
 
-  /* h1 */
+      /* Remove background colors and set border colors */
+      & * {
+        background-color: transparent !important;
+        border-color: var(--gray400) !important;
+      }
 
-  .page-cheatmd .content-inner h1 {
-    margin-top: 0;
-    margin-bottom: .5em;
-  }
+      /* Headings */
 
-  /* h2 */
+      & h1 {
+        margin-top: 0;
+        margin-bottom: .5em;
+      }
 
-  .page-cheatmd .content-inner h2.section-heading {
-    font-weight: bold;
-    margin-top: 1em;
-    column-span: all;
-  }
+      & h2.section-heading {
+        font-weight: bold;
+        margin-top: 1em;
+        column-span: all;
+      }
 
-  .page-cheatmd .content-inner section.h2 {
-    break-inside: avoid;
-  }
+      & section.h2 {
+        break-inside: avoid;
+      }
 
-  /* h3 */
+      & h3 {
+        font-weight: bold;
+        color: var(--mainDark);
+      }
 
-  .page-cheatmd .content-inner h3 {
-    font-weight: bold;
-    color: var(--mainDark);
-  }
+      & h3::after {
+        height: 2px;
+        background-color: var(--gray400);
+      }
 
-  .page-cheatmd .content-inner h3::after {
-    height: 2px;
-    background-color: var(--gray400);
-  }
+      & section.h3 {
+        min-width: 300px;
+        break-inside: avoid;
+      }
 
-  .page-cheatmd .content-inner section.h3 {
-    min-width: 300px;
-    break-inside: avoid;
-  }
+      & h4 {
+        padding: .5em 0;
+        border: none;
+        font-weight: bold;
+        color: black;
+      }
 
-  /* h4 */
+      /* Paragraphs */
 
-  .page-cheatmd .content-inner h4 {
-    padding: .5em 0;
-    border: none;
-    font-weight: bold;
-    color: black;
-  }
+      & .h2 p {
+        padding-left: 0;
+        padding-right: 0;
+        border: none !important;
+      }
 
-  /* Paragraphs */
+      /* Code blocks */
 
-  .page-cheatmd .content-inner .h2 p {
-    padding-left: 0;
-    padding-right: 0;
-    border: none !important;
-  }
+      & code {
+        line-height: 1.5em;
+      }
 
-  /* Code blocks */
+      /* Tables */
 
-  .page-cheatmd .content-inner code {
-    line-height: 1.5em;
-  }
+      & .h2 table {
+        font-variant-numeric: tabular-nums;
+        break-inside: avoid;
+      }
 
-  /* Tables */
+      & .h2 :is(th, td) {
+        vertical-align: top;
+        padding-left: 0;
+        padding-right: 0;
+      }
 
-  .page-cheatmd .content-inner .h2 table {
-    font-variant-numeric: tabular-nums;
-    break-inside: avoid;
-  }
+      & .h2 thead {
+        border-style: solid none;
+        border-width: 1px;
+      }
 
-  .page-cheatmd .content-inner .h2 :is(th, td) {
-    vertical-align: top;
-    padding-left: 0;
-    padding-right: 0;
-  }
+      & .h2 tr {
+        border-bottom: none;
+      }
 
-  .page-cheatmd .content-inner .h2 thead {
-    border-style: solid none;
-    border-width: 1px;
-  }
+      & .h2 th {
+        font-weight: bold;
+      }
 
-  .page-cheatmd .content-inner .h2 tr {
-    border-bottom: none;
-  }
+      /* Lists */
 
-  .page-cheatmd .content-inner .h2 th {
-    font-weight: bold;
-  }
+      & .h2 li {
+        padding-left: 0;
+        padding-right: 0;
+        vertical-align: middle;
+        border-bottom: none;
+      }
 
-  /* Lists */
+      /* Remove copy button from code blocks */
+      & pre:hover button.copy-button {
+        display: none;
+      }
 
-  .page-cheatmd .content-inner .h2 li {
-    padding-left: 0;
-    padding-right: 0;
-    vertical-align: middle;
-    border-bottom: none;
-  }
+      /* Remove hover tooltip from inline code references */
+      & div.tooltip {
+        display: none;
+      }
 
-  /* Remove copy button from code blocks */
-  .page-cheatmd .content-inner pre:hover button.copy-button {
-    display: none;
-  }
-
-  /* Remove hover tooltip from inline code references */
-  .page-cheatmd .content-inner div.tooltip {
-    display: none;
-  }
-
-  .page-cheatmd .content-inner footer p:not(.built-using) {
-    display: none;
+      & footer p:not(.built-using) {
+        display: none;
+      }
+    }
   }
 
 }
