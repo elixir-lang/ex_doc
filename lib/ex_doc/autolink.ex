@@ -52,7 +52,7 @@ defmodule ExDoc.Autolink do
     :language,
     file: "nofile",
     apps: [],
-    extras: [],
+    extras: %{},
     deps: [],
     ext: ".html",
     current_kfa: nil,
@@ -217,7 +217,7 @@ defmodule ExDoc.Autolink do
     with %{scheme: nil, host: nil, path: path} = uri <- URI.parse(link),
          true <- is_binary(path) and path != "" and not (path =~ ref_regex()),
          true <- Path.extname(path) in @builtin_ext do
-      if file = config.extras[Path.basename(path)] do
+      if file = resolve_extra_target(path, config) do
         append_fragment(file <> config.ext, uri.fragment)
       else
         maybe_warn(config, nil, nil, %{file_path: path, original_text: link})
@@ -225,6 +225,26 @@ defmodule ExDoc.Autolink do
       end
     else
       _ -> nil
+    end
+  end
+
+  defp resolve_extra_target(path, config) do
+    filename = Path.basename(path)
+
+    case path do
+      "/" <> absolute_path ->
+        config.extras[absolute_path]
+
+      ^filename ->
+        config.extras[filename]
+
+      relative_path ->
+        path =
+          relative_path
+          |> Path.expand(Path.dirname(config.file))
+          |> Path.relative_to_cwd()
+
+        config.extras[path]
     end
   end
 
