@@ -166,6 +166,7 @@ defmodule ExDoc.DocAST do
     to_html({:p, [], remove_ids(inner), meta})
   end
 
+  def synopsis([{:comment, _, _, _} | rest]), do: synopsis(rest)
   def synopsis([head | _]), do: synopsis(head)
   def synopsis(_other), do: ""
 

@@ -147,6 +147,10 @@ defmodule ExDoc.DocASTTest do
                "<p>Example function: Summary should display trailing period :.</p>"
     end
 
+    test "skips html comments" do
+      assert synopsis("<!-- comment -->\nSynopsis.") == "<p>Synopsis.</p>"
+    end
+
     defp synopsis(markdown) do
       markdown
       |> parse!("text/markdown")
