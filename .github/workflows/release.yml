@@ -29,15 +29,15 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - otp: 25
-            otp_version: "25.3.2.12"
-            elixir_version: "1.16.2"
           - otp: 26
             otp_version: "26.2.5"
             elixir_version: "1.16.2"
           - otp: 27
-            otp_version: "27.2"
-            elixir_version: "1.18.2"
+            otp_version: "27.3.4.9"
+            elixir_version: "1.19.5"
+          - otp: 28
+            otp_version: "28.4.1"
+            elixir_version: "1.19.5"
 
     runs-on: ubuntu-22.04
     steps:
