@@ -207,19 +207,6 @@ defmodule ExDoc.Language.Erlang do
     nil
   end
 
-  def autolink_spec({:attribute, _, :opaque, ast}, _opts) do
-    {name, _, args} = ast
-
-    args =
-      for arg <- args do
-        {:var, _, name} = arg
-        Atom.to_string(name)
-      end
-      |> Enum.intersperse(", ")
-
-    IO.iodata_to_binary([Atom.to_string(name), "(", args, ")"])
-  end
-
   def autolink_spec(ast, %Autolink{} = config) do
     {name, anno, quoted} =
       case ast do
@@ -232,11 +219,7 @@ defmodule ExDoc.Language.Erlang do
 
           {mn, anno, Enum.map(ast, &Code.Typespec.spec_to_quoted(name, &1))}
 
-        {:attribute, anno, :type, ast} ->
-          {name, _, _} = ast
-          {name, anno, Code.Typespec.type_to_quoted(ast)}
-
-        {:attribute, anno, :nominal, ast} ->
+        {:attribute, anno, kind, ast} when kind in [:type, :opaque, :nominal] ->
           {name, _, _} = ast
           {name, anno, Code.Typespec.type_to_quoted(ast)}
       end
@@ -510,10 +493,17 @@ defmodule ExDoc.Language.Erlang do
 
     options = [linewidth: 98 + offset]
 
-    :erl_pp.attribute(ast, options)
-    |> IO.chardata_to_string()
-    |> String.trim()
-    |> String.trim_leading("-#{Atom.to_string(type)} ")
+    spec =
+      :erl_pp.attribute(ast, options)
+      |> IO.chardata_to_string()
+      |> String.trim()
+      |> String.trim_leading("-#{Atom.to_string(type)} ")
+
+    if type == :opaque do
+      String.replace(spec, ~r/ ::.*$/s, "")
+    else
+      spec
+    end
   end
 
   # Traverses quoted and formatted string of the typespec AST, replacing refs with links.

@@ -6,7 +6,7 @@
 <% end %>
 
 <%= if node.source_specs != [] do %>
-```elixir
+```<%= module.language.highlight_info().language_name %>
 <%= for spec <- node.source_specs do %><%= module.language.format_spec_attribute(node) %> <%= module.language.format_spec(spec) %>
 <% end %>```
 <% end %>
