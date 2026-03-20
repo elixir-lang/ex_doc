@@ -299,7 +299,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert opaque1.doc |> DocAST.to_html() =~ "opaque1/0 docs."
 
       assert hd(opaque1.source_specs) |> format_spec() ==
-               "opaque1() :: atom()."
+               "opaque1()"
 
       assert nominal1.id == "t:nominal1/0"
       assert nominal1.type == @nominal_type
@@ -514,7 +514,7 @@ defmodule ExDoc.Retriever.ErlangTest do
       assert opaque1.doc |> DocAST.to_html() =~ "opaque1/0 docs."
 
       assert hd(opaque1.source_specs) |> format_spec() ==
-               "opaque1() :: atom()."
+               "opaque1()"
 
       assert nominal1.id == "t:nominal1/0"
       assert nominal1.type == @nominal_type

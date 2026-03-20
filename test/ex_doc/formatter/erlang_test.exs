@@ -56,7 +56,7 @@ defmodule ExDoc.Formatter.ErlangTest do
     -module(bar).
     -moduledoc("bar module.").
     -export([bar/1, baz/0]).
-    -export_type([t/0]).
+    -export_type([t/0, o/0]).
 
     -doc("bar/1 function.").
     -spec bar(t()) -> t().
@@ -68,6 +68,9 @@ defmodule ExDoc.Formatter.ErlangTest do
 
     -doc("t/0 type.").
     -type t() :: atom().
+
+    -doc("o/0 opaque.").
+    -opaque o() :: {atom(), integer()}.
     """)
 
     generate(c)
@@ -104,13 +107,20 @@ defmodule ExDoc.Formatter.ErlangTest do
     assert markdown =~ "bar/1 function."
     assert markdown =~ "baz/0 function."
 
-    # Check specs in markdown
-    assert markdown =~ "-spec bar(t()) -> t()."
-    assert markdown =~ "-spec baz() -> atom()."
+    # Check specs in markdown use erlang code fences
+    assert markdown =~ "```erlang\n-spec bar(t()) -> t()."
+    assert markdown =~ "```erlang\n-spec baz() -> atom()."
 
     # Check type in markdown
-    assert markdown =~ "-type t() :: atom()."
+    assert markdown =~ "```erlang\n-type t() :: atom()."
     assert markdown =~ "t/0 type."
+
+    # Opaque types hide their internals in both HTML and markdown
+    assert html =~ ~s|-opaque</span> o()|
+    refute html =~ ~s|o() :: {|
+    assert markdown =~ "```erlang\n-opaque o()\n```"
+    refute markdown =~ "o() ::"
+    assert markdown =~ "o/0 opaque."
   end
 
   defp generate(c) do
