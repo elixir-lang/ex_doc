@@ -259,7 +259,9 @@ defmodule ExDoc.Language.ElixirTest do
 
     test "extras" do
       opts = [
+        file: "guides/current.md",
         extras: %{
+          "guide/Foo Bar.md" => "foo-bar",
           "Foo Bar.md" => "foo-bar",
           "Bar Baz.livemd" => "bar-baz",
           "Bar Baz.cheatmd" => "bar-baz"
@@ -284,6 +286,45 @@ defmodule ExDoc.Language.ElixirTest do
                ~s|<a href="http://example.com/foo.md">Foo</a>|
 
       assert autolink_doc("[Foo](#baz)", opts) == ~s|<a href="#baz">Foo</a>|
+    end
+
+    test "path-qualified extra links use the extra source path" do
+      opts = [
+        file: "guides/current.md",
+        extras: %{"guides/Foo Bar.md" => "foo-bar", "Foo Bar.md" => "legacy-foo"}
+      ]
+
+      assert autolink_doc("[Foo](./Foo Bar.md)", opts) ==
+               ~s|<a href="foo-bar.html">Foo</a>|
+
+      assert autolink_doc("[Foo](../guides/Foo Bar.md)", opts) ==
+               ~s|<a href="foo-bar.html">Foo</a>|
+
+      assert autolink_doc("[Foo](/guides/Foo Bar.md)", opts) ==
+               ~s|<a href="foo-bar.html">Foo</a>|
+    end
+
+    test "bare filename extra links use legacy lookup" do
+      opts = [
+        file: "guides/current.md",
+        extras: %{"guides/Foo Bar.md" => "relative-foo", "Foo Bar.md" => "legacy-foo"}
+      ]
+
+      assert autolink_doc("[Foo](Foo Bar.md)", opts) ==
+               ~s|<a href="legacy-foo.html">Foo</a>|
+    end
+
+    test "extras with bad directories warn instead of silently matching by basename" do
+      opts = [
+        warnings: :send,
+        file: "guides/current.md",
+        extras: %{"guide/Foo Bar.md" => "foo-bar", "Foo Bar.md" => "foo-bar"}
+      ]
+
+      assert warn(fn ->
+               assert autolink_doc("[Foo](/bad_dir/Foo Bar.md)", opts) ==
+                        ~s|<a href="/bad_dir/Foo Bar.md">Foo</a>|
+             end) =~ ~s|documentation references file "/bad_dir/Foo Bar.md" but it does not exist|
     end
 
     test "special case links" do

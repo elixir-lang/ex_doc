@@ -249,6 +249,10 @@ defmodule ExDoc do
     * `:title` - The title of the extra page. If not provided, the title will be inferred from the extra name.
     * `:url` - The external url to link to from the sidebar.
 
+  Bare filenames such as `[Intro](intro.md)` use the legacy filename-based lookup against the flattened output.
+  Links with a directory component, such as `[Intro](guides/intro.md)`, `[Intro](../guides/intro.md)`, or
+  `[Intro](/guides/intro.md)`, are resolved against the extra source path (or project root for `/`).
+
   ### Customizing search data
 
   It is possible to fully customize the way a given extra is indexed, both in autocomplete and in search.

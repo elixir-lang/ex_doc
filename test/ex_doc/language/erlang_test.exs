@@ -669,6 +669,16 @@ defmodule ExDoc.Language.ErlangTest do
       extras: %{"Foo Bar.md" => "foo-bar", "Bar Baz.livemd" => "bar-baz"}
     ]
 
+    @relative_opts [
+      file: "guides/current.md",
+      extras: %{
+        "guide/Foo Bar.md" => "foo-bar",
+        "guide/Bar Baz.livemd" => "bar-baz",
+        "Foo Bar.md" => "foo-bar",
+        "Bar Baz.livemd" => "bar-baz"
+      }
+    ]
+
     test "extras", c do
       assert autolink_doc("[Foo](Foo Bar.md)", c, @opts) ==
                ~s|<a href="foo-bar.html">Foo</a>|
@@ -690,7 +700,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "extras relative", c do
-      assert autolink_doc("[Foo](../guide/Foo Bar.md)", c, @opts) ==
+      assert autolink_doc("[Foo](../guide/Foo Bar.md)", c, @relative_opts) ==
                ~s|<a href="foo-bar.html">Foo</a>|
     end
   end

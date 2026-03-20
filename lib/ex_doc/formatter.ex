@@ -314,7 +314,10 @@ defmodule ExDoc.Formatter do
 
       %ExDoc.ExtraNode{source_path: source_path, id: id}, acc when is_binary(source_path) ->
         base = Path.basename(source_path)
-        Map.put(acc, base, id)
+
+        acc
+        |> Map.put(source_path, id)
+        |> Map.put(base, id)
 
       _extra, acc ->
         acc
