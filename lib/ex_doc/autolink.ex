@@ -156,10 +156,16 @@ defmodule ExDoc.Autolink do
   def maybe_warn(config, ref, visibility, metadata) do
     file = Path.relative_to_cwd(config.file)
 
-    unless Enum.any?(
-             [config.id, config.module_id, file],
-             config.skip_undefined_reference_warnings_on
-           ) do
+    skip_checks =
+      case metadata do
+        %{file_path: file_path} when is_binary(file_path) ->
+          [config.id, config.module_id, file, file_path]
+
+        _ ->
+          [config.id, config.module_id, file]
+      end
+
+    if not Enum.any?(skip_checks, config.skip_undefined_reference_warnings_on) do
       warn(config, ref, visibility, metadata)
     end
   end

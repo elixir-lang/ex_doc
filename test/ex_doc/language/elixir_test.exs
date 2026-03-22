@@ -644,6 +644,30 @@ defmodule ExDoc.Language.ElixirTest do
                       ~s|<a href="Foo Bar.md">Foo</a>|
            end) =~ ~s|documentation references file "Foo Bar.md" but it does not exist|
 
+    # skip_undefined_reference_warnings_on matches file_path (without fragment)
+    refute_warn(fn ->
+      assert autolink_doc(
+               "[Foo](Foo Bar.md)",
+               opts ++
+                 [
+                   extras: %{},
+                   skip_undefined_reference_warnings_on: &(&1 == "Foo Bar.md")
+                 ]
+             ) == ~s|<a href="Foo Bar.md">Foo</a>|
+    end)
+
+    # skip_undefined_reference_warnings_on matches file_path even with fragment
+    refute_warn(fn ->
+      autolink_doc(
+        "[Foo](Foo Bar.md#section)",
+        opts ++
+          [
+            extras: %{},
+            skip_undefined_reference_warnings_on: &(&1 == "Foo Bar.md")
+          ]
+      )
+    end)
+
     assert warn(fn ->
              assert autolink_doc("[Bar A](`Bar.A`)", opts) == "Bar A"
            end) =~ ~s|module "Bar.A" but it is undefined|
@@ -716,6 +740,12 @@ defmodule ExDoc.Language.ElixirTest do
     fun.()
     assert_received {:warn, message, _metadata}
     message
+  end
+
+  defp refute_warn(fun) when is_function(fun, 0) do
+    fun.()
+
+    refute_received {:warn, _, _}
   end
 
   defp autolink_spec(spec, options \\ []) do
