@@ -105,3 +105,6 @@ jobs:
 
       - run: mix format --check-formatted
         if: ${{ matrix.lint }}
+
+      - run: mix docs --warnings-as-errors
+        if: ${{ matrix.lint }}
