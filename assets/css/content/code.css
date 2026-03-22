@@ -40,7 +40,7 @@
 }
 
 .content-inner :is(h1, h2, h3, h4, h5, h6) code {
-  font-size: 1em;
+  font-size: 0.875em;
 }
 
 .content-inner pre {
