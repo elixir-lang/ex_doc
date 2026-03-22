@@ -2,7 +2,14 @@ defmodule ExDoc do
   @moduledoc """
   Main entry point for generating docs.
   """
+
   @ex_doc_version Mix.Project.config()[:version]
+
+  @typedoc """
+  Documentation AST.
+  """
+  # Resolves to t:ExDoc.DocAST.t/0 (a public type of a hidden module)
+  @type doc_ast() :: term()
 
   @doc """
   Returns the ExDoc version (used in templates).
