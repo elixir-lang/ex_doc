@@ -62,6 +62,7 @@ defmodule ExDoc.Autolink do
     skip_code_autolink_to: &ExDoc.Formatter.Config.skip_code_autolink_to/1,
     force_module_prefix: nil,
     filtered_modules: [],
+    assets: %{},
     warnings: :emit
   ]
 
@@ -217,15 +218,33 @@ defmodule ExDoc.Autolink do
     with %{scheme: nil, host: nil, path: path} = uri <- URI.parse(link),
          true <- is_binary(path) and path != "" and not (path =~ ref_regex()),
          true <- Path.extname(path) in @builtin_ext do
-      if file = config.extras[Path.basename(path)] do
-        append_fragment(file <> config.ext, uri.fragment)
-      else
-        maybe_warn(config, nil, nil, %{file_path: path, original_text: link})
-        nil
+      cond do
+        file = config.extras[Path.basename(path)] ->
+          append_fragment(file <> config.ext, uri.fragment)
+
+        asset_file?(path, config.assets) ->
+          nil
+
+        true ->
+          maybe_warn(config, nil, nil, %{file_path: path, original_text: link})
+          nil
       end
     else
       _ -> nil
     end
+  end
+
+  defp asset_file?(path, assets) do
+    Enum.any?(assets, fn {source_dir, target_dir} ->
+      prefix = String.trim_trailing(target_dir, "/") <> "/"
+
+      if String.starts_with?(path, prefix) do
+        path
+        |> String.trim_leading(prefix)
+        |> Path.expand(source_dir)
+        |> File.exists?()
+      end
+    end)
   end
 
   defp maybe_remove_link(nil, :custom_link) do

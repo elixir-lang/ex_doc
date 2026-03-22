@@ -196,7 +196,8 @@ defmodule ExDoc.Formatter do
       extras: extra_paths(extras),
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
       skip_code_autolink_to: config.skip_code_autolink_to,
-      filtered_modules: filtered_nodes
+      filtered_modules: filtered_nodes,
+      assets: config.assets
     }
 
     extras =
