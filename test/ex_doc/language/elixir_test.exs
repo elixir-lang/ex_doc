@@ -692,6 +692,57 @@ defmodule ExDoc.Language.ElixirTest do
              ~s|<code class="inline">String.upcase/9</code>|
   end
 
+  @tag :tmp_dir
+  test "asset file warnings", %{tmp_dir: tmp_dir} do
+    lic_dir = Path.join(tmp_dir, "src/licenses")
+    File.mkdir_p!(lic_dir)
+    File.write!(Path.join(lic_dir, "MIT.txt"), "")
+
+    assets_dir = Path.join(tmp_dir, "assets")
+    File.mkdir_p!(Path.join(assets_dir, "sub"))
+    File.write!(Path.join(assets_dir, "sub/file.txt"), "")
+
+    opts = [
+      warnings: :send,
+      extras: %{},
+      assets: %{lic_dir => "LICENSES", assets_dir => "assets"}
+    ]
+
+    # Existing file — no warning
+    refute_warn(fn ->
+      assert autolink_doc("[MIT](LICENSES/MIT.txt)", opts) ==
+               ~s|<a href="LICENSES/MIT.txt">MIT</a>|
+    end)
+
+    # Nested file — no warning
+    refute_warn(fn -> autolink_doc("[License](assets/sub/file.txt)", opts) end)
+
+    # Source and target differ — link must use target dir
+    assert warn(fn -> autolink_doc("[MIT](src/licenses/MIT.txt)", opts) end) =~
+             "but it does not exist"
+
+    # Missing file in asset dir — warns
+    assert warn(fn -> autolink_doc("[License](LICENSES/nonexistent.txt)", opts) end) =~
+             "but it does not exist"
+
+    # Missing nested file — warns
+    assert warn(fn -> autolink_doc("[License](assets/sub/missing.txt)", opts) end) =~
+             "but it does not exist"
+
+    # Path not matching any target dir — warns
+    assert warn(fn -> autolink_doc("[License](other/file.txt)", opts) end) =~
+             "but it does not exist"
+
+    # Target dir prefix must match on "/" boundary
+    assert warn(fn -> autolink_doc("[MIT](LICENSESEXTRA/MIT.txt)", opts) end) =~
+             "but it does not exist"
+
+    # No assets configured — warns
+    assert warn(fn ->
+             autolink_doc("[MIT](LICENSES/MIT.txt)", warnings: :send, extras: %{}, assets: %{})
+           end) =~ "but it does not exist"
+  end
+
   ## Helpers
 
   @default_options [
@@ -716,6 +767,12 @@ defmodule ExDoc.Language.ElixirTest do
     fun.()
     assert_received {:warn, message, _metadata}
     message
+  end
+
+  defp refute_warn(fun) when is_function(fun, 0) do
+    fun.()
+
+    refute_received {:warn, _, _}
   end
 
   defp autolink_spec(spec, options \\ []) do
