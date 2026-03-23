@@ -7,12 +7,13 @@ defmodule ExDoc.Extras do
   Build a list of `ExDoc.ExtraNode` and `ExDoc.URLNode`.
   """
   def build(extras_input, config) do
-    validate_no_duplicate_extras!(extras_input)
     groups = config.groups_for_extras
 
     extras =
       extras_input
       |> Enum.map(&build_extra(&1, groups, config))
+
+    validate_no_duplicate_extras!(extras)
 
     ids_count = Enum.reduce(extras, %{}, &Map.update(&2, &1.id, 1, fn c -> c + 1 end))
 
@@ -24,30 +25,20 @@ defmodule ExDoc.Extras do
     |> Enum.sort_by(fn extra -> Config.index(groups, extra.group) end)
   end
 
-  # Detects duplicate extras by normalizing each entry to {source, resolved_id}
-  # and checking for collisions on that pair. The resolved_id is the :filename
-  # option if provided, otherwise derived from the source path (same logic as
-  # build_extra). Only the :filename option affects the output file ID — other
-  # options like :title, :source, and :search_data do not. So:
-  #
-  #   - "readme.md" and "readme.md" are duplicates
-  #
-  #   - {"readme.md", title: "A"} and {"readme.md", title: "B"} are duplicates
-  #     (same source file, same resolved ID "readme")
-  #
-  #   - "readme.md" and {"readme.md", filename: "readme"} are duplicates
-  #     (the explicit filename matches the derived one)
-  #
-  #   - {"readme.md", filename: "a"} and {"readme.md", filename: "b"} are NOT duplicates
-  #     (explicitly different resolved IDs)
-  #
-  #   - foo/README.md and bar/README.md are NOT duplicates — they have different
-  #     content and disambiguate_id/2 handles their ID collision
-  defp validate_no_duplicate_extras!(extras_input) do
+  # Detects duplicate ExtraNode entries by checking for collisions on the
+  # {source_path, id} pair.
+  #   - URLNodes are excluded since they don't produce output files.
+  #   - Two nodes are duplicates when they share both source_path and ID — meaning
+  #     the same file would generate the same output page.
+  #   - Nodes with different source paths or different IDs (e.g. via the
+  #     :filename option) are not duplicates.
+  #   - Nodes from different source files that happen to share an ID are handled
+  #     by disambiguate_id/2 instead.
+  defp validate_no_duplicate_extras!(extras) do
     duplicates =
-      extras_input
-      |> Enum.map(&extra_duplicate_key/1)
-      |> Enum.frequencies()
+      extras
+      |> Enum.filter(&match?(%ExDoc.ExtraNode{}, &1))
+      |> Enum.frequencies_by(fn extra -> {extra.source_path, extra.id} end)
       |> Enum.filter(fn {_, count} -> count > 1 end)
 
     if duplicates != [] do
@@ -57,21 +48,6 @@ defmodule ExDoc.Extras do
             "duplicate extras: #{entries}"
     end
   end
-
-  defp extra_duplicate_key(input) when is_binary(input),
-    do: {input, resolve_id(input, nil)}
-
-  defp extra_duplicate_key({input, opts}) when is_list(opts),
-    do: extra_duplicate_key({input, Map.new(opts)})
-
-  defp extra_duplicate_key({input, %{} = opts}) do
-    input = to_string(input)
-
-    {input, resolve_id(input, opts[:filename])}
-  end
-
-  defp resolve_id(_input, filename) when is_binary(filename), do: filename
-  defp resolve_id(input, _filename), do: input |> filename_to_title() |> Utils.text_to_id()
 
   defp disambiguate_id(extra, discriminator) do
     Map.put(extra, :id, "#{extra.id}-#{discriminator}")
