@@ -323,6 +323,53 @@ defmodule ExDoc.ExtrasTest do
       end
     end
 
+    test "raises on duplicate extras", %{tmp_dir: tmp_dir} do
+      File.write!("#{tmp_dir}/readme.md", "# README")
+
+      assert_raise ArgumentError, ~r/duplicate extras/, fn ->
+        extras = ["#{tmp_dir}/readme.md", "#{tmp_dir}/readme.md"]
+        Extras.build(extras, config())
+      end
+    end
+
+    test "raises on same file with different non-filename options", %{tmp_dir: tmp_dir} do
+      File.write!("#{tmp_dir}/readme.md", "# README")
+
+      assert_raise ArgumentError, ~r/duplicate extras/, fn ->
+        extras = [
+          {"#{tmp_dir}/readme.md", [title: "A"]},
+          {"#{tmp_dir}/readme.md", [title: "B"]}
+        ]
+
+        Extras.build(extras, config())
+      end
+    end
+
+    test "raises when explicit filename matches derived id", %{tmp_dir: tmp_dir} do
+      File.write!("#{tmp_dir}/readme.md", "# README")
+
+      assert_raise ArgumentError, ~r/duplicate extras/, fn ->
+        extras = [
+          "#{tmp_dir}/readme.md",
+          {"#{tmp_dir}/readme.md", [filename: "readme"]}
+        ]
+
+        Extras.build(extras, config())
+      end
+    end
+
+    test "allows same file with different filename options", %{tmp_dir: tmp_dir} do
+      File.write!("#{tmp_dir}/readme.md", "# README")
+
+      extras = [
+        {"#{tmp_dir}/readme.md", [filename: "foo"]},
+        {"#{tmp_dir}/readme.md", [filename: "bar"]}
+      ]
+
+      result = Extras.build(extras, config())
+      assert length(result) == 2
+    end
+
     test "raises when title option is not a string", %{tmp_dir: tmp_dir} do
       File.write!("#{tmp_dir}/page.md", "# Page")
 

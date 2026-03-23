@@ -13,6 +13,8 @@ defmodule ExDoc.Extras do
       extras_input
       |> Enum.map(&build_extra(&1, groups, config))
 
+    validate_no_duplicate_extras!(extras)
+
     ids_count = Enum.reduce(extras, %{}, &Map.update(&2, &1.id, 1, fn c -> c + 1 end))
 
     extras
@@ -21,6 +23,30 @@ defmodule ExDoc.Extras do
     end)
     |> elem(0)
     |> Enum.sort_by(fn extra -> Config.index(groups, extra.group) end)
+  end
+
+  # Detects duplicate ExtraNode entries by checking for collisions on the
+  # {source_path, id} pair.
+  #   - URLNodes are excluded since they don't produce output files.
+  #   - Two nodes are duplicates when they share both source_path and ID — meaning
+  #     the same file would generate the same output page.
+  #   - Nodes with different source paths or different IDs (e.g. via the
+  #     :filename option) are not duplicates.
+  #   - Nodes from different source files that happen to share an ID are handled
+  #     by disambiguate_id/2 instead.
+  defp validate_no_duplicate_extras!(extras) do
+    duplicates =
+      extras
+      |> Enum.filter(&match?(%ExDoc.ExtraNode{}, &1))
+      |> Enum.frequencies_by(fn extra -> {extra.source_path, extra.id} end)
+      |> Enum.filter(fn {_, count} -> count > 1 end)
+
+    if duplicates != [] do
+      entries = Enum.map_join(duplicates, ", ", fn {{source, _}, _} -> inspect(source) end)
+
+      raise ArgumentError,
+            "duplicate extras: #{entries}"
+    end
   end
 
   defp disambiguate_id(extra, discriminator) do
