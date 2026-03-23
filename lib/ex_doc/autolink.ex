@@ -235,11 +235,13 @@ defmodule ExDoc.Autolink do
   end
 
   defp asset_file?(path, assets) do
+    normalized = path |> Path.expand("/") |> Path.relative_to("/")
+
     Enum.any?(assets, fn {source_dir, target_dir} ->
       prefix = String.trim_trailing(target_dir, "/") <> "/"
 
-      if String.starts_with?(path, prefix) do
-        path
+      if String.starts_with?(normalized, prefix) do
+        normalized
         |> String.trim_leading(prefix)
         |> Path.expand(source_dir)
         |> File.exists?()
