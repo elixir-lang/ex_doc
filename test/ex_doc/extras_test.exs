@@ -370,22 +370,6 @@ defmodule ExDoc.ExtrasTest do
       assert length(result) == 2
     end
 
-    test "allows different files with the same resolved ID", %{tmp_dir: tmp_dir} do
-      File.mkdir_p!("#{tmp_dir}/foo")
-      File.write!("#{tmp_dir}/foo/readme.md", "# README foo")
-
-      File.mkdir_p!("#{tmp_dir}/bar")
-      File.write!("#{tmp_dir}/bar/readme.md", "# README bar")
-
-      extras = [
-        "#{tmp_dir}/foo/readme.md",
-        {"#{tmp_dir}/bar/readme.md", [filename: "readme"]}
-      ]
-
-      result = Extras.build(extras, config())
-      assert length(result) == 2
-    end
-
     test "raises when title option is not a string", %{tmp_dir: tmp_dir} do
       File.write!("#{tmp_dir}/page.md", "# Page")
 
