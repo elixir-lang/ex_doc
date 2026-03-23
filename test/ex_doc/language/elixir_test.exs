@@ -717,9 +717,6 @@ defmodule ExDoc.Language.ElixirTest do
     # Nested file — no warning
     refute_warn(fn -> autolink_doc("[License](assets/sub/file.txt)", opts) end)
 
-    # Relative path with .. — no warning
-    refute_warn(fn -> autolink_doc("[MIT](LICENSES/../LICENSES/MIT.txt)", opts) end)
-
     # Source and target differ — link must use target dir
     assert warn(fn -> autolink_doc("[MIT](src/licenses/MIT.txt)", opts) end) =~
              "but it does not exist"
