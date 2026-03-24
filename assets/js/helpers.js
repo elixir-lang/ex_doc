@@ -221,6 +221,23 @@ export function isAppleOS () {
 }
 
 /**
+ * Returns the file extension used by the current page.
+ * Some hosting platforms (e.g. Netlify) strip `.html` from URLs,
+ * so we detect this and match the convention for generated links.
+ * Defaults to `.html` unless the current page is clearly extensionless
+ * (has a multi-segment path without any file extension).
+ */
+export function getPageExtension () {
+  const pathname = window.location.pathname
+  if (pathname.endsWith('.html')) { return '.html' }
+  // Only omit .html if we're clearly on an extensionless doc page
+  // (not the root path, and no file extension in the last segment).
+  const lastSegment = pathname.split('/').pop()
+  if (lastSegment && !lastSegment.includes('.')) { return '' }
+  return '.html'
+}
+
+/**
  * Create element from tag, attributes and children.
  *
  * @param {string} tagName

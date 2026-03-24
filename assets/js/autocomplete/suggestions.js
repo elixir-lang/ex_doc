@@ -1,5 +1,7 @@
 import { getSidebarNodes } from '../globals'
-import { escapeRegexModifiers, escapeHtmlEntities, isBlank } from '../helpers'
+import { escapeRegexModifiers, escapeHtmlEntities, getPageExtension, isBlank } from '../helpers'
+
+const ext = getPageExtension()
 
 /**
  * @typedef Suggestion
@@ -114,7 +116,7 @@ function nodeSuggestion (node, query, category, label) {
   if (!matchesAll(node.title, query)) { return null }
 
   return {
-    link: `${node.id}.html`,
+    link: `${node.id}${ext}`,
     title: highlightMatches(node.title, query),
     description: null,
     matchQuality: matchQuality(node.title, query),
@@ -132,7 +134,7 @@ function childNodeSuggestion (childNode, parentId, query, category, label) {
   if (!matchesAll(childNode.id, query)) { return null }
 
   return {
-    link: `${parentId}.html#${childNode.anchor}`,
+    link: `${parentId}${ext}#${childNode.anchor}`,
     title: highlightMatches(childNode.id, query),
     labels: [label],
     description: parentId,
@@ -151,9 +153,9 @@ function nodeSectionSuggestion (node, section, query, category, label) {
   let link
 
   if (section.anchor === '') {
-    link = `${node.id}.html`
+    link = `${node.id}${ext}`
   } else {
-    link = `${node.id}.html#${section.anchor}`
+    link = `${node.id}${ext}#${section.anchor}`
   }
 
   return {
@@ -194,7 +196,7 @@ function moduleChildNodeSuggestion (childNode, parentId, query, category, label)
   if (!matchesAny(childNode.id, tokenizedQuery)) return null
 
   return {
-    link: `${parentId}.html#${childNode.anchor}`,
+    link: `${parentId}${ext}#${childNode.anchor}`,
     title: highlightMatches(childNode.id, tokenizedQuery),
     label,
     description: parentId,

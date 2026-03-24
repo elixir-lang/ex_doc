@@ -1,5 +1,7 @@
-import { el, getCurrentPageSidebarType, qs, qsAll } from '../helpers'
+import { el, getCurrentPageSidebarType, getPageExtension, qs, qsAll } from '../helpers'
 import { getSidebarNodes } from '../globals'
+
+const ext = getPageExtension()
 
 // Sidebar list is only rendered when needed.
 // Mobile users may never see the sidebar.
@@ -59,7 +61,7 @@ export function initialize () {
       const items = []
       const hasHeaders = Array.isArray(node.headers)
       const translate = hasHeaders ? undefined : 'no'
-      const href = node?.url || `${node.id}.html`
+      const href = node?.url || `${node.id}${ext}`
 
       // Group header.
       if (node.group !== group) {
@@ -122,7 +124,7 @@ function renderHeaders (node) {
   return node.headers
     .map(({id, anchor}) =>
       el('li', {}, [
-        el('a', {href: `${node.id}.html#${anchor}`}, [id])
+        el('a', {href: `${node.id}${ext}#${anchor}`}, [id])
       ])
     )
 }
@@ -132,12 +134,12 @@ function renderSectionsAndGroups (node) {
 
   if (node.sections?.length) {
     items.push(el('li', {}, [
-      el('a', {href: `${node.id}.html#content`}, ['Sections']),
+      el('a', {href: `${node.id}${ext}#content`}, ['Sections']),
       ...childList(`${node.id}-sections-list`,
         node.sections
           .map(({id, anchor}) =>
             el('li', {}, [
-              el('a', {href: `${node.id}.html#${anchor}`}, [id])
+              el('a', {href: `${node.id}${ext}#${anchor}`}, [id])
             ])
           )
       )
@@ -146,17 +148,17 @@ function renderSectionsAndGroups (node) {
 
   if (node.nodeGroups) {
     items.push(el('li', {}, [
-      el('a', {href: `${node.id}.html#summary`}, ['Summary'])
+      el('a', {href: `${node.id}${ext}#summary`}, ['Summary'])
     ]))
 
     items.push(...node.nodeGroups.map(({key, name, nodes}) =>
       el('li', {}, [
-        el('a', {href: `${node.id}.html#${key}`}, [name]),
+        el('a', {href: `${node.id}${ext}#${key}`}, [name]),
         ...childList(`node-${node.id}-group-${key}-list`,
           nodes
             .map(({anchor, title, id}) =>
               el('li', {}, [
-                el('a', {href: `${node.id}.html#${anchor}`, title, translate: 'no'}, [id])
+                el('a', {href: `${node.id}${ext}#${anchor}`, title, translate: 'no'}, [id])
               ])
             )
         )
@@ -192,8 +194,8 @@ function markCurrentHashInSidebar () {
   const sidebar = document.getElementById('sidebar')
   const {pathname, hash} = window.location
 
-  // All sidebar links are relative and end in .html.
-  const page = pathname.split('/').pop().replace(/\.html$/, '') + '.html'
+  // All sidebar links are relative, with or without .html depending on the hosting platform.
+  const page = pathname.split('/').pop().replace(/\.html$/, '') + ext
 
   // Try find exact link with hash, fall back to page.
   const current = sidebar.querySelector(`li a[href="${page + hash}"]`) || sidebar.querySelector(`li a[href="${page}"]`)
