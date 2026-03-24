@@ -57,9 +57,14 @@ export function isValidHintHref (href) {
   const unsupportedHash = href.includes('#') && !supportedHashRegex.test(href)
   if (unsupportedHash) { return false }
 
-  const validExtension = href.includes('.html')
-
-  return validExtension
+  // Accept both .html URLs and extensionless URLs (some hosting platforms strip .html).
+  try {
+    const url = new URL(href, window.location.href)
+    if (url.origin !== window.location.origin) { return false }
+    return url.pathname !== '' && url.pathname !== '/'
+  } catch {
+    return href.includes('.html')
+  }
 }
 
 /**
@@ -86,7 +91,11 @@ export function getHint (href) {
  * @returns {Hint|null} The matching hint.
  */
 function findPredefinedHint (href) {
-  const result = predefinedHints.find(predefinedHint => href.includes(predefinedHint.href))
+  const result = predefinedHints.find(predefinedHint => {
+    if (href.includes(predefinedHint.href)) { return true }
+    // Also match extensionless version (some hosting platforms strip .html).
+    return href.includes(predefinedHint.href.replace('.html', ''))
+  })
   return result ? result.hint : null
 }
 
@@ -99,7 +108,10 @@ function findPredefinedHint (href) {
 function loadHintFromExternalPage (href) {
   // Add the hint parameter, so that the target documentation page
   // knows it should send us a window message event.
-  const hintHref = href.replace('.html', '.html?hint=true')
+  // Use the URL API to handle both .html and extensionless URLs.
+  const url = new URL(href, window.location.href)
+  url.searchParams.set('hint', 'true')
+  const hintHref = url.href
 
   return new Promise((resolve, reject) => {
     // Load the page in a hidden iframe, so that it may send a message to the window.
@@ -108,8 +120,11 @@ function loadHintFromExternalPage (href) {
     iframe.style.display = 'none'
 
     function handleMessage (event) {
-      const { href, hint } = event.data
-      if (hintHref === href) {
+      // Use event.source to match the iframe instead of comparing URLs,
+      // since hosting platforms may rewrite URLs (e.g. stripping .html).
+      if (event.source !== iframe.contentWindow) { return }
+      const { hint } = event.data
+      if (hint) {
         cleanup()
         resolve(hint)
       }

@@ -1,4 +1,54 @@
-import { extractModuleHint, extractFunctionHint } from '../../js/tooltips/hints'
+import { extractModuleHint, extractFunctionHint, isValidHintHref, getHint, HINT_KIND } from '../../js/tooltips/hints'
+
+function setLocation (url) {
+  delete window.location
+  window.location = new URL(url)
+}
+
+describe('isValidHintHref', () => {
+  beforeAll(() => setLocation('http://localhost/doc/gen_server.html'))
+
+  it('accepts .html links with arity hash', () => {
+    expect(isValidHintHref('http://localhost/doc/erlang.html#t:timeout/0')).toBe(true)
+    expect(isValidHintHref('http://localhost/doc/gen_server.html#start_link/3')).toBe(true)
+  })
+
+  it('accepts extensionless links with arity hash', () => {
+    expect(isValidHintHref('http://localhost/doc/erlang#t:timeout/0')).toBe(true)
+    expect(isValidHintHref('http://localhost/doc/gen_server#start_link/3')).toBe(true)
+  })
+
+  it('accepts module links without hash', () => {
+    expect(isValidHintHref('http://localhost/doc/gen_server.html')).toBe(true)
+    expect(isValidHintHref('http://localhost/doc/gen_server')).toBe(true)
+  })
+
+  it('rejects section hashes without arity', () => {
+    expect(isValidHintHref('http://localhost/doc/gen_server.html#functions')).toBe(false)
+    expect(isValidHintHref('http://localhost/doc/gen_server#functions')).toBe(false)
+  })
+
+  it('rejects cross-origin links', () => {
+    expect(isValidHintHref('http://other-host.com/erlang.html#t:timeout/0')).toBe(false)
+  })
+
+  it('accepts predefined hint hrefs', () => {
+    expect(isValidHintHref('http://localhost/doc/typespecs.html#built-in-types')).toBe(true)
+    expect(isValidHintHref('http://localhost/doc/typespecs#built-in-types')).toBe(true)
+  })
+})
+
+describe('getHint predefined hints', () => {
+  it('matches .html predefined hints', async () => {
+    const hint = await getHint('http://localhost/doc/typespecs.html#basic-types')
+    expect(hint).toEqual({ kind: HINT_KIND.plain, description: 'Basic type' })
+  })
+
+  it('matches extensionless predefined hints', async () => {
+    const hint = await getHint('http://localhost/doc/typespecs#built-in-types')
+    expect(hint).toEqual({ kind: HINT_KIND.plain, description: 'Built-in type' })
+  })
+})
 
 describe('hints extraction', () => {
   describe('extractModuleHint', () => {
