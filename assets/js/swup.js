@@ -19,18 +19,32 @@ const maybeMetaRedirect = (visit, {page}) => {
   }
 }
 
+/**
+ * Checks if a navigation should be ignored by swup.
+ * Returns true for same-page links and cross-directory links.
+ * Same-directory links get smooth swup transitions.
+ */
+export function shouldIgnoreVisit (url, currentPathname) {
+  const path = url.split('#')[0]
+  // Ignore same-page links (with or without .html mismatch).
+  if (path === currentPathname ||
+      path === currentPathname + '.html' ||
+      path + '.html' === currentPathname) { return true }
+  // Only use swup for links within the same directory (same app).
+  // Cross-directory links need a full reload to update the sidebar.
+  const currentDir = currentPathname.substring(0, currentPathname.lastIndexOf('/') + 1)
+  const targetDir = path.substring(0, path.lastIndexOf('/') + 1)
+  return targetDir !== currentDir
+}
+
 window.addEventListener('DOMContentLoaded', emitExdocLoaded)
 
 if (!isEmbedded && window.location.protocol !== 'file:') {
   new Swup({
     animationSelector: false,
     containers: ['#main'],
-    ignoreVisit: (url) => {
-      const path = url.split('#')[0]
-      return path === window.location.pathname ||
-            path === window.location.pathname + '.html'
-    },
-    linkSelector: 'a[href]:not([href^="/"]):not([href^="http"])[href$=".html"]',
+    ignoreVisit: (url) => shouldIgnoreVisit(url, window.location.pathname),
+    linkSelector: 'a[href]:not([href^="http"]):not([href^="#"])',
     hooks: {
       'page:load': maybeMetaRedirect,
       'page:view': emitExdocLoaded
