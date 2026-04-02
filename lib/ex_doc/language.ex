@@ -78,7 +78,7 @@ defmodule ExDoc.Language do
               %{
                 id_key: binary(),
                 default_group: binary(),
-                doc_fallback: (-> ExDoc.DocAST.t()),
+                doc_fallback: (-> ExDoc.doc_ast()),
                 extra_annotations: [String.t()],
                 signature: [binary()],
                 source_file: String.t() | nil,
@@ -91,8 +91,7 @@ defmodule ExDoc.Language do
   @doc """
   Autolinks docs.
   """
-  @callback autolink_doc(doc :: ExDoc.DocAST.t(), config :: ExDoc.Autolink.t()) ::
-              ExDoc.DocAST.t()
+  @callback autolink_doc(doc :: ExDoc.doc_ast(), config :: ExDoc.Autolink.t()) :: ExDoc.doc_ast()
 
   @doc """
   Autolinks typespecs.

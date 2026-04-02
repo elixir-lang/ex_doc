@@ -33,7 +33,7 @@ defmodule ExDoc.ModuleNode do
           module: module(),
           group: atom() | nil,
           deprecated: String.t() | nil,
-          doc: ExDoc.DocAST.t() | nil,
+          doc: ExDoc.doc_ast() | nil,
           source_doc: term() | nil,
           source_format: String.t() | nil,
           moduledoc_line: non_neg_integer(),
@@ -81,7 +81,7 @@ defmodule ExDoc.DocNode do
           arity: non_neg_integer(),
           defaults: [function_default()],
           deprecated: String.t() | nil,
-          doc: ExDoc.DocAST.t() | nil,
+          doc: ExDoc.doc_ast() | nil,
           source_doc: term() | nil,
           type: atom(),
           signature: String.t(),
@@ -104,7 +104,7 @@ defmodule ExDoc.DocGroupNode do
   @type t :: %__MODULE__{
           title: String.t() | atom(),
           description: String.t() | nil,
-          doc: ExDoc.DocAST.t() | nil,
+          doc: ExDoc.doc_ast() | nil,
           docs: [ExDoc.DocNode.t()]
         }
 end
@@ -128,10 +128,10 @@ defmodule ExDoc.ExtraNode do
   @type t :: %__MODULE__{
           id: String.t(),
           title: String.t(),
-          title_doc: ExDoc.DocAST.t() | String.t(),
+          title_doc: ExDoc.doc_ast() | String.t(),
           group: atom() | nil,
           type: atom(),
-          doc: ExDoc.DocAST.t() | nil,
+          doc: ExDoc.doc_ast() | nil,
           source_doc: String.t(),
           source_path: String.t(),
           source_url: String.t(),
