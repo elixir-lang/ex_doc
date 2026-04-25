@@ -3,6 +3,8 @@ defmodule ExDoc.Extras do
 
   alias ExDoc.{Config, Markdown, Utils}
 
+  @reserved_filenames ~w(404.html search.html)
+
   @doc """
   Build a list of `ExDoc.ExtraNode` and `ExDoc.URLNode`.
   """
@@ -13,6 +15,7 @@ defmodule ExDoc.Extras do
       extras_input
       |> Enum.map(&build_extra(&1, groups, config))
 
+    validate_no_reserved_filenames!(extras)
     validate_no_duplicate_extras!(extras)
 
     ids_count = Enum.reduce(extras, %{}, &Map.update(&2, &1.id, 1, fn c -> c + 1 end))
@@ -23,6 +26,24 @@ defmodule ExDoc.Extras do
     end)
     |> elem(0)
     |> Enum.sort_by(fn extra -> Config.index(groups, extra.group) end)
+  end
+
+  defp validate_no_reserved_filenames!(extras) do
+    conflicts =
+      extras
+      |> Enum.filter(&match?(%ExDoc.ExtraNode{}, &1))
+      |> Enum.filter(fn extra -> "#{extra.id}.html" in @reserved_filenames end)
+
+    if conflicts != [] do
+      entries =
+        Enum.map_join(conflicts, ", ", fn extra ->
+          "#{inspect(extra.source_path)} would generate #{extra.id}.html"
+        end)
+
+      raise ArgumentError,
+            "extra(s) would conflict with built-in ExDoc page(s): #{entries}; " <>
+              "rename your extra file(s) or use the :filename option to set different output filename(s)"
+    end
   end
 
   # Detects duplicate ExtraNode entries by checking for collisions on the

@@ -390,6 +390,22 @@ defmodule ExDoc.ExtrasTest do
       end
     end
 
+    test "raises when extra would generate search.html", %{tmp_dir: tmp_dir} do
+      File.write!("#{tmp_dir}/search.md", "# Search")
+
+      assert_raise ArgumentError, ~r/would conflict with built-in ExDoc page/, fn ->
+        Extras.build(["#{tmp_dir}/search.md"], config())
+      end
+    end
+
+    test "raises when extra with filename option would generate search.html", %{tmp_dir: tmp_dir} do
+      File.write!("#{tmp_dir}/searching.md", "# Search")
+
+      assert_raise ArgumentError, ~r/would conflict with built-in ExDoc page/, fn ->
+        Extras.build([{"#{tmp_dir}/searching.md", [filename: "search"]}], config())
+      end
+    end
+
     test "handles extras with keyword list options", %{tmp_dir: tmp_dir} do
       File.write!("#{tmp_dir}/page.md", "# Page")
 
