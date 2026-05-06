@@ -3,16 +3,12 @@
 .page-cheatmd .content-inner {
   --horizontal-space: 1.5em;
   --vertical-space: 1em;
-}
 
-@media (max-width: 600px) {
-  .page-cheatmd .content-inner {
+  @media (max-width: 600px) {
     --horizontal-space: 1em;
     --vertical-space: 0.75em;
   }
-}
 
-.page-cheatmd .content-inner {
   max-width: 1200px;
 }
 
@@ -221,94 +217,98 @@
 /* Columns */
 
 .page-cheatmd .content-inner {
-  & section.width-50 {
-    display: block;
-    width: 50%;
-    margin: 0;
+  & section {
+    &.width-50 {
+      display: block;
+      width: 50%;
+      margin: 0;
 
-    & > section > table {
-      width: 100%;
+      & > section > table {
+        width: 100%;
+      }
     }
-  }
 
-  & section:is(.col-2, .col-2-left, .col-3) {
-    column-gap: 40px;
-  }
-
-  & section.col-2 {
-    column-count: 2;
-    height: auto;
-  }
-
-  & section.col-2-left {
-    display: grid;
-    grid-template-columns: calc(100% / 3) auto;
-
-    & > h2 {
-      grid-column-end: span 2;
+    &:is(.col-2, .col-2-left, .col-3) {
+      column-gap: 40px;
     }
-  }
 
-  & section.col-3 {
-    column-count: 3;
-    height: auto;
-  }
-
-  & section.list-4 > ul {
-    display: flex;
-    flex-wrap: wrap;
-
-    & > li {
-      flex: 0 0 calc(100% / 4);
+    &.col-2 {
+      column-count: 2;
+      height: auto;
     }
-  }
 
-  & section.list-6 > ul {
-    display: flex;
-    flex-wrap: wrap;
+    &.col-2-left {
+      display: grid;
+      grid-template-columns: calc(100% / 3) auto;
 
-    & > li {
-      flex: 0 0 calc(100% / 6);
+      & > h2 {
+        grid-column-end: span 2;
+      }
+    }
+
+    &.col-3 {
+      column-count: 3;
+      height: auto;
+    }
+
+    &.list-4 > ul {
+      display: flex;
+      flex-wrap: wrap;
+
+      & > li {
+        flex: 0 0 calc(100% / 4);
+      }
+    }
+
+    &.list-6 > ul {
+      display: flex;
+      flex-wrap: wrap;
+
+      & > li {
+        flex: 0 0 calc(100% / 6);
+      }
     }
   }
 
   /* Layout adjustments for smaller viewports. Limited to screen as sufficient width is assumed when printing. */
 
-  @media screen and (max-width: 1400px) {
-    & section.col-3 {
-      column-count: 2;
+  section {
+    @media screen and (max-width: 1400px) {
+      &.col-3 {
+        column-count: 2;
+      }
+
+      &.col-2-left {
+        display: flex;
+        flex-direction: column;
+      }
     }
 
-    & section.col-2-left {
-      display: flex;
-      flex-direction: column;
-    }
-  }
+    @media screen and (max-width: 1200px) {
+      &:is(.col-2, .col-3) {
+        display: flex;
+        flex-direction: column;
+      }
 
-  @media screen and (max-width: 1200px) {
-    & section:is(.col-2, .col-3) {
-      display: flex;
-      flex-direction: column;
-    }
-
-    & section.list-6 > ul > li {
-      flex: 0 0 calc(100% / 4);
-    }
-  }
-
-  @media screen and (max-width: 1000px) {
-    & section:is(.list-4, .list-6) > ul > li {
-      flex: 0 0 calc(100% / 3);
-    }
-  }
-
-  @media screen and (max-width: 600px) {
-    & section:is(.list-4, .list-6) > ul > li {
-      flex: 0 0 calc(100% / 2);
+      &.list-6 > ul > li {
+        flex: 0 0 calc(100% / 4);
+      }
     }
 
-    & section.width-50 {
-      width: 100%;
+    @media screen and (max-width: 1000px) {
+      &:is(.list-4, .list-6) > ul > li {
+        flex: 0 0 calc(100% / 3);
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      &:is(.list-4, .list-6) > ul > li {
+        flex: 0 0 calc(100% / 2);
+      }
+
+      &.width-50 {
+        width: 100%;
+      }
     }
   }
 }

@@ -1,3 +1,5 @@
+/* Used in EPUB styles. Use selectors with good support in ebook readers for important rules. */
+
 .content-inner section.admonition {
   border-left: solid 4px;
   color: var(--black);
@@ -36,7 +38,7 @@
 
 .content-inner section.admonition > .admonition-title {
   font-weight: bold;
-  margin: 0px 10px 5px 0px;
+  margin: 0 10px 5px 0;
   font-style: normal;
   font-weight: 700;
 }

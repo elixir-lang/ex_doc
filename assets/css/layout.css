@@ -13,8 +13,7 @@ body {
   color: var(--textBody);
   font-size: var(--text-md);
   line-height: 1.6875em;
-  /* swup.js adds tabindex=-1 on Chrome,
-     which then adds an outline when clicked */
+  /* swup.js adds tabindex=-1 on Chrome, which then adds an outline when clicked */
   outline: none !important;
 }
 
@@ -29,7 +28,7 @@ body {
   height: 100%;
 }
 
-/* Sidebar is closed by default and opened with body.sidebar-opened. */
+/* Sidebar is closed by default and opened with body.sidebar-opened */
 .sidebar {
   display: none;
   flex-direction: column;
@@ -59,42 +58,41 @@ body {
   width: 100%;
   height: 100%;
   position: absolute;
-}
 
-.content .content-inner {
-  container: content / inline-size;
-  max-width: var(--content-width);
-  min-height: 100%;
-  margin: 0 auto;
-  padding: 0 var(--content-gutter) 10px;
+  & .content-inner {
+    container: content / inline-size;
+    max-width: var(--content-width);
+    min-height: 100%;
+    margin: 0 auto;
+    padding: 0 var(--content-gutter) 10px;
+  }
 }
 
 .content-inner:focus {
   outline: none;
 }
 
-.sidebar-transition .sidebar,
-.sidebar-transition .sidebar-button,
-.sidebar-transition .content {
+.sidebar-transition :is(.sidebar, .sidebar-button, .content) {
   transition: all var(--sidebarTransitionDuration) ease-in-out allow-discrete;
 }
 
-.sidebar-open .sidebar,
-.sidebar-transition .sidebar {
+:is(.sidebar-open, .sidebar-transition) .sidebar {
   display: flex;
 }
 
-.sidebar-open .sidebar {
-  left: 0;
-}
+.sidebar-open {
+  & .sidebar {
+    left: 0;
+  }
 
-.sidebar-open .sidebar-button {
-  transform: translateX(calc(var(--sidebarWidth) - 100%));
-}
+  & .sidebar-button {
+    transform: translateX(calc(var(--sidebarWidth) - 100%));
+  }
 
-.sidebar-open .content {
-  width: calc(100% - var(--sidebarWidth));
-  left: var(--sidebarWidth);
+  & .content {
+    width: calc(100% - var(--sidebarWidth));
+    left: var(--sidebarWidth);
+  }
 }
 
 @media screen and (max-width: 768px) {

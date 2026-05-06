@@ -12,58 +12,57 @@
   visibility: hidden;
   transform: translateY(20px);
   opacity: 0;
-  transition: .2s visibility ease-out, .2s transform ease-out, .2s opacity ease-out;
-}
+  transition: 0.2s visibility ease-out, 0.2s transform ease-out, 0.2s opacity ease-out;
 
-/*
-Show-up animation
-======
-Note: it's fine to hide the tooltip with `visibility: hidden` (rather than `display: none`)
-as it has absolute positioning, so doesn't impact the layout and click events pass through.
-*/
-.tooltip.tooltip-shown {
-  visibility: visible;
-  transform: translateY(0);
-  opacity: 1;
-}
+  /*
+  Show-up animation
+  Note: it's fine to hide the tooltip with `visibility: hidden` (rather than `display: none`)
+  as it has absolute positioning, so doesn't impact the layout and click events pass through.
+  */
+  &.tooltip-shown {
+    visibility: visible;
+    transform: translateY(0);
+    opacity: 1;
+  }
 
-.tooltip .tooltip-body {
-  border: 1px solid var(--codeBorder);
-  border-radius: var(--borderRadius-sm);
-  overflow: auto;
-}
+  & .tooltip-body {
+    border: 1px solid var(--codeBorder);
+    border-radius: var(--borderRadius-sm);
+    overflow: auto;
 
-/* !important used in order to beat main heading and functions signature styles. */
-.tooltip .tooltip-body .signature {
-  min-width: 320px;
-  width: 100%;
-  line-height: 1em !important;
-  margin: .75em 0 !important;
-}
+    /* !important used in order to beat main heading and functions signature styles. */
+    & .signature {
+      min-width: 320px;
+      width: 100%;
+      line-height: 1em !important;
+      margin: 0.75em 0 !important;
+    }
 
-.tooltip .tooltip-body .detail-header {
-  border-left: 0;
-  margin-bottom: 0;
-  margin-top: 0;
-}
+    & .detail-header {
+      border-left: 0;
+      margin-bottom: 0;
+      margin-top: 0;
+    }
 
-.tooltip .tooltip-body .docstring {
-  background-color: var(--background);
-  padding: 1.2em;
-  margin: 0;
-  width: 498px; /* Taking 2 * 1px of border into account */
-}
+    & .docstring {
+      background-color: var(--background);
+      padding: 1.2em;
+      margin: 0;
+      width: 498px; /* Taking 2 * 1px of border into account */
+    }
 
-/* Used for simple tooltips having only description. */
-.tooltip .tooltip-body .docstring-plain {
-  max-width: 498px;
-  width: auto;
-}
+    /* Used for simple tooltips having only description. */
+    & .docstring-plain {
+      max-width: 498px;
+      width: auto;
+    }
 
-.tooltip .tooltip-body .version-info {
-  float: right;
-  font-family: var(--monoFontFamily);
-  font-weight: normal;
-  opacity: .3;
-  padding-left: .3em;
+    & .version-info {
+      float: right;
+      font-family: var(--monoFontFamily);
+      font-weight: normal;
+      opacity: 0.3;
+      padding-left: 0.3em;
+    }
+  }
 }

@@ -82,7 +82,7 @@ body.dark {
   --searchBarBorder:             var(--gray500);
   --searchAccentMain:            var(--gray300);
   --searchSearch:                var(--gray900);
-  --autocompleteBorder:          rgba(28,42,60,.75);
+  --autocompleteBorder:          rgba(28,42,60,0.75);
   --autocompletePreview:         var(--gray750);
   --autocompleteSelected:        var(--gray750);
   --autocompleteHover:           var(--gray700);

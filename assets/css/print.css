@@ -15,7 +15,7 @@
   .content {
     padding-left: 0;
     overflow: visible;
-    left: 0px;
+    left: 0;
     width: 100%;
   }
 
@@ -29,31 +29,27 @@
 
   .content-inner {
     padding: 0;
-  }
 
-  .content-inner .section-heading a.hover-link {
-    display: none;
-  }
+    & .section-heading a.hover-link {
+      display: none;
+    }
 
-  .content-inner button.icon-action {
-    display: none;
-  }
+    & :is(button, a).icon-action {
+      display: none;
+    }
 
-  .content-inner a.icon-action {
-    display: none;
-  }
+    & .bottom-actions {
+      display: none;
+    }
 
-  .content-inner .bottom-actions {
-    display: none;
+    & pre code.makeup {
+      white-space: break-spaces;
+      break-inside: avoid;
+    }
   }
 
   /* Hide On Hex.pm text but keep Built Using ExDoc */
   .footer p:first-of-type {
     display: none;
-  }
-
-  .content-inner pre code.makeup {
-    white-space: break-spaces;
-    break-inside: avoid;
   }
 }

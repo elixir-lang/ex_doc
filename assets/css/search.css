@@ -17,62 +17,64 @@
     position: absolute;
     top: 50%;
     left: calc(50% - 32px);
-  }
 
-  & .loading div {
-    box-sizing: border-box;
-    display: block;
-    position: absolute;
-    width: 51px;
-    height: 51px;
-    margin: 6px;
-    border: 6px solid var(--coldGray);
-    border-radius: 50%;
-    animation: loading 1.2s cubic-bezier(.5, 0, .5, 1) infinite;
-    border-color: var(--coldGray) transparent transparent transparent;
-  }
+    & div {
+      box-sizing: border-box;
+      display: block;
+      position: absolute;
+      width: 51px;
+      height: 51px;
+      margin: 6px;
+      border: 6px solid var(--coldGray);
+      border-radius: 50%;
+      animation: loading 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      border-color: var(--coldGray) transparent transparent transparent;
 
-  & .loading div:nth-child(1) {
-    animation-delay: -.45s;
-  }
-  & .loading div:nth-child(2) {
-    animation-delay: -.3s;
-  }
-  & .loading div:nth-child(3) {
-    animation-delay: -.15s;
+      &:nth-child(1) {
+        animation-delay: -0.45s;
+      }
+      &:nth-child(2) {
+        animation-delay: -0.3s;
+      }
+      &:nth-child(3) {
+        animation-delay: -0.15s;
+      }
+    }
   }
 
   & .result {
     margin: 2em 0;
-  }
 
-  & .result p {
-    margin: 0;
+    & p {
+      margin: 0;
+    }
   }
 
   & .result-id {
     font-size: 1.4em;
     margin: 0;
-  }
 
-  & .result-id a {
-    text-decoration: none;
-    color: var(--textHeaders);
-    transition: var(--transition-colors);
-  }
-  & .result-id a:is(:visited, :active) {
-    color: var(--textHeaders);
-  }
-  & .result-id a:is(:hover, :focus) {
-    color: var(--main);
+    & a {
+      text-decoration: none;
+      color: var(--textHeaders);
+      transition: var(--transition-colors);
+
+      &:is(:visited, :active) {
+        color: var(--textHeaders);
+      }
+
+      &:is(:hover, :focus) {
+        color: var(--main);
+      }
+    }
+
+    & small {
+      font-weight: normal;
+    }
   }
 
   & :is(.result-id, .result-elem) em {
     font-style: normal;
     color: var(--main);
-  }
-
-  & .result-id small {
-    font-weight: normal;
   }
 }

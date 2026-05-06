@@ -38,7 +38,7 @@
   --icon-markdown-line: "\ef1e";
 }
 
-.ri-lg { font-size: 1.3333em; line-height: .75em; vertical-align: -.0667em; }
+.ri-lg { font-size: 1.3333em; line-height: 0.75em; vertical-align: -0.0667em; }
 
 .ri-settings-3-line:before { content: var(--icon-settings-3-line); }
 .ri-add-line:before { content: var(--icon-add); }
