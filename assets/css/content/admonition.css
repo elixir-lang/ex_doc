@@ -1,129 +1,83 @@
 /* See general.css for base admonition styles - they are shared with blockquote */
 
 .content-inner section.admonition {
+  --admonitionBackground: transparent;
+  --admonitionHeading: var(--contrast);
+
+  background-color: var(--admonitionBackground);
   border-radius: var(--borderRadius-base);
-}
 
-.content-inner section.admonition > .admonition-title {
-  color: var(--contrast);
-  padding-left: 2.2rem;
-  font-weight: 700;
-  font-style: normal;
-}
-.content-inner section.admonition > .admonition-title::before {
-  color: var(--contrast);
-  position: absolute;
-  left: 1rem;
-  font-size: 1.8rem;
-  font-family: 'remixicon';
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.content-inner section.admonition {
   &.warning {
-    background-color: var(--warningBackground);
-    & .admonition-title {
-      &, &::before {
-        content: var(--icon-error-warning);
-        color: var(--warningHeading);
-      }
-    }
+    --admonitionBackground: var(--warningBackground);
+    --admonitionHeading: var(--warningHeading);
+    --admonitionPrintHeading: hsl(var(--warningHue), 90%, 40%);
+    --admonitionIcon: var(--icon-error-warning);
   }
   &.error {
-    background-color: var(--errorBackground);
-    & .admonition-title {
-      &, &::before {
-        content: var(--icon-error-warning);
-        color: var(--errorHeading);
-      }
-    }
+    --admonitionBackground: var(--errorBackground);
+    --admonitionHeading: var(--errorHeading);
+    --admonitionPrintHeading: hsl(var(--errorHue), 80%, 40%);
+    --admonitionIcon: var(--icon-error-warning);
   }
   &.info {
-    background-color: var(--infoBackground);
-    & .admonition-title {
-      &, &::before {
-        content: var(--icon-information);
-        color: var(--infoHeading);
-      }
-    }
+    --admonitionBackground: var(--infoBackground);
+    --admonitionHeading: var(--infoHeading);
+    --admonitionPrintHeading: hsl(var(--infoHue), 80%, 40%);
+    --admonitionIcon: var(--icon-information);
   }
   &.neutral {
-    background-color: var(--neutralBackground);
-    & .admonition-title {
-      &, &::before {
-        content: var(--icon-double-quotes-l);
-        color: var(--neutralHeading);
-      }
-    }
+    --admonitionBackground: var(--neutralBackground);
+    --admonitionHeading: var(--neutralHeading);
+    --admonitionPrintHeading: hsl(var(--neutralHue), 30%, 40%);
+    --admonitionIcon: var(--icon-double-quotes-l);
   }
   &.tip {
-    background-color: var(--tipBackground);
-    & .admonition-title {
-      &, &::before {
-        content: var(--icon-information);
-        color: var(--tipHeading);
-      }
+    --admonitionBackground: var(--tipBackground);
+    --admonitionHeading: var(--tipHeading);
+    --admonitionPrintHeading: hsl(var(--tipHue), 50%, 40%);
+    --admonitionIcon: var(--icon-information);
+  }
+
+  & > .admonition-title {
+    color: var(--admonitionHeading);
+    padding-left: 2.2rem;
+    font-weight: 700;
+    font-style: normal;
+
+    &::before {
+      content: var(--admonitionIcon);
+      color: var(--admonitionHeading);
+      position: absolute;
+      left: 1rem;
+      font-size: 1.8rem;
+      font-family: 'remixicon';
+      font-style: normal;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    & code {
+      margin: 0 0.5ch;
     }
   }
-}
 
-@media print {
-  .content-inner section.admonition {
-    &.warning {
-      border-color: hsl(from var(--warningHeading) h s l / 15%);
-      & .admonition-title {
-        &, &::before {
-          color: hsl(var(--warningHue), 90%, 40%);
-        }
-      }
-    }
-    &.error {
-      border-color: hsl(from var(--errorHeading) h s l / 15%);
-      & .admonition-title {
-        &, &::before {
-          color: hsl(var(--errorHue), 80%, 40%);
-        }
-      }
-    }
-    &.info {
-      border-color: hsl(from var(--infoHeading) h s l / 15%);
-      & .admonition-title {
-        &, &::before {
-          color: hsl(var(--infoHue), 80%, 40%);
-        }
-      }
-    }
-    &.neutral {
-      border-color: hsl(from var(--neutralHeading) h s l / 15%);
-      & .admonition-title {
-        &, &::before {
-          color: hsl(var(--neutralHue), 30%, 40%);
-        }
-      }
-    }
-    &.tip {
-      border-color: hsl(from var(--tipHeading) h s l / 15%);
-      & .admonition-title {
-        &, &::before {
-          color: hsl(var(--tipHue), 50%, 40%);
-        }
-      }
-    }
-  }
-}
-
-.content-inner section.admonition > .admonition-title code {
-  margin: 0 0.5ch;
-}
-
-@media screen and (max-width: 768px) {
-  .content-inner section.admonition {
+  @media screen and (max-width: 768px) {
     margin-left: calc(-1 * var(--content-gutter));
     margin-right: calc(-1 * var(--content-gutter));
     padding-left: var(--content-gutter);
     padding-right: var(--content-gutter);
     border-radius: 0;
+  }
+
+  @media print {
+    &:is(.warning, .error, .info, .neutral, .tip) {
+      border-color: hsl(from var(--admonitionHeading) h s l / 15%);
+    }
+
+    & > .admonition-title {
+      &, &::before {
+        color: var(--admonitionPrintHeading, var(--admonitionHeading));
+      }
+    }
   }
 }

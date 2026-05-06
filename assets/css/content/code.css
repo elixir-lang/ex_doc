@@ -1,3 +1,5 @@
+/* Used in EPUB styles. Use selectors with good support in ebook readers for important rules. */
+
 /* The Consolas font on Windows is too small compared to other ones */
 @font-face {
   font-family: "Consolas";
@@ -5,15 +7,17 @@
   size-adjust: 110%;
 }
 
-.content-inner.content-inner :is(a:has(code, img), pre a) {
-  color: var(--link-color);
-  text-shadow: none;
-  text-decoration: none;
-  background-image: none;
-}
+.content-inner.content-inner {
+  & :is(a:has(code, img), pre a) {
+    color: var(--link-color);
+    text-shadow: none;
+    text-decoration: none;
+    background-image: none;
 
-.content-inner.content-inner :is(a:has(code, img), pre a):is(:visited, :active, :focus, :hover) {
-  color: var(--link-visited-color);
+    :is(:visited, :active, :focus, :hover) {
+      color: var(--link-visited-color);
+    }
+  }
 }
 
 .content-inner strong > code {
@@ -29,7 +33,7 @@
   background-color: var(--codeBackground);
   vertical-align: baseline;
   border-radius: var(--borderRadius-sm);
-  padding: .1em .2em;
+  padding: 0.1em 0.2em;
   border: 1px solid var(--codeBorder);
   text-transform: none;
 }
@@ -39,7 +43,12 @@
   word-wrap: break-word;
 }
 
-.content-inner :is(h1, h2, h3, h4, h5, h6) code {
+.content-inner h1 code,
+.content-inner h2 code,
+.content-inner h3 code,
+.content-inner h4 code,
+.content-inner h5 code,
+.content-inner h6 code {
   font-size: 0.875em;
 }
 
@@ -83,8 +92,8 @@
 }
 
 @media screen and (max-width: 768px) {
-  .content-inner > pre:has(code),
-  .content-inner section > pre:has(code) {
+  .content-inner > pre,
+  .content-inner section > pre {
     margin-left: calc(-1 * var(--content-gutter));
     margin-right: calc(-1 * var(--content-gutter));
   }

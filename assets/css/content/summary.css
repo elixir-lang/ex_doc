@@ -1,32 +1,36 @@
 /* Summary section subheading (e.g., Types) */
-.content-inner .summary h3 a {
-  text-decoration: none;
-  border: none;
-  color: var(--textHeaders) !important;
-}
+.content-inner .summary {
+  & h3 a {
+    text-decoration: none;
+    border: none;
+    color: var(--textHeaders) !important;
+  }
 
-.content-inner .summary span.deprecated {
-  color: var(--darkDeprecated);
-  font-weight: normal;
-}
+  & span.deprecated {
+    color: var(--darkDeprecated);
+    font-weight: normal;
+  }
 
-.content-inner .summary .summary-row .summary-signature {
-  font-family: var(--monoFontFamily);
-  font-size: 13px;
-  font-weight: 700;
-}
+  & .summary-row {
+    & .summary-signature {
+      font-family: var(--monoFontFamily);
+      font-size: 13px;
+      font-weight: 700;
 
-.content-inner .summary .summary-row .summary-signature a {
-  text-decoration: none;
-  border: none;
-}
+      & a {
+        text-decoration: none;
+        border: none;
+      }
+    }
 
-.content-inner .summary .summary-row .summary-synopsis {
-  padding: 0 1.2em;
-  margin: 0 0 0.5em;
-}
+    & .summary-synopsis {
+      padding: 0 1.2em;
+      margin: 0 0 0.5em;
 
-.content-inner .summary .summary-row .summary-synopsis p {
-  margin: 0;
-  padding: 0;
+      & p {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
 }
