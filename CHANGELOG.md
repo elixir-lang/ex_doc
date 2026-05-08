@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.40.2 (2026-05-08)
+
+  * Bug fixes
+    * Add `rel="nofollow"` to external links in HTML output
+    * Use blockquote in `llms.txt` description
+    * Void elements in `epub`, such `wbr`, must be terminated by the matching end-tag
+    * Fix content container scrolling in older versions of Safari
+    * Skip HTML comments when computing synopsis
+    * Fix markdown backend code fence language and opaque type display
+    * Fix false positive warning when linking to asset files
+    * Prevent `#search` selector from impacting user content
+    * Raise on extras that conflict with reserved filenames
+    * Fix styling of admonition blocks
+
 ## v0.40.1 (2026-01-31)
 
   * Enhancements
