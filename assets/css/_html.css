@@ -35,6 +35,10 @@
 @import "makeup.css";
 @import "tabset.css";
 
+option {
+  background-color: var(--sidebarBackground);
+}
+
 body:not(.dark) .content-inner img[src*="#gh-dark-mode-only"],
 body.dark .content-inner img[src*="#gh-light-mode-only"] {
   display: none;
