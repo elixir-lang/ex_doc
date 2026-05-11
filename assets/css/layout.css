@@ -68,10 +68,6 @@ body {
   }
 }
 
-.content-inner:focus {
-  outline: none;
-}
-
 .sidebar-transition :is(.sidebar, .sidebar-button, .content) {
   transition: all var(--sidebarTransitionDuration) ease-in-out allow-discrete;
 }
