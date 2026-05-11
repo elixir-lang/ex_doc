@@ -9,12 +9,6 @@ body {
   --sidebarWidth: 300px;
   --sidebarMinWidth: 300px;
   --sidebarTransitionDuration: 0.3s;
-  background-color: var(--background);
-  color: var(--textBody);
-  font-size: var(--text-md);
-  line-height: 1.6875em;
-  /* swup.js adds tabindex=-1 on Chrome, which then adds an outline when clicked */
-  outline: none !important;
 }
 
 *,
@@ -104,9 +98,4 @@ body {
   body:not(.sidebar-open) .sidebar-button {
     position: absolute;
   }
-}
-
-.swup-progress-bar {
-  height: 2px;
-  background-color: var(--progressBarColor);
 }
