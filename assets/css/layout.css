@@ -38,7 +38,7 @@ body {
 }
 
 .sidebar-button {
-  padding: 20px 12px 18px 19px;
+  padding: 20px 12px 18px;
   position: fixed;
   z-index: 200;
   top: 0;
