@@ -7,9 +7,7 @@ button:focus,
 [type="button"]:focus,
 [type="reset"]:focus,
 [type="submit"]:focus {
-  outline: 2px solid var(--main);
-  /* negative offset to make outline visible when overflow hidden */
-  outline-offset: -2px;
+  outline: var(--borderWidth) solid var(--main);
 }
 
 *:focus:not(:focus-visible),

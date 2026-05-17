@@ -1,8 +1,7 @@
 .tabset {
-  --borderWidth: 1px;
   --tabsetPadding: var(--baseLineHeight);
   margin: var(--baseLineHeight) 0;
-  border: var(--borderWidth) solid var(--tabBorder);
+  border: 1px solid var(--tabBorder);
   padding: 0 var(--tabsetPadding);
   border-radius: var(--borderRadius-lg);
 }
@@ -25,10 +24,15 @@
   border: 0;
   box-shadow: none;
   cursor: pointer;
-  border-bottom-width: 2px;
+  border-bottom-width: var(--borderWidth);
   border-bottom-style: solid;
   border-bottom-color: transparent;
   transition: var(--transition-all);
+
+  /* keep focus outline inside overflow-clipped ancestor */
+  &:focus {
+    outline-offset: calc(-1 * var(--borderWidth));
+  }
 
   &:hover {
     border-bottom-color: var(--tabBorderTop);
