@@ -50,7 +50,7 @@
       }
 
       & .icon-action {
-        padding-top: 1.7rem; /* vertically align with x-height of first line of heading */
+        margin-top: 1rem; /* vertically align with x-height of first line of heading */
       }
     }
   }
