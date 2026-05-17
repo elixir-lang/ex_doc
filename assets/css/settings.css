@@ -102,8 +102,8 @@
   }
 
   & .switch-button__checkbox:focus + .switch-button__bg {
-    outline: 2px solid var(--main);
-    outline-offset: 2px;
+    outline: var(--borderWidth) solid var(--main);
+    outline-offset: var(--borderWidth);
   }
 
   & .switch-button__checkbox:focus:not(:focus-visible) + .switch-button__bg {

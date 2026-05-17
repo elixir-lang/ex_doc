@@ -5,7 +5,7 @@
   --borderRadius-lg: 14px;
   --borderRadius-base: 8px;
   --borderRadius-sm: 3px;
-  --navTabBorderWidth: 2px;
+  --borderWidth: 2px;
 
   /* Font Families */
   /* These mirror modern-normalize.css with "Lato" on top */
