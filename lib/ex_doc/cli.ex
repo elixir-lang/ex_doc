@@ -228,7 +228,7 @@ defmodule ExDoc.CLI do
     The file must either have ".exs" or ".config" extension.
 
     The file with the ".exs" extension must be an Elixir script that returns
-    a keyword list with the same options declares in `ExDoc.generate/4`.
+    a keyword list with the same options specified in `ExDoc`.
     Here is an example:
 
         [

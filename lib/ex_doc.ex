@@ -1,32 +1,6 @@
 defmodule ExDoc do
   @moduledoc """
-  Main entry point for generating docs.
-  """
-  @ex_doc_version Mix.Project.config()[:version]
-
-  @doc """
-  Returns the ExDoc version (used in templates).
-  """
-  @spec version :: String.t()
-  def version, do: @ex_doc_version
-
-  @doc """
-  Emits a warning.
-  """
-  def warn(message, stacktrace_info) do
-    :persistent_term.put({__MODULE__, :warned?}, true)
-    IO.warn(message, stacktrace_info)
-  end
-
-  defp unset_warned() do
-    warned? = :persistent_term.get({__MODULE__, :warned?}, false)
-    :persistent_term.erase({__MODULE__, :warned?})
-    warned?
-  end
-
-  @doc ~S"""
-  Generates documentation for the given `project`, `vsn` (version),
-  `source_beams` directories, and `options`.
+  ExDoc is a tool to generate documentation for Erlang and Elixir projects.
 
   By default it generates HTML, Markdown, and EPUB documents.
 
@@ -511,6 +485,35 @@ defmodule ExDoc do
     * `versionNodes` - an array of `{"version":"vNUMBER", "url":url}` listing
       all documented versions and their URLs. ExDoc will automatically match
       the version of the package with the one in the array to mark as current.
+  """
+  @ex_doc_version Mix.Project.config()[:version]
+
+  @doc """
+  Returns the ExDoc version (used in templates).
+  """
+  @spec version :: String.t()
+  def version, do: @ex_doc_version
+
+  @doc """
+  Emits a warning.
+  """
+  def warn(message, stacktrace_info) do
+    :persistent_term.put({__MODULE__, :warned?}, true)
+    IO.warn(message, stacktrace_info)
+  end
+
+  defp unset_warned() do
+    warned? = :persistent_term.get({__MODULE__, :warned?}, false)
+    :persistent_term.erase({__MODULE__, :warned?})
+    warned?
+  end
+
+  @doc ~S"""
+  Generates documentation for the given `project`, `vsn` (version),
+  `source_beams` directories, and `options`.
+
+  This is the entrypoint called `mix docs` and other tools. See
+  the moduledoc (`ExDoc`) for more information.
   """
   @spec generate(String.t(), String.t(), [Path.t()], Keyword.t()) ::
           [%{entrypoint: String.t(), warned?: boolean(), formatter: module()}]

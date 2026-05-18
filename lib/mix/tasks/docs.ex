@@ -62,7 +62,7 @@ defmodule Mix.Tasks.Docs do
   be set. The following options should be put under the `:docs` key
   in your project's main configuration. The `:docs` options should
   be a keyword list or a function returning a keyword list that will
-  be lazily executed. See all supported options in `ExDoc.generate/4`.
+  be lazily executed. See all supported options in `ExDoc`.
 
   ## Umbrella project
 
