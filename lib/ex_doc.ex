@@ -1,5 +1,5 @@
 defmodule ExDoc do
-  @moduledoc """
+  @moduledoc ~S"""
   ExDoc is a tool to generate documentation for Erlang and Elixir projects.
 
   By default it generates HTML, Markdown, and EPUB documents.
