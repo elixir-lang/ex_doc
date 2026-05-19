@@ -708,6 +708,13 @@ defmodule ExDoc.Language.ErlangTest do
                  ~s| <a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0">atom</a>()}]].|
     end
 
+    if System.otp_release() >= "29" do
+      test "spec referencing builtin record/0 type", c do
+        assert autolink_spec("-spec foo() -> record().", c) ==
+                 ~s|foo() -> <a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:record/0">record</a>().|
+      end
+    end
+
     test "callback", c do
       assert autolink_spec("-callback foo() -> t().", c) ==
                ~s|foo() -> <a href="#t:t/0">t</a>().|
