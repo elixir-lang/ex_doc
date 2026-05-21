@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.40.3 (2026-05-21)
+
+  * Enhancements
+    * Add autolinking for Erlang/OTP 29 native records
+
 ## v0.40.2 (2026-05-08)
 
   * Bug fixes
