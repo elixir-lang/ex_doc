@@ -61,12 +61,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "external module", c do
       assert autolink_edoc("{@link 'Elixir.EarmarkParser'}", c) ==
-               ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
+               ~s|<a href="https://earmark-parser.hexdocs.pm/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
     end
 
     test "external module - extension is ignored", c do
       assert autolink_edoc("{@link 'Elixir.EarmarkParser'}", c, ext: ".xhtml") ==
-               ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
+               ~s|<a href="https://earmark-parser.hexdocs.pm/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
     end
 
     test "module with anchor" do
@@ -127,7 +127,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "external function", c do
       assert autolink_edoc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) ==
-               ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>|
+               ~s|<a href="https://earmark-parser.hexdocs.pm/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>|
     end
 
     test "local type", c do
@@ -517,7 +517,7 @@ defmodule ExDoc.Language.ErlangTest do
       assert warn(
                fn ->
                  assert autolink_doc("[extra](`e:barlib:extra.md`)", c) ==
-                          ~s|<a href="https://hexdocs.pm/barlib/extra.html">extra</a>|
+                          ~s|<a href="https://barlib.hexdocs.pm/extra.html">extra</a>|
                end,
                line: nil
              ) =~
@@ -528,7 +528,7 @@ defmodule ExDoc.Language.ErlangTest do
       assert warn(
                fn ->
                  assert autolink_doc("[extra](`e:barlib:extra.md#anchor`)", c) ==
-                          ~s|<a href="https://hexdocs.pm/barlib/extra.html#anchor">extra</a>|
+                          ~s|<a href="https://barlib.hexdocs.pm/extra.html#anchor">extra</a>|
                end,
                line: nil
              ) =~
