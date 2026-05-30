@@ -480,11 +480,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     test "outputs the types and function specs", context do
       content = get_module_template([TypesAndSpecs, TypesAndSpecs.Sub], context)
-      integer = ~s[<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>()]
+      integer = ~s[<a href="https://elixir.hexdocs.pm/typespecs.html#basic-types">integer</a>()]
 
       public_html =
         ~S[<span class="attribute">@type</span> public(t) :: {t, ] <>
-          ~s[<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>(), ] <>
+          ~s[<a href="https://elixir.hexdocs.pm/String.html#t:t/0">String.t</a>(), ] <>
           ~S[<a href="TypesAndSpecs.Sub.html#t:t/0">TypesAndSpecs.Sub.t</a>(), ] <>
           ~S[<a href="#t:opaque/0">opaque</a>(), :ok | :error}]
 
@@ -498,7 +498,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       refute content =~ ~s[minus(#{integer}, #{integer}) :: #{integer}]
 
       assert content =~
-               ~s[Basic type: <a href=\"https://hexdocs.pm/elixir/typespecs.html#basic-types\"><code class=\"inline\">atom/0</code></a>.]
+               ~s[Basic type: <a href=\"https://elixir.hexdocs.pm/typespecs.html#basic-types\"><code class=\"inline\">atom/0</code></a>.]
 
       assert content =~ ~r{<span class="attribute">@opaque</span> opaque}
     end

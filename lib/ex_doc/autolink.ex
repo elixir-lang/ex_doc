@@ -66,7 +66,6 @@ defmodule ExDoc.Autolink do
     warnings: :emit
   ]
 
-  @hexdocs "https://hexdocs.pm/"
   @otpappdocs "https://www.erlang.org/doc/apps/"
 
   def app_module_url(tool, module, anchor \\ "#content", config)
@@ -74,14 +73,8 @@ defmodule ExDoc.Autolink do
   def app_module_url(:no_tool, _, _, _), do: nil
 
   def app_module_url(tool, module, anchor, config) do
-    base_url =
-      case tool do
-        :ex_doc -> @hexdocs
-        :otp -> @otpappdocs
-      end
-
     path = module |> inspect() |> String.trim_leading(":")
-    app_url(base_url, module, config, path, config.ext, "#{anchor}")
+    app_url(tool, module, config, path, config.ext, "#{anchor}")
   end
 
   defp string_app_module_url(tool, module, anchor, config) do
@@ -95,16 +88,16 @@ defmodule ExDoc.Autolink do
 
   @doc false
   def ex_doc_app_url(module, config, path, ext, suffix) do
-    app_url(@hexdocs, module, config, path, ext, suffix)
+    app_url(:ex_doc, module, config, path, ext, suffix)
   end
 
-  defp app_url(base_url, module, config, path, ext, suffix) do
+  defp app_url(tool, module, config, path, ext, suffix) do
     if app = app(module) do
       if app in config.apps do
         path <> ext <> suffix
       else
         config.deps
-        |> Keyword.get_lazy(app, fn -> base_url <> "#{app}" end)
+        |> Keyword.get_lazy(app, fn -> app_base_url(tool, app) end)
         |> String.trim_trailing("/")
         |> Kernel.<>("/" <> path <> ".html" <> suffix)
       end
@@ -112,6 +105,13 @@ defmodule ExDoc.Autolink do
       path <> ext <> suffix
     end
   end
+
+  defp app_base_url(:ex_doc, app) do
+    subdomain = app |> Atom.to_string() |> String.replace("_", "-")
+    "https://#{subdomain}.hexdocs.pm"
+  end
+
+  defp app_base_url(:otp, app), do: @otpappdocs <> "#{app}"
 
   defp app(module) do
     case :code.which(module) do
@@ -322,14 +322,11 @@ defmodule ExDoc.Autolink do
             )
           end
 
-          prefix =
-            cond do
-              app in config.apps -> ""
-              is_app_otp(app) -> @otpappdocs
-              true -> @hexdocs
-            end
-
-          prefix <> "#{app}"
+          cond do
+            app in config.apps -> "#{app}"
+            is_app_otp(app) -> app_base_url(:otp, app)
+            true -> app_base_url(:ex_doc, app)
+          end
         end)
         |> String.trim_trailing("/")
         |> Kernel.<>("/" <> convert_extra_extension(extra, config) <> anchor)

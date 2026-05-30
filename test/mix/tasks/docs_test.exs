@@ -159,7 +159,7 @@ defmodule Mix.Tasks.DocsTest do
 
     assert List.keyfind(deps, :earmark_parser, 0) ==
              {:earmark_parser,
-              "https://hexdocs.pm/earmark_parser/#{Application.spec(:earmark_parser, :vsn)}/"}
+              "https://earmark-parser.hexdocs.pm/#{Application.spec(:earmark_parser, :vsn)}/"}
   end
 
   test "allows custom dependency paths", context do
