@@ -481,6 +481,12 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     test "outputs the types and function specs", context do
       content = get_module_template([TypesAndSpecs, TypesAndSpecs.Sub], context)
       integer = ~s[<a href="https://elixir.hexdocs.pm/typespecs.html#basic-types">integer</a>()]
+      atom = ~s[<a href="https://elixir.hexdocs.pm/typespecs.html#basic-types">atom</a>()]
+
+      keyword =
+        ~s[<a href="https://elixir.hexdocs.pm/typespecs.html#built-in-types">keyword</a>()]
+
+      string_t = ~s[<a href="https://elixir.hexdocs.pm/String.html#t:t/0">String.t</a>()]
 
       public_html =
         ~S[<span class="attribute">@type</span> public(t) :: {t, ] <>
@@ -495,6 +501,10 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert content =~ ~s[A public type]
       assert content =~ ~s[<span class="attribute">@spec</span> add(]
       assert content =~ ~s[add(#{integer}, <a href="#t:opaque/0">opaque</a>()) :: #{integer}]
+
+      assert content =~
+               ~s[format_filters(#{keyword}, #{atom}) :: #{string_t}]
+
       refute content =~ ~s[minus(#{integer}, #{integer}) :: #{integer}]
 
       assert content =~
