@@ -13,7 +13,7 @@ jobs:
         include:
           - elixir: "1.17"
             otp: "27"
-            node: 18.x
+            node: 20.x
     steps:
       - uses: actions/checkout@v3
 
