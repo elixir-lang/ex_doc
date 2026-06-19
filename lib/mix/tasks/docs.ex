@@ -301,7 +301,7 @@ defmodule Mix.Tasks.Docs do
     for {key, _} <- Mix.Project.deps_paths(),
         _ = Application.load(key),
         vsn = Application.spec(key, :vsn) do
-      {key, "https://hexdocs.pm/#{key}/#{vsn}/"}
+      {key, "https://#{String.replace("#{key}", "_", "-")}.hexdocs.pm/#{vsn}/"}
     end
   end
 

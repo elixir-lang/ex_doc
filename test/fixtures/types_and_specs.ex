@@ -28,6 +28,9 @@ defmodule TypesAndSpecs do
   @spec macro_with_spec(v) :: {:ok, v} when v: any()
   defmacro macro_with_spec(v), do: {:ok, v}
 
+  @spec format_filters(keyword(), atom()) :: String.t()
+  def format_filters(filters, _type), do: inspect(filters)
+
   @spec priv_macro_spec(any) :: {:no, any}
   defmacrop priv_macro_spec(v), do: {:no, v}
 

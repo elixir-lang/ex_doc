@@ -21,16 +21,29 @@ const maybeMetaRedirect = (visit, {page}) => {
 
 window.addEventListener('DOMContentLoaded', emitExdocLoaded)
 
+// Match links to local .html documentation pages, with or without a fragment.
+// Note we need to explicitly check for .html so we don't use swup on other
+// formats, such as .md, and so forth.
+//
+// We want to only apply SWUP on links without "/" (or rather "/" can only
+// appear in a fragment), but it is not possible to write such selector,
+// so we check specifically for root relative links (starting with "/" or
+// starting with http) in the LINK_SELECTOR and then reject any link with
+// "/" before the fragment in "isWithinBuild".
+export const LINK_SELECTOR = 'a[href]:not([href^="/"]):not([href^="http"]):is([href$=".html"], [href*=".html#"])'
+export const isWithinBuild = (href) => !href.split('#')[0].includes('/')
+
 if (!isEmbedded && window.location.protocol !== 'file:') {
   new Swup({
     animationSelector: false,
     containers: ['#main'],
-    ignoreVisit: (url) => {
+    ignoreVisit: (url, {el} = {}) => {
       const path = url.split('#')[0]
       return path === window.location.pathname ||
-            path === window.location.pathname + '.html'
+            path === window.location.pathname + '.html' ||
+            !isWithinBuild(el?.getAttribute('href') ?? '')
     },
-    linkSelector: 'a[href]:not([href^="/"]):not([href^="http"])[href$=".html"]',
+    linkSelector: LINK_SELECTOR,
     hooks: {
       'page:load': maybeMetaRedirect,
       'page:view': emitExdocLoaded

@@ -114,11 +114,6 @@ defmodule ExDoc.Retriever do
 
       {:error, _} = error ->
         raise Error, "error accessing #{inspect(module)}: #{inspect(error)}"
-
-      _ ->
-        raise Error,
-              "unknown format in Docs chunk. This likely means you are running on " <>
-                "a more recent Elixir version that is not supported by ExDoc. Please update."
     end
   end
 

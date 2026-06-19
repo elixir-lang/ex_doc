@@ -378,6 +378,7 @@ defmodule ExDoc.Language.Elixir do
   @impl true
   def format_spec(ast) do
     ast
+    |> normalize_spec_metadata()
     |> Macro.to_string()
     |> safe_format_string!()
     |> ExDoc.Utils.h()
@@ -648,6 +649,18 @@ defmodule ExDoc.Language.Elixir do
     rescue
       _ -> string
     end
+  end
+
+  defp normalize_spec_metadata(ast) do
+    Macro.prewalk(ast, fn
+      {name, metadata, args} when is_atom(name) and is_list(metadata) and is_list(args) ->
+        # Elixir uses line metadata to decide when to break lines during stringification.
+        # Specs come from debug info, so we do not want line numbers to affect rendering.
+        {name, Keyword.delete(metadata, :line), args}
+
+      other ->
+        other
+    end)
   end
 
   defp typespec_name({:"::", _, [{name, _, _}, _]}), do: Atom.to_string(name)
