@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+  * Enhancements
+    * Add `:api_reference_noindex` option to keep search engines from indexing `api-reference.html`
+
 ## v0.40.3 (2026-05-21)
 
   * Enhancements

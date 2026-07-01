@@ -138,6 +138,21 @@ defmodule ExDoc.Formatter.HTMLTest do
     refute content =~ ~r{"id":"api-reference","title":"API Reference"}
   end
 
+  test "does not add noindex to api-reference by default", %{tmp_dir: tmp_dir} = context do
+    generate(config(context))
+
+    content = File.read!(tmp_dir <> "/html/api-reference.html")
+    refute content =~ ~r{<meta name="robots" content="noindex">}
+  end
+
+  test "adds noindex to api-reference when :api_reference_noindex is true",
+       %{tmp_dir: tmp_dir} = context do
+    generate(config(context, api_reference_noindex: true))
+
+    content = File.read!(tmp_dir <> "/html/api-reference.html")
+    assert content =~ ~r{<meta name="robots" content="noindex">}
+  end
+
   test "generates markdown links when markdown formatter is included",
        %{tmp_dir: tmp_dir} = context do
     generate(

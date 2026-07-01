@@ -22,6 +22,7 @@ defmodule ExDoc.Formatter.Config do
             version: nil,
             main: "api-reference",
             api_reference: true,
+            api_reference_noindex: false,
             canonical: nil,
             redirects: %{},
             assets: %{},
@@ -57,6 +58,7 @@ defmodule ExDoc.Formatter.Config do
           version: nil | String.t(),
           main: nil | String.t(),
           api_reference: boolean(),
+          api_reference_noindex: boolean(),
           canonical: nil | String.t(),
           redirects: %{optional(String.t()) => String.t()} | [{String.t(), String.t()}],
           assets: %{binary() => binary()},
@@ -131,6 +133,7 @@ defmodule ExDoc.Formatter.Config do
       Keyword.take(options, [
         :main,
         :api_reference,
+        :api_reference_noindex,
         :canonical,
         :redirects,
         :assets,

@@ -14,6 +14,10 @@ defmodule ExDoc do
     * `:api_reference` - Whether to generate `api-reference.html`; default: `true`.
       If this is set to false, `:main` must also be set.
 
+    * `:api_reference_noindex` - Whether to add a `<meta name="robots" content="noindex">`
+      tag to `api-reference.html`, asking search engines not to index it; default: `false`.
+      Useful when the page is large and its individual entries are already indexed.
+
     * `:assets` - A map of source => target directories that will be copied as is to
       the output path. It defaults to an empty map.
 
