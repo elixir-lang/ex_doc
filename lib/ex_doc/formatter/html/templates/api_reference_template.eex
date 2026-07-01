@@ -1,4 +1,4 @@
-<%= head_template(config, "API Reference", false) %>
+<%= head_template(config, "API Reference", config.api_reference_noindex) %>
 <%= sidebar_template(config, :extra) %>
 
 <div id="top-content">
