@@ -8,7 +8,7 @@ ExDoc is a tool to generate documentation for Erlang and Elixir projects. To see
 
 ExDoc ships with many features:
 
-  * Automatically generates offline-accessible HTML and EPUB documents from your API documentation.
+  * Automatically generates offline-accessible HTML, Markdown (including `llms.txt`), and EPUB documents from your API documentation.
   * When hosted, ExDoc relies on browser's page transitions for better UX, caching, and enhanced accessibility.
   * Responsive design, covering phones and tablets.
   * Support for custom pages, guides, livebooks and cheatsheets.
@@ -31,12 +31,12 @@ You can use ExDoc with Mix (recommended for Elixir projects), with Rebar (recomm
 
 ### Mix
 
-ExDoc requires Elixir v1.12 or later. Then add ExDoc as a dependency:
+ExDoc requires Elixir v1.15 or later. Then add ExDoc as a dependency:
 
 ```elixir
 def deps do
   [
-    {:ex_doc, "~> 0.34", only: :dev, runtime: false},
+    {:ex_doc, "~> 0.34", only: :dev, runtime: false, warn_if_outdated: true},
   ]
 end
 ```
@@ -66,7 +66,7 @@ end
 
 defp docs do
   [
-    main: "MyApp", # The main page in the docs
+    main: "readme", # can be changed to a module name, if you prefer
     logo: "path/to/logo.png",
     extras: ["README.md"]
   ]
@@ -110,7 +110,7 @@ You can use ExDoc via the command line.
    PROJECT_NAME    => Ecto
    PROJECT_VERSION => 0.1.0
    PROJECT_MODULE  => Ecto (the main module provided by the library)
-   GITHUB_USER     => elixir-lang
+   GITHUB_USER     => elixir-ecto
    GITHUB_REPO     => ecto
    ```
 
@@ -217,7 +217,7 @@ The following metadata is available for both modules and functions:
 
 The following metadata is available for modules:
 
-  * `tags` (list of atoms) - a list of strings to be added as tags to the module. (Not supported by EDoc.)
+  * `tags` (list of atoms) - tags to be added as module annotations. (Not supported by EDoc.)
 
 ## Auto-linking
 
@@ -227,9 +227,9 @@ ExDoc for Elixir and Erlang will automatically generate links across modules and
 
 ### Elixir
 
-ExDoc will automatically link modules, functions, types or callbacks defined in your project and its dependencies (including Erlang and Elixir). ExDoc will automatically link to it at the dependency's documentation at [hexdocs.pm](https://hexdocs.pm/). The link can be configured by setting `docs: [deps: [my_dep: "https://path/to/docs/"]]` in your `mix.exs`.
+ExDoc will automatically link modules, functions, types or callbacks defined in your project and its dependencies (including Erlang and Elixir). ExDoc will automatically link to the dependency's documentation at [hexdocs.pm](https://hexdocs.pm/). The link can be configured by setting `docs: [deps: [my_dep: "https://path/to/docs/"]]` in your `mix.exs`.
 
-ExDoc supports linking to modules (`` `MyModule` `` and `` `m:MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name, for example: `` `function/1` ``.
+ExDoc supports linking to modules (`` `MyModule` `` and `` `m:MyModule` ``), functions (`` `MyModule.function/1` ``), types (`` `t:MyModule.type/2` ``) and callbacks (`` `c:MyModule.callback/3` ``). If you want to link a function, type or callback in the current module, you may skip the module name, for example: `` `function/1` ``. Similarly, you can automatically link to Erlang modules (`` `m::my_module` ``), functions (`` `:my_module.function/1` ``), types (`` `t::my_module.type/2` ``) and callbacks (`` `c::my_module.callback/3` ``) (since Erlang modules in Elixir start with `:`, note the double colon in some cases).
 
 You can also use custom text, such as `` [custom text](`MyModule.function/1`) ``. Link to extra pages using the syntax `` [Up and running](Up and running.md) ``. The final link will be automatically converted to `up-and-running.html`.
 

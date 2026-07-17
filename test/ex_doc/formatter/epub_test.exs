@@ -1,12 +1,7 @@
 defmodule ExDoc.Formatter.EPUBTest do
-  use ExUnit.Case, async: false
-
-  import ExUnit.CaptureIO
-
-  alias ExDoc.Utils
+  use ExUnit.Case, async: true
 
   @moduletag :tmp_dir
-
   @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
   @before_closing_body_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
 
@@ -16,38 +11,38 @@ defmodule ExDoc.Formatter.EPUBTest do
   def before_closing_head_tag(:epub, name), do: "<meta name=#{name}>"
   def before_closing_body_tag(:epub, name), do: "<p>#{name}</p>"
 
-  defp doc_config(%{tmp_dir: tmp_dir} = _context) do
+  defp config(%{tmp_dir: tmp_dir} = _context) do
     [
       app: :elixir,
       project: "Elixir",
       version: "1.0.1",
-      formatter: "epub",
+      formatters: ["epub"],
       output: tmp_dir <> "/epub",
       source_beam: "test/tmp/beam",
-      extras: ["test/fixtures/README.md"],
       skip_undefined_reference_warnings_on: ["Warnings"]
     ]
   end
 
-  defp doc_config(context, config) when is_map(context) and is_list(config) do
-    Keyword.merge(doc_config(context), config)
+  defp config(context, config) when is_map(context) and is_list(config) do
+    Keyword.merge(config(context), config)
   end
 
-  defp generate_docs(config) do
-    ExDoc.generate_docs(config[:project], config[:version], config)
+  defp generate(config) do
+    source_beam = config[:source_beam] |> List.wrap()
+    ExDoc.generate(config[:project], config[:version], source_beam, config)
   end
 
-  defp generate_docs_and_unzip(context, config) do
-    generate_docs(config)
-    unzip_dir = String.to_charlist("#{doc_config(context)[:output]}")
+  defp generate_and_unzip(context, config) do
+    generate(config)
+    unzip_dir = String.to_charlist("#{config(context)[:output]}")
 
-    "#{doc_config(context)[:output]}/#{doc_config(context)[:project]}.epub"
+    "#{config(context)[:output]}/#{config(context)[:project]}.epub"
     |> String.to_charlist()
     |> :zip.unzip(cwd: unzip_dir)
   end
 
   test "generates headers for module pages", %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(context, doc_config(context, main: "RandomError"))
+    generate_and_unzip(context, config(context, main: "RandomError"))
 
     content = File.read!(tmp_dir <> "/epub/OEBPS/RandomError.xhtml")
     assert content =~ ~r{<html.*lang="en".*xmlns:epub="http://www.idpf.org/2007/ops">}ms
@@ -57,14 +52,14 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   test "allows to set the primary language of the document", %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(context, doc_config(context, main: "RandomError", language: "fr"))
+    generate_and_unzip(context, config(context, main: "RandomError", language: "fr"))
 
     content = File.read!(tmp_dir <> "/epub/OEBPS/RandomError.xhtml")
     assert content =~ ~r{<html.*lang="fr".*xmlns:epub="http://www.idpf.org/2007/ops">}ms
   end
 
-  test "allows to set the authors of the book", %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(context, doc_config(context, authors: ["John Doe", "Jane Doe"]))
+  test "allows to set the authors of the document", %{tmp_dir: tmp_dir} = context do
+    generate_and_unzip(context, config(context, authors: ["John Doe", "Jane Doe"]))
 
     content = File.read!(tmp_dir <> "/epub/OEBPS/content.opf")
     assert content =~ ~r{<dc:creator id="author1">John Doe</dc:creator>}
@@ -72,30 +67,30 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   test "generates an EPUB file in the default directory", %{tmp_dir: tmp_dir} = context do
-    generate_docs(doc_config(context))
-    assert File.regular?(tmp_dir <> "/epub/#{doc_config(context)[:project]}.epub")
+    generate(config(context))
+    assert File.regular?(tmp_dir <> "/epub/#{config(context)[:project]}.epub")
   end
 
   test "generates an EPUB file with erlang as proglang", %{tmp_dir: tmp_dir} = context do
     config =
       context
-      |> doc_config()
+      |> config()
       |> Keyword.put(:proglang, :erlang)
       |> Keyword.update!(:skip_undefined_reference_warnings_on, &["test/fixtures/README.md" | &1])
 
-    generate_docs(config)
+    generate(config)
     assert File.regular?(tmp_dir <> "/epub/#{config[:project]}.epub")
   end
 
   test "generates an EPUB file in specified output directory", %{tmp_dir: tmp_dir} = context do
-    config = doc_config(context, output: tmp_dir <> "/epub/another_dir", main: "RandomError")
-    generate_docs(config)
+    config = config(context, output: tmp_dir <> "/epub/another_dir", main: "RandomError")
+    generate(config)
 
-    assert File.regular?(tmp_dir <> "/epub/another_dir/#{doc_config(context)[:project]}.epub")
+    assert File.regular?(tmp_dir <> "/epub/another_dir/#{config(context)[:project]}.epub")
   end
 
   test "generates an EPUB file with a standardized structure", %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(context, doc_config(context))
+    generate_and_unzip(context, config(context))
 
     root_dir = tmp_dir <> "/epub"
     meta_dir = "#{root_dir}/META-INF"
@@ -108,7 +103,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert File.regular?("#{oebps_dir}/content.opf")
     assert File.regular?("#{oebps_dir}/nav.xhtml")
     assert File.regular?("#{oebps_dir}/title.xhtml")
-    assert File.regular?("#{oebps_dir}/readme.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.xhtml")
     assert File.regular?("#{oebps_dir}/CompiledWithDocs.Nested.xhtml")
     assert [_] = Path.wildcard("#{dist_dir}/epub-*.js")
@@ -116,7 +110,7 @@ defmodule ExDoc.Formatter.EPUBTest do
   end
 
   test "generates all listing files", %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(context, doc_config(context))
+    generate_and_unzip(context, config(context))
     content = File.read!(tmp_dir <> "/epub/OEBPS/content.opf")
 
     assert content =~ ~r{.*"CompiledWithDocs\".*}ms
@@ -128,26 +122,55 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~ ~r{.*"Mix\.Tasks\.TaskWithDocs\".*}ms
   end
 
-  test "generates the readme file", %{tmp_dir: tmp_dir} = context do
-    config = doc_config(context, main: "README")
-    generate_docs_and_unzip(context, config)
-
-    content = File.read!(tmp_dir <> "/epub/OEBPS/readme.xhtml")
-    assert content =~ ~r{<title>README [^<]*</title>}
-    assert content =~ ~r{<a href="RandomError.xhtml"><code(\sclass="inline")?>RandomError</code>}
-
-    assert content =~
-             ~r{<a href="CustomBehaviourImpl.xhtml#hello/1"><code(\sclass="inline")?>CustomBehaviourImpl.hello/1</code>}
-
-    assert content =~
-             ~r{<a href="TypesAndSpecs.Sub.xhtml"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
+  test "generates the readme file as main", %{tmp_dir: tmp_dir} = context do
+    config = config(context, main: "README", extras: ["test/fixtures/README.md"])
+    generate_and_unzip(context, config)
 
     content = File.read!(tmp_dir <> "/epub/OEBPS/nav.xhtml")
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
   end
 
+  test "generates and renders extras", %{tmp_dir: tmp_dir} = context do
+    config =
+      config(context,
+        extras: [
+          "test/fixtures/LICENSE",
+          "test/fixtures/PlainText.txt",
+          "test/fixtures/PlainTextFiles.md",
+          "test/fixtures/cheatsheets.cheatmd"
+        ]
+      )
+
+    generate_and_unzip(context, config)
+
+    # Markdown files are rendered with formatting and autolinks
+    content = File.read!(tmp_dir <> "/epub/OEBPS/plaintextfiles.xhtml")
+    assert content =~ ~r{Plain Text Files</h1>}s
+    assert content =~ ~r{<a href="plaintext.xhtml">plain-text file</a>}
+
+    # Plain text files are rendered as preformatted
+    plain_text_file = File.read!(tmp_dir <> "/epub/OEBPS/plaintext.xhtml")
+    assert plain_text_file =~ ~r{<pre>\nThis is plain\n  text and nothing\n.+\s+good bye\n</pre>}s
+
+    # Cheatmd files have section headers with IDs
+    cheatsheet = File.read!(tmp_dir <> "/epub/OEBPS/cheatsheets.xhtml")
+    assert cheatsheet =~ ~s{<h2 id="getting-started">}
+    assert cheatsheet =~ ~s{<h3 id="hello-world">}
+  end
+
+  test "ignores any external url extras", %{tmp_dir: tmp_dir} = context do
+    config =
+      context
+      |> config()
+      |> Keyword.put(:extras, elixir: [url: "https://elixir-lang.org"])
+
+    generate_and_unzip(context, config)
+
+    refute File.exists?(tmp_dir <> "/epub/OEBPS/elixir.xhtml")
+  end
+
   test "uses samp as highlight tag for markdown", %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(context, doc_config(context))
+    generate_and_unzip(context, config(context))
 
     assert File.read!(tmp_dir <> "/epub/OEBPS/CompiledWithDocs.xhtml") =~
              "<samp class=\"nc\">CompiledWithDocs<\/samp>"
@@ -163,13 +186,13 @@ defmodule ExDoc.Formatter.EPUBTest do
     "CompiledWithDocs.Nested.xhtml"
   ]
 
-  test "before_closing_*_tags required by the user are in the right place",
-       %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(
+  test "generates before_closing_*_tags", %{tmp_dir: tmp_dir} = context do
+    generate_and_unzip(
       context,
-      doc_config(context,
+      config(context,
         before_closing_head_tag: &before_closing_head_tag/1,
-        before_closing_body_tag: &before_closing_body_tag/1
+        before_closing_body_tag: &before_closing_body_tag/1,
+        extras: ["test/fixtures/README.md"]
       )
     )
 
@@ -182,52 +205,14 @@ defmodule ExDoc.Formatter.EPUBTest do
     end
   end
 
-  test "before_closing_*_tags required by the user are in the right place using map",
-       %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(
-      context,
-      doc_config(context,
-        before_closing_head_tag: %{epub: "<meta name=StaticDemo>"},
-        before_closing_body_tag: %{epub: "<p>StaticDemo</p>"}
-      )
-    )
-
-    oebps_dir = tmp_dir <> "/epub/OEBPS"
-
-    for basename <- @example_basenames do
-      content = File.read!(Path.join(oebps_dir, basename))
-      assert content =~ ~r[<meta name=StaticDemo>\s*</head>]
-      assert content =~ ~r[<p>StaticDemo</p>\s*</body>]
-    end
-  end
-
-  test "before_closing_*_tags required by the user are in the right place using a MFA",
-       %{tmp_dir: tmp_dir} = context do
-    generate_docs_and_unzip(
-      context,
-      doc_config(context,
-        before_closing_head_tag: {__MODULE__, :before_closing_head_tag, ["Demo"]},
-        before_closing_body_tag: {__MODULE__, :before_closing_body_tag, ["Demo"]}
-      )
-    )
-
-    oebps_dir = tmp_dir <> "/epub/OEBPS"
-
-    for basename <- @example_basenames do
-      content = File.read!(Path.join(oebps_dir, basename))
-      assert content =~ ~r[<meta name=Demo>\s*</head>]
-      assert content =~ ~r[<p>Demo</p>\s*</body>]
-    end
-  end
-
-  test "assets required by the user end up in the right place", %{tmp_dir: tmp_dir} = context do
+  test "generates assets required by the user", %{tmp_dir: tmp_dir} = context do
     File.mkdir_p!("test/tmp/epub_assets/hello")
     File.touch!("test/tmp/epub_assets/hello/world.png")
     File.touch!("test/tmp/epub_assets/hello/world.pdf")
 
-    generate_docs_and_unzip(
+    generate_and_unzip(
       context,
-      doc_config(context,
+      config(context,
         assets: %{"test/tmp/epub_assets" => "assets"},
         logo: "test/fixtures/elixir.png",
         cover: "test/fixtures/elixir.png"
@@ -242,46 +227,11 @@ defmodule ExDoc.Formatter.EPUBTest do
     File.rm_rf!("test/tmp/epub_assets")
   end
 
-  describe "warnings" do
-    @describetag :warnings
+  test "stores generated EPUB file in .build.epub", %{tmp_dir: tmp_dir} = context do
+    config = config(context, extras: ["test/fixtures/README.md"])
+    generate(config)
 
-    test "multiple warnings are registered when using warnings_as_errors: true", context do
-      Utils.unset_warned()
-
-      output =
-        capture_io(:stderr, fn ->
-          generate_docs(
-            doc_config(context,
-              skip_undefined_reference_warnings_on: [],
-              warnings_as_errors: true
-            )
-          )
-        end)
-
-      # TODO: remove check when we require Elixir v1.16
-      if Version.match?(System.version(), ">= 1.16.0-rc") do
-        assert output =~ ~S|moduledoc `Warnings.bar/0`|
-        assert output =~ ~S|typedoc `Warnings.bar/0`|
-        assert output =~ ~S|doc callback `Warnings.bar/0`|
-        assert output =~ ~S|doc `Warnings.bar/0`|
-      end
-
-      assert Utils.unset_warned()
-    end
-
-    test "warnings are registered even with warnings_as_errors: false", context do
-      Utils.unset_warned()
-
-      capture_io(:stderr, fn ->
-        generate_docs(
-          doc_config(context,
-            skip_undefined_reference_warnings_on: [],
-            warnings_as_errors: false
-          )
-        )
-      end)
-
-      assert Utils.unset_warned()
-    end
+    content = File.read!(tmp_dir <> "/epub/.build.epub")
+    assert content =~ ~r(Elixir\.epub$)m
   end
 end

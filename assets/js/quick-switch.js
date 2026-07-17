@@ -3,7 +3,7 @@ import { openModal } from './modal'
 import quickSwitchModalBodyHtml from './handlebars/templates/quick-switch-modal-body.html'
 import { isEmbedded } from './globals'
 
-const HEX_DOCS_ENDPOINT = 'https://hexdocs.pm/%%'
+const HEX_DOCS_ENDPOINT = 'https://%%.hexdocs.pm/'
 const OTP_DOCS_ENDPOINT = 'https://www.erlang.org/doc/apps/%%'
 const HEX_SEARCH_ENDPOINT = 'https://hex.pm/api/packages?search=name:%%*'
 const QUICK_SWITCH_LINK_SELECTOR = '.display-quick-switch'
@@ -154,7 +154,7 @@ function navigateToAppDocs (app) {
   if (OTP_APPS.includes(app.toLowerCase())) {
     window.location = OTP_DOCS_ENDPOINT.replace('%%', app.toLowerCase())
   } else {
-    window.location = HEX_DOCS_ENDPOINT.replace('%%', app.toLowerCase())
+    window.location = HEX_DOCS_ENDPOINT.replace('%%', app.toLowerCase().replace(/_/g, '-'))
   }
 }
 

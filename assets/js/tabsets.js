@@ -85,7 +85,6 @@ function initialize () {
         id: tabPanelId,
         class: 'tabset-panel',
         hidden: !selected ? '' : undefined,
-        tabindex: selected ? 0 : -1,
         'aria-labelledby': tabId
       }, content)
       tabset.appendChild(tabPanel)

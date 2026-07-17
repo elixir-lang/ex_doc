@@ -23,7 +23,7 @@
     <script defer src="<%= Assets.rev config.output, "dist/sidebar_items-*.js" %>"></script>
     <script defer src="docs_config.js"></script>
     <script defer src="dist/<%= Assets.js_filename() %>"></script>
-    <%= before_closing_head_tag(config, :html) %>
+    <%= config.before_closing_head_tag.(:html) %>
   </head>
   <body>
     <script><%= ExDoc.Formatter.HTML.Assets.inline_js_source() %></script>

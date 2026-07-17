@@ -1,8 +1,7 @@
 .tabset {
-  --borderWidth: 1px;
   --tabsetPadding: var(--baseLineHeight);
   margin: var(--baseLineHeight) 0;
-  border: var(--borderWidth) solid var(--tabBorder);
+  border: 1px solid var(--tabBorder);
   padding: 0 var(--tabsetPadding);
   border-radius: var(--borderRadius-lg);
 }
@@ -22,30 +21,35 @@
   color: var(--textColor);
   margin-right: calc(-1 * var(--borderWidth));
   background-color: transparent;
-  border:0;
+  border: 0;
   box-shadow: none;
   cursor: pointer;
-  border-bottom-width: 2px;
+  border-bottom-width: var(--borderWidth);
   border-bottom-style: solid;
   border-bottom-color: transparent;
   transition: var(--transition-all);
-}
 
-:hover.tabset-tab {
-  border-bottom-color: var(--tabBorderTop);
-  color: var(--textHeaders);
-}
+  /* keep focus outline inside overflow-clipped ancestor */
+  &:focus {
+    outline-offset: calc(-1 * var(--borderWidth));
+  }
 
-.tabset-tab[aria-selected=true] {
-  border-bottom-color: var(--mainLight);
-  color: var(--textHeaders);
-}
+  &:hover {
+    border-bottom-color: var(--tabBorderTop);
+    color: var(--textHeaders);
+  }
 
-/* Keyboard navigation focus state (increased contrast) */
-.tabset-tab[aria-selected=true]:focus-visible {
-  background-color: var(--mainLight);
-  border-color: var(--mainLight);
-  color: var(--white); /* light works best for both light and dark themes given background colors */
+  &[aria-selected=true] {
+    border-bottom-color: var(--mainLight);
+    color: var(--textHeaders);
+
+    /* Keyboard navigation focus state (increased contrast) */
+    &:focus-visible {
+      background-color: var(--mainLight);
+      border-color: var(--mainLight);
+      color: var(--white); /* light works best for both light and dark themes given background colors */
+    }
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -56,18 +60,16 @@
   .tabset-panel {
     padding-top: calc(var(--tabsetPadding) / 2);
     padding-bottom: calc(var(--tabsetPadding) / 2);
-  }
 
-  .tabset-panel pre,
-  .tabset-panel blockquote,
-  .tabset-panel section.admonition {
-    margin-left: calc(-1 * var(--tabsetPadding)) !important;
-    margin-right: calc(-1 * var(--tabsetPadding)) !important;
-  }
+    & :is(pre, blockquote, section.admonition) {
+      margin-left: calc(-1 * var(--tabsetPadding)) !important;
+      margin-right: calc(-1 * var(--tabsetPadding)) !important;
+    }
 
-  .tabset-panel > pre code {
-    border-left-width: 0;
-    border-right-width: 0;
+    & > pre code {
+      border-left-width: 0;
+      border-right-width: 0;
+    }
   }
 }
 
@@ -75,10 +77,11 @@
 @media screen and (max-width: 768px) {
   .tabset-panel > :is(:first-child) {
     &:is(table) {
-      margin: .5em 0;
+      margin: 0.5em 0;
     }
   }
 }
+
 @media screen and (min-width: 769px) {
   .tabset-panel > :is(:first-child) {
     &:is(blockquote, .admonition) {
@@ -88,7 +91,7 @@
       margin-top: 1.25em;
     }
     &:is(table) {
-      margin-top: .75em;
+      margin-top: 0.75em;
     }
   }
   .tabset-panel > :is(:last-child) {
@@ -99,7 +102,7 @@
       margin-bottom: 1.25em;
     }
     &:is(table) {
-      margin-bottom: .75em;
+      margin-bottom: 0.75em;
     }
   }
 }

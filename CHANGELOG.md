@@ -1,5 +1,123 @@
 # Changelog
 
+## Unreleased
+
+  * Enhancements
+    * Add `:api_reference_noindex` option to keep search engines from indexing `api-reference.html`
+
+## v0.40.3 (2026-05-21)
+
+  * Enhancements
+    * Add autolinking for Erlang/OTP 29 native records
+
+## v0.40.2 (2026-05-08)
+
+  * Bug fixes
+    * Add `rel="nofollow"` to external links in HTML output
+    * Use blockquote in `llms.txt` description
+    * Void elements in `epub`, such `wbr`, must be terminated by the matching end-tag
+    * Fix content container scrolling in older versions of Safari
+    * Skip HTML comments when computing synopsis
+    * Fix markdown backend code fence language and opaque type display
+    * Fix false positive warning when linking to asset files
+    * Prevent `#search` selector from impacting user content
+    * Raise on extras that conflict with reserved filenames
+    * Fix styling of admonition blocks
+
+## v0.40.1 (2026-01-31)
+
+  * Enhancements
+    * Remove link to source from generated .md files
+    * Improve word-breaking of module names and sizing of main page titles
+    * Include description in llms.txt
+
+  * Bug fixes
+    * Fix headers in custom groups
+
+## v0.40.0 (2026-01-20)
+
+  * Enhancements
+    * Introduce Markdown formatter (thanks to Yordis Prietro)
+    * Generate a `llms.txt` document by default and add a "Copy Markdown" button to the top of every page
+    * Run retriever only once per formatter
+    * Support anchors on redirects
+
+  * Bug fixes
+    * Copy button on `erl` and `iex` snippets now include prompts
+    * Fix headers having wrong selectors due to whitespace minification
+    * Only include `.html` links on Swup
+
+  * Breaking changes
+    * Revamp the ExDoc entrypoint and formatter API. While those have never been made public, others may have relied on it. We have now changed and documented them on the path to standardization
+    * The previously deprecated :assets option will raise if given a string, pass a map instead
+
+## v0.39.3 (2025-12-09)
+
+  * Enhancements
+    * Add the option to trim down the footer
+
+## v0.39.2 (2025-12-04)
+
+  * Bug fixes
+    * Do not strip hrefs on summaries
+    * Show go to latest for prereleases
+    * Prevent fake italic in autocomplete text
+    * Rename "Search Hexdocs" link to "Go to package docs"
+
+## v0.39.1 (2025-10-23)
+
+  * Bug fixes
+    * Improve box-shadow around autocompletion
+    * Trim search engine selector on small screens
+    * Fix admonition titles on small screens
+
+## v0.39.0 (2025-10-23)
+
+  * Enhancements
+    * Allow custom search engines to be configured with support for `https://hexdocs.pm`
+    * Improve admonition blocks so they better integrate with the page flow
+  * Bug fixes
+    * Add .cheatmd to EPUB to avoid broken links
+  * Backwards incompatible changes
+    * Validate :extras fields: if you were previously setting them to unexpected values, you may now get an exception
+    * Setting `exdoc:full-text-search-url` metadata is no longer supported, using the new search engines configuration
+
+## v0.38.4 (2025-09-09)
+
+  * Bug fixes
+    * Fix escaping of links when they have ampersand in them
+    * Increase spacing of footers in pages
+    * Align stale icon positioning
+
+## v0.38.3 (2025-08-17)
+
+  * Enhancements
+    * Allow configuring autocomplete limit, and default it to 10 instead of 8
+    * Display description text in docs groups
+    * Load discovered makeup apps for CLI
+
+## v0.38.2 (2025-05-27)
+
+  * Bug fixes
+    * Render documents with hardcoded `<h2>`/`<h3>` entries correctly
+    * Fix padding on external links
+
+## v0.38.1 (2025-05-12)
+
+  * Bug fixes
+    * Ensure stripping apps for Erlang sources emit valid AST
+
+## v0.38.0 (2025-05-09)
+
+  * Enhancements
+    * Allow listing outside URLs in extras
+
+  * Bug fixes
+    * Ensure some cases where `<`, `>`, `&` and in headers would appear as entities in the sidebar
+    * Fix outline caused by swup.js on Webkit based browsers
+    * Fix bugs when computing synopsis
+    * Automatically close the sidebar when navigating sections on mobile
+
 ## v0.37.3 (2025-03-06)
 
   * Bug fixes

@@ -7,7 +7,7 @@ To work on these assets you need to have [Node.js] and [npm] installed. (npm is 
 Assets are built with [esbuild], which, along with the JavaScript linter and test-runner, is set as a dependency in the assets `package.json` and installed via [npm]:
 
 ```bash
-$ npm install --prefix assets
+npm install --prefix assets
 ```
 
 ## `npm run` scripts
@@ -17,7 +17,7 @@ The following scripts are available from the root folder of the project.
 ### `build`
 
 ```bash
-$ npm run --prefix assets build
+npm run --prefix assets build
 ```
 
 Build a complete production bundle, including JavaScript and CSS.
@@ -27,7 +27,7 @@ Build a complete production bundle, including JavaScript and CSS.
 ### `build:watch`
 
 ```bash
-$ npm run --prefix assets build:watch
+npm run --prefix assets build:watch
 ```
 
 Run the `build` command with watch mode set, providing for automatic assets rebuilds on every asset file change.
@@ -37,7 +37,7 @@ Additionally, in watch mode, the docs are built after every asset rebuild, meani
 ### `lint`
 
 ```bash
-$ npm run --prefix assets lint
+npm run --prefix assets lint
 ```
 
 Lint all JavaScript files using [ESLint].
@@ -45,7 +45,7 @@ Lint all JavaScript files using [ESLint].
 ### `lint:fix`
 
 ```bash
-$ npm run --prefix assets lint:fix
+npm run --prefix assets lint:fix
 ```
 
 Lint and automatically fix all JavaScript files using [ESLint].
@@ -53,14 +53,21 @@ Lint and automatically fix all JavaScript files using [ESLint].
 ### `test`
 
 ```bash
-$ npm run --prefix assets test
+npm run --prefix assets test
 ```
 
-Run all the available JavaScript tests using [Karma].
+Run all the available JavaScript tests using [Vitest].
 
+### `test:coverage`
+
+```bash
+npm run --prefix assets test:coverage
+```
+
+Run all the available JavaScript tests with code coverage using [Vitest].
 
 [esbuild]: https://esbuild.github.io
 [Node.js]: https://nodejs.org/
 [npm]: https://www.npmjs.com/
 [ESLint]: https://eslint.org/
-[Karma]: https://karma-runner.github.io/
+[Vitest]: https://vitest.dev/

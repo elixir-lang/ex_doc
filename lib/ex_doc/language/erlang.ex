@@ -52,7 +52,7 @@ defmodule ExDoc.Language.Erlang do
         }
       }
     else
-      ExDoc.Utils.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
+      ExDoc.warn("skipping docs for module #{inspect(module)}, reason: :no_debug_info", [])
       false
     end
   end
@@ -74,7 +74,7 @@ defmodule ExDoc.Language.Erlang do
         callback_data(name, arity, anno, signature, metadata, module_data)
 
       kind == :type ->
-        type_data(name, arity, anno, signature, metadata, module_data)
+        type_data(name, arity, signature, metadata, module_data)
 
       true ->
         false
@@ -141,15 +141,9 @@ defmodule ExDoc.Language.Erlang do
     }
   end
 
-  defp type_data(name, arity, anno, signature, metadata, module_data) do
-    {specs, file, line, type} =
-      case Source.fetch_type!(module_data, name, arity) do
-        %{attr: attr, source_file: file, source_line: line, type: type} ->
-          {[attr], file, line, type}
-
-        nil ->
-          {[], nil, Source.anno_line(anno), :type}
-      end
+  defp type_data(name, arity, signature, metadata, module_data) do
+    %{attr: attr, source_file: file, source_line: line, type: type} =
+      Source.fetch_type!(module_data, name, arity)
 
     %{
       id_key: "t:",
@@ -159,7 +153,7 @@ defmodule ExDoc.Language.Erlang do
       signature: signature,
       source_file: file,
       source_line: line,
-      specs: specs,
+      specs: [attr],
       type: type
     }
   end
@@ -173,18 +167,20 @@ defmodule ExDoc.Language.Erlang do
         ## We try to parse the equiv in order to link to the target
         with {:ok, toks, _} <- :erl_scan.string(:unicode.characters_to_list(equiv <> ".")),
              {:ok, [{:call, _, {:atom, _, func}, args}]} <- :erl_parse.parse_exprs(toks) do
-          "Equivalent to [`#{equiv}`](`#{prefix}#{func}/#{length(args)}`)."
+          equivalent_to(
+            {:a, [href: "`#{prefix}#{func}/#{length(args)}`"],
+             [{:code, [class: "inline"], [equiv], %{}}], %{}}
+          )
         else
           {:ok, [{:op, _, :/, {:atom, _, _}, {:integer, _, _}}]} ->
-            "Equivalent to `#{prefix}#{equiv}`."
+            equivalent_to({:code, [class: "inline"], ["#{prefix}#{equiv}"], %{}})
 
           _ ->
-            "Equivalent to `#{equiv}`."
+            equivalent_to({:code, [class: "inline"], [equiv], %{}})
         end
-        |> ExDoc.DocAST.parse!("text/markdown")
 
       equiv ->
-        ExDoc.Utils.warn("invalid equiv #{inspect(equiv)}",
+        ExDoc.warn("invalid equiv #{inspect(equiv)}",
           file: file,
           line: line,
           module: module
@@ -194,9 +190,12 @@ defmodule ExDoc.Language.Erlang do
     end
   end
 
+  defp equivalent_to(node) do
+    [{:p, [], ["Equivalent to ", node, "."], %{}}]
+  end
+
   @impl true
-  def autolink_doc(ast, opts) do
-    config = struct!(Autolink, opts)
+  def autolink_doc(ast, %Autolink{} = config) do
     true = config.language == __MODULE__
 
     config = %{config | force_module_prefix: true}
@@ -208,22 +207,7 @@ defmodule ExDoc.Language.Erlang do
     nil
   end
 
-  def autolink_spec({:attribute, _, :opaque, ast}, _opts) do
-    {name, _, args} = ast
-
-    args =
-      for arg <- args do
-        {:var, _, name} = arg
-        Atom.to_string(name)
-      end
-      |> Enum.intersperse(", ")
-
-    IO.iodata_to_binary([Atom.to_string(name), "(", args, ")"])
-  end
-
-  def autolink_spec(ast, opts) do
-    config = struct!(Autolink, opts)
-
+  def autolink_spec(ast, %Autolink{} = config) do
     {name, anno, quoted} =
       case ast do
         {:attribute, anno, kind, {mfa, ast}} when kind in [:spec, :callback] ->
@@ -235,11 +219,7 @@ defmodule ExDoc.Language.Erlang do
 
           {mn, anno, Enum.map(ast, &Code.Typespec.spec_to_quoted(name, &1))}
 
-        {:attribute, anno, :type, ast} ->
-          {name, _, _} = ast
-          {name, anno, Code.Typespec.type_to_quoted(ast)}
-
-        {:attribute, anno, :nominal, ast} ->
+        {:attribute, anno, kind, ast} when kind in [:type, :opaque, :nominal] ->
           {name, _, _} = ast
           {name, anno, Code.Typespec.type_to_quoted(ast)}
       end
@@ -418,15 +398,15 @@ defmodule ExDoc.Language.Erlang do
   end
 
   defp strip_app([{:code, attrs, [code], meta}], app) do
-    [{:code, attrs, strip_app(code, app), meta}]
+    [{:code, attrs, List.wrap(strip_app(code, app)), meta}]
   end
 
   defp strip_app(code, app) when is_binary(code) do
-    String.trim_leading(code, "//#{app}/")
+    List.wrap(String.trim_leading(code, "//#{app}/"))
   end
 
   defp strip_app(other, _app) do
-    other
+    List.wrap(other)
   end
 
   defp warn_ref(href, config) do
@@ -474,7 +454,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def try_autoimported_function(name, arity, mode, config, original_text) do
+  def try_autoimported_function(name, arity, mode, %Autolink{} = config, original_text) do
     if :erl_internal.bif(name, arity) do
       Autolink.remote_url({:function, :erlang, name, arity}, config, original_text,
         warn?: false,
@@ -484,7 +464,7 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def try_builtin_type(name, arity, mode, config, original_text) do
+  def try_builtin_type(name, arity, mode, %Autolink{} = config, original_text) do
     if :erl_internal.is_type(name, arity) do
       Autolink.remote_url({:type, :erlang, name, arity}, config, original_text,
         warn?: false,
@@ -501,6 +481,28 @@ defmodule ExDoc.Language.Erlang do
 
       _ ->
         :error
+    end
+  end
+
+  @impl true
+  def format_spec(ast) do
+    {:attribute, _, type, _} = ast
+
+    # `-type ` => 6
+    offset = byte_size(Atom.to_string(type)) + 2
+
+    options = [linewidth: 98 + offset]
+
+    spec =
+      :erl_pp.attribute(ast, options)
+      |> IO.chardata_to_string()
+      |> String.trim()
+      |> String.trim_leading("-#{Atom.to_string(type)} ")
+
+    if type == :opaque do
+      String.replace(spec, ~r/ ::.*$/s, "")
+    else
+      spec
     end
   end
 
@@ -568,7 +570,7 @@ defmodule ExDoc.Language.Erlang do
               arity = length(args)
 
               cond do
-                name == :record and acc != [] ->
+                name == :record and args != [] and acc != [] ->
                   {ast, acc}
 
                 name in [:"::", :when, :%{}, :{}, :|, :->, :..., :fun] ->
@@ -718,20 +720,6 @@ defmodule ExDoc.Language.Erlang do
 
   defp pp({module, name}) when is_atom(module) and is_atom(name) do
     :io_lib.format("~p:~p", [module, name]) |> IO.iodata_to_binary()
-  end
-
-  defp format_spec(ast) do
-    {:attribute, _, type, _} = ast
-
-    # `-type ` => 6
-    offset = byte_size(Atom.to_string(type)) + 2
-
-    options = [linewidth: 98 + offset]
-
-    :erl_pp.attribute(ast, options)
-    |> IO.chardata_to_string()
-    |> String.trim()
-    |> String.trim_leading("-#{Atom.to_string(type)} ")
   end
 
   ## Helpers

@@ -5,71 +5,6 @@ defmodule ExDoc.Utils do
   @moduledoc false
 
   @doc """
-  Emits a warning.
-  """
-  def warn(message, stacktrace_info) do
-    :persistent_term.put({__MODULE__, :warned?}, true)
-    IO.warn(message, stacktrace_info)
-  end
-
-  @doc """
-  Removes that a warning has been generated and returns its previous value.
-  """
-  def unset_warned() do
-    warned? = :persistent_term.get({__MODULE__, :warned?}, false)
-    :persistent_term.erase({__MODULE__, :warned?})
-    warned?
-  end
-
-  @doc """
-  Runs the `before_closing_head_tag` callback.
-  """
-  def before_closing_head_tag(%{before_closing_head_tag: {m, f, a}}, module) do
-    apply(m, f, [module | a])
-  end
-
-  def before_closing_head_tag(%{before_closing_head_tag: before_closing_head_tag}, module)
-      when is_map(before_closing_head_tag) do
-    Map.get(before_closing_head_tag, module, "")
-  end
-
-  def before_closing_head_tag(%{before_closing_head_tag: before_closing_head_tag}, module) do
-    before_closing_head_tag.(module)
-  end
-
-  @doc """
-  Runs the `before_closing_footer_tag` callback.
-  """
-  def before_closing_footer_tag(%{before_closing_footer_tag: {m, f, a}}, module) do
-    apply(m, f, [module | a])
-  end
-
-  def before_closing_footer_tag(%{before_closing_footer_tag: before_closing_footer_tag}, module)
-      when is_map(before_closing_footer_tag) do
-    Map.get(before_closing_footer_tag, module, "")
-  end
-
-  def before_closing_footer_tag(%{before_closing_footer_tag: before_closing_footer_tag}, module) do
-    before_closing_footer_tag.(module)
-  end
-
-  @doc """
-  Runs the `before_closing_body_tag` callback.
-  """
-  def before_closing_body_tag(%{before_closing_body_tag: {m, f, a}}, module) do
-    apply(m, f, [module | a])
-  end
-
-  def before_closing_body_tag(%{before_closing_body_tag: before_closing_body_tag}, module)
-      when is_map(before_closing_body_tag) do
-    Map.get(before_closing_body_tag, module, "")
-  end
-
-  def before_closing_body_tag(%{before_closing_body_tag: before_closing_body_tag}, module) do
-    before_closing_body_tag.(module)
-  end
-
-  @doc """
   HTML escapes the given string.
 
       iex> ExDoc.Utils.h("<foo>")
@@ -102,7 +37,6 @@ defmodule ExDoc.Utils do
 
   def text_to_id(text) when is_binary(text) do
     text
-    |> strip_tags()
     |> String.replace(~r/&#\d+;/, "")
     |> String.replace(~r/&[A-Za-z0-9]+;/, "")
     |> String.replace(~r/\W+/u, "-")
@@ -160,6 +94,7 @@ defmodule ExDoc.Utils do
   their app due to an ExDoc restriction, so we ship with a
   simple JSON implementation.
   """
+  # TODO: Remove this once we require Elixir v1.20+
   def to_json(nil), do: "null"
   def to_json(true), do: "true"
   def to_json(false), do: "false"

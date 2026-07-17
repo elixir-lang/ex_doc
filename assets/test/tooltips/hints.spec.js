@@ -22,9 +22,9 @@ describe('hints extraction', () => {
     `)[0]
 
     it('extracts hint info', () => {
-      expect(extractModuleHint(modulePageObject).title).to.eql('Some module')
-      expect(extractModuleHint(modulePageObject).description).to.eql('Module <strong>description</strong> here')
-      expect(extractModuleHint(modulePageObject).kind).to.eql('module')
+      expect(extractModuleHint(modulePageObject).title).toBe('Some module')
+      expect(extractModuleHint(modulePageObject).description).toBe('Module <strong>description</strong> here')
+      expect(extractModuleHint(modulePageObject).kind).toBe('module')
     })
   })
 
@@ -54,9 +54,9 @@ describe('hints extraction', () => {
     it('extracts hint info', () => {
       const hint = extractFunctionHint(functionDetailObject)
 
-      expect(hint.title).to.eql('configure(any)')
-      expect(hint.description).to.eql('First line of description.')
-      expect(hint.kind).to.eql('function')
+      expect(hint.title).toBe('configure(any)')
+      expect(hint.description).toBe('First line of description.')
+      expect(hint.kind).toBe('function')
     })
   })
 })

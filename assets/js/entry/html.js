@@ -1,6 +1,5 @@
-// Load preview & hint-page first because they could remove DOM.
+// Load hint-page first because it could remove DOM.
 // This prevents later modules doing unnecessary work.
-import '../preview'
 import '../tooltips/hint-page'
 // The remaining modules are loaded in order of visible impact.
 import '../theme'
@@ -12,6 +11,7 @@ import '../makeup'
 import '../search-bar'
 import '../tooltips/tooltips'
 import '../copy-button'
+import '../copy-markdown'
 import '../search-page'
 import '../settings'
 import '../keyboard-shortcuts'

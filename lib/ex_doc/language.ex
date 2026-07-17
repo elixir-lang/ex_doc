@@ -1,8 +1,6 @@
 defmodule ExDoc.Language do
   @moduledoc false
 
-  @type spec_ast() :: term()
-
   @typedoc """
   The map has the following keys:
 
@@ -85,7 +83,7 @@ defmodule ExDoc.Language do
                 signature: [binary()],
                 source_file: String.t() | nil,
                 source_line: non_neg_integer() | nil,
-                specs: [spec_ast()],
+                specs: [ExDoc.DocNode.spec_ast()],
                 type: atom()
               }
               | false
@@ -93,12 +91,18 @@ defmodule ExDoc.Language do
   @doc """
   Autolinks docs.
   """
-  @callback autolink_doc(doc :: ExDoc.DocAST.t(), opts :: keyword()) :: ExDoc.DocAST.t()
+  @callback autolink_doc(doc :: ExDoc.DocAST.t(), config :: ExDoc.Autolink.t()) ::
+              ExDoc.DocAST.t()
 
   @doc """
   Autolinks typespecs.
   """
-  @callback autolink_spec(spec :: term(), opts :: keyword()) :: iodata()
+  @callback autolink_spec(spec :: term(), config :: ExDoc.Autolink.t()) :: iodata()
+
+  @doc """
+  Formats typespecs (without autolinking).
+  """
+  @callback format_spec(spec :: term()) :: iodata()
 
   @doc """
   Returns information for syntax highlighting.
@@ -135,7 +139,7 @@ defmodule ExDoc.Language do
               name :: atom(),
               arity :: non_neg_integer(),
               mode :: :regular_link | :custom_link,
-              opts :: keyword(),
+              config :: ExDoc.Autolink.t(),
               original_text :: String.t()
             ) ::
               nil | String.t()
@@ -147,7 +151,7 @@ defmodule ExDoc.Language do
               name :: atom(),
               arity :: non_neg_integer(),
               mode :: :regular_link | :custom_link,
-              opts :: keyword(),
+              config :: ExDoc.Autolink.t(),
               original_text :: String.t()
             ) ::
               nil | String.t()
@@ -156,7 +160,7 @@ defmodule ExDoc.Language do
   def get(:erlang, _module), do: {:ok, ExDoc.Language.Erlang}
 
   def get(language, module) when is_atom(language) and is_atom(module) do
-    ExDoc.Utils.warn(
+    ExDoc.warn(
       "skipping module #{module}, reason: unsupported language (#{language})",
       []
     )

@@ -1,6 +1,5 @@
 import { getSuggestions } from './suggestions'
 import { isBlank, qs } from '../helpers'
-import { currentTheme } from '../theme'
 import autocompleteSuggestionsTemplate from '../handlebars/templates/autocomplete-suggestions.handlebars'
 
 export const AUTOCOMPLETE_CONTAINER_SELECTOR = '.autocomplete'
@@ -9,7 +8,6 @@ export const AUTOCOMPLETE_SUGGESTION_SELECTOR = '.autocomplete-suggestion'
 
 const state = {
   autocompleteSuggestions: [],
-  previewOpen: false,
   selectedIdx: -1
 }
 
@@ -84,17 +82,6 @@ export function moveAutocompleteSelection (offset) {
   setAutocompleteSelection(newAutocompleteIndex(offset))
 }
 
-function handlePreviewMessage (event) {
-  if (event.data.type === 'preview') {
-    const { contentHeight } = event.data
-    const previewContainer = qs('.autocomplete-preview')
-    if (previewContainer) {
-      previewContainer.style.height = `${contentHeight + 32}px`
-      previewContainer.classList.remove('loading')
-    }
-  }
-}
-
 export function setAutocompleteSelection (index) {
   state.selectedIdx = index
   const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
@@ -106,74 +93,10 @@ export function setAutocompleteSelection (index) {
   }
 
   if (elementToSelect) {
-    if (state.previewOpen) {
-      removePreview()
-      window.addEventListener('message', handlePreviewMessage)
-      suggestionList.classList.add('previewing')
-      const newContainer = document.createElement('div')
-      newContainer.classList.add('autocomplete-preview')
-      newContainer.classList.add('loading')
-
-      const previewHref = elementToSelect.href.replace('.html', `.html?preview=true&theme=${currentTheme()}`)
-      const iframe = document.createElement('iframe')
-      iframe.setAttribute('src', previewHref)
-
-      newContainer.appendChild(document.createElement('div'))
-      newContainer.appendChild(document.createElement('span'))
-      newContainer.appendChild(iframe)
-      elementToSelect.parentNode.insertBefore(newContainer, elementToSelect.nextSibling)
-    }
-
     elementToSelect.classList.add('selected')
     elementToSelect.scrollIntoView({ block: 'nearest' })
   } else {
     if (suggestionList) { suggestionList.scrollTop = 0 }
-  }
-}
-
-/**
- * Toggles the preview state of the autocomplete list
- */
-export function togglePreview () {
-  if (state.previewOpen) {
-    hidePreview()
-  } else {
-    showPreview()
-  }
-}
-
-/**
- * Hides the preview state of the autocomplete list
- */
-export function hidePreview () {
-  state.previewOpen = false
-  const suggestionList = qs(AUTOCOMPLETE_SUGGESTION_LIST_SELECTOR)
-  if (suggestionList) { suggestionList.classList.remove('previewing') }
-  removePreview()
-}
-
-/**
- * Shows the preview state of the autocomplete list
- */
-export function showPreview (elementToSelect) {
-  state.previewOpen = true
-
-  if (elementToSelect) {
-    elementToSelect = elementToSelect.closest(AUTOCOMPLETE_SUGGESTION_SELECTOR)
-  } else {
-    elementToSelect = qs(`${AUTOCOMPLETE_SUGGESTION_SELECTOR}[data-index="${state.selectedIdx}"]`)
-  }
-
-  if (elementToSelect) {
-    setAutocompleteSelection(parseInt(elementToSelect.dataset.index))
-  }
-}
-
-function removePreview () {
-  const preview = qs('.autocomplete-preview')
-  if (preview) {
-    preview.remove()
-    window.removeEventListener('message', handlePreviewMessage)
   }
 }
 

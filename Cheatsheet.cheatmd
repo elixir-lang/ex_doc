@@ -261,3 +261,24 @@ IO.puts "Hello, " <> user.name
 ### Four
 
 A grid, with 1/3 - 2/3 widths.
+
+## Admonition blocks
+{: .col-2}
+
+### Pros
+
+> #### Information {: .info}
+>
+> Admonition blocks can also be used in cheatsheets.
+>
+> - Facilitates emphasis.
+> - Colours!
+
+### Cons
+
+> #### Warning {: .warning}
+>
+> Just because you can, doesn't mean you should.
+>
+> - May distract.
+> - Colours.

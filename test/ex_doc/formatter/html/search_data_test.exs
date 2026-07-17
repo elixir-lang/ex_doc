@@ -22,7 +22,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       end
       ''')
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc"}
     data = search_data(modules, config)
     assert data["content_type"] == "text/markdown"
     assert data["proglang"] == "elixir"
@@ -61,7 +61,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       end
       ''')
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc"}
     [item1, item2] = search_data(modules, config)["items"]
 
     assert item1["ref"] == "Mix.Tasks.SearchItemTest.html"
@@ -82,7 +82,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       end
       ''')
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc"}
     [item] = search_data(modules, config)["items"]
     assert item["ref"] == "SearchFoo.html"
     assert item["type"] == "module"
@@ -100,7 +100,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       end
       ''')
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc"}
     [item] = search_data(modules, config)["items"]
 
     assert item["doc"] == ~S"#{}"
@@ -112,17 +112,18 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       erlc(c, :search_foo, """
       %% @doc
       %% Hello <em>world</em>.
+      %% Newline.
       -module(search_foo).
       """)
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", proglang: :erlang}
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc", proglang: :erlang}
     data = search_data([module], config)
     assert data["content_type"] == "text/markdown"
     [item] = data["items"]
     assert item["ref"] == "search_foo.html"
     assert item["type"] == "module"
     assert item["title"] == "search_foo"
-    assert item["doc"] == "Hello world ."
+    assert item["doc"] == "Hello  world . Newline."
   end
 
   test "function", c do
@@ -136,7 +137,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       end
       ''')
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc"}
     [%{"type" => "module"}, item] = search_data(modules, config)["items"]
     assert item["ref"] == "SearchFoo.html#foo/0"
     assert item["type"] == "function"
@@ -159,7 +160,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       end
       ''')
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc"}
     [%{"type" => "behaviour"}, item1, item2] = search_data(modules, config)["items"]
     assert item1["ref"] == "SearchFoo.html#c:handle_foo/0"
     assert item1["type"] == "callback"
@@ -183,7 +184,7 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
       end
       ''')
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc"}
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc"}
     [%{"type" => "module"}, item] = search_data(modules, config)["items"]
     assert item["ref"] == "SearchFoo.html#t:foo/0"
     assert item["type"] == "type"
@@ -204,8 +205,13 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     Section _1_ content.
     """)
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: [readme_path]}
-    [item1, item2] = search_data([], config)["items"]
+    extras = [
+      readme_path,
+      "Elixir": [url: "https://elixir-lang.org"]
+    ]
+
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc"}
+    [item1, item2] = search_data([], config, extras)["items"]
 
     assert item1["ref"] == "readme.html"
     assert item1["type"] == "extras"
@@ -235,8 +241,8 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     Section _1_ content.
     """)
 
-    config = %ExDoc.Config{output: "#{c.tmp_dir}/doc", extras: [readme_path]}
-    [item1, item2] = search_data([], config)["items"]
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc"}
+    [item1, item2] = search_data([], config, [readme_path])["items"]
 
     assert item1["ref"] == "readme.html"
     assert item1["type"] == "extras"
@@ -249,11 +255,61 @@ defmodule ExDoc.Formatter.HTML.SearchDataTest do
     assert item2["doc"] == "Section _1_ content."
   end
 
-  defp search_data(modules, config) do
-    {modules, []} = ExDoc.Retriever.docs_from_modules(modules, config)
+  test "custom search data", c do
+    readme_path = "#{c.tmp_dir}/README.md"
 
-    ExDoc.Formatter.HTML.run(modules, [], config)
-    [path] = Path.wildcard(Path.join([config.output, "dist", "search_data-*.js"]))
+    File.write!(readme_path, """
+    # README
+
+    Content here.
+
+    ## Heading without content
+    """)
+
+    extras = [
+      {readme_path,
+       search_data: [
+         %{
+           anchor: "",
+           title: "top of the doc",
+           type: "custom",
+           body: """
+           In this doc we...
+           """
+         },
+         %{
+           anchor: "heading-without-content",
+           title: "custom-text",
+           type: "custom",
+           body: """
+           Some longer text!
+
+           Here it is :)
+           """
+         }
+       ]}
+    ]
+
+    config = %ExDoc.Formatter.Config{output: "#{c.tmp_dir}/doc"}
+    [item1, item2] = search_data([], config, extras)["items"]
+
+    assert item1["ref"] == "readme.html"
+    assert item1["type"] == "custom"
+    assert item1["title"] == "top of the doc - readme"
+    assert item1["doc"] == "In this doc we..."
+
+    assert item2["ref"] == "readme.html#heading-without-content"
+    assert item2["type"] == "custom"
+    assert item2["title"] == "custom-text - readme"
+    assert item2["doc"] == "Some longer text!\n\nHere it is :)"
+  end
+
+  defp search_data(modules, formatter_config, extras_input \\ []) do
+    retriever_config = %ExDoc.Config{proglang: formatter_config.proglang}
+    {modules, []} = ExDoc.Retriever.docs_from_modules(modules, retriever_config)
+    extras = ExDoc.Extras.build(extras_input, retriever_config)
+    ExDoc.Formatter.HTML.run(formatter_config, modules, extras)
+    [path] = Path.wildcard(Path.join([formatter_config.output, "dist", "search_data-*.js"]))
     "searchData=" <> json = File.read!(path)
     Jason.decode!(json)
   end

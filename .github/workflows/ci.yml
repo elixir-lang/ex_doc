@@ -7,13 +7,13 @@ env:
 
 jobs:
   assets:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
           - elixir: "1.17"
             otp: "27"
-            node: 18.x
+            node: 20.x
     steps:
       - uses: actions/checkout@v3
 
@@ -54,12 +54,7 @@ jobs:
 
       # Test JS
       - run: npm run lint --prefix assets
-      - name: npm run test --prefix assets
-        run: |
-          sudo apt-get install xvfb
-          xvfb-run --auto-servernum npm run test --prefix assets
-        env:
-          CI: true
+      - run: npm run test --prefix assets
 
       # Push updated assets if all good
       - name: Push updated assets
@@ -70,7 +65,7 @@ jobs:
           file_pattern: formatters
 
   elixir:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -86,6 +81,9 @@ jobs:
             otp: "27"
           - elixir: "1.18"
             otp: "27"
+          # Test with latest Elixir and Erlang versions
+          - elixir: "1.19"
+            otp: "29"
             lint: true
     steps:
       - uses: actions/checkout@v3

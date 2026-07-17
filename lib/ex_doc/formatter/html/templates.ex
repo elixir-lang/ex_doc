@@ -3,35 +3,22 @@ defmodule ExDoc.Formatter.HTML.Templates do
   require EEx
   alias ExDoc.Formatter.HTML.Assets
 
-  import ExDoc.Utils,
-    only: [
-      h: 1,
-      before_closing_body_tag: 2,
-      before_closing_footer_tag: 2,
-      before_closing_head_tag: 2,
-      text_to_id: 1
-    ]
+  import ExDoc.Utils, only: [h: 1, text_to_id: 1]
 
-  @doc """
-  Generate content from the module template for a given `node`
-  """
-  def module_page(module_node, config) do
-    summary = module_summary(module_node)
-    module_template(config, module_node, summary)
-  end
-
-  @doc """
-  Format the attribute type used to define the spec of the given `node`.
-  """
-  def format_spec_attribute(module, node) do
-    module.language.format_spec_attribute(node)
-  end
+  defp enc(binary), do: ExDoc.Utils.h(URI.encode(binary))
 
   @doc """
   Get the pretty name of a function node
   """
   def pretty_type(%{type: t}) do
     Atom.to_string(t)
+  end
+
+  @doc """
+  Returns the title with `<wbr />` after each fullstop, allowing word breaks in long module names.
+  """
+  def breakable_module_title(title) when is_binary(title) do
+    String.replace(title, ".", ".<wbr />")
   end
 
   @doc """
@@ -42,55 +29,48 @@ defmodule ExDoc.Formatter.HTML.Templates do
   def module_type(%{type: type}), do: "<small>#{type}</small>"
 
   @doc """
-  Gets the first paragraph of the documentation of a node. It strips
-  surrounding white-spaces and trailing `:`.
-
-  If `doc` is `nil`, it returns `nil`.
+  Renders a "Copy Markdown" link if markdown formatter is enabled.
   """
-  @spec synopsis(String.t()) :: String.t()
-  @spec synopsis(nil) :: nil
-  def synopsis(nil), do: nil
-
-  def synopsis(doc) when is_binary(doc) do
-    doc =
-      case :binary.split(doc, "</p>") do
-        [left, _] -> String.trim_trailing(left, ":") <> "</p>"
-        [all] -> all
-      end
-
-    # Remove any anchors found in synopsis.
-    # Old Erlang docs placed anchors at the top of the documentation
-    # for links. Ideally they would have been removed but meanwhile
-    # it is simpler to guarantee they won't be duplicated in docs.
-    Regex.replace(~r|(<[^>]*) id="[^"]*"([^>]*>)|, doc, ~S"\1\2", [])
+  def copy_markdown_link(config, path) do
+    if "markdown" in config.formatters do
+      """
+      <a href="#{enc(path)}" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+        <i class="ri-markdown-line" aria-hidden="true"></i>
+        <span class="sr-only">Copy Markdown</span>
+      </a>
+      """
+    else
+      ""
+    end
   end
-
-  defp enc(binary), do: URI.encode(binary)
 
   @doc """
   Create a JS object which holds all the items displayed in the sidebar area
   """
-  def create_sidebar_items(nodes_map, extras) do
+  def create_sidebar_items(config, modules, tasks, extras) do
     nodes =
-      nodes_map
+      [modules: modules, tasks: tasks]
       |> Enum.map(&sidebar_module/1)
       |> Map.new()
-      |> Map.put(:extras, sidebar_extras(extras))
+      |> Map.put(:extras, api_reference(config, modules, tasks) ++ sidebar_extras(extras))
 
     ["sidebarNodes=" | ExDoc.Utils.to_json(nodes)]
   end
 
+  defp api_reference(%{api_reference: false}, _modules, _tasks), do: []
+
+  defp api_reference(_config, modules, tasks) do
+    headers =
+      if(modules != [], do: [%{id: "Modules", anchor: "modules"}], else: []) ++
+        if(tasks != [], do: [%{id: "Mix Tasks", anchor: "tasks"}], else: [])
+
+    [%{id: "api-reference", title: "API Reference", group: "", headers: headers}]
+  end
+
   defp sidebar_extras(extras) do
     for extra <- extras do
-      %{id: id, title: title, group: group, content: content} = extra
-
-      item =
-        %{
-          id: to_string(id),
-          title: to_string(title),
-          group: to_string(group),
-          headers: extract_headers(content)
-        }
+      %{id: id, title: title, group: group} = extra
+      item = %{id: to_string(id), title: to_string(title), group: to_string(group)}
 
       case extra do
         %{search_data: search_data} when is_list(search_data) ->
@@ -103,10 +83,15 @@ defmodule ExDoc.Formatter.HTML.Templates do
               }
             end)
 
-          Map.put(item, :searchData, search_data)
+          item
+          |> Map.put(:headers, headers(extra.doc))
+          |> Map.put(:searchData, search_data)
+
+        %{url: url} when is_binary(url) ->
+          Map.put(item, :url, url)
 
         _ ->
-          item
+          Map.put(item, :headers, headers(extra.doc))
       end
     end
   end
@@ -114,34 +99,32 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_module({id, modules}) do
     modules =
       for module <- modules do
-        extra =
-          module
-          |> module_summary()
-          |> case do
+        groups =
+          case module.docs_groups do
             [] -> []
             entries -> [nodeGroups: Enum.map(entries, &sidebar_entries/1)]
           end
-
-        sections = module_sections(module)
-
-        deprecated? = not is_nil(module.deprecated)
 
         pairs =
           for key <- [:id, :title, :nested_title, :nested_context],
               value = Map.get(module, key),
               do: {key, value}
 
-        pairs = [{:deprecated, deprecated?} | pairs]
+        others = [
+          deprecated: not is_nil(module.deprecated),
+          sections: headers(module.doc || []),
+          group: to_string(module.group)
+        ]
 
-        Map.new([group: to_string(module.group)] ++ extra ++ pairs ++ sections)
+        Map.new(groups ++ pairs ++ others)
       end
 
     {id, modules}
   end
 
-  defp sidebar_entries({group, nodes}) do
+  defp sidebar_entries(group) do
     nodes =
-      for node <- nodes do
+      for node <- group.docs do
         id =
           if "struct" in node.annotations do
             node.signature
@@ -158,48 +141,19 @@ defmodule ExDoc.Formatter.HTML.Templates do
         %{id: id, title: node.signature, anchor: URI.encode(node.id), deprecated: deprecated?}
       end
 
-    %{key: text_to_id(group), name: group, nodes: nodes}
+    %{key: text_to_id(group.title), name: group.title, nodes: nodes}
   end
 
-  defp module_sections(%ExDoc.ModuleNode{rendered_doc: nil}), do: [sections: []]
-
-  defp module_sections(module) do
-    {sections, _} =
-      module.rendered_doc
-      |> extract_headers()
-      |> Enum.map_reduce(%{}, fn header, acc ->
-        # TODO Duplicates some of the logic of link_headings/3
-        case Map.fetch(acc, header.id) do
-          {:ok, id} ->
-            {%{header | anchor: "module-#{header.anchor}-#{id}"}, Map.put(acc, header.id, id + 1)}
-
-          :error ->
-            {%{header | anchor: "module-#{header.anchor}"}, Map.put(acc, header.id, 1)}
-        end
-      end)
-
-    [sections: sections]
+  defp headers(doc) do
+    doc
+    |> ExDoc.DocAST.extract_headers_with_ids([:h2])
+    |> Enum.map(fn {:h2, text, anchor} ->
+      %{id: text, anchor: anchor}
+    end)
   end
 
-  # TODO: split into sections in Formatter.HTML instead (possibly via DocAST)
-  defp extract_headers(content) do
-    ~r/<h2.*?>(.*?)<\/h2>/m
-    |> Regex.scan(content, capture: :all_but_first)
-    |> List.flatten()
-    |> Enum.filter(&(&1 != ""))
-    |> Enum.map(&ExDoc.Utils.strip_tags/1)
-    |> Enum.map(&%{id: &1, anchor: URI.encode(text_to_id(&1))})
-  end
-
-  def module_summary(module_node) do
-    # TODO: Maybe it should be moved to retriever and it already returned grouped metadata
-    ExDoc.GroupMatcher.group_by(module_node.docs_groups, module_node.docs, & &1.group)
-  end
-
-  defp favicon_path(%{favicon: nil}), do: nil
   defp favicon_path(%{favicon: favicon}), do: "assets/favicon#{Path.extname(favicon)}"
 
-  defp logo_path(%{logo: nil}), do: nil
   defp logo_path(%{logo: logo}), do: "assets/logo#{Path.extname(logo)}"
 
   defp sidebar_type(:exception), do: "modules"
@@ -213,107 +167,93 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:livemd), do: "extras"
   defp sidebar_type(:extra), do: "extras"
 
-  # TODO: Move link_headings and friends to html.ex (possibly via DocAST)
-  # or even to autolinking code, so content is built with it upfront instead
-  # of added at the template level.
+  @section_header_class_name "section-heading"
 
   @doc """
-  Add link headings for the given `content`.
+  Renders the document in the page.
 
-  IDs are prefixed with `prefix`.
-
-  We only link `h2` and `h3` headers. This is kept consistent in ExDoc.SearchData.
+  For now it enriches the document by adding fancy anchors
+  around h2 and h3 tags with IDs.
   """
-  @spec link_headings(String.t() | nil, String.t()) :: String.t() | nil
-  def link_headings(content, prefix \\ "")
-  def link_headings(nil, _), do: nil
+  def render_doc(nil), do: ""
 
-  def link_headings(content, prefix) do
-    ~r/<(h[23]).*?>(.*?)<\/\1>/m
-    |> Regex.scan(content)
-    |> Enum.reduce({content, %{}}, fn [match, tag, title], {content, occurrences} ->
-      possible_id = text_to_id(title)
-      id_occurred = Map.get(occurrences, possible_id, 0)
+  def render_doc(ast) do
+    ast
+    |> add_fancy_anchors()
+    |> add_nofollow()
+    |> ExDoc.DocAST.to_html()
+  end
 
-      anchor_id = if id_occurred >= 1, do: "#{possible_id}-#{id_occurred}", else: possible_id
-      replacement = link_heading(match, tag, title, anchor_id, prefix)
-      linked_content = String.replace(content, match, replacement, global: false)
-      incremented_occs = Map.put(occurrences, possible_id, id_occurred + 1)
-      {linked_content, incremented_occs}
+  @official_domains ~w(hex.pm hexdocs.pm elixir-lang.org erlang.org)
+
+  defp add_nofollow(ast) do
+    ExDoc.DocAST.map_tags(ast, fn
+      {:a, attrs, inner, meta} ->
+        href = Keyword.get(attrs, :href, "")
+
+        if nofollow?(href) do
+          {:a, Keyword.put(attrs, :rel, "nofollow"), inner, meta}
+        else
+          {:a, attrs, inner, meta}
+        end
+
+      other ->
+        other
     end)
-    |> elem(0)
   end
 
-  @class_separator " "
-  defp link_heading(match, _tag, _title, "", _prefix), do: match
-
-  defp link_heading(match, tag, title, id, prefix) do
-    section_header_class_name = "section-heading"
-
-    # NOTE: This addition is mainly to preserve the previous `class` attributes
-    # from the headers, in case there is one. Now with the _admonition_ text
-    # block, we inject CSS classes. So far, the supported classes are:
-    # `warning`, `info`, `error`, and `neutral`.
-    #
-    # The Markdown syntax that we support for the admonition text
-    # blocks is something like this:
-    #
-    #     > ### Never open this door! {: .warning}
-    #     >
-    #     > ...
-    #
-    # That should produce the following HTML:
-    #
-    #      <blockquote>
-    #        <h3 class="warning">Never open this door!</h3>
-    #        <p>...</p>
-    #      </blockquote>
-    #
-    # The original implementation discarded the previous CSS classes. Instead,
-    # it was setting `#{section_header_class_name}` as the only CSS class
-    # associated with the given header.
-    class_attribute =
-      case Regex.named_captures(~r/<h[23].*?(\sclass="(?<class>[^"]+)")?.*?>/, match) do
-        %{"class" => ""} ->
-          section_header_class_name
-
-        %{"class" => previous_classes} ->
-          # Let's make sure that the `section_header_class_name` is not already
-          # included in the previous classes for the header
-          previous_classes
-          |> String.split(@class_separator)
-          |> Enum.reject(&(&1 == section_header_class_name))
-          |> Enum.join(@class_separator)
-          |> Kernel.<>(" #{section_header_class_name}")
-      end
-
-    """
-    <#{tag} id="#{prefix}#{id}" class="#{class_attribute}">
-      <a href="##{prefix}#{id}" class="hover-link">
-        <i class="ri-link-m" aria-hidden="true"></i>
-      </a>
-      <span class="text">#{title}</span>
-    </#{tag}>
-    """
+  defp nofollow?(href) do
+    uri = URI.parse(href)
+    uri.scheme in ["http", "https"] and not official_host?(uri.host)
   end
 
-  def link_moduledoc_headings(content) do
-    link_headings(content, "module-")
+  defp official_host?(nil), do: false
+
+  defp official_host?(host) do
+    Enum.any?(@official_domains, fn domain ->
+      host == domain or String.ends_with?(host, "." <> domain)
+    end)
   end
 
-  def link_detail_headings(content, prefix) do
-    link_headings(content, prefix <> "-")
+  defp add_fancy_anchors(ast) do
+    ExDoc.DocAST.map_tags(ast, fn
+      {tag, attrs, inner, meta} = ast
+      when tag in [:h2, :h3] and not is_map_key(meta, :verbatim) ->
+        if id = Keyword.get(attrs, :id) do
+          attrs =
+            Keyword.update(
+              attrs,
+              :class,
+              @section_header_class_name,
+              &(&1 <> " " <> @section_header_class_name)
+            )
+
+          {tag, attrs,
+           [
+             {:a, [href: "##{id}", class: "hover-link"],
+              [
+                {:i, [class: "ri-link-m", "aria-hidden": "true"], [], %{}}
+              ], %{}},
+             {:span, [class: "text"], inner, %{}}
+           ], meta}
+        else
+          ast
+        end
+
+      ast ->
+        ast
+    end)
   end
 
   templates = [
     detail_template: [:node, :module],
-    footer_template: [:config, :node],
+    footer_template: [:config, :source_path],
     head_template: [:config, :title, :noindex],
-    module_template: [:config, :module, :summary],
+    module_template: [:config, :module],
     not_found_template: [:config],
     api_reference_entry_template: [:module_node],
-    api_reference_template: [:nodes_map],
-    extra_template: [:config, :node, :type, :refs],
+    api_reference_template: [:config, :modules, :tasks],
+    extra_template: [:config, :node, :refs],
     search_template: [:config],
     sidebar_template: [:config, :type],
     summary_template: [:name, :nodes],

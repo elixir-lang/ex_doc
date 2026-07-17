@@ -1,24 +1,25 @@
 <%= head_template(config, node.title, false) %>
-<%= sidebar_template(config, type) %>
+<%= sidebar_template(config, node.type) %>
 
 <div id="top-content">
   <div class="heading-with-actions top-heading">
-    <h1><%= node.title_content %></h1>
-    <%= if type == :cheatmd do %>
-      <button onclick="window.print()" title="Print Cheatsheet" class="icon-action" rel="print">
+    <h1><%= ExDoc.DocAST.to_html(node.title_doc) %></h1>
+    <%= if node.type == :cheatmd do %>
+      <a onclick="window.print()" title="Print Cheatsheet" class="icon-action" rel="print">
         <i class="ri-printer-line" aria-hidden="true"></i>
         <span class="sr-only">Print Cheatsheet</span>
-      </button>
+      </a>
     <% end %>
+    <%= copy_markdown_link(config, "#{node.id}.md") %>
     <%= if node.source_url do %>
-      <a href="<%= node.source_url %>" title="View Source" class="icon-action" rel="help">
+      <a href="<%= node.source_url %>" title="View Source" class="icon-action" rel="help nofollow">
         <i class="ri-code-s-slash-line" aria-hidden="true"></i>
         <span class="sr-only">View Source</span>
       </a>
     <% end %>
   </div>
 
-  <%= if type == :livemd do %>
+  <%= if node.type == :livemd do %>
     <div class="livebook-badge-container">
       <a href="#" class="livebook-badge">
         <img src="https://livebook.dev/badge/v1/blue.svg" alt="Run in Livebook" width="150" />
@@ -26,7 +27,11 @@
     </div>
   <% end %>
 
-  <%= link_headings(node.content) %>
+  <%= if node.type == :cheatmd do %>
+    <%= node.doc |> ExDoc.DocAST.sectionize([:h2, :h3]) |> render_doc() %>
+  <% else %>
+    <%= render_doc(node.doc) %>
+  <% end %>
 </div>
 
 <div class="bottom-actions" id="bottom-actions">
@@ -56,4 +61,4 @@
   </div>
 </div>
 
-<%= footer_template(config, node) %>
+<%= footer_template(config, node.source_path) %>

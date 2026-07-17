@@ -2,11 +2,6 @@ pre {
   position: relative;
 }
 
-pre:hover .copy-button,
-pre .copy-button:focus {
-  opacity: 1;
-}
-
 .copy-button {
   display: flex;
   opacity: 0;
@@ -24,35 +19,33 @@ pre .copy-button:focus {
   line-height: 24px;
   color: currentColor;
 
-  & svg[aria-live="polite"] {
-    display: none;
+  & svg {
+    opacity: 0.5;
+    transition: var(--transition-all);
+    width: 20px;
+
+    &[aria-live="polite"] {
+      display: none;
+    }
   }
-}
 
-.copy-button svg {
-  opacity: 0.5;
-  transition: var(--transition-all);
-}
-
-pre .copy-button:hover svg,
-pre .copy-button:focus-visible svg {
-  opacity: 1;
-}
-
-.copy-button svg {
-  width: 20px;
-}
-
-.copy-button.clicked {
-  opacity: 1;
-  color: var(--success);
-
-  & svg[aria-live="polite"] {
-    display: block;
+  pre:hover &,
+  &:focus,
+  &.clicked,
+  &:is(:hover, :focus-visible) svg {
+    opacity: 1;
   }
-}
 
-.copy-button.clicked svg {
-  display: none;
-  color: currentColor;
+  &.clicked {
+    color: var(--success);
+
+    & svg {
+      display: none;
+      color: currentColor;
+
+      &[aria-live="polite"] {
+        display: block;
+      }
+    }
+  }
 }

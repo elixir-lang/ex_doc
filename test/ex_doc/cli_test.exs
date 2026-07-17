@@ -6,28 +6,45 @@ defmodule ExDoc.CLITest do
   @ebin2 "_build/test/lib/makeup/ebin"
 
   defp run(args) do
-    with_io(fn -> ExDoc.CLI.main(args, &{&1, &2, &3}) end)
+    with_io(fn -> ExDoc.CLI.main(args, &mock_generator/4) end)
+  end
+
+  defp mock_generator(project, version, source_beam, options) do
+    formatters = options[:formatters] || ["html"]
+
+    for formatter <- formatters do
+      formatter_module = Module.concat([ExDoc.Formatter, String.upcase(formatter)])
+
+      %{
+        entrypoint: {project, version, source_beam, options},
+        warned?: false,
+        formatter: formatter_module
+      }
+    end
   end
 
   test "minimum command-line options" do
-    {[html, epub], _io} = run(["ExDoc", "1.2.3", @ebin])
+    {[html, epub, markdown], _io} = run(["ExDoc", "1.2.3", @ebin])
 
     assert html ==
-             {"ExDoc", "1.2.3",
+             {"ExDoc", "1.2.3", [@ebin],
               [
-                formatter: "html",
-                formatters: ["html", "epub"],
-                apps: [:ex_doc],
-                source_beam: [@ebin]
+                formatters: ["html", "markdown", "epub"],
+                apps: [:ex_doc]
               ]}
 
     assert epub ==
-             {"ExDoc", "1.2.3",
+             {"ExDoc", "1.2.3", [@ebin],
               [
-                formatter: "epub",
-                formatters: ["html", "epub"],
-                apps: [:ex_doc],
-                source_beam: [@ebin]
+                formatters: ["html", "markdown", "epub"],
+                apps: [:ex_doc]
+              ]}
+
+    assert markdown ==
+             {"ExDoc", "1.2.3", [@ebin],
+              [
+                formatters: ["html", "markdown", "epub"],
+                apps: [:ex_doc]
               ]}
   end
 
@@ -35,21 +52,17 @@ defmodule ExDoc.CLITest do
     {[epub, html], _io} = run(["ExDoc", "1.2.3", @ebin, "-f", "epub", "-f", "html"])
 
     assert epub ==
-             {"ExDoc", "1.2.3",
+             {"ExDoc", "1.2.3", [@ebin],
               [
-                formatter: "epub",
                 formatters: ["epub", "html"],
-                apps: [:ex_doc],
-                source_beam: [@ebin]
+                apps: [:ex_doc]
               ]}
 
     assert html ==
-             {"ExDoc", "1.2.3",
+             {"ExDoc", "1.2.3", [@ebin],
               [
-                formatter: "html",
                 formatters: ["epub", "html"],
-                apps: [:ex_doc],
-                source_beam: [@ebin]
+                apps: [:ex_doc]
               ]}
   end
 
@@ -66,11 +79,13 @@ defmodule ExDoc.CLITest do
   end
 
   test "multiple apps" do
-    {[{"ExDoc", "1.2.3", html}, {"ExDoc", "1.2.3", epub}], _io} =
+    {[{"ExDoc", "1.2.3", _, html}, {"ExDoc", "1.2.3", _, epub}, {"ExDoc", "1.2.3", _, markdown}],
+     _io} =
       run(["ExDoc", "1.2.3", @ebin, @ebin2])
 
     assert [:ex_doc, :makeup] = Enum.sort(Keyword.get(html, :apps))
     assert [:ex_doc, :makeup] = Enum.sort(Keyword.get(epub, :apps))
+    assert [:ex_doc, :makeup] = Enum.sort(Keyword.get(markdown, :apps))
   end
 
   test "arguments that are not aliased" do
@@ -89,21 +104,19 @@ defmodule ExDoc.CLITest do
       --canonical http://example.com/project
     )
 
-    {[{project, version, opts}], _io} = run(args)
+    {[{project, version, _source_beam, opts}], _io} = run(args)
     assert project == "ExDoc"
     assert version == "1.2.3"
 
     assert Enum.sort(opts) == [
              apps: [:ex_doc],
              canonical: "http://example.com/project",
-             formatter: "html",
              formatters: ["html"],
              homepage_url: "http://example.com",
              key: "val",
              logo: "logo.png",
              main: "Main",
              output: "html",
-             source_beam: ["#{@ebin}"],
              source_ref: "abcdefg",
              source_url: "http://example.com/username/project"
            ]
@@ -120,7 +133,7 @@ defmodule ExDoc.CLITest do
     test "loading" do
       File.write!("test.exs", ~s([extras: ["README.md"], formatters: ["html"]]))
 
-      {[{project, version, opts}], _io} =
+      {[{project, version, _source_beam, opts}], _io} =
         run(["ExDoc", "--extra-section", "Guides", "1.2.3", @ebin, "-c", "test.exs"])
 
       assert project == "ExDoc"
@@ -130,9 +143,7 @@ defmodule ExDoc.CLITest do
                apps: [:ex_doc],
                extra_section: "Guides",
                extras: ["README.md"],
-               formatter: "html",
-               formatters: ["html"],
-               source_beam: [@ebin]
+               formatters: ["html"]
              ]
     after
       File.rm!("test.exs")
@@ -141,7 +152,7 @@ defmodule ExDoc.CLITest do
     test "switches take precedence over config" do
       File.write!("test.exs", ~s([logo: "config_logo.png", formatters: ["html"]]))
 
-      {[{project, version, opts}], _io} =
+      {[{project, version, _source_beam, opts}], _io} =
         run([
           "ExDoc",
           "--logo",
@@ -157,10 +168,8 @@ defmodule ExDoc.CLITest do
 
       assert Enum.sort(opts) == [
                apps: [:ex_doc],
-               formatter: "html",
                formatters: ["html"],
-               logo: "opts_logo.png",
-               source_beam: [@ebin]
+               logo: "opts_logo.png"
              ]
     after
       File.rm!("test.exs")
@@ -187,7 +196,8 @@ defmodule ExDoc.CLITest do
     test "loading" do
       File.write!("test.config", ~s({extras, [<<"README.md">>]}. {formatters, [<<"html">>]}.))
 
-      {[{project, version, opts}], _io} = run(["ExDoc", "1.2.3", @ebin, "-c", "test.config"])
+      {[{project, version, _source_beam, opts}], _io} =
+        run(["ExDoc", "1.2.3", @ebin, "-c", "test.config"])
 
       assert project == "ExDoc"
       assert version == "1.2.3"
@@ -195,9 +205,7 @@ defmodule ExDoc.CLITest do
       assert Enum.sort(opts) == [
                apps: [:ex_doc],
                extras: ["README.md"],
-               formatter: "html",
-               formatters: ["html"],
-               source_beam: [@ebin]
+               formatters: ["html"]
              ]
     after
       File.rm!("test.config")

@@ -2,19 +2,18 @@
   margin: 4em auto 1em;
   text-align: center;
   font-size: var(--text-sm);
-}
 
-.content-inner .footer .line {
-  display: inline-block;
-}
+  & .line {
+    display: inline-block;
 
-.content-inner .footer .footer-button {
-  background-color: transparent;
-  border: 0;
-  cursor: pointer;
-  padding: 0 4px;
-}
+    & :is(a, button) {
+      padding: 0 4px;
+    }
+  }
 
-.content-inner .footer .footer-hex-package {
-  margin-right: 4px;
+  & button {
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+  }
 }

@@ -12,7 +12,7 @@ defmodule ExDoc.Language.Elixir do
           | %{
               docs: any,
               id: binary,
-              language: ExDoc.Language.Erlang,
+              language: ExDoc.Language.Elixir,
               source_line: pos_integer,
               source_file: Path.t(),
               source_basedir: Path.t(),
@@ -67,7 +67,7 @@ defmodule ExDoc.Language.Elixir do
         }
 
       true ->
-        ExDoc.Utils.warn(
+        ExDoc.warn(
           "skipping docs for module #{inspect(module)}, reason: :no_debug_info",
           []
         )
@@ -200,7 +200,7 @@ defmodule ExDoc.Language.Elixir do
   @autoimported_modules [Kernel, Kernel.SpecialForms]
 
   @impl true
-  def try_autoimported_function(name, arity, mode, config, original_text) do
+  def try_autoimported_function(name, arity, mode, %Autolink{} = config, original_text) do
     Enum.find_value(@autoimported_modules, fn module ->
       Autolink.remote_url({:function, module, name, arity}, config, original_text,
         warn?: false,
@@ -263,17 +263,17 @@ defmodule ExDoc.Language.Elixir do
   ]
 
   @impl true
-  def try_builtin_type(name, arity, _mode, config, _original_text)
+  def try_builtin_type(name, arity, _mode, %Autolink{} = config, _original_text)
       when {name, arity} in @basic_types do
     Autolink.ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#basic-types")
   end
 
-  def try_builtin_type(name, arity, _mode, config, _original_text)
+  def try_builtin_type(name, arity, _mode, %Autolink{} = config, _original_text)
       when {name, arity} in @built_in_types do
     Autolink.ex_doc_app_url(Kernel, config, "typespecs", config.ext, "#built-in-types")
   end
 
-  def try_builtin_type(_name, _arity, _mode, _config, _original_text) do
+  def try_builtin_type(_name, _arity, _mode, %Autolink{}, _original_text) do
     nil
   end
 
@@ -368,8 +368,7 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def autolink_doc(ast, opts) do
-    config = struct!(Autolink, opts)
+  def autolink_doc(ast, %Autolink{} = config) do
     true = config.language == __MODULE__
 
     config = %{config | force_module_prefix: false}
@@ -377,19 +376,20 @@ defmodule ExDoc.Language.Elixir do
   end
 
   @impl true
-  def autolink_spec(ast, opts) do
-    config = struct!(Autolink, opts)
+  def format_spec(ast) do
+    ast
+    |> normalize_spec_metadata()
+    |> Macro.to_string()
+    |> safe_format_string!()
+    |> ExDoc.Utils.h()
+  end
 
-    string =
-      ast
-      |> Macro.to_string()
-      |> safe_format_string!()
-      |> ExDoc.Utils.h()
-
+  @impl true
+  def autolink_spec(ast, %Autolink{} = config) do
+    string = format_spec(ast)
     name = typespec_name(ast)
     {name, rest} = split_name(string, name)
-
-    name <> do_typespec(rest, config)
+    name <> autolink_typespec(rest, config)
   end
 
   @impl true
@@ -560,17 +560,17 @@ defmodule ExDoc.Language.Elixir do
 
   defp to_var({:%, meta, [name, _]}, _), do: {:%, meta, [name, {:%{}, meta, []}]}
   defp to_var({:%{}, _, _}, _), do: {:map, [], nil}
+  defp to_var({:<<>>, _, _}, _), do: {:binary, [], nil}
+  defp to_var({:{}, _, _}, _), do: {:tuple, [], nil}
   defp to_var({name, meta, _}, _) when is_atom(name), do: {name, meta, nil}
 
   defp to_var({{:., meta, [_module, name]}, _, _args}, _) when is_atom(name),
     do: {name, meta, nil}
 
   defp to_var([{:->, _, _} | _], _), do: {:function, [], nil}
-  defp to_var({:<<>>, _, _}, _), do: {:binary, [], nil}
-  defp to_var({:{}, _, _}, _), do: {:tuple, [], nil}
   defp to_var({_, _}, _), do: {:tuple, [], nil}
   defp to_var(integer, _) when is_integer(integer), do: {:integer, [], nil}
-  defp to_var(float, _) when is_integer(float), do: {:float, [], nil}
+  defp to_var(float, _) when is_float(float), do: {:float, [], nil}
   defp to_var(list, _) when is_list(list), do: {:list, [], nil}
   defp to_var(atom, _) when is_atom(atom), do: {:atom, [], nil}
   defp to_var(_, position), do: {:"arg#{position}", [], nil}
@@ -651,6 +651,18 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
+  defp normalize_spec_metadata(ast) do
+    Macro.prewalk(ast, fn
+      {name, metadata, args} when is_atom(name) and is_list(metadata) and is_list(args) ->
+        # Elixir uses line metadata to decide when to break lines during stringification.
+        # Specs come from debug info, so we do not want line numbers to affect rendering.
+        {name, Keyword.delete(metadata, :line), args}
+
+      other ->
+        other
+    end)
+  end
+
   defp typespec_name({:"::", _, [{name, _, _}, _]}), do: Atom.to_string(name)
   defp typespec_name({:when, _, [left, _]}), do: typespec_name(left)
   defp typespec_name({name, _, _}) when is_atom(name), do: Atom.to_string(name)
@@ -665,7 +677,7 @@ defmodule ExDoc.Language.Elixir do
     end
   end
 
-  defp do_typespec(string, config) do
+  defp autolink_typespec(string, config) do
     regex = ~r{
         (                                             # <call_string>
           (?:
@@ -702,7 +714,7 @@ defmodule ExDoc.Language.Elixir do
         ~s[<a href="#{url}">#{ExDoc.Utils.h(call_string)}</a>]
       else
         call_string
-      end <> do_typespec(rest, config)
+      end <> autolink_typespec(rest, config)
     end)
   end
 

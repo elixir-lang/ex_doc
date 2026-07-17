@@ -2,7 +2,7 @@ defmodule ExDoc.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/elixir-lang/ex_doc"
-  @version "0.37.3"
+  @version "0.40.3"
 
   def project do
     [
@@ -46,8 +46,7 @@ defmodule ExDoc.Mixfile do
       {:makeup_c, ">= 0.1.0", optional: true},
       {:makeup_html, ">= 0.1.0", optional: true},
       {:jason, "~> 1.2", only: :test},
-      {:floki, "~> 0.0", only: :test},
-      {:easyhtml, "~> 0.0", only: :test}
+      {:lazy_html, "~> 0.1.0", only: :test}
     ]
   end
 
@@ -84,37 +83,66 @@ defmodule ExDoc.Mixfile do
   defp elixirc_paths(_), do: ["lib"]
 
   defp docs do
-    [
-      main: "readme",
-      extras:
-        [
-          "README.md",
-          "Cheatsheet.cheatmd",
-          "CHANGELOG.md"
-        ] ++ test_dev_examples(Mix.env()),
-      source_ref: "v#{@version}",
-      source_url: @source_url,
-      groups_for_modules: [
-        Markdown: [
-          ExDoc.Markdown,
-          ExDoc.Markdown.Earmark
+    if Mix.env() == :dev do
+      [
+        search: [
+          %{
+            name: "ExDoc + Elixir",
+            help: "Search latest ExDoc + Elixir",
+            packages: [:ex_doc, elixir: "main"]
+          },
+          %{
+            name: "ExDoc on Google",
+            help: "Search everything about ExDoc on Google",
+            url: "https://google.com/?q="
+          },
+          %{name: "Lunr", help: "Search using Lunr in browser"}
         ]
-      ],
-      groups_for_extras: [
-        Examples: ~r"test/examples"
-      ],
-      skip_undefined_reference_warnings_on: [
-        "CHANGELOG.md"
       ]
-    ]
+    else
+      []
+    end ++
+      [
+        main: "readme",
+        extras:
+          [
+            "README.md",
+            "Cheatsheet.cheatmd",
+            "CHANGELOG.md"
+          ] ++ test_dev_examples(Mix.env()),
+        source_ref: "v#{@version}",
+        source_url: @source_url,
+        groups_for_modules: [
+          Markdown: [
+            ExDoc.Markdown,
+            ExDoc.Markdown.Earmark
+          ],
+          Formatter: [
+            ExDoc.Formatter,
+            ExDoc.Formatter.Config
+          ],
+          Nodes: [
+            ExDoc.ModuleNode,
+            ExDoc.DocNode,
+            ExDoc.DocGroupNode,
+            ExDoc.ExtraNode,
+            ExDoc.URLNode
+          ]
+        ],
+        groups_for_extras: [
+          Examples: ~r"test/examples"
+        ],
+        skip_undefined_reference_warnings_on: [
+          "CHANGELOG.md"
+        ]
+      ]
   end
 
   defp docs(args) do
     Mix.Task.run("docs", args)
     {text_tags, 0} = System.cmd("git", ["tag"])
 
-    [latest | _] =
-      versions =
+    versions =
       for("v" <> rest <- String.split(text_tags), do: Version.parse!(rest))
       |> Enum.sort({:desc, Version})
 
@@ -126,7 +154,6 @@ defmodule ExDoc.Mixfile do
 
     File.write!("doc/docs_config.js", """
     var versionNodes = [#{list_contents}];
-    var searchNodes = [{"name":"ex_doc","version":"#{Version.to_string(latest)}"}];
     """)
   end
 

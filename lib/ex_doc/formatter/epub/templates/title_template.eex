@@ -10,6 +10,6 @@
         <% end %>
       <% end %>
     </div>
-    <%= before_closing_body_tag(config, :epub) %>
+    <%= config.before_closing_body_tag.(:epub) %>
   </body>
 </html>

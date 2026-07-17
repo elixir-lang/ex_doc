@@ -2,13 +2,18 @@ defmodule ExDoc.DocASTTest do
   use ExUnit.Case, async: true
   alias ExDoc.DocAST
 
+  defp parse!(text, format, opts \\ []) do
+    opts = [markdown_processor: ExDoc.Markdown.Earmark] ++ opts
+    DocAST.parse!(text, format, opts)
+  end
+
   describe "parse!/3" do
     test "markdown" do
       markdown = """
       **foo**
       """
 
-      assert DocAST.parse!(markdown, "text/markdown") ==
+      assert parse!(markdown, "text/markdown") ==
                [{:p, [], [{:strong, [], ["foo"], %{}}], %{}}]
     end
 
@@ -18,7 +23,7 @@ defmodule ExDoc.DocASTTest do
       <!-- bar -->
       """
 
-      assert DocAST.parse!(markdown, "text/markdown") ==
+      assert parse!(markdown, "text/markdown") ==
                [
                  {:p, [], [{:strong, [], ["foo"], %{}}], %{}},
                  {:comment, [], [" bar "], %{comment: true}}
@@ -27,7 +32,7 @@ defmodule ExDoc.DocASTTest do
 
     test "markdown errors" do
       assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
-               assert DocAST.parse!("`String.upcase", "text/markdown") ==
+               assert parse!("`String.upcase", "text/markdown") ==
                         [{:p, [], ["`String.upcase"], %{}}]
              end) =~ "Closing unclosed backquotes ` at end of input"
     end
@@ -35,14 +40,14 @@ defmodule ExDoc.DocASTTest do
     test "erlang+html" do
       erl_ast = [{:p, [], ["foo"]}]
 
-      assert DocAST.parse!(erl_ast, "application/erlang+html") ==
+      assert parse!(erl_ast, "application/erlang+html") ==
                [{:p, [], ["foo"], %{}}]
     end
 
     test "erlang+html code blocks" do
       erl_ast = [{:pre, [], ["foo"]}]
 
-      assert DocAST.parse!(erl_ast, "application/erlang+html") ==
+      assert parse!(erl_ast, "application/erlang+html") ==
                [{:pre, [], [{:code, [], ["foo"], %{}}], %{}}]
     end
   end
@@ -53,22 +58,34 @@ defmodule ExDoc.DocASTTest do
       foo **bar** baz
       """
 
-      ast = DocAST.parse!(markdown, "text/markdown")
+      ast = parse!(markdown, "text/markdown")
 
-      assert DocAST.to_string(ast) ==
+      assert DocAST.to_html(ast) ==
                ~s{<p>foo <strong>bar</strong> baz</p>}
+    end
+
+    test "comments" do
+      markdown = """
+      hello
+      <!-- HTML -->
+      """
+
+      ast = parse!(markdown, "text/markdown")
+
+      assert DocAST.to_html(ast) ==
+               ~s{<p>hello</p><!-- HTML -->}
     end
 
     test "escape" do
       markdown = "foo > bar"
-      ast = DocAST.parse!(markdown, "text/markdown")
-      assert DocAST.to_string(ast) == ~s{<p>foo &gt; bar</p>}
+      ast = parse!(markdown, "text/markdown")
+      assert DocAST.to_html(ast) == ~s{<p>foo &gt; bar</p>}
     end
 
     test "raw html" do
       markdown = "<strong><em>bar</em></strong>"
-      ast = DocAST.parse!(markdown, "text/markdown")
-      assert DocAST.to_string(ast) == ~s{<strong><em>bar</em></strong>}
+      ast = parse!(markdown, "text/markdown")
+      assert DocAST.to_html(ast) == ~s{<strong><em>bar</em></strong>}
     end
 
     test "empty" do
@@ -79,113 +96,185 @@ defmodule ExDoc.DocASTTest do
       </span>
       """
 
-      ast = DocAST.parse!(markdown, "text/markdown")
-      assert DocAST.to_string(ast) == ~s{<span><i></i>\n<i></i></span>}
-    end
-
-    test "with fun" do
-      markdown = """
-      foo **bar** baz
-      """
-
-      ast = DocAST.parse!(markdown, "text/markdown")
-
-      f = fn
-        {:strong, _, _, _}, string ->
-          String.upcase(string)
-
-        _ast, string ->
-          string
-      end
-
-      assert DocAST.to_string(ast, f) ==
-               "<p>foo <STRONG>BAR</STRONG> baz</p>"
+      ast = parse!(markdown, "text/markdown")
+      assert DocAST.to_html(ast) == ~s{<span><i></i>\n<i></i></span>}
     end
 
     test "void elements" do
       markdown = """
-      foo  
+      foo\s\s
       bar
       """
 
-      ast = DocAST.parse!(markdown, "text/markdown")
+      ast = parse!(markdown, "text/markdown")
 
-      assert DocAST.to_string(ast) == ~s{<p>foo<br/>bar</p>}
+      assert DocAST.to_html(ast) == ~s{<p>foo<br/>bar</p>}
+    end
+  end
+
+  describe "synopsis" do
+    test "functionality" do
+      assert synopsis("") == ""
+      assert synopsis(".") == "<p>.</p>"
+      assert synopsis("::") == "<p></p>"
+      assert synopsis("abcd") == "<p>abcd</p>"
+      assert synopsis("Description:") == "<p>Description</p>"
+
+      assert synopsis("[Access](Access.html)") ==
+               "<p><a href=\"Access.html\">Access</a></p>"
+
+      assert synopsis("[Access](Access.html) {: #foo}") ==
+               "<p><a href=\"Access.html\">Access</a></p>"
+    end
+
+    test "should not end have trailing periods or semicolons" do
+      doc1 = """
+      Summaries should not be displayed with trailing semicolons :
+
+      ## Example
+      """
+
+      doc2 = """
+      Example function: Summary should display trailing period :.
+
+      ## Example:
+      """
+
+      assert synopsis(doc1) ==
+               "<p>Summaries should not be displayed with trailing semicolons </p>"
+
+      assert synopsis(doc2) ==
+               "<p>Example function: Summary should display trailing period :.</p>"
+    end
+
+    test "skips html comments" do
+      assert synopsis("<!-- comment -->\nSynopsis.") == "<p>Synopsis.</p>"
+    end
+
+    defp synopsis(markdown) do
+      markdown
+      |> parse!("text/markdown")
+      |> DocAST.synopsis()
+    end
+  end
+
+  describe "headers" do
+    test "adds and extracts anchored headers" do
+      assert """
+             # h1
+
+             ## h2
+
+             ### h3 repeat
+
+             ## h2 > h3
+
+             ### h3 repeat
+
+             > ## inside `blockquote`
+             """
+             |> parse!("text/markdown")
+             |> DocAST.add_ids_to_headers([:h2, :h3])
+             |> DocAST.extract_headers_with_ids([:h2, :h3]) ==
+               [
+                 {:h2, "h2", "h2"},
+                 {:h3, "h3 repeat", "h3-repeat"},
+                 {:h2, "h2 > h3", "h2-h3"},
+                 {:h3, "h3 repeat", "h3-repeat-1"},
+                 {:h2, "inside blockquote", "inside-blockquote"}
+               ]
     end
   end
 
   describe "highlight" do
     test "with default class" do
-      # Empty class
-      assert DocAST.highlight(
-               ~S[<pre><code class="">mix run --no-halt path/to/file.exs</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
+      # Four spaces
+      assert highlight("""
+                 mix run --no-halt path/to/file.exs
+             """) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
-      # Without class
-      assert DocAST.highlight(
-               "<pre><code>mix run --no-halt path/to/file.exs</code></pre>",
-               ExDoc.Language.Elixir
-             ) =~
+      # Code block without language
+      assert highlight("""
+             ```
+             mix run --no-halt path/to/file.exs</code></pre>
+             ```
+             """) =~
                ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
 
-      # Pre class
-      assert DocAST.highlight(
-               ~S[<pre class="wrap"><code class="">mix run --no-halt path/to/file.exs</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
+      # Pre IAL
+      assert highlight("""
+             ```
+             mix run --no-halt path/to/file.exs</code></pre>
+             ```
+             {:class="wrap"}
+             """) =~
                ~r{<pre class="wrap"><code class=\"makeup elixir\" translate="no">.*}
 
-      # Pre id
-      assert DocAST.highlight(
-               ~S[<pre id="anchor"><code class="">mix run --no-halt path/to/file.exs</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
-               ~r{<pre id="anchor"><code class=\"makeup elixir\" translate="no">.*}
+      # Code with language
+      assert highlight("""
+             ```html
+             <foo />
+             ```
+             """) =~
+               ~r{<pre><code class=\"makeup html\" translate="no">.*}
 
-      # Pre id and class
-      assert DocAST.highlight(
-               ~S[<pre id="anchor" class="wrap"><code class="">mix run --no-halt path/to/file.exs</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
-               ~r{<pre id="anchor" class="wrap"><code class=\"makeup elixir\" translate="no">.*}
+      # Code with shell detection
+      assert highlight("""
+             ```
+             $ hello
+             ```
+             """) =~
+               ~r{<pre><code class=\"makeup shell\" translate="no"><span class="gp unselectable">\$.*}
 
-      # IEx highlight with empty class
-      assert DocAST.highlight(
-               ~S[<pre><code class="">iex&gt; max(4, 5)</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
-               ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
+      # Nested in another element
+      assert highlight("""
+             > ```elixir
+             > hello
+             > ```
+             """) =~
+               ~r{<blockquote><pre><code class=\"makeup elixir\" translate="no">.*}
+    end
 
-      # IEx highlight without class
-      assert DocAST.highlight(
-               ~S[<pre><code>iex&gt; max(4, 5)</code></pre>],
-               ExDoc.Language.Elixir
-             ) =~
-               ~r{<pre><code class=\"makeup elixir\" translate="no">.*}
+    defp highlight(markdown) do
+      markdown
+      |> parse!("text/markdown")
+      |> DocAST.highlight(ExDoc.Language.Elixir)
+      |> DocAST.to_html()
     end
   end
 
   describe "sectionize" do
     test "sectioninize" do
-      list = [
-        {:h1, [], ["H1"], %{}},
-        {:h2, [class: "example"], ["H2-1"], %{}},
-        {:p, [], ["p1"], %{}},
-        {:h3, [], ["H3-1"], %{}},
-        {:p, [], ["p2"], %{}},
-        {:h3, [], ["H3-2"], %{}},
-        {:p, [], ["p3"], %{}},
-        {:h3, [], ["H3-3"], %{}},
-        {:p, [], ["p4"], %{}},
-        {:h2, [], ["H2-2"], %{}},
-        {:p, [], ["p5"], %{}},
-        {:h3, [class: "last"], ["H3-1"], %{}},
-        {:p, [], ["p6"], %{}}
-      ]
+      assert """
+             # H1
 
-      assert DocAST.sectionize(list, &h2_or_h3?/1) ==
+             ## H2-1 {:class="example"}
+
+             p1
+
+             ### H3-1
+
+             p2
+
+             ### H3-2
+
+             p3
+
+             ### H3-3
+
+             p4
+
+             ## H2-2
+
+             p5
+
+             ### H3-1 {:class="last"}
+
+             p6
+             """
+             |> parse!("text/markdown")
+             |> DocAST.sectionize([:h2, :h3]) ==
                [
                  {:h1, [], ["H1"], %{}},
                  {:section, [class: "h2 example"],
@@ -220,9 +309,5 @@ defmodule ExDoc.DocASTTest do
                   ], %{}}
                ]
     end
-
-    defp h2_or_h3?({:h2, _, _, _}), do: true
-    defp h2_or_h3?({:h3, _, _, _}), do: true
-    defp h2_or_h3?(_), do: false
   end
 end

@@ -61,12 +61,12 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "external module", c do
       assert autolink_edoc("{@link 'Elixir.EarmarkParser'}", c) ==
-               ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
+               ~s|<a href="https://earmark-parser.hexdocs.pm/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
     end
 
     test "external module - extension is ignored", c do
       assert autolink_edoc("{@link 'Elixir.EarmarkParser'}", c, ext: ".xhtml") ==
-               ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
+               ~s|<a href="https://earmark-parser.hexdocs.pm/EarmarkParser.html"><code>'Elixir.EarmarkParser'</code></a>|
     end
 
     test "module with anchor" do
@@ -127,7 +127,7 @@ defmodule ExDoc.Language.ErlangTest do
 
     test "external function", c do
       assert autolink_edoc("{@link 'Elixir.EarmarkParser':as_ast/2}", c) ==
-               ~s|<a href="https://hexdocs.pm/earmark_parser/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>|
+               ~s|<a href="https://earmark-parser.hexdocs.pm/EarmarkParser.html#as_ast/2"><code>'Elixir.EarmarkParser':as_ast/2</code></a>|
     end
 
     test "local type", c do
@@ -517,7 +517,7 @@ defmodule ExDoc.Language.ErlangTest do
       assert warn(
                fn ->
                  assert autolink_doc("[extra](`e:barlib:extra.md`)", c) ==
-                          ~s|<a href="https://hexdocs.pm/barlib/extra.html">extra</a>|
+                          ~s|<a href="https://barlib.hexdocs.pm/extra.html">extra</a>|
                end,
                line: nil
              ) =~
@@ -528,7 +528,7 @@ defmodule ExDoc.Language.ErlangTest do
       assert warn(
                fn ->
                  assert autolink_doc("[extra](`e:barlib:extra.md#anchor`)", c) ==
-                          ~s|<a href="https://hexdocs.pm/barlib/extra.html#anchor">extra</a>|
+                          ~s|<a href="https://barlib.hexdocs.pm/extra.html#anchor">extra</a>|
                end,
                line: nil
              ) =~
@@ -708,6 +708,13 @@ defmodule ExDoc.Language.ErlangTest do
                  ~s| <a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:atom/0">atom</a>()}]].|
     end
 
+    if System.otp_release() >= "29" do
+      test "spec referencing builtin record/0 type", c do
+        assert autolink_spec("-spec foo() -> record().", c) ==
+                 ~s|foo() -> <a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:record/0">record</a>().|
+      end
+    end
+
     test "callback", c do
       assert autolink_spec("-callback foo() -> t().", c) ==
                ~s|foo() -> <a href="#t:t/0">t</a>().|
@@ -871,19 +878,20 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   defp autolink_spec(binary, _c, opts \\ []) when is_binary(binary) do
-    opts =
+    config =
       opts
       |> Keyword.put_new(:current_module, :erlang_bar)
       |> Keyword.put_new(:current_kfa, {:function, :bar, 1})
+      |> then(&struct!(ExDoc.Autolink, &1))
 
     {:ok, tokens, _} = :erl_scan.string(String.to_charlist(binary))
     {:ok, ast} = :erl_parse.parse_form(tokens)
     ast = put_elem(ast, 1, :erl_anno.set_file(~c"test.erl", elem(ast, 1)))
-    ExDoc.Language.Erlang.autolink_spec(ast, opts)
+    ExDoc.Language.Erlang.autolink_spec(ast, config)
   end
 
   defp autolink_extra(text, c) do
-    [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, [])
+    [{:p, _, [ast], _}] = ExDoc.Markdown.to_ast(text, markdown_processor: ExDoc.Markdown.Earmark)
     opts = c |> Map.take([:warnings]) |> Enum.to_list()
 
     autolink(
@@ -897,7 +905,7 @@ defmodule ExDoc.Language.ErlangTest do
     fixtures(c, "", opts)
 
     ast =
-      case ExDoc.Markdown.to_ast(text, []) do
+      case ExDoc.Markdown.to_ast(text, markdown_processor: ExDoc.Markdown.Earmark) do
         [{:p, _, ast, _}] -> ast
         ast -> ast
       end
@@ -926,7 +934,7 @@ defmodule ExDoc.Language.ErlangTest do
   end
 
   defp autolink(doc, opts \\ []) do
-    opts =
+    config =
       opts
       |> Keyword.put(:language, ExDoc.Language.Erlang)
       |> Keyword.put_new(:warnings, :raise)
@@ -935,10 +943,11 @@ defmodule ExDoc.Language.ErlangTest do
       |> Keyword.put_new(:module_id, "erlang_foo")
       |> Keyword.put_new(:deps, foolib: "https://foolib.com")
       |> Keyword.drop([:extra_foo_code])
+      |> then(&struct!(ExDoc.Autolink, &1))
 
     doc
-    |> ExDoc.Language.Erlang.autolink_doc(opts)
-    |> ExDoc.DocAST.to_string()
+    |> ExDoc.Language.Erlang.autolink_doc(config)
+    |> ExDoc.DocAST.to_html()
   end
 
   defp warn(fun, md \\ []) when is_function(fun, 0) do

@@ -3,44 +3,30 @@
   <div class="autocomplete-suggestions">
     <div class="autocomplete-results">
       <span class="query">
-        Autocompletion results for <span class="bold">"{{term}}"</span>
+        {{#if suggestions.length}}
+          Autocompletion results within this project
+        {{else}}
+          No autocompletion results within this project
+        {{/if}}
       </span>
       <span class="press-return">
-        Press <span class="bold">RETURN</span> for full-text search, <span class="bold">TAB</span> for previews
+        Press <span class="bold">RETURN</span> for full-text search
       </span>
     </div>
     <div>
       {{#each suggestions}}
       <a href="{{link}}" class="autocomplete-suggestion" data-index="{{@index}}" tabindex="-1">
-        <div class="title">
-          {{# if deprecated }}
-          <s><span class="header" translate="no">{{{title}}}</span></s>
-          {{ else }}
-          <span class="header" translate="no">{{{title}}}</span>
-          {{/if}}
-
-          {{#each labels}}
-          <span class="label">{{this}}</span>
-          {{/each}}
-          <div class="autocomplete-preview-indicator autocomplete-preview-indicator-open">
-            <button onclick="onTogglePreviewClick(event, false)" title="Close preview" tabindex="-1">
-              <i class="ri-close-line" aria-hidden="true"></i>
-              Close preview
-            </button>
-          </div>
-          <div class="autocomplete-preview-indicator autocomplete-preview-indicator-closed">
-            <button onclick="onTogglePreviewClick(event, true)" title="Open preview" tabindex="-1">
-              <i class="ri-search-2-line" aria-hidden="true"></i>
-              Open preview
-            </button>
-          </div>
-        </div>
-
+        <span class="header" translate="no">{{{title}}}</span>
         {{#if description}}
-        <div class="description" translate="no">
-          {{{description}}}
-        </div>
+        <span class="separator" aria-hidden="true"> · </span>
+        <span class="description" translate="no">{{{description}}}</span>
         {{/if}}
+        {{# if deprecated }}
+        <span class="label deprecated">deprecated</span>
+        {{/if}}
+        {{#each labels}}
+        <span class="label">{{this}}</span>
+        {{/each}}
       </a>
       {{/each}}
     </div>

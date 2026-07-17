@@ -1,5 +1,6 @@
 defmodule ExDoc.Autolink do
-  # Encapsulates all functionality related to autolinking.
+  # Encapsulates all functionality related to autolinking,
+  # decoupled from language and ExDoc structs.
   @moduledoc false
 
   # * `:apps` - the apps that the docs are being generated for. When linking modules they are
@@ -56,14 +57,15 @@ defmodule ExDoc.Autolink do
     ext: ".html",
     current_kfa: nil,
     siblings: [],
-    skip_undefined_reference_warnings_on: &ExDoc.Config.skip_undefined_reference_warnings_on/1,
-    skip_code_autolink_to: &ExDoc.Config.skip_code_autolink_to/1,
+    skip_undefined_reference_warnings_on:
+      &ExDoc.Formatter.Config.skip_undefined_reference_warnings_on/1,
+    skip_code_autolink_to: &ExDoc.Formatter.Config.skip_code_autolink_to/1,
     force_module_prefix: nil,
     filtered_modules: [],
+    assets: %{},
     warnings: :emit
   ]
 
-  @hexdocs "https://hexdocs.pm/"
   @otpappdocs "https://www.erlang.org/doc/apps/"
 
   def app_module_url(tool, module, anchor \\ "#content", config)
@@ -71,14 +73,8 @@ defmodule ExDoc.Autolink do
   def app_module_url(:no_tool, _, _, _), do: nil
 
   def app_module_url(tool, module, anchor, config) do
-    base_url =
-      case tool do
-        :ex_doc -> @hexdocs
-        :otp -> @otpappdocs
-      end
-
     path = module |> inspect() |> String.trim_leading(":")
-    app_url(base_url, module, config, path, config.ext, "#{anchor}")
+    app_url(tool, module, config, path, config.ext, "#{anchor}")
   end
 
   defp string_app_module_url(tool, module, anchor, config) do
@@ -92,16 +88,16 @@ defmodule ExDoc.Autolink do
 
   @doc false
   def ex_doc_app_url(module, config, path, ext, suffix) do
-    app_url(@hexdocs, module, config, path, ext, suffix)
+    app_url(:ex_doc, module, config, path, ext, suffix)
   end
 
-  defp app_url(base_url, module, config, path, ext, suffix) do
+  defp app_url(tool, module, config, path, ext, suffix) do
     if app = app(module) do
       if app in config.apps do
         path <> ext <> suffix
       else
         config.deps
-        |> Keyword.get_lazy(app, fn -> base_url <> "#{app}" end)
+        |> Keyword.get_lazy(app, fn -> app_base_url(tool, app) end)
         |> String.trim_trailing("/")
         |> Kernel.<>("/" <> path <> ".html" <> suffix)
       end
@@ -109,6 +105,13 @@ defmodule ExDoc.Autolink do
       path <> ext <> suffix
     end
   end
+
+  defp app_base_url(:ex_doc, app) do
+    subdomain = app |> Atom.to_string() |> String.replace("_", "-")
+    "https://#{subdomain}.hexdocs.pm"
+  end
+
+  defp app_base_url(:otp, app), do: @otpappdocs <> "#{app}"
 
   defp app(module) do
     case :code.which(module) do
@@ -215,15 +218,33 @@ defmodule ExDoc.Autolink do
     with %{scheme: nil, host: nil, path: path} = uri <- URI.parse(link),
          true <- is_binary(path) and path != "" and not (path =~ ref_regex()),
          true <- Path.extname(path) in @builtin_ext do
-      if file = config.extras[Path.basename(path)] do
-        append_fragment(file <> config.ext, uri.fragment)
-      else
-        maybe_warn(config, nil, nil, %{file_path: path, original_text: link})
-        nil
+      cond do
+        file = config.extras[Path.basename(path)] ->
+          append_fragment(file <> config.ext, uri.fragment)
+
+        asset_file?(path, config.assets) ->
+          nil
+
+        true ->
+          maybe_warn(config, nil, nil, %{file_path: path, original_text: link})
+          nil
       end
     else
       _ -> nil
     end
+  end
+
+  defp asset_file?(path, assets) do
+    Enum.any?(assets, fn {source_dir, target_dir} ->
+      prefix = String.trim_trailing(target_dir, "/") <> "/"
+
+      if String.starts_with?(path, prefix) do
+        path
+        |> String.trim_leading(prefix)
+        |> Path.expand(source_dir)
+        |> File.exists?()
+      end
+    end)
   end
 
   defp maybe_remove_link(nil, :custom_link) do
@@ -301,14 +322,11 @@ defmodule ExDoc.Autolink do
             )
           end
 
-          prefix =
-            cond do
-              app in config.apps -> ""
-              is_app_otp(app) -> @otpappdocs
-              true -> @hexdocs
-            end
-
-          prefix <> "#{app}"
+          cond do
+            app in config.apps -> "#{app}"
+            is_app_otp(app) -> app_base_url(:otp, app)
+            true -> app_base_url(:ex_doc, app)
+          end
         end)
         |> String.trim_trailing("/")
         |> Kernel.<>("/" <> convert_extra_extension(extra, config) <> anchor)
@@ -539,10 +557,10 @@ defmodule ExDoc.Autolink do
 
     case config.warnings do
       :emit ->
-        ExDoc.Utils.warn(message, stacktrace_info)
+        ExDoc.warn(message, stacktrace_info)
 
       :raise ->
-        ExDoc.Utils.warn(message, stacktrace_info)
+        ExDoc.warn(message, stacktrace_info)
         raise "fail due to warnings"
 
       :send ->

@@ -4,7 +4,7 @@ defmodule ExDoc.CLI do
   @doc """
   Handles the command line parsing for the escript.
   """
-  def main(args, generator \\ &ExDoc.generate_docs/3) do
+  def main(args, generator \\ &ExDoc.generate/4) do
     {:ok, _} = Application.ensure_all_started(:ex_doc)
 
     {opts, args} =
@@ -23,6 +23,7 @@ defmodule ExDoc.CLI do
           canonical: :string,
           config: :string,
           favicon: :string,
+          footer: :boolean,
           formatter: [:keep, :string],
           homepage_url: :string,
           language: :string,
@@ -44,71 +45,79 @@ defmodule ExDoc.CLI do
     if List.keymember?(opts, :version, 0) do
       IO.puts("ExDoc v#{ExDoc.version()}")
     else
-      results = generate(args, opts, generator)
-      error_results = Enum.filter(results, &(elem(&1, 0) == :error))
-
-      if error_results == [] do
-        Enum.map(results, fn {:ok, value} -> value end)
-      else
-        formatters = Enum.map(error_results, &elem(&1, 1).formatter)
-
-        format_message =
-          case formatters do
-            [formatter] -> "#{formatter} format"
-            _ -> "#{Enum.join(formatters, ", ")} formats"
-          end
-
-        message =
-          "Documents have been generated, but generation for #{format_message} failed due to warnings while using the --warnings-as-errors option."
-
-        message_formatted = IO.ANSI.format([:red, message, :reset])
-        IO.puts(:stderr, message_formatted)
-        exit({:shutdown, 1})
-      end
+      generate(args, opts, generator)
     end
   end
 
   defp generate(args, opts, generator) do
     [project, version | source_beams] = parse_args(args)
-
     Code.prepend_paths(source_beams)
 
     for path <- Keyword.get_values(opts, :paths),
         path <- Path.wildcard(path) do
       Code.prepend_path(path)
+      app(path) |> Application.load()
+    end
+
+    # Start all applications with the makeup prefix
+    for {app, _, _} <- Application.loaded_applications(),
+        match?("makeup_" <> _, Atom.to_string(app)) do
+      Application.ensure_all_started(app)
     end
 
     opts =
       opts
-      |> Keyword.put(:source_beam, source_beams)
       |> Keyword.put(:apps, Enum.map(source_beams, &app/1))
       |> merge_config()
       |> normalize_formatters()
 
     quiet? = Keyword.get(opts, :quiet, false)
+    generated_docs = generator.(project, version, source_beams, opts)
 
-    for formatter <- opts[:formatters] do
-      index = generator.(project, version, Keyword.put(opts, :formatter, formatter))
-
-      quiet? ||
-        IO.puts(IO.ANSI.format([:green, "View #{inspect(formatter)} docs at #{inspect(index)}"]))
-
-      if opts[:warnings_as_errors] == true and ExDoc.Utils.unset_warned() do
-        {:error, %{reason: :warnings_as_errors, formatter: formatter}}
-      else
-        {:ok, index}
-      end
+    unless quiet? do
+      Enum.each(generated_docs, fn %{entrypoint: entrypoint, formatter: formatter} ->
+        extension = formatter_module_to_extension(formatter)
+        IO.puts(IO.ANSI.format([:green, "View #{extension} docs at #{inspect(entrypoint)}"]))
+      end)
     end
+
+    warned = Enum.filter(generated_docs, & &1.warned?)
+
+    if opts[:warnings_as_errors] == true and warned != [] do
+      formatters = Enum.map(warned, &formatter_module_to_extension(&1.formatter))
+
+      format_message =
+        case formatters do
+          [formatter] -> "#{formatter} format"
+          _ -> "#{Enum.join(formatters, ", ")} formats"
+        end
+
+      message =
+        "Documents have been generated, but generation for #{format_message} failed " <>
+          "due to warnings while using the --warnings-as-errors option"
+
+      message_formatted = IO.ANSI.format([:red, message, :reset])
+      IO.puts(:stderr, message_formatted)
+      exit({:shutdown, 1})
+    else
+      Enum.map(generated_docs, & &1.entrypoint)
+    end
+  end
+
+  defp formatter_module_to_extension(module) do
+    module |> Module.split() |> List.last() |> String.downcase()
   end
 
   defp normalize_formatters(opts) do
     formatters =
       case Keyword.get_values(opts, :formatter) do
-        [] -> opts[:formatters] || ["html", "epub"]
+        [] -> opts[:formatters] || ["html", "markdown", "epub"]
         values -> values
       end
 
-    Keyword.put(opts, :formatters, formatters)
+    opts
+    |> Keyword.delete(:formatter)
+    |> Keyword.put(:formatters, formatters)
   end
 
   defp app(source_beam) do
@@ -193,6 +202,7 @@ defmodule ExDoc.CLI do
           --favicon             Path to a favicon image for the project. Must be PNG, JPEG or SVG. The image
                                 will be placed in the output "assets" directory.
       -f, --formatter           Docs formatter to use (html or epub), default: html and epub
+          --no-footer           Do not render the footer (except for the required "Built with ExDoc" note)
           --homepage-url        URL to link to for the site name
           --language            Identify the primary language of the documents, its value must be
                                 a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag, default: "en"
@@ -218,7 +228,7 @@ defmodule ExDoc.CLI do
     The file must either have ".exs" or ".config" extension.
 
     The file with the ".exs" extension must be an Elixir script that returns
-    a keyword list with the same options declares in `Mix.Tasks.Docs`.
+    a keyword list with the same options specified in `ExDoc`.
     Here is an example:
 
         [

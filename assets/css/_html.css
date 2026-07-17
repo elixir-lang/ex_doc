@@ -25,7 +25,7 @@
 @import "keyboard-shortcuts.css";
 @import "quick-switch.css";
 @import "autocomplete.css";
-@import "tooltips.css";
+@import "tooltips.css"; /* must remain below functions */
 @import "copy-button.css";
 @import "settings.css";
 @import "toast.css";
@@ -34,7 +34,22 @@
 @import "print-cheatsheet.css";
 @import "makeup.css";
 @import "tabset.css";
-@import "preview.css";
+
+body {
+  background-color: var(--background);
+  color: var(--textBody);
+  font-size: var(--text-md);
+  line-height: 1.6875em;
+}
+
+.swup-progress-bar {
+  height: 2px;
+  background-color: var(--progressBarColor);
+}
+
+option {
+  background-color: var(--sidebarBackground);
+}
 
 body:not(.dark) .content-inner img[src*="#gh-dark-mode-only"],
 body.dark .content-inner img[src*="#gh-light-mode-only"] {

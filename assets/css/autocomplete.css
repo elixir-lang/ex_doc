@@ -3,76 +3,27 @@
   position: absolute;
   width: calc(100% - 32px);
   top: 55px;
-}
 
-.autocomplete .triangle {
-  width: 0;
-  height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 12px solid var(--autocompleteBackground);
-  position: absolute;
-  top: 8px;
-  left: 26px;
-  transform: translateX(-50%);
-  z-index: 100;
-  background-color: transparent;
-}
+  & .triangle {
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 12px solid var(--autocompleteBackground);
+    position: absolute;
+    top: 8px;
+    left: 26px;
+    transform: translateX(-50%);
+    z-index: 100;
+    background-color: transparent;
+  }
 
-.autocomplete-preview {
-  width: 100%;
-  margin: 0;
-  height: 100%;
-  line-height: 20px;
-  background-color: var(--background);
-  font-family: var(--sansFontFamily);
-  border: 4px solid var(--autocompleteBorder);
-  padding: 12px 16px;
-}
-
-.autocomplete-preview div, .autocomplete-preview span {
-  display: none;
-}
-
-.autocomplete-preview.loading div {
-  float: left;
-  display: block;
-  border: 5px solid var(--autocompleteBorder);
-  border-radius: 50%;
-  border-top: 5px solid var(--textDetailAccent);
-  width: 20px;
-  height: 20px;
-  animation: spinner 4s linear infinite;
-}
-
-.autocomplete-preview.loading span {
-  color: var(--autocompleteResults);
-  display: inline;
-  margin-left: 6px;
-}
-
-.autocomplete-preview.loading span:after {
-  color: var(--autocompleteResults);
-  content: "Loading";
-}
-
-@keyframes spinner {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.autocomplete-preview.loading iframe {
-  height: 0;
-}
-
-.autocomplete-preview iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
+  &.shown {
+    display: block;
+  }
 }
 
 .autocomplete-results {
-  list-style: none;
   margin: 0;
   padding: 15px 20px;
   display: flex;
@@ -80,27 +31,29 @@
   justify-content: space-between;
   gap: 8px;
   color: var(--autocompleteResults);
-  font-family: var(--sansFontFamily);
   font-weight: 300;
   font-size: 0.9rem;
-}
+  font-style: italic;
 
-.autocomplete-results .query {
-  margin-right: auto;
-}
+  & .query {
+    margin-right: auto;
+  }
 
-.autocomplete-results .bold {
-  color: var(--autocompleteResultsBold);
-  font-weight: 400;
-}
+  & .bold {
+    color: var(--autocompleteResultsBold);
+    font-weight: 400;
+  }
 
-.autocomplete.shown {
-  display: block;
+  @media screen and (hover: none) {
+    & .press-return {
+      display: none !important;
+    }
+  }
 }
 
 .autocomplete-container {
   position: absolute;
-  top: 15px;
+  top: 5px;
   width: 100%;
   z-index: 200;
 }
@@ -108,29 +61,13 @@
 .autocomplete-suggestions {
   background-color: var(--autocompleteBackground);
   border-radius: var(--borderRadius-base);
-  box-shadow: 0px 15px 99px 0px var(--autocompleteBorder);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   overflow-y: auto;
   max-height: 450px;
   white-space: normal;
   overflow-x: hidden;
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
-}
-
-.autocomplete-suggestions.previewing:has(.selected) {
-  max-height: 80vh;
-}
-
-.autocomplete-suggestions.previewing:has(.selected) .autocomplete-suggestion:not(.selected) {
-  display: none;
-}
-
-.autocomplete-suggestions.previewing:not(:has(.selected)) .autocomplete-preview {
-  display: none;
-}
-
-.autocomplete-suggestions:not(.previewing) .autocomplete-preview {
-  display: none;
 }
 
 .autocomplete-suggestion {
@@ -141,101 +78,41 @@
   transition: var(--transition-colors);
   border-top: 1px solid var(--suggestionBorder);
   font-size: 0.9rem;
-}
-
-.autocomplete-suggestion.selected {
-  background-color: var(--autocompleteSelected);
-  /* focus indicator on left, similar to default in focus.css  */
-  box-shadow: inset 2px 0 var(--main);
-}
-
-.autocomplete-suggestion:hover {
-  background-color: var(--autocompleteHover);
-}
-
-.autocomplete-suggestion:not(.selected) .autocomplete-preview-indicator {
-  display: none;
-}
-
-.autocomplete-preview-indicator {
-  float: right;
-}
-
-.autocomplete-preview-indicator button {
-  color: var(--iconAction);
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  border: 1px solid var(--suggestionBorder);
-  border-radius: var(--borderRadius-base);
-  transition: var(--transition-colors);
-  background-color: var(--autocompletePreview);
-  cursor: pointer;
-  padding: 4px 8px;
-  font-size: var(--text-sm);
-}
-
-.autocomplete-preview-indicator button:hover {
-  color: var(--iconActionHover);
-  background-color: var(--autocompleteHover);
-}
-
-.autocomplete-preview-indicator button i {
-  margin-right: 4px;
-}
-
-.autocomplete-suggestions.previewing .autocomplete-preview-indicator-closed {
-  display: none;
-}
-
-.autocomplete-suggestions:not(.previewing) .autocomplete-preview-indicator-open {
-  display: none;
-}
-
-.autocomplete-suggestion:hover:not(.selected) .autocomplete-preview-indicator-closed {
-  display: block;
-}
-
-.autocomplete-suggestion em {
-  font-style: normal;
-  font-weight: bold;
-}
-
-.autocomplete-suggestion .description {
-  opacity: 0.6;
-  padding-top: 3px;
-}
-
-.autocomplete-suggestion .label {
-  background-color: var(--autocompleteLabelBack);
-  opacity: 0.6;
-  color: var(--autocompleteLabelFont);
-  padding: 4px 8px 4px 8px;
-  border-radius: 4px;
-  margin-left: 5px;
-  text-transform: uppercase;
-  font-family: var(--sansFontFamily);
-  font-size: 0.7rem;
-}
-
-.autocomplete-suggestion .header {
-  margin-right: 5px;
-}
-
-.autocomplete-suggestion .title,
-.autocomplete-suggestion .description {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 100%;
-}
 
-@media screen and (hover: none) {
-  .autocomplete-preview-indicator {
-    display: none !important;
+  &.selected {
+    background-color: var(--autocompleteSelected);
   }
 
-  .autocomplete-results .press-return {
-    display: none !important;
+  &:hover {
+    background-color: var(--autocompleteHover);
+  }
+
+  & em {
+    font-style: normal;
+    font-weight: bold;
+  }
+
+  & .separator {
+    opacity: 0.4;
+    margin: 0 2px;
+  }
+
+  & .description {
+    opacity: 0.6;
+  }
+
+  & .label {
+    background-color: var(--autocompleteLabelBack);
+    opacity: 0.6;
+    color: var(--autocompleteLabelFont);
+    padding: 4px 8px 4px 8px;
+    border-radius: 4px;
+    margin-left: 5px;
+    text-transform: uppercase;
+    font-family: var(--sansFontFamily);
+    font-size: 0.7rem;
   }
 }

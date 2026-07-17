@@ -34,3 +34,6 @@ formatters/html/dist/html.js
 
 # Ignore escript when built
 /ex_doc
+
+# Ignore coverage directory created by Vitest
+assets/coverage/

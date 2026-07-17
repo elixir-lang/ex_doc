@@ -1,24 +1,8 @@
 defmodule ExDoc.ConfigTest do
   use ExUnit.Case, async: true
 
-  @project "Elixir"
-  @version "1"
-
   defp build(opts) do
-    ExDoc.Config.build(@project, @version, opts)
-  end
-
-  test "normalizes output" do
-    opts_with_output = &[source_beam: "beam_dir", output: &1]
-
-    config = build(opts_with_output.("test/tmp/ex_doc"))
-    assert config.output == "test/tmp/ex_doc"
-
-    config = build(opts_with_output.("test/tmp/ex_doc/"))
-    assert config.output == "test/tmp/ex_doc"
-
-    config = build(opts_with_output.("test/tmp/ex_doc//"))
-    assert config.output == "test/tmp/ex_doc"
+    ExDoc.Config.build(opts)
   end
 
   test "normalizes filter_modules" do
@@ -35,121 +19,185 @@ defmodule ExDoc.ConfigTest do
     refute config.filter_modules.(Foo, %{works: false})
   end
 
-  test "normalizes skip_undefined_reference_warnings_on" do
-    config = build(skip_undefined_reference_warnings_on: ["Foo", "Bar.baz/0"])
+  test "normalizes source_url_pattern: from a function" do
+    config = build(source_url_pattern: fn path, line -> "#{path}-fun-#{line}" end)
+    assert config.source_url_pattern.("foo.ex", 123) == "foo.ex-fun-123"
+  end
 
-    assert config.skip_undefined_reference_warnings_on.("Foo")
-    assert config.skip_undefined_reference_warnings_on.("Bar.baz/0")
-    refute config.skip_undefined_reference_warnings_on.("Foo.bar/1")
+  test "normalizes source_url_pattern: from nil" do
+    config = build(source_url_pattern: nil)
+    assert config.source_url_pattern.("foo.ex", 123) == nil
+  end
 
+  test "normalizes source_url_pattern: from a static string" do
+    config = build(source_url_pattern: "static")
+    assert config.source_url_pattern.("foo.ex", 123) == "static"
+  end
+
+  test "normalizes source_url_pattern: from a %{path} only string" do
+    config = build(source_url_pattern: "file:%{path}")
+    assert config.source_url_pattern.("foo.ex", 123) == "file:foo.ex"
+
+    config = build(source_url_pattern: "%{path}:file")
+    assert config.source_url_pattern.("foo.ex", 123) == "foo.ex:file"
+
+    config = build(source_url_pattern: "-%{path}-")
+    assert config.source_url_pattern.("foo.ex", 123) == "-foo.ex-"
+  end
+
+  test "normalizes source_url_pattern: from a %{line} only string" do
+    config = build(source_url_pattern: "line:%{line}")
+    assert config.source_url_pattern.("foo.ex", 123) == "line:123"
+
+    config = build(source_url_pattern: "%{line}:line")
+    assert config.source_url_pattern.("foo.ex", 123) == "123:line"
+
+    config = build(source_url_pattern: "-%{line}-")
+    assert config.source_url_pattern.("foo.ex", 123) == "-123-"
+  end
+
+  test "normalizes source_url_pattern: from a %{path} and %{line} string" do
+    config = build(source_url_pattern: "a%{path}b%{line}c")
+    assert config.source_url_pattern.("foo.ex", 123) == "afoo.exb123c"
+
+    config = build(source_url_pattern: "a%{line}b%{path}c")
+    assert config.source_url_pattern.("foo.ex", 123) == "a123bfoo.exc"
+  end
+
+  test "groups_for_docs" do
     config =
-      build(skip_undefined_reference_warnings_on: &String.match?(&1, ~r/Foo/))
+      build(groups_for_docs: [Foo: &(&1[:section] == "foo"), Bar: &(&1[:section] == "bar")])
 
-    assert config.skip_undefined_reference_warnings_on.("Foo")
-    refute config.skip_undefined_reference_warnings_on.("Bar.baz/0")
-    assert config.skip_undefined_reference_warnings_on.("Foo.bar/1")
+    assert config.group_for_doc.(section: "foo") == "Foo"
+    assert config.group_for_doc.(section: "bar") == "Bar"
+    assert config.group_for_doc.(section: "baz") == nil
+    assert config.docs_groups == ~w(Foo Bar)
   end
 
-  test "normalizes skip_code_autolink_to" do
-    config = build(skip_code_autolink_to: ["ConfigTest.Hidden", "ConfigTest.Hidden.foo/1"])
+  test "groups_for_modules" do
+    # Using real applications, since we load them to extract the corresponding list of modules
+    stdlib = :stdlib
+    kernel = :kernel
+    custom_group = :custom_group
 
-    assert config.skip_code_autolink_to.("ConfigTest.Hidden")
-    assert config.skip_code_autolink_to.("ConfigTest.Hidden.foo/1")
-    refute config.skip_code_autolink_to.("ConfigTest.Hidden.foo/2")
-    refute config.skip_code_autolink_to.("ConfigTest.Hidden.bar/1")
-    refute config.skip_code_autolink_to.("ConfigTest.NotHidden")
+    groups_for_modules = fn config, key ->
+      List.keyfind(config.groups_for_modules, to_string(key), 0)
+    end
 
-    config = build(skip_code_autolink_to: &String.match?(&1, ~r/\AConfigTest\.Hidden/))
+    # Single app, no custom grouping
+    config = build(apps: [stdlib])
+    assert groups_for_modules.(config, stdlib) == nil
+    assert groups_for_modules.(config, custom_group) == nil
 
-    assert config.skip_code_autolink_to.("ConfigTest.Hidden")
-    assert config.skip_code_autolink_to.("ConfigTest.Hidden.foo/1")
-    assert config.skip_code_autolink_to.("ConfigTest.Hidden.foo/2")
-    assert config.skip_code_autolink_to.("ConfigTest.Hidden.bar/1")
-    refute config.skip_code_autolink_to.("ConfigTest.NotHidden")
+    # Single app, custom grouping
+    config = build(apps: [stdlib], groups_for_modules: [{"custom_group", ["module_1"]}])
+    assert groups_for_modules.(config, stdlib) == nil
+    assert groups_for_modules.(config, custom_group) == {"custom_group", ["module_1"]}
+
+    # Multiple apps, no custom grouping
+    config = build(apps: [stdlib, kernel])
+    stdlib_groups = groups_for_modules.(config, stdlib)
+    kernel_groups = groups_for_modules.(config, kernel)
+    assert match?({"stdlib", _}, stdlib_groups)
+    assert match?({"kernel", _}, kernel_groups)
+    {"stdlib", stdlib_modules} = stdlib_groups
+    {"kernel", kernel_modules} = kernel_groups
+    assert Enum.member?(stdlib_modules, :gen_server)
+    assert Enum.member?(kernel_modules, :file)
+
+    # Multiple apps, custom grouping
+    config = build(apps: [stdlib, kernel], groups_for_modules: [{"custom_group", ["module_1"]}])
+    assert groups_for_modules.(config, stdlib) == nil
+    assert groups_for_modules.(config, kernel) == nil
+    assert groups_for_modules.(config, custom_group) == {"custom_group", ["module_1"]}
   end
 
-  describe "normalizes source_url_pattern" do
-    test "from a function" do
-      config = build(source_url_pattern: fn path, line -> "#{path}-fun-#{line}" end)
-      assert config.source_url_pattern.("foo.ex", 123) == "foo.ex-fun-123"
+  describe "module matching" do
+    test "by atom names" do
+      patterns = [
+        Group: [MyApp.SomeModule, :lists]
+      ]
+
+      assert ExDoc.Config.match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule", %{}) ==
+               :Group
+
+      assert ExDoc.Config.match_module(patterns, :lists, ":lists", %{}) == :Group
+
+      assert ExDoc.Config.match_module(
+               patterns,
+               MyApp.SomeOtherModule,
+               "MyApp.SomeOtherModule",
+               %{}
+             ) ==
+               nil
     end
 
-    test "from nil" do
-      config = build(source_url_pattern: nil)
-      assert config.source_url_pattern.("foo.ex", 123) == nil
+    test "by string names" do
+      patterns = [
+        Group: ["MyApp.SomeModule", ":lists"]
+      ]
+
+      assert ExDoc.Config.match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule", %{}) ==
+               :Group
+
+      assert ExDoc.Config.match_module(patterns, :lists, ":lists", %{}) == :Group
+
+      assert ExDoc.Config.match_module(
+               patterns,
+               MyApp.SomeOtherModule,
+               "MyApp.SomeOtherModule",
+               %{}
+             ) ==
+               nil
     end
 
-    test "from a static string" do
-      config = build(source_url_pattern: "static")
-      assert config.source_url_pattern.("foo.ex", 123) == "static"
+    test "by regular expressions" do
+      patterns = [
+        Group: ~r/MyApp\..?/
+      ]
+
+      assert ExDoc.Config.match_module(patterns, MyApp.SomeModule, "MyApp.SomeModule", %{}) ==
+               :Group
+
+      assert ExDoc.Config.match_module(
+               patterns,
+               MyApp.SomeOtherModule,
+               "MyApp.SomeOtherModule",
+               %{}
+             ) ==
+               :Group
+
+      assert ExDoc.Config.match_module(
+               patterns,
+               MyAppWeb.SomeOtherModule,
+               "MyAppWeb.SomeOtherModule",
+               %{}
+             ) ==
+               nil
+    end
+  end
+
+  describe "extras matching" do
+    test "by string names" do
+      patterns = [Group: ["docs/handling/testing.md"]]
+
+      assert ExDoc.Config.match_extra(patterns, "docs/handling/testing.md") == :Group
+      refute ExDoc.Config.match_extra(patterns, "docs/handling/setup.md")
     end
 
-    test "from a %{path} only string" do
-      config = build(source_url_pattern: "file:%{path}")
-      assert config.source_url_pattern.("foo.ex", 123) == "file:foo.ex"
+    test "by regular expressions" do
+      patterns = [Group: ~r/docs\/handling?/]
 
-      config = build(source_url_pattern: "%{path}:file")
-      assert config.source_url_pattern.("foo.ex", 123) == "foo.ex:file"
-
-      config = build(source_url_pattern: "-%{path}-")
-      assert config.source_url_pattern.("foo.ex", 123) == "-foo.ex-"
+      assert ExDoc.Config.match_extra(patterns, "docs/handling/testing.md") == :Group
+      assert ExDoc.Config.match_extra(patterns, "docs/handling/setup.md") == :Group
+      refute ExDoc.Config.match_extra(patterns, "docs/introduction.md")
     end
 
-    test "from a %{line} only string" do
-      config = build(source_url_pattern: "line:%{line}")
-      assert config.source_url_pattern.("foo.ex", 123) == "line:123"
+    test "for extras with a url" do
+      patterns = [Group: ~r/elixir/i]
 
-      config = build(source_url_pattern: "%{line}:line")
-      assert config.source_url_pattern.("foo.ex", 123) == "123:line"
-
-      config = build(source_url_pattern: "-%{line}-")
-      assert config.source_url_pattern.("foo.ex", 123) == "-123-"
-    end
-
-    test "from a %{path} and %{line} string" do
-      config = build(source_url_pattern: "a%{path}b%{line}c")
-      assert config.source_url_pattern.("foo.ex", 123) == "afoo.exb123c"
-
-      config = build(source_url_pattern: "a%{line}b%{path}c")
-      assert config.source_url_pattern.("foo.ex", 123) == "a123bfoo.exc"
-    end
-
-    test "groups_for_modules" do
-      # Using real applications, since we load them to extract the corresponding list of modules
-      stdlib = :stdlib
-      kernel = :kernel
-      custom_group = :custom_group
-
-      groups_for_modules = fn config, key ->
-        List.keyfind(config.groups_for_modules, to_string(key), 0)
-      end
-
-      # Single app, no custom grouping
-      config = build(apps: [stdlib])
-      assert groups_for_modules.(config, stdlib) == nil
-      assert groups_for_modules.(config, custom_group) == nil
-
-      # Single app, custom grouping
-      config = build(apps: [stdlib], groups_for_modules: [{"custom_group", ["module_1"]}])
-      assert groups_for_modules.(config, stdlib) == nil
-      assert groups_for_modules.(config, custom_group) == {"custom_group", ["module_1"]}
-
-      # Multiple apps, no custom grouping
-      config = build(apps: [stdlib, kernel])
-      stdlib_groups = groups_for_modules.(config, stdlib)
-      kernel_groups = groups_for_modules.(config, kernel)
-      assert match?({"stdlib", _}, stdlib_groups)
-      assert match?({"kernel", _}, kernel_groups)
-      {"stdlib", stdlib_modules} = stdlib_groups
-      {"kernel", kernel_modules} = kernel_groups
-      assert Enum.member?(stdlib_modules, :gen_server)
-      assert Enum.member?(kernel_modules, :file)
-
-      # Multiple apps, custom grouping
-      config = build(apps: [stdlib, kernel], groups_for_modules: [{"custom_group", ["module_1"]}])
-      assert groups_for_modules.(config, stdlib) == nil
-      assert groups_for_modules.(config, kernel) == nil
-      assert groups_for_modules.(config, custom_group) == {"custom_group", ["module_1"]}
+      assert ExDoc.Config.match_extra(patterns, "https://elixir-lang.org") == :Group
+      refute ExDoc.Config.match_extra(patterns, "https://example.com")
     end
   end
 end

@@ -12,7 +12,7 @@
         <span class="note">(<%= annotation %>)</span>
       <% end %>
       <%= if node.source_url do %>
-        <a href="<%= node.source_url %>" class="icon-action" rel="help" aria-label="View Source">
+        <a href="<%= node.source_url %>" class="icon-action" rel="help nofollow" aria-label="View Source">
           <i class="ri-code-s-slash-line" aria-hidden="true"></i>
         </a>
       <% end %>
@@ -28,11 +28,11 @@
     <%= if node.specs != [] do %>
       <div class="specs">
         <%= for spec <- node.specs do %>
-          <pre translate="no"><span class="attribute"><%= format_spec_attribute(module, node) %></span> <%= spec %></pre>
+          <pre translate="no"><span class="attribute"><%= module.language.format_spec_attribute(node) %></span> <%= spec %></pre>
         <% end %>
       </div>
     <% end %>
 
-    <%= link_detail_headings(node.rendered_doc, enc(node.id)) %>
+    <%= render_doc(node.doc) %>
   </section>
 </section>
