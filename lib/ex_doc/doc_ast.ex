@@ -246,7 +246,7 @@ defmodule ExDoc.DocAST do
             try do
               Makeup.highlight_inner_html(code,
                 lexer: lexer,
-                lexer_options: lexer_opts,
+                lexer_options: Keyword.put_new(lexer_opts, :group_prefix, "group"),
                 formatter_options: opts
               )
             rescue
