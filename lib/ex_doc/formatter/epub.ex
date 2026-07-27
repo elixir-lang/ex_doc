@@ -140,19 +140,14 @@ defmodule ExDoc.Formatter.EPUB do
     # Use SOURCE_DATE_EPOCH instead of the current time when set, for
     # reproducible builds
     # (https://reproducible-builds.org/docs/source-date-epoch/).
-    time =
-      case System.get_env("SOURCE_DATE_EPOCH") do
-        nil ->
-          :calendar.universal_time()
-
-        epoch ->
-          case Integer.parse(epoch) do
-            {seconds, ""} -> :calendar.system_time_to_universal_time(seconds, :second)
-            _ -> :calendar.universal_time()
-          end
+    {{year, month, day}, {hour, min, sec}} =
+      with epoch when is_binary(epoch) <- System.get_env("SOURCE_DATE_EPOCH"),
+           {seconds, ""} <- Integer.parse(epoch) do
+        :calendar.system_time_to_universal_time(seconds, :second)
+      else
+        _ -> :calendar.universal_time()
       end
 
-    {{year, month, day}, {hour, min, sec}} = time
     list = [year, month, day, hour, min, sec]
 
     "~4..0B-~2..0B-~2..0BT~2..0B:~2..0B:~2..0BZ"
