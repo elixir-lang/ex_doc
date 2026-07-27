@@ -59,7 +59,7 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   defp generate_content(config, modules, tasks, extras, static_files) do
-    uuid = "urn:uuid:#{uuid4()}"
+    uuid = "urn:uuid:#{uuid(config)}"
     datetime = format_datetime()
 
     static_files =
@@ -137,7 +137,17 @@ defmodule ExDoc.Formatter.EPUB do
 
   # Helper to format Erlang datetime tuple
   defp format_datetime do
-    {{year, month, day}, {hour, min, sec}} = :calendar.universal_time()
+    # Use SOURCE_DATE_EPOCH instead of the current time when set, for
+    # reproducible builds
+    # (https://reproducible-builds.org/docs/source-date-epoch/).
+    {{year, month, day}, {hour, min, sec}} =
+      with epoch when is_binary(epoch) <- System.get_env("SOURCE_DATE_EPOCH"),
+           {seconds, ""} <- Integer.parse(epoch) do
+        :calendar.system_time_to_universal_time(seconds, :second)
+      else
+        _ -> :calendar.universal_time()
+      end
+
     list = [year, month, day, hour, min, sec]
 
     "~4..0B-~2..0B-~2..0BT~2..0B:~2..0B:~2..0BZ"
@@ -145,21 +155,12 @@ defmodule ExDoc.Formatter.EPUB do
     |> IO.iodata_to_binary()
   end
 
-  @two_power_16 65536
-  @two_power_32 4_294_967_296
-  @two_power_48 281_474_976_710_656
+  # For reproducible builds, derive the identifier from the project name
+  # and version instead of random data
+  defp uuid(config) do
+    <<a::binary-size(4), b::binary-size(2), c::binary-size(2), d::binary-size(2),
+      e::binary-size(6)>> = :erlang.md5("#{config.project} #{config.version}")
 
-  defp uuid4 do
-    Enum.map_join(
-      [
-        <<:rand.uniform(@two_power_32) - 1::32>>,
-        <<:rand.uniform(@two_power_16) - 1::16>>,
-        <<:rand.uniform(@two_power_16) - 1::16>>,
-        <<:rand.uniform(@two_power_16) - 1::16>>,
-        <<:rand.uniform(@two_power_48) - 1::48>>
-      ],
-      <<45>>,
-      &Base.encode16(&1, case: :lower)
-    )
+    Enum.map_join([a, b, c, d, e], <<45>>, &Base.encode16(&1, case: :lower))
   end
 end
