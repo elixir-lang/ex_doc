@@ -1,7 +1,7 @@
 /*
-* Only used icons are included in the font
-* Icons can be generated at https://remixicon.com/
-* In assets/fonts/RemixIconCollection.remixicon there's easy to import on website list of icons
+* Icons can be generated at https://remixicon.com/. In assets/fonts/RemixIconCollection.remixicon
+* there's a ready to import list of icons, although they have changed their license
+* and we may need to migrate if recent icons are necessary.
 */
 
 @font-face {
