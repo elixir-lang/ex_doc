@@ -1,9 +1,17 @@
 # Changelog
 
-## Unreleased
+## v0.40.4 (2026-09-03)
 
   * Enhancements
     * Add `:api_reference_noindex` option to keep search engines from indexing `api-reference.html`
+    * Generate reproducible HTML and EPUB output
+    * Link HexDocs packages through their per-package subdomains
+
+  * Bug fixes
+    * Preserve in-page anchors during Swup navigation and fully reload navigation between ExDoc builds
+    * Format Elixir specs consistently regardless of their source line numbers
+    * Autolink the Erlang/OTP 29 built-in `record/0` type
+    * Fix focus outline positioning for top-content heading action icons
 
 ## v0.40.3 (2026-05-21)
 
