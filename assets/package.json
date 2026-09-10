@@ -46,6 +46,6 @@
     "modern-normalize": "^3.0.1",
     "swup": "^4.8.1",
     "@vitest/coverage-v8": "^4.1.9",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.11"
   }
 }
