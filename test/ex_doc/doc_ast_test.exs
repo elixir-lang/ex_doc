@@ -67,13 +67,15 @@ defmodule ExDoc.DocASTTest do
     test "comments" do
       markdown = """
       hello
-      <!-- HTML -->
+      <!--------------------- HTML --------------------->
       """
 
       ast = parse!(markdown, "text/markdown")
 
       assert DocAST.to_html(ast) ==
-               ~s{<p>hello</p><!-- HTML -->}
+               ~s{<p>hello</p><!--------------------- HTML --------------------->}
+
+      assert DocAST.to_html(ast, skip_comments: true) == ~s{<p>hello</p>}
     end
 
     test "escape" do

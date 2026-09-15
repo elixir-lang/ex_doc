@@ -33,6 +33,6 @@
       </div>
     <% end %>
 
-    <%= render_doc(node.doc) %>
+    <%= render_doc(node.doc, render_opts) %>
   </section>
 </section>

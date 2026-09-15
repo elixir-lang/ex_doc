@@ -11,7 +11,7 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   defp enc(binary), do: h(URI.encode(binary))
 
   # The actual rendering happens here
-  defp render_doc(ast), do: ast && ExDoc.DocAST.to_html(ast)
+  defp render_doc(ast), do: ast && ExDoc.DocAST.to_html(ast, skip_comments: true)
 
   @doc """
   Generated ID for static file.

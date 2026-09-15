@@ -42,7 +42,7 @@
       </a>
       <span class="text">Summary</span>
     </h2>
-    <%= for group <- module.docs_groups, do: summary_template(group.title, group.docs) %>
+    <%= for group <- module.docs_groups, do: summary_template(group.title, group.docs, []) %>
   </section>
 <% end %>
 
@@ -60,7 +60,7 @@
       </div>
     <% end %>
     <div class="<%= key %>-list">
-      <%= for node <- group.docs, do: detail_template(node, module) %>
+      <%= for node <- group.docs, do: detail_template(node, module, []) %>
     </div>
   </section>
 <% end %>

@@ -11,7 +11,7 @@
         <% end %>
       </div>
       <%= if doc = node.doc do %>
-        <div class="summary-synopsis"><%= ExDoc.DocAST.synopsis(doc) %></div>
+        <div class="summary-synopsis"><%= ExDoc.DocAST.synopsis(doc, render_opts) %></div>
       <% end %>
     </div>
   <% end %>

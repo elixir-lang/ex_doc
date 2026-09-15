@@ -109,6 +109,19 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
   end
 
   describe "module_template/2" do
+    test "skips comments" do
+      module_node = %ExDoc.ModuleNode{
+        module: XPTOModule,
+        doc: [{:comment, [], [" invalid -- comment "], %{comment: true}}],
+        id: "XPTOModule",
+        title: "XPTOModule"
+      }
+
+      content = Templates.module_template(formatter_config(), module_node)
+
+      refute content =~ "invalid -- comment"
+    end
+
     test "generates only the module name when there's no more info" do
       module_node = %ExDoc.ModuleNode{
         module: XPTOModule,

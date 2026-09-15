@@ -175,13 +175,15 @@ defmodule ExDoc.Formatter.HTML.Templates do
   For now it enriches the document by adding fancy anchors
   around h2 and h3 tags with IDs.
   """
-  def render_doc(nil), do: ""
+  def render_doc(ast, opts \\ [])
 
-  def render_doc(ast) do
+  def render_doc(nil, _opts), do: ""
+
+  def render_doc(ast, opts) do
     ast
     |> add_fancy_anchors()
     |> add_nofollow()
-    |> ExDoc.DocAST.to_html()
+    |> ExDoc.DocAST.to_html(opts)
   end
 
   @official_domains ~w(hex.pm hexdocs.pm elixir-lang.org erlang.org)
@@ -245,8 +247,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
     end)
   end
 
+  @doc false
+  def detail_template(node, module), do: detail_template(node, module, [])
+
+  @doc false
+  def summary_template(name, nodes), do: summary_template(name, nodes, [])
+
   templates = [
-    detail_template: [:node, :module],
+    detail_template: [:node, :module, :render_opts],
     footer_template: [:config, :source_path],
     head_template: [:config, :title, :noindex],
     module_template: [:config, :module],
@@ -256,7 +264,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     extra_template: [:config, :node, :refs],
     search_template: [:config],
     sidebar_template: [:config, :type],
-    summary_template: [:name, :nodes],
+    summary_template: [:name, :nodes, :render_opts],
     redirect_template: [:config, :redirect_to]
   ]
 

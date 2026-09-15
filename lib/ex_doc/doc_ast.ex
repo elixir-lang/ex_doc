@@ -31,32 +31,40 @@ defmodule ExDoc.DocAST do
   @doc """
   Transform AST into HTML string.
   """
-  def to_html(binary) do
-    IO.iodata_to_binary(to_iodata(binary))
+  def to_html(binary, opts \\ []) do
+    IO.iodata_to_binary(to_iodata(binary, Keyword.get(opts, :skip_comments, false)))
   end
 
-  defp to_iodata(binary) when is_binary(binary) do
+  defp to_iodata(binary, _skip_comments) when is_binary(binary) do
     ExDoc.Utils.h(binary)
   end
 
-  defp to_iodata(list) when is_list(list) do
-    Enum.map(list, &to_iodata/1)
+  defp to_iodata(list, skip_comments) when is_list(list) do
+    Enum.map(list, &to_iodata(&1, skip_comments))
   end
 
-  defp to_iodata({:comment, _attrs, inner, _meta}) do
+  defp to_iodata({:comment, _attrs, _inner, _meta}, true) do
+    []
+  end
+
+  defp to_iodata({:comment, _attrs, inner, _meta}, false) do
     ["<!--", inner, "-->"]
   end
 
-  defp to_iodata({tag, attrs, _inner, _meta}) when tag in @void_elements do
+  defp to_iodata({tag, attrs, _inner, _meta}, _skip_comments) when tag in @void_elements do
     "<#{tag}#{ast_attributes_to_string(attrs)}/>"
   end
 
-  defp to_iodata({tag, attrs, inner, %{verbatim: true}}) do
+  defp to_iodata({tag, attrs, inner, %{verbatim: true}}, _skip_comments) do
     ["<#{tag}#{ast_attributes_to_string(attrs)}>", inner, "</#{tag}>"]
   end
 
-  defp to_iodata({tag, attrs, inner, _meta}) do
-    ["<#{tag}#{ast_attributes_to_string(attrs)}>", to_iodata(inner), "</#{tag}>"]
+  defp to_iodata({tag, attrs, inner, _meta}, skip_comments) do
+    [
+      "<#{tag}#{ast_attributes_to_string(attrs)}>",
+      to_iodata(inner, skip_comments),
+      "</#{tag}>"
+    ]
   end
 
   defp ast_attributes_to_string(attrs) do
@@ -153,7 +161,9 @@ defmodule ExDoc.DocAST do
   @doc """
   Compute a synopsis from a document by looking at its first paragraph.
   """
-  def synopsis({:p, _attrs, [_ | _] = inner, meta}) do
+  def synopsis(ast, opts \\ [])
+
+  def synopsis({:p, _attrs, [_ | _] = inner, meta}, opts) do
     inner =
       case Enum.split(inner, -1) do
         {pre, [post]} when is_binary(post) ->
@@ -163,12 +173,12 @@ defmodule ExDoc.DocAST do
           inner
       end
 
-    to_html({:p, [], remove_ids(inner), meta})
+    to_html({:p, [], remove_ids(inner), meta}, opts)
   end
 
-  def synopsis([{:comment, _, _, _} | rest]), do: synopsis(rest)
-  def synopsis([head | _]), do: synopsis(head)
-  def synopsis(_other), do: ""
+  def synopsis([{:comment, _, _, _} | rest], opts), do: synopsis(rest, opts)
+  def synopsis([head | _], opts), do: synopsis(head, opts)
+  def synopsis(_other, _opts), do: ""
 
   defp remove_ids(ast) do
     map_tags(ast, fn {tag, attrs, inner, meta} ->
