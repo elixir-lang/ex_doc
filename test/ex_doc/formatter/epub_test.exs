@@ -66,28 +66,6 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert content =~ ~r{<dc:creator id="author2">Jane Doe</dc:creator>}
   end
 
-  test "escapes ids and hrefs built from a configured filename", %{tmp_dir: tmp_dir} = context do
-    extra = tmp_dir <> "/readme.md"
-    File.write!(extra, "# Hello\n")
-
-    generate_and_unzip(context, config(context, extras: [{extra, filename: "a&b"}]))
-
-    content = File.read!(tmp_dir <> "/epub/OEBPS/content.opf")
-    assert content =~ ~s{<item id="a&amp;b" href="a&amp;b.xhtml"}
-    assert content =~ ~s{<itemref idref="a&amp;b"/>}
-
-    nav = File.read!(tmp_dir <> "/epub/OEBPS/nav.xhtml")
-    assert nav =~ ~s{<a href="a&amp;b.xhtml">}
-
-    # an unescaped & here is a fatal XML error, not a quirk
-    for file <- ["content.opf", "nav.xhtml"] do
-      (tmp_dir <> "/epub/OEBPS/" <> file)
-      |> File.read!()
-      |> :binary.bin_to_list()
-      |> :xmerl_scan.string()
-    end
-  end
-
   test "generates an EPUB file in the default directory", %{tmp_dir: tmp_dir} = context do
     generate(config(context))
     assert File.regular?(tmp_dir <> "/epub/#{config(context)[:project]}.epub")
@@ -156,7 +134,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     config =
       config(context,
         extras: [
-          "test/fixtures/LICENSE",
+          {"test/fixtures/LICENSE", filename: "a&b"},
           "test/fixtures/PlainText.txt",
           "test/fixtures/PlainTextFiles.md",
           "test/fixtures/cheatsheets.cheatmd"
@@ -178,6 +156,13 @@ defmodule ExDoc.Formatter.EPUBTest do
     cheatsheet = File.read!(tmp_dir <> "/epub/OEBPS/cheatsheets.xhtml")
     assert cheatsheet =~ ~s{<h2 id="getting-started">}
     assert cheatsheet =~ ~s{<h3 id="hello-world">}
+
+    manifest = File.read!(tmp_dir <> "/epub/OEBPS/content.opf")
+    assert manifest =~ ~s{<item id="a&amp;b" href="a&amp;b.xhtml"}
+    assert manifest =~ ~s{<itemref idref="a&amp;b"/>}
+
+    nav = File.read!(tmp_dir <> "/epub/OEBPS/nav.xhtml")
+    assert nav =~ ~s{<a href="a&amp;b.xhtml">}
   end
 
   test "ignores any external url extras", %{tmp_dir: tmp_dir} = context do
