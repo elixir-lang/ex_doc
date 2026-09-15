@@ -1,8 +1,9 @@
 /* globals searchData */
 
 import lunr from 'lunr'
-import { qs, escapeHtmlEntities, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
+import { qs, isBlank, getQueryParamByName, getProjectNameAndVersion } from './helpers'
 import { setSearchInputValue } from './search-bar'
+import { generateSnippet } from './search-highlighting'
 import searchResultsTemplate from './handlebars/templates/search-results.handlebars'
 
 const SEARCH_CONTAINER_SELECTOR = '#search'
@@ -254,49 +255,6 @@ function getSearchItemByRef (ref) {
 
 function getExcerpts (searchItem, metadata) {
   const { doc } = searchItem
-  const searchTerms = Object.keys(metadata)
 
-  return [generateSnippet(doc, searchTerms)]
-}
-
-function generateSnippet (doc, searchTerms) {
-  // Extract all paragraphs by splitting on both possible line endings
-  const paragraphsFromCRLF = doc.split('\r\n\r\n')
-  const paragraphs = paragraphsFromCRLF.flatMap(p => p.split('\n\n'))
-
-  // Get first usable paragraph (skip if starts with "#")
-  let firstParagraph
-  if (paragraphs.length >= 2) {
-    const first = paragraphs[0].trim()
-    if (first.startsWith('#')) {
-      firstParagraph = paragraphs[1]
-    } else {
-      firstParagraph = paragraphs[0]
-    }
-  } else if (paragraphs.length === 1) {
-    firstParagraph = paragraphs[0]
-  } else {
-    firstParagraph = doc
-  }
-
-  // Truncate to reasonable length (around 200 characters)
-  let truncated
-  if (firstParagraph.length > 200) {
-    truncated = firstParagraph.slice(0, 200) + '...'
-  } else {
-    truncated = firstParagraph
-  }
-
-  // Highlight search terms (case-insensitive)
-  let result = escapeHtmlEntities(truncated)
-  for (const term of searchTerms) {
-    if (term.trim() === '') continue
-
-    // Create a case-insensitive regex for the term
-    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    const regex = new RegExp(escapedTerm, 'gi')
-    result = result.replace(regex, match => `<em>${match}</em>`)
-  }
-
-  return result
+  return [generateSnippet(doc, metadata)]
 }
