@@ -4,7 +4,7 @@
       <ol>
   <% end %>
   <%= for node <- nodes do %>
-      <li><a href="<%= URI.encode node.id %>.xhtml"><%=h node.title %></a></li>
+      <li><a href="<%= enc node.id %>.xhtml"><%=h node.title %></a></li>
   <% end %>
   <%= if title do %>
       </ol>

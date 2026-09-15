@@ -8,6 +8,8 @@ defmodule ExDoc.Formatter.EPUB.Templates do
   alias ExDoc.Formatter.HTML.Templates, as: H
   alias ExDoc.Formatter.EPUB.Assets
 
+  defp enc(binary), do: h(URI.encode(binary))
+
   # The actual rendering happens here
   defp render_doc(ast), do: ast && ExDoc.DocAST.to_html(ast)
 
