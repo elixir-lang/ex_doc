@@ -1,6 +1,9 @@
 defmodule ExDoc.Formatter.EPUBTest do
   use ExUnit.Case, async: true
 
+  require Record
+  Record.defrecordp(:xmlElement, Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl"))
+
   @moduletag :tmp_dir
   @before_closing_head_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-HEAD-TAG-HTML</dont-escape>"
   @before_closing_body_tag_content_epub "UNIQUE:<dont-escape>&copy;BEFORE-CLOSING-BODY-TAG-HTML</dont-escape>"
@@ -41,10 +44,21 @@ defmodule ExDoc.Formatter.EPUBTest do
     |> :zip.unzip(cwd: unzip_dir)
   end
 
+  defp read_xml(path, root) do
+    content = File.read!(path)
+
+    assert {xmlElement(name: ^root), []} =
+             content
+             |> :binary.bin_to_list()
+             |> :xmerl_scan.string()
+
+    content
+  end
+
   test "generates headers for module pages", %{tmp_dir: tmp_dir} = context do
     generate_and_unzip(context, config(context, main: "RandomError"))
 
-    content = File.read!(tmp_dir <> "/epub/OEBPS/RandomError.xhtml")
+    content = read_xml(tmp_dir <> "/epub/OEBPS/RandomError.xhtml", :html)
     assert content =~ ~r{<html.*lang="en".*xmlns:epub="http://www.idpf.org/2007/ops">}ms
     assert content =~ ~r{<meta charset="utf-8" />}ms
     assert content =~ ~r{<meta name="generator" content="ExDoc v[^"]+" />}
@@ -54,14 +68,14 @@ defmodule ExDoc.Formatter.EPUBTest do
   test "allows to set the primary language of the document", %{tmp_dir: tmp_dir} = context do
     generate_and_unzip(context, config(context, main: "RandomError", language: "fr"))
 
-    content = File.read!(tmp_dir <> "/epub/OEBPS/RandomError.xhtml")
+    content = read_xml(tmp_dir <> "/epub/OEBPS/RandomError.xhtml", :html)
     assert content =~ ~r{<html.*lang="fr".*xmlns:epub="http://www.idpf.org/2007/ops">}ms
   end
 
   test "allows to set the authors of the document", %{tmp_dir: tmp_dir} = context do
     generate_and_unzip(context, config(context, authors: ["John Doe", "Jane Doe"]))
 
-    content = File.read!(tmp_dir <> "/epub/OEBPS/content.opf")
+    content = read_xml(tmp_dir <> "/epub/OEBPS/content.opf", :package)
     assert content =~ ~r{<dc:creator id="author1">John Doe</dc:creator>}
     assert content =~ ~r{<dc:creator id="author2">Jane Doe</dc:creator>}
   end
@@ -111,7 +125,7 @@ defmodule ExDoc.Formatter.EPUBTest do
 
   test "generates all listing files", %{tmp_dir: tmp_dir} = context do
     generate_and_unzip(context, config(context))
-    content = File.read!(tmp_dir <> "/epub/OEBPS/content.opf")
+    content = read_xml(tmp_dir <> "/epub/OEBPS/content.opf", :package)
 
     assert content =~ ~r{.*"CompiledWithDocs\".*}ms
     assert content =~ ~r{.*"CompiledWithDocs.Nested\".*}ms
@@ -126,7 +140,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     config = config(context, main: "README", extras: ["test/fixtures/README.md"])
     generate_and_unzip(context, config)
 
-    content = File.read!(tmp_dir <> "/epub/OEBPS/nav.xhtml")
+    content = read_xml(tmp_dir <> "/epub/OEBPS/nav.xhtml", :html)
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}
   end
 
@@ -144,24 +158,24 @@ defmodule ExDoc.Formatter.EPUBTest do
     generate_and_unzip(context, config)
 
     # Markdown files are rendered with formatting and autolinks
-    content = File.read!(tmp_dir <> "/epub/OEBPS/plaintextfiles.xhtml")
+    content = read_xml(tmp_dir <> "/epub/OEBPS/plaintextfiles.xhtml", :html)
     assert content =~ ~r{Plain Text Files</h1>}s
     assert content =~ ~r{<a href="plaintext.xhtml">plain-text file</a>}
 
     # Plain text files are rendered as preformatted
-    plain_text_file = File.read!(tmp_dir <> "/epub/OEBPS/plaintext.xhtml")
+    plain_text_file = read_xml(tmp_dir <> "/epub/OEBPS/plaintext.xhtml", :html)
     assert plain_text_file =~ ~r{<pre>\nThis is plain\n  text and nothing\n.+\s+good bye\n</pre>}s
 
     # Cheatmd files have section headers with IDs
-    cheatsheet = File.read!(tmp_dir <> "/epub/OEBPS/cheatsheets.xhtml")
+    cheatsheet = read_xml(tmp_dir <> "/epub/OEBPS/cheatsheets.xhtml", :html)
     assert cheatsheet =~ ~s{<h2 id="getting-started">}
     assert cheatsheet =~ ~s{<h3 id="hello-world">}
 
-    manifest = File.read!(tmp_dir <> "/epub/OEBPS/content.opf")
+    manifest = read_xml(tmp_dir <> "/epub/OEBPS/content.opf", :package)
     assert manifest =~ ~s{<item id="a&amp;b" href="a&amp;b.xhtml"}
     assert manifest =~ ~s{<itemref idref="a&amp;b"/>}
 
-    nav = File.read!(tmp_dir <> "/epub/OEBPS/nav.xhtml")
+    nav = read_xml(tmp_dir <> "/epub/OEBPS/nav.xhtml", :html)
     assert nav =~ ~s{<a href="a&amp;b.xhtml">}
   end
 
@@ -179,7 +193,7 @@ defmodule ExDoc.Formatter.EPUBTest do
   test "uses samp as highlight tag for markdown", %{tmp_dir: tmp_dir} = context do
     generate_and_unzip(context, config(context))
 
-    assert File.read!(tmp_dir <> "/epub/OEBPS/CompiledWithDocs.xhtml") =~
+    assert read_xml(tmp_dir <> "/epub/OEBPS/CompiledWithDocs.xhtml", :html) =~
              "<samp class=\"nc\">CompiledWithDocs<\/samp>"
   end
 
@@ -206,9 +220,13 @@ defmodule ExDoc.Formatter.EPUBTest do
     oebps_dir = tmp_dir <> "/epub/OEBPS"
 
     for basename <- @example_basenames do
-      content = File.read!(Path.join(oebps_dir, basename))
-      assert content =~ ~r[#{@before_closing_head_tag_content_epub}\s*</head>]
-      assert content =~ ~r[#{@before_closing_body_tag_content_epub}\s*</body>]
+      content = read_xml(Path.join(oebps_dir, basename), :html)
+
+      assert content =~
+               ~r[#{ExDoc.EPUB.Entities.to_numeric(@before_closing_head_tag_content_epub)}\s*</head>]
+
+      assert content =~
+               ~r[#{ExDoc.EPUB.Entities.to_numeric(@before_closing_body_tag_content_epub)}\s*</body>]
     end
   end
 

@@ -4,6 +4,7 @@ defmodule ExDoc.Formatter.EPUB do
   @mimetype "application/epub+zip"
   @assets_dir "OEBPS/assets"
   alias __MODULE__.{Assets, Templates}
+  alias ExDoc.EPUB.Entities
   alias ExDoc.Formatter
 
   @doc false
@@ -54,7 +55,7 @@ defmodule ExDoc.Formatter.EPUB do
         ExDoc.warn("file #{Path.relative_to_cwd(output)} already exists", [])
       end
 
-      File.write!(output, html)
+      write_xhtml(output, html)
     end
   end
 
@@ -80,7 +81,7 @@ defmodule ExDoc.Formatter.EPUB do
     extras = group_by_group(extras)
 
     content = Templates.nav_template(config, modules, tasks, extras)
-    File.write!("#{config.output}/OEBPS/nav.xhtml", content)
+    write_xhtml("#{config.output}/OEBPS/nav.xhtml", content)
   end
 
   defp group_by_group(nodes) do
@@ -91,7 +92,7 @@ defmodule ExDoc.Formatter.EPUB do
 
   defp generate_title(config) do
     content = Templates.title_template(config)
-    File.write!("#{config.output}/OEBPS/title.xhtml", content)
+    write_xhtml("#{config.output}/OEBPS/title.xhtml", content)
   end
 
   defp generate_modules(config, nodes) do
@@ -99,7 +100,7 @@ defmodule ExDoc.Formatter.EPUB do
     |> Task.async_stream(
       fn module_node ->
         content = Templates.module_template(config, module_node)
-        File.write!("#{config.output}/OEBPS/#{module_node.id}.xhtml", content)
+        write_xhtml("#{config.output}/OEBPS/#{module_node.id}.xhtml", content)
       end,
       timeout: :infinity
     )
@@ -115,6 +116,10 @@ defmodule ExDoc.Formatter.EPUB do
   end
 
   ## Helpers
+
+  defp write_xhtml(output, content) do
+    File.write!(output, Entities.to_numeric(content))
+  end
 
   defp additional_assets(config) do
     [
