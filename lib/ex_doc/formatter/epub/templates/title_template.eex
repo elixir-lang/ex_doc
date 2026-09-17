@@ -3,8 +3,8 @@
       <%= if cover = config.cover do %>
         <div><img src="assets/cover<%= Path.extname(cover) %>"/></div>
       <% else %>
-        <h1><%= config.project %></h1>
-        <h2>v<%= config.version %></h2>
+        <h1><%= h(config.project) %></h1>
+        <h2>v<%= h(config.version) %></h2>
         <%= if logo = config.logo do %>
           <div><img src="assets/logo<%= Path.extname(logo) %>" alt="Logo"/></div>
         <% end %>
