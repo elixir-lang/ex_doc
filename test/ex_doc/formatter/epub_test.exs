@@ -179,6 +179,36 @@ defmodule ExDoc.Formatter.EPUBTest do
     assert nav =~ ~s{<a href="a&amp;b.xhtml">}
   end
 
+  test "escapes XML metacharacters in the package document and pages",
+       %{tmp_dir: tmp_dir} = context do
+    project = "Elixir & Friends"
+    output = tmp_dir <> "/epub"
+
+    config =
+      config(context,
+        project: project,
+        authors: ["AT&T"],
+        extras: ["test/fixtures/ExtraPageWithAmpersand.md"]
+      )
+
+    generate(config)
+
+    assert {:ok, _} =
+             "#{output}/#{project}.epub"
+             |> String.to_charlist()
+             |> :zip.unzip(cwd: String.to_charlist(output))
+
+    content = read_xml(output <> "/OEBPS/content.opf", :package)
+    assert content =~ "<dc:title>Elixir &amp; Friends - 1.0.1</dc:title>"
+    assert content =~ ~s{<dc:creator id="author1">AT&amp;T</dc:creator>}
+
+    title = read_xml(output <> "/OEBPS/title.xhtml", :html)
+    assert title =~ "<h1>Elixir &amp; Friends</h1>"
+
+    extra = read_xml(output <> "/OEBPS/extrapagewithampersand.xhtml", :html)
+    assert extra =~ "<title>Tips &amp; Tricks - Elixir &amp; Friends v1.0.1</title>"
+  end
+
   test "ignores any external url extras", %{tmp_dir: tmp_dir} = context do
     config =
       context

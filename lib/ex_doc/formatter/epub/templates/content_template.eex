@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf"
-         unique-identifier="project-<%= config.project %>"
+         unique-identifier="project-<%= h(config.project) %>"
          version="3.0">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <dc:title><%= config.project %> - <%= config.version %></dc:title>
-    <dc:identifier id="project-<%= config.project %>"><%= uuid %></dc:identifier>
-    <dc:language><%= config.language %></dc:language>
+    <dc:title><%= h(config.project) %> - <%= h(config.version) %></dc:title>
+    <dc:identifier id="project-<%= h(config.project) %>"><%= uuid %></dc:identifier>
+    <dc:language><%= h(config.language) %></dc:language>
     <%= for {author, index} <- Enum.with_index(config.authors || [], 1) do %>
-      <dc:creator id="author<%= index %>"><%= author %></dc:creator>
+      <dc:creator id="author<%= index %>"><%= h(author) %></dc:creator>
     <% end %>
     <meta property="dcterms:modified"><%= datetime %></meta>
     <%= if config.cover do %>
@@ -24,7 +24,7 @@
       <item id="<%= enc node.id %>" href="<%= enc node.id %>.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
     <% end %>
     <%= for {static_file, media_type} <- static_files do %>
-      <item id="<%= static_file_to_id(static_file) %>" href="<%= static_file %>" media-type="<%= media_type %>"/>
+      <item id="<%= static_file_to_id(static_file) %>" href="<%= h(static_file) %>" media-type="<%= media_type %>"/>
     <% end %>
     <%= if config.cover do %>
       <item id="cover-image" href="assets/cover<%= Path.extname(config.cover) %>" media-type="<%= media_type(Path.extname(config.cover)) %>"/>
