@@ -207,6 +207,9 @@ defmodule ExDoc.Config do
   defp known_pattern("bitbucket.org/" <> _, ref),
     do: {:ok, "src/#{ref}/%{path}#cl-%{line}"}
 
+  defp known_pattern("tangled.org/" <> _, ref),
+    do: {:ok, "blob/#{ref}/%{path}#L%{line}"}
+
   defp known_pattern(_host_with_path, _ref),
     do: :error
 
