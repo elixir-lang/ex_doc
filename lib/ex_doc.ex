@@ -146,8 +146,8 @@ defmodule ExDoc do
 
     * `:source_url_pattern` - Public URL of the project for source links. This is derived
       automatically from the project's `:source_url` and `:source_ref` when using one of
-      the supported public hosting services (currently GitHub, GitLab, or Bitbucket). If
-      you are using one of those services with their default public hostname, you do not
+      the supported public hosting services (currently GitHub, GitLab, Bitbucket, or Tangled).
+      If you are using one of those services with their default public hostname, you do not
       need to set this configuration.
 
       However, if using a different solution, or self-hosting, you will need to set this
