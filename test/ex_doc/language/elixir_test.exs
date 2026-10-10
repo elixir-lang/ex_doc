@@ -469,6 +469,132 @@ defmodule ExDoc.Language.ElixirTest do
     end
   end
 
+  describe "autolink_deprecated/2" do
+    test "links local functions" do
+      ExDoc.Refs.insert([
+        {{:module, String}, :public},
+        {{:function, String, :to_existing_atom, 1}, :public},
+        {{:function, String, :to_unsafe_atom, 1}, :public}
+      ])
+
+      msg = "Use to_existing_atom/1 or to_unsafe_atom/1 instead"
+
+      assert autolink_deprecated(msg, current_module: String) ==
+               ~s|Use <a href="#to_existing_atom/1"><code class="inline">to_existing_atom/1</code></a> or <a href="#to_unsafe_atom/1"><code class="inline">to_unsafe_atom/1</code></a> instead|
+
+      assert autolink_deprecated("Use to_existing_atom/1.", current_module: String) ==
+               ~s|Use <a href="#to_existing_atom/1"><code class="inline">to_existing_atom/1</code></a>.|
+
+      assert autolink_deprecated("Use to_existing_atom/1, which is safer", current_module: String) ==
+               ~s|Use <a href="#to_existing_atom/1"><code class="inline">to_existing_atom/1</code></a>, which is safer|
+
+      msg = "Use to_existing_atom/1. May also use to_unsafe_atom/1"
+
+      assert autolink_deprecated(msg, current_module: String) ==
+               ~s|Use <a href="#to_existing_atom/1"><code class="inline">to_existing_atom/1</code></a>. May also use <a href="#to_unsafe_atom/1"><code class="inline">to_unsafe_atom/1</code></a>|
+    end
+
+    test "links remote functions" do
+      ExDoc.Refs.insert([
+        {{:module, Macro}, :public},
+        {{:function, Macro, :struct_info!, 2}, :public},
+        {{:module, Macro.Env}, :public},
+        {{:function, Macro.Env, :lookup, 2}, :public}
+      ])
+
+      msg = "Use Macro.struct_info!/2 instead"
+
+      assert autolink_deprecated(msg, apps: [:elixir]) ==
+               ~s|Use <a href="Macro.html#struct_info!/2"><code class="inline">Macro.struct_info!/2</code></a> instead|
+
+      msg = "Use Macro.Env.lookup/2 instead"
+
+      assert autolink_deprecated(msg, apps: [:elixir]) ==
+               ~s|Use <a href="Macro.Env.html#lookup/2"><code class="inline">Macro.Env.lookup/2</code></a> instead|
+    end
+
+    test "links erlang modules and functions" do
+      assert autolink_deprecated("Use :re.version/0 instead") ==
+               ~s|Use <a href="https://www.erlang.org/doc/apps/stdlib/re.html#version/0"><code class="inline">:re.version/0</code></a> instead|
+    end
+
+    test "links predicate functions ending in ?" do
+      ExDoc.Refs.insert([
+        {{:module, String}, :public},
+        {{:function, String, :valid?, 1}, :public}
+      ])
+
+      assert autolink_deprecated("Use valid?/1 instead", current_module: String) ==
+               ~s|Use <a href="#valid?/1"><code class="inline">valid?/1</code></a> instead|
+    end
+
+    test "does not link matches with surrounding word characters, colons, slashes, dots, or fragments" do
+      ExDoc.Refs.insert([
+        {{:module, String}, :public},
+        {{:function, String, :valid?, 1}, :public}
+      ])
+
+      assert autolink_deprecated("Use not_valid?/1 instead", current_module: String) ==
+               "Use not_valid?/1 instead"
+
+      assert autolink_deprecated("Use ::valid?/1 instead", current_module: String) ==
+               "Use ::valid?/1 instead"
+
+      assert autolink_deprecated("See https://example.com/valid?/1", current_module: String) ==
+               "See https://example.com/valid?/1"
+
+      assert autolink_deprecated("See https://example.com?valid?/1", current_module: String) ==
+               "See https://example.com?valid?/1"
+
+      assert autolink_deprecated("See /path/to/valid?/1", current_module: String) ==
+               "See /path/to/valid?/1"
+
+      assert autolink_deprecated("See conn.valid?/1 instead", current_module: String) ==
+               "See conn.valid?/1 instead"
+
+      assert autolink_deprecated("See valid?/1/2 instead", current_module: String) ==
+               "See valid?/1/2 instead"
+
+      assert autolink_deprecated("See valid?/1#anchor instead", current_module: String) ==
+               "See valid?/1#anchor instead"
+
+      msg = "See https://elixir.hexdocs.pm/String.html#valid?/2"
+      assert autolink_deprecated(msg, current_module: String) == msg
+
+      assert autolink_deprecated("See conn.String.valid?/1 instead", current_module: String) ==
+               "See conn.String.valid?/1 instead"
+    end
+
+    test "does not link bare module names" do
+      ExDoc.Refs.insert([
+        {{:module, MapSet}, :public},
+        {{:module, Macro.Env}, :public}
+      ])
+
+      assert autolink_deprecated("Use MapSet instead", apps: [:elixir]) ==
+               "Use MapSet instead"
+
+      assert autolink_deprecated("Use Macro.Env instead", apps: [:elixir]) ==
+               "Use Macro.Env instead"
+    end
+
+    test "does not warn or raise on undefined or hidden functions" do
+      ExDoc.Refs.insert([
+        {{:module, String}, :public},
+        {{:function, String, :secret_fun, 1}, :hidden}
+      ])
+
+      msg = "Use String.secret_fun/1 or String.does_not_exist/1 instead"
+      assert autolink_deprecated(msg, warnings: :raise, apps: [:elixir]) == msg
+    end
+
+    test "preserves plain text and escapes HTML without linkable targets" do
+      assert autolink_deprecated("Use <.link> instead") == "Use &lt;.link&gt; instead"
+      assert autolink_deprecated("Use something else instead") == "Use something else instead"
+      assert autolink_deprecated("Use unknown_func/1 instead") == "Use unknown_func/1 instead"
+    end
+  end
+
   defmodule Elixir.InMemory do
     @callback hello() :: :world
     def hello(), do: :world
@@ -778,5 +904,10 @@ defmodule ExDoc.Language.ElixirTest do
   defp autolink_spec(spec, options \\ []) do
     config = struct!(ExDoc.Autolink, Keyword.merge(@default_options, options))
     ExDoc.Language.Elixir.autolink_spec(spec, config)
+  end
+
+  defp autolink_deprecated(text, options \\ []) when is_binary(text) do
+    config = struct!(ExDoc.Autolink, Keyword.merge(@default_options, options))
+    ExDoc.Language.Elixir.autolink_deprecated(text, config)
   end
 end

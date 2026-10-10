@@ -478,6 +478,27 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
                ~r{<div class="deprecated">\s*This function is deprecated. Use something else instead.}
     end
 
+    test "autolinks deprecation information", context do
+      content = get_module_template([Deprecated], context)
+
+      assert content =~
+               ~s{<span class="deprecated" title="Use something else instead">deprecated</span>}
+
+      assert content =~
+               ~s{<span class="deprecated" title="Use example_1/0 or String.to_atom/1 instead">deprecated</span>}
+
+      refute content =~ ~s{title="Use <a href}
+
+      assert content =~
+               ~r{<div class="deprecated">\s*This module is deprecated. Use <a href="#example_1/0"><code class="inline">example_1/0</code></a> or <a href="https://elixir.hexdocs.pm/String.html#to_atom/1"><code class="inline">String.to_atom/1</code></a> instead.}
+
+      assert content =~
+               ~r{<div class="deprecated">\s*This function is deprecated. Use something else instead.}
+
+      assert content =~
+               ~r{<div class="deprecated">\s*This function is deprecated. Use <a href="#example_1/0"><code class="inline">example_1/0</code></a> or <a href="https://elixir.hexdocs.pm/String.html#to_atom/1"><code class="inline">String.to_atom/1</code></a> instead.}
+    end
+
     test "outputs the types and function specs", context do
       content = get_module_template([TypesAndSpecs, TypesAndSpecs.Sub], context)
       integer = ~s[<a href="https://elixir.hexdocs.pm/typespecs.html#basic-types">integer</a>()]
