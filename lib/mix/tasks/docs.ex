@@ -298,11 +298,29 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp get_deps do
+    lock = Mix.Dep.Lock.read()
+
     for {key, _} <- Mix.Project.deps_paths(),
         _ = Application.load(key),
         vsn = Application.spec(key, :vsn) do
-      {key, "https://#{String.replace("#{key}", "_", "-")}.hexdocs.pm/#{vsn}/"}
+      {key, dependency_url(key, vsn, lock[key])}
     end
+  end
+
+  defp dependency_url(app, vsn, lock)
+       when is_tuple(lock) and tuple_size(lock) in [7, 8] and elem(lock, 0) == :hex do
+    case {elem(lock, 1), elem(lock, 6)} do
+      {package, "hexpm:" <> organization}
+      when (is_atom(package) or is_binary(package)) and organization != "" ->
+        "https://#{organization}.hexdocs.pm/#{package}/#{vsn}/"
+
+      _ ->
+        dependency_url(app, vsn, nil)
+    end
+  end
+
+  defp dependency_url(app, vsn, _lock) do
+    "https://#{String.replace("#{app}", "_", "-")}.hexdocs.pm/#{vsn}/"
   end
 
   defp put_package(options, config) do

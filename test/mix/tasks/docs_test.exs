@@ -177,6 +177,92 @@ defmodule Mix.Tasks.DocsTest do
              {:earmark_parser, "foo"}
   end
 
+  test "includes private dependency URLs from the project lock", %{tmp_dir: tmp_dir} = context do
+    deps_path = Mix.Project.deps_path()
+
+    File.write!(Path.join(tmp_dir, "mix.exs"), """
+    defmodule PrivateDocsProject do
+      use Mix.Project
+
+      def project do
+        [
+          app: :private_docs,
+          version: "0.1.0",
+          deps_path: #{inspect(deps_path)},
+          deps: [
+            {:earmark_parser, path: #{inspect(Path.join(deps_path, "earmark_parser"))}},
+            {:makeup_elixir, path: #{inspect(Path.join(deps_path, "makeup_elixir"))}},
+            {:missing_docs_app, path: #{inspect(Path.join(deps_path, "earmark_parser"))}, app: false}
+          ]
+        ]
+      end
+    end
+    """)
+
+    lock = %{
+      earmark_parser:
+        {:hex, :private_parser, "0.0.1", "checksum", [:mix], [], "hexpm:my-org", "checksum"},
+      makeup: {:hex, :"private-makeup", "0.0.1", "checksum", [:mix], [], "hexpm:my-org"}
+    }
+
+    File.write!(Path.join(tmp_dir, "mix.lock"), inspect(lock))
+    project = Mix.Project.pop()
+
+    try do
+      Mix.Project.in_project(:private_docs, tmp_dir, fn _ ->
+        try do
+          assert [{_, _, _, options}] = run(context, [], app: :private_docs)
+
+          assert options[:deps][:earmark_parser] ==
+                   "https://my-org.hexdocs.pm/private_parser/#{Application.spec(:earmark_parser, :vsn)}/"
+
+          assert options[:deps][:makeup] ==
+                   "https://my-org.hexdocs.pm/private-makeup/#{Application.spec(:makeup, :vsn)}/"
+
+          refute Keyword.has_key?(options[:deps], :missing_docs_app)
+
+          assert [{_, _, _, options}] =
+                   run(context, [],
+                     app: :private_docs,
+                     docs: [deps: [earmark_parser: "foo", missing_docs_app: "bar"]]
+                   )
+
+          assert options[:deps][:earmark_parser] == "foo"
+          refute Keyword.has_key?(options[:deps], :missing_docs_app)
+
+          for entry <- [
+                nil,
+                {:git, "https://example.com/repo.git", "ref", []},
+                {:hex, :private_parser, "0.0.1"},
+                Tuple.insert_at(lock.earmark_parser, 8, :unknown),
+                put_elem(lock.earmark_parser, 6, "hexpm"),
+                put_elem(lock.earmark_parser, 6, "custom-repo"),
+                put_elem(lock.earmark_parser, 6, nil),
+                put_elem(lock.earmark_parser, 6, "hexpm:")
+              ] do
+            lock =
+              if entry,
+                do: %{lock | earmark_parser: entry},
+                else: Map.delete(lock, :earmark_parser)
+
+            File.write!("mix.lock", inspect(lock))
+
+            assert [{_, _, _, options}] = run(context, [], app: :private_docs)
+
+            assert options[:deps][:earmark_parser] ==
+                     "https://earmark-parser.hexdocs.pm/#{Application.spec(:earmark_parser, :vsn)}/"
+          end
+        after
+          Mix.Project.clear_deps_cache()
+        end
+      end)
+    after
+      :code.purge(PrivateDocsProject)
+      :code.delete(PrivateDocsProject)
+      Mix.Project.push(project.name, project.file)
+    end
+  end
+
   test "accepts lazy docs", context do
     assert [
              {"ex_doc", "dev", _,
