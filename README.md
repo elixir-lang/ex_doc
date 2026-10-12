@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/elixir-lang/ex_doc/workflows/CI/badge.svg)](https://github.com/elixir-lang/ex_doc/actions?query=workflow%3A%22CI%22)
 
-ExDoc is a tool to generate documentation for Erlang and Elixir projects. To see an example, [you can access Elixir's official docs](https://hexdocs.pm/elixir/).
+ExDoc is a tool to generate documentation for Erlang and Elixir projects. To see an example, [you can access Elixir's official docs](https://elixir.hexdocs.pm/).
 
 ## Features
 
@@ -75,7 +75,7 @@ end
 
 Now you are ready to generate your project documentation with `mix docs`. To see all options available, run `mix help docs`.
 
-To learn about how to document your projects, see [Elixir's writing documentation page](https://hexdocs.pm/elixir/writing-documentation.html).
+To learn about how to document your projects, see [Elixir's writing documentation page](https://elixir.hexdocs.pm/writing-documentation.html).
 
 ### Rebar3
 
@@ -154,7 +154,7 @@ You can publish additional pages in your project documentation by configuring th
 
   * Markdown (`.md` extension) - useful for general long-term text. [Learn more](https://daringfireball.net/projects/markdown/syntax).
 
-  * Cheatsheets (`.cheatmd` extension) - useful for discovery and quick reference. [Learn more](https://hexdocs.pm/ex_doc/cheatsheet.html).
+  * Cheatsheets (`.cheatmd` extension) - useful for discovery and quick reference. [Learn more](https://ex-doc.hexdocs.pm/cheatsheet.html).
 
   * Livebooks (`.livemd` extension) - useful for tutorials, interactive examples, and deep dives. [Learn more](https://livebook.dev/).
 
@@ -233,13 +233,13 @@ ExDoc supports linking to modules (`` `MyModule` `` and `` `m:MyModule` ``), fun
 
 You can also use custom text, such as `` [custom text](`MyModule.function/1`) ``. Link to extra pages using the syntax `` [Up and running](Up and running.md) ``. The final link will be automatically converted to `up-and-running.html`.
 
-Link to extra pages in another application using the syntax `` [Writing Documentation](`e:elixir:writing-documentation.html`) ``, skipping the directory in which the page is. The final link will be automatically converted to `https://hexdocs.pm/elixir/writing-documentation.html`.
+Link to extra pages in another application using the syntax `` [Writing Documentation](`e:elixir:writing-documentation.html`) ``, skipping the directory in which the page is. The final link will be automatically converted to `https://elixir.hexdocs.pm/writing-documentation.html`.
 
 It is also possible to place anchors after the module name and extra pages. For example:
 
-  * `` `m:Keyword#module-duplicate-keys-and-ordering` `` will create a link to `https://hexdocs.pm/elixir/Keyword.html#module-duplicate-keys-and-ordering`
+  * `` `m:Keyword#module-duplicate-keys-and-ordering` `` will create a link to `https://elixir.hexdocs.pm/Keyword.html#module-duplicate-keys-and-ordering`
 
-  * `` `e:elixir:syntax-reference.md#expressions` `` will create a link to `https://hexdocs.pm/elixir/syntax-reference.html#expressions`
+  * `` `e:elixir:syntax-reference.md#expressions` `` will create a link to `https://elixir.hexdocs.pm/syntax-reference.html#expressions`
 
 ### Erlang
 
@@ -251,13 +251,13 @@ You can also use custom text, such as `` [custom text](`my_module:function/1`) `
 
 Link to extra pages using the syntax `` [Up and running](Up and running.md) ``. The final link will be automatically converted to `up-and-running.html`.
 
-Link to extra pages in another application using the syntax `` [Using unicode](`e:stdlib:unicode_usage.html`) ``, skipping the directory in which the page is. The final link will be automatically converted to `https://hexdocs.pm/elixir/writing-documentation.html`.
+Link to extra pages in another application using the syntax `` [Using unicode](`e:stdlib:unicode_usage.html`) ``, skipping the directory in which the page is. The final link will be automatically converted to `https://www.erlang.org/doc/apps/stdlib/unicode_usage.html`.
 
 It is also possible to place anchors after the module name and extra pages. For example:
 
-  * `` `m:argparse#quick-start` `` will create a link to `https://erlang.org/doc/man/argparse#quick-start`
+  * `` `m:argparse#module-quick-start` `` will create a link to `https://www.erlang.org/doc/apps/stdlib/argparse.html#module-quick-start`
 
-  * `` `e:stdlib:unicode-usage.md#what-unicode-is` `` will create a link to `https://erlang.org/doc/apps/stdlib/unicode-usage.html#what-unicode-is`
+  * `` `e:stdlib:unicode_usage.md#what-unicode-is` `` will create a link to `https://www.erlang.org/doc/apps/stdlib/unicode_usage.html#what-unicode-is`
 
 <!-- tabs-close -->
 

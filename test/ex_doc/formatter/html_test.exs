@@ -338,15 +338,15 @@ defmodule ExDoc.Formatter.HTMLTest do
         config(context,
           source_beam: "unknown",
           extras: ["test/fixtures/README.md"],
-          canonical: "https://hexdocs.pm/elixir/"
+          canonical: "https://example.com"
         )
 
       generate(config)
       content = File.read!(tmp_dir <> "/html/api-reference.html")
-      assert content =~ ~r{<link rel="canonical" href="https://hexdocs.pm/elixir/}
+      assert content =~ ~r{<link rel="canonical" href="https://example.com/}
 
       content = File.read!(tmp_dir <> "/html/readme.html")
-      assert content =~ ~r{<link rel="canonical" href="https://hexdocs.pm/elixir/}
+      assert content =~ ~r{<link rel="canonical" href="https://example.com/}
     end
 
     test "is not included when canonical is nil", %{tmp_dir: tmp_dir} = context do
