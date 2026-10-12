@@ -98,6 +98,9 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       assert render_doc("[docs](https://hexdocs.pm/ex_doc)") ==
                ~s|<p><a href="https://hexdocs.pm/ex_doc">docs</a></p>|
 
+      assert render_doc("[docs](https://ex-doc.hexdocs.pm)") ==
+               ~s|<p><a href="https://ex-doc.hexdocs.pm">docs</a></p>|
+
       assert render_doc("[elixir](https://elixir-lang.org)") ==
                ~s|<p><a href="https://elixir-lang.org">elixir</a></p>|
 

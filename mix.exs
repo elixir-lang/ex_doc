@@ -67,8 +67,8 @@ defmodule ExDoc.Mixfile do
       files: ~w(CHANGELOG.md Cheatsheet.cheatmd formatters lib LICENSE mix.exs README.md),
       links: %{
         "GitHub" => @source_url,
-        "Changelog" => "https://hexdocs.pm/ex_doc/changelog.html",
-        "Writing documentation" => "https://hexdocs.pm/elixir/writing-documentation.html"
+        "Changelog" => "https://ex-doc.hexdocs.pm/changelog.html",
+        "Writing documentation" => "https://elixir.hexdocs.pm/writing-documentation.html"
       }
     ]
   end
@@ -149,7 +149,7 @@ defmodule ExDoc.Mixfile do
     list_contents =
       Enum.map_intersperse(versions, ", ", fn version ->
         string = Version.to_string(version)
-        ~s[{"version":"v#{string}", "url":"https://hexdocs.pm/ex_doc/#{string}"}]
+        ~s[{"version":"v#{string}", "url":"https://ex-doc.hexdocs.pm/#{string}"}]
       end)
 
     File.write!("doc/docs_config.js", """
