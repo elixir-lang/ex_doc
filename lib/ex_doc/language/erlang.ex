@@ -203,10 +203,6 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
-  def autolink_spec(nil, _opts) do
-    nil
-  end
-
   def autolink_spec(ast, %Autolink{} = config) do
     {name, anno, quoted} =
       case ast do
