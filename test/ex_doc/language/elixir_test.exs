@@ -472,45 +472,52 @@ defmodule ExDoc.Language.ElixirTest do
   describe "autolink_deprecated/2" do
     test "links local functions" do
       ExDoc.Refs.insert([
-        {{:module, String}, :public},
-        {{:function, String, :to_existing_atom, 1}, :public},
-        {{:function, String, :to_unsafe_atom, 1}, :public}
+        {{:module, AutolinkTest.Local}, :public},
+        {{:function, AutolinkTest.Local, :to_existing_atom, 1}, :public},
+        {{:function, AutolinkTest.Local, :to_unsafe_atom, 1}, :public}
       ])
 
       msg = "Use to_existing_atom/1 or to_unsafe_atom/1 instead"
 
-      assert autolink_deprecated(msg, current_module: String) ==
+      assert autolink_deprecated(msg, current_module: AutolinkTest.Local) ==
                ~s|Use <a href="#to_existing_atom/1"><code class="inline">to_existing_atom/1</code></a> or <a href="#to_unsafe_atom/1"><code class="inline">to_unsafe_atom/1</code></a> instead|
 
-      assert autolink_deprecated("Use to_existing_atom/1.", current_module: String) ==
+      assert autolink_deprecated("Use to_existing_atom/1.", current_module: AutolinkTest.Local) ==
                ~s|Use <a href="#to_existing_atom/1"><code class="inline">to_existing_atom/1</code></a>.|
 
-      assert autolink_deprecated("Use to_existing_atom/1, which is safer", current_module: String) ==
+      msg = "to_existing_atom/1 is safer"
+
+      assert autolink_deprecated(msg, current_module: AutolinkTest.Local) ==
+               ~s|<a href="#to_existing_atom/1"><code class="inline">to_existing_atom/1</code></a> is safer|
+
+      msg = "Use to_existing_atom/1, which is safer"
+
+      assert autolink_deprecated(msg, current_module: AutolinkTest.Local) ==
                ~s|Use <a href="#to_existing_atom/1"><code class="inline">to_existing_atom/1</code></a>, which is safer|
 
       msg = "Use to_existing_atom/1. May also use to_unsafe_atom/1"
 
-      assert autolink_deprecated(msg, current_module: String) ==
+      assert autolink_deprecated(msg, current_module: AutolinkTest.Local) ==
                ~s|Use <a href="#to_existing_atom/1"><code class="inline">to_existing_atom/1</code></a>. May also use <a href="#to_unsafe_atom/1"><code class="inline">to_unsafe_atom/1</code></a>|
     end
 
     test "links remote functions" do
       ExDoc.Refs.insert([
-        {{:module, Macro}, :public},
-        {{:function, Macro, :struct_info!, 2}, :public},
-        {{:module, Macro.Env}, :public},
-        {{:function, Macro.Env, :lookup, 2}, :public}
+        {{:module, AutolinkTest.Remote}, :public},
+        {{:function, AutolinkTest.Remote, :bar, 2}, :public},
+        {{:module, AutolinkTest.Remote.Sub}, :public},
+        {{:function, AutolinkTest.Remote.Sub, :lookup, 2}, :public}
       ])
 
-      msg = "Use Macro.struct_info!/2 instead"
+      msg = "Use AutolinkTest.Remote.bar/2 instead"
 
-      assert autolink_deprecated(msg, apps: [:elixir]) ==
-               ~s|Use <a href="Macro.html#struct_info!/2"><code class="inline">Macro.struct_info!/2</code></a> instead|
+      assert autolink_deprecated(msg) ==
+               ~s|Use <a href="AutolinkTest.Remote.html#bar/2"><code class="inline">AutolinkTest.Remote.bar/2</code></a> instead|
 
-      msg = "Use Macro.Env.lookup/2 instead"
+      msg = "Use AutolinkTest.Remote.Sub.lookup/2 instead"
 
-      assert autolink_deprecated(msg, apps: [:elixir]) ==
-               ~s|Use <a href="Macro.Env.html#lookup/2"><code class="inline">Macro.Env.lookup/2</code></a> instead|
+      assert autolink_deprecated(msg) ==
+               ~s|Use <a href="AutolinkTest.Remote.Sub.html#lookup/2"><code class="inline">AutolinkTest.Remote.Sub.lookup/2</code></a> instead|
     end
 
     test "links erlang modules and functions" do
@@ -518,74 +525,81 @@ defmodule ExDoc.Language.ElixirTest do
                ~s|Use <a href="https://www.erlang.org/doc/apps/stdlib/re.html#version/0"><code class="inline">:re.version/0</code></a> instead|
     end
 
-    test "links predicate functions ending in ?" do
+    test "links predicate and bang functions ending in ? or !" do
       ExDoc.Refs.insert([
-        {{:module, String}, :public},
-        {{:function, String, :valid?, 1}, :public}
+        {{:module, AutolinkTest.Pred}, :public},
+        {{:function, AutolinkTest.Pred, :valid?, 1}, :public},
+        {{:function, AutolinkTest.Pred, :action!, 1}, :public}
       ])
 
-      assert autolink_deprecated("Use valid?/1 instead", current_module: String) ==
+      assert autolink_deprecated("Use valid?/1 instead", current_module: AutolinkTest.Pred) ==
                ~s|Use <a href="#valid?/1"><code class="inline">valid?/1</code></a> instead|
+
+      assert autolink_deprecated("Use action!/1 instead", current_module: AutolinkTest.Pred) ==
+               ~s|Use <a href="#action!/1"><code class="inline">action!/1</code></a> instead|
     end
 
     test "does not link matches with surrounding word characters, colons, slashes, dots, or fragments" do
       ExDoc.Refs.insert([
-        {{:module, String}, :public},
-        {{:function, String, :valid?, 1}, :public}
+        {{:module, AutolinkTest.Edge}, :public},
+        {{:function, AutolinkTest.Edge, :valid?, 1}, :public}
       ])
 
-      assert autolink_deprecated("Use not_valid?/1 instead", current_module: String) ==
+      assert autolink_deprecated("Use not_valid?/1 instead", current_module: AutolinkTest.Edge) ==
                "Use not_valid?/1 instead"
 
-      assert autolink_deprecated("Use ::valid?/1 instead", current_module: String) ==
+      assert autolink_deprecated("Use !valid?/1 instead", current_module: AutolinkTest.Edge) ==
+               "Use !valid?/1 instead"
+
+      assert autolink_deprecated("Use ::valid?/1 instead", current_module: AutolinkTest.Edge) ==
                "Use ::valid?/1 instead"
 
-      assert autolink_deprecated("See https://example.com/valid?/1", current_module: String) ==
-               "See https://example.com/valid?/1"
+      msg = "See https://example.com/valid?/1"
+      assert autolink_deprecated(msg, current_module: AutolinkTest.Edge) == msg
 
-      assert autolink_deprecated("See https://example.com?valid?/1", current_module: String) ==
-               "See https://example.com?valid?/1"
+      msg = "See https://example.com?valid?/1"
+      assert autolink_deprecated(msg, current_module: AutolinkTest.Edge) == msg
 
-      assert autolink_deprecated("See /path/to/valid?/1", current_module: String) ==
+      msg = "See https://example.com#valid?/1"
+      assert autolink_deprecated(msg, current_module: AutolinkTest.Edge) == msg
+
+      assert autolink_deprecated("See /path/to/valid?/1", current_module: AutolinkTest.Edge) ==
                "See /path/to/valid?/1"
 
-      assert autolink_deprecated("See conn.valid?/1 instead", current_module: String) ==
+      assert autolink_deprecated("See conn.valid?/1 instead", current_module: AutolinkTest.Edge) ==
                "See conn.valid?/1 instead"
 
-      assert autolink_deprecated("See valid?/1/2 instead", current_module: String) ==
+      assert autolink_deprecated("See valid?/1/2 instead", current_module: AutolinkTest.Edge) ==
                "See valid?/1/2 instead"
 
-      assert autolink_deprecated("See valid?/1#anchor instead", current_module: String) ==
+      assert autolink_deprecated("See valid?/1#anchor instead", current_module: AutolinkTest.Edge) ==
                "See valid?/1#anchor instead"
 
-      msg = "See https://elixir.hexdocs.pm/String.html#valid?/2"
-      assert autolink_deprecated(msg, current_module: String) == msg
-
-      assert autolink_deprecated("See conn.String.valid?/1 instead", current_module: String) ==
-               "See conn.String.valid?/1 instead"
+      msg = "See conn.AutolinkTest.Edge.valid?/1 instead"
+      assert autolink_deprecated(msg, current_module: AutolinkTest.Edge) == msg
     end
 
     test "does not link bare module names" do
       ExDoc.Refs.insert([
-        {{:module, MapSet}, :public},
-        {{:module, Macro.Env}, :public}
+        {{:module, AutolinkTestBare}, :public},
+        {{:module, AutolinkTest.Nested}, :public}
       ])
 
-      assert autolink_deprecated("Use MapSet instead", apps: [:elixir]) ==
-               "Use MapSet instead"
+      assert autolink_deprecated("Use AutolinkTestBare instead") ==
+               "Use AutolinkTestBare instead"
 
-      assert autolink_deprecated("Use Macro.Env instead", apps: [:elixir]) ==
-               "Use Macro.Env instead"
+      assert autolink_deprecated("Use AutolinkTest.Nested instead") ==
+               "Use AutolinkTest.Nested instead"
     end
 
     test "does not warn or raise on undefined or hidden functions" do
       ExDoc.Refs.insert([
-        {{:module, String}, :public},
-        {{:function, String, :secret_fun, 1}, :hidden}
+        {{:module, AutolinkTest.Undef}, :public},
+        {{:function, AutolinkTest.Undef, :secret_fun, 1}, :hidden}
       ])
 
-      msg = "Use String.secret_fun/1 or String.does_not_exist/1 instead"
-      assert autolink_deprecated(msg, warnings: :raise, apps: [:elixir]) == msg
+      msg = "Use AutolinkTest.Undef.secret_fun/1 or AutolinkTest.Undef.does_not_exist/1 instead"
+      assert autolink_deprecated(msg, warnings: :raise) == msg
     end
 
     test "preserves plain text and escapes HTML without linkable targets" do
