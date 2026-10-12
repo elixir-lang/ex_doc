@@ -5,7 +5,7 @@
     <select>
       {{#each nodes}}
         <option translate="no" value="{{url}}"{{#if isCurrentVersion}} selected disabled{{/if}}>
-          {{version}}
+          {{version}}{{#if retired}} (retired){{/if}}
         </option>
       {{/each}}
     </select>
