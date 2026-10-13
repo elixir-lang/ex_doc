@@ -489,6 +489,8 @@ defmodule ExDoc do
     * `versionNodes` - an array of `{"version":"vNUMBER", "url":url}` listing
       all documented versions and their URLs. ExDoc will automatically match
       the version of the package with the one in the array to mark as current.
+      Nodes may also include `"latest": true` to mark the latest version and
+      `"retired": true` to mark retired versions.
   """
   @ex_doc_version Mix.Project.config()[:version]
 
