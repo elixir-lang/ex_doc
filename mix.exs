@@ -149,7 +149,9 @@ defmodule ExDoc.Mixfile do
     list_contents =
       Enum.map_intersperse(versions, ", ", fn version ->
         string = Version.to_string(version)
-        ~s[{"version":"v#{string}", "url":"https://ex-doc.hexdocs.pm/#{string}"}]
+        retired = string in ~w(0.17.0 0.18.0)
+
+        ~s[{"version":"v#{string}","url":"https://ex-doc.hexdocs.pm/#{string}","retired":#{retired}}]
       end)
 
     File.write!("doc/docs_config.js", """
