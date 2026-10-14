@@ -312,7 +312,7 @@ defmodule Mix.Tasks.Docs do
     case {elem(lock, 1), elem(lock, 6)} do
       {package, "hexpm:" <> organization}
       when (is_atom(package) or is_binary(package)) and organization != "" ->
-        "https://#{organization}.hexdocs.pm/#{package}/#{vsn}/"
+        "https://#{organization}.hexorgs.pm/#{package}/#{vsn}/"
 
       _ ->
         dependency_url(app, vsn, nil)
