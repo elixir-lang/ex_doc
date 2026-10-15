@@ -21,9 +21,9 @@
     <% end %>
   </div>
 
-  <%= if deprecated = module.deprecated do %>
+  <%= if deprecated = module.deprecated_doc do %>
     <div class="deprecated">
-      This <%= module.type %> is deprecated. <%= h(deprecated) %>.
+      This <%= module.type %> is deprecated. <%= deprecated %>.
     </div>
   <% end %>
 
