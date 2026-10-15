@@ -177,19 +177,29 @@ defmodule Mix.Tasks.DocsTest do
              {:earmark_parser, "foo"}
   end
 
-  test "includes private dependency URLs from the project lock", %{tmp_dir: tmp_dir} = context do
-    lock = %{
-      earmark_parser:
-        {:hex, :private_parser, "0.0.1", "checksum", [:mix], [], "hexpm:my-org", "checksum"},
-      makeup: {:hex, :"private-makeup", "0.0.1", "checksum", [:mix], [], "hexpm:my-org"}
-    }
+  test "includes private dependency URLs from cached deps", context do
+    cache_key = {:cached_deps, Mix.Project.get()}
+    deps = Mix.Dep.cached()
+    previous = Mix.State.read_cache(cache_key)
 
-    lockfile = Path.join(tmp_dir, "mix.lock")
-    File.write!(lockfile, inspect(lock))
-    previous_lockfile = Mix.Project.config()[:lockfile]
-    Mix.ProjectStack.merge_config(lockfile: lockfile)
+    put_deps = fn updates ->
+      updated =
+        Enum.map(deps, fn %Mix.Dep{app: app, opts: opts} = dep ->
+          case updates[app] do
+            {scm, extra} -> %{dep | scm: scm, opts: Keyword.merge(opts, extra)}
+            nil -> dep
+          end
+        end)
+
+      Mix.State.write_cache(cache_key, {{Mix.env(), Mix.target()}, updated})
+    end
 
     try do
+      put_deps.(%{
+        earmark_parser: {Hex.SCM, hex: "private_parser", repo: "hexpm:my-org"},
+        makeup: {Hex.SCM, hex: "private-makeup", repo: "hexpm:my-org"}
+      })
+
       assert [{_, _, _, options}] = run(context, [], app: :ex_doc)
 
       assert options[:deps][:earmark_parser] ==
@@ -209,22 +219,14 @@ defmodule Mix.Tasks.DocsTest do
       assert options[:deps][:earmark_parser] == "foo"
       refute Keyword.has_key?(options[:deps], :missing_docs_app)
 
-      for entry <- [
-            nil,
-            {:git, "https://example.com/repo.git", "ref", []},
-            {:hex, :private_parser, "0.0.1"},
-            Tuple.insert_at(lock.earmark_parser, 8, :unknown),
-            put_elem(lock.earmark_parser, 6, "hexpm"),
-            put_elem(lock.earmark_parser, 6, "custom-repo"),
-            put_elem(lock.earmark_parser, 6, nil),
-            put_elem(lock.earmark_parser, 6, "hexpm:")
+      for update <- [
+            {Hex.SCM, hex: "private_parser", repo: "hexpm"},
+            {Hex.SCM, hex: "private_parser", repo: "custom-repo"},
+            {Hex.SCM, hex: "private_parser", repo: "hexpm:"},
+            {Hex.SCM, hex: "private_parser", repo: nil},
+            {Mix.SCM.Git, hex: "private_parser", repo: "hexpm:my-org"}
           ] do
-        lock =
-          if entry,
-            do: %{lock | earmark_parser: entry},
-            else: Map.delete(lock, :earmark_parser)
-
-        File.write!(lockfile, inspect(lock))
+        put_deps.(%{earmark_parser: update})
 
         assert [{_, _, _, options}] = run(context, [], app: :ex_doc)
 
@@ -232,7 +234,11 @@ defmodule Mix.Tasks.DocsTest do
                  "https://earmark-parser.hexdocs.pm/#{Application.spec(:earmark_parser, :vsn)}/"
       end
     after
-      Mix.ProjectStack.merge_config(lockfile: previous_lockfile)
+      if previous do
+        Mix.State.write_cache(cache_key, previous)
+      else
+        Mix.State.delete_cache(cache_key)
+      end
     end
   end
 

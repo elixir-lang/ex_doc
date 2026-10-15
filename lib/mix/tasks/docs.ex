@@ -298,28 +298,29 @@ defmodule Mix.Tasks.Docs do
   end
 
   defp get_deps do
-    lock = Mix.Dep.Lock.read()
+    private_deps = private_hex_deps()
 
-    for {key, _} <- Mix.Project.deps_paths(),
-        _ = Application.load(key),
-        vsn = Application.spec(key, :vsn) do
-      {key, dependency_url(key, vsn, lock[key])}
+    for {app, _} <- Mix.Project.deps_paths(),
+        _ = Application.load(app),
+        vsn = Application.spec(app, :vsn) do
+      {app, dependency_url(app, vsn, private_deps[app])}
     end
   end
 
-  defp dependency_url(app, vsn, lock)
-       when is_tuple(lock) and tuple_size(lock) in [7, 8] and elem(lock, 0) == :hex do
-    case {elem(lock, 1), elem(lock, 6)} do
-      {package, "hexpm:" <> organization}
-      when (is_atom(package) or is_binary(package)) and organization != "" ->
-        "https://#{organization}.hexorgs.pm/#{package}/#{vsn}/"
-
-      _ ->
-        dependency_url(app, vsn, nil)
-    end
+  defp private_hex_deps do
+    for %Mix.Dep{app: app, scm: Hex.SCM, opts: opts} <- Mix.Dep.cached(),
+        package = opts[:hex] || app,
+        "hexpm:" <> organization <- [opts[:repo]],
+        organization != "",
+        into: %{},
+        do: {app, {package, organization}}
   end
 
-  defp dependency_url(app, vsn, _lock) do
+  defp dependency_url(_app, vsn, {package, organization}) do
+    "https://#{organization}.hexorgs.pm/#{package}/#{vsn}/"
+  end
+
+  defp dependency_url(app, vsn, _dep) do
     "https://#{String.replace("#{app}", "_", "-")}.hexdocs.pm/#{vsn}/"
   end
 
