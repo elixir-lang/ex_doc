@@ -178,67 +178,59 @@ defmodule Mix.Tasks.DocsTest do
   end
 
   test "includes private dependency URLs from cached deps", context do
-    cache_key = {:cached_deps, Mix.Project.get()}
-    deps = Mix.Dep.cached()
-    previous = Mix.State.read_cache(cache_key)
-
-    put_deps = fn updates ->
-      updated =
+    deps_transform = fn updates ->
+      fn deps ->
         Enum.map(deps, fn %Mix.Dep{app: app, opts: opts} = dep ->
           case updates[app] do
             {scm, extra} -> %{dep | scm: scm, opts: Keyword.merge(opts, extra)}
             nil -> dep
           end
         end)
-
-      Mix.State.write_cache(cache_key, {{Mix.env(), Mix.target()}, updated})
+      end
     end
 
-    try do
-      put_deps.(%{
+    private_deps =
+      deps_transform.(%{
         earmark_parser: {Hex.SCM, hex: "private_parser", repo: "hexpm:my-org"},
         makeup: {Hex.SCM, hex: "private-makeup", repo: "hexpm:my-org"}
       })
 
-      assert [{_, _, _, options}] = run(context, [], app: :ex_doc)
+    assert [{_, _, _, options}] =
+             run(context, [], app: :ex_doc, deps_transform: private_deps)
 
-      assert options[:deps][:earmark_parser] ==
-               "https://my-org.hexorgs.pm/private_parser/#{Application.spec(:earmark_parser, :vsn)}/"
+    assert options[:deps][:earmark_parser] ==
+             "https://my-org.hexorgs.pm/private_parser/#{Application.spec(:earmark_parser, :vsn)}/"
 
-      assert options[:deps][:makeup] ==
-               "https://my-org.hexorgs.pm/private-makeup/#{Application.spec(:makeup, :vsn)}/"
+    assert options[:deps][:makeup] ==
+             "https://my-org.hexorgs.pm/private-makeup/#{Application.spec(:makeup, :vsn)}/"
 
-      refute Keyword.has_key?(options[:deps], :missing_docs_app)
+    refute Keyword.has_key?(options[:deps], :missing_docs_app)
 
+    assert [{_, _, _, options}] =
+             run(context, [],
+               app: :ex_doc,
+               deps_transform: private_deps,
+               docs: [deps: [earmark_parser: "foo", missing_docs_app: "bar"]]
+             )
+
+    assert options[:deps][:earmark_parser] == "foo"
+    refute Keyword.has_key?(options[:deps], :missing_docs_app)
+
+    for update <- [
+          {Hex.SCM, hex: "private_parser", repo: "hexpm"},
+          {Hex.SCM, hex: "private_parser", repo: "custom-repo"},
+          {Hex.SCM, hex: "private_parser", repo: "hexpm:"},
+          {Hex.SCM, hex: "private_parser", repo: nil},
+          {Mix.SCM.Git, hex: "private_parser", repo: "hexpm:my-org"}
+        ] do
       assert [{_, _, _, options}] =
                run(context, [],
                  app: :ex_doc,
-                 docs: [deps: [earmark_parser: "foo", missing_docs_app: "bar"]]
+                 deps_transform: deps_transform.(%{earmark_parser: update})
                )
 
-      assert options[:deps][:earmark_parser] == "foo"
-      refute Keyword.has_key?(options[:deps], :missing_docs_app)
-
-      for update <- [
-            {Hex.SCM, hex: "private_parser", repo: "hexpm"},
-            {Hex.SCM, hex: "private_parser", repo: "custom-repo"},
-            {Hex.SCM, hex: "private_parser", repo: "hexpm:"},
-            {Hex.SCM, hex: "private_parser", repo: nil},
-            {Mix.SCM.Git, hex: "private_parser", repo: "hexpm:my-org"}
-          ] do
-        put_deps.(%{earmark_parser: update})
-
-        assert [{_, _, _, options}] = run(context, [], app: :ex_doc)
-
-        assert options[:deps][:earmark_parser] ==
-                 "https://earmark-parser.hexdocs.pm/#{Application.spec(:earmark_parser, :vsn)}/"
-      end
-    after
-      if previous do
-        Mix.State.write_cache(cache_key, previous)
-      else
-        Mix.State.delete_cache(cache_key)
-      end
+      assert options[:deps][:earmark_parser] ==
+               "https://earmark-parser.hexdocs.pm/#{Application.spec(:earmark_parser, :vsn)}/"
     end
   end
 

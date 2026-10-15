@@ -139,7 +139,7 @@ defmodule Mix.Tasks.Docs do
       |> normalize_description(config)
       |> normalize_apps(config)
       |> normalize_main()
-      |> normalize_deps()
+      |> normalize_deps(config)
       |> normalize_formatters()
       |> put_package(config)
 
@@ -285,11 +285,11 @@ defmodule Mix.Tasks.Docs do
     end
   end
 
-  defp normalize_deps(options) do
+  defp normalize_deps(options, config) do
     user_deps = Keyword.get(options, :deps, [])
 
     deps =
-      for {app, doc} <- Keyword.merge(get_deps(), user_deps),
+      for {app, doc} <- Keyword.merge(get_deps(config), user_deps),
           lib_dir = :code.lib_dir(app),
           is_list(lib_dir),
           do: {app, doc}
@@ -297,8 +297,9 @@ defmodule Mix.Tasks.Docs do
     Keyword.put(options, :deps, deps)
   end
 
-  defp get_deps do
-    private_deps = private_hex_deps()
+  defp get_deps(config) do
+    deps_transform = Keyword.get(config, :deps_transform, &Function.identity/1)
+    private_deps = private_hex_deps(deps_transform.(Mix.Dep.cached()))
 
     for {app, _} <- Mix.Project.deps_paths(),
         _ = Application.load(app),
@@ -307,8 +308,8 @@ defmodule Mix.Tasks.Docs do
     end
   end
 
-  defp private_hex_deps do
-    for %Mix.Dep{app: app, scm: Hex.SCM, opts: opts} <- Mix.Dep.cached(),
+  defp private_hex_deps(deps) do
+    for %Mix.Dep{app: app, scm: Hex.SCM, opts: opts} <- deps,
         package = opts[:hex] || app,
         "hexpm:" <> organization <- [opts[:repo]],
         organization != "",
