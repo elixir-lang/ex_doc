@@ -375,6 +375,57 @@ defmodule ExDoc.Language.Elixir do
     walk_doc(ast, config)
   end
 
+  # Autolinks references within deprecation messages.
+  #
+  # Unlike docstrings which are parsed as Markdown AST and require references in backticks (e.g. `foo/1`),
+  # deprecation messages are arbitrary plain-text strings (e.g. `@deprecated "Use foo/1 instead"`).
+  #
+  # Supported patterns:
+  #   * Local functions/macros: `name/arity` (e.g. `to_existing_atom/1`)
+  #   * Remote Elixir functions/macros: `Module.name/arity` (e.g. `String.to_existing_atom/1`)
+  #   * Remote Erlang functions: `:module.name/arity` (e.g. `:re.version/0`)
+  #
+  # Patterns supported in `autolink_doc` but intentionally omitted here:
+  #   * Module names (e.g. `MapSet`, `Macro.Env`): omitted to avoid false positives in plain text
+  #   * Prefixed references (e.g. `m:Module`, `t:Mod.type/0`, `c:Mod.callback/1`): not common in deprecation messages
+  @impl true
+  def autolink_deprecated(message, %Autolink{} = config) do
+    config = %{
+      config
+      | force_module_prefix: false,
+        skip_undefined_reference_warnings_on: fn _ -> true end
+    }
+
+    regex = ~r{
+      (?<=\A|\s)                                         # Preceded by start of string or whitespace
+      (                                                  # <reference>
+        (?:
+          (?:
+            :[a-z][_a-zA-Z0-9]*                          # Erlang module (e.g. :re)
+          |
+            [A-Z][_a-zA-Z0-9]*(?:\.[A-Z][_a-zA-Z0-9]*)*  # Elixir module (e.g. String or Macro.Env)
+          )
+          \.                                             # Dot operator
+        )?
+        [a-z_][_a-zA-Z0-9]*[!?]?                         # Function/macro name
+        /\d+                                             # /arity
+      )                                                  # </reference>
+      (?=[\s,.]|\z)                                      # Followed by whitespace, comma, period, or end of string
+    }x
+
+    escaped = ExDoc.Utils.h(message)
+
+    Regex.replace(regex, escaped, fn _all, ref ->
+      case Autolink.url(ref, :regular_link, config) do
+        url when is_binary(url) ->
+          ~s|<a href="#{url}"><code class="inline">#{ref}</code></a>|
+
+        _ ->
+          ref
+      end
+    end)
+  end
+
   @impl true
   def format_spec(ast) do
     ast

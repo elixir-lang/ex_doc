@@ -877,6 +877,18 @@ defmodule ExDoc.Language.ErlangTest do
     end
   end
 
+  describe "autolink_deprecated/2" do
+    test "escapes HTML entities" do
+      assert autolink_deprecated("Use <other> & \"bar\"") ==
+               "Use &lt;other&gt; &amp; &quot;bar&quot;"
+    end
+
+    test "passes through plain text without autolinking" do
+      assert autolink_deprecated("Use foo/0 instead") ==
+               "Use foo/0 instead"
+    end
+  end
+
   defp autolink_spec(binary, _c, opts \\ []) when is_binary(binary) do
     config =
       opts
@@ -948,6 +960,15 @@ defmodule ExDoc.Language.ErlangTest do
     doc
     |> ExDoc.Language.Erlang.autolink_doc(config)
     |> ExDoc.DocAST.to_html()
+  end
+
+  defp autolink_deprecated(text, opts \\ []) when is_binary(text) do
+    config =
+      opts
+      |> Keyword.put(:language, ExDoc.Language.Erlang)
+      |> then(&struct!(ExDoc.Autolink, &1))
+
+    ExDoc.Language.Erlang.autolink_deprecated(text, config)
   end
 
   defp warn(fun, md \\ []) when is_function(fun, 0) do
