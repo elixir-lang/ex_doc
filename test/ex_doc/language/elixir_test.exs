@@ -4,6 +4,11 @@ defmodule ExDoc.Language.ElixirTest do
   doctest ExDoc.Autolink
 
   describe "autolink_doc/2" do
+    test "adjacent code and module links" do
+      assert autolink_doc("`%{` `String` `}`") ==
+               ~s|<code class="inline">%{ <a href="https://elixir.hexdocs.pm/String.html">String</a> }</code>|
+    end
+
     test "elixir stdlib module" do
       assert autolink_doc("`String`") ==
                ~s|<a href="https://elixir.hexdocs.pm/String.html"><code class="inline">String</code></a>|
