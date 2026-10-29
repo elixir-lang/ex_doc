@@ -48,6 +48,7 @@ defmodule TestHelper do
   end
 
   def erlc(context, module, code, opts \\ []) do
+    false = Map.get(context, :async, false)
     dir = context.tmp_dir
 
     docs = Keyword.get(opts, :docs, true)
@@ -73,6 +74,7 @@ defmodule TestHelper do
 
     true = Code.prepend_path(ebin_dir)
     {:module, ^module} = :code.load_file(module)
+    ExDoc.Refs.clear()
 
     ExUnit.Callbacks.on_exit(fn ->
       :code.purge(module)

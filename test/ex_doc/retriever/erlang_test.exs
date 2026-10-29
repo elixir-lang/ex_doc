@@ -1,5 +1,5 @@
 defmodule ExDoc.Retriever.ErlangTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   alias ExDoc.{Retriever, DocAST, Language.Erlang, DocGroupNode}
   import TestHelper
 
