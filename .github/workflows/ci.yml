@@ -65,7 +65,7 @@ jobs:
           file_pattern: formatters
 
   elixir:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -73,17 +73,22 @@ jobs:
           # Test very old Elixir and Erlang
           - elixir: "1.15"
             otp: "25"
+            os: ubuntu-24.04
           # Test Erlang without -doc attribute support
           - elixir: "1.16"
             otp: "26"
+            os: ubuntu-24.04
           # Test with initial Erlang doc attribute support
           - elixir: "1.17"
             otp: "27"
+            os: ubuntu-latest
           - elixir: "1.18"
             otp: "27"
+            os: ubuntu-latest
           # Test with latest Elixir and Erlang versions
           - elixir: "1.19"
             otp: "29"
+            os: ubuntu-latest
             lint: true
     steps:
       - uses: actions/checkout@v3
