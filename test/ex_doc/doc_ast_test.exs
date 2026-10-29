@@ -160,6 +160,63 @@ defmodule ExDoc.DocASTTest do
     end
   end
 
+  describe "merge_code_segments/1" do
+    test "merges adjacent code and linked-code nodes" do
+      ast = [
+        {:code, [class: "inline"], ["{"], %{line: 1}},
+        " ",
+        {:a, [href: "#type"], [{:code, [class: "inline"], ["type()"], %{}}], %{}},
+        " ",
+        {:code, [class: "inline"], ["}"], %{}}
+      ]
+
+      assert DocAST.merge_code_segments(ast) ==
+               [
+                 {:code, [class: "inline"],
+                  ["{", " ", {:a, [href: "#type"], ["type()"], %{}}, " ", "}"], %{line: 1}}
+               ]
+    end
+
+    test "merges code nodes separated by whitespace and keeps code blocks unchanged" do
+      code = {:code, [], ["foo"], %{}}
+
+      assert DocAST.merge_code_segments([code, " ", code]) ==
+               [{:code, [], ["foo", " ", "foo"], %{}}]
+
+      assert DocAST.merge_code_segments([code, "\n", code]) == [code, "\n", code]
+
+      assert DocAST.merge_code_segments([code, " and ", code]) == [code, " and ", code]
+
+      assert DocAST.merge_code_segments({:pre, [], [code, code], %{}}) ==
+               {:pre, [], [code, code], %{}}
+    end
+
+    test "preserves attributes and stops at conflicts" do
+      left = {:code, [class: "inline"], ["foo"], %{}}
+      right = {:code, [class: "inline", id: "bar"], ["bar"], %{}}
+      conflict = {:code, [class: "other"], ["baz"], %{}}
+
+      assert DocAST.merge_code_segments([left, right, conflict]) ==
+               [
+                 {:code, [class: "inline", id: "bar"], ["foo", "bar"], %{}},
+                 conflict
+               ]
+    end
+
+    test "preserves spacing after an assignment operator" do
+      ast = [
+        {:code, [class: "inline"], ["level ="], %{}},
+        {:a, [href: "#level"], [{:code, [class: "inline"], ["logger:level/0"], %{}}], %{}}
+      ]
+
+      assert DocAST.merge_code_segments(ast) ==
+               [
+                 {:code, [class: "inline"],
+                  ["level =", " ", {:a, [href: "#level"], ["logger:level/0"], %{}}], %{}}
+               ]
+    end
+  end
+
   describe "headers" do
     test "adds and extracts anchored headers" do
       assert """

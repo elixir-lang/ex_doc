@@ -4,7 +4,7 @@ defmodule ExDoc.Language.Erlang do
   @behaviour ExDoc.Language
 
   alias ExDoc.Language.Source
-  alias ExDoc.{Autolink, Refs}
+  alias ExDoc.{Autolink, DocAST, Refs}
 
   @impl true
   @spec module_data(atom, any, any) ::
@@ -199,7 +199,10 @@ defmodule ExDoc.Language.Erlang do
     true = config.language == __MODULE__
 
     config = %{config | force_module_prefix: true}
-    walk_doc(ast, config)
+
+    ast
+    |> walk_doc(config)
+    |> DocAST.merge_code_segments()
   end
 
   @impl true

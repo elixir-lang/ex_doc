@@ -150,6 +150,18 @@ defmodule ExDoc.Language.ErlangTest do
                ~s|<a href="https://www.erlang.org/doc/apps/stdlib/array.html#t:array/0"><code>array:array()</code></a>|
     end
 
+    test "adjacent code and type links" do
+      ast = [
+        {:code, [], ["{"], %{}},
+        {:a, [href: "#integer()", rel: "https://erlang.org/doc/link/seetype"],
+         [{:code, [], ["integer()"], %{}}], %{}},
+        {:code, [], ["}"], %{}}
+      ]
+
+      assert autolink(ast) ==
+               ~s|<code>{<a href="https://www.erlang.org/doc/apps/erts/erlang.html#t:integer/0">integer()</a>}</code>|
+    end
+
     @myList (if :erlang.system_info(:otp_release) >= ~c"27" do
                "t:myList/0"
              else

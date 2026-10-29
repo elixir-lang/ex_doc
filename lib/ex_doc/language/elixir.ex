@@ -3,7 +3,7 @@ defmodule ExDoc.Language.Elixir do
 
   @behaviour ExDoc.Language
 
-  alias ExDoc.Autolink
+  alias ExDoc.{Autolink, DocAST}
   alias ExDoc.Language.Source
 
   @impl true
@@ -372,7 +372,10 @@ defmodule ExDoc.Language.Elixir do
     true = config.language == __MODULE__
 
     config = %{config | force_module_prefix: false}
-    walk_doc(ast, config)
+
+    ast
+    |> walk_doc(config)
+    |> DocAST.merge_code_segments()
   end
 
   @impl true

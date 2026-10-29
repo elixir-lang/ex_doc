@@ -187,6 +187,70 @@ defmodule ExDoc.DocAST do
   end
 
   @doc """
+  Merges adjacent inline code and linked-code nodes into one code node.
+  """
+  def merge_code_segments(ast) when is_list(ast) do
+    ast
+    |> Enum.map(&merge_code_segments/1)
+    |> Enum.reduce([], &merge_code_segment/2)
+    |> Enum.reverse()
+  end
+
+  def merge_code_segments({:pre, _, _, _} = ast), do: ast
+
+  def merge_code_segments({tag, attrs, inner, meta}) do
+    {tag, attrs, merge_code_segments(inner), meta}
+  end
+
+  def merge_code_segments(ast), do: ast
+
+  defp merge_code_segment(right, [separator, left | rest]) when is_binary(separator) do
+    with "" <- String.trim_leading(separator),
+         false <- String.contains?(separator, ["\n", "\r"]),
+         {left_attrs, left_inner, left_meta} <- code_segment(left),
+         {right_attrs, right_inner, _right_meta} <- code_segment(right),
+         {:ok, attrs} <- merge_code_attrs(left_attrs, right_attrs) do
+      [{:code, attrs, left_inner ++ [separator] ++ right_inner, left_meta} | rest]
+    else
+      _ -> [right, separator, left | rest]
+    end
+  end
+
+  defp merge_code_segment(right, [left | rest]) do
+    with {left_attrs, left_inner, left_meta} <- code_segment(left),
+         {right_attrs, right_inner, _right_meta} <- code_segment(right),
+         {:ok, attrs} <- merge_code_attrs(left_attrs, right_attrs) do
+      [{:code, attrs, left_inner ++ code_joiner(left_inner) ++ right_inner, left_meta} | rest]
+    else
+      _ -> [right, left | rest]
+    end
+  end
+
+  defp merge_code_segment(node, []), do: [node]
+
+  defp code_segment({:code, attrs, inner, meta}), do: {attrs, inner, meta}
+
+  defp code_segment({:a, attrs, [{:code, code_attrs, inner, code_meta}], meta}) do
+    {code_attrs, [{:a, attrs, inner, meta}], code_meta}
+  end
+
+  defp code_segment(_), do: nil
+
+  defp code_joiner(inner) do
+    if String.ends_with?(text(inner), "="), do: [" "], else: []
+  end
+
+  defp merge_code_attrs(left, right) do
+    Enum.reduce_while(right, {:ok, left}, fn {key, value}, {:ok, attrs} ->
+      case Keyword.fetch(attrs, key) do
+        :error -> {:cont, {:ok, attrs ++ [{key, value}]}}
+        {:ok, ^value} -> {:cont, {:ok, attrs}}
+        {:ok, _value} -> {:halt, :error}
+      end
+    end)
+  end
+
+  @doc """
   Returns text content from the given AST.
   """
   def text(ast, joiner \\ "") do
