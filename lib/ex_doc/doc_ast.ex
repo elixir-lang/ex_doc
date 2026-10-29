@@ -205,7 +205,7 @@ defmodule ExDoc.DocAST do
   def merge_code_segments(ast), do: ast
 
   defp merge_code_segment(right, [separator, left | rest]) when is_binary(separator) do
-    with "" <- String.trim(separator),
+    with "" <- String.trim_leading(separator),
          false <- String.contains?(separator, ["\n", "\r"]),
          {left_attrs, left_inner, left_meta} <- code_segment(left),
          {right_attrs, right_inner, _right_meta} <- code_segment(right),
