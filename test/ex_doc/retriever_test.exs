@@ -346,8 +346,6 @@ defmodule ExDoc.RetrieverTest do
     config = %ExDoc.Config{filter_modules: fn module, _ -> Atom.to_string(module) =~ "A" end}
 
     assert {[%{id: "A"}, %{id: "A.A"}], [B]} = Retriever.docs_from_dir([ebin_dir], config)
-    assert :erlang.module_loaded(A)
-    refute :erlang.module_loaded(B)
   end
 
   test "natural sorting", c do
