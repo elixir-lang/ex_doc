@@ -206,6 +206,11 @@ defmodule ExDoc.Language.Erlang do
   end
 
   @impl true
+  def autolink_deprecated(message, _config) do
+    ExDoc.Utils.h(message)
+  end
+
+  @impl true
   def autolink_spec(ast, %Autolink{} = config) do
     {name, anno, quoted} =
       case ast do
