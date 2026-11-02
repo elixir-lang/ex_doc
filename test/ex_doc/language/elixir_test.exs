@@ -606,28 +606,28 @@ defmodule ExDoc.Language.ElixirTest do
     ## filtered_modules
 
     assert warn(fn ->
-             opts = opts ++ [filtered_modules: [%ExDoc.ModuleNode{module: String}]]
+             opts = opts ++ [filtered_modules: MapSet.new([String])]
 
              assert autolink_doc("`String`", opts) ==
                       ~s|<code class="inline">String</code>|
            end) =~ "reference to a filtered module"
 
     assert warn(fn ->
-             opts = opts ++ [filtered_modules: [%ExDoc.ModuleNode{module: String}]]
+             opts = opts ++ [filtered_modules: MapSet.new([String])]
 
              assert autolink_doc("`String.upcase/1`", opts) ==
                       ~s|<code class="inline">String.upcase/1</code>|
            end) =~ "reference to a filtered module"
 
     assert warn(fn ->
-             opts = opts ++ [filtered_modules: [%ExDoc.ModuleNode{module: String}]]
+             opts = opts ++ [filtered_modules: MapSet.new([String])]
 
              assert autolink_doc("`t:String.t/0`", opts) ==
                       ~s|<code class="inline">t:String.t/0</code>|
            end) =~ "reference to a filtered module"
 
     assert warn(fn ->
-             opts = opts ++ [filtered_modules: [%ExDoc.ModuleNode{module: String}]]
+             opts = opts ++ [filtered_modules: MapSet.new([String])]
              autolink_spec(quote(do: t() :: String.t()), opts)
            end) =~ "reference to a filtered module"
 

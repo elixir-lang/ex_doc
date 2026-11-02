@@ -24,7 +24,7 @@ defmodule ExDoc.Formatter do
   @optional_callbacks autolink_options: 0
 
   @doc false
-  def run(formatter, formatter_config, module_nodes, filtered_nodes, extras) do
+  def run(formatter, formatter_config, module_nodes, filtered_modules, extras) do
     if not Code.ensure_loaded?(formatter) do
       raise "formatter module #{inspect(formatter)} not found"
     end
@@ -35,7 +35,7 @@ defmodule ExDoc.Formatter do
     {module_nodes, extras} =
       if function_exported?(formatter, :autolink_options, 0) do
         autolink_opts = formatter.autolink_options()
-        autolink(formatter_config, module_nodes, filtered_nodes, extras, autolink_opts)
+        autolink(formatter_config, module_nodes, filtered_modules, extras, autolink_opts)
       else
         {module_nodes, extras}
       end
@@ -180,7 +180,7 @@ defmodule ExDoc.Formatter do
   ## Autolinking
 
   @doc false
-  def autolink(config, nodes, filtered_nodes, extras, opts) do
+  def autolink(config, nodes, filtered_modules, extras, opts) do
     {ext, highlight_opts} = Keyword.pop!(opts, :extension)
 
     language =
@@ -196,7 +196,7 @@ defmodule ExDoc.Formatter do
       extras: extra_paths(extras),
       skip_undefined_reference_warnings_on: config.skip_undefined_reference_warnings_on,
       skip_code_autolink_to: config.skip_code_autolink_to,
-      filtered_modules: filtered_nodes,
+      filtered_modules: MapSet.new(filtered_modules),
       assets: config.assets
     }
 

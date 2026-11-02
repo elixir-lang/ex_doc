@@ -32,7 +32,7 @@ defmodule ExDoc.Autolink do
   # * `:skip_code_autolink_to` - function that will be called with a term and return a boolean
   #    whether to skip autolinking to it.
   #
-  # * `:filtered_modules` - A list of module nodes that were filtered by the retriever
+  # * `:filtered_modules` - A set of the module names the retriever filtered out
   #
   # * `:warnings` - one of:
   #
@@ -61,7 +61,7 @@ defmodule ExDoc.Autolink do
       &ExDoc.Formatter.Config.skip_undefined_reference_warnings_on/1,
     skip_code_autolink_to: &ExDoc.Formatter.Config.skip_code_autolink_to/1,
     force_module_prefix: nil,
-    filtered_modules: [],
+    filtered_modules: MapSet.new(),
     assets: %{},
     warnings: :emit
   ]
@@ -78,7 +78,7 @@ defmodule ExDoc.Autolink do
   end
 
   defp string_app_module_url(tool, module, anchor, config) do
-    if Enum.any?(config.filtered_modules, &(&1.module == module)) do
+    if MapSet.member?(config.filtered_modules, module) do
       warn(config, "reference to a filtered module")
       nil
     else
