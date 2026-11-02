@@ -13,11 +13,11 @@ defmodule ExDoc.Retriever do
   @doc """
   Extract documentation from all modules in the specified directories.
 
-  Returns a tuple containing `{modules, filtered}`, using `config.filter_modules`
-  as a filter criteria.
+  Returns a tuple containing `{modules, filtered}`: the module nodes that
+  passed `config.filter_modules` and the names of the modules it rejected.
   """
   @spec docs_from_dir([Path.t()], ExDoc.Config.t()) ::
-          {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]}
+          {[ExDoc.ModuleNode.t()], [module()]}
   def docs_from_dir(dirs, config) when is_list(dirs) do
     dirs
     |> Enum.reduce({[], []}, &docs_from_dir(&1, &2, config))
@@ -34,33 +34,65 @@ defmodule ExDoc.Retriever do
 
   @doc """
   Extract documentation from all modules and returns a tuple containing
-  `{modules, filtered}`, two lists of modules that were extracted and filtered
-  by `config.filter_modules`, respectively.
+  `{modules, filtered}`: the module nodes that passed `config.filter_modules`
+  and the names of the modules it rejected.
   """
   @spec docs_from_modules([atom], ExDoc.Config.t()) ::
-          {[ExDoc.ModuleNode.t()], [ExDoc.ModuleNode.t()]}
+          {[ExDoc.ModuleNode.t()], [module()]}
   def docs_from_modules(modules, config) when is_list(modules) do
     modules |> docs_from_modules({[], []}, config) |> sort_modules(config)
   end
 
-  defp docs_from_modules(modules, acc, config) do
-    modules
-    |> Task.async_stream(&get_module(&1, config), timeout: :infinity)
-    |> Enum.reduce(acc, fn {:ok, result}, {modules, filtered} = acc ->
-      case result do
-        {:error, _module} ->
-          acc
+  # Filtering happens on the docs chunk alone, before the module is loaded and
+  # its specs, callbacks and docs are processed, so filtered modules cost only a
+  # chunk read. The kept modules are then loaded in one call: loading them one
+  # by one from several tasks serializes on the code server, which on large
+  # projects takes an order of magnitude longer than the rest of the retrieval.
+  defp docs_from_modules(modules, {acc_modules, acc_filtered}, config) do
+    {kept, filtered} =
+      modules
+      |> Task.async_stream(&filter_module(&1, config), timeout: :infinity)
+      |> Enum.reduce({[], acc_filtered}, fn
+        {:ok, {:kept, module, docs_chunk}}, {kept, filtered} ->
+          {[{module, docs_chunk} | kept], filtered}
 
-        {:ok, module_node} ->
-          if config.filter_modules.(module_node.module, module_node.metadata),
-            do: {[module_node | modules], filtered},
-            else: {modules, [module_node | filtered]}
-      end
-    end)
+        {:ok, {:filtered, module}}, {kept, filtered} ->
+          {kept, [module | filtered]}
+
+        {:ok, :skip}, acc ->
+          acc
+      end)
+
+    _ = Code.ensure_all_loaded(Enum.map(kept, &elem(&1, 0)))
+
+    modules =
+      kept
+      |> Task.async_stream(
+        fn {module, docs_chunk} -> get_module(module, docs_chunk, config) end,
+        timeout: :infinity
+      )
+      |> Enum.reduce(acc_modules, fn
+        {:ok, {:ok, module_node}}, modules -> [module_node | modules]
+        {:ok, {:error, _module}}, modules -> modules
+      end)
+
+    {modules, filtered}
+  end
+
+  defp filter_module(module, config) do
+    case docs_chunk(module) do
+      {:docs_v1, _, _, _, _, metadata, _} = docs_chunk ->
+        if config.filter_modules.(module, metadata),
+          do: {:kept, module, docs_chunk},
+          else: {:filtered, module}
+
+      _ ->
+        :skip
+    end
   end
 
   defp sort_modules({modules, filtered}, config) do
-    {sort_modules(modules, config), sort_modules(filtered, config)}
+    {sort_modules(modules, config), Enum.sort(filtered)}
   end
 
   defp sort_modules(modules, config) when is_list(modules) do
@@ -75,14 +107,25 @@ defmodule ExDoc.Retriever do
     String.to_atom(name)
   end
 
-  defp get_module(module, config) do
-    with {:docs_v1, _, language, _, _, _metadata, _} = docs_chunk <- docs_chunk(module),
+  defp get_module(module, {:docs_v1, _, language, _, _, _metadata, _} = docs_chunk, config) do
+    with {:module, _} <- ensure_loaded(module),
          {:ok, language} <- ExDoc.Language.get(language, module),
          %{} = module_data <- language.module_data(module, docs_chunk, config) do
       {:ok, generate_node(module, module_data, config)}
     else
       _ ->
         {:error, module}
+    end
+  end
+
+  defp ensure_loaded(module) do
+    case Code.ensure_loaded(module) do
+      {:module, _} = loaded ->
+        loaded
+
+      {:error, reason} ->
+        ExDoc.warn("skipping docs for module #{inspect(module)}, reason: #{reason}", [])
+        false
     end
   end
 
@@ -95,14 +138,7 @@ defmodule ExDoc.Retriever do
         false
 
       {:docs_v1, _, _, _, _, _, _} = docs ->
-        case Code.ensure_loaded(module) do
-          {:module, _} ->
-            docs
-
-          {:error, reason} ->
-            ExDoc.warn("skipping docs for module #{inspect(module)}, reason: #{reason}", [])
-            false
-        end
+        docs
 
       {:error, :chunk_not_found} ->
         false

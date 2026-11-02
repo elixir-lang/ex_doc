@@ -345,10 +345,7 @@ defmodule ExDoc.RetrieverTest do
     ebin_dir = Path.join(c.tmp_dir, "ebin")
     config = %ExDoc.Config{filter_modules: fn module, _ -> Atom.to_string(module) =~ "A" end}
 
-    assert {
-             [%{id: "A"}, %{id: "A.A"}],
-             [%{id: "B"}]
-           } = Retriever.docs_from_dir([ebin_dir], config)
+    assert {[%{id: "A"}, %{id: "A.A"}], [B]} = Retriever.docs_from_dir([ebin_dir], config)
   end
 
   test "natural sorting", c do

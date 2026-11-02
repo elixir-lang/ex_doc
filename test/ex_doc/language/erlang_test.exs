@@ -230,7 +230,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "filtered module", c do
-      opts = [filtered_modules: [%ExDoc.ModuleNode{module: :lists, id: "lists"}]]
+      opts = [filtered_modules: MapSet.new([:lists])]
 
       assert warn(fn ->
                assert autolink_edoc("{@link lists}", c, opts) ==
@@ -239,7 +239,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "filtered module function", c do
-      opts = [filtered_modules: [%ExDoc.ModuleNode{module: :lists, id: "lists"}]]
+      opts = [filtered_modules: MapSet.new([:lists])]
 
       assert warn(fn ->
                assert autolink_edoc("{@link lists:all/2}", c, opts) ==
@@ -548,7 +548,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "filtered module", c do
-      opts = [filtered_modules: [%ExDoc.ModuleNode{module: :lists, id: "lists"}]]
+      opts = [filtered_modules: MapSet.new([:lists])]
 
       assert warn(fn ->
                assert autolink_doc("`m:lists`", c, opts) ==
@@ -557,7 +557,7 @@ defmodule ExDoc.Language.ErlangTest do
     end
 
     test "filtered module callback", c do
-      opts = [filtered_modules: [%ExDoc.ModuleNode{module: :gen_server, id: "gen_server"}]]
+      opts = [filtered_modules: MapSet.new([:gen_server])]
 
       assert warn(fn ->
                assert autolink_doc("`c:gen_server:handle_call/3`", c, opts) ==
