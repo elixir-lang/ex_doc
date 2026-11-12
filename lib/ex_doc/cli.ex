@@ -51,11 +51,11 @@ defmodule ExDoc.CLI do
 
   defp generate(args, opts, generator) do
     [project, version | source_beams] = parse_args(args)
-    Code.prepend_paths(source_beams)
+    Code.prepend_paths(source_beams, cache: true)
 
     for path <- Keyword.get_values(opts, :paths),
         path <- Path.wildcard(path) do
-      Code.prepend_path(path)
+      Code.prepend_path(path, cache: true)
       app(path) |> Application.load()
     end
 
