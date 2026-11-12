@@ -24,7 +24,6 @@ defmodule ExDoc.Retriever do
     # directory at a time.
     dirs
     |> Enum.flat_map(&Path.wildcard(Path.expand("*.beam", &1)))
-    |> Enum.map(&filename_to_module/1)
     |> docs_from_modules({[], []}, config)
     |> sort_modules(config)
   end
@@ -76,8 +75,34 @@ defmodule ExDoc.Retriever do
     {modules, filtered}
   end
 
-  defp filter_module(module, config) do
-    case docs_chunk(module) do
+  defp filter_module(path, config) when is_binary(path) do
+    module = path |> Path.basename(".beam") |> String.to_atom()
+
+    # TODO: Remove the chunk fallback on Elixir ~> 1.21,
+    # as Code.fetch_docs/1 does it for paths too.
+    result =
+      case Code.fetch_docs(path) do
+        {:error, :chunk_not_found} ->
+          chunk_path = Path.expand("../../doc/chunks/#{module}.chunk", path)
+
+          case File.read(chunk_path) do
+            {:ok, bin} -> :erlang.binary_to_term(bin)
+            {:error, _} -> {:error, :chunk_not_found}
+          end
+
+        result ->
+          result
+      end
+
+    filter_module(module, result, config)
+  end
+
+  defp filter_module(module, config) when is_atom(module) do
+    filter_module(module, Code.fetch_docs(module), config)
+  end
+
+  defp filter_module(module, result, config) do
+    case docs_chunk(module, result) do
       {:docs_v1, _, _, _, _, metadata, _} = docs_chunk ->
         if config.filter_modules.(module, metadata),
           do: {:kept, module, docs_chunk},
@@ -97,11 +122,6 @@ defmodule ExDoc.Retriever do
       {Config.index(config.groups_for_modules, module.group), module.nested_context,
        module.nested_title, module.id}
     end)
-  end
-
-  defp filename_to_module(name) do
-    name = Path.basename(name, ".beam")
-    String.to_atom(name)
   end
 
   defp get_module(module, {:docs_v1, _, language, _, _, _metadata, _} = docs_chunk, config) do
@@ -126,8 +146,7 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp docs_chunk(module) do
-    result = Code.fetch_docs(module)
+  defp docs_chunk(module, result) do
     Refs.insert_from_chunk(module, result)
 
     case result do
