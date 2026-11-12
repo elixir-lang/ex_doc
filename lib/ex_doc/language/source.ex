@@ -22,12 +22,34 @@ defmodule ExDoc.Language.Source do
   have had their fields in-lined.
   """
   def get_abstract_code(module) do
-    with {^module, binary, _file} <- :code.get_object_code(module),
+    with binary when is_binary(binary) <- get_object_code(module),
          {:ok, {_, [{:abstract_code, {_vsn, abst_code}}]}} <-
            :beam_lib.chunks(binary, [:abstract_code]) do
       expand_records_in_types(abst_code)
     else
       _ -> nil
+    end
+  end
+
+  @doc """
+  Get the object code of a module, or `nil` if it cannot be found.
+
+  The beam file of a loaded module is read directly from the path it was
+  loaded from. `:code.get_object_code/1` would instead search the code path
+  and read the file through the code server and the primitive loader, which
+  are single processes, so concurrent callers queue up behind each other on
+  projects with many applications.
+  """
+  def get_object_code(module) do
+    with path when is_list(path) and path != [] <- :code.which(module),
+         {:ok, binary} <- File.read(path) do
+      binary
+    else
+      _ ->
+        case :code.get_object_code(module) do
+          {^module, binary, _file} -> binary
+          :error -> nil
+        end
     end
   end
 
