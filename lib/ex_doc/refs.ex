@@ -209,7 +209,7 @@ defmodule ExDoc.Refs do
   end
 
   defp types(module, kind_list) do
-    case Code.Typespec.fetch_types(module) do
+    case Code.Typespec.fetch_types(ExDoc.Language.Source.get_object_code(module) || module) do
       {:ok, list} ->
         for {kind, {name, _, args}} <- list,
             kind in kind_list do
