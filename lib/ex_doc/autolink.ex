@@ -114,6 +114,10 @@ defmodule ExDoc.Autolink do
   defp app_base_url(:otp, app), do: @otpappdocs <> "#{app}"
 
   defp app(module) do
+    ExDoc.Refs.memoize({:app, module}, fn -> find_app(module) end)
+  end
+
+  defp find_app(module) do
     case :code.which(module) do
       :preloaded ->
         :erts
@@ -150,8 +154,10 @@ defmodule ExDoc.Autolink do
   end
 
   defp is_app_otp(app) do
-    maybe_lib_dir_path = :code.lib_dir(app)
-    is_list(maybe_lib_dir_path) and List.starts_with?(maybe_lib_dir_path, :code.root_dir())
+    ExDoc.Refs.memoize({:otp_app?, app}, fn ->
+      maybe_lib_dir_path = :code.lib_dir(app)
+      is_list(maybe_lib_dir_path) and List.starts_with?(maybe_lib_dir_path, :code.root_dir())
+    end)
   end
 
   def maybe_warn(config, ref, visibility, metadata) do

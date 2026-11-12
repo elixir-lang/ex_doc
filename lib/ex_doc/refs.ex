@@ -17,6 +17,7 @@ defmodule ExDoc.Refs do
   @typep visibility() :: :hidden | :public | :undefined | :partial
 
   @name __MODULE__
+  @memo Module.concat(__MODULE__, Memo)
 
   use GenServer
 
@@ -28,13 +29,50 @@ defmodule ExDoc.Refs do
   @spec init(any()) :: {:ok, nil}
   def init(_) do
     :ets.new(@name, [:named_table, :public, :set])
+    :ets.new(@memo, [:named_table, :public, :set, read_concurrency: true])
     {:ok, nil}
   end
 
   @spec clear() :: :ok
   def clear() do
     :ets.delete_all_objects(@name)
+    :ets.delete_all_objects(@memo)
     :ok
+  end
+
+  @doc """
+  Returns the value of `fun`, computed once per `key` until the cache is cleared.
+
+  Used for lookups that go through the code server or the application
+  controller, which are single processes, and whose cost grows with the
+  number of entries in the code path and of loaded applications.
+  """
+  @spec memoize(term(), (-> value)) :: value when value: term()
+  def memoize(key, fun) do
+    case memo_lookup(key) do
+      {:ok, value} ->
+        value
+
+      :error ->
+        value = fun.()
+        memo_insert(key, value)
+        value
+    end
+  end
+
+  defp memo_lookup(key) do
+    case :ets.lookup(@memo, key) do
+      [{^key, value}] -> {:ok, value}
+      [] -> :error
+    end
+  rescue
+    _ -> :error
+  end
+
+  defp memo_insert(key, value) do
+    :ets.insert(@memo, {key, value})
+  rescue
+    _ -> true
   end
 
   @spec get_visibility(ref()) :: visibility()
