@@ -19,17 +19,14 @@ defmodule ExDoc.Retriever do
   @spec docs_from_dir([Path.t()], ExDoc.Config.t()) ::
           {[ExDoc.ModuleNode.t()], [module()]}
   def docs_from_dir(dirs, config) when is_list(dirs) do
+    # All directories are retrieved as a single batch, so projects made of
+    # many small applications are processed in parallel rather than one
+    # directory at a time.
     dirs
-    |> Enum.reduce({[], []}, &docs_from_dir(&1, &2, config))
-    |> sort_modules(config)
-  end
-
-  defp docs_from_dir(dir, acc, config) do
-    files = Path.wildcard(Path.expand("*.beam", dir))
-
-    files
+    |> Enum.flat_map(&Path.wildcard(Path.expand("*.beam", &1)))
     |> Enum.map(&filename_to_module/1)
-    |> docs_from_modules(acc, config)
+    |> docs_from_modules({[], []}, config)
+    |> sort_modules(config)
   end
 
   @doc """
