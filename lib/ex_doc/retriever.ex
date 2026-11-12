@@ -45,9 +45,20 @@ defmodule ExDoc.Retriever do
   # chunk read. The kept modules are then loaded in one call: loading them one
   # by one from several tasks serializes on the code server, which on large
   # projects takes an order of magnitude longer than the rest of the retrieval.
+  #
+  # Modules without a docs chunk are loaded too, so their references can be
+  # computed from their exports, callbacks and types. They are also loaded in
+  # one call, after all chunks have been fetched, for the same reason.
   defp docs_from_modules(modules, {acc_modules, acc_filtered}, config) do
-    {kept, filtered} =
+    chunks =
       modules
+      |> Task.async_stream(&{&1, Code.fetch_docs(&1)}, timeout: :infinity)
+      |> Enum.map(fn {:ok, chunk} -> chunk end)
+
+    _ = Code.ensure_all_loaded(for {module, {:error, _}} <- chunks, do: module)
+
+    {kept, filtered} =
+      chunks
       |> Task.async_stream(&filter_module(&1, config), timeout: :infinity)
       |> Enum.reduce({[], acc_filtered}, fn
         {:ok, {:kept, module, docs_chunk}}, {kept, filtered} ->
@@ -76,8 +87,8 @@ defmodule ExDoc.Retriever do
     {modules, filtered}
   end
 
-  defp filter_module(module, config) do
-    case docs_chunk(module) do
+  defp filter_module({module, result}, config) do
+    case docs_chunk(module, result) do
       {:docs_v1, _, _, _, _, metadata, _} = docs_chunk ->
         if config.filter_modules.(module, metadata),
           do: {:kept, module, docs_chunk},
@@ -126,8 +137,7 @@ defmodule ExDoc.Retriever do
     end
   end
 
-  defp docs_chunk(module) do
-    result = Code.fetch_docs(module)
+  defp docs_chunk(module, result) do
     Refs.insert_from_chunk(module, result)
 
     case result do
