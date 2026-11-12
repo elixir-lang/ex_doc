@@ -149,9 +149,19 @@ defmodule ExDoc.Autolink do
     end
   end
 
+  @doc false
+  def store_otp_apps do
+    apps =
+      case File.ls(:code.lib_dir()) do
+        {:ok, dirs} -> for dir <- dirs, do: dir |> String.split("-") |> hd() |> String.to_atom()
+        {:error, _} -> []
+      end
+
+    :persistent_term.put({__MODULE__, :otp_apps}, Map.from_keys([:erts | apps], true))
+  end
+
   defp is_app_otp(app) do
-    maybe_lib_dir_path = :code.lib_dir(app)
-    is_list(maybe_lib_dir_path) and List.starts_with?(maybe_lib_dir_path, :code.root_dir())
+    is_map_key(:persistent_term.get({__MODULE__, :otp_apps}), app)
   end
 
   def maybe_warn(config, ref, visibility, metadata) do

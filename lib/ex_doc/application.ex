@@ -12,6 +12,8 @@ defmodule ExDoc.Application do
     # Load applications so we can find their modules in docs
     Enum.each([:eex, :ex_unit, :iex, :logger, :mix], &Application.load/1)
 
+    ExDoc.Autolink.store_otp_apps()
+
     # Start all applications with the makeup prefix
     for {app, _, _} <- Application.loaded_applications(),
         match?("makeup_" <> _, Atom.to_string(app)) do
