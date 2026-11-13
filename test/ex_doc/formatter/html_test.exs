@@ -98,6 +98,7 @@ defmodule ExDoc.Formatter.HTMLTest do
                %{"id" => "OverlappingDefaults"},
                %{"id" => "TypesAndSpecs"},
                %{"id" => "TypesAndSpecs.Sub"},
+               %{"id" => "Deprecated"},
                %{"id" => "Warnings"},
                %{"id" => "RandomError"}
              ],

@@ -245,7 +245,12 @@ defmodule ExDoc.Formatter do
             specs =
               Enum.map(child_node.source_specs, &language.autolink_spec(&1, child_config))
 
-            child_node = %{child_node | specs: specs}
+            deprecated_doc =
+              child_node.deprecated &&
+                language.autolink_deprecated(child_node.deprecated, child_config)
+
+            child_node = %{child_node | specs: specs, deprecated_doc: deprecated_doc}
+
             autolink_doc(child_node, language, child_config, highlight_opts)
           end
 
@@ -258,6 +263,11 @@ defmodule ExDoc.Formatter do
         file: node.moduledoc_file,
         line: node.moduledoc_line
     }
+
+    deprecated_doc =
+      node.deprecated && language.autolink_deprecated(node.deprecated, module_config)
+
+    node = %{node | deprecated_doc: deprecated_doc}
 
     %{
       autolink_doc(node, language, module_config, highlight_opts)
