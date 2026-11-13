@@ -14,7 +14,7 @@ defmodule ExDoc.Refs do
            {:module, module()}
            | {kind(), module(), name :: atom(), arity()}
   @typep kind() :: :function | :callback | :type
-  @typep visibility() :: :hidden | :public | :undefined | :partial
+  @typep visibility() :: :hidden | :public | :undefined | :limited
 
   @name __MODULE__
 
