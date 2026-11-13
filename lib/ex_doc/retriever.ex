@@ -146,14 +146,17 @@ defmodule ExDoc.Retriever do
     end
   end
 
+  # Refs for modules without docs are left for Refs to fetch on demand,
+  # as computing them requires loading the module, which would serialize
+  # these tasks on the code server.
   defp docs_chunk(module, result) do
-    Refs.insert_from_chunk(module, result)
-
     case result do
       {:docs_v1, _, _, _, :hidden, _, _} ->
+        Refs.insert_from_chunk(module, result)
         false
 
       {:docs_v1, _, _, _, _, _, _} = docs ->
+        Refs.insert_from_chunk(module, result)
         docs
 
       {:error, :chunk_not_found} ->
