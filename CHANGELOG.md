@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.40.5
+
+  * Enhancements
+    * Add Tangled as a supported source URL pattern
+    * Update links format used for both hexdocs and erlang.org
+    * Mark retired versions in the version dropdown
+    * Resolve documentation links for private Hex dependencies
+    * Speed up documentation generation for large projects
+  * Bug fixes
+    * Escape ids, hrefs, and XHTML entities in the EPUB templates
+    * Skip comments when rendering EPUB templates
+    * Fix wrong stemming on HTML search results
+    * Normalize adjacent code nodes after autolinking while preserving link boundaries
+
 ## v0.40.4 (2026-09-03)
 
   * Enhancements
