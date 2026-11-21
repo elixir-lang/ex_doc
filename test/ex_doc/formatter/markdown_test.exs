@@ -195,6 +195,8 @@ defmodule ExDoc.Formatter.MarkdownTest do
 
       assert content =~ """
              - Deprecated
+               - [Deprecated](Deprecated.md): A module for testing deprecations.
+
                - [Warnings](Warnings.md): moduledoc `Warnings.bar/0`
 
              - Exceptions

@@ -95,6 +95,11 @@ defmodule ExDoc.Language do
               ExDoc.DocAST.t()
 
   @doc """
+  Autolinks deprecation messages.
+  """
+  @callback autolink_deprecated(message :: String.t(), config :: ExDoc.Autolink.t()) :: iodata()
+
+  @doc """
   Autolinks typespecs.
   """
   @callback autolink_spec(spec :: term(), config :: ExDoc.Autolink.t()) :: iodata()

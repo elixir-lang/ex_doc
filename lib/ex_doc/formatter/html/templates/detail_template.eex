@@ -18,9 +18,9 @@
       <% end %>
     </div>
   </div>
-  <%= if deprecated = node.deprecated do %>
+  <%= if deprecated = node.deprecated_doc do %>
     <div class="deprecated">
-      This <%= node.type %> is deprecated. <%= h(deprecated) %>.
+      This <%= node.type %> is deprecated. <%= deprecated %>.
     </div>
   <% end %>
 

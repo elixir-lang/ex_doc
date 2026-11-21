@@ -234,6 +234,19 @@ defmodule ExDoc.Formatter.EPUB.TemplatesTest do
       assert content =~ "<p>A content example.</p>"
     end
 
+    test "autolinks deprecation information" do
+      content = get_module_template([Deprecated])
+
+      assert content =~
+               ~r{<div class="deprecated">\s*This module is deprecated. Use <a href="#example_1/0"><code class="inline">example_1/0</code></a> or <a href="https://elixir.hexdocs.pm/String.html#to_atom/1"><code class="inline">String.to_atom/1</code></a> instead.}
+
+      assert content =~
+               ~r{<div class="deprecated">\s*This function is deprecated. Use something else instead.}
+
+      assert content =~
+               ~r{<div class="deprecated">\s*This function is deprecated. Use <a href="#example_1/0"><code class="inline">example_1/0</code></a> or <a href="https://elixir.hexdocs.pm/String.html#to_atom/1"><code class="inline">String.to_atom/1</code></a> instead.}
+    end
+
     test "outputs summaries" do
       content = get_module_template([CompiledWithDocs])
 
